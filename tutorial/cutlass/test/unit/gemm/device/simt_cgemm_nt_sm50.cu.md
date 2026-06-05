@@ -1,0 +1,3991 @@
+# simt_cgemm_nt_sm50.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/device/simt_cgemm_nt_sm50.cu`
+
+## Purpose / 目的
+- EN: This file tests SIMT complex GEMM kernels and verifies the targeted transpose/layout combinations on SM50.
+- CN: 该文件测试 SIMT 复数 GEMM 内核，并验证 SM50 上目标转置/布局组合。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `/*! \file`
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: `    \brief Tests for device-wide GEMM interface`
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: `#include <iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `#include "cutlass/cutlass.h"`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- **Line 38**: `#include "cutlass/gemm/device/gemm.h"`
+  - EN: Declares the standard device-level GEMM operator wrapper.
+  - CN: 声明标准设备级 GEMM 算子封装。
+- **Line 39**: `#include "cutlass/numeric_types.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `#include "../../common/cutlass_unit_test.h"`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 42**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 43**: `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 44**: `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 45**: `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- **Line 46**: `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 47**: `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 48**: `#include "cutlass/util/reference/host/gemm.h"`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- **Line 49**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: `#include "testbed.h"`
+  - EN: Local GEMM testbed that allocates tensors, runs kernels, and checks results.
+  - CN: 本地 GEMM 测试平台，负责分配张量、运行内核并校验结果。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 53**: `// Elements / Thread:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 54**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 55**: `//     Warps / Block:   1 x   1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 56**: `//       Threadblock:   8 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 57**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 8x32x8_8x32x1_2x4_4x8_1x1, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 58**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 59**: `    using ThreadblockShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 60**: `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 61**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 62**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 63**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 64**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 65**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 66**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 68**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 69**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 70**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 71**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 72**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 73**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 74**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 75**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 76**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 77**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 78**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 79**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 80**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 81**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 82**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 83**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 84**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 85**: `//     Warps / Block:   1 x   1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 86**: `//       Threadblock:  16 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 87**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 16x32x8_16x32x1_4x4_4x8_1x1, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 88**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 89**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 90**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 91**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 92**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 93**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 94**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 95**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 96**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 97**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 98**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 99**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 100**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 101**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 102**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 103**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 104**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 105**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 106**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 107**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 108**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 109**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 110**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 113**: `// Elements / Thread:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 114**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 115**: `//     Warps / Block:   1 x   1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 116**: `//       Threadblock:  16 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 117**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 16x64x8_16x64x1_4x8_4x8_1x1, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 118**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 119**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 120**: `    using WarpShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 121**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 122**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 123**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 124**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 125**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 126**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 127**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 128**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 129**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 130**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 131**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 132**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 133**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 134**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 135**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 136**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 137**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 138**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 139**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 140**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 141**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 142**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 143**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 144**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 145**: `//     Warps / Block:   1 x   1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 146**: `//       Threadblock:  32 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 147**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 32x32x8_32x32x1_8x4_4x8_1x1, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 148**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 149**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 150**: `    using WarpShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 151**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 152**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 153**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 154**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 155**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 156**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 157**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 158**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 159**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 160**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 161**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 162**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 163**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 164**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 165**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 166**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 167**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 168**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 169**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 170**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 171**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 172**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 173**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 174**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 175**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 176**: `//       Threadblock:   8 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 177**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 8x32x8_8x16x1_2x2_4x8_1x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 178**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 179**: `    using ThreadblockShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 180**: `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 181**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 182**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 183**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 184**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 185**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 186**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 187**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 188**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 189**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 190**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 191**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 192**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 193**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 194**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 195**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 196**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 197**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 198**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 199**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 200**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 201**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 202**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 203**: `// Elements / Thread:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 204**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 205**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 206**: `//       Threadblock:   8 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 207**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 8x64x8_8x32x1_2x4_4x8_1x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 208**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 209**: `    using ThreadblockShape = cutlass::gemm::GemmShape<8, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 210**: `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 211**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 212**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 213**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 214**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 215**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 216**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 217**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 218**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 219**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 220**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 221**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 222**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 223**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 224**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 225**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 226**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 227**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 228**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 229**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 230**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 231**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 232**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 233**: `// Elements / Thread:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 234**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 235**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 236**: `//       Threadblock:  16 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 237**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 16x32x8_16x16x1_4x2_4x8_1x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 238**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 239**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 240**: `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 241**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 242**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 243**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 244**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 245**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 246**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 247**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 248**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 249**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 250**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 251**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 252**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 253**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 254**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 255**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 256**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 257**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 258**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 259**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 260**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 261**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 262**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 263**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 264**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 265**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 266**: `//       Threadblock:  16 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 267**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 16x64x8_16x32x1_4x4_4x8_1x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 268**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 269**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 270**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 271**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 272**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 273**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 274**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 275**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 276**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 277**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 278**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 279**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 280**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 281**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 282**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 283**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 284**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 285**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 286**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 287**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 288**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 289**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 290**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 291**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 292**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 293**: `// Elements / Thread:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 294**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 295**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 296**: `//       Threadblock:  16 x 128 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 297**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 16x128x8_16x64x1_4x8_4x8_1x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 298**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 299**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 128, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 300**: `    using WarpShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 301**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 302**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 303**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 304**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 305**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 306**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 307**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 308**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 309**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 310**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 311**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 312**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 313**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 314**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 315**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 316**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 317**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 318**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 319**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 320**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 321**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 322**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 323**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 324**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 325**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 326**: `//       Threadblock:  32 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 327**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x32x8_32x16x1_4x4_8x4_1x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 328**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 329**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 330**: `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 331**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 332**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 333**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 334**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 335**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 336**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 337**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 338**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 339**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 340**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 341**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 342**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 343**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 344**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 345**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 346**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 347**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 348**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 349**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 350**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 351**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 352**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 353**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 354**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 355**: `//     Warps / Block:   1 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 356**: `//       Threadblock:  32 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 357**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 32x64x8_32x32x1_8x4_4x8_1x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 358**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 359**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 360**: `    using WarpShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 361**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 362**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 363**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 364**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 365**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 366**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 367**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 368**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 369**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 370**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 371**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 372**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 373**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 374**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 375**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 376**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 377**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 378**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 379**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 380**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 381**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 382**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 383**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 384**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 385**: `//     Warps / Block:   2 x   1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 386**: `//       Threadblock:  32 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 387**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x32x8_16x32x1_4x4_4x8_2x1, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 388**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 389**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 390**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 391**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 392**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 393**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 394**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 395**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 396**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 397**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 398**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 399**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 400**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 401**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 402**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 403**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 404**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 405**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 406**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 407**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 408**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 409**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 410**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 411**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 412**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 413**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 414**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 415**: `//     Warps / Block:   2 x   1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 416**: `//       Threadblock:  64 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 417**: `CUTLASS_TEST_L0(SM50_device_cgemm_nt, 64x32x8_32x32x1_8x4_4x8_2x1, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 418**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 419**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 420**: `    using WarpShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 421**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 422**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 423**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 424**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 425**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 426**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 427**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 428**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 429**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 430**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 431**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 432**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 433**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 434**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 435**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 436**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 437**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 438**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 439**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 440**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 441**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 442**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 443**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 444**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 445**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 446**: `//       Threadblock:  16 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 447**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 16x32x8_8x16x1_2x2_4x8_2x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 448**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 449**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 450**: `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 451**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 452**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 453**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 454**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 455**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 456**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 457**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 458**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 459**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 460**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 461**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 462**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 463**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 464**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 465**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 466**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 467**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 468**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 469**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 470**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 471**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 472**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 473**: `// Elements / Thread:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 474**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 475**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 476**: `//       Threadblock:  16 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 477**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 16x64x8_8x32x1_2x4_4x8_2x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 478**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 479**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 480**: `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 481**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 482**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 483**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 484**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 485**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 486**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 487**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 488**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 489**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 490**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 491**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 492**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 493**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 494**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 495**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 496**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 497**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 498**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 499**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 500**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 501**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 502**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 503**: `// Elements / Thread:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 504**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 505**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 506**: `//       Threadblock:  32 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 507**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x32x8_16x16x1_4x2_4x8_2x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 508**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 509**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 510**: `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 511**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 512**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 513**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 514**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 515**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 516**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 517**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 518**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 519**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 520**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 521**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 522**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 523**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 524**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 525**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 526**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 527**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 528**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 529**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 530**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 531**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 532**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 533**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 534**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 535**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 536**: `//       Threadblock:  32 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 537**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x64x8_16x32x1_4x4_4x8_2x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 538**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 539**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 540**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 541**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 542**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 543**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 544**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 545**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 546**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 547**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 548**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 549**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 550**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 551**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 552**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 553**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 554**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 555**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 556**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 557**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 558**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 559**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 560**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 561**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 562**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 563**: `// Elements / Thread:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 564**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 565**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 566**: `//       Threadblock:  32 x 128 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 567**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 32x128x8_16x64x1_4x8_4x8_2x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 568**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 569**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 128, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 570**: `    using WarpShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 571**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 572**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 573**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 574**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 575**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 576**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 577**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 578**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 579**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 580**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 581**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 582**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 583**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 584**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 585**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 586**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 587**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 588**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 589**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 590**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 591**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 592**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 593**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 594**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 595**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 596**: `//       Threadblock:  64 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 597**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 64x32x8_32x16x1_4x4_8x4_2x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 598**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 599**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 600**: `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 601**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 602**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 603**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 604**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 605**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 606**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 607**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 608**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 609**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 610**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 611**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 612**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 613**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 614**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 615**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 616**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 617**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 618**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 619**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 620**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 621**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 622**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 623**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 624**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 625**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 626**: `//       Threadblock:  64 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 627**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 64x64x8_32x32x1_8x4_4x8_2x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 628**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 629**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 630**: `    using WarpShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 631**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 632**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 633**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 634**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 635**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 636**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 637**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 638**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 639**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 640**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 641**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 642**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 643**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 644**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 645**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 646**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 647**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 648**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 649**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 650**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 651**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 652**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 653**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 654**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 655**: `//     Warps / Block:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 656**: `//       Threadblock: 128 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 657**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 128x32x8_64x16x1_8x4_8x4_2x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 658**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 659**: `    using ThreadblockShape = cutlass::gemm::GemmShape<128, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 660**: `    using WarpShape = cutlass::gemm::GemmShape<64, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 661**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 662**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 663**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 664**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 665**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 666**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 667**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 668**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 669**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 670**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 671**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 672**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 673**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 674**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 675**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 676**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 677**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 678**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 679**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 680**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 681**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 682**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 683**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 684**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 685**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 686**: `//       Threadblock:  16 x  64 x 16`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 687**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 16x64x16_8x16x1_2x2_4x8_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 688**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 689**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 16>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 690**: `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 16>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 691**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 692**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 693**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 694**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 695**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 696**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 697**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 698**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 699**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 700**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 701**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 702**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 703**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 704**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 705**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 706**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 707**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 708**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 709**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 710**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 711**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 712**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 713**: `// Elements / Thread:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 714**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 715**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 716**: `//       Threadblock:  16 x 128 x 16`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 717**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 16x128x16_8x32x1_2x4_4x8_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 718**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 719**: `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 128, 16>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 720**: `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 16>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 721**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 722**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 723**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 724**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 725**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 726**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 727**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 728**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 729**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 730**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 731**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 732**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 733**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 734**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 735**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 736**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 737**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 738**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 739**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 740**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 741**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 742**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 743**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 744**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 745**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 746**: `//       Threadblock:  32 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 747**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x32x8_16x8x1_2x2_8x4_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 748**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 749**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 750**: `    using WarpShape = cutlass::gemm::GemmShape<16, 8, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 751**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 752**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 753**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 754**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 755**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 756**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 757**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 758**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 759**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 760**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 761**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 762**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 763**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 764**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 765**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 766**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 767**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 768**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 769**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 770**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 771**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 772**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 773**: `// Elements / Thread:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 774**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 775**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 776**: `//       Threadblock:  32 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 777**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x64x8_16x16x1_4x2_4x8_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 778**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 779**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 780**: `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 781**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 782**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 783**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 784**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 785**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 786**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 787**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 788**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 789**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 790**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 791**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 792**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 793**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 794**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 795**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 796**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 797**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 798**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 799**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 800**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 801**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 802**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 803**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 804**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 805**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 806**: `//       Threadblock:  32 x 128 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 807**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x128x8_16x32x1_4x4_4x8_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 808**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 809**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 128, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 810**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 811**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 812**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 813**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 814**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 815**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 816**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 817**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 818**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 819**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 820**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 821**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 822**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 823**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 824**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 825**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 826**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 827**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 828**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 829**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 830**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 831**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 832**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 833**: `// Elements / Thread:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 834**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 835**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 836**: `//       Threadblock:  32 x 256 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 837**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 32x256x8_16x64x1_4x8_4x8_2x4, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 838**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 839**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 256, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 840**: `    using WarpShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 841**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 842**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 843**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 844**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 845**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 846**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 847**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 848**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 849**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 850**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 851**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 852**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 853**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 854**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 855**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 856**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 857**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 858**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 859**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 860**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 861**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 862**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 863**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 864**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 865**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 866**: `//       Threadblock:  64 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 867**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 64x64x8_32x16x1_4x4_8x4_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 868**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 869**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 870**: `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 871**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 872**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 873**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 874**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 875**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 876**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 877**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 878**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 879**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 880**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 881**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 882**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 883**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 884**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 885**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 886**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 887**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 888**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 889**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 890**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 891**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 892**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 893**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 894**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 895**: `//     Warps / Block:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 896**: `//       Threadblock:  64 x 128 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 897**: `CUTLASS_TEST_L0(SM50_device_cgemm_nt, 64x128x8_32x32x1_8x4_4x8_2x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 898**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 899**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 128, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 900**: `    using WarpShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 901**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 902**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 903**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 904**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 905**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 906**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 907**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 908**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 909**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 910**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 911**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 912**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 913**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 914**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 915**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 916**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 917**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 918**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 919**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 920**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 921**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 922**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 923**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 924**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 925**: `//     Warps / Block:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 926**: `//       Threadblock:  32 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 927**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x32x8_8x16x1_2x2_4x8_4x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 928**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 929**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 930**: `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 931**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 932**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 933**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 934**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 935**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 936**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 937**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 938**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 939**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 940**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 941**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 942**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 943**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 944**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 945**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 946**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 947**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 948**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 949**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 950**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 951**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 952**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 953**: `// Elements / Thread:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 954**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 955**: `//     Warps / Block:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 956**: `//       Threadblock:  64 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 957**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 64x32x8_16x16x1_4x2_4x8_4x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 958**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 959**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 960**: `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 961**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 962**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 963**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 964**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 965**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 966**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 967**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 968**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 969**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 970**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 971**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 972**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 973**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 974**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 975**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 976**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 977**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 978**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 979**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 980**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 981**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 982**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 983**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 984**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 985**: `//     Warps / Block:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 986**: `//       Threadblock:  64 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 987**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 64x64x8_16x32x1_4x4_4x8_4x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 988**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 989**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 990**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 991**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 992**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 993**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 994**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 995**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 996**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 997**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 998**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 999**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1000**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1001**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1002**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1003**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1004**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1005**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1006**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1007**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1008**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1009**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1010**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1011**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1012**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1013**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1014**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1015**: `//     Warps / Block:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1016**: `//       Threadblock: 128 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1017**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 128x32x8_32x16x1_4x4_8x4_4x2, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1018**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1019**: `    using ThreadblockShape = cutlass::gemm::GemmShape<128, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1020**: `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1021**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1022**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1023**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1024**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1025**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1026**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1027**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1028**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1029**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1030**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1031**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1032**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1033**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1034**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1035**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1036**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1037**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1038**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1039**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1040**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1041**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1042**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1043**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1044**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1045**: `//     Warps / Block:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1046**: `//       Threadblock: 128 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1047**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 128x64x8_32x32x1_8x4_4x8_4x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 1048**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1049**: `    using ThreadblockShape = cutlass::gemm::GemmShape<128, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1050**: `    using WarpShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1051**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1052**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1053**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1054**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1055**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1056**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1057**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1058**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1059**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1060**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1061**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1062**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1063**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1064**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1065**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1066**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1067**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1068**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1069**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1070**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 1071**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1072**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1073**: `// Elements / Thread:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1074**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1075**: `//     Warps / Block:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1076**: `//       Threadblock: 256 x  32 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1077**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 256x32x8_64x16x1_8x4_8x4_4x2, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 1078**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1079**: `    using ThreadblockShape = cutlass::gemm::GemmShape<256, 32, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1080**: `    using WarpShape = cutlass::gemm::GemmShape<64, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1081**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1082**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1083**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1084**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1085**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1086**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1087**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1088**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1089**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1090**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1091**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1092**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1093**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1094**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1095**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1096**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1097**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1098**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1099**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1100**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 1101**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1102**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1103**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1104**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1105**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1106**: `//       Threadblock:  32 x  64 x 16`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1107**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x64x16_8x16x1_2x2_4x8_4x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1108**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1109**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 16>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1110**: `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 16>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1112**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1113**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1114**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1115**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1116**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1117**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1118**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1119**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1120**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1121**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1122**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1123**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1124**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1125**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1126**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1127**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1128**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1129**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1130**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1131**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1132**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1133**: `// Elements / Thread:   2 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1134**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1135**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1136**: `//       Threadblock:  32 x 128 x 16`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1137**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 32x128x16_8x32x1_2x4_4x8_4x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1138**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1139**: `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 128, 16>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1140**: `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 16>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1141**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1142**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1143**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1144**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1145**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1146**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1147**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1148**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1149**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1150**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1151**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1152**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1153**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1154**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1155**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1156**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1157**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1158**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1159**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1160**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1161**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1162**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1163**: `// Elements / Thread:   2 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1164**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1165**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1166**: `//       Threadblock:  64 x  32 x 16`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1167**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 64x32x16_16x8x1_2x2_8x4_4x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1168**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1169**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 16>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1170**: `    using WarpShape = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1171**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1172**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1173**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1174**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1175**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1176**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1177**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1178**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1179**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1180**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1181**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1182**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1183**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1184**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1185**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1186**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1187**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1188**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1189**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1190**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1191**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1192**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1193**: `// Elements / Thread:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1194**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1195**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1196**: `//       Threadblock:  64 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1197**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 64x64x8_16x16x1_4x2_4x8_4x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1198**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1199**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1200**: `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1201**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1202**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1203**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1204**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1205**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1206**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1207**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1208**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1209**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1210**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1211**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1212**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1213**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1214**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1215**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1216**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1217**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1218**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1219**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1220**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1221**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1222**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1223**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1224**: `//    Threads / Warp:   4 x   8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1225**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1226**: `//       Threadblock:  64 x 128 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1227**: `CUTLASS_TEST_L1(SM50_device_cgemm_nt, 64x128x8_16x32x1_4x4_4x8_4x4, {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 1228**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1229**: `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 128, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1230**: `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1231**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1232**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1233**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1234**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1235**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1236**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1237**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1238**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1239**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1240**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1241**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1242**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1243**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1244**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1245**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1246**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1247**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1248**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1249**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1250**: `} )`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 1251**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1252**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1253**: `// Elements / Thread:   4 x   2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1254**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1255**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1256**: `//       Threadblock: 128 x  32 x 16`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1257**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 128x32x16_32x8x1_4x2_8x4_4x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1258**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1259**: `    using ThreadblockShape = cutlass::gemm::GemmShape<128, 32, 16>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1260**: `    using WarpShape = cutlass::gemm::GemmShape<32, 8, 16>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1261**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1262**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1263**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1264**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1265**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1266**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1267**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1268**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1269**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1270**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1271**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1272**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1273**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1274**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1275**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1276**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1277**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1278**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1279**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1280**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1281**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1282**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1283**: `// Elements / Thread:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1284**: `//    Threads / Warp:   8 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1285**: `//     Warps / Block:   4 x   4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1286**: `//       Threadblock: 128 x  64 x  8`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1287**: `CUTLASS_TEST_L2(SM50_device_cgemm_nt, 128x64x8_32x16x1_4x4_8x4_4x4, {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1288**: `    using precision = cutlass::complex<float>;`
+  - EN: Creates type alias `precision` to simplify later code.
+  - CN: 创建类型别名 `precision` 以简化后续代码。
+- **Line 1289**: `    using ThreadblockShape = cutlass::gemm::GemmShape<128, 64, 8>;`
+  - EN: Creates type alias `ThreadblockShape` to simplify later code.
+  - CN: 创建类型别名 `ThreadblockShape` 以简化后续代码。
+- **Line 1290**: `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates type alias `WarpShape` to simplify later code.
+  - CN: 创建类型别名 `WarpShape` 以简化后续代码。
+- **Line 1291**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1292**: `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1293**: `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates type alias `InstructionShape` to simplify later code.
+  - CN: 创建类型别名 `InstructionShape` 以简化后续代码。
+- **Line 1294**: `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 1295**: `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1296**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1297**: `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Begins alias `Gemm` for a fully specified device GEMM operator type.
+  - CN: 开始为完全指定的设备 GEMM 算子类型定义别名 `Gemm`。
+- **Line 1298**: `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1299**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1300**: `        precision, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1301**: `        precision,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1302**: `        cutlass::arch::OpClassSimt,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 1303**: `        cutlass::arch::Sm50,`
+  - EN: Targets the `Sm50` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm50`。
+- **Line 1304**: `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1305**: `        EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1306**: `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 1307**: `        2 // Stages`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1308**: `    >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1309**: `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1310**: `} )`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1311**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+
+## Key Concepts / 关键概念
+- `CUTLASS_TEST_L1`
+  - EN: Uses CUTLASS L1 test macros to register lightweight parameterized kernel checks.
+  - CN: 使用 CUTLASS 的 L1 测试宏注册轻量级参数化内核检查。
+- `cutlass::gemm::device::Gemm<`
+  - EN: Instantiates a device-level GEMM operator directly from explicit template arguments.
+  - CN: 通过显式模板参数直接实例化设备级 GEMM 算子。
+- `GemmShape<`
+  - EN: Encodes threadblock, warp, and instruction tile sizes that determine kernel decomposition.
+  - CN: 编码线程块、warp 和指令级 tile 尺寸，以决定内核分解方式。
+
+## Dependencies / 依赖关系
+- `<iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- `cutlass/cutlass.h`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- `cutlass/gemm/device/gemm.h`
+  - EN: Declares the standard device-level GEMM operator wrapper.
+  - CN: 声明标准设备级 GEMM 算子封装。
+- `cutlass/numeric_types.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- `testbed.h`
+  - EN: Local GEMM testbed that allocates tensors, runs kernels, and checks results.
+  - CN: 本地 GEMM 测试平台，负责分配张量、运行内核并校验结果。

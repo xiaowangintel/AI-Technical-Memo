@@ -1,0 +1,452 @@
+# device_nhwc_to_nchw.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/device_nhwc_to_nchw.h`
+**Purpose / 用途**: Provides CUDA device utilities for nhwc to nchw. / 提供与 nhwc to nchw 相关的 CUDA 设备端工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code> * \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L36** <code> * \brief cuda kernels to transform a device memory tensor from NHWC layout to NCHW layout.</code>
+  - EN: Comment that documents intent or context: "\brief cuda kernels to transform a device memory tensor from NHWC layout to NCHW layout.".
+  - CN: 用于说明意图或上下文的注释："\brief cuda kernels to transform a device memory tensor from NHWC layout to NCHW layout."。
+- **L37** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/layout/tensor.h&quot;</code>
+  - EN: Includes `cutlass/layout/tensor.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/tensor.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L41** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L42** <code>#include &quot;cutlass/tensor_coord.h&quot;</code>
+  - EN: Includes `cutlass/tensor_coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/tensor_ref.h&quot;</code>
+  - EN: Includes `cutlass/tensor_ref.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_ref.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>/** \brief interface to transform a device memory tensor from NHWC layout to NCHW layout.</code>
+  - EN: Comment that documents intent or context: "\brief interface to transform a device memory tensor from NHWC layout to NCHW layout.".
+  - CN: 用于说明意图或上下文的注释："\brief interface to transform a device memory tensor from NHWC layout to NCHW layout."。
+- **L48** <code> * \tparam T: data type</code>
+  - EN: Comment that documents intent or context: "\tparam T: data type".
+  - CN: 用于说明意图或上下文的注释："\tparam T: data type"。
+- **L49** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L50** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L51** <code>void nhwc_to_nchw(cutlass::Tensor4DCoord input_tensor_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `nhwc_to_nchw`.
+  - CN: 开始或继续与 `nhwc_to_nchw` 相关的签名/调用语法。
+- **L52** <code>                  cutlass::Tensor4DCoord output_tensor_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L53** <code>                  TensorRef&lt;T, layout::TensorNHWC&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L54** <code>                  TensorRef&lt;T, layout::TensorNCHW&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L55** <code>                  cudaStream_t stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L59** <code>__global__ void nhwc_to_nchw_kernel(T *output, </code>
+  - EN: Begins or continues the signature/call syntax involving `nhwc_to_nchw_kernel`.
+  - CN: 开始或继续与 `nhwc_to_nchw_kernel` 相关的签名/调用语法。
+- **L60** <code>                                    const T *input, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L61** <code>                                    const int n,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L62** <code>                                    const int h, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L63** <code>                                    const int w, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L64** <code>                                    const int c) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L65** <code> </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>  const int hw = h*w;</code>
+  - EN: Assigns or initializes `hw` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `hw` 进行赋值或初始化。
+- **L67** <code>  const int hwc = hw*c;</code>
+  - EN: Assigns or initializes `hwc` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `hwc` 进行赋值或初始化。
+- **L68** <code>  __shared__ T shbuf[32 * (32 + 1)]; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L69** <code>  const int32_t tid  = threadIdx.y*blockDim.x + threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L70** <code>  const int32_t wid  = tid / 32; </code>
+  - EN: Assigns or initializes `wid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `wid` 进行赋值或初始化。
+- **L71** <code>  const int32_t lid  = tid % 32; </code>
+  - EN: Assigns or initializes `lid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `lid` 进行赋值或初始化。
+- **L72** <code>  const int32_t ni   = blockIdx.z;</code>
+  - EN: Assigns or initializes `ni` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ni` 进行赋值或初始化。
+- **L73** <code>  const int32_t hwi0  = blockIdx.y * 32;  </code>
+  - EN: Assigns or initializes `hwi0` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `hwi0` 进行赋值或初始化。
+- **L74** <code>  const int32_t ci0 = blockIdx.x * 32;  </code>
+  - EN: Assigns or initializes `ci0` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ci0` 进行赋值或初始化。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>  const size_t input_idx = ni * hwc + (hwi0 + wid) * c + ci0;</code>
+  - EN: Assigns or initializes `input_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `input_idx` 进行赋值或初始化。
+- **L77** <code>  const T *A = input + input_idx;</code>
+  - EN: Assigns or initializes `A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `A` 进行赋值或初始化。
+- **L78** <code>  if (ci0 + lid &lt; c) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L79** <code>    const int lid_x_33 = lid * 33;</code>
+  - EN: Assigns or initializes `lid_x_33` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `lid_x_33` 进行赋值或初始化。
+- **L80** <code>    if ((hwi0 + 32) &lt;= hw) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L81** <code>      int hwi = wid;  // between 0 and 7</code>
+  - EN: Assigns or initializes `hwi` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `hwi` 进行赋值或初始化。
+- **L82** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L83** <code>      for (int cLoopIdx = 0; cLoopIdx &lt; 4; cLoopIdx++) { </code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L84** <code>        shbuf[lid_x_33 + hwi] = A[lid];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L85** <code>        A                     = &amp;A[8 * c];</code>
+  - EN: Assigns or initializes `A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `A` 进行赋值或初始化。
+- **L86** <code>        hwi += 8;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L87** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L88** <code>    } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L89** <code>      for (int hwi = wid; hwi &lt; 32; hwi += 8) { </code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L90** <code>        if ((hwi + hwi0) &lt; hw) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L91** <code>          shbuf[lid_x_33 + hwi] = A[lid];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L92** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L93** <code>        A = &amp;A[8 * c];</code>
+  - EN: Assigns or initializes `A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `A` 进行赋值或初始化。
+- **L94** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L95** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L96** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L97** <code>  __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>  const int32_t hwiOut = hwi0 + lid;</code>
+  - EN: Assigns or initializes `hwiOut` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `hwiOut` 进行赋值或初始化。
+- **L100** <code>  output = &amp;output[ni * hwc + hwiOut];</code>
+  - EN: Assigns or initializes `output` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output` 进行赋值或初始化。
+- **L101** <code>  if (hwiOut &lt; hw) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L102** <code>    if (ci0 + 32 &lt; c) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L103** <code>      int cI = wid;</code>
+  - EN: Assigns or initializes `cI` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `cI` 进行赋值或初始化。
+- **L104** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L105** <code>      for (int hwLoopIdx = 0; hwLoopIdx &lt; 4; ++hwLoopIdx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L106** <code>        output[(ci0 + cI) * hw] = shbuf[(cI)*33 + lid];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L107** <code>        cI += 8;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L108** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L109** <code>    } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L110** <code>      for (int cI = wid; cI &lt; 32; cI += 8) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L111** <code>        if (ci0 + cI &lt; c) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L112** <code>          output[(ci0 + cI) * hw] = shbuf[(cI)*33 + lid];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L113** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L114** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L116** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L117** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L118** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L119** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L120** <code>void nhwc_to_nchw(cutlass::Tensor4DCoord input_tensor_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `nhwc_to_nchw`.
+  - CN: 开始或继续与 `nhwc_to_nchw` 相关的签名/调用语法。
+- **L121** <code>                  cutlass::Tensor4DCoord output_tensor_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L122** <code>                  TensorRef&lt;T, layout::TensorNHWC&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L123** <code>                  TensorRef&lt;T, layout::TensorNCHW&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L124** <code>                  cudaStream_t stream) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L125** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L126** <code>  assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `assert`.
+  - CN: 开始或继续与 `assert` 相关的签名/调用语法。
+- **L127** <code>    input_tensor_size.n() == output_tensor_size.n() &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `n`.
+  - CN: 开始或继续与 `n` 相关的签名/调用语法。
+- **L128** <code>    input_tensor_size.h() == output_tensor_size.c() &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `c`.
+  - CN: 开始或继续与 `c` 相关的签名/调用语法。
+- **L129** <code>    input_tensor_size.w() == output_tensor_size.h() &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `h`.
+  - CN: 开始或继续与 `h` 相关的签名/调用语法。
+- **L130** <code>    input_tensor_size.c() == output_tensor_size.w());</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>  int n = input_tensor_size.n();</code>
+  - EN: Declares function or method `n` without defining it here.
+  - CN: 声明函数或方法 `n`，但不在此处给出定义。
+- **L133** <code>  int h = input_tensor_size.h();</code>
+  - EN: Declares function or method `h` without defining it here.
+  - CN: 声明函数或方法 `h`，但不在此处给出定义。
+- **L134** <code>  int w = input_tensor_size.w();</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L135** <code>  int c = input_tensor_size.c();</code>
+  - EN: Declares function or method `c` without defining it here.
+  - CN: 声明函数或方法 `c`，但不在此处给出定义。
+- **L136** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L137** <code>  dim3 grid((c + 31)/32, (h*w + 31)/32, n);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L138** <code>  dim3 block(32, 8);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L139** <code>  nhwc_to_nchw_kernel&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(ref_output.data(), ref_input.data(), </code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L140** <code>                                                  n, h, w, c);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L141** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L142** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L143** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L144** <code>} //namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/tensor.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_ref.h</code> — general CUTLASS declarations / CUTLASS 通用声明

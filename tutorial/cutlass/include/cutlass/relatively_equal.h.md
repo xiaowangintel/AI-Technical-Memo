@@ -1,0 +1,944 @@
+# relatively_equal.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/relatively_equal.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Performs comparison between two elements with support for floating-point comparisons." and defines related CUTLASS facilities in `include/cutlass/relatively_equal.h`.
+- CN: 该头文件以注释摘要“Performs comparison between two elements with support for floating-point comparisons.”引入，并在 `include/cutlass/relatively_equal.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/* \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>  \brief Performs comparison between two elements with support for floating-point comparisons.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L34**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L35**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L36**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L37**: <code>#include &quot;numeric_types.h&quot;</code>
+  - EN: Includes "numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;complex.h&quot;</code>
+  - EN: Includes "complex.h" so this file can use declarations from that dependency.
+  - CN: 包含 "complex.h"，以便本文件使用该依赖中的声明。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L41**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L42**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>template &lt;typename T, typename U = T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L45**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L46**: <code>bool relatively_equal(T a, T b, U epsilon, U nonzero_floor);</code>
+  - EN: Declares the callable or operator `relatively_equal`.
+  - CN: 声明可调用对象或运算符 `relatively_equal`。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>// This floating-point comparison function implements the method described in</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L53**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L54**: <code>// https://floating-point-gui.de/errors/comparison/</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L55**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L56**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L57**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L58**: <code>bool relatively_equal_float(T a, T b, T epsilon, T nonzero_floor) {</code>
+  - EN: Starts the definition body for `relatively_equal_float`.
+  - CN: 开始 `relatively_equal_float` 的定义体。
+- **L59**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L60**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L61**: <code>  using cuda::std::abs;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L62**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L63**: <code>  using std::abs;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L64**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>  T abs_A = abs(a);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L67**: <code>  T abs_B = abs(b);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L68**: <code>  T diff = abs(a - b);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L69**: <code>  T zero = T(0);</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L70**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L71**: <code>  if (a == b) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L72**: <code>    return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L73**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L74**: <code>  else if (a == zero || b == zero || (abs_A + abs_B) &lt; nonzero_floor) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L75**: <code>    return diff &lt; epsilon * nonzero_floor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L76**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L77**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L78**: <code>  return diff &lt; epsilon * (abs_A + abs_B);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L79**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L82**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L83**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L84**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L85**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L86**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L87**: <code>bool relatively_equal&lt;bool&gt;(bool a, bool b, bool, bool) {</code>
+  - EN: Starts the definition body for `bool`.
+  - CN: 开始 `bool` 的定义体。
+- **L88**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L89**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L90**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L91**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L92**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L93**: <code>bool relatively_equal&lt;uint1b_t&gt;(uint1b_t a, uint1b_t b, uint1b_t, uint1b_t) {</code>
+  - EN: Starts the definition body for `uint1b_t`.
+  - CN: 开始 `uint1b_t` 的定义体。
+- **L94**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L95**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L96**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L97**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L98**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L99**: <code>bool relatively_equal&lt;int2b_t&gt;(int2b_t a, int2b_t b, int2b_t, int2b_t) {</code>
+  - EN: Starts the definition body for `int2b_t`.
+  - CN: 开始 `int2b_t` 的定义体。
+- **L100**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L101**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L104**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L105**: <code>bool relatively_equal&lt;uint2b_t&gt;(uint2b_t a, uint2b_t b, uint2b_t, uint2b_t) {</code>
+  - EN: Starts the definition body for `uint2b_t`.
+  - CN: 开始 `uint2b_t` 的定义体。
+- **L106**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L107**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L109**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L110**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L111**: <code>bool relatively_equal&lt;int4b_t&gt;(int4b_t a, int4b_t b, int4b_t, int4b_t) {</code>
+  - EN: Starts the definition body for `int4b_t`.
+  - CN: 开始 `int4b_t` 的定义体。
+- **L112**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L113**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L114**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L115**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L116**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L117**: <code>bool relatively_equal&lt;uint4b_t&gt;(uint4b_t a, uint4b_t b, uint4b_t, uint4b_t) {</code>
+  - EN: Starts the definition body for `uint4b_t`.
+  - CN: 开始 `uint4b_t` 的定义体。
+- **L118**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L119**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L120**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L121**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L122**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L123**: <code>bool relatively_equal&lt;int8_t&gt;(int8_t a, int8_t b, int8_t, int8_t) {</code>
+  - EN: Starts the definition body for `int8_t`.
+  - CN: 开始 `int8_t` 的定义体。
+- **L124**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L125**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L126**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L127**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L128**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L129**: <code>bool relatively_equal&lt;uint8_t&gt;(uint8_t a, uint8_t b, uint8_t, uint8_t) {</code>
+  - EN: Starts the definition body for `uint8_t`.
+  - CN: 开始 `uint8_t` 的定义体。
+- **L130**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L131**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L132**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L133**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L134**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L135**: <code>bool relatively_equal&lt;int16_t&gt;(int16_t a, int16_t b, int16_t, int16_t) {</code>
+  - EN: Starts the definition body for `int16_t`.
+  - CN: 开始 `int16_t` 的定义体。
+- **L136**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L137**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L138**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L139**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L140**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L141**: <code>bool relatively_equal&lt;uint16_t&gt;(uint16_t a, uint16_t b, uint16_t, uint16_t) {</code>
+  - EN: Starts the definition body for `uint16_t`.
+  - CN: 开始 `uint16_t` 的定义体。
+- **L142**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L143**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L144**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L145**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L146**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L147**: <code>bool relatively_equal&lt;int32_t&gt;(int32_t a, int32_t b, int32_t, int32_t) {</code>
+  - EN: Starts the definition body for `int32_t`.
+  - CN: 开始 `int32_t` 的定义体。
+- **L148**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L149**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L150**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L151**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L152**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L153**: <code>bool relatively_equal&lt;uint32_t&gt;(uint32_t a, uint32_t b, uint32_t, uint32_t) {</code>
+  - EN: Starts the definition body for `uint32_t`.
+  - CN: 开始 `uint32_t` 的定义体。
+- **L154**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L155**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L156**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L157**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L158**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L159**: <code>bool relatively_equal&lt;int64_t&gt;(int64_t a, int64_t b, int64_t, int64_t) {</code>
+  - EN: Starts the definition body for `int64_t`.
+  - CN: 开始 `int64_t` 的定义体。
+- **L160**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L161**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L162**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L163**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L164**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L165**: <code>bool relatively_equal&lt;uint64_t&gt;(uint64_t a, uint64_t b, uint64_t, uint64_t) {</code>
+  - EN: Starts the definition body for `uint64_t`.
+  - CN: 开始 `uint64_t` 的定义体。
+- **L166**: <code>  return (a == b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L167**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L168**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L169**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L170**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L171**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L172**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L173**: <code>bool relatively_equal&lt;float_e4m3_t&gt;(float_e4m3_t a, float_e4m3_t b, float_e4m3_t epsilon, float_e4m3_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_e4m3_t`.
+  - CN: 开始 `float_e4m3_t` 的定义体。
+- **L174**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L175**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L176**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L177**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L178**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L179**: <code>bool relatively_equal&lt;float_e5m2_t&gt;(float_e5m2_t a, float_e5m2_t b, float_e5m2_t epsilon, float_e5m2_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_e5m2_t`.
+  - CN: 开始 `float_e5m2_t` 的定义体。
+- **L180**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L181**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L182**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L183**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L184**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L185**: <code>bool relatively_equal&lt;half_t&gt;(half_t a, half_t b, half_t epsilon, half_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `half_t`.
+  - CN: 开始 `half_t` 的定义体。
+- **L186**: <code>  return detail::relatively_equal_float(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L187**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L189**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L190**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L191**: <code>bool relatively_equal&lt;bfloat16_t&gt;(</code>
+  - EN: Begins or continues the signature/parameter list for `bfloat16_t`.
+  - CN: 开始或继续 `bfloat16_t` 的签名/参数列表。
+- **L192**: <code>  bfloat16_t a, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L193**: <code>  bfloat16_t b, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L194**: <code>  bfloat16_t epsilon, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L195**: <code>  bfloat16_t nonzero_floor) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L196**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L197**: <code>  return detail::relatively_equal_float(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L198**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L199**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L200**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L201**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L202**: <code>bool relatively_equal&lt;tfloat32_t&gt;(</code>
+  - EN: Begins or continues the signature/parameter list for `tfloat32_t`.
+  - CN: 开始或继续 `tfloat32_t` 的签名/参数列表。
+- **L203**: <code>  tfloat32_t a, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L204**: <code>  tfloat32_t b, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L205**: <code>  tfloat32_t epsilon, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L206**: <code>  tfloat32_t nonzero_floor) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L207**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L208**: <code>  return detail::relatively_equal_float(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L209**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L210**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L211**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L212**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L213**: <code>bool relatively_equal&lt;float&gt;(float a, float b, float epsilon, float nonzero_floor) {</code>
+  - EN: Starts the definition body for `float`.
+  - CN: 开始 `float` 的定义体。
+- **L214**: <code>  return detail::relatively_equal_float(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L215**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L216**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L217**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L218**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L219**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L220**: <code>bool relatively_equal&lt;double&gt;(double a, double b, double epsilon, double nonzero_floor) {</code>
+  - EN: Starts the definition body for `double`.
+  - CN: 开始 `double` 的定义体。
+- **L221**: <code>  return detail::relatively_equal_float(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L222**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L223**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L224**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L225**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L226**: <code>bool relatively_equal(complex&lt;T&gt; a, complex&lt;T&gt; b, T epsilon, T nonzero_floor) {</code>
+  - EN: Starts the definition body for `relatively_equal`.
+  - CN: 开始 `relatively_equal` 的定义体。
+- **L227**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L228**: <code>  using cuda::std::abs;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L229**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L230**: <code>  using std::abs;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L231**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L232**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L233**: <code>  T abs_A = abs(a);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L234**: <code>  T abs_B = abs(b);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L235**: <code>  T diff = abs(a - b);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L236**: <code>  complex&lt;T&gt; zero = complex&lt;T&gt;{T{}, T{}};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L237**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L238**: <code>  if (a == b) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L239**: <code>    return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L240**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L241**: <code>  else if (a == zero || b == zero || diff &lt; nonzero_floor) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L242**: <code>    return diff &lt; epsilon * nonzero_floor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L243**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L244**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L245**: <code>  return diff &lt; epsilon * (abs_A + abs_B);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L246**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L247**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L248**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L249**: <code>CUTLASS_HOST_DEVICE </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L250**: <code>bool relatively_equal(complex&lt;T&gt; a,  complex&lt;T&gt; b, complex&lt;T&gt; epsilon, complex&lt;T&gt; nonzero_floor) {</code>
+  - EN: Starts the definition body for `relatively_equal`.
+  - CN: 开始 `relatively_equal` 的定义体。
+- **L251**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L252**: <code>  using cuda::std::abs;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L253**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L254**: <code>  using std::abs;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L255**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L256**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L257**: <code>  T abs_A = abs(a);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L258**: <code>  T abs_B = abs(b);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L259**: <code>  complex&lt;T&gt; diff = a - b;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L260**: <code>  T abs_diff = abs(diff);</code>
+  - EN: Declares the callable or operator `abs`.
+  - CN: 声明可调用对象或运算符 `abs`。
+- **L261**: <code>  complex&lt;T&gt; zero = complex&lt;T&gt;{T{}, T{}};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L262**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L263**: <code>  if (a == b) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L264**: <code>    return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L265**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L266**: <code>  else if (a == zero || b == zero || abs_diff &lt; abs(nonzero_floor)) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L267**: <code>    return abs_diff &lt; abs(epsilon * nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L268**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L269**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L270**: <code>  return abs_diff &lt; abs(epsilon) * (abs_A + abs_B);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L271**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L272**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L273**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L274**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L275**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L276**: <code>bool relatively_equal&lt;float_e2m3_t&gt;(float_e2m3_t a, float_e2m3_t b, float_e2m3_t epsilon, float_e2m3_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_e2m3_t`.
+  - CN: 开始 `float_e2m3_t` 的定义体。
+- **L277**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L278**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L279**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L280**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L281**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L282**: <code>bool relatively_equal&lt;float_e3m2_t&gt;(float_e3m2_t a, float_e3m2_t b, float_e3m2_t epsilon, float_e3m2_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_e3m2_t`.
+  - CN: 开始 `float_e3m2_t` 的定义体。
+- **L283**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L284**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L285**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L286**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L287**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L288**: <code>bool relatively_equal&lt;float_e2m1_t&gt;(float_e2m1_t a, float_e2m1_t b, float_e2m1_t epsilon, float_e2m1_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_e2m1_t`.
+  - CN: 开始 `float_e2m1_t` 的定义体。
+- **L289**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L290**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L291**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L292**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L293**: <code>bool relatively_equal&lt;float_ue8m0_t&gt;(float_ue8m0_t a, float_ue8m0_t b, float_ue8m0_t epsilon, float_ue8m0_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_ue8m0_t`.
+  - CN: 开始 `float_ue8m0_t` 的定义体。
+- **L294**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L295**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L296**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L297**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L298**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L299**: <code>bool relatively_equal&lt;float_ue4m3_t&gt;(float_ue4m3_t a, float_ue4m3_t b, float_ue4m3_t epsilon, float_ue4m3_t nonzero_floor) {</code>
+  - EN: Starts the definition body for `float_ue4m3_t`.
+  - CN: 开始 `float_ue4m3_t` 的定义体。
+- **L300**: <code>  return detail::relatively_equal_float&lt;float&gt;(a, b, epsilon, nonzero_floor);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L301**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L302**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L303**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L304**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L305**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L306**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Host-device annotations / 主机设备限定符
+- Conditional compilation / 条件编译
+- Symbol focus: `relatively_equal` / 重点符号：`relatively_equal`
+- Symbol focus: `relatively_equal_float` / 重点符号：`relatively_equal_float`
+- Symbol focus: `abs` / 重点符号：`abs`
+- Symbol focus: `T` / 重点符号：`T`
+- Symbol focus: `epsilon` / 重点符号：`epsilon`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"numeric_types.h"`
+  - `"complex.h"`

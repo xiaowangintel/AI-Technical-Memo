@@ -1,0 +1,1041 @@
+# tensor_elementwise.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/host/tensor_elementwise.h`
+**Purpose / 用途**: Provides a host-side reference implementation or helper for tensor elementwise. / 为 tensor elementwise 提供主机端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>  \brief Defines host-side elementwise operations on TensorView.</code>
+  - EN: Comment that documents intent or context: "\brief Defines host-side elementwise operations on TensorView.".
+  - CN: 用于说明意图或上下文的注释："\brief Defines host-side elementwise operations on TensorView."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>// Cutlass includes</code>
+  - EN: Comment that documents intent or context: "Cutlass includes".
+  - CN: 用于说明意图或上下文的注释："Cutlass includes"。
+- **L38** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes `cutlass/functional.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/functional.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>#include &quot;tensor_foreach.h&quot;</code>
+  - EN: Includes `tensor_foreach.h` so this file can use project-specific declarations from `tensor_foreach.h`.
+  - CN: 引入 `tensor_foreach.h`，使当前文件可以使用来自 `tensor_foreach.h` 的项目专用声明。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L44** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L45** <code>namespace host {</code>
+  - EN: Opens namespace `host` to group related symbols.
+  - CN: 打开命名空间 `host`，用于归组相关符号。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L48** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>/// Helper to apply a binary operator in place</code>
+  - EN: Comment that documents intent or context: "Helper to apply a binary operator in place".
+  - CN: 用于说明意图或上下文的注释："Helper to apply a binary operator in place"。
+- **L55** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L56** <code>  typename ElementA, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L57** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L58** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L59** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L60** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L61** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L62** <code>  typename BinaryFunc&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L63** <code>struct TensorFuncBinaryOp {</code>
+  - EN: Begins the declaration of struct `TensorFuncBinaryOp`.
+  - CN: 开始声明 struct `TensorFuncBinaryOp`。
+- **L64** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L65** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L66** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L67** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L68** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L69** <code>  /// View of left-hand-side tensor</code>
+  - EN: Comment that documents intent or context: "View of left-hand-side tensor".
+  - CN: 用于说明意图或上下文的注释："View of left-hand-side tensor"。
+- **L70** <code>  TensorView&lt;ElementD, LayoutD&gt; view_d;</code>
+  - EN: Declares the symbol `view_d` in the current scope.
+  - CN: 在当前作用域中声明符号 `view_d`。
+- **L71** <code>  TensorRef&lt;ElementA, LayoutA&gt; view_a;</code>
+  - EN: Declares the symbol `view_a` in the current scope.
+  - CN: 在当前作用域中声明符号 `view_a`。
+- **L72** <code>  TensorRef&lt;ElementB, LayoutB&gt; view_b;</code>
+  - EN: Declares the symbol `view_b` in the current scope.
+  - CN: 在当前作用域中声明符号 `view_b`。
+- **L73** <code>  BinaryFunc func;</code>
+  - EN: Declares the symbol `func` in the current scope.
+  - CN: 在当前作用域中声明符号 `func`。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L76** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L77** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>  /// Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L80** <code>  TensorFuncBinaryOp() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFuncBinaryOp`.
+  - CN: 开始或继续与 `TensorFuncBinaryOp` 相关的签名/调用语法。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>  /// Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L83** <code>  TensorFuncBinaryOp(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFuncBinaryOp`.
+  - CN: 开始或继续与 `TensorFuncBinaryOp` 相关的签名/调用语法。
+- **L84** <code>    TensorView&lt;ElementD, LayoutD&gt; const &amp; view_d_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L85** <code>    TensorRef&lt;ElementA, LayoutA&gt; const &amp; view_a_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L86** <code>    TensorRef&lt;ElementB, LayoutB&gt; const &amp; view_b_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L87** <code>    BinaryFunc func = BinaryFunc()</code>
+  - EN: Begins or continues the signature/call syntax involving `BinaryFunc`.
+  - CN: 开始或继续与 `BinaryFunc` 相关的签名/调用语法。
+- **L88** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L89** <code>    view_d(view_d_), view_a(view_a_), view_b(view_b_), func(func) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `func`.
+  - CN: 开始或继续与 `func` 相关的签名/调用语法。
+- **L90** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L91** <code>  /// Equality check</code>
+  - EN: Comment that documents intent or context: "Equality check".
+  - CN: 用于说明意图或上下文的注释："Equality check"。
+- **L92** <code>  void operator()(Coord&lt;LayoutD::kRank&gt; const &amp;coord) const {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L93** <code>    view_d.at(coord) = func(</code>
+  - EN: Begins or continues the signature/call syntax involving `func`.
+  - CN: 开始或继续与 `func` 相关的签名/调用语法。
+- **L94** <code>      ElementD(view_a.at(coord)),</code>
+  - EN: Begins or continues the signature/call syntax involving `at`.
+  - CN: 开始或继续与 `at` 相关的签名/调用语法。
+- **L95** <code>      ElementD(view_b.at(coord))</code>
+  - EN: Begins or continues the signature/call syntax involving `at`.
+  - CN: 开始或继续与 `at` 相关的签名/调用语法。
+- **L96** <code>    );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L97** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L98** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L101** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L102** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L103** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L104** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L105** <code>/// Adds two tensors and stores in the destination tensor: d = a + b</code>
+  - EN: Comment that documents intent or context: "Adds two tensors and stores in the destination tensor: d = a + b".
+  - CN: 用于说明意图或上下文的注释："Adds two tensors and stores in the destination tensor: d = a + b"。
+- **L106** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L107** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L108** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L109** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L110** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L111** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L112** <code>  typename LayoutB</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L113** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L114** <code>void TensorAdd(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorAdd`.
+  - CN: 开始或继续与 `TensorAdd` 相关的签名/调用语法。
+- **L115** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L116** <code>  TensorRef&lt;ElementA, LayoutA&gt; a,       ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L117** <code>  TensorRef&lt;ElementB, LayoutB&gt; b        ///&lt; B tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L119** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L120** <code>  detail::TensorFuncBinaryOp&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>    ElementD, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L122** <code>    LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L123** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L124** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L125** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L126** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L127** <code>    cutlass::plus&lt;ElementD&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>  &gt; func(d, a, b);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L131** <code>    d.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L132** <code>    func); </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L133** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>/// Adds a tensor in place: d = d .+ a</code>
+  - EN: Comment that documents intent or context: "Adds a tensor in place: d = d .+ a".
+  - CN: 用于说明意图或上下文的注释："Adds a tensor in place: d = d .+ a"。
+- **L136** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L137** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L138** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L139** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L140** <code>  typename LayoutA</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L141** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L142** <code>void TensorAdd(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorAdd`.
+  - CN: 开始或继续与 `TensorAdd` 相关的签名/调用语法。
+- **L143** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>  TensorRef&lt;ElementA, LayoutA&gt; a        ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L145** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L146** <code>  TensorAdd(d, d, a);</code>
+  - EN: Declares function or method `TensorAdd` without defining it here.
+  - CN: 声明函数或方法 `TensorAdd`，但不在此处给出定义。
+- **L147** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>/// Subtracts two tensors and stores in the destination tensor: d = a - b</code>
+  - EN: Comment that documents intent or context: "Subtracts two tensors and stores in the destination tensor: d = a - b".
+  - CN: 用于说明意图或上下文的注释："Subtracts two tensors and stores in the destination tensor: d = a - b"。
+- **L152** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L153** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L154** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L155** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L156** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L157** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L158** <code>  typename LayoutB</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L159** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L160** <code>void TensorSub(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorSub`.
+  - CN: 开始或继续与 `TensorSub` 相关的签名/调用语法。
+- **L161** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>  TensorRef&lt;ElementA, LayoutA&gt; a,       ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L163** <code>  TensorRef&lt;ElementB, LayoutB&gt; b        ///&lt; B tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L164** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>  detail::TensorFuncBinaryOp&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>    ElementD, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L168** <code>    LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L169** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L170** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L171** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L172** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L173** <code>    cutlass::minus&lt;ElementD&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L174** <code>  &gt; func(d, a, b);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L177** <code>    d.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L178** <code>    func);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L179** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>/// Subtracts two tensors in place: d = d .- a</code>
+  - EN: Comment that documents intent or context: "Subtracts two tensors in place: d = d .- a".
+  - CN: 用于说明意图或上下文的注释："Subtracts two tensors in place: d = d .- a"。
+- **L182** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L183** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L184** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L185** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L186** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L187** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L188** <code>  typename LayoutB</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L189** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L190** <code>void TensorSub(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorSub`.
+  - CN: 开始或继续与 `TensorSub` 相关的签名/调用语法。
+- **L191** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L192** <code>  TensorRef&lt;ElementA, LayoutA&gt; a        ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L193** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L194** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L195** <code>  TensorSub(d, d, a);</code>
+  - EN: Declares function or method `TensorSub` without defining it here.
+  - CN: 声明函数或方法 `TensorSub`，但不在此处给出定义。
+- **L196** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L197** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L198** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>/// Multiplies two tensors and stores in the destination tensor: d = a .* b</code>
+  - EN: Comment that documents intent or context: "Multiplies two tensors and stores in the destination tensor: d = a .* b".
+  - CN: 用于说明意图或上下文的注释："Multiplies two tensors and stores in the destination tensor: d = a .* b"。
+- **L201** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L202** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L203** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L204** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L205** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L206** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L207** <code>  typename LayoutB</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L208** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L209** <code>void TensorMul(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorMul`.
+  - CN: 开始或继续与 `TensorMul` 相关的签名/调用语法。
+- **L210** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L211** <code>  TensorRef&lt;ElementA, LayoutA&gt; a,       ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>  TensorRef&lt;ElementB, LayoutB&gt; b        ///&lt; B tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L213** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L214** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L215** <code>  detail::TensorFuncBinaryOp&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L216** <code>    ElementD, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L217** <code>    LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L218** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L219** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L220** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L221** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L222** <code>    cutlass::multiplies&lt;ElementD&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L223** <code>  &gt; func(d, a, b);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L224** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L225** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L226** <code>    d.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L227** <code>    func);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L228** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L229** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L230** <code>/// Multiplies tensors in place: d = d .* a</code>
+  - EN: Comment that documents intent or context: "Multiplies tensors in place: d = d .* a".
+  - CN: 用于说明意图或上下文的注释："Multiplies tensors in place: d = d .* a"。
+- **L231** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L232** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L233** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L234** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L235** <code>  typename LayoutA</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L236** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L237** <code>void TensorMul(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorMul`.
+  - CN: 开始或继续与 `TensorMul` 相关的签名/调用语法。
+- **L238** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L239** <code>  TensorRef&lt;ElementA, LayoutA&gt; a        ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L240** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L241** <code>  TensorMul(d, d, a);</code>
+  - EN: Declares function or method `TensorMul` without defining it here.
+  - CN: 声明函数或方法 `TensorMul`，但不在此处给出定义。
+- **L242** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L245** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L246** <code>/// Divides two tensors and stores in the destination tensor: d = a ./ b</code>
+  - EN: Comment that documents intent or context: "Divides two tensors and stores in the destination tensor: d = a ./ b".
+  - CN: 用于说明意图或上下文的注释："Divides two tensors and stores in the destination tensor: d = a ./ b"。
+- **L247** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L248** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L249** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L250** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L251** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L252** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L253** <code>  typename LayoutB</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L255** <code>void TensorDiv(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDiv`.
+  - CN: 开始或继续与 `TensorDiv` 相关的签名/调用语法。
+- **L256** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L257** <code>  TensorRef&lt;ElementA, LayoutA&gt; a,       ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L258** <code>  TensorRef&lt;ElementB, LayoutB&gt; b        ///&lt; B tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L259** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L260** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L261** <code>  detail::TensorFuncBinaryOp&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L262** <code>    ElementD, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L263** <code>    LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L264** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L265** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L266** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L267** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L268** <code>    cutlass::divides&lt;ElementD&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L269** <code>  &gt; func(d, a, b);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L272** <code>    d.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L273** <code>    func);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L274** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>/// Divides tensors in place: d = d ./ a</code>
+  - EN: Comment that documents intent or context: "Divides tensors in place: d = d ./ a".
+  - CN: 用于说明意图或上下文的注释："Divides tensors in place: d = d ./ a"。
+- **L277** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L278** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L279** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L280** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L281** <code>  typename LayoutA</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L282** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L283** <code>void TensorDiv(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDiv`.
+  - CN: 开始或继续与 `TensorDiv` 相关的签名/调用语法。
+- **L284** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L285** <code>  TensorRef&lt;ElementA, LayoutA&gt; a        ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L286** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L287** <code>  TensorDiv(d, d, a);</code>
+  - EN: Declares function or method `TensorDiv` without defining it here.
+  - CN: 声明函数或方法 `TensorDiv`，但不在此处给出定义。
+- **L288** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L291** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L292** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L293** <code>/// Divides two tensors and stores in the destination tensor: d = a ./ b</code>
+  - EN: Comment that documents intent or context: "Divides two tensors and stores in the destination tensor: d = a ./ b".
+  - CN: 用于说明意图或上下文的注释："Divides two tensors and stores in the destination tensor: d = a ./ b"。
+- **L294** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L295** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L296** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L297** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L298** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L299** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L300** <code>  typename LayoutB</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L301** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L302** <code>void TensorModulus(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorModulus`.
+  - CN: 开始或继续与 `TensorModulus` 相关的签名/调用语法。
+- **L303** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L304** <code>  TensorRef&lt;ElementA, LayoutA&gt; a,       ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L305** <code>  TensorRef&lt;ElementB, LayoutB&gt; b        ///&lt; B tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L306** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L307** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L308** <code>  detail::TensorFuncBinaryOp&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L309** <code>    ElementD, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L310** <code>    LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L311** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L312** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L313** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L314** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L315** <code>    cutlass::divides&lt;ElementD&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L316** <code>  &gt; func(d, a, b);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L317** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L318** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L319** <code>    d.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L320** <code>    func);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L321** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>/// Divides tensors in place: d = d ./ a</code>
+  - EN: Comment that documents intent or context: "Divides tensors in place: d = d ./ a".
+  - CN: 用于说明意图或上下文的注释："Divides tensors in place: d = d ./ a"。
+- **L324** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L325** <code>  typename ElementD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L326** <code>  typename LayoutD,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L327** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L328** <code>  typename LayoutA</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L329** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L330** <code>void TensorModulus(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorModulus`.
+  - CN: 开始或继续与 `TensorModulus` 相关的签名/调用语法。
+- **L331** <code>  TensorView&lt;ElementD, LayoutD&gt; d,      ///&lt; destination tensor view</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L332** <code>  TensorRef&lt;ElementA, LayoutA&gt; a        ///&lt; A tensor reference</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L334** <code>  TensorDiv(d, d, a);</code>
+  - EN: Declares function or method `TensorDiv` without defining it here.
+  - CN: 声明函数或方法 `TensorDiv`，但不在此处给出定义。
+- **L335** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L336** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L337** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>} // namespace host</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L340** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L341** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/functional.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>tensor_foreach.h</code> — project-specific declarations from `tensor_foreach.h` / 来自 `tensor_foreach.h` 的项目专用声明

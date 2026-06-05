@@ -1,0 +1,1793 @@
+# host_tensor_planar_complex.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/host_tensor_planar_complex.h`
+**Purpose / 用途**: Provides host-side helpers for tensor planar complex. / 提供与 tensor planar complex 相关的主机端辅助工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L32** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L33** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L34** <code>  \brief HostTensorPlanarComplex contributes management for both host and device memory.</code>
+  - EN: Comment that documents intent or context: "\brief HostTensorPlanarComplex contributes management for both host and device memory.".
+  - CN: 用于说明意图或上下文的注释："\brief HostTensorPlanarComplex contributes management for both host and device memory."。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>  HostTensorPlanarComplex allocates host and device memory upon construction. Basic element-wise operations on</code>
+  - EN: Comment that documents intent or context: "HostTensorPlanarComplex allocates host and device memory upon construction. Basic element-wise operations on".
+  - CN: 用于说明意图或上下文的注释："HostTensorPlanarComplex allocates host and device memory upon construction. Basic element-wise operations on"。
+- **L37** <code>  host memory synchronize device memory automatically. Explicit copy operations provide abstractions</code>
+  - EN: Comment that documents intent or context: "host memory synchronize device memory automatically. Explicit copy operations provide abstractions".
+  - CN: 用于说明意图或上下文的注释："host memory synchronize device memory automatically. Explicit copy operations provide abstractions"。
+- **L38** <code>  for CUDA memcpy operations.</code>
+  - EN: Comment that documents intent or context: "for CUDA memcpy operations.".
+  - CN: 用于说明意图或上下文的注释："for CUDA memcpy operations."。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>  Call {host, device}_{data, ref, view}() for accessing host or device memory.</code>
+  - EN: Comment that documents intent or context: "Call {host, device}_{data, ref, view}() for accessing host or device memory.".
+  - CN: 用于说明意图或上下文的注释："Call {host, device}_{data, ref, view}() for accessing host or device memory."。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>  See cutlass/tensor_ref_planar_complex.h and cutlass/tensor_view_planar_complex.h for more details.</code>
+  - EN: Comment that documents intent or context: "See cutlass/tensor_ref_planar_complex.h and cutlass/tensor_view_planar_complex.h for more details.".
+  - CN: 用于说明意图或上下文的注释："See cutlass/tensor_ref_planar_complex.h and cutlass/tensor_view_planar_complex.h for more details."。
+- **L43** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>#include &lt;vector&gt;</code>
+  - EN: Includes `vector` so this file can use dynamic array containers.
+  - CN: 引入 `vector`，使当前文件可以使用动态数组容器。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>#include &quot;cutlass/tensor_ref_planar_complex.h&quot;</code>
+  - EN: Includes `cutlass/tensor_ref_planar_complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_ref_planar_complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L50** <code>#include &quot;cutlass/tensor_view_planar_complex.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view_planar_complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view_planar_complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>#include &quot;device_memory.h&quot;</code>
+  - EN: Includes `device_memory.h` so this file can use project-specific declarations from `device_memory.h`.
+  - CN: 引入 `device_memory.h`，使当前文件可以使用来自 `device_memory.h` 的项目专用声明。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>/// Host tensor</code>
+  - EN: Comment that documents intent or context: "Host tensor".
+  - CN: 用于说明意图或上下文的注释："Host tensor"。
+- **L59** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L60** <code>  /// Data type of element stored within tensor (concept: NumericType)</code>
+  - EN: Comment that documents intent or context: "Data type of element stored within tensor (concept: NumericType)".
+  - CN: 用于说明意图或上下文的注释："Data type of element stored within tensor (concept: NumericType)"。
+- **L61** <code>  typename Element_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L62** <code>  /// Defines a mapping from logical coordinate to linear memory (concept: Layout)</code>
+  - EN: Comment that documents intent or context: "Defines a mapping from logical coordinate to linear memory (concept: Layout)".
+  - CN: 用于说明意图或上下文的注释："Defines a mapping from logical coordinate to linear memory (concept: Layout)"。
+- **L63** <code>  typename Layout_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L64** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L65** <code>class HostTensorPlanarComplex {</code>
+  - EN: Begins the declaration of class `HostTensorPlanarComplex`.
+  - CN: 开始声明 class `HostTensorPlanarComplex`。
+- **L66** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>  /// Data type of individual access</code>
+  - EN: Comment that documents intent or context: "Data type of individual access".
+  - CN: 用于说明意图或上下文的注释："Data type of individual access"。
+- **L69** <code>  using Element = Element_;</code>
+  - EN: Introduces the type or namespace alias `Element`.
+  - CN: 引入类型或命名空间别名 `Element`。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>  /// Mapping function from logical coordinate to linear memory</code>
+  - EN: Comment that documents intent or context: "Mapping function from logical coordinate to linear memory".
+  - CN: 用于说明意图或上下文的注释："Mapping function from logical coordinate to linear memory"。
+- **L72** <code>  using Layout = Layout_;</code>
+  - EN: Introduces the type or namespace alias `Layout`.
+  - CN: 引入类型或命名空间别名 `Layout`。
+- **L73** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L74** <code>  /// Logical rank of tensor index space</code>
+  - EN: Comment that documents intent or context: "Logical rank of tensor index space".
+  - CN: 用于说明意图或上下文的注释："Logical rank of tensor index space"。
+- **L75** <code>  static int const kRank = Layout::kRank;</code>
+  - EN: Assigns or initializes `kRank` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kRank` 进行赋值或初始化。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>  /// Index type</code>
+  - EN: Comment that documents intent or context: "Index type".
+  - CN: 用于说明意图或上下文的注释："Index type"。
+- **L78** <code>  using Index = typename Layout::Index;</code>
+  - EN: Introduces the type or namespace alias `Index`.
+  - CN: 引入类型或命名空间别名 `Index`。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>  /// Long index used for pointer offsets</code>
+  - EN: Comment that documents intent or context: "Long index used for pointer offsets".
+  - CN: 用于说明意图或上下文的注释："Long index used for pointer offsets"。
+- **L81** <code>  using LongIndex = typename Layout::LongIndex;</code>
+  - EN: Introduces the type or namespace alias `LongIndex`.
+  - CN: 引入类型或命名空间别名 `LongIndex`。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>  /// Coordinate in logical tensor space</code>
+  - EN: Comment that documents intent or context: "Coordinate in logical tensor space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in logical tensor space"。
+- **L84** <code>  using TensorCoord = typename Layout::TensorCoord;</code>
+  - EN: Introduces the type or namespace alias `TensorCoord`.
+  - CN: 引入类型或命名空间别名 `TensorCoord`。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>  /// Layout&#x27;s stride vector</code>
+  - EN: Comment that documents intent or context: "Layout's stride vector".
+  - CN: 用于说明意图或上下文的注释："Layout's stride vector"。
+- **L87** <code>  using Stride = typename Layout::Stride;</code>
+  - EN: Introduces the type or namespace alias `Stride`.
+  - CN: 引入类型或命名空间别名 `Stride`。
+- **L88** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L89** <code>  /// Tensor reference to device memory</code>
+  - EN: Comment that documents intent or context: "Tensor reference to device memory".
+  - CN: 用于说明意图或上下文的注释："Tensor reference to device memory"。
+- **L90** <code>  using TensorRef = TensorRefPlanarComplex&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorRef`.
+  - CN: 引入类型或命名空间别名 `TensorRef`。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>  /// Tensor reference to constant device memory</code>
+  - EN: Comment that documents intent or context: "Tensor reference to constant device memory".
+  - CN: 用于说明意图或上下文的注释："Tensor reference to constant device memory"。
+- **L93** <code>  using ConstTensorRef = typename TensorRef::ConstTensorRef;</code>
+  - EN: Introduces the type or namespace alias `ConstTensorRef`.
+  - CN: 引入类型或命名空间别名 `ConstTensorRef`。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>  /// Tensor reference to device memory</code>
+  - EN: Comment that documents intent or context: "Tensor reference to device memory".
+  - CN: 用于说明意图或上下文的注释："Tensor reference to device memory"。
+- **L96** <code>  using TensorView = TensorViewPlanarComplex&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>  /// Tensor reference to constant device memory</code>
+  - EN: Comment that documents intent or context: "Tensor reference to constant device memory".
+  - CN: 用于说明意图或上下文的注释："Tensor reference to constant device memory"。
+- **L99** <code>  using ConstTensorView = typename TensorView::ConstTensorView;</code>
+  - EN: Introduces the type or namespace alias `ConstTensorView`.
+  - CN: 引入类型或命名空间别名 `ConstTensorView`。
+- **L100** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L101** <code>  /// Reference to element in tensor</code>
+  - EN: Comment that documents intent or context: "Reference to element in tensor".
+  - CN: 用于说明意图或上下文的注释："Reference to element in tensor"。
+- **L102** <code>  using Reference = typename TensorRef::Reference;</code>
+  - EN: Introduces the type or namespace alias `Reference`.
+  - CN: 引入类型或命名空间别名 `Reference`。
+- **L103** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L104** <code>  /// Constant reference to element in tensor</code>
+  - EN: Comment that documents intent or context: "Constant reference to element in tensor".
+  - CN: 用于说明意图或上下文的注释："Constant reference to element in tensor"。
+- **L105** <code>  using ConstReference = typename ConstTensorRef::Reference;</code>
+  - EN: Introduces the type or namespace alias `ConstReference`.
+  - CN: 引入类型或命名空间别名 `ConstReference`。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code> private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L108** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L109** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L110** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L111** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L112** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L113** <code>  /// Extent of tensor in logical dimensions</code>
+  - EN: Comment that documents intent or context: "Extent of tensor in logical dimensions".
+  - CN: 用于说明意图或上下文的注释："Extent of tensor in logical dimensions"。
+- **L114** <code>  TensorCoord extent_;</code>
+  - EN: Declares the symbol `extent_` in the current scope.
+  - CN: 在当前作用域中声明符号 `extent_`。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>  /// Layout object</code>
+  - EN: Comment that documents intent or context: "Layout object".
+  - CN: 用于说明意图或上下文的注释："Layout object"。
+- **L117** <code>  Layout layout_;</code>
+  - EN: Declares the symbol `layout_` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_`。
+- **L118** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L119** <code>  /// Host-side memory allocation</code>
+  - EN: Comment that documents intent or context: "Host-side memory allocation".
+  - CN: 用于说明意图或上下文的注释："Host-side memory allocation"。
+- **L120** <code>  std::vector&lt;Element&gt; host_;</code>
+  - EN: Declares the symbol `host_` in the current scope.
+  - CN: 在当前作用域中声明符号 `host_`。
+- **L121** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>  /// Device-side memory</code>
+  - EN: Comment that documents intent or context: "Device-side memory".
+  - CN: 用于说明意图或上下文的注释："Device-side memory"。
+- **L123** <code>  device_memory::allocation&lt;Element&gt; device_;</code>
+  - EN: Declares the symbol `device_` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_`。
+- **L124** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L125** <code> public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L126** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L127** <code>  // Device and Host Methods</code>
+  - EN: Comment that documents intent or context: "Device and Host Methods".
+  - CN: 用于说明意图或上下文的注释："Device and Host Methods"。
+- **L128** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>  /// Default constructor</code>
+  - EN: Comment that documents intent or context: "Default constructor".
+  - CN: 用于说明意图或上下文的注释："Default constructor"。
+- **L131** <code>  HostTensorPlanarComplex() {}</code>
+  - EN: Begins or continues the signature/call syntax involving `HostTensorPlanarComplex`.
+  - CN: 开始或继续与 `HostTensorPlanarComplex` 相关的签名/调用语法。
+- **L132** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L133** <code>  /// Constructs a tensor given an extent. Assumes a packed layout</code>
+  - EN: Comment that documents intent or context: "Constructs a tensor given an extent. Assumes a packed layout".
+  - CN: 用于说明意图或上下文的注释："Constructs a tensor given an extent. Assumes a packed layout"。
+- **L134** <code>  HostTensorPlanarComplex(</code>
+  - EN: Begins or continues the signature/call syntax involving `HostTensorPlanarComplex`.
+  - CN: 开始或继续与 `HostTensorPlanarComplex` 相关的签名/调用语法。
+- **L135** <code>    TensorCoord const &amp;extent,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L136** <code>    bool device_backed = true</code>
+  - EN: Assigns or initializes `device_backed` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed` 进行赋值或初始化。
+- **L137** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>    this-&gt;reset(extent, Layout::packed(extent), device_backed);</code>
+  - EN: Declares function or method `packed` without defining it here.
+  - CN: 声明函数或方法 `packed`，但不在此处给出定义。
+- **L140** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L141** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L142** <code>  /// Constructs a tensor given an extent and layout</code>
+  - EN: Comment that documents intent or context: "Constructs a tensor given an extent and layout".
+  - CN: 用于说明意图或上下文的注释："Constructs a tensor given an extent and layout"。
+- **L143** <code>  HostTensorPlanarComplex(</code>
+  - EN: Begins or continues the signature/call syntax involving `HostTensorPlanarComplex`.
+  - CN: 开始或继续与 `HostTensorPlanarComplex` 相关的签名/调用语法。
+- **L144** <code>    TensorCoord const &amp;extent,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L145** <code>    Layout const &amp;layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L146** <code>    bool device_backed = true</code>
+  - EN: Assigns or initializes `device_backed` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed` 进行赋值或初始化。
+- **L147** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>    this-&gt;reset(extent, layout, device_backed);</code>
+  - EN: Declares function or method `reset` without defining it here.
+  - CN: 声明函数或方法 `reset`，但不在此处给出定义。
+- **L150** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>  ~HostTensorPlanarComplex() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `~HostTensorPlanarComplex`.
+  - CN: 开始或继续与 `~HostTensorPlanarComplex` 相关的签名/调用语法。
+- **L153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L154** <code>  /// Clears the HostTensor allocation to size/capacity = 0</code>
+  - EN: Comment that documents intent or context: "Clears the HostTensor allocation to size/capacity = 0".
+  - CN: 用于说明意图或上下文的注释："Clears the HostTensor allocation to size/capacity = 0"。
+- **L155** <code>  void reset() {</code>
+  - EN: Begins the definition of function or method `reset`.
+  - CN: 开始定义函数或方法 `reset`。
+- **L156** <code>    extent_ = TensorCoord();</code>
+  - EN: Declares function or method `TensorCoord` without defining it here.
+  - CN: 声明函数或方法 `TensorCoord`，但不在此处给出定义。
+- **L157** <code>    layout_ = Layout::packed(extent_);</code>
+  - EN: Declares function or method `packed` without defining it here.
+  - CN: 声明函数或方法 `packed`，但不在此处给出定义。
+- **L158** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L159** <code>    host_.clear();</code>
+  - EN: Declares function or method `clear` without defining it here.
+  - CN: 声明函数或方法 `clear`，但不在此处给出定义。
+- **L160** <code>    device_.reset();</code>
+  - EN: Declares function or method `reset` without defining it here.
+  - CN: 声明函数或方法 `reset`，但不在此处给出定义。
+- **L161** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>  /// Resizes internal memory allocations without affecting layout or extent</code>
+  - EN: Comment that documents intent or context: "Resizes internal memory allocations without affecting layout or extent".
+  - CN: 用于说明意图或上下文的注释："Resizes internal memory allocations without affecting layout or extent"。
+- **L164** <code>  void reserve(</code>
+  - EN: Begins or continues the signature/call syntax involving `reserve`.
+  - CN: 开始或继续与 `reserve` 相关的签名/调用语法。
+- **L165** <code>    size_t count,                                        ///&lt; size of tensor in elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L166** <code>    bool device_backed_ = true) {                        ///&lt; if true, device memory is also allocated</code>
+  - EN: Assigns or initializes `device_backed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed_` 进行赋值或初始化。
+- **L167** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L168** <code>    device_.reset();</code>
+  - EN: Declares function or method `reset` without defining it here.
+  - CN: 声明函数或方法 `reset`，但不在此处给出定义。
+- **L169** <code>    host_.clear();</code>
+  - EN: Declares function or method `clear` without defining it here.
+  - CN: 声明函数或方法 `clear`，但不在此处给出定义。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>    host_.resize(count * 2);</code>
+  - EN: Declares function or method `resize` without defining it here.
+  - CN: 声明函数或方法 `resize`，但不在此处给出定义。
+- **L172** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L173** <code>    // Allocate memory</code>
+  - EN: Comment that documents intent or context: "Allocate memory".
+  - CN: 用于说明意图或上下文的注释："Allocate memory"。
+- **L174** <code>    Element* device_memory = nullptr;</code>
+  - EN: Assigns or initializes `device_memory` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_memory` 进行赋值或初始化。
+- **L175** <code>    if (device_backed_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L176** <code>      device_memory = device_memory::allocate&lt;Element&gt;(count * 2);</code>
+  - EN: Declares function or method `allocate<Element>` without defining it here.
+  - CN: 声明函数或方法 `allocate<Element>`，但不在此处给出定义。
+- **L177** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L178** <code>    device_.reset(device_memory, device_backed_ ? count * 2 : 0);</code>
+  - EN: Declares function or method `reset` without defining it here.
+  - CN: 声明函数或方法 `reset`，但不在此处给出定义。
+- **L179** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>  /// Updates the extent and layout of the HostTensor. Allocates memory according to the new</code>
+  - EN: Comment that documents intent or context: "Updates the extent and layout of the HostTensor. Allocates memory according to the new".
+  - CN: 用于说明意图或上下文的注释："Updates the extent and layout of the HostTensor. Allocates memory according to the new"。
+- **L182** <code>  /// extent and layout.</code>
+  - EN: Comment that documents intent or context: "extent and layout.".
+  - CN: 用于说明意图或上下文的注释："extent and layout."。
+- **L183** <code>  void reset(</code>
+  - EN: Begins or continues the signature/call syntax involving `reset`.
+  - CN: 开始或继续与 `reset` 相关的签名/调用语法。
+- **L184** <code>    TensorCoord const &amp;extent,                           ///&lt; extent of logical tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L185** <code>    Layout const &amp;layout,                                ///&lt; layout object of tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L186** <code>    bool device_backed_ = true) {                        ///&lt; if true, device memory is also allocated. </code>
+  - EN: Assigns or initializes `device_backed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed_` 进行赋值或初始化。
+- **L187** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L188** <code>    extent_ = extent;</code>
+  - EN: Assigns or initializes `extent_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `extent_` 进行赋值或初始化。
+- **L189** <code>    layout_ = layout;</code>
+  - EN: Assigns or initializes `layout_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_` 进行赋值或初始化。
+- **L190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L191** <code>    reserve(size_t(layout_.capacity(extent_)), device_backed_);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L192** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>  /// Updates the extent and layout of the HostTensor. Allocates memory according to the new</code>
+  - EN: Comment that documents intent or context: "Updates the extent and layout of the HostTensor. Allocates memory according to the new".
+  - CN: 用于说明意图或上下文的注释："Updates the extent and layout of the HostTensor. Allocates memory according to the new"。
+- **L195** <code>  /// extent and layout. Assumes a packed tensor configuration.</code>
+  - EN: Comment that documents intent or context: "extent and layout. Assumes a packed tensor configuration.".
+  - CN: 用于说明意图或上下文的注释："extent and layout. Assumes a packed tensor configuration."。
+- **L196** <code>  void reset(</code>
+  - EN: Begins or continues the signature/call syntax involving `reset`.
+  - CN: 开始或继续与 `reset` 相关的签名/调用语法。
+- **L197** <code>    TensorCoord const &amp;extent,                           ///&lt; extent of logical tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L198** <code>    bool device_backed_ = true) {                        ///&lt; if true, device memory is also allocated. </code>
+  - EN: Assigns or initializes `device_backed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed_` 进行赋值或初始化。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>    reset(extent, Layout::packed(extent), device_backed_);</code>
+  - EN: Declares function or method `packed` without defining it here.
+  - CN: 声明函数或方法 `packed`，但不在此处给出定义。
+- **L201** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L202** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L203** <code>  /// Changes the size of the logical tensor. Only allocates memory if new capacity exceeds reserved capacity.</code>
+  - EN: Comment that documents intent or context: "Changes the size of the logical tensor. Only allocates memory if new capacity exceeds reserved capacity.".
+  - CN: 用于说明意图或上下文的注释："Changes the size of the logical tensor. Only allocates memory if new capacity exceeds reserved capacity."。
+- **L204** <code>  /// To force allocation, call reset().</code>
+  - EN: Comment that documents intent or context: "To force allocation, call reset().".
+  - CN: 用于说明意图或上下文的注释："To force allocation, call reset()."。
+- **L205** <code>  void resize(</code>
+  - EN: Begins or continues the signature/call syntax involving `resize`.
+  - CN: 开始或继续与 `resize` 相关的签名/调用语法。
+- **L206** <code>    TensorCoord const &amp;extent,                           ///&lt; extent of logical tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L207** <code>    Layout const &amp;layout,                                ///&lt; layout object of tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L208** <code>    bool device_backed_ = true) {                        ///&lt; if true, device memory is also allocated. </code>
+  - EN: Assigns or initializes `device_backed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed_` 进行赋值或初始化。
+- **L209** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L210** <code>    extent_ = extent;</code>
+  - EN: Assigns or initializes `extent_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `extent_` 进行赋值或初始化。
+- **L211** <code>    layout_ = layout;</code>
+  - EN: Assigns or initializes `layout_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_` 进行赋值或初始化。
+- **L212** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L213** <code>    LongIndex new_size = size_t(layout_.capacity(extent_));</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L214** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L215** <code>    if (static_cast&lt;decltype(host_.size())&gt;(new_size * 2) &gt; host_.size()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L216** <code>      reserve(new_size);</code>
+  - EN: Declares function or method `reserve` without defining it here.
+  - CN: 声明函数或方法 `reserve`，但不在此处给出定义。
+- **L217** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L218** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L219** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L220** <code>  /// Changes the size of the logical tensor. Only allocates memory if new capacity exceeds reserved capacity.</code>
+  - EN: Comment that documents intent or context: "Changes the size of the logical tensor. Only allocates memory if new capacity exceeds reserved capacity.".
+  - CN: 用于说明意图或上下文的注释："Changes the size of the logical tensor. Only allocates memory if new capacity exceeds reserved capacity."。
+- **L221** <code>  /// To force allocation, call reset(). Note, this form of resize() assumes a packed tensor configuration.</code>
+  - EN: Comment that documents intent or context: "To force allocation, call reset(). Note, this form of resize() assumes a packed tensor configuration.".
+  - CN: 用于说明意图或上下文的注释："To force allocation, call reset(). Note, this form of resize() assumes a packed tensor configuration."。
+- **L222** <code>  void resize(</code>
+  - EN: Begins or continues the signature/call syntax involving `resize`.
+  - CN: 开始或继续与 `resize` 相关的签名/调用语法。
+- **L223** <code>    TensorCoord const &amp;extent,                           ///&lt; extent of logical tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>    bool device_backed_ = true) {                        ///&lt; if true, device memory is also allocated. </code>
+  - EN: Assigns or initializes `device_backed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_backed_` 进行赋值或初始化。
+- **L225** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L226** <code>    resize(extent, Layout::packed(extent), device_backed_);</code>
+  - EN: Declares function or method `packed` without defining it here.
+  - CN: 声明函数或方法 `packed`，但不在此处给出定义。
+- **L227** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L228** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L229** <code>  /// Returns the number of elements stored in the host tensor</code>
+  - EN: Comment that documents intent or context: "Returns the number of elements stored in the host tensor".
+  - CN: 用于说明意图或上下文的注释："Returns the number of elements stored in the host tensor"。
+- **L230** <code>  size_t size() const {</code>
+  - EN: Begins the definition of function or method `size`.
+  - CN: 开始定义函数或方法 `size`。
+- **L231** <code>    return host_.size() / 2;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L232** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L234** <code>  /// Returns the logical capacity based on extent and layout. May differ from size().</code>
+  - EN: Comment that documents intent or context: "Returns the logical capacity based on extent and layout. May differ from size().".
+  - CN: 用于说明意图或上下文的注释："Returns the logical capacity based on extent and layout. May differ from size()."。
+- **L235** <code>  LongIndex capacity() const {</code>
+  - EN: Begins the definition of function or method `capacity`.
+  - CN: 开始定义函数或方法 `capacity`。
+- **L236** <code>    return layout_.capacity(extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L237** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L238** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L239** <code>  /// Stride between real and imaginary parts</code>
+  - EN: Comment that documents intent or context: "Stride between real and imaginary parts".
+  - CN: 用于说明意图或上下文的注释："Stride between real and imaginary parts"。
+- **L240** <code>  LongIndex imaginary_stride() const {</code>
+  - EN: Begins the definition of function or method `imaginary_stride`.
+  - CN: 开始定义函数或方法 `imaginary_stride`。
+- **L241** <code>    return host_.size() / 2;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L242** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  /// Gets pointer to host data</code>
+  - EN: Comment that documents intent or context: "Gets pointer to host data".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to host data"。
+- **L245** <code>  Element * host_data() { return host_.data(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>  /// Gets pointer to host data imaginary part</code>
+  - EN: Comment that documents intent or context: "Gets pointer to host data imaginary part".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to host data imaginary part"。
+- **L248** <code>  Element * host_data_imag() { return host_.data() + imaginary_stride(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `imaginary_stride`.
+  - CN: 开始或继续与 `imaginary_stride` 相关的签名/调用语法。
+- **L249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L250** <code>  /// Gets pointer to host data with a pointer offset</code>
+  - EN: Comment that documents intent or context: "Gets pointer to host data with a pointer offset".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to host data with a pointer offset"。
+- **L251** <code>  Element * host_data_ptr_offset(LongIndex ptr_element_offset) { return host_data() + ptr_element_offset; }</code>
+  - EN: Begins or continues the signature/call syntax involving `host_data`.
+  - CN: 开始或继续与 `host_data` 相关的签名/调用语法。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  /// Gets pointer to host data with a pointer offset</code>
+  - EN: Comment that documents intent or context: "Gets pointer to host data with a pointer offset".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to host data with a pointer offset"。
+- **L254** <code>  Element * host_data_imag_ptr_offset(LongIndex ptr_element_offset) { return host_data_imag() + ptr_element_offset; }</code>
+  - EN: Begins or continues the signature/call syntax involving `host_data_imag`.
+  - CN: 开始或继续与 `host_data_imag` 相关的签名/调用语法。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>  /// Gets a reference to an element in host memory</code>
+  - EN: Comment that documents intent or context: "Gets a reference to an element in host memory".
+  - CN: 用于说明意图或上下文的注释："Gets a reference to an element in host memory"。
+- **L257** <code>  Reference host_data(LongIndex idx) {</code>
+  - EN: Begins the definition of function or method `host_data`.
+  - CN: 开始定义函数或方法 `host_data`。
+- **L258** <code>    return PlanarComplexReference&lt;Element&gt;(host_data() + idx, host_data_imag() + idx);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L259** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L260** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L261** <code>  /// Gets pointer to host data</code>
+  - EN: Comment that documents intent or context: "Gets pointer to host data".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to host data"。
+- **L262** <code>  Element const * host_data() const { return host_.data(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>  /// Gets pointer to host data imaginary part</code>
+  - EN: Comment that documents intent or context: "Gets pointer to host data imaginary part".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to host data imaginary part"。
+- **L265** <code>  Element const * host_data_imag() const { return host_.data() + imaginary_stride(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `imaginary_stride`.
+  - CN: 开始或继续与 `imaginary_stride` 相关的签名/调用语法。
+- **L266** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L267** <code>  /// Gets a constant reference to an element in host memory</code>
+  - EN: Comment that documents intent or context: "Gets a constant reference to an element in host memory".
+  - CN: 用于说明意图或上下文的注释："Gets a constant reference to an element in host memory"。
+- **L268** <code>  ConstReference host_data(LongIndex idx) const {</code>
+  - EN: Begins the definition of function or method `host_data`.
+  - CN: 开始定义函数或方法 `host_data`。
+- **L269** <code>    return PlanarComplexReference&lt;Element const&gt;(host_data() + idx, host_data_imag() + idx);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L270** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L271** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L272** <code>  /// Gets pointer to device data</code>
+  - EN: Comment that documents intent or context: "Gets pointer to device data".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to device data"。
+- **L273** <code>  Element * device_data() { return device_.get(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L274** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L275** <code>  /// Gets pointer to device data with a pointer offset</code>
+  - EN: Comment that documents intent or context: "Gets pointer to device data with a pointer offset".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to device data with a pointer offset"。
+- **L276** <code>  Element * device_data_ptr_offset(LongIndex ptr_element_offset) { return device_.get() + ptr_element_offset; }</code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L277** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L278** <code>  /// Gets pointer to device data</code>
+  - EN: Comment that documents intent or context: "Gets pointer to device data".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to device data"。
+- **L279** <code>  Element const * device_data() const { return device_.get(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>  /// Gets pointer to device data with a pointer offset</code>
+  - EN: Comment that documents intent or context: "Gets pointer to device data with a pointer offset".
+  - CN: 用于说明意图或上下文的注释："Gets pointer to device data with a pointer offset"。
+- **L282** <code>  Element const * device_data_ptr_offset(LongIndex ptr_element_offset) const { return device_.get() + ptr_element_offset; }</code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L283** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L284** <code>  /// Gets a pointer to the device data imaginary part</code>
+  - EN: Comment that documents intent or context: "Gets a pointer to the device data imaginary part".
+  - CN: 用于说明意图或上下文的注释："Gets a pointer to the device data imaginary part"。
+- **L285** <code>  Element * device_data_imag() { return device_.get() + imaginary_stride(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `imaginary_stride`.
+  - CN: 开始或继续与 `imaginary_stride` 相关的签名/调用语法。
+- **L286** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L287** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L288** <code>  TensorRef host_ref(LongIndex ptr_element_offset=0) { </code>
+  - EN: Begins the definition of function or method `host_ref`.
+  - CN: 开始定义函数或方法 `host_ref`。
+- **L289** <code>    return TensorRef(host_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride()); </code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L290** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L291** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L292** <code>  /// Returns a tensor reference to the real part of the tensor</code>
+  - EN: Comment that documents intent or context: "Returns a tensor reference to the real part of the tensor".
+  - CN: 用于说明意图或上下文的注释："Returns a tensor reference to the real part of the tensor"。
+- **L293** <code>  cutlass::TensorRef&lt;Element, Layout&gt; host_ref_real() {</code>
+  - EN: Begins the definition of function or method `host_ref_real`.
+  - CN: 开始定义函数或方法 `host_ref_real`。
+- **L294** <code>    return cutlass::TensorRef&lt;Element, Layout&gt;(host_data(), layout_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L295** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L296** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L297** <code>  /// Returns a tensor reference to the real part of the tensor</code>
+  - EN: Comment that documents intent or context: "Returns a tensor reference to the real part of the tensor".
+  - CN: 用于说明意图或上下文的注释："Returns a tensor reference to the real part of the tensor"。
+- **L298** <code>  cutlass::TensorRef&lt;Element, Layout&gt; host_ref_imag() {</code>
+  - EN: Begins the definition of function or method `host_ref_imag`.
+  - CN: 开始定义函数或方法 `host_ref_imag`。
+- **L299** <code>    return cutlass::TensorRef&lt;Element, Layout&gt;(host_data_ptr_offset(imaginary_stride()), layout_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L300** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L301** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L302** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L303** <code>  ConstTensorRef host_ref(LongIndex ptr_element_offset=0) const { </code>
+  - EN: Begins the definition of function or method `host_ref`.
+  - CN: 开始定义函数或方法 `host_ref`。
+- **L304** <code>    return ConstTensorRef(host_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride()); </code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L305** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L306** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L307** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L308** <code>  TensorRef device_ref(LongIndex ptr_element_offset=0) {</code>
+  - EN: Begins the definition of function or method `device_ref`.
+  - CN: 开始定义函数或方法 `device_ref`。
+- **L309** <code>    return TensorRef(device_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L310** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L311** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L312** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L313** <code>  ConstTensorRef device_ref(LongIndex ptr_element_offset=0) const {</code>
+  - EN: Begins the definition of function or method `device_ref`.
+  - CN: 开始定义函数或方法 `device_ref`。
+- **L314** <code>    return TensorRef(device_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L315** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L316** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L317** <code>  /// Returns a tensor reference to the real part of the tensor</code>
+  - EN: Comment that documents intent or context: "Returns a tensor reference to the real part of the tensor".
+  - CN: 用于说明意图或上下文的注释："Returns a tensor reference to the real part of the tensor"。
+- **L318** <code>  cutlass::TensorRef&lt;Element, Layout&gt; device_ref_real() {</code>
+  - EN: Begins the definition of function or method `device_ref_real`.
+  - CN: 开始定义函数或方法 `device_ref_real`。
+- **L319** <code>    return cutlass::TensorRef&lt;Element, Layout&gt;(device_data(), layout_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L320** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L321** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L322** <code>  /// Returns a tensor reference to the real part of the tensor</code>
+  - EN: Comment that documents intent or context: "Returns a tensor reference to the real part of the tensor".
+  - CN: 用于说明意图或上下文的注释："Returns a tensor reference to the real part of the tensor"。
+- **L323** <code>  cutlass::TensorRef&lt;Element, Layout&gt; device_ref_imag() {</code>
+  - EN: Begins the definition of function or method `device_ref_imag`.
+  - CN: 开始定义函数或方法 `device_ref_imag`。
+- **L324** <code>    return cutlass::TensorRef&lt;Element, Layout&gt;(device_data_ptr_offset(imaginary_stride()), layout_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L325** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L326** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L327** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L328** <code>  TensorView host_view(LongIndex ptr_element_offset=0) {</code>
+  - EN: Begins the definition of function or method `host_view`.
+  - CN: 开始定义函数或方法 `host_view`。
+- **L329** <code>    return TensorView(host_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride(), extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L330** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L331** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L332** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L333** <code>  ConstTensorView host_view(LongIndex ptr_element_offset=0) const {</code>
+  - EN: Begins the definition of function or method `host_view`.
+  - CN: 开始定义函数或方法 `host_view`。
+- **L334** <code>    return ConstTensorView(host_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride(), extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L335** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L336** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L337** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L338** <code>  cutlass::TensorView&lt;Element, Layout&gt; host_view_real() {</code>
+  - EN: Begins the definition of function or method `host_view_real`.
+  - CN: 开始定义函数或方法 `host_view_real`。
+- **L339** <code>    return cutlass::TensorView&lt;Element, Layout&gt;(host_data(), layout_, extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L340** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L341** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L342** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L343** <code>  cutlass::TensorView&lt;Element, Layout&gt; host_view_imag() {</code>
+  - EN: Begins the definition of function or method `host_view_imag`.
+  - CN: 开始定义函数或方法 `host_view_imag`。
+- **L344** <code>    return cutlass::TensorView&lt;Element, Layout&gt;(host_data_ptr_offset(imaginary_stride()), layout_, extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L345** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L346** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L347** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L348** <code>  TensorView device_view(LongIndex ptr_element_offset=0) {</code>
+  - EN: Begins the definition of function or method `device_view`.
+  - CN: 开始定义函数或方法 `device_view`。
+- **L349** <code>    return TensorView(device_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride(), extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L350** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L351** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L352** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L353** <code>  ConstTensorView device_view(LongIndex ptr_element_offset=0) const {</code>
+  - EN: Begins the definition of function or method `device_view`.
+  - CN: 开始定义函数或方法 `device_view`。
+- **L354** <code>    return ConstTensorView(device_data_ptr_offset(ptr_element_offset), layout_, imaginary_stride(), extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L355** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L356** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L357** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L358** <code>  cutlass::TensorView&lt;Element, Layout&gt; device_view_real() {</code>
+  - EN: Begins the definition of function or method `device_view_real`.
+  - CN: 开始定义函数或方法 `device_view_real`。
+- **L359** <code>    return cutlass::TensorView&lt;Element, Layout&gt;(device_data(), layout_, extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L360** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L361** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L362** <code>  /// Accesses the tensor reference pointing to data</code>
+  - EN: Comment that documents intent or context: "Accesses the tensor reference pointing to data".
+  - CN: 用于说明意图或上下文的注释："Accesses the tensor reference pointing to data"。
+- **L363** <code>  cutlass::TensorView&lt;Element, Layout&gt; device_view_imag() {</code>
+  - EN: Begins the definition of function or method `device_view_imag`.
+  - CN: 开始定义函数或方法 `device_view_imag`。
+- **L364** <code>    return cutlass::TensorView&lt;Element, Layout&gt;(device_data_ptr_offset(imaginary_stride()), layout_, extent_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L365** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L366** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L367** <code>  /// Returns true if device memory is allocated</code>
+  - EN: Comment that documents intent or context: "Returns true if device memory is allocated".
+  - CN: 用于说明意图或上下文的注释："Returns true if device memory is allocated"。
+- **L368** <code>  bool device_backed() const {</code>
+  - EN: Begins the definition of function or method `device_backed`.
+  - CN: 开始定义函数或方法 `device_backed`。
+- **L369** <code>    return (device_.get() == nullptr) ? false : true;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L370** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L371** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L372** <code>  /// Returns the layout object</code>
+  - EN: Comment that documents intent or context: "Returns the layout object".
+  - CN: 用于说明意图或上下文的注释："Returns the layout object"。
+- **L373** <code>  Layout layout() const {</code>
+  - EN: Begins the definition of function or method `layout`.
+  - CN: 开始定义函数或方法 `layout`。
+- **L374** <code>    return layout_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L375** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L376** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L377** <code>  /// Returns the layout object&#x27;s stride vector</code>
+  - EN: Comment that documents intent or context: "Returns the layout object's stride vector".
+  - CN: 用于说明意图或上下文的注释："Returns the layout object's stride vector"。
+- **L378** <code>  Stride stride() const {</code>
+  - EN: Begins the definition of function or method `stride`.
+  - CN: 开始定义函数或方法 `stride`。
+- **L379** <code>    return layout_.stride();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L380** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L381** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L382** <code>  /// Returns the layout object&#x27;s stride in a given physical dimension</code>
+  - EN: Comment that documents intent or context: "Returns the layout object's stride in a given physical dimension".
+  - CN: 用于说明意图或上下文的注释："Returns the layout object's stride in a given physical dimension"。
+- **L383** <code>  Index stride(int dim) const {</code>
+  - EN: Begins the definition of function or method `stride`.
+  - CN: 开始定义函数或方法 `stride`。
+- **L384** <code>    return layout_.stride().at(dim);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L385** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L386** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L387** <code>  /// Computes the offset of an index from the origin of the tensor</code>
+  - EN: Comment that documents intent or context: "Computes the offset of an index from the origin of the tensor".
+  - CN: 用于说明意图或上下文的注释："Computes the offset of an index from the origin of the tensor"。
+- **L388** <code>  LongIndex offset(TensorCoord const&amp; coord) const {</code>
+  - EN: Begins the definition of function or method `offset`.
+  - CN: 开始定义函数或方法 `offset`。
+- **L389** <code>    return layout_(coord);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L390** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L391** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L392** <code>  /// Returns a reference to the element at the logical Coord in host memory</code>
+  - EN: Comment that documents intent or context: "Returns a reference to the element at the logical Coord in host memory".
+  - CN: 用于说明意图或上下文的注释："Returns a reference to the element at the logical Coord in host memory"。
+- **L393** <code>  Reference at(TensorCoord const&amp; coord) {</code>
+  - EN: Begins the definition of function or method `at`.
+  - CN: 开始定义函数或方法 `at`。
+- **L394** <code>    return host_data(offset(coord));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L395** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L396** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L397** <code>  /// Returns a const reference to the element at the logical Coord in host memory</code>
+  - EN: Comment that documents intent or context: "Returns a const reference to the element at the logical Coord in host memory".
+  - CN: 用于说明意图或上下文的注释："Returns a const reference to the element at the logical Coord in host memory"。
+- **L398** <code>  ConstReference at(TensorCoord const&amp; coord) const {</code>
+  - EN: Begins the definition of function or method `at`.
+  - CN: 开始定义函数或方法 `at`。
+- **L399** <code>    return host_data(offset(coord));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L400** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L401** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L402** <code>  /// Returns the extent of the tensor</code>
+  - EN: Comment that documents intent or context: "Returns the extent of the tensor".
+  - CN: 用于说明意图或上下文的注释："Returns the extent of the tensor"。
+- **L403** <code>  TensorCoord extent() const {</code>
+  - EN: Begins the definition of function or method `extent`.
+  - CN: 开始定义函数或方法 `extent`。
+- **L404** <code>    return extent_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L405** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L406** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L407** <code>  /// Returns the extent of the tensor</code>
+  - EN: Comment that documents intent or context: "Returns the extent of the tensor".
+  - CN: 用于说明意图或上下文的注释："Returns the extent of the tensor"。
+- **L408** <code>  TensorCoord &amp; extent() {</code>
+  - EN: Begins the definition of function or method `extent`.
+  - CN: 开始定义函数或方法 `extent`。
+- **L409** <code>    return extent_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L410** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L411** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L412** <code>  /// Copies data from device to host</code>
+  - EN: Comment that documents intent or context: "Copies data from device to host".
+  - CN: 用于说明意图或上下文的注释："Copies data from device to host"。
+- **L413** <code>  void sync_host() {</code>
+  - EN: Begins the definition of function or method `sync_host`.
+  - CN: 开始定义函数或方法 `sync_host`。
+- **L414** <code>    if (device_backed()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L415** <code>      device_memory::copy_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_host`.
+  - CN: 开始或继续与 `copy_to_host` 相关的签名/调用语法。
+- **L416** <code>          host_data(), device_data(), imaginary_stride() * 2);</code>
+  - EN: Declares function or method `imaginary_stride` without defining it here.
+  - CN: 声明函数或方法 `imaginary_stride`，但不在此处给出定义。
+- **L417** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L418** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L419** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L420** <code>  /// Copies data from host to device</code>
+  - EN: Comment that documents intent or context: "Copies data from host to device".
+  - CN: 用于说明意图或上下文的注释："Copies data from host to device"。
+- **L421** <code>  void sync_device() {</code>
+  - EN: Begins the definition of function or method `sync_device`.
+  - CN: 开始定义函数或方法 `sync_device`。
+- **L422** <code>    if (device_backed()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L423** <code>      device_memory::copy_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_device`.
+  - CN: 开始或继续与 `copy_to_device` 相关的签名/调用语法。
+- **L424** <code>          device_data(), host_data(), imaginary_stride() * 2);</code>
+  - EN: Declares function or method `imaginary_stride` without defining it here.
+  - CN: 声明函数或方法 `imaginary_stride`，但不在此处给出定义。
+- **L425** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L426** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L427** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L428** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L429** <code>  void copy_in_device_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_in_device_to_host`.
+  - CN: 开始或继续与 `copy_in_device_to_host` 相关的签名/调用语法。
+- **L430** <code>    Element const* ptr_device_real,   ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L431** <code>    Element const* ptr_device_imag,   ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L432** <code>    LongIndex count = -1) {           ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L433** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L434** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L435** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L436** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L437** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L438** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L439** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L440** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L441** <code>    device_memory::copy_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_host`.
+  - CN: 开始或继续与 `copy_to_host` 相关的签名/调用语法。
+- **L442** <code>      host_data(), ptr_device_real, count);</code>
+  - EN: Declares function or method `host_data` without defining it here.
+  - CN: 声明函数或方法 `host_data`，但不在此处给出定义。
+- **L443** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L444** <code>    device_memory::copy_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_host`.
+  - CN: 开始或继续与 `copy_to_host` 相关的签名/调用语法。
+- **L445** <code>      host_data_imag(), ptr_device_imag, count);</code>
+  - EN: Declares function or method `host_data_imag` without defining it here.
+  - CN: 声明函数或方法 `host_data_imag`，但不在此处给出定义。
+- **L446** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L447** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L448** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L449** <code>  void copy_in_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_in_device_to_device`.
+  - CN: 开始或继续与 `copy_in_device_to_device` 相关的签名/调用语法。
+- **L450** <code>    Element const* ptr_device_real,   ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L451** <code>    Element const* ptr_device_imag,   ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L452** <code>    LongIndex count = -1) {           ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L453** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L454** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L455** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L456** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L457** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L458** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L459** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L460** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L461** <code>    device_memory::copy_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_device_to_device`.
+  - CN: 开始或继续与 `copy_device_to_device` 相关的签名/调用语法。
+- **L462** <code>      device_data(), ptr_device_real, count);</code>
+  - EN: Declares function or method `device_data` without defining it here.
+  - CN: 声明函数或方法 `device_data`，但不在此处给出定义。
+- **L463** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L464** <code>    device_memory::copy_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_device_to_device`.
+  - CN: 开始或继续与 `copy_device_to_device` 相关的签名/调用语法。
+- **L465** <code>      device_data_imag(), ptr_device_imag, count);</code>
+  - EN: Declares function or method `device_data_imag` without defining it here.
+  - CN: 声明函数或方法 `device_data_imag`，但不在此处给出定义。
+- **L466** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L467** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L468** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L469** <code>  void copy_in_host_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_in_host_to_device`.
+  - CN: 开始或继续与 `copy_in_host_to_device` 相关的签名/调用语法。
+- **L470** <code>    Element const* ptr_host_real,      ///&lt; source host memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L471** <code>    Element const* ptr_host_imag,      ///&lt; source host memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L472** <code>    LongIndex count = -1) {            ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L473** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L474** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L475** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L476** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L477** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L478** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L479** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L480** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L481** <code>    device_memory::copy_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_device`.
+  - CN: 开始或继续与 `copy_to_device` 相关的签名/调用语法。
+- **L482** <code>      device_data(), ptr_host_real, count);</code>
+  - EN: Declares function or method `device_data` without defining it here.
+  - CN: 声明函数或方法 `device_data`，但不在此处给出定义。
+- **L483** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L484** <code>    device_memory::copy_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_device`.
+  - CN: 开始或继续与 `copy_to_device` 相关的签名/调用语法。
+- **L485** <code>      device_data_imag(), ptr_host_imag, count);</code>
+  - EN: Declares function or method `device_data_imag` without defining it here.
+  - CN: 声明函数或方法 `device_data_imag`，但不在此处给出定义。
+- **L486** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L487** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L488** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L489** <code>  void copy_in_host_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_in_host_to_host`.
+  - CN: 开始或继续与 `copy_in_host_to_host` 相关的签名/调用语法。
+- **L490** <code>    Element const* ptr_host_real,     ///&lt; source host memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L491** <code>    Element const* ptr_host_imag,     ///&lt; source host memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L492** <code>    LongIndex count = -1) {           ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L493** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L494** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L495** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L496** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L497** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L498** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L499** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L500** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L501** <code>    device_memory::copy_host_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_host_to_host`.
+  - CN: 开始或继续与 `copy_host_to_host` 相关的签名/调用语法。
+- **L502** <code>      host_data(), ptr_host_real, count);</code>
+  - EN: Declares function or method `host_data` without defining it here.
+  - CN: 声明函数或方法 `host_data`，但不在此处给出定义。
+- **L503** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L504** <code>    device_memory::copy_host_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_host_to_host`.
+  - CN: 开始或继续与 `copy_host_to_host` 相关的签名/调用语法。
+- **L505** <code>      host_data_imag(), ptr_host_imag, count);</code>
+  - EN: Declares function or method `host_data_imag` without defining it here.
+  - CN: 声明函数或方法 `host_data_imag`，但不在此处给出定义。
+- **L506** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L508** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L509** <code>  void copy_out_device_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_out_device_to_host`.
+  - CN: 开始或继续与 `copy_out_device_to_host` 相关的签名/调用语法。
+- **L510** <code>    Element * ptr_host_real,           ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L511** <code>    Element * ptr_host_imag,           ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L512** <code>    LongIndex count = -1) const {      ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L513** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L514** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L515** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L516** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L517** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L518** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L519** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L520** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L521** <code>    device_memory::copy_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_host`.
+  - CN: 开始或继续与 `copy_to_host` 相关的签名/调用语法。
+- **L522** <code>      ptr_host_real, device_data(), count);</code>
+  - EN: Declares function or method `device_data` without defining it here.
+  - CN: 声明函数或方法 `device_data`，但不在此处给出定义。
+- **L523** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L524** <code>    device_memory::copy_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_host`.
+  - CN: 开始或继续与 `copy_to_host` 相关的签名/调用语法。
+- **L525** <code>      ptr_host_imag, device_data_imag(), count);</code>
+  - EN: Declares function or method `device_data_imag` without defining it here.
+  - CN: 声明函数或方法 `device_data_imag`，但不在此处给出定义。
+- **L526** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L527** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L528** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L529** <code>  void copy_out_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_out_device_to_device`.
+  - CN: 开始或继续与 `copy_out_device_to_device` 相关的签名/调用语法。
+- **L530** <code>    Element * ptr_device_real,        ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L531** <code>    Element * ptr_device_imag,        ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L532** <code>    LongIndex count = -1) const {     ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L533** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L534** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L535** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L536** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L537** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L538** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L539** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L540** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L541** <code>    device_memory::copy_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_device_to_device`.
+  - CN: 开始或继续与 `copy_device_to_device` 相关的签名/调用语法。
+- **L542** <code>      ptr_device_real, device_data(), count);</code>
+  - EN: Declares function or method `device_data` without defining it here.
+  - CN: 声明函数或方法 `device_data`，但不在此处给出定义。
+- **L543** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L544** <code>    device_memory::copy_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_device_to_device`.
+  - CN: 开始或继续与 `copy_device_to_device` 相关的签名/调用语法。
+- **L545** <code>      ptr_device_imag, device_data_imag(), count);</code>
+  - EN: Declares function or method `device_data_imag` without defining it here.
+  - CN: 声明函数或方法 `device_data_imag`，但不在此处给出定义。
+- **L546** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L547** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L548** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L549** <code>  void copy_out_host_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_out_host_to_device`.
+  - CN: 开始或继续与 `copy_out_host_to_device` 相关的签名/调用语法。
+- **L550** <code>    Element * ptr_device_real,        ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L551** <code>    Element * ptr_device_imag,        ///&lt; source device memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L552** <code>    LongIndex count = -1) const {     ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L553** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L554** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L555** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L556** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L557** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L558** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L559** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L560** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L561** <code>    device_memory::copy_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_device`.
+  - CN: 开始或继续与 `copy_to_device` 相关的签名/调用语法。
+- **L562** <code>      ptr_device_real, host_data(), count);</code>
+  - EN: Declares function or method `host_data` without defining it here.
+  - CN: 声明函数或方法 `host_data`，但不在此处给出定义。
+- **L563** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L564** <code>    device_memory::copy_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_to_device`.
+  - CN: 开始或继续与 `copy_to_device` 相关的签名/调用语法。
+- **L565** <code>      ptr_device_imag, host_data_imag(), count);</code>
+  - EN: Declares function or method `host_data_imag` without defining it here.
+  - CN: 声明函数或方法 `host_data_imag`，但不在此处给出定义。
+- **L566** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L567** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L568** <code>  /// Copy data from a caller-supplied device pointer into host memory.</code>
+  - EN: Comment that documents intent or context: "Copy data from a caller-supplied device pointer into host memory.".
+  - CN: 用于说明意图或上下文的注释："Copy data from a caller-supplied device pointer into host memory."。
+- **L569** <code>  void copy_out_host_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_out_host_to_host`.
+  - CN: 开始或继续与 `copy_out_host_to_host` 相关的签名/调用语法。
+- **L570** <code>    Element * ptr_host_real,          ///&lt; source host memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L571** <code>    Element * ptr_host_imag,          ///&lt; source host memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L572** <code>    LongIndex count = -1) const {     ///&lt; number of elements to transfer; if negative, entire tensor is overwritten.</code>
+  - EN: Assigns or initializes `count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `count` 进行赋值或初始化。
+- **L573** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L574** <code>    if (count &lt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L575** <code>      count = capacity();</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L576** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L577** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L578** <code>      count = __NV_STD_MIN(capacity(), count);</code>
+  - EN: Declares function or method `capacity` without defining it here.
+  - CN: 声明函数或方法 `capacity`，但不在此处给出定义。
+- **L579** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L580** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L581** <code>    device_memory::copy_host_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_host_to_host`.
+  - CN: 开始或继续与 `copy_host_to_host` 相关的签名/调用语法。
+- **L582** <code>      ptr_host_real, host_data(), count);</code>
+  - EN: Declares function or method `host_data` without defining it here.
+  - CN: 声明函数或方法 `host_data`，但不在此处给出定义。
+- **L583** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L584** <code>    device_memory::copy_host_to_host(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_host_to_host`.
+  - CN: 开始或继续与 `copy_host_to_host` 相关的签名/调用语法。
+- **L585** <code>      ptr_host_imag, host_data_imag(), count);</code>
+  - EN: Declares function or method `host_data_imag` without defining it here.
+  - CN: 声明函数或方法 `host_data_imag`，但不在此处给出定义。
+- **L586** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L587** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L588** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L589** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L590** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L591** <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>vector</code> — dynamic array containers / 动态数组容器
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_ref_planar_complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view_planar_complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>device_memory.h</code> — project-specific declarations from `device_memory.h` / 来自 `device_memory.h` 的项目专用声明

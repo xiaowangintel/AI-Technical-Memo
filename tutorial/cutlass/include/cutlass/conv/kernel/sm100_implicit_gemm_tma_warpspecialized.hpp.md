@@ -1,0 +1,2660 @@
+# sm100_implicit_gemm_tma_warpspecialized.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/kernel/sm100_implicit_gemm_tma_warpspecialized.hpp`
+**Purpose / 用途**: Provides kernel-level configuration, implicit GEMM support, SM100 specialization. / 提供kernel 级配置、隐式 GEMM 支持、SM100 特化。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 32 / 第 32 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 33 / 第 33 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 34 / 第 34 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 35 / 第 35 行** — `#include "cutlass/fast_math.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/fast_math.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/fast_math.h`。
+- **Line 36 / 第 36 行** — `#include "cutlass/kernel_hardware_info.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/kernel_hardware_info.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/kernel_hardware_info.hpp`。
+- **Line 37 / 第 37 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 38 / 第 38 行** — `#include "cute/tensor.hpp"`
+  - **EN**: Includes CuTe dependency `cute/tensor.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/tensor.hpp`。
+- **Line 39 / 第 39 行** — `#include "cute/arch/tmem_allocator_sm100.hpp"`
+  - **EN**: Includes CuTe dependency `cute/arch/tmem_allocator_sm100.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/arch/tmem_allocator_sm100.hpp`。
+- **Line 40 / 第 40 行** — `#include "cute/arch/cluster_sm90.hpp"`
+  - **EN**: Includes CuTe dependency `cute/arch/cluster_sm90.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/arch/cluster_sm90.hpp`。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `#include "cutlass/arch/arch.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/arch/arch.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/arch/arch.h`。
+- **Line 43 / 第 43 行** — `#include "cutlass/arch/grid_dependency_control.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/arch/grid_dependency_control.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/arch/grid_dependency_control.h`。
+- **Line 44 / 第 44 行** — `#include "cutlass/conv/detail.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/detail.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/detail.hpp`。
+- **Line 45 / 第 45 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 46 / 第 46 行** — `#include "cutlass/conv/dispatch_policy.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/dispatch_policy.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/dispatch_policy.hpp`。
+- **Line 47 / 第 47 行** — `#include "cutlass/gemm/kernel/tile_scheduler.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/kernel/tile_scheduler.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/kernel/tile_scheduler.hpp`。
+- **Line 48 / 第 48 行** — `#include "cutlass/pipeline/sm100_pipeline.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/pipeline/sm100_pipeline.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/pipeline/sm100_pipeline.hpp`。
+- **Line 49 / 第 49 行** — `#include "cutlass/detail/sm100_tmem_helper.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/detail/sm100_tmem_helper.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/detail/sm100_tmem_helper.hpp`。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `///////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 52 / 第 52 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 53 / 第 53 行** — `namespace cutlass::conv::kernel {`
+  - **EN**: Opens namespace `cutlass::conv::kernel` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv::kernel`。
+- **Line 54 / 第 54 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 55 / 第 55 行** — `///////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 56 / 第 56 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 57 / 第 57 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 58 / 第 58 行** — `  class ProblemShape_,`
+  - **EN**: Adds template parameter specifier `class ProblemShape_`.
+  - **CN**: 补充模板参数说明符 `class ProblemShape_`。
+- **Line 59 / 第 59 行** — `  class CollectiveMainloop_,`
+  - **EN**: Adds template parameter specifier `class CollectiveMainloop_`.
+  - **CN**: 补充模板参数说明符 `class CollectiveMainloop_`。
+- **Line 60 / 第 60 行** — `  class CollectiveEpilogue_,`
+  - **EN**: Adds template parameter specifier `class CollectiveEpilogue_`.
+  - **CN**: 补充模板参数说明符 `class CollectiveEpilogue_`。
+- **Line 61 / 第 61 行** — `  class TileSchedulerTag_`
+  - **EN**: Adds template parameter specifier `class TileSchedulerTag_`.
+  - **CN**: 补充模板参数说明符 `class TileSchedulerTag_`。
+- **Line 62 / 第 62 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 63 / 第 63 行** — `class ConvUniversal<`
+  - **EN**: Declares class `ConvUniversal`.
+  - **CN**: 声明 class `ConvUniversal`。
+- **Line 64 / 第 64 行** — `  ProblemShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 65 / 第 65 行** — `  CollectiveMainloop_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 66 / 第 66 行** — `  CollectiveEpilogue_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 67 / 第 67 行** — `  TileSchedulerTag_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 68 / 第 68 行** — `  cute::enable_if_t<cute::is_base_of_v<KernelImplicitTmaWarpSpecializedSm100,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 69 / 第 69 行** — `                                       typename CollectiveMainloop_::DispatchPolicy::Schedule>>>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 70 / 第 70 行** — `{`
+  - **EN**: Opens the body for the preceding declaration or control block.
+  - **CN**: 为前面的声明或控制块打开主体。
+- **Line 71 / 第 71 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 72 / 第 72 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 73 / 第 73 行** — `  // Type Aliases`
+  - **EN**: Inline comment explaining intent: `Type Aliases`.
+  - **CN**: 行内注释说明意图：`Type Aliases`。
+- **Line 74 / 第 74 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 75 / 第 75 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 76 / 第 76 行** — `  // Mainloop derived types`
+  - **EN**: Inline comment explaining intent: `Mainloop derived types`.
+  - **CN**: 行内注释说明意图：`Mainloop derived types`。
+- **Line 77 / 第 77 行** — `  using ProblemShape = ProblemShape_;`
+  - **EN**: Introduces type or value alias `ProblemShape`.
+  - **CN**: 引入类型或值别名 `ProblemShape`。
+- **Line 78 / 第 78 行** — `  using CollectiveMainloop = CollectiveMainloop_;`
+  - **EN**: Introduces type or value alias `CollectiveMainloop`.
+  - **CN**: 引入类型或值别名 `CollectiveMainloop`。
+- **Line 79 / 第 79 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 80 / 第 80 行** — `  using TileShape = typename CollectiveMainloop::TileShape;`
+  - **EN**: Introduces type or value alias `TileShape`.
+  - **CN**: 引入类型或值别名 `TileShape`。
+- **Line 81 / 第 81 行** — `  using TiledMma  = typename CollectiveMainloop::TiledMma;`
+  - **EN**: Introduces type or value alias `TiledMma`.
+  - **CN**: 引入类型或值别名 `TiledMma`。
+- **Line 82 / 第 82 行** — `  using ArchTag   = typename CollectiveMainloop::ArchTag;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 83 / 第 83 行** — `  using ElementA  = typename CollectiveMainloop::ElementA;`
+  - **EN**: Introduces type or value alias `ElementA`.
+  - **CN**: 引入类型或值别名 `ElementA`。
+- **Line 84 / 第 84 行** — `  using StrideA   = typename CollectiveMainloop::StrideA;`
+  - **EN**: Introduces type or value alias `StrideA`.
+  - **CN**: 引入类型或值别名 `StrideA`。
+- **Line 85 / 第 85 行** — `  using ElementB  = typename CollectiveMainloop::ElementB;`
+  - **EN**: Introduces type or value alias `ElementB`.
+  - **CN**: 引入类型或值别名 `ElementB`。
+- **Line 86 / 第 86 行** — `  using StrideB   = typename CollectiveMainloop::StrideB;`
+  - **EN**: Introduces type or value alias `StrideB`.
+  - **CN**: 引入类型或值别名 `StrideB`。
+- **Line 87 / 第 87 行** — `  using DispatchPolicy = typename CollectiveMainloop::DispatchPolicy;`
+  - **EN**: Introduces type or value alias `DispatchPolicy`.
+  - **CN**: 引入类型或值别名 `DispatchPolicy`。
+- **Line 88 / 第 88 行** — `  using ElementAccumulator = typename CollectiveMainloop::ElementAccumulator;`
+  - **EN**: Introduces type or value alias `ElementAccumulator`.
+  - **CN**: 引入类型或值别名 `ElementAccumulator`。
+- **Line 89 / 第 89 行** — `  using ClusterShape = typename DispatchPolicy::ClusterShape;`
+  - **EN**: Introduces type or value alias `ClusterShape`.
+  - **CN**: 引入类型或值别名 `ClusterShape`。
+- **Line 90 / 第 90 行** — `  using MainloopArguments = typename CollectiveMainloop::Arguments;`
+  - **EN**: Introduces type or value alias `MainloopArguments`.
+  - **CN**: 引入类型或值别名 `MainloopArguments`。
+- **Line 91 / 第 91 行** — `  using MainloopParams = typename CollectiveMainloop::Params;`
+  - **EN**: Introduces type or value alias `MainloopParams`.
+  - **CN**: 引入类型或值别名 `MainloopParams`。
+- **Line 92 / 第 92 行** — `  using CtaShape_MNK = typename CollectiveMainloop::CtaShape_MNK;`
+  - **EN**: Introduces type or value alias `CtaShape_MNK`.
+  - **CN**: 引入类型或值别名 `CtaShape_MNK`。
+- **Line 93 / 第 93 行** — `  using AtomThrShapeMNK = typename CollectiveMainloop::AtomThrShapeMNK;`
+  - **EN**: Introduces type or value alias `AtomThrShapeMNK`.
+  - **CN**: 引入类型或值别名 `AtomThrShapeMNK`。
+- **Line 94 / 第 94 行** — `  static constexpr int NumSpatialDimensions = CollectiveMainloop::NumSpatialDimensions;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 95 / 第 95 行** — `  static constexpr bool is_grouped_wgrad = CollectiveMainloop::is_grouped_wgrad;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 96 / 第 96 行** — `  static constexpr bool IsComplex = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 97 / 第 97 行** — `  static_assert(ArchTag::kMinComputeCapability >= 100);`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 98 / 第 98 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 99 / 第 99 行** — `  // Epilogue derived types`
+  - **EN**: Inline comment explaining intent: `Epilogue derived types`.
+  - **CN**: 行内注释说明意图：`Epilogue derived types`。
+- **Line 100 / 第 100 行** — `  using CollectiveEpilogue = CollectiveEpilogue_;`
+  - **EN**: Introduces type or value alias `CollectiveEpilogue`.
+  - **CN**: 引入类型或值别名 `CollectiveEpilogue`。
+- **Line 101 / 第 101 行** — `  using ElementC = typename CollectiveEpilogue::ElementC;`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 102 / 第 102 行** — `  using StrideC  = typename CollectiveEpilogue::StrideC;`
+  - **EN**: Introduces type or value alias `StrideC`.
+  - **CN**: 引入类型或值别名 `StrideC`。
+- **Line 103 / 第 103 行** — `  using ElementD = typename CollectiveEpilogue::ElementD;`
+  - **EN**: Introduces type or value alias `ElementD`.
+  - **CN**: 引入类型或值别名 `ElementD`。
+- **Line 104 / 第 104 行** — `  using StrideD  = typename CollectiveEpilogue::StrideD;`
+  - **EN**: Introduces type or value alias `StrideD`.
+  - **CN**: 引入类型或值别名 `StrideD`。
+- **Line 105 / 第 105 行** — `  using EpilogueArguments = typename CollectiveEpilogue::Arguments;`
+  - **EN**: Introduces type or value alias `EpilogueArguments`.
+  - **CN**: 引入类型或值别名 `EpilogueArguments`。
+- **Line 106 / 第 106 行** — `  using EpilogueParams = typename CollectiveEpilogue::Params;`
+  - **EN**: Introduces type or value alias `EpilogueParams`.
+  - **CN**: 引入类型或值别名 `EpilogueParams`。
+- **Line 107 / 第 107 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 108 / 第 108 行** — `  static constexpr bool IsGdcEnabled = cutlass::arch::IsGdcGloballyEnabled;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 109 / 第 109 行** — `  // TileID scheduler`
+  - **EN**: Inline comment explaining intent: `TileID scheduler`.
+  - **CN**: 行内注释说明意图：`TileID scheduler`。
+- **Line 110 / 第 110 行** — `  // CLC pipeline depth determines how many waves (stages-1) the scheduler can race ahead`
+  - **EN**: Inline comment explaining intent: `CLC pipeline depth determines how many waves (stages-1) the scheduler can race ahead`.
+  - **CN**: 行内注释说明意图：`CLC pipeline depth determines how many waves (stages-1) the scheduler can race ahead`。
+- **Line 111 / 第 111 行** — `  static constexpr uint32_t SchedulerPipelineStageCount = DispatchPolicy::Schedule::SchedulerPipelineStageCount;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 112 / 第 112 行** — `  static constexpr uint32_t AccumulatorPipelineStageCount = DispatchPolicy::Schedule::AccumulatorPipelineStageCount;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 113 / 第 113 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 114 / 第 114 行** — `  using TileSchedulerTag = TileSchedulerTag_;`
+  - **EN**: Introduces type or value alias `TileSchedulerTag`.
+  - **CN**: 引入类型或值别名 `TileSchedulerTag`。
+- **Line 115 / 第 115 行** — `  using TileScheduler = typename cutlass::gemm::kernel::detail::TileSchedulerSelector<`
+  - **EN**: Introduces type or value alias `TileScheduler`.
+  - **CN**: 引入类型或值别名 `TileScheduler`。
+- **Line 116 / 第 116 行** — `    TileSchedulerTag, ArchTag, CtaShape_MNK, ClusterShape, SchedulerPipelineStageCount>::Scheduler;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 117 / 第 117 行** — `  using TileSchedulerArguments = typename TileScheduler::Arguments;`
+  - **EN**: Introduces type or value alias `TileSchedulerArguments`.
+  - **CN**: 引入类型或值别名 `TileSchedulerArguments`。
+- **Line 118 / 第 118 行** — `  using TileSchedulerParams = typename TileScheduler::Params;`
+  - **EN**: Introduces type or value alias `TileSchedulerParams`.
+  - **CN**: 引入类型或值别名 `TileSchedulerParams`。
+- **Line 119 / 第 119 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 120 / 第 120 行** — `  static constexpr bool IsDynamicCluster = not cute::is_static_v<ClusterShape>;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 121 / 第 121 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 122 / 第 122 行** — `  // Warp specialization thread count per threadblock`
+  - **EN**: Inline comment explaining intent: `Warp specialization thread count per threadblock`.
+  - **CN**: 行内注释说明意图：`Warp specialization thread count per threadblock`。
+- **Line 123 / 第 123 行** — `  static constexpr uint32_t NumSchedThreads        = NumThreadsPerWarp; // 1 warp`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 124 / 第 124 行** — `  static constexpr uint32_t NumMMAThreads          = NumThreadsPerWarp; // 1 warp`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 125 / 第 125 行** — `  static constexpr uint32_t NumMainloopLoadThreads = NumThreadsPerWarp; // 1 warp`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 126 / 第 126 行** — `  static constexpr uint32_t NumEpilogueLoadThreads = NumThreadsPerWarp; // 1 warp`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 127 / 第 127 行** — `  static constexpr uint32_t NumEpilogueThreads     = CollectiveEpilogue::ThreadCount;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 128 / 第 128 行** — `  static constexpr uint32_t NumEpilogueWarps       = NumEpilogueThreads / NumThreadsPerWarp;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 129 / 第 129 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 130 / 第 130 行** — `  static constexpr uint32_t MaxThreadsPerBlock = NumSchedThreads +`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 131 / 第 131 行** — `                                                 NumMainloopLoadThreads + NumMMAThreads +`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 132 / 第 132 行** — `                                                 NumEpilogueLoadThreads + NumEpilogueThreads;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 133 / 第 133 行** — `  static constexpr uint32_t MinBlocksPerMultiprocessor = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 134 / 第 134 行** — `  static constexpr uint32_t NumFixupBarriers = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 135 / 第 135 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 136 / 第 136 行** — `  // Pipelines and pipeline states`
+  - **EN**: Inline comment explaining intent: `Pipelines and pipeline states`.
+  - **CN**: 行内注释说明意图：`Pipelines and pipeline states`。
+- **Line 137 / 第 137 行** — `  static constexpr uint32_t CLCResponseSize = sizeof(typename TileScheduler::CLCResponse);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 138 / 第 138 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 139 / 第 139 行** — `  // Pipeline and pipeline state types`
+  - **EN**: Inline comment explaining intent: `Pipeline and pipeline state types`.
+  - **CN**: 行内注释说明意图：`Pipeline and pipeline state types`。
+- **Line 140 / 第 140 行** — `  using MainloopPipeline = typename CollectiveMainloop::MainloopPipeline;`
+  - **EN**: Introduces type or value alias `MainloopPipeline`.
+  - **CN**: 引入类型或值别名 `MainloopPipeline`。
+- **Line 141 / 第 141 行** — `  using MainloopPipelineState = typename CollectiveMainloop::MainloopPipelineState;`
+  - **EN**: Introduces type or value alias `MainloopPipelineState`.
+  - **CN**: 引入类型或值别名 `MainloopPipelineState`。
+- **Line 142 / 第 142 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 143 / 第 143 行** — `  using EpiLoadPipeline = typename CollectiveEpilogue::LoadPipeline;`
+  - **EN**: Introduces type or value alias `EpiLoadPipeline`.
+  - **CN**: 引入类型或值别名 `EpiLoadPipeline`。
+- **Line 144 / 第 144 行** — `  using EpiLoadPipelineState = typename CollectiveEpilogue::LoadPipelineState;`
+  - **EN**: Introduces type or value alias `EpiLoadPipelineState`.
+  - **CN**: 引入类型或值别名 `EpiLoadPipelineState`。
+- **Line 145 / 第 145 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 146 / 第 146 行** — `  using EpiStorePipeline = typename CollectiveEpilogue::StorePipeline;`
+  - **EN**: Introduces type or value alias `EpiStorePipeline`.
+  - **CN**: 引入类型或值别名 `EpiStorePipeline`。
+- **Line 147 / 第 147 行** — `  using EpiStorePipelineState = typename CollectiveEpilogue::StorePipelineState;`
+  - **EN**: Introduces type or value alias `EpiStorePipelineState`.
+  - **CN**: 引入类型或值别名 `EpiStorePipelineState`。
+- **Line 148 / 第 148 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 149 / 第 149 行** — `  using LoadOrderBarrier = cutlass::OrderedSequenceBarrier<1,2>;`
+  - **EN**: Introduces type or value alias `LoadOrderBarrier`.
+  - **CN**: 引入类型或值别名 `LoadOrderBarrier`。
+- **Line 150 / 第 150 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 151 / 第 151 行** — `  using AccumulatorPipeline = cutlass::PipelineUmmaAsync<AccumulatorPipelineStageCount, AtomThrShapeMNK>;`
+  - **EN**: Introduces type or value alias `AccumulatorPipeline`.
+  - **CN**: 引入类型或值别名 `AccumulatorPipeline`。
+- **Line 152 / 第 152 行** — `  using AccumulatorPipelineState = typename AccumulatorPipeline::PipelineState;`
+  - **EN**: Introduces type or value alias `AccumulatorPipelineState`.
+  - **CN**: 引入类型或值别名 `AccumulatorPipelineState`。
+- **Line 153 / 第 153 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 154 / 第 154 行** — `  using CLCPipeline = cutlass::PipelineCLCFetchAsync<SchedulerPipelineStageCount, ClusterShape>;`
+  - **EN**: Introduces type or value alias `CLCPipeline`.
+  - **CN**: 引入类型或值别名 `CLCPipeline`。
+- **Line 155 / 第 155 行** — `  using CLCPipelineState = cutlass::PipelineDetail::PipelineCLCFetchAsyncPipelineState<SchedulerPipelineStageCount>;`
+  - **EN**: Introduces type or value alias `CLCPipelineState`.
+  - **CN**: 引入类型或值别名 `CLCPipelineState`。
+- **Line 156 / 第 156 行** — `  using CLCPipelineSharedStorage = cutlass::PipelineDetail::PipelineCLCFetchAsyncSharedStorage<SchedulerPipelineStageCount>;`
+  - **EN**: Introduces type or value alias `CLCPipelineSharedStorage`.
+  - **CN**: 引入类型或值别名 `CLCPipelineSharedStorage`。
+- **Line 157 / 第 157 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 158 / 第 158 行** — `  using TmemAllocator = cute::conditional_t<cute::size(cute::shape<0>(typename TiledMma::ThrLayoutVMNK{})) == 1,`
+  - **EN**: Introduces type or value alias `TmemAllocator`.
+  - **CN**: 引入类型或值别名 `TmemAllocator`。
+- **Line 159 / 第 159 行** — `      cute::TMEM::Allocator1Sm, cute::TMEM::Allocator2Sm>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 160 / 第 160 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 161 / 第 161 行** — `  // Kernel level shared memory storage`
+  - **EN**: Inline comment explaining intent: `Kernel level shared memory storage`.
+  - **CN**: 行内注释说明意图：`Kernel level shared memory storage`。
+- **Line 162 / 第 162 行** — `  struct SharedStorage {`
+  - **EN**: Starts the definition of struct `SharedStorage`.
+  - **CN**: 开始定义 struct `SharedStorage`。
+- **Line 163 / 第 163 行** — `    struct PipelineStorage : cute::aligned_struct<16, _1> {`
+  - **EN**: Starts the definition of struct `PipelineStorage`.
+  - **CN**: 开始定义 struct `PipelineStorage`。
+- **Line 164 / 第 164 行** — `      using MainloopPipelineStorage = typename CollectiveMainloop::PipelineStorage;`
+  - **EN**: Introduces type or value alias `MainloopPipelineStorage`.
+  - **CN**: 引入类型或值别名 `MainloopPipelineStorage`。
+- **Line 165 / 第 165 行** — `      using EpiLoadPipelineStorage = typename CollectiveEpilogue::PipelineStorage;`
+  - **EN**: Introduces type or value alias `EpiLoadPipelineStorage`.
+  - **CN**: 引入类型或值别名 `EpiLoadPipelineStorage`。
+- **Line 166 / 第 166 行** — `      using LoadOrderBarrierStorage = typename LoadOrderBarrier::SharedStorage;`
+  - **EN**: Introduces type or value alias `LoadOrderBarrierStorage`.
+  - **CN**: 引入类型或值别名 `LoadOrderBarrierStorage`。
+- **Line 167 / 第 167 行** — `      using CLCPipelineStorage = CLCPipelineSharedStorage;`
+  - **EN**: Introduces type or value alias `CLCPipelineStorage`.
+  - **CN**: 引入类型或值别名 `CLCPipelineStorage`。
+- **Line 168 / 第 168 行** — `      using AccumulatorPipelineStorage = typename AccumulatorPipeline::SharedStorage;`
+  - **EN**: Introduces type or value alias `AccumulatorPipelineStorage`.
+  - **CN**: 引入类型或值别名 `AccumulatorPipelineStorage`。
+- **Line 169 / 第 169 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 170 / 第 170 行** — `      alignas(16) MainloopPipelineStorage mainloop;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 171 / 第 171 行** — `      alignas(16) EpiLoadPipelineStorage epi_load;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 172 / 第 172 行** — `      alignas(16) LoadOrderBarrierStorage load_order;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 173 / 第 173 行** — `      alignas(16) CLCPipelineStorage clc;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 174 / 第 174 行** — `      alignas(16) AccumulatorPipelineStorage accumulator;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 175 / 第 175 行** — `      alignas(16) arch::ClusterBarrier tmem_dealloc;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 176 / 第 176 行** — `    } pipelines;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 177 / 第 177 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 178 / 第 178 行** — `    alignas(16) typename TileScheduler::CLCResponse clc_response[SchedulerPipelineStageCount];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 179 / 第 179 行** — `    uint32_t tmem_base_ptr;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 180 / 第 180 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 181 / 第 181 行** — `    struct TensorStorage : cute::aligned_struct<128, _1> {`
+  - **EN**: Starts the definition of struct `TensorStorage`.
+  - **CN**: 开始定义 struct `TensorStorage`。
+- **Line 182 / 第 182 行** — `      using EpilogueTensorStorage = typename CollectiveEpilogue::TensorStorage;`
+  - **EN**: Introduces type or value alias `EpilogueTensorStorage`.
+  - **CN**: 引入类型或值别名 `EpilogueTensorStorage`。
+- **Line 183 / 第 183 行** — `      using MainloopTensorStorage = typename CollectiveMainloop::TensorStorage;`
+  - **EN**: Introduces type or value alias `MainloopTensorStorage`.
+  - **CN**: 引入类型或值别名 `MainloopTensorStorage`。
+- **Line 184 / 第 184 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 185 / 第 185 行** — `      EpilogueTensorStorage epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 186 / 第 186 行** — `      MainloopTensorStorage mainloop;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 187 / 第 187 行** — `    } tensors;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 188 / 第 188 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 189 / 第 189 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 190 / 第 190 行** — `  static constexpr int SharedStorageSize = sizeof(SharedStorage);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 191 / 第 191 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 192 / 第 192 行** — `  // Host facing host arguments`
+  - **EN**: Inline comment explaining intent: `Host facing host arguments`.
+  - **CN**: 行内注释说明意图：`Host facing host arguments`。
+- **Line 193 / 第 193 行** — `  struct Arguments {`
+  - **EN**: Starts the definition of struct `Arguments`.
+  - **CN**: 开始定义 struct `Arguments`。
+- **Line 194 / 第 194 行** — `    ProblemShape problem_shape{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 195 / 第 195 行** — `    MainloopArguments mainloop{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 196 / 第 196 行** — `    EpilogueArguments epilogue{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 197 / 第 197 行** — `    KernelHardwareInfo hw_info{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 198 / 第 198 行** — `    TileSchedulerArguments scheduler{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 199 / 第 199 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 200 / 第 200 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 201 / 第 201 行** — `  // Kernel device entry point API`
+  - **EN**: Inline comment explaining intent: `Kernel device entry point API`.
+  - **CN**: 行内注释说明意图：`Kernel device entry point API`。
+- **Line 202 / 第 202 行** — `  struct Params {`
+  - **EN**: Starts the definition of struct `Params`.
+  - **CN**: 开始定义 struct `Params`。
+- **Line 203 / 第 203 行** — `    using ProblemShapeMNKL = decltype(CollectiveMainloop::get_problem_shape_MNKL(ProblemShape{}));`
+  - **EN**: Introduces type or value alias `ProblemShapeMNKL`.
+  - **CN**: 引入类型或值别名 `ProblemShapeMNKL`。
+- **Line 204 / 第 204 行** — `    ProblemShapeMNKL problem_shape;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 205 / 第 205 行** — `    MainloopParams mainloop;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 206 / 第 206 行** — `    EpilogueParams epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 207 / 第 207 行** — `    TileSchedulerParams scheduler;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 208 / 第 208 行** — `    KernelHardwareInfo hw_info{}; `
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 209 / 第 209 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 210 / 第 210 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 211 / 第 211 行** — `  enum class WarpCategory : int32_t {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 212 / 第 212 行** — `    MMA          = 0,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 213 / 第 213 行** — `    Sched        = 1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 214 / 第 214 行** — `    MainloopLoad = 2,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 215 / 第 215 行** — `    EpilogueLoad = 3,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 216 / 第 216 行** — `    Epilogue     = 4`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 217 / 第 217 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 218 / 第 218 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 219 / 第 219 行** — `  struct IsParticipant {`
+  - **EN**: Starts the definition of struct `IsParticipant`.
+  - **CN**: 开始定义 struct `IsParticipant`。
+- **Line 220 / 第 220 行** — `    uint32_t mma       = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 221 / 第 221 行** — `    uint32_t sched     = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 222 / 第 222 行** — `    uint32_t main_load = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 223 / 第 223 行** — `    uint32_t epi_load  = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 224 / 第 224 行** — `    uint32_t epilogue  = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 225 / 第 225 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 226 / 第 226 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 227 / 第 227 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 228 / 第 228 行** — `  // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 229 / 第 229 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 230 / 第 230 行** — `  // Map user facing arguments to device facing params`
+  - **EN**: Inline comment explaining intent: `Map user facing arguments to device facing params`.
+  - **CN**: 行内注释说明意图：`Map user facing arguments to device facing params`。
+- **Line 231 / 第 231 行** — `  CUTLASS_HOST`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 232 / 第 232 行** — `  static Params`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 233 / 第 233 行** — `  to_underlying_arguments(Arguments const& args, void* workspace) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 234 / 第 234 行** — `    static constexpr uint32_t NumEpilogueSubTiles = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 235 / 第 235 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 236 / 第 236 行** — `    auto problem_shape_mnkl = CollectiveMainloop::get_problem_shape_MNKL(args.problem_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 237 / 第 237 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 238 / 第 238 行** — `    auto mainloop_params = CollectiveMainloop::to_underlying_arguments(args.problem_shape, args.mainloop, workspace, args.hw_info);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 239 / 第 239 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 240 / 第 240 行** — `    // Calculate workspace pointers`
+  - **EN**: Inline comment explaining intent: `Calculate workspace pointers`.
+  - **CN**: 行内注释说明意图：`Calculate workspace pointers`。
+- **Line 241 / 第 241 行** — `    uint8_t* workspace_ptr = reinterpret_cast<uint8_t*>(workspace);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 242 / 第 242 行** — `    size_t workspace_offset = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 243 / 第 243 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 244 / 第 244 行** — `    // Epilogue`
+  - **EN**: Inline comment explaining intent: `Epilogue`.
+  - **CN**: 行内注释说明意图：`Epilogue`。
+- **Line 245 / 第 245 行** — `    void* epilogue_workspace = workspace_ptr + workspace_offset;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 246 / 第 246 行** — `    workspace_offset += CollectiveEpilogue::get_workspace_size(args.problem_shape, args.epilogue);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 247 / 第 247 行** — `    workspace_offset = round_nearest(workspace_offset,  MinWorkspaceAlignment);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 248 / 第 248 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 249 / 第 249 行** — `    // Tile scheduler`
+  - **EN**: Inline comment explaining intent: `Tile scheduler`.
+  - **CN**: 行内注释说明意图：`Tile scheduler`。
+- **Line 250 / 第 250 行** — `    void* scheduler_workspace = workspace_ptr + workspace_offset;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 251 / 第 251 行** — `    workspace_offset += TileScheduler::template get_workspace_size<decltype(problem_shape_mnkl), ElementAccumulator>(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 252 / 第 252 行** — `      args.scheduler, problem_shape_mnkl, args.hw_info, NumFixupBarriers, NumEpilogueSubTiles, CollectiveEpilogue::NumAccumulatorMtxs);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 253 / 第 253 行** — `    workspace_offset = round_nearest(workspace_offset,  MinWorkspaceAlignment);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 254 / 第 254 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 255 / 第 255 行** — `    return {`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 256 / 第 256 行** — `      problem_shape_mnkl,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 257 / 第 257 行** — `      mainloop_params,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 258 / 第 258 行** — `      CollectiveEpilogue::to_underlying_arguments(args.problem_shape, args.epilogue, epilogue_workspace),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 259 / 第 259 行** — `      TileScheduler::to_underlying_arguments(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 260 / 第 260 行** — `          args.problem_shape, TileShape{}, AtomThrShapeMNK{}, ClusterShape{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 261 / 第 261 行** — `          args.hw_info, args.scheduler, scheduler_workspace),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 262 / 第 262 行** — `      args.hw_info `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 263 / 第 263 行** — `    };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 264 / 第 264 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 265 / 第 265 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 266 / 第 266 行** — `  CUTLASS_HOST`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 267 / 第 267 行** — `  static bool`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 268 / 第 268 行** — `  can_implement(Arguments const& args) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 269 / 第 269 行** — `    bool implementable = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 270 / 第 270 行** — `    implementable &= CollectiveMainloop::can_implement(args.problem_shape, args.mainloop);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 271 / 第 271 行** — `    implementable &= CollectiveEpilogue::can_implement(args.problem_shape, args.epilogue);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 272 / 第 272 行** — `    implementable &= TileScheduler::can_implement(args.scheduler, args.hw_info);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 273 / 第 273 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 274 / 第 274 行** — `    if constexpr (IsDynamicCluster) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 275 / 第 275 行** — `      static constexpr int MaxClusterSize = 16;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 276 / 第 276 行** — `      implementable &= size(args.hw_info.cluster_shape) <= MaxClusterSize;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 277 / 第 277 行** — `      implementable &= size(args.hw_info.cluster_shape_fallback) <= MaxClusterSize;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 278 / 第 278 行** — `      // Early return if cluster shape validation failed to avoid division by zero below`
+  - **EN**: Inline comment explaining intent: `Early return if cluster shape validation failed to avoid division by zero below`.
+  - **CN**: 行内注释说明意图：`Early return if cluster shape validation failed to avoid division by zero below`。
+- **Line 279 / 第 279 行** — `      if (not cutlass::detail::preferred_cluster_can_implement<AtomThrShapeMNK>(args.hw_info.cluster_shape, args.hw_info.cluster_shape_fallback)) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 280 / 第 280 行** — `        CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Invalid dynamic cluster shape\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 281 / 第 281 行** — `        return false;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 282 / 第 282 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 283 / 第 283 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 284 / 第 284 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 285 / 第 285 行** — `    auto cluster_shape = cutlass::detail::select_cluster_shape(ClusterShape{}, args.hw_info.cluster_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 286 / 第 286 行** — `    auto cluster_shape_fallback = cutlass::detail::select_cluster_shape(ClusterShape{}, args.hw_info.cluster_shape_fallback);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 287 / 第 287 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 288 / 第 288 行** — `    // implicit gemm B tile can be small for conv, ensure multicast smem offsets are 128B aligned`
+  - **EN**: Inline comment explaining intent: `implicit gemm B tile can be small for conv, ensure multicast smem offsets are 128B aligned`.
+  - **CN**: 行内注释说明意图：`implicit gemm B tile can be small for conv, ensure multicast smem offsets are 128B aligned`。
+- **Line 289 / 第 289 行** — `    int multicast_b_bits = (size<1>(TileShape{}) * size<2>(TileShape{}) / size<0>(cluster_shape)) * sizeof_bits_v<ElementB>;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 290 / 第 290 行** — `    int multicast_b_fallback_bits = (size<1>(TileShape{}) * size<2>(TileShape{}) / size<0>(cluster_shape_fallback)) * sizeof_bits_v<ElementB>;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 291 / 第 291 行** — `    implementable &= multicast_b_bits % (128*8) == 0 && multicast_b_fallback_bits % (128*8) == 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 292 / 第 292 行** — `    if (not implementable) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 293 / 第 293 行** — `      CUTLASS_TRACE_HOST("  CAN IMPLEMENT: multicast size too large for B tile\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 294 / 第 294 行** — `      return false;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 295 / 第 295 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 296 / 第 296 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 297 / 第 297 行** — `    if constexpr (is_grouped_wgrad) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 298 / 第 298 行** — `      implementable &= size<0>(cluster_shape) == 1 && size<0>(cluster_shape_fallback) == 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 299 / 第 299 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 300 / 第 300 行** — `      if (!implementable) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 301 / 第 301 行** — `        return false;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 302 / 第 302 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 303 / 第 303 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 304 / 第 304 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 305 / 第 305 行** — `    return implementable;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 306 / 第 306 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 307 / 第 307 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 308 / 第 308 行** — `  CUTLASS_HOST`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 309 / 第 309 行** — `  static size_t`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 310 / 第 310 行** — `  get_workspace_size(Arguments const& args) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 311 / 第 311 行** — `    static constexpr uint32_t NumEpilogueSubTiles = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 312 / 第 312 行** — `    size_t workspace_size = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 313 / 第 313 行** — `    auto linear_problem_shape_MNKL = cutlass::conv::detail::get_linearized_problem_shape_MNKL(args.problem_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 314 / 第 314 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 315 / 第 315 行** — `    // Epilogue`
+  - **EN**: Inline comment explaining intent: `Epilogue`.
+  - **CN**: 行内注释说明意图：`Epilogue`。
+- **Line 316 / 第 316 行** — `    workspace_size += CollectiveEpilogue::get_workspace_size(args.problem_shape, args.epilogue);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 317 / 第 317 行** — `    workspace_size = round_nearest(workspace_size,  MinWorkspaceAlignment);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 318 / 第 318 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 319 / 第 319 行** — `    // Tile scheduler`
+  - **EN**: Inline comment explaining intent: `Tile scheduler`.
+  - **CN**: 行内注释说明意图：`Tile scheduler`。
+- **Line 320 / 第 320 行** — `    workspace_size += TileScheduler::template get_workspace_size<decltype(linear_problem_shape_MNKL), ElementAccumulator>(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 321 / 第 321 行** — `      args.scheduler, linear_problem_shape_MNKL, args.hw_info, NumFixupBarriers, NumEpilogueSubTiles, CollectiveEpilogue::NumAccumulatorMtxs);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 322 / 第 322 行** — `    workspace_size = round_nearest(workspace_size,  MinWorkspaceAlignment);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 323 / 第 323 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 324 / 第 324 行** — `    return workspace_size;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 325 / 第 325 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 326 / 第 326 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 327 / 第 327 行** — `  CUTLASS_HOST`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 328 / 第 328 行** — `  static cutlass::Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 329 / 第 329 行** — `  initialize_workspace(Arguments const& args, void* workspace = nullptr, cudaStream_t stream = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 330 / 第 330 行** — `    CudaHostAdapter* cuda_adapter = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 331 / 第 331 行** — `    static constexpr uint32_t NumEpilogueSubTiles = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 332 / 第 332 行** — `    auto linear_problem_shape_MNKL = cutlass::conv::detail::get_linearized_problem_shape_MNKL(args.problem_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 333 / 第 333 行** — `    Status status = Status::kSuccess;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 334 / 第 334 行** — `    uint8_t* workspace_ptr = reinterpret_cast<uint8_t*>(workspace);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 335 / 第 335 行** — `    size_t workspace_offset = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 336 / 第 336 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 337 / 第 337 行** — `    // Epilogue`
+  - **EN**: Inline comment explaining intent: `Epilogue`.
+  - **CN**: 行内注释说明意图：`Epilogue`。
+- **Line 338 / 第 338 行** — `    status = CollectiveEpilogue::initialize_workspace(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 339 / 第 339 行** — `      args.problem_shape, args.epilogue, workspace_ptr + workspace_offset, stream, cuda_adapter);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 340 / 第 340 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 341 / 第 341 行** — `    workspace_offset += CollectiveEpilogue::get_workspace_size(args.problem_shape, args.epilogue);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 342 / 第 342 行** — `    workspace_offset = round_nearest(workspace_offset,  MinWorkspaceAlignment);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 343 / 第 343 行** — `    if (status != Status::kSuccess) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 344 / 第 344 行** — `      return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 345 / 第 345 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 346 / 第 346 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 347 / 第 347 行** — `    // Tile scheduler`
+  - **EN**: Inline comment explaining intent: `Tile scheduler`.
+  - **CN**: 行内注释说明意图：`Tile scheduler`。
+- **Line 348 / 第 348 行** — `    status = TileScheduler::template initialize_workspace`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 349 / 第 349 行** — `      <decltype(linear_problem_shape_MNKL), ElementAccumulator>(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 350 / 第 350 行** — `      args.scheduler, workspace_ptr + workspace_offset, stream, linear_problem_shape_MNKL,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 351 / 第 351 行** — `      args.hw_info, NumFixupBarriers, NumEpilogueSubTiles, CollectiveEpilogue::NumAccumulatorMtxs, cuda_adapter);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 352 / 第 352 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 353 / 第 353 行** — `    workspace_offset += TileScheduler::template get_workspace_size`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 354 / 第 354 行** — `      <decltype(linear_problem_shape_MNKL), ElementAccumulator>(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 355 / 第 355 行** — `      args.scheduler, linear_problem_shape_MNKL, args.hw_info, NumFixupBarriers, NumEpilogueSubTiles,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 356 / 第 356 行** — `      CollectiveEpilogue::NumAccumulatorMtxs);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 357 / 第 357 行** — `    workspace_offset = round_nearest(workspace_offset,  MinWorkspaceAlignment);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 358 / 第 358 行** — `    if (status != Status::kSuccess) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 359 / 第 359 行** — `      return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 360 / 第 360 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 361 / 第 361 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 362 / 第 362 行** — `    return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 363 / 第 363 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 364 / 第 364 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 365 / 第 365 行** — `  // Computes the kernel launch grid shape based on runtime parameters`
+  - **EN**: Inline comment explaining intent: `Computes the kernel launch grid shape based on runtime parameters`.
+  - **CN**: 行内注释说明意图：`Computes the kernel launch grid shape based on runtime parameters`。
+- **Line 366 / 第 366 行** — `  CUTLASS_HOST`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 367 / 第 367 行** — `  static dim3`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 368 / 第 368 行** — `  get_grid_shape(Params const& params) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 369 / 第 369 行** — `    auto cluster_shape = cutlass::detail::select_cluster_shape(ClusterShape{}, params.hw_info.cluster_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 370 / 第 370 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 371 / 第 371 行** — `    return TileScheduler::get_grid_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 372 / 第 372 行** — `        params.scheduler,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 373 / 第 373 行** — `        params.problem_shape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 374 / 第 374 行** — `        TileShape{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 375 / 第 375 行** — `        AtomThrShapeMNK{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 376 / 第 376 行** — `        cluster_shape`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 377 / 第 377 行** — `        ,params.hw_info `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 378 / 第 378 行** — `       );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 379 / 第 379 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 380 / 第 380 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 381 / 第 381 行** — `  CUTLASS_HOST`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 382 / 第 382 行** — `  static dim3`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 383 / 第 383 行** — `  get_block_shape() {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 384 / 第 384 行** — `    return dim3(MaxThreadsPerBlock, 1, 1);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 385 / 第 385 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 386 / 第 386 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 387 / 第 387 行** — `  CUTLASS_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 388 / 第 388 行** — `  void`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 389 / 第 389 行** — `  operator()(Params const& params, char* smem_buf) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 390 / 第 390 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 391 / 第 391 行** — `    using namespace cute;`
+  - **EN**: Introduces type or value alias `namespace`.
+  - **CN**: 引入类型或值别名 `namespace`。
+- **Line 392 / 第 392 行** — `    using X = Underscore;`
+  - **EN**: Introduces type or value alias `X`.
+  - **CN**: 引入类型或值别名 `X`。
+- **Line 393 / 第 393 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 394 / 第 394 行** — `    // Separate out problem shape for convenience`
+  - **EN**: Inline comment explaining intent: `Separate out problem shape for convenience`.
+  - **CN**: 行内注释说明意图：`Separate out problem shape for convenience`。
+- **Line 395 / 第 395 行** — `    auto problem_shape_MNKL = append<4>(params.problem_shape, _1{});`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 396 / 第 396 行** — `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 397 / 第 397 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 398 / 第 398 行** — `    // Account for more than one epilogue warp`
+  - **EN**: Inline comment explaining intent: `Account for more than one epilogue warp`.
+  - **CN**: 行内注释说明意图：`Account for more than one epilogue warp`。
+- **Line 399 / 第 399 行** — `    int warp_idx = canonical_warp_idx_sync();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 400 / 第 400 行** — `    WarpCategory warp_category = warp_idx < static_cast<int>(WarpCategory::Epilogue) ? WarpCategory(warp_idx)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 401 / 第 401 行** — `                                                                                     : WarpCategory::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 402 / 第 402 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 403 / 第 403 行** — `    uint32_t lane_predicate = cute::elect_one_sync();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 404 / 第 404 行** — `    auto cluster_shape = cutlass::detail::select_cluster_shape(ClusterShape{});`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 405 / 第 405 行** — `    int cluster_size = size(cluster_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 406 / 第 406 行** — `    uint32_t cta_rank_in_cluster = cute::block_rank_in_cluster();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 407 / 第 407 行** — `    bool is_first_cta_in_cluster = cta_rank_in_cluster == 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 408 / 第 408 行** — `    int cta_coord_v = cta_rank_in_cluster % size<0>(typename TiledMma::AtomThrID{});`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 409 / 第 409 行** — `    bool is_mma_leader_cta = cta_coord_v == 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 410 / 第 410 行** — `    constexpr bool has_mma_peer_cta = size(AtomThrShapeMNK{}) == 2;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 411 / 第 411 行** — `    [[maybe_unused]] uint32_t mma_peer_cta_rank = has_mma_peer_cta ? cta_rank_in_cluster ^ 1 : cta_rank_in_cluster;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 412 / 第 412 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 413 / 第 413 行** — `    // Kernel level shared memory storage`
+  - **EN**: Inline comment explaining intent: `Kernel level shared memory storage`.
+  - **CN**: 行内注释说明意图：`Kernel level shared memory storage`。
+- **Line 414 / 第 414 行** — `    SharedStorage& shared_storage = *reinterpret_cast<SharedStorage*>(smem_buf);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 415 / 第 415 行** — `    static_assert(SharedStorageSize <= cutlass::arch::sm100_smem_capacity_bytes, "SMEM usage exceeded capacity.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 416 / 第 416 行** — `    // In a warp specialized kernel, collectives expose data movement and compute operations separately`
+  - **EN**: Inline comment explaining intent: `In a warp specialized kernel, collectives expose data movement and compute operations separately`.
+  - **CN**: 行内注释说明意图：`In a warp specialized kernel, collectives expose data movement and compute operations separately`。
+- **Line 417 / 第 417 行** — `    CollectiveMainloop collective_mainloop(params.mainloop, cluster_shape, cta_rank_in_cluster);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 418 / 第 418 行** — `    CollectiveEpilogue collective_epilogue(params.epilogue, shared_storage.tensors.epilogue);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 419 / 第 419 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 420 / 第 420 行** — `    // Issue Tma Descriptor Prefetch from a single thread`
+  - **EN**: Inline comment explaining intent: `Issue Tma Descriptor Prefetch from a single thread`.
+  - **CN**: 行内注释说明意图：`Issue Tma Descriptor Prefetch from a single thread`。
+- **Line 421 / 第 421 行** — `    if ((warp_category == WarpCategory::Sched) && lane_predicate) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 422 / 第 422 行** — `      collective_mainloop.prefetch_tma_descriptors();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 423 / 第 423 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 424 / 第 424 行** — `    if ((warp_category == WarpCategory::EpilogueLoad) && lane_predicate) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 425 / 第 425 行** — `      collective_epilogue.prefetch_tma_descriptors(params.epilogue);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 426 / 第 426 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 427 / 第 427 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 428 / 第 428 行** — `    // Do we load source tensor C or other aux inputs`
+  - **EN**: Inline comment explaining intent: `Do we load source tensor C or other aux inputs`.
+  - **CN**: 行内注释说明意图：`Do we load source tensor C or other aux inputs`。
+- **Line 429 / 第 429 行** — `    bool is_epi_load_needed = collective_epilogue.is_producer_load_needed();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 430 / 第 430 行** — `    IsParticipant is_participant = {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 431 / 第 431 行** — `      (warp_category == WarpCategory::MMA),                                 // mma`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 432 / 第 432 行** — `      (warp_category == WarpCategory::Sched) && is_first_cta_in_cluster,    // sched`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 433 / 第 433 行** — `      (warp_category == WarpCategory::MainloopLoad),                        // main_load`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 434 / 第 434 行** — `      (warp_category == WarpCategory::EpilogueLoad) && is_epi_load_needed,  // epi_load`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 435 / 第 435 行** — `      (warp_category == WarpCategory::Epilogue)                             // epilogue`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 436 / 第 436 行** — `    };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 437 / 第 437 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 438 / 第 438 行** — `    // Mainloop Load pipeline`
+  - **EN**: Inline comment explaining intent: `Mainloop Load pipeline`.
+  - **CN**: 行内注释说明意图：`Mainloop Load pipeline`。
+- **Line 439 / 第 439 行** — `    typename MainloopPipeline::Params mainloop_pipeline_params;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 440 / 第 440 行** — `    if (WarpCategory::MainloopLoad == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 441 / 第 441 行** — `      mainloop_pipeline_params.role = MainloopPipeline::ThreadCategory::Producer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 442 / 第 442 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 443 / 第 443 行** — `    if (WarpCategory::MMA == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 444 / 第 444 行** — `      mainloop_pipeline_params.role = MainloopPipeline::ThreadCategory::Consumer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 445 / 第 445 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 446 / 第 446 行** — `    mainloop_pipeline_params.is_leader = lane_predicate && is_mma_leader_cta && is_participant.main_load;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 447 / 第 447 行** — `    mainloop_pipeline_params.transaction_bytes = CollectiveMainloop::TmaTransactionBytes;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 448 / 第 448 行** — `    mainloop_pipeline_params.initializing_warp = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 449 / 第 449 行** — `    MainloopPipeline mainloop_pipeline(shared_storage.pipelines.mainloop,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 450 / 第 450 行** — `                                       mainloop_pipeline_params,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 451 / 第 451 行** — `                                       cluster_shape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 452 / 第 452 行** — `                                       cute::true_type{},   // Perform barrier init`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 453 / 第 453 行** — `                                       cute::false_type{}); // Delay mask calculation`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 454 / 第 454 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 455 / 第 455 行** — `    // Epilogue Load pipeline`
+  - **EN**: Inline comment explaining intent: `Epilogue Load pipeline`.
+  - **CN**: 行内注释说明意图：`Epilogue Load pipeline`。
+- **Line 456 / 第 456 行** — `    typename EpiLoadPipeline::Params epi_load_pipeline_params;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 457 / 第 457 行** — `    if (WarpCategory::EpilogueLoad == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 458 / 第 458 行** — `      epi_load_pipeline_params.role = EpiLoadPipeline::ThreadCategory::Producer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 459 / 第 459 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 460 / 第 460 行** — `    if (WarpCategory::Epilogue == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 461 / 第 461 行** — `      epi_load_pipeline_params.role = EpiLoadPipeline::ThreadCategory::Consumer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 462 / 第 462 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 463 / 第 463 行** — `    epi_load_pipeline_params.dst_blockid = cta_rank_in_cluster;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 464 / 第 464 行** — `    epi_load_pipeline_params.producer_arv_count = NumEpilogueLoadThreads;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 465 / 第 465 行** — `    epi_load_pipeline_params.consumer_arv_count = NumEpilogueThreads;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 466 / 第 466 行** — `    epi_load_pipeline_params.transaction_bytes = CollectiveEpilogue::TmaTransactionBytes;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 467 / 第 467 行** — `    epi_load_pipeline_params.initializing_warp = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 468 / 第 468 行** — `    EpiLoadPipeline epi_load_pipeline(shared_storage.pipelines.epi_load, epi_load_pipeline_params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 469 / 第 469 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 470 / 第 470 行** — `    // Epilogue Store pipeline`
+  - **EN**: Inline comment explaining intent: `Epilogue Store pipeline`.
+  - **CN**: 行内注释说明意图：`Epilogue Store pipeline`。
+- **Line 471 / 第 471 行** — `    typename EpiStorePipeline::Params epi_store_pipeline_params;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 472 / 第 472 行** — `    epi_store_pipeline_params.always_wait = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 473 / 第 473 行** — `    EpiStorePipeline epi_store_pipeline(epi_store_pipeline_params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 474 / 第 474 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 475 / 第 475 行** — `    // Load order barrier`
+  - **EN**: Inline comment explaining intent: `Load order barrier`.
+  - **CN**: 行内注释说明意图：`Load order barrier`。
+- **Line 476 / 第 476 行** — `    typename LoadOrderBarrier::Params load_order_barrier_params;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 477 / 第 477 行** — `    load_order_barrier_params.group_id = (warp_category == WarpCategory::MainloopLoad) ? 0 : 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 478 / 第 478 行** — `    load_order_barrier_params.group_size = NumMainloopLoadThreads;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 479 / 第 479 行** — `    load_order_barrier_params.initializing_warp = 3;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 480 / 第 480 行** — `    LoadOrderBarrier load_order_barrier(shared_storage.pipelines.load_order, load_order_barrier_params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 481 / 第 481 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 482 / 第 482 行** — `    // CLC pipeline`
+  - **EN**: Inline comment explaining intent: `CLC pipeline`.
+  - **CN**: 行内注释说明意图：`CLC pipeline`。
+- **Line 483 / 第 483 行** — `    typename CLCPipeline::Params clc_pipeline_params;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 484 / 第 484 行** — `    if (WarpCategory::Sched == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 485 / 第 485 行** — `      clc_pipeline_params.role = CLCPipeline::ThreadCategory::ProducerConsumer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 486 / 第 486 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 487 / 第 487 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 488 / 第 488 行** — `      clc_pipeline_params.role = CLCPipeline::ThreadCategory::Consumer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 489 / 第 489 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 490 / 第 490 行** — `    clc_pipeline_params.producer_blockid = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 491 / 第 491 行** — `    clc_pipeline_params.producer_arv_count = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 492 / 第 492 行** — `    clc_pipeline_params.consumer_arv_count = NumSchedThreads + cluster_size *`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 493 / 第 493 行** — `                                                 (NumMainloopLoadThreads + NumEpilogueThreads + NumMMAThreads);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 494 / 第 494 行** — `    if (is_epi_load_needed) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 495 / 第 495 行** — `      clc_pipeline_params.consumer_arv_count += cluster_size * NumEpilogueLoadThreads;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 496 / 第 496 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 497 / 第 497 行** — `    clc_pipeline_params.transaction_bytes = CLCResponseSize;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 498 / 第 498 行** — `    clc_pipeline_params.initializing_warp = 4;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 499 / 第 499 行** — `    CLCPipeline clc_pipeline(shared_storage.pipelines.clc, clc_pipeline_params, cluster_shape);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 500 / 第 500 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 501 / 第 501 行** — `    // Mainloop-Epilogue pipeline`
+  - **EN**: Inline comment explaining intent: `Mainloop-Epilogue pipeline`.
+  - **CN**: 行内注释说明意图：`Mainloop-Epilogue pipeline`。
+- **Line 502 / 第 502 行** — `    typename AccumulatorPipeline::Params accumulator_pipeline_params;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 503 / 第 503 行** — `    if (WarpCategory::MMA == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 504 / 第 504 行** — `      accumulator_pipeline_params.role = AccumulatorPipeline::ThreadCategory::Producer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 505 / 第 505 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 506 / 第 506 行** — `    if (WarpCategory::Epilogue == warp_category) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 507 / 第 507 行** — `      accumulator_pipeline_params.role = AccumulatorPipeline::ThreadCategory::Consumer;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 508 / 第 508 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 509 / 第 509 行** — `    // Only one producer thread arrives on this barrier.`
+  - **EN**: Inline comment explaining intent: `Only one producer thread arrives on this barrier.`.
+  - **CN**: 行内注释说明意图：`Only one producer thread arrives on this barrier.`。
+- **Line 510 / 第 510 行** — `    accumulator_pipeline_params.producer_arv_count = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 511 / 第 511 行** — `    accumulator_pipeline_params.consumer_arv_count = size(AtomThrShapeMNK{}) * NumEpilogueThreads;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 512 / 第 512 行** — `    accumulator_pipeline_params.initializing_warp = 5;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 513 / 第 513 行** — `    AccumulatorPipeline accumulator_pipeline(shared_storage.pipelines.accumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 514 / 第 514 行** — `                                             accumulator_pipeline_params,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 515 / 第 515 行** — `                                             cluster_shape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 516 / 第 516 行** — `                                             cute::true_type{},   // Perform barrier init`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 517 / 第 517 行** — `                                             cute::false_type{}); // Delay mask calculation`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 518 / 第 518 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 519 / 第 519 行** — `    // Tmem allocator`
+  - **EN**: Inline comment explaining intent: `Tmem allocator`.
+  - **CN**: 行内注释说明意图：`Tmem allocator`。
+- **Line 520 / 第 520 行** — `    TmemAllocator tmem_allocator{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 521 / 第 521 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 522 / 第 522 行** — `    // Sync allocation status between MMA and epilogue warps within CTA`
+  - **EN**: Inline comment explaining intent: `Sync allocation status between MMA and epilogue warps within CTA`.
+  - **CN**: 行内注释说明意图：`Sync allocation status between MMA and epilogue warps within CTA`。
+- **Line 523 / 第 523 行** — `    arch::NamedBarrier tmem_allocation_result_barrier(NumMMAThreads + NumEpilogueThreads, cutlass::arch::ReservedNamedBarriers::TmemAllocBarrier);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 524 / 第 524 行** — `    // Sync deallocation status between MMA warps of peer CTAs`
+  - **EN**: Inline comment explaining intent: `Sync deallocation status between MMA warps of peer CTAs`.
+  - **CN**: 行内注释说明意图：`Sync deallocation status between MMA warps of peer CTAs`。
+- **Line 525 / 第 525 行** — `    arch::ClusterBarrier& tmem_deallocation_result_barrier = shared_storage.pipelines.tmem_dealloc;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 526 / 第 526 行** — `    [[maybe_unused]] uint32_t dealloc_barrier_phase = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 527 / 第 527 行** — `    if (WarpCategory::MMA == warp_category && has_mma_peer_cta && lane_predicate) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 528 / 第 528 行** — `      tmem_deallocation_result_barrier.init(NumMMAThreads);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 529 / 第 529 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 530 / 第 530 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 531 / 第 531 行** — `    // We need this to guarantee that the Pipeline init is visible`
+  - **EN**: Inline comment explaining intent: `We need this to guarantee that the Pipeline init is visible`.
+  - **CN**: 行内注释说明意图：`We need this to guarantee that the Pipeline init is visible`。
+- **Line 532 / 第 532 行** — `    // To all producers and consumer threadblocks in the cluster`
+  - **EN**: Inline comment explaining intent: `To all producers and consumer threadblocks in the cluster`.
+  - **CN**: 行内注释说明意图：`To all producers and consumer threadblocks in the cluster`。
+- **Line 533 / 第 533 行** — `    pipeline_init_arrive_relaxed(cluster_size);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 534 / 第 534 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 535 / 第 535 行** — `    auto load_inputs = collective_mainloop.load_init(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 536 / 第 536 行** — `      problem_shape_MNKL, params.mainloop, shared_storage.tensors.mainloop);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 537 / 第 537 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 538 / 第 538 行** — `    uint32_t tmem_stage_ptrs[AccumulatorPipelineStageCount];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 539 / 第 539 行** — `    MainloopPipelineState mainloop_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 540 / 第 540 行** — `    MainloopPipelineState mainloop_pipe_producer_state = cutlass::make_producer_start_state<MainloopPipeline>();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 541 / 第 541 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 542 / 第 542 行** — `    EpiLoadPipelineState epi_load_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 543 / 第 543 行** — `    EpiLoadPipelineState epi_load_pipe_producer_state = cutlass::make_producer_start_state<EpiLoadPipeline>();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 544 / 第 544 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 545 / 第 545 行** — `    // epilogue store pipe is producer-only (consumer is TMA unit, waits via scoreboarding)`
+  - **EN**: Inline comment explaining intent: `epilogue store pipe is producer-only (consumer is TMA unit, waits via scoreboarding)`.
+  - **CN**: 行内注释说明意图：`epilogue store pipe is producer-only (consumer is TMA unit, waits via scoreboarding)`。
+- **Line 546 / 第 546 行** — `    EpiStorePipelineState epi_store_pipe_producer_state = cutlass::make_producer_start_state<EpiStorePipeline>();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 547 / 第 547 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 548 / 第 548 行** — `    CLCPipelineState clc_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 549 / 第 549 行** — `    CLCPipelineState clc_pipe_producer_state = cutlass::make_producer_start_state<CLCPipeline>();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 550 / 第 550 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 551 / 第 551 行** — `    AccumulatorPipelineState accumulator_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 552 / 第 552 行** — `    AccumulatorPipelineState accumulator_pipe_producer_state = cutlass::make_producer_start_state<AccumulatorPipeline>();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 553 / 第 553 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 554 / 第 554 行** — `    dim3 block_id_in_cluster = cute::block_id_in_cluster();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 555 / 第 555 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 556 / 第 556 行** — `    // Calculate mask after cluster barrier arrival`
+  - **EN**: Inline comment explaining intent: `Calculate mask after cluster barrier arrival`.
+  - **CN**: 行内注释说明意图：`Calculate mask after cluster barrier arrival`。
+- **Line 557 / 第 557 行** — `    mainloop_pipeline.init_masks(cluster_shape, block_id_in_cluster);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 558 / 第 558 行** — `    accumulator_pipeline.init_masks(cluster_shape, block_id_in_cluster);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 559 / 第 559 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 560 / 第 560 行** — `    // TileID scheduler`
+  - **EN**: Inline comment explaining intent: `TileID scheduler`.
+  - **CN**: 行内注释说明意图：`TileID scheduler`。
+- **Line 561 / 第 561 行** — `    TileScheduler scheduler(&shared_storage.clc_response[0], params.scheduler, problem_shape_MNKL, TileShape{}, block_id_in_cluster);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 562 / 第 562 行** — `    typename TileScheduler::WorkTileInfo work_tile_info = scheduler.initial_work_tile_info(cluster_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 563 / 第 563 行** — `    auto cta_coord_mnkl = scheduler.work_tile_to_cta_coord(work_tile_info);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 564 / 第 564 行** — `    auto acc_shape = collective_mainloop.partition_accumulator_shape();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 565 / 第 565 行** — `    auto accumulators = TiledMma::make_fragment_C(acc_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 566 / 第 566 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 567 / 第 567 行** — `    int TmemColumnsPerAccumulatorTile = cutlass::detail::find_tmem_tensor_col_offset(accumulators);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 568 / 第 568 行** — `    pipeline_init_wait(cluster_size);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 569 / 第 569 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 570 / 第 570 行** — `    if (is_participant.main_load) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 571 / 第 571 行** — `      // Ensure that the prefetched kernel does not touch`
+  - **EN**: Inline comment explaining intent: `Ensure that the prefetched kernel does not touch`.
+  - **CN**: 行内注释说明意图：`Ensure that the prefetched kernel does not touch`。
+- **Line 572 / 第 572 行** — `      // unflushed global memory prior to this instruction`
+  - **EN**: Inline comment explaining intent: `unflushed global memory prior to this instruction`.
+  - **CN**: 行内注释说明意图：`unflushed global memory prior to this instruction`。
+- **Line 573 / 第 573 行** — `      cutlass::arch::wait_on_dependent_grids();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 574 / 第 574 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 575 / 第 575 行** — `      bool do_load_order_arrive = is_epi_load_needed;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 576 / 第 576 行** — `      Tensor gA_mk = get<0>(load_inputs);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 577 / 第 577 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 578 / 第 578 行** — `      do {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 579 / 第 579 行** — `        // Get the number of K tiles to compute for this work as well as the starting K tile offset of the work.`
+  - **EN**: Inline comment explaining intent: `Get the number of K tiles to compute for this work as well as the starting K tile offset of the ...`.
+  - **CN**: 行内注释说明意图：`Get the number of K tiles to compute for this work as well as the starting K tile offset of the ...`。
+- **Line 580 / 第 580 行** — `        auto k_tile_iter = scheduler.get_k_tile_iterator(work_tile_info, problem_shape_MNKL, TileShape{}, shape<3>(gA_mk));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 581 / 第 581 行** — `        auto k_tile_count = scheduler.get_work_k_tile_count(work_tile_info, problem_shape_MNKL, TileShape{});`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 582 / 第 582 行** — `        auto k_tile_prologue = min(MainloopPipeline::Stages, k_tile_count);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 583 / 第 583 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 584 / 第 584 行** — `        auto [mainloop_producer_state_next, k_tile_iter_next] = collective_mainloop.load(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 585 / 第 585 行** — `          params.mainloop,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 586 / 第 586 行** — `          mainloop_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 587 / 第 587 行** — `          mainloop_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 588 / 第 588 行** — `          load_inputs,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 589 / 第 589 行** — `          cta_coord_mnkl,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 590 / 第 590 行** — `          k_tile_iter, k_tile_prologue`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 591 / 第 591 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 592 / 第 592 行** — `        mainloop_pipe_producer_state = mainloop_producer_state_next;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 593 / 第 593 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 594 / 第 594 行** — `        if (do_load_order_arrive) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 595 / 第 595 行** — `          load_order_barrier.arrive();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 596 / 第 596 行** — `          do_load_order_arrive = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 597 / 第 597 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 598 / 第 598 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 599 / 第 599 行** — `        auto [mainloop_producer_state_next_, unused_] = collective_mainloop.load(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 600 / 第 600 行** — `          params.mainloop,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 601 / 第 601 行** — `          mainloop_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 602 / 第 602 行** — `          mainloop_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 603 / 第 603 行** — `          load_inputs,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 604 / 第 604 行** — `          cta_coord_mnkl,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 605 / 第 605 行** — `          k_tile_iter_next, k_tile_count - k_tile_prologue`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 606 / 第 606 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 607 / 第 607 行** — `        mainloop_pipe_producer_state = mainloop_producer_state_next_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 608 / 第 608 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 609 / 第 609 行** — `        // Sync warp to prevent non-participating threads entering next wave early`
+  - **EN**: Inline comment explaining intent: `Sync warp to prevent non-participating threads entering next wave early`.
+  - **CN**: 行内注释说明意图：`Sync warp to prevent non-participating threads entering next wave early`。
+- **Line 610 / 第 610 行** — `        __syncwarp();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 611 / 第 611 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 612 / 第 612 行** — `        auto [next_work_tile_info, increment_pipe] = scheduler.fetch_next_work(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 613 / 第 613 行** — `          work_tile_info,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 614 / 第 614 行** — `          clc_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 615 / 第 615 行** — `          clc_pipe_consumer_state`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 616 / 第 616 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 617 / 第 617 行** — `        work_tile_info = next_work_tile_info;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 618 / 第 618 行** — `        cta_coord_mnkl = scheduler.work_tile_to_cta_coord(work_tile_info);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 619 / 第 619 行** — `        if (increment_pipe) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 620 / 第 620 行** — `          ++clc_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 621 / 第 621 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 622 / 第 622 行** — `      } while (work_tile_info.is_valid());`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 623 / 第 623 行** — `      collective_mainloop.load_tail(mainloop_pipeline, mainloop_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 624 / 第 624 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 625 / 第 625 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 626 / 第 626 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 627 / 第 627 行** — `    else if (is_participant.sched) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 628 / 第 628 行** — `      // Whether a new CLC query must be performed.`
+  - **EN**: Inline comment explaining intent: `Whether a new CLC query must be performed.`.
+  - **CN**: 行内注释说明意图：`Whether a new CLC query must be performed.`。
+- **Line 629 / 第 629 行** — `      // See comment below where this variable is updated for a description of`
+  - **EN**: Inline comment explaining intent: `See comment below where this variable is updated for a description of`.
+  - **CN**: 行内注释说明意图：`See comment below where this variable is updated for a description of`。
+- **Line 630 / 第 630 行** — `      // why this variable is needed.`
+  - **EN**: Inline comment explaining intent: `why this variable is needed.`.
+  - **CN**: 行内注释说明意图：`why this variable is needed.`。
+- **Line 631 / 第 631 行** — `      bool requires_clc_query = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 632 / 第 632 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 633 / 第 633 行** — `      do {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 634 / 第 634 行** — `        if (requires_clc_query) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 635 / 第 635 行** — `          // Query next clcID and update producer state`
+  - **EN**: Inline comment explaining intent: `Query next clcID and update producer state`.
+  - **CN**: 行内注释说明意图：`Query next clcID and update producer state`。
+- **Line 636 / 第 636 行** — `          clc_pipe_producer_state = scheduler.advance_to_next_work(clc_pipeline, clc_pipe_producer_state);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 637 / 第 637 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 638 / 第 638 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 639 / 第 639 行** — `        // Fetch next work tile`
+  - **EN**: Inline comment explaining intent: `Fetch next work tile`.
+  - **CN**: 行内注释说明意图：`Fetch next work tile`。
+- **Line 640 / 第 640 行** — `        auto [next_work_tile_info, increment_pipe] = scheduler.fetch_next_work(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 641 / 第 641 行** — `          work_tile_info,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 642 / 第 642 行** — `          clc_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 643 / 第 643 行** — `          clc_pipe_consumer_state`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 644 / 第 644 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 645 / 第 645 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 646 / 第 646 行** — `        // Only perform a new CLC query if we consumed a new CLC query result in`
+  - **EN**: Inline comment explaining intent: `Only perform a new CLC query if we consumed a new CLC query result in`.
+  - **CN**: 行内注释说明意图：`Only perform a new CLC query if we consumed a new CLC query result in`。
+- **Line 647 / 第 647 行** — ``        // `fetch_next_work`. An example of a case in which CLC `fetch_next_work` does``
+  - **EN**: Inline comment explaining intent: ``fetch_next_work`. An example of a case in which CLC `fetch_next_work` does`.
+  - **CN**: 行内注释说明意图：``fetch_next_work`. An example of a case in which CLC `fetch_next_work` does`。
+- **Line 648 / 第 648 行** — `        // not consume a new CLC query response is when processing stream-K units.`
+  - **EN**: Inline comment explaining intent: `not consume a new CLC query response is when processing stream-K units.`.
+  - **CN**: 行内注释说明意图：`not consume a new CLC query response is when processing stream-K units.`。
+- **Line 649 / 第 649 行** — `        // The current stream-K scheduler uses single WorkTileInfo to track multiple`
+  - **EN**: Inline comment explaining intent: `The current stream-K scheduler uses single WorkTileInfo to track multiple`.
+  - **CN**: 行内注释说明意图：`The current stream-K scheduler uses single WorkTileInfo to track multiple`。
+- **Line 650 / 第 650 行** — `        // (potentially-partial) tiles to be computed via stream-K. In this case,`
+  - **EN**: Inline comment explaining intent: `(potentially-partial) tiles to be computed via stream-K. In this case,`.
+  - **CN**: 行内注释说明意图：`(potentially-partial) tiles to be computed via stream-K. In this case,`。
+- **Line 651 / 第 651 行** — ``        // `fetch_next_work` simply performs in-place updates on the existing WorkTileInfo,``
+  - **EN**: Inline comment explaining intent: ``fetch_next_work` simply performs in-place updates on the existing WorkTileInfo,`.
+  - **CN**: 行内注释说明意图：``fetch_next_work` simply performs in-place updates on the existing WorkTileInfo,`。
+- **Line 652 / 第 652 行** — `        // rather than consuming a CLC query response.`
+  - **EN**: Inline comment explaining intent: `rather than consuming a CLC query response.`.
+  - **CN**: 行内注释说明意图：`rather than consuming a CLC query response.`。
+- **Line 653 / 第 653 行** — `        requires_clc_query = increment_pipe;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 654 / 第 654 行** — `        if (increment_pipe) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 655 / 第 655 行** — `          ++clc_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 656 / 第 656 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 657 / 第 657 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 658 / 第 658 行** — `        work_tile_info = next_work_tile_info;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 659 / 第 659 行** — `      } while (work_tile_info.is_valid());`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 660 / 第 660 行** — `      clc_pipeline.producer_tail(clc_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 661 / 第 661 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 662 / 第 662 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 663 / 第 663 行** — `    else if (is_participant.mma) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 664 / 第 664 行** — `      // Tmem allocation sequence`
+  - **EN**: Inline comment explaining intent: `Tmem allocation sequence`.
+  - **CN**: 行内注释说明意图：`Tmem allocation sequence`。
+- **Line 665 / 第 665 行** — `      tmem_allocator.allocate(TmemAllocator::Sm100TmemCapacityColumns, &shared_storage.tmem_base_ptr);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 666 / 第 666 行** — `      __syncwarp();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 667 / 第 667 行** — `      tmem_allocation_result_barrier.arrive();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 668 / 第 668 行** — `      uint32_t tmem_base_ptr = shared_storage.tmem_base_ptr;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 669 / 第 669 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 670 / 第 670 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 671 / 第 671 行** — `      for (int acc_stage = 0; acc_stage < AccumulatorPipelineStageCount; acc_stage++) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 672 / 第 672 行** — `        tmem_stage_ptrs[acc_stage] = tmem_base_ptr + (TmemColumnsPerAccumulatorTile * acc_stage) & cutlass::detail::TmemColMask;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 673 / 第 673 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 674 / 第 674 行** — `      auto mma_inputs = collective_mainloop.mma_init(shared_storage.tensors.mainloop);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 675 / 第 675 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 676 / 第 676 行** — `      do {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 677 / 第 677 行** — `        auto k_tile_count = scheduler.get_work_k_tile_count(work_tile_info, problem_shape_MNKL, TileShape{});`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 678 / 第 678 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 679 / 第 679 行** — `        // Fetch next work tile`
+  - **EN**: Inline comment explaining intent: `Fetch next work tile`.
+  - **CN**: 行内注释说明意图：`Fetch next work tile`。
+- **Line 680 / 第 680 行** — `        auto [next_work_tile_info, increment_pipe] = scheduler.fetch_next_work(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 681 / 第 681 行** — `          work_tile_info,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 682 / 第 682 行** — `          clc_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 683 / 第 683 行** — `          clc_pipe_consumer_state`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 684 / 第 684 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 685 / 第 685 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 686 / 第 686 行** — `        if (increment_pipe) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 687 / 第 687 行** — `          ++clc_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 688 / 第 688 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 689 / 第 689 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 690 / 第 690 行** — `        // Wait for tmem accumulator buffer to become empty with a flipped phase`
+  - **EN**: Inline comment explaining intent: `Wait for tmem accumulator buffer to become empty with a flipped phase`.
+  - **CN**: 行内注释说明意图：`Wait for tmem accumulator buffer to become empty with a flipped phase`。
+- **Line 691 / 第 691 行** — `        if (is_mma_leader_cta) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 692 / 第 692 行** — `          accumulator_pipeline.producer_acquire(accumulator_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 693 / 第 693 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 694 / 第 694 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 695 / 第 695 行** — `        // Accumulator stage slice`
+  - **EN**: Inline comment explaining intent: `Accumulator stage slice`.
+  - **CN**: 行内注释说明意图：`Accumulator stage slice`。
+- **Line 696 / 第 696 行** — `        int acc_stage = accumulator_pipe_producer_state.index();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 697 / 第 697 行** — `        accumulators.data() = tmem_stage_ptrs[acc_stage];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 698 / 第 698 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 699 / 第 699 行** — `        if (is_mma_leader_cta) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 700 / 第 700 行** — `          mainloop_pipe_consumer_state = collective_mainloop.mma(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 701 / 第 701 行** — `            mainloop_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 702 / 第 702 行** — `            mainloop_pipe_consumer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 703 / 第 703 行** — `            accumulators,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 704 / 第 704 行** — `            mma_inputs,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 705 / 第 705 行** — `            k_tile_count`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 706 / 第 706 行** — `          );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 707 / 第 707 行** — `          accumulator_pipeline.producer_commit(accumulator_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 708 / 第 708 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 709 / 第 709 行** — `        ++accumulator_pipe_producer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 710 / 第 710 行** — `        work_tile_info = next_work_tile_info;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 711 / 第 711 行** — `      } while (work_tile_info.is_valid());`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 712 / 第 712 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 713 / 第 713 行** — `      // Hint on an early release of global memory resources.`
+  - **EN**: Inline comment explaining intent: `Hint on an early release of global memory resources.`.
+  - **CN**: 行内注释说明意图：`Hint on an early release of global memory resources.`。
+- **Line 714 / 第 714 行** — `      // The timing of calling this function only influences performance,`
+  - **EN**: Inline comment explaining intent: `The timing of calling this function only influences performance,`.
+  - **CN**: 行内注释说明意图：`The timing of calling this function only influences performance,`。
+- **Line 715 / 第 715 行** — `      // not functional correctness.`
+  - **EN**: Inline comment explaining intent: `not functional correctness.`.
+  - **CN**: 行内注释说明意图：`not functional correctness.`。
+- **Line 716 / 第 716 行** — `      cutlass::arch::launch_dependent_grids();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 717 / 第 717 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 718 / 第 718 行** — `      // Release the right to allocate before deallocations so that the next CTA can rasterize`
+  - **EN**: Inline comment explaining intent: `Release the right to allocate before deallocations so that the next CTA can rasterize`.
+  - **CN**: 行内注释说明意图：`Release the right to allocate before deallocations so that the next CTA can rasterize`。
+- **Line 719 / 第 719 行** — `      tmem_allocator.release_allocation_lock();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 720 / 第 720 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 721 / 第 721 行** — `      // Leader MMA waits for leader + peer epilogues to release accumulator stage`
+  - **EN**: Inline comment explaining intent: `Leader MMA waits for leader + peer epilogues to release accumulator stage`.
+  - **CN**: 行内注释说明意图：`Leader MMA waits for leader + peer epilogues to release accumulator stage`。
+- **Line 722 / 第 722 行** — `      if (is_mma_leader_cta) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 723 / 第 723 行** — `        accumulator_pipeline.producer_tail(accumulator_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 724 / 第 724 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 725 / 第 725 行** — `      // Signal to peer MMA that entire tmem allocation can be deallocated`
+  - **EN**: Inline comment explaining intent: `Signal to peer MMA that entire tmem allocation can be deallocated`.
+  - **CN**: 行内注释说明意图：`Signal to peer MMA that entire tmem allocation can be deallocated`。
+- **Line 726 / 第 726 行** — `      if constexpr (has_mma_peer_cta) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 727 / 第 727 行** — `        // Leader does wait + arrive, follower does arrive + wait`
+  - **EN**: Inline comment explaining intent: `Leader does wait + arrive, follower does arrive + wait`.
+  - **CN**: 行内注释说明意图：`Leader does wait + arrive, follower does arrive + wait`。
+- **Line 728 / 第 728 行** — `        tmem_deallocation_result_barrier.arrive(mma_peer_cta_rank, not is_mma_leader_cta);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 729 / 第 729 行** — `        tmem_deallocation_result_barrier.wait(dealloc_barrier_phase);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 730 / 第 730 行** — `        tmem_deallocation_result_barrier.arrive(mma_peer_cta_rank, is_mma_leader_cta);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 731 / 第 731 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 732 / 第 732 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 733 / 第 733 行** — `      // Free entire tmem allocation`
+  - **EN**: Inline comment explaining intent: `Free entire tmem allocation`.
+  - **CN**: 行内注释说明意图：`Free entire tmem allocation`。
+- **Line 734 / 第 734 行** — `      tmem_allocator.free(tmem_base_ptr, TmemAllocator::Sm100TmemCapacityColumns);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 735 / 第 735 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 736 / 第 736 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 737 / 第 737 行** — `    else if (is_participant.epi_load) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 738 / 第 738 行** — `      // Ensure that the prefetched kernel does not touch`
+  - **EN**: Inline comment explaining intent: `Ensure that the prefetched kernel does not touch`.
+  - **CN**: 行内注释说明意图：`Ensure that the prefetched kernel does not touch`。
+- **Line 739 / 第 739 行** — `      // unflushed global memory prior to this instruction`
+  - **EN**: Inline comment explaining intent: `unflushed global memory prior to this instruction`.
+  - **CN**: 行内注释说明意图：`unflushed global memory prior to this instruction`。
+- **Line 740 / 第 740 行** — `      cutlass::arch::wait_on_dependent_grids();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 741 / 第 741 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 742 / 第 742 行** — `      bool do_load_order_wait = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 743 / 第 743 行** — `      bool do_tail_load = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 744 / 第 744 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 745 / 第 745 行** — `      do {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 746 / 第 746 行** — `        bool compute_epilogue = TileScheduler::compute_epilogue(work_tile_info, params.scheduler);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 747 / 第 747 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 748 / 第 748 行** — `        // Get current work tile and fetch next work tile`
+  - **EN**: Inline comment explaining intent: `Get current work tile and fetch next work tile`.
+  - **CN**: 行内注释说明意图：`Get current work tile and fetch next work tile`。
+- **Line 749 / 第 749 行** — `        auto [next_work_tile_info, increment_pipe] = scheduler.fetch_next_work(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 750 / 第 750 行** — `          work_tile_info,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 751 / 第 751 行** — `          clc_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 752 / 第 752 行** — `          clc_pipe_consumer_state`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 753 / 第 753 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 754 / 第 754 行** — `        work_tile_info = next_work_tile_info;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 755 / 第 755 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 756 / 第 756 行** — `        if (increment_pipe) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 757 / 第 757 行** — `          ++clc_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 758 / 第 758 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 759 / 第 759 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 760 / 第 760 行** — `        if (compute_epilogue) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 761 / 第 761 行** — `          if (do_load_order_wait) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 762 / 第 762 行** — `            load_order_barrier.wait();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 763 / 第 763 行** — `            do_load_order_wait = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 764 / 第 764 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 765 / 第 765 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 766 / 第 766 行** — `          epi_load_pipe_producer_state = collective_epilogue.load(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 767 / 第 767 行** — `            epi_load_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 768 / 第 768 行** — `            epi_load_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 769 / 第 769 行** — `            problem_shape_MNKL,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 770 / 第 770 行** — `            CtaShape_MNK{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 771 / 第 771 行** — `            cta_coord_mnkl,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 772 / 第 772 行** — `            TileShape{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 773 / 第 773 行** — `            TiledMma{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 774 / 第 774 行** — `            shared_storage.tensors.epilogue`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 775 / 第 775 行** — `          );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 776 / 第 776 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 777 / 第 777 行** — `          do_tail_load = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 778 / 第 778 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 779 / 第 779 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 780 / 第 780 行** — `        // Calculate the cta coordinates of the next work tile`
+  - **EN**: Inline comment explaining intent: `Calculate the cta coordinates of the next work tile`.
+  - **CN**: 行内注释说明意图：`Calculate the cta coordinates of the next work tile`。
+- **Line 781 / 第 781 行** — `        cta_coord_mnkl = scheduler.work_tile_to_cta_coord(work_tile_info);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 782 / 第 782 行** — `      } while (work_tile_info.is_valid());`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 783 / 第 783 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 784 / 第 784 行** — `      // Only perform a tail load if one of the work units processed performed`
+  - **EN**: Inline comment explaining intent: `Only perform a tail load if one of the work units processed performed`.
+  - **CN**: 行内注释说明意图：`Only perform a tail load if one of the work units processed performed`。
+- **Line 785 / 第 785 行** — `      // an epilogue load. An example of a case in which a tail load should not be`
+  - **EN**: Inline comment explaining intent: `an epilogue load. An example of a case in which a tail load should not be`.
+  - **CN**: 行内注释说明意图：`an epilogue load. An example of a case in which a tail load should not be`。
+- **Line 786 / 第 786 行** — `      // performed is in split-K if a cluster is only assigned non-final splits (for which`
+  - **EN**: Inline comment explaining intent: `performed is in split-K if a cluster is only assigned non-final splits (for which`.
+  - **CN**: 行内注释说明意图：`performed is in split-K if a cluster is only assigned non-final splits (for which`。
+- **Line 787 / 第 787 行** — `      // the cluster does not compute the epilogue).`
+  - **EN**: Inline comment explaining intent: `the cluster does not compute the epilogue).`.
+  - **CN**: 行内注释说明意图：`the cluster does not compute the epilogue).`。
+- **Line 788 / 第 788 行** — `      if (do_tail_load) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 789 / 第 789 行** — `        collective_epilogue.load_tail(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 790 / 第 790 行** — `          epi_load_pipeline, epi_load_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 791 / 第 791 行** — `          epi_store_pipeline, epi_store_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 792 / 第 792 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 793 / 第 793 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 794 / 第 794 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 795 / 第 795 行** — `    else if (is_participant.epilogue) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 796 / 第 796 行** — `      // Wait for tmem allocate here`
+  - **EN**: Inline comment explaining intent: `Wait for tmem allocate here`.
+  - **CN**: 行内注释说明意图：`Wait for tmem allocate here`。
+- **Line 797 / 第 797 行** — `      tmem_allocation_result_barrier.arrive_and_wait();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 798 / 第 798 行** — `      uint32_t tmem_base_ptr = shared_storage.tmem_base_ptr;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 799 / 第 799 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 800 / 第 800 行** — `      for (int acc_stage = 0; acc_stage < AccumulatorPipelineStageCount; acc_stage++) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 801 / 第 801 行** — `        tmem_stage_ptrs[acc_stage] = tmem_base_ptr + (TmemColumnsPerAccumulatorTile * acc_stage) & cutlass::detail::TmemColMask;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 802 / 第 802 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 803 / 第 803 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 804 / 第 804 行** — `      bool do_tail_store = false;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 805 / 第 805 行** — `      do {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 806 / 第 806 行** — `        // Fetch next work tile`
+  - **EN**: Inline comment explaining intent: `Fetch next work tile`.
+  - **CN**: 行内注释说明意图：`Fetch next work tile`。
+- **Line 807 / 第 807 行** — `        auto [next_work_tile_info, increment_pipe] = scheduler.fetch_next_work(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 808 / 第 808 行** — `          work_tile_info,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 809 / 第 809 行** — `          clc_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 810 / 第 810 行** — `          clc_pipe_consumer_state`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 811 / 第 811 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 812 / 第 812 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 813 / 第 813 行** — `        if (increment_pipe) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 814 / 第 814 行** — `          ++clc_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 815 / 第 815 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 816 / 第 816 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 817 / 第 817 行** — `        // Accumulator stage slice after making sure allocation has been performed`
+  - **EN**: Inline comment explaining intent: `Accumulator stage slice after making sure allocation has been performed`.
+  - **CN**: 行内注释说明意图：`Accumulator stage slice after making sure allocation has been performed`。
+- **Line 818 / 第 818 行** — `        int acc_stage = accumulator_pipe_consumer_state.index();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 819 / 第 819 行** — `        accumulators.data() = tmem_stage_ptrs[acc_stage];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 820 / 第 820 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 821 / 第 821 行** — `        accumulator_pipe_consumer_state = scheduler.template fixup<IsComplex>(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 822 / 第 822 行** — `          TiledMma{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 823 / 第 823 行** — `          work_tile_info,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 824 / 第 824 行** — `          accumulators,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 825 / 第 825 行** — `          accumulator_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 826 / 第 826 行** — `          accumulator_pipe_consumer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 827 / 第 827 行** — `          typename CollectiveEpilogue::CopyOpT2R{}`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 828 / 第 828 行** — `        );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 829 / 第 829 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 830 / 第 830 行** — `        //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 831 / 第 831 行** — `        // Epilogue and write to gD`
+  - **EN**: Inline comment explaining intent: `Epilogue and write to gD`.
+  - **CN**: 行内注释说明意图：`Epilogue and write to gD`。
+- **Line 832 / 第 832 行** — `        //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 833 / 第 833 行** — `        if (scheduler.compute_epilogue(work_tile_info)) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 834 / 第 834 行** — `          auto [load_state_next, store_state_next, acc_state_next] = collective_epilogue.store(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 835 / 第 835 行** — `            epi_load_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 836 / 第 836 行** — `            epi_load_pipe_consumer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 837 / 第 837 行** — `            epi_store_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 838 / 第 838 行** — `            epi_store_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 839 / 第 839 行** — `            accumulator_pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 840 / 第 840 行** — `            accumulator_pipe_consumer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 841 / 第 841 行** — `            problem_shape_MNKL,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 842 / 第 842 行** — `            CtaShape_MNK{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 843 / 第 843 行** — `            cta_coord_mnkl,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 844 / 第 844 行** — `            TileShape{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 845 / 第 845 行** — `            TiledMma{},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 846 / 第 846 行** — `            accumulators,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 847 / 第 847 行** — `            shared_storage.tensors.epilogue`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 848 / 第 848 行** — `          );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 849 / 第 849 行** — `          epi_load_pipe_consumer_state = load_state_next;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 850 / 第 850 行** — `          epi_store_pipe_producer_state = store_state_next;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 851 / 第 851 行** — `          accumulator_pipe_consumer_state = acc_state_next;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 852 / 第 852 行** — `          do_tail_store = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 853 / 第 853 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 854 / 第 854 行** — `        work_tile_info = next_work_tile_info;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 855 / 第 855 行** — `        cta_coord_mnkl = scheduler.work_tile_to_cta_coord(work_tile_info);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 856 / 第 856 行** — `      } while (work_tile_info.is_valid());`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 857 / 第 857 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 858 / 第 858 行** — `      // Only perform a tail store if one of the work units processed performed`
+  - **EN**: Inline comment explaining intent: `Only perform a tail store if one of the work units processed performed`.
+  - **CN**: 行内注释说明意图：`Only perform a tail store if one of the work units processed performed`。
+- **Line 859 / 第 859 行** — `      // an epilogue. An example of a case in which a tail load should not be`
+  - **EN**: Inline comment explaining intent: `an epilogue. An example of a case in which a tail load should not be`.
+  - **CN**: 行内注释说明意图：`an epilogue. An example of a case in which a tail load should not be`。
+- **Line 860 / 第 860 行** — `      // performed is in split-K if a cluster is only assigned non-final splits (for which`
+  - **EN**: Inline comment explaining intent: `performed is in split-K if a cluster is only assigned non-final splits (for which`.
+  - **CN**: 行内注释说明意图：`performed is in split-K if a cluster is only assigned non-final splits (for which`。
+- **Line 861 / 第 861 行** — `      // the cluster does not compute the epilogue).`
+  - **EN**: Inline comment explaining intent: `the cluster does not compute the epilogue).`.
+  - **CN**: 行内注释说明意图：`the cluster does not compute the epilogue).`。
+- **Line 862 / 第 862 行** — `      if (do_tail_store) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 863 / 第 863 行** — `        collective_epilogue.store_tail(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 864 / 第 864 行** — `          epi_load_pipeline, epi_load_pipe_consumer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 865 / 第 865 行** — `          epi_store_pipeline, epi_store_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 866 / 第 866 行** — `          CtaShape_MNK{});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 867 / 第 867 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 868 / 第 868 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 869 / 第 869 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 870 / 第 870 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 871 / 第 871 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 872 / 第 872 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 873 / 第 873 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 874 / 第 874 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 875 / 第 875 行** — `///////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 876 / 第 876 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 877 / 第 877 行** — `} // namespace cutlass::gemm::kernel`
+  - **EN**: Closes namespace `cutlass::gemm::kernel`.
+  - **CN**: 关闭命名空间 `cutlass::gemm::kernel`。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/fast_math.h` — CUTLASS dependency `cutlass/fast_math.h` / CUTLASS 依赖 `cutlass/fast_math.h`
+- `cutlass/kernel_hardware_info.hpp` — CUTLASS dependency `cutlass/kernel_hardware_info.hpp` / CUTLASS 依赖 `cutlass/kernel_hardware_info.hpp`
+- `cute/tensor.hpp` — CuTe dependency `cute/tensor.hpp` / CuTe 依赖 `cute/tensor.hpp`
+- `cute/arch/tmem_allocator_sm100.hpp` — CuTe dependency `cute/arch/tmem_allocator_sm100.hpp` / CuTe 依赖 `cute/arch/tmem_allocator_sm100.hpp`
+- `cute/arch/cluster_sm90.hpp` — CuTe dependency `cute/arch/cluster_sm90.hpp` / CuTe 依赖 `cute/arch/cluster_sm90.hpp`
+- `cutlass/arch/arch.h` — Architecture-specific support `cutlass/arch/arch.h` / 架构特化支持 `cutlass/arch/arch.h`
+- `cutlass/arch/grid_dependency_control.h` — Architecture-specific support `cutlass/arch/grid_dependency_control.h` / 架构特化支持 `cutlass/arch/grid_dependency_control.h`
+- `cutlass/conv/detail.hpp` — CUTLASS convolution component `cutlass/conv/detail.hpp` / CUTLASS 卷积组件 `cutlass/conv/detail.hpp`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/conv/dispatch_policy.hpp` — CUTLASS convolution component `cutlass/conv/dispatch_policy.hpp` / CUTLASS 卷积组件 `cutlass/conv/dispatch_policy.hpp`
+- `cutlass/gemm/kernel/tile_scheduler.hpp` — CUTLASS GEMM primitive `cutlass/gemm/kernel/tile_scheduler.hpp` / CUTLASS GEMM 原语 `cutlass/gemm/kernel/tile_scheduler.hpp`
+- `cutlass/pipeline/sm100_pipeline.hpp` — CUTLASS dependency `cutlass/pipeline/sm100_pipeline.hpp` / CUTLASS 依赖 `cutlass/pipeline/sm100_pipeline.hpp`
+- `cutlass/detail/sm100_tmem_helper.hpp` — Internal helper `cutlass/detail/sm100_tmem_helper.hpp` / 内部辅助头 `cutlass/detail/sm100_tmem_helper.hpp`

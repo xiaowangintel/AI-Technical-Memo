@@ -1,0 +1,213 @@
+# rank_2k_grouped.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `include/cutlass/gemm/device/rank_2k_grouped.h`  
+**Purpose / 用途**: Defines the grouped rank-2k device wrapper by specializing the shared grouped base. / 通过特化共享 grouped 基类定义 grouped rank-2k 设备级封装。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**: `/***************************************************************************************************`
+  - **EN**: Begins the file header comment block.
+  - **CN**: 开始文件头部注释块。
+- **Line 2 / 第2行**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 3 / 第3行**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 4 / 第4行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 5 / 第5行**: ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 6 / 第6行**: ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 7 / 第7行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 8 / 第8行**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 9 / 第9行**: ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 10 / 第10行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 11 / 第11行**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 12 / 第12行**: ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 13 / 第13行**: ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 14 / 第14行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 15 / 第15行**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 16 / 第16行**: ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 17 / 第17行**: ` * this software without specific prior written permission.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 18 / 第18行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 19 / 第19行**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 20 / 第20行**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 21 / 第21行**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 22 / 第22行**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 23 / 第23行**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 24 / 第24行**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 25 / 第25行**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 26 / 第26行**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 27 / 第27行**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 28 / 第28行**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 29 / 第29行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 30 / 第30行**: ` **************************************************************************************************/`
+  - **EN**: Closes the header comment block.
+  - **CN**: 关闭头部注释块。
+- **Line 31 / 第31行**: `/*!`
+  - **EN**: Begins a Doxygen file comment block.
+  - **CN**: 开始一个 Doxygen 文件注释块。
+- **Line 32 / 第32行**: `  \file`
+  - **EN**: Marks the current Doxygen block as file-level documentation.
+  - **CN**: 标记当前 Doxygen 注释块用于说明整个文件。
+- **Line 33 / 第33行**: `  \brief Device-level grouped Rank2K.`
+  - **EN**: Summarizes the file purpose for generated documentation.
+  - **CN**: 用一句话概括文件用途，供生成文档使用。
+- **Line 34 / 第34行**: `*/`
+  - **EN**: Closes the Doxygen comment block that introduced the file.
+  - **CN**: 关闭用于介绍该文件的 Doxygen 注释块。
+- **Line 35 / 第35行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 36 / 第36行**: `#pragma once`
+  - **EN**: Ensures the header is included only once per translation unit.
+  - **CN**: 确保该头文件在同一个编译单元中只会被包含一次。
+- **Line 37 / 第37行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 38 / 第38行**: `#include "cutlass/gemm/device/base_grouped.h"`
+  - **EN**: Includes `cutlass/gemm/device/base_grouped.h` so the wrapper can reuse required declarations. Provides the shared grouped-kernel host wrapper used by grouped device APIs.
+  - **CN**: 包含 `cutlass/gemm/device/base_grouped.h`，以便该封装复用所需声明。提供 grouped 设备 API 共用的主机端 grouped-kernel 封装。
+- **Line 39 / 第39行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 40 / 第40行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 41 / 第41行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 42 / 第42行**: `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` to scope the following declarations.
+  - **CN**: 打开命名空间 `cutlass`，为后续声明限定作用域。
+- **Line 43 / 第43行**: `namespace gemm {`
+  - **EN**: Opens namespace `gemm` to scope the following declarations.
+  - **CN**: 打开命名空间 `gemm`，为后续声明限定作用域。
+- **Line 44 / 第44行**: `namespace device {`
+  - **EN**: Opens namespace `device` to scope the following declarations.
+  - **CN**: 打开命名空间 `device`，为后续声明限定作用域。
+- **Line 45 / 第45行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 46 / 第46行**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 47 / 第47行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 48 / 第48行**: `/// Rank2K Grouped`
+  - **EN**: Documentation comment describing the next declaration: Rank2K Grouped
+  - **CN**: 文档注释，用于说明后续声明：Rank2K Grouped
+- **Line 49 / 第49行**: `template <typename Rank2Kkernel_>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 50 / 第50行**: `class Rank2KGrouped : public BaseGrouped<Rank2Kkernel_> {`
+  - **EN**: Declares template parameter `Rank2KGrouped`. The nearby documentation says: Rank2K Grouped
+  - **CN**: 声明模板参数 `Rank2KGrouped`。附近文档对它的说明是：Rank2K Grouped
+- **Line 51 / 第51行**: `public:`
+  - **EN**: Switches to the `public` access section of the class.
+  - **CN**: 切换到类的 `public` 访问区域。
+- **Line 52 / 第52行**: `  using Rank2Kkernel = Rank2Kkernel_;`
+  - **EN**: Defines the alias `Rank2Kkernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Rank2Kkernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 53 / 第53行**: `  static const cutlass::FillMode kFillModeC = Rank2Kkernel::kFillModeC;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 54 / 第54行**: `  static const cutlass::BlasMode kBlasMode = Rank2Kkernel::kBlasMode;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 55 / 第55行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 56 / 第56行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 57 / 第57行**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 58 / 第58行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 59 / 第59行**: `} // namespace device`
+  - **EN**: Closes namespace `device`.
+  - **CN**: 关闭命名空间 `device`。
+- **Line 60 / 第60行**: `} // namespace gemm`
+  - **EN**: Closes namespace `gemm`.
+  - **CN**: 关闭命名空间 `gemm`。
+- **Line 61 / 第61行**: `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 62 / 第62行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 63 / 第63行**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+
+## Key Concepts / 关键概念
+
+- **EN**: The header lives at CUTLASS's device API layer, where heavy template composition is turned into a callable host-side wrapper.  
+- **CN**: 该头文件位于 CUTLASS 的设备 API 层，把复杂的模板组合封装成可由主机调用的包装器。
+- **EN**: Grouped wrappers manage multiple independent problems through one launch and often need workspace precomputation.  
+- **CN**: Grouped 封装会通过一次启动管理多个独立问题，因此常常需要工作区预计算。
+- **EN**: These BLAS-structured wrappers preserve mathematical structure such as symmetry, triangularity, or rank-update semantics while still using CUTLASS kernel machinery.  
+- **CN**: 这些面向 BLAS 结构化运算的封装会保留对称性、三角性或 rank-update 语义，同时继续复用 CUTLASS 内核机制。
+- **EN**: Most device wrappers expose a common lifecycle: argument validation, workspace sizing, initialization, and kernel launch.  
+- **CN**: 大多数设备封装都遵循共同生命周期：参数校验、工作区大小计算、初始化以及内核启动。
+
+## Dependencies / 依赖关系
+
+- `cutlass/gemm/device/base_grouped.h`: Provides the shared grouped-kernel host wrapper used by grouped device APIs. / 提供 grouped 设备 API 共用的主机端 grouped-kernel 封装。

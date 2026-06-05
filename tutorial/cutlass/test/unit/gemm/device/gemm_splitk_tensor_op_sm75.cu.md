@@ -1,0 +1,1063 @@
+# gemm_splitk_tensor_op_sm75.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/device/gemm_splitk_tensor_op_sm75.cu`
+
+## Purpose / 目的
+- EN: This file follows the brief "Tests for device-wide GEMM interface" and encodes the concrete kernel variants exercised by the test cases for SM75.
+- CN: 该文件用于设备级 GEMM 接口的测试，并给出了在 SM75 上由测试用例实际覆盖的具体内核变体。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `/*! \file`
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: `    \brief Tests for device-wide GEMM interface`
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: `#include <iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `#include "cutlass/cutlass.h"`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- **Line 38**: `#include "cutlass/gemm/device/gemm_splitk_parallel.h"`
+  - EN: Provides a CUTLASS device-level GEMM-family operator or adapter.
+  - CN: 提供 CUTLASS 设备级 GEMM 家族算子或适配器。
+- **Line 39**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 40**: `#include "../../common/cutlass_unit_test.h"`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 41**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 42**: `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 43**: `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 44**: `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- **Line 45**: `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 46**: `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 47**: `#include "cutlass/util/reference/host/gemm.h"`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `#include "testbed_splitk.h"`
+  - EN: Provides local testbed helpers shared by neighboring GEMM tests.
+  - CN: 提供相邻 GEMM 测试共享的本地测试平台辅助工具。
+- **Line 50**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 51**: `// These operators are assert(0) unless extended PTX is used. `
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 52**: `#if defined(CUTLASS_ARCH_MMA_SM75_SUPPORTED)`
+  - EN: Compiles the following code only when `CUTLASS_ARCH_MMA_SM75_SUPPORTED` is available.
+  - CN: 仅当 `CUTLASS_ARCH_MMA_SM75_SUPPORTED` 可用时才编译后续代码。
+- **Line 53**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 54**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 55**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 56**: `TEST(SM75_Device_GemmSplitKParallel_f16n_f16t_f32t_tensor_op_f32, 64x64x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `  using ElementOutput = float;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 59**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 60**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 61**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 62**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 63**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 64**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 65**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 66**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 67**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 68**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 69**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 70**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 71**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 72**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 73**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 74**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 75**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 76**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 77**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 78**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 79**: `TEST(SM75_Device_GemmSplitKParallel_f16n_f16t_f32n_tensor_op_f32, 64x64x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 80**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 81**: `  using ElementOutput = float;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 82**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 83**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 84**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 85**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 86**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 87**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 88**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 89**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 90**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 91**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 92**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 93**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 94**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 95**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 96**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 97**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 98**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 99**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 100**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 101**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 102**: `TEST(SM75_Device_GemmSplitKParallel_f16n_f16t_f16t_tensor_op_f32, 128x128x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 103**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 104**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 105**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 106**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 107**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 108**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 109**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 110**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 111**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 112**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 113**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 114**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 115**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 116**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 117**: `    cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 118**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 119**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 120**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 121**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 122**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 123**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 124**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 125**: `TEST(SM75_Device_GemmSplitKParallel_f16n_f16t_f16n_tensor_op_f32, 128x128x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 126**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 127**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 128**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 129**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 130**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 131**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 132**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 133**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 134**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 135**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 136**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 137**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 138**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 139**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 140**: `    cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 141**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 142**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 143**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 144**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 145**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 146**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 147**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 148**: `TEST(SM75_Device_GemmSplitKParallel_f16n_f16t_f16t_tensor_op_f16, 64x128x32_32x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 149**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 150**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 151**: `  using ElementAccumulator = cutlass::half_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 152**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 153**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 154**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 155**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 156**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 157**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 158**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 159**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 160**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 161**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 162**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 163**: `    cutlass::gemm::GemmShape<64, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 164**: `    cutlass::gemm::GemmShape<32, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 165**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 166**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 167**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 168**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 169**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `TEST(SM75_Device_GemmSplitKParallel_f16n_f16t_f16n_tensor_op_f16, 64x128x32_32x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 172**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 173**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 174**: `  using ElementAccumulator = cutlass::half_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 175**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 176**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 177**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 178**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 179**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 180**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 181**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 182**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 183**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 184**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 185**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 186**: `    cutlass::gemm::GemmShape<64, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 187**: `    cutlass::gemm::GemmShape<32, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 188**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 189**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 190**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 191**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 192**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 193**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 194**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 195**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 196**: `TEST(SM75_Device_GemmSplitKParallel_f16t_f16n_f32t_tensor_op_f32, 128x256x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 197**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 198**: `  using ElementOutput = float;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 199**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 200**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 201**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 202**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 203**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 204**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 205**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 206**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 207**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 208**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 209**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 210**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 211**: `    cutlass::gemm::GemmShape<128, 256, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 212**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 213**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 214**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 215**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 216**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 217**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 218**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 219**: `TEST(SM75_Device_GemmSplitKParallel_f16t_f16n_f32n_tensor_op_f32, 128x256x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 220**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 221**: `  using ElementOutput = float;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 222**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 223**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 224**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 225**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 226**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 227**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 228**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 229**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 230**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 231**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 232**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 233**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 234**: `    cutlass::gemm::GemmShape<128, 256, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 235**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 236**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 237**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 238**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 239**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 240**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 241**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 242**: `TEST(SM75_Device_GemmSplitKParallel_f16t_f16n_f16t_tensor_op_f32, 128x128x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 243**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 244**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 245**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 246**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 247**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 248**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 249**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 250**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 251**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 252**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 253**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 254**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 255**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 256**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 257**: `    cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 258**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 259**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 260**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 261**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 262**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 263**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 264**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 265**: `TEST(SM75_Device_GemmSplitKParallel_f16t_f16n_f16n_tensor_op_f32, 128x128x32_64x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 266**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 267**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 268**: `  using ElementAccumulator = float;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 269**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 270**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 271**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 272**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 273**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 274**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 275**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 276**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 277**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 278**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 279**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 280**: `    cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 281**: `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 282**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 283**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 284**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 285**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 286**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 287**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 288**: `TEST(SM75_Device_GemmSplitKParallel_f16t_f16n_f16t_tensor_op_f16, 64x128x32_32x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 289**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 290**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 291**: `  using ElementAccumulator = cutlass::half_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 292**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 293**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 294**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 295**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 296**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 297**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 298**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 299**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 300**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 301**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 302**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 303**: `    cutlass::gemm::GemmShape<64, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 304**: `    cutlass::gemm::GemmShape<32, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 305**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 306**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 307**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 308**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 309**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 310**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 311**: `TEST(SM75_Device_GemmSplitKParallel_f16t_f16n_f16n_tensor_op_f16, 64x128x32_32x64x32) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 312**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 313**: `  using ElementOutput = cutlass::half_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 314**: `  using ElementAccumulator = cutlass::half_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 315**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 316**: `  using Gemm = cutlass::gemm::device::GemmSplitKParallel<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 317**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 318**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 319**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 320**: `    cutlass::layout::ColumnMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 321**: `    ElementOutput,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 322**: `    cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 323**: `    ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 324**: `    cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 325**: `    cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 326**: `    cutlass::gemm::GemmShape<64, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 327**: `    cutlass::gemm::GemmShape<32, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 328**: `    cutlass::gemm::GemmShape<16, 8, 8>`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 329**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 330**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 331**: `  test::gemm::device::TestAllGemmSplitK<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 332**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 333**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 334**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 335**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 336**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Uses GoogleTest-style test cases to instantiate and run specific kernel configurations.
+  - CN: 使用 GoogleTest 风格测试用例实例化并运行特定内核配置。
+- `GemmShape<`
+  - EN: Encodes threadblock, warp, and instruction tile sizes that determine kernel decomposition.
+  - CN: 编码线程块、warp 和指令级 tile 尺寸，以决定内核分解方式。
+- `Sm75`
+  - EN: Targets NVIDIA Turing-class SM75 kernels.
+  - CN: 面向 NVIDIA Turing 架构的 SM75 内核。
+
+## Dependencies / 依赖关系
+- `<iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- `cutlass/cutlass.h`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- `cutlass/gemm/device/gemm_splitk_parallel.h`
+  - EN: Provides a CUTLASS device-level GEMM-family operator or adapter.
+  - CN: 提供 CUTLASS 设备级 GEMM 家族算子或适配器。
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- `testbed_splitk.h`
+  - EN: Provides local testbed helpers shared by neighboring GEMM tests.
+  - CN: 提供相邻 GEMM 测试共享的本地测试平台辅助工具。

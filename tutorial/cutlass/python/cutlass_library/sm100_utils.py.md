@@ -1,0 +1,906 @@
+# sm100_utils.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/sm100_utils.py`
+
+## Purpose / 作用
+- EN: Utilities for enumerating CUTLASS library SM100 kernels
+- CN: 该模块的文档字符串将其描述为：Utilities for enumerating CUTLASS library SM100 kernels
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utilities for enumerating CUTLASS library SM100 kernels` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import argparse` — **EN:** Imports argparse for later use. **CN:** 导入 argparse 供后续使用。
+- **L38** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L39** `from itertools import product` — **EN:** Imports product from `itertools`. **CN:** 从 `itertools` 导入 product。
+- **L40** `import math` — **EN:** Imports math for later use. **CN:** 导入 math 供后续使用。
+- **L41** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L42** `import os.path` — **EN:** Imports os.path for later use. **CN:** 导入 os.path 供后续使用。
+- **L43** `import shutil` — **EN:** Imports shutil for later use. **CN:** 导入 shutil 供后续使用。
+- **L44** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L45** `import copy` — **EN:** Imports copy for later use. **CN:** 导入 copy 供后续使用。
+- **L46** `from typing import Any, Optional, Sequence, Tuple, List, Union, Callable` — **EN:** Imports Any, Optional, Sequence, Tuple, List, Union, ... (+1 more) from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Sequence, Tuple, List, Union, ... (+1 more)。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L49** `  import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L50** `  if hasattr(builtins, "CUTLASS_IGNORE_PACKAGE") and CUTLASS_IGNORE_PACKAGE == True:` — **EN:** Starts a conditional branch guarded by `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...`. **CN:** 开始一个由 `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...` 控制的条件分支。
+- **L51** `    raise ImportError("Disabling attempt to import cutlass_library")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L52** `  from cutlass_library.library import *` — **EN:** Imports * from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 *。
+- **L53** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L54** `  from library import *` — **EN:** Imports * from `library`. **CN:** 从 `library` 导入 *。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `#### Step 0: define levels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `# One integer level controls multiple "generators" and how many` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L59** `# combinations they generate. That is the "global" level.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `# "Generators" are WGMMA shapes, MMA multipliers, cluster sizes, and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L61** `# anything that is eventually involved in the Cartesian product` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L62** `# which yields our kernel configurations.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L63** `# For simplicity, each generator defines their own levels, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `# starting from 0. As a rule we assume 10 or fewer levels, making` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L65** `# their level a digit.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L66** `# The "global" level simply stacks these digits and represents them` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `# as a single integer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `# ` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L69** `# For example, level 500 indicates cluster sizes are at level 5, MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `# multipliers are at level 0, and WGMMA shapes are at level 0 as well.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L72** `# Here we define the global level to generator level mappings.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `def get_tcgen05_level_from_global_level(global_level: int):` — **EN:** Defines function `get_tcgen05_level_from_global_level`. **CN:** 定义函数 `get_tcgen05_level_from_global_level`。
+- **L76** `    return global_level % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `def get_mma_level_from_global_level(global_level: int):` — **EN:** Defines function `get_mma_level_from_global_level`. **CN:** 定义函数 `get_mma_level_from_global_level`。
+- **L79** `    return (global_level // 10) % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `def get_cluster_level_from_global_level(global_level: int):` — **EN:** Defines function `get_cluster_level_from_global_level`. **CN:** 定义函数 `get_cluster_level_from_global_level`。
+- **L83** `    return (global_level // 100) % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `def get_pruning_level_from_global_level(global_level: int):` — **EN:** Defines function `get_pruning_level_from_global_level`. **CN:** 定义函数 `get_pruning_level_from_global_level`。
+- **L87** `    return (global_level // 1000) % 10` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `#### Step 1: generate MMA instruction shapes based on levels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L93** `    from .sm100_shapes import *` — **EN:** Imports * from `.sm100_shapes`. **CN:** 从 `.sm100_shapes` 导入 *。
+- **L94** `except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L95** `    from sm100_shapes import *` — **EN:** Imports * from `sm100_shapes`. **CN:** 从 `sm100_shapes` 导入 *。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `###########` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `def generate_tf32_math_instructions_sm100(level: int):` — **EN:** Defines function `generate_tf32_math_instructions_sm100`. **CN:** 定义函数 `generate_tf32_math_instructions_sm100`。
+- **L100** `    """` — **EN:** Starts the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 开始说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L101** `    Generate all TensorOp math instructions for TF32 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 继续说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `    Args:` — **EN:** Continues the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 继续说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L104** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 继续说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    Returns:` — **EN:** Continues the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 继续说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L107** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 继续说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L108** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 继续说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L109** `    """` — **EN:** Ends the docstring for the function `generate_tf32_math_instructions_sm100`. **CN:** 结束说明 function `generate_tf32_math_instructions_sm100` 的文档字符串。
+- **L110** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L111** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L112** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L115** `        shape for shape, min_level in SM100_MMA_SHAPES_TF32_DENSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L118** `        shape for shape, min_level in SM100_MMA_SHAPES_TF32_DENSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L122** `        math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L123** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `              DataType.tf32, DataType.tf32, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L131** `        math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L132** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `              DataType.tf32, DataType.tf32, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `def generate_16b_math_instructions_sm100(level: int):` — **EN:** Defines function `generate_16b_math_instructions_sm100`. **CN:** 定义函数 `generate_16b_math_instructions_sm100`。
+- **L142** `    """` — **EN:** Starts the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 开始说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L143** `    Generate all TensorOp math instructions for 16b MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 继续说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    Args:` — **EN:** Continues the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 继续说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L146** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 继续说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `    Returns:` — **EN:** Continues the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 继续说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L149** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 继续说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L150** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 继续说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L151** `    """` — **EN:** Ends the docstring for the function `generate_16b_math_instructions_sm100`. **CN:** 结束说明 function `generate_16b_math_instructions_sm100` 的文档字符串。
+- **L152** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L153** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L154** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L157** `        shape for shape, min_level in SM100_MMA_SHAPES_16b_DENSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L160** `        shape for shape, min_level in SM100_MMA_SHAPES_16b_DENSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L164** `        math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L165** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `              DataType.f16, DataType.f16, DataType.f16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `        math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L172** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `              DataType.f16, DataType.f16, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `        math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L179** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `              DataType.bf16, DataType.bf16, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L188** `        math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L189** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `              DataType.f16, DataType.f16, DataType.f16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `        math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L196** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `              DataType.f16, DataType.f16, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L203** `          MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `              shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `              DataType.bf16, DataType.bf16, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `              OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `              MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `def generate_fp8_math_instructions_sm100(level: int, enable_runtime_dtype = True, enable_compile_time_dtype = True):` — **EN:** Defines function `generate_fp8_math_instructions_sm100`. **CN:** 定义函数 `generate_fp8_math_instructions_sm100`。
+- **L214** `    """` — **EN:** Starts the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 开始说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L215** `    Generate all TensorOp math instructions for FP8 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** `    Args:` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L218** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L219** `        enable_runtime_dtype: Whether to generate runtime dtype math instructions.` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L220** `        enable_compile_time_dtype: Whether to generate compile time dtype math instructions.` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `    Returns:` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L223** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L224** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 继续说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L225** `    """` — **EN:** Ends the docstring for the function `generate_fp8_math_instructions_sm100`. **CN:** 结束说明 function `generate_fp8_math_instructions_sm100` 的文档字符串。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L228** `    pruning_level = get_pruning_level_from_global_level(level)` — **EN:** Assigns a value to pruning_level. **CN:** 将一个值赋给 pruning_level。
+- **L229** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L230** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L233** `        shape for shape, min_level in SM100_MMA_SHAPES_F8F6F4_DENSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L236** `        shape for shape, min_level in SM100_MMA_SHAPES_F8F6F4_DENSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L240** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L241** `            math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L242** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `                  DataType.f8, DataType.f8, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `        if enable_compile_time_dtype:    ` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L249** `            math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L250** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `                  DataType.e4m3, DataType.e4m3, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `            math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L257** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `                  DataType.e5m2, DataType.e4m3, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `            math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L264** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `                  DataType.e4m3, DataType.e5m2, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `            if pruning_level >= 2:` — **EN:** Starts a conditional branch guarded by `pruning_level >= 2`. **CN:** 开始一个由 `pruning_level >= 2` 控制的条件分支。
+- **L271** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L272** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `                      DataType.e5m2, DataType.e5m2, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `                      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `                      MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L279** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L280** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L281** `            math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L282** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `                  DataType.f8, DataType.f8, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `        if enable_compile_time_dtype:    ` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L289** `            math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L290** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `                  DataType.e4m3, DataType.e4m3, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `            math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L297** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `                  DataType.e5m2, DataType.e4m3, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `            math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L304** `              MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `                  shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `                  DataType.e4m3, DataType.e5m2, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `                  OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `                  MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `            if pruning_level >= 2:` — **EN:** Starts a conditional branch guarded by `pruning_level >= 2`. **CN:** 开始一个由 `pruning_level >= 2` 控制的条件分支。
+- **L311** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L312** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `                      DataType.e5m2, DataType.e5m2, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `                      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `                      MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L320** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L321** `def generate_f8f6f4_math_instructions_sm100(level: int, enable_runtime_dtype = True, enable_compile_time_dtype = True):` — **EN:** Defines function `generate_f8f6f4_math_instructions_sm100`. **CN:** 定义函数 `generate_f8f6f4_math_instructions_sm100`。
+- **L322** `    """` — **EN:** Starts the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 开始说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L323** `    Generate all TensorOp math instructions for FP8 FP6 and FP4 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `    Args:` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L326** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L327** `        enable_runtime_dtype: Whether to generate runtime dtype math instructions.` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L328** `        enable_compile_time_dtype: Whether to generate compile time dtype math instructions.` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `    Returns:` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L331** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L332** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L333** `    """` — **EN:** Ends the docstring for the function `generate_f8f6f4_math_instructions_sm100`. **CN:** 结束说明 function `generate_f8f6f4_math_instructions_sm100` 的文档字符串。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L336** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L337** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L339** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L340** `        shape for shape, min_level in SM100_MMA_SHAPES_F8F6F4_DENSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L343** `        shape for shape, min_level in SM100_MMA_SHAPES_F8F6F4_DENSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L347** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** `            runtime_types = [ DataType.f8, DataType.f6, DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L352** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L353** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `                      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `                      MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L361** `            compile_time_types = [ DataType.e4m3, DataType.e5m2, DataType.e3m2, DataType.e2m1 ]` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L364** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L365** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `                      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `                      MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L374** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L375** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L376** `            runtime_types = [ DataType.f8, DataType.f6, DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L379** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L380** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `                      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `                      MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L388** `            compile_time_types = [ DataType.e4m3, DataType.e5m2, DataType.e3m2, DataType.e2m1 ]` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L389** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L390** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L391** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L392** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `                      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `                      MathOperation.multiply_add)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L401** `def generate_mxf8f6f4_math_instructions_sm100(level: int, enable_runtime_dtype = True, enable_compile_time_dtype = True):` — **EN:** Defines function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 定义函数 `generate_mxf8f6f4_math_instructions_sm100`。
+- **L402** `    """` — **EN:** Starts the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 开始说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L403** `    Generate all BlockScaledTensorOp math instructions for MXFP8, MXFP6, and MXFP4 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `    Args:` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L406** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L407** `        enable_runtime_dtype: Whether to generate runtime dtype math instructions.` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L408** `        enable_compile_time_dtype: Whether to generate compile time dtype math instructions.` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** `    Returns:` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L411** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L412** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L413** `    """` — **EN:** Ends the docstring for the function `generate_mxf8f6f4_math_instructions_sm100`. **CN:** 结束说明 function `generate_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L416** `    pruning_level = get_pruning_level_from_global_level(level)` — **EN:** Assigns a value to pruning_level. **CN:** 将一个值赋给 pruning_level。
+- **L417** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L418** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L419** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L422** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF8F6F4_DENSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L425** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF8F6F4_DENSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L428** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L429** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `            runtime_types = [ DataType.f8, DataType.f6, DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `                if pruning_level < 2 and ((a_type == DataType.f8 or b_type == DataType.f8)):` — **EN:** Starts a conditional branch guarded by `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...`. **CN:** 开始一个由 `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...` 控制的条件分支。
+- **L436** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L439** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L448** `            compile_time_types = [ DataType.e4m3, ` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L449** `                                   DataType.e5m2, ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `                                   DataType.e3m2, ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `                                   DataType.e2m3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `                                   DataType.e2m1 ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L455** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L456** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L457** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L458** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L459** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L462** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L466** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `            runtime_types = [ DataType.f8, DataType.f6, DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L469** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L470** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L471** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L472** `                if pruning_level < 2 and ((a_type == DataType.f8 or b_type == DataType.f8)):` — **EN:** Starts a conditional branch guarded by `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...`. **CN:** 开始一个由 `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...` 控制的条件分支。
+- **L473** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L476** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L484** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L485** `            compile_time_types = [ DataType.e4m3, ` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L486** `                                   DataType.e5m2, ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `                                   DataType.e3m2, ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `                                   DataType.e2m3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** `                                   DataType.e2m1 ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L492** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L493** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L494** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L497** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L498** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L499** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `def generate_mxf4nvf4_math_instructions_sm100(level: int, enable_runtime_dtype = True, enable_compile_time_dtype = True):` — **EN:** Defines function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 定义函数 `generate_mxf4nvf4_math_instructions_sm100`。
+- **L504** `    """` — **EN:** Starts the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 开始说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L505** `    Generate all BlockScaledTensorOp math instructions for MXFP4 and MXFP4 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    Args:` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L508** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L509** `        enable_runtime_dtype: Whether to generate runtime dtype math instructions.` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L510** `        enable_compile_time_dtype: Whether to generate compile time dtype math instructions.` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** `    Returns:` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L513** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L514** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L515** `    """` — **EN:** Ends the docstring for the function `generate_mxf4nvf4_math_instructions_sm100`. **CN:** 结束说明 function `generate_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L516** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L517** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L518** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L519** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L520** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L521** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF4NVF4_DENSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L524** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF4NVF4_DENSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L528** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L529** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L530** `            runtime_types = [ DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L533** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L534** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L537** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L538** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L539** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L540** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L542** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L546** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L547** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L552** `            compile_time_types = [ DataType.e2m1, ` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L553** `                                 ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L556** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L557** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L558** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L559** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L560** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L561** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L563** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L564** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L565** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L571** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L572** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L575** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** `            runtime_types = [ DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L578** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L579** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L580** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L581** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L589** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L595** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L596** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L597** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L598** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L599** `            compile_time_types = [ DataType.e2m1, ` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L600** `                                 ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L603** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L604** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L606** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L607** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L608** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L612** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L615** `                      OpcodeClass.BlockScaledTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L618** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L621** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L622** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L623** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L624** `def generate_cluster_shapes_sm100(level: int, change_priority_func : Union[Callable, None] = None):` — **EN:** Defines function `generate_cluster_shapes_sm100`. **CN:** 定义函数 `generate_cluster_shapes_sm100`。
+- **L625** `    """` — **EN:** Starts the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 开始说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L626** `    Generate all cluster shapes for SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 继续说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L627** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L628** `    Args:` — **EN:** Continues the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 继续说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L629** `        level: The global level to generate cluster shapes for.` — **EN:** Continues the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 继续说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L631** `    Returns:` — **EN:** Continues the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 继续说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L632** `        A tuple of two lists of cluster shapes. ` — **EN:** Continues the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 继续说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L633** `        The first list contains the cluster shapes for 1SM, and the second list contains the cluster shapes for 2SM.` — **EN:** Continues the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 继续说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L634** `    """` — **EN:** Ends the docstring for the function `generate_cluster_shapes_sm100`. **CN:** 结束说明 function `generate_cluster_shapes_sm100` 的文档字符串。
+- **L635** `    cluster_level = get_cluster_level_from_global_level(level)` — **EN:** Assigns a value to cluster_level. **CN:** 将一个值赋给 cluster_level。
+- **L636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L637** `    assert cluster_level >= 4` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L638** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L639** `    if change_priority_func is not None:` — **EN:** Starts a conditional branch guarded by `change_priority_func is not None`. **CN:** 开始一个由 `change_priority_func is not None` 控制的条件分支。
+- **L640** `        SM100_CLUSTER_SHAPES_1SM_CPY = copy.deepcopy(SM100_CLUSTER_SHAPES_1SM)` — **EN:** Assigns a value to SM100_CLUSTER_SHAPES_1SM_CPY. **CN:** 将一个值赋给 SM100_CLUSTER_SHAPES_1SM_CPY。
+- **L641** `        SM100_CLUSTER_SHAPES_2SM_CPY = copy.deepcopy(SM100_CLUSTER_SHAPES_2SM)` — **EN:** Assigns a value to SM100_CLUSTER_SHAPES_2SM_CPY. **CN:** 将一个值赋给 SM100_CLUSTER_SHAPES_2SM_CPY。
+- **L642** `        change_priority_func(SM100_CLUSTER_SHAPES_1SM_CPY, SM100_CLUSTER_SHAPES_2SM_CPY)` — **EN:** Invokes `change_priority_func` as a standalone call. **CN:** 以独立语句方式调用 `change_priority_func`。
+- **L643** `        shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L644** `            list(shape) for shape, min_level in SM100_CLUSTER_SHAPES_1SM_CPY.items() if cluster_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L646** `        shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L647** `            list(shape) for shape, min_level in SM100_CLUSTER_SHAPES_2SM_CPY.items() if cluster_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L648** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L649** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L650** `        return shapes_1sm, shapes_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L652** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L654** `        shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L655** `            list(shape) for shape, min_level in SM100_CLUSTER_SHAPES_1SM.items() if cluster_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L657** `        shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L658** `            list(shape) for shape, min_level in SM100_CLUSTER_SHAPES_2SM.items() if cluster_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L659** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L660** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L661** `        return shapes_1sm, shapes_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L662** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L663** `def generate_sparse_mxf4nvf4_math_instructions_sm100(level: int, enable_runtime_dtype = False, enable_compile_time_dtype = True):` — **EN:** Defines function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 定义函数 `generate_sparse_mxf4nvf4_math_instructions_sm100`。
+- **L664** `    """` — **EN:** Starts the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 开始说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L665** `    Generate all BlockScaledSparseTensorOp math instructions for MXFP4 and MXFP4 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L666** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L667** `    Args:` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L668** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L669** `        enable_runtime_dtype: Whether to generate runtime dtype math instructions.` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L670** `        enable_compile_time_dtype: Whether to generate compile time dtype math instructions.` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L671** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L672** `    Returns:` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L673** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L674** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L675** `    """` — **EN:** Ends the docstring for the function `generate_sparse_mxf4nvf4_math_instructions_sm100`. **CN:** 结束说明 function `generate_sparse_mxf4nvf4_math_instructions_sm100` 的文档字符串。
+- **L676** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L677** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L678** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L679** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L680** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L681** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF4NVF4_SPARSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L684** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF4NVF4_SPARSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L688** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L689** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L690** `            runtime_types = [ DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L691** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L692** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L693** `                # math_instructions_1sm.append(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L694** `                #   MathInstruction(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L695** `                #       shape,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L696** `                #       a_type, b_type, DataType.f32,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L697** `                #       OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L698** `                #       MathOperation.multiply_add,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L699** `                #       DataType.ue8m0)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L700** `                # )` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L701** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L702** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L703** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L705** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L706** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L707** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L710** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L711** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L712** `            compile_time_types = [ DataType.e2m1, ` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L713** `                                 ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L715** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L716** `                # math_instructions_1sm.append(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L717** `                #   MathInstruction(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L718** `                #       shape,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L719** `                #       a_type, b_type, DataType.f32,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L720** `                #       OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L721** `                #       MathOperation.multiply_add,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L722** `                #       DataType.ue8m0)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L723** `                # )` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L724** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L725** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L726** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L731** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L732** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L733** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L734** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L735** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L736** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L737** `            runtime_types = [ DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L738** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L739** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L740** `                # math_instructions_2sm.append(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L741** `                #   MathInstruction(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L742** `                #       shape,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L743** `                #       a_type, b_type, DataType.f32,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L744** `                #       OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L745** `                #       MathOperation.multiply_add,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L746** `                #       DataType.ue8m0)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L747** `                # )` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L748** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L749** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L750** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L752** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L753** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L757** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L758** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L759** `            compile_time_types = [ DataType.e2m1, ` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L760** `                                 ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L761** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L762** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L763** `                # math_instructions_2sm.append(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L764** `                #   MathInstruction(` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L765** `                #       shape,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L766** `                #       a_type, b_type, DataType.f32,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L767** `                #       OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L768** `                #       MathOperation.multiply_add,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L769** `                #       DataType.ue8m0)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L770** `                # )` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L771** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L772** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L775** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L776** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L777** `                      DataType.ue4m3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L779** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L780** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L781** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L782** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L783** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L784** `def generate_sparse_mxf8f6f4_math_instructions_sm100(level: int, enable_runtime_dtype = False, enable_compile_time_dtype = True):` — **EN:** Defines function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 定义函数 `generate_sparse_mxf8f6f4_math_instructions_sm100`。
+- **L785** `    """` — **EN:** Starts the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 开始说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L786** `    Generate all BlockScaledSparseTensorOp math instructions for MXFP8, MXFP6, and MXFP4 MMA that are supported by SM100 at or above the given level.` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L787** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L788** `    Args:` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L789** `        level: The global level to generate math instructions for.` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L790** `        enable_runtime_dtype: Whether to generate runtime dtype math instructions.` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L791** `        enable_compile_time_dtype: Whether to generate compile time dtype math instructions.` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L792** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L793** `    Returns:` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L794** `        A tuple of two lists of MathInstruction objects. ` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L795** `        The first list contains the math instructions for 1SM, and the second list contains the math instructions for 2SM.` — **EN:** Continues the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 继续说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L796** `    """` — **EN:** Ends the docstring for the function `generate_sparse_mxf8f6f4_math_instructions_sm100`. **CN:** 结束说明 function `generate_sparse_mxf8f6f4_math_instructions_sm100` 的文档字符串。
+- **L797** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L798** `    tcgen05_level = get_tcgen05_level_from_global_level(level)` — **EN:** Assigns a value to tcgen05_level. **CN:** 将一个值赋给 tcgen05_level。
+- **L799** `    pruning_level = get_pruning_level_from_global_level(level)` — **EN:** Assigns a value to pruning_level. **CN:** 将一个值赋给 pruning_level。
+- **L800** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L801** `    math_instructions_1sm = []` — **EN:** Assigns a value to math_instructions_1sm. **CN:** 将一个值赋给 math_instructions_1sm。
+- **L802** `    math_instructions_2sm = []` — **EN:** Assigns a value to math_instructions_2sm. **CN:** 将一个值赋给 math_instructions_2sm。
+- **L803** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L804** `    shapes_1sm = [` — **EN:** Assigns a value to shapes_1sm. **CN:** 将一个值赋给 shapes_1sm。
+- **L805** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF8F6F4_SPARSE_1SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L806** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** `    shapes_2sm = [` — **EN:** Assigns a value to shapes_2sm. **CN:** 将一个值赋给 shapes_2sm。
+- **L808** `        shape for shape, min_level in SM100_MMA_SHAPES_MXF8F6F4_SPARSE_2SM.items() if tcgen05_level >= min_level` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L811** `    for shape in shapes_1sm:` — **EN:** Starts a loop assigning items from `shapes_1sm` to `shape`. **CN:** 开始一个循环，将 `shapes_1sm` 的元素赋给 `shape`。
+- **L812** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L813** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L814** `            runtime_types = [ DataType.f8, DataType.f6, DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L815** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L816** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L817** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L818** `                if pruning_level < 2 and ((a_type == DataType.f8 or b_type == DataType.f8)):` — **EN:** Starts a conditional branch guarded by `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...`. **CN:** 开始一个由 `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...` 控制的条件分支。
+- **L819** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L820** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L821** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L822** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L825** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L827** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L828** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L829** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L830** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L831** `            compile_time_types = [ DataType.e4m3,` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L832** `                                #    DataType.e5m2, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L833** `                                #    DataType.e3m2, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L834** `                                #    DataType.e2m3, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L835** `                                #    DataType.e2m1 ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L836** `                                   ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L837** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L838** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L839** `                math_instructions_1sm.append(` — **EN:** Invokes `math_instructions_1sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_1sm.append`。
+- **L840** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L841** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L842** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L844** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L845** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L846** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L847** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L848** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L849** `    for shape in shapes_2sm:` — **EN:** Starts a loop assigning items from `shapes_2sm` to `shape`. **CN:** 开始一个循环，将 `shapes_2sm` 的元素赋给 `shape`。
+- **L850** `        if enable_runtime_dtype:` — **EN:** Starts a conditional branch guarded by `enable_runtime_dtype`. **CN:** 开始一个由 `enable_runtime_dtype` 控制的条件分支。
+- **L851** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L852** `            runtime_types = [ DataType.f8, DataType.f6, DataType.f4 ]` — **EN:** Assigns a value to runtime_types. **CN:** 将一个值赋给 runtime_types。
+- **L853** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L854** `            for a_type, b_type in product(runtime_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(runtime_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(runtime_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L855** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L856** `                if pruning_level < 2 and ((a_type == DataType.f8 or b_type == DataType.f8)):` — **EN:** Starts a conditional branch guarded by `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...`. **CN:** 开始一个由 `pruning_level < 2 and (a_type == DataType.f8 or b_type ==...` 控制的条件分支。
+- **L857** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L858** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L859** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L860** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L861** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L862** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L863** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L864** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L865** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L866** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L867** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L868** `        if enable_compile_time_dtype:` — **EN:** Starts a conditional branch guarded by `enable_compile_time_dtype`. **CN:** 开始一个由 `enable_compile_time_dtype` 控制的条件分支。
+- **L869** `            compile_time_types = [ DataType.e4m3,` — **EN:** Assigns a value to compile_time_types. **CN:** 将一个值赋给 compile_time_types。
+- **L870** `                                #    DataType.e5m2, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L871** `                                #    DataType.e3m2, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L872** `                                #    DataType.e2m3, ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L873** `                                #    DataType.e2m1 ` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L874** `                                   ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L875** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L876** `            for a_type, b_type in product(compile_time_types, repeat=2):` — **EN:** Starts a loop assigning items from `product(compile_time_types, repeat=2)` to `(a_type, b_type)`. **CN:** 开始一个循环，将 `product(compile_time_types, repeat=2)` 的元素赋给 `(a_type, b_type)`。
+- **L877** `                math_instructions_2sm.append(` — **EN:** Invokes `math_instructions_2sm.append` as a standalone call. **CN:** 以独立语句方式调用 `math_instructions_2sm.append`。
+- **L878** `                  MathInstruction(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L879** `                      shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L880** `                      a_type, b_type, DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L881** `                      OpcodeClass.BlockScaledSparseTensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L882** `                      MathOperation.multiply_add,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L883** `                      DataType.ue8m0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L884** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L885** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L886** `    return math_instructions_1sm, math_instructions_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.sm100_utils`. CN: 模块名为 `cutlass_library.sm100_utils`。
+- EN: Module docstring summary: Utilities for enumerating CUTLASS library SM100 kernels CN: 模块文档摘要为：Utilities for enumerating CUTLASS library SM100 kernels
+- EN: Top-level functions: get_tcgen05_level_from_global_level, get_mma_level_from_global_level, get_cluster_level_from_global_level, get_pruning_level_from_global_level, generate_tf32_math_instructions_sm100, generate_16b_math_instructions_sm100, generate_fp8_math_instructions_sm100, generate_f8f6f4_math_instructions_sm100, generate_mxf8f6f4_math_instructions_sm100, generate_mxf4nvf4_math_instructions_sm100, generate_cluster_shapes_sm100, generate_sparse_mxf4nvf4_math_instructions_sm100, ... (+1 more) CN: 顶层函数包括：get_tcgen05_level_from_global_level, get_mma_level_from_global_level, get_cluster_level_from_global_level, get_pruning_level_from_global_level, generate_tf32_math_instructions_sm100, generate_16b_math_instructions_sm100, generate_fp8_math_instructions_sm100, generate_f8f6f4_math_instructions_sm100, generate_mxf8f6f4_math_instructions_sm100, generate_mxf4nvf4_math_instructions_sm100, generate_cluster_shapes_sm100, generate_sparse_mxf4nvf4_math_instructions_sm100, ... (+1 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library.library:*, .sm100_shapes:* CN: 内部依赖：cutlass_library.library:*, .sm100_shapes:*
+- EN: External or standard-library dependencies: argparse, enum, itertools:product, math, logging, os.path, shutil, sys, copy, typing:Any,Optional,Sequence,Tuple,List,Union,Callable, builtins, library:*, sm100_shapes:* CN: 外部或标准库依赖：argparse, enum, itertools:product, math, logging, os.path, shutil, sys, copy, typing:Any,Optional,Sequence,Tuple,List,Union,Callable, builtins, library:*, sm100_shapes:*

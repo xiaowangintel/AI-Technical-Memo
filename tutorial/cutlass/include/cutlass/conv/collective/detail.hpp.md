@@ -1,0 +1,827 @@
+# detail.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/collective/detail.hpp`
+**Purpose / 用途**: Provides convolution collective composition. / 提供卷积 collective 组合。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 32 / 第 32 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 33 / 第 33 行** — `#include "cutlass/conv/convnd_problem_shape.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convnd_problem_shape.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convnd_problem_shape.hpp`。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `namespace cutlass::conv::collective::detail {`
+  - **EN**: Opens namespace `cutlass::conv::collective::detail` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv::collective::detail`。
+- **Line 38 / 第 38 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 39 / 第 39 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 40 / 第 40 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 41 / 第 41 行** — `// Construct the stride types for conv collectives based on the dispatch policy, strides 64b by default`
+  - **EN**: Inline comment explaining intent: `Construct the stride types for conv collectives based on the dispatch policy, strides 64b by def...`.
+  - **CN**: 行内注释说明意图：`Construct the stride types for conv collectives based on the dispatch policy, strides 64b by def...`。
+- **Line 42 / 第 42 行** — `template <class DispatchPolicy>`
+  - **EN**: Starts a template declaration with specifier `class DispatchPolicy`.
+  - **CN**: 开始一个模板声明，说明符为 `class DispatchPolicy`。
+- **Line 43 / 第 43 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 44 / 第 44 行** — `sm90_dispatch_policy_to_stride_A() {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 45 / 第 45 行** — `  if constexpr (DispatchPolicy::ConvOp == conv::Operator::kFprop) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 46 / 第 46 行** — `    // Maps to modes ((w,n), C)`
+  - **EN**: Inline comment explaining intent: `Maps to modes ((w,n), C)`.
+  - **CN**: 行内注释说明意图：`Maps to modes ((w,n), C)`。
+- **Line 47 / 第 47 行** — `    if constexpr (DispatchPolicy::NumSpatialDimensions == 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 48 / 第 48 行** — `      return cute::Stride<cute::Stride<int64_t, int64_t>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 49 / 第 49 行** — `                          cute::Int<1>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 50 / 第 50 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 51 / 第 51 行** — `    // Maps to modes ((w,h,n), C)`
+  - **EN**: Inline comment explaining intent: `Maps to modes ((w,h,n), C)`.
+  - **CN**: 行内注释说明意图：`Maps to modes ((w,h,n), C)`。
+- **Line 52 / 第 52 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 2) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 53 / 第 53 行** — `      return cute::Stride<cute::Stride<int64_t, int64_t, int64_t>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 54 / 第 54 行** — `                          cute::Int<1>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 55 / 第 55 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 56 / 第 56 行** — `    // Maps to modes ((w,h,d,n), C)`
+  - **EN**: Inline comment explaining intent: `Maps to modes ((w,h,d,n), C)`.
+  - **CN**: 行内注释说明意图：`Maps to modes ((w,h,d,n), C)`。
+- **Line 57 / 第 57 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 3) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 58 / 第 58 行** — `      return cute::Stride<cute::Stride<int64_t, int64_t, int64_t, int64_t>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 59 / 第 59 行** — `                          cute::Int<1>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 60 / 第 60 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 61 / 第 61 行** — `    // error dims assert`
+  - **EN**: Inline comment explaining intent: `error dims assert`.
+  - **CN**: 行内注释说明意图：`error dims assert`。
+- **Line 62 / 第 62 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 63 / 第 63 行** — `      static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported spatial dim count.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 64 / 第 64 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 65 / 第 65 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 66 / 第 66 行** — `  else if constexpr (DispatchPolicy::ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 67 / 第 67 行** — `    // Maps to modes (k, nq/npq/nzpq)`
+  - **EN**: Inline comment explaining intent: `Maps to modes (k, nq/npq/nzpq)`.
+  - **CN**: 行内注释说明意图：`Maps to modes (k, nq/npq/nzpq)`。
+- **Line 68 / 第 68 行** — `    if constexpr (DispatchPolicy::NumSpatialDimensions == 1 ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 69 / 第 69 行** — `                  DispatchPolicy::NumSpatialDimensions == 2 ||`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 70 / 第 70 行** — `                  DispatchPolicy::NumSpatialDimensions == 3) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 71 / 第 71 行** — `      return cute::Stride<cute::Int<1>, int64_t>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 72 / 第 72 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 73 / 第 73 行** — `    // error dims assert`
+  - **EN**: Inline comment explaining intent: `error dims assert`.
+  - **CN**: 行内注释说明意图：`error dims assert`。
+- **Line 74 / 第 74 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 75 / 第 75 行** — `      static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported spatial dim count.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 76 / 第 76 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 77 / 第 77 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 78 / 第 78 行** — `  else if constexpr (DispatchPolicy::ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 79 / 第 79 行** — `    // Maps to modes ((q,n), K)`
+  - **EN**: Inline comment explaining intent: `Maps to modes ((q,n), K)`.
+  - **CN**: 行内注释说明意图：`Maps to modes ((q,n), K)`。
+- **Line 80 / 第 80 行** — `    if constexpr (DispatchPolicy::NumSpatialDimensions == 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 81 / 第 81 行** — `      return cute::Stride<cute::Stride<int64_t, int64_t>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 82 / 第 82 行** — `                          cute::Int<1>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 83 / 第 83 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 84 / 第 84 行** — `    // Maps to modes ((q,p,n), K)`
+  - **EN**: Inline comment explaining intent: `Maps to modes ((q,p,n), K)`.
+  - **CN**: 行内注释说明意图：`Maps to modes ((q,p,n), K)`。
+- **Line 85 / 第 85 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 2) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 86 / 第 86 行** — `      return cute::Stride<cute::Stride<int64_t, int64_t, int64_t>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 87 / 第 87 行** — `                          cute::Int<1>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 88 / 第 88 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 89 / 第 89 行** — `    // Maps to modes ((q,p,z,n), K)`
+  - **EN**: Inline comment explaining intent: `Maps to modes ((q,p,z,n), K)`.
+  - **CN**: 行内注释说明意图：`Maps to modes ((q,p,z,n), K)`。
+- **Line 90 / 第 90 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 3) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 91 / 第 91 行** — `      return cute::Stride<cute::Stride<int64_t, int64_t, int64_t, int64_t>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 92 / 第 92 行** — `                          cute::Int<1>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 93 / 第 93 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 94 / 第 94 行** — `    // error dims assert`
+  - **EN**: Inline comment explaining intent: `error dims assert`.
+  - **CN**: 行内注释说明意图：`error dims assert`。
+- **Line 95 / 第 95 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 96 / 第 96 行** — `      static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported spatial dim count.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 97 / 第 97 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 98 / 第 98 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 99 / 第 99 行** — `  else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 100 / 第 100 行** — `    static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported ConvOp.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 101 / 第 101 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 102 / 第 102 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 103 / 第 103 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 104 / 第 104 行** — `// Construct the stirde types for conv collectives based on the dispatch policy, strides 64b by default`
+  - **EN**: Inline comment explaining intent: `Construct the stirde types for conv collectives based on the dispatch policy, strides 64b by def...`.
+  - **CN**: 行内注释说明意图：`Construct the stirde types for conv collectives based on the dispatch policy, strides 64b by def...`。
+- **Line 105 / 第 105 行** — `template <class DispatchPolicy>`
+  - **EN**: Starts a template declaration with specifier `class DispatchPolicy`.
+  - **CN**: 开始一个模板声明，说明符为 `class DispatchPolicy`。
+- **Line 106 / 第 106 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 107 / 第 107 行** — `sm90_dispatch_policy_to_stride_B() {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 108 / 第 108 行** — `  if constexpr (DispatchPolicy::ConvOp == conv::Operator::kFprop) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 109 / 第 109 行** — `    // Maps to modes (k, (C,s))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (k, (C,s))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (k, (C,s))`。
+- **Line 110 / 第 110 行** — `    if constexpr      (DispatchPolicy::NumSpatialDimensions == 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 111 / 第 111 行** — `      return cute::Stride<int64_t, cute::Stride<cute::Int<1>, int64_t>>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 112 / 第 112 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 113 / 第 113 行** — `    // Maps to modes (k, (C,s,r))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (k, (C,s,r))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (k, (C,s,r))`。
+- **Line 114 / 第 114 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 2) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 115 / 第 115 行** — `      return cute::Stride<int64_t, cute::Stride<cute::Int<1>, int64_t, int64_t>>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 116 / 第 116 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 117 / 第 117 行** — `    // Maps to modes (k, (C,s,r,t))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (k, (C,s,r,t))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (k, (C,s,r,t))`。
+- **Line 118 / 第 118 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 3) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 119 / 第 119 行** — `      return cute::Stride<int64_t, cute::Stride<cute::Int<1>, int64_t, int64_t, int64_t>>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 120 / 第 120 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 121 / 第 121 行** — `    // error dims assert`
+  - **EN**: Inline comment explaining intent: `error dims assert`.
+  - **CN**: 行内注释说明意图：`error dims assert`。
+- **Line 122 / 第 122 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 123 / 第 123 行** — `      static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported spatial dim count.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 124 / 第 124 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 125 / 第 125 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 126 / 第 126 行** — `  else if constexpr (DispatchPolicy::ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 127 / 第 127 行** — `    // Maps to modes (C, (w,n))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (C, (w,n))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (C, (w,n))`。
+- **Line 128 / 第 128 行** — `    if constexpr (DispatchPolicy::NumSpatialDimensions == 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 129 / 第 129 行** — `      return cute::Stride<cute::Int<1>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 130 / 第 130 行** — `                          cute::Stride<int64_t, int64_t>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 131 / 第 131 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 132 / 第 132 行** — `    // Maps to modes (C, (w,h,n))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (C, (w,h,n))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (C, (w,h,n))`。
+- **Line 133 / 第 133 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 2) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 134 / 第 134 行** — `      return cute::Stride<cute::Int<1>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 135 / 第 135 行** — `                          cute::Stride<int64_t, int64_t, int64_t>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 136 / 第 136 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 137 / 第 137 行** — `    // Maps to modes (C, (w,h,d,n))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (C, (w,h,d,n))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (C, (w,h,d,n))`。
+- **Line 138 / 第 138 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 3) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 139 / 第 139 行** — `      return cute::Stride<cute::Int<1>,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 140 / 第 140 行** — `                          cute::Stride<int64_t, int64_t, int64_t, int64_t>>{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 141 / 第 141 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 142 / 第 142 行** — `    // error dims assert`
+  - **EN**: Inline comment explaining intent: `error dims assert`.
+  - **CN**: 行内注释说明意图：`error dims assert`。
+- **Line 143 / 第 143 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 144 / 第 144 行** — `      static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported spatial dim count.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 145 / 第 145 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 146 / 第 146 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 147 / 第 147 行** — `  else if constexpr (DispatchPolicy::ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 148 / 第 148 行** — `    // Maps to modes (C, (k,s))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (C, (k,s))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (C, (k,s))`。
+- **Line 149 / 第 149 行** — `    if constexpr      (DispatchPolicy::NumSpatialDimensions == 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 150 / 第 150 行** — `      return cute::Stride<cute::Int<1>, cute::Stride<int64_t, int64_t>>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 151 / 第 151 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 152 / 第 152 行** — `    // Maps to modes (C, (k,s,r))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (C, (k,s,r))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (C, (k,s,r))`。
+- **Line 153 / 第 153 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 2) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 154 / 第 154 行** — `      return cute::Stride<cute::Int<1>, cute::Stride<int64_t, int64_t, int64_t>>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 155 / 第 155 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 156 / 第 156 行** — `    // Maps to modes (C, (k,s,r,t))`
+  - **EN**: Inline comment explaining intent: `Maps to modes (C, (k,s,r,t))`.
+  - **CN**: 行内注释说明意图：`Maps to modes (C, (k,s,r,t))`。
+- **Line 157 / 第 157 行** — `    else if constexpr (DispatchPolicy::NumSpatialDimensions == 3) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 158 / 第 158 行** — `      return cute::Stride<cute::Int<1>, cute::Stride<int64_t, int64_t, int64_t, int64_t>>{};`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 159 / 第 159 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 160 / 第 160 行** — `    // error dims assert`
+  - **EN**: Inline comment explaining intent: `error dims assert`.
+  - **CN**: 行内注释说明意图：`error dims assert`。
+- **Line 161 / 第 161 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 162 / 第 162 行** — `      static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported spatial dim count.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 163 / 第 163 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 164 / 第 164 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 165 / 第 165 行** — `  else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 166 / 第 166 行** — `    static_assert(cutlass::detail::dependent_false<DispatchPolicy>, "Unsupported ConvOp.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 167 / 第 167 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 168 / 第 168 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 169 / 第 169 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 170 / 第 170 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 171 / 第 171 行** — `template <class DispatchPolicy>`
+  - **EN**: Starts a template declaration with specifier `class DispatchPolicy`.
+  - **CN**: 开始一个模板声明，说明符为 `class DispatchPolicy`。
+- **Line 172 / 第 172 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 173 / 第 173 行** — `sm100_dispatch_policy_to_stride_A() {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 174 / 第 174 行** — `  return sm90_dispatch_policy_to_stride_A<DispatchPolicy>();`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 175 / 第 175 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 176 / 第 176 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 177 / 第 177 行** — `template <class DispatchPolicy>`
+  - **EN**: Starts a template declaration with specifier `class DispatchPolicy`.
+  - **CN**: 开始一个模板声明，说明符为 `class DispatchPolicy`。
+- **Line 178 / 第 178 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 179 / 第 179 行** — `sm100_dispatch_policy_to_stride_B() {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 180 / 第 180 行** — `  return sm90_dispatch_policy_to_stride_B<DispatchPolicy>();`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 181 / 第 181 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 182 / 第 182 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 183 / 第 183 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 184 / 第 184 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 185 / 第 185 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 186 / 第 186 行** — `// Compute the lower/near corner, returning it as a cute::array in [W,H,D] order`
+  - **EN**: Inline comment explaining intent: `Compute the lower/near corner, returning it as a cute::array in [W,H,D] order`.
+  - **CN**: 行内注释说明意图：`Compute the lower/near corner, returning it as a cute::array in [W,H,D] order`。
+- **Line 187 / 第 187 行** — `template <conv::Operator ConvOp, int NumSpatialDimensions>`
+  - **EN**: Starts a template declaration with specifier `conv::Operator ConvOp, int NumSpatialDimensions`.
+  - **CN**: 开始一个模板声明，说明符为 `conv::Operator ConvOp, int NumSpatialDimensions`。
+- **Line 188 / 第 188 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 189 / 第 189 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 190 / 第 190 行** — `compute_lower_corner_whd(ConvProblemShape<ConvOp, NumSpatialDimensions> const& problem_shape) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 191 / 第 191 行** — `  using cute::for_each;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 192 / 第 192 行** — `  using cute::make_seq;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 193 / 第 193 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 194 / 第 194 行** — `  cute::array<int, NumSpatialDimensions> lower{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 195 / 第 195 行** — `  if constexpr (ConvOp == conv::Operator::kFprop ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 196 / 第 196 行** — `                ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 197 / 第 197 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 198 / 第 198 行** — `      lower[NumSpatialDimensions-1-i] = -1 * problem_shape.lower_padding[i];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 199 / 第 199 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 200 / 第 200 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 201 / 第 201 行** — `  else if constexpr (ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 202 / 第 202 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 203 / 第 203 行** — `      lower[NumSpatialDimensions-1-i] = problem_shape.lower_padding[i] -`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 204 / 第 204 行** — `        (problem_shape.shape_B[i+1] - 1) * problem_shape.dilation[i];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 205 / 第 205 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 206 / 第 206 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 207 / 第 207 行** — `  return lower;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 208 / 第 208 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 209 / 第 209 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 210 / 第 210 行** — `// Computes the upper/far corner, returning it as a cute::array in [W,H,D] order`
+  - **EN**: Inline comment explaining intent: `Computes the upper/far corner, returning it as a cute::array in [W,H,D] order`.
+  - **CN**: 行内注释说明意图：`Computes the upper/far corner, returning it as a cute::array in [W,H,D] order`。
+- **Line 211 / 第 211 行** — `template <conv::Operator ConvOp, int NumSpatialDimensions>`
+  - **EN**: Starts a template declaration with specifier `conv::Operator ConvOp, int NumSpatialDimensions`.
+  - **CN**: 开始一个模板声明，说明符为 `conv::Operator ConvOp, int NumSpatialDimensions`。
+- **Line 212 / 第 212 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 213 / 第 213 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 214 / 第 214 行** — `compute_upper_corner_whd(ConvProblemShape<ConvOp, NumSpatialDimensions> const& problem_shape) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 215 / 第 215 行** — `  using cute::for_each;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 216 / 第 216 行** — `  using cute::make_seq;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 217 / 第 217 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 218 / 第 218 行** — `  cute::array<int, NumSpatialDimensions> upper{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 219 / 第 219 行** — `  if constexpr (ConvOp == conv::Operator::kFprop) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 220 / 第 220 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 221 / 第 221 行** — `      upper[NumSpatialDimensions-1-i] = problem_shape.upper_padding[i] -`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 222 / 第 222 行** — `        (problem_shape.shape_B[i+1] - 1) * problem_shape.dilation[i];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 223 / 第 223 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 224 / 第 224 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 225 / 第 225 行** — `  else if constexpr (ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 226 / 第 226 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 227 / 第 227 行** — `      upper[NumSpatialDimensions-1-i] = problem_shape.upper_padding[i] -`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 228 / 第 228 行** — `        (problem_shape.shape_C[i+1] - 1) * problem_shape.dilation[i];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 229 / 第 229 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 230 / 第 230 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 231 / 第 231 行** — `  else if constexpr (ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 232 / 第 232 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 233 / 第 233 行** — `      upper[NumSpatialDimensions-1-i] = problem_shape.lower_padding[i] -`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 234 / 第 234 行** — `        (problem_shape.shape_B[i+1] - 1) * problem_shape.dilation[i] + problem_shape.shape_C[i+1] - problem_shape.shape_A[i+1];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 235 / 第 235 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 236 / 第 236 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 237 / 第 237 行** — `  return upper;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 238 / 第 238 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 239 / 第 239 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 240 / 第 240 行** — `// Compute the lower/near corner of (t,r,s), returning it as a cute::array in [S,R,T] order`
+  - **EN**: Inline comment explaining intent: `Compute the lower/near corner of (t,r,s), returning it as a cute::array in [S,R,T] order`.
+  - **CN**: 行内注释说明意图：`Compute the lower/near corner of (t,r,s), returning it as a cute::array in [S,R,T] order`。
+- **Line 241 / 第 241 行** — `template <conv::Operator ConvOp, int NumSpatialDimensions>`
+  - **EN**: Starts a template declaration with specifier `conv::Operator ConvOp, int NumSpatialDimensions`.
+  - **CN**: 开始一个模板声明，说明符为 `conv::Operator ConvOp, int NumSpatialDimensions`。
+- **Line 242 / 第 242 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 243 / 第 243 行** — `constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 244 / 第 244 行** — `compute_lower_srt(ConvProblemShape<ConvOp, NumSpatialDimensions> const& problem_shape) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 245 / 第 245 行** — `  using cute::for_each;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 246 / 第 246 行** — `  using cute::make_seq;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 247 / 第 247 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 248 / 第 248 行** — `  cute::array<int, NumSpatialDimensions> lower{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 249 / 第 249 行** — `  if constexpr (ConvOp == conv::Operator::kFprop ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 250 / 第 250 行** — `                ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 251 / 第 251 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 252 / 第 252 行** — `      lower[NumSpatialDimensions-1-i] = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 253 / 第 253 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 254 / 第 254 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 255 / 第 255 行** — `  else if constexpr (ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 256 / 第 256 行** — `    for_each(make_seq<NumSpatialDimensions>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 257 / 第 257 行** — `      lower[NumSpatialDimensions-1-i] = (problem_shape.shape_B[i+1] - 1) * problem_shape.dilation[i];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 258 / 第 258 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 259 / 第 259 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 260 / 第 260 行** — `  return lower;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 261 / 第 261 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 262 / 第 262 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 263 / 第 263 行** — `template <class CopyOp> struct is_im2col_load { static constexpr bool value = false; };`
+  - **EN**: Starts a template declaration with specifier `class CopyOp`.
+  - **CN**: 开始一个模板声明，说明符为 `class CopyOp`。
+- **Line 264 / 第 264 行** — `template <> struct is_im2col_load<cute::SM90_TMA_LOAD_IM2COL          > { static constexpr bool value = true; };`
+  - **EN**: Starts a template declaration with specifier `> struct is_im2col_load<cute::SM90_TMA_LOAD_IM2COL`.
+  - **CN**: 开始一个模板声明，说明符为 `> struct is_im2col_load<cute::SM90_TMA_LOAD_IM2COL`。
+- **Line 265 / 第 265 行** — `template <> struct is_im2col_load<cute::SM90_TMA_LOAD_IM2COL_MULTICAST> { static constexpr bool value = true; };`
+  - **EN**: Starts a template declaration with specifier `> struct is_im2col_load<cute::SM90_TMA_LOAD_IM2COL_MULTICAST`.
+  - **CN**: 开始一个模板声明，说明符为 `> struct is_im2col_load<cute::SM90_TMA_LOAD_IM2COL_MULTICAST`。
+- **Line 266 / 第 266 行** — `template <> struct is_im2col_load<cute::SM100_TMA_2SM_LOAD_IM2COL          > { static constexpr bool value = true; }; `
+  - **EN**: Starts a template declaration with specifier `> struct is_im2col_load<cute::SM100_TMA_2SM_LOAD_IM2COL`.
+  - **CN**: 开始一个模板声明，说明符为 `> struct is_im2col_load<cute::SM100_TMA_2SM_LOAD_IM2COL`。
+- **Line 267 / 第 267 行** — `template <> struct is_im2col_load<cute::SM100_TMA_2SM_LOAD_IM2COL_MULTICAST> { static constexpr bool value = true; }; `
+  - **EN**: Starts a template declaration with specifier `> struct is_im2col_load<cute::SM100_TMA_2SM_LOAD_IM2COL_MULTICAST`.
+  - **CN**: 开始一个模板声明，说明符为 `> struct is_im2col_load<cute::SM100_TMA_2SM_LOAD_IM2COL_MULTICAST`。
+- **Line 268 / 第 268 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 269 / 第 269 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 270 / 第 270 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 271 / 第 271 行** — `} // namespace cutlass::conv::collective::detail`
+  - **EN**: Closes namespace `cutlass::conv::collective::detail`.
+  - **CN**: 关闭命名空间 `cutlass::conv::collective::detail`。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Layouts and strides / 布局与步幅
+
+## Dependencies / 依赖
+- `cutlass/conv/convnd_problem_shape.hpp` — CUTLASS convolution component `cutlass/conv/convnd_problem_shape.hpp` / CUTLASS 卷积组件 `cutlass/conv/convnd_problem_shape.hpp`

@@ -1,0 +1,577 @@
+# gemm.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/device/thread/gemm.h`
+**Purpose / 用途**: Provides a device-side reference implementation or helper for GEMM. / 为 GEMM 提供设备端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>    \brief Reference implementation for GEMM in host-side code.</code>
+  - EN: Comment that documents intent or context: "\brief Reference implementation for GEMM in host-side code.".
+  - CN: 用于说明意图或上下文的注释："\brief Reference implementation for GEMM in host-side code."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes `cutlass/coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L38** <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/gemm/gemm.h&quot;</code>
+  - EN: Includes `cutlass/gemm/gemm.h` so this file can use CUTLASS GEMM abstractions and kernels.
+  - CN: 引入 `cutlass/gemm/gemm.h`，使当前文件可以使用CUTLASS GEMM 抽象与内核。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L42** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L43** <code>namespace device {</code>
+  - EN: Opens namespace `device` to group related symbols.
+  - CN: 打开命名空间 `device`，用于归组相关符号。
+- **L44** <code>namespace thread {</code>
+  - EN: Opens namespace `thread` to group related symbols.
+  - CN: 打开命名空间 `thread`，用于归组相关符号。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>/// Thread-level blocked general matrix product.</code>
+  - EN: Comment that documents intent or context: "Thread-level blocked general matrix product.".
+  - CN: 用于说明意图或上下文的注释："Thread-level blocked general matrix product."。
+- **L49** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L50** <code>// Note, this is a reference implementation. Performance is not expected to approach peak.</code>
+  - EN: Comment that documents intent or context: "Note, this is a reference implementation. Performance is not expected to approach peak.".
+  - CN: 用于说明意图或上下文的注释："Note, this is a reference implementation. Performance is not expected to approach peak."。
+- **L51** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L52** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L53** <code>  typename TensorRefA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L54** <code>  typename TensorRefB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L55** <code>  typename TensorRefC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L56** <code>  typename ScalarType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L57** <code>  typename AccumulatorType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L58** <code>  typename OutputTile,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L59** <code>  typename InnerProductOp = multiply_add&lt;AccumulatorType&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L60** <code>  typename ConvertOp = NumericConverter&lt;typename TensorRefC::Element, ScalarType&gt;</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L61** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L62** <code>struct Gemm {</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>  using ElementA = typename TensorRefA::Element;</code>
+  - EN: Introduces the type or namespace alias `ElementA`.
+  - CN: 引入类型或命名空间别名 `ElementA`。
+- **L65** <code>  using ElementB = typename TensorRefB::Element;</code>
+  - EN: Introduces the type or namespace alias `ElementB`.
+  - CN: 引入类型或命名空间别名 `ElementB`。
+- **L66** <code>  using ElementC = typename TensorRefC::Element;</code>
+  - EN: Introduces the type or namespace alias `ElementC`.
+  - CN: 引入类型或命名空间别名 `ElementC`。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L69** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L70** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L71** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L72** <code>  /// Tile for A operand</code>
+  - EN: Comment that documents intent or context: "Tile for A operand".
+  - CN: 用于说明意图或上下文的注释："Tile for A operand"。
+- **L73** <code>  ElementA A_tile[OutputTile::kColumn];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>  /// Tile for B operand</code>
+  - EN: Comment that documents intent or context: "Tile for B operand".
+  - CN: 用于说明意图或上下文的注释："Tile for B operand"。
+- **L76** <code>  ElementB B_tile[OutputTile::kRow];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L77** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L78** <code>  /// Tile for Accumulator</code>
+  - EN: Comment that documents intent or context: "Tile for Accumulator".
+  - CN: 用于说明意图或上下文的注释："Tile for Accumulator"。
+- **L79** <code>  AccumulatorType accum[OutputTile::kColumn][OutputTile::kRow];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L80** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L81** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L82** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L83** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L84** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L85** <code>  /// Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L86** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L87** <code>  Gemm(AccumulatorType initial_accum = AccumulatorType(0)) {</code>
+  - EN: Begins the definition of function or method `AccumulatorType`.
+  - CN: 开始定义函数或方法 `AccumulatorType`。
+- **L88** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L89** <code>    // Clear fetch registers</code>
+  - EN: Comment that documents intent or context: "Clear fetch registers".
+  - CN: 用于说明意图或上下文的注释："Clear fetch registers"。
+- **L90** <code>    for (int i = 0; i &lt; OutputTile::kColumn; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L91** <code>      A_tile[i] = ElementA(0);</code>
+  - EN: Declares function or method `ElementA` without defining it here.
+  - CN: 声明函数或方法 `ElementA`，但不在此处给出定义。
+- **L92** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>    for (int j = 0; j &lt; OutputTile::kRow; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L95** <code>      B_tile[j] = ElementB(0);</code>
+  - EN: Declares function or method `ElementB` without defining it here.
+  - CN: 声明函数或方法 `ElementB`，但不在此处给出定义。
+- **L96** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>    // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L99** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L100** <code>    for (int j = 0; j &lt; OutputTile::kColumn; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L101** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L102** <code>      for (int i = 0; i &lt; OutputTile::kRow; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L103** <code>        accum[j][i] = initial_accum;</code>
+  - EN: Declares the symbol `initial_accum` in the current scope.
+  - CN: 在当前作用域中声明符号 `initial_accum`。
+- **L104** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L105** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L106** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>  /// Computes a matrix product</code>
+  - EN: Comment that documents intent or context: "Computes a matrix product".
+  - CN: 用于说明意图或上下文的注释："Computes a matrix product"。
+- **L109** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L110** <code>  Gemm &amp; multiply_add(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add`.
+  - CN: 开始或继续与 `multiply_add` 相关的签名/调用语法。
+- **L111** <code>    gemm::GemmCoord problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L112** <code>    TensorRefA tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L113** <code>    TensorRefB tensor_b,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L114** <code>    MatrixCoord output_coord = MatrixCoord()) {</code>
+  - EN: Begins the definition of function or method `MatrixCoord`.
+  - CN: 开始定义函数或方法 `MatrixCoord`。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>    InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L117** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L118** <code>    // Loop over the GEMM K dimension</code>
+  - EN: Comment that documents intent or context: "Loop over the GEMM K dimension".
+  - CN: 用于说明意图或上下文的注释："Loop over the GEMM K dimension"。
+- **L119** <code>    CUTLASS_PRAGMA_NO_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L120** <code>    for (int k = 0; k &lt; problem_size.k(); ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L121** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>      // Fetch a slice of the A matrix</code>
+  - EN: Comment that documents intent or context: "Fetch a slice of the A matrix".
+  - CN: 用于说明意图或上下文的注释："Fetch a slice of the A matrix"。
+- **L123** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L124** <code>      for (int i = 0; i &lt; OutputTile::kColumn; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L125** <code>        if (output_coord.row() + i &lt; problem_size.m()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L126** <code>          A_tile[i] = tensor_a.at(make_Coord(output_coord.row() + i, k));</code>
+  - EN: Declares function or method `row` without defining it here.
+  - CN: 声明函数或方法 `row`，但不在此处给出定义。
+- **L127** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L128** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>      // Fetch a slice of the B matrix</code>
+  - EN: Comment that documents intent or context: "Fetch a slice of the B matrix".
+  - CN: 用于说明意图或上下文的注释："Fetch a slice of the B matrix"。
+- **L131** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L132** <code>      for (int j = 0; j &lt; OutputTile::kRow; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L133** <code>        if (output_coord.column() + j &lt; problem_size.n()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L134** <code>          B_tile[j] = tensor_b.at(make_Coord(k, output_coord.column() + j));</code>
+  - EN: Declares function or method `column` without defining it here.
+  - CN: 声明函数或方法 `column`，但不在此处给出定义。
+- **L135** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L136** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L137** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L138** <code>      // Compute an accumulated matrix product</code>
+  - EN: Comment that documents intent or context: "Compute an accumulated matrix product".
+  - CN: 用于说明意图或上下文的注释："Compute an accumulated matrix product"。
+- **L139** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L140** <code>      for (int j = 0; j &lt; OutputTile::kRow; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L141** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L142** <code>        for (int i = 0; i &lt; OutputTile::kColumn; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L143** <code>          accum[j][i] = inner_product_op(A_tile[i], B_tile[j], accum[j][i]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L144** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L146** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L147** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L148** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L149** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>  /// Performs linear scaling of matrix product and updates output tensor</code>
+  - EN: Comment that documents intent or context: "Performs linear scaling of matrix product and updates output tensor".
+  - CN: 用于说明意图或上下文的注释："Performs linear scaling of matrix product and updates output tensor"。
+- **L152** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L153** <code>  Gemm &amp; epilogue(</code>
+  - EN: Begins or continues the signature/call syntax involving `epilogue`.
+  - CN: 开始或继续与 `epilogue` 相关的签名/调用语法。
+- **L154** <code>    gemm::GemmCoord problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L155** <code>    ScalarType alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L156** <code>    ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L157** <code>    TensorRefC tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L158** <code>    TensorRefC tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L159** <code>    MatrixCoord output_coord = MatrixCoord()) {</code>
+  - EN: Begins the definition of function or method `MatrixCoord`.
+  - CN: 开始定义函数或方法 `MatrixCoord`。
+- **L160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L161** <code>    ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L162** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>    // Update the output tensor</code>
+  - EN: Comment that documents intent or context: "Update the output tensor".
+  - CN: 用于说明意图或上下文的注释："Update the output tensor"。
+- **L164** <code>    for (int j = 0; j &lt; OutputTile::kRow; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L165** <code>      for (int i = 0; i &lt; OutputTile::kColumn; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L166** <code>        MatrixCoord coord = output_coord + MatrixCoord(i, j);</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L167** <code>        if (coord.row() &lt; problem_size.m() &amp;&amp; coord.column() &lt; problem_size.n()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L168** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L169** <code>          tensor_d.at(coord) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L170** <code>            alpha * ScalarType(accum[j][i]) +</code>
+  - EN: Begins or continues the signature/call syntax involving `ScalarType`.
+  - CN: 开始或继续与 `ScalarType` 相关的签名/调用语法。
+- **L171** <code>            beta * ScalarType(tensor_c.at(coord))</code>
+  - EN: Begins or continues the signature/call syntax involving `at`.
+  - CN: 开始或继续与 `at` 相关的签名/调用语法。
+- **L172** <code>          );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L173** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L174** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L175** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L176** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L177** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L178** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L179** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L182** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L183** <code>} // namespace thread</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>} // namespace device</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L185** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L186** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Linear algebra kernels and metadata / 线性代数内核与元数据
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/gemm/gemm.h</code> — CUTLASS GEMM abstractions and kernels / CUTLASS GEMM 抽象与内核

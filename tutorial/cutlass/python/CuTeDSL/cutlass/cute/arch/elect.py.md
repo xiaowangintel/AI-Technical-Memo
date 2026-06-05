@@ -1,0 +1,169 @@
+# elect.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/arch/elect.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (IfOpRegion) and 2 functions (make_warp_uniform, elect_one) in `CuTeDSL.cutlass.cute.arch.elect`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.arch.elect` 定义了 1 个类（IfOpRegion） 和 2 个函数（make_warp_uniform, elect_one）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.cutlass_dsl import BaseDSL, dsl_user_op` — **EN:** Imports BaseDSL, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 BaseDSL, dsl_user_op。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L17** `from cutlass._mlir.dialects import nvvm, scf` — **EN:** Imports nvvm, scf from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 nvvm, scf。
+- **L18** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `from ..typing import Int, Int32` — **EN:** Imports Int, Int32 from `..typing`. **CN:** 从 `..typing` 导入 Int, Int32。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L24** `def make_warp_uniform(` — **EN:** Defines function `make_warp_uniform`. **CN:** 定义函数 `make_warp_uniform`。
+- **L25** `    value: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `) -> Int32:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L30** `    """` — **EN:** Starts the docstring for the function `make_warp_uniform`. **CN:** 开始说明 function `make_warp_uniform` 的文档字符串。
+- **L31** `    Provides a compiler hint indicating that the specified value is invariant across all threads in the warp,` — **EN:** Continues the docstring for the function `make_warp_uniform`. **CN:** 继续说明 function `make_warp_uniform` 的文档字符串。
+- **L32** `    which may enable performance optimizations.` — **EN:** Continues the docstring for the function `make_warp_uniform`. **CN:** 继续说明 function `make_warp_uniform` 的文档字符串。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `    :param value: The integer value to be marked as warp-uniform.` — **EN:** Continues the docstring for the function `make_warp_uniform`. **CN:** 继续说明 function `make_warp_uniform` 的文档字符串。
+- **L35** `    :type value:  Int` — **EN:** Continues the docstring for the function `make_warp_uniform`. **CN:** 继续说明 function `make_warp_uniform` 的文档字符串。
+- **L36** `    :return:      The input value, marked as warp-uniform.` — **EN:** Continues the docstring for the function `make_warp_uniform`. **CN:** 继续说明 function `make_warp_uniform` 的文档字符串。
+- **L37** `    :rtype:       Int32` — **EN:** Continues the docstring for the function `make_warp_uniform`. **CN:** 继续说明 function `make_warp_uniform` 的文档字符串。
+- **L38** `    """` — **EN:** Ends the docstring for the function `make_warp_uniform`. **CN:** 结束说明 function `make_warp_uniform` 的文档字符串。
+- **L39** `    return Int32(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L40** `        _cute_nvgpu_ir.arch_make_warp_uniform(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `            Int32(value).ir_value(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `class IfOpRegion:` — **EN:** Defines class `IfOpRegion`. **CN:** 定义类 `IfOpRegion`。
+- **L47** `    """` — **EN:** Starts the docstring for the class `IfOpRegion`. **CN:** 开始说明 class `IfOpRegion` 的文档字符串。
+- **L48** `    A context manager for if Op.` — **EN:** Continues the docstring for the class `IfOpRegion`. **CN:** 继续说明 class `IfOpRegion` 的文档字符串。
+- **L49** `    Automatically inserts \`scf.yield([])\` when exiting the context.` — **EN:** Continues the docstring for the class `IfOpRegion`. **CN:** 继续说明 class `IfOpRegion` 的文档字符串。
+- **L50** `    """` — **EN:** Ends the docstring for the class `IfOpRegion`. **CN:** 结束说明 class `IfOpRegion` 的文档字符串。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L53** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L54** `        block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L59** `        self.block = block` — **EN:** Assigns a value to self.block. **CN:** 将一个值赋给 self.block。
+- **L60** `        self.insert_point = ir.InsertionPoint(self.block)` — **EN:** Assigns a value to self.insert_point. **CN:** 将一个值赋给 self.insert_point。
+- **L61** `        self.loc = loc` — **EN:** Assigns a value to self.loc. **CN:** 将一个值赋给 self.loc。
+- **L62** `        self.ip = ip` — **EN:** Assigns a value to self.ip. **CN:** 将一个值赋给 self.ip。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `    def __enter__(self) -> ir.BlockArgumentList:` — **EN:** Defines function `__enter__`. **CN:** 定义函数 `__enter__`。
+- **L65** `        self.insert_point.__enter__()` — **EN:** Invokes `self.insert_point.__enter__` as a standalone call. **CN:** 以独立语句方式调用 `self.insert_point.__enter__`。
+- **L66** `        return self.block.arguments` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    def __exit__(` — **EN:** Defines function `__exit__`. **CN:** 定义函数 `__exit__`。
+- **L69** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L70** `        exc_type: Optional[type[BaseException]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L71** `        exc_value: Optional[BaseException],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L72** `        traceback: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L73** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L74** `        scf.yield_([], loc=self.loc, ip=self.ip)` — **EN:** Invokes `scf.yield_` as a standalone call. **CN:** 以独立语句方式调用 `scf.yield_`。
+- **L75** `        self.insert_point.__exit__(exc_type, exc_value, traceback)` — **EN:** Invokes `self.insert_point.__exit__` as a standalone call. **CN:** 以独立语句方式调用 `self.insert_point.__exit__`。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L79** `def elect_one(` — **EN:** Defines function `elect_one`. **CN:** 定义函数 `elect_one`。
+- **L80** `    *, loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L81** `) -> IfOpRegion:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L82** `    """` — **EN:** Starts the docstring for the function `elect_one`. **CN:** 开始说明 function `elect_one` 的文档字符串。
+- **L83** `    Elects one thread within a warp to execute single-threaded operations.` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `    This function uses the PTX \`\`elect.sync\`\` instruction to select exactly one thread` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L86** `    per warp to execute the code within its context. All other threads in the warp skip` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L87** `    the block and reconverge after it.` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    See the PTX ISA documentation on \`elect.sync <https://docs.nvidia.com/cuda/parallel-thread-execution/#parallel-synchronization-and-communication-instructions-elect-sync>\`__.` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    **When to Use elect_one:**` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    \`\`elect_one()\`\` is **required** for operations that must be executed by a single thread` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L94** `    for correctness, including:` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    - **Barrier initialization and transaction setup** (\`\`mbarrier_init\`\`, \`\`mbarrier_expect_tx\`\`,` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L97** `      \`\`mbarrier_arrive_and_expect_tx\`\`)` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L98** `    - **tcgen05 commit operations** (\`\`tcgen05.commit\`\`) - DSL does NOT` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L99** `      automatically guard these, unlike C++ which uses \`\`elect_one_sync()\`\` internally` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L100** `    - **Single-thread state setup**` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    **When NOT to Use elect_one:**` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    Do NOT use \`\`elect_one()\`\` for operations that already handle single-threaded execution internally:` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    - **TMA copy operations** (\`\`cute.copy\`\` with TMA atoms) - TMA partitioning ensures only one` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L107** `      thread within a warp issues the operation automatically. Wrapping in \`\`elect_one()\`\` can cause GPU deadlock.` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    .. code-block:: python` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `        # CORRECT: Initialize barrier with elect_one` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L112** `        with elect_one():` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L113** `            cute.arch.mbarrier_init(barrier_ptr, arrival_count)` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L114** `            cute.arch.mbarrier_expect_tx(barrier_ptr, num_bytes)` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `        # CORRECT: tcgen05.commit requires elect_one in DSL` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L117** `        with elect_one():` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L118** `            tcgen05.commit(barrier_ptr, None, cta_group)` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `        # CORRECT: TMA copy does not need elect_one` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L121** `        cute.copy(` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L122** `            tma_atom,` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L123** `            gmem_tensor,  # TMA handles single-thread internally` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L124** `            smem_tensor,` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L125** `            tma_bar_ptr=barrier_ptr` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L126** `        )` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    **PTX Programming Model:**` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    In the PTX programming model, certain cluster-scoped and CTA-scoped operations must be` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L131** `    issued by a single thread to maintain correctness. The \`\`elect.sync\`\` instruction provides` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L132** `    a warp-uniform way to select this thread with proper synchronization.` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `    :return: A context manager that executes its block on exactly one thread per warp` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L135** `    :rtype: IfOpRegion` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `    .. seealso::` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L138** `       - :func:\`cute.arch.mbarrier_init\` - Requires elect_one` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L139** `       - :func:\`cute.arch.mbarrier_expect_tx\` - Requires elect_one` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L140** `       - :func:\`cute.arch.mbarrier_arrive_and_expect_tx\` - Requires elect_one` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L141** `       - PTX ISA documentation on \`\`elect.sync\`\`` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L142** `       - Tutorial example: \`\`examples/blackwell/tutorial_tma/tma_v0.py\`\`` — **EN:** Continues the docstring for the function `elect_one`. **CN:** 继续说明 function `elect_one` 的文档字符串。
+- **L143** `    """` — **EN:** Ends the docstring for the function `elect_one`. **CN:** 结束说明 function `elect_one` 的文档字符串。
+- **L144** `    from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `    BaseDSL._get_dsl().check_arch(lambda arch: arch >= Arch.sm_90)` — **EN:** Invokes `BaseDSL._get_dsl().check_arch` as a standalone call. **CN:** 以独立语句方式调用 `BaseDSL._get_dsl().check_arch`。
+- **L147** `    is_thread_leader = nvvm.elect_sync()` — **EN:** Assigns a value to is_thread_leader. **CN:** 将一个值赋给 is_thread_leader。
+- **L148** `    if_op = scf.IfOp(is_thread_leader, loc=loc, ip=ip)` — **EN:** Assigns a value to if_op. **CN:** 将一个值赋给 if_op。
+- **L149** `    return IfOpRegion(if_op.then_block, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.arch.elect`. CN: 模块名为 `CuTeDSL.cutlass.cute.arch.elect`。
+- EN: Top-level classes: IfOpRegion CN: 顶层类包括：IfOpRegion
+- EN: Top-level functions: make_warp_uniform, elect_one CN: 顶层函数包括：make_warp_uniform, elect_one
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:BaseDSL,dsl_user_op, cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir.dialects:nvvm,scf, cutlass._mlir:ir, ..typing:Int,Int32, cutlass.base_dsl.arch:Arch CN: 内部依赖：cutlass.cutlass_dsl:BaseDSL,dsl_user_op, cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir.dialects:nvvm,scf, cutlass._mlir:ir, ..typing:Int,Int32, cutlass.base_dsl.arch:Arch
+- EN: External or standard-library dependencies: typing:Optional CN: 外部或标准库依赖：typing:Optional

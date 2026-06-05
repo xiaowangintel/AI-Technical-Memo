@@ -1,0 +1,1728 @@
+# packed_stride.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/packed_stride.hpp`
+**Purpose / 用途**: Declares packed-stride helpers for CUTLASS layouts. / 声明 CUTLASS 布局使用的紧凑步幅辅助工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>    \brief Utilities for packing constructing canonical CuTe stride types for 3.x mainloop params.</code>
+  - EN: Comment that documents intent or context: "\brief Utilities for packing constructing canonical CuTe stride types for 3.x mainloop params.".
+  - CN: 用于说明意图或上下文的注释："\brief Utilities for packing constructing canonical CuTe stride types for 3.x mainloop params."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &quot;cute/layout.hpp&quot;</code>
+  - EN: Includes `cute/layout.hpp` so this file can use project-specific declarations from `layout.hpp`.
+  - CN: 引入 `cute/layout.hpp`，使当前文件可以使用来自 `layout.hpp` 的项目专用声明。
+- **L38** <code>#include &quot;cute/container/array.hpp&quot;   // cute::array</code>
+  - EN: Includes `cute/container/array.hpp` so this file can use fixed-size array containers.
+  - CN: 引入 `cute/container/array.hpp`，使当前文件可以使用定长数组容器。
+- **L39** <code>#include &quot;cutlass/conv/convolution.h&quot; // cutlass::conv::Operator</code>
+  - EN: Includes `cutlass/conv/convolution.h` so this file can use CUTLASS convolution support.
+  - CN: 引入 `cutlass/conv/convolution.h`，使当前文件可以使用CUTLASS 卷积支持。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>// Strides without batch mode</code>
+  - EN: Comment that documents intent or context: "Strides without batch mode".
+  - CN: 用于说明意图或上下文的注释："Strides without batch mode"。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L50** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L51** <code>cute::Stride&lt;IntT, cute::Int&lt;1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L52** <code>make_cute_packed_stride(cute::Stride&lt;IntT, cute::Int&lt;1&gt;&gt; s, cute::Shape&lt;int,int,int&gt; shape_MKL) {</code>
+  - EN: Begins the definition of function or method `make_cute_packed_stride`.
+  - CN: 开始定义函数或方法 `make_cute_packed_stride`。
+- **L53** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L54** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L55** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L56** <code>  cute::get&lt;0&gt;(s_copy) = static_cast&lt;IntT&gt;(cute::get&lt;1&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L57** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L58** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L61** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L62** <code>cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L63** <code>make_cute_packed_stride(cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt; s, cute::Shape&lt;int,int,int&gt; shape_MKL) {</code>
+  - EN: Begins the definition of function or method `make_cute_packed_stride`.
+  - CN: 开始定义函数或方法 `make_cute_packed_stride`。
+- **L64** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L65** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L66** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L67** <code>  cute::get&lt;1&gt;(s_copy) = static_cast&lt;IntT&gt;(cute::get&lt;0&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L68** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L69** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>// Strides with batch mode</code>
+  - EN: Comment that documents intent or context: "Strides with batch mode".
+  - CN: 用于说明意图或上下文的注释："Strides with batch mode"。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L76** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L77** <code>cute::Stride&lt;IntT, cute::Int&lt;1&gt;, int64_t&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L78** <code>make_cute_packed_stride(cute::Stride&lt;IntT, cute::Int&lt;1&gt;, int64_t&gt; s, cute::Shape&lt;int,int,int&gt; shape_MKL) {</code>
+  - EN: Begins the definition of function or method `make_cute_packed_stride`.
+  - CN: 开始定义函数或方法 `make_cute_packed_stride`。
+- **L79** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L80** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L81** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L82** <code>  cute::get&lt;0&gt;(s_copy) = static_cast&lt;IntT&gt;(cute::get&lt;1&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L83** <code>  int batch_count =  cute::get&lt;2&gt;(shape_MKL);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L84** <code>  if (batch_count &gt; 1) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L85** <code>    cute::get&lt;2&gt;(s_copy) = static_cast&lt;IntT&gt;(cute::get&lt;0&gt;(shape_MKL) * cute::get&lt;1&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L86** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L87** <code>  else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L88** <code>    cute::get&lt;2&gt;(s_copy) = static_cast&lt;IntT&gt;(0);</code>
+  - EN: Declares function or method `static_cast<IntT>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<IntT>`，但不在此处给出定义。
+- **L89** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L90** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L91** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L94** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L95** <code>cute::Stride&lt;cute::Int&lt;1&gt;, IntT, int64_t&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L96** <code>make_cute_packed_stride(cute::Stride&lt;cute::Int&lt;1&gt;, IntT, int64_t&gt; s, cute::Shape&lt;int,int,int&gt; shape_MKL) {</code>
+  - EN: Begins the definition of function or method `make_cute_packed_stride`.
+  - CN: 开始定义函数或方法 `make_cute_packed_stride`。
+- **L97** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L98** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L99** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L100** <code>  cute::get&lt;1&gt;(s_copy) = static_cast&lt;IntT&gt;(cute::get&lt;0&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L101** <code>  int batch_count =  cute::get&lt;2&gt;(shape_MKL);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L102** <code>  if (batch_count &gt; 1) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L103** <code>    cute::get&lt;2&gt;(s_copy) = static_cast&lt;IntT&gt;(cute::get&lt;0&gt;(shape_MKL) * cute::get&lt;1&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L104** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L105** <code>  else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L106** <code>    cute::get&lt;2&gt;(s_copy) = static_cast&lt;IntT&gt;(0);</code>
+  - EN: Declares function or method `static_cast<IntT>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<IntT>`，但不在此处给出定义。
+- **L107** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L108** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L109** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L112** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L113** <code>// Strides with group mode</code>
+  - EN: Comment that documents intent or context: "Strides with group mode".
+  - CN: 用于说明意图或上下文的注释："Strides with group mode"。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>template &lt;class StrideIntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L116** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L117** <code>cute::Stride&lt;StrideIntT, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>make_cute_packed_stride(cute::Stride&lt;StrideIntT, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt; s, cute::Shape&lt;int,int,int&gt; shape_MKL) {</code>
+  - EN: Begins the definition of function or method `make_cute_packed_stride`.
+  - CN: 开始定义函数或方法 `make_cute_packed_stride`。
+- **L119** <code>  static_assert(std::is_integral_v&lt;StrideIntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L120** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L122** <code>  cute::get&lt;0&gt;(s_copy) = static_cast&lt;StrideIntT&gt;(cute::get&lt;1&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L123** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L124** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L125** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L126** <code>template &lt;class StrideIntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L127** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>cute::Stride&lt;cute::Int&lt;1&gt;, StrideIntT, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L129** <code>make_cute_packed_stride(cute::Stride&lt;cute::Int&lt;1&gt;, StrideIntT, cute::Int&lt;0&gt;&gt; s, cute::Shape&lt;int,int,int&gt; shape_MKL) {</code>
+  - EN: Begins the definition of function or method `make_cute_packed_stride`.
+  - CN: 开始定义函数或方法 `make_cute_packed_stride`。
+- **L130** <code>  static_assert(std::is_integral_v&lt;StrideIntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L131** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L132** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L133** <code>  cute::get&lt;1&gt;(s_copy) = static_cast&lt;StrideIntT&gt;(cute::get&lt;0&gt;(shape_MKL));</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L134** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L135** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L136** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L137** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>// Strides for convolutions</code>
+  - EN: Comment that documents intent or context: "Strides for convolutions".
+  - CN: 用于说明意图或上下文的注释："Strides for convolutions"。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>// Output cutlass::layout::TensorNDHWC -&gt; rank-3 stride (InT,_1,_0)</code>
+  - EN: Comment that documents intent or context: "Output cutlass::layout::TensorNDHWC -> rank-3 stride (InT,_1,_0)".
+  - CN: 用于说明意图或上下文的注释："Output cutlass::layout::TensorNDHWC -> rank-3 stride (InT,_1,_0)"。
+- **L142** <code>// Note: For fprop/dgrad kernel, strides are assumed to be layout right in NZPQK/NDHWC order</code>
+  - EN: Comment that documents intent or context: "Note: For fprop/dgrad kernel, strides are assumed to be layout right in NZPQK/NDHWC order".
+  - CN: 用于说明意图或上下文的注释："Note: For fprop/dgrad kernel, strides are assumed to be layout right in NZPQK/NDHWC order"。
+- **L143** <code>// and therefore can be coalesced to just q/w. For wgrad kernel, strides are assumed to be layout</code>
+  - EN: Comment that documents intent or context: "and therefore can be coalesced to just q/w. For wgrad kernel, strides are assumed to be layout".
+  - CN: 用于说明意图或上下文的注释："and therefore can be coalesced to just q/w. For wgrad kernel, strides are assumed to be layout"。
+- **L144** <code>// right in KTRSC order and can be coalesced to just k.</code>
+  - EN: Comment that documents intent or context: "right in KTRSC order and can be coalesced to just k.".
+  - CN: 用于说明意图或上下文的注释："right in KTRSC order and can be coalesced to just k."。
+- **L145** <code>// We enforce this condition here with asserts.</code>
+  - EN: Comment that documents intent or context: "We enforce this condition here with asserts.".
+  - CN: 用于说明意图或上下文的注释："We enforce this condition here with asserts."。
+- **L146** <code>template &lt;class IntT, size_t RankT_&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L147** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L148** <code>cute::Stride&lt;IntT, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L149** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L150** <code>    cute::Stride&lt;IntT, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L151** <code>    cute::array&lt;int32_t, RankT_&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L152** <code>    cute::array&lt;IntT, RankT_&gt; stride_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L153** <code>    cutlass::conv::Operator conv_op) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L154** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L155** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L156** <code>  static_assert(RankT_ &gt;= 3u);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L157** <code>  constexpr static int RankT = static_cast&lt;int&gt;(RankT_);</code>
+  - EN: Declares function or method `static_cast<int>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<int>`，但不在此处给出定义。
+- **L158** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L159** <code>  assert(stride_output[RankT-1] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L160** <code>  cute::for_each(cute::make_seq&lt;RankT-2&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L161** <code>    assert(stride_output[i] == shape_output[i+1] * stride_output[i+1]);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L162** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L163** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L164** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L165** <code>  cute::get&lt;0&gt;(s_copy) = (conv_op == cutlass::conv::Operator::kWgrad) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `get<0>`.
+  - CN: 开始或继续与 `get<0>` 相关的签名/调用语法。
+- **L166** <code>      stride_output[0] :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>      stride_output[RankT-2];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L168** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L169** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L172** <code>// Activation tensor ((w, h, d, n), _1) for fprop kernel</code>
+  - EN: Comment that documents intent or context: "Activation tensor ((w, h, d, n), _1) for fprop kernel".
+  - CN: 用于说明意图或上下文的注释："Activation tensor ((w, h, d, n), _1) for fprop kernel"。
+- **L173** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L174** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L175** <code>// Activation cutlass::layout::TensorNWC -&gt; rank-2 stride ((W,N),_1)</code>
+  - EN: Comment that documents intent or context: "Activation cutlass::layout::TensorNWC -> rank-2 stride ((W,N),_1)".
+  - CN: 用于说明意图或上下文的注释："Activation cutlass::layout::TensorNWC -> rank-2 stride ((W,N),_1)"。
+- **L176** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L177** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L178** <code>cute::Stride&lt;cute::Stride&lt;IntT, IntT&gt;, cute::Int&lt;1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L179** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L180** <code>    cute::Stride&lt;cute::Stride&lt;IntT, IntT&gt;, cute::Int&lt;1&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L181** <code>    cute::array&lt;IntT, 3&gt; stride_nwc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L182** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L183** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L184** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L185** <code>  assert(stride_nwc[2] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L186** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L187** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_nwc[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L188** <code>  cute::get&lt;0,1&gt;(s_copy) = stride_nwc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L189** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L190** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L191** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L192** <code>// Activation cutlass::layout::TensorNHWC -&gt; rank-2 stride ((W,H,N),_1)</code>
+  - EN: Comment that documents intent or context: "Activation cutlass::layout::TensorNHWC -> rank-2 stride ((W,H,N),_1)".
+  - CN: 用于说明意图或上下文的注释："Activation cutlass::layout::TensorNHWC -> rank-2 stride ((W,H,N),_1)"。
+- **L193** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L194** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L195** <code>cute::Stride&lt;cute::Stride&lt;IntT, IntT, IntT&gt;, cute::Int&lt;1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L196** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L197** <code>    cute::Stride&lt;cute::Stride&lt;IntT, IntT, IntT&gt;, cute::Int&lt;1&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L198** <code>    cute::array&lt;IntT, 4&gt; stride_nhwc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L199** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L200** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L201** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L202** <code>  assert(stride_nhwc[3] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L203** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L204** <code>  cute::for_each(cute::make_seq&lt;3&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L205** <code>    cute::get&lt;0,i&gt;(s_copy) = stride_nhwc[2-i];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L206** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L207** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L208** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L209** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L210** <code>// Activation cutlass::layout::TensorNDHWC -&gt; rank-2 stride ((W,H,D,N),_1)</code>
+  - EN: Comment that documents intent or context: "Activation cutlass::layout::TensorNDHWC -> rank-2 stride ((W,H,D,N),_1)".
+  - CN: 用于说明意图或上下文的注释："Activation cutlass::layout::TensorNDHWC -> rank-2 stride ((W,H,D,N),_1)"。
+- **L211** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L212** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L213** <code>cute::Stride&lt;cute::Stride&lt;IntT, IntT, IntT, IntT&gt;, cute::Int&lt;1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L214** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L215** <code>    cute::Stride&lt;cute::Stride&lt;IntT, IntT, IntT, IntT&gt;, cute::Int&lt;1&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L216** <code>    cute::array&lt;IntT, 5&gt; stride_ndhwc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L217** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L218** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L219** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>  assert(stride_ndhwc[4] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L222** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L223** <code>  cute::for_each(cute::make_seq&lt;4&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L224** <code>    cute::get&lt;0,i&gt;(s_copy) = stride_ndhwc[3-i];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L225** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L226** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L227** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L228** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L229** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L230** <code>// Filter tensor (k, (_1, s, r, t)) for fprop kernel</code>
+  - EN: Comment that documents intent or context: "Filter tensor (k, (_1, s, r, t)) for fprop kernel".
+  - CN: 用于说明意图或上下文的注释："Filter tensor (k, (_1, s, r, t)) for fprop kernel"。
+- **L231** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L232** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L233** <code>// Filter cutlass::layout::TensorNWC -&gt; rank-2 stride (k, (_1, s))</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorNWC -> rank-2 stride (k, (_1, s))".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorNWC -> rank-2 stride (k, (_1, s))"。
+- **L234** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L235** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L236** <code>cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L237** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L238** <code>    cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L239** <code>    cute::array&lt;IntT, 3&gt; stride_ksc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L240** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L241** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L242** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  assert(stride_ksc[2] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L245** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L246** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_ksc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L247** <code>  cute::get&lt;1,1&gt;(s_copy) = stride_ksc[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L248** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L249** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L250** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L251** <code>// Filter cutlass::layout::TensorNHWC -&gt; rank-2 stride (k, (_1, s, r))</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorNHWC -> rank-2 stride (k, (_1, s, r))".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorNHWC -> rank-2 stride (k, (_1, s, r))"。
+- **L252** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L253** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L255** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L256** <code>    cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L257** <code>    cute::array&lt;IntT, 4&gt; stride_krsc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L258** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L259** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L260** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L261** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L262** <code>  assert(stride_krsc[3] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L263** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L264** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_krsc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L265** <code>  cute::for_each(cute::make_seq&lt;2&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L266** <code>    cute::get&lt;1,2-i&gt;(s_copy) = stride_krsc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L267** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L268** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L269** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>// Filter cutlass::layout::TensorNDHWC -&gt; rank-2 stride (k, (_1, s, r, t))</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorNDHWC -> rank-2 stride (k, (_1, s, r, t))".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorNDHWC -> rank-2 stride (k, (_1, s, r, t))"。
+- **L272** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L273** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L274** <code>cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT, IntT&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L275** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L276** <code>    cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT, IntT&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L277** <code>    cute::array&lt;IntT, 5&gt; stride_ktrsc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L278** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L279** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L280** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L281** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L282** <code>  assert(stride_ktrsc[4] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L283** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L284** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_ktrsc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L285** <code>  cute::for_each(cute::make_seq&lt;3&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L286** <code>    cute::get&lt;1,3-i&gt;(s_copy) = stride_ktrsc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L287** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L288** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L289** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L290** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L291** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L292** <code>// Activation tensor (_1, (w, h, d, n)) for wgrad kernel</code>
+  - EN: Comment that documents intent or context: "Activation tensor (_1, (w, h, d, n)) for wgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Activation tensor (_1, (w, h, d, n)) for wgrad kernel"。
+- **L293** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L294** <code>// It is also Filter tensor ((_1), (k, s, r, t)) for dgrad kernel</code>
+  - EN: Comment that documents intent or context: "It is also Filter tensor ((_1), (k, s, r, t)) for dgrad kernel".
+  - CN: 用于说明意图或上下文的注释："It is also Filter tensor ((_1), (k, s, r, t)) for dgrad kernel"。
+- **L295** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L296** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L297** <code>// Activation cutlass::layout::TensorNWC -&gt; rank-2 stride (_1, (W,N)) in wgrad</code>
+  - EN: Comment that documents intent or context: "Activation cutlass::layout::TensorNWC -> rank-2 stride (_1, (W,N)) in wgrad".
+  - CN: 用于说明意图或上下文的注释："Activation cutlass::layout::TensorNWC -> rank-2 stride (_1, (W,N)) in wgrad"。
+- **L298** <code>// Filter cutlass::layout::TensorNWC -&gt; rank-2 stride ((_1), (k, s)) in dgrad</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorNWC -> rank-2 stride ((_1), (k, s)) in dgrad".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorNWC -> rank-2 stride ((_1), (k, s)) in dgrad"。
+- **L299** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L300** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L301** <code>cute::Stride&lt;cute::Int&lt;1&gt;, cute::Stride&lt;IntT, IntT&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L302** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L303** <code>    cute::Stride&lt;cute::Int&lt;1&gt;, cute::Stride&lt;IntT, IntT&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L304** <code>    cute::array&lt;IntT, 3&gt; stride_nwc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L305** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L306** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L307** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L308** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L309** <code>  assert(stride_nwc[2] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L310** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L311** <code>  if (ConvOp == cutlass::conv::Operator::kWgrad) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L312** <code>    cute::get&lt;1,0&gt;(s_copy) = stride_nwc[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L313** <code>    cute::get&lt;1,1&gt;(s_copy) = stride_nwc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L314** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L315** <code>  else if (ConvOp == cutlass::conv::Operator::kDgrad) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L316** <code>    // stride_nwc in dgrad is ksc.</code>
+  - EN: Comment that documents intent or context: "stride_nwc in dgrad is ksc.".
+  - CN: 用于说明意图或上下文的注释："stride_nwc in dgrad is ksc."。
+- **L317** <code>    cute::get&lt;1,0&gt;(s_copy) = stride_nwc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L318** <code>    cute::get&lt;1,1&gt;(s_copy) = stride_nwc[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L319** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L320** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L321** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>// Activation cutlass::layout::TensorNHWC -&gt; rank-2 stride (_1, (W,H,N)) in wgrad</code>
+  - EN: Comment that documents intent or context: "Activation cutlass::layout::TensorNHWC -> rank-2 stride (_1, (W,H,N)) in wgrad".
+  - CN: 用于说明意图或上下文的注释："Activation cutlass::layout::TensorNHWC -> rank-2 stride (_1, (W,H,N)) in wgrad"。
+- **L324** <code>// Filter cutlass::layout::TensorNHWC -&gt; rank-2 stride ((_1), (k, s, r)) in dgrad</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorNHWC -> rank-2 stride ((_1), (k, s, r)) in dgrad".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorNHWC -> rank-2 stride ((_1), (k, s, r)) in dgrad"。
+- **L325** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L326** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L327** <code>cute::Stride&lt;cute::Int&lt;1&gt;, cute::Stride&lt;IntT, IntT, IntT&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L328** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L329** <code>    cute::Stride&lt;cute::Int&lt;1&gt;, cute::Stride&lt;IntT, IntT, IntT&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L330** <code>    cute::array&lt;IntT, 4&gt; stride_nhwc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L331** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L332** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L333** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L334** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L335** <code>  assert(stride_nhwc[3] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L336** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L337** <code>  if (ConvOp == cutlass::conv::Operator::kWgrad) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L338** <code>    cute::for_each(cute::make_seq&lt;3&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L339** <code>      cute::get&lt;1,i&gt;(s_copy) = stride_nhwc[2-i];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L340** <code>    });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L341** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L342** <code>  else if (ConvOp == cutlass::conv::Operator::kDgrad) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L343** <code>    // stride_nhwc in dgrad is krsc.</code>
+  - EN: Comment that documents intent or context: "stride_nhwc in dgrad is krsc.".
+  - CN: 用于说明意图或上下文的注释："stride_nhwc in dgrad is krsc."。
+- **L344** <code>    cute::get&lt;1,0&gt;(s_copy) = stride_nhwc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L345** <code>    cute::for_each(cute::make_seq&lt;2&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L346** <code>      cute::get&lt;1,2-i&gt;(s_copy) = stride_nhwc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L347** <code>    });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L348** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L349** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L350** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L351** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L352** <code>// Activation cutlass::layout::TensorNDHWC -&gt; rank-2 stride (_1, (W,H,D,N)) in wgrad</code>
+  - EN: Comment that documents intent or context: "Activation cutlass::layout::TensorNDHWC -> rank-2 stride (_1, (W,H,D,N)) in wgrad".
+  - CN: 用于说明意图或上下文的注释："Activation cutlass::layout::TensorNDHWC -> rank-2 stride (_1, (W,H,D,N)) in wgrad"。
+- **L353** <code>// Filter cutlass::layout::TensorNDHWC -&gt; rank-2 stride ((_1), (k, s, r, t)) in dgrad</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorNDHWC -> rank-2 stride ((_1), (k, s, r, t)) in dgrad".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorNDHWC -> rank-2 stride ((_1), (k, s, r, t)) in dgrad"。
+- **L354** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L355** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L356** <code>cute::Stride&lt;cute::Int&lt;1&gt;, cute::Stride&lt;IntT, IntT, IntT, IntT&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L357** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L358** <code>    cute::Stride&lt;cute::Int&lt;1&gt;, cute::Stride&lt;IntT, IntT, IntT, IntT&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L359** <code>    cute::array&lt;IntT, 5&gt; stride_ndhwc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L360** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L361** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L362** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>  assert(stride_ndhwc[4] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L365** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L366** <code>  if (ConvOp == cutlass::conv::Operator::kWgrad) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L367** <code>    cute::for_each(cute::make_seq&lt;4&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L368** <code>      cute::get&lt;1,i&gt;(s_copy) = stride_ndhwc[3-i];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L369** <code>    });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L370** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L371** <code>  else if (ConvOp == cutlass::conv::Operator::kDgrad) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L372** <code>    // stride_ndhwc in dgrad is ktrsc.</code>
+  - EN: Comment that documents intent or context: "stride_ndhwc in dgrad is ktrsc.".
+  - CN: 用于说明意图或上下文的注释："stride_ndhwc in dgrad is ktrsc."。
+- **L373** <code>    cute::get&lt;1,0&gt;(s_copy) = stride_ndhwc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L374** <code>    cute::for_each(cute::make_seq&lt;3&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L375** <code>      cute::get&lt;1,3-i&gt;(s_copy) = stride_ndhwc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L376** <code>    });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L377** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L378** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L379** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L380** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L381** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L382** <code>// NZPQ tensor (_1, nzpq) for wgrad kernel</code>
+  - EN: Comment that documents intent or context: "NZPQ tensor (_1, nzpq) for wgrad kernel".
+  - CN: 用于说明意图或上下文的注释："NZPQ tensor (_1, nzpq) for wgrad kernel"。
+- **L383** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L384** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L385** <code>// cutlass::layout::TensorNWC -&gt; rank-2 stride (_1, nzpq)</code>
+  - EN: Comment that documents intent or context: "cutlass::layout::TensorNWC -> rank-2 stride (_1, nzpq)".
+  - CN: 用于说明意图或上下文的注释："cutlass::layout::TensorNWC -> rank-2 stride (_1, nzpq)"。
+- **L386** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L387** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L388** <code>cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L389** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L390** <code>    cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L391** <code>    cute::array&lt;IntT, 3&gt; stride_nqk,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L392** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L393** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L394** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L395** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L396** <code>  assert(stride_nqk[2] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L397** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L398** <code>  cute::get&lt;1&gt;(s_copy) = stride_nqk[1];</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L399** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L400** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L401** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L402** <code>// cutlass::layout::TensorNHWC -&gt; rank-2 stride (_1, nzpq)</code>
+  - EN: Comment that documents intent or context: "cutlass::layout::TensorNHWC -> rank-2 stride (_1, nzpq)".
+  - CN: 用于说明意图或上下文的注释："cutlass::layout::TensorNHWC -> rank-2 stride (_1, nzpq)"。
+- **L403** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L404** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L405** <code>cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L406** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L407** <code>    cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L408** <code>    cute::array&lt;IntT, 4&gt; stride_npqk,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L409** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L410** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L411** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L412** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L413** <code>  assert(stride_npqk[3] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L414** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L415** <code>  cute::get&lt;1&gt;(s_copy) = stride_npqk[2];</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L416** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L417** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L418** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L419** <code>// cutlass::layout::TensorNDHWC -&gt; rank-2 stride (_1, nzpq)</code>
+  - EN: Comment that documents intent or context: "cutlass::layout::TensorNDHWC -> rank-2 stride (_1, nzpq)".
+  - CN: 用于说明意图或上下文的注释："cutlass::layout::TensorNDHWC -> rank-2 stride (_1, nzpq)"。
+- **L420** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L421** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L422** <code>cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L423** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L424** <code>    cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L425** <code>    cute::array&lt;IntT, 5&gt; stride_nzpqk,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L426** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L427** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L428** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L429** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L430** <code>  assert(stride_nzpqk[4] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L431** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L432** <code>  cute::get&lt;1&gt;(s_copy) = stride_nzpqk[3];</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L433** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L434** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L435** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L436** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L437** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L438** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L439** <code>// Wgrad output tensor (k, (_1, s, r, t), _0)</code>
+  - EN: Comment that documents intent or context: "Wgrad output tensor (k, (_1, s, r, t), _0)".
+  - CN: 用于说明意图或上下文的注释："Wgrad output tensor (k, (_1, s, r, t), _0)"。
+- **L440** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L441** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L442** <code>// Filter cutlass::layout::TensorKCS -&gt; rank-3 stride (k, (_1, s), _0)</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorKCS -> rank-3 stride (k, (_1, s), _0)".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorKCS -> rank-3 stride (k, (_1, s), _0)"。
+- **L443** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L444** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L445** <code>cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L446** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L447** <code>    cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L448** <code>    [[maybe_unused]] cute::array&lt;int32_t, 3&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L449** <code>    cute::array&lt;IntT, 3&gt; stride_ksc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L450** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L451** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L452** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L453** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L454** <code>  assert(stride_ksc[2] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L455** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L456** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_ksc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L457** <code>  cute::get&lt;1,1&gt;(s_copy) = stride_ksc[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L458** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L459** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L460** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L461** <code>// Filter cutlass::layout::TensorKCSR -&gt; rank-3 stride (k, (_1, s, r), _0)</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorKCSR -> rank-3 stride (k, (_1, s, r), _0)".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorKCSR -> rank-3 stride (k, (_1, s, r), _0)"。
+- **L462** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L463** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L464** <code>cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT&gt;, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L465** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L466** <code>    cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT&gt;, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L467** <code>    [[maybe_unused]] cute::array&lt;int32_t, 4&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L468** <code>    cute::array&lt;IntT, 4&gt; stride_krsc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L469** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L470** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L471** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L472** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L473** <code>  assert(stride_krsc[3] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L474** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L475** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_krsc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L476** <code>  cute::for_each(cute::make_seq&lt;2&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L477** <code>    cute::get&lt;1,2-i&gt;(s_copy) = stride_krsc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L478** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L479** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L480** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L481** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L482** <code>// Filter cutlass::layout::TensorKCSRT -&gt; rank-3 stride (k, (_1, s, r, t), _0)</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorKCSRT -> rank-3 stride (k, (_1, s, r, t), _0)".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorKCSRT -> rank-3 stride (k, (_1, s, r, t), _0)"。
+- **L483** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L484** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L485** <code>cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT, IntT&gt;, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L486** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L487** <code>    cute::Stride&lt;IntT, cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT, IntT&gt;, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L488** <code>    [[maybe_unused]] cute::array&lt;int32_t, 5&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L489** <code>    cute::array&lt;IntT, 5&gt; stride_ktrsc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L490** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L491** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L492** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L493** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L494** <code>  assert(stride_ktrsc[4] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L495** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L496** <code>  cute::get&lt;0,0&gt;(s_copy) = stride_ktrsc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L497** <code>  cute::for_each(cute::make_seq&lt;3&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L498** <code>    cute::get&lt;1,3-i&gt;(s_copy) = stride_ktrsc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L499** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L500** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L501** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L502** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L503** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L504** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L505** <code>// Wgrad output tensor ((_1, s, r, t), k, _0)</code>
+  - EN: Comment that documents intent or context: "Wgrad output tensor ((_1, s, r, t), k, _0)".
+  - CN: 用于说明意图或上下文的注释："Wgrad output tensor ((_1, s, r, t), k, _0)"。
+- **L506** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L508** <code>// Filter cutlass::layout::TensorCSK -&gt; rank-3 stride ((_1, s), k, _0)</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorCSK -> rank-3 stride ((_1, s), k, _0)".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorCSK -> rank-3 stride ((_1, s), k, _0)"。
+- **L509** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L510** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L511** <code>cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;, IntT, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L512** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L513** <code>    cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, IntT&gt;, IntT, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L514** <code>    [[maybe_unused]] cute::array&lt;int32_t, 3&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L515** <code>    cute::array&lt;IntT, 3&gt; stride_ksc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L516** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L517** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L518** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L519** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L520** <code>  assert(stride_ksc[2] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L521** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L522** <code>  cute::get&lt;1,0&gt;(s_copy) = stride_ksc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L523** <code>  cute::get&lt;0,1&gt;(s_copy) = stride_ksc[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L524** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L525** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L526** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L527** <code>// Filter cutlass::layout::TensorCSRK -&gt; rank-3 stride ((_1, s, r), k, _0)</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorCSRK -> rank-3 stride ((_1, s, r), k, _0)".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorCSRK -> rank-3 stride ((_1, s, r), k, _0)"。
+- **L528** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L529** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L530** <code>cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT&gt;, IntT, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L531** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L532** <code>    cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT&gt;, IntT, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L533** <code>    [[maybe_unused]] cute::array&lt;int32_t, 4&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L534** <code>    cute::array&lt;IntT, 4&gt; stride_krsc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L535** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L536** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L537** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L538** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L539** <code>  assert(stride_krsc[3] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L540** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L541** <code>  cute::get&lt;1,0&gt;(s_copy) = stride_krsc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L542** <code>  cute::for_each(cute::make_seq&lt;2&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L543** <code>    cute::get&lt;0,2-i&gt;(s_copy) = stride_krsc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L544** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L545** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L546** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L547** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L548** <code>// Filter cutlass::layout::TensorCSRTK -&gt; rank-3 stride ((_1, s, r, t), k, _0)</code>
+  - EN: Comment that documents intent or context: "Filter cutlass::layout::TensorCSRTK -> rank-3 stride ((_1, s, r, t), k, _0)".
+  - CN: 用于说明意图或上下文的注释："Filter cutlass::layout::TensorCSRTK -> rank-3 stride ((_1, s, r, t), k, _0)"。
+- **L549** <code>template &lt;class IntT&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L550** <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L551** <code>cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT, IntT&gt;, IntT, cute::Int&lt;0&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L552** <code>make_cute_packed_stride(</code>
+  - EN: Begins or continues the signature/call syntax involving `make_cute_packed_stride`.
+  - CN: 开始或继续与 `make_cute_packed_stride` 相关的签名/调用语法。
+- **L553** <code>    cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, IntT, IntT, IntT&gt;, IntT, cute::Int&lt;0&gt;&gt; s,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L554** <code>    [[maybe_unused]] cute::array&lt;int32_t, 5&gt; shape_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L555** <code>    cute::array&lt;IntT, 5&gt; stride_ktrsc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L556** <code>    conv::Operator ConvOp) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L557** <code>  static_assert(std::is_integral_v&lt;IntT&gt;,</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L558** <code>    &quot;Stride must have an integral type so it can be set dynamically. Static strides not supported.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L559** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L560** <code>  assert(stride_ktrsc[4] == 1);</code>
+  - EN: Declares function or method `assert` without defining it here.
+  - CN: 声明函数或方法 `assert`，但不在此处给出定义。
+- **L561** <code>  auto s_copy = s;</code>
+  - EN: Assigns or initializes `s_copy` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_copy` 进行赋值或初始化。
+- **L562** <code>  cute::get&lt;1,0&gt;(s_copy) = stride_ktrsc[0];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L563** <code>  cute::for_each(cute::make_seq&lt;3&gt;{}, [&amp;](auto i) {</code>
+  - EN: Begins the definition of function or method `for_each`.
+  - CN: 开始定义函数或方法 `for_each`。
+- **L564** <code>    cute::get&lt;0,3-i&gt;(s_copy) = stride_ktrsc[i+1];</code>
+  - EN: Declares function or method `i>` without defining it here.
+  - CN: 声明函数或方法 `i>`，但不在此处给出定义。
+- **L565** <code>  });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L566** <code>  return s_copy;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L567** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L568** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L569** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L570** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>cute/layout.hpp</code> — project-specific declarations from `layout.hpp` / 来自 `layout.hpp` 的项目专用声明
+- <code>cute/container/array.hpp</code> — fixed-size array containers / 定长数组容器
+- <code>cutlass/conv/convolution.h</code> — CUTLASS convolution support / CUTLASS 卷积支持

@@ -1,0 +1,3729 @@
+# handle.cu — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/src/handle.cu`
+**Purpose / 用途**: Declares or implements the CUTLASS library runtime handle. / 声明或实现 CUTLASS 运行时库句柄。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L33** <code>    \brief CUTLASS Library handle.</code>
+  - EN: Comment that documents intent or context: "\brief CUTLASS Library handle.".
+  - CN: 用于说明意图或上下文的注释："\brief CUTLASS Library handle."。
+- **L34** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code>#include &lt;iostream&gt;</code>
+  - EN: Includes `iostream` so this file can use standard stream input/output support.
+  - CN: 引入 `iostream`，使当前文件可以使用标准流输入输出支持。
+- **L36** <code>#include &lt;stdexcept&gt;</code>
+  - EN: Includes `stdexcept` so this file can use APIs or definitions from `stdexcept`.
+  - CN: 引入 `stdexcept`，使当前文件可以使用来自 `stdexcept` 的 API 或定义。
+- **L37** <code>#include &lt;cstdint&gt;</code>
+  - EN: Includes `cstdint` so this file can use fixed-width integer types.
+  - CN: 引入 `cstdint`，使当前文件可以使用定宽整数类型。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &quot;cutlass/library/handle.h&quot;</code>
+  - EN: Includes `cutlass/library/handle.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/handle.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L40** <code>#include &quot;cutlass/library/singleton.h&quot;</code>
+  - EN: Includes `cutlass/library/singleton.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/singleton.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L41** <code>#include &quot;cutlass/library/util.h&quot;</code>
+  - EN: Includes `cutlass/library/util.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/util.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L44** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>/// Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L49** <code>Handle::Handle(</code>
+  - EN: Begins or continues the signature/call syntax involving `Handle`.
+  - CN: 开始或继续与 `Handle` 相关的签名/调用语法。
+- **L50** <code>  cudaStream_t stream,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L51** <code>  size_t workspace_size</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L52** <code>):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L53** <code>  provider_(Provider::kCUTLASS),</code>
+  - EN: Begins or continues the signature/call syntax involving `provider_`.
+  - CN: 开始或继续与 `provider_` 相关的签名/调用语法。
+- **L54** <code>  stream_(stream),</code>
+  - EN: Begins or continues the signature/call syntax involving `stream_`.
+  - CN: 开始或继续与 `stream_` 相关的签名/调用语法。
+- **L55** <code>  workspace_(nullptr),</code>
+  - EN: Begins or continues the signature/call syntax involving `workspace_`.
+  - CN: 开始或继续与 `workspace_` 相关的签名/调用语法。
+- **L56** <code>  workspace_size_(0),</code>
+  - EN: Begins or continues the signature/call syntax involving `workspace_size_`.
+  - CN: 开始或继续与 `workspace_size_` 相关的签名/调用语法。
+- **L57** <code>  scalar_pointer_mode_(ScalarPointerMode::kHost),</code>
+  - EN: Begins or continues the signature/call syntax involving `scalar_pointer_mode_`.
+  - CN: 开始或继续与 `scalar_pointer_mode_` 相关的签名/调用语法。
+- **L58** <code>  last_operation_(nullptr) {</code>
+  - EN: Begins the definition of function or method `last_operation_`.
+  - CN: 开始定义函数或方法 `last_operation_`。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>  cudaError_t error = cudaGetDevice(&amp;device_idx_);</code>
+  - EN: Declares function or method `cudaGetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDevice`，但不在此处给出定义。
+- **L61** <code>  if (error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L62** <code>    throw std::runtime_error(&quot;cudaGetDevice() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L63** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L64** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L65** <code>  error = cudaGetDeviceProperties(&amp;device_, device_idx_);</code>
+  - EN: Declares function or method `cudaGetDeviceProperties` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDeviceProperties`，但不在此处给出定义。
+- **L66** <code>  if (error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L67** <code>    throw std::runtime_error(&quot;cudaGetDeviceProperties() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L68** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L69** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L70** <code>  set_workspace_size(workspace_size);</code>
+  - EN: Declares function or method `set_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `set_workspace_size`，但不在此处给出定义。
+- **L71** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L72** <code>  Singleton::get();</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L73** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>/// Destructor</code>
+  - EN: Comment that documents intent or context: "Destructor".
+  - CN: 用于说明意图或上下文的注释："Destructor"。
+- **L76** <code>Handle::~Handle() {</code>
+  - EN: Begins the definition of function or method `~Handle`.
+  - CN: 开始定义函数或方法 `~Handle`。
+- **L77** <code>  if (workspace_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>    int device_before;</code>
+  - EN: Declares the symbol `device_before` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_before`。
+- **L80** <code>    cudaGetDevice(&amp;device_before);</code>
+  - EN: Declares function or method `cudaGetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDevice`，但不在此处给出定义。
+- **L81** <code>    if (device_before != device_idx_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L82** <code>      cudaSetDevice(device_idx_);</code>
+  - EN: Declares function or method `cudaSetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaSetDevice`，但不在此处给出定义。
+- **L83** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L84** <code>    cudaFree(workspace_);</code>
+  - EN: Declares function or method `cudaFree` without defining it here.
+  - CN: 声明函数或方法 `cudaFree`，但不在此处给出定义。
+- **L85** <code>    if (device_before != device_idx_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L86** <code>      cudaSetDevice(device_before);</code>
+  - EN: Declares function or method `cudaSetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaSetDevice`，但不在此处给出定义。
+- **L87** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L88** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L89** <code>    workspace_ = nullptr;</code>
+  - EN: Assigns or initializes `workspace_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_` 进行赋值或初始化。
+- **L90** <code>    workspace_size_ = 0;</code>
+  - EN: Assigns or initializes `workspace_size_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size_` 进行赋值或初始化。
+- **L91** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L92** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>/// Move constructor</code>
+  - EN: Comment that documents intent or context: "Move constructor".
+  - CN: 用于说明意图或上下文的注释："Move constructor"。
+- **L95** <code>Handle::Handle(Handle &amp;&amp; handle) {</code>
+  - EN: Begins the definition of function or method `Handle`.
+  - CN: 开始定义函数或方法 `Handle`。
+- **L96** <code>  cudaError_t error = cudaGetDevice(&amp;device_idx_);</code>
+  - EN: Declares function or method `cudaGetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDevice`，但不在此处给出定义。
+- **L97** <code>  if (error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L98** <code>    throw std::runtime_error(&quot;cudaGetDevice() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L99** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L100** <code>  device_ = handle.device_;</code>
+  - EN: Assigns or initializes `device_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_` 进行赋值或初始化。
+- **L101** <code>  workspace_size_ = handle.workspace_size_;</code>
+  - EN: Assigns or initializes `workspace_size_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size_` 进行赋值或初始化。
+- **L102** <code>  workspace_ = handle.workspace_;</code>
+  - EN: Assigns or initializes `workspace_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_` 进行赋值或初始化。
+- **L103** <code>  stream_ = handle.stream_;</code>
+  - EN: Assigns or initializes `stream_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream_` 进行赋值或初始化。
+- **L104** <code>  scalar_pointer_mode_ = handle.scalar_pointer_mode_;</code>
+  - EN: Assigns or initializes `scalar_pointer_mode_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `scalar_pointer_mode_` 进行赋值或初始化。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>  handle.workspace_ = nullptr;</code>
+  - EN: Assigns or initializes `workspace_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_` 进行赋值或初始化。
+- **L107** <code>  handle.workspace_size_ = 0;</code>
+  - EN: Assigns or initializes `workspace_size_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size_` 进行赋值或初始化。
+- **L108** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>/// Move assignment operator</code>
+  - EN: Comment that documents intent or context: "Move assignment operator".
+  - CN: 用于说明意图或上下文的注释："Move assignment operator"。
+- **L111** <code>Handle &amp; Handle::operator=(Handle &amp;&amp; handle) {</code>
+  - EN: Assigns or initializes `operator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operator` 进行赋值或初始化。
+- **L112** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L113** <code>  provider_ = handle.provider_;</code>
+  - EN: Assigns or initializes `provider_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `provider_` 进行赋值或初始化。
+- **L114** <code>  device_ = handle.device_;</code>
+  - EN: Assigns or initializes `device_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_` 进行赋值或初始化。
+- **L115** <code>  workspace_size_ = handle.workspace_size_;</code>
+  - EN: Assigns or initializes `workspace_size_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size_` 进行赋值或初始化。
+- **L116** <code>  workspace_ = handle.workspace_;</code>
+  - EN: Assigns or initializes `workspace_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_` 进行赋值或初始化。
+- **L117** <code>  stream_ = handle.stream_;</code>
+  - EN: Assigns or initializes `stream_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream_` 进行赋值或初始化。
+- **L118** <code>  scalar_pointer_mode_ = handle.scalar_pointer_mode_;</code>
+  - EN: Assigns or initializes `scalar_pointer_mode_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `scalar_pointer_mode_` 进行赋值或初始化。
+- **L119** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L120** <code>  handle.workspace_ = nullptr;</code>
+  - EN: Assigns or initializes `workspace_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_` 进行赋值或初始化。
+- **L121** <code>  handle.workspace_size_ = 0;</code>
+  - EN: Assigns or initializes `workspace_size_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size_` 进行赋值或初始化。
+- **L122** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L123** <code>  device_idx_ = handle.device_idx_;</code>
+  - EN: Assigns or initializes `device_idx_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_idx_` 进行赋值或初始化。
+- **L124** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L125** <code>  return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L126** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>int Handle::compute_capability() const {</code>
+  - EN: Begins the definition of function or method `compute_capability`.
+  - CN: 开始定义函数或方法 `compute_capability`。
+- **L129** <code>  return device_.major * 10 + device_.minor;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L130** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>/// Sets the current CUDA stream</code>
+  - EN: Comment that documents intent or context: "Sets the current CUDA stream".
+  - CN: 用于说明意图或上下文的注释："Sets the current CUDA stream"。
+- **L133** <code>void Handle::set_stream(cudaStream_t stream) {</code>
+  - EN: Begins the definition of function or method `set_stream`.
+  - CN: 开始定义函数或方法 `set_stream`。
+- **L134** <code>  stream_ = stream;</code>
+  - EN: Assigns or initializes `stream_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream_` 进行赋值或初始化。
+- **L135** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L136** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L137** <code>/// Gets the current CUDA stream</code>
+  - EN: Comment that documents intent or context: "Gets the current CUDA stream".
+  - CN: 用于说明意图或上下文的注释："Gets the current CUDA stream"。
+- **L138** <code>cudaStream_t Handle::get_stream() const {</code>
+  - EN: Begins the definition of function or method `get_stream`.
+  - CN: 开始定义函数或方法 `get_stream`。
+- **L139** <code>  return stream_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L140** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L141** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L142** <code>/// Gets the current provider</code>
+  - EN: Comment that documents intent or context: "Gets the current provider".
+  - CN: 用于说明意图或上下文的注释："Gets the current provider"。
+- **L143** <code>Provider Handle::get_provider() const {</code>
+  - EN: Begins the definition of function or method `get_provider`.
+  - CN: 开始定义函数或方法 `get_provider`。
+- **L144** <code>  return provider_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L145** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L146** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L147** <code>/// Sets the provider of operations</code>
+  - EN: Comment that documents intent or context: "Sets the provider of operations".
+  - CN: 用于说明意图或上下文的注释："Sets the provider of operations"。
+- **L148** <code>void Handle::set_provider(Provider provider) {</code>
+  - EN: Begins the definition of function or method `set_provider`.
+  - CN: 开始定义函数或方法 `set_provider`。
+- **L149** <code>  provider_ = provider;</code>
+  - EN: Assigns or initializes `provider_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `provider_` 进行赋值或初始化。
+- **L150** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>/// Gets the device workspace size</code>
+  - EN: Comment that documents intent or context: "Gets the device workspace size".
+  - CN: 用于说明意图或上下文的注释："Gets the device workspace size"。
+- **L153** <code>size_t Handle::get_workspace_size() const {</code>
+  - EN: Begins the definition of function or method `get_workspace_size`.
+  - CN: 开始定义函数或方法 `get_workspace_size`。
+- **L154** <code>  return workspace_size_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L155** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L156** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L157** <code>/// Gets a pointer to the device workspace allocation in Global Memory</code>
+  - EN: Comment that documents intent or context: "Gets a pointer to the device workspace allocation in Global Memory".
+  - CN: 用于说明意图或上下文的注释："Gets a pointer to the device workspace allocation in Global Memory"。
+- **L158** <code>void *Handle::get_workspace() const {</code>
+  - EN: Begins the definition of function or method `get_workspace`.
+  - CN: 开始定义函数或方法 `get_workspace`。
+- **L159** <code>  return workspace_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L160** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L161** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L162** <code>/// Sets the size of device workspace, invalidating previous calls to get_device_workspace()</code>
+  - EN: Comment that documents intent or context: "Sets the size of device workspace, invalidating previous calls to get_device_workspace()".
+  - CN: 用于说明意图或上下文的注释："Sets the size of device workspace, invalidating previous calls to get_device_workspace()"。
+- **L163** <code>void Handle::set_workspace_size(size_t bytes) {</code>
+  - EN: Begins the definition of function or method `set_workspace_size`.
+  - CN: 开始定义函数或方法 `set_workspace_size`。
+- **L164** <code>  int device_before;</code>
+  - EN: Declares the symbol `device_before` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_before`。
+- **L165** <code>  cudaGetDevice(&amp;device_before);</code>
+  - EN: Declares function or method `cudaGetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDevice`，但不在此处给出定义。
+- **L166** <code>  if (device_before != device_idx_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L167** <code>    cudaSetDevice(device_idx_);</code>
+  - EN: Declares function or method `cudaSetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaSetDevice`，但不在此处给出定义。
+- **L168** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L169** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L170** <code>  if (bytes != workspace_size_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L172** <code>    if (workspace_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L173** <code>      cudaFree(workspace_);</code>
+  - EN: Declares function or method `cudaFree` without defining it here.
+  - CN: 声明函数或方法 `cudaFree`，但不在此处给出定义。
+- **L174** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>    workspace_ = nullptr;</code>
+  - EN: Assigns or initializes `workspace_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_` 进行赋值或初始化。
+- **L177** <code>    workspace_size_ = bytes;</code>
+  - EN: Assigns or initializes `workspace_size_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size_` 进行赋值或初始化。
+- **L178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L179** <code>    if (workspace_size_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>      cudaError_t error = cudaMalloc((void **)&amp;workspace_, workspace_size_);</code>
+  - EN: Declares function or method `cudaMalloc` without defining it here.
+  - CN: 声明函数或方法 `cudaMalloc`，但不在此处给出定义。
+- **L182** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L183** <code>      if (error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L184** <code>        throw std::runtime_error(&quot;Failed to allocate workspace&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L185** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L186** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L187** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>  if (workspace_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L190** <code>    cudaError_t error = cudaMemset(workspace_, 0, workspace_size_);</code>
+  - EN: Declares function or method `cudaMemset` without defining it here.
+  - CN: 声明函数或方法 `cudaMemset`，但不在此处给出定义。
+- **L191** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L192** <code>    if (error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L193** <code>      throw std::runtime_error(&quot;Failed to clear workspace&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L194** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L195** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L196** <code>  if (device_before != device_idx_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L197** <code>    cudaSetDevice(device_before);</code>
+  - EN: Declares function or method `cudaSetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaSetDevice`，但不在此处给出定义。
+- **L198** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L199** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L200** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L201** <code>/// Gets the scalar pointer mode</code>
+  - EN: Comment that documents intent or context: "Gets the scalar pointer mode".
+  - CN: 用于说明意图或上下文的注释："Gets the scalar pointer mode"。
+- **L202** <code>ScalarPointerMode Handle::get_scalar_pointer_mode() const {</code>
+  - EN: Begins the definition of function or method `get_scalar_pointer_mode`.
+  - CN: 开始定义函数或方法 `get_scalar_pointer_mode`。
+- **L203** <code>  return scalar_pointer_mode_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L204** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L205** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L206** <code>/// Sets the scalar pointer mode</code>
+  - EN: Comment that documents intent or context: "Sets the scalar pointer mode".
+  - CN: 用于说明意图或上下文的注释："Sets the scalar pointer mode"。
+- **L207** <code>void Handle::set_scalar_pointer_mode(ScalarPointerMode mode) {</code>
+  - EN: Begins the definition of function or method `set_scalar_pointer_mode`.
+  - CN: 开始定义函数或方法 `set_scalar_pointer_mode`。
+- **L208** <code>  scalar_pointer_mode_ = mode;</code>
+  - EN: Assigns or initializes `scalar_pointer_mode_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `scalar_pointer_mode_` 进行赋值或初始化。
+- **L209** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L210** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L211** <code>/// Gets the last operation</code>
+  - EN: Comment that documents intent or context: "Gets the last operation".
+  - CN: 用于说明意图或上下文的注释："Gets the last operation"。
+- **L212** <code>Operation const *Handle::get_last_operation() const {</code>
+  - EN: Begins the definition of function or method `get_last_operation`.
+  - CN: 开始定义函数或方法 `get_last_operation`。
+- **L213** <code>  return last_operation_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L214** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L215** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L216** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L217** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L218** <code>/// Returns the maximum required alignment for each operator</code>
+  - EN: Comment that documents intent or context: "Returns the maximum required alignment for each operator".
+  - CN: 用于说明意图或上下文的注释："Returns the maximum required alignment for each operator"。
+- **L219** <code>static int maximum_alignment_requirement(GemmDescription const &amp;desc) {</code>
+  - EN: Begins the definition of function or method `maximum_alignment_requirement`.
+  - CN: 开始定义函数或方法 `maximum_alignment_requirement`。
+- **L220** <code>  return std::max(</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L221** <code>    std::max(desc.A.alignment, desc.B.alignment), desc.C.alignment);</code>
+  - EN: Declares function or method `max` without defining it here.
+  - CN: 声明函数或方法 `max`，但不在此处给出定义。
+- **L222** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L223** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L224** <code>/// Returns the largest alignment (in units of elements) the problem satisfies, starting from a</code>
+  - EN: Comment that documents intent or context: "Returns the largest alignment (in units of elements) the problem satisfies, starting from a".
+  - CN: 用于说明意图或上下文的注释："Returns the largest alignment (in units of elements) the problem satisfies, starting from a"。
+- **L225** <code>/// given upper limit.</code>
+  - EN: Comment that documents intent or context: "given upper limit.".
+  - CN: 用于说明意图或上下文的注释："given upper limit."。
+- **L226** <code>static int gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L227** <code>  int M,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L228** <code>  int N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L229** <code>  int K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L230** <code>  NumericTypeID element_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L231** <code>  void const *ptr_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L232** <code>  int64_t lda,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L233** <code>  int64_t batch_stride_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L234** <code>  NumericTypeID element_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L235** <code>  void const *ptr_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L236** <code>  int64_t ldb,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L237** <code>  int64_t batch_stride_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L238** <code>  NumericTypeID element_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L239** <code>  void const * ptr_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L240** <code>  int64_t ldc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L241** <code>  int64_t batch_stride_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L242** <code>  void const * ptr_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L243** <code>  int64_t ldd,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L244** <code>  int64_t batch_stride_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L245** <code>  int max_alignment_in_bytes = 16</code>
+  - EN: Assigns or initializes `max_alignment_in_bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max_alignment_in_bytes` 进行赋值或初始化。
+- **L246** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L247** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L248** <code>  void const *pointers[] = {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L249** <code>    ptr_A, ptr_B, ptr_C, ptr_D</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L250** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L251** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L252** <code>  int64_t extents[] = {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L253** <code>    M, N, K, lda, ldb, ldc, ldd, batch_stride_A, batch_stride_B, batch_stride_C, batch_stride_D</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>  NumericTypeID elements[] = {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L257** <code>    element_A, element_B, element_C</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L258** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L259** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L260** <code>  for (; max_alignment_in_bytes &gt; 0; max_alignment_in_bytes /= 2) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L261** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L262** <code>    bool satisfied = true;</code>
+  - EN: Assigns or initializes `satisfied` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `satisfied` 进行赋值或初始化。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>    // Can pointers satisfy this?</code>
+  - EN: Comment that documents intent or context: "Can pointers satisfy this?".
+  - CN: 用于说明意图或上下文的注释："Can pointers satisfy this?"。
+- **L265** <code>    for (void const *ptr : pointers) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L266** <code>      std::uintptr_t int_ptr = reinterpret_cast&lt;std::uintptr_t&gt;(ptr);</code>
+  - EN: Declares function or method `uintptr_t>` without defining it here.
+  - CN: 声明函数或方法 `uintptr_t>`，但不在此处给出定义。
+- **L267** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L268** <code>      if (int_ptr % max_alignment_in_bytes) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L269** <code>        satisfied = false;</code>
+  - EN: Assigns or initializes `satisfied` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `satisfied` 进行赋值或初始化。
+- **L270** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L271** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L272** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L273** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L274** <code>    if (!satisfied) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L275** <code>      continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L276** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L277** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L278** <code>    // Compute the maximum alignment based on element data types</code>
+  - EN: Comment that documents intent or context: "Compute the maximum alignment based on element data types".
+  - CN: 用于说明意图或上下文的注释："Compute the maximum alignment based on element data types"。
+- **L279** <code>    int max_element_alignment = 0;</code>
+  - EN: Assigns or initializes `max_element_alignment` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max_element_alignment` 进行赋值或初始化。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>    for (NumericTypeID type_id : elements) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L282** <code>      if (library::sizeof_bits(type_id)==0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L283** <code>        continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L284** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L285** <code>      int element_alignment = max_alignment_in_bytes * 8 / library::sizeof_bits(type_id);</code>
+  - EN: Declares function or method `sizeof_bits` without defining it here.
+  - CN: 声明函数或方法 `sizeof_bits`，但不在此处给出定义。
+- **L286** <code>      max_element_alignment = std::max(max_element_alignment, element_alignment);</code>
+  - EN: Declares function or method `max` without defining it here.
+  - CN: 声明函数或方法 `max`，但不在此处给出定义。
+- **L287** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L288** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L289** <code>    // Can the problem size and leading dimensions satisfy this?</code>
+  - EN: Comment that documents intent or context: "Can the problem size and leading dimensions satisfy this?".
+  - CN: 用于说明意图或上下文的注释："Can the problem size and leading dimensions satisfy this?"。
+- **L290** <code>    for (int64_t extent : extents) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L291** <code>      if (extent % max_element_alignment) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L292** <code>        satisfied = false;</code>
+  - EN: Assigns or initializes `satisfied` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `satisfied` 进行赋值或初始化。
+- **L293** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L294** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L295** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L296** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L297** <code>    if (!satisfied) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L298** <code>      continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L299** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L300** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L301** <code>    // Yes</code>
+  - EN: Comment that documents intent or context: "Yes".
+  - CN: 用于说明意图或上下文的注释："Yes"。
+- **L302** <code>    return max_element_alignment;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L303** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>  // No alignment satisfies this problem</code>
+  - EN: Comment that documents intent or context: "No alignment satisfies this problem".
+  - CN: 用于说明意图或上下文的注释："No alignment satisfies this problem"。
+- **L306** <code>  return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L307** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L308** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L309** <code>/// Find the best kernel in descending order of preference.</code>
+  - EN: Comment that documents intent or context: "Find the best kernel in descending order of preference.".
+  - CN: 用于说明意图或上下文的注释："Find the best kernel in descending order of preference."。
+- **L310** <code>static Operation const * find_gemm_operation(</code>
+  - EN: Begins or continues the signature/call syntax involving `find_gemm_operation`.
+  - CN: 开始或继续与 `find_gemm_operation` 相关的签名/调用语法。
+- **L311** <code>  GemmOperationFunctionalMap::const_iterator operators_it,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L312** <code>  GemmPreferenceKey const preference_key) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L313** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L314** <code>  auto cc_it = operators_it-&gt;second.upper_bound(preference_key);</code>
+  - EN: Declares function or method `upper_bound` without defining it here.
+  - CN: 声明函数或方法 `upper_bound`，但不在此处给出定义。
+- **L315** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L316** <code>  if (cc_it == operators_it-&gt;second.begin()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L317** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L318** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L319** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L320** <code>  Operation const *operation = nullptr;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L321** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L322** <code>  // Search in descending order of compute capability</code>
+  - EN: Comment that documents intent or context: "Search in descending order of compute capability".
+  - CN: 用于说明意图或上下文的注释："Search in descending order of compute capability"。
+- **L323** <code>  do {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L324** <code>    --cc_it;</code>
+  - EN: Declares the symbol `cc_it` in the current scope.
+  - CN: 在当前作用域中声明符号 `cc_it`。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>    // Search tile sizes in order, for now.</code>
+  - EN: Comment that documents intent or context: "Search tile sizes in order, for now.".
+  - CN: 用于说明意图或上下文的注释："Search tile sizes in order, for now."。
+- **L327** <code>    for (auto const * op : cc_it-&gt;second) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L328** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L329** <code>      GemmDescription const &amp;desc = static_cast&lt;GemmDescription const &amp;&gt;(op-&gt;description());</code>
+  - EN: Declares function or method `description` without defining it here.
+  - CN: 声明函数或方法 `description`，但不在此处给出定义。
+- **L330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L331** <code>      int min_cc = desc.tile_description.minimum_compute_capability;</code>
+  - EN: Assigns or initializes `min_cc` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `min_cc` 进行赋值或初始化。
+- **L332** <code>      int max_cc = desc.tile_description.maximum_compute_capability;</code>
+  - EN: Assigns or initializes `max_cc` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max_cc` 进行赋值或初始化。
+- **L333** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L334** <code>      int op_alignment = maximum_alignment_requirement(desc);</code>
+  - EN: Declares function or method `maximum_alignment_requirement` without defining it here.
+  - CN: 声明函数或方法 `maximum_alignment_requirement`，但不在此处给出定义。
+- **L335** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L336** <code>      if ((min_cc &lt;= preference_key.compute_capability) &amp;&amp;</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L337** <code>        (preference_key.compute_capability &lt;= max_cc) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L338** <code>        (op_alignment &lt;= preference_key.alignment)) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L339** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L340** <code>        operation = op;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L341** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L342** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L343** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L344** <code>  } while (!operation &amp;&amp; cc_it != operators_it-&gt;second.begin());</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L345** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L346** <code>  return operation;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L347** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L348** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L349** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L350** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L351** <code>/// Executes a GEMM computation: D &lt;= alpha * A*B + beta * C</code>
+  - EN: Comment that documents intent or context: "Executes a GEMM computation: D <= alpha * A*B + beta * C".
+  - CN: 用于说明意图或上下文的注释："Executes a GEMM computation: D <= alpha * A*B + beta * C"。
+- **L352** <code>Status Handle::gemm(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm`.
+  - CN: 开始或继续与 `gemm` 相关的签名/调用语法。
+- **L353** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L354** <code>  int M,                                    /// GEMM M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L355** <code>  int N,                                    /// GEMM N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L356** <code>  int K,                                    /// GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L357** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L358** <code>  NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L359** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L360** <code>  NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L361** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L362** <code>  void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>  NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L365** <code>  LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L366** <code>  ComplexTransform transform_A,             /// Complex transformation applied to A matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L367** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L368** <code>  void const * ptr_A,                       /// Pointer to A matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L369** <code>  int64_t lda,                              /// Leading dimension of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L370** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L371** <code>  NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L372** <code>  LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L373** <code>  ComplexTransform transform_B,             /// Complex transformation applied to B matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L374** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L375** <code>  void const * ptr_B,                       /// Pointer to B matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L376** <code>  int64_t ldb,                              /// Leading dimension of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L377** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L378** <code>  void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L379** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L380** <code>  NumericTypeID element_C,                  /// Data type of C and D matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L381** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L382** <code>  void const * ptr_C,                       /// Pointer to C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L383** <code>  int64_t ldc,                              /// Leading dimension of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L384** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L385** <code>  void * ptr_D,                             /// Pointer to D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L386** <code>  int64_t ldd                               /// Leading dimension of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L387** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L388** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L389** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L390** <code>  // Find the operation</code>
+  - EN: Comment that documents intent or context: "Find the operation".
+  - CN: 用于说明意图或上下文的注释："Find the operation"。
+- **L391** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L392** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L393** <code>  GemmFunctionalKey key(</code>
+  - EN: Begins or continues the signature/call syntax involving `key`.
+  - CN: 开始或继续与 `key` 相关的签名/调用语法。
+- **L394** <code>    provider_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L395** <code>    GemmKind::kGemm,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L396** <code>    element_compute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L397** <code>    element_scalar,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L398** <code>    element_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L399** <code>    layout_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L400** <code>    transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L401** <code>    element_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L402** <code>    layout_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L403** <code>    transform_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L404** <code>    element_C,  // C/D are same type and col major default</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L405** <code>    LayoutTypeID::kColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L406** <code>    element_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L407** <code>    LayoutTypeID::kColumnMajor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L408** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L409** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L410** <code>  auto operators_it = Singleton::get().operation_table.gemm_operations.find(key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L411** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L412** <code>  if (operators_it == Singleton::get().operation_table.gemm_operations.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L413** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L414** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L415** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L416** <code>  if (operators_it-&gt;second.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L417** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L418** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L419** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L420** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L421** <code>  // Compute the largest alignment restriction the kernel can satisfy.</code>
+  - EN: Comment that documents intent or context: "Compute the largest alignment restriction the kernel can satisfy.".
+  - CN: 用于说明意图或上下文的注释："Compute the largest alignment restriction the kernel can satisfy."。
+- **L422** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L423** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L424** <code>  // Maximum alignment expectation among all kernels (in units of bytes)</code>
+  - EN: Comment that documents intent or context: "Maximum alignment expectation among all kernels (in units of bytes)".
+  - CN: 用于说明意图或上下文的注释："Maximum alignment expectation among all kernels (in units of bytes)"。
+- **L425** <code>  int const kMaximumAlignmentSize = 16;</code>
+  - EN: Assigns or initializes `kMaximumAlignmentSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMaximumAlignmentSize` 进行赋值或初始化。
+- **L426** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L427** <code>  int alignment = gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L428** <code>    M, N, K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L429** <code>    element_A, ptr_A, lda, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L430** <code>    element_B, ptr_B, ldb, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L431** <code>    element_C, ptr_C, ldc, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L432** <code>    ptr_D, ldd, 0, kMaximumAlignmentSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L433** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L434** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L435** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L436** <code>  // Find the best kernel in descending order of preference.</code>
+  - EN: Comment that documents intent or context: "Find the best kernel in descending order of preference.".
+  - CN: 用于说明意图或上下文的注释："Find the best kernel in descending order of preference."。
+- **L437** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L438** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L439** <code>  GemmPreferenceKey preference_key(compute_capability(), alignment);</code>
+  - EN: Declares function or method `compute_capability` without defining it here.
+  - CN: 声明函数或方法 `compute_capability`，但不在此处给出定义。
+- **L440** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L441** <code>  Operation const *operation = find_gemm_operation(operators_it, preference_key);</code>
+  - EN: Declares function or method `find_gemm_operation` without defining it here.
+  - CN: 声明函数或方法 `find_gemm_operation`，但不在此处给出定义。
+- **L442** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L443** <code>  if (!operation) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L444** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L445** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L446** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L447** <code>  last_operation_ = operation;</code>
+  - EN: Assigns or initializes `last_operation_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `last_operation_` 进行赋值或初始化。
+- **L448** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L449** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L450** <code>  // Configure operation</code>
+  - EN: Comment that documents intent or context: "Configure operation".
+  - CN: 用于说明意图或上下文的注释："Configure operation"。
+- **L451** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L452** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L453** <code>  GemmConfiguration configuration{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L454** <code>    {M, N, K},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L455** <code>    lda,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L456** <code>    ldb,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L457** <code>    ldc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L458** <code>    ldd,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L459** <code>    1</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L460** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L461** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L462** <code>  // Query host work space size</code>
+  - EN: Comment that documents intent or context: "Query host work space size".
+  - CN: 用于说明意图或上下文的注释："Query host work space size"。
+- **L463** <code>  uint64_t host_workspace_size_needed = operation-&gt;get_host_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_host_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_host_workspace_size`，但不在此处给出定义。
+- **L464** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L465** <code>  if (uint64_t(kHostWorkspaceSize) &lt; host_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L466** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L467** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L468** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L469** <code>  char host_workspace[kHostWorkspaceSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L470** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L471** <code>  // Query device workspace size</code>
+  - EN: Comment that documents intent or context: "Query device workspace size".
+  - CN: 用于说明意图或上下文的注释："Query device workspace size"。
+- **L472** <code>  uint64_t device_workspace_size_needed = operation-&gt;get_device_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_device_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_device_workspace_size`，但不在此处给出定义。
+- **L473** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L474** <code>  if (uint64_t(workspace_size_) &lt; device_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L475** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L476** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L477** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L478** <code>  // Initialize host and device workspaces</code>
+  - EN: Comment that documents intent or context: "Initialize host and device workspaces".
+  - CN: 用于说明意图或上下文的注释："Initialize host and device workspaces"。
+- **L479** <code>  Status status = operation-&gt;initialize(</code>
+  - EN: Begins or continues the signature/call syntax involving `initialize`.
+  - CN: 开始或继续与 `initialize` 相关的签名/调用语法。
+- **L480** <code>    &amp;configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L481** <code>    host_workspace,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L482** <code>    workspace_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L483** <code>    stream_);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L484** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L485** <code>  if (status != cutlass::Status::kSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L486** <code>    return status;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L487** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L488** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L489** <code>  // Run the operator</code>
+  - EN: Comment that documents intent or context: "Run the operator".
+  - CN: 用于说明意图或上下文的注释："Run the operator"。
+- **L490** <code>  GemmArguments arguments{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L491** <code>    ptr_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L492** <code>    ptr_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L493** <code>    ptr_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L494** <code>    ptr_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L495** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L496** <code>    beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L497** <code>    scalar_pointer_mode_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L498** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L499** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L500** <code>  return operation-&gt;run(&amp;arguments, host_workspace, workspace_, stream_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L501** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L502** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L503** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L504** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L505** <code>/// Executes a GEMM computation: D &lt;= alpha * A*B + beta * C.</code>
+  - EN: Comment that documents intent or context: "Executes a GEMM computation: D <= alpha * A*B + beta * C.".
+  - CN: 用于说明意图或上下文的注释："Executes a GEMM computation: D <= alpha * A*B + beta * C."。
+- **L506** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L507** <code>// Supports batched-strided, batched array or split-K serial or split-K parallel.</code>
+  - EN: Comment that documents intent or context: "Supports batched-strided, batched array or split-K serial or split-K parallel.".
+  - CN: 用于说明意图或上下文的注释："Supports batched-strided, batched array or split-K serial or split-K parallel."。
+- **L508** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L509** <code>Status Handle::gemm_universal(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_universal`.
+  - CN: 开始或继续与 `gemm_universal` 相关的签名/调用语法。
+- **L510** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L511** <code>  GemmUniversalMode mode,                   /// indicates the mode in which the kUniversal GEMM is launched</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L512** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L513** <code>  int M,                                    /// GEMM M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L514** <code>  int N,                                    /// GEMM N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L515** <code>  int K,                                    /// GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L516** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L517** <code>  int cluster_m,                            /// cluster shape M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L518** <code>  int cluster_n,                            /// cluster shape N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L519** <code>  int cluster_k,                            /// cluster shape K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L520** <code>  int cluster_m_fallback,                   /// Fallback cluster shape M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L521** <code>  int cluster_n_fallback,                   /// Fallback cluster shape N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L522** <code>  int cluster_k_fallback,                   /// Fallback cluster shape K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L523** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L524** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L525** <code>  NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L526** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L527** <code>  NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L528** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L529** <code>  void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L530** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L531** <code>  NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L532** <code>  LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L533** <code>  ComplexTransform transform_A,             /// Complex transformation applied to A matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L534** <code>  void const * ptr_A,                       /// Pointer to A matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L535** <code>  int64_t lda,                              /// Leading dimension of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L536** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L537** <code>  NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L538** <code>  LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L539** <code>  ComplexTransform transform_B,             /// Complex transformation applied to B matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L540** <code>  void const * ptr_B,                       /// Pointer to B matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L541** <code>  int64_t ldb,                              /// Leading dimension of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L542** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L543** <code>  void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L544** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L545** <code>  NumericTypeID element_C,                  /// Data type of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L546** <code>  LayoutTypeID layout_C,                    /// Layout of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L547** <code>  void const * ptr_C,                       /// Pointer to C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L548** <code>  int64_t ldc,                              /// Leading dimension of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L549** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L550** <code>  NumericTypeID element_D,                  /// Data type of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L551** <code>  LayoutTypeID layout_D,                    /// Layout of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L552** <code>  void * ptr_D,                             /// Pointer to D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L553** <code>  int64_t ldd,                              /// Leading dimension of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L554** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L555** <code>  int batch_count,                          /// Batch count or number of split-K slices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L556** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L557** <code>  int64_t batch_stride_A,                   /// Batch stride of A operand</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L558** <code>  int64_t batch_stride_B,                   /// Batch stride of B operand</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L559** <code>  int64_t batch_stride_C,                   /// Batch stride of C operand</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L560** <code>  int64_t batch_stride_D                    /// Batch stride of D operand</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L561** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L562** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L563** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L564** <code>  // Find the operation</code>
+  - EN: Comment that documents intent or context: "Find the operation".
+  - CN: 用于说明意图或上下文的注释："Find the operation"。
+- **L565** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L566** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L567** <code>  GemmFunctionalKey key(</code>
+  - EN: Begins or continues the signature/call syntax involving `key`.
+  - CN: 开始或继续与 `key` 相关的签名/调用语法。
+- **L568** <code>    provider_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L569** <code>    GemmKind::kUniversal,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L570** <code>    element_compute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L571** <code>    element_scalar,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L572** <code>    element_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L573** <code>    layout_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L574** <code>    transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L575** <code>    element_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L576** <code>    layout_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L577** <code>    transform_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L578** <code>    element_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L579** <code>    layout_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L580** <code>    element_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L581** <code>    layout_D</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L582** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L583** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L584** <code>  auto operators_it = Singleton::get().operation_table.gemm_operations.find(key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L585** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L586** <code>  if (operators_it == Singleton::get().operation_table.gemm_operations.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L587** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L588** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L589** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L590** <code>  if (operators_it-&gt;second.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L591** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L592** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L593** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L594** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L595** <code>  // Compute the largest alignment restriction the kernel can satisfy.</code>
+  - EN: Comment that documents intent or context: "Compute the largest alignment restriction the kernel can satisfy.".
+  - CN: 用于说明意图或上下文的注释："Compute the largest alignment restriction the kernel can satisfy."。
+- **L596** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L597** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L598** <code>  // Maximum alignment expectation among all kernels (in units of bytes)</code>
+  - EN: Comment that documents intent or context: "Maximum alignment expectation among all kernels (in units of bytes)".
+  - CN: 用于说明意图或上下文的注释："Maximum alignment expectation among all kernels (in units of bytes)"。
+- **L599** <code>  int const kMaximumAlignmentSize = 16;</code>
+  - EN: Assigns or initializes `kMaximumAlignmentSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMaximumAlignmentSize` 进行赋值或初始化。
+- **L600** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L601** <code>  void const *ptr_A_check = ptr_A;</code>
+  - EN: Assigns or initializes `ptr_A_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_A_check` 进行赋值或初始化。
+- **L602** <code>  void const *ptr_B_check = ptr_B;</code>
+  - EN: Assigns or initializes `ptr_B_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_B_check` 进行赋值或初始化。
+- **L603** <code>  void const *ptr_C_check = ptr_C;</code>
+  - EN: Assigns or initializes `ptr_C_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_C_check` 进行赋值或初始化。
+- **L604** <code>  void *      ptr_D_check = ptr_D;</code>
+  - EN: Assigns or initializes `ptr_D_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_D_check` 进行赋值或初始化。
+- **L605** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L606** <code>  // Ignore alignment of pointers to pointers. We can&#x27;t check this from the host,</code>
+  - EN: Comment that documents intent or context: "Ignore alignment of pointers to pointers. We can't check this from the host,".
+  - CN: 用于说明意图或上下文的注释："Ignore alignment of pointers to pointers. We can't check this from the host,"。
+- **L607** <code>  // as each batch index has its own pointer in device memory.</code>
+  - EN: Comment that documents intent or context: "as each batch index has its own pointer in device memory.".
+  - CN: 用于说明意图或上下文的注释："as each batch index has its own pointer in device memory."。
+- **L608** <code>  if (mode == GemmUniversalMode::kArray) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L609** <code>    ptr_A_check = nullptr;</code>
+  - EN: Assigns or initializes `ptr_A_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_A_check` 进行赋值或初始化。
+- **L610** <code>    ptr_B_check = nullptr;</code>
+  - EN: Assigns or initializes `ptr_B_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_B_check` 进行赋值或初始化。
+- **L611** <code>    ptr_C_check = nullptr;</code>
+  - EN: Assigns or initializes `ptr_C_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_C_check` 进行赋值或初始化。
+- **L612** <code>    ptr_D_check = nullptr;</code>
+  - EN: Assigns or initializes `ptr_D_check` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr_D_check` 进行赋值或初始化。
+- **L613** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L614** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L615** <code>  int alignment = gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L616** <code>    M, N, K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L617** <code>    element_A, ptr_A_check, lda, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L618** <code>    element_B, ptr_B_check, ldb, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L619** <code>    element_C, ptr_C_check, ldc, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L620** <code>    ptr_D_check, ldd, 0, kMaximumAlignmentSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L621** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L622** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L623** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L624** <code>  // Find the best kernel in descending order of preference.</code>
+  - EN: Comment that documents intent or context: "Find the best kernel in descending order of preference.".
+  - CN: 用于说明意图或上下文的注释："Find the best kernel in descending order of preference."。
+- **L625** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L626** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L627** <code>  GemmPreferenceKey preference_key(compute_capability(), alignment);</code>
+  - EN: Declares function or method `compute_capability` without defining it here.
+  - CN: 声明函数或方法 `compute_capability`，但不在此处给出定义。
+- **L628** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L629** <code>  Operation const *operation = find_gemm_operation(operators_it, preference_key);</code>
+  - EN: Declares function or method `find_gemm_operation` without defining it here.
+  - CN: 声明函数或方法 `find_gemm_operation`，但不在此处给出定义。
+- **L630** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L631** <code>  if (!operation) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L632** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L633** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L634** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L635** <code>  last_operation_ = operation;</code>
+  - EN: Assigns or initializes `last_operation_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `last_operation_` 进行赋值或初始化。
+- **L636** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L637** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L638** <code>  // Configure operation</code>
+  - EN: Comment that documents intent or context: "Configure operation".
+  - CN: 用于说明意图或上下文的注释："Configure operation"。
+- **L639** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L640** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L641** <code>  GemmUniversalConfiguration configuration{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L642** <code>    mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L643** <code>    {M, N, K},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L644** <code>    {cluster_m, cluster_n, cluster_k}, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L645** <code>    {cluster_m_fallback, cluster_n_fallback, cluster_k_fallback}, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L646** <code>    batch_count,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L647** <code>    lda,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L648** <code>    ldb,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L649** <code>    ldc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L650** <code>    ldd</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L651** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L652** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L653** <code>  // Query host work space size</code>
+  - EN: Comment that documents intent or context: "Query host work space size".
+  - CN: 用于说明意图或上下文的注释："Query host work space size"。
+- **L654** <code>  uint64_t host_workspace_size_needed = operation-&gt;get_host_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_host_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_host_workspace_size`，但不在此处给出定义。
+- **L655** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L656** <code>  if (uint64_t(kHostWorkspaceSize) &lt; host_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L657** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L658** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L659** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L660** <code>  char host_workspace[kHostWorkspaceSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L661** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L662** <code>  GemmUniversalArguments arguments{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L663** <code>    {M, N, K},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L664** <code>    {cluster_m, cluster_n, cluster_k}, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L665** <code>    {cluster_m_fallback, cluster_n_fallback, cluster_k_fallback}, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L666** <code>    batch_count,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L667** <code>    ptr_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L668** <code>    ptr_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L669** <code>    ptr_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L670** <code>    ptr_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L671** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L672** <code>    beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L673** <code>    scalar_pointer_mode_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L674** <code>    lda,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L675** <code>    ldb,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L676** <code>    ldc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L677** <code>    ldd,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L678** <code>    batch_stride_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L679** <code>    batch_stride_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L680** <code>    batch_stride_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L681** <code>    batch_stride_D</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L682** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L683** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L684** <code>  // Query device workspace size</code>
+  - EN: Comment that documents intent or context: "Query device workspace size".
+  - CN: 用于说明意图或上下文的注释："Query device workspace size"。
+- **L685** <code>  uint64_t device_workspace_size_needed = operation-&gt;get_device_workspace_size(&amp;configuration, &amp;arguments);</code>
+  - EN: Declares function or method `get_device_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_device_workspace_size`，但不在此处给出定义。
+- **L686** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L687** <code>  if (uint64_t(workspace_size_) &lt; device_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L688** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L689** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L690** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L691** <code>  // Initialize host and device workspaces</code>
+  - EN: Comment that documents intent or context: "Initialize host and device workspaces".
+  - CN: 用于说明意图或上下文的注释："Initialize host and device workspaces"。
+- **L692** <code>  Status status = operation-&gt;initialize(</code>
+  - EN: Begins or continues the signature/call syntax involving `initialize`.
+  - CN: 开始或继续与 `initialize` 相关的签名/调用语法。
+- **L693** <code>    &amp;configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L694** <code>    host_workspace,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L695** <code>    workspace_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L696** <code>    stream_);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L697** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L698** <code>  if (status != cutlass::Status::kSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L699** <code>    return status;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L700** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L701** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L702** <code>  // Run the operator</code>
+  - EN: Comment that documents intent or context: "Run the operator".
+  - CN: 用于说明意图或上下文的注释："Run the operator"。
+- **L703** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L704** <code>  return operation-&gt;run(&amp;arguments, host_workspace, workspace_, stream_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L705** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L706** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L707** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L708** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L709** <code>/// Planar complex GEMM</code>
+  - EN: Comment that documents intent or context: "Planar complex GEMM".
+  - CN: 用于说明意图或上下文的注释："Planar complex GEMM"。
+- **L710** <code>Status Handle::gemm_planar_complex(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_planar_complex`.
+  - CN: 开始或继续与 `gemm_planar_complex` 相关的签名/调用语法。
+- **L711** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L712** <code>  int M,                                    /// GEMM M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L713** <code>  int N,                                    /// GEMM N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L714** <code>  int K,                                    /// GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L715** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L716** <code>  NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L717** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L718** <code>  NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L719** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L720** <code>  void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L721** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L722** <code>  NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L723** <code>  LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L724** <code>  ComplexTransform transform_A,             /// Complex transformation applied to A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L725** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L726** <code>  void const * ptr_A_real,                  /// Pointer to real part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L727** <code>  void const * ptr_A_imag,                  /// Pointer to imaginary part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L728** <code>  int64_t lda_real,                         /// Leading dimension of real part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L729** <code>  int64_t lda_imag,                         /// Leading dimension of imaginary part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L730** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L731** <code>  NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L732** <code>  LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L733** <code>  ComplexTransform transform_B,             /// Complex transformation applied to B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L734** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L735** <code>  void const * ptr_B_real,                  /// Pointer to real part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L736** <code>  void const * ptr_B_imag,                  /// Pointer to imaginary part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L737** <code>  int64_t ldb_real,                             /// Leading dimension of real part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L738** <code>  int64_t ldb_imag,                             /// Leading dimension of imaginary part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L739** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L740** <code>  void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L741** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L742** <code>  NumericTypeID element_C,                  /// Data type of C and D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L743** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L744** <code>  void const * ptr_C_real,                  /// Pointer to real part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L745** <code>  void const * ptr_C_imag,                  /// Pointer to imaginary part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L746** <code>  int64_t ldc_real,                             /// Leading dimension of real part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L747** <code>  int64_t ldc_imag,                             /// Leading dimension of imaginary part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L748** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L749** <code>  void * ptr_D_real,                        /// Pointer to real part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L750** <code>  void * ptr_D_imag,                        /// Pointer to imaginary part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L751** <code>  int64_t ldd_real,                             /// Leading dimension of real part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L752** <code>  int64_t ldd_imag,                             /// Leading dimension of imaginary part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L753** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L754** <code>  int batch_count,                          /// Number of batched GEMMs to execute</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L755** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L756** <code>  int64_t batch_stride_A_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L757** <code>  int64_t batch_stride_A_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L758** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L759** <code>  int64_t batch_stride_B_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L760** <code>  int64_t batch_stride_B_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L761** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L762** <code>  int64_t batch_stride_C_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L763** <code>  int64_t batch_stride_C_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L764** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L765** <code>  int64_t batch_stride_D_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L766** <code>  int64_t batch_stride_D_imag</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L767** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L768** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L769** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L770** <code>  // Find the operation</code>
+  - EN: Comment that documents intent or context: "Find the operation".
+  - CN: 用于说明意图或上下文的注释："Find the operation"。
+- **L771** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L772** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L773** <code>  GemmFunctionalKey key(</code>
+  - EN: Begins or continues the signature/call syntax involving `key`.
+  - CN: 开始或继续与 `key` 相关的签名/调用语法。
+- **L774** <code>    provider_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L775** <code>    GemmKind::kPlanarComplex,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L776** <code>    element_compute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L777** <code>    element_scalar,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L778** <code>    element_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L779** <code>    layout_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L780** <code>    transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L781** <code>    element_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L782** <code>    layout_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L783** <code>    transform_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L784** <code>    element_C,  // C/D are same type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L785** <code>    LayoutTypeID::kColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L786** <code>    element_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L787** <code>    LayoutTypeID::kColumnMajor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L788** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L789** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L790** <code>  auto operators_it = Singleton::get().operation_table.gemm_operations.find(key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L791** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L792** <code>  if (operators_it == Singleton::get().operation_table.gemm_operations.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L793** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L794** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L795** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L796** <code>  if (operators_it-&gt;second.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L797** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L798** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L799** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L800** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L801** <code>  // Compute the largest alignment restriction the kernel can satisfy.</code>
+  - EN: Comment that documents intent or context: "Compute the largest alignment restriction the kernel can satisfy.".
+  - CN: 用于说明意图或上下文的注释："Compute the largest alignment restriction the kernel can satisfy."。
+- **L802** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L803** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L804** <code>  // Maximum alignment expectation among all kernels (in units of bytes)</code>
+  - EN: Comment that documents intent or context: "Maximum alignment expectation among all kernels (in units of bytes)".
+  - CN: 用于说明意图或上下文的注释："Maximum alignment expectation among all kernels (in units of bytes)"。
+- **L805** <code>  int const kMaximumAlignmentSize = 16;</code>
+  - EN: Assigns or initializes `kMaximumAlignmentSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMaximumAlignmentSize` 进行赋值或初始化。
+- **L806** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L807** <code>  int alignment = std::max(</code>
+  - EN: Begins or continues the signature/call syntax involving `max`.
+  - CN: 开始或继续与 `max` 相关的签名/调用语法。
+- **L808** <code>    gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L809** <code>      M, N, K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L810** <code>      element_A, ptr_A_real, lda_real, batch_stride_A_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L811** <code>      element_B, ptr_B_real, ldb_real, batch_stride_B_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L812** <code>      element_C, ptr_C_real, ldc_real, batch_stride_C_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L813** <code>      ptr_D_real, ldd_real, batch_stride_D_real, kMaximumAlignmentSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L814** <code>    ),</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L815** <code>    gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L816** <code>      M, N, K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L817** <code>      element_A, ptr_A_imag, lda_imag, batch_stride_A_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L818** <code>      element_B, ptr_B_imag, ldb_imag, batch_stride_B_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L819** <code>      element_C, ptr_C_imag, ldc_imag, batch_stride_C_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L820** <code>      ptr_D_imag, ldd_imag, batch_stride_D_imag, kMaximumAlignmentSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L821** <code>    )</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L822** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L823** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L824** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L825** <code>  // Find the best kernel in descending order of preference.</code>
+  - EN: Comment that documents intent or context: "Find the best kernel in descending order of preference.".
+  - CN: 用于说明意图或上下文的注释："Find the best kernel in descending order of preference."。
+- **L826** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L827** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L828** <code>  GemmPreferenceKey preference_key(compute_capability(), alignment);</code>
+  - EN: Declares function or method `compute_capability` without defining it here.
+  - CN: 声明函数或方法 `compute_capability`，但不在此处给出定义。
+- **L829** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L830** <code>  Operation const *operation = find_gemm_operation(operators_it, preference_key);</code>
+  - EN: Declares function or method `find_gemm_operation` without defining it here.
+  - CN: 声明函数或方法 `find_gemm_operation`，但不在此处给出定义。
+- **L831** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L832** <code>  if (!operation) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L833** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L834** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L835** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L836** <code>  last_operation_ = operation;</code>
+  - EN: Assigns or initializes `last_operation_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `last_operation_` 进行赋值或初始化。
+- **L837** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L838** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L839** <code>  // Configure operation</code>
+  - EN: Comment that documents intent or context: "Configure operation".
+  - CN: 用于说明意图或上下文的注释："Configure operation"。
+- **L840** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L841** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L842** <code>  GemmPlanarComplexConfiguration configuration{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L843** <code>    GemmUniversalMode::kBatched,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L844** <code>    {M, N, K},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L845** <code>    batch_count,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L846** <code>    lda_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L847** <code>    lda_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L848** <code>    ldb_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L849** <code>    ldb_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L850** <code>    ldc_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L851** <code>    ldc_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L852** <code>    ldd_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L853** <code>    ldd_imag</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L854** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L855** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L856** <code>  // Query host work space size</code>
+  - EN: Comment that documents intent or context: "Query host work space size".
+  - CN: 用于说明意图或上下文的注释："Query host work space size"。
+- **L857** <code>  uint64_t host_workspace_size_needed = operation-&gt;get_host_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_host_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_host_workspace_size`，但不在此处给出定义。
+- **L858** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L859** <code>  if (uint64_t(kHostWorkspaceSize) &lt; host_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L860** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L861** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L862** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L863** <code>  char host_workspace[kHostWorkspaceSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L864** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L865** <code>  // Query device workspace size</code>
+  - EN: Comment that documents intent or context: "Query device workspace size".
+  - CN: 用于说明意图或上下文的注释："Query device workspace size"。
+- **L866** <code>  uint64_t device_workspace_size_needed = operation-&gt;get_device_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_device_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_device_workspace_size`，但不在此处给出定义。
+- **L867** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L868** <code>  if (uint64_t(workspace_size_) &lt; device_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L869** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L870** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L871** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L872** <code>  // Initialize host and device workspaces</code>
+  - EN: Comment that documents intent or context: "Initialize host and device workspaces".
+  - CN: 用于说明意图或上下文的注释："Initialize host and device workspaces"。
+- **L873** <code>  Status status = operation-&gt;initialize(</code>
+  - EN: Begins or continues the signature/call syntax involving `initialize`.
+  - CN: 开始或继续与 `initialize` 相关的签名/调用语法。
+- **L874** <code>    &amp;configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L875** <code>    host_workspace,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L876** <code>    workspace_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L877** <code>    stream_);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L878** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L879** <code>  if (status != cutlass::Status::kSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L880** <code>    return status;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L881** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L882** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L883** <code>  // Run the operator</code>
+  - EN: Comment that documents intent or context: "Run the operator".
+  - CN: 用于说明意图或上下文的注释："Run the operator"。
+- **L884** <code>  GemmPlanarComplexArguments arguments{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L885** <code>    ptr_A_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L886** <code>    ptr_A_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L887** <code>    ptr_B_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L888** <code>    ptr_B_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L889** <code>    ptr_C_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L890** <code>    ptr_C_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L891** <code>    ptr_D_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L892** <code>    ptr_D_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L893** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L894** <code>    beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L895** <code>    scalar_pointer_mode_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L896** <code>    batch_stride_A_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L897** <code>    batch_stride_A_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L898** <code>    batch_stride_B_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L899** <code>    batch_stride_B_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L900** <code>    batch_stride_C_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L901** <code>    batch_stride_C_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L902** <code>    batch_stride_D_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L903** <code>    batch_stride_D_imag</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L904** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L905** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L906** <code>  return operation-&gt;run(&amp;arguments, host_workspace, workspace_, stream_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L907** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L908** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L909** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L910** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L911** <code>/// Planar complex batched GEMM loading pointers from arrays in global memory</code>
+  - EN: Comment that documents intent or context: "Planar complex batched GEMM loading pointers from arrays in global memory".
+  - CN: 用于说明意图或上下文的注释："Planar complex batched GEMM loading pointers from arrays in global memory"。
+- **L912** <code>Status Handle::gemm_planar_complex_array(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_planar_complex_array`.
+  - CN: 开始或继续与 `gemm_planar_complex_array` 相关的签名/调用语法。
+- **L913** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L914** <code>  int expected_M,                           /// Expected GEMM M dimension (used for sizing CUDA grid)</code>
+  - EN: Begins or continues the signature/call syntax involving `dimension`.
+  - CN: 开始或继续与 `dimension` 相关的签名/调用语法。
+- **L915** <code>  int expected_N,                           /// Expected GEMM N dimension (used for sizing CUDA grid)</code>
+  - EN: Begins or continues the signature/call syntax involving `dimension`.
+  - CN: 开始或继续与 `dimension` 相关的签名/调用语法。
+- **L916** <code>  int expected_K,                           /// Expected GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L917** <code>  int batch_count,                          /// Number of independent GEMM computations to execute</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L918** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L919** <code>  int const *M,                             /// Array containing the GEMM M dimension for each batch index</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L920** <code>  int const *N,                             /// Array containing the GEMM N dimension for each batch index</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L921** <code>  int const *K,                             /// Array containing the GEMM K dimension for each batch index</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L922** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L923** <code>  NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L924** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L925** <code>  NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L926** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L927** <code>  void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L928** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L929** <code>  NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L930** <code>  LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L931** <code>  ComplexTransform transform_A,             /// Complex transformation applied to A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L932** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L933** <code>  void const * const * ptr_A_real,          /// Pointer to array containing pointers to real part of A matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L934** <code>  void const * const * ptr_A_imag,          /// Pointer to array containing pointers to imaginary part of A matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L935** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L936** <code>  int64_t lda_real,                             /// Leading dimension of real part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L937** <code>  int64_t lda_imag,                             /// Leading dimension of imaginary part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L938** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L939** <code>  NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L940** <code>  LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L941** <code>  ComplexTransform transform_B,             /// Complex transformation applied to B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L942** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L943** <code>  void const * const * ptr_B_real,          /// Pointer to array containing pointers to real part of B matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L944** <code>  void const * const * ptr_B_imag,          /// Pointer to array containing pointers to imaginary part of B matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L945** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L946** <code>  int64_t ldb_real,                             /// Leading dimension of real part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L947** <code>  int64_t ldb_imag,                             /// Leading dimension of imaginary part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L948** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L949** <code>  void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L950** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L951** <code>  NumericTypeID element_C,                  /// Data type of C and D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L952** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L953** <code>  void const * const * ptr_C_real,          /// Pointer to array containing pointers to real part of C matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L954** <code>  void const * const * ptr_C_imag,          /// Pointer to array containing pointers to imaginary part of C matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L955** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L956** <code>  int64_t ldc_real,                             /// Leading dimension of real part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L957** <code>  int64_t ldc_imag,                             /// Leading dimension of imaginary part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L958** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L959** <code>  void * const * ptr_D_real,                /// Pointer to array containing pointers to real part of D matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L960** <code>  void * const * ptr_D_imag,                /// Pointer to array containing pointers to imaginary part of D matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L961** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L962** <code>  int64_t ldd_real,                             /// Leading dimension of real part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L963** <code>  int64_t ldd_imag                              /// Leading dimension of imaginary part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L964** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L965** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L966** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L967** <code>  // Find the operation</code>
+  - EN: Comment that documents intent or context: "Find the operation".
+  - CN: 用于说明意图或上下文的注释："Find the operation"。
+- **L968** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L969** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L970** <code>  GemmFunctionalKey key(</code>
+  - EN: Begins or continues the signature/call syntax involving `key`.
+  - CN: 开始或继续与 `key` 相关的签名/调用语法。
+- **L971** <code>    provider_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L972** <code>    GemmKind::kPlanarComplexArray,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L973** <code>    element_compute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L974** <code>    element_scalar,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L975** <code>    element_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L976** <code>    layout_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L977** <code>    transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L978** <code>    element_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L979** <code>    layout_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L980** <code>    transform_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L981** <code>    element_C,  // C/D are same type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L982** <code>    LayoutTypeID::kColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L983** <code>    element_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L984** <code>    LayoutTypeID::kColumnMajor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L985** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L986** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L987** <code>  auto operators_it = Singleton::get().operation_table.gemm_operations.find(key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L988** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L989** <code>  if (operators_it == Singleton::get().operation_table.gemm_operations.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L990** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L991** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L992** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L993** <code>  if (operators_it-&gt;second.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L994** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L995** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L996** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L997** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L998** <code>  // Compute the largest alignment restriction the kernel can satisfy.</code>
+  - EN: Comment that documents intent or context: "Compute the largest alignment restriction the kernel can satisfy.".
+  - CN: 用于说明意图或上下文的注释："Compute the largest alignment restriction the kernel can satisfy."。
+- **L999** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1000** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1001** <code>  // Maximum alignment expectation among all kernels (in units of bytes)</code>
+  - EN: Comment that documents intent or context: "Maximum alignment expectation among all kernels (in units of bytes)".
+  - CN: 用于说明意图或上下文的注释："Maximum alignment expectation among all kernels (in units of bytes)"。
+- **L1002** <code>  int const kMaximumAlignmentSize = 16;</code>
+  - EN: Assigns or initializes `kMaximumAlignmentSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMaximumAlignmentSize` 进行赋值或初始化。
+- **L1003** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1004** <code>  int alignment = std::max(</code>
+  - EN: Begins or continues the signature/call syntax involving `max`.
+  - CN: 开始或继续与 `max` 相关的签名/调用语法。
+- **L1005** <code>    gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L1006** <code>      expected_M, expected_N, expected_K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1007** <code>      element_A, nullptr, lda_real, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1008** <code>      element_B, nullptr, ldb_real, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1009** <code>      element_C, nullptr, ldc_real, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1010** <code>      nullptr, ldd_real, 0, kMaximumAlignmentSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1011** <code>    ),</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1012** <code>    gemm_problem_alignment(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_problem_alignment`.
+  - CN: 开始或继续与 `gemm_problem_alignment` 相关的签名/调用语法。
+- **L1013** <code>      expected_M, expected_N, expected_K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1014** <code>      element_A, nullptr, lda_imag, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1015** <code>      element_B, nullptr, ldb_imag, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1016** <code>      element_C, nullptr, ldc_imag, 0,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1017** <code>      nullptr, ldd_imag, 0, kMaximumAlignmentSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1018** <code>    )</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L1019** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1020** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1021** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1022** <code>  // Find the best kernel in descending order of preference.</code>
+  - EN: Comment that documents intent or context: "Find the best kernel in descending order of preference.".
+  - CN: 用于说明意图或上下文的注释："Find the best kernel in descending order of preference."。
+- **L1023** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1024** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1025** <code>  GemmPreferenceKey preference_key(compute_capability(), alignment);</code>
+  - EN: Declares function or method `compute_capability` without defining it here.
+  - CN: 声明函数或方法 `compute_capability`，但不在此处给出定义。
+- **L1026** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1027** <code>  Operation const *operation = find_gemm_operation(operators_it, preference_key);</code>
+  - EN: Declares function or method `find_gemm_operation` without defining it here.
+  - CN: 声明函数或方法 `find_gemm_operation`，但不在此处给出定义。
+- **L1028** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1029** <code>  if (!operation) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1030** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1031** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1032** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1033** <code>  last_operation_ = operation;</code>
+  - EN: Assigns or initializes `last_operation_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `last_operation_` 进行赋值或初始化。
+- **L1034** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1035** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1036** <code>  // Configure operation</code>
+  - EN: Comment that documents intent or context: "Configure operation".
+  - CN: 用于说明意图或上下文的注释："Configure operation"。
+- **L1037** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1038** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1039** <code>  GemmPlanarComplexArrayConfiguration configuration{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L1040** <code>    {expected_M, expected_N, expected_K},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1041** <code>    batch_count,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1042** <code>    lda_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1043** <code>    lda_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1044** <code>    ldb_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1045** <code>    ldb_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1046** <code>    ldc_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1047** <code>    ldc_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1048** <code>    ldd_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1049** <code>    ldd_imag</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1050** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1051** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1052** <code>  // Query host work space size</code>
+  - EN: Comment that documents intent or context: "Query host work space size".
+  - CN: 用于说明意图或上下文的注释："Query host work space size"。
+- **L1053** <code>  uint64_t host_workspace_size_needed = operation-&gt;get_host_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_host_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_host_workspace_size`，但不在此处给出定义。
+- **L1054** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1055** <code>  if (uint64_t(kHostWorkspaceSize) &lt; host_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1056** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1057** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1058** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1059** <code>  char host_workspace[kHostWorkspaceSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1060** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1061** <code>  // Query device workspace size</code>
+  - EN: Comment that documents intent or context: "Query device workspace size".
+  - CN: 用于说明意图或上下文的注释："Query device workspace size"。
+- **L1062** <code>  uint64_t device_workspace_size_needed = operation-&gt;get_device_workspace_size(&amp;configuration);</code>
+  - EN: Declares function or method `get_device_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_device_workspace_size`，但不在此处给出定义。
+- **L1063** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1064** <code>  if (uint64_t(workspace_size_) &lt; device_workspace_size_needed) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1065** <code>    return cutlass::Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1066** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1067** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1068** <code>  // Initialize host and device workspaces</code>
+  - EN: Comment that documents intent or context: "Initialize host and device workspaces".
+  - CN: 用于说明意图或上下文的注释："Initialize host and device workspaces"。
+- **L1069** <code>  Status status = operation-&gt;initialize(</code>
+  - EN: Begins or continues the signature/call syntax involving `initialize`.
+  - CN: 开始或继续与 `initialize` 相关的签名/调用语法。
+- **L1070** <code>    &amp;configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1071** <code>    host_workspace,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1072** <code>    workspace_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1073** <code>    stream_);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1074** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1075** <code>  if (status != cutlass::Status::kSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1076** <code>    return status;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1077** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1078** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1079** <code>  // Run the operator</code>
+  - EN: Comment that documents intent or context: "Run the operator".
+  - CN: 用于说明意图或上下文的注释："Run the operator"。
+- **L1080** <code>  GemmPlanarComplexArrayArguments arguments{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L1081** <code>    M, N, K,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1082** <code>    ptr_A_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1083** <code>    ptr_A_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1084** <code>    ptr_B_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1085** <code>    ptr_B_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1086** <code>    ptr_C_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1087** <code>    ptr_C_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1088** <code>    ptr_D_real,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1089** <code>    ptr_D_imag,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1090** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1091** <code>    beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1092** <code>    scalar_pointer_mode_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1093** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1094** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1095** <code>  return operation-&gt;run(&amp;arguments, host_workspace, workspace_, stream_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1096** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1097** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1098** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1099** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1100** <code>/// Finds conv operation instances with Conv::ElementC = Reduction::ElementWorkspace</code>
+  - EN: Comment that documents intent or context: "Finds conv operation instances with Conv::ElementC = Reduction::ElementWorkspace".
+  - CN: 用于说明意图或上下文的注释："Finds conv operation instances with Conv::ElementC = Reduction::ElementWorkspace"。
+- **L1101** <code>Operation const* find_conv_operation_for_parallel_reduction(Operation const *operation) {</code>
+  - EN: Begins the definition of function or method `find_conv_operation_for_parallel_reduction`.
+  - CN: 开始定义函数或方法 `find_conv_operation_for_parallel_reduction`。
+- **L1102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1103** <code>  ConvDescription const &amp;conv_desc =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1104** <code>    static_cast&lt;ConvDescription const &amp;&gt;(operation-&gt;description());</code>
+  - EN: Declares function or method `description` without defining it here.
+  - CN: 声明函数或方法 `description`，但不在此处给出定义。
+- **L1105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1106** <code>  // if the curren conv operation accumulator and output data type match return operation</code>
+  - EN: Comment that documents intent or context: "if the curren conv operation accumulator and output data type match return operation".
+  - CN: 用于说明意图或上下文的注释："if the curren conv operation accumulator and output data type match return operation"。
+- **L1107** <code>  if(conv_desc.tile_description.math_instruction.element_accumulator == conv_desc.C.element) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1108** <code>    return operation;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1109** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1111** <code>  // find conv operation to match conv output and reduction workspace data type</code>
+  - EN: Comment that documents intent or context: "find conv operation to match conv output and reduction workspace data type".
+  - CN: 用于说明意图或上下文的注释："find conv operation to match conv output and reduction workspace data type"。
+- **L1112** <code>  ConvFunctionalKey key(</code>
+  - EN: Begins or continues the signature/call syntax involving `key`.
+  - CN: 开始或继续与 `key` 相关的签名/调用语法。
+- **L1113** <code>    library::Provider::kCUTLASS,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1114** <code>    conv_desc.conv_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1115** <code>    conv_desc.A.element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1116** <code>    conv_desc.A.layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1117** <code>    conv_desc.B.element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1118** <code>    conv_desc.B.layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1119** <code>    conv_desc.tile_description.math_instruction.element_accumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1120** <code>    conv_desc.C.layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1121** <code>    conv_desc.tile_description.math_instruction.element_accumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1122** <code>    conv_desc.element_epilogue);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1124** <code>  // conv operation table for conv2d or conv3d</code>
+  - EN: Comment that documents intent or context: "conv operation table for conv2d or conv3d".
+  - CN: 用于说明意图或上下文的注释："conv operation table for conv2d or conv3d"。
+- **L1125** <code>  auto conv_operations = (conv_desc.kind == OperationKind::kConv2d) ?</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1126** <code>                          Singleton::get().operation_table.conv2d_operations :</code>
+  - EN: Begins the definition of function or method `get`.
+  - CN: 开始定义函数或方法 `get`。
+- **L1127** <code>                          Singleton::get().operation_table.conv3d_operations;</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L1128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1129** <code>  // find ConvFunctionalKey in convolution operation table</code>
+  - EN: Comment that documents intent or context: "find ConvFunctionalKey in convolution operation table".
+  - CN: 用于说明意图或上下文的注释："find ConvFunctionalKey in convolution operation table"。
+- **L1130** <code>  auto operators_it = conv_operations.find(key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L1131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1132** <code>  if (operators_it == conv_operations.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1133** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1134** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1135** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1136** <code>  if (operators_it-&gt;second.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1137** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1138** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1140** <code>  // conv operation for same compute capability and iterator algorithm</code>
+  - EN: Comment that documents intent or context: "conv operation for same compute capability and iterator algorithm".
+  - CN: 用于说明意图或上下文的注释："conv operation for same compute capability and iterator algorithm"。
+- **L1141** <code>  ConvPreferenceKey preference_key(</code>
+  - EN: Begins or continues the signature/call syntax involving `preference_key`.
+  - CN: 开始或继续与 `preference_key` 相关的签名/调用语法。
+- **L1142** <code>    conv_desc.tile_description.minimum_compute_capability,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1143** <code>    conv_desc.iterator_algorithm);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1145** <code>  auto it = operators_it-&gt;second.find(preference_key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L1146** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1147** <code>  if(it == operators_it-&gt;second.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1148** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1149** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1151** <code>  // return matching conv opertion (same tile sizes and instruction)</code>
+  - EN: Comment that documents intent or context: "return matching conv opertion (same tile sizes and instruction)".
+  - CN: 用于说明意图或上下文的注释："return matching conv opertion (same tile sizes and instruction)"。
+- **L1152** <code>  for (auto op : it-&gt;second) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1153** <code>    if (op-&gt;description().tile_description == operation-&gt;description().tile_description) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1154** <code>      return op;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1155** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1156** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1157** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1158** <code>  return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1159** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1161** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1163** <code>/// Finds gemm operation instances with Gemm::ElementC = Reduction::ElementWorkspace</code>
+  - EN: Comment that documents intent or context: "Finds gemm operation instances with Gemm::ElementC = Reduction::ElementWorkspace".
+  - CN: 用于说明意图或上下文的注释："Finds gemm operation instances with Gemm::ElementC = Reduction::ElementWorkspace"。
+- **L1164** <code>Operation const* find_gemm_operation_for_parallel_reduction(Operation const *operation) {</code>
+  - EN: Begins the definition of function or method `find_gemm_operation_for_parallel_reduction`.
+  - CN: 开始定义函数或方法 `find_gemm_operation_for_parallel_reduction`。
+- **L1165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1166** <code>  GemmDescription const &amp;gemm_desc =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1167** <code>    static_cast&lt;GemmDescription const &amp;&gt;(operation-&gt;description());</code>
+  - EN: Declares function or method `description` without defining it here.
+  - CN: 声明函数或方法 `description`，但不在此处给出定义。
+- **L1168** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1169** <code>  // if the curren gemm operation accumulator and output data type match return operation</code>
+  - EN: Comment that documents intent or context: "if the curren gemm operation accumulator and output data type match return operation".
+  - CN: 用于说明意图或上下文的注释："if the curren gemm operation accumulator and output data type match return operation"。
+- **L1170** <code>  if(gemm_desc.tile_description.math_instruction.element_accumulator == gemm_desc.D.element) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1171** <code>    return operation;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1172** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1173** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1174** <code>  // find gemm operation to match gemm output and reduction workspace data type</code>
+  - EN: Comment that documents intent or context: "find gemm operation to match gemm output and reduction workspace data type".
+  - CN: 用于说明意图或上下文的注释："find gemm operation to match gemm output and reduction workspace data type"。
+- **L1175** <code>  GemmFunctionalKey key(</code>
+  - EN: Begins or continues the signature/call syntax involving `key`.
+  - CN: 开始或继续与 `key` 相关的签名/调用语法。
+- **L1176** <code>    library::Provider::kCUTLASS,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1177** <code>    gemm_desc.gemm_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1178** <code>    gemm_desc.tile_description.math_instruction.element_accumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1179** <code>    gemm_desc.element_epilogue,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1180** <code>    gemm_desc.A.element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1181** <code>    gemm_desc.A.layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1182** <code>    gemm_desc.transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1183** <code>    gemm_desc.B.element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1184** <code>    gemm_desc.B.layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1185** <code>    gemm_desc.transform_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1186** <code>    gemm_desc.tile_description.math_instruction.element_accumulator, // C/D are same type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1187** <code>    LayoutTypeID::kColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1188** <code>    gemm_desc.tile_description.math_instruction.element_accumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1189** <code>    LayoutTypeID::kColumnMajor);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1191** <code>  // gemm operation table</code>
+  - EN: Comment that documents intent or context: "gemm operation table".
+  - CN: 用于说明意图或上下文的注释："gemm operation table"。
+- **L1192** <code>  auto gemm_operations = Singleton::get().operation_table.gemm_operations;</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L1193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1194** <code>  // find ConvFunctionalKey in gemm operation table</code>
+  - EN: Comment that documents intent or context: "find ConvFunctionalKey in gemm operation table".
+  - CN: 用于说明意图或上下文的注释："find ConvFunctionalKey in gemm operation table"。
+- **L1195** <code>  auto operators_it = gemm_operations.find(key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L1196** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1197** <code>  if (operators_it == gemm_operations.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1198** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1199** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1200** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1201** <code>  if (operators_it-&gt;second.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1202** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1203** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1204** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1205** <code>  // gemm operation for same compute capability and max operand alignment</code>
+  - EN: Comment that documents intent or context: "gemm operation for same compute capability and max operand alignment".
+  - CN: 用于说明意图或上下文的注释："gemm operation for same compute capability and max operand alignment"。
+- **L1206** <code>  int alignment = std::max(</code>
+  - EN: Begins or continues the signature/call syntax involving `max`.
+  - CN: 开始或继续与 `max` 相关的签名/调用语法。
+- **L1207** <code>    gemm_desc.A.alignment,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1208** <code>    gemm_desc.B.alignment);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1209** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1210** <code>  GemmPreferenceKey preference_key(</code>
+  - EN: Begins or continues the signature/call syntax involving `preference_key`.
+  - CN: 开始或继续与 `preference_key` 相关的签名/调用语法。
+- **L1211** <code>    gemm_desc.tile_description.minimum_compute_capability,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1212** <code>    alignment);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1213** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1214** <code>  auto it = operators_it-&gt;second.find(preference_key);</code>
+  - EN: Declares function or method `find` without defining it here.
+  - CN: 声明函数或方法 `find`，但不在此处给出定义。
+- **L1215** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1216** <code>  if(it == operators_it-&gt;second.end()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1217** <code>    return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1218** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1219** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1220** <code>  // return matching gemm opertion (same tile shape, stages, warp count, and instruction)</code>
+  - EN: Comment that documents intent or context: "return matching gemm opertion (same tile shape, stages, warp count, and instruction)".
+  - CN: 用于说明意图或上下文的注释："return matching gemm opertion (same tile shape, stages, warp count, and instruction)"。
+- **L1221** <code>  for (auto op : it-&gt;second) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1222** <code>    if (op-&gt;description().tile_description == operation-&gt;description().tile_description) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1223** <code>      return op;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1224** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1225** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1226** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1227** <code>  // return nullptr if no matching gemm operation found for parallel split-k reduction</code>
+  - EN: Comment that documents intent or context: "return nullptr if no matching gemm operation found for parallel split-k reduction".
+  - CN: 用于说明意图或上下文的注释："return nullptr if no matching gemm operation found for parallel split-k reduction"。
+- **L1228** <code>  return nullptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1229** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1230** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1231** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1232** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1233** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1234** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1235** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1236** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>iostream</code> — standard stream input/output support / 标准流输入输出支持
+- <code>stdexcept</code> — APIs or definitions from `stdexcept` / 来自 `stdexcept` 的 API 或定义
+- <code>cstdint</code> — fixed-width integer types / 定宽整数类型
+- <code>cutlass/library/handle.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/singleton.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/util.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据

@@ -1,0 +1,1748 @@
+# gemm_testbed.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/python/cutlass/gemm/gemm_testbed.py`
+**Purpose / 用途**: This helper module provides shared support code for gemm testbed tests. / 该辅助模块为 gemm testbed 测试提供共享支持代码。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `#################################################################################################`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 2 / 第2行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 3 / 第3行**
+  - Code / 代码: `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 4 / 第4行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 5 / 第5行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 7 / 第7行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 10 / 第10行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 14 / 第14行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 18 / 第18行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 29 / 第29行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 30 / 第30行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 31 / 第31行**
+  - Code / 代码: `#################################################################################################`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 32 / 第32行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 33 / 第33行**
+  - Code / 代码: `from math import prod`
+  - EN: Imports selected symbols from `math` for later use.
+  - CN: 从 `math` 导入选定符号以供后续使用。
+- **Line 34 / 第34行**
+  - Code / 代码: `import os`
+  - EN: Imports `os` so its symbols are available to the test module.
+  - CN: 导入 `os`，使其符号可供该测试模块使用。
+- **Line 35 / 第35行**
+  - Code / 代码: `import re`
+  - EN: Imports `re` so its symbols are available to the test module.
+  - CN: 导入 `re`，使其符号可供该测试模块使用。
+- **Line 36 / 第36行**
+  - Code / 代码: `import subprocess`
+  - EN: Imports `subprocess` so its symbols are available to the test module.
+  - CN: 导入 `subprocess`，使其符号可供该测试模块使用。
+- **Line 37 / 第37行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 38 / 第38行**
+  - Code / 代码: `import torch`
+  - EN: Imports `torch` so its symbols are available to the test module.
+  - CN: 导入 `torch`，使其符号可供该测试模块使用。
+- **Line 39 / 第39行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 40 / 第40行**
+  - Code / 代码: `from cutlass_library import (`
+  - EN: Imports selected symbols from `cutlass_library` for later use.
+  - CN: 从 `cutlass_library` 导入选定符号以供后续使用。
+- **Line 41 / 第41行**
+  - Code / 代码: `    DataType,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 42 / 第42行**
+  - Code / 代码: `    DataTypeSize,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 43 / 第43行**
+  - Code / 代码: `    GemmUniversalMode,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 44 / 第44行**
+  - Code / 代码: `    LayoutType,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 45 / 第45行**
+  - Code / 代码: `    OpcodeClass,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 46 / 第46行**
+  - Code / 代码: `    ShortDataTypeNames,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 47 / 第47行**
+  - Code / 代码: `    SwizzlingFunctor`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 48 / 第48行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 49 / 第49行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 50 / 第50行**
+  - Code / 代码: `from cutlass_cppgen.backend import compiler`
+  - EN: Imports selected symbols from `cutlass_cppgen.backend` for later use.
+  - CN: 从 `cutlass_cppgen.backend` 导入选定符号以供后续使用。
+- **Line 51 / 第51行**
+  - Code / 代码: `from cutlass_cppgen.backend.gemm_operation import GemmArguments, GemmOperationUniversal`
+  - EN: Imports selected symbols from `cutlass_cppgen.backend.gemm_operation` for later use.
+  - CN: 从 `cutlass_cppgen.backend.gemm_operation` 导入选定符号以供后续使用。
+- **Line 52 / 第52行**
+  - Code / 代码: `from cutlass_cppgen.backend.reduction_operation import ReductionArguments, ReductionOperation`
+  - EN: Imports selected symbols from `cutlass_cppgen.backend.reduction_operation` for later use.
+  - CN: 从 `cutlass_cppgen.backend.reduction_operation` 导入选定符号以供后续使用。
+- **Line 53 / 第53行**
+  - Code / 代码: `from cutlass_cppgen.shape import GemmCoord, MatrixCoord`
+  - EN: Imports selected symbols from `cutlass_cppgen.shape` for later use.
+  - CN: 从 `cutlass_cppgen.shape` 导入选定符号以供后续使用。
+- **Line 54 / 第54行**
+  - Code / 代码: `from cutlass_cppgen.utils.datatypes import torch_type`
+  - EN: Imports selected symbols from `cutlass_cppgen.utils.datatypes` for later use.
+  - CN: 从 `cutlass_cppgen.utils.datatypes` 导入选定符号以供后续使用。
+- **Line 55 / 第55行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 56 / 第56行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 57 / 第57行**
+  - Code / 代码: `class GemmUniversalLauncher:`
+  - EN: Declares class `GemmUniversalLauncher` to group related tests or helpers.
+  - CN: 声明类 `GemmUniversalLauncher`，用于组织相关测试或辅助逻辑。
+- **Line 58 / 第58行**
+  - Code / 代码: `    def __init__(`
+  - EN: Defines function `__init__`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `__init__`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 59 / 第59行**
+  - Code / 代码: `        self,`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 60 / 第60行**
+  - Code / 代码: `        operation,`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 61 / 第61行**
+  - Code / 代码: `        seed=2080,`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 62 / 第62行**
+  - Code / 代码: `        verification=True,`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 63 / 第63行**
+  - Code / 代码: `        iterations=500,`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 64 / 第64行**
+  - Code / 代码: `        compiler_mode= "nvcc",`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 65 / 第65行**
+  - Code / 代码: `        **kwargs,`
+  - EN: Continues the multi-line function signature for `__init__`.
+  - CN: 继续 `__init__` 的多行函数签名。
+- **Line 66 / 第66行**
+  - Code / 代码: `    ) -> None:`
+  - EN: Completes the multi-line function signature for `__init__`.
+  - CN: 完成 `__init__` 的多行函数签名。
+- **Line 67 / 第67行**
+  - Code / 代码: `        self.math_operation = operation.tile_description.math_instruction.math_operation`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 68 / 第68行**
+  - Code / 代码: `        self.verification = verification`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 69 / 第69行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 70 / 第70行**
+  - Code / 代码: `        if compiler_mode == "nvcc":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 71 / 第71行**
+  - Code / 代码: `            compiler.nvcc()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 72 / 第72行**
+  - Code / 代码: `        elif compiler_mode == "nvrtc":`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 73 / 第73行**
+  - Code / 代码: `            compiler.nvrtc()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 74 / 第74行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 75 / 第75行**
+  - Code / 代码: `            raise Exception(f"Unexpected compiler string {compiler_mode}")`
+  - EN: Raises an exception to report an invalid or unexpected state.
+  - CN: 抛出异常以报告无效或意外状态。
+- **Line 76 / 第76行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 77 / 第77行**
+  - Code / 代码: `        op_list = [operation]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 78 / 第78行**
+  - Code / 代码: `        if operation.arch < 90:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 79 / 第79行**
+  - Code / 代码: `            # Split K via Python is currently only supported for pre-SM90 kernels`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 80 / 第80行**
+  - Code / 代码: `            self.reduction_operation: ReductionOperation = ReductionOperation(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 81 / 第81行**
+  - Code / 代码: `                shape=MatrixCoord(4, 32 * operation.C.alignment),`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 82 / 第82行**
+  - Code / 代码: `                C=operation.C,`
+  - EN: Defines module-level constant `C` used later in the file.
+  - CN: 定义模块级常量 `C`，供后续代码使用。
+- **Line 83 / 第83行**
+  - Code / 代码: `                element_accumulator=operation.tile_description.math_instruction.element_accumulator,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 84 / 第84行**
+  - Code / 代码: `                element_compute=operation.epilogue_functor.element_epilogue,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 85 / 第85行**
+  - Code / 代码: `                epilogue_functor=operation.epilogue_functor,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 86 / 第86行**
+  - Code / 代码: `                count=operation.C.alignment,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 87 / 第87行**
+  - Code / 代码: `            )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 88 / 第88行**
+  - Code / 代码: `            op_list.append(self.reduction_operation)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 89 / 第89行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 90 / 第90行**
+  - Code / 代码: `        compiler.add_module(op_list, bypass_cache=False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 91 / 第91行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 92 / 第92行**
+  - Code / 代码: `        self.operation = operation`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 93 / 第93行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 94 / 第94行**
+  - Code / 代码: `        self.dtype_A = torch_type(operation.A.element if not self.operation.switched else self.operation.B.element)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 95 / 第95行**
+  - Code / 代码: `        self.dtype_B = torch_type(operation.B.element if not self.operation.switched else self.operation.A.element)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 96 / 第96行**
+  - Code / 代码: `        self.dtype_C = torch_type(operation.C.element)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 97 / 第97行**
+  - Code / 代码: `        self.dtype_D = torch_type(operation.epilogue_functor.element_output)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 98 / 第98行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 99 / 第99行**
+  - Code / 代码: `        element_size = min(DataTypeSize[operation.A.element], DataTypeSize[operation.B.element])`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 100 / 第100行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 101 / 第101行**
+  - Code / 代码: `        if element_size == 1:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 102 / 第102行**
+  - Code / 代码: `            self.rand_max = 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 103 / 第103行**
+  - Code / 代码: `            self.rand_min = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 104 / 第104行**
+  - Code / 代码: `        elif element_size <= 8:`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 105 / 第105行**
+  - Code / 代码: `            self.rand_max = 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 106 / 第106行**
+  - Code / 代码: `            self.rand_min = -1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 107 / 第107行**
+  - Code / 代码: `        elif element_size == 16:`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 108 / 第108行**
+  - Code / 代码: `            self.rand_max = 4`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 109 / 第109行**
+  - Code / 代码: `            self.rand_min = -4`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 110 / 第110行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 111 / 第111行**
+  - Code / 代码: `            self.rand_max = 8`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 112 / 第112行**
+  - Code / 代码: `            self.rand_min = -8`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 113 / 第113行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 114 / 第114行**
+  - Code / 代码: `        self.seed = seed`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 115 / 第115行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 116 / 第116行**
+  - Code / 代码: `        self.compute_type = operation.epilogue_functor.element_epilogue`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 117 / 第117行**
+  - Code / 代码: `        self.accumulator_type = operation.tile_description.math_instruction.element_accumulator`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 118 / 第118行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 119 / 第119行**
+  - Code / 代码: `    def print_problem_size(self, p, mode, batch_count):`
+  - EN: Defines function `print_problem_size`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `print_problem_size`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 120 / 第120行**
+  - Code / 代码: `        if mode == GemmUniversalMode.Gemm:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 121 / 第121行**
+  - Code / 代码: `            mode = "Gemm"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 122 / 第122行**
+  - Code / 代码: `        elif mode == GemmUniversalMode.Batched:`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 123 / 第123行**
+  - Code / 代码: `            mode = "GemmBatched"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 124 / 第124行**
+  - Code / 代码: `        elif mode == GemmUniversalMode.GemmSplitKParallel:`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 125 / 第125行**
+  - Code / 代码: `            mode = "GemmSplitKParallel"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 126 / 第126行**
+  - Code / 代码: `        print(f"problem: {p.m}, {p.n}, {p.k}\n batch_count: {batch_count}\n mode: {mode}")`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 127 / 第127行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 128 / 第128行**
+  - Code / 代码: `    def uniform_init(self, shape, dtype, layout):`
+  - EN: Defines function `uniform_init`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `uniform_init`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 129 / 第129行**
+  - Code / 代码: `        size = prod(shape)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 130 / 第130行**
+  - Code / 代码: `        if dtype.is_floating_point:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 131 / 第131行**
+  - Code / 代码: `            # Initialize data in FP32 and call convert to the data type we desire.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 132 / 第132行**
+  - Code / 代码: `            # This is a workaround for the following error that occurs when attempting to`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 133 / 第133行**
+  - Code / 代码: `            # call uniform_ on a tensor with torch.float8_e4m3fn data:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 134 / 第134行**
+  - Code / 代码: `            # RuntimeError: "check_uniform_bounds" not implemented for 'Float8_e4m3fn'`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 135 / 第135行**
+  - Code / 代码: `            data = torch.ceil(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 136 / 第136行**
+  - Code / 代码: `                torch.empty(size=(size,), dtype=torch.float32, device="cuda").uniform_(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 137 / 第137行**
+  - Code / 代码: `                    self.rand_min - 0.5, self.rand_max - 0.5)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 138 / 第138行**
+  - Code / 代码: `                ).to(dtype)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 139 / 第139行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 140 / 第140行**
+  - Code / 代码: `            # PyTorch does not currently support integer-typed matrix multiplications on GPU.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 141 / 第141行**
+  - Code / 代码: `            # Fall back to CPU for integer type references.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 142 / 第142行**
+  - Code / 代码: `            data = torch.empty(size=(size,), dtype=dtype, device="cpu").random_(self.rand_min, self.rand_max + 1)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 143 / 第143行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 144 / 第144行**
+  - Code / 代码: `        is_fp8 = dtype == getattr(torch, "float8_e4m3fn", -1) or dtype == dtype == getattr(torch, "float8_e5m2", -1)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 145 / 第145行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 146 / 第146行**
+  - Code / 代码: `        if dtype == torch.float64 or dtype == torch.float32 or is_fp8:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 147 / 第147行**
+  - Code / 代码: `            data = data.to("cpu")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 148 / 第148行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 149 / 第149行**
+  - Code / 代码: `        data_ref = data.reshape(shape)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 150 / 第150行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 151 / 第151行**
+  - Code / 代码: `        if layout == LayoutType.RowMajor:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 152 / 第152行**
+  - Code / 代码: `            data_cutlass = data_ref`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 153 / 第153行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 154 / 第154行**
+  - Code / 代码: `            data_cutlass = data_ref.transpose(-1, -2).contiguous()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 155 / 第155行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 156 / 第156行**
+  - Code / 代码: `        data_cutlass = data_cutlass.to("cuda")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 157 / 第157行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 158 / 第158行**
+  - Code / 代码: `        # As of this writing, few operations in PyTorch are supported with FP8 data.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 159 / 第159行**
+  - Code / 代码: `        # Thus, we perform computation in FP32 for FP8 reference checks.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 160 / 第160行**
+  - Code / 代码: `        if is_fp8:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 161 / 第161行**
+  - Code / 代码: `            data_ref = data_ref.to(torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 162 / 第162行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 163 / 第163行**
+  - Code / 代码: `        return data_cutlass, data_ref`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 164 / 第164行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 165 / 第165行**
+  - Code / 代码: `    def reference(self, problem_size, tensor_A, tensor_B, tensor_C, alpha, beta):`
+  - EN: Defines function `reference`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `reference`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 166 / 第166行**
+  - Code / 代码: `        # If any tensor is on CPU, place all tensors on CPU unless only`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 167 / 第167行**
+  - Code / 代码: `        # tensor C is on CPU`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 168 / 第168行**
+  - Code / 代码: `        # Handle mixed-input cases by casting to the larger data type and overriding`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 169 / 第169行**
+  - Code / 代码: `        # to whatever the data type of the larger type is`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 170 / 第170行**
+  - Code / 代码: `        if self.dtype_A != self.dtype_B:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 171 / 第171行**
+  - Code / 代码: `            if DataTypeSize[self.operation.A.element] < DataTypeSize[self.operation.B.element]:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 172 / 第172行**
+  - Code / 代码: `                tensor_A = tensor_A.to(self.dtype_B).to(tensor_B.device)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 173 / 第173行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 174 / 第174行**
+  - Code / 代码: `                tensor_B = tensor_B.to(self.dtype_A).to(tensor_A.device)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 175 / 第175行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 176 / 第176行**
+  - Code / 代码: `        devices = [x.device.type for x in [tensor_A, tensor_B]]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 177 / 第177行**
+  - Code / 代码: `        if tensor_C is not None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 178 / 第178行**
+  - Code / 代码: `            devices.append(tensor_C.device.type)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 179 / 第179行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 180 / 第180行**
+  - Code / 代码: `        if "cpu" in devices and devices != ["cuda", "cuda", "cpu"]:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 181 / 第181行**
+  - Code / 代码: `            device = torch.device("cpu")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 182 / 第182行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 183 / 第183行**
+  - Code / 代码: `            device = tensor_A.device`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 184 / 第184行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 185 / 第185行**
+  - Code / 代码: `        tensor_A = tensor_A.to(device)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 186 / 第186行**
+  - Code / 代码: `        tensor_B = tensor_B.to(device)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 187 / 第187行**
+  - Code / 代码: `        if tensor_C is not None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 188 / 第188行**
+  - Code / 代码: `            tensor_C = tensor_C.to(device)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 189 / 第189行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 190 / 第190行**
+  - Code / 代码: `        dtype = torch_type(self.compute_type)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 191 / 第191行**
+  - Code / 代码: `        alpha_torch = torch.tensor([alpha], device=device).to(dtype)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 192 / 第192行**
+  - Code / 代码: `        beta_torch = torch.tensor([beta], device=device).to(dtype)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 193 / 第193行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 194 / 第194行**
+  - Code / 代码: `        tmp = tensor_A @ tensor_B`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 195 / 第195行**
+  - Code / 代码: `        tensor_D_ref = (alpha_torch * tmp)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 196 / 第196行**
+  - Code / 代码: `        if tensor_C is not None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 197 / 第197行**
+  - Code / 代码: `            tensor_D_ref += (tensor_C * beta_torch)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 198 / 第198行**
+  - Code / 代码: `        return tensor_D_ref.to(self.dtype_D)`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 199 / 第199行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 200 / 第200行**
+  - Code / 代码: `    def run(self, mode, problem_size, batch_count=1, split_k_slices=1, alpha=1.0, beta=0.0):`
+  - EN: Defines function `run`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `run`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 201 / 第201行**
+  - Code / 代码: `        torch.random.manual_seed(self.seed)`
+  - EN: Seeds a random-number generator so test behavior stays reproducible.
+  - CN: 为随机数生成器设定种子，以保持测试行为可复现。
+- **Line 202 / 第202行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 203 / 第203行**
+  - Code / 代码: `        # Assign an actual batch count in cases where we are not running in batched mode.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 204 / 第204行**
+  - Code / 代码: `        # This is to differentiate between the number of split K slices and the batch count,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 205 / 第205行**
+  - Code / 代码: `        # which are overloaded within the single \`batch_count\` variable.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 206 / 第206行**
+  - Code / 代码: `        if mode == GemmUniversalMode.Batched:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 207 / 第207行**
+  - Code / 代码: `            true_batch_count = batch_count`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 208 / 第208行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 209 / 第209行**
+  - Code / 代码: `            true_batch_count = 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 210 / 第210行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 211 / 第211行**
+  - Code / 代码: `        def transpose(layout):`
+  - EN: Defines function `transpose`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `transpose`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 212 / 第212行**
+  - Code / 代码: `            if layout == LayoutType.RowMajor:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 213 / 第213行**
+  - Code / 代码: `                return LayoutType.ColumnMajor`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 214 / 第214行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 215 / 第215行**
+  - Code / 代码: `                return LayoutType.RowMajor`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 216 / 第216行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 217 / 第217行**
+  - Code / 代码: `        tensor_A, tensor_A_ref = self.uniform_init(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 218 / 第218行**
+  - Code / 代码: `            (true_batch_count, problem_size.m, problem_size.k),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 219 / 第219行**
+  - Code / 代码: `            self.dtype_A,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 220 / 第220行**
+  - Code / 代码: `            self.operation.A.layout if not self.operation.switched else transpose(self.operation.B.layout),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 221 / 第221行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 222 / 第222行**
+  - Code / 代码: `        tensor_B, tensor_B_ref = self.uniform_init(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 223 / 第223行**
+  - Code / 代码: `            (true_batch_count, problem_size.k, problem_size.n),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 224 / 第224行**
+  - Code / 代码: `            self.dtype_B,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 225 / 第225行**
+  - Code / 代码: `            self.operation.B.layout if not self.operation.switched else transpose(self.operation.A.layout),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 226 / 第226行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 227 / 第227行**
+  - Code / 代码: `        if self.dtype_C is not None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 228 / 第228行**
+  - Code / 代码: `            tensor_C, tensor_C_ref = self.uniform_init(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 229 / 第229行**
+  - Code / 代码: `                (true_batch_count, problem_size.m, problem_size.n),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 230 / 第230行**
+  - Code / 代码: `                self.dtype_C,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 231 / 第231行**
+  - Code / 代码: `                self.operation.C.layout if not self.operation.switched else transpose(self.operation.C.layout),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 232 / 第232行**
+  - Code / 代码: `            )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 233 / 第233行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 234 / 第234行**
+  - Code / 代码: `            tensor_C = None`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 235 / 第235行**
+  - Code / 代码: `            tensor_C_ref = None`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 236 / 第236行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 237 / 第237行**
+  - Code / 代码: `        tensor_D, _ = self.uniform_init(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 238 / 第238行**
+  - Code / 代码: `            (true_batch_count, problem_size.m, problem_size.n),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 239 / 第239行**
+  - Code / 代码: `            self.dtype_D,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 240 / 第240行**
+  - Code / 代码: `            self.operation.C.layout if not self.operation.switched else transpose(self.operation.C.layout),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 241 / 第241行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 242 / 第242行**
+  - Code / 代码: `        tensor_D = torch.zeros_like(tensor_D)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 243 / 第243行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 244 / 第244行**
+  - Code / 代码: `        if self.compute_type in [DataType.s8, DataType.s32, DataType.u8, DataType.u32]:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 245 / 第245行**
+  - Code / 代码: `            alpha = int(alpha)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 246 / 第246行**
+  - Code / 代码: `            beta = int(beta)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 247 / 第247行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 248 / 第248行**
+  - Code / 代码: `        #`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 249 / 第249行**
+  - Code / 代码: `        # Launch kernel`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 250 / 第250行**
+  - Code / 代码: `        #`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 251 / 第251行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 252 / 第252行**
+  - Code / 代码: `        arguments = GemmArguments(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 253 / 第253行**
+  - Code / 代码: `            operation=self.operation,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 254 / 第254行**
+  - Code / 代码: `            problem_size=problem_size,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 255 / 第255行**
+  - Code / 代码: `            A=tensor_A,`
+  - EN: Defines module-level constant `A` used later in the file.
+  - CN: 定义模块级常量 `A`，供后续代码使用。
+- **Line 256 / 第256行**
+  - Code / 代码: `            B=tensor_B,`
+  - EN: Defines module-level constant `B` used later in the file.
+  - CN: 定义模块级常量 `B`，供后续代码使用。
+- **Line 257 / 第257行**
+  - Code / 代码: `            C=tensor_C,`
+  - EN: Defines module-level constant `C` used later in the file.
+  - CN: 定义模块级常量 `C`，供后续代码使用。
+- **Line 258 / 第258行**
+  - Code / 代码: `            D=tensor_D,`
+  - EN: Defines module-level constant `D` used later in the file.
+  - CN: 定义模块级常量 `D`，供后续代码使用。
+- **Line 259 / 第259行**
+  - Code / 代码: `            output_op=self.operation.epilogue_type(alpha, beta),`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 260 / 第260行**
+  - Code / 代码: `            gemm_mode=mode,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 261 / 第261行**
+  - Code / 代码: `            split_k_slices=split_k_slices,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 262 / 第262行**
+  - Code / 代码: `            batch=batch_count,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 263 / 第263行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 264 / 第264行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 265 / 第265行**
+  - Code / 代码: `        if mode == GemmUniversalMode.GemmSplitKParallel:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 266 / 第266行**
+  - Code / 代码: `            reduction_arguments = ReductionArguments(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 267 / 第267行**
+  - Code / 代码: `                self.reduction_operation,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 268 / 第268行**
+  - Code / 代码: `                problem_size=[problem_size.m, problem_size.n],`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 269 / 第269行**
+  - Code / 代码: `                partitions=split_k_slices,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 270 / 第270行**
+  - Code / 代码: `                workspace=arguments.ptr_D,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 271 / 第271行**
+  - Code / 代码: `                destination=tensor_D,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 272 / 第272行**
+  - Code / 代码: `                source=tensor_C,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 273 / 第273行**
+  - Code / 代码: `                output_op=self.reduction_operation.epilogue_type(alpha, beta),`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 274 / 第274行**
+  - Code / 代码: `            )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 275 / 第275行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 276 / 第276行**
+  - Code / 代码: `        self.operation.run(arguments)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 277 / 第277行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 278 / 第278行**
+  - Code / 代码: `        if mode == GemmUniversalMode.GemmSplitKParallel:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 279 / 第279行**
+  - Code / 代码: `            self.reduction_operation.run(reduction_arguments)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 280 / 第280行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 281 / 第281行**
+  - Code / 代码: `        passed = True`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 282 / 第282行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 283 / 第283行**
+  - Code / 代码: `        if self.verification:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 284 / 第284行**
+  - Code / 代码: `            if mode == GemmUniversalMode.GemmSplitKParallel:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 285 / 第285行**
+  - Code / 代码: `                reduction_arguments.sync()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 286 / 第286行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 287 / 第287行**
+  - Code / 代码: `                # Free memory allocated by args because we are not`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 288 / 第288行**
+  - Code / 代码: `                # calling \`arguments.sync()\` in this case (which will free memory)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 289 / 第289行**
+  - Code / 代码: `                arguments.free()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 290 / 第290行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 291 / 第291行**
+  - Code / 代码: `                arguments.sync()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 292 / 第292行**
+  - Code / 代码: `            tensor_D_ref = self.reference(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 293 / 第293行**
+  - Code / 代码: `                problem_size,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 294 / 第294行**
+  - Code / 代码: `                tensor_A_ref,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 295 / 第295行**
+  - Code / 代码: `                tensor_B_ref,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 296 / 第296行**
+  - Code / 代码: `                tensor_C_ref,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 297 / 第297行**
+  - Code / 代码: `                alpha,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 298 / 第298行**
+  - Code / 代码: `                beta,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 299 / 第299行**
+  - Code / 代码: `            )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 300 / 第300行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 301 / 第301行**
+  - Code / 代码: `            tensor_D_ref = tensor_D_ref.to('cuda')`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 302 / 第302行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 303 / 第303行**
+  - Code / 代码: `            if self.operation.switched or self.operation.C.layout == LayoutType.ColumnMajor:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 304 / 第304行**
+  - Code / 代码: `                tensor_D = tensor_D.transpose(-1, -2).contiguous()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 305 / 第305行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 306 / 第306行**
+  - Code / 代码: `            passed = tensor_D.equal(tensor_D_ref)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 307 / 第307行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 308 / 第308行**
+  - Code / 代码: `            try:`
+  - EN: Starts an exception-handling region.
+  - CN: 开始一个异常处理区域。
+- **Line 309 / 第309行**
+  - Code / 代码: `                assert passed`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 310 / 第310行**
+  - Code / 代码: `            except AssertionError:`
+  - EN: Handles an exception path for the protected code.
+  - CN: 处理受保护代码的异常路径。
+- **Line 311 / 第311行**
+  - Code / 代码: `                self.print_problem_size(problem_size, mode, batch_count)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 312 / 第312行**
+  - Code / 代码: `        del arguments`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 313 / 第313行**
+  - Code / 代码: `        if mode == GemmUniversalMode.GemmSplitKParallel:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 314 / 第314行**
+  - Code / 代码: `            del reduction_arguments`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 315 / 第315行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 316 / 第316行**
+  - Code / 代码: `        return passed`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 317 / 第317行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 318 / 第318行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 319 / 第319行**
+  - Code / 代码: `def test_all_gemm(operation: "GemmOperationUniversal", testcase="universal", compilation_mode="nvcc"):`
+  - EN: Defines function `test_all_gemm`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_all_gemm`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 320 / 第320行**
+  - Code / 代码: `    passed = True`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 321 / 第321行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 322 / 第322行**
+  - Code / 代码: `    minimum_operand_element_size = min(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 323 / 第323行**
+  - Code / 代码: `        DataTypeSize[operation.A.element], DataTypeSize[operation.B.element]`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 324 / 第324行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 325 / 第325行**
+  - Code / 代码: `    opcode_class = operation.tile_description.math_instruction.opcode_class`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 326 / 第326行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 327 / 第327行**
+  - Code / 代码: `    if opcode_class == OpcodeClass.Simt:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 328 / 第328行**
+  - Code / 代码: `        alignment = 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 329 / 第329行**
+  - Code / 代码: `    else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 330 / 第330行**
+  - Code / 代码: `        alignment = 128 // minimum_operand_element_size`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 331 / 第331行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 332 / 第332行**
+  - Code / 代码: `    alignment_m = alignment`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 333 / 第333行**
+  - Code / 代码: `    alignment_n = alignment`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 334 / 第334行**
+  - Code / 代码: `    alignment_k = alignment`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 335 / 第335行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 336 / 第336行**
+  - Code / 代码: `    # INT8 alignment constraints`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 337 / 第337行**
+  - Code / 代码: `    if opcode_class == OpcodeClass.Simt:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 338 / 第338行**
+  - Code / 代码: `        A_is_s8 = operation.A.element == DataType.s8`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 339 / 第339行**
+  - Code / 代码: `        B_is_s8 = operation.B.element == DataType.s8`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 340 / 第340行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 341 / 第341行**
+  - Code / 代码: `        if A_is_s8 and operation.A.layout == LayoutType.ColumnMajor:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 342 / 第342行**
+  - Code / 代码: `            alignment_m = 4`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 343 / 第343行**
+  - Code / 代码: `        if B_is_s8 == DataType.s8 and operation.A.layout == LayoutType.RowMajor:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 344 / 第344行**
+  - Code / 代码: `            alignment_n = 4`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 345 / 第345行**
+  - Code / 代码: `        if A_is_s8 and B_is_s8 and (operation.A.layout == LayoutType.RowMajor or operation.B.layout == LayoutType.ColumnMajor):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 346 / 第346行**
+  - Code / 代码: `            alignment_k = 4`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 347 / 第347行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 348 / 第348行**
+  - Code / 代码: `    threadblock_k = operation.tile_description.threadblock_shape[2]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 349 / 第349行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 350 / 第350行**
+  - Code / 代码: `    assert testcase != "interleaved"`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 351 / 第351行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 352 / 第352行**
+  - Code / 代码: `    supports_split_k = operation.arch < 90 and not operation.swizzling_functor == SwizzlingFunctor.StreamK`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 353 / 第353行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 354 / 第354行**
+  - Code / 代码: `    if testcase == "multistage":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 355 / 第355行**
+  - Code / 代码: `        modes = [GemmUniversalMode.Gemm]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 356 / 第356行**
+  - Code / 代码: `        problem_size_m = [16, 528]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 357 / 第357行**
+  - Code / 代码: `        problem_size_n = [16, 528]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 358 / 第358行**
+  - Code / 代码: `        problem_size_k = [`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 359 / 第359行**
+  - Code / 代码: `            threadblock_k,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 360 / 第360行**
+  - Code / 代码: `            threadblock_k * operation.tile_description.stages`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 361 / 第361行**
+  - Code / 代码: `            + operation.tile_description.math_instruction.instruction_shape[2],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 362 / 第362行**
+  - Code / 代码: `        ]`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 363 / 第363行**
+  - Code / 代码: `        problem_alpha = [1.0]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 364 / 第364行**
+  - Code / 代码: `        problem_beta = [0.0]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 365 / 第365行**
+  - Code / 代码: `        batch_counts = [1]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 366 / 第366行**
+  - Code / 代码: `    else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 367 / 第367行**
+  - Code / 代码: `        modes = [GemmUniversalMode.Gemm]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 368 / 第368行**
+  - Code / 代码: `        batch_counts = [1, 2, 3, 5, 7]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 369 / 第369行**
+  - Code / 代码: `        if supports_split_k:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 370 / 第370行**
+  - Code / 代码: `            modes.append(GemmUniversalMode.GemmSplitKParallel)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 371 / 第371行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 372 / 第372行**
+  - Code / 代码: `        problem_size_m = [alignment_m, 512 - 3 * alignment_m]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 373 / 第373行**
+  - Code / 代码: `        problem_size_n = [alignment_n, 512 - 2 * alignment_n]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 374 / 第374行**
+  - Code / 代码: `        if operation.tile_description.stages is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 375 / 第375行**
+  - Code / 代码: `            stages_for_k_calc = 7`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 376 / 第376行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 377 / 第377行**
+  - Code / 代码: `            stages_for_k_calc = operation.tile_description.stages`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 378 / 第378行**
+  - Code / 代码: `        problem_size_k = [`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 379 / 第379行**
+  - Code / 代码: `            alignment_k,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 380 / 第380行**
+  - Code / 代码: `            threadblock_k * stages_for_k_calc - alignment_k,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 381 / 第381行**
+  - Code / 代码: `            threadblock_k * stages_for_k_calc * 3 - alignment_k,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 382 / 第382行**
+  - Code / 代码: `        ]`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 383 / 第383行**
+  - Code / 代码: `        problem_alpha = [1.0]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 384 / 第384行**
+  - Code / 代码: `        problem_beta = [2.0]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 385 / 第385行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 386 / 第386行**
+  - Code / 代码: `    testbed = GemmUniversalLauncher(operation, compiler_mode=compilation_mode)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 387 / 第387行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 388 / 第388行**
+  - Code / 代码: `    for mode in modes:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 389 / 第389行**
+  - Code / 代码: `        for m in problem_size_m:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 390 / 第390行**
+  - Code / 代码: `            for n in problem_size_n:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 391 / 第391行**
+  - Code / 代码: `                for k in problem_size_k:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 392 / 第392行**
+  - Code / 代码: `                    for batch_count in batch_counts:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 393 / 第393行**
+  - Code / 代码: `                        for alpha in problem_alpha:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 394 / 第394行**
+  - Code / 代码: `                            for beta in problem_beta:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 395 / 第395行**
+  - Code / 代码: `                                # skip very small K problems`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 396 / 第396行**
+  - Code / 代码: `                                if testcase == "universal":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 397 / 第397行**
+  - Code / 代码: `                                    if k // batch_count < 2 * threadblock_k:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 398 / 第398行**
+  - Code / 代码: `                                        continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 399 / 第399行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 400 / 第400行**
+  - Code / 代码: `                                problem_size = GemmCoord(m, n, k)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 401 / 第401行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 402 / 第402行**
+  - Code / 代码: `                                if supports_split_k:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 403 / 第403行**
+  - Code / 代码: `                                    split_k_slices = batch_count`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 404 / 第404行**
+  - Code / 代码: `                                else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 405 / 第405行**
+  - Code / 代码: `                                    split_k_slices = 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 406 / 第406行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 407 / 第407行**
+  - Code / 代码: `                                overridden_mode = mode`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 408 / 第408行**
+  - Code / 代码: `                                if mode == GemmUniversalMode.Gemm and batch_count > 1:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 409 / 第409行**
+  - Code / 代码: `                                    overridden_mode = GemmUniversalMode.Batched`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 410 / 第410行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 411 / 第411行**
+  - Code / 代码: `                                passed = testbed.run(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 412 / 第412行**
+  - Code / 代码: `                                    overridden_mode,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 413 / 第413行**
+  - Code / 代码: `                                    problem_size,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 414 / 第414行**
+  - Code / 代码: `                                    batch_count,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 415 / 第415行**
+  - Code / 代码: `                                    split_k_slices,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 416 / 第416行**
+  - Code / 代码: `                                    alpha,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 417 / 第417行**
+  - Code / 代码: `                                    beta,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 418 / 第418行**
+  - Code / 代码: `                                )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 419 / 第419行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 420 / 第420行**
+  - Code / 代码: `                                if not passed:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 421 / 第421行**
+  - Code / 代码: `                                    return False`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 422 / 第422行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 423 / 第423行**
+  - Code / 代码: `    return passed`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Focuses on GEMM kernels, configurations, or correctness checks.
+  **CN**: 聚焦 GEMM 内核、配置或正确性检查。
+- **EN**: Exercises FP8 data types or FP8-oriented kernel paths.
+  **CN**: 测试 FP8 数据类型或面向 FP8 的内核路径。
+
+## Dependencies / 依赖项
+
+- `math`
+  - EN: Provides math helpers used in size calculations or filtering.
+  - CN: 提供尺寸计算或筛选所需的数学辅助函数。
+- `os`
+  - EN: Provides environment-variable or filesystem helpers.
+  - CN: 提供环境变量或文件系统辅助功能。
+- `re`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `subprocess`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `torch`
+  - EN: Provides tensor creation, GPU execution, and reference math helpers.
+  - CN: 提供张量创建、GPU 执行与参考数学辅助功能。
+- `cutlass_library`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `cutlass_cppgen.backend`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。
+- `cutlass_cppgen.backend.gemm_operation`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。
+- `cutlass_cppgen.backend.reduction_operation`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。
+- `cutlass_cppgen.shape`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。
+- `cutlass_cppgen.utils.datatypes`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。

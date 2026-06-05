@@ -1,0 +1,237 @@
+# pass_layout_elimination.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/passes/pass_layout_elimination.py`
+
+## Purpose / 作用
+- EN: Eliminate layout manipulation nodes
+- CN: 该模块的文档字符串将其描述为：Eliminate layout manipulation nodes
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Eliminate layout manipulation nodes` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from copy import deepcopy` — **EN:** Imports deepcopy from `copy`. **CN:** 从 `copy` 导入 deepcopy。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_cppgen.backend.evt.ir import DAGIR, LayoutNode` — **EN:** Imports DAGIR, LayoutNode from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 DAGIR, LayoutNode。
+- **L40** `from cutlass_cppgen.backend.evt.passes.pass_manager import EVTPassBase` — **EN:** Imports EVTPassBase from `cutlass_cppgen.backend.evt.passes.pass_manager`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_manager` 导入 EVTPassBase。
+- **L41** `from cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation import PassShapeTypePropagation` — **EN:** Imports PassShapeTypePropagation from `cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation` 导入 PassShapeTypePropagation。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `class PassLayoutManipulateElimination(EVTPassBase):` — **EN:** Defines class `PassLayoutManipulateElimination` with bases EVTPassBase. **CN:** 定义类 `PassLayoutManipulateElimination`，其基类为 EVTPassBase。
+- **L45** `    """` — **EN:** Starts the docstring for the class `PassLayoutManipulateElimination`. **CN:** 开始说明 class `PassLayoutManipulateElimination` 的文档字符串。
+- **L46** `    Eliminate layout manipulation nodes` — **EN:** Continues the docstring for the class `PassLayoutManipulateElimination`. **CN:** 继续说明 class `PassLayoutManipulateElimination` 的文档字符串。
+- **L47** `    """` — **EN:** Ends the docstring for the class `PassLayoutManipulateElimination`. **CN:** 结束说明 class `PassLayoutManipulateElimination` 的文档字符串。
+- **L48** `    dependencies = [PassShapeTypePropagation]` — **EN:** Assigns a value to dependencies. **CN:** 将一个值赋给 dependencies。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    def __init__(self, dag_ir: DAGIR) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L51** `        super().__init__(dag_ir)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L52** `        self.copy_cnt = 0` — **EN:** Assigns a value to self.copy_cnt. **CN:** 将一个值赋给 self.copy_cnt。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    def call(self):` — **EN:** Defines function `call`. **CN:** 定义函数 `call`。
+- **L55** `        self.layout_nodes_worklist = self.get_all_layout_nodes()` — **EN:** Assigns a value to self.layout_nodes_worklist. **CN:** 将一个值赋给 self.layout_nodes_worklist。
+- **L56** `        # Run while loop utill all layout nodes are eliminated` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** `        while(len(self.layout_nodes_worklist) > 0):` — **EN:** Starts a while-loop guarded by `len(self.layout_nodes_worklist) > 0`. **CN:** 开始一个由 `len(self.layout_nodes_worklist) > 0` 控制的 while 循环。
+- **L58** `            node = self.layout_nodes_worklist.pop(0)` — **EN:** Assigns a value to node. **CN:** 将一个值赋给 node。
+- **L59** `            # for node in layout_nodes:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `            # Step 1: get the propagation direction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L61** `            direction = self.get_propagation_direction(node)` — **EN:** Assigns a value to direction. **CN:** 将一个值赋给 direction。
+- **L62** `            self.visited = []` — **EN:** Assigns a value to self.visited. **CN:** 将一个值赋给 self.visited。
+- **L63** `            getattr(self, f"propagate_to_{direction}")(self.dag_ir.get_node_meta(node), node)` — **EN:** Invokes `getattr(self, f'propagate_to_{direction}')` as a standalone call. **CN:** 以独立语句方式调用 `getattr(self, f'propagate_to_{direction}')`。
+- **L64** `            # Eliminate the current node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L65** `            input_node = self.dag_ir.get_all_inputs(node)[0]` — **EN:** Assigns a value to input_node. **CN:** 将一个值赋给 input_node。
+- **L66** `            self.dag_ir.replace_all_uses_with(node, input_node)` — **EN:** Invokes `self.dag_ir.replace_all_uses_with` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.replace_all_uses_with`。
+- **L67** `            # layout_nodes = self.get_all_layout_nodes()` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    def get_all_layout_nodes(self):` — **EN:** Defines function `get_all_layout_nodes`. **CN:** 定义函数 `get_all_layout_nodes`。
+- **L70** `        layout_nodes = []` — **EN:** Assigns a value to layout_nodes. **CN:** 将一个值赋给 layout_nodes。
+- **L71** `        for node_meta in reversed(self.dag_ir.node_metas_topological_order()):` — **EN:** Starts a loop assigning items from `reversed(self.dag_ir.node_metas_topological_ord...` to `node_meta`. **CN:** 开始一个循环，将 `reversed(self.dag_ir.node_metas_topological_ord...` 的元素赋给 `node_meta`。
+- **L72** `            if isinstance(node_meta, LayoutNode):` — **EN:** Starts a conditional branch guarded by `isinstance(node_meta, LayoutNode)`. **CN:** 开始一个由 `isinstance(node_meta, LayoutNode)` 控制的条件分支。
+- **L73** `                layout_nodes.append(node_meta.name)` — **EN:** Invokes `layout_nodes.append` as a standalone call. **CN:** 以独立语句方式调用 `layout_nodes.append`。
+- **L74** `        return layout_nodes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    def get_propagation_direction(self, node: str):` — **EN:** Defines function `get_propagation_direction`. **CN:** 定义函数 `get_propagation_direction`。
+- **L77** `        """` — **EN:** Starts the docstring for the function `get_propagation_direction`. **CN:** 开始说明 function `get_propagation_direction` 的文档字符串。
+- **L78** `        The logic is propagating all layout nodes away from the accumulator node.` — **EN:** Continues the docstring for the function `get_propagation_direction`. **CN:** 继续说明 function `get_propagation_direction` 的文档字符串。
+- **L79** `        """` — **EN:** Ends the docstring for the function `get_propagation_direction`. **CN:** 结束说明 function `get_propagation_direction` 的文档字符串。
+- **L80** `        self.visited = []` — **EN:** Assigns a value to self.visited. **CN:** 将一个值赋给 self.visited。
+- **L81** `        self.get_influenced_users(node)` — **EN:** Invokes `self.get_influenced_users` as a standalone call. **CN:** 以独立语句方式调用 `self.get_influenced_users`。
+- **L82** `        nodes_influenced_dir_users = self.visited` — **EN:** Assigns a value to nodes_influenced_dir_users. **CN:** 将一个值赋给 nodes_influenced_dir_users。
+- **L83** `        self.visited = []` — **EN:** Assigns a value to self.visited. **CN:** 将一个值赋给 self.visited。
+- **L84** `        self.get_influenced_inputs(node)` — **EN:** Invokes `self.get_influenced_inputs` as a standalone call. **CN:** 以独立语句方式调用 `self.get_influenced_inputs`。
+- **L85** `        nodes_influenced_dir_inputs = self.visited` — **EN:** Assigns a value to nodes_influenced_dir_inputs. **CN:** 将一个值赋给 nodes_influenced_dir_inputs。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `        if "accum" in nodes_influenced_dir_users and "accum" not in nodes_influenced_dir_inputs:` — **EN:** Starts a conditional branch guarded by `'accum' in nodes_influenced_dir_users and 'accum' not in ...`. **CN:** 开始一个由 `'accum' in nodes_influenced_dir_users and 'accum' not in ...` 控制的条件分支。
+- **L88** `            return "inputs"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** `        elif "accum" not in nodes_influenced_dir_users and "accum" in nodes_influenced_dir_inputs:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L90** `            return "users"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L92** `            raise RuntimeError("Unsolved propagation direction")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    # Get all influenced nodes if we propagate along the user direction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L95** `    def get_influenced_users(self, node: str):` — **EN:** Defines function `get_influenced_users`. **CN:** 定义函数 `get_influenced_users`。
+- **L96** `        if node in self.visited:` — **EN:** Starts a conditional branch guarded by `node in self.visited`. **CN:** 开始一个由 `node in self.visited` 控制的条件分支。
+- **L97** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L98** `        self.visited.append(node)` — **EN:** Invokes `self.visited.append` as a standalone call. **CN:** 以独立语句方式调用 `self.visited.append`。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `        users = self.dag_ir.get_users(node)` — **EN:** Assigns a value to users. **CN:** 将一个值赋给 users。
+- **L101** `        for user in users:` — **EN:** Starts a loop assigning items from `users` to `user`. **CN:** 开始一个循环，将 `users` 的元素赋给 `user`。
+- **L102** `            self.get_influenced_users(user)` — **EN:** Invokes `self.get_influenced_users` as a standalone call. **CN:** 以独立语句方式调用 `self.get_influenced_users`。
+- **L103** `        user_inputs = []` — **EN:** Assigns a value to user_inputs. **CN:** 将一个值赋给 user_inputs。
+- **L104** `        for user in users:` — **EN:** Starts a loop assigning items from `users` to `user`. **CN:** 开始一个循环，将 `users` 的元素赋给 `user`。
+- **L105** `            user_inputs.append(set(self.dag_ir.get_all_inputs(user)))` — **EN:** Invokes `user_inputs.append` as a standalone call. **CN:** 以独立语句方式调用 `user_inputs.append`。
+- **L106** `        if len(user_inputs) > 0:` — **EN:** Starts a conditional branch guarded by `len(user_inputs) > 0`. **CN:** 开始一个由 `len(user_inputs) > 0` 控制的条件分支。
+- **L107** `            user_inputs = set.union(*user_inputs)` — **EN:** Assigns a value to user_inputs. **CN:** 将一个值赋给 user_inputs。
+- **L108** `            user_inputs.remove(node)` — **EN:** Invokes `user_inputs.remove` as a standalone call. **CN:** 以独立语句方式调用 `user_inputs.remove`。
+- **L109** `            for input in user_inputs:` — **EN:** Starts a loop assigning items from `user_inputs` to `input`. **CN:** 开始一个循环，将 `user_inputs` 的元素赋给 `input`。
+- **L110** `                self.get_influenced_inputs(input)` — **EN:** Invokes `self.get_influenced_inputs` as a standalone call. **CN:** 以独立语句方式调用 `self.get_influenced_inputs`。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `    # Get all influenced nodes if we propagate along the input direction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L113** `    def get_influenced_inputs(self, node: str):` — **EN:** Defines function `get_influenced_inputs`. **CN:** 定义函数 `get_influenced_inputs`。
+- **L114** `        if node in self.visited:` — **EN:** Starts a conditional branch guarded by `node in self.visited`. **CN:** 开始一个由 `node in self.visited` 控制的条件分支。
+- **L115** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** `        self.visited.append(node)` — **EN:** Invokes `self.visited.append` as a standalone call. **CN:** 以独立语句方式调用 `self.visited.append`。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `        inputs = self.dag_ir.get_all_inputs(node)` — **EN:** Assigns a value to inputs. **CN:** 将一个值赋给 inputs。
+- **L119** `        for input in inputs:` — **EN:** Starts a loop assigning items from `inputs` to `input`. **CN:** 开始一个循环，将 `inputs` 的元素赋给 `input`。
+- **L120** `            self.get_influenced_inputs(input)` — **EN:** Invokes `self.get_influenced_inputs` as a standalone call. **CN:** 以独立语句方式调用 `self.get_influenced_inputs`。
+- **L121** `        input_users = []` — **EN:** Assigns a value to input_users. **CN:** 将一个值赋给 input_users。
+- **L122** `        for input in inputs:` — **EN:** Starts a loop assigning items from `inputs` to `input`. **CN:** 开始一个循环，将 `inputs` 的元素赋给 `input`。
+- **L123** `            input_users.append(set(self.dag_ir.get_users(input)))` — **EN:** Invokes `input_users.append` as a standalone call. **CN:** 以独立语句方式调用 `input_users.append`。
+- **L124** `        if len(input_users) > 0:` — **EN:** Starts a conditional branch guarded by `len(input_users) > 0`. **CN:** 开始一个由 `len(input_users) > 0` 控制的条件分支。
+- **L125** `            input_users = set.union(*input_users)` — **EN:** Assigns a value to input_users. **CN:** 将一个值赋给 input_users。
+- **L126** `            input_users.remove(node)` — **EN:** Invokes `input_users.remove` as a standalone call. **CN:** 以独立语句方式调用 `input_users.remove`。
+- **L127** `            for user in input_users:` — **EN:** Starts a loop assigning items from `input_users` to `user`. **CN:** 开始一个循环，将 `input_users` 的元素赋给 `user`。
+- **L128** `                self.get_influenced_users(user)` — **EN:** Invokes `self.get_influenced_users` as a standalone call. **CN:** 以独立语句方式调用 `self.get_influenced_users`。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def add_copy_before(self, layout_node_meta: LayoutNode, target: str):` — **EN:** Defines function `add_copy_before`. **CN:** 定义函数 `add_copy_before`。
+- **L131** `        copied_node_meta = deepcopy(layout_node_meta)` — **EN:** Assigns a value to copied_node_meta. **CN:** 将一个值赋给 copied_node_meta。
+- **L132** `        copied_node = f"{copied_node_meta.name}_copy{self.copy_cnt}"` — **EN:** Assigns a value to copied_node. **CN:** 将一个值赋给 copied_node。
+- **L133** `        self.copy_cnt += 1` — **EN:** Updates self.copy_cnt in place. **CN:** 原地更新 self.copy_cnt。
+- **L134** `        copied_node_meta.name = copied_node` — **EN:** Assigns a value to copied_node_meta.name. **CN:** 将一个值赋给 copied_node_meta.name。
+- **L135** `        self.dag_ir.add_node(copied_node_meta)` — **EN:** Invokes `self.dag_ir.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_node`。
+- **L136** `        # Add edges` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L137** `        target_inputs = self.dag_ir.get_all_inputs(target)` — **EN:** Assigns a value to target_inputs. **CN:** 将一个值赋给 target_inputs。
+- **L138** `        for src in target_inputs:` — **EN:** Starts a loop assigning items from `target_inputs` to `src`. **CN:** 开始一个循环，将 `target_inputs` 的元素赋给 `src`。
+- **L139** `            self.dag_ir.remove_edge(src, target)` — **EN:** Invokes `self.dag_ir.remove_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.remove_edge`。
+- **L140** `            self.dag_ir.add_edge(src, copied_node)` — **EN:** Invokes `self.dag_ir.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_edge`。
+- **L141** `        self.dag_ir.add_edge(copied_node, target)` — **EN:** Invokes `self.dag_ir.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_edge`。
+- **L142** `        self.layout_nodes_worklist.append(copied_node)` — **EN:** Invokes `self.layout_nodes_worklist.append` as a standalone call. **CN:** 以独立语句方式调用 `self.layout_nodes_worklist.append`。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `    def add_copy_after(self, layout_node_meta: LayoutNode, target: str):` — **EN:** Defines function `add_copy_after`. **CN:** 定义函数 `add_copy_after`。
+- **L145** `        copied_node_meta = deepcopy(layout_node_meta)` — **EN:** Assigns a value to copied_node_meta. **CN:** 将一个值赋给 copied_node_meta。
+- **L146** `        copied_node = f"{copied_node_meta.name}_copy{self.copy_cnt}"` — **EN:** Assigns a value to copied_node. **CN:** 将一个值赋给 copied_node。
+- **L147** `        self.copy_cnt += 1` — **EN:** Updates self.copy_cnt in place. **CN:** 原地更新 self.copy_cnt。
+- **L148** `        copied_node_meta.name = copied_node` — **EN:** Assigns a value to copied_node_meta.name. **CN:** 将一个值赋给 copied_node_meta.name。
+- **L149** `        self.dag_ir.add_node(copied_node_meta)` — **EN:** Invokes `self.dag_ir.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_node`。
+- **L150** `        # Add edges` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L151** `        users = self.dag_ir.get_users(target)` — **EN:** Assigns a value to users. **CN:** 将一个值赋给 users。
+- **L152** `        for user in users:` — **EN:** Starts a loop assigning items from `users` to `user`. **CN:** 开始一个循环，将 `users` 的元素赋给 `user`。
+- **L153** `            self.dag_ir.remove_edge(target, user)` — **EN:** Invokes `self.dag_ir.remove_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.remove_edge`。
+- **L154** `            self.dag_ir.add_edge(copied_node, user)` — **EN:** Invokes `self.dag_ir.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_edge`。
+- **L155** `        self.dag_ir.add_edge(target, copied_node)` — **EN:** Invokes `self.dag_ir.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_edge`。
+- **L156** `        self.layout_nodes_worklist.append(copied_node)` — **EN:** Invokes `self.layout_nodes_worklist.append` as a standalone call. **CN:** 以独立语句方式调用 `self.layout_nodes_worklist.append`。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    # Propagate the layout \`node\` along the user direction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L159** `    def propagate_to_users(self, layout_node_meta: LayoutNode, node: str):` — **EN:** Defines function `propagate_to_users`. **CN:** 定义函数 `propagate_to_users`。
+- **L160** `        """` — **EN:** Starts the docstring for the function `propagate_to_users`. **CN:** 开始说明 function `propagate_to_users` 的文档字符串。
+- **L161** `        Propagate layout node to users` — **EN:** Continues the docstring for the function `propagate_to_users`. **CN:** 继续说明 function `propagate_to_users` 的文档字符串。
+- **L162** `        """` — **EN:** Ends the docstring for the function `propagate_to_users`. **CN:** 结束说明 function `propagate_to_users` 的文档字符串。
+- **L163** `        if node in self.visited:` — **EN:** Starts a conditional branch guarded by `node in self.visited`. **CN:** 开始一个由 `node in self.visited` 控制的条件分支。
+- **L164** `            # Avoid applying twice` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L165** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** `        self.visited.append(node)` — **EN:** Invokes `self.visited.append` as a standalone call. **CN:** 以独立语句方式调用 `self.visited.append`。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `        node_meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to node_meta. **CN:** 将一个值赋给 node_meta。
+- **L169** `        if layout_node_meta.name != node:` — **EN:** Starts a conditional branch guarded by `layout_node_meta.name != node`. **CN:** 开始一个由 `layout_node_meta.name != node` 控制的条件分支。
+- **L170** `            if isinstance(node_meta, LayoutNode):` — **EN:** Starts a conditional branch guarded by `isinstance(node_meta, LayoutNode)`. **CN:** 开始一个由 `isinstance(node_meta, LayoutNode)` 控制的条件分支。
+- **L171** `                # Layout node is not transparent with layout node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L172** `                self.add_copy_before(layout_node_meta, node)` — **EN:** Invokes `self.add_copy_before` as a standalone call. **CN:** 以独立语句方式调用 `self.add_copy_before`。
+- **L173** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L174** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L175** `                layout_node_meta.apply_to_user(node_meta)` — **EN:** Invokes `layout_node_meta.apply_to_user` as a standalone call. **CN:** 以独立语句方式调用 `layout_node_meta.apply_to_user`。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `        users = self.dag_ir.get_users(node)` — **EN:** Assigns a value to users. **CN:** 将一个值赋给 users。
+- **L178** `        user_inputs = []` — **EN:** Assigns a value to user_inputs. **CN:** 将一个值赋给 user_inputs。
+- **L179** `        for user in users:` — **EN:** Starts a loop assigning items from `users` to `user`. **CN:** 开始一个循环，将 `users` 的元素赋给 `user`。
+- **L180** `            user_inputs.append(set(self.dag_ir.get_all_inputs(user)))` — **EN:** Invokes `user_inputs.append` as a standalone call. **CN:** 以独立语句方式调用 `user_inputs.append`。
+- **L181** `        for user in users:` — **EN:** Starts a loop assigning items from `users` to `user`. **CN:** 开始一个循环，将 `users` 的元素赋给 `user`。
+- **L182** `            self.propagate_to_users(layout_node_meta, user)` — **EN:** Invokes `self.propagate_to_users` as a standalone call. **CN:** 以独立语句方式调用 `self.propagate_to_users`。
+- **L183** `        if len(user_inputs) > 0:` — **EN:** Starts a conditional branch guarded by `len(user_inputs) > 0`. **CN:** 开始一个由 `len(user_inputs) > 0` 控制的条件分支。
+- **L184** `            user_inputs = set.union(*user_inputs)` — **EN:** Assigns a value to user_inputs. **CN:** 将一个值赋给 user_inputs。
+- **L185** `            user_inputs.remove(node)` — **EN:** Invokes `user_inputs.remove` as a standalone call. **CN:** 以独立语句方式调用 `user_inputs.remove`。
+- **L186** `            for input in user_inputs:` — **EN:** Starts a loop assigning items from `user_inputs` to `input`. **CN:** 开始一个循环，将 `user_inputs` 的元素赋给 `input`。
+- **L187** `                self.propagate_to_inputs(layout_node_meta.get_inverse_node(), input)` — **EN:** Invokes `self.propagate_to_inputs` as a standalone call. **CN:** 以独立语句方式调用 `self.propagate_to_inputs`。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `    # Propagate the layout \`node\` along the input direction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L190** `    def propagate_to_inputs(self, layout_node_meta: LayoutNode, node: str):` — **EN:** Defines function `propagate_to_inputs`. **CN:** 定义函数 `propagate_to_inputs`。
+- **L191** `        """` — **EN:** Starts the docstring for the function `propagate_to_inputs`. **CN:** 开始说明 function `propagate_to_inputs` 的文档字符串。
+- **L192** `        Propagate layout node to inputs` — **EN:** Continues the docstring for the function `propagate_to_inputs`. **CN:** 继续说明 function `propagate_to_inputs` 的文档字符串。
+- **L193** `        """` — **EN:** Ends the docstring for the function `propagate_to_inputs`. **CN:** 结束说明 function `propagate_to_inputs` 的文档字符串。
+- **L194** `        if node in self.visited:` — **EN:** Starts a conditional branch guarded by `node in self.visited`. **CN:** 开始一个由 `node in self.visited` 控制的条件分支。
+- **L195** `            # Avoid applying twice` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L196** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L197** `        self.visited.append(node)` — **EN:** Invokes `self.visited.append` as a standalone call. **CN:** 以独立语句方式调用 `self.visited.append`。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `        node_meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to node_meta. **CN:** 将一个值赋给 node_meta。
+- **L200** `        if layout_node_meta.name != node:` — **EN:** Starts a conditional branch guarded by `layout_node_meta.name != node`. **CN:** 开始一个由 `layout_node_meta.name != node` 控制的条件分支。
+- **L201** `            if isinstance(node_meta, LayoutNode):` — **EN:** Starts a conditional branch guarded by `isinstance(node_meta, LayoutNode)`. **CN:** 开始一个由 `isinstance(node_meta, LayoutNode)` 控制的条件分支。
+- **L202** `                # Layout node is not transparent with layout node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L203** `                self.add_copy_after(layout_node_meta, node)` — **EN:** Invokes `self.add_copy_after` as a standalone call. **CN:** 以独立语句方式调用 `self.add_copy_after`。
+- **L204** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L205** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L206** `                layout_node_meta.apply_to_input(node_meta)` — **EN:** Invokes `layout_node_meta.apply_to_input` as a standalone call. **CN:** 以独立语句方式调用 `layout_node_meta.apply_to_input`。
+- **L207** `        inputs = self.dag_ir.get_all_inputs(node)` — **EN:** Assigns a value to inputs. **CN:** 将一个值赋给 inputs。
+- **L208** `        input_users = []` — **EN:** Assigns a value to input_users. **CN:** 将一个值赋给 input_users。
+- **L209** `        for input in inputs:` — **EN:** Starts a loop assigning items from `inputs` to `input`. **CN:** 开始一个循环，将 `inputs` 的元素赋给 `input`。
+- **L210** `            input_users.append(set(self.dag_ir.get_users(input)))` — **EN:** Invokes `input_users.append` as a standalone call. **CN:** 以独立语句方式调用 `input_users.append`。
+- **L211** `        for input in inputs:` — **EN:** Starts a loop assigning items from `inputs` to `input`. **CN:** 开始一个循环，将 `inputs` 的元素赋给 `input`。
+- **L212** `            self.propagate_to_inputs(layout_node_meta, input)` — **EN:** Invokes `self.propagate_to_inputs` as a standalone call. **CN:** 以独立语句方式调用 `self.propagate_to_inputs`。
+- **L213** `        if len(input_users) > 0:` — **EN:** Starts a conditional branch guarded by `len(input_users) > 0`. **CN:** 开始一个由 `len(input_users) > 0` 控制的条件分支。
+- **L214** `            input_users = set.union(*input_users)` — **EN:** Assigns a value to input_users. **CN:** 将一个值赋给 input_users。
+- **L215** `            input_users.remove(node)` — **EN:** Invokes `input_users.remove` as a standalone call. **CN:** 以独立语句方式调用 `input_users.remove`。
+- **L216** `            for user in input_users:` — **EN:** Starts a loop assigning items from `input_users` to `user`. **CN:** 开始一个循环，将 `input_users` 的元素赋给 `user`。
+- **L217** `                self.propagate_to_users(layout_node_meta.get_inverse_node(), user)` — **EN:** Invokes `self.propagate_to_users` as a standalone call. **CN:** 以独立语句方式调用 `self.propagate_to_users`。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.passes.pass_layout_elimination`. CN: 模块名为 `cutlass_cppgen.backend.evt.passes.pass_layout_elimination`。
+- EN: Module docstring summary: Eliminate layout manipulation nodes CN: 模块文档摘要为：Eliminate layout manipulation nodes
+- EN: Top-level classes: PassLayoutManipulateElimination CN: 顶层类包括：PassLayoutManipulateElimination
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.backend.evt.ir:DAGIR,LayoutNode, cutlass_cppgen.backend.evt.passes.pass_manager:EVTPassBase, cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation:PassShapeTypePropagation CN: 内部依赖：cutlass_cppgen.backend.evt.ir:DAGIR,LayoutNode, cutlass_cppgen.backend.evt.passes.pass_manager:EVTPassBase, cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation:PassShapeTypePropagation
+- EN: External or standard-library dependencies: copy:deepcopy CN: 外部或标准库依赖：copy:deepcopy

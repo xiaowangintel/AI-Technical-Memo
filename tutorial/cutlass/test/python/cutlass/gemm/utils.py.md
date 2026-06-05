@@ -1,0 +1,1071 @@
+# utils.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/python/cutlass/gemm/utils.py`
+**Purpose / 用途**: This helper module provides shared support code for utils tests. / 该辅助模块为 utils 测试提供共享支持代码。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `#################################################################################################`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 2 / 第2行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 3 / 第3行**
+  - Code / 代码: `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 4 / 第4行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 5 / 第5行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 7 / 第7行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 10 / 第10行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 14 / 第14行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 18 / 第18行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 29 / 第29行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 30 / 第30行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 31 / 第31行**
+  - Code / 代码: `#################################################################################################`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 32 / 第32行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 33 / 第33行**
+  - Code / 代码: `from cutlass_library import SubstituteTemplate`
+  - EN: Imports selected symbols from `cutlass_library` for later use.
+  - CN: 从 `cutlass_library` 导入选定符号以供后续使用。
+- **Line 34 / 第34行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 35 / 第35行**
+  - Code / 代码: `import cutlass_cppgen`
+  - EN: Imports `cutlass_cppgen` so its symbols are available to the test module.
+  - CN: 导入 `cutlass_cppgen`，使其符号可供该测试模块使用。
+- **Line 36 / 第36行**
+  - Code / 代码: `from cutlass_library import (`
+  - EN: Imports selected symbols from `cutlass_library` for later use.
+  - CN: 从 `cutlass_library` 导入选定符号以供后续使用。
+- **Line 37 / 第37行**
+  - Code / 代码: `    DataTypeNames,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 38 / 第38行**
+  - Code / 代码: `    EpilogueScheduleSuffixes,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 39 / 第39行**
+  - Code / 代码: `    KernelScheduleSuffixes,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 40 / 第40行**
+  - Code / 代码: `    LayoutType,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 41 / 第41行**
+  - Code / 代码: `    OpcodeClassNames,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 42 / 第42行**
+  - Code / 代码: `    ShortDataTypeNames,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 43 / 第43行**
+  - Code / 代码: `    ShortLayoutTypeNames`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 44 / 第44行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 45 / 第45行**
+  - Code / 代码: `from cutlass_cppgen.backend import library`
+  - EN: Imports selected symbols from `cutlass_cppgen.backend` for later use.
+  - CN: 从 `cutlass_cppgen.backend` 导入选定符号以供后续使用。
+- **Line 46 / 第46行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 47 / 第47行**
+  - Code / 代码: `from gemm_testbed import test_all_gemm`
+  - EN: Imports selected symbols from `gemm_testbed` for later use.
+  - CN: 从 `gemm_testbed` 导入选定符号以供后续使用。
+- **Line 48 / 第48行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 49 / 第49行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 50 / 第50行**
+  - Code / 代码: `class Layout:`
+  - EN: Declares class `Layout` to group related tests or helpers.
+  - CN: 声明类 `Layout`，用于组织相关测试或辅助逻辑。
+- **Line 51 / 第51行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 52 / 第52行**
+  - Code / 代码: `    Utility class to map transpose and non-transpose terminology to row- and column-major terminology`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 53 / 第53行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 54 / 第54行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 55 / 第55行**
+  - Code / 代码: `    T = LayoutType.RowMajor`
+  - EN: Defines module-level constant `T` used later in the file.
+  - CN: 定义模块级常量 `T`，供后续代码使用。
+- **Line 56 / 第56行**
+  - Code / 代码: `    N = LayoutType.ColumnMajor`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 57 / 第57行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 58 / 第58行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 59 / 第59行**
+  - Code / 代码: `class LayoutCombination:`
+  - EN: Declares class `LayoutCombination` to group related tests or helpers.
+  - CN: 声明类 `LayoutCombination`，用于组织相关测试或辅助逻辑。
+- **Line 60 / 第60行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 61 / 第61行**
+  - Code / 代码: `    Utility class defining all combinations of row- and column-major layouts for operands to a GEMMs`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 62 / 第62行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 63 / 第63行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 64 / 第64行**
+  - Code / 代码: `    NNN = (Layout.N, Layout.N, Layout.N)`
+  - EN: Defines module-level constant `NNN` used later in the file.
+  - CN: 定义模块级常量 `NNN`，供后续代码使用。
+- **Line 65 / 第65行**
+  - Code / 代码: `    NNT = (Layout.N, Layout.N, Layout.T)`
+  - EN: Defines module-level constant `NNT` used later in the file.
+  - CN: 定义模块级常量 `NNT`，供后续代码使用。
+- **Line 66 / 第66行**
+  - Code / 代码: `    NTN = (Layout.N, Layout.T, Layout.N)`
+  - EN: Defines module-level constant `NTN` used later in the file.
+  - CN: 定义模块级常量 `NTN`，供后续代码使用。
+- **Line 67 / 第67行**
+  - Code / 代码: `    NTT = (Layout.N, Layout.T, Layout.T)`
+  - EN: Defines module-level constant `NTT` used later in the file.
+  - CN: 定义模块级常量 `NTT`，供后续代码使用。
+- **Line 68 / 第68行**
+  - Code / 代码: `    TNN = (Layout.T, Layout.N, Layout.N)`
+  - EN: Defines module-level constant `TNN` used later in the file.
+  - CN: 定义模块级常量 `TNN`，供后续代码使用。
+- **Line 69 / 第69行**
+  - Code / 代码: `    TNT = (Layout.T, Layout.N, Layout.T)`
+  - EN: Defines module-level constant `TNT` used later in the file.
+  - CN: 定义模块级常量 `TNT`，供后续代码使用。
+- **Line 70 / 第70行**
+  - Code / 代码: `    TTN = (Layout.T, Layout.T, Layout.N)`
+  - EN: Defines module-level constant `TTN` used later in the file.
+  - CN: 定义模块级常量 `TTN`，供后续代码使用。
+- **Line 71 / 第71行**
+  - Code / 代码: `    TTT = (Layout.T, Layout.T, Layout.T)`
+  - EN: Defines module-level constant `TTT` used later in the file.
+  - CN: 定义模块级常量 `TTT`，供后续代码使用。
+- **Line 72 / 第72行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 73 / 第73行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 74 / 第74行**
+  - Code / 代码: `def get_name(`
+  - EN: Defines function `get_name`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `get_name`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 75 / 第75行**
+  - Code / 代码: `    layouts,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 76 / 第76行**
+  - Code / 代码: `    alignments,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 77 / 第77行**
+  - Code / 代码: `    element_output,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 78 / 第78行**
+  - Code / 代码: `    element_accumulator,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 79 / 第79行**
+  - Code / 代码: `    element_epilogue,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 80 / 第80行**
+  - Code / 代码: `    cluster_shape,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 81 / 第81行**
+  - Code / 代码: `    threadblock_shape,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 82 / 第82行**
+  - Code / 代码: `    stages,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 83 / 第83行**
+  - Code / 代码: `    element_a,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 84 / 第84行**
+  - Code / 代码: `    element_b,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 85 / 第85行**
+  - Code / 代码: `    element_c,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 86 / 第86行**
+  - Code / 代码: `    arch,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 87 / 第87行**
+  - Code / 代码: `    opclass,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 88 / 第88行**
+  - Code / 代码: `    kernel_schedule=None,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 89 / 第89行**
+  - Code / 代码: `    epilogue_schedule=None,`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 90 / 第90行**
+  - Code / 代码: `    suffix="",`
+  - EN: Continues the multi-line function signature for `get_name`.
+  - CN: 继续 `get_name` 的多行函数签名。
+- **Line 91 / 第91行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `get_name`.
+  - CN: 完成 `get_name` 的多行函数签名。
+- **Line 92 / 第92行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 93 / 第93行**
+  - Code / 代码: `    Generates a procedural name for a test case.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 94 / 第94行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 95 / 第95行**
+  - Code / 代码: `    :param layouts: indexable container of layouts of A, B, and C operands`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 96 / 第96行**
+  - Code / 代码: `    :param alignments: indexable container of alignments of A, B, and C operands`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 97 / 第97行**
+  - Code / 代码: `    :param element_output: data type of the output element`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 98 / 第98行**
+  - Code / 代码: `    :param element_accumulator: data type used in accumulation`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 99 / 第99行**
+  - Code / 代码: `    :param element_epilogue: data type used in computing the epilogue`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 100 / 第100行**
+  - Code / 代码: `    :param cluster_shape: indexable container of dimensions of threadblock cluster to be launched`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 101 / 第101行**
+  - Code / 代码: `    :param threadblock_shape: indexable container of dimensions of threadblock tiles`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 102 / 第102行**
+  - Code / 代码: `    :param stages: number of pipeline stages to use in the kernel`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 103 / 第103行**
+  - Code / 代码: `    :type stages: int`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 104 / 第104行**
+  - Code / 代码: `    :param element_a: data type of operand A`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 105 / 第105行**
+  - Code / 代码: `    :param element_b: data type of operand B`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 106 / 第106行**
+  - Code / 代码: `    :param element_c: data type of operand C`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 107 / 第107行**
+  - Code / 代码: `    :param arch: compute capability of kernel being generated`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 108 / 第108行**
+  - Code / 代码: `    :type arch: int`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 109 / 第109行**
+  - Code / 代码: `    :param opclass: class of operation being performed (e.g., SIMT, Tensor Core)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 110 / 第110行**
+  - Code / 代码: `    :type opclass: cutlass_cppgen.OpcodeClass`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 111 / 第111行**
+  - Code / 代码: `    :param kernel_schedule: kernel_schedule type`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 112 / 第112行**
+  - Code / 代码: `    :type kernel_schedule: cutlass_cppgen.KernelScheduleType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 113 / 第113行**
+  - Code / 代码: `    :param epilogue_schedule: epilogue_schedule type`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 114 / 第114行**
+  - Code / 代码: `    :type epilogue_schedule: cutlass_cppgen.EpilogueScheduleType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 115 / 第115行**
+  - Code / 代码: `    :param suffix: additional string to add to the suffix of the name`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 116 / 第116行**
+  - Code / 代码: `    :type suffix: str`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 117 / 第117行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 118 / 第118行**
+  - Code / 代码: `    :return: str`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 119 / 第119行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 120 / 第120行**
+  - Code / 代码: `    name_format = "test_SM${arch}_Device_Gemm_${eA}${lA}_${eB}${lB}_${eC}${lC}_${opclass}_${acc}_${tbM}x${tbN}x${tbK}_${cM}x${cN}x${cK}_${stages}_align${aA}-${aB}-${aC}${k}${e}${suffix}"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 121 / 第121行**
+  - Code / 代码: `    return SubstituteTemplate(`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 122 / 第122行**
+  - Code / 代码: `        name_format,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 123 / 第123行**
+  - Code / 代码: `        {`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 124 / 第124行**
+  - Code / 代码: `            "arch": str(arch),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 125 / 第125行**
+  - Code / 代码: `            "eA": DataTypeNames[element_a],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 126 / 第126行**
+  - Code / 代码: `            "eB": DataTypeNames[element_b],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 127 / 第127行**
+  - Code / 代码: `            "eC": DataTypeNames[element_c],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 128 / 第128行**
+  - Code / 代码: `            "lA": ShortLayoutTypeNames[layouts[0]],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 129 / 第129行**
+  - Code / 代码: `            "lB": ShortLayoutTypeNames[layouts[1]],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 130 / 第130行**
+  - Code / 代码: `            "lC": ShortLayoutTypeNames[layouts[2]],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 131 / 第131行**
+  - Code / 代码: `            "opclass": OpcodeClassNames[opclass],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 132 / 第132行**
+  - Code / 代码: `            "acc": DataTypeNames[element_accumulator],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 133 / 第133行**
+  - Code / 代码: `            "cM": str(cluster_shape[0]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 134 / 第134行**
+  - Code / 代码: `            "cN": str(cluster_shape[1]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 135 / 第135行**
+  - Code / 代码: `            "cK": str(cluster_shape[2]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 136 / 第136行**
+  - Code / 代码: `            "tbM": str(threadblock_shape[0]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 137 / 第137行**
+  - Code / 代码: `            "tbN": str(threadblock_shape[1]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 138 / 第138行**
+  - Code / 代码: `            "tbK": str(threadblock_shape[2]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 139 / 第139行**
+  - Code / 代码: `            "stages": str(stages) if stages is not None else "auto",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 140 / 第140行**
+  - Code / 代码: `            "aA": str(alignments[0]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 141 / 第141行**
+  - Code / 代码: `            "aB": str(alignments[1]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 142 / 第142行**
+  - Code / 代码: `            "aC": str(alignments[2]),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 143 / 第143行**
+  - Code / 代码: `            "k": "" if kernel_schedule is None else KernelScheduleSuffixes[kernel_schedule],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 144 / 第144行**
+  - Code / 代码: `            "e": "" if epilogue_schedule is None else EpilogueScheduleSuffixes[epilogue_schedule],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 145 / 第145行**
+  - Code / 代码: `            "suffix": "" if suffix is None else suffix,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 146 / 第146行**
+  - Code / 代码: `        },`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 147 / 第147行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 148 / 第148行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 149 / 第149行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 150 / 第150行**
+  - Code / 代码: `def add_test_gemm(`
+  - EN: Defines function `add_test_gemm`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `add_test_gemm`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 151 / 第151行**
+  - Code / 代码: `    cls=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 152 / 第152行**
+  - Code / 代码: `    cc=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 153 / 第153行**
+  - Code / 代码: `    element=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 154 / 第154行**
+  - Code / 代码: `    layouts=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 155 / 第155行**
+  - Code / 代码: `    alignments=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 156 / 第156行**
+  - Code / 代码: `    element_output=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 157 / 第157行**
+  - Code / 代码: `    element_accumulator=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 158 / 第158行**
+  - Code / 代码: `    cluster_shape=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 159 / 第159行**
+  - Code / 代码: `    threadblock_shape=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 160 / 第160行**
+  - Code / 代码: `    warp_count=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 161 / 第161行**
+  - Code / 代码: `    stages=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 162 / 第162行**
+  - Code / 代码: `    opclass=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 163 / 第163行**
+  - Code / 代码: `    swizzle=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 164 / 第164行**
+  - Code / 代码: `    kernel_schedule=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 165 / 第165行**
+  - Code / 代码: `    epilogue_schedule=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 166 / 第166行**
+  - Code / 代码: `    compilation_modes=['nvcc', 'nvrtc'],`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 167 / 第167行**
+  - Code / 代码: `    element_A=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 168 / 第168行**
+  - Code / 代码: `    element_B=None,`
+  - EN: Continues the multi-line function signature for `add_test_gemm`.
+  - CN: 继续 `add_test_gemm` 的多行函数签名。
+- **Line 169 / 第169行**
+  - Code / 代码: `    element_C=None):`
+  - EN: Completes the multi-line function signature for `add_test_gemm`.
+  - CN: 完成 `add_test_gemm` 的多行函数签名。
+- **Line 170 / 第170行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 171 / 第171行**
+  - Code / 代码: `    Create test-running functions with the given specification and set it as a method of \`\`cls\`\`.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 172 / 第172行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 173 / 第173行**
+  - Code / 代码: `    :param cls: class to which the generated method will be added`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 174 / 第174行**
+  - Code / 代码: `    :type cls: type`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 175 / 第175行**
+  - Code / 代码: `    :param cc: compute capability to compile for`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 176 / 第176行**
+  - Code / 代码: `    :type cc: int`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 177 / 第177行**
+  - Code / 代码: `    :param element: data type of A and B operands`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 178 / 第178行**
+  - Code / 代码: `    :type element: cutlass_cppgen.DataType.f16`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 179 / 第179行**
+  - Code / 代码: `    :param layouts: layouts of A, B, and C operands`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 180 / 第180行**
+  - Code / 代码: `    :type layouts: list or tuple`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 181 / 第181行**
+  - Code / 代码: `    :param alignments: alingments of A, B, and C operands`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 182 / 第182行**
+  - Code / 代码: `    :type alignments: list or tuple`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 183 / 第183行**
+  - Code / 代码: `    :param element_output: data type of the output element`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 184 / 第184行**
+  - Code / 代码: `    :type element_output: cutlass_cppgen.DataType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 185 / 第185行**
+  - Code / 代码: `    :param element_accumulator: data type used in accumulation`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 186 / 第186行**
+  - Code / 代码: `    :type element_accumulator: cutlass_cppgen.DataType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 187 / 第187行**
+  - Code / 代码: `    :param cluster_shape: dimensions of clusters`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 188 / 第188行**
+  - Code / 代码: `    :type cluster_shape: list or tuple`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 189 / 第189行**
+  - Code / 代码: `    :param threadblock_shape: dimensions of threadblock tiles`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 190 / 第190行**
+  - Code / 代码: `    :type threadblock_shape: list or tuple`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 191 / 第191行**
+  - Code / 代码: `    :param warp_count: warps to be launched per threadblock dimension`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 192 / 第192行**
+  - Code / 代码: `    :type warp_count: list or tuple`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 193 / 第193行**
+  - Code / 代码: `    :param stages: number of pipeline stages to use in the kernel`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 194 / 第194行**
+  - Code / 代码: `    :type stages: int`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 195 / 第195行**
+  - Code / 代码: `    :param opclass: class of operation being performed (e.g., SIMT, Tensor Core)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 196 / 第196行**
+  - Code / 代码: `    :type opclass: cutlass_cppgen.OpcodeClass`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 197 / 第197行**
+  - Code / 代码: `    :param swizzle: threadblock swizzling functor`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 198 / 第198行**
+  - Code / 代码: `    :param kernel_schedule: kernel schedule to use`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 199 / 第199行**
+  - Code / 代码: `    :type kernel_schedule: cutlass_cppgen.KernelScheduleType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 200 / 第200行**
+  - Code / 代码: `    :param epilogue_schedule: epilogue schedule to use`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 201 / 第201行**
+  - Code / 代码: `    :type epilogue_schedule: cutlass_cppgen.EpilogueScheduleType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 202 / 第202行**
+  - Code / 代码: `    :param compilation_modes: list of compilers to used in testing the kernel (options: 'nvrtc', 'nvcc')`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 203 / 第203行**
+  - Code / 代码: `    :type compilation_modes: list,`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 204 / 第204行**
+  - Code / 代码: `    :param element_A: data type of operand A. If set, overrides \`\`element\`\``
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 205 / 第205行**
+  - Code / 代码: `    :type element_A: cutlass_cppgen.DataType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 206 / 第206行**
+  - Code / 代码: `    :param element_B: data type of operand B. If set, overrides \`\`element\`\``
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 207 / 第207行**
+  - Code / 代码: `    :type element_B: cutlass_cppgen.DataType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 208 / 第208行**
+  - Code / 代码: `    :param element_C: data type of operand C. If set, overrides \`\`element\`\``
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 209 / 第209行**
+  - Code / 代码: `    :type element_C: cutlass_cppgen.DataType`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 210 / 第210行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 211 / 第211行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 212 / 第212行**
+  - Code / 代码: `    if element_A is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 213 / 第213行**
+  - Code / 代码: `        element_A = element`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 214 / 第214行**
+  - Code / 代码: `    if element_B is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 215 / 第215行**
+  - Code / 代码: `        element_B = element`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 216 / 第216行**
+  - Code / 代码: `    if element_C is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 217 / 第217行**
+  - Code / 代码: `        element_C = element`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 218 / 第218行**
+  - Code / 代码: `    if element_output is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 219 / 第219行**
+  - Code / 代码: `        element_output = element`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 220 / 第220行**
+  - Code / 代码: `    if element_accumulator is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 221 / 第221行**
+  - Code / 代码: `        element_accumulator = element`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 222 / 第222行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 223 / 第223行**
+  - Code / 代码: `    for compilation_mode in compilation_modes:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 224 / 第224行**
+  - Code / 代码: `        def run(self):`
+  - EN: Defines function `run`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `run`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 225 / 第225行**
+  - Code / 代码: `            """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 226 / 第226行**
+  - Code / 代码: `            Dynamically-generated function that constructs a GEMM operation and verifies it against`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 227 / 第227行**
+  - Code / 代码: `            multiple test cases.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 228 / 第228行**
+  - Code / 代码: `            """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 229 / 第229行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 230 / 第230行**
+  - Code / 代码: `            layout_A, layout_B, layout_C = layouts`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 231 / 第231行**
+  - Code / 代码: `            alignment_A, alignment_B, alignment_C = alignments`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 232 / 第232行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 233 / 第233行**
+  - Code / 代码: `            plan = cutlass_cppgen.op.Gemm(element_A=element_A, element_B=element_B,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 234 / 第234行**
+  - Code / 代码: `                                element_C=element_C, element_D=element_output,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 235 / 第235行**
+  - Code / 代码: `                                layout_A=layout_A, layout_B=layout_B, layout_C=layout_C,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 236 / 第236行**
+  - Code / 代码: `                                element_accumulator=element_accumulator,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 237 / 第237行**
+  - Code / 代码: `                                kernel_cc=cc)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 238 / 第238行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 239 / 第239行**
+  - Code / 代码: `            plan.opclass = opclass`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 240 / 第240行**
+  - Code / 代码: `            if swizzle is not None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 241 / 第241行**
+  - Code / 代码: `                plan.swizzling_functor = swizzle`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 242 / 第242行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 243 / 第243行**
+  - Code / 代码: `            td = plan.tile_descriptions()[0]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 244 / 第244行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 245 / 第245行**
+  - Code / 代码: `            if warp_count is not None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 246 / 第246行**
+  - Code / 代码: `                td.warp_count = warp_count`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 247 / 第247行**
+  - Code / 代码: `            td.threadblock_shape = threadblock_shape`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 248 / 第248行**
+  - Code / 代码: `            td.stages = stages`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 249 / 第249行**
+  - Code / 代码: `            td.cluster_shape = cluster_shape`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 250 / 第250行**
+  - Code / 代码: `            op = plan.construct(tile_description=td, alignment_A=alignment_A, alignment_B=alignment_B, alignment_C=alignment_C)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 251 / 第251行**
+  - Code / 代码: `            self.assertTrue(test_all_gemm(op, 'universal', compilation_mode=compilation_mode))`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 252 / 第252行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 253 / 第253行**
+  - Code / 代码: `        element_epilogue = element_accumulator`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 254 / 第254行**
+  - Code / 代码: `        name = get_name(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 255 / 第255行**
+  - Code / 代码: `            layouts=layouts, alignments=alignments, element_output=element_output, element_accumulator=element_accumulator,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 256 / 第256行**
+  - Code / 代码: `            element_epilogue=element_epilogue, cluster_shape=cluster_shape, threadblock_shape=threadblock_shape,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 257 / 第257行**
+  - Code / 代码: `            stages=stages, element_a=element_A, element_b=element_B, element_c=element_C, arch=cc, opclass=opclass,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 258 / 第258行**
+  - Code / 代码: `            kernel_schedule=kernel_schedule, epilogue_schedule=epilogue_schedule, suffix=f'_{compilation_mode}')`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 259 / 第259行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 260 / 第260行**
+  - Code / 代码: `        setattr(cls, name, run)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Focuses on GEMM kernels, configurations, or correctness checks.
+  **CN**: 聚焦 GEMM 内核、配置或正确性检查。
+
+## Dependencies / 依赖项
+
+- `cutlass_library`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `cutlass_cppgen`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。
+- `cutlass_cppgen.backend`
+  - EN: Provides CUTLASS Python code-generation APIs used by these tests.
+  - CN: 提供这些测试使用的 CUTLASS Python 代码生成 API。
+- `gemm_testbed`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。

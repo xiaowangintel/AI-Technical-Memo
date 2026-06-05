@@ -1,0 +1,1870 @@
+# tensor_compare.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/host/tensor_compare.h`
+**Purpose / 用途**: Provides a host-side reference implementation or helper for tensor compare. / 为 tensor compare 提供主机端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>  \brief Defines host-side elementwise operations on TensorView.</code>
+  - EN: Comment that documents intent or context: "\brief Defines host-side elementwise operations on TensorView.".
+  - CN: 用于说明意图或上下文的注释："\brief Defines host-side elementwise operations on TensorView."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>// Standard Library includes</code>
+  - EN: Comment that documents intent or context: "Standard Library includes".
+  - CN: 用于说明意图或上下文的注释："Standard Library includes"。
+- **L38** <code>#include &lt;utility&gt;</code>
+  - EN: Includes `utility` so this file can use general utility helpers.
+  - CN: 引入 `utility`，使当前文件可以使用通用辅助工具。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>// Cutlass includes</code>
+  - EN: Comment that documents intent or context: "Cutlass includes".
+  - CN: 用于说明意图或上下文的注释："Cutlass includes"。
+- **L41** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L42** <code>#include &quot;cutlass/relatively_equal.h&quot;</code>
+  - EN: Includes `cutlass/relatively_equal.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/relatively_equal.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>#include &quot;cutlass/tensor_view_planar_complex.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view_planar_complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view_planar_complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>#include &quot;cutlass/util/distribution.h&quot;</code>
+  - EN: Includes `cutlass/util/distribution.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/distribution.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L47** <code>#include &quot;tensor_foreach.h&quot;</code>
+  - EN: Includes `tensor_foreach.h` so this file can use project-specific declarations from `tensor_foreach.h`.
+  - CN: 引入 `tensor_foreach.h`，使当前文件可以使用来自 `tensor_foreach.h` 的项目专用声明。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L50** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L51** <code>namespace host {</code>
+  - EN: Opens namespace `host` to group related symbols.
+  - CN: 打开命名空间 `host`，用于归组相关符号。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L54** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L59** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L60** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>struct TensorGreatestErrorFunc {</code>
+  - EN: Begins the declaration of struct `TensorGreatestErrorFunc`.
+  - CN: 开始声明 struct `TensorGreatestErrorFunc`。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L64** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L65** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L66** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L67** <code>  TensorView&lt;Element, Layout&gt; lhs;</code>
+  - EN: Declares the symbol `lhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `lhs`。
+- **L68** <code>  TensorView&lt;Element, Layout&gt; rhs;</code>
+  - EN: Declares the symbol `rhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `rhs`。
+- **L69** <code>  double result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L72** <code>  TensorGreatestErrorFunc(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorGreatestErrorFunc`.
+  - CN: 开始或继续与 `TensorGreatestErrorFunc` 相关的签名/调用语法。
+- **L73** <code>    TensorView&lt;Element, Layout&gt; const &amp;lhs_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L74** <code>    TensorView&lt;Element, Layout&gt; const &amp;rhs_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L75** <code>  ) :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L76** <code>    lhs(lhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `lhs`.
+  - CN: 开始或继续与 `lhs` 相关的签名/调用语法。
+- **L77** <code>    rhs(rhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `rhs`.
+  - CN: 开始或继续与 `rhs` 相关的签名/调用语法。
+- **L78** <code>    result(0.0) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `result`.
+  - CN: 开始或继续与 `result` 相关的签名/调用语法。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>  /// Visits a coordinate</code>
+  - EN: Comment that documents intent or context: "Visits a coordinate".
+  - CN: 用于说明意图或上下文的注释："Visits a coordinate"。
+- **L81** <code>  void operator()(Coord&lt;Layout::kRank&gt; const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>    Element lhs_ = lhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L84** <code>    Element rhs_ = rhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>    result = std::max(result, std::abs(double(lhs_) - double(rhs_)));</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L87** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L88** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L89** <code>  /// Returns true if equal</code>
+  - EN: Comment that documents intent or context: "Returns true if equal".
+  - CN: 用于说明意图或上下文的注释："Returns true if equal"。
+- **L90** <code>  operator double() const {</code>
+  - EN: Begins the definition of function or method `double`.
+  - CN: 开始定义函数或方法 `double`。
+- **L91** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L92** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L93** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L96** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L97** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L98** <code>struct TensorMREFunc {</code>
+  - EN: Begins the declaration of struct `TensorMREFunc`.
+  - CN: 开始声明 struct `TensorMREFunc`。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L101** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L102** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L103** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L104** <code>  TensorView&lt;Element, Layout&gt; lhs;</code>
+  - EN: Declares the symbol `lhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `lhs`。
+- **L105** <code>  TensorView&lt;Element, Layout&gt; rhs;</code>
+  - EN: Declares the symbol `rhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `rhs`。
+- **L106** <code>  double sum;</code>
+  - EN: Declares the symbol `sum` in the current scope.
+  - CN: 在当前作用域中声明符号 `sum`。
+- **L107** <code>  uint64_t count;</code>
+  - EN: Declares the symbol `count` in the current scope.
+  - CN: 在当前作用域中声明符号 `count`。
+- **L108** <code>  static constexpr double epsilon = 1e-6;</code>
+  - EN: Assigns or initializes `epsilon` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `epsilon` 进行赋值或初始化。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L111** <code>  TensorMREFunc(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorMREFunc`.
+  - CN: 开始或继续与 `TensorMREFunc` 相关的签名/调用语法。
+- **L112** <code>    TensorView&lt;Element, Layout&gt; const &amp;lhs_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L113** <code>    TensorView&lt;Element, Layout&gt; const &amp;rhs_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L114** <code>  ) :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L115** <code>    lhs(lhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `lhs`.
+  - CN: 开始或继续与 `lhs` 相关的签名/调用语法。
+- **L116** <code>    rhs(rhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `rhs`.
+  - CN: 开始或继续与 `rhs` 相关的签名/调用语法。
+- **L117** <code>    sum(0.0),</code>
+  - EN: Begins or continues the signature/call syntax involving `sum`.
+  - CN: 开始或继续与 `sum` 相关的签名/调用语法。
+- **L118** <code>    count(0) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `count`.
+  - CN: 开始或继续与 `count` 相关的签名/调用语法。
+- **L119** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L120** <code>  /// Visits a coordinate</code>
+  - EN: Comment that documents intent or context: "Visits a coordinate".
+  - CN: 用于说明意图或上下文的注释："Visits a coordinate"。
+- **L121** <code>  void operator()(Coord&lt;Layout::kRank&gt; const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L122** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L123** <code>    Element lhs_ = lhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L124** <code>    Element rhs_ = rhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L125** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L126** <code>    sum += std::abs(double(lhs_) - double(rhs_) / (double(rhs_) + epsilon));</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L127** <code>    ++count;</code>
+  - EN: Declares the symbol `count` in the current scope.
+  - CN: 在当前作用域中声明符号 `count`。
+- **L128** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>  /// Returns true if equal</code>
+  - EN: Comment that documents intent or context: "Returns true if equal".
+  - CN: 用于说明意图或上下文的注释："Returns true if equal"。
+- **L131** <code>  operator double() const {</code>
+  - EN: Begins the definition of function or method `double`.
+  - CN: 开始定义函数或方法 `double`。
+- **L132** <code>    return sum / double(count);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L133** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L135** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L136** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L137** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L138** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L139** <code>struct TensorMSEFunc {</code>
+  - EN: Begins the declaration of struct `TensorMSEFunc`.
+  - CN: 开始声明 struct `TensorMSEFunc`。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L142** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L143** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>  TensorView&lt;Element, Layout&gt; lhs;</code>
+  - EN: Declares the symbol `lhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `lhs`。
+- **L146** <code>  TensorView&lt;Element, Layout&gt; rhs;</code>
+  - EN: Declares the symbol `rhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `rhs`。
+- **L147** <code>  double sum;</code>
+  - EN: Declares the symbol `sum` in the current scope.
+  - CN: 在当前作用域中声明符号 `sum`。
+- **L148** <code>  uint64_t count;</code>
+  - EN: Declares the symbol `count` in the current scope.
+  - CN: 在当前作用域中声明符号 `count`。
+- **L149** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L150** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L151** <code>  TensorMSEFunc(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorMSEFunc`.
+  - CN: 开始或继续与 `TensorMSEFunc` 相关的签名/调用语法。
+- **L152** <code>    TensorView&lt;Element, Layout&gt; const &amp;lhs_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L153** <code>    TensorView&lt;Element, Layout&gt; const &amp;rhs_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L154** <code>  ) :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L155** <code>    lhs(lhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `lhs`.
+  - CN: 开始或继续与 `lhs` 相关的签名/调用语法。
+- **L156** <code>    rhs(rhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `rhs`.
+  - CN: 开始或继续与 `rhs` 相关的签名/调用语法。
+- **L157** <code>    sum(0.0),</code>
+  - EN: Begins or continues the signature/call syntax involving `sum`.
+  - CN: 开始或继续与 `sum` 相关的签名/调用语法。
+- **L158** <code>    count(0) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `count`.
+  - CN: 开始或继续与 `count` 相关的签名/调用语法。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>  /// Visits a coordinate</code>
+  - EN: Comment that documents intent or context: "Visits a coordinate".
+  - CN: 用于说明意图或上下文的注释："Visits a coordinate"。
+- **L161** <code>  void operator()(Coord&lt;Layout::kRank&gt; const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>    Element lhs_ = lhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L164** <code>    Element rhs_ = rhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>    sum += std::pow((double(lhs_) - double(rhs_)), 2);</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L167** <code>    ++count;</code>
+  - EN: Declares the symbol `count` in the current scope.
+  - CN: 在当前作用域中声明符号 `count`。
+- **L168** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L169** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L170** <code>  /// Returns true if equal</code>
+  - EN: Comment that documents intent or context: "Returns true if equal".
+  - CN: 用于说明意图或上下文的注释："Returns true if equal"。
+- **L171** <code>  operator double() const {</code>
+  - EN: Begins the definition of function or method `double`.
+  - CN: 开始定义函数或方法 `double`。
+- **L172** <code>    return sum / double(count);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L173** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L174** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L177** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L178** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L179** <code>struct TensorEqualsFunc {</code>
+  - EN: Begins the declaration of struct `TensorEqualsFunc`.
+  - CN: 开始声明 struct `TensorEqualsFunc`。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L182** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L183** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>  TensorView&lt;Element, Layout&gt; lhs;</code>
+  - EN: Declares the symbol `lhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `lhs`。
+- **L186** <code>  TensorView&lt;Element, Layout&gt; rhs;</code>
+  - EN: Declares the symbol `rhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `rhs`。
+- **L187** <code>  bool result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L190** <code>  TensorEqualsFunc(): result(true) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `result`.
+  - CN: 开始或继续与 `result` 相关的签名/调用语法。
+- **L191** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L192** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L193** <code>  TensorEqualsFunc(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorEqualsFunc`.
+  - CN: 开始或继续与 `TensorEqualsFunc` 相关的签名/调用语法。
+- **L194** <code>    TensorView&lt;Element, Layout&gt; const &amp;lhs_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L195** <code>    TensorView&lt;Element, Layout&gt; const &amp;rhs_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L196** <code>  ) :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L197** <code>    lhs(lhs_), rhs(rhs_), result(true) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `result`.
+  - CN: 开始或继续与 `result` 相关的签名/调用语法。
+- **L198** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L199** <code>  /// Visits a coordinate</code>
+  - EN: Comment that documents intent or context: "Visits a coordinate".
+  - CN: 用于说明意图或上下文的注释："Visits a coordinate"。
+- **L200** <code>  void operator()(Coord&lt;Layout::kRank&gt; const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>    Element lhs_ = lhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L203** <code>    Element rhs_ = rhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L204** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L205** <code>    if (lhs_ != rhs_) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L206** <code>      result = false;</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L207** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L208** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L209** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L210** <code>  /// Returns true if equal</code>
+  - EN: Comment that documents intent or context: "Returns true if equal".
+  - CN: 用于说明意图或上下文的注释："Returns true if equal"。
+- **L211** <code>  operator bool() const {</code>
+  - EN: Begins the definition of function or method `bool`.
+  - CN: 开始定义函数或方法 `bool`。
+- **L212** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L213** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L214** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L215** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L216** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L217** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L218** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L219** <code>struct TensorRelativelyEqualsFunc {</code>
+  - EN: Begins the declaration of struct `TensorRelativelyEqualsFunc`.
+  - CN: 开始声明 struct `TensorRelativelyEqualsFunc`。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L222** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L223** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L224** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L225** <code>  TensorView&lt;Element, Layout&gt; lhs;</code>
+  - EN: Declares the symbol `lhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `lhs`。
+- **L226** <code>  TensorView&lt;Element, Layout&gt; rhs;</code>
+  - EN: Declares the symbol `rhs` in the current scope.
+  - CN: 在当前作用域中声明符号 `rhs`。
+- **L227** <code>  Element epsilon;</code>
+  - EN: Declares the symbol `epsilon` in the current scope.
+  - CN: 在当前作用域中声明符号 `epsilon`。
+- **L228** <code>  Element nonzero_floor;</code>
+  - EN: Declares the symbol `nonzero_floor` in the current scope.
+  - CN: 在当前作用域中声明符号 `nonzero_floor`。
+- **L229** <code>  bool result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L230** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L231** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L232** <code>  TensorRelativelyEqualsFunc(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorRelativelyEqualsFunc`.
+  - CN: 开始或继续与 `TensorRelativelyEqualsFunc` 相关的签名/调用语法。
+- **L233** <code>    TensorView&lt;Element, Layout&gt; const &amp;lhs_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L234** <code>    TensorView&lt;Element, Layout&gt; const &amp;rhs_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L235** <code>    Element epsilon_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L236** <code>    Element nonzero_floor_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L237** <code>  ) :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L238** <code>    lhs(lhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `lhs`.
+  - CN: 开始或继续与 `lhs` 相关的签名/调用语法。
+- **L239** <code>    rhs(rhs_),</code>
+  - EN: Begins or continues the signature/call syntax involving `rhs`.
+  - CN: 开始或继续与 `rhs` 相关的签名/调用语法。
+- **L240** <code>    epsilon(epsilon_),</code>
+  - EN: Begins or continues the signature/call syntax involving `epsilon`.
+  - CN: 开始或继续与 `epsilon` 相关的签名/调用语法。
+- **L241** <code>    nonzero_floor(nonzero_floor_),</code>
+  - EN: Begins or continues the signature/call syntax involving `nonzero_floor`.
+  - CN: 开始或继续与 `nonzero_floor` 相关的签名/调用语法。
+- **L242** <code>    result(true) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `result`.
+  - CN: 开始或继续与 `result` 相关的签名/调用语法。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  /// Visits a coordinate</code>
+  - EN: Comment that documents intent or context: "Visits a coordinate".
+  - CN: 用于说明意图或上下文的注释："Visits a coordinate"。
+- **L245** <code>  void operator()(Coord&lt;Layout::kRank&gt; const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>    Element lhs_ = lhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L248** <code>    Element rhs_ = rhs.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L250** <code>    if (!relatively_equal(lhs_, rhs_, epsilon, nonzero_floor)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L251** <code>      result = false;</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L252** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L253** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L254** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L255** <code>  /// Returns true if equal</code>
+  - EN: Comment that documents intent or context: "Returns true if equal".
+  - CN: 用于说明意图或上下文的注释："Returns true if equal"。
+- **L256** <code>  operator bool() const {</code>
+  - EN: Begins the definition of function or method `bool`.
+  - CN: 开始定义函数或方法 `bool`。
+- **L257** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L258** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L259** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L260** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L261** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L262** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L263** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L264** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L265** <code>/// Returns the Mean Squared Error between two tensors.</code>
+  - EN: Comment that documents intent or context: "Returns the Mean Squared Error between two tensors.".
+  - CN: 用于说明意图或上下文的注释："Returns the Mean Squared Error between two tensors."。
+- **L266** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L267** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L268** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L269** <code>double TensorMSE(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorMSE`.
+  - CN: 开始或继续与 `TensorMSE` 相关的签名/调用语法。
+- **L270** <code>  TensorView&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L271** <code>  TensorView&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L272** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L273** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L274** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L275** <code>    return -1;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L276** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L277** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L278** <code>  detail::TensorMSEFunc&lt;Element, Layout&gt; func(lhs, rhs);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L279** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L280** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L281** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L282** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L283** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L284** <code>  return double(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L285** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L286** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L287** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L288** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>/// Returns the Mean Relative Error between two tensors.</code>
+  - EN: Comment that documents intent or context: "Returns the Mean Relative Error between two tensors.".
+  - CN: 用于说明意图或上下文的注释："Returns the Mean Relative Error between two tensors."。
+- **L291** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L292** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L293** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L294** <code>double TensorMRE(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorMRE`.
+  - CN: 开始或继续与 `TensorMRE` 相关的签名/调用语法。
+- **L295** <code>  TensorView&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L296** <code>  TensorView&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L297** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L298** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L299** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L300** <code>    return -1;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L301** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L302** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L303** <code>  detail::TensorMREFunc&lt;Element, Layout&gt; func(lhs, rhs);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L304** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L305** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L306** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L307** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L308** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L309** <code>  return double(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L310** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L311** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L312** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L313** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L314** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L315** <code>/// Returns the greatest error between two tensors.</code>
+  - EN: Comment that documents intent or context: "Returns the greatest error between two tensors.".
+  - CN: 用于说明意图或上下文的注释："Returns the greatest error between two tensors."。
+- **L316** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L317** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L318** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L319** <code>double TensorGreatestError(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorGreatestError`.
+  - CN: 开始或继续与 `TensorGreatestError` 相关的签名/调用语法。
+- **L320** <code>  TensorView&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L321** <code>  TensorView&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L324** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L325** <code>    return -1;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L326** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L327** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L328** <code>  detail::TensorGreatestErrorFunc&lt;Element, Layout&gt; func(lhs, rhs);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L329** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L330** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L331** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L332** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L334** <code>  return double(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L335** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L336** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L337** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L338** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L339** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L340** <code>/// Returns true if two tensor views are equal.</code>
+  - EN: Comment that documents intent or context: "Returns true if two tensor views are equal.".
+  - CN: 用于说明意图或上下文的注释："Returns true if two tensor views are equal."。
+- **L341** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L342** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L343** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L344** <code>bool TensorEquals(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorEquals`.
+  - CN: 开始或继续与 `TensorEquals` 相关的签名/调用语法。
+- **L345** <code>  TensorView&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L346** <code>  TensorView&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L347** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L348** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L349** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L350** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L351** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L353** <code>  detail::TensorEqualsFunc&lt;Element, Layout&gt; func(lhs, rhs);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L354** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L355** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L356** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L357** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L358** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L359** <code>  return bool(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L360** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L361** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L362** <code>/// Returns true if two tensor views are equal.</code>
+  - EN: Comment that documents intent or context: "Returns true if two tensor views are equal.".
+  - CN: 用于说明意图或上下文的注释："Returns true if two tensor views are equal."。
+- **L363** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L364** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L365** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L366** <code>bool TensorEquals(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorEquals`.
+  - CN: 开始或继续与 `TensorEquals` 相关的签名/调用语法。
+- **L367** <code>  TensorViewPlanarComplex&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L368** <code>  TensorViewPlanarComplex&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L369** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L370** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L371** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L372** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L373** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L374** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L375** <code>  detail::TensorEqualsFunc&lt;Element, Layout&gt; real_func(</code>
+  - EN: Begins or continues the signature/call syntax involving `real_func`.
+  - CN: 开始或继续与 `real_func` 相关的签名/调用语法。
+- **L376** <code>    {lhs.data(), lhs.layout(), lhs.extent()},</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L377** <code>    {rhs.data(), rhs.layout(), rhs.extent()}</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L378** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L379** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L380** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L381** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L382** <code>    real_func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L383** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L384** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L385** <code>  if (!bool(real_func)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L386** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L387** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L388** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L389** <code>  detail::TensorEqualsFunc&lt;Element, Layout&gt; imag_func(</code>
+  - EN: Begins or continues the signature/call syntax involving `imag_func`.
+  - CN: 开始或继续与 `imag_func` 相关的签名/调用语法。
+- **L390** <code>    {lhs.data() + lhs.imaginary_stride(), lhs.layout(), lhs.extent()}, </code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L391** <code>    {rhs.data() + rhs.imaginary_stride(), rhs.layout(), rhs.extent()}</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L392** <code>    );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L393** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L394** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L395** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L396** <code>    imag_func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L397** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L398** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L399** <code>  return bool(imag_func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L400** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L401** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L402** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L403** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L404** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L405** <code>/// Returns true if two tensor views are relatively equal.</code>
+  - EN: Comment that documents intent or context: "Returns true if two tensor views are relatively equal.".
+  - CN: 用于说明意图或上下文的注释："Returns true if two tensor views are relatively equal."。
+- **L406** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L407** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L408** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L409** <code>bool TensorRelativelyEquals(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorRelativelyEquals`.
+  - CN: 开始或继续与 `TensorRelativelyEquals` 相关的签名/调用语法。
+- **L410** <code>  TensorView&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L411** <code>  TensorView&lt;Element, Layout&gt; const &amp;rhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L412** <code>  Element epsilon,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L413** <code>  Element nonzero_floor) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L414** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L415** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L416** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L417** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L418** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L419** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L420** <code>  detail::TensorRelativelyEqualsFunc&lt;Element, Layout&gt; func(lhs, rhs, epsilon, nonzero_floor);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L421** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L422** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L423** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L424** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L425** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L426** <code>  return bool(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L427** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L428** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L429** <code>/// Returns true if two tensor views are relatively equal.</code>
+  - EN: Comment that documents intent or context: "Returns true if two tensor views are relatively equal.".
+  - CN: 用于说明意图或上下文的注释："Returns true if two tensor views are relatively equal."。
+- **L430** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L431** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L432** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L433** <code>bool TensorRelativelyEquals(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorRelativelyEquals`.
+  - CN: 开始或继续与 `TensorRelativelyEquals` 相关的签名/调用语法。
+- **L434** <code>  TensorViewPlanarComplex&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L435** <code>  TensorViewPlanarComplex&lt;Element, Layout&gt; const &amp;rhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L436** <code>  Element epsilon,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L437** <code>  Element nonzero_floor) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L438** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L439** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L440** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L441** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L442** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L443** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L444** <code>  detail::TensorRelativelyEqualsFunc&lt;Element, Layout&gt; real_func(</code>
+  - EN: Begins or continues the signature/call syntax involving `real_func`.
+  - CN: 开始或继续与 `real_func` 相关的签名/调用语法。
+- **L445** <code>    {lhs.data(), lhs.layout(), lhs.extent()},</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L446** <code>    {rhs.data(), rhs.layout(), rhs.extent()},</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L447** <code>    epsilon,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L448** <code>    nonzero_floor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L449** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L450** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L451** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L452** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L453** <code>    real_func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L454** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L455** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L456** <code>  if (!bool(real_func)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L457** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L458** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L459** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L460** <code>  detail::TensorEqualsFunc&lt;Element, Layout&gt; imag_func(</code>
+  - EN: Begins or continues the signature/call syntax involving `imag_func`.
+  - CN: 开始或继续与 `imag_func` 相关的签名/调用语法。
+- **L461** <code>    {lhs.data() + lhs.imaginary_stride(), lhs.layout(), lhs.extent()},</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L462** <code>    {rhs.data() + rhs.imaginary_stride(), rhs.layout(), rhs.extent()},</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L463** <code>    epsilon,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L464** <code>    nonzero_floor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L465** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L466** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L467** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L468** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L469** <code>    imag_func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L470** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L471** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L472** <code>  return bool(imag_func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L473** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L474** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L475** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L476** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L477** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L478** <code>/// Returns true if two tensor views are NOT equal.</code>
+  - EN: Comment that documents intent or context: "Returns true if two tensor views are NOT equal.".
+  - CN: 用于说明意图或上下文的注释："Returns true if two tensor views are NOT equal."。
+- **L479** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L480** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L481** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L482** <code>bool TensorNotEquals(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorNotEquals`.
+  - CN: 开始或继续与 `TensorNotEquals` 相关的签名/调用语法。
+- **L483** <code>  TensorView&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L484** <code>  TensorView&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L485** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L486** <code>  // Extents must be identical</code>
+  - EN: Comment that documents intent or context: "Extents must be identical".
+  - CN: 用于说明意图或上下文的注释："Extents must be identical"。
+- **L487** <code>  if (lhs.extent() != rhs.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L488** <code>    return true;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L489** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L490** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L491** <code>  detail::TensorEqualsFunc&lt;Element, Layout&gt; func(lhs, rhs);</code>
+  - EN: Declares function or method `func` without defining it here.
+  - CN: 声明函数或方法 `func`，但不在此处给出定义。
+- **L492** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L493** <code>    lhs.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L494** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L495** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L496** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L497** <code>  return !bool(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L498** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L499** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L500** <code>/// Returns true if two tensor views are equal.</code>
+  - EN: Comment that documents intent or context: "Returns true if two tensor views are equal.".
+  - CN: 用于说明意图或上下文的注释："Returns true if two tensor views are equal."。
+- **L501** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L502** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L503** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L504** <code>bool TensorNotEquals(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorNotEquals`.
+  - CN: 开始或继续与 `TensorNotEquals` 相关的签名/调用语法。
+- **L505** <code>  TensorViewPlanarComplex&lt;Element, Layout&gt; const &amp;lhs,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L506** <code>  TensorViewPlanarComplex&lt;Element, Layout&gt; const &amp;rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L508** <code>  return !TensorEquals(lhs, rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L509** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L510** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L511** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L512** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L513** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L514** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L515** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L516** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L517** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L518** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L519** <code>struct TensorContainsFunc {</code>
+  - EN: Begins the declaration of struct `TensorContainsFunc`.
+  - CN: 开始声明 struct `TensorContainsFunc`。
+- **L520** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L521** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L522** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L523** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L524** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L525** <code>  TensorView&lt;Element, Layout&gt; view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L526** <code>  Element value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L527** <code>  bool contains;</code>
+  - EN: Declares the symbol `contains` in the current scope.
+  - CN: 在当前作用域中声明符号 `contains`。
+- **L528** <code>  Coord&lt;Layout::kRank&gt; location;</code>
+  - EN: Declares the symbol `location` in the current scope.
+  - CN: 在当前作用域中声明符号 `location`。
+- **L529** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L530** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L531** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L532** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L533** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L534** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L535** <code>  TensorContainsFunc(): contains(false) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `contains`.
+  - CN: 开始或继续与 `contains` 相关的签名/调用语法。
+- **L536** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L537** <code>  /// Ctor</code>
+  - EN: Comment that documents intent or context: "Ctor".
+  - CN: 用于说明意图或上下文的注释："Ctor"。
+- **L538** <code>  TensorContainsFunc(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorContainsFunc`.
+  - CN: 开始或继续与 `TensorContainsFunc` 相关的签名/调用语法。
+- **L539** <code>    TensorView&lt;Element, Layout&gt; const &amp;view_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L540** <code>    Element value_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L541** <code>  ) :</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L542** <code>    view(view_), value(value_), contains(false) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `contains`.
+  - CN: 开始或继续与 `contains` 相关的签名/调用语法。
+- **L543** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L544** <code>  /// Visits a coordinate</code>
+  - EN: Comment that documents intent or context: "Visits a coordinate".
+  - CN: 用于说明意图或上下文的注释："Visits a coordinate"。
+- **L545** <code>  void operator()(Coord&lt;Layout::kRank&gt; const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L546** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L547** <code>    if (view.at(coord) == value) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L548** <code>      if (!contains) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L549** <code>        location = coord;</code>
+  - EN: Assigns or initializes `location` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `location` 进行赋值或初始化。
+- **L550** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L551** <code>      contains = true;</code>
+  - EN: Assigns or initializes `contains` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `contains` 进行赋值或初始化。
+- **L552** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L553** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L554** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L555** <code>  /// Returns true if equal</code>
+  - EN: Comment that documents intent or context: "Returns true if equal".
+  - CN: 用于说明意图或上下文的注释："Returns true if equal"。
+- **L556** <code>  operator bool() const {</code>
+  - EN: Begins the definition of function or method `bool`.
+  - CN: 开始定义函数或方法 `bool`。
+- **L557** <code>    return contains;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L558** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L559** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L560** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L561** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L562** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L563** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L564** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L565** <code>/// Returns true if a value is present in a tensor</code>
+  - EN: Comment that documents intent or context: "Returns true if a value is present in a tensor".
+  - CN: 用于说明意图或上下文的注释："Returns true if a value is present in a tensor"。
+- **L566** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L567** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L568** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L569** <code>bool TensorContains(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorContains`.
+  - CN: 开始或继续与 `TensorContains` 相关的签名/调用语法。
+- **L570** <code>  TensorView&lt;Element, Layout&gt; const &amp; view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L571** <code>  Element value) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L572** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L573** <code>  detail::TensorContainsFunc&lt;Element, Layout&gt; func(</code>
+  - EN: Begins or continues the signature/call syntax involving `func`.
+  - CN: 开始或继续与 `func` 相关的签名/调用语法。
+- **L574** <code>    view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L575** <code>    value</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L576** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L577** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L578** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L579** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L580** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L581** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L582** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L583** <code>  return bool(func);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L584** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L585** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L586** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L587** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L588** <code>/// Returns a pair containing a boolean of whether a value exists in a tensor and the location of</code>
+  - EN: Comment that documents intent or context: "Returns a pair containing a boolean of whether a value exists in a tensor and the location of".
+  - CN: 用于说明意图或上下文的注释："Returns a pair containing a boolean of whether a value exists in a tensor and the location of"。
+- **L589** <code>/// of the first occurrence. If the value is not contained in the tensor, the second element of the</code>
+  - EN: Comment that documents intent or context: "of the first occurrence. If the value is not contained in the tensor, the second element of the".
+  - CN: 用于说明意图或上下文的注释："of the first occurrence. If the value is not contained in the tensor, the second element of the"。
+- **L590** <code>/// pair is undefined.</code>
+  - EN: Comment that documents intent or context: "pair is undefined.".
+  - CN: 用于说明意图或上下文的注释："pair is undefined."。
+- **L591** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L592** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L593** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L594** <code>std::pair&lt;bool, Coord&lt;Layout::kRank&gt; &gt; TensorFind(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFind`.
+  - CN: 开始或继续与 `TensorFind` 相关的签名/调用语法。
+- **L595** <code>  TensorView&lt;Element, Layout&gt; const &amp; view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L596** <code>  Element value) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L597** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L598** <code>  detail::TensorContainsFunc&lt;Element, Layout&gt; func(</code>
+  - EN: Begins or continues the signature/call syntax involving `func`.
+  - CN: 开始或继续与 `func` 相关的签名/调用语法。
+- **L599** <code>    view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L600** <code>    value</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L601** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L602** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L603** <code>  TensorForEach(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorForEach`.
+  - CN: 开始或继续与 `TensorForEach` 相关的签名/调用语法。
+- **L604** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L605** <code>    func</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L606** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L607** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L608** <code>  return std::make_pair(bool(func), func.location);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L609** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L610** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L611** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L612** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L613** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L614** <code>} // namespace host</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L615** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L616** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>utility</code> — general utility helpers / 通用辅助工具
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/relatively_equal.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view_planar_complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/distribution.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>tensor_foreach.h</code> — project-specific declarations from `tensor_foreach.h` / 来自 `tensor_foreach.h` 的项目专用声明

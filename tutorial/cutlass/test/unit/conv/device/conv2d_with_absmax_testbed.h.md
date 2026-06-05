@@ -1,0 +1,1968 @@
+# conv2d_with_absmax_testbed.h — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device/conv2d_with_absmax_testbed.h`
+**Purpose / 用途**: Testbed for running device-level Conv2Ds with absolute maximum calculation and scaling. The file instantiates and runs tests for 2D, with concrete type aliases and builders declared in the source. / 该文件为对应卷积内核提供测试覆盖。 这里针对 2 维 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L32** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L33** `    \brief Testbed for running device-level Conv2Ds with absolute maximum calculation and scaling`
+  - **EN**: Records the file-level brief description: Testbed for running device-level Conv2Ds with absolute maximum calculation and scaling.
+  - **CN**: 记录文件级简述：Testbed for running device-level Conv2Ds with absolute maximum calculation and scaling。
+- **L34** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L35** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L36** `#pragma once`
+  - **EN**: Makes this header idempotent by preventing multiple inclusion.
+  - **CN**: 通过防止重复包含，让该头文件具备幂等性。
+- **L37** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L38** `#include <iostream>`
+  - **EN**: Console stream utilities for logging progress and results.
+  - **CN**: 用于记录进度和结果的控制台流工具。
+- **L39** `#include <fstream>`
+  - **EN**: File stream utilities for reading or writing benchmark data.
+  - **CN**: 用于读写基准数据的文件流工具。
+- **L40** `#include <sstream>`
+  - **EN**: String-stream helpers for assembling formatted text.
+  - **CN**: 用于拼接格式化文本的字符串流工具。
+- **L41** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L42** `#include "conv2d_problems.h"`
+  - **EN**: Provides `conv2d_problems.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `conv2d_problems.h`，使本文件能够使用相关 API 或辅助工具。
+- **L43** `#include "../../common/cutlass_unit_test.h"`
+  - **EN**: Shared CUTLASS unit-test harness used by older convolution tests.
+  - **CN**: 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- **L44** `#include "../../gemm/device/testbed_utils.h"`
+  - **EN**: Provides `../../gemm/device/testbed_utils.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `../../gemm/device/testbed_utils.h`，使本文件能够使用相关 API 或辅助工具。
+- **L45** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L46** `#include "cutlass/matrix_coord.h"`
+  - **EN**: Provides `cutlass/matrix_coord.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/matrix_coord.h`，使本文件能够使用相关 API 或辅助工具。
+- **L47** `#include "cutlass/conv/convolution.h"`
+  - **EN**: Provides `cutlass/conv/convolution.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/conv/convolution.h`，使本文件能够使用相关 API 或辅助工具。
+- **L48** `#include "cutlass/layout/matrix.h"`
+  - **EN**: Layout descriptors that define how tensors are mapped in memory.
+  - **CN**: 描述张量内存映射方式的布局描述符。
+- **L49** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L50** `#include "cutlass/util/host_tensor.h"`
+  - **EN**: Host/device tensor wrapper used to allocate storage and transfer data.
+  - **CN**: 主机/设备张量封装，用于分配存储并传输数据。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `#include "cutlass/util/tensor_view_io.h"`
+  - **EN**: Tensor printing helpers for debugging layouts and values.
+  - **CN**: 用于调试布局和值的张量打印辅助工具。
+- **L52** `#include "cutlass/util/distribution.h"`
+  - **EN**: Random-data distribution utilities for initializing test tensors.
+  - **CN**: 用于初始化测试张量的随机分布工具。
+- **L53** `#include "cutlass/util/reference/host/convolution.h"`
+  - **EN**: Host-side reference implementation used for correctness checking.
+  - **CN**: 用于正确性检查的主机端参考实现。
+- **L54** `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - **EN**: Host-side reference implementation used for correctness checking.
+  - **CN**: 用于正确性检查的主机端参考实现。
+- **L55** `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - **EN**: Host-side reference implementation used for correctness checking.
+  - **CN**: 用于正确性检查的主机端参考实现。
+- **L56** `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - **EN**: Host-side reference implementation used for correctness checking.
+  - **CN**: 用于正确性检查的主机端参考实现。
+- **L57** `#include "cutlass/util/reference/host/tensor_reduce.h"`
+  - **EN**: Host-side reference implementation used for correctness checking.
+  - **CN**: 用于正确性检查的主机端参考实现。
+- **L58** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L59** `namespace test {`
+  - **EN**: Opens namespace `test` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `test`。
+- **L60** `namespace conv {`
+  - **EN**: Opens namespace `conv` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `conv`。
+- **L61** `namespace device {`
+  - **EN**: Opens namespace `device` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `device`。
+- **L62** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L63** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L64** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L65** `template <`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L66** `  typename Conv,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L67** `  template<typename T> class ActivationFunctor`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L68** `>`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L69** `struct TestbedConv2dWithAbsMax {`
+  - **EN**: Starts the declaration of struct `TestbedConv2dWithAbsMax`.
+  - **CN**: 开始声明结构体 `TestbedConv2dWithAbsMax`。
+- **L70** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L71** `  using ElementAccumulator = typename Conv::ElementAccumulator;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L72** `  using ElementCompute = typename Conv::UnderlyingKernel::Epilogue::OutputOp::ElementCompute;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L73** `  using ElementScalingFactor = typename Conv::EpilogueOutputOp::ElementScalingFactor;`
+  - **EN**: Creates the `ElementScalingFactor` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementScalingFactor` 类型别名，供后续内核与 epilogue 定义使用。
+- **L74** `  using ElementAbsmax = typename Conv::EpilogueOutputOp::ElementAbsmax;`
+  - **EN**: Creates the `ElementAbsmax` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAbsmax` 类型别名，供后续内核与 epilogue 定义使用。
+- **L75** `  static cutlass::conv::Operator const kConvolutionalOperator = Conv::kConvolutionalOperator;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L77** `  static bool const kScaleAux = Conv::EpilogueOutputOp::kIsScalingAndAmaxAuxOutputNeeded;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L78** `  static bool const kScaleOutput = Conv::EpilogueOutputOp::kIsScalingAndAmaxOutputNeeded;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L79** `  bool doScaleA;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L80** `  bool doScaleB;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L81** `  bool doScaleC;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L82** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L83** `  /// Initialization`
+  - **EN**: Comment explaining: Initialization.
+  - **CN**: 说明性注释：Initialization。
+- **L84** `  cutlass::Distribution::Kind init_A;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L85** `  cutlass::Distribution::Kind init_B;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L86** `  cutlass::Distribution::Kind init_C;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L87** `  uint64_t seed;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L88** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L89** `  cutlass::HostTensor<typename Conv::ElementA, typename Conv::LayoutA> tensor_A;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L90** `  cutlass::HostTensor<typename Conv::ElementB, typename Conv::LayoutB> tensor_B;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L91** `  cutlass::HostTensor<typename Conv::ElementC, typename Conv::LayoutC> tensor_C;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L92** `  cutlass::HostTensor<typename Conv::EpilogueOutputOp::ElementAuxOutput, typename Conv::LayoutC> tensor_Aux;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L93** `  cutlass::HostTensor<typename Conv::EpilogueOutputOp::ElementOutput, typename Conv::LayoutC> tensor_D;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L94** `  cutlass::HostTensor<typename Conv::ElementC, typename Conv::LayoutC> tensor_Vector;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L95** `  cutlass::HostTensor<ElementAccumulator, typename Conv::LayoutC> tmp_D;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L96** `  cutlass::HostTensor<typename Conv::EpilogueOutputOp::ElementOutput, typename Conv::LayoutC> reference_D;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L97** `  cutlass::HostTensor<typename Conv::EpilogueOutputOp::ElementAuxOutput, typename Conv::LayoutC> reference_Aux;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L98** `  cutlass::HostTensor<ElementScalingFactor, typename Conv::LayoutC> scale_A;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L99** `  cutlass::HostTensor<ElementScalingFactor, typename Conv::LayoutC> scale_B;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L100** `  cutlass::HostTensor<ElementScalingFactor, typename Conv::LayoutC> scale_C;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `  cutlass::HostTensor<ElementScalingFactor, typename Conv::LayoutC> scale_D;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L102** `  cutlass::HostTensor<ElementScalingFactor, typename Conv::LayoutC> scale_Aux;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L103** `  cutlass::HostTensor<ElementAbsmax, typename Conv::LayoutC> abs_max_Aux;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L104** `  cutlass::HostTensor<ElementAbsmax, typename Conv::LayoutC> abs_max_D;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L105** `  cutlass::HostTensor<ElementAbsmax, typename Conv::LayoutC> reference_abs_max_Aux;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L106** `  cutlass::HostTensor<ElementAbsmax, typename Conv::LayoutC> reference_abs_max_D;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L107** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L108** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L109** `  // Methods`
+  - **EN**: Comment explaining: Methods.
+  - **CN**: 说明性注释：Methods。
+- **L110** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L111** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L112** `  TestbedConv2dWithAbsMax(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L113** `    bool scaleA = true,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L114** `    bool scaleB = true,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L115** `    bool scaleC = true,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L116** `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L117** `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L118** `    cutlass::Distribution::Kind init_C_ = cutlass::Distribution::Uniform,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L119** `    uint64_t seed_ = 2080`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L120** `  ):`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L121** `    doScaleA(scaleA), doScaleB(scaleB), doScaleC(scaleC),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L122** `    init_A(init_A_), init_B(init_B_), init_C(init_C_), seed(seed_) { }`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L123** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L124** `  /// Helper to initialize scaling factors`
+  - **EN**: Comment explaining: Helper to initialize scaling factors.
+  - **CN**: 说明性注释：Helper to initialize scaling factors。
+- **L125** `  template <typename Element, typename Layout>`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `  bool initialize_scale_factor(cutlass::TensorView<Element, Layout> view, uint64_t seed, int bits=0) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L127** `    cutlass::reference::host::TensorFillRandomUniform(view, seed, double(1.), double(0.), bits);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L128** `    return true;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L129** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L130** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L131** `  /// Helper to initialize a tensor view`
+  - **EN**: Comment explaining: Helper to initialize a tensor view.
+  - **CN**: 说明性注释：Helper to initialize a tensor view。
+- **L132** `  template <typename Element, typename Layout>`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L133** `  bool initialize_tensor(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L134** `    cutlass::TensorView<Element, Layout> view,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L135** `    cutlass::Distribution::Kind dist_kind,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L136** `    uint64_t seed) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L137** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L138** `    if (dist_kind == cutlass::Distribution::Uniform) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L139** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L140** `      double scope_max, scope_min;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L141** `      int bits_input = cutlass::sizeof_bits<Element>::value;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L142** `      int bits_output = cutlass::sizeof_bits<typename Conv::ElementC>::value;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L143** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L144** `      if (bits_input == 1) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L145** `        scope_max = 2;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L146** `        scope_min = 0;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L147** `      } else if (bits_input <= 8) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L148** `        scope_max = 2;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L149** `        scope_min = -2;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L150** `      } else if (bits_output == 16) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `        scope_max = 5;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L152** `        scope_min = -5;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L153** `      } else {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L154** `        scope_max = 8;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L155** `        scope_min = -8;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L156** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L157** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L158** `      cutlass::reference::host::TensorFillRandomUniform(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L159** `        view, seed, scope_max, scope_min, 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L160** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L161** `    else if (dist_kind == cutlass::Distribution::Identity) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L162** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L163** `      cutlass::reference::host::TensorFillIdentity(view);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L164** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L165** `    else if (dist_kind == cutlass::Distribution::Gaussian) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L166** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L167** `      cutlass::reference::host::TensorFillRandomGaussian(view, seed, 0, 0.5);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L168** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L169** `    else if (dist_kind == cutlass::Distribution::Sequential) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L170** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L171** `      cutlass::reference::host::BlockFillSequential(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L172** `        view.data(), view.capacity());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L173** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L174** `    else {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L175** `      EXPECT_TRUE(false) << "Not implemented";`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `      return false;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L177** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L178** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L179** `    return true;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L180** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L181** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L182** `  /// Initializes data structures`
+  - **EN**: Comment explaining: Initializes data structures.
+  - **CN**: 说明性注释：Initializes data structures。
+- **L183** `  void initialize(cutlass::conv::Conv2dProblemSize const &problem_size) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L184** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L185** `    // Allocate the GEMM workspace`
+  - **EN**: Comment explaining: Allocate the GEMM workspace.
+  - **CN**: 说明性注释：Allocate the GEMM workspace。
+- **L186** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L187** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L188** `    tensor_A.resize(implicit_gemm_tensor_a_extent(kConvolutionalOperator, problem_size));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L189** `    tensor_B.resize(implicit_gemm_tensor_b_extent(kConvolutionalOperator, problem_size));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L190** `    tensor_C.resize(implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L191** `    tensor_D.resize(implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L192** `    tensor_Vector.resize({1, 1, 1, implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size).c()});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L193** `    reference_D.resize(implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size), false);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L194** `    tmp_D.resize(implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size), false);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L195** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L196** `    EXPECT_TRUE(initialize_tensor(tensor_A.host_view(), init_A, seed + 2019));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L197** `    EXPECT_TRUE(initialize_tensor(tensor_B.host_view(), init_B, seed + 2018));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L198** `    EXPECT_TRUE(initialize_tensor(tensor_C.host_view(), init_C, seed + 2017));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L199** `    EXPECT_TRUE(initialize_tensor(tensor_Vector.host_view(), init_C, seed + 2020));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L200** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - **EN**: Comment explaining: It is possible to randomly initialize to all zeros, so override this with non-zeros.
+  - **CN**: 说明性注释：It is possible to randomly initialize to all zeros, so override this with non-zeros。
+- **L202** `    // in the upper left corner of each operand.`
+  - **EN**: Comment explaining: in the upper left corner of each operand..
+  - **CN**: 说明性注释：in the upper left corner of each operand.。
+- **L203** `    cutlass::Coord<4> origin(0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L204** `    tensor_A.host_view().at(origin) = typename Conv::ElementA(1);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L205** `    tensor_B.host_view().at(origin) = typename Conv::ElementB(1);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L206** `    tensor_C.host_view().at(origin) = typename Conv::ElementC(1);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L207** `    tensor_Vector.host_view().at(origin) = typename Conv::ElementC(1);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L208** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L209** `    cutlass::reference::host::TensorFill(tensor_D.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L210** `    cutlass::reference::host::TensorCopy(reference_D.host_view(), tensor_C.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L211** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L212** `    tensor_A.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L213** `    tensor_B.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L214** `    tensor_C.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L215** `    tensor_D.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L216** `    tensor_Vector.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L217** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L218** `    int scale_bits = 2;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L219** `    if (doScaleA) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L220** `      scale_A.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L221** `      EXPECT_TRUE(initialize_scale_factor(scale_A.host_view(), seed + 2021, scale_bits));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L222** `      scale_A.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L223** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L224** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L225** `    if (doScaleB) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `      scale_B.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L227** `      EXPECT_TRUE(initialize_scale_factor(scale_B.host_view(), seed + 2022, scale_bits));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L228** `      scale_B.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L229** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L230** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L231** `    if (doScaleC) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L232** `      scale_C.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L233** `      EXPECT_TRUE(initialize_scale_factor(scale_C.host_view(), seed + 2023, scale_bits));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L234** `      scale_C.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L235** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L236** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L237** `    if (kScaleOutput) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L238** `      scale_D.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L239** `      EXPECT_TRUE(initialize_scale_factor(scale_D.host_view(), seed + 2024, scale_bits));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L240** `      scale_D.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L241** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L242** `      abs_max_D.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L243** `      cutlass::reference::host::TensorFill(abs_max_D.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L244** `      abs_max_D.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L245** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L246** `      reference_abs_max_D.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L247** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L248** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L249** `    if (kScaleAux) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L250** `      tensor_Aux.resize(implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `      cutlass::reference::host::TensorFill(tensor_Aux.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L252** `      tensor_Aux.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L253** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L254** `      scale_Aux.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L255** `      EXPECT_TRUE(initialize_scale_factor(scale_Aux.host_view(), seed + 2025, scale_bits));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L256** `      scale_Aux.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L257** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L258** `      abs_max_Aux.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L259** `      cutlass::reference::host::TensorFill(abs_max_Aux.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L260** `      abs_max_Aux.sync_device();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L261** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L262** `      reference_Aux.resize(implicit_gemm_tensor_c_extent(kConvolutionalOperator, problem_size), false);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L263** `      reference_abs_max_Aux.resize({1, 1, 1, 1});`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L264** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L265** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L266** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L267** `  /// Compares computed reference with device reference and outputs to a file if incorrect`
+  - **EN**: Comment explaining: Compares computed reference with device reference and outputs to a file if incorrect.
+  - **CN**: 说明性注释：Compares computed reference with device reference and outputs to a file if incorrect。
+- **L268** `  bool compare_reference(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L269** `    cutlass::conv::Conv2dProblemSize const &problem_size,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L270** `    ElementCompute alpha,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L271** `    ElementCompute beta) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L272** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L273** `    tensor_D.sync_host();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L274** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L275** `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_A.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 276-300 / 第276-300行
+
+- **L276** `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_B.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L277** `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_C.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L278** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L279** `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_D.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L280** `    EXPECT_GT(cutlass::reference::host::TensorNorm(reference_D.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L281** `    bool passed = cutlass::reference::host::TensorEquals(reference_D.host_view(), tensor_D.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L282** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L283** `    if (kScaleAux) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L284** `      tensor_Aux.sync_host();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L285** `      abs_max_Aux.sync_host();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L286** `      EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_Aux.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L287** `      EXPECT_GT(cutlass::reference::host::TensorNorm(abs_max_Aux.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L288** `      EXPECT_GT(cutlass::reference::host::TensorNorm(reference_Aux.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L289** `      passed &= cutlass::reference::host::TensorEquals(reference_Aux.host_view(), tensor_Aux.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L290** `      passed &= cutlass::reference::host::TensorEquals(abs_max_Aux.host_view(), reference_abs_max_Aux.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L291** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L292** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L293** `    if (kScaleOutput) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L294** `      abs_max_D.sync_host();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L295** `      EXPECT_GT(cutlass::reference::host::TensorNorm(abs_max_D.host_view()), 0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L296** `      passed &= cutlass::reference::host::TensorEquals(abs_max_D.host_view(), reference_abs_max_D.host_view());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L297** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L298** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L299** `    EXPECT_TRUE(passed) << " mismatched reference";`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L300** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 301-325 / 第301-325行
+
+- **L301** `    if (!passed) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L302** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L303** `      std::ofstream file0("conv_testbed_with_amax_errors_reference.txt");`
+  - **EN**: Opens an output file stream used to write cached test data.
+  - **CN**: 打开一个输出文件流，用于写入缓存的测试数据。
+- **L304** `      std::ofstream file1("conv_testbed_with_amax_errors_computed.txt");`
+  - **EN**: Opens an output file stream used to write cached test data.
+  - **CN**: 打开一个输出文件流，用于写入缓存的测试数据。
+- **L305** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L306** `      std::ofstream file("conv_testbed_with_amax_errors.txt");`
+  - **EN**: Opens an output file stream used to write cached test data.
+  - **CN**: 打开一个输出文件流，用于写入缓存的测试数据。
+- **L307** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L308** `      file`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L309** `        << "problem: " << problem_size`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L310** `        << ", alpha: " << alpha << ", beta: " << beta << "\n\n";`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L311** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L312** `      file`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L313** `        << "A =\n" << tensor_A.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L314** `        << "\nB =\n" << tensor_B.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L315** `        << "\nC =\n" << tensor_C.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L316** `        << "\nVector =\n" << tensor_Vector.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L317** `        << "\nScaleA = " << scale_A.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L318** `        << "\nScaleB = " << scale_B.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L319** `        << "\nScaleC = " << scale_C.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L320** `        << "\nScaleD = " << scale_D.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L321** `        << "\nScaleAux = " << scale_Aux.host_view()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L322** `        << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L323** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L324** `      file0 << "\n\nReference D =\n" << reference_D.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L325** `      file1 << "\n\nComputed D =\n" << tensor_D.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 326-350 / 第326-350行
+
+- **L326** `      if (kScaleAux) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L327** `        file0 << "\n\nReference Aux =\n" << reference_Aux.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L328** `        file1 << "\n\nComputed Aux =\n" << tensor_Aux.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L329** `        file0 << "\n\nReference Absmax Aux = " << reference_abs_max_Aux.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L330** `        file1 << "\n\nComputed Absmax Aux = " << abs_max_Aux.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L331** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L332** `      if (kScaleOutput) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L333** `        file0 << "\n\nReference Absmax D = " << reference_abs_max_D.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L334** `        file1 << "\n\nComputed Absmax D = " << abs_max_D.host_view() << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L335** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L336** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L337** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L338** `    return passed;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L339** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L340** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L341** `  /// Verifies the result is a GEMM`
+  - **EN**: Comment explaining: Verifies the result is a GEMM.
+  - **CN**: 说明性注释：Verifies the result is a GEMM。
+- **L342** `  bool verify(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L343** `    cutlass::conv::Conv2dProblemSize const &problem_size,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L344** `    ElementCompute alpha,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L345** `    ElementCompute beta) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L346** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L347** `    cutlass::Coord<4> origin(0);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L348** `    ElementCompute scaled_alpha = alpha;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L349** `    if (doScaleA) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L350** `      scaled_alpha *= scale_A.host_view().at(origin);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 351-375 / 第351-375行
+
+- **L351** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L352** `    if (doScaleB) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L353** `      scaled_alpha *= scale_B.host_view().at(origin);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L354** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L355** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L356** `    ElementCompute scaled_beta = beta;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L357** `    if (doScaleC) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L358** `      scaled_beta *= scale_C.host_view().at(origin);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L359** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L360** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L361** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L362** `    // Verify`
+  - **EN**: Comment explaining: Verify.
+  - **CN**: 说明性注释：Verify。
+- **L363** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L364** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L365** `    cutlass::reference::host::Conv2d<`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L366** `        typename Conv::ElementA, typename Conv::LayoutA,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L367** `        typename Conv::ElementB, typename Conv::LayoutB,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L368** `        typename Conv::ElementC, typename Conv::LayoutC,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L369** `        ElementCompute, ElementAccumulator, ElementAccumulator`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L370** `    >(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L371** `      kConvolutionalOperator,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L372** `      problem_size,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L373** `      tensor_A.host_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L374** `      tensor_B.host_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L375** `      tensor_C.host_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 376-400 / 第376-400行
+
+- **L376** `      tmp_D.host_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L377** `      scaled_alpha,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L378** `      scaled_beta`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L379** `    );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L380** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L381** `    ElementCompute tmp_abs_max_Aux(0.);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L382** `    ElementCompute tmp_abs_max_D(0.);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L383** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L384** `    cutlass::NumericConverter<ElementCompute, typename Conv::ElementC> cvt_c_to_compute;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L385** `    cutlass::NumericConverter<ElementCompute, ElementAccumulator> cvt_accum_to_compute;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L386** `    cutlass::NumericConverter<ElementAbsmax, ElementCompute> cvt_compute_to_absmax;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L387** `    cutlass::NumericConverter<typename Conv::EpilogueOutputOp::ElementOutput, ElementCompute> cvt_compute_to_d;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L388** `    cutlass::NumericConverter<typename Conv::EpilogueOutputOp::ElementAuxOutput, ElementCompute> cvt_compute_to_aux;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L389** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L390** `    cutlass::absolute_value_op<ElementCompute> abs;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L391** `    cutlass::maximum_with_nan_propogation<ElementCompute> max;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L392** `    ActivationFunctor<ElementCompute> act;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L393** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L394** `    ElementScalingFactor d_scale = kScaleOutput ? scale_D.host_view().at(origin) : ElementScalingFactor(1.);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L395** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L396** `    for (int n = 0; n < problem_size.N; ++n) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L397** `      for (int p = 0; p < problem_size.P; ++p) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L398** `        for (int q = 0; q < problem_size.Q; ++q) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L399** `          for (int k = 0; k < problem_size.K; ++k) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L400** `            ElementCompute intermediate = cvt_accum_to_compute(tmp_D.host_view().at({n, p, q, k}));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 401-425 / 第401-425行
+
+- **L401** `            ElementCompute bias = cvt_c_to_compute(tensor_Vector.host_view().at({0, 0, 0, k}));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L402** `            ElementCompute aux = intermediate + bias;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L403** `            ElementCompute d = act(aux);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L404** `            tmp_abs_max_Aux = max(abs(aux), tmp_abs_max_Aux);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L405** `            tmp_abs_max_D = max(abs(d), tmp_abs_max_D);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L406** `            reference_D.host_view().at({n, p, q, k}) = cvt_compute_to_d(d * d_scale);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L407** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L408** `            if (kScaleAux) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L409** `              reference_Aux.host_view().at({n, p, q, k}) = cvt_compute_to_aux(aux * scale_Aux.host_view().at(origin));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L410** `            }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L411** `          }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L412** `        }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L413** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L414** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L415** `    if (kScaleAux) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L416** `      reference_abs_max_Aux.host_view().at(origin) = cvt_compute_to_absmax(tmp_abs_max_Aux);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L417** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L418** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L419** `    if (kScaleOutput) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L420** `      reference_abs_max_D.host_view().at(origin) = cvt_compute_to_absmax(tmp_abs_max_D);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L421** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L422** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L423** `    return compare_reference(problem_size, alpha, beta);`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L424** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L425** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 426-450 / 第426-450行
+
+- **L426** `  /// Returns true if the CUDA device is sufficient to execute the kernel.`
+  - **EN**: Comment explaining: Returns true if the CUDA device is sufficient to execute the kernel..
+  - **CN**: 说明性注释：Returns true if the CUDA device is sufficient to execute the kernel.。
+- **L427** `  bool sufficient() const {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L428** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L429** `    // Determine SMEM requirements and waive if not satisfied`
+  - **EN**: Comment explaining: Determine SMEM requirements and waive if not satisfied.
+  - **CN**: 说明性注释：Determine SMEM requirements and waive if not satisfied。
+- **L430** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L431** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L432** `    size_t smem_size = sizeof(typename Conv::UnderlyingKernel::SharedStorage);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L433** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L434** `    cudaDeviceProp properties;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L435** `    int device_idx;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L436** `    cudaError_t result = cudaGetDevice(&device_idx);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L437** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L438** `    if (result != cudaSuccess) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L439** `      throw std::runtime_error("cudaGetDevice() API call failed.");`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L440** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L441** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L442** `    result = cudaGetDeviceProperties(&properties, device_idx);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L443** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L444** `    if (result != cudaSuccess) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L445** `      throw std::runtime_error("cudaGetDeviceProperties() failed");`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L446** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L447** `      if (properties.sharedMemPerBlockOptin < smem_size) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L448** `        printf("failed due to smem_size\n");`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L449** `        printf("hardware smem_size: %d, required smem_size: %d\n\n", int(properties.sharedMemPerBlockOptin), int(smem_size));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L450** `        return false;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+
+### Lines 451-475 / 第451-475行
+
+- **L451** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L452** `    return true;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L453** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L454** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L455** `  /// Executes one test`
+  - **EN**: Comment explaining: Executes one test.
+  - **CN**: 说明性注释：Executes one test。
+- **L456** `  bool run(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L457** `    cutlass::conv::Conv2dProblemSize const &problem_size,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L458** `    ElementCompute alpha = ElementCompute(1),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L459** `    ElementCompute beta = ElementCompute(0))`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L460** `  {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L461** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L462** `    // Waive test if insufficient CUDA device`
+  - **EN**: Comment explaining: Waive test if insufficient CUDA device.
+  - **CN**: 说明性注释：Waive test if insufficient CUDA device。
+- **L463** `    if (!sufficient()) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L464** `      if (CUTLASS_TEST_UNIT_ENABLE_WARNINGS) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L465** `        std::cerr << "Test waived due to insufficient CUDA device." << std::endl;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L466** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L467** `      return true;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L468** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L469** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L470** `    this->initialize(problem_size);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L471** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L472** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L473** `    // Initialize the GEMM operator`
+  - **EN**: Comment explaining: Initialize the GEMM operator.
+  - **CN**: 说明性注释：Initialize the GEMM operator。
+- **L474** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L475** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 476-500 / 第476-500行
+
+- **L476** `    typename Conv::EpilogueOutputOp::Params::ActivationParams activation_params{alpha, beta};`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L477** `    typename Conv::EpilogueOutputOp::Params epilogue_params{`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L478** `      activation_params,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L479** `      scale_A.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L480** `      scale_B.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L481** `      scale_C.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L482** `      scale_D.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L483** `      scale_Aux.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L484** `      abs_max_Aux.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L485** `      abs_max_D.device_data()`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L486** `    };`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L487** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L488** `    typename Conv::Arguments arguments{`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L489** `      problem_size,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L490** `      tensor_A.device_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L491** `      tensor_B.device_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L492** `      tensor_C.device_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L493** `      tensor_D.device_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L494** `      tensor_Aux.device_ref(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L495** `      epilogue_params,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L496** `      cutlass::conv::SplitKMode::kSerial,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L497** `      tensor_Vector.device_data(),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L498** `      0`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L499** `    };`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L500** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 501-525 / 第501-525行
+
+- **L501** `    Conv conv2d_op;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L502** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L503** `    cutlass::Status status = conv2d_op.can_implement(arguments);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L504** `    EXPECT_TRUE(status == cutlass::Status::kSuccess) << to_string(status);`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L505** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L506** `    size_t workspace_size = Conv::get_workspace_size(arguments);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L507** `    cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L508** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L509** `    status = conv2d_op.initialize(arguments, workspace.get());`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L510** `    EXPECT_TRUE(status == cutlass::Status::kSuccess) << to_string(status);`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L511** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L512** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L513** `    // Run the GEMM`
+  - **EN**: Comment explaining: Run the GEMM.
+  - **CN**: 说明性注释：Run the GEMM。
+- **L514** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L515** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L516** `    status = conv2d_op();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L517** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L518** `    EXPECT_TRUE(status == cutlass::Status::kSuccess) << to_string(status);`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L519** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L520** `    cudaError_t cuda_error = cudaDeviceSynchronize();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L521** `    EXPECT_TRUE(cuda_error == cudaSuccess) << cudaGetErrorString(cuda_error);`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L522** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L523** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L524** `    // Verify`
+  - **EN**: Comment explaining: Verify.
+  - **CN**: 说明性注释：Verify。
+- **L525** `    //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+### Lines 526-550 / 第526-550行
+
+- **L526** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L527** `    bool passed = this->verify(problem_size, alpha, beta);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L528** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L529** `    if (!passed) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L530** `      std::cout << "Failed" << std::endl;`
+  - **EN**: Writes the next serialized field to the output stream.
+  - **CN**: 向输出流写入下一个序列化字段。
+- **L531** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L532** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L533** `    return passed;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L534** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L535** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L536** `};`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L537** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L538** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L539** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L540** `template <`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L541** `  typename ImplicitGemm,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L542** `  template<typename T> class ActivationFunctor = cutlass::epilogue::thread::Identity`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L543** `>`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L544** `bool TestAllConv2dWithAbsmax(bool scaleA=true, bool scaleB=true, bool scaleC=true) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L545** `  const Conv2dProblemVector &conv_test_sizes = Conv2dProblemVector();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L546** `  const Conv2dProblemVector &conv_blacklist_sizes = Conv2dProblemVector();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L547** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L548** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L549** `  // Testbed object`
+  - **EN**: Comment explaining: Testbed object.
+  - **CN**: 说明性注释：Testbed object。
+- **L550** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+### Lines 551-575 / 第551-575行
+
+- **L551** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L552** `  TestbedConv2dWithAbsMax<ImplicitGemm, ActivationFunctor> testbed(scaleA, scaleB, scaleC);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L553** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L554** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L555** `  // Get conv problem sizes to run conv operator `
+  - **EN**: Comment explaining: Get conv problem sizes to run conv operator.
+  - **CN**: 说明性注释：Get conv problem sizes to run conv operator。
+- **L556** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L557** `  TestbedConv2dProblemSizes conv_problems(128/cutlass::sizeof_bits<typename ImplicitGemm::ElementA>::value);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L558** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L559** `  // Vector of conv2d problem sizes to avoid duplicate runs`
+  - **EN**: Comment explaining: Vector of conv2d problem sizes to avoid duplicate runs.
+  - **CN**: 说明性注释：Vector of conv2d problem sizes to avoid duplicate runs。
+- **L560** `  Conv2dProblemVector conv_tested_sizes;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L561** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L562** `  Conv2dProblemVector const *problem_vectors[] = {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L563** `    &conv_test_sizes,                               // run user specified sizes`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L564** `    &conv_problems.conv2d_default_sizes,            // run default and cudnn bug sizes`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L565** `    &conv_problems.conv2d_resnet50_sizes,           // run resnet50 sizes`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L566** `#if CUTLASS_CONV_UNIT_TEST_RIGOROUS_SIZE_ENABLED `
+  - **EN**: Starts a compile-time conditional block guarded by `CUTLASS_CONV_UNIT_TEST_RIGOROUS_SIZE_ENABLED`.
+  - **CN**: 开始由 `CUTLASS_CONV_UNIT_TEST_RIGOROUS_SIZE_ENABLED` 保护的编译期条件块。
+- **L567** `    &conv_problems.conv2d_rigorous_sizes,           // run large and rigorous sizes if enabled`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L568** `#endif`
+  - **EN**: Ends the current compile-time conditional block.
+  - **CN**: 结束当前编译期条件块。
+- **L569** `  };`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L570** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L571** `  bool passed = true;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L572** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L573** `  // Sweep conv2d problem sizes (split-k-mode=kSerial, split-k-slice=1, alpha=1.0, beta=0.0)`
+  - **EN**: Comment explaining: Sweep conv2d problem sizes (split-k-mode=kSerial, split-k-slice=1, alpha=1.0, beta=0.0).
+  - **CN**: 说明性注释：Sweep conv2d problem sizes (split-k-mode=kSerial, split-k-slice=1, alpha=1.0, beta=0.0)。
+- **L574** `  for (Conv2dProblemVector const * problem_vector : problem_vectors) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L575** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 576-600 / 第576-600行
+
+- **L576** `    // Prune all problems with channels that aren't divisible by the number of elements accessed per`
+  - **EN**: Comment explaining: Prune all problems with channels that aren't divisible by the number of elements accessed per.
+  - **CN**: 说明性注释：Prune all problems with channels that aren't divisible by the number of elements accessed per。
+- **L577** `    // load for operands A and B. This is meant to align with the requirements of iterators used for`
+  - **EN**: Comment explaining: load for operands A and B. This is meant to align with the requirements of iterators used for.
+  - **CN**: 说明性注释：load for operands A and B. This is meant to align with the requirements of iterators used for。
+- **L578** `    // fprop kernels.`
+  - **EN**: Comment explaining: fprop kernels..
+  - **CN**: 说明性注释：fprop kernels.。
+- **L579** `    ChannelDivisibilitySpecification channel_spec(128 / cutlass::sizeof_bits<typename ImplicitGemm::ElementA>::value);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L580** `    auto pruned_problem_vector = prune(*problem_vector, channel_spec);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L581** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L582** `    //  Run conv testbed on default convolution sizes`
+  - **EN**: Comment explaining: Run conv testbed on default convolution sizes.
+  - **CN**: 说明性注释：Run conv testbed on default convolution sizes。
+- **L583** `    for(auto conv_problem : pruned_problem_vector) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L584** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L585** `      // Skip blacklist and avoid duplicate problem sizes`
+  - **EN**: Comment explaining: Skip blacklist and avoid duplicate problem sizes.
+  - **CN**: 说明性注释：Skip blacklist and avoid duplicate problem sizes。
+- **L586** `      if (std::find(conv_blacklist_sizes.begin(), conv_blacklist_sizes.end(), conv_problem) != conv_blacklist_sizes.end() ||`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L587** `          std::find(conv_tested_sizes.begin(), conv_tested_sizes.end(), conv_problem) != conv_tested_sizes.end()) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L588** `        continue;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L589** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L590** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L591** `      //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L592** `      // Test`
+  - **EN**: Comment explaining: Test.
+  - **CN**: 说明性注释：Test。
+- **L593** `      //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L594** `      // push back tested problem size to avoid re-running duplicates`
+  - **EN**: Comment explaining: push back tested problem size to avoid re-running duplicates.
+  - **CN**: 说明性注释：push back tested problem size to avoid re-running duplicates。
+- **L595** `      conv_tested_sizes.push_back(conv_problem);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L596** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L597** `      // test mode = xcross`
+  - **EN**: Comment explaining: test mode = xcross.
+  - **CN**: 说明性注释：test mode = xcross。
+- **L598** `      passed &= testbed.run(conv_problem);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L599** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L600** `      if (!passed) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+
+### Lines 601-622 / 第601-622行
+
+- **L601** `        return false;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L602** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L603** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L604** `      // test mode = convolution`
+  - **EN**: Comment explaining: test mode = convolution.
+  - **CN**: 说明性注释：test mode = convolution。
+- **L605** `      passed &= testbed.run(conv_problem.reset_mode(cutlass::conv::Mode::kConvolution));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L606** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L607** `      if (!passed) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L608** `        return false;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L609** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L610** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L611** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L612** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L613** `  return passed;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L614** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L615** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L616** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L617** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L618** `} // namespace device`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L619** `} // namespace conv`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L620** `} // namespace test`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L621** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L622** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+## Key Concepts / 关键概念
+- GoogleTest test cases encode each kernel variant as a compile-time instantiation that is exercised by a shared testbed. / GoogleTest 用例将每个内核变体编码为编译期实例化，并交由共享测试平台执行。
+- The cache helpers serialize hashed inputs and outputs so expensive test results can be reused across runs. / 缓存辅助逻辑会序列化哈希后的输入与输出，使昂贵的测试结果能够在多次运行之间复用。
+## Dependencies / 依赖项
+- `iostream` — Console stream utilities for logging progress and results. / 用于记录进度和结果的控制台流工具。
+- `fstream` — File stream utilities for reading or writing benchmark data. / 用于读写基准数据的文件流工具。
+- `sstream` — String-stream helpers for assembling formatted text. / 用于拼接格式化文本的字符串流工具。
+- `conv2d_problems.h` — Provides `conv2d_problems.h` so this file can use the related API or helper utilities. / 提供 `conv2d_problems.h`，使本文件能够使用相关 API 或辅助工具。
+- `../../common/cutlass_unit_test.h` — Shared CUTLASS unit-test harness used by older convolution tests. / 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- `../../gemm/device/testbed_utils.h` — Provides `../../gemm/device/testbed_utils.h` so this file can use the related API or helper utilities. / 提供 `../../gemm/device/testbed_utils.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/matrix_coord.h` — Provides `cutlass/matrix_coord.h` so this file can use the related API or helper utilities. / 提供 `cutlass/matrix_coord.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/conv/convolution.h` — Provides `cutlass/conv/convolution.h` so this file can use the related API or helper utilities. / 提供 `cutlass/conv/convolution.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/layout/matrix.h` — Layout descriptors that define how tensors are mapped in memory. / 描述张量内存映射方式的布局描述符。
+- `cutlass/util/host_tensor.h` — Host/device tensor wrapper used to allocate storage and transfer data. / 主机/设备张量封装，用于分配存储并传输数据。
+- `cutlass/util/tensor_view_io.h` — Tensor printing helpers for debugging layouts and values. / 用于调试布局和值的张量打印辅助工具。
+- `cutlass/util/distribution.h` — Random-data distribution utilities for initializing test tensors. / 用于初始化测试张量的随机分布工具。
+- `cutlass/util/reference/host/convolution.h` — Host-side reference implementation used for correctness checking. / 用于正确性检查的主机端参考实现。
+- `cutlass/util/reference/host/tensor_copy.h` — Host-side reference implementation used for correctness checking. / 用于正确性检查的主机端参考实现。
+- `cutlass/util/reference/host/tensor_compare.h` — Host-side reference implementation used for correctness checking. / 用于正确性检查的主机端参考实现。
+- `cutlass/util/reference/host/tensor_fill.h` — Host-side reference implementation used for correctness checking. / 用于正确性检查的主机端参考实现。
+- `cutlass/util/reference/host/tensor_reduce.h` — Host-side reference implementation used for correctness checking. / 用于正确性检查的主机端参考实现。

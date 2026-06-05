@@ -1,0 +1,386 @@
+# torch.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/torch.py`
+
+## Purpose / 作用
+- EN: Defines 4 classes (ScalarInitConfig, RandomInitConfig, GaussianInitConfig, TensorInitType) and 10 functions (dtype, as_tensor, create_and_permute_torch_tensor, get_leading_dim, ... (+6 more)) in `CuTeDSL.cutlass.torch`.
+- CN: 该模块 `CuTeDSL.cutlass.torch` 定义了 4 个类（ScalarInitConfig, RandomInitConfig, GaussianInitConfig, TensorInitType） 和 10 个函数（dtype, as_tensor, create_and_permute_torch_tensor, get_leading_dim, ... (+6 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L13** `from math import prod` — **EN:** Imports prod from `math`. **CN:** 从 `math` 导入 prod。
+- **L14** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L15** `from enum import Enum` — **EN:** Imports Enum from `enum`. **CN:** 从 `enum` 导入 Enum。
+- **L16** `from typing import Any, Optional, Type, Union, Tuple` — **EN:** Imports Any, Optional, Type, Union, Tuple from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Type, Union, Tuple。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `from cutlass.cute.typing import (` — **EN:** Imports Numeric, Boolean, TFloat32, Float8E4M3B11FNUZ, Float8E4M3FN, Float8E5M2, ... (+6 more) from `cutlass.cute.typing`. **CN:** 从 `cutlass.cute.typing` 导入 Numeric, Boolean, TFloat32, Float8E4M3B11FNUZ, Float8E4M3FN, Float8E5M2, ... (+6 more)。
+- **L19** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    TFloat32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    Float8E4M3B11FNUZ,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    Float6E3M2FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    Float6E2M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    Int4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    Tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `from cutlass.cute.runtime import from_dlpack` — **EN:** Imports from_dlpack from `cutlass.cute.runtime`. **CN:** 从 `cutlass.cute.runtime` 导入 from_dlpack。
+- **L33** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L34** `import torch` — **EN:** Imports torch for later use. **CN:** 导入 torch 供后续使用。
+- **L35** `import cuda.bindings.driver as cuda` — **EN:** Imports cuda.bindings.driver as cuda for later use. **CN:** 导入 cuda.bindings.driver as cuda 供后续使用。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `def dtype(ty: Type[Numeric]) -> "torch.dtype":` — **EN:** Defines function `dtype`. **CN:** 定义函数 `dtype`。
+- **L39** `    """` — **EN:** Starts the docstring for the function `dtype`. **CN:** 开始说明 function `dtype` 的文档字符串。
+- **L40** `    Return the corresponding torch.dtype per the given DSL type` — **EN:** Continues the docstring for the function `dtype`. **CN:** 继续说明 function `dtype` 的文档字符串。
+- **L41** `    """` — **EN:** Ends the docstring for the function `dtype`. **CN:** 结束说明 function `dtype` 的文档字符串。
+- **L42** `    torch_dtype = getattr(torch, ty.__name__.lower(), None)` — **EN:** Assigns a value to torch_dtype. **CN:** 将一个值赋给 torch_dtype。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    torch_type_map = {` — **EN:** Assigns a value to torch_type_map. **CN:** 将一个值赋给 torch_type_map。
+- **L45** `        Boolean: torch.bool,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `        # TFloat32 is just alias of float32` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L47** `        TFloat32: torch.float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `        Float8E5M2: torch.float8_e5m2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `        Float8E4M3FN: torch.float8_e4m3fn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `        Float8E4M3B11FNUZ: torch.float8_e4m3fnuz,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `    # float8_e8m0fnu is introduced in latest version of torch` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L54** `    if hasattr(torch, "float8_e8m0fnu"):` — **EN:** Starts a conditional branch guarded by `hasattr(torch, 'float8_e8m0fnu')`. **CN:** 开始一个由 `hasattr(torch, 'float8_e8m0fnu')` 控制的条件分支。
+- **L55** `        torch_type_map[Float8E8M0FNU] = torch.float8_e8m0fnu` — **EN:** Assigns a value to torch_type_map[Float8E8M0FNU]. **CN:** 将一个值赋给 torch_type_map[Float8E8M0FNU]。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    if torch_dtype is None:` — **EN:** Starts a conditional branch guarded by `torch_dtype is None`. **CN:** 开始一个由 `torch_dtype is None` 控制的条件分支。
+- **L58** `        torch_dtype = torch_type_map.get(ty)` — **EN:** Assigns a value to torch_dtype. **CN:** 将一个值赋给 torch_dtype。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    if torch_dtype is None:` — **EN:** Starts a conditional branch guarded by `torch_dtype is None`. **CN:** 开始一个由 `torch_dtype is None` 控制的条件分支。
+- **L61** `        raise TypeError(f"{ty} is not supported by torch")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L62** `    return torch_dtype` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `def as_tensor(pointer: Any, shape: Any, torch_type: "torch.dtype") -> "torch.Tensor":` — **EN:** Defines function `as_tensor`. **CN:** 定义函数 `as_tensor`。
+- **L66** `    """Convert a pointer to a torch tensor"""` — **EN:** Docstring line documenting the function `as_tensor`. **CN:** 文档字符串行，用于说明 function `as_tensor`。
+- **L67** `    if torch_type.itemsize == 1:` — **EN:** Starts a conditional branch guarded by `torch_type.itemsize == 1`. **CN:** 开始一个由 `torch_type.itemsize == 1` 控制的条件分支。
+- **L68** `        cytype: type = ctypes.c_uint8` — **EN:** Assigns a typed value to cytype. **CN:** 为 cytype 赋予带类型标注的值。
+- **L69** `    elif torch_type.itemsize == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L70** `        cytype = ctypes.c_uint16` — **EN:** Assigns a value to cytype. **CN:** 将一个值赋给 cytype。
+- **L71** `    elif torch_type.itemsize == 4:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L72** `        cytype = ctypes.c_uint32` — **EN:** Assigns a value to cytype. **CN:** 将一个值赋给 cytype。
+- **L73** `    elif torch_type.itemsize == 8:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L74** `        cytype = ctypes.c_uint64` — **EN:** Assigns a value to cytype. **CN:** 将一个值赋给 cytype。
+- **L75** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L76** `        raise ValueError(f"Unsupported torch dtype: {torch_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L77** `    cpointer: Any = ctypes.cast(pointer, ctypes.POINTER(cytype))` — **EN:** Assigns a typed value to cpointer. **CN:** 为 cpointer 赋予带类型标注的值。
+- **L78** `    arr = (cpointer._type_ * prod(shape)).from_address(` — **EN:** Assigns a value to arr. **CN:** 将一个值赋给 arr。
+- **L79** `        ctypes.addressof(cpointer.contents)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    return torch.frombuffer(arr, dtype=torch_type).view(*shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L85** `class ScalarInitConfig:` — **EN:** Defines class `ScalarInitConfig`. **CN:** 定义类 `ScalarInitConfig`。
+- **L86** `    """Configuration for scalar initialization"""` — **EN:** Docstring line documenting the class `ScalarInitConfig`. **CN:** 文档字符串行，用于说明 class `ScalarInitConfig`。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `    value: float = 0.0` — **EN:** Assigns a typed value to value. **CN:** 为 value 赋予带类型标注的值。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L92** `class RandomInitConfig:` — **EN:** Defines class `RandomInitConfig`. **CN:** 定义类 `RandomInitConfig`。
+- **L93** `    """Configuration for random initialization"""` — **EN:** Docstring line documenting the class `RandomInitConfig`. **CN:** 文档字符串行，用于说明 class `RandomInitConfig`。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `    min_val: int = -2` — **EN:** Assigns a typed value to min_val. **CN:** 为 min_val 赋予带类型标注的值。
+- **L96** `    max_val: int = 2` — **EN:** Assigns a typed value to max_val. **CN:** 为 max_val 赋予带类型标注的值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L100** `class GaussianInitConfig:` — **EN:** Defines class `GaussianInitConfig`. **CN:** 定义类 `GaussianInitConfig`。
+- **L101** `    """Configuration for Gaussian initialization"""` — **EN:** Docstring line documenting the class `GaussianInitConfig`. **CN:** 文档字符串行，用于说明 class `GaussianInitConfig`。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `    mean: float = 0.0` — **EN:** Assigns a typed value to mean. **CN:** 为 mean 赋予带类型标注的值。
+- **L104** `    std: float = 1.0` — **EN:** Assigns a typed value to std. **CN:** 为 std 赋予带类型标注的值。
+- **L105** `    scale: float = 1.0` — **EN:** Assigns a typed value to scale. **CN:** 为 scale 赋予带类型标注的值。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `class TensorInitType(Enum):` — **EN:** Defines class `TensorInitType` with bases Enum. **CN:** 定义类 `TensorInitType`，其基类为 Enum。
+- **L109** `    """Enumeration of tensor initialization types"""` — **EN:** Docstring line documenting the class `TensorInitType`. **CN:** 文档字符串行，用于说明 class `TensorInitType`。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `    SKIP = "skip"` — **EN:** Assigns a value to SKIP. **CN:** 将一个值赋给 SKIP。
+- **L112** `    SCALAR = "scalar"` — **EN:** Assigns a value to SCALAR. **CN:** 将一个值赋给 SCALAR。
+- **L113** `    RANDOM = "random"` — **EN:** Assigns a value to RANDOM. **CN:** 将一个值赋给 RANDOM。
+- **L114** `    GAUSSIAN = "gaussian"` — **EN:** Assigns a value to GAUSSIAN. **CN:** 将一个值赋给 GAUSSIAN。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `def create_and_permute_torch_tensor(` — **EN:** Defines function `create_and_permute_torch_tensor`. **CN:** 定义函数 `create_and_permute_torch_tensor`。
+- **L118** `    shape: Tuple[int, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `    dtype: "torch.dtype",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `    permute_order: Optional[Tuple[int, ...]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `    init_type: TensorInitType = TensorInitType.RANDOM,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `    init_config: Optional[` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `        Union[RandomInitConfig, ScalarInitConfig, GaussianInitConfig]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `    ] = None,` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L125** `    device: Optional[torch.device] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `) -> "torch.Tensor":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L127** `    """` — **EN:** Starts the docstring for the function `create_and_permute_torch_tensor`. **CN:** 开始说明 function `create_and_permute_torch_tensor` 的文档字符串。
+- **L128** `    Create a torch tensor with specified shape and dtype. Optionally permute it and initialize it with specified init type and config` — **EN:** Continues the docstring for the function `create_and_permute_torch_tensor`. **CN:** 继续说明 function `create_and_permute_torch_tensor` 的文档字符串。
+- **L129** `    """` — **EN:** Ends the docstring for the function `create_and_permute_torch_tensor`. **CN:** 结束说明 function `create_and_permute_torch_tensor` 的文档字符串。
+- **L130** `    init_dtype = torch.int32 if init_type == TensorInitType.RANDOM else torch.float32` — **EN:** Assigns a value to init_dtype. **CN:** 将一个值赋给 init_dtype。
+- **L131** `    init_torch_tensor = torch.empty(*shape, dtype=init_dtype, device=device)` — **EN:** Assigns a value to init_torch_tensor. **CN:** 将一个值赋给 init_torch_tensor。
+- **L132** `    if init_type == TensorInitType.SKIP:` — **EN:** Starts a conditional branch guarded by `init_type == TensorInitType.SKIP`. **CN:** 开始一个由 `init_type == TensorInitType.SKIP` 控制的条件分支。
+- **L133** `        assert init_config is None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L134** `        f32_torch_tensor = init_torch_tensor` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L135** `    elif init_type == TensorInitType.SCALAR:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L136** `        if init_config is None:` — **EN:** Starts a conditional branch guarded by `init_config is None`. **CN:** 开始一个由 `init_config is None` 控制的条件分支。
+- **L137** `            init_config = ScalarInitConfig()` — **EN:** Assigns a value to init_config. **CN:** 将一个值赋给 init_config。
+- **L138** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L139** `            if not isinstance(init_config, ScalarInitConfig):` — **EN:** Starts a conditional branch guarded by `not isinstance(init_config, ScalarInitConfig)`. **CN:** 开始一个由 `not isinstance(init_config, ScalarInitConfig)` 控制的条件分支。
+- **L140** `                raise ValueError("init_config must be ScalarInitConfig()")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L141** `        f32_torch_tensor = init_torch_tensor.fill_(init_config.value)` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L142** `    elif init_type == TensorInitType.RANDOM:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L143** `        if init_config is None:` — **EN:** Starts a conditional branch guarded by `init_config is None`. **CN:** 开始一个由 `init_config is None` 控制的条件分支。
+- **L144** `            init_config = RandomInitConfig()` — **EN:** Assigns a value to init_config. **CN:** 将一个值赋给 init_config。
+- **L145** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L146** `            if not isinstance(init_config, RandomInitConfig):` — **EN:** Starts a conditional branch guarded by `not isinstance(init_config, RandomInitConfig)`. **CN:** 开始一个由 `not isinstance(init_config, RandomInitConfig)` 控制的条件分支。
+- **L147** `                raise ValueError("init_config must be RandomInitConfig()")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L148** `        f32_torch_tensor = init_torch_tensor.random_(` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L149** `            init_config.min_val, init_config.max_val` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `        ).to(dtype=torch.float32)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `    elif init_type == TensorInitType.GAUSSIAN:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L152** `        if init_config is None:` — **EN:** Starts a conditional branch guarded by `init_config is None`. **CN:** 开始一个由 `init_config is None` 控制的条件分支。
+- **L153** `            init_config = GaussianInitConfig()` — **EN:** Assigns a value to init_config. **CN:** 将一个值赋给 init_config。
+- **L154** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L155** `            if not isinstance(init_config, GaussianInitConfig):` — **EN:** Starts a conditional branch guarded by `not isinstance(init_config, GaussianInitConfig)`. **CN:** 开始一个由 `not isinstance(init_config, GaussianInitConfig)` 控制的条件分支。
+- **L156** `                raise ValueError("init_config must be GaussianInitConfig()")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L157** `        f32_torch_tensor = init_torch_tensor.normal_(init_config.mean, init_config.std)` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L158** `        f32_torch_tensor = f32_torch_tensor * init_config.scale` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L159** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L160** `        raise ValueError(f"Invalid init type: {init_type} ({type(init_type)})")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `    if permute_order is not None:` — **EN:** Starts a conditional branch guarded by `permute_order is not None`. **CN:** 开始一个由 `permute_order is not None` 控制的条件分支。
+- **L163** `        f32_torch_tensor = f32_torch_tensor.permute(permute_order)` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    dtype_torch_tensor = f32_torch_tensor.to(dtype=dtype)` — **EN:** Assigns a value to dtype_torch_tensor. **CN:** 将一个值赋给 dtype_torch_tensor。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    return dtype_torch_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `def get_leading_dim(torch_tensor: torch.Tensor) -> int:` — **EN:** Defines function `get_leading_dim`. **CN:** 定义函数 `get_leading_dim`。
+- **L171** `    """` — **EN:** Starts the docstring for the function `get_leading_dim`. **CN:** 开始说明 function `get_leading_dim` 的文档字符串。
+- **L172** `    Get the leading dimension of a torch tensor` — **EN:** Continues the docstring for the function `get_leading_dim`. **CN:** 继续说明 function `get_leading_dim` 的文档字符串。
+- **L173** `    """` — **EN:** Ends the docstring for the function `get_leading_dim`. **CN:** 结束说明 function `get_leading_dim` 的文档字符串。
+- **L174** `    for i, stride in enumerate(torch_tensor.stride()):` — **EN:** Starts a loop assigning items from `enumerate(torch_tensor.stride())` to `(i, stride)`. **CN:** 开始一个循环，将 `enumerate(torch_tensor.stride())` 的元素赋给 `(i, stride)`。
+- **L175** `        if stride == 1:` — **EN:** Starts a conditional branch guarded by `stride == 1`. **CN:** 开始一个由 `stride == 1` 控制的条件分支。
+- **L176** `            return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L177** `    return None  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `def convert_cute_tensor(` — **EN:** Defines function `convert_cute_tensor`. **CN:** 定义函数 `convert_cute_tensor`。
+- **L181** `    f32_torch_tensor: "torch.Tensor",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L182** `    cute_tensor: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L183** `    dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L184** `    is_dynamic_layout: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `) -> Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L186** `    """` — **EN:** Starts the docstring for the function `convert_cute_tensor`. **CN:** 开始说明 function `convert_cute_tensor` 的文档字符串。
+- **L187** `    Change the value of the cute tensor to make its value converted from a fp32 torch tensor.` — **EN:** Continues the docstring for the function `convert_cute_tensor`. **CN:** 继续说明 function `convert_cute_tensor` 的文档字符串。
+- **L188** `    Used for fp8 and int4 types tensor creation now.` — **EN:** Continues the docstring for the function `convert_cute_tensor`. **CN:** 继续说明 function `convert_cute_tensor` 的文档字符串。
+- **L189** `    """` — **EN:** Ends the docstring for the function `convert_cute_tensor`. **CN:** 结束说明 function `convert_cute_tensor` 的文档字符串。
+- **L190** `    # if torch_tensor is on cpu, create a gpu copy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L191** `    if f32_torch_tensor.device.type == "cpu":` — **EN:** Starts a conditional branch guarded by `f32_torch_tensor.device.type == 'cpu'`. **CN:** 开始一个由 `f32_torch_tensor.device.type == 'cpu'` 控制的条件分支。
+- **L192** `        f32_torch_tensor = f32_torch_tensor.cuda()` — **EN:** Assigns a value to f32_torch_tensor. **CN:** 将一个值赋给 f32_torch_tensor。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `    # Fp8 type need explicit type conversion` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L195** `    if dtype in {` — **EN:** Starts a conditional branch guarded by `dtype in {Int4, Float8E5M2, Float8E4M3FN, Float8E8M0FNU, ...`. **CN:** 开始一个由 `dtype in {Int4, Float8E5M2, Float8E4M3FN, Float8E8M0FNU, ...` 控制的条件分支。
+- **L196** `        Int4,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `        Float8E5M2,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `        Float8E4M3FN,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L199** `        Float8E8M0FNU,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L200** `        Float6E3M2FN,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L201** `        Float6E2M3FN,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L202** `        Float4E2M1FN,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L203** `    }:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L204** `        fp32_cute_tensor = from_dlpack(f32_torch_tensor)` — **EN:** Assigns a value to fp32_cute_tensor. **CN:** 将一个值赋给 fp32_cute_tensor。
+- **L205** `        if is_dynamic_layout:` — **EN:** Starts a conditional branch guarded by `is_dynamic_layout`. **CN:** 开始一个由 `is_dynamic_layout` 控制的条件分支。
+- **L206** `            # note: dim_order to not always maps to leading dimension,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L207** `            # so we need to get the leading dimension from the torch tensor strides` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L208** `            fp32_cute_tensor = fp32_cute_tensor.mark_layout_dynamic(` — **EN:** Assigns a value to fp32_cute_tensor. **CN:** 将一个值赋给 fp32_cute_tensor。
+- **L209** `                leading_dim=get_leading_dim(f32_torch_tensor)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `        # Copy and convert from f32 cute tensor to dtype cute tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L212** `        cute.testing.convert(fp32_cute_tensor, cute_tensor)` — **EN:** Invokes `cute.testing.convert` as a standalone call. **CN:** 以独立语句方式调用 `cute.testing.convert`。
+- **L213** `    return cute_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `def default_stream() -> cuda.CUstream:` — **EN:** Defines function `default_stream`. **CN:** 定义函数 `default_stream`。
+- **L217** `    """` — **EN:** Starts the docstring for the function `default_stream`. **CN:** 开始说明 function `default_stream` 的文档字符串。
+- **L218** `    Get default CUstream from torch stream` — **EN:** Continues the docstring for the function `default_stream`. **CN:** 继续说明 function `default_stream` 的文档字符串。
+- **L219** `    """` — **EN:** Ends the docstring for the function `default_stream`. **CN:** 结束说明 function `default_stream` 的文档字符串。
+- **L220** `    torch_stream = torch.cuda.default_stream()` — **EN:** Assigns a value to torch_stream. **CN:** 将一个值赋给 torch_stream。
+- **L221** `    stream = cuda.CUstream(torch_stream.cuda_stream)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L222** `    return stream` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `def current_stream() -> cuda.CUstream:` — **EN:** Defines function `current_stream`. **CN:** 定义函数 `current_stream`。
+- **L226** `    """` — **EN:** Starts the docstring for the function `current_stream`. **CN:** 开始说明 function `current_stream` 的文档字符串。
+- **L227** `    Get current CUstream from torch stream` — **EN:** Continues the docstring for the function `current_stream`. **CN:** 继续说明 function `current_stream` 的文档字符串。
+- **L228** `    """` — **EN:** Ends the docstring for the function `current_stream`. **CN:** 结束说明 function `current_stream` 的文档字符串。
+- **L229** `    torch_stream = torch.cuda.current_stream()` — **EN:** Assigns a value to torch_stream. **CN:** 将一个值赋给 torch_stream。
+- **L230** `    stream = cuda.CUstream(torch_stream.cuda_stream)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L231** `    return stream` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `def matrix(` — **EN:** Defines function `matrix`. **CN:** 定义函数 `matrix`。
+- **L235** `    l: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L236** `    mode0: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L237** `    mode1: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `    is_mode0_major: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L239** `    cutlass_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `    init_type: TensorInitType = TensorInitType.RANDOM,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `    init_config: Optional[` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L242** `        Union[RandomInitConfig, ScalarInitConfig, GaussianInitConfig]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L243** `    ] = None,` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L244** `    device: Optional[torch.device] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L245** `) -> torch.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L246** `    """` — **EN:** Starts the docstring for the function `matrix`. **CN:** 开始说明 function `matrix` 的文档字符串。
+- **L247** `    Create a torch tensor for matrix` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    :param l: length of the matrix` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L250** `    :param mode0: mode0 of the matrix` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L251** `    :param mode1: mode1 of the matrix` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L252** `    :param is_mode0_major: whether the matrix is mode0 major` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L253** `    :param cutlass_dtype: cutlass dtype of the matrix` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L254** `    :param init_type: type of initialization` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L255** `    :param init_config: configuration for initialization` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L256** `    :param device: target torch device` — **EN:** Continues the docstring for the function `matrix`. **CN:** 继续说明 function `matrix` 的文档字符串。
+- **L257** `    """` — **EN:** Ends the docstring for the function `matrix`. **CN:** 结束说明 function `matrix` 的文档字符串。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `    shape = (l, mode1, mode0) if is_mode0_major else (l, mode0, mode1)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L260** `    permute_order = (2, 1, 0) if is_mode0_major else (1, 2, 0)` — **EN:** Assigns a value to permute_order. **CN:** 将一个值赋给 permute_order。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `    if cutlass_dtype.is_float and cutlass_dtype.width <= 8:` — **EN:** Starts a conditional branch guarded by `cutlass_dtype.is_float and cutlass_dtype.width <= 8`. **CN:** 开始一个由 `cutlass_dtype.is_float and cutlass_dtype.width <= 8` 控制的条件分支。
+- **L263** `        torch_dtype = torch.int8` — **EN:** Assigns a value to torch_dtype. **CN:** 将一个值赋给 torch_dtype。
+- **L264** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L265** `        torch_dtype = dtype(cutlass_dtype)` — **EN:** Assigns a value to torch_dtype. **CN:** 将一个值赋给 torch_dtype。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `    if init_type == TensorInitType.RANDOM and init_config is None:` — **EN:** Starts a conditional branch guarded by `init_type == TensorInitType.RANDOM and init_config is None`. **CN:** 开始一个由 `init_type == TensorInitType.RANDOM and init_config is None` 控制的条件分支。
+- **L268** `        if torch_dtype.is_signed:` — **EN:** Starts a conditional branch guarded by `torch_dtype.is_signed`. **CN:** 开始一个由 `torch_dtype.is_signed` 控制的条件分支。
+- **L269** `            min_val = -2` — **EN:** Assigns a value to min_val. **CN:** 将一个值赋给 min_val。
+- **L270** `            max_val = 2` — **EN:** Assigns a value to max_val. **CN:** 将一个值赋给 max_val。
+- **L271** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L272** `            min_val = 0` — **EN:** Assigns a value to min_val. **CN:** 将一个值赋给 min_val。
+- **L273** `            max_val = 4` — **EN:** Assigns a value to max_val. **CN:** 将一个值赋给 max_val。
+- **L274** `        init_config = RandomInitConfig(min_val=min_val, max_val=max_val)` — **EN:** Assigns a value to init_config. **CN:** 将一个值赋给 init_config。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `    # Create dtype torch tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L277** `    torch_tensor = create_and_permute_torch_tensor(` — **EN:** Assigns a value to torch_tensor. **CN:** 将一个值赋给 torch_tensor。
+- **L278** `        shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `        torch_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `        permute_order=permute_order,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `        init_type=init_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `        init_config=init_config,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `        device=device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `    return torch_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `def cute_tensor_like(` — **EN:** Defines function `cute_tensor_like`. **CN:** 定义函数 `cute_tensor_like`。
+- **L290** `    data_ref: torch.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L291** `    cutlass_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L292** `    is_dynamic_layout: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L293** `    assumed_align: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L294** `) -> tuple[Tensor, torch.Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L295** `    """` — **EN:** Starts the docstring for the function `cute_tensor_like`. **CN:** 开始说明 function `cute_tensor_like` 的文档字符串。
+- **L296** `    Create a cute tensor use a torch tensor as the data source.` — **EN:** Continues the docstring for the function `cute_tensor_like`. **CN:** 继续说明 function `cute_tensor_like` 的文档字符串。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `    The cute tensor is a managed reference to the torch tensor.` — **EN:** Continues the docstring for the function `cute_tensor_like`. **CN:** 继续说明 function `cute_tensor_like` 的文档字符串。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `    :param data_ref: torch tensor as the data source` — **EN:** Continues the docstring for the function `cute_tensor_like`. **CN:** 继续说明 function `cute_tensor_like` 的文档字符串。
+- **L301** `    :param cutlass_dtype: cutlass dtype of the cute tensor` — **EN:** Continues the docstring for the function `cute_tensor_like`. **CN:** 继续说明 function `cute_tensor_like` 的文档字符串。
+- **L302** `    :param is_dynamic_layout: whether the cute tensor uses dynamic layout` — **EN:** Continues the docstring for the function `cute_tensor_like`. **CN:** 继续说明 function `cute_tensor_like` 的文档字符串。
+- **L303** `    :param assumed_align: assumed alignment of the cute tensor` — **EN:** Continues the docstring for the function `cute_tensor_like`. **CN:** 继续说明 function `cute_tensor_like` 的文档字符串。
+- **L304** `    """` — **EN:** Ends the docstring for the function `cute_tensor_like`. **CN:** 结束说明 function `cute_tensor_like` 的文档字符串。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `    # allocate device buffer for cute tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L307** `    if (cutlass_dtype.is_float and cutlass_dtype.width <= 8) or (` — **EN:** Starts a conditional branch guarded by `cutlass_dtype.is_float and cutlass_dtype.width <= 8 or (c...`. **CN:** 开始一个由 `cutlass_dtype.is_float and cutlass_dtype.width <= 8 or (c...` 控制的条件分支。
+- **L308** `        cutlass_dtype.is_integer and cutlass_dtype.width == 4` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L310** `        torch_dtype = torch.int8` — **EN:** Assigns a value to torch_dtype. **CN:** 将一个值赋给 torch_dtype。
+- **L311** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L312** `        torch_dtype = dtype(cutlass_dtype)` — **EN:** Assigns a value to torch_dtype. **CN:** 将一个值赋给 torch_dtype。
+- **L313** `    torch_tensor = torch.empty_like(data_ref, dtype=torch_dtype, device="cuda")` — **EN:** Assigns a value to torch_tensor. **CN:** 将一个值赋给 torch_tensor。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `    # create cute tensor using the device buffer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L316** `    cute_tensor = from_dlpack(torch_tensor, assumed_align=assumed_align)` — **EN:** Assigns a value to cute_tensor. **CN:** 将一个值赋给 cute_tensor。
+- **L317** `    cute_tensor.element_type = cutlass_dtype` — **EN:** Assigns a value to cute_tensor.element_type. **CN:** 将一个值赋给 cute_tensor.element_type。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `    if is_dynamic_layout:` — **EN:** Starts a conditional branch guarded by `is_dynamic_layout`. **CN:** 开始一个由 `is_dynamic_layout` 控制的条件分支。
+- **L320** `        leading_dim = get_leading_dim(torch_tensor)` — **EN:** Assigns a value to leading_dim. **CN:** 将一个值赋给 leading_dim。
+- **L321** `        cute_tensor = cute_tensor.mark_layout_dynamic(leading_dim=leading_dim)` — **EN:** Assigns a value to cute_tensor. **CN:** 将一个值赋给 cute_tensor。
+- **L322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L323** `    is_empty_tensor = torch_tensor.numel() == 0` — **EN:** Assigns a value to is_empty_tensor. **CN:** 将一个值赋给 is_empty_tensor。
+- **L324** `    # initialize the cute tensor data` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L325** `    if not is_empty_tensor and (` — **EN:** Starts a conditional branch guarded by `not is_empty_tensor and (cutlass_dtype.is_float and cutla...`. **CN:** 开始一个由 `not is_empty_tensor and (cutlass_dtype.is_float and cutla...` 控制的条件分支。
+- **L326** `        (cutlass_dtype.is_float and cutlass_dtype.width <= 8)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L327** `        or (cutlass_dtype.is_integer and cutlass_dtype.width == 4)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L328** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L329** `        cute_tensor = convert_cute_tensor(` — **EN:** Assigns a value to cute_tensor. **CN:** 将一个值赋给 cute_tensor。
+- **L330** `            data_ref.to(dtype=torch.float32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `            cute_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `            cutlass_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `            is_dynamic_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L336** `        torch_tensor.copy_(data_ref.to(dtype=torch_dtype))` — **EN:** Invokes `torch_tensor.copy_` as a standalone call. **CN:** 以独立语句方式调用 `torch_tensor.copy_`。
+- **L337** `    return cute_tensor, torch_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** `def prepare_tensors_for_gemm(` — **EN:** Defines function `prepare_tensors_for_gemm`. **CN:** 定义函数 `prepare_tensors_for_gemm`。
+- **L341** `    mnkl: Tuple[int, int, int, int] | Tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `    a_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L343** `    b_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L344** `    c_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L345** `) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L346** `    """` — **EN:** Starts the docstring for the function `prepare_tensors_for_gemm`. **CN:** 开始说明 function `prepare_tensors_for_gemm` 的文档字符串。
+- **L347** `    Prepare tensors for GEMM` — **EN:** Continues the docstring for the function `prepare_tensors_for_gemm`. **CN:** 继续说明 function `prepare_tensors_for_gemm` 的文档字符串。
+- **L348** `    """` — **EN:** Ends the docstring for the function `prepare_tensors_for_gemm`. **CN:** 结束说明 function `prepare_tensors_for_gemm` 的文档字符串。
+- **L349** `    if len(mnkl) == 4:` — **EN:** Starts a conditional branch guarded by `len(mnkl) == 4`. **CN:** 开始一个由 `len(mnkl) == 4` 控制的条件分支。
+- **L350** `        m, n, k, l = mnkl` — **EN:** Assigns a value to (m, n, k, l). **CN:** 将一个值赋给 (m, n, k, l)。
+- **L351** `        a = torch.empty(l, m, k, dtype=dtype(a_dtype), device="cuda").permute(1, 2, 0)` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L352** `        b = torch.empty(l, n, k, dtype=dtype(b_dtype), device="cuda").permute(1, 2, 0)` — **EN:** Assigns a value to b. **CN:** 将一个值赋给 b。
+- **L353** `        c = torch.empty(l, m, n, dtype=dtype(c_dtype), device="cuda").permute(1, 2, 0)` — **EN:** Assigns a value to c. **CN:** 将一个值赋给 c。
+- **L354** `    elif len(mnkl) == 3:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L355** `        m, n, k = mnkl` — **EN:** Assigns a value to (m, n, k). **CN:** 将一个值赋给 (m, n, k)。
+- **L356** `        a = torch.empty(m, k, dtype=dtype(a_dtype), device="cuda")` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L357** `        b = torch.empty(n, k, dtype=dtype(b_dtype), device="cuda")` — **EN:** Assigns a value to b. **CN:** 将一个值赋给 b。
+- **L358** `        c = torch.empty(m, n, dtype=dtype(c_dtype), device="cuda")` — **EN:** Assigns a value to c. **CN:** 将一个值赋给 c。
+- **L359** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L360** `        raise ValueError(f"mnkl must be a tuple of length 3 or 4, but got {mnkl}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** `    a = a.random_(-2, 2)` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L363** `    b = b.random_(-2, 2)` — **EN:** Assigns a value to b. **CN:** 将一个值赋给 b。
+- **L364** `    c = c.random_(-2, 2)` — **EN:** Assigns a value to c. **CN:** 将一个值赋给 c。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `    return a, b, c` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.torch`. CN: 模块名为 `CuTeDSL.cutlass.torch`。
+- EN: Top-level classes: ScalarInitConfig, RandomInitConfig, GaussianInitConfig, TensorInitType CN: 顶层类包括：ScalarInitConfig, RandomInitConfig, GaussianInitConfig, TensorInitType
+- EN: Top-level functions: dtype, as_tensor, create_and_permute_torch_tensor, get_leading_dim, convert_cute_tensor, default_stream, current_stream, matrix, cute_tensor_like, prepare_tensors_for_gemm CN: 顶层函数包括：dtype, as_tensor, create_and_permute_torch_tensor, get_leading_dim, convert_cute_tensor, default_stream, current_stream, matrix, cute_tensor_like, prepare_tensors_for_gemm
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute.typing:Numeric,Boolean,TFloat32,Float8E4M3B11FNUZ,Float8E4M3FN,Float8E5M2,Float8E8M0FNU,Float6E3M2FN,Float6E2M3FN,Float4E2M1FN,Int4,Tensor, cutlass.cute.runtime:from_dlpack, cutlass.cute CN: 内部依赖：cutlass.cute.typing:Numeric,Boolean,TFloat32,Float8E4M3B11FNUZ,Float8E4M3FN,Float8E5M2,Float8E8M0FNU,Float6E3M2FN,Float6E2M3FN,Float4E2M1FN,Int4,Tensor, cutlass.cute.runtime:from_dlpack, cutlass.cute
+- EN: External or standard-library dependencies: ctypes, math:prod, dataclasses:dataclass, enum:Enum, typing:Any,Optional,Type,Union,Tuple, torch, cuda.bindings.driver CN: 外部或标准库依赖：ctypes, math:prod, dataclasses:dataclass, enum:Enum, typing:Any,Optional,Type,Union,Tuple, torch, cuda.bindings.driver

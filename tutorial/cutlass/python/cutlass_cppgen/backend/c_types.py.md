@@ -1,0 +1,645 @@
+# c_types.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/c_types.py`
+
+## Purpose / 作用
+- EN: Defines 15 classes (GemmCoord_, GemmCoordBatched_, MatrixCoord_, dim3_, ... (+11 more)) and 11 functions (get_tile_scheduler_arguments_3x, get_mainloop_arguments_3x, get_gemm_arguments_3x, get_gemm_arguments, ... (+7 more)) in `cutlass_cppgen.backend.c_types`.
+- CN: 该模块 `cutlass_cppgen.backend.c_types` 定义了 15 个类（GemmCoord_, GemmCoordBatched_, MatrixCoord_, dim3_, ... (+11 more)） 和 11 个函数（get_tile_scheduler_arguments_3x, get_mainloop_arguments_3x, get_gemm_arguments_3x, get_gemm_arguments, ... (+7 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `from cutlass_library import (` — **EN:** Imports DataType, KernelScheduleType, TileSchedulerType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType, KernelScheduleType, TileSchedulerType。
+- **L36** `    DataType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    KernelScheduleType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    TileSchedulerType` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `from cutlass_cppgen.backend.library import DataTypeSizeBytes` — **EN:** Imports DataTypeSizeBytes from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 DataTypeSizeBytes。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `class GemmCoord_(ctypes.Structure):` — **EN:** Defines class `GemmCoord_` with bases ctypes.Structure. **CN:** 定义类 `GemmCoord_`，其基类为 ctypes.Structure。
+- **L44** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L45** `        ("m", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `        ("n", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `        ("k", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    def __init__(self, m, n, k) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L51** `        self.m = m` — **EN:** Assigns a value to self.m. **CN:** 将一个值赋给 self.m。
+- **L52** `        self.n = n` — **EN:** Assigns a value to self.n. **CN:** 将一个值赋给 self.n。
+- **L53** `        self.k = k` — **EN:** Assigns a value to self.k. **CN:** 将一个值赋给 self.k。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `class GemmCoordBatched_(ctypes.Structure):` — **EN:** Defines class `GemmCoordBatched_` with bases ctypes.Structure. **CN:** 定义类 `GemmCoordBatched_`，其基类为 ctypes.Structure。
+- **L57** `    """` — **EN:** Starts the docstring for the class `GemmCoordBatched_`. **CN:** 开始说明 class `GemmCoordBatched_` 的文档字符串。
+- **L58** `    Wrapper around a GemmCoord that also contains batch count. This is used for encoding` — **EN:** Continues the docstring for the class `GemmCoordBatched_`. **CN:** 继续说明 class `GemmCoordBatched_` 的文档字符串。
+- **L59** `    batched GEMM inputs to CUTLASS 3 GEMMs.` — **EN:** Continues the docstring for the class `GemmCoordBatched_`. **CN:** 继续说明 class `GemmCoordBatched_` 的文档字符串。
+- **L60** `    """` — **EN:** Ends the docstring for the class `GemmCoordBatched_`. **CN:** 结束说明 class `GemmCoordBatched_` 的文档字符串。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L63** `        ("m", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `        ("n", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `        ("k", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `        ("batch_count", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    def __init__(self, gemm_coord, batch_count) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L70** `        self.m = gemm_coord.m` — **EN:** Assigns a value to self.m. **CN:** 将一个值赋给 self.m。
+- **L71** `        self.n = gemm_coord.n` — **EN:** Assigns a value to self.n. **CN:** 将一个值赋给 self.n。
+- **L72** `        self.k = gemm_coord.k` — **EN:** Assigns a value to self.k. **CN:** 将一个值赋给 self.k。
+- **L73** `        self.batch_count = batch_count` — **EN:** Assigns a value to self.batch_count. **CN:** 将一个值赋给 self.batch_count。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `class MatrixCoord_(ctypes.Structure):` — **EN:** Defines class `MatrixCoord_` with bases ctypes.Structure. **CN:** 定义类 `MatrixCoord_`，其基类为 ctypes.Structure。
+- **L77** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L78** `        ("row", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        ("column", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `class dim3_(ctypes.Structure):` — **EN:** Defines class `dim3_` with bases ctypes.Structure. **CN:** 定义类 `dim3_`，其基类为 ctypes.Structure。
+- **L84** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L85** `        ("x", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `        ("y", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `        ("z", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `class StrideBatched_(ctypes.Structure):` — **EN:** Defines class `StrideBatched_` with bases ctypes.Structure. **CN:** 定义类 `StrideBatched_`，其基类为 ctypes.Structure。
+- **L92** `    """` — **EN:** Starts the docstring for the class `StrideBatched_`. **CN:** 开始说明 class `StrideBatched_` 的文档字符串。
+- **L93** `    CUTLASS 3.0 strides for operands contain one static dimension and two variable dimensions. The` — **EN:** Continues the docstring for the class `StrideBatched_`. **CN:** 继续说明 class `StrideBatched_` 的文档字符串。
+- **L94** `    variable dimensions represent the stride along non-unit-stride dimension of the row/column major` — **EN:** Continues the docstring for the class `StrideBatched_`. **CN:** 继续说明 class `StrideBatched_` 的文档字符串。
+- **L95** `    layout, and the batch stride. This structure encodes the two variable dimensions.` — **EN:** Continues the docstring for the class `StrideBatched_`. **CN:** 继续说明 class `StrideBatched_` 的文档字符串。
+- **L96** `    """` — **EN:** Ends the docstring for the class `StrideBatched_`. **CN:** 结束说明 class `StrideBatched_` 的文档字符串。
+- **L97** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L98** `        ("major_stride", ctypes.c_int64),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `        ("batch_stride", ctypes.c_int64)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `class GenericMainloopArguments3x_(ctypes.Structure):` — **EN:** Defines class `GenericMainloopArguments3x_` with bases ctypes.Structure. **CN:** 定义类 `GenericMainloopArguments3x_`，其基类为 ctypes.Structure。
+- **L105** `    """` — **EN:** Starts the docstring for the class `GenericMainloopArguments3x_`. **CN:** 开始说明 class `GenericMainloopArguments3x_` 的文档字符串。
+- **L106** `    Structure representing the superset of possible mainloop arguments.` — **EN:** Continues the docstring for the class `GenericMainloopArguments3x_`. **CN:** 继续说明 class `GenericMainloopArguments3x_` 的文档字符串。
+- **L107** `    This structure should not be passed to kernels directly, but, rather,` — **EN:** Continues the docstring for the class `GenericMainloopArguments3x_`. **CN:** 继续说明 class `GenericMainloopArguments3x_` 的文档字符串。
+- **L108** `    be used as an input to one of the more specific schedule arguments, which` — **EN:** Continues the docstring for the class `GenericMainloopArguments3x_`. **CN:** 继续说明 class `GenericMainloopArguments3x_` 的文档字符串。
+- **L109** `    will each select those arguments relevant to the particular schedule.` — **EN:** Continues the docstring for the class `GenericMainloopArguments3x_`. **CN:** 继续说明 class `GenericMainloopArguments3x_` 的文档字符串。
+- **L110** `    """` — **EN:** Ends the docstring for the class `GenericMainloopArguments3x_`. **CN:** 结束说明 class `GenericMainloopArguments3x_` 的文档字符串。
+- **L111** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L112** `        ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        ("stride_A", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        ("stride_B", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `        ("mma_promotion_interval", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `class _PersistentTileSchedulerArguments(ctypes.Structure):` — **EN:** Defines class `_PersistentTileSchedulerArguments` with bases ctypes.Structure. **CN:** 定义类 `_PersistentTileSchedulerArguments`，其基类为 ctypes.Structure。
+- **L121** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L122** `        ("max_swizzle_size", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `        ("raster_order_option", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `class _PersistentTileSchedulerStreamKArguments(ctypes.Structure):` — **EN:** Defines class `_PersistentTileSchedulerStreamKArguments` with bases ctypes.Structure. **CN:** 定义类 `_PersistentTileSchedulerStreamKArguments`，其基类为 ctypes.Structure。
+- **L128** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L129** `        ("splits", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `        ("max_swizzle_size", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        ("raster_order_option", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        ("reduction_mode", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `        ("decomposition_mode", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `def get_tile_scheduler_arguments_3x(` — **EN:** Defines function `get_tile_scheduler_arguments_3x`. **CN:** 定义函数 `get_tile_scheduler_arguments_3x`。
+- **L138** `    tile_scheduler: TileSchedulerType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L139** `    splits: int = 1):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L140** `    max_swizzle_size = 1` — **EN:** Assigns a value to max_swizzle_size. **CN:** 将一个值赋给 max_swizzle_size。
+- **L141** `    raster_order_option = 0 # Heuristic` — **EN:** Assigns a value to raster_order_option. **CN:** 将一个值赋给 raster_order_option。
+- **L142** `    if tile_scheduler in [TileSchedulerType.Default, TileSchedulerType.Persistent]:` — **EN:** Starts a conditional branch guarded by `tile_scheduler in [TileSchedulerType.Default, TileSchedul...`. **CN:** 开始一个由 `tile_scheduler in [TileSchedulerType.Default, TileSchedul...` 控制的条件分支。
+- **L143** `        return _PersistentTileSchedulerArguments(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L144** `            max_swizzle_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `            raster_order_option,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `    elif tile_scheduler == TileSchedulerType.StreamK:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L148** `        reduction_mode = 0 # Deterministic` — **EN:** Assigns a value to reduction_mode. **CN:** 将一个值赋给 reduction_mode。
+- **L149** `        decomposition_mode = 0 # Heuristic` — **EN:** Assigns a value to decomposition_mode. **CN:** 将一个值赋给 decomposition_mode。
+- **L150** `        return _PersistentTileSchedulerStreamKArguments(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L151** `            splits,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `            max_swizzle_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `            raster_order_option,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `            reduction_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `            decomposition_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `def get_mainloop_arguments_3x(` — **EN:** Defines function `get_mainloop_arguments_3x`. **CN:** 定义函数 `get_mainloop_arguments_3x`。
+- **L160** `    kernel_schedule: KernelScheduleType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L161** `    element_A,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L162** `    element_B,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L163** `    alignment_A: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L164** `    alignment_B: int) -> ctypes.Structure:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L165** `    """` — **EN:** Starts the docstring for the function `get_mainloop_arguments_3x`. **CN:** 开始说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L166** `    Returns the ctypes structure to be used for the 3.x kernel's mainloop parameters.` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `    :param kernel_schedule: type of kernel schedule to be used in the mainloop` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L169** `    :type kernel_schedule: cutlass_library.KernelScheduleType` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L170** `    :param element_A: data type of operand A` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L171** `    :param element_B: data type of operand B` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L172** `    :param alignment_A: alignment of operand A` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L173** `    :type alignment_A: int` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L174** `    :param alignment_B: alignment of operand B` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L175** `    :type alignment_B: int` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `    :returns: ctypes structure to be used for the 3.x kernel's mainloop parameters` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L178** `    :rtype: ctypes.Structure` — **EN:** Continues the docstring for the function `get_mainloop_arguments_3x`. **CN:** 继续说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L179** `    """` — **EN:** Ends the docstring for the function `get_mainloop_arguments_3x`. **CN:** 结束说明 function `get_mainloop_arguments_3x` 的文档字符串。
+- **L180** `    class _MainloopArgumentsTma(ctypes.Structure):` — **EN:** Defines class `_MainloopArgumentsTma` with bases ctypes.Structure. **CN:** 定义类 `_MainloopArgumentsTma`，其基类为 ctypes.Structure。
+- **L181** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L182** `            ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `            ("stride_A", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `            ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `            ("stride_B", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `            ("mma_promotion_interval", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `        @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L190** `        def from_generic_mainloop_args(args: GenericMainloopArguments3x_):` — **EN:** Defines function `from_generic_mainloop_args`. **CN:** 定义函数 `from_generic_mainloop_args`。
+- **L191** `            return _MainloopArgumentsTma(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L192** `                args.ptr_A, args.stride_A, args.ptr_B, args.stride_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `                args.mma_promotion_interval` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `    class _MainloopArgumentsMultistage(ctypes.Structure):` — **EN:** Defines class `_MainloopArgumentsMultistage` with bases ctypes.Structure. **CN:** 定义类 `_MainloopArgumentsMultistage`，其基类为 ctypes.Structure。
+- **L197** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L198** `            ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `            ("stride_A", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `            ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `            ("stride_B", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `        @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L205** `        def from_generic_mainloop_args(args: GenericMainloopArguments3x_):` — **EN:** Defines function `from_generic_mainloop_args`. **CN:** 定义函数 `from_generic_mainloop_args`。
+- **L206** `            return _MainloopArgumentsMultistage(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L207** `                args.ptr_A, args.stride_A, args.ptr_B, args.stride_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `    # Currently all 3.x kernels (CpAsync and Tma) have the same argument structure.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L211** `    # Should that become not the case, this is the place to return custom ctypes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L212** `    # structures based on selected kernel schedule.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L213** `    return _MainloopArgumentsTma` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `def get_gemm_arguments_3x(mainloop_arguments, epilogue_functor, scheduler_args, default_epilogue):` — **EN:** Defines function `get_gemm_arguments_3x`. **CN:** 定义函数 `get_gemm_arguments_3x`。
+- **L217** `    if not default_epilogue and hasattr(epilogue_functor, "epilogue_type_evt"):` — **EN:** Starts a conditional branch guarded by `not default_epilogue and hasattr(epilogue_functor, 'epilo...`. **CN:** 开始一个由 `not default_epilogue and hasattr(epilogue_functor, 'epilo...` 控制的条件分支。
+- **L218** `        _EpilogueOutputOpParams = epilogue_functor.epilogue_type_evt` — **EN:** Assigns a value to _EpilogueOutputOpParams. **CN:** 将一个值赋给 _EpilogueOutputOpParams。
+- **L219** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L220** `        _EpilogueOutputOpParams = epilogue_functor.epilogue_type` — **EN:** Assigns a value to _EpilogueOutputOpParams. **CN:** 将一个值赋给 _EpilogueOutputOpParams。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `    if hasattr(epilogue_functor, "visitor"):` — **EN:** Starts a conditional branch guarded by `hasattr(epilogue_functor, 'visitor')`. **CN:** 开始一个由 `hasattr(epilogue_functor, 'visitor')` 控制的条件分支。
+- **L223** `        class _EpilogueArguments(ctypes.Structure):` — **EN:** Defines class `_EpilogueArguments` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueArguments`，其基类为 ctypes.Structure。
+- **L224** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L225** `                ("epilogue", _EpilogueOutputOpParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `                ("arg_C", epilogue_functor.arg_c_type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `                ("arg_D", epilogue_functor.arg_d_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `            def __init__(self, output_op, ptr_c, stride_c, ptr_d, stride_d) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L231** `                self.epilogue = output_op` — **EN:** Assigns a value to self.epilogue. **CN:** 将一个值赋给 self.epilogue。
+- **L232** `                self.arg_C = epilogue_functor.arg_c_type(ptr_c)` — **EN:** Assigns a value to self.arg_C. **CN:** 将一个值赋给 self.arg_C。
+- **L233** `                self.arg_D = epilogue_functor.arg_d_type(ptr_d)` — **EN:** Assigns a value to self.arg_D. **CN:** 将一个值赋给 self.arg_D。
+- **L234** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L235** `        class _EpilogueArguments(ctypes.Structure):` — **EN:** Defines class `_EpilogueArguments` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueArguments`，其基类为 ctypes.Structure。
+- **L236** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L237** `                ("epilogue", _EpilogueOutputOpParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `                ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `                ("stride_C", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `                ("ptr_D", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `                ("stride_D", StrideBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `    class _HardwareInfo(ctypes.Structure):` — **EN:** Defines class `_HardwareInfo` with bases ctypes.Structure. **CN:** 定义类 `_HardwareInfo`，其基类为 ctypes.Structure。
+- **L245** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L246** `            ("device_id", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            ("sm_count", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `            ("max_active_clusters", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `            ("cluster_shape", dim3_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `            ("cluster_shape_fallback", dim3_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `    class _GemmArguments(ctypes.Structure):` — **EN:** Defines class `_GemmArguments` with bases ctypes.Structure. **CN:** 定义类 `_GemmArguments`，其基类为 ctypes.Structure。
+- **L254** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L255** `            ("mode", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `            ("problem_size", GemmCoordBatched_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            ("mainloop", mainloop_arguments),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `            ("epilogue", _EpilogueArguments),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `            ("hw_info", _HardwareInfo),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `            ("scheduler", type(scheduler_args)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `    return _GemmArguments, _EpilogueArguments, _EpilogueOutputOpParams, _HardwareInfo` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `def get_gemm_arguments(epilogue_functor):` — **EN:** Defines function `get_gemm_arguments`. **CN:** 定义函数 `get_gemm_arguments`。
+- **L267** `    _EpilogueOutputOpParams = epilogue_functor.epilogue_type` — **EN:** Assigns a value to _EpilogueOutputOpParams. **CN:** 将一个值赋给 _EpilogueOutputOpParams。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** `    class _GemmArguments(ctypes.Structure):` — **EN:** Defines class `_GemmArguments` with bases ctypes.Structure. **CN:** 定义类 `_GemmArguments`，其基类为 ctypes.Structure。
+- **L270** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L271** `            # Arguments from UniversalArgumentsBase` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L272** `            ("mode", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `            ("problem_size", GemmCoord_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `            ("batch_count", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `            ("batch_stride_D", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `            # Remaining arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L277** `            ("epilogue", _EpilogueOutputOpParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `            ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `            ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `            ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `            ("ptr_D", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `            ("batch_stride_A", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `            ("batch_stride_B", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `            ("batch_stride_C", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `            ("stride_a", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `            ("stride_b", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `            ("stride_c", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `            ("stride_d", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `            ("lda", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `            ("ldb", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `            ("ldc", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `            ("ldd", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `            ("ptr_gather_A_indices", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `            ("ptr_gather_B_indices", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `            ("ptr_scatter_D_indices", ctypes.c_void_p)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `    return _GemmArguments, _EpilogueOutputOpParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** `def get_gemm_arguments_streamk(epilogue_functor):` — **EN:** Defines function `get_gemm_arguments_streamk`. **CN:** 定义函数 `get_gemm_arguments_streamk`。
+- **L302** `    _EpilogueOutputOpParams = epilogue_functor.epilogue_type` — **EN:** Assigns a value to _EpilogueOutputOpParams. **CN:** 将一个值赋给 _EpilogueOutputOpParams。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `    class _GemmArguments(ctypes.Structure):` — **EN:** Defines class `_GemmArguments` with bases ctypes.Structure. **CN:** 定义类 `_GemmArguments`，其基类为 ctypes.Structure。
+- **L305** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L306** `            ("mode", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `            ("problem_size", GemmCoord_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `            ("batch_count", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `            ("epilogue", _EpilogueOutputOpParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `            ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** `            ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L312** `            ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `            ("ptr_D", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `            ("batch_stride_A", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `            ("batch_stride_B", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `            ("batch_stride_C", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `            ("batch_stride_D", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `            ("stride_a", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `            ("stride_b", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `            ("stride_c", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `            ("stride_d", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `            ("lda", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `            ("ldb", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `            ("ldc", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `            ("ldd", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            ("avail_sms", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `    return _GemmArguments, _EpilogueOutputOpParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `###########################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L333** `# GEMM Grouped` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L334** `###########################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L335** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `def get_gemm_grouped_arguments(epilogue_functor):` — **EN:** Defines function `get_gemm_grouped_arguments`. **CN:** 定义函数 `get_gemm_grouped_arguments`。
+- **L338** `    _EpilogueOutputOpParams = epilogue_functor.epilogue_type` — **EN:** Assigns a value to _EpilogueOutputOpParams. **CN:** 将一个值赋给 _EpilogueOutputOpParams。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** `    class _GEMMGroupedArguments(ctypes.Structure):` — **EN:** Defines class `_GEMMGroupedArguments` with bases ctypes.Structure. **CN:** 定义类 `_GEMMGroupedArguments`，其基类为 ctypes.Structure。
+- **L341** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L342** `            ("problem_sizes", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `            ("problem_count", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `            ("threadblock_count", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `            ("output_op", _EpilogueOutputOpParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `            ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `            ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `            ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `            ("ptr_D", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `            ("lda", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `            ("ldb", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            ("ldc", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `            ("ldd", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `            ("host_problem_sizes", ctypes.c_void_p)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `    return _GEMMGroupedArguments, _EpilogueOutputOpParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `############################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L361** `# Convolution2D` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L362** `############################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L365** `class Conv2DProblemSize_(ctypes.Structure):` — **EN:** Defines class `Conv2DProblemSize_` with bases ctypes.Structure. **CN:** 定义类 `Conv2DProblemSize_`，其基类为 ctypes.Structure。
+- **L366** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L367** `        ("N", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `        ("H", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `        ("W", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `        ("C", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `        ("P", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `        ("Q", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `        ("K", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `        ("R", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `        ("S", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `        ("pad_h", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `        ("pad_w", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `        ("stride_h", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `        ("stride_w", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `        ("dilation_h", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `        ("dilation_w", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `        ("mode", ctypes.c_int),  # kCrossCorrelation: 0, kConvolution: 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `        ("split_k_slices", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `        ("groups", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `    def __init__(self, problem_size) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L388** `        for field_name, _ in self._fields_:` — **EN:** Starts a loop assigning items from `self._fields_` to `(field_name, _)`. **CN:** 开始一个循环，将 `self._fields_` 的元素赋给 `(field_name, _)`。
+- **L389** `            setattr(self, field_name, getattr(problem_size, field_name))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `class Layout4D(ctypes.Structure):` — **EN:** Defines class `Layout4D` with bases ctypes.Structure. **CN:** 定义类 `Layout4D`，其基类为 ctypes.Structure。
+- **L393** `    _fields_ = [("stride", ctypes.c_int * 3)]` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `    def __init__(self, tensor_ref):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L396** `        stride = tensor_ref.stride()` — **EN:** Assigns a value to stride. **CN:** 将一个值赋给 stride。
+- **L397** `        setattr(self, "stride", (stride.at(0), stride.at(1), stride.at(2)))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `class TensorRef_(ctypes.Structure):` — **EN:** Defines class `TensorRef_` with bases ctypes.Structure. **CN:** 定义类 `TensorRef_`，其基类为 ctypes.Structure。
+- **L401** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L402** `        ("ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `        ("layout", Layout4D)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `    def __init__(self, tensor_ref):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L407** `        setattr(self, "ptr", tensor_ref.data())` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L408** `        setattr(self, "layout", Layout4D(tensor_ref.layout()))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `class TensorRef2D_(ctypes.Structure):` — **EN:** Defines class `TensorRef2D_` with bases ctypes.Structure. **CN:** 定义类 `TensorRef2D_`，其基类为 ctypes.Structure。
+- **L412** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L413** `        ("ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `        ("stride", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L417** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L418** `def get_conv2d_arguments(epilogue_functor):` — **EN:** Defines function `get_conv2d_arguments`. **CN:** 定义函数 `get_conv2d_arguments`。
+- **L419** `    _EpilogueOutputOpParams = epilogue_functor.epilogue_type` — **EN:** Assigns a value to _EpilogueOutputOpParams. **CN:** 将一个值赋给 _EpilogueOutputOpParams。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `    class _Conv2dArguments(ctypes.Structure):` — **EN:** Defines class `_Conv2dArguments` with bases ctypes.Structure. **CN:** 定义类 `_Conv2dArguments`，其基类为 ctypes.Structure。
+- **L422** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L423** `            ("conv_kind", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `            ("problem_size", Conv2DProblemSize_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `            ("ptr_A", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `            ("ptr_B", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `            ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `            ("ptr_D", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `            ("tensor_C_numel", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `            ("output_op", _EpilogueOutputOpParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `            ("split_k_mode", ctypes.c_int)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** `    return _Conv2dArguments, _EpilogueOutputOpParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L437** `############################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L438** `# Reduction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L439** `############################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** `def get_reduction_params(epilogue_functor):` — **EN:** Defines function `get_reduction_params`. **CN:** 定义函数 `get_reduction_params`。
+- **L443** `    _EpilogueOutputParams = epilogue_functor.epilogue_type` — **EN:** Assigns a value to _EpilogueOutputParams. **CN:** 将一个值赋给 _EpilogueOutputParams。
+- **L444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L445** `    class _ReductionParams(ctypes.Structure):` — **EN:** Defines class `_ReductionParams` with bases ctypes.Structure. **CN:** 定义类 `_ReductionParams`，其基类为 ctypes.Structure。
+- **L446** `        _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L447** `            ("problem_size", MatrixCoord_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `            ("partitions", ctypes.c_int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `            ("partition_stride", ctypes.c_longlong),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `            ("workspace", TensorRef2D_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `            ("destination", TensorRef2D_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `            ("source", TensorRef2D_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `            ("output_op", _EpilogueOutputParams),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** `    return _ReductionParams, _EpilogueOutputParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L457** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `###########################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L460** `# Epilogue Visitor Type Factory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L461** `###########################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `class Empty(ctypes.Structure):` — **EN:** Defines class `Empty` with bases ctypes.Structure. **CN:** 定义类 `Empty`，其基类为 ctypes.Structure。
+- **L464** `    _fields_ = []` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L465** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L466** `    def __init__(self, *arg) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L467** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** `class EmptyByte(ctypes.Structure):` — **EN:** Defines class `EmptyByte` with bases ctypes.Structure. **CN:** 定义类 `EmptyByte`，其基类为 ctypes.Structure。
+- **L470** `    _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L471** `        ("byte", ctypes.c_byte)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L474** `    def __init__(self, *arg) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L475** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L476** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L477** `class EBO:` — **EN:** Defines class `EBO`. **CN:** 定义类 `EBO`。
+- **L478** `    def __init__(self, index: int, type) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L479** `        self.index = index` — **EN:** Assigns a value to self.index. **CN:** 将一个值赋给 self.index。
+- **L480** `        self.type = type` — **EN:** Assigns a value to self.type. **CN:** 将一个值赋给 self.type。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** `    def __eq__(self, other) -> bool:` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L483** `        if isinstance(other, EBO):` — **EN:** Starts a conditional branch guarded by `isinstance(other, EBO)`. **CN:** 开始一个由 `isinstance(other, EBO)` 控制的条件分支。
+- **L484** `            return self.index == other.index and self.type == other.type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L485** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** `    def __hash__(self) -> int:` — **EN:** Defines function `__hash__`. **CN:** 定义函数 `__hash__`。
+- **L488** `        return hash((self.index, self.type))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `    def __ne__(self, other):` — **EN:** Defines function `__ne__`. **CN:** 定义函数 `__ne__`。
+- **L491** `        return not self.__eq__(other)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L494** `        return f"<{self.index}, {self.type}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L495** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `def tuple_factory_(input_tuple, dtype, constants=[0,1]):` — **EN:** Defines function `tuple_factory_`. **CN:** 定义函数 `tuple_factory_`。
+- **L498** `    """` — **EN:** Starts the docstring for the function `tuple_factory_`. **CN:** 开始说明 function `tuple_factory_` 的文档字符串。
+- **L499** `    The factory function generating cute::Tuple with input tuple` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L500** `    :param input_tuple: the input tuple` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L501** `    :type input_tuple: tuple` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L502** `    :param dtype: the data type for non-constant values` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L503** `    :type dtype: str, "int32_t", "int", "int64_t"` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L504** `    :param constant: the values that will be treated as constants` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L505** `    :type constant: list[int]` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    :return: ctype structure representing the cute::Tuple` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L508** `    :return: the empty base classes of the tuple` — **EN:** Continues the docstring for the function `tuple_factory_`. **CN:** 继续说明 function `tuple_factory_` 的文档字符串。
+- **L509** `    """` — **EN:** Ends the docstring for the function `tuple_factory_`. **CN:** 结束说明 function `tuple_factory_` 的文档字符串。
+- **L510** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L511** `    # The empty base classes of the current tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L512** `    empty_bases = []` — **EN:** Assigns a value to empty_bases. **CN:** 将一个值赋给 empty_bases。
+- **L513** `    # The first non empty base class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L514** `    first_non_empty_base = None` — **EN:** Assigns a value to first_non_empty_base. **CN:** 将一个值赋给 first_non_empty_base。
+- **L515** `    # The ctype fields of the current tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L516** `    ctype_fields = []` — **EN:** Assigns a value to ctype_fields. **CN:** 将一个值赋给 ctype_fields。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `    for idx, entry in enumerate(input_tuple):` — **EN:** Starts a loop assigning items from `enumerate(input_tuple)` to `(idx, entry)`. **CN:** 开始一个循环，将 `enumerate(input_tuple)` 的元素赋给 `(idx, entry)`。
+- **L519** `        # For nested tuples` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L520** `        if isinstance(entry, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(entry, tuple)`. **CN:** 开始一个由 `isinstance(entry, tuple)` 控制的条件分支。
+- **L521** `            sub_tuple_ctype, sub_empty_bases = tuple_factory_(entry, dtype, constants)` — **EN:** Assigns a value to (sub_tuple_ctype, sub_empty_bases). **CN:** 将一个值赋给 (sub_tuple_ctype, sub_empty_bases)。
+- **L522** `            if ctypes.sizeof(sub_tuple_ctype) == 0:` — **EN:** Starts a conditional branch guarded by `ctypes.sizeof(sub_tuple_ctype) == 0`. **CN:** 开始一个由 `ctypes.sizeof(sub_tuple_ctype) == 0` 控制的条件分支。
+- **L523** `                # The empty tuple base class is also an empty EBO` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L524** `                empty_bases.append(EBO(idx, entry))` — **EN:** Invokes `empty_bases.append` as a standalone call. **CN:** 以独立语句方式调用 `empty_bases.append`。
+- **L525** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L526** `                if first_non_empty_base is None:` — **EN:** Starts a conditional branch guarded by `first_non_empty_base is None`. **CN:** 开始一个由 `first_non_empty_base is None` 控制的条件分支。
+- **L527** `                    first_non_empty_base = sub_empty_bases` — **EN:** Assigns a value to first_non_empty_base. **CN:** 将一个值赋给 first_non_empty_base。
+- **L528** `            ctype_fields.append((f"entry_{idx}", sub_tuple_ctype))` — **EN:** Invokes `ctype_fields.append` as a standalone call. **CN:** 以独立语句方式调用 `ctype_fields.append`。
+- **L529** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L530** `            if entry in constants:` — **EN:** Starts a conditional branch guarded by `entry in constants`. **CN:** 开始一个由 `entry in constants` 控制的条件分支。
+- **L531** `                empty_bases.append(EBO(idx, entry))` — **EN:** Invokes `empty_bases.append` as a standalone call. **CN:** 以独立语句方式调用 `empty_bases.append`。
+- **L532** `                ctype_fields.append((f"entry_{idx}", Empty))` — **EN:** Invokes `ctype_fields.append` as a standalone call. **CN:** 以独立语句方式调用 `ctype_fields.append`。
+- **L533** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L534** `                ctype_fields.append((f"entry_{idx}", dtype))` — **EN:** Invokes `ctype_fields.append` as a standalone call. **CN:** 以独立语句方式调用 `ctype_fields.append`。
+- **L535** `                if first_non_empty_base is None:` — **EN:** Starts a conditional branch guarded by `first_non_empty_base is None`. **CN:** 开始一个由 `first_non_empty_base is None` 控制的条件分支。
+- **L536** `                    first_non_empty_base = []` — **EN:** Assigns a value to first_non_empty_base. **CN:** 将一个值赋给 first_non_empty_base。
+- **L537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L538** `    # Create the ctype tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L539** `    class TupleType(ctypes.Structure):` — **EN:** Defines class `TupleType` with bases ctypes.Structure. **CN:** 定义类 `TupleType`，其基类为 ctypes.Structure。
+- **L540** `        _fields_ = ctype_fields` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L541** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L542** `        def __init__(self, args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L543** `            fields = self._fields_` — **EN:** Assigns a value to fields. **CN:** 将一个值赋给 fields。
+- **L544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L545** `            assert len(fields) == len(args)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L546** `            for field, arg in zip(fields, args):` — **EN:** Starts a loop assigning items from `zip(fields, args)` to `(field, arg)`. **CN:** 开始一个循环，将 `zip(fields, args)` 的元素赋给 `(field, arg)`。
+- **L547** `                name = field[0]` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L548** `                field_type = field[1]` — **EN:** Assigns a value to field_type. **CN:** 将一个值赋给 field_type。
+- **L549** `                setattr(self, name, field_type(arg))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** `    return TupleType, empty_bases` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `def tuple_factory(input_tuple, dtype: str, constants=[0,1]):` — **EN:** Defines function `tuple_factory`. **CN:** 定义函数 `tuple_factory`。
+- **L554** `    """` — **EN:** Starts the docstring for the function `tuple_factory`. **CN:** 开始说明 function `tuple_factory` 的文档字符串。
+- **L555** `    The factory function generating cute::Tuple with input tuple` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L556** `    :param input_tuple: the input tuple` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L557** `    :type input_tuple: tuple` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L558** `    :param dtype: the data type for non-constant values` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L559** `    :type dtype: str, "int32_t", "int", "int64_t"` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L560** `    :param constant: the values that will be treated as constants` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L561** `    :type constant: list[int]` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L562** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L563** `    :return: ctype structure representing the cute::Tuple` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L564** `    :return: the empty base classes of the tuple` — **EN:** Continues the docstring for the function `tuple_factory`. **CN:** 继续说明 function `tuple_factory` 的文档字符串。
+- **L565** `    """` — **EN:** Ends the docstring for the function `tuple_factory`. **CN:** 结束说明 function `tuple_factory` 的文档字符串。
+- **L566** `    # Step 1: convert the dtype` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L567** `    if dtype == "int64_t":` — **EN:** Starts a conditional branch guarded by `dtype == 'int64_t'`. **CN:** 开始一个由 `dtype == 'int64_t'` 控制的条件分支。
+- **L568** `        dtype = ctypes.c_longlong` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L569** `    elif dtype in ["int", "int32_t"]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L570** `        dtype = ctypes.c_int32` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L571** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L572** `        raise NotImplementedError(f"Type {dtype} is not supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `    tuple_type, _ = tuple_factory_(input_tuple, dtype, constants)` — **EN:** Assigns a value to (tuple_type, _). **CN:** 将一个值赋给 (tuple_type, _)。
+- **L575** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L576** `    if ctypes.sizeof(tuple_type) == 0:` — **EN:** Starts a conditional branch guarded by `ctypes.sizeof(tuple_type) == 0`. **CN:** 开始一个由 `ctypes.sizeof(tuple_type) == 0` 控制的条件分支。
+- **L577** `        return EmptyByte` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L578** `    return tuple_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L579** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L581** `def visitor_factory(node_types, node_names):` — **EN:** Defines function `visitor_factory`. **CN:** 定义函数 `visitor_factory`。
+- **L582** `    """` — **EN:** Starts the docstring for the function `visitor_factory`. **CN:** 开始说明 function `visitor_factory` 的文档字符串。
+- **L583** `    Creates the argument type of epilogue visitor type` — **EN:** Continues the docstring for the function `visitor_factory`. **CN:** 继续说明 function `visitor_factory` 的文档字符串。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** `    :param node_types: list of argument types under ctypes` — **EN:** Continues the docstring for the function `visitor_factory`. **CN:** 继续说明 function `visitor_factory` 的文档字符串。
+- **L586** `    :param node_names: list of argument names under str` — **EN:** Continues the docstring for the function `visitor_factory`. **CN:** 继续说明 function `visitor_factory` 的文档字符串。
+- **L587** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L588** `    :return: tuple type in ctypes.Structure` — **EN:** Continues the docstring for the function `visitor_factory`. **CN:** 继续说明 function `visitor_factory` 的文档字符串。
+- **L589** `    """` — **EN:** Ends the docstring for the function `visitor_factory`. **CN:** 结束说明 function `visitor_factory` 的文档字符串。
+- **L590** `    ctypes_field = []` — **EN:** Assigns a value to ctypes_field. **CN:** 将一个值赋给 ctypes_field。
+- **L591** `    # Struct is used when number of nodes < 4` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L592** `    # Because the Sm90VisitorImplBase has specification up to 4 nodes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L593** `    # in \`include/cutlass/epilogue/fusion/sm90_visitor_tma_warpspecialized.hpp\`` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L594** `    if len(node_types) <= 4:` — **EN:** Starts a conditional branch guarded by `len(node_types) <= 4`. **CN:** 开始一个由 `len(node_types) <= 4` 控制的条件分支。
+- **L595** `        for idx, node_type in enumerate(node_types):` — **EN:** Starts a loop assigning items from `enumerate(node_types)` to `(idx, node_type)`. **CN:** 开始一个循环，将 `enumerate(node_types)` 的元素赋给 `(idx, node_type)`。
+- **L596** `            if ctypes.sizeof(node_type) == 0:` — **EN:** Starts a conditional branch guarded by `ctypes.sizeof(node_type) == 0`. **CN:** 开始一个由 `ctypes.sizeof(node_type) == 0` 控制的条件分支。
+- **L597** `                # Special case for empty struct` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L598** `                # 1 byte placeholder is used for correct alignment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L599** `                ctypes_field.append((node_names[idx], ctypes.c_byte))` — **EN:** Invokes `ctypes_field.append` as a standalone call. **CN:** 以独立语句方式调用 `ctypes_field.append`。
+- **L600** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L601** `                ctypes_field.append((node_names[idx], node_type))` — **EN:** Invokes `ctypes_field.append` as a standalone call. **CN:** 以独立语句方式调用 `ctypes_field.append`。
+- **L602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L603** `        class VisitorType(ctypes.Structure):` — **EN:** Defines class `VisitorType` with bases ctypes.Structure. **CN:** 定义类 `VisitorType`，其基类为 ctypes.Structure。
+- **L604** `            _fields_ = ctypes_field` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L605** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L606** `            def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L607** `                for field in self._fields_:` — **EN:** Starts a loop assigning items from `self._fields_` to `field`. **CN:** 开始一个循环，将 `self._fields_` 的元素赋给 `field`。
+- **L608** `                    fname, ftype = field` — **EN:** Assigns a value to (fname, ftype). **CN:** 将一个值赋给 (fname, ftype)。
+- **L609** `                    if ftype != ctypes.c_byte:` — **EN:** Starts a conditional branch guarded by `ftype != ctypes.c_byte`. **CN:** 开始一个由 `ftype != ctypes.c_byte` 控制的条件分支。
+- **L610** `                        setattr(self, fname, ftype(kwargs))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L611** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L612** `    # For cases with more than 4 nodes, tuple is used` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L613** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L614** `        for idx, node_type in enumerate(node_types):` — **EN:** Starts a loop assigning items from `enumerate(node_types)` to `(idx, node_type)`. **CN:** 开始一个循环，将 `enumerate(node_types)` 的元素赋给 `(idx, node_type)`。
+- **L615** `            ctypes_field.append((node_names[idx], node_type))` — **EN:** Invokes `ctypes_field.append` as a standalone call. **CN:** 以独立语句方式调用 `ctypes_field.append`。
+- **L616** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L617** `        class VisitorType(ctypes.Structure):` — **EN:** Defines class `VisitorType` with bases ctypes.Structure. **CN:** 定义类 `VisitorType`，其基类为 ctypes.Structure。
+- **L618** `            _fields_ = ctypes_field` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L620** `            def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L621** `                for field in self._fields_:` — **EN:** Starts a loop assigning items from `self._fields_` to `field`. **CN:** 开始一个循环，将 `self._fields_` 的元素赋给 `field`。
+- **L622** `                    fname, ftype = field` — **EN:** Assigns a value to (fname, ftype). **CN:** 将一个值赋给 (fname, ftype)。
+- **L623** `                    setattr(self, fname, ftype(kwargs))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L624** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L625** `    return VisitorType` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.c_types`. CN: 模块名为 `cutlass_cppgen.backend.c_types`。
+- EN: Top-level classes: GemmCoord_, GemmCoordBatched_, MatrixCoord_, dim3_, StrideBatched_, GenericMainloopArguments3x_, _PersistentTileSchedulerArguments, _PersistentTileSchedulerStreamKArguments, Conv2DProblemSize_, Layout4D, TensorRef_, TensorRef2D_, ... (+3 more) CN: 顶层类包括：GemmCoord_, GemmCoordBatched_, MatrixCoord_, dim3_, StrideBatched_, GenericMainloopArguments3x_, _PersistentTileSchedulerArguments, _PersistentTileSchedulerStreamKArguments, Conv2DProblemSize_, Layout4D, TensorRef_, TensorRef2D_, ... (+3 more)
+- EN: Top-level functions: get_tile_scheduler_arguments_3x, get_mainloop_arguments_3x, get_gemm_arguments_3x, get_gemm_arguments, get_gemm_arguments_streamk, get_gemm_grouped_arguments, get_conv2d_arguments, get_reduction_params, tuple_factory_, tuple_factory, visitor_factory CN: 顶层函数包括：get_tile_scheduler_arguments_3x, get_mainloop_arguments_3x, get_gemm_arguments_3x, get_gemm_arguments, get_gemm_arguments_streamk, get_gemm_grouped_arguments, get_conv2d_arguments, get_reduction_params, tuple_factory_, tuple_factory, visitor_factory
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataType,KernelScheduleType,TileSchedulerType, cutlass_cppgen.backend.library:DataTypeSizeBytes CN: 内部依赖：cutlass_library:DataType,KernelScheduleType,TileSchedulerType, cutlass_cppgen.backend.library:DataTypeSizeBytes
+- EN: External or standard-library dependencies: ctypes CN: 外部或标准库依赖：ctypes

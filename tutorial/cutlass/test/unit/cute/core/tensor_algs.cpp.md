@@ -1,0 +1,646 @@
+# tensor_algs.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/tensor_algs.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `tensor algs` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `tensor algs` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cute/algorithm/tensor_algorithms.hpp>`
+  - EN: Provides CuTe `algorithm / tensor_algorithms` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `algorithm / tensor_algorithms` 功能。
+- **Line 35**: `#include <cute/algorithm/tensor_reduce.hpp>`
+  - EN: Provides CuTe `algorithm / tensor_reduce` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `algorithm / tensor_reduce` 功能。
+- **Line 36**: `#include <cute/numeric/complex.hpp>`
+  - EN: Provides CuTe `numeric / complex` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `numeric / complex` 功能。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `TEST(CuTe_algorithm, TensorTransform) {`
+  - EN: Declares GoogleTest case `CuTe_algorithm::TensorTransform` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_algorithm::TensorTransform`，用于验证一个具体的 CuTe 场景。
+- **Line 39**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 40**: `  complex<float> array[4] = {{0,0}, {1,0}, {0,1}, {1,1}};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 41**: `  complex<float> correct[4] = {{0,0}, {1,0}, {0,-1}, {1,-1}};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 42**: `  Tensor tensor = make_tensor(static_cast<complex<float>*>(array), make_layout(make_shape(4)));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 43**: `  conjugate conj;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 44**: `  transform(tensor, conj);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 45**: `  for (int i = 0; i < 4; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 46**: `    EXPECT_EQ(tensor(i), correct[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 47**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 48**: `}`
+  - EN: Closes the scope for `test CuTe_algorithm::TensorTransform`.
+  - CN: 结束 `test CuTe_algorithm::TensorTransform` 的作用域。
+- **Line 49**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: `TEST(CuTe_algorithm, TensorBatchReduce) {`
+  - EN: Declares GoogleTest case `CuTe_algorithm::TensorBatchReduce` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_algorithm::TensorBatchReduce`，用于验证一个具体的 CuTe 场景。
+- **Line 51**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 52**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 53**: `  int src_vals[16] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 54**: `  Tensor src_tensor = make_tensor(static_cast<int*>(src_vals),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 55**: `                                  make_layout(make_shape (make_shape (2,2), make_shape (2,2)),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 56**: `                                              make_stride(make_stride(2,8), make_stride(1,4))));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `  array<int, 4> dst_vals;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 59**: `  fill(dst_vals, 0);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 60**: `  Tensor dst_tensor = make_tensor(dst_vals.begin(), make_shape(2,2));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 61**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 62**: `  batch_reduce(src_tensor, dst_tensor);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 63**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 64**: `  int correct[4] = {20,24,36,40};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 65**: `  for (int i = 0; i < 4; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 66**: `    //printf("%d  %d\n", dst_tensor(i), correct[i]);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 67**: `    EXPECT_EQ(dst_tensor(i), correct[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 68**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 69**: `}`
+  - EN: Closes the scope for `test CuTe_algorithm::TensorBatchReduce`.
+  - CN: 结束 `test CuTe_algorithm::TensorBatchReduce` 的作用域。
+- **Line 70**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 71**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 72**: `TEST(CuTe_algorithm, TensorLogicalReduce) {`
+  - EN: Declares GoogleTest case `CuTe_algorithm::TensorLogicalReduce` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_algorithm::TensorLogicalReduce`，用于验证一个具体的 CuTe 场景。
+- **Line 73**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 74**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 75**: `  { // Reduce each column of a matrix`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 76**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 77**: `                                    Layout<Shape <_32, Shape <_12,_6>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 78**: `                                           Stride< _1, Stride<_64,_1>>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 79**: `    auto slicer = make_coord(0_c, _);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 80**: `    Tensor dst_tensor = make_tensor_like(src_tensor(slicer));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 81**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 82**: `    logical_reduce(src_tensor, dst_tensor, slicer);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 83**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 84**: `    for (int i = 0; i < size(dst_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 85**: `      EXPECT_EQ(dst_tensor(i), reduce(src_tensor(_,i), int(0)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 86**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 87**: `  }`
+  - EN: Closes the scope for `test CuTe_algorithm::TensorLogicalReduce`.
+  - CN: 结束 `test CuTe_algorithm::TensorLogicalReduce` 的作用域。
+- **Line 88**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 89**: `  { // Reduce each row of a matrix`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 90**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 91**: `                                    Layout<Shape <_32, Shape <_12,_6>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 92**: `                                           Stride< _1, Stride<_64,_1>>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 93**: `    auto slicer = make_coord(_, 0_c);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 94**: `    Tensor dst_tensor = make_tensor_like(src_tensor(slicer));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 95**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 96**: `    logical_reduce(src_tensor, dst_tensor, slicer);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 97**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 98**: `    for (int i = 0; i < size(dst_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 99**: `      EXPECT_EQ(dst_tensor(i), reduce(src_tensor(i,_), int(0)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 100**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 101**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 102**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 103**: `  { // 1 profile`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 104**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 105**: `                                    Layout<Shape<_32>, Stride<_1>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 106**: `    array<int, 1> dst_vals;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 107**: `    fill(dst_vals, 0);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 108**: `    Tensor dst_tensor = make_tensor(dst_vals.begin(), Layout<_1,_0>{});`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 109**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 110**: `    logical_reduce(src_tensor, dst_tensor, 1);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: `    for (int i = 0; i < size(dst_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 113**: `      EXPECT_EQ(dst_tensor(i), reduce(src_tensor, int(0)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 114**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 115**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 116**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 117**: `  { // _ profile`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 118**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 119**: `                                    Layout<Shape<_32>, Stride<_1>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 120**: `    auto slicer = _;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 121**: `    Tensor dst_tensor = make_tensor_like(src_tensor(slicer));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 122**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: `    logical_reduce(src_tensor, dst_tensor, slicer);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 124**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 125**: `    for (int i = 0; i < size(dst_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 126**: `      EXPECT_EQ(dst_tensor(i), src_tensor(i));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 127**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 128**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 129**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 130**: `  { // (1,1) profile`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 131**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 132**: `                                    Layout<Shape <_32, Shape <_12,_6>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 133**: `                                           Stride< _1, Stride<_192,_32>>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 134**: `    auto slicer = make_coord(1, 1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 135**: `    array<int, 1> dst_vals;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 136**: `    fill(dst_vals, 0);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 137**: `    Tensor dst_tensor = make_tensor(dst_vals.begin(), Layout<_1,_0>{});`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 138**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 139**: `    logical_reduce(src_tensor, dst_tensor, slicer);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 140**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 141**: `    for (int i = 0; i < size(dst_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 142**: `      EXPECT_EQ(dst_tensor(i), reduce(src_tensor, int(0)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 143**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 144**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 145**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 146**: `  { // (_,_) profile`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 147**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 148**: `                                    Layout<Shape <_32, Shape <_12,_6>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 149**: `                                           Stride< _1, Stride<_192,_32>>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 150**: `    auto slicer = make_coord(_,_);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 151**: `    Tensor dst_tensor = make_tensor_like(src_tensor(slicer));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 152**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 153**: `    logical_reduce(src_tensor, dst_tensor, slicer);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 154**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 155**: `    for (int i = 0; i < size(dst_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 156**: `      EXPECT_EQ(dst_tensor(i), src_tensor(i));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 157**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 158**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 159**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 160**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 161**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 162**: `                                    make_layout(make_shape (2,2,2,2),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 163**: `                                                make_stride(1,2,4,8)));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `    array<int, 4> dst_vals;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 166**: `    fill(dst_vals, 0);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 167**: `    Tensor dst_tensor = make_tensor(dst_vals.begin(), make_shape(2,2));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 168**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 169**: `    auto target_profile = make_coord(_,1,_,1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `    logical_reduce(src_tensor, dst_tensor, target_profile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 172**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 173**: `    int correct[4] = {20,24,36,40};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 174**: `    for (int i = 0; i < 4; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 175**: `      //printf("%d  %d\n", dst_tensor(i), correct[i]);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 176**: `      EXPECT_EQ(dst_tensor(i), correct[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 177**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 178**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 179**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 180**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 181**: `    Tensor src_tensor = make_tensor(counting_iterator<int>{0},`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 182**: `                                    make_layout(make_shape (2,make_shape (2,2),2),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 183**: `                                                make_stride(1,make_stride(2,4),8)));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 184**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 185**: `    array<int, 4> dst_vals;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 186**: `    fill(dst_vals, 0);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 187**: `    Tensor dst_tensor = make_tensor(dst_vals.begin(), make_shape(2,2));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 188**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 189**: `    auto target_profile = make_coord(_,make_coord(1,_),1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 190**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 191**: `    logical_reduce(src_tensor, dst_tensor, target_profile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 192**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 193**: `    int correct[4] = {20,24,36,40};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 194**: `    for (int i = 0; i < 4; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 195**: `      //printf("%d  %d\n", dst_tensor(i), correct[i]);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 196**: `      EXPECT_EQ(dst_tensor(i), correct[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 197**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 198**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 199**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 200**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `Tensor`
+  - EN: Uses the CuTe tensor abstraction to bind memory pointers with layouts.
+  - CN: 使用 CuTe Tensor 抽象把内存指针与布局绑定起来。
+- `make_tensor`
+  - EN: Builds a CuTe tensor object from a pointer and a layout.
+  - CN: 从指针和布局构造一个 CuTe 张量对象。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cute/algorithm/tensor_algorithms.hpp`
+  - EN: Provides CuTe `algorithm / tensor_algorithms` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `algorithm / tensor_algorithms` 功能。
+- `cute/algorithm/tensor_reduce.hpp`
+  - EN: Provides CuTe `algorithm / tensor_reduce` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `algorithm / tensor_reduce` 功能。
+- `cute/numeric/complex.hpp`
+  - EN: Provides CuTe `numeric / complex` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `numeric / complex` 功能。

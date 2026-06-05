@@ -1,0 +1,206 @@
+# ffi.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/jax/ffi.py`
+
+## Purpose / 作用
+- EN: Defines 6 functions (get_cutlass_call_ffi_version, get_cutlass_call_ffi_name, get_export_disabled_safety_checks, find_cute_dsl_runtime_library, ... (+2 more)) in `CuTeDSL.cutlass.jax.ffi`.
+- CN: 该模块 `CuTeDSL.cutlass.jax.ffi` 定义了 6 个函数（get_cutlass_call_ffi_version, get_cutlass_call_ffi_name, get_export_disabled_safety_checks, find_cute_dsl_runtime_library, ... (+2 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Sequence, Optional` — **EN:** Imports Sequence, Optional from `typing`. **CN:** 从 `typing` 导入 Sequence, Optional。
+- **L13** `from pathlib import Path` — **EN:** Imports Path from `pathlib`. **CN:** 从 `pathlib` 导入 Path。
+- **L14** `from functools import cache` — **EN:** Imports cache from `functools`. **CN:** 从 `functools` 导入 cache。
+- **L15** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L16** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L19** `from cutlass.base_dsl.env_manager import find_libs_in_ancestors` — **EN:** Imports find_libs_in_ancestors from `cutlass.base_dsl.env_manager`. **CN:** 从 `cutlass.base_dsl.env_manager` 导入 find_libs_in_ancestors。
+- **L20** `from cutlass.cutlass_dsl.cutlass import CuTeDSL` — **EN:** Imports CuTeDSL from `cutlass.cutlass_dsl.cutlass`. **CN:** 从 `cutlass.cutlass_dsl.cutlass` 导入 CuTeDSL。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `import jax` — **EN:** Imports jax for later use. **CN:** 导入 jax 供后续使用。
+- **L23** `import jax.export` — **EN:** Imports jax.export for later use. **CN:** 导入 jax.export 供后续使用。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `logger = logging.getLogger(__name__)` — **EN:** Assigns a value to logger. **CN:** 将一个值赋给 logger。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `_CUTE_DSL_RUNTIME_LIBRARY_NAME = "cute_dsl_runtime"` — **EN:** Assigns a value to _CUTE_DSL_RUNTIME_LIBRARY_NAME. **CN:** 将一个值赋给 _CUTE_DSL_RUNTIME_LIBRARY_NAME。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `# V1 targets for older jax clients` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `_CUTLASS_CALL_TARGETS_V1 = {` — **EN:** Assigns a value to _CUTLASS_CALL_TARGETS_V1. **CN:** 将一个值赋给 _CUTLASS_CALL_TARGETS_V1。
+- **L31** `    "CuteDSLRT_NvJaxCutlassCall": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `        "prepare": "CuteDSLRT_NvJaxCutlassCallPrepare_v1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `        "execute": "CuteDSLRT_NvJaxCutlassCallExecute_v1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    "CuteDSLRT_NvJaxCutlassCallNoCudaGraph": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `        "prepare": "CuteDSLRT_NvJaxCutlassCallPrepare_v1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `        "execute": "CuteDSLRT_NvJaxCutlassCallExecuteNoCudaGraph_v1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `# V2 targets for newer jax clients supporting stateful FFI calls.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L42** `_JAX_FFI_V2_MIN_VERSION = (0, 9, 1)` — **EN:** Assigns a value to _JAX_FFI_V2_MIN_VERSION. **CN:** 将一个值赋给 _JAX_FFI_V2_MIN_VERSION。
+- **L43** `_CUTLASS_CALL_TARGETS_V2 = {` — **EN:** Assigns a value to _CUTLASS_CALL_TARGETS_V2. **CN:** 将一个值赋给 _CUTLASS_CALL_TARGETS_V2。
+- **L44** `    "CuteDSLRT_NvJaxCutlassCall": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `        "execute": "CuteDSLRT_NvJaxCutlassCallExecute_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `        "instantiate": "CuteDSLRT_NvJaxCutlassCallInstantiate_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `        "prepare": "CuteDSLRT_NvJaxCutlassCallPrepare_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    "CuteDSLRT_NvJaxCutlassCallNoCudaGraph": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `        "execute": "CuteDSLRT_NvJaxCutlassCallExecuteNoCudaGraph_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `        "instantiate": "CuteDSLRT_NvJaxCutlassCallInstantiate_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `        "prepare": "CuteDSLRT_NvJaxCutlassCallPrepare_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `_CUTLASS_CALL_TYPES_V2 = {` — **EN:** Assigns a value to _CUTLASS_CALL_TYPES_V2. **CN:** 将一个值赋给 _CUTLASS_CALL_TYPES_V2。
+- **L56** `    "CuteDSLRT_NvJaxCutlassCallTypes": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `        "type_id": "CuteDSLRT_NvJaxCutlassCallStateTypeId_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `        "type_info": "CuteDSLRT_NvJaxCutlassCallStateTypeInfo_v2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `def get_cutlass_call_ffi_version() -> int:` — **EN:** Defines function `get_cutlass_call_ffi_version`. **CN:** 定义函数 `get_cutlass_call_ffi_version`。
+- **L64** `    """Returns the FFI API version based on JAX version."""` — **EN:** Docstring line documenting the function `get_cutlass_call_ffi_version`. **CN:** 文档字符串行，用于说明 function `get_cutlass_call_ffi_version`。
+- **L65** `    if jax.version.__version_info__ >= _JAX_FFI_V2_MIN_VERSION:` — **EN:** Starts a conditional branch guarded by `jax.version.__version_info__ >= _JAX_FFI_V2_MIN_VERSION`. **CN:** 开始一个由 `jax.version.__version_info__ >= _JAX_FFI_V2_MIN_VERSION` 控制的条件分支。
+- **L66** `        return 2` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L68** `        return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `def get_cutlass_call_ffi_name(allow_cuda_graph: bool) -> str:` — **EN:** Defines function `get_cutlass_call_ffi_name`. **CN:** 定义函数 `get_cutlass_call_ffi_name`。
+- **L72** `    """Returns the FFI target to call when running cutlass_call functions."""` — **EN:** Docstring line documenting the function `get_cutlass_call_ffi_name`. **CN:** 文档字符串行，用于说明 function `get_cutlass_call_ffi_name`。
+- **L73** `    if allow_cuda_graph:` — **EN:** Starts a conditional branch guarded by `allow_cuda_graph`. **CN:** 开始一个由 `allow_cuda_graph` 控制的条件分支。
+- **L74** `        return "CuteDSLRT_NvJaxCutlassCall"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L76** `        return "CuteDSLRT_NvJaxCutlassCallNoCudaGraph"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `def get_export_disabled_safety_checks() -> Sequence[jax.export.DisabledSafetyCheck]:` — **EN:** Defines function `get_export_disabled_safety_checks`. **CN:** 定义函数 `get_export_disabled_safety_checks`。
+- **L80** `    """Returns jax.export.DisabledSafetyCheck to allow cutlass_call kernels."""` — **EN:** Docstring line documenting the function `get_export_disabled_safety_checks`. **CN:** 文档字符串行，用于说明 function `get_export_disabled_safety_checks`。
+- **L81** `    targets = set(_CUTLASS_CALL_TARGETS_V1.keys()) | set(` — **EN:** Assigns a value to targets. **CN:** 将一个值赋给 targets。
+- **L82** `        _CUTLASS_CALL_TARGETS_V2.keys()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `    return tuple([jax.export.DisabledSafetyCheck.custom_call(t) for t in targets])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `@cache` — **EN:** Applies decorator `cache` to the following definition. **CN:** 将装饰器 `cache` 应用于后面的定义。
+- **L88** `def find_cute_dsl_runtime_library() -> Optional[str]:` — **EN:** Defines function `find_cute_dsl_runtime_library`. **CN:** 定义函数 `find_cute_dsl_runtime_library`。
+- **L89** `    """Searches for the CuTeDSL runtime library."""` — **EN:** Docstring line documenting the function `find_cute_dsl_runtime_library`. **CN:** 文档字符串行，用于说明 function `find_cute_dsl_runtime_library`。
+- **L90** `    dsl = CuTeDSL._get_dsl()` — **EN:** Assigns a value to dsl. **CN:** 将一个值赋给 dsl。
+- **L91** `    candidate_libs = []` — **EN:** Assigns a value to candidate_libs. **CN:** 将一个值赋给 candidate_libs。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L94** `        # Prefer the environment variable if we find it there.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L95** `        if dsl.envar.shared_libs:` — **EN:** Starts a conditional branch guarded by `dsl.envar.shared_libs`. **CN:** 开始一个由 `dsl.envar.shared_libs` 控制的条件分支。
+- **L96** `            for lib in dsl.envar.shared_libs.split(":"):` — **EN:** Starts a loop assigning items from `dsl.envar.shared_libs.split(':')` to `lib`. **CN:** 开始一个循环，将 `dsl.envar.shared_libs.split(':')` 的元素赋给 `lib`。
+- **L97** `                if lib.endswith(f"{_CUTE_DSL_RUNTIME_LIBRARY_NAME}.so"):` — **EN:** Starts a conditional branch guarded by `lib.endswith(f'{_CUTE_DSL_RUNTIME_LIBRARY_NAME}.so')`. **CN:** 开始一个由 `lib.endswith(f'{_CUTE_DSL_RUNTIME_LIBRARY_NAME}.so')` 控制的条件分支。
+- **L98** `                    return lib` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `        # Otherwise try to search for the library inside the wheel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L101** `        def get_libs_cand(start):` — **EN:** Defines function `get_libs_cand`. **CN:** 定义函数 `get_libs_cand`。
+- **L102** `            libs_cand = find_libs_in_ancestors(` — **EN:** Assigns a value to libs_cand. **CN:** 将一个值赋给 libs_cand。
+- **L103** `                start, [_CUTE_DSL_RUNTIME_LIBRARY_NAME], ["lib"]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `            if libs_cand:` — **EN:** Starts a conditional branch guarded by `libs_cand`. **CN:** 开始一个由 `libs_cand` 控制的条件分支。
+- **L106** `                return libs_cand` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L107** `            return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `        dsl_libs = get_libs_cand(cutlass.__file__)` — **EN:** Assigns a value to dsl_libs. **CN:** 将一个值赋给 dsl_libs。
+- **L110** `        if not dsl_libs:` — **EN:** Starts a conditional branch guarded by `not dsl_libs`. **CN:** 开始一个由 `not dsl_libs` 控制的条件分支。
+- **L111** `            dsl_libs = get_libs_cand(Path(__file__).parent.parent.resolve())` — **EN:** Assigns a value to dsl_libs. **CN:** 将一个值赋给 dsl_libs。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `        candidate_libs.extend(dsl_libs)` — **EN:** Invokes `candidate_libs.extend` as a standalone call. **CN:** 以独立语句方式调用 `candidate_libs.extend`。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L116** `        logger.debug(` — **EN:** Invokes `logger.debug` as a standalone call. **CN:** 以独立语句方式调用 `logger.debug`。
+- **L117** `            f"Failed to locate {_CUTE_DSL_RUNTIME_LIBRARY_NAME} library: {e}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `            exc_info=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    for lib in candidate_libs:` — **EN:** Starts a loop assigning items from `candidate_libs` to `lib`. **CN:** 开始一个循环，将 `candidate_libs` 的元素赋给 `lib`。
+- **L122** `        if lib.endswith(f"{_CUTE_DSL_RUNTIME_LIBRARY_NAME}.so"):` — **EN:** Starts a conditional branch guarded by `lib.endswith(f'{_CUTE_DSL_RUNTIME_LIBRARY_NAME}.so')`. **CN:** 开始一个由 `lib.endswith(f'{_CUTE_DSL_RUNTIME_LIBRARY_NAME}.so')` 控制的条件分支。
+- **L123** `            return lib` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `_FFI_CALLS_REGISTERED = False` — **EN:** Assigns a value to _FFI_CALLS_REGISTERED. **CN:** 将一个值赋给 _FFI_CALLS_REGISTERED。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `def register_ffi(ffi_version: int = get_cutlass_call_ffi_version()):` — **EN:** Defines function `register_ffi`. **CN:** 定义函数 `register_ffi`。
+- **L132** `    """Registers custom calls with Jax/XLA runtime.` — **EN:** Starts the docstring for the function `register_ffi`. **CN:** 开始说明 function `register_ffi` 的文档字符串。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `    A specific version can be requested using \`ffi_version\` argument. Attempting` — **EN:** Continues the docstring for the function `register_ffi`. **CN:** 继续说明 function `register_ffi` 的文档字符串。
+- **L135** `    to register non default FFI versions may not work with your specific JAX.` — **EN:** Continues the docstring for the function `register_ffi`. **CN:** 继续说明 function `register_ffi` 的文档字符串。
+- **L136** `    """` — **EN:** Ends the docstring for the function `register_ffi`. **CN:** 结束说明 function `register_ffi` 的文档字符串。
+- **L137** `    global _FFI_CALLS_REGISTERED` — **EN:** Declares _FFI_CALLS_REGISTERED as module-level globals. **CN:** 将 _FFI_CALLS_REGISTERED 声明为模块级全局变量。
+- **L138** `    if _FFI_CALLS_REGISTERED:` — **EN:** Starts a conditional branch guarded by `_FFI_CALLS_REGISTERED`. **CN:** 开始一个由 `_FFI_CALLS_REGISTERED` 控制的条件分支。
+- **L139** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    runtime_library = find_cute_dsl_runtime_library()` — **EN:** Assigns a value to runtime_library. **CN:** 将一个值赋给 runtime_library。
+- **L142** `    if not runtime_library:` — **EN:** Starts a conditional branch guarded by `not runtime_library`. **CN:** 开始一个由 `not runtime_library` 控制的条件分支。
+- **L143** `        logger.debug(` — **EN:** Invokes `logger.debug` as a standalone call. **CN:** 以独立语句方式调用 `logger.debug`。
+- **L144** `            "No CuTeDSL runtime library found - skipping python ffi registration."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `    lib = ctypes.CDLL(runtime_library)` — **EN:** Assigns a value to lib. **CN:** 将一个值赋给 lib。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `    def _register_ffi_targets(lib, targets):` — **EN:** Defines function `_register_ffi_targets`. **CN:** 定义函数 `_register_ffi_targets`。
+- **L151** `        for target_name, target in targets.items():` — **EN:** Starts a loop assigning items from `targets.items()` to `(target_name, target)`. **CN:** 开始一个循环，将 `targets.items()` 的元素赋给 `(target_name, target)`。
+- **L152** `            handler = {}` — **EN:** Assigns a value to handler. **CN:** 将一个值赋给 handler。
+- **L153** `            for stage, fn_name in target.items():` — **EN:** Starts a loop assigning items from `target.items()` to `(stage, fn_name)`. **CN:** 开始一个循环，将 `target.items()` 的元素赋给 `(stage, fn_name)`。
+- **L154** `                fn = getattr(lib, fn_name)` — **EN:** Assigns a value to fn. **CN:** 将一个值赋给 fn。
+- **L155** `                fn.restype = ctypes.c_void_p` — **EN:** Assigns a value to fn.restype. **CN:** 将一个值赋给 fn.restype。
+- **L156** `                handler[stage] = jax.ffi.pycapsule(fn)` — **EN:** Assigns a value to handler[stage]. **CN:** 将一个值赋给 handler[stage]。
+- **L157** `            logger.debug(f"Registering ffi handler: {target_name}, {handler}")` — **EN:** Invokes `logger.debug` as a standalone call. **CN:** 以独立语句方式调用 `logger.debug`。
+- **L158** `            jax.ffi.register_ffi_target(target_name, handler, platform="CUDA")` — **EN:** Invokes `jax.ffi.register_ffi_target` as a standalone call. **CN:** 以独立语句方式调用 `jax.ffi.register_ffi_target`。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    def _register_ffi_types(lib, types):` — **EN:** Defines function `_register_ffi_types`. **CN:** 定义函数 `_register_ffi_types`。
+- **L161** `        for type_name, type_dict_targets in types.items():` — **EN:** Starts a loop assigning items from `types.items()` to `(type_name, type_dict_targets)`. **CN:** 开始一个循环，将 `types.items()` 的元素赋给 `(type_name, type_dict_targets)`。
+- **L162** `            type_dict = {}` — **EN:** Assigns a value to type_dict. **CN:** 将一个值赋给 type_dict。
+- **L163** `            for field, fn_name in type_dict_targets.items():` — **EN:** Starts a loop assigning items from `type_dict_targets.items()` to `(field, fn_name)`. **CN:** 开始一个循环，将 `type_dict_targets.items()` 的元素赋给 `(field, fn_name)`。
+- **L164** `                fn = getattr(lib, fn_name)` — **EN:** Assigns a value to fn. **CN:** 将一个值赋给 fn。
+- **L165** `                fn.restype = ctypes.c_void_p` — **EN:** Assigns a value to fn.restype. **CN:** 将一个值赋给 fn.restype。
+- **L166** `                type_dict[field] = jax.ffi.pycapsule(fn())` — **EN:** Assigns a value to type_dict[field]. **CN:** 将一个值赋给 type_dict[field]。
+- **L167** `            logger.debug(f"Registering ffi type: {type_name}, {type_dict}")` — **EN:** Invokes `logger.debug` as a standalone call. **CN:** 以独立语句方式调用 `logger.debug`。
+- **L168** `            jax.ffi.register_ffi_type(type_name, type_dict, platform="CUDA")  # type: ignore[arg-type]` — **EN:** Invokes `jax.ffi.register_ffi_type` as a standalone call. **CN:** 以独立语句方式调用 `jax.ffi.register_ffi_type`。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    # Register the custom FFI targets.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L171** `    match ffi_version:` — **EN:** Starts structural pattern matching on `ffi_version`. **CN:** 开始对 `ffi_version` 进行结构化模式匹配。
+- **L172** `        case 1:` — **EN:** Defines one pattern-matching case. **CN:** 定义一个模式匹配分支。
+- **L173** `            _register_ffi_targets(lib, _CUTLASS_CALL_TARGETS_V1)` — **EN:** Invokes `_register_ffi_targets` as a standalone call. **CN:** 以独立语句方式调用 `_register_ffi_targets`。
+- **L174** `            # no types for v1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L175** `        case 2:` — **EN:** Defines one pattern-matching case. **CN:** 定义一个模式匹配分支。
+- **L176** `            _register_ffi_types(lib, _CUTLASS_CALL_TYPES_V2)` — **EN:** Invokes `_register_ffi_types` as a standalone call. **CN:** 以独立语句方式调用 `_register_ffi_types`。
+- **L177** `            _register_ffi_targets(lib, _CUTLASS_CALL_TARGETS_V2)` — **EN:** Invokes `_register_ffi_targets` as a standalone call. **CN:** 以独立语句方式调用 `_register_ffi_targets`。
+- **L178** `        case _:` — **EN:** Defines one pattern-matching case. **CN:** 定义一个模式匹配分支。
+- **L179** `            raise ValueError(f"Invalid FFI version {ffi_version}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `    _FFI_CALLS_REGISTERED = True` — **EN:** Assigns a value to _FFI_CALLS_REGISTERED. **CN:** 将一个值赋给 _FFI_CALLS_REGISTERED。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `def is_ffi_registered():` — **EN:** Defines function `is_ffi_registered`. **CN:** 定义函数 `is_ffi_registered`。
+- **L185** `    """Returns true if the FFI calls have been registered with Jax/XLA."""` — **EN:** Docstring line documenting the function `is_ffi_registered`. **CN:** 文档字符串行，用于说明 function `is_ffi_registered`。
+- **L186** `    global _FFI_CALLS_REGISTERED` — **EN:** Declares _FFI_CALLS_REGISTERED as module-level globals. **CN:** 将 _FFI_CALLS_REGISTERED 声明为模块级全局变量。
+- **L187** `    return _FFI_CALLS_REGISTERED` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.jax.ffi`. CN: 模块名为 `CuTeDSL.cutlass.jax.ffi`。
+- EN: Top-level functions: get_cutlass_call_ffi_version, get_cutlass_call_ffi_name, get_export_disabled_safety_checks, find_cute_dsl_runtime_library, register_ffi, is_ffi_registered CN: 顶层函数包括：get_cutlass_call_ffi_version, get_cutlass_call_ffi_name, get_export_disabled_safety_checks, find_cute_dsl_runtime_library, register_ffi, is_ffi_registered
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass, cutlass.base_dsl.env_manager:find_libs_in_ancestors, cutlass.cutlass_dsl.cutlass:CuTeDSL CN: 内部依赖：cutlass, cutlass.base_dsl.env_manager:find_libs_in_ancestors, cutlass.cutlass_dsl.cutlass:CuTeDSL
+- EN: External or standard-library dependencies: typing:Sequence,Optional, pathlib:Path, functools:cache, logging, ctypes, jax, jax.export CN: 外部或标准库依赖：typing:Sequence,Optional, pathlib:Path, functools:cache, logging, ctypes, jax, jax.export

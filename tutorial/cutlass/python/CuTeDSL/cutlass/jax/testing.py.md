@@ -1,0 +1,284 @@
+# testing.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/jax/testing.py`
+
+## Purpose / 作用
+- EN: Defines 18 functions (reorder_modes, gemm_a_major, gemm_a_mode, gemm_b_major, ... (+14 more)) in `CuTeDSL.cutlass.jax.testing`.
+- CN: 该模块 `CuTeDSL.cutlass.jax.testing` 定义了 18 个函数（reorder_modes, gemm_a_major, gemm_a_mode, gemm_b_major, ... (+14 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L13** `import jax` — **EN:** Imports jax for later use. **CN:** 导入 jax 供后续使用。
+- **L14** `import jax.numpy as jnp` — **EN:** Imports jax.numpy as jnp for later use. **CN:** 导入 jax.numpy as jnp 供后续使用。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L17** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L18** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L19** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `def reorder_modes(src: str, target: str) -> tuple[int, ...]:` — **EN:** Defines function `reorder_modes`. **CN:** 定义函数 `reorder_modes`。
+- **L23** `    """Computes the mode given a source and target order."""` — **EN:** Docstring line documenting the function `reorder_modes`. **CN:** 文档字符串行，用于说明 function `reorder_modes`。
+- **L24** `    src = tuple(src)` — **EN:** Assigns a value to src. **CN:** 将一个值赋给 src。
+- **L25** `    target = tuple(target)` — **EN:** Assigns a value to target. **CN:** 将一个值赋给 target。
+- **L26** `    src_map = {}` — **EN:** Assigns a value to src_map. **CN:** 将一个值赋给 src_map。
+- **L27** `    for idx, s in enumerate(src):` — **EN:** Starts a loop assigning items from `enumerate(src)` to `(idx, s)`. **CN:** 开始一个循环，将 `enumerate(src)` 的元素赋给 `(idx, s)`。
+- **L28** `        src_map[s] = idx` — **EN:** Assigns a value to src_map[s]. **CN:** 将一个值赋给 src_map[s]。
+- **L29** `    return tuple([src_map[d] for d in target])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `def gemm_a_major(d: str):` — **EN:** Defines function `gemm_a_major`. **CN:** 定义函数 `gemm_a_major`。
+- **L33** `    """Returns order for A tensor major mode."""` — **EN:** Docstring line documenting the function `gemm_a_major`. **CN:** 文档字符串行，用于说明 function `gemm_a_major`。
+- **L34** `    return {"k": "lmk", "m": "lkm"}[d]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `def gemm_a_mode(d: str) -> tuple[int, ...]:` — **EN:** Defines function `gemm_a_mode`. **CN:** 定义函数 `gemm_a_mode`。
+- **L38** `    """Returns mode for A tensor major mode."""` — **EN:** Docstring line documenting the function `gemm_a_mode`. **CN:** 文档字符串行，用于说明 function `gemm_a_mode`。
+- **L39** `    return reorder_modes(gemm_a_major(d), "mkl")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `def gemm_b_major(d: str):` — **EN:** Defines function `gemm_b_major`. **CN:** 定义函数 `gemm_b_major`。
+- **L43** `    """Returns order for B tensor major mode."""` — **EN:** Docstring line documenting the function `gemm_b_major`. **CN:** 文档字符串行，用于说明 function `gemm_b_major`。
+- **L44** `    return {"k": "lnk", "n": "lkn"}[d]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `def gemm_b_mode(d: str) -> tuple[int, ...]:` — **EN:** Defines function `gemm_b_mode`. **CN:** 定义函数 `gemm_b_mode`。
+- **L48** `    """Returns mode for B tensor major mode."""` — **EN:** Docstring line documenting the function `gemm_b_mode`. **CN:** 文档字符串行，用于说明 function `gemm_b_mode`。
+- **L49** `    return reorder_modes(gemm_b_major(d), "nkl")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `def gemm_c_major(d: str):` — **EN:** Defines function `gemm_c_major`. **CN:** 定义函数 `gemm_c_major`。
+- **L53** `    """Returns order for C tensor major mode."""` — **EN:** Docstring line documenting the function `gemm_c_major`. **CN:** 文档字符串行，用于说明 function `gemm_c_major`。
+- **L54** `    return {"n": "lmn", "m": "lnm"}[d]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `def gemm_c_mode(d: str) -> tuple[int, ...]:` — **EN:** Defines function `gemm_c_mode`. **CN:** 定义函数 `gemm_c_mode`。
+- **L58** `    """Returns mode for C tensor major mode."""` — **EN:** Docstring line documenting the function `gemm_c_mode`. **CN:** 文档字符串行，用于说明 function `gemm_c_mode`。
+- **L59** `    return reorder_modes(gemm_c_major(d), "mnl")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `def gemm_a_shape(l, m, k, major) -> tuple[int, ...]:` — **EN:** Defines function `gemm_a_shape`. **CN:** 定义函数 `gemm_a_shape`。
+- **L63** `    """Returns shape for A tensor given major mode."""` — **EN:** Docstring line documenting the function `gemm_a_shape`. **CN:** 文档字符串行，用于说明 function `gemm_a_shape`。
+- **L64** `    assert major in ("k", "m")` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L65** `    shape = (l, m, k) if major == "k" else (l, k, m)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L66** `    return shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `def gemm_b_shape(l, n, k, major) -> tuple[int, ...]:` — **EN:** Defines function `gemm_b_shape`. **CN:** 定义函数 `gemm_b_shape`。
+- **L70** `    """Returns shape for B tensor given major mode."""` — **EN:** Docstring line documenting the function `gemm_b_shape`. **CN:** 文档字符串行，用于说明 function `gemm_b_shape`。
+- **L71** `    assert major in ("k", "n")` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L72** `    shape = (l, n, k) if major == "k" else (l, k, n)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L73** `    return shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `def gemm_c_shape(l, m, n, major) -> tuple[int, ...]:` — **EN:** Defines function `gemm_c_shape`. **CN:** 定义函数 `gemm_c_shape`。
+- **L77** `    """Returns shape for C tensor given major mode."""` — **EN:** Docstring line documenting the function `gemm_c_shape`. **CN:** 文档字符串行，用于说明 function `gemm_c_shape`。
+- **L78** `    assert major in ("m", "n")` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L79** `    shape = (l, m, n) if major == "n" else (l, n, m)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L80** `    return shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L84** `def get_gemm_shape_from_tensors(` — **EN:** Defines function `get_gemm_shape_from_tensors`. **CN:** 定义函数 `get_gemm_shape_from_tensors`。
+- **L85** `    a: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `    b: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L87** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L88** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L89** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L90** `) -> tuple[int, int, int, int]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L91** `    """Returns a tuple of (M, N, K, L) from A/B gemm tensors."""` — **EN:** Docstring line documenting the function `get_gemm_shape_from_tensors`. **CN:** 文档字符串行，用于说明 function `get_gemm_shape_from_tensors`。
+- **L92** `    # mkl, nkl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L93** `    m, k, l = a.shape[:]  # type: ignore[index]` — **EN:** Assigns a value to (m, k, l). **CN:** 将一个值赋给 (m, k, l)。
+- **L94** `    n = b.shape[0]  # type: ignore[index]` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L95** `    return (m, n, k, l)  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `def create_tensor(` — **EN:** Defines function `create_tensor`. **CN:** 定义函数 `create_tensor`。
+- **L99** `    shape, dtype, key, *, minval=-2.0, maxval=2.0, fill_value=None, fill_arange=False` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L100** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L101** `    if fill_arange:` — **EN:** Starts a conditional branch guarded by `fill_arange`. **CN:** 开始一个由 `fill_arange` 控制的条件分支。
+- **L102** `        tensor = jnp.ones(shape, dtype=dtype)` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L103** `        tensor = tensor * jnp.arange(tensor.size, dtype=tensor.dtype).reshape(` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L104** `            tensor.shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `    elif fill_value is not None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L107** `        tensor = jnp.full(shape, fill_value, dtype=dtype)` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L108** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L109** `        tensor = jax.random.uniform(` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L110** `            key, shape, dtype=jnp.float32, minval=minval, maxval=maxval` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        tensor = tensor.astype(dtype)` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L113** `    return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `def create_a_tensor(` — **EN:** Defines function `create_a_tensor`. **CN:** 定义函数 `create_a_tensor`。
+- **L117** `    l,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L118** `    m,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `    k,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `    major,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `    dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `    key,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `    minval=-2.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `    maxval=2.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `    fill_value=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `    fill_arange=False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L128** `    shape = gemm_a_shape(l, m, k, major)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L129** `    tensor = create_tensor(` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L130** `        shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        key,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `        minval=minval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        maxval=maxval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `        fill_value=fill_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `        fill_arange=fill_arange,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `def create_b_tensor(` — **EN:** Defines function `create_b_tensor`. **CN:** 定义函数 `create_b_tensor`。
+- **L142** `    l,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L143** `    n,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `    k,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    major,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `    dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L147** `    key,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L148** `    minval=-2.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L149** `    maxval=2.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L150** `    fill_value=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `    fill_arange=False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L152** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L153** `    shape = gemm_b_shape(l, n, k, major)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L154** `    tensor = create_tensor(` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L155** `        shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `        key,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `        minval=minval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `        maxval=maxval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `        fill_value=fill_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `        fill_arange=fill_arange,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `    return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `def create_cd_tensor(` — **EN:** Defines function `create_cd_tensor`. **CN:** 定义函数 `create_cd_tensor`。
+- **L167** `    l,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L168** `    m,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L169** `    n,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L170** `    major,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L171** `    dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L172** `    key,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L173** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L174** `    minval=-2.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L175** `    maxval=2.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L176** `    fill_value=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L177** `    fill_arange=False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L178** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L179** `    shape = gemm_c_shape(l, m, n, major)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L180** `    tensor = create_tensor(` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L181** `        shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `        dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `        key,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `        minval=minval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `        maxval=maxval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `        fill_value=fill_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `        fill_arange=fill_arange,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `    return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `def gemm_reference_einsum(` — **EN:** Defines function `gemm_reference_einsum`. **CN:** 定义函数 `gemm_reference_einsum`。
+- **L193** `    a,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `    b,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `    acc_dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `    c_dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `    a_major,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `    b_major,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L199** `    c_major,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L200** `    sf_a=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L201** `    sf_b=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L202** `    precision="highest",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L203** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L204** `    a_idx = gemm_a_major(a_major)` — **EN:** Assigns a value to a_idx. **CN:** 将一个值赋给 a_idx。
+- **L205** `    b_idx = gemm_b_major(b_major)` — **EN:** Assigns a value to b_idx. **CN:** 将一个值赋给 b_idx。
+- **L206** `    c_idx = gemm_c_major(c_major)` — **EN:** Assigns a value to c_idx. **CN:** 将一个值赋给 c_idx。
+- **L207** `    spec = f"{a_idx},{b_idx}->{c_idx}"` — **EN:** Assigns a value to spec. **CN:** 将一个值赋给 spec。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `    # If block scaled pre-scale input at higher precision` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L210** `    # Assumes we only use it for fp8 and smaller.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L211** `    if sf_a is not None:` — **EN:** Starts a conditional branch guarded by `sf_a is not None`. **CN:** 开始一个由 `sf_a is not None` 控制的条件分支。
+- **L212** `        sf_vec_size = int(a.shape[-1] // sf_a.shape[-1])` — **EN:** Assigns a value to sf_vec_size. **CN:** 将一个值赋给 sf_vec_size。
+- **L213** `        sf_a = jnp.repeat(sf_a, sf_vec_size, axis=-1)` — **EN:** Assigns a value to sf_a. **CN:** 将一个值赋给 sf_a。
+- **L214** `        a = a.astype(jnp.float16) * sf_a.astype(jnp.float16)` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `    if sf_b is not None:` — **EN:** Starts a conditional branch guarded by `sf_b is not None`. **CN:** 开始一个由 `sf_b is not None` 控制的条件分支。
+- **L217** `        sf_vec_size = int(b.shape[-1] // sf_b.shape[-1])` — **EN:** Assigns a value to sf_vec_size. **CN:** 将一个值赋给 sf_vec_size。
+- **L218** `        sf_b = jnp.repeat(sf_b, sf_vec_size, axis=-1)` — **EN:** Assigns a value to sf_b. **CN:** 将一个值赋给 sf_b。
+- **L219** `        b = b.astype(jnp.float16) * sf_b.astype(jnp.float16)` — **EN:** Assigns a value to b. **CN:** 将一个值赋给 b。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    return jax.jit(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L222** `        lambda a, b: jnp.einsum(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `            spec, a, b, preferred_element_type=acc_dtype, precision=precision` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `        ).astype(c_dtype)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `    )(a, b)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `def create_attn_tensors(` — **EN:** Defines function `create_attn_tensors`. **CN:** 定义函数 `create_attn_tensors`。
+- **L229** `    b, s, hq, hkv, d, dtype, key, *, minval=-2.0, maxval=2.0, fill_value=None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L231** `    qkey, kkey, vkey = jax.random.split(key, 3)` — **EN:** Assigns a value to (qkey, kkey, vkey). **CN:** 将一个值赋给 (qkey, kkey, vkey)。
+- **L232** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L233** `        create_tensor(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `            (b, s, hq, d),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `            dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `            qkey,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `            minval=minval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `            maxval=maxval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `            fill_value=fill_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `        create_tensor(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `            (b, s, hkv, d),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `            dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `            kkey,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `            minval=minval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `            maxval=maxval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            fill_value=fill_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `        create_tensor(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `            (b, s, hkv, d),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `            dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `            vkey,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `            minval=minval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `            maxval=maxval,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `            fill_value=fill_value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `def attn_ref(q, k, v, is_causal: bool):` — **EN:** Defines function `attn_ref`. **CN:** 定义函数 `attn_ref`。
+- **L261** `    return jax.jit(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L262** `        lambda q, k, v: jax.nn.dot_product_attention(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `            q, k, v, is_causal=is_causal, implementation="cudnn"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `    )(q, k, v)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.jax.testing`. CN: 模块名为 `CuTeDSL.cutlass.jax.testing`。
+- EN: Top-level functions: reorder_modes, gemm_a_major, gemm_a_mode, gemm_b_major, gemm_b_mode, gemm_c_major, gemm_c_mode, gemm_a_shape, gemm_b_shape, gemm_c_shape, get_gemm_shape_from_tensors, create_tensor, ... (+6 more) CN: 顶层函数包括：reorder_modes, gemm_a_major, gemm_a_mode, gemm_b_major, gemm_b_mode, gemm_c_major, gemm_c_mode, gemm_a_shape, gemm_b_shape, gemm_c_shape, get_gemm_shape_from_tensors, create_tensor, ... (+6 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute, cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir CN: 内部依赖：cutlass.cute, cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir
+- EN: External or standard-library dependencies: jax, jax.numpy, typing:Optional CN: 外部或标准库依赖：jax, jax.numpy, typing:Optional

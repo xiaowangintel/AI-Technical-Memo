@@ -1,0 +1,316 @@
+# manifest.cpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/src/manifest.cpp`
+**Purpose / 用途**: Declares or implements the runtime manifest that stores available CUTLASS operations. / 声明或实现保存可用 CUTLASS 算子的运行时清单。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L33** <code>    \brief Manifest of CUTLASS Library</code>
+  - EN: Comment that documents intent or context: "\brief Manifest of CUTLASS Library".
+  - CN: 用于说明意图或上下文的注释："\brief Manifest of CUTLASS Library"。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>    This is the root of the data structure containing CUTLASS objects</code>
+  - EN: Comment that documents intent or context: "This is the root of the data structure containing CUTLASS objects".
+  - CN: 用于说明意图或上下文的注释："This is the root of the data structure containing CUTLASS objects"。
+- **L36** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>#include &lt;memory&gt;</code>
+  - EN: Includes `memory` so this file can use memory-management helpers.
+  - CN: 引入 `memory`，使当前文件可以使用内存管理辅助工具。
+- **L39** <code>#include &quot;cutlass/library/manifest.h&quot;</code>
+  - EN: Includes `cutlass/library/manifest.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/manifest.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L42** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L43** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L44** <code>//////////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>void initialize_reference_operations(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_reference_operations` without defining it here.
+  - CN: 声明函数或方法 `initialize_reference_operations`，但不在此处给出定义。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>//////////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>/// Top-level initialization</code>
+  - EN: Comment that documents intent or context: "Top-level initialization".
+  - CN: 用于说明意图或上下文的注释："Top-level initialization"。
+- **L51** <code>Status Manifest::initialize() {</code>
+  - EN: Begins the definition of function or method `initialize`.
+  - CN: 开始定义函数或方法 `initialize`。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>  if (!operations_.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L54** <code>    operations_.clear();</code>
+  - EN: Declares function or method `clear` without defining it here.
+  - CN: 声明函数或方法 `clear`，但不在此处给出定义。
+- **L55** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>  // initialize procedurally generated cutlass op in manifest object</code>
+  - EN: Comment that documents intent or context: "initialize procedurally generated cutlass op in manifest object".
+  - CN: 用于说明意图或上下文的注释："initialize procedurally generated cutlass op in manifest object"。
+- **L58** <code>  initialize_all(*this);</code>
+  - EN: Declares function or method `initialize_all` without defining it here.
+  - CN: 声明函数或方法 `initialize_all`，但不在此处给出定义。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>  // initialize manually instanced reference op in manifest object</code>
+  - EN: Comment that documents intent or context: "initialize manually instanced reference op in manifest object".
+  - CN: 用于说明意图或上下文的注释："initialize manually instanced reference op in manifest object"。
+- **L61** <code>  initialize_reference_operations(*this);</code>
+  - EN: Declares function or method `initialize_reference_operations` without defining it here.
+  - CN: 声明函数或方法 `initialize_reference_operations`，但不在此处给出定义。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>  // initialize manually instanced reduction reference op in manifest object</code>
+  - EN: Comment that documents intent or context: "initialize manually instanced reduction reference op in manifest object".
+  - CN: 用于说明意图或上下文的注释："initialize manually instanced reduction reference op in manifest object"。
+- **L64** <code>  initialize_all_reduction_op(*this);</code>
+  - EN: Declares function or method `initialize_all_reduction_op` without defining it here.
+  - CN: 声明函数或方法 `initialize_all_reduction_op`，但不在此处给出定义。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L67** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L68** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L69** <code>/// Used for initialization</code>
+  - EN: Comment that documents intent or context: "Used for initialization".
+  - CN: 用于说明意图或上下文的注释："Used for initialization"。
+- **L70** <code>void Manifest::reserve(size_t operation_count) {</code>
+  - EN: Begins the definition of function or method `reserve`.
+  - CN: 开始定义函数或方法 `reserve`。
+- **L71** <code>  operations_.reserve(operation_count);</code>
+  - EN: Declares function or method `reserve` without defining it here.
+  - CN: 声明函数或方法 `reserve`，但不在此处给出定义。
+- **L72** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L73** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L74** <code>/// Graceful shutdown</code>
+  - EN: Comment that documents intent or context: "Graceful shutdown".
+  - CN: 用于说明意图或上下文的注释："Graceful shutdown"。
+- **L75** <code>Status Manifest::release() {</code>
+  - EN: Begins the definition of function or method `release`.
+  - CN: 开始定义函数或方法 `release`。
+- **L76** <code>  operations_.clear();</code>
+  - EN: Declares function or method `clear` without defining it here.
+  - CN: 声明函数或方法 `clear`，但不在此处给出定义。
+- **L77** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L78** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>/// Returns an iterator to the first operation</code>
+  - EN: Comment that documents intent or context: "Returns an iterator to the first operation".
+  - CN: 用于说明意图或上下文的注释："Returns an iterator to the first operation"。
+- **L81** <code>OperationVector const &amp; Manifest::operations() const {</code>
+  - EN: Begins the definition of function or method `operations`.
+  - CN: 开始定义函数或方法 `operations`。
+- **L82** <code>  return operations_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L83** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L84** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L85** <code>/// Returns a const iterator</code>
+  - EN: Comment that documents intent or context: "Returns a const iterator".
+  - CN: 用于说明意图或上下文的注释："Returns a const iterator"。
+- **L86** <code>OperationVector::const_iterator Manifest::begin() const {</code>
+  - EN: Begins the definition of function or method `begin`.
+  - CN: 开始定义函数或方法 `begin`。
+- **L87** <code>  return operations_.begin();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L88** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>/// Returns a const iterator</code>
+  - EN: Comment that documents intent or context: "Returns a const iterator".
+  - CN: 用于说明意图或上下文的注释："Returns a const iterator"。
+- **L91** <code>OperationVector::const_iterator Manifest::end() const {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L92** <code>  return operations_.end();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L93** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L98** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>memory</code> — memory-management helpers / 内存管理辅助工具
+- <code>cutlass/library/manifest.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据

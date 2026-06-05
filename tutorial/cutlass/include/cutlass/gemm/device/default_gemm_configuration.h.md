@@ -1,0 +1,2894 @@
+# default_gemm_configuration.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `include/cutlass/gemm/device/default_gemm_configuration.h`  
+**Purpose / 用途**: Defines architecture- and datatype-specific default GEMM configuration policies, including tile shapes, alignments, and epilogue choices. / 定义面向不同架构与数据类型的默认 GEMM 配置策略，包括 tile 形状、对齐方式和 epilogue 选择。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**: `/***************************************************************************************************`
+  - **EN**: Begins the file header comment block.
+  - **CN**: 开始文件头部注释块。
+- **Line 2 / 第2行**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 3 / 第3行**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 4 / 第4行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 5 / 第5行**: ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 6 / 第6行**: ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 7 / 第7行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 8 / 第8行**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 9 / 第9行**: ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 10 / 第10行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 11 / 第11行**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 12 / 第12行**: ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 13 / 第13行**: ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 14 / 第14行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 15 / 第15行**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 16 / 第16行**: ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 17 / 第17行**: ` * this software without specific prior written permission.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 18 / 第18行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 19 / 第19行**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 20 / 第20行**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 21 / 第21行**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 22 / 第22行**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 23 / 第23行**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 24 / 第24行**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 25 / 第25行**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 26 / 第26行**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 27 / 第27行**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 28 / 第28行**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 29 / 第29行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 30 / 第30行**: ` **************************************************************************************************/`
+  - **EN**: Closes the header comment block.
+  - **CN**: 关闭头部注释块。
+- **Line 31 / 第31行**: `/*! \file`
+  - **EN**: Begins a Doxygen file comment block.
+  - **CN**: 开始一个 Doxygen 文件注释块。
+- **Line 32 / 第32行**: `    \brief Definitions for GEMM structures`
+  - **EN**: Summarizes the file purpose for generated documentation.
+  - **CN**: 用一句话概括文件用途，供生成文档使用。
+- **Line 33 / 第33行**: `*/`
+  - **EN**: Closes the Doxygen comment block that introduced the file.
+  - **CN**: 关闭用于介绍该文件的 Doxygen 注释块。
+- **Line 34 / 第34行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 35 / 第35行**: `#pragma once`
+  - **EN**: Ensures the header is included only once per translation unit.
+  - **CN**: 确保该头文件在同一个编译单元中只会被包含一次。
+- **Line 36 / 第36行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 37 / 第37行**: `#include "cutlass/cutlass.h"`
+  - **EN**: Includes `cutlass/cutlass.h` so the wrapper can reuse required declarations. Provides core CUTLASS types, macros, and status codes.
+  - **CN**: 包含 `cutlass/cutlass.h`，以便该封装复用所需声明。提供 CUTLASS 核心类型、宏与状态码。
+- **Line 38 / 第38行**: `#include "cutlass/numeric_types.h"`
+  - **EN**: Includes `cutlass/numeric_types.h` so the wrapper can reuse required declarations. Defines CUTLASS numeric scalar and packed data types.
+  - **CN**: 包含 `cutlass/numeric_types.h`，以便该封装复用所需声明。定义 CUTLASS 的数值标量与打包数据类型。
+- **Line 39 / 第39行**: `#include "cutlass/arch/arch.h"`
+  - **EN**: Includes `cutlass/arch/arch.h` so the wrapper can reuse required declarations. Provides architecture tags and architecture-specific traits.
+  - **CN**: 包含 `cutlass/arch/arch.h`，以便该封装复用所需声明。提供架构标签与架构相关 traits。
+- **Line 40 / 第40行**: `#include "cutlass/arch/mma.h"`
+  - **EN**: Includes `cutlass/arch/mma.h` so the wrapper can reuse required declarations. Provides architecture-specific helpers referenced by this header.
+  - **CN**: 包含 `cutlass/arch/mma.h`，以便该封装复用所需声明。提供本头文件引用的架构相关辅助类型。
+- **Line 41 / 第41行**: `#include "cutlass/arch/wmma.h"`
+  - **EN**: Includes `cutlass/arch/wmma.h` so the wrapper can reuse required declarations. Provides architecture-specific helpers referenced by this header.
+  - **CN**: 包含 `cutlass/arch/wmma.h`，以便该封装复用所需声明。提供本头文件引用的架构相关辅助类型。
+- **Line 42 / 第42行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 43 / 第43行**: `#include "cutlass/gemm/gemm.h"`
+  - **EN**: Includes `cutlass/gemm/gemm.h` so the wrapper can reuse required declarations. Defines common GEMM enums, problem shapes, and coordinate helpers.
+  - **CN**: 包含 `cutlass/gemm/gemm.h`，以便该封装复用所需声明。定义通用 GEMM 枚举、问题形状与坐标辅助类型。
+- **Line 44 / 第44行**: `#include "cutlass/epilogue/thread/linear_combination.h"`
+  - **EN**: Includes `cutlass/epilogue/thread/linear_combination.h` so the wrapper can reuse required declarations. Provides epilogue operators that transform accumulators into output tensors.
+  - **CN**: 包含 `cutlass/epilogue/thread/linear_combination.h`，以便该封装复用所需声明。提供把累加器转换为输出张量的 epilogue 算子。
+- **Line 45 / 第45行**: `#include "cutlass/epilogue/thread/linear_combination_clamp.h"`
+  - **EN**: Includes `cutlass/epilogue/thread/linear_combination_clamp.h` so the wrapper can reuse required declarations. Provides epilogue operators that transform accumulators into output tensors.
+  - **CN**: 包含 `cutlass/epilogue/thread/linear_combination_clamp.h`，以便该封装复用所需声明。提供把累加器转换为输出张量的 epilogue 算子。
+- **Line 46 / 第46行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 47 / 第47行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 48 / 第48行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 49 / 第49行**: `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` to scope the following declarations.
+  - **CN**: 打开命名空间 `cutlass`，为后续声明限定作用域。
+- **Line 50 / 第50行**: `namespace gemm {`
+  - **EN**: Opens namespace `gemm` to scope the following declarations.
+  - **CN**: 打开命名空间 `gemm`，为后续声明限定作用域。
+- **Line 51 / 第51行**: `namespace device {`
+  - **EN**: Opens namespace `device` to scope the following declarations.
+  - **CN**: 打开命名空间 `device`，为后续声明限定作用域。
+- **Line 52 / 第52行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 53 / 第53行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 54 / 第54行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 55 / 第55行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 56 / 第56行**: `  typename OperatorClass,`
+  - **EN**: Declares template parameter `OperatorClass` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `OperatorClass`，用于定制生成出的封装。
+- **Line 57 / 第57行**: `  typename ArchTag,`
+  - **EN**: Declares template parameter `ArchTag` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ArchTag`，用于定制生成出的封装。
+- **Line 58 / 第58行**: `  typename ElementA, `
+  - **EN**: Declares template parameter `ElementA` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementA`，用于定制生成出的封装。
+- **Line 59 / 第59行**: `  typename ElementB, `
+  - **EN**: Declares template parameter `ElementB` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementB`，用于定制生成出的封装。
+- **Line 60 / 第60行**: `  typename ElementC,`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 61 / 第61行**: `  typename ElementAccumulator`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 62 / 第62行**: `>`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 63 / 第63行**: `struct DefaultGemmConfiguration;`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 64 / 第64行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 65 / 第65行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 66 / 第66行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 67 / 第67行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 68 / 第68行**: `  typename ArchTag,`
+  - **EN**: Declares template parameter `ArchTag` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ArchTag`，用于定制生成出的封装。
+- **Line 69 / 第69行**: `  typename ElementA, `
+  - **EN**: Declares template parameter `ElementA` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementA`，用于定制生成出的封装。
+- **Line 70 / 第70行**: `  typename ElementB, `
+  - **EN**: Declares template parameter `ElementB` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementB`，用于定制生成出的封装。
+- **Line 71 / 第71行**: `  typename ElementC, `
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 72 / 第72行**: `  typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 73 / 第73行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 74 / 第74行**: `  arch::OpClassSimt, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 75 / 第75行**: `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 76 / 第76行**: `  ElementA, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 77 / 第77行**: `  ElementB, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 78 / 第78行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 79 / 第79行**: `  ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 80 / 第80行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 81 / 第81行**: `  static int const kAlignmentA = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 82 / 第82行**: `  static int const kAlignmentB = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 83 / 第83行**: `  using ThreadblockShape = GemmShape<128, 128, 8>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 84 / 第84行**: `  using WarpShape = GemmShape<32, 64, 8>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 85 / 第85行**: `  using InstructionShape = GemmShape<1, 1, 1>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 86 / 第86行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 87 / 第87行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 88 / 第88行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 89 / 第89行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 90 / 第90行**: `    1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 91 / 第91行**: `    ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 92 / 第92行**: `    ElementAccumulator`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 93 / 第93行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 94 / 第94行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 95 / 第95行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 96 / 第96行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 97 / 第97行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 98 / 第98行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 99 / 第99行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 100 / 第100行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 101 / 第101行**: `  typename ArchTag,`
+  - **EN**: Declares template parameter `ArchTag` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ArchTag`，用于定制生成出的封装。
+- **Line 102 / 第102行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 103 / 第103行**: `struct DefaultGemmConfiguration<arch::OpClassSimt, ArchTag, int8_t, int8_t, ElementC, int32_t> {`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 104 / 第104行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 105 / 第105行**: `  static int const kAlignmentA = 4;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 106 / 第106行**: `  static int const kAlignmentB = 4;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 107 / 第107行**: `  using ThreadblockShape = GemmShape<128, 128, 32>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 108 / 第108行**: `  using WarpShape = GemmShape<32, 64, 32>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 109 / 第109行**: `  using InstructionShape = GemmShape<1, 1, 4>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 110 / 第110行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 111 / 第111行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 112 / 第112行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 113 / 第113行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 114 / 第114行**: `    1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 115 / 第115行**: `    int32_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 116 / 第116行**: `    float`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 117 / 第117行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 118 / 第118行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 119 / 第119行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 120 / 第120行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 121 / 第121行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 122 / 第122行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 123 / 第123行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 124 / 第124行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 125 / 第125行**: `  typename ArchTag,`
+  - **EN**: Declares template parameter `ArchTag` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ArchTag`，用于定制生成出的封装。
+- **Line 126 / 第126行**: `  typename ElementA, `
+  - **EN**: Declares template parameter `ElementA` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementA`，用于定制生成出的封装。
+- **Line 127 / 第127行**: `  typename ElementB, `
+  - **EN**: Declares template parameter `ElementB` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementB`，用于定制生成出的封装。
+- **Line 128 / 第128行**: `  typename ElementC, `
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 129 / 第129行**: `  typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 130 / 第130行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 131 / 第131行**: `  arch::OpClassWmmaTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 132 / 第132行**: `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 133 / 第133行**: `  ElementA, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 134 / 第134行**: `  ElementB, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 135 / 第135行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 136 / 第136行**: `  ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 137 / 第137行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 138 / 第138行**: `  static int const kAlignmentA = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 139 / 第139行**: `  static int const kAlignmentB = 128 / sizeof_bits<ElementB>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 140 / 第140行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 141 / 第141行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 142 / 第142行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 143 / 第143行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 144 / 第144行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 145 / 第145行**: `    128 / sizeof_bits<ElementC>::value,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 146 / 第146行**: `    ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 147 / 第147行**: `    ElementAccumulator`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 148 / 第148行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 149 / 第149行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 150 / 第150行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 151 / 第151行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 152 / 第152行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 153 / 第153行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 154 / 第154行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 155 / 第155行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 156 / 第156行**: `  typename ElementA, `
+  - **EN**: Declares template parameter `ElementA` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementA`，用于定制生成出的封装。
+- **Line 157 / 第157行**: `  typename ElementB, `
+  - **EN**: Declares template parameter `ElementB` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementB`，用于定制生成出的封装。
+- **Line 158 / 第158行**: `  typename ElementC, `
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 159 / 第159行**: `  typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 160 / 第160行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 161 / 第161行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 162 / 第162行**: `  arch::Sm70,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 163 / 第163行**: `  ElementA, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 164 / 第164行**: `  ElementB, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 165 / 第165行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 166 / 第166行**: `  ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 167 / 第167行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 168 / 第168行**: `  static int const kAlignmentA = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 169 / 第169行**: `  static int const kAlignmentB = 128 / sizeof_bits<ElementB>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 170 / 第170行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 171 / 第171行**: `  using ThreadblockShape = GemmShape<128, 256, 32>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 172 / 第172行**: `  using WarpShape = GemmShape<64, 64, 32>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 173 / 第173行**: `  using InstructionShape = GemmShape<8, 8, 4>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 174 / 第174行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 175 / 第175行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 176 / 第176行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 177 / 第177行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 178 / 第178行**: `    128 / sizeof_bits<ElementC>::value,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 179 / 第179行**: `    ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 180 / 第180行**: `    ElementAccumulator`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 181 / 第181行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 182 / 第182行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 183 / 第183行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 184 / 第184行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 185 / 第185行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 186 / 第186行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 187 / 第187行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 188 / 第188行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 189 / 第189行**: `  typename ElementA, `
+  - **EN**: Declares template parameter `ElementA` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementA`，用于定制生成出的封装。
+- **Line 190 / 第190行**: `  typename ElementB, `
+  - **EN**: Declares template parameter `ElementB` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementB`，用于定制生成出的封装。
+- **Line 191 / 第191行**: `  typename ElementC, `
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 192 / 第192行**: `  typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 193 / 第193行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 194 / 第194行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 195 / 第195行**: `  arch::Sm75,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 196 / 第196行**: `  ElementA, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 197 / 第197行**: `  ElementB, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 198 / 第198行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 199 / 第199行**: `  ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 200 / 第200行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 201 / 第201行**: `  static int const kAlignmentA = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 202 / 第202行**: `  static int const kAlignmentB = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 203 / 第203行**: `  using ThreadblockShape = GemmShape<128, 256, 32>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 204 / 第204行**: `  using WarpShape = GemmShape<64, 64, 32>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 205 / 第205行**: `  using InstructionShape = GemmShape<16, 8, 8>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 206 / 第206行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 207 / 第207行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 208 / 第208行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 209 / 第209行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 210 / 第210行**: `    128 / sizeof_bits<ElementC>::value,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 211 / 第211行**: `    ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 212 / 第212行**: `    ElementAccumulator`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 213 / 第213行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 214 / 第214行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 215 / 第215行**: `  using Operator = typename platform::conditional<`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 216 / 第216行**: `      (platform::is_same<ElementA, int8_t>::value ||`
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 217 / 第217行**: `       platform::is_same<ElementA, int4b_t>::value ||`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 218 / 第218行**: `       platform::is_same<ElementA, uint8_t>::value ||`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 219 / 第219行**: `       platform::is_same<ElementA, uint4b_t>::value),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 220 / 第220行**: `      arch::OpMultiplyAddSaturate, arch::OpMultiplyAdd>::type;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 221 / 第221行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 222 / 第222行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 223 / 第223行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 224 / 第224行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 225 / 第225行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 226 / 第226行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 227 / 第227行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 228 / 第228行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 229 / 第229行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 230 / 第230行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 231 / 第231行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 232 / 第232行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 233 / 第233行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 234 / 第234行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 235 / 第235行**: `  static int const kAlignmentA = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 236 / 第236行**: `  static int const kAlignmentB = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 237 / 第237行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 238 / 第238行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 239 / 第239行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 240 / 第240行**: `  using InstructionShape = GemmShape<8, 8, 16>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 241 / 第241行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 242 / 第242行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 243 / 第243行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 244 / 第244行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 245 / 第245行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 246 / 第246行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 247 / 第247行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 248 / 第248行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 249 / 第249行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 250 / 第250行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 251 / 第251行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 252 / 第252行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 253 / 第253行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 254 / 第254行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 255 / 第255行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 256 / 第256行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 257 / 第257行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 258 / 第258行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 259 / 第259行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 260 / 第260行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 261 / 第261行**: `  static int const kAlignmentA = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 262 / 第262行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 263 / 第263行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 264 / 第264行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 265 / 第265行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 266 / 第266行**: `  using InstructionShape = GemmShape<8, 8, 16>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 267 / 第267行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 268 / 第268行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 269 / 第269行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 270 / 第270行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 271 / 第271行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 272 / 第272行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 273 / 第273行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 274 / 第274行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 275 / 第275行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 276 / 第276行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 277 / 第277行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 278 / 第278行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 279 / 第279行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 280 / 第280行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 281 / 第281行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 282 / 第282行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 283 / 第283行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 284 / 第284行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 285 / 第285行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 286 / 第286行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 287 / 第287行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 288 / 第288行**: `  static int const kAlignmentB = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 289 / 第289行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 290 / 第290行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 291 / 第291行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 292 / 第292行**: `  using InstructionShape = GemmShape<8, 8, 16>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 293 / 第293行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 294 / 第294行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 295 / 第295行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 296 / 第296行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 297 / 第297行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 298 / 第298行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 299 / 第299行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 300 / 第300行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 301 / 第301行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 302 / 第302行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 303 / 第303行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 304 / 第304行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 305 / 第305行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 306 / 第306行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 307 / 第307行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 308 / 第308行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 309 / 第309行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 310 / 第310行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 311 / 第311行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 312 / 第312行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 313 / 第313行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 314 / 第314行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 315 / 第315行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 316 / 第316行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 317 / 第317行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 318 / 第318行**: `  using InstructionShape = GemmShape<8, 8, 16>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 319 / 第319行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 320 / 第320行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 321 / 第321行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 322 / 第322行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 323 / 第323行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 324 / 第324行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 325 / 第325行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 326 / 第326行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 327 / 第327行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 328 / 第328行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 329 / 第329行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 330 / 第330行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 331 / 第331行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 332 / 第332行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 333 / 第333行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 334 / 第334行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 335 / 第335行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 336 / 第336行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 337 / 第337行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 338 / 第338行**: `   `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 339 / 第339行**: `  static int const kAlignmentA = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 340 / 第340行**: `  static int const kAlignmentB = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 341 / 第341行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 342 / 第342行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 343 / 第343行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 344 / 第344行**: `  using InstructionShape = GemmShape<8, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 345 / 第345行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 346 / 第346行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 347 / 第347行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 348 / 第348行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 349 / 第349行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 350 / 第350行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 351 / 第351行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 352 / 第352行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 353 / 第353行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 354 / 第354行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 355 / 第355行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 356 / 第356行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 357 / 第357行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 358 / 第358行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 359 / 第359行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 360 / 第360行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 361 / 第361行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 362 / 第362行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 363 / 第363行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 364 / 第364行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 365 / 第365行**: `  static int const kAlignmentA = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 366 / 第366行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 367 / 第367行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 368 / 第368行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 369 / 第369行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 370 / 第370行**: `  using InstructionShape = GemmShape<8, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 371 / 第371行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 372 / 第372行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 373 / 第373行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 374 / 第374行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 375 / 第375行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 376 / 第376行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 377 / 第377行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 378 / 第378行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 379 / 第379行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 380 / 第380行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 381 / 第381行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 382 / 第382行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 383 / 第383行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 384 / 第384行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 385 / 第385行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 386 / 第386行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 387 / 第387行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 388 / 第388行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 389 / 第389行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 390 / 第390行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 391 / 第391行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 392 / 第392行**: `  static int const kAlignmentB = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 393 / 第393行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 394 / 第394行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 395 / 第395行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 396 / 第396行**: `  using InstructionShape = GemmShape<8, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 397 / 第397行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 398 / 第398行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 399 / 第399行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 400 / 第400行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 401 / 第401行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 402 / 第402行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 403 / 第403行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 404 / 第404行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 405 / 第405行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 406 / 第406行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 407 / 第407行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 408 / 第408行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 409 / 第409行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 410 / 第410行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 411 / 第411行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 412 / 第412行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 413 / 第413行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 414 / 第414行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 415 / 第415行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 416 / 第416行**: `   `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 417 / 第417行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 418 / 第418行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 419 / 第419行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 420 / 第420行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 421 / 第421行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 422 / 第422行**: `  using InstructionShape = GemmShape<8, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 423 / 第423行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 424 / 第424行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 425 / 第425行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 426 / 第426行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 427 / 第427行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 428 / 第428行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 429 / 第429行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 430 / 第430行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 431 / 第431行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 432 / 第432行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 433 / 第433行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 434 / 第434行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 435 / 第435行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 436 / 第436行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 437 / 第437行**: `  arch::Sm75, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 438 / 第438行**: `  uint1b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 439 / 第439行**: `  uint1b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 440 / 第440行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 441 / 第441行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 442 / 第442行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 443 / 第443行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint1b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 444 / 第444行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint1b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 445 / 第445行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 446 / 第446行**: `  using ThreadblockShape = GemmShape<128, 256, 512>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 447 / 第447行**: `  using WarpShape = GemmShape<64, 64, 512>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 448 / 第448行**: `  using InstructionShape = GemmShape<8, 8, 128>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 449 / 第449行**: `  static int const kStages = 2;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 450 / 第450行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 451 / 第451行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 452 / 第452行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 453 / 第453行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 454 / 第454行**: `  using Operator = arch::OpXorPopc;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 455 / 第455行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 456 / 第456行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 457 / 第457行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 458 / 第458行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 459 / 第459行**: `template <typename ElementA, typename ElementB, typename ElementC,`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 460 / 第460行**: `          typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 461 / 第461行**: `struct DefaultGemmConfiguration<arch::OpClassTensorOp, arch::Sm80, ElementA,`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 462 / 第462行**: `                                ElementB, ElementC, ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 463 / 第463行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 464 / 第464行**: `  static int const kAlignmentA = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 465 / 第465行**: `  static int const kAlignmentB = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 466 / 第466行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 467 / 第467行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 468 / 第468行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 469 / 第469行**: `  using InstructionShape = GemmShape<16, 8, 16>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 470 / 第470行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 471 / 第471行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 472 / 第472行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 473 / 第473行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 474 / 第474行**: `      ElementAccumulator>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 475 / 第475行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 476 / 第476行**: `  using Operator = typename platform::conditional<`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 477 / 第477行**: `      (platform::is_same<ElementA, int8_t>::value ||`
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 478 / 第478行**: `       platform::is_same<ElementA, int4b_t>::value ||`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 479 / 第479行**: `       platform::is_same<ElementA, uint8_t>::value ||`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 480 / 第480行**: `       platform::is_same<ElementA, uint4b_t>::value),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 481 / 第481行**: `      arch::OpMultiplyAddSaturate, arch::OpMultiplyAdd>::type;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 482 / 第482行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 483 / 第483行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 484 / 第484行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 485 / 第485行**: `template <typename ElementC,`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 486 / 第486行**: `          typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 487 / 第487行**: `struct DefaultGemmConfiguration<arch::OpClassTensorOp, arch::Sm80, double,`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 488 / 第488行**: `                                double, ElementC, ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 489 / 第489行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 490 / 第490行**: `  static int const kAlignmentA = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 491 / 第491行**: `  static int const kAlignmentB = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 492 / 第492行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 493 / 第493行**: `  using ThreadblockShape = GemmShape<128, 128, 16>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 494 / 第494行**: `  using WarpShape = GemmShape<32, 64, 16>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 495 / 第495行**: `  using InstructionShape = GemmShape<8, 8, 4>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 496 / 第496行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 497 / 第497行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 498 / 第498行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 499 / 第499行**: `      ElementC, 1, ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 500 / 第500行**: `      ElementAccumulator>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 501 / 第501行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 502 / 第502行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 503 / 第503行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 504 / 第504行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 505 / 第505行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 506 / 第506行**: `template <>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 507 / 第507行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 508 / 第508行**: `    arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 509 / 第509行**: `    arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 510 / 第510行**: `    complex<double>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 511 / 第511行**: `    complex<double>, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 512 / 第512行**: `    complex<double>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 513 / 第513行**: `    complex<double>`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 514 / 第514行**: `  > {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 515 / 第515行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 516 / 第516行**: `  static int const kAlignmentA = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 517 / 第517行**: `  static int const kAlignmentB = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 518 / 第518行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 519 / 第519行**: `  using ThreadblockShape = GemmShape<64, 64, 16>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 520 / 第520行**: `  using WarpShape = GemmShape<32, 32, 16>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 521 / 第521行**: `  using InstructionShape = GemmShape<8, 8, 4>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 522 / 第522行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 523 / 第523行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 524 / 第524行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 525 / 第525行**: `      complex<double>, 1, complex<double>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 526 / 第526行**: `      complex<double>>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 527 / 第527行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 528 / 第528行**: `  using Operator = arch::OpMultiplyAddComplex;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 529 / 第529行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 530 / 第530行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 531 / 第531行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 532 / 第532行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 533 / 第533行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 534 / 第534行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 535 / 第535行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 536 / 第536行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 537 / 第537行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 538 / 第538行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 539 / 第539行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 540 / 第540行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 541 / 第541行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 542 / 第542行**: `     `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 543 / 第543行**: `  static int const kAlignmentA = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 544 / 第544行**: `  static int const kAlignmentB = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 545 / 第545行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 546 / 第546行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 547 / 第547行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 548 / 第548行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 549 / 第549行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 550 / 第550行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 551 / 第551行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 552 / 第552行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 553 / 第553行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 554 / 第554行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 555 / 第555行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 556 / 第556行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 557 / 第557行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 558 / 第558行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 559 / 第559行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 560 / 第560行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 561 / 第561行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 562 / 第562行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 563 / 第563行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 564 / 第564行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 565 / 第565行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 566 / 第566行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 567 / 第567行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 568 / 第568行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 569 / 第569行**: `  static int const kAlignmentA = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 570 / 第570行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 571 / 第571行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 572 / 第572行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 573 / 第573行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 574 / 第574行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 575 / 第575行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 576 / 第576行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 577 / 第577行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 578 / 第578行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 579 / 第579行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 580 / 第580行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 581 / 第581行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 582 / 第582行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 583 / 第583行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 584 / 第584行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 585 / 第585行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 586 / 第586行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 587 / 第587行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 588 / 第588行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 589 / 第589行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 590 / 第590行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 591 / 第591行**: `  int8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 592 / 第592行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 593 / 第593行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 594 / 第594行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 595 / 第595行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 596 / 第596行**: `  static int const kAlignmentB = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 597 / 第597行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 598 / 第598行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 599 / 第599行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 600 / 第600行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 601 / 第601行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 602 / 第602行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 603 / 第603行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 604 / 第604行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 605 / 第605行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 606 / 第606行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 607 / 第607行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 608 / 第608行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 609 / 第609行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 610 / 第610行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 611 / 第611行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 612 / 第612行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 613 / 第613行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 614 / 第614行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 615 / 第615行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 616 / 第616行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 617 / 第617行**: `  uint8_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 618 / 第618行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 619 / 第619行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 620 / 第620行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 621 / 第621行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 622 / 第622行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 623 / 第623行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 624 / 第624行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 625 / 第625行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 626 / 第626行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 627 / 第627行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 628 / 第628行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 629 / 第629行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 630 / 第630行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 631 / 第631行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 632 / 第632行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 633 / 第633行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 634 / 第634行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 635 / 第635行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 636 / 第636行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 637 / 第637行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 638 / 第638行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 639 / 第639行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 640 / 第640行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 641 / 第641行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 642 / 第642行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 643 / 第643行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 644 / 第644行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 645 / 第645行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 646 / 第646行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 647 / 第647行**: `  static int const kAlignmentA = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 648 / 第648行**: `  static int const kAlignmentB = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 649 / 第649行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 650 / 第650行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 651 / 第651行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 652 / 第652行**: `  using InstructionShape = GemmShape<16, 8, 64>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 653 / 第653行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 654 / 第654行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 655 / 第655行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 656 / 第656行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 657 / 第657行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 658 / 第658行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 659 / 第659行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 660 / 第660行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 661 / 第661行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 662 / 第662行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 663 / 第663行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 664 / 第664行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 665 / 第665行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 666 / 第666行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 667 / 第667行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 668 / 第668行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 669 / 第669行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 670 / 第670行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 671 / 第671行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 672 / 第672行**: `       `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 673 / 第673行**: `  static int const kAlignmentA = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 674 / 第674行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 675 / 第675行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 676 / 第676行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 677 / 第677行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 678 / 第678行**: `  using InstructionShape = GemmShape<16, 8, 64>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 679 / 第679行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 680 / 第680行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 681 / 第681行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 682 / 第682行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 683 / 第683行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 684 / 第684行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 685 / 第685行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 686 / 第686行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 687 / 第687行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 688 / 第688行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 689 / 第689行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 690 / 第690行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 691 / 第691行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 692 / 第692行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 693 / 第693行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 694 / 第694行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 695 / 第695行**: `  int4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 696 / 第696行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 697 / 第697行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 698 / 第698行**: `       `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 699 / 第699行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 700 / 第700行**: `  static int const kAlignmentB = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 701 / 第701行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 702 / 第702行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 703 / 第703行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 704 / 第704行**: `  using InstructionShape = GemmShape<16, 8, 64>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 705 / 第705行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 706 / 第706行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 707 / 第707行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 708 / 第708行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 709 / 第709行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 710 / 第710行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 711 / 第711行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 712 / 第712行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 713 / 第713行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 714 / 第714行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 715 / 第715行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 716 / 第716行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 717 / 第717行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 718 / 第718行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 719 / 第719行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 720 / 第720行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 721 / 第721行**: `  uint4b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 722 / 第722行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 723 / 第723行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 724 / 第724行**: `       `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 725 / 第725行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 726 / 第726行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 727 / 第727行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 728 / 第728行**: `  using ThreadblockShape = GemmShape<128, 256, 128>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 729 / 第729行**: `  using WarpShape = GemmShape<64, 64, 128>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 730 / 第730行**: `  using InstructionShape = GemmShape<16, 8, 64>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 731 / 第731行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 732 / 第732行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 733 / 第733行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 734 / 第734行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 735 / 第735行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 736 / 第736行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 737 / 第737行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 738 / 第738行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 739 / 第739行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 740 / 第740行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 741 / 第741行**: `template < `
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 742 / 第742行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 743 / 第743行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 744 / 第744行**: `  arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 745 / 第745行**: `  arch::Sm80, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 746 / 第746行**: `  uint1b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 747 / 第747行**: `  uint1b_t, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 748 / 第748行**: `  ElementC, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 749 / 第749行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 750 / 第750行**: `       `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 751 / 第751行**: `  static int const kAlignmentA = 128 / sizeof_bits<uint1b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 752 / 第752行**: `  static int const kAlignmentB = 128 / sizeof_bits<uint1b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 753 / 第753行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 754 / 第754行**: `  using ThreadblockShape = GemmShape<128, 256, 512>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 755 / 第755行**: `  using WarpShape = GemmShape<64, 64, 512>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 756 / 第756行**: `  using InstructionShape = GemmShape<16, 8, 256>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 757 / 第757行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 758 / 第758行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 759 / 第759行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 760 / 第760行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 761 / 第761行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 762 / 第762行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 763 / 第763行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 764 / 第764行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 765 / 第765行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 766 / 第766行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 767 / 第767行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 768 / 第768行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 769 / 第769行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 770 / 第770行**: `  arch::OpClassTensorOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 771 / 第771行**: `  arch::Sm80,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 772 / 第772行**: `  int4b_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 773 / 第773行**: `  int8_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 774 / 第774行**: `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 775 / 第775行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 776 / 第776行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 777 / 第777行**: `  static int const kAlignmentA = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 778 / 第778行**: `  static int const kAlignmentB = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 779 / 第779行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 780 / 第780行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 781 / 第781行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 782 / 第782行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 783 / 第783行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 784 / 第784行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 785 / 第785行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 786 / 第786行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 787 / 第787行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 788 / 第788行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 789 / 第789行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 790 / 第790行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 791 / 第791行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 792 / 第792行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 793 / 第793行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 794 / 第794行**: `  typename ElementC>`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 795 / 第795行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 796 / 第796行**: `  arch::OpClassTensorOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 797 / 第797行**: `  arch::Sm80,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 798 / 第798行**: `  int8_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 799 / 第799行**: `  int4b_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 800 / 第800行**: `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 801 / 第801行**: `  int32_t> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 802 / 第802行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 803 / 第803行**: `  static int const kAlignmentA = 128 / sizeof_bits<int8_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 804 / 第804行**: `  static int const kAlignmentB = 128 / sizeof_bits<int4b_t>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 805 / 第805行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 806 / 第806行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 807 / 第807行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 808 / 第808行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 809 / 第809行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 810 / 第810行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 811 / 第811行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombinationClamp<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 812 / 第812行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, int32_t, float>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 813 / 第813行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 814 / 第814行**: `  using Operator = arch::OpMultiplyAddSaturate;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 815 / 第815行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 816 / 第816行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 817 / 第817行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 818 / 第818行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 819 / 第819行**: `/// Base configuration for all {fe4m3, fe5m2} x {fe4m3, fe5m2} combinations on SM89`
+  - **EN**: Documentation comment describing the next declaration: Base configuration for all {fe4m3, fe5m2} x {fe4m3, fe5m2} combinations on SM89
+  - **CN**: 文档注释，用于说明后续声明：Base configuration for all {fe4m3, fe5m2} x {fe4m3, fe5m2} combinations on SM89
+- **Line 820 / 第820行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 821 / 第821行**: `  typename ElementA,`
+  - **EN**: Declares template parameter `ElementA`. The nearby documentation says: Base configuration for all {fe4m3, fe5m2} x {fe4m3, fe5m2} combinations on SM89
+  - **CN**: 声明模板参数 `ElementA`。附近文档对它的说明是：Base configuration for all {fe4m3, fe5m2} x {fe4m3, fe5m2} combinations on SM89
+- **Line 822 / 第822行**: `  typename ElementB,`
+  - **EN**: Declares template parameter `ElementB` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementB`，用于定制生成出的封装。
+- **Line 823 / 第823行**: `  typename ElementC,`
+  - **EN**: Declares template parameter `ElementC` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementC`，用于定制生成出的封装。
+- **Line 824 / 第824行**: `  typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 825 / 第825行**: `struct DefaultGemmConfigurationSm89F8 {`
+  - **EN**: Declares `DefaultGemmConfigurationSm89F8`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfigurationSm89F8`，它是公开设备级接口的一部分封装类型。
+- **Line 826 / 第826行**: `  static_assert((platform::is_same<ElementA, cutlass::float_e4m3_t>::value ||`
+  - **EN**: This line contributes to the signature or invocation of `static_assert`.
+  - **CN**: 这一行参与 `static_assert` 的签名或调用。
+- **Line 827 / 第827行**: `                 platform::is_same<ElementA, cutlass::float_e5m2_t>::value),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 828 / 第828行**: `                "ElementA must be of type float_e4m3_t or float_e5m2_t");`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 829 / 第829行**: `  static_assert((platform::is_same<ElementB, cutlass::float_e4m3_t>::value ||`
+  - **EN**: This line contributes to the signature or invocation of `static_assert`.
+  - **CN**: 这一行参与 `static_assert` 的签名或调用。
+- **Line 830 / 第830行**: `                 platform::is_same<ElementB, cutlass::float_e5m2_t>::value),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 831 / 第831行**: `                "ElementB must be of type float_e4m3_t or float_e5m2_t");`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 832 / 第832行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 833 / 第833行**: `  static int const kAlignmentA = 128 / sizeof_bits<ElementA>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 834 / 第834行**: `  static int const kAlignmentB = 128 / sizeof_bits<ElementB>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 835 / 第835行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 836 / 第836行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 837 / 第837行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 838 / 第838行**: `  using InstructionShape = GemmShape<16, 8, 32>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 839 / 第839行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 840 / 第840行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 841 / 第841行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 842 / 第842行**: `      ElementC, 128 / sizeof_bits<ElementC>::value, ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 843 / 第843行**: `      ElementAccumulator>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 844 / 第844行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 845 / 第845行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 846 / 第846行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 847 / 第847行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 848 / 第848行**: `/// Partial specialization for SM89 fe4m3 x fe4m3`
+  - **EN**: Documentation comment describing the next declaration: Partial specialization for SM89 fe4m3 x fe4m3
+  - **CN**: 文档注释，用于说明后续声明：Partial specialization for SM89 fe4m3 x fe4m3
+- **Line 849 / 第849行**: `template <typename ElementC, typename ElementAccumulator>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 850 / 第850行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, with the nearby comment describing it as: Partial specialization for SM89 fe4m3 x fe4m3
+  - **CN**: 声明 `DefaultGemmConfiguration`，其附近注释说明为：Partial specialization for SM89 fe4m3 x fe4m3
+- **Line 851 / 第851行**: `  arch::OpClassTensorOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 852 / 第852行**: `  arch::Sm89,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 853 / 第853行**: `  cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 854 / 第854行**: `  cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 855 / 第855行**: `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 856 / 第856行**: `  ElementAccumulator> : DefaultGemmConfigurationSm89F8<`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 857 / 第857行**: `                            cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 858 / 第858行**: `                            cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 859 / 第859行**: `                            ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 860 / 第860行**: `                            ElementAccumulator> {};`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 861 / 第861行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 862 / 第862行**: `/// Partial specialization for SM89 fe4m3 x fe5m2`
+  - **EN**: Documentation comment describing the next declaration: Partial specialization for SM89 fe4m3 x fe5m2
+  - **CN**: 文档注释，用于说明后续声明：Partial specialization for SM89 fe4m3 x fe5m2
+- **Line 863 / 第863行**: `template <typename ElementC, typename ElementAccumulator>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 864 / 第864行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, with the nearby comment describing it as: Partial specialization for SM89 fe4m3 x fe5m2
+  - **CN**: 声明 `DefaultGemmConfiguration`，其附近注释说明为：Partial specialization for SM89 fe4m3 x fe5m2
+- **Line 865 / 第865行**: `  arch::OpClassTensorOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 866 / 第866行**: `  arch::Sm89,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 867 / 第867行**: `  cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 868 / 第868行**: `  cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 869 / 第869行**: `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 870 / 第870行**: `  ElementAccumulator> : DefaultGemmConfigurationSm89F8<`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 871 / 第871行**: `                            cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 872 / 第872行**: `                            cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 873 / 第873行**: `                            ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 874 / 第874行**: `                            ElementAccumulator> {};`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 875 / 第875行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 876 / 第876行**: `/// Partial specialization for SM89 fe5m2 x fe4m3`
+  - **EN**: Documentation comment describing the next declaration: Partial specialization for SM89 fe5m2 x fe4m3
+  - **CN**: 文档注释，用于说明后续声明：Partial specialization for SM89 fe5m2 x fe4m3
+- **Line 877 / 第877行**: `template <typename ElementC, typename ElementAccumulator>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 878 / 第878行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, with the nearby comment describing it as: Partial specialization for SM89 fe5m2 x fe4m3
+  - **CN**: 声明 `DefaultGemmConfiguration`，其附近注释说明为：Partial specialization for SM89 fe5m2 x fe4m3
+- **Line 879 / 第879行**: `  arch::OpClassTensorOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 880 / 第880行**: `  arch::Sm89,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 881 / 第881行**: `  cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 882 / 第882行**: `  cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 883 / 第883行**: `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 884 / 第884行**: `  ElementAccumulator> : DefaultGemmConfigurationSm89F8<`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 885 / 第885行**: `                            cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 886 / 第886行**: `                            cutlass::float_e4m3_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 887 / 第887行**: `                            ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 888 / 第888行**: `                            ElementAccumulator> {};`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 889 / 第889行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 890 / 第890行**: `/// Partial specialization for SM89 fe5m2 x fe5m2`
+  - **EN**: Documentation comment describing the next declaration: Partial specialization for SM89 fe5m2 x fe5m2
+  - **CN**: 文档注释，用于说明后续声明：Partial specialization for SM89 fe5m2 x fe5m2
+- **Line 891 / 第891行**: `template <typename ElementC, typename ElementAccumulator>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 892 / 第892行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, with the nearby comment describing it as: Partial specialization for SM89 fe5m2 x fe5m2
+  - **CN**: 声明 `DefaultGemmConfiguration`，其附近注释说明为：Partial specialization for SM89 fe5m2 x fe5m2
+- **Line 893 / 第893行**: `  arch::OpClassTensorOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 894 / 第894行**: `  arch::Sm89,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 895 / 第895行**: `  cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 896 / 第896行**: `  cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 897 / 第897行**: `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 898 / 第898行**: `  ElementAccumulator> : DefaultGemmConfigurationSm89F8<`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 899 / 第899行**: `                            cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 900 / 第900行**: `                            cutlass::float_e5m2_t,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 901 / 第901行**: `                            ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 902 / 第902行**: `                            ElementAccumulator> {};`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 903 / 第903行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 904 / 第904行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 905 / 第905行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 906 / 第906行**: `template <typename ElementC,`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 907 / 第907行**: `          typename ElementAccumulator>`
+  - **EN**: Declares template parameter `ElementAccumulator` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `ElementAccumulator`，用于定制生成出的封装。
+- **Line 908 / 第908行**: `struct DefaultGemmConfiguration<arch::OpClassTensorOp, arch::Sm90, double,`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 909 / 第909行**: `                                double, ElementC, ElementAccumulator> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 910 / 第910行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 911 / 第911行**: `  static int const kAlignmentA = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 912 / 第912行**: `  static int const kAlignmentB = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 913 / 第913行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 914 / 第914行**: `  using ThreadblockShape = GemmShape<128, 256, 64>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 915 / 第915行**: `  using WarpShape = GemmShape<64, 64, 64>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 916 / 第916行**: `  using InstructionShape = GemmShape<16, 8, 4>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 917 / 第917行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 918 / 第918行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 919 / 第919行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 920 / 第920行**: `      ElementC, 1, ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 921 / 第921行**: `      ElementAccumulator>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 922 / 第922行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 923 / 第923行**: `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 924 / 第924行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 925 / 第925行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 926 / 第926行**: `template <>`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 927 / 第927行**: `struct DefaultGemmConfiguration<`
+  - **EN**: Declares `DefaultGemmConfiguration`, a type that packages part of the public device-level interface.
+  - **CN**: 声明 `DefaultGemmConfiguration`，它是公开设备级接口的一部分封装类型。
+- **Line 928 / 第928行**: `    arch::OpClassTensorOp, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 929 / 第929行**: `    arch::Sm90, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 930 / 第930行**: `    complex<double>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 931 / 第931行**: `    complex<double>, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 932 / 第932行**: `    complex<double>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 933 / 第933行**: `    complex<double>`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 934 / 第934行**: `  > {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 935 / 第935行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 936 / 第936行**: `  static int const kAlignmentA = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 937 / 第937行**: `  static int const kAlignmentB = 1;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 938 / 第938行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 939 / 第939行**: `  using ThreadblockShape = GemmShape<64, 64, 16>;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 940 / 第940行**: `  using WarpShape = GemmShape<32, 32, 16>;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 941 / 第941行**: `  using InstructionShape = GemmShape<16, 8, 4>;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 942 / 第942行**: `  static int const kStages = 3;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 943 / 第943行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 944 / 第944行**: `  using EpilogueOutputOp = epilogue::thread::LinearCombination<`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 945 / 第945行**: `      complex<double>, 1, complex<double>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 946 / 第946行**: `      complex<double>>;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 947 / 第947行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 948 / 第948行**: `  using Operator = arch::OpMultiplyAddComplex;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 949 / 第949行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 950 / 第950行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 951 / 第951行**: `} // namespace device`
+  - **EN**: Closes namespace `device`.
+  - **CN**: 关闭命名空间 `device`。
+- **Line 952 / 第952行**: `} // namespace gemm`
+  - **EN**: Closes namespace `gemm`.
+  - **CN**: 关闭命名空间 `gemm`。
+- **Line 953 / 第953行**: `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 954 / 第954行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 955 / 第955行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+
+## Key Concepts / 关键概念
+
+- **EN**: DefaultGemmConfiguration centralizes architecture-, datatype-, and operator-class-dependent policy choices.  
+- **CN**: DefaultGemmConfiguration 集中管理与架构、数据类型和算子类别相关的默认策略选择。
+- **EN**: The file chooses threadblock, warp, and instruction shapes that downstream wrappers use as defaults.  
+- **CN**: 该文件选择 threadblock、warp 和 instruction 形状，供下游封装作为默认配置使用。
+- **EN**: Alignment, stages, and epilogue operator defaults are exposed here so higher-level wrappers stay concise.  
+- **CN**: 对齐方式、流水级数和 epilogue 算子默认值都在这里给出，从而让更高层封装保持简洁。
+
+## Dependencies / 依赖关系
+
+- `cutlass/cutlass.h`: Provides core CUTLASS types, macros, and status codes. / 提供 CUTLASS 核心类型、宏与状态码。
+- `cutlass/numeric_types.h`: Defines CUTLASS numeric scalar and packed data types. / 定义 CUTLASS 的数值标量与打包数据类型。
+- `cutlass/arch/arch.h`: Provides architecture tags and architecture-specific traits. / 提供架构标签与架构相关 traits。
+- `cutlass/arch/mma.h`: Provides architecture-specific helpers referenced by this header. / 提供本头文件引用的架构相关辅助类型。
+- `cutlass/arch/wmma.h`: Provides architecture-specific helpers referenced by this header. / 提供本头文件引用的架构相关辅助类型。
+- `cutlass/gemm/gemm.h`: Defines common GEMM enums, problem shapes, and coordinate helpers. / 定义通用 GEMM 枚举、问题形状与坐标辅助类型。
+- `cutlass/epilogue/thread/linear_combination.h`: Provides epilogue operators that transform accumulators into output tensors. / 提供把累加器转换为输出张量的 epilogue 算子。
+- `cutlass/epilogue/thread/linear_combination_clamp.h`: Provides epilogue operators that transform accumulators into output tensors. / 提供把累加器转换为输出张量的 epilogue 算子。

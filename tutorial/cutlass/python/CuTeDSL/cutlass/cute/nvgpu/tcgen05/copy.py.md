@@ -1,0 +1,1133 @@
+# copy.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/nvgpu/tcgen05/copy.py`
+
+## Purpose / 作用
+- EN: Defines 43 classes (TmemLoadRedOp, Repetition, Pack, Unpack, ... (+39 more)) in `CuTeDSL.cutlass.cute.nvgpu.tcgen05.copy`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.nvgpu.tcgen05.copy` 定义了 43 个类（TmemLoadRedOp, Repetition, Pack, Unpack, ... (+39 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L13** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L14** `from typing import Any, Optional, Type` — **EN:** Imports Any, Optional, Type from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Type。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L17** `from cutlass.cutlass_dsl import BaseDSL` — **EN:** Imports BaseDSL from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 BaseDSL。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L20** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `from ..common import OpError` — **EN:** Imports OpError from `..common`. **CN:** 从 `..common` 导入 OpError。
+- **L23** `from ...atom import CopyOp, Trait, make_atom` — **EN:** Imports CopyOp, Trait, make_atom from `...atom`. **CN:** 从 `...atom` 导入 CopyOp, Trait, make_atom。
+- **L24** `from ...typing import Numeric` — **EN:** Imports Numeric from `...typing`. **CN:** 从 `...typing` 导入 Numeric。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `from .mma import CtaGroup` — **EN:** Imports CtaGroup from `.mma`. **CN:** 从 `.mma` 导入 CtaGroup。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `class TmemLoadRedOp(enum.Enum):` — **EN:** Defines class `TmemLoadRedOp` with bases enum.Enum. **CN:** 定义类 `TmemLoadRedOp`，其基类为 enum.Enum。
+- **L30** `    """` — **EN:** Starts the docstring for the class `TmemLoadRedOp`. **CN:** 开始说明 class `TmemLoadRedOp` 的文档字符串。
+- **L31** `    An enumeration for the possible reduce operations for TMEM load operations.` — **EN:** Continues the docstring for the class `TmemLoadRedOp`. **CN:** 继续说明 class `TmemLoadRedOp` 的文档字符串。
+- **L32** `    """` — **EN:** Ends the docstring for the class `TmemLoadRedOp`. **CN:** 结束说明 class `TmemLoadRedOp` 的文档字符串。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `    MAX = _cute_nvgpu_ir.TmemLoadRedOp.max` — **EN:** Assigns a value to MAX. **CN:** 将一个值赋给 MAX。
+- **L35** `    MAXABS = _cute_nvgpu_ir.TmemLoadRedOp.maxabs` — **EN:** Assigns a value to MAXABS. **CN:** 将一个值赋给 MAXABS。
+- **L36** `    MIN = _cute_nvgpu_ir.TmemLoadRedOp.min` — **EN:** Assigns a value to MIN. **CN:** 将一个值赋给 MIN。
+- **L37** `    MINABS = _cute_nvgpu_ir.TmemLoadRedOp.minabs` — **EN:** Assigns a value to MINABS. **CN:** 将一个值赋给 MINABS。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L40** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L43** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `class Repetition(enum.Enum):` — **EN:** Defines class `Repetition` with bases enum.Enum. **CN:** 定义类 `Repetition`，其基类为 enum.Enum。
+- **L47** `    """` — **EN:** Starts the docstring for the class `Repetition`. **CN:** 开始说明 class `Repetition` 的文档字符串。
+- **L48** `    An enumeration for the number of repetitions of a given TMEM copy within the instruction.` — **EN:** Continues the docstring for the class `Repetition`. **CN:** 继续说明 class `Repetition` 的文档字符串。
+- **L49** `    """` — **EN:** Ends the docstring for the class `Repetition`. **CN:** 结束说明 class `Repetition` 的文档字符串。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `    x1 = 1` — **EN:** Assigns a value to x1. **CN:** 将一个值赋给 x1。
+- **L52** `    x2 = 2` — **EN:** Assigns a value to x2. **CN:** 将一个值赋给 x2。
+- **L53** `    x4 = 4` — **EN:** Assigns a value to x4. **CN:** 将一个值赋给 x4。
+- **L54** `    x8 = 8` — **EN:** Assigns a value to x8. **CN:** 将一个值赋给 x8。
+- **L55** `    x16 = 16` — **EN:** Assigns a value to x16. **CN:** 将一个值赋给 x16。
+- **L56** `    x32 = 32` — **EN:** Assigns a value to x32. **CN:** 将一个值赋给 x32。
+- **L57** `    x64 = 64` — **EN:** Assigns a value to x64. **CN:** 将一个值赋给 x64。
+- **L58** `    x128 = 128` — **EN:** Assigns a value to x128. **CN:** 将一个值赋给 x128。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L61** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L64** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `class Pack(enum.Enum):` — **EN:** Defines class `Pack` with bases enum.Enum. **CN:** 定义类 `Pack`，其基类为 enum.Enum。
+- **L68** `    """` — **EN:** Starts the docstring for the class `Pack`. **CN:** 开始说明 class `Pack` 的文档字符串。
+- **L69** `    An enumeration for the possible packing patterns for TMEM to RMEM copies.` — **EN:** Continues the docstring for the class `Pack`. **CN:** 继续说明 class `Pack` 的文档字符串。
+- **L70** `    """` — **EN:** Ends the docstring for the class `Pack`. **CN:** 结束说明 class `Pack` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    NONE = enum.auto()` — **EN:** Assigns a value to NONE. **CN:** 将一个值赋给 NONE。
+- **L73** `    PACK_16b_IN_32b = enum.auto()` — **EN:** Assigns a value to PACK_16b_IN_32b. **CN:** 将一个值赋给 PACK_16b_IN_32b。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L76** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L79** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `class Unpack(enum.Enum):` — **EN:** Defines class `Unpack` with bases enum.Enum. **CN:** 定义类 `Unpack`，其基类为 enum.Enum。
+- **L83** `    """` — **EN:** Starts the docstring for the class `Unpack`. **CN:** 开始说明 class `Unpack` 的文档字符串。
+- **L84** `    An enumeration for the possible unpacking patterns for RMEM to TMEM copies.` — **EN:** Continues the docstring for the class `Unpack`. **CN:** 继续说明 class `Unpack` 的文档字符串。
+- **L85** `    """` — **EN:** Ends the docstring for the class `Unpack`. **CN:** 结束说明 class `Unpack` 的文档字符串。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    NONE = enum.auto()` — **EN:** Assigns a value to NONE. **CN:** 将一个值赋给 NONE。
+- **L88** `    UNPACK_32b_IN_16b = enum.auto()` — **EN:** Assigns a value to UNPACK_32b_IN_16b. **CN:** 将一个值赋给 UNPACK_32b_IN_16b。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L91** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L94** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L98** `class _LdBase(CopyOp):` — **EN:** Defines class `_LdBase` with bases CopyOp. **CN:** 定义类 `_LdBase`，其基类为 CopyOp。
+- **L99** `    """` — **EN:** Starts the docstring for the class `_LdBase`. **CN:** 开始说明 class `_LdBase` 的文档字符串。
+- **L100** `    Base class for TMEM load operations in the tcgen05 instruction set.` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    This abstract base class provides common functionality and validation for tensor memory (TMEM)` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L103** `    load operations. It defines the fundamental parameters and architecture constraints that apply` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L104** `    to all load operation variants.` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    :param repeat: Number of repetitions for the load operation, defaults to Repetition.x1` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L107** `    :type repeat: Repetition, optional` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L108** `    :param pack: Packing pattern for TMEM to RMEM copies, defaults to Pack.NONE` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L109** `    :type pack: Pack, optional` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L110** `    :raises OpError: If the current architecture is not supported or if invalid parameters are provided` — **EN:** Continues the docstring for the class `_LdBase`. **CN:** 继续说明 class `_LdBase` 的文档字符串。
+- **L111** `    """` — **EN:** Ends the docstring for the class `_LdBase`. **CN:** 结束说明 class `_LdBase` 的文档字符串。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    repeat: Repetition = Repetition.x1` — **EN:** Assigns a typed value to repeat. **CN:** 为 repeat 赋予带类型标注的值。
+- **L114** `    pack: Pack = Pack.NONE` — **EN:** Assigns a typed value to pack. **CN:** 为 pack 赋予带类型标注的值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    admissible_archs = Arch.filter(` — **EN:** Assigns a value to admissible_archs. **CN:** 将一个值赋给 admissible_archs。
+- **L117** `        lambda arch: arch.is_family_of(Arch.sm_100f) or arch.is_family_of(Arch.sm_110f)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L121** `        """` — **EN:** Starts the docstring for the function `__post_init__`. **CN:** 开始说明 function `__post_init__` 的文档字符串。
+- **L122** `        Post-initialization validation for TMEM load operations.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `        Performs comprehensive validation of operation parameters and architecture compatibility.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L125** `        This method is automatically called after object creation to ensure all constraints are met.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `        :raises OpError: If architecture is not supported` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L128** `        :raises OpError: If repeat parameter is not a Repetition instance` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L129** `        :raises OpError: If pack parameter is not a Pack instance` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L130** `        """` — **EN:** Ends the docstring for the function `__post_init__`. **CN:** 结束说明 function `__post_init__` 的文档字符串。
+- **L131** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L132** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L133** `        if arch not in self.admissible_archs:` — **EN:** Starts a conditional branch guarded by `arch not in self.admissible_archs`. **CN:** 开始一个由 `arch not in self.admissible_archs` 控制的条件分支。
+- **L134** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L135** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `                f"expects arch to be one of {self.admissible_archs}, but got {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `        if not isinstance(self.repeat, Repetition):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.repeat, Repetition)`. **CN:** 开始一个由 `not isinstance(self.repeat, Repetition)` 控制的条件分支。
+- **L141** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L142** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `                "expects the 'repeat' Op parameter to be a tcgen05.Repetition instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `        if not isinstance(self.pack, Pack):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.pack, Pack)`. **CN:** 开始一个由 `not isinstance(self.pack, Pack)` 控制的条件分支。
+- **L146** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L147** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `                "expects the 'pack' Op parameter to be a tcgen05.Pack instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L152** `        """` — **EN:** Starts the docstring for the function `__str__`. **CN:** 开始说明 function `__str__` 的文档字符串。
+- **L153** `        Generate a human-readable string representation of the load operation.` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        Creates a formatted description showing the operation type, repetition count,` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L156** `        and any special packing configuration.` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `        :return: Multi-line string describing the operation configuration` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L159** `        :rtype: str` — **EN:** Continues the docstring for the function `__str__`. **CN:** 继续说明 function `__str__` 的文档字符串。
+- **L160** `        """` — **EN:** Ends the docstring for the function `__str__`. **CN:** 结束说明 function `__str__` 的文档字符串。
+- **L161** `        res = (` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L162** `            f"tcgen05 {self.__class__.__name__[:-2]} Copy Operation"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `            + f"\n  number of repetitions = {self.repeat.value}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `        if self.pack == Pack.PACK_16b_IN_32b:` — **EN:** Starts a conditional branch guarded by `self.pack == Pack.PACK_16b_IN_32b`. **CN:** 开始一个由 `self.pack == Pack.PACK_16b_IN_32b` 控制的条件分支。
+- **L166** `            res += "\n  with 2x 16-bit to 32b packing"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L167** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L171** `class Ld16x64bOp(_LdBase):` — **EN:** Defines class `Ld16x64bOp` with bases _LdBase. **CN:** 定义类 `Ld16x64bOp`，其基类为 _LdBase。
+- **L172** `    """` — **EN:** Starts the docstring for the class `Ld16x64bOp`. **CN:** 开始说明 class `Ld16x64bOp` 的文档字符串。
+- **L173** `    16x64b TMEM load Operation.` — **EN:** Continues the docstring for the class `Ld16x64bOp`. **CN:** 继续说明 class `Ld16x64bOp` 的文档字符串。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `Ld16x64bOp`. **CN:** 继续说明 class `Ld16x64bOp` 的文档字符串。
+- **L176** `    This Operation corresponds to the \`\`.16x64b\`\` qualifier.` — **EN:** Continues the docstring for the class `Ld16x64bOp`. **CN:** 继续说明 class `Ld16x64bOp` 的文档字符串。
+- **L177** `    """` — **EN:** Ends the docstring for the class `Ld16x64bOp`. **CN:** 结束说明 class `Ld16x64bOp` 的文档字符串。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L180** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L182** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L183** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L184** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L186** `    ) -> "Ld16x64bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L187** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L188** `        Create a trait object for the 16x64b TMEM load operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `        Constructs an MLIR-based trait that encapsulates the specific parameters and` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L191** `        characteristics of this load operation. The trait is used by the compiler` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L192** `        infrastructure to generate the appropriate low-level code.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L195** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L196** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L197** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L198** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L199** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L200** `        :param kwargs: Additional keyword arguments passed to the trait constructor` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L201** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L202** `        :return: A trait object that represents this specific load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L203** `        :rtype: Ld16x64bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L204** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L205** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemLoadType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L206** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `            64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `            ir.UnitAttr.get() if self.pack == Pack.PACK_16b_IN_32b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `        return Ld16x64bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `class Ld16x64bTrait(Trait):` — **EN:** Defines class `Ld16x64bTrait` with bases Trait. **CN:** 定义类 `Ld16x64bTrait`，其基类为 Trait。
+- **L216** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L220** `class Ld16x128bOp(_LdBase):` — **EN:** Defines class `Ld16x128bOp` with bases _LdBase. **CN:** 定义类 `Ld16x128bOp`，其基类为 _LdBase。
+- **L221** `    """` — **EN:** Starts the docstring for the class `Ld16x128bOp`. **CN:** 开始说明 class `Ld16x128bOp` 的文档字符串。
+- **L222** `    16x128b TMEM load Operation.` — **EN:** Continues the docstring for the class `Ld16x128bOp`. **CN:** 继续说明 class `Ld16x128bOp` 的文档字符串。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `Ld16x128bOp`. **CN:** 继续说明 class `Ld16x128bOp` 的文档字符串。
+- **L225** `    This Operation corresponds to the \`\`.16x128b\`\` qualifier.` — **EN:** Continues the docstring for the class `Ld16x128bOp`. **CN:** 继续说明 class `Ld16x128bOp` 的文档字符串。
+- **L226** `    """` — **EN:** Ends the docstring for the class `Ld16x128bOp`. **CN:** 结束说明 class `Ld16x128bOp` 的文档字符串。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L229** `        """` — **EN:** Starts the docstring for the function `__post_init__`. **CN:** 开始说明 function `__post_init__` 的文档字符串。
+- **L230** `        Additional validation specific to 16x128b load operations.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `        Extends the base class validation with operation-specific constraints.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L233** `        The 16x128b operation has limitations on the maximum repetition count due to` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L234** `        hardware register and bandwidth constraints.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `        :raises OpError: If x128 repetition is specified` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L237** `        """` — **EN:** Ends the docstring for the function `__post_init__`. **CN:** 结束说明 function `__post_init__` 的文档字符串。
+- **L238** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L239** `        if self.repeat == Repetition.x128:` — **EN:** Starts a conditional branch guarded by `self.repeat == Repetition.x128`. **CN:** 开始一个由 `self.repeat == Repetition.x128` 控制的条件分支。
+- **L240** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L241** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `                "x128 repetition is not supported",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                suggestion="choose one of x1, x2, x4, x8, x16, x32, x64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L247** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L248** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L249** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L250** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L251** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L252** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L253** `    ) -> "Ld16x128bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L254** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L255** `        Create a trait object for the 16x128b TMEM load operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L258** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L259** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L260** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L261** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L262** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L263** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L264** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L265** `        :return: A trait object for this load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L266** `        :rtype: Ld16x128bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L267** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L268** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemLoadType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L269** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `            ir.UnitAttr.get() if self.pack == Pack.PACK_16b_IN_32b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `        return Ld16x128bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L277** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L278** `class Ld16x128bTrait(Trait):` — **EN:** Defines class `Ld16x128bTrait` with bases Trait. **CN:** 定义类 `Ld16x128bTrait`，其基类为 Trait。
+- **L279** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L283** `class Ld16x256bOp(_LdBase):` — **EN:** Defines class `Ld16x256bOp` with bases _LdBase. **CN:** 定义类 `Ld16x256bOp`，其基类为 _LdBase。
+- **L284** `    """` — **EN:** Starts the docstring for the class `Ld16x256bOp`. **CN:** 开始说明 class `Ld16x256bOp` 的文档字符串。
+- **L285** `    16x256b TMEM load Operation.` — **EN:** Continues the docstring for the class `Ld16x256bOp`. **CN:** 继续说明 class `Ld16x256bOp` 的文档字符串。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `Ld16x256bOp`. **CN:** 继续说明 class `Ld16x256bOp` 的文档字符串。
+- **L288** `    This Operation corresponds to the \`\`.16x256b\`\` qualifier.` — **EN:** Continues the docstring for the class `Ld16x256bOp`. **CN:** 继续说明 class `Ld16x256bOp` 的文档字符串。
+- **L289** `    """` — **EN:** Ends the docstring for the class `Ld16x256bOp`. **CN:** 结束说明 class `Ld16x256bOp` 的文档字符串。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L292** `        """` — **EN:** Starts the docstring for the function `__post_init__`. **CN:** 开始说明 function `__post_init__` 的文档字符串。
+- **L293** `        Additional validation specific to 16x256b load operations.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `        Extends the base class validation with operation-specific constraints.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L296** `        The 16x256b operation has more restrictive limitations on repetition count due to` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L297** `        the larger data size per operation requiring more hardware resources.` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `        :raises OpError: If x64 or x128 repetition is specified` — **EN:** Continues the docstring for the function `__post_init__`. **CN:** 继续说明 function `__post_init__` 的文档字符串。
+- **L300** `        """` — **EN:** Ends the docstring for the function `__post_init__`. **CN:** 结束说明 function `__post_init__` 的文档字符串。
+- **L301** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L302** `        if self.repeat in (Repetition.x128, Repetition.x64):` — **EN:** Starts a conditional branch guarded by `self.repeat in (Repetition.x128, Repetition.x64)`. **CN:** 开始一个由 `self.repeat in (Repetition.x128, Repetition.x64)` 控制的条件分支。
+- **L303** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L304** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `                "x64 and x128 repetition is not supported",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `                suggestion="choose one of x1, x2, x4, x8, x16, x32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L310** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `    ) -> "Ld16x256bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L317** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L318** `        Create a trait object for the 16x256b TMEM load operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L321** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L322** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L323** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L324** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L325** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L326** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L327** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L328** `        :return: A trait object for this load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L329** `        :rtype: Ld16x256bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L330** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L331** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemLoadType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L332** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `            256,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `            ir.UnitAttr.get() if self.pack == Pack.PACK_16b_IN_32b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `        return Ld16x256bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `class Ld16x256bTrait(Trait):` — **EN:** Defines class `Ld16x256bTrait` with bases Trait. **CN:** 定义类 `Ld16x256bTrait`，其基类为 Trait。
+- **L342** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L346** `class Ld16x32bx2Op(_LdBase):` — **EN:** Defines class `Ld16x32bx2Op` with bases _LdBase. **CN:** 定义类 `Ld16x32bx2Op`，其基类为 _LdBase。
+- **L347** `    """` — **EN:** Starts the docstring for the class `Ld16x32bx2Op`. **CN:** 开始说明 class `Ld16x32bx2Op` 的文档字符串。
+- **L348** `    16x32bx2 TMEM load Operation.` — **EN:** Continues the docstring for the class `Ld16x32bx2Op`. **CN:** 继续说明 class `Ld16x32bx2Op` 的文档字符串。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `Ld16x32bx2Op`. **CN:** 继续说明 class `Ld16x32bx2Op` 的文档字符串。
+- **L351** `    This Operation corresponds to the \`\`.16x32bx2\`\` qualifier.` — **EN:** Continues the docstring for the class `Ld16x32bx2Op`. **CN:** 继续说明 class `Ld16x32bx2Op` 的文档字符串。
+- **L352** `    """` — **EN:** Ends the docstring for the class `Ld16x32bx2Op`. **CN:** 结束说明 class `Ld16x32bx2Op` 的文档字符串。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L355** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L356** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L357** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L359** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L360** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L361** `    ) -> "Ld16x32bx2Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L362** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L363** `        Create a trait object for the 16x32bx2 TMEM load operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L365** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L366** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L367** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L368** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L369** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L370** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L371** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L372** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L373** `        :return: A trait object for this load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L374** `        :rtype: Ld16x32bx2Trait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L375** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L376** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemLoadType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L377** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `            ir.UnitAttr.get() if self.pack == Pack.PACK_16b_IN_32b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `        return Ld16x32bx2Trait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L384** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `class Ld16x32bx2Trait(Trait):` — **EN:** Defines class `Ld16x32bx2Trait` with bases Trait. **CN:** 定义类 `Ld16x32bx2Trait`，其基类为 Trait。
+- **L387** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L390** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L391** `class Ld32x32bOp(_LdBase):` — **EN:** Defines class `Ld32x32bOp` with bases _LdBase. **CN:** 定义类 `Ld32x32bOp`，其基类为 _LdBase。
+- **L392** `    """` — **EN:** Starts the docstring for the class `Ld32x32bOp`. **CN:** 开始说明 class `Ld32x32bOp` 的文档字符串。
+- **L393** `    32x32b TMEM load Operation.` — **EN:** Continues the docstring for the class `Ld32x32bOp`. **CN:** 继续说明 class `Ld32x32bOp` 的文档字符串。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `Ld32x32bOp`. **CN:** 继续说明 class `Ld32x32bOp` 的文档字符串。
+- **L396** `    This Operation corresponds to the \`\`.32x32\`\` qualifier.` — **EN:** Continues the docstring for the class `Ld32x32bOp`. **CN:** 继续说明 class `Ld32x32bOp` 的文档字符串。
+- **L397** `    """` — **EN:** Ends the docstring for the class `Ld32x32bOp`. **CN:** 结束说明 class `Ld32x32bOp` 的文档字符串。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L400** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L401** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L405** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L406** `    ) -> "Ld32x32bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L407** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L408** `        Create a trait object for the 32x32b TMEM load operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L411** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L412** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L413** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L414** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L415** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L416** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L417** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L418** `        :return: A trait object for this load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L419** `        :rtype: Ld32x32bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L420** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L421** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemLoadType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L422** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `            ir.UnitAttr.get() if self.pack == Pack.PACK_16b_IN_32b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `        return Ld32x32bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `class Ld32x32bTrait(Trait):` — **EN:** Defines class `Ld32x32bTrait` with bases Trait. **CN:** 定义类 `Ld32x32bTrait`，其基类为 Trait。
+- **L432** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L436** `class LdRed16x32bx2Op(_LdBase):` — **EN:** Defines class `LdRed16x32bx2Op` with bases _LdBase. **CN:** 定义类 `LdRed16x32bx2Op`，其基类为 _LdBase。
+- **L437** `    """` — **EN:** Starts the docstring for the class `LdRed16x32bx2Op`. **CN:** 开始说明 class `LdRed16x32bx2Op` 的文档字符串。
+- **L438** `    16x32bx2 TMEM load Reduce Operation.` — **EN:** Continues the docstring for the class `LdRed16x32bx2Op`. **CN:** 继续说明 class `LdRed16x32bx2Op` 的文档字符串。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `LdRed16x32bx2Op`. **CN:** 继续说明 class `LdRed16x32bx2Op` 的文档字符串。
+- **L441** `    This Operation corresponds to the \`\`.red\`\` and \`\`.16x32bx2\`\` qualifiers.` — **EN:** Continues the docstring for the class `LdRed16x32bx2Op`. **CN:** 继续说明 class `LdRed16x32bx2Op` 的文档字符串。
+- **L442** `    """` — **EN:** Ends the docstring for the class `LdRed16x32bx2Op`. **CN:** 结束说明 class `LdRed16x32bx2Op` 的文档字符串。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `    redOp: TmemLoadRedOp = TmemLoadRedOp.MAX` — **EN:** Assigns a typed value to redOp. **CN:** 为 redOp 赋予带类型标注的值。
+- **L445** `    nan: bool = False` — **EN:** Assigns a typed value to nan. **CN:** 为 nan 赋予带类型标注的值。
+- **L446** `    half_split_off: int = 0` — **EN:** Assigns a typed value to half_split_off. **CN:** 为 half_split_off 赋予带类型标注的值。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L449** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L450** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L451** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L452** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L453** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L454** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L455** `    ) -> "LdRed16x32bx2Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L456** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L457** `        Create a trait object for the 16x32bx2 TMEM load Reduce operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L460** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L461** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L462** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L463** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L464** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L465** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L466** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L467** `        :return: A trait object for this load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L468** `        :rtype: LdRed16x32bx2Trait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L469** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L470** `        ty = _cute_nvgpu_ir.CopyAtomSM10xTmemLoadRedType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L471** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** `            self.redOp.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `            ir.UnitAttr.get() if self.nan else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `            ir.IntegerAttr.get(ir.IntegerType.get_signless(32), self.half_split_off),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `        return LdRed16x32bx2Trait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L480** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** `class LdRed16x32bx2Trait(Trait):` — **EN:** Defines class `LdRed16x32bx2Trait` with bases Trait. **CN:** 定义类 `LdRed16x32bx2Trait`，其基类为 Trait。
+- **L483** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L486** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L487** `class LdRed32x32bOp(_LdBase):` — **EN:** Defines class `LdRed32x32bOp` with bases _LdBase. **CN:** 定义类 `LdRed32x32bOp`，其基类为 _LdBase。
+- **L488** `    """` — **EN:** Starts the docstring for the class `LdRed32x32bOp`. **CN:** 开始说明 class `LdRed32x32bOp` 的文档字符串。
+- **L489** `    32x32b TMEM load Reduce Operation.` — **EN:** Continues the docstring for the class `LdRed32x32bOp`. **CN:** 继续说明 class `LdRed32x32bOp` 的文档字符串。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-ld>\`__.` — **EN:** Continues the docstring for the class `LdRed32x32bOp`. **CN:** 继续说明 class `LdRed32x32bOp` 的文档字符串。
+- **L492** `    This Operation corresponds to the \`\`red\`\` and \`\`.32x32\`\` qualifiers.` — **EN:** Continues the docstring for the class `LdRed32x32bOp`. **CN:** 继续说明 class `LdRed32x32bOp` 的文档字符串。
+- **L493** `    """` — **EN:** Ends the docstring for the class `LdRed32x32bOp`. **CN:** 结束说明 class `LdRed32x32bOp` 的文档字符串。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `    redOp: TmemLoadRedOp = TmemLoadRedOp.MAX` — **EN:** Assigns a typed value to redOp. **CN:** 为 redOp 赋予带类型标注的值。
+- **L496** `    nan: bool = False` — **EN:** Assigns a typed value to nan. **CN:** 为 nan 赋予带类型标注的值。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L499** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L500** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L501** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L502** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L503** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L504** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L505** `    ) -> "LdRed32x32bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L506** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L507** `        Create a trait object for the 32x32b TMEM load Reduce operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L510** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L511** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L512** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L513** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L514** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L515** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L516** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L517** `        :return: A trait object for this load operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L518** `        :rtype: LdRed32x32bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L519** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L520** `        ty = _cute_nvgpu_ir.CopyAtomSM10xTmemLoadRedType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L521** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `            self.redOp.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `            ir.UnitAttr.get() if self.nan else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `            None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L528** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L529** `        return LdRed32x32bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `class LdRed32x32bTrait(Trait):` — **EN:** Defines class `LdRed32x32bTrait` with bases Trait. **CN:** 定义类 `LdRed32x32bTrait`，其基类为 Trait。
+- **L533** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L537** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L538** `class _StBase(CopyOp):` — **EN:** Defines class `_StBase` with bases CopyOp. **CN:** 定义类 `_StBase`，其基类为 CopyOp。
+- **L539** `    """` — **EN:** Starts the docstring for the class `_StBase`. **CN:** 开始说明 class `_StBase` 的文档字符串。
+- **L540** `    Base class for TMEM store operations in the tcgen05 instruction set.` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L541** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L542** `    This abstract base class provides common functionality and validation for tensor memory (TMEM)` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L543** `    store operations. It defines the fundamental parameters and architecture constraints that apply` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L544** `    to all store operation variants.` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `    :param repeat: Number of repetitions for the store operation (required parameter)` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L547** `    :type repeat: Repetition` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L548** `    :param unpack: Unpacking pattern for RMEM to TMEM copies, defaults to Unpack.NONE` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L549** `    :type unpack: Unpack, optional` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L550** `    :raises OpError: If the current architecture is not supported or if invalid parameters are provided` — **EN:** Continues the docstring for the class `_StBase`. **CN:** 继续说明 class `_StBase` 的文档字符串。
+- **L551** `    """` — **EN:** Ends the docstring for the class `_StBase`. **CN:** 结束说明 class `_StBase` 的文档字符串。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `    repeat: Repetition` — **EN:** Assigns a typed value to repeat. **CN:** 为 repeat 赋予带类型标注的值。
+- **L554** `    unpack: Unpack = Unpack.NONE` — **EN:** Assigns a typed value to unpack. **CN:** 为 unpack 赋予带类型标注的值。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `    admissible_archs = Arch.filter(` — **EN:** Assigns a value to admissible_archs. **CN:** 将一个值赋给 admissible_archs。
+- **L557** `        lambda arch: arch.is_family_of(Arch.sm_100f) or arch.is_family_of(Arch.sm_110f)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L558** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L559** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L560** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L561** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L562** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L563** `        if arch not in self.admissible_archs:` — **EN:** Starts a conditional branch guarded by `arch not in self.admissible_archs`. **CN:** 开始一个由 `arch not in self.admissible_archs` 控制的条件分支。
+- **L564** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L565** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `                f"expects arch to be one of {self.admissible_archs}, but got {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L570** `        if not isinstance(self.repeat, Repetition):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.repeat, Repetition)`. **CN:** 开始一个由 `not isinstance(self.repeat, Repetition)` 控制的条件分支。
+- **L571** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L572** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** `                "expects the 'repeat' Op parameter to be a tcgen05.Repetition instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L574** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L575** `        if not isinstance(self.unpack, Unpack):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.unpack, Unpack)`. **CN:** 开始一个由 `not isinstance(self.unpack, Unpack)` 控制的条件分支。
+- **L576** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L577** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L578** `                "expects the 'unpack' Op parameter to be a tcgen05.Unpack instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L579** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L581** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L582** `        res = (` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L583** `            f"tcgen05 {self.__class__.__name__[:-2]} Copy Operation"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `            + f"\n  number of repetitions = {self.repeat.value}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** `        if self.unpack == Unpack.UNPACK_32b_IN_16b:` — **EN:** Starts a conditional branch guarded by `self.unpack == Unpack.UNPACK_32b_IN_16b`. **CN:** 开始一个由 `self.unpack == Unpack.UNPACK_32b_IN_16b` 控制的条件分支。
+- **L587** `            res += "\n  with 32-bit to 2x 16b unpacking"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L588** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L589** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L590** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L591** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L592** `class St16x64bOp(_StBase):` — **EN:** Defines class `St16x64bOp` with bases _StBase. **CN:** 定义类 `St16x64bOp`，其基类为 _StBase。
+- **L593** `    """` — **EN:** Starts the docstring for the class `St16x64bOp`. **CN:** 开始说明 class `St16x64bOp` 的文档字符串。
+- **L594** `    16x64b TMEM store Operation.` — **EN:** Continues the docstring for the class `St16x64bOp`. **CN:** 继续说明 class `St16x64bOp` 的文档字符串。
+- **L595** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L596** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-st>\`__.` — **EN:** Continues the docstring for the class `St16x64bOp`. **CN:** 继续说明 class `St16x64bOp` 的文档字符串。
+- **L597** `    This Operation corresponds to the \`\`.16x64\`\` qualifier.` — **EN:** Continues the docstring for the class `St16x64bOp`. **CN:** 继续说明 class `St16x64bOp` 的文档字符串。
+- **L598** `    """` — **EN:** Ends the docstring for the class `St16x64bOp`. **CN:** 结束说明 class `St16x64bOp` 的文档字符串。
+- **L599** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L600** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L601** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L602** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L603** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L604** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L605** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L606** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L607** `    ) -> "St16x64bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L608** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L609** `        Create a trait object for the 16x64b TMEM store operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L610** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L611** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L612** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L613** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L614** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L615** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L616** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L617** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L618** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L619** `        :return: A trait object for this store operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L620** `        :rtype: St16x64bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L621** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L622** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemStoreType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L623** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L624** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L625** `            64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `            ir.UnitAttr.get() if self.unpack == Unpack.UNPACK_32b_IN_16b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `        return St16x64bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `class St16x64bTrait(Trait):` — **EN:** Defines class `St16x64bTrait` with bases Trait. **CN:** 定义类 `St16x64bTrait`，其基类为 Trait。
+- **L633** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L634** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L635** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L636** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L637** `class St16x128bOp(_StBase):` — **EN:** Defines class `St16x128bOp` with bases _StBase. **CN:** 定义类 `St16x128bOp`，其基类为 _StBase。
+- **L638** `    """` — **EN:** Starts the docstring for the class `St16x128bOp`. **CN:** 开始说明 class `St16x128bOp` 的文档字符串。
+- **L639** `    16x128b TMEM store Operation.` — **EN:** Continues the docstring for the class `St16x128bOp`. **CN:** 继续说明 class `St16x128bOp` 的文档字符串。
+- **L640** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L641** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-st>\`__.` — **EN:** Continues the docstring for the class `St16x128bOp`. **CN:** 继续说明 class `St16x128bOp` 的文档字符串。
+- **L642** `    This Operation corresponds to the \`\`.16x128\`\` qualifier.` — **EN:** Continues the docstring for the class `St16x128bOp`. **CN:** 继续说明 class `St16x128bOp` 的文档字符串。
+- **L643** `    """` — **EN:** Ends the docstring for the class `St16x128bOp`. **CN:** 结束说明 class `St16x128bOp` 的文档字符串。
+- **L644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L645** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L646** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L647** `        if self.repeat == Repetition.x128:` — **EN:** Starts a conditional branch guarded by `self.repeat == Repetition.x128`. **CN:** 开始一个由 `self.repeat == Repetition.x128` 控制的条件分支。
+- **L648** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L649** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** `                "x128 repetition is not supported",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L651** `                suggestion="choose one of x1, x2, x4, x8, x16, x32, x64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L652** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L654** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L655** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L656** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L657** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L658** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L659** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L660** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L661** `    ) -> "St16x128bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L662** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemStoreType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L663** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L664** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L666** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L667** `            ir.UnitAttr.get() if self.unpack == Unpack.UNPACK_32b_IN_16b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L668** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L669** `        return St16x128bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L670** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L671** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L672** `class St16x128bTrait(Trait):` — **EN:** Defines class `St16x128bTrait` with bases Trait. **CN:** 定义类 `St16x128bTrait`，其基类为 Trait。
+- **L673** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L674** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L675** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L676** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L677** `class St16x256bOp(_StBase):` — **EN:** Defines class `St16x256bOp` with bases _StBase. **CN:** 定义类 `St16x256bOp`，其基类为 _StBase。
+- **L678** `    """` — **EN:** Starts the docstring for the class `St16x256bOp`. **CN:** 开始说明 class `St16x256bOp` 的文档字符串。
+- **L679** `    16x256b TMEM store Operation.` — **EN:** Continues the docstring for the class `St16x256bOp`. **CN:** 继续说明 class `St16x256bOp` 的文档字符串。
+- **L680** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L681** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-st>\`__.` — **EN:** Continues the docstring for the class `St16x256bOp`. **CN:** 继续说明 class `St16x256bOp` 的文档字符串。
+- **L682** `    This Operation corresponds to the \`\`.16x256\`\` qualifier.` — **EN:** Continues the docstring for the class `St16x256bOp`. **CN:** 继续说明 class `St16x256bOp` 的文档字符串。
+- **L683** `    """` — **EN:** Ends the docstring for the class `St16x256bOp`. **CN:** 结束说明 class `St16x256bOp` 的文档字符串。
+- **L684** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L685** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L686** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L687** `        if self.repeat in (Repetition.x128, Repetition.x64):` — **EN:** Starts a conditional branch guarded by `self.repeat in (Repetition.x128, Repetition.x64)`. **CN:** 开始一个由 `self.repeat in (Repetition.x128, Repetition.x64)` 控制的条件分支。
+- **L688** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L689** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `                "x64 and x128 repetition is not supported",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `                suggestion="choose one of x1, x2, x4, x8, x16, x32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L694** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L695** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L696** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L697** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L698** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L699** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L700** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L701** `    ) -> "St16x256bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L702** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemStoreType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L703** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L705** `            256,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L706** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L707** `            ir.UnitAttr.get() if self.unpack == Unpack.UNPACK_32b_IN_16b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** `        return St16x256bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L710** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** `class St16x256bTrait(Trait):` — **EN:** Defines class `St16x256bTrait` with bases Trait. **CN:** 定义类 `St16x256bTrait`，其基类为 Trait。
+- **L713** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L714** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L715** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L716** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L717** `class St16x32bx2Op(_StBase):` — **EN:** Defines class `St16x32bx2Op` with bases _StBase. **CN:** 定义类 `St16x32bx2Op`，其基类为 _StBase。
+- **L718** `    """` — **EN:** Starts the docstring for the class `St16x32bx2Op`. **CN:** 开始说明 class `St16x32bx2Op` 的文档字符串。
+- **L719** `    16x32x2b TMEM store Operation.` — **EN:** Continues the docstring for the class `St16x32bx2Op`. **CN:** 继续说明 class `St16x32bx2Op` 的文档字符串。
+- **L720** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L721** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-st>\`__.` — **EN:** Continues the docstring for the class `St16x32bx2Op`. **CN:** 继续说明 class `St16x32bx2Op` 的文档字符串。
+- **L722** `    This Operation corresponds to the \`\`.16x32x2\`\` qualifier.` — **EN:** Continues the docstring for the class `St16x32bx2Op`. **CN:** 继续说明 class `St16x32bx2Op` 的文档字符串。
+- **L723** `    """` — **EN:** Ends the docstring for the class `St16x32bx2Op`. **CN:** 结束说明 class `St16x32bx2Op` 的文档字符串。
+- **L724** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L725** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L726** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L727** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L728** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L729** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L730** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L731** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L732** `    ) -> "St16x32bx2Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L733** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemStoreType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L734** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L735** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L736** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L737** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L738** `            ir.UnitAttr.get() if self.unpack == Unpack.UNPACK_32b_IN_16b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L739** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L740** `        return St16x32bx2Trait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L741** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L742** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L743** `class St16x32bx2Trait(Trait):` — **EN:** Defines class `St16x32bx2Trait` with bases Trait. **CN:** 定义类 `St16x32bx2Trait`，其基类为 Trait。
+- **L744** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L745** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L746** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L747** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L748** `class St32x32bOp(_StBase):` — **EN:** Defines class `St32x32bOp` with bases _StBase. **CN:** 定义类 `St32x32bOp`，其基类为 _StBase。
+- **L749** `    """` — **EN:** Starts the docstring for the class `St32x32bOp`. **CN:** 开始说明 class `St32x32bOp` 的文档字符串。
+- **L750** `    32x32b TMEM store Operation.` — **EN:** Continues the docstring for the class `St32x32bOp`. **CN:** 继续说明 class `St32x32bOp` 的文档字符串。
+- **L751** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L752** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-instructions-tcgen05-st>\`__.` — **EN:** Continues the docstring for the class `St32x32bOp`. **CN:** 继续说明 class `St32x32bOp` 的文档字符串。
+- **L753** `    This Operation corresponds to the \`\`.32x32\`\` qualifier.` — **EN:** Continues the docstring for the class `St32x32bOp`. **CN:** 继续说明 class `St32x32bOp` 的文档字符串。
+- **L754** `    """` — **EN:** Ends the docstring for the class `St32x32bOp`. **CN:** 结束说明 class `St32x32bOp` 的文档字符串。
+- **L755** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L756** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L757** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L758** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L759** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L760** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L761** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L762** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L763** `    ) -> "St32x32bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L764** `        ty = _cute_nvgpu_ir.CopyAtomSM100TmemStoreType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L765** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L766** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L767** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L768** `            self.repeat.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L769** `            ir.UnitAttr.get() if self.unpack == Unpack.UNPACK_32b_IN_16b else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L770** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `        return St32x32bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L772** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L773** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L774** `class St32x32bTrait(Trait):` — **EN:** Defines class `St32x32bTrait` with bases Trait. **CN:** 定义类 `St32x32bTrait`，其基类为 Trait。
+- **L775** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L776** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L777** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L778** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L779** `class _S2TCopyBase(CopyOp):` — **EN:** Defines class `_S2TCopyBase` with bases CopyOp. **CN:** 定义类 `_S2TCopyBase`，其基类为 CopyOp。
+- **L780** `    """` — **EN:** Starts the docstring for the class `_S2TCopyBase`. **CN:** 开始说明 class `_S2TCopyBase` 的文档字符串。
+- **L781** `    Base class for SMEM to TMEM copy operations in the tcgen05 instruction set.` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L782** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L783** `    This abstract base class provides common functionality and validation for shared memory (SMEM)` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L784** `    to tensor memory (TMEM) copy operations. These operations are used for high-throughput data` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L785** `    movement between different memory hierarchies in modern GPU architectures.` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L786** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L787** `    :param cta_group: Cooperative Thread Array (CTA) group configuration` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L788** `    :type cta_group: CtaGroup` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L789** `    :raises OpError: If the current architecture is not SM100f family or if invalid parameters are provided` — **EN:** Continues the docstring for the class `_S2TCopyBase`. **CN:** 继续说明 class `_S2TCopyBase` 的文档字符串。
+- **L790** `    """` — **EN:** Ends the docstring for the class `_S2TCopyBase`. **CN:** 结束说明 class `_S2TCopyBase` 的文档字符串。
+- **L791** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L792** `    cta_group: CtaGroup` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L793** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L794** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L795** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L796** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L797** `        if not arch.is_family_of(Arch.sm_100f):` — **EN:** Starts a conditional branch guarded by `not arch.is_family_of(Arch.sm_100f)`. **CN:** 开始一个由 `not arch.is_family_of(Arch.sm_100f)` 控制的条件分支。
+- **L798** `            supported = Arch.filter(lambda a: a.is_family_of(Arch.sm_100f))` — **EN:** Assigns a value to supported. **CN:** 将一个值赋给 supported。
+- **L799** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L800** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L801** `                f"expects arch to be one of {supported}, but got {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L802** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L803** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L804** `        # Verify that the user provided enum values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L805** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L806** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L807** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L808** `                "expects the 'cta_group' Op parameter to be a tcgen05.CtaGroup instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L811** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L812** `        res = (` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L813** `            f"tcgen05 {self.__class__.__name__[:-2]} Copy Operation"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L814** `            + f"\n  CTA group = {self.cta_group}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L815** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L817** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L818** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L819** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L820** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L821** `class Cp128x256bOp(_S2TCopyBase):` — **EN:** Defines class `Cp128x256bOp` with bases _S2TCopyBase. **CN:** 定义类 `Cp128x256bOp`，其基类为 _S2TCopyBase。
+- **L822** `    """` — **EN:** Starts the docstring for the class `Cp128x256bOp`. **CN:** 开始说明 class `Cp128x256bOp` 的文档字符串。
+- **L823** `    128x256b SMEM to TMEM Copy Operation.` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L824** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L825** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html?highlight=tcgen05#tcgen05-instructions-tcgen05-cp>\`__.` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L826** `    This Operation corresponds to the \`\`.128x256b\`\` qualifier.` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `    SMEM to TMEM copy operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L829** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L830** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L831** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L832** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L833** `        # CORRECT: SMEM to TMEM copy without elect_one` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L834** `        cute.copy(` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L835** `            s2t_atom,` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L836** `            smem_tensor,` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L837** `            tmem_tensor,` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L838** `        )` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L839** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L840** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L841** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L842** `            cute.copy(s2t_atom, smem_tensor, tmem_tensor)` — **EN:** Continues the docstring for the class `Cp128x256bOp`. **CN:** 继续说明 class `Cp128x256bOp` 的文档字符串。
+- **L843** `    """` — **EN:** Ends the docstring for the class `Cp128x256bOp`. **CN:** 结束说明 class `Cp128x256bOp` 的文档字符串。
+- **L844** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L845** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L846** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L847** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L848** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L849** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L850** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L851** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L852** `    ) -> "Cp128x256bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L853** `        """` — **EN:** Starts the docstring for the function `_make_trait`. **CN:** 开始说明 function `_make_trait` 的文档字符串。
+- **L854** `        Create a trait object for the 128x256b SMEM to TMEM copy operation.` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L855** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L856** `        :param copy_internal_type: The data type for the copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L857** `        :type copy_internal_type: Type[Numeric]` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L858** `        :param loc: MLIR location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L859** `        :type loc: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L860** `        :param ip: MLIR insertion point for code generation, defaults to None` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L861** `        :type ip: optional` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L862** `        :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L863** `        :type kwargs: dict` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L864** `        :return: A trait object for this S2T copy operation` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L865** `        :rtype: Cp128x256bTrait` — **EN:** Continues the docstring for the function `_make_trait`. **CN:** 继续说明 function `_make_trait` 的文档字符串。
+- **L866** `        """` — **EN:** Ends the docstring for the function `_make_trait`. **CN:** 结束说明 function `_make_trait` 的文档字符串。
+- **L867** `        ty = _cute_nvgpu_ir.CopyAtomSM100CopyS2TType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L868** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L869** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L870** `            256,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L871** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L872** `            _cute_nvgpu_ir.CopyS2TBroadcast.none,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L873** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L874** `        return Cp128x256bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L875** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L876** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L877** `class Cp128x256bTrait(Trait):` — **EN:** Defines class `Cp128x256bTrait` with bases Trait. **CN:** 定义类 `Cp128x256bTrait`，其基类为 Trait。
+- **L878** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L879** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L880** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L881** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L882** `class Cp128x128bOp(_S2TCopyBase):` — **EN:** Defines class `Cp128x128bOp` with bases _S2TCopyBase. **CN:** 定义类 `Cp128x128bOp`，其基类为 _S2TCopyBase。
+- **L883** `    """` — **EN:** Starts the docstring for the class `Cp128x128bOp`. **CN:** 开始说明 class `Cp128x128bOp` 的文档字符串。
+- **L884** `    128x128b SMEM to TMEM Copy Operation.` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L885** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L886** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html?highlight=tcgen05#tcgen05-instructions-tcgen05-cp>\`__.` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L887** `    This Operation corresponds to the \`\`.128x128b\`\` qualifier.` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L888** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L889** `    SMEM to TMEM copy operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L890** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L891** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L892** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L893** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L894** `        # CORRECT: SMEM to TMEM copy without elect_one` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L895** `        cute.copy(` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L896** `            s2t_atom,` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L897** `            smem_tensor,` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L898** `            tmem_tensor,` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L899** `        )` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L900** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L901** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L902** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L903** `            cute.copy(s2t_atom, smem_tensor, tmem_tensor)` — **EN:** Continues the docstring for the class `Cp128x128bOp`. **CN:** 继续说明 class `Cp128x128bOp` 的文档字符串。
+- **L904** `    """` — **EN:** Ends the docstring for the class `Cp128x128bOp`. **CN:** 结束说明 class `Cp128x128bOp` 的文档字符串。
+- **L905** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L906** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L907** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L908** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L909** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L910** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L911** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L912** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L913** `    ) -> "Cp128x128bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L914** `        ty = _cute_nvgpu_ir.CopyAtomSM100CopyS2TType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L915** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L916** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L917** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L918** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L919** `            _cute_nvgpu_ir.CopyS2TBroadcast.none,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L920** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L921** `        return Cp128x128bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L922** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L923** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L924** `class Cp128x128bTrait(Trait):` — **EN:** Defines class `Cp128x128bTrait` with bases Trait. **CN:** 定义类 `Cp128x128bTrait`，其基类为 Trait。
+- **L925** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L926** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L927** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L928** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L929** `class Cp4x256bOp(_S2TCopyBase):` — **EN:** Defines class `Cp4x256bOp` with bases _S2TCopyBase. **CN:** 定义类 `Cp4x256bOp`，其基类为 _S2TCopyBase。
+- **L930** `    """` — **EN:** Starts the docstring for the class `Cp4x256bOp`. **CN:** 开始说明 class `Cp4x256bOp` 的文档字符串。
+- **L931** `    4x256b SMEM to TMEM Copy Operation.` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L932** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L933** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html?highlight=tcgen05#tcgen05-instructions-tcgen05-cp>\`__.` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L934** `    This Operation corresponds to the \`\`.4x256b\`\` qualifier.` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L935** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L936** `    SMEM to TMEM copy operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L937** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L938** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L939** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L940** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L941** `        # CORRECT: SMEM to TMEM copy without elect_one` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L942** `        cute.copy(` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L943** `            s2t_atom,` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L944** `            smem_tensor,` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L945** `            tmem_tensor,` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L946** `        )` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L947** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L948** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L949** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L950** `            cute.copy(s2t_atom, smem_tensor, tmem_tensor)` — **EN:** Continues the docstring for the class `Cp4x256bOp`. **CN:** 继续说明 class `Cp4x256bOp` 的文档字符串。
+- **L951** `    """` — **EN:** Ends the docstring for the class `Cp4x256bOp`. **CN:** 结束说明 class `Cp4x256bOp` 的文档字符串。
+- **L952** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L953** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L954** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L955** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L956** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L957** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L958** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L959** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L960** `    ) -> "Cp4x256bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L961** `        ty = _cute_nvgpu_ir.CopyAtomSM100CopyS2TType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L962** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L963** `            4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L964** `            256,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L965** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L966** `            _cute_nvgpu_ir.CopyS2TBroadcast.none,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L967** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L968** `        return Cp4x256bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L969** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L970** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L971** `class Cp4x256bTrait(Trait):` — **EN:** Defines class `Cp4x256bTrait` with bases Trait. **CN:** 定义类 `Cp4x256bTrait`，其基类为 Trait。
+- **L972** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L973** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L974** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L975** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L976** `class Cp4x32x128bOp(_S2TCopyBase):` — **EN:** Defines class `Cp4x32x128bOp` with bases _S2TCopyBase. **CN:** 定义类 `Cp4x32x128bOp`，其基类为 _S2TCopyBase。
+- **L977** `    """` — **EN:** Starts the docstring for the class `Cp4x32x128bOp`. **CN:** 开始说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L978** `    32x128b SMEM to TMEM Copy Operation.` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L979** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L980** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html?highlight=tcgen05#tcgen05-instructions-tcgen05-cp>\`__.` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L981** `    This Operation corresponds to the \`\`.32x128b\`\` qualifier with \`\`warpx4\`\` broadcast qualifier enabled.` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L982** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L983** `    SMEM to TMEM copy operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L984** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L985** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L986** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L987** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L988** `        # CORRECT: SMEM to TMEM copy without elect_one` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L989** `        cute.copy(` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L990** `            s2t_atom,` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L991** `            smem_tensor,` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L992** `            tmem_tensor,` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L993** `        )` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L994** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L995** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L996** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L997** `            cute.copy(s2t_atom, smem_tensor, tmem_tensor)` — **EN:** Continues the docstring for the class `Cp4x32x128bOp`. **CN:** 继续说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L998** `    """` — **EN:** Ends the docstring for the class `Cp4x32x128bOp`. **CN:** 结束说明 class `Cp4x32x128bOp` 的文档字符串。
+- **L999** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1000** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1001** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1002** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1003** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1004** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1005** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1006** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1007** `    ) -> "Cp4x32x128bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1008** `        ty = _cute_nvgpu_ir.CopyAtomSM100CopyS2TType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1009** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1010** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1011** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1012** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1013** `            _cute_nvgpu_ir.CopyS2TBroadcast.x4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1014** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1015** `        return Cp4x32x128bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1016** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1017** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1018** `class Cp4x32x128bTrait(Trait):` — **EN:** Defines class `Cp4x32x128bTrait` with bases Trait. **CN:** 定义类 `Cp4x32x128bTrait`，其基类为 Trait。
+- **L1019** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1020** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1021** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1022** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1023** `class Cp2x64x128b0213Op(_S2TCopyBase):` — **EN:** Defines class `Cp2x64x128b0213Op` with bases _S2TCopyBase. **CN:** 定义类 `Cp2x64x128b0213Op`，其基类为 _S2TCopyBase。
+- **L1024** `    """` — **EN:** Starts the docstring for the class `Cp2x64x128b0213Op`. **CN:** 开始说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1025** `    64x128b SMEM to TMEM Copy Operation.` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1026** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1027** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html?highlight=tcgen05#tcgen05-instructions-tcgen05-cp>\`__.` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1028** `    This Operation corresponds to the \`\`.64x128b\`\` qualifier with \`\`.warpx2::02_13\`\` broadcast qualifier enabled.` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1029** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1030** `    SMEM to TMEM copy operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1031** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1032** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1033** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1034** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1035** `        # CORRECT: SMEM to TMEM copy without elect_one` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1036** `        cute.copy(` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1037** `            s2t_atom,` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1038** `            smem_tensor,` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1039** `            tmem_tensor,` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1040** `        )` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1041** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1042** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1043** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1044** `            cute.copy(s2t_atom, smem_tensor, tmem_tensor)` — **EN:** Continues the docstring for the class `Cp2x64x128b0213Op`. **CN:** 继续说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1045** `    """` — **EN:** Ends the docstring for the class `Cp2x64x128b0213Op`. **CN:** 结束说明 class `Cp2x64x128b0213Op` 的文档字符串。
+- **L1046** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1047** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1048** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1049** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1050** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1051** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1052** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1053** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1054** `    ) -> "Cp2x64x128b0213Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1055** `        ty = _cute_nvgpu_ir.CopyAtomSM100CopyS2TType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1056** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1057** `            64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1058** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1059** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1060** `            _cute_nvgpu_ir.CopyS2TBroadcast.lw_0213,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1061** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1062** `        return Cp2x64x128b0213Trait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1063** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1064** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1065** `class Cp2x64x128b0213Trait(Trait):` — **EN:** Defines class `Cp2x64x128b0213Trait` with bases Trait. **CN:** 定义类 `Cp2x64x128b0213Trait`，其基类为 Trait。
+- **L1066** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1067** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1068** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1069** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1070** `class Cp2x64x128b0123Op(_S2TCopyBase):` — **EN:** Defines class `Cp2x64x128b0123Op` with bases _S2TCopyBase. **CN:** 定义类 `Cp2x64x128b0123Op`，其基类为 _S2TCopyBase。
+- **L1071** `    """` — **EN:** Starts the docstring for the class `Cp2x64x128b0123Op`. **CN:** 开始说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1072** `    64x128b SMEM to TMEM Copy Operation.` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1073** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1074** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html?highlight=tcgen05#tcgen05-instructions-tcgen05-cp>\`__.` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1075** `    This Operation corresponds to the \`\`.64x128b\`\` qualifier with \`\`.warpx2::01_23\`\` broadcast qualifier enabled.` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1076** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1077** `    SMEM to TMEM copy operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1078** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1079** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1080** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1081** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1082** `        # CORRECT: SMEM to TMEM copy without elect_one` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1083** `        cute.copy(` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1084** `            s2t_atom,` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1085** `            smem_tensor,` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1086** `            tmem_tensor,` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1087** `        )` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1088** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1089** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1090** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1091** `            cute.copy(s2t_atom, smem_tensor, tmem_tensor)` — **EN:** Continues the docstring for the class `Cp2x64x128b0123Op`. **CN:** 继续说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1092** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1093** `    """` — **EN:** Ends the docstring for the class `Cp2x64x128b0123Op`. **CN:** 结束说明 class `Cp2x64x128b0123Op` 的文档字符串。
+- **L1094** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1095** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1096** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1097** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1098** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1099** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1100** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1101** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1102** `    ) -> "Cp2x64x128b0123Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1103** `        ty = _cute_nvgpu_ir.CopyAtomSM100CopyS2TType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1104** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1105** `            64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1106** `            128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1107** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1108** `            _cute_nvgpu_ir.CopyS2TBroadcast.lw_0123,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1109** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1110** `        return Cp2x64x128b0123Trait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1113** `class Cp2x64x128b0123Trait(Trait):` — **EN:** Defines class `Cp2x64x128b0123Trait` with bases Trait. **CN:** 定义类 `Cp2x64x128b0123Trait`，其基类为 Trait。
+- **L1114** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.nvgpu.tcgen05.copy`. CN: 模块名为 `CuTeDSL.cutlass.cute.nvgpu.tcgen05.copy`。
+- EN: Top-level classes: TmemLoadRedOp, Repetition, Pack, Unpack, _LdBase, Ld16x64bOp, Ld16x64bTrait, Ld16x128bOp, Ld16x128bTrait, Ld16x256bOp, Ld16x256bTrait, Ld16x32bx2Op, ... (+31 more) CN: 顶层类包括：TmemLoadRedOp, Repetition, Pack, Unpack, _LdBase, Ld16x64bOp, Ld16x64bTrait, Ld16x128bOp, Ld16x128bTrait, Ld16x256bOp, Ld16x256bTrait, Ld16x32bx2Op, ... (+31 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL, cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir:ir, ..common:OpError, ...atom:CopyOp,Trait,make_atom, ...typing:Numeric, .mma:CtaGroup CN: 内部依赖：cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL, cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir:ir, ..common:OpError, ...atom:CopyOp,Trait,make_atom, ...typing:Numeric, .mma:CtaGroup
+- EN: External or standard-library dependencies: enum, dataclasses:dataclass, typing:Any,Optional,Type CN: 外部或标准库依赖：enum, dataclasses:dataclass, typing:Any,Optional,Type

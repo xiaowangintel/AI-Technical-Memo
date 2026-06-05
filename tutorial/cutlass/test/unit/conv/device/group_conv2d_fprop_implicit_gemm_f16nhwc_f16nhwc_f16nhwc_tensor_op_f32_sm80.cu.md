@@ -1,0 +1,1560 @@
+# group_conv2d_fprop_implicit_gemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_sm80.cu — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device/group_conv2d_fprop_implicit_gemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_sm80.cu`
+**Purpose / 用途**: Tests for device-wide Implicit GEMM interface. The file instantiates and runs tests for 2D, forward-propagation, SM80, with concrete type aliases and builders declared in the source. / 该文件为设备级隐式 GEMM 卷积内核提供测试覆盖。 这里针对 2 维、前向传播、SM80 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief Tests for device-wide Implicit GEMM interface`
+  - **EN**: Records the file-level brief description: Tests for device-wide Implicit GEMM interface.
+  - **CN**: 记录文件级简述：Tests for device-wide Implicit GEMM interface。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L35** `#include "../../common/cutlass_unit_test.h"`
+  - **EN**: Shared CUTLASS unit-test harness used by older convolution tests.
+  - **CN**: 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- **L36** `#include "cutlass/cutlass.h"`
+  - **EN**: Core CUTLASS definitions, architecture tags, and status types.
+  - **CN**: CUTLASS 核心定义、架构标签和状态类型。
+- **L37** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L38** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L39** `#include "cutlass/conv/kernel/default_conv2d_group_fprop.h"`
+  - **EN**: Kernel-level convolution building blocks.
+  - **CN**: 内核级卷积构建模块。
+- **L40** `#include "cutlass/conv/device/implicit_gemm_convolution.h"`
+  - **EN**: Device-level wrapper that launches convolution kernels expressed as implicit GEMM.
+  - **CN**: 将隐式 GEMM 卷积内核封装为设备级调用接口的包装器。
+- **L41** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L42** `#include "conv2d_testbed.h"`
+  - **EN**: Conv2d testbed helpers that generate problem sizes and verify results.
+  - **CN**: 用于生成问题规模并校验结果的 Conv2d 测试平台辅助工具。
+- **L43** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L44** `#if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`
+  - **EN**: Starts a compile-time conditional block guarded by `defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`.
+  - **CN**: 开始由 `defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)` 保护的编译期条件块。
+- **L45** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L46** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L47** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L48** `TEST(SM80_Device_Conv2d_Group_Fprop_Analytic_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L49** `  SingleGroupPerCTA_128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L50** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L52** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L53** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L54** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L55** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L56** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L57** `  using ThreadblockShape   = cutlass::gemm::GemmShape<128, 128, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L58** `  using WarpShape          = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L59** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L60** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L61** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L62** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L63** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L64** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L65** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L66** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L67** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L68** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L69** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L70** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L71** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L72** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L73** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L74** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L75** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L77** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L78** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L79** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L80** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L81** `    cutlass::conv::GroupMode::kSingleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L82** `    cutlass::conv::IteratorAlgorithm::kAnalytic`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L83** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L84** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L85** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L86** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L87** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L88** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L89** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L90** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L91** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L92** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_single_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L93** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L94** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L95** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L96** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L97** `TEST(SM80_Device_Conv2d_Group_Fprop_Analytic_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L98** `  SingleGroupPerCTA_64x64_64x3_32x32x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L99** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L100** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L102** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L103** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L104** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L105** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L106** `  using ThreadblockShape   = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L107** `  using WarpShape          = cutlass::gemm::GemmShape<32, 32, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L108** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L109** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L110** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L111** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L112** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L113** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L114** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L115** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L116** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L117** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L118** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L119** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L120** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L121** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L122** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L123** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L124** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L125** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L127** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L128** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L129** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L130** `    cutlass::conv::GroupMode::kSingleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L131** `    cutlass::conv::IteratorAlgorithm::kAnalytic`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L132** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L133** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L134** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L135** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L136** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L137** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L138** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L139** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L140** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L141** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_single_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L142** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L143** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L144** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L145** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L146** `TEST(SM80_Device_Conv2d_Group_Fprop_Analytic_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L147** `  MultipleGroupPerCTA_128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L148** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L149** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L150** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L152** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L153** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L154** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L155** `  using ThreadblockShape   = cutlass::gemm::GemmShape<128, 128, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L156** `  using WarpShape          = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L157** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L158** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L159** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L160** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L161** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L162** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L163** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L164** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L165** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L166** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L167** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L168** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L169** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L170** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L171** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L172** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L173** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L174** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L175** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L177** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L178** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L179** `    cutlass::conv::GroupMode::kMultipleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L180** `    cutlass::conv::IteratorAlgorithm::kAnalytic`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L181** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L182** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L183** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L184** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L185** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L186** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L187** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L188** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L189** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L190** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_multiple_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L191** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L192** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L193** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L194** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L195** `TEST(SM80_Device_Conv2d_Group_Fprop_Analytic_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L196** `  MutipleGroupPerCTA_64x64_64x3_32x32x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L197** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L198** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L199** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L200** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L202** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L203** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L204** `  using ThreadblockShape   = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L205** `  using WarpShape          = cutlass::gemm::GemmShape<32, 32, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L206** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L207** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L208** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L209** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L210** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L211** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L212** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L213** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L214** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L215** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L216** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L217** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L218** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L219** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L220** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L221** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L222** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L223** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L224** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L225** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L227** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L228** `    cutlass::conv::GroupMode::kMultipleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L229** `    cutlass::conv::IteratorAlgorithm::kAnalytic`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L230** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L231** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L232** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L233** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L234** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L235** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L236** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L237** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L238** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L239** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_multiple_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L240** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L241** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L242** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L243** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L244** `// Analytic 2 stage SingleGroup kernel`
+  - **EN**: Comment explaining: Analytic 2 stage SingleGroup kernel.
+  - **CN**: 说明性注释：Analytic 2 stage SingleGroup kernel。
+- **L245** `TEST(SM80_Device_Conv2d_Group_Fprop_Analytic_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L246** `  SingleGroupPerCTA_128x128_64x2_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L247** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L248** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L249** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L250** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L252** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L253** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L254** `  using ThreadblockShape   = cutlass::gemm::GemmShape<128, 128, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L255** `  using WarpShape          = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L256** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L257** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L258** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L259** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L260** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L261** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L262** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L263** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L264** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L265** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L266** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L267** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L268** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L269** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L270** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L271** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L272** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L273** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L274** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L275** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 276-300 / 第276-300行
+
+- **L276** `    2,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L277** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L278** `    cutlass::conv::GroupMode::kSingleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L279** `    cutlass::conv::IteratorAlgorithm::kAnalytic`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L280** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L281** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L282** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L283** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L284** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L285** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L286** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L287** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L288** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L289** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_single_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L290** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L291** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L292** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L293** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L294** `// Analytic 2 stage MutipleGroup kernel`
+  - **EN**: Comment explaining: Analytic 2 stage MutipleGroup kernel.
+  - **CN**: 说明性注释：Analytic 2 stage MutipleGroup kernel。
+- **L295** `TEST(SM80_Device_Conv2d_Group_Fprop_Analytic_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L296** `  MutipleGroupPerCTA_64x64_64x2_32x32x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L297** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L298** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L299** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L300** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 301-325 / 第301-325行
+
+- **L301** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L302** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L303** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L304** `  using ThreadblockShape   = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L305** `  using WarpShape          = cutlass::gemm::GemmShape<32, 32, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L306** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L307** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L308** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L309** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L310** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L311** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L312** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L313** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L314** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L315** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L316** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L317** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L318** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L319** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L320** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L321** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L322** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L323** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L324** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L325** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 326-350 / 第326-350行
+
+- **L326** `    2,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L327** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L328** `    cutlass::conv::GroupMode::kMultipleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L329** `    cutlass::conv::IteratorAlgorithm::kAnalytic`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L330** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L331** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L332** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L333** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L334** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L335** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L336** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L337** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L338** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L339** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_multiple_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L340** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L341** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L342** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L343** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L344** `TEST(SM80_Device_Conv2d_Group_Fprop_Optimized_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L345** `  SingleGroupPerCTA_128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L346** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L347** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L348** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L349** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L350** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 351-375 / 第351-375行
+
+- **L351** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L352** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L353** `  using ThreadblockShape   = cutlass::gemm::GemmShape<128, 128, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L354** `  using WarpShape          = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L355** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L356** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L357** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L358** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L359** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L360** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L361** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L362** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L363** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L364** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L365** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L366** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L367** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L368** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L369** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L370** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L371** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L372** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L373** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L374** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L375** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 376-400 / 第376-400行
+
+- **L376** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L377** `    cutlass::conv::GroupMode::kSingleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L378** `    cutlass::conv::IteratorAlgorithm::kOptimized`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L379** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L380** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L381** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L382** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L383** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L384** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L385** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L386** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L387** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L388** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_single_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L389** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L390** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L391** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L392** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L393** `// Optimized multistage singleGroup kernel`
+  - **EN**: Comment explaining: Optimized multistage singleGroup kernel.
+  - **CN**: 说明性注释：Optimized multistage singleGroup kernel。
+- **L394** `TEST(SM80_Device_Conv2d_Group_Fprop_Optimized_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L395** `  SingleGroupPerCTA_64x64_64x3_32x32x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L396** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L397** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L398** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L399** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L400** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 401-425 / 第401-425行
+
+- **L401** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L402** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L403** `  using ThreadblockShape   = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L404** `  using WarpShape          = cutlass::gemm::GemmShape<32, 32, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L405** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L406** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L407** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L408** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L409** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L410** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L411** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L412** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L413** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L414** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L415** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L416** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L417** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L418** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L419** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L420** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L421** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L422** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L423** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L424** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L425** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 426-450 / 第426-450行
+
+- **L426** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L427** `    cutlass::conv::GroupMode::kSingleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L428** `    cutlass::conv::IteratorAlgorithm::kOptimized`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L429** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L430** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L431** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L432** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L433** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L434** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L435** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L436** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L437** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L438** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_single_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L439** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L440** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L441** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L442** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L443** `// Optimized 2 stage SingleGroup kernel`
+  - **EN**: Comment explaining: Optimized 2 stage SingleGroup kernel.
+  - **CN**: 说明性注释：Optimized 2 stage SingleGroup kernel。
+- **L444** `TEST(SM80_Device_Conv2d_Group_Fprop_Optimized_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L445** `  SingleGroupPerCTA_64x64_64x2_32x32x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L446** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L447** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L448** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L449** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L450** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 451-475 / 第451-475行
+
+- **L451** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L452** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L453** `  using ThreadblockShape   = cutlass::gemm::GemmShape<64, 64, 64>;`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L454** `  using WarpShape          = cutlass::gemm::GemmShape<32, 32, 64>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L455** `  using InstructionShape   = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L456** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L457** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L458** `  using Conv2dGroupFpropKernel = typename cutlass::conv::kernel::DefaultConv2dGroupFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dGroupFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dGroupFpropKernel`，形成具体卷积内核。
+- **L459** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L460** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L461** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dGroupFpropKernel`.
+  - **CN**: 设置 `Conv2dGroupFpropKernel` 使用的一个张量布局。
+- **L462** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L463** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择张量核心指令类别。
+- **L464** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 指定目标 GPU 架构。
+- **L465** `    ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L466** `    WarpShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L467** `    InstructionShape,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L468** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dGroupFpropKernel`.
+  - **CN**: 在 `Conv2dGroupFpropKernel` 中开始定义 epilogue 输出算子。
+- **L469** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L470** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L471** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L472** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L473** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L474** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L475** `    2,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+
+### Lines 476-495 / 第476-495行
+
+- **L476** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L477** `    cutlass::conv::GroupMode::kSingleGroup,`
+  - **EN**: Continues supplying template arguments for `Conv2dGroupFpropKernel`.
+  - **CN**: 继续为 `Conv2dGroupFpropKernel` 提供模板参数。
+- **L478** `    cutlass::conv::IteratorAlgorithm::kOptimized`
+  - **EN**: Selects the iterator algorithm used by `Conv2dGroupFpropKernel`.
+  - **CN**: 为 `Conv2dGroupFpropKernel` 选择使用的迭代器算法。
+- **L479** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dGroupFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dGroupFpropKernel` 最终确定为选定的内核类型。
+- **L480** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L481** `  using Conv2dGroupFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dGroupFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dGroupFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dGroupFprop`。
+- **L482** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L483** `  /// Run group conv unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run group conv unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run group conv unit test sizes with device-level Conv2d instance。
+- **L484** `  test::conv::device::TestbedGroupConv2dProblemSizes problem_sizes(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L485** `    ThreadblockShape::kN, ThreadblockShape::kK,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L486** `    128/cutlass::sizeof_bits<ElementA>::value`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L487** `  );`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L488** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dGroupFprop>(problem_sizes.default_single_group_sizes));`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L489** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L490** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L491** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L492** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L493** `#endif  // CUTLASS_ARCH_MMA_SM80_SUPPORTED`
+  - **EN**: Ends the current compile-time conditional block.
+  - **CN**: 结束当前编译期条件块。
+- **L494** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L495** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+## Key Concepts / 关键概念
+- GoogleTest test cases encode each kernel variant as a compile-time instantiation that is exercised by a shared testbed. / GoogleTest 用例将每个内核变体编码为编译期实例化，并交由共享测试平台执行。
+- Legacy convolution tests rely on default kernel builders and the `ImplicitGemmConvolution` device wrapper. / 旧版卷积测试依赖默认内核构建器以及 `ImplicitGemmConvolution` 设备包装器。
+## Dependencies / 依赖项
+- `../../common/cutlass_unit_test.h` — Shared CUTLASS unit-test harness used by older convolution tests. / 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- `cutlass/cutlass.h` — Core CUTLASS definitions, architecture tags, and status types. / CUTLASS 核心定义、架构标签和状态类型。
+- `cutlass/conv/kernel/default_conv2d_group_fprop.h` — Kernel-level convolution building blocks. / 内核级卷积构建模块。
+- `cutlass/conv/device/implicit_gemm_convolution.h` — Device-level wrapper that launches convolution kernels expressed as implicit GEMM. / 将隐式 GEMM 卷积内核封装为设备级调用接口的包装器。
+- `conv2d_testbed.h` — Conv2d testbed helpers that generate problem sizes and verify results. / 用于生成问题规模并校验结果的 Conv2d 测试平台辅助工具。

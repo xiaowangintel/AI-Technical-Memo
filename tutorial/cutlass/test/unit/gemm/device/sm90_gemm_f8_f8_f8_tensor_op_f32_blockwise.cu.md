@@ -1,0 +1,962 @@
+# sm90_gemm_f8_f8_f8_tensor_op_f32_blockwise.cu — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/sm90_gemm_f8_f8_f8_tensor_op_f32_blockwise.cu`
+- 中文：`test/unit/gemm/device/sm90_gemm_f8_f8_f8_tensor_op_f32_blockwise.cu`
+
+## Purpose / 目的
+- EN: This file contains tests for device-wide gemm interface tailored to the configuration encoded in `sm90_gemm_f8_f8_f8_tensor_op_f32_blockwise`. The file-level brief is: "Tests for device-wide GEMM interface."
+- 中文：该文件包含针对 `sm90_gemm_f8_f8_f8_tensor_op_f32_blockwise` 配置定制的 CUTLASS GEMM 测试。 文件级摘要为：“设备级 GEMM 接口测试”。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L32** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L33** `    \brief Tests for device-wide GEMM interface`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L34** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L35** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L36** `#include <iostream>`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- **L37** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L38** `#include <thrust/universal_vector.h>`
+  - EN: Includes `thrust/universal_vector.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `thrust/universal_vector.h`，这是该测试编译单元所需的依赖。
+- **L39** `#include <thrust/generate.h>`
+  - EN: Includes `thrust/generate.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `thrust/generate.h`，这是该测试编译单元所需的依赖。
+- **L40** `#include <thrust/random.h>`
+  - EN: Includes `thrust/random.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `thrust/random.h`，这是该测试编译单元所需的依赖。
+- **L41** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L42** `#include "cutlass/cutlass.h"`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- **L43** `#include "cute/tensor.hpp"`
+  - EN: Provides CUTE tensor abstractions used to describe tiled tensor layouts.
+  - 中文：提供 CUTE 张量抽象，用于描述分块张量布局。
+- **L44** `#include "cute/atom/mma_atom.hpp"`
+  - EN: Provides CUTE MMA atom definitions used to model tensor-core operations.
+  - 中文：提供 CUTE MMA 原子定义，用于描述 Tensor Core 运算。
+- **L45** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L46** `#include "cutlass/numeric_types.h"`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- **L47** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L48** `#include "cutlass/gemm/device/gemm_universal_adapter.h"`
+  - EN: Provides the universal adapter that wraps a CUTLASS 3.x GEMM kernel for launch.
+  - 中文：提供通用适配器，用于封装并启动 CUTLASS 3.x GEMM 内核。
+- **L49** `#include "cutlass/gemm/kernel/gemm_universal.hpp"`
+  - EN: Defines the universal GEMM kernel composition used by modern CUTLASS tests.
+  - 中文：定义现代 CUTLASS 测试使用的通用 GEMM 内核组合。
+- **L50** `#include "cutlass/gemm/collective/collective_builder.hpp"`
+  - EN: Builds the GEMM mainloop collective from architecture, tile, and datatype parameters.
+  - 中文：根据架构、tile 和数据类型参数构建 GEMM 主循环 collective。
+- **L51** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L52** `#include "cutlass/epilogue/dispatch_policy.hpp"`
+  - EN: Defines epilogue scheduling policy tags used by collective builders.
+  - 中文：定义 collective builder 使用的 epilogue 调度策略标签。
+- **L53** `#include "cutlass/epilogue/collective/collective_builder.hpp"`
+  - EN: Builds the epilogue collective that writes GEMM results to memory.
+  - 中文：构建将 GEMM 结果写回内存的 epilogue collective。
+- **L54** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L55** `#include "cutlass/epilogue/thread/activation.h"`
+  - EN: Declares activation operators that can be fused into the epilogue.
+  - 中文：声明可融合到 epilogue 中的激活算子。
+- **L56** `#include "../../common/cutlass_unit_test.h"`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- **L57** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L58** `#include "cutlass/util/packed_stride.hpp"`
+  - EN: Includes `cutlass/util/packed_stride.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/packed_stride.hpp`，这是该测试编译单元所需的依赖。
+- **L59** `#include "cutlass/util/reference/host/gett.hpp"`
+  - EN: Includes `cutlass/util/reference/host/gett.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/reference/host/gett.hpp`，这是该测试编译单元所需的依赖。
+- **L60** `#include "cutlass/util/device_memory.h"`
+  - EN: Includes `cutlass/util/device_memory.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/device_memory.h`，这是该测试编译单元所需的依赖。
+- **L61** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L62** `using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L63** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L64** `#if defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Begins a conditional-compilation region guarded by `defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`.
+  - 中文：开始一个由 `defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)` 控制的条件编译区域。
+- **L65** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L66** `template<cute::GMMA::Major SFAMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L67** `         cute::GMMA::Major SFBMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L68** `         int ScaleGranularityM,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L69** `         int ScaleGranularityN,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L70** `         int ScaleGranularityK,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L71** `         class LayoutA,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L72** `         class LayoutB,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L73** `         class LayoutCD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L74** `         class MmaTileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L75** `         class ClusterShape>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L76** `bool groupwise_test(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L77** `    Int<ScaleGranularityM>, Int<ScaleGranularityN>, Int<ScaleGranularityK>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L78** `    LayoutA, LayoutB, LayoutCD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L79** `    MmaTileShape, ClusterShape) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L80** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L81** `  using ScaleConfig = cutlass::detail::Sm90BlockwiseScaleConfig<ScaleGranularityM, ScaleGranularityN, ScaleGranularityK, SFAMajor, SFBMajor>;`
+  - EN: Creates the alias `ScaleConfig` for the helper type `cutlass::detail::Sm90BlockwiseScaleConfig<ScaleGranularityM, ScaleGranularityN, ScaleGranularityK, SFAMajor, SFBMajor>`.
+  - 中文：为 `ScaleConfig` 创建别名，对应 辅助类型 `cutlass::detail::Sm90BlockwiseScaleConfig<ScaleGranularityM, ScaleGranularityN, ScaleGranularityK, SFAMajor, SFBMajor>`。
+- **L82** `  using LayoutSFA             = decltype(ScaleConfig::deduce_layoutSFA());                     // Layout type for SFA matrix operand`
+  - EN: Creates the alias `LayoutSFA` for the helper type `decltype(ScaleConfig::deduce_layoutSFA())`. The inline comment documents: Layout type for SFA matrix operand.
+  - 中文：为 `LayoutSFA` 创建别名，对应 辅助类型 `decltype(ScaleConfig::deduce_layoutSFA())`。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L83** `  using LayoutSFB             = decltype(ScaleConfig::deduce_layoutSFB());                     // Layout type for SFB matrix operand`
+  - EN: Creates the alias `LayoutSFB` for the helper type `decltype(ScaleConfig::deduce_layoutSFB())`. The inline comment documents: Layout type for SFB matrix operand.
+  - 中文：为 `LayoutSFB` 创建别名，对应 辅助类型 `decltype(ScaleConfig::deduce_layoutSFB())`。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L84** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L85** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L86** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L87** `      MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L88** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L89** `      float, float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L90** `      cutlass::float_e4m3_t, LayoutCD, 16,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L91** `      cutlass::float_e4m3_t, LayoutCD, 16,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L92** `      cutlass::epilogue::TmaWarpSpecializedCooperative`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L93** `    >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L94** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L95** `  using CollectiveMainloop =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L96** `    typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM mainloop.
+  - 中文：开始实例化用于 GEMM 主循环的 collective builder。
+- **L97** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L98** `      cutlass::float_e4m3_t, cute::tuple<LayoutA, LayoutSFA>, 16,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L99** `      cutlass::float_e4m3_t, cute::tuple<LayoutB, LayoutSFB>, 16,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L100** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L101** `      MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L102** `      cutlass::gemm::collective::StageCountAutoCarveout<sizeof(typename CollectiveEpilogue::SharedStorage)>,`
+  - EN: Supplies the stage-count policy for pipeline buffering.
+  - 中文：提供流水线缓冲使用的阶段数策略。
+- **L103** `      cutlass::gemm::KernelTmaWarpSpecializedCooperativeFP8BlockScaledAccum`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L104** `    >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L105** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L106** `  using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L107** `      cute::Shape<int,int,int,int>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L108** `      CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L109** `      CollectiveEpilogue>;`
+  - EN: Completes the statement `CollectiveEpilogue>;`.
+  - 中文：完成语句 `CollectiveEpilogue>;`。
+- **L110** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L111** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L112** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L113** `  using StrideA = typename Gemm::GemmKernel::StrideA;`
+  - EN: Creates the alias `StrideA` for the helper type `typename Gemm::GemmKernel::StrideA`.
+  - 中文：为 `StrideA` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::StrideA`。
+- **L114** `  using StrideB = typename Gemm::GemmKernel::StrideB;`
+  - EN: Creates the alias `StrideB` for the helper type `typename Gemm::GemmKernel::StrideB`.
+  - 中文：为 `StrideB` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::StrideB`。
+- **L115** `  using StrideC = typename Gemm::GemmKernel::StrideC;`
+  - EN: Creates the alias `StrideC` for the helper type `typename Gemm::GemmKernel::StrideC`.
+  - 中文：为 `StrideC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::StrideC`。
+- **L116** `  using StrideD = typename Gemm::GemmKernel::StrideD;`
+  - EN: Creates the alias `StrideD` for the helper type `typename Gemm::GemmKernel::StrideD`.
+  - 中文：为 `StrideD` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::StrideD`。
+- **L117** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L118** `  /// Initialization`
+  - EN: Adds a human-readable comment for the next code region: / Initialization.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Initialization。
+- **L119** `  StrideA stride_A;`
+  - EN: Completes the statement `StrideA stride_A;`.
+  - 中文：完成语句 `StrideA stride_A;`。
+- **L120** `  StrideB stride_B;`
+  - EN: Completes the statement `StrideB stride_B;`.
+  - 中文：完成语句 `StrideB stride_B;`。
+- **L121** `  StrideC stride_C;`
+  - EN: Completes the statement `StrideC stride_C;`.
+  - 中文：完成语句 `StrideC stride_C;`。
+- **L122** `  StrideD stride_D;`
+  - EN: Completes the statement `StrideD stride_D;`.
+  - 中文：完成语句 `StrideD stride_D;`。
+- **L123** `  // Strides just iterate over scalars and have no zeros`
+  - EN: Adds a human-readable comment for the next code region: Strides just iterate over scalars and have no zeros.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Strides just iterate over scalars and have no zeros。
+- **L124** `  LayoutSFA layout_SFA;`
+  - EN: Completes the statement `LayoutSFA layout_SFA;`.
+  - 中文：完成语句 `LayoutSFA layout_SFA;`。
+- **L125** `  LayoutSFB layout_SFB;`
+  - EN: Completes the statement `LayoutSFB layout_SFB;`.
+  - 中文：完成语句 `LayoutSFB layout_SFB;`。
+- **L126** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L127** `  int alignment_M = max(max((is_same_v<LayoutA, cutlass::layout::ColumnMajor> ? 16 : 1) , `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L128** `                            (SFAMajor == cute::GMMA::Major::MN ? CollectiveMainloop::AlignmentSFA : 1)),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L129** `                        (is_same_v<LayoutCD, cutlass::layout::ColumnMajor> ? 16 : 1));`
+  - EN: Completes the statement `(is_same_v<LayoutCD, cutlass::layout::ColumnMajor> ? 16 : 1));`.
+  - 中文：完成语句 `(is_same_v<LayoutCD, cutlass::layout::ColumnMajor> ? 16 : 1));`。
+- **L130** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L131** `  int alignment_N = max(max((is_same_v<LayoutB, cutlass::layout::RowMajor> ? 16 : 1) , `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L132** `                            (SFBMajor == cute::GMMA::Major::MN ? CollectiveMainloop::AlignmentSFB : 1)),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L133** `                         (is_same_v<LayoutCD, cutlass::layout::RowMajor> ? 16 : 1));`
+  - EN: Completes the statement `(is_same_v<LayoutCD, cutlass::layout::RowMajor> ? 16 : 1));`.
+  - 中文：完成语句 `(is_same_v<LayoutCD, cutlass::layout::RowMajor> ? 16 : 1));`。
+- **L134** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L135** `  int alignment_K = max(max((is_same_v<LayoutA, cutlass::layout::RowMajor> ? 16 : 1) , `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L136** `                            (SFAMajor == cute::GMMA::Major::K ? CollectiveMainloop::AlignmentSFA : 1)),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L137** `                        max((is_same_v<LayoutB, cutlass::layout::ColumnMajor> ? 16 : 1) , `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L138** `                            (SFBMajor == cute::GMMA::Major::K ? CollectiveMainloop::AlignmentSFB : 1)));`
+  - EN: Completes the statement `(SFBMajor == cute::GMMA::Major::K ? CollectiveMainloop::AlignmentSFB : 1)));`.
+  - 中文：完成语句 `(SFBMajor == cute::GMMA::Major::K ? CollectiveMainloop::AlignmentSFB : 1)));`。
+- **L139** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L140** `  alignment_K = (alignment_K / size<2>(MmaTileShape{}) + 1) * size<2>(MmaTileShape{});`
+  - EN: Completes the statement `alignment_K = (alignment_K / size<2>(MmaTileShape{}) + 1) * size<2>(MmaTileShape{});`.
+  - 中文：完成语句 `alignment_K = (alignment_K / size<2>(MmaTileShape{}) + 1) * size<2>(MmaTileShape{});`。
+- **L141** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L142** `  int M = 1024 + alignment_M;`
+  - EN: Completes the statement `int M = 1024 + alignment_M;`.
+  - 中文：完成语句 `int M = 1024 + alignment_M;`。
+- **L143** `  int N = 1024 + alignment_N;`
+  - EN: Completes the statement `int N = 1024 + alignment_N;`.
+  - 中文：完成语句 `int N = 1024 + alignment_N;`。
+- **L144** `  int K = 512  + alignment_K;`
+  - EN: Completes the statement `int K = 512  + alignment_K;`.
+  - 中文：完成语句 `int K = 512  + alignment_K;`。
+- **L145** `  EXPECT_TRUE(M % alignment_M == 0);`
+  - EN: Checks that `M % alignment_M == 0` evaluates to true, marking the test as passed.
+  - 中文：检查 `M % alignment_M == 0` 的结果是否为真，以判定测试通过。
+- **L146** `  EXPECT_TRUE(N % alignment_N == 0);`
+  - EN: Checks that `N % alignment_N == 0` evaluates to true, marking the test as passed.
+  - 中文：检查 `N % alignment_N == 0` 的结果是否为真，以判定测试通过。
+- **L147** `  EXPECT_TRUE(K % alignment_K == 0);`
+  - EN: Checks that `K % alignment_K == 0` evaluates to true, marking the test as passed.
+  - 中文：检查 `K % alignment_K == 0` 的结果是否为真，以判定测试通过。
+- **L148** `  EXPECT_TRUE(K % size<2>(MmaTileShape{}) == 0);`
+  - EN: Checks that `K % size<2>(MmaTileShape{}) == 0` evaluates to true, marking the test as passed.
+  - 中文：检查 `K % size<2>(MmaTileShape{}) == 0` 的结果是否为真，以判定测试通过。
+- **L149** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L150** `  stride_A = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, 1));`
+  - EN: Completes the statement `stride_A = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, 1));`.
+  - 中文：完成语句 `stride_A = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, 1));`。
+- **L151** `  stride_B = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, 1));`
+  - EN: Completes the statement `stride_B = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, 1));`.
+  - 中文：完成语句 `stride_B = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, 1));`。
+- **L152** `  stride_C = cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, 1));`
+  - EN: Completes the statement `stride_C = cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, 1));`.
+  - 中文：完成语句 `stride_C = cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, 1));`。
+- **L153** `  stride_D = cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, 1));`
+  - EN: Completes the statement `stride_D = cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, 1));`.
+  - 中文：完成语句 `stride_D = cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, 1));`。
+- **L154** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L155** `  layout_SFA = ScaleConfig::tile_atom_to_shape_SFA(make_shape(M, N, K, 1));`
+  - EN: Completes the statement `layout_SFA = ScaleConfig::tile_atom_to_shape_SFA(make_shape(M, N, K, 1));`.
+  - 中文：完成语句 `layout_SFA = ScaleConfig::tile_atom_to_shape_SFA(make_shape(M, N, K, 1));`。
+- **L156** `  layout_SFB = ScaleConfig::tile_atom_to_shape_SFB(make_shape(M, N, K, 1));`
+  - EN: Completes the statement `layout_SFB = ScaleConfig::tile_atom_to_shape_SFB(make_shape(M, N, K, 1));`.
+  - 中文：完成语句 `layout_SFB = ScaleConfig::tile_atom_to_shape_SFB(make_shape(M, N, K, 1));`。
+- **L157** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L158** `  thrust::universal_vector<cutlass::float_e4m3_t> tensor_A(M * K);`
+  - EN: Completes the statement `thrust::universal_vector<cutlass::float_e4m3_t> tensor_A(M * K);`.
+  - 中文：完成语句 `thrust::universal_vector<cutlass::float_e4m3_t> tensor_A(M * K);`。
+- **L159** `  thrust::universal_vector<float> tensor_SFA(cute::size(cute::filter_zeros(layout_SFA)));`
+  - EN: Completes the statement `thrust::universal_vector<float> tensor_SFA(cute::size(cute::filter_zeros(layout_SFA)));`.
+  - 中文：完成语句 `thrust::universal_vector<float> tensor_SFA(cute::size(cute::filter_zeros(layout_SFA)));`。
+- **L160** `  thrust::universal_vector<cutlass::float_e4m3_t> tensor_B(N * K);`
+  - EN: Completes the statement `thrust::universal_vector<cutlass::float_e4m3_t> tensor_B(N * K);`.
+  - 中文：完成语句 `thrust::universal_vector<cutlass::float_e4m3_t> tensor_B(N * K);`。
+- **L161** `  thrust::universal_vector<float> tensor_SFB(cute::size(cute::filter_zeros(layout_SFB)));`
+  - EN: Completes the statement `thrust::universal_vector<float> tensor_SFB(cute::size(cute::filter_zeros(layout_SFB)));`.
+  - 中文：完成语句 `thrust::universal_vector<float> tensor_SFB(cute::size(cute::filter_zeros(layout_SFB)));`。
+- **L162** `  thrust::universal_vector<cutlass::float_e4m3_t> tensor_C(M * N);`
+  - EN: Completes the statement `thrust::universal_vector<cutlass::float_e4m3_t> tensor_C(M * N);`.
+  - 中文：完成语句 `thrust::universal_vector<cutlass::float_e4m3_t> tensor_C(M * N);`。
+- **L163** `  thrust::universal_vector<cutlass::float_e4m3_t> tensor_D(M * N);`
+  - EN: Completes the statement `thrust::universal_vector<cutlass::float_e4m3_t> tensor_D(M * N);`.
+  - 中文：完成语句 `thrust::universal_vector<cutlass::float_e4m3_t> tensor_D(M * N);`。
+- **L164** `  thrust::universal_vector<cutlass::float_e4m3_t> tensor_ref_D(M * N);`
+  - EN: Completes the statement `thrust::universal_vector<cutlass::float_e4m3_t> tensor_ref_D(M * N);`.
+  - 中文：完成语句 `thrust::universal_vector<cutlass::float_e4m3_t> tensor_ref_D(M * N);`。
+- **L165** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L166** `  thrust::random::default_random_engine engine(2025);`
+  - EN: Completes the statement `thrust::random::default_random_engine engine(2025);`.
+  - 中文：完成语句 `thrust::random::default_random_engine engine(2025);`。
+- **L167** `  thrust::random::uniform_int_distribution<int> dist(-2, 2);`
+  - EN: Completes the statement `thrust::random::uniform_int_distribution<int> dist(-2, 2);`.
+  - 中文：完成语句 `thrust::random::uniform_int_distribution<int> dist(-2, 2);`。
+- **L168** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L169** `  std::generate(tensor_A.begin(), tensor_A.end(), [&] () {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L170** `    return static_cast<cutlass::float_e4m3_t>(dist(engine));`
+  - EN: Completes the statement `return static_cast<cutlass::float_e4m3_t>(dist(engine));`.
+  - 中文：完成语句 `return static_cast<cutlass::float_e4m3_t>(dist(engine));`。
+- **L171** `  });`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L172** `  std::generate(tensor_SFA.begin(), tensor_SFA.end(), [&] () {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L173** `    return static_cast<float>(dist(engine));`
+  - EN: Completes the statement `return static_cast<float>(dist(engine));`.
+  - 中文：完成语句 `return static_cast<float>(dist(engine));`。
+- **L174** `  });`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L175** `  std::generate(tensor_B.begin(), tensor_B.end(), [&] () {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L176** `    return static_cast<cutlass::float_e4m3_t>(dist(engine));`
+  - EN: Completes the statement `return static_cast<cutlass::float_e4m3_t>(dist(engine));`.
+  - 中文：完成语句 `return static_cast<cutlass::float_e4m3_t>(dist(engine));`。
+- **L177** `  });`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L178** `  std::generate(tensor_SFB.begin(), tensor_SFB.end(), [&] () {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L179** `    return static_cast<float>(dist(engine));`
+  - EN: Completes the statement `return static_cast<float>(dist(engine));`.
+  - 中文：完成语句 `return static_cast<float>(dist(engine));`。
+- **L180** `  });`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L181** `  std::generate(tensor_C.begin(), tensor_C.end(), [&] () {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L182** `    return static_cast<cutlass::float_e4m3_t>(dist(engine));`
+  - EN: Completes the statement `return static_cast<cutlass::float_e4m3_t>(dist(engine));`.
+  - 中文：完成语句 `return static_cast<cutlass::float_e4m3_t>(dist(engine));`。
+- **L183** `  });`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L184** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L185** `  typename Gemm::Arguments arguments {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L186** `    cutlass::gemm::GemmUniversalMode::kGemm,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L187** `    {M, N, K, 1},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L188** `    {thrust::raw_pointer_cast(tensor_A.data()), stride_A, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L189** `     thrust::raw_pointer_cast(tensor_B.data()), stride_B,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L190** `     thrust::raw_pointer_cast(tensor_SFA.data()), layout_SFA,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L191** `     thrust::raw_pointer_cast(tensor_SFB.data()), layout_SFB},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L192** `    {`
+  - EN: Opens a new scope.
+  - 中文：打开一个新的作用域。
+- **L193** `      {}, // epilogue.thread`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L194** `      thrust::raw_pointer_cast(tensor_C.data()), stride_C,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L195** `      thrust::raw_pointer_cast(tensor_D.data()), stride_D`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L196** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L197** `  };`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L198** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L199** `  auto &fusion_args = arguments.epilogue.thread;`
+  - EN: Completes the statement `auto &fusion_args = arguments.epilogue.thread;`.
+  - 中文：完成语句 `auto &fusion_args = arguments.epilogue.thread;`。
+- **L200** `  fusion_args.alpha = 1.0f;`
+  - EN: Completes the statement `fusion_args.alpha = 1.0f;`.
+  - 中文：完成语句 `fusion_args.alpha = 1.0f;`。
+- **L201** `  fusion_args.beta = 1.0f;`
+  - EN: Completes the statement `fusion_args.beta = 1.0f;`.
+  - 中文：完成语句 `fusion_args.beta = 1.0f;`。
+- **L202** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L203** `  size_t workspace_size = Gemm::get_workspace_size(arguments);`
+  - EN: Completes the statement `size_t workspace_size = Gemm::get_workspace_size(arguments);`.
+  - 中文：完成语句 `size_t workspace_size = Gemm::get_workspace_size(arguments);`。
+- **L204** `  cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`
+  - EN: Completes the statement `cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`.
+  - 中文：完成语句 `cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`。
+- **L205** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L206** `  Gemm gemm;`
+  - EN: Completes the statement `Gemm gemm;`.
+  - 中文：完成语句 `Gemm gemm;`。
+- **L207** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L208** `  EXPECT_TRUE(gemm.can_implement(arguments) == cutlass::Status::kSuccess);`
+  - EN: Checks that `gemm.can_implement(arguments) == cutlass::Status::kSuccess` evaluates to true, marking the test as passed.
+  - 中文：检查 `gemm.can_implement(arguments) == cutlass::Status::kSuccess` 的结果是否为真，以判定测试通过。
+- **L209** `  EXPECT_TRUE(gemm.initialize(arguments, workspace.get()) == cutlass::Status::kSuccess);`
+  - EN: Checks that `gemm.initialize(arguments, workspace.get()) == cutlass::Status::kSuccess` evaluates to true, marking the test as passed.
+  - 中文：检查 `gemm.initialize(arguments, workspace.get()) == cutlass::Status::kSuccess` 的结果是否为真，以判定测试通过。
+- **L210** `  EXPECT_TRUE(gemm.run() == cutlass::Status::kSuccess);`
+  - EN: Checks that `gemm.run() == cutlass::Status::kSuccess` evaluates to true, marking the test as passed.
+  - 中文：检查 `gemm.run() == cutlass::Status::kSuccess` 的结果是否为真，以判定测试通过。
+- **L211** `  EXPECT_TRUE(cudaDeviceSynchronize() == cudaSuccess);`
+  - EN: Checks that `cudaDeviceSynchronize() == cudaSuccess` evaluates to true, marking the test as passed.
+  - 中文：检查 `cudaDeviceSynchronize() == cudaSuccess` 的结果是否为真，以判定测试通过。
+- **L212** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L213** `  auto A = cute::make_tensor(thrust::raw_pointer_cast(tensor_A.data()),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L214** `      cute::make_layout(cute::make_shape(M, K, 1), stride_A));`
+  - EN: Completes the statement `cute::make_layout(cute::make_shape(M, K, 1), stride_A));`.
+  - 中文：完成语句 `cute::make_layout(cute::make_shape(M, K, 1), stride_A));`。
+- **L215** `  auto B = cute::make_tensor(thrust::raw_pointer_cast(tensor_B.data()),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L216** `      cute::make_layout(cute::make_shape(N, K, 1), stride_B));`
+  - EN: Completes the statement `cute::make_layout(cute::make_shape(N, K, 1), stride_B));`.
+  - 中文：完成语句 `cute::make_layout(cute::make_shape(N, K, 1), stride_B));`。
+- **L217** `  auto C = cute::make_tensor(thrust::raw_pointer_cast(tensor_C.data()),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L218** `      cute::make_layout(cute::make_shape(M, N, 1), stride_C));`
+  - EN: Completes the statement `cute::make_layout(cute::make_shape(M, N, 1), stride_C));`.
+  - 中文：完成语句 `cute::make_layout(cute::make_shape(M, N, 1), stride_C));`。
+- **L219** `  auto D = cute::make_tensor(thrust::raw_pointer_cast(tensor_ref_D.data()),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L220** `      cute::make_layout(cute::make_shape(M, N, 1), stride_D));`
+  - EN: Completes the statement `cute::make_layout(cute::make_shape(M, N, 1), stride_D));`.
+  - 中文：完成语句 `cute::make_layout(cute::make_shape(M, N, 1), stride_D));`。
+- **L221** `  auto SFA = cute::make_tensor(thrust::raw_pointer_cast(tensor_SFA.data()), layout_SFA);`
+  - EN: Completes the statement `auto SFA = cute::make_tensor(thrust::raw_pointer_cast(tensor_SFA.data()), layout_SFA);`.
+  - 中文：完成语句 `auto SFA = cute::make_tensor(thrust::raw_pointer_cast(tensor_SFA.data()), layout_SFA);`。
+- **L222** `  auto SFB = cute::make_tensor(thrust::raw_pointer_cast(tensor_SFB.data()), layout_SFB);`
+  - EN: Completes the statement `auto SFB = cute::make_tensor(thrust::raw_pointer_cast(tensor_SFB.data()), layout_SFB);`.
+  - 中文：完成语句 `auto SFB = cute::make_tensor(thrust::raw_pointer_cast(tensor_SFB.data()), layout_SFB);`。
+- **L223** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L224** `  cutlass::reference::host::GettBlockScalingMainloopParams<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L225** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L226** `      decltype(A), `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L227** `      decltype(SFA), `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L228** `      decltype(B),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L229** `      decltype(SFB)`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L230** `    > mainloop_params{A, SFA, B, SFB};`
+  - EN: Completes the statement `> mainloop_params{A, SFA, B, SFB};`.
+  - 中文：完成语句 `> mainloop_params{A, SFA, B, SFB};`。
+- **L231** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L232** `  cutlass::reference::host::GettEpilogueParams<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L233** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L234** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L235** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L236** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L237** `      decltype(C),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L238** `      decltype(D)`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L239** `  > epilogue_params;`
+  - EN: Completes the statement `> epilogue_params;`.
+  - 中文：完成语句 `> epilogue_params;`。
+- **L240** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L241** `  epilogue_params.C = C;`
+  - EN: Completes the statement `epilogue_params.C = C;`.
+  - 中文：完成语句 `epilogue_params.C = C;`。
+- **L242** `  epilogue_params.D = D;`
+  - EN: Completes the statement `epilogue_params.D = D;`.
+  - 中文：完成语句 `epilogue_params.D = D;`。
+- **L243** `  epilogue_params.alpha = 1.0f;`
+  - EN: Completes the statement `epilogue_params.alpha = 1.0f;`.
+  - 中文：完成语句 `epilogue_params.alpha = 1.0f;`。
+- **L244** `  epilogue_params.beta = 1.0f;`
+  - EN: Completes the statement `epilogue_params.beta = 1.0f;`.
+  - 中文：完成语句 `epilogue_params.beta = 1.0f;`。
+- **L245** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L246** `  // get reference result`
+  - EN: Adds a human-readable comment for the next code region: get reference result.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：get reference result。
+- **L247** `  cutlass::reference::host::Gemm3x(mainloop_params, epilogue_params);`
+  - EN: Completes the statement `cutlass::reference::host::Gemm3x(mainloop_params, epilogue_params);`.
+  - 中文：完成语句 `cutlass::reference::host::Gemm3x(mainloop_params, epilogue_params);`。
+- **L248** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L249** `  // compare_reference`
+  - EN: Adds a human-readable comment for the next code region: compare_reference.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：compare_reference。
+- **L250** `  bool equal = true;`
+  - EN: Completes the statement `bool equal = true;`.
+  - 中文：完成语句 `bool equal = true;`。
+- **L251** `  for (size_t i = 0; i < tensor_ref_D.size(); ++i) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L252** `    equal &= (tensor_ref_D[i] == tensor_D[i]);`
+  - EN: Completes the statement `equal &= (tensor_ref_D[i] == tensor_D[i]);`.
+  - 中文：完成语句 `equal &= (tensor_ref_D[i] == tensor_D[i]);`。
+- **L253** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L254** `  return equal;`
+  - EN: Completes the statement `return equal;`.
+  - 中文：完成语句 `return equal;`。
+- **L255** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L256** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L257** `TEST(SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise, 128x128x128_1x1x1_1x128x128_scale) {`
+  - EN: Defines GoogleTest case `SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise.128x128x128_1x1x1_1x128x128_scale` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise.128x128x128_1x1x1_1x128x128_scale`，用于覆盖一个 GEMM 场景。
+- **L258** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L259** `  bool passed = groupwise_test<cute::GMMA::Major::MN, cute::GMMA::Major::K>(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L260** `      Int<1>{}, Int<128>{}, Int<128>{},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L261** `      cutlass::layout::RowMajor{}, cutlass::layout::ColumnMajor{}, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L262** `      cutlass::layout::RowMajor{}, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L263** `      Shape<_128,_128,_128>{},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L264** `      Shape<_1,_1,_1>{});`
+  - EN: Completes the statement `Shape<_1,_1,_1>{});`.
+  - 中文：完成语句 `Shape<_1,_1,_1>{});`。
+- **L265** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L266** `  EXPECT_TRUE(passed);`
+  - EN: Checks that `passed` evaluates to true, marking the test as passed.
+  - 中文：检查 `passed` 的结果是否为真，以判定测试通过。
+- **L267** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L268** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L269** `TEST(SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise, 128x128x128_1x1x1_1x1x128_scale) {`
+  - EN: Defines GoogleTest case `SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise.128x128x128_1x1x1_1x1x128_scale` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise.128x128x128_1x1x1_1x1x128_scale`，用于覆盖一个 GEMM 场景。
+- **L270** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L271** `  bool passed = groupwise_test<cute::GMMA::Major::MN, cute::GMMA::Major::MN>(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L272** `      Int<1>{}, Int<128>{}, Int<128>{},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L273** `      cutlass::layout::RowMajor{}, cutlass::layout::ColumnMajor{}, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L274** `      cutlass::layout::RowMajor{}, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L275** `      Shape<_256,_128,_128>{},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L276** `      Shape<_2,_1,_1>{});`
+  - EN: Completes the statement `Shape<_2,_1,_1>{});`.
+  - 中文：完成语句 `Shape<_2,_1,_1>{});`。
+- **L277** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L278** `  EXPECT_TRUE(passed);`
+  - EN: Checks that `passed` evaluates to true, marking the test as passed.
+  - 中文：检查 `passed` 的结果是否为真，以判定测试通过。
+- **L279** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L280** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L281** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L282** `TEST(SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise, 128x128x128_1x1x1_1x128x128_k_maj_k_maj_scale) {`
+  - EN: Defines GoogleTest case `SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise.128x128x128_1x1x1_1x128x128_k_maj_k_maj_scale` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM90_Device_Gemm_e4m3t_e4m3n_e4m3t_tensorop_f32_align16_blockwise.128x128x128_1x1x1_1x128x128_k_maj_k_maj_scale`，用于覆盖一个 GEMM 场景。
+- **L283** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L284** `  bool passed = groupwise_test<cute::GMMA::Major::K, cute::GMMA::Major::K>(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L285** `      Int<1>{}, Int<128>{}, Int<128>{},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L286** `      cutlass::layout::RowMajor{}, cutlass::layout::ColumnMajor{}, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L287** `      cutlass::layout::RowMajor{}, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L288** `      Shape<_128,_128,_128>{},`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L289** `      Shape<_1,_1,_1>{});`
+  - EN: Completes the statement `Shape<_1,_1,_1>{});`.
+  - 中文：完成语句 `Shape<_1,_1,_1>{});`。
+- **L290** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L291** `  EXPECT_TRUE(passed);`
+  - EN: Checks that `passed` evaluates to true, marking the test as passed.
+  - 中文：检查 `passed` 的结果是否为真，以判定测试通过。
+- **L292** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L293** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L294** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L295** `#endif // #if defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Closes the current conditional-compilation block.
+  - 中文：结束当前条件编译块。
+
+## Key Concepts / 关键概念
+- EN: CUTLASS 3.x universal GEMM adapter
+  - 中文：CUTLASS 3.x 通用 GEMM 适配器
+- EN: Collective-builder based kernel composition
+  - 中文：基于 CollectiveBuilder 的内核组合
+- EN: GoogleTest test cases
+  - 中文：GoogleTest 测试用例
+- EN: Tensor Core operator class
+  - 中文：Tensor Core 运算类别
+
+## Dependencies / 依赖关系
+- `iostream`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- `thrust/universal_vector.h`
+  - EN: Includes `thrust/universal_vector.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `thrust/universal_vector.h`，这是该测试编译单元所需的依赖。
+- `thrust/generate.h`
+  - EN: Includes `thrust/generate.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `thrust/generate.h`，这是该测试编译单元所需的依赖。
+- `thrust/random.h`
+  - EN: Includes `thrust/random.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `thrust/random.h`，这是该测试编译单元所需的依赖。
+- `cutlass/cutlass.h`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- `cute/tensor.hpp`
+  - EN: Provides CUTE tensor abstractions used to describe tiled tensor layouts.
+  - 中文：提供 CUTE 张量抽象，用于描述分块张量布局。
+- `cute/atom/mma_atom.hpp`
+  - EN: Provides CUTE MMA atom definitions used to model tensor-core operations.
+  - 中文：提供 CUTE MMA 原子定义，用于描述 Tensor Core 运算。
+- `cutlass/numeric_types.h`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- `cutlass/gemm/device/gemm_universal_adapter.h`
+  - EN: Provides the universal adapter that wraps a CUTLASS 3.x GEMM kernel for launch.
+  - 中文：提供通用适配器，用于封装并启动 CUTLASS 3.x GEMM 内核。
+- `cutlass/gemm/kernel/gemm_universal.hpp`
+  - EN: Defines the universal GEMM kernel composition used by modern CUTLASS tests.
+  - 中文：定义现代 CUTLASS 测试使用的通用 GEMM 内核组合。
+- `cutlass/gemm/collective/collective_builder.hpp`
+  - EN: Builds the GEMM mainloop collective from architecture, tile, and datatype parameters.
+  - 中文：根据架构、tile 和数据类型参数构建 GEMM 主循环 collective。
+- `cutlass/epilogue/dispatch_policy.hpp`
+  - EN: Defines epilogue scheduling policy tags used by collective builders.
+  - 中文：定义 collective builder 使用的 epilogue 调度策略标签。
+- `cutlass/epilogue/collective/collective_builder.hpp`
+  - EN: Builds the epilogue collective that writes GEMM results to memory.
+  - 中文：构建将 GEMM 结果写回内存的 epilogue collective。
+- `cutlass/epilogue/thread/activation.h`
+  - EN: Declares activation operators that can be fused into the epilogue.
+  - 中文：声明可融合到 epilogue 中的激活算子。
+- `../../common/cutlass_unit_test.h`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- `cutlass/util/packed_stride.hpp`
+  - EN: Includes `cutlass/util/packed_stride.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/packed_stride.hpp`，这是该测试编译单元所需的依赖。
+- `cutlass/util/reference/host/gett.hpp`
+  - EN: Includes `cutlass/util/reference/host/gett.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/reference/host/gett.hpp`，这是该测试编译单元所需的依赖。
+- `cutlass/util/device_memory.h`
+  - EN: Includes `cutlass/util/device_memory.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/device_memory.h`，这是该测试编译单元所需的依赖。

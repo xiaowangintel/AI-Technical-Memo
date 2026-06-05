@@ -1,0 +1,745 @@
+# gemm.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/op/gemm.py`
+
+## Purpose / 作用
+- EN: Ease-of-use interface for constructing, compiling, and running GEMMs.
+- CN: 该模块的文档字符串将其描述为：Ease-of-use interface for constructing, compiling, and running GEMMs.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `    Ease-of-use interface for constructing, compiling, and running GEMMs.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    The \`\`Gemm\`\` interface is meant to allow one to easily instantiate, compile, and run` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L37** `    GEMM operations in CUTLASS via Python, without specifying many configuration parameters.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L38** `    Under the hood, the interface will select sensible default parameters for the many template` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L39** `    parameters for CUTLASS GEMMs.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `    Note: optimal performance is not to be expected from this interface. To achieve optimal` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L42** `    performance, one should specify and tune each configuration parameter.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    The simplest example of using this interface is the following:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L47** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `        # A, B, C, and D are torch/numpy/cupy tensor objects` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L50** `        plan = cutlass_cppgen.op.Gemm(A, B, C, D)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L51** `        plan.run()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    One can also use the interface by specifying data types of operands at construction` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L55** `    and using different tensor objects with these data types at runtime:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L58** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `        # The following is shorthand for:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L61** `        #        cutlass_cppgen.op.Gemm(element_A=torch.float32, element_B=torch.float32,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L62** `        #                        element_C=torch.float32, element_D=torch.float32,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L63** `        #                        element_accumulator=torch.float32,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L64** `        #                        layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L65** `        plan = cutlass_cppgen.op.Gemm(element=torch.float32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `        A0 = torch.rand((128, 256), device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L68** `        B0 = torch.rand((256, 64), device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L69** `        C0 = torch.zeros((128, 64), device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L70** `        D0 = torch.zeros((128, 64), device.'cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L71** `        plan.run(A0, B0, C0, D0)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `        A = torch.rand((32, 128), device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L74** `        B = torch.rand((128, 256), device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L75** `        C = torch.zeros((32, 256), device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L76** `        D = torch.zeros((32, 256), device.'cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L77** `        plan.run(A1, B1, C1, D1)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    The interface additionally enables one to decouple the compilation of the underlying CUTLASS` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L80** `    kernel from its execution:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L83** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `        plan = cutlass_cppgen.op.Gemm(element=np.float32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L86** `        plan.compile()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `        # Do other work...` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `        plan.run(A0, B0, C0, D0)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `        # Do other work...` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `        plan.run(A1, B1, C1, D1)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    Elementwise activation functions are easily fused to the GEMM via the interface:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L99** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `        plan = cutlass_cppgen.op.Gemm(element=np.float32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L102** `        plan.activation = cutlass_cppgen.epilogue.relu` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    Operations can also be run asynchronously:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L107** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `        plan = cutlass_cppgen.op.Gemm(element=np.float32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L110** `        args = plan.run()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `        # Do other work...` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `        args.sync()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L115** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L116** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L117** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L118** `from math import prod` — **EN:** Imports prod from `math`. **CN:** 从 `math` 导入 prod。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L121** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L122** `from cutlass_library import (` — **EN:** Imports DataType, DataTypeSize, GemmUniversalMode, KernelScheduleSuffixes from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType, DataTypeSize, GemmUniversalMode, KernelScheduleSuffixes。
+- **L123** `    DataType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `    GemmUniversalMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    KernelScheduleSuffixes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L130** `from cutlass_cppgen import epilogue, swizzle` — **EN:** Imports epilogue, swizzle from `cutlass_cppgen`. **CN:** 从 `cutlass_cppgen` 导入 epilogue, swizzle。
+- **L131** `from cutlass_cppgen.backend import compiler` — **EN:** Imports compiler from `cutlass_cppgen.backend`. **CN:** 从 `cutlass_cppgen.backend` 导入 compiler。
+- **L132** `from cutlass_cppgen.backend.evt import EpilogueFunctorVisitor` — **EN:** Imports EpilogueFunctorVisitor from `cutlass_cppgen.backend.evt`. **CN:** 从 `cutlass_cppgen.backend.evt` 导入 EpilogueFunctorVisitor。
+- **L133** `from cutlass_cppgen.backend.gemm_operation import GemmArguments, GemmOperationUniversal` — **EN:** Imports GemmArguments, GemmOperationUniversal from `cutlass_cppgen.backend.gemm_operation`. **CN:** 从 `cutlass_cppgen.backend.gemm_operation` 导入 GemmArguments, GemmOperationUniversal。
+- **L134** `from cutlass_cppgen.backend.library import TensorDescription, TileDescription` — **EN:** Imports TensorDescription, TileDescription from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 TensorDescription, TileDescription。
+- **L135** `from cutlass_cppgen.op.op import OperationBase` — **EN:** Imports OperationBase from `cutlass_cppgen.op.op`. **CN:** 从 `cutlass_cppgen.op.op` 导入 OperationBase。
+- **L136** `from cutlass_cppgen.shape import GemmCoord` — **EN:** Imports GemmCoord from `cutlass_cppgen.shape`. **CN:** 从 `cutlass_cppgen.shape` 导入 GemmCoord。
+- **L137** `from cutlass_cppgen.utils import check, datatypes` — **EN:** Imports check, datatypes from `cutlass_cppgen.utils`. **CN:** 从 `cutlass_cppgen.utils` 导入 check, datatypes。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `class Gemm(OperationBase):` — **EN:** Defines class `Gemm` with bases OperationBase. **CN:** 定义类 `Gemm`，其基类为 OperationBase。
+- **L141** `    """` — **EN:** Starts the docstring for the class `Gemm`. **CN:** 开始说明 class `Gemm` 的文档字符串。
+- **L142** `    Constructs a \`\`Gemm\`\` object.` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `    The data types and layouts of operands A, B, and C, along with the data type of output D` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L145** `    and that used for accumulation, are bound to the \`\`Gemm\`\` object throughout its lifetime --` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L146** `    these are not to be changed after a \`\`Gemm\`\` has been constructed.` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `    The constructor has optional parameters for flexibly setting these parameters. The following` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L149** `    constructors are equivalent:` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `    .. highlight:: python` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L152** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `        # Use F32 for A, B, C, D, and accumulation. All operands are row major.` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `        # Use the generic \`\`element\`\` and \`\`layout\`\` parameters to concisely set all data types and layouts` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L157** `        # for operands to the same values.` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L158** `        Gemm(element=cutlass_cppgen.DataType.f32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        # Explicitly specify the data types to use for A, B, C, and D. Use the generic \`\`layout\`\`.` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L161** `        Gemm(element_A=cutlass_cppgen.DataType.f32, element_B=cutlass_cppgen.DataType.f32, element_C=cutlass_cppgen.DataType.f32,` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L162** `            element_D=cutlass_cppgen.DataType.f32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `        # Set the data types and elements from existing tensors. Note that one can use different tensors when` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L165** `        # executing GEMM via the \`\`run()\`\` method than passed in here (though those passed in to \`\`run()\`\` must` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L166** `        # have the same data type and layout as those passed in here).` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L167** `        # A, B, C, and D are row-major torch.Tensor objects of type torch.float32` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L168** `        Gemm(A=A, B=B, C=C, D=D)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `        # Use the generic \`\`element\`\` and explicitly specify the layouts to use for A, B, and C (layout of D is` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L171** `        # the same as that for D, at present)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L172** `        Gemm(element=cutlass_cppgen.DataType.f32, layout_A=cutlass_cppgen.LayoutType.RowMajor,` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L173** `            layout_B=cutlass_cppgen.LayoutType.RowMajor, layout_C=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `        # Explicitly specify the data type and layout for only some of A, B, C, and D. Unspecified data types` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L176** `        # and layouts will inherit those passed in via the generic \`\`element\`\` and \`\`layout\`\`` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L177** `        Gemm(element_A=cutlass_cppgen.DataType.f32, layout_B=cutlass_cppgen.LayoutType.RowMajor,` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L178** `            element=cutlass_cppgen.DataType.f32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    The order of precedence for the setting of the data type and layout for a given operand/output is as follows:` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L181** `        1) If the tensor type is specified (e.g., \`\`A\`\`), use the data type and layout inferred from this tensor` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L182** `        2) Otherwise, if the data type/layout (e.g., \`\`element_A\`\`, \`\`layout_A\`\`) is specified, use those` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L183** `        3) Otherwise, use the generic values (e.g., \`\`element\`\`, \`\`layout\`\`)` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `    :param cc: compute capability of device for which kernels should be compiled. For example, if running on H100, this should be set to 90` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L186** `    :type cc: int` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L187** `    :param kernel_cc: compute capability of kernels to generate. For example, if running on SM90, but desiring to use a CUTLASS 2.x-style Ampere kernel, this should be set to 80` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L188** `    :type kernel_cc: int` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L189** `    :param A: tensor representing data type and layout of operand A` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L190** `    :param B: tensor representing data type and layout of operand B` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L191** `    :param C: tensor representing data type and layout of operand C` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L192** `    :param D: tensor representing data type and layout of operand D` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L193** `    :param alpha: scalar paramter alpha from GEMM computation that scales the product of operands A and B` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L194** `    :param beta: scalar parameter beta from GEMM operation that scales operand C` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L195** `    :param element_accumulator: data type to be used in accumulation of the product of operands A and B` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L196** `    :type element_accumulator: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L197** `    :param element: generic data type to be used for operands A, B, C, D, as well as the accumulation data type` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L198** `    :type element: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L199** `    :param layout: generic layout type to be used for operands A, B, C, and D` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L200** `    :type layout: cutlass_cppgen.LayoutType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L201** `    :param element_A: data type to be used for operand A` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L202** `    :type element_A: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L203** `    :param element_B: data type to be used for operand B` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L204** `    :type element_B: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L205** `    :param element_C: data type to be used for operand C` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L206** `    :type element_C: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L207** `    :param element_D: data type to be used for operand D` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L208** `    :type element_D: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L209** `    :param layout_A: layout of operand A` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L210** `    :type layout_A: cutlass_cppgen.LayoutType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L211** `    :param layout_B: layout of operand B` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L212** `    :type layout_B: cutlass_cppgen.LayoutType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L213** `    :param layout_C: layout of operand C` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L214** `    :type layout_C: cutlass_cppgen.LayoutType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L215** `    :param layout_D: layout of operand D` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L216** `    :type layout_D: cutlass_cppgen.LayoutType` — **EN:** Continues the docstring for the class `Gemm`. **CN:** 继续说明 class `Gemm` 的文档字符串。
+- **L217** `    """` — **EN:** Ends the docstring for the class `Gemm`. **CN:** 结束说明 class `Gemm` 的文档字符串。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L220** `        self, A=None, B=None, C=None, D=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L221** `        alpha=1.0, beta=0.0, element_accumulator=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L222** `        element=None, layout=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L223** `        element_A=None, element_B=None, element_C=None, element_D=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L224** `        layout_A=None, layout_B=None, layout_C=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L225** `        cc: int = None, kernel_cc: int = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L227** `        super().__init__(cc=cc, kernel_cc=kernel_cc)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L228** `        self.name = "gemm"` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L229** `        self.compiled = False` — **EN:** Assigns a value to self.compiled. **CN:** 将一个值赋给 self.compiled。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `        elements = []` — **EN:** Assigns a value to elements. **CN:** 将一个值赋给 elements。
+- **L232** `        layouts = []` — **EN:** Assigns a value to layouts. **CN:** 将一个值赋给 layouts。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `        # Check that at least one of the following is set for each tensor (illustrated assuming tensor A):` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `        # \`\`A\`\`, \`\`element_A\`\`, \`\`element\`\` and \`\`A\`\`, \`\`layout_A\`\`, \`\`layout\`\`` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L236** `        for elt, lay, tens, name in zip([element_A, element_B, element_C, element_D],` — **EN:** Starts a loop assigning items from `zip([element_A, element_B, element_C, element_D...` to `(elt, lay, tens, name)`. **CN:** 开始一个循环，将 `zip([element_A, element_B, element_C, element_D...` 的元素赋给 `(elt, lay, tens, name)`。
+- **L237** `                                        [layout_A, layout_B, layout_C, layout_C],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `                                        [A, B, C, D],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L239** `                                        ["A", "B", "C", "D"]):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `            if elt is not None and tens is not None:` — **EN:** Starts a conditional branch guarded by `elt is not None and tens is not None`. **CN:** 开始一个由 `elt is not None and tens is not None` 控制的条件分支。
+- **L241** `                raise Exception(f'Must not specify both element_{name} and tensor {name}')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L242** `            if lay is not None and tens is not None:` — **EN:** Starts a conditional branch guarded by `lay is not None and tens is not None`. **CN:** 开始一个由 `lay is not None and tens is not None` 控制的条件分支。
+- **L243** `                raise Exception(f'Must not specify both layout_{name} and tensor {name}')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L244** `            if elt is None and tens is None and element is None:` — **EN:** Starts a conditional branch guarded by `elt is None and tens is None and (element is None)`. **CN:** 开始一个由 `elt is None and tens is None and (element is None)` 控制的条件分支。
+- **L245** `                raise Exception(f'Must specify one of element_{name}, tensor {name}, or generic element.')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L246** `            if lay is None and tens is None and layout is None:` — **EN:** Starts a conditional branch guarded by `lay is None and tens is None and (layout is None)`. **CN:** 开始一个由 `lay is None and tens is None and (layout is None)` 控制的条件分支。
+- **L247** `                raise Exception(f'Must specify one of layout_{name}, tensor {name}, or generic layout.')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `            elt_to_set = None` — **EN:** Assigns a value to elt_to_set. **CN:** 将一个值赋给 elt_to_set。
+- **L250** `            lay_to_set = None` — **EN:** Assigns a value to lay_to_set. **CN:** 将一个值赋给 lay_to_set。
+- **L251** `            if tens is not None:` — **EN:** Starts a conditional branch guarded by `tens is not None`. **CN:** 开始一个由 `tens is not None` 控制的条件分支。
+- **L252** `                elt_to_set, lay_to_set = datatypes.get_datatype_and_layout(tens)` — **EN:** Assigns a value to (elt_to_set, lay_to_set). **CN:** 将一个值赋给 (elt_to_set, lay_to_set)。
+- **L253** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L254** `                elt_to_set = elt if elt is not None else element` — **EN:** Assigns a value to elt_to_set. **CN:** 将一个值赋给 elt_to_set。
+- **L255** `                lay_to_set = lay if lay is not None else layout` — **EN:** Assigns a value to lay_to_set. **CN:** 将一个值赋给 lay_to_set。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `            elements.append(datatypes.library_type(elt_to_set))` — **EN:** Invokes `elements.append` as a standalone call. **CN:** 以独立语句方式调用 `elements.append`。
+- **L258** `            layouts.append(lay_to_set)` — **EN:** Invokes `layouts.append` as a standalone call. **CN:** 以独立语句方式调用 `layouts.append`。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `        self._element_a, self._element_b, self._element_c, self._element_d = elements` — **EN:** Assigns a value to (self._element_a, self._element_b, self._element_c, self..... **CN:** 将一个值赋给 (self._element_a, self._element_b, self._element_c, self....。
+- **L261** `        self._layout_a, self._layout_b, self._layout_c, self._layout_d = layouts` — **EN:** Assigns a value to (self._layout_a, self._layout_b, self._layout_c, self._la.... **CN:** 将一个值赋给 (self._layout_a, self._layout_b, self._layout_c, self._la...。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `        if element_accumulator is None:` — **EN:** Starts a conditional branch guarded by `element_accumulator is None`. **CN:** 开始一个由 `element_accumulator is None` 控制的条件分支。
+- **L264** `            self._element_accumulator = self._element_c` — **EN:** Assigns a value to self._element_accumulator. **CN:** 将一个值赋给 self._element_accumulator。
+- **L265** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L266** `            self._element_accumulator = datatypes.library_type(element_accumulator)` — **EN:** Assigns a value to self._element_accumulator. **CN:** 将一个值赋给 self._element_accumulator。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `        self.A = A` — **EN:** Assigns a value to self.A. **CN:** 将一个值赋给 self.A。
+- **L269** `        self.B = B` — **EN:** Assigns a value to self.B. **CN:** 将一个值赋给 self.B。
+- **L270** `        self.C = C` — **EN:** Assigns a value to self.C. **CN:** 将一个值赋给 self.C。
+- **L271** `        self.D = D` — **EN:** Assigns a value to self.D. **CN:** 将一个值赋给 self.D。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `        self.alpha = alpha` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L274** `        self.beta = beta` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `        self.epilogue_functor = None` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L277** `        self.op_class = None` — **EN:** Assigns a value to self.op_class. **CN:** 将一个值赋给 self.op_class。
+- **L278** `        self._tile_description = None` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `        self._reset_operations()` — **EN:** Invokes `self._reset_operations` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_operations`。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `        self._swizzling_functor = cutlass_cppgen.swizzle.IdentitySwizzle1` — **EN:** Assigns a value to self._swizzling_functor. **CN:** 将一个值赋给 self._swizzling_functor。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `    def _reset_operations(self, reset_epilogue: bool = True):` — **EN:** Defines function `_reset_operations`. **CN:** 定义函数 `_reset_operations`。
+- **L285** `        # Set the default op class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L286** `        datatype_comb = (self._element_a, self._element_b, self._element_accumulator)` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L287** `        layout_comb = (self._layout_a, self._layout_b)` — **EN:** Assigns a value to layout_comb. **CN:** 将一个值赋给 layout_comb。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `        self.possible_op_classes = self.options.supporting_opclasses(` — **EN:** Assigns a value to self.possible_op_classes. **CN:** 将一个值赋给 self.possible_op_classes。
+- **L290** `            self._element_a, self._element_b, self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `            self._layout_a, self._layout_b, self._math_operation)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `        if cutlass_cppgen.OpcodeClass.TensorOp in self.possible_op_classes:` — **EN:** Starts a conditional branch guarded by `cutlass_cppgen.OpcodeClass.TensorOp in self.possible_op_c...`. **CN:** 开始一个由 `cutlass_cppgen.OpcodeClass.TensorOp in self.possible_op_c...` 控制的条件分支。
+- **L294** `            self.opclass = cutlass_cppgen.OpcodeClass.TensorOp` — **EN:** Assigns a value to self.opclass. **CN:** 将一个值赋给 self.opclass。
+- **L295** `        elif cutlass_cppgen.OpcodeClass.Simt in self.possible_op_classes:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L296** `            self.opclass = cutlass_cppgen.OpcodeClass.Simt` — **EN:** Assigns a value to self.opclass. **CN:** 将一个值赋给 self.opclass。
+- **L297** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L298** `            if self._math_operation is not None:` — **EN:** Starts a conditional branch guarded by `self._math_operation is not None`. **CN:** 开始一个由 `self._math_operation is not None` 控制的条件分支。
+- **L299** `                math_op_str = f' and math operation {self._math_operation}'` — **EN:** Assigns a value to math_op_str. **CN:** 将一个值赋给 math_op_str。
+- **L300** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L301** `                math_op_str = ''` — **EN:** Assigns a value to math_op_str. **CN:** 将一个值赋给 math_op_str。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `            raise Exception(f'No kernel configuration found for supported data type and layout '` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L304** `                            f'combination {datatype_comb}x{layout_comb}{math_op_str}')` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `        if reset_epilogue:` — **EN:** Starts a conditional branch guarded by `reset_epilogue`. **CN:** 开始一个由 `reset_epilogue` 控制的条件分支。
+- **L307** `            self._reset_epilogue_functor_activation(cutlass_cppgen.epilogue.identity)` — **EN:** Invokes `self._reset_epilogue_functor_activation` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_epilogue_functor_activation`。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L310** `    def swizzling_functor(self):` — **EN:** Defines function `swizzling_functor`. **CN:** 定义函数 `swizzling_functor`。
+- **L311** `        """` — **EN:** Starts the docstring for the function `swizzling_functor`. **CN:** 开始说明 function `swizzling_functor` 的文档字符串。
+- **L312** `        Returns the type of the swizzling functor currently being used by the GEMM` — **EN:** Continues the docstring for the function `swizzling_functor`. **CN:** 继续说明 function `swizzling_functor` 的文档字符串。
+- **L313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L314** `        :return: swizzing functor type` — **EN:** Continues the docstring for the function `swizzling_functor`. **CN:** 继续说明 function `swizzling_functor` 的文档字符串。
+- **L315** `        """` — **EN:** Ends the docstring for the function `swizzling_functor`. **CN:** 结束说明 function `swizzling_functor` 的文档字符串。
+- **L316** `        return self._swizzling_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `    @swizzling_functor.setter` — **EN:** Applies decorator `swizzling_functor.setter` to the following definition. **CN:** 将装饰器 `swizzling_functor.setter` 应用于后面的定义。
+- **L319** `    def swizzling_functor(self, swizzling_functor):` — **EN:** Defines function `swizzling_functor`. **CN:** 定义函数 `swizzling_functor`。
+- **L320** `        """` — **EN:** Starts the docstring for the function `swizzling_functor`. **CN:** 开始说明 function `swizzling_functor` 的文档字符串。
+- **L321** `        Sets the swizzling functor to the type specified by \`swizzling_functor\`` — **EN:** Continues the docstring for the function `swizzling_functor`. **CN:** 继续说明 function `swizzling_functor` 的文档字符串。
+- **L322** `        """` — **EN:** Ends the docstring for the function `swizzling_functor`. **CN:** 结束说明 function `swizzling_functor` 的文档字符串。
+- **L323** `        if swizzling_functor == cutlass_cppgen.swizzle.ThreadblockSwizzleStreamK:` — **EN:** Starts a conditional branch guarded by `swizzling_functor == cutlass_cppgen.swizzle.ThreadblockSw...`. **CN:** 开始一个由 `swizzling_functor == cutlass_cppgen.swizzle.ThreadblockSw...` 控制的条件分支。
+- **L324** `            if self.op_class == cutlass_cppgen.OpcodeClass.Simt:` — **EN:** Starts a conditional branch guarded by `self.op_class == cutlass_cppgen.OpcodeClass.Simt`. **CN:** 开始一个由 `self.op_class == cutlass_cppgen.OpcodeClass.Simt` 控制的条件分支。
+- **L325** `                raise Exception('ThreadblockSwizzleStreamK is currently only supported with opcode class TensorOp')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `            if self.current_cc in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `self.current_cc in [90, 100, 101, 103]`. **CN:** 开始一个由 `self.current_cc in [90, 100, 101, 103]` 控制的条件分支。
+- **L328** `                raise Exception('ThreadblockSwizzleStreamK is currently unsupported on SM90+')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L329** `        self._swizzling_functor = swizzling_functor` — **EN:** Assigns a value to self._swizzling_functor. **CN:** 将一个值赋给 self._swizzling_functor。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L332** `    # Tile description Related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L333** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L336** `    def tile_description(self) -> TileDescription:` — **EN:** Defines function `tile_description`. **CN:** 定义函数 `tile_description`。
+- **L337** `        """` — **EN:** Starts the docstring for the function `tile_description`. **CN:** 开始说明 function `tile_description` 的文档字符串。
+- **L338** `        Returns the tile description` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L339** `        """` — **EN:** Ends the docstring for the function `tile_description`. **CN:** 结束说明 function `tile_description` 的文档字符串。
+- **L340** `        return self._tile_description` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** `    @tile_description.setter` — **EN:** Applies decorator `tile_description.setter` to the following definition. **CN:** 将装饰器 `tile_description.setter` 应用于后面的定义。
+- **L343** `    def tile_description(` — **EN:** Defines function `tile_description`. **CN:** 定义函数 `tile_description`。
+- **L344** `        self, td=None):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L345** `        """` — **EN:** Starts the docstring for the function `tile_description`. **CN:** 开始说明 function `tile_description` 的文档字符串。
+- **L346** `        Set the tile description` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `        :param td: tile description` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L349** `        :type td: cutlass_cppgen.backend.TileDescription, or a dict with keys` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L350** `                  {` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L351** `                      "threadblock_shape": [int, int, int],` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L352** `                      "warp_count": [int, int, int],` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L353** `                      "stages": int,` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L354** `                      "instruction_shape": [int, int, int] (optional),` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L355** `                      "cluster_shape": [int, int, int] (optional)` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L356** `                  }` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L357** `        """` — **EN:** Ends the docstring for the function `tile_description`. **CN:** 结束说明 function `tile_description` 的文档字符串。
+- **L358** `        if td is None:` — **EN:** Starts a conditional branch guarded by `td is None`. **CN:** 开始一个由 `td is None` 控制的条件分支。
+- **L359** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L360** `        if isinstance(td, dict):` — **EN:** Starts a conditional branch guarded by `isinstance(td, dict)`. **CN:** 开始一个由 `isinstance(td, dict)` 控制的条件分支。
+- **L361** `            if self._tile_description is None:` — **EN:** Starts a conditional branch guarded by `self._tile_description is None`. **CN:** 开始一个由 `self._tile_description is None` 控制的条件分支。
+- **L362** `                op = self.possible_operations.default_operation(self._math_operation)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L363** `                self._tile_description = datatypes.td_from_profiler_op(op)` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L364** `            td = self._tile_description.clone_and_update(td)` — **EN:** Assigns a value to td. **CN:** 将一个值赋给 td。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `        valid, msg = self._valid_tile_description(td)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L367** `        if valid:` — **EN:** Starts a conditional branch guarded by `valid`. **CN:** 开始一个由 `valid` 控制的条件分支。
+- **L368** `            self._tile_description = td` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L369** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L370** `            raise Exception(msg)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    def _valid_tile_description(self, td: TileDescription) -> tuple:` — **EN:** Defines function `_valid_tile_description`. **CN:** 定义函数 `_valid_tile_description`。
+- **L373** `        """` — **EN:** Starts the docstring for the function `_valid_tile_description`. **CN:** 开始说明 function `_valid_tile_description` 的文档字符串。
+- **L374** `        Checks whether the provided tile description is valid for the given compute capability. At present,` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L375** `        this checks the following:` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** `        - Does the tile description use a number of stages supported by the compute capability in question?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L378** `        - Does the tile size requested fit within shared memory?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L379** `        - Are cluster dimensions outside the valid range requested for a given architecture (e.g.,` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L380** `          more non-unit cluster dimensions for pre-SM90 architectures)?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L381** `        - Is the kernel schedule being used supported on the architecture in question?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `        :param td: tile description to validate` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L384** `        :type td: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L385** `        :return: tuple in which the first element is a bool indicating that the tile description is valid` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L386** `                 and the second element is a string providing an optional error message.` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L387** `        :rtype: tuple` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L388** `        """` — **EN:** Ends the docstring for the function `_valid_tile_description`. **CN:** 结束说明 function `_valid_tile_description` 的文档字符串。
+- **L389** `        valid, msg = check.valid_stage_count(self.cc, self.current_cc, td, self._element_c, self._element_d)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L390** `        if not valid:` — **EN:** Starts a conditional branch guarded by `not valid`. **CN:** 开始一个由 `not valid` 控制的条件分支。
+- **L391** `            return (valid, msg)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `        valid, msg = check.valid_cluster_shape(self.current_cc, td.cluster_shape)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L394** `        if not valid:` — **EN:** Starts a conditional branch guarded by `not valid`. **CN:** 开始一个由 `not valid` 控制的条件分支。
+- **L395** `            return (valid, msg)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `        valid, msg = check.valid_schedule(self.current_cc, td.kernel_schedule, td.epilogue_schedule, td.tile_scheduler)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `        if self.cc in [100, 101, 103] and td.kernel_schedule is not None and td.is_2sm and td.cluster_shape[0] % 2 != 0:` — **EN:** Starts a conditional branch guarded by `self.cc in [100, 101, 103] and td.kernel_schedule is not ...`. **CN:** 开始一个由 `self.cc in [100, 101, 103] and td.kernel_schedule is not ...` 控制的条件分支。
+- **L400** `            valid = False` — **EN:** Assigns a value to valid. **CN:** 将一个值赋给 valid。
+- **L401** `            msg = "Cluster shape must be divisible by 2 for 2SM kernels on SM100, SM101, and SM103"` — **EN:** Assigns a value to msg. **CN:** 将一个值赋给 msg。
+- **L402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L403** `        return valid, msg` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `    def tile_descriptions(self) -> list:` — **EN:** Defines function `tile_descriptions`. **CN:** 定义函数 `tile_descriptions`。
+- **L406** `        """` — **EN:** Starts the docstring for the function `tile_descriptions`. **CN:** 开始说明 function `tile_descriptions` 的文档字符串。
+- **L407** `        Returns a list of valid tile descriptions for the operations` — **EN:** Continues the docstring for the function `tile_descriptions`. **CN:** 继续说明 function `tile_descriptions` 的文档字符串。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `        :returns: list of valid tile descriptions for the operations` — **EN:** Continues the docstring for the function `tile_descriptions`. **CN:** 继续说明 function `tile_descriptions` 的文档字符串。
+- **L410** `        :rtype: list` — **EN:** Continues the docstring for the function `tile_descriptions`. **CN:** 继续说明 function `tile_descriptions` 的文档字符串。
+- **L411** `        """` — **EN:** Ends the docstring for the function `tile_descriptions`. **CN:** 结束说明 function `tile_descriptions` 的文档字符串。
+- **L412** `        tds = [datatypes.td_from_profiler_op(op) for op in self.possible_operations.all_operations]` — **EN:** Assigns a value to tds. **CN:** 将一个值赋给 tds。
+- **L413** `        if self._math_operation is not None:` — **EN:** Starts a conditional branch guarded by `self._math_operation is not None`. **CN:** 开始一个由 `self._math_operation is not None` 控制的条件分支。
+- **L414** `            tds = [td for td in tds if td.math_instruction.math_operation == self._math_operation]` — **EN:** Assigns a value to tds. **CN:** 将一个值赋给 tds。
+- **L415** `        return tds` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L417** `    def construct(` — **EN:** Defines function `construct`. **CN:** 定义函数 `construct`。
+- **L418** `        self, tile_description: TileDescription = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L419** `        alignment_A: int = None, alignment_B: int = None, alignment_C: int = None) -> GemmOperationUniversal:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L420** `        """` — **EN:** Starts the docstring for the function `construct`. **CN:** 开始说明 function `construct` 的文档字符串。
+- **L421** `        Constructs a \`\`cutlass_cppgen.backend.GemmUniversalOperation\`\` based on the input parameters and current` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L422** `        kernel specification of the \`\`Gemm\`\` object.` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `        :param tile_description: tile description specifying shapes and operand types to use in the kernel` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L425** `        :type tile_description: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L426** `        :param alignment_A: alignment of operand A` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L427** `        :type alignment_A: int` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L428** `        :param alignment_B: alignment of operand B` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L429** `        :type alignment_B: int` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L430** `        :param alignment_C: alignment of operand C` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L431** `        :type alignment_C: int` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `        :return: operation that was constructed` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L434** `        :rtype: cutlass_cppgen.backend.GemmOperationUniversal` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L435** `        """` — **EN:** Ends the docstring for the function `construct`. **CN:** 结束说明 function `construct` 的文档字符串。
+- **L436** `        alignment_pref_A = min(128 // DataTypeSize[self._element_a], max(self.possible_operations.alignments("A")))` — **EN:** Assigns a value to alignment_pref_A. **CN:** 将一个值赋给 alignment_pref_A。
+- **L437** `        alignment_pref_B = min(128 // DataTypeSize[self._element_b], max(self.possible_operations.alignments("B")))` — **EN:** Assigns a value to alignment_pref_B. **CN:** 将一个值赋给 alignment_pref_B。
+- **L438** `        alignment_A = check.alignment_or_default(alignment_A, alignment_pref_A)` — **EN:** Assigns a value to alignment_A. **CN:** 将一个值赋给 alignment_A。
+- **L439** `        alignment_B = check.alignment_or_default(alignment_B, alignment_pref_B)` — **EN:** Assigns a value to alignment_B. **CN:** 将一个值赋给 alignment_B。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** `        tensor_A = TensorDescription(self._element_a, self._layout_a, alignment_A)` — **EN:** Assigns a value to tensor_A. **CN:** 将一个值赋给 tensor_A。
+- **L442** `        tensor_B = TensorDescription(self._element_b, self._layout_b, alignment_B)` — **EN:** Assigns a value to tensor_B. **CN:** 将一个值赋给 tensor_B。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `        if alignment_C is None:` — **EN:** Starts a conditional branch guarded by `alignment_C is None`. **CN:** 开始一个由 `alignment_C is None` 控制的条件分支。
+- **L445** `            alignment_C = max(self.possible_operations.alignments("C"))` — **EN:** Assigns a value to alignment_C. **CN:** 将一个值赋给 alignment_C。
+- **L446** `            if self._element_c != DataType.void:` — **EN:** Starts a conditional branch guarded by `self._element_c != DataType.void`. **CN:** 开始一个由 `self._element_c != DataType.void` 控制的条件分支。
+- **L447** `                alignment_C = min(128 // DataTypeSize[self._element_c], alignment_C)` — **EN:** Assigns a value to alignment_C. **CN:** 将一个值赋给 alignment_C。
+- **L448** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L449** `        if tile_description is None:` — **EN:** Starts a conditional branch guarded by `tile_description is None`. **CN:** 开始一个由 `tile_description is None` 控制的条件分支。
+- **L450** `            if self._tile_description is None:` — **EN:** Starts a conditional branch guarded by `self._tile_description is None`. **CN:** 开始一个由 `self._tile_description is None` 控制的条件分支。
+- **L451** `                op = self.possible_operations.operations(alignment_A, alignment_B, alignment_C, self._math_operation)[0]` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L452** `                tile_description = datatypes.td_from_profiler_op(op)` — **EN:** Assigns a value to tile_description. **CN:** 将一个值赋给 tile_description。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `                # The selected op may have lower alignment than that determined above, so we must` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L455** `                # reset alignment here.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L456** `                alignment_C = op.C.alignment` — **EN:** Assigns a value to alignment_C. **CN:** 将一个值赋给 alignment_C。
+- **L457** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L458** `                tile_description = self._tile_description` — **EN:** Assigns a value to tile_description. **CN:** 将一个值赋给 tile_description。
+- **L459** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L460** `            valid, err_str = self._valid_tile_description(tile_description)` — **EN:** Assigns a value to (valid, err_str). **CN:** 将一个值赋给 (valid, err_str)。
+- **L461** `            if not valid:` — **EN:** Starts a conditional branch guarded by `not valid`. **CN:** 开始一个由 `not valid` 控制的条件分支。
+- **L462** `                raise Exception(f"Invalid tile description. {err_str}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L463** `            self._tile_description = tile_description` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `        tensor_C = TensorDescription(self._element_c, self._layout_c, alignment_C)` — **EN:** Assigns a value to tensor_C. **CN:** 将一个值赋给 tensor_C。
+- **L466** `        self.epilogue_functor = self._reset_epilogue_functor_alignment(alignment_C, self.epilogue_functor)` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `        operation = GemmOperationUniversal(` — **EN:** Assigns a value to operation. **CN:** 将一个值赋给 operation。
+- **L469** `            arch=self.current_cc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `            tile_description=tile_description,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `            A=tensor_A, B=tensor_B, C=tensor_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `            epilogue_functor=self.epilogue_functor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `            swizzling_functor=self._swizzling_functor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** `        return operation` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** `    def compile(self, tile_description: TileDescription = None,` — **EN:** Defines function `compile`. **CN:** 定义函数 `compile`。
+- **L479** `                alignment_A: int = None, alignment_B: int = None, alignment_C: int = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L480** `                print_module: bool = False) -> cutlass_cppgen.backend.GemmOperationUniversal:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L481** `        """` — **EN:** Starts the docstring for the function `compile`. **CN:** 开始说明 function `compile` 的文档字符串。
+- **L482** `        Emits and compiles the kernel currently specified. If \`\`tile_description\`\` and any` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L483** `        of the \`\`alignment\`\` parameters are set, the kernel will be chosen using this` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L484** `        tile description and alignments. Otherwise, a default tile description and alignment` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L485** `        will be used.` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** `        :param tile_description: tile description specifying shapes and operand types to use in the kernel` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L488** `        :type tile_description: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L489** `        :param alignment_A: alignment of operand A` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L490** `        :type alignment_A: int` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L491** `        :param alignment_B: alignment of operand B` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L492** `        :type alignment_B: int` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L493** `        :param alignment_C: alignment of operand C` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L494** `        :type alignment_C: int` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L495** `        :param print_module: whether to print the emitted C++ code` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L496** `        :type print_module: bool` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `        :return: operation that was compiled` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L499** `        :rtype: cutlass_cppgen.backend.GemmOperationUniversal` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L500** `        """` — **EN:** Ends the docstring for the function `compile`. **CN:** 结束说明 function `compile` 的文档字符串。
+- **L501** `        self.operation = self.construct(tile_description, alignment_A, alignment_B, alignment_C)` — **EN:** Assigns a value to self.operation. **CN:** 将一个值赋给 self.operation。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `        if print_module:` — **EN:** Starts a conditional branch guarded by `print_module`. **CN:** 开始一个由 `print_module` 控制的条件分支。
+- **L504** `            print(self.operation.rt_module.emit())` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L505** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L506** `        compiler.add_module([self.operation,])` — **EN:** Invokes `compiler.add_module` as a standalone call. **CN:** 以独立语句方式调用 `compiler.add_module`。
+- **L507** `        return self.operation` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** `    def _verify_rank(self, tensor):` — **EN:** Defines function `_verify_rank`. **CN:** 定义函数 `_verify_rank`。
+- **L510** `        """` — **EN:** Starts the docstring for the function `_verify_rank`. **CN:** 开始说明 function `_verify_rank` 的文档字符串。
+- **L511** `        Verifies that \`\`tensor\`\` has rank greater than 1` — **EN:** Continues the docstring for the function `_verify_rank`. **CN:** 继续说明 function `_verify_rank` 的文档字符串。
+- **L512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L513** `        :param tensor: object representing a tensor passed in to verify, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_rank`. **CN:** 继续说明 function `_verify_rank` 的文档字符串。
+- **L514** `        :type tensor: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_verify_rank`. **CN:** 继续说明 function `_verify_rank` 的文档字符串。
+- **L515** `        """` — **EN:** Ends the docstring for the function `_verify_rank`. **CN:** 结束说明 function `_verify_rank` 的文档字符串。
+- **L516** `        if len(tensor.shape) < 2:` — **EN:** Starts a conditional branch guarded by `len(tensor.shape) < 2`. **CN:** 开始一个由 `len(tensor.shape) < 2` 控制的条件分支。
+- **L517** `            raise Exception(f"Tensors must be of rank greater than 1. Received tensor of shape: {tensor.shape}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `    def _get_batch_count(self, A, B, C, D) -> int:` — **EN:** Defines function `_get_batch_count`. **CN:** 定义函数 `_get_batch_count`。
+- **L520** `        """` — **EN:** Starts the docstring for the function `_get_batch_count`. **CN:** 开始说明 function `_get_batch_count` 的文档字符串。
+- **L521** `        Returns the batch count specified by the tensors A, B, C, and D and verifies that these` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L522** `        tensors match in batch size. Presence of a batch dimension is detected by one of the` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L523** `        tensors being rank 3. If a batch dimension is present, it must be present in one of` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L524** `        operands A, B, or C (but need not be in all), and must be present in D.` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** `        :param A: tensor A` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L527** `        :type A: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L528** `        :param B: tensor B` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L529** `        :type B: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L530** `        :param C: tensor C` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L531** `        :type C: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L532** `        :param D: tensor D` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L533** `        :type D: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L535** `        :return: tuple of batch count dimensions` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L536** `        :rtype: tuple` — **EN:** Continues the docstring for the function `_get_batch_count`. **CN:** 继续说明 function `_get_batch_count` 的文档字符串。
+- **L537** `        """` — **EN:** Ends the docstring for the function `_get_batch_count`. **CN:** 结束说明 function `_get_batch_count` 的文档字符串。
+- **L538** `        A_batch = prod(A.shape[:-2]) if len(A.shape) > 2 else 1` — **EN:** Assigns a value to A_batch. **CN:** 将一个值赋给 A_batch。
+- **L539** `        B_batch = prod(B.shape[:-2]) if len(B.shape) > 2 else 1` — **EN:** Assigns a value to B_batch. **CN:** 将一个值赋给 B_batch。
+- **L540** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L541** `        if 1 not in [A_batch, B_batch]:` — **EN:** Starts a conditional branch guarded by `1 not in [A_batch, B_batch]`. **CN:** 开始一个由 `1 not in [A_batch, B_batch]` 控制的条件分支。
+- **L542** `            if A_batch != B_batch:` — **EN:** Starts a conditional branch guarded by `A_batch != B_batch`. **CN:** 开始一个由 `A_batch != B_batch` 控制的条件分支。
+- **L543** `                raise Exception(f"Get invalid batch counts: A={A_batch}, B={B_batch}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L544** `        return max(A_batch, B_batch)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `    def _get_batch_stride(self, tensor) -> int:` — **EN:** Defines function `_get_batch_stride`. **CN:** 定义函数 `_get_batch_stride`。
+- **L547** `        """` — **EN:** Starts the docstring for the function `_get_batch_stride`. **CN:** 开始说明 function `_get_batch_stride` 的文档字符串。
+- **L548** `        Returns the batch stride of \`\`tensor\`\`. If \`\`tensor\`\` is only rank-2, batch stride is 0.` — **EN:** Continues the docstring for the function `_get_batch_stride`. **CN:** 继续说明 function `_get_batch_stride` 的文档字符串。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** `        :param tensor: tensor object to process` — **EN:** Continues the docstring for the function `_get_batch_stride`. **CN:** 继续说明 function `_get_batch_stride` 的文档字符串。
+- **L551** `        :type tensor: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_batch_stride`. **CN:** 继续说明 function `_get_batch_stride` 的文档字符串。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `        :return: stride between each matrix in the batch` — **EN:** Continues the docstring for the function `_get_batch_stride`. **CN:** 继续说明 function `_get_batch_stride` 的文档字符串。
+- **L554** `        :rtype: int` — **EN:** Continues the docstring for the function `_get_batch_stride`. **CN:** 继续说明 function `_get_batch_stride` 的文档字符串。
+- **L555** `        """` — **EN:** Ends the docstring for the function `_get_batch_stride`. **CN:** 结束说明 function `_get_batch_stride` 的文档字符串。
+- **L556** `        if tensor is not None and len(tensor.shape) > 2:` — **EN:** Starts a conditional branch guarded by `tensor is not None and len(tensor.shape) > 2`. **CN:** 开始一个由 `tensor is not None and len(tensor.shape) > 2` 控制的条件分支。
+- **L557** `            return tensor.shape[-2] * tensor.shape[-1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L558** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L559** `            return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L560** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L561** `    def _get_problem_args(self, A, B, C, D) -> tuple:` — **EN:** Defines function `_get_problem_args`. **CN:** 定义函数 `_get_problem_args`。
+- **L562** `        """` — **EN:** Starts the docstring for the function `_get_problem_args`. **CN:** 开始说明 function `_get_problem_args` 的文档字符串。
+- **L563** `        Returns the problem size and GEMM universal mode to use for the` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L564** `        given operands.` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `        :param A: tensor A` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L567** `        :type A: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L568** `        :param B: tensor B` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L569** `        :type B: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L570** `        :param C: tensor C` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L571** `        :type C: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L572** `        :param D: tensor D` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L573** `        :type D: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L574** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L575** `        :return: tuple containing the problem size (cutlass_cppgen.shape.GemmCoord), the GEMM mode (cutlass_cppgen.GemmUniversalMode), and the batch count (int)` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L576** `        :rtype: tuple` — **EN:** Continues the docstring for the function `_get_problem_args`. **CN:** 继续说明 function `_get_problem_args` 的文档字符串。
+- **L577** `        """` — **EN:** Ends the docstring for the function `_get_problem_args`. **CN:** 结束说明 function `_get_problem_args` 的文档字符串。
+- **L578** `        M, K = A.shape[-2:]` — **EN:** Assigns a value to (M, K). **CN:** 将一个值赋给 (M, K)。
+- **L579** `        N = B.shape[-1]` — **EN:** Assigns a value to N. **CN:** 将一个值赋给 N。
+- **L580** `        mode = GemmUniversalMode.Gemm` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L581** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L582** `        batch_count = self._get_batch_count(A, B, C, D)` — **EN:** Assigns a value to batch_count. **CN:** 将一个值赋给 batch_count。
+- **L583** `        returned_batch_count = batch_count` — **EN:** Assigns a value to returned_batch_count. **CN:** 将一个值赋给 returned_batch_count。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** `        # If we are running a batched GEMM in which there is a nonzero batch stride` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L586** `        # only for A, then we can fold the batched dimension of A into the M dimension` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L587** `        # (i.e., (b, m, k) x (k, n) -> (m*b, k) x (k, n)). This works only if both A` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L588** `        # and C are row major. A similar operation can be performed if only B has a nonzero` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L589** `        # batch dimension` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L590** `        if batch_count > 1:` — **EN:** Starts a conditional branch guarded by `batch_count > 1`. **CN:** 开始一个由 `batch_count > 1` 控制的条件分支。
+- **L591** `            A_row = self._layout_a == cutlass_cppgen.LayoutType.RowMajor` — **EN:** Assigns a value to A_row. **CN:** 将一个值赋给 A_row。
+- **L592** `            B_row = self._layout_b == cutlass_cppgen.LayoutType.RowMajor` — **EN:** Assigns a value to B_row. **CN:** 将一个值赋给 B_row。
+- **L593** `            C_row = self._layout_c == cutlass_cppgen.LayoutType.RowMajor` — **EN:** Assigns a value to C_row. **CN:** 将一个值赋给 C_row。
+- **L594** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L595** `            # Consider a Tensor to be batched if its rank is > 2 and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L596** `            # the product of the modes beyond rank 2 equals our pre-determined batch size.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L597** `            batched = lambda x : x is None or (len(x.shape) > 2 and prod(x.shape[:-2]) == batch_count)` — **EN:** Assigns a value to batched. **CN:** 将一个值赋给 batched。
+- **L598** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L599** `            if batched(A) and not batched(B) and (C is None or batched(C)) and A_row and C_row:` — **EN:** Starts a conditional branch guarded by `batched(A) and (not batched(B)) and (C is None or batched...`. **CN:** 开始一个由 `batched(A) and (not batched(B)) and (C is None or batched...` 控制的条件分支。
+- **L600** `                M *= batch_count` — **EN:** Updates M in place. **CN:** 原地更新 M。
+- **L601** `                returned_batch_count = 1` — **EN:** Assigns a value to returned_batch_count. **CN:** 将一个值赋给 returned_batch_count。
+- **L602** `            elif not batched(A) and batched(B) and (C is None or batched(C)) and not B_row and not C_row:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L603** `                N *= batch_count` — **EN:** Updates N in place. **CN:** 原地更新 N。
+- **L604** `                returned_batch_count = 1` — **EN:** Assigns a value to returned_batch_count. **CN:** 将一个值赋给 returned_batch_count。
+- **L605** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L606** `                mode = GemmUniversalMode.Batched` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L607** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L608** `        return GemmCoord(M, N, K), mode, returned_batch_count` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L609** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L610** `    def _verify_type_and_layout(self, tensor, ref_type, ref_layout, name):` — **EN:** Defines function `_verify_type_and_layout`. **CN:** 定义函数 `_verify_type_and_layout`。
+- **L611** `        """` — **EN:** Starts the docstring for the function `_verify_type_and_layout`. **CN:** 开始说明 function `_verify_type_and_layout` 的文档字符串。
+- **L612** `        Verifies that \`\`tensor\`\` has data type \`\`ref_type\`\` and layout \`\`ref_layout\`\`. An exception` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L613** `        is raised if it does not.` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L614** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L615** `        :param tensor: object representing a tensor passed in to verify, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L616** `        :type tensor: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L617** `        :param ref_dtype: data type for the tensor that this object was initialized to` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L618** `        :param ref_layout: layout for the tensor that this object was initialized to` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L619** `        :param name: identifier of the tensor to verify. Used in raising exceptions` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L620** `        :type name: str` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L621** `        """` — **EN:** Ends the docstring for the function `_verify_type_and_layout`. **CN:** 结束说明 function `_verify_type_and_layout` 的文档字符串。
+- **L622** `        dtype, layout = datatypes.get_datatype_and_layout(tensor)` — **EN:** Assigns a value to (dtype, layout). **CN:** 将一个值赋给 (dtype, layout)。
+- **L623** `        if dtype != ref_type or layout != ref_layout:` — **EN:** Starts a conditional branch guarded by `dtype != ref_type or layout != ref_layout`. **CN:** 开始一个由 `dtype != ref_type or layout != ref_layout` 控制的条件分支。
+- **L624** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L625** `                # Attempt to transpose the tensor to fit the desired layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L626** `                tensor = tensor.transpose(-1, -2)` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L627** `            except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L628** `                raise Exception(f'Tensor {name} with type and layout ({dtype}, {layout}) '` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L629** `                                f'does not match the expected type and '` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `                                f'layout of ({ref_type}, {ref_layout}) and transpose failed.')` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `    def run(self, A=None, B=None, C=None, D=None,` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L633** `            alpha=None, beta=None, sync: bool = True, print_module: bool = False, visitor_args: dict = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L634** `            stream: Optional[cuda.CUstream] = None) -> GemmArguments:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L635** `        """` — **EN:** Starts the docstring for the function `run`. **CN:** 开始说明 function `run` 的文档字符串。
+- **L636** `        Runs the kernel currently specified. If it has not already been, the kernel is emitted and` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L637** `        compiled. Tensors holding operands and outputs of the kernel are sourced either from the` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L638** `        \`\`A\`\`, \`\`B\`\`, \`\`C\`\`, \`\`D\`\`, \`\`alpha\`\`, and \`\`beta\`\`` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L639** `        parameters provided in this call, or from those` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L640** `        passed in on the construction of this object -- one of the two must be specified.` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L641** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L642** `        By default, this call returns only once the kernel has completed. To launch the kernel` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L643** `        and immediately return, set \`\`sync=False\`\`. In this case, it is the responsibility of the` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L644** `        caller to syncrhonize the results of the kernel before attempting to access outputs` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L645** `        by calling \`\`sync()\`\` on the arguments returned from this call.` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L646** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L647** `        :param A: tensor representing data type and layout of operand A` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L648** `        :param B: tensor representing data type and layout of operand B` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L649** `        :param C: tensor representing data type and layout of operand C` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L650** `        :param D: tensor representing data type and layout of operand D` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L651** `        :param alpha: scalar paramter alpha from GEMM computation that scales the product of operands A and B` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L652** `        :param beta: scalar parameter beta from GEMM operation that scales operand C` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L653** `        :param sync: whether the call should wait for the kernel to complete before returning` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L654** `        :type sync: bool` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L655** `        :param print_module: whether to print the emitted C++ code` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L656** `        :type print_module: bool` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L657** `        :param stream: cuda stream, defaults to cuda.cuda.CUstream(0)` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L658** `        :type stream: :class:\`cuda.cuda.CUstream\`` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L660** `        :return: arguments passed in to the kernel` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L661** `        :rtype: cutlass_cppgen.backend.GemmArguments` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L662** `        """` — **EN:** Ends the docstring for the function `run`. **CN:** 结束说明 function `run` 的文档字符串。
+- **L663** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L664** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L665** `        super().run_setup()` — **EN:** Invokes `super().run_setup` as a standalone call. **CN:** 以独立语句方式调用 `super().run_setup`。
+- **L666** `        A = self._verify_tensor(A, self.A, self._element_a, self._layout_a, "A")` — **EN:** Assigns a value to A. **CN:** 将一个值赋给 A。
+- **L667** `        B = self._verify_tensor(B, self.B, self._element_b, self._layout_b, "B")` — **EN:** Assigns a value to B. **CN:** 将一个值赋给 B。
+- **L668** `        C = self._verify_tensor(C, self.C, self._element_c, self._layout_c, "C")` — **EN:** Assigns a value to C. **CN:** 将一个值赋给 C。
+- **L669** `        D = self._verify_tensor(D, self.D, self._element_d, self._layout_d, "D")` — **EN:** Assigns a value to D. **CN:** 将一个值赋给 D。
+- **L670** `        alpha = self._verify_scalar(alpha, self.alpha, self._element_c, "alpha")` — **EN:** Assigns a value to alpha. **CN:** 将一个值赋给 alpha。
+- **L671** `        beta = self._verify_scalar(beta, self.beta, self._element_c, "beta")` — **EN:** Assigns a value to beta. **CN:** 将一个值赋给 beta。
+- **L672** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L673** `        is_void_c = self._element_c == DataType.void` — **EN:** Assigns a value to is_void_c. **CN:** 将一个值赋给 is_void_c。
+- **L674** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L675** `        self._verify_rank(A)` — **EN:** Invokes `self._verify_rank` as a standalone call. **CN:** 以独立语句方式调用 `self._verify_rank`。
+- **L676** `        self._verify_rank(B)` — **EN:** Invokes `self._verify_rank` as a standalone call. **CN:** 以独立语句方式调用 `self._verify_rank`。
+- **L677** `        if not is_void_c:` — **EN:** Starts a conditional branch guarded by `not is_void_c`. **CN:** 开始一个由 `not is_void_c` 控制的条件分支。
+- **L678** `            self._verify_rank(C)` — **EN:** Invokes `self._verify_rank` as a standalone call. **CN:** 以独立语句方式调用 `self._verify_rank`。
+- **L679** `        self._verify_rank(D)` — **EN:** Invokes `self._verify_rank` as a standalone call. **CN:** 以独立语句方式调用 `self._verify_rank`。
+- **L680** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L681** `        alignment_a = self.possible_operations.find_alignment(A.shape, self._layout_a, operand="A")` — **EN:** Assigns a value to alignment_a. **CN:** 将一个值赋给 alignment_a。
+- **L682** `        alignment_b = self.possible_operations.find_alignment(B.shape, self._layout_b, operand="B")` — **EN:** Assigns a value to alignment_b. **CN:** 将一个值赋给 alignment_b。
+- **L683** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L684** `        # Set C alignment based on D.shape so as to correctly get an alignment with void-C` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L685** `        # kernels, for which \`C\` is None.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L686** `        alignment_c = self.possible_operations.find_alignment(D.shape, self._layout_c, operand="C")` — **EN:** Assigns a value to alignment_c. **CN:** 将一个值赋给 alignment_c。
+- **L687** `        self.compile(self._tile_description, alignment_A=alignment_a, alignment_B=alignment_b,` — **EN:** Invokes `self.compile` as a standalone call. **CN:** 以独立语句方式调用 `self.compile`。
+- **L688** `                     alignment_C=alignment_c, print_module=print_module)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L689** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L690** `        problem_size, mode, batch_count = self._get_problem_args(A, B, C, D)` — **EN:** Assigns a value to (problem_size, mode, batch_count). **CN:** 将一个值赋给 (problem_size, mode, batch_count)。
+- **L691** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L692** `        if mode == GemmUniversalMode.Gemm or batch_count == 1:` — **EN:** Starts a conditional branch guarded by `mode == GemmUniversalMode.Gemm or batch_count == 1`. **CN:** 开始一个由 `mode == GemmUniversalMode.Gemm or batch_count == 1` 控制的条件分支。
+- **L693** `            kwargs = {'split_k_slices': 1}` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L694** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L695** `            kwargs = {` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L696** `                'batch': batch_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** `                'batch_strides': {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L698** `                    'A': self._get_batch_stride(A),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L699** `                    'B': self._get_batch_stride(B),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L700** `                    'C': self._get_batch_stride(C),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L701** `                    'D': self._get_batch_stride(D)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L702** `                }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L703** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L705** `        kwargs['stream'] = stream` — **EN:** Assigns a value to kwargs['stream']. **CN:** 将一个值赋给 kwargs['stream']。
+- **L706** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L707** `        if isinstance(self.epilogue_functor, EpilogueFunctorVisitor):` — **EN:** Starts a conditional branch guarded by `isinstance(self.epilogue_functor, EpilogueFunctorVisitor)`. **CN:** 开始一个由 `isinstance(self.epilogue_functor, EpilogueFunctorVisitor)` 控制的条件分支。
+- **L708** `            output_op = self.operation.epilogue_type(visitor_args)` — **EN:** Assigns a value to output_op. **CN:** 将一个值赋给 output_op。
+- **L709** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L710** `            output_op = self.operation.epilogue_type(alpha, beta)` — **EN:** Assigns a value to output_op. **CN:** 将一个值赋给 output_op。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** `        arguments = GemmArguments(` — **EN:** Assigns a value to arguments. **CN:** 将一个值赋给 arguments。
+- **L713** `            operation=self.operation, problem_size=problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** `            A=A, B=B, C=C, D=D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L715** `            output_op=output_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L716** `            gemm_mode=mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L717** `            **kwargs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L718** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L719** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L720** `        self.operation.run(arguments)` — **EN:** Invokes `self.operation.run` as a standalone call. **CN:** 以独立语句方式调用 `self.operation.run`。
+- **L721** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L722** `        if sync:` — **EN:** Starts a conditional branch guarded by `sync`. **CN:** 开始一个由 `sync` 控制的条件分支。
+- **L723** `            arguments.sync()` — **EN:** Invokes `arguments.sync` as a standalone call. **CN:** 以独立语句方式调用 `arguments.sync`。
+- **L724** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L725** `        return arguments` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.op.gemm`. CN: 模块名为 `cutlass_cppgen.op.gemm`。
+- EN: Module docstring summary: Ease-of-use interface for constructing, compiling, and running GEMMs. CN: 模块文档摘要为：Ease-of-use interface for constructing, compiling, and running GEMMs.
+- EN: Top-level classes: Gemm CN: 顶层类包括：Gemm
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:DataType,DataTypeSize,GemmUniversalMode,KernelScheduleSuffixes, cutlass_cppgen, cutlass_cppgen:epilogue,swizzle, cutlass_cppgen.backend:compiler, cutlass_cppgen.backend.evt:EpilogueFunctorVisitor, cutlass_cppgen.backend.gemm_operation:GemmArguments,GemmOperationUniversal, cutlass_cppgen.backend.library:TensorDescription,TileDescription, cutlass_cppgen.op.op:OperationBase, cutlass_cppgen.shape:GemmCoord, cutlass_cppgen.utils:check,datatypes CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:DataType,DataTypeSize,GemmUniversalMode,KernelScheduleSuffixes, cutlass_cppgen, cutlass_cppgen:epilogue,swizzle, cutlass_cppgen.backend:compiler, cutlass_cppgen.backend.evt:EpilogueFunctorVisitor, cutlass_cppgen.backend.gemm_operation:GemmArguments,GemmOperationUniversal, cutlass_cppgen.backend.library:TensorDescription,TileDescription, cutlass_cppgen.op.op:OperationBase, cutlass_cppgen.shape:GemmCoord, cutlass_cppgen.utils:check,datatypes
+- EN: External or standard-library dependencies: __future__:annotations, typing:Optional, math:prod CN: 外部或标准库依赖：__future__:annotations, typing:Optional, math:prod

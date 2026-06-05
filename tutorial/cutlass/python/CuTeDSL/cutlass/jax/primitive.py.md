@@ -1,0 +1,378 @@
+# primitive.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/jax/primitive.py`
+
+## Purpose / 作用
+- EN: Defines 11 functions (cutlass_call, _is_spec_leaf, _normalize_tensor_spec, _resolve_spec_flat, ... (+7 more)) in `CuTeDSL.cutlass.jax.primitive`.
+- CN: 该模块 `CuTeDSL.cutlass.jax.primitive` 定义了 11 个函数（cutlass_call, _is_spec_leaf, _normalize_tensor_spec, _resolve_spec_flat, ... (+7 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Any, Sequence, Callable` — **EN:** Imports Any, Sequence, Callable from `typing`. **CN:** 从 `typing` 导入 Any, Sequence, Callable。
+- **L13** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import jax` — **EN:** Imports jax for later use. **CN:** 导入 jax 供后续使用。
+- **L17** `import jax.extend` — **EN:** Imports jax.extend for later use. **CN:** 导入 jax.extend 供后续使用。
+- **L18** `from jax.interpreters import mlir` — **EN:** Imports mlir from `jax.interpreters`. **CN:** 从 `jax.interpreters` 导入 mlir。
+- **L19** `from jax._src.interpreters import ad` — **EN:** Imports ad from `jax._src.interpreters`. **CN:** 从 `jax._src.interpreters` 导入 ad。
+- **L20** `from jax._src.interpreters import batching` — **EN:** Imports batching from `jax._src.interpreters`. **CN:** 从 `jax._src.interpreters` 导入 batching。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `from .compile import get_or_compile_kernel, build_function_spec` — **EN:** Imports get_or_compile_kernel, build_function_spec from `.compile`. **CN:** 从 `.compile` 导入 get_or_compile_kernel, build_function_spec。
+- **L24** `from .types import cutlass_to_jax_layout_order, default_tensor_spec, TensorSpec` — **EN:** Imports cutlass_to_jax_layout_order, default_tensor_spec, TensorSpec from `.types`. **CN:** 从 `.types` 导入 cutlass_to_jax_layout_order, default_tensor_spec, TensorSpec。
+- **L25** `from .ffi import get_cutlass_call_ffi_name, is_ffi_registered, register_ffi` — **EN:** Imports get_cutlass_call_ffi_name, is_ffi_registered, register_ffi from `.ffi`. **CN:** 从 `.ffi` 导入 get_cutlass_call_ffi_name, is_ffi_registered, register_ffi。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `logger = logging.getLogger(__name__)` — **EN:** Assigns a value to logger. **CN:** 将一个值赋给 logger。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `cutlass_call_inner_p = jax.extend.core.Primitive("cutlass_call_inner")` — **EN:** Assigns a value to cutlass_call_inner_p. **CN:** 将一个值赋给 cutlass_call_inner_p。
+- **L31** `cutlass_call_inner_p.multiple_results = True` — **EN:** Assigns a value to cutlass_call_inner_p.multiple_results. **CN:** 将一个值赋给 cutlass_call_inner_p.multiple_results。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `def cutlass_call(` — **EN:** Defines function `cutlass_call`. **CN:** 定义函数 `cutlass_call`。
+- **L35** `    fn: Callable[..., None],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L36** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L37** `    output_shape_dtype: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L38** `    input_spec: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L39** `    output_spec: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L40** `    input_mode: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L41** `    output_mode: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L42** `    input_output_aliases=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L43** `    allow_cuda_graph=True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L44** `    compile_options=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    use_static_tensors=False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `    **kwargs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L48** `    """Create a callable that invokes a \`\`@cute.jit\`\` function from JAX.` — **EN:** Starts the docstring for the function `cutlass_call`. **CN:** 开始说明 function `cutlass_call` 的文档字符串。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    Returns a callable that accepts JAX arrays and dispatches to *fn* as part` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L51** `    of a \`\`jax.jit\`\`-compiled computation.  The kernel is compiled once on the` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L52** `    first call and cached for subsequent invocations with the same shapes and` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L53** `    specs.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    Example::` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `        @cute.jit` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L58** `        def my_kernel(stream, A, B, C, D):` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L59** `            ...` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `        @jax.jit` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L62** `        def run(a, b):` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L63** `            return cutlass_call(` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L64** `                my_kernel,` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L65** `                output_shape_dtype=(` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L66** `                    jax.ShapeDtypeStruct(a.shape, a.dtype),` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L67** `                    jax.ShapeDtypeStruct(b.shape, b.dtype),` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L68** `                ),` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L69** `            )(a, b)` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `        c, d = run(a, b)` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `    Args:` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L74** `        fn: A \`\`@cute.jit\`\`-decorated function with the signature` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L75** `            \`\`(stream, *inputs, *outputs, **kwargs)\`\`.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L76** `        output_shape_dtype: A pytree of :class:\`jax.ShapeDtypeStruct\` (or` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L77** `            objects with \`\`.shape\`\` and \`\`.dtype\`\` attributes) describing each` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L78** `            output buffer.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L79** `        input_spec: A :class:\`TensorSpec\` or list thereof providing` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L80** `            layout/mode/divisibility hints for input tensors.  \`\`None\`\` infers` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L81** `            defaults from each array.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L82** `        output_spec: Same as *input_spec* but applied to output tensors.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L83** `        input_output_aliases: \`\`{input_index: output_index}\`\` mapping that` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L84** `            allows an input buffer to alias an output, avoiding an extra copy.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L85** `            Indices are into the flattened input and output pytrees.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L86** `        allow_cuda_graph: If \`\`False\`\`, prevents XLA from capturing this call` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L87** `            in a CUDA graph.  Defaults to \`\`True\`\`.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L88** `        compile_options: Optional dict of compiler flags forwarded to` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L89** `            \`\`cute.compile\`\`.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L90** `        use_static_tensors: If \`\`True\`\`, tensor shapes and strides are baked in` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L91** `            as compile-time constants, improving performance when shapes are` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L92** `            fixed across calls.  Defaults to \`\`False\`\`.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L93** `        **kwargs: Additional keyword arguments forwarded to *fn* as compile-time` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L94** `            constants.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    Returns:` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L97** `        A callable \`\`(*arrays) -> output_pytree\`\` that can be used inside` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L98** `        \`\`jax.jit\`\`.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    Note:` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L101** `        This API is experimental and subject to change.` — **EN:** Continues the docstring for the function `cutlass_call`. **CN:** 继续说明 function `cutlass_call` 的文档字符串。
+- **L102** `    """` — **EN:** Ends the docstring for the function `cutlass_call`. **CN:** 结束说明 function `cutlass_call` 的文档字符串。
+- **L103** `    if output_shape_dtype is None:` — **EN:** Starts a conditional branch guarded by `output_shape_dtype is None`. **CN:** 开始一个由 `output_shape_dtype is None` 控制的条件分支。
+- **L104** `        raise ValueError("'output_shape_dtype' must be specified.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    output_shape_dtype = jax.tree.map(` — **EN:** Assigns a value to output_shape_dtype. **CN:** 将一个值赋给 output_shape_dtype。
+- **L107** `        lambda leaf: jax.ShapeDtypeStruct(leaf.shape, leaf.dtype), output_shape_dtype` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    if input_output_aliases is None:` — **EN:** Starts a conditional branch guarded by `input_output_aliases is None`. **CN:** 开始一个由 `input_output_aliases is None` 控制的条件分支。
+- **L111** `        input_output_aliases = {}` — **EN:** Assigns a value to input_output_aliases. **CN:** 将一个值赋给 input_output_aliases。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    if input_spec and input_mode:` — **EN:** Starts a conditional branch guarded by `input_spec and input_mode`. **CN:** 开始一个由 `input_spec and input_mode` 控制的条件分支。
+- **L114** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L115** `            "input_spec and input_mode can not both be set. Use input_spec only as input_mode is deprecated."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `    if input_mode:` — **EN:** Starts a conditional branch guarded by `input_mode`. **CN:** 开始一个由 `input_mode` 控制的条件分支。
+- **L118** `        input_spec = input_mode` — **EN:** Assigns a value to input_spec. **CN:** 将一个值赋给 input_spec。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    if output_spec and output_mode:` — **EN:** Starts a conditional branch guarded by `output_spec and output_mode`. **CN:** 开始一个由 `output_spec and output_mode` 控制的条件分支。
+- **L121** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L122** `            "input_spec and input_mode can not both be set. Use input_spec only as input_mode is deprecated."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    if output_mode:` — **EN:** Starts a conditional branch guarded by `output_mode`. **CN:** 开始一个由 `output_mode` 控制的条件分支。
+- **L125** `        output_spec = output_mode` — **EN:** Assigns a value to output_spec. **CN:** 将一个值赋给 output_spec。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    return _cutlass_call_impl(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** `        fn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `        output_shape_dtype=output_shape_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `        input_spec=input_spec,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        output_spec=output_spec,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        input_output_aliases=input_output_aliases,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `        allow_cuda_graph=allow_cuda_graph,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        compile_options=compile_options,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `        use_static_tensors=use_static_tensors,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `        **kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `def _is_spec_leaf(x: Any) -> bool:` — **EN:** Defines function `_is_spec_leaf`. **CN:** 定义函数 `_is_spec_leaf`。
+- **L141** `    """Return True if *x* should be treated as a leaf when traversing a spec pytree.` — **EN:** Starts the docstring for the function `_is_spec_leaf`. **CN:** 开始说明 function `_is_spec_leaf` 的文档字符串。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    Stops traversal at \`\`TensorSpec\`\` and \`\`None\`\` (both are valid leaf specs) and at` — **EN:** Continues the docstring for the function `_is_spec_leaf`. **CN:** 继续说明 function `_is_spec_leaf` 的文档字符串。
+- **L144** `    bare integer sequences (the legacy mode-spec shorthand).  Everything else is` — **EN:** Continues the docstring for the function `_is_spec_leaf`. **CN:** 继续说明 function `_is_spec_leaf` 的文档字符串。
+- **L145** `    treated as a pytree container and recursed into by \`\`jax.tree.leaves\`\`.` — **EN:** Continues the docstring for the function `_is_spec_leaf`. **CN:** 继续说明 function `_is_spec_leaf` 的文档字符串。
+- **L146** `    """` — **EN:** Ends the docstring for the function `_is_spec_leaf`. **CN:** 结束说明 function `_is_spec_leaf` 的文档字符串。
+- **L147** `    if x is None or isinstance(x, TensorSpec):` — **EN:** Starts a conditional branch guarded by `x is None or isinstance(x, TensorSpec)`. **CN:** 开始一个由 `x is None or isinstance(x, TensorSpec)` 控制的条件分支。
+- **L148** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L149** `    # Legacy: a bare sequence of ints represents a single TensorSpec(mode=...).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L150** `    # Check *all* elements so that mixed sequences like (1, TensorSpec()) are NOT` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L151** `    # mistaken for a mode spec and instead cause a TypeError below.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L152** `    if isinstance(x, (list, tuple)) and bool(x) and all(isinstance(i, int) for i in x):` — **EN:** Starts a conditional branch guarded by `isinstance(x, (list, tuple)) and bool(x) and all((isinsta...`. **CN:** 开始一个由 `isinstance(x, (list, tuple)) and bool(x) and all((isinsta...` 控制的条件分支。
+- **L153** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L154** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `def _normalize_tensor_spec(value: Any) -> list[TensorSpec | None]:` — **EN:** Defines function `_normalize_tensor_spec`. **CN:** 定义函数 `_normalize_tensor_spec`。
+- **L158** `    """Normalize a spec pytree into a flat list of \`\`TensorSpec | None\`\` entries.` — **EN:** Starts the docstring for the function `_normalize_tensor_spec`. **CN:** 开始说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    *value* may be any JAX pytree whose leaves are \`\`TensorSpec\`\`, \`\`None\`\`, or a` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L161** `    bare integer sequence (legacy shorthand for \`\`TensorSpec(mode=...)\`\`).  Dict and` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L162** `    other non-list/tuple pytree containers are supported via \`\`jax.tree.leaves\`\`.` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    Note: \`\`TensorSpec\`\` is itself a JAX-registered dataclass with all-static fields,` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L165** `    so traversal *must* use the \`\`is_leaf\`\` predicate to stop at \`\`TensorSpec\`\` nodes` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L166** `    rather than recursing into them (which would yield no children and silently drop` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L167** `    the spec).` — **EN:** Continues the docstring for the function `_normalize_tensor_spec`. **CN:** 继续说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L168** `    """` — **EN:** Ends the docstring for the function `_normalize_tensor_spec`. **CN:** 结束说明 function `_normalize_tensor_spec` 的文档字符串。
+- **L169** `    leaves = jax.tree.leaves(value, is_leaf=_is_spec_leaf)` — **EN:** Assigns a value to leaves. **CN:** 将一个值赋给 leaves。
+- **L170** `    result = []` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L171** `    for leaf in leaves:` — **EN:** Starts a loop assigning items from `leaves` to `leaf`. **CN:** 开始一个循环，将 `leaves` 的元素赋给 `leaf`。
+- **L172** `        if leaf is None or isinstance(leaf, TensorSpec):` — **EN:** Starts a conditional branch guarded by `leaf is None or isinstance(leaf, TensorSpec)`. **CN:** 开始一个由 `leaf is None or isinstance(leaf, TensorSpec)` 控制的条件分支。
+- **L173** `            result.append(leaf)` — **EN:** Invokes `result.append` as a standalone call. **CN:** 以独立语句方式调用 `result.append`。
+- **L174** `        elif isinstance(leaf, (list, tuple)):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L175** `            # Legacy: bare int sequence → TensorSpec(mode=...)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L176** `            result.append(TensorSpec(mode=tuple(leaf)))` — **EN:** Invokes `result.append` as a standalone call. **CN:** 以独立语句方式调用 `result.append`。
+- **L177** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L178** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L179** `                f"Unexpected value for TensorSpec: {leaf!r} ({type(leaf).__name__})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `def _resolve_spec_flat(spec: Any, tensors: list) -> tuple[TensorSpec, ...]:` — **EN:** Defines function `_resolve_spec_flat`. **CN:** 定义函数 `_resolve_spec_flat`。
+- **L185** `    """Normalize *spec* and fill any \`\`None\`\` slots with defaults inferred from *tensors*."""` — **EN:** Docstring line documenting the function `_resolve_spec_flat`. **CN:** 文档字符串行，用于说明 function `_resolve_spec_flat`。
+- **L186** `    if spec is None:` — **EN:** Starts a conditional branch guarded by `spec is None`. **CN:** 开始一个由 `spec is None` 控制的条件分支。
+- **L187** `        return tuple(default_tensor_spec(t) for t in tensors)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L188** `    specs = list(_normalize_tensor_spec(spec))` — **EN:** Assigns a value to specs. **CN:** 将一个值赋给 specs。
+- **L189** `    if len(specs) != len(tensors):` — **EN:** Starts a conditional branch guarded by `len(specs) != len(tensors)`. **CN:** 开始一个由 `len(specs) != len(tensors)` 控制的条件分支。
+- **L190** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L191** `            f"Must have the same number of specs ({len(specs)}) as tensors ({len(tensors)})."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `    return tuple(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** `        default_tensor_spec(t) if s is None else s for s, t in zip(specs, tensors)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `def _validate_specs(label: str, tensors: list, specs: tuple[TensorSpec, ...]) -> None:` — **EN:** Defines function `_validate_specs`. **CN:** 定义函数 `_validate_specs`。
+- **L199** `    """Validate that each spec's rank-dependent fields match the corresponding tensor shape."""` — **EN:** Docstring line documenting the function `_validate_specs`. **CN:** 文档字符串行，用于说明 function `_validate_specs`。
+- **L200** `    for idx, (tensor, spec) in enumerate(zip(tensors, specs)):` — **EN:** Starts a loop assigning items from `enumerate(zip(tensors, specs))` to `(idx, (tensor, spec))`. **CN:** 开始一个循环，将 `enumerate(zip(tensors, specs))` 的元素赋给 `(idx, (tensor, spec))`。
+- **L201** `        ndim = len(tensor.shape)` — **EN:** Assigns a value to ndim. **CN:** 将一个值赋给 ndim。
+- **L202** `        if spec.layout is not None and len(spec.layout) != ndim:` — **EN:** Starts a conditional branch guarded by `spec.layout is not None and len(spec.layout) != ndim`. **CN:** 开始一个由 `spec.layout is not None and len(spec.layout) != ndim` 控制的条件分支。
+- **L203** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L204** `                f"{label} #{idx} has invalid layout {spec.layout} for shape {tensor.shape}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `        if spec.mode is not None and len(spec.mode) != ndim:` — **EN:** Starts a conditional branch guarded by `spec.mode is not None and len(spec.mode) != ndim`. **CN:** 开始一个由 `spec.mode is not None and len(spec.mode) != ndim` 控制的条件分支。
+- **L207** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L208** `                f"{label} #{idx} has invalid mode {spec.mode} for shape {tensor.shape}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `        if (` — **EN:** Starts a conditional branch guarded by `spec.divisibility is not None and (not isinstance(spec.di...`. **CN:** 开始一个由 `spec.divisibility is not None and (not isinstance(spec.di...` 控制的条件分支。
+- **L211** `            spec.divisibility is not None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L212** `            and not isinstance(spec.divisibility, int)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L213** `            and len(spec.divisibility) != ndim` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L214** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L215** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L216** `                f"{label} #{idx} has invalid divisibility {spec.divisibility} for shape {tensor.shape}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** `def _cutlass_call_impl(` — **EN:** Defines function `_cutlass_call_impl`. **CN:** 定义函数 `_cutlass_call_impl`。
+- **L221** `    fn,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L222** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L223** `    output_shape_dtype: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L224** `    input_spec: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L225** `    output_spec: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `    input_output_aliases,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L227** `    allow_cuda_graph,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `    compile_options,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `    use_static_tensors,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `    **kwargs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L232** `    # A single ShapeDtypeStruct means one output; a sequence means multiple.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L233** `    multiple_results = isinstance(output_shape_dtype, Sequence)` — **EN:** Assigns a value to multiple_results. **CN:** 将一个值赋给 multiple_results。
+- **L234** `    if not multiple_results:` — **EN:** Starts a conditional branch guarded by `not multiple_results`. **CN:** 开始一个由 `not multiple_results` 控制的条件分支。
+- **L235** `        output_shape_dtype = (output_shape_dtype,)` — **EN:** Assigns a value to output_shape_dtype. **CN:** 将一个值赋给 output_shape_dtype。
+- **L236** `    output_shape_dtype_flat, output_tree = jax.tree.flatten(output_shape_dtype)` — **EN:** Assigns a value to (output_shape_dtype_flat, output_tree). **CN:** 将一个值赋给 (output_shape_dtype_flat, output_tree)。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `    @jax.jit` — **EN:** Applies decorator `jax.jit` to the following definition. **CN:** 将装饰器 `jax.jit` 应用于后面的定义。
+- **L239** `    def call_wrapper(*args):` — **EN:** Defines function `call_wrapper`. **CN:** 定义函数 `call_wrapper`。
+- **L240** `        args_flat, args_tree = jax.tree.flatten(args)` — **EN:** Assigns a value to (args_flat, args_tree). **CN:** 将一个值赋给 (args_flat, args_tree)。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `        input_spec_flat = _resolve_spec_flat(input_spec, args_flat)` — **EN:** Assigns a value to input_spec_flat. **CN:** 将一个值赋给 input_spec_flat。
+- **L243** `        output_spec_flat = _resolve_spec_flat(output_spec, output_shape_dtype_flat)` — **EN:** Assigns a value to output_spec_flat. **CN:** 将一个值赋给 output_spec_flat。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `        _validate_specs("Input", args_flat, input_spec_flat)` — **EN:** Invokes `_validate_specs` as a standalone call. **CN:** 以独立语句方式调用 `_validate_specs`。
+- **L246** `        _validate_specs("Output", output_shape_dtype_flat, output_spec_flat)` — **EN:** Invokes `_validate_specs` as a standalone call. **CN:** 以独立语句方式调用 `_validate_specs`。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `        output_flat = cutlass_call_inner_p.bind(` — **EN:** Assigns a value to output_flat. **CN:** 将一个值赋给 output_flat。
+- **L249** `            *args_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `            fn=fn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `            args_tree=args_tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `            output_shape_dtype_flat=tuple(output_shape_dtype_flat),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `            output_tree=output_tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `            input_spec_flat=input_spec_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `            output_spec_flat=output_spec_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `            input_output_aliases=tuple(input_output_aliases.items()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            allow_cuda_graph=allow_cuda_graph,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `            compile_options=compile_options,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `            use_static_tensors=use_static_tensors,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `            **kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `        output = jax.tree.unflatten(output_tree, output_flat)` — **EN:** Assigns a value to output. **CN:** 将一个值赋给 output。
+- **L264** `        return output if multiple_results else output[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    return call_wrapper` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** `@cutlass_call_inner_p.def_abstract_eval` — **EN:** Applies decorator `cutlass_call_inner_p.def_abstract_eval` to the following definition. **CN:** 将装饰器 `cutlass_call_inner_p.def_abstract_eval` 应用于后面的定义。
+- **L270** `def cutlass_call_inner_p_abstract(*_, output_shape_dtype_flat, **__):` — **EN:** Defines function `cutlass_call_inner_p_abstract`. **CN:** 定义函数 `cutlass_call_inner_p_abstract`。
+- **L271** `    return [jax.core.ShapedArray(x.shape, x.dtype) for x in output_shape_dtype_flat]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `def cutlass_call_inner_p_impl(` — **EN:** Defines function `cutlass_call_inner_p_impl`. **CN:** 定义函数 `cutlass_call_inner_p_impl`。
+- **L275** `    *args_flat,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `    fn,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `    args_tree: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `    output_shape_dtype_flat: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `    output_tree: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `    input_spec_flat: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L281** `    output_spec_flat: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L282** `    input_output_aliases,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L283** `    allow_cuda_graph,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L284** `    compile_options,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L285** `    use_static_tensors,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L286** `    **kwargs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L287** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L288** `    input_output_aliases = dict(input_output_aliases)` — **EN:** Assigns a value to input_output_aliases. **CN:** 将一个值赋给 input_output_aliases。
+- **L289** `    spec = build_function_spec(` — **EN:** Assigns a value to spec. **CN:** 将一个值赋给 spec。
+- **L290** `        args_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `        args_tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `        output_shape_dtype_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `        output_tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `        input_spec_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `        output_spec_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `        input_output_aliases,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `        compile_options,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `        use_static_tensors,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `        kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `    kernel = get_or_compile_kernel(fn, spec)` — **EN:** Assigns a value to kernel. **CN:** 将一个值赋给 kernel。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `    # Ensure our FFI target is registered. We do this lazily here` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L305** `    # so that we only load the dependant library if needed.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L306** `    if not is_ffi_registered():` — **EN:** Starts a conditional branch guarded by `not is_ffi_registered()`. **CN:** 开始一个由 `not is_ffi_registered()` 控制的条件分支。
+- **L307** `        register_ffi()` — **EN:** Invokes `register_ffi` as a standalone call. **CN:** 以独立语句方式调用 `register_ffi`。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    call_name = get_cutlass_call_ffi_name(allow_cuda_graph)` — **EN:** Assigns a value to call_name. **CN:** 将一个值赋给 call_name。
+- **L310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L311** `    # Convert layout from CuTeDSL to JAX order as ffi_call expects this.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L312** `    input_layouts = [cutlass_to_jax_layout_order(s.layout) for s in input_spec_flat]` — **EN:** Assigns a value to input_layouts. **CN:** 将一个值赋给 input_layouts。
+- **L313** `    output_layouts = [cutlass_to_jax_layout_order(s.layout) for s in output_spec_flat]` — **EN:** Assigns a value to output_layouts. **CN:** 将一个值赋给 output_layouts。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `    fun = jax.ffi.ffi_call(` — **EN:** Assigns a value to fun. **CN:** 将一个值赋给 fun。
+- **L316** `        call_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `        result_shape_dtypes=output_shape_dtype_flat,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `        input_output_aliases=dict(spec.input_output_aliases),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `        input_layouts=input_layouts,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `        output_layouts=output_layouts,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L323** `    return fun(*args_flat, module=kernel.module, key=kernel.fingerprint)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** `def _cutlass_call_jvp_rule(*args, **kwargs):` — **EN:** Defines function `_cutlass_call_jvp_rule`. **CN:** 定义函数 `_cutlass_call_jvp_rule`。
+- **L327** `    del args, kwargs` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L328** `    raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L329** `        "cutlass_call does not support VJP. Please use \`jax.custom_jvp\` for taking gradients."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `ad.primitive_jvps[cutlass_call_inner_p] = _cutlass_call_jvp_rule` — **EN:** Assigns a value to ad.primitive_jvps[cutlass_call_inner_p]. **CN:** 将一个值赋给 ad.primitive_jvps[cutlass_call_inner_p]。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L336** `def _cutlass_call_transpose_rule(*args, **kwargs):` — **EN:** Defines function `_cutlass_call_transpose_rule`. **CN:** 定义函数 `_cutlass_call_transpose_rule`。
+- **L337** `    del args, kwargs` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L338** `    raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L339** `        "cutlass_call does not support transpose. Please use \`jax.custom_vjp\` for taking gradients."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `ad.primitive_transposes[cutlass_call_inner_p] = _cutlass_call_transpose_rule` — **EN:** Assigns a value to ad.primitive_transposes[cutlass_call_inner_p]. **CN:** 将一个值赋给 ad.primitive_transposes[cutlass_call_inner_p]。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `def _cutlass_call_vmap_rule(*args, **kwargs):` — **EN:** Defines function `_cutlass_call_vmap_rule`. **CN:** 定义函数 `_cutlass_call_vmap_rule`。
+- **L347** `    del args, kwargs` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L348** `    raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L349** `        "cutlass_call does not support batching with jax.vmap. Please "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `        "use jax.custom_batching.custom_vmap for applying vmap. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `batching.primitive_batchers[cutlass_call_inner_p] = _cutlass_call_vmap_rule` — **EN:** Assigns a value to batching.primitive_batchers[cutlass_call_inner_p]. **CN:** 将一个值赋给 batching.primitive_batchers[cutlass_call_inner_p]。
+- **L355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L356** `jax._src.dispatch.simple_impl(cutlass_call_inner_p)` — **EN:** Invokes `jax._src.dispatch.simple_impl` as a standalone call. **CN:** 以独立语句方式调用 `jax._src.dispatch.simple_impl`。
+- **L357** `jax._src.dispatch.prim_requires_devices_during_lowering.add(cutlass_call_inner_p)` — **EN:** Invokes `jax._src.dispatch.prim_requires_devices_during_lower...` as a standalone call. **CN:** 以独立语句方式调用 `jax._src.dispatch.prim_requires_devices_during_lower...`。
+- **L358** `lowering = mlir.lower_fun(cutlass_call_inner_p_impl, multiple_results=True)` — **EN:** Assigns a value to lowering. **CN:** 将一个值赋给 lowering。
+- **L359** `mlir.register_lowering(cutlass_call_inner_p, lowering, platform="cuda")` — **EN:** Invokes `mlir.register_lowering` as a standalone call. **CN:** 以独立语句方式调用 `mlir.register_lowering`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.jax.primitive`. CN: 模块名为 `CuTeDSL.cutlass.jax.primitive`。
+- EN: Top-level functions: cutlass_call, _is_spec_leaf, _normalize_tensor_spec, _resolve_spec_flat, _validate_specs, _cutlass_call_impl, cutlass_call_inner_p_abstract, cutlass_call_inner_p_impl, _cutlass_call_jvp_rule, _cutlass_call_transpose_rule, _cutlass_call_vmap_rule CN: 顶层函数包括：cutlass_call, _is_spec_leaf, _normalize_tensor_spec, _resolve_spec_flat, _validate_specs, _cutlass_call_impl, cutlass_call_inner_p_abstract, cutlass_call_inner_p_impl, _cutlass_call_jvp_rule, _cutlass_call_transpose_rule, _cutlass_call_vmap_rule
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .compile:get_or_compile_kernel,build_function_spec, .types:cutlass_to_jax_layout_order,default_tensor_spec,TensorSpec, .ffi:get_cutlass_call_ffi_name,is_ffi_registered,register_ffi CN: 内部依赖：.compile:get_or_compile_kernel,build_function_spec, .types:cutlass_to_jax_layout_order,default_tensor_spec,TensorSpec, .ffi:get_cutlass_call_ffi_name,is_ffi_registered,register_ffi
+- EN: External or standard-library dependencies: typing:Any,Sequence,Callable, logging, jax, jax.extend, jax.interpreters:mlir, jax._src.interpreters:ad, jax._src.interpreters:batching CN: 外部或标准库依赖：typing:Any,Sequence,Callable, logging, jax, jax.extend, jax.interpreters:mlir, jax._src.interpreters:ad, jax._src.interpreters:batching

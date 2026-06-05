@@ -1,0 +1,82 @@
+# install_magma.sh — Documentation Analysis / 文档分析
+
+## Source / 来源
+
+- **File / 文件**: `.ci/docker/common/install_magma.sh`
+- **Repository / 仓库**: `pytorch` (`/root/xw/pytorch`)
+- **Purpose (EN)**: Automates repository maintenance, build, test, packaging, or release tasks through shell commands. The opening comment frames the file as: "!/usr/bin/env bash Script used only in CD pipeline."
+- **Purpose (CN)**: 通过 shell 命令自动化执行仓库维护、构建、测试、打包或发布任务。 开头注释将该文件概括为：“!/usr/bin/env bash Script used only in CD pipeline”。
+
+## Content Analysis / 内容分析
+
+### Lines 1-5 / 第 1-5 行
+
+```bash
+#!/usr/bin/env bash
+# Script used only in CD pipeline
+
+set -eou pipefail
+
+```
+
+- **EN:** This chunk introduces sections such as !/usr/bin/env bash, Script used only in CD pipeline, which organize the surrounding guidance or configuration.
+- **CN:** 这一段通过 !/usr/bin/env bash、Script used only in CD pipeline 等标题组织周边说明或配置。
+
+### Lines 6-12 / 第 6-12 行
+
+```bash
+function do_install() {
+    cuda_version=$1
+    cuda_version_nodot=${1/./}
+
+    MAGMA_VERSION="2.6.1"
+    magma_archive="magma-cuda${cuda_version_nodot}-${MAGMA_VERSION}-1.tar.bz2"
+
+```
+
+- **EN:** The script defines shell helpers such as do_install to structure repeated tasks.
+- **CN:** 脚本定义了 do_install 等 shell 辅助函数，以组织重复任务。
+- **EN:** Environment variables such as MAGMA_VERSION communicate required tool locations or behavioral switches.
+- **CN:** MAGMA_VERSION 等环境变量用于说明所需工具位置或行为开关。
+
+### Lines 13-22 / 第 13-22 行
+
+```bash
+    cuda_dir="/usr/local/cuda-${cuda_version}"
+    (
+        set -x
+        tmp_dir=$(mktemp -d)
+        pushd ${tmp_dir}
+        curl -OLs https://ossci-linux.s3.us-east-1.amazonaws.com/${magma_archive}
+        tar -xvf "${magma_archive}"
+        mkdir -p "${cuda_dir}/magma"
+        mv include "${cuda_dir}/magma/include"
+        mv lib "${cuda_dir}/magma/lib"
+```
+
+- **EN:** It invokes commands such as pushd, curl, tar, mkdir, mv, showing the operational steps the workflow performs.
+- **CN:** 它调用了 pushd、curl、tar、mkdir、mv 等命令，展示该工作流执行的操作步骤。
+
+### Lines 23-27 / 第 23-27 行
+
+```bash
+        popd
+    )
+}
+
+do_install $1
+```
+
+- **EN:** It invokes commands such as popd, do_install, showing the operational steps the workflow performs.
+- **CN:** 它调用了 popd、do_install 等命令，展示该工作流执行的操作步骤。
+
+## Key Concepts / 关键概念
+
+- **Repository support logic** — 仓库支撑逻辑
+- **Representative symbols: do_install** — 代表性符号：do_install
+
+## Dependencies / 依赖关系
+
+- `bash`
+- `tar`
+- `curl`

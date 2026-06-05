@@ -1,0 +1,977 @@
+# uint128.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/uint128.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Defines an unsigned 128b integer with several operators to support 64-bit integer division." and defines related CUTLASS facilities in `include/cutlass/uint128.h`.
+- CN: 该头文件以注释摘要“Defines an unsigned 128b integer with several operators to support 64-bit integer division.”引入，并在 `include/cutlass/uint128.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! </code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L32**: <code>  \file</code>
+  - EN: Doxygen file tag indicating that the comment documents the whole file.
+  - CN: Doxygen 文件标签，说明该注释用于描述整个文件。
+- **L33**: <code>  \brief Defines an unsigned 128b integer with several operators to support 64-bit integer division.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L34**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L36**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L37**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L38**: <code>#include CUDA_STD_HEADER(cstdint)</code>
+  - EN: Includes CUDA_STD_HEADER(cstdint) so this file can use declarations from that dependency.
+  - CN: 包含 CUDA_STD_HEADER(cstdint)，以便本文件使用该依赖中的声明。
+- **L39**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L40**: <code>#include &lt;cstdint&gt;</code>
+  - EN: Includes <cstdint> so this file can use declarations from that dependency.
+  - CN: 包含 <cstdint>，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &lt;cstdlib&gt;</code>
+  - EN: Includes <cstdlib> so this file can use declarations from that dependency.
+  - CN: 包含 <cstdlib>，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &lt;cmath&gt;</code>
+  - EN: Includes <cmath> so this file can use declarations from that dependency.
+  - CN: 包含 <cmath>，以便本文件使用该依赖中的声明。
+- **L43**: <code>#include &lt;type_traits&gt;</code>
+  - EN: Includes <type_traits> so this file can use declarations from that dependency.
+  - CN: 包含 <type_traits>，以便本文件使用该依赖中的声明。
+- **L44**: <code>#include &lt;stdexcept&gt;</code>
+  - EN: Includes <stdexcept> so this file can use declarations from that dependency.
+  - CN: 包含 <stdexcept>，以便本文件使用该依赖中的声明。
+- **L45**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L46**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>/// Optionally enable GCC&#x27;s built-in type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L49**: <code>#if (defined(__x86_64) || defined (__aarch64__)) &amp;&amp; !(defined(__CUDA_ARCH__) &amp;&amp; ((__CUDACC_VER_MAJOR__ &lt;= 10) || ((__CUDACC_VER_MAJOR__ == 11) &amp;&amp; (__CUDACC_VER_MINOR__ &lt;= 4)))) &amp;&amp; defined(__GNUC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `(defined(__x86_64) || defined (__aarch64__)) && !(defined(__CUDA_ARCH__) && ((__CUDACC_VER_MAJOR__ <= 10) || ((__CUDACC_VER_MAJOR__ == 11) && (__CUDACC_VER_MINOR__ <= 4)))) && defined(__GNUC__)`.
+  - CN: 开始一个由 `(defined(__x86_64) || defined (__aarch64__)) && !(defined(__CUDA_ARCH__) && ((__CUDACC_VER_MAJOR__ <= 10) || ((__CUDACC_VER_MAJOR__ == 11) && (__CUDACC_VER_MINOR__ <= 4)))) && defined(__GNUC__)` 控制的条件编译块。
+- **L50**: <code>#define CUTLASS_UINT128_NATIVE</code>
+  - EN: Defines the macro or header-guard symbol `CUTLASS_UINT128_NATIVE`.
+  - CN: 定义宏或头文件保护符号 `CUTLASS_UINT128_NATIVE`。
+- **L51**: <code>#elif !defined(__CUDA_ARCH__)</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L52**: <code>// No custom support for 128b arithmetic on device</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L53**: <code>#if defined(_MSC_VER) &amp;&amp; defined(_M_AMD64)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(_MSC_VER) && defined(_M_AMD64)`.
+  - CN: 开始一个由 `defined(_MSC_VER) && defined(_M_AMD64)` 控制的条件编译块。
+- **L54**: <code>#define CUTLASS_INT128_ARITHMETIC</code>
+  - EN: Defines the macro or header-guard symbol `CUTLASS_INT128_ARITHMETIC`.
+  - CN: 定义宏或头文件保护符号 `CUTLASS_INT128_ARITHMETIC`。
+- **L55**: <code>#include &lt;intrin.h&gt;</code>
+  - EN: Includes <intrin.h> so this file can use declarations from that dependency.
+  - CN: 包含 <intrin.h>，以便本文件使用该依赖中的声明。
+- **L56**: <code>#if _MSC_VER &gt;= 1920 &amp;&amp; !defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `_MSC_VER >= 1920 && !defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `_MSC_VER >= 1920 && !defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L57**: <code>#define CUTLASS_INT128_ARITHMETIC_DIV</code>
+  - EN: Defines the macro or header-guard symbol `CUTLASS_INT128_ARITHMETIC_DIV`.
+  - CN: 定义宏或头文件保护符号 `CUTLASS_INT128_ARITHMETIC_DIV`。
+- **L58**: <code>#include &lt;immintrin.h&gt;</code>
+  - EN: Includes <immintrin.h> so this file can use declarations from that dependency.
+  - CN: 包含 <immintrin.h>，以便本文件使用该依赖中的声明。
+- **L59**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L60**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L61**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L62**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L63**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L64**: <code>uint64_t umul128(</code>
+  - EN: Begins or continues the signature/parameter list for `umul128`.
+  - CN: 开始或继续 `umul128` 的签名/参数列表。
+- **L65**: <code>   uint64_t multiplier,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L66**: <code>   uint64_t multiplicand,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L67**: <code>   uint64_t *high_product</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L68**: <code>) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L69**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L70**: <code>#if defined(CUTLASS_INT128_ARITHMETIC)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_INT128_ARITHMETIC)`.
+  - CN: 开始一个由 `defined(CUTLASS_INT128_ARITHMETIC)` 控制的条件编译块。
+- **L71**: <code>  return _umul128(multiplier, multiplicand, high_product);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L72**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L73**: <code>  const uint64_t mask = 0xFFFFFFFF;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>  uint64_t a_lo = multiplier &amp; mask;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L76**: <code>  uint64_t a_hi = multiplier &gt;&gt; 32;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L77**: <code>  uint64_t b_lo = multiplicand &amp; mask;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L78**: <code>  uint64_t b_hi = multiplicand &gt;&gt; 32;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L79**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L80**: <code>  uint64_t p_ll = a_lo * b_lo;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L81**: <code>  uint64_t p_lh = a_lo * b_hi;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L82**: <code>  uint64_t p_hl = a_hi * b_lo;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L83**: <code>  uint64_t p_hh = a_hi * b_hi;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L84**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L85**: <code>  uint64_t p_mid = (p_ll &gt;&gt; 32) + (p_lh &amp; mask) + (p_hl &amp; mask);</code>
+  - EN: Declares the callable or operator `p_mid`.
+  - CN: 声明可调用对象或运算符 `p_mid`。
+- **L86**: <code>  uint64_t r_lo = (p_ll &amp; mask) + (p_mid &lt;&lt; 32);</code>
+  - EN: Declares the callable or operator `r_lo`.
+  - CN: 声明可调用对象或运算符 `r_lo`。
+- **L87**: <code>  uint64_t r_hi = (p_lh &amp; mask) + (p_hl &amp; mask) + p_hh;</code>
+  - EN: Declares the callable or operator `r_hi`.
+  - CN: 声明可调用对象或运算符 `r_hi`。
+- **L88**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L89**: <code>  *high_product = r_hi;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L90**: <code>  return r_lo;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L91**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L92**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L95**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L96**: <code>uint64_t udiv128(uint64_t high, uint64_t low, uint64_t divisor, uint64_t *remainder_ptr) {</code>
+  - EN: Starts the definition body for `udiv128`.
+  - CN: 开始 `udiv128` 的定义体。
+- **L97**: <code>#if defined(CUTLASS_INT128_ARITHMETIC_DIV)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_INT128_ARITHMETIC_DIV)`.
+  - CN: 开始一个由 `defined(CUTLASS_INT128_ARITHMETIC_DIV)` 控制的条件编译块。
+- **L98**: <code>  return _udiv128(high, low, divisor, remainder_ptr);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L99**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L100**: <code>  uint64_t quotient = 0, remainder = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L101**: <code>  uint64_t const bit = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L102**: <code>  for (int32_t i=127; i&gt;=0; --i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L103**: <code>    uint64_t r = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L104**: <code>    if (i &gt;= 64) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L105**: <code>      r = ((high &gt;&gt; (i - 64)) &amp; bit);</code>
+  - EN: Declares the callable or operator `r`.
+  - CN: 声明可调用对象或运算符 `r`。
+- **L106**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L107**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L108**: <code>      r = ((low &gt;&gt; i) &amp; bit);</code>
+  - EN: Declares the callable or operator `r`.
+  - CN: 声明可调用对象或运算符 `r`。
+- **L109**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L110**: <code>    remainder = (remainder &lt;&lt; 1) | r;</code>
+  - EN: Declares the callable or operator `remainder`.
+  - CN: 声明可调用对象或运算符 `remainder`。
+- **L111**: <code>    if (remainder &gt;= divisor) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L112**: <code>      remainder -= divisor;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L113**: <code>      quotient |= (bit &lt;&lt; i);</code>
+  - EN: Declares the callable or operator `quotient`.
+  - CN: 声明可调用对象或运算符 `quotient`。
+- **L114**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L115**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L116**: <code>  *remainder_ptr = remainder;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L117**: <code>  return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L118**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L119**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L120**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L121**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L122**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L123**: <code>///! Unsigned 128b integer type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L124**: <code>struct alignas(16) uint128_t</code>
+  - EN: Declares or defines the struct `alignas`.
+  - CN: 声明或定义 struct `alignas`。
+- **L125**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L126**: <code>  /// Size of one part of the uint&#x27;s storage in bits</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L127**: <code>  static constexpr int storage_bits_ = 64;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L128**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L129**: <code>  struct hilo</code>
+  - EN: Declares or defines the struct `hilo`.
+  - CN: 声明或定义 struct `hilo`。
+- **L130**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L131**: <code>    uint64_t lo;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L132**: <code>    uint64_t hi;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L133**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>  // Use a union to store either low and high parts or, if present, a built-in 128b integer type.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L136**: <code>  union {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L137**: <code>    struct hilo hilo_;</code>
+  - EN: Declares or defines the struct `hilo`.
+  - CN: 声明或定义 struct `hilo`。
+- **L138**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L139**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L140**: <code>    unsigned __int128 native;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L141**: <code>#endif // defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L142**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L143**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L144**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L145**: <code>  // Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L146**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L147**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L148**: <code>  /// Default ctor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L149**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L150**: <code>  uint128_t() : hilo_{0, 0} {}</code>
+  - EN: Starts the definition body for `uint128_t`.
+  - CN: 开始 `uint128_t` 的定义体。
+- **L151**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L152**: <code>  /// Constructor from uint64</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L153**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L154**: <code>  uint128_t(uint64_t lo_) : hilo_{lo_, 0} {}</code>
+  - EN: Starts the definition body for `uint128_t`.
+  - CN: 开始 `uint128_t` 的定义体。
+- **L155**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L156**: <code>  /// Constructor from two 64b unsigned integers</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L157**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L158**: <code>  uint128_t(uint64_t lo_, uint64_t hi_) : hilo_{lo_, hi_} {}</code>
+  - EN: Starts the definition body for `uint128_t`.
+  - CN: 开始 `uint128_t` 的定义体。
+- **L159**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L160**: <code>  /// Optional constructor from native value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L161**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L162**: <code>  uint128_t(unsigned __int128 value) : native(value) { }</code>
+  - EN: Starts the definition body for `uint128_t`.
+  - CN: 开始 `uint128_t` 的定义体。
+- **L163**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L164**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L165**: <code>  /// Lossily cast to uint64</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L166**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L167**: <code>  explicit operator uint64_t() const</code>
+  - EN: Provides part of the signature or implementation for `operatoruint64_t`.
+  - CN: 提供 `operatoruint64_t` 的签名或实现的一部分。
+- **L168**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L169**: <code>    return hilo_.lo;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L170**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L171**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L172**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L173**: <code>  static void exception()</code>
+  - EN: Provides part of the signature or implementation for `exception`.
+  - CN: 提供 `exception` 的签名或实现的一部分。
+- **L174**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L175**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L176**: <code>  asm volatile (&quot;  brkpt;\n&quot;);</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L177**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L178**: <code>  // throw std::runtime_error(&quot;Not yet implemented.&quot;);</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L179**: <code>  abort();</code>
+  - EN: Declares the callable or operator `abort`.
+  - CN: 声明可调用对象或运算符 `abort`。
+- **L180**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L181**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L182**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L183**: <code>  /// Add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L184**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L185**: <code>  uint128_t operator+(uint128_t const&amp; rhs) const</code>
+  - EN: Provides part of the signature or implementation for `operator+`.
+  - CN: 提供 `operator+` 的签名或实现的一部分。
+- **L186**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L187**: <code>    uint128_t y{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L188**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L189**: <code>    y.native = native + rhs.native;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L190**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L191**: <code>    y.hilo_.lo = hilo_.lo + rhs.hilo_.lo;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L192**: <code>    y.hilo_.hi = hilo_.hi + rhs.hilo_.hi + (y.hilo_.lo &lt; hilo_.lo);</code>
+  - EN: Declares the callable or operator `hi`.
+  - CN: 声明可调用对象或运算符 `hi`。
+- **L193**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L194**: <code>    return y;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L195**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L196**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L197**: <code>  /// Subtract</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L198**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L199**: <code>  uint128_t operator-(uint128_t const&amp; rhs) const</code>
+  - EN: Provides part of the signature or implementation for `operator-`.
+  - CN: 提供 `operator-` 的签名或实现的一部分。
+- **L200**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L201**: <code>    uint128_t y{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L202**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L203**: <code>    y.native = native - rhs.native;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L204**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L205**: <code>    y.hilo_.lo = hilo_.lo - rhs.hilo_.lo;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L206**: <code>    y.hilo_.hi = hilo_.hi - rhs.hilo_.hi - (rhs.hilo_.lo &amp;&amp; y.hilo_.lo &gt; hilo_.lo);</code>
+  - EN: Declares the callable or operator `hi`.
+  - CN: 声明可调用对象或运算符 `hi`。
+- **L207**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L208**: <code>    return y;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L209**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L210**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L211**: <code>  /// Multiply by unsigned 64b integer yielding 128b integer</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L212**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L213**: <code>  uint128_t operator*(uint64_t const&amp; rhs) const</code>
+  - EN: Provides part of the signature or implementation for `operator*`.
+  - CN: 提供 `operator*` 的签名或实现的一部分。
+- **L214**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L215**: <code>    uint128_t y{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L216**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L217**: <code>    y.native = native * rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L218**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L219**: <code>    // Multiply by the low part</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L220**: <code>    y.hilo_.lo = umul128(hilo_.lo, rhs, &amp;y.hilo_.hi);</code>
+  - EN: Declares the callable or operator `umul128`.
+  - CN: 声明可调用对象或运算符 `umul128`。
+- **L221**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L222**: <code>    // Add the high part and ignore the overflow</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L223**: <code>    uint64_t overflow{0};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L224**: <code>    y.hilo_.hi += umul128(hilo_.hi, rhs, &amp;overflow);</code>
+  - EN: Declares the callable or operator `umul128`.
+  - CN: 声明可调用对象或运算符 `umul128`。
+- **L225**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L226**: <code>    return y;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L227**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L228**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L229**: <code>  /// Divide 128b operation by 64b operation yielding a 64b quotient</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L230**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L231**: <code>  uint64_t operator/(uint64_t const&amp; divisor) const</code>
+  - EN: Provides part of the signature or implementation for `operator/`.
+  - CN: 提供 `operator/` 的签名或实现的一部分。
+- **L232**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L233**: <code>    uint64_t quotient{0};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L234**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L235**: <code>    quotient = uint64_t(native / divisor);</code>
+  - EN: Declares the callable or operator `uint64_t`.
+  - CN: 声明可调用对象或运算符 `uint64_t`。
+- **L236**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L237**: <code>    // implemented using MSVC&#x27;s arithmetic intrinsics</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L238**: <code>    uint64_t remainder{0};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L239**: <code>    quotient = udiv128(hilo_.hi, hilo_.lo, divisor, &amp;remainder);</code>
+  - EN: Declares the callable or operator `udiv128`.
+  - CN: 声明可调用对象或运算符 `udiv128`。
+- **L240**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L241**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L242**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L243**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L244**: <code>  /// Divide 128b operation by 64b operation yielding a 64b quotient</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L245**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L246**: <code>  uint64_t operator%(uint64_t const&amp; divisor) const</code>
+  - EN: Provides part of the signature or implementation for `operator%`.
+  - CN: 提供 `operator%` 的签名或实现的一部分。
+- **L247**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L248**: <code>    uint64_t remainder{0};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L249**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L250**: <code>    remainder = uint64_t(native % divisor);</code>
+  - EN: Declares the callable or operator `uint64_t`.
+  - CN: 声明可调用对象或运算符 `uint64_t`。
+- **L251**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L252**: <code>    // implemented using MSVC&#x27;s arithmetic intrinsics</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L253**: <code>    (void)udiv128(hilo_.hi, hilo_.lo, divisor, &amp;remainder);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L254**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L255**: <code>    return remainder;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L256**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L257**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L258**: <code>  /// Computes the quotient and remainder in a single method.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L259**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L260**: <code>  uint64_t divmod(uint64_t &amp;remainder, uint64_t divisor) const</code>
+  - EN: Provides part of the signature or implementation for `divmod`.
+  - CN: 提供 `divmod` 的签名或实现的一部分。
+- **L261**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L262**: <code>    uint64_t quotient{0};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L263**: <code>#if defined(CUTLASS_UINT128_NATIVE)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_UINT128_NATIVE)`.
+  - CN: 开始一个由 `defined(CUTLASS_UINT128_NATIVE)` 控制的条件编译块。
+- **L264**: <code>    quotient = uint64_t(native / divisor);</code>
+  - EN: Declares the callable or operator `uint64_t`.
+  - CN: 声明可调用对象或运算符 `uint64_t`。
+- **L265**: <code>    remainder = uint64_t(native % divisor);</code>
+  - EN: Declares the callable or operator `uint64_t`.
+  - CN: 声明可调用对象或运算符 `uint64_t`。
+- **L266**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L267**: <code>    // implemented using MSVC&#x27;s arithmetic intrinsics</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L268**: <code>    quotient = udiv128(hilo_.hi, hilo_.lo, divisor, &amp;remainder);</code>
+  - EN: Declares the callable or operator `udiv128`.
+  - CN: 声明可调用对象或运算符 `udiv128`。
+- **L269**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L270**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L271**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L272**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L273**: <code>  /// Left-shifts a 128b unsigned integer</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L274**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L275**: <code>  uint128_t operator&lt;&lt;(int sh) const</code>
+  - EN: Provides part of the signature or implementation for `operator<<`.
+  - CN: 提供 `operator<<` 的签名或实现的一部分。
+- **L276**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L277**: <code>    if (sh == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L278**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L279**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L280**: <code>    else if (sh &gt;= storage_bits_) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L281**: <code>      return uint128_t(0, hilo_.lo &lt;&lt; (sh - storage_bits_));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L282**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L283**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L284**: <code>      return uint128_t(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L285**: <code>        (hilo_.lo &lt;&lt; sh),</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L286**: <code>        (hilo_.hi &lt;&lt; sh) | uint64_t(hilo_.lo &gt;&gt; (storage_bits_ - sh))</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L287**: <code>      );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L288**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L289**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L290**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L291**: <code>  /// Right-shifts a 128b unsigned integer</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L292**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L293**: <code>  uint128_t operator&gt;&gt;(int sh) const</code>
+  - EN: Provides part of the signature or implementation for `operator>>`.
+  - CN: 提供 `operator>>` 的签名或实现的一部分。
+- **L294**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L295**: <code>    if (sh == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L296**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L297**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L298**: <code>    else if (sh &gt;= storage_bits_) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L299**: <code>      return uint128_t((hilo_.hi &gt;&gt; (sh - storage_bits_)), 0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L300**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L301**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L302**: <code>      return uint128_t(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L303**: <code>        (hilo_.lo &gt;&gt; sh) | (hilo_.hi &lt;&lt; (storage_bits_ - sh)),</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L304**: <code>        (hilo_.hi &gt;&gt; sh)</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L305**: <code>      );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L306**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L307**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L308**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L309**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L310**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L311**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L312**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L313**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L314**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Alignment control / 对齐控制
+- Conditional compilation / 条件编译
+- Symbol focus: `CUTLASS_UINT128_NATIVE` / 重点符号：`CUTLASS_UINT128_NATIVE`
+- Symbol focus: `CUTLASS_INT128_ARITHMETIC` / 重点符号：`CUTLASS_INT128_ARITHMETIC`
+- Symbol focus: `CUTLASS_INT128_ARITHMETIC_DIV` / 重点符号：`CUTLASS_INT128_ARITHMETIC_DIV`
+- Symbol focus: `umul128` / 重点符号：`umul128`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `CUDA_STD_HEADER(cstdint)`
+  - `<cstdint>`
+  - `<cstdlib>`
+  - `<cmath>`
+  - `<type_traits>`
+  - `<stdexcept>`
+  - `<intrin.h>`
+  - `<immintrin.h>`

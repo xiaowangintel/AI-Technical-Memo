@@ -1,0 +1,516 @@
+# env_manager.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/env_manager.py`
+
+## Purpose / 作用
+- EN: This module provides utilities for the environment variables setup.
+- CN: 该模块的文档字符串将其描述为：This module provides utilities for the environment variables setup.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides utilities for the environment variables setup.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `It provides an EnvironmentVarManager, which reads environment variables for the DSL` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L16** `and caches them for efficient access.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `It also provides utilities to automatically setup a subset of environment variables` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L19** `based on heuristics.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L20** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L23** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L24** `import shutil` — **EN:** Imports shutil for later use. **CN:** 导入 shutil 供后续使用。
+- **L25** `import glob` — **EN:** Imports glob for later use. **CN:** 导入 glob 供后续使用。
+- **L26** `import warnings` — **EN:** Imports warnings for later use. **CN:** 导入 warnings 供后续使用。
+- **L27** `from pathlib import Path` — **EN:** Imports Path from `pathlib`. **CN:** 从 `pathlib` 导入 Path。
+- **L28** `from functools import lru_cache` — **EN:** Imports lru_cache from `functools`. **CN:** 从 `functools` 导入 lru_cache。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `from ..base_dsl.runtime.cuda import get_compute_capability_major_minor` — **EN:** Imports get_compute_capability_major_minor from `..base_dsl.runtime.cuda`. **CN:** 从 `..base_dsl.runtime.cuda` 导入 get_compute_capability_major_minor。
+- **L31** `from .common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `.common`. **CN:** 从 `.common` 导入 DSLRuntimeError。
+- **L32** `from .utils.logger import log` — **EN:** Imports log from `.utils.logger`. **CN:** 从 `.utils.logger` 导入 log。
+- **L33** `from .cache_helpers import get_default_file_dump_root` — **EN:** Imports get_default_file_dump_root from `.cache_helpers`. **CN:** 从 `.cache_helpers` 导入 get_default_file_dump_root。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `IS_WINDOWS = sys.platform == "win32"` — **EN:** Assigns a value to IS_WINDOWS. **CN:** 将一个值赋给 IS_WINDOWS。
+- **L36** `CLIB_EXT = ".dll" if IS_WINDOWS else ".so"` — **EN:** Assigns a value to CLIB_EXT. **CN:** 将一个值赋给 CLIB_EXT。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L39** `# [DSL]_KEEP token definitions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L40** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `# All individual artifact tokens accepted by [DSL]_KEEP.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L43** `_KEEP_ALL_TOKENS: frozenset[str] = frozenset(` — **EN:** Assigns a typed value to _KEEP_ALL_TOKENS. **CN:** 为 _KEEP_ALL_TOKENS 赋予带类型标注的值。
+- **L44** `    {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `        "ir",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `        "ir-debug",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `        "ptx",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `        "cubin",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `# "all" is a convenience alias that expands to every token above.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L52** `_KEEP_VALID_TOKENS: frozenset[str] = _KEEP_ALL_TOKENS | {"all"}` — **EN:** Assigns a typed value to _KEEP_VALID_TOKENS. **CN:** 为 _KEEP_VALID_TOKENS 赋予带类型标注的值。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `CUTLASS_FAMILY_DSL_PREFIXES: frozenset[str] = frozenset(` — **EN:** Assigns a typed value to CUTLASS_FAMILY_DSL_PREFIXES. **CN:** 为 CUTLASS_FAMILY_DSL_PREFIXES 赋予带类型标注的值。
+- **L55** `    {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `        "CUTE_DSL",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `        "CUTE_EXPERIMENTAL_DSL",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `def is_cutlass_family_dsl_prefix(prefix: str) -> bool:` — **EN:** Defines function `is_cutlass_family_dsl_prefix`. **CN:** 定义函数 `is_cutlass_family_dsl_prefix`。
+- **L63** `    """Return whether the prefix uses the shared CuTe DSL runtime."""` — **EN:** Docstring line documenting the function `is_cutlass_family_dsl_prefix`. **CN:** 文档字符串行，用于说明 function `is_cutlass_family_dsl_prefix`。
+- **L64** `    return prefix in CUTLASS_FAMILY_DSL_PREFIXES` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `def _parse_keep_tokens(raw: str, prefix: str = "") -> frozenset[str]:` — **EN:** Defines function `_parse_keep_tokens`. **CN:** 定义函数 `_parse_keep_tokens`。
+- **L68** `    """` — **EN:** Starts the docstring for the function `_parse_keep_tokens`. **CN:** 开始说明 function `_parse_keep_tokens` 的文档字符串。
+- **L69** `    Parse the value of [DSL]_KEEP into a frozenset of canonical artifact tokens.` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    Accepts a comma-separated list of tokens (case-insensitive).` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L72** `    The special value \`\`all\`\` expands to every token in \`\`_KEEP_ALL_TOKENS\`\`.` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L73** `    Unknown tokens are logged as warnings and ignored.` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    Token semantics:` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L76** `      ir               — IR after canonicalize+cse (clean, human-readable)` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L77** `      ir-debug         — Raw IR before any passes (old KEEP_IR=1 behaviour)` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L78** `      ptx              — PTX assembly` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L79** `      cubin            — CUBIN binary` — **EN:** Continues the docstring for the function `_parse_keep_tokens`. **CN:** 继续说明 function `_parse_keep_tokens` 的文档字符串。
+- **L80** `    """` — **EN:** Ends the docstring for the function `_parse_keep_tokens`. **CN:** 结束说明 function `_parse_keep_tokens` 的文档字符串。
+- **L81** `    tokens = frozenset(t.strip().lower() for t in raw.split(",") if t.strip())` — **EN:** Assigns a value to tokens. **CN:** 将一个值赋给 tokens。
+- **L82** `    if "all" in tokens:` — **EN:** Starts a conditional branch guarded by `'all' in tokens`. **CN:** 开始一个由 `'all' in tokens` 控制的条件分支。
+- **L83** `        return _KEEP_ALL_TOKENS` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L84** `    unknown = tokens - _KEEP_VALID_TOKENS` — **EN:** Assigns a value to unknown. **CN:** 将一个值赋给 unknown。
+- **L85** `    if unknown:` — **EN:** Starts a conditional branch guarded by `unknown`. **CN:** 开始一个由 `unknown` 控制的条件分支。
+- **L86** `        message = f"{prefix}_KEEP" if prefix else "[DSL]_KEEP"` — **EN:** Assigns a value to message. **CN:** 将一个值赋给 message。
+- **L87** `        log().warning(` — **EN:** Invokes `log().warning` as a standalone call. **CN:** 以独立语句方式调用 `log().warning`。
+- **L88** `            "%s: unknown token(s) %s will be ignored. Valid tokens: %s",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `            message,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `            sorted(unknown),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `            sorted(_KEEP_VALID_TOKENS),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    return tokens - unknown` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L97** `# Environment Variable Helpers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L98** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `@lru_cache(maxsize=None)` — **EN:** Applies decorator `lru_cache(maxsize=None)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=None)` 应用于后面的定义。
+- **L102** `def get_str_env_var(var_name: str, default_value: str | None = None) -> str | None:` — **EN:** Defines function `get_str_env_var`. **CN:** 定义函数 `get_str_env_var`。
+- **L103** `    """` — **EN:** Starts the docstring for the function `get_str_env_var`. **CN:** 开始说明 function `get_str_env_var` 的文档字符串。
+- **L104** `    Get the string value of an environment variable.` — **EN:** Continues the docstring for the function `get_str_env_var`. **CN:** 继续说明 function `get_str_env_var` 的文档字符串。
+- **L105** `    Note that the value is cached after the first call.` — **EN:** Continues the docstring for the function `get_str_env_var`. **CN:** 继续说明 function `get_str_env_var` 的文档字符串。
+- **L106** `    """` — **EN:** Ends the docstring for the function `get_str_env_var`. **CN:** 结束说明 function `get_str_env_var` 的文档字符串。
+- **L107** `    value = os.getenv(var_name)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L108** `    return value if value is not None else default_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `@lru_cache(maxsize=None)` — **EN:** Applies decorator `lru_cache(maxsize=None)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=None)` 应用于后面的定义。
+- **L112** `def get_bool_env_var(var_name: str, default_value: bool = False) -> bool:` — **EN:** Defines function `get_bool_env_var`. **CN:** 定义函数 `get_bool_env_var`。
+- **L113** `    """` — **EN:** Starts the docstring for the function `get_bool_env_var`. **CN:** 开始说明 function `get_bool_env_var` 的文档字符串。
+- **L114** `    Get the value of a boolean environment variable.` — **EN:** Continues the docstring for the function `get_bool_env_var`. **CN:** 继续说明 function `get_bool_env_var` 的文档字符串。
+- **L115** `    If the value it not in False, 0, or empty string, it is considered True.` — **EN:** Continues the docstring for the function `get_bool_env_var`. **CN:** 继续说明 function `get_bool_env_var` 的文档字符串。
+- **L116** `    Note that the value is cached after the first call.` — **EN:** Continues the docstring for the function `get_bool_env_var`. **CN:** 继续说明 function `get_bool_env_var` 的文档字符串。
+- **L117** `    """` — **EN:** Ends the docstring for the function `get_bool_env_var`. **CN:** 结束说明 function `get_bool_env_var` 的文档字符串。
+- **L118** `    value = get_str_env_var(var_name)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L119** `    if value is None:` — **EN:** Starts a conditional branch guarded by `value is None`. **CN:** 开始一个由 `value is None` 控制的条件分支。
+- **L120** `        return default_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L121** `    return value not in {"False", "0", ""}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `@lru_cache(maxsize=None)` — **EN:** Applies decorator `lru_cache(maxsize=None)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=None)` 应用于后面的定义。
+- **L125** `def get_int_env_var(var_name: str, default_value: int = 0) -> int:` — **EN:** Defines function `get_int_env_var`. **CN:** 定义函数 `get_int_env_var`。
+- **L126** `    """` — **EN:** Starts the docstring for the function `get_int_env_var`. **CN:** 开始说明 function `get_int_env_var` 的文档字符串。
+- **L127** `    Get the value of an integer environment variable.` — **EN:** Continues the docstring for the function `get_int_env_var`. **CN:** 继续说明 function `get_int_env_var` 的文档字符串。
+- **L128** `    If the value is not a valid integer, the default value 0 is returned.` — **EN:** Continues the docstring for the function `get_int_env_var`. **CN:** 继续说明 function `get_int_env_var` 的文档字符串。
+- **L129** `    Note that the value is cached after the first call.` — **EN:** Continues the docstring for the function `get_int_env_var`. **CN:** 继续说明 function `get_int_env_var` 的文档字符串。
+- **L130** `    """` — **EN:** Ends the docstring for the function `get_int_env_var`. **CN:** 结束说明 function `get_int_env_var` 的文档字符串。
+- **L131** `    value = get_str_env_var(var_name)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L132** `    return int(value) if value and value.isdigit() else default_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `@lru_cache(maxsize=None)` — **EN:** Applies decorator `lru_cache(maxsize=None)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=None)` 应用于后面的定义。
+- **L136** `def get_int_or_none_env_var(` — **EN:** Defines function `get_int_or_none_env_var`. **CN:** 定义函数 `get_int_or_none_env_var`。
+- **L137** `    var_name: str, default_value: int | None = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `) -> int | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L139** `    """` — **EN:** Starts the docstring for the function `get_int_or_none_env_var`. **CN:** 开始说明 function `get_int_or_none_env_var` 的文档字符串。
+- **L140** `    Get the value of an integer or None union environment variable.` — **EN:** Continues the docstring for the function `get_int_or_none_env_var`. **CN:** 继续说明 function `get_int_or_none_env_var` 的文档字符串。
+- **L141** `    If the value is not a valid integer, the default value 0 is returned.` — **EN:** Continues the docstring for the function `get_int_or_none_env_var`. **CN:** 继续说明 function `get_int_or_none_env_var` 的文档字符串。
+- **L142** `    Note that the value is cached after the first call.` — **EN:** Continues the docstring for the function `get_int_or_none_env_var`. **CN:** 继续说明 function `get_int_or_none_env_var` 的文档字符串。
+- **L143** `    """` — **EN:** Ends the docstring for the function `get_int_or_none_env_var`. **CN:** 结束说明 function `get_int_or_none_env_var` 的文档字符串。
+- **L144** `    raw = get_str_env_var(var_name)` — **EN:** Assigns a value to raw. **CN:** 将一个值赋给 raw。
+- **L145** `    if raw is None:` — **EN:** Starts a conditional branch guarded by `raw is None`. **CN:** 开始一个由 `raw is None` 控制的条件分支。
+- **L146** `        return default_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `    value = raw.strip().lower()` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L149** `    if value == "none":` — **EN:** Starts a conditional branch guarded by `value == 'none'`. **CN:** 开始一个由 `value == 'none'` 控制的条件分支。
+- **L150** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L153** `        return int(value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L154** `    except ValueError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L155** `        return default_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `@lru_cache(maxsize=None)` — **EN:** Applies decorator `lru_cache(maxsize=None)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=None)` 应用于后面的定义。
+- **L159** `def has_env_var(var_name: str) -> bool:` — **EN:** Defines function `has_env_var`. **CN:** 定义函数 `has_env_var`。
+- **L160** `    """` — **EN:** Starts the docstring for the function `has_env_var`. **CN:** 开始说明 function `has_env_var` 的文档字符串。
+- **L161** `    Check if an environment variable is set.` — **EN:** Continues the docstring for the function `has_env_var`. **CN:** 继续说明 function `has_env_var` 的文档字符串。
+- **L162** `    Note that the value is cached after the first call.` — **EN:** Continues the docstring for the function `has_env_var`. **CN:** 继续说明 function `has_env_var` 的文档字符串。
+- **L163** `    """` — **EN:** Ends the docstring for the function `has_env_var`. **CN:** 结束说明 function `has_env_var` 的文档字符串。
+- **L164** `    return os.getenv(var_name) is not None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `def detect_gpu_arch(prefix: str) -> str:` — **EN:** Defines function `detect_gpu_arch`. **CN:** 定义函数 `detect_gpu_arch`。
+- **L168** `    """` — **EN:** Starts the docstring for the function `detect_gpu_arch`. **CN:** 开始说明 function `detect_gpu_arch` 的文档字符串。
+- **L169** `    Attempts to detect the machine's GPU architecture.` — **EN:** Continues the docstring for the function `detect_gpu_arch`. **CN:** 继续说明 function `detect_gpu_arch` 的文档字符串。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `    Returns:` — **EN:** Continues the docstring for the function `detect_gpu_arch`. **CN:** 继续说明 function `detect_gpu_arch` 的文档字符串。
+- **L172** `        A string representing the GPU architecture (e.g. "70" for compute capability 7.0),` — **EN:** Continues the docstring for the function `detect_gpu_arch`. **CN:** 继续说明 function `detect_gpu_arch` 的文档字符串。
+- **L173** `        or a default value(e.g. "sm_100") if the GPU architecture cannot be determined.` — **EN:** Continues the docstring for the function `detect_gpu_arch`. **CN:** 继续说明 function `detect_gpu_arch` 的文档字符串。
+- **L174** `    """` — **EN:** Ends the docstring for the function `detect_gpu_arch`. **CN:** 结束说明 function `detect_gpu_arch` 的文档字符串。
+- **L175** `    arch: tuple[int | None, int | None] = (None, None)` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L176** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L177** `        arch = get_compute_capability_major_minor()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L178** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L179** `        log().info("Failed to get CUDA compute capability: %s", e)` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `    if arch == (None, None):` — **EN:** Starts a conditional branch guarded by `arch == (None, None)`. **CN:** 开始一个由 `arch == (None, None)` 控制的条件分支。
+- **L182** `        # default to sm_100` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L183** `        arch = (10, 0)` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `    major, minor = arch` — **EN:** Assigns a value to (major, minor). **CN:** 将一个值赋给 (major, minor)。
+- **L186** `    suffix = ""` — **EN:** Assigns a value to suffix. **CN:** 将一个值赋给 suffix。
+- **L187** `    if major >= 9:  # type: ignore[operator]` — **EN:** Starts a conditional branch guarded by `major >= 9`. **CN:** 开始一个由 `major >= 9` 控制的条件分支。
+- **L188** `        suffix = "a"` — **EN:** Assigns a value to suffix. **CN:** 将一个值赋给 suffix。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    return f"sm_{major}{minor}{suffix}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `def find_libs_in_ancestors(` — **EN:** Defines function `find_libs_in_ancestors`. **CN:** 定义函数 `find_libs_in_ancestors`。
+- **L194** `    start: str | Path, target_libs: set[str], lib_folder_guesses: list[str]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `) -> list[str] | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L196** `    """` — **EN:** Starts the docstring for the function `find_libs_in_ancestors`. **CN:** 开始说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L197** `    Search ancestor directories for a candidate library folder containing all required libraries.` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `    Starting from the given path, this function traverses up through each parent directory.` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L200** `    For every ancestor, it checks candidate subdirectories (specified by lib_folder_guesses)` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L201** `    for files that match the required library extension (CLIB_EXT). Library file names are` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L202** `    canonicalized by removing the "lib" prefix from their stem. If a candidate directory contains` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L203** `    all of the required libraries (as specified in target_libs), the function returns a list of` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L204** `    absolute paths to these library files.` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `    Parameters:` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L207** `        start (str or Path): The starting directory from which to begin the search.` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L208** `        target_libs (iterable of str): A collection of required library names (without the "lib" prefix).` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L209** `        lib_folder_guesses (iterable of str): Relative paths from an ancestor directory that may contain the libraries.` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    Returns:` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L212** `        list[str] or None: A list of resolved paths to the required library files if found; otherwise, None.` — **EN:** Continues the docstring for the function `find_libs_in_ancestors`. **CN:** 继续说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L213** `    """` — **EN:** Ends the docstring for the function `find_libs_in_ancestors`. **CN:** 结束说明 function `find_libs_in_ancestors` 的文档字符串。
+- **L214** `    # Traverse through all parent directories of the resolved starting path.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L215** `    for ancestor in Path(start).resolve().parents:` — **EN:** Starts a loop assigning items from `Path(start).resolve().parents` to `ancestor`. **CN:** 开始一个循环，将 `Path(start).resolve().parents` 的元素赋给 `ancestor`。
+- **L216** `        # Iterate over each candidate relative directory path.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L217** `        for rel_path in lib_folder_guesses:` — **EN:** Starts a loop assigning items from `lib_folder_guesses` to `rel_path`. **CN:** 开始一个循环，将 `lib_folder_guesses` 的元素赋给 `rel_path`。
+- **L218** `            target_dir = ancestor / rel_path` — **EN:** Assigns a value to target_dir. **CN:** 将一个值赋给 target_dir。
+- **L219** `            # Skip if the candidate directory does not exist.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L220** `            if not target_dir.is_dir():` — **EN:** Starts a conditional branch guarded by `not target_dir.is_dir()`. **CN:** 开始一个由 `not target_dir.is_dir()` 控制的条件分支。
+- **L221** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `            # Initialize a list to hold the resolved paths of matching library files.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L224** `            libs_cand = []` — **EN:** Assigns a value to libs_cand. **CN:** 将一个值赋给 libs_cand。
+- **L225** `            # Create a set of the remaining libraries we need to find.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L226** `            remaining_libs = set(target_libs)` — **EN:** Assigns a value to remaining_libs. **CN:** 将一个值赋给 remaining_libs。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `            # Iterate over all items in the candidate directory.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L229** `            for p in target_dir.iterdir():` — **EN:** Starts a loop assigning items from `target_dir.iterdir()` to `p`. **CN:** 开始一个循环，将 `target_dir.iterdir()` 的元素赋给 `p`。
+- **L230** `                # Consider only files with the expected library extension.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L231** `                if p.suffix == CLIB_EXT:` — **EN:** Starts a conditional branch guarded by `p.suffix == CLIB_EXT`. **CN:** 开始一个由 `p.suffix == CLIB_EXT` 控制的条件分支。
+- **L232** `                    # Canonicalize the library name by removing the "lib" prefix.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L233** `                    lib_name = p.stem.removeprefix("lib")` — **EN:** Assigns a value to lib_name. **CN:** 将一个值赋给 lib_name。
+- **L234** `                    # If this library is required, add its resolved path and mark it as found.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `                    if lib_name in remaining_libs:` — **EN:** Starts a conditional branch guarded by `lib_name in remaining_libs`. **CN:** 开始一个由 `lib_name in remaining_libs` 控制的条件分支。
+- **L236** `                        libs_cand.append(str(p.resolve()))` — **EN:** Invokes `libs_cand.append` as a standalone call. **CN:** 以独立语句方式调用 `libs_cand.append`。
+- **L237** `                        remaining_libs.remove(lib_name)` — **EN:** Invokes `remaining_libs.remove` as a standalone call. **CN:** 以独立语句方式调用 `remaining_libs.remove`。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `            # If all required libraries have been found, return the list of library paths.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L240** `            if len(remaining_libs) == 0:` — **EN:** Starts a conditional branch guarded by `len(remaining_libs) == 0`. **CN:** 开始一个由 `len(remaining_libs) == 0` 控制的条件分支。
+- **L241** `                return libs_cand` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `    # Return None if no candidate directory contains all required libraries.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L244** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `def _find_cuda_home() -> str | None:` — **EN:** Defines function `_find_cuda_home`. **CN:** 定义函数 `_find_cuda_home`。
+- **L248** `    """Find the CUDA installation path using a series of heuristic methods.` — **EN:** Starts the docstring for the function `_find_cuda_home`. **CN:** 开始说明 function `_find_cuda_home` 的文档字符串。
+- **L249** `    Methods below are checked in order, and the function returns on first match:` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L250** `    1. Checking the environment variables CUDA_HOME and CUDA_PATH.` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L251** `    2. Searching for the 'nvcc' compiler in the system PATH and deriving the path of cuda.` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L252** `    3. Scanning common installation directories based on the operating system.` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L253** `       - On Windows systems (when IS_WINDOWS is True), it searches in:` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L254** `             C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v*.*` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L255** `       - On Unix-like systems, it searches in:` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L256** `             /usr/local/cuda*` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `    Returns:` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L259** `        Optional[str]: The absolute CUDA installation path if found; otherwise, None.` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L260** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L261** `    Note:` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L262** `        The variable IS_WINDOWS is defined in the module scope.` — **EN:** Continues the docstring for the function `_find_cuda_home`. **CN:** 继续说明 function `_find_cuda_home` 的文档字符串。
+- **L263** `    """` — **EN:** Ends the docstring for the function `_find_cuda_home`. **CN:** 结束说明 function `_find_cuda_home` 的文档字符串。
+- **L264** `    # Guess #1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L265** `    cuda_home = get_str_env_var("CUDA_HOME") or get_str_env_var("CUDA_PATH")` — **EN:** Assigns a value to cuda_home. **CN:** 将一个值赋给 cuda_home。
+- **L266** `    if cuda_home is None:` — **EN:** Starts a conditional branch guarded by `cuda_home is None`. **CN:** 开始一个由 `cuda_home is None` 控制的条件分支。
+- **L267** `        # Guess #2` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L268** `        nvcc_path = shutil.which("nvcc")` — **EN:** Assigns a value to nvcc_path. **CN:** 将一个值赋给 nvcc_path。
+- **L269** `        if nvcc_path is not None:` — **EN:** Starts a conditional branch guarded by `nvcc_path is not None`. **CN:** 开始一个由 `nvcc_path is not None` 控制的条件分支。
+- **L270** `            cuda_home = os.path.dirname(os.path.dirname(nvcc_path))` — **EN:** Assigns a value to cuda_home. **CN:** 将一个值赋给 cuda_home。
+- **L271** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L272** `            # Guess #3` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L273** `            if IS_WINDOWS:` — **EN:** Starts a conditional branch guarded by `IS_WINDOWS`. **CN:** 开始一个由 `IS_WINDOWS` 控制的条件分支。
+- **L274** `                glob_pat = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v*.*"` — **EN:** Assigns a value to glob_pat. **CN:** 将一个值赋给 glob_pat。
+- **L275** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L276** `                glob_pat = "/usr/local/cuda*"` — **EN:** Assigns a value to glob_pat. **CN:** 将一个值赋给 glob_pat。
+- **L277** `            cuda_homes = glob.glob(glob_pat)` — **EN:** Assigns a value to cuda_homes. **CN:** 将一个值赋给 cuda_homes。
+- **L278** `            if len(cuda_homes) == 0:` — **EN:** Starts a conditional branch guarded by `len(cuda_homes) == 0`. **CN:** 开始一个由 `len(cuda_homes) == 0` 控制的条件分支。
+- **L279** `                cuda_home = ""` — **EN:** Assigns a value to cuda_home. **CN:** 将一个值赋给 cuda_home。
+- **L280** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L281** `                cuda_home = cuda_homes[0]` — **EN:** Assigns a value to cuda_home. **CN:** 将一个值赋给 cuda_home。
+- **L282** `            if not os.path.exists(cuda_home):` — **EN:** Starts a conditional branch guarded by `not os.path.exists(cuda_home)`. **CN:** 开始一个由 `not os.path.exists(cuda_home)` 控制的条件分支。
+- **L283** `                cuda_home = None` — **EN:** Assigns a value to cuda_home. **CN:** 将一个值赋给 cuda_home。
+- **L284** `    return cuda_home` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `def get_prefix_dsl_libs(prefix: str) -> str | None:` — **EN:** Defines function `get_prefix_dsl_libs`. **CN:** 定义函数 `get_prefix_dsl_libs`。
+- **L288** `    """` — **EN:** Starts the docstring for the function `get_prefix_dsl_libs`. **CN:** 开始说明 function `get_prefix_dsl_libs` 的文档字符串。
+- **L289** `    Returns get_str_env_var('{prefix}_LIBS') if set.` — **EN:** Continues the docstring for the function `get_prefix_dsl_libs`. **CN:** 继续说明 function `get_prefix_dsl_libs` 的文档字符串。
+- **L290** `    Otherwise, attempts to discover libs based on heuristics and return` — **EN:** Continues the docstring for the function `get_prefix_dsl_libs`. **CN:** 继续说明 function `get_prefix_dsl_libs` 的文档字符串。
+- **L291** `    If not found, return None.` — **EN:** Continues the docstring for the function `get_prefix_dsl_libs`. **CN:** 继续说明 function `get_prefix_dsl_libs` 的文档字符串。
+- **L292** `    """` — **EN:** Ends the docstring for the function `get_prefix_dsl_libs`. **CN:** 结束说明 function `get_prefix_dsl_libs` 的文档字符串。
+- **L293** `    # Check if the environment variable is already set, if so, return it immediately.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L294** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L295** `        prefix_libs_existing = get_str_env_var(f"{prefix}_LIBS")` — **EN:** Assigns a value to prefix_libs_existing. **CN:** 将一个值赋给 prefix_libs_existing。
+- **L296** `        if prefix_libs_existing:` — **EN:** Starts a conditional branch guarded by `prefix_libs_existing`. **CN:** 开始一个由 `prefix_libs_existing` 控制的条件分支。
+- **L297** `            return prefix_libs_existing` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `        def get_libs_cand(start: str | Path) -> str | None:` — **EN:** Defines function `get_libs_cand`. **CN:** 定义函数 `get_libs_cand`。
+- **L300** `            target_dsl_runtime_libs = {` — **EN:** Assigns a value to target_dsl_runtime_libs. **CN:** 将一个值赋给 target_dsl_runtime_libs。
+- **L301** `                "cute_dsl_runtime",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `            lib_folder_guesses = [` — **EN:** Assigns a value to lib_folder_guesses. **CN:** 将一个值赋给 lib_folder_guesses。
+- **L304** `                "lib",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `            for target_libs in [` — **EN:** Starts a loop assigning items from `[target_dsl_runtime_libs]` to `target_libs`. **CN:** 开始一个循环，将 `[target_dsl_runtime_libs]` 的元素赋给 `target_libs`。
+- **L308** `                target_dsl_runtime_libs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `            ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L310** `                libs_cand = find_libs_in_ancestors(` — **EN:** Assigns a value to libs_cand. **CN:** 将一个值赋给 libs_cand。
+- **L311** `                    start, target_libs, lib_folder_guesses` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L312** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `                if libs_cand:` — **EN:** Starts a conditional branch guarded by `libs_cand`. **CN:** 开始一个由 `libs_cand` 控制的条件分支。
+- **L314** `                    dsl_libs = ":".join(libs_cand)` — **EN:** Assigns a value to dsl_libs. **CN:** 将一个值赋给 dsl_libs。
+- **L315** `                    return dsl_libs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L316** `            return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `        # find from install folder` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L319** `        dsl_libs = get_libs_cand(__file__)` — **EN:** Assigns a value to dsl_libs. **CN:** 将一个值赋给 dsl_libs。
+- **L320** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L321** `        if not dsl_libs:` — **EN:** Starts a conditional branch guarded by `not dsl_libs`. **CN:** 开始一个由 `not dsl_libs` 控制的条件分支。
+- **L322** `            # try to find from build folder structure` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L323** `            dsl_libs = get_libs_cand(Path(__file__).parent.parent.resolve())` — **EN:** Assigns a value to dsl_libs. **CN:** 将一个值赋给 dsl_libs。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `        if dsl_libs:` — **EN:** Starts a conditional branch guarded by `dsl_libs`. **CN:** 开始一个由 `dsl_libs` 控制的条件分支。
+- **L326** `            return dsl_libs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `        # Known CuTe-family DSLs share libcute_dsl_runtime.so. With pip` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L329** `        # editable installs (\`pip install -e\`), the startup hook in` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L330** `        # cutlass/_pth_hook.py sets CUTE_DSL_LIBS but not the per-prefix` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L331** `        # variants, and the ancestor walk from the source tree cannot reach` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L332** `        # the build/vendored lib directory. Fall back to CUTE_DSL_LIBS for` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L333** `        # those aliases when their prefix-specific lookup fails.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L334** `        if is_cutlass_family_dsl_prefix(prefix) and prefix != "CUTE_DSL":` — **EN:** Starts a conditional branch guarded by `is_cutlass_family_dsl_prefix(prefix) and prefix != 'CUTE_...`. **CN:** 开始一个由 `is_cutlass_family_dsl_prefix(prefix) and prefix != 'CUTE_...` 控制的条件分支。
+- **L335** `            fallback = os.getenv("CUTE_DSL_LIBS")` — **EN:** Assigns a value to fallback. **CN:** 将一个值赋给 fallback。
+- **L336** `            if fallback:` — **EN:** Starts a conditional branch guarded by `fallback`. **CN:** 开始一个由 `fallback` 控制的条件分支。
+- **L337** `                return fallback` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L339** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L342** `        log().info("default_env: exception on get_prefix_dsl_libs", e)` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L343** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `class LogEnvironmentManager:` — **EN:** Defines class `LogEnvironmentManager`. **CN:** 定义类 `LogEnvironmentManager`。
+- **L347** `    def __init__(self, prefix: str = "DSL") -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L348** `        self.prefix = prefix` — **EN:** Assigns a value to self.prefix. **CN:** 将一个值赋给 self.prefix。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `        # Logging options` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L351** `        self.jit_time_profiling = get_bool_env_var(` — **EN:** Assigns a value to self.jit_time_profiling. **CN:** 将一个值赋给 self.jit_time_profiling。
+- **L352** `            f"{prefix}_JIT_TIME_PROFILING", False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `        self.log_to_console = get_bool_env_var(f"{prefix}_LOG_TO_CONSOLE", False)` — **EN:** Assigns a value to self.log_to_console. **CN:** 将一个值赋给 self.log_to_console。
+- **L355** `        self.log_to_file = get_bool_env_var(f"{prefix}_LOG_TO_FILE", False)` — **EN:** Assigns a value to self.log_to_file. **CN:** 将一个值赋给 self.log_to_file。
+- **L356** `        if (` — **EN:** Starts a conditional branch guarded by `has_env_var(f'{prefix}_LOG_LEVEL') and (not self.log_to_c...`. **CN:** 开始一个由 `has_env_var(f'{prefix}_LOG_LEVEL') and (not self.log_to_c...` 控制的条件分支。
+- **L357** `            has_env_var(f"{prefix}_LOG_LEVEL")` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `            and not self.log_to_console` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L359** `            and not self.log_to_file` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L360** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L361** `            log().warning(` — **EN:** Invokes `log().warning` as a standalone call. **CN:** 以独立语句方式调用 `log().warning`。
+- **L362** `                "Log level was set, but neither logging to file (%s_LOG_TO_FILE) nor"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `                " logging to console (%s_LOG_TO_CONSOLE) is enabled!",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `                prefix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `                prefix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `        self.log_level = get_int_env_var(f"{prefix}_LOG_LEVEL", 1)` — **EN:** Assigns a value to self.log_level. **CN:** 将一个值赋给 self.log_level。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L370** `class EnvironmentVarManager(LogEnvironmentManager):` — **EN:** Defines class `EnvironmentVarManager` with bases LogEnvironmentManager. **CN:** 定义类 `EnvironmentVarManager`，其基类为 LogEnvironmentManager。
+- **L371** `    """Manages environment variables for configuration options.` — **EN:** Starts the docstring for the class `EnvironmentVarManager`. **CN:** 开始说明 class `EnvironmentVarManager` 的文档字符串。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `    Printing options:` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L374** `    - [DSL_NAME]_LOG_TO_CONSOLE: Print logging to stderr (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L375** `    - [DSL_NAME]_PRINT_AFTER_PREPROCESSOR: Print after preprocess (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L376** `    - [DSL_NAME]_PRINT_IR: Print generated IR (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L377** `    - [DSL_NAME]_FILTER_STACKTRACE: Filter internal stacktrace (default: True)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L378** `    File options:` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L379** `    - [DSL_NAME]_DUMP_DIR: Directory to dump the generated files (default: current working directory)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L380** `    - [DSL_NAME]_CACHE_DIR: Cache directory (default: /tmp/{dsl_name}_python_cache_{tmpfile_suffix})` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L381** `    - [DSL_NAME]_LOG_TO_FILE: Store all logging into a file, excluding COMPILE_LOGS (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L382** `    - [DSL_NAME]_KEEP: Comma-separated list of artifacts to save to DUMP_DIR (default: "").` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L383** `        Tokens:` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L384** `          ir           — IR after canonicalize+cse (clean, human-readable)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L385** `          ir-debug     — Raw IR before any passes` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L386** `          ptx          — PTX assembly` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L387** `          cubin        — CUBIN binary` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L388** `          all          — all of the above` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L389** `        Example: CUTE_DSL_KEEP=ir,ptx` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L390** `    # Deprecated — use [DSL_NAME]_KEEP instead:` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L391** `    - [DSL_NAME]_KEEP_IR: (deprecated) use KEEP=ir-debug` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L392** `    - [DSL_NAME]_KEEP_PTX: (deprecated) use KEEP=ptx` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L393** `    - [DSL_NAME]_KEEP_CUBIN: (deprecated) use KEEP=cubin` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L394** `    Other options:` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L395** `    - [DSL_NAME]_SHOW_STACKTRACE: Show full stack traces on failure (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L396** `    - [DSL_NAME]_LINEINFO: Compile with \`--lineinfo\` enabling developer tools such as the profiler and debugger (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L397** `    - [DSL_NAME]_LOG_LEVEL: Logging level to set, for LOG_TO_CONSOLE or LOG_TO_FILE (default: 1).` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L398** `    - [DSL_NAME]_DRYRUN: Generates IR only (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L399** `    - [DSL_NAME]_ARCH: GPU architecture (default: "sm_100")` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L400** `    - [DSL_NAME]_WARNINGS_AS_ERRORS: Enable warnings as error (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L401** `    - [DSL_NAME]_WARNINGS_IGNORE: Ignore warnings (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L402** `    - [DSL_NAME]_ENABLE_OPTIMIZATION_WARNINGS: Enable warnings of optimization warnings (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L403** `    - [DSL_NAME]_JIT_TIME_PROFILING: Whether or not to profile the IR generation/compilation/execution time (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L404** `    - [DSL_NAME]_JIT_CACHE_MAX_ELEMS: Maximum number of JIT compiled functions to cache in memory (default: None). If None, the cache is unbounded.` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L405** `    - [DSL_NAME]_NO_CACHE: Disable JIT cache (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L406** `    - [DSL_NAME]_DISABLE_FILE_CACHING: Disable file caching (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L407** `    - [DSL_NAME]_LIBS: Path to dependent shared libraries (default: None)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L408** `    - [DSL_NAME]_ENABLE_TVM_FFI: Enable TVM-FFI or not (default: False)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L409** `    - [DSL_NAME]_LOC_TRACEBACKS: Maximum depth of location tracebacks (default: 0)` — **EN:** Continues the docstring for the class `EnvironmentVarManager`. **CN:** 继续说明 class `EnvironmentVarManager` 的文档字符串。
+- **L410** `    """` — **EN:** Ends the docstring for the class `EnvironmentVarManager`. **CN:** 结束说明 class `EnvironmentVarManager` 的文档字符串。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** `    def __init__(self, prefix: str = "DSL") -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L413** `        super().__init__(prefix)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `        # Printing options` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L416** `        self.print_after_preprocessor = get_bool_env_var(` — **EN:** Assigns a value to self.print_after_preprocessor. **CN:** 将一个值赋给 self.print_after_preprocessor。
+- **L417** `            f"{prefix}_PRINT_AFTER_PREPROCESSOR", False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `        self.print_ir = get_bool_env_var(f"{prefix}_PRINT_IR", False)` — **EN:** Assigns a value to self.print_ir. **CN:** 将一个值赋给 self.print_ir。
+- **L420** `        self.filter_stacktrace = get_bool_env_var(f"{prefix}_FILTER_STACKTRACE", True)` — **EN:** Assigns a value to self.filter_stacktrace. **CN:** 将一个值赋给 self.filter_stacktrace。
+- **L421** `        self.show_stacktrace = get_bool_env_var(f"{prefix}_SHOW_STACKTRACE", False)` — **EN:** Assigns a value to self.show_stacktrace. **CN:** 将一个值赋给 self.show_stacktrace。
+- **L422** `        self.lineinfo = get_bool_env_var(f"{prefix}_LINEINFO", False)` — **EN:** Assigns a value to self.lineinfo. **CN:** 将一个值赋给 self.lineinfo。
+- **L423** `        self.no_cache = get_bool_env_var(f"{prefix}_NO_CACHE", False)` — **EN:** Assigns a value to self.no_cache. **CN:** 将一个值赋给 self.no_cache。
+- **L424** `        self.jit_cache_max_elems = get_int_or_none_env_var(` — **EN:** Assigns a value to self.jit_cache_max_elems. **CN:** 将一个值赋给 self.jit_cache_max_elems。
+- **L425** `            f"{prefix}_JIT_CACHE_MAX_ELEMS", None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `        if self.no_cache:` — **EN:** Starts a conditional branch guarded by `self.no_cache`. **CN:** 开始一个由 `self.no_cache` 控制的条件分支。
+- **L428** `            self.jit_cache_max_elems = 0` — **EN:** Assigns a value to self.jit_cache_max_elems. **CN:** 将一个值赋给 self.jit_cache_max_elems。
+- **L429** `        self.dump_dir = get_str_env_var(` — **EN:** Assigns a value to self.dump_dir. **CN:** 将一个值赋给 self.dump_dir。
+- **L430** `            f"{prefix}_DUMP_DIR", get_default_file_dump_root()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `        # File options` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L433** `        self.cache_dir = get_str_env_var(f"{prefix}_CACHE_DIR", None)` — **EN:** Assigns a value to self.cache_dir. **CN:** 将一个值赋给 self.cache_dir。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `        # ------------------------------------------------------------------ #` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L436** `        # Artifact keep — [DSL]_KEEP=<comma-list>                            #` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L437** `        # ------------------------------------------------------------------ #` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L438** `        _keep_raw = get_str_env_var(f"{prefix}_KEEP", "")` — **EN:** Assigns a value to _keep_raw. **CN:** 将一个值赋给 _keep_raw。
+- **L439** `        _keep_tokens: set[str] = set(` — **EN:** Assigns a typed value to _keep_tokens. **CN:** 为 _keep_tokens 赋予带类型标注的值。
+- **L440** `            _parse_keep_tokens(_keep_raw, prefix) if _keep_raw else frozenset()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `        if get_bool_env_var(f"{prefix}_KEEP_IR", False):` — **EN:** Starts a conditional branch guarded by `get_bool_env_var(f'{prefix}_KEEP_IR', False)`. **CN:** 开始一个由 `get_bool_env_var(f'{prefix}_KEEP_IR', False)` 控制的条件分支。
+- **L444** `            warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L445** `                f"{prefix}_KEEP_IR is deprecated; use {prefix}_KEEP=ir-debug instead.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** `                DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `                stacklevel=2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `            _keep_tokens.add("ir-debug")` — **EN:** Invokes `_keep_tokens.add` as a standalone call. **CN:** 以独立语句方式调用 `_keep_tokens.add`。
+- **L450** `        if get_bool_env_var(f"{prefix}_KEEP_PTX", False):` — **EN:** Starts a conditional branch guarded by `get_bool_env_var(f'{prefix}_KEEP_PTX', False)`. **CN:** 开始一个由 `get_bool_env_var(f'{prefix}_KEEP_PTX', False)` 控制的条件分支。
+- **L451** `            warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L452** `                f"{prefix}_KEEP_PTX is deprecated; use {prefix}_KEEP=ptx instead.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `                DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** `                stacklevel=2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L456** `            _keep_tokens.add("ptx")` — **EN:** Invokes `_keep_tokens.add` as a standalone call. **CN:** 以独立语句方式调用 `_keep_tokens.add`。
+- **L457** `        if get_bool_env_var(f"{prefix}_KEEP_CUBIN", False):` — **EN:** Starts a conditional branch guarded by `get_bool_env_var(f'{prefix}_KEEP_CUBIN', False)`. **CN:** 开始一个由 `get_bool_env_var(f'{prefix}_KEEP_CUBIN', False)` 控制的条件分支。
+- **L458** `            warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L459** `                f"{prefix}_KEEP_CUBIN is deprecated; use {prefix}_KEEP=cubin instead.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `                DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `                stacklevel=2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L462** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `            _keep_tokens.add("cubin")` — **EN:** Invokes `_keep_tokens.add` as a standalone call. **CN:** 以独立语句方式调用 `_keep_tokens.add`。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `        self.keep_tokens: frozenset[str] = frozenset(_keep_tokens)` — **EN:** Assigns a typed value to self.keep_tokens. **CN:** 为 self.keep_tokens 赋予带类型标注的值。
+- **L466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L467** `        # Derived boolean attributes — used by compiler.py and dsl.py.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L468** `        # keep_ir_clean: save IR after canonicalize+cse (the readable form).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L469** `        self.keep_ir_clean: bool = "ir" in self.keep_tokens` — **EN:** Assigns a typed value to self.keep_ir_clean. **CN:** 为 self.keep_ir_clean 赋予带类型标注的值。
+- **L470** `        # keep_ir: save raw IR before any passes (old KEEP_IR=1 semantics).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L471** `        self.keep_ir: bool = "ir-debug" in self.keep_tokens` — **EN:** Assigns a typed value to self.keep_ir. **CN:** 为 self.keep_ir 赋予带类型标注的值。
+- **L472** `        self.keep_ptx: bool = "ptx" in self.keep_tokens` — **EN:** Assigns a typed value to self.keep_ptx. **CN:** 为 self.keep_ptx 赋予带类型标注的值。
+- **L473** `        self.keep_cubin: bool = "cubin" in self.keep_tokens` — **EN:** Assigns a typed value to self.keep_cubin. **CN:** 为 self.keep_cubin 赋予带类型标注的值。
+- **L474** `        # Other options` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L475** `        self.dryrun = get_bool_env_var(f"{prefix}_DRYRUN", False)` — **EN:** Assigns a value to self.dryrun. **CN:** 将一个值赋给 self.dryrun。
+- **L476** `        self.arch = get_str_env_var(f"{prefix}_ARCH", detect_gpu_arch(prefix))` — **EN:** Assigns a value to self.arch. **CN:** 将一个值赋给 self.arch。
+- **L477** `        self.warnings_as_errors = get_bool_env_var(` — **EN:** Assigns a value to self.warnings_as_errors. **CN:** 将一个值赋给 self.warnings_as_errors。
+- **L478** `            f"{prefix}_WARNINGS_AS_ERRORS", False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `        self.warnings_ignore = get_bool_env_var(f"{prefix}_WARNINGS_IGNORE", False)` — **EN:** Assigns a value to self.warnings_ignore. **CN:** 将一个值赋给 self.warnings_ignore。
+- **L481** `        self.enable_optimization_warnings = get_bool_env_var(` — **EN:** Assigns a value to self.enable_optimization_warnings. **CN:** 将一个值赋给 self.enable_optimization_warnings。
+- **L482** `            f"{prefix}_ENABLE_OPTIMIZATION_WARNINGS", False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** `        self.disable_file_caching = get_bool_env_var(` — **EN:** Assigns a value to self.disable_file_caching. **CN:** 将一个值赋给 self.disable_file_caching。
+- **L485** `            f"{prefix}_DISABLE_FILE_CACHING", False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `        # set mlir shared libraries` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L488** `        self.shared_libs = get_prefix_dsl_libs(prefix)` — **EN:** Assigns a value to self.shared_libs. **CN:** 将一个值赋给 self.shared_libs。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `        # whether to enable assert in host and device code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L491** `        self.enable_assertions = get_bool_env_var(f"{prefix}_ENABLE_ASSERTIONS", False)` — **EN:** Assigns a value to self.enable_assertions. **CN:** 将一个值赋给 self.enable_assertions。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `        self.enable_tvm_ffi = get_bool_env_var(f"{prefix}_ENABLE_TVM_FFI", False)` — **EN:** Assigns a value to self.enable_tvm_ffi. **CN:** 将一个值赋给 self.enable_tvm_ffi。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `        self.loc_tracebacks = get_int_env_var(f"{prefix}_LOC_TRACEBACKS", 0)` — **EN:** Assigns a value to self.loc_tracebacks. **CN:** 将一个值赋给 self.loc_tracebacks。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.env_manager`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.env_manager`。
+- EN: Module docstring summary: This module provides utilities for the environment variables setup. CN: 模块文档摘要为：This module provides utilities for the environment variables setup.
+- EN: Top-level classes: LogEnvironmentManager, EnvironmentVarManager CN: 顶层类包括：LogEnvironmentManager, EnvironmentVarManager
+- EN: Top-level functions: is_cutlass_family_dsl_prefix, _parse_keep_tokens, get_str_env_var, get_bool_env_var, get_int_env_var, get_int_or_none_env_var, has_env_var, detect_gpu_arch, find_libs_in_ancestors, _find_cuda_home, get_prefix_dsl_libs CN: 顶层函数包括：is_cutlass_family_dsl_prefix, _parse_keep_tokens, get_str_env_var, get_bool_env_var, get_int_env_var, get_int_or_none_env_var, has_env_var, detect_gpu_arch, find_libs_in_ancestors, _find_cuda_home, get_prefix_dsl_libs
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..base_dsl.runtime.cuda:get_compute_capability_major_minor, .common:DSLRuntimeError, .utils.logger:log, .cache_helpers:get_default_file_dump_root CN: 内部依赖：..base_dsl.runtime.cuda:get_compute_capability_major_minor, .common:DSLRuntimeError, .utils.logger:log, .cache_helpers:get_default_file_dump_root
+- EN: External or standard-library dependencies: os, sys, shutil, glob, warnings, pathlib:Path, functools:lru_cache CN: 外部或标准库依赖：os, sys, shutil, glob, warnings, pathlib:Path, functools:lru_cache

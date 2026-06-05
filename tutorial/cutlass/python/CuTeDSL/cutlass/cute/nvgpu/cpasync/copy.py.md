@@ -1,0 +1,1563 @@
+# copy.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/nvgpu/cpasync/copy.py`
+
+## Purpose / 作用
+- EN: Defines 37 classes (LoadCacheMode, CopyG2SOp, CopyG2STrait, TmaCopyOp, ... (+33 more)) in `CuTeDSL.cutlass.cute.nvgpu.cpasync.copy`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.nvgpu.cpasync.copy` 定义了 37 个类（LoadCacheMode, CopyG2SOp, CopyG2STrait, TmaCopyOp, ... (+33 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L13** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L14** `from typing import Any, Optional, Type` — **EN:** Imports Any, Optional, Type from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Type。
+- **L15** `from typing_extensions import deprecated` — **EN:** Imports deprecated from `typing_extensions`. **CN:** 从 `typing_extensions` 导入 deprecated。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L18** `from cutlass.cutlass_dsl import BaseDSL` — **EN:** Imports BaseDSL from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 BaseDSL。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L21** `from cutlass._mlir.dialects.nvvm import ReductionOp as ReductionOp` — **EN:** Imports ReductionOp as ReductionOp from `cutlass._mlir.dialects.nvvm`. **CN:** 从 `cutlass._mlir.dialects.nvvm` 导入 ReductionOp as ReductionOp。
+- **L22** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `from ...atom import CopyOp, Trait, make_atom` — **EN:** Imports CopyOp, Trait, make_atom from `...atom`. **CN:** 从 `...atom` 导入 CopyOp, Trait, make_atom。
+- **L25** `from ...typing import Int16, Int32, Int64, Pointer, Integer, Numeric` — **EN:** Imports Int16, Int32, Int64, Pointer, Integer, Numeric from `...typing`. **CN:** 从 `...typing` 导入 Int16, Int32, Int64, Pointer, Integer, Numeric。
+- **L26** `from ..common import OpError, LoadCacheMode as LoadCacheMode_` — **EN:** Imports OpError, LoadCacheMode as LoadCacheMode_ from `..common`. **CN:** 从 `..common` 导入 OpError, LoadCacheMode as LoadCacheMode_。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `from ..tcgen05.mma import CtaGroup` — **EN:** Imports CtaGroup from `..tcgen05.mma`. **CN:** 从 `..tcgen05.mma` 导入 CtaGroup。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L33** `# Asynchronous copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L34** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L35** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `@deprecated(` — **EN:** Applies decorator `deprecated('cute.nvgpu.cpasync.LoadCacheMode is deprecate...` to the following definition. **CN:** 将装饰器 `deprecated('cute.nvgpu.cpasync.LoadCacheMode is deprecate...` 应用于后面的定义。
+- **L39** `    "cute.nvgpu.cpasync.LoadCacheMode is deprecated, use cute.nvgpu.LoadCacheMode instead"` — **EN:** Applies decorator `deprecated('cute.nvgpu.cpasync.LoadCacheMode is deprecate...` to the following definition. **CN:** 将装饰器 `deprecated('cute.nvgpu.cpasync.LoadCacheMode is deprecate...` 应用于后面的定义。
+- **L40** `)` — **EN:** Applies decorator `deprecated('cute.nvgpu.cpasync.LoadCacheMode is deprecate...` to the following definition. **CN:** 将装饰器 `deprecated('cute.nvgpu.cpasync.LoadCacheMode is deprecate...` 应用于后面的定义。
+- **L41** `class LoadCacheMode(enum.Enum):` — **EN:** Defines class `LoadCacheMode` with bases enum.Enum. **CN:** 定义类 `LoadCacheMode`，其基类为 enum.Enum。
+- **L42** `    """` — **EN:** Starts the docstring for the class `LoadCacheMode`. **CN:** 开始说明 class `LoadCacheMode` 的文档字符串。
+- **L43** `    An enumeration for the possible cache modes of a non-bulk \`\`cp.async\`\` instruction.` — **EN:** Continues the docstring for the class `LoadCacheMode`. **CN:** 继续说明 class `LoadCacheMode` 的文档字符串。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#cache-operators>\`__.` — **EN:** Continues the docstring for the class `LoadCacheMode`. **CN:** 继续说明 class `LoadCacheMode` 的文档字符串。
+- **L46** `    """` — **EN:** Ends the docstring for the class `LoadCacheMode`. **CN:** 结束说明 class `LoadCacheMode` 的文档字符串。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `    ALWAYS = _cute_nvgpu_ir.LoadCacheMode.always` — **EN:** Assigns a value to ALWAYS. **CN:** 将一个值赋给 ALWAYS。
+- **L49** `    GLOBAL = _cute_nvgpu_ir.LoadCacheMode.global_` — **EN:** Assigns a value to GLOBAL. **CN:** 将一个值赋给 GLOBAL。
+- **L50** `    STREAMING = _cute_nvgpu_ir.LoadCacheMode.streaming` — **EN:** Assigns a value to STREAMING. **CN:** 将一个值赋给 STREAMING。
+- **L51** `    LAST_USE = _cute_nvgpu_ir.LoadCacheMode.last_use` — **EN:** Assigns a value to LAST_USE. **CN:** 将一个值赋给 LAST_USE。
+- **L52** `    NONE = _cute_nvgpu_ir.LoadCacheMode.none` — **EN:** Assigns a value to NONE. **CN:** 将一个值赋给 NONE。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L55** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L58** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    def _to_ir(self) -> _cute_nvgpu_ir.LoadCacheMode:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L61** `        return self.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L65** `class CopyG2SOp(CopyOp):` — **EN:** Defines class `CopyG2SOp` with bases CopyOp. **CN:** 定义类 `CopyG2SOp`，其基类为 CopyOp。
+- **L66** `    """` — **EN:** Starts the docstring for the class `CopyG2SOp`. **CN:** 开始说明 class `CopyG2SOp` 的文档字符串。
+- **L67** `    Non-bulk asynchronous GMEM to SMEM Copy Operation.` — **EN:** Continues the docstring for the class `CopyG2SOp`. **CN:** 继续说明 class `CopyG2SOp` 的文档字符串。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-non-bulk-copy>\`__.` — **EN:** Continues the docstring for the class `CopyG2SOp`. **CN:** 继续说明 class `CopyG2SOp` 的文档字符串。
+- **L70** `    """` — **EN:** Ends the docstring for the class `CopyG2SOp`. **CN:** 结束说明 class `CopyG2SOp` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    cache_mode: LoadCacheMode_ = LoadCacheMode_.ALWAYS` — **EN:** Assigns a typed value to cache_mode. **CN:** 为 cache_mode 赋予带类型标注的值。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L75** `        self, cache_mode: LoadCacheMode_ | LoadCacheMode = LoadCacheMode_.ALWAYS` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L77** `        super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L78** `        object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L79** `            self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `            "cache_mode",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `            LoadCacheMode_(cache_mode.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `            if isinstance(cache_mode, LoadCacheMode)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `            else cache_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L87** `        res = "cp.async GMEM -> SMEM copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L88** `        if self.cache_mode != LoadCacheMode_.ALWAYS:` — **EN:** Starts a conditional branch guarded by `self.cache_mode != LoadCacheMode_.ALWAYS`. **CN:** 开始一个由 `self.cache_mode != LoadCacheMode_.ALWAYS` 控制的条件分支。
+- **L89** `            res += f"\n  with cache mode = {self.cache_mode}"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L90** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L93** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L95** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L96** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L97** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L98** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L99** `    ) -> "CopyG2STrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L100** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", None)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L101** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy <= 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L102** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L103** `                "expects a 'num_bits_per_copy' kw argument of type int that is positive "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `        # Verify that the user provided enum values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** `        if not isinstance(self.cache_mode, LoadCacheMode_):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cache_mode, LoadCacheMode_)`. **CN:** 开始一个由 `not isinstance(self.cache_mode, LoadCacheMode_)` 控制的条件分支。
+- **L108** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L109** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `                "expects the 'cache_mode' Op parameter to be a LoadCacheMode instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        ty = _cute_nvgpu_ir.CopyAtomSIMTAsyncCopyType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L113** `            copy_internal_type.mlir_type, self.cache_mode._to_ir(), num_bits_per_copy` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        return CopyG2STrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `class CopyG2STrait(Trait):` — **EN:** Defines class `CopyG2STrait` with bases Trait. **CN:** 定义类 `CopyG2STrait`，其基类为 Trait。
+- **L119** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L123** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L124** `# Bulk tensor copies a.k.a TMA copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L126** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `TMA_MBAR_PTR_FIELD_NAME = "tma_bar"` — **EN:** Assigns a value to TMA_MBAR_PTR_FIELD_NAME. **CN:** 将一个值赋给 TMA_MBAR_PTR_FIELD_NAME。
+- **L129** `TMA_MCAST_MASK_FIELD_NAME = "mcast_mask"` — **EN:** Assigns a value to TMA_MCAST_MASK_FIELD_NAME. **CN:** 将一个值赋给 TMA_MCAST_MASK_FIELD_NAME。
+- **L130** `TMA_DESC_PTR_FIELD_NAME = "tma_descriptor_ptr"` — **EN:** Assigns a value to TMA_DESC_PTR_FIELD_NAME. **CN:** 将一个值赋给 TMA_DESC_PTR_FIELD_NAME。
+- **L131** `TMA_BYTE_MASK_FIELD_NAME = "byte_mask"` — **EN:** Assigns a value to TMA_BYTE_MASK_FIELD_NAME. **CN:** 将一个值赋给 TMA_BYTE_MASK_FIELD_NAME。
+- **L132** `TMA_CTA_RANK_FIELD_NAME = "cta_rank"` — **EN:** Assigns a value to TMA_CTA_RANK_FIELD_NAME. **CN:** 将一个值赋给 TMA_CTA_RANK_FIELD_NAME。
+- **L133** `TMA_CACHE_POLICY_FIELD_NAME = "cache_policy"` — **EN:** Assigns a value to TMA_CACHE_POLICY_FIELD_NAME. **CN:** 将一个值赋给 TMA_CACHE_POLICY_FIELD_NAME。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `class TmaCopyOp(CopyOp):` — **EN:** Defines class `TmaCopyOp` with bases CopyOp. **CN:** 定义类 `TmaCopyOp`，其基类为 CopyOp。
+- **L137** `    """` — **EN:** Starts the docstring for the class `TmaCopyOp`. **CN:** 开始说明 class `TmaCopyOp` 的文档字符串。
+- **L138** `    Base class for all TMA copy operations.` — **EN:** Continues the docstring for the class `TmaCopyOp`. **CN:** 继续说明 class `TmaCopyOp` 的文档字符串。
+- **L139** `    """` — **EN:** Ends the docstring for the class `TmaCopyOp`. **CN:** 结束说明 class `TmaCopyOp` 的文档字符串。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L145** `# TMA GMEM -> SMEM copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L150** `class CopyBulkTensorTileG2SOp(TmaCopyOp):` — **EN:** Defines class `CopyBulkTensorTileG2SOp` with bases TmaCopyOp. **CN:** 定义类 `CopyBulkTensorTileG2SOp`，其基类为 TmaCopyOp。
+- **L151** `    """` — **EN:** Starts the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 开始说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L152** `    Bulk tensor asynchronous GMEM to SMEM Copy Operation using the TMA unit.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `    TMA copy operations are issued by a single thread within a warp, but the DSL **automatically handles this** by` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L155** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    .. code-block:: python` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `        # CORRECT: TMA copy without elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L160** `        cute.copy(` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L161** `            tma_atom,` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L162** `            gmem_tensor,  # TMA partition ensures single-thread automatically` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L163** `            smem_tensor,` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L164** `            tma_bar_ptr=barrier_ptr` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L165** `        )` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L168** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L169** `            cute.copy(tma_atom, gmem_tensor, smem_tensor, tma_bar_ptr=barrier_ptr)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `    While the TMA copy itself does not need \`\`elect_one()\`\`, barrier initialization and transaction byte setup **must** use \`\`elect_one()\`\`:` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    .. code-block:: python` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `        # Barrier setup requires elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L176** `        with cute.arch.elect_one():` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L177** `            cute.arch.mbarrier_init(barrier_ptr, arrival_count)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L178** `            cute.arch.mbarrier_expect_tx(barrier_ptr, num_tma_bytes)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `        # TMA copy does NOT need elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L181** `        cute.copy(tma_atom, gmem_tensor, smem_tensor, tma_bar_ptr=barrier_ptr)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    **PTX Programming Model**: In PTX, TMA operations (\`\`cp.async.bulk.tensor\`\`) must be issued` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L184** `    by a single thread. The DSL automatically handles this.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk-tensor>\`__.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L187** `    This Operation uses TMA in the \`\`.tile\`\` mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `    .. seealso::` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L190** `       - :func:\`cute.arch.elect_one\` - **NOT** needed for TMA copy, but needed for barrier setup` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L191** `       - :func:\`cute.arch.mbarrier_init\` - Requires elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L192** `       - :func:\`cute.arch.mbarrier_expect_tx\` - Requires elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L193** `       - Tutorial example: \`\`examples/blackwell/tutorial_tma/tma_v0.py\`\`` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L194** `    """` — **EN:** Ends the docstring for the class `CopyBulkTensorTileG2SOp`. **CN:** 结束说明 class `CopyBulkTensorTileG2SOp` 的文档字符串。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `    cta_group: CtaGroup = CtaGroup.ONE` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L199** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L200** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L201** `                self, "expects the 'cta_group' parameter to be a CtaGroup instance"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L204** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L205** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L206** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L207** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `        if (self.cta_group == CtaGroup.TWO) and arch.major == Arch.sm_90.major:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...` 控制的条件分支。
+- **L212** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L213** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `                f"CTA group of 2 is tcgen05-specific and is not and is not compatible with {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L219** `        res = "cp.async GMEM -> SMEM bulk tensor copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L220** `        if self.cta_group == CtaGroup.TWO:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO` 控制的条件分支。
+- **L221** `            res += "\n  CTA group = 2"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L222** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L225** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L227** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `    ) -> "CopyBulkTensorTileG2SNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L232** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L233** `            "Use cpasync.make_tiled_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `    def _to_ir(self) -> _cute_nvgpu_ir.TiledTmaLoadEnum:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L237** `        if self.cta_group == CtaGroup.ONE:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.ONE`. **CN:** 开始一个由 `self.cta_group == CtaGroup.ONE` 控制的条件分支。
+- **L238** `            return _cute_nvgpu_ir.TiledTmaLoadEnum.sm_90` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L239** `        elif self.cta_group == CtaGroup.TWO:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L240** `            return _cute_nvgpu_ir.TiledTmaLoadEnum.sm_100_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L241** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L242** `            assert False, "unrecognized self.cta_group"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `class CopyBulkTensorTileG2SNonExecTrait(Trait):` — **EN:** Defines class `CopyBulkTensorTileG2SNonExecTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorTileG2SNonExecTrait`，其基类为 Trait。
+- **L246** `    # We allow kw args to be dropped so that the user can write common code for non-multicast` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L247** `    # and multicast loads.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L250** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L251** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L252** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L253** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L254** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L255** `    ) -> "CopyBulkTensorTileG2STrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L256** `        return CopyBulkTensorTileG2STrait(self.unpack(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L259** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L260** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L261** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L262** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L263** `        tma_bar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L264** `        tma_desc_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L265** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L266** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L267** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L268** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L269** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `        The non-multicast TMA load requires a \`tma_bar_ptr\` keyword argument to be provided when` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L272** `        using \`cute.copy\`. \`cache_policy\` keyword argument to be provided to set the l2 cache eviction priority.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L273** `        Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L274** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L275** `        if not isinstance(tma_bar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(tma_bar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(tma_bar_ptr, Pointer)` 控制的条件分支。
+- **L276** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L277** `                "expects a pointer to an mbarrier to be provided via the tma_bar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(self.value, loc=loc, ip=ip)` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L280** `        attr_str = f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_MBAR_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L281** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L282** `        exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L283** `            exec_value, attr, tma_bar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L286** `            attr_str = f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L287** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L288** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L289** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L292** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L293** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L294** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L298** `                f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L301** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L302** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `class CopyBulkTensorTileG2STrait(Trait):` — **EN:** Defines class `CopyBulkTensorTileG2STrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorTileG2STrait`，其基类为 Trait。
+- **L308** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L311** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L312** `class CopyBulkTensorIm2ColG2SOp(TmaCopyOp):` — **EN:** Defines class `CopyBulkTensorIm2ColG2SOp` with bases TmaCopyOp. **CN:** 定义类 `CopyBulkTensorIm2ColG2SOp`，其基类为 TmaCopyOp。
+- **L313** `    """` — **EN:** Starts the docstring for the class `CopyBulkTensorIm2ColG2SOp`. **CN:** 开始说明 class `CopyBulkTensorIm2ColG2SOp` 的文档字符串。
+- **L314** `    Bulk tensor asynchrnous GMEM to SMEM Copy Operation using the TMA unit in im2col mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColG2SOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColG2SOp` 的文档字符串。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk-tensor>\`__.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColG2SOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColG2SOp` 的文档字符串。
+- **L317** `    This Operation uses TMA in the \`\`.im2col\`\` mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColG2SOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColG2SOp` 的文档字符串。
+- **L318** `    """` — **EN:** Ends the docstring for the class `CopyBulkTensorIm2ColG2SOp`. **CN:** 结束说明 class `CopyBulkTensorIm2ColG2SOp` 的文档字符串。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    cta_group: CtaGroup = CtaGroup.ONE` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L323** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L324** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L325** `                self, "expects the 'cta_group' parameter to be a CtaGroup instance"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L328** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L329** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L330** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L331** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `        if (self.cta_group == CtaGroup.TWO) and arch.major == Arch.sm_90.major:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...` 控制的条件分支。
+- **L336** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L337** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `                f"CTA group of 2 is tcgen05-specific and is not and is not compatible with {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L343** `        res = "cp.async GMEM -> SMEM bulk tensor copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L344** `        if self.cta_group == CtaGroup.TWO:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO` 控制的条件分支。
+- **L345** `            res += "\n  CTA group = 2"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L346** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L349** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L350** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L351** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L352** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L353** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L354** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L355** `    ) -> "CopyBulkTensorIm2ColG2SNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L356** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L357** `            "Use cpasync.make_im2col_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `    def _to_ir(self) -> _cute_nvgpu_ir.Im2ColTmaLoadEnum:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L361** `        if self.cta_group == CtaGroup.ONE:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.ONE`. **CN:** 开始一个由 `self.cta_group == CtaGroup.ONE` 控制的条件分支。
+- **L362** `            return _cute_nvgpu_ir.Im2ColTmaLoadEnum.sm_90` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L363** `        elif self.cta_group == CtaGroup.TWO:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L364** `            return _cute_nvgpu_ir.Im2ColTmaLoadEnum.sm_100_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L365** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L366** `            assert False, "unrecognized self.cta_group"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L367** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `class CopyBulkTensorIm2ColG2SNonExecTrait(Trait):` — **EN:** Defines class `CopyBulkTensorIm2ColG2SNonExecTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorIm2ColG2SNonExecTrait`，其基类为 Trait。
+- **L370** `    # We allow kw args to be dropped so that the user can write common code for non-multicast` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L371** `    # and multicast loads.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L374** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L375** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L376** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L377** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L378** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L379** `    ) -> "CopyBulkTensorIm2ColG2STrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L380** `        return CopyBulkTensorIm2ColG2STrait(self.unpack(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L383** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L384** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L385** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L386** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L387** `        tma_bar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L388** `        tma_desc_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L389** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L390** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L391** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L392** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L393** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `        The non-multicast TMA load requires a \`tma_bar_ptr\` keyword argument to be provided when` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L396** `        using \`cute.copy\`. \`cache_policy\` keyword argument to be provided to set the l2 cache eviction priority.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L397** `        Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L398** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L399** `        if not isinstance(tma_bar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(tma_bar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(tma_bar_ptr, Pointer)` 控制的条件分支。
+- **L400** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L401** `                "expects a pointer to an mbarrier to be provided via the tma_bar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L405** `            self.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L406** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L409** `        attr_str = f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_MBAR_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L410** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L411** `        exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L412** `            exec_value, attr, tma_bar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L415** `            attr_str = f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L416** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L417** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L418** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L421** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L422** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L423** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L426** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L427** `                f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L430** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L431** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `class CopyBulkTensorIm2ColG2STrait(Trait):` — **EN:** Defines class `CopyBulkTensorIm2ColG2STrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorIm2ColG2STrait`，其基类为 Trait。
+- **L437** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L438** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L441** `# TMA GMEM -> SMEM multicast copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L442** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L445** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L446** `class CopyBulkTensorIm2ColG2SMulticastOp(TmaCopyOp):` — **EN:** Defines class `CopyBulkTensorIm2ColG2SMulticastOp` with bases TmaCopyOp. **CN:** 定义类 `CopyBulkTensorIm2ColG2SMulticastOp`，其基类为 TmaCopyOp。
+- **L447** `    """` — **EN:** Starts the docstring for the class `CopyBulkTensorIm2ColG2SMulticastOp`. **CN:** 开始说明 class `CopyBulkTensorIm2ColG2SMulticastOp` 的文档字符串。
+- **L448** `    Bulk tensor asynchrnous multicast GMEM to SMEM Copy Operation using the TMA unit.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColG2SMulticastOp` 的文档字符串。
+- **L449** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L450** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk-tensor>\`__.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColG2SMulticastOp` 的文档字符串。
+- **L451** `    This Operation uses TMA in the \`\`.im2col\`\` mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColG2SMulticastOp` 的文档字符串。
+- **L452** `    """` — **EN:** Ends the docstring for the class `CopyBulkTensorIm2ColG2SMulticastOp`. **CN:** 结束说明 class `CopyBulkTensorIm2ColG2SMulticastOp` 的文档字符串。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `    cta_group: CtaGroup = CtaGroup.ONE` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L457** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L458** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L459** `                self, "expects the 'cta_group' parameter to be a CtaGroup instance"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L462** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L463** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L464** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L465** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `        if (self.cta_group == CtaGroup.TWO) and arch.major == Arch.sm_90.major:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...` 控制的条件分支。
+- **L470** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L471** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `                f"CTA group of 2 is tcgen05-specific and is not and is not compatible with {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L477** `        res = "cp.async GMEM -> SMEM bulk tensor multicast copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L478** `        if self.cta_group == CtaGroup.TWO:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO` 控制的条件分支。
+- **L479** `            res += "\n  CTA group = 2"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L480** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L483** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L484** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L485** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L486** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L487** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L488** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L489** `    ) -> "CopyBulkTensorIm2ColG2SMulticastNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L490** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L491** `            "Use cpasync.make_im2col_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L492** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L494** `    def _to_ir(self) -> _cute_nvgpu_ir.Im2ColTmaLoadEnum:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L495** `        if self.cta_group == CtaGroup.ONE:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.ONE`. **CN:** 开始一个由 `self.cta_group == CtaGroup.ONE` 控制的条件分支。
+- **L496** `            return _cute_nvgpu_ir.Im2ColTmaLoadEnum.sm_90_multicast` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L497** `        elif self.cta_group == CtaGroup.TWO:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L498** `            return _cute_nvgpu_ir.Im2ColTmaLoadEnum.sm_100_2sm_multicast` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L499** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L500** `            assert False, "unrecognized self.cta_group"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `class CopyBulkTensorIm2ColG2SMulticastNonExecTrait(Trait):` — **EN:** Defines class `CopyBulkTensorIm2ColG2SMulticastNonExecTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorIm2ColG2SMulticastNonExecTrait`，其基类为 Trait。
+- **L504** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L505** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L506** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L507** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L508** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L509** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L510** `    ) -> "CopyBulkTensorIm2ColG2SMulticastTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L511** `        return CopyBulkTensorIm2ColG2SMulticastTrait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L512** `            self.unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `    def unpack(  # type: ignore[override]` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L516** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L517** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L518** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L519** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L520** `        tma_bar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L521** `        mcast_mask: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L522** `        tma_desc_ptr: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L523** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L524** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L525** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L526** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L527** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L528** `        The multicast TMA load requires a \`tma_bar_ptr\`  and a \`mcast_mask\` keyword arguments to be` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L529** `        provided when using \`cute.copy\`. \`cache_policy\` keyword argument to be provided to set the` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L530** `        l2 cache eviction priority.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L531** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L532** `        if not isinstance(tma_bar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(tma_bar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(tma_bar_ptr, Pointer)` 控制的条件分支。
+- **L533** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L534** `                "expects a pointer to an mbarrier to be provided via the tma_bar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `        if not isinstance(mcast_mask, Integer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mcast_mask, Integer)`. **CN:** 开始一个由 `not isinstance(mcast_mask, Integer)` 控制的条件分支。
+- **L537** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L538** `                "expects a multicast mask to be provided via the mcast_mask kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L539** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L540** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L541** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L542** `            self.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L546** `        attr_str = "#cute_nvgpu.atom_copy_field_tmaload<mcast_mask>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L547** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L548** `        exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L549** `            exec_value, attr, Int16(mcast_mask).ir_value(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L551** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L552** `            attr_str = f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L553** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L554** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L555** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L556** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L557** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L558** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L559** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L560** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L561** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L563** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L564** `                f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L565** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L567** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L568** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `        # Set the tma_bar_ptr at last to ensure that the atom creation and setting` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L571** `        # operations above can be moved outside the loop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L572** `        attr_str = "#cute_nvgpu.atom_copy_field_tmaload<tma_bar>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L573** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L574** `        exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L575** `            exec_value, attr, tma_bar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L576** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L577** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L578** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L579** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L580** `class CopyBulkTensorIm2ColG2SMulticastTrait(Trait):` — **EN:** Defines class `CopyBulkTensorIm2ColG2SMulticastTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorIm2ColG2SMulticastTrait`，其基类为 Trait。
+- **L581** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L582** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L583** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L584** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L585** `class CopyBulkTensorIm2ColS2GOp(TmaCopyOp):` — **EN:** Defines class `CopyBulkTensorIm2ColS2GOp` with bases TmaCopyOp. **CN:** 定义类 `CopyBulkTensorIm2ColS2GOp`，其基类为 TmaCopyOp。
+- **L586** `    """` — **EN:** Starts the docstring for the class `CopyBulkTensorIm2ColS2GOp`. **CN:** 开始说明 class `CopyBulkTensorIm2ColS2GOp` 的文档字符串。
+- **L587** `    Bulk tensor asynchrnous SMEM to GMEM Copy Operation using the TMA unit in im2col mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColS2GOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColS2GOp` 的文档字符串。
+- **L588** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L589** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk-tensor>\`__.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColS2GOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColS2GOp` 的文档字符串。
+- **L590** `    This Operation uses TMA in the \`\`.im2col\`\` mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorIm2ColS2GOp`. **CN:** 继续说明 class `CopyBulkTensorIm2ColS2GOp` 的文档字符串。
+- **L591** `    """` — **EN:** Ends the docstring for the class `CopyBulkTensorIm2ColS2GOp`. **CN:** 结束说明 class `CopyBulkTensorIm2ColS2GOp` 的文档字符串。
+- **L592** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L593** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L594** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L595** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L596** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L597** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L598** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L600** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L603** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L604** `        return "cp.async SMEM -> GMEM bulk tensor copy Operation"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L605** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L606** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L607** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L608** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L609** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L610** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L611** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L612** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L613** `    ) -> "CopyBulkTensorIm2ColS2GNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L614** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L615** `            "Use cpasync.make_im2col_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L618** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L619** `class CopyBulkTensorIm2ColS2GNonExecTrait(Trait):` — **EN:** Defines class `CopyBulkTensorIm2ColS2GNonExecTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorIm2ColS2GNonExecTrait`，其基类为 Trait。
+- **L620** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L621** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L622** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L623** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L624** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L625** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L626** `    ) -> "CopyBulkTensorIm2ColS2GTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L627** `        return CopyBulkTensorIm2ColS2GTrait(self.unpack(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L628** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L629** `    def unpack(  # type: ignore[override]` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L630** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L631** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L632** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L633** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L634** `        tma_desc_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L635** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L636** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L637** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L638** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L639** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L640** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(self.value, loc=loc, ip=ip)` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L641** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L642** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L643** `                f"#cute_nvgpu.atom_copy_field_tmastore<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L644** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L646** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L647** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L648** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L649** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L650** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L651** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L652** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L653** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L654** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L655** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L656** `                f"#cute_nvgpu.atom_copy_field_tmastore<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L657** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L658** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L659** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L660** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L661** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L663** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L664** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L665** `class CopyBulkTensorIm2ColS2GTrait(Trait):` — **EN:** Defines class `CopyBulkTensorIm2ColS2GTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorIm2ColS2GTrait`，其基类为 Trait。
+- **L666** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L667** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L668** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L669** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L670** `# TMA GMEM -> SMEM multicast copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L671** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L672** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L673** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L674** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L675** `class CopyBulkTensorTileG2SMulticastOp(TmaCopyOp):` — **EN:** Defines class `CopyBulkTensorTileG2SMulticastOp` with bases TmaCopyOp. **CN:** 定义类 `CopyBulkTensorTileG2SMulticastOp`，其基类为 TmaCopyOp。
+- **L676** `    """` — **EN:** Starts the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 开始说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L677** `    Bulk tensor asynchronous multicast GMEM to SMEM Copy Operation using the TMA unit.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** `    TMA multicast operations are issued by a single thread within a warp, but the DSL **automatically handles this** by` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L680** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L681** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L682** `    .. code-block:: python` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L683** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L684** `        # CORRECT: TMA multicast without elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L685** `        cute.copy(` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L686** `            tma_atom.with_(mcast_mask=cluster_mask),` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L687** `            gmem_tensor,` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L688** `            smem_tensor,` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L689** `            tma_bar_ptr=barrier_ptr` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L690** `        )` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L691** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L692** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L693** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L694** `            cute.copy(tma_atom.with_(mcast_mask=mask), gmem_tensor, smem_tensor)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L695** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L696** `    **PTX Programming Model**: In PTX, TMA multicast operations (\`\`cp.async.bulk.tensor.multicast\`\`)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L697** `    must be issued by a single thread.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L698** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L699** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk-tensor>\`__.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L700** `    This Operation uses TMA in the \`\`.tile\`\` mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L701** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L702** `    .. seealso::` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L703** `       - :func:\`cute.arch.elect_one\` - **NOT** needed for TMA copy` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L704** `       - :class:\`CopyBulkTensorTileG2SOp\` - Non-multicast TMA load` — **EN:** Continues the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L705** `    """` — **EN:** Ends the docstring for the class `CopyBulkTensorTileG2SMulticastOp`. **CN:** 结束说明 class `CopyBulkTensorTileG2SMulticastOp` 的文档字符串。
+- **L706** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L707** `    cta_group: CtaGroup = CtaGroup.ONE` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L708** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L709** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L710** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L711** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L712** `                self, "expects the 'cta_group' parameter to be a CtaGroup instance"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L713** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L715** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L716** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L717** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L718** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L719** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L720** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L721** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L722** `        if (self.cta_group == CtaGroup.TWO) and arch.major == Arch.sm_90.major:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO and arch.major == Arch.sm_...` 控制的条件分支。
+- **L723** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L724** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L725** `                f"CTA group of 2 is tcgen05-specific and is not and is not compatible with {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L726** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L729** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L730** `        res = "cp.async GMEM -> SMEM bulk tensor multicast copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L731** `        if self.cta_group == CtaGroup.TWO:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.TWO`. **CN:** 开始一个由 `self.cta_group == CtaGroup.TWO` 控制的条件分支。
+- **L732** `            res += "\n  CTA group = 2"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L733** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L734** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L735** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L736** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L737** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L738** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L739** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L740** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L741** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L742** `    ) -> "CopyBulkTensorTileG2SMulticastNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L743** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L744** `            "Use cpasync.make_tiled_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L747** `    def _to_ir(self) -> _cute_nvgpu_ir.TiledTmaLoadEnum:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L748** `        if self.cta_group == CtaGroup.ONE:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.ONE`. **CN:** 开始一个由 `self.cta_group == CtaGroup.ONE` 控制的条件分支。
+- **L749** `            return _cute_nvgpu_ir.TiledTmaLoadEnum.sm_90_multicast` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L750** `        elif self.cta_group == CtaGroup.TWO:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L751** `            return _cute_nvgpu_ir.TiledTmaLoadEnum.sm_100_2sm_multicast` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L752** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L753** `            assert False, "unrecognized self.cta_group"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L754** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L755** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L756** `class CopyBulkTensorTileG2SMulticastNonExecTrait(Trait):` — **EN:** Defines class `CopyBulkTensorTileG2SMulticastNonExecTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorTileG2SMulticastNonExecTrait`，其基类为 Trait。
+- **L757** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L758** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L759** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L760** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L761** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L762** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L763** `    ) -> "CopyBulkTensorTileG2SMulticastTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L764** `        return CopyBulkTensorTileG2SMulticastTrait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L765** `            self.unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L766** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L767** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L768** `    def unpack(  # type: ignore[override]` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L769** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L770** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L771** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L772** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L773** `        tma_bar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L774** `        mcast_mask: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L775** `        tma_desc_ptr: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L776** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L777** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L778** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L779** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L780** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L781** `        The multicast TMA load requires a \`tma_bar_ptr\`  and a \`mcast_mask\` keyword arguments to be` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L782** `        provided when using \`cute.copy\`. \`cache_policy\` keyword argument to be provided to set the` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L783** `        l2 cache eviction priority.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L784** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L785** `        if not isinstance(tma_bar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(tma_bar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(tma_bar_ptr, Pointer)` 控制的条件分支。
+- **L786** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L787** `                "expects a pointer to an mbarrier to be provided via the tma_bar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L789** `        if not isinstance(mcast_mask, Integer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mcast_mask, Integer)`. **CN:** 开始一个由 `not isinstance(mcast_mask, Integer)` 控制的条件分支。
+- **L790** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L791** `                "expects a multicast mask to be provided via the mcast_mask kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L793** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(self.value, loc=loc, ip=ip)` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L794** `        attr_str = "#cute_nvgpu.atom_copy_field_tmaload<mcast_mask>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L795** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L796** `        exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L797** `            exec_value, attr, Int16(mcast_mask).ir_value(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L798** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L799** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L800** `            attr_str = f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L801** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L802** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L803** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L804** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L805** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L806** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L807** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L808** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L811** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L812** `                f"#cute_nvgpu.atom_copy_field_tmaload<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L813** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L814** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L815** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L816** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L818** `        # Set the tma_bar_ptr at last to ensure that the atom creation and setting` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L819** `        # operations above can be moved outside the loop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L820** `        attr_str = "#cute_nvgpu.atom_copy_field_tmaload<tma_bar>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L821** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L822** `        exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L823** `            exec_value, attr, tma_bar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L825** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L826** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `class CopyBulkTensorTileG2SMulticastTrait(Trait):` — **EN:** Defines class `CopyBulkTensorTileG2SMulticastTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorTileG2SMulticastTrait`，其基类为 Trait。
+- **L829** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L830** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L831** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L832** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L833** `# TMA SMEM -> GMEM copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L834** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L835** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L836** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L837** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L838** `class CopyBulkTensorTileS2GOp(TmaCopyOp):` — **EN:** Defines class `CopyBulkTensorTileS2GOp` with bases TmaCopyOp. **CN:** 定义类 `CopyBulkTensorTileS2GOp`，其基类为 TmaCopyOp。
+- **L839** `    """` — **EN:** Starts the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 开始说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L840** `    Bulk tensor asynchronous SMEM to GMEM Copy Operation using the TMA unit.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L841** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L842** `    TMA store operations are issued by a single thread within a warp, but the DSL **automatically handles this** by` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L843** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L844** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L845** `    .. code-block:: python` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L846** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L847** `        # CORRECT: TMA store without elect_one` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L848** `        cute.copy(` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L849** `            tma_atom,` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L850** `            smem_tensor,  # Source: shared memory` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L851** `            gmem_tensor,  # Destination: global memory` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L852** `        )` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L853** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L854** `        # WRONG: Do NOT wrap in elect_one (causes deadlock)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L855** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L856** `            cute.copy(tma_atom, smem_tensor, gmem_tensor)` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L857** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L858** `    **PTX Programming Model**: In PTX, TMA store operations must be issued by a single thread.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L859** `    The DSL automatically handles this.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L860** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L861** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk-tensor>\`__.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L862** `    This Operation uses TMA in the \`\`.tile\`\` mode.` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L863** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L864** `    .. seealso::` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L865** `       - :func:\`cute.arch.elect_one\` - **NOT** needed for TMA store` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L866** `       - :class:\`CopyBulkTensorTileG2SOp\` - TMA load operation` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L867** `       - Tutorial example: \`\`examples/blackwell/tutorial_tma/tma_v0.py\`\`` — **EN:** Continues the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L868** `    """` — **EN:** Ends the docstring for the class `CopyBulkTensorTileS2GOp`. **CN:** 结束说明 class `CopyBulkTensorTileS2GOp` 的文档字符串。
+- **L869** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L870** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L871** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L872** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L873** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L874** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L875** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L876** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L877** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L878** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L879** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L880** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L881** `        return "cp.async SMEM -> GMEM bulk tensor copy Operation"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L882** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L883** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L884** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L885** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L886** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L887** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L888** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L889** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L890** `    ) -> "CopyBulkTensorTileS2GNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L891** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L892** `            "Use cpasync.make_tiled_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L893** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L894** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L895** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L896** `class CopyBulkTensorTileS2GNonExecTrait(Trait):` — **EN:** Defines class `CopyBulkTensorTileS2GNonExecTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorTileS2GNonExecTrait`，其基类为 Trait。
+- **L897** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L898** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L899** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L900** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L901** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L902** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L903** `    ) -> "CopyBulkTensorTileS2GTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L904** `        return CopyBulkTensorTileS2GTrait(self.unpack(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L905** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L906** `    def unpack(  # type: ignore[override]` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L907** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L908** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L909** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L910** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L911** `        tma_desc_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L912** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L913** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L914** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L915** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L916** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L917** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(self.value, loc=loc, ip=ip)` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L918** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L919** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L920** `                f"#cute_nvgpu.atom_copy_field_tmastore<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L921** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L922** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L923** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L924** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L925** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L926** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L927** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L928** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L929** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L930** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L931** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L932** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L933** `                f"#cute_nvgpu.atom_copy_field_tmastore<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L934** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L935** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L936** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L937** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L938** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L939** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L940** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L941** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L942** `class CopyBulkTensorTileS2GTrait(Trait):` — **EN:** Defines class `CopyBulkTensorTileS2GTrait` with bases Trait. **CN:** 定义类 `CopyBulkTensorTileS2GTrait`，其基类为 Trait。
+- **L943** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L944** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L945** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L946** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L947** `class CopyReduceBulkTensorTileS2GOp(TmaCopyOp):` — **EN:** Defines class `CopyReduceBulkTensorTileS2GOp` with bases TmaCopyOp. **CN:** 定义类 `CopyReduceBulkTensorTileS2GOp`，其基类为 TmaCopyOp。
+- **L948** `    """` — **EN:** Starts the docstring for the class `CopyReduceBulkTensorTileS2GOp`. **CN:** 开始说明 class `CopyReduceBulkTensorTileS2GOp` 的文档字符串。
+- **L949** `    Bulk tensor asynchronous SMEM to GMEM Reduction Operation using the TMA unit.` — **EN:** Continues the docstring for the class `CopyReduceBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyReduceBulkTensorTileS2GOp` 的文档字符串。
+- **L950** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L951** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-reduce-async-bulk>\`__.` — **EN:** Continues the docstring for the class `CopyReduceBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyReduceBulkTensorTileS2GOp` 的文档字符串。
+- **L952** `    This Operation uses TMA in the \`\`.tile\`\` mode.` — **EN:** Continues the docstring for the class `CopyReduceBulkTensorTileS2GOp`. **CN:** 继续说明 class `CopyReduceBulkTensorTileS2GOp` 的文档字符串。
+- **L953** `    """` — **EN:** Ends the docstring for the class `CopyReduceBulkTensorTileS2GOp`. **CN:** 结束说明 class `CopyReduceBulkTensorTileS2GOp` 的文档字符串。
+- **L954** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L955** `    reduction_kind: ReductionOp = ReductionOp.ADD` — **EN:** Assigns a typed value to reduction_kind. **CN:** 为 reduction_kind 赋予带类型标注的值。
+- **L956** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L957** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L958** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L959** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L960** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L961** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L962** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L963** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L964** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L965** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L966** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L967** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L968** `        return "cp.async SMEM -> GMEM bulk tensor reduction Operation"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L969** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L970** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L971** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L972** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L973** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L974** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L975** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L976** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L977** `    ) -> "CopyReduceBulkTensorTileS2GNonExecTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L978** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L979** `            "Use cpasync.make_tiled_tma_atom to obtain a copy Atom for TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L980** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L981** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L982** `    def _to_ir(self) -> _cute_nvgpu_ir.ReductionKind:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L983** `        if self.reduction_kind == ReductionOp.ADD:` — **EN:** Starts a conditional branch guarded by `self.reduction_kind == ReductionOp.ADD`. **CN:** 开始一个由 `self.reduction_kind == ReductionOp.ADD` 控制的条件分支。
+- **L984** `            return _cute_nvgpu_ir.ReductionKind.ADD` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L985** `        elif self.reduction_kind == ReductionOp.MIN:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L986** `            return _cute_nvgpu_ir.ReductionKind.MIN` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L987** `        elif self.reduction_kind == ReductionOp.MAX:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L988** `            return _cute_nvgpu_ir.ReductionKind.MAX` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L989** `        elif self.reduction_kind == ReductionOp.INC:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L990** `            return _cute_nvgpu_ir.ReductionKind.INC` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L991** `        elif self.reduction_kind == ReductionOp.DEC:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L992** `            return _cute_nvgpu_ir.ReductionKind.DEC` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L993** `        elif self.reduction_kind == ReductionOp.AND:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L994** `            return _cute_nvgpu_ir.ReductionKind.AND` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L995** `        elif self.reduction_kind == ReductionOp.OR:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L996** `            return _cute_nvgpu_ir.ReductionKind.OR` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L997** `        elif self.reduction_kind == ReductionOp.XOR:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L998** `            return _cute_nvgpu_ir.ReductionKind.XOR` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L999** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1000** `            assert False, "unrecognized self.reduction_kind"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1001** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1002** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1003** `class CopyReduceBulkTensorTileS2GNonExecTrait(Trait):` — **EN:** Defines class `CopyReduceBulkTensorTileS2GNonExecTrait` with bases Trait. **CN:** 定义类 `CopyReduceBulkTensorTileS2GNonExecTrait`，其基类为 Trait。
+- **L1004** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L1005** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1006** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1007** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1008** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1009** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1010** `    ) -> "CopyReduceBulkTensorTileS2GTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1011** `        return CopyReduceBulkTensorTileS2GTrait(self.unpack(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1012** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1013** `    def unpack(  # type: ignore[override]` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L1014** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1015** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1016** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1017** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1018** `        tma_desc_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1019** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1020** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1021** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L1022** `        Custom implementation of unpack for non-executable TMAs.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1023** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L1024** `        exec_value = _cute_nvgpu_ir.atom_make_exec_tma(self.value, loc=loc, ip=ip)` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L1025** `        if isinstance(tma_desc_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(tma_desc_ptr, Pointer)`. **CN:** 开始一个由 `isinstance(tma_desc_ptr, Pointer)` 控制的条件分支。
+- **L1026** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1027** `                f"#cute_nvgpu.atom_copy_field_tmareduce<{TMA_DESC_PTR_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1028** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1029** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1030** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L1031** `                exec_value, attr, tma_desc_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1032** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1033** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L1034** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L1035** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1036** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1037** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1038** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1039** `                f"#cute_nvgpu.atom_copy_field_tmareduce<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1040** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1041** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1042** `            exec_value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to exec_value. **CN:** 将一个值赋给 exec_value。
+- **L1043** `                exec_value, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1044** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1045** `        return exec_value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1046** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1047** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1048** `class CopyReduceBulkTensorTileS2GTrait(Trait):` — **EN:** Defines class `CopyReduceBulkTensorTileS2GTrait` with bases Trait. **CN:** 定义类 `CopyReduceBulkTensorTileS2GTrait`，其基类为 Trait。
+- **L1049** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1050** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1051** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1052** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1053** `# Bulk GMEM -> SMEM copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1054** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1055** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1056** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1057** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1058** `class CopyBulkG2SOp(CopyOp):` — **EN:** Defines class `CopyBulkG2SOp` with bases CopyOp. **CN:** 定义类 `CopyBulkG2SOp`，其基类为 CopyOp。
+- **L1059** `    """` — **EN:** Starts the docstring for the class `CopyBulkG2SOp`. **CN:** 开始说明 class `CopyBulkG2SOp` 的文档字符串。
+- **L1060** `    Bulk copy asynchrnous GMEM to SMEM Copy Operation.` — **EN:** Continues the docstring for the class `CopyBulkG2SOp`. **CN:** 继续说明 class `CopyBulkG2SOp` 的文档字符串。
+- **L1061** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1062** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk>\`__.` — **EN:** Continues the docstring for the class `CopyBulkG2SOp`. **CN:** 继续说明 class `CopyBulkG2SOp` 的文档字符串。
+- **L1063** `    """` — **EN:** Ends the docstring for the class `CopyBulkG2SOp`. **CN:** 结束说明 class `CopyBulkG2SOp` 的文档字符串。
+- **L1064** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1065** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L1066** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1067** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L1068** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L1069** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1070** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1071** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1072** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1073** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1074** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1075** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L1076** `        res = "cp.async GMEM -> SMEM bulk copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1077** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1078** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1079** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1080** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1081** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1082** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1083** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1084** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1085** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1086** `    ) -> "CopyBulkG2STrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1087** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", 0)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L1088** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy < 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L1089** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1090** `                "expects a 'num_bits_per_copy' kw argument of type int that is positive "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1091** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1092** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1093** `        ty = _cute_nvgpu_ir.CopyAtomBulkCopyG2SType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1094** `            copy_internal_type.mlir_type, num_bits_per_copy, False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1095** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1096** `        return CopyBulkG2STrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1097** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1098** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1099** `class CopyBulkG2STrait(Trait):` — **EN:** Defines class `CopyBulkG2STrait` with bases Trait. **CN:** 定义类 `CopyBulkG2STrait`，其基类为 Trait。
+- **L1100** `    # We allow kw args to be dropped so that the user can write common code for non-multicast` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1101** `    # and multicast loads.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1102** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L1103** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1104** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1105** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1106** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1107** `        mbar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1108** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1109** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1110** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1111** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L1112** `        Custom implementation of unpack for bulk copy load.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1114** `        The non-multicast bulk load requires a \`mbar_ptr\` keyword argument to be provided when` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1115** `        using \`cute.copy\`. \`cache_policy\` keyword argument to be provided to set the l2 cache eviction priority.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1116** `        Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1117** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L1118** `        if not isinstance(mbar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mbar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(mbar_ptr, Pointer)` 控制的条件分支。
+- **L1119** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1120** `                "expects a pointer to an mbarrier to be provided via the mbar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1121** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1122** `        attr_str = f"#cute_nvgpu.atom_copy_field_bulkg2s<{TMA_MBAR_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1123** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1124** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1125** `            self.value, attr, mbar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1126** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1127** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L1128** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L1129** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1130** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1131** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1132** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1133** `                f"#cute_nvgpu.atom_copy_field_bulkg2s<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1134** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1135** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1136** `            val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1137** `                val, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1138** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1139** `        return val` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1142** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1143** `# Bulk GMEM -> SMEM Multicast copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1144** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1147** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1148** `class CopyBulkG2SMulticastOp(CopyOp):` — **EN:** Defines class `CopyBulkG2SMulticastOp` with bases CopyOp. **CN:** 定义类 `CopyBulkG2SMulticastOp`，其基类为 CopyOp。
+- **L1149** `    """` — **EN:** Starts the docstring for the class `CopyBulkG2SMulticastOp`. **CN:** 开始说明 class `CopyBulkG2SMulticastOp` 的文档字符串。
+- **L1150** `    Bulk multicast copy asynchrnous GMEM to SMEM Copy Operation.` — **EN:** Continues the docstring for the class `CopyBulkG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkG2SMulticastOp` 的文档字符串。
+- **L1151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1152** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk>\`__.` — **EN:** Continues the docstring for the class `CopyBulkG2SMulticastOp`. **CN:** 继续说明 class `CopyBulkG2SMulticastOp` 的文档字符串。
+- **L1153** `    """` — **EN:** Ends the docstring for the class `CopyBulkG2SMulticastOp`. **CN:** 结束说明 class `CopyBulkG2SMulticastOp` 的文档字符串。
+- **L1154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1155** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L1156** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1157** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L1158** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L1159** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1160** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1161** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1162** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1163** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1165** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L1166** `        res = "cp.async GMEM -> SMEM multicast bulk copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1167** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1169** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1170** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1171** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1172** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1173** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1174** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1175** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1176** `    ) -> "CopyBulkG2SMulticastTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1177** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", 0)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L1178** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy < 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L1179** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1180** `                "expects a 'num_bits_per_copy' kw argument of type int that is positive "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1181** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1182** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1183** `        ty = _cute_nvgpu_ir.CopyAtomBulkCopyG2SType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1184** `            copy_internal_type.mlir_type, num_bits_per_copy, True` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1185** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1186** `        return CopyBulkG2SMulticastTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1189** `class CopyBulkG2SMulticastTrait(Trait):` — **EN:** Defines class `CopyBulkG2SMulticastTrait` with bases Trait. **CN:** 定义类 `CopyBulkG2SMulticastTrait`，其基类为 Trait。
+- **L1190** `    # We allow kw args to be dropped so that the user can write common code for non-multicast` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1191** `    # and multicast loads.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1192** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L1193** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1194** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1195** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1196** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1197** `        mbar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1198** `        mcast_mask: Optional[Integer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1199** `        cache_policy: Optional[Int64] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1200** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1201** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1202** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L1203** `        Custom implementation of unpack for bulk copy load.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1205** `        The non-multicast bulk load requires a \`mbar_ptr\` keyword argument to be provided when` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1206** `        using \`cute.copy\`. Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1207** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L1208** `        if not isinstance(mbar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mbar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(mbar_ptr, Pointer)` 控制的条件分支。
+- **L1209** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1210** `                "expects a pointer to an mbarrier to be provided via the mbar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1211** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1212** `        if not isinstance(mcast_mask, Integer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mcast_mask, Integer)`. **CN:** 开始一个由 `not isinstance(mcast_mask, Integer)` 控制的条件分支。
+- **L1213** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1214** `                "expects a multicast mask to be provided via the mcast_mask kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1215** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1216** `        attr_str = f"#cute_nvgpu.atom_copy_field_bulkg2s<{TMA_MBAR_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1217** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1218** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1219** `            self.value, attr, mbar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1220** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1221** `        attr_str = f"#cute_nvgpu.atom_copy_field_bulkg2s<{TMA_MCAST_MASK_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1222** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1223** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1224** `            val, attr, Int16(mcast_mask).ir_value(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1225** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1226** `        if cache_policy is not None:` — **EN:** Starts a conditional branch guarded by `cache_policy is not None`. **CN:** 开始一个由 `cache_policy is not None` 控制的条件分支。
+- **L1227** `            if not isinstance(cache_policy, Int64):` — **EN:** Starts a conditional branch guarded by `not isinstance(cache_policy, Int64)`. **CN:** 开始一个由 `not isinstance(cache_policy, Int64)` 控制的条件分支。
+- **L1228** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1229** `                    "expects \`Int64\` value to be provided via the cache_policy kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1230** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1231** `            attr_str = (` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1232** `                f"#cute_nvgpu.atom_copy_field_bulkg2s<{TMA_CACHE_POLICY_FIELD_NAME}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1233** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1234** `            attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1235** `            val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1236** `                val, attr, cache_policy.ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1237** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1238** `        return val` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1241** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1242** `# Bulk SMEM -> GMEM copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1243** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1246** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1247** `class CopyBulkS2GOp(CopyOp):` — **EN:** Defines class `CopyBulkS2GOp` with bases CopyOp. **CN:** 定义类 `CopyBulkS2GOp`，其基类为 CopyOp。
+- **L1248** `    """` — **EN:** Starts the docstring for the class `CopyBulkS2GOp`. **CN:** 开始说明 class `CopyBulkS2GOp` 的文档字符串。
+- **L1249** `    Bulk copy asynchrnous SMEM to GMEM Copy Operation.` — **EN:** Continues the docstring for the class `CopyBulkS2GOp`. **CN:** 继续说明 class `CopyBulkS2GOp` 的文档字符串。
+- **L1250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1251** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk>\`__.` — **EN:** Continues the docstring for the class `CopyBulkS2GOp`. **CN:** 继续说明 class `CopyBulkS2GOp` 的文档字符串。
+- **L1252** `    """` — **EN:** Ends the docstring for the class `CopyBulkS2GOp`. **CN:** 结束说明 class `CopyBulkS2GOp` 的文档字符串。
+- **L1253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1254** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L1255** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1256** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L1257** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L1258** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1259** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1260** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1261** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1262** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1264** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L1265** `        res = "cp.async SMEM -> GMEM bulk copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1266** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1268** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1269** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1270** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1271** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1272** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1273** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1274** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1275** `    ) -> "CopyBulkS2GTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1276** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", 0)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L1277** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy < 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L1278** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1279** `                "expects a 'num_bits_per_copy' kw argument of type int that is positive "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1280** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1281** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1282** `        ty = _cute_nvgpu_ir.CopyAtomBulkCopyS2GType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1283** `            copy_internal_type.mlir_type, num_bits_per_copy, False` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1284** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1285** `        return CopyBulkS2GTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1288** `class CopyBulkS2GTrait(Trait):` — **EN:** Defines class `CopyBulkS2GTrait` with bases Trait. **CN:** 定义类 `CopyBulkS2GTrait`，其基类为 Trait。
+- **L1289** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1292** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1293** `# Bulk SMEM -> GMEM mask copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1294** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1295** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1297** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1298** `class CopyBulkS2GByteMaskOp(CopyOp):` — **EN:** Defines class `CopyBulkS2GByteMaskOp` with bases CopyOp. **CN:** 定义类 `CopyBulkS2GByteMaskOp`，其基类为 CopyOp。
+- **L1299** `    """` — **EN:** Starts the docstring for the class `CopyBulkS2GByteMaskOp`. **CN:** 开始说明 class `CopyBulkS2GByteMaskOp` 的文档字符串。
+- **L1300** `    Bulk copy asynchrnous SMEM to GMEM Copy Operation with mask.` — **EN:** Continues the docstring for the class `CopyBulkS2GByteMaskOp`. **CN:** 继续说明 class `CopyBulkS2GByteMaskOp` 的文档字符串。
+- **L1301** `    The i-th bit in the 16-bit wide byteMask operand specifies whether` — **EN:** Continues the docstring for the class `CopyBulkS2GByteMaskOp`. **CN:** 继续说明 class `CopyBulkS2GByteMaskOp` 的文档字符串。
+- **L1302** `    the i-th byte of each 16-byte wide chunk of source data is copied to the destination.` — **EN:** Continues the docstring for the class `CopyBulkS2GByteMaskOp`. **CN:** 继续说明 class `CopyBulkS2GByteMaskOp` 的文档字符串。
+- **L1303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1304** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk>\`__.` — **EN:** Continues the docstring for the class `CopyBulkS2GByteMaskOp`. **CN:** 继续说明 class `CopyBulkS2GByteMaskOp` 的文档字符串。
+- **L1305** `    """` — **EN:** Ends the docstring for the class `CopyBulkS2GByteMaskOp`. **CN:** 结束说明 class `CopyBulkS2GByteMaskOp` 的文档字符串。
+- **L1306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1307** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L1308** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1309** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L1310** `        if not arch >= Arch.sm_100:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_100`. **CN:** 开始一个由 `not arch >= Arch.sm_100` 控制的条件分支。
+- **L1311** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1312** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1313** `                f"expects arch to be at least {Arch.sm_100.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1314** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1315** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1317** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L1318** `        res = "cp.async SMEM -> GMEM bulk copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1319** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1320** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1321** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1322** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1323** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1324** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1325** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1326** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1327** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1328** `    ) -> "CopyBulkS2GByteMaskTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1329** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", 0)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L1330** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy < 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L1331** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1332** `                "expects a 'num_bits_per_copy' kw argument of type int that is positive "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1333** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1334** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1335** `        ty = _cute_nvgpu_ir.CopyAtomBulkCopyS2GType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1336** `            copy_internal_type.mlir_type, num_bits_per_copy, True` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1337** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1338** `        return CopyBulkS2GByteMaskTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1341** `class CopyBulkS2GByteMaskTrait(Trait):` — **EN:** Defines class `CopyBulkS2GByteMaskTrait` with bases Trait. **CN:** 定义类 `CopyBulkS2GByteMaskTrait`，其基类为 Trait。
+- **L1342** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L1343** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1344** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1345** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1346** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1347** `        byte_mask: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1348** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1349** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1350** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L1351** `        Custom implementation of unpack for bulk copy store with mask.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1353** `        The bulk store with mask requires \`byte_mask\` keyword argument to be provided when` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1354** `        using \`copy\`. Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1355** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L1356** `        if not isinstance(byte_mask, Integer):` — **EN:** Starts a conditional branch guarded by `not isinstance(byte_mask, Integer)`. **CN:** 开始一个由 `not isinstance(byte_mask, Integer)` 控制的条件分支。
+- **L1357** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1358** `                "expects a byte mask to be provided via the byte_mask kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1359** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1360** `        # Support for .cp_mask qualifier requires sm_100 or higher.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1361** `        attr_str = f"#cute_nvgpu.atom_copy_field_bulks2g<{TMA_BYTE_MASK_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1362** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1363** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1364** `            self.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1365** `            attr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1366** `            Int16(byte_mask).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1367** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1368** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1369** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1370** `        return val` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1373** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1374** `# Bulk SMEM CTA to Cluster copies` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1375** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1378** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1379** `class CopyBulkS2SOp(CopyOp):` — **EN:** Defines class `CopyBulkS2SOp` with bases CopyOp. **CN:** 定义类 `CopyBulkS2SOp`，其基类为 CopyOp。
+- **L1380** `    """` — **EN:** Starts the docstring for the class `CopyBulkS2SOp`. **CN:** 开始说明 class `CopyBulkS2SOp` 的文档字符串。
+- **L1381** `    Bulk copy asynchrnous SMEM CTA to Cluster Copy Operation.` — **EN:** Continues the docstring for the class `CopyBulkS2SOp`. **CN:** 继续说明 class `CopyBulkS2SOp` 的文档字符串。
+- **L1382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1383** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#data-movement-and-conversion-instructions-cp-async-bulk>\`__.` — **EN:** Continues the docstring for the class `CopyBulkS2SOp`. **CN:** 继续说明 class `CopyBulkS2SOp` 的文档字符串。
+- **L1384** `    """` — **EN:** Ends the docstring for the class `CopyBulkS2SOp`. **CN:** 结束说明 class `CopyBulkS2SOp` 的文档字符串。
+- **L1385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1386** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L1387** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1388** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L1389** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L1390** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1391** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1392** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1393** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1394** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1395** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1396** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L1397** `        res = "cp.async CTA -> Cluster bulk copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1398** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1400** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1401** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1402** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1403** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1404** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1405** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1406** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1407** `    ) -> "CopyBulkS2STrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1408** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", 0)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L1409** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy < 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L1410** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1411** `                "expects a 'num_bits_per_copy' kw argument of type int that is positive "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1412** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1413** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1414** `        ty = _cute_nvgpu_ir.CopyAtomBulkCopyS2SType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1415** `            copy_internal_type.mlir_type, num_bits_per_copy` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1416** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1417** `        return CopyBulkS2STrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1418** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1420** `class CopyBulkS2STrait(Trait):` — **EN:** Defines class `CopyBulkS2STrait` with bases Trait. **CN:** 定义类 `CopyBulkS2STrait`，其基类为 Trait。
+- **L1421** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L1422** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1423** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1424** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1425** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1426** `        mbar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1427** `        cta_rank: Optional[Integer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1428** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1429** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1430** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L1431** `        Custom implementation of unpack for bulk copy cta to cluster.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1433** `        The bulk cta to cluster copy requires a \`mbar_ptr\` and \`cta_rank\` keyword argument to be provided` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1434** `        when using \`cute.copy\`. Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1435** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L1436** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1437** `        if not isinstance(mbar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mbar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(mbar_ptr, Pointer)` 控制的条件分支。
+- **L1438** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1439** `                "expects a pointer to an mbarrier to be provided via the mbar_ptr kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1440** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1441** `        if not isinstance(cta_rank, Integer):` — **EN:** Starts a conditional branch guarded by `not isinstance(cta_rank, Integer)`. **CN:** 开始一个由 `not isinstance(cta_rank, Integer)` 控制的条件分支。
+- **L1442** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1443** `                "expects a cta rank of int32 to be provided via the cta_rank kw argument"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1444** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1445** `        attr_str = f"#cute_nvgpu.atom_copy_field_bulks2s<{TMA_MBAR_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1446** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1447** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1448** `            self.value, attr, mbar_ptr.value, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1449** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1450** `        attr_str = f"#cute_nvgpu.atom_copy_field_bulks2s<{TMA_CTA_RANK_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1451** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1452** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1453** `            val, attr, Int32(cta_rank).ir_value(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1454** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1455** `        return val` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1457** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1458** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1459** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1460** `# Aynchronous distributed shared memory stores` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1461** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1462** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1463** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1464** `MBAR_PTR_FIELD_NAME = "mbar_ptr"` — **EN:** Assigns a value to MBAR_PTR_FIELD_NAME. **CN:** 将一个值赋给 MBAR_PTR_FIELD_NAME。
+- **L1465** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1467** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1468** `class CopyDsmemStoreOp(CopyOp):` — **EN:** Defines class `CopyDsmemStoreOp` with bases CopyOp. **CN:** 定义类 `CopyDsmemStoreOp`，其基类为 CopyOp。
+- **L1469** `    """` — **EN:** Starts the docstring for the class `CopyDsmemStoreOp`. **CN:** 开始说明 class `CopyDsmemStoreOp` 的文档字符串。
+- **L1470** `    Asynchronous Store operation to DSMEM with explicit synchronization.` — **EN:** Continues the docstring for the class `CopyDsmemStoreOp`. **CN:** 继续说明 class `CopyDsmemStoreOp` 的文档字符串。
+- **L1471** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1472** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/index.html#data-movement-and-conversion-instructions-st-async>\`__.` — **EN:** Continues the docstring for the class `CopyDsmemStoreOp`. **CN:** 继续说明 class `CopyDsmemStoreOp` 的文档字符串。
+- **L1473** `    """` — **EN:** Ends the docstring for the class `CopyDsmemStoreOp`. **CN:** 结束说明 class `CopyDsmemStoreOp` 的文档字符串。
+- **L1474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1475** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L1476** `        # Arch verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1477** `        arch: Arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a typed value to arch. **CN:** 为 arch 赋予带类型标注的值。
+- **L1478** `        if not arch >= Arch.sm_90:` — **EN:** Starts a conditional branch guarded by `not arch >= Arch.sm_90`. **CN:** 开始一个由 `not arch >= Arch.sm_90` 控制的条件分支。
+- **L1479** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1480** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1481** `                f"expects arch to be at least {Arch.sm_90.name}, but got {arch.name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1482** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1483** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1485** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L1486** `        res = "st.async RMEM -> DSMEM copy Operation"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1487** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1489** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1490** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1491** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1492** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1493** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1494** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1495** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1496** `    ) -> "CopyDsmemStoreTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1497** `        num_bits_per_copy = kwargs.get("num_bits_per_copy", 0)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L1498** `        if not isinstance(num_bits_per_copy, int) or (num_bits_per_copy < 0):` — **EN:** Starts a conditional branch guarded by `not isinstance(num_bits_per_copy, int) or num_bits_per_co...`. **CN:** 开始一个由 `not isinstance(num_bits_per_copy, int) or num_bits_per_co...` 控制的条件分支。
+- **L1499** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1500** `                "expects a 'num_bits_per_copy' kw argument of type int that is non-negative "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1501** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1502** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1503** `        if num_bits_per_copy not in [0, 32, 64, 128]:` — **EN:** Starts a conditional branch guarded by `num_bits_per_copy not in [0, 32, 64, 128]`. **CN:** 开始一个由 `num_bits_per_copy not in [0, 32, 64, 128]` 控制的条件分支。
+- **L1504** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1505** `                "expects a 'num_bits_per_copy' kw argument that is one of {0, 32, 64, 128} "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1506** `                f"when creating a copy Atom for {self.__class__.__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1507** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1508** `        ty = _cute_nvgpu_ir.CopyAtomDsmemStoreType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1509** `            copy_internal_type.mlir_type, num_bits_per_copy` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1510** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1511** `        return CopyDsmemStoreTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1513** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1514** `class CopyDsmemStoreTrait(Trait):` — **EN:** Defines class `CopyDsmemStoreTrait` with bases Trait. **CN:** 定义类 `CopyDsmemStoreTrait`，其基类为 Trait。
+- **L1515** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L1516** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1517** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1518** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1519** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1520** `        mbar_ptr: Optional[Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1521** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1522** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1523** `        """` — **EN:** Starts the docstring for the function `unpack`. **CN:** 开始说明 function `unpack` 的文档字符串。
+- **L1524** `        Custom implementation of unpack for dsmem async copy.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1526** `        The dsmem async copy requires \`mbar_ptr\` keyword argument to be provided when using \`cute.copy\`.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1527** `        Any other kw arguments will be ignored instead of triggering an error.` — **EN:** Continues the docstring for the function `unpack`. **CN:** 继续说明 function `unpack` 的文档字符串。
+- **L1528** `        """` — **EN:** Ends the docstring for the function `unpack`. **CN:** 结束说明 function `unpack` 的文档字符串。
+- **L1529** `        if not isinstance(mbar_ptr, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(mbar_ptr, Pointer)`. **CN:** 开始一个由 `not isinstance(mbar_ptr, Pointer)` 控制的条件分支。
+- **L1530** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1531** `                "expects a pointer to an mbarrier to be provided via the mbar_ptr kw argument",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1532** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1533** `        attr_str = f"#cute_nvgpu.atom_copy_field_dsmem_store<{MBAR_PTR_FIELD_NAME}>"` — **EN:** Assigns a value to attr_str. **CN:** 将一个值赋给 attr_str。
+- **L1534** `        attr = ir.Attribute.parse(attr_str)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L1535** `        val = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1536** `            self.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1537** `            attr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1538** `            mbar_ptr.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1539** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1540** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1541** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1542** `        return val` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1543** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.nvgpu.cpasync.copy`. CN: 模块名为 `CuTeDSL.cutlass.cute.nvgpu.cpasync.copy`。
+- EN: Top-level classes: LoadCacheMode, CopyG2SOp, CopyG2STrait, TmaCopyOp, CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SNonExecTrait, CopyBulkTensorTileG2STrait, CopyBulkTensorIm2ColG2SOp, CopyBulkTensorIm2ColG2SNonExecTrait, CopyBulkTensorIm2ColG2STrait, CopyBulkTensorIm2ColG2SMulticastOp, CopyBulkTensorIm2ColG2SMulticastNonExecTrait, ... (+25 more) CN: 顶层类包括：LoadCacheMode, CopyG2SOp, CopyG2STrait, TmaCopyOp, CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SNonExecTrait, CopyBulkTensorTileG2STrait, CopyBulkTensorIm2ColG2SOp, CopyBulkTensorIm2ColG2SNonExecTrait, CopyBulkTensorIm2ColG2STrait, CopyBulkTensorIm2ColG2SMulticastOp, CopyBulkTensorIm2ColG2SMulticastNonExecTrait, ... (+25 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL, cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir.dialects.nvvm:ReductionOp, cutlass._mlir:ir, ...atom:CopyOp,Trait,make_atom, ...typing:Int16,Int32,Int64,Pointer,Integer,Numeric, ..common:OpError,LoadCacheMode, ..tcgen05.mma:CtaGroup CN: 内部依赖：cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL, cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir.dialects.nvvm:ReductionOp, cutlass._mlir:ir, ...atom:CopyOp,Trait,make_atom, ...typing:Int16,Int32,Int64,Pointer,Integer,Numeric, ..common:OpError,LoadCacheMode, ..tcgen05.mma:CtaGroup
+- EN: External or standard-library dependencies: enum, dataclasses:dataclass, typing:Any,Optional,Type, typing_extensions:deprecated CN: 外部或标准库依赖：enum, dataclasses:dataclass, typing:Any,Optional,Type, typing_extensions:deprecated

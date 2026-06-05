@@ -1,0 +1,459 @@
+# blas3.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/blas3.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Basic include for CUTLASS BLAS3/HPC code." and defines related CUTLASS facilities in `include/cutlass/blas3.h`.
+- CN: 该头文件以注释摘要“Basic include for CUTLASS BLAS3/HPC code.”引入，并在 `include/cutlass/blas3.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L33**: <code>  \brief Basic include for CUTLASS BLAS3/HPC code.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L34**: <code>    </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L35**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L37**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L38**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cutlass/array.h&quot;</code>
+  - EN: Includes "cutlass/array.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/array.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/blas3_types.h&quot;</code>
+  - EN: Includes "cutlass/blas3_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/blas3_types.h"，以便本文件使用该依赖中的声明。
+- **L43**: <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes "cutlass/coord.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/coord.h"，以便本文件使用该依赖中的声明。
+- **L44**: <code>#include &quot;cutlass/complex.h&quot;</code>
+  - EN: Includes "cutlass/complex.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/complex.h"，以便本文件使用该依赖中的声明。
+- **L45**: <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes "cutlass/functional.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/functional.h"，以便本文件使用该依赖中的声明。
+- **L46**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>/// Defines FillMode inversions</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L55**: <code>template &lt;FillMode kFillMode&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L56**: <code>struct InvertFillMode;</code>
+  - EN: Declares or defines the struct `InvertFillMode`.
+  - CN: 声明或定义 struct `InvertFillMode`。
+- **L57**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L58**: <code>/// Invert FillMode lower to upper</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L59**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L60**: <code>struct InvertFillMode&lt;FillMode::kLower&gt; {</code>
+  - EN: Declares or defines the struct `InvertFillMode`.
+  - CN: 声明或定义 struct `InvertFillMode`。
+- **L61**: <code>  static FillMode const mode = FillMode::kUpper;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L62**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>/// Invert FillMode upper to lower</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L65**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L66**: <code>struct InvertFillMode&lt;FillMode::kUpper&gt; {</code>
+  - EN: Declares or defines the struct `InvertFillMode`.
+  - CN: 声明或定义 struct `InvertFillMode`。
+- **L67**: <code>  static FillMode const mode = FillMode::kLower;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L68**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L69**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L70**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L71**: <code>/// Defines SideMode inversions</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L72**: <code>template &lt;SideMode kSideMode&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L73**: <code>struct InvertSideMode;</code>
+  - EN: Declares or defines the struct `InvertSideMode`.
+  - CN: 声明或定义 struct `InvertSideMode`。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>/// Invert SideMode left to right</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L76**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L77**: <code>struct InvertSideMode&lt;SideMode::kLeft&gt; {</code>
+  - EN: Declares or defines the struct `InvertSideMode`.
+  - CN: 声明或定义 struct `InvertSideMode`。
+- **L78**: <code>  static SideMode const mode = SideMode::kRight;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L79**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>/// Invert SideMode right to left</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L82**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L83**: <code>struct InvertSideMode&lt;SideMode::kRight&gt; {</code>
+  - EN: Declares or defines the struct `InvertSideMode`.
+  - CN: 声明或定义 struct `InvertSideMode`。
+- **L84**: <code>  static SideMode const mode = SideMode::kLeft;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L85**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L86**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L87**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L88**: <code>/// Defines correct compare operation for Triangular matrix boundary</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L89**: <code>template &lt;FillMode kFillMode, DiagType kDiagType = DiagType::kNonUnit&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L90**: <code>struct TrMatrixCompareOp {</code>
+  - EN: Declares or defines the struct `TrMatrixCompareOp`.
+  - CN: 声明或定义 struct `TrMatrixCompareOp`。
+- **L91**: <code>  using Index = int32_t;</code>
+  - EN: Defines the alias `Index` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Index`。
+- **L92**: <code>  using Type = typename platform::conditional&lt;</code>
+  - EN: Defines the alias `Type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Type`。
+- **L93**: <code>                        (kFillMode == FillMode::kLower), </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L94**: <code>                        greater_equal&lt;Index&gt;, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L95**: <code>                        less_equal&lt;Index&gt;&gt;::type;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L96**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L97**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L98**: <code>template &lt;FillMode kFillMode&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L99**: <code>struct TrMatrixCompareOp &lt;kFillMode, DiagType::kUnit&gt; {</code>
+  - EN: Declares or defines the struct `TrMatrixCompareOp`.
+  - CN: 声明或定义 struct `TrMatrixCompareOp`。
+- **L100**: <code>   using Index = int32_t;</code>
+  - EN: Defines the alias `Index` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Index`。
+- **L101**: <code>   using Type = typename platform::conditional&lt;</code>
+  - EN: Defines the alias `Type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Type`。
+- **L102**: <code>                        (kFillMode == FillMode::kLower), </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L103**: <code>                        greater_equal&lt;Index&gt;, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L104**: <code>                        less_equal&lt;Index&gt;&gt;::type;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L105**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L106**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L107**: <code>template &lt;FillMode kFillMode&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L108**: <code>struct TrMatrixCompareOp &lt;kFillMode, DiagType::kZero&gt; {</code>
+  - EN: Declares or defines the struct `TrMatrixCompareOp`.
+  - CN: 声明或定义 struct `TrMatrixCompareOp`。
+- **L109**: <code>   using Index = int32_t;</code>
+  - EN: Defines the alias `Index` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Index`。
+- **L110**: <code>   using Type = typename platform::conditional&lt;</code>
+  - EN: Defines the alias `Type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Type`。
+- **L111**: <code>                        (kFillMode == FillMode::kLower), </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L112**: <code>                        greater&lt;Index&gt;, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L113**: <code>                        less&lt;Index&gt;&gt;::type;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L114**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L115**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L116**: <code>// Returns precision in terms of bits (based on datatype) to fill tensors with.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L117**: <code>// Defaults to 5 bits of mantissa for TF32 and FP32 (with implicit round-offs).</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L118**: <code>// Also defines acceptable mantissa result variance/error.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L119**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L120**: <code>struct MantissaInBits {</code>
+  - EN: Declares or defines the struct `MantissaInBits`.
+  - CN: 声明或定义 struct `MantissaInBits`。
+- **L121**: <code>  static int constexpr bits = 5;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L122**: <code>  static double constexpr error = 1.0e-7;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L123**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L124**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L125**: <code>// Full precision is supported for FP64</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L126**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L127**: <code>struct MantissaInBits&lt;double&gt; {</code>
+  - EN: Declares or defines the struct `MantissaInBits`.
+  - CN: 声明或定义 struct `MantissaInBits`。
+- **L128**: <code>  static int constexpr bits = 30;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L129**: <code>  static double constexpr error = 1.0e-15;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L130**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L131**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L132**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L133**: <code>struct MantissaInBits&lt;cutlass::complex&lt;double&gt;&gt; {</code>
+  - EN: Declares or defines the struct `MantissaInBits`.
+  - CN: 声明或定义 struct `MantissaInBits`。
+- **L134**: <code>  static int constexpr bits = 30;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L135**: <code>  static double constexpr error = 1.0e-14;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L136**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L137**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L138**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L139**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L140**: <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L141**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L142**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L143**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Symbol focus: `InvertFillMode` / 重点符号：`InvertFillMode`
+- Symbol focus: `InvertSideMode` / 重点符号：`InvertSideMode`
+- Symbol focus: `TrMatrixCompareOp` / 重点符号：`TrMatrixCompareOp`
+- Symbol focus: `Index` / 重点符号：`Index`
+- Symbol focus: `Type` / 重点符号：`Type`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/array.h"`
+  - `"cutlass/blas3_types.h"`
+  - `"cutlass/coord.h"`
+  - `"cutlass/complex.h"`
+  - `"cutlass/functional.h"`
+  - `"cutlass/numeric_types.h"`

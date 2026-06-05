@@ -1,0 +1,1612 @@
+# mixed_dtype_utils.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/mixed_dtype_utils.hpp`
+**Purpose / 用途**: Declares helpers for mixed-datatype testing and conversions. / 声明用于混合数据类型测试与转换的辅助工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>    \brief Utilities for mixed input data type kernels.</code>
+  - EN: Comment that documents intent or context: "\brief Utilities for mixed input data type kernels.".
+  - CN: 用于说明意图或上下文的注释："\brief Utilities for mixed input data type kernels."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &lt;cuda.h&gt;</code>
+  - EN: Includes `cuda.h` so this file can use project-specific declarations from `cuda.h`.
+  - CN: 引入 `cuda.h`，使当前文件可以使用来自 `cuda.h` 的项目专用声明。
+- **L38** <code>#include &lt;cstdint&gt;</code>
+  - EN: Includes `cstdint` so this file can use fixed-width integer types.
+  - CN: 引入 `cstdint`，使当前文件可以使用定宽整数类型。
+- **L39** <code>#include &quot;cute/layout.hpp&quot;</code>
+  - EN: Includes `cute/layout.hpp` so this file can use project-specific declarations from `layout.hpp`.
+  - CN: 引入 `cute/layout.hpp`，使当前文件可以使用来自 `layout.hpp` 的项目专用声明。
+- **L40** <code>#include &quot;cute/tensor.hpp&quot;</code>
+  - EN: Includes `cute/tensor.hpp` so this file can use project-specific declarations from `tensor.hpp`.
+  - CN: 引入 `cute/tensor.hpp`，使当前文件可以使用来自 `tensor.hpp` 的项目专用声明。
+- **L41** <code>#include &quot;cute/arch/mma_sm90.hpp&quot;</code>
+  - EN: Includes `cute/arch/mma_sm90.hpp` so this file can use project-specific declarations from `mma_sm90.hpp`.
+  - CN: 引入 `cute/arch/mma_sm90.hpp`，使当前文件可以使用来自 `mma_sm90.hpp` 的项目专用声明。
+- **L42** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/util/device_memory.h&quot;</code>
+  - EN: Includes `cutlass/util/device_memory.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/device_memory.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L44** <code>#include &quot;cutlass/util/reference/device/tensor_fill.h&quot;</code>
+  - EN: Includes `cutlass/util/reference/device/tensor_fill.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/reference/device/tensor_fill.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L45** <code>#include &quot;cute/util/type_traits.hpp&quot;</code>
+  - EN: Includes `cute/util/type_traits.hpp` so this file can use compile-time type traits.
+  - CN: 引入 `cute/util/type_traits.hpp`，使当前文件可以使用编译期类型特征。
+- **L46** <code>#include &quot;cute/numeric/numeric_types.hpp&quot;</code>
+  - EN: Includes `cute/numeric/numeric_types.hpp` so this file can use project-specific declarations from `numeric_types.hpp`.
+  - CN: 引入 `cute/numeric/numeric_types.hpp`，使当前文件可以使用来自 `numeric_types.hpp` 的项目专用声明。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>#define CUDA_CHECK(status)                                              \</code>
+  - EN: Defines the preprocessor macro `CUDA_CHECK(status)`.
+  - CN: 定义预处理宏 `CUDA_CHECK(status)`。
+- **L51** <code>  {                                                                     \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L52** <code>    cudaError_t error = status;                                         \</code>
+  - EN: Assigns or initializes `error` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `error` 进行赋值或初始化。
+- **L53** <code>    if (error != cudaSuccess) {                                         \</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L54** <code>      std::cerr &lt;&lt; &quot;Got bad cuda status: &quot; &lt;&lt; cudaGetErrorString(error) \</code>
+  - EN: Begins or continues the signature/call syntax involving `cudaGetErrorString`.
+  - CN: 开始或继续与 `cudaGetErrorString` 相关的签名/调用语法。
+- **L55** <code>                &lt;&lt; &quot; at line: &quot; &lt;&lt; __LINE__ &lt;&lt; std::endl;               \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L56** <code>      exit(EXIT_FAILURE);                                               \</code>
+  - EN: Begins or continues the signature/call syntax involving `exit`.
+  - CN: 开始或继续与 `exit` 相关的签名/调用语法。
+- **L57** <code>    }                                                                   \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L58** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L61** <code>  class QuantizedElement,</code>
+  - EN: Begins the declaration of class `QuantizedElement`.
+  - CN: 开始声明 class `QuantizedElement`。
+- **L62** <code>  class DequantizedElement,</code>
+  - EN: Begins the declaration of class `DequantizedElement`.
+  - CN: 开始声明 class `DequantizedElement`。
+- **L63** <code>  class OperandLayout,</code>
+  - EN: Begins the declaration of class `OperandLayout`.
+  - CN: 开始声明 class `OperandLayout`。
+- **L64** <code>  class ElementScale,</code>
+  - EN: Begins the declaration of class `ElementScale`.
+  - CN: 开始声明 class `ElementScale`。
+- **L65** <code>  class ElementZero,</code>
+  - EN: Begins the declaration of class `ElementZero`.
+  - CN: 开始声明 class `ElementZero`。
+- **L66** <code>  class ScaleBroadCastLayout,</code>
+  - EN: Begins the declaration of class `ScaleBroadCastLayout`.
+  - CN: 开始声明 class `ScaleBroadCastLayout`。
+- **L67** <code>  class ThrLayout&gt;</code>
+  - EN: Begins the declaration of class `ThrLayout`.
+  - CN: 开始声明 class `ThrLayout`。
+- **L68** <code>__global__ void dequantize_kernel(DequantizedElement* dq_buffer,</code>
+  - EN: Begins or continues the signature/call syntax involving `dequantize_kernel`.
+  - CN: 开始或继续与 `dequantize_kernel` 相关的签名/调用语法。
+- **L69** <code>                                  QuantizedElement const* q_buffer,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L70** <code>                                  OperandLayout const operand_layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L71** <code>                                  ElementScale const* scale_buffer,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L72** <code>                                  ElementZero const* zero_buffer,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L73** <code>                                  ScaleBroadCastLayout const broadcasted_scale_layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L74** <code>                                  ThrLayout thr_layout) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L75** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>  // Represent the full tensors to gmem elements.</code>
+  - EN: Comment that documents intent or context: "Represent the full tensors to gmem elements.".
+  - CN: 用于说明意图或上下文的注释："Represent the full tensors to gmem elements."。
+- **L78** <code>  // These are expected to have shape [MN, K, L]</code>
+  - EN: Comment that documents intent or context: "These are expected to have shape [MN, K, L]".
+  - CN: 用于说明意图或上下文的注释："These are expected to have shape [MN, K, L]"。
+- **L79** <code>  cute::Tensor gmem_op_dq = cute::make_tensor(cute::make_gmem_ptr(dq_buffer), operand_layout);</code>
+  - EN: Declares function or method `make_gmem_ptr` without defining it here.
+  - CN: 声明函数或方法 `make_gmem_ptr`，但不在此处给出定义。
+- **L80** <code>  cute::Tensor gmem_op_q  = cute::make_tensor(cute::make_gmem_ptr&lt;QuantizedElement const&gt;(q_buffer), operand_layout);</code>
+  - EN: Declares function or method `const>` without defining it here.
+  - CN: 声明函数或方法 `const>`，但不在此处给出定义。
+- **L81** <code>  // While the scales are expected to have shape [MN, G, L] but with a stride to allow broadcasting</code>
+  - EN: Comment that documents intent or context: "While the scales are expected to have shape [MN, G, L] but with a stride to allow broadcasting".
+  - CN: 用于说明意图或上下文的注释："While the scales are expected to have shape [MN, G, L] but with a stride to allow broadcasting"。
+- **L82** <code>  // It is expected that K % G == 0</code>
+  - EN: Comment that documents intent or context: "It is expected that K % G == 0".
+  - CN: 用于说明意图或上下文的注释："It is expected that K % G == 0"。
+- **L83** <code>  cute::Tensor gmem_scale_broadcasted = cute::make_tensor(make_gmem_ptr(scale_buffer), broadcasted_scale_layout);</code>
+  - EN: Declares function or method `make_gmem_ptr` without defining it here.
+  - CN: 声明函数或方法 `make_gmem_ptr`，但不在此处给出定义。
+- **L84** <code>  cute::Tensor gmem_zero_broadcasted = cute::make_tensor(make_gmem_ptr(zero_buffer), broadcasted_scale_layout);</code>
+  - EN: Declares function or method `make_gmem_ptr` without defining it here.
+  - CN: 声明函数或方法 `make_gmem_ptr`，但不在此处给出定义。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>  // Assign 1 thread per element in the thread block</code>
+  - EN: Comment that documents intent or context: "Assign 1 thread per element in the thread block".
+  - CN: 用于说明意图或上下文的注释："Assign 1 thread per element in the thread block"。
+- **L87** <code>  auto blk_shape = cute::make_shape(size&lt;0&gt;(thr_layout), _1{}, _1{}); //</code>
+  - EN: Begins or continues the signature/call syntax involving `size<0>`.
+  - CN: 开始或继续与 `size<0>` 相关的签名/调用语法。
+- **L88** <code>  auto blk_coord = cute::make_coord(_, blockIdx.x, blockIdx.y);  // (MN, K, L)</code>
+  - EN: Begins or continues the signature/call syntax involving `make_coord`.
+  - CN: 开始或继续与 `make_coord` 相关的签名/调用语法。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>  // Tile across the block</code>
+  - EN: Comment that documents intent or context: "Tile across the block".
+  - CN: 用于说明意图或上下文的注释："Tile across the block"。
+- **L91** <code>  auto gOp_dq = cute::local_tile(gmem_op_dq, blk_shape, blk_coord);</code>
+  - EN: Declares function or method `local_tile` without defining it here.
+  - CN: 声明函数或方法 `local_tile`，但不在此处给出定义。
+- **L92** <code>  auto gScale = cute::local_tile(gmem_scale_broadcasted, blk_shape, blk_coord);</code>
+  - EN: Declares function or method `local_tile` without defining it here.
+  - CN: 声明函数或方法 `local_tile`，但不在此处给出定义。
+- **L93** <code>  auto gZero  = cute::local_tile(gmem_zero_broadcasted,  blk_shape, blk_coord);</code>
+  - EN: Declares function or method `local_tile` without defining it here.
+  - CN: 声明函数或方法 `local_tile`，但不在此处给出定义。
+- **L94** <code>  auto gOp_q  = cute::local_tile(gmem_op_q, blk_shape, blk_coord);</code>
+  - EN: Declares function or method `local_tile` without defining it here.
+  - CN: 声明函数或方法 `local_tile`，但不在此处给出定义。
+- **L95** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L96** <code>  auto tOpDq_gOpDq = cute::local_partition(gOp_dq, thr_layout, threadIdx.x);</code>
+  - EN: Declares function or method `local_partition` without defining it here.
+  - CN: 声明函数或方法 `local_partition`，但不在此处给出定义。
+- **L97** <code>  auto tScale_gScale = cute::local_partition(gScale, thr_layout, threadIdx.x);</code>
+  - EN: Declares function or method `local_partition` without defining it here.
+  - CN: 声明函数或方法 `local_partition`，但不在此处给出定义。
+- **L98** <code>  auto tZero_gZero = cute::local_partition(gZero, thr_layout, threadIdx.x);</code>
+  - EN: Declares function or method `local_partition` without defining it here.
+  - CN: 声明函数或方法 `local_partition`，但不在此处给出定义。
+- **L99** <code>  auto tOpQ_gOpQ = cute::local_partition(gOp_q, thr_layout, threadIdx.x);</code>
+  - EN: Declares function or method `local_partition` without defining it here.
+  - CN: 声明函数或方法 `local_partition`，但不在此处给出定义。
+- **L100** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L101** <code>  // Make a fragment of registers to hold gmem loads</code>
+  - EN: Comment that documents intent or context: "Make a fragment of registers to hold gmem loads".
+  - CN: 用于说明意图或上下文的注释："Make a fragment of registers to hold gmem loads"。
+- **L102** <code>  cute::Tensor rmem_op_q = cute::make_fragment_like(tOpQ_gOpQ(_, _, _, 0));</code>
+  - EN: Declares function or method `tOpQ_gOpQ` without defining it here.
+  - CN: 声明函数或方法 `tOpQ_gOpQ`，但不在此处给出定义。
+- **L103** <code>  cute::Tensor rmem_scale = cute::make_fragment_like(tScale_gScale(_, _, _, 0));</code>
+  - EN: Declares function or method `tScale_gScale` without defining it here.
+  - CN: 声明函数或方法 `tScale_gScale`，但不在此处给出定义。
+- **L104** <code>  cute::Tensor rmem_zero = cute::make_fragment_like(tZero_gZero(_, _, _, 0));</code>
+  - EN: Declares function or method `tZero_gZero` without defining it here.
+  - CN: 声明函数或方法 `tZero_gZero`，但不在此处给出定义。
+- **L105** <code>  cute::Tensor rmem_op_dq = cute::make_fragment_like(tOpDq_gOpDq(_, _, _, 0));</code>
+  - EN: Declares function or method `tOpDq_gOpDq` without defining it here.
+  - CN: 声明函数或方法 `tOpDq_gOpDq`，但不在此处给出定义。
+- **L106** <code>  cute::Tensor rmem_op_scaled = cute::make_fragment_like&lt;ElementScale&gt;(rmem_op_dq);</code>
+  - EN: Declares function or method `make_fragment_like<ElementScale>` without defining it here.
+  - CN: 声明函数或方法 `make_fragment_like<ElementScale>`，但不在此处给出定义。
+- **L107** <code>  cute::Tensor rmem_zero_buf = cute::make_fragment_like&lt;ElementScale&gt;(rmem_zero);</code>
+  - EN: Declares function or method `make_fragment_like<ElementScale>` without defining it here.
+  - CN: 声明函数或方法 `make_fragment_like<ElementScale>`，但不在此处给出定义。
+- **L108** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L109** <code>  cute::Tensor pred_id = cute::make_identity_tensor(shape(operand_layout));</code>
+  - EN: Declares function or method `shape` without defining it here.
+  - CN: 声明函数或方法 `shape`，但不在此处给出定义。
+- **L110** <code>  auto pred_blk_tile = cute::local_tile(pred_id, blk_shape, blk_coord);</code>
+  - EN: Declares function or method `local_tile` without defining it here.
+  - CN: 声明函数或方法 `local_tile`，但不在此处给出定义。
+- **L111** <code>  auto pred_thr_partition = cute::local_partition(pred_blk_tile, thr_layout, threadIdx.x);</code>
+  - EN: Declares function or method `local_partition` without defining it here.
+  - CN: 声明函数或方法 `local_partition`，但不在此处给出定义。
+- **L112** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L113** <code>  const auto num_iters = cute::size&lt;3&gt;(tOpDq_gOpDq);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>  for (int ii = 0; ii &lt; num_iters; ++ii) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L116** <code>    const auto thread_offset = cute::get&lt;0&gt;(pred_thr_partition(0, 0, 0, ii));</code>
+  - EN: Declares function or method `pred_thr_partition` without defining it here.
+  - CN: 声明函数或方法 `pred_thr_partition`，但不在此处给出定义。
+- **L117** <code>    if (thread_offset &lt; cute::size&lt;0&gt;(operand_layout)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L118** <code>      cute::copy(tOpQ_gOpQ(_, _, _, ii), rmem_op_q);</code>
+  - EN: Declares function or method `tOpQ_gOpQ` without defining it here.
+  - CN: 声明函数或方法 `tOpQ_gOpQ`，但不在此处给出定义。
+- **L119** <code>      cute::copy(tScale_gScale(_, _, _, ii), rmem_scale);</code>
+  - EN: Declares function or method `tScale_gScale` without defining it here.
+  - CN: 声明函数或方法 `tScale_gScale`，但不在此处给出定义。
+- **L120** <code>      cute::copy(tZero_gZero(_, _, _, ii), rmem_zero);</code>
+  - EN: Declares function or method `tZero_gZero` without defining it here.
+  - CN: 声明函数或方法 `tZero_gZero`，但不在此处给出定义。
+- **L121** <code>      cute::transform(rmem_op_q, rmem_op_scaled, [] (const QuantizedElement&amp; elt) { return ElementScale(elt); } );</code>
+  - EN: Declares function or method `ElementScale` without defining it here.
+  - CN: 声明函数或方法 `ElementScale`，但不在此处给出定义。
+- **L122** <code>      cute::transform(rmem_zero, rmem_zero_buf, [] (const ElementZero&amp; elt) { return ElementScale(elt); } );</code>
+  - EN: Declares function or method `ElementScale` without defining it here.
+  - CN: 声明函数或方法 `ElementScale`，但不在此处给出定义。
+- **L123** <code>      cute::transform(rmem_op_scaled, rmem_scale, rmem_op_scaled, cute::multiplies{});</code>
+  - EN: Declares function or method `transform` without defining it here.
+  - CN: 声明函数或方法 `transform`，但不在此处给出定义。
+- **L124** <code>      cute::transform(rmem_op_scaled, rmem_zero_buf, rmem_op_scaled, cute::plus{});</code>
+  - EN: Declares function or method `transform` without defining it here.
+  - CN: 声明函数或方法 `transform`，但不在此处给出定义。
+- **L125** <code>      cute::transform(rmem_op_scaled, rmem_op_dq, [] (const ElementScale&amp; elt) { return DequantizedElement(elt); } );</code>
+  - EN: Declares function or method `DequantizedElement` without defining it here.
+  - CN: 声明函数或方法 `DequantizedElement`，但不在此处给出定义。
+- **L126** <code>      cute::copy(rmem_op_dq, tOpDq_gOpDq(_, _, _, ii));</code>
+  - EN: Declares function or method `tOpDq_gOpDq` without defining it here.
+  - CN: 声明函数或方法 `tOpDq_gOpDq`，但不在此处给出定义。
+- **L127** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L128** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L129** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L130** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L131** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L132** <code>  class QuantizedElement,</code>
+  - EN: Begins the declaration of class `QuantizedElement`.
+  - CN: 开始声明 class `QuantizedElement`。
+- **L133** <code>  class DequantizedElement,</code>
+  - EN: Begins the declaration of class `DequantizedElement`.
+  - CN: 开始声明 class `DequantizedElement`。
+- **L134** <code>  class OperandLayout,</code>
+  - EN: Begins the declaration of class `OperandLayout`.
+  - CN: 开始声明 class `OperandLayout`。
+- **L135** <code>  class ElementScale,</code>
+  - EN: Begins the declaration of class `ElementScale`.
+  - CN: 开始声明 class `ElementScale`。
+- **L136** <code>  class ElementZero,</code>
+  - EN: Begins the declaration of class `ElementZero`.
+  - CN: 开始声明 class `ElementZero`。
+- **L137** <code>  class ScaleLayout&gt;</code>
+  - EN: Begins the declaration of class `ScaleLayout`.
+  - CN: 开始声明 class `ScaleLayout`。
+- **L138** <code>static void dequantize(DequantizedElement* dq_buffer,</code>
+  - EN: Begins or continues the signature/call syntax involving `dequantize`.
+  - CN: 开始或继续与 `dequantize` 相关的签名/调用语法。
+- **L139** <code>                       QuantizedElement const* q_buffer,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L140** <code>                       OperandLayout const operand_layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L141** <code>                       ElementScale const* scale_buffer,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L142** <code>                       ElementZero const* zero_buffer,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L143** <code>                       ScaleLayout const scale_layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L144** <code>                       int const group_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L145** <code>                       cudaStream_t &amp;stream) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L146** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L147** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L148** <code>  constexpr int tpb = 128;</code>
+  - EN: Assigns or initializes `tpb` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tpb` 进行赋值或初始化。
+- **L149** <code>  auto thr_layout = make_layout(make_shape(Int&lt;tpb&gt;{}));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>  const auto num_rows = get&lt;0&gt;(shape(operand_layout));</code>
+  - EN: Declares function or method `shape` without defining it here.
+  - CN: 声明函数或方法 `shape`，但不在此处给出定义。
+- **L152** <code>  const auto gemm_k = get&lt;1&gt;(shape(operand_layout));   // [MN, K, L]</code>
+  - EN: Begins or continues the signature/call syntax involving `shape`.
+  - CN: 开始或继续与 `shape` 相关的签名/调用语法。
+- **L153** <code>  const auto batches = get&lt;2&gt;(shape(operand_layout));  // [MN, K, L]</code>
+  - EN: Begins or continues the signature/call syntax involving `shape`.
+  - CN: 开始或继续与 `shape` 相关的签名/调用语法。
+- **L154** <code>  const auto scale_k = get&lt;1&gt;(shape(scale_layout));    // [MN, Scale_K, L]</code>
+  - EN: Begins or continues the signature/call syntax involving `shape`.
+  - CN: 开始或继续与 `shape` 相关的签名/调用语法。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>  if (num_rows != size&lt;0&gt;(scale_layout)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L157** <code>    std::cerr &lt;&lt; &quot;Invalid first dimension for scales. Must match first dim for weights.&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L158** <code>              &lt;&lt; &quot; But got shapes &quot; &lt;&lt; shape(operand_layout) &lt;&lt; &quot; &quot; &lt;&lt; shape(scale_layout)</code>
+  - EN: Begins or continues the signature/call syntax involving `shape`.
+  - CN: 开始或继续与 `shape` 相关的签名/调用语法。
+- **L159** <code>              &lt;&lt; std::endl;</code>
+  - EN: Declares the symbol `endl` in the current scope.
+  - CN: 在当前作用域中声明符号 `endl`。
+- **L160** <code>    exit(-1);</code>
+  - EN: Declares function or method `exit` without defining it here.
+  - CN: 声明函数或方法 `exit`，但不在此处给出定义。
+- **L161** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>  const auto scale_stride0 = get&lt;0&gt;(stride(scale_layout));</code>
+  - EN: Declares function or method `stride` without defining it here.
+  - CN: 声明函数或方法 `stride`，但不在此处给出定义。
+- **L164** <code>  const auto scale_stride1 = get&lt;1&gt;(stride(scale_layout));</code>
+  - EN: Declares function or method `stride` without defining it here.
+  - CN: 声明函数或方法 `stride`，但不在此处给出定义。
+- **L165** <code>  const auto scale_stride2 = get&lt;2&gt;(stride(scale_layout));</code>
+  - EN: Declares function or method `stride` without defining it here.
+  - CN: 声明函数或方法 `stride`，但不在此处给出定义。
+- **L166** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L167** <code>  auto scale_shape_bcast = make_shape(num_rows, make_shape(group_size, scale_k), batches);</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L168** <code>  auto scale_stride_bcast = make_stride(scale_stride0, make_stride(0, scale_stride1), scale_stride2);</code>
+  - EN: Declares function or method `make_stride` without defining it here.
+  - CN: 声明函数或方法 `make_stride`，但不在此处给出定义。
+- **L169** <code>  auto scale_layout_bcast = make_layout(scale_shape_bcast, scale_stride_bcast);</code>
+  - EN: Declares function or method `make_layout` without defining it here.
+  - CN: 声明函数或方法 `make_layout`，但不在此处给出定义。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>  const auto blocks_x = gemm_k;</code>
+  - EN: Assigns or initializes `blocks_x` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_x` 进行赋值或初始化。
+- **L172** <code>  const auto blocks_y = batches;</code>
+  - EN: Assigns or initializes `blocks_y` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_y` 进行赋值或初始化。
+- **L173** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L174** <code>  dim3 blocks(blocks_x, blocks_y, 1);</code>
+  - EN: Declares function or method `blocks` without defining it here.
+  - CN: 声明函数或方法 `blocks`，但不在此处给出定义。
+- **L175** <code>  dequantize_kernel&lt;&lt;&lt;blocks, tpb, 0, stream&gt;&gt;&gt;(dq_buffer, q_buffer, operand_layout, scale_buffer, zero_buffer, scale_layout_bcast, thr_layout);</code>
+  - EN: Declares function or method `stream>>>` without defining it here.
+  - CN: 声明函数或方法 `stream>>>`，但不在此处给出定义。
+- **L176** <code>  CUDA_CHECK(cudaStreamSynchronize(stream));</code>
+  - EN: Declares function or method `cudaStreamSynchronize` without defining it here.
+  - CN: 声明函数或方法 `cudaStreamSynchronize`，但不在此处给出定义。
+- **L177** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L179** <code>template &lt;typename ElementScale, typename QuantType = cutlass::int4b_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L180** <code>class packed_scale_t {</code>
+  - EN: Begins the declaration of class `packed_scale_t`.
+  - CN: 开始声明 class `packed_scale_t`。
+- **L181** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L182** <code>  static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L183** <code>    cute::sizeof_bits_v&lt;ElementScale&gt; == 8,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L184** <code>    &quot;ElementScale must be a supported 8-bit type.&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L185** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L186** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L187** <code>  explicit packed_scale_t(ElementScale val) {</code>
+  - EN: Begins the definition of function or method `packed_scale_t`.
+  - CN: 开始定义函数或方法 `packed_scale_t`。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>    if constexpr (cutlass::platform::is_floating_point&lt;QuantType&gt;::value ||</code>
+  - EN: Begins or continues the signature/call syntax involving `constexpr`.
+  - CN: 开始或继续与 `constexpr` 相关的签名/调用语法。
+- **L190** <code>                  cute::is_same_v&lt;QuantType, cutlass::float_e2m1_t&gt;) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L191** <code>      // floating point QuantType needs to be converted to a signed type </code>
+  - EN: Comment that documents intent or context: "floating point QuantType needs to be converted to a signed type".
+  - CN: 用于说明意图或上下文的注释："floating point QuantType needs to be converted to a signed type"。
+- **L192** <code>      // or a floating point ttype </code>
+  - EN: Comment that documents intent or context: "or a floating point ttype".
+  - CN: 用于说明意图或上下文的注释："or a floating point ttype"。
+- **L193** <code>      static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L194** <code>        !std::is_unsigned_v&lt;ElementScale&gt; ||</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L195** <code>        cutlass::platform::is_floating_point&lt;ElementScale&gt;::value ||</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L196** <code>        cute::is_same_v&lt;ElementScale, cutlass::float_e4m3_t&gt; ||</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L197** <code>        cute::is_same_v&lt;ElementScale, cutlass::float_e5m2_t&gt;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L198** <code>        &quot;E2M1 quantization requires ElementScale to be signed or FP8&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>      // E2M1 quantization: Use E2M1 LUT values</code>
+  - EN: Comment that documents intent or context: "E2M1 quantization: Use E2M1 LUT values".
+  - CN: 用于说明意图或上下文的注释："E2M1 quantization: Use E2M1 LUT values"。
+- **L201** <code>      storage[0] = pack4(</code>
+  - EN: Begins or continues the signature/call syntax involving `pack4`.
+  - CN: 开始或继续与 `pack4` 相关的签名/调用语法。
+- **L202** <code>        ElementScale(float(val) * 0.0f),     // E2M1: 0b000 =&gt; 0.0</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L203** <code>        ElementScale(float(val) * (-0.5f)),  // E2M1: 0b001 =&gt; -0.5</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L204** <code>        ElementScale(float(val) * (-1.0f)),  // E2M1: 0b010 =&gt; -1.0</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L205** <code>        ElementScale(float(val) * (-1.5f))   // E2M1: 0b011 =&gt; -1.5</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L206** <code>      );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L207** <code>      storage[1] = pack4(</code>
+  - EN: Begins or continues the signature/call syntax involving `pack4`.
+  - CN: 开始或继续与 `pack4` 相关的签名/调用语法。
+- **L208** <code>        ElementScale(float(val) * (-2.0f)),  // E2M1: 0b100 =&gt; -2.0</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L209** <code>        ElementScale(float(val) * (-3.0f)),  // E2M1: 0b101 =&gt; -3.0</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L210** <code>        ElementScale(float(val) * (-4.0f)),  // E2M1: 0b110 =&gt; -4.0</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L211** <code>        ElementScale(float(val) * (-6.0f))   // E2M1: 0b111 =&gt; -6.0</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L212** <code>      );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L213** <code>    } else if constexpr (!std::is_unsigned_v&lt;ElementScale&gt;) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L214** <code>      static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L215** <code>        (std::is_integral_v&lt;QuantType&gt; &amp;&amp; std::is_signed_v&lt;QuantType&gt;) ||</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L216** <code>        cute::is_same_v&lt;QuantType, cutlass::int4b_t&gt;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L217** <code>        &quot;Two&#x27;s complement LUT requires signed integer QuantType (int4b_t)&quot;);</code>
+  - EN: Declares function or method `QuantType` without defining it here.
+  - CN: 声明函数或方法 `QuantType`，但不在此处给出定义。
+- **L218** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L219** <code>      // INT4 Two&#x27;s Complement quantization: Use TC LUT values</code>
+  - EN: Comment that documents intent or context: "INT4 Two's Complement quantization: Use TC LUT values".
+  - CN: 用于说明意图或上下文的注释："INT4 Two's Complement quantization: Use TC LUT values"。
+- **L220** <code>      storage[0] = pack4(</code>
+  - EN: Begins or continues the signature/call syntax involving `pack4`.
+  - CN: 开始或继续与 `pack4` 相关的签名/调用语法。
+- **L221** <code>        ElementScale(float(val) * (-8.0f)),  // TC: 0b000 =&gt; -8</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L222** <code>        ElementScale(float(val) * (-7.0f)),  // TC: 0b001 =&gt; -7</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L223** <code>        ElementScale(float(val) * (-6.0f)),  // TC: 0b010 =&gt; -6</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L224** <code>        ElementScale(float(val) * (-5.0f))   // TC: 0b011 =&gt; -5</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L225** <code>      );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L226** <code>      storage[1] = pack4(</code>
+  - EN: Begins or continues the signature/call syntax involving `pack4`.
+  - CN: 开始或继续与 `pack4` 相关的签名/调用语法。
+- **L227** <code>        ElementScale(float(val) * (-4.0f)),  // TC: 0b100 =&gt; -4</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L228** <code>        ElementScale(float(val) * (-3.0f)),  // TC: 0b101 =&gt; -3</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L229** <code>        ElementScale(float(val) * (-2.0f)),  // TC: 0b110 =&gt; -2</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L230** <code>        ElementScale(float(val) * (-1.0f))   // TC: 0b111 =&gt; -1</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L231** <code>      );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L232** <code>    } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L233** <code>      // Unsigned ElementScale and QuantType: Pack positive LUT values (for UINT4)</code>
+  - EN: Comment that documents intent or context: "Unsigned ElementScale and QuantType: Pack positive LUT values (for UINT4)".
+  - CN: 用于说明意图或上下文的注释："Unsigned ElementScale and QuantType: Pack positive LUT values (for UINT4)"。
+- **L234** <code>      static_assert(((std::is_integral_v&lt;QuantType&gt; &amp;&amp; std::is_unsigned_v&lt;QuantType&gt;) ||</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L235** <code>                     cute::is_same_v&lt;QuantType, cutlass::uint4b_t&gt;) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L236** <code>                    std::is_unsigned_v&lt;ElementScale&gt;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L237** <code>                    &quot;Uint4 LUT requires unsigned QuantType (uint4b_t) and ElementScale&quot;);</code>
+  - EN: Declares function or method `QuantType` without defining it here.
+  - CN: 声明函数或方法 `QuantType`，但不在此处给出定义。
+- **L238** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L239** <code>      // UINT4 LUT: pack positive LUT values</code>
+  - EN: Comment that documents intent or context: "UINT4 LUT: pack positive LUT values".
+  - CN: 用于说明意图或上下文的注释："UINT4 LUT: pack positive LUT values"。
+- **L240** <code>      storage[0] = pack4(</code>
+  - EN: Begins or continues the signature/call syntax involving `pack4`.
+  - CN: 开始或继续与 `pack4` 相关的签名/调用语法。
+- **L241** <code>        ElementScale(float(val) * 8.0f), </code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L242** <code>        ElementScale(float(val) * 7.0f), </code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L243** <code>        ElementScale(float(val) * 6.0f), </code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L244** <code>        ElementScale(float(val) * 5.0f)</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L245** <code>      );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L246** <code>      storage[1] = pack4(</code>
+  - EN: Begins or continues the signature/call syntax involving `pack4`.
+  - CN: 开始或继续与 `pack4` 相关的签名/调用语法。
+- **L247** <code>        ElementScale(float(val) * 4.0f), </code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L248** <code>        ElementScale(float(val) * 3.0f), </code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L249** <code>        ElementScale(float(val) * 2.0f), </code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L250** <code>        ElementScale(float(val) * 1.0f)</code>
+  - EN: Begins or continues the signature/call syntax involving `float`.
+  - CN: 开始或继续与 `float` 相关的签名/调用语法。
+- **L251** <code>      );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L252** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L253** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L254** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L255** <code>  packed_scale_t() = default;</code>
+  - EN: Declares function or method `packed_scale_t` without defining it here.
+  - CN: 声明函数或方法 `packed_scale_t`，但不在此处给出定义。
+- **L256** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L257** <code>  explicit operator float() const {</code>
+  - EN: Begins the definition of function or method `float`.
+  - CN: 开始定义函数或方法 `float`。
+- **L258** <code>    return float(get());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L259** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L260** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L261** <code>  bool operator==(packed_scale_t const&amp; rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L262** <code>    return storage[0] == rhs.storage[0] &amp;&amp; storage[1] == rhs.storage[1];</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L263** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L264** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L265** <code>  bool operator!=(packed_scale_t const&amp; rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L266** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L267** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L268** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L269** <code>  friend packed_scale_t operator+(packed_scale_t const&amp; lhs, packed_scale_t const&amp; rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L270** <code>    return packed_scale_t(lhs.get() + rhs.get());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L271** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L272** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L273** <code>  friend packed_scale_t operator-(packed_scale_t const&amp; lhs, packed_scale_t const&amp; rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L274** <code>    return packed_scale_t(lhs.get() - rhs.get());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L275** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L276** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L277** <code>  friend packed_scale_t operator*(packed_scale_t const&amp; lhs, packed_scale_t const&amp; rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L278** <code>    return packed_scale_t(lhs.get() * rhs.get());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L279** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L280** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L281** <code>  friend packed_scale_t operator/(packed_scale_t const&amp; lhs, packed_scale_t const&amp; rhs) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L282** <code>    return packed_scale_t(lhs.get() / rhs.get());</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L283** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L284** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L285** <code>private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L286** <code>  using Storage = uint32_t;</code>
+  - EN: Introduces the type or namespace alias `Storage`.
+  - CN: 引入类型或命名空间别名 `Storage`。
+- **L287** <code>  using Stage = uint8_t;</code>
+  - EN: Introduces the type or namespace alias `Stage`.
+  - CN: 引入类型或命名空间别名 `Stage`。
+- **L288** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L289** <code>  Storage storage[2] {};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L290** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L291** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L292** <code>  static Storage pack4(ElementScale c1, ElementScale c2, ElementScale c3, ElementScale c4) {</code>
+  - EN: Begins the definition of function or method `pack4`.
+  - CN: 开始定义函数或方法 `pack4`。
+- **L293** <code>    Storage result = 0;</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L294** <code>    result |= (static_cast&lt;Storage&gt;(reinterpret_cast&lt;Stage const&amp;&gt;(c4)) &lt;&lt; 24);</code>
+  - EN: Declares function or method `static_cast<Storage>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<Storage>`，但不在此处给出定义。
+- **L295** <code>    result |= (static_cast&lt;Storage&gt;(reinterpret_cast&lt;Stage const&amp;&gt;(c3)) &lt;&lt; 16);</code>
+  - EN: Declares function or method `static_cast<Storage>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<Storage>`，但不在此处给出定义。
+- **L296** <code>    result |= (static_cast&lt;Storage&gt;(reinterpret_cast&lt;Stage const&amp;&gt;(c2)) &lt;&lt; 8);</code>
+  - EN: Declares function or method `static_cast<Storage>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<Storage>`，但不在此处给出定义。
+- **L297** <code>    result |= static_cast&lt;Storage&gt;(reinterpret_cast&lt;Stage const&amp;&gt;(c1));</code>
+  - EN: Declares function or method `static_cast<Storage>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<Storage>`，但不在此处给出定义。
+- **L298** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L299** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L300** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L301** <code>  ElementScale get() const {</code>
+  - EN: Begins the definition of function or method `get`.
+  - CN: 开始定义函数或方法 `get`。
+- **L302** <code>    auto stage = static_cast&lt;Stage&gt;(storage[0] &gt;&gt; 8);</code>
+  - EN: Declares function or method `static_cast<Stage>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<Stage>`，但不在此处给出定义。
+- **L303** <code>    #if defined(__CUDA_ARCH__)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L304** <code>    return reinterpret_cast&lt;ElementScale const&amp;&gt;(stage);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L305** <code>    #else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L306** <code>    ElementScale tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L307** <code>    std::memcpy(&amp;tmp, &amp;stage, sizeof(Stage));</code>
+  - EN: Declares function or method `memcpy` without defining it here.
+  - CN: 声明函数或方法 `memcpy`，但不在此处给出定义。
+- **L308** <code>    return tmp;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L309** <code>    #endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L310** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L311** <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L312** <code>  ElementScale get(int idx) const {</code>
+  - EN: Begins the definition of function or method `get`.
+  - CN: 开始定义函数或方法 `get`。
+- **L313** <code>    Stage stage;</code>
+  - EN: Declares the symbol `stage` in the current scope.
+  - CN: 在当前作用域中声明符号 `stage`。
+- **L314** <code>    if (idx &lt; 4) stage = static_cast&lt;Stage&gt;(storage[0] &gt;&gt; (8 * idx));</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L315** <code>    else         stage = static_cast&lt;Stage&gt;(storage[1] &gt;&gt; (8 * idx - 32));</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L316** <code>    #if defined(__CUDA_ARCH__)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L317** <code>    return reinterpret_cast&lt;ElementScale const&amp;&gt;(stage);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L318** <code>    #else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L319** <code>    ElementScale tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L320** <code>    std::memcpy(&amp;tmp, &amp;stage, sizeof(Stage));</code>
+  - EN: Declares function or method `memcpy` without defining it here.
+  - CN: 声明函数或方法 `memcpy`，但不在此处给出定义。
+- **L321** <code>    return tmp;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L322** <code>    #endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L323** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L324** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>// In the mainloop, PRMT selects 1 byte from only 8 bytes so the sign bit is handled in an extra PRMT.</code>
+  - EN: Comment that documents intent or context: "In the mainloop, PRMT selects 1 byte from only 8 bytes so the sign bit is handled in an extra PRMT.".
+  - CN: 用于说明意图或上下文的注释："In the mainloop, PRMT selects 1 byte from only 8 bytes so the sign bit is handled in an extra PRMT."。
+- **L327** <code>// Here the encodings of positive values and negative values are unified (except for the sign bit).</code>
+  - EN: Comment that documents intent or context: "Here the encodings of positive values and negative values are unified (except for the sign bit).".
+  - CN: 用于说明意图或上下文的注释："Here the encodings of positive values and negative values are unified (except for the sign bit)."。
+- **L328** <code>// For instance, 1 becomes 0b0111, which is the same encoding as -1 (0b1111).</code>
+  - EN: Comment that documents intent or context: "For instance, 1 becomes 0b0111, which is the same encoding as -1 (0b1111).".
+  - CN: 用于说明意图或上下文的注释："For instance, 1 becomes 0b0111, which is the same encoding as -1 (0b1111)."。
+- **L329** <code>static bool unified_encode_int4b(cutlass::int4b_t const *block_in, cutlass::int4b_t *block_out, const size_t block_size) {</code>
+  - EN: Begins the definition of function or method `unified_encode_int4b`.
+  - CN: 开始定义函数或方法 `unified_encode_int4b`。
+- **L330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L331** <code>  using StorageType = cutlass::int4b_t::Storage;</code>
+  - EN: Introduces the type or namespace alias `StorageType`.
+  - CN: 引入类型或命名空间别名 `StorageType`。
+- **L332** <code>  constexpr int pack = cute::sizeof_bits_v&lt;StorageType&gt; / 4;</code>
+  - EN: Assigns or initializes `pack` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pack` 进行赋值或初始化。
+- **L333** <code>  const size_t host_buf_size = block_size / pack;</code>
+  - EN: Assigns or initializes `host_buf_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `host_buf_size` 进行赋值或初始化。
+- **L334** <code>  std::vector&lt;StorageType&gt; host_buf(host_buf_size);</code>
+  - EN: Constructs object `host_buf` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `host_buf`。
+- **L335** <code>  cutlass::device_memory::copy_to_host(host_buf.data(), (StorageType *) block_in, host_buf_size);</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L336** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L337** <code>  for (auto&amp;&amp; d : host_buf) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L338** <code>    StorageType out = 0;</code>
+  - EN: Assigns or initializes `out` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `out` 进行赋值或初始化。
+- **L339** <code>    StorageType mask = 0x0f;</code>
+  - EN: Assigns or initializes `mask` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `mask` 进行赋值或初始化。
+- **L340** <code>    for (int i = 0; i &lt; pack; i++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L341** <code>      cutlass::int4b_t curr;</code>
+  - EN: Declares the symbol `curr` in the current scope.
+  - CN: 在当前作用域中声明符号 `curr`。
+- **L342** <code>      curr.storage = (d &gt;&gt; (i * 4)) &amp; 0x0f;</code>
+  - EN: Assigns or initializes `storage` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `storage` 进行赋值或初始化。
+- **L343** <code>      switch (curr) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L344** <code>        case 1: curr.storage = StorageType(0b0111); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L345** <code>        case 2: curr.storage = StorageType(0b0110); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L346** <code>        case 3: curr.storage = StorageType(0b0101); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L347** <code>        case 4: curr.storage = StorageType(0b0100); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L348** <code>        case 5: curr.storage = StorageType(0b0011); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L349** <code>        case 6: curr.storage = StorageType(0b0010); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L350** <code>        case 7: curr.storage = StorageType(0b0001); break; // 2&#x27;s complement</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L351** <code>        default: break;</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L352** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L353** <code>      out |= (curr.storage &lt;&lt; (4 * i)) &amp; mask;</code>
+  - EN: Declares the symbol `mask` in the current scope.
+  - CN: 在当前作用域中声明符号 `mask`。
+- **L354** <code>      mask &lt;&lt;= 4;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L355** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L356** <code>    d = out;</code>
+  - EN: Assigns or initializes `d` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `d` 进行赋值或初始化。
+- **L357** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L358** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L359** <code>  cutlass::device_memory::copy_to_device((StorageType*) block_out, host_buf.data(), host_buf_size);</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L360** <code>  return true;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L361** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L362** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L363** <code>template &lt;class ElementScale, typename QuantType = cutlass::int4b_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L364** <code>static bool pack_scale_fp8(ElementScale const *block_in, cutlass::Array&lt;ElementScale, 8&gt; *block_out, const size_t block_size) {</code>
+  - EN: Begins the definition of function or method `pack_scale_fp8`.
+  - CN: 开始定义函数或方法 `pack_scale_fp8`。
+- **L365** <code>  std::vector&lt;ElementScale&gt; data_in(block_size);</code>
+  - EN: Constructs object `data_in` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `data_in`。
+- **L366** <code>  std::vector&lt;cutlass::Array&lt;ElementScale, 8&gt;&gt; data_out(block_size);</code>
+  - EN: Declares function or method `data_out` without defining it here.
+  - CN: 声明函数或方法 `data_out`，但不在此处给出定义。
+- **L367** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L368** <code>  try {</code>
+  - EN: Begins an exception-handling region.
+  - CN: 开始一个异常处理区域。
+- **L369** <code>    cutlass::device_memory::copy_to_host(data_in.data(), block_in, block_size);</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L370** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L371** <code>  catch (cutlass::cuda_exception const&amp; e) {</code>
+  - EN: Handles an exception thrown by the preceding `try` block.
+  - CN: 处理前面 `try` 代码块抛出的异常。
+- **L372** <code>    std::cerr &lt;&lt; &quot;CUDA Error: &quot; &lt;&lt; cudaGetErrorString(e.cudaError()) &lt;&lt; std::endl;</code>
+  - EN: Declares function or method `cudaError` without defining it here.
+  - CN: 声明函数或方法 `cudaError`，但不在此处给出定义。
+- **L373** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L374** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L375** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L376** <code>  for (size_t i = 0; i &lt; block_size; i++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L377** <code>    cutlass::packed_scale_t&lt;ElementScale, QuantType&gt; tmp(data_in[i]);</code>
+  - EN: Declares function or method `tmp` without defining it here.
+  - CN: 声明函数或方法 `tmp`，但不在此处给出定义。
+- **L378** <code>    data_out[i] = reinterpret_cast&lt;cutlass::Array&lt;ElementScale, 8&gt; const&amp;&gt;(tmp);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L379** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L380** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L381** <code>  try {</code>
+  - EN: Begins an exception-handling region.
+  - CN: 开始一个异常处理区域。
+- **L382** <code>    cutlass::device_memory::copy_to_device(block_out, data_out.data(), block_size);</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L383** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L384** <code>  catch (cutlass::cuda_exception const&amp; e) {</code>
+  - EN: Handles an exception thrown by the preceding `try` block.
+  - CN: 处理前面 `try` 代码块抛出的异常。
+- **L385** <code>    std::cerr &lt;&lt; &quot;CUDA Error: &quot; &lt;&lt; cudaGetErrorString(e.cudaError()) &lt;&lt; std::endl;</code>
+  - EN: Declares function or method `cudaError` without defining it here.
+  - CN: 声明函数或方法 `cudaError`，但不在此处给出定义。
+- **L386** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L387** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L388** <code>  return true;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L389** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L390** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L391** <code>template &lt;class T, class = void&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L392** <code>struct UnderlyingElement {</code>
+  - EN: Begins the declaration of struct `UnderlyingElement`.
+  - CN: 开始声明 struct `UnderlyingElement`。
+- **L393** <code>  using type = T;</code>
+  - EN: Introduces the type or namespace alias `type`.
+  - CN: 引入类型或命名空间别名 `type`。
+- **L394** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L395** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L396** <code>template &lt;class T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L397** <code>struct UnderlyingElement&lt;T, cute::void_t&lt;typename T::Element&gt;&gt; {</code>
+  - EN: Begins the declaration of struct `UnderlyingElement`.
+  - CN: 开始声明 struct `UnderlyingElement`。
+- **L398** <code>  using type = typename T::Element;</code>
+  - EN: Introduces the type or namespace alias `type`.
+  - CN: 引入类型或命名空间别名 `type`。
+- **L399** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L400** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L401** <code>// Given a type of MMA instruction, compute a memory reordering atom that places all values</code>
+  - EN: Comment that documents intent or context: "Given a type of MMA instruction, compute a memory reordering atom that places all values".
+  - CN: 用于说明意图或上下文的注释："Given a type of MMA instruction, compute a memory reordering atom that places all values"。
+- **L402** <code>// owned by each thread in contiguous memory locations. This improves smem load vectorization,</code>
+  - EN: Comment that documents intent or context: "owned by each thread in contiguous memory locations. This improves smem load vectorization,".
+  - CN: 用于说明意图或上下文的注释："owned by each thread in contiguous memory locations. This improves smem load vectorization,"。
+- **L403** <code>// particularly for mixed dtype GEMMs where a narrow type is loaded in the thread/value order</code>
+  - EN: Comment that documents intent or context: "particularly for mixed dtype GEMMs where a narrow type is loaded in the thread/value order".
+  - CN: 用于说明意图或上下文的注释："particularly for mixed dtype GEMMs where a narrow type is loaded in the thread/value order"。
+- **L404** <code>// of the wider type and may result in inefficient sub-bank (8-bit or 16-bit) accesses.</code>
+  - EN: Comment that documents intent or context: "of the wider type and may result in inefficient sub-bank (8-bit or 16-bit) accesses.".
+  - CN: 用于说明意图或上下文的注释："of the wider type and may result in inefficient sub-bank (8-bit or 16-bit) accesses."。
+- **L405** <code>// In addition, we can reorder the values across several MMA instructions to get even wider</code>
+  - EN: Comment that documents intent or context: "In addition, we can reorder the values across several MMA instructions to get even wider".
+  - CN: 用于说明意图或上下文的注释："In addition, we can reorder the values across several MMA instructions to get even wider"。
+- **L406** <code>// vectorization (AtomLayout parameter) and permute the values within each instruction to get</code>
+  - EN: Comment that documents intent or context: "vectorization (AtomLayout parameter) and permute the values within each instruction to get".
+  - CN: 用于说明意图或上下文的注释："vectorization (AtomLayout parameter) and permute the values within each instruction to get"。
+- **L407** <code>// more optimal conversion instruction sequences (ValLayout parameter).</code>
+  - EN: Comment that documents intent or context: "more optimal conversion instruction sequences (ValLayout parameter).".
+  - CN: 用于说明意图或上下文的注释："more optimal conversion instruction sequences (ValLayout parameter)."。
+- **L408** <code>template &lt;class ElementMma,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L409** <code>         class AtomLayout = cute::Layout&lt;cute::_1&gt;,</code>
+  - EN: Begins the declaration of class `AtomLayout`.
+  - CN: 开始声明 class `AtomLayout`。
+- **L410** <code>         class ValLayout  = cute::Layout&lt;cute::_1&gt;&gt;</code>
+  - EN: Begins the declaration of class `ValLayout`.
+  - CN: 开始声明 class `ValLayout`。
+- **L411** <code>constexpr auto compute_memory_reordering_atom(AtomLayout atom_layout = {}, ValLayout val_layout = {})</code>
+  - EN: Begins or continues the signature/call syntax involving `compute_memory_reordering_atom`.
+  - CN: 开始或继续与 `compute_memory_reordering_atom` 相关的签名/调用语法。
+- **L412** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L413** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L414** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L415** <code>  static_assert(is_static_v&lt;ValLayout&gt;, &quot;ValLayout must be static&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L416** <code>  static_assert(is_static_v&lt;AtomLayout&gt;, &quot;AtomLayout must be static&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L417** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L418** <code>  // 1. Choose an MMA atom to access TV layout and MN shape</code>
+  - EN: Comment that documents intent or context: "1. Choose an MMA atom to access TV layout and MN shape".
+  - CN: 用于说明意图或上下文的注释："1. Choose an MMA atom to access TV layout and MN shape"。
+- **L419** <code>  // Note: parameters like GMMA Major, TileShape, ElementC don&#x27;t affect TV layout of A, use arbitrary</code>
+  - EN: Comment that documents intent or context: "Note: parameters like GMMA Major, TileShape, ElementC don't affect TV layout of A, use arbitrary".
+  - CN: 用于说明意图或上下文的注释："Note: parameters like GMMA Major, TileShape, ElementC don't affect TV layout of A, use arbitrary"。
+- **L420** <code>  using MmaAtom = decltype(SM90::GMMA::rs_op_selector&lt;ElementMma, ElementMma, float, Shape&lt;_64,_16,_32&gt;&gt;());</code>
+  - EN: Introduces the type or namespace alias `MmaAtom`.
+  - CN: 引入类型或命名空间别名 `MmaAtom`。
+- **L421** <code>  using MmaTraits = MMA_Traits&lt;MmaAtom&gt;;</code>
+  - EN: Introduces the type or namespace alias `MmaTraits`.
+  - CN: 引入类型或命名空间别名 `MmaTraits`。
+- **L422** <code>  auto mk_shape_mma = select&lt;0,2&gt;(typename MmaTraits::Shape_MNK{});</code>
+  - EN: Assigns or initializes `mk_shape_mma` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `mk_shape_mma` 进行赋值或初始化。
+- **L423** <code>  auto tv_layout_mma = typename MmaTraits::ALayout{};</code>
+  - EN: Assigns or initializes `tv_layout_mma` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tv_layout_mma` 进行赋值或初始化。
+- **L424** <code>  static_assert(size&lt;1&gt;(tv_layout_mma) % size(val_layout) == 0, &quot;Value layout must evenly divide the MMA value layout&quot;);</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L425** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L426** <code>  // 2. Create a single warp&#x27;s TV layout from that of the whole MMA and invert to get (m,k -&gt; thr,val)</code>
+  - EN: Comment that documents intent or context: "2. Create a single warp's TV layout from that of the whole MMA and invert to get (m,k -> thr,val)".
+  - CN: 用于说明意图或上下文的注释："2. Create a single warp's TV layout from that of the whole MMA and invert to get (m,k -> thr,val)"。
+- **L427** <code>  // Note: this assumes A is partitioned between warps along M mode</code>
+  - EN: Comment that documents intent or context: "Note: this assumes A is partitioned between warps along M mode".
+  - CN: 用于说明意图或上下文的注释："Note: this assumes A is partitioned between warps along M mode"。
+- **L428** <code>  auto tv_tiler_warp = make_shape(Int&lt;32&gt;{}, size&lt;1&gt;(tv_layout_mma));</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L429** <code>  auto mk_shape_warp = shape_div(mk_shape_mma, size(typename MmaTraits::ThrID{}) / Int&lt;32&gt;{});</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L430** <code>  auto tv_layout_mma_warp = make_layout_like(composition(tv_layout_mma, tv_tiler_warp));</code>
+  - EN: Declares function or method `composition` without defining it here.
+  - CN: 声明函数或方法 `composition`，但不在此处给出定义。
+- **L431** <code>  auto mk_layout_mma_warp = right_inverse(tv_layout_mma_warp).with_shape(mk_shape_warp);</code>
+  - EN: Declares function or method `with_shape` without defining it here.
+  - CN: 声明函数或方法 `with_shape`，但不在此处给出定义。
+- **L432** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L433** <code>  // 3. Repeat the warp layout NumAtoms times along K mode to get wider vectorization</code>
+  - EN: Comment that documents intent or context: "3. Repeat the warp layout NumAtoms times along K mode to get wider vectorization".
+  - CN: 用于说明意图或上下文的注释："3. Repeat the warp layout NumAtoms times along K mode to get wider vectorization"。
+- **L434** <code>  auto mk_layout_mma_trgt = blocked_product(mk_layout_mma_warp, atom_layout);</code>
+  - EN: Declares function or method `blocked_product` without defining it here.
+  - CN: 声明函数或方法 `blocked_product`，但不在此处给出定义。
+- **L435** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L436** <code>  // 4. Compose with a contiguous layout of values in each thread (required for smem vectorization)</code>
+  - EN: Comment that documents intent or context: "4. Compose with a contiguous layout of values in each thread (required for smem vectorization)".
+  - CN: 用于说明意图或上下文的注释："4. Compose with a contiguous layout of values in each thread (required for smem vectorization)"。
+- **L437** <code>  auto val_to_offset = logical_product(val_layout, size&lt;1&gt;(tv_layout_mma) / size(val_layout) * size(atom_layout));</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L438** <code>  auto thr_to_offset = make_layout(size&lt;0&gt;(tv_layout_mma_warp));</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L439** <code>  auto tv_to_offset = select&lt;1,0&gt;(logical_product(val_to_offset, thr_to_offset));</code>
+  - EN: Declares function or method `logical_product` without defining it here.
+  - CN: 声明函数或方法 `logical_product`，但不在此处给出定义。
+- **L440** <code>  auto layout_atom = composition(tv_to_offset, mk_layout_mma_trgt);</code>
+  - EN: Declares function or method `composition` without defining it here.
+  - CN: 声明函数或方法 `composition`，但不在此处给出定义。
+- **L441** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L442** <code>  return layout_atom;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L443** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L444** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L445** <code>template &lt;class TileShape, class EngineSrc, class LayoutSrc, class EngineDst, class LayoutDst, class TiledCopy&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L446** <code>__global__ void reorder_tensor_kernel(</code>
+  - EN: Begins or continues the signature/call syntax involving `reorder_tensor_kernel`.
+  - CN: 开始或继续与 `reorder_tensor_kernel` 相关的签名/调用语法。
+- **L447** <code>  cute::Tensor&lt;EngineSrc, LayoutSrc&gt; S,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L448** <code>  cute::Tensor&lt;EngineDst, LayoutDst&gt; D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L449** <code>  TiledCopy tiled_copy)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L450** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L451** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L452** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L453** <code>  using T = typename EngineDst::value_type;</code>
+  - EN: Introduces the type or namespace alias `T`.
+  - CN: 引入类型或命名空间别名 `T`。
+- **L454** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L455** <code>  Tensor gS = local_tile(S, TileShape{}, make_coord(blockIdx.x, _, blockIdx.z));</code>
+  - EN: Declares function or method `make_coord` without defining it here.
+  - CN: 声明函数或方法 `make_coord`，但不在此处给出定义。
+- **L456** <code>  Tensor gD = local_tile(D, TileShape{}, make_coord(blockIdx.x, _, blockIdx.z));</code>
+  - EN: Declares function or method `make_coord` without defining it here.
+  - CN: 声明函数或方法 `make_coord`，但不在此处给出定义。
+- **L457** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L458** <code>  auto thread_copy = tiled_copy.get_slice(threadIdx.x);</code>
+  - EN: Declares function or method `get_slice` without defining it here.
+  - CN: 声明函数或方法 `get_slice`，但不在此处给出定义。
+- **L459** <code>  Tensor tS = thread_copy.partition_S(gS);</code>
+  - EN: Declares function or method `partition_S` without defining it here.
+  - CN: 声明函数或方法 `partition_S`，但不在此处给出定义。
+- **L460** <code>  Tensor tD = thread_copy.partition_D(gD);</code>
+  - EN: Declares function or method `partition_D` without defining it here.
+  - CN: 声明函数或方法 `partition_D`，但不在此处给出定义。
+- **L461** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L462** <code>  copy(tiled_copy, tS, tD);</code>
+  - EN: Declares function or method `copy` without defining it here.
+  - CN: 声明函数或方法 `copy`，但不在此处给出定义。
+- **L463** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L464** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L465** <code>template &lt;class EngineSrc, class LayoutSrc, class EngineDst, class LayoutDst&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L466** <code>void reorder_tensor(</code>
+  - EN: Begins or continues the signature/call syntax involving `reorder_tensor`.
+  - CN: 开始或继续与 `reorder_tensor` 相关的签名/调用语法。
+- **L467** <code>  cute::Tensor&lt;EngineSrc, LayoutSrc&gt; S,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L468** <code>  cute::Tensor&lt;EngineDst, LayoutDst&gt; D)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L469** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L470** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L471** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L472** <code>  using T = typename EngineDst::value_type;</code>
+  - EN: Introduces the type or namespace alias `T`.
+  - CN: 引入类型或命名空间别名 `T`。
+- **L473** <code>  static_assert(is_same_v&lt;remove_const_t&lt;typename EngineSrc::value_type&gt;, T&gt;, &quot;Type mismatch&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L474** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L475** <code>  // Construct a value layout that assigns at least 8 bits of contiguous elements in destination tensor to a thread</code>
+  - EN: Comment that documents intent or context: "Construct a value layout that assigns at least 8 bits of contiguous elements in destination tensor to a thread".
+  - CN: 用于说明意图或上下文的注释："Construct a value layout that assigns at least 8 bits of contiguous elements in destination tensor to a thread"。
+- **L476** <code>  // This avoids a race condition when writing out subbyte types (e.g. int4b_t).</code>
+  - EN: Comment that documents intent or context: "This avoids a race condition when writing out subbyte types (e.g. int4b_t).".
+  - CN: 用于说明意图或上下文的注释："This avoids a race condition when writing out subbyte types (e.g. int4b_t)."。
+- **L477** <code>  auto has_major_mode = [](auto s) {</code>
+  - EN: Assigns or initializes `has_major_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `has_major_mode` 进行赋值或初始化。
+- **L478** <code>    return any_of(flatten(s), [](auto a){ return is_constant&lt;1, decltype(a)&gt;{}; });</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L479** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L480** <code>  static_assert(has_major_mode(stride&lt;0&gt;(LayoutDst{})) ^ has_major_mode(stride&lt;1&gt;(LayoutDst{})),</code>
+  - EN: Begins or continues the signature/call syntax involving `stride<1>`.
+  - CN: 开始或继续与 `stride<1>` 相关的签名/调用语法。
+- **L481** <code>                &quot;Could not find stride-1 mode in destination layout&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L482** <code>  constexpr int N = shape_div(Int&lt;8&gt;{}, Int&lt;sizeof_bits_v&lt;T&gt;&gt;{});</code>
+  - EN: Declares function or method `shape_div` without defining it here.
+  - CN: 声明函数或方法 `shape_div`，但不在此处给出定义。
+- **L483** <code>  auto val_layout = conditional_return&lt;has_major_mode(stride&lt;0&gt;(LayoutDst{}))&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stride<0>`.
+  - CN: 开始或继续与 `stride<0>` 相关的签名/调用语法。
+- **L484** <code>    make_layout(make_shape(Int&lt;N&gt;{}, Int&lt;1&gt;{}), GenColMajor{}),</code>
+  - EN: Begins or continues the signature/call syntax involving `make_shape`.
+  - CN: 开始或继续与 `make_shape` 相关的签名/调用语法。
+- **L485** <code>    make_layout(make_shape(Int&lt;1&gt;{}, Int&lt;N&gt;{}), GenRowMajor{}));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L486** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L487** <code>  // Make a tiled copy with a simple row-major thread order and above layout</code>
+  - EN: Comment that documents intent or context: "Make a tiled copy with a simple row-major thread order and above layout".
+  - CN: 用于说明意图或上下文的注释："Make a tiled copy with a simple row-major thread order and above layout"。
+- **L488** <code>  int constexpr NumThreads = 128;</code>
+  - EN: Assigns or initializes `NumThreads` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `NumThreads` 进行赋值或初始化。
+- **L489** <code>  auto const thr_layout = make_layout(make_shape(Int&lt;1&gt;{}, Int&lt;NumThreads&gt;{}));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L490** <code>  auto tiled_copy = make_tiled_copy(Copy_Atom&lt;DefaultCopy, T&gt;{}, thr_layout, val_layout);</code>
+  - EN: Declares function or method `make_tiled_copy` without defining it here.
+  - CN: 声明函数或方法 `make_tiled_copy`，但不在此处给出定义。
+- **L491** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L492** <code>  // Assign a group of 16 rows to a threadblock; this matches the shuffle atom size for Hopper</code>
+  - EN: Comment that documents intent or context: "Assign a group of 16 rows to a threadblock; this matches the shuffle atom size for Hopper".
+  - CN: 用于说明意图或上下文的注释："Assign a group of 16 rows to a threadblock; this matches the shuffle atom size for Hopper"。
+- **L493** <code>  using TileShape = Shape&lt;_16&gt;;</code>
+  - EN: Introduces the type or namespace alias `TileShape`.
+  - CN: 引入类型或命名空间别名 `TileShape`。
+- **L494** <code>  auto tiled_D = group_modes&lt;3,rank_v&lt;LayoutDst&gt;&gt;(tiled_divide(D, TileShape{}));</code>
+  - EN: Declares function or method `tiled_divide` without defining it here.
+  - CN: 声明函数或方法 `tiled_divide`，但不在此处给出定义。
+- **L495** <code>  dim3 blocks{unsigned(size&lt;1&gt;(tiled_D)), 1u, unsigned(size&lt;3&gt;(tiled_D))};</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L496** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L497** <code>  reorder_tensor_kernel&lt;TileShape&gt;&lt;&lt;&lt;blocks, NumThreads&gt;&gt;&gt;(S, D, tiled_copy);</code>
+  - EN: Declares function or method `NumThreads>>>` without defining it here.
+  - CN: 声明函数或方法 `NumThreads>>>`，但不在此处给出定义。
+- **L498** <code>  CUDA_CHECK(cudaDeviceSynchronize());</code>
+  - EN: Declares function or method `cudaDeviceSynchronize` without defining it here.
+  - CN: 声明函数或方法 `cudaDeviceSynchronize`，但不在此处给出定义。
+- **L499** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L500** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L501** <code>// In-place version</code>
+  - EN: Comment that documents intent or context: "In-place version".
+  - CN: 用于说明意图或上下文的注释："In-place version"。
+- **L502** <code>template &lt;class T, class LayoutSrc, class LayoutDst&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L503** <code>void reorder_tensor(</code>
+  - EN: Begins or continues the signature/call syntax involving `reorder_tensor`.
+  - CN: 开始或继续与 `reorder_tensor` 相关的签名/调用语法。
+- **L504** <code>  T const* src,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L505** <code>  LayoutSrc const&amp; layout_src,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L506** <code>  T * dst,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L507** <code>  LayoutDst const&amp; layout_dst)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L508** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L509** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L510** <code>  reorder_tensor(make_tensor(make_gmem_ptr&lt;T&gt;(src), layout_src),</code>
+  - EN: Begins or continues the signature/call syntax involving `make_gmem_ptr<T>`.
+  - CN: 开始或继续与 `make_gmem_ptr<T>` 相关的签名/调用语法。
+- **L511** <code>                 make_tensor(make_gmem_ptr&lt;T&gt;(dst), layout_dst));</code>
+  - EN: Declares function or method `make_gmem_ptr<T>` without defining it here.
+  - CN: 声明函数或方法 `make_gmem_ptr<T>`，但不在此处给出定义。
+- **L512** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L513** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L514** <code>// In-place version</code>
+  - EN: Comment that documents intent or context: "In-place version".
+  - CN: 用于说明意图或上下文的注释："In-place version"。
+- **L515** <code>template &lt;class T, class LayoutSrc, class LayoutDst&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L516** <code>void reorder_tensor(</code>
+  - EN: Begins or continues the signature/call syntax involving `reorder_tensor`.
+  - CN: 开始或继续与 `reorder_tensor` 相关的签名/调用语法。
+- **L517** <code>  T * data,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L518** <code>  LayoutSrc const&amp; layout_src,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L519** <code>  LayoutDst const&amp; layout_dst)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L520** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L521** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L522** <code>  cutlass::DeviceAllocation&lt;T&gt; temp(size(layout_src));</code>
+  - EN: Constructs object `temp` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `temp`。
+- **L523** <code>  reorder_tensor(data, layout_src, temp.get(), layout_dst);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L524** <code>  cutlass::device_memory::copy_device_to_device(data, temp.get(), static_cast&lt;size_t&gt;(size(layout_src)));</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L525** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L526** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L527** <code>#undef CUDA_CHECK</code>
+  - EN: Undefines the preprocessor macro `CUDA_CHECK`.
+  - CN: 取消定义预处理宏 `CUDA_CHECK`。
+- **L528** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L529** <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cuda.h</code> — project-specific declarations from `cuda.h` / 来自 `cuda.h` 的项目专用声明
+- <code>cstdint</code> — fixed-width integer types / 定宽整数类型
+- <code>cute/layout.hpp</code> — project-specific declarations from `layout.hpp` / 来自 `layout.hpp` 的项目专用声明
+- <code>cute/tensor.hpp</code> — project-specific declarations from `tensor.hpp` / 来自 `tensor.hpp` 的项目专用声明
+- <code>cute/arch/mma_sm90.hpp</code> — project-specific declarations from `mma_sm90.hpp` / 来自 `mma_sm90.hpp` 的项目专用声明
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/device_memory.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/util/reference/device/tensor_fill.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cute/util/type_traits.hpp</code> — compile-time type traits / 编译期类型特征
+- <code>cute/numeric/numeric_types.hpp</code> — project-specific declarations from `numeric_types.hpp` / 来自 `numeric_types.hpp` 的项目专用声明

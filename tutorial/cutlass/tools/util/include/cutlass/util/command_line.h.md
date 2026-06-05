@@ -1,0 +1,995 @@
+# command_line.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/command_line.h`
+**Purpose / 用途**: Declares a lightweight command-line parser used by CUTLASS tools and examples. / 声明 CUTLASS 工具和示例使用的轻量级命令行解析器。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code> * \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L36** <code> * Utility for parsing command line arguments</code>
+  - EN: Comment that documents intent or context: "Utility for parsing command line arguments".
+  - CN: 用于说明意图或上下文的注释："Utility for parsing command line arguments"。
+- **L37** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &lt;iostream&gt;</code>
+  - EN: Includes `iostream` so this file can use standard stream input/output support.
+  - CN: 引入 `iostream`，使当前文件可以使用标准流输入输出支持。
+- **L40** <code>#include &lt;limits&gt;</code>
+  - EN: Includes `limits` so this file can use numeric limits.
+  - CN: 引入 `limits`，使当前文件可以使用数值范围定义。
+- **L41** <code>#include &lt;sstream&gt;</code>
+  - EN: Includes `sstream` so this file can use string-based stream utilities.
+  - CN: 引入 `sstream`，使当前文件可以使用基于字符串的流工具。
+- **L42** <code>#include &lt;string&gt;</code>
+  - EN: Includes `string` so this file can use string utilities.
+  - CN: 引入 `string`，使当前文件可以使用字符串工具。
+- **L43** <code>#include &lt;vector&gt;</code>
+  - EN: Includes `vector` so this file can use dynamic array containers.
+  - CN: 引入 `vector`，使当前文件可以使用动态数组容器。
+- **L44** <code>#include &lt;unordered_map&gt;</code>
+  - EN: Includes `unordered_map` so this file can use hash-map containers.
+  - CN: 引入 `unordered_map`，使当前文件可以使用哈希映射容器。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>#include &lt;cuda_runtime.h&gt;</code>
+  - EN: Includes `cuda_runtime.h` so this file can use project-specific declarations from `cuda_runtime.h`.
+  - CN: 引入 `cuda_runtime.h`，使当前文件可以使用来自 `cuda_runtime.h` 的项目专用声明。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L53** <code> * command_line</code>
+  - EN: Comment that documents intent or context: "command_line".
+  - CN: 用于说明意图或上下文的注释："command_line"。
+- **L54** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L57** <code> * Utility for parsing command line arguments</code>
+  - EN: Comment that documents intent or context: "Utility for parsing command line arguments".
+  - CN: 用于说明意图或上下文的注释："Utility for parsing command line arguments"。
+- **L58** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L59** <code>struct CommandLine {</code>
+  - EN: Begins the declaration of struct `CommandLine`.
+  - CN: 开始声明 struct `CommandLine`。
+- **L60** <code>  std::vector&lt;std::string&gt; keys;</code>
+  - EN: Declares the symbol `keys` in the current scope.
+  - CN: 在当前作用域中声明符号 `keys`。
+- **L61** <code>  std::vector&lt;std::string&gt; values;</code>
+  - EN: Declares the symbol `values` in the current scope.
+  - CN: 在当前作用域中声明符号 `values`。
+- **L62** <code>  std::vector&lt;std::string&gt; args;</code>
+  - EN: Declares the symbol `args` in the current scope.
+  - CN: 在当前作用域中声明符号 `args`。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L65** <code>   * Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L66** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L67** <code>  CommandLine(int argc, const char** argv) {</code>
+  - EN: Begins the definition of function or method `CommandLine`.
+  - CN: 开始定义函数或方法 `CommandLine`。
+- **L68** <code>    using namespace std;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L69** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L70** <code>    for (int i = 1; i &lt; argc; i++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L71** <code>      string arg = argv[i];</code>
+  - EN: Assigns or initializes `arg` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `arg` 进行赋值或初始化。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>      if ((arg[0] != &#x27;-&#x27;) || (arg[1] != &#x27;-&#x27;)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L74** <code>        args.push_back(arg);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L75** <code>        continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L76** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L77** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L78** <code>      string::size_type pos;</code>
+  - EN: Declares the symbol `pos` in the current scope.
+  - CN: 在当前作用域中声明符号 `pos`。
+- **L79** <code>      string key, val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L80** <code>      if ((pos = arg.find(&#x27;=&#x27;)) == string::npos) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L81** <code>        key = string(arg, 2, arg.length() - 2);</code>
+  - EN: Declares function or method `length` without defining it here.
+  - CN: 声明函数或方法 `length`，但不在此处给出定义。
+- **L82** <code>        val = &quot;&quot;;</code>
+  - EN: Assigns or initializes `val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `val` 进行赋值或初始化。
+- **L83** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L84** <code>        key = string(arg, 2, pos - 2);</code>
+  - EN: Declares function or method `string` without defining it here.
+  - CN: 声明函数或方法 `string`，但不在此处给出定义。
+- **L85** <code>        val = string(arg, pos + 1, arg.length() - 1);</code>
+  - EN: Declares function or method `length` without defining it here.
+  - CN: 声明函数或方法 `length`，但不在此处给出定义。
+- **L86** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L87** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L88** <code>      keys.push_back(key);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L89** <code>      values.push_back(val);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L90** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L91** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L94** <code>   * Constructor to represent a command line from a map of [argument] -&gt; [value]</code>
+  - EN: Comment that documents intent or context: "Constructor to represent a command line from a map of [argument] -> [value]".
+  - CN: 用于说明意图或上下文的注释："Constructor to represent a command line from a map of [argument] -> [value]"。
+- **L95** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L96** <code>  CommandLine(std::unordered_map&lt;std::string, std::string&gt;&amp; arg_map) {</code>
+  - EN: Begins the definition of function or method `CommandLine`.
+  - CN: 开始定义函数或方法 `CommandLine`。
+- **L97** <code>    for (const auto&amp; [key, value] : arg_map) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L98** <code>      keys.push_back(key);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L99** <code>      values.push_back(value);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L100** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L101** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L104** <code>   * Checks whether a flag &quot;--&lt;flag&gt;&quot; is present in the commandline</code>
+  - EN: Comment that documents intent or context: "Checks whether a flag "--<flag>" is present in the commandline".
+  - CN: 用于说明意图或上下文的注释："Checks whether a flag "--<flag>" is present in the commandline"。
+- **L105** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L106** <code>  bool check_cmd_line_flag(const char* arg_name) const {</code>
+  - EN: Begins the definition of function or method `check_cmd_line_flag`.
+  - CN: 开始定义函数或方法 `check_cmd_line_flag`。
+- **L107** <code>    using namespace std;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L108** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L109** <code>    for (int i = 0; i &lt; int(keys.size()); ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L110** <code>      if (keys[i] == string(arg_name)) return true;</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L111** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L112** <code>    return false;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L113** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L116** <code>   * Returns number of naked (non-flag and non-key-value) commandline parameters</code>
+  - EN: Comment that documents intent or context: "Returns number of naked (non-flag and non-key-value) commandline parameters".
+  - CN: 用于说明意图或上下文的注释："Returns number of naked (non-flag and non-key-value) commandline parameters"。
+- **L117** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L118** <code>  size_t num_naked_args() const {</code>
+  - EN: Begins the definition of function or method `num_naked_args`.
+  - CN: 开始定义函数或方法 `num_naked_args`。
+- **L119** <code>    return args.size();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L120** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L121** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L123** <code>   * Print naked (non-flag and non-key-value) commandline parameters</code>
+  - EN: Comment that documents intent or context: "Print naked (non-flag and non-key-value) commandline parameters".
+  - CN: 用于说明意图或上下文的注释："Print naked (non-flag and non-key-value) commandline parameters"。
+- **L124** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L125** <code>  void print_naked_args(std::ostream &amp;out) const {</code>
+  - EN: Begins the definition of function or method `print_naked_args`.
+  - CN: 开始定义函数或方法 `print_naked_args`。
+- **L126** <code>    for (auto arg : args) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L127** <code>      out &lt;&lt; &quot;   &quot; &lt;&lt; arg &lt;&lt;&quot;\n&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L129** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L130** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L131** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L132** <code>   * Returns the commandline parameter for a given index (not including flags)</code>
+  - EN: Comment that documents intent or context: "Returns the commandline parameter for a given index (not including flags)".
+  - CN: 用于说明意图或上下文的注释："Returns the commandline parameter for a given index (not including flags)"。
+- **L133** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L134** <code>  template &lt;typename value_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L135** <code>  void get_cmd_line_argument(size_t index, value_t&amp; val) const {</code>
+  - EN: Begins the definition of function or method `get_cmd_line_argument`.
+  - CN: 开始定义函数或方法 `get_cmd_line_argument`。
+- **L136** <code>    using namespace std;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L137** <code>    if (index &lt; args.size()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L138** <code>      istringstream str_stream(args[index]);</code>
+  - EN: Declares function or method `str_stream` without defining it here.
+  - CN: 声明函数或方法 `str_stream`，但不在此处给出定义。
+- **L139** <code>      str_stream &gt;&gt; val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L140** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L141** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L142** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L143** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L144** <code>   * Obtains the boolean value specified for a given commandline parameter --&lt;flag&gt;=&lt;bool&gt;</code>
+  - EN: Comment that documents intent or context: "Obtains the boolean value specified for a given commandline parameter --<flag>=<bool>".
+  - CN: 用于说明意图或上下文的注释："Obtains the boolean value specified for a given commandline parameter --<flag>=<bool>"。
+- **L145** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L146** <code>  void get_cmd_line_argument(const char* arg_name, bool&amp; val, bool _default) const {</code>
+  - EN: Begins the definition of function or method `get_cmd_line_argument`.
+  - CN: 开始定义函数或方法 `get_cmd_line_argument`。
+- **L147** <code>    val = _default;</code>
+  - EN: Assigns or initializes `val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `val` 进行赋值或初始化。
+- **L148** <code>    if (check_cmd_line_flag(arg_name)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L149** <code>      std::string value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L150** <code>      get_cmd_line_argument(arg_name, value);</code>
+  - EN: Declares function or method `get_cmd_line_argument` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_argument`，但不在此处给出定义。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>      val = !(value == &quot;0&quot; || value == &quot;false&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L153** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L154** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L155** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L157** <code>   * Obtains the value specified for a given commandline parameter --&lt;flag&gt;=&lt;value&gt;</code>
+  - EN: Comment that documents intent or context: "Obtains the value specified for a given commandline parameter --<flag>=<value>".
+  - CN: 用于说明意图或上下文的注释："Obtains the value specified for a given commandline parameter --<flag>=<value>"。
+- **L158** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L159** <code>  template &lt;typename value_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L160** <code>  void get_cmd_line_argument(const char* arg_name,</code>
+  - EN: Begins or continues the signature/call syntax involving `get_cmd_line_argument`.
+  - CN: 开始或继续与 `get_cmd_line_argument` 相关的签名/调用语法。
+- **L161** <code>                             value_t&amp; val) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>    get_cmd_line_argument(arg_name, val, val);</code>
+  - EN: Declares function or method `get_cmd_line_argument` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_argument`，但不在此处给出定义。
+- **L164** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L167** <code>   * Obtains the value specified for a given commandline parameter --&lt;flag&gt;=&lt;value&gt;</code>
+  - EN: Comment that documents intent or context: "Obtains the value specified for a given commandline parameter --<flag>=<value>".
+  - CN: 用于说明意图或上下文的注释："Obtains the value specified for a given commandline parameter --<flag>=<value>"。
+- **L168** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L169** <code>  template &lt;typename value_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L170** <code>  void get_cmd_line_argument(const char* arg_name,</code>
+  - EN: Begins or continues the signature/call syntax involving `get_cmd_line_argument`.
+  - CN: 开始或继续与 `get_cmd_line_argument` 相关的签名/调用语法。
+- **L171** <code>                             value_t&amp; val,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L172** <code>                             value_t const&amp; _default) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L173** <code>    using namespace std;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L174** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L175** <code>    val = _default;</code>
+  - EN: Assigns or initializes `val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `val` 进行赋值或初始化。
+- **L176** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L177** <code>    for (int i = 0; i &lt; int(keys.size()); ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L178** <code>      if (keys[i] == string(arg_name)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L179** <code>        istringstream str_stream(values[i]);</code>
+  - EN: Declares function or method `str_stream` without defining it here.
+  - CN: 声明函数或方法 `str_stream`，但不在此处给出定义。
+- **L180** <code>        str_stream &gt;&gt; val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L181** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L182** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L183** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L186** <code>   * Returns the values specified for a given commandline parameter --&lt;flag&gt;=&lt;value&gt;,&lt;value&gt;*</code>
+  - EN: Comment that documents intent or context: "Returns the values specified for a given commandline parameter --<flag>=<value>,<value>*".
+  - CN: 用于说明意图或上下文的注释："Returns the values specified for a given commandline parameter --<flag>=<value>,<value>*"。
+- **L187** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L188** <code>  template &lt;typename value_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L189** <code>  void get_cmd_line_arguments(const char* arg_name,</code>
+  - EN: Begins or continues the signature/call syntax involving `get_cmd_line_arguments`.
+  - CN: 开始或继续与 `get_cmd_line_arguments` 相关的签名/调用语法。
+- **L190** <code>                              std::vector&lt;value_t&gt;&amp; vals,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L191** <code>                              char sep = &#x27;,&#x27;) const {</code>
+  - EN: Assigns or initializes `sep` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep` 进行赋值或初始化。
+- **L192** <code>    using namespace std;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>    if (check_cmd_line_flag(arg_name)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L195** <code>      // Clear any default values</code>
+  - EN: Comment that documents intent or context: "Clear any default values".
+  - CN: 用于说明意图或上下文的注释："Clear any default values"。
+- **L196** <code>      vals.clear();</code>
+  - EN: Declares function or method `clear` without defining it here.
+  - CN: 声明函数或方法 `clear`，但不在此处给出定义。
+- **L197** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L198** <code>      // Recover from multi-value string</code>
+  - EN: Comment that documents intent or context: "Recover from multi-value string".
+  - CN: 用于说明意图或上下文的注释："Recover from multi-value string"。
+- **L199** <code>      for (size_t i = 0; i &lt; keys.size(); ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L200** <code>        if (keys[i] == string(arg_name)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L201** <code>          string val_string(values[i]);</code>
+  - EN: Declares function or method `val_string` without defining it here.
+  - CN: 声明函数或方法 `val_string`，但不在此处给出定义。
+- **L202** <code>          separate_string(val_string, vals, sep);</code>
+  - EN: Declares function or method `separate_string` without defining it here.
+  - CN: 声明函数或方法 `separate_string`，但不在此处给出定义。
+- **L203** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L204** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L205** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L206** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L207** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L208** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L209** <code>   * Returns the values specified for a given commandline parameter</code>
+  - EN: Comment that documents intent or context: "Returns the values specified for a given commandline parameter".
+  - CN: 用于说明意图或上下文的注释："Returns the values specified for a given commandline parameter"。
+- **L210** <code>   * --&lt;flag&gt;=&lt;value&gt;,&lt;value_start:value_end&gt;*</code>
+  - EN: Comment that documents intent or context: "--<flag>=<value>,<value_start:value_end>*".
+  - CN: 用于说明意图或上下文的注释："--<flag>=<value>,<value_start:value_end>*"。
+- **L211** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L212** <code>  void get_cmd_line_argument_pairs(const char* arg_name,</code>
+  - EN: Begins or continues the signature/call syntax involving `get_cmd_line_argument_pairs`.
+  - CN: 开始或继续与 `get_cmd_line_argument_pairs` 相关的签名/调用语法。
+- **L213** <code>                                   std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt;&amp; tokens,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L214** <code>                                   char delim = &#x27;,&#x27;,</code>
+  - EN: Assigns or initializes `delim` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `delim` 进行赋值或初始化。
+- **L215** <code>                                   char sep = &#x27;:&#x27;) const {</code>
+  - EN: Assigns or initializes `sep` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep` 进行赋值或初始化。
+- **L216** <code>    if (check_cmd_line_flag(arg_name)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L217** <code>      std::string value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L218** <code>      get_cmd_line_argument(arg_name, value);</code>
+  - EN: Declares function or method `get_cmd_line_argument` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_argument`，但不在此处给出定义。
+- **L219** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L220** <code>      tokenize(tokens, value, delim, sep);</code>
+  - EN: Declares function or method `tokenize` without defining it here.
+  - CN: 声明函数或方法 `tokenize`，但不在此处给出定义。
+- **L221** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L222** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L223** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L224** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L225** <code>   * Returns a list of ranges specified for a given commandline parameter</code>
+  - EN: Comment that documents intent or context: "Returns a list of ranges specified for a given commandline parameter".
+  - CN: 用于说明意图或上下文的注释："Returns a list of ranges specified for a given commandline parameter"。
+- **L226** <code>   * --&lt;flag&gt;=&lt;key:value&gt;,&lt;key:value&gt;*</code>
+  - EN: Comment that documents intent or context: "--<flag>=<key:value>,<key:value>*".
+  - CN: 用于说明意图或上下文的注释："--<flag>=<key:value>,<key:value>*"。
+- **L227** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L228** <code>  void get_cmd_line_argument_ranges(const char* arg_name,</code>
+  - EN: Begins or continues the signature/call syntax involving `get_cmd_line_argument_ranges`.
+  - CN: 开始或继续与 `get_cmd_line_argument_ranges` 相关的签名/调用语法。
+- **L229** <code>                                    std::vector&lt;std::vector&lt;std::string&gt; &gt;&amp; vals,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L230** <code>                                    char delim = &#x27;,&#x27;,</code>
+  - EN: Assigns or initializes `delim` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `delim` 进行赋值或初始化。
+- **L231** <code>                                    char sep = &#x27;:&#x27;) const {</code>
+  - EN: Assigns or initializes `sep` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep` 进行赋值或初始化。
+- **L232** <code>    std::vector&lt;std::string&gt; ranges;</code>
+  - EN: Declares the symbol `ranges` in the current scope.
+  - CN: 在当前作用域中声明符号 `ranges`。
+- **L233** <code>    get_cmd_line_arguments(arg_name, ranges, delim);</code>
+  - EN: Declares function or method `get_cmd_line_arguments` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_arguments`，但不在此处给出定义。
+- **L234** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L235** <code>    for (std::vector&lt;std::string&gt;::const_iterator range = ranges.begin();</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L236** <code>      range != ranges.end(); ++range) {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L237** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L238** <code>      std::vector&lt;std::string&gt; range_vals;</code>
+  - EN: Declares the symbol `range_vals` in the current scope.
+  - CN: 在当前作用域中声明符号 `range_vals`。
+- **L239** <code>      separate_string(*range, range_vals, sep);</code>
+  - EN: Declares function or method `separate_string` without defining it here.
+  - CN: 声明函数或方法 `separate_string`，但不在此处给出定义。
+- **L240** <code>      vals.push_back(range_vals);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L241** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L242** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  /**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L245** <code>   * The number of pairs parsed</code>
+  - EN: Comment that documents intent or context: "The number of pairs parsed".
+  - CN: 用于说明意图或上下文的注释："The number of pairs parsed"。
+- **L246** <code>   */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L247** <code>  int parsed_argc() const { return (int)keys.size(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `size`.
+  - CN: 开始或继续与 `size` 相关的签名/调用语法。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>  //-------------------------------------------------------------------------</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L250** <code>  // Utility functions</code>
+  - EN: Comment that documents intent or context: "Utility functions".
+  - CN: 用于说明意图或上下文的注释："Utility functions"。
+- **L251** <code>  //-------------------------------------------------------------------------</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  /// Tokenizes a comma-delimited list of string pairs delimited by &#x27;:&#x27;</code>
+  - EN: Comment that documents intent or context: "Tokenizes a comma-delimited list of string pairs delimited by ':'".
+  - CN: 用于说明意图或上下文的注释："Tokenizes a comma-delimited list of string pairs delimited by ':'"。
+- **L254** <code>  static void tokenize(std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt;&amp; tokens,</code>
+  - EN: Begins or continues the signature/call syntax involving `tokenize`.
+  - CN: 开始或继续与 `tokenize` 相关的签名/调用语法。
+- **L255** <code>                       std::string const&amp; str,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L256** <code>                       char delim = &#x27;,&#x27;,</code>
+  - EN: Assigns or initializes `delim` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `delim` 进行赋值或初始化。
+- **L257** <code>                       char sep = &#x27;:&#x27;) {</code>
+  - EN: Assigns or initializes `sep` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep` 进行赋值或初始化。
+- **L258** <code>    // Home-built to avoid Boost dependency</code>
+  - EN: Comment that documents intent or context: "Home-built to avoid Boost dependency".
+  - CN: 用于说明意图或上下文的注释："Home-built to avoid Boost dependency"。
+- **L259** <code>    size_t s_idx = 0;</code>
+  - EN: Assigns or initializes `s_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_idx` 进行赋值或初始化。
+- **L260** <code>    size_t d_idx = std::string::npos;</code>
+  - EN: Assigns or initializes `d_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `d_idx` 进行赋值或初始化。
+- **L261** <code>    while (s_idx &lt; str.size()) {</code>
+  - EN: Starts a `while` loop that repeats while its condition remains true.
+  - CN: 开始一个 `while` 循环，只要条件成立就重复执行。
+- **L262** <code>      d_idx = str.find_first_of(delim, s_idx);</code>
+  - EN: Declares function or method `find_first_of` without defining it here.
+  - CN: 声明函数或方法 `find_first_of`，但不在此处给出定义。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>      size_t end_idx = (d_idx != std::string::npos ? d_idx : str.size());</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L265** <code>      size_t sep_idx = str.find_first_of(sep, s_idx);</code>
+  - EN: Declares function or method `find_first_of` without defining it here.
+  - CN: 声明函数或方法 `find_first_of`，但不在此处给出定义。
+- **L266** <code>      size_t offset = 1;</code>
+  - EN: Assigns or initializes `offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `offset` 进行赋值或初始化。
+- **L267** <code>      if (sep_idx == std::string::npos || sep_idx &gt;= end_idx) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L268** <code>        sep_idx = end_idx;</code>
+  - EN: Assigns or initializes `sep_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep_idx` 进行赋值或初始化。
+- **L269** <code>        offset = 0;</code>
+  - EN: Assigns or initializes `offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `offset` 进行赋值或初始化。
+- **L270** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L271** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L272** <code>      std::pair&lt;std::string, std::string&gt; item(</code>
+  - EN: Begins or continues the signature/call syntax involving `item`.
+  - CN: 开始或继续与 `item` 相关的签名/调用语法。
+- **L273** <code>          str.substr(s_idx, sep_idx - s_idx),</code>
+  - EN: Begins or continues the signature/call syntax involving `substr`.
+  - CN: 开始或继续与 `substr` 相关的签名/调用语法。
+- **L274** <code>          str.substr(sep_idx + offset, end_idx - sep_idx - offset));</code>
+  - EN: Declares function or method `substr` without defining it here.
+  - CN: 声明函数或方法 `substr`，但不在此处给出定义。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>      tokens.push_back(item);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L277** <code>      s_idx = end_idx + 1;</code>
+  - EN: Assigns or initializes `s_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_idx` 进行赋值或初始化。
+- **L278** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L279** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>  /// Tokenizes a comma-delimited list of string pairs delimited by &#x27;:&#x27;</code>
+  - EN: Comment that documents intent or context: "Tokenizes a comma-delimited list of string pairs delimited by ':'".
+  - CN: 用于说明意图或上下文的注释："Tokenizes a comma-delimited list of string pairs delimited by ':'"。
+- **L282** <code>  static void tokenize(std::vector&lt;std::string&gt;&amp; tokens,</code>
+  - EN: Begins or continues the signature/call syntax involving `tokenize`.
+  - CN: 开始或继续与 `tokenize` 相关的签名/调用语法。
+- **L283** <code>                       std::string const&amp; str,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L284** <code>                       char delim = &#x27;,&#x27;,</code>
+  - EN: Assigns or initializes `delim` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `delim` 进行赋值或初始化。
+- **L285** <code>                       char sep = &#x27;:&#x27;) {</code>
+  - EN: Assigns or initializes `sep` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep` 进行赋值或初始化。
+- **L286** <code>    typedef std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt; TokenVector;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L287** <code>    typedef TokenVector::const_iterator token_iterator;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L288** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L289** <code>    std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt; token_pairs;</code>
+  - EN: Declares the symbol `token_pairs` in the current scope.
+  - CN: 在当前作用域中声明符号 `token_pairs`。
+- **L290** <code>    tokenize(token_pairs, str, delim, sep);</code>
+  - EN: Declares function or method `tokenize` without defining it here.
+  - CN: 声明函数或方法 `tokenize`，但不在此处给出定义。
+- **L291** <code>    for (token_iterator tok = token_pairs.begin(); tok != token_pairs.end(); ++tok) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L292** <code>      tokens.push_back(tok-&gt;first);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L293** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L294** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L295** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L296** <code>  template &lt;typename value_t&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L297** <code>  static void separate_string(std::string const&amp; str,</code>
+  - EN: Begins or continues the signature/call syntax involving `separate_string`.
+  - CN: 开始或继续与 `separate_string` 相关的签名/调用语法。
+- **L298** <code>                              std::vector&lt;value_t&gt;&amp; vals,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L299** <code>                              char sep = &#x27;,&#x27;) {</code>
+  - EN: Assigns or initializes `sep` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sep` 进行赋值或初始化。
+- **L300** <code>    std::istringstream str_stream(str);</code>
+  - EN: Constructs object `str_stream` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `str_stream`。
+- **L301** <code>    std::string::size_type old_pos = 0;</code>
+  - EN: Assigns or initializes `old_pos` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `old_pos` 进行赋值或初始化。
+- **L302** <code>    std::string::size_type new_pos = 0;</code>
+  - EN: Assigns or initializes `new_pos` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `new_pos` 进行赋值或初始化。
+- **L303** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L304** <code>    // Iterate &lt;sep&gt;-delimited values</code>
+  - EN: Comment that documents intent or context: "Iterate <sep>-delimited values".
+  - CN: 用于说明意图或上下文的注释："Iterate <sep>-delimited values"。
+- **L305** <code>    value_t val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L306** <code>    while ((new_pos = str.find(sep, old_pos)) != std::string::npos) {</code>
+  - EN: Starts a `while` loop that repeats while its condition remains true.
+  - CN: 开始一个 `while` 循环，只要条件成立就重复执行。
+- **L307** <code>      if (new_pos != old_pos) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L308** <code>        str_stream.width(new_pos - old_pos);</code>
+  - EN: Declares function or method `width` without defining it here.
+  - CN: 声明函数或方法 `width`，但不在此处给出定义。
+- **L309** <code>        str_stream &gt;&gt; val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L310** <code>        vals.push_back(val);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L311** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L312** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L313** <code>      // skip over delimiter</code>
+  - EN: Comment that documents intent or context: "skip over delimiter".
+  - CN: 用于说明意图或上下文的注释："skip over delimiter"。
+- **L314** <code>      str_stream.ignore(1);</code>
+  - EN: Declares function or method `ignore` without defining it here.
+  - CN: 声明函数或方法 `ignore`，但不在此处给出定义。
+- **L315** <code>      old_pos = new_pos + 1;</code>
+  - EN: Assigns or initializes `old_pos` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `old_pos` 进行赋值或初始化。
+- **L316** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L317** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L318** <code>    // Read last value</code>
+  - EN: Comment that documents intent or context: "Read last value".
+  - CN: 用于说明意图或上下文的注释："Read last value"。
+- **L319** <code>    str_stream &gt;&gt; val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L320** <code>    vals.push_back(val);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L321** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L322** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L323** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L324** <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Tooling entry points and command-line handling / 工具入口与命令行处理
+
+## Dependencies / 依赖关系
+
+- <code>iostream</code> — standard stream input/output support / 标准流输入输出支持
+- <code>limits</code> — numeric limits / 数值范围定义
+- <code>sstream</code> — string-based stream utilities / 基于字符串的流工具
+- <code>string</code> — string utilities / 字符串工具
+- <code>vector</code> — dynamic array containers / 动态数组容器
+- <code>unordered_map</code> — hash-map containers / 哈希映射容器
+- <code>cuda_runtime.h</code> — project-specific declarations from `cuda_runtime.h` / 来自 `cuda_runtime.h` 的项目专用声明
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明

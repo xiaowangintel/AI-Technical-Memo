@@ -1,0 +1,461 @@
+# test_sparse_utils.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `examples/python/CuTeDSL/utils/test_sparse_utils.py`
+**Purpose / 用途**: This file defines automated tests for test sparse utils. / 该文件定义了针对 test sparse utils 的自动化测试。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `import sparse_utils as su`
+  - EN: Imports `sparse_utils` so its symbols are available to the test module.
+  - CN: 导入 `sparse_utils`，使其符号可供该测试模块使用。
+- **Line 2 / 第2行**
+  - Code / 代码: `import cutlass`
+  - EN: Imports `cutlass` so its symbols are available to the test module.
+  - CN: 导入 `cutlass`，使其符号可供该测试模块使用。
+- **Line 3 / 第3行**
+  - Code / 代码: `import torch`
+  - EN: Imports `torch` so its symbols are available to the test module.
+  - CN: 导入 `torch`，使其符号可供该测试模块使用。
+- **Line 4 / 第4行**
+  - Code / 代码: `from cutlass.cute.runtime import from_dlpack`
+  - EN: Imports selected symbols from `cutlass.cute.runtime` for later use.
+  - CN: 从 `cutlass.cute.runtime` 导入选定符号以供后续使用。
+- **Line 5 / 第5行**
+  - Code / 代码: `import numpy as np`
+  - EN: Imports `numpy` so its symbols are available to the test module.
+  - CN: 导入 `numpy`，使其符号可供该测试模块使用。
+- **Line 6 / 第6行**
+  - Code / 代码: `import pytest`
+  - EN: Imports `pytest` so its symbols are available to the test module.
+  - CN: 导入 `pytest`，使其符号可供该测试模块使用。
+- **Line 7 / 第7行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 8 / 第8行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 9 / 第9行**
+  - Code / 代码: `@pytest.mark.L0`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 10 / 第10行**
+  - Code / 代码: `def test_sparse_cpu():`
+  - EN: Defines function `test_sparse_cpu`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_sparse_cpu`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 11 / 第11行**
+  - Code / 代码: `    M = 128`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 12 / 第12行**
+  - Code / 代码: `    N = 32`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 13 / 第13行**
+  - Code / 代码: `    K = 32`
+  - EN: Defines module-level constant `K` used later in the file.
+  - CN: 定义模块级常量 `K`，供后续代码使用。
+- **Line 14 / 第14行**
+  - Code / 代码: `    L = 1`
+  - EN: Defines module-level constant `L` used later in the file.
+  - CN: 定义模块级常量 `L`，供后续代码使用。
+- **Line 15 / 第15行**
+  - Code / 代码: `    debug = False`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 16 / 第16行**
+  - Code / 代码: `    # generate sparse tensor`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `    a = torch.empty(M, K).random_(-5, 5).to(torch.float16)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 18 / 第18行**
+  - Code / 代码: `    sparse_utils = su.SparseUtils(M, K, L, cutlass.Float16)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 19 / 第19行**
+  - Code / 代码: `    if debug:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 20 / 第20行**
+  - Code / 代码: `        sparse_utils.use_specific_meta_data()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 21 / 第21行**
+  - Code / 代码: `    a_gen_from_cpu = sparse_utils.generate_sparse_4_2_tensor_with_tensor(a, True)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 22 / 第22行**
+  - Code / 代码: `    # print(a_gen_from_cpu)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `    # generate compressed tensor and meta data`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `    a_compressed_cpu = torch.empty(M, K // 2).to(torch.float16)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 25 / 第25行**
+  - Code / 代码: `    meta_data_cpu = torch.empty(M, K // 4 // 8).to(torch.uint32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 26 / 第26行**
+  - Code / 代码: `    compressor = su.Compressor(M, K, L)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 27 / 第27行**
+  - Code / 代码: `    compressor.compress(a_gen_from_cpu, a_compressed_cpu, meta_data_cpu, True)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 28 / 第28行**
+  - Code / 代码: `    # # test with gemm`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 29 / 第29行**
+  - Code / 代码: `    b = torch.empty(N, K).random_(-5, 5).to(torch.float16).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 30 / 第30行**
+  - Code / 代码: `    d = torch.empty(M, N).zero_().to(torch.float16).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 31 / 第31行**
+  - Code / 代码: `    b_tensor = from_dlpack(b)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 32 / 第32行**
+  - Code / 代码: `    d_tensor = from_dlpack(d)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 33 / 第33行**
+  - Code / 代码: `    a_compressed_cpu_tensor = from_dlpack(a_compressed_cpu.cuda())`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 34 / 第34行**
+  - Code / 代码: `    meta_data_cpu_tensor = from_dlpack(meta_data_cpu.cuda())`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 35 / 第35行**
+  - Code / 代码: `    sparse_emulation = su.SparseEmulation(M, N, K, 1)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 36 / 第36行**
+  - Code / 代码: `    sparse_emulation(a_compressed_cpu_tensor, b_tensor, d_tensor, meta_data_cpu_tensor)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 37 / 第37行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 38 / 第38行**
+  - Code / 代码: `    ref = torch.einsum("mk,nk->mn", a_gen_from_cpu.cpu(), b.cpu())`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 39 / 第39行**
+  - Code / 代码: `    if debug:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 40 / 第40行**
+  - Code / 代码: `        a_ori = a_gen_from_cpu.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 41 / 第41行**
+  - Code / 代码: `        np.savetxt("a.txt", a_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 42 / 第42行**
+  - Code / 代码: `        a_compressed_cpu_ori = a_compressed_cpu.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 43 / 第43行**
+  - Code / 代码: `        np.savetxt("a_compressed_cpu.txt", a_compressed_cpu_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 44 / 第44行**
+  - Code / 代码: `        meta_data_cpu_ori = meta_data_cpu.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 45 / 第45行**
+  - Code / 代码: `        np.savetxt("meta_data_cpu.txt", meta_data_cpu_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 46 / 第46行**
+  - Code / 代码: `        d_ori = d.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 47 / 第47行**
+  - Code / 代码: `        np.savetxt("d.txt", d_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 48 / 第48行**
+  - Code / 代码: `        ref_ori = ref.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 49 / 第49行**
+  - Code / 代码: `        np.savetxt("ref.txt", ref_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 50 / 第50行**
+  - Code / 代码: `    torch.testing.assert_close(d.cpu(), ref)`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 51 / 第51行**
+  - Code / 代码: `    print("cpu d == ref")`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 52 / 第52行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 53 / 第53行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 54 / 第54行**
+  - Code / 代码: `@pytest.mark.L0`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 55 / 第55行**
+  - Code / 代码: `def test_sparse_cuda():`
+  - EN: Defines function `test_sparse_cuda`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_sparse_cuda`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 56 / 第56行**
+  - Code / 代码: `    M = 128`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 57 / 第57行**
+  - Code / 代码: `    N = 32`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 58 / 第58行**
+  - Code / 代码: `    K = 32`
+  - EN: Defines module-level constant `K` used later in the file.
+  - CN: 定义模块级常量 `K`，供后续代码使用。
+- **Line 59 / 第59行**
+  - Code / 代码: `    L = 1`
+  - EN: Defines module-level constant `L` used later in the file.
+  - CN: 定义模块级常量 `L`，供后续代码使用。
+- **Line 60 / 第60行**
+  - Code / 代码: `    debug = False`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 61 / 第61行**
+  - Code / 代码: `    sparse_utils = su.SparseUtils(M, K, L, cutlass.Float16)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 62 / 第62行**
+  - Code / 代码: `    if debug:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 63 / 第63行**
+  - Code / 代码: `        sparse_utils.use_specific_meta_data()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 64 / 第64行**
+  - Code / 代码: `    # generate sparse tensor`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 65 / 第65行**
+  - Code / 代码: `    a = torch.empty(M, K).random_(-5, 5).to(torch.float16).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 66 / 第66行**
+  - Code / 代码: `    a_gen_from_cuda = sparse_utils.generate_4_2_sparse_tensor(False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 67 / 第67行**
+  - Code / 代码: `    # print(a_gen_from_cuda)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 68 / 第68行**
+  - Code / 代码: `    # generate compressed tensor and meta data`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 69 / 第69行**
+  - Code / 代码: `    a_compressed_cuda = torch.empty(M, K // 2).to(torch.float16).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 70 / 第70行**
+  - Code / 代码: `    meta_data_cuda = torch.empty(M, K // 4 // 8).to(torch.uint32).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 71 / 第71行**
+  - Code / 代码: `    compressor = su.Compressor(M, K, L)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 72 / 第72行**
+  - Code / 代码: `    compressor.compress(a_gen_from_cuda, a_compressed_cuda, meta_data_cuda, False)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 73 / 第73行**
+  - Code / 代码: `    # test with gemm`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 74 / 第74行**
+  - Code / 代码: `    b = torch.empty(N, K).random_(-5, 5).to(torch.float16).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 75 / 第75行**
+  - Code / 代码: `    d = torch.empty(M, N).zero_().to(torch.float16).cuda()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 76 / 第76行**
+  - Code / 代码: `    b_tensor = from_dlpack(b)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 77 / 第77行**
+  - Code / 代码: `    d_tensor = from_dlpack(d)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 78 / 第78行**
+  - Code / 代码: `    a_compressed_cuda_tensor = from_dlpack(a_compressed_cuda)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 79 / 第79行**
+  - Code / 代码: `    meta_data_cuda_tensor = from_dlpack(meta_data_cuda)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 80 / 第80行**
+  - Code / 代码: `    sparse_emulation = su.SparseEmulation(M, N, K, 1)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 81 / 第81行**
+  - Code / 代码: `    sparse_emulation(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 82 / 第82行**
+  - Code / 代码: `        a_compressed_cuda_tensor, b_tensor, d_tensor, meta_data_cuda_tensor`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 83 / 第83行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 84 / 第84行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 85 / 第85行**
+  - Code / 代码: `    ref = torch.einsum("mk,nk->mn", a_gen_from_cuda.cpu(), b.cpu())`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 86 / 第86行**
+  - Code / 代码: `    if debug:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 87 / 第87行**
+  - Code / 代码: `        a_ori = a_gen_from_cuda.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 88 / 第88行**
+  - Code / 代码: `        np.savetxt("a.txt", a_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 89 / 第89行**
+  - Code / 代码: `        a_compressed_cuda_ori = a_compressed_cuda.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 90 / 第90行**
+  - Code / 代码: `        np.savetxt("a_compressed_cuda.txt", a_compressed_cuda_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 91 / 第91行**
+  - Code / 代码: `        meta_data_cuda_ori = meta_data_cuda.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 92 / 第92行**
+  - Code / 代码: `        np.savetxt("meta_data_cuda.txt", meta_data_cuda_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 93 / 第93行**
+  - Code / 代码: `        d_ori = d.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 94 / 第94行**
+  - Code / 代码: `        np.savetxt("d.txt", d_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 95 / 第95行**
+  - Code / 代码: `        ref_ori = ref.cpu().numpy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 96 / 第96行**
+  - Code / 代码: `        np.savetxt("ref.txt", ref_ori, fmt="%f")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 97 / 第97行**
+  - Code / 代码: `    torch.testing.assert_close(d.cpu(), ref)`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 98 / 第98行**
+  - Code / 代码: `    print("cuda d == ref")`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 99 / 第99行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 100 / 第100行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 101 / 第101行**
+  - Code / 代码: `if __name__ == "__main__":`
+  - EN: Adds the standard script entry guard for direct execution.
+  - CN: 加入标准脚本入口保护，以支持直接执行。
+- **Line 102 / 第102行**
+  - Code / 代码: `    cutlass.cuda.initialize_cuda_context()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 103 / 第103行**
+  - Code / 代码: `    test_sparse_cpu()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 104 / 第104行**
+  - Code / 代码: `    test_sparse_cuda()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+
+## Key Concepts / 关键概念
+
+- **EN**: Uses pytest markers, parametrization, or hooks to organize automated test coverage.
+  **CN**: 使用 pytest 的标记、参数化或钩子来组织自动化测试覆盖。
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Relates to CuTeDSL-based examples or testing utilities.
+  **CN**: 与基于 CuTeDSL 的示例或测试工具有关。
+- **EN**: Focuses on GEMM kernels, configurations, or correctness checks.
+  **CN**: 聚焦 GEMM 内核、配置或正确性检查。
+- **EN**: Covers sparse layouts, compressed operands, or sparse-kernel behavior.
+  **CN**: 覆盖稀疏布局、压缩操作数或稀疏内核行为。
+
+## Dependencies / 依赖项
+
+- `sparse_utils`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `cutlass`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `torch`
+  - EN: Provides tensor creation, GPU execution, and reference math helpers.
+  - CN: 提供张量创建、GPU 执行与参考数学辅助功能。
+- `cutlass.cute.runtime`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `numpy`
+  - EN: Provides array manipulation or numerical reference utilities.
+  - CN: 提供数组处理或数值参考工具。
+- `pytest`
+  - EN: Provides the Python test runner, markers, and parametrization helpers.
+  - CN: 提供 Python 测试运行器、标记与参数化辅助功能。

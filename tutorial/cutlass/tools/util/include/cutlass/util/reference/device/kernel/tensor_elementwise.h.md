@@ -1,0 +1,522 @@
+# tensor_elementwise.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/device/kernel/tensor_elementwise.h`
+**Purpose / 用途**: Provides a device-side reference implementation or helper for tensor elementwise. / 为 tensor elementwise 提供设备端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>#include &lt;curand_kernel.h&gt;</code>
+  - EN: Includes `curand_kernel.h` so this file can use project-specific declarations from `curand_kernel.h`.
+  - CN: 引入 `curand_kernel.h`，使当前文件可以使用来自 `curand_kernel.h` 的项目专用声明。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L39** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L40** <code>namespace device {</code>
+  - EN: Opens namespace `device` to group related symbols.
+  - CN: 打开命名空间 `device`，用于归组相关符号。
+- **L41** <code>namespace kernel {</code>
+  - EN: Opens namespace `kernel` to group related symbols.
+  - CN: 打开命名空间 `kernel`，用于归组相关符号。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>/// Kernel to initialize tensor to uniform random distribution</code>
+  - EN: Comment that documents intent or context: "Kernel to initialize tensor to uniform random distribution".
+  - CN: 用于说明意图或上下文的注释："Kernel to initialize tensor to uniform random distribution"。
+- **L46** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L47** <code>__global__ void TensorInitializeUniform(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorInitializeUniform`.
+  - CN: 开始或继续与 `TensorInitializeUniform` 相关的签名/调用语法。
+- **L48** <code>    Distribution dist, int64_t seed, int dim_contiguous, int dim_strided, T *tensor, int ldm) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L49** <code>  __shared__ curandState_t rng_state[1024];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>  uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x + blockIdx.y * gridDim.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>  curand_init(seed, gtid, 0, &amp;rng_state[threadIdx.x]);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>  int c_idx = blockIdx.x * blockDim.x + threadIdx.x;</code>
+  - EN: Assigns or initializes `c_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_idx` 进行赋值或初始化。
+- **L56** <code>  int s_idx = blockIdx.y * blockDim.x;</code>
+  - EN: Assigns or initializes `s_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_idx` 进行赋值或初始化。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>  tensor += s_idx * ldm + c_idx;</code>
+  - EN: Declares the symbol `c_idx` in the current scope.
+  - CN: 在当前作用域中声明符号 `c_idx`。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>  for (int s_offset = 0; s_offset &lt; blockDim.x; ++s_offset, ++s_idx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L61** <code>    if (s_idx &lt; dim_strided &amp;&amp; c_idx &lt; dim_contiguous) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L62** <code>      double range = dist.uniform.max - dist.uniform.min;</code>
+  - EN: Assigns or initializes `range` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `range` 进行赋值或初始化。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>      double rnd = curand_uniform(&amp;rng_state[threadIdx.x]);</code>
+  - EN: Declares function or method `curand_uniform` without defining it here.
+  - CN: 声明函数或方法 `curand_uniform`，但不在此处给出定义。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>      rnd = dist.uniform.min + range * rnd;</code>
+  - EN: Assigns or initializes `rnd` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd` 进行赋值或初始化。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>      // Random values are cast to integer after scaling by a power of two to facilitate error</code>
+  - EN: Comment that documents intent or context: "Random values are cast to integer after scaling by a power of two to facilitate error".
+  - CN: 用于说明意图或上下文的注释："Random values are cast to integer after scaling by a power of two to facilitate error"。
+- **L69** <code>      // testing</code>
+  - EN: Comment that documents intent or context: "testing".
+  - CN: 用于说明意图或上下文的注释："testing"。
+- **L70** <code>      if (dist.int_scale &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L71** <code>        rnd = double(int(rnd * double(1 &lt;&lt; dist.int_scale)));</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L72** <code>        *tensor = T(rnd / double(1 &lt;&lt; dist.int_scale));</code>
+  - EN: Comment that documents intent or context: "tensor = T(rnd / double(1 << dist.int_scale));".
+  - CN: 用于说明意图或上下文的注释："tensor = T(rnd / double(1 << dist.int_scale));"。
+- **L73** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L74** <code>        *tensor = T(rnd);</code>
+  - EN: Comment that documents intent or context: "tensor = T(rnd);".
+  - CN: 用于说明意图或上下文的注释："tensor = T(rnd);"。
+- **L75** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>      tensor += ldm;</code>
+  - EN: Declares the symbol `ldm` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldm`。
+- **L78** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L79** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L80** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L83** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L84** <code>/// Kernel to initialize tensor to uniform distribution</code>
+  - EN: Comment that documents intent or context: "Kernel to initialize tensor to uniform distribution".
+  - CN: 用于说明意图或上下文的注释："Kernel to initialize tensor to uniform distribution"。
+- **L85** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L86** <code>__global__ void TensorInitializeGaussian(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorInitializeGaussian`.
+  - CN: 开始或继续与 `TensorInitializeGaussian` 相关的签名/调用语法。
+- **L87** <code>    Distribution dist, int64_t seed, int dim_contiguous, int dim_strided, T *tensor, int ldm) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L88** <code>  __shared__ curandState_t rng_state[1024];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>  uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x + blockIdx.y * gridDim.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>  curand_init(seed, gtid, 0, &amp;rng_state[threadIdx.x]);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>  int c_idx = blockIdx.x * blockDim.x + threadIdx.x;</code>
+  - EN: Assigns or initializes `c_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_idx` 进行赋值或初始化。
+- **L95** <code>  int s_idx = blockIdx.y * blockDim.x;</code>
+  - EN: Assigns or initializes `s_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_idx` 进行赋值或初始化。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>  tensor += s_idx * ldm + c_idx;</code>
+  - EN: Declares the symbol `c_idx` in the current scope.
+  - CN: 在当前作用域中声明符号 `c_idx`。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>  for (int s_offset = 0; s_offset &lt; blockDim.x; ++s_offset, ++s_idx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L100** <code>    if (s_idx &lt; dim_strided &amp;&amp; c_idx &lt; dim_contiguous) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L101** <code>      // Random values are cast to integer after scaling by a power of two to facilitate error</code>
+  - EN: Comment that documents intent or context: "Random values are cast to integer after scaling by a power of two to facilitate error".
+  - CN: 用于说明意图或上下文的注释："Random values are cast to integer after scaling by a power of two to facilitate error"。
+- **L102** <code>      // testing</code>
+  - EN: Comment that documents intent or context: "testing".
+  - CN: 用于说明意图或上下文的注释："testing"。
+- **L103** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L104** <code>      double rnd = curand_normal(&amp;rng_state[threadIdx.x]);</code>
+  - EN: Declares function or method `curand_normal` without defining it here.
+  - CN: 声明函数或方法 `curand_normal`，但不在此处给出定义。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>      rnd = dist.gaussian.mean + dist.gaussian.stddev * rnd;</code>
+  - EN: Assigns or initializes `rnd` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd` 进行赋值或初始化。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>      if (dist.int_scale &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L109** <code>        rnd = double(int(rnd * double(1 &lt;&lt; dist.int_scale)));</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L110** <code>        *tensor = T(rnd / double(1 &lt;&lt; dist.int_scale));</code>
+  - EN: Comment that documents intent or context: "tensor = T(rnd / double(1 << dist.int_scale));".
+  - CN: 用于说明意图或上下文的注释："tensor = T(rnd / double(1 << dist.int_scale));"。
+- **L111** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L112** <code>        *tensor = T(rnd);</code>
+  - EN: Comment that documents intent or context: "tensor = T(rnd);".
+  - CN: 用于说明意图或上下文的注释："tensor = T(rnd);"。
+- **L113** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L114** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L116** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L117** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L118** <code>/// Kernel to initialize tensor to an identity matrix</code>
+  - EN: Comment that documents intent or context: "Kernel to initialize tensor to an identity matrix".
+  - CN: 用于说明意图或上下文的注释："Kernel to initialize tensor to an identity matrix"。
+- **L119** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L120** <code>__global__ void TensorInitializeLinear(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorInitializeLinear`.
+  - CN: 开始或继续与 `TensorInitializeLinear` 相关的签名/调用语法。
+- **L121** <code>    Distribution dist, int64_t seed, int dim_contiguous, int dim_strided, T *tensor, int ldm) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L122** <code>  __shared__ curandState_t rng_state[1024];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>  uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x + blockIdx.y * gridDim.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L125** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L126** <code>  curand_init(seed, gtid, 0, &amp;rng_state[threadIdx.x]);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>  int c_idx = blockIdx.x * blockDim.x + threadIdx.x;</code>
+  - EN: Assigns or initializes `c_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_idx` 进行赋值或初始化。
+- **L129** <code>  int s_idx = blockIdx.y * blockDim.x;</code>
+  - EN: Assigns or initializes `s_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_idx` 进行赋值或初始化。
+- **L130** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L131** <code>  tensor += s_idx * ldm + c_idx;</code>
+  - EN: Declares the symbol `c_idx` in the current scope.
+  - CN: 在当前作用域中声明符号 `c_idx`。
+- **L132** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L133** <code>  for (int s_offset = 0; s_offset &lt; blockDim.x; ++s_offset, ++s_idx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L134** <code>    if (s_idx &lt; dim_strided &amp;&amp; c_idx &lt; dim_contiguous) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L135** <code>      *tensor =</code>
+  - EN: Comment that documents intent or context: "tensor =".
+  - CN: 用于说明意图或上下文的注释："tensor ="。
+- **L136** <code>          dist.linear.offset + dist.linear.delta_row * c_idx + dist.linear.delta_column * s_idx;</code>
+  - EN: Declares the symbol `s_idx` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_idx`。
+- **L137** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L138** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L139** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>/// Kernel to initialize tensor to an identity matrix</code>
+  - EN: Comment that documents intent or context: "Kernel to initialize tensor to an identity matrix".
+  - CN: 用于说明意图或上下文的注释："Kernel to initialize tensor to an identity matrix"。
+- **L142** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L143** <code>__global__ void TensorInitializeIdentity(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorInitializeIdentity`.
+  - CN: 开始或继续与 `TensorInitializeIdentity` 相关的签名/调用语法。
+- **L144** <code>    Distribution dist, int64_t seed, int dim_contiguous, int dim_strided, T *tensor, int ldm) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L145** <code>  __shared__ curandState_t rng_state[1024];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L146** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L147** <code>  uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x + blockIdx.y * gridDim.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>  curand_init(seed, gtid, 0, &amp;rng_state[threadIdx.x]);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>  int c_idx = blockIdx.x * blockDim.x + threadIdx.x;</code>
+  - EN: Assigns or initializes `c_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_idx` 进行赋值或初始化。
+- **L152** <code>  int s_idx = blockIdx.y * blockDim.x;</code>
+  - EN: Assigns or initializes `s_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_idx` 进行赋值或初始化。
+- **L153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L154** <code>  tensor += s_idx * ldm + c_idx;</code>
+  - EN: Declares the symbol `c_idx` in the current scope.
+  - CN: 在当前作用域中声明符号 `c_idx`。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>  for (int s_offset = 0; s_offset &lt; blockDim.x; ++s_offset, ++s_idx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L157** <code>    if (s_idx &lt; dim_strided &amp;&amp; c_idx &lt; dim_contiguous) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L158** <code>      *tensor = (c_idx == s_idx ? T(1) : T(0));</code>
+  - EN: Comment that documents intent or context: "tensor = (c_idx == s_idx ? T(1) : T(0));".
+  - CN: 用于说明意图或上下文的注释："tensor = (c_idx == s_idx ? T(1) : T(0));"。
+- **L159** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L160** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L161** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L165** <code>} // namespace kernel</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L166** <code>} // namespace device</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L167** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L168** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>curand_kernel.h</code> — project-specific declarations from `curand_kernel.h` / 来自 `curand_kernel.h` 的项目专用声明
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明

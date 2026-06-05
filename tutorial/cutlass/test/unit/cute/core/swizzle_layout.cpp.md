@@ -1,0 +1,400 @@
+# swizzle_layout.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/swizzle_layout.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `swizzle layout` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `swizzle layout` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <cute/tensor_impl.hpp>`
+  - EN: Provides CuTe `tensor_impl` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `tensor_impl` 功能。
+- **Line 37**: `#include <cute/swizzle_layout.hpp>`
+  - EN: Provides layout wrappers that combine base layouts with swizzle transforms.
+  - CN: 提供把基础布局与 swizzle 变换组合起来的布局包装器。
+- **Line 38**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: `template <class SwLayout>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 40**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 41**: `test_swizzle_2d(SwLayout const& sw_layout)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 42**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 43**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 44**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 45**: `  auto sw_tensor = make_tensor(counting_iterator<int>{0}, sw_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 46**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 47**: `  //print_tensor(sw_tensor);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `  // Dynamic slicing`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 50**: `  for (int i = 0; i < size<0>(sw_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 51**: `    auto sliced_tensor = sw_tensor(i,_);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 52**: `    //printf("sw_tensor(%d,_) => ", int(i)); print(sliced_tensor); printf("\n");`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 53**: `    for (int j = 0; j < size<1>(sw_tensor); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 54**: `      EXPECT_EQ(sw_tensor(i,j), sliced_tensor(j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 55**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 56**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `  // Static slicing`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 59**: `  cute::for_each(make_int_sequence<size<0>(sw_tensor)>{}, [&] (auto i) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 60**: `    auto sliced_tensor = sw_tensor(i,_);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 61**: `    //printf("sw_tensor(%d,_) => ", int(i)); print(sliced_tensor); printf("\n");`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 62**: `    // If sw_tensor is static, then sliced_tensor should be too`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 63**: `    auto sw_tensor_2 = sw_tensor;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 64**: `    static_assert(is_static<decltype(layout(sliced_tensor))>::value || not is_static<decltype(layout(sw_tensor_2))>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 65**: `    cute::for_each(make_int_sequence<size(sliced_tensor)>{}, [&] (auto j) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 66**: `      EXPECT_EQ(sw_tensor(i,j), sliced_tensor(j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 67**: `    });`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 68**: `  });`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 69**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: `  // Dynamic slicing`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 71**: `  for (int j = 0; j < size<1>(sw_tensor); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 72**: `    auto sliced_tensor = sw_tensor(_,j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 73**: `    //printf("sw_tensor(_,%d) => ", int(j)); print(sliced_tensor); printf("\n");`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 74**: `    for (int i = 0; i < size<0>(sw_tensor); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 75**: `      EXPECT_EQ(sw_tensor(i,j), sliced_tensor(i));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 76**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 77**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 78**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 79**: `  // Static slicing`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 80**: `  cute::for_each(make_int_sequence<size<1>(sw_tensor)>{}, [&] (auto j) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 81**: `    auto sliced_tensor = sw_tensor(_,j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 82**: `    //printf("sw_tensor(_,%d) => ", int(j)); print(sliced_tensor); printf("\n");`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 83**: `    // If sw_tensor is static, then sliced_tensor should be too`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 84**: `    auto sw_tensor_2 = sw_tensor;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 85**: `    static_assert(is_static<decltype(layout(sliced_tensor))>::value || not is_static<decltype(layout(sw_tensor_2))>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 86**: `    cute::for_each(make_int_sequence<size(sliced_tensor)>{}, [&] (auto i) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 87**: `      EXPECT_EQ(sw_tensor(i,j), sliced_tensor(i));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 88**: `    });`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 89**: `  });`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 90**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 91**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 92**: `TEST(CuTe_core, SwizzleLayout)`
+  - EN: Declares GoogleTest case `CuTe_core::SwizzleLayout` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::SwizzleLayout`，用于验证一个具体的 CuTe 场景。
+- **Line 93**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 94**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 95**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 96**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 97**: `  auto sw_layout = composition(Swizzle<3,0,3>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 98**: `                               Layout<Shape <_8,_8>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 99**: `                                      Stride<_8,_1>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 100**: `  test_swizzle_2d(sw_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 101**: `  }`
+  - EN: Closes the scope for `test CuTe_core::SwizzleLayout`.
+  - CN: 结束 `test CuTe_core::SwizzleLayout` 的作用域。
+- **Line 102**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 103**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 104**: `  auto sw_layout = composition(Swizzle<3,0,-3>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 105**: `                               Layout<Shape <_8,_8>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 106**: `                                      Stride<_8,_1>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 107**: `  test_swizzle_2d(sw_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 108**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 109**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 110**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 111**: `  auto sw_layout = composition(Swizzle<2,1,3>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 112**: `                               Layout<Shape <Shape < _2,_2,_2>,Shape <_2,_2, _2>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 113**: `                                      Stride<Stride<_32,_2,_8>,Stride<_4,_1,_16>>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 114**: `  test_swizzle_2d(sw_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 115**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 116**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `static_assert`
+  - EN: Checks a property at compile time before the binary can be produced.
+  - CN: 在生成二进制文件之前，于编译期检查某个性质。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `make_tensor`
+  - EN: Builds a CuTe tensor object from a pointer and a layout.
+  - CN: 从指针和布局构造一个 CuTe 张量对象。
+- `composition(`
+  - EN: Composes multiple layout transforms into one mapping.
+  - CN: 把多个布局变换组合成一个映射。
+- `Swizzle<`
+  - EN: Models swizzled address mappings that match hardware-friendly shared-memory layouts.
+  - CN: 建模 swizzle 地址映射，以匹配硬件友好的共享内存布局。
+- `layout-algebra`
+  - EN: The file focuses on layout construction, transformation, and coordinate mapping.
+  - CN: 该文件关注布局构造、变换与坐标映射。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/tensor_impl.hpp`
+  - EN: Provides CuTe `tensor_impl` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `tensor_impl` 功能。
+- `cute/swizzle_layout.hpp`
+  - EN: Provides layout wrappers that combine base layouts with swizzle transforms.
+  - CN: 提供把基础布局与 swizzle 变换组合起来的布局包装器。

@@ -1,0 +1,128 @@
+# frontend.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/frontend.py`
+
+## Purpose / 作用
+- EN: Defines 4 classes (NumpyFrontend, TorchFrontend, CupyFrontend, TensorFrontend) in `cutlass_cppgen.backend.frontend`.
+- CN: 该模块 `cutlass_cppgen.backend.frontend` 定义了 4 个类（NumpyFrontend, TorchFrontend, CupyFrontend, TensorFrontend）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L35** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L36** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `from cutlass_cppgen.backend.memory_manager import device_mem_alloc, todevice` — **EN:** Imports device_mem_alloc, todevice from `cutlass_cppgen.backend.memory_manager`. **CN:** 从 `cutlass_cppgen.backend.memory_manager` 导入 device_mem_alloc, todevice。
+- **L39** `from cutlass_cppgen.utils.datatypes import is_cupy_tensor, is_numpy_tensor, is_torch_tensor` — **EN:** Imports is_cupy_tensor, is_numpy_tensor, is_torch_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_cupy_tensor, is_numpy_tensor, is_torch_tensor。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `class NumpyFrontend:` — **EN:** Defines class `NumpyFrontend`. **CN:** 定义类 `NumpyFrontend`。
+- **L43** `    """` — **EN:** Starts the docstring for the class `NumpyFrontend`. **CN:** 开始说明 class `NumpyFrontend` 的文档字符串。
+- **L44** `    Frontend node for numpy` — **EN:** Continues the docstring for the class `NumpyFrontend`. **CN:** 继续说明 class `NumpyFrontend` 的文档字符串。
+- **L45** `    """` — **EN:** Ends the docstring for the class `NumpyFrontend`. **CN:** 结束说明 class `NumpyFrontend` 的文档字符串。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L48** `    def argument(np_tensor: "np.ndarray", is_output: "bool") -> cuda.CUdeviceptr:` — **EN:** Defines function `argument`. **CN:** 定义函数 `argument`。
+- **L49** `        """Convert the input numpy tensor to CUDA device pointer` — **EN:** Starts the docstring for the function `argument`. **CN:** 开始说明 function `argument` 的文档字符串。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `        :param np_tensor: input numpy nd array` — **EN:** Continues the docstring for the function `argument`. **CN:** 继续说明 function `argument` 的文档字符串。
+- **L52** `        :param is_output: whether the tensor is output` — **EN:** Continues the docstring for the function `argument`. **CN:** 继续说明 function `argument` 的文档字符串。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `        :return: CUDA device pointer` — **EN:** Continues the docstring for the function `argument`. **CN:** 继续说明 function `argument` 的文档字符串。
+- **L55** `        """` — **EN:** Ends the docstring for the function `argument`. **CN:** 结束说明 function `argument` 的文档字符串。
+- **L56** `        # copy the data to device` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** `        if is_output:` — **EN:** Starts a conditional branch guarded by `is_output`. **CN:** 开始一个由 `is_output` 控制的条件分支。
+- **L58** `            return device_mem_alloc(np_tensor.size * np_tensor.itemsize)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L60** `            return todevice(np_tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `class TorchFrontend:` — **EN:** Defines class `TorchFrontend`. **CN:** 定义类 `TorchFrontend`。
+- **L64** `    """` — **EN:** Starts the docstring for the class `TorchFrontend`. **CN:** 开始说明 class `TorchFrontend` 的文档字符串。
+- **L65** `    Frontend node for torch` — **EN:** Continues the docstring for the class `TorchFrontend`. **CN:** 继续说明 class `TorchFrontend` 的文档字符串。
+- **L66** `    """` — **EN:** Ends the docstring for the class `TorchFrontend`. **CN:** 结束说明 class `TorchFrontend` 的文档字符串。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L69** `    def argument(torch_tensor: "torch.Tensor") -> cuda.CUdeviceptr:` — **EN:** Defines function `argument`. **CN:** 定义函数 `argument`。
+- **L70** `        """Convert the input torch tensor to CUDA device pointer` — **EN:** Starts the docstring for the function `argument`. **CN:** 开始说明 function `argument` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `        :param torch_tensor: input torch tensor` — **EN:** Continues the docstring for the function `argument`. **CN:** 继续说明 function `argument` 的文档字符串。
+- **L73** `        :param is_output: whether the tensor is output` — **EN:** Continues the docstring for the function `argument`. **CN:** 继续说明 function `argument` 的文档字符串。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `        :return: CUDA device pointer` — **EN:** Continues the docstring for the function `argument`. **CN:** 继续说明 function `argument` 的文档字符串。
+- **L76** `        """` — **EN:** Ends the docstring for the function `argument`. **CN:** 结束说明 function `argument` 的文档字符串。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `        # check the device of torch_tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `        if not torch_tensor.is_cuda:` — **EN:** Starts a conditional branch guarded by `not torch_tensor.is_cuda`. **CN:** 开始一个由 `not torch_tensor.is_cuda` 控制的条件分支。
+- **L80** `            torch_tensor = torch_tensor.to("cuda")` — **EN:** Assigns a value to torch_tensor. **CN:** 将一个值赋给 torch_tensor。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `        return cuda.CUdeviceptr(torch_tensor.data_ptr())` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `class CupyFrontend:` — **EN:** Defines class `CupyFrontend`. **CN:** 定义类 `CupyFrontend`。
+- **L86** `    """` — **EN:** Starts the docstring for the class `CupyFrontend`. **CN:** 开始说明 class `CupyFrontend` 的文档字符串。
+- **L87** `    Frontend node for cupy` — **EN:** Continues the docstring for the class `CupyFrontend`. **CN:** 继续说明 class `CupyFrontend` 的文档字符串。
+- **L88** `    """` — **EN:** Ends the docstring for the class `CupyFrontend`. **CN:** 结束说明 class `CupyFrontend` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L91** `    def argument(cupy_ndarray: "cp.ndarray"):` — **EN:** Defines function `argument`. **CN:** 定义函数 `argument`。
+- **L92** `        return cuda.CUdeviceptr(int(cupy_ndarray.data.ptr))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `class TensorFrontend:` — **EN:** Defines class `TensorFrontend`. **CN:** 定义类 `TensorFrontend`。
+- **L96** `    """` — **EN:** Starts the docstring for the class `TensorFrontend`. **CN:** 开始说明 class `TensorFrontend` 的文档字符串。
+- **L97** `    Universal Frontend for client-provide tensors` — **EN:** Continues the docstring for the class `TensorFrontend`. **CN:** 继续说明 class `TensorFrontend` 的文档字符串。
+- **L98** `    """` — **EN:** Ends the docstring for the class `TensorFrontend`. **CN:** 结束说明 class `TensorFrontend` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L101** `    def argument(tensor, is_output=False):` — **EN:** Defines function `argument`. **CN:** 定义函数 `argument`。
+- **L102** `        if is_numpy_tensor(tensor):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(tensor)`. **CN:** 开始一个由 `is_numpy_tensor(tensor)` 控制的条件分支。
+- **L103** `            return NumpyFrontend.argument(tensor, is_output)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** `        elif is_torch_tensor(tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L105** `            return TorchFrontend.argument(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** `        elif is_cupy_tensor(tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L107** `            return CupyFrontend.argument(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L109** `            raise NotImplementedError("Unknown Tensor Type")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.frontend`. CN: 模块名为 `cutlass_cppgen.backend.frontend`。
+- EN: Top-level classes: NumpyFrontend, TorchFrontend, CupyFrontend, TensorFrontend CN: 顶层类包括：NumpyFrontend, TorchFrontend, CupyFrontend, TensorFrontend
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen.backend.memory_manager:device_mem_alloc,todevice, cutlass_cppgen.utils.datatypes:is_cupy_tensor,is_numpy_tensor,is_torch_tensor CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen.backend.memory_manager:device_mem_alloc,todevice, cutlass_cppgen.utils.datatypes:is_cupy_tensor,is_numpy_tensor,is_torch_tensor
+- EN: External or standard-library dependencies: __future__:annotations, numpy CN: 外部或标准库依赖：__future__:annotations, numpy

@@ -1,0 +1,2792 @@
+# cutlass.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cutlass_dsl/cutlass.py`
+
+## Purpose / 作用
+- EN: This module provides a DSL for Cutlass Dialects.
+- CN: 该模块的文档字符串将其描述为：This module provides a DSL for Cutlass Dialects.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides a DSL for Cutlass Dialects. It also includes utils with` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `regarding to that dialect.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L15** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `# Local module imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `from types import GenericAlias, SimpleNamespace, UnionType` — **EN:** Imports GenericAlias, SimpleNamespace, UnionType from `types`. **CN:** 从 `types` 导入 GenericAlias, SimpleNamespace, UnionType。
+- **L19** `from typing_extensions import deprecated` — **EN:** Imports deprecated from `typing_extensions`. **CN:** 从 `typing_extensions` 导入 deprecated。
+- **L20** `from typing import (` — **EN:** Imports Callable, Generator, Optional, Union, List, Tuple, ... (+6 more) from `typing`. **CN:** 从 `typing` 导入 Callable, Generator, Optional, Union, List, Tuple, ... (+6 more)。
+- **L21** `    Callable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    Generator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    Optional,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    Union,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    List,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    Tuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    Sequence,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    Iterable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    ForwardRef,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    Any,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    get_origin,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    get_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `import functools` — **EN:** Imports functools for later use. **CN:** 导入 functools 供后续使用。
+- **L35** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L36** `import pkgutil` — **EN:** Imports pkgutil for later use. **CN:** 导入 pkgutil 供后续使用。
+- **L37** `from concurrent.futures import ThreadPoolExecutor, as_completed` — **EN:** Imports ThreadPoolExecutor, as_completed from `concurrent.futures`. **CN:** 从 `concurrent.futures` 导入 ThreadPoolExecutor, as_completed。
+- **L38** `from dataclasses import fields` — **EN:** Imports fields from `dataclasses`. **CN:** 从 `dataclasses` 导入 fields。
+- **L39** `from math import ceil` — **EN:** Imports ceil from `math`. **CN:** 从 `math` 导入 ceil。
+- **L40** `from itertools import chain` — **EN:** Imports chain from `itertools`. **CN:** 从 `itertools` 导入 chain。
+- **L41** `from pathlib import Path` — **EN:** Imports Path from `pathlib`. **CN:** 从 `pathlib` 导入 Path。
+- **L42** `import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L43** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L44** `import hashlib` — **EN:** Imports hashlib for later use. **CN:** 导入 hashlib 供后续使用。
+- **L45** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L46** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `from ..base_dsl import *` — **EN:** Imports * from `..base_dsl`. **CN:** 从 `..base_dsl` 导入 *。
+- **L49** `from ..base_dsl import compiler` — **EN:** Imports compiler from `..base_dsl`. **CN:** 从 `..base_dsl` 导入 compiler。
+- **L50** `from ..base_dsl.dsl import (` — **EN:** Imports is_dynamic_expression, extract_mlir_values, BaseDSL, new_from_mlir_values, implements_dynamic_expression from `..base_dsl.dsl`. **CN:** 从 `..base_dsl.dsl` 导入 is_dynamic_expression, extract_mlir_values, BaseDSL, new_from_mlir_values, implements_dynamic_expression。
+- **L51** `    is_dynamic_expression,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    extract_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    BaseDSL,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    new_from_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    implements_dynamic_expression,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `from ..base_dsl.typing import *` — **EN:** Imports * from `..base_dsl.typing`. **CN:** 从 `..base_dsl.typing` 导入 *。
+- **L58** `from ..base_dsl.typing import (` — **EN:** Imports DynamicExpression, get_mlir_types, Int32, Int64, Int8, Integer, ... (+7 more) from `..base_dsl.typing`. **CN:** 从 `..base_dsl.typing` 导入 DynamicExpression, get_mlir_types, Int32, Int64, Int8, Integer, ... (+7 more)。
+- **L59** `    DynamicExpression,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `    get_mlir_types,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `    Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    Integer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    NumericMeta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `    DslType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `    as_numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    get_c_pointers,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    cast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `from ..base_dsl.common import DSLRuntimeError, DSLNotImplemented` — **EN:** Imports DSLRuntimeError, DSLNotImplemented from `..base_dsl.common`. **CN:** 从 `..base_dsl.common` 导入 DSLRuntimeError, DSLNotImplemented。
+- **L74** `from ..base_dsl.utils.logger import log` — **EN:** Imports log from `..base_dsl.utils.logger`. **CN:** 从 `..base_dsl.utils.logger` 导入 log。
+- **L75** `from ..base_dsl.utils.tree_utils import (` — **EN:** Imports Leaf, PyTreeDef, tree_flatten, tree_unflatten, DSLTreeFlattenError, is_constexpr_field from `..base_dsl.utils.tree_utils`. **CN:** 从 `..base_dsl.utils.tree_utils` 导入 Leaf, PyTreeDef, tree_flatten, tree_unflatten, DSLTreeFlattenError, is_constexpr_field。
+- **L76** `    Leaf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    PyTreeDef,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    tree_flatten,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `    tree_unflatten,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    DSLTreeFlattenError,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    is_constexpr_field,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `from ..base_dsl.leaf_utils import is_frozen_dataclass` — **EN:** Imports is_frozen_dataclass from `..base_dsl.leaf_utils`. **CN:** 从 `..base_dsl.leaf_utils` 导入 is_frozen_dataclass。
+- **L84** `from ..base_dsl.runtime.jit_arg_adapters import is_arg_annotation_constexpr` — **EN:** Imports is_arg_annotation_constexpr from `..base_dsl.runtime.jit_arg_adapters`. **CN:** 从 `..base_dsl.runtime.jit_arg_adapters` 导入 is_arg_annotation_constexpr。
+- **L85** `from ..base_dsl.jit_executor import ExecutionArgs  # noqa: F401` — **EN:** Imports ExecutionArgs from `..base_dsl.jit_executor`. **CN:** 从 `..base_dsl.jit_executor` 导入 ExecutionArgs。
+- **L86** `from ..base_dsl.runtime import cuda as cuda_helpers` — **EN:** Imports cuda as cuda_helpers from `..base_dsl.runtime`. **CN:** 从 `..base_dsl.runtime` 导入 cuda as cuda_helpers。
+- **L87** `from .cuda_stream_adapter import CudaDialectStreamAdapter` — **EN:** Imports CudaDialectStreamAdapter from `.cuda_stream_adapter`. **CN:** 从 `.cuda_stream_adapter` 导入 CudaDialectStreamAdapter。
+- **L88** `from .cuda_jit_executor import CudaDialectJitCompiledFunction` — **EN:** Imports CudaDialectJitCompiledFunction from `.cuda_jit_executor`. **CN:** 从 `.cuda_jit_executor` 导入 CudaDialectJitCompiledFunction。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `# MLIR Imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `from cutlass._mlir import ir, execution_engine, passmanager` — **EN:** Imports ir, execution_engine, passmanager from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir, execution_engine, passmanager。
+- **L92** `from cutlass._mlir.dialects import (` — **EN:** Imports arith, func, gpu, scf, cute, gpu as cutlass_gpu, ... (+1 more) from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 arith, func, gpu, scf, cute, gpu as cutlass_gpu, ... (+1 more)。
+- **L93** `    arith,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `    gpu,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `    scf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    cute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `    gpu as cutlass_gpu,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    cuda as cuda_dialect,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `from cutlass._mlir.dialects._ods_common import (` — **EN:** Imports get_op_result_or_op_results as _get_op_result_or_op_results from `cutlass._mlir.dialects._ods_common`. **CN:** 从 `cutlass._mlir.dialects._ods_common` 导入 get_op_result_or_op_results as _get_op_result_or_op_results。
+- **L102** `    get_op_result_or_op_results as _get_op_result_or_op_results,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L106** `    from cutlass._mlir.dialects import lir as cutlass_lir` — **EN:** Imports lir as cutlass_lir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 lir as cutlass_lir。
+- **L107** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L108** `    cutlass_lir = None` — **EN:** Assigns a value to cutlass_lir. **CN:** 将一个值赋给 cutlass_lir。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `from cutlass._mlir.extras import types as T` — **EN:** Imports types as T from `cutlass._mlir.extras`. **CN:** 从 `cutlass._mlir.extras` 导入 types as T。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `# Helpers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L113** `from ..base_dsl._mlir_helpers import arith as cutlass_arith` — **EN:** Imports arith as cutlass_arith from `..base_dsl._mlir_helpers`. **CN:** 从 `..base_dsl._mlir_helpers` 导入 arith as cutlass_arith。
+- **L114** `from ..base_dsl._mlir_helpers import lru_cache_ir` — **EN:** Imports lru_cache_ir from `..base_dsl._mlir_helpers`. **CN:** 从 `..base_dsl._mlir_helpers` 导入 lru_cache_ir。
+- **L115** `from ..base_dsl._mlir_helpers.op import dsl_user_op` — **EN:** Imports dsl_user_op from `..base_dsl._mlir_helpers.op`. **CN:** 从 `..base_dsl._mlir_helpers.op` 导入 dsl_user_op。
+- **L116** `from ..base_dsl._mlir_helpers.arith import const` — **EN:** Imports const from `..base_dsl._mlir_helpers.arith`. **CN:** 从 `..base_dsl._mlir_helpers.arith` 导入 const。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `from ..base_dsl.ast_helpers import (` — **EN:** Imports loop_selector, executor, if_selector, if_executor, while_selector, while_executor, ... (+7 more) from `..base_dsl.ast_helpers`. **CN:** 从 `..base_dsl.ast_helpers` 导入 loop_selector, executor, if_selector, if_executor, while_selector, while_executor, ... (+7 more)。
+- **L119** `    loop_selector,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `    executor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `    if_selector,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `    if_executor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `    while_selector,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    while_executor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `    assert_executor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    const_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    dynamic_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `    bool_cast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `    compare_executor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `    range_value_check,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `    cf_symbol_check,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `from .cutlass_ast_decorators import (` — **EN:** Imports _loop_execute_range_dynamic, _if_execute_dynamic, _while_execute_dynamic, _ifexp_execute_dynamic, LoopUnroll from `.cutlass_ast_decorators`. **CN:** 从 `.cutlass_ast_decorators` 导入 _loop_execute_range_dynamic, _if_execute_dynamic, _while_execute_dynamic, _ifexp_execute_dynamic, LoopUnroll。
+- **L135** `    _loop_execute_range_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `    _if_execute_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    _while_execute_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    _ifexp_execute_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `    LoopUnroll,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `from ..base_dsl.runtime.jit_arg_adapters import JitArgAdapterRegistry` — **EN:** Imports JitArgAdapterRegistry from `..base_dsl.runtime.jit_arg_adapters`. **CN:** 从 `..base_dsl.runtime.jit_arg_adapters` 导入 JitArgAdapterRegistry。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L145** `# Cutlass DSL Device Info` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `# Contains a map of SM architecture to shared memory capacity in bytes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L149** `SMEM_CAPACITY_MAP = {` — **EN:** Assigns a value to SMEM_CAPACITY_MAP. **CN:** 将一个值赋给 SMEM_CAPACITY_MAP。
+- **L150** `    "sm_121": (100 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `    "sm_120": (100 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `    "sm_110": (228 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `    "sm_103": (228 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `    "sm_101": (228 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `    "sm_100": (228 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `    "sm_90": (228 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `    "sm_89": (100 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `    "sm_86": (100 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    "sm_87": (164 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    "sm_80": (164 - 1) * 1024,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L164** `# Cutlass DSL Base Abstract Class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L165** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `def _get_max_cpu_threads() -> int:` — **EN:** Defines function `_get_max_cpu_threads`. **CN:** 定义函数 `_get_max_cpu_threads`。
+- **L169** `    """Return a safe thread-pool size: half of CPU count, clamped to [1, 16]."""` — **EN:** Docstring line documenting the function `_get_max_cpu_threads`. **CN:** 文档字符串行，用于说明 function `_get_max_cpu_threads`。
+- **L170** `    return max(1, min(16, (os.cpu_count() or 8) // 2))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `# Return a ctype class that represents the in-memory layout expected` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L174** `# for a CuTe hierarchical tuple type.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L175** `def get_sparse_tuple_ctype(dyn: Union[int, Sequence[object]]) -> type:` — **EN:** Defines function `get_sparse_tuple_ctype`. **CN:** 定义函数 `get_sparse_tuple_ctype`。
+- **L176** `    # When there is a single dynamic value, the sparse CuTe` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L177** `    # representation is a single integer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L178** `    if isinstance(dyn, int):` — **EN:** Starts a conditional branch guarded by `isinstance(dyn, int)`. **CN:** 开始一个由 `isinstance(dyn, int)` 控制的条件分支。
+- **L179** `        return ctypes.c_int32` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `    dyn_seq: Sequence[object] = dyn` — **EN:** Assigns a typed value to dyn_seq. **CN:** 为 dyn_seq 赋予带类型标注的值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    # For zero or greater than 1 dynamic values, the tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L184** `    # representation will be a struct with a field for each dynamic` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L185** `    # value. The representation is flattened, even for hierarchical CuTe` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L186** `    # profiles (although we are only dealing with depth 1 inputs here).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L187** `    class TupleDescriptor(ctypes.Structure):` — **EN:** Defines class `TupleDescriptor` with bases ctypes.Structure. **CN:** 定义类 `TupleDescriptor`，其基类为 ctypes.Structure。
+- **L188** `        _fields_ = [(f"x{idx}", ctypes.c_int32) for idx in range(len(dyn_seq))]` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `        def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L191** `            return f"struct<{str(self._fields_)}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `    return TupleDescriptor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `def is_cute_algebra_type(arg_spec: object) -> bool:` — **EN:** Defines function `is_cute_algebra_type`. **CN:** 定义函数 `is_cute_algebra_type`。
+- **L197** `    # Walk through the arg_spec to check if it's a cute algebra type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L198** `    _cute_algebra_type_aliases = (` — **EN:** Assigns a value to _cute_algebra_type_aliases. **CN:** 将一个值赋给 _cute_algebra_type_aliases。
+- **L199** `        "Shape",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `        "Stride",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        "Coord",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        "Tile",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `        "IntTuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `    origin = get_origin(arg_spec)` — **EN:** Assigns a value to origin. **CN:** 将一个值赋给 origin。
+- **L207** `    if origin is Union:` — **EN:** Starts a conditional branch guarded by `origin is Union`. **CN:** 开始一个由 `origin is Union` 控制的条件分支。
+- **L208** `        for sub_ty in get_args(arg_spec):` — **EN:** Starts a loop assigning items from `get_args(arg_spec)` to `sub_ty`. **CN:** 开始一个循环，将 `get_args(arg_spec)` 的元素赋给 `sub_ty`。
+- **L209** `            sub_origin = get_origin(sub_ty)` — **EN:** Assigns a value to sub_origin. **CN:** 将一个值赋给 sub_origin。
+- **L210** `            if sub_origin is Tuple or (` — **EN:** Starts a conditional branch guarded by `sub_origin is Tuple or (type(sub_origin) is type and issu...`. **CN:** 开始一个由 `sub_origin is Tuple or (type(sub_origin) is type and issu...` 控制的条件分支。
+- **L211** `                type(sub_origin) is type and issubclass(sub_origin, tuple)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L212** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L213** `                tuple_arg0 = get_args(sub_ty)[0]` — **EN:** Assigns a value to tuple_arg0. **CN:** 将一个值赋给 tuple_arg0。
+- **L214** `                if isinstance(` — **EN:** Starts a conditional branch guarded by `isinstance(tuple_arg0, ForwardRef) and tuple_arg0.__forwa...`. **CN:** 开始一个由 `isinstance(tuple_arg0, ForwardRef) and tuple_arg0.__forwa...` 控制的条件分支。
+- **L215** `                    tuple_arg0, ForwardRef` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L216** `                ) and tuple_arg0.__forward_arg__ in (_cute_algebra_type_aliases):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L217** `                    return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `def _build_kernel_attrs(config: BaseDSL.LaunchConfig) -> dict:` — **EN:** Defines function `_build_kernel_attrs`. **CN:** 定义函数 `_build_kernel_attrs`。
+- **L222** `    kernel_attrs = {}` — **EN:** Assigns a value to kernel_attrs. **CN:** 将一个值赋给 kernel_attrs。
+- **L223** `    if config.min_blocks_per_mp > 1:` — **EN:** Starts a conditional branch guarded by `config.min_blocks_per_mp > 1`. **CN:** 开始一个由 `config.min_blocks_per_mp > 1` 控制的条件分支。
+- **L224** `        assert config.smem is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L225** `        kernel_attrs = {` — **EN:** Assigns a value to kernel_attrs. **CN:** 将一个值赋给 kernel_attrs。
+- **L226** `            cuda_helpers.cuda.CUfunction_attribute.CU_FUNC_ATTRIBUTE_PREFERRED_SHARED_MEMORY_CARVEOUT: ceil(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `                config.min_blocks_per_mp` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `                * config.smem` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `                / cuda_helpers.get_device_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `                    cuda_helpers.cuda.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `                * 100` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `    return kernel_attrs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L236** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `class CutlassBaseDSL(BaseDSL):` — **EN:** Defines class `CutlassBaseDSL` with bases BaseDSL. **CN:** 定义类 `CutlassBaseDSL`，其基类为 BaseDSL。
+- **L239** `    """This abstract class provides a DSL for Cutlass."""` — **EN:** Docstring line documenting the class `CutlassBaseDSL`. **CN:** 文档字符串行，用于说明 class `CutlassBaseDSL`。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `    _ALLOWED_EXTRA_KERNEL_VALUE_ATTRS: frozenset[str] = frozenset()` — **EN:** Assigns a typed value to _ALLOWED_EXTRA_KERNEL_VALUE_ATTRS. **CN:** 为 _ALLOWED_EXTRA_KERNEL_VALUE_ATTRS 赋予带类型标注的值。
+- **L242** `    _KERNEL_ATTR_SPEC_FIELD: Optional[str] = None` — **EN:** Assigns a typed value to _KERNEL_ATTR_SPEC_FIELD. **CN:** 为 _KERNEL_ATTR_SPEC_FIELD 赋予带类型标注的值。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L245** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L246** `        name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L247** `        compiler_provider: compiler.Compiler,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L248** `        pass_sm_arch_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L249** `        device_compilation_only: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L250** `        preprocess: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L251** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L252** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L253** `            name=name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `            dsl_package_name=["cutlass"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `            compiler_provider=compiler_provider,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `            pass_sm_arch_name=pass_sm_arch_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            device_compilation_only=device_compilation_only,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `            preprocess=preprocess,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `        self._smem_usage_tracker: Optional[tuple] = None` — **EN:** Assigns a typed value to self._smem_usage_tracker. **CN:** 为 self._smem_usage_tracker 赋予带类型标注的值。
+- **L261** `        # extra function to convert cute arguments to tvm ffi spec params` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L262** `        # this needs to be reverse registered because the arg convention` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L263** `        # depends on the runtime type of the DSL arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L264** `        self._tvm_ffi_args_spec_converter = None` — **EN:** Assigns a value to self._tvm_ffi_args_spec_converter. **CN:** 将一个值赋给 self._tvm_ffi_args_spec_converter。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    def _set_smem_tracking(` — **EN:** Defines function `_set_smem_tracking`. **CN:** 定义函数 `_set_smem_tracking`。
+- **L267** `        self, allocator: object, callback: Callable[[object], int]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L268** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L269** `        self._smem_usage_tracker = (allocator, callback)` — **EN:** Assigns a value to self._smem_usage_tracker. **CN:** 将一个值赋给 self._smem_usage_tracker。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `    def _reset_smem_tracking(self) -> None:` — **EN:** Defines function `_reset_smem_tracking`. **CN:** 定义函数 `_reset_smem_tracking`。
+- **L272** `        self._smem_usage_tracker = None` — **EN:** Assigns a value to self._smem_usage_tracker. **CN:** 将一个值赋给 self._smem_usage_tracker。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `    def _get_smem_usage(self) -> int:` — **EN:** Defines function `_get_smem_usage`. **CN:** 定义函数 `_get_smem_usage`。
+- **L275** `        if not self._smem_usage_tracker:` — **EN:** Starts a conditional branch guarded by `not self._smem_usage_tracker`. **CN:** 开始一个由 `not self._smem_usage_tracker` 控制的条件分支。
+- **L276** `            return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L277** `        allocator, callback = self._smem_usage_tracker` — **EN:** Assigns a value to (allocator, callback). **CN:** 将一个值赋给 (allocator, callback)。
+- **L278** `        return callback(allocator)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `    # this method is not useful for cutlass_dsl, so we only provide a dummy implementation.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L281** `    def _is_tensor_descriptor(self, maybe_tensor_descriptor: object) -> bool:` — **EN:** Defines function `_is_tensor_descriptor`. **CN:** 定义函数 `_is_tensor_descriptor`。
+- **L282** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `    # this method is not useful for cutlass_dsl, so we only provide a dummy implementation.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L285** `    def _handle_tensor_descriptor(` — **EN:** Defines function `_handle_tensor_descriptor`. **CN:** 定义函数 `_handle_tensor_descriptor`。
+- **L286** `        self, maybe_tensor: object, arg_name: str, need_gpu_memory: bool` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L287** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L288** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L290** `    def _collect_raw_kernel_attrs_from_decorator(` — **EN:** Defines function `_collect_raw_kernel_attrs_from_decorator`. **CN:** 定义函数 `_collect_raw_kernel_attrs_from_decorator`。
+- **L291** `        self, func_body: Callable[..., None], func_args: tuple` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L292** `    ) -> dict:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L293** `        field = self._KERNEL_ATTR_SPEC_FIELD` — **EN:** Assigns a value to field. **CN:** 将一个值赋给 field。
+- **L294** `        if field is None:` — **EN:** Starts a conditional branch guarded by `field is None`. **CN:** 开始一个由 `field is None` 控制的条件分支。
+- **L295** `            return {}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L296** `        attr_spec = getattr(func_body, field, None)` — **EN:** Assigns a value to attr_spec. **CN:** 将一个值赋给 attr_spec。
+- **L297** `        if attr_spec is None:` — **EN:** Starts a conditional branch guarded by `attr_spec is None`. **CN:** 开始一个由 `attr_spec is None` 控制的条件分支。
+- **L298** `            return {}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `        if isinstance(attr_spec, dict):` — **EN:** Starts a conditional branch guarded by `isinstance(attr_spec, dict)`. **CN:** 开始一个由 `isinstance(attr_spec, dict)` 控制的条件分支。
+- **L301** `            return attr_spec` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L302** `        if callable(attr_spec):` — **EN:** Starts a conditional branch guarded by `callable(attr_spec)`. **CN:** 开始一个由 `callable(attr_spec)` 控制的条件分支。
+- **L303** `            # Resolver signature: (owner, kernel_name) -> dict | None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L304** `            # *owner* is the first argument passed to the kernel (typically` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L305** `            # \`\`self\`\`), or \`\`None\`\` for free-function kernels.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L306** `            owner = func_args[0] if func_args else None` — **EN:** Assigns a value to owner. **CN:** 将一个值赋给 owner。
+- **L307** `            resolved = attr_spec(owner, func_body.__name__)` — **EN:** Assigns a value to resolved. **CN:** 将一个值赋给 resolved。
+- **L308** `            if resolved is None:` — **EN:** Starts a conditional branch guarded by `resolved is None`. **CN:** 开始一个由 `resolved is None` 控制的条件分支。
+- **L309** `                return {}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L310** `            if not isinstance(resolved, dict):` — **EN:** Starts a conditional branch guarded by `not isinstance(resolved, dict)`. **CN:** 开始一个由 `not isinstance(resolved, dict)` 控制的条件分支。
+- **L311** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L312** `                    "Kernel attribute resolver must return a dict or None.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `                    suggestion="Return a dict[str, str | ir.Attribute], or None for no attributes.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `            return resolved` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L318** `            f"Unsupported kernel decorator attributes spec type: {type(attr_spec)}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `            suggestion="Use a dict or a callable returning dict[str, str | ir.Attribute].",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    def _collect_extra_kernel_value_attrs(` — **EN:** Defines function `_collect_extra_kernel_value_attrs`. **CN:** 定义函数 `_collect_extra_kernel_value_attrs`。
+- **L323** `        self, func_body: Callable[..., None], func_args: tuple, func_kwargs: dict` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L324** `    ) -> dict[str, ir.Attribute]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L325** `        del func_kwargs` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L326** `        raw_attrs = self._collect_raw_kernel_attrs_from_decorator(func_body, func_args)` — **EN:** Assigns a value to raw_attrs. **CN:** 将一个值赋给 raw_attrs。
+- **L327** `        if not raw_attrs:` — **EN:** Starts a conditional branch guarded by `not raw_attrs`. **CN:** 开始一个由 `not raw_attrs` 控制的条件分支。
+- **L328** `            return {}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        converted_attrs: dict[str, ir.Attribute] = {}` — **EN:** Assigns a typed value to converted_attrs. **CN:** 为 converted_attrs 赋予带类型标注的值。
+- **L331** `        for key, value in raw_attrs.items():` — **EN:** Starts a loop assigning items from `raw_attrs.items()` to `(key, value)`. **CN:** 开始一个循环，将 `raw_attrs.items()` 的元素赋给 `(key, value)`。
+- **L332** `            if key not in self._ALLOWED_EXTRA_KERNEL_VALUE_ATTRS:` — **EN:** Starts a conditional branch guarded by `key not in self._ALLOWED_EXTRA_KERNEL_VALUE_ATTRS`. **CN:** 开始一个由 `key not in self._ALLOWED_EXTRA_KERNEL_VALUE_ATTRS` 控制的条件分支。
+- **L333** `                allowed_keys = ", ".join(sorted(self._ALLOWED_EXTRA_KERNEL_VALUE_ATTRS))` — **EN:** Assigns a value to allowed_keys. **CN:** 将一个值赋给 allowed_keys。
+- **L334** `                if allowed_keys:` — **EN:** Starts a conditional branch guarded by `allowed_keys`. **CN:** 开始一个由 `allowed_keys` 控制的条件分支。
+- **L335** `                    suggestion = f"Use one of the allowed keys: {allowed_keys}."` — **EN:** Assigns a value to suggestion. **CN:** 将一个值赋给 suggestion。
+- **L336** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L337** `                    suggestion = f"No extra kernel function attributes are supported for '{self.name}'."` — **EN:** Assigns a value to suggestion. **CN:** 将一个值赋给 suggestion。
+- **L338** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L339** `                    f"Unsupported kernel function attribute key '{key}'.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `                    suggestion=suggestion,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** `            if isinstance(value, ir.Attribute):` — **EN:** Starts a conditional branch guarded by `isinstance(value, ir.Attribute)`. **CN:** 开始一个由 `isinstance(value, ir.Attribute)` 控制的条件分支。
+- **L343** `                converted_attrs[key] = value` — **EN:** Assigns a value to converted_attrs[key]. **CN:** 将一个值赋给 converted_attrs[key]。
+- **L344** `            elif isinstance(value, str):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L345** `                converted_attrs[key] = ir.StringAttr.get(value)` — **EN:** Assigns a value to converted_attrs[key]. **CN:** 将一个值赋给 converted_attrs[key]。
+- **L346** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L347** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L348** `                    f"Unsupported kernel function attribute value type for '{key}': {type(value)}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `                    suggestion="Use str or ir.Attribute as the attribute value.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `        return converted_attrs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** `    def _build_gpu_module(` — **EN:** Defines function `_build_gpu_module`. **CN:** 定义函数 `_build_gpu_module`。
+- **L354** `        self, attrs: dict[str, str], loc: Optional[ir.Location] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L355** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L356** `        log().info(f"self : {self}")` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L357** `        log().info(f"Building GPU module for {self.name}")` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L358** `        self.gpu_module = gpu.GPUModuleOp(ir.StringAttr.get("kernels"), loc=loc)` — **EN:** Assigns a value to self.gpu_module. **CN:** 将一个值赋给 self.gpu_module。
+- **L359** `        log().info(f"GPU module: {self.gpu_module}")` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L360** `        with ir.InsertionPoint(self.gpu_module.bodyRegion.blocks.append(*[])):` — **EN:** Starts a context-managed block using ir.InsertionPoint(self.gpu_module.bodyRegion.blocks.append(*[])). **CN:** 开始一个使用 ir.InsertionPoint(self.gpu_module.bodyRegion.blocks.append(*[])) 的上下文管理代码块。
+- **L361** `            pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** `        for attr_name in attrs:` — **EN:** Starts a loop assigning items from `attrs` to `attr_name`. **CN:** 开始一个循环，将 `attrs` 的元素赋给 `attr_name`。
+- **L364** `            self.gpu_module.attributes[attr_name] = ir.Attribute.parse(attrs[attr_name])` — **EN:** Assigns a value to self.gpu_module.attributes[attr_name]. **CN:** 将一个值赋给 self.gpu_module.attributes[attr_name]。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `    def _get_pipeline(self, pipeline: Optional[str]) -> str:` — **EN:** Defines function `_get_pipeline`. **CN:** 定义函数 `_get_pipeline`。
+- **L367** `        pipeline = super()._get_pipeline(pipeline)` — **EN:** Assigns a value to pipeline. **CN:** 将一个值赋给 pipeline。
+- **L368** `        if pipeline is None:` — **EN:** Starts a conditional branch guarded by `pipeline is None`. **CN:** 开始一个由 `pipeline is None` 控制的条件分支。
+- **L369** `            # cubin format is required to be cubin as we launch cuda module at python level.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L370** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L371** `                "builtin.module(cute-to-nvvm{cubin-format=bin "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `                + self.compile_options.to_str()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `                + "})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L376** `        return pipeline` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `    def preprocess_pipeline(self, pipeline: str, arch: str) -> str:` — **EN:** Defines function `preprocess_pipeline`. **CN:** 定义函数 `preprocess_pipeline`。
+- **L379** `        pipeline = super().preprocess_pipeline(pipeline, arch)` — **EN:** Assigns a value to pipeline. **CN:** 将一个值赋给 pipeline。
+- **L380** `        pipeline = (` — **EN:** Assigns a value to pipeline. **CN:** 将一个值赋给 pipeline。
+- **L381** `            pipeline.rstrip("})")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `            + " enable-cuda-dialect=true cuda-dialect-external-module=true})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `        return pipeline` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `    def _enter_gpu_module(self) -> ir.InsertionPoint:` — **EN:** Defines function `_enter_gpu_module`. **CN:** 定义函数 `_enter_gpu_module`。
+- **L387** `        log().info(f"self: {self}")` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L388** `        log().info(f"Entering GPU module for {self.name}")` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L389** `        log().info(f"GPU module: {self.gpu_module}")` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L390** `        return ir.InsertionPoint(self.gpu_module.bodyRegion.blocks[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L393** `    def generate_func_ret_op(` — **EN:** Defines function `generate_func_ret_op`. **CN:** 定义函数 `generate_func_ret_op`。
+- **L394** `        loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L395** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L396** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L397** `            "generate_func_ret_op() must be implemented by subclasses."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L401** `    def generate_func_op(` — **EN:** Defines function `generate_func_op`. **CN:** 定义函数 `generate_func_op`。
+- **L402** `        arg_types: List[ir.Type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `        arg_attrs: Optional[List[ir.Attribute]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `        kernel_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L405** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L406** `    ) -> ir.Operation:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L407** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L408** `            "generate_func_op() must be implemented by subclasses."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L409** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `    def _generate_kernel_attrs(self, config: BaseDSL.LaunchConfig) -> dict:` — **EN:** Defines function `_generate_kernel_attrs`. **CN:** 定义函数 `_generate_kernel_attrs`。
+- **L412** `        assert isinstance(config, BaseDSL.LaunchConfig), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L413** `            f"Expect LaunchConfig for @kernel, but got {type(config)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `        ret = {}` — **EN:** Assigns a value to ret. **CN:** 将一个值赋给 ret。
+- **L417** `        if config.has_max_number_threads():` — **EN:** Starts a conditional branch guarded by `config.has_max_number_threads()`. **CN:** 开始一个由 `config.has_max_number_threads()` 控制的条件分支。
+- **L418** `            block_str = ", ".join(map(str, config.block))` — **EN:** Assigns a value to block_str. **CN:** 将一个值赋给 block_str。
+- **L419** `            has_dynamic = any(is_dynamic_expression(dim) for dim in config.block)` — **EN:** Assigns a value to has_dynamic. **CN:** 将一个值赋给 has_dynamic。
+- **L420** `            if not has_dynamic:` — **EN:** Starts a conditional branch guarded by `not has_dynamic`. **CN:** 开始一个由 `not has_dynamic` 控制的条件分支。
+- **L421** `                # Case 1. Auto-generate reqntid from block size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L422** `                ret["nvvm.reqntid"] = ir.Attribute.parse(f"array<i32 : {block_str}>")` — **EN:** Assigns a value to ret['nvvm.reqntid']. **CN:** 将一个值赋给 ret['nvvm.reqntid']。
+- **L423** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L424** `                # Case 2. Don't auto-generate reqntid from block size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L425** `                self.print_warning_once(` — **EN:** Invokes `self.print_warning_once` as a standalone call. **CN:** 以独立语句方式调用 `self.print_warning_once`。
+- **L426** `                    f"Dynamic variable in block size {block_str}, cannot auto-generate \`nvvm.reqntid\`"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L429** `            # Case 3. Use user-defined value for maxntid` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L430** `            max_ntid_str = ", ".join(map(str, config.max_number_threads))` — **EN:** Assigns a value to max_ntid_str. **CN:** 将一个值赋给 max_ntid_str。
+- **L431** `            for value in config.max_number_threads:` — **EN:** Starts a loop assigning items from `config.max_number_threads` to `value`. **CN:** 开始一个循环，将 `config.max_number_threads` 的元素赋给 `value`。
+- **L432** `                if is_dynamic_expression(value):` — **EN:** Starts a conditional branch guarded by `is_dynamic_expression(value)`. **CN:** 开始一个由 `is_dynamic_expression(value)` 控制的条件分支。
+- **L433** `                    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L434** `                        f"User defined max number threads \`{max_ntid_str}\` contains dynamic expression, cannot generate \`nvvm.maxntid\`",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `                        suggestion="Consider using \`Constexpr\` annotation or Python constant",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `            # Use user-defined maxntid` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L438** `            ret["nvvm.maxntid"] = ir.Attribute.parse(f"array<i32 : {max_ntid_str}>")` — **EN:** Assigns a value to ret['nvvm.maxntid']. **CN:** 将一个值赋给 ret['nvvm.maxntid']。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `        # Add optional minimum blocks per multiprocessor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L441** `        if config.min_blocks_per_mp > 0:` — **EN:** Starts a conditional branch guarded by `config.min_blocks_per_mp > 0`. **CN:** 开始一个由 `config.min_blocks_per_mp > 0` 控制的条件分支。
+- **L442** `            ret["nvvm.minctasm"] = ir.Attribute.parse(` — **EN:** Assigns a value to ret['nvvm.minctasm']. **CN:** 将一个值赋给 ret['nvvm.minctasm']。
+- **L443** `                f"{config.min_blocks_per_mp} : i32"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** `        return ret` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `    @functools.lru_cache(maxsize=1)` — **EN:** Applies decorator `functools.lru_cache(maxsize=1)` to the following definition. **CN:** 将装饰器 `functools.lru_cache(maxsize=1)` 应用于后面的定义。
+- **L449** `    def get_version(self) -> Any:` — **EN:** Defines function `get_version`. **CN:** 定义函数 `get_version`。
+- **L450** `        """` — **EN:** Starts the docstring for the function `get_version`. **CN:** 开始说明 function `get_version` 的文档字符串。
+- **L451** `        Get the version of cutlass dsl, used for computing the hash key of the cache.` — **EN:** Continues the docstring for the function `get_version`. **CN:** 继续说明 function `get_version` 的文档字符串。
+- **L452** `        Including source python files and the shared library.` — **EN:** Continues the docstring for the function `get_version`. **CN:** 继续说明 function `get_version` 的文档字符串。
+- **L453** `        """` — **EN:** Ends the docstring for the function `get_version`. **CN:** 结束说明 function `get_version` 的文档字符串。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `        def _hash_chunk(` — **EN:** Defines function `_hash_chunk`. **CN:** 定义函数 `_hash_chunk`。
+- **L456** `            key: str, path: str, idx: int, start: int, size: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L457** `        ) -> tuple[str, int, bytes]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L458** `            """Hash one chunk of a file with SHA-256."""` — **EN:** Docstring line documenting the function `_hash_chunk`. **CN:** 文档字符串行，用于说明 function `_hash_chunk`。
+- **L459** `            h = hashlib.sha256()` — **EN:** Assigns a value to h. **CN:** 将一个值赋给 h。
+- **L460** `            if size > 0:` — **EN:** Starts a conditional branch guarded by `size > 0`. **CN:** 开始一个由 `size > 0` 控制的条件分支。
+- **L461** `                try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L462** `                    with open(path, "rb") as f:` — **EN:** Starts a context-managed block using open(path, 'rb'). **CN:** 开始一个使用 open(path, 'rb') 的上下文管理代码块。
+- **L463** `                        f.seek(start)` — **EN:** Invokes `f.seek` as a standalone call. **CN:** 以独立语句方式调用 `f.seek`。
+- **L464** `                        h.update(f.read(size))` — **EN:** Invokes `h.update` as a standalone call. **CN:** 以独立语句方式调用 `h.update`。
+- **L465** `                except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L466** `                    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L467** `                        f"Failed to read module file {key}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `                        "The file may not exist or may not be readable."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `                        "Please re-install the package."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `                    ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `            return key, idx, h.digest()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L472** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L473** `        def _iter_jobs() -> Generator:` — **EN:** Defines function `_iter_jobs`. **CN:** 定义函数 `_iter_jobs`。
+- **L474** `            """Chunk jobs generator to hash files in parallel"""` — **EN:** Docstring line documenting the function `_iter_jobs`. **CN:** 文档字符串行，用于说明 function `_iter_jobs`。
+- **L475** `            for key, path, size in files:` — **EN:** Starts a loop assigning items from `files` to `(key, path, size)`. **CN:** 开始一个循环，将 `files` 的元素赋给 `(key, path, size)`。
+- **L476** `                # empty files still get a deterministic hash from SHA-256 of zero bytes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L477** `                for i in range(max(1, -(-size // chunk_size))):  # ceil division` — **EN:** Starts a loop assigning items from `range(max(1, -(-size // chunk_size)))` to `i`. **CN:** 开始一个循环，将 `range(max(1, -(-size // chunk_size)))` 的元素赋给 `i`。
+- **L478** `                    start = i * chunk_size` — **EN:** Assigns a value to start. **CN:** 将一个值赋给 start。
+- **L479** `                    computed_size = min(chunk_size, max(size - start, 0))` — **EN:** Assigns a value to computed_size. **CN:** 将一个值赋给 computed_size。
+- **L480** `                    yield (key, path, i, start, computed_size)` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** `        dsl_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))` — **EN:** Assigns a value to dsl_path. **CN:** 将一个值赋给 dsl_path。
+- **L483** `        files = []` — **EN:** Assigns a value to files. **CN:** 将一个值赋给 files。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** `        mlir_libs_candidates = [` — **EN:** Assigns a value to mlir_libs_candidates. **CN:** 将一个值赋给 mlir_libs_candidates。
+- **L486** `            Path(dsl_path) / "_mlir" / "_mlir_libs",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L489** `            import cutlass._mlir as _mlir_module` — **EN:** Imports cutlass._mlir as _mlir_module for later use. **CN:** 导入 cutlass._mlir as _mlir_module 供后续使用。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `            if hasattr(_mlir_module, "__path__"):` — **EN:** Starts a conditional branch guarded by `hasattr(_mlir_module, '__path__')`. **CN:** 开始一个由 `hasattr(_mlir_module, '__path__')` 控制的条件分支。
+- **L492** `                for p in _mlir_module.__path__:` — **EN:** Starts a loop assigning items from `_mlir_module.__path__` to `p`. **CN:** 开始一个循环，将 `_mlir_module.__path__` 的元素赋给 `p`。
+- **L493** `                    mlir_libs_candidates.append(Path(p) / "_mlir_libs")` — **EN:** Invokes `mlir_libs_candidates.append` as a standalone call. **CN:** 以独立语句方式调用 `mlir_libs_candidates.append`。
+- **L494** `        except (ImportError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L495** `            pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L496** `        mlir_libs_path = None` — **EN:** Assigns a value to mlir_libs_path. **CN:** 将一个值赋给 mlir_libs_path。
+- **L497** `        for candidate in mlir_libs_candidates:` — **EN:** Starts a loop assigning items from `mlir_libs_candidates` to `candidate`. **CN:** 开始一个循环，将 `mlir_libs_candidates` 的元素赋给 `candidate`。
+- **L498** `            if candidate.exists():` — **EN:** Starts a conditional branch guarded by `candidate.exists()`. **CN:** 开始一个由 `candidate.exists()` 控制的条件分支。
+- **L499** `                mlir_libs_path = candidate` — **EN:** Assigns a value to mlir_libs_path. **CN:** 将一个值赋给 mlir_libs_path。
+- **L500** `                break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L501** `        if mlir_libs_path is None:` — **EN:** Starts a conditional branch guarded by `mlir_libs_path is None`. **CN:** 开始一个由 `mlir_libs_path is None` 控制的条件分支。
+- **L502** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L503** `                "Could not find _mlir/_mlir_libs directory. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L504** `                "Please re-install the package."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L505** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L506** `        giant_dso_name = str(next(mlir_libs_path.glob("_cutlass_ir.cpython*")).name)` — **EN:** Assigns a value to giant_dso_name. **CN:** 将一个值赋给 giant_dso_name。
+- **L507** `        so_path = str(mlir_libs_path / giant_dso_name)` — **EN:** Assigns a value to so_path. **CN:** 将一个值赋给 so_path。
+- **L508** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L509** `            # update the version hash of the cutlass shared library` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L510** `            so_size = os.path.getsize(so_path)` — **EN:** Assigns a value to so_size. **CN:** 将一个值赋给 so_size。
+- **L511** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L512** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L513** `                f"Failed to read the shared library file {giant_dso_name}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L514** `                "The file may not exist or may not be readable."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L515** `                "Please re-install the package."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `            ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L517** `        files.append((giant_dso_name, so_path, so_size))` — **EN:** Invokes `files.append` as a standalone call. **CN:** 以独立语句方式调用 `files.append`。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `        for lib in pkgutil.walk_packages([dsl_path], prefix="cutlass."):` — **EN:** Starts a loop assigning items from `pkgutil.walk_packages([dsl_path], prefix='cutla...` to `lib`. **CN:** 开始一个循环，将 `pkgutil.walk_packages([dsl_path], prefix='cutla...` 的元素赋给 `lib`。
+- **L520** `            spec = lib.module_finder.find_spec(lib.name)  # type: ignore[call-arg]` — **EN:** Assigns a value to spec. **CN:** 将一个值赋给 spec。
+- **L521** `            if not spec or not spec.origin:` — **EN:** Starts a conditional branch guarded by `not spec or not spec.origin`. **CN:** 开始一个由 `not spec or not spec.origin` 控制的条件分支。
+- **L522** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L523** `            path = spec.origin` — **EN:** Assigns a value to path. **CN:** 将一个值赋给 path。
+- **L524** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L525** `                size = os.path.getsize(path)` — **EN:** Assigns a value to size. **CN:** 将一个值赋给 size。
+- **L526** `            except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L527** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L528** `                    f"Failed to read module file {lib.name}. The file may not exist or may not be readable."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L529** `                    "Please re-install the package."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `                ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `            files.append((lib.name, path, size))` — **EN:** Invokes `files.append` as a standalone call. **CN:** 以独立语句方式调用 `files.append`。
+- **L532** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L533** `        # Submit chunks to a job queue` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L534** `        chunk_size = 1 << 24  # 16 MB (tuned)` — **EN:** Assigns a value to chunk_size. **CN:** 将一个值赋给 chunk_size。
+- **L535** `        per_file_chunks: dict[str, list] = {}` — **EN:** Assigns a typed value to per_file_chunks. **CN:** 为 per_file_chunks 赋予带类型标注的值。
+- **L536** `        max_workers = _get_max_cpu_threads()` — **EN:** Assigns a value to max_workers. **CN:** 将一个值赋给 max_workers。
+- **L537** `        with ThreadPoolExecutor(max_workers=max_workers) as ex:` — **EN:** Starts a context-managed block using ThreadPoolExecutor(max_workers=max_workers). **CN:** 开始一个使用 ThreadPoolExecutor(max_workers=max_workers) 的上下文管理代码块。
+- **L538** `            futures = [ex.submit(_hash_chunk, *job) for job in _iter_jobs()]` — **EN:** Assigns a value to futures. **CN:** 将一个值赋给 futures。
+- **L539** `            for fut in as_completed(futures):` — **EN:** Starts a loop assigning items from `as_completed(futures)` to `fut`. **CN:** 开始一个循环，将 `as_completed(futures)` 的元素赋给 `fut`。
+- **L540** `                key, idx, digest = fut.result()` — **EN:** Assigns a value to (key, idx, digest). **CN:** 将一个值赋给 (key, idx, digest)。
+- **L541** `                per_file_chunks.setdefault(key, []).append((idx, digest))` — **EN:** Invokes `per_file_chunks.setdefault(key, []).append` as a standalone call. **CN:** 以独立语句方式调用 `per_file_chunks.setdefault(key, []).append`。
+- **L542** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L543** `        # update the version hash of the cutlass shared library using tree-hash` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L544** `        version_hash = hashlib.sha256()` — **EN:** Assigns a value to version_hash. **CN:** 将一个值赋给 version_hash。
+- **L545** `        # Since files list is in arbitrary order, we sort by key to get deterministic order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L546** `        for key, path, size in sorted(files, key=lambda t: t[0]):` — **EN:** Starts a loop assigning items from `sorted(files, key=lambda t: t[0])` to `(key, path, size)`. **CN:** 开始一个循环，将 `sorted(files, key=lambda t: t[0])` 的元素赋给 `(key, path, size)`。
+- **L547** `            chunks = per_file_chunks.get(key)` — **EN:** Assigns a value to chunks. **CN:** 将一个值赋给 chunks。
+- **L548** `            assert chunks is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L549** `            file_hash = hashlib.sha256(` — **EN:** Assigns a value to file_hash. **CN:** 将一个值赋给 file_hash。
+- **L550** `                b"".join(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L551** `                    digest` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L552** `                    for _, digest in sorted(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `                        chunks` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** `                    )  # Similarily, sort chunks by index to get deterministic order` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L555** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L556** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L557** `            file_hash.update(key.encode("utf-8"))` — **EN:** Invokes `file_hash.update` as a standalone call. **CN:** 以独立语句方式调用 `file_hash.update`。
+- **L558** `            version_hash.update(file_hash.digest())` — **EN:** Invokes `version_hash.update` as a standalone call. **CN:** 以独立语句方式调用 `version_hash.update`。
+- **L559** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L560** `        return version_hash` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L562** `    def get_return_types(self) -> List[ir.Type]:` — **EN:** Defines function `get_return_types`. **CN:** 定义函数 `get_return_types`。
+- **L563** `        """` — **EN:** Starts the docstring for the function `get_return_types`. **CN:** 开始说明 function `get_return_types` 的文档字符串。
+- **L564** `        Get the return types of the function.` — **EN:** Continues the docstring for the function `get_return_types`. **CN:** 继续说明 function `get_return_types` 的文档字符串。
+- **L565** `        With cuda dialect, the return type is i32 to indicate cuda result.` — **EN:** Continues the docstring for the function `get_return_types`. **CN:** 继续说明 function `get_return_types` 的文档字符串。
+- **L566** `        """` — **EN:** Ends the docstring for the function `get_return_types`. **CN:** 结束说明 function `get_return_types` 的文档字符串。
+- **L567** `        i32_ty = ir.IntegerType.get_signless(32)` — **EN:** Assigns a value to i32_ty. **CN:** 将一个值赋给 i32_ty。
+- **L568** `        return [i32_ty]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L569** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L570** `    def generate_default_return_values(` — **EN:** Defines function `generate_default_return_values`. **CN:** 定义函数 `generate_default_return_values`。
+- **L571** `        self, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L572** `    ) -> List[ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L573** `        """` — **EN:** Starts the docstring for the function `generate_default_return_values`. **CN:** 开始说明 function `generate_default_return_values` 的文档字符串。
+- **L574** `        Generate the default return values of the function.` — **EN:** Continues the docstring for the function `generate_default_return_values`. **CN:** 继续说明 function `generate_default_return_values` 的文档字符串。
+- **L575** `        With cuda dialect, the default return value is 0 to indicate success.` — **EN:** Continues the docstring for the function `generate_default_return_values`. **CN:** 继续说明 function `generate_default_return_values` 的文档字符串。
+- **L576** `        """` — **EN:** Ends the docstring for the function `generate_default_return_values`. **CN:** 结束说明 function `generate_default_return_values` 的文档字符串。
+- **L577** `        if ip is None:` — **EN:** Starts a conditional branch guarded by `ip is None`. **CN:** 开始一个由 `ip is None` 控制的条件分支。
+- **L578** `            raise DSLRuntimeError("ip is required to generate default return values")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L579** `        return_types = self.get_return_types()` — **EN:** Assigns a value to return_types. **CN:** 将一个值赋给 return_types。
+- **L580** `        if len(return_types) != 1:` — **EN:** Starts a conditional branch guarded by `len(return_types) != 1`. **CN:** 开始一个由 `len(return_types) != 1` 控制的条件分支。
+- **L581** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L582** `                f"Expected exactly one return type, but got {len(return_types)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `        return_type = return_types[0]` — **EN:** Assigns a value to return_type. **CN:** 将一个值赋给 return_type。
+- **L585** `        with ip:` — **EN:** Starts a context-managed block using ip. **CN:** 开始一个使用 ip 的上下文管理代码块。
+- **L586** `            zero = arith.ConstantOp(return_type, 0).result` — **EN:** Assigns a value to zero. **CN:** 将一个值赋给 zero。
+- **L587** `        return [zero]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L588** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L589** `    def compile_and_cache(` — **EN:** Defines function `compile_and_cache`. **CN:** 定义函数 `compile_and_cache`。
+- **L590** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L591** `        module: ir.Module,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L592** `        module_hash: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L593** `        function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L594** `        pipeline: Optional[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L595** `        signature: inspect.Signature,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L596** `        no_cache: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L597** `        no_jit_engine: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L598** `        func_type: type = CudaDialectJitCompiledFunction,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L599** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L600** `        full_args: Optional[tuple] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L601** `        full_kwargs: Optional[dict] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L602** `        dynamic_args: Optional[list] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L603** `        dynamic_kwargs: Optional[dict] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L604** `        original_function_name: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L605** `        funcBody: Optional[Callable[..., None]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L606** `    ) -> CudaDialectJitCompiledFunction:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L607** `        """` — **EN:** Starts the docstring for the function `compile_and_cache`. **CN:** 开始说明 function `compile_and_cache` 的文档字符串。
+- **L608** `        Compile the module and cache the result.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L609** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L610** `        :param module: The MLIR module to compile.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L611** `        :param module_hash: The hash of the MLIR module.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L612** `        :param function_name: The name of the function to compile.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L613** `        :param pipeline: The pipeline to use for compilation.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L614** `        :param signature: The signature of the function to compile.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L615** `        :param no_cache: Whether to cache the result.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L616** `        :param no_jit_engine: Whether to create JIT execution engine.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L617** `        :param full_args: The full arguments to use for compilation.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L618** `        :param full_kwargs: The full keyword arguments to use for compilation.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L619** `        :param dynamic_args: The dynamic arguments to use for compilation.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L620** `        :param dynamic_kwargs: The dynamic keyword arguments to use for compilation.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L621** `        :param original_function_name: The name of the original function without mangling.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L622** `        :return: The compiled function.` — **EN:** Continues the docstring for the function `compile_and_cache`. **CN:** 继续说明 function `compile_and_cache` 的文档字符串。
+- **L623** `        """` — **EN:** Ends the docstring for the function `compile_and_cache`. **CN:** 结束说明 function `compile_and_cache` 的文档字符串。
+- **L624** `        if self.compile_options.enable_tvm_ffi:` — **EN:** Starts a conditional branch guarded by `self.compile_options.enable_tvm_ffi`. **CN:** 开始一个由 `self.compile_options.enable_tvm_ffi` 控制的条件分支。
+- **L625** `            # TVM FFI post compile logic` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L626** `            # attach extra ABI function to the MLIR module` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L627** `            from .tvm_ffi_provider import (` — **EN:** Imports TVMFFIJitCompiledFunction, TVMFFIJitCompiledFunctionWithKwargs, TVMFFICuteCallProvider from `.tvm_ffi_provider`. **CN:** 从 `.tvm_ffi_provider` 导入 TVMFFIJitCompiledFunction, TVMFFIJitCompiledFunctionWithKwargs, TVMFFICuteCallProvider。
+- **L628** `                TVMFFIJitCompiledFunction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `                TVMFFIJitCompiledFunctionWithKwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `                TVMFFICuteCallProvider,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L632** `            from cutlass.base_dsl.tvm_ffi_builder import attach_ffi_func` — **EN:** Imports attach_ffi_func from `cutlass.base_dsl.tvm_ffi_builder`. **CN:** 从 `cutlass.base_dsl.tvm_ffi_builder` 导入 attach_ffi_func。
+- **L633** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L634** `            assert self._tvm_ffi_args_spec_converter is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L635** `            tvm_ffi_spec_params, kwargs_wrapper_spec = (` — **EN:** Assigns a value to (tvm_ffi_spec_params, kwargs_wrapper_spec). **CN:** 将一个值赋给 (tvm_ffi_spec_params, kwargs_wrapper_spec)。
+- **L636** `                self._tvm_ffi_args_spec_converter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `                    function_name, signature, full_args, full_kwargs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L639** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L640** `            tvm_ffi_provider = TVMFFICuteCallProvider(` — **EN:** Assigns a value to tvm_ffi_provider. **CN:** 将一个值赋给 tvm_ffi_provider。
+- **L641** `                function_name, has_gpu_module=self.num_kernels > 0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L642** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L643** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L644** `            # ensure we run the postprocessor hook after the compiler has run its passes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L645** `            def post_compile_hook(module: ir.Module) -> None:` — **EN:** Defines function `post_compile_hook`. **CN:** 定义函数 `post_compile_hook`。
+- **L646** `                with module.context, module.operation.location:` — **EN:** Starts a context-managed block using module.context, module.operation.location. **CN:** 开始一个使用 module.context, module.operation.location 的上下文管理代码块。
+- **L647** `                    # attach the tvm ffi function to the mlir module` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L648** `                    attach_ffi_func(` — **EN:** Invokes `attach_ffi_func` as a standalone call. **CN:** 以独立语句方式调用 `attach_ffi_func`。
+- **L649** `                        module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** `                        function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L651** `                        tvm_ffi_spec_params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L652** `                        tvm_ffi_provider,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L653** `                        fn_display_name=original_function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L654** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L655** `                module.operation.verify()` — **EN:** Invokes `module.operation.verify` as a standalone call. **CN:** 以独立语句方式调用 `module.operation.verify`。
+- **L656** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L657** `            def _make_compiled_func(*args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `_make_compiled_func`. **CN:** 定义函数 `_make_compiled_func`。
+- **L658** `                if kwargs_wrapper_spec.kwonly_names or kwargs_wrapper_spec.arg_defaults:` — **EN:** Starts a conditional branch guarded by `kwargs_wrapper_spec.kwonly_names or kwargs_wrapper_spec.a...`. **CN:** 开始一个由 `kwargs_wrapper_spec.kwonly_names or kwargs_wrapper_spec.a...` 控制的条件分支。
+- **L659** `                    return TVMFFIJitCompiledFunctionWithKwargs(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L660** `                        *args, **kwargs, kwargs_wrapper_spec=kwargs_wrapper_spec` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L661** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L663** `                    return TVMFFIJitCompiledFunction(*args, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L664** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L665** `            # ensure the compiler can run post-compile hook after its passes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L666** `            # the context will restore the previous post-compile hook after it exits` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L667** `            with compiler.PostCompileHookContext(` — **EN:** Starts a context-managed block using compiler.PostCompileHookContext(self.compiler_provider, post_compile_hook). **CN:** 开始一个使用 compiler.PostCompileHookContext(self.compiler_provider, post_compile_hook) 的上下文管理代码块。
+- **L668** `                self.compiler_provider, post_compile_hook` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L669** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L670** `                return super().compile_and_cache(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L671** `                    module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `                    module_hash,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `                    function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `                    pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L675** `                    signature,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `                    no_cache,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `                    no_jit_engine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** `                    _make_compiled_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L679** `                    full_args=full_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L680** `                    full_kwargs=full_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** `                    dynamic_args=dynamic_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** `                    dynamic_kwargs=dynamic_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `                    funcBody=funcBody,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L684** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L686** `        return super().compile_and_cache(  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L687** `            module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `            module_hash,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L689** `            function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `            pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `            signature,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `            no_cache,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** `            no_jit_engine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L694** `            CudaDialectJitCompiledFunction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L695** `            full_args=full_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L696** `            full_kwargs=full_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** `            dynamic_args=dynamic_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L698** `            dynamic_kwargs=dynamic_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L699** `            original_function_name=original_function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L700** `            funcBody=funcBody,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L701** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L702** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L703** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L704** `    def track_smem_allocator(` — **EN:** Defines function `track_smem_allocator`. **CN:** 定义函数 `track_smem_allocator`。
+- **L705** `        allocator: object, callback: Callable[[object], int]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L706** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L707** `        """` — **EN:** Starts the docstring for the function `track_smem_allocator`. **CN:** 开始说明 function `track_smem_allocator` 的文档字符串。
+- **L708** `        Tracks shared memory usage for kernel functions.` — **EN:** Continues the docstring for the function `track_smem_allocator`. **CN:** 继续说明 function `track_smem_allocator` 的文档字符串。
+- **L709** `        Find and set allocator to its parent dsl object.` — **EN:** Continues the docstring for the function `track_smem_allocator`. **CN:** 继续说明 function `track_smem_allocator` 的文档字符串。
+- **L710** `        """` — **EN:** Ends the docstring for the function `track_smem_allocator`. **CN:** 结束说明 function `track_smem_allocator` 的文档字符串。
+- **L711** `        frame = inspect.currentframe().f_back  # type: ignore[union-attr]` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L712** `        while frame:` — **EN:** Starts a while-loop guarded by `frame`. **CN:** 开始一个由 `frame` 控制的 while 循环。
+- **L713** `            obj = frame.f_locals.get("self", None)` — **EN:** Assigns a value to obj. **CN:** 将一个值赋给 obj。
+- **L714** `            if obj and isinstance(obj, CutlassBaseDSL):` — **EN:** Starts a conditional branch guarded by `obj and isinstance(obj, CutlassBaseDSL)`. **CN:** 开始一个由 `obj and isinstance(obj, CutlassBaseDSL)` 控制的条件分支。
+- **L715** `                obj._set_smem_tracking(allocator, callback)` — **EN:** Invokes `obj._set_smem_tracking` as a standalone call. **CN:** 以独立语句方式调用 `obj._set_smem_tracking`。
+- **L716** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L717** `            frame = frame.f_back` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L718** `        warnings.warn("Cannot find parent dsl for allocator!", UserWarning)` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L719** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L720** `    def _set_smem_tracking(  # type: ignore[no-redef]` — **EN:** Defines function `_set_smem_tracking`. **CN:** 定义函数 `_set_smem_tracking`。
+- **L721** `        self, allocator: object, callback: Callable[[object], int]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L722** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L723** `        # Registers an allocator and callback for current dsl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L724** `        self._smem_usage_tracker = (allocator, callback)` — **EN:** Assigns a value to self._smem_usage_tracker. **CN:** 将一个值赋给 self._smem_usage_tracker。
+- **L725** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L726** `    def _reset_smem_tracking(self) -> None:  # type: ignore[no-redef]` — **EN:** Defines function `_reset_smem_tracking`. **CN:** 定义函数 `_reset_smem_tracking`。
+- **L727** `        # Clear an allocator and callback for current dsl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L728** `        self._smem_usage_tracker = None` — **EN:** Assigns a value to self._smem_usage_tracker. **CN:** 将一个值赋给 self._smem_usage_tracker。
+- **L729** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L730** `    def _get_smem_usage(self) -> int:  # type: ignore[no-redef]` — **EN:** Defines function `_get_smem_usage`. **CN:** 定义函数 `_get_smem_usage`。
+- **L731** `        # Treat final allocated bytes of allocator as smem usage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L732** `        if not self._smem_usage_tracker:` — **EN:** Starts a conditional branch guarded by `not self._smem_usage_tracker`. **CN:** 开始一个由 `not self._smem_usage_tracker` 控制的条件分支。
+- **L733** `            return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L734** `        allocator, callback = self._smem_usage_tracker` — **EN:** Assigns a value to (allocator, callback). **CN:** 将一个值赋给 (allocator, callback)。
+- **L735** `        return callback(allocator)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L736** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L737** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L738** `    def cuda_launch_func(` — **EN:** Defines function `cuda_launch_func`. **CN:** 定义函数 `cuda_launch_func`。
+- **L739** `        stream: Union[list, tuple],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L740** `        kernel: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L741** `        grid_size_x: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L742** `        grid_size_y: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L743** `        grid_size_z: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L744** `        block_size_x: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L745** `        block_size_y: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L746** `        block_size_z: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L747** `        kernel_operands: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L748** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L749** `        cluster_size_x: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L750** `        cluster_size_y: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L751** `        cluster_size_z: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L752** `        preferred_cluster_size_x: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L753** `        preferred_cluster_size_y: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L754** `        preferred_cluster_size_z: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L755** `        dynamic_shared_memory_size: Optional[Union[Int64, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L756** `        use_pdl: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L757** `        cooperative: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L758** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L759** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L760** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L761** `        max_num_attributes = 17` — **EN:** Assigns a value to max_num_attributes. **CN:** 将一个值赋给 max_num_attributes。
+- **L762** `        launch_config_type = cuda_dialect.LaunchConfigType.get(max_num_attributes)` — **EN:** Assigns a value to launch_config_type. **CN:** 将一个值赋给 launch_config_type。
+- **L763** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L764** `        if len(stream) == 0:` — **EN:** Starts a conditional branch guarded by `len(stream) == 0`. **CN:** 开始一个由 `len(stream) == 0` 控制的条件分支。
+- **L765** `            stream = cuda_dialect.CastOp(` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L766** `                src=Int64(0).ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L767** `                dst=cuda_dialect.StreamType.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L768** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L769** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L770** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L772** `            stream = stream[0]` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L773** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L774** `        dynamic_shared_memory_size = Int64(dynamic_shared_memory_size).ir_value()` — **EN:** Assigns a value to dynamic_shared_memory_size. **CN:** 将一个值赋给 dynamic_shared_memory_size。
+- **L775** `        block_size_x = Int32(block_size_x).ir_value()` — **EN:** Assigns a value to block_size_x. **CN:** 将一个值赋给 block_size_x。
+- **L776** `        block_size_y = Int32(block_size_y).ir_value()` — **EN:** Assigns a value to block_size_y. **CN:** 将一个值赋给 block_size_y。
+- **L777** `        block_size_z = Int32(block_size_z).ir_value()` — **EN:** Assigns a value to block_size_z. **CN:** 将一个值赋给 block_size_z。
+- **L778** `        grid_size_x = Int32(grid_size_x).ir_value()` — **EN:** Assigns a value to grid_size_x. **CN:** 将一个值赋给 grid_size_x。
+- **L779** `        grid_size_y = Int32(grid_size_y).ir_value()` — **EN:** Assigns a value to grid_size_y. **CN:** 将一个值赋给 grid_size_y。
+- **L780** `        grid_size_z = Int32(grid_size_z).ir_value()` — **EN:** Assigns a value to grid_size_z. **CN:** 将一个值赋给 grid_size_z。
+- **L781** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L782** `        cfg = cuda_dialect.launch_cfg_create(` — **EN:** Assigns a value to cfg. **CN:** 将一个值赋给 cfg。
+- **L783** `            # Launch config type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L784** `            launch_config_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L785** `            ir.IntegerAttr.get(ir.IntegerType.get_signless(32), max_num_attributes),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L786** `            block_size_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L787** `            block_size_y,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** `            block_size_z,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L789** `            dynamic_shared_memory_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `            grid_size_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `            grid_size_y,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `            grid_size_z,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L793** `            stream,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L794** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L795** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L796** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L797** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L798** `        cuda_dialect.launch_cfg_programmatic_stream_serialization_allowed(` — **EN:** Invokes `cuda_dialect.launch_cfg_programmatic_stream_serializ...` as a standalone call. **CN:** 以独立语句方式调用 `cuda_dialect.launch_cfg_programmatic_stream_serializ...`。
+- **L799** `            cfg, Int32(use_pdl).ir_value(), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L800** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L801** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L802** `        if cluster_size_x is not None:` — **EN:** Starts a conditional branch guarded by `cluster_size_x is not None`. **CN:** 开始一个由 `cluster_size_x is not None` 控制的条件分支。
+- **L803** `            if cluster_size_y is None:` — **EN:** Starts a conditional branch guarded by `cluster_size_y is None`. **CN:** 开始一个由 `cluster_size_y is None` 控制的条件分支。
+- **L804** `                cluster_size_y = 1` — **EN:** Assigns a value to cluster_size_y. **CN:** 将一个值赋给 cluster_size_y。
+- **L805** `            if cluster_size_z is None:` — **EN:** Starts a conditional branch guarded by `cluster_size_z is None`. **CN:** 开始一个由 `cluster_size_z is None` 控制的条件分支。
+- **L806** `                cluster_size_z = 1` — **EN:** Assigns a value to cluster_size_z. **CN:** 将一个值赋给 cluster_size_z。
+- **L807** `            cluster_size_x = Int32(cluster_size_x).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to cluster_size_x. **CN:** 将一个值赋给 cluster_size_x。
+- **L808** `            cluster_size_y = Int32(cluster_size_y).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to cluster_size_y. **CN:** 将一个值赋给 cluster_size_y。
+- **L809** `            cluster_size_z = Int32(cluster_size_z).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to cluster_size_z. **CN:** 将一个值赋给 cluster_size_z。
+- **L810** `            cuda_dialect.launch_cfg_cluster_dim(` — **EN:** Invokes `cuda_dialect.launch_cfg_cluster_dim` as a standalone call. **CN:** 以独立语句方式调用 `cuda_dialect.launch_cfg_cluster_dim`。
+- **L811** `                cfg, cluster_size_x, cluster_size_y, cluster_size_z, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L812** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L813** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L814** `        if preferred_cluster_size_x is not None:` — **EN:** Starts a conditional branch guarded by `preferred_cluster_size_x is not None`. **CN:** 开始一个由 `preferred_cluster_size_x is not None` 控制的条件分支。
+- **L815** `            preferred_cluster_size_y = preferred_cluster_size_y or 1` — **EN:** Assigns a value to preferred_cluster_size_y. **CN:** 将一个值赋给 preferred_cluster_size_y。
+- **L816** `            preferred_cluster_size_z = preferred_cluster_size_z or 1` — **EN:** Assigns a value to preferred_cluster_size_z. **CN:** 将一个值赋给 preferred_cluster_size_z。
+- **L817** `            preferred_x = Int32(preferred_cluster_size_x).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to preferred_x. **CN:** 将一个值赋给 preferred_x。
+- **L818** `            preferred_y = Int32(preferred_cluster_size_y).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to preferred_y. **CN:** 将一个值赋给 preferred_y。
+- **L819** `            preferred_z = Int32(preferred_cluster_size_z).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to preferred_z. **CN:** 将一个值赋给 preferred_z。
+- **L820** `            cuda_dialect.launch_cfg_preferred_cluster_dim(` — **EN:** Invokes `cuda_dialect.launch_cfg_preferred_cluster_dim` as a standalone call. **CN:** 以独立语句方式调用 `cuda_dialect.launch_cfg_preferred_cluster_dim`。
+- **L821** `                cfg, preferred_x, preferred_y, preferred_z, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L822** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L824** `        cuda_dialect.launch_cfg_cooperative(` — **EN:** Invokes `cuda_dialect.launch_cfg_cooperative` as a standalone call. **CN:** 以独立语句方式调用 `cuda_dialect.launch_cfg_cooperative`。
+- **L825** `            cfg, Int32(cooperative).ir_value(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `        op = cuda_dialect.launch_ex(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L829** `            cuda_dialect.ResultType.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L830** `            kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L831** `            cfg,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L832** `            kernel_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L833** `            # This is true for any DSL generated kernel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L834** `            assume_kernel_attr=ir.Attribute.parse("#cuda.assume_kernel_attr<true>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L835** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L836** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L837** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L838** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L839** `        res_i32 = cuda_dialect.CastOp(` — **EN:** Assigns a value to res_i32. **CN:** 将一个值赋给 res_i32。
+- **L840** `            src=op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L841** `            dst=cuda_dialect.IntegerType.get_signless(32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L842** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L844** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L845** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L846** `        cuda_dialect.return_if_error([res_i32], loc=loc, ip=ip)` — **EN:** Invokes `cuda_dialect.return_if_error` as a standalone call. **CN:** 以独立语句方式调用 `cuda_dialect.return_if_error`。
+- **L847** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L848** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L849** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L850** `    def gpu_launch_func(` — **EN:** Defines function `gpu_launch_func`. **CN:** 定义函数 `gpu_launch_func`。
+- **L851** `        async_token: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L852** `        async_dependencies: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L853** `        kernel: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L854** `        grid_size_x: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L855** `        grid_size_y: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L856** `        grid_size_z: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L857** `        block_size_x: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L858** `        block_size_y: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L859** `        block_size_z: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L860** `        kernel_operands: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L861** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L862** `        cluster_size_x: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L863** `        cluster_size_y: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L864** `        cluster_size_z: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L865** `        dynamic_shared_memory_size: Optional[Union[Int64, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L866** `        async_object: Optional[ir.Value] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L867** `        use_pdl: Any = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L868** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L869** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L870** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L871** `        op = gpu.LaunchFuncOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L872** `            asyncToken=async_token,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L873** `            asyncDependencies=async_dependencies,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L874** `            kernel=kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L875** `            gridSizeX=grid_size_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L876** `            gridSizeY=grid_size_y,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L877** `            gridSizeZ=grid_size_z,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L878** `            blockSizeX=block_size_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L879** `            blockSizeY=block_size_y,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L880** `            blockSizeZ=block_size_z,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L881** `            kernelOperands=kernel_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L882** `            clusterSizeX=cluster_size_x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L883** `            clusterSizeY=cluster_size_y,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L884** `            clusterSizeZ=cluster_size_z,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L885** `            dynamicSharedMemorySize=dynamic_shared_memory_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L886** `            asyncObject=async_object,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L887** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L888** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L889** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L890** `        op.attributes["use_pdl"] = use_pdl.ir_value()` — **EN:** Assigns a value to op.attributes['use_pdl']. **CN:** 将一个值赋给 op.attributes['use_pdl']。
+- **L891** `        return _get_op_result_or_op_results(op)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L892** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L893** `    def _kernel_helper(  # type: ignore[override]` — **EN:** Defines function `_kernel_helper`. **CN:** 定义函数 `_kernel_helper`。
+- **L894** `        self, funcBody: Callable[..., None], *args: Any, **kwargs: Any` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L895** `    ) -> "KernelLauncher":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L896** `        class _CutlassIrKernelGenHelper(BaseDSL._KernelGenHelper):` — **EN:** Defines class `_CutlassIrKernelGenHelper` with bases BaseDSL._KernelGenHelper. **CN:** 定义类 `_CutlassIrKernelGenHelper`，其基类为 BaseDSL._KernelGenHelper。
+- **L897** `            def __init__(self, dsl: CutlassBaseDSL):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L898** `                super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L899** `                self.dsl = dsl` — **EN:** Assigns a value to self.dsl. **CN:** 将一个值赋给 self.dsl。
+- **L900** `                self.dsl._reset_smem_tracking()` — **EN:** Invokes `self.dsl._reset_smem_tracking` as a standalone call. **CN:** 以独立语句方式调用 `self.dsl._reset_smem_tracking`。
+- **L901** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L902** `            def generate_func_op(` — **EN:** Defines function `generate_func_op`. **CN:** 定义函数 `generate_func_op`。
+- **L903** `                self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L904** `                arg_types: List[ir.Type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L905** `                arg_attrs: Optional[List[ir.Attribute]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L906** `                kernel_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L907** `                loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L908** `            ) -> ir.Operation:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L909** `                assert arg_attrs is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L910** `                super().generate_func_op(arg_types, arg_attrs, kernel_name)` — **EN:** Invokes `super().generate_func_op` as a standalone call. **CN:** 以独立语句方式调用 `super().generate_func_op`。
+- **L911** `                self.func_op = self.dsl.generate_func_op(` — **EN:** Assigns a value to self.func_op. **CN:** 将一个值赋给 self.func_op。
+- **L912** `                    arg_types, arg_attrs, kernel_name, loc` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L913** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L914** `                self.arg_types = arg_types` — **EN:** Assigns a value to self.arg_types. **CN:** 将一个值赋给 self.arg_types。
+- **L915** `                return self.func_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L916** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L917** `            def generate_func_ret_op(` — **EN:** Defines function `generate_func_ret_op`. **CN:** 定义函数 `generate_func_ret_op`。
+- **L918** `                self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L919** `                loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L920** `                ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L921** `            ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L922** `                self.dsl.generate_func_ret_op(loc, ip)` — **EN:** Invokes `self.dsl.generate_func_ret_op` as a standalone call. **CN:** 以独立语句方式调用 `self.dsl.generate_func_ret_op`。
+- **L923** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L924** `            def get_func_body_start(self) -> ir.Block:` — **EN:** Defines function `get_func_body_start`. **CN:** 定义函数 `get_func_body_start`。
+- **L925** `                assert self.func_op is not None, "Invalid func_op is not expected!"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L926** `                arg_locs = [self.func_op.operation.location for _ in self.arg_types]` — **EN:** Assigns a value to arg_locs. **CN:** 将一个值赋给 arg_locs。
+- **L927** `                return self.func_op.add_entry_block(arg_locs=arg_locs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L928** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L929** `            def generate_launch_op(self, *args: Any, **kwargs: Any) -> None:` — **EN:** Defines function `generate_launch_op`. **CN:** 定义函数 `generate_launch_op`。
+- **L930** `                # Extract args and do validation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L931** `                kernelSym = kwargs.get("kernelSym", None)` — **EN:** Assigns a value to kernelSym. **CN:** 将一个值赋给 kernelSym。
+- **L932** `                kernelOperands = kwargs.get("kernelOperands", None)` — **EN:** Assigns a value to kernelOperands. **CN:** 将一个值赋给 kernelOperands。
+- **L933** `                requiredArgs = kwargs.get("requiredArgs", None)` — **EN:** Assigns a value to requiredArgs. **CN:** 将一个值赋给 requiredArgs。
+- **L934** `                loc = kwargs.get("loc", None)` — **EN:** Assigns a value to loc. **CN:** 将一个值赋给 loc。
+- **L935** `                assert kernelSym is not None, "kernelSym being None is not expected!"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L936** `                assert requiredArgs is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L937** `                    "requiredArgs being None is not expected!"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L938** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L939** `                assert kernelOperands is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L940** `                    "kernelOperands being None is not expected!"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L941** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L942** `                assert isinstance(requiredArgs.config, BaseDSL.LaunchConfig), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L943** `                    f"Expect LaunchConfig for @kernel, but got {type(requiredArgs.config)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L944** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L945** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L946** `                cfg = requiredArgs.config` — **EN:** Assigns a value to cfg. **CN:** 将一个值赋给 cfg。
+- **L947** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L948** `                smem_usage = self.dsl._get_smem_usage()` — **EN:** Assigns a value to smem_usage. **CN:** 将一个值赋给 smem_usage。
+- **L949** `                if any(not isinstance(x, int) for x in [cfg.smem, smem_usage]):` — **EN:** Starts a conditional branch guarded by `any((not isinstance(x, int) for x in [cfg.smem, smem_usag...`. **CN:** 开始一个由 `any((not isinstance(x, int) for x in [cfg.smem, smem_usag...` 控制的条件分支。
+- **L950** `                    pass  # cannot compare dynamic value inside kernel to launch op in py` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L951** `                elif cfg.auto_smem:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L952** `                    cfg.smem = smem_usage` — **EN:** Assigns a value to cfg.smem. **CN:** 将一个值赋给 cfg.smem。
+- **L953** `                elif smem_usage > cfg.smem:  # type: ignore[operator]` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L954** `                    warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L955** `                        f"Potential error: specified kernel launch smem bytes "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L956** `                        f"({cfg.smem}) is smaller than kernel usage ({smem_usage})!",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L957** `                        UserWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L958** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L959** `                cfg.smem = const(cfg.smem)` — **EN:** Assigns a value to cfg.smem. **CN:** 将一个值赋给 cfg.smem。
+- **L960** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L961** `                # Warn user if shared memory exceed arch max` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L962** `                # Currently runtime only show 'CUDA_ERROR_INVALID_VALUE' error which is not useful` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L963** `                arch = self.dsl.get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L964** `                arch_str = f"sm_{arch.major}{arch.minor}"` — **EN:** Assigns a value to arch_str. **CN:** 将一个值赋给 arch_str。
+- **L965** `                if arch_str in SMEM_CAPACITY_MAP:` — **EN:** Starts a conditional branch guarded by `arch_str in SMEM_CAPACITY_MAP`. **CN:** 开始一个由 `arch_str in SMEM_CAPACITY_MAP` 控制的条件分支。
+- **L966** `                    arch_smem = SMEM_CAPACITY_MAP[arch_str]` — **EN:** Assigns a value to arch_smem. **CN:** 将一个值赋给 arch_smem。
+- **L967** `                    smem_msg = (` — **EN:** Assigns a value to smem_msg. **CN:** 将一个值赋给 smem_msg。
+- **L968** `                        f"\nError: kernel '{kernelSym}' launch shared memory "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L969** `                        f"exceeds current GPU arch {arch} allowed. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L970** `                        f"Allocated: {{}} bytes. Max: {arch_smem} bytes.\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L971** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L972** `                    if_generate(` — **EN:** Invokes `if_generate` as a standalone call. **CN:** 以独立语句方式调用 `if_generate`。
+- **L973** `                        arch_smem < cfg.smem,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L974** `                        lambda: cute.print_([cfg.smem], fmt=smem_msg),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L975** `                        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L976** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L977** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L978** `                    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L979** `                        f"Lack smem capacity info for GPU arch {arch}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L980** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L981** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L982** `                async_deps = cfg.async_deps` — **EN:** Assigns a value to async_deps. **CN:** 将一个值赋给 async_deps。
+- **L983** `                if not isinstance(cfg.async_deps, (list, tuple)):` — **EN:** Starts a conditional branch guarded by `not isinstance(cfg.async_deps, (list, tuple))`. **CN:** 开始一个由 `not isinstance(cfg.async_deps, (list, tuple))` 控制的条件分支。
+- **L984** `                    async_deps = [cfg.async_deps]` — **EN:** Assigns a value to async_deps. **CN:** 将一个值赋给 async_deps。
+- **L985** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L986** `                launch_kwargs = {}` — **EN:** Assigns a value to launch_kwargs. **CN:** 将一个值赋给 launch_kwargs。
+- **L987** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L988** `                if cfg.has_fallback_cluster:` — **EN:** Starts a conditional branch guarded by `cfg.has_fallback_cluster`. **CN:** 开始一个由 `cfg.has_fallback_cluster` 控制的条件分支。
+- **L989** `                    assert cfg.fallback_cluster is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L990** `                    assert cfg.cluster is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L991** `                    launch_kwargs.update(` — **EN:** Invokes `launch_kwargs.update` as a standalone call. **CN:** 以独立语句方式调用 `launch_kwargs.update`。
+- **L992** `                        dict(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L993** `                            zip(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L994** `                                ("cluster_size_x", "cluster_size_y", "cluster_size_z"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L995** `                                tuple(cfg.fallback_cluster),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L996** `                            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L997** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L998** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L999** `                    launch_kwargs.update(` — **EN:** Invokes `launch_kwargs.update` as a standalone call. **CN:** 以独立语句方式调用 `launch_kwargs.update`。
+- **L1000** `                        dict(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1001** `                            zip(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1002** `                                (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1003** `                                    "preferred_cluster_size_x",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1004** `                                    "preferred_cluster_size_y",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1005** `                                    "preferred_cluster_size_z",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1006** `                                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1007** `                                tuple(cfg.cluster),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1008** `                            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1009** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1010** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1011** `                elif cfg.has_cluster:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1012** `                    assert cfg.cluster is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1013** `                    launch_kwargs.update(` — **EN:** Invokes `launch_kwargs.update` as a standalone call. **CN:** 以独立语句方式调用 `launch_kwargs.update`。
+- **L1014** `                        dict(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1015** `                            zip(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1016** `                                ("cluster_size_x", "cluster_size_y", "cluster_size_z"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1017** `                                tuple(cfg.cluster),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1018** `                            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1019** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1020** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1021** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1022** `                CutlassBaseDSL.cuda_launch_func(  # type: ignore[misc]` — **EN:** Invokes `CutlassBaseDSL.cuda_launch_func` as a standalone call. **CN:** 以独立语句方式调用 `CutlassBaseDSL.cuda_launch_func`。
+- **L1023** `                    async_deps,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1024** `                    kernelSym,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1025** `                    *cfg.grid,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1026** `                    *cfg.block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1027** `                    kernelOperands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1028** `                    **launch_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1029** `                    dynamic_shared_memory_size=cfg.smem,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1030** `                    use_pdl=cfg.use_pdl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1031** `                    cooperative=cfg.cooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1032** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1033** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1034** `                return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1035** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1036** `        custom_name = kwargs.pop("_name_prefix", None)` — **EN:** Assigns a value to custom_name. **CN:** 将一个值赋给 custom_name。
+- **L1037** `        if custom_name:` — **EN:** Starts a conditional branch guarded by `custom_name`. **CN:** 开始一个由 `custom_name` 控制的条件分支。
+- **L1038** `            return KernelLauncher(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1039** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1040** `                lambda: _CutlassIrKernelGenHelper(self),  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1041** `                funcBody,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1042** `                *args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1043** `                **kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1044** `                _name_prefix=custom_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1045** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1046** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1047** `            return KernelLauncher(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1048** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1049** `                lambda: _CutlassIrKernelGenHelper(self),  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1050** `                funcBody,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1051** `                *args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1052** `                **kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1053** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1054** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1055** `    def _preprocess_launch_config_args(self, args: tuple, kwargs: dict) -> None:` — **EN:** Defines function `_preprocess_launch_config_args`. **CN:** 定义函数 `_preprocess_launch_config_args`。
+- **L1056** `        """Helper to preprocess args and kwargs for LaunchConfig"""` — **EN:** Docstring line documenting the function `_preprocess_launch_config_args`. **CN:** 文档字符串行，用于说明 function `_preprocess_launch_config_args`。
+- **L1057** `        if "stream" in kwargs:` — **EN:** Starts a conditional branch guarded by `'stream' in kwargs`. **CN:** 开始一个由 `'stream' in kwargs` 控制的条件分支。
+- **L1058** `            kwargs["async_deps"] = kwargs.pop("stream")` — **EN:** Assigns a value to kwargs['async_deps']. **CN:** 将一个值赋给 kwargs['async_deps']。
+- **L1059** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1060** `    def mangle_name(` — **EN:** Defines function `mangle_name`. **CN:** 定义函数 `mangle_name`。
+- **L1061** `        self, function_name: str, args: tuple[Any, ...], signature: inspect.Signature` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1062** `    ) -> str:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1063** `        """Mangle the name of the function to avoid conflicts with other functions"""` — **EN:** Docstring line documenting the function `mangle_name`. **CN:** 文档字符串行，用于说明 function `mangle_name`。
+- **L1064** `        function_name = "cutlass_" + function_name` — **EN:** Assigns a value to function_name. **CN:** 将一个值赋给 function_name。
+- **L1065** `        return super().mangle_name(function_name, args, signature)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1066** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1067** `    def _validate_arg(` — **EN:** Defines function `_validate_arg`. **CN:** 定义函数 `_validate_arg`。
+- **L1068** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1069** `        arg: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1070** `        arg_index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1071** `        arg_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1072** `        arg_annotation: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1073** `    ) -> Optional[DSLRuntimeError]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1074** `        """` — **EN:** Starts the docstring for the function `_validate_arg`. **CN:** 开始说明 function `_validate_arg` 的文档字符串。
+- **L1075** `        Validates if the arg is really of the annotated type.` — **EN:** Continues the docstring for the function `_validate_arg`. **CN:** 继续说明 function `_validate_arg` 的文档字符串。
+- **L1076** `        """` — **EN:** Ends the docstring for the function `_validate_arg`. **CN:** 结束说明 function `_validate_arg` 的文档字符串。
+- **L1077** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1078** `        if (` — **EN:** Starts a conditional branch guarded by `is_arg_annotation_constexpr(arg_annotation, arg_name, arg...`. **CN:** 开始一个由 `is_arg_annotation_constexpr(arg_annotation, arg_name, arg...` 控制的条件分支。
+- **L1079** `            is_arg_annotation_constexpr(arg_annotation, arg_name, arg_index, None)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1080** `            or arg_annotation is Any` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1081** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1082** `            pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1083** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1084** `            origin = get_origin(arg_annotation)` — **EN:** Assigns a value to origin. **CN:** 将一个值赋给 origin。
+- **L1085** `            # Handle special case where annotation is Type[X] but arg is an actual type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1086** `            if origin is type and isinstance(arg, type):` — **EN:** Starts a conditional branch guarded by `origin is type and isinstance(arg, type)`. **CN:** 开始一个由 `origin is type and isinstance(arg, type)` 控制的条件分支。
+- **L1087** `                # Get the expected base type from Type[X]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1088** `                expected_base = get_args(arg_annotation)[0]` — **EN:** Assigns a value to expected_base. **CN:** 将一个值赋给 expected_base。
+- **L1089** `                if not issubclass(arg, expected_base):` — **EN:** Starts a conditional branch guarded by `not issubclass(arg, expected_base)`. **CN:** 开始一个由 `not issubclass(arg, expected_base)` 控制的条件分支。
+- **L1090** `                    return DSLRuntimeError(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1091** `                        f"expects argument #{arg_index + 1} ({arg_name}) to be Type[{expected_base}], but got {arg}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1092** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1093** `            # Handle Union types and generic types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1094** `            elif origin is Union or isinstance(arg_annotation, UnionType):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1095** `                # For Union types, check if arg matches any of the allowed types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1096** `                allowed_types = get_args(arg_annotation)` — **EN:** Assigns a value to allowed_types. **CN:** 将一个值赋给 allowed_types。
+- **L1097** `                if not any(` — **EN:** Starts a conditional branch guarded by `not any((ty is Any or (isinstance(ty, type) and isinstanc...`. **CN:** 开始一个由 `not any((ty is Any or (isinstance(ty, type) and isinstanc...` 控制的条件分支。
+- **L1098** `                    (ty is Any)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1099** `                    or (isinstance(ty, type) and isinstance(arg, ty))` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1100** `                    or (get_origin(ty) is tuple and isinstance(arg, tuple))` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1101** `                    for ty in allowed_types` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1102** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1103** `                    return DSLRuntimeError(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1104** `                        f"expects argument #{arg_index + 1} ({arg_name}) to be one of {allowed_types}, but got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1105** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1106** `            elif isinstance(arg_annotation, GenericAlias):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1107** `                # skip generic types such as List[int], Tuple[int, int], etc. for performance consideration?` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1108** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1110** `            elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1111** `                getattr(arg_annotation, "__name__", None) == "CUstream"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1112** `                and arg.__class__.__name__ == "_FakeStream"` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1113** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1114** `                # allow FakeStream to be passed as CUDA stream` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1115** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1117** `            elif isinstance(arg_annotation, type):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1118** `                # Handle simple type annotations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1119** `                if not isinstance(arg, arg_annotation) and arg is not None:` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, arg_annotation) and arg is not None`. **CN:** 开始一个由 `not isinstance(arg, arg_annotation) and arg is not None` 控制的条件分支。
+- **L1120** `                    return DSLRuntimeError(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1121** `                        f"expects argument #{arg_index + 1} ({arg_name}) to be {arg_annotation}, but got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1122** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1123** `        # Everything looks good if we are here` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1124** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1126** `    def _generate_jit_func_args_for_known_types(` — **EN:** Defines function `_generate_jit_func_args_for_known_types`. **CN:** 定义函数 `_generate_jit_func_args_for_known_types`。
+- **L1127** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1128** `        func: Callable[..., None],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1129** `        arg: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1130** `        arg_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1131** `        arg_spec: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1132** `        arg_index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1133** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1134** `        is_host: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1135** `    ) -> Tuple[` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1136** `        Optional[List[object]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1137** `        Optional[List[ir.Type]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1138** `        Optional[List[ir.Attribute]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1139** `    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1140** `        jit_arg_type: Optional[List[ir.Type]] = []` — **EN:** Assigns a typed value to jit_arg_type. **CN:** 为 jit_arg_type 赋予带类型标注的值。
+- **L1141** `        jit_arg_attr: Optional[List[ir.Attribute]] = []` — **EN:** Assigns a typed value to jit_arg_attr. **CN:** 为 jit_arg_attr 赋予带类型标注的值。
+- **L1142** `        jit_exec_arg: Optional[List[object]] = []` — **EN:** Assigns a typed value to jit_exec_arg. **CN:** 为 jit_exec_arg 赋予带类型标注的值。
+- **L1143** `        default_attr = ir.DictAttr.get({})` — **EN:** Assigns a value to default_attr. **CN:** 将一个值赋给 default_attr。
+- **L1144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1145** `        (` — **EN:** Assigns a value to (jit_exec_arg, jit_arg_type, jit_arg_attr). **CN:** 将一个值赋给 (jit_exec_arg, jit_arg_type, jit_arg_attr)。
+- **L1146** `            jit_exec_arg,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1147** `            jit_arg_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1148** `            jit_arg_attr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1149** `        ) = super()._generate_jit_func_args_for_known_types(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1150** `            func, arg, arg_name, arg_spec, arg_index, is_host=is_host` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1151** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1153** `        if jit_arg_type is not None and len(jit_arg_type) == 0:` — **EN:** Starts a conditional branch guarded by `jit_arg_type is not None and len(jit_arg_type) == 0`. **CN:** 开始一个由 `jit_arg_type is not None and len(jit_arg_type) == 0` 控制的条件分支。
+- **L1154** `            assert jit_arg_attr is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1155** `            assert jit_exec_arg is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1156** `            # Handle DSL specific types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1157** `            if is_cute_algebra_type(arg_spec):` — **EN:** Starts a conditional branch guarded by `is_cute_algebra_type(arg_spec)`. **CN:** 开始一个由 `is_cute_algebra_type(arg_spec)` 控制的条件分支。
+- **L1158** `                dyn_vals = extract_mlir_values(arg)` — **EN:** Assigns a value to dyn_vals. **CN:** 将一个值赋给 dyn_vals。
+- **L1159** `                if dyn_vals:` — **EN:** Starts a conditional branch guarded by `dyn_vals`. **CN:** 开始一个由 `dyn_vals` 控制的条件分支。
+- **L1160** `                    # Handle dynamic types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1161** `                    jit_arg_type.extend([v.type for v in dyn_vals])` — **EN:** Invokes `jit_arg_type.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_arg_type.extend`。
+- **L1162** `                    jit_arg_attr.extend([default_attr] * len(dyn_vals))` — **EN:** Invokes `jit_arg_attr.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_arg_attr.extend`。
+- **L1163** `                    if is_host and self.envar.enable_tvm_ffi:` — **EN:** Starts a conditional branch guarded by `is_host and self.envar.enable_tvm_ffi`. **CN:** 开始一个由 `is_host and self.envar.enable_tvm_ffi` 控制的条件分支。
+- **L1164** `                        import tvm_ffi` — **EN:** Imports tvm_ffi for later use. **CN:** 导入 tvm_ffi 供后续使用。
+- **L1165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1166** `                        jit_exec_arg.extend(` — **EN:** Invokes `jit_exec_arg.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_exec_arg.extend`。
+- **L1167** `                            [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1168** `                                tvm_ffi.Shape(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1169** `                                    [  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1170** `                                        v.value if isinstance(v, Numeric) else v` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1171** `                                        for v in arg` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1172** `                                    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1173** `                                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1174** `                            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1175** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1176** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1177** `                        jit_exec_arg.extend(` — **EN:** Invokes `jit_exec_arg.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_exec_arg.extend`。
+- **L1178** `                            get_c_pointers(arg) if is_host else dyn_vals` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1179** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1180** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1181** `                    return None, None, None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1182** `            elif not is_host and not implements_dynamic_expression(arg, partial=True):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1183** `                # Try tree_flatten` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1184** `                try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L1185** `                    dyn_vals, attr_vals, _ = tree_flatten(arg)` — **EN:** Assigns a value to (dyn_vals, attr_vals, _). **CN:** 将一个值赋给 (dyn_vals, attr_vals, _)。
+- **L1186** `                except DSLTreeFlattenError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L1187** `                    # If fails, just return the original arg` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1188** `                    return jit_exec_arg, jit_arg_type, jit_arg_attr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1190** `                if dyn_vals:` — **EN:** Starts a conditional branch guarded by `dyn_vals`. **CN:** 开始一个由 `dyn_vals` 控制的条件分支。
+- **L1191** `                    jit_arg_type.extend([v.type for v in dyn_vals])` — **EN:** Invokes `jit_arg_type.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_arg_type.extend`。
+- **L1192** `                    jit_arg_attr.extend(attr_vals)` — **EN:** Invokes `jit_arg_attr.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_arg_attr.extend`。
+- **L1193** `                    jit_exec_arg.extend(dyn_vals)` — **EN:** Invokes `jit_exec_arg.extend` as a standalone call. **CN:** 以独立语句方式调用 `jit_exec_arg.extend`。
+- **L1194** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1195** `                    return None, None, None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1196** `        return jit_exec_arg, jit_arg_type, jit_arg_attr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1198** `    def _generate_execution_arguments_for_known_types(` — **EN:** Defines function `_generate_execution_arguments_for_known_types`. **CN:** 定义函数 `_generate_execution_arguments_for_known_types`。
+- **L1199** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1200** `        arg: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1201** `        arg_spec: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1202** `        arg_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1203** `        i: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1204** `        fop_args: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1205** `        iv_block_args: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1206** `    ) -> Tuple[List[object], int]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1207** `        ir_arg, iv_block_args = super()._generate_execution_arguments_for_known_types(` — **EN:** Assigns a value to (ir_arg, iv_block_args). **CN:** 将一个值赋给 (ir_arg, iv_block_args)。
+- **L1208** `            arg, arg_spec, arg_name, i, fop_args, iv_block_args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1209** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1210** `        if not ir_arg:` — **EN:** Starts a conditional branch guarded by `not ir_arg`. **CN:** 开始一个由 `not ir_arg` 控制的条件分支。
+- **L1211** `            # Handling DSL specific types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1212** `            if is_cute_algebra_type(arg_spec):` — **EN:** Starts a conditional branch guarded by `is_cute_algebra_type(arg_spec)`. **CN:** 开始一个由 `is_cute_algebra_type(arg_spec)` 控制的条件分支。
+- **L1213** `                n_args = len(get_mlir_types(arg))` — **EN:** Assigns a value to n_args. **CN:** 将一个值赋给 n_args。
+- **L1214** `                blk_args = fop_args[iv_block_args : iv_block_args + n_args]` — **EN:** Assigns a value to blk_args. **CN:** 将一个值赋给 blk_args。
+- **L1215** `                ir_arg.append(new_from_mlir_values(arg, blk_args))` — **EN:** Invokes `ir_arg.append` as a standalone call. **CN:** 以独立语句方式调用 `ir_arg.append`。
+- **L1216** `                iv_block_args += n_args` — **EN:** Updates iv_block_args in place. **CN:** 原地更新 iv_block_args。
+- **L1217** `            elif not implements_dynamic_expression(arg, partial=True):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1218** `                # Try tree_unflatten` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1219** `                try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L1220** `                    # we just need the length of flattened values,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1221** `                    # and we don't expect to emit arith.constant ops` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1222** `                    # to get ir values from python literals.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1223** `                    flat_vals, _, tree_def = tree_flatten(arg, return_ir_values=False)` — **EN:** Assigns a value to (flat_vals, _, tree_def). **CN:** 将一个值赋给 (flat_vals, _, tree_def)。
+- **L1224** `                    block_args = fop_args[` — **EN:** Assigns a value to block_args. **CN:** 将一个值赋给 block_args。
+- **L1225** `                        iv_block_args : iv_block_args + len(flat_vals)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1226** `                    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1227** `                    ir_arg.append(tree_unflatten(tree_def, block_args))  # type: ignore[arg-type]` — **EN:** Invokes `ir_arg.append` as a standalone call. **CN:** 以独立语句方式调用 `ir_arg.append`。
+- **L1228** `                    iv_block_args += len(flat_vals)` — **EN:** Updates iv_block_args in place. **CN:** 原地更新 iv_block_args。
+- **L1229** `                except DSLTreeFlattenError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L1230** `                    return ir_arg, iv_block_args` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1232** `        return ir_arg, iv_block_args` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1235** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1236** `# Cute DSL Class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1237** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1240** `class CuTeDSL(CutlassBaseDSL):` — **EN:** Defines class `CuTeDSL` with bases CutlassBaseDSL. **CN:** 定义类 `CuTeDSL`，其基类为 CutlassBaseDSL。
+- **L1241** `    """` — **EN:** Starts the docstring for the class `CuTeDSL`. **CN:** 开始说明 class `CuTeDSL` 的文档字符串。
+- **L1242** `    This is a concrete DSL subclass for the CuTe dialect.` — **EN:** Continues the docstring for the class `CuTeDSL`. **CN:** 继续说明 class `CuTeDSL` 的文档字符串。
+- **L1243** `    """` — **EN:** Ends the docstring for the class `CuTeDSL`. **CN:** 结束说明 class `CuTeDSL` 的文档字符串。
+- **L1244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1245** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1246** `        name = "CUTE_DSL"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L1247** `        compiler_provider = compiler.Compiler(passmanager, execution_engine)` — **EN:** Assigns a value to compiler_provider. **CN:** 将一个值赋给 compiler_provider。
+- **L1248** `        pass_sm_arch_name = "cubin-chip"` — **EN:** Assigns a value to pass_sm_arch_name. **CN:** 将一个值赋给 pass_sm_arch_name。
+- **L1249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1250** `        super().__init__(name, compiler_provider, pass_sm_arch_name, preprocess=True)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1252** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1253** `    def generate_func_op(` — **EN:** Defines function `generate_func_op`. **CN:** 定义函数 `generate_func_op`。
+- **L1254** `        arg_types: List[ir.Type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1255** `        arg_attrs: Optional[List[ir.Attribute]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1256** `        kernel_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1257** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1258** `    ) -> ir.Operation:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1259** `        func_op = cuda_dialect.KernelOp(` — **EN:** Assigns a value to func_op. **CN:** 将一个值赋给 func_op。
+- **L1260** `            kernel_name, ir.FunctionType.get(arg_types, []), loc=loc` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1261** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1262** `        func_op.attributes["cu_attrs"] = ir.DictAttr.get(` — **EN:** Assigns a value to func_op.attributes['cu_attrs']. **CN:** 将一个值赋给 func_op.attributes['cu_attrs']。
+- **L1263** `            {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1264** `                str(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1265** `                    cuda_dialect.CUFunctionAttribute.non_portable_cluster_size_allowed` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1266** `                ): ir.IntegerAttr.get(ir.IntegerType.get_signless(32), 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1267** `                str(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1268** `                    cuda_dialect.CUFunctionAttribute.max_dynamic_shared_size_bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1269** `                ): cuda_dialect.DevMaxSharedMemoryOptinAttr.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1270** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1271** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1272** `        if arg_attrs is not None:` — **EN:** Starts a conditional branch guarded by `arg_attrs is not None`. **CN:** 开始一个由 `arg_attrs is not None` 控制的条件分支。
+- **L1273** `            log().debug(arg_attrs)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1274** `            func_op.arg_attrs = arg_attrs` — **EN:** Assigns a value to func_op.arg_attrs. **CN:** 将一个值赋给 func_op.arg_attrs。
+- **L1275** `        return func_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1277** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1278** `    def generate_func_ret_op(` — **EN:** Defines function `generate_func_ret_op`. **CN:** 定义函数 `generate_func_ret_op`。
+- **L1279** `        loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1280** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1281** `        return cuda_dialect.ReturnOp([], loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1284** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1285** `# CuteExperimentalJitCompiledFunction Class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1286** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1289** `class _CuteExperimentalJitCompiledFunction(CudaDialectJitCompiledFunction):` — **EN:** Defines class `_CuteExperimentalJitCompiledFunction` with bases CudaDialectJitCompiledFunction. **CN:** 定义类 `_CuteExperimentalJitCompiledFunction`，其基类为 CudaDialectJitCompiledFunction。
+- **L1290** `    """JitCompiledFunction subclass for CuteExperimentalDSL.` — **EN:** Starts the docstring for the class `_CuteExperimentalJitCompiledFunction`. **CN:** 开始说明 class `_CuteExperimentalJitCompiledFunction` 的文档字符串。
+- **L1291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1292** `    Overrides \`\`__call__\`\` to validate that the caller supplies exactly` — **EN:** Continues the docstring for the class `_CuteExperimentalJitCompiledFunction`. **CN:** 继续说明 class `_CuteExperimentalJitCompiledFunction` 的文档字符串。
+- **L1293** `    \`\`total_added_arguments\`\` extra workspace pointer arguments beyond the` — **EN:** Continues the docstring for the class `_CuteExperimentalJitCompiledFunction`. **CN:** 继续说明 class `_CuteExperimentalJitCompiledFunction` 的文档字符串。
+- **L1294** `    original kernel signature.` — **EN:** Continues the docstring for the class `_CuteExperimentalJitCompiledFunction`. **CN:** 继续说明 class `_CuteExperimentalJitCompiledFunction` 的文档字符串。
+- **L1295** `    """` — **EN:** Ends the docstring for the class `_CuteExperimentalJitCompiledFunction`. **CN:** 结束说明 class `_CuteExperimentalJitCompiledFunction` 的文档字符串。
+- **L1296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1297** `    def __call__(self, *args: Any, **kwargs: Any) -> int | None:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L1298** `        n = self.execution_args._meta.arg_count` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L1299** `        n_extra = builtins.max(0, len(args) - n)` — **EN:** Assigns a value to n_extra. **CN:** 将一个值赋给 n_extra。
+- **L1300** `        if n_extra != self.total_added_arguments:` — **EN:** Starts a conditional branch guarded by `n_extra != self.total_added_arguments`. **CN:** 开始一个由 `n_extra != self.total_added_arguments` 控制的条件分支。
+- **L1301** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1302** `                "Wrong number of extra workspace arguments",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1303** `                context={` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1304** `                    "expected": self.total_added_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1305** `                    "got": n_extra,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1306** `                },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1307** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1308** `        return super().__call__(*args, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1311** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1312** `# CuteExperimental DSL Class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1313** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1316** `class CuteExperimentalDSL(CutlassBaseDSL):` — **EN:** Defines class `CuteExperimentalDSL` with bases CutlassBaseDSL. **CN:** 定义类 `CuteExperimentalDSL`，其基类为 CutlassBaseDSL。
+- **L1317** `    _ALLOWED_EXTRA_KERNEL_VALUE_ATTRS: frozenset[str] = frozenset(` — **EN:** Assigns a typed value to _ALLOWED_EXTRA_KERNEL_VALUE_ATTRS. **CN:** 为 _ALLOWED_EXTRA_KERNEL_VALUE_ATTRS 赋予带类型标注的值。
+- **L1318** `        {"lir.tma_update_mode"}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1319** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1320** `    _KERNEL_ATTR_SPEC_FIELD: Optional[str] = "_cute_experimental_kernel_attributes"` — **EN:** Assigns a typed value to _KERNEL_ATTR_SPEC_FIELD. **CN:** 为 _KERNEL_ATTR_SPEC_FIELD 赋予带类型标注的值。
+- **L1321** `    JitCompiledFunction = _CuteExperimentalJitCompiledFunction` — **EN:** Assigns a value to JitCompiledFunction. **CN:** 将一个值赋给 JitCompiledFunction。
+- **L1322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1323** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1324** `        name = "CUTE_EXPERIMENTAL_DSL"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L1325** `        compiler_provider = compiler.Compiler(passmanager, execution_engine)` — **EN:** Assigns a value to compiler_provider. **CN:** 将一个值赋给 compiler_provider。
+- **L1326** `        pass_sm_arch_name = "cubin-chip"` — **EN:** Assigns a value to pass_sm_arch_name. **CN:** 将一个值赋给 pass_sm_arch_name。
+- **L1327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1328** `        super().__init__(name, compiler_provider, pass_sm_arch_name, preprocess=True)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1330** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L1331** `    def kernel(cls, *dargs: Any, **dkwargs: Any) -> Any:` — **EN:** Defines function `kernel`. **CN:** 定义函数 `kernel`。
+- **L1332** `        attr_spec = dkwargs.pop("attributes", None)` — **EN:** Assigns a value to attr_spec. **CN:** 将一个值赋给 attr_spec。
+- **L1333** `        # Capture the caller's frame here rather than delegating to` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1334** `        # super().kernel(), which would record *this* frame instead of` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1335** `        # the user's source location (f_back would land in this override` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1336** `        # rather than in the user file).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1337** `        current_frame = inspect.currentframe()` — **EN:** Assigns a value to current_frame. **CN:** 将一个值赋给 current_frame。
+- **L1338** `        assert current_frame is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1339** `        frame = current_frame.f_back` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L1340** `        kernel_decorator = BaseDSL.jit_runner(` — **EN:** Assigns a value to kernel_decorator. **CN:** 将一个值赋给 kernel_decorator。
+- **L1341** `            cls, "_kernel_helper", frame, *dargs, **dkwargs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1342** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1343** `        if attr_spec is None:` — **EN:** Starts a conditional branch guarded by `attr_spec is None`. **CN:** 开始一个由 `attr_spec is None` 控制的条件分支。
+- **L1344** `            return kernel_decorator` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1346** `        def attach_and_decorate(func: Callable[..., None]) -> Callable[..., None]:` — **EN:** Defines function `attach_and_decorate`. **CN:** 定义函数 `attach_and_decorate`。
+- **L1347** `            assert cls._KERNEL_ATTR_SPEC_FIELD is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1348** `            setattr(func, cls._KERNEL_ATTR_SPEC_FIELD, attr_spec)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L1349** `            return kernel_decorator(func)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1351** `        return attach_and_decorate` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1353** `    def _generate_kernel_attrs(self, config: BaseDSL.LaunchConfig) -> dict:` — **EN:** Defines function `_generate_kernel_attrs`. **CN:** 定义函数 `_generate_kernel_attrs`。
+- **L1354** `        import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L1355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1356** `        ret = super()._generate_kernel_attrs(config)` — **EN:** Assigns a value to ret. **CN:** 将一个值赋给 ret。
+- **L1357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1358** `        # Add compute capability attribute from the target arch.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1359** `        # get_arch_enum() validates the arch string; strip the portability` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1360** `        # suffix (a/f) since C++ GpuArchitecture only has base names.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1361** `        arch_enum = self.get_arch_enum()` — **EN:** Assigns a value to arch_enum. **CN:** 将一个值赋给 arch_enum。
+- **L1362** `        sm_match = re.match(r"(sm_\d+)", arch_enum.to_string())` — **EN:** Assigns a value to sm_match. **CN:** 将一个值赋给 sm_match。
+- **L1363** `        if sm_match:` — **EN:** Starts a conditional branch guarded by `sm_match`. **CN:** 开始一个由 `sm_match` 控制的条件分支。
+- **L1364** `            sm_name = sm_match.group(1)` — **EN:** Assigns a value to sm_name. **CN:** 将一个值赋给 sm_name。
+- **L1365** `            ret["cc_attr"] = ir.Attribute.parse(` — **EN:** Assigns a value to ret['cc_attr']. **CN:** 将一个值赋给 ret['cc_attr']。
+- **L1366** `                f"#core.compute_capability<arch = {sm_name}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1367** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1369** `        return ret` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1371** `    def _get_pipeline(self, pipeline: Optional[str]) -> str:` — **EN:** Defines function `_get_pipeline`. **CN:** 定义函数 `_get_pipeline`。
+- **L1372** `        if pipeline == None:` — **EN:** Starts a conditional branch guarded by `pipeline == None`. **CN:** 开始一个由 `pipeline == None` 控制的条件分支。
+- **L1373** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1374** `                "builtin.module(gpu.module(lir-to-cute{enable-cuda-dialect enable-lir-func-finalization=false}), lir-func-finalization{enable-cuda-dialect=true}, cute-to-nvvm{cubin-format=bin enable-cuda-dialect "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1375** `                + self.compile_options.to_str()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1376** `                + "})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1377** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1378** `        return pipeline` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1379** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1380** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1381** `    def generate_func_op(` — **EN:** Defines function `generate_func_op`. **CN:** 定义函数 `generate_func_op`。
+- **L1382** `        arg_types: List[ir.Type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1383** `        arg_attrs: Optional[List[ir.Attribute]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1384** `        kernel_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1385** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1386** `    ) -> ir.Operation:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1387** `        func_op = cutlass_lir.FuncOp(` — **EN:** Assigns a value to func_op. **CN:** 将一个值赋给 func_op。
+- **L1388** `            ir.StringAttr.get(kernel_name),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1389** `            ir.TypeAttr.get(ir.FunctionType.get(arg_types, [])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1390** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1391** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1392** `        func_op.attributes["cu_attrs"] = ir.DictAttr.get(` — **EN:** Assigns a value to func_op.attributes['cu_attrs']. **CN:** 将一个值赋给 func_op.attributes['cu_attrs']。
+- **L1393** `            {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1394** `                str(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1395** `                    cuda_dialect.CUFunctionAttribute.non_portable_cluster_size_allowed` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1396** `                ): ir.IntegerAttr.get(ir.IntegerType.get_signless(32), 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1397** `                str(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1398** `                    cuda_dialect.CUFunctionAttribute.max_dynamic_shared_size_bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1399** `                ): cuda_dialect.DevMaxSharedMemoryOptinAttr.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1400** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1401** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1402** `        # Monkey patch FuncOp to add an add_entry_block method, if not already defined.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1403** `        if not hasattr(func_op, "add_entry_block"):` — **EN:** Starts a conditional branch guarded by `not hasattr(func_op, 'add_entry_block')`. **CN:** 开始一个由 `not hasattr(func_op, 'add_entry_block')` 控制的条件分支。
+- **L1404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1405** `            def add_entry_block(arg_locs: List[ir.Location]) -> ir.Block:` — **EN:** Defines function `add_entry_block`. **CN:** 定义函数 `add_entry_block`。
+- **L1406** `                if len(func_op.body.blocks) != 0:` — **EN:** Starts a conditional branch guarded by `len(func_op.body.blocks) != 0`. **CN:** 开始一个由 `len(func_op.body.blocks) != 0` 控制的条件分支。
+- **L1407** `                    raise RuntimeError("The function already has an entry block.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1408** `                func_op.body.blocks.append(*arg_types)` — **EN:** Invokes `func_op.body.blocks.append` as a standalone call. **CN:** 以独立语句方式调用 `func_op.body.blocks.append`。
+- **L1409** `                return func_op.body.blocks[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1411** `            func_op.add_entry_block = add_entry_block` — **EN:** Assigns a value to func_op.add_entry_block. **CN:** 将一个值赋给 func_op.add_entry_block。
+- **L1412** `        return func_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1414** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1415** `    def generate_func_ret_op(` — **EN:** Defines function `generate_func_ret_op`. **CN:** 定义函数 `generate_func_ret_op`。
+- **L1416** `        loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1417** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1418** `        return cutlass_lir.ReturnOp([])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1420** `    def compile_and_cache(` — **EN:** Defines function `compile_and_cache`. **CN:** 定义函数 `compile_and_cache`。
+- **L1421** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1422** `        module: ir.Module,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1423** `        module_hash: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1424** `        function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1425** `        pipeline: Optional[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1426** `        signature: inspect.Signature,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1427** `        no_cache: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1428** `        no_jit_engine: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1429** `        func_type: type = CudaDialectJitCompiledFunction,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1430** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1431** `        full_args: Optional[tuple] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1432** `        full_kwargs: Optional[dict] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1433** `        dynamic_args: Optional[list] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1434** `        dynamic_kwargs: Optional[dict] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1435** `        original_function_name: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1436** `        funcBody: Optional[Callable[..., None]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1437** `    ) -> CudaDialectJitCompiledFunction:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1438** `        fn = super().compile_and_cache(` — **EN:** Assigns a value to fn. **CN:** 将一个值赋给 fn。
+- **L1439** `            module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1440** `            module_hash,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1441** `            function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1442** `            pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1443** `            signature,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1444** `            no_cache,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1445** `            no_jit_engine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1446** `            func_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1447** `            full_args=full_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1448** `            full_kwargs=full_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1449** `            dynamic_args=dynamic_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1450** `            dynamic_kwargs=dynamic_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1451** `            original_function_name=original_function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1452** `            funcBody=funcBody,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1453** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1454** `        # Extract the kernel_extra_args attribute written by FuncFinalizationPass` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1455** `        # and store it on the compiled function for later retrieval.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1456** `        # Maps kernel name → number of extra workspace pointer args added to the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1457** `        # host entry point signature.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1458** `        fn.kernel_extra_args = {}` — **EN:** Assigns a value to fn.kernel_extra_args. **CN:** 将一个值赋给 fn.kernel_extra_args。
+- **L1459** `        fn.total_added_arguments = 0` — **EN:** Assigns a value to fn.total_added_arguments. **CN:** 将一个值赋给 fn.total_added_arguments。
+- **L1460** `        if fn.ir_module is not None:` — **EN:** Starts a conditional branch guarded by `fn.ir_module is not None`. **CN:** 开始一个由 `fn.ir_module is not None` 控制的条件分支。
+- **L1461** `            attrs = fn.ir_module.operation.attributes` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L1462** `            if "kernel_extra_args" in attrs:` — **EN:** Starts a conditional branch guarded by `'kernel_extra_args' in attrs`. **CN:** 开始一个由 `'kernel_extra_args' in attrs` 控制的条件分支。
+- **L1463** `                for named in ir.DictAttr(attrs["kernel_extra_args"]):` — **EN:** Starts a loop assigning items from `ir.DictAttr(attrs['kernel_extra_args'])` to `named`. **CN:** 开始一个循环，将 `ir.DictAttr(attrs['kernel_extra_args'])` 的元素赋给 `named`。
+- **L1464** `                    fn.kernel_extra_args[named.name] = ir.IntegerAttr(named.attr).value` — **EN:** Assigns a value to fn.kernel_extra_args[named.name]. **CN:** 将一个值赋给 fn.kernel_extra_args[named.name]。
+- **L1465** `                fn.total_added_arguments = fn.kernel_extra_args.pop(` — **EN:** Assigns a value to fn.total_added_arguments. **CN:** 将一个值赋给 fn.total_added_arguments。
+- **L1466** `                    "total_added_arguments", 0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1467** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1468** `        fn.__class__ = CuteExperimentalDSL.JitCompiledFunction` — **EN:** Assigns a value to fn.__class__. **CN:** 将一个值赋给 fn.__class__。
+- **L1469** `        return fn` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1471** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1472** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1473** `# KernelLauncher` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1474** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1476** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1477** `class KernelLauncher:` — **EN:** Defines class `KernelLauncher`. **CN:** 定义类 `KernelLauncher`。
+- **L1478** `    """` — **EN:** Starts the docstring for the class `KernelLauncher`. **CN:** 开始说明 class `KernelLauncher` 的文档字符串。
+- **L1479** `    This class is used to launch a kernel function.` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1480** `    Usage:` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1481** `        \`\`\`python` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1482** `        @cute.kernel` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1483** `        def kernel(arg1, arg2, ...):` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1484** `            ...` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1486** `        @cute.jit` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1487** `        def launch_kernel():` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1488** `            kernel(arg1, arg2, ...).launch(grid=[1, 1, 1], block=[1, 1, 1], ...)` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1489** `            # or` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1490** `            kernel(arg1, arg2, ...)(grid=[1, 1, 1], block=[1, 1, 1], ...)` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1491** `        \`\`\`` — **EN:** Continues the docstring for the class `KernelLauncher`. **CN:** 继续说明 class `KernelLauncher` 的文档字符串。
+- **L1492** `    """` — **EN:** Ends the docstring for the class `KernelLauncher`. **CN:** 结束说明 class `KernelLauncher` 的文档字符串。
+- **L1493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1494** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1495** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1496** `        dsl: "CutlassBaseDSL",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1497** `        kernelGenHelper: BaseDSL._KernelGenHelper,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1498** `        funcBody: Callable[..., None],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1499** `        *func_args: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1500** `        **func_kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1501** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1502** `        self.dsl = dsl` — **EN:** Assigns a value to self.dsl. **CN:** 将一个值赋给 self.dsl。
+- **L1503** `        self.kernelGenHelper = kernelGenHelper` — **EN:** Assigns a value to self.kernelGenHelper. **CN:** 将一个值赋给 self.kernelGenHelper。
+- **L1504** `        self.funcBody = funcBody` — **EN:** Assigns a value to self.funcBody. **CN:** 将一个值赋给 self.funcBody。
+- **L1505** `        self.func_args = func_args` — **EN:** Assigns a value to self.func_args. **CN:** 将一个值赋给 self.func_args。
+- **L1506** `        self.func_kwargs = func_kwargs` — **EN:** Assigns a value to self.func_kwargs. **CN:** 将一个值赋给 self.func_kwargs。
+- **L1507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1508** `        self._name_prefix = func_kwargs.pop("_name_prefix", None)` — **EN:** Assigns a value to self._name_prefix. **CN:** 将一个值赋给 self._name_prefix。
+- **L1509** `        self._launch_name = None` — **EN:** Assigns a value to self._launch_name. **CN:** 将一个值赋给 self._launch_name。
+- **L1510** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1511** `        self._check_func_args(funcBody, *func_args, **func_kwargs)` — **EN:** Invokes `self._check_func_args` as a standalone call. **CN:** 以独立语句方式调用 `self._check_func_args`。
+- **L1512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1513** `    def _check_func_args(` — **EN:** Defines function `_check_func_args`. **CN:** 定义函数 `_check_func_args`。
+- **L1514** `        self, funcBody: Any, *func_args: Any, **func_kwargs: Any` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1515** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1516** `        # Get function signature` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1517** `        sig = inspect.signature(funcBody)` — **EN:** Assigns a value to sig. **CN:** 将一个值赋给 sig。
+- **L1518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1519** `        # func_args and func_kwargs should match funcBody's signature,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1520** `        # no extra or missing arguments.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1521** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L1522** `            sig.bind(*func_args, **func_kwargs)` — **EN:** Invokes `sig.bind` as a standalone call. **CN:** 以独立语句方式调用 `sig.bind`。
+- **L1523** `        except TypeError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L1524** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1525** `                f"Failed to bind arguments to function \`{funcBody.__name__}\` with signature \`{sig}\`",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1526** `                cause=e,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1527** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1529** `    @deprecated(` — **EN:** Applies decorator `deprecated('`smem_usage()` is deprecated, use public API ...` to the following definition. **CN:** 将装饰器 `deprecated('`smem_usage()` is deprecated, use public API ...` 应用于后面的定义。
+- **L1530** `        "\`smem_usage()\` is deprecated, use public API \`arch.dynamic_smem_size()\` instead."` — **EN:** Applies decorator `deprecated('`smem_usage()` is deprecated, use public API ...` to the following definition. **CN:** 将装饰器 `deprecated('`smem_usage()` is deprecated, use public API ...` 应用于后面的定义。
+- **L1531** `    )` — **EN:** Applies decorator `deprecated('`smem_usage()` is deprecated, use public API ...` to the following definition. **CN:** 将装饰器 `deprecated('`smem_usage()` is deprecated, use public API ...` 应用于后面的定义。
+- **L1532** `    def smem_usage(self) -> Int32:` — **EN:** Defines function `smem_usage`. **CN:** 定义函数 `smem_usage`。
+- **L1533** `        """` — **EN:** Starts the docstring for the function `smem_usage`. **CN:** 开始说明 function `smem_usage` 的文档字符串。
+- **L1534** `        Check smem usage for this kernel, only available after \`launch\`` — **EN:** Continues the docstring for the function `smem_usage`. **CN:** 继续说明 function `smem_usage` 的文档字符串。
+- **L1535** `        """` — **EN:** Ends the docstring for the function `smem_usage`. **CN:** 结束说明 function `smem_usage` 的文档字符串。
+- **L1536** `        return self.dsl._get_smem_usage()  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1538** `    def launch(self, *args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `launch`. **CN:** 定义函数 `launch`。
+- **L1539** `        self.dsl._preprocess_launch_config_args(args, kwargs)` — **EN:** Invokes `self.dsl._preprocess_launch_config_args` as a standalone call. **CN:** 以独立语句方式调用 `self.dsl._preprocess_launch_config_args`。
+- **L1540** `        config = self.dsl.LaunchConfig(*args, **kwargs)` — **EN:** Assigns a value to config. **CN:** 将一个值赋给 config。
+- **L1541** `        kernel_attrs = _build_kernel_attrs(config)` — **EN:** Assigns a value to kernel_attrs. **CN:** 将一个值赋给 kernel_attrs。
+- **L1542** `        value_attrs = self.dsl._generate_kernel_attrs(config)` — **EN:** Assigns a value to value_attrs. **CN:** 将一个值赋给 value_attrs。
+- **L1543** `        collector = getattr(self.dsl, "_collect_extra_kernel_value_attrs", None)` — **EN:** Assigns a value to collector. **CN:** 将一个值赋给 collector。
+- **L1544** `        if callable(collector):` — **EN:** Starts a conditional branch guarded by `callable(collector)`. **CN:** 开始一个由 `callable(collector)` 控制的条件分支。
+- **L1545** `            value_attrs.update(` — **EN:** Invokes `value_attrs.update` as a standalone call. **CN:** 以独立语句方式调用 `value_attrs.update`。
+- **L1546** `                collector(self.funcBody, self.func_args, self.func_kwargs)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1547** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1548** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1549** `        if hasattr(self, "_name_prefix") and self._name_prefix:` — **EN:** Starts a conditional branch guarded by `hasattr(self, '_name_prefix') and self._name_prefix`. **CN:** 开始一个由 `hasattr(self, '_name_prefix') and self._name_prefix` 控制的条件分支。
+- **L1550** `            self.dsl._name_prefix = self._name_prefix  # type: ignore[attr-defined]` — **EN:** Assigns a value to self.dsl._name_prefix. **CN:** 将一个值赋给 self.dsl._name_prefix。
+- **L1551** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1552** `        kernel_generator = self.dsl.kernel_launcher(` — **EN:** Assigns a value to kernel_generator. **CN:** 将一个值赋给 kernel_generator。
+- **L1553** `            requiredArgs=["config"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1554** `            unitAttrNames=["gpu.kernel", "cute.kernel"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1555** `            valueAttrDict=value_attrs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1556** `            kernelGenHelper=self.kernelGenHelper,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1557** `        )(self.funcBody)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1558** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1559** `        ret, name = kernel_generator(*self.func_args, **self.func_kwargs, config=config)` — **EN:** Assigns a value to (ret, name). **CN:** 将一个值赋给 (ret, name)。
+- **L1560** `        self.dsl.kernel_info[name] = kernel_attrs` — **EN:** Assigns a value to self.dsl.kernel_info[name]. **CN:** 将一个值赋给 self.dsl.kernel_info[name]。
+- **L1561** `        self._launch_name = name` — **EN:** Assigns a value to self._launch_name. **CN:** 将一个值赋给 self._launch_name。
+- **L1562** `        return ret.launch_op_ret` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1563** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1564** `    def __call__(self, *args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L1565** `        return self.launch(*args, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1566** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1567** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1568** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1569** `# Utils` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1570** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1571** `def _filter_readonly_frozen_dataclass(` — **EN:** Defines function `_filter_readonly_frozen_dataclass`. **CN:** 定义函数 `_filter_readonly_frozen_dataclass`。
+- **L1572** `    iter_args: List[Any], items_to_filter: List[Any], full_write_args_count: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1573** `) -> List[Any]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1574** `    """` — **EN:** Starts the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 开始说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1575** `    Filter items based on whether corresponding iter_args are frozen dataclasses.` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1577** `    This function filters items (which can be values or names) based on the same` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1578** `    logic: keep items if they correspond to full-write arguments (index < full_write_args_count)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1579** `    or if the corresponding iter_arg is not a frozen dataclass.` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1581** `    Args:` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1582** `        iter_args: List of arguments to check for frozen dataclass status` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1583** `        items_to_filter: List of items to filter (values or names)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1584** `        full_write_args_count: Number of arguments that are always written (not read-only)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1585** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1586** `    Returns:` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1587** `        Filtered list of items` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1588** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1589** `    Examples:` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1590** `        # Filter values (original remove_read_only_frozen_dataclass behavior)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1591** `        filtered_values = _filter_readonly_frozen_dataclass(iter_args, iter_args, full_write_args_count)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1592** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1593** `        # Filter names (original filter_readonly_frozen_dataclass_names behavior)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1594** `        filtered_names = _filter_readonly_frozen_dataclass(iter_args, iter_args_names, full_write_args_count)` — **EN:** Continues the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 继续说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1595** `    """` — **EN:** Ends the docstring for the function `_filter_readonly_frozen_dataclass`. **CN:** 结束说明 function `_filter_readonly_frozen_dataclass` 的文档字符串。
+- **L1596** `    return [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1597** `        item` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1598** `        for i, item in enumerate(items_to_filter)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1599** `        if i < full_write_args_count or not is_frozen_dataclass(iter_args[i])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1600** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1603** `def remove_read_only_frozen_dataclass(` — **EN:** Defines function `remove_read_only_frozen_dataclass`. **CN:** 定义函数 `remove_read_only_frozen_dataclass`。
+- **L1604** `    iter_args: List[Any], full_write_args_count: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1605** `) -> List[Any]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1606** `    """Filter out frozen dataclass arguments that are not full-write arguments."""` — **EN:** Docstring line documenting the function `remove_read_only_frozen_dataclass`. **CN:** 文档字符串行，用于说明 function `remove_read_only_frozen_dataclass`。
+- **L1607** `    return _filter_readonly_frozen_dataclass(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1608** `        iter_args, iter_args, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1609** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1610** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1611** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1612** `def filter_readonly_frozen_dataclass_names(` — **EN:** Defines function `filter_readonly_frozen_dataclass_names`. **CN:** 定义函数 `filter_readonly_frozen_dataclass_names`。
+- **L1613** `    iter_args: List[Any], iter_args_names: List[str], full_write_args_count: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1614** `) -> List[str]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1615** `    """Filter names based on whether corresponding iter_args are frozen dataclasses."""` — **EN:** Docstring line documenting the function `filter_readonly_frozen_dataclass_names`. **CN:** 文档字符串行，用于说明 function `filter_readonly_frozen_dataclass_names`。
+- **L1616** `    return _filter_readonly_frozen_dataclass(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1617** `        iter_args, iter_args_names, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1618** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1621** `def insert_read_only_frozen_dataclass(` — **EN:** Defines function `insert_read_only_frozen_dataclass`. **CN:** 定义函数 `insert_read_only_frozen_dataclass`。
+- **L1622** `    iter_args: List[Any], original_iter_args: List[Any], full_write_args_count: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1623** `) -> List[Any]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1624** `    """` — **EN:** Starts the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 开始说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1625** `    Insert read-only frozen dataclass arguments back into the iteration arguments.` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1626** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1627** `    This function takes the new iteration arguments and the original arguments,` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1628** `    and preserves frozen dataclass instances from the original arguments while` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1629** `    using the new arguments for non-frozen dataclass instances.` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1631** `    Args:` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1632** `        iter_args: New iteration arguments to use for non-frozen dataclass instances` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1633** `        original_iter_args: Original iteration arguments to preserve frozen dataclass instances from` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1634** `        full_write_args_count: Number of arguments that are always written (not read-only)` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1635** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1636** `    Returns:` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1637** `        List of arguments with frozen dataclass instances preserved from original` — **EN:** Continues the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 继续说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1638** `    """` — **EN:** Ends the docstring for the function `insert_read_only_frozen_dataclass`. **CN:** 结束说明 function `insert_read_only_frozen_dataclass` 的文档字符串。
+- **L1639** `    # Take full-write arguments from new iter_args` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1640** `    full_write_args = (` — **EN:** Assigns a value to full_write_args. **CN:** 将一个值赋给 full_write_args。
+- **L1641** `        iter_args[:full_write_args_count] if full_write_args_count > 0 else []` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1642** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1643** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1644** `    # Process remaining arguments: preserve frozen dataclass from original, use new for others` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1645** `    remaining_original = original_iter_args[full_write_args_count:]` — **EN:** Assigns a value to remaining_original. **CN:** 将一个值赋给 remaining_original。
+- **L1646** `    remaining_new = iter_args[full_write_args_count:]` — **EN:** Assigns a value to remaining_new. **CN:** 将一个值赋给 remaining_new。
+- **L1647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1648** `    def process_remaining_arg(original_arg: object, new_arg_iter: Any) -> object:` — **EN:** Defines function `process_remaining_arg`. **CN:** 定义函数 `process_remaining_arg`。
+- **L1649** `        """Process a single remaining argument, preserving frozen dataclass if present"""` — **EN:** Docstring line documenting the function `process_remaining_arg`. **CN:** 文档字符串行，用于说明 function `process_remaining_arg`。
+- **L1650** `        return original_arg if is_frozen_dataclass(original_arg) else next(new_arg_iter)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1652** `    # Use zip to pair original args with new args, then map the processing function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1653** `    new_arg_iter = iter(remaining_new)` — **EN:** Assigns a value to new_arg_iter. **CN:** 将一个值赋给 new_arg_iter。
+- **L1654** `    processed_remaining = [` — **EN:** Assigns a value to processed_remaining. **CN:** 将一个值赋给 processed_remaining。
+- **L1655** `        process_remaining_arg(orig_arg, new_arg_iter) for orig_arg in remaining_original` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1656** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1657** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1658** `    return full_write_args + processed_remaining` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1660** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1661** `def unpack_to_irvalue(` — **EN:** Defines function `unpack_to_irvalue`. **CN:** 定义函数 `unpack_to_irvalue`。
+- **L1662** `    mixed_values: List[Any], body_name: str, full_write_args_count: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1663** `) -> Tuple[List[ir.Value], Union[PyTreeDef, Leaf]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1664** `    log().debug("===--- Values UNPack")` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1665** `    for idx, packed in enumerate(mixed_values):` — **EN:** Starts a loop assigning items from `enumerate(mixed_values)` to `(idx, packed)`. **CN:** 开始一个循环，将 `enumerate(mixed_values)` 的元素赋给 `(idx, packed)`。
+- **L1666** `        log().debug("[%d]: will-unpacked: [type:%s] %s", idx, type(packed), packed)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1667** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1668** `    # DEBUG: Print input values before tree_flatten (only if enabled)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1669** `    from ..base_dsl.dsl import (` — **EN:** Imports debug_print_mlir_values, should_print_dynamic_debug, get_dynamic_debug_level from `..base_dsl.dsl`. **CN:** 从 `..base_dsl.dsl` 导入 debug_print_mlir_values, should_print_dynamic_debug, get_dynamic_debug_level。
+- **L1670** `        debug_print_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1671** `        should_print_dynamic_debug,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1672** `        get_dynamic_debug_level,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1673** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1674** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1675** `    if should_print_dynamic_debug():` — **EN:** Starts a conditional branch guarded by `should_print_dynamic_debug()`. **CN:** 开始一个由 `should_print_dynamic_debug()` 控制的条件分支。
+- **L1676** `        import traceback` — **EN:** Imports traceback for later use. **CN:** 导入 traceback 供后续使用。
+- **L1677** `        import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L1678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1679** `        level = get_dynamic_debug_level()` — **EN:** Assigns a value to level. **CN:** 将一个值赋给 level。
+- **L1680** `        indent = "  " * level  # Indent based on level` — **EN:** Assigns a value to indent. **CN:** 将一个值赋给 indent。
+- **L1681** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1682** `        print("=" * 80)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1683** `        print(f"{indent}[Level {level}] DEBUG '{body_name}'")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1684** `        # Find the source location - look for generated DSL function names in stack` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1685** `        # These are created by the AST transformer: loop_body_N, then_block_N, etc.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1686** `        generated_func_pattern = re.compile(` — **EN:** Assigns a value to generated_func_pattern. **CN:** 将一个值赋给 generated_func_pattern。
+- **L1687** `            r"^(loop_body|while_region|while_before_block|while_after_block|if_region|then_block|else_block|elif_region)_\d+$"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1688** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1689** `        stack = traceback.extract_stack()` — **EN:** Assigns a value to stack. **CN:** 将一个值赋给 stack。
+- **L1690** `        for frame_info in reversed(stack):` — **EN:** Starts a loop assigning items from `reversed(stack)` to `frame_info`. **CN:** 开始一个循环，将 `reversed(stack)` 的元素赋给 `frame_info`。
+- **L1691** `            if generated_func_pattern.match(frame_info.name):` — **EN:** Starts a conditional branch guarded by `generated_func_pattern.match(frame_info.name)`. **CN:** 开始一个由 `generated_func_pattern.match(frame_info.name)` 控制的条件分支。
+- **L1692** `                print(f"{indent}  source: {frame_info.filename}:{frame_info.lineno}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1693** `                if frame_info.line:` — **EN:** Starts a conditional branch guarded by `frame_info.line`. **CN:** 开始一个由 `frame_info.line` 控制的条件分支。
+- **L1694** `                    print(f"{indent}    {frame_info.line}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1695** `                break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L1696** `        print(f"{indent}  mixed_values count: {len(mixed_values)}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1697** `        print(f"{indent}  full_write_args_count: {full_write_args_count}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1698** `        for idx, packed in enumerate(mixed_values):` — **EN:** Starts a loop assigning items from `enumerate(mixed_values)` to `(idx, packed)`. **CN:** 开始一个循环，将 `enumerate(mixed_values)` 的元素赋给 `(idx, packed)`。
+- **L1699** `            print(f"{indent}  [{idx}] type: {type(packed).__name__}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1700** `            if hasattr(packed, "__extract_mlir_values__"):` — **EN:** Starts a conditional branch guarded by `hasattr(packed, '__extract_mlir_values__')`. **CN:** 开始一个由 `hasattr(packed, '__extract_mlir_values__')` 控制的条件分支。
+- **L1701** `                # Add extra indentation for the tree print` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1702** `                tree_str = debug_print_mlir_values(` — **EN:** Assigns a value to tree_str. **CN:** 将一个值赋给 tree_str。
+- **L1703** `                    packed, indent=3 + level, types_only=True` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1704** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1705** `                print(tree_str)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1706** `        print("=" * 80)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1707** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1708** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L1709** `        unpacked_values, _, treedef = tree_flatten(` — **EN:** Assigns a value to (unpacked_values, _, treedef). **CN:** 将一个值赋给 (unpacked_values, _, treedef)。
+- **L1710** `            remove_read_only_frozen_dataclass(mixed_values, full_write_args_count)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1711** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1712** `    except DSLTreeFlattenError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L1713** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1714** `            f"The '{body_name}' statement encountered a user-defined Python object, which cannot be automatically converted into an dynamic expression.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1715** `            context={` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1716** `                e.message: (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1717** `                    f"All expressions within '{body_name}' must be dynamic expressions, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1718** `                    "mixing Python objects and dynamic expressions is not supported. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1719** `                    "The DSL failed to convert the Python object into dynamic expressions."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1720** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1721** `            },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1722** `            suggestion=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1723** `                f"Please ensure '{e.type_str}' implements the '{DynamicExpression.__name__}' or mark with \`dataclass\`, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1724** `                f"so it can be treated as a valid dynamic expression or mark '{body_name}' as a constant expression if conditions are Python objects."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1725** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1726** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1727** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1728** `    # DEBUG: Print unpacked values after tree_flatten` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1729** `    if should_print_dynamic_debug():` — **EN:** Starts a conditional branch guarded by `should_print_dynamic_debug()`. **CN:** 开始一个由 `should_print_dynamic_debug()` 控制的条件分支。
+- **L1730** `        level = get_dynamic_debug_level()` — **EN:** Assigns a value to level. **CN:** 将一个值赋给 level。
+- **L1731** `        indent = "  " * level` — **EN:** Assigns a value to indent. **CN:** 将一个值赋给 indent。
+- **L1732** `        print(f"{indent}  => flattened to {len(unpacked_values)} ir.Values")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1733** `        print("=" * 80)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L1734** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1735** `    log().debug("------------------ ")` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1736** `    for idx, unpacked in enumerate(unpacked_values):` — **EN:** Starts a loop assigning items from `enumerate(unpacked_values)` to `(idx, unpacked)`. **CN:** 开始一个循环，将 `enumerate(unpacked_values)` 的元素赋给 `(idx, unpacked)`。
+- **L1737** `        log().debug("[%d]: unpacked values: %s", idx, unpacked)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1738** `    log().debug("treedef: %s", treedef)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1739** `    log().debug("------------------ ")` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1740** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1741** `    return unpacked_values, treedef` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1742** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1743** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1744** `def pack_from_irvalue(` — **EN:** Defines function `pack_from_irvalue`. **CN:** 定义函数 `pack_from_irvalue`。
+- **L1745** `    ir_values: List["ir.Value"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1746** `    pytree_def: PyTreeDef,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1747** `    mixed_values: List[Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1748** `    full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1749** `) -> List[Any]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1750** `    """` — **EN:** Starts the docstring for the function `pack_from_irvalue`. **CN:** 开始说明 function `pack_from_irvalue` 的文档字符串。
+- **L1751** `    Packs MLIR values into a list of mixed values.` — **EN:** Continues the docstring for the function `pack_from_irvalue`. **CN:** 继续说明 function `pack_from_irvalue` 的文档字符串。
+- **L1752** `    """` — **EN:** Ends the docstring for the function `pack_from_irvalue`. **CN:** 结束说明 function `pack_from_irvalue` 的文档字符串。
+- **L1753** `    log().debug("===--- Values Pack (%d)", len(ir_values))` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1754** `    for idx, value in enumerate(ir_values):` — **EN:** Starts a loop assigning items from `enumerate(ir_values)` to `(idx, value)`. **CN:** 开始一个循环，将 `enumerate(ir_values)` 的元素赋给 `(idx, value)`。
+- **L1755** `        log().debug("[%d]: will-packed: %s", idx, value)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1756** `    log().debug("treedef: %s", pytree_def)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1757** `    log().debug("------------------ ")` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L1758** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1759** `    unflattened = tree_unflatten(pytree_def, ir_values)` — **EN:** Assigns a value to unflattened. **CN:** 将一个值赋给 unflattened。
+- **L1760** `    return insert_read_only_frozen_dataclass(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1761** `        unflattened, mixed_values, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1762** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1763** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1764** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1765** `def to_index(value: Union[Numeric, ir.Value, int]) -> ir.Value:` — **EN:** Defines function `to_index`. **CN:** 定义函数 `to_index`。
+- **L1766** `    """Converts a value to an index, either by casting or coercing to int."""` — **EN:** Docstring line documenting the function `to_index`. **CN:** 文档字符串行，用于说明 function `to_index`。
+- **L1767** `    if is_dynamic_expression(value):` — **EN:** Starts a conditional branch guarded by `is_dynamic_expression(value)`. **CN:** 开始一个由 `is_dynamic_expression(value)` 控制的条件分支。
+- **L1768** `        if isinstance(value, Numeric):` — **EN:** Starts a conditional branch guarded by `isinstance(value, Numeric)`. **CN:** 开始一个由 `isinstance(value, Numeric)` 控制的条件分支。
+- **L1769** `            value = value.ir_value()` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L1770** `        assert isinstance(value, ir.Value)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1771** `        assert isinstance(value.type, ir.IntegerType), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1772** `            f"expects integer type, but got {value.type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1773** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1774** `        res = arith.index_cast(T.index(), value)` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1775** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1776** `        res = const(int(value), ty=T.index())` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1777** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1778** `    return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1779** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1780** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1781** `def _validate_iter_args_structure(iter_args: object, ir_values: object) -> bool:` — **EN:** Defines function `_validate_iter_args_structure`. **CN:** 定义函数 `_validate_iter_args_structure`。
+- **L1782** `    """` — **EN:** Starts the docstring for the function `_validate_iter_args_structure`. **CN:** 开始说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1783** `    Validates that iter_args structure contains the same number of atomic values` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1784** `    as there are IR values.` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1785** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1786** `    Args:` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1787** `        iter_args: Original iteration arguments, possibly nested sequences` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1788** `        ir_values: Flattened MLIR values extracted from iter_args` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1789** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1790** `    Returns:` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1791** `        bool: True if the number of atomic values in iter_args matches` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1792** `              the number of values in ir_values` — **EN:** Continues the docstring for the function `_validate_iter_args_structure`. **CN:** 继续说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1793** `    """` — **EN:** Ends the docstring for the function `_validate_iter_args_structure`. **CN:** 结束说明 function `_validate_iter_args_structure` 的文档字符串。
+- **L1794** `    # Handle non-sequence case` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1795** `    if not isinstance(iter_args, (tuple, list, set)):` — **EN:** Starts a conditional branch guarded by `not isinstance(iter_args, (tuple, list, set))`. **CN:** 开始一个由 `not isinstance(iter_args, (tuple, list, set))` 控制的条件分支。
+- **L1796** `        return not isinstance(ir_values, (tuple, list, set)) or len(ir_values) == 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1797** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1798** `    # If we have a sequence but ir_values isn't one, there's a mismatch` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1799** `    if not isinstance(ir_values, (tuple, list, set)):` — **EN:** Starts a conditional branch guarded by `not isinstance(ir_values, (tuple, list, set))`. **CN:** 开始一个由 `not isinstance(ir_values, (tuple, list, set))` 控制的条件分支。
+- **L1800** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1801** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1802** `    # Count all non-sequence values recursively` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1803** `    def count_values(args: object) -> int:` — **EN:** Defines function `count_values`. **CN:** 定义函数 `count_values`。
+- **L1804** `        if not isinstance(args, (tuple, list, set)):` — **EN:** Starts a conditional branch guarded by `not isinstance(args, (tuple, list, set))`. **CN:** 开始一个由 `not isinstance(args, (tuple, list, set))` 控制的条件分支。
+- **L1805** `            return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1806** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1807** `            return sum(count_values(arg) for arg in args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1808** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1809** `    return count_values(iter_args) == len(ir_values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1810** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1811** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1812** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1813** `# DSL implementation of Python Build-in Operators` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1814** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1815** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1816** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1817** `def _minmax(` — **EN:** Defines function `_minmax`. **CN:** 定义函数 `_minmax`。
+- **L1818** `    op: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1819** `    *args: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1820** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1821** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1822** `) -> Union[Numeric, int, float]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1823** `    """Computes the minimum or maximum value from the provided arguments."""` — **EN:** Docstring line documenting the function `_minmax`. **CN:** 文档字符串行，用于说明 function `_minmax`。
+- **L1824** `    from ..base_dsl.typing import _binary_op, _binary_op_type_promote` — **EN:** Imports _binary_op, _binary_op_type_promote from `..base_dsl.typing`. **CN:** 从 `..base_dsl.typing` 导入 _binary_op, _binary_op_type_promote。
+- **L1825** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1826** `    # AST Traversal doesn't support early exit in if executor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1827** `    x = None` — **EN:** Assigns a value to x. **CN:** 将一个值赋给 x。
+- **L1828** `    res = None` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1829** `    if len(args) == 1:` — **EN:** Starts a conditional branch guarded by `len(args) == 1`. **CN:** 开始一个由 `len(args) == 1` 控制的条件分支。
+- **L1830** `        # Handle case for min([a, b, c, d, ..])` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1831** `        if hasattr(args[0], "__iter__"):` — **EN:** Starts a conditional branch guarded by `hasattr(args[0], '__iter__')`. **CN:** 开始一个由 `hasattr(args[0], '__iter__')` 控制的条件分支。
+- **L1832** `            x = op(*tuple(args[0]))` — **EN:** Assigns a value to x. **CN:** 将一个值赋给 x。
+- **L1833** `        # Handle case for min(a)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1834** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1835** `            x = args[0]` — **EN:** Assigns a value to x. **CN:** 将一个值赋给 x。
+- **L1836** `    # Handle case for min(a, b, c, ...) and min([x, y], [b]) and min(a, (x, y, z))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1837** `    elif len(args) > 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1838** `        res, *xs = tuple(args)` — **EN:** Assigns a value to (res, *xs). **CN:** 将一个值赋给 (res, *xs)。
+- **L1839** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1840** `        for x in xs:` — **EN:** Starts a loop assigning items from `xs` to `x`. **CN:** 开始一个循环，将 `xs` 的元素赋给 `x`。
+- **L1841** `            emitter = getattr(cutlass_arith, f"_{op.__name__}")` — **EN:** Assigns a value to emitter. **CN:** 将一个值赋给 emitter。
+- **L1842** `            if not (is_dynamic_expression(res) or is_dynamic_expression(x)):` — **EN:** Starts a conditional branch guarded by `not (is_dynamic_expression(res) or is_dynamic_expression(x))`. **CN:** 开始一个由 `not (is_dynamic_expression(res) or is_dynamic_expression(x))` 控制的条件分支。
+- **L1843** `                res = emitter(op(res), op(x), loc=loc, ip=ip)` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1844** `            elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1845** `                hasattr(res, "type")` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1846** `                and hasattr(x, "type")` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1847** `                and isinstance(res.type, T.VectorType)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1848** `                and isinstance(x.type, T.VectorType)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1849** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1850** `                lhs = op(res, loc=loc, ip=ip)` — **EN:** Assigns a value to lhs. **CN:** 将一个值赋给 lhs。
+- **L1851** `                rhs = op(x, loc=loc, ip=ip)` — **EN:** Assigns a value to rhs. **CN:** 将一个值赋给 rhs。
+- **L1852** `                return lhs.apply_op(emitter, rhs, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1853** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1854** `                lhs = as_numeric(op(res, loc=loc, ip=ip))` — **EN:** Assigns a value to lhs. **CN:** 将一个值赋给 lhs。
+- **L1855** `                rhs = as_numeric(op(x, loc=loc, ip=ip))` — **EN:** Assigns a value to rhs. **CN:** 将一个值赋给 rhs。
+- **L1856** `                lhs, rhs, res_type = _binary_op_type_promote(` — **EN:** Assigns a value to (lhs, rhs, res_type). **CN:** 将一个值赋给 (lhs, rhs, res_type)。
+- **L1857** `                    lhs, rhs, promote_bool=True` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1858** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1859** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1860** `                lhs_val: Union[bool, int, float, ir.Value, cutlass_arith.ArithValue]` — **EN:** Assigns a typed value to lhs_val. **CN:** 为 lhs_val 赋予带类型标注的值。
+- **L1861** `                if isinstance(lhs.value, cutlass_arith.ArithValue) and isinstance(` — **EN:** Starts a conditional branch guarded by `isinstance(lhs.value, cutlass_arith.ArithValue) and isins...`. **CN:** 开始一个由 `isinstance(lhs.value, cutlass_arith.ArithValue) and isins...` 控制的条件分支。
+- **L1862** `                    lhs, Integer` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1863** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1864** `                    lhs_val = lhs.value.with_signedness(lhs.signed)  # type: ignore[attr-defined]` — **EN:** Assigns a value to lhs_val. **CN:** 将一个值赋给 lhs_val。
+- **L1865** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1866** `                    lhs_val = lhs.value` — **EN:** Assigns a value to lhs_val. **CN:** 将一个值赋给 lhs_val。
+- **L1867** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1868** `                rhs_val: Union[bool, int, float, ir.Value, cutlass_arith.ArithValue]` — **EN:** Assigns a typed value to rhs_val. **CN:** 为 rhs_val 赋予带类型标注的值。
+- **L1869** `                if isinstance(rhs.value, cutlass_arith.ArithValue) and isinstance(` — **EN:** Starts a conditional branch guarded by `isinstance(rhs.value, cutlass_arith.ArithValue) and isins...`. **CN:** 开始一个由 `isinstance(rhs.value, cutlass_arith.ArithValue) and isins...` 控制的条件分支。
+- **L1870** `                    rhs, Integer` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1871** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1872** `                    rhs_val = rhs.value.with_signedness(rhs.signed)  # type: ignore[attr-defined]` — **EN:** Assigns a value to rhs_val. **CN:** 将一个值赋给 rhs_val。
+- **L1873** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1874** `                    rhs_val = rhs.value` — **EN:** Assigns a value to rhs_val. **CN:** 将一个值赋给 rhs_val。
+- **L1875** `                res = res_type(` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L1876** `                    emitter(lhs_val, rhs_val, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1877** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1878** `        x = res` — **EN:** Assigns a value to x. **CN:** 将一个值赋给 x。
+- **L1879** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1880** `        raise DSLNotImplemented(f"{type(args)} is not supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1881** `    return x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1882** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1883** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1884** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1885** `def min(` — **EN:** Defines function `min`. **CN:** 定义函数 `min`。
+- **L1886** `    *args: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1887** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1888** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1889** `) -> Union[Numeric, int, float]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1890** `    """Computes the minimum value from the provided arguments.` — **EN:** Starts the docstring for the function `min`. **CN:** 开始说明 function `min` 的文档字符串。
+- **L1891** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1892** `    This function differs from Python's built-in min() in that the return type` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1893** `    is determined by the static types of the inputs, not their dynamic values.` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1894** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1895** `    :param args: One or more values or iterables to find the minimum of` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1896** `    :type args: tuple` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1897** `    :param loc: Source location for MLIR operation tracking` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1898** `    :type loc: object, optional` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1899** `    :param ip: Insertion point for MLIR operation` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1900** `    :type ip: object, optional` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1901** `    :return: The minimum value among all inputs` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1902** `    :rtype: Numeric` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1903** `    :raises DSLNotImplemented: If the input type is not supported` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1904** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1905** `    Supports multiple calling patterns:` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1906** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1907** `    - min(a): Returns a` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1908** `    - min([a, b, c, ...]): Returns minimum of all elements in the iterable` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1909** `    - min(a, b, c, ...): Returns minimum of all arguments` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1910** `    - min([x, y], [b]): Returns minimum across all elements in all iterables` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1911** `    - min(a, (x, y, z)): Returns minimum across all elements` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1912** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1913** `    Examples:` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1914** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1915** `    .. code-block:: python` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1916** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1917** `        # Find minimum of two values` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1918** `        result = min(x, y)` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1919** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1920** `        # Find minimum of multiple values` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1921** `        result = min(a, b, c, d)` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1922** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1923** `        # Find minimum of values in a list` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1924** `        values = [a, b, c, d]` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1925** `        result = min(values)` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1926** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1927** `        # Find minimum across mixed arguments` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1928** `        result = min(x, [y, z])` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1929** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1930** `    Difference from Python's built-in min():` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1931** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1932** `    .. code-block:: python` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1933** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1934** `        # In Python, the return type depends on the dynamic values:` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1935** `        a = 5` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1936** `        b = 3.14` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1937** `        result = min(a, b)  # Returns 3.14 (float)` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1938** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1939** `        # In this DSL implementation, the return type is determined statically:` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1940** `        a = Int32(5)` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1941** `        b = Float32(3.14)` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1942** `        result = min(a, b)  # Return type is determined by the type of operands, not values` — **EN:** Continues the docstring for the function `min`. **CN:** 继续说明 function `min` 的文档字符串。
+- **L1943** `    """` — **EN:** Ends the docstring for the function `min`. **CN:** 结束说明 function `min` 的文档字符串。
+- **L1944** `    return _minmax(min, *args, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1945** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1946** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1947** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1948** `def max(` — **EN:** Defines function `max`. **CN:** 定义函数 `max`。
+- **L1949** `    *args: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1950** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1951** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1952** `) -> Union[Numeric, int, float]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1953** `    """Computes the maximum value from the provided arguments.` — **EN:** Starts the docstring for the function `max`. **CN:** 开始说明 function `max` 的文档字符串。
+- **L1954** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1955** `    This function differs from Python's built-in max() in that the return type` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1956** `    is determined by the static types of the inputs, not their dynamic values.` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1957** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1958** `    :param args: One or more values or iterables to find the maximum of` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1959** `    :type args: tuple` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1960** `    :param loc: Source location for MLIR operation tracking` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1961** `    :type loc: object, optional` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1962** `    :param ip: Insertion point for MLIR operation` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1963** `    :type ip: object, optional` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1964** `    :return: The maximum value among all inputs` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1965** `    :rtype: Numeric` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1966** `    :raises DSLNotImplemented: If the input type is not supported` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1967** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1968** `    Supports multiple calling patterns:` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1969** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1970** `    - max(a): Returns a` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1971** `    - max([a, b, c, ...]): Returns maximum of all elements in the iterable` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1972** `    - max(a, b, c, ...): Returns maximum of all arguments` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1973** `    - max([x, y], [b]): Returns maximum across all elements in all iterables` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1974** `    - max(a, (x, y, z)): Returns maximum across all elements` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1975** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1976** `    Examples:` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1977** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1978** `    .. code-block:: python` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1979** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1980** `        # Find maximum of two values` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1981** `        result = max(x, y)` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1982** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1983** `        # Find maximum of multiple values` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1984** `        result = max(a, b, c, d)` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1985** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1986** `        # Find maximum of values in a list` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1987** `        values = [a, b, c, d]` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1988** `        result = max(values)` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1989** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1990** `        # Find maximum across mixed arguments` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1991** `        result = max(x, [y, z])` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1992** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1993** `    Difference from Python's built-in max():` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1994** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1995** `    .. code-block:: python` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1996** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1997** `        # In Python, the return type depends on the dynamic values:` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1998** `        a = 5` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L1999** `        b = 3.14` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L2000** `        result = max(a, b)  # Returns 5 (int)` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L2001** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2002** `        # In this DSL implementation, the return type is determined statically:` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L2003** `        a = Int32(5)` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L2004** `        b = Float32(3.14)` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L2005** `        result = max(a, b)  # Return type is determined by the type of operands, not values` — **EN:** Continues the docstring for the function `max`. **CN:** 继续说明 function `max` 的文档字符串。
+- **L2006** `    """` — **EN:** Ends the docstring for the function `max`. **CN:** 结束说明 function `max` 的文档字符串。
+- **L2007** `    return _minmax(max, *args, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2008** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2009** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2010** `def and_(` — **EN:** Defines function `and_`. **CN:** 定义函数 `and_`。
+- **L2011** `    *args: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2012** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2013** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2014** `) -> Union[Numeric, int, float, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2015** `    """AND operation for value in DSL numeric types.` — **EN:** Starts the docstring for the function `and_`. **CN:** 开始说明 function `and_` 的文档字符串。
+- **L2016** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2017** `    :param *args: One or more numeric values to AND together` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2018** `    :type *args: Numeric` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2019** `    :param loc: Source location for MLIR operation tracking` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2020** `    :type loc: object, optional` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2021** `    :param ip: Insertion point for MLIR operation` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2022** `    :type ip: object, optional` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2023** `    :return: The result of the logical AND operation` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2024** `    :rtype: Numeric` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2025** `    :raises ValueError: If no arguments are provided` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2026** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2027** `    Supports multiple calling patterns:` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2028** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2029** `    - and_(a): Returns a` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2030** `    - and_(a, b, c, ...): if a is truthy, returns and_(b, c, ...), otherwise returns a` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2031** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2032** `    All arguments must be of the same type.` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2033** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2034** `    Examples:` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2035** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2036** `    .. code-block:: python` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2037** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2038** `        # In Python, 'and' returns the second operand if the first is truthy,` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2039** `        # otherwise it returns the first operand` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2040** `        a = 5` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2041** `        b = 3` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2042** `        result = a and b  # Returns 3` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2043** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2044** `        # In this DSL implementation, the behavior is similar but works with DSL types` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2045** `        a = Int32(5)` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2046** `        b = Int32(3)` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2047** `        result = and_(a, b)  # Returns b` — **EN:** Continues the docstring for the function `and_`. **CN:** 继续说明 function `and_` 的文档字符串。
+- **L2048** `    """` — **EN:** Ends the docstring for the function `and_`. **CN:** 结束说明 function `and_` 的文档字符串。
+- **L2049** `    if len(args) == 0:` — **EN:** Starts a conditional branch guarded by `len(args) == 0`. **CN:** 开始一个由 `len(args) == 0` 控制的条件分支。
+- **L2050** `        raise ValueError("and_() requires at least one argument")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2051** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2052** `    if len(args) == 1:` — **EN:** Starts a conditional branch guarded by `len(args) == 1`. **CN:** 开始一个由 `len(args) == 1` 控制的条件分支。
+- **L2053** `        return args[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2054** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2055** `    def and_op(` — **EN:** Defines function `and_op`. **CN:** 定义函数 `and_op`。
+- **L2056** `        lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2057** `        rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2058** `    ) -> Union[Numeric, int, float, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2059** `        if not isinstance(lhs, (Numeric, cutlass_arith.ArithValue, int, float, bool)):` — **EN:** Starts a conditional branch guarded by `not isinstance(lhs, (Numeric, cutlass_arith.ArithValue, i...`. **CN:** 开始一个由 `not isinstance(lhs, (Numeric, cutlass_arith.ArithValue, i...` 控制的条件分支。
+- **L2060** `            raise DSLNotImplemented(f"{type(lhs)} is not supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2061** `        elif isinstance(lhs, (int, float, bool)) and isinstance(` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2062** `            rhs, (int, float, bool)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2063** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2064** `            return lhs and rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2065** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2066** `            return as_numeric(lhs).__dsl_and__(as_numeric(rhs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2067** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2068** `    return functools.reduce(and_op, args[1:], args[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2069** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2070** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2071** `def or_(` — **EN:** Defines function `or_`. **CN:** 定义函数 `or_`。
+- **L2072** `    *args: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2073** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2074** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2075** `) -> Union[Numeric, int, float, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2076** `    """Logical OR operation for DSL numeric types.` — **EN:** Starts the docstring for the function `or_`. **CN:** 开始说明 function `or_` 的文档字符串。
+- **L2077** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2078** `    :param *args: One or more numeric values to OR together` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2079** `    :type *args: Numeric` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2080** `    :param loc: Source location for MLIR operation tracking` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2081** `    :type loc: object, optional` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2082** `    :param ip: Insertion point for MLIR operation` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2083** `    :type ip: object, optional` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2084** `    :return: The result of the logical OR operation` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2085** `    :rtype: Numeric` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2086** `    :raises ValueError: If no arguments are provided` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2087** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2088** `    Supports multiple calling patterns:` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2089** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2090** `    - or_(a): Returns a` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2091** `    - or_(a, b, c, ...): if a is truthy, returns a, otherwise returns or_(b, c, ...)` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2092** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2093** `    Examples:` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2094** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2095** `    .. code-block:: python` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2096** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2097** `        # In Python, 'or' returns the first operand if it's truthy,` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2098** `        # otherwise it returns the second operand` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2099** `        a = 5` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2100** `        b = 3` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2101** `        result = a or b  # Returns 5` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2103** `        # In this DSL implementation, the behavior is similar but works with DSL types` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2104** `        a = Int32(5)` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2105** `        b = Int32(3)` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2106** `        result = or_(a, b)  # Returns a` — **EN:** Continues the docstring for the function `or_`. **CN:** 继续说明 function `or_` 的文档字符串。
+- **L2107** `    """` — **EN:** Ends the docstring for the function `or_`. **CN:** 结束说明 function `or_` 的文档字符串。
+- **L2108** `    if len(args) == 0:` — **EN:** Starts a conditional branch guarded by `len(args) == 0`. **CN:** 开始一个由 `len(args) == 0` 控制的条件分支。
+- **L2109** `        raise ValueError("or_() requires at least one argument")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2111** `    if len(args) == 1:` — **EN:** Starts a conditional branch guarded by `len(args) == 1`. **CN:** 开始一个由 `len(args) == 1` 控制的条件分支。
+- **L2112** `        return args[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2114** `    def or_op(` — **EN:** Defines function `or_op`. **CN:** 定义函数 `or_op`。
+- **L2115** `        lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2116** `        rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2117** `    ) -> Union[Numeric, int, float, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2118** `        if not isinstance(lhs, (Numeric, cutlass_arith.ArithValue, int, float, bool)):` — **EN:** Starts a conditional branch guarded by `not isinstance(lhs, (Numeric, cutlass_arith.ArithValue, i...`. **CN:** 开始一个由 `not isinstance(lhs, (Numeric, cutlass_arith.ArithValue, i...` 控制的条件分支。
+- **L2119** `            raise DSLNotImplemented(f"{type(lhs)} is not supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2120** `        elif isinstance(lhs, (int, float, bool)) and isinstance(` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2121** `            rhs, (int, float, bool)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2122** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2123** `            return lhs or rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2124** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2125** `            return as_numeric(lhs).__dsl_or__(as_numeric(rhs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2127** `    return functools.reduce(or_op, args[1:], args[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2130** `def all_(iterable: Iterable[Union[Numeric, ir.Value, bool]]) -> Boolean:` — **EN:** Defines function `all_`. **CN:** 定义函数 `all_`。
+- **L2131** `    """Logical AND operation for all elements in an iterable.` — **EN:** Starts the docstring for the function `all_`. **CN:** 开始说明 function `all_` 的文档字符串。
+- **L2132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2133** `    Returns True if all elements in the iterable are truthy, otherwise False.` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2134** `    This is the DSL equivalent of Python's built-in all() function.` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2136** `    :param iterable: An iterable containing values to check` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2137** `    :type iterable: Iterable` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2138** `    :return: True if all elements are truthy, False otherwise` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2139** `    :rtype: Boolean` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2141** `    Examples:` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2143** `    .. code-block:: python` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2145** `        # Check if all values are non-zero` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2146** `        values = [Int32(1), Int32(2), Int32(3)]` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2147** `        result = all_(values)  # Returns True` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2149** `        # Check if all conditions are met` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2150** `        conditions = [a > 0, b < 10, c != 0]` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2151** `        result = all_(conditions)  # Returns True if all conditions are met` — **EN:** Continues the docstring for the function `all_`. **CN:** 继续说明 function `all_` 的文档字符串。
+- **L2152** `    """` — **EN:** Ends the docstring for the function `all_`. **CN:** 结束说明 function `all_` 的文档字符串。
+- **L2153** `    bool_iterable = [Boolean(i) for i in iterable]` — **EN:** Assigns a value to bool_iterable. **CN:** 将一个值赋给 bool_iterable。
+- **L2154** `    reducer = lambda lhs, rhs: (` — **EN:** Assigns a value to reducer. **CN:** 将一个值赋给 reducer。
+- **L2155** `        lhs.__dsl_and__(rhs) if hasattr(lhs, "__dsl_and__") else lhs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2156** `    )  # noqa: E731` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2157** `    return functools.reduce(reducer, bool_iterable, Boolean(True))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2160** `def any_(iterable: Iterable[Union[Numeric, ir.Value, bool]]) -> Boolean:` — **EN:** Defines function `any_`. **CN:** 定义函数 `any_`。
+- **L2161** `    """Logical OR operation for any element in an iterable.` — **EN:** Starts the docstring for the function `any_`. **CN:** 开始说明 function `any_` 的文档字符串。
+- **L2162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2163** `    Returns True if any element in the iterable is truthy, otherwise False.` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2164** `    This is the DSL equivalent of Python's built-in any() function.` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2166** `    :param iterable: An iterable containing values to check` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2167** `    :type iterable: Iterable` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2168** `    :return: True if any element is truthy, False otherwise` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2169** `    :rtype: Boolean` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2171** `    Examples:` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2173** `    .. code-block:: python` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2175** `        # Check if any value is non-zero` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2176** `        values = [Int32(0), Int32(0), Int32(3)]` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2177** `        result = any_(values)  # Returns True` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2179** `        # Check if any condition is met` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2180** `        conditions = [a > 10, b < 0, c != 0]` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2181** `        result = any_(conditions)  # Returns True if any condition is met` — **EN:** Continues the docstring for the function `any_`. **CN:** 继续说明 function `any_` 的文档字符串。
+- **L2182** `    """` — **EN:** Ends the docstring for the function `any_`. **CN:** 结束说明 function `any_` 的文档字符串。
+- **L2183** `    bool_iterable = [Boolean(i) for i in iterable]` — **EN:** Assigns a value to bool_iterable. **CN:** 将一个值赋给 bool_iterable。
+- **L2184** `    reducer = lambda lhs, rhs: (` — **EN:** Assigns a value to reducer. **CN:** 将一个值赋给 reducer。
+- **L2185** `        lhs.__dsl_or__(rhs) if hasattr(lhs, "__dsl_or__") else lhs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2186** `    )  # noqa: E731` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2187** `    return functools.reduce(reducer, bool_iterable, Boolean(False))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2190** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2191** `# Conditional Expression` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2192** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2195** `def select_(` — **EN:** Defines function `select_`. **CN:** 定义函数 `select_`。
+- **L2196** `    cond: Union[Boolean, ir.Value, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2197** `    if_value: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2198** `    else_value: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2199** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2200** `    def _as_scalar(` — **EN:** Defines function `_as_scalar`. **CN:** 定义函数 `_as_scalar`。
+- **L2201** `        value: Union[Numeric, ir.Value, int, float, List[ir.Value]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2202** `    ) -> Union[ir.Value, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2203** `        if isinstance(value, list):` — **EN:** Starts a conditional branch guarded by `isinstance(value, list)`. **CN:** 开始一个由 `isinstance(value, list)` 控制的条件分支。
+- **L2204** `            if len(value) == 1:` — **EN:** Starts a conditional branch guarded by `len(value) == 1`. **CN:** 开始一个由 `len(value) == 1` 控制的条件分支。
+- **L2205** `                return value[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2206** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2207** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2208** `                    "Conditional expression must have exactly one value in all expressions"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2209** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2210** `        return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2212** `    if not is_dynamic_expression(cond):` — **EN:** Starts a conditional branch guarded by `not is_dynamic_expression(cond)`. **CN:** 开始一个由 `not is_dynamic_expression(cond)` 控制的条件分支。
+- **L2213** `        raise DSLRuntimeError("Conditional expression must be dynamic")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2215** `    # Extract MLIR values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2216** `    cond = extract_mlir_values(cond)` — **EN:** Assigns a value to cond. **CN:** 将一个值赋给 cond。
+- **L2217** `    if is_dynamic_expression(if_value):` — **EN:** Starts a conditional branch guarded by `is_dynamic_expression(if_value)`. **CN:** 开始一个由 `is_dynamic_expression(if_value)` 控制的条件分支。
+- **L2218** `        if_value = extract_mlir_values(if_value)` — **EN:** Assigns a value to if_value. **CN:** 将一个值赋给 if_value。
+- **L2219** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2220** `        if_value = const(if_value)` — **EN:** Assigns a value to if_value. **CN:** 将一个值赋给 if_value。
+- **L2221** `    if is_dynamic_expression(else_value):` — **EN:** Starts a conditional branch guarded by `is_dynamic_expression(else_value)`. **CN:** 开始一个由 `is_dynamic_expression(else_value)` 控制的条件分支。
+- **L2222** `        else_value = extract_mlir_values(else_value)` — **EN:** Assigns a value to else_value. **CN:** 将一个值赋给 else_value。
+- **L2223** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2224** `        else_value = const(else_value)` — **EN:** Assigns a value to else_value. **CN:** 将一个值赋给 else_value。
+- **L2225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2226** `    return arith.SelectOp(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2227** `        _as_scalar(cond), _as_scalar(if_value), _as_scalar(else_value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2228** `    ).result` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2231** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2232** `# Terminator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2233** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2236** `def yield_out(` — **EN:** Defines function `yield_out`. **CN:** 定义函数 `yield_out`。
+- **L2237** `    args: Union[List[ir.Value], List[Numeric]] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2238** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2239** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2240** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2241** `    """` — **EN:** Starts the docstring for the function `yield_out`. **CN:** 开始说明 function `yield_out` 的文档字符串。
+- **L2242** `    Generate a yield operation. It it used to return values from a loop, if-else, or while region.` — **EN:** Continues the docstring for the function `yield_out`. **CN:** 继续说明 function `yield_out` 的文档字符串。
+- **L2243** `    """` — **EN:** Ends the docstring for the function `yield_out`. **CN:** 结束说明 function `yield_out` 的文档字符串。
+- **L2244** `    scf.yield_(extract_mlir_values(args), loc=loc, ip=ip)` — **EN:** Invokes `scf.yield_` as a standalone call. **CN:** 以独立语句方式调用 `scf.yield_`。
+- **L2245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2247** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2248** `# For Loop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2249** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2252** `def for_generate(` — **EN:** Defines function `for_generate`. **CN:** 定义函数 `for_generate`。
+- **L2253** `    start: Union[Int32, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2254** `    stop: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2255** `    step: Optional[Union[Int32, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2256** `    iter_args: Optional[Sequence[ir.Value]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2257** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2258** `    unroll: Optional[LoopUnroll] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2259** `    prefetch_stages: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2260** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2261** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2262** `) -> Generator:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2263** `    """` — **EN:** Starts the docstring for the function `for_generate`. **CN:** 开始说明 function `for_generate` 的文档字符串。
+- **L2264** `    scf.for with yield support` — **EN:** Continues the docstring for the function `for_generate`. **CN:** 继续说明 function `for_generate` 的文档字符串。
+- **L2265** `    """` — **EN:** Ends the docstring for the function `for_generate`. **CN:** 结束说明 function `for_generate` 的文档字符串。
+- **L2266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2267** `    if step is None:` — **EN:** Starts a conditional branch guarded by `step is None`. **CN:** 开始一个由 `step is None` 控制的条件分支。
+- **L2268** `        step = 1` — **EN:** Assigns a value to step. **CN:** 将一个值赋给 step。
+- **L2269** `    if stop is None:` — **EN:** Starts a conditional branch guarded by `stop is None`. **CN:** 开始一个由 `stop is None` 控制的条件分支。
+- **L2270** `        stop = start` — **EN:** Assigns a value to stop. **CN:** 将一个值赋给 stop。
+- **L2271** `        start = 0` — **EN:** Assigns a value to start. **CN:** 将一个值赋给 start。
+- **L2272** `    start = const(start)` — **EN:** Assigns a value to start. **CN:** 将一个值赋给 start。
+- **L2273** `    params = [start, stop, step]` — **EN:** Assigns a value to params. **CN:** 将一个值赋给 params。
+- **L2274** `    for i, p in enumerate(params):` — **EN:** Starts a loop assigning items from `enumerate(params)` to `(i, p)`. **CN:** 开始一个循环，将 `enumerate(params)` 的元素赋给 `(i, p)`。
+- **L2275** `        if isinstance(p, int):` — **EN:** Starts a conditional branch guarded by `isinstance(p, int)`. **CN:** 开始一个由 `isinstance(p, int)` 控制的条件分支。
+- **L2276** `            p = const(p)` — **EN:** Assigns a value to p. **CN:** 将一个值赋给 p。
+- **L2277** `        elif isinstance(p, float):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2278** `            raise DSLRuntimeError(f"{p=} must be int.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2279** `        elif isinstance(p, Integer):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2280** `            p = p.ir_value()` — **EN:** Assigns a value to p. **CN:** 将一个值赋给 p。
+- **L2281** `        params[i] = p` — **EN:** Assigns a value to params[i]. **CN:** 将一个值赋给 params[i]。
+- **L2282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2283** `    start, stop, step = params` — **EN:** Assigns a value to (start, stop, step). **CN:** 将一个值赋给 (start, stop, step)。
+- **L2284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2285** `    def _createI32Attr(value: Union[Int32, int]) -> ir.IntegerAttr:` — **EN:** Defines function `_createI32Attr`. **CN:** 定义函数 `_createI32Attr`。
+- **L2286** `        if not isinstance(value, int):` — **EN:** Starts a conditional branch guarded by `not isinstance(value, int)`. **CN:** 开始一个由 `not isinstance(value, int)` 控制的条件分支。
+- **L2287** `            raise DSLRuntimeError(f"value must be int.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2288** `        return ir.IntegerAttr.get(ir.IntegerType.get_signless(32), value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2290** `    ir_iter_args = extract_mlir_values(iter_args) if iter_args is not None else None` — **EN:** Assigns a value to ir_iter_args. **CN:** 将一个值赋给 ir_iter_args。
+- **L2291** `    if not _validate_iter_args_structure(iter_args, ir_iter_args):` — **EN:** Starts a conditional branch guarded by `not _validate_iter_args_structure(iter_args, ir_iter_args)`. **CN:** 开始一个由 `not _validate_iter_args_structure(iter_args, ir_iter_args)` 控制的条件分支。
+- **L2292** `        raise DSLRuntimeError("iter_args: Elements should be extractable as ir.Value.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2293** `    for_op = scf.ForOp(start, stop, step, ir_iter_args, loc=loc, ip=ip)` — **EN:** Assigns a value to for_op. **CN:** 将一个值赋给 for_op。
+- **L2294** `    if unroll is not None:` — **EN:** Starts a conditional branch guarded by `unroll is not None`. **CN:** 开始一个由 `unroll is not None` 控制的条件分支。
+- **L2295** `        for_op.attributes["loop_annotation"] = unroll` — **EN:** Assigns a value to for_op.attributes['loop_annotation']. **CN:** 将一个值赋给 for_op.attributes['loop_annotation']。
+- **L2296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2297** `    if prefetch_stages is not None:` — **EN:** Starts a conditional branch guarded by `prefetch_stages is not None`. **CN:** 开始一个由 `prefetch_stages is not None` 控制的条件分支。
+- **L2298** `        for_op.attributes["cutlass.pipelining"] = _createI32Attr(prefetch_stages)` — **EN:** Assigns a value to for_op.attributes['cutlass.pipelining']. **CN:** 将一个值赋给 for_op.attributes['cutlass.pipelining']。
+- **L2299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2300** `    iv = for_op.induction_variable` — **EN:** Assigns a value to iv. **CN:** 将一个值赋给 iv。
+- **L2301** `    new_results = new_from_mlir_values(iter_args, for_op.results)` — **EN:** Assigns a value to new_results. **CN:** 将一个值赋给 new_results。
+- **L2302** `    new_iter_args = new_from_mlir_values(iter_args, for_op.inner_iter_args)` — **EN:** Assigns a value to new_iter_args. **CN:** 将一个值赋给 new_iter_args。
+- **L2303** `    new_iter_args = () if new_iter_args is None else tuple(new_iter_args)` — **EN:** Assigns a value to new_iter_args. **CN:** 将一个值赋给 new_iter_args。
+- **L2304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2305** `    with ir.InsertionPoint(for_op.body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(for_op.body). **CN:** 开始一个使用 ir.InsertionPoint(for_op.body) 的上下文管理代码块。
+- **L2306** `        if len(new_iter_args) > 1:` — **EN:** Starts a conditional branch guarded by `len(new_iter_args) > 1`. **CN:** 开始一个由 `len(new_iter_args) > 1` 控制的条件分支。
+- **L2307** `            yield iv, new_iter_args, new_results` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L2308** `        elif len(new_iter_args) == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2309** `            yield iv, new_iter_args[0], new_results[0]` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L2310** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2311** `            yield iv` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L2312** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2314** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2315** `# Logical Operators` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2316** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2319** `def not_(` — **EN:** Defines function `not_`. **CN:** 定义函数 `not_`。
+- **L2320** `    lhs: Union[ir.Value, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2321** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2322** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2323** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2324** `) -> Union[Boolean, bool, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2325** `    """` — **EN:** Starts the docstring for the function `not_`. **CN:** 开始说明 function `not_` 的文档字符串。
+- **L2326** `    Logical Not` — **EN:** Continues the docstring for the function `not_`. **CN:** 继续说明 function `not_` 的文档字符串。
+- **L2327** `    """` — **EN:** Ends the docstring for the function `not_`. **CN:** 结束说明 function `not_` 的文档字符串。
+- **L2328** `    res = None` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L2329** `    # Handle Python bool first to prevent infinite recursion` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2330** `    if type(lhs) == bool:` — **EN:** Starts a conditional branch guarded by `type(lhs) == bool`. **CN:** 开始一个由 `type(lhs) == bool` 控制的条件分支。
+- **L2331** `        res = lhs ^ True` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L2332** `    elif hasattr(lhs, "__dsl_not__"):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2333** `        res = lhs.__dsl_not__(loc=loc, ip=ip)` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L2334** `    elif is_dynamic_expression(lhs):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2335** `        # If lhs is MLIR value, compute not using xor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2336** `        res = arith.XOrIOp(lhs, const(1, lhs.type)).result` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L2337** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2338** `        res = bool(lhs) ^ True` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L2339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2340** `    return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2343** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2344** `# If/Else` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2345** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2348** `def if_generate(` — **EN:** Defines function `if_generate`. **CN:** 定义函数 `if_generate`。
+- **L2349** `    cond: Union[Boolean, ir.Value, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2350** `    then_body: Callable,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2351** `    else_body: Optional[Callable] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2352** `    input_args: Optional[List[DslType]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2353** `    return_types: Optional[List[DslType]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2354** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2355** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2356** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2357** `) -> Union[List[Numeric], Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2358** `    """` — **EN:** Starts the docstring for the function `if_generate`. **CN:** 开始说明 function `if_generate` 的文档字符串。
+- **L2359** `    Generate an IfOp with optional else branch and return values.` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2361** `    Args:` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2362** `        cond: The condition expression` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2363** `        then_body: Function to execute in then branch` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2364** `        else_body: Optional function to execute in else branch` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2365** `        input_args: Arguments to pass to branch bodies` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2366** `        return_types: Expected return types for the operation` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2367** `        loc: Optional location information` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2368** `        ip: Optional insertion point` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2370** `    Returns:` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2371** `        List of DSL typed results` — **EN:** Continues the docstring for the function `if_generate`. **CN:** 继续说明 function `if_generate` 的文档字符串。
+- **L2372** `    """` — **EN:** Ends the docstring for the function `if_generate`. **CN:** 结束说明 function `if_generate` 的文档字符串。
+- **L2373** `    input_args = input_args or []` — **EN:** Assigns a value to input_args. **CN:** 将一个值赋给 input_args。
+- **L2374** `    mlir_return_types = []` — **EN:** Assigns a value to mlir_return_types. **CN:** 将一个值赋给 mlir_return_types。
+- **L2375** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2376** `    # Validate and collect MLIR return types (if provided).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2377** `    if return_types is not None:` — **EN:** Starts a conditional branch guarded by `return_types is not None`. **CN:** 开始一个由 `return_types is not None` 控制的条件分支。
+- **L2378** `        for t in return_types:` — **EN:** Starts a loop assigning items from `return_types` to `t`. **CN:** 开始一个循环，将 `return_types` 的元素赋给 `t`。
+- **L2379** `            if not isinstance(t, DslType):` — **EN:** Starts a conditional branch guarded by `not isinstance(t, DslType)`. **CN:** 开始一个由 `not isinstance(t, DslType)` 控制的条件分支。
+- **L2380** `                raise DSLRuntimeError(f"{t=} must be a DslType.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2381** `            mlir_return_types.append(t.mlir_type)  # type: ignore[attr-defined]` — **EN:** Invokes `mlir_return_types.append` as a standalone call. **CN:** 以独立语句方式调用 `mlir_return_types.append`。
+- **L2382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2383** `    # Determine whether there's an else branch.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2384** `    has_else = else_body is not None` — **EN:** Assigns a value to has_else. **CN:** 将一个值赋给 has_else。
+- **L2385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2386** `    # Create the IfOp.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2387** `    if_op = scf.IfOp(` — **EN:** Assigns a value to if_op. **CN:** 将一个值赋给 if_op。
+- **L2388** `        Boolean(cond).ir_value(), mlir_return_types, hasElse=has_else, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2389** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2391** `    def _execute_and_yield_out(body: Callable, input_args: List[DslType]) -> None:` — **EN:** Defines function `_execute_and_yield_out`. **CN:** 定义函数 `_execute_and_yield_out`。
+- **L2392** `        yield_vals = body(*input_args)` — **EN:** Assigns a value to yield_vals. **CN:** 将一个值赋给 yield_vals。
+- **L2393** `        if return_types is not None:` — **EN:** Starts a conditional branch guarded by `return_types is not None`. **CN:** 开始一个由 `return_types is not None` 控制的条件分支。
+- **L2394** `            if not isinstance(yield_vals, Iterable):` — **EN:** Starts a conditional branch guarded by `not isinstance(yield_vals, Iterable)`. **CN:** 开始一个由 `not isinstance(yield_vals, Iterable)` 控制的条件分支。
+- **L2395** `                # body only return single element` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2396** `                yield_vals = [yield_vals]` — **EN:** Assigns a value to yield_vals. **CN:** 将一个值赋给 yield_vals。
+- **L2397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2398** `            yield_vals = [t(r) for t, r in zip(return_types, yield_vals)]` — **EN:** Assigns a value to yield_vals. **CN:** 将一个值赋给 yield_vals。
+- **L2399** `        yield_out(yield_vals)` — **EN:** Invokes `yield_out` as a standalone call. **CN:** 以独立语句方式调用 `yield_out`。
+- **L2400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2401** `    # Generate the body for 'then'.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2402** `    with ir.InsertionPoint(if_op.then_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(if_op.then_block). **CN:** 开始一个使用 ir.InsertionPoint(if_op.then_block) 的上下文管理代码块。
+- **L2403** `        _execute_and_yield_out(then_body, input_args)` — **EN:** Invokes `_execute_and_yield_out` as a standalone call. **CN:** 以独立语句方式调用 `_execute_and_yield_out`。
+- **L2404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2405** `    # Generate the body for 'else' if provided.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2406** `    if has_else:` — **EN:** Starts a conditional branch guarded by `has_else`. **CN:** 开始一个由 `has_else` 控制的条件分支。
+- **L2407** `        assert else_body is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L2408** `        with ir.InsertionPoint(if_op.else_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(if_op.else_block). **CN:** 开始一个使用 ir.InsertionPoint(if_op.else_block) 的上下文管理代码块。
+- **L2409** `            _execute_and_yield_out(else_body, input_args)` — **EN:** Invokes `_execute_and_yield_out` as a standalone call. **CN:** 以独立语句方式调用 `_execute_and_yield_out`。
+- **L2410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2411** `    # Collect MLIR results.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2412** `    mlir_results = _get_op_result_or_op_results(if_op)` — **EN:** Assigns a value to mlir_results. **CN:** 将一个值赋给 mlir_results。
+- **L2413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2414** `    if not isinstance(mlir_results, list) and not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(mlir_results, list) and (not isinstance(ml...`. **CN:** 开始一个由 `not isinstance(mlir_results, list) and (not isinstance(ml...` 控制的条件分支。
+- **L2415** `        mlir_results, ir.OpResultList` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2416** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2417** `        mlir_results = [mlir_results]` — **EN:** Assigns a value to mlir_results. **CN:** 将一个值赋给 mlir_results。
+- **L2418** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2419** `    # Wrap the results with their DSL types.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2420** `    if return_types is None:` — **EN:** Starts a conditional branch guarded by `return_types is None`. **CN:** 开始一个由 `return_types is None` 控制的条件分支。
+- **L2421** `        return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2423** `    vals = [t(r) for t, r in zip(return_types, mlir_results)]` — **EN:** Assigns a value to vals. **CN:** 将一个值赋给 vals。
+- **L2424** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2425** `    if len(vals) == 1:` — **EN:** Starts a conditional branch guarded by `len(vals) == 1`. **CN:** 开始一个由 `len(vals) == 1` 控制的条件分支。
+- **L2426** `        return vals[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2428** `    return vals` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2431** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2432** `# While Loop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2433** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2436** `class WhileLoopContext:` — **EN:** Defines class `WhileLoopContext`. **CN:** 定义类 `WhileLoopContext`。
+- **L2437** `    """` — **EN:** Starts the docstring for the class `WhileLoopContext`. **CN:** 开始说明 class `WhileLoopContext` 的文档字符串。
+- **L2438** `    Context manager for a dynamic while loop.` — **EN:** Continues the docstring for the class `WhileLoopContext`. **CN:** 继续说明 class `WhileLoopContext` 的文档字符串。
+- **L2439** `    """` — **EN:** Ends the docstring for the class `WhileLoopContext`. **CN:** 结束说明 class `WhileLoopContext` 的文档字符串。
+- **L2440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2441** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L2442** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2443** `        inputs: Sequence[Union[ir.Value, Numeric]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2444** `        condition: Callable[[Sequence[ir.Value]], ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2445** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2446** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2447** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2448** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2449** `        # Keep original inputs and allow recover original type information` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2450** `        self.inputs = inputs` — **EN:** Assigns a value to self.inputs. **CN:** 将一个值赋给 self.inputs。
+- **L2451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2452** `        self.input_ir_values = extract_mlir_values(inputs)` — **EN:** Assigns a value to self.input_ir_values. **CN:** 将一个值赋给 self.input_ir_values。
+- **L2453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2454** `        if not _validate_iter_args_structure(inputs, self.input_ir_values):` — **EN:** Starts a conditional branch guarded by `not _validate_iter_args_structure(inputs, self.input_ir_v...`. **CN:** 开始一个由 `not _validate_iter_args_structure(inputs, self.input_ir_v...` 控制的条件分支。
+- **L2455** `            raise DSLRuntimeError("inputs: Elements should be extractable as ir.Value.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2457** `        self.condition = condition` — **EN:** Assigns a value to self.condition. **CN:** 将一个值赋给 self.condition。
+- **L2458** `        self.input_ir_types = [i.type for i in self.input_ir_values]` — **EN:** Assigns a value to self.input_ir_types. **CN:** 将一个值赋给 self.input_ir_types。
+- **L2459** `        self.while_op = scf.WhileOp(` — **EN:** Assigns a value to self.while_op. **CN:** 将一个值赋给 self.while_op。
+- **L2460** `            self.input_ir_types, self.input_ir_values, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2461** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2463** `        self.before_region = self.while_op.before` — **EN:** Assigns a value to self.before_region. **CN:** 将一个值赋给 self.before_region。
+- **L2464** `        self.after_region = self.while_op.after` — **EN:** Assigns a value to self.after_region. **CN:** 将一个值赋给 self.after_region。
+- **L2465** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2466** `        self.before_region.blocks.append(*self.input_ir_types)` — **EN:** Invokes `self.before_region.blocks.append` as a standalone call. **CN:** 以独立语句方式调用 `self.before_region.blocks.append`。
+- **L2467** `        self.before_block = self.before_region.blocks[0]` — **EN:** Assigns a value to self.before_block. **CN:** 将一个值赋给 self.before_block。
+- **L2468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2469** `        self.after_region.blocks.append(*self.input_ir_types)` — **EN:** Invokes `self.after_region.blocks.append` as a standalone call. **CN:** 以独立语句方式调用 `self.after_region.blocks.append`。
+- **L2470** `        self.after_block = self.after_region.blocks[0]` — **EN:** Assigns a value to self.after_block. **CN:** 将一个值赋给 self.after_block。
+- **L2471** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2472** `    def __enter__(self) -> List[Numeric]:` — **EN:** Defines function `__enter__`. **CN:** 定义函数 `__enter__`。
+- **L2473** `        with ir.InsertionPoint(self.before_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(self.before_block). **CN:** 开始一个使用 ir.InsertionPoint(self.before_block) 的上下文管理代码块。
+- **L2474** `            args = new_from_mlir_values(self.inputs, self.before_block.arguments)` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L2475** `            cond = self.condition(*args)` — **EN:** Assigns a value to cond. **CN:** 将一个值赋给 cond。
+- **L2476** `            cond_ir_val = extract_mlir_values(cond)` — **EN:** Assigns a value to cond_ir_val. **CN:** 将一个值赋给 cond_ir_val。
+- **L2477** `            scf.ConditionOp(cond_ir_val[0], [*self.before_block.arguments])` — **EN:** Invokes `scf.ConditionOp` as a standalone call. **CN:** 以独立语句方式调用 `scf.ConditionOp`。
+- **L2478** `        self.ipoint_op = ir.InsertionPoint(self.after_block)` — **EN:** Assigns a value to self.ipoint_op. **CN:** 将一个值赋给 self.ipoint_op。
+- **L2479** `        self.ipoint_op.__enter__()` — **EN:** Invokes `self.ipoint_op.__enter__` as a standalone call. **CN:** 以独立语句方式调用 `self.ipoint_op.__enter__`。
+- **L2480** `        return new_from_mlir_values(self.inputs, self.after_block.arguments)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2482** `    def __exit__(` — **EN:** Defines function `__exit__`. **CN:** 定义函数 `__exit__`。
+- **L2483** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2484** `        exc_type: Optional[type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2485** `        exc_value: Optional[BaseException],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2486** `        traceback: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2487** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2488** `        self.ipoint_op.__exit__(exc_type, exc_value, traceback)` — **EN:** Invokes `self.ipoint_op.__exit__` as a standalone call. **CN:** 以独立语句方式调用 `self.ipoint_op.__exit__`。
+- **L2489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2490** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L2491** `    def results(self) -> List[Numeric]:` — **EN:** Defines function `results`. **CN:** 定义函数 `results`。
+- **L2492** `        return new_from_mlir_values(self.inputs, self.while_op.results_)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2495** `def while_generate(` — **EN:** Defines function `while_generate`. **CN:** 定义函数 `while_generate`。
+- **L2496** `    inputs: Sequence[Union[ir.Value, Numeric]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2497** `    condition: Callable[[Sequence[Union[ir.Value, Numeric]]], Union[ir.Value, Numeric]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2498** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2499** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2500** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2501** `) -> WhileLoopContext:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2502** `    """` — **EN:** Starts the docstring for the function `while_generate`. **CN:** 开始说明 function `while_generate` 的文档字符串。
+- **L2503** `    Generate a WhileLoopContext for a dynamic loop.` — **EN:** Continues the docstring for the function `while_generate`. **CN:** 继续说明 function `while_generate` 的文档字符串。
+- **L2504** `    """` — **EN:** Ends the docstring for the function `while_generate`. **CN:** 结束说明 function `while_generate` 的文档字符串。
+- **L2505** `    return WhileLoopContext(inputs, condition, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2508** `def equal(` — **EN:** Defines function `equal`. **CN:** 定义函数 `equal`。
+- **L2509** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2510** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2511** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2512** `    if not is_dynamic_expression(lhs) and not is_dynamic_expression(rhs):` — **EN:** Starts a conditional branch guarded by `not is_dynamic_expression(lhs) and (not is_dynamic_expres...`. **CN:** 开始一个由 `not is_dynamic_expression(lhs) and (not is_dynamic_expres...` 控制的条件分支。
+- **L2513** `        return lhs == rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2515** `    # Both sequence` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2516** `    if isinstance(lhs, Sequence) and isinstance(rhs, Sequence):` — **EN:** Starts a conditional branch guarded by `isinstance(lhs, Sequence) and isinstance(rhs, Sequence)`. **CN:** 开始一个由 `isinstance(lhs, Sequence) and isinstance(rhs, Sequence)` 控制的条件分支。
+- **L2517** `        # Short-circuit for unequal length` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2518** `        if len(lhs) != len(rhs):` — **EN:** Starts a conditional branch guarded by `len(lhs) != len(rhs)`. **CN:** 开始一个由 `len(lhs) != len(rhs)` 控制的条件分支。
+- **L2519** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2520** `        return all_(equal(l, r) for l, r in zip(lhs, rhs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2521** `    return lhs == rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2524** `def not_equal(` — **EN:** Defines function `not_equal`. **CN:** 定义函数 `not_equal`。
+- **L2525** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2526** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2527** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2528** `    if not is_dynamic_expression(lhs) and not is_dynamic_expression(rhs):` — **EN:** Starts a conditional branch guarded by `not is_dynamic_expression(lhs) and (not is_dynamic_expres...`. **CN:** 开始一个由 `not is_dynamic_expression(lhs) and (not is_dynamic_expres...` 控制的条件分支。
+- **L2529** `        return lhs != rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2531** `    # Both sequence` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2532** `    if isinstance(lhs, Sequence) and isinstance(rhs, Sequence):` — **EN:** Starts a conditional branch guarded by `isinstance(lhs, Sequence) and isinstance(rhs, Sequence)`. **CN:** 开始一个由 `isinstance(lhs, Sequence) and isinstance(rhs, Sequence)` 控制的条件分支。
+- **L2533** `        # Short-circuit for unequal length` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2534** `        if len(lhs) != len(rhs):` — **EN:** Starts a conditional branch guarded by `len(lhs) != len(rhs)`. **CN:** 开始一个由 `len(lhs) != len(rhs)` 控制的条件分支。
+- **L2535** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2536** `        return any_(not_equal(l, r) for l, r in zip(lhs, rhs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2538** `    if hasattr(lhs, "__ne__"):` — **EN:** Starts a conditional branch guarded by `hasattr(lhs, '__ne__')`. **CN:** 开始一个由 `hasattr(lhs, '__ne__')` 控制的条件分支。
+- **L2539** `        return lhs != rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2540** `    elif hasattr(rhs, "__ne__"):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2541** `        return rhs != lhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2542** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2543** `        return not_(equal(lhs, rhs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2546** `def in_(lhs: object, rhs: Any) -> Union[bool, Boolean]:` — **EN:** Defines function `in_`. **CN:** 定义函数 `in_`。
+- **L2547** `    if not is_dynamic_expression(lhs) and not is_dynamic_expression(rhs):` — **EN:** Starts a conditional branch guarded by `not is_dynamic_expression(lhs) and (not is_dynamic_expres...`. **CN:** 开始一个由 `not is_dynamic_expression(lhs) and (not is_dynamic_expres...` 控制的条件分支。
+- **L2548** `        return lhs in rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2550** `    if not isinstance(rhs, Sequence):` — **EN:** Starts a conditional branch guarded by `not isinstance(rhs, Sequence)`. **CN:** 开始一个由 `not isinstance(rhs, Sequence)` 控制的条件分支。
+- **L2551** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2552** `            f"'in' not supported between instances of {type(lhs)} and {type(rhs)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2553** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2555** `    return any_(equal(lhs, r) for r in rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2556** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2557** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2558** `def _lte_gte(` — **EN:** Defines function `_lte_gte`. **CN:** 定义函数 `_lte_gte`。
+- **L2559** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2560** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2561** `    op: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2562** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2563** `    def native_lte_gte(` — **EN:** Defines function `native_lte_gte`. **CN:** 定义函数 `native_lte_gte`。
+- **L2564** `        lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2565** `        rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2566** `        op: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2567** `    ) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2568** `        if op == "<":` — **EN:** Starts a conditional branch guarded by `op == '<'`. **CN:** 开始一个由 `op == '<'` 控制的条件分支。
+- **L2569** `            return lhs < rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2570** `        elif op == "<=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2571** `            if hasattr(lhs, "__le__"):` — **EN:** Starts a conditional branch guarded by `hasattr(lhs, '__le__')`. **CN:** 开始一个由 `hasattr(lhs, '__le__')` 控制的条件分支。
+- **L2572** `                return lhs <= rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2573** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2574** `                return not_(lhs > rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2575** `        elif op == ">":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2576** `            return lhs > rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2577** `        elif op == ">=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2578** `            if hasattr(lhs, "__ge__"):` — **EN:** Starts a conditional branch guarded by `hasattr(lhs, '__ge__')`. **CN:** 开始一个由 `hasattr(lhs, '__ge__')` 控制的条件分支。
+- **L2579** `                return lhs >= rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2580** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2581** `                return not_(lhs < rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2582** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2583** `            raise DSLRuntimeError(f"Unsupported comparison operator: {op}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2585** `    if not is_dynamic_expression(lhs) and not is_dynamic_expression(rhs):` — **EN:** Starts a conditional branch guarded by `not is_dynamic_expression(lhs) and (not is_dynamic_expres...`. **CN:** 开始一个由 `not is_dynamic_expression(lhs) and (not is_dynamic_expres...` 控制的条件分支。
+- **L2586** `        return native_lte_gte(lhs, rhs, op)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2587** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2588** `    # Both sequence, comparisons other than == and != do not allow mixing different types of sequences` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2589** `    if (` — **EN:** Starts a conditional branch guarded by `isinstance(lhs, Sequence) and isinstance(rhs, Sequence) a...`. **CN:** 开始一个由 `isinstance(lhs, Sequence) and isinstance(rhs, Sequence) a...` 控制的条件分支。
+- **L2590** `        isinstance(lhs, Sequence)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2591** `        and isinstance(rhs, Sequence)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2592** `        and type(lhs) == type(rhs)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2593** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2594** `        unequal_found: Union[Numeric, bool] = False` — **EN:** Assigns a typed value to unequal_found. **CN:** 为 unequal_found 赋予带类型标注的值。
+- **L2595** `        comp_results = []` — **EN:** Assigns a value to comp_results. **CN:** 将一个值赋给 comp_results。
+- **L2596** `        mask = []` — **EN:** Assigns a value to mask. **CN:** 将一个值赋给 mask。
+- **L2597** `        for l, r in zip(lhs, rhs):` — **EN:** Starts a loop assigning items from `zip(lhs, rhs)` to `(l, r)`. **CN:** 开始一个循环，将 `zip(lhs, rhs)` 的元素赋给 `(l, r)`。
+- **L2598** `            is_equal = equal(l, r)` — **EN:** Assigns a value to is_equal. **CN:** 将一个值赋给 is_equal。
+- **L2599** `            mask.append(not_(or_(is_equal, unequal_found)))` — **EN:** Invokes `mask.append` as a standalone call. **CN:** 以独立语句方式调用 `mask.append`。
+- **L2600** `            unequal_found = not_(is_equal)` — **EN:** Assigns a value to unequal_found. **CN:** 将一个值赋给 unequal_found。
+- **L2601** `            comp_results.append(_lte_gte(l, r, op))` — **EN:** Invokes `comp_results.append` as a standalone call. **CN:** 以独立语句方式调用 `comp_results.append`。
+- **L2602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2603** `        result = any_(and_(r, m) for r, m in zip(comp_results, mask))` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L2604** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2605** `        if len(lhs) != len(rhs):` — **EN:** Starts a conditional branch guarded by `len(lhs) != len(rhs)`. **CN:** 开始一个由 `len(lhs) != len(rhs)` 控制的条件分支。
+- **L2606** `            # Ref https://docs.python.org/3/tutorial/datastructures.html#comparing-sequences-and-other-types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2607** `            # If one sequence is an initial sub-sequence of the other, the shorter sequence is the smaller (lesser) one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2608** `            has_valid_mask = any_(mask)` — **EN:** Assigns a value to has_valid_mask. **CN:** 将一个值赋给 has_valid_mask。
+- **L2609** `            if op == "<":` — **EN:** Starts a conditional branch guarded by `op == '<'`. **CN:** 开始一个由 `op == '<'` 控制的条件分支。
+- **L2610** `                length_result = len(lhs) < len(rhs)` — **EN:** Assigns a value to length_result. **CN:** 将一个值赋给 length_result。
+- **L2611** `            elif op == ">":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2612** `                length_result = len(lhs) > len(rhs)` — **EN:** Assigns a value to length_result. **CN:** 将一个值赋给 length_result。
+- **L2613** `            elif op == "<=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2614** `                length_result = len(lhs) <= len(rhs)` — **EN:** Assigns a value to length_result. **CN:** 将一个值赋给 length_result。
+- **L2615** `            elif op == ">=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2616** `                length_result = len(lhs) >= len(rhs)` — **EN:** Assigns a value to length_result. **CN:** 将一个值赋给 length_result。
+- **L2617** `            if type(has_valid_mask) == bool:` — **EN:** Starts a conditional branch guarded by `type(has_valid_mask) == bool`. **CN:** 开始一个由 `type(has_valid_mask) == bool` 控制的条件分支。
+- **L2618** `                return result if has_valid_mask else length_result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2619** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2620** `                return select_(has_valid_mask, result, length_result)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2621** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2622** `            if op in {"<=", ">="}:` — **EN:** Starts a conditional branch guarded by `op in {'<=', '>='}`. **CN:** 开始一个由 `op in {'<=', '>='}` 控制的条件分支。
+- **L2623** `                # If no unequal, return True` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2624** `                return select_(unequal_found, result, True)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2625** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2626** `                return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2627** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2628** `        return native_lte_gte(lhs, rhs, op)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2629** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2631** `def greater_than(` — **EN:** Defines function `greater_than`. **CN:** 定义函数 `greater_than`。
+- **L2632** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2633** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2634** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2635** `    return _lte_gte(lhs, rhs, ">")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2637** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2638** `def greater_equal(` — **EN:** Defines function `greater_equal`. **CN:** 定义函数 `greater_equal`。
+- **L2639** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2640** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2641** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2642** `    return _lte_gte(lhs, rhs, ">=")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2643** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2645** `def less_than(` — **EN:** Defines function `less_than`. **CN:** 定义函数 `less_than`。
+- **L2646** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2647** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2648** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2649** `    return _lte_gte(lhs, rhs, "<")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2650** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2652** `def less_equal(` — **EN:** Defines function `less_equal`. **CN:** 定义函数 `less_equal`。
+- **L2653** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2654** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2655** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2656** `    return _lte_gte(lhs, rhs, "<=")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2657** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2658** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2659** `def _compare_dispatch(` — **EN:** Defines function `_compare_dispatch`. **CN:** 定义函数 `_compare_dispatch`。
+- **L2660** `    lhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2661** `    rhs: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2662** `    op: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2663** `) -> Union[Boolean, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2664** `    """` — **EN:** Starts the docstring for the function `_compare_dispatch`. **CN:** 开始说明 function `_compare_dispatch` 的文档字符串。
+- **L2665** `    Dispatches the comparison operation between lhs and rhs based on the given operator.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2666** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2667** `    :param lhs: The left-hand side operand for the comparison.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2668** `    :param rhs: The right-hand side operand for the comparison.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2669** `    :param op: The comparison operator as a string. Supported operators are:` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2670** `        - "is", "is not": Python identity comparisons.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2671** `        - "in", "not in": Membership tests.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2672** `        - "==", "!=": Equality and inequality.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2673** `        - "<", ">", "<=", ">=": Relational comparisons.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2674** `    :return: The result of the comparison, which may be a boolean or a DSL-specific type.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2675** `    :raises DSLRuntimeError: If the operator is not supported.` — **EN:** Continues the docstring for the function `_compare_dispatch`. **CN:** 继续说明 function `_compare_dispatch` 的文档字符串。
+- **L2676** `    """` — **EN:** Ends the docstring for the function `_compare_dispatch`. **CN:** 结束说明 function `_compare_dispatch` 的文档字符串。
+- **L2677** `    # 'is' and 'is not' are pure python operators` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2678** `    if op == "is":` — **EN:** Starts a conditional branch guarded by `op == 'is'`. **CN:** 开始一个由 `op == 'is'` 控制的条件分支。
+- **L2679** `        return lhs is rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2680** `    elif op == "is not":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2681** `        return lhs is not rhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2682** `    elif op == "in":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2683** `        return in_(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2684** `    elif op == "not in":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2685** `        return not_(in_(lhs, rhs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2686** `    elif op == "==":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2687** `        return equal(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2688** `    elif op == "!=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2689** `        return not_equal(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2690** `    elif op == "<":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2691** `        return less_than(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2692** `    elif op == ">":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2693** `        return greater_than(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2694** `    elif op == ">=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2695** `        return greater_equal(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2696** `    elif op == "<=":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2697** `        return less_equal(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2698** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2699** `        raise DSLRuntimeError(f"Unsupported comparison operator: {op}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2700** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2701** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2702** `def _compare_executor(` — **EN:** Defines function `_compare_executor`. **CN:** 定义函数 `_compare_executor`。
+- **L2703** `    left: Union[Numeric, ir.Value, int, float, bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2704** `    comparators: List[Union[Numeric, ir.Value, int, float, bool]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2705** `    ops: List[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2706** `) -> Union[Numeric, int, float, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2707** `    # Fast path for single comparison` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2708** `    if len(comparators) == 1:` — **EN:** Starts a conditional branch guarded by `len(comparators) == 1`. **CN:** 开始一个由 `len(comparators) == 1` 控制的条件分支。
+- **L2709** `        return _compare_dispatch(left, comparators[0], ops[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2710** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2711** `    # Chain comparison, dispatch in a loop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2712** `    result: Union[Numeric, int, float, bool] = True` — **EN:** Assigns a typed value to result. **CN:** 为 result 赋予带类型标注的值。
+- **L2713** `    current = left` — **EN:** Assigns a value to current. **CN:** 将一个值赋给 current。
+- **L2714** `    for comparator, op in zip(comparators, ops):` — **EN:** Starts a loop assigning items from `zip(comparators, ops)` to `(comparator, op)`. **CN:** 开始一个循环，将 `zip(comparators, ops)` 的元素赋给 `(comparator, op)`。
+- **L2715** `        cmp_result = _compare_dispatch(current, comparator, op)` — **EN:** Assigns a value to cmp_result. **CN:** 将一个值赋给 cmp_result。
+- **L2716** `        result = and_(result, cmp_result)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L2717** `        current = comparator` — **EN:** Assigns a value to current. **CN:** 将一个值赋给 current。
+- **L2718** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2719** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2720** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2721** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2722** `def _builtin_redirector(fcn: Callable[..., object]) -> Callable[..., object]:` — **EN:** Defines function `_builtin_redirector`. **CN:** 定义函数 `_builtin_redirector`。
+- **L2723** `    def builtin_wrapper(fcn: Any, *args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `builtin_wrapper`. **CN:** 定义函数 `builtin_wrapper`。
+- **L2724** `        if is_dynamic_expression(args):` — **EN:** Starts a conditional branch guarded by `is_dynamic_expression(args)`. **CN:** 开始一个由 `is_dynamic_expression(args)` 控制的条件分支。
+- **L2725** `            if kwargs:` — **EN:** Starts a conditional branch guarded by `kwargs`. **CN:** 开始一个由 `kwargs` 控制的条件分支。
+- **L2726** `                # Redirected built-ins do not support keyword arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2727** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2728** `                    f"Unsupported keyword arguments for built-in function: {fcn}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2729** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2730** `            if fcn is builtins.max:` — **EN:** Starts a conditional branch guarded by `fcn is builtins.max`. **CN:** 开始一个由 `fcn is builtins.max` 控制的条件分支。
+- **L2731** `                return max(*args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2732** `            elif fcn is builtins.min:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2733** `                return min(*args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2734** `            elif fcn is builtins.any:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2735** `                return any_(*args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2736** `            elif fcn is builtins.all:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2737** `                return all_(*args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2738** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2739** `                raise DSLRuntimeError(f"Unsupported built-in function: {fcn}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2740** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2741** `            return fcn(*args, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2742** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2743** `    return functools.partial(builtin_wrapper, fcn)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2744** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2745** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2746** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2747** `# Set the AST decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2748** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2749** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2750** `# Set the DSL specific functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2751** `executor.set_functions(` — **EN:** Invokes `executor.set_functions` as a standalone call. **CN:** 以独立语句方式调用 `executor.set_functions`。
+- **L2752** `    is_dynamic_expression=is_dynamic_expression,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2753** `    loop_execute_range_dynamic=_loop_execute_range_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2754** `    if_dynamic=_if_execute_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2755** `    while_dynamic=_while_execute_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2756** `    compare_executor=_compare_executor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2757** `    builtin_redirector=_builtin_redirector,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2758** `    ifexp_dynamic=_ifexp_execute_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2759** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2760** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2761** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2762** `class DSLCudaVerNotImplemented(DSLNotImplemented):` — **EN:** Defines class `DSLCudaVerNotImplemented` with bases DSLNotImplemented. **CN:** 定义类 `DSLCudaVerNotImplemented`，其基类为 DSLNotImplemented。
+- **L2763** `    """` — **EN:** Starts the docstring for the class `DSLCudaVerNotImplemented`. **CN:** 开始说明 class `DSLCudaVerNotImplemented` 的文档字符串。
+- **L2764** `    Exception raised when a feature is not supported for DSL with CUDA version less than the required version.` — **EN:** Continues the docstring for the class `DSLCudaVerNotImplemented`. **CN:** 继续说明 class `DSLCudaVerNotImplemented` 的文档字符串。
+- **L2765** `    """` — **EN:** Ends the docstring for the class `DSLCudaVerNotImplemented`. **CN:** 结束说明 class `DSLCudaVerNotImplemented` 的文档字符串。
+- **L2766** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2767** `    def __init__(self, feature: str, required_version: str):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L2768** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L2769** `            message=f"{feature} is not supported for DSL with CUDA version less than {required_version}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2770** `            suggestion=f"Consider upgrading to CUDA version {required_version}+ based DSL",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2771** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cutlass_dsl.cutlass`. CN: 模块名为 `CuTeDSL.cutlass.cutlass_dsl.cutlass`。
+- EN: Module docstring summary: This module provides a DSL for Cutlass Dialects. CN: 模块文档摘要为：This module provides a DSL for Cutlass Dialects.
+- EN: Top-level classes: CutlassBaseDSL, CuTeDSL, _CuteExperimentalJitCompiledFunction, CuteExperimentalDSL, KernelLauncher, WhileLoopContext, DSLCudaVerNotImplemented CN: 顶层类包括：CutlassBaseDSL, CuTeDSL, _CuteExperimentalJitCompiledFunction, CuteExperimentalDSL, KernelLauncher, WhileLoopContext, DSLCudaVerNotImplemented
+- EN: Top-level functions: _get_max_cpu_threads, get_sparse_tuple_ctype, is_cute_algebra_type, _build_kernel_attrs, _filter_readonly_frozen_dataclass, remove_read_only_frozen_dataclass, filter_readonly_frozen_dataclass_names, insert_read_only_frozen_dataclass, unpack_to_irvalue, pack_from_irvalue, to_index, _validate_iter_args_structure, ... (+24 more) CN: 顶层函数包括：_get_max_cpu_threads, get_sparse_tuple_ctype, is_cute_algebra_type, _build_kernel_attrs, _filter_readonly_frozen_dataclass, remove_read_only_frozen_dataclass, filter_readonly_frozen_dataclass_names, insert_read_only_frozen_dataclass, unpack_to_irvalue, pack_from_irvalue, to_index, _validate_iter_args_structure, ... (+24 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..base_dsl:*, ..base_dsl:compiler, ..base_dsl.dsl:is_dynamic_expression,extract_mlir_values,BaseDSL,new_from_mlir_values,implements_dynamic_expression, ..base_dsl.typing:*, ..base_dsl.typing:DynamicExpression,get_mlir_types,Int32,Int64,Int8,Integer,Boolean,Numeric,NumericMeta,DslType,as_numeric,get_c_pointers,cast, ..base_dsl.common:DSLRuntimeError,DSLNotImplemented, ..base_dsl.utils.logger:log, ..base_dsl.utils.tree_utils:Leaf,PyTreeDef,tree_flatten,tree_unflatten,DSLTreeFlattenError,is_constexpr_field, ..base_dsl.leaf_utils:is_frozen_dataclass, ..base_dsl.runtime.jit_arg_adapters:is_arg_annotation_constexpr, ..base_dsl.jit_executor:ExecutionArgs, ..base_dsl.runtime:cuda, .cuda_stream_adapter:CudaDialectStreamAdapter, .cuda_jit_executor:CudaDialectJitCompiledFunction, cutlass._mlir:ir,execution_engine,passmanager, cutlass._mlir.dialects:arith,func,gpu,scf,cute,gpu,cuda, cutlass._mlir.dialects._ods_common:get_op_result_or_op_results, cutlass._mlir.extras:types, ..base_dsl._mlir_helpers:arith, ..base_dsl._mlir_helpers:lru_cache_ir, ... (+11 more) CN: 内部依赖：..base_dsl:*, ..base_dsl:compiler, ..base_dsl.dsl:is_dynamic_expression,extract_mlir_values,BaseDSL,new_from_mlir_values,implements_dynamic_expression, ..base_dsl.typing:*, ..base_dsl.typing:DynamicExpression,get_mlir_types,Int32,Int64,Int8,Integer,Boolean,Numeric,NumericMeta,DslType,as_numeric,get_c_pointers,cast, ..base_dsl.common:DSLRuntimeError,DSLNotImplemented, ..base_dsl.utils.logger:log, ..base_dsl.utils.tree_utils:Leaf,PyTreeDef,tree_flatten,tree_unflatten,DSLTreeFlattenError,is_constexpr_field, ..base_dsl.leaf_utils:is_frozen_dataclass, ..base_dsl.runtime.jit_arg_adapters:is_arg_annotation_constexpr, ..base_dsl.jit_executor:ExecutionArgs, ..base_dsl.runtime:cuda, .cuda_stream_adapter:CudaDialectStreamAdapter, .cuda_jit_executor:CudaDialectJitCompiledFunction, cutlass._mlir:ir,execution_engine,passmanager, cutlass._mlir.dialects:arith,func,gpu,scf,cute,gpu,cuda, cutlass._mlir.dialects._ods_common:get_op_result_or_op_results, cutlass._mlir.extras:types, ..base_dsl._mlir_helpers:arith, ..base_dsl._mlir_helpers:lru_cache_ir, ... (+11 more)
+- EN: External or standard-library dependencies: types:GenericAlias,SimpleNamespace,UnionType, typing_extensions:deprecated, typing:Callable,Generator,Optional,Union,List,Tuple,Sequence,Iterable,ForwardRef,Any,get_origin,get_args, functools, inspect, pkgutil, concurrent.futures:ThreadPoolExecutor,as_completed, dataclasses:fields, math:ceil, itertools:chain, pathlib:Path, builtins, ctypes, hashlib, os, re, traceback, tvm_ffi CN: 外部或标准库依赖：types:GenericAlias,SimpleNamespace,UnionType, typing_extensions:deprecated, typing:Callable,Generator,Optional,Union,List,Tuple,Sequence,Iterable,ForwardRef,Any,get_origin,get_args, functools, inspect, pkgutil, concurrent.futures:ThreadPoolExecutor,as_completed, dataclasses:fields, math:ceil, itertools:chain, pathlib:Path, builtins, ctypes, hashlib, os, re, traceback, tvm_ffi

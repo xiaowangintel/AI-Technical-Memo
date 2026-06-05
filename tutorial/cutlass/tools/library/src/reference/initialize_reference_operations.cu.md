@@ -1,0 +1,411 @@
+# initialize_reference_operations.cu — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/src/reference/initialize_reference_operations.cu`
+**Purpose / 用途**: Registers reference operations used for correctness checking in the CUTLASS library runtime. / 注册 CUTLASS 运行时库中用于正确性校验的参考算子。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>   \brief</code>
+  - EN: Comment that documents intent or context: "\brief".
+  - CN: 用于说明意图或上下文的注释："\brief"。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L37** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L38** <code>#include &quot;cutlass/library/manifest.h&quot;</code>
+  - EN: Includes `cutlass/library/manifest.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/manifest.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L43** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>// note: init methods for the same op-class may be split into multiple to parallelize compilation</code>
+  - EN: Comment that documents intent or context: "note: init methods for the same op-class may be split into multiple to parallelize compilation".
+  - CN: 用于说明意图或上下文的注释："note: init methods for the same op-class may be split into multiple to parallelize compilation"。
+- **L46** <code>void initialize_gemm_reference_operations_int4(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int4` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int4`，但不在此处给出定义。
+- **L47** <code>void initialize_gemm_reference_operations_int8_interleaved_32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int8_interleaved_32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int8_interleaved_32`，但不在此处给出定义。
+- **L48** <code>void initialize_gemm_reference_operations_int8_interleaved_64(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int8_interleaved_64` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int8_interleaved_64`，但不在此处给出定义。
+- **L49** <code>void initialize_gemm_reference_operations_s8_s8_s32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_s8_s8_s32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_s8_s8_s32`，但不在此处给出定义。
+- **L50** <code>void initialize_gemm_reference_operations_u8_u8_s32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_u8_u8_s32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_u8_u8_s32`，但不在此处给出定义。
+- **L51** <code>void initialize_gemm_reference_operations_e4m3a_e4m3out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e4m3a_e4m3out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e4m3a_e4m3out`，但不在此处给出定义。
+- **L52** <code>void initialize_gemm_reference_operations_e5m2a_e4m3out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e5m2a_e4m3out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e5m2a_e4m3out`，但不在此处给出定义。
+- **L53** <code>void initialize_gemm_reference_operations_e4m3a_e5m2out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e4m3a_e5m2out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e4m3a_e5m2out`，但不在此处给出定义。
+- **L54** <code>void initialize_gemm_reference_operations_e5m2a_e5m2out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e5m2a_e5m2out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e5m2a_e5m2out`，但不在此处给出定义。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>void initialize_gemm_reference_operations_f4_f4_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f4_f4_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f4_f4_f32`，但不在此处给出定义。
+- **L57** <code>void initialize_gemm_reference_operations_f4_f6_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f4_f6_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f4_f6_f32`，但不在此处给出定义。
+- **L58** <code>void initialize_gemm_reference_operations_f4_f8_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f4_f8_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f4_f8_f32`，但不在此处给出定义。
+- **L59** <code>void initialize_gemm_reference_operations_f6_f4_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f6_f4_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f6_f4_f32`，但不在此处给出定义。
+- **L60** <code>void initialize_gemm_reference_operations_f6_f6_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f6_f6_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f6_f6_f32`，但不在此处给出定义。
+- **L61** <code>void initialize_gemm_reference_operations_f6_f8_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f6_f8_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f6_f8_f32`，但不在此处给出定义。
+- **L62** <code>void initialize_gemm_reference_operations_f8_f4_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f8_f4_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f8_f4_f32`，但不在此处给出定义。
+- **L63** <code>void initialize_gemm_reference_operations_f8_f6_f32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f8_f6_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f8_f6_f32`，但不在此处给出定义。
+- **L64** <code>void initialize_block_scaled_gemm_reference_operations_fp4a_vs16(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_block_scaled_gemm_reference_operations_fp4a_vs16` without defining it here.
+  - CN: 声明函数或方法 `initialize_block_scaled_gemm_reference_operations_fp4a_vs16`，但不在此处给出定义。
+- **L65** <code>void initialize_block_scaled_gemm_reference_operations_fp4a_vs32(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_block_scaled_gemm_reference_operations_fp4a_vs32` without defining it here.
+  - CN: 声明函数或方法 `initialize_block_scaled_gemm_reference_operations_fp4a_vs32`，但不在此处给出定义。
+- **L66** <code>void initialize_block_scaled_gemm_reference_operations_mixed8bitsa(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_block_scaled_gemm_reference_operations_mixed8bitsa` without defining it here.
+  - CN: 声明函数或方法 `initialize_block_scaled_gemm_reference_operations_mixed8bitsa`，但不在此处给出定义。
+- **L67** <code>void initialize_blockwise_gemm_reference_operations_fp32out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_blockwise_gemm_reference_operations_fp32out` without defining it here.
+  - CN: 声明函数或方法 `initialize_blockwise_gemm_reference_operations_fp32out`，但不在此处给出定义。
+- **L68** <code>void initialize_blockwise_gemm_reference_operations_fp16out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_blockwise_gemm_reference_operations_fp16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_blockwise_gemm_reference_operations_fp16out`，但不在此处给出定义。
+- **L69** <code>void initialize_blockwise_gemm_reference_operations_bf16out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_blockwise_gemm_reference_operations_bf16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_blockwise_gemm_reference_operations_bf16out`，但不在此处给出定义。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>void initialize_gemm_reference_operations_fp8in_fp16out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp8in_fp16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp8in_fp16out`，但不在此处给出定义。
+- **L72** <code>void initialize_gemm_reference_operations_fp8in_bf16out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp8in_bf16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp8in_bf16out`，但不在此处给出定义。
+- **L73** <code>void initialize_gemm_reference_operations_fp8in_fp32out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp8in_fp32out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp8in_fp32out`，但不在此处给出定义。
+- **L74** <code>void initialize_gemm_reference_operations_fp32out(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp32out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp32out`，但不在此处给出定义。
+- **L75** <code>void initialize_gemm_reference_operations_fp_other(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp_other` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp_other`，但不在此处给出定义。
+- **L76** <code>void initialize_gemm_reference_operations_fp_mixed_input(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp_mixed_input` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp_mixed_input`，但不在此处给出定义。
+- **L77** <code>void initialize_gemm_reference_operations_int_mixed_input(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int_mixed_input` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int_mixed_input`，但不在此处给出定义。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>void initialize_conv2d_reference_operations(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_conv2d_reference_operations` without defining it here.
+  - CN: 声明函数或方法 `initialize_conv2d_reference_operations`，但不在此处给出定义。
+- **L80** <code>void initialize_conv3d_reference_operations(Manifest &amp;manifest);</code>
+  - EN: Declares function or method `initialize_conv3d_reference_operations` without defining it here.
+  - CN: 声明函数或方法 `initialize_conv3d_reference_operations`，但不在此处给出定义。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L83** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L84** <code>void initialize_reference_operations(Manifest &amp;manifest) {</code>
+  - EN: Begins the definition of function or method `initialize_reference_operations`.
+  - CN: 开始定义函数或方法 `initialize_reference_operations`。
+- **L85** <code>  initialize_conv2d_reference_operations(manifest);</code>
+  - EN: Declares function or method `initialize_conv2d_reference_operations` without defining it here.
+  - CN: 声明函数或方法 `initialize_conv2d_reference_operations`，但不在此处给出定义。
+- **L86** <code>  initialize_conv3d_reference_operations(manifest);</code>
+  - EN: Declares function or method `initialize_conv3d_reference_operations` without defining it here.
+  - CN: 声明函数或方法 `initialize_conv3d_reference_operations`，但不在此处给出定义。
+- **L87** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L88** <code>  initialize_gemm_reference_operations_int4(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int4` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int4`，但不在此处给出定义。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>  initialize_gemm_reference_operations_int8_interleaved_32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int8_interleaved_32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int8_interleaved_32`，但不在此处给出定义。
+- **L91** <code>  initialize_gemm_reference_operations_int8_interleaved_64(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int8_interleaved_64` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int8_interleaved_64`，但不在此处给出定义。
+- **L92** <code>  initialize_gemm_reference_operations_s8_s8_s32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_s8_s8_s32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_s8_s8_s32`，但不在此处给出定义。
+- **L93** <code>  initialize_gemm_reference_operations_u8_u8_s32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_u8_u8_s32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_u8_u8_s32`，但不在此处给出定义。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>  initialize_gemm_reference_operations_e4m3a_e4m3out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e4m3a_e4m3out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e4m3a_e4m3out`，但不在此处给出定义。
+- **L96** <code>  initialize_gemm_reference_operations_e5m2a_e4m3out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e5m2a_e4m3out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e5m2a_e4m3out`，但不在此处给出定义。
+- **L97** <code>  initialize_gemm_reference_operations_e4m3a_e5m2out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e4m3a_e5m2out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e4m3a_e5m2out`，但不在此处给出定义。
+- **L98** <code>  initialize_gemm_reference_operations_e5m2a_e5m2out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_e5m2a_e5m2out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_e5m2a_e5m2out`，但不在此处给出定义。
+- **L99** <code>  initialize_gemm_reference_operations_fp8in_fp16out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp8in_fp16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp8in_fp16out`，但不在此处给出定义。
+- **L100** <code>  initialize_gemm_reference_operations_fp8in_bf16out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp8in_bf16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp8in_bf16out`，但不在此处给出定义。
+- **L101** <code>  initialize_gemm_reference_operations_fp8in_fp32out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp8in_fp32out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp8in_fp32out`，但不在此处给出定义。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>  initialize_gemm_reference_operations_fp32out(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp32out` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp32out`，但不在此处给出定义。
+- **L104** <code>  initialize_gemm_reference_operations_fp_other(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp_other` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp_other`，但不在此处给出定义。
+- **L105** <code>  initialize_gemm_reference_operations_fp_mixed_input(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_fp_mixed_input` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_fp_mixed_input`，但不在此处给出定义。
+- **L106** <code>  initialize_gemm_reference_operations_int_mixed_input(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_int_mixed_input` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_int_mixed_input`，但不在此处给出定义。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L109** <code>  initialize_gemm_reference_operations_f4_f4_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f4_f4_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f4_f4_f32`，但不在此处给出定义。
+- **L110** <code>  initialize_gemm_reference_operations_f4_f6_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f4_f6_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f4_f6_f32`，但不在此处给出定义。
+- **L111** <code>  initialize_gemm_reference_operations_f4_f8_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f4_f8_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f4_f8_f32`，但不在此处给出定义。
+- **L112** <code>  initialize_gemm_reference_operations_f6_f4_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f6_f4_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f6_f4_f32`，但不在此处给出定义。
+- **L113** <code>  initialize_gemm_reference_operations_f6_f6_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f6_f6_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f6_f6_f32`，但不在此处给出定义。
+- **L114** <code>  initialize_gemm_reference_operations_f6_f8_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f6_f8_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f6_f8_f32`，但不在此处给出定义。
+- **L115** <code>  initialize_gemm_reference_operations_f8_f4_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f8_f4_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f8_f4_f32`，但不在此处给出定义。
+- **L116** <code>  initialize_gemm_reference_operations_f8_f6_f32(manifest);</code>
+  - EN: Declares function or method `initialize_gemm_reference_operations_f8_f6_f32` without defining it here.
+  - CN: 声明函数或方法 `initialize_gemm_reference_operations_f8_f6_f32`，但不在此处给出定义。
+- **L117** <code>  initialize_block_scaled_gemm_reference_operations_fp4a_vs16(manifest);</code>
+  - EN: Declares function or method `initialize_block_scaled_gemm_reference_operations_fp4a_vs16` without defining it here.
+  - CN: 声明函数或方法 `initialize_block_scaled_gemm_reference_operations_fp4a_vs16`，但不在此处给出定义。
+- **L118** <code>  initialize_block_scaled_gemm_reference_operations_fp4a_vs32(manifest);</code>
+  - EN: Declares function or method `initialize_block_scaled_gemm_reference_operations_fp4a_vs32` without defining it here.
+  - CN: 声明函数或方法 `initialize_block_scaled_gemm_reference_operations_fp4a_vs32`，但不在此处给出定义。
+- **L119** <code>  initialize_block_scaled_gemm_reference_operations_mixed8bitsa(manifest);</code>
+  - EN: Declares function or method `initialize_block_scaled_gemm_reference_operations_mixed8bitsa` without defining it here.
+  - CN: 声明函数或方法 `initialize_block_scaled_gemm_reference_operations_mixed8bitsa`，但不在此处给出定义。
+- **L120** <code>  initialize_blockwise_gemm_reference_operations_fp32out(manifest);</code>
+  - EN: Declares function or method `initialize_blockwise_gemm_reference_operations_fp32out` without defining it here.
+  - CN: 声明函数或方法 `initialize_blockwise_gemm_reference_operations_fp32out`，但不在此处给出定义。
+- **L121** <code>  initialize_blockwise_gemm_reference_operations_fp16out(manifest);</code>
+  - EN: Declares function or method `initialize_blockwise_gemm_reference_operations_fp16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_blockwise_gemm_reference_operations_fp16out`，但不在此处给出定义。
+- **L122** <code>  initialize_blockwise_gemm_reference_operations_bf16out(manifest);</code>
+  - EN: Declares function or method `initialize_blockwise_gemm_reference_operations_bf16out` without defining it here.
+  - CN: 声明函数或方法 `initialize_blockwise_gemm_reference_operations_bf16out`，但不在此处给出定义。
+- **L123** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L124** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L125** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L126** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L127** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L128** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Reference implementations for validation / 用于正确性校验的参考实现
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/manifest.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据

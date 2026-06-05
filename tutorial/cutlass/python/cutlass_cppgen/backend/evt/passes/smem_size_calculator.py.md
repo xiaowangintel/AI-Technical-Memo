@@ -1,0 +1,339 @@
+# smem_size_calculator.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/passes/smem_size_calculator.py`
+
+## Purpose / 作用
+- EN: Compute the shared memory size in bytes
+- CN: 该模块的文档字符串将其描述为：Compute the shared memory size in bytes
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Compute the shared memory size in bytes` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from math import gcd` — **EN:** Imports gcd from `math`. **CN:** 从 `math` 导入 gcd。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `import cutlass_library` — **EN:** Imports cutlass_library for later use. **CN:** 导入 cutlass_library 供后续使用。
+- **L40** `from pycute import flatten, shape_div, product` — **EN:** Imports flatten, shape_div, product from `pycute`. **CN:** 从 `pycute` 导入 flatten, shape_div, product。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L43** `from cutlass_cppgen.backend.evt.ir import TopoVisitorNode, DAGIR` — **EN:** Imports TopoVisitorNode, DAGIR from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 TopoVisitorNode, DAGIR。
+- **L44** `from cutlass_cppgen.backend.library import DataType, DataTypeSize` — **EN:** Imports DataType, DataTypeSize from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 DataType, DataTypeSize。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `class GetSmemSize:` — **EN:** Defines class `GetSmemSize`. **CN:** 定义类 `GetSmemSize`。
+- **L48** `    """` — **EN:** Starts the docstring for the class `GetSmemSize`. **CN:** 开始说明 class `GetSmemSize` 的文档字符串。
+- **L49** `    Get the size in byte of shared memory used by the kernel` — **EN:** Continues the docstring for the class `GetSmemSize`. **CN:** 继续说明 class `GetSmemSize` 的文档字符串。
+- **L50** `    """` — **EN:** Ends the docstring for the class `GetSmemSize`. **CN:** 结束说明 class `GetSmemSize` 的文档字符串。
+- **L51** `    def __init__(self, dag_ir: DAGIR) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L52** `        self.dag_ir = dag_ir` — **EN:** Assigns a value to self.dag_ir. **CN:** 将一个值赋给 self.dag_ir。
+- **L53** `        self.cc = self.dag_ir.cc` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L56** `    # Sm90 epilogue specific` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    def sm90_epilogue_tile(self, tile_description):` — **EN:** Defines function `sm90_epilogue_tile`. **CN:** 定义函数 `sm90_epilogue_tile`。
+- **L60** `        # Get the epilogue tile size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L61** `        schedule = tile_description.epilogue_schedule` — **EN:** Assigns a value to schedule. **CN:** 将一个值赋给 schedule。
+- **L62** `        if schedule == cutlass_library.EpilogueScheduleType.TmaWarpSpecialized:` — **EN:** Starts a conditional branch guarded by `schedule == cutlass_library.EpilogueScheduleType.TmaWarpS...`. **CN:** 开始一个由 `schedule == cutlass_library.EpilogueScheduleType.TmaWarpS...` 控制的条件分支。
+- **L63** `            element_d = self.dag_ir.get_node_meta("D").element` — **EN:** Assigns a value to element_d. **CN:** 将一个值赋给 element_d。
+- **L64** `            nperf = 64 if (DataTypeSize[element_d] == 8 and tile_description.threadblock_shape[1] % 64 == 0) else 32` — **EN:** Assigns a value to nperf. **CN:** 将一个值赋给 nperf。
+- **L65** `            epi_tile_m = min(64, tile_description.threadblock_shape[0])` — **EN:** Assigns a value to epi_tile_m. **CN:** 将一个值赋给 epi_tile_m。
+- **L66** `            epi_tile_n = gcd(min(nperf, tile_description.threadblock_shape[1]), tile_description.threadblock_shape[1])` — **EN:** Assigns a value to epi_tile_n. **CN:** 将一个值赋给 epi_tile_n。
+- **L67** `            epilogue_tile_mn = (epi_tile_m, epi_tile_n)` — **EN:** Assigns a value to epilogue_tile_mn. **CN:** 将一个值赋给 epilogue_tile_mn。
+- **L68** `        elif schedule == cutlass_library.EpilogueScheduleType.TmaWarpSpecializedCooperative:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L69** `            epi_tile_m = min(128, tile_description.threadblock_shape[0])` — **EN:** Assigns a value to epi_tile_m. **CN:** 将一个值赋给 epi_tile_m。
+- **L70** `            epi_tile_n = gcd(min(32, tile_description.threadblock_shape[1]), tile_description.threadblock_shape[1])` — **EN:** Assigns a value to epi_tile_n. **CN:** 将一个值赋给 epi_tile_n。
+- **L71** `            epilogue_tile_mn = (epi_tile_m, epi_tile_n)` — **EN:** Assigns a value to epilogue_tile_mn. **CN:** 将一个值赋给 epilogue_tile_mn。
+- **L72** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L73** `            raise NotImplementedError(f"Unsupported schedule: {schedule}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `        # Get the pipeline stages` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L76** `        stages_d = 2` — **EN:** Assigns a value to stages_d. **CN:** 将一个值赋给 stages_d。
+- **L77** `        epi_tiles = product(shape_div(tuple(tile_description.threadblock_shape)[:2], epilogue_tile_mn))` — **EN:** Assigns a value to epi_tiles. **CN:** 将一个值赋给 epi_tiles。
+- **L78** `        if self.dag_ir.has_node("C"):` — **EN:** Starts a conditional branch guarded by `self.dag_ir.has_node('C')`. **CN:** 开始一个由 `self.dag_ir.has_node('C')` 控制的条件分支。
+- **L79** `            element_c = self.dag_ir.get_node_meta("C").element` — **EN:** Assigns a value to element_c. **CN:** 将一个值赋给 element_c。
+- **L80** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L81** `            element_c = None` — **EN:** Assigns a value to element_c. **CN:** 将一个值赋给 element_c。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `        element_d = self.dag_ir.get_node_meta("D").element` — **EN:** Assigns a value to element_d. **CN:** 将一个值赋给 element_d。
+- **L84** `        if element_c == element_d:` — **EN:** Starts a conditional branch guarded by `element_c == element_d`. **CN:** 开始一个由 `element_c == element_d` 控制的条件分支。
+- **L85** `            reuse_smem_c = True` — **EN:** Assigns a value to reuse_smem_c. **CN:** 将一个值赋给 reuse_smem_c。
+- **L86** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L87** `            reuse_smem_c = False` — **EN:** Assigns a value to reuse_smem_c. **CN:** 将一个值赋给 reuse_smem_c。
+- **L88** `        stages_c = max(epi_tiles, stages_d + 1) if reuse_smem_c else epi_tiles` — **EN:** Assigns a value to stages_c. **CN:** 将一个值赋给 stages_c。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `        # Record the epilogue tile` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `        self.cta_tile_mnk = tuple(tile_description.threadblock_shape)` — **EN:** Assigns a value to self.cta_tile_mnk. **CN:** 将一个值赋给 self.cta_tile_mnk。
+- **L92** `        self.epilogue_tile_mn = epilogue_tile_mn` — **EN:** Assigns a value to self.epilogue_tile_mn. **CN:** 将一个值赋给 self.epilogue_tile_mn。
+- **L93** `        self.epi_tiles = epi_tiles` — **EN:** Assigns a value to self.epi_tiles. **CN:** 将一个值赋给 self.epi_tiles。
+- **L94** `        self.stages_c = stages_c` — **EN:** Assigns a value to self.stages_c. **CN:** 将一个值赋给 self.stages_c。
+- **L95** `        self.stages_d = stages_d` — **EN:** Assigns a value to self.stages_d. **CN:** 将一个值赋给 self.stages_d。
+- **L96** `        self.reuse_smem_c = reuse_smem_c` — **EN:** Assigns a value to self.reuse_smem_c. **CN:** 将一个值赋给 self.reuse_smem_c。
+- **L97** `        self.element_c = element_c` — **EN:** Assigns a value to self.element_c. **CN:** 将一个值赋给 self.element_c。
+- **L98** `        self.element_d = element_d` — **EN:** Assigns a value to self.element_d. **CN:** 将一个值赋给 self.element_d。
+- **L99** `        self.is_source_supported = element_c is not None` — **EN:** Assigns a value to self.is_source_supported. **CN:** 将一个值赋给 self.is_source_supported。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `    def sm90_or_sm100_epilogue_smem_size(self, tile_description):` — **EN:** Defines function `sm90_or_sm100_epilogue_smem_size`. **CN:** 定义函数 `sm90_or_sm100_epilogue_smem_size`。
+- **L102** `        # Get the Fusion Storage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `        nodes = self.dag_ir.nodes_topological_order()` — **EN:** Assigns a value to nodes. **CN:** 将一个值赋给 nodes。
+- **L104** `        self.smem_types = {}` — **EN:** Assigns a value to self.smem_types. **CN:** 将一个值赋给 self.smem_types。
+- **L105** `        for node in nodes:` — **EN:** Starts a loop assigning items from `nodes` to `node`. **CN:** 开始一个循环，将 `nodes` 的元素赋给 `node`。
+- **L106** `            meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L107** `            if not meta.disabled:` — **EN:** Starts a conditional branch guarded by `not meta.disabled`. **CN:** 开始一个由 `not meta.disabled` 控制的条件分支。
+- **L108** `                self.smem_types[node] = meta.underlying_impl.get_smem_size(` — **EN:** Assigns a value to self.smem_types[node]. **CN:** 将一个值赋给 self.smem_types[node]。
+- **L109** `                    self.cta_tile_mnk, self.epilogue_tile_mn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `                    self.stages_c, self.stages_d, self.epi_tiles)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `            if node == "D":` — **EN:** Starts a conditional branch guarded by `node == 'D'`. **CN:** 开始一个由 `node == 'D'` 控制的条件分支。
+- **L112** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L113** `            if isinstance(meta, TopoVisitorNode):` — **EN:** Starts a conditional branch guarded by `isinstance(meta, TopoVisitorNode)`. **CN:** 开始一个由 `isinstance(meta, TopoVisitorNode)` 控制的条件分支。
+- **L114** `                self.get_dag_smem_type(node)` — **EN:** Invokes `self.get_dag_smem_type` as a standalone call. **CN:** 以独立语句方式调用 `self.get_dag_smem_type`。
+- **L115** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L116** `                self.get_evt_smem_type(node)` — **EN:** Invokes `self.get_evt_smem_type` as a standalone call. **CN:** 以独立语句方式调用 `self.get_evt_smem_type`。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `        thread_smem_size = self.smem_types[self.dag_ir.get_all_inputs("D")[0]][0]` — **EN:** Assigns a value to thread_smem_size. **CN:** 将一个值赋给 thread_smem_size。
+- **L119** `        # Get the Tensor Storage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L120** `        tensors = []` — **EN:** Assigns a value to tensors. **CN:** 将一个值赋给 tensors。
+- **L121** `        if self.is_source_supported:` — **EN:** Starts a conditional branch guarded by `self.is_source_supported`. **CN:** 开始一个由 `self.is_source_supported` 控制的条件分支。
+- **L122** `            smem_C = DataTypeSize[self.element_c] * product(self.epilogue_tile_mn) * self.stages_c // 8` — **EN:** Assigns a value to smem_C. **CN:** 将一个值赋给 smem_C。
+- **L123** `            tensors.append((smem_C, 128))` — **EN:** Invokes `tensors.append` as a standalone call. **CN:** 以独立语句方式调用 `tensors.append`。
+- **L124** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L125** `            tensors.append((0, 1))` — **EN:** Invokes `tensors.append` as a standalone call. **CN:** 以独立语句方式调用 `tensors.append`。
+- **L126** `        if self.reuse_smem_c:` — **EN:** Starts a conditional branch guarded by `self.reuse_smem_c`. **CN:** 开始一个由 `self.reuse_smem_c` 控制的条件分支。
+- **L127** `            tensors.append((0, 128))` — **EN:** Invokes `tensors.append` as a standalone call. **CN:** 以独立语句方式调用 `tensors.append`。
+- **L128** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L129** `            smem_D = DataTypeSize[self.element_d] * product(self.epilogue_tile_mn) * self.stages_d // 8` — **EN:** Assigns a value to smem_D. **CN:** 将一个值赋给 smem_D。
+- **L130** `            tensors.append((smem_D, 128))` — **EN:** Invokes `tensors.append` as a standalone call. **CN:** 以独立语句方式调用 `tensors.append`。
+- **L131** `        tensors.append((thread_smem_size, 128))` — **EN:** Invokes `tensors.append` as a standalone call. **CN:** 以独立语句方式调用 `tensors.append`。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `        tensor_smem_size = self.get_struct_size(tensors)` — **EN:** Assigns a value to tensor_smem_size. **CN:** 将一个值赋给 tensor_smem_size。
+- **L134** `        # Get pipeline storage size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L135** `        # sizeof(uint64_t * stages_c * 2), alignment of uint64_t` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L136** `        # 2 is for FullBarrier and EmptyBarrier` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L137** `        pipeline_smem_size = (8 * self.stages_c * 2, 8)` — **EN:** Assigns a value to pipeline_smem_size. **CN:** 将一个值赋给 pipeline_smem_size。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `        # get SharedStorage size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L140** `        smem_size = self.get_struct_size([tensor_smem_size, pipeline_smem_size])` — **EN:** Assigns a value to smem_size. **CN:** 将一个值赋给 smem_size。
+- **L141** `        return smem_size[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    def sm90_epilogue_smem_size(self, tile_description):` — **EN:** Defines function `sm90_epilogue_smem_size`. **CN:** 定义函数 `sm90_epilogue_smem_size`。
+- **L144** `        """` — **EN:** Starts the docstring for the function `sm90_epilogue_smem_size`. **CN:** 开始说明 function `sm90_epilogue_smem_size` 的文档字符串。
+- **L145** `        Compute the shared memory size of sm90 collective epilogue` — **EN:** Continues the docstring for the function `sm90_epilogue_smem_size`. **CN:** 继续说明 function `sm90_epilogue_smem_size` 的文档字符串。
+- **L146** `        """` — **EN:** Ends the docstring for the function `sm90_epilogue_smem_size`. **CN:** 结束说明 function `sm90_epilogue_smem_size` 的文档字符串。
+- **L147** `        self.sm90_epilogue_tile(tile_description)` — **EN:** Invokes `self.sm90_epilogue_tile` as a standalone call. **CN:** 以独立语句方式调用 `self.sm90_epilogue_tile`。
+- **L148** `        return self.sm90_or_sm100_epilogue_smem_size(tile_description)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L151** `    # Sm100 epilogue specific` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L152** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `    def sm100_epilogue_tile(self, tile_description):` — **EN:** Defines function `sm100_epilogue_tile`. **CN:** 定义函数 `sm100_epilogue_tile`。
+- **L155** `        cta_tile = (tile_description.blackwell_threadblock_shape[0], tile_description.blackwell_threadblock_shape[1])` — **EN:** Assigns a value to cta_tile. **CN:** 将一个值赋给 cta_tile。
+- **L156** `        mma_tile = cta_tile` — **EN:** Assigns a value to mma_tile. **CN:** 将一个值赋给 mma_tile。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `        if tile_description.is_2sm:` — **EN:** Starts a conditional branch guarded by `tile_description.is_2sm`. **CN:** 开始一个由 `tile_description.is_2sm` 控制的条件分支。
+- **L159** `            cta_tile = (cta_tile[0] // 2, cta_tile[1])` — **EN:** Assigns a value to cta_tile. **CN:** 将一个值赋给 cta_tile。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `        if tile_description.is_2sm and mma_tile[0] == 128:` — **EN:** Starts a conditional branch guarded by `tile_description.is_2sm and mma_tile[0] == 128`. **CN:** 开始一个由 `tile_description.is_2sm and mma_tile[0] == 128` 控制的条件分支。
+- **L162** `            tmem_warps = (2, 2)` — **EN:** Assigns a value to tmem_warps. **CN:** 将一个值赋给 tmem_warps。
+- **L163** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L164** `            tmem_warps = (4, 1)` — **EN:** Assigns a value to tmem_warps. **CN:** 将一个值赋给 tmem_warps。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `        if self.dag_ir.has_node("C"):` — **EN:** Starts a conditional branch guarded by `self.dag_ir.has_node('C')`. **CN:** 开始一个由 `self.dag_ir.has_node('C')` 控制的条件分支。
+- **L167** `            element_c = self.dag_ir.get_node_meta("C").element` — **EN:** Assigns a value to element_c. **CN:** 将一个值赋给 element_c。
+- **L168** `            element_c_size = DataTypeSize[element_c]` — **EN:** Assigns a value to element_c_size. **CN:** 将一个值赋给 element_c_size。
+- **L169** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L170** `            element_c = None` — **EN:** Assigns a value to element_c. **CN:** 将一个值赋给 element_c。
+- **L171** `            element_c_size = 0` — **EN:** Assigns a value to element_c_size. **CN:** 将一个值赋给 element_c_size。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `        element_d = self.dag_ir.get_node_meta("D").element` — **EN:** Assigns a value to element_d. **CN:** 将一个值赋给 element_d。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `        DisableSource = element_c is None or not self.dag_ir.has_node("C") or self.dag_ir.get_node_meta("C").element == DataType.void` — **EN:** Assigns a value to DisableSource. **CN:** 将一个值赋给 DisableSource。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `        CtaM = cta_tile[0]` — **EN:** Assigns a value to CtaM. **CN:** 将一个值赋给 CtaM。
+- **L178** `        CtaN = cta_tile[1]` — **EN:** Assigns a value to CtaN. **CN:** 将一个值赋给 CtaN。
+- **L179** `        WarpM = tmem_warps[0]` — **EN:** Assigns a value to WarpM. **CN:** 将一个值赋给 WarpM。
+- **L180** `        WarpN = tmem_warps[1]` — **EN:** Assigns a value to WarpN. **CN:** 将一个值赋给 WarpN。
+- **L181** `        MaxBits = max(element_c_size, DataTypeSize[element_d])` — **EN:** Assigns a value to MaxBits. **CN:** 将一个值赋给 MaxBits。
+- **L182** `        DpFull = 32` — **EN:** Assigns a value to DpFull. **CN:** 将一个值赋给 DpFull。
+- **L183** `        M = min(CtaM, DpFull * WarpM)` — **EN:** Assigns a value to M. **CN:** 将一个值赋给 M。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `        if DisableSource:` — **EN:** Starts a conditional branch guarded by `DisableSource`. **CN:** 开始一个由 `DisableSource` 控制的条件分支。
+- **L186** `            # Epilogues w/o residual load are less sensitive to smem allocation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L187** `            # Target a fixed amount of compute per epilogue iteration` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `            if MaxBits == 4:` — **EN:** Starts a conditional branch guarded by `MaxBits == 4`. **CN:** 开始一个由 `MaxBits == 4` 控制的条件分支。
+- **L189** `                # Make epilogue tile larger to reduce the epilogue iterations.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L190** `                # 64 is the experimental value. It will minimize epilogue iterations but keep the number of A/B buffers the same.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L191** `                ComputeElts = 8192` — **EN:** Assigns a value to ComputeElts. **CN:** 将一个值赋给 ComputeElts。
+- **L192** `                Nperf = ComputeElts // M` — **EN:** Assigns a value to Nperf. **CN:** 将一个值赋给 Nperf。
+- **L193** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L194** `                ComputeElts = 4096` — **EN:** Assigns a value to ComputeElts. **CN:** 将一个值赋给 ComputeElts。
+- **L195** `                Nperf = ComputeElts // M` — **EN:** Assigns a value to Nperf. **CN:** 将一个值赋给 Nperf。
+- **L196** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L197** `            # Epilogues w/ residual load are more sensitive to smem allocation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L198** `            # Target optimal smem distribution between epilogue+mainloop based on datatype+tilesize` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L199** `            if MaxBits == 32:` — **EN:** Starts a conditional branch guarded by `MaxBits == 32`. **CN:** 开始一个由 `MaxBits == 32` 控制的条件分支。
+- **L200** `                Nperf = 16 if CtaM > 64 and CtaN <= 128 else 32` — **EN:** Assigns a value to Nperf. **CN:** 将一个值赋给 Nperf。
+- **L201** `            elif MaxBits == 16:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L202** `                Nperf = 32 if CtaN <= 128 else 64` — **EN:** Assigns a value to Nperf. **CN:** 将一个值赋给 Nperf。
+- **L203** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L204** `                Nperf = 64` — **EN:** Assigns a value to Nperf. **CN:** 将一个值赋给 Nperf。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `        def is_m_major(layout):` — **EN:** Defines function `is_m_major`. **CN:** 定义函数 `is_m_major`。
+- **L207** `            return flatten(layout.stride[0]) == 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `        if DisableSource or is_m_major(self.dag_ir.get_node_meta("C").tensor.layout):` — **EN:** Starts a conditional branch guarded by `DisableSource or is_m_major(self.dag_ir.get_node_meta('C'...`. **CN:** 开始一个由 `DisableSource or is_m_major(self.dag_ir.get_node_meta('C'...` 控制的条件分支。
+- **L210** `            N_min_C = 8 * WarpN` — **EN:** Assigns a value to N_min_C. **CN:** 将一个值赋给 N_min_C。
+- **L211** `        elif element_c_size == 6:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L212** `            N_min_C = 128 * WarpN` — **EN:** Assigns a value to N_min_C. **CN:** 将一个值赋给 N_min_C。
+- **L213** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L214** `            N_min_C = (128 // element_c_size) * WarpN` — **EN:** Assigns a value to N_min_C. **CN:** 将一个值赋给 N_min_C。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `        if is_m_major(self.dag_ir.get_node_meta("D").tensor.layout):` — **EN:** Starts a conditional branch guarded by `is_m_major(self.dag_ir.get_node_meta('D').tensor.layout)`. **CN:** 开始一个由 `is_m_major(self.dag_ir.get_node_meta('D').tensor.layout)` 控制的条件分支。
+- **L217** `            N_min_D = 8 * WarpN` — **EN:** Assigns a value to N_min_D. **CN:** 将一个值赋给 N_min_D。
+- **L218** `        elif DataTypeSize[element_d] == 6:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L219** `            N_min_D = 128 * WarpN` — **EN:** Assigns a value to N_min_D. **CN:** 将一个值赋给 N_min_D。
+- **L220** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L221** `            N_min_D = (128 // DataTypeSize[element_d]) * WarpN` — **EN:** Assigns a value to N_min_D. **CN:** 将一个值赋给 N_min_D。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `        N = min(CtaN, max(Nperf, N_min_C, N_min_D))` — **EN:** Assigns a value to N. **CN:** 将一个值赋给 N。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `        tile_m = M` — **EN:** Assigns a value to tile_m. **CN:** 将一个值赋给 tile_m。
+- **L226** `        tile_n_size = N // WarpN * WarpN` — **EN:** Assigns a value to tile_n_size. **CN:** 将一个值赋给 tile_n_size。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `        epilogue_tile_mn = (tile_m, tile_n_size)` — **EN:** Assigns a value to epilogue_tile_mn. **CN:** 将一个值赋给 epilogue_tile_mn。
+- **L229** `        epi_tiles = product(shape_div(tuple(tile_description.threadblock_shape)[:2], epilogue_tile_mn))` — **EN:** Assigns a value to epi_tiles. **CN:** 将一个值赋给 epi_tiles。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `        stages_d = min(epi_tiles, 2)` — **EN:** Assigns a value to stages_d. **CN:** 将一个值赋给 stages_d。
+- **L232** `        reuse_smem_c = (element_c_size > 8)` — **EN:** Assigns a value to reuse_smem_c. **CN:** 将一个值赋给 reuse_smem_c。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `        if reuse_smem_c:` — **EN:** Starts a conditional branch guarded by `reuse_smem_c`. **CN:** 开始一个由 `reuse_smem_c` 控制的条件分支。
+- **L235** `            stages_c = max(min(epi_tiles, 4), stages_d + 1)` — **EN:** Assigns a value to stages_c. **CN:** 将一个值赋给 stages_c。
+- **L236** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L237** `            stages_c = min(epi_tiles, 4)` — **EN:** Assigns a value to stages_c. **CN:** 将一个值赋给 stages_c。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `        # Record the epilogue tile` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L240** `        self.cta_tile_mnk = tuple(tile_description.threadblock_shape)` — **EN:** Assigns a value to self.cta_tile_mnk. **CN:** 将一个值赋给 self.cta_tile_mnk。
+- **L241** `        self.epilogue_tile_mn = epilogue_tile_mn` — **EN:** Assigns a value to self.epilogue_tile_mn. **CN:** 将一个值赋给 self.epilogue_tile_mn。
+- **L242** `        self.epi_tiles = epi_tiles` — **EN:** Assigns a value to self.epi_tiles. **CN:** 将一个值赋给 self.epi_tiles。
+- **L243** `        self.stages_c = stages_c` — **EN:** Assigns a value to self.stages_c. **CN:** 将一个值赋给 self.stages_c。
+- **L244** `        self.stages_d = stages_d` — **EN:** Assigns a value to self.stages_d. **CN:** 将一个值赋给 self.stages_d。
+- **L245** `        self.reuse_smem_c = reuse_smem_c` — **EN:** Assigns a value to self.reuse_smem_c. **CN:** 将一个值赋给 self.reuse_smem_c。
+- **L246** `        self.element_c = element_c` — **EN:** Assigns a value to self.element_c. **CN:** 将一个值赋给 self.element_c。
+- **L247** `        self.element_d = element_d` — **EN:** Assigns a value to self.element_d. **CN:** 将一个值赋给 self.element_d。
+- **L248** `        self.is_source_supported = not DisableSource` — **EN:** Assigns a value to self.is_source_supported. **CN:** 将一个值赋给 self.is_source_supported。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `    def sm100_epilogue_smem_size(self, tile_description):` — **EN:** Defines function `sm100_epilogue_smem_size`. **CN:** 定义函数 `sm100_epilogue_smem_size`。
+- **L251** `        """` — **EN:** Starts the docstring for the function `sm100_epilogue_smem_size`. **CN:** 开始说明 function `sm100_epilogue_smem_size` 的文档字符串。
+- **L252** `        Compute the shared memory size of sm100 collective epilogue` — **EN:** Continues the docstring for the function `sm100_epilogue_smem_size`. **CN:** 继续说明 function `sm100_epilogue_smem_size` 的文档字符串。
+- **L253** `        """` — **EN:** Ends the docstring for the function `sm100_epilogue_smem_size`. **CN:** 结束说明 function `sm100_epilogue_smem_size` 的文档字符串。
+- **L254** `        self.sm100_epilogue_tile(tile_description)` — **EN:** Invokes `self.sm100_epilogue_tile` as a standalone call. **CN:** 以独立语句方式调用 `self.sm100_epilogue_tile`。
+- **L255** `        return self.sm90_or_sm100_epilogue_smem_size(tile_description)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `    def __call__(self, tile_description):` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L258** `        return getattr(self, f"sm{self.cc}_epilogue_smem_size")(tile_description)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L261** `    # Helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L262** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L265** `    def get_visitor_size(members: list, ebo: bool):` — **EN:** Defines function `get_visitor_size`. **CN:** 定义函数 `get_visitor_size`。
+- **L266** `        """` — **EN:** Starts the docstring for the function `get_visitor_size`. **CN:** 开始说明 function `get_visitor_size` 的文档字符串。
+- **L267** `        Get the size of struct in bytes` — **EN:** Continues the docstring for the function `get_visitor_size`. **CN:** 继续说明 function `get_visitor_size` 的文档字符串。
+- **L268** `        """` — **EN:** Ends the docstring for the function `get_visitor_size`. **CN:** 结束说明 function `get_visitor_size` 的文档字符串。
+- **L269** `        offset = 0` — **EN:** Assigns a value to offset. **CN:** 将一个值赋给 offset。
+- **L270** `        max_alignment = 1` — **EN:** Assigns a value to max_alignment. **CN:** 将一个值赋给 max_alignment。
+- **L271** `        if len(members) > 0:` — **EN:** Starts a conditional branch guarded by `len(members) > 0`. **CN:** 开始一个由 `len(members) > 0` 控制的条件分支。
+- **L272** `            # Get alignment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L273** `            for _, alignment in members:` — **EN:** Starts a loop assigning items from `members` to `(_, alignment)`. **CN:** 开始一个循环，将 `members` 的元素赋给 `(_, alignment)`。
+- **L274** `                max_alignment = max(max_alignment, alignment)` — **EN:** Assigns a value to max_alignment. **CN:** 将一个值赋给 max_alignment。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `            for type_size, _ in members:` — **EN:** Starts a loop assigning items from `members` to `(type_size, _)`. **CN:** 开始一个循环，将 `members` 的元素赋给 `(type_size, _)`。
+- **L277** `                if type_size != 0:` — **EN:** Starts a conditional branch guarded by `type_size != 0`. **CN:** 开始一个由 `type_size != 0` 控制的条件分支。
+- **L278** `                    offset = ((offset + max_alignment - 1) // max_alignment) * max_alignment` — **EN:** Assigns a value to offset. **CN:** 将一个值赋给 offset。
+- **L279** `                if type_size == 0 and not ebo:` — **EN:** Starts a conditional branch guarded by `type_size == 0 and (not ebo)`. **CN:** 开始一个由 `type_size == 0 and (not ebo)` 控制的条件分支。
+- **L280** `                    offset += 1` — **EN:** Updates offset in place. **CN:** 原地更新 offset。
+- **L281** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L282** `                    offset += type_size` — **EN:** Updates offset in place. **CN:** 原地更新 offset。
+- **L283** `            offset = ((offset + max_alignment - 1) // max_alignment) * max_alignment` — **EN:** Assigns a value to offset. **CN:** 将一个值赋给 offset。
+- **L284** `            return (offset, max_alignment)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L285** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L286** `            # Struct size is at least 1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L287** `            return (1, 1)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `    def get_struct_size(self, members: list):` — **EN:** Defines function `get_struct_size`. **CN:** 定义函数 `get_struct_size`。
+- **L290** `        """` — **EN:** Starts the docstring for the function `get_struct_size`. **CN:** 开始说明 function `get_struct_size` 的文档字符串。
+- **L291** `        Get the size of struct in bytes` — **EN:** Continues the docstring for the function `get_struct_size`. **CN:** 继续说明 function `get_struct_size` 的文档字符串。
+- **L292** `        """` — **EN:** Ends the docstring for the function `get_struct_size`. **CN:** 结束说明 function `get_struct_size` 的文档字符串。
+- **L293** `        return self.get_visitor_size(members, False)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `    def get_evt_smem_type(self, node):` — **EN:** Defines function `get_evt_smem_type`. **CN:** 定义函数 `get_evt_smem_type`。
+- **L296** `        # Sort the input nodes by edge weight` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L297** `        input_types = [self.smem_types[child] for child in self.dag_ir.get_all_inputs(node)]` — **EN:** Assigns a value to input_types. **CN:** 将一个值赋给 input_types。
+- **L298** `        input_types.append(self.smem_types[node])` — **EN:** Invokes `input_types.append` as a standalone call. **CN:** 以独立语句方式调用 `input_types.append`。
+- **L299** `        if len(input_types) > 1:` — **EN:** Starts a conditional branch guarded by `len(input_types) > 1`. **CN:** 开始一个由 `len(input_types) > 1` 控制的条件分支。
+- **L300** `            ebo = len(input_types) > 4` — **EN:** Assigns a value to ebo. **CN:** 将一个值赋给 ebo。
+- **L301** `            self.smem_types[node] = self.get_visitor_size(input_types, ebo)` — **EN:** Assigns a value to self.smem_types[node]. **CN:** 将一个值赋给 self.smem_types[node]。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `    def get_dag_smem_type(self, node):` — **EN:** Defines function `get_dag_smem_type`. **CN:** 定义函数 `get_dag_smem_type`。
+- **L304** `        meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L305** `        subgraph = meta.subgraph` — **EN:** Assigns a value to subgraph. **CN:** 将一个值赋给 subgraph。
+- **L306** `        subgraph_nodes = subgraph.nodes_topological_order()` — **EN:** Assigns a value to subgraph_nodes. **CN:** 将一个值赋给 subgraph_nodes。
+- **L307** `        # Visit the unvisited nodes in subgraph` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L308** `        for n in subgraph_nodes:` — **EN:** Starts a loop assigning items from `subgraph_nodes` to `n`. **CN:** 开始一个循环，将 `subgraph_nodes` 的元素赋给 `n`。
+- **L309** `            m = subgraph.get_node_meta(n)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L310** `            if m.disabled:` — **EN:** Starts a conditional branch guarded by `m.disabled`. **CN:** 开始一个由 `m.disabled` 控制的条件分支。
+- **L311** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L312** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L313** `                self.smem_types[n] = m.underlying_impl.get_smem_size(` — **EN:** Assigns a value to self.smem_types[n]. **CN:** 将一个值赋给 self.smem_types[n]。
+- **L314** `                    self.cta_tile_mnk, self.epilogue_tile_mn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `                    self.stages_c, self.stages_d, self.epi_tiles)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `        input_types = [self.smem_types[child] for child in subgraph_nodes[:-1]]` — **EN:** Assigns a value to input_types. **CN:** 将一个值赋给 input_types。
+- **L317** `        if len(input_types) > 0:` — **EN:** Starts a conditional branch guarded by `len(input_types) > 0`. **CN:** 开始一个由 `len(input_types) > 0` 控制的条件分支。
+- **L318** `            ebo = len(input_types) > 4` — **EN:** Assigns a value to ebo. **CN:** 将一个值赋给 ebo。
+- **L319** `            self.smem_types[node] = self.get_visitor_size(input_types, ebo)` — **EN:** Assigns a value to self.smem_types[node]. **CN:** 将一个值赋给 self.smem_types[node]。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.passes.smem_size_calculator`. CN: 模块名为 `cutlass_cppgen.backend.evt.passes.smem_size_calculator`。
+- EN: Module docstring summary: Compute the shared memory size in bytes CN: 模块文档摘要为：Compute the shared memory size in bytes
+- EN: Top-level classes: GetSmemSize CN: 顶层类包括：GetSmemSize
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library, pycute:flatten,shape_div,product, cutlass_cppgen, cutlass_cppgen.backend.evt.ir:TopoVisitorNode,DAGIR, cutlass_cppgen.backend.library:DataType,DataTypeSize CN: 内部依赖：cutlass_library, pycute:flatten,shape_div,product, cutlass_cppgen, cutlass_cppgen.backend.evt.ir:TopoVisitorNode,DAGIR, cutlass_cppgen.backend.library:DataType,DataTypeSize
+- EN: External or standard-library dependencies: math:gcd CN: 外部或标准库依赖：math:gcd

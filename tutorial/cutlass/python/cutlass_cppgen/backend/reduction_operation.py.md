@@ -1,0 +1,474 @@
+# reduction_operation.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/reduction_operation.py`
+
+## Purpose / 作用
+- EN: Defines 5 classes (ReductionOperation, ReductionArguments, ReductionRT, ReductionOperation, ... (+1 more)) in `cutlass_cppgen.backend.reduction_operation`.
+- CN: 该模块 `cutlass_cppgen.backend.reduction_operation` 定义了 5 个类（ReductionOperation, ReductionArguments, ReductionRT, ReductionOperation, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L35** `from typing import Union` — **EN:** Imports Union from `typing`. **CN:** 从 `typing` 导入 Union。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L38** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L39** `cudart =  lazy_import("cuda.cudart")` — **EN:** Assigns a value to cudart. **CN:** 将一个值赋给 cudart。
+- **L40** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `from cutlass_library import (` — **EN:** Imports DataTypeNames, DataTypeSize, DataTypeTag, LayoutType, SubstituteTemplate from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeNames, DataTypeSize, DataTypeTag, LayoutType, SubstituteTemplate。
+- **L43** `    DataTypeNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    DataTypeTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    LayoutType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    SubstituteTemplate` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L51** `from cutlass_cppgen.backend.c_types import MatrixCoord_, TensorRef2D_, get_reduction_params` — **EN:** Imports MatrixCoord_, TensorRef2D_, get_reduction_params from `cutlass_cppgen.backend.c_types`. **CN:** 从 `cutlass_cppgen.backend.c_types` 导入 MatrixCoord_, TensorRef2D_, get_reduction_params。
+- **L52** `from cutlass_cppgen.backend.frontend import NumpyFrontend, TorchFrontend` — **EN:** Imports NumpyFrontend, TorchFrontend from `cutlass_cppgen.backend.frontend`. **CN:** 从 `cutlass_cppgen.backend.frontend` 导入 NumpyFrontend, TorchFrontend。
+- **L53** `from cutlass_cppgen.backend.library import TensorDescription` — **EN:** Imports TensorDescription from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 TensorDescription。
+- **L54** `from cutlass_cppgen.backend.memory_manager import DevicePtrWrapper` — **EN:** Imports DevicePtrWrapper from `cutlass_cppgen.backend.memory_manager`. **CN:** 从 `cutlass_cppgen.backend.memory_manager` 导入 DevicePtrWrapper。
+- **L55** `from cutlass_cppgen.backend.operation import ExecutableOperation, LaunchConfiguration` — **EN:** Imports ExecutableOperation, LaunchConfiguration from `cutlass_cppgen.backend.operation`. **CN:** 从 `cutlass_cppgen.backend.operation` 导入 ExecutableOperation, LaunchConfiguration。
+- **L56** `from cutlass_cppgen.shape import MatrixCoord` — **EN:** Imports MatrixCoord from `cutlass_cppgen.shape`. **CN:** 从 `cutlass_cppgen.shape` 导入 MatrixCoord。
+- **L57** `from cutlass_cppgen.utils.datatypes import is_numpy_tensor, is_torch_tensor` — **EN:** Imports is_numpy_tensor, is_torch_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_numpy_tensor, is_torch_tensor。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `class ReductionOperation:` — **EN:** Defines class `ReductionOperation`. **CN:** 定义类 `ReductionOperation`。
+- **L61** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `class ReductionArguments:` — **EN:** Defines class `ReductionArguments`. **CN:** 定义类 `ReductionArguments`。
+- **L65** `    """` — **EN:** Starts the docstring for the class `ReductionArguments`. **CN:** 开始说明 class `ReductionArguments` 的文档字符串。
+- **L66** `    Arguments of reduction` — **EN:** Continues the docstring for the class `ReductionArguments`. **CN:** 继续说明 class `ReductionArguments` 的文档字符串。
+- **L67** `    """` — **EN:** Ends the docstring for the class `ReductionArguments`. **CN:** 结束说明 class `ReductionArguments` 的文档字符串。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L70** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L71** `        operation: ReductionOperation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L72** `        problem_size: "list[int]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L73** `        partitions: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L74** `        workspace: cuda.CUdeviceptr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L75** `        destination: "Union[cuda.CUdeviceptr, np.ndarray, torch.Tensor]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `        source: "Union[cuda.CUdeviceptr, np.ndarray, torch.Tensor]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `        **kwargs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L78** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L79** `        # tensor_C can be interpreted as the bias with bias=True in keyword args` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L80** `        if "bias" in kwargs.keys():` — **EN:** Starts a conditional branch guarded by `'bias' in kwargs.keys()`. **CN:** 开始一个由 `'bias' in kwargs.keys()` 控制的条件分支。
+- **L81** `            self.bias = kwargs["bias"]` — **EN:** Assigns a value to self.bias. **CN:** 将一个值赋给 self.bias。
+- **L82** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L83** `            # by default, tensor_C is not bias` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L84** `            self.bias = False` — **EN:** Assigns a value to self.bias. **CN:** 将一个值赋给 self.bias。
+- **L85** `        if "stream" in kwargs.keys():` — **EN:** Starts a conditional branch guarded by `'stream' in kwargs.keys()`. **CN:** 开始一个由 `'stream' in kwargs.keys()` 控制的条件分支。
+- **L86** `            self.stream = kwargs["stream"]` — **EN:** Assigns a value to self.stream. **CN:** 将一个值赋给 self.stream。
+- **L87** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L88** `            self.stream = cuda.CUstream(0)` — **EN:** Assigns a value to self.stream. **CN:** 将一个值赋给 self.stream。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `        self.operation = operation` — **EN:** Assigns a value to self.operation. **CN:** 将一个值赋给 self.operation。
+- **L91** `        self.ptr_workspace = workspace` — **EN:** Assigns a value to self.ptr_workspace. **CN:** 将一个值赋给 self.ptr_workspace。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `        # number of split-k partitions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L94** `        self.partitions = partitions` — **EN:** Assigns a value to self.partitions. **CN:** 将一个值赋给 self.partitions。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `        if is_numpy_tensor(destination):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(destination)`. **CN:** 开始一个由 `is_numpy_tensor(destination)` 控制的条件分支。
+- **L97** `            self.host_D = destination` — **EN:** Assigns a value to self.host_D. **CN:** 将一个值赋给 self.host_D。
+- **L98** `            self.destination_buffer = NumpyFrontend.argument(destination, True)` — **EN:** Assigns a value to self.destination_buffer. **CN:** 将一个值赋给 self.destination_buffer。
+- **L99** `            self.source_buffer = NumpyFrontend.argument(source, False)` — **EN:** Assigns a value to self.source_buffer. **CN:** 将一个值赋给 self.source_buffer。
+- **L100** `            self.ptr_destination = cuda.CUdeviceptr(self.destination_buffer.ptr)` — **EN:** Assigns a value to self.ptr_destination. **CN:** 将一个值赋给 self.ptr_destination。
+- **L101** `            self.ptr_source = cuda.CUdeviceptr(self.source_buffer.ptr)` — **EN:** Assigns a value to self.ptr_source. **CN:** 将一个值赋给 self.ptr_source。
+- **L102** `        elif is_torch_tensor(destination):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L103** `            self.ptr_destination = TorchFrontend.argument(destination)` — **EN:** Assigns a value to self.ptr_destination. **CN:** 将一个值赋给 self.ptr_destination。
+- **L104** `            self.ptr_source = TorchFrontend.argument(source)` — **EN:** Assigns a value to self.ptr_source. **CN:** 将一个值赋给 self.ptr_source。
+- **L105** `        elif isinstance(destination, cuda.CUdeviceptr):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L106** `            self.ptr_destination = destination` — **EN:** Assigns a value to self.ptr_destination. **CN:** 将一个值赋给 self.ptr_destination。
+- **L107** `            self.ptr_source = source` — **EN:** Assigns a value to self.ptr_source. **CN:** 将一个值赋给 self.ptr_source。
+- **L108** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L109** `            raise TypeError("unknown Type")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `        self.problem_size = MatrixCoord_(problem_size[0], problem_size[1])` — **EN:** Assigns a value to self.problem_size. **CN:** 将一个值赋给 self.problem_size。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `        self.partition_stride = (` — **EN:** Assigns a value to self.partition_stride. **CN:** 将一个值赋给 self.partition_stride。
+- **L114** `            problem_size[0] * problem_size[1] * DataTypeSize[operation.C.element] // 8` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `        if "output_op" in kwargs.keys():` — **EN:** Starts a conditional branch guarded by `'output_op' in kwargs.keys()`. **CN:** 开始一个由 `'output_op' in kwargs.keys()` 控制的条件分支。
+- **L118** `            self.output_op = kwargs["output_op"]` — **EN:** Assigns a value to self.output_op. **CN:** 将一个值赋给 self.output_op。
+- **L119** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L120** `            self.output_op = self.operation.epilogue_type(1.0, 0.0)` — **EN:** Assigns a value to self.output_op. **CN:** 将一个值赋给 self.output_op。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `        self.get_arguments()` — **EN:** Invokes `self.get_arguments` as a standalone call. **CN:** 以独立语句方式调用 `self.get_arguments`。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L125** `    def get_tensor_ref(` — **EN:** Defines function `get_tensor_ref`. **CN:** 定义函数 `get_tensor_ref`。
+- **L126** `        extent: "tuple[int]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `        device_ptr: cuda.CUdeviceptr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L128** `        layout: LayoutType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L129** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L130** `        if layout == LayoutType.RowMajor:` — **EN:** Starts a conditional branch guarded by `layout == LayoutType.RowMajor`. **CN:** 开始一个由 `layout == LayoutType.RowMajor` 控制的条件分支。
+- **L131** `            return TensorRef2D_(int(device_ptr), extent[1])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L132** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L133** `            raise ValueError(f"Unknown layout type {layout}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    def get_arguments(self):` — **EN:** Defines function `get_arguments`. **CN:** 定义函数 `get_arguments`。
+- **L136** `        ref_workspace = ReductionArguments.get_tensor_ref(` — **EN:** Assigns a value to ref_workspace. **CN:** 将一个值赋给 ref_workspace。
+- **L137** `            extent=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `                self.problem_size.row,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `                self.problem_size.column,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `            device_ptr=self.ptr_workspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            layout=LayoutType.RowMajor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `        if self.bias:` — **EN:** Starts a conditional branch guarded by `self.bias`. **CN:** 开始一个由 `self.bias` 控制的条件分支。
+- **L145** `            ref_source = ReductionArguments.get_tensor_ref(` — **EN:** Assigns a value to ref_source. **CN:** 将一个值赋给 ref_source。
+- **L146** `                extent=[0, 0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `                device_ptr=self.ptr_source,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `                layout=LayoutType.RowMajor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L151** `            ref_source = ReductionArguments.get_tensor_ref(` — **EN:** Assigns a value to ref_source. **CN:** 将一个值赋给 ref_source。
+- **L152** `                extent=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `                    self.problem_size.row,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `                    self.problem_size.column,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `                device_ptr=self.ptr_source,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `                layout=LayoutType.RowMajor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        ref_destination = ReductionArguments.get_tensor_ref(` — **EN:** Assigns a value to ref_destination. **CN:** 将一个值赋给 ref_destination。
+- **L161** `            extent=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `                self.problem_size.row,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `                self.problem_size.column,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `            device_ptr=self.ptr_destination,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `            layout=LayoutType.RowMajor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `        self.c_arguments = self.operation.argument_type(` — **EN:** Assigns a value to self.c_arguments. **CN:** 将一个值赋给 self.c_arguments。
+- **L170** `            self.problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `            self.partitions,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `            self.partition_stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `            ref_workspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `            ref_destination,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `            ref_source,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `            self.output_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `        params_ = self.operation.rt_module.get_args(ctypes.byref(self.c_arguments))` — **EN:** Assigns a value to params_. **CN:** 将一个值赋给 params_。
+- **L180** `        self.host_workspace = bytearray(params_.contents)` — **EN:** Assigns a value to self.host_workspace. **CN:** 将一个值赋给 self.host_workspace。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    def sync(self):` — **EN:** Defines function `sync`. **CN:** 定义函数 `sync`。
+- **L183** `        (err,) = cudart.cudaDeviceSynchronize()` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L184** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L185** `            raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        if hasattr(self, "host_D"):` — **EN:** Starts a conditional branch guarded by `hasattr(self, 'host_D')`. **CN:** 开始一个由 `hasattr(self, 'host_D')` 控制的条件分支。
+- **L188** `            (err,) = cuda.cuMemcpyDtoH(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L189** `                self.host_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `                self.ptr_destination,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `                self.host_D.size * self.host_D.itemsize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L194** `                raise RuntimeError("CUDA Error %s" % str(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `        self.free()` — **EN:** Invokes `self.free` as a standalone call. **CN:** 以独立语句方式调用 `self.free`。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `    def free(self):` — **EN:** Defines function `free`. **CN:** 定义函数 `free`。
+- **L199** `        """` — **EN:** Starts the docstring for the function `free`. **CN:** 开始说明 function `free` 的文档字符串。
+- **L200** `        Frees allocated device-side memory` — **EN:** Continues the docstring for the function `free`. **CN:** 继续说明 function `free` 的文档字符串。
+- **L201** `        """` — **EN:** Ends the docstring for the function `free`. **CN:** 结束说明 function `free` 的文档字符串。
+- **L202** `        # Free any device memory allocated manually` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L203** `        if not cutlass_cppgen.use_rmm:` — **EN:** Starts a conditional branch guarded by `not cutlass_cppgen.use_rmm`. **CN:** 开始一个由 `not cutlass_cppgen.use_rmm` 控制的条件分支。
+- **L204** `            for attr in ["destination_buffer", "source_buffer"]:` — **EN:** Starts a loop assigning items from `['destination_buffer', 'source_buffer']` to `attr`. **CN:** 开始一个循环，将 `['destination_buffer', 'source_buffer']` 的元素赋给 `attr`。
+- **L205** `                if hasattr(self, attr):` — **EN:** Starts a conditional branch guarded by `hasattr(self, attr)`. **CN:** 开始一个由 `hasattr(self, attr)` 控制的条件分支。
+- **L206** `                    buf = getattr(self, attr)` — **EN:** Assigns a value to buf. **CN:** 将一个值赋给 buf。
+- **L207** `                    if isinstance(buf, DevicePtrWrapper):` — **EN:** Starts a conditional branch guarded by `isinstance(buf, DevicePtrWrapper)`. **CN:** 开始一个由 `isinstance(buf, DevicePtrWrapper)` 控制的条件分支。
+- **L208** `                        err, = cudart.cudaFree(buf.ptr)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L209** `                        if err != cudart.cudaError_t.cudaSuccess:` — **EN:** Starts a conditional branch guarded by `err != cudart.cudaError_t.cudaSuccess`. **CN:** 开始一个由 `err != cudart.cudaError_t.cudaSuccess` 控制的条件分支。
+- **L210** `                            raise RuntimeError(f"cudaFree failed with error {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L211** `                        del buf` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `class ReductionRT(ExecutableOperation):` — **EN:** Defines class `ReductionRT` with bases ExecutableOperation. **CN:** 定义类 `ReductionRT`，其基类为 ExecutableOperation。
+- **L215** `    """` — **EN:** Starts the docstring for the class `ReductionRT`. **CN:** 开始说明 class `ReductionRT` 的文档字符串。
+- **L216** `    ReductionRT manages the CUTLASS runtime components for reduction` — **EN:** Continues the docstring for the class `ReductionRT`. **CN:** 继续说明 class `ReductionRT` 的文档字符串。
+- **L217** `    """` — **EN:** Ends the docstring for the class `ReductionRT`. **CN:** 结束说明 class `ReductionRT` 的文档字符串。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `    KernelTemplate = r"""` — **EN:** Assigns a value to KernelTemplate. **CN:** 将一个值赋给 KernelTemplate。
+- **L220** `extern "C"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `__global__ void` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `${operation_name}(${operation_name}${operation_suffix}::Params params) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `  // Dynamic shared memory base pointer` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `  extern __shared__ int SharedStorageBase[];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `  // Declare pointer to dynamic shared memory.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `  ${operation_name}${operation_suffix}::SharedStorage *shared_storage =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `      reinterpret_cast<${operation_name}${operation_suffix}::SharedStorage *>(SharedStorageBase);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `  ${operation_name}${operation_suffix} op;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `  op(params, *shared_storage);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `    HostTemplate = r"""` — **EN:** Assigns a value to HostTemplate. **CN:** 将一个值赋给 HostTemplate。
+- **L237** `extern "C" {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `  // Get the size of params in bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `  int ${operation_name}_get_param_size(){` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `    return sizeof(${operation_name}${operation_suffix}::Params);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `  // Get the size of dynamic shared memory in bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `  int ${operation_name}_shared_memory_size() {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `    return int(sizeof(${operation_name}${operation_suffix}::SharedStorage));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `  // Get the params as byte array` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `  char* ${operation_name}_get_params(${operation_name}${operation_suffix}::Params* params){` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `    char *bytes = ((char*)(params));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `    char *output = new char[sizeof(${operation_name}${operation_suffix}::Params)];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `    for (unsigned int i = 0; i < sizeof(${operation_name}${operation_suffix}::Params); i ++)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `        output[i] = bytes[i];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `    return output;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    def __init__(self, operation: ReductionOperation):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L261** `        super().__init__(operation)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `        self.operation: ReductionOperation = operation` — **EN:** Assigns a typed value to self.operation. **CN:** 为 self.operation 赋予带类型标注的值。
+- **L264** `        self.emitter = EmitReductionInstance("_type")` — **EN:** Assigns a value to self.emitter. **CN:** 将一个值赋给 self.emitter。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `        self.elements_per_access = self.operation.count` — **EN:** Assigns a value to self.elements_per_access. **CN:** 将一个值赋给 self.elements_per_access。
+- **L267** `        (` — **EN:** Assigns a value to (self.argument_type, self.epilogue_type). **CN:** 将一个值赋给 (self.argument_type, self.epilogue_type)。
+- **L268** `            self.argument_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `            self.epilogue_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `        ) = get_reduction_params(operation.epilogue_functor)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `        self.argtype = [ctypes.POINTER(self.argument_type)]` — **EN:** Assigns a value to self.argtype. **CN:** 将一个值赋给 self.argtype。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L274** `        return self.emitter.emit(self.operation)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `    def plan(self, arguments: ReductionArguments):` — **EN:** Defines function `plan`. **CN:** 定义函数 `plan`。
+- **L277** `        block_shape = [` — **EN:** Assigns a value to block_shape. **CN:** 将一个值赋给 block_shape。
+- **L278** `            self.operation.shape.column // self.elements_per_access,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `            self.operation.shape.row,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `            1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `        grid_shape = [` — **EN:** Assigns a value to grid_shape. **CN:** 将一个值赋给 grid_shape。
+- **L283** `            (arguments.problem_size.row + self.operation.shape.row - 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `            // self.operation.shape.row,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `            (arguments.problem_size.column + self.operation.shape.column - 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `            // self.operation.shape.column,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `            1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `        return LaunchConfiguration(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L290** `            grid_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `            block_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `            self.shared_memory_capacity,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `    def initialize(self):` — **EN:** Defines function `initialize`. **CN:** 定义函数 `initialize`。
+- **L296** `        (err,) = cuda.cuFuncSetAttribute(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L297** `            self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `            attrib=cuda.CUfunction_attribute.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `            value=self.shared_memory_capacity,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L302** `            raise RuntimeError(f"CUDA Error: {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** `class ReductionOperation:` — **EN:** Defines class `ReductionOperation`. **CN:** 定义类 `ReductionOperation`。
+- **L306** `    """` — **EN:** Starts the docstring for the class `ReductionOperation`. **CN:** 开始说明 class `ReductionOperation` 的文档字符串。
+- **L307** `    CUTLASS reduction Operation` — **EN:** Continues the docstring for the class `ReductionOperation`. **CN:** 继续说明 class `ReductionOperation` 的文档字符串。
+- **L308** `    """` — **EN:** Ends the docstring for the class `ReductionOperation`. **CN:** 结束说明 class `ReductionOperation` 的文档字符串。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L311** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        shape: MatrixCoord,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        C: TensorDescription,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `        element_accumulator,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `        element_workspace=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `        element_compute=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L317** `        epilogue_functor=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L318** `        count: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L319** `        partitions_per_stage: int = 4,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L320** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L321** `        self.shape = shape` — **EN:** Assigns a value to self.shape. **CN:** 将一个值赋给 self.shape。
+- **L322** `        self.epilogue_functor = epilogue_functor` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L323** `        self.element_accumulator = element_accumulator` — **EN:** Assigns a value to self.element_accumulator. **CN:** 将一个值赋给 self.element_accumulator。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `        if element_workspace is None:` — **EN:** Starts a conditional branch guarded by `element_workspace is None`. **CN:** 开始一个由 `element_workspace is None` 控制的条件分支。
+- **L326** `            self.element_workspace = element_accumulator` — **EN:** Assigns a value to self.element_workspace. **CN:** 将一个值赋给 self.element_workspace。
+- **L327** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L328** `            self.element_workspace = element_workspace` — **EN:** Assigns a value to self.element_workspace. **CN:** 将一个值赋给 self.element_workspace。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        if element_compute is None:` — **EN:** Starts a conditional branch guarded by `element_compute is None`. **CN:** 开始一个由 `element_compute is None` 控制的条件分支。
+- **L331** `            self.element_compute = element_accumulator` — **EN:** Assigns a value to self.element_compute. **CN:** 将一个值赋给 self.element_compute。
+- **L332** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L333** `            self.element_compute = element_compute` — **EN:** Assigns a value to self.element_compute. **CN:** 将一个值赋给 self.element_compute。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `        self.element_output = C.element` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+- **L336** `        self.C: TensorDescription = C` — **EN:** Assigns a typed value to self.C. **CN:** 为 self.C 赋予带类型标注的值。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `        # Reduce op processing size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** `        self.count: int = count` — **EN:** Assigns a typed value to self.count. **CN:** 为 self.count 赋予带类型标注的值。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `        # Number of partitions to reduce per stage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L342** `        self.partitions_per_stage: int = partitions_per_stage` — **EN:** Assigns a typed value to self.partitions_per_stage. **CN:** 为 self.partitions_per_stage 赋予带类型标注的值。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `        self.rt_module: ReductionRT = ReductionRT(self)` — **EN:** Assigns a typed value to self.rt_module. **CN:** 为 self.rt_module 赋予带类型标注的值。
+- **L345** `        self.argument_type = self.rt_module.argument_type` — **EN:** Assigns a value to self.argument_type. **CN:** 将一个值赋给 self.argument_type。
+- **L346** `        self.epilogue_type = self.rt_module.epilogue_type` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    def extended_name(self):` — **EN:** Defines function `extended_name`. **CN:** 定义函数 `extended_name`。
+- **L349** `        extend_name = "${element_workspace}_${element_accumulator}_${element_compute}_${element_output}"` — **EN:** Assigns a value to extend_name. **CN:** 将一个值赋给 extend_name。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `        return SubstituteTemplate(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L352** `            extend_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `            {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `                "element_workspace": DataTypeNames[self.element_workspace],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `                "element_accumulator": DataTypeNames[self.element_accumulator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `                "element_compute": DataTypeNames[self.element_compute],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `                "element_output": DataTypeNames[self.element_output],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `            },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** `    def configuration_name(self):` — **EN:** Defines function `configuration_name`. **CN:** 定义函数 `configuration_name`。
+- **L362** `        """The full procedural name indicates architecture, extended name, tile size"""` — **EN:** Docstring line documenting the function `configuration_name`. **CN:** 文档字符串行，用于说明 function `configuration_name`。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `        configuration_name = "cutlass_reduce_split_k_${extended_name}_${threadblock}"` — **EN:** Assigns a value to configuration_name. **CN:** 将一个值赋给 configuration_name。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `        threadblock = "%dx%d" % (` — **EN:** Assigns a value to threadblock. **CN:** 将一个值赋给 threadblock。
+- **L367** `            self.shape.row,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `            self.shape.column,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L371** `        return SubstituteTemplate(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L372** `            configuration_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `            {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `                "extended_name": self.extended_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `                "threadblock": threadblock,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `            },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L379** `    def procedural_name(self):` — **EN:** Defines function `procedural_name`. **CN:** 定义函数 `procedural_name`。
+- **L380** `        """The full procedural name indicates architeture, extended name, tile size"""` — **EN:** Docstring line documenting the function `procedural_name`. **CN:** 文档字符串行，用于说明 function `procedural_name`。
+- **L381** `        return self.configuration_name()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `    def run(self, arguments: ReductionArguments) -> cuda.CUresult:` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L384** `        """` — **EN:** Starts the docstring for the function `run`. **CN:** 开始说明 function `run` 的文档字符串。
+- **L385** `        Configure and launch the cuda kernel with input arguments` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L386** `        """` — **EN:** Ends the docstring for the function `run`. **CN:** 结束说明 function `run` 的文档字符串。
+- **L387** `        launch_config = self.rt_module.plan(arguments)` — **EN:** Assigns a value to launch_config. **CN:** 将一个值赋给 launch_config。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** `        host_workspace = arguments.host_workspace` — **EN:** Assigns a value to host_workspace. **CN:** 将一个值赋给 host_workspace。
+- **L390** `        device_workspace = None` — **EN:** Assigns a value to device_workspace. **CN:** 将一个值赋给 device_workspace。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `        err = self.rt_module.run(` — **EN:** Assigns a value to err. **CN:** 将一个值赋给 err。
+- **L393** `            host_workspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `            device_workspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `            launch_config,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `            arguments.stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L400** `            raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L401** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L402** `        return err` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `class EmitReductionInstance:` — **EN:** Defines class `EmitReductionInstance`. **CN:** 定义类 `EmitReductionInstance`。
+- **L406** `    def __init__(self, operation_suffix="") -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L407** `        self.operation_suffix = operation_suffix` — **EN:** Assigns a value to self.operation_suffix. **CN:** 将一个值赋给 self.operation_suffix。
+- **L408** `        self.includes = [` — **EN:** Assigns a value to self.includes. **CN:** 将一个值赋给 self.includes。
+- **L409** `            "cutlass/cutlass.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `            "cutlass/numeric_types.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `            "cutlass/arch/arch.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `            "cutlass/arch/mma.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `            "cutlass/layout/matrix.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `            "cutlass/gemm/device/gemm.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `            "cutlass/gemm/device/gemm_universal_adapter.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `            "cutlass/gemm/kernel/default_gemm_universal.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `            "cutlass/reduction/kernel/reduce_split_k.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `            "cutlass/reduction/thread/reduction_operators.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        self.template = """` — **EN:** Assigns a value to self.template. **CN:** 将一个值赋给 self.template。
+- **L421** `// Reduction kernel instance` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `using ${operation_name}_base =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `typename cutlass::reduction::kernel::ReduceSplitK<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `  cutlass::MatrixShape<${shape_row}, ${shape_column}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `  ${epilogue_functor},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `  cutlass::reduction::thread::ReduceAdd<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `    ${element_accumulator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `    ${element_output},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `    ${count}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `  ${partition_per_stage}>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L432** `struct ${operation_name}${operation_suffix}:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `  public ${operation_name}_base { };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `      """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `    def emit(self, operation: ReductionOperation):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L437** `        vector_length_bits = min(operation.C.alignment * DataTypeSize[operation.C.element], 128)` — **EN:** Assigns a value to vector_length_bits. **CN:** 将一个值赋给 vector_length_bits。
+- **L438** `        epilogue_vector_length = vector_length_bits // DataTypeSize[operation.C.element]` — **EN:** Assigns a value to epilogue_vector_length. **CN:** 将一个值赋给 epilogue_vector_length。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `        values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L441** `            "operation_name": operation.configuration_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `            "operation_suffix": self.operation_suffix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `            "shape_row": str(operation.shape.row),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `            "shape_column": str(operation.shape.column),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `            "epilogue_functor": operation.epilogue_functor.emit(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** `            "element_output": DataTypeTag[operation.element_output],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `            "epilogue_vector_length": str(epilogue_vector_length),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `            "element_accumulator": DataTypeTag[operation.element_accumulator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `            "element_compute": DataTypeTag[operation.element_compute],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `            "element_workspace": DataTypeTag[operation.element_workspace],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `            "count": str(operation.count),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `            "partition_per_stage": str(operation.partitions_per_stage),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `        return SubstituteTemplate(self.template, values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.reduction_operation`. CN: 模块名为 `cutlass_cppgen.backend.reduction_operation`。
+- EN: Top-level classes: ReductionOperation, ReductionArguments, ReductionRT, ReductionOperation, EmitReductionInstance CN: 顶层类包括：ReductionOperation, ReductionArguments, ReductionRT, ReductionOperation, EmitReductionInstance
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:DataTypeNames,DataTypeSize,DataTypeTag,LayoutType,SubstituteTemplate, cutlass_cppgen, cutlass_cppgen.backend.c_types:MatrixCoord_,TensorRef2D_,get_reduction_params, cutlass_cppgen.backend.frontend:NumpyFrontend,TorchFrontend, cutlass_cppgen.backend.library:TensorDescription, cutlass_cppgen.backend.memory_manager:DevicePtrWrapper, cutlass_cppgen.backend.operation:ExecutableOperation,LaunchConfiguration, cutlass_cppgen.shape:MatrixCoord, cutlass_cppgen.utils.datatypes:is_numpy_tensor,is_torch_tensor CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:DataTypeNames,DataTypeSize,DataTypeTag,LayoutType,SubstituteTemplate, cutlass_cppgen, cutlass_cppgen.backend.c_types:MatrixCoord_,TensorRef2D_,get_reduction_params, cutlass_cppgen.backend.frontend:NumpyFrontend,TorchFrontend, cutlass_cppgen.backend.library:TensorDescription, cutlass_cppgen.backend.memory_manager:DevicePtrWrapper, cutlass_cppgen.backend.operation:ExecutableOperation,LaunchConfiguration, cutlass_cppgen.shape:MatrixCoord, cutlass_cppgen.utils.datatypes:is_numpy_tensor,is_torch_tensor
+- EN: External or standard-library dependencies: __future__:annotations, ctypes, typing:Union, numpy CN: 外部或标准库依赖：__future__:annotations, ctypes, typing:Union, numpy

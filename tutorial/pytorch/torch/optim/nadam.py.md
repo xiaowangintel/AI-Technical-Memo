@@ -1,0 +1,849 @@
+# nadam.py — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `torch/optim/nadam.py`
+- **Repository / 仓库**: `pytorch` (`/root/xw/pytorch`)
+- **Purpose (EN)**: Implements optimizer algorithms, shared optimizer utilities, and scheduling-facing helpers.
+- **Purpose (CN)**: 实现优化器算法、共享优化器工具以及面向调度器的辅助逻辑。
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-26 / 第 1-26 行
+````python
+# mypy: allow-untyped-defs
+r"""Implementation for the NAdam algorithm."""
+
+from typing import cast
+
+import torch
+from torch import Tensor
+
+from .optimizer import (
+    _capturable_doc,
+    _default_to_fused_or_foreach,
+    _differentiable_doc,
+    _disable_dynamo_if_unsupported,
+    _foreach_doc,
+    _get_capturable_supported_devices,
+    _get_scalar_dtype,
+    _get_value,
+    _maximize_doc,
+    _params_doc,
+    _stack_if_compiling,
+    _to_scalar,
+    _use_grad_for_differentiable,
+    _view_as_real,
+    Optimizer,
+    ParamsT,
+)
+````
+- **EN**: This block assembles module dependencies, pulling in internal torch modules such as torch, .optimizer; standard-library helpers such as typing. The docstring documents user-facing behavior, caveats, and examples for the surrounding API surface.
+- **CN**: 这一段组织模块依赖，引入了内部 torch 模块，如 torch、.optimizer；标准库辅助模块，如 typing。 文档字符串说明了周边 API 的用户可见行为、注意事项以及示例。
+
+### Lines 29-56 / 第 29-56 行
+````python
+__all__ = ["NAdam", "nadam"]
+
+
+class NAdam(Optimizer):
+    def __init__(
+        self,
+        params: ParamsT,
+        lr: float | Tensor = 2e-3,
+        betas: tuple[float, float] = (0.9, 0.999),
+        eps: float = 1e-8,
+        weight_decay: float = 0,
+        momentum_decay: float = 4e-3,
+        decoupled_weight_decay: bool = False,
+        *,
+        foreach: bool | None = None,
+        maximize: bool = False,
+        capturable: bool = False,
+        differentiable: bool = False,
+    ) -> None:
+        if isinstance(lr, Tensor) and lr.numel() != 1:
+            raise ValueError("Tensor lr must be 1-element")
+        if not 0.0 <= lr:
+            raise ValueError(f"Invalid learning rate: {lr}")
+        if not 0.0 <= eps:
+            raise ValueError(f"Invalid epsilon value: {eps}")
+        if not 0.0 <= betas[0] < 1.0:
+            raise ValueError(f"Invalid beta parameter at index 0: {betas[0]}")
+        if not 0.0 <= betas[1] < 1.0:
+````
+- **EN**: `__all__` defines the public symbols that this module chooses to export. It introduces or extends `NAdam`, which hold the main object-oriented state for this portion of the file. This chunk defines `__init__`, which initializes object state and binds construction-time configuration. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: `__all__` 定义了本模块选择导出的公共符号。 它引入或扩展了 `NAdam`，这些类承载了本段涉及的主要面向对象状态。 这一段定义了 `__init__`，其作用是初始化对象状态并绑定构造期配置。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 57-74 / 第 57-74 行
+````python
+            raise ValueError(f"Invalid beta parameter at index 1: {betas[1]}")
+        if not 0.0 <= weight_decay:
+            raise ValueError(f"Invalid weight_decay value: {weight_decay}")
+        if not 0.0 <= momentum_decay:
+            raise ValueError(f"Invalid momentum_decay value: {momentum_decay}")
+        defaults = {
+            "lr": lr,
+            "betas": betas,
+            "eps": eps,
+            "weight_decay": weight_decay,
+            "momentum_decay": momentum_decay,
+            "decoupled_weight_decay": decoupled_weight_decay,
+            "maximize": maximize,
+            "foreach": foreach,
+            "capturable": capturable,
+            "differentiable": differentiable,
+        }
+        super().__init__(params, defaults)
+````
+- **EN**: This chunk continues `NAdam` and expands its internal control flow or state updates. Calls to `super()` delegate the low-level work to a base class or C++-backed implementation while the Python layer adds policy or ergonomics. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: 这一段延续了 `NAdam`，进一步展开其内部控制流或状态更新。 对 `super()` 的调用会把底层工作委托给基类或 C++ 支撑的实现，而 Python 层主要补充策略或易用性。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 76-103 / 第 76-103 行
+````python
+    def __setstate__(self, state):
+        super().__setstate__(state)
+        for group in self.param_groups:
+            group.setdefault("maximize", False)
+            group.setdefault("foreach", None)
+            group.setdefault("capturable", False)
+            group.setdefault("differentiable", False)
+            group.setdefault("decoupled_weight_decay", False)
+            for p in group["params"]:
+                p_state = self.state.get(p, [])
+                if len(p_state) != 0:
+                    if not torch.is_tensor(p_state["step"]):
+                        step_val = float(p_state["step"])
+                        p_state["step"] = (
+                            torch.tensor(
+                                step_val, dtype=_get_scalar_dtype(), device=p.device
+                            )
+                            if group["capturable"]
+                            else torch.tensor(step_val, dtype=_get_scalar_dtype())
+                        )
+                    if not torch.is_tensor(p_state["mu_product"]):
+                        mu_prod_val = p_state["mu_product"]
+                        p_state["mu_product"] = (
+                            torch.tensor(
+                                mu_prod_val, dtype=_get_scalar_dtype(), device=p.device
+                            )
+                            if group["capturable"]
+                            else torch.tensor(mu_prod_val, dtype=_get_scalar_dtype())
+````
+- **EN**: This chunk defines `__setstate__`, which implements a focused step in optimizer state updates. Calls to `super()` delegate the low-level work to a base class or C++-backed implementation while the Python layer adds policy or ergonomics. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段定义了 `__setstate__`，其作用是实现优化器状态更新中的一个关键步骤。 对 `super()` 的调用会把底层工作委托给基类或 C++ 支撑的实现，而 Python 层主要补充策略或易用性。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 104-123 / 第 104-123 行
+````python
+                        )
+
+    def _init_group(
+        self,
+        group,
+        params_with_grad,
+        grads,
+        exp_avgs,
+        exp_avg_sqs,
+        mu_products,
+        state_steps,
+    ):
+        has_complex = False
+        for p in group["params"]:
+            if p.grad is not None:
+                has_complex |= torch.is_complex(p)
+                params_with_grad.append(p)
+                if p.grad.is_sparse:
+                    raise RuntimeError("NAdam does not support sparse gradients")
+                grads.append(p.grad)
+````
+- **EN**: This chunk defines `_init_group`, which implements a focused step in optimizer state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: 这一段定义了 `_init_group`，其作用是实现优化器状态更新中的一个关键步骤。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 125-148 / 第 125-148 行
+````python
+                state = self.state[p]
+                # Lazy state initialization
+                if len(state) == 0:
+                    # note(crcrpar): [special device hosting for step]
+                    # Deliberately host `step` and `mu_product` on CPU if capturable is False.
+                    # This is because kernel launches are costly on CUDA and XLA.
+                    state["step"] = (
+                        torch.zeros((), dtype=_get_scalar_dtype(), device=p.device)
+                        if group["capturable"]
+                        else torch.tensor(0.0, dtype=_get_scalar_dtype())
+                    )
+                    state["mu_product"] = (
+                        torch.ones((), dtype=_get_scalar_dtype(), device=p.device)
+                        if group["capturable"]
+                        else torch.tensor(1.0, dtype=_get_scalar_dtype())
+                    )
+                    # Exponential moving average of gradient values
+                    state["exp_avg"] = torch.zeros_like(
+                        p, memory_format=torch.preserve_format
+                    )
+                    # Exponential moving average of squared gradient values
+                    state["exp_avg_sq"] = torch.zeros_like(
+                        p, memory_format=torch.preserve_format
+                    )
+````
+- **EN**: This chunk continues `_init_group` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_init_group`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 150-169 / 第 150-169 行
+````python
+                exp_avgs.append(state["exp_avg"])
+                exp_avg_sqs.append(state["exp_avg_sq"])
+                mu_products.append(state["mu_product"])
+                state_steps.append(state["step"])
+        return has_complex
+
+    @_use_grad_for_differentiable
+    def step(self, closure=None):
+        """Perform a single optimization step.
+
+        Args:
+            closure (Callable, optional): A closure that reevaluates the model
+                and returns the loss.
+        """
+        self._accelerator_graph_capture_health_check()
+
+        loss = None
+        if closure is not None:
+            with torch.enable_grad():
+                loss = closure()
+````
+- **EN**: This chunk defines `step`, which advances mutable state using the current inputs, gradients, or counters. Decorators such as `_use_grad_for_differentiable` adjust how the following definitions participate in typing, warnings, or runtime protocol hooks. Context-manager style flow scopes temporary state such as streams, autocast modes, or tracing/capture boundaries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. The tail returns the assembled value or hands updated state back to the caller.
+- **CN**: 这一段定义了 `step`，其作用是利用当前输入、梯度或计数器推进可变状态。 像 `_use_grad_for_differentiable` 这样的装饰器会调整后续定义在类型系统、告警或运行时协议中的参与方式。 类似上下文管理器的流程会限定临时状态的作用域，例如流、autocast 模式或 tracing/捕获边界。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 末尾会返回组装好的值，或把更新后的状态交还给调用方。
+
+### Lines 171-188 / 第 171-188 行
+````python
+        for group in self.param_groups:
+            params_with_grad: list[Tensor] = []
+            grads: list[Tensor] = []
+            exp_avgs: list[Tensor] = []
+            exp_avg_sqs: list[Tensor] = []
+            mu_products: list[Tensor] = []
+            state_steps: list[Tensor] = []
+            beta1, beta2 = cast(tuple[float, float], group["betas"])
+
+            has_complex = self._init_group(
+                group,
+                params_with_grad,
+                grads,
+                exp_avgs,
+                exp_avg_sqs,
+                mu_products,
+                state_steps,
+            )
+````
+- **EN**: This chunk continues `step` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries.
+- **CN**: 这一段延续了 `step`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。
+
+### Lines 190-215 / 第 190-215 行
+````python
+            nadam(
+                params_with_grad,
+                grads,
+                exp_avgs,
+                exp_avg_sqs,
+                mu_products,
+                state_steps,
+                beta1=beta1,
+                beta2=beta2,
+                lr=group["lr"],
+                weight_decay=group["weight_decay"],
+                momentum_decay=group["momentum_decay"],
+                eps=group["eps"],
+                maximize=group["maximize"],
+                decoupled_weight_decay=group["decoupled_weight_decay"],
+                foreach=group["foreach"],
+                capturable=group["capturable"],
+                differentiable=group["differentiable"],
+                has_complex=has_complex,
+            )
+
+        return loss
+
+
+NAdam.__doc__ = (
+    r"""Implements NAdam algorithm.
+````
+- **EN**: This chunk continues `step` and expands its internal control flow or state updates. The tail returns the assembled value or hands updated state back to the caller.
+- **CN**: 这一段延续了 `step`，进一步展开其内部控制流或状态更新。 末尾会返回组装好的值，或把更新后的状态交还给调用方。
+
+### Lines 217-244 / 第 217-244 行
+````python
+    .. math::
+       \begin{aligned}
+            &\rule{110mm}{0.4pt}                                                                 \\
+            &\textbf{input}      : \gamma_t \text{ (lr)}, \: \beta_1,\beta_2 \text{ (betas)},
+                \: \theta_0 \text{ (params)}, \: f(\theta) \text{ (objective)}                   \\
+            &\hspace{13mm} \: \lambda \text{ (weight decay)}, \:\psi \text{ (momentum decay)}    \\
+            &\hspace{13mm} \: \textit{decoupled\_weight\_decay}, \:\textit{maximize}             \\
+            &\textbf{initialize} :  m_0 \leftarrow 0 \text{ ( first moment)},
+                v_0 \leftarrow 0 \text{ ( second moment)}                                 \\[-1.ex]
+            &\rule{110mm}{0.4pt}                                                                 \\
+            &\textbf{for} \: t=1 \: \textbf{to} \: \ldots \: \textbf{do}                         \\
+            &\hspace{5mm}\textbf{if} \: \textit{maximize}:                                       \\
+            &\hspace{10mm}g_t           \leftarrow   -\nabla_{\theta} f_t (\theta_{t-1})         \\
+            &\hspace{5mm}\textbf{else}                                                           \\
+            &\hspace{10mm}g_t           \leftarrow   \nabla_{\theta} f_t (\theta_{t-1})          \\
+            &\hspace{5mm} \theta_t \leftarrow \theta_{t-1}                                       \\
+            &\hspace{5mm} \textbf{if} \: \lambda \neq 0                                          \\
+            &\hspace{10mm}\textbf{if} \: \textit{decoupled\_weight\_decay}                       \\
+            &\hspace{15mm} \theta_t \leftarrow \theta_{t-1} - \gamma \lambda \theta_{t-1}                    \\
+            &\hspace{10mm}\textbf{else}                                                          \\
+            &\hspace{15mm} g_t \leftarrow g_t + \lambda \theta_{t-1}                             \\
+            &\hspace{5mm} \mu_t \leftarrow \beta_1 \big(1 - \frac{1}{2}  0.96^{t \psi} \big)     \\
+            &\hspace{5mm} \mu_{t+1} \leftarrow \beta_1 \big(1 - \frac{1}{2} 0.96^{(t+1)\psi}\big)\\
+            &\hspace{5mm}m_t           \leftarrow   \beta_1 m_{t-1} + (1 - \beta_1) g_t          \\
+            &\hspace{5mm}v_t           \leftarrow   \beta_2 v_{t-1} + (1-\beta_2) g^2_t          \\
+            &\hspace{5mm}\widehat{m_t} \leftarrow \mu_{t+1} m_t/(1-\prod_{i=1}^{t+1}\mu_i)\\[-1.ex]
+            & \hspace{11mm} + (1-\mu_t) g_t /(1-\prod_{i=1}^{t} \mu_{i})                         \\
+            &\hspace{5mm}\widehat{v_t} \leftarrow   v_t/\big(1-\beta_2^t \big)                   \\
+````
+- **EN**: This chunk continues `step` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `step`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 245-270 / 第 245-270 行
+````python
+            &\hspace{5mm}\theta_t \leftarrow \theta_t - \gamma \widehat{m_t}/
+                \big(\sqrt{\widehat{v_t}} + \epsilon \big)                                       \\
+            &\rule{110mm}{0.4pt}                                                          \\[-1.ex]
+            &\bf{return} \:  \theta_t                                                     \\[-1.ex]
+            &\rule{110mm}{0.4pt}                                                          \\[-1.ex]
+       \end{aligned}
+
+    For further details regarding the algorithm we refer to `Incorporating Nesterov Momentum into Adam`_.
+    """
+    + rf"""
+    Args:
+        {_params_doc}
+        lr (float, Tensor, optional): learning rate (default: 2e-3)
+        betas (Tuple[float, float], optional): coefficients used for computing
+            running averages of gradient and its square (default: (0.9, 0.999))
+        eps (float, optional): term added to the denominator to improve
+            numerical stability (default: 1e-8)
+        weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
+        momentum_decay (float, optional): momentum momentum_decay (default: 4e-3)
+        decoupled_weight_decay (bool, optional): whether to decouple the weight
+            decay as in AdamW to obtain NAdamW. If True, the algorithm does not
+            accumulate weight decay in the momentum nor variance. (default: False)
+        {_foreach_doc}
+        {_maximize_doc}
+        {_capturable_doc}
+        {_differentiable_doc}
+````
+- **EN**: This chunk continues `step` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. The tail returns the assembled value or hands updated state back to the caller.
+- **CN**: 这一段延续了 `step`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 末尾会返回组装好的值，或把更新后的状态交还给调用方。
+
+### Lines 272-299 / 第 272-299 行
+````python
+    .. _Incorporating Nesterov Momentum into Adam:
+        https://openreview.net/forum?id=OM0jvwB8jIp57ZJjtNEZ
+    .. _Decoupled Weight Decay Regularization:
+        https://arxiv.org/abs/1711.05101
+
+    """
+)
+
+
+def _single_tensor_nadam(
+    params: list[Tensor],
+    grads: list[Tensor],
+    exp_avgs: list[Tensor],
+    exp_avg_sqs: list[Tensor],
+    mu_products: list[Tensor],
+    state_steps: list[Tensor],
+    *,
+    beta1: float,
+    beta2: float,
+    lr: float,
+    weight_decay: float,
+    momentum_decay: float,
+    eps: float,
+    decoupled_weight_decay: bool,
+    maximize: bool,
+    capturable: bool,
+    differentiable: bool,
+    has_complex: bool,
+````
+- **EN**: This chunk defines `_single_tensor_nadam`, which implements a focused step in optimizer state updates.
+- **CN**: 这一段定义了 `_single_tensor_nadam`，其作用是实现优化器状态更新中的一个关键步骤。
+
+### Lines 300-327 / 第 300-327 行
+````python
+) -> None:
+    if not torch.jit.is_scripting():
+        lr = _to_scalar(lr)
+
+    for i, param in enumerate(params):
+        grad = grads[i] if not maximize else -grads[i]
+        exp_avg = exp_avgs[i]
+        exp_avg_sq = exp_avg_sqs[i]
+        mu_product = mu_products[i]
+        step_t = state_steps[i]
+
+        if torch.is_complex(param):
+            param = torch.view_as_real(param)
+            grad = torch.view_as_real(grad)
+            exp_avg = torch.view_as_real(exp_avg)
+            exp_avg_sq = torch.view_as_real(exp_avg_sq)
+
+        # If compiling, the compiler will handle cudagraph checks, see note [torch.compile x capturable]
+        if not torch.compiler.is_compiling() and capturable:
+            capturable_supported_devices = _get_capturable_supported_devices()
+            if not (
+                param.device.type == mu_product.device.type == step_t.device.type
+                and param.device.type in capturable_supported_devices
+            ):
+                raise AssertionError(
+                    f"If capturable=True, params, mu_products and state_steps must be "
+                    f"on supported devices: {capturable_supported_devices}."
+                )
+````
+- **EN**: Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 329-351 / 第 329-351 行
+````python
+        # update step
+        step_t += 1
+
+        if capturable:
+            step = step_t
+        else:
+            step = _get_value(step_t)
+
+        bias_correction2 = 1 - beta2**step
+
+        if weight_decay != 0:
+            if decoupled_weight_decay:
+                # Perform stepweight decay
+                param.mul_(1 - lr * weight_decay)
+            else:
+                grad = grad.add(param, alpha=weight_decay)
+
+        # calculate the momentum cache \mu^{t} and \mu^{t+1}
+        mu = beta1 * (1.0 - 0.5 * (0.96 ** (step * momentum_decay)))
+        mu_next = beta1 * (1.0 - 0.5 * (0.96 ** ((step + 1) * momentum_decay)))
+
+        # update mu_product
+        mu_product *= mu
+````
+- **EN**: This chunk continues `_single_tensor_nadam` and expands its internal control flow or state updates. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_single_tensor_nadam`，进一步展开其内部控制流或状态更新。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 353-378 / 第 353-378 行
+````python
+        # decay the first and second moment running average coefficient
+        exp_avg.lerp_(grad, 1 - beta1)
+        exp_avg_sq.mul_(beta2).addcmul_(grad, grad, value=1 - beta2)
+        denom = exp_avg_sq.div(bias_correction2).sqrt()
+
+        if differentiable or capturable:
+            denom = denom.add(eps)
+            # Make autograd track the operations
+            # by updating the grad and exp_avg directly and not using the
+            # scalar "value" argument of addcdiv.
+            mu_product_next = mu_product * mu_next
+            grad = grad * (-lr * (1.0 - mu) / (1.0 - mu_product))
+            exp_avg = exp_avg * (-lr * mu_next / (1.0 - mu_product_next))
+            param.addcdiv_(grad, denom)
+            param.addcdiv_(exp_avg, denom)
+        else:
+            mu_product_next = _get_value(mu_product) * mu_next
+            denom.add_(eps)
+            param.addcdiv_(
+                grad, denom, value=(-lr * (1.0 - mu) / (1.0 - _get_value(mu_product)))
+            )
+            param.addcdiv_(
+                exp_avg,
+                denom,
+                value=cast(float, (-lr * mu_next) / (1.0 - mu_product_next)),
+            )
+````
+- **EN**: This chunk continues `_single_tensor_nadam` and expands its internal control flow or state updates. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_single_tensor_nadam`，进一步展开其内部控制流或状态更新。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 381-405 / 第 381-405 行
+````python
+def _multi_tensor_nadam(
+    params: list[Tensor],
+    grads: list[Tensor],
+    exp_avgs: list[Tensor],
+    exp_avg_sqs: list[Tensor],
+    mu_products: list[Tensor],
+    state_steps: list[Tensor],
+    *,
+    beta1: float,
+    beta2: float,
+    lr: float,
+    weight_decay: float,
+    momentum_decay: float,
+    eps: float,
+    decoupled_weight_decay: bool,
+    maximize: bool,
+    capturable: bool,
+    differentiable: bool,
+    has_complex: bool,
+) -> None:
+    if len(params) == 0:
+        return
+
+    if differentiable:
+        raise AssertionError("_foreach ops don't support autograd")
+````
+- **EN**: This chunk defines `_multi_tensor_nadam`, which implements a focused step in optimizer state updates. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results. The tail returns the assembled value or hands updated state back to the caller.
+- **CN**: 这一段定义了 `_multi_tensor_nadam`，其作用是实现优化器状态更新中的一个关键步骤。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。 末尾会返回组装好的值，或把更新后的状态交还给调用方。
+
+### Lines 407-434 / 第 407-434 行
+````python
+    # If compiling, the compiler will handle cudagraph checks, see note [torch.compile x capturable]
+    if not torch.compiler.is_compiling() and capturable:
+        capturable_supported_devices = _get_capturable_supported_devices(
+            supports_xla=False
+        )
+        if not all(
+            p.device.type == mp.device.type == step.device.type
+            and p.device.type in capturable_supported_devices
+            for p, mp, step in zip(params, mu_products, state_steps, strict=True)
+        ):
+            raise AssertionError(
+                "If capturable=True, "
+                "params, mu_products, and state_steps must be on supported devices: "
+                f"{capturable_supported_devices}."
+            )
+
+    lr = _to_scalar(lr)
+
+    grouped_tensors = Optimizer._group_tensors_by_device_and_dtype(
+        [params, grads, exp_avgs, exp_avg_sqs, mu_products, state_steps]  # type: ignore[list-item]
+    )
+    for (
+        grouped_params_,
+        grouped_grads_,
+        grouped_exp_avgs_,
+        grouped_exp_avg_sqs_,
+        grouped_mu_products_,
+        grouped_state_steps_,
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 435-461 / 第 435-461 行
+````python
+    ), _ in grouped_tensors.values():
+        grouped_params = cast(list[Tensor], grouped_params_)
+        grouped_grads = cast(list[Tensor], grouped_grads_)
+        grouped_exp_avgs = cast(list[Tensor], grouped_exp_avgs_)
+        grouped_exp_avg_sqs = cast(list[Tensor], grouped_exp_avg_sqs_)
+        grouped_mu_products = cast(list[Tensor], grouped_mu_products_)
+        grouped_state_steps = cast(list[Tensor], grouped_state_steps_)
+
+        # handle complex
+        if has_complex:
+            _view_as_real(
+                grouped_params, grouped_grads, grouped_exp_avgs, grouped_exp_avg_sqs
+            )
+
+        if maximize:
+            grouped_grads = torch._foreach_neg(grouped_grads)  # type: ignore[assignment]
+
+        # Update steps
+        # If steps are on CPU, foreach will fall back to the slow path, which is a for-loop calling t.add(1) over
+        # and over. 1 will then be wrapped into a Tensor over and over again, which is slower than if we just
+        # wrapped it once now. The alpha is required to assure we go to the right overload.
+        if not torch.compiler.is_compiling() and grouped_state_steps[0].is_cpu:
+            torch._foreach_add_(
+                grouped_state_steps, torch.tensor(1.0, device="cpu"), alpha=1.0
+            )
+        else:
+            torch._foreach_add_(grouped_state_steps, 1)
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 463-486 / 第 463-486 行
+````python
+        if weight_decay != 0:
+            if decoupled_weight_decay:
+                # Perform stepweight decay
+                torch._foreach_mul_(grouped_params, 1 - lr * weight_decay)
+            else:
+                # Reuse the intermediate memory (grouped_grads) already allocated for maximize
+                if maximize:
+                    torch._foreach_add_(
+                        grouped_grads, grouped_params, alpha=weight_decay
+                    )
+                else:
+                    grouped_grads = torch._foreach_add(  # type: ignore[assignment]
+                        grouped_grads, grouped_params, alpha=weight_decay
+                    )
+
+        # Decay the first and second moment running average coefficient
+        torch._foreach_lerp_(grouped_exp_avgs, grouped_grads, 1 - beta1)
+
+        torch._foreach_mul_(grouped_exp_avg_sqs, beta2)
+        torch._foreach_addcmul_(
+            grouped_exp_avg_sqs, grouped_grads, grouped_grads, 1 - beta2
+        )
+
+        exp_avg_sq_sqrt = torch._foreach_sqrt(grouped_exp_avg_sqs)
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 488-507 / 第 488-507 行
+````python
+        bias_correction_sqrt: tuple[Tensor, ...] | list[Tensor]
+        mus: tuple[Tensor, ...] | list[Tensor]
+        mu_nexts: tuple[Tensor, ...] | list[Tensor]
+        if capturable:
+            # mus will be beta1 * (1 - 0.5 * 0.96 ** (step * momentum_decay))
+            exponent = torch._foreach_mul(grouped_state_steps, momentum_decay)
+            mus = torch._foreach_pow(0.96, exponent)
+            torch._foreach_mul_(mus, -0.5)
+            torch._foreach_add_(mus, 1.0)
+            torch._foreach_mul_(mus, beta1)
+
+            # mu_nexts will be beta1 * (1 - 0.5 * 0.96 ** ((step + 1) * momentum_decay))
+            torch._foreach_add_(exponent, momentum_decay)
+            mu_nexts = torch._foreach_pow(0.96, exponent)
+            torch._foreach_mul_(mu_nexts, -0.5)
+            torch._foreach_add_(mu_nexts, 1.0)
+            torch._foreach_mul_(mu_nexts, beta1)
+
+            # save peak memory as we don't need exponent anymore
+            del exponent
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 509-535 / 第 509-535 行
+````python
+            bias_correction_sqrt = torch._foreach_pow(beta2, grouped_state_steps)
+            # foreach_sub doesn't allow a scalar as the first arg
+            torch._foreach_sub_(bias_correction_sqrt, 1.0)
+            torch._foreach_neg_(bias_correction_sqrt)
+            torch._foreach_sqrt_(bias_correction_sqrt)
+        else:
+            bias_correction_sqrt = [
+                (1 - beta2 ** _get_value(step)) ** 0.5 for step in grouped_state_steps
+            ]
+            mus = [
+                beta1 * (1.0 - 0.5 * (0.96 ** (_get_value(step) * momentum_decay)))
+                for step in grouped_state_steps
+            ]
+            mu_nexts = [
+                beta1
+                * (1.0 - 0.5 * (0.96 ** ((_get_value(step) + 1) * momentum_decay)))
+                for step in grouped_state_steps
+            ]
+
+        # update mu_products
+        torch._foreach_mul_(grouped_mu_products, mus)
+
+        torch._foreach_div_(exp_avg_sq_sqrt, bias_correction_sqrt)
+        torch._foreach_add_(exp_avg_sq_sqrt, eps)
+
+        # explicitly delete bias_correction refs to save memory
+        del bias_correction_sqrt
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。
+
+### Lines 537-560 / 第 537-560 行
+````python
+        if capturable:
+            # Build up the step_size multiplier for grad, reusing mus' memory
+            torch._foreach_sub_(mus, 1.0)
+            torch._foreach_mul_(mus, lr)
+            # foreach_sub doesn't allow a scalar as the first arg
+            denom = torch._foreach_sub(grouped_mu_products, 1.0)
+            torch._foreach_neg_(denom)
+            torch._foreach_div_(mus, denom)
+            # - lr * (1 - mu) / (1 - mu_product)
+            step_size_grads = mus
+            # explicitly delete denom to save memory
+            del denom
+
+            # Build up the step_size multiplier for exp_avg, reusing mu_nexts' memory
+            denom = torch._foreach_mul(grouped_mu_products, mu_nexts)
+            torch._foreach_mul_(mu_nexts, lr)
+            # foreach_sub doesn't allow a scalar as the first arg, but it's okay because
+            # we need a negative here anyway
+            torch._foreach_sub_(denom, 1.0)
+            torch._foreach_div_(mu_nexts, denom)
+            # - lr * mu_next / (1 - mu_product * mu_next)
+            step_size_expavg = mu_nexts
+            # explicitly delete denom to save memory
+            del denom
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。
+
+### Lines 562-588 / 第 562-588 行
+````python
+            # we cannot inplace into step_size_grads cuz it is a list of ScalarTensors
+            # and mul'ing with grouped_grads will result in a list of bigger Tensors
+            numerator = torch._foreach_mul(step_size_grads, grouped_grads)
+            torch._foreach_addcmul_(numerator, step_size_expavg, grouped_exp_avgs)
+
+            # finally, update params
+            torch._foreach_addcdiv_(grouped_params, numerator, exp_avg_sq_sqrt)
+        else:
+            step_size_grads = _stack_if_compiling(
+                [
+                    (_get_value(lr) * (1.0 - mu) / (1.0 - _get_value(mu_product))) * -1
+                    for mu_product, mu in zip(grouped_mu_products, mus, strict=True)
+                ]
+            )
+            step_size_expavg = _stack_if_compiling(
+                [
+                    (
+                        _get_value(lr)
+                        * mu_next
+                        / (1.0 - _get_value(mu_product) * mu_next)
+                    )
+                    * -1
+                    for mu_product, mu_next in zip(
+                        grouped_mu_products, mu_nexts, strict=True
+                    )
+                ]
+            )
+````
+- **EN**: This chunk continues `_multi_tensor_nadam` and expands its internal control flow or state updates. Context-manager style flow scopes temporary state such as streams, autocast modes, or tracing/capture boundaries. Exception-handling paths normalize backend/runtime failures into predictable Python-visible behavior. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries.
+- **CN**: 这一段延续了 `_multi_tensor_nadam`，进一步展开其内部控制流或状态更新。 类似上下文管理器的流程会限定临时状态的作用域，例如流、autocast 模式或 tracing/捕获边界。 异常处理路径会把后端/运行时失败规范化为可预期的 Python 可见行为。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。
+
+### Lines 590-617 / 第 590-617 行
+````python
+            torch._foreach_addcdiv_(
+                grouped_params,
+                grouped_grads,
+                exp_avg_sq_sqrt,
+                step_size_grads,  # type: ignore[arg-type]
+            )
+            torch._foreach_addcdiv_(
+                grouped_params,
+                grouped_exp_avgs,
+                exp_avg_sq_sqrt,
+                step_size_expavg,  # type: ignore[arg-type]
+            )
+
+
+@_disable_dynamo_if_unsupported(single_tensor_fn=_single_tensor_nadam)
+def nadam(
+    params: list[Tensor],
+    grads: list[Tensor],
+    exp_avgs: list[Tensor],
+    exp_avg_sqs: list[Tensor],
+    mu_products: list[Tensor],
+    state_steps: list[Tensor],
+    # kwonly args with defaults are not supported by functions compiled with torchscript issue #70627
+    # setting this as kwarg for now as functional API is compiled by torch/distributed/optim
+    decoupled_weight_decay: bool = False,
+    foreach: bool | None = None,
+    capturable: bool = False,
+    differentiable: bool = False,
+````
+- **EN**: This chunk defines `nadam`, which implements a focused step in optimizer state updates. Decorators such as `_disable_dynamo_if_unsupported` adjust how the following definitions participate in typing, warnings, or runtime protocol hooks. Context-manager style flow scopes temporary state such as streams, autocast modes, or tracing/capture boundaries. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries.
+- **CN**: 这一段定义了 `nadam`，其作用是实现优化器状态更新中的一个关键步骤。 像 `_disable_dynamo_if_unsupported` 这样的装饰器会调整后续定义在类型系统、告警或运行时协议中的参与方式。 类似上下文管理器的流程会限定临时状态的作用域，例如流、autocast 模式或 tracing/捕获边界。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。
+
+### Lines 618-640 / 第 618-640 行
+````python
+    has_complex: bool = False,
+    maximize: bool = False,
+    *,
+    beta1: float,
+    beta2: float,
+    lr: float,
+    weight_decay: float,
+    momentum_decay: float,
+    eps: float,
+) -> None:
+    r"""Functional API that performs NAdam algorithm computation.
+
+    See :class:`~torch.optim.NAdam` for details.
+    """
+    if not all(isinstance(t, torch.Tensor) for t in state_steps):
+        raise RuntimeError(
+            "API has changed, `state_steps` argument must contain a list of singleton tensors"
+        )
+
+    if not all(isinstance(t, torch.Tensor) for t in mu_products):
+        raise RuntimeError(
+            "API has changed, `mu_products` argument must contain a list of singleton tensors"
+        )
+````
+- **EN**: This chunk continues `nadam` and expands its internal control flow or state updates. Looping logic applies the same validation or transformation across tensors, parameters, or registry entries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: 这一段延续了 `nadam`，进一步展开其内部控制流或状态更新。 循环逻辑会在张量、参数或注册表条目上重复应用相同的校验或变换。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 642-669 / 第 642-669 行
+````python
+    if foreach is None:
+        _, foreach = _default_to_fused_or_foreach(
+            params, differentiable, use_fused=False
+        )
+
+    if foreach and torch.jit.is_scripting():
+        raise RuntimeError("torch.jit.script not supported with foreach optimizers")
+
+    if foreach and not torch.jit.is_scripting():
+        func = _multi_tensor_nadam
+    else:
+        func = _single_tensor_nadam
+
+    func(
+        params,
+        grads,
+        exp_avgs,
+        exp_avg_sqs,
+        mu_products,
+        state_steps,
+        beta1=beta1,
+        beta2=beta2,
+        lr=lr,
+        weight_decay=weight_decay,
+        momentum_decay=momentum_decay,
+        maximize=maximize,
+        decoupled_weight_decay=decoupled_weight_decay,
+        eps=eps,
+````
+- **EN**: This chunk continues `nadam` and expands its internal control flow or state updates. Context-manager style flow scopes temporary state such as streams, autocast modes, or tracing/capture boundaries. Conditional branches separate fast paths, backend-specific cases, and user-facing invariants. Assertions or explicit exceptions make unsupported states fail early instead of silently producing bad results.
+- **CN**: 这一段延续了 `nadam`，进一步展开其内部控制流或状态更新。 类似上下文管理器的流程会限定临时状态的作用域，例如流、autocast 模式或 tracing/捕获边界。 条件分支用于区分快速路径、后端特定情况以及面向用户的不变量。 断言或显式异常会让不支持的状态尽早失败，而不是悄悄产生错误结果。
+
+### Lines 670-673 / 第 670-673 行
+````python
+        capturable=capturable,
+        differentiable=differentiable,
+        has_complex=has_complex,
+    )
+````
+- **EN**: This chunk continues `nadam` and expands its internal control flow or state updates.
+- **CN**: 这一段延续了 `nadam`，进一步展开其内部控制流或状态更新。
+
+## Key Concepts / 关键概念
+
+- **Optimization algorithms**
+  - EN: Updates model parameters using optimizer state, gradients, and step-wise scheduling rules.
+  - CN: 利用优化器状态、梯度和逐步调度规则更新模型参数。
+- **__all__**
+  - EN: `__all__` is one of the main symbols declared or implemented in this file.
+  - CN: `__all__` 是本文件声明或实现的主要符号之一。
+- **NAdam**
+  - EN: `NAdam` is one of the main symbols declared or implemented in this file.
+  - CN: `NAdam` 是本文件声明或实现的主要符号之一。
+- **Graph handling**
+  - EN: The implementation manipulates captured graphs, graph metadata, or graph-scoped execution state.
+  - CN: 实现会处理捕获图、图元数据或图作用域的执行状态。
+- **Memory management**
+  - EN: The file manages caches, pools, or allocation-related state exposed to Python.
+  - CN: 该文件管理暴露给 Python 的缓存、内存池或分配相关状态。
+- **Gradient semantics**
+  - EN: The implementation preserves gradient correctness and explains how backward/JVP state is tracked.
+  - CN: 实现会维护梯度正确性，并说明如何跟踪 backward/JVP 状态。
+## Dependencies / 依赖关系
+
+- **Internal torch modules / torch 内部模块**: `torch`, `.optimizer`
+- **Standard library / 标准库**: `typing`
+- **Primary symbols in this file / 本文件核心符号**: `__all__`, `NAdam`, `_single_tensor_nadam`, `_multi_tensor_nadam`, `nadam`

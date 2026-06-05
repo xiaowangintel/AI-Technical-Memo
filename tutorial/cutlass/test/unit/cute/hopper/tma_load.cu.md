@@ -1,0 +1,1321 @@
+# tma_load.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/hopper/tma_load.cu`
+
+## Purpose / 用途
+- EN: This Hopper / SM90-era CuTe test validates the `tma load` path, covering architecture-specific tensor movement, layout mapping, or matrix-instruction behavior.
+- CN: 这个面向 Hopper / SM90 时代 的 CuTe 测试验证 `tma load` 路径，覆盖架构特定的张量搬运、布局映射或矩阵指令行为。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include "../hopper/tma_load_testbed.hpp"`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 37**: `using namespace cutlass::test;`
+  - EN: Brings namespace `cutlass::test` into the local scope to shorten later code.
+  - CN: 把命名空间 `cutlass::test` 引入当前作用域，以简化后续代码。
+- **Line 38**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: `#if CUDA_12_0_SM90_FEATURES_SUPPORTED`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `template <class T, class TmaType = T, class GMEM_Layout, class SMEM_Layout, class CTA_Tile>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 42**: `auto`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 43**: `test_tma_load(GMEM_Layout const& gmem_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 44**: `              SMEM_Layout const& smem_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 45**: `              CTA_Tile    const& cta_tile)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 46**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 47**: `  return test_tma_load<T, TmaType>(SM90_TMA_LOAD{}, gmem_layout, smem_layout, cta_tile);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 48**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 49**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: `template <class T, class TmaType = T, class GMEM_Layout, class SMEM_Layout>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 51**: `auto`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 52**: `test_tma_load(GMEM_Layout const& gmem_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 53**: `              SMEM_Layout const& smem_layout)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 54**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 55**: `  return test_tma_load<T, TmaType>(gmem_layout, smem_layout, product_each(shape(smem_layout)));`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 56**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `TEST(SM90_CuTe_Hopper, Tma_Load_1D)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_1D` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_1D`，用于验证一个具体的 CuTe 场景。
+- **Line 59**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 60**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 61**: `    Layout smem_layout = Layout<_256, _1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 62**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 63**: `    Layout gmem_layout = smem_layout;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 64**: `    test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 65**: `    test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 66**: `    test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 67**: `    test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 68**: `    }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_1D`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_1D` 的作用域。
+- **Line 69**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 71**: `    Layout gmem_layout = make_layout(128, GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 72**: `    test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 73**: `    test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 74**: `    test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 75**: `    test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 76**: `    }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 77**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 78**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 79**: `    Layout gmem_layout = make_layout(384, GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 80**: `    test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 81**: `    test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 82**: `    test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 83**: `    test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 84**: `    }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 85**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 86**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 87**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 88**: `    Layout smem_layout = Layout<Shape<_8,_8>, Stride<_1,_8>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 89**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 90**: `    Layout gmem_layout = smem_layout;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 91**: `    test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 92**: `    test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 93**: `    test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 94**: `    test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 95**: `    }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 96**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 97**: `    // This doesn't result in a 1D TMA, even though it could/should...`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 98**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 99**: `    Layout gmem_layout = tile_to_shape(smem_layout, Shape<_16,_16>{});`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 100**: `    test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 101**: `    test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 102**: `    test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 103**: `    test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 104**: `    }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 105**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 106**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 107**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 108**: `TEST(SM90_CuTe_Hopper, Tma_Load_32x32_Col)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_32x32_Col` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_32x32_Col`，用于验证一个具体的 CuTe 场景。
+- **Line 109**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 110**: `  Layout smem_layout = Layout<Shape<_32,_32>, Stride<_1,_32>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 111**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 112**: `  Layout gmem_layout = smem_layout;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 113**: `  test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 114**: `  test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 115**: `  test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 116**: `  test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 117**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_32x32_Col`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_32x32_Col` 的作用域。
+- **Line 118**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 119**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 120**: `  Layout gmem_layout = make_layout(make_shape(32,32), GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 121**: `  test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 122**: `  test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 123**: `  test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 124**: `  test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 125**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 126**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 127**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 128**: `  Layout gmem_layout = make_layout(make_shape(32,32), make_stride(Int<1>{}, 1024));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 129**: `  test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 130**: `  test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 131**: `  test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 132**: `  test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 133**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 134**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 135**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 136**: `TEST(SM90_CuTe_Hopper, Tma_Load_32x32_Row)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_32x32_Row` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_32x32_Row`，用于验证一个具体的 CuTe 场景。
+- **Line 137**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 138**: `  Layout smem_layout = Layout<Shape<_32,_32>, Stride<_32,_1>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 139**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 140**: `  Layout gmem_layout = smem_layout;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 141**: `  test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 142**: `  test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 143**: `  test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 144**: `  test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 145**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_32x32_Row`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_32x32_Row` 的作用域。
+- **Line 146**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 147**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 148**: `  Layout gmem_layout = make_layout(make_shape(32,32), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 149**: `  test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 150**: `  test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 151**: `  test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 152**: `  test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 153**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 154**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 155**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 156**: `  Layout gmem_layout = make_layout(make_shape(32,32), make_stride(1024, Int<1>{}));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 157**: `  test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 158**: `  test_tma_load<half_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 159**: `  test_tma_load< float>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 160**: `  test_tma_load<double>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 161**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 162**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 163**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 164**: `template <class T, template <typename> typename SWIZZLE_ATOM>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 165**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 166**: `test_tma_load_swizzle_atom_mn()`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 167**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 168**: `  auto smem_layout = SWIZZLE_ATOM<T>{};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 169**: `  { // Static gmem`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 170**: `  //Layout gmem_layout = make_layout(shape(smem_layout), GenColMajor{});`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 171**: `  //test_tma_load<T>(gmem_layout, smem_layout);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 172**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 173**: `  { // Dynamic gmem`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 174**: `  Layout gmem_layout = make_layout(make_shape(2*uint32_t(size<0>(smem_layout)), 2*uint32_t(size<1>(smem_layout))),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 175**: `                                   GenColMajor{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 176**: `  test_tma_load<T>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 177**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 178**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 179**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 180**: `template <class T, template <typename> typename SWIZZLE_ATOM>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 181**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 182**: `test_tma_load_swizzle_atom_k()`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 183**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 184**: `  auto smem_layout = SWIZZLE_ATOM<T>{};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 185**: `  { // Static gmem`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 186**: `  //Layout gmem_layout = make_layout(shape(smem_layout), GenRowMajor{});`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 187**: `  //test_tma_load<T>(gmem_layout, smem_layout);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 188**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 189**: `  { // Dynamic gmem`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 190**: `  Layout gmem_layout = make_layout(make_shape(2*uint32_t(size<0>(smem_layout)), 2*uint32_t(size<1>(smem_layout))),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 191**: `                                   GenRowMajor{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 192**: `  test_tma_load<T>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 193**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 194**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 195**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 196**: `TEST(SM90_CuTe_Hopper, Tma_Load_Swizzle_Atoms)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_Swizzle_Atoms` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_Swizzle_Atoms`，用于验证一个具体的 CuTe 场景。
+- **Line 197**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 198**: `  test_tma_load_swizzle_atom_mn<int8_t, GMMA::Layout_MN_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 199**: `  test_tma_load_swizzle_atom_mn<half_t, GMMA::Layout_MN_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 200**: `  test_tma_load_swizzle_atom_mn< float, GMMA::Layout_MN_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 201**: `  test_tma_load_swizzle_atom_mn<double, GMMA::Layout_MN_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 202**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 203**: `  test_tma_load_swizzle_atom_mn<int8_t, GMMA::Layout_MN_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 204**: `  test_tma_load_swizzle_atom_mn<half_t, GMMA::Layout_MN_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 205**: `  test_tma_load_swizzle_atom_mn< float, GMMA::Layout_MN_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 206**: `  test_tma_load_swizzle_atom_mn<double, GMMA::Layout_MN_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 207**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 208**: `  test_tma_load_swizzle_atom_mn<int8_t, GMMA::Layout_MN_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 209**: `  test_tma_load_swizzle_atom_mn<half_t, GMMA::Layout_MN_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 210**: `  test_tma_load_swizzle_atom_mn< float, GMMA::Layout_MN_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 211**: `  test_tma_load_swizzle_atom_mn<double, GMMA::Layout_MN_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 212**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 213**: `  test_tma_load_swizzle_atom_mn<int8_t, GMMA::Layout_MN_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 214**: `  test_tma_load_swizzle_atom_mn<half_t, GMMA::Layout_MN_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 215**: `  test_tma_load_swizzle_atom_mn< float, GMMA::Layout_MN_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 216**: `  test_tma_load_swizzle_atom_mn<double, GMMA::Layout_MN_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 217**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 218**: `  test_tma_load_swizzle_atom_k<int8_t, GMMA::Layout_K_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 219**: `  test_tma_load_swizzle_atom_k<half_t, GMMA::Layout_K_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 220**: `  test_tma_load_swizzle_atom_k< float, GMMA::Layout_K_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 221**: `  test_tma_load_swizzle_atom_k<double, GMMA::Layout_K_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 222**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 223**: `  test_tma_load_swizzle_atom_k<int8_t, GMMA::Layout_K_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 224**: `  test_tma_load_swizzle_atom_k<half_t, GMMA::Layout_K_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 225**: `  test_tma_load_swizzle_atom_k< float, GMMA::Layout_K_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 226**: `  test_tma_load_swizzle_atom_k<double, GMMA::Layout_K_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 227**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 228**: `  test_tma_load_swizzle_atom_k<int8_t, GMMA::Layout_K_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 229**: `  test_tma_load_swizzle_atom_k<half_t, GMMA::Layout_K_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 230**: `  test_tma_load_swizzle_atom_k< float, GMMA::Layout_K_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 231**: `  test_tma_load_swizzle_atom_k<double, GMMA::Layout_K_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 232**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 233**: `  test_tma_load_swizzle_atom_k<int8_t, GMMA::Layout_K_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 234**: `  test_tma_load_swizzle_atom_k<half_t, GMMA::Layout_K_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 235**: `  test_tma_load_swizzle_atom_k< float, GMMA::Layout_K_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 236**: `  test_tma_load_swizzle_atom_k<double, GMMA::Layout_K_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 237**: `}`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_Swizzle_Atoms`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_Swizzle_Atoms` 的作用域。
+- **Line 238**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 239**: `template <class T, template <typename> typename SWIZZLE_ATOM>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 240**: `auto`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 241**: `test_tma_load_swizzle_tile_mn()`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 242**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 243**: `  auto   smem_layout = tile_to_shape(SWIZZLE_ATOM<T>{}, Shape<_128,_128>{});`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 244**: `  Layout gmem_layout = make_layout(make_shape(int(size<0>(smem_layout)), int(size<1>(smem_layout))), GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 245**: `  return test_tma_load<T>(gmem_layout, smem_layout);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 246**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 247**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 248**: `template <class T, template <typename> typename SWIZZLE_ATOM>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 249**: `auto`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 250**: `test_tma_load_swizzle_tile_k()`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 251**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 252**: `  auto   smem_layout = tile_to_shape(SWIZZLE_ATOM<T>{}, Shape<_128,_128>{});`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 253**: `  Layout gmem_layout = make_layout(make_shape(int(size<0>(smem_layout)), int(size<1>(smem_layout))), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 254**: `  return test_tma_load<T>(gmem_layout, smem_layout);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 255**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 256**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 257**: `TEST(SM90_CuTe_Hopper, Tma_Load_Swizzle_Tiles)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_Swizzle_Tiles` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_Swizzle_Tiles`，用于验证一个具体的 CuTe 场景。
+- **Line 258**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 259**: `  // Other T-types use too much smem`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 260**: `  test_tma_load_swizzle_tile_mn<int8_t, GMMA::Layout_MN_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 261**: `  test_tma_load_swizzle_tile_mn<half_t, GMMA::Layout_MN_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 262**: `  test_tma_load_swizzle_tile_mn<int8_t, GMMA::Layout_MN_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 263**: `  test_tma_load_swizzle_tile_mn<half_t, GMMA::Layout_MN_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 264**: `  test_tma_load_swizzle_tile_mn<int8_t, GMMA::Layout_MN_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 265**: `  test_tma_load_swizzle_tile_mn<half_t, GMMA::Layout_MN_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 266**: `  test_tma_load_swizzle_tile_mn<int8_t, GMMA::Layout_MN_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 267**: `  test_tma_load_swizzle_tile_mn<half_t, GMMA::Layout_MN_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 268**: `  test_tma_load_swizzle_tile_k<int8_t, GMMA::Layout_K_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 269**: `  test_tma_load_swizzle_tile_k<half_t, GMMA::Layout_K_SW128_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 270**: `  test_tma_load_swizzle_tile_k<int8_t, GMMA::Layout_K_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 271**: `  test_tma_load_swizzle_tile_k<half_t, GMMA::Layout_K_SW64_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 272**: `  test_tma_load_swizzle_tile_k<int8_t, GMMA::Layout_K_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 273**: `  test_tma_load_swizzle_tile_k<half_t, GMMA::Layout_K_SW32_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 274**: `  test_tma_load_swizzle_tile_k<int8_t, GMMA::Layout_K_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 275**: `  test_tma_load_swizzle_tile_k<half_t, GMMA::Layout_K_INTER_Atom>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 276**: `}`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_Swizzle_Tiles`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_Swizzle_Tiles` 的作用域。
+- **Line 277**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 278**: `// Tensor by-mode`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 279**: `TEST(SM90_CuTe_Hopper, Tma_Load_Tensor)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_Tensor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_Tensor`，用于验证一个具体的 CuTe 场景。
+- **Line 280**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 281**: `  // 3-mode TMA`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 282**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 283**: `  Layout gmem_layout = make_layout(make_shape(128, 64, 5));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 284**: `  auto cta_tile      = Shape<_64, _32>{};                    // GMEM Tiling:`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 285**: `                                                             //   Take 64-elem from m`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 286**: `                                                             //   Take 32-elem from k`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 287**: `  auto smem_layout = make_layout(Shape<_64,_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 288**: `  test_tma_load<half_t>(gmem_layout, smem_layout, cta_tile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 289**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_Tensor`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_Tensor` 的作用域。
+- **Line 290**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 291**: `  // 4-mode TMA`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 292**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 293**: `  Layout gmem_layout = make_layout(make_shape(make_shape(80,40),make_shape(32,12)));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 294**: `  auto cta_tile      = Shape<Shape<_16,_8>,Shape<_32,_2>>{}; // GMEM Tiling:`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 295**: `                                                             //   Take 16-elem from m0, 8-elem from m1,`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 296**: `                                                             //   Take 32-elem from k0, 2-elem from k1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 297**: `  auto smem_layout = make_layout(Shape<_128,_64>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 298**: `  test_tma_load<half_t>(gmem_layout, smem_layout, cta_tile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 299**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 300**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 301**: `  // 5-mode TMA`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 302**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 303**: `  Layout gmem_layout = make_layout(make_shape(make_shape(32,32,32),make_shape(32,12)));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 304**: `  auto cta_tile      = Shape<Shape<_16,_4,_2>,Shape<_16,_2>>{}; // GMEM Tiling:`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 305**: `                                                             //   Take 4-elem from m0, 4-elem from m1, 5-elem from m2`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 306**: `                                                             //   Take 32-elem from k0, 2-elem from k1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 307**: `  auto smem_layout = make_layout(Shape<_128,_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 308**: `  test_tma_load<half_t>(gmem_layout, smem_layout, cta_tile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 309**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 310**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 311**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 312**: `// Tensor Multimode -- TMA with more than 5 modes in GMEM (packs residual modes into last TMA mode)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 313**: `TEST(SM90_CuTe_Hopper, Tma_Load_Tensor_Multimode)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_Tensor_Multimode` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_Tensor_Multimode`，用于验证一个具体的 CuTe 场景。
+- **Line 314**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 315**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 316**: `  Layout gmem_layout = make_layout(make_shape(make_shape(32,3,2,2),make_shape(32,4,2)));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 317**: `  auto cta_tile      = Shape<Shape<_32>, Shape<_32,_2>>{};    // GMEM Tiling:`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 318**: `                                                              //  Take 32-elem from m0`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 319**: `                                                              //  Take 32-elem from k0, 2-elem from k1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 320**: `  auto smem_layout = make_layout(Shape<_32,_64>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 321**: `  test_tma_load<half_t>(gmem_layout, smem_layout, cta_tile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 322**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_Tensor_Multimode`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_Tensor_Multimode` 的作用域。
+- **Line 323**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 324**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 325**: `  Layout gmem_layout = make_layout(make_shape(make_shape(64,3,2,2),make_shape(32,4,2)));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 326**: `  auto cta_tile      = Shape<Shape<_32,_3>, Shape<_32,_2>>{}; // GMEM Tiling:`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 327**: `                                                              //  Take 32-elem from m0, 3-elem from m1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 328**: `                                                              //  Take 32-elem from k0, 2-elem from k1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 329**: `  auto smem_layout = make_layout(Shape<_96,_64>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 330**: `  test_tma_load<half_t>(gmem_layout, smem_layout, cta_tile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 331**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 332**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 333**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 334**: `  Layout gmem_layout = make_layout(make_shape(make_shape(64,3,2,3,2),make_shape(32,4,2,2)));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 335**: `  auto cta_tile      = Shape<Shape<_32>, Shape<_16,_2>>{};    // GMEM Tiling:`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 336**: `                                                              //  Take 32-elem from m0`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 337**: `                                                              //  Take 16-elem from k0, 2-elem from k1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 338**: `  auto smem_layout = make_layout(Shape<_32,_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 339**: `  test_tma_load<half_t>(gmem_layout, smem_layout, cta_tile);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 340**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 341**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 342**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 343**: `TEST(SM90_CuTe_Hopper, Tma_Load_Coalesce)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_Coalesce` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_Coalesce`，用于验证一个具体的 CuTe 场景。
+- **Line 344**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 345**: `  // Interleaved ColMajor`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 346**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 347**: `  Layout gmem_layout = make_layout(make_shape (  128, make_shape (_4{},  128)),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 348**: `                                   make_stride( _4{}, make_stride(_1{},  512)));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 349**: `  auto   smem_layout = make_layout(make_shape (_32{}, make_shape (_4{},  _32{})),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 350**: `                                   make_stride( _4{}, make_stride(_1{}, _128{})));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 351**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 352**: `  // By default, uses cta_tile = Shape<_32,_128>`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 353**: `  auto tma = test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 354**: `  // Check the TMA rank`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 355**: `  EXPECT_EQ(rank(tma.get_tma_tensor(shape(gmem_layout))(0)), 2);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 356**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_Coalesce`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_Coalesce` 的作用域。
+- **Line 357**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 358**: `  // Interleaved RowMajor`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 359**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 360**: `  Layout gmem_layout = make_layout(make_shape (make_shape (_4{},   128),   128),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 361**: `                                   make_stride(make_stride(_1{},   512),   _4{}));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 362**: `  auto   smem_layout = make_layout(make_shape (make_shape (_4{},  _32{}), _32{}),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 363**: `                                   make_stride(make_stride(_1{}, _128{}),  _4{}));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 364**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 365**: `  // By default, uses cta_tile = Shape<_128,_32>`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 366**: `  auto tma = test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 367**: `  // Check the TMA rank`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 368**: `  EXPECT_EQ(rank(tma.get_tma_tensor(shape(gmem_layout))(0)), 2);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 369**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 370**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 371**: `  // Account for stride-0 modes within the TMA tile`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 372**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 373**: `  Layout gmem_layout = make_layout(make_shape (  128, make_shape (_32{},   4)),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 374**: `                                   make_stride( _1{}, make_stride( _0{}, 128)));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 375**: `  auto   smem_layout = make_layout(make_shape (_64{}, make_shape (_32{}     )),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 376**: `                                   make_stride( _1{}, make_stride( _0{}     )));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 377**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 378**: `  // By default, uses cta_tile = Shape<_64,_32>`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 379**: `  auto tma = test_tma_load<uint16_t>(gmem_layout, smem_layout);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 380**: `  // Check the TMA rank`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 381**: `  EXPECT_EQ(rank(tma.get_tma_tensor(shape(gmem_layout))(0)), 2);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 382**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 383**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 384**: `  // Coalesce many modes and account for stride-0 modes within the TMA tile`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 385**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 386**: `  Layout gmem_layout = make_layout(make_shape (make_shape (_32{},_4{},     4), _32{}, make_shape (_4{},      4)),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 387**: `                                   make_stride(make_stride(_16{},_4{},  2048),  _0{}, make_stride(_1{}, _512{})));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 388**: `  auto   smem_layout = make_layout(make_shape (make_shape (_32{},_4{}       ), _32{}, make_shape (_4{}        )),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 389**: `                                   make_stride(make_stride(_16{},_4{}       ),  _0{}, make_stride(_1{}        )));`
+  - EN: Constructs a CuTe stride object that describes linear stepping rules.
+  - CN: 构造一个描述线性步进规则的 CuTe 步长对象。
+- **Line 390**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 391**: `  // By default, uses cta_tile = Shape<_128,_32,_4>`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 392**: `  auto tma = test_tma_load<int8_t>(gmem_layout, smem_layout);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 393**: `  // Check the TMA rank (Could be 3 instead of 4 with even better coalescing...?)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 394**: `  EXPECT_EQ(rank(tma.get_tma_tensor(shape(gmem_layout))(0)), 4);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 395**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 396**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 397**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 398**: `TEST(SM90_CuTe_Hopper, Tma_Load_InternalType)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Tma_Load_InternalType` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Tma_Load_InternalType`，用于验证一个具体的 CuTe 场景。
+- **Line 399**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 400**: `  Layout smem_layout = Layout<Shape<_32,_32>, Stride<_1,_32>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 401**: `  Layout gmem_layout = make_layout(make_shape(64, 64));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 402**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 403**: `  // Downcasted tensors to smaller TmaTypes`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 404**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 405**: `  test_tma_load<int8_t, uint8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 406**: `  test_tma_load<half_t, uint8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 407**: `  test_tma_load< float, uint8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 408**: `  test_tma_load<double, uint8_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 409**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Tma_Load_InternalType`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Tma_Load_InternalType` 的作用域。
+- **Line 410**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 411**: `  // Upcasted tensors to larger TmaTypes`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 412**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 413**: `  test_tma_load<int8_t, uint64_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 414**: `  test_tma_load<half_t, uint64_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 415**: `  test_tma_load< float, uint64_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 416**: `  test_tma_load<double, uint64_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 417**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 418**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 419**: `  // Complex<double> is 128bit, which the TMA has no concept of`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 420**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 421**: `  test_tma_load<complex<double>, uint64_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 422**: `  test_tma_load<complex<double>, uint32_t>(gmem_layout, smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 423**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 424**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 425**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 426**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `Tensor`
+  - EN: Uses the CuTe tensor abstraction to bind memory pointers with layouts.
+  - CN: 使用 CuTe Tensor 抽象把内存指针与布局绑定起来。
+- `tma`
+  - EN: Exercises Tensor Memory Accelerator style data movement on Hopper-class paths.
+  - CN: 测试 Hopper 类路径上的 Tensor Memory Accelerator 数据搬运。
+- `tma-transfer`
+  - EN: The file focuses on TMA-based tensor movement between global and shared memory.
+  - CN: 该文件关注基于 TMA 的全局内存与共享内存之间的张量搬运。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `../hopper/tma_load_testbed.hpp`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。

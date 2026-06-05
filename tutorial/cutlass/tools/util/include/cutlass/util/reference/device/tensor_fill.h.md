@@ -1,0 +1,6255 @@
+# tensor_fill.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/device/tensor_fill.h`
+**Purpose / 用途**: Provides a device-side reference implementation or helper for tensor fill. / 为 tensor fill 提供设备端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>  \brief Defines device-side elementwise operations on TensorView. Note, the operations defined</code>
+  - EN: Comment that documents intent or context: "\brief Defines device-side elementwise operations on TensorView. Note, the operations defined".
+  - CN: 用于说明意图或上下文的注释："\brief Defines device-side elementwise operations on TensorView. Note, the operations defined"。
+- **L33** <code>    in this header are not specialized for any particular data layout and are therefore not</code>
+  - EN: Comment that documents intent or context: "in this header are not specialized for any particular data layout and are therefore not".
+  - CN: 用于说明意图或上下文的注释："in this header are not specialized for any particular data layout and are therefore not"。
+- **L34** <code>    intended to offer the best possible performance. Rather, they are intended to be generic</code>
+  - EN: Comment that documents intent or context: "intended to offer the best possible performance. Rather, they are intended to be generic".
+  - CN: 用于说明意图或上下文的注释："intended to offer the best possible performance. Rather, they are intended to be generic"。
+- **L35** <code>    reference implementations to support the CUTLASS unit tests.</code>
+  - EN: Comment that documents intent or context: "reference implementations to support the CUTLASS unit tests.".
+  - CN: 用于说明意图或上下文的注释："reference implementations to support the CUTLASS unit tests."。
+- **L36** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>// Standard Library includes</code>
+  - EN: Comment that documents intent or context: "Standard Library includes".
+  - CN: 用于说明意图或上下文的注释："Standard Library includes"。
+- **L43** <code>#include &lt;utility&gt;</code>
+  - EN: Includes `utility` so this file can use general utility helpers.
+  - CN: 引入 `utility`，使当前文件可以使用通用辅助工具。
+- **L44** <code>#include &lt;cstdlib&gt;</code>
+  - EN: Includes `cstdlib` so this file can use C standard utilities.
+  - CN: 引入 `cstdlib`，使当前文件可以使用C 标准工具。
+- **L45** <code>#include &lt;cmath&gt;</code>
+  - EN: Includes `cmath` so this file can use math routines.
+  - CN: 引入 `cmath`，使当前文件可以使用数学函数。
+- **L46** <code>#include &lt;type_traits&gt;</code>
+  - EN: Includes `type_traits` so this file can use compile-time type traits.
+  - CN: 引入 `type_traits`，使当前文件可以使用编译期类型特征。
+- **L47** <code>#include &lt;cstdint&gt;</code>
+  - EN: Includes `cstdint` so this file can use fixed-width integer types.
+  - CN: 引入 `cstdint`，使当前文件可以使用定宽整数类型。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>// CUDA includes</code>
+  - EN: Comment that documents intent or context: "CUDA includes".
+  - CN: 用于说明意图或上下文的注释："CUDA includes"。
+- **L52** <code>#include &lt;curand_kernel.h&gt;</code>
+  - EN: Includes `curand_kernel.h` so this file can use project-specific declarations from `curand_kernel.h`.
+  - CN: 引入 `curand_kernel.h`，使当前文件可以使用来自 `curand_kernel.h` 的项目专用声明。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>// Cutlass includes</code>
+  - EN: Comment that documents intent or context: "Cutlass includes".
+  - CN: 用于说明意图或上下文的注释："Cutlass includes"。
+- **L55** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L56** <code>#include &quot;cutlass/array.h&quot;</code>
+  - EN: Includes `cutlass/array.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/array.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L57** <code>#include &quot;cutlass/complex.h&quot;</code>
+  - EN: Includes `cutlass/complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L58** <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L59** <code>#include &quot;cutlass/blas3.h&quot;</code>
+  - EN: Includes `cutlass/blas3.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/blas3.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L60** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L61** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L62** <code>#include &quot;cutlass/layout/vector.h&quot;</code>
+  - EN: Includes `cutlass/layout/vector.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/vector.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>#include &quot;cutlass/util/reference/device/tensor_foreach.h&quot;</code>
+  - EN: Includes `cutlass/util/reference/device/tensor_foreach.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/reference/device/tensor_foreach.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L65** <code>#include &quot;cutlass/util/distribution.h&quot;</code>
+  - EN: Includes `cutlass/util/distribution.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/distribution.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L66** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L67** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L68** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L69** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L70** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L71** <code>namespace device {</code>
+  - EN: Opens namespace `device` to group related symbols.
+  - CN: 打开命名空间 `device`，用于归组相关符号。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L74** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L77** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L78** <code>template &lt;typename FloatType&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L79** <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L80** <code>FloatType random_normal_float(curandState_t *state) {</code>
+  - EN: Begins the definition of function or method `random_normal_float`.
+  - CN: 开始定义函数或方法 `random_normal_float`。
+- **L81** <code>  return curand_normal(state);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L82** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L83** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L84** <code>template &lt;&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L85** <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L86** <code>double random_normal_float&lt;double&gt;(curandState_t *state) {</code>
+  - EN: Begins the definition of function or method `random_normal_float<double>`.
+  - CN: 开始定义函数或方法 `random_normal_float<double>`。
+- **L87** <code>  return curand_normal_double(state);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L88** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>template &lt;typename FloatType&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L91** <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L92** <code>FloatType random_uniform_float(curandState_t *state) {</code>
+  - EN: Begins the definition of function or method `random_uniform_float`.
+  - CN: 开始定义函数或方法 `random_uniform_float`。
+- **L93** <code>  return curand_uniform(state);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L94** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L95** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L96** <code>template &lt;&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L97** <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L98** <code>double random_uniform_float&lt;double&gt;(curandState_t *state) {</code>
+  - EN: Begins the definition of function or method `random_uniform_float<double>`.
+  - CN: 开始定义函数或方法 `random_uniform_float<double>`。
+- **L99** <code>  return curand_uniform_double(state);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L100** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L101** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L102** <code>template &lt;typename Element&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L103** <code>struct RandomGaussianFunc {</code>
+  - EN: Begins the declaration of struct `RandomGaussianFunc`.
+  - CN: 开始声明 struct `RandomGaussianFunc`。
+- **L104** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L105** <code>  using FloatType = typename std::conditional&lt;(sizeof(Element) &gt; 4), double, float&gt;::type;</code>
+  - EN: Introduces the type or namespace alias `FloatType`.
+  - CN: 引入类型或命名空间别名 `FloatType`。
+- **L106** <code>  using IntType = typename std::conditional&lt;(sizeof(Element) &gt; 4), int64_t, int&gt;::type;</code>
+  - EN: Introduces the type or namespace alias `IntType`.
+  - CN: 引入类型或命名空间别名 `IntType`。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L109** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L112** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L113** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>    uint64_t seed;</code>
+  - EN: Declares the symbol `seed` in the current scope.
+  - CN: 在当前作用域中声明符号 `seed`。
+- **L116** <code>    FloatType mean;</code>
+  - EN: Declares the symbol `mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `mean`。
+- **L117** <code>    FloatType stddev;</code>
+  - EN: Declares the symbol `stddev` in the current scope.
+  - CN: 在当前作用域中声明符号 `stddev`。
+- **L118** <code>    int int_scale;</code>
+  - EN: Declares the symbol `int_scale` in the current scope.
+  - CN: 在当前作用域中声明符号 `int_scale`。
+- **L119** <code>    FloatType float_scale_up;</code>
+  - EN: Declares the symbol `float_scale_up` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_up`。
+- **L120** <code>    FloatType float_scale_down;</code>
+  - EN: Declares the symbol `float_scale_down` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_down`。
+- **L121** <code>    int exclude_zero;           ///&lt; If non-negative, excludes zeros</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L122** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L123** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L124** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L125** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L126** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L127** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L128** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L129** <code>      uint64_t seed_ = 0,</code>
+  - EN: Assigns or initializes `seed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `seed_` 进行赋值或初始化。
+- **L130** <code>      Element mean_ = 0, </code>
+  - EN: Assigns or initializes `mean_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `mean_` 进行赋值或初始化。
+- **L131** <code>      Element stddev_ = 1,</code>
+  - EN: Assigns or initializes `stddev_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stddev_` 进行赋值或初始化。
+- **L132** <code>      int int_scale_ = -1,</code>
+  - EN: Assigns or initializes `int_scale_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale_` 进行赋值或初始化。
+- **L133** <code>      int exclude_zero_ = -1</code>
+  - EN: Assigns or initializes `exclude_zero_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero_` 进行赋值或初始化。
+- **L134** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L135** <code>      seed(seed_), </code>
+  - EN: Begins or continues the signature/call syntax involving `seed`.
+  - CN: 开始或继续与 `seed` 相关的签名/调用语法。
+- **L136** <code>      mean(static_cast&lt;FloatType&gt;(mean_)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L137** <code>      stddev(static_cast&lt;FloatType&gt;(stddev_)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L138** <code>      int_scale(int_scale_),</code>
+  - EN: Begins or continues the signature/call syntax involving `int_scale`.
+  - CN: 开始或继续与 `int_scale` 相关的签名/调用语法。
+- **L139** <code>      exclude_zero(exclude_zero_) {</code>
+  - EN: Begins the definition of function or method `exclude_zero`.
+  - CN: 开始定义函数或方法 `exclude_zero`。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>      float_scale_up = FloatType(IntType(1) &lt;&lt; int_scale); // scale up to clamp low order bits</code>
+  - EN: Begins or continues the signature/call syntax involving `IntType`.
+  - CN: 开始或继续与 `IntType` 相关的签名/调用语法。
+- **L142** <code>      float_scale_down = FloatType(1) / FloatType(IntType(1) &lt;&lt; int_scale);</code>
+  - EN: Declares function or method `IntType` without defining it here.
+  - CN: 声明函数或方法 `IntType`，但不在此处给出定义。
+- **L143** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L144** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L147** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L148** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L149** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L150** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L151** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L152** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L153** <code>  /// RNG state object</code>
+  - EN: Comment that documents intent or context: "RNG state object".
+  - CN: 用于说明意图或上下文的注释："RNG state object"。
+- **L154** <code>  curandState_t rng_state;</code>
+  - EN: Declares the symbol `rng_state` in the current scope.
+  - CN: 在当前作用域中声明符号 `rng_state`。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L157** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L158** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L161** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>  RandomGaussianFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L163** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L164** <code>    uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>    curand_init(params.seed, gtid, 0, &amp;rng_state);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L167** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L168** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L169** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L170** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L171** <code>  Element operator()() {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L172** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L173** <code>    FloatType rnd = random_normal_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_normal_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_normal_float<FloatType>`，但不在此处给出定义。
+- **L174** <code>    rnd = params.mean + params.stddev * rnd;</code>
+  - EN: Assigns or initializes `rnd` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd` 进行赋值或初始化。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>    Element result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L177** <code>    if (params.int_scale &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L178** <code>      rnd = FloatType(std::llround(rnd * params.float_scale_up));</code>
+  - EN: Declares function or method `llround` without defining it here.
+  - CN: 声明函数或方法 `llround`，但不在此处给出定义。
+- **L179** <code>      result = Element(rnd * params.float_scale_down);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L180** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L181** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L182** <code>      result = Element(rnd);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L183** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>    if (params.exclude_zero &gt;=0 &amp;&amp; result == Element(0.0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L186** <code>      if (rnd &gt; FloatType(0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L187** <code>        rnd += FloatType(1);</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L188** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L189** <code>        rnd -= FloatType(1);</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L190** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L191** <code>      result = Element(rnd);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L192** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L195** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L196** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L197** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L198** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L199** <code>template &lt;typename Real&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L200** <code>struct RandomGaussianFunc&lt;complex&lt;Real&gt;&gt; {</code>
+  - EN: Begins the declaration of struct `RandomGaussianFunc`.
+  - CN: 开始声明 struct `RandomGaussianFunc`。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>  using Element = complex&lt;Real&gt;;</code>
+  - EN: Introduces the type or namespace alias `Element`.
+  - CN: 引入类型或命名空间别名 `Element`。
+- **L203** <code>  using FloatType = typename std::conditional&lt;(sizeof(Real) &gt; 4), double, float&gt;::type;</code>
+  - EN: Introduces the type or namespace alias `FloatType`.
+  - CN: 引入类型或命名空间别名 `FloatType`。
+- **L204** <code>  using IntType = typename std::conditional&lt;(sizeof(Real) &gt; 4), int64_t, int&gt;::type;</code>
+  - EN: Introduces the type or namespace alias `IntType`.
+  - CN: 引入类型或命名空间别名 `IntType`。
+- **L205** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L206** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L207** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L208** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L209** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L210** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L211** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L212** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L213** <code>    uint64_t seed;</code>
+  - EN: Declares the symbol `seed` in the current scope.
+  - CN: 在当前作用域中声明符号 `seed`。
+- **L214** <code>    FloatType mean;</code>
+  - EN: Declares the symbol `mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `mean`。
+- **L215** <code>    FloatType stddev;</code>
+  - EN: Declares the symbol `stddev` in the current scope.
+  - CN: 在当前作用域中声明符号 `stddev`。
+- **L216** <code>    int int_scale;</code>
+  - EN: Declares the symbol `int_scale` in the current scope.
+  - CN: 在当前作用域中声明符号 `int_scale`。
+- **L217** <code>    FloatType float_scale_up;</code>
+  - EN: Declares the symbol `float_scale_up` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_up`。
+- **L218** <code>    FloatType float_scale_down;</code>
+  - EN: Declares the symbol `float_scale_down` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_down`。
+- **L219** <code>    int exclude_zero;           ///&lt; If non-negative, excludes zeros</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L222** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L223** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L224** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L225** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L226** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L227** <code>      uint64_t seed_ = 0,</code>
+  - EN: Assigns or initializes `seed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `seed_` 进行赋值或初始化。
+- **L228** <code>      Real mean_ = 0, </code>
+  - EN: Assigns or initializes `mean_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `mean_` 进行赋值或初始化。
+- **L229** <code>      Real stddev_ = 1,</code>
+  - EN: Assigns or initializes `stddev_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stddev_` 进行赋值或初始化。
+- **L230** <code>      int int_scale_ = -1,</code>
+  - EN: Assigns or initializes `int_scale_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale_` 进行赋值或初始化。
+- **L231** <code>      int exclude_zero_ = -1</code>
+  - EN: Assigns or initializes `exclude_zero_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero_` 进行赋值或初始化。
+- **L232** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L233** <code>      seed(seed_), </code>
+  - EN: Begins or continues the signature/call syntax involving `seed`.
+  - CN: 开始或继续与 `seed` 相关的签名/调用语法。
+- **L234** <code>      mean(static_cast&lt;FloatType&gt;(mean_)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L235** <code>      stddev(static_cast&lt;FloatType&gt;(stddev_)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L236** <code>      int_scale(int_scale_),</code>
+  - EN: Begins or continues the signature/call syntax involving `int_scale`.
+  - CN: 开始或继续与 `int_scale` 相关的签名/调用语法。
+- **L237** <code>      exclude_zero(exclude_zero_) {</code>
+  - EN: Begins the definition of function or method `exclude_zero`.
+  - CN: 开始定义函数或方法 `exclude_zero`。
+- **L238** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L239** <code>      float_scale_up = FloatType(IntType(1) &lt;&lt; int_scale);</code>
+  - EN: Declares function or method `IntType` without defining it here.
+  - CN: 声明函数或方法 `IntType`，但不在此处给出定义。
+- **L240** <code>      float_scale_down = FloatType(1) / FloatType(IntType(1) &lt;&lt; int_scale);</code>
+  - EN: Declares function or method `IntType` without defining it here.
+  - CN: 声明函数或方法 `IntType`，但不在此处给出定义。
+- **L241** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L242** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L245** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L246** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L247** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L248** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L249** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L250** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L251** <code>  /// RNG state object</code>
+  - EN: Comment that documents intent or context: "RNG state object".
+  - CN: 用于说明意图或上下文的注释："RNG state object"。
+- **L252** <code>  curandState_t rng_state;</code>
+  - EN: Declares the symbol `rng_state` in the current scope.
+  - CN: 在当前作用域中声明符号 `rng_state`。
+- **L253** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L254** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L255** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L256** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L257** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L258** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L259** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L260** <code>  RandomGaussianFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L261** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L262** <code>    uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>    curand_init(params.seed, gtid, 0, &amp;rng_state);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L265** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L266** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L267** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L268** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L269** <code>  Element operator()() {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>    FloatType rnd_r = random_normal_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_normal_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_normal_float<FloatType>`，但不在此处给出定义。
+- **L272** <code>    FloatType rnd_i = random_normal_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_normal_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_normal_float<FloatType>`，但不在此处给出定义。
+- **L273** <code>    rnd_r = params.mean + params.stddev * rnd_r;</code>
+  - EN: Assigns or initializes `rnd_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd_r` 进行赋值或初始化。
+- **L274** <code>    rnd_i = params.mean + params.stddev * rnd_i;</code>
+  - EN: Assigns or initializes `rnd_i` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd_i` 进行赋值或初始化。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>    Element result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L277** <code>    if (params.int_scale &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L278** <code>      rnd_r = FloatType(std::llround(rnd_r * params.float_scale_up));</code>
+  - EN: Declares function or method `llround` without defining it here.
+  - CN: 声明函数或方法 `llround`，但不在此处给出定义。
+- **L279** <code>      rnd_i = FloatType(std::llround(rnd_i * params.float_scale_up));</code>
+  - EN: Declares function or method `llround` without defining it here.
+  - CN: 声明函数或方法 `llround`，但不在此处给出定义。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>      result = {</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L282** <code>        Real(rnd_r * params.float_scale_down),</code>
+  - EN: Begins or continues the signature/call syntax involving `Real`.
+  - CN: 开始或继续与 `Real` 相关的签名/调用语法。
+- **L283** <code>        Real(rnd_i * params.float_scale_down)</code>
+  - EN: Begins or continues the signature/call syntax involving `Real`.
+  - CN: 开始或继续与 `Real` 相关的签名/调用语法。
+- **L284** <code>      };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L285** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L286** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L287** <code>      result = Element(Real(rnd_r), Real(rnd_i));</code>
+  - EN: Declares function or method `Real` without defining it here.
+  - CN: 声明函数或方法 `Real`，但不在此处给出定义。
+- **L288** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>    if (params.exclude_zero &gt;= 0 &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L291** <code>        result.real() == Real(0.0) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `Real`.
+  - CN: 开始或继续与 `Real` 相关的签名/调用语法。
+- **L292** <code>        result.imag() == Real(0.0)) {</code>
+  - EN: Begins the definition of function or method `Real`.
+  - CN: 开始定义函数或方法 `Real`。
+- **L293** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L294** <code>      if (rnd_r &gt; FloatType(0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L295** <code>        rnd_r += FloatType(1);</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L296** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L297** <code>        rnd_r -= FloatType(1);</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L298** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L299** <code>      result = Element(Real(rnd_r), Real(rnd_i));</code>
+  - EN: Declares function or method `Real` without defining it here.
+  - CN: 声明函数或方法 `Real`，但不在此处给出定义。
+- **L300** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L301** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L302** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L303** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L304** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L305** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L306** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L307** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L308** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L309** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L310** <code>struct TensorFillRandomGaussianFunc {</code>
+  - EN: Begins the declaration of struct `TensorFillRandomGaussianFunc`.
+  - CN: 开始声明 struct `TensorFillRandomGaussianFunc`。
+- **L311** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L312** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L313** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L314** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L315** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L316** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L317** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L318** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L319** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L320** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L321** <code>  using RandomFunc = RandomGaussianFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L324** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L327** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L328** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L329** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L330** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L331** <code>    typename RandomFunc::Params random;</code>
+  - EN: Declares the symbol `random` in the current scope.
+  - CN: 在当前作用域中声明符号 `random`。
+- **L332** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L333** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L334** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L335** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L336** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L337** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L338** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L339** <code>      TensorView view_ = TensorView(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorView`.
+  - CN: 开始或继续与 `TensorView` 相关的签名/调用语法。
+- **L340** <code>      typename RandomFunc::Params random_ = typename RandomFunc::Params()</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L341** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L342** <code>      view(view_), random(random_) {</code>
+  - EN: Begins the definition of function or method `random`.
+  - CN: 开始定义函数或方法 `random`。
+- **L343** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L344** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L345** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L346** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L347** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L348** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L349** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L350** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L351** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L352** <code>  RandomFunc random;</code>
+  - EN: Declares the symbol `random` in the current scope.
+  - CN: 在当前作用域中声明符号 `random`。
+- **L353** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L354** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L355** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L356** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L357** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L358** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L359** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L360** <code>  TensorFillRandomGaussianFunc(Params const &amp;params): params(params), random(params.random) {</code>
+  - EN: Begins the definition of function or method `random`.
+  - CN: 开始定义函数或方法 `random`。
+- **L361** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L362** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L365** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L366** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L367** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L368** <code>    params.view.at(coord) = random();</code>
+  - EN: Declares function or method `random` without defining it here.
+  - CN: 声明函数或方法 `random`，但不在此处给出定义。
+- **L369** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L370** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L371** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L372** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L373** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L374** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L375** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L376** <code>/// Fills a tensor with random values with a Gaussian distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values with a Gaussian distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values with a Gaussian distribution."。
+- **L377** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L378** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L379** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L380** <code>void TensorFillRandomGaussian(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillRandomGaussian`.
+  - CN: 开始或继续与 `TensorFillRandomGaussian` 相关的签名/调用语法。
+- **L381** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L382** <code>  uint64_t seed,                          ///&lt; seed for RNG</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L383** <code>  typename RealType&lt;Element&gt;::Type mean = Element(0),   ///&lt; Gaussian distribution&#x27;s mean</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L384** <code>  typename RealType&lt;Element&gt;::Type stddev = Element(1), ///&lt; Gaussian distribution&#x27;s standard deviation</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L385** <code>  int bits = -1,                          ///&lt; If non-negative, specifies number of fractional bits that</code>
+  - EN: Assigns or initializes `bits` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bits` 进行赋值或初始化。
+- **L386** <code>                                          ///  are not truncated to zero. Permits reducing precision of</code>
+  - EN: Comment that documents intent or context: "are not truncated to zero. Permits reducing precision of".
+  - CN: 用于说明意图或上下文的注释："are not truncated to zero. Permits reducing precision of"。
+- **L387** <code>                                          ///  data.</code>
+  - EN: Comment that documents intent or context: "data.".
+  - CN: 用于说明意图或上下文的注释："data."。
+- **L388** <code>  int exclude_zero = -1,                  ///&lt; If non-negative, excludes zeros from tensor init</code>
+  - EN: Assigns or initializes `exclude_zero` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero` 进行赋值或初始化。
+- **L389** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L390** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L391** <code>  using RandomFunc = detail::RandomGaussianFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L392** <code>  using Func = detail::TensorFillRandomGaussianFunc&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `Func`.
+  - CN: 引入类型或命名空间别名 `Func`。
+- **L393** <code>  using Params = typename Func::Params;</code>
+  - EN: Introduces the type or namespace alias `Params`.
+  - CN: 引入类型或命名空间别名 `Params`。
+- **L394** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L395** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L396** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L397** <code>    Params(view, typename RandomFunc::Params(seed, mean, stddev, bits, exclude_zero)),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L398** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L399** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L400** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L401** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L402** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L403** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L404** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L405** <code>/// Fills a tensor with random values with a Gaussian distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values with a Gaussian distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values with a Gaussian distribution."。
+- **L406** <code>template &lt;typename Element&gt;               ///&lt; Element type</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L407** <code>void BlockFillRandomGaussian(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillRandomGaussian`.
+  - CN: 开始或继续与 `BlockFillRandomGaussian` 相关的签名/调用语法。
+- **L408** <code>  Element *ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L409** <code>  size_t capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L410** <code>  uint64_t seed,                              ///&lt; seed for RNG</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L411** <code>  typename RealType&lt;Element&gt;::Type mean,      ///&lt; Gaussian distribution&#x27;s mean</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L412** <code>  typename RealType&lt;Element&gt;::Type stddev,    ///&lt; Gaussian distribution&#x27;s standard deviation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L413** <code>  int bits = -1,                              ///&lt; If non-negative, specifies number of fractional bits that</code>
+  - EN: Assigns or initializes `bits` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bits` 进行赋值或初始化。
+- **L414** <code>                                              ///  are not truncated to zero. Permits reducing precision of</code>
+  - EN: Comment that documents intent or context: "are not truncated to zero. Permits reducing precision of".
+  - CN: 用于说明意图或上下文的注释："are not truncated to zero. Permits reducing precision of"。
+- **L415** <code>                                              ///  data.</code>
+  - EN: Comment that documents intent or context: "data.".
+  - CN: 用于说明意图或上下文的注释："data."。
+- **L416** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L417** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L418** <code>  using RandomFunc = detail::RandomGaussianFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L419** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L420** <code>  typename RandomFunc::Params params(seed, mean, stddev, bits);</code>
+  - EN: Constructs object `params` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `params`。
+- **L421** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L422** <code>  BlockForEach&lt;Element, RandomFunc&gt;(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);</code>
+  - EN: Comment that documents intent or context: "BlockForEach<Element, RandomFunc>(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);".
+  - CN: 用于说明意图或上下文的注释："BlockForEach<Element, RandomFunc>(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);"。
+- **L423** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L424** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L425** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L426** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L427** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L428** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L429** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L430** <code>/// Computes a random uniform distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random uniform distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random uniform distribution"。
+- **L431** <code>template &lt;typename Element&gt;                ///&lt; Element type </code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L432** <code>struct RandomUniformFunc {</code>
+  - EN: Begins the declaration of struct `RandomUniformFunc`.
+  - CN: 开始声明 struct `RandomUniformFunc`。
+- **L433** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L434** <code>  using FloatType = typename std::conditional&lt;</code>
+  - EN: Introduces the type or namespace alias `FloatType`.
+  - CN: 引入类型或命名空间别名 `FloatType`。
+- **L435** <code>    (sizeof(Element) &gt; 4),</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L436** <code>    double,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L437** <code>    float&gt;::type;</code>
+  - EN: Declares the symbol `type` in the current scope.
+  - CN: 在当前作用域中声明符号 `type`。
+- **L438** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L439** <code>  using IntType = typename std::conditional&lt;</code>
+  - EN: Introduces the type or namespace alias `IntType`.
+  - CN: 引入类型或命名空间别名 `IntType`。
+- **L440** <code>    (sizeof(Element) &gt; 4),</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L441** <code>    int64_t,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L442** <code>    int&gt;::type;</code>
+  - EN: Declares the symbol `type` in the current scope.
+  - CN: 在当前作用域中声明符号 `type`。
+- **L443** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L444** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L445** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L446** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L447** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L448** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L449** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L450** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L451** <code>    uint64_t seed;</code>
+  - EN: Declares the symbol `seed` in the current scope.
+  - CN: 在当前作用域中声明符号 `seed`。
+- **L452** <code>    FloatType range;</code>
+  - EN: Declares the symbol `range` in the current scope.
+  - CN: 在当前作用域中声明符号 `range`。
+- **L453** <code>    FloatType max;</code>
+  - EN: Declares the symbol `max` in the current scope.
+  - CN: 在当前作用域中声明符号 `max`。
+- **L454** <code>    int int_scale;</code>
+  - EN: Declares the symbol `int_scale` in the current scope.
+  - CN: 在当前作用域中声明符号 `int_scale`。
+- **L455** <code>    double pnan;</code>
+  - EN: Declares the symbol `pnan` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnan`。
+- **L456** <code>    FloatType float_scale_up;</code>
+  - EN: Declares the symbol `float_scale_up` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_up`。
+- **L457** <code>    FloatType float_scale_down;</code>
+  - EN: Declares the symbol `float_scale_down` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_down`。
+- **L458** <code>    int exclude_zero;           ///&lt; If non-negative, excludes zeros</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L459** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L460** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L461** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L462** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L463** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L464** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L465** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L466** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L467** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L468** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L469** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L470** <code>      uint64_t seed_ = 0, </code>
+  - EN: Assigns or initializes `seed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `seed_` 进行赋值或初始化。
+- **L471** <code>      Element max_ = 1,</code>
+  - EN: Assigns or initializes `max_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max_` 进行赋值或初始化。
+- **L472** <code>      Element min = 0,</code>
+  - EN: Assigns or initializes `min` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `min` 进行赋值或初始化。
+- **L473** <code>      int int_scale_ = -1,</code>
+  - EN: Assigns or initializes `int_scale_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale_` 进行赋值或初始化。
+- **L474** <code>      double pnan_ = 0,</code>
+  - EN: Assigns or initializes `pnan_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnan_` 进行赋值或初始化。
+- **L475** <code>      int exclude_zero_ = -1</code>
+  - EN: Assigns or initializes `exclude_zero_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero_` 进行赋值或初始化。
+- **L476** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L477** <code>      seed(seed_), </code>
+  - EN: Begins or continues the signature/call syntax involving `seed`.
+  - CN: 开始或继续与 `seed` 相关的签名/调用语法。
+- **L478** <code>      range(static_cast&lt;FloatType&gt;(max_) - static_cast&lt;FloatType&gt;(min)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L479** <code>      max(static_cast&lt;FloatType&gt;(max_)),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L480** <code>      int_scale(int_scale_),</code>
+  - EN: Begins or continues the signature/call syntax involving `int_scale`.
+  - CN: 开始或继续与 `int_scale` 相关的签名/调用语法。
+- **L481** <code>      pnan(pnan_),</code>
+  - EN: Begins or continues the signature/call syntax involving `pnan`.
+  - CN: 开始或继续与 `pnan` 相关的签名/调用语法。
+- **L482** <code>      exclude_zero(exclude_zero_) {</code>
+  - EN: Begins the definition of function or method `exclude_zero`.
+  - CN: 开始定义函数或方法 `exclude_zero`。
+- **L483** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L484** <code>      float_scale_up = FloatType(IntType(1) &lt;&lt; int_scale); // scale up to clamp low order bits</code>
+  - EN: Begins or continues the signature/call syntax involving `IntType`.
+  - CN: 开始或继续与 `IntType` 相关的签名/调用语法。
+- **L485** <code>      float_scale_down = FloatType(1) / FloatType(IntType(1) &lt;&lt; int_scale);</code>
+  - EN: Declares function or method `IntType` without defining it here.
+  - CN: 声明函数或方法 `IntType`，但不在此处给出定义。
+- **L486** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L487** <code>      // Handle cases where min = 0 or max = 0 for excluding zeros</code>
+  - EN: Comment that documents intent or context: "Handle cases where min = 0 or max = 0 for excluding zeros".
+  - CN: 用于说明意图或上下文的注释："Handle cases where min = 0 or max = 0 for excluding zeros"。
+- **L488** <code>      if (exclude_zero &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L489** <code>        range = (min == Element(0)) ? range - FloatType(1): range;</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L490** <code>        max = (max_ == Element(0)) ? max - FloatType(1): max; </code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L491** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L492** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L493** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L494** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L495** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L496** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L497** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L498** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L499** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L500** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L501** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L502** <code>  /// RNG state object</code>
+  - EN: Comment that documents intent or context: "RNG state object".
+  - CN: 用于说明意图或上下文的注释："RNG state object"。
+- **L503** <code>  curandState_t rng_state;</code>
+  - EN: Declares the symbol `rng_state` in the current scope.
+  - CN: 在当前作用域中声明符号 `rng_state`。
+- **L504** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L505** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L506** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L507** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L508** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L509** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L510** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L511** <code>  RandomUniformFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L512** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L513** <code>    uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L514** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L515** <code>    curand_init(params.seed, gtid, 0, &amp;rng_state);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L516** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L517** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L518** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L519** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L520** <code>  Element operator()() {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L521** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L522** <code>    // Draw random float in [0.0, 1.0] to determine if element should be NaN.</code>
+  - EN: Comment that documents intent or context: "Draw random float in [0.0, 1.0] to determine if element should be NaN.".
+  - CN: 用于说明意图或上下文的注释："Draw random float in [0.0, 1.0] to determine if element should be NaN."。
+- **L523** <code>    if constexpr (std::numeric_limits&lt;Element&gt;::has_quiet_NaN) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L524** <code>      if (params.pnan &gt; 0 &amp;&amp; (curand_uniform(&amp;rng_state) &lt; (params.pnan))) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L525** <code>        return Element(NAN);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L526** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L527** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L528** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L529** <code>    FloatType rnd = random_uniform_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_uniform_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_uniform_float<FloatType>`，但不在此处给出定义。
+- **L530** <code>    rnd = params.max - params.range * rnd;</code>
+  - EN: Assigns or initializes `rnd` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd` 进行赋值或初始化。
+- **L531** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L532** <code>    // Random values are cast to integer after scaling by a power of two to facilitate error</code>
+  - EN: Comment that documents intent or context: "Random values are cast to integer after scaling by a power of two to facilitate error".
+  - CN: 用于说明意图或上下文的注释："Random values are cast to integer after scaling by a power of two to facilitate error"。
+- **L533** <code>    // testing</code>
+  - EN: Comment that documents intent or context: "testing".
+  - CN: 用于说明意图或上下文的注释："testing"。
+- **L534** <code>    Element result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L535** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L536** <code>    if (params.int_scale &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L537** <code>      rnd = FloatType(std::llround(rnd * params.float_scale_up));</code>
+  - EN: Declares function or method `llround` without defining it here.
+  - CN: 声明函数或方法 `llround`，但不在此处给出定义。
+- **L538** <code>      result = Element(rnd * params.float_scale_down);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L539** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L540** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L541** <code>      result = Element(rnd);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L542** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L543** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L544** <code>    if (params.exclude_zero &gt;=0 &amp;&amp; result == Element(0.0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L545** <code>      if (rnd &gt; FloatType(0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L546** <code>        rnd = std::min(params.max, rnd + FloatType(1));</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L547** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L548** <code>        rnd = std::max((params.max - params.range), rnd - FloatType(1));</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L549** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L550** <code>      result = Element(rnd);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L551** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L552** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L553** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L554** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L555** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L556** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L557** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L558** <code>template &lt;typename Real&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L559** <code>struct RandomUniformFunc&lt;complex&lt;Real&gt;&gt; {</code>
+  - EN: Begins the declaration of struct `RandomUniformFunc`.
+  - CN: 开始声明 struct `RandomUniformFunc`。
+- **L560** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L561** <code>  using Element = complex&lt;Real&gt;;</code>
+  - EN: Introduces the type or namespace alias `Element`.
+  - CN: 引入类型或命名空间别名 `Element`。
+- **L562** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L563** <code>  using FloatType = typename std::conditional&lt;</code>
+  - EN: Introduces the type or namespace alias `FloatType`.
+  - CN: 引入类型或命名空间别名 `FloatType`。
+- **L564** <code>    (sizeof(Real) &gt; 4),</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L565** <code>    double,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L566** <code>    float&gt;::type;</code>
+  - EN: Declares the symbol `type` in the current scope.
+  - CN: 在当前作用域中声明符号 `type`。
+- **L567** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L568** <code>  using IntType = typename std::conditional&lt;</code>
+  - EN: Introduces the type or namespace alias `IntType`.
+  - CN: 引入类型或命名空间别名 `IntType`。
+- **L569** <code>    (sizeof(Real) &gt; 4),</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L570** <code>    int64_t,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L571** <code>    int&gt;::type;</code>
+  - EN: Declares the symbol `type` in the current scope.
+  - CN: 在当前作用域中声明符号 `type`。
+- **L572** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L573** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L574** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L575** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L576** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L577** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L578** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L579** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L580** <code>    uint64_t seed;</code>
+  - EN: Declares the symbol `seed` in the current scope.
+  - CN: 在当前作用域中声明符号 `seed`。
+- **L581** <code>    FloatType range;</code>
+  - EN: Declares the symbol `range` in the current scope.
+  - CN: 在当前作用域中声明符号 `range`。
+- **L582** <code>    FloatType min;</code>
+  - EN: Declares the symbol `min` in the current scope.
+  - CN: 在当前作用域中声明符号 `min`。
+- **L583** <code>    int int_scale;</code>
+  - EN: Declares the symbol `int_scale` in the current scope.
+  - CN: 在当前作用域中声明符号 `int_scale`。
+- **L584** <code>    double pnan;</code>
+  - EN: Declares the symbol `pnan` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnan`。
+- **L585** <code>    FloatType float_scale_up;</code>
+  - EN: Declares the symbol `float_scale_up` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_up`。
+- **L586** <code>    FloatType float_scale_down;</code>
+  - EN: Declares the symbol `float_scale_down` in the current scope.
+  - CN: 在当前作用域中声明符号 `float_scale_down`。
+- **L587** <code>    int exclude_zero;           ///&lt; If non-negative, excludes zeros</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L588** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L589** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L590** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L591** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L592** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L593** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L594** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L595** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L596** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L597** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L598** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L599** <code>      uint64_t seed_ = 0, </code>
+  - EN: Assigns or initializes `seed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `seed_` 进行赋值或初始化。
+- **L600** <code>      FloatType max = 1,</code>
+  - EN: Assigns or initializes `max` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max` 进行赋值或初始化。
+- **L601** <code>      FloatType min_ = 0,</code>
+  - EN: Assigns or initializes `min_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `min_` 进行赋值或初始化。
+- **L602** <code>      int int_scale_ = -1,</code>
+  - EN: Assigns or initializes `int_scale_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale_` 进行赋值或初始化。
+- **L603** <code>      double pnan_ = 0,</code>
+  - EN: Assigns or initializes `pnan_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnan_` 进行赋值或初始化。
+- **L604** <code>      int exclude_zero_ = -1</code>
+  - EN: Assigns or initializes `exclude_zero_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero_` 进行赋值或初始化。
+- **L605** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L606** <code>      seed(seed_), </code>
+  - EN: Begins or continues the signature/call syntax involving `seed`.
+  - CN: 开始或继续与 `seed` 相关的签名/调用语法。
+- **L607** <code>      range(static_cast&lt;FloatType&gt;(max - min_)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L608** <code>      min(static_cast&lt;FloatType&gt;(min_)), </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<FloatType>`.
+  - CN: 开始或继续与 `static_cast<FloatType>` 相关的签名/调用语法。
+- **L609** <code>      int_scale(int_scale_),</code>
+  - EN: Begins or continues the signature/call syntax involving `int_scale`.
+  - CN: 开始或继续与 `int_scale` 相关的签名/调用语法。
+- **L610** <code>      pnan(pnan_),</code>
+  - EN: Begins or continues the signature/call syntax involving `pnan`.
+  - CN: 开始或继续与 `pnan` 相关的签名/调用语法。
+- **L611** <code>      exclude_zero(exclude_zero_) {</code>
+  - EN: Begins the definition of function or method `exclude_zero`.
+  - CN: 开始定义函数或方法 `exclude_zero`。
+- **L612** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L613** <code>      float_scale_up = FloatType(IntType(1) &lt;&lt; int_scale);</code>
+  - EN: Declares function or method `IntType` without defining it here.
+  - CN: 声明函数或方法 `IntType`，但不在此处给出定义。
+- **L614** <code>      float_scale_down = FloatType(1) / FloatType(IntType(1) &lt;&lt; int_scale);</code>
+  - EN: Declares function or method `IntType` without defining it here.
+  - CN: 声明函数或方法 `IntType`，但不在此处给出定义。
+- **L615** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L616** <code>      // Handle cases where min = 0 or max = 0 for excluding zeros</code>
+  - EN: Comment that documents intent or context: "Handle cases where min = 0 or max = 0 for excluding zeros".
+  - CN: 用于说明意图或上下文的注释："Handle cases where min = 0 or max = 0 for excluding zeros"。
+- **L617** <code>      if (exclude_zero &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L618** <code>        min = (min == FloatType(0)) ? min + FloatType(1): min;</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L619** <code>        range = (max == FloatType(0)) ? range - FloatType(1): range; </code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L620** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L621** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L622** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L623** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L624** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L625** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L626** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L627** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L628** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L629** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L630** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L631** <code>  /// RNG state object</code>
+  - EN: Comment that documents intent or context: "RNG state object".
+  - CN: 用于说明意图或上下文的注释："RNG state object"。
+- **L632** <code>  curandState_t rng_state;</code>
+  - EN: Declares the symbol `rng_state` in the current scope.
+  - CN: 在当前作用域中声明符号 `rng_state`。
+- **L633** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L634** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L635** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L636** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L637** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L638** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L639** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L640** <code>  RandomUniformFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L641** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L642** <code>    uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L643** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L644** <code>    curand_init(params.seed, gtid, 0, &amp;rng_state);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L645** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L646** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L647** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L648** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L649** <code>  Element operator()() {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L650** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L651** <code>    // Draw random float in [0.0, 1.0] to determine if element should be NaN.</code>
+  - EN: Comment that documents intent or context: "Draw random float in [0.0, 1.0] to determine if element should be NaN.".
+  - CN: 用于说明意图或上下文的注释："Draw random float in [0.0, 1.0] to determine if element should be NaN."。
+- **L652** <code>    if constexpr (std::numeric_limits&lt;Element&gt;::has_quiet_NaN) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L653** <code>      if (params.pnan &gt; 0 &amp;&amp; (curand_uniform(&amp;rng_state) &lt; (params.pnan))) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L654** <code>        return Element(Real(NAN), Real(NAN));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L655** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L656** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L657** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L658** <code>    FloatType rnd_r = random_uniform_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_uniform_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_uniform_float<FloatType>`，但不在此处给出定义。
+- **L659** <code>    FloatType rnd_i = random_uniform_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_uniform_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_uniform_float<FloatType>`，但不在此处给出定义。
+- **L660** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L661** <code>    rnd_r = params.min + params.range * rnd_r;</code>
+  - EN: Assigns or initializes `rnd_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd_r` 进行赋值或初始化。
+- **L662** <code>    rnd_i = params.min + params.range * rnd_i;</code>
+  - EN: Assigns or initializes `rnd_i` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd_i` 进行赋值或初始化。
+- **L663** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L664** <code>    // Random values are cast to integer after scaling by a power of two to facilitate error</code>
+  - EN: Comment that documents intent or context: "Random values are cast to integer after scaling by a power of two to facilitate error".
+  - CN: 用于说明意图或上下文的注释："Random values are cast to integer after scaling by a power of two to facilitate error"。
+- **L665** <code>    // testing</code>
+  - EN: Comment that documents intent or context: "testing".
+  - CN: 用于说明意图或上下文的注释："testing"。
+- **L666** <code>    Element result;</code>
+  - EN: Declares the symbol `result` in the current scope.
+  - CN: 在当前作用域中声明符号 `result`。
+- **L667** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L668** <code>    if (params.int_scale &gt;= 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L669** <code>      rnd_r = FloatType(std::llround(rnd_r * params.float_scale_up));</code>
+  - EN: Declares function or method `llround` without defining it here.
+  - CN: 声明函数或方法 `llround`，但不在此处给出定义。
+- **L670** <code>      rnd_i = FloatType(std::llround(rnd_i * params.float_scale_up));</code>
+  - EN: Declares function or method `llround` without defining it here.
+  - CN: 声明函数或方法 `llround`，但不在此处给出定义。
+- **L671** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L672** <code>      result = {</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L673** <code>        Real(rnd_r * params.float_scale_down),</code>
+  - EN: Begins or continues the signature/call syntax involving `Real`.
+  - CN: 开始或继续与 `Real` 相关的签名/调用语法。
+- **L674** <code>        Real(rnd_i * params.float_scale_down)</code>
+  - EN: Begins or continues the signature/call syntax involving `Real`.
+  - CN: 开始或继续与 `Real` 相关的签名/调用语法。
+- **L675** <code>      };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L676** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L677** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L678** <code>      result = Element(Real(rnd_r), Real(rnd_i));</code>
+  - EN: Declares function or method `Real` without defining it here.
+  - CN: 声明函数或方法 `Real`，但不在此处给出定义。
+- **L679** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L680** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L681** <code>    if (params.exclude_zero &gt;= 0 &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L682** <code>        result.real() == Real(0.0) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `Real`.
+  - CN: 开始或继续与 `Real` 相关的签名/调用语法。
+- **L683** <code>        result.imag() == Real(0.0)) {</code>
+  - EN: Begins the definition of function or method `Real`.
+  - CN: 开始定义函数或方法 `Real`。
+- **L684** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L685** <code>      if (rnd_r &gt; FloatType(0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L686** <code>        rnd_r = std::min(params.min + params.range, rnd_r + FloatType(1));</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L687** <code>      } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L688** <code>        rnd_r = std::max((params.min), rnd_r - FloatType(1));</code>
+  - EN: Declares function or method `FloatType` without defining it here.
+  - CN: 声明函数或方法 `FloatType`，但不在此处给出定义。
+- **L689** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L690** <code>      result = Element(Real(rnd_r), Real(rnd_i));</code>
+  - EN: Declares function or method `Real` without defining it here.
+  - CN: 声明函数或方法 `Real`，但不在此处给出定义。
+- **L691** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L692** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L693** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L694** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L695** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L696** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L697** <code>/// Computes a random uniform distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random uniform distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random uniform distribution"。
+- **L698** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L699** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L700** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L701** <code>struct TensorFillRandomUniformFunc {</code>
+  - EN: Begins the declaration of struct `TensorFillRandomUniformFunc`.
+  - CN: 开始声明 struct `TensorFillRandomUniformFunc`。
+- **L702** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L703** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L704** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L705** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L706** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L707** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L708** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L709** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L710** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L711** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L712** <code>  using RandomFunc = RandomUniformFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L713** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L714** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L715** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L716** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L717** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L718** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L719** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L720** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L721** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L722** <code>    typename RandomFunc::Params random;</code>
+  - EN: Declares the symbol `random` in the current scope.
+  - CN: 在当前作用域中声明符号 `random`。
+- **L723** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L724** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L725** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L726** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L727** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L728** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L729** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L730** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L731** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L732** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L733** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L734** <code>      TensorView view_ = TensorView(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorView`.
+  - CN: 开始或继续与 `TensorView` 相关的签名/调用语法。
+- **L735** <code>      typename RandomFunc::Params random_ = RandomFunc::Params()</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L736** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L737** <code>      view(view_), random(random_) {</code>
+  - EN: Begins the definition of function or method `random`.
+  - CN: 开始定义函数或方法 `random`。
+- **L738** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L739** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L740** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L741** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L742** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L743** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L744** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L745** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L746** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L747** <code>  RandomFunc random;</code>
+  - EN: Declares the symbol `random` in the current scope.
+  - CN: 在当前作用域中声明符号 `random`。
+- **L748** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L749** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L750** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L751** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L752** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L753** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L754** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L755** <code>  TensorFillRandomUniformFunc(Params const &amp;params): params(params), random(params.random) {</code>
+  - EN: Begins the definition of function or method `random`.
+  - CN: 开始定义函数或方法 `random`。
+- **L756** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L757** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L758** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L759** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L760** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L761** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L762** <code>    params.view.at(coord) = random();</code>
+  - EN: Declares function or method `random` without defining it here.
+  - CN: 声明函数或方法 `random`，但不在此处给出定义。
+- **L763** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L764** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L765** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L766** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L767** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L768** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L769** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L770** <code>/// Fills a tensor with random values with a uniform random distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values with a uniform random distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values with a uniform random distribution."。
+- **L771** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L772** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L773** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L774** <code>void TensorFillRandomUniform(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillRandomUniform`.
+  - CN: 开始或继续与 `TensorFillRandomUniform` 相关的签名/调用语法。
+- **L775** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L776** <code>  uint64_t seed,                          ///&lt; seed for RNG</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L777** <code>  typename RealType&lt;Element&gt;::Type max = Element(1), ///&lt; upper bound of distribution</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L778** <code>  typename RealType&lt;Element&gt;::Type min = Element(0), ///&lt; lower bound for distribution</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L779** <code>  int bits = -1,                          ///&lt; If non-negative, specifies number of fractional bits that</code>
+  - EN: Assigns or initializes `bits` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bits` 进行赋值或初始化。
+- **L780** <code>                                          ///  are not truncated to zero. Permits reducing precision of</code>
+  - EN: Comment that documents intent or context: "are not truncated to zero. Permits reducing precision of".
+  - CN: 用于说明意图或上下文的注释："are not truncated to zero. Permits reducing precision of"。
+- **L781** <code>                                          ///  data.</code>
+  - EN: Comment that documents intent or context: "data.".
+  - CN: 用于说明意图或上下文的注释："data."。
+- **L782** <code>  double pnan = 0,                        ///&lt; Percentage of NaN elements.</code>
+  - EN: Assigns or initializes `pnan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnan` 进行赋值或初始化。
+- **L783** <code>  int exclude_zero = -1,               ///&lt; If non-negative, excludes zeros from tensor init</code>
+  - EN: Assigns or initializes `exclude_zero` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero` 进行赋值或初始化。
+- **L784** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L785** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L786** <code>  using RandomFunc = detail::RandomUniformFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L787** <code>  using Func = detail::TensorFillRandomUniformFunc&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `Func`.
+  - CN: 引入类型或命名空间别名 `Func`。
+- **L788** <code>  using Params = typename Func::Params;</code>
+  - EN: Introduces the type or namespace alias `Params`.
+  - CN: 引入类型或命名空间别名 `Params`。
+- **L789** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L790** <code>  typename RandomFunc::Params random(seed, max, min, bits, pnan, exclude_zero);</code>
+  - EN: Constructs object `random` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `random`。
+- **L791** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L792** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L793** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L794** <code>    Params(view, random),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L795** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L796** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L797** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L798** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L799** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L800** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L801** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L802** <code>/// Fills a tensor with random values with a uniform random distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values with a uniform random distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values with a uniform random distribution."。
+- **L803** <code>template &lt;typename Element&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L804** <code>void BlockFillRandomUniform(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillRandomUniform`.
+  - CN: 开始或继续与 `BlockFillRandomUniform` 相关的签名/调用语法。
+- **L805** <code>  Element *ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L806** <code>  size_t capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L807** <code>  uint64_t seed,                          ///&lt; seed for RNG</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L808** <code>  typename RealType&lt;Element&gt;::Type max,   ///&lt; upper bound of distribution</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L809** <code>  typename RealType&lt;Element&gt;::Type min,   ///&lt; lower bound for distribution</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L810** <code>  int bits = -1,                          ///&lt; If non-negative, specifies number of fractional bits that</code>
+  - EN: Assigns or initializes `bits` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bits` 进行赋值或初始化。
+- **L811** <code>                                          ///  are not truncated to zero. Permits reducing precision of</code>
+  - EN: Comment that documents intent or context: "are not truncated to zero. Permits reducing precision of".
+  - CN: 用于说明意图或上下文的注释："are not truncated to zero. Permits reducing precision of"。
+- **L812** <code>                                          ///  data.</code>
+  - EN: Comment that documents intent or context: "data.".
+  - CN: 用于说明意图或上下文的注释："data."。
+- **L813** <code>  double pnan = 0,                        ///&lt; Percentage of NaN elements.</code>
+  - EN: Assigns or initializes `pnan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnan` 进行赋值或初始化。
+- **L814** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L815** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L816** <code>  using RandomFunc = detail::RandomUniformFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L817** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L818** <code>  typename RandomFunc::Params params(seed, max, min, bits, pnan);</code>
+  - EN: Constructs object `params` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `params`。
+- **L819** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L820** <code>  BlockForEach&lt;Element, RandomFunc&gt;(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);</code>
+  - EN: Comment that documents intent or context: "BlockForEach<Element, RandomFunc>(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);".
+  - CN: 用于说明意图或上下文的注释："BlockForEach<Element, RandomFunc>(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);"。
+- **L821** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L822** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L823** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L824** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L825** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L826** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L827** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L828** <code>/// Computes a random sparse meta </code>
+  - EN: Comment that documents intent or context: "Computes a random sparse meta".
+  - CN: 用于说明意图或上下文的注释："Computes a random sparse meta"。
+- **L829** <code>template &lt;typename Element&gt;               ///&lt; Element type</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L830** <code>struct RandomSparseMetaFunc {</code>
+  - EN: Begins the declaration of struct `RandomSparseMetaFunc`.
+  - CN: 开始声明 struct `RandomSparseMetaFunc`。
+- **L831** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L832** <code>  using FloatType = float;</code>
+  - EN: Introduces the type or namespace alias `FloatType`.
+  - CN: 引入类型或命名空间别名 `FloatType`。
+- **L833** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L834** <code>  using IntType = int32_t;</code>
+  - EN: Introduces the type or namespace alias `IntType`.
+  - CN: 引入类型或命名空间别名 `IntType`。
+- **L835** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L836** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L837** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L838** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L839** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L840** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L841** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L842** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L843** <code>    uint64_t seed;</code>
+  - EN: Declares the symbol `seed` in the current scope.
+  - CN: 在当前作用域中声明符号 `seed`。
+- **L844** <code>    FloatType range;</code>
+  - EN: Declares the symbol `range` in the current scope.
+  - CN: 在当前作用域中声明符号 `range`。
+- **L845** <code>    int MetaSizeInBits;</code>
+  - EN: Declares the symbol `MetaSizeInBits` in the current scope.
+  - CN: 在当前作用域中声明符号 `MetaSizeInBits`。
+- **L846** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L847** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L848** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L849** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L850** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L851** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L852** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L853** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L854** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L855** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L856** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L857** <code>      uint64_t seed_ = 0, </code>
+  - EN: Assigns or initializes `seed_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `seed_` 进行赋值或初始化。
+- **L858** <code>      int MetaSizeInBits_ = 2 </code>
+  - EN: Assigns or initializes `MetaSizeInBits_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `MetaSizeInBits_` 进行赋值或初始化。
+- **L859** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L860** <code>      seed(seed_), </code>
+  - EN: Begins or continues the signature/call syntax involving `seed`.
+  - CN: 开始或继续与 `seed` 相关的签名/调用语法。
+- **L861** <code>      MetaSizeInBits(MetaSizeInBits_) {</code>
+  - EN: Begins the definition of function or method `MetaSizeInBits`.
+  - CN: 开始定义函数或方法 `MetaSizeInBits`。
+- **L862** <code>      if (MetaSizeInBits_ == 2) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L863** <code>        range = 6;</code>
+  - EN: Assigns or initializes `range` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `range` 进行赋值或初始化。
+- **L864** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L865** <code>      else if (MetaSizeInBits_ == 4) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L866** <code>        range = 2;</code>
+  - EN: Assigns or initializes `range` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `range` 进行赋值或初始化。
+- **L867** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L868** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L869** <code>        throw std::invalid_argument(&quot;Invalid MetaSizeInBits&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L870** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L871** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L872** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L873** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L874** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L875** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L876** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L877** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L878** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L879** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L880** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L881** <code>  /// RNG state object</code>
+  - EN: Comment that documents intent or context: "RNG state object".
+  - CN: 用于说明意图或上下文的注释："RNG state object"。
+- **L882** <code>  curandState_t rng_state;</code>
+  - EN: Declares the symbol `rng_state` in the current scope.
+  - CN: 在当前作用域中声明符号 `rng_state`。
+- **L883** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L884** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L885** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L886** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L887** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L888** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L889** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L890** <code>  RandomSparseMetaFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L891** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L892** <code>    uint64_t gtid = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `gtid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gtid` 进行赋值或初始化。
+- **L893** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L894** <code>    curand_init(params.seed, gtid, 0, &amp;rng_state);</code>
+  - EN: Declares function or method `curand_init` without defining it here.
+  - CN: 声明函数或方法 `curand_init`，但不在此处给出定义。
+- **L895** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L896** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L897** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L898** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L899** <code>  Element operator()() {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L900** <code>    Element FourToTwoMeta[6] = {0x4, 0x8, 0x9, 0xc, 0xd, 0xe};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L901** <code>    Element TwoToOneMeta[2] = {0x4, 0xe};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L902** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L903** <code>    Element *MetaArray =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L904** <code>        (params.MetaSizeInBits == 2) ? FourToTwoMeta : TwoToOneMeta;</code>
+  - EN: Declares the symbol `TwoToOneMeta` in the current scope.
+  - CN: 在当前作用域中声明符号 `TwoToOneMeta`。
+- **L905** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L906** <code>    Element result = 0x0;</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L907** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L908** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L909** <code>    for (int i = 0; i &lt; cutlass::sizeof_bits&lt;Element&gt;::value / 4; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L910** <code>      FloatType rnd = random_uniform_float&lt;FloatType&gt;(&amp;rng_state);</code>
+  - EN: Declares function or method `random_uniform_float<FloatType>` without defining it here.
+  - CN: 声明函数或方法 `random_uniform_float<FloatType>`，但不在此处给出定义。
+- **L911** <code>      rnd = params.range * rnd;</code>
+  - EN: Assigns or initializes `rnd` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rnd` 进行赋值或初始化。
+- **L912** <code>      Element meta = MetaArray[(int)rnd];</code>
+  - EN: Assigns or initializes `meta` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `meta` 进行赋值或初始化。
+- **L913** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L914** <code>      result = (Element)(result | ((Element)(meta &lt;&lt; (i * 4))));</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L915** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L916** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L917** <code>    return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L918** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L919** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L920** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L921** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L922** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L923** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L924** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L925** <code>struct TensorFillRandomSparseMetaFunc {</code>
+  - EN: Begins the declaration of struct `TensorFillRandomSparseMetaFunc`.
+  - CN: 开始声明 struct `TensorFillRandomSparseMetaFunc`。
+- **L926** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L927** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L928** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L929** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L930** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L931** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L932** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L933** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L934** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L935** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L936** <code>  using RandomFunc = RandomSparseMetaFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L937** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L938** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L939** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L940** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L941** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L942** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L943** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L944** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L945** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L946** <code>    typename RandomFunc::Params random;</code>
+  - EN: Declares the symbol `random` in the current scope.
+  - CN: 在当前作用域中声明符号 `random`。
+- **L947** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L948** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L949** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L950** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L951** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L952** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L953** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L954** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L955** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L956** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L957** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L958** <code>      TensorView view_ = TensorView(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorView`.
+  - CN: 开始或继续与 `TensorView` 相关的签名/调用语法。
+- **L959** <code>      typename RandomFunc::Params random_ = RandomFunc::Params()</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L960** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L961** <code>      view(view_), random(random_) {</code>
+  - EN: Begins the definition of function or method `random`.
+  - CN: 开始定义函数或方法 `random`。
+- **L962** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L963** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L964** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L965** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L966** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L967** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L968** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L969** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L970** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L971** <code>  RandomFunc random;</code>
+  - EN: Declares the symbol `random` in the current scope.
+  - CN: 在当前作用域中声明符号 `random`。
+- **L972** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L973** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L974** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L975** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L976** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L977** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L978** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L979** <code>  TensorFillRandomSparseMetaFunc(Params const &amp;params): params(params), random(params.random) {</code>
+  - EN: Begins the definition of function or method `random`.
+  - CN: 开始定义函数或方法 `random`。
+- **L980** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L981** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L982** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L983** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L984** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L985** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L986** <code>    params.view.at(coord) = random();</code>
+  - EN: Declares function or method `random` without defining it here.
+  - CN: 声明函数或方法 `random`，但不在此处给出定义。
+- **L987** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L988** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L989** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L990** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L991** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L992** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L993** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L994** <code>/// Fills a tensor with random values with a uniform random distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values with a uniform random distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values with a uniform random distribution."。
+- **L995** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L996** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L997** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L998** <code>void TensorFillRandomSparseMeta(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillRandomSparseMeta`.
+  - CN: 开始或继续与 `TensorFillRandomSparseMeta` 相关的签名/调用语法。
+- **L999** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1000** <code>  uint64_t seed,                          ///&lt; seed for RNG</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1001** <code>  int MetaSizeInBits = 2,                 ///&lt; meta data size</code>
+  - EN: Assigns or initializes `MetaSizeInBits` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `MetaSizeInBits` 进行赋值或初始化。
+- **L1002** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1003** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1004** <code>  using RandomFunc = detail::RandomSparseMetaFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L1005** <code>  using Func = detail::TensorFillRandomUniformFunc&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `Func`.
+  - CN: 引入类型或命名空间别名 `Func`。
+- **L1006** <code>  using Params = typename Func::Params;</code>
+  - EN: Introduces the type or namespace alias `Params`.
+  - CN: 引入类型或命名空间别名 `Params`。
+- **L1007** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1008** <code>  typename RandomFunc::Params random(seed, MetaSizeInBits);</code>
+  - EN: Constructs object `random` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `random`。
+- **L1009** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1010** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1011** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1012** <code>    Params(view, random),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1013** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1014** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1015** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1016** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1017** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1018** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1019** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1020** <code>/// Fills a tensor with random values with a uniform random distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values with a uniform random distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values with a uniform random distribution."。
+- **L1021** <code>template &lt;typename Element&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1022** <code>void BlockFillRandomSparseMeta(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillRandomSparseMeta`.
+  - CN: 开始或继续与 `BlockFillRandomSparseMeta` 相关的签名/调用语法。
+- **L1023** <code>  Element *ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1024** <code>  size_t capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1025** <code>  uint64_t seed,                          ///&lt; seed for RNG</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1026** <code>  int MetaSizeInBits = 2,                 ///&lt; meta data size</code>
+  - EN: Assigns or initializes `MetaSizeInBits` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `MetaSizeInBits` 进行赋值或初始化。
+- **L1027** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1028** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1029** <code>  using RandomFunc = detail::RandomSparseMetaFunc&lt;Element&gt;;</code>
+  - EN: Introduces the type or namespace alias `RandomFunc`.
+  - CN: 引入类型或命名空间别名 `RandomFunc`。
+- **L1030** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1031** <code>  typename RandomFunc::Params params(seed, MetaSizeInBits);</code>
+  - EN: Constructs object `params` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `params`。
+- **L1032** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1033** <code>  BlockForEach&lt;Element, RandomFunc&gt;(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);</code>
+  - EN: Comment that documents intent or context: "BlockForEach<Element, RandomFunc>(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);".
+  - CN: 用于说明意图或上下文的注释："BlockForEach<Element, RandomFunc>(ptr, capacity, params, /*grid_size*/0, /*block_size*/0, stream);"。
+- **L1034** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1035** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1036** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1037** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1038** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1039** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L1040** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1041** <code>/// Functor to fill a tensor with zeros off the diagonal and a uniform value on the diagonal.</code>
+  - EN: Comment that documents intent or context: "Functor to fill a tensor with zeros off the diagonal and a uniform value on the diagonal.".
+  - CN: 用于说明意图或上下文的注释："Functor to fill a tensor with zeros off the diagonal and a uniform value on the diagonal."。
+- **L1042** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1043** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1044** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1045** <code>struct TensorFillDiagonalFunc {</code>
+  - EN: Begins the declaration of struct `TensorFillDiagonalFunc`.
+  - CN: 开始声明 struct `TensorFillDiagonalFunc`。
+- **L1046** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1047** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1048** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1049** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1050** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1051** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1052** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1053** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1054** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1055** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1056** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1057** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1058** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1059** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1060** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1061** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1062** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1063** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1064** <code>    Element diag;</code>
+  - EN: Declares the symbol `diag` in the current scope.
+  - CN: 在当前作用域中声明符号 `diag`。
+- **L1065** <code>    Element other;</code>
+  - EN: Declares the symbol `other` in the current scope.
+  - CN: 在当前作用域中声明符号 `other`。
+- **L1066** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1067** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1068** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1069** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1070** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1071** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1072** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1073** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1074** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1075** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1076** <code>      TensorView view_ = TensorView(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorView`.
+  - CN: 开始或继续与 `TensorView` 相关的签名/调用语法。
+- **L1077** <code>      Element diag_ = Element(1),</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1078** <code>      Element other_ = Element(0)</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1079** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L1080** <code>      view(view_), diag(diag_), other(other_) {</code>
+  - EN: Begins the definition of function or method `other`.
+  - CN: 开始定义函数或方法 `other`。
+- **L1081** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1082** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1083** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1084** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1085** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1086** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1087** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1088** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1089** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1090** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1091** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1092** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1093** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1094** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1095** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1096** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L1097** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1098** <code>  TensorFillDiagonalFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1099** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1100** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1101** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1102** <code>  /// Updates the tensor</code>
+  - EN: Comment that documents intent or context: "Updates the tensor".
+  - CN: 用于说明意图或上下文的注释："Updates the tensor"。
+- **L1103** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1104** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1106** <code>    bool is_diag = true;</code>
+  - EN: Assigns or initializes `is_diag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diag` 进行赋值或初始化。
+- **L1107** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1108** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1109** <code>    for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1110** <code>      if (coord[i] != coord[i - 1]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1111** <code>        is_diag = false;</code>
+  - EN: Assigns or initializes `is_diag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diag` 进行赋值或初始化。
+- **L1112** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1113** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1114** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1116** <code>    params.view.at(coord) = (is_diag ? params.diag : params.other);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1117** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1118** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1119** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1120** <code>// Overwrites the elements of a tensor with a uniform value depending on fill mode</code>
+  - EN: Comment that documents intent or context: "Overwrites the elements of a tensor with a uniform value depending on fill mode".
+  - CN: 用于说明意图或上下文的注释："Overwrites the elements of a tensor with a uniform value depending on fill mode"。
+- **L1121** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1122** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1123** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1124** <code>struct TensorFillPartialFunc {</code>
+  - EN: Begins the declaration of struct `TensorFillPartialFunc`.
+  - CN: 开始声明 struct `TensorFillPartialFunc`。
+- **L1125** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1126** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1127** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1129** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1130** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1132** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1133** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1135** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1136** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1137** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1138** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1139** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1140** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1141** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1142** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1143** <code>    Element element;</code>
+  - EN: Declares the symbol `element` in the current scope.
+  - CN: 在当前作用域中声明符号 `element`。
+- **L1144** <code>    FillMode fill_mode;</code>
+  - EN: Declares the symbol `fill_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `fill_mode`。
+- **L1145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1146** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1147** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1148** <code>    Params(): fill_mode(FillMode::kNone) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `fill_mode`.
+  - CN: 开始或继续与 `fill_mode` 相关的签名/调用语法。
+- **L1149** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1150** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1151** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1152** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1154** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L1155** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1156** <code>      TensorView view_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1157** <code>      Element element_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1158** <code>      FillMode fill_mode_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1159** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L1160** <code>      view(view_), element(element_), fill_mode(fill_mode_) {</code>
+  - EN: Begins the definition of function or method `fill_mode`.
+  - CN: 开始定义函数或方法 `fill_mode`。
+- **L1161** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1162** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1163** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1165** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1166** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1167** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1168** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1169** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1170** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1172** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1173** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1174** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1176** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1177** <code>  TensorFillPartialFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1179** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1181** <code>  /// Overwrites the element if it is within the covered region.</code>
+  - EN: Comment that documents intent or context: "Overwrites the element if it is within the covered region.".
+  - CN: 用于说明意图或上下文的注释："Overwrites the element if it is within the covered region."。
+- **L1182** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1183** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1185** <code>    bool predicate = true;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1186** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1187** <code>    switch (params.fill_mode) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L1188** <code>    case FillMode::kFull:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1189** <code>      predicate = true;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1190** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1191** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1192** <code>    case FillMode::kLower:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1193** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1194** <code>      for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1195** <code>        if (coord[i - 1] &lt; coord[i]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1196** <code>          predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1197** <code>          break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1198** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1199** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1200** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1202** <code>    case FillMode::kUpper:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1203** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1204** <code>      for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1205** <code>        if (coord[i - 1] &gt; coord[i]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1206** <code>          predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1207** <code>          break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1208** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1209** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1210** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1211** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1212** <code>    case FillMode::kDiagonal:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1213** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1214** <code>      for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1215** <code>        if (coord[i - 1] != coord[i]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1216** <code>          predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1217** <code>          break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1218** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1219** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1220** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1221** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1222** <code>    case FillMode::kNone: // fall-through</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1223** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1224** <code>    default:</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L1225** <code>      predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1226** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1227** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1228** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1229** <code>    if (predicate) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1230** <code>      params.view.at(coord) = params.element;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1231** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1232** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1233** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1234** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1235** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1236** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1237** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1238** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1239** <code>struct TensorClearPartialFunc {</code>
+  - EN: Begins the declaration of struct `TensorClearPartialFunc`.
+  - CN: 开始声明 struct `TensorClearPartialFunc`。
+- **L1240** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1241** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1242** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1244** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1245** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1247** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1248** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1250** <code>  /// </code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1251** <code>  static_assert((Layout::kRank == 2), &quot;TensorClearPartial is only supported for matrices&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L1252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1253** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1254** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1255** <code>    TensorView view{};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1256** <code>    Element element{};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1257** <code>    FillMode fill_mode{FillMode::kNone};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1258** <code>    int alignment{0};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1259** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1260** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1261** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1262** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1263** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1264** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1265** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1266** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1267** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1268** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1269** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1270** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1271** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1272** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1273** <code>  TensorClearPartialFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1274** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1275** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1276** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1277** <code>  /// Overwrites the element if it is within the covered region.</code>
+  - EN: Comment that documents intent or context: "Overwrites the element if it is within the covered region.".
+  - CN: 用于说明意图或上下文的注释："Overwrites the element if it is within the covered region."。
+- **L1278** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1279** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1281** <code>    bool predicate = true;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1282** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1283** <code>    switch (params.fill_mode) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L1284** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1285** <code>    case FillMode::kLower:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1286** <code>      if ((coord[0] &gt;= coord[1]) || </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1287** <code>          ((coord[1] - coord[0]) &gt;= params.alignment))  {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L1288** <code>          predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1289** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1290** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1291** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1292** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1293** <code>    case FillMode::kUpper:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1294** <code>      if ((coord[0] &lt;= coord[1]) ||</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1295** <code>          ((coord[0] - coord[1]) &gt;= params.alignment))  {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L1296** <code>          predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1297** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1298** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1299** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1300** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1301** <code>    case FillMode::kNone: // fall-through</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1302** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1303** <code>    default:</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L1304** <code>      predicate = false;</code>
+  - EN: Assigns or initializes `predicate` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `predicate` 进行赋值或初始化。
+- **L1305** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1306** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1307** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1308** <code>    if (predicate) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1309** <code>      params.view.at(coord) = params.element;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1310** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1311** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1312** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1313** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1314** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1315** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1316** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1317** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1318** <code>/// Fills a tensor everywhere with a unique value for its diagonal.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor everywhere with a unique value for its diagonal.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor everywhere with a unique value for its diagonal."。
+- **L1319** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1320** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1321** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1322** <code>void TensorFillDiagonal(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillDiagonal`.
+  - CN: 开始或继续与 `TensorFillDiagonal` 相关的签名/调用语法。
+- **L1323** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1324** <code>  Element diag = Element(1),              ///&lt; value to write in the diagonal</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1325** <code>  Element other = Element(0),             ///&lt; value to write off the diagonal</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1326** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1327** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1328** <code>  typedef detail::TensorFillDiagonalFunc&lt;Element, Layout&gt; Func;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1329** <code>  typedef typename Func::Params Params;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1331** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1332** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1333** <code>    Params(view, diag, other),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1334** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1335** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1336** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1337** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1339** <code>/// Fills a tensor partially depending on fill mode. Elements not covered by the fillmode are</code>
+  - EN: Comment that documents intent or context: "Fills a tensor partially depending on fill mode. Elements not covered by the fillmode are".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor partially depending on fill mode. Elements not covered by the fillmode are"。
+- **L1340** <code>/// not written.</code>
+  - EN: Comment that documents intent or context: "not written.".
+  - CN: 用于说明意图或上下文的注释："not written."。
+- **L1341** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1342** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1343** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1344** <code>void TensorFillPartial(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillPartial`.
+  - CN: 开始或继续与 `TensorFillPartial` 相关的签名/调用语法。
+- **L1345** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1346** <code>  Element element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1347** <code>  FillMode fill_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1348** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1349** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1350** <code>  typedef detail::TensorFillPartialFunc&lt;Element, Layout&gt; Func;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1351** <code>  typedef typename Func::Params Params;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1353** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1354** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1355** <code>    Params(view, element, fill_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1356** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1357** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1358** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1359** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1360** <code>/// Clears a tensor partially depending on fill mode and alignment. Elements on the wrong-side</code>
+  - EN: Comment that documents intent or context: "Clears a tensor partially depending on fill mode and alignment. Elements on the wrong-side".
+  - CN: 用于说明意图或上下文的注释："Clears a tensor partially depending on fill mode and alignment. Elements on the wrong-side"。
+- **L1361** <code>/// of fillmode (upto the alignment) are overwritten with the user supplied element (typically zeros)</code>
+  - EN: Comment that documents intent or context: "of fillmode (upto the alignment) are overwritten with the user supplied element (typically zeros)".
+  - CN: 用于说明意图或上下文的注释："of fillmode (upto the alignment) are overwritten with the user supplied element (typically zeros)"。
+- **L1362** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1363** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1364** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1365** <code>void TensorClearPartial(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorClearPartial`.
+  - CN: 开始或继续与 `TensorClearPartial` 相关的签名/调用语法。
+- **L1366** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1367** <code>  Element element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1368** <code>  FillMode fill_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1369** <code>  int alignment,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1370** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1371** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1372** <code>  typedef detail::TensorClearPartialFunc&lt;Element, Layout&gt; Func;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1373** <code>  typedef typename Func::Params Params;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1374** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1375** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1376** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1377** <code>    Params{view, element, fill_mode, alignment},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1378** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1379** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1380** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1381** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1382** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1383** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1384** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1385** <code>/// Fills a tensor with a uniform value</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with a uniform value".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with a uniform value"。
+- **L1386** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1387** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1388** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1389** <code>void TensorFill(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFill`.
+  - CN: 开始或继续与 `TensorFill` 相关的签名/调用语法。
+- **L1390** <code>  TensorView&lt;Element, Layout&gt; view,         ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1391** <code>  Element val = Element(0),                 ///&lt; value to uniformly fill it with</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1392** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1393** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1394** <code>  TensorFillDiagonal(view, val, val, stream);</code>
+  - EN: Declares function or method `TensorFillDiagonal` without defining it here.
+  - CN: 声明函数或方法 `TensorFillDiagonal`，但不在此处给出定义。
+- **L1395** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1396** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1397** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1398** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1399** <code>/// Fills a tensor&#x27;s diagonal with 1 and 0 everywhere else.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor's diagonal with 1 and 0 everywhere else.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor's diagonal with 1 and 0 everywhere else."。
+- **L1400** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1401** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1402** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1403** <code>void TensorFillIdentity(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillIdentity`.
+  - CN: 开始或继续与 `TensorFillIdentity` 相关的签名/调用语法。
+- **L1404** <code>  TensorView&lt;Element, Layout&gt; view,                 ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1405** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1406** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1407** <code>  TensorFillDiagonal(view, Element(1), Element(0), stream);</code>
+  - EN: Declares function or method `Element` without defining it here.
+  - CN: 声明函数或方法 `Element`，但不在此处给出定义。
+- **L1408** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1409** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1410** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1411** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1412** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1413** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L1414** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1415** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L1416** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1417** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1418** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1419** <code>struct TensorUpdateDiagonalFunc {</code>
+  - EN: Begins the declaration of struct `TensorUpdateDiagonalFunc`.
+  - CN: 开始声明 struct `TensorUpdateDiagonalFunc`。
+- **L1420** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1421** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1422** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1423** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1424** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1425** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1426** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1427** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1428** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1429** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1430** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1431** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1432** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1433** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1434** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1435** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1436** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1437** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1438** <code>    Element diag;</code>
+  - EN: Declares the symbol `diag` in the current scope.
+  - CN: 在当前作用域中声明符号 `diag`。
+- **L1439** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1440** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1441** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1442** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1443** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1444** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1445** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1446** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1447** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1448** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L1449** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1450** <code>      TensorView view_ = TensorView(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorView`.
+  - CN: 开始或继续与 `TensorView` 相关的签名/调用语法。
+- **L1451** <code>      Element diag_ = Element(1)</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1452** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L1453** <code>      view(view_), diag(diag_) {</code>
+  - EN: Begins the definition of function or method `diag`.
+  - CN: 开始定义函数或方法 `diag`。
+- **L1454** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1455** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1456** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1457** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1458** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1459** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1460** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1461** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1462** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1463** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1464** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1465** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1466** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1467** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1468** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1469** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L1470** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1471** <code>  TensorUpdateDiagonalFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1472** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1473** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1474** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1475** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L1476** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1477** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1478** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1479** <code>    bool is_diag = true;</code>
+  - EN: Assigns or initializes `is_diag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diag` 进行赋值或初始化。
+- **L1480** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1481** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1482** <code>    for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1483** <code>      if (coord[i] != coord[i - 1]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1484** <code>        is_diag = false;</code>
+  - EN: Assigns or initializes `is_diag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diag` 进行赋值或初始化。
+- **L1485** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1486** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1487** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1488** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1489** <code>    if (is_diag) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1490** <code>      params.view.at(coord) = params.diag;  </code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1491** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1492** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1493** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1494** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1495** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1496** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1497** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1498** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1499** <code>/// Writes a uniform value to the diagonal of a tensor without modifying off-diagonal elements.</code>
+  - EN: Comment that documents intent or context: "Writes a uniform value to the diagonal of a tensor without modifying off-diagonal elements.".
+  - CN: 用于说明意图或上下文的注释："Writes a uniform value to the diagonal of a tensor without modifying off-diagonal elements."。
+- **L1500** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1501** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1502** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1503** <code>void TensorUpdateDiagonal(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorUpdateDiagonal`.
+  - CN: 开始或继续与 `TensorUpdateDiagonal` 相关的签名/调用语法。
+- **L1504** <code>  TensorView&lt;Element, Layout&gt; view,                 ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1505** <code>  Element diag = Element(1),</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1506** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1508** <code>  typedef detail::TensorUpdateDiagonalFunc&lt;Element, Layout&gt; Func;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1509** <code>  typedef typename Func::Params Params;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1510** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1511** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1512** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1513** <code>    Params(view, diag),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1514** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1515** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1516** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1517** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1518** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1519** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1520** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1521** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1522** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L1523** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1524** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L1525** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1526** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1527** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1528** <code>struct TensorUpdateOffDiagonalFunc {</code>
+  - EN: Begins the declaration of struct `TensorUpdateOffDiagonalFunc`.
+  - CN: 开始声明 struct `TensorUpdateOffDiagonalFunc`。
+- **L1529** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1530** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1531** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1532** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1533** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1534** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1535** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1536** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1537** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1538** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1539** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1540** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1541** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1542** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1543** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1544** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1545** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1546** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1547** <code>    Element other;</code>
+  - EN: Declares the symbol `other` in the current scope.
+  - CN: 在当前作用域中声明符号 `other`。
+- **L1548** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1549** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1550** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1551** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1552** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1553** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1554** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1555** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1556** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1557** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L1558** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1559** <code>      TensorView view_ = TensorView(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorView`.
+  - CN: 开始或继续与 `TensorView` 相关的签名/调用语法。
+- **L1560** <code>      Element other_ = Element(0)</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1561** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L1562** <code>      view(view_), other(other_) {</code>
+  - EN: Begins the definition of function or method `other`.
+  - CN: 开始定义函数或方法 `other`。
+- **L1563** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1564** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1565** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1566** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1567** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1568** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1569** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1570** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1571** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1572** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1573** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1574** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1575** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1576** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1577** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1578** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L1579** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1580** <code>  TensorUpdateOffDiagonalFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1581** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1582** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1583** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1584** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L1585** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1586** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1587** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1588** <code>    bool is_diag = true;</code>
+  - EN: Assigns or initializes `is_diag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diag` 进行赋值或初始化。
+- **L1589** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1590** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1591** <code>    for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1592** <code>      if (coord[i] != coord[i - 1]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1593** <code>        is_diag = false;</code>
+  - EN: Assigns or initializes `is_diag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diag` 进行赋值或初始化。
+- **L1594** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1595** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1596** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1597** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1598** <code>    if (!is_diag) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1599** <code>      params.view.at(coord) = params.other;  </code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1600** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1601** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1602** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1603** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1604** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1605** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1606** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1607** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1608** <code>/// Writes a uniform value to all elements in the tensor without modifying diagonal elements.</code>
+  - EN: Comment that documents intent or context: "Writes a uniform value to all elements in the tensor without modifying diagonal elements.".
+  - CN: 用于说明意图或上下文的注释："Writes a uniform value to all elements in the tensor without modifying diagonal elements."。
+- **L1609** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1610** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1611** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1612** <code>void TensorUpdateOffDiagonal(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorUpdateOffDiagonal`.
+  - CN: 开始或继续与 `TensorUpdateOffDiagonal` 相关的签名/调用语法。
+- **L1613** <code>  TensorView&lt;Element, Layout&gt; view,      ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1614** <code>  Element other = Element(1),</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1615** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1616** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1617** <code>  typedef detail::TensorUpdateOffDiagonalFunc&lt;Element, Layout&gt; Func;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1618** <code>  typedef typename Func::Params Params;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1619** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1620** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1621** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1622** <code>    Params(view, other),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1623** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1624** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1625** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1626** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1627** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1628** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1629** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1630** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1631** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L1632** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1633** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L1634** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1635** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1636** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1637** <code>struct TensorFillLinearFunc {</code>
+  - EN: Begins the declaration of struct `TensorFillLinearFunc`.
+  - CN: 开始声明 struct `TensorFillLinearFunc`。
+- **L1638** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1639** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1640** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1641** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1642** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1643** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1644** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1645** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1646** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1647** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1648** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1649** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1650** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1651** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1652** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1653** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1654** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1655** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1656** <code>    Array&lt;Element, Layout::kRank&gt; v;</code>
+  - EN: Declares the symbol `v` in the current scope.
+  - CN: 在当前作用域中声明符号 `v`。
+- **L1657** <code>    Element s;</code>
+  - EN: Declares the symbol `s` in the current scope.
+  - CN: 在当前作用域中声明符号 `s`。
+- **L1658** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1659** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1660** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1661** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1662** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1663** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1664** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1665** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1666** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1667** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L1668** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1669** <code>      TensorView view_,      ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1670** <code>      Array&lt;Element, Layout::kRank&gt; const &amp; v_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1671** <code>      Element s_ = Element(0)</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1672** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L1673** <code>      view(view_), v(v_), s(s_) { </code>
+  - EN: Begins the definition of function or method `s`.
+  - CN: 开始定义函数或方法 `s`。
+- **L1674** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1675** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1676** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1677** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1678** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1679** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1680** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1681** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1682** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1683** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1684** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1685** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1686** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1687** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1688** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1689** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L1690** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1691** <code>  TensorFillLinearFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1692** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1693** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1694** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1695** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L1696** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1697** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1698** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1699** <code>    Element sum = params.s;</code>
+  - EN: Assigns or initializes `sum` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sum` 进行赋值或初始化。
+- **L1700** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1701** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1702** <code>    for (int i = 0; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1703** <code>      if constexpr (is_complex&lt;Element&gt;::value) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L1704** <code>        if constexpr (sizeof_bits&lt;Element&gt;::value &lt;= 32) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L1705** <code>          sum = Element(static_cast&lt;complex&lt;float&gt;&gt;(sum) + </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<complex<float>>`.
+  - CN: 开始或继续与 `static_cast<complex<float>>` 相关的签名/调用语法。
+- **L1706** <code>                  static_cast&lt;complex&lt;float&gt;&gt;(params.v[i]) * static_cast&lt;complex&lt;float&gt;&gt;(coord[i]));</code>
+  - EN: Declares function or method `static_cast<complex<float>>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<complex<float>>`，但不在此处给出定义。
+- **L1707** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1708** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1709** <code>      else if constexpr (sizeof_bits&lt;Element&gt;::value &lt;= 32) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L1710** <code>        if constexpr (std::numeric_limits&lt;Element&gt;::is_integer) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L1711** <code>          sum = Element(static_cast&lt;int32_t&gt;(sum) + </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<int32_t>`.
+  - CN: 开始或继续与 `static_cast<int32_t>` 相关的签名/调用语法。
+- **L1712** <code>                  static_cast&lt;int32_t&gt;(params.v[i]) * static_cast&lt;int32_t&gt;(coord[i]));</code>
+  - EN: Declares function or method `static_cast<int32_t>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<int32_t>`，但不在此处给出定义。
+- **L1713** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1714** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L1715** <code>          sum = Element(static_cast&lt;float&gt;(sum) + </code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L1716** <code>                  static_cast&lt;float&gt;(params.v[i]) * static_cast&lt;float&gt;(coord[i]));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L1717** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1718** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1719** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L1720** <code>        sum += params.v[i] * coord[i];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1721** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1722** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1723** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1724** <code>    params.view.at(coord) = sum;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1725** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1726** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1727** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1728** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1729** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1730** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1731** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1732** <code>/// Fills tensor with a linear combination of its coordinate and another vector</code>
+  - EN: Comment that documents intent or context: "Fills tensor with a linear combination of its coordinate and another vector".
+  - CN: 用于说明意图或上下文的注释："Fills tensor with a linear combination of its coordinate and another vector"。
+- **L1733** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1734** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1735** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1736** <code>void TensorFillLinear(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillLinear`.
+  - CN: 开始或继续与 `TensorFillLinear` 相关的签名/调用语法。
+- **L1737** <code>  TensorView&lt;Element, Layout&gt; view,      ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1738** <code>  Array&lt;Element, Layout::kRank&gt; const &amp; v,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1739** <code>  Element s = Element(0),</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1740** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1741** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1742** <code>  using Func = detail::TensorFillLinearFunc&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `Func`.
+  - CN: 引入类型或命名空间别名 `Func`。
+- **L1743** <code>  using Params = typename Func::Params;</code>
+  - EN: Introduces the type or namespace alias `Params`.
+  - CN: 引入类型或命名空间别名 `Params`。
+- **L1744** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1745** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1746** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1747** <code>    Params(view, v, s),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1748** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1749** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1750** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1751** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1752** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1753** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1754** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1755** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1756** <code>/// Fills a tensor with random values from a distribution.</code>
+  - EN: Comment that documents intent or context: "Fills a tensor with random values from a distribution.".
+  - CN: 用于说明意图或上下文的注释："Fills a tensor with random values from a distribution."。
+- **L1757** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1758** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1759** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1760** <code>void TensorFillRandom(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorFillRandom`.
+  - CN: 开始或继续与 `TensorFillRandom` 相关的签名/调用语法。
+- **L1761** <code>  TensorView&lt;Element, Layout&gt; view,       ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1762** <code>  uint64_t seed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1763** <code>  Distribution dist,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1764** <code>  cudaStream_t stream = nullptr,</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1765** <code>  int exclude_zero = -1                   ///&lt; If non-negative, excludes 0.</code>
+  - EN: Assigns or initializes `exclude_zero` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `exclude_zero` 进行赋值或初始化。
+- **L1766** <code>                                          ///  Note that setting this flag will result in more 1&#x27;s,</code>
+  - EN: Comment that documents intent or context: "Note that setting this flag will result in more 1's,".
+  - CN: 用于说明意图或上下文的注释："Note that setting this flag will result in more 1's,"。
+- **L1767** <code>                                          ///  as we use a simple mechanism to replace 0&#x27;s by adding/subtracting 1&#x27;s.</code>
+  - EN: Comment that documents intent or context: "as we use a simple mechanism to replace 0's by adding/subtracting 1's.".
+  - CN: 用于说明意图或上下文的注释："as we use a simple mechanism to replace 0's by adding/subtracting 1's."。
+- **L1768** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L1769** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1770** <code>  using Real = typename RealType&lt;Element&gt;::Type;</code>
+  - EN: Introduces the type or namespace alias `Real`.
+  - CN: 引入类型或命名空间别名 `Real`。
+- **L1771** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1772** <code>  if (dist.kind == Distribution::Gaussian) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1773** <code>    TensorFillRandomGaussian&lt;Element, Layout&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Layout>`.
+  - CN: 开始或继续与 `Layout>` 相关的签名/调用语法。
+- **L1774** <code>      view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1775** <code>      seed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1776** <code>      static_cast&lt;Real&gt;(dist.gaussian.mean),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1777** <code>      static_cast&lt;Real&gt;(dist.gaussian.stddev),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1778** <code>      dist.int_scale,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1779** <code>      exclude_zero,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1780** <code>      stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1781** <code>  } else if (dist.kind == Distribution::Uniform) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L1782** <code>    TensorFillRandomUniform&lt;Element, Layout&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Layout>`.
+  - CN: 开始或继续与 `Layout>` 相关的签名/调用语法。
+- **L1783** <code>      view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1784** <code>      seed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1785** <code>      static_cast&lt;Real&gt;(dist.uniform.max),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1786** <code>      static_cast&lt;Real&gt;(dist.uniform.min),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1787** <code>      dist.int_scale,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1788** <code>      dist.uniform.pnan,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1789** <code>      exclude_zero,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1790** <code>      stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1791** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1792** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1793** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1794** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1795** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1796** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1797** <code>/// Fills a block of data with sequential elements</code>
+  - EN: Comment that documents intent or context: "Fills a block of data with sequential elements".
+  - CN: 用于说明意图或上下文的注释："Fills a block of data with sequential elements"。
+- **L1798** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1799** <code>  typename Element</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1800** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1801** <code>void BlockFillSequential(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillSequential`.
+  - CN: 开始或继续与 `BlockFillSequential` 相关的签名/调用语法。
+- **L1802** <code>  Element *ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1803** <code>  int64_t capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1804** <code>  Element v = Element(1),</code>
+  - EN: Begins or continues the signature/call syntax involving `Element`.
+  - CN: 开始或继续与 `Element` 相关的签名/调用语法。
+- **L1805** <code>  Element s = Element(0)) {</code>
+  - EN: Begins the definition of function or method `Element`.
+  - CN: 开始定义函数或方法 `Element`。
+- **L1806** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1807** <code>  using Layout = layout::PackedVectorLayout;</code>
+  - EN: Introduces the type or namespace alias `Layout`.
+  - CN: 引入类型或命名空间别名 `Layout`。
+- **L1808** <code>  Layout::TensorCoord size(static_cast&lt;Layout::Index&gt;(capacity)); // -Wconversion</code>
+  - EN: Begins or continues the signature/call syntax involving `Index>`.
+  - CN: 开始或继续与 `Index>` 相关的签名/调用语法。
+- **L1809** <code>  Layout layout = Layout::packed(size);</code>
+  - EN: Declares function or method `packed` without defining it here.
+  - CN: 声明函数或方法 `packed`，但不在此处给出定义。
+- **L1810** <code>  TensorView&lt;Element, Layout&gt; view(ptr, layout, size);</code>
+  - EN: Declares function or method `view` without defining it here.
+  - CN: 声明函数或方法 `view`，但不在此处给出定义。
+- **L1811** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1812** <code>  Array&lt;Element, Layout::kRank&gt; c{};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1813** <code>  c[0] = v;</code>
+  - EN: Declares the symbol `v` in the current scope.
+  - CN: 在当前作用域中声明符号 `v`。
+- **L1814** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1815** <code>  TensorFillLinear(view, c, s);</code>
+  - EN: Declares function or method `TensorFillLinear` without defining it here.
+  - CN: 声明函数或方法 `TensorFillLinear`，但不在此处给出定义。
+- **L1816** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1817** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1818** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1819** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1820** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1821** <code>/// Fills a block of data with sequential elements</code>
+  - EN: Comment that documents intent or context: "Fills a block of data with sequential elements".
+  - CN: 用于说明意图或上下文的注释："Fills a block of data with sequential elements"。
+- **L1822** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1823** <code>  typename Element</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1824** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1825** <code>void BlockFillRandom(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillRandom`.
+  - CN: 开始或继续与 `BlockFillRandom` 相关的签名/调用语法。
+- **L1826** <code>  Element *ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1827** <code>  size_t capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1828** <code>  uint64_t seed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1829** <code>  Distribution dist,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1830** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1831** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1832** <code>  using Real = typename RealType&lt;Element&gt;::Type;</code>
+  - EN: Introduces the type or namespace alias `Real`.
+  - CN: 引入类型或命名空间别名 `Real`。
+- **L1833** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1834** <code>  if (dist.kind == Distribution::Gaussian) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1835** <code>    BlockFillRandomGaussian&lt;Element&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillRandomGaussian<Element>`.
+  - CN: 开始或继续与 `BlockFillRandomGaussian<Element>` 相关的签名/调用语法。
+- **L1836** <code>      ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1837** <code>      capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1838** <code>      seed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1839** <code>      static_cast&lt;Real&gt;(dist.gaussian.mean),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1840** <code>      static_cast&lt;Real&gt;(dist.gaussian.stddev),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1841** <code>      dist.int_scale,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1842** <code>      stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1843** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1844** <code>  else if (dist.kind == Distribution::Uniform) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L1845** <code>    BlockFillRandomUniform&lt;Element&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockFillRandomUniform<Element>`.
+  - CN: 开始或继续与 `BlockFillRandomUniform<Element>` 相关的签名/调用语法。
+- **L1846** <code>      ptr,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1847** <code>      capacity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1848** <code>      seed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1849** <code>      static_cast&lt;Real&gt;(dist.uniform.max),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1850** <code>      static_cast&lt;Real&gt;(dist.uniform.min),</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<Real>`.
+  - CN: 开始或继续与 `static_cast<Real>` 相关的签名/调用语法。
+- **L1851** <code>      dist.int_scale,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1852** <code>      dist.uniform.pnan,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1853** <code>      stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1854** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1855** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1856** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1857** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1858** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1859** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1860** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L1861** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1862** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L1863** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1864** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1865** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1866** <code>struct TensorCopyDiagonalInFunc {</code>
+  - EN: Begins the declaration of struct `TensorCopyDiagonalInFunc`.
+  - CN: 开始声明 struct `TensorCopyDiagonalInFunc`。
+- **L1867** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1868** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1869** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1870** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1871** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1872** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1873** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1874** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1875** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1876** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1877** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1878** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1879** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1880** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1881** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1882** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1883** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1884** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1885** <code>    Element const *ptr;</code>
+  - EN: Declares the symbol `ptr` in the current scope.
+  - CN: 在当前作用域中声明符号 `ptr`。
+- **L1886** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1887** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1888** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1889** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1890** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1891** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1892** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1893** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1894** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1895** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L1896** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1897** <code>      TensorView view_,      ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1898** <code>      Element const *ptr_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1899** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L1900** <code>      view(view_), ptr(ptr_) { </code>
+  - EN: Begins the definition of function or method `ptr`.
+  - CN: 开始定义函数或方法 `ptr`。
+- **L1901** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1902** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1903** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1904** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1905** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1906** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1907** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1908** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1909** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L1910** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L1911** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1912** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1913** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L1914** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1915** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1916** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L1917** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1918** <code>  TensorCopyDiagonalInFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L1919** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1920** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1921** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1922** <code>  /// Only update the diagonal element</code>
+  - EN: Comment that documents intent or context: "Only update the diagonal element".
+  - CN: 用于说明意图或上下文的注释："Only update the diagonal element"。
+- **L1923** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1924** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L1925** <code>    bool is_diagonal = true;</code>
+  - EN: Assigns or initializes `is_diagonal` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diagonal` 进行赋值或初始化。
+- **L1926** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1927** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1928** <code>    for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L1929** <code>      if (coord[i] != coord[0]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1930** <code>        is_diagonal = false;</code>
+  - EN: Assigns or initializes `is_diagonal` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diagonal` 进行赋值或初始化。
+- **L1931** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1932** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1933** <code>    if (is_diagonal) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1934** <code>      params.view.at(coord) = params.ptr[coord[0]];</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L1935** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1936** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1937** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1938** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1939** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1940** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1941** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1942** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1943** <code>/// Copies a diagonal in from host memory without modifying off-diagonal elements.</code>
+  - EN: Comment that documents intent or context: "Copies a diagonal in from host memory without modifying off-diagonal elements.".
+  - CN: 用于说明意图或上下文的注释："Copies a diagonal in from host memory without modifying off-diagonal elements."。
+- **L1944** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1945** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1946** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1947** <code>void TensorCopyDiagonalIn(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorCopyDiagonalIn`.
+  - CN: 开始或继续与 `TensorCopyDiagonalIn` 相关的签名/调用语法。
+- **L1948** <code>  TensorView&lt;Element, Layout&gt; view,   ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1949** <code>  Element const *ptr,                        ///&lt; dense buffer of elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1950** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1951** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1952** <code>  using Func = detail::TensorCopyDiagonalInFunc&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `Func`.
+  - CN: 引入类型或命名空间别名 `Func`。
+- **L1953** <code>  using Params = typename Func::Params;</code>
+  - EN: Introduces the type or namespace alias `Params`.
+  - CN: 引入类型或命名空间别名 `Params`。
+- **L1954** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1955** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L1956** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L1957** <code>    Params(view, ptr),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1958** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L1959** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1960** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1961** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1962** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1963** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1964** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1965** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1966** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1967** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L1968** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1969** <code>/// Computes a random Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Computes a random Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Computes a random Gaussian distribution"。
+- **L1970** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1971** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1972** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1973** <code>struct TensorCopyDiagonalOutFunc {</code>
+  - EN: Begins the declaration of struct `TensorCopyDiagonalOutFunc`.
+  - CN: 开始声明 struct `TensorCopyDiagonalOutFunc`。
+- **L1974** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1975** <code>  /// View type</code>
+  - EN: Comment that documents intent or context: "View type".
+  - CN: 用于说明意图或上下文的注释："View type"。
+- **L1976** <code>  using TensorView = TensorView&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `TensorView`.
+  - CN: 引入类型或命名空间别名 `TensorView`。
+- **L1977** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1978** <code>  /// Scalar type</code>
+  - EN: Comment that documents intent or context: "Scalar type".
+  - CN: 用于说明意图或上下文的注释："Scalar type"。
+- **L1979** <code>  typedef typename TensorView::Element T;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1980** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1981** <code>  /// Coordinate in tensor&#x27;s index space</code>
+  - EN: Comment that documents intent or context: "Coordinate in tensor's index space".
+  - CN: 用于说明意图或上下文的注释："Coordinate in tensor's index space"。
+- **L1982** <code>  typedef typename TensorView::TensorCoord TensorCoord;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L1983** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1984** <code>  /// Parameters structure</code>
+  - EN: Comment that documents intent or context: "Parameters structure".
+  - CN: 用于说明意图或上下文的注释："Parameters structure"。
+- **L1985** <code>  struct Params {</code>
+  - EN: Begins the declaration of struct `Params`.
+  - CN: 开始声明 struct `Params`。
+- **L1986** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1987** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1988** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L1989** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1990** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1991** <code>    TensorView view;</code>
+  - EN: Declares the symbol `view` in the current scope.
+  - CN: 在当前作用域中声明符号 `view`。
+- **L1992** <code>    Element *ptr;</code>
+  - EN: Declares the symbol `ptr` in the current scope.
+  - CN: 在当前作用域中声明符号 `ptr`。
+- **L1993** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1994** <code>    /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L1995** <code>    CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1996** <code>    Params() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L1997** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1998** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1999** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L2000** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2001** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2002** <code>    /// Construction of Gaussian RNG functor.</code>
+  - EN: Comment that documents intent or context: "Construction of Gaussian RNG functor.".
+  - CN: 用于说明意图或上下文的注释："Construction of Gaussian RNG functor."。
+- **L2003** <code>    Params(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L2004** <code>      TensorView view_,      ///&lt; destination tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2005** <code>      Element *ptr_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2006** <code>    ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L2007** <code>      view(view_), ptr(ptr_) { </code>
+  - EN: Begins the definition of function or method `ptr`.
+  - CN: 开始定义函数或方法 `ptr`。
+- **L2008** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2009** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2010** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2011** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2012** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2013** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L2014** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2015** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2016** <code>  /// Parameters object</code>
+  - EN: Comment that documents intent or context: "Parameters object".
+  - CN: 用于说明意图或上下文的注释："Parameters object"。
+- **L2017** <code>  Params params;</code>
+  - EN: Declares the symbol `params` in the current scope.
+  - CN: 在当前作用域中声明符号 `params`。
+- **L2018** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2019** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2020** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L2021** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2022** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2023** <code>  /// Device-side initialization of RNG</code>
+  - EN: Comment that documents intent or context: "Device-side initialization of RNG".
+  - CN: 用于说明意图或上下文的注释："Device-side initialization of RNG"。
+- **L2024** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2025** <code>  TensorCopyDiagonalOutFunc(Params const &amp;params): params(params) {</code>
+  - EN: Begins the definition of function or method `params`.
+  - CN: 开始定义函数或方法 `params`。
+- **L2026** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2027** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2028** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2029** <code>  /// Compute random value and update RNG state</code>
+  - EN: Comment that documents intent or context: "Compute random value and update RNG state".
+  - CN: 用于说明意图或上下文的注释："Compute random value and update RNG state"。
+- **L2030** <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2031** <code>  void operator()(TensorCoord const &amp;coord) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L2032** <code>    bool is_diagonal = true;</code>
+  - EN: Assigns or initializes `is_diagonal` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diagonal` 进行赋值或初始化。
+- **L2033** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2034** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2035** <code>    for (int i = 1; i &lt; Layout::kRank; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L2036** <code>      if (coord[i] != coord[0]) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L2037** <code>        is_diagonal = false;</code>
+  - EN: Assigns or initializes `is_diagonal` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `is_diagonal` 进行赋值或初始化。
+- **L2038** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2039** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2040** <code>    if (is_diagonal) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L2041** <code>      params.ptr[coord[0]] = params.view.at(coord);  </code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L2042** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2043** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2044** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2045** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2046** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2047** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2048** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2049** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2050** <code>/// Copies the diagonal of a tensor into a dense buffer in host memory.</code>
+  - EN: Comment that documents intent or context: "Copies the diagonal of a tensor into a dense buffer in host memory.".
+  - CN: 用于说明意图或上下文的注释："Copies the diagonal of a tensor into a dense buffer in host memory."。
+- **L2051** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L2052** <code>  typename Element,               ///&lt; Element type</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2053** <code>  typename Layout&gt;                ///&lt; Layout function</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2054** <code>void TensorCopyDiagonalOut(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorCopyDiagonalOut`.
+  - CN: 开始或继续与 `TensorCopyDiagonalOut` 相关的签名/调用语法。
+- **L2055** <code>  Element *ptr,                               ///&lt; dense buffer of elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2056** <code>  TensorView&lt;Element, Layout&gt; view,      ///&lt; source tensor</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2057** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L2058** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2059** <code>  using Func = detail::TensorCopyDiagonalOutFunc&lt;Element, Layout&gt;;</code>
+  - EN: Introduces the type or namespace alias `Func`.
+  - CN: 引入类型或命名空间别名 `Func`。
+- **L2060** <code>  using Params = typename Func::Params;</code>
+  - EN: Introduces the type or namespace alias `Params`.
+  - CN: 引入类型或命名空间别名 `Params`。
+- **L2061** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2062** <code>  TensorForEach&lt;Func, Layout::kRank, Params&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `Params>`.
+  - CN: 开始或继续与 `Params>` 相关的签名/调用语法。
+- **L2063** <code>    view.extent(),</code>
+  - EN: Begins or continues the signature/call syntax involving `extent`.
+  - CN: 开始或继续与 `extent` 相关的签名/调用语法。
+- **L2064** <code>    Params(view, ptr),</code>
+  - EN: Begins or continues the signature/call syntax involving `Params`.
+  - CN: 开始或继续与 `Params` 相关的签名/调用语法。
+- **L2065** <code>    /*grid_size*/0, /*block_size*/0,</code>
+  - EN: Comment that documents intent or context: "grid_size*/0, /*block_size*/0,".
+  - CN: 用于说明意图或上下文的注释："grid_size*/0, /*block_size*/0,"。
+- **L2066** <code>    stream</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2067** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L2068** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2069** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2070** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2071** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2072** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L2073** <code>} // namespace device</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2074** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L2075** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>utility</code> — general utility helpers / 通用辅助工具
+- <code>cstdlib</code> — C standard utilities / C 标准工具
+- <code>cmath</code> — math routines / 数学函数
+- <code>type_traits</code> — compile-time type traits / 编译期类型特征
+- <code>cstdint</code> — fixed-width integer types / 定宽整数类型
+- <code>curand_kernel.h</code> — project-specific declarations from `curand_kernel.h` / 来自 `curand_kernel.h` 的项目专用声明
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/array.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/blas3.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/vector.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/reference/device/tensor_foreach.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/util/distribution.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块

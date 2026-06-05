@@ -1,0 +1,802 @@
+# cutlass_ast_decorators.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cutlass_dsl/cutlass_ast_decorators.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (LoopUnroll, ScfGenerator) and 5 functions (_attr_const_check, _loop_execute_range_dynamic, _if_execute_dynamic, _while_execute_dynamic, ... (+1 more)) in `CuTeDSL.cutlass.cutlass_dsl.cutlass_ast_decorators`.
+- CN: 该模块 `CuTeDSL.cutlass.cutlass_dsl.cutlass_ast_decorators` 定义了 2 个类（LoopUnroll, ScfGenerator） 和 5 个函数（_attr_const_check, _loop_execute_range_dynamic, _if_execute_dynamic, _while_execute_dynamic, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L13** `from typing import Any, Callable, Dict, List, Optional, Union` — **EN:** Imports Any, Callable, Dict, List, Optional, Union from `typing`. **CN:** 从 `typing` 导入 Any, Callable, Dict, List, Optional, Union。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L16** `from cutlass._mlir.dialects import scf` — **EN:** Imports scf from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 scf。
+- **L17** `from collections.abc import Sequence` — **EN:** Imports Sequence from `collections.abc`. **CN:** 从 `collections.abc` 导入 Sequence。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from ..base_dsl.common import DSLRuntimeError, DSLNotImplemented` — **EN:** Imports DSLRuntimeError, DSLNotImplemented from `..base_dsl.common`. **CN:** 从 `..base_dsl.common` 导入 DSLRuntimeError, DSLNotImplemented。
+- **L20** `from ..base_dsl.dsl import is_dynamic_expression` — **EN:** Imports is_dynamic_expression from `..base_dsl.dsl`. **CN:** 从 `..base_dsl.dsl` 导入 is_dynamic_expression。
+- **L21** `from ..base_dsl._mlir_helpers.arith import ArithValue` — **EN:** Imports ArithValue from `..base_dsl._mlir_helpers.arith`. **CN:** 从 `..base_dsl._mlir_helpers.arith` 导入 ArithValue。
+- **L22** `from ..base_dsl.ast_helpers import *  # noqa: F401,F403` — **EN:** Imports * from `..base_dsl.ast_helpers`. **CN:** 从 `..base_dsl.ast_helpers` 导入 *。
+- **L23** `from ..base_dsl.utils.logger import log` — **EN:** Imports log from `..base_dsl.utils.logger`. **CN:** 从 `..base_dsl.utils.logger` 导入 log。
+- **L24** `from ..base_dsl import typing as t` — **EN:** Imports typing as t from `..base_dsl`. **CN:** 从 `..base_dsl` 导入 typing as t。
+- **L25** `from ..base_dsl.typing import Boolean, Numeric, as_numeric` — **EN:** Imports Boolean, Numeric, as_numeric from `..base_dsl.typing`. **CN:** 从 `..base_dsl.typing` 导入 Boolean, Numeric, as_numeric。
+- **L26** `from ..base_dsl.utils.tree_utils import PyTreeDef, check_tree_equal` — **EN:** Imports PyTreeDef, check_tree_equal from `..base_dsl.utils.tree_utils`. **CN:** 从 `..base_dsl.utils.tree_utils` 导入 PyTreeDef, check_tree_equal。
+- **L27** `from . import cutlass as cutlass_dsl` — **EN:** Imports cutlass as cutlass_dsl from the current package. **CN:** 从当前包导入 cutlass as cutlass_dsl。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `# AST Helpers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L31** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `NoneType = type(None)` — **EN:** Assigns a value to NoneType. **CN:** 将一个值赋给 NoneType。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `class LoopUnroll(ir.Attribute):` — **EN:** Defines class `LoopUnroll` with bases ir.Attribute. **CN:** 定义类 `LoopUnroll`，其基类为 ir.Attribute。
+- **L37** `    def __init__(self, **kwargs: Union[int, bool]) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L38** `        valid_keys = set(["count", "full"])` — **EN:** Assigns a value to valid_keys. **CN:** 将一个值赋给 valid_keys。
+- **L39** `        def to_mlir_attr(val: Union[int, bool]) -> str:` — **EN:** Defines function `to_mlir_attr`. **CN:** 定义函数 `to_mlir_attr`。
+- **L40** `            if isinstance(val, bool):` — **EN:** Starts a conditional branch guarded by `isinstance(val, bool)`. **CN:** 开始一个由 `isinstance(val, bool)` 控制的条件分支。
+- **L41** `                return "true" if val else "false"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L42** `            elif isinstance(val, int):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L43** `                return f"{val} : i32"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L44** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L45** `                raise DSLNotImplemented(f"{type(val)} is not supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `        cfg = {key: to_mlir_attr(kwargs[key]) for key in valid_keys if key in kwargs}` — **EN:** Assigns a value to cfg. **CN:** 将一个值赋给 cfg。
+- **L48** `        if kwargs.get("count", None) == 1:` — **EN:** Starts a conditional branch guarded by `kwargs.get('count', None) == 1`. **CN:** 开始一个由 `kwargs.get('count', None) == 1` 控制的条件分支。
+- **L49** `            cfg["disable"] = "true"` — **EN:** Assigns a value to cfg['disable']. **CN:** 将一个值赋给 cfg['disable']。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `        unroll = "<" + ", ".join(f"{key} = {value}" for key, value in cfg.items()) + ">"` — **EN:** Assigns a value to unroll. **CN:** 将一个值赋给 unroll。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L54** `            ir.Attribute.parse(f"#llvm.loop_annotation<unroll = {unroll}>")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `class ScfGenerator:` — **EN:** Defines class `ScfGenerator`. **CN:** 定义类 `ScfGenerator`。
+- **L59** `    """` — **EN:** Starts the docstring for the class `ScfGenerator`. **CN:** 开始说明 class `ScfGenerator` 的文档字符串。
+- **L60** `    Encapsulates common scf dialect functionality: pack, unpack, and SCF execution.` — **EN:** Continues the docstring for the class `ScfGenerator`. **CN:** 继续说明 class `ScfGenerator` 的文档字符串。
+- **L61** `    """` — **EN:** Ends the docstring for the class `ScfGenerator`. **CN:** 结束说明 class `ScfGenerator` 的文档字符串。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L64** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L67** `    def _normalize_region_result_to_list(region_result: Any) -> List[Any]:` — **EN:** Defines function `_normalize_region_result_to_list`. **CN:** 定义函数 `_normalize_region_result_to_list`。
+- **L68** `        """` — **EN:** Starts the docstring for the function `_normalize_region_result_to_list`. **CN:** 开始说明 function `_normalize_region_result_to_list` 的文档字符串。
+- **L69** `        Convert region_result to a list if it is not already a list` — **EN:** Continues the docstring for the function `_normalize_region_result_to_list`. **CN:** 继续说明 function `_normalize_region_result_to_list` 的文档字符串。
+- **L70** `        If region_result is a list, return it as is.` — **EN:** Continues the docstring for the function `_normalize_region_result_to_list`. **CN:** 继续说明 function `_normalize_region_result_to_list` 的文档字符串。
+- **L71** `        If region_result is None, return an empty list.` — **EN:** Continues the docstring for the function `_normalize_region_result_to_list`. **CN:** 继续说明 function `_normalize_region_result_to_list` 的文档字符串。
+- **L72** `        If region_result is not a list, return a list containing region_result as the only element.` — **EN:** Continues the docstring for the function `_normalize_region_result_to_list`. **CN:** 继续说明 function `_normalize_region_result_to_list` 的文档字符串。
+- **L73** `        """` — **EN:** Ends the docstring for the function `_normalize_region_result_to_list`. **CN:** 结束说明 function `_normalize_region_result_to_list` 的文档字符串。
+- **L74** `        if region_result is None:` — **EN:** Starts a conditional branch guarded by `region_result is None`. **CN:** 开始一个由 `region_result is None` 控制的条件分支。
+- **L75** `            region_result_list = []` — **EN:** Assigns a value to region_result_list. **CN:** 将一个值赋给 region_result_list。
+- **L76** `        elif not isinstance(region_result, list):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L77** `            region_result_list = [region_result]` — **EN:** Assigns a value to region_result_list. **CN:** 将一个值赋给 region_result_list。
+- **L78** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L79** `            region_result_list = region_result` — **EN:** Assigns a value to region_result_list. **CN:** 将一个值赋给 region_result_list。
+- **L80** `        return region_result_list` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L83** `    def _check_region_result(` — **EN:** Defines function `_check_region_result`. **CN:** 定义函数 `_check_region_result`。
+- **L84** `        original_value: object, region_value: object, arg_name: str, op_type_name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L86** `        """` — **EN:** Starts the docstring for the function `_check_region_result`. **CN:** 开始说明 function `_check_region_result` 的文档字符串。
+- **L87** `        Validate that a region result maintains the same type as the original value.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `        This method checks for type consistency between the original value passed to a dynamic` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L90** `        SCF operation (like for, if, while) and the value returned from the operation's region.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `        Args:` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L93** `            original_value: The value before entering the SCF operation region` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L94** `            region_value: The value returned from the SCF operation region` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L95** `            arg_name: Name of the argument being checked (for error reporting)` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L96** `            op_type_name: Type of SCF operation (e.g., 'for', 'if', 'while') for error reporting` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `        Raises:` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L99** `            DSLRuntimeError: If the region value has a different type than the original value.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L100** `                The error includes suggestions for using compile-time control flow instead.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `        Note:` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L103** `            This method performs relaxed type checking that allows inheritance relationships.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L104** `            For example, a child class can be returned where a parent class was expected.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L105** `            However, fundamental type changes (like None to non-None, different sequence types,` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L106** `            or different numeric types) are not allowed in dynamic SCF operations.` — **EN:** Continues the docstring for the function `_check_region_result`. **CN:** 继续说明 function `_check_region_result` 的文档字符串。
+- **L107** `        """` — **EN:** Ends the docstring for the function `_check_region_result`. **CN:** 结束说明 function `_check_region_result` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `        def get_type_name(value: object) -> str:` — **EN:** Defines function `get_type_name`. **CN:** 定义函数 `get_type_name`。
+- **L110** `            if isinstance(value, NoneType):` — **EN:** Starts a conditional branch guarded by `isinstance(value, NoneType)`. **CN:** 开始一个由 `isinstance(value, NoneType)` 控制的条件分支。
+- **L111** `                return "None"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L112** `            elif isinstance(value, Sequence):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L113** `                return f"{type(value).__name__}<{len(value)}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L115** `                return type(value).__name__` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `        # Check for type mismatches` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L118** `        type_mismatch = False` — **EN:** Assigns a value to type_mismatch. **CN:** 将一个值赋给 type_mismatch。
+- **L119** `        old_type_name = None` — **EN:** Assigns a value to old_type_name. **CN:** 将一个值赋给 old_type_name。
+- **L120** `        new_type_name = None` — **EN:** Assigns a value to new_type_name. **CN:** 将一个值赋给 new_type_name。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `        # Handle None type changes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L123** `        if isinstance(original_value, NoneType) != isinstance(region_value, NoneType):` — **EN:** Starts a conditional branch guarded by `isinstance(original_value, NoneType) != isinstance(region...`. **CN:** 开始一个由 `isinstance(original_value, NoneType) != isinstance(region...` 控制的条件分支。
+- **L124** `            type_mismatch = True` — **EN:** Assigns a value to type_mismatch. **CN:** 将一个值赋给 type_mismatch。
+- **L125** `            old_type_name = get_type_name(original_value)` — **EN:** Assigns a value to old_type_name. **CN:** 将一个值赋给 old_type_name。
+- **L126** `            new_type_name = get_type_name(region_value)` — **EN:** Assigns a value to new_type_name. **CN:** 将一个值赋给 new_type_name。
+- **L127** `        # Handle sequence type/length changes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L128** `        elif isinstance(original_value, Sequence) and isinstance(` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L129** `            region_value, Sequence` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L130** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L131** `            if type(original_value) != type(region_value) or len(original_value) != len(` — **EN:** Starts a conditional branch guarded by `type(original_value) != type(region_value) or len(origina...`. **CN:** 开始一个由 `type(original_value) != type(region_value) or len(origina...` 控制的条件分支。
+- **L132** `                region_value` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L133** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L134** `                type_mismatch = True` — **EN:** Assigns a value to type_mismatch. **CN:** 将一个值赋给 type_mismatch。
+- **L135** `                old_type_name = get_type_name(original_value)` — **EN:** Assigns a value to old_type_name. **CN:** 将一个值赋给 old_type_name。
+- **L136** `                new_type_name = get_type_name(region_value)` — **EN:** Assigns a value to new_type_name. **CN:** 将一个值赋给 new_type_name。
+- **L137** `        # Handle numeric type changes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L138** `        elif isinstance(` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L139** `            original_value, (Numeric, ArithValue, ir.Value, int, float, bool)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L140** `        ) or isinstance(` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L141** `            region_value, (Numeric, ArithValue, ir.Value, int, float, bool)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L142** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L143** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L144** `                original_numeric = as_numeric(original_value)` — **EN:** Assigns a value to original_numeric. **CN:** 将一个值赋给 original_numeric。
+- **L145** `                region_numeric = as_numeric(region_value)` — **EN:** Assigns a value to region_numeric. **CN:** 将一个值赋给 region_numeric。
+- **L146** `                if original_numeric.dtype != region_numeric.dtype:` — **EN:** Starts a conditional branch guarded by `original_numeric.dtype != region_numeric.dtype`. **CN:** 开始一个由 `original_numeric.dtype != region_numeric.dtype` 控制的条件分支。
+- **L147** `                    type_mismatch = True` — **EN:** Assigns a value to type_mismatch. **CN:** 将一个值赋给 type_mismatch。
+- **L148** `                    old_type_name = original_numeric.dtype.__name__` — **EN:** Assigns a value to old_type_name. **CN:** 将一个值赋给 old_type_name。
+- **L149** `                    new_type_name = region_numeric.dtype.__name__` — **EN:** Assigns a value to new_type_name. **CN:** 将一个值赋给 new_type_name。
+- **L150** `            except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L151** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L152** `        # Handle general type changes (relaxed for inheritance)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L153** `        elif type(original_value) != type(region_value):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L154** `            old_type = type(original_value)` — **EN:** Assigns a value to old_type. **CN:** 将一个值赋给 old_type。
+- **L155** `            new_type = type(region_value)` — **EN:** Assigns a value to new_type. **CN:** 将一个值赋给 new_type。
+- **L156** `            if not (issubclass(old_type, new_type) or issubclass(new_type, old_type)):` — **EN:** Starts a conditional branch guarded by `not (issubclass(old_type, new_type) or issubclass(new_typ...`. **CN:** 开始一个由 `not (issubclass(old_type, new_type) or issubclass(new_typ...` 控制的条件分支。
+- **L157** `                type_mismatch = True` — **EN:** Assigns a value to type_mismatch. **CN:** 将一个值赋给 type_mismatch。
+- **L158** `                old_type_name = old_type.__name__` — **EN:** Assigns a value to old_type_name. **CN:** 将一个值赋给 old_type_name。
+- **L159** `                new_type_name = new_type.__name__` — **EN:** Assigns a value to new_type_name. **CN:** 将一个值赋给 new_type_name。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `        if type_mismatch:` — **EN:** Starts a conditional branch guarded by `type_mismatch`. **CN:** 开始一个由 `type_mismatch` 控制的条件分支。
+- **L162** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L163** `                f"\`{arg_name}\` is {old_type_name} prior to this \`{op_type_name}\`, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `                f"and update to {new_type_name} inside of this \`{op_type_name}\` is not supported.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `                suggestion=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `                    f"Please avoid changing type inside a dynamic \`{op_type_name}\`, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `                    f"or change to compile-time control flow by marking this \`{op_type_name}\` with "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `                    f"\`{'range_constexpr' if op_type_name == 'for' else 'const_expr'}\`."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `    def scf_execute_dynamic(` — **EN:** Defines function `scf_execute_dynamic`. **CN:** 定义函数 `scf_execute_dynamic`。
+- **L173** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L174** `        op_type_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L175** `        mix_iter_args: List[object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L176** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L177** `        mix_iter_arg_names: List[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L178** `        create_op_func: Callable[[List[ir.Value]], ir.Operation],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L179** `        region_builders: List[Callable[..., Any]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L180** `        block_term_op_builder: Dict[Callable[..., Any], Callable[..., Any]] = {},` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L182** `        # 1) Unpack` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L183** `        ir_values, pytree_def = cutlass_dsl.unpack_to_irvalue(` — **EN:** Assigns a value to (ir_values, pytree_def). **CN:** 将一个值赋给 (ir_values, pytree_def)。
+- **L184** `            mix_iter_args, op_type_name, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        # 2) Create the SCF op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `        op = create_op_func(ir_values)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L189** `        log().debug("Generated scf.%s \n[%s]", op_type_name, op)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `        # 3) Build the regions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L192** `        for i, builder in enumerate(region_builders):` — **EN:** Starts a loop assigning items from `enumerate(region_builders)` to `(i, builder)`. **CN:** 开始一个循环，将 `enumerate(region_builders)` 的元素赋给 `(i, builder)`。
+- **L193** `            region = op.regions[i]` — **EN:** Assigns a value to region. **CN:** 将一个值赋给 region。
+- **L194** `            block = region.blocks[0]` — **EN:** Assigns a value to block. **CN:** 将一个值赋给 block。
+- **L195** `            with ir.InsertionPoint(block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(block). **CN:** 开始一个使用 ir.InsertionPoint(block) 的上下文管理代码块。
+- **L196** `                block_args = list(block.arguments)` — **EN:** Assigns a value to block_args. **CN:** 将一个值赋给 block_args。
+- **L197** `                region_result = builder(` — **EN:** Assigns a value to region_result. **CN:** 将一个值赋给 region_result。
+- **L198** `                    op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `                    block_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `                    ir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `                    pytree_def,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `                    mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `                    full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `                # Use custom terminator if provided for this builder, otherwise use default YieldOp` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L207** `                if builder in block_term_op_builder:` — **EN:** Starts a conditional branch guarded by `builder in block_term_op_builder`. **CN:** 开始一个由 `builder in block_term_op_builder` 控制的条件分支。
+- **L208** `                    # Use the provided terminator generator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L209** `                    block_term_op_builder[builder](region_result, full_write_args_count)` — **EN:** Invokes `block_term_op_builder[builder]` as a standalone call. **CN:** 以独立语句方式调用 `block_term_op_builder[builder]`。
+- **L210** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L211** `                    # Normalize region_result` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L212** `                    region_result_list = ScfGenerator._normalize_region_result_to_list(` — **EN:** Assigns a value to region_result_list. **CN:** 将一个值赋给 region_result_list。
+- **L213** `                        region_result` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `                    # For standard yield op, check result` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L216** `                    for arg, result, name in zip(` — **EN:** Starts a loop assigning items from `zip(mix_iter_args, region_result_list, mix_iter...` to `(arg, result, name)`. **CN:** 开始一个循环，将 `zip(mix_iter_args, region_result_list, mix_iter...` 的元素赋给 `(arg, result, name)`。
+- **L217** `                        mix_iter_args,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L218** `                        region_result_list,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `                        mix_iter_arg_names,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L220** `                    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L221** `                        ScfGenerator._check_region_result(` — **EN:** Invokes `ScfGenerator._check_region_result` as a standalone call. **CN:** 以独立语句方式调用 `ScfGenerator._check_region_result`。
+- **L222** `                            arg, result, name, op_type_name` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `                    # Default behavior - generate YieldOp` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L226** `                    region_values, yield_pytree_def = cutlass_dsl.unpack_to_irvalue(` — **EN:** Assigns a value to (region_values, yield_pytree_def). **CN:** 将一个值赋给 (region_values, yield_pytree_def)。
+- **L227** `                        region_result_list, op_type_name, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `                    assert isinstance(pytree_def, PyTreeDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L231** `                    assert isinstance(yield_pytree_def, PyTreeDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L232** `                    mismatch = check_tree_equal(pytree_def, yield_pytree_def)` — **EN:** Assigns a value to mismatch. **CN:** 将一个值赋给 mismatch。
+- **L233** `                    if mismatch != -1:` — **EN:** Starts a conditional branch guarded by `mismatch != -1`. **CN:** 开始一个由 `mismatch != -1` 控制的条件分支。
+- **L234** `                        # Get arg name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `                        filterd_arg_names = (` — **EN:** Assigns a value to filterd_arg_names. **CN:** 将一个值赋给 filterd_arg_names。
+- **L236** `                            cutlass_dsl.filter_readonly_frozen_dataclass_names(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `                                mix_iter_args, mix_iter_arg_names, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `                            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `                        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L242** `                            f"\`{filterd_arg_names[mismatch]}\` is structured different after this \`{op_type_name}\`.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                            suggestion=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `                                f"Please avoid changing type structure inside a dynamic \`{op_type_name}\`, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `                                f"or change to compile-time control flow by marking this \`{op_type_name}\` with "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `                                f"\`{'range_constexpr' if op_type_name == 'for' else 'const_expr'}\`."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `                            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `                    scf.YieldOp(region_values)` — **EN:** Invokes `scf.YieldOp` as a standalone call. **CN:** 以独立语句方式调用 `scf.YieldOp`。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** `        log().debug("Completed scf.%s \n[%s]", op_type_name, op)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `        # 4) Pack final results` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L255** `        assert isinstance(pytree_def, PyTreeDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L256** `        final_results = cutlass_dsl.pack_from_irvalue(` — **EN:** Assigns a value to final_results. **CN:** 将一个值赋给 final_results。
+- **L257** `            op.results, pytree_def, mix_iter_args, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `        # 5) Return in a nice pattern` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L261** `        if not final_results:` — **EN:** Starts a conditional branch guarded by `not final_results`. **CN:** 开始一个由 `not final_results` 控制的条件分支。
+- **L262** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L263** `        if len(final_results) == 1:` — **EN:** Starts a conditional branch guarded by `len(final_results) == 1`. **CN:** 开始一个由 `len(final_results) == 1` 控制的条件分支。
+- **L264** `            return final_results[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L265** `        return final_results` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `def _attr_const_check(attr: object, expected_type: type, attr_name: str) -> None:` — **EN:** Defines function `_attr_const_check`. **CN:** 定义函数 `_attr_const_check`。
+- **L269** `    # Use strict type equality to prevent \`bool\` being accepted where \`int\` is required.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L270** `    if is_dynamic_expression(attr) or type(attr) is not expected_type:` — **EN:** Starts a conditional branch guarded by `is_dynamic_expression(attr) or type(attr) is not expected...`. **CN:** 开始一个由 `is_dynamic_expression(attr) or type(attr) is not expected...` 控制的条件分支。
+- **L271** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L272** `            f"loop attribute \`{attr_name}\` must be a Python value of type \`{expected_type.__name__}\`, got \`{type(attr).__name__}\`."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `def _loop_execute_range_dynamic(` — **EN:** Defines function `_loop_execute_range_dynamic`. **CN:** 定义函数 `_loop_execute_range_dynamic`。
+- **L277** `    func: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `    start: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `    stop: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `    step: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L281** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L282** `    write_args: List[Any] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L283** `    full_write_args_count: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L284** `    write_args_names: List[str] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L285** `    unroll: int = -1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L286** `    unroll_full: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L287** `    prefetch_stages: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L288** `    vectorize: Optional[bool] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L289** `    at_least_once: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L290** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L291** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L292** `    """` — **EN:** Starts the docstring for the function `_loop_execute_range_dynamic`. **CN:** 开始说明 function `_loop_execute_range_dynamic` 的文档字符串。
+- **L293** `    Example: build an scf.for with optional unroll, using our universal helper.` — **EN:** Continues the docstring for the function `_loop_execute_range_dynamic`. **CN:** 继续说明 function `_loop_execute_range_dynamic` 的文档字符串。
+- **L294** `    """` — **EN:** Ends the docstring for the function `_loop_execute_range_dynamic`. **CN:** 结束说明 function `_loop_execute_range_dynamic` 的文档字符串。
+- **L295** `    scf_gen = ScfGenerator()` — **EN:** Assigns a value to scf_gen. **CN:** 将一个值赋给 scf_gen。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `    def create_for_op(dyn_yield_ops: List[ir.Value]) -> ir.Operation:` — **EN:** Defines function `create_for_op`. **CN:** 定义函数 `create_for_op`。
+- **L298** `        for d in dyn_yield_ops:` — **EN:** Starts a loop assigning items from `dyn_yield_ops` to `d`. **CN:** 开始一个循环，将 `dyn_yield_ops` 的元素赋给 `d`。
+- **L299** `            if not isinstance(d, ir.Value):` — **EN:** Starts a conditional branch guarded by `not isinstance(d, ir.Value)`. **CN:** 开始一个由 `not isinstance(d, ir.Value)` 控制的条件分支。
+- **L300** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L301** `                    f"Invalid dyn_yield_ops: {dyn_yield_ops} \n\tExpected ir.Value, got {type(d)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `        # Convert Python ints or values to IR constants if needed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L305** `        start_ = t.as_numeric(start)` — **EN:** Assigns a value to start_. **CN:** 将一个值赋给 start_。
+- **L306** `        stop_ = t.as_numeric(stop)` — **EN:** Assigns a value to stop_. **CN:** 将一个值赋给 stop_。
+- **L307** `        step_ = t.as_numeric(step)` — **EN:** Assigns a value to step_. **CN:** 将一个值赋给 step_。
+- **L308** `        if start_.dtype is not t.Int32:` — **EN:** Starts a conditional branch guarded by `start_.dtype is not t.Int32`. **CN:** 开始一个由 `start_.dtype is not t.Int32` 控制的条件分支。
+- **L309** `            raise DSLRuntimeError(f"expected Int32 for start, got {start_.dtype}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L310** `        if stop_.dtype is not t.Int32:` — **EN:** Starts a conditional branch guarded by `stop_.dtype is not t.Int32`. **CN:** 开始一个由 `stop_.dtype is not t.Int32` 控制的条件分支。
+- **L311** `            raise DSLRuntimeError(f"expected Int32 for stop, got {stop_.dtype}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L312** `        if step_.dtype is not t.Int32:` — **EN:** Starts a conditional branch guarded by `step_.dtype is not t.Int32`. **CN:** 开始一个由 `step_.dtype is not t.Int32` 控制的条件分支。
+- **L313** `            raise DSLRuntimeError(f"expected Int32 for step, got {step_.dtype}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L314** `        start_ = start_.ir_value()` — **EN:** Assigns a value to start_. **CN:** 将一个值赋给 start_。
+- **L315** `        stop_ = stop_.ir_value()` — **EN:** Assigns a value to stop_. **CN:** 将一个值赋给 stop_。
+- **L316** `        step_ = step_.ir_value()` — **EN:** Assigns a value to step_. **CN:** 将一个值赋给 step_。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `        # Attributes must be pure Python value, add a check` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L319** `        _attr_const_check(unroll, int, "unroll")` — **EN:** Invokes `_attr_const_check` as a standalone call. **CN:** 以独立语句方式调用 `_attr_const_check`。
+- **L320** `        _attr_const_check(unroll_full, bool, "unroll_full")` — **EN:** Invokes `_attr_const_check` as a standalone call. **CN:** 以独立语句方式调用 `_attr_const_check`。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `        # Possibly attach unroll attributes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L323** `        unroll_attr = None` — **EN:** Assigns a value to unroll_attr. **CN:** 将一个值赋给 unroll_attr。
+- **L324** `        if unroll_full:` — **EN:** Starts a conditional branch guarded by `unroll_full`. **CN:** 开始一个由 `unroll_full` 控制的条件分支。
+- **L325** `            unroll_attr = LoopUnroll(full=True)` — **EN:** Assigns a value to unroll_attr. **CN:** 将一个值赋给 unroll_attr。
+- **L326** `        elif unroll != -1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L327** `            unroll_attr = LoopUnroll(count=unroll)` — **EN:** Assigns a value to unroll_attr. **CN:** 将一个值赋给 unroll_attr。
+- **L328** `        log().debug("Unroll attribute: %s", unroll_attr)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        prefetch_stages_attr = None` — **EN:** Assigns a value to prefetch_stages_attr. **CN:** 将一个值赋给 prefetch_stages_attr。
+- **L331** `        if prefetch_stages is not None:` — **EN:** Starts a conditional branch guarded by `prefetch_stages is not None`. **CN:** 开始一个由 `prefetch_stages is not None` 控制的条件分支。
+- **L332** `            _attr_const_check(prefetch_stages, int, "prefetch_stages")` — **EN:** Invokes `_attr_const_check` as a standalone call. **CN:** 以独立语句方式调用 `_attr_const_check`。
+- **L333** `            if prefetch_stages >= 0:` — **EN:** Starts a conditional branch guarded by `prefetch_stages >= 0`. **CN:** 开始一个由 `prefetch_stages >= 0` 控制的条件分支。
+- **L334** `                prefetch_stages_attr = ir.IntegerAttr.get(` — **EN:** Assigns a value to prefetch_stages_attr. **CN:** 将一个值赋给 prefetch_stages_attr。
+- **L335** `                    ir.IntegerType.get_signless(32), prefetch_stages` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L338** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L339** `                    f"loop attribute \`prefetch_stages\` must be non-negative, got \`{prefetch_stages}\`."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `        log().debug("prefetch_stages attribute: %s", prefetch_stages_attr)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `        vectorize_attr = None` — **EN:** Assigns a value to vectorize_attr. **CN:** 将一个值赋给 vectorize_attr。
+- **L344** `        if vectorize:` — **EN:** Starts a conditional branch guarded by `vectorize`. **CN:** 开始一个由 `vectorize` 控制的条件分支。
+- **L345** `            from ..base_dsl.arch import Arch` — **EN:** Imports Arch from `..base_dsl.arch`. **CN:** 从 `..base_dsl.arch` 导入 Arch。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** `            arch = cutlass_dsl.CuTeDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L348** `            if arch < Arch.sm_100:` — **EN:** Starts a conditional branch guarded by `arch < Arch.sm_100`. **CN:** 开始一个由 `arch < Arch.sm_100` 控制的条件分支。
+- **L349** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L350** `                    f"vectorize is supported for sm_100 and above, got {arch}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            _attr_const_check(vectorize, bool, "vectorize")` — **EN:** Invokes `_attr_const_check` as a standalone call. **CN:** 以独立语句方式调用 `_attr_const_check`。
+- **L353** `            vectorize_attr = ir.BoolAttr.get(True)` — **EN:** Assigns a value to vectorize_attr. **CN:** 将一个值赋给 vectorize_attr。
+- **L354** `        log().debug("vectorize attribute: %s", vectorize_attr)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L356** `        log().debug(` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L357** `            "Creating scf.ForOp \n\t\tstart=%s: type : %s\n\t\tstop=%s: type : %s\n\t\tstep=%s: type : %s",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `            start_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `            type(start_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `            stop_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `            type(stop_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `            step_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `            type(step_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `        # Create scf.ForOp, passing iteration args if any` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L367** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L368** `            if not dyn_yield_ops:` — **EN:** Starts a conditional branch guarded by `not dyn_yield_ops`. **CN:** 开始一个由 `not dyn_yield_ops` 控制的条件分支。
+- **L369** `                for_op = scf.ForOp(start_, stop_, step_)` — **EN:** Assigns a value to for_op. **CN:** 将一个值赋给 for_op。
+- **L370** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L371** `                for_op = scf.ForOp(start_, stop_, step_, list(dyn_yield_ops))` — **EN:** Assigns a value to for_op. **CN:** 将一个值赋给 for_op。
+- **L372** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L373** `            yield_ops = "\n".join(` — **EN:** Assigns a value to yield_ops. **CN:** 将一个值赋给 yield_ops。
+- **L374** `                f"\t\t{i} => {d} : type : {type(d)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `                for i, d in enumerate(dyn_yield_ops)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L378** `                f"Failed to create dynamic for loop \n\t\tstart={start_}: type : {type(start_)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `                f"\n\t\tstop={stop_}: type : {type(stop_)}\n\t\tstep={step_}: type : {type(step_)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `                f", \n\tdyn_yield_ops:\n{yield_ops}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `            ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `        if unroll_attr is not None:` — **EN:** Starts a conditional branch guarded by `unroll_attr is not None`. **CN:** 开始一个由 `unroll_attr is not None` 控制的条件分支。
+- **L384** `            for_op.attributes["loop_annotation"] = unroll_attr` — **EN:** Assigns a value to for_op.attributes['loop_annotation']. **CN:** 将一个值赋给 for_op.attributes['loop_annotation']。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `        if prefetch_stages_attr is not None:` — **EN:** Starts a conditional branch guarded by `prefetch_stages_attr is not None`. **CN:** 开始一个由 `prefetch_stages_attr is not None` 控制的条件分支。
+- **L387** `            for_op.attributes["cutlass.pipelining"] = prefetch_stages_attr` — **EN:** Assigns a value to for_op.attributes['cutlass.pipelining']. **CN:** 将一个值赋给 for_op.attributes['cutlass.pipelining']。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** `        if vectorize_attr is not None:` — **EN:** Starts a conditional branch guarded by `vectorize_attr is not None`. **CN:** 开始一个由 `vectorize_attr is not None` 控制的条件分支。
+- **L390** `            for_op.attributes["cutlass.vectorize"] = vectorize_attr` — **EN:** Assigns a value to for_op.attributes['cutlass.vectorize']. **CN:** 将一个值赋给 for_op.attributes['cutlass.vectorize']。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `        if at_least_once:` — **EN:** Starts a conditional branch guarded by `at_least_once`. **CN:** 开始一个由 `at_least_once` 控制的条件分支。
+- **L393** `            for_op.attributes["at_least_once"] = ir.UnitAttr.get()` — **EN:** Assigns a value to for_op.attributes['at_least_once']. **CN:** 将一个值赋给 for_op.attributes['at_least_once']。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `        return for_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `    def for_body_builder(` — **EN:** Defines function `for_body_builder`. **CN:** 定义函数 `for_body_builder`。
+- **L398** `        op: ir.Operation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L399** `        block_args: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L400** `        _: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L401** `        pytree_def: Optional[PyTreeDef],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `        mix_iter_args: List[object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `    ) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L405** `        # scf.ForOp block_args are typically [induction_var, iter_args...]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L406** `        # But MLIR also gives you op.induction_variable` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L407** `        iv = t.as_numeric(op.induction_variable)` — **EN:** Assigns a value to iv. **CN:** 将一个值赋给 iv。
+- **L408** `        log().debug(` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L409** `            "For body builder: %s block_args: %s full_write_args_count: %s",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `            iv,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `            block_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `            full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `        # block_args[1:] are iteration variables` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L415** `        func_args = []` — **EN:** Assigns a value to func_args. **CN:** 将一个值赋给 func_args。
+- **L416** `        func_args.extend(` — **EN:** Invokes `func_args.extend` as a standalone call. **CN:** 以独立语句方式调用 `func_args.extend`。
+- **L417** `            cutlass_dsl.pack_from_irvalue(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `                block_args[1:],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `                pytree_def,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `                mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `                full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `        if not func_args:` — **EN:** Starts a conditional branch guarded by `not func_args`. **CN:** 开始一个由 `not func_args` 控制的条件分支。
+- **L425** `            # No iteration arguments, or only the induction var` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L426** `            func(iv)` — **EN:** Invokes `func` as a standalone call. **CN:** 以独立语句方式调用 `func`。
+- **L427** `            return []  # yield nothing` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L428** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L429** `            updated_func_args = func(iv, *func_args)` — **EN:** Assigns a value to updated_func_args. **CN:** 将一个值赋给 updated_func_args。
+- **L430** `            return updated_func_args` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L431** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L432** `    # Now call the universal SCF executor with a single region builder` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L433** `    return scf_gen.scf_execute_dynamic(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L434** `        op_type_name="for",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `        mix_iter_args=write_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `        full_write_args_count=full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `        mix_iter_arg_names=write_args_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `        create_op_func=create_for_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `        region_builders=[for_body_builder],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `def _if_execute_dynamic(` — **EN:** Defines function `_if_execute_dynamic`. **CN:** 定义函数 `_if_execute_dynamic`。
+- **L444** `    pred: "ir.Value",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L445** `    then_block: Callable[..., object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L446** `    else_block: Optional[Callable[..., object]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L447** `    mix_yield_args: List[object] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L448** `    full_write_args_count: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L449** `    mix_yield_arg_names: List[str] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L450** `    if_constexpr: Optional[bool] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L451** `) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L452** `    """` — **EN:** Starts the docstring for the function `_if_execute_dynamic`. **CN:** 开始说明 function `_if_execute_dynamic` 的文档字符串。
+- **L453** `    Build an scf.if with optional else, using our universal helper.` — **EN:** Continues the docstring for the function `_if_execute_dynamic`. **CN:** 继续说明 function `_if_execute_dynamic` 的文档字符串。
+- **L454** `    """` — **EN:** Ends the docstring for the function `_if_execute_dynamic`. **CN:** 结束说明 function `_if_execute_dynamic` 的文档字符串。
+- **L455** `    scf_gen = ScfGenerator()` — **EN:** Assigns a value to scf_gen. **CN:** 将一个值赋给 scf_gen。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `    def create_if_op(dyn_yield_ops: List[ir.Value]) -> ir.Operation:` — **EN:** Defines function `create_if_op`. **CN:** 定义函数 `create_if_op`。
+- **L458** `        # Assume final result types match the dynamic yields` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L459** `        result_types = [arg.type for arg in dyn_yield_ops]` — **EN:** Assigns a value to result_types. **CN:** 将一个值赋给 result_types。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `        pred_ = Boolean(pred)` — **EN:** Assigns a value to pred_. **CN:** 将一个值赋给 pred_。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L464** `            if_op = scf.IfOp(` — **EN:** Assigns a value to if_op. **CN:** 将一个值赋给 if_op。
+- **L465** `                pred_.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `                hasElse=(else_block is not None),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `                results_=result_types,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L470** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L471** `                f"Failed to create dynamic if \n\t\tpred={pred_}: type : {type(pred_)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `            ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `        return if_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `    def then_builder(` — **EN:** Defines function `then_builder`. **CN:** 定义函数 `then_builder`。
+- **L476** `        if_op: ir.Operation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L477** `        _: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L478** `        dyn_yield_ops: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L479** `        pytree_def: Optional[PyTreeDef],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L480** `        mix_iter_args: List[object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L481** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L482** `    ) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L483** `        flat_args = list(` — **EN:** Assigns a value to flat_args. **CN:** 将一个值赋给 flat_args。
+- **L484** `            cutlass_dsl.pack_from_irvalue(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `                dyn_yield_ops,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `                pytree_def,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `                mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `                full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L490** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L491** `        return then_block(*flat_args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `    region_builders = [then_builder]` — **EN:** Assigns a value to region_builders. **CN:** 将一个值赋给 region_builders。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `    if else_block is not None:` — **EN:** Starts a conditional branch guarded by `else_block is not None`. **CN:** 开始一个由 `else_block is not None` 控制的条件分支。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `        def else_builder(` — **EN:** Defines function `else_builder`. **CN:** 定义函数 `else_builder`。
+- **L498** `            if_op: ir.Operation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L499** `            _: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L500** `            dyn_yield_ops: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L501** `            pytree_def: Optional[PyTreeDef],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L502** `            mix_iter_args: List[object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L503** `            full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L504** `        ) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L505** `            flat_args = list(` — **EN:** Assigns a value to flat_args. **CN:** 将一个值赋给 flat_args。
+- **L506** `                cutlass_dsl.pack_from_irvalue(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L507** `                    dyn_yield_ops,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L508** `                    pytree_def,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L509** `                    mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L510** `                    full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L511** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `            return else_block(*flat_args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `        region_builders.append(else_builder)` — **EN:** Invokes `region_builders.append` as a standalone call. **CN:** 以独立语句方式调用 `region_builders.append`。
+- **L516** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L517** `    return scf_gen.scf_execute_dynamic(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L518** `        op_type_name="if",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L519** `        mix_iter_args=mix_yield_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L520** `        full_write_args_count=full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L521** `        mix_iter_arg_names=mix_yield_arg_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `        create_op_func=create_if_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `        region_builders=region_builders,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `def _while_execute_dynamic(` — **EN:** Defines function `_while_execute_dynamic`. **CN:** 定义函数 `_while_execute_dynamic`。
+- **L528** `    while_before_block: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L529** `    while_after_block: Optional[Callable[..., Any]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L530** `    write_args: List[Any] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L531** `    full_write_args_count: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L532** `    write_args_names: List[str] = [],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L533** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L534** `    """` — **EN:** Starts the docstring for the function `_while_execute_dynamic`. **CN:** 开始说明 function `_while_execute_dynamic` 的文档字符串。
+- **L535** `    Create and return an SCF WhileOp for dynamic loops.` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L536** `    Generate the dynamic loop body using SCF WhileOp.` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L538** `    Args:` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L539** `        while_before_block: Function that returns (condition, updated_values)` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L540** `        while_after_block: Function that returns updated values` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L541** `        write_args: Values that are updated in the loop` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L542** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L543** `    See create_while_function in ast_preprocessor.py for details on the input structure.` — **EN:** Continues the docstring for the function `_while_execute_dynamic`. **CN:** 继续说明 function `_while_execute_dynamic` 的文档字符串。
+- **L544** `    """` — **EN:** Ends the docstring for the function `_while_execute_dynamic`. **CN:** 结束说明 function `_while_execute_dynamic` 的文档字符串。
+- **L545** `    log().debug("_while_execute_dynamic")` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L546** `    while_op_type_name = "while"` — **EN:** Assigns a value to while_op_type_name. **CN:** 将一个值赋给 while_op_type_name。
+- **L547** `    scf_gen = ScfGenerator()` — **EN:** Assigns a value to scf_gen. **CN:** 将一个值赋给 scf_gen。
+- **L548** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L549** `    def create_while_op(dyn_yield_ops: List[ir.Value]) -> ir.Operation:` — **EN:** Defines function `create_while_op`. **CN:** 定义函数 `create_while_op`。
+- **L550** `        # Create the while operation with the types from yield_args` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L551** `        result_types = [arg.type for arg in dyn_yield_ops]` — **EN:** Assigns a value to result_types. **CN:** 将一个值赋给 result_types。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L554** `            while_op = scf.WhileOp(result_types, dyn_yield_ops)` — **EN:** Assigns a value to while_op. **CN:** 将一个值赋给 while_op。
+- **L555** `            while_op.before.blocks.append(*result_types)` — **EN:** Invokes `while_op.before.blocks.append` as a standalone call. **CN:** 以独立语句方式调用 `while_op.before.blocks.append`。
+- **L556** `            while_op.after.blocks.append(*result_types)` — **EN:** Invokes `while_op.after.blocks.append` as a standalone call. **CN:** 以独立语句方式调用 `while_op.after.blocks.append`。
+- **L557** `            log().debug("[%s]", while_op)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L558** `            return while_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L559** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L560** `            yield_ops = "\n".join(` — **EN:** Assigns a value to yield_ops. **CN:** 将一个值赋给 yield_ops。
+- **L561** `                f"\t\t{i} => {d} : type : {type(d)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** `                for i, d in enumerate(dyn_yield_ops)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L563** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L564** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L565** `                f"Failed to create dynamic while loop with yield_ops:\n{yield_ops}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `            ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L568** `    def before_block_builder(` — **EN:** Defines function `before_block_builder`. **CN:** 定义函数 `before_block_builder`。
+- **L569** `        op: ir.Operation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L570** `        block_args: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L571** `        _: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L572** `        pytree_def: Optional[PyTreeDef],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L573** `        mix_iter_args: List[Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L574** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L575** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L576** `        # Build the before (condition) block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L577** `        flat_args = []` — **EN:** Assigns a value to flat_args. **CN:** 将一个值赋给 flat_args。
+- **L578** `        flat_args.extend(` — **EN:** Invokes `flat_args.extend` as a standalone call. **CN:** 以独立语句方式调用 `flat_args.extend`。
+- **L579** `            cutlass_dsl.pack_from_irvalue(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L580** `                block_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `                pytree_def,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `                mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `                full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L587** `        log().debug("before block args: %s", flat_args)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L588** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L589** `        cond, before_results = while_before_block(*flat_args)` — **EN:** Assigns a value to (cond, before_results). **CN:** 将一个值赋给 (cond, before_results)。
+- **L590** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L591** `        if not isinstance(before_results, (list, ir.OpResultList)):` — **EN:** Starts a conditional branch guarded by `not isinstance(before_results, (list, ir.OpResultList))`. **CN:** 开始一个由 `not isinstance(before_results, (list, ir.OpResultList))` 控制的条件分支。
+- **L592** `            before_results = [before_results]` — **EN:** Assigns a value to before_results. **CN:** 将一个值赋给 before_results。
+- **L593** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L594** `        log().debug("cond [%s]", cond)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L595** `        log().debug(` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L596** `            "before_results [%s]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** `            before_results,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L598** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L600** `        return cond, before_results` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** `    def before_block_terminator(` — **EN:** Defines function `before_block_terminator`. **CN:** 定义函数 `before_block_terminator`。
+- **L603** `        cond_and_results: Any, full_write_args_count: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L604** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L605** `        # Generate a condition op instead of yield op.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L606** `        cond = cond_and_results[0]` — **EN:** Assigns a value to cond. **CN:** 将一个值赋给 cond。
+- **L607** `        before_result_list = ScfGenerator._normalize_region_result_to_list(` — **EN:** Assigns a value to before_result_list. **CN:** 将一个值赋给 before_result_list。
+- **L608** `            cond_and_results[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `        ir_cond = as_numeric(cond).ir_value()` — **EN:** Assigns a value to ir_cond. **CN:** 将一个值赋给 ir_cond。
+- **L611** `        ir_results_list, pytree_def = cutlass_dsl.unpack_to_irvalue(` — **EN:** Assigns a value to (ir_results_list, pytree_def). **CN:** 将一个值赋给 (ir_results_list, pytree_def)。
+- **L612** `            before_result_list, while_op_type_name, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** `        log().debug(` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L615** `            "creating scf.ConditionOp with [%s], [%s]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `            ir_cond,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** `            ir_results_list,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L618** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L619** `        scf.ConditionOp(ir_cond, ir_results_list)` — **EN:** Invokes `scf.ConditionOp` as a standalone call. **CN:** 以独立语句方式调用 `scf.ConditionOp`。
+- **L620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L621** `    def after_block_builder(` — **EN:** Defines function `after_block_builder`. **CN:** 定义函数 `after_block_builder`。
+- **L622** `        op: ir.Operation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L623** `        block_args: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L624** `        _: List[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L625** `        pytree_def: Optional[PyTreeDef],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L626** `        mix_iter_args: List[object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L627** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L628** `    ) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L629** `        # Build the after (body) block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L630** `        flat_args = []` — **EN:** Assigns a value to flat_args. **CN:** 将一个值赋给 flat_args。
+- **L631** `        flat_args.extend(` — **EN:** Invokes `flat_args.extend` as a standalone call. **CN:** 以独立语句方式调用 `flat_args.extend`。
+- **L632** `            cutlass_dsl.pack_from_irvalue(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L633** `                block_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `                pytree_def,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** `                mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L636** `                full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L640** `        log().debug("after block args: %s", flat_args)` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L641** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L642** `        assert while_after_block is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L643** `        after_results = while_after_block(*flat_args)` — **EN:** Assigns a value to after_results. **CN:** 将一个值赋给 after_results。
+- **L644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L645** `        if not isinstance(after_results, (list, ir.OpResultList)):` — **EN:** Starts a conditional branch guarded by `not isinstance(after_results, (list, ir.OpResultList))`. **CN:** 开始一个由 `not isinstance(after_results, (list, ir.OpResultList))` 控制的条件分支。
+- **L646** `            after_results = [after_results]` — **EN:** Assigns a value to after_results. **CN:** 将一个值赋给 after_results。
+- **L647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L648** `        log().debug(` — **EN:** Invokes `log().debug` as a standalone call. **CN:** 以独立语句方式调用 `log().debug`。
+- **L649** `            "after_results [%s]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** `            after_results,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L651** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L652** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L653** `        return after_results` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L654** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L655** `    # Call the universal SCF executor with two region builders` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L656** `    return scf_gen.scf_execute_dynamic(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L657** `        op_type_name=while_op_type_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L658** `        mix_iter_args=write_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L659** `        full_write_args_count=full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L660** `        mix_iter_arg_names=write_args_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L661** `        create_op_func=create_while_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `        region_builders=[before_block_builder, after_block_builder],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L663** `        block_term_op_builder={` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L664** `            before_block_builder: before_block_terminator` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** `        },  # Only customize the before block` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L666** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L667** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L668** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L669** `def _ifexp_execute_dynamic(` — **EN:** Defines function `_ifexp_execute_dynamic`. **CN:** 定义函数 `_ifexp_execute_dynamic`。
+- **L670** `    pred: "ir.Value",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L671** `    block_args: tuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L672** `    then_block: Callable[..., object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L673** `    else_block: Callable[..., object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L674** `) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L675** `    """` — **EN:** Starts the docstring for the function `_ifexp_execute_dynamic`. **CN:** 开始说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L676** `    Dynamically execute a Python inline if-expression (ternary) as a runtime-dispatched control flow op.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L677** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L678** `    This function builds an SCF (Structured Control Flow) \`if\` operation in the IR, using the given` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L679** `    predicate and block functions for the 'then' and 'else' branches, and infers the result types` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L680** `    from the return signature of those blocks. It ensures that both branches return values of the same` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L681** `    tree structure and types, so that the IR op can properly yield their results.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L682** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L683** `    Parameters` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L684** `    ----------` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L685** `    pred : ir.Value` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L686** `        The predicate value (a boolean IR value) that determines which branch is executed.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L687** `    block_args : tuple` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L688** `        The block arguments that are passed to the then and else blocks.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L689** `    then_block : Callable` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L690** `        A Python function that executes the 'then' branch and returns the result(s). This will be` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L691** `        executed if \`pred\` evaluates to True.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L692** `    else_block : Callable` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L693** `        A Python function that executes the 'else' branch and returns the result(s). This will be` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L694** `        executed if \`pred\` evaluates to False.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L695** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L696** `    Returns` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L697** `    -------` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L698** `    list` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L699** `        The evaluated result(s) of the selected branch, in a standardized (possibly list-wrapped) format.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L700** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L701** `    Raises` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L702** `    ------` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L703** `    DSLRuntimeError` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L704** `        If the 'then' and 'else' blocks return values of different tree structures or types,` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L705** `        or if IR construction fails.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L706** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L707** `    Notes` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L708** `    -----` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L709** `    This function is a low-level implementation intended for use by the AST transformation machinery,` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L710** `    and not for direct user invocation. It acts as the backend for transformed Python inline if-expressions.` — **EN:** Continues the docstring for the function `_ifexp_execute_dynamic`. **CN:** 继续说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L711** `    """` — **EN:** Ends the docstring for the function `_ifexp_execute_dynamic`. **CN:** 结束说明 function `_ifexp_execute_dynamic` 的文档字符串。
+- **L712** `    # Infer result types by running both branches with dummy arguments in a temporary region` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L713** `    execution_region = scf.ExecuteRegionOp(result=[])` — **EN:** Assigns a value to execution_region. **CN:** 将一个值赋给 execution_region。
+- **L714** `    execution_region.region.blocks.append()` — **EN:** Invokes `execution_region.region.blocks.append` as a standalone call. **CN:** 以独立语句方式调用 `execution_region.region.blocks.append`。
+- **L715** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L716** `    result_types = []` — **EN:** Assigns a value to result_types. **CN:** 将一个值赋给 result_types。
+- **L717** `    mix_iter_args = []` — **EN:** Assigns a value to mix_iter_args. **CN:** 将一个值赋给 mix_iter_args。
+- **L718** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L719** `    with ir.InsertionPoint(execution_region.region.blocks[0]):` — **EN:** Starts a context-managed block using ir.InsertionPoint(execution_region.region.blocks[0]). **CN:** 开始一个使用 ir.InsertionPoint(execution_region.region.blocks[0]) 的上下文管理代码块。
+- **L720** `        # Call the then block and unpack its results to IR values and tree structure` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L721** `        then_results = ScfGenerator._normalize_region_result_to_list(` — **EN:** Assigns a value to then_results. **CN:** 将一个值赋给 then_results。
+- **L722** `            then_block(*block_args)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L723** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L724** `        ir_values, then_tree = cutlass_dsl.unpack_to_irvalue(then_results, "ifexp", 0)` — **EN:** Assigns a value to (ir_values, then_tree). **CN:** 将一个值赋给 (ir_values, then_tree)。
+- **L725** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L726** `        # Call the else block and unpack its results to IR values and tree structure` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L727** `        else_results = ScfGenerator._normalize_region_result_to_list(` — **EN:** Assigns a value to else_results. **CN:** 将一个值赋给 else_results。
+- **L728** `            else_block(*block_args)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** `        _, else_tree = cutlass_dsl.unpack_to_irvalue(else_results, "ifexp", 0)` — **EN:** Assigns a value to (_, else_tree). **CN:** 将一个值赋给 (_, else_tree)。
+- **L731** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L732** `        assert isinstance(then_tree, PyTreeDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L733** `        assert isinstance(else_tree, PyTreeDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L734** `        if check_tree_equal(then_tree, else_tree) != -1:` — **EN:** Starts a conditional branch guarded by `check_tree_equal(then_tree, else_tree) != -1`. **CN:** 开始一个由 `check_tree_equal(then_tree, else_tree) != -1` 控制的条件分支。
+- **L735** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L736** `                "Then and else blocks of ifexp return different types"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L737** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L738** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L739** `        # Collect result types for the SCF IfOp` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L740** `        result_types.extend([arg.type for arg in ir_values])` — **EN:** Invokes `result_types.extend` as a standalone call. **CN:** 以独立语句方式调用 `result_types.extend`。
+- **L741** `        mix_iter_args.extend(then_results)` — **EN:** Invokes `mix_iter_args.extend` as a standalone call. **CN:** 以独立语句方式调用 `mix_iter_args.extend`。
+- **L742** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L743** `    # Set up a generator for SCF op creation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L744** `    scf_gen = ScfGenerator()` — **EN:** Assigns a value to scf_gen. **CN:** 将一个值赋给 scf_gen。
+- **L745** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L746** `    # Function to create the IfOp with correct predicate and result types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L747** `    def create_if_op(_: List[ir.Value]) -> ir.Operation:` — **EN:** Defines function `create_if_op`. **CN:** 定义函数 `create_if_op`。
+- **L748** `        pred_ = Boolean(pred)` — **EN:** Assigns a value to pred_. **CN:** 将一个值赋给 pred_。
+- **L749** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L750** `            if_op = scf.IfOp(` — **EN:** Assigns a value to if_op. **CN:** 将一个值赋给 if_op。
+- **L751** `                pred_.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L752** `                hasElse=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L753** `                results_=result_types,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L756** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L757** `                f"Failed to create dynamic if-expression \n\t\tpred={pred_}: type : {type(pred_)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** `            ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `        return if_op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L760** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L761** `    def then_builder(*args: object) -> object:` — **EN:** Defines function `then_builder`. **CN:** 定义函数 `then_builder`。
+- **L762** `        return then_block(*block_args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L763** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L764** `    def else_builder(*args: object) -> object:` — **EN:** Defines function `else_builder`. **CN:** 定义函数 `else_builder`。
+- **L765** `        return else_block(*block_args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L766** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L767** `    # Prepare the list of region builders for the SCF IfOp: first for "then", then for "else"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L768** `    region_builders = [then_builder, else_builder]` — **EN:** Assigns a value to region_builders. **CN:** 将一个值赋给 region_builders。
+- **L769** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L770** `    ret = scf_gen.scf_execute_dynamic(` — **EN:** Assigns a value to ret. **CN:** 将一个值赋给 ret。
+- **L771** `        op_type_name="if",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L772** `        mix_iter_args=mix_iter_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `        full_write_args_count=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `        mix_iter_arg_names=["unknown" for _ in mix_iter_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L775** `        create_op_func=create_if_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L776** `        region_builders=region_builders,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L777** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L779** `    # Clean up: Remove the temporary execution region from the IR graph` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L780** `    execution_region.operation.erase()` — **EN:** Invokes `execution_region.operation.erase` as a standalone call. **CN:** 以独立语句方式调用 `execution_region.operation.erase`。
+- **L781** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L782** `    return ret` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cutlass_dsl.cutlass_ast_decorators`. CN: 模块名为 `CuTeDSL.cutlass.cutlass_dsl.cutlass_ast_decorators`。
+- EN: Top-level classes: LoopUnroll, ScfGenerator CN: 顶层类包括：LoopUnroll, ScfGenerator
+- EN: Top-level functions: _attr_const_check, _loop_execute_range_dynamic, _if_execute_dynamic, _while_execute_dynamic, _ifexp_execute_dynamic CN: 顶层函数包括：_attr_const_check, _loop_execute_range_dynamic, _if_execute_dynamic, _while_execute_dynamic, _ifexp_execute_dynamic
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir:ir, cutlass._mlir.dialects:scf, ..base_dsl.common:DSLRuntimeError,DSLNotImplemented, ..base_dsl.dsl:is_dynamic_expression, ..base_dsl._mlir_helpers.arith:ArithValue, ..base_dsl.ast_helpers:*, ..base_dsl.utils.logger:log, ..base_dsl:typing, ..base_dsl.typing:Boolean,Numeric,as_numeric, ..base_dsl.utils.tree_utils:PyTreeDef,check_tree_equal, .:cutlass, ..base_dsl.arch:Arch CN: 内部依赖：cutlass._mlir:ir, cutlass._mlir.dialects:scf, ..base_dsl.common:DSLRuntimeError,DSLNotImplemented, ..base_dsl.dsl:is_dynamic_expression, ..base_dsl._mlir_helpers.arith:ArithValue, ..base_dsl.ast_helpers:*, ..base_dsl.utils.logger:log, ..base_dsl:typing, ..base_dsl.typing:Boolean,Numeric,as_numeric, ..base_dsl.utils.tree_utils:PyTreeDef,check_tree_equal, .:cutlass, ..base_dsl.arch:Arch
+- EN: External or standard-library dependencies: builtins, typing:Any,Callable,Dict,List,Optional,Union, collections.abc:Sequence CN: 外部或标准库依赖：builtins, typing:Any,Callable,Dict,List,Optional,Union, collections.abc:Sequence

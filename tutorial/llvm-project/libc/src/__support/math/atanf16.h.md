@@ -1,0 +1,443 @@
+# atanf16.h — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `libc/src/__support/math/atanf16.h`
+- **Repository / 仓库**: `llvm-project`
+- **Purpose / 目的**:
+  - **EN**: Implementation header for atanf16.
+  - **CN**: 声明供 llvm-libc 入口复用的共享初等数学内核、常量与近似辅助逻辑。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-12
+
+````cpp
+//===-- Implementation header for atanf16 -----------------------*- C++ -*-===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H
+#define LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H
+
+#include "include/llvm-libc-macros/float16-macros.h"
+````
+- **L1 EN**: Banner comment marking a file or section boundary.
+  **L1 CN**: 横幅注释，用于标记文件或章节边界。
+- **L2 EN**: Separator comment used for visual grouping.
+  **L2 CN**: 分隔注释，用于视觉分组。
+- **L3 EN**: Comment documents nearby intent or constraints: `Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`.
+  **L3 CN**: 注释说明附近代码的意图或约束：`Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`。
+- **L4 EN**: Comment documents nearby intent or constraints: `See https://llvm.org/LICENSE.txt for license information.`.
+  **L4 CN**: 注释说明附近代码的意图或约束：`See https://llvm.org/LICENSE.txt for license information.`。
+- **L5 EN**: Comment documents nearby intent or constraints: `SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`.
+  **L5 CN**: 注释说明附近代码的意图或约束：`SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`。
+- **L6 EN**: Separator comment used for visual grouping.
+  **L6 CN**: 分隔注释，用于视觉分组。
+- **L7 EN**: Banner comment marking a file or section boundary.
+  **L7 CN**: 横幅注释，用于标记文件或章节边界。
+- **L8 EN**: Blank line separating nearby declarations or logic.
+  **L8 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L9 EN**: Starts a header guard condition: `#ifndef LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H`.
+  **L9 CN**: 开始头文件保护条件：`#ifndef LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H`。
+- **L10 EN**: Defines macro `LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H` for compile-time control or shorthand.
+  **L10 CN**: 定义宏 `LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H`，用于编译期控制或简写。
+- **L11 EN**: Blank line separating nearby declarations or logic.
+  **L11 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L12 EN**: Includes "include/llvm-libc-macros/float16-macros.h" to access nearby local declarations.
+  **L12 CN**: 引入 "include/llvm-libc-macros/float16-macros.h" 以使用附近的本地声明。
+
+### Lines 13-24
+
+````cpp
+
+#ifdef LIBC_TYPES_HAS_FLOAT16
+
+#include "src/__support/FPUtil/FEnvImpl.h"
+#include "src/__support/FPUtil/FPBits.h"
+#include "src/__support/FPUtil/PolyEval.h"
+#include "src/__support/FPUtil/cast.h"
+#include "src/__support/FPUtil/except_value_utils.h"
+#include "src/__support/FPUtil/multiply_add.h"
+#include "src/__support/FPUtil/sqrt.h"
+#include "src/__support/macros/optimization.h"
+
+````
+- **L13 EN**: Blank line separating nearby declarations or logic.
+  **L13 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L14 EN**: Starts a preprocessor conditional block: `#ifdef LIBC_TYPES_HAS_FLOAT16`.
+  **L14 CN**: 开始一个预处理条件块：`#ifdef LIBC_TYPES_HAS_FLOAT16`。
+- **L15 EN**: Blank line separating nearby declarations or logic.
+  **L15 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L16 EN**: Includes "src/__support/FPUtil/FEnvImpl.h" to access floating-point utility helpers.
+  **L16 CN**: 引入 "src/__support/FPUtil/FEnvImpl.h" 以使用浮点工具辅助组件。
+- **L17 EN**: Includes "src/__support/FPUtil/FPBits.h" to access floating-point utility helpers.
+  **L17 CN**: 引入 "src/__support/FPUtil/FPBits.h" 以使用浮点工具辅助组件。
+- **L18 EN**: Includes "src/__support/FPUtil/PolyEval.h" to access floating-point utility helpers.
+  **L18 CN**: 引入 "src/__support/FPUtil/PolyEval.h" 以使用浮点工具辅助组件。
+- **L19 EN**: Includes "src/__support/FPUtil/cast.h" to access floating-point utility helpers.
+  **L19 CN**: 引入 "src/__support/FPUtil/cast.h" 以使用浮点工具辅助组件。
+- **L20 EN**: Includes "src/__support/FPUtil/except_value_utils.h" to access floating-point utility helpers.
+  **L20 CN**: 引入 "src/__support/FPUtil/except_value_utils.h" 以使用浮点工具辅助组件。
+- **L21 EN**: Includes "src/__support/FPUtil/multiply_add.h" to access floating-point utility helpers.
+  **L21 CN**: 引入 "src/__support/FPUtil/multiply_add.h" 以使用浮点工具辅助组件。
+- **L22 EN**: Includes "src/__support/FPUtil/sqrt.h" to access floating-point utility helpers.
+  **L22 CN**: 引入 "src/__support/FPUtil/sqrt.h" 以使用浮点工具辅助组件。
+- **L23 EN**: Includes "src/__support/macros/optimization.h" to access configuration and attribute macros.
+  **L23 CN**: 引入 "src/__support/macros/optimization.h" 以使用配置与属性宏。
+- **L24 EN**: Blank line separating nearby declarations or logic.
+  **L24 CN**: 空行，用于分隔相邻声明或逻辑。
+
+### Lines 25-36
+
+````cpp
+namespace LIBC_NAMESPACE_DECL {
+
+namespace math {
+
+LIBC_INLINE constexpr float16 atanf16(float16 x) {
+  // Generated by Solly using the following command:
+  // > round(pi/2, SG, RN);
+  constexpr float PI_2 = 0x1.921fb6p0;
+
+#ifndef LIBC_MATH_HAS_SKIP_ACCURATE_PASS
+  constexpr size_t N_EXCEPTS = 6;
+
+````
+- **L25 EN**: Opens namespace scope `LIBC_NAMESPACE_DECL`.
+  **L25 CN**: 打开命名空间作用域 `LIBC_NAMESPACE_DECL`。
+- **L26 EN**: Blank line separating nearby declarations or logic.
+  **L26 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L27 EN**: Opens namespace scope `math`.
+  **L27 CN**: 打开命名空间作用域 `math`。
+- **L28 EN**: Blank line separating nearby declarations or logic.
+  **L28 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L29 EN**: Marks the declaration with LLVM libc inlining or linkage attributes.
+  **L29 CN**: 使用 LLVM libc 的内联或链接属性标注该声明。
+- **L30 EN**: Comment documents nearby intent or constraints: `Generated by Solly using the following command:`.
+  **L30 CN**: 注释说明附近代码的意图或约束：`Generated by Solly using the following command:`。
+- **L31 EN**: Comment documents nearby intent or constraints: `> round(pi/2, SG, RN);`.
+  **L31 CN**: 注释说明附近代码的意图或约束：`> round(pi/2, SG, RN);`。
+- **L32 EN**: Initializes variable `PI_2` from the right-hand expression.
+  **L32 CN**: 使用右侧表达式初始化变量 `PI_2`。
+- **L33 EN**: Blank line separating nearby declarations or logic.
+  **L33 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L34 EN**: Starts a header guard condition: `#ifndef LIBC_MATH_HAS_SKIP_ACCURATE_PASS`.
+  **L34 CN**: 开始头文件保护条件：`#ifndef LIBC_MATH_HAS_SKIP_ACCURATE_PASS`。
+- **L35 EN**: Initializes variable `N_EXCEPTS` from the right-hand expression.
+  **L35 CN**: 使用右侧表达式初始化变量 `N_EXCEPTS`。
+- **L36 EN**: Blank line separating nearby declarations or logic.
+  **L36 CN**: 空行，用于分隔相邻声明或逻辑。
+
+### Lines 37-48
+
+````cpp
+  constexpr fputil::ExceptValues<float16, N_EXCEPTS> ATANF16_EXCEPTS{{
+      // (input, RZ output, RU offset, RD offset, RN offset)
+      {0x2745, 0x2744, 1, 0, 1},
+      {0x3099, 0x3090, 1, 0, 1},
+      {0x3c6c, 0x3aae, 1, 0, 1},
+      {0x466e, 0x3daa, 1, 0, 1},
+      {0x48ae, 0x3ddb, 1, 0, 0},
+      {0x5619, 0x3e3d, 1, 0, 1},
+  }};
+#endif // !LIBC_MATH_HAS_SKIP_ACCURATE_PASS
+
+  using FPBits = fputil::FPBits<float16>;
+````
+- **L37 EN**: Continues the surrounding expression or declaration: `constexpr fputil::ExceptValues<float16, N_EXCEPTS> ATANF16_EXCEPTS{{`.
+  **L37 CN**: 继续构造周围的表达式或声明：`constexpr fputil::ExceptValues<float16, N_EXCEPTS> ATANF16_EXCEPTS{{`。
+- **L38 EN**: Comment documents nearby intent or constraints: `(input, RZ output, RU offset, RD offset, RN offset)`.
+  **L38 CN**: 注释说明附近代码的意图或约束：`(input, RZ output, RU offset, RD offset, RN offset)`。
+- **L39 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `{0x2745, 0x2744, 1, 0, 1},`.
+  **L39 CN**: 继续一个多行参数列表、初始化器或聚合项：`{0x2745, 0x2744, 1, 0, 1},`。
+- **L40 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `{0x3099, 0x3090, 1, 0, 1},`.
+  **L40 CN**: 继续一个多行参数列表、初始化器或聚合项：`{0x3099, 0x3090, 1, 0, 1},`。
+- **L41 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `{0x3c6c, 0x3aae, 1, 0, 1},`.
+  **L41 CN**: 继续一个多行参数列表、初始化器或聚合项：`{0x3c6c, 0x3aae, 1, 0, 1},`。
+- **L42 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `{0x466e, 0x3daa, 1, 0, 1},`.
+  **L42 CN**: 继续一个多行参数列表、初始化器或聚合项：`{0x466e, 0x3daa, 1, 0, 1},`。
+- **L43 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `{0x48ae, 0x3ddb, 1, 0, 0},`.
+  **L43 CN**: 继续一个多行参数列表、初始化器或聚合项：`{0x48ae, 0x3ddb, 1, 0, 0},`。
+- **L44 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `{0x5619, 0x3e3d, 1, 0, 1},`.
+  **L44 CN**: 继续一个多行参数列表、初始化器或聚合项：`{0x5619, 0x3e3d, 1, 0, 1},`。
+- **L45 EN**: Executes a standalone statement or declaration: `}};`.
+  **L45 CN**: 执行一条独立语句或声明：`}};`。
+- **L46 EN**: Closes the current preprocessor conditional block or header guard.
+  **L46 CN**: 结束当前预处理条件块或头文件保护。
+- **L47 EN**: Blank line separating nearby declarations or logic.
+  **L47 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L48 EN**: Introduces a using declaration or alias: `using FPBits = fputil::FPBits<float16>;`.
+  **L48 CN**: 引入一条 using 声明或别名：`using FPBits = fputil::FPBits<float16>;`。
+
+### Lines 49-60
+
+````cpp
+  FPBits xbits(x);
+
+  uint16_t x_u = xbits.uintval();
+  uint16_t x_abs = x_u & 0x7fff;
+  bool x_sign = x_u >> 15;
+  float sign = (x_sign ? -1.0 : 1.0);
+
+  // |x| >= +/-inf
+  if (LIBC_UNLIKELY(x_abs >= 0x7c00)) {
+    if (xbits.is_nan()) {
+      if (xbits.is_signaling_nan()) {
+        fputil::raise_except_if_required(FE_INVALID);
+````
+- **L49 EN**: Executes a call or declaration centered on `xbits`.
+  **L49 CN**: 执行以 `xbits` 为核心的调用或声明。
+- **L50 EN**: Blank line separating nearby declarations or logic.
+  **L50 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L51 EN**: Initializes variable `x_u` from the right-hand expression.
+  **L51 CN**: 使用右侧表达式初始化变量 `x_u`。
+- **L52 EN**: Initializes variable `x_abs` from the right-hand expression.
+  **L52 CN**: 使用右侧表达式初始化变量 `x_abs`。
+- **L53 EN**: Initializes variable `x_sign` from the right-hand expression.
+  **L53 CN**: 使用右侧表达式初始化变量 `x_sign`。
+- **L54 EN**: Initializes variable `sign` from the right-hand expression.
+  **L54 CN**: 使用右侧表达式初始化变量 `sign`。
+- **L55 EN**: Blank line separating nearby declarations or logic.
+  **L55 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L56 EN**: Comment documents nearby intent or constraints: `|x| >= +/-inf`.
+  **L56 CN**: 注释说明附近代码的意图或约束：`|x| >= +/-inf`。
+- **L57 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L57 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L58 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L58 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L59 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L59 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L60 EN**: Executes a call or declaration centered on `fputil::raise_except_if_required`.
+  **L60 CN**: 执行以 `fputil::raise_except_if_required` 为核心的调用或声明。
+
+### Lines 61-72
+
+````cpp
+        return FPBits::quiet_nan().get_val();
+      }
+      return x;
+    }
+
+    // atanf16(+/-inf) = +/-pi/2
+    return fputil::cast<float16>(sign * PI_2);
+  }
+
+  float xf = x;
+  float xsq = xf * xf;
+#ifndef LIBC_MATH_HAS_SKIP_ACCURATE_PASS
+````
+- **L61 EN**: Returns from the current function with `FPBits::quiet_nan().get_val()`.
+  **L61 CN**: 以 `FPBits::quiet_nan().get_val()` 从当前函数返回。
+- **L62 EN**: Closes the current lexical scope or compound statement.
+  **L62 CN**: 结束当前词法作用域或复合语句块。
+- **L63 EN**: Returns from the current function with `x`.
+  **L63 CN**: 以 `x` 从当前函数返回。
+- **L64 EN**: Closes the current lexical scope or compound statement.
+  **L64 CN**: 结束当前词法作用域或复合语句块。
+- **L65 EN**: Blank line separating nearby declarations or logic.
+  **L65 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L66 EN**: Comment documents nearby intent or constraints: `atanf16(+/-inf) = +/-pi/2`.
+  **L66 CN**: 注释说明附近代码的意图或约束：`atanf16(+/-inf) = +/-pi/2`。
+- **L67 EN**: Returns from the current function with `fputil::cast<float16>(sign * PI_2)`.
+  **L67 CN**: 以 `fputil::cast<float16>(sign * PI_2)` 从当前函数返回。
+- **L68 EN**: Closes the current lexical scope or compound statement.
+  **L68 CN**: 结束当前词法作用域或复合语句块。
+- **L69 EN**: Blank line separating nearby declarations or logic.
+  **L69 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L70 EN**: Initializes variable `xf` from the right-hand expression.
+  **L70 CN**: 使用右侧表达式初始化变量 `xf`。
+- **L71 EN**: Initializes variable `xsq` from the right-hand expression.
+  **L71 CN**: 使用右侧表达式初始化变量 `xsq`。
+- **L72 EN**: Starts a header guard condition: `#ifndef LIBC_MATH_HAS_SKIP_ACCURATE_PASS`.
+  **L72 CN**: 开始头文件保护条件：`#ifndef LIBC_MATH_HAS_SKIP_ACCURATE_PASS`。
+
+### Lines 73-84
+
+````cpp
+  // Handle exceptional values
+  if (auto r = ATANF16_EXCEPTS.lookup_odd(x_abs, x_sign);
+      LIBC_UNLIKELY(r.has_value()))
+    return r.value();
+#endif
+
+  // |x| <= 0x1p0, |x| <= 1
+  if (x_abs <= 0x3c00) {
+    // atanf16(+/-0) = +/-0
+    if (LIBC_UNLIKELY(x_abs == 0))
+      return x;
+
+````
+- **L73 EN**: Comment documents nearby intent or constraints: `Handle exceptional values`.
+  **L73 CN**: 注释说明附近代码的意图或约束：`Handle exceptional values`。
+- **L74 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L74 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L75 EN**: Continues logic associated with callable symbol `LIBC_UNLIKELY`.
+  **L75 CN**: 继续与可调用符号 `LIBC_UNLIKELY` 相关的逻辑。
+- **L76 EN**: Returns from the current function with `r.value()`.
+  **L76 CN**: 以 `r.value()` 从当前函数返回。
+- **L77 EN**: Closes the current preprocessor conditional block or header guard.
+  **L77 CN**: 结束当前预处理条件块或头文件保护。
+- **L78 EN**: Blank line separating nearby declarations or logic.
+  **L78 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L79 EN**: Comment documents nearby intent or constraints: `|x| <= 0x1p0, |x| <= 1`.
+  **L79 CN**: 注释说明附近代码的意图或约束：`|x| <= 0x1p0, |x| <= 1`。
+- **L80 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L80 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L81 EN**: Comment documents nearby intent or constraints: `atanf16(+/-0) = +/-0`.
+  **L81 CN**: 注释说明附近代码的意图或约束：`atanf16(+/-0) = +/-0`。
+- **L82 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L82 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L83 EN**: Returns from the current function with `x`.
+  **L83 CN**: 以 `x` 从当前函数返回。
+- **L84 EN**: Blank line separating nearby declarations or logic.
+  **L84 CN**: 空行，用于分隔相邻声明或逻辑。
+
+### Lines 85-96
+
+````cpp
+    // Degree-14 minimax odd polynomial of atan(x) generated by Sollya with:
+    // > P = fpminimax(atan(x)/x, [|0, 2, 4, 6, 8, 10, 12, 14|], [|SG...|],
+    // [0, 1]);
+    float result = fputil::polyeval(
+        xsq, 0x1.fffffcp-1f, -0x1.55519ep-2f, 0x1.98f6a8p-3f, -0x1.1f0a92p-3f,
+        0x1.95b654p-4f, -0x1.e65492p-5f, 0x1.8c0c36p-6f, -0x1.32316ep-8f);
+    return fputil::cast<float16>(xf * result);
+  }
+
+  // If |x| > 1
+  // y = atan(x) = sign(x) * atan(|x|)
+  // atan(|x|) = pi/2 - atan(1/|x|)
+````
+- **L85 EN**: Comment documents nearby intent or constraints: `Degree-14 minimax odd polynomial of atan(x) generated by Sollya with:`.
+  **L85 CN**: 注释说明附近代码的意图或约束：`Degree-14 minimax odd polynomial of atan(x) generated by Sollya with:`。
+- **L86 EN**: Comment documents nearby intent or constraints: `> P = fpminimax(atan(x)/x, [|0, 2, 4, 6, 8, 10, 12, 14|], [|SG...|],`.
+  **L86 CN**: 注释说明附近代码的意图或约束：`> P = fpminimax(atan(x)/x, [|0, 2, 4, 6, 8, 10, 12, 14|], [|SG...|],`。
+- **L87 EN**: Comment documents nearby intent or constraints: `[0, 1]);`.
+  **L87 CN**: 注释说明附近代码的意图或约束：`[0, 1]);`。
+- **L88 EN**: Continues logic associated with callable symbol `polyeval`.
+  **L88 CN**: 继续与可调用符号 `polyeval` 相关的逻辑。
+- **L89 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `xsq, 0x1.fffffcp-1f, -0x1.55519ep-2f, 0x1.98f6a8p-3f, -0x1.1f0a92p-3f,`.
+  **L89 CN**: 继续一个多行参数列表、初始化器或聚合项：`xsq, 0x1.fffffcp-1f, -0x1.55519ep-2f, 0x1.98f6a8p-3f, -0x1.1f0a92p-3f,`。
+- **L90 EN**: Executes a standalone statement or declaration: `0x1.95b654p-4f, -0x1.e65492p-5f, 0x1.8c0c36p-6f, -0x1.32316ep-8f);`.
+  **L90 CN**: 执行一条独立语句或声明：`0x1.95b654p-4f, -0x1.e65492p-5f, 0x1.8c0c36p-6f, -0x1.32316ep-8f);`。
+- **L91 EN**: Returns from the current function with `fputil::cast<float16>(xf * result)`.
+  **L91 CN**: 以 `fputil::cast<float16>(xf * result)` 从当前函数返回。
+- **L92 EN**: Closes the current lexical scope or compound statement.
+  **L92 CN**: 结束当前词法作用域或复合语句块。
+- **L93 EN**: Blank line separating nearby declarations or logic.
+  **L93 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L94 EN**: Comment documents nearby intent or constraints: `If |x| > 1`.
+  **L94 CN**: 注释说明附近代码的意图或约束：`If |x| > 1`。
+- **L95 EN**: Comment documents nearby intent or constraints: `y = atan(x) = sign(x) * atan(|x|)`.
+  **L95 CN**: 注释说明附近代码的意图或约束：`y = atan(x) = sign(x) * atan(|x|)`。
+- **L96 EN**: Comment documents nearby intent or constraints: `atan(|x|) = pi/2 - atan(1/|x|)`.
+  **L96 CN**: 注释说明附近代码的意图或约束：`atan(|x|) = pi/2 - atan(1/|x|)`。
+
+### Lines 97-108
+
+````cpp
+  // Recall, 1/|x| < 1
+  float x_inv_sq = 1.0f / xsq;
+  float x_inv = fputil::sqrt<float>(x_inv_sq);
+
+  // Degree-14 minimax odd polynomial of atan(x) generated by Sollya with:
+  // > P = fpminimax(atan(x)/x, [|0, 2, 4, 6, 8, 10, 12, 14|], [|SG...|],
+  // [0, 1]);
+  float interm =
+      fputil::polyeval(x_inv_sq, 0x1.fffffcp-1f, -0x1.55519ep-2f,
+                       0x1.98f6a8p-3f, -0x1.1f0a92p-3f, 0x1.95b654p-4f,
+                       -0x1.e65492p-5f, 0x1.8c0c36p-6f, -0x1.32316ep-8f);
+
+````
+- **L97 EN**: Comment documents nearby intent or constraints: `Recall, 1/|x| < 1`.
+  **L97 CN**: 注释说明附近代码的意图或约束：`Recall, 1/|x| < 1`。
+- **L98 EN**: Initializes variable `x_inv_sq` from the right-hand expression.
+  **L98 CN**: 使用右侧表达式初始化变量 `x_inv_sq`。
+- **L99 EN**: Initializes variable `x_inv` from the right-hand expression.
+  **L99 CN**: 使用右侧表达式初始化变量 `x_inv`。
+- **L100 EN**: Blank line separating nearby declarations or logic.
+  **L100 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L101 EN**: Comment documents nearby intent or constraints: `Degree-14 minimax odd polynomial of atan(x) generated by Sollya with:`.
+  **L101 CN**: 注释说明附近代码的意图或约束：`Degree-14 minimax odd polynomial of atan(x) generated by Sollya with:`。
+- **L102 EN**: Comment documents nearby intent or constraints: `> P = fpminimax(atan(x)/x, [|0, 2, 4, 6, 8, 10, 12, 14|], [|SG...|],`.
+  **L102 CN**: 注释说明附近代码的意图或约束：`> P = fpminimax(atan(x)/x, [|0, 2, 4, 6, 8, 10, 12, 14|], [|SG...|],`。
+- **L103 EN**: Comment documents nearby intent or constraints: `[0, 1]);`.
+  **L103 CN**: 注释说明附近代码的意图或约束：`[0, 1]);`。
+- **L104 EN**: Continues the surrounding expression or declaration: `float interm =`.
+  **L104 CN**: 继续构造周围的表达式或声明：`float interm =`。
+- **L105 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `fputil::polyeval(x_inv_sq, 0x1.fffffcp-1f, -0x1.55519ep-2f,`.
+  **L105 CN**: 继续一个多行参数列表、初始化器或聚合项：`fputil::polyeval(x_inv_sq, 0x1.fffffcp-1f, -0x1.55519ep-2f,`。
+- **L106 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `0x1.98f6a8p-3f, -0x1.1f0a92p-3f, 0x1.95b654p-4f,`.
+  **L106 CN**: 继续一个多行参数列表、初始化器或聚合项：`0x1.98f6a8p-3f, -0x1.1f0a92p-3f, 0x1.95b654p-4f,`。
+- **L107 EN**: Executes a standalone statement or declaration: `-0x1.e65492p-5f, 0x1.8c0c36p-6f, -0x1.32316ep-8f);`.
+  **L107 CN**: 执行一条独立语句或声明：`-0x1.e65492p-5f, 0x1.8c0c36p-6f, -0x1.32316ep-8f);`。
+- **L108 EN**: Blank line separating nearby declarations or logic.
+  **L108 CN**: 空行，用于分隔相邻声明或逻辑。
+
+### Lines 109-119
+
+````cpp
+  return fputil::cast<float16>(sign *
+                               fputil::multiply_add(x_inv, -interm, PI_2));
+}
+
+} // namespace math
+
+} // namespace LIBC_NAMESPACE_DECL
+
+#endif // LIBC_TYPES_HAS_FLOAT16
+
+#endif // LLVM_LIBC_SRC___SUPPORT_MATH_ATANF16_H
+````
+- **L109 EN**: Returns from the current function with `fputil::cast<float16>(sign *`.
+  **L109 CN**: 以 `fputil::cast<float16>(sign *` 从当前函数返回。
+- **L110 EN**: Executes a call or declaration centered on `fputil::multiply_add`.
+  **L110 CN**: 执行以 `fputil::multiply_add` 为核心的调用或声明。
+- **L111 EN**: Closes the current lexical scope or compound statement.
+  **L111 CN**: 结束当前词法作用域或复合语句块。
+- **L112 EN**: Blank line separating nearby declarations or logic.
+  **L112 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L113 EN**: Closes a namespace scope while preserving the trailing comment: `} // namespace math`.
+  **L113 CN**: 结束一个命名空间作用域，并保留尾部注释：`} // namespace math`。
+- **L114 EN**: Blank line separating nearby declarations or logic.
+  **L114 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L115 EN**: Closes a namespace scope while preserving the trailing comment: `} // namespace LIBC_NAMESPACE_DECL`.
+  **L115 CN**: 结束一个命名空间作用域，并保留尾部注释：`} // namespace LIBC_NAMESPACE_DECL`。
+- **L116 EN**: Blank line separating nearby declarations or logic.
+  **L116 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L117 EN**: Closes the current preprocessor conditional block or header guard.
+  **L117 CN**: 结束当前预处理条件块或头文件保护。
+- **L118 EN**: Blank line separating nearby declarations or logic.
+  **L118 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L119 EN**: Closes the current preprocessor conditional block or header guard.
+  **L119 CN**: 结束当前预处理条件块或头文件保护。
+
+## Key Concepts / 关键概念
+
+- **Shared math kernels / 共享数学内核**: Collects reusable elementary-function approximations, constants, and reduction helpers. / 汇集可复用的初等函数近似、常量与归约辅助逻辑。
+- **Low-level libc support / 底层 libc 支撑**: Provides reusable building blocks such as allocation helpers, numeric formatting, or internal data structures. / 提供可复用的基础构件，例如分配辅助逻辑、数值格式化或内部数据结构。
+- **Floating-point representation / 浮点表示**: Models floating-point values through helper types that expose sign, exponent, mantissa, or extended precision pieces. / 通过辅助类型建模浮点值，暴露符号、指数、尾数或扩展精度片段。
+- **Floating-point environment control / 浮点环境控制**: Reads or updates rounding modes and exception-related state for IEEE-754-sensitive operations. / 为对 IEEE-754 敏感的操作读取或更新舍入模式与异常相关状态。
+- **Elementary function approximation / 初等函数近似**: Implements inverse trigonometric or hyperbolic kernels through argument reduction and approximation logic. / 通过自变量归约与近似逻辑实现反三角或双曲函数内核。
+- **Header contracts / 头文件契约**: Provides declarations, templates, or inline logic consumed by other translation units. / 提供供其他编译单元使用的声明、模板或内联逻辑。
+- **Multiple-inclusion protection / 防重复包含保护**: Guards header contents against accidental repeated inclusion. / 保护头文件内容，防止被意外重复包含。
+
+## Dependencies / 依赖关系
+
+- **Direct local/internal includes / 直接本地或内部包含**: `include/llvm-libc-macros/float16-macros.h`, `src/__support/FPUtil/FEnvImpl.h`, `src/__support/FPUtil/FPBits.h`, `src/__support/FPUtil/PolyEval.h`, `src/__support/FPUtil/cast.h`, `src/__support/FPUtil/except_value_utils.h`, `src/__support/FPUtil/multiply_add.h`, `src/__support/FPUtil/sqrt.h`, `src/__support/macros/optimization.h`
+- **Dependency categories / 依赖类别**: floating-point utility helpers / 浮点工具辅助组件 (7), nearby local declarations / 附近的本地声明 (1), configuration and attribute macros / 配置与属性宏 (1)
+
+- `include/llvm-libc-macros/float16-macros.h`: Provides nearby local declarations. / 提供附近的本地声明。
+- `src/__support/FPUtil/FEnvImpl.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/FPUtil/FPBits.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/FPUtil/PolyEval.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/FPUtil/cast.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/FPUtil/except_value_utils.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/FPUtil/multiply_add.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/FPUtil/sqrt.h`: Provides floating-point utility helpers. / 提供浮点工具辅助组件。
+- `src/__support/macros/optimization.h`: Provides configuration and attribute macros. / 提供配置与属性宏。

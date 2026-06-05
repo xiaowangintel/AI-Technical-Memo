@@ -1,0 +1,141 @@
+# memory_manager.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/memory_manager.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (PoolMemoryManager, DevicePtrWrapper) and 5 functions (_todevice, todevice, device_mem_alloc, align_size, ... (+1 more)) in `cutlass_cppgen.backend.memory_manager`.
+- CN: 该模块 `cutlass_cppgen.backend.memory_manager` 定义了 2 个类（PoolMemoryManager, DevicePtrWrapper） 和 5 个函数（_todevice, todevice, device_mem_alloc, align_size, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L36** `from cutlass_cppgen.utils.datatypes import is_numpy_tensor` — **EN:** Imports is_numpy_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_numpy_tensor。
+- **L37** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `if cutlass_cppgen.use_rmm:` — **EN:** Starts a conditional branch guarded by `cutlass_cppgen.use_rmm`. **CN:** 开始一个由 `cutlass_cppgen.use_rmm` 控制的条件分支。
+- **L40** `    import rmm` — **EN:** Imports rmm for later use. **CN:** 导入 rmm 供后续使用。
+- **L41** `else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L42** `    cudart = lazy_import("cuda.cudart")` — **EN:** Assigns a value to cudart. **CN:** 将一个值赋给 cudart。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `class PoolMemoryManager:` — **EN:** Defines class `PoolMemoryManager`. **CN:** 定义类 `PoolMemoryManager`。
+- **L46** `    def __init__(self, init_pool_size: int, max_pool_size: int) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L47** `        self.pool = rmm.mr.PoolMemoryResource(` — **EN:** Assigns a value to self.pool. **CN:** 将一个值赋给 self.pool。
+- **L48** `            rmm.mr.CudaMemoryResource(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `            initial_pool_size=init_pool_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `            maximum_pool_size=max_pool_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `        self.mr = rmm.mr.TrackingResourceAdaptor(self.pool)` — **EN:** Assigns a value to self.mr. **CN:** 将一个值赋给 self.mr。
+- **L53** `        rmm.mr.set_current_device_resource(self.mr)` — **EN:** Invokes `rmm.mr.set_current_device_resource` as a standalone call. **CN:** 以独立语句方式调用 `rmm.mr.set_current_device_resource`。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    def pool_size(self):` — **EN:** Defines function `pool_size`. **CN:** 定义函数 `pool_size`。
+- **L56** `        return self.pool.pool_size()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `class DevicePtrWrapper:` — **EN:** Defines class `DevicePtrWrapper`. **CN:** 定义类 `DevicePtrWrapper`。
+- **L60** `    """` — **EN:** Starts the docstring for the class `DevicePtrWrapper`. **CN:** 开始说明 class `DevicePtrWrapper` 的文档字符串。
+- **L61** `    Wrapper around a pointer to device memory to provide a uniform interface with the RMM DeviceBuffer` — **EN:** Continues the docstring for the class `DevicePtrWrapper`. **CN:** 继续说明 class `DevicePtrWrapper` 的文档字符串。
+- **L62** `    (at least in terms of the interface used by the CUTLASS Python interface)` — **EN:** Continues the docstring for the class `DevicePtrWrapper`. **CN:** 继续说明 class `DevicePtrWrapper` 的文档字符串。
+- **L63** `    """` — **EN:** Ends the docstring for the class `DevicePtrWrapper`. **CN:** 结束说明 class `DevicePtrWrapper` 的文档字符串。
+- **L64** `    def __init__(self, dev_ptr):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L65** `        self.dev_ptr = dev_ptr` — **EN:** Assigns a value to self.dev_ptr. **CN:** 将一个值赋给 self.dev_ptr。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L68** `    def ptr(self):` — **EN:** Defines function `ptr`. **CN:** 定义函数 `ptr`。
+- **L69** `        return self.dev_ptr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `def _todevice(host_data):` — **EN:** Defines function `_todevice`. **CN:** 定义函数 `_todevice`。
+- **L73** `    """` — **EN:** Starts the docstring for the function `_todevice`. **CN:** 开始说明 function `_todevice` 的文档字符串。
+- **L74** `    Helper for transferring host data to device memory` — **EN:** Continues the docstring for the function `_todevice`. **CN:** 继续说明 function `_todevice` 的文档字符串。
+- **L75** `    """` — **EN:** Ends the docstring for the function `_todevice`. **CN:** 结束说明 function `_todevice` 的文档字符串。
+- **L76** `    if cutlass_cppgen.use_rmm:` — **EN:** Starts a conditional branch guarded by `cutlass_cppgen.use_rmm`. **CN:** 开始一个由 `cutlass_cppgen.use_rmm` 控制的条件分支。
+- **L77** `        return rmm.DeviceBuffer.to_device(host_data.tobytes())` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L78** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L79** `        nbytes = len(host_data.tobytes())` — **EN:** Assigns a value to nbytes. **CN:** 将一个值赋给 nbytes。
+- **L80** `        dev_ptr_wrapper = device_mem_alloc(nbytes)` — **EN:** Assigns a value to dev_ptr_wrapper. **CN:** 将一个值赋给 dev_ptr_wrapper。
+- **L81** `        err, = cudart.cudaMemcpy(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L82** `            dev_ptr_wrapper.ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `            host_data.__array_interface__['data'][0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `            nbytes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `            cudart.cudaMemcpyKind.cudaMemcpyHostToDevice` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `        if err != cudart.cudaError_t.cudaSuccess:` — **EN:** Starts a conditional branch guarded by `err != cudart.cudaError_t.cudaSuccess`. **CN:** 开始一个由 `err != cudart.cudaError_t.cudaSuccess` 控制的条件分支。
+- **L88** `            raise Exception(f"cudaMemcpy failed with error {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L89** `        return dev_ptr_wrapper` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `def todevice(host_data, dtype=np.float32):` — **EN:** Defines function `todevice`. **CN:** 定义函数 `todevice`。
+- **L93** `    """` — **EN:** Starts the docstring for the function `todevice`. **CN:** 开始说明 function `todevice` 的文档字符串。
+- **L94** `    Pass the host_data to device memory` — **EN:** Continues the docstring for the function `todevice`. **CN:** 继续说明 function `todevice` 的文档字符串。
+- **L95** `    """` — **EN:** Ends the docstring for the function `todevice`. **CN:** 结束说明 function `todevice` 的文档字符串。
+- **L96** `    if isinstance(host_data, list):` — **EN:** Starts a conditional branch guarded by `isinstance(host_data, list)`. **CN:** 开始一个由 `isinstance(host_data, list)` 控制的条件分支。
+- **L97** `        return _todevice(np.array(host_data, dtype=dtype))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L98** `    elif is_numpy_tensor(host_data):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L99** `        return _todevice(host_data)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `def device_mem_alloc(size):` — **EN:** Defines function `device_mem_alloc`. **CN:** 定义函数 `device_mem_alloc`。
+- **L103** `    if cutlass_cppgen.use_rmm:` — **EN:** Starts a conditional branch guarded by `cutlass_cppgen.use_rmm`. **CN:** 开始一个由 `cutlass_cppgen.use_rmm` 控制的条件分支。
+- **L104** `        return rmm.DeviceBuffer(size=size)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L106** `        err, ptr = cudart.cudaMalloc(size)` — **EN:** Assigns a value to (err, ptr). **CN:** 将一个值赋给 (err, ptr)。
+- **L107** `        if err != cudart.cudaError_t.cudaSuccess:` — **EN:** Starts a conditional branch guarded by `err != cudart.cudaError_t.cudaSuccess`. **CN:** 开始一个由 `err != cudart.cudaError_t.cudaSuccess` 控制的条件分支。
+- **L108** `            raise Exception(f"cudaMalloc failed with error {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L109** `        return DevicePtrWrapper(ptr)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `def align_size(size, alignment=256):` — **EN:** Defines function `align_size`. **CN:** 定义函数 `align_size`。
+- **L113** `    return ((size + alignment - 1) // alignment) * alignment` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `def create_memory_pool(init_pool_size=0, max_pool_size=2 ** 34):` — **EN:** Defines function `create_memory_pool`. **CN:** 定义函数 `create_memory_pool`。
+- **L117** `    if cutlass_cppgen.use_rmm:` — **EN:** Starts a conditional branch guarded by `cutlass_cppgen.use_rmm`. **CN:** 开始一个由 `cutlass_cppgen.use_rmm` 控制的条件分支。
+- **L118** `        memory_pool = PoolMemoryManager(init_pool_size=init_pool_size, max_pool_size=max_pool_size)` — **EN:** Assigns a value to memory_pool. **CN:** 将一个值赋给 memory_pool。
+- **L119** `        return memory_pool` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L120** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L121** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.memory_manager`. CN: 模块名为 `cutlass_cppgen.backend.memory_manager`。
+- EN: Top-level classes: PoolMemoryManager, DevicePtrWrapper CN: 顶层类包括：PoolMemoryManager, DevicePtrWrapper
+- EN: Top-level functions: _todevice, todevice, device_mem_alloc, align_size, create_memory_pool CN: 顶层函数包括：_todevice, todevice, device_mem_alloc, align_size, create_memory_pool
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen, cutlass_cppgen.utils.datatypes:is_numpy_tensor, cutlass_cppgen.utils.lazy_import:lazy_import CN: 内部依赖：cutlass_cppgen, cutlass_cppgen.utils.datatypes:is_numpy_tensor, cutlass_cppgen.utils.lazy_import:lazy_import
+- EN: External or standard-library dependencies: numpy, rmm CN: 外部或标准库依赖：numpy, rmm

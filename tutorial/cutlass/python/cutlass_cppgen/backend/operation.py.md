@@ -1,0 +1,160 @@
+# operation.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/operation.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (LaunchConfiguration, ExecutableOperation) and 1 functions (supports_cluster_launch) in `cutlass_cppgen.backend.operation`.
+- CN: 该模块 `cutlass_cppgen.backend.operation` 定义了 2 个类（LaunchConfiguration, ExecutableOperation） 和 1 个函数（supports_cluster_launch）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L34** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L35** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_cppgen.backend.utils.device import device_cc` — **EN:** Imports device_cc from `cutlass_cppgen.backend.utils.device`. **CN:** 从 `cutlass_cppgen.backend.utils.device` 导入 device_cc。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `_supports_cluster_launch = None` — **EN:** Assigns a value to _supports_cluster_launch. **CN:** 将一个值赋给 _supports_cluster_launch。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `def supports_cluster_launch():` — **EN:** Defines function `supports_cluster_launch`. **CN:** 定义函数 `supports_cluster_launch`。
+- **L43** `    from cuda import __version__ ` — **EN:** Imports __version__ from `cuda`. **CN:** 从 `cuda` 导入 __version__。
+- **L44** `    _version_splits = [int(x) for x in __version__.split("rc")[0].split(".post")[0].split(".")]` — **EN:** Assigns a value to _version_splits. **CN:** 将一个值赋给 _version_splits。
+- **L45** `    global _supports_cluster_launch` — **EN:** Declares _supports_cluster_launch as module-level globals. **CN:** 将 _supports_cluster_launch 声明为模块级全局变量。
+- **L46** `    if _supports_cluster_launch is None:` — **EN:** Starts a conditional branch guarded by `_supports_cluster_launch is None`. **CN:** 开始一个由 `_supports_cluster_launch is None` 控制的条件分支。
+- **L47** `        major, minor = _version_splits[0], _version_splits[1]` — **EN:** Assigns a value to (major, minor). **CN:** 将一个值赋给 (major, minor)。
+- **L48** `        _supports_cluster_launch = device_cc() in [90, 100, 101, 103] and (major > 11 or (major == 11 and minor >= 8))` — **EN:** Assigns a value to _supports_cluster_launch. **CN:** 将一个值赋给 _supports_cluster_launch。
+- **L49** `    return _supports_cluster_launch` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `class LaunchConfiguration:` — **EN:** Defines class `LaunchConfiguration`. **CN:** 定义类 `LaunchConfiguration`。
+- **L53** `    def __init__(self, grid=[1, 1, 1], block=[1, 1, 1], smem=0):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L54** `        self.grid = grid` — **EN:** Assigns a value to self.grid. **CN:** 将一个值赋给 self.grid。
+- **L55** `        self.block = block` — **EN:** Assigns a value to self.block. **CN:** 将一个值赋给 self.block。
+- **L56** `        self.shared_memory_capacity = smem` — **EN:** Assigns a value to self.shared_memory_capacity. **CN:** 将一个值赋给 self.shared_memory_capacity。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `class ExecutableOperation:` — **EN:** Defines class `ExecutableOperation`. **CN:** 定义类 `ExecutableOperation`。
+- **L60** `    def __init__(self, operation):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L61** `        self.operation = operation` — **EN:** Assigns a value to self.operation. **CN:** 将一个值赋给 self.operation。
+- **L62** `        self.module = None` — **EN:** Assigns a value to self.module. **CN:** 将一个值赋给 self.module。
+- **L63** `        self.kernel = None` — **EN:** Assigns a value to self.kernel. **CN:** 将一个值赋给 self.kernel。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    def name(self):` — **EN:** Defines function `name`. **CN:** 定义函数 `name`。
+- **L66** `        return self.operation.procedural_name()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L69** `        return ""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    def can_implement(self, configuration, arguments):` — **EN:** Defines function `can_implement`. **CN:** 定义函数 `can_implement`。
+- **L72** `        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    def get_host_workspace_size(self, arguments):` — **EN:** Defines function `get_host_workspace_size`. **CN:** 定义函数 `get_host_workspace_size`。
+- **L75** `        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    def get_device_workspace_size(self, arguments):` — **EN:** Defines function `get_device_workspace_size`. **CN:** 定义函数 `get_device_workspace_size`。
+- **L78** `        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `    def plan(self, arguments):` — **EN:** Defines function `plan`. **CN:** 定义函数 `plan`。
+- **L81** `        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `    def initialize(self, host_workspace, device_workspace, launch_config, arguments, stream=None):` — **EN:** Defines function `initialize`. **CN:** 定义函数 `initialize`。
+- **L84** `        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    def run_with_clusters(self, launch_config, kernel_params, stream=None):` — **EN:** Defines function `run_with_clusters`. **CN:** 定义函数 `run_with_clusters`。
+- **L87** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L88** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L89** `        if hasattr(self.operation, "tile_description") and hasattr(self.operation.tile_description, "cluster_shape"):` — **EN:** Starts a conditional branch guarded by `hasattr(self.operation, 'tile_description') and hasattr(s...`. **CN:** 开始一个由 `hasattr(self.operation, 'tile_description') and hasattr(s...` 控制的条件分支。
+- **L90** `            attr = cuda.CUlaunchAttribute()` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L91** `            attr.value.clusterDim.x, attr.value.clusterDim.y, attr.value.clusterDim.z = self.operation.tile_description.cluster_shape` — **EN:** Assigns a value to (attr.value.clusterDim.x, attr.value.clusterDim.y, attr.v.... **CN:** 将一个值赋给 (attr.value.clusterDim.x, attr.value.clusterDim.y, attr.v...。
+- **L92** `            attr.id = cuda.CUstreamAttrID.CU_LAUNCH_ATTRIBUTE_CLUSTER_DIMENSION` — **EN:** Assigns a value to attr.id. **CN:** 将一个值赋给 attr.id。
+- **L93** `            attrs = [attr]` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `            # Allow for non-portable cluster sizes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `            err, = cuda.cuFuncSetAttribute(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L97** `                self.kernel, cuda.CUfunction_attribute.CU_FUNC_ATTRIBUTE_NON_PORTABLE_CLUSTER_SIZE_ALLOWED, 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L99** `                return err` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L100** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L101** `            attrs = []` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `        config = cuda.CUlaunchConfig()` — **EN:** Assigns a value to config. **CN:** 将一个值赋给 config。
+- **L104** `        config.gridDimX, config.gridDimY, config.gridDimZ = launch_config.grid` — **EN:** Assigns a value to (config.gridDimX, config.gridDimY, config.gridDimZ). **CN:** 将一个值赋给 (config.gridDimX, config.gridDimY, config.gridDimZ)。
+- **L105** `        config.blockDimX, config.blockDimY, config.blockDimZ = launch_config.block` — **EN:** Assigns a value to (config.blockDimX, config.blockDimY, config.blockDimZ). **CN:** 将一个值赋给 (config.blockDimX, config.blockDimY, config.blockDimZ)。
+- **L106** `        config.blockDimZ = launch_config.block[2]` — **EN:** Assigns a value to config.blockDimZ. **CN:** 将一个值赋给 config.blockDimZ。
+- **L107** `        config.sharedMemBytes = launch_config.shared_memory_capacity` — **EN:** Assigns a value to config.sharedMemBytes. **CN:** 将一个值赋给 config.sharedMemBytes。
+- **L108** `        config.hStream = stream` — **EN:** Assigns a value to config.hStream. **CN:** 将一个值赋给 config.hStream。
+- **L109** `        config.attrs = attrs` — **EN:** Assigns a value to config.attrs. **CN:** 将一个值赋给 config.attrs。
+- **L110** `        config.numAttrs = len(attrs)` — **EN:** Assigns a value to config.numAttrs. **CN:** 将一个值赋给 config.numAttrs。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `        err, = cuda.cuLaunchKernelEx(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L113** `            config, f=self.kernel, kernelParams=kernel_params, extra=0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        return err` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    def run_without_clusters(self, launch_config, kernel_params, stream=None):` — **EN:** Defines function `run_without_clusters`. **CN:** 定义函数 `run_without_clusters`。
+- **L117** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L118** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L119** `        err, = cuda.cuLaunchKernel(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L120** `            self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `            launch_config.grid[0], launch_config.grid[1], launch_config.grid[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            launch_config.block[0], launch_config.block[1], launch_config.block[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `            launch_config.shared_memory_capacity,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `            stream,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `            kernel_params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `            0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `        return err` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def run(self, host_workspace, device_workspace, launch_config, stream=None):` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L131** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L132** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L133** `        cArg = (ctypes.c_char * len(host_workspace)).from_buffer(host_workspace)` — **EN:** Assigns a value to cArg. **CN:** 将一个值赋给 cArg。
+- **L134** `        packed = (ctypes.c_void_p * 1)()` — **EN:** Assigns a value to packed. **CN:** 将一个值赋给 packed。
+- **L135** `        packed[0] = ctypes.addressof(cArg)` — **EN:** Assigns a value to packed[0]. **CN:** 将一个值赋给 packed[0]。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `        if supports_cluster_launch():` — **EN:** Starts a conditional branch guarded by `supports_cluster_launch()`. **CN:** 开始一个由 `supports_cluster_launch()` 控制的条件分支。
+- **L138** `            return self.run_with_clusters(launch_config, packed, stream)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L139** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L140** `            return self.run_without_clusters(launch_config, packed, stream)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.operation`. CN: 模块名为 `cutlass_cppgen.backend.operation`。
+- EN: Top-level classes: LaunchConfiguration, ExecutableOperation CN: 顶层类包括：LaunchConfiguration, ExecutableOperation
+- EN: Top-level functions: supports_cluster_launch CN: 顶层函数包括：supports_cluster_launch
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen.backend.utils.device:device_cc CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen.backend.utils.device:device_cc
+- EN: External or standard-library dependencies: ctypes, cuda:__version__ CN: 外部或标准库依赖：ctypes, cuda:__version__

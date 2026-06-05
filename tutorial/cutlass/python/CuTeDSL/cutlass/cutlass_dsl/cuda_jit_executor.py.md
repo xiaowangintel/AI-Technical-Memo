@@ -1,0 +1,302 @@
+# cuda_jit_executor.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cutlass_dsl/cuda_jit_executor.py`
+
+## Purpose / 作用
+- EN: This module provides jit executor related classes for CUTLASS.
+- CN: 该模块的文档字符串将其描述为：This module provides jit executor related classes for CUTLASS.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides jit executor related classes for CUTLASS.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L17** `import functools` — **EN:** Imports functools for later use. **CN:** 导入 functools 供后续使用。
+- **L18** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L19** `import weakref` — **EN:** Imports weakref for later use. **CN:** 导入 weakref 供后续使用。
+- **L20** `import threading` — **EN:** Imports threading for later use. **CN:** 导入 threading 供后续使用。
+- **L21** `from typing import Any, List, Optional, Tuple, Union` — **EN:** Imports Any, List, Optional, Tuple, Union from `typing`. **CN:** 从 `typing` 导入 Any, List, Optional, Tuple, Union。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `import cuda.bindings.runtime as cuda_runtime` — **EN:** Imports cuda.bindings.runtime as cuda_runtime for later use. **CN:** 导入 cuda.bindings.runtime as cuda_runtime 供后续使用。
+- **L24** `import cuda.bindings.driver as cuda_driver` — **EN:** Imports cuda.bindings.driver as cuda_driver for later use. **CN:** 导入 cuda.bindings.driver as cuda_driver 供后续使用。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `# Local modules imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `from ..base_dsl.jit_executor import (` — **EN:** Imports JitExecutor, JitCompiledFunction, ExecutionArgs, JitFunctionArtifacts from `..base_dsl.jit_executor`. **CN:** 从 `..base_dsl.jit_executor` 导入 JitExecutor, JitCompiledFunction, ExecutionArgs, JitFunctionArtifacts。
+- **L28** `    JitExecutor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    JitCompiledFunction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    ExecutionArgs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    JitFunctionArtifacts,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `from ..base_dsl.utils.logger import log` — **EN:** Imports log from `..base_dsl.utils.logger`. **CN:** 从 `..base_dsl.utils.logger` 导入 log。
+- **L34** `from ..base_dsl.common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `..base_dsl.common`. **CN:** 从 `..base_dsl.common` 导入 DSLRuntimeError。
+- **L35** `from ..base_dsl.typing import Int32` — **EN:** Imports Int32 from `..base_dsl.typing`. **CN:** 从 `..base_dsl.typing` 导入 Int32。
+- **L36** `from ..base_dsl.runtime.cuda import checkCudaErrors` — **EN:** Imports checkCudaErrors from `..base_dsl.runtime.cuda`. **CN:** 从 `..base_dsl.runtime.cuda` 导入 checkCudaErrors。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `from .._mlir import ir, execution_engine` — **EN:** Imports ir, execution_engine from `.._mlir`. **CN:** 从 `.._mlir` 导入 ir, execution_engine。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `class CudaDialectJitModule:` — **EN:** Defines class `CudaDialectJitModule`. **CN:** 定义类 `CudaDialectJitModule`。
+- **L42** `    """Holds the execution engine and cuda libraries."""` — **EN:** Docstring line documenting the class `CudaDialectJitModule`. **CN:** 文档字符串行，用于说明 class `CudaDialectJitModule`。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L45** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `        engine: execution_engine.ExecutionEngine,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `        capi_func: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `        execution_args: ExecutionArgs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L49** `        cuda_library: list["cuda_runtime.cudaLibrary_t"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L51** `        self.engine = engine` — **EN:** Assigns a value to self.engine. **CN:** 将一个值赋给 self.engine。
+- **L52** `        self.capi_func = capi_func` — **EN:** Assigns a value to self.capi_func. **CN:** 将一个值赋给 self.capi_func。
+- **L53** `        self.execution_args = execution_args` — **EN:** Assigns a value to self.execution_args. **CN:** 将一个值赋给 self.execution_args。
+- **L54** `        self.cuda_library = cuda_library` — **EN:** Assigns a value to self.cuda_library. **CN:** 将一个值赋给 self.cuda_library。
+- **L55** `        self._unloaded = False` — **EN:** Assigns a value to self._unloaded. **CN:** 将一个值赋给 self._unloaded。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    def is_unloaded(self) -> bool:` — **EN:** Defines function `is_unloaded`. **CN:** 定义函数 `is_unloaded`。
+- **L58** `        return self._unloaded` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    def unload(self) -> None:` — **EN:** Defines function `unload`. **CN:** 定义函数 `unload`。
+- **L61** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L62** `            for library in self.cuda_library:` — **EN:** Starts a loop assigning items from `self.cuda_library` to `library`. **CN:** 开始一个循环，将 `self.cuda_library` 的元素赋给 `library`。
+- **L63** `                cuda_runtime.cudaLibraryUnload(library)` — **EN:** Invokes `cuda_runtime.cudaLibraryUnload` as a standalone call. **CN:** 以独立语句方式调用 `cuda_runtime.cudaLibraryUnload`。
+- **L64** `            self.cuda_library.clear()` — **EN:** Invokes `self.cuda_library.clear` as a standalone call. **CN:** 以独立语句方式调用 `self.cuda_library.clear`。
+- **L65** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L66** `            pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L67** `        finally:` — **EN:** Starts cleanup code that always runs. **CN:** 开始始终会执行的清理代码。
+- **L68** `            self._unloaded = True` — **EN:** Assigns a value to self._unloaded. **CN:** 将一个值赋给 self._unloaded。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    def __del__(self) -> None:` — **EN:** Defines function `__del__`. **CN:** 定义函数 `__del__`。
+- **L71** `        self.unload()` — **EN:** Invokes `self.unload` as a standalone call. **CN:** 以独立语句方式调用 `self.unload`。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `class CudaDialectJitCompiledFunction(JitCompiledFunction):` — **EN:** Defines class `CudaDialectJitCompiledFunction` with bases JitCompiledFunction. **CN:** 定义类 `CudaDialectJitCompiledFunction`，其基类为 JitCompiledFunction。
+- **L75** `    """Holds a compiled function and its module."""` — **EN:** Docstring line documenting the class `CudaDialectJitCompiledFunction`. **CN:** 文档字符串行，用于说明 class `CudaDialectJitCompiledFunction`。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L78** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L79** `        ir_module: ir.Module,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L80** `        engine: Optional[execution_engine.ExecutionEngine],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L81** `        capi_func: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L82** `        signature: Optional[inspect.Signature],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L83** `        function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L84** `        kernel_info: Optional[dict],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `        jit_time_profiling: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `        jit_function_artifacts: Optional[JitFunctionArtifacts],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L87** `        prefix: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L88** `        load_from_binary: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L89** `        dynamic_args: tuple[Any] = tuple[Any](),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L90** `        dynamic_kwargs: dict[str, Any] = dict[str, Any](),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L91** `        has_gpu_module: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L92** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L93** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L94** `            ir_module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `            engine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `            capi_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `            signature,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `            function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `            kernel_info,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `            jit_time_profiling,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `            jit_function_artifacts,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `            prefix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `            load_from_binary,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `            dynamic_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `            dynamic_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `            has_gpu_module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `        # Populated from module attributes by CuteExperimentalDSL.compile_and_cache;` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `        # defaults match pre-pass state and non-experimental CUDA JIT functions.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L111** `        self.kernel_extra_args: dict[str, int] = {}` — **EN:** Assigns a typed value to self.kernel_extra_args. **CN:** 为 self.kernel_extra_args 赋予带类型标注的值。
+- **L112** `        self.total_added_arguments: int = 0` — **EN:** Assigns a typed value to self.total_added_arguments. **CN:** 为 self.total_added_arguments 赋予带类型标注的值。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `        # Set cuda result return type.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L115** `        # When execution engine/capi function is None, do not set the return type.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `        if self.capi_func:` — **EN:** Starts a conditional branch guarded by `self.capi_func`. **CN:** 开始一个由 `self.capi_func` 控制的条件分支。
+- **L117** `            self.capi_func.restype = ctypes.c_int32` — **EN:** Assigns a value to self.capi_func.restype. **CN:** 将一个值赋给 self.capi_func.restype。
+- **L118** `        if self.execution_args:` — **EN:** Starts a conditional branch guarded by `self.execution_args`. **CN:** 开始一个由 `self.execution_args` 控制的条件分支。
+- **L119** `            self.execution_args.signature = self.execution_args.signature.replace(` — **EN:** Assigns a value to self.execution_args.signature. **CN:** 将一个值赋给 self.execution_args.signature。
+- **L120** `                return_annotation=Int32` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    @functools.cached_property` — **EN:** Applies decorator `functools.cached_property` to the following definition. **CN:** 将装饰器 `functools.cached_property` 应用于后面的定义。
+- **L124** `    def num_devices(self) -> int:` — **EN:** Defines function `num_devices`. **CN:** 定义函数 `num_devices`。
+- **L125** `        """Returns the number of CUDA devices available."""` — **EN:** Docstring line documenting the function `num_devices`. **CN:** 文档字符串行，用于说明 function `num_devices`。
+- **L126** `        return checkCudaErrors(cuda_runtime.cudaGetDeviceCount())` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    def _deserializer(self) -> List["cuda_runtime.cudaLibrary_t"]:` — **EN:** Defines function `_deserializer`. **CN:** 定义函数 `_deserializer`。
+- **L129** `        """Load the cuda library from the binary execution engine.` — **EN:** Starts the docstring for the function `_deserializer`. **CN:** 开始说明 function `_deserializer` 的文档字符串。
+- **L130** `        @return: The list of cuda kernels.` — **EN:** Continues the docstring for the function `_deserializer`. **CN:** 继续说明 function `_deserializer` 的文档字符串。
+- **L131** `        """` — **EN:** Ends the docstring for the function `_deserializer`. **CN:** 结束说明 function `_deserializer` 的文档字符串。
+- **L132** `        library = ctypes.c_void_p()` — **EN:** Assigns a value to library. **CN:** 将一个值赋给 library。
+- **L133** `        pointer_to_library = ctypes.pointer(library)` — **EN:** Assigns a value to pointer_to_library. **CN:** 将一个值赋给 pointer_to_library。
+- **L134** `        pointer_to_pointer_to_library = ctypes.pointer(pointer_to_library)` — **EN:** Assigns a value to pointer_to_pointer_to_library. **CN:** 将一个值赋给 pointer_to_pointer_to_library。
+- **L135** `        err = ctypes.c_int32(0)` — **EN:** Assigns a value to err. **CN:** 将一个值赋给 err。
+- **L136** `        pointer_to_err = ctypes.pointer(err)` — **EN:** Assigns a value to pointer_to_err. **CN:** 将一个值赋给 pointer_to_err。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `        # cuda init takes in a pointer to a cudaLibrary_t and returns` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L139** `        # a i32 cudaError_t. It initialized (lazy loads) our cudaLibrary_t` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L140** `        cuda_init = self.engine.lookup(f"_mlir_{self.prefix}_cuda_init")` — **EN:** Assigns a value to cuda_init. **CN:** 将一个值赋给 cuda_init。
+- **L141** `        if cuda_init is None:` — **EN:** Starts a conditional branch guarded by `cuda_init is None`. **CN:** 开始一个由 `cuda_init is None` 控制的条件分支。
+- **L142** `            raise DSLRuntimeError("cuda_init not found")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L143** `        cuda_init = ctypes.CFUNCTYPE(None, ctypes.c_void_p)(cuda_init)` — **EN:** Assigns a value to cuda_init. **CN:** 将一个值赋给 cuda_init。
+- **L144** `        # cuda load takes in a pointer to a cudaLibrary_t and returns` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L145** `        # a i32 cudaError_t. It loads the functions from the cuda library,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `        # sets function attributes, and returns an error if encountered.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L147** `        cuda_load = self.engine.lookup(f"_mlir_{self.prefix}_cuda_load")` — **EN:** Assigns a value to cuda_load. **CN:** 将一个值赋给 cuda_load。
+- **L148** `        if cuda_load is None:` — **EN:** Starts a conditional branch guarded by `cuda_load is None`. **CN:** 开始一个由 `cuda_load is None` 控制的条件分支。
+- **L149** `            raise DSLRuntimeError("cuda_load not found")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L150** `        cuda_load = ctypes.CFUNCTYPE(None, ctypes.c_void_p)(cuda_load)` — **EN:** Assigns a value to cuda_load. **CN:** 将一个值赋给 cuda_load。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `        cuda_init_args = [pointer_to_pointer_to_library, pointer_to_err]` — **EN:** Assigns a value to cuda_init_args. **CN:** 将一个值赋给 cuda_init_args。
+- **L153** `        packed_args = (ctypes.c_void_p * len(cuda_init_args))()` — **EN:** Assigns a value to packed_args. **CN:** 将一个值赋给 packed_args。
+- **L154** `        for i in range(len(cuda_init_args)):` — **EN:** Starts a loop assigning items from `range(len(cuda_init_args))` to `i`. **CN:** 开始一个循环，将 `range(len(cuda_init_args))` 的元素赋给 `i`。
+- **L155** `            packed_args[i] = ctypes.cast(cuda_init_args[i], ctypes.c_void_p)  # type: ignore[arg-type]` — **EN:** Assigns a value to packed_args[i]. **CN:** 将一个值赋给 packed_args[i]。
+- **L156** `        cuda_init(packed_args)` — **EN:** Invokes `cuda_init` as a standalone call. **CN:** 以独立语句方式调用 `cuda_init`。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `        checkCudaErrors((cuda_runtime.cudaError_t(err.value),))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        cuda_load_args = [pointer_to_library, pointer_to_err]` — **EN:** Assigns a value to cuda_load_args. **CN:** 将一个值赋给 cuda_load_args。
+- **L161** `        packed_args = (ctypes.c_void_p * len(cuda_load_args))()` — **EN:** Assigns a value to packed_args. **CN:** 将一个值赋给 packed_args。
+- **L162** `        for i in range(len(cuda_load_args)):` — **EN:** Starts a loop assigning items from `range(len(cuda_load_args))` to `i`. **CN:** 开始一个循环，将 `range(len(cuda_load_args))` 的元素赋给 `i`。
+- **L163** `            packed_args[i] = ctypes.cast(cuda_load_args[i], ctypes.c_void_p)  # type: ignore[arg-type]` — **EN:** Assigns a value to packed_args[i]. **CN:** 将一个值赋给 packed_args[i]。
+- **L164** `        cuda_load(packed_args)` — **EN:** Invokes `cuda_load` as a standalone call. **CN:** 以独立语句方式调用 `cuda_load`。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `        checkCudaErrors((cuda_runtime.cudaError_t(err.value),))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `        return [cuda_runtime.cudaLibrary_t(library.value)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    def _get_cuda_init_and_load(self) -> Tuple[Any, Any]:` — **EN:** Defines function `_get_cuda_init_and_load`. **CN:** 定义函数 `_get_cuda_init_and_load`。
+- **L171** `        """Returns the cuda init and load functions from the engine."""` — **EN:** Docstring line documenting the function `_get_cuda_init_and_load`. **CN:** 文档字符串行，用于说明 function `_get_cuda_init_and_load`。
+- **L172** `        # cuda init takes in a pointer to a cudaLibrary_t and returns` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L173** `        # a i32 cudaError_t. It initialized (lazy loads) our cudaLibrary_t` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `        cuda_init = None` — **EN:** Assigns a value to cuda_init. **CN:** 将一个值赋给 cuda_init。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `        # cuda load for device takes in a pointer to a cudaLibrary_t and a device index and returns` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L178** `        # a i32 cudaError_t. It resolves each kernel from the cuda library,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L179** `        # and applies device scoped attributes for the given device id, and returns an error if encountered.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L180** `        cuda_load_to_device = None` — **EN:** Assigns a value to cuda_load_to_device. **CN:** 将一个值赋给 cuda_load_to_device。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `        # When load_from_binary is true, the symbols are prefixed by _mlir_<prefix>_ and are looked` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L183** `        # up from the JIT engine. Otherwise we look for the unprefixed forms. Looking up cuda_init` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L184** `        # and cuda_load_to_device from the engine which are defined in CudaToLLVM.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L185** `        if self.load_from_binary:` — **EN:** Starts a conditional branch guarded by `self.load_from_binary`. **CN:** 开始一个由 `self.load_from_binary` 控制的条件分支。
+- **L186** `            if self.prefix is None:` — **EN:** Starts a conditional branch guarded by `self.prefix is None`. **CN:** 开始一个由 `self.prefix is None` 控制的条件分支。
+- **L187** `                raise DSLRuntimeError("prefix is required to be set for binary loading")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L188** `            cuda_init = self.engine.lookup(f"_mlir_{self.prefix}_cuda_init")` — **EN:** Assigns a value to cuda_init. **CN:** 将一个值赋给 cuda_init。
+- **L189** `            if cuda_init is None:` — **EN:** Starts a conditional branch guarded by `cuda_init is None`. **CN:** 开始一个由 `cuda_init is None` 控制的条件分支。
+- **L190** `                raise DSLRuntimeError(f"cuda_init not found for prefix {self.prefix}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L191** `            cuda_load_to_device = self.engine.lookup(` — **EN:** Assigns a value to cuda_load_to_device. **CN:** 将一个值赋给 cuda_load_to_device。
+- **L192** `                f"_mlir_{self.prefix}_cuda_load_to_device"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `            if cuda_load_to_device is None:` — **EN:** Starts a conditional branch guarded by `cuda_load_to_device is None`. **CN:** 开始一个由 `cuda_load_to_device is None` 控制的条件分支。
+- **L195** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L196** `                    f"cuda_load_to_device not found for prefix {self.prefix}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L199** `            cuda_init = self.engine.raw_lookup("cuda_init")` — **EN:** Assigns a value to cuda_init. **CN:** 将一个值赋给 cuda_init。
+- **L200** `            if cuda_init is None:` — **EN:** Starts a conditional branch guarded by `cuda_init is None`. **CN:** 开始一个由 `cuda_init is None` 控制的条件分支。
+- **L201** `                raise DSLRuntimeError("cuda_init not found")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L202** `            cuda_load_to_device = self.engine.raw_lookup("cuda_load_to_device")` — **EN:** Assigns a value to cuda_load_to_device. **CN:** 将一个值赋给 cuda_load_to_device。
+- **L203** `            if cuda_load_to_device is None:` — **EN:** Starts a conditional branch guarded by `cuda_load_to_device is None`. **CN:** 开始一个由 `cuda_load_to_device is None` 控制的条件分支。
+- **L204** `                raise DSLRuntimeError("cuda_load_to_device not found")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L205** `        cuda_init = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p)(cuda_init)` — **EN:** Assigns a value to cuda_init. **CN:** 将一个值赋给 cuda_init。
+- **L206** `        cuda_load_to_device = ctypes.CFUNCTYPE(ctypes.c_int32, ctypes.c_void_p)(` — **EN:** Assigns a value to cuda_load_to_device. **CN:** 将一个值赋给 cuda_load_to_device。
+- **L207** `            cuda_load_to_device` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `        return cuda_init, cuda_load_to_device` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `    def _load_cuda_library(self) -> List["cuda_runtime.cudaLibrary_t"]:` — **EN:** Defines function `_load_cuda_library`. **CN:** 定义函数 `_load_cuda_library`。
+- **L213** `        """Loads the CUDA library from the engine."""` — **EN:** Docstring line documenting the function `_load_cuda_library`. **CN:** 文档字符串行，用于说明 function `_load_cuda_library`。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `        cuda_init, cuda_load_to_device = self._get_cuda_init_and_load()` — **EN:** Assigns a value to (cuda_init, cuda_load_to_device). **CN:** 将一个值赋给 (cuda_init, cuda_load_to_device)。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** `        library = ctypes.c_void_p()` — **EN:** Assigns a value to library. **CN:** 将一个值赋给 library。
+- **L218** `        pointer_to_library = ctypes.pointer(library)` — **EN:** Assigns a value to pointer_to_library. **CN:** 将一个值赋给 pointer_to_library。
+- **L219** `        pointer_to_pointer_to_library = ctypes.pointer(pointer_to_library)` — **EN:** Assigns a value to pointer_to_pointer_to_library. **CN:** 将一个值赋给 pointer_to_pointer_to_library。
+- **L220** `        err = ctypes.c_int32(0)` — **EN:** Assigns a value to err. **CN:** 将一个值赋给 err。
+- **L221** `        pointer_to_err = ctypes.pointer(err)` — **EN:** Assigns a value to pointer_to_err. **CN:** 将一个值赋给 pointer_to_err。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `        cuda_init_args = [pointer_to_pointer_to_library, pointer_to_err]` — **EN:** Assigns a value to cuda_init_args. **CN:** 将一个值赋给 cuda_init_args。
+- **L224** `        packed_args = (ctypes.c_void_p * len(cuda_init_args))()` — **EN:** Assigns a value to packed_args. **CN:** 将一个值赋给 packed_args。
+- **L225** `        for i in range(len(cuda_init_args)):` — **EN:** Starts a loop assigning items from `range(len(cuda_init_args))` to `i`. **CN:** 开始一个循环，将 `range(len(cuda_init_args))` 的元素赋给 `i`。
+- **L226** `            packed_args[i] = ctypes.cast(cuda_init_args[i], ctypes.c_void_p)  # type: ignore[arg-type]` — **EN:** Assigns a value to packed_args[i]. **CN:** 将一个值赋给 packed_args[i]。
+- **L227** `        cuda_init(packed_args)` — **EN:** Invokes `cuda_init` as a standalone call. **CN:** 以独立语句方式调用 `cuda_init`。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `        checkCudaErrors((cuda_runtime.cudaError_t(err.value),))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `        device_id = ctypes.c_int32(0)` — **EN:** Assigns a value to device_id. **CN:** 将一个值赋给 device_id。
+- **L232** `        pointer_to_device_id = ctypes.pointer(device_id)` — **EN:** Assigns a value to pointer_to_device_id. **CN:** 将一个值赋给 pointer_to_device_id。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `        cuda_load_args = [` — **EN:** Assigns a value to cuda_load_args. **CN:** 将一个值赋给 cuda_load_args。
+- **L235** `            pointer_to_pointer_to_library,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `            pointer_to_device_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `            pointer_to_err,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `        packed_args = (ctypes.c_void_p * len(cuda_load_args))()` — **EN:** Assigns a value to packed_args. **CN:** 将一个值赋给 packed_args。
+- **L240** `        for i, arg in enumerate(cuda_load_args):` — **EN:** Starts a loop assigning items from `enumerate(cuda_load_args)` to `(i, arg)`. **CN:** 开始一个循环，将 `enumerate(cuda_load_args)` 的元素赋给 `(i, arg)`。
+- **L241** `            packed_args[i] = ctypes.cast(arg, ctypes.c_void_p)  # type: ignore[arg-type]` — **EN:** Assigns a value to packed_args[i]. **CN:** 将一个值赋给 packed_args[i]。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `        for dev in range(self.num_devices):` — **EN:** Starts a loop assigning items from `range(self.num_devices)` to `dev`. **CN:** 开始一个循环，将 `range(self.num_devices)` 的元素赋给 `dev`。
+- **L244** `            device_id.value = dev` — **EN:** Assigns a value to device_id.value. **CN:** 将一个值赋给 device_id.value。
+- **L245** `            cuda_load_to_device(packed_args)` — **EN:** Invokes `cuda_load_to_device` as a standalone call. **CN:** 以独立语句方式调用 `cuda_load_to_device`。
+- **L246** `            checkCudaErrors((cuda_runtime.cudaError_t(err.value),))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `        checkCudaErrors((cuda_runtime.cudaError_t(err.value),))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `        return [cuda_runtime.cudaLibrary_t(library.value)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** `    def to(self, device: Optional[int] = None) -> JitExecutor:` — **EN:** Defines function `to`. **CN:** 定义函数 `to`。
+- **L253** `        """Returns an executable function bound to the given device.` — **EN:** Starts the docstring for the function `to`. **CN:** 开始说明 function `to` 的文档字符串。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `        For multi-device execution this method can be called for each device where` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L256** `        the kernel will run.` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `        Since CudaJitCompiledFunction uses CUDA libraries, which are context free,` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L259** `        binding to a device is not necessary and the device is ignored. Device is` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L260** `        kept in for compatibility with the JitCompiledFunction.` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `        :param device: Specifies the device for the executor. If None the current device is used.` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L263** `        :type device: Optional[Union[int, CUdevice]]` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L264** `        :return: A callable executor function.` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L265** `        :rtype: JitExecutor` — **EN:** Continues the docstring for the function `to`. **CN:** 继续说明 function `to` 的文档字符串。
+- **L266** `        """` — **EN:** Ends the docstring for the function `to`. **CN:** 结束说明 function `to` 的文档字符串。
+- **L267** `        super()._validate_engine()` — **EN:** Invokes `super()._validate_engine` as a standalone call. **CN:** 以独立语句方式调用 `super()._validate_engine`。
+- **L268** `        with self._executor_lock:` — **EN:** Starts a context-managed block using self._executor_lock. **CN:** 开始一个使用 self._executor_lock 的上下文管理代码块。
+- **L269** `            # We need to ensure that the modules are loaded if not already` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L270** `            if self.jit_module is None or (` — **EN:** Starts a conditional branch guarded by `self.jit_module is None or (isinstance(self.jit_module, C...`. **CN:** 开始一个由 `self.jit_module is None or (isinstance(self.jit_module, C...` 控制的条件分支。
+- **L271** `                isinstance(self.jit_module, CudaDialectJitModule)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L272** `                and self.jit_module.is_unloaded()` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L273** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L274** `                cuda_library = self._load_cuda_library() if self.has_gpu_module else []` — **EN:** Assigns a value to cuda_library. **CN:** 将一个值赋给 cuda_library。
+- **L275** `                self.jit_module = CudaDialectJitModule(  # type: ignore[assignment]` — **EN:** Assigns a value to self.jit_module. **CN:** 将一个值赋给 self.jit_module。
+- **L276** `                    self.engine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `                    self.capi_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `                    self.execution_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `                    cuda_library,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `            return JitExecutor(self.jit_module, None, self.jit_time_profiling)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cutlass_dsl.cuda_jit_executor`. CN: 模块名为 `CuTeDSL.cutlass.cutlass_dsl.cuda_jit_executor`。
+- EN: Module docstring summary: This module provides jit executor related classes for CUTLASS. CN: 模块文档摘要为：This module provides jit executor related classes for CUTLASS.
+- EN: Top-level classes: CudaDialectJitModule, CudaDialectJitCompiledFunction CN: 顶层类包括：CudaDialectJitModule, CudaDialectJitCompiledFunction
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..base_dsl.jit_executor:JitExecutor,JitCompiledFunction,ExecutionArgs,JitFunctionArtifacts, ..base_dsl.utils.logger:log, ..base_dsl.common:DSLRuntimeError, ..base_dsl.typing:Int32, ..base_dsl.runtime.cuda:checkCudaErrors, .._mlir:ir,execution_engine CN: 内部依赖：..base_dsl.jit_executor:JitExecutor,JitCompiledFunction,ExecutionArgs,JitFunctionArtifacts, ..base_dsl.utils.logger:log, ..base_dsl.common:DSLRuntimeError, ..base_dsl.typing:Int32, ..base_dsl.runtime.cuda:checkCudaErrors, .._mlir:ir,execution_engine
+- EN: External or standard-library dependencies: ctypes, functools, inspect, weakref, threading, typing:Any,List,Optional,Tuple,Union, cuda.bindings.runtime, cuda.bindings.driver CN: 外部或标准库依赖：ctypes, functools, inspect, weakref, threading, typing:Any,List,Optional,Tuple,Union, cuda.bindings.runtime, cuda.bindings.driver

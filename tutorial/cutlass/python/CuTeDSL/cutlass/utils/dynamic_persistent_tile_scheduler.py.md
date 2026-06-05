@@ -1,0 +1,536 @@
+# dynamic_persistent_tile_scheduler.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/dynamic_persistent_tile_scheduler.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler) in `CuTeDSL.cutlass.utils.dynamic_persistent_tile_scheduler`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.dynamic_persistent_tile_scheduler` 定义了 2 个类（ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L13** `from typing import Optional, Tuple` — **EN:** Imports Optional, Tuple from `typing`. **CN:** 从 `typing` 导入 Optional, Tuple。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L16** `from cutlass.cutlass_dsl import (` — **EN:** Imports Boolean, Integer, Int32, extract_mlir_values, new_from_mlir_values, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 Boolean, Integer, Int32, extract_mlir_values, new_from_mlir_values, dsl_user_op。
+- **L17** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    Integer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    extract_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    new_from_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    dsl_user_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L26** `from cutlass.utils.static_persistent_tile_scheduler import (` — **EN:** Imports WorkTileInfo from `cutlass.utils.static_persistent_tile_scheduler`. **CN:** 从 `cutlass.utils.static_persistent_tile_scheduler` 导入 WorkTileInfo。
+- **L27** `    WorkTileInfo,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `class ClcDynamicPersistentTileSchedulerParams:` — **EN:** Defines class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 定义类 `ClcDynamicPersistentTileSchedulerParams`。
+- **L33** `    """A class to represent parameters for a dynamic persistent tile scheduler.` — **EN:** Starts the docstring for the class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 开始说明 class `ClcDynamicPersistentTileSchedulerParams` 的文档字符串。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `    This class is designed to manage and compute the layout of clusters and tiles` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 继续说明 class `ClcDynamicPersistentTileSchedulerParams` 的文档字符串。
+- **L36** `    in a batched gemm problem.` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 继续说明 class `ClcDynamicPersistentTileSchedulerParams` 的文档字符串。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `    :ivar cluster_shape_mn: Shape of the cluster in (m, n) dimensions (K dimension cta count must be 1).` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 继续说明 class `ClcDynamicPersistentTileSchedulerParams` 的文档字符串。
+- **L39** `    :type cluster_shape_mn: tuple` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 继续说明 class `ClcDynamicPersistentTileSchedulerParams` 的文档字符串。
+- **L40** `    """` — **EN:** Ends the docstring for the class `ClcDynamicPersistentTileSchedulerParams`. **CN:** 结束说明 class `ClcDynamicPersistentTileSchedulerParams` 的文档字符串。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L43** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L44** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `        problem_shape_ntile_mnl: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `        cluster_shape_mnk: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `        swizzle_size: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `        raster_along_m: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L49** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L51** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L53** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L54** `        Initializes the ClcDynamicPersistentTileSchedulerParams with the given parameters.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `        :param problem_shape_ntile_mnl: The shape of the problem in terms of` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L57** `            number of CTA (Cooperative Thread Array) in (m, n, l) dimensions.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L58** `        :type problem_shape_ntile_mnl: cute.Shape` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L59** `        :param cluster_shape_mnk: The shape of the cluster in (m, n) dimensions.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L60** `        :type cluster_shape_mnk: cute.Shape` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L61** `        :param swizzle_size: Swizzling size in the unit of cluster. 1 means no swizzle` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L62** `        :type swizzle_size: int` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L63** `        :param raster_along_m: Rasterization order of clusters. Only used when swizzle_size > 1.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L64** `            True means along M, false means along N.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L65** `        :type raster_along_m: bool` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `        :raises ValueError: If cluster_shape_k is not 1.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L68** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `        if cluster_shape_mnk[2] != 1:  # type: ignore[index]` — **EN:** Starts a conditional branch guarded by `cluster_shape_mnk[2] != 1`. **CN:** 开始一个由 `cluster_shape_mnk[2] != 1` 控制的条件分支。
+- **L71** `            raise ValueError(f"unsupported cluster_shape_k {cluster_shape_mnk[2]}")  # type: ignore[index]` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L72** `        if swizzle_size < 1:` — **EN:** Starts a conditional branch guarded by `swizzle_size < 1`. **CN:** 开始一个由 `swizzle_size < 1` 控制的条件分支。
+- **L73** `            raise ValueError(f"expect swizzle_size >= 1, but get {swizzle_size}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `        self.problem_shape_ntile_mnl = problem_shape_ntile_mnl` — **EN:** Assigns a value to self.problem_shape_ntile_mnl. **CN:** 将一个值赋给 self.problem_shape_ntile_mnl。
+- **L76** `        # cluster_shape_mnk is kept for reconstruction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L77** `        self._cluster_shape_mnk = cluster_shape_mnk` — **EN:** Assigns a value to self._cluster_shape_mnk. **CN:** 将一个值赋给 self._cluster_shape_mnk。
+- **L78** `        self.cluster_shape_mn = cluster_shape_mnk[:2]  # type: ignore[index]` — **EN:** Assigns a value to self.cluster_shape_mn. **CN:** 将一个值赋给 self.cluster_shape_mn。
+- **L79** `        self.swizzle_size = swizzle_size` — **EN:** Assigns a value to self.swizzle_size. **CN:** 将一个值赋给 self.swizzle_size。
+- **L80** `        self._raster_along_m = raster_along_m` — **EN:** Assigns a value to self._raster_along_m. **CN:** 将一个值赋给 self._raster_along_m。
+- **L81** `        self.cluster_shape_major_fdd = None` — **EN:** Assigns a value to self.cluster_shape_major_fdd. **CN:** 将一个值赋给 self.cluster_shape_major_fdd。
+- **L82** `        self.cluster_shape_minor_fdd = None` — **EN:** Assigns a value to self.cluster_shape_minor_fdd. **CN:** 将一个值赋给 self.cluster_shape_minor_fdd。
+- **L83** `        self._loc = loc` — **EN:** Assigns a value to self._loc. **CN:** 将一个值赋给 self._loc。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `        # By default, we follow m major (col-major) raster order, so make a col-major layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L86** `        self.problem_layout_ncluster_mnl = cute.make_layout(` — **EN:** Assigns a value to self.problem_layout_ncluster_mnl. **CN:** 将一个值赋给 self.problem_layout_ncluster_mnl。
+- **L87** `            cute.ceil_div(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `                self.problem_shape_ntile_mnl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `                cluster_shape_mnk[:2],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `        # Apply swizzle if swizzle_size > 1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L98** `        if swizzle_size > 1:` — **EN:** Starts a conditional branch guarded by `swizzle_size > 1`. **CN:** 开始一个由 `swizzle_size > 1` 控制的条件分支。
+- **L99** `            problem_shape_ncluster_mnl = cute.round_up(` — **EN:** Assigns a value to problem_shape_ncluster_mnl. **CN:** 将一个值赋给 problem_shape_ncluster_mnl。
+- **L100** `                self.problem_layout_ncluster_mnl.shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `                (1, swizzle_size, 1) if raster_along_m else (swizzle_size, 1, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `            if raster_along_m:` — **EN:** Starts a conditional branch guarded by `raster_along_m`. **CN:** 开始一个由 `raster_along_m` 控制的条件分支。
+- **L105** `                self.problem_layout_ncluster_mnl = cute.make_layout(` — **EN:** Assigns a value to self.problem_layout_ncluster_mnl. **CN:** 将一个值赋给 self.problem_layout_ncluster_mnl。
+- **L106** `                    (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `                        problem_shape_ncluster_mnl[0],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `                        (swizzle_size, problem_shape_ncluster_mnl[1] // swizzle_size),  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `                        problem_shape_ncluster_mnl[2],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `                    stride=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `                        swizzle_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `                        (1, swizzle_size * problem_shape_ncluster_mnl[0]),  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `                        problem_shape_ncluster_mnl[0] * problem_shape_ncluster_mnl[1],  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L120** `                self.problem_layout_ncluster_mnl = cute.make_layout(` — **EN:** Assigns a value to self.problem_layout_ncluster_mnl. **CN:** 将一个值赋给 self.problem_layout_ncluster_mnl。
+- **L121** `                    (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `                        (swizzle_size, problem_shape_ncluster_mnl[0] // swizzle_size),  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `                        problem_shape_ncluster_mnl[1],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `                        problem_shape_ncluster_mnl[2],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `                    stride=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `                        (1, swizzle_size * problem_shape_ncluster_mnl[1]),  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `                        swizzle_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `                        problem_shape_ncluster_mnl[0] * problem_shape_ncluster_mnl[1],  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        elif not raster_along_m:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L135** `            cluster_count_major = self.problem_layout_ncluster_mnl.shape[1]` — **EN:** Assigns a value to cluster_count_major. **CN:** 将一个值赋给 cluster_count_major。
+- **L136** `            cluster_count_minor = self.problem_layout_ncluster_mnl.shape[0]` — **EN:** Assigns a value to cluster_count_minor. **CN:** 将一个值赋给 cluster_count_minor。
+- **L137** `            self.cluster_shape_major_fdd = cute.fast_divmod_create_divisor(` — **EN:** Assigns a value to self.cluster_shape_major_fdd. **CN:** 将一个值赋给 self.cluster_shape_major_fdd。
+- **L138** `                cluster_count_major, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `            self.cluster_shape_minor_fdd = cute.fast_divmod_create_divisor(` — **EN:** Assigns a value to self.cluster_shape_minor_fdd. **CN:** 将一个值赋给 self.cluster_shape_minor_fdd。
+- **L141** `                cluster_count_minor, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L145** `        values, self._values_pos = [], []` — **EN:** Assigns a value to (values, self._values_pos). **CN:** 将一个值赋给 (values, self._values_pos)。
+- **L146** `        for obj in [` — **EN:** Starts a loop assigning items from `[self.problem_shape_ntile_mnl, self._cluster_sh...` to `obj`. **CN:** 开始一个循环，将 `[self.problem_shape_ntile_mnl, self._cluster_sh...` 的元素赋给 `obj`。
+- **L147** `            self.problem_shape_ntile_mnl,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L148** `            self._cluster_shape_mnk,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L149** `            self.swizzle_size,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L150** `            self._raster_along_m,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `        ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L152** `            obj_values = extract_mlir_values(obj)` — **EN:** Assigns a value to obj_values. **CN:** 将一个值赋给 obj_values。
+- **L153** `            values += obj_values` — **EN:** Updates values in place. **CN:** 原地更新 values。
+- **L154** `            self._values_pos.append(len(obj_values))` — **EN:** Invokes `self._values_pos.append` as a standalone call. **CN:** 以独立语句方式调用 `self._values_pos.append`。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `        # Add FastDivmod divisors to MLIR values for Host->Device transfer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L157** `        # Only add non-None values to avoid MLIR type errors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L158** `        fastdivmod_values = []` — **EN:** Assigns a value to fastdivmod_values. **CN:** 将一个值赋给 fastdivmod_values。
+- **L159** `        fastdivmod_indices = []  # Track which FastDivmod objects are present` — **EN:** Assigns a value to fastdivmod_indices. **CN:** 将一个值赋给 fastdivmod_indices。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `        for i, (fdd_name, fdd_obj) in enumerate(` — **EN:** Starts a loop assigning items from `enumerate([('cluster_shape_major_fdd', self.clu...` to `(i, (fdd_name, fdd_obj))`. **CN:** 开始一个循环，将 `enumerate([('cluster_shape_major_fdd', self.clu...` 的元素赋给 `(i, (fdd_name, fdd_obj))`。
+- **L162** `            [` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L163** `                ("cluster_shape_major_fdd", self.cluster_shape_major_fdd),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L164** `                ("cluster_shape_minor_fdd", self.cluster_shape_minor_fdd),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L165** `            ]` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L166** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L167** `            if fdd_obj is not None:` — **EN:** Starts a conditional branch guarded by `fdd_obj is not None`. **CN:** 开始一个由 `fdd_obj is not None` 控制的条件分支。
+- **L168** `                # Extract MLIR values from FastDivmodDivisor objects` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L169** `                fdd_values = extract_mlir_values(fdd_obj)` — **EN:** Assigns a value to fdd_values. **CN:** 将一个值赋给 fdd_values。
+- **L170** `                fastdivmod_values.extend(fdd_values)` — **EN:** Invokes `fastdivmod_values.extend` as a standalone call. **CN:** 以独立语句方式调用 `fastdivmod_values.extend`。
+- **L171** `                fastdivmod_indices.append(i)` — **EN:** Invokes `fastdivmod_indices.append` as a standalone call. **CN:** 以独立语句方式调用 `fastdivmod_indices.append`。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `        values += fastdivmod_values` — **EN:** Updates values in place. **CN:** 原地更新 values。
+- **L174** `        self._values_pos.append(` — **EN:** Invokes `self._values_pos.append` as a standalone call. **CN:** 以独立语句方式调用 `self._values_pos.append`。
+- **L175** `            len(fastdivmod_indices)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `        )  # Store count of FastDivmod objects, not values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `        self._fastdivmod_indices = fastdivmod_indices  # Store for reconstruction` — **EN:** Assigns a value to self._fastdivmod_indices. **CN:** 将一个值赋给 self._fastdivmod_indices。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L182** `        self, values: list[ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L183** `    ) -> "ClcDynamicPersistentTileSchedulerParams":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L184** `        obj_list = []` — **EN:** Assigns a value to obj_list. **CN:** 将一个值赋给 obj_list。
+- **L185** `        values_copy = list(values)  # Make a copy to avoid modifying original` — **EN:** Assigns a value to values_copy. **CN:** 将一个值赋给 values_copy。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        # Reconstruct original objects from MLIR values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `        for obj, n_items in zip(` — **EN:** Starts a loop assigning items from `zip([self.problem_shape_ntile_mnl, self._cluste...` to `(obj, n_items)`. **CN:** 开始一个循环，将 `zip([self.problem_shape_ntile_mnl, self._cluste...` 的元素赋给 `(obj, n_items)`。
+- **L189** `            [` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L190** `                self.problem_shape_ntile_mnl,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L191** `                self._cluster_shape_mnk,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L192** `                self.swizzle_size,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L193** `                self._raster_along_m,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `            ],` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L195** `            self._values_pos[:-1],  # Exclude FastDivmod count` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L197** `            obj_list.append(new_from_mlir_values(obj, values_copy[:n_items]))` — **EN:** Invokes `obj_list.append` as a standalone call. **CN:** 以独立语句方式调用 `obj_list.append`。
+- **L198** `            values_copy = values_copy[n_items:]` — **EN:** Assigns a value to values_copy. **CN:** 将一个值赋给 values_copy。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `        new_params = ClcDynamicPersistentTileSchedulerParams(` — **EN:** Assigns a value to new_params. **CN:** 将一个值赋给 new_params。
+- **L201** `            *(tuple(obj_list)), loc=self._loc` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `        # Restore FastDivmod divisors from remaining values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L205** `        fdd_names = [` — **EN:** Assigns a value to fdd_names. **CN:** 将一个值赋给 fdd_names。
+- **L206** `            "cluster_shape_major_fdd",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `            "cluster_shape_minor_fdd",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `        if hasattr(self, "_fastdivmod_indices") and len(self._fastdivmod_indices) > 0:` — **EN:** Starts a conditional branch guarded by `hasattr(self, '_fastdivmod_indices') and len(self._fastdi...`. **CN:** 开始一个由 `hasattr(self, '_fastdivmod_indices') and len(self._fastdi...` 控制的条件分支。
+- **L211** `            # Override the FastDivmod divisors created by __init__ with reconstructed ones` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L212** `            for j, original_index in enumerate(self._fastdivmod_indices):` — **EN:** Starts a loop assigning items from `enumerate(self._fastdivmod_indices)` to `(j, original_index)`. **CN:** 开始一个循环，将 `enumerate(self._fastdivmod_indices)` 的元素赋给 `(j, original_index)`。
+- **L213** `                fdd_name = fdd_names[original_index]` — **EN:** Assigns a value to fdd_name. **CN:** 将一个值赋给 fdd_name。
+- **L214** `                # Get the original FastDivmodDivisor object` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L215** `                original_fdd = getattr(self, fdd_name)` — **EN:** Assigns a value to original_fdd. **CN:** 将一个值赋给 original_fdd。
+- **L216** `                if original_fdd is not None and j < len(values_copy):` — **EN:** Starts a conditional branch guarded by `original_fdd is not None and j < len(values_copy)`. **CN:** 开始一个由 `original_fdd is not None and j < len(values_copy)` 控制的条件分支。
+- **L217** `                    # Each FastDivmodDivisor has 1 MLIR value` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L218** `                    reconstructed_fdd = new_from_mlir_values(` — **EN:** Assigns a value to reconstructed_fdd. **CN:** 将一个值赋给 reconstructed_fdd。
+- **L219** `                        original_fdd, [values_copy[j]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `                    setattr(new_params, fdd_name, reconstructed_fdd)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `        return new_params` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L226** `    def get_grid_shape(` — **EN:** Defines function `get_grid_shape`. **CN:** 定义函数 `get_grid_shape`。
+- **L227** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `    ) -> Tuple[Integer, Integer, Integer]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L232** `        """` — **EN:** Starts the docstring for the function `get_grid_shape`. **CN:** 开始说明 function `get_grid_shape` 的文档字符串。
+- **L233** `        Computes the grid shape based on the problem shape and cluster shape.` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `        :return: the grid is the CTA numbers that has aligned with cluster shape.` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L236** `        """` — **EN:** Ends the docstring for the function `get_grid_shape`. **CN:** 结束说明 function `get_grid_shape` 的文档字符串。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `        problem_ceiling_cta_mnl = cute.round_up(` — **EN:** Assigns a value to problem_ceiling_cta_mnl. **CN:** 将一个值赋给 problem_ceiling_cta_mnl。
+- **L239** `            self.problem_shape_ntile_mnl, self._cluster_shape_mnk` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `        if self.swizzle_size == 1 and self._raster_along_m:` — **EN:** Starts a conditional branch guarded by `self.swizzle_size == 1 and self._raster_along_m`. **CN:** 开始一个由 `self.swizzle_size == 1 and self._raster_along_m` 控制的条件分支。
+- **L243** `            return problem_ceiling_cta_mnl  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L244** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L245** `            # If swizzling is enabled or raster_along_n,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L246** `            # we are going to map from a linear idx to tile id manually.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L247** `            num_problem_cta_count = cute.size(problem_ceiling_cta_mnl, loc=loc, ip=ip)` — **EN:** Assigns a value to num_problem_cta_count. **CN:** 将一个值赋给 num_problem_cta_count。
+- **L248** `            num_ctas_per_cluster = cute.size(self.cluster_shape_mn, loc=loc, ip=ip)` — **EN:** Assigns a value to num_ctas_per_cluster. **CN:** 将一个值赋给 num_ctas_per_cluster。
+- **L249** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L250** `                *self.cluster_shape_mn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `                num_problem_cta_count // num_ctas_per_cluster,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `# Set explicit signature for Sphinx documentation to avoid issues with @dsl_user_op decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L256** `ClcDynamicPersistentTileSchedulerParams.__init__.__signature__ = inspect.Signature(  # type: ignore[attr-defined]` — **EN:** Assigns a value to ClcDynamicPersistentTileSchedulerParams.__init__.__signat.... **CN:** 将一个值赋给 ClcDynamicPersistentTileSchedulerParams.__init__.__signat...。
+- **L257** `    [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `        inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `class ClcDynamicPersistentTileScheduler:` — **EN:** Defines class `ClcDynamicPersistentTileScheduler`. **CN:** 定义类 `ClcDynamicPersistentTileScheduler`。
+- **L264** `    """A scheduler for dynamic persistent tile execution in CUTLASS/CuTe kernels.` — **EN:** Starts the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 开始说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    :ivar params: Tile schedule related params, including cluster shape.` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 继续说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L267** `    :type params: ClcDynamicPersistentTileSchedulerParams` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 继续说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L268** `    :ivar cta_id_in_cluster: ID of the CTA within its cluster` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 继续说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L269** `    :type cta_id_in_cluster: cute.Coord` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 继续说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L270** `    :ivar _num_tiles_executed: Counter for executed tiles` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 继续说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L271** `    :type _num_tiles_executed: Int32` — **EN:** Continues the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 继续说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L272** `    """` — **EN:** Ends the docstring for the class `ClcDynamicPersistentTileScheduler`. **CN:** 结束说明 class `ClcDynamicPersistentTileScheduler` 的文档字符串。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L275** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `        params: ClcDynamicPersistentTileSchedulerParams,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `        cta_id_in_cluster: cute.Coord,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `        num_tiles_executed: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `        clc_response_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `        block_idx: Tuple[Integer, Integer, Integer],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L281** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L282** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L283** `        Initializes the ClcDynamicPersistentTileScheduler with the given parameters.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `        :param params: Tile schedule related params, including cluster shape.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L286** `        :type params: ClcDynamicPersistentTileSchedulerParams` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L287** `        :param cta_id_in_cluster: ID of the CTA within its cluster.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L288** `        :type cta_id_in_cluster: cute.Coord` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L289** `        :param num_tiles_executed: Counter for executed tiles.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L290** `        :type num_tiles_executed: Int32` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L291** `        :param clc_response_ptr: Pointer of the clc rsponse.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L292** `        :type clc_response_ptr: cute.Pointer` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L293** `        :param block_idx: The block index.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L294** `        :type block_idx: Tuple[Integer, Integer, Integer]` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L295** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L296** `        self.params = params` — **EN:** Assigns a value to self.params. **CN:** 将一个值赋给 self.params。
+- **L297** `        self.cta_id_in_cluster = cta_id_in_cluster` — **EN:** Assigns a value to self.cta_id_in_cluster. **CN:** 将一个值赋给 self.cta_id_in_cluster。
+- **L298** `        self._num_tiles_executed = num_tiles_executed` — **EN:** Assigns a value to self._num_tiles_executed. **CN:** 将一个值赋给 self._num_tiles_executed。
+- **L299** `        self._clc_response_ptr = clc_response_ptr` — **EN:** Assigns a value to self._clc_response_ptr. **CN:** 将一个值赋给 self._clc_response_ptr。
+- **L300** `        self._block_idx = block_idx` — **EN:** Assigns a value to self._block_idx. **CN:** 将一个值赋给 self._block_idx。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L303** `        values = extract_mlir_values(self.cta_id_in_cluster)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L304** `        values.extend(extract_mlir_values(self._num_tiles_executed))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L305** `        values.extend(extract_mlir_values(self._clc_response_ptr))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L306** `        values.extend(extract_mlir_values(self._block_idx))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L307** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L310** `        self, values: list[ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `    ) -> "ClcDynamicPersistentTileScheduler":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L312** `        assert len(values) == 8` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L313** `        new_cta_id_in_cluster = new_from_mlir_values(` — **EN:** Assigns a value to new_cta_id_in_cluster. **CN:** 将一个值赋给 new_cta_id_in_cluster。
+- **L314** `            self.cta_id_in_cluster, values[0:3]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `        new_num_tiles_executed = new_from_mlir_values(` — **EN:** Assigns a value to new_num_tiles_executed. **CN:** 将一个值赋给 new_num_tiles_executed。
+- **L317** `            self._num_tiles_executed, [values[3]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `        new_clc_response_ptr = new_from_mlir_values(self._clc_response_ptr, [values[4]])` — **EN:** Assigns a value to new_clc_response_ptr. **CN:** 将一个值赋给 new_clc_response_ptr。
+- **L320** `        new_block_idx = new_from_mlir_values(self._block_idx, values[5:8])` — **EN:** Assigns a value to new_block_idx. **CN:** 将一个值赋给 new_block_idx。
+- **L321** `        return ClcDynamicPersistentTileScheduler(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L322** `            self.params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `            new_cta_id_in_cluster,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `            new_num_tiles_executed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `            new_clc_response_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            new_block_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L330** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L331** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L332** `        params: ClcDynamicPersistentTileSchedulerParams,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L333** `        block_idx: Tuple[Integer, Integer, Integer],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L334** `        grid_dim: Tuple[Integer, Integer, Integer],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L335** `        clc_response_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L336** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L337** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L338** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L339** `    ) -> "ClcDynamicPersistentTileScheduler":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L340** `        """Initialize the dynamic persistent tile scheduler.` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** `        :param params: Parameters for the persistent` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L343** `            tile scheduler.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L344** `        :type params: ClcDynamicPersistentTileSchedulerParams` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L345** `        :param block_idx: The 3d block index in the format (bidx, bidy, bidz).` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L346** `        :type block_idx: Tuple[Integer, Integer, Integer]` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L347** `        :param grid_dim: The 3d grid dimensions for kernel launch.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L348** `        :type grid_dim: Tuple[Integer, Integer, Integer]` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `        :return: A ClcDynamicPersistentTileScheduler object.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L351** `        :rtype: ClcDynamicPersistentTileScheduler` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L352** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L353** `        params = params` — **EN:** Assigns a value to params. **CN:** 将一个值赋给 params。
+- **L354** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L355** `        bidx, bidy, bidz = block_idx` — **EN:** Assigns a value to (bidx, bidy, bidz). **CN:** 将一个值赋给 (bidx, bidy, bidz)。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `        # CTA id in the cluster` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L358** `        cta_id_in_cluster = (` — **EN:** Assigns a value to cta_id_in_cluster. **CN:** 将一个值赋给 cta_id_in_cluster。
+- **L359** `            Int32(bidx % params.cluster_shape_mn[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `            Int32(bidy % params.cluster_shape_mn[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `            Int32(0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `        # Initialize number of tiles executed to zero` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L365** `        num_tiles_executed = Int32(0)` — **EN:** Assigns a value to num_tiles_executed. **CN:** 将一个值赋给 num_tiles_executed。
+- **L366** `        # Initialize clc response pointer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L367** `        clc_response_ptr = clc_response_ptr` — **EN:** Assigns a value to clc_response_ptr. **CN:** 将一个值赋给 clc_response_ptr。
+- **L368** `        # The block index` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L369** `        block_idx = block_idx` — **EN:** Assigns a value to block_idx. **CN:** 将一个值赋给 block_idx。
+- **L370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L371** `        return ClcDynamicPersistentTileScheduler(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L372** `            params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `            cta_id_in_cluster,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `            num_tiles_executed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `            clc_response_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `            block_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L379** `    # called by host` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L380** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L381** `    def get_grid_shape(` — **EN:** Defines function `get_grid_shape`. **CN:** 定义函数 `get_grid_shape`。
+- **L382** `        params: ClcDynamicPersistentTileSchedulerParams,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L383** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L384** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L385** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L386** `    ) -> Tuple[Integer, Integer, Integer]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L387** `        """Calculates the grid shape to be launched on GPU using problem shape,` — **EN:** Starts the docstring for the function `get_grid_shape`. **CN:** 开始说明 function `get_grid_shape` 的文档字符串。
+- **L388** `        threadblock shape, and active cluster size.` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L389** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L390** `        :param params: Parameters for grid shape calculation.` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L391** `        :type params: ClcDynamicPersistentTileSchedulerParams` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `        :return: The calculated 3d grid shape.` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L394** `        :rtype: Tuple[Integer, Integer, Integer]` — **EN:** Continues the docstring for the function `get_grid_shape`. **CN:** 继续说明 function `get_grid_shape` 的文档字符串。
+- **L395** `        """` — **EN:** Ends the docstring for the function `get_grid_shape`. **CN:** 结束说明 function `get_grid_shape` 的文档字符串。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `        return params.get_grid_shape(loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L400** `    def _swizzle_and_rasterize(` — **EN:** Defines function `_swizzle_and_rasterize`. **CN:** 定义函数 `_swizzle_and_rasterize`。
+- **L401** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `        x_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `        y_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `        z_idx: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L405** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L406** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L407** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L408** `    ) -> Tuple[Int32, Int32, Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L409** `        """Swizzle and rasterize the given coordinates for leader CTA of the cluster.` — **EN:** Starts the docstring for the function `_swizzle_and_rasterize`. **CN:** 开始说明 function `_swizzle_and_rasterize` 的文档字符串。
+- **L410** `        x_idx, y_idx, and z_idx must be divisible by cluster shape x, y, and z respectively. They should not be offset` — **EN:** Continues the docstring for the function `_swizzle_and_rasterize`. **CN:** 继续说明 function `_swizzle_and_rasterize` 的文档字符串。
+- **L411** `        by the ID of the CTA in the cluster.` — **EN:** Continues the docstring for the function `_swizzle_and_rasterize`. **CN:** 继续说明 function `_swizzle_and_rasterize` 的文档字符串。
+- **L412** `        """` — **EN:** Ends the docstring for the function `_swizzle_and_rasterize`. **CN:** 结束说明 function `_swizzle_and_rasterize` 的文档字符串。
+- **L413** `        if cutlass.const_expr(self.params.swizzle_size == 1):` — **EN:** Starts a conditional branch guarded by `cutlass.const_expr(self.params.swizzle_size == 1)`. **CN:** 开始一个由 `cutlass.const_expr(self.params.swizzle_size == 1)` 控制的条件分支。
+- **L414** `            if cutlass.const_expr(self.params._raster_along_m):` — **EN:** Starts a conditional branch guarded by `cutlass.const_expr(self.params._raster_along_m)`. **CN:** 开始一个由 `cutlass.const_expr(self.params._raster_along_m)` 控制的条件分支。
+- **L415** `                return x_idx, y_idx, z_idx` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L416** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L417** `                # Decode linear index using FastDivmod objects.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L418** `                # First, get cluster_major using cluster_shape_major_fdd` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L419** `                cluster_minor_batch, cluster_major = divmod(  # type: ignore[operator]` — **EN:** Assigns a value to (cluster_minor_batch, cluster_major). **CN:** 将一个值赋给 (cluster_minor_batch, cluster_major)。
+- **L420** `                    z_idx, self.params.cluster_shape_major_fdd` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `                # Then decode cluster_minor_batch to get cluster_minor and batch_l using FastDivmod` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L423** `                batch_l, cluster_minor = divmod(` — **EN:** Assigns a value to (batch_l, cluster_minor). **CN:** 将一个值赋给 (batch_l, cluster_minor)。
+- **L424** `                    cluster_minor_batch, self.params.cluster_shape_minor_fdd` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `                cluster_m = cluster_minor` — **EN:** Assigns a value to cluster_m. **CN:** 将一个值赋给 cluster_m。
+- **L427** `                cluster_n = cluster_major` — **EN:** Assigns a value to cluster_n. **CN:** 将一个值赋给 cluster_n。
+- **L428** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L429** `                return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L430** `                    cluster_m * self.params.cluster_shape_mn[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `                    cluster_n * self.params.cluster_shape_mn[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `                    batch_l,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L435** `            cluster_coord = self.params.problem_layout_ncluster_mnl.get_flat_coord(` — **EN:** Assigns a value to cluster_coord. **CN:** 将一个值赋给 cluster_coord。
+- **L436** `                z_idx, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L439** `                cluster_coord[0] * self.params.cluster_shape_mn[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `                cluster_coord[1] * self.params.cluster_shape_mn[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `                cluster_coord[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L445** `    def work_tile_info_from_clc_response(` — **EN:** Defines function `work_tile_info_from_clc_response`. **CN:** 定义函数 `work_tile_info_from_clc_response`。
+- **L446** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L447** `        result_addr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L448** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L449** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L450** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L451** `    ) -> WorkTileInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L452** `        """` — **EN:** Starts the docstring for the function `work_tile_info_from_clc_response`. **CN:** 开始说明 function `work_tile_info_from_clc_response` 的文档字符串。
+- **L453** `        Simulates parsing CLC response data in Python.` — **EN:** Continues the docstring for the function `work_tile_info_from_clc_response`. **CN:** 继续说明 function `work_tile_info_from_clc_response` 的文档字符串。
+- **L454** `        result_addr: 16-byte response data (simulating shared memory access)` — **EN:** Continues the docstring for the function `work_tile_info_from_clc_response`. **CN:** 继续说明 function `work_tile_info_from_clc_response` 的文档字符串。
+- **L455** `        """` — **EN:** Ends the docstring for the function `work_tile_info_from_clc_response`. **CN:** 结束说明 function `work_tile_info_from_clc_response` 的文档字符串。
+- **L456** `        m_idx, n_idx, l_idx, vld = cute.arch.clc_response(result_addr, loc=loc, ip=ip)` — **EN:** Assigns a value to (m_idx, n_idx, l_idx, vld). **CN:** 将一个值赋给 (m_idx, n_idx, l_idx, vld)。
+- **L457** `        cute.arch.fence_proxy(` — **EN:** Invokes `cute.arch.fence_proxy` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.fence_proxy`。
+- **L458** `            "async.shared",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L459** `            space="cta",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `        m_idx, n_idx, l_idx = self._swizzle_and_rasterize(` — **EN:** Assigns a value to (m_idx, n_idx, l_idx). **CN:** 将一个值赋给 (m_idx, n_idx, l_idx)。
+- **L462** `            m_idx, n_idx, l_idx, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `        cta_idx_in_cluster, cta_idy_in_cluster, _ = self.cta_id_in_cluster  # type: ignore[misc]` — **EN:** Assigns a value to (cta_idx_in_cluster, cta_idy_in_cluster, _). **CN:** 将一个值赋给 (cta_idx_in_cluster, cta_idy_in_cluster, _)。
+- **L465** `        cur_tile_coord = (m_idx + cta_idx_in_cluster, n_idx + cta_idy_in_cluster, l_idx)` — **EN:** Assigns a value to cur_tile_coord. **CN:** 将一个值赋给 cur_tile_coord。
+- **L466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L467** `        return WorkTileInfo(cur_tile_coord, vld)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L470** `    def get_current_work(` — **EN:** Defines function `get_current_work`. **CN:** 定义函数 `get_current_work`。
+- **L471** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L472** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L473** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L475** `    ) -> WorkTileInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L476** `        smem_addr = self._clc_response_ptr` — **EN:** Assigns a value to smem_addr. **CN:** 将一个值赋给 smem_addr。
+- **L477** `        work_tile = self.work_tile_info_from_clc_response(smem_addr)` — **EN:** Assigns a value to work_tile. **CN:** 将一个值赋给 work_tile。
+- **L478** `        return work_tile` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L481** `    def initial_work_tile_info(` — **EN:** Defines function `initial_work_tile_info`. **CN:** 定义函数 `initial_work_tile_info`。
+- **L482** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L483** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L484** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L485** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L486** `    ) -> WorkTileInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L487** `        bidx, bidy, bidz = self._block_idx` — **EN:** Assigns a value to (bidx, bidy, bidz). **CN:** 将一个值赋给 (bidx, bidy, bidz)。
+- **L488** `        # Subtract cta_id_in_cluster from block_idx because swizzle_and_rasterize expects coordinates to be` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L489** `        # those of the leader CTA in the cluster.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L490** `        cta_idx_in_cluster, cta_idy_in_cluster, _ = self.cta_id_in_cluster  # type: ignore[misc]` — **EN:** Assigns a value to (cta_idx_in_cluster, cta_idy_in_cluster, _). **CN:** 将一个值赋给 (cta_idx_in_cluster, cta_idy_in_cluster, _)。
+- **L491** `        m_idx = bidx - cta_idx_in_cluster` — **EN:** Assigns a value to m_idx. **CN:** 将一个值赋给 m_idx。
+- **L492** `        n_idx = bidy - cta_idy_in_cluster` — **EN:** Assigns a value to n_idx. **CN:** 将一个值赋给 n_idx。
+- **L493** `        l_idx = bidz` — **EN:** Assigns a value to l_idx. **CN:** 将一个值赋给 l_idx。
+- **L494** `        m_idx, n_idx, l_idx = self._swizzle_and_rasterize(` — **EN:** Assigns a value to (m_idx, n_idx, l_idx). **CN:** 将一个值赋给 (m_idx, n_idx, l_idx)。
+- **L495** `            m_idx, n_idx, l_idx, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L497** `        cur_tile_coord = (m_idx + cta_idx_in_cluster, n_idx + cta_idy_in_cluster, l_idx)` — **EN:** Assigns a value to cur_tile_coord. **CN:** 将一个值赋给 cur_tile_coord。
+- **L498** `        return WorkTileInfo(cur_tile_coord, Boolean(True))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L499** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L500** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L501** `    def advance_to_next_work(` — **EN:** Defines function `advance_to_next_work`. **CN:** 定义函数 `advance_to_next_work`。
+- **L502** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L503** `        mbarrier_addr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L504** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L505** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L506** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L507** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L508** `        # Query new work tile` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L509** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L510** `            cute.arch.issue_clc_query(` — **EN:** Invokes `cute.arch.issue_clc_query` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.issue_clc_query`。
+- **L511** `                mbarrier_addr, self._clc_response_ptr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `        self._num_tiles_executed += Int32(1)` — **EN:** Updates self._num_tiles_executed in place. **CN:** 原地更新 self._num_tiles_executed。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L516** `    def num_tiles_executed(self) -> Int32:` — **EN:** Defines function `num_tiles_executed`. **CN:** 定义函数 `num_tiles_executed`。
+- **L517** `        return self._num_tiles_executed` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.dynamic_persistent_tile_scheduler`. CN: 模块名为 `CuTeDSL.cutlass.utils.dynamic_persistent_tile_scheduler`。
+- EN: Top-level classes: ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler CN: 顶层类包括：ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass, cutlass.cutlass_dsl:Boolean,Integer,Int32,extract_mlir_values,new_from_mlir_values,dsl_user_op, cutlass._mlir:ir, cutlass.utils.static_persistent_tile_scheduler:WorkTileInfo, cutlass.cute CN: 内部依赖：cutlass, cutlass.cutlass_dsl:Boolean,Integer,Int32,extract_mlir_values,new_from_mlir_values,dsl_user_op, cutlass._mlir:ir, cutlass.utils.static_persistent_tile_scheduler:WorkTileInfo, cutlass.cute
+- EN: External or standard-library dependencies: inspect, typing:Optional,Tuple CN: 外部或标准库依赖：inspect, typing:Optional,Tuple

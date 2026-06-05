@@ -1,0 +1,285 @@
+# common.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/emit/common.py`
+
+## Purpose / 作用
+- EN: Common utilities for emitting CUTLASS kernels
+- CN: 该模块的文档字符串将其描述为：Common utilities for emitting CUTLASS kernels
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Common utilities for emitting CUTLASS kernels` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `# Strings used for printing information about the generation of emitted scripts` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L40** `_AUTOGEN_STR = f"This file was automatically generated by the CUTLASS {cutlass_cppgen.__version__} Python interface (https://github.com/nvidia/cutlass/python)"` — **EN:** Assigns a value to _AUTOGEN_STR. **CN:** 将一个值赋给 _AUTOGEN_STR。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `_CSTYLE_AUTOGEN_COMMENT = f"""// {_AUTOGEN_STR}` — **EN:** Assigns a value to _CSTYLE_AUTOGEN_COMMENT. **CN:** 将一个值赋给 _CSTYLE_AUTOGEN_COMMENT。
+- **L44** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `_PYSTYLE_AUTOGEN_COMMENT = f"""# {_AUTOGEN_STR}` — **EN:** Assigns a value to _PYSTYLE_AUTOGEN_COMMENT. **CN:** 将一个值赋给 _PYSTYLE_AUTOGEN_COMMENT。
+- **L48** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `_CUTLASS_KERNEL_ARGS_2x = """` — **EN:** Assigns a value to _CUTLASS_KERNEL_ARGS_2x. **CN:** 将一个值赋给 _CUTLASS_KERNEL_ARGS_2x。
+- **L51** `  typename DeviceKernel::Arguments arguments {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `      cutlass::gemm::GemmUniversalMode::kGemm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `      {M, N, K},                                        // problem size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `      1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `      {alpha, beta},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `      A, B, C, D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `      0, 0, 0, 0,                                       // batch strides` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `      DeviceKernel::LayoutA::packed({M, K}).stride(0),  // lda` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `      DeviceKernel::LayoutB::packed({K, N}).stride(0),  // ldb` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `      DeviceKernel::LayoutC::packed({M, N}).stride(0),  // ldc` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `      DeviceKernel::LayoutC::packed({M, N}).stride(0)   // ldd` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `  };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `_CUTLASS_KERNEL_ARGS_2x_STREAM_K = """` — **EN:** Assigns a value to _CUTLASS_KERNEL_ARGS_2x_STREAM_K. **CN:** 将一个值赋给 _CUTLASS_KERNEL_ARGS_2x_STREAM_K。
+- **L66** `  typename DeviceKernel::Arguments arguments {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `      cutlass::gemm::GemmUniversalMode::kGemm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `      {M, N, K},                                        // problem size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `      1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `      {alpha, beta},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `      A, B, C, D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `      0, 0, 0, 0,                                       // batch strides` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `      DeviceKernel::LayoutA::packed({M, K}).stride(0),  // lda` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `      DeviceKernel::LayoutB::packed({K, N}).stride(0),  // ldb` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `      DeviceKernel::LayoutC::packed({M, N}).stride(0),  // ldc` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `      DeviceKernel::LayoutC::packed({M, N}).stride(0),  // ldd` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `      -1                                                // avail_sms` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `  };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `_CUTLASS_KERNEL_RUN_GEMM_2x = """` — **EN:** Assigns a value to _CUTLASS_KERNEL_RUN_GEMM_2x. **CN:** 将一个值赋给 _CUTLASS_KERNEL_RUN_GEMM_2x。
+- **L82** `using ElementCompute = typename DeviceKernel::EpilogueOutputOp::ElementCompute;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `cutlass::Status ${name}_kernel_run(int M, int N, int K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `                        const DeviceKernel::ElementA* A, const DeviceKernel::ElementB* B, const DeviceKernel::ElementC* C, DeviceKernel::ElementC* D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `                        ElementCompute alpha, ElementCompute beta) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `  ${args}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `  size_t workspace_size = DeviceKernel::get_workspace_size(arguments);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `  cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `  DeviceKernel gemm_op;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `  cutlass::Status status = gemm_op.initialize(arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `                                              workspace.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `                                              nullptr);     // CUDA stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `  if (status != cutlass::Status::kSuccess) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `  status = gemm_op();` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `  return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `_CUTLASS_KERNEL_RUN_GEMM_3x = """` — **EN:** Assigns a value to _CUTLASS_KERNEL_RUN_GEMM_3x. **CN:** 将一个值赋给 _CUTLASS_KERNEL_RUN_GEMM_3x。
+- **L106** `using StrideA = typename DeviceKernel::GemmKernel::StrideA;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `using StrideB = typename DeviceKernel::GemmKernel::StrideB;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `using StrideC = typename DeviceKernel::GemmKernel::StrideC;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `using StrideD = typename DeviceKernel::GemmKernel::StrideD;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `using ElementCompute = typename DeviceKernel::EpilogueOutputOp::ElementCompute;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `cutlass::Status ${name}_kernel_run(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        int M, int N, int K, int L,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        const DeviceKernel::ElementA* A, const DeviceKernel::ElementB* B, const DeviceKernel::ElementC* C, DeviceKernel::ElementC* D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `        ElementCompute alpha, ElementCompute beta, const cutlass::KernelHardwareInfo& hw_info) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `  typename DeviceKernel::Arguments arguments{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `      cutlass::gemm::GemmUniversalMode::kGemm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `      {M, N, K, L},                                                              // problem size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `      {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `        A,                                                                         // ptrA` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `        cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, L)),    // stride A` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `        B,                                                                         // ptrB` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `        cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, L)),    // stride B` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `      },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `      {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `        {alpha, beta},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `        C,                                                                       // ptrC` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `        cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, L)),  // stride C` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        D,                                                                       // ptrD` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, L)),  // stride D` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `      },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `      hw_info` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `  };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `  size_t workspace_size = DeviceKernel::get_workspace_size(arguments);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `  cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `  DeviceKernel gemm_op;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `  cutlass::Status status = gemm_op.run(arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `                                       workspace.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `                                       nullptr);     // CUDA stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `  return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `_CUTLASS_KERNEL_RUN_GROUPED_GEMM_2x = """` — **EN:** Assigns a value to _CUTLASS_KERNEL_RUN_GROUPED_GEMM_2x. **CN:** 将一个值赋给 _CUTLASS_KERNEL_RUN_GROUPED_GEMM_2x。
+- **L151** `using ElementCompute = typename DeviceKernel::EpilogueOutputOp::ElementCompute;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `int threadblock_count = DeviceKernel::sufficient();` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `cutlass::Status ${name}_kernel_run(int problem_count, cutlass::gemm::GemmCoord* problem_sizes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `                        DeviceKernel::ElementA** A, DeviceKernel::ElementB** B, DeviceKernel::ElementC** C, DeviceKernel::ElementC** D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `                        int64_t* lda, int64_t* ldb, int64_t* ldc, int64_t* ldd,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `                        ElementCompute alpha, ElementCompute beta) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `  typename DeviceKernel::Arguments arguments {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `    problem_sizes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `    problem_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `    threadblock_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `    {alpha, beta},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `    A, B, C, D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `    lda, ldb, ldc, ldd` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `  };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `  size_t workspace_size = DeviceKernel::get_workspace_size(arguments);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `  cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `  DeviceKernel gemm_op;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `  cutlass::Status status = gemm_op.initialize(arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `                                              workspace.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `                                              nullptr);     // CUDA stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `  if (status != cutlass::Status::kSuccess) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `    return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `  status = gemm_op();` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `  return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `_CUTLASS_KERNEL_RUN_CONV2D_2x = """` — **EN:** Assigns a value to _CUTLASS_KERNEL_RUN_CONV2D_2x. **CN:** 将一个值赋给 _CUTLASS_KERNEL_RUN_CONV2D_2x。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `using UnderlyingKernel = typename DeviceKernel::UnderlyingKernel;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `namespace {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `using TensorRefA = typename UnderlyingKernel::TensorRefA;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `using TensorRefB = typename UnderlyingKernel::TensorRefB;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `using TensorRefC = typename UnderlyingKernel::TensorRefC;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `using ElementCompute = typename UnderlyingKernel::EpilogueOutputOp::ElementCompute;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `template<typename TensorRef, typename Element>` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `TensorRef get_tensor_ref(cutlass::Tensor4DCoord tensor_coord, Element* ptr){` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `  cutlass::layout::TensorNHWC layout = cutlass::layout::TensorNHWC::packed(tensor_coord);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `  TensorRef tensor_ref(ptr, layout);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `  return tensor_ref;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `cutlass::Status ${name}_kernel_run(cutlass::conv::Conv2dProblemSize* problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `                        UnderlyingKernel::ElementA* A, UnderlyingKernel::ElementB* B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `                        UnderlyingKernel::ElementC* C, UnderlyingKernel::ElementC* D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `                        ElementCompute alpha, ElementCompute beta, std::string split_k_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `                        cudaStream_t stream, int device_id=0) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `  // create the tensor references` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `  cutlass::Tensor4DCoord tensor_coord_A = cutlass::conv::implicit_gemm_tensor_a_extent(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `    cutlass::conv::Operator::k${conv_kind_name}, *problem_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `  );` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `  cutlass::Tensor4DCoord tensor_coord_B = cutlass::conv::implicit_gemm_tensor_b_extent(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `    cutlass::conv::Operator::k${conv_kind_name}, *problem_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `  );` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `  cutlass::Tensor4DCoord tensor_coord_C = cutlass::conv::implicit_gemm_tensor_c_extent(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `    cutlass::conv::Operator::k${conv_kind_name}, *problem_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `  );` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** `  TensorRefA tensor_ref_A = get_tensor_ref<TensorRefA, UnderlyingKernel::ElementA>(tensor_coord_A, A);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `  TensorRefB tensor_ref_B = get_tensor_ref<TensorRefB, UnderlyingKernel::ElementB>(tensor_coord_B, B);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `  TensorRefC tensor_ref_C = get_tensor_ref<TensorRefC, UnderlyingKernel::ElementC>(tensor_coord_C, C);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `  TensorRefC tensor_ref_D = get_tensor_ref<TensorRefC, UnderlyingKernel::ElementC>(tensor_coord_C, D);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `  cutlass::conv::SplitKMode mode;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `  if (split_k_mode == "serial") {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `    mode = cutlass::conv::SplitKMode::kSerial;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `  } else if (split_k_mode == "parallel") {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `    mode = cutlass::conv::SplitKMode::kParallel;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `  } else {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `    throw std::runtime_error("Invalid split_k_mode: " + split_k_mode);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `  typename DeviceKernel::Arguments arguments{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `    *problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `    tensor_ref_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `    tensor_ref_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `    tensor_ref_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `    tensor_ref_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `    {alpha, beta},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `    mode` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `  };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `  DeviceKernel implicit_gemm_op;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `  size_t workspace_size = implicit_gemm_op.get_workspace_size(arguments);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `  void* workspace_ptr = device_memory_allocation(workspace_size, device_id);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `  cutlass::Status status = implicit_gemm_op.can_implement(arguments);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `  if (status != cutlass::Status::kSuccess) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `    return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `  status = implicit_gemm_op.initialize(arguments, workspace_ptr, stream);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `  if (status != cutlass::Status::kSuccess) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `    return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `  //` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `  // Launch initialized CUTLASS kernel` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `  //` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `  status = implicit_gemm_op(stream);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `  return status;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.emit.common`. CN: 模块名为 `cutlass_cppgen.emit.common`。
+- EN: Module docstring summary: Common utilities for emitting CUTLASS kernels CN: 模块文档摘要为：Common utilities for emitting CUTLASS kernels
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen CN: 内部依赖：cutlass_cppgen

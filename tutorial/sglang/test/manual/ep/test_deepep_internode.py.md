@@ -1,0 +1,581 @@
+# test_deepep_internode.py — Code Analysis / 代码分析
+
+## Source / 来源
+- **File**: `test/manual/ep/test_deepep_internode.py`
+- **Repository**: sgl-project/sglang
+- **Purpose**: This manual test module covers the `deepep internode` scenario in `test/manual/ep`. It uses SGLang's shared test infrastructure to configure models or services and verify expected performance behavior. / 该手动测试模块覆盖 `test/manual/ep` 中的 `deepep internode` 场景。它利用 SGLang 的共享测试基础设施配置模型或服务，并验证预期的性能表现。
+
+## Line-by-Line Analysis / 逐行分析
+### Lines 1-24: Scenario logic / 场景逻辑
+```python
+# Copy from deepseek-ai/DeepEP/tests/test_internode.py
+
+import os
+import time
+
+# noinspection PyUnresolvedReferences
+import deep_ep
+
+# Test compatibility with low latency functions
+import test_deepep_low_latency
+import torch
+import torch.distributed as dist
+
+from sglang.test.test_deepep_utils import (
+    bench,
+    calc_diff,
+    create_grouped_scores,
+    init_dist,
+    inplace_unique,
+    per_token_cast_back,
+    per_token_cast_to_fp8,
+)
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。
+
+### Lines 25-49: Test routines around test_main / 测试例程
+```python
+def test_main(
+    num_sms: int,
+    local_rank: int,
+    num_local_ranks: int,
+    num_ranks: int,
+    num_nodes: int,
+    rank: int,
+    buffer: deep_ep.Buffer,
+    group: dist.ProcessGroup,
+):
+    # Settings
+    num_tokens, hidden, num_topk_groups, num_topk, num_experts = (
+        4096,
+        7168,
+        min(num_nodes, 4),
+        8,
+        (256 // num_ranks) * num_ranks,
+    )
+    assert num_experts % num_ranks == 0 and num_local_ranks == 8
+    if local_rank == 0:
+        print(
+            f"[config] num_tokens={num_tokens}, hidden={hidden}, num_topk_groups={num_topk_groups}, num_topk={num_topk}",
+            flush=True,
+        )
+```
+**EN:** This range defines concrete test routine(s) `test_main`. The logic drives the target scenario and encodes the expected acceptance criteria. Assertions in this block enforce the intended outcome.
+**CN:** 这一部分定义具体测试例程，用于驱动目标场景并写入预期的验收标准。 其中的断言会落实预期结果。
+
+### Lines 50-74: Scenario logic / 场景逻辑
+```python
+    # Random data
+    x = torch.ones((num_tokens, hidden), dtype=torch.bfloat16, device="cuda") * rank
+    x_pure_rand = torch.randn((num_tokens, hidden), dtype=torch.bfloat16, device="cuda")
+    x_e4m3 = per_token_cast_to_fp8(x)
+    scores = (
+        torch.randn((num_tokens, num_experts), dtype=torch.float32, device="cuda").abs()
+        + 1
+    )
+    group_scores = scores.view(num_tokens, num_nodes, -1).amax(dim=-1)
+    group_idx = torch.topk(
+        group_scores, k=num_topk_groups, dim=-1, sorted=False
+    ).indices
+    masked_scores = create_grouped_scores(scores, group_idx, num_nodes)
+    topk_idx = torch.topk(masked_scores, num_topk, dim=-1, largest=True, sorted=False)[
+        1
+    ]
+    topk_weights = (
+        torch.ones((num_tokens, num_topk), dtype=torch.float32, device="cuda") * rank
+    )
+    topk_weights_pure_rand = torch.randn(
+        (num_tokens, num_topk), dtype=torch.float32, device="cuda"
+    )
+    rank_idx = topk_idx // (num_experts // num_ranks)
+    rank_idx.masked_fill_(topk_idx == -1, -1)
+    inplace_unique(rank_idx, num_ranks)
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Representative call sites include `ones`, `randn`, `per_token_cast_to_fp8` and `abs`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 75-99: Scenario logic / 场景逻辑
+```python
+    rdma_rank_idx = rank_idx // num_local_ranks
+    rdma_rank_idx.masked_fill_(rank_idx == -1, -1)
+    inplace_unique(rdma_rank_idx, num_nodes)
+
+    # RDMA dispatch counts
+    rdma_idx = topk_idx // (num_experts // num_nodes)
+    rdma_idx.masked_fill_(topk_idx == -1, -1)
+    inplace_unique(rdma_idx, num_nodes)
+    num_rdma_token_sent = rdma_idx.ne(-1).sum().item()
+
+    # Expert meta
+    num_tokens_per_expert = torch.zeros((num_experts,), dtype=torch.int, device="cuda")
+    for i in range(num_experts):
+        num_tokens_per_expert[i] = (topk_idx == i).sum()
+    gbl_num_tokens_per_expert = num_tokens_per_expert.clone()
+    dist.all_reduce(gbl_num_tokens_per_expert, group=group)
+
+    # Rank layout meta
+    num_tokens_per_rank = torch.empty((num_ranks,), dtype=torch.int, device="cuda")
+    num_tokens_per_rdma_rank = torch.empty((num_nodes,), dtype=torch.int, device="cuda")
+    token_idx_in_rank = torch.full(
+        (num_ranks, num_tokens), -1, dtype=torch.long, device="cuda"
+    )
+    for i in range(num_ranks):
+        num_tokens_per_rank[i] = (rank_idx == i).sum()
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Representative call sites include `masked_fill_`, `inplace_unique`, `ne` and `item`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 100-124: Assertions and result checks / 断言与结果检查
+```python
+        token_sel = (rank_idx == i).max(dim=-1)[0]
+        count = token_sel.sum().item()
+        tokens = torch.sort(token_sel.to(torch.int), descending=True)[1]
+        tokens[:count] = torch.sort(tokens[:count])[0]
+        token_idx_in_rank[i][tokens[:count]] = torch.arange(
+            count, dtype=torch.long, device="cuda"
+        )
+    for i in range(num_nodes):
+        num_tokens_per_rdma_rank[i] = (rdma_rank_idx == i).sum()
+    token_idx_in_rank = token_idx_in_rank.T.contiguous().to(torch.int)
+    is_token_in_rank = token_idx_in_rank >= 0
+    gbl_num_tokens_per_rank = num_tokens_per_rank.clone()
+    dist.all_reduce(gbl_num_tokens_per_rank, group=group)
+
+    (
+        ref_num_tokens_per_rank,
+        ref_num_tokens_per_rdma_rank,
+        ref_num_tokens_per_expert,
+        ref_is_token_in_rank,
+        _,
+    ) = buffer.get_dispatch_layout(topk_idx, num_experts)
+    assert torch.allclose(ref_num_tokens_per_rank, num_tokens_per_rank)
+    assert torch.allclose(ref_num_tokens_per_rdma_rank, num_tokens_per_rdma_rank)
+    assert torch.allclose(ref_num_tokens_per_expert, num_tokens_per_expert)
+    assert torch.allclose(ref_is_token_in_rank, is_token_in_rank)
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Assertions in this block enforce the intended outcome. Representative call sites include `item`, `sort`, `to` and `arange`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 125-149: Helper routines around check_data / 辅助例程
+```python
+    t = bench(lambda: buffer.get_dispatch_layout(topk_idx, num_experts))[0]
+    if local_rank == 0:
+        print(f"[layout] Kernel performance: {t * 1000:.3f} ms", flush=True)
+        print("", flush=True)
+    group.barrier()
+    time.sleep(1)
+
+    # Config
+    rdma_buffer_size, nvl_buffer_size = 128, (720 if num_ranks in (144, 160) else 512)
+    config = deep_ep.Config(num_sms, 8, nvl_buffer_size, 16, rdma_buffer_size)
+
+    # Test dispatch
+    # noinspection PyShadowingNames
+    def check_data(check_x, recv_gbl_rank_prefix_sum):
+        assert torch.allclose(check_x.amin(dim=1), check_x.amax(dim=1))
+        check_start = 0
+        for i in range(num_ranks):
+            check_end = recv_gbl_rank_prefix_sum[i].item()
+            assert (check_x[check_start:check_end, :].int() - i).sum().item() == 0
+            check_start = check_end
+
+    for previous_mode in (False, True):
+        for async_mode in (False, True):
+            for current_x in (x_pure_rand, x, x_e4m3):
+                for with_topk in (False, True):
+```
+**EN:** This range implements helper routine(s) `check_data` so setup, transformation, or validation logic can be reused cleanly. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Assertions in this block enforce the intended outcome. Representative call sites include `bench`, `get_dispatch_layout`, `barrier` and `sleep`.
+**CN:** 这一部分实现辅助例程，使初始化、转换或校验逻辑能够被整洁地复用。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 150-174: Scenario logic / 场景逻辑
+```python
+                    if local_rank == 0:
+                        print(
+                            f'[testing] Running with {"FP8" if isinstance(current_x, tuple) else "BF16"}, {"with" if with_topk else "without"} top-k (async={async_mode}, previous={previous_mode}) ...',
+                            flush=True,
+                            end="",
+                        )
+                    dispatch_args = {
+                        "x": current_x,
+                        "num_tokens_per_rank": num_tokens_per_rank,
+                        "num_tokens_per_rdma_rank": num_tokens_per_rdma_rank,
+                        "is_token_in_rank": is_token_in_rank,
+                        "num_tokens_per_expert": num_tokens_per_expert,
+                        "config": config,
+                        "async_finish": async_mode,
+                    }
+                    if with_topk:
+                        dispatch_args.update(
+                            {
+                                "topk_idx": topk_idx,
+                                "topk_weights": (
+                                    topk_weights_pure_rand
+                                    if current_x is x_pure_rand
+                                    else topk_weights
+                                ),
+                            }
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Representative call sites include `k` and `update`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 175-199: Assertions and result checks / 断言与结果检查
+```python
+                        )
+                    if previous_mode:
+                        dispatch_args.update({"previous_event": buffer.capture()})
+                    (
+                        recv_x,
+                        recv_topk_idx,
+                        recv_topk_weights,
+                        recv_num_tokens_per_expert_list,
+                        handle,
+                        event,
+                    ) = buffer.dispatch(**dispatch_args)
+                    event.current_stream_wait() if async_mode else ()
+                    recv_x = (
+                        per_token_cast_back(*recv_x)
+                        if isinstance(recv_x, tuple)
+                        else recv_x
+                    )
+
+                    # Checks
+                    recv_gbl_rank_prefix_sum = handle[-4]
+                    assert gbl_num_tokens_per_rank[rank].item() == recv_x.size(
+                        0
+                    ), f"{gbl_num_tokens_per_rank[rank].item()} != {recv_x.size(0)}"
+                    assert (
+                        gbl_num_tokens_per_expert.view(num_ranks, -1)[rank].tolist()
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Assertions in this block enforce the intended outcome. Representative call sites include `update`, `capture`, `dispatch` and `current_stream_wait`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 200-224: Assertions and result checks / 断言与结果检查
+```python
+                        == recv_num_tokens_per_expert_list
+                    )
+                    if current_x is not x_pure_rand:
+                        check_data(recv_x, recv_gbl_rank_prefix_sum)
+                    if with_topk:
+                        # Check `topk_idx`
+                        assert (
+                            recv_topk_idx.eq(-1)
+                            | (
+                                (recv_topk_idx >= 0)
+                                & (recv_topk_idx < (num_experts // num_ranks))
+                            )
+                        ).sum().item() == recv_topk_idx.numel()
+                        for i, count in enumerate(recv_num_tokens_per_expert_list):
+                            assert recv_topk_idx.eq(i).sum().item() == count
+
+                        # Check `topk_weights`
+                        if current_x is not x_pure_rand:
+                            recv_topk_weights[recv_topk_idx.eq(-1)] = (
+                                recv_topk_weights.amax(dim=1, keepdim=True).expand_as(
+                                    recv_topk_weights
+                                )[recv_topk_idx.eq(-1)]
+                            )
+                            check_data(recv_topk_weights, recv_gbl_rank_prefix_sum)
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Assertions in this block enforce the intended outcome. Representative call sites include `check_data`, `assert`, `eq` and `item`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 225-249: Scenario logic / 场景逻辑
+```python
+                    # Test cached dispatch (must without top-k staffs)
+                    if not with_topk:
+                        dispatch_args = {
+                            "x": current_x,
+                            "handle": handle,
+                            "config": config,
+                            "async_finish": async_mode,
+                        }
+                        if previous_mode:
+                            dispatch_args.update({"previous_event": buffer.capture()})
+                        recv_x, _, _, _, _, event = buffer.dispatch(**dispatch_args)
+                        event.current_stream_wait() if async_mode else ()
+                        recv_x = (
+                            per_token_cast_back(*recv_x)
+                            if isinstance(recv_x, tuple)
+                            else recv_x
+                        )
+                        if current_x is not x_pure_rand:
+                            check_data(recv_x, recv_gbl_rank_prefix_sum)
+
+                    # Test combine
+                    combine_args = {
+                        "x": recv_x,
+                        "handle": handle,
+                        "config": config,
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Representative call sites include `dispatch`, `update`, `capture` and `current_stream_wait`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 250-274: Assertions and result checks / 断言与结果检查
+```python
+                        "async_finish": async_mode,
+                    }
+                    if with_topk:
+                        combine_args.update({"topk_weights": recv_topk_weights})
+                    if previous_mode:
+                        dispatch_args.update({"previous_event": buffer.capture()})
+                    combined_x, combined_topk_weights, event = buffer.combine(
+                        **combine_args
+                    )
+                    event.current_stream_wait() if async_mode else ()
+                    check_x = combined_x.float() / is_token_in_rank.sum(
+                        dim=1
+                    ).unsqueeze(1)
+                    ref_x = x_pure_rand if current_x is x_pure_rand else x
+                    assert calc_diff(check_x, ref_x) < 5e-6
+                    if with_topk:
+                        check_topk_weights = (
+                            combined_topk_weights
+                            if (current_x is x_pure_rand)
+                            else (
+                                combined_topk_weights
+                                / is_token_in_rank.sum(dim=1).unsqueeze(1)
+                            )
+                        )
+                        ref_topk_weights = (
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Assertions in this block enforce the intended outcome. Representative call sites include `update`, `capture`, `combine` and `current_stream_wait`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 275-299: Assertions and result checks / 断言与结果检查
+```python
+                            topk_weights_pure_rand
+                            if current_x is x_pure_rand
+                            else topk_weights
+                        )
+                        assert calc_diff(check_topk_weights, ref_topk_weights) < 1e-9
+
+                    # For later tuning
+                    dispatch_bf16_rdma_send_bytes = num_rdma_token_sent * hidden * 2
+                    dispatch_bf16_nvl_recv_bytes = recv_x.numel() * 2
+                    combine_bf16_nvl_send_bytes = dispatch_bf16_nvl_recv_bytes
+                    combine_bf16_rdma_recv_bytes = dispatch_bf16_rdma_send_bytes
+
+                    if local_rank == 0:
+                        print(" passed", flush=True)
+    if local_rank == 0:
+        print("", flush=True)
+
+    # Tune dispatch performance
+    best_dispatch_results = None
+    fp8_factor = (1 + 4 / 128) / 2
+    for current_x in (x_e4m3, x):
+        best_time, best_results = 1e10, None
+        rdma_send_bytes = (
+            (dispatch_bf16_rdma_send_bytes * fp8_factor)
+            if isinstance(current_x, tuple)
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Assertions in this block enforce the intended outcome. Representative call sites include `calc_diff`, `numel` and `in`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 300-324: Scenario logic / 场景逻辑
+```python
+            else dispatch_bf16_rdma_send_bytes
+        )
+        nvl_recv_bytes = (
+            (dispatch_bf16_nvl_recv_bytes * fp8_factor)
+            if isinstance(current_x, tuple)
+            else dispatch_bf16_nvl_recv_bytes
+        )
+        for nvl_chunk_size in range(4, 33, 4):
+            for rdma_chunk_size in range(4, 33, 4):
+                config = deep_ep.Config(
+                    num_sms,
+                    nvl_chunk_size,
+                    nvl_buffer_size,
+                    rdma_chunk_size,
+                    rdma_buffer_size,
+                )
+                tune_args = {"x": current_x, "handle": handle, "config": config}
+                t = bench(lambda: buffer.dispatch(**tune_args))[0]
+                if t < best_time:
+                    best_time, best_results = t, (
+                        num_sms,
+                        nvl_chunk_size,
+                        rdma_chunk_size,
+                    )
+                if local_rank == 0:
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Representative call sites include `Config`, `bench` and `dispatch`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 325-349: Scenario logic / 场景逻辑
+```python
+                    print(
+                        f"[tuning] SMs {num_sms}, NVL chunk {nvl_chunk_size}, RDMA chunk {rdma_chunk_size}: {rdma_send_bytes / 1e9 / t:.2f} GB/s (RDMA), {nvl_recv_bytes / 1e9 / t:.2f} GB/s (NVL) ",
+                        flush=True,
+                    )
+        if local_rank == 0:
+            print(
+                f'[tuning] Best dispatch ({"FP8" if isinstance(current_x, tuple) else "BF16"}): SMs {best_results[0]}, NVL chunk {best_results[1]}, RDMA chunk {best_results[2]}: {rdma_send_bytes / 1e9 / best_time:.2f} GB/s (RDMA), {nvl_recv_bytes / 1e9 / best_time:.2f} GB/s (NVL)',
+                flush=True,
+            )
+            print("", flush=True)
+
+        if isinstance(current_x, tuple):
+            # Gather FP8 the best config from rank 0
+            best_dispatch_results = torch.tensor(
+                [best_results[0], best_results[1], best_results[2]],
+                dtype=torch.int32,
+                device="cuda",
+            )
+            all_best_fp8_results_list = [
+                torch.zeros_like(best_dispatch_results)
+                for _ in range(torch.distributed.get_world_size())
+            ]
+            dist.all_gather(
+                all_best_fp8_results_list, best_dispatch_results, group=group
+            )
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Representative call sites include `s`, `dispatch`, `tensor` and `zeros_like`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 350-374: Scenario logic / 场景逻辑
+```python
+            best_dispatch_results = all_best_fp8_results_list[0].tolist()
+    dispatch_config = deep_ep.Config(
+        best_dispatch_results[0],
+        best_dispatch_results[1],
+        nvl_buffer_size,
+        best_dispatch_results[2],
+        rdma_buffer_size,
+    )
+
+    dispatch_args = {
+        "x": x,
+        "num_tokens_per_rank": num_tokens_per_rank,
+        "num_tokens_per_rdma_rank": num_tokens_per_rdma_rank,
+        "is_token_in_rank": is_token_in_rank,
+        "num_tokens_per_expert": num_tokens_per_expert,
+        "config": dispatch_config if dispatch_config is not None else config,
+    }
+    recv_x, _, _, _, handle, _ = buffer.dispatch(**dispatch_args)
+
+    # Tune combine performance
+    best_time, best_results = 1e10, None
+    for nvl_chunk_size in range(1, 5, 1):
+        for rdma_chunk_size in range(8, 33, 4):
+            config = deep_ep.Config(
+                num_sms,
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Representative call sites include `tolist`, `Config` and `dispatch`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 375-399: Scenario logic / 场景逻辑
+```python
+                nvl_chunk_size,
+                nvl_buffer_size,
+                rdma_chunk_size,
+                rdma_buffer_size,
+            )
+            tune_args = {"x": recv_x, "handle": handle, "config": config}
+            t = bench(lambda: buffer.combine(**tune_args))[0]
+            if local_rank == 0:
+                print(
+                    f"[tuning] SMs {num_sms}, NVL chunk {nvl_chunk_size}, RDMA chunk {rdma_chunk_size}: {combine_bf16_rdma_recv_bytes / 1e9 / t:.2f} GB/s (RDMA), {combine_bf16_nvl_send_bytes / 1e9 / t:.2f} GB/s (NVL) ",
+                    flush=True,
+                )
+                if t < best_time:
+                    best_time, best_results = t, (
+                        num_sms,
+                        nvl_chunk_size,
+                        rdma_chunk_size,
+                    )
+
+    if local_rank == 0:
+        print(
+            f"[tuning] Best combine: SMs {best_results[0]}, NVL chunk {best_results[1]}, RDMA chunk {best_results[2]}: {combine_bf16_rdma_recv_bytes / 1e9 / best_time:.2f} GB/s (RDMA), {combine_bf16_nvl_send_bytes / 1e9 / best_time:.2f} GB/s (NVL)",
+            flush=True,
+        )
+        print("", flush=True)
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Representative call sites include `bench`, `combine` and `s`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 400-402: Scenario logic / 场景逻辑
+```python
+
+
+# noinspection PyUnboundLocalVariable
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。
+
+### Lines 403-427: Test routines around test_loop / 测试例程
+```python
+def test_loop(local_rank: int, num_local_ranks: int):
+    num_nodes = int(os.getenv("WORLD_SIZE", 1))
+    rank, num_ranks, group = init_dist(local_rank, num_local_ranks)
+    test_ll_compatibility = False
+    if test_ll_compatibility:
+        ll_num_tokens, ll_hidden, ll_num_experts, ll_num_topk = 16, 5120, 256, 9
+
+    buffer = deep_ep.Buffer(
+        group,
+        int(1e9),
+        int(1e9),
+        low_latency_mode=test_ll_compatibility,
+        num_qps_per_rank=(ll_num_experts // num_ranks if test_ll_compatibility else 1),
+    )
+    assert num_local_ranks == 8 and num_ranks > 8
+    torch.manual_seed(rank)
+
+    for i in (24,):
+        test_main(
+            i, local_rank, num_local_ranks, num_ranks, num_nodes, rank, buffer, group
+        )
+        if local_rank == 0:
+            print("", flush=True)
+
+    # Test compatibility with low latency functions
+```
+**EN:** This range defines concrete test routine(s) `test_loop`. The logic drives the target scenario and encodes the expected acceptance criteria. Environment variables are read here so the scenario adapts to the local machine and accelerator topology. Assertions in this block enforce the intended outcome. Representative call sites include `getenv`, `init_dist`, `Buffer` and `manual_seed`.
+**CN:** 这一部分定义具体测试例程，用于驱动目标场景并写入预期的验收标准。 这里会读取环境变量，使场景能够适配本地机器与加速器拓扑。 其中的断言会落实预期结果。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 428-440: Scenario logic / 场景逻辑
+```python
+    if test_ll_compatibility:
+        buffer.clean_low_latency_buffer(ll_num_tokens, ll_hidden, ll_num_experts)
+        test_deepep_low_latency.test_main(
+            ll_num_tokens,
+            ll_hidden,
+            ll_num_experts,
+            ll_num_topk,
+            rank,
+            num_ranks,
+            group,
+            buffer,
+            seed=1,
+        )
+```
+**EN:** This range contains intermediate control flow and scenario-specific implementation details that connect the surrounding setup and assertions. Representative call sites include `clean_low_latency_buffer` and `test_main`.
+**CN:** 这一部分包含中间控制流程以及场景相关实现细节，用来连接前后的准备与断言逻辑。 其中还会调用若干代表性的函数来串联完整流程。
+
+### Lines 441-445: Script entry point / 脚本入口
+```python
+
+
+if __name__ == "__main__":
+    num_processes = 8
+    torch.multiprocessing.spawn(test_loop, args=(num_processes,), nprocs=num_processes)
+```
+**EN:** This range exposes the module as a directly runnable script, usually by delegating to a test runner or helper entry point. Representative call sites include `spawn`.
+**CN:** 这一部分把模块暴露为可直接运行的脚本，通常会委托给测试运行器或辅助入口。 其中还会调用若干代表性的函数来串联完整流程。
+
+## Key Concepts / 关键概念
+- Accuracy evaluation / 精度评测
+- Performance benchmarking / 性能基准测试
+- Multi-GPU orchestration / 多 GPU 编排
+- Quantization configuration / 量化配置
+- Environment-aware configuration / 环境感知配置
+- Streaming responses / 流式响应
+
+## Dependencies / 依赖关系
+- **Standard Library / 标准库**: `os`, `time`
+- **Third-party / 第三方库**: `deep_ep`, `test_deepep_low_latency`, `torch`, `torch.distributed`
+- **Project Modules / 项目模块**: `sglang.test.test_deepep_utils`

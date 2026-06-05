@@ -1,0 +1,976 @@
+# complement.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/complement.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `complement` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `complement` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `//#define CUTLASS_DEBUG_TRACE_LEVEL 1`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 39**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 40**: `template <class Layout, class CoTarget>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 41**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 42**: `test_complement(Layout const& layout, CoTarget const& cotarget)`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 43**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 44**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 45**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: `  auto result = complement(layout, cotarget);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 47**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 48**: `  CUTLASS_TRACE_HOST("complement(" << layout << ", " << cotarget << ")  =>  " << result);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 49**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: `  auto completed = make_layout(layout, result);`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `  // Lower-bound on the codomain size of the layout ++ complement (1)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 53**: `  EXPECT_GE(cosize(completed), size(cotarget));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 54**: `  // Upper-bound on the codomain size of the complement (2)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 55**: `  EXPECT_LE(cosize(result), cute::round_up(size(cotarget), cosize(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 56**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 57**: `  // Post-condition on the codomain of the complement`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 58**: `  for (int i = 1; i < size(result); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 59**: `    EXPECT_LT(result(i-1), result(i));         // Ordered (3)`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 60**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 61**: `      EXPECT_NE(result(i), layout(j));         // Disjoint (4)`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 62**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 63**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 64**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 65**: `  // Other observations`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 66**: `  EXPECT_LE(size(result), cosize(result));                        // As a result of the ordered condition (3)`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 67**: `  EXPECT_GE(size(result), size(cotarget) / size(filter(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 68**: `  EXPECT_LE(cosize(completed), cosize(result) + cosize(layout));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 69**: `  EXPECT_GE(cosize(result), size(cotarget) / size(filter(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 70**: `  if constexpr (is_static<decltype(stride(completed))>::value) {  // If we can apply complement again`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 71**: `    EXPECT_EQ(size(complement(completed)), 1);                    // There's no more codomain left over`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 72**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 73**: `  if constexpr (is_static<decltype(result)>::value && is_static<decltype(layout)>::value) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 74**: `    EXPECT_TRUE(bool(complement(complement(result,cosize(layout)),cotarget) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 75**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 76**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 77**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 78**: `template <class Layout>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 79**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 80**: `test_complement(Layout const& layout)`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 81**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 82**: `  return test_complement(layout, cosize(layout));`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 83**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 84**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 85**: `TEST(CuTe_core, Complement)`
+  - EN: Declares GoogleTest case `CuTe_core::Complement` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Complement`，用于验证一个具体的 CuTe 场景。
+- **Line 86**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 87**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 88**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 89**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 90**: `  CUTLASS_TRACE_HOST("COMPLEMENT");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 91**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 92**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 93**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 94**: `  auto layout = Layout<_1,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 95**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 96**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 97**: `  test_complement(layout, Int<2>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 98**: `  test_complement(layout, Int<5>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 99**: `  test_complement(layout, make_shape(Int<2>{}, 2));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 100**: `  }`
+  - EN: Closes the scope for `test CuTe_core::Complement`.
+  - CN: 结束 `test CuTe_core::Complement` 的作用域。
+- **Line 101**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 102**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 103**: `  auto layout = Layout<_1,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 104**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 105**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 106**: `  test_complement(layout, Int<2>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 107**: `  test_complement(layout, Int<5>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 108**: `  test_complement(layout, make_shape(Int<2>{}, 2));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 109**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 110**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 111**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 112**: `  auto layout = Layout<_1,_2>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 113**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 114**: `  test_complement(layout, Int<1>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 115**: `  test_complement(layout, Int<2>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 116**: `  test_complement(layout, Int<8>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 117**: `  test_complement(layout, Int<5>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 118**: `  test_complement(layout, make_shape(Int<2>{}, 2));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 119**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 120**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 121**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 122**: `  auto layout = Layout<_4,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 123**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 124**: `  test_complement(layout, Int<1>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 125**: `  test_complement(layout, Int<2>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 126**: `  test_complement(layout, Int<8>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 127**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 128**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 129**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 130**: `  auto layout = Layout<_4,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 131**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 132**: `  test_complement(layout, Int<1>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 133**: `  test_complement(layout, Int<2>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 134**: `  test_complement(layout, Int<8>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 135**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 136**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 137**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 138**: `  auto layout = Layout<_4,_2>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 139**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 140**: `  test_complement(layout, Int<1>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 141**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 142**: `  test_complement(layout, Int<16>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 143**: `  test_complement(layout, Int<19>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 144**: `  test_complement(layout, make_shape(Int<2>{}, 2));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 145**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 146**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 147**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 148**: `  auto layout = Layout<_4,_4>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 149**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 150**: `  test_complement(layout, Int<1>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 151**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 152**: `  test_complement(layout, Int<17>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 153**: `  test_complement(layout, make_shape(Int<2>{}, 2));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 154**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 155**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 156**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 157**: `  auto layout = Layout<Shape<_2,_4>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 158**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 159**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 160**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 161**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 162**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 163**: `  auto layout = Layout<Shape<_2,_3>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 166**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 167**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 168**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 169**: `  auto layout = Layout<Shape<_2,_4>, Stride<_1,_4>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 172**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 173**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 174**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 175**: `  auto layout = Layout<Shape<_2,_4>, Stride<_1,_6>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 176**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 177**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 178**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 179**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 180**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 181**: `  auto layout = Layout<Shape<_2,_4,_8>, Stride<_8,_1,_64>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 182**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 183**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 184**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 185**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 186**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 187**: `  auto layout = Layout<Shape<_2,_4,_8>, Stride<_8,_1,_0>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 188**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 189**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 190**: `  test_complement(layout, Int<460>{});`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 191**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 192**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 193**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 194**: `  auto layout = make_layout(Shape <Shape <_2,_2>,Shape <_2, _2>>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 195**: `                            Stride<Stride<_1,_4>,Stride<_8,_32>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 196**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 197**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 198**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 199**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 200**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 201**: `  auto layout = make_layout(Shape <Shape <_2, _2>,Shape <_2,_2>>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 202**: `                            Stride<Stride<_1,_32>,Stride<_8,_4>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 203**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 204**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 205**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 206**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 207**: `  // Fails due to non-injective layout`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 208**: `  // {`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 209**: `  // auto layout = make_layout(Shape <Shape <_2,_2>,Shape <_2,_2>>{},`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 210**: `  //                           Stride<Stride<_1,_8>,Stride<_8,_4>>{});`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 211**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 212**: `  // test_complement(layout);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 213**: `  // }`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 214**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 215**: `  // Fails due to non-injective layout`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 216**: `  // {`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 217**: `  // auto layout = Layout<Shape<_2,_2>, Stride<_2,_3>>{};`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 218**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 219**: `  // test_complement(layout);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 220**: `  // test_complement(layout, Int<19>{});`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 221**: `  // }`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 222**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 223**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 224**: `  auto layout = Layout<Shape<_4,_6>, Stride<_1,_6>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 225**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 226**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 227**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 228**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 229**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 230**: `  auto layout = Layout<Shape<_4,_2>, Stride<_1,_10>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 231**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 232**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 233**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 234**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 235**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 236**: `  auto layout = Layout<Shape<_4,_2>, Stride<_1,_16>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 237**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 238**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 239**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 240**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 241**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 242**: `  CUTLASS_TRACE_HOST("Dynamic shapes/strides");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 243**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 244**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 245**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 246**: `  auto layout = make_layout(12);`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 247**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 248**: `  test_complement(layout, 1);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 249**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 250**: `  test_complement(layout, 53);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 251**: `  test_complement(layout, 128);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 252**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 253**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 254**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 255**: `  auto layout = make_layout(12, 1);`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 256**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 257**: `  test_complement(layout, 1);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 258**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 259**: `  test_complement(layout, 53);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 260**: `  test_complement(layout, 128);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 261**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 262**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 263**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 264**: `  auto layout = make_layout(12, Int<2>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 265**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 266**: `  test_complement(layout, 1);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 267**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 268**: `  test_complement(layout, 53);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 269**: `  test_complement(layout, 128);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 270**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 271**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 272**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 273**: `  auto layout = make_layout(12, 2);`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 274**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 275**: `  test_complement(layout, 1);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 276**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 277**: `  test_complement(layout, 53);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 278**: `  test_complement(layout, 128);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 279**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 280**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 281**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 282**: `  auto layout = make_layout(make_shape(3,6),make_stride(_1{}, _3{}));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 283**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 284**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 285**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 286**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 287**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 288**: `  auto layout = make_layout(make_shape(3,6),make_stride(_1{}, _9{}));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 289**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 290**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 291**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 292**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 293**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 294**: `  auto layout = make_layout(make_shape(3,6),make_stride(_1{}, _10{}));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 295**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 296**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 297**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 298**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 299**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 300**: `  auto layout = make_layout(make_shape(make_shape(2,2), make_shape(2,2)),`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 301**: `                            Stride<Stride<_1,_4>,Stride<_8,_32>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 302**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 303**: `  test_complement(layout);`
+  - EN: Computes complementary layout information needed by the test.
+  - CN: 计算测试所需的补布局信息。
+- **Line 304**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 305**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 306**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 307**: `  auto layout = make_layout(Int<64>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 308**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 309**: `  test_complement(layout, make_shape(Int<32>{}, Int<4>{}, Int<4>{}));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 310**: `  test_complement(layout, make_shape(Int<32>{}, Int<4>{}, 4));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 311**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 312**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `complement(`
+  - EN: Computes the complementary layout structure needed to complete a mapping.
+  - CN: 计算补布局结构，以补全一个映射。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。

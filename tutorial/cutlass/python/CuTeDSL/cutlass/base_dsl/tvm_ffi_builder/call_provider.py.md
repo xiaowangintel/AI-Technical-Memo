@@ -1,0 +1,303 @@
+# call_provider.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/tvm_ffi_builder/call_provider.py`
+
+## Purpose / 作用
+- EN: Call provider that implements a specific calling convention.
+- CN: 该模块的文档字符串将其描述为：Call provider that implements a specific calling convention.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""Call provider that implements a specific calling convention."""` — **EN:** Docstring line documenting the module `module`. **CN:** 文档字符串行，用于说明 module `module`。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L15** `from typing import Any, Optional, Union` — **EN:** Imports Any, Optional, Union from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Union。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from . import spec` — **EN:** Imports spec from the current package. **CN:** 从当前包导入 spec。
+- **L18** `from ..._mlir import ir` — **EN:** Imports ir from `..._mlir`. **CN:** 从 `..._mlir` 导入 ir。
+- **L19** `from ..._mlir.dialects import llvm` — **EN:** Imports llvm from `..._mlir.dialects`. **CN:** 从 `..._mlir.dialects` 导入 llvm。
+- **L20** `from .tvm_ffi_builder import CallContext, CallProvider, TVMFFIBuilder` — **EN:** Imports CallContext, CallProvider, TVMFFIBuilder from `.tvm_ffi_builder`. **CN:** 从 `.tvm_ffi_builder` 导入 CallContext, CallProvider, TVMFFIBuilder。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `def _flatten_tuple_params(params: list[spec.Param]) -> list[spec.Param]:` — **EN:** Defines function `_flatten_tuple_params`. **CN:** 定义函数 `_flatten_tuple_params`。
+- **L24** `    """Recursively flatten TupleParam into list of params."""` — **EN:** Docstring line documenting the function `_flatten_tuple_params`. **CN:** 文档字符串行，用于说明 function `_flatten_tuple_params`。
+- **L25** `    flattened = []` — **EN:** Assigns a value to flattened. **CN:** 将一个值赋给 flattened。
+- **L26** `    for param in params:` — **EN:** Starts a loop assigning items from `params` to `param`. **CN:** 开始一个循环，将 `params` 的元素赋给 `param`。
+- **L27** `        if isinstance(param, spec.TupleParam):` — **EN:** Starts a conditional branch guarded by `isinstance(param, spec.TupleParam)`. **CN:** 开始一个由 `isinstance(param, spec.TupleParam)` 控制的条件分支。
+- **L28** `            # Recursively flatten nested tuples` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `            flattened.extend(_flatten_tuple_params(param.params))` — **EN:** Invokes `flattened.extend` as a standalone call. **CN:** 以独立语句方式调用 `flattened.extend`。
+- **L30** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L31** `            flattened.append(param)` — **EN:** Invokes `flattened.append` as a standalone call. **CN:** 以独立语句方式调用 `flattened.append`。
+- **L32** `    return flattened` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `class NopCallProvider(CallProvider):` — **EN:** Defines class `NopCallProvider` with bases CallProvider. **CN:** 定义类 `NopCallProvider`，其基类为 CallProvider。
+- **L36** `    """No-op call provider for testing purposes."""` — **EN:** Docstring line documenting the class `NopCallProvider`. **CN:** 文档字符串行，用于说明 class `NopCallProvider`。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `    def __call__(self, current_block: ir.Block, context: CallContext) -> ir.Block:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L39** `        """No-op call provider that just returns the current block."""` — **EN:** Docstring line documenting the function `__call__`. **CN:** 文档字符串行，用于说明 function `__call__`。
+- **L40** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `class DynamicParamPackCallProvider(CallProvider, TVMFFIBuilder):` — **EN:** Defines class `DynamicParamPackCallProvider` with bases CallProvider, TVMFFIBuilder. **CN:** 定义类 `DynamicParamPackCallProvider`，其基类为 CallProvider, TVMFFIBuilder。
+- **L44** `    """Packs dynamic arguments to a struct then calls the function.` — **EN:** Starts the docstring for the class `DynamicParamPackCallProvider`. **CN:** 开始说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `    .. code-block:: c` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `        void call(Tensor0 t0, Tensor1 t1) {` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L49** `            // packed arguments` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L50** `            void** packed_args[] = {&t0, &t1};` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L51** `            // call target` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L52** `            target_func(packed_args);` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L53** `        }` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    Parameters` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L56** `    ----------` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L57** `    target_func: str` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L58** `        The name of the target function.` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    include_num_args: bool` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L61** `        Whether to include the number of arguments in the packed arguments.` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    struct_call: bool` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L64** `        Whether to use the struct call convention.` — **EN:** Continues the docstring for the class `DynamicParamPackCallProvider`. **CN:** 继续说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L65** `    """` — **EN:** Ends the docstring for the class `DynamicParamPackCallProvider`. **CN:** 结束说明 class `DynamicParamPackCallProvider` 的文档字符串。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L68** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `        target_func: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L70** `        include_num_args: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L71** `        struct_call: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L72** `        flatten_tuple_params: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L73** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L74** `        import tvm_ffi` — **EN:** Imports tvm_ffi for later use. **CN:** 导入 tvm_ffi 供后续使用。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `        TVMFFIBuilder.__init__(self)` — **EN:** Invokes `TVMFFIBuilder.__init__` as a standalone call. **CN:** 以独立语句方式调用 `TVMFFIBuilder.__init__`。
+- **L77** `        self.target_func = target_func` — **EN:** Assigns a value to self.target_func. **CN:** 将一个值赋给 self.target_func。
+- **L78** `        self.include_num_args = include_num_args` — **EN:** Assigns a value to self.include_num_args. **CN:** 将一个值赋给 self.include_num_args。
+- **L79** `        self.struct_call = struct_call` — **EN:** Assigns a value to self.struct_call. **CN:** 将一个值赋给 self.struct_call。
+- **L80** `        self.flatten_tuple_params = flatten_tuple_params` — **EN:** Assigns a value to self.flatten_tuple_params. **CN:** 将一个值赋给 self.flatten_tuple_params。
+- **L81** `        self.float4x2_dtype = tvm_ffi.dtype("float4_e2m1fnx2")` — **EN:** Assigns a value to self.float4x2_dtype. **CN:** 将一个值赋给 self.float4x2_dtype。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `        if not self.flatten_tuple_params:` — **EN:** Starts a conditional branch guarded by `not self.flatten_tuple_params`. **CN:** 开始一个由 `not self.flatten_tuple_params` 控制的条件分支。
+- **L84** `            raise RuntimeError("flatten_tuple_params=False is not supported yet")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    def get_callee_struct_for_param_tensor(` — **EN:** Defines function `get_callee_struct_for_param_tensor`. **CN:** 定义函数 `get_callee_struct_for_param_tensor`。
+- **L87** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L88** `        param: spec.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L89** `        current_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L90** `        data: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L91** `        shape: list[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L92** `        strides: list[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L93** `        flatten_struct: ir.Type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `    ) -> ir.Type:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L95** `        """Routine used to override tensor passsing struct conention."""` — **EN:** Docstring line documenting the function `get_callee_struct_for_param_tensor`. **CN:** 文档字符串行，用于说明 function `get_callee_struct_for_param_tensor`。
+- **L96** `        return flatten_struct` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    def pack_param_tensor(` — **EN:** Defines function `pack_param_tensor`. **CN:** 定义函数 `pack_param_tensor`。
+- **L99** `        self, current_block: ir.Block, context: CallContext, param: spec.Tensor` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L100** `    ) -> tuple[ir.Type, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L101** `        """Pack a tensor parameter to a struct."""` — **EN:** Docstring line documenting the function `pack_param_tensor`. **CN:** 文档字符串行，用于说明 function `pack_param_tensor`。
+- **L102** `        map_shape_value = lambda _, value: value` — **EN:** Assigns a value to map_shape_value. **CN:** 将一个值赋给 map_shape_value。
+- **L103** `        map_stride_value = lambda _, value: value` — **EN:** Assigns a value to map_stride_value. **CN:** 将一个值赋给 map_stride_value。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `        if param.map_tensor_dtype_f4x2_to_f4 and param.dtype == self.float4x2_dtype:` — **EN:** Starts a conditional branch guarded by `param.map_tensor_dtype_f4x2_to_f4 and param.dtype == self...`. **CN:** 开始一个由 `param.map_tensor_dtype_f4x2_to_f4 and param.dtype == self...` 控制的条件分支。
+- **L106** `            # specially handle f4x2 to f4 tensor conversion` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** `            # we multiply the stride by 2 for all dimensions except the one with stride=1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L108** `            # we also multiply the shape by 2 for the specific dimension with stride=1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L109** `            def find_stride_one_index() -> int:` — **EN:** Defines function `find_stride_one_index`. **CN:** 定义函数 `find_stride_one_index`。
+- **L110** `                if param.strides is None:` — **EN:** Starts a conditional branch guarded by `param.strides is None`. **CN:** 开始一个由 `param.strides is None` 控制的条件分支。
+- **L111** `                    return len(param.shape) - 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L112** `                for i, stride in enumerate(param.strides):` — **EN:** Starts a loop assigning items from `enumerate(param.strides)` to `(i, stride)`. **CN:** 开始一个循环，将 `enumerate(param.strides)` 的元素赋给 `(i, stride)`。
+- **L113** `                    if isinstance(stride, int) and stride == 1:` — **EN:** Starts a conditional branch guarded by `isinstance(stride, int) and stride == 1`. **CN:** 开始一个由 `isinstance(stride, int) and stride == 1` 控制的条件分支。
+- **L114** `                        return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** `                raise ValueError("stride=1 index not found, needed for f4 tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `            stride_one_index = find_stride_one_index()` — **EN:** Assigns a value to stride_one_index. **CN:** 将一个值赋给 stride_one_index。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `            def map_shape_for_tensor_dtype_f4x2_to_f4(` — **EN:** Defines function `map_shape_for_tensor_dtype_f4x2_to_f4`. **CN:** 定义函数 `map_shape_for_tensor_dtype_f4x2_to_f4`。
+- **L120** `                index: int, value: ir.Value` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `            ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L122** `                if index == stride_one_index:` — **EN:** Starts a conditional branch guarded by `index == stride_one_index`. **CN:** 开始一个由 `index == stride_one_index` 控制的条件分支。
+- **L123** `                    with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L124** `                        return self.mul(value, self.integer_constant(value.type, 2))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L125** `                return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `            def map_stride_for_tensor_dtype_f4x2_to_f4(` — **EN:** Defines function `map_stride_for_tensor_dtype_f4x2_to_f4`. **CN:** 定义函数 `map_stride_for_tensor_dtype_f4x2_to_f4`。
+- **L128** `                index: int, value: ir.Value` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L129** `            ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L130** `                if index != stride_one_index:` — **EN:** Starts a conditional branch guarded by `index != stride_one_index`. **CN:** 开始一个由 `index != stride_one_index` 控制的条件分支。
+- **L131** `                    with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L132** `                        return self.mul(value, self.integer_constant(value.type, 2))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L133** `                return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `            map_shape_value = map_shape_for_tensor_dtype_f4x2_to_f4` — **EN:** Assigns a value to map_shape_value. **CN:** 将一个值赋给 map_shape_value。
+- **L136** `            map_stride_value = map_stride_for_tensor_dtype_f4x2_to_f4` — **EN:** Assigns a value to map_stride_value. **CN:** 将一个值赋给 map_stride_value。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `        data = context.matched_var_binding[param.data]` — **EN:** Assigns a value to data. **CN:** 将一个值赋给 data。
+- **L139** `        shape = []` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L140** `        strides = []` — **EN:** Assigns a value to strides. **CN:** 将一个值赋给 strides。
+- **L141** `        # append all vars in shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L142** `        for index, dim in enumerate(param.shape):` — **EN:** Starts a loop assigning items from `enumerate(param.shape)` to `(index, dim)`. **CN:** 开始一个循环，将 `enumerate(param.shape)` 的元素赋给 `(index, dim)`。
+- **L143** `            if isinstance(dim, spec.Var):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, spec.Var)`. **CN:** 开始一个由 `isinstance(dim, spec.Var)` 控制的条件分支。
+- **L144** `                shape.append(map_shape_value(index, context.matched_var_binding[dim]))` — **EN:** Invokes `shape.append` as a standalone call. **CN:** 以独立语句方式调用 `shape.append`。
+- **L145** `        # append all vars in strides` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `        if param.strides is not None:` — **EN:** Starts a conditional branch guarded by `param.strides is not None`. **CN:** 开始一个由 `param.strides is not None` 控制的条件分支。
+- **L147** `            for index, dim in enumerate(param.strides):` — **EN:** Starts a loop assigning items from `enumerate(param.strides)` to `(index, dim)`. **CN:** 开始一个循环，将 `enumerate(param.strides)` 的元素赋给 `(index, dim)`。
+- **L148** `                if isinstance(dim, spec.Var):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, spec.Var)`. **CN:** 开始一个由 `isinstance(dim, spec.Var)` 控制的条件分支。
+- **L149** `                    strides.append(` — **EN:** Invokes `strides.append` as a standalone call. **CN:** 以独立语句方式调用 `strides.append`。
+- **L150** `                        map_stride_value(index, context.matched_var_binding[dim])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `        flatten_struct, alloca = self.pack_values_to_alloca(` — **EN:** Assigns a value to (flatten_struct, alloca). **CN:** 将一个值赋给 (flatten_struct, alloca)。
+- **L153** `            current_block, context.entry_block, [data, *shape, *strides]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `        callee_struct = self.get_callee_struct_for_param_tensor(` — **EN:** Assigns a value to callee_struct. **CN:** 将一个值赋给 callee_struct。
+- **L156** `            param, current_block, data, shape, strides, flatten_struct` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `        return callee_struct, alloca` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    def pack_param_var(` — **EN:** Defines function `pack_param_var`. **CN:** 定义函数 `pack_param_var`。
+- **L162** `        self, current_block: ir.Block, context: CallContext, param: spec.Var` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L163** `    ) -> tuple[ir.Type, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L164** `        """Pack a var parameter to a struct."""` — **EN:** Docstring line documenting the function `pack_param_var`. **CN:** 文档字符串行，用于说明 function `pack_param_var`。
+- **L165** `        value: ir.Value = context.matched_var_binding[param]` — **EN:** Assigns a typed value to value. **CN:** 为 value 赋予带类型标注的值。
+- **L166** `        _, alloca = self.pack_values_to_alloca(` — **EN:** Assigns a value to (_, alloca). **CN:** 将一个值赋给 (_, alloca)。
+- **L167** `            current_block, context.entry_block, [value]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `        return (value.type, alloca)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `    def pack_param_shape(` — **EN:** Defines function `pack_param_shape`. **CN:** 定义函数 `pack_param_shape`。
+- **L172** `        self, current_block: ir.Block, context: CallContext, param: spec.Shape` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L173** `    ) -> tuple[ir.Type, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L174** `        """Pack a shape parameter to a struct."""` — **EN:** Docstring line documenting the function `pack_param_shape`. **CN:** 文档字符串行，用于说明 function `pack_param_shape`。
+- **L175** `        dynamic_args: list[ir.Value] = []` — **EN:** Assigns a typed value to dynamic_args. **CN:** 为 dynamic_args 赋予带类型标注的值。
+- **L176** `        for dim in param.shape:` — **EN:** Starts a loop assigning items from `param.shape` to `dim`. **CN:** 开始一个循环，将 `param.shape` 的元素赋给 `dim`。
+- **L177** `            if isinstance(dim, spec.Var):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, spec.Var)`. **CN:** 开始一个由 `isinstance(dim, spec.Var)` 控制的条件分支。
+- **L178** `                dynamic_args.append(context.matched_var_binding[dim])` — **EN:** Invokes `dynamic_args.append` as a standalone call. **CN:** 以独立语句方式调用 `dynamic_args.append`。
+- **L179** `        return self.pack_values_to_alloca(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L180** `            current_block, context.entry_block, dynamic_args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    def pack_params(` — **EN:** Defines function `pack_params`. **CN:** 定义函数 `pack_params`。
+- **L184** `        self, current_block: ir.Block, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `    ) -> list[tuple[ir.Type, ir.Value]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L186** `        """Pack a parameter to a struct."""` — **EN:** Docstring line documenting the function `pack_params`. **CN:** 文档字符串行，用于说明 function `pack_params`。
+- **L187** `        # Flatten TupleParam into list of params if enabled` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `        if self.flatten_tuple_params:` — **EN:** Starts a conditional branch guarded by `self.flatten_tuple_params`. **CN:** 开始一个由 `self.flatten_tuple_params` 控制的条件分支。
+- **L189** `            flattened_params = _flatten_tuple_params(context.params)` — **EN:** Assigns a value to flattened_params. **CN:** 将一个值赋给 flattened_params。
+- **L190** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L191** `            flattened_params = context.params` — **EN:** Assigns a value to flattened_params. **CN:** 将一个值赋给 flattened_params。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `        # Pack each parameter` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L194** `        packed_params = []` — **EN:** Assigns a value to packed_params. **CN:** 将一个值赋给 packed_params。
+- **L195** `        for param in flattened_params:` — **EN:** Starts a loop assigning items from `flattened_params` to `param`. **CN:** 开始一个循环，将 `flattened_params` 的元素赋给 `param`。
+- **L196** `            if isinstance(param, spec.Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(param, spec.Tensor)`. **CN:** 开始一个由 `isinstance(param, spec.Tensor)` 控制的条件分支。
+- **L197** `                packed_params.append(` — **EN:** Invokes `packed_params.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_params.append`。
+- **L198** `                    self.pack_param_tensor(current_block, context, param)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `            elif isinstance(param, spec.Var):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L201** `                packed_params.append(self.pack_param_var(current_block, context, param))` — **EN:** Invokes `packed_params.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_params.append`。
+- **L202** `            elif isinstance(param, spec.Shape):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L203** `                packed_params.append(` — **EN:** Invokes `packed_params.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_params.append`。
+- **L204** `                    self.pack_param_shape(current_block, context, param)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `            elif isinstance(param, (spec.Stream, spec.EnvStream)):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L207** `                packed_params.append(` — **EN:** Invokes `packed_params.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_params.append`。
+- **L208** `                    self.pack_param_var(current_block, context, param.var)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `            elif isinstance(param, spec.DataPointer):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L211** `                packed_params.append(` — **EN:** Invokes `packed_params.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_params.append`。
+- **L212** `                    self.pack_param_var(current_block, context, param.var)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `            elif isinstance(param, spec.ConstNone):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L215** `                # const none is not packed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L216** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L217** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L218** `                raise NotImplementedError(f"Unsupported parameter type: {type(param)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L219** `        return packed_params` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    def generate_llvm_call(` — **EN:** Defines function `generate_llvm_call`. **CN:** 定义函数 `generate_llvm_call`。
+- **L222** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L223** `        current_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L224** `        call_operands: list[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L225** `        context: CallContext,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L227** `        """Generate the LLVM call operation."""` — **EN:** Docstring line documenting the function `generate_llvm_call`. **CN:** 文档字符串行，用于说明 function `generate_llvm_call`。
+- **L228** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L229** `            llvm.call(` — **EN:** Invokes `llvm.call` as a standalone call. **CN:** 以独立语句方式调用 `llvm.call`。
+- **L230** `                result=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `                callee=self.target_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `                callee_operands=call_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `                op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `                op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `    def load_to_call_operands(` — **EN:** Defines function `load_to_call_operands`. **CN:** 定义函数 `load_to_call_operands`。
+- **L239** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `        struct_type: Union[ir.Type, tuple[ir.Type]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `        alloca: Union[ir.Value, tuple[ir.Value]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L242** `    ) -> list[ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L243** `        """Load the packed parameters to the call operands."""` — **EN:** Docstring line documenting the function `load_to_call_operands`. **CN:** 文档字符串行，用于说明 function `load_to_call_operands`。
+- **L244** `        assert (isinstance(struct_type, ir.Type) and isinstance(alloca, ir.Value)) or (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L245** `            isinstance(struct_type, tuple) and isinstance(alloca, tuple)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `        if isinstance(struct_type, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(struct_type, tuple)`. **CN:** 开始一个由 `isinstance(struct_type, tuple)` 控制的条件分支。
+- **L248** `            return [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L249** `                llvm.load(struct_type[i], alloca[i]) for i in range(len(struct_type))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `        return [llvm.load(struct_type, alloca)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `    def __call__(self, current_block: ir.Block, context: CallContext) -> ir.Block:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L254** `        """Alloca call provider that uses dynamic param pack call convention."""` — **EN:** Docstring line documenting the function `__call__`. **CN:** 文档字符串行，用于说明 function `__call__`。
+- **L255** `        packed_params = self.pack_params(current_block, context)` — **EN:** Assigns a value to packed_params. **CN:** 将一个值赋给 packed_params。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `        if self.struct_call:` — **EN:** Starts a conditional branch guarded by `self.struct_call`. **CN:** 开始一个由 `self.struct_call` 控制的条件分支。
+- **L258** `            # load back arguments as structs from alloca` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L259** `            call_operands = []` — **EN:** Assigns a value to call_operands. **CN:** 将一个值赋给 call_operands。
+- **L260** `            with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L261** `                for struct_type, alloca in packed_params:` — **EN:** Starts a loop assigning items from `packed_params` to `(struct_type, alloca)`. **CN:** 开始一个循环，将 `packed_params` 的元素赋给 `(struct_type, alloca)`。
+- **L262** `                    call_operands += self.load_to_call_operands(struct_type, alloca)` — **EN:** Updates call_operands in place. **CN:** 原地更新 call_operands。
+- **L263** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L264** `            # pack the values to an alloca that we can pass as void**` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L265** `            all_values: list[Any] = []` — **EN:** Assigns a typed value to all_values. **CN:** 为 all_values 赋予带类型标注的值。
+- **L266** `            for _, value in packed_params:` — **EN:** Starts a loop assigning items from `packed_params` to `(_, value)`. **CN:** 开始一个循环，将 `packed_params` 的元素赋给 `(_, value)`。
+- **L267** `                if isinstance(value, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(value, tuple)`. **CN:** 开始一个由 `isinstance(value, tuple)` 控制的条件分支。
+- **L268** `                    all_values.extend(value)` — **EN:** Invokes `all_values.extend` as a standalone call. **CN:** 以独立语句方式调用 `all_values.extend`。
+- **L269** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L270** `                    all_values.append(value)` — **EN:** Invokes `all_values.append` as a standalone call. **CN:** 以独立语句方式调用 `all_values.append`。
+- **L271** `            _, packed_args_value = self.pack_values_to_alloca(` — **EN:** Assigns a value to (_, packed_args_value). **CN:** 将一个值赋给 (_, packed_args_value)。
+- **L272** `                current_block, context.entry_block, all_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L275** `            call_operands = [packed_args_value]` — **EN:** Assigns a value to call_operands. **CN:** 将一个值赋给 call_operands。
+- **L276** `            if self.include_num_args:` — **EN:** Starts a conditional branch guarded by `self.include_num_args`. **CN:** 开始一个由 `self.include_num_args` 控制的条件分支。
+- **L277** `                with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L278** `                    num_args = self.i32(len(all_values))` — **EN:** Assigns a value to num_args. **CN:** 将一个值赋给 num_args。
+- **L279** `                    call_operands.append(num_args)` — **EN:** Invokes `call_operands.append` as a standalone call. **CN:** 以独立语句方式调用 `call_operands.append`。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `        current_block = self.generate_llvm_call(current_block, call_operands, context)` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L282** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.tvm_ffi_builder.call_provider`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.tvm_ffi_builder.call_provider`。
+- EN: Module docstring summary: Call provider that implements a specific calling convention. CN: 模块文档摘要为：Call provider that implements a specific calling convention.
+- EN: Top-level classes: NopCallProvider, DynamicParamPackCallProvider CN: 顶层类包括：NopCallProvider, DynamicParamPackCallProvider
+- EN: Top-level functions: _flatten_tuple_params CN: 顶层函数包括：_flatten_tuple_params
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .:spec, ..._mlir:ir, ..._mlir.dialects:llvm, .tvm_ffi_builder:CallContext,CallProvider,TVMFFIBuilder CN: 内部依赖：.:spec, ..._mlir:ir, ..._mlir.dialects:llvm, .tvm_ffi_builder:CallContext,CallProvider,TVMFFIBuilder
+- EN: External or standard-library dependencies: dataclasses:dataclass, typing:Any,Optional,Union, tvm_ffi CN: 外部或标准库依赖：dataclasses:dataclass, typing:Any,Optional,Union, tvm_ffi

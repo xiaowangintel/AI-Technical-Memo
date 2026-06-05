@@ -1,0 +1,983 @@
+# implicit_gemm_pipelined.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/threadblock/implicit_gemm_pipelined.h`
+**Purpose / 用途**: Template for a double-buffered threadblock-scoped GEMM kernel. / 提供threadblock 构件、隐式 GEMM 支持。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief Template for a double-buffered threadblock-scoped GEMM kernel.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 38 / 第 38 行** — `#include "cutlass/array.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/array.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/array.h`。
+- **Line 39 / 第 39 行** — `#include "cutlass/aligned_buffer.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/aligned_buffer.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/aligned_buffer.h`。
+- **Line 40 / 第 40 行** — `#include "cutlass/numeric_conversion.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/numeric_conversion.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/numeric_conversion.h`。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `#include "cutlass/numeric_types.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/numeric_types.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/numeric_types.h`。
+- **Line 43 / 第 43 行** — `#include "cutlass/matrix_shape.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/matrix_shape.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/matrix_shape.h`。
+- **Line 44 / 第 44 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 45 / 第 45 行** — `#include "cutlass/gemm/gemm.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/gemm.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/gemm.h`。
+- **Line 46 / 第 46 行** — `#include "cutlass/gemm/threadblock/mma_base.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/threadblock/mma_base.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/threadblock/mma_base.h`。
+- **Line 47 / 第 47 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 48 / 第 48 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 51 / 第 51 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 52 / 第 52 行** — `namespace threadblock {`
+  - **EN**: Opens namespace `threadblock` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `threadblock`。
+- **Line 53 / 第 53 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 54 / 第 54 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 55 / 第 55 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 56 / 第 56 行** — `/// Structure to compute the matrix product targeting CUDA cores and SIMT math instructions.`
+  - **EN**: Inline comment explaining intent: `Structure to compute the matrix product targeting CUDA cores and SIMT math instructions.`.
+  - **CN**: 行内注释说明意图：`Structure to compute the matrix product targeting CUDA cores and SIMT math instructions.`。
+- **Line 57 / 第 57 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 58 / 第 58 行** — `  /// Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Adds template parameter specifier `/// Size of the Gemm problem - concept: gemm::GemmShape<>`.
+  - **CN**: 补充模板参数说明符 `/// Size of the Gemm problem - concept: gemm::GemmShape<>`。
+- **Line 59 / 第 59 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 60 / 第 60 行** — `  /// Iterates over tiles of A operand in global memory `
+  - **EN**: Adds template parameter specifier `/// Iterates over tiles of A operand in global memory`.
+  - **CN**: 补充模板参数说明符 `/// Iterates over tiles of A operand in global memory`。
+- **Line 61 / 第 61 行** — `  //  (concept: ReadableTileIterator | ForwardTileIterator | MaskedTileIterator)`
+  - **EN**: Adds template parameter specifier `//  (concept: ReadableTileIterator | ForwardTileIterator | MaskedTileIterator)`.
+  - **CN**: 补充模板参数说明符 `//  (concept: ReadableTileIterator | ForwardTileIterator | MaskedTileIterator)`。
+- **Line 62 / 第 62 行** — `  typename IteratorA_,`
+  - **EN**: Adds template parameter specifier `typename IteratorA_`.
+  - **CN**: 补充模板参数说明符 `typename IteratorA_`。
+- **Line 63 / 第 63 行** — `  /// Iterates over tiles of A operand in shared memory`
+  - **EN**: Adds template parameter specifier `/// Iterates over tiles of A operand in shared memory`.
+  - **CN**: 补充模板参数说明符 `/// Iterates over tiles of A operand in shared memory`。
+- **Line 64 / 第 64 行** — `  /// (concept: WriteableTileIterator | RandomAccessTileIterator)`
+  - **EN**: Adds template parameter specifier `/// (concept: WriteableTileIterator | RandomAccessTileIterator)`.
+  - **CN**: 补充模板参数说明符 `/// (concept: WriteableTileIterator | RandomAccessTileIterator)`。
+- **Line 65 / 第 65 行** — `  typename SmemIteratorA_,`
+  - **EN**: Adds template parameter specifier `typename SmemIteratorA_`.
+  - **CN**: 补充模板参数说明符 `typename SmemIteratorA_`。
+- **Line 66 / 第 66 行** — `  /// Iterates over tiles of B operand in global memory`
+  - **EN**: Adds template parameter specifier `/// Iterates over tiles of B operand in global memory`.
+  - **CN**: 补充模板参数说明符 `/// Iterates over tiles of B operand in global memory`。
+- **Line 67 / 第 67 行** — `  //  (concept: ReadableTileIterator | ForwardTileIterator | MaskedTileIterator)`
+  - **EN**: Adds template parameter specifier `//  (concept: ReadableTileIterator | ForwardTileIterator | MaskedTileIterator)`.
+  - **CN**: 补充模板参数说明符 `//  (concept: ReadableTileIterator | ForwardTileIterator | MaskedTileIterator)`。
+- **Line 68 / 第 68 行** — `  typename IteratorB_,`
+  - **EN**: Adds template parameter specifier `typename IteratorB_`.
+  - **CN**: 补充模板参数说明符 `typename IteratorB_`。
+- **Line 69 / 第 69 行** — `  /// Iterates over tiles of B operand in shared memory`
+  - **EN**: Adds template parameter specifier `/// Iterates over tiles of B operand in shared memory`.
+  - **CN**: 补充模板参数说明符 `/// Iterates over tiles of B operand in shared memory`。
+- **Line 70 / 第 70 行** — `  /// (concept: WriteableTileIterator | RandomAccessTileIterator)`
+  - **EN**: Adds template parameter specifier `/// (concept: WriteableTileIterator | RandomAccessTileIterator)`.
+  - **CN**: 补充模板参数说明符 `/// (concept: WriteableTileIterator | RandomAccessTileIterator)`。
+- **Line 71 / 第 71 行** — `  typename SmemIteratorB_,`
+  - **EN**: Adds template parameter specifier `typename SmemIteratorB_`.
+  - **CN**: 补充模板参数说明符 `typename SmemIteratorB_`。
+- **Line 72 / 第 72 行** — `  /// Data type of accumulator matrix`
+  - **EN**: Adds template parameter specifier `/// Data type of accumulator matrix`.
+  - **CN**: 补充模板参数说明符 `/// Data type of accumulator matrix`。
+- **Line 73 / 第 73 行** — `  typename ElementC_,`
+  - **EN**: Adds template parameter specifier `typename ElementC_`.
+  - **CN**: 补充模板参数说明符 `typename ElementC_`。
+- **Line 74 / 第 74 行** — `  /// Data type of accumulator matrix`
+  - **EN**: Adds template parameter specifier `/// Data type of accumulator matrix`.
+  - **CN**: 补充模板参数说明符 `/// Data type of accumulator matrix`。
+- **Line 75 / 第 75 行** — `  typename LayoutC_,`
+  - **EN**: Adds template parameter specifier `typename LayoutC_`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC_`。
+- **Line 76 / 第 76 行** — `  /// Policy describing tuning details (concept: MmaPolicy)`
+  - **EN**: Adds template parameter specifier `/// Policy describing tuning details (concept: MmaPolicy)`.
+  - **CN**: 补充模板参数说明符 `/// Policy describing tuning details (concept: MmaPolicy)`。
+- **Line 77 / 第 77 行** — `  typename Policy_,`
+  - **EN**: Adds template parameter specifier `typename Policy_`.
+  - **CN**: 补充模板参数说明符 `typename Policy_`。
+- **Line 78 / 第 78 行** — `  /// Transformation applied to A operand`
+  - **EN**: Adds template parameter specifier `/// Transformation applied to A operand`.
+  - **CN**: 补充模板参数说明符 `/// Transformation applied to A operand`。
+- **Line 79 / 第 79 行** — `  typename TransformA_ = NumericArrayConverter<`
+  - **EN**: Adds template parameter specifier `typename TransformA_ = NumericArrayConverter<`.
+  - **CN**: 补充模板参数说明符 `typename TransformA_ = NumericArrayConverter<`。
+- **Line 80 / 第 80 行** — `    typename SmemIteratorA_::Element, `
+  - **EN**: Adds template parameter specifier `typename SmemIteratorA_::Element`.
+  - **CN**: 补充模板参数说明符 `typename SmemIteratorA_::Element`。
+- **Line 81 / 第 81 行** — `    typename IteratorA_::Element, `
+  - **EN**: Adds template parameter specifier `typename IteratorA_::Element`.
+  - **CN**: 补充模板参数说明符 `typename IteratorA_::Element`。
+- **Line 82 / 第 82 行** — `    IteratorA_::Fragment::kElements>,`
+  - **EN**: Adds template parameter specifier `IteratorA_::Fragment::kElements>`.
+  - **CN**: 补充模板参数说明符 `IteratorA_::Fragment::kElements>`。
+- **Line 83 / 第 83 行** — `  ///`
+  - **EN**: Adds template parameter specifier `///`.
+  - **CN**: 补充模板参数说明符 `///`。
+- **Line 84 / 第 84 行** — `  /// Transformation applied to A operand`
+  - **EN**: Adds template parameter specifier `/// Transformation applied to A operand`.
+  - **CN**: 补充模板参数说明符 `/// Transformation applied to A operand`。
+- **Line 85 / 第 85 行** — `  typename TransformB_ = NumericArrayConverter<`
+  - **EN**: Adds template parameter specifier `typename TransformB_ = NumericArrayConverter<`.
+  - **CN**: 补充模板参数说明符 `typename TransformB_ = NumericArrayConverter<`。
+- **Line 86 / 第 86 行** — `    typename SmemIteratorB_::Element, `
+  - **EN**: Adds template parameter specifier `typename SmemIteratorB_::Element`.
+  - **CN**: 补充模板参数说明符 `typename SmemIteratorB_::Element`。
+- **Line 87 / 第 87 行** — `    typename IteratorB_::Element, `
+  - **EN**: Adds template parameter specifier `typename IteratorB_::Element`.
+  - **CN**: 补充模板参数说明符 `typename IteratorB_::Element`。
+- **Line 88 / 第 88 行** — `    IteratorB_::Fragment::kElements>,`
+  - **EN**: Adds template parameter specifier `IteratorB_::Fragment::kElements>`.
+  - **CN**: 补充模板参数说明符 `IteratorB_::Fragment::kElements>`。
+- **Line 89 / 第 89 行** — `  /// Used for partial specialization`
+  - **EN**: Adds template parameter specifier `/// Used for partial specialization`.
+  - **CN**: 补充模板参数说明符 `/// Used for partial specialization`。
+- **Line 90 / 第 90 行** — `  typename Enable = bool`
+  - **EN**: Adds template parameter specifier `typename Enable = bool`.
+  - **CN**: 补充模板参数说明符 `typename Enable = bool`。
+- **Line 91 / 第 91 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 92 / 第 92 行** — `class ImplicitGemmPipelined : public gemm::threadblock::MmaBase<Shape_, Policy_, 2> {`
+  - **EN**: Starts the definition of class `ImplicitGemmPipelined`.
+  - **CN**: 开始定义 class `ImplicitGemmPipelined`。
+- **Line 93 / 第 93 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 94 / 第 94 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 95 / 第 95 行** — `  ///< Base class`
+  - **EN**: Inline comment explaining intent: `< Base class`.
+  - **CN**: 行内注释说明意图：`< Base class`。
+- **Line 96 / 第 96 行** — `  using Base = gemm::threadblock::MmaBase<Shape_, Policy_, 2>;`
+  - **EN**: Introduces type or value alias `Base`.
+  - **CN**: 引入类型或值别名 `Base`。
+- **Line 97 / 第 97 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 98 / 第 98 行** — `  using Shape = Shape_;             ///< Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Introduces type or value alias `Shape`.
+  - **CN**: 引入类型或值别名 `Shape`。
+- **Line 99 / 第 99 行** — `  using IteratorA = IteratorA_;     ///< Iterates over tiles of A operand in global memory`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 100 / 第 100 行** — `  using IteratorB = IteratorB_;     ///< Iterates over tiles of B operand in global memory`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 101 / 第 101 行** — `  using ElementC = ElementC_;       ///< Data type of accumulator matrix`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 102 / 第 102 行** — `  using LayoutC = LayoutC_;         ///< Layout of accumulator matrix`
+  - **EN**: Introduces type or value alias `LayoutC`.
+  - **CN**: 引入类型或值别名 `LayoutC`。
+- **Line 103 / 第 103 行** — `  using Policy = Policy_;           ///< Policy describing tuning details`
+  - **EN**: Introduces type or value alias `Policy`.
+  - **CN**: 引入类型或值别名 `Policy`。
+- **Line 104 / 第 104 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 105 / 第 105 行** — `  using SmemIteratorA = SmemIteratorA_;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 106 / 第 106 行** — `  using SmemIteratorB = SmemIteratorB_;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 107 / 第 107 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 108 / 第 108 行** — `  using TransformA = TransformA_;`
+  - **EN**: Introduces type or value alias `TransformA`.
+  - **CN**: 引入类型或值别名 `TransformA`。
+- **Line 109 / 第 109 行** — `  using TransformB = TransformB_;`
+  - **EN**: Introduces type or value alias `TransformB`.
+  - **CN**: 引入类型或值别名 `TransformB`。
+- **Line 110 / 第 110 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 111 / 第 111 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 112 / 第 112 行** — `  // Dependent types`
+  - **EN**: Inline comment explaining intent: `Dependent types`.
+  - **CN**: 行内注释说明意图：`Dependent types`。
+- **Line 113 / 第 113 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 114 / 第 114 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 115 / 第 115 行** — `  /// Fragment of operand A loaded from global memory`
+  - **EN**: Inline comment explaining intent: `Fragment of operand A loaded from global memory`.
+  - **CN**: 行内注释说明意图：`Fragment of operand A loaded from global memory`。
+- **Line 116 / 第 116 行** — `  using FragmentA = typename IteratorA::Fragment;`
+  - **EN**: Introduces type or value alias `FragmentA`.
+  - **CN**: 引入类型或值别名 `FragmentA`。
+- **Line 117 / 第 117 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 118 / 第 118 行** — `  /// Fragment of operand B loaded from global memory`
+  - **EN**: Inline comment explaining intent: `Fragment of operand B loaded from global memory`.
+  - **CN**: 行内注释说明意图：`Fragment of operand B loaded from global memory`。
+- **Line 119 / 第 119 行** — `  using FragmentB = typename IteratorB::Fragment;`
+  - **EN**: Introduces type or value alias `FragmentB`.
+  - **CN**: 引入类型或值别名 `FragmentB`。
+- **Line 120 / 第 120 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 121 / 第 121 行** — `  /// Fragment of accumulator tile`
+  - **EN**: Inline comment explaining intent: `Fragment of accumulator tile`.
+  - **CN**: 行内注释说明意图：`Fragment of accumulator tile`。
+- **Line 122 / 第 122 行** — `  using FragmentC = typename Policy::Operator::FragmentC;`
+  - **EN**: Introduces type or value alias `FragmentC`.
+  - **CN**: 引入类型或值别名 `FragmentC`。
+- **Line 123 / 第 123 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 124 / 第 124 行** — `  /// Warp-level Mma`
+  - **EN**: Inline comment explaining intent: `Warp-level Mma`.
+  - **CN**: 行内注释说明意图：`Warp-level Mma`。
+- **Line 125 / 第 125 行** — `  using Operator = typename Policy::Operator;`
+  - **EN**: Introduces type or value alias `Operator`.
+  - **CN**: 引入类型或值别名 `Operator`。
+- **Line 126 / 第 126 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 127 / 第 127 行** — `  /// Obtain the arch tag from the warp-level operator`
+  - **EN**: Inline comment explaining intent: `Obtain the arch tag from the warp-level operator`.
+  - **CN**: 行内注释说明意图：`Obtain the arch tag from the warp-level operator`。
+- **Line 128 / 第 128 行** — `  using ArchTag = typename Policy::Operator::ArchTag;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 129 / 第 129 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 130 / 第 130 行** — `  /// Complex transform on A operand`
+  - **EN**: Inline comment explaining intent: `Complex transform on A operand`.
+  - **CN**: 行内注释说明意图：`Complex transform on A operand`。
+- **Line 131 / 第 131 行** — `  static ComplexTransform const kTransformA = Operator::kTransformA;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 132 / 第 132 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 133 / 第 133 行** — `  /// Complex transform on B operand`
+  - **EN**: Inline comment explaining intent: `Complex transform on B operand`.
+  - **CN**: 行内注释说明意图：`Complex transform on B operand`。
+- **Line 134 / 第 134 行** — `  static ComplexTransform const kTransformB = Operator::kTransformB;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 135 / 第 135 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 136 / 第 136 行** — `  // staticaly assert kStages for MmaPipelined is two (Double-buffered pipeline)`
+  - **EN**: Inline comment explaining intent: `staticaly assert kStages for MmaPipelined is two (Double-buffered pipeline)`.
+  - **CN**: 行内注释说明意图：`staticaly assert kStages for MmaPipelined is two (Double-buffered pipeline)`。
+- **Line 137 / 第 137 行** — `  static_assert((Base::kStages==2), "MmaPipelined requires kStages set to value 2");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 138 / 第 138 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 139 / 第 139 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 140 / 第 140 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 141 / 第 141 行** — `  using WarpFragmentA = typename Operator::FragmentA;`
+  - **EN**: Introduces type or value alias `WarpFragmentA`.
+  - **CN**: 引入类型或值别名 `WarpFragmentA`。
+- **Line 142 / 第 142 行** — `  using WarpFragmentB = typename Operator::FragmentB;`
+  - **EN**: Introduces type or value alias `WarpFragmentB`.
+  - **CN**: 引入类型或值别名 `WarpFragmentB`。
+- **Line 143 / 第 143 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 144 / 第 144 行** — `protected:`
+  - **EN**: Sets the current access level to `protected`.
+  - **CN**: 将当前访问级别设置为 `protected`。
+- **Line 145 / 第 145 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 146 / 第 146 行** — `  /// Iterator to write threadblock-scoped tile of A operand to shared memory`
+  - **EN**: Inline comment explaining intent: `Iterator to write threadblock-scoped tile of A operand to shared memory`.
+  - **CN**: 行内注释说明意图：`Iterator to write threadblock-scoped tile of A operand to shared memory`。
+- **Line 147 / 第 147 行** — `  SmemIteratorA smem_iterator_A_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 148 / 第 148 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 149 / 第 149 行** — `  /// Iterator to write threadblock-scoped tile of B operand to shared memory`
+  - **EN**: Inline comment explaining intent: `Iterator to write threadblock-scoped tile of B operand to shared memory`.
+  - **CN**: 行内注释说明意图：`Iterator to write threadblock-scoped tile of B operand to shared memory`。
+- **Line 150 / 第 150 行** — `  SmemIteratorB smem_iterator_B_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 151 / 第 151 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 152 / 第 152 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 153 / 第 153 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 154 / 第 154 行** — `  /// Construct from tensor references`
+  - **EN**: Inline comment explaining intent: `Construct from tensor references`.
+  - **CN**: 行内注释说明意图：`Construct from tensor references`。
+- **Line 155 / 第 155 行** — `  CUTLASS_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 156 / 第 156 行** — `  ImplicitGemmPipelined(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 157 / 第 157 行** — `    typename Base::SharedStorage &shared_storage,       ///< Shared storage needed for internal use by threadblock-scoped GEMM`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 158 / 第 158 行** — `    int thread_idx,                                     ///< ID within the threadblock`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 159 / 第 159 行** — `    int warp_idx,                                       ///< ID of warp`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 160 / 第 160 行** — `    int lane_idx                                        ///< ID of each thread within a warp`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 161 / 第 161 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 162 / 第 162 行** — `    Base(shared_storage, thread_idx, warp_idx, lane_idx),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 163 / 第 163 行** — `    smem_iterator_A_(shared_storage.operand_A_ref(), thread_idx),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 164 / 第 164 行** — `    smem_iterator_B_(shared_storage.operand_B_ref(), thread_idx) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 165 / 第 165 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 166 / 第 166 行** — `    // Compute warp location within threadblock tile by mapping the warp_id to`
+  - **EN**: Inline comment explaining intent: `Compute warp location within threadblock tile by mapping the warp_id to`.
+  - **CN**: 行内注释说明意图：`Compute warp location within threadblock tile by mapping the warp_id to`。
+- **Line 167 / 第 167 行** — `    // three coordinates:`
+  - **EN**: Inline comment explaining intent: `three coordinates:`.
+  - **CN**: 行内注释说明意图：`three coordinates:`。
+- **Line 168 / 第 168 行** — `    //   _m: the warp's position within the threadblock along the M dimension`
+  - **EN**: Inline comment explaining intent: `_m: the warp's position within the threadblock along the M dimension`.
+  - **CN**: 行内注释说明意图：`_m: the warp's position within the threadblock along the M dimension`。
+- **Line 169 / 第 169 行** — `    //   _n: the warp's position within the threadblock along the N dimension`
+  - **EN**: Inline comment explaining intent: `_n: the warp's position within the threadblock along the N dimension`.
+  - **CN**: 行内注释说明意图：`_n: the warp's position within the threadblock along the N dimension`。
+- **Line 170 / 第 170 行** — `    //   _k: the warp's position within the threadblock along the K dimension`
+  - **EN**: Inline comment explaining intent: `_k: the warp's position within the threadblock along the K dimension`.
+  - **CN**: 行内注释说明意图：`_k: the warp's position within the threadblock along the K dimension`。
+- **Line 171 / 第 171 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 172 / 第 172 行** — `    int warp_idx_mn = warp_idx % (Base::WarpCount::kM * Base::WarpCount::kN);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 173 / 第 173 行** — `    int warp_idx_k = warp_idx / (Base::WarpCount::kM * Base::WarpCount::kN);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 174 / 第 174 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 175 / 第 175 行** — `    int warp_idx_m = warp_idx_mn % Base::WarpCount::kM;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 176 / 第 176 行** — `    int warp_idx_n = warp_idx_mn / Base::WarpCount::kM;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 177 / 第 177 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 178 / 第 178 行** — `    // Add per-warp offsets in units of warp-level tiles`
+  - **EN**: Inline comment explaining intent: `Add per-warp offsets in units of warp-level tiles`.
+  - **CN**: 行内注释说明意图：`Add per-warp offsets in units of warp-level tiles`。
+- **Line 179 / 第 179 行** — `    this->warp_tile_iterator_A_.add_tile_offset({warp_idx_m, Base::kWarpGemmIterations * warp_idx_k});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 180 / 第 180 行** — `    this->warp_tile_iterator_B_.add_tile_offset({Base::kWarpGemmIterations * warp_idx_k, warp_idx_n});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 181 / 第 181 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 182 / 第 182 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 183 / 第 183 行** — `  /// Perform a threadblock-scoped matrix multiply-accumulate`
+  - **EN**: Inline comment explaining intent: `Perform a threadblock-scoped matrix multiply-accumulate`.
+  - **CN**: 行内注释说明意图：`Perform a threadblock-scoped matrix multiply-accumulate`。
+- **Line 184 / 第 184 行** — `  CUTLASS_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 185 / 第 185 行** — `  void operator()(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 186 / 第 186 行** — `    int gemm_k_iterations,                            ///< number of iterations of the mainloop`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 187 / 第 187 行** — `    FragmentC &accum,                                 ///< destination accumulator tile`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 188 / 第 188 行** — `    IteratorA iterator_A,                             ///< iterator over A operand in global memory`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 189 / 第 189 行** — `    IteratorB iterator_B,                             ///< iterator over B operand in global memory`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 190 / 第 190 行** — `    FragmentC const &src_accum,                       ///< source accumulator tile`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 191 / 第 191 行** — `    int gemm_k_iterations_per_channel = 0,             ///< number of iterations per channel`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 192 / 第 192 行** — `    TransformA transform_A = TransformA(),            ///< transformation applied to A fragment`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 193 / 第 193 行** — `    TransformB transform_B = TransformB()) {          ///< transformation applied to B fragment`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 194 / 第 194 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 195 / 第 195 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 196 / 第 196 行** — `    // Prologue`
+  - **EN**: Inline comment explaining intent: `Prologue`.
+  - **CN**: 行内注释说明意图：`Prologue`。
+- **Line 197 / 第 197 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 198 / 第 198 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 199 / 第 199 行** — `    // Perform accumulation in the 'd' output operand`
+  - **EN**: Inline comment explaining intent: `Perform accumulation in the 'd' output operand`.
+  - **CN**: 行内注释说明意图：`Perform accumulation in the 'd' output operand`。
+- **Line 200 / 第 200 行** — `    accum = src_accum;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 201 / 第 201 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 202 / 第 202 行** — `    FragmentA tb_frag_A;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 203 / 第 203 行** — `    FragmentB tb_frag_B;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 204 / 第 204 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 205 / 第 205 行** — `    tb_frag_A.clear();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 206 / 第 206 行** — `    tb_frag_B.clear();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 207 / 第 207 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 208 / 第 208 行** — `    // The last kblock is loaded in the prolog`
+  - **EN**: Inline comment explaining intent: `The last kblock is loaded in the prolog`.
+  - **CN**: 行内注释说明意图：`The last kblock is loaded in the prolog`。
+- **Line 209 / 第 209 行** — `    iterator_A.load(tb_frag_A);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 210 / 第 210 行** — `    iterator_B.load(tb_frag_B);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 211 / 第 211 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 212 / 第 212 行** — `    ++iterator_A;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 213 / 第 213 行** — `    ++iterator_B;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 214 / 第 214 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 215 / 第 215 行** — `    this->smem_iterator_A_.store(transform_A(tb_frag_A));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 216 / 第 216 行** — `    this->smem_iterator_B_.store(transform_B(tb_frag_B));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 217 / 第 217 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 218 / 第 218 行** — `    ++this->smem_iterator_A_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 219 / 第 219 行** — `    ++this->smem_iterator_B_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 220 / 第 220 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 221 / 第 221 行** — `    __syncthreads();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 222 / 第 222 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 223 / 第 223 行** — `    // Pair of fragments used to overlap shared memory loads and math instructions`
+  - **EN**: Inline comment explaining intent: `Pair of fragments used to overlap shared memory loads and math instructions`.
+  - **CN**: 行内注释说明意图：`Pair of fragments used to overlap shared memory loads and math instructions`。
+- **Line 224 / 第 224 行** — `    WarpFragmentA warp_frag_A[2];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 225 / 第 225 行** — `    WarpFragmentB warp_frag_B[2];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 226 / 第 226 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 227 / 第 227 行** — `    this->warp_tile_iterator_A_.set_kgroup_index(0);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 228 / 第 228 行** — `    this->warp_tile_iterator_B_.set_kgroup_index(0);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 229 / 第 229 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 230 / 第 230 行** — `    this->warp_tile_iterator_A_.load(warp_frag_A[0]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 231 / 第 231 行** — `    this->warp_tile_iterator_B_.load(warp_frag_B[0]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 232 / 第 232 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 233 / 第 233 行** — `    ++this->warp_tile_iterator_A_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 234 / 第 234 行** — `    ++this->warp_tile_iterator_B_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 235 / 第 235 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 236 / 第 236 行** — `    Operator warp_mma;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 237 / 第 237 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 238 / 第 238 行** — `    int smem_write_stage_idx = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 239 / 第 239 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 240 / 第 240 行** — `    // Issue loads during the first warp-level matrix multiply-add *AFTER* issuing `
+  - **EN**: Inline comment explaining intent: `Issue loads during the first warp-level matrix multiply-add *AFTER* issuing`.
+  - **CN**: 行内注释说明意图：`Issue loads during the first warp-level matrix multiply-add *AFTER* issuing`。
+- **Line 241 / 第 241 行** — `    // shared memory loads (which have the tightest latency requirement).`
+  - **EN**: Inline comment explaining intent: `shared memory loads (which have the tightest latency requirement).`.
+  - **CN**: 行内注释说明意图：`shared memory loads (which have the tightest latency requirement).`。
+- **Line 242 / 第 242 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 243 / 第 243 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 244 / 第 244 行** — `    // Mainloop`
+  - **EN**: Inline comment explaining intent: `Mainloop`.
+  - **CN**: 行内注释说明意图：`Mainloop`。
+- **Line 245 / 第 245 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 246 / 第 246 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 247 / 第 247 行** — `    // Note: The main loop does not support Base::kWarpGemmIterations == 2.`
+  - **EN**: Inline comment explaining intent: `Note: The main loop does not support Base::kWarpGemmIterations == 2.`.
+  - **CN**: 行内注释说明意图：`Note: The main loop does not support Base::kWarpGemmIterations == 2.`。
+- **Line 248 / 第 248 行** — `    CUTLASS_GEMM_LOOP`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 249 / 第 249 行** — `    for (; gemm_k_iterations > 0; --gemm_k_iterations) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 250 / 第 250 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 251 / 第 251 行** — `      // Loop over GEMM K dimension`
+  - **EN**: Inline comment explaining intent: `Loop over GEMM K dimension`.
+  - **CN**: 行内注释说明意图：`Loop over GEMM K dimension`。
+- **Line 252 / 第 252 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 253 / 第 253 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 254 / 第 254 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 255 / 第 255 行** — `      for (int warp_mma_k = 0; warp_mma_k < Base::kWarpGemmIterations; ++warp_mma_k) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 256 / 第 256 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 257 / 第 257 行** — `        // Load warp-level tiles from shared memory, wrapping to k offset if this is the last group`
+  - **EN**: Inline comment explaining intent: `Load warp-level tiles from shared memory, wrapping to k offset if this is the last group`.
+  - **CN**: 行内注释说明意图：`Load warp-level tiles from shared memory, wrapping to k offset if this is the last group`。
+- **Line 258 / 第 258 行** — `        // as the case may be.`
+  - **EN**: Inline comment explaining intent: `as the case may be.`.
+  - **CN**: 行内注释说明意图：`as the case may be.`。
+- **Line 259 / 第 259 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 260 / 第 260 行** — `        if (warp_mma_k == Base::kWarpGemmIterations - 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 261 / 第 261 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 262 / 第 262 行** — `          // Write fragments to shared memory`
+  - **EN**: Inline comment explaining intent: `Write fragments to shared memory`.
+  - **CN**: 行内注释说明意图：`Write fragments to shared memory`。
+- **Line 263 / 第 263 行** — `          this->smem_iterator_A_.store(transform_A(tb_frag_A));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 264 / 第 264 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 265 / 第 265 行** — `          this->smem_iterator_B_.store(transform_B(tb_frag_B));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 266 / 第 266 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 267 / 第 267 行** — `          __syncthreads();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 268 / 第 268 行** — `          `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 269 / 第 269 行** — `          ++this->smem_iterator_A_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 270 / 第 270 行** — `          ++this->smem_iterator_B_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 271 / 第 271 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 272 / 第 272 行** — `          // Add negative offsets to return iterators to the 'start' of the circular buffer in shared memory`
+  - **EN**: Inline comment explaining intent: `Add negative offsets to return iterators to the 'start' of the circular buffer in shared memory`.
+  - **CN**: 行内注释说明意图：`Add negative offsets to return iterators to the 'start' of the circular buffer in shared memory`。
+- **Line 273 / 第 273 行** — `          if (smem_write_stage_idx == 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 274 / 第 274 行** — `            this->smem_iterator_A_.add_tile_offset({0, -Base::kStages});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 275 / 第 275 行** — `            this->smem_iterator_B_.add_tile_offset({-Base::kStages, 0});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 276 / 第 276 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 277 / 第 277 行** — `          else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 278 / 第 278 行** — `            this->warp_tile_iterator_A_.add_tile_offset(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 279 / 第 279 行** — `                {0, -Base::kStages * Policy::kPartitionsK * Base::kWarpGemmIterations});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 280 / 第 280 行** — `            this->warp_tile_iterator_B_.add_tile_offset(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 281 / 第 281 行** — `                {-Base::kStages * Policy::kPartitionsK * Base::kWarpGemmIterations,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 282 / 第 282 行** — `                 0});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 283 / 第 283 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 284 / 第 284 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 285 / 第 285 行** — `          smem_write_stage_idx ^= 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 286 / 第 286 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 287 / 第 287 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 288 / 第 288 行** — `        this->warp_tile_iterator_A_.set_kgroup_index((warp_mma_k + 1) % Base::kWarpGemmIterations);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 289 / 第 289 行** — `        this->warp_tile_iterator_B_.set_kgroup_index((warp_mma_k + 1) % Base::kWarpGemmIterations);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 290 / 第 290 行** — `        `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 291 / 第 291 行** — `        this->warp_tile_iterator_A_.load(warp_frag_A[(warp_mma_k + 1) % 2]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 292 / 第 292 行** — `        this->warp_tile_iterator_B_.load(warp_frag_B[(warp_mma_k + 1) % 2]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 293 / 第 293 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 294 / 第 294 行** — `        ++this->warp_tile_iterator_A_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 295 / 第 295 行** — `        ++this->warp_tile_iterator_B_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 296 / 第 296 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 297 / 第 297 行** — `        if (warp_mma_k == 0) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 298 / 第 298 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 299 / 第 299 行** — `          iterator_A.load(tb_frag_A);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 300 / 第 300 行** — `          iterator_B.load(tb_frag_B);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 301 / 第 301 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 302 / 第 302 行** — `          ++iterator_A;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 303 / 第 303 行** — `          ++iterator_B;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 304 / 第 304 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 305 / 第 305 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 306 / 第 306 行** — `        warp_mma(accum, warp_frag_A[warp_mma_k % 2],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 307 / 第 307 行** — `                 warp_frag_B[warp_mma_k % 2], accum);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 308 / 第 308 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 309 / 第 309 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 310 / 第 310 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 311 / 第 311 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 312 / 第 312 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 313 / 第 313 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 314 / 第 314 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 315 / 第 315 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 316 / 第 316 行** — `} // namespace threadblock`
+  - **EN**: Closes namespace `threadblock`.
+  - **CN**: 关闭命名空间 `threadblock`。
+- **Line 317 / 第 317 行** — `} // namespace gemm`
+  - **EN**: Closes namespace `gemm`.
+  - **CN**: 关闭命名空间 `gemm`。
+- **Line 318 / 第 318 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 319 / 第 319 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 320 / 第 320 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/array.h` — CUTLASS dependency `cutlass/array.h` / CUTLASS 依赖 `cutlass/array.h`
+- `cutlass/aligned_buffer.h` — CUTLASS dependency `cutlass/aligned_buffer.h` / CUTLASS 依赖 `cutlass/aligned_buffer.h`
+- `cutlass/numeric_conversion.h` — CUTLASS dependency `cutlass/numeric_conversion.h` / CUTLASS 依赖 `cutlass/numeric_conversion.h`
+- `cutlass/numeric_types.h` — CUTLASS dependency `cutlass/numeric_types.h` / CUTLASS 依赖 `cutlass/numeric_types.h`
+- `cutlass/matrix_shape.h` — CUTLASS dependency `cutlass/matrix_shape.h` / CUTLASS 依赖 `cutlass/matrix_shape.h`
+- `cutlass/gemm/gemm.h` — CUTLASS GEMM primitive `cutlass/gemm/gemm.h` / CUTLASS GEMM 原语 `cutlass/gemm/gemm.h`
+- `cutlass/gemm/threadblock/mma_base.h` — CUTLASS GEMM primitive `cutlass/gemm/threadblock/mma_base.h` / CUTLASS GEMM 原语 `cutlass/gemm/threadblock/mma_base.h`

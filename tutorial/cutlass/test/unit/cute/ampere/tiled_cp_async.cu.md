@@ -1,0 +1,472 @@
+# tiled_cp_async.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/ampere/tiled_cp_async.cu`
+
+## Purpose / 用途
+- EN: This Ampere / SM80-era CuTe test validates the `tiled cp async` path, covering architecture-specific tensor movement, layout mapping, or matrix-instruction behavior.
+- CN: 这个面向 Ampere / SM80 时代 的 CuTe 测试验证 `tiled cp async` 路径，覆盖架构特定的张量搬运、布局映射或矩阵指令行为。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <iostream>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 35**: `#include <iomanip>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 36**: `#include <utility>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 37**: `#include <type_traits>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 38**: `#include <vector>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 39**: `#include <numeric>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `#include <thrust/host_vector.h>`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- **Line 42**: `#include <thrust/device_vector.h>`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- **Line 43**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 45**: `#include <cute/swizzle.hpp> // cute::Swizzle`
+  - EN: Provides CuTe swizzle mappings used to model shared-memory permutations.
+  - CN: 提供用于建模共享内存置换的 CuTe swizzle 映射。
+- **Line 46**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 47**: `#include "tiled_cp_async_testbed.hpp"`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 50**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 51**: `TEST(SM80_CuTe_tiled_cp_async, no_swizzle_mn_single_tile)`
+  - EN: Declares GoogleTest case `SM80_CuTe_tiled_cp_async::no_swizzle_mn_single_tile` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_tiled_cp_async::no_swizzle_mn_single_tile`，用于验证一个具体的 CuTe 场景。
+- **Line 52**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 53**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 54**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<cute::uint128_t>, double>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 55**: `  using thr_layout = decltype(Layout<Shape <_16, _8>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 56**: `  using val_layout = decltype(Layout<Shape<_2,_1>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 57**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 58**: `  using smem_layout_atom = decltype(Layout<Shape <_16, _4>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 59**: `  using gmem_stride_type = decltype(LayoutLeft{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 60**: `  test_cp_async_no_swizzle<double, cute::Int<64>, cute::Int<16>, gmem_stride_type, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 61**: `  }`
+  - EN: Closes the scope for `test SM80_CuTe_tiled_cp_async::no_swizzle_mn_single_tile`.
+  - CN: 结束 `test SM80_CuTe_tiled_cp_async::no_swizzle_mn_single_tile` 的作用域。
+- **Line 62**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 63**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 64**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<cute::uint128_t>, double>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 65**: `  using thr_layout = decltype(Layout<Shape <_16, _8>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 66**: `  using val_layout = decltype(Layout<Shape<_2,_1>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 67**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 68**: `  using smem_layout_atom = decltype(Layout<Shape <_16, _4>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 69**: `  using gmem_stride_type = decltype(LayoutLeft{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 70**: `  test_cp_async_no_swizzle<double, cute::Int<128>, cute::Int<16>, gmem_stride_type, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 71**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 72**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 73**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 74**: `TEST(SM80_CuTe_tiled_cp_async, no_swizzle_k_single_tile)`
+  - EN: Declares GoogleTest case `SM80_CuTe_tiled_cp_async::no_swizzle_k_single_tile` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_tiled_cp_async::no_swizzle_k_single_tile`，用于验证一个具体的 CuTe 场景。
+- **Line 75**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 76**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 77**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<cute::uint128_t>, double>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 78**: `  using thr_layout = decltype(Layout<Shape <_16, _8>, Stride< _8,_1>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 79**: `  using val_layout = decltype(Layout<Shape<_1,_2>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 80**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 81**: `  using smem_layout_atom = decltype(make_ordered_layout(Shape<_128,_16>{}, Step <_2, _1>{}));`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 82**: `  using gmem_stride_type = decltype(LayoutRight{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 83**: `  test_cp_async_no_swizzle<double, cute::Int<128>, cute::Int<16>, gmem_stride_type, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 84**: `  }`
+  - EN: Closes the scope for `test SM80_CuTe_tiled_cp_async::no_swizzle_k_single_tile`.
+  - CN: 结束 `test SM80_CuTe_tiled_cp_async::no_swizzle_k_single_tile` 的作用域。
+- **Line 85**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 86**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 87**: `TEST(SM80_CuTe_tiled_cp_async, swizzle_mn_single_tile)`
+  - EN: Declares GoogleTest case `SM80_CuTe_tiled_cp_async::swizzle_mn_single_tile` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_tiled_cp_async::swizzle_mn_single_tile`，用于验证一个具体的 CuTe 场景。
+- **Line 88**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 89**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 90**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<cute::uint128_t>, double>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 91**: `  using thr_layout = decltype(Layout<Shape <_16, _8>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 92**: `  using val_layout = decltype(Layout<Shape<_2,_1>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 93**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 94**: `  using swizzle_atom = decltype(Swizzle<2,2,2>{});`
+  - EN: Creates alias `swizzle_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `swizzle_atom`，以简化较长的类型或表达式。
+- **Line 95**: `  using smem_layout_atom = decltype(Layout<Shape <_16, _4>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 96**: `  using gmem_stride_type = decltype(LayoutLeft{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 97**: `  test_cp_async_with_swizzle<double, cute::Int<64>, cute::Int<16>, gmem_stride_type, swizzle_atom, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 98**: `  }`
+  - EN: Closes the scope for `test SM80_CuTe_tiled_cp_async::swizzle_mn_single_tile`.
+  - CN: 结束 `test SM80_CuTe_tiled_cp_async::swizzle_mn_single_tile` 的作用域。
+- **Line 99**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 100**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 101**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<cute::uint128_t>, double>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 102**: `  using thr_layout = decltype(Layout<Shape <_16, _8>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 103**: `  using val_layout = decltype(Layout<Shape<_2,_1>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 104**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 105**: `  using swizzle_atom = decltype(Swizzle<2,2,2>{});`
+  - EN: Creates alias `swizzle_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `swizzle_atom`，以简化较长的类型或表达式。
+- **Line 106**: `  using smem_layout_atom = decltype(Layout<Shape <_16, _4>, Stride< _1,_16>>{});`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 107**: `  using gmem_stride_type = decltype(LayoutLeft{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 108**: `  test_cp_async_with_swizzle<double, cute::Int<128>, cute::Int<16>, gmem_stride_type, swizzle_atom, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 109**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 110**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: `TEST(SM80_CuTe_tiled_cp_async, swizzle_k_single_tile)`
+  - EN: Declares GoogleTest case `SM80_CuTe_tiled_cp_async::swizzle_k_single_tile` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_tiled_cp_async::swizzle_k_single_tile`，用于验证一个具体的 CuTe 场景。
+- **Line 113**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 114**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 115**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<double>, double>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 116**: `  using thr_layout = decltype(Layout<Shape < _8,_16>, Stride<_16, _1>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 117**: `  using val_layout = decltype(Layout<Shape<_1,_1>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 118**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 119**: `  using swizzle_atom = decltype(Swizzle<2,0,4>{});`
+  - EN: Creates alias `swizzle_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `swizzle_atom`，以简化较长的类型或表达式。
+- **Line 120**: `  using smem_layout_atom = decltype(Layout<Shape <_4,_16>, Stride<_1, _4>>{});`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 121**: `  using gmem_stride_type = decltype(LayoutRight{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 122**: `  test_cp_async_with_swizzle<double, cute::Int<128>, cute::Int<16>, gmem_stride_type, swizzle_atom, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 123**: `  }`
+  - EN: Closes the scope for `test SM80_CuTe_tiled_cp_async::swizzle_k_single_tile`.
+  - CN: 结束 `test SM80_CuTe_tiled_cp_async::swizzle_k_single_tile` 的作用域。
+- **Line 124**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 125**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 126**: `  using copy_atom = decltype(Copy_Atom<SM80_CP_ASYNC_CACHEALWAYS<cute::uint128_t>, tfloat32_t>{});`
+  - EN: Creates alias `copy_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `copy_atom`，以简化较长的类型或表达式。
+- **Line 127**: `  using thr_layout = decltype(Layout<Shape <_16,_8>, Stride< _8,_1>>{});`
+  - EN: Creates type alias `thr_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `thr_layout`。
+- **Line 128**: `  using val_layout = decltype(Layout<Shape < _1,_4>>{});`
+  - EN: Creates type alias `val_layout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `val_layout`。
+- **Line 129**: `  using tiled_copy = decltype(make_tiled_copy(copy_atom{}, thr_layout{}, val_layout{}));`
+  - EN: Creates alias `tiled_copy` to simplify a verbose type or expression.
+  - CN: 创建别名 `tiled_copy`，以简化较长的类型或表达式。
+- **Line 130**: `  using swizzle_atom = decltype(Swizzle<3,2,3>{});`
+  - EN: Creates alias `swizzle_atom` to simplify a verbose type or expression.
+  - CN: 创建别名 `swizzle_atom`，以简化较长的类型或表达式。
+- **Line 131**: `  using smem_layout_atom = decltype(Layout<Shape < _8,_32>, Stride<_32, _1>>{});`
+  - EN: Creates type alias `smem_layout_atom` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `smem_layout_atom`。
+- **Line 132**: `  using gmem_stride_type = decltype(LayoutRight{});`
+  - EN: Creates alias `gmem_stride_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `gmem_stride_type`，以简化较长的类型或表达式。
+- **Line 133**: `  test_cp_async_with_swizzle<tfloat32_t, cute::Int<128>, cute::Int<32>, gmem_stride_type, swizzle_atom, smem_layout_atom, tiled_copy>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 134**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 135**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `Swizzle<`
+  - EN: Models swizzled address mappings that match hardware-friendly shared-memory layouts.
+  - CN: 建模 swizzle 地址映射，以匹配硬件友好的共享内存布局。
+- `cp_async`
+  - EN: Exercises asynchronous copy primitives on architectures that support them.
+  - CN: 测试支持该能力的架构上的异步拷贝原语。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `iostream`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `iomanip`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `utility`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `type_traits`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `vector`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `numeric`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `thrust/host_vector.h`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- `thrust/device_vector.h`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- `cute/swizzle.hpp`
+  - EN: Provides CuTe swizzle mappings used to model shared-memory permutations.
+  - CN: 提供用于建模共享内存置换的 CuTe swizzle 映射。
+- `tiled_cp_async_testbed.hpp`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。

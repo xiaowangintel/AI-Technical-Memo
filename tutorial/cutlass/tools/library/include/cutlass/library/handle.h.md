@@ -1,0 +1,1112 @@
+# handle.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/include/cutlass/library/handle.h`
+**Purpose / 用途**: Declares or implements the CUTLASS library runtime handle. / 声明或实现 CUTLASS 运行时库句柄。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>    \brief BLAS-like handle used to launch operations on the CUDA device.</code>
+  - EN: Comment that documents intent or context: "\brief BLAS-like handle used to launch operations on the CUDA device.".
+  - CN: 用于说明意图或上下文的注释："\brief BLAS-like handle used to launch operations on the CUDA device."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &lt;memory&gt;</code>
+  - EN: Includes `memory` so this file can use memory-management helpers.
+  - CN: 引入 `memory`，使当前文件可以使用内存管理辅助工具。
+- **L38** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L43** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>/// Handle object</code>
+  - EN: Comment that documents intent or context: "Handle object".
+  - CN: 用于说明意图或上下文的注释："Handle object"。
+- **L48** <code>class Handle {</code>
+  - EN: Begins the declaration of class `Handle`.
+  - CN: 开始声明 class `Handle`。
+- **L49** <code>private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>  /// Host workspace</code>
+  - EN: Comment that documents intent or context: "Host workspace".
+  - CN: 用于说明意图或上下文的注释："Host workspace"。
+- **L52** <code>  static int const kHostWorkspaceSize = (4 &lt;&lt; 10);</code>
+  - EN: Assigns or initializes `kHostWorkspaceSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kHostWorkspaceSize` 进行赋值或初始化。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>  /// Provider of operations</code>
+  - EN: Comment that documents intent or context: "Provider of operations".
+  - CN: 用于说明意图或上下文的注释："Provider of operations"。
+- **L55** <code>  Provider provider_;</code>
+  - EN: Declares the symbol `provider_` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider_`。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>  /// CUDA device properties</code>
+  - EN: Comment that documents intent or context: "CUDA device properties".
+  - CN: 用于说明意图或上下文的注释："CUDA device properties"。
+- **L58** <code>  cudaDeviceProp device_;</code>
+  - EN: Declares the symbol `device_` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_`。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>  /// CUDA stream</code>
+  - EN: Comment that documents intent or context: "CUDA stream".
+  - CN: 用于说明意图或上下文的注释："CUDA stream"。
+- **L61** <code>  cudaStream_t stream_;</code>
+  - EN: Declares the symbol `stream_` in the current scope.
+  - CN: 在当前作用域中声明符号 `stream_`。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>  /// Device workspace</code>
+  - EN: Comment that documents intent or context: "Device workspace".
+  - CN: 用于说明意图或上下文的注释："Device workspace"。
+- **L64** <code>  void *workspace_;</code>
+  - EN: Declares the symbol `workspace_` in the current scope.
+  - CN: 在当前作用域中声明符号 `workspace_`。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>  /// Size of device workspace in bytes</code>
+  - EN: Comment that documents intent or context: "Size of device workspace in bytes".
+  - CN: 用于说明意图或上下文的注释："Size of device workspace in bytes"。
+- **L67** <code>  size_t workspace_size_;</code>
+  - EN: Declares the symbol `workspace_size_` in the current scope.
+  - CN: 在当前作用域中声明符号 `workspace_size_`。
+- **L68** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L69** <code>  /// Indicates whether scalars are host or device pointers</code>
+  - EN: Comment that documents intent or context: "Indicates whether scalars are host or device pointers".
+  - CN: 用于说明意图或上下文的注释："Indicates whether scalars are host or device pointers"。
+- **L70** <code>  ScalarPointerMode scalar_pointer_mode_;</code>
+  - EN: Declares the symbol `scalar_pointer_mode_` in the current scope.
+  - CN: 在当前作用域中声明符号 `scalar_pointer_mode_`。
+- **L71** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L72** <code>  /// Pointer to the most recently executed operation</code>
+  - EN: Comment that documents intent or context: "Pointer to the most recently executed operation".
+  - CN: 用于说明意图或上下文的注释："Pointer to the most recently executed operation"。
+- **L73** <code>  Operation const *last_operation_;</code>
+  - EN: Declares the symbol `last_operation_` in the current scope.
+  - CN: 在当前作用域中声明符号 `last_operation_`。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>  int device_idx_;</code>
+  - EN: Declares the symbol `device_idx_` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_idx_`。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>  /// Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L80** <code>  Handle(cudaStream_t stream = nullptr, size_t workspace_size = (4&lt;&lt;20));</code>
+  - EN: Declares function or method `Handle` without defining it here.
+  - CN: 声明函数或方法 `Handle`，但不在此处给出定义。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>  /// Destructor</code>
+  - EN: Comment that documents intent or context: "Destructor".
+  - CN: 用于说明意图或上下文的注释："Destructor"。
+- **L83** <code>  ~Handle();</code>
+  - EN: Declares function or method `~Handle` without defining it here.
+  - CN: 声明函数或方法 `~Handle`，但不在此处给出定义。
+- **L84** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L85** <code>  /// Move constructor</code>
+  - EN: Comment that documents intent or context: "Move constructor".
+  - CN: 用于说明意图或上下文的注释："Move constructor"。
+- **L86** <code>  Handle(Handle &amp;&amp; handle);</code>
+  - EN: Declares function or method `Handle` without defining it here.
+  - CN: 声明函数或方法 `Handle`，但不在此处给出定义。
+- **L87** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L88** <code>  /// Move assignment operator</code>
+  - EN: Comment that documents intent or context: "Move assignment operator".
+  - CN: 用于说明意图或上下文的注释："Move assignment operator"。
+- **L89** <code>  Handle &amp;operator=(Handle &amp;&amp; handle);</code>
+  - EN: Assigns or initializes `operator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operator` 进行赋值或初始化。
+- **L90** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L91** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L92** <code>  // Persistent state accessors</code>
+  - EN: Comment that documents intent or context: "Persistent state accessors".
+  - CN: 用于说明意图或上下文的注释："Persistent state accessors"。
+- **L93** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>  /// Returns compute capability of the selected device</code>
+  - EN: Comment that documents intent or context: "Returns compute capability of the selected device".
+  - CN: 用于说明意图或上下文的注释："Returns compute capability of the selected device"。
+- **L96** <code>  int compute_capability() const;</code>
+  - EN: Declares function or method `compute_capability` without defining it here.
+  - CN: 声明函数或方法 `compute_capability`，但不在此处给出定义。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>  /// Sets the current CUDA stream</code>
+  - EN: Comment that documents intent or context: "Sets the current CUDA stream".
+  - CN: 用于说明意图或上下文的注释："Sets the current CUDA stream"。
+- **L99** <code>  void set_stream(cudaStream_t stream);</code>
+  - EN: Declares function or method `set_stream` without defining it here.
+  - CN: 声明函数或方法 `set_stream`，但不在此处给出定义。
+- **L100** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L101** <code>  /// Gets the current CUDA stream</code>
+  - EN: Comment that documents intent or context: "Gets the current CUDA stream".
+  - CN: 用于说明意图或上下文的注释："Gets the current CUDA stream"。
+- **L102** <code>  cudaStream_t get_stream() const;</code>
+  - EN: Declares function or method `get_stream` without defining it here.
+  - CN: 声明函数或方法 `get_stream`，但不在此处给出定义。
+- **L103** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L104** <code>  /// Gets the current provider</code>
+  - EN: Comment that documents intent or context: "Gets the current provider".
+  - CN: 用于说明意图或上下文的注释："Gets the current provider"。
+- **L105** <code>  Provider get_provider() const;</code>
+  - EN: Declares function or method `get_provider` without defining it here.
+  - CN: 声明函数或方法 `get_provider`，但不在此处给出定义。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code>  /// Sets the provider of operations</code>
+  - EN: Comment that documents intent or context: "Sets the provider of operations".
+  - CN: 用于说明意图或上下文的注释："Sets the provider of operations"。
+- **L108** <code>  void set_provider(Provider provider);</code>
+  - EN: Declares function or method `set_provider` without defining it here.
+  - CN: 声明函数或方法 `set_provider`，但不在此处给出定义。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>  /// Gets the device workspace size</code>
+  - EN: Comment that documents intent or context: "Gets the device workspace size".
+  - CN: 用于说明意图或上下文的注释："Gets the device workspace size"。
+- **L111** <code>  size_t get_workspace_size() const;</code>
+  - EN: Declares function or method `get_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `get_workspace_size`，但不在此处给出定义。
+- **L112** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L113** <code>  /// Gets a pointer to the device workspace allocation in Global Memory</code>
+  - EN: Comment that documents intent or context: "Gets a pointer to the device workspace allocation in Global Memory".
+  - CN: 用于说明意图或上下文的注释："Gets a pointer to the device workspace allocation in Global Memory"。
+- **L114** <code>  void *get_workspace() const;</code>
+  - EN: Declares function or method `get_workspace` without defining it here.
+  - CN: 声明函数或方法 `get_workspace`，但不在此处给出定义。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>  /// Sets the size of device workspace, invalidating calls to get_device_workspace()</code>
+  - EN: Comment that documents intent or context: "Sets the size of device workspace, invalidating calls to get_device_workspace()".
+  - CN: 用于说明意图或上下文的注释："Sets the size of device workspace, invalidating calls to get_device_workspace()"。
+- **L117** <code>  void set_workspace_size(size_t bytes);</code>
+  - EN: Declares function or method `set_workspace_size` without defining it here.
+  - CN: 声明函数或方法 `set_workspace_size`，但不在此处给出定义。
+- **L118** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L119** <code>  /// Gets the scalar pointer mode</code>
+  - EN: Comment that documents intent or context: "Gets the scalar pointer mode".
+  - CN: 用于说明意图或上下文的注释："Gets the scalar pointer mode"。
+- **L120** <code>  ScalarPointerMode get_scalar_pointer_mode() const;</code>
+  - EN: Declares function or method `get_scalar_pointer_mode` without defining it here.
+  - CN: 声明函数或方法 `get_scalar_pointer_mode`，但不在此处给出定义。
+- **L121** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>  /// Sets the scalar pointer mode</code>
+  - EN: Comment that documents intent or context: "Sets the scalar pointer mode".
+  - CN: 用于说明意图或上下文的注释："Sets the scalar pointer mode"。
+- **L123** <code>  void set_scalar_pointer_mode(ScalarPointerMode mode);</code>
+  - EN: Declares function or method `set_scalar_pointer_mode` without defining it here.
+  - CN: 声明函数或方法 `set_scalar_pointer_mode`，但不在此处给出定义。
+- **L124** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L125** <code>  /// Gets the most recently executed operation</code>
+  - EN: Comment that documents intent or context: "Gets the most recently executed operation".
+  - CN: 用于说明意图或上下文的注释："Gets the most recently executed operation"。
+- **L126** <code>  Operation const *get_last_operation() const;</code>
+  - EN: Declares function or method `get_last_operation` without defining it here.
+  - CN: 声明函数或方法 `get_last_operation`，但不在此处给出定义。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L129** <code>  // Computations</code>
+  - EN: Comment that documents intent or context: "Computations".
+  - CN: 用于说明意图或上下文的注释："Computations"。
+- **L130** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>  /// Executes a GEMM computation: D &lt;= alpha * A*B + beta * C</code>
+  - EN: Comment that documents intent or context: "Executes a GEMM computation: D <= alpha * A*B + beta * C".
+  - CN: 用于说明意图或上下文的注释："Executes a GEMM computation: D <= alpha * A*B + beta * C"。
+- **L133** <code>  Status gemm(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm`.
+  - CN: 开始或继续与 `gemm` 相关的签名/调用语法。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>    int M,                                    /// GEMM M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L136** <code>    int N,                                    /// GEMM N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L137** <code>    int K,                                    /// GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>    NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>    NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L142** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L143** <code>    void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>    NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L146** <code>    LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L147** <code>    ComplexTransform transform_A,             /// Complex transformation applied to A matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>    void const * ptr_A,                       /// Pointer to A matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L150** <code>    int64_t lda,                              /// Leading dimension of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>    NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L153** <code>    LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L154** <code>    ComplexTransform transform_B,             /// Complex transformation applied to B matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>    void const * ptr_B,                       /// Pointer to B matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L157** <code>    int64_t ldb,                              /// Leading dimension of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L158** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L159** <code>    void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L161** <code>    NumericTypeID element_C,                  /// Data type of C and D matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>    void const * ptr_C,                       /// Pointer to C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L164** <code>    int64_t ldc,                              /// Leading dimension of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>    void * ptr_D,                             /// Pointer to D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>    int64_t ldd                               /// Leading dimension of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L168** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L169** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L170** <code>  /// Executes a GEMM computation: D &lt;= alpha * A*B + beta * C.</code>
+  - EN: Comment that documents intent or context: "Executes a GEMM computation: D <= alpha * A*B + beta * C.".
+  - CN: 用于说明意图或上下文的注释："Executes a GEMM computation: D <= alpha * A*B + beta * C."。
+- **L171** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L172** <code>  // Supports batched-strided, batched array or split-K serial or split-K parallel.</code>
+  - EN: Comment that documents intent or context: "Supports batched-strided, batched array or split-K serial or split-K parallel.".
+  - CN: 用于说明意图或上下文的注释："Supports batched-strided, batched array or split-K serial or split-K parallel."。
+- **L173** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L174** <code>  Status gemm_universal(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_universal`.
+  - CN: 开始或继续与 `gemm_universal` 相关的签名/调用语法。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>    GemmUniversalMode mode,                   /// indicates the mode in which the kUniversal GEMM is launched</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L177** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L178** <code>    int M,                                    /// GEMM M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L179** <code>    int N,                                    /// GEMM N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L180** <code>    int K,                                    /// GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L181** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L182** <code>    int cluster_m,                            /// cluster shape M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L183** <code>    int cluster_n,                            /// cluster shape N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L184** <code>    int cluster_k,                            /// cluster shape K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L185** <code>    int cluster_m_fallback,                   /// Fallback cluster shape M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L186** <code>    int cluster_n_fallback,                   /// Fallback cluster shape N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L187** <code>    int cluster_k_fallback,                   /// Fallback cluster shape K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L188** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L190** <code>    NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L191** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L192** <code>    NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>    void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L195** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L196** <code>    NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L197** <code>    LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L198** <code>    ComplexTransform transform_A,             /// Complex transformation applied to A matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L199** <code>    void const * ptr_A,                       /// Pointer to A matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L200** <code>    int64_t lda,                              /// Leading dimension of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>    NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L203** <code>    LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L204** <code>    ComplexTransform transform_B,             /// Complex transformation applied to B matrix - ignored for real-valued matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L205** <code>    void const * ptr_B,                       /// Pointer to B matrix in Global Memory</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L206** <code>    int64_t ldb,                              /// Leading dimension of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L207** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L208** <code>    void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L209** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L210** <code>    NumericTypeID element_C,                  /// Data type of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L211** <code>    LayoutTypeID layout_C,                    /// Layout of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>    void const * ptr_C,                       /// Pointer to C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L213** <code>    int64_t ldc,                              /// Leading dimension of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L214** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L215** <code>    NumericTypeID element_D,                  /// Data type of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L216** <code>    LayoutTypeID layout_D,                    /// Layout of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L217** <code>    void * ptr_D,                             /// Pointer to D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L218** <code>    int64_t ldd,                              /// Leading dimension of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L219** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L220** <code>    int batch_count = 1,                      /// Batch count or number of split-K slices</code>
+  - EN: Assigns or initializes `batch_count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_count` 进行赋值或初始化。
+- **L221** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L222** <code>    int64_t batch_stride_A = 0,               /// Batch stride of A operand</code>
+  - EN: Assigns or initializes `batch_stride_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_A` 进行赋值或初始化。
+- **L223** <code>    int64_t batch_stride_B = 0,               /// Batch stride of B operand</code>
+  - EN: Assigns or initializes `batch_stride_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_B` 进行赋值或初始化。
+- **L224** <code>    int64_t batch_stride_C = 0,               /// Batch stride of C operand</code>
+  - EN: Assigns or initializes `batch_stride_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_C` 进行赋值或初始化。
+- **L225** <code>    int64_t batch_stride_D = 0                /// Batch stride of D operand</code>
+  - EN: Assigns or initializes `batch_stride_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_D` 进行赋值或初始化。
+- **L226** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L227** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L228** <code>  /// Planar complex GEMM</code>
+  - EN: Comment that documents intent or context: "Planar complex GEMM".
+  - CN: 用于说明意图或上下文的注释："Planar complex GEMM"。
+- **L229** <code>  ///</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L230** <code>  /// Note, all data types are the real-valued base types used by the planar-complex GEMM kernel.</code>
+  - EN: Comment that documents intent or context: "Note, all data types are the real-valued base types used by the planar-complex GEMM kernel.".
+  - CN: 用于说明意图或上下文的注释："Note, all data types are the real-valued base types used by the planar-complex GEMM kernel."。
+- **L231** <code>  ///</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L232** <code>  Status gemm_planar_complex(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_planar_complex`.
+  - CN: 开始或继续与 `gemm_planar_complex` 相关的签名/调用语法。
+- **L233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L234** <code>    int M,                                    /// GEMM M dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L235** <code>    int N,                                    /// GEMM N dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L236** <code>    int K,                                    /// GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L237** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L238** <code>    NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L239** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L240** <code>    NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L241** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L242** <code>    void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>    NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L245** <code>    LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L246** <code>    ComplexTransform transform_A,             /// Complex transformation applied to A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L247** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L248** <code>    void const * ptr_A_real,                  /// Pointer to real part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L249** <code>    void const * ptr_A_imag,                  /// Pointer to imaginary part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L250** <code>    int64_t lda_real,                         /// Leading dimension of real part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L251** <code>    int64_t lda_imag,                         /// Leading dimension of imaginary part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>    NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>    LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L255** <code>    ComplexTransform transform_B,             /// Complex transformation applied to B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L256** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L257** <code>    void const * ptr_B_real,                  /// Pointer to real part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L258** <code>    void const * ptr_B_imag,                  /// Pointer to imaginary part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L259** <code>    int64_t ldb_real,                         /// Leading dimension of real part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L260** <code>    int64_t ldb_imag,                         /// Leading dimension of imaginary part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L261** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L262** <code>    void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>    NumericTypeID element_C,                  /// Data type of C and D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L265** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L266** <code>    void const * ptr_C_real,                  /// Pointer to real part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L267** <code>    void const * ptr_C_imag,                  /// Pointer to imaginary part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L268** <code>    int64_t ldc_real,                         /// Leading dimension of real part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L269** <code>    int64_t ldc_imag,                         /// Leading dimension of imaginary part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>    void * ptr_D_real,                        /// Pointer to real part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L272** <code>    void * ptr_D_imag,                        /// Pointer to imaginary part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L273** <code>    int64_t ldd_real,                         /// Leading dimension of real part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L274** <code>    int64_t ldd_imag,                         /// Leading dimension of imaginary part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>    int batch_count = 1,                      /// Number of batched GEMMs to execute</code>
+  - EN: Assigns or initializes `batch_count` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_count` 进行赋值或初始化。
+- **L277** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L278** <code>    int64_t batch_stride_A_real = 0,</code>
+  - EN: Assigns or initializes `batch_stride_A_real` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_A_real` 进行赋值或初始化。
+- **L279** <code>    int64_t batch_stride_A_imag = 0,</code>
+  - EN: Assigns or initializes `batch_stride_A_imag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_A_imag` 进行赋值或初始化。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>    int64_t batch_stride_B_real = 0,</code>
+  - EN: Assigns or initializes `batch_stride_B_real` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_B_real` 进行赋值或初始化。
+- **L282** <code>    int64_t batch_stride_B_imag = 0,</code>
+  - EN: Assigns or initializes `batch_stride_B_imag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_B_imag` 进行赋值或初始化。
+- **L283** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L284** <code>    int64_t batch_stride_C_real = 0,</code>
+  - EN: Assigns or initializes `batch_stride_C_real` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_C_real` 进行赋值或初始化。
+- **L285** <code>    int64_t batch_stride_C_imag = 0,</code>
+  - EN: Assigns or initializes `batch_stride_C_imag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_C_imag` 进行赋值或初始化。
+- **L286** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L287** <code>    int64_t batch_stride_D_real = 0,</code>
+  - EN: Assigns or initializes `batch_stride_D_real` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_D_real` 进行赋值或初始化。
+- **L288** <code>    int64_t batch_stride_D_imag = 0</code>
+  - EN: Assigns or initializes `batch_stride_D_imag` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `batch_stride_D_imag` 进行赋值或初始化。
+- **L289** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L290** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L291** <code>  /// Planar complex GEMM loading pointers from arrays in global memory</code>
+  - EN: Comment that documents intent or context: "Planar complex GEMM loading pointers from arrays in global memory".
+  - CN: 用于说明意图或上下文的注释："Planar complex GEMM loading pointers from arrays in global memory"。
+- **L292** <code>  Status gemm_planar_complex_array(</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_planar_complex_array`.
+  - CN: 开始或继续与 `gemm_planar_complex_array` 相关的签名/调用语法。
+- **L293** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L294** <code>    int expected_M,                           /// Expected GEMM M dimension (used for sizing CUDA grid)</code>
+  - EN: Begins or continues the signature/call syntax involving `dimension`.
+  - CN: 开始或继续与 `dimension` 相关的签名/调用语法。
+- **L295** <code>    int expected_N,                           /// Expected GEMM N dimension (used for sizing CUDA grid)</code>
+  - EN: Begins or continues the signature/call syntax involving `dimension`.
+  - CN: 开始或继续与 `dimension` 相关的签名/调用语法。
+- **L296** <code>    int expected_K,                           /// Expected GEMM K dimension</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L297** <code>    int batch_count,                          /// Number of independent GEMM computations to execute</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L298** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L299** <code>    int const *M,                             /// Array containing the GEMM M dimension for each batch index</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L300** <code>    int const *N,                             /// Array containing the GEMM N dimension for each batch index</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L301** <code>    int const *K,                             /// Array containing the GEMM K dimension for each batch index</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L302** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L303** <code>    NumericTypeID element_compute,            /// Data type of internal accumulation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>    NumericTypeID element_scalar,             /// Data type of alpha/beta scalars</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L306** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L307** <code>    void const *alpha,                        /// Pointer to alpha scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L308** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L309** <code>    NumericTypeID element_A,                  /// Data type of A matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L310** <code>    LayoutTypeID layout_A,                    /// Layout of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L311** <code>    ComplexTransform transform_A,             /// Complex transformation applied to A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L312** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L313** <code>    void const * const * ptr_A_real,          /// Pointer to array containing pointers to real part of A matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L314** <code>    void const * const * ptr_A_imag,          /// Pointer to array containing pointers to imaginary part of A matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L315** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L316** <code>    int64_t lda_real,                         /// Leading dimension of real part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L317** <code>    int64_t lda_imag,                         /// Leading dimension of imaginary part of A matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L318** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L319** <code>    NumericTypeID element_B,                  /// Data type of B matrix elements</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L320** <code>    LayoutTypeID layout_B,                    /// Layout of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L321** <code>    ComplexTransform transform_B,             /// Complex transformation applied to B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>    void const * const * ptr_B_real,          /// Pointer to array containing pointers to real part of B matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L324** <code>    void const * const * ptr_B_imag,          /// Pointer to array containing pointers to imaginary part of B matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>    int64_t ldb_real,                         /// Leading dimension of real part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L327** <code>    int64_t ldb_imag,                         /// Leading dimension of imaginary part of B matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L328** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L329** <code>    void const * beta,                        /// Pointer to beta scalar</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L331** <code>    NumericTypeID element_C,                  /// Data type of C and D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L332** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L333** <code>    void const * const * ptr_C_real,          /// Pointer to array containing pointers to real part of C matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L334** <code>    void const * const * ptr_C_imag,          /// Pointer to array containing pointers to imaginary part of C matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L335** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L336** <code>    int64_t ldc_real,                         /// Leading dimension of real part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L337** <code>    int64_t ldc_imag,                         /// Leading dimension of imaginary part of C matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>    void * const * ptr_D_real,                /// Pointer to array containing pointers to real part of D matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L340** <code>    void * const * ptr_D_imag,                /// Pointer to array containing pointers to imaginary part of D matrices</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L341** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L342** <code>    int64_t ldd_real,                         /// Leading dimension of real part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L343** <code>    int64_t ldd_imag                          /// Leading dimension of imaginary part of D matrix</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L344** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L345** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L346** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L347** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L348** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L349** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L350** <code>/// Unique pointer storing the handle</code>
+  - EN: Comment that documents intent or context: "Unique pointer storing the handle".
+  - CN: 用于说明意图或上下文的注释："Unique pointer storing the handle"。
+- **L351** <code>using HandlePtr = std::unique_ptr&lt;Handle&gt;;</code>
+  - EN: Introduces the type or namespace alias `HandlePtr`.
+  - CN: 引入类型或命名空间别名 `HandlePtr`。
+- **L352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L353** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L354** <code>/// Finds conv2d operation instances with Conv2d::ElementC = Reduction::ElementWorkspace</code>
+  - EN: Comment that documents intent or context: "Finds conv2d operation instances with Conv2d::ElementC = Reduction::ElementWorkspace".
+  - CN: 用于说明意图或上下文的注释："Finds conv2d operation instances with Conv2d::ElementC = Reduction::ElementWorkspace"。
+- **L355** <code>Operation const* find_conv_operation_for_parallel_reduction(Operation const *operation);</code>
+  - EN: Declares function or method `find_conv_operation_for_parallel_reduction` without defining it here.
+  - CN: 声明函数或方法 `find_conv_operation_for_parallel_reduction`，但不在此处给出定义。
+- **L356** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L357** <code>/// Finds gemm operation instances with ElementC = Reduction::ElementWorkspace</code>
+  - EN: Comment that documents intent or context: "Finds gemm operation instances with ElementC = Reduction::ElementWorkspace".
+  - CN: 用于说明意图或上下文的注释："Finds gemm operation instances with ElementC = Reduction::ElementWorkspace"。
+- **L358** <code>Operation const* find_gemm_operation_for_parallel_reduction(Operation const *operation);</code>
+  - EN: Declares function or method `find_gemm_operation_for_parallel_reduction` without defining it here.
+  - CN: 声明函数或方法 `find_gemm_operation_for_parallel_reduction`，但不在此处给出定义。
+- **L359** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L360** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L361** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L362** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L365** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>memory</code> — memory-management helpers / 内存管理辅助工具
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据

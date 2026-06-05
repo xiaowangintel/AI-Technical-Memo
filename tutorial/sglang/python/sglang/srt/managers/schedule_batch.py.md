@@ -1,0 +1,3452 @@
+# schedule_batch.py — Code Analysis / 代码分析
+
+## Source / 来源
+- **File**: `python/sglang/srt/managers/schedule_batch.py`
+- **Repository**: sgl-project/sglang
+- **Purpose**: This module implements schedule batch logic for runtime managers and coordination components. It exposes the classes, functions, and helpers that keep this part of the serving stack working. / 该模块实现与 调度 批处理 相关的逻辑，并服务于 运行时管理与协调组件。它提供支撑这一服务链路所需的类、函数与辅助流程。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-1: Import runtime dependencies / 导入运行时依赖
+```python
+from __future__ import annotations
+```
+**EN:** This block gathers the standard-library, third-party, and local runtime modules that the rest of the file relies on.
+**CN:** 该代码块汇集标准库、第三方库以及本地运行时模块，供后续实现复用。
+
+### Lines 3-32: Provide supporting module logic / 提供辅助模块逻辑
+```python
+from sglang.srt.dllm.config import DllmConfig
+from sglang.srt.model_executor.forward_batch_info import ForwardBatch
+from sglang.srt.utils.common import ceil_align, is_pin_memory_available
+
+# Copyright 2023-2024 SGLang Team
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+"""
+Store information about requests and batches.
+
+The following is the flow of data structures for a batch:
+
+ScheduleBatch -> ForwardBatch
+
+- ScheduleBatch is managed by `scheduler.py::Scheduler`.
+  It contains high-level scheduling data. Most of the data is on the CPU.
+- ForwardBatch is managed by `model_runner.py::ModelRunner`.
+  It contains low-level tensor data. Most of the data consists of GPU tensors.
+  It is constructed directly from a ScheduleBatch by `ForwardBatch.init_new`.
+"""
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 34-43: Import runtime dependencies / 导入运行时依赖
+```python
+import copy
+import dataclasses
+import logging
+import re
+from concurrent.futures import Future
+from enum import Enum, auto
+from functools import lru_cache
+from http import HTTPStatus
+from itertools import chain
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
+```
+**EN:** This block gathers the standard-library, third-party, and local runtime modules that the rest of the file relies on.
+**CN:** 该代码块汇集标准库、第三方库以及本地运行时模块，供后续实现复用。
+
+### Lines 45-46: Import runtime dependencies / 导入运行时依赖
+```python
+import numpy as np
+import torch
+```
+**EN:** This block gathers the standard-library, third-party, and local runtime modules that the rest of the file relies on.
+**CN:** 该代码块汇集标准库、第三方库以及本地运行时模块，供后续实现复用。
+
+### Lines 48-92: Provide supporting module logic / 提供辅助模块逻辑
+```python
+from sglang.srt.constrained.base_grammar_backend import BaseGrammarObject
+from sglang.srt.disaggregation.base import BaseKVSender
+from sglang.srt.disaggregation.decode_schedule_batch_mixin import (
+    ScheduleBatchDisaggregationDecodeMixin,
+)
+from sglang.srt.disaggregation.utils import FAKE_BOOTSTRAP_HOST, DisaggregationMode
+from sglang.srt.distributed.parallel_state import get_tensor_model_parallel_rank
+from sglang.srt.dllm.mixin.req import ReqDllmMixin
+from sglang.srt.environ import envs
+from sglang.srt.layers.attention.fla.chunk_delta_h import CHUNK_SIZE as FLA_CHUNK_SIZE
+from sglang.srt.managers.embed_types import PositionalEmbeds
+from sglang.srt.mem_cache.allocator import BaseTokenToKVPoolAllocator
+from sglang.srt.mem_cache.base_prefix_cache import (
+    BasePrefixCache,
+    MatchPrefixParams,
+    zero_match_result,
+)
+from sglang.srt.mem_cache.common import (
+    alloc_for_decode,
+    alloc_for_extend,
+    evict_from_tree_cache,
+    release_kv_cache,
+)
+from sglang.srt.mem_cache.memory_pool import ReqToTokenPool
+from sglang.srt.mem_cache.radix_cache import RadixKey
+from sglang.srt.mem_cache.swa_memory_pool import SWATokenToKVPoolAllocator
+from sglang.srt.model_executor.forward_batch_info import (
+    CaptureHiddenMode,
+    ForwardBatch,
+    ForwardMode,
+)
+from sglang.srt.observability.metrics_collector import (
+    DPCooperationInfo,
+    SchedulerMetricsCollector,
+)
+from sglang.srt.observability.req_time_stats import (
+    APIServerReqTimeStats,
+    DPControllerReqTimeStats,
+    SchedulerReqTimeStats,
+)
+from sglang.srt.sampling.sampling_batch_info import SamplingBatchInfo
+from sglang.srt.sampling.sampling_params import SamplingParams
+from sglang.srt.server_args import ServerArgs, get_global_server_args
+from sglang.srt.utils import flatten_nested_list
+from sglang.srt.utils.cuda_ipc_transport_utils import CudaIpcTensorTransportProxy
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 94-102: Provide supporting module logic / 提供辅助模块逻辑
+```python
+if TYPE_CHECKING:
+    from typing import Any, Dict
+
+    from sglang.srt.configs.model_config import ModelConfig
+    from sglang.srt.managers.hisparse_coordinator import HiSparseCoordinator
+    from sglang.srt.managers.scheduler_components.metrics_reporter import PrefillStats
+    from sglang.srt.session.session_controller import Session
+    from sglang.srt.speculative.eagle_info import EagleDraftInput
+    from sglang.srt.speculative.spec_info import SpecInput, SpeculativeAlgorithm
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 104-108: Provide supporting module logic / 提供辅助模块逻辑
+```python
+INIT_INCREMENTAL_DETOKENIZATION_OFFSET = 5
+
+# Constant used as the base offset for MM (multimodal) pad values.
+# This ensures pad_values don't overlap with valid text token IDs.
+MM_PAD_SHIFT_VALUE = 1_000_000
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 110-113: Provide supporting module logic / 提供辅助模块逻辑
+```python
+logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=1)
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 114-120: Implement sanity check mm pad shift value / 实现sanity 检查 mm pad shift value
+```python
+def sanity_check_mm_pad_shift_value(vocab_size: int) -> None:
+    if vocab_size > MM_PAD_SHIFT_VALUE:
+        raise ValueError(
+            f"Model vocab_size ({vocab_size}) exceeds MM_PAD_SHIFT_VALUE ({MM_PAD_SHIFT_VALUE}). "
+            f"MM pad_values may overlap with valid token IDs. "
+            f"Please increase MM_PAD_SHIFT_VALUE in schedule_batch.py."
+        )
+```
+**EN:** This block implements the function `sanity_check_mm_pad_shift_value(vocab_size)`. It focuses on handling the schedule batch responsibilities represented by `sanity_check_mm_pad_shift_value`, providing reusable behavior for the schedule batch pipeline.
+**CN:** 该代码块实现函数 `sanity_check_mm_pad_shift_value(vocab_size)`。它围绕 `sanity_check_mm_pad_shift_value` 所承担的 调度 批处理 相关职责展开，为对应处理链路提供可复用能力。
+
+### Lines 123-125: Implement compute pad value / 实现compute pad value
+```python
+def _compute_pad_value(hash: int) -> int:
+    """Compute pad value from hash."""
+    return MM_PAD_SHIFT_VALUE + (hash % (1 << 30))
+```
+**EN:** This block implements the function `_compute_pad_value(hash)`. It focuses on Compute pad value from hash., providing reusable behavior for the schedule batch pipeline.
+**CN:** 该代码块实现函数 `_compute_pad_value(hash)`。它围绕 `_compute_pad_value` 所承担的 调度 批处理 相关职责展开，为对应处理链路提供可复用能力。
+
+### Lines 128-130: Define class BaseFinishReason / 定义类 BaseFinishReason
+```python
+class BaseFinishReason:
+    def to_json(self):
+        raise NotImplementedError()
+```
+**EN:** This block declares the class `BaseFinishReason`. It centers on coordinating schedule batch behavior, with methods such as to_json.
+**CN:** 该代码块声明类 `BaseFinishReason`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 to_json 等方法组织实现。
+
+### Lines 133-142: Define class FINISH_MATCHED_TOKEN / 定义类 FINISH_MATCHED_TOKEN
+```python
+class FINISH_MATCHED_TOKEN(BaseFinishReason):
+    def __init__(self, matched: Union[int, List[int]]):
+        super().__init__()
+        self.matched = matched
+
+    def to_json(self):
+        return {
+            "type": "stop",  # to match OpenAI API's return value
+            "matched": self.matched,
+        }
+```
+**EN:** This block declares the class `FINISH_MATCHED_TOKEN`. It centers on coordinating schedule batch behavior, with methods such as __init__, to_json.
+**CN:** 该代码块声明类 `FINISH_MATCHED_TOKEN`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 __init__, to_json 等方法组织实现。
+
+### Lines 145-154: Define class FINISH_MATCHED_STR / 定义类 FINISH_MATCHED_STR
+```python
+class FINISH_MATCHED_STR(BaseFinishReason):
+    def __init__(self, matched: str):
+        super().__init__()
+        self.matched = matched
+
+    def to_json(self):
+        return {
+            "type": "stop",  # to match OpenAI API's return value
+            "matched": self.matched,
+        }
+```
+**EN:** This block declares the class `FINISH_MATCHED_STR`. It centers on coordinating schedule batch behavior, with methods such as __init__, to_json.
+**CN:** 该代码块声明类 `FINISH_MATCHED_STR`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 __init__, to_json 等方法组织实现。
+
+### Lines 157-166: Define class FINISHED_MATCHED_REGEX / 定义类 FINISHED_MATCHED_REGEX
+```python
+class FINISHED_MATCHED_REGEX(BaseFinishReason):
+    def __init__(self, matched: str):
+        super().__init__()
+        self.matched = matched
+
+    def to_json(self):
+        return {
+            "type": "stop",  # to match OpenAI API's return value
+            "matched": self.matched,
+        }
+```
+**EN:** This block declares the class `FINISHED_MATCHED_REGEX`. It centers on coordinating schedule batch behavior, with methods such as __init__, to_json.
+**CN:** 该代码块声明类 `FINISHED_MATCHED_REGEX`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 __init__, to_json 等方法组织实现。
+
+### Lines 169-178: Define class FINISH_LENGTH / 定义类 FINISH_LENGTH
+```python
+class FINISH_LENGTH(BaseFinishReason):
+    def __init__(self, length: int):
+        super().__init__()
+        self.length = length
+
+    def to_json(self):
+        return {
+            "type": "length",  # to match OpenAI API's return value
+            "length": self.length,
+        }
+```
+**EN:** This block declares the class `FINISH_LENGTH`. It centers on coordinating schedule batch behavior, with methods such as __init__, to_json.
+**CN:** 该代码块声明类 `FINISH_LENGTH`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 __init__, to_json 等方法组织实现。
+
+### Lines 181-194: Define class FINISH_ABORT / 定义类 FINISH_ABORT
+```python
+class FINISH_ABORT(BaseFinishReason):
+    def __init__(self, message=None, status_code=None, err_type=None):
+        super().__init__()
+        self.message = message or "Aborted"
+        self.status_code = status_code
+        self.err_type = err_type
+
+    def to_json(self):
+        return {
+            "type": "abort",
+            "message": self.message,
+            "status_code": self.status_code,
+            "err_type": self.err_type,
+        }
+```
+**EN:** This block declares the class `FINISH_ABORT`. It centers on coordinating schedule batch behavior, with methods such as __init__, to_json.
+**CN:** 该代码块声明类 `FINISH_ABORT`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 __init__, to_json 等方法组织实现。
+
+### Lines 197-213: Define class Modality / 定义类 Modality
+```python
+class Modality(Enum):
+    IMAGE = auto()
+    VIDEO = auto()
+    AUDIO = auto()
+
+    @staticmethod
+    def from_str(modality_str: str):
+        try:
+            return Modality[modality_str.upper()]
+        except KeyError:
+            raise ValueError(
+                f"Invalid modality string: {modality_str}. Valid modalities are: {[m.name for m in Modality]}"
+            )
+
+    @staticmethod
+    def all():
+        return [Modality.IMAGE, Modality.VIDEO, Modality.AUDIO]
+```
+**EN:** This block declares the class `Modality`. It centers on coordinating schedule batch behavior, with methods such as from_str, all.
+**CN:** 该代码块声明类 `Modality`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 from_str, all 等方法组织实现。
+
+### Lines 216-219: Define class MultimodalInputFormat / 定义类 MultimodalInputFormat
+```python
+class MultimodalInputFormat(Enum):
+    NORMAL = auto()
+    PROCESSOR_OUTPUT = auto()
+    PRECOMPUTED_EMBEDDING = auto()
+```
+**EN:** This block declares the class `MultimodalInputFormat`. It centers on coordinating schedule batch behavior.
+**CN:** 该代码块声明类 `MultimodalInputFormat`。它负责承载与 调度 批处理 相关的核心状态与行为。
+
+### Lines 220-231: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+
+@dataclasses.dataclass
+class MultimodalDataItem:
+    """
+    One MultimodalDataItem represents a single multimodal input (one image, one video, or one audio).
+    For example, if there are 3 images and 1 audio, there will be 4 MultimodalDataItems.
+
+    Each item has its own hash and pad_value, enabling per-image RadixAttention caching.
+
+    We put the common fields first and the model-specific fields in model_specific_data.
+    """
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 233-236: Provide supporting module logic / 提供辅助模块逻辑
+```python
+    modality: Modality
+    hash: int = None
+    pad_value: int = None
+    offsets: Optional[list] = None
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 238-247: Provide supporting module logic / 提供辅助模块逻辑
+```python
+    format: MultimodalInputFormat = MultimodalInputFormat.NORMAL
+
+    # the raw features returned by processor, e.g. pixel_values or audio_features
+    feature: Union[torch.Tensor, np.ndarray] = None
+    # the precomputed embeddings, passed as final encoder embeddings
+    # One and only one of the feature and precomputed_embeddings will be empty
+    precomputed_embeddings: Optional[Union[torch.Tensor, np.ndarray]] = None
+
+    # Model-specific data stored in a dictionary
+    model_specific_data: dict[str, Any] = dataclasses.field(default_factory=dict)
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 249-258: Implement getattr / 实现getattr
+```python
+    def __getattr__(self, name: str):
+        if (
+            "model_specific_data" in self.__dict__
+            and name in self.__dict__["model_specific_data"]
+        ):
+            return self.__dict__["model_specific_data"][name]
+        else:
+            raise AttributeError(
+                f"'{self.__class__.__name__}' object has no attribute '{name}'"
+            )
+```
+**EN:** This block implements the method `__getattr__(name)` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `__getattr__`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `__getattr__(name)`。它围绕 `__getattr__` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 260-264: Implement setitem / 实现setitem
+```python
+    def __setitem__(self, key: str, value: Any):
+        if key in self.__dict__:
+            self.__dict__[key] = value
+        else:
+            self.model_specific_data[key] = value
+```
+**EN:** This block implements the method `__setitem__(key, value)` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `__setitem__`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `__setitem__(key, value)`。它围绕 `__setitem__` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 266-267: Implement set / 实现set
+```python
+    def set(self, key: str, value: Any):
+        self.__setitem__(key, value)
+```
+**EN:** This block implements the method `set(key, value)` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `set`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `set(key, value)`。它围绕 `set` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 268-269: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @staticmethod
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 270-273: Implement is empty list / 实现is empty list
+```python
+    def is_empty_list(l):
+        if l is None:
+            return True
+        return len([item for item in flatten_nested_list(l) if item is not None]) == 0
+```
+**EN:** This block implements the method `is_empty_list(l)` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_empty_list`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_empty_list(l)`。它围绕 `is_empty_list` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 275-297: Implement set pad value / 实现set pad value
+```python
+    def set_pad_value(self):
+        """
+        Set the pad value after first hashing the data
+        """
+        if self.pad_value is not None:
+            return
+
+        from sglang.srt.managers.mm_utils import hash_feature
+
+        if envs.SGLANG_MM_SKIP_COMPUTE_HASH.get():
+            import uuid
+
+            self.hash = uuid.uuid4().int
+            self.pad_value = _compute_pad_value(self.hash)
+            return
+        if self.hash is None:
+            if self.feature is not None:
+                hashed_feature = self.feature
+            else:
+                hashed_feature = self.precomputed_embeddings
+            self.hash = hash_feature(hashed_feature)
+        assert self.hash is not None
+        self.pad_value = _compute_pad_value(self.hash)
+```
+**EN:** This block implements the method `set_pad_value()` on `MultimodalDataItem`. It focuses on Set the pad value after first hashing the data, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `set_pad_value()`。它围绕 `set_pad_value` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 299-300: Implement is modality / 实现is modality
+```python
+    def is_modality(self, modality: Modality) -> bool:
+        return self.modality == modality
+```
+**EN:** This block implements the method `is_modality(modality)` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_modality`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_modality(modality)`。它围绕 `is_modality` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 302-303: Implement is audio / 实现is audio
+```python
+    def is_audio(self):
+        return self.modality == Modality.AUDIO
+```
+**EN:** This block implements the method `is_audio()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_audio`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_audio()`。它围绕 `is_audio` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 305-306: Implement is image / 实现is 图像
+```python
+    def is_image(self):
+        return self.modality == Modality.IMAGE
+```
+**EN:** This block implements the method `is_image()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_image`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_image()`。它围绕 `is_image` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 308-309: Implement is video / 实现is video
+```python
+    def is_video(self):
+        return self.modality == Modality.VIDEO
+```
+**EN:** This block implements the method `is_video()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_video`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_video()`。它围绕 `is_video` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 311-312: Implement is valid / 实现is valid
+```python
+    def is_valid(self) -> bool:
+        return self.is_image() or self.is_video() or self.is_audio()
+```
+**EN:** This block implements the method `is_valid()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_valid`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_valid()`。它围绕 `is_valid` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 314-315: Implement validate / 实现validate
+```python
+    def validate(self):
+        ...
+```
+**EN:** This block implements the method `validate()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `validate`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `validate()`。它围绕 `validate` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 316-317: Import runtime dependencies / 导入运行时依赖
+```python
+        # TODO
+```
+**EN:** This block gathers the standard-library, third-party, and local runtime modules that the rest of the file relies on.
+**CN:** 该代码块汇集标准库、第三方库以及本地运行时模块，供后续实现复用。
+
+### Lines 318-319: Implement is precomputed embedding / 实现is precomputed 嵌入
+```python
+    def is_precomputed_embedding(self):
+        return self.format == MultimodalInputFormat.PRECOMPUTED_EMBEDDING
+```
+**EN:** This block implements the method `is_precomputed_embedding()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `is_precomputed_embedding`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `is_precomputed_embedding()`。它围绕 `is_precomputed_embedding` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 320-321: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @staticmethod
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 322-329: Implement from dict / 实现from dict
+```python
+    def from_dict(obj: dict):
+        kwargs = dict(obj)
+        modality = kwargs.pop("modality")
+        if isinstance(modality, str):
+            modality = Modality[modality]
+        ret = MultimodalDataItem(modality=modality, **kwargs)
+        ret.validate()
+        return ret
+```
+**EN:** This block implements the method `from_dict(obj)` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `from_dict`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `from_dict(obj)`。它围绕 `from_dict` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 331-351: Implement reconstruct / 实现reconstruct
+```python
+    def reconstruct(self):
+        if not isinstance(self.feature, CudaIpcTensorTransportProxy):
+            return
+
+        reconstruct_device = torch.cuda.current_device()
+        if isinstance(self.feature, CudaIpcTensorTransportProxy):
+            self.feature = self.feature.reconstruct_on_target_device(reconstruct_device)
+        if isinstance(self.precomputed_embeddings, CudaIpcTensorTransportProxy):
+            self.precomputed_embeddings = (
+                self.precomputed_embeddings.reconstruct_on_target_device(
+                    reconstruct_device
+                )
+            )
+        for extra_key in self.model_specific_data:
+            if isinstance(
+                self.model_specific_data[extra_key], CudaIpcTensorTransportProxy
+            ):
+                extra_data = self.model_specific_data[
+                    extra_key
+                ].reconstruct_on_target_device(reconstruct_device)
+                self.model_specific_data[extra_key] = extra_data
+```
+**EN:** This block implements the method `reconstruct()` on `MultimodalDataItem`. It focuses on handling the schedule batch responsibilities represented by `reconstruct`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalDataItem` 上的方法 `reconstruct()`。它围绕 `reconstruct` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 352-354: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+
+@dataclasses.dataclass
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 355-412: Define class MultimodalProcessorOutput / 定义类 MultimodalProcessorOutput
+```python
+class MultimodalProcessorOutput:
+    """Raw output from multimodal processors, before pad/hash computation.
+
+    This is the typed replacement for the dict previously returned by
+    ``BaseMultimodalProcessor.process_mm_data_async``.  Unlike
+    ``MultimodalInputs``, items here do NOT carry pad_value or hash yet.
+    """
+
+    mm_items: List[MultimodalDataItem]
+    input_ids: Optional[List[int]] = None
+
+    # image
+    im_token_id: Optional[int] = None
+    im_start_id: Optional[int] = None
+    im_end_id: Optional[int] = None
+    slice_start_id: Optional[int] = None
+    slice_end_id: Optional[int] = None
+
+    # video
+    video_token_id: Optional[int] = None
+
+    # audio
+    audio_token_id: Optional[int] = None
+    audio_start_id: Optional[int] = None
+    audio_end_id: Optional[int] = None
+
+    # QWen2-VL related
+    mrope_positions: Optional[torch.Tensor] = None
+    mrope_position_delta: Optional[torch.Tensor] = None
+
+    # Moss-VL related
+    vision_position_ids: Optional[torch.Tensor] = None
+    media_nums_per_sample: Optional[List[int]] = None
+    visible_frame_counts: Optional[torch.Tensor] = None
+
+    # for transformers-compatibility
+    token_type_ids: Optional[torch.Tensor] = None
+
+    @staticmethod
+    def from_dict(d: dict) -> "MultimodalProcessorOutput":
+        return MultimodalProcessorOutput(
+            mm_items=d["mm_items"],
+            input_ids=d.get("input_ids"),
+            im_token_id=d.get("im_token_id"),
+            im_start_id=d.get("im_start_id"),
+            im_end_id=d.get("im_end_id"),
+            slice_start_id=d.get("slice_start_id"),
+            slice_end_id=d.get("slice_end_id"),
+            video_token_id=d.get("video_token_id"),
+            audio_token_id=d.get("audio_token_id"),
+            audio_start_id=d.get("audio_start_id"),
+            audio_end_id=d.get("audio_end_id"),
+            mrope_positions=d.get("mrope_positions"),
+            mrope_position_delta=d.get("mrope_position_delta"),
+            vision_position_ids=d.get("vision_position_ids"),
+            media_nums_per_sample=d.get("media_nums_per_sample"),
+            visible_frame_counts=d.get("visible_frame_counts"),
+        )
+```
+**EN:** This block declares the class `MultimodalProcessorOutput`. It centers on Raw output from multimodal processors, before pad/hash computation., with methods such as from_dict.
+**CN:** 该代码块声明类 `MultimodalProcessorOutput`。它负责承载与 调度 批处理 相关的核心状态与行为，并通过 from_dict 等方法组织实现。
+
+### Lines 413-447: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+
+@dataclasses.dataclass
+class MultimodalInputs:
+    """The multimodal data related inputs."""
+
+    # items of data
+    mm_items: List[MultimodalDataItem]
+    image_pad_len: Optional[list] = None
+    num_image_tokens: Optional[int] = None
+
+    # image
+    im_token_id: Optional[int] = None
+    im_start_id: Optional[int] = None
+    im_end_id: Optional[int] = None
+    slice_start_id: Optional[int] = None
+    slice_end_id: Optional[int] = None
+
+    # video
+    video_token_id: Optional[int] = None
+
+    # audio
+    audio_token_id: Optional[int] = None
+    audio_start_id: Optional[int] = None
+    audio_end_id: Optional[int] = None
+
+    # QWen2-VL related
+    mrope_positions: Optional[torch.Tensor] = None
+    mrope_position_delta: Optional[torch.Tensor] = None
+    mrope_position_delta_repeated_cache: Optional[torch.Tensor] = None
+
+    # Moss-VL related
+    vision_position_ids: Optional[torch.Tensor] = None
+    media_nums_per_sample: Optional[List[int]] = None
+    visible_frame_counts: Optional[torch.Tensor] = None
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 449-452: Implement release features / 实现release features
+```python
+    def release_features(self):
+        """Release feature tensors to free GPU memory."""
+        for item in self.mm_items:
+            item.feature = None
+```
+**EN:** This block implements the method `release_features()` on `MultimodalInputs`. It focuses on Release feature tensors to free GPU memory., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `release_features()`。它围绕 `release_features` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 453-454: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @staticmethod
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 455-490: Implement from processor output / 实现from 处理器 output
+```python
+    def from_processor_output(obj: "MultimodalProcessorOutput"):
+        mm_items = obj.mm_items
+        for mm_item in mm_items:
+            mm_item.reconstruct()
+
+        ret = MultimodalInputs(
+            mm_items=mm_items,
+        )
+
+        assert isinstance(ret.mm_items, list)
+        ret.mm_items = [item for item in ret.mm_items if item.is_valid()]
+
+        if envs.SGLANG_MM_BUFFER_SIZE_MB.get() > 0:
+            # Multi-modal feature hashing optimization:
+            # When SGLANG_MM_BUFFER_SIZE_MB > 0, we temporarily move feature tensors to GPU
+            # for faster hash computation, while avoiding OOM issues.
+            from sglang.srt.managers.mm_utils import (
+                init_feature_buffer,
+                is_feature_buffer_initialized,
+                reset_buffer_offset,
+                try_add_to_buffer,
+            )
+
+            device = torch.cuda.current_device() if torch.cuda.is_available() else "cpu"
+            if not is_feature_buffer_initialized():
+                init_feature_buffer(device)
+            reset_buffer_offset()
+            for item in ret.mm_items:
+                if item.feature is not None:
+                    if isinstance(item.feature, torch.Tensor):
+                        item.feature = try_add_to_buffer(item.feature)
+
+        for item in ret.mm_items:
+            item.set_pad_value()
+
+        if envs.SGLANG_MM_BUFFER_SIZE_MB.get() > 0:
+```
+**EN:** This block implements the method `from_processor_output(obj)` on `MultimodalInputs`. It focuses on handling the schedule batch responsibilities represented by `from_processor_output`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `from_processor_output(obj)`。它围绕 `from_processor_output` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 491-516: Continue from processor output / 继续说明from 处理器 output
+```python
+            for item in ret.mm_items:
+                if item.feature is not None:
+                    item.feature = item.feature.to("cpu", non_blocking=True)
+
+        optional_args = [
+            "mrope_positions",
+            "mrope_position_delta",
+            "im_token_id",
+            "im_start_id",
+            "im_end_id",
+            "video_token_id",
+            "slice_start_id",
+            "slice_end_id",
+            "audio_start_id",
+            "audio_end_id",
+            "audio_token_id",
+            "vision_position_ids",
+            "media_nums_per_sample",
+            "visible_frame_counts",
+        ]
+        for arg in optional_args:
+            val = getattr(obj, arg, None)
+            if val is not None:
+                setattr(ret, arg, val)
+
+        return ret
+```
+**EN:** This block implements the method `from_processor_output(obj)` on `MultimodalInputs`. It focuses on handling the schedule batch responsibilities represented by `from_processor_output`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `from_processor_output(obj)`。它围绕 `from_processor_output` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 518-519: Implement contains image inputs / 实现contains 图像 inputs
+```python
+    def contains_image_inputs(self) -> bool:
+        return any(item.is_image() for item in self.mm_items)
+```
+**EN:** This block implements the method `contains_image_inputs()` on `MultimodalInputs`. It focuses on handling the schedule batch responsibilities represented by `contains_image_inputs`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `contains_image_inputs()`。它围绕 `contains_image_inputs` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 521-522: Implement contains video inputs / 实现contains video inputs
+```python
+    def contains_video_inputs(self) -> bool:
+        return any(item.is_video() for item in self.mm_items)
+```
+**EN:** This block implements the method `contains_video_inputs()` on `MultimodalInputs`. It focuses on handling the schedule batch responsibilities represented by `contains_video_inputs`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `contains_video_inputs()`。它围绕 `contains_video_inputs` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 524-525: Implement contains audio inputs / 实现contains audio inputs
+```python
+    def contains_audio_inputs(self) -> bool:
+        return any(item.is_audio() for item in self.mm_items)
+```
+**EN:** This block implements the method `contains_audio_inputs()` on `MultimodalInputs`. It focuses on handling the schedule batch responsibilities represented by `contains_audio_inputs`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `contains_audio_inputs()`。它围绕 `contains_audio_inputs` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 527-528: Implement contains mm input / 实现contains mm input
+```python
+    def contains_mm_input(self) -> bool:
+        return any(True for item in self.mm_items if item.is_valid())
+```
+**EN:** This block implements the method `contains_mm_input()` on `MultimodalInputs`. It focuses on handling the schedule batch responsibilities represented by `contains_mm_input`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `contains_mm_input()`。它围绕 `contains_mm_input` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 530-567: Implement merge / 实现merge
+```python
+    def merge(self, other: MultimodalInputs):
+        """
+        merge image inputs when requests are being merged
+        """
+
+        # args needed to be merged
+        optional_args = [
+            "mm_items",
+            "image_pad_len",
+        ]
+        for arg in optional_args:
+            self_arg = getattr(self, arg, None)
+            if self_arg is not None:
+                setattr(self, arg, self_arg + getattr(other, arg))
+
+        mrope_positions = self.mrope_positions
+        if mrope_positions is not None:
+            if other.mrope_positions is None:
+                self.mrope_positions = mrope_positions
+            else:
+                self.mrope_positions = torch.cat(
+                    [self.mrope_positions, other.mrope_positions], dim=1
+                )
+
+        mrope_position_delta = self.mrope_position_delta
+        if mrope_position_delta is not None:
+            if other.mrope_position_delta is None:
+                self.mrope_position_delta = mrope_position_delta
+            else:
+                self.mrope_position_delta = torch.cat(
+                    [self.mrope_position_delta, other.mrope_position_delta], dim=0
+                )
+
+        for key, val in other.__dict__.items():
+            if "_id" in key:
+                # set token_ids
+                if getattr(self, key, None) is None:
+                    setattr(self, key, getattr(other, key, None))
+```
+**EN:** This block implements the method `merge(other)` on `MultimodalInputs`. It focuses on merge image inputs when requests are being merged, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `MultimodalInputs` 上的方法 `merge(other)`。它围绕 `merge` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 568-572: Provide supporting module logic / 提供辅助模块逻辑
+```python
+        # other args would be kept intact
+
+
+class Req(ReqDllmMixin):
+    """The input and output status of a request."""
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 574-609: Initialize Req / 初始化 Req
+```python
+    def __init__(
+        self,
+        rid: str,
+        origin_input_text: str,
+        origin_input_ids: List[int],
+        sampling_params: SamplingParams,
+        return_logprob: bool = False,
+        top_logprobs_num: int = 0,
+        dllm_config: Optional[DllmConfig] = None,
+        token_ids_logprob: List[int] = None,
+        stream: bool = False,
+        origin_input_ids_unpadded: Optional[Tuple[int]] = None,
+        lora_id: Optional[str] = None,
+        input_embeds: Optional[List[List[float]]] = None,
+        positional_embed_overrides: Optional[PositionalEmbeds] = None,
+        token_type_ids: List[int] = None,
+        session: Optional[Session] = None,
+        custom_logit_processor: Optional[str] = None,
+        require_reasoning: bool = False,
+        return_hidden_states: bool = False,
+        return_routed_experts: bool = False,
+        routed_experts_start_len: int = 0,
+        return_indexer_topk: bool = False,
+        eos_token_ids: Optional[Set[int]] = None,
+        bootstrap_host: Optional[str] = None,
+        bootstrap_port: Optional[int] = None,
+        bootstrap_room: Optional[int] = None,
+        disagg_mode: Optional[DisaggregationMode] = None,
+        routed_dp_rank: Optional[int] = None,
+        disagg_prefill_dp_rank: Optional[int] = None,
+        vocab_size: Optional[int] = None,
+        priority: Optional[int] = None,
+        metrics_collector: Optional[SchedulerMetricsCollector] = None,
+        extra_key: Optional[str] = None,
+        routing_key: Optional[str] = None,
+        dimensions: Optional[int] = None,
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 610-645: Initialize Req (continued) / 初始化 Req（续）
+```python
+        http_worker_ipc: Optional[str] = None,
+        time_stats: Optional[
+            Union[APIServerReqTimeStats, DPControllerReqTimeStats]
+        ] = None,
+        return_pooled_hidden_states: bool = False,
+        multi_item_delimiter_indices: Optional[List[int]] = None,
+    ):
+        # Input and output info
+        self.rid = rid
+        self.origin_input_ids_unpadded = (
+            origin_input_ids_unpadded
+            if origin_input_ids_unpadded
+            else origin_input_ids  # Before image padding
+        )
+        self.origin_input_ids = origin_input_ids
+        # Each decode stage's output ids
+        self.output_ids = []
+        # fill_ids = origin_input_ids + output_ids. Updated if chunked.
+        self.fill_ids = []
+        self.session = session
+        self.input_embeds = input_embeds
+        self.positional_embed_overrides = positional_embed_overrides
+        self.multi_item_delimiter_indices = multi_item_delimiter_indices
+
+        # For req-level memory management
+        self.kv_committed_len = 0
+        self.kv_allocated_len = 0
+        self.kv_committed_freed = False
+        self.kv_overallocated_freed = False
+
+        # for corss-endoder model
+        self.token_type_ids = token_type_ids
+
+        # The length of KV that have been removed in swa cache.
+        # SWA KV cache eviction behavior differs by cache type:
+        # - Radix cache: KV in range [cache_protected_len, swa_evicted_seqlen) is freed manually in
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 646-681: Initialize Req (continued) / 初始化 Req（续）
+```python
+        #   `ScheduleBatch.maybe_evict_swa`; KV in range [0, cache_protected_len) is freed during radix cache eviction.
+        # - Chunk cache: KV in range [0, swa_evicted_seqlen) is freed manually in `ScheduleBatch.maybe_evict_swa`.
+        self.swa_evicted_seqlen = 0
+
+        # The index of the extend / decode batch
+        self.extend_batch_idx = 0
+        self.decode_batch_idx = 0
+
+        # For multi-http worker
+        self.http_worker_ipc = http_worker_ipc
+
+        # Require reasoning for the request
+        self.require_reasoning = require_reasoning
+
+        # State indicating whether the reasoning phase has finished (only meaningful when require_reasoning is True)
+        self._is_reasoning_over = False
+        self.reasoning_tokens = 0
+
+        # Sampling info
+        if isinstance(sampling_params.custom_params, dict):
+            sampling_params = copy.copy(sampling_params)
+            sampling_params.custom_params = sampling_params.custom_params | {
+                "__req__": self
+            }
+        self.sampling_params = sampling_params
+        self.custom_logit_processor = custom_logit_processor
+        self.return_hidden_states = return_hidden_states
+
+        # extra key for classifying the request (e.g. cache_salt)
+        if lora_id is not None:
+            extra_key = (
+                extra_key or ""
+            ) + lora_id  # lora_id is concatenated to the extra key
+
+        self.extra_key = extra_key
+        self.lora_id = lora_id
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 682-717: Initialize Req (continued) / 初始化 Req（续）
+```python
+        self.routing_key = routing_key
+
+        # Memory pool info
+        self.req_pool_idx: Optional[int] = None
+        self.mamba_pool_idx: Optional[torch.Tensor] = None  # shape (1)
+        self.mamba_ping_pong_track_buffer: Optional[torch.Tensor] = None  # shape (2)
+        self.mamba_next_track_idx: Optional[int] = None  # 0 or 1
+        self.mamba_last_track_seqlen: Optional[int] = (
+            None  # seq len of the last cached mamba state
+        )
+        # the branching point seqlen to track mamba state. If set, given by prefix match,
+        # it will be the tracked seqlen in the ping pong buffer for the right prefill pass.
+        self.mamba_branching_seqlen: Optional[int] = None
+
+        # Check finish
+        self.tokenizer = None
+        self.finished_reason: Optional[BaseFinishReason] = None
+        # finished position (in output_ids), used when checking stop conditions with speculative decoding
+        self.finished_len = None
+        # Whether this request has finished output
+        self.finished_output = None
+        # If we want to abort the request in the middle of the event loop,
+        # set to_finish instead of directly setting finished_reason.
+        # Note: We should never set finished_reason in the middle, the req will get filtered and never respond
+        self.to_finish: Optional[BaseFinishReason] = None
+        self.stream = stream
+        self.eos_token_ids = eos_token_ids
+        self.vocab_size = vocab_size
+        self.priority = priority
+
+        # For incremental decoding
+        # ----- | --------- read_ids -------|
+        # ----- |   surr_ids  |
+        # xxxxx | xxxxxxxxxxx | xxxxxxxxxxx |
+        # ----- ^ ----------- ^ ----------- ^
+        # ----- 1 ----------- 2 ----------- 3
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 718-753: Initialize Req (continued) / 初始化 Req（续）
+```python
+        # 1: surr_offset
+        # 2: read_offset
+        # 3: last token
+        self.surr_offset = None  # Surrounding offset to defeat the cleanup algorithm
+        self.read_offset = None
+        self.decoded_text = ""
+
+        # For multimodal inputs
+        self.multimodal_inputs: Optional[MultimodalInputs] = None
+
+        # Prefix info
+        # The indices to kv cache for the shared prefix.
+        self.prefix_indices: torch.Tensor = torch.empty((0,), dtype=torch.int64)
+        # Number of tokens to run prefill.
+        self.extend_input_len = 0
+        # The relative logprob_start_len in an extend batch
+        self.extend_logprob_start_len = 0
+        # TODO(ispobock): rename to last_device_node
+        self.last_node: Any = None
+        self.last_host_node: Any = None
+        self.best_match_node: Any = None
+        self.host_hit_length = 0
+        # Tokens loaded from storage backend (L3) during prefetch for this request
+        self.storage_hit_length = 0
+        # The node to lock until for swa radix tree lock ref
+        self.swa_uuid_for_lock: Optional[int] = None
+        # Whether the prefill-time SWA tree lock has been released early
+        self.swa_prefix_lock_released: bool = False
+        # The prefix length that is inserted into the tree cache
+        self.cache_protected_len: int = 0
+
+        # Whether or not if it is chunked. It increments whenever
+        # it is chunked, and decrement whenever chunked request is
+        # processed.
+        self.is_chunked = 0
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 754-789: Initialize Req (continued) / 初始化 Req（续）
+```python
+        # For retraction
+        self.is_retracted = False
+        # Indicates if the req has ever been retracted.
+        self.retracted_stain = False
+
+        # Incremental streamining
+        self.send_token_offset: int = 0
+        self.send_decode_id_offset: int = 0
+        # TODO (Byron): send_output_token_logprobs_offset and send_decode_id_offset can be different in disaggregation mode
+        # because the decode server does not have the first output token logprobs
+        self.send_output_token_logprobs_offset: int = 0
+
+        # Logprobs (arguments)
+        self.return_logprob = return_logprob
+        # Start index to compute logprob from.
+        self.logprob_start_len = 0
+        self.top_logprobs_num = top_logprobs_num
+        self.token_ids_logprob = token_ids_logprob
+
+        # Logprobs (return values)
+        # True means the input logprob has been already sent to detokenizer.
+        self.input_logprob_sent: bool = False
+        self.input_token_logprobs_val: Optional[List[float]] = None
+        self.input_token_logprobs_idx: Optional[List[int]] = None
+        self.input_top_logprobs_val: Optional[List[float]] = None
+        self.input_top_logprobs_idx: Optional[List[int]] = None
+        self.input_token_ids_logprobs_val: Optional[List[float]] = None
+        self.input_token_ids_logprobs_idx: Optional[List[int]] = None
+        # Temporary holder to store input_token_logprobs.
+        self.input_token_logprobs: Optional[List[Tuple[int]]] = None
+        self.temp_input_top_logprobs_val: Optional[List[torch.Tensor]] = None
+        self.temp_input_top_logprobs_idx: Optional[List[int]] = None
+        self.temp_input_token_ids_logprobs_val: Optional[List[float]] = None
+        self.temp_input_token_ids_logprobs_idx: Optional[List[int]] = None
+
+        if return_logprob:
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 790-825: Initialize Req (continued) / 初始化 Req（续）
+```python
+            # shape: (bs, 1)
+            self.output_token_logprobs_val = []
+            self.output_token_logprobs_idx = []
+            # shape: (bs, k)
+            self.output_top_logprobs_val = []
+            self.output_top_logprobs_idx = []
+            # Can contain either lists or GPU tensors (delayed copy optimization for prefill-only scoring)
+            self.output_token_ids_logprobs_val: List[
+                Union[List[float], torch.Tensor]
+            ] = []
+            self.output_token_ids_logprobs_idx = []
+        else:
+            self.output_token_logprobs_val = self.output_token_logprobs_idx = (
+                self.output_top_logprobs_val
+            ) = self.output_top_logprobs_idx = self.output_token_ids_logprobs_val = (
+                self.output_token_ids_logprobs_idx
+            ) = None
+        self.hidden_states: List[List[float]] = []
+        self.hidden_states_tensor = None  # Note: use tensor instead of list to transfer hidden_states when PD + MTP
+        self.output_topk_p = None
+        self.output_topk_index = None
+
+        # capture routed experts
+        self.return_routed_experts = return_routed_experts
+        self.routed_experts_start_len = routed_experts_start_len
+        self.routed_experts: Optional[torch.Tensor] = (
+            None  # cpu tensor: shape (seqlen, topk)
+        )
+
+        self.return_indexer_topk = return_indexer_topk
+        self.indexer_topk: Optional[torch.Tensor] = (
+            None  # cpu tensor: shape (seqlen, num_indexer_layers, index_topk)
+        )
+        # Customized info
+        self.customized_info: Optional[Dict[str, List[Any]]] = None
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 826-861: Initialize Req (continued) / 初始化 Req（续）
+```python
+        # Embedding (return values)
+        self.embedding = None
+
+        # Constrained decoding
+        self.grammar_key: Optional[Tuple[str, str]] = None
+        self.grammar: Optional[Union[BaseGrammarObject, Future[BaseGrammarObject]]] = (
+            None
+        )
+        self.grammar_wait_ct = 0
+
+        # The number of cached tokens that were already cached in the KV cache
+        self.cached_tokens = 0
+        self.already_computed = 0
+
+        # Detailed breakdown of cached tokens by source (for HiCache)
+        self.cached_tokens_device = 0  # Tokens from device cache (GPU)
+        self.cached_tokens_host = 0  # Tokens from host cache (CPU memory)
+        self.cached_tokens_storage = 0  # Tokens from L3 storage backend
+        self._cache_breakdown_computed = (
+            False  # Track if breakdown was already computed
+        )
+
+        # Per-request count of verification forward passes.
+        self.spec_verify_ct = 0
+
+        # Per-request count of accepted draft tokens (excludes the bonus token).
+        self.spec_num_correct_drafts = 0
+
+        # Acceptance histogram for speculative decoding.
+        # List index = number of accepted tokens in a step, List value = count of steps with that many accepted tokens.
+        # Example: histogram[0] = 5 means 5 steps with 0 accepted tokens, histogram[3] = 10 means 10 steps with 3 accepted tokens.
+        self.spec_correct_drafts_histogram: List[int] = []
+
+        # The number of times this request has been retracted / preempted.
+        self.retraction_count = 0
+        self.retraction_mb_id = None
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 862-897: Initialize Req (continued) / 初始化 Req（续）
+```python
+
+        # For observability
+        self.metrics_collector = metrics_collector
+        if time_stats is not None:
+            self.time_stats = SchedulerReqTimeStats.new_from_obj(time_stats)
+        else:
+            self.time_stats = SchedulerReqTimeStats(disagg_mode=disagg_mode)
+        self.time_stats.set_metrics_collector(metrics_collector)
+        self.time_stats.set_scheduler_recv_time()
+        self.has_log_time_stats: bool = False
+
+        # For disaggregation
+        self.bootstrap_host: str = bootstrap_host
+        self.bootstrap_port: Optional[int] = bootstrap_port
+        self.bootstrap_room: Optional[int] = bootstrap_room
+        self.skip_radix_cache_insert = bootstrap_host == FAKE_BOOTSTRAP_HOST
+        self.disagg_kv_sender: Optional[BaseKVSender] = None
+
+        self.routed_dp_rank: Optional[int] = routed_dp_rank
+        self.disagg_prefill_dp_rank: Optional[int] = disagg_prefill_dp_rank
+
+        # the start index of the sent kv cache
+        # We want to send it chunk by chunk for chunked prefill.
+        # After every chunk forward, we do the following:
+        # kv_send(req.input_ids[req.start_send_idx:len(req.fill_ids)])
+        # start_send_idx = len(req.fill_ids)
+        self.start_send_idx: int = 0
+
+        # For overlap schedule, we delay the kv transfer until `process_batch_result_disagg_prefill` rather than `process_prefill_chunk` in non-overlap
+        # This is because kv is not ready in `process_prefill_chunk`.
+        # We use `tmp_end_idx` to store the end index of the kv cache to send.
+        self.tmp_end_idx: int = -1
+        self.metadata_buffer_index: int = -1
+
+        # For Matryoshka embeddings
+        self.dimensions = dimensions
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 898-907: Initialize Req (continued) / 初始化 Req（续）
+```python
+
+        # Whether to return pooled hidden states (pre-head transformer output)
+        self.return_pooled_hidden_states = return_pooled_hidden_states
+        self.pooled_hidden_state = None
+
+        # For diffusion LLM
+        self.init_diffusion_llm(dllm_config)
+
+        # For hisparse
+        self.hisparse_staging = False
+```
+**EN:** This block implements the initializer `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)` for `Req`. It prepares the object state and connects the instance to the surrounding schedule batch workflow.
+**CN:** 该代码块实现 `Req` 的初始化方法 `__init__(rid, origin_input_text, origin_input_ids, sampling_params, return_logprob, ...)`。它负责准备对象状态，并把实例接入 调度 批处理 相关的运行流程。
+
+### Lines 908-909: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @property
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 910-912: Implement seqlen / 实现seqlen
+```python
+    def seqlen(self) -> int:
+        """Get the current sequence length of the request."""
+        return len(self.origin_input_ids) + len(self.output_ids)
+```
+**EN:** This block implements the method `seqlen()` on `Req`. It focuses on Get the current sequence length of the request., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `seqlen()`。它围绕 `seqlen` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 913-914: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @property
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 915-920: Implement is prefill only / 实现is prefill only
+```python
+    def is_prefill_only(self) -> bool:
+        """Check if this request is prefill-only (no token generation needed)."""
+        # NOTE: when spec is enabled, prefill_only optimizations are disabled
+
+        spec_alg = get_global_server_args().speculative_algorithm
+        return self.sampling_params.max_new_tokens == 0 and spec_alg is None
+```
+**EN:** This block implements the method `is_prefill_only()` on `Req`. It focuses on Check if this request is prefill-only (no token generation needed)., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `is_prefill_only()`。它围绕 `is_prefill_only` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 921-922: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @property
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 923-927: Implement output ids through stop / 实现output ids through stop
+```python
+    def output_ids_through_stop(self) -> List[int]:
+        """Get the output ids through the stop condition. Stop position is included."""
+        if self.finished_len is not None:
+            return self.output_ids[: self.finished_len]
+        return self.output_ids
+```
+**EN:** This block implements the method `output_ids_through_stop()` on `Req`. It focuses on Get the output ids through the stop condition., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `output_ids_through_stop()`。它围绕 `output_ids_through_stop` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 929-934: Implement cache commit len / 实现缓存 commit len
+```python
+    def _cache_commit_len(self) -> int:
+        # Report only the prompt prefix so thinking + answer fall into the
+        # overallocated range and are reclaimed by release_kv_cache. #22373.
+        if get_global_server_args().strip_thinking_cache and self.reasoning_tokens > 0:
+            return min(self.kv_committed_len, len(self.origin_input_ids))
+        return self.kv_committed_len
+```
+**EN:** This block implements the method `_cache_commit_len()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `_cache_commit_len`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `_cache_commit_len()`。它围绕 `_cache_commit_len` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 936-942: Implement pop committed kv cache / 实现pop committed kv 缓存
+```python
+    def pop_committed_kv_cache(self) -> int:
+        """Return the length of committed KV cache and mark them as freed."""
+        assert (
+            not self.kv_committed_freed
+        ), f"Committed KV cache already freed ({self.kv_committed_len=})"
+        self.kv_committed_freed = True
+        return self._cache_commit_len()
+```
+**EN:** This block implements the method `pop_committed_kv_cache()` on `Req`. It focuses on Return the length of committed KV cache and mark them as freed., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `pop_committed_kv_cache()`。它围绕 `pop_committed_kv_cache` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 944-954: Implement pop overallocated kv cache / 实现pop overallocated kv 缓存
+```python
+    def pop_overallocated_kv_cache(self) -> Tuple[int, int]:
+        """Return the range of over-allocated KV cache and mark them as freed."""
+
+        # NOTE: This function is called when there is over-allocation of KV cache.
+        # Over-allocation: we allocate more KV cache than the committed length.
+        # e.g., speculative decoding may allocate more KV cache than actually used.
+        assert (
+            not self.kv_overallocated_freed
+        ), f"Overallocated KV cache already freed, {self.kv_committed_len=}, {self.kv_allocated_len=}"
+        self.kv_overallocated_freed = True
+        return self._cache_commit_len(), self.kv_allocated_len
+```
+**EN:** This block implements the method `pop_overallocated_kv_cache()` on `Req`. It focuses on Return the range of over-allocated KV cache and mark them as freed., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `pop_overallocated_kv_cache()`。它围绕 `pop_overallocated_kv_cache` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 956-966: Implement update spec correct drafts histogram / 实现update spec correct drafts histogram
+```python
+    def update_spec_correct_drafts_histogram(self, num_correct_drafts: int):
+        """Update the speculative decoding acceptance histogram.
+
+        Args:
+            num_correct_drafts: Number of correct draft tokens (no bonus) in this step.
+        """
+        if len(self.spec_correct_drafts_histogram) <= num_correct_drafts:
+            self.spec_correct_drafts_histogram.extend(
+                [0] * (num_correct_drafts - len(self.spec_correct_drafts_histogram) + 1)
+            )
+        self.spec_correct_drafts_histogram[num_correct_drafts] += 1
+```
+**EN:** This block implements the method `update_spec_correct_drafts_histogram(num_correct_drafts)` on `Req`. It focuses on Update the speculative decoding acceptance histogram., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `update_spec_correct_drafts_histogram(num_correct_drafts)`。它围绕 `update_spec_correct_drafts_histogram` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 968-972: Implement extend image inputs / 实现extend 图像 inputs
+```python
+    def extend_image_inputs(self, image_inputs):
+        if self.multimodal_inputs is None:
+            self.multimodal_inputs = image_inputs
+        else:
+            self.multimodal_inputs.merge(image_inputs)
+```
+**EN:** This block implements the method `extend_image_inputs(image_inputs)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `extend_image_inputs`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `extend_image_inputs(image_inputs)`。它围绕 `extend_image_inputs` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 974-976: Implement finished / 实现finished
+```python
+    def finished(self) -> bool:
+        # Whether request reached finished condition
+        return self.finished_reason is not None
+```
+**EN:** This block implements the method `finished()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `finished`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `finished()`。它围绕 `finished` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 978-1013: Implement init next round input / 实现init next round input
+```python
+    def init_next_round_input(
+        self,
+        tree_cache: Optional[BasePrefixCache] = None,
+        cow_mamba: Optional[bool] = None,
+    ):
+        if self.is_dllm():
+            self._init_fill_ids_for_dllm()
+            self.determine_dllm_phase()
+        else:
+            self.fill_ids = self.origin_input_ids + self.output_ids
+
+        input_len = len(self.fill_ids)
+
+        # Streaming sessions reuse committed KV from the session slot, so
+        # custom logprob_start_len is not supported — override to -1.
+        if (
+            self.session is not None
+            and self.session.streaming
+            and self.return_logprob
+            and self.logprob_start_len >= 0
+        ):
+            logger.warning(
+                "logprob_start_len=%d is not supported for streaming sessions "
+                "and will be ignored (rid=%s). Only new-token logprobs are returned.",
+                self.logprob_start_len,
+                self.rid,
+            )
+            self.logprob_start_len = -1
+
+        # NOTE: the matched length is at most 1 less than the input length to enable logprob computation
+        max_prefix_len = input_len - 1
+        if self.return_logprob and self.logprob_start_len >= 0:
+            max_prefix_len = min(max_prefix_len, self.logprob_start_len)
+        max_prefix_len = max(max_prefix_len, 0)
+        token_ids = self.fill_ids[:max_prefix_len]
+```
+**EN:** This block implements the method `init_next_round_input(tree_cache, cow_mamba)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `init_next_round_input`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `init_next_round_input(tree_cache, cow_mamba)`。它围绕 `init_next_round_input` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1014-1049: Continue init next round input / 继续说明init next round input
+```python
+        # Disable prefix caching when embed overrides are present: same token IDs
+        # with different override vectors must not share cached KV values.
+        if self.positional_embed_overrides is not None:
+            max_prefix_len = 0
+            token_ids = []
+
+        if tree_cache is not None:
+            if cow_mamba is None:
+                cow_mamba = tree_cache.supports_mamba()
+            match_result = tree_cache.match_prefix(
+                MatchPrefixParams(
+                    key=RadixKey(token_ids=token_ids, extra_key=self.extra_key),
+                    req=self,
+                    cow_mamba=cow_mamba,
+                )
+            )
+            if envs.SGLANG_RADIX_FORCE_MISS.get():
+                match_result = zero_match_result(tree_cache, match_result)
+            (
+                self.prefix_indices,
+                self.last_node,
+                self.last_host_node,
+                self.best_match_node,
+                self.host_hit_length,
+                self.mamba_branching_seqlen,
+            ) = (
+                match_result.device_indices,
+                match_result.last_device_node,
+                match_result.last_host_node,
+                match_result.best_match_node,
+                match_result.host_hit_length,
+                match_result.mamba_branching_seqlen,
+            )
+            if match_result.cache_protected_len is not None:
+                self.cache_protected_len = match_result.cache_protected_len
+            else:
+```
+**EN:** This block implements the method `init_next_round_input(tree_cache, cow_mamba)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `init_next_round_input`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `init_next_round_input(tree_cache, cow_mamba)`。它围绕 `init_next_round_input` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1050-1070: Continue init next round input / 继续说明init next round input
+```python
+                self.cache_protected_len = len(self.prefix_indices)
+
+            if self.is_dllm():
+                self._update_block_offset_for_dllm()
+
+        if (
+            self.is_retracted
+            and self.multimodal_inputs is not None
+            and self.multimodal_inputs.mrope_positions is not None
+        ):
+            from sglang.srt.managers.mm_utils import (
+                extend_mrope_positions_for_retracted_request,
+            )
+
+            self.multimodal_inputs.mrope_positions = (
+                extend_mrope_positions_for_retracted_request(
+                    self.multimodal_inputs.mrope_positions, len(self.output_ids)
+                )
+            )
+
+        self.set_extend_input_len(len(self.fill_ids) - len(self.prefix_indices))
+```
+**EN:** This block implements the method `init_next_round_input(tree_cache, cow_mamba)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `init_next_round_input`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `init_next_round_input(tree_cache, cow_mamba)`。它围绕 `init_next_round_input` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1071-1072: Import runtime dependencies / 导入运行时依赖
+```python
+
+    # Based on https://github.com/vllm-project/vllm/blob/7a64d24aad69e4d2548aa0bf528d9fe63428ab01/vllm/transformers_utils/detokenizer.py#L194-L313
+```
+**EN:** This block gathers the standard-library, third-party, and local runtime modules that the rest of the file relies on.
+**CN:** 该代码块汇集标准库、第三方库以及本地运行时模块，供后续实现复用。
+
+### Lines 1073-1091: Implement init incremental detokenize / 实现init incremental detokenize
+```python
+    def init_incremental_detokenize(self):
+        first_iter = self.surr_offset is None or self.read_offset is None
+
+        output_ids = self.output_ids_through_stop
+
+        if first_iter:
+            self.read_offset = len(self.origin_input_ids_unpadded)
+            self.surr_offset = max(
+                self.read_offset - INIT_INCREMENTAL_DETOKENIZATION_OFFSET, 0
+            )
+            self.surr_and_decode_ids = (
+                self.origin_input_ids_unpadded[self.surr_offset :] + output_ids
+            )
+            self.cur_decode_ids_len = len(output_ids)
+        else:
+            self.surr_and_decode_ids.extend(output_ids[self.cur_decode_ids_len :])
+            self.cur_decode_ids_len = len(output_ids)
+
+        return self.surr_and_decode_ids, self.read_offset - self.surr_offset
+```
+**EN:** This block implements the method `init_incremental_detokenize()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `init_incremental_detokenize`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `init_incremental_detokenize()`。它围绕 `init_incremental_detokenize` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1093-1107: Implement tail str / 实现tail str
+```python
+    def tail_str(self) -> str:
+        # Check stop strings and stop regex patterns together
+        if (
+            len(self.sampling_params.stop_strs) == 0
+            and len(self.sampling_params.stop_regex_strs) == 0
+        ):
+            return ""
+
+        max_len_tail_str = max(
+            self.sampling_params.stop_str_max_len + 1,
+            self.sampling_params.stop_regex_max_len + 1,
+        )
+
+        tail_len = min(max_len_tail_str, len(self.output_ids))
+        return self.tokenizer.decode(self.output_ids[-tail_len:])
+```
+**EN:** This block implements the method `tail_str()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `tail_str`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `tail_str()`。它围绕 `tail_str` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1109-1136: Implement check match stop str prefix / 实现检查 match stop str prefix
+```python
+    def check_match_stop_str_prefix(self) -> bool:
+        """
+        Check if the suffix of tail_str overlaps with any stop_str prefix
+        """
+        if not self.sampling_params.stop_strs:
+            return False
+
+        tail_str = self.tail_str()
+
+        # Early return if tail_str is empty
+        if not tail_str:
+            return False
+
+        for stop_str in self.sampling_params.stop_strs:
+            if not stop_str:
+                continue
+            # Check if stop_str is contained in tail_str (fastest check first)
+            if stop_str in tail_str:
+                return True
+
+            # Check if tail_str suffix matches stop_str prefix
+            # Only check if stop_str is not empty, it's for stream output
+            min_len = min(len(tail_str), len(stop_str))
+            for i in range(1, min_len + 1):
+                if tail_str[-i:] == stop_str[:i]:
+                    return True
+
+        return False
+```
+**EN:** This block implements the method `check_match_stop_str_prefix()` on `Req`. It focuses on Check if the suffix of tail_str overlaps with any stop_str prefix, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `check_match_stop_str_prefix()`。它围绕 `check_match_stop_str_prefix` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1138-1160: Implement check token based finish / 实现检查 Token based finish
+```python
+    def _check_token_based_finish(self, new_accepted_tokens: List[int]) -> bool:
+        if self.sampling_params.ignore_eos:
+            return False
+
+        # Check stop token ids
+        matched_eos = False
+
+        for i, token_id in enumerate(new_accepted_tokens):
+            if self.sampling_params.stop_token_ids:
+                matched_eos |= token_id in self.sampling_params.stop_token_ids
+            if self.eos_token_ids:
+                matched_eos |= token_id in self.eos_token_ids
+            if self.tokenizer is not None:
+                matched_eos |= token_id == self.tokenizer.eos_token_id
+                if self.tokenizer.additional_stop_token_ids:
+                    matched_eos |= token_id in self.tokenizer.additional_stop_token_ids
+            if matched_eos:
+                self.finished_reason = FINISH_MATCHED_TOKEN(matched=token_id)
+                matched_pos = len(self.output_ids) - len(new_accepted_tokens) + i
+                self.finished_len = matched_pos + 1
+                return True
+
+        return False
+```
+**EN:** This block implements the method `_check_token_based_finish(new_accepted_tokens)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `_check_token_based_finish`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `_check_token_based_finish(new_accepted_tokens)`。它围绕 `_check_token_based_finish` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1162-1185: Implement check str based finish / 实现检查 str based finish
+```python
+    def _check_str_based_finish(self):
+        if (
+            len(self.sampling_params.stop_strs) > 0
+            or len(self.sampling_params.stop_regex_strs) > 0
+        ):
+            tail_str = self.tail_str()
+
+            # Check stop strings
+            if len(self.sampling_params.stop_strs) > 0:
+                for stop_str in self.sampling_params.stop_strs:
+                    if stop_str in tail_str or stop_str in self.decoded_text:
+                        self.finished_reason = FINISH_MATCHED_STR(matched=stop_str)
+                        return True
+
+            # Check stop regex
+            if len(self.sampling_params.stop_regex_strs) > 0:
+                for stop_regex_str in self.sampling_params.stop_regex_strs:
+                    if re.search(stop_regex_str, tail_str):
+                        self.finished_reason = FINISHED_MATCHED_REGEX(
+                            matched=stop_regex_str
+                        )
+                        return True
+
+        return False
+```
+**EN:** This block implements the method `_check_str_based_finish()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `_check_str_based_finish`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `_check_str_based_finish()`。它围绕 `_check_str_based_finish` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1187-1201: Implement check vocab boundary finish / 实现检查 vocab boundary finish
+```python
+    def _check_vocab_boundary_finish(self, new_accepted_tokens: List[int] = None):
+        for i, token_id in enumerate(new_accepted_tokens):
+            if token_id > self.vocab_size or token_id < 0:
+                offset = len(self.output_ids) - len(new_accepted_tokens) + i
+                if self.sampling_params.stop_token_ids:
+                    self.output_ids[offset] = next(
+                        iter(self.sampling_params.stop_token_ids)
+                    )
+                if self.eos_token_ids:
+                    self.output_ids[offset] = next(iter(self.eos_token_ids))
+                self.finished_reason = FINISH_MATCHED_STR(matched="NaN happened")
+                self.finished_len = offset + 1
+                return True
+
+        return False
+```
+**EN:** This block implements the method `_check_vocab_boundary_finish(new_accepted_tokens)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `_check_vocab_boundary_finish`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `_check_vocab_boundary_finish(new_accepted_tokens)`。它围绕 `_check_vocab_boundary_finish` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1203-1233: Implement check finished / 实现检查 finished
+```python
+    def check_finished(self, new_accepted_len: int = 1):
+        if self.finished():
+            return
+
+        if self.to_finish:
+            self.finished_reason = self.to_finish
+            self.to_finish = None
+            return
+
+        if len(self.output_ids) >= self.sampling_params.max_new_tokens:
+            self.finished_reason = FINISH_LENGTH(
+                length=self.sampling_params.max_new_tokens
+            )
+            self.finished_len = self.sampling_params.max_new_tokens
+            return
+
+        if self.grammar is not None:
+            if self.grammar.is_terminated():
+                self.finished_reason = FINISH_MATCHED_TOKEN(matched=self.output_ids[-1])
+                return
+
+        new_accepted_tokens = self.output_ids[-new_accepted_len:]
+
+        if self._check_token_based_finish(new_accepted_tokens):
+            return
+
+        if self._check_vocab_boundary_finish(new_accepted_tokens):
+            return
+
+        if self._check_str_based_finish():
+            return
+```
+**EN:** This block implements the method `check_finished(new_accepted_len)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `check_finished`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `check_finished(new_accepted_len)`。它围绕 `check_finished` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1235-1275: Implement reset for retract / 实现reset for retract
+```python
+    def reset_for_retract(self):
+        # Increment retraction count before resetting other state. We should not reset this
+        # since we are tracking the total number of retractions for each request.
+        self.retraction_count += 1
+
+        self.prefix_indices = torch.empty((0,), dtype=torch.int64)
+        self.routed_experts = None
+        self.indexer_topk = None
+        self.last_node = None
+        self.cache_protected_len = 0
+        self.swa_uuid_for_lock = None
+        self.swa_prefix_lock_released = False
+        self.extend_input_len = 0
+        self.is_retracted = True
+        self.retracted_stain = True
+        self.input_token_logprobs = None
+        self.temp_input_top_logprobs_val = None
+        self.temp_input_top_logprobs_idx = None
+        self.extend_logprob_start_len = 0
+        self.is_chunked = 0
+        self.mamba_pool_idx = None
+        self.mamba_ping_pong_track_buffer = None
+        self.mamba_next_track_idx = None
+        self.mamba_last_track_seqlen = None
+        self.mamba_branching_seqlen = None
+        self.already_computed = 0
+        self.kv_allocated_len = 0
+        self.kv_committed_len = 0
+        self.kv_committed_freed = False
+        self.kv_overallocated_freed = False
+        self.swa_evicted_seqlen = 0
+        self.extend_batch_idx = 0
+        self.decode_batch_idx = 0
+
+        # When using input_embeds, we cannot easily mix the original input embeddings
+        # with the newly generated output token IDs during re-prefill of retracted request.
+        # output_ids will have no use, but will lead to wrong size cache indexes.
+        # Therefore, we discard the generated output_ids and restart prefill and generation
+        # to ensure shape consistency in KV cache.
+        if self.input_embeds is not None:
+            self.output_ids = []
+```
+**EN:** This block implements the method `reset_for_retract()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `reset_for_retract`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `reset_for_retract()`。它围绕 `reset_for_retract` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1277-1284: Implement offload kv cache / 实现offload kv 缓存
+```python
+    def offload_kv_cache(self, req_to_token_pool, token_to_kv_pool_allocator):
+        token_indices = req_to_token_pool.req_to_token[
+            self.req_pool_idx, : self.seqlen - 1
+        ]
+        # Copies over both the kv cache and mamba state if available
+        self.kv_cache_cpu = token_to_kv_pool_allocator.get_cpu_copy(
+            token_indices, mamba_indices=self.mamba_pool_idx
+        )
+```
+**EN:** This block implements the method `offload_kv_cache(req_to_token_pool, token_to_kv_pool_allocator)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `offload_kv_cache`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `offload_kv_cache(req_to_token_pool, token_to_kv_pool_allocator)`。它围绕 `offload_kv_cache` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1286-1294: Implement load kv cache / 实现load kv 缓存
+```python
+    def load_kv_cache(self, req_to_token_pool, token_to_kv_pool_allocator):
+        token_indices = req_to_token_pool.req_to_token[
+            self.req_pool_idx, : self.seqlen - 1
+        ]
+        # Loads both the kv cache and mamba state if exists
+        token_to_kv_pool_allocator.load_cpu_copy(
+            self.kv_cache_cpu, token_indices, mamba_indices=self.mamba_pool_idx
+        )
+        del self.kv_cache_cpu
+```
+**EN:** This block implements the method `load_kv_cache(req_to_token_pool, token_to_kv_pool_allocator)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `load_kv_cache`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `load_kv_cache(req_to_token_pool, token_to_kv_pool_allocator)`。它围绕 `load_kv_cache` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1296-1315: Implement log time stats / 实现log time stats
+```python
+    def log_time_stats(self):
+        # If overlap schedule, we schedule one decode batch ahead so this gets called twice.
+        if self.has_log_time_stats:
+            return
+
+        bootstrap_info = (
+            f", bootstrap_room={self.bootstrap_room}"
+            if self.bootstrap_room is not None
+            else ""
+        )
+        prefix = (
+            f"ReqTimeStats("
+            f"rid={self.rid}{bootstrap_info}, "
+            f"input_len={len(self.origin_input_ids)}, "
+            f"cached_input_len={self.cached_tokens}, "
+            f"output_len={len(self.output_ids)}, "
+            f"type={self.time_stats.disagg_mode_str()})"
+        )
+        logger.info(f"{prefix}: {self.time_stats.convert_to_duration()}")
+        self.has_log_time_stats = True
+```
+**EN:** This block implements the method `log_time_stats()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `log_time_stats`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `log_time_stats()`。它围绕 `log_time_stats` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1317-1333: Implement set extend input len / 实现set extend input len
+```python
+    def set_extend_input_len(self, extend_input_len: int):
+        # Setting extend_input_len and computing the relative logprob_start_len in an extend batch
+        #
+        # Key variables:
+        # - logprob_start_len: Absolute position in full sequence where logprob computation begins
+        # - extend_logprob_start_len: Relative position within current extend batch where logprob computation begins
+        # - extend_input_len: Number of tokens that need to be processed in this extend batch
+        self.extend_input_len = extend_input_len
+        if self.logprob_start_len == -1:
+            logprob_start_len = len(self.fill_ids)
+        else:
+            # logprob_start_len should be at least the length of the prefix indices
+            logprob_start_len = max(self.logprob_start_len, len(self.prefix_indices))
+        self.extend_logprob_start_len = min(
+            logprob_start_len - len(self.prefix_indices),
+            self.extend_input_len,
+        )
+```
+**EN:** This block implements the method `set_extend_input_len(extend_input_len)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `set_extend_input_len`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `set_extend_input_len(extend_input_len)`。它围绕 `set_extend_input_len` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1335-1345: Implement set finish with abort / 实现set finish with abort
+```python
+    def set_finish_with_abort(self, error_msg: str):
+        if get_tensor_model_parallel_rank() == 0:
+            logger.error(f"{error_msg}, {self.rid=}")
+        self.multimodal_inputs = None
+        self.grammar = None
+        self.origin_input_ids = [0]  # set it to one token to skip the long prefill
+        self.return_logprob = False
+        self.logprob_start_len = -1
+        self.to_finish = FINISH_ABORT(
+            error_msg, HTTPStatus.BAD_REQUEST, "BadRequestError"
+        )
+```
+**EN:** This block implements the method `set_finish_with_abort(error_msg)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `set_finish_with_abort`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `set_finish_with_abort(error_msg)`。它围绕 `set_finish_with_abort` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1347-1359: Implement update reasoning tokens / 实现update reasoning tokens
+```python
+    def update_reasoning_tokens(self, token_id, think_end_id):
+        if self._is_reasoning_over:
+            return
+
+        if not isinstance(token_id, list):
+            token_id = [token_id]
+
+        try:
+            end_pos = token_id.index(think_end_id)
+            self.reasoning_tokens += end_pos + 1
+            self._is_reasoning_over = True
+        except ValueError:
+            self.reasoning_tokens += len(token_id)
+```
+**EN:** This block implements the method `update_reasoning_tokens(token_id, think_end_id)` on `Req`. It focuses on handling the schedule batch responsibilities represented by `update_reasoning_tokens`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `update_reasoning_tokens(token_id, think_end_id)`。它围绕 `update_reasoning_tokens` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1361-1367: Implement repr / 实现repr
+```python
+    def __repr__(self):
+        return (
+            f"Req(rid={self.rid}, "
+            f"input_ids={self.origin_input_ids}, output_ids={self.output_ids}, "
+            f"{self.grammar=}, "
+            f"{self.sampling_params=})"
+        )
+```
+**EN:** This block implements the method `__repr__()` on `Req`. It focuses on handling the schedule batch responsibilities represented by `__repr__`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `Req` 上的方法 `__repr__()`。它围绕 `__repr__` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1368-1427: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+
+@dataclasses.dataclass
+class ScheduleBatch(ScheduleBatchDisaggregationDecodeMixin):
+    """Store all information of a batch on the scheduler."""
+
+    # Request, memory pool, and cache
+    reqs: List[Req]
+    req_to_token_pool: ReqToTokenPool = None
+    token_to_kv_pool_allocator: BaseTokenToKVPoolAllocator = None
+    tree_cache: BasePrefixCache = None
+    is_hybrid_swa: bool = False
+
+    # Batch configs
+    model_config: ModelConfig = None
+    forward_mode: ForwardMode = None
+    enable_overlap: bool = False
+    # Tell whether the current running batch is full so that we can skip
+    # the check of whether to prefill new requests.
+    # This is an optimization to reduce the overhead of the prefill check.
+    batch_is_full: bool = False
+
+    # For chunked prefill in PP
+    chunked_req: Optional[Req] = None
+
+    # Sampling info
+    sampling_info: SamplingBatchInfo = None
+
+    # Batched arguments to model runner
+    input_ids: torch.Tensor = None  # shape: [b], int64
+    input_embeds: torch.Tensor = None  # shape: [b, hidden_size], float32
+    # Token replacement embeddings and absolute positions (optional).
+    replace_embeds: Optional[torch.Tensor] = None
+    replace_positions: Optional[torch.Tensor] = None
+    ne_token_table: torch.Tensor = None
+    token_type_ids: torch.Tensor = None  # shape: [b], int64
+    req_pool_indices: torch.Tensor = None  # shape: [b], int64
+    seq_lens: torch.Tensor = None  # shape: [b], int64
+    seq_lens_cpu: torch.Tensor = None  # shape: [b], int64
+    # The output locations of the KV cache
+    out_cache_loc: torch.Tensor = None  # shape: [b], int64
+    output_ids: torch.Tensor = None  # shape: [b], int64
+
+    # For hybrid GDN prefix cache
+    mamba_track_indices: torch.Tensor = None  # shape: [b], int64
+    mamba_track_mask: torch.Tensor = None  # shape: [b], bool
+    mamba_track_seqlens: torch.Tensor = None  # shape: [b], int64
+
+    # For multimodal inputs
+    multimodal_inputs: Optional[List] = None
+
+    # The sum of all sequence lengths
+    seq_lens_sum: int = None
+    # The original sequence lengths, Qwen-1M related
+    orig_seq_lens: torch.Tensor = None  # shape: [b], int32
+
+    # For DP attention
+    inner_idle_batch: Optional[ScheduleBatch] = None
+    global_num_tokens: Optional[List[int]] = None
+    global_num_tokens_for_logprob: Optional[List[int]] = None
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 1428-1487: Provide supporting module logic / 提供辅助模块逻辑
+```python
+    is_extend_in_batch: bool = False
+    all_extend_in_batch: bool = False  # plumbing for downstream forks (PR #19639)
+    can_run_dp_cuda_graph: bool = False
+    tbo_split_seq_index: Optional[int] = None
+    global_forward_mode: Optional[ForwardMode] = None
+
+    # For processing logprobs
+    return_logprob: bool = False
+    top_logprobs_nums: Optional[List[int]] = None
+    token_ids_logprobs: Optional[List[List[int]]] = None
+
+    # For logits and logprob post processing
+    temp_scaled_logprobs: bool = False
+    top_p_normalized_logprobs: bool = False
+
+    # For extend and mixed chunekd prefill
+    prefix_lens: List[int] = None
+    extend_lens: List[int] = None
+    extend_num_tokens: Optional[int] = None
+    decoding_reqs: List[Req] = None
+    extend_logprob_start_lens: List[int] = None
+    # It comes empty list if logprob is not required.
+    extend_input_logprob_token_ids: Optional[torch.Tensor] = None
+
+    # For encoder-decoder architectures
+    encoder_cached: Optional[List[bool]] = None
+    encoder_lens: Optional[torch.Tensor] = None
+    encoder_lens_cpu: Optional[List[int]] = None
+    encoder_out_cache_loc: Optional[torch.Tensor] = None
+
+    # For matryoshka embeddings
+    dimensions: Optional[list[int]] = None
+
+    # Whether to return pooled hidden states (pre-head transformer output)
+    return_pooled_hidden_states: bool = False
+
+    # For split prefill
+    split_index: int = 0
+    split_prefill_finished: bool = False
+    split_forward_count: int = 1
+    split_forward_batch: ForwardBatch = None
+
+    # One-shot per-forward overrides; init_new consumes and resets.
+    seq_lens_cpu_cache: torch.Tensor = None
+    capture_hidden_mode: Optional[CaptureHiddenMode] = None
+    return_hidden_states_before_norm: bool = False
+
+    # Forward-pass metrics
+    fpm_start_time: float = 0.0
+
+    # Stream
+    has_stream: bool = False
+
+    # Has grammar
+    has_grammar: bool = False
+
+    # Device
+    device: str = "cuda"
+
+    # Speculative decoding
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 1488-1496: Provide supporting module logic / 提供辅助模块逻辑
+```python
+    spec_algorithm: SpeculativeAlgorithm = None
+    # spec_info: Optional[SpecInput] = None
+    spec_info: Optional[SpecInput] = None
+
+    # Whether to return hidden states
+    return_hidden_states: bool = False
+
+    # Whether to return captured experts
+    return_routed_experts: bool = False
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 1498-1520: Provide supporting module logic / 提供辅助模块逻辑
+```python
+    return_indexer_topk: bool = False
+
+    # Whether this batch is prefill-only (no token generation needed)
+    is_prefill_only: bool = False
+
+    # Multi-item scoring delimiter indices (set during prepare_for_extend)
+    multi_item_delimiter_indices: Optional[List[torch.Tensor]] = None
+
+    # hicache pointer for synchronizing data loading from CPU to GPU
+    hicache_consumer_index: int = -1
+
+    # Diffusion LLM
+    dllm_config: Optional[DllmConfig] = None
+
+    # Metrics
+    dp_cooperation_info: Optional[DPCooperationInfo] = None
+    prefill_stats: Optional[PrefillStats] = None
+    forward_iter: Optional[int] = None
+
+    # HiSparse
+    hisparse_coordinator: Optional[HiSparseCoordinator] = None
+
+    @classmethod
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 1521-1559: Implement init new / 实现init new
+```python
+    def init_new(
+        cls,
+        reqs: List[Req],
+        req_to_token_pool: ReqToTokenPool,
+        token_to_kv_pool_allocator: BaseTokenToKVPoolAllocator,
+        tree_cache: BasePrefixCache,
+        model_config: ModelConfig,
+        enable_overlap: bool,
+        spec_algorithm: SpeculativeAlgorithm,
+        chunked_req: Optional[Req] = None,
+        dllm_config: Optional[DllmConfig] = None,
+    ):
+        return_logprob = any(req.return_logprob for req in reqs)
+
+        is_hybrid_swa = False
+        if isinstance(token_to_kv_pool_allocator, SWATokenToKVPoolAllocator):
+            is_hybrid_swa = True
+
+        batch = cls(
+            reqs=reqs,
+            req_to_token_pool=req_to_token_pool,
+            token_to_kv_pool_allocator=token_to_kv_pool_allocator,
+            tree_cache=tree_cache,
+            is_hybrid_swa=is_hybrid_swa,
+            model_config=model_config,
+            enable_overlap=enable_overlap,
+            return_logprob=return_logprob,
+            has_stream=any(req.stream for req in reqs),
+            has_grammar=any(req.grammar for req in reqs),
+            device=req_to_token_pool.device,
+            spec_algorithm=spec_algorithm,
+            return_hidden_states=any(req.return_hidden_states for req in reqs),
+            return_routed_experts=any(req.return_routed_experts for req in reqs),
+            return_indexer_topk=any(req.return_indexer_topk for req in reqs),
+            is_prefill_only=all(req.is_prefill_only for req in reqs),
+            chunked_req=chunked_req,
+            dllm_config=dllm_config,
+        )
+        return batch
+```
+**EN:** This block implements the method `init_new(reqs, req_to_token_pool, token_to_kv_pool_allocator, tree_cache, model_config, ...)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `init_new`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `init_new(reqs, req_to_token_pool, token_to_kv_pool_allocator, tree_cache, model_config, ...)`。它围绕 `init_new` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1561-1562: Implement batch size / 实现批处理 size
+```python
+    def batch_size(self):
+        return len(self.reqs)
+```
+**EN:** This block implements the method `batch_size()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `batch_size`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `batch_size()`。它围绕 `batch_size` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1564-1565: Implement is empty / 实现is empty
+```python
+    def is_empty(self):
+        return len(self.reqs) == 0
+```
+**EN:** This block implements the method `is_empty()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `is_empty`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `is_empty()`。它围绕 `is_empty` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1567-1568: Implement is dllm / 实现is dllm
+```python
+    def is_dllm(self):
+        return self.dllm_config is not None
+```
+**EN:** This block implements the method `is_dllm()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `is_dllm`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `is_dllm()`。它围绕 `is_dllm` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1570-1605: Implement prepare encoder info extend / 实现prepare encoder info extend
+```python
+    def prepare_encoder_info_extend(self, input_ids: List[int], seq_lens: List[int]):
+        _pin = is_pin_memory_available(self.device)
+        self.encoder_lens_cpu = []
+        self.encoder_cached = []
+
+        for req in self.reqs:
+            im = req.multimodal_inputs
+            if im is None or im.num_image_tokens is None:
+                # No image input
+                self.encoder_lens_cpu.append(0)
+                self.encoder_cached.append(True)
+            else:
+                self.encoder_lens_cpu.append(im.num_image_tokens)
+                self.encoder_cached.append(
+                    self.forward_mode.is_decode()
+                    or len(req.prefix_indices) >= im.num_image_tokens
+                )
+
+        self.encoder_lens = torch.tensor(
+            self.encoder_lens_cpu, dtype=torch.int64, pin_memory=_pin
+        ).to(self.device, non_blocking=True)
+
+        # Strip encoder infos
+        pt = 0
+        decoder_out_cache_loc = []
+        encoder_out_cache_loc = []
+        for i, req in enumerate(self.reqs):
+            encoder_len = self.encoder_lens_cpu[i]
+            seq_lens[i] -= encoder_len
+
+            if len(req.prefix_indices) < encoder_len:
+                # NOTE: the encoder part should be considered as a whole
+                assert len(req.prefix_indices) == 0
+                input_ids[i] = input_ids[i][encoder_len:]
+                encoder_out_cache_loc.append(self.out_cache_loc[pt : pt + encoder_len])
+                decoder_out_cache_loc.append(
+```
+**EN:** This block implements the method `prepare_encoder_info_extend(input_ids, seq_lens)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_encoder_info_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_encoder_info_extend(input_ids, seq_lens)`。它围绕 `prepare_encoder_info_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1606-1641: Continue prepare encoder info extend / 继续说明prepare encoder info extend
+```python
+                    self.out_cache_loc[pt + encoder_len : pt + req.extend_input_len]
+                )
+                self.extend_lens[i] -= encoder_len
+                self.extend_num_tokens -= encoder_len
+            else:
+                decoder_out_cache_loc.append(
+                    self.out_cache_loc[pt : pt + req.extend_input_len]
+                )
+                self.prefix_lens[i] -= encoder_len
+
+            pt += req.extend_input_len
+
+        # Reassign
+        self.input_ids = torch.tensor(
+            sum(input_ids, []), dtype=torch.int64, pin_memory=_pin
+        ).to(self.device, non_blocking=True)
+        self.seq_lens = torch.tensor(seq_lens, dtype=torch.int64, pin_memory=_pin).to(
+            self.device, non_blocking=True
+        )
+        self.seq_lens_cpu = torch.tensor(seq_lens, dtype=torch.int64)
+
+        if not decoder_out_cache_loc:
+            self.out_cache_loc = torch.zeros(0, dtype=torch.int64).to(
+                self.device, non_blocking=True
+            )
+        else:
+            self.out_cache_loc = torch.cat(decoder_out_cache_loc)
+
+        if not encoder_out_cache_loc:
+            self.encoder_out_cache_loc = torch.zeros(0, dtype=torch.int64).to(
+                self.device, non_blocking=True
+            )
+        else:
+            self.encoder_out_cache_loc = torch.cat(encoder_out_cache_loc)
+
+        assert (
+```
+**EN:** This block implements the method `prepare_encoder_info_extend(input_ids, seq_lens)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_encoder_info_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_encoder_info_extend(input_ids, seq_lens)`。它围绕 `prepare_encoder_info_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1642-1677: Continue prepare encoder info extend / 继续说明prepare encoder info extend
+```python
+            len(self.out_cache_loc) == self.extend_num_tokens
+        ), f"Expected {len(self.out_cache_loc)}, got {self.extend_num_tokens}"
+
+        if self.extend_input_logprob_token_ids is not None:
+            new_token_ids_parts = []
+            offset = 0
+            for i, req in enumerate(self.reqs):
+                encoder_len = self.encoder_lens_cpu[i]
+                old_start_len = self.extend_logprob_start_lens[i]
+                old_contribution = req.extend_input_len - old_start_len
+
+                if len(req.prefix_indices) < encoder_len:
+                    tokens_to_strip = max(0, encoder_len - old_start_len)
+                    new_token_ids_parts.append(
+                        self.extend_input_logprob_token_ids[
+                            offset + tokens_to_strip : offset + old_contribution
+                        ]
+                    )
+                    self.extend_logprob_start_lens[i] = max(
+                        0, old_start_len - encoder_len
+                    )
+                else:
+                    new_token_ids_parts.append(
+                        self.extend_input_logprob_token_ids[
+                            offset : offset + old_contribution
+                        ]
+                    )
+
+                offset += old_contribution
+
+            if new_token_ids_parts:
+                self.extend_input_logprob_token_ids = torch.cat(new_token_ids_parts)
+            else:
+                self.extend_input_logprob_token_ids = None
+
+        for i, req in enumerate(self.reqs):
+```
+**EN:** This block implements the method `prepare_encoder_info_extend(input_ids, seq_lens)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_encoder_info_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_encoder_info_extend(input_ids, seq_lens)`。它围绕 `prepare_encoder_info_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1678-1686: Continue prepare encoder info extend / 继续说明prepare encoder info extend
+```python
+            encoder_len = self.encoder_lens_cpu[i]
+            if encoder_len == 0:
+                continue
+            if len(req.prefix_indices) < encoder_len:
+                req.extend_input_len -= encoder_len
+                req.extend_logprob_start_len = max(
+                    0, req.extend_logprob_start_len - encoder_len
+                )
+            req.logprob_start_len = max(req.logprob_start_len, encoder_len)
+```
+**EN:** This block implements the method `prepare_encoder_info_extend(input_ids, seq_lens)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_encoder_info_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_encoder_info_extend(input_ids, seq_lens)`。它围绕 `prepare_encoder_info_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1688-1723: Implement prepare for extend / 实现prepare for extend
+```python
+    def prepare_for_extend(self):
+        self.forward_mode = ForwardMode.EXTEND
+
+        if self.is_dllm():
+            # For DLLM, we use a separate forward mode
+            self.forward_mode = ForwardMode.DLLM_EXTEND
+
+        # Init tensors
+        reqs = self.reqs
+        input_ids = [r.fill_ids[len(r.prefix_indices) :] for r in reqs]
+        extend_num_tokens = sum(len(ids) for ids in input_ids)
+        seq_lens = [len(r.fill_ids) for r in reqs]
+        orig_seq_lens = [max(len(r.fill_ids), len(r.origin_input_ids)) for r in reqs]
+        prefix_lens = [len(r.prefix_indices) for r in reqs]
+        extend_lens = [r.extend_input_len for r in reqs]
+
+        # For matryoshka embeddings
+        if self.model_config.is_matryoshka and any(
+            r.dimensions is not None for r in reqs
+        ):
+            self.dimensions = [
+                r.dimensions if r.dimensions else self.model_config.hidden_size
+                for r in reqs
+            ]
+
+        # OR across the batch so ForwardBatch matches a single fused forward; requests
+        # that did not ask for PHS still skip attaching it in the output processor.
+        self.return_pooled_hidden_states = any(
+            r.return_pooled_hidden_states for r in reqs
+        )
+
+        token_type_ids = [
+            r.token_type_ids for r in reqs if r.token_type_ids is not None
+        ]
+
+        _pin = is_pin_memory_available(self.device)
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1724-1759: Continue prepare for extend / 继续说明prepare for extend
+```python
+        input_ids_tensor = torch.tensor(
+            list(chain.from_iterable(input_ids)), dtype=torch.int64, pin_memory=_pin
+        ).to(self.device, non_blocking=True)
+        seq_lens_tensor = torch.tensor(seq_lens, dtype=torch.int64, pin_memory=_pin).to(
+            self.device, non_blocking=True
+        )
+        seq_lens_cpu = torch.tensor(seq_lens, dtype=torch.int64)
+        orig_seq_lens_tensor = torch.tensor(
+            orig_seq_lens, dtype=torch.int32, pin_memory=_pin
+        ).to(self.device, non_blocking=True)
+
+        token_type_ids_tensor = None
+        if len(token_type_ids) > 0:
+            token_type_ids_tensor = torch.tensor(
+                sum(token_type_ids, []), dtype=torch.int64, pin_memory=_pin
+            ).to(self.device, non_blocking=True)
+
+        # Set batch fields needed by alloc_for_extend
+        self.prefix_lens = prefix_lens
+        self.extend_lens = extend_lens
+        self.seq_lens = seq_lens_tensor
+        self.seq_lens_cpu = seq_lens_cpu
+        self.extend_num_tokens = extend_num_tokens
+
+        # Allocate memory
+        out_cache_loc, req_pool_indices_tensor, req_pool_indices = alloc_for_extend(
+            self
+        )
+
+        # Set fields
+        input_embeds = []
+        all_replace_embeds: List[torch.Tensor] = []
+        all_replace_positions: List[int] = []
+        has_replace_embeds = False
+        input_id_pointer = 0
+        input_id_lens = [len(input_id) for input_id in input_ids]
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1760-1795: Continue prepare for extend / 继续说明prepare for extend
+```python
+        extend_input_logprob_token_ids = []
+        multimodal_inputs = []
+        mamba_track_mask_cpu = []
+        mamba_track_indices_cpu = []
+        mamba_track_seqlens_cpu = []
+
+        for i, (req, seq_len, pre_len) in enumerate(zip(reqs, seq_lens, prefix_lens)):
+            req.req_pool_idx = req_pool_indices[i]
+            assert seq_len - pre_len == req.extend_input_len
+
+            req.extend_batch_idx += 1
+
+            # update req-level memory management fields
+            req.kv_committed_len = seq_len
+            req.kv_allocated_len = seq_len
+
+            # If input_embeds are available, store them
+            if req.input_embeds is not None:
+                # Slice to match extend_input_len — PrefillAdder truncates
+                # fill_ids/extend_input_len on chunk overflow but not input_embeds.
+                input_embeds.extend(
+                    req.input_embeds[pre_len : pre_len + req.extend_input_len]
+                )
+
+            if req.positional_embed_overrides is not None:
+                # Override positions are absolute in the full sequence.
+                # Convert to extend-tensor coordinates by subtracting pre_len,
+                # then skip any that fall within the cached prefix.
+                embeds_to_add = []
+                for embed_idx, pos in enumerate(
+                    req.positional_embed_overrides.positions
+                ):
+                    extend_pos = pos - pre_len
+                    if extend_pos < 0 or extend_pos >= req.extend_input_len:
+                        continue  # Outside current extend chunk, skip
+                    embeds_to_add.append((embed_idx, input_id_pointer + extend_pos))
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1796-1831: Continue prepare for extend / 继续说明prepare for extend
+```python
+                if embeds_to_add:
+                    has_replace_embeds = True
+                    indices, positions = zip(*embeds_to_add)
+                    all_replace_embeds.append(
+                        req.positional_embed_overrides.embeds[list(indices)]
+                    )
+                    all_replace_positions.extend(positions)
+            input_id_pointer += input_id_lens[i]
+
+            multimodal_inputs.append(req.multimodal_inputs)
+
+            # Only calculate cached_tokens once. Once retracted, the 'retracted_stain'
+            # flag will always True
+            if not req.retracted_stain:
+                new_cached = pre_len - req.already_computed
+                req.cached_tokens += new_cached
+
+                # Calculate detailed breakdown of cached tokens by source (for HiCache)
+                # Only compute once on FIRST chunk - subsequent chunks in chunked prefill
+                # would incorrectly count previously computed tokens as cache hits.
+                if not req._cache_breakdown_computed:
+                    # At this point, prefix_indices has been extended with host data
+                    # via init_load_back in schedule_policy, so:
+                    # - len(prefix_indices) = device_original + host_loaded
+                    # - host_hit_length = total tokens from host cache (including storage-prefetched)
+                    # - storage_hit_length = tokens loaded from storage backend (L3 hits)
+                    # - device_portion = len(prefix_indices) - host_hit_length
+                    #
+                    # Storage hits are now tracked via scheduler after prefetch completes.
+                    # storage_hit_length is set by scheduler.pop_prefetch_loaded_tokens()
+                    host_total = req.host_hit_length
+                    # Clamp storage to host_total to handle edge cases
+                    storage_portion = min(host_total, req.storage_hit_length)
+                    host_portion = host_total - storage_portion
+                    device_portion = max(0, len(req.prefix_indices) - host_total)
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1832-1867: Continue prepare for extend / 继续说明prepare for extend
+```python
+                    req.cached_tokens_device = device_portion
+                    req.cached_tokens_host = host_portion
+                    req.cached_tokens_storage = storage_portion
+                    req._cache_breakdown_computed = True
+
+                req.already_computed = seq_len
+            req.is_retracted = False
+
+            if get_global_server_args().enable_mamba_extra_buffer():
+                self._mamba_radix_cache_v2_req_prepare_for_extend(
+                    req,
+                    mamba_track_mask_cpu,
+                    mamba_track_indices_cpu,
+                    mamba_track_seqlens_cpu,
+                )
+
+            if self.return_logprob:
+                # Find input logprob token ids.
+                # First, find a global index within origin_input_ids and slide it by 1
+                # to compute input logprobs. It is because you need the next token
+                # to compute input logprobs. E.g., (chunk size 2)
+                #
+                # input_logprobs = [1, 2, 3, 4]
+                # fill_ids = [1, 2]
+                # extend_input_logprob_token_id = [2, 3]
+                #
+                # Note that it can also overflow. In this case, we pad it with 0.
+                # input_logprobs = [1, 2, 3, 4]
+                # fill_ids = [3, 4]
+                # extend_input_logprob_token_id = [4, 0]
+                global_start_idx, global_end_idx = (
+                    len(req.prefix_indices),
+                    len(req.fill_ids),
+                )
+                if req.logprob_start_len == -1:
+                    logprob_start_len = len(req.origin_input_ids)
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1868-1903: Continue prepare for extend / 继续说明prepare for extend
+```python
+                else:
+                    logprob_start_len = req.logprob_start_len
+                # Apply logprob_start_len
+                if global_start_idx < logprob_start_len:
+                    global_start_idx = logprob_start_len
+
+                logprob_token_ids = req.origin_input_ids[
+                    global_start_idx + 1 : global_end_idx + 1
+                ]
+                extend_input_logprob_token_ids.extend(logprob_token_ids)
+
+                # We will need req.extend_input_len - req.extend_logprob_start_len number of
+                # tokens, and logprob_token_ids is for input logprob, so pad the rest of them by 0.
+                extend_input_logprob_token_ids.extend(
+                    [0]
+                    * (
+                        req.extend_input_len
+                        - req.extend_logprob_start_len
+                        - len(logprob_token_ids)
+                    )
+                )
+
+        if self.return_logprob:
+            extend_input_logprob_token_ids = torch.tensor(
+                extend_input_logprob_token_ids
+            )
+            # Clamp placeholder or out-of-range token IDs (e.g., multimodal hashes)
+            # so they stay within the vocab boundary before being sent to GPU.
+            extend_input_logprob_token_ids.clamp_(0, self.model_config.vocab_size - 1)
+        else:
+            extend_input_logprob_token_ids = None
+
+        if has_replace_embeds:
+            replace_embeds_tensor = torch.cat(all_replace_embeds, dim=0).to(
+                self.device, non_blocking=True
+            )
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1904-1939: Continue prepare for extend / 继续说明prepare for extend
+```python
+            replace_positions_tensor = torch.tensor(
+                all_replace_positions, dtype=torch.long, device=self.device
+            )
+        else:
+            replace_embeds_tensor = None
+            replace_positions_tensor = None
+
+        self.input_ids = input_ids_tensor
+        self.req_pool_indices = req_pool_indices_tensor
+        self.orig_seq_lens = orig_seq_lens_tensor
+        self.out_cache_loc = out_cache_loc
+        self.input_embeds = (
+            torch.tensor(input_embeds, pin_memory=_pin).to(
+                self.device, non_blocking=True
+            )
+            if input_embeds
+            else None
+        )
+        self.replace_embeds = replace_embeds_tensor
+        self.replace_positions = replace_positions_tensor
+        for mm_input in multimodal_inputs:
+            if mm_input is None:
+                continue
+            if isinstance(mm_input.vision_position_ids, torch.Tensor):
+                mm_input.vision_position_ids = mm_input.vision_position_ids.to(
+                    self.device, non_blocking=True
+                )
+            if isinstance(mm_input.visible_frame_counts, torch.Tensor):
+                mm_input.visible_frame_counts = mm_input.visible_frame_counts.to(
+                    self.device, non_blocking=True
+                )
+        self.multimodal_inputs = multimodal_inputs
+        self.token_type_ids = token_type_ids_tensor
+        self.seq_lens_sum = sum(seq_lens)
+
+        # Pre-compute delimiter indices as CPU tensors for MIS.
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1940-1975: Continue prepare for extend / 继续说明prepare for extend
+```python
+        # When --enable-mis is on, every request in the batch is expected to
+        # carry delimiter indices (the score endpoint always produces MIS-structured
+        # requests). Consumers index this list without None-checking.
+        if get_global_server_args().enable_mis and any(
+            r.multi_item_delimiter_indices is not None for r in reqs
+        ):
+            assert all(
+                r.multi_item_delimiter_indices is not None for r in reqs
+            ), "MIS batch must have delimiter indices on every request"
+            self.multi_item_delimiter_indices = [
+                torch.tensor(r.multi_item_delimiter_indices, dtype=torch.int64)
+                for r in reqs
+            ]
+        else:
+            self.multi_item_delimiter_indices = None
+
+        if self.return_logprob:
+            self.top_logprobs_nums = [r.top_logprobs_num for r in reqs]
+            self.token_ids_logprobs = [r.token_ids_logprob for r in reqs]
+
+        self.extend_logprob_start_lens = [r.extend_logprob_start_len for r in reqs]
+        self.extend_input_logprob_token_ids = extend_input_logprob_token_ids
+
+        if get_global_server_args().enable_mamba_extra_buffer():
+            self.mamba_track_indices = torch.tensor(
+                mamba_track_indices_cpu,
+                dtype=torch.int64,
+                device=self.device,
+            )
+            self.mamba_track_mask = torch.tensor(
+                mamba_track_mask_cpu,
+                dtype=torch.bool,
+                device=self.device,
+            )
+            self.mamba_track_seqlens = torch.tensor(
+                mamba_track_seqlens_cpu,
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1976-1987: Continue prepare for extend / 继续说明prepare for extend
+```python
+                dtype=torch.int64,
+                device=self.device,
+            )
+
+        if self.model_config.is_encoder_decoder:
+            self.prepare_encoder_info_extend(input_ids, seq_lens)
+
+        # Build sampling info
+        self.sampling_info = SamplingBatchInfo.from_schedule_batch(
+            self,
+            self.model_config.vocab_size,
+        )
+```
+**EN:** This block implements the method `prepare_for_extend()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_extend()`。它围绕 `prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 1989-2024: Implement mamba radix cache v2 req prepare for extend / 实现mamba radix 缓存 v2 req prepare for extend
+```python
+    def _mamba_radix_cache_v2_req_prepare_for_extend(
+        self,
+        req: Req,
+        mamba_track_mask_cpu: List[bool],
+        mamba_track_indices_cpu: List[int],
+        mamba_track_seqlens_cpu: List[int],
+    ):
+        def _force_track_h(i: int) -> int:
+            assert i % FLA_CHUNK_SIZE == 0
+            # There are 3 cases for mamba_track_seqlen passed to mamba_track_seqlens_cpu:
+            # 1) aligned with FLA_CHUNK_SIZE-> retrieve from last_recurrent_state
+            #    a) is the last position -> retrieve from last_recurrent_state
+            #    b) is NOT the last position -> retrieve from h
+            # 2) unaligned with FLA_CHUNK_SIZE -> retrieve from h
+            # Currently, the math calculation only supports case 1a and 2. So for 1b, we need to add 1
+            # to force the math calculation to retrieve the correct mamba state from h.
+            return i + 1
+
+        mamba_cache_chunk_size = get_global_server_args().mamba_cache_chunk_size
+        mask = req.extend_input_len >= mamba_cache_chunk_size
+        mamba_track_mask_cpu.append(mask)
+        mamba_track_indices_cpu.append(
+            req.mamba_ping_pong_track_buffer[req.mamba_next_track_idx].item()
+        )
+        mamba_track_seqlen = -1
+        if mask:
+            # mamba_track_seqlen is used to calculate the indices to track in
+            # hybrid_linear_attn_backend's _init_track_ssm_indices. Due to the
+            # fact that the ssm state between aligned and non-aligned are retrieved differently,
+            # if 1) last pos and 2) is aligned, then retrieved from the last_recurrent_state,
+            # otherwise retrieved from h (i.e. unaligned).
+            # We need to pass the non-aligned seqlen to the calculation. Even though
+            # we pass in mamba_track_seqlen, the actual tracked seqlen is mamba_last_track_seqlen.
+            mamba_track_seqlen = len(req.prefix_indices) + req.extend_input_len
+
+            # mamba_track_seqlen_aligned/mamba_last_track_seqlen is actual tracked seqlen. Used to pass to
+```
+**EN:** This block implements the method `_mamba_radix_cache_v2_req_prepare_for_extend(req, mamba_track_mask_cpu, mamba_track_indices_cpu, mamba_track_seqlens_cpu)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `_mamba_radix_cache_v2_req_prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `_mamba_radix_cache_v2_req_prepare_for_extend(req, mamba_track_mask_cpu, mamba_track_indices_cpu, mamba_track_seqlens_cpu)`。它围绕 `_mamba_radix_cache_v2_req_prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2025-2060: Continue mamba radix cache v2 req prepare for extend / 继续说明mamba radix 缓存 v2 req prepare for extend
+```python
+            # mamba radix cache to track which seqlen this mamba state should store at.
+            mamba_track_seqlen_aligned = (
+                len(req.prefix_indices)
+                + (req.extend_input_len // mamba_cache_chunk_size)
+                * mamba_cache_chunk_size
+            )
+
+            # mamba_track_fla_chunk_aligned is the aligned seqlen based on FLA_CHUNK_SIZE
+            # If mamba_track_fla_chunk_aligned != mamba_track_seqlen_aligned, which can be true when
+            # page_size > FLA_CHUNK_SIZE, we need to force the math calculation to retrieve the correct mamba state from h
+            # by _force_track_h()
+            mamba_track_fla_chunk_aligned = (
+                len(req.prefix_indices)
+                + (req.extend_input_len // FLA_CHUNK_SIZE) * FLA_CHUNK_SIZE
+            )
+            if mamba_track_fla_chunk_aligned != mamba_track_seqlen_aligned:
+                # We want to track mamba_track_seqlen_aligned, and it's not the last position,
+                # so we need to add 1 to the seqlen to retrieve the correct mamba state from h.
+                mamba_track_seqlen = _force_track_h(mamba_track_seqlen_aligned)
+
+            req.mamba_next_track_idx = (
+                self.req_to_token_pool.get_mamba_ping_pong_other_idx(
+                    req.mamba_next_track_idx
+                )
+            )
+            if req.mamba_branching_seqlen is not None:
+                # track branching point in this forward if the branching point
+                # is within the current extend batch.
+                branching_seqlen_aligned_mask = (
+                    req.mamba_branching_seqlen - len(req.prefix_indices)
+                ) % mamba_cache_chunk_size == 0
+                if (
+                    req.mamba_branching_seqlen > len(req.prefix_indices)
+                    and req.mamba_branching_seqlen < mamba_track_seqlen
+                    and branching_seqlen_aligned_mask
+                ):
+```
+**EN:** This block implements the method `_mamba_radix_cache_v2_req_prepare_for_extend(req, mamba_track_mask_cpu, mamba_track_indices_cpu, mamba_track_seqlens_cpu)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `_mamba_radix_cache_v2_req_prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `_mamba_radix_cache_v2_req_prepare_for_extend(req, mamba_track_mask_cpu, mamba_track_indices_cpu, mamba_track_seqlens_cpu)`。它围绕 `_mamba_radix_cache_v2_req_prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2061-2067: Continue mamba radix cache v2 req prepare for extend / 继续说明mamba radix 缓存 v2 req prepare for extend
+```python
+                    # We want to track mamba_track_seqlen_aligned, and it's not the last position,
+                    # so we need to add 1 to the seqlen to retrieve the correct mamba state from h.
+                    # See _force_track_h() for more details.
+                    mamba_track_seqlen = _force_track_h(req.mamba_branching_seqlen)
+                    mamba_track_seqlen_aligned = req.mamba_branching_seqlen
+            req.mamba_last_track_seqlen = mamba_track_seqlen_aligned
+        mamba_track_seqlens_cpu.append(mamba_track_seqlen)
+```
+**EN:** This block implements the method `_mamba_radix_cache_v2_req_prepare_for_extend(req, mamba_track_mask_cpu, mamba_track_indices_cpu, mamba_track_seqlens_cpu)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `_mamba_radix_cache_v2_req_prepare_for_extend`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `_mamba_radix_cache_v2_req_prepare_for_extend(req, mamba_track_mask_cpu, mamba_track_indices_cpu, mamba_track_seqlens_cpu)`。它围绕 `_mamba_radix_cache_v2_req_prepare_for_extend` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2069-2072: Implement prepare for split prefill / 实现prepare for split prefill
+```python
+    def prepare_for_split_prefill(self):
+        self.prepare_for_extend()
+        # For split prefill, we need to set the forward mode to SPLIT_PREFILL
+        self.forward_mode = ForwardMode.SPLIT_PREFILL
+```
+**EN:** This block implements the method `prepare_for_split_prefill()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_split_prefill`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_split_prefill()`。它围绕 `prepare_for_split_prefill` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2074-2103: Implement mix with running / 实现mix with running
+```python
+    def mix_with_running(self, running_batch: "ScheduleBatch"):
+        self.forward_mode = ForwardMode.MIXED
+        running_bs = running_batch.batch_size()
+
+        for req in running_batch.reqs:
+            req.fill_ids = req.origin_input_ids + req.output_ids
+            req.set_extend_input_len(1)
+
+        input_ids = torch.cat([self.input_ids, running_batch.input_ids])
+        out_cache_loc = torch.cat([self.out_cache_loc, running_batch.out_cache_loc])
+
+        self.merge_batch(running_batch)
+        self.input_ids = input_ids
+        self.out_cache_loc = out_cache_loc
+
+        # For overlap scheduler, the output_ids has one step delay
+        delta = 0 if self.enable_overlap else -1
+
+        # NOTE: prefix_indices is what has been cached, but we don't cache each decode step
+        self.prefix_lens.extend(
+            [
+                len(r.origin_input_ids) + len(r.output_ids) + delta
+                for r in running_batch.reqs
+            ]
+        )
+        self.extend_lens.extend([1] * running_bs)
+        self.extend_num_tokens += running_bs
+        # TODO (lianmin): Revisit this. It should be seq_len - 1
+        self.extend_logprob_start_lens.extend([0] * running_bs)
+        self.is_prefill_only = False
+```
+**EN:** This block implements the method `mix_with_running(running_batch)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `mix_with_running`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `mix_with_running(running_batch)`。它围绕 `mix_with_running` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2105-2137: Implement new tokens required next decode / 实现new tokens required next 解码
+```python
+    def new_tokens_required_next_decode(
+        self, selected_indices: Optional[List[int]] = None
+    ):
+        page_size = self.token_to_kv_pool_allocator.page_size
+        requests = (
+            self.reqs
+            if selected_indices is None
+            else [self.reqs[i] for i in selected_indices]
+        )
+
+        if self.spec_algorithm.is_none():
+            new_pages = sum(1 for r in requests if r.kv_committed_len % page_size == 0)
+            return new_pages * page_size
+
+        if self.is_spec_v2:
+            return self._new_tokens_required_next_decode_spec_v2(requests, page_size)
+
+        server_args = get_global_server_args()
+        len_per_topk = server_args.speculative_num_steps or 1
+        spec_topk = server_args.speculative_eagle_topk or 1
+        spec_tokens = server_args.speculative_num_draft_tokens
+
+        if page_size > 1 and spec_topk > 1:
+            # last partial page and ceil alignment
+            len_per_topk = ceil_align(len_per_topk + page_size, page_size)
+            spec_tokens = ceil_align(spec_tokens, page_size)
+        elif page_size > 1:
+            # only page alignment
+            len_per_topk = ceil_align(len_per_topk, page_size)
+            spec_tokens = ceil_align(spec_tokens, page_size)
+
+        num_tokens = max(len_per_topk * spec_topk, spec_tokens) * len(requests)
+        return num_tokens
+```
+**EN:** This block implements the method `new_tokens_required_next_decode(selected_indices)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `new_tokens_required_next_decode`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `new_tokens_required_next_decode(selected_indices)`。它围绕 `new_tokens_required_next_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2139-2150: Implement new tokens required next decode spec v2 / 实现new tokens required next 解码 spec v2
+```python
+    def _new_tokens_required_next_decode_spec_v2(self, requests, page_size):
+        """Tight estimate matching eagle_info_v2.prepare_for_decode allocation."""
+        from sglang.srt.managers.utils import get_alloc_len_per_decode
+
+        alloc_len = get_alloc_len_per_decode()
+        total = 0
+        for r in requests:
+            x = max(0, r.kv_committed_len + 2 * alloc_len - r.kv_allocated_len)
+            cur = r.kv_allocated_len
+            nxt = cur + x
+            total += ceil_align(nxt, page_size) - ceil_align(cur, page_size)
+        return total
+```
+**EN:** This block implements the method `_new_tokens_required_next_decode_spec_v2(requests, page_size)` on `ScheduleBatch`. It focuses on Tight estimate matching eagle_info_v2.prepare_for_decode allocation., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `_new_tokens_required_next_decode_spec_v2(requests, page_size)`。它围绕 `_new_tokens_required_next_decode_spec_v2` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2152-2155: Implement check decode mem / 实现检查 解码 mem
+```python
+    def check_decode_mem(self, selected_indices: Optional[List[int]] = None):
+        num_tokens = self.new_tokens_required_next_decode(selected_indices)
+        evict_from_tree_cache(self.tree_cache, num_tokens)
+        return self.token_to_kv_pool_allocator.available_size() >= num_tokens
+```
+**EN:** This block implements the method `check_decode_mem(selected_indices)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `check_decode_mem`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `check_decode_mem(selected_indices)`。它围绕 `check_decode_mem` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2157-2163: Implement retract all / 实现retract all
+```python
+    def retract_all(self, server_args: ServerArgs):
+        retracted_reqs = self.reqs
+        for idx in range(len(self.reqs)):
+            self.release_req(idx, len(self.reqs) - idx, server_args)
+
+        self.filter_batch(retracted_reqs)
+        return retracted_reqs
+```
+**EN:** This block implements the method `retract_all(server_args)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `retract_all`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `retract_all(server_args)`。它围绕 `retract_all` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2165-2200: Implement retract decode / 实现retract 解码
+```python
+    def retract_decode(
+        self, server_args: ServerArgs
+    ) -> Tuple[List[Req], float, List[Req]]:
+        """Retract the decoding requests when there is not enough memory."""
+        sorted_indices = list(range(len(self.reqs)))
+
+        # TODO(lsyin): improve retraction policy for radix cache
+        # For spec decoding, filter_batch API can only filter
+        # requests from the back, so we can only retract from the back.
+        # TODO(sang): Clean up finish path and support better retract
+        # policy.
+        if not server_args.speculative_algorithm:
+            sorted_indices.sort(
+                key=lambda i: (
+                    len(self.reqs[i].output_ids),
+                    -len(self.reqs[i].origin_input_ids),
+                ),
+                reverse=True,
+            )
+
+        retracted_reqs = []
+        first_iter = True
+        while first_iter or (
+            not self.check_decode_mem(selected_indices=sorted_indices)
+        ):
+            if len(sorted_indices) == 1:
+                # Always keep at least one request
+                break
+
+            first_iter = False
+            idx = sorted_indices.pop()
+            req = self.reqs[idx]
+            retracted_reqs.append(req)
+            # release memory and don't insert into the tree because we need the space instantly
+            self.release_req(idx, len(sorted_indices), server_args)
+```
+**EN:** This block implements the method `retract_decode(server_args)` on `ScheduleBatch`. It focuses on Retract the decoding requests when there is not enough memory., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `retract_decode(server_args)`。它围绕 `retract_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2201-2234: Continue retract decode / 继续说明retract 解码
+```python
+        reqs_to_abort: List[Req] = []
+        if len(sorted_indices) <= 1 and not self.check_decode_mem(
+            selected_indices=sorted_indices
+        ):
+            # Even the last remaining request cannot fit in memory.
+            # Instead of crashing the scheduler, gracefully abort it.
+            last_idx = sorted_indices.pop()
+            last_req = self.reqs[last_idx]
+            last_req.to_finish = FINISH_ABORT(
+                "Out of memory even after retracting all other requests "
+                "in the decode batch. Aborting the last request.",
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            )
+            reqs_to_abort.append(last_req)
+            self.release_req(last_idx, 0, server_args)
+            logger.warning(
+                "retract_decode: aborted last request %s due to OOM", last_req.rid
+            )
+
+        self.filter_batch(keep_indices=sorted_indices)
+
+        # Reqs in batch are filtered
+        total_decoded_tokens = sum(len(r.output_ids) for r in self.reqs)
+        total_max_new_tokens = sum(r.sampling_params.max_new_tokens for r in self.reqs)
+
+        new_estimate_ratio = (
+            total_decoded_tokens
+            + envs.SGLANG_RETRACT_DECODE_STEPS.get() * len(self.reqs)
+        ) / (
+            total_max_new_tokens + 1
+        )  # avoid zero division
+        new_estimate_ratio = min(1.0, new_estimate_ratio)
+
+        return retracted_reqs, new_estimate_ratio, reqs_to_abort
+```
+**EN:** This block implements the method `retract_decode(server_args)` on `ScheduleBatch`. It focuses on Retract the decoding requests when there is not enough memory., so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `retract_decode(server_args)`。它围绕 `retract_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2236-2252: Implement release req / 实现release req
+```python
+    def release_req(self, idx: int, remaing_req_count: int, server_args: ServerArgs):
+        req = self.reqs[idx]
+
+        if self.hisparse_coordinator is not None and not req.finished():
+            self.hisparse_coordinator.retract_req(req)
+
+        if server_args.disaggregation_mode == "decode":
+            req.offload_kv_cache(
+                self.req_to_token_pool, self.token_to_kv_pool_allocator
+            )
+        # TODO (csy): for preempted requests, we may want to insert into the tree
+        release_kv_cache(req, self.tree_cache, is_insert=False)
+        # NOTE(lsyin): we should use the newly evictable memory instantly.
+        num_tokens = remaing_req_count * envs.SGLANG_RETRACT_DECODE_STEPS.get()
+        evict_from_tree_cache(self.tree_cache, num_tokens)
+
+        req.reset_for_retract()
+```
+**EN:** This block implements the method `release_req(idx, remaing_req_count, server_args)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `release_req`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `release_req(idx, remaing_req_count, server_args)`。它围绕 `release_req` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2254-2256: Implement prepare encoder info decode / 实现prepare encoder info 解码
+```python
+    def prepare_encoder_info_decode(self):
+        # Reset the encoder cached status
+        self.encoder_cached = [True] * len(self.reqs)
+```
+**EN:** This block implements the method `prepare_encoder_info_decode()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_encoder_info_decode`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_encoder_info_decode()`。它围绕 `prepare_encoder_info_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2258-2271: Implement prepare for idle / 实现prepare for idle
+```python
+    def prepare_for_idle(self):
+        self.forward_mode = ForwardMode.IDLE
+        self.input_ids = torch.empty(0, dtype=torch.int64, device=self.device)
+        self.seq_lens = torch.empty(0, dtype=torch.int64, device=self.device)
+        self.seq_lens_cpu = torch.empty(0, dtype=torch.int64)
+        self.orig_seq_lens = torch.empty(0, dtype=torch.int32, device=self.device)
+        self.out_cache_loc = torch.empty(0, dtype=torch.int64, device=self.device)
+        self.req_pool_indices = torch.empty(0, dtype=torch.int64, device=self.device)
+        self.seq_lens_sum = 0
+        self.extend_num_tokens = 0
+        self.sampling_info = SamplingBatchInfo.from_schedule_batch(
+            self,
+            self.model_config.vocab_size,
+        )
+```
+**EN:** This block implements the method `prepare_for_idle()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_idle`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_idle()`。它围绕 `prepare_for_idle` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2272-2273: Provide supporting module logic / 提供辅助模块逻辑
+```python
+
+    @property
+```
+**EN:** This block contains supporting statements such as constants, small helpers, or configuration glue.
+**CN:** 该代码块包含常量、小型辅助逻辑或配置衔接代码。
+
+### Lines 2274-2278: Implement is spec v2 / 实现is spec v2
+```python
+    def is_spec_v2(self):
+        # FIXME: finally deprecate is_spec_v2
+        ret = self.enable_overlap and not self.spec_algorithm.is_none()
+        assert not ret or self.spec_algorithm.supports_spec_v2()
+        return ret
+```
+**EN:** This block implements the method `is_spec_v2()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `is_spec_v2`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `is_spec_v2()`。它围绕 `is_spec_v2` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2280-2315: Implement prepare for decode / 实现prepare for 解码
+```python
+    def prepare_for_decode(self):
+        self.forward_mode = ForwardMode.DECODE
+        bs = len(self.reqs)
+        # Decode embeds the last output token via embed_tokens; clear the stale
+        # prefill-time tensor so it doesn't leak into ForwardBatch.
+        self.input_embeds = None
+
+        # Clear context parallel metadata - CP is only for prefill, not decode
+        if hasattr(self, "attn_cp_metadata") and self.attn_cp_metadata is not None:
+            self.attn_cp_metadata = None
+
+        if self.is_spec_v2:
+            # TODO(spec-v2): all spec v2 should go through this path
+            draft_input: EagleDraftInput = self.spec_info
+            draft_input.prepare_for_decode(self)
+
+        if not self.spec_algorithm.is_none():
+            # if spec decoding is used, the decode batch is prepared inside
+            # `forward_batch_speculative_generation` after running draft models.
+            return
+
+        if self.sampling_info.penalizer_orchestrator.is_required:
+            if self.enable_overlap:
+                # TODO: this can be slow, optimize this.
+                delayed_output_ids = torch.tensor(
+                    [
+                        (
+                            req.output_ids[-1]
+                            if len(req.output_ids)
+                            else req.origin_input_ids[-1]
+                        )
+                        for req in self.reqs
+                    ],
+                    dtype=torch.int64,
+                    device=self.device,
+                )
+```
+**EN:** This block implements the method `prepare_for_decode()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_decode`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_decode()`。它围绕 `prepare_for_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2316-2351: Continue prepare for decode / 继续说明prepare for 解码
+```python
+                self.sampling_info.penalizer_orchestrator.cumulate_output_tokens(
+                    delayed_output_ids
+                )
+            else:
+                self.sampling_info.penalizer_orchestrator.cumulate_output_tokens(
+                    self.output_ids.to(torch.int64)
+                )
+
+        # Update fields
+        # Coerce to int64: torch sampling helpers (sampling_from_probs_torch /
+        # top_k_top_p_min_p_sampling_from_probs_torch) return int32 token ids,
+        # but downstream kernels enforce int64 (e.g. DeepSeek-V4 hash_topk).
+        self.input_ids = self.output_ids.to(torch.int64)
+        self.output_ids = None
+
+        if self.model_config.is_encoder_decoder:
+            self.prepare_encoder_info_decode()
+
+        # Allocate memory
+        self.out_cache_loc = alloc_for_decode(self, token_per_req=1)
+
+        # Update req-level memory management fields
+        for req in self.reqs:
+            req.decode_batch_idx += 1
+            req.kv_committed_len += 1
+            req.kv_allocated_len += 1
+
+        # Update seq_lens after allocation
+        if self.enable_overlap:
+            # Do not use in-place operations in the overlap mode
+            self.seq_lens = self.seq_lens + 1
+            self.seq_lens_cpu = self.seq_lens_cpu + 1
+            self.orig_seq_lens = self.orig_seq_lens + 1
+        else:
+            # A faster in-place version
+            self.seq_lens.add_(1)
+```
+**EN:** This block implements the method `prepare_for_decode()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_decode`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_decode()`。它围绕 `prepare_for_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2352-2387: Continue prepare for decode / 继续说明prepare for 解码
+```python
+            self.seq_lens_cpu.add_(1)
+            self.orig_seq_lens.add_(1)
+        self.seq_lens_sum += bs
+
+        if self.hisparse_coordinator is not None:
+            self.hisparse_coordinator.map_last_loc_to_buffer(
+                self.seq_lens,
+                self.out_cache_loc,
+                self.req_pool_indices,
+                self.seq_lens_cpu,
+            )
+
+        if get_global_server_args().enable_mamba_extra_buffer():
+            if len(self.reqs) == 0:
+                self.mamba_track_indices = torch.empty(
+                    (0,), dtype=torch.int64, device=self.device
+                )
+            else:
+                # already on device
+                all_buffers = torch.stack(
+                    [req.mamba_ping_pong_track_buffer for req in self.reqs]
+                )
+                idx = (
+                    torch.tensor(
+                        [req.mamba_next_track_idx for req in self.reqs],
+                        dtype=torch.int64,
+                        pin_memory=True,
+                    )
+                    .unsqueeze(1)
+                    .to(device=all_buffers.device, non_blocking=True)
+                )
+                self.mamba_track_indices = (
+                    torch.gather(all_buffers, 1, idx).squeeze(1).to(torch.int64)
+                )
+
+            # async H2D
+```
+**EN:** This block implements the method `prepare_for_decode()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_decode`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_decode()`。它围绕 `prepare_for_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2388-2392: Continue prepare for decode / 继续说明prepare for 解码
+```python
+            self.mamba_track_mask = (
+                (self.seq_lens_cpu % get_global_server_args().mamba_track_interval == 0)
+                .pin_memory()
+                .to(device=self.device, non_blocking=True)
+            )
+```
+**EN:** This block implements the method `prepare_for_decode()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `prepare_for_decode`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `prepare_for_decode()`。它围绕 `prepare_for_decode` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2394-2398: Implement maybe wait verify done / 实现maybe wait verify done
+```python
+    def maybe_wait_verify_done(self):
+        if self.is_spec_v2:
+            draft_input: EagleDraftInput = self.spec_info
+            if draft_input.verify_done is not None:
+                draft_input.verify_done.synchronize()
+```
+**EN:** This block implements the method `maybe_wait_verify_done()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `maybe_wait_verify_done`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `maybe_wait_verify_done()`。它围绕 `maybe_wait_verify_done` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2400-2435: Implement filter batch / 实现filter 批处理
+```python
+    def filter_batch(
+        self,
+        chunked_req_to_exclude: Optional[Union[Req, List[Req]]] = None,
+        keep_indices: Optional[List[int]] = None,
+        # FIXME(lsyin): deprecate this API after spec v1 is deprecated
+        v1_spec_info_filtered: Optional[bool] = False,
+    ):
+        # FIXME(lsyin): used here to get the correct seq_lens
+        # The batch has been launched but we need it verified to get correct next batch info
+        self.maybe_wait_verify_done()
+
+        if keep_indices is None:
+            if isinstance(chunked_req_to_exclude, Req):
+                chunked_req_to_exclude = [chunked_req_to_exclude]
+            elif chunked_req_to_exclude is None:
+                chunked_req_to_exclude = []
+            keep_indices = [
+                i
+                for i in range(len(self.reqs))
+                if not self.reqs[i].finished()
+                and self.reqs[i] not in chunked_req_to_exclude
+            ]
+
+        if keep_indices is None or len(keep_indices) == 0:
+            # Filter out all requests
+            self.reqs = []
+            return
+
+        if len(keep_indices) == len(self.reqs):
+            # No need to filter
+            return
+
+        keep_indices_device = torch.tensor(
+            keep_indices,
+            dtype=torch.int64,
+            pin_memory=is_pin_memory_available(self.device),
+```
+**EN:** This block implements the method `filter_batch(chunked_req_to_exclude, keep_indices, v1_spec_info_filtered)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `filter_batch`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `filter_batch(chunked_req_to_exclude, keep_indices, v1_spec_info_filtered)`。它围绕 `filter_batch` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2436-2471: Continue filter batch / 继续说明filter 批处理
+```python
+        ).to(self.device, non_blocking=True)
+
+        if self.model_config.is_encoder_decoder:
+            self.encoder_lens = self.encoder_lens[keep_indices_device]
+            self.encoder_lens_cpu = [self.encoder_lens_cpu[i] for i in keep_indices]
+
+        self.reqs = [self.reqs[i] for i in keep_indices]
+        if self.multimodal_inputs is not None:
+            self.multimodal_inputs = [self.multimodal_inputs[i] for i in keep_indices]
+        self.req_pool_indices = self.req_pool_indices[keep_indices_device]
+        self.seq_lens = self.seq_lens[keep_indices_device]
+        self.seq_lens_cpu = self.seq_lens_cpu[keep_indices]
+        self.orig_seq_lens = self.orig_seq_lens[keep_indices_device]
+        self.out_cache_loc = None
+        self.seq_lens_sum = self.seq_lens.sum().item()
+
+        if self.output_ids is not None:
+            self.output_ids = self.output_ids[keep_indices_device]
+
+        self.mamba_track_indices = None
+        self.mamba_track_mask = None
+        self.mamba_track_seqlens = None
+        self.return_logprob = any(req.return_logprob for req in self.reqs)
+        if self.return_logprob:
+            self.top_logprobs_nums = [self.top_logprobs_nums[i] for i in keep_indices]
+            self.token_ids_logprobs = [self.token_ids_logprobs[i] for i in keep_indices]
+        else:
+            self.top_logprobs_nums = None
+            self.token_ids_logprobs = None
+
+        self.has_stream = any(req.stream for req in self.reqs)
+        self.has_grammar = any(req.grammar for req in self.reqs)
+
+        self.sampling_info.filter_batch(keep_indices, keep_indices_device)
+        # NOTE: spec_info filtered before batch filtering only happens in:
+        # - Spec v1's verify phase
+```
+**EN:** This block implements the method `filter_batch(chunked_req_to_exclude, keep_indices, v1_spec_info_filtered)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `filter_batch`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `filter_batch(chunked_req_to_exclude, keep_indices, v1_spec_info_filtered)`。它围绕 `filter_batch` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2472-2479: Continue filter batch / 继续说明filter 批处理
+```python
+        # - Only for decode batch (running_batch)
+        has_been_filtered = v1_spec_info_filtered and not self.is_spec_v2
+
+        if self.spec_info:
+            self.spec_info.filter_batch(
+                new_indices=keep_indices_device,
+                has_been_filtered=has_been_filtered,
+            )
+```
+**EN:** This block implements the method `filter_batch(chunked_req_to_exclude, keep_indices, v1_spec_info_filtered)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `filter_batch`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `filter_batch(chunked_req_to_exclude, keep_indices, v1_spec_info_filtered)`。它围绕 `filter_batch` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2481-2516: Implement merge batch / 实现merge 批处理
+```python
+    def merge_batch(self, other: "ScheduleBatch"):
+        # In the regular scheduler path:
+        # 1) self is always prefill, whose seq_lens is not a future
+        # 2) other is always decode, which is finished in previous step
+        # so verify_done is already synced and this is a no-op.
+        # In disagg decode + overlap, merge_batch can be called before
+        # filter_batch, so running_batch.seq_lens may still be a forward_stream
+        # future. Synchronize here to avoid a cross-stream data race.
+        self.maybe_wait_verify_done()
+
+        # Penalizer orchestrator must be merged before Batch.reqs is merged. This is because
+        # orchestrator.merge() depends on Batch.reqs during preparation of each penalizers, so it
+        # needs to be called with pre-merged Batch.reqs.
+        self.sampling_info.merge_batch(other.sampling_info)
+
+        # Encoder-decoder infos
+        if self.model_config.is_encoder_decoder:
+            self.encoder_lens = torch.cat([self.encoder_lens, other.encoder_lens])
+            self.encoder_lens_cpu.extend(other.encoder_lens_cpu)
+        self.req_pool_indices = torch.cat(
+            [self.req_pool_indices, other.req_pool_indices]
+        )
+        self.seq_lens = torch.cat([self.seq_lens, other.seq_lens])
+        self.seq_lens_cpu = torch.cat([self.seq_lens_cpu, other.seq_lens_cpu])
+        self.orig_seq_lens = torch.cat([self.orig_seq_lens, other.orig_seq_lens])
+        self.out_cache_loc = None
+        self.seq_lens_sum += other.seq_lens_sum
+        if self.output_ids is not None:
+            self.output_ids = torch.cat([self.output_ids, other.output_ids])
+        self.mamba_track_indices = None
+        self.mamba_track_mask = None
+        self.mamba_track_seqlens = None
+        if self.return_logprob and other.return_logprob:
+            self.top_logprobs_nums.extend(other.top_logprobs_nums)
+            self.token_ids_logprobs.extend(other.token_ids_logprobs)
+        elif self.return_logprob:
+```
+**EN:** This block implements the method `merge_batch(other)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `merge_batch`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `merge_batch(other)`。它围绕 `merge_batch` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2517-2533: Continue merge batch / 继续说明merge 批处理
+```python
+            self.top_logprobs_nums.extend([0] * len(other.reqs))
+            self.token_ids_logprobs.extend([None] * len(other.reqs))
+        elif other.return_logprob:
+            self.top_logprobs_nums = [0] * len(self.reqs) + other.top_logprobs_nums
+            self.token_ids_logprobs = [None] * len(self.reqs) + other.token_ids_logprobs
+        self.reqs.extend(other.reqs)
+        if self.multimodal_inputs is not None:
+            self.multimodal_inputs.extend(other.multimodal_inputs)
+
+        self.return_logprob |= other.return_logprob
+        self.has_stream |= other.has_stream
+        self.has_grammar |= other.has_grammar
+        self.return_hidden_states |= other.return_hidden_states
+        self.is_prefill_only = self.is_prefill_only and other.is_prefill_only
+
+        if self.spec_info:
+            self.spec_info.merge_batch(other.spec_info)
+```
+**EN:** This block implements the method `merge_batch(other)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `merge_batch`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `merge_batch(other)`。它围绕 `merge_batch` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2535-2564: Implement copy / 实现copy
+```python
+    def copy(self):
+        # Only contain fields that will be used by process_batch_result.
+        # Shallow-copy the reqs list so that in-place mutations (filter_batch,
+        # merge_batch) on the original don't corrupt this snapshot.
+        return ScheduleBatch(
+            reqs=self.reqs[:],
+            req_to_token_pool=self.req_to_token_pool,
+            req_pool_indices=self.req_pool_indices,
+            model_config=self.model_config,
+            forward_mode=self.forward_mode,
+            out_cache_loc=self.out_cache_loc,
+            return_logprob=self.return_logprob,
+            decoding_reqs=self.decoding_reqs,
+            spec_algorithm=self.spec_algorithm,
+            global_num_tokens=self.global_num_tokens,
+            global_num_tokens_for_logprob=self.global_num_tokens_for_logprob,
+            can_run_dp_cuda_graph=self.can_run_dp_cuda_graph,
+            is_extend_in_batch=self.is_extend_in_batch,
+            all_extend_in_batch=self.all_extend_in_batch,
+            is_prefill_only=self.is_prefill_only,
+            seq_lens_cpu=self.seq_lens_cpu,
+            enable_overlap=self.enable_overlap,
+            mamba_track_indices=self.mamba_track_indices,
+            mamba_track_mask=self.mamba_track_mask,
+            mamba_track_seqlens=self.mamba_track_seqlens,
+            dp_cooperation_info=self.dp_cooperation_info,
+            prefill_stats=self.prefill_stats,
+            fpm_start_time=self.fpm_start_time,
+            forward_iter=self.forward_iter,
+        )
+```
+**EN:** This block implements the method `copy()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `copy`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `copy()`。它围绕 `copy` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2566-2601: Implement maybe evict swa / 实现maybe evict swa
+```python
+    def maybe_evict_swa(self):
+        if self.tree_cache.supports_swa():
+            sliding_window_size = self.tree_cache.sliding_window_size
+            server_args = get_global_server_args()
+
+            release_leaf_lock = (
+                envs.SGLANG_OPT_SWA_RELEASE_LEAF_LOCK_AFTER_WINDOW.get()
+                and hasattr(self.tree_cache, "dec_swa_lock_only")
+            )
+
+            # Eviction_interval: trade-off between SWA token waste and eviction overhead
+            page_size = self.tree_cache.page_size
+            eviction_interval = max(
+                page_size,
+                int(
+                    sliding_window_size
+                    * envs.SGLANG_SWA_EVICTION_INTERVAL_MULTIPLIER.get()
+                ),
+            )
+            eviction_interval = (eviction_interval // page_size) * page_size
+            for idx, req in enumerate(self.reqs):
+                if self.forward_mode.is_decode():
+                    # We set evict_swa condition here with two reasons:
+                    # 1. In overlap scheduler, we cannot evict swa when req.decode_batch_idx == 0 since the prev extend batch is still running.
+                    # 2. Evict swa every eviction_interval tokens to reduce the overhead.
+                    if req.decode_batch_idx % eviction_interval == 1:
+                        self._evict_swa(req, req.seqlen - 1)
+
+                    # Once the decode position has moved past the sliding window,
+                    # the SWA portion of the prefill-time tree lock is no longer
+                    # needed by this request. Convert it from protected to
+                    # evictable so SWA LRU can reclaim it under pressure.
+                    if (
+                        release_leaf_lock
+                        and not req.swa_prefix_lock_released
+                        and req.swa_uuid_for_lock is not None
+```
+**EN:** This block implements the method `maybe_evict_swa()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `maybe_evict_swa`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `maybe_evict_swa()`。它围绕 `maybe_evict_swa` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2602-2623: Continue maybe evict swa / 继续说明maybe evict swa
+```python
+                        and req.last_node is not None
+                        and req.decode_batch_idx >= sliding_window_size
+                    ):
+                        self.tree_cache.dec_swa_lock_only(
+                            req.last_node, req.swa_uuid_for_lock
+                        )
+                        req.swa_prefix_lock_released = True
+                elif self.forward_mode.is_extend() and self.tree_cache.is_chunk_cache():
+                    pre_len = self.prefix_lens[idx]
+                    if self.enable_overlap:
+                        # In chunked prefill case, when the second extend batch is scheduling, the first extend batch is still running, so we cannot evict swa tokens
+                        if req.extend_batch_idx < 2:
+                            continue
+                        else:
+                            pre_len = (
+                                pre_len - server_args.chunked_prefill_size
+                                if server_args.chunked_prefill_size > 0
+                                else pre_len
+                            )
+                            self._evict_swa(req, pre_len)
+                    else:
+                        self._evict_swa(req, pre_len)
+```
+**EN:** This block implements the method `maybe_evict_swa()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `maybe_evict_swa`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `maybe_evict_swa()`。它围绕 `maybe_evict_swa` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2625-2660: Implement evict swa / 实现evict swa
+```python
+    def _evict_swa(self, req: Req, pre_len: int):
+        assert self.tree_cache.supports_swa(), "prefix cache must support swa"
+        sliding_window_size = self.tree_cache.sliding_window_size
+
+        # For swa radix cache, we need to evict the tokens that are not in the tree cache and also not in the sliding window
+        assert (
+            req.cache_protected_len % self.tree_cache.page_size == 0
+        ), "cache_protected_len must be page aligned"
+        req.swa_evicted_seqlen = max(req.swa_evicted_seqlen, req.cache_protected_len)
+
+        # Subtract an extra page_size so the eviction frontier never reaches the
+        # radix tree insert boundary (page_floor(seq_len)). This keeps at least one
+        # page of non-evicted SWA KV for the tree to store as a non-tombstone node,
+        # preserving cache reuse in multi-turn scenarios. Without this, leaf nodes
+        # may become tombstoned, causing SWA memory leak.
+        # See also: _insert_helper case 3 in swa_radix_cache.py (defensive counterpart).
+        if envs.SGLANG_OPT_SWA_EVICT_DROP_PAGE_MARGIN.get():
+            evict_threshold = pre_len - sliding_window_size
+        else:
+            evict_threshold = pre_len - sliding_window_size - self.tree_cache.page_size
+        new_swa_evicted_seqlen = max(
+            req.swa_evicted_seqlen,
+            evict_threshold,
+        )
+
+        if self.tree_cache.page_size > 1:
+            new_swa_evicted_seqlen = (
+                new_swa_evicted_seqlen // self.tree_cache.page_size
+            ) * self.tree_cache.page_size
+
+        if new_swa_evicted_seqlen > req.swa_evicted_seqlen:
+            free_slots = self.req_to_token_pool.req_to_token[
+                req.req_pool_idx, req.swa_evicted_seqlen : new_swa_evicted_seqlen
+            ]
+            self.token_to_kv_pool_allocator.free_swa(free_slots)
+            req.swa_evicted_seqlen = new_swa_evicted_seqlen
+```
+**EN:** This block implements the method `_evict_swa(req, pre_len)` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `_evict_swa`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `_evict_swa(req, pre_len)`。它围绕 `_evict_swa` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+### Lines 2662-2666: Implement str / 实现str
+```python
+    def __str__(self):
+        return (
+            f"ScheduleBatch(forward_mode={self.forward_mode.name if self.forward_mode else 'None'}, "
+            f"#req={(len(self.reqs))})"
+        )
+```
+**EN:** This block implements the method `__str__()` on `ScheduleBatch`. It focuses on handling the schedule batch responsibilities represented by `__str__`, so the class can advance the schedule batch workflow in a self-contained way.
+**CN:** 该代码块实现 `ScheduleBatch` 上的方法 `__str__()`。它围绕 `__str__` 所承担的 调度 批处理 相关职责展开，使该类能够独立推进相应流程。
+
+## Key Concepts / 关键概念
+- **Core types / 核心类型**: BaseFinishReason, FINISH_MATCHED_TOKEN, FINISH_MATCHED_STR, FINISHED_MATCHED_REGEX, FINISH_LENGTH, FINISH_ABORT, ...
+- **Main callables / 主要可调用对象**: sanity_check_mm_pad_shift_value, _compute_pad_value
+- **Domain focus / 领域焦点**: schedule batch / 调度 批处理
+- **Control style / 控制方式**: mostly synchronous orchestration and helper composition / 以同步编排与辅助逻辑组合为主
+
+## Dependencies / 依赖关系
+- **Standard Library / 标准库**: copy, dataclasses, enum, functools, itertools, logging, re, typing, uuid
+- **Third-party / 第三方库**: __future__, concurrent.futures, http, numpy, torch
+- **Local Modules / 本地模块**: sglang.srt.configs.model_config, sglang.srt.constrained.base_grammar_backend, sglang.srt.disaggregation.base, sglang.srt.disaggregation.decode_schedule_batch_mixin, sglang.srt.disaggregation.utils, sglang.srt.distributed.parallel_state, sglang.srt.dllm.config, sglang.srt.dllm.mixin.req, sglang.srt.environ, sglang.srt.layers.attention.fla.chunk_delta_h, sglang.srt.managers.embed_types, sglang.srt.managers.hisparse_coordinator

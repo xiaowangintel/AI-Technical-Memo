@@ -1,0 +1,485 @@
+# arch_mappings.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/include/cutlass/library/arch_mappings.h`
+**Purpose / 用途**: Declares metadata and type descriptions used by the CUTLASS library runtime. / 声明 CUTLASS 运行时库使用的元数据与类型描述。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*!</code>
+  - EN: Comment that documents intent or context: "!".
+  - CN: 用于说明意图或上下文的注释："!"。
+- **L32** <code>  \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>  \brief CUTLASS Library is an object-oriented approach to managing operations implemented by CUTLASS.</code>
+  - EN: Comment that documents intent or context: "\brief CUTLASS Library is an object-oriented approach to managing operations implemented by CUTLASS.".
+  - CN: 用于说明意图或上下文的注释："\brief CUTLASS Library is an object-oriented approach to managing operations implemented by CUTLASS."。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>  Generally,</code>
+  - EN: Comment that documents intent or context: "Generally,".
+  - CN: 用于说明意图或上下文的注释："Generally,"。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>    description   - compile-time constant parameters used to instantiate an operation</code>
+  - EN: Comment that documents intent or context: "description   - compile-time constant parameters used to instantiate an operation".
+  - CN: 用于说明意图或上下文的注释："description   - compile-time constant parameters used to instantiate an operation"。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>    configuration - runtime parameters with computationally expensive initialization</code>
+  - EN: Comment that documents intent or context: "configuration - runtime parameters with computationally expensive initialization".
+  - CN: 用于说明意图或上下文的注释："configuration - runtime parameters with computationally expensive initialization"。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>    arguments     - runtime parameters that may be passed to an initialized operation with low</code>
+  - EN: Comment that documents intent or context: "arguments     - runtime parameters that may be passed to an initialized operation with low".
+  - CN: 用于说明意图或上下文的注释："arguments     - runtime parameters that may be passed to an initialized operation with low"。
+- **L43** <code>                    computational overhead</code>
+  - EN: Comment that documents intent or context: "computational overhead".
+  - CN: 用于说明意图或上下文的注释："computational overhead"。
+- **L44** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>#include &quot;cutlass/arch/mma.h&quot;</code>
+  - EN: Includes `cutlass/arch/mma.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/arch/mma.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L49** <code>#include &quot;cutlass/arch/arch.h&quot;</code>
+  - EN: Includes `cutlass/arch/arch.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/arch/arch.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L54** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>template &lt;typename ArchTag, typename OperatorClass&gt; struct ArchMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm50, arch::OpClassSimt&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L61** <code>  static int const kMin = 50;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L62** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L63** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L64** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L65** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm60, arch::OpClassSimt&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L66** <code>  static int const kMin = 60;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L67** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L68** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L69** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L70** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm61, arch::OpClassSimt&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L71** <code>  static int const kMin = 61;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L72** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L73** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm70, arch::OpClassWmmaTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L76** <code>  static int const kMin = 70;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L77** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L78** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm70, arch::OpClassTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L81** <code>  static int const kMin = 70;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L82** <code>  static int const kMax = 75;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L83** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L84** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L85** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm75, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L86** <code>  static int const kMin = 75;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L87** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L88** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm80, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L91** <code>  static int const kMin = 80;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L92** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L93** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm86, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L96** <code>  static int const kMin = 86;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L97** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L98** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm89, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L101** <code>  static int const kMin = 89;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L102** <code>  static int const kMax = 100;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L103** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L104** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L105** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm90, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L106** <code>  static int const kMin = 90;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L107** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L108** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>// Arch conditional WGMMA</code>
+  - EN: Comment that documents intent or context: "Arch conditional WGMMA".
+  - CN: 用于说明意图或上下文的注释："Arch conditional WGMMA"。
+- **L111** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm90, arch::OpClassTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L112** <code>  static int const kMin = 90;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L113** <code>  static int const kMax = 90;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L114** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>// Arch conditional sparse WGMMA</code>
+  - EN: Comment that documents intent or context: "Arch conditional sparse WGMMA".
+  - CN: 用于说明意图或上下文的注释："Arch conditional sparse WGMMA"。
+- **L117** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm90, arch::OpClassSparseTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L118** <code>  static int const kMin = 90;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L119** <code>  static int const kMax = 90;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L120** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L121** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L123** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm100, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L124** <code>  static int const kMin = 100;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L125** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L126** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm100, arch::OpClassTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L129** <code>  static int const kMin = 100;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L130** <code>  #if (__CUDACC_VER_MAJOR__ &gt;= 13)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L131** <code>    static int const kMax = 110;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L132** <code>  #else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L133** <code>      static int const kMax = 103;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L134** <code>  #endif // __CUDACC_VER_MAJOR__ &gt;= 13</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L135** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L136** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L137** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm103, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L138** <code>  static int const kMin = 103;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L139** <code>  static int const kMax = 1024;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L140** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L141** <code>template &lt;&gt; struct ArchMap&lt;arch::Sm103, arch::OpClassTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L142** <code>  static int const kMin = 103;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L143** <code>  static int const kMax = 103;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L144** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>template &lt;typename OperatorClass&gt; struct ArchMap&lt;arch::Sm120, OperatorClass&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L147** <code>  static int const kMin = 120;</code>
+  - EN: Assigns or initializes `kMin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMin` 进行赋值或初始化。
+- **L148** <code>  static int const kMax = 121;</code>
+  - EN: Assigns or initializes `kMax` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kMax` 进行赋值或初始化。
+- **L149** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L152** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L153** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L154** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/arch/mma.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/arch/arch.h</code> — general CUTLASS declarations / CUTLASS 通用声明

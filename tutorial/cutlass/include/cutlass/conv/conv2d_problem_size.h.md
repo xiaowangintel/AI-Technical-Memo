@@ -1,0 +1,1996 @@
+# conv2d_problem_size.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/conv2d_problem_size.h`
+**Purpose / 用途**: This file contains definitions and utility functions for describing convolution problem sizes. / 提供问题形状描述、2D 卷积支持。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief This file contains definitions and utility functions for describing convolution problem sizes.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 34 / 第 34 行** — `  Conv2dProblem desciption:`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 35 / 第 35 行** — `    activation (NHWC), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 36 / 第 36 行** — `    filter (KRSC), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 37 / 第 37 行** — `    output (NPQK), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 38 / 第 38 行** — `    pading (pad_h, pad_w),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 39 / 第 39 行** — `    stride (stride_h, stride_w),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 40 / 第 40 行** — `    dilation (dilation_h, dilation_w).`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 41 / 第 41 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `  Free functions to map:`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 43 / 第 43 行** — `    Map tensor extents (Conv2d -> ImplicitGemm)      : implicit_gemm_tensor_[a|b|c]_extent(ConvolutionOperator)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 44 / 第 44 行** — `    Map tensor sizes (Conv2d -> ImplicitGemm)        : implicit_gemm_tensor_[a|b|c]_size(ConvolutionOperator)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 45 / 第 45 行** — `    Map tensor problem sizes (Conv2d -> ImplicitGemm): implicit_gemm_problem_size(ConvolutionOperator)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 46 / 第 46 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 47 / 第 47 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 48 / 第 48 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 51 / 第 51 行** — `#include "cutlass/tensor_coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_coord.h`。
+- **Line 52 / 第 52 行** — `#include "cutlass/fast_math.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/fast_math.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/fast_math.h`。
+- **Line 53 / 第 53 行** — `#include "cutlass/gemm/gemm_enumerated_types.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/gemm_enumerated_types.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/gemm_enumerated_types.h`。
+- **Line 54 / 第 54 行** — `#include "cutlass/matrix_coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/matrix_coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/matrix_coord.h`。
+- **Line 55 / 第 55 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 56 / 第 56 行** — `#include "cutlass/functional.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/functional.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/functional.h`。
+- **Line 57 / 第 57 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 58 / 第 58 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 59 / 第 59 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 60 / 第 60 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 61 / 第 61 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 62 / 第 62 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 63 / 第 63 行** — `/// Problem size structure`
+  - **EN**: Inline comment explaining intent: `Problem size structure`.
+  - **CN**: 行内注释说明意图：`Problem size structure`。
+- **Line 64 / 第 64 行** — `struct Conv2dProblemSize {`
+  - **EN**: Starts the definition of struct `Conv2dProblemSize`.
+  - **CN**: 开始定义 struct `Conv2dProblemSize`。
+- **Line 65 / 第 65 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 66 / 第 66 行** — `  // Conv2d strictly problem size parameters`
+  - **EN**: Inline comment explaining intent: `Conv2d strictly problem size parameters`.
+  - **CN**: 行内注释说明意图：`Conv2d strictly problem size parameters`。
+- **Line 67 / 第 67 行** — `  int N, H, W, C, P, Q, K, R, S;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 68 / 第 68 行** — `  int pad_h, pad_w;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 69 / 第 69 行** — `  int stride_h, stride_w;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 70 / 第 70 行** — `  int dilation_h, dilation_w;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 71 / 第 71 行** — `  Mode mode;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 72 / 第 72 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 73 / 第 73 行** — `  // Conv2d implementation-related parameters `
+  - **EN**: Inline comment explaining intent: `Conv2d implementation-related parameters`.
+  - **CN**: 行内注释说明意图：`Conv2d implementation-related parameters`。
+- **Line 74 / 第 74 行** — `  int split_k_slices;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 75 / 第 75 行** — `  int groups;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 76 / 第 76 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 77 / 第 77 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 78 / 第 78 行** — `  // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 79 / 第 79 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 80 / 第 80 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 81 / 第 81 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 82 / 第 82 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 83 / 第 83 行** — `  Conv2dProblemSize():`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 84 / 第 84 行** — `    N(0), H(0), W(0), C(0), P(0), Q(0), K(0), R(0), S(0),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 85 / 第 85 行** — `    pad_h(0), pad_w(0), stride_h(1), stride_w(1), dilation_h(1), dilation_w(1),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 86 / 第 86 行** — `    mode(Mode::kConvolution), split_k_slices(1), groups(1) { }`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 87 / 第 87 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 88 / 第 88 行** — `  /// Constructor for default padding, stride, dilation, and split-K`
+  - **EN**: Inline comment explaining intent: `Constructor for default padding, stride, dilation, and split-K`.
+  - **CN**: 行内注释说明意图：`Constructor for default padding, stride, dilation, and split-K`。
+- **Line 89 / 第 89 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 90 / 第 90 行** — `  Conv2dProblemSize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 91 / 第 91 行** — `    int N,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 92 / 第 92 行** — `    int H,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 93 / 第 93 行** — `    int W,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 94 / 第 94 行** — `    int C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 95 / 第 95 行** — `    int P,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 96 / 第 96 行** — `    int Q,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 97 / 第 97 行** — `    int K,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 98 / 第 98 行** — `    int R,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 99 / 第 99 行** — `    int S,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 100 / 第 100 行** — `    Mode mode`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 101 / 第 101 行** — `  ): `
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 102 / 第 102 行** — `    N(N), H(H), W(W), C(C), P(P), Q(Q), K(K), R(R), S(S),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 103 / 第 103 行** — `    pad_h(R / 2), pad_w(S / 2), stride_h(1), stride_w(1), dilation_h(1), dilation_w(1),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 104 / 第 104 行** — `    mode(mode), split_k_slices(1), groups (1) { }`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 105 / 第 105 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 106 / 第 106 行** — `  /// Constructor`
+  - **EN**: Inline comment explaining intent: `Constructor`.
+  - **CN**: 行内注释说明意图：`Constructor`。
+- **Line 107 / 第 107 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 108 / 第 108 行** — `  Conv2dProblemSize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 109 / 第 109 行** — `    int N,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 110 / 第 110 行** — `    int H,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 111 / 第 111 行** — `    int W,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 112 / 第 112 行** — `    int C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 113 / 第 113 行** — `    int K,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 114 / 第 114 行** — `    int R,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 115 / 第 115 行** — `    int S,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 116 / 第 116 行** — `    int P,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 117 / 第 117 行** — `    int Q,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 118 / 第 118 行** — `    int pad_h,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 119 / 第 119 行** — `    int pad_w,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 120 / 第 120 行** — `    int stride_h,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 121 / 第 121 行** — `    int stride_w,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 122 / 第 122 行** — `    int dilation_h,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 123 / 第 123 行** — `    int dilation_w,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 124 / 第 124 行** — `    Mode mode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 125 / 第 125 行** — `    int split_k_slices = 1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 126 / 第 126 行** — `    int groups = 1`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 127 / 第 127 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 128 / 第 128 行** — `    N(N), H(H), W(W), C(C), P(P), Q(Q), K(K), R(R), S(S),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 129 / 第 129 行** — `    pad_h(pad_h), pad_w(pad_w), stride_h(stride_h), stride_w(stride_w),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 130 / 第 130 行** — `    dilation_h(dilation_h), dilation_w(dilation_w), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 131 / 第 131 行** — `    mode(mode), split_k_slices(split_k_slices), groups (groups) { }`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 132 / 第 132 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 133 / 第 133 行** — `  /// Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord `
+  - **EN**: Inline comment explaining intent: `Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord`.
+  - **CN**: 行内注释说明意图：`Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord`。
+- **Line 134 / 第 134 行** — `  // set user-defined output size and sets P and Q (include all data members in ctor)`
+  - **EN**: Inline comment explaining intent: `set user-defined output size and sets P and Q (include all data members in ctor)`.
+  - **CN**: 行内注释说明意图：`set user-defined output size and sets P and Q (include all data members in ctor)`。
+- **Line 135 / 第 135 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 136 / 第 136 行** — `  Conv2dProblemSize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 137 / 第 137 行** — `    cutlass::Tensor4DCoord input_size,    // NHWC`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 138 / 第 138 行** — `    cutlass::Tensor4DCoord filter_size,   // KRSC`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 139 / 第 139 行** — `    cutlass::Tensor4DCoord padding,       // pad_h, _, pad_w, _`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 140 / 第 140 行** — `    cutlass::MatrixCoord stride,          // stride_h, stride_w`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 141 / 第 141 行** — `    cutlass::MatrixCoord dilation,        // dilation_h, dilation_w`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 142 / 第 142 行** — `    cutlass::Tensor4DCoord output_size,   // NPQK`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 143 / 第 143 行** — `    cutlass::conv::Mode mode = cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 144 / 第 144 行** — `    int split_k_slices = 1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 145 / 第 145 行** — `    int groups = 1`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 146 / 第 146 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 147 / 第 147 行** — `    N(input_size.n()), H(input_size.h()), W(input_size.w()), C(input_size.c()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 148 / 第 148 行** — `    P(output_size.h()), Q(output_size.w()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 149 / 第 149 行** — `    K(filter_size.n()), R(filter_size.h()), S(filter_size.w()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 150 / 第 150 行** — `    pad_h(padding[0]), pad_w(padding[2]),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 151 / 第 151 行** — `    stride_h(stride.row()), stride_w(stride.column()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 152 / 第 152 行** — `    dilation_h(dilation.row()), dilation_w(dilation.column()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 153 / 第 153 行** — `    mode(mode), split_k_slices(split_k_slices), groups(groups) {}`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 154 / 第 154 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 155 / 第 155 行** — `  /// Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord `
+  - **EN**: Inline comment explaining intent: `Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord`.
+  - **CN**: 行内注释说明意图：`Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord`。
+- **Line 156 / 第 156 行** — `  // computes output size and sets P and Q (skip output from ctor arguments)`
+  - **EN**: Inline comment explaining intent: `computes output size and sets P and Q (skip output from ctor arguments)`.
+  - **CN**: 行内注释说明意图：`computes output size and sets P and Q (skip output from ctor arguments)`。
+- **Line 157 / 第 157 行** — `  CUTLASS_HOST_DEVICE  `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 158 / 第 158 行** — `  Conv2dProblemSize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 159 / 第 159 行** — `    cutlass::Tensor4DCoord input_size,   // NHWC`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 160 / 第 160 行** — `    cutlass::Tensor4DCoord filter_size,  // KRSC`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 161 / 第 161 行** — `    cutlass::Tensor4DCoord padding,      // pad_h, upper_pad_h, pad_w, upper_pad_w`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 162 / 第 162 行** — `    cutlass::MatrixCoord stride,         // stride_h, stride_w`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 163 / 第 163 行** — `    cutlass::MatrixCoord dilation,       // dilation_h, dilation_w`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 164 / 第 164 行** — `    cutlass::conv::Mode mode = cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 165 / 第 165 行** — `    int split_k_slices = 1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 166 / 第 166 行** — `    int groups = 1`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 167 / 第 167 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 168 / 第 168 行** — `    N(input_size.n()), H(input_size.h()), W(input_size.w()), C(input_size.c()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 169 / 第 169 行** — `    K(filter_size.n()), R(filter_size.h()), S(filter_size.w()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 170 / 第 170 行** — `    pad_h(padding[0]), pad_w(padding[2]),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 171 / 第 171 行** — `    stride_h(stride.row()), stride_w(stride.column()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 172 / 第 172 行** — `    dilation_h(dilation.row()), dilation_w(dilation.column()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 173 / 第 173 行** — `    mode(mode), split_k_slices(split_k_slices), groups(groups) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 174 / 第 174 行** — `      // set output P and Q`
+  - **EN**: Inline comment explaining intent: `set output P and Q`.
+  - **CN**: 行内注释说明意图：`set output P and Q`。
+- **Line 175 / 第 175 行** — `      P = ((H + pad_h + padding[1] - R * dilation_h) / stride_h) + 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 176 / 第 176 行** — `      Q = ((W + pad_w + padding[3] - S * dilation_w) / stride_w) + 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 177 / 第 177 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 178 / 第 178 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 179 / 第 179 行** — `  /// Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord `
+  - **EN**: Inline comment explaining intent: `Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord`.
+  - **CN**: 行内注释说明意图：`Constructs convolution problem size from cutlass Tensor4DCoord and MatrixCoord`。
+- **Line 180 / 第 180 行** — `  // set user-defined output size and sets P and Q (skip padding, striding, and dilation)`
+  - **EN**: Inline comment explaining intent: `set user-defined output size and sets P and Q (skip padding, striding, and dilation)`.
+  - **CN**: 行内注释说明意图：`set user-defined output size and sets P and Q (skip padding, striding, and dilation)`。
+- **Line 181 / 第 181 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 182 / 第 182 行** — `  Conv2dProblemSize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 183 / 第 183 行** — `    cutlass::Tensor4DCoord input_size,    // NHWC`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 184 / 第 184 行** — `    cutlass::Tensor4DCoord filter_size,   // KRSC`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 185 / 第 185 行** — `    cutlass::Tensor4DCoord output_size,   // NPQK`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 186 / 第 186 行** — `    cutlass::conv::Mode mode = cutlass::conv::Mode::kCrossCorrelation,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 187 / 第 187 行** — `    int split_k_slices = 1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 188 / 第 188 行** — `    int groups = 1`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 189 / 第 189 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 190 / 第 190 行** — `    N(input_size.n()), H(input_size.h()), W(input_size.w()), C(input_size.c()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 191 / 第 191 行** — `    P(output_size.h()), Q(output_size.w()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 192 / 第 192 行** — `    K(filter_size.n()), R(filter_size.h()), S(filter_size.w()),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 193 / 第 193 行** — `    pad_h(R / 2), pad_w(S / 2), stride_h(1), stride_w(1),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 194 / 第 194 行** — `    dilation_h(1), dilation_w(1),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 195 / 第 195 行** — `    mode(mode), split_k_slices(split_k_slices), groups(groups) {}`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 196 / 第 196 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 197 / 第 197 行** — `  // Reset covolution mode in the problem`
+  - **EN**: Inline comment explaining intent: `Reset covolution mode in the problem`.
+  - **CN**: 行内注释说明意图：`Reset covolution mode in the problem`。
+- **Line 198 / 第 198 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 199 / 第 199 行** — `  Conv2dProblemSize reset_mode(cutlass::conv::Mode mode_) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 200 / 第 200 行** — `    Conv2dProblemSize tmp(*this);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 201 / 第 201 行** — `    tmp.mode = mode_; `
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 202 / 第 202 行** — `    return tmp; `
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 203 / 第 203 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 204 / 第 204 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 205 / 第 205 行** — `  // Reset covolution mode in the problem`
+  - **EN**: Inline comment explaining intent: `Reset covolution mode in the problem`.
+  - **CN**: 行内注释说明意图：`Reset covolution mode in the problem`。
+- **Line 206 / 第 206 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 207 / 第 207 行** — `  Conv2dProblemSize reset_split_k_slices(int split_k_slices_) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 208 / 第 208 行** — `    Conv2dProblemSize tmp(*this);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 209 / 第 209 行** — `    tmp.split_k_slices = split_k_slices_; `
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 210 / 第 210 行** — `    return tmp; `
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 211 / 第 211 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 212 / 第 212 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 213 / 第 213 行** — `  /// Equality operator (ignores mode and split_k_slice)`
+  - **EN**: Inline comment explaining intent: `Equality operator (ignores mode and split_k_slice)`.
+  - **CN**: 行内注释说明意图：`Equality operator (ignores mode and split_k_slice)`。
+- **Line 214 / 第 214 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 215 / 第 215 行** — `  bool operator==(Conv2dProblemSize const &conv) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 216 / 第 216 行** — `    return (`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 217 / 第 217 行** — `      (N == conv.N) && (H == conv.H) && (W == conv.W) && (C == conv.C) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 218 / 第 218 行** — `      (K == conv.K) && (R == conv.R) && (S == conv.S) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 219 / 第 219 行** — `      (P == conv.P) && (Q == conv.Q) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 220 / 第 220 行** — `      (pad_h == conv.pad_h) && (pad_w == conv.pad_w) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 221 / 第 221 行** — `      (stride_h == conv.stride_h) && (stride_w == conv.stride_w) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 222 / 第 222 行** — `      (dilation_h == conv.dilation_h) && (dilation_w == conv.dilation_w)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 223 / 第 223 行** — `    );  `
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 224 / 第 224 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 225 / 第 225 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 226 / 第 226 行** — `  /// Inequality operator`
+  - **EN**: Inline comment explaining intent: `Inequality operator`.
+  - **CN**: 行内注释说明意图：`Inequality operator`。
+- **Line 227 / 第 227 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 228 / 第 228 行** — `  bool operator!=(Conv2dProblemSize const &rhs) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 229 / 第 229 行** — `    return !(*this == rhs);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 230 / 第 230 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 231 / 第 231 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 232 / 第 232 行** — `  /// Returns activation extent as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns activation extent as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns activation extent as Tensor4DCoord`。
+- **Line 233 / 第 233 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 234 / 第 234 行** — `  cutlass::Tensor4DCoord activation_extent() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 235 / 第 235 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 236 / 第 236 行** — `    return cutlass::Tensor4DCoord ({N, H, W, C});`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 237 / 第 237 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 238 / 第 238 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 239 / 第 239 行** — `  /// Returns filter extent as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns filter extent as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns filter extent as Tensor4DCoord`。
+- **Line 240 / 第 240 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 241 / 第 241 行** — `  cutlass::Tensor4DCoord filter_extent(bool is_deconv = false) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 242 / 第 242 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 243 / 第 243 行** — `    return is_deconv ? cutlass::Tensor4DCoord ({C, R, S, K / groups})`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 244 / 第 244 行** — `        : cutlass::Tensor4DCoord ({K, R, S, C / groups});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 245 / 第 245 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 246 / 第 246 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 247 / 第 247 行** — `  /// Returns output extent as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns output extent as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns output extent as Tensor4DCoord`。
+- **Line 248 / 第 248 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 249 / 第 249 行** — `  cutlass::Tensor4DCoord output_extent() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 250 / 第 250 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 251 / 第 251 行** — `    return cutlass::Tensor4DCoord ({N, P, Q, K});`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 252 / 第 252 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 253 / 第 253 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 254 / 第 254 行** — `  /// Returns activation size in number of elements`
+  - **EN**: Inline comment explaining intent: `Returns activation size in number of elements`.
+  - **CN**: 行内注释说明意图：`Returns activation size in number of elements`。
+- **Line 255 / 第 255 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 256 / 第 256 行** — `  int64_t activation_size() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 257 / 第 257 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 258 / 第 258 行** — `    return static_cast<int64_t>(N) * static_cast<int64_t>(H) *`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 259 / 第 259 行** — `           static_cast<int64_t>(W) * static_cast<int64_t>(C);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 260 / 第 260 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 261 / 第 261 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 262 / 第 262 行** — `  /// Returns filter size in number of elements`
+  - **EN**: Inline comment explaining intent: `Returns filter size in number of elements`.
+  - **CN**: 行内注释说明意图：`Returns filter size in number of elements`。
+- **Line 263 / 第 263 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 264 / 第 264 行** — `  int64_t filter_size() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 265 / 第 265 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 266 / 第 266 行** — `    return static_cast<int64_t>(K) * static_cast<int64_t>(R) *`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 267 / 第 267 行** — `           static_cast<int64_t>(S) * static_cast<int64_t>(C) /`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 268 / 第 268 行** — `           static_cast<int64_t>(groups);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 269 / 第 269 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 270 / 第 270 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 271 / 第 271 行** — `  /// Returns output size in number of elements`
+  - **EN**: Inline comment explaining intent: `Returns output size in number of elements`.
+  - **CN**: 行内注释说明意图：`Returns output size in number of elements`。
+- **Line 272 / 第 272 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 273 / 第 273 行** — `  int64_t output_size() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 274 / 第 274 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 275 / 第 275 行** — `    return static_cast<int64_t>(N) * static_cast<int64_t>(P) *`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 276 / 第 276 行** — `           static_cast<int64_t>(Q) * static_cast<int64_t>(K);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 277 / 第 277 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 278 / 第 278 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 279 / 第 279 行** — `  /// Returns padding as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns padding as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns padding as Tensor4DCoord`。
+- **Line 280 / 第 280 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 281 / 第 281 行** — `  cutlass::Tensor4DCoord padding() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 282 / 第 282 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 283 / 第 283 行** — `    return cutlass::Tensor4DCoord ({pad_h, pad_h, pad_w, pad_w});`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 284 / 第 284 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 285 / 第 285 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 286 / 第 286 行** — `  /// Returns stride as MatrixCoord`
+  - **EN**: Inline comment explaining intent: `Returns stride as MatrixCoord`.
+  - **CN**: 行内注释说明意图：`Returns stride as MatrixCoord`。
+- **Line 287 / 第 287 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 288 / 第 288 行** — `  cutlass::MatrixCoord stride() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 289 / 第 289 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 290 / 第 290 行** — `    return cutlass::MatrixCoord ({stride_h, stride_w});`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 291 / 第 291 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 292 / 第 292 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 293 / 第 293 行** — `  /// Returns dilation as MatrixCoord`
+  - **EN**: Inline comment explaining intent: `Returns dilation as MatrixCoord`.
+  - **CN**: 行内注释说明意图：`Returns dilation as MatrixCoord`。
+- **Line 294 / 第 294 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 295 / 第 295 行** — `  cutlass::MatrixCoord dilation() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 296 / 第 296 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 297 / 第 297 行** — `    return cutlass::MatrixCoord ({dilation_h, dilation_w});`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 298 / 第 298 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 299 / 第 299 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 300 / 第 300 行** — `  /////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 301 / 第 301 行** — `  //        Methods used for strided dgrad implementation`
+  - **EN**: Inline comment explaining intent: `Methods used for strided dgrad implementation`.
+  - **CN**: 行内注释说明意图：`Methods used for strided dgrad implementation`。
+- **Line 302 / 第 302 行** — `  /////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 303 / 第 303 行** — `  /// Number of filter r positions to accumulate in gemm-k dim`
+  - **EN**: Inline comment explaining intent: `Number of filter r positions to accumulate in gemm-k dim`.
+  - **CN**: 行内注释说明意图：`Number of filter r positions to accumulate in gemm-k dim`。
+- **Line 304 / 第 304 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 305 / 第 305 行** — `  int num_gemm_k_filter_r(int r) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 306 / 第 306 行** — `    return ((R - r + stride_h - 1) / stride_h);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 307 / 第 307 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 308 / 第 308 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 309 / 第 309 行** — `  /// Number of filter s positions to accumulate in gemm-k dim`
+  - **EN**: Inline comment explaining intent: `Number of filter s positions to accumulate in gemm-k dim`.
+  - **CN**: 行内注释说明意图：`Number of filter s positions to accumulate in gemm-k dim`。
+- **Line 310 / 第 310 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 311 / 第 311 行** — `  int num_gemm_k_filter_s(int s) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 312 / 第 312 行** — `    return ((S - s + stride_w - 1) / stride_w);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 313 / 第 313 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 314 / 第 314 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 315 / 第 315 行** — `  /// Number of filter positions to accumulate in gemm-k dim`
+  - **EN**: Inline comment explaining intent: `Number of filter positions to accumulate in gemm-k dim`.
+  - **CN**: 行内注释说明意图：`Number of filter positions to accumulate in gemm-k dim`。
+- **Line 316 / 第 316 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 317 / 第 317 行** — `  int num_gemm_k_filter_positions(int r, int s) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 318 / 第 318 行** — `    return num_gemm_k_filter_r(r) * num_gemm_k_filter_s(s);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 319 / 第 319 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 320 / 第 320 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 321 / 第 321 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 322 / 第 322 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 323 / 第 323 行** — `//                                  ImplicitGemm helper functions                                 //`
+  - **EN**: Inline comment explaining intent: `ImplicitGemm helper functions                                 //`.
+  - **CN**: 行内注释说明意图：`ImplicitGemm helper functions                                 //`。
+- **Line 324 / 第 324 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 325 / 第 325 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 326 / 第 326 行** — `/// Determine the problem size of the implicit GEMM operation`
+  - **EN**: Inline comment explaining intent: `Determine the problem size of the implicit GEMM operation`.
+  - **CN**: 行内注释说明意图：`Determine the problem size of the implicit GEMM operation`。
+- **Line 327 / 第 327 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 328 / 第 328 行** — `cutlass::gemm::GemmCoord implicit_gemm_problem_size(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 329 / 第 329 行** — `  Operator conv_operator, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 330 / 第 330 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 331 / 第 331 行** — `  // Compute problem size`
+  - **EN**: Inline comment explaining intent: `Compute problem size`.
+  - **CN**: 行内注释说明意图：`Compute problem size`。
+- **Line 332 / 第 332 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 333 / 第 333 行** — `  case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 334 / 第 334 行** — `    return gemm::GemmCoord(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 335 / 第 335 行** — `      problem_size.N * problem_size.P * problem_size.Q,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 336 / 第 336 行** — `      problem_size.K,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 337 / 第 337 行** — `      problem_size.R * problem_size.S * problem_size.C / problem_size.groups`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 338 / 第 338 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 339 / 第 339 行** — `  case Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 340 / 第 340 行** — `  case Operator::kDgrad:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 341 / 第 341 行** — `    return gemm::GemmCoord(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 342 / 第 342 行** — `      problem_size.N * problem_size.H * problem_size.W,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 343 / 第 343 行** — `      problem_size.C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 344 / 第 344 行** — `      problem_size.R * problem_size.S * problem_size.K`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 345 / 第 345 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 346 / 第 346 行** — `  case Operator::kWgrad:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 347 / 第 347 行** — `    return gemm::GemmCoord(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 348 / 第 348 行** — `      problem_size.K,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 349 / 第 349 行** — `      problem_size.R * problem_size.S * problem_size.C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 350 / 第 350 行** — `      problem_size.N * problem_size.P * problem_size.Q`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 351 / 第 351 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 352 / 第 352 行** — `  default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 353 / 第 353 行** — `    break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 354 / 第 354 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 355 / 第 355 行** — `  return gemm::GemmCoord();`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 356 / 第 356 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 357 / 第 357 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 358 / 第 358 行** — `// Determine the number of gemm_k iterations for conv2d problem using implicit gemm algorithm`
+  - **EN**: Inline comment explaining intent: `Determine the number of gemm_k iterations for conv2d problem using implicit gemm algorithm`.
+  - **CN**: 行内注释说明意图：`Determine the number of gemm_k iterations for conv2d problem using implicit gemm algorithm`。
+- **Line 359 / 第 359 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 360 / 第 360 行** — `int implicit_gemm_k_iterations(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 361 / 第 361 行** — `  Operator conv_operator, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 362 / 第 362 行** — `  int threadblock_K, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 363 / 第 363 行** — `  Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 364 / 第 364 行** — `  IteratorAlgorithm algorithm = IteratorAlgorithm::kAnalytic,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 365 / 第 365 行** — `  GroupMode group_mode = GroupMode::kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 366 / 第 366 行** — `  int threadblock_N = 0) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 367 / 第 367 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 368 / 第 368 行** — `  int iterations = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 369 / 第 369 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 370 / 第 370 行** — `  if (group_mode == GroupMode::kNone) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 371 / 第 371 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 372 / 第 372 行** — `    if (algorithm == IteratorAlgorithm::kFixedChannels) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 373 / 第 373 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 374 / 第 374 行** — `      int positions_per_iteration = threadblock_K / problem_size.C;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 375 / 第 375 行** — `      switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 376 / 第 376 行** — `      case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 377 / 第 377 行** — `        iterations = (problem_size.R * problem_size.S + positions_per_iteration - 1 ) / positions_per_iteration;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 378 / 第 378 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 379 / 第 379 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 380 / 第 380 行** — `      default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 381 / 第 381 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 382 / 第 382 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 383 / 第 383 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 384 / 第 384 行** — `    else if (algorithm == IteratorAlgorithm::kFewChannels) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 385 / 第 385 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 386 / 第 386 行** — `      switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 387 / 第 387 行** — `      case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 388 / 第 388 行** — `        iterations = (problem_size.R * problem_size.S * problem_size.C + threadblock_K - 1 ) / threadblock_K;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 389 / 第 389 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 390 / 第 390 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 391 / 第 391 行** — `      default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 392 / 第 392 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 393 / 第 393 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 394 / 第 394 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 395 / 第 395 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 396 / 第 396 行** — `      int elements_per_split_k_slice = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 397 / 第 397 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 398 / 第 398 行** — `      switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 399 / 第 399 行** — `      case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 400 / 第 400 行** — `        elements_per_split_k_slice = (problem_size.C + problem_size.split_k_slices - 1) / problem_size.split_k_slices;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 401 / 第 401 行** — `        iterations = problem_size.R * problem_size.S * ((elements_per_split_k_slice + threadblock_K - 1) / threadblock_K);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 402 / 第 402 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 403 / 第 403 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 404 / 第 404 行** — `      case Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 405 / 第 405 行** — `      case Operator::kDgrad:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 406 / 第 406 行** — `        elements_per_split_k_slice = (problem_size.K + problem_size.split_k_slices - 1) / problem_size.split_k_slices;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 407 / 第 407 行** — `        iterations = problem_size.R * problem_size.S * ((elements_per_split_k_slice + threadblock_K - 1) / threadblock_K);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 408 / 第 408 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 409 / 第 409 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 410 / 第 410 行** — `      case Operator::kWgrad:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 411 / 第 411 行** — `        elements_per_split_k_slice = (problem_size.N * problem_size.P * problem_size.Q + problem_size.split_k_slices - 1) / problem_size.split_k_slices;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 412 / 第 412 行** — `        iterations = (elements_per_split_k_slice + threadblock_K - 1) / threadblock_K;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 413 / 第 413 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 414 / 第 414 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 415 / 第 415 行** — `      default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 416 / 第 416 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 417 / 第 417 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 418 / 第 418 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 419 / 第 419 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 420 / 第 420 行** — `  } else if (group_mode == GroupMode::kDepthwise) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 421 / 第 421 行** — `    int channels_per_cta = threadblock_N;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 422 / 第 422 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 423 / 第 423 行** — `    if (algorithm == IteratorAlgorithm::kAnalytic) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 424 / 第 424 行** — `      switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 425 / 第 425 行** — `        case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 426 / 第 426 行** — `          iterations = problem_size.R * problem_size.S *`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 427 / 第 427 行** — `                       ((channels_per_cta + threadblock_K - 1) / threadblock_K);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 428 / 第 428 行** — `          break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 429 / 第 429 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 430 / 第 430 行** — `        default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 431 / 第 431 行** — `          break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 432 / 第 432 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 433 / 第 433 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 434 / 第 434 行** — `  } else {  // Group conv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 435 / 第 435 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 436 / 第 436 行** — `    int channels_per_group = problem_size.C / problem_size.groups;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 437 / 第 437 行** — `    int k_per_group = problem_size.K / problem_size.groups;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 438 / 第 438 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 439 / 第 439 行** — `    if (algorithm == IteratorAlgorithm::kAnalytic) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 440 / 第 440 行** — `      switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 441 / 第 441 行** — `        case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 442 / 第 442 行** — `          iterations = problem_size.R * problem_size.S * ((channels_per_group + threadblock_K - 1) / threadblock_K);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 443 / 第 443 行** — `          // In group conv, if k_per_group < threadblock_N, one Threadblock will calculate multiple groups`
+  - **EN**: Inline comment explaining intent: `In group conv, if k_per_group < threadblock_N, one Threadblock will calculate multiple groups`.
+  - **CN**: 行内注释说明意图：`In group conv, if k_per_group < threadblock_N, one Threadblock will calculate multiple groups`。
+- **Line 444 / 第 444 行** — `          if (problem_size.groups != 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 445 / 第 445 行** — `            if (k_per_group < threadblock_N) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 446 / 第 446 行** — `              iterations *= threadblock_N / k_per_group;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 447 / 第 447 行** — `            }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 448 / 第 448 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 449 / 第 449 行** — `          break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 450 / 第 450 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 451 / 第 451 行** — `        default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 452 / 第 452 行** — `          break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 453 / 第 453 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 454 / 第 454 行** — `    } else if (algorithm == IteratorAlgorithm::kOptimized) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 455 / 第 455 行** — `      // Current optimized iterator only support GroupMode::kSingleGroup`
+  - **EN**: Inline comment explaining intent: `Current optimized iterator only support GroupMode::kSingleGroup`.
+  - **CN**: 行内注释说明意图：`Current optimized iterator only support GroupMode::kSingleGroup`。
+- **Line 456 / 第 456 行** — `      if (group_mode == GroupMode::kSingleGroup) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 457 / 第 457 行** — `        switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 458 / 第 458 行** — `          case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 459 / 第 459 行** — `            iterations = problem_size.R * problem_size.S * ((channels_per_group + threadblock_K - 1) / threadblock_K);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 460 / 第 460 行** — `            break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 461 / 第 461 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 462 / 第 462 行** — `          default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 463 / 第 463 行** — `            break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 464 / 第 464 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 465 / 第 465 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 466 / 第 466 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 467 / 第 467 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 468 / 第 468 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 469 / 第 469 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 470 / 第 470 行** — `  return iterations;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 471 / 第 471 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 472 / 第 472 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 473 / 第 473 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 474 / 第 474 行** — `template <int N = 1, int Output_P = 1, int Output_Q = 1>`
+  - **EN**: Starts a template declaration with specifier `int N = 1, int Output_P = 1, int Output_Q = 1`.
+  - **CN**: 开始一个模板声明，说明符为 `int N = 1, int Output_P = 1, int Output_Q = 1`。
+- **Line 475 / 第 475 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 476 / 第 476 行** — `int depthwise_gemm_k_iterations(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 477 / 第 477 行** — `  Operator conv_operator, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 478 / 第 478 行** — `  int threadblock_K, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 479 / 第 479 行** — `  Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 480 / 第 480 行** — `  IteratorAlgorithm algorithm = IteratorAlgorithm::kAnalytic,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 481 / 第 481 行** — `  GroupMode group_mode = GroupMode::kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 482 / 第 482 行** — `  int threadblock_N = 0) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 483 / 第 483 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 484 / 第 484 行** — `    int n =  problem_size.N;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 485 / 第 485 行** — `    int p = (problem_size.P + Output_P - 1) /  Output_P;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 486 / 第 486 行** — `    int q = (problem_size.Q + Output_Q - 1) /  Output_Q;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 487 / 第 487 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 488 / 第 488 行** — `    int iterations = (n * p * q + problem_size.split_k_slices - 1) / problem_size.split_k_slices;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 489 / 第 489 行** — `    return iterations;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 490 / 第 490 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 491 / 第 491 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 492 / 第 492 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 493 / 第 493 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 494 / 第 494 行** — `int implicit_gemm_k_iterations_per_channel(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 495 / 第 495 行** — `    Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 496 / 第 496 行** — `    Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 497 / 第 497 行** — `    IteratorAlgorithm algorithm = IteratorAlgorithm::kAnalytic) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 498 / 第 498 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 499 / 第 499 行** — `  int iterations = 0; //0 means not applicable`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 500 / 第 500 行** — `  if (algorithm == IteratorAlgorithm::kAnalytic || algorithm == IteratorAlgorithm::kOptimized) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 501 / 第 501 行** — `    switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 502 / 第 502 行** — `      case Operator::kFprop:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 503 / 第 503 行** — `        iterations = problem_size.R * problem_size.S;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 504 / 第 504 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 505 / 第 505 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 506 / 第 506 行** — `      case Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 507 / 第 507 行** — `      case Operator::kDgrad:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 508 / 第 508 行** — `        iterations = problem_size.R * problem_size.S;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 509 / 第 509 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 510 / 第 510 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 511 / 第 511 行** — `      default:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 512 / 第 512 行** — `        break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 513 / 第 513 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 514 / 第 514 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 515 / 第 515 行** — `  return iterations;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 516 / 第 516 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 517 / 第 517 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 518 / 第 518 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 519 / 第 519 行** — `//  Mapping function (ImplicitGemm A, B, C -> Conv Activation, Filter, Output)`
+  - **EN**: Inline comment explaining intent: `Mapping function (ImplicitGemm A, B, C -> Conv Activation, Filter, Output)`.
+  - **CN**: 行内注释说明意图：`Mapping function (ImplicitGemm A, B, C -> Conv Activation, Filter, Output)`。
+- **Line 520 / 第 520 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 521 / 第 521 行** — `/// Returns ImplicitGemm tensor A extent as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns ImplicitGemm tensor A extent as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns ImplicitGemm tensor A extent as Tensor4DCoord`。
+- **Line 522 / 第 522 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 523 / 第 523 行** — `cutlass::Tensor4DCoord implicit_gemm_tensor_a_extent(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 524 / 第 524 行** — `  Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 525 / 第 525 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 526 / 第 526 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 527 / 第 527 行** — `    case cutlass::conv::Operator::kFprop: return problem_size.activation_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 528 / 第 528 行** — `    case cutlass::conv::Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 529 / 第 529 行** — `    case cutlass::conv::Operator::kDgrad: return problem_size.output_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 530 / 第 530 行** — `    case cutlass::conv::Operator::kWgrad: return problem_size.output_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 531 / 第 531 行** — `    default : break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 532 / 第 532 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 533 / 第 533 行** — `  return cutlass::Tensor4DCoord();`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 534 / 第 534 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 535 / 第 535 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 536 / 第 536 行** — `/// Returns ImplicitGemm tensor B extent as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns ImplicitGemm tensor B extent as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns ImplicitGemm tensor B extent as Tensor4DCoord`。
+- **Line 537 / 第 537 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 538 / 第 538 行** — `cutlass::Tensor4DCoord implicit_gemm_tensor_b_extent(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 539 / 第 539 行** — `  Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 540 / 第 540 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 541 / 第 541 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 542 / 第 542 行** — `    case cutlass::conv::Operator::kFprop: return problem_size.filter_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 543 / 第 543 行** — `    case cutlass::conv::Operator::kDeconv: return problem_size.filter_extent(true);`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 544 / 第 544 行** — `    case cutlass::conv::Operator::kDgrad: return problem_size.filter_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 545 / 第 545 行** — `    case cutlass::conv::Operator::kWgrad: return problem_size.activation_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 546 / 第 546 行** — `    default : break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 547 / 第 547 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 548 / 第 548 行** — `  return cutlass::Tensor4DCoord();`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 549 / 第 549 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 550 / 第 550 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 551 / 第 551 行** — `/// Returns ImplicitGemm tensor C extent as Tensor4DCoord`
+  - **EN**: Inline comment explaining intent: `Returns ImplicitGemm tensor C extent as Tensor4DCoord`.
+  - **CN**: 行内注释说明意图：`Returns ImplicitGemm tensor C extent as Tensor4DCoord`。
+- **Line 552 / 第 552 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 553 / 第 553 行** — `cutlass::Tensor4DCoord implicit_gemm_tensor_c_extent(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 554 / 第 554 行** — `  Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 555 / 第 555 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 556 / 第 556 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 557 / 第 557 行** — `    case cutlass::conv::Operator::kFprop: return problem_size.output_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 558 / 第 558 行** — `    case cutlass::conv::Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 559 / 第 559 行** — `    case cutlass::conv::Operator::kDgrad: return problem_size.activation_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 560 / 第 560 行** — `    case cutlass::conv::Operator::kWgrad: return problem_size.filter_extent();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 561 / 第 561 行** — `    default : break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 562 / 第 562 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 563 / 第 563 行** — `  return cutlass::Tensor4DCoord();`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 564 / 第 564 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 565 / 第 565 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 566 / 第 566 行** — `/// Returns ImplicitGemm tensor A size in number of elements`
+  - **EN**: Inline comment explaining intent: `Returns ImplicitGemm tensor A size in number of elements`.
+  - **CN**: 行内注释说明意图：`Returns ImplicitGemm tensor A size in number of elements`。
+- **Line 567 / 第 567 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 568 / 第 568 行** — `int64_t implicit_gemm_tensor_a_size(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 569 / 第 569 行** — `  Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 570 / 第 570 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 571 / 第 571 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 572 / 第 572 行** — `    case cutlass::conv::Operator::kFprop: return problem_size.activation_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 573 / 第 573 行** — `    case cutlass::conv::Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 574 / 第 574 行** — `    case cutlass::conv::Operator::kDgrad: return problem_size.output_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 575 / 第 575 行** — `    case cutlass::conv::Operator::kWgrad: return problem_size.output_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 576 / 第 576 行** — `    default : break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 577 / 第 577 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 578 / 第 578 行** — `  return 0;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 579 / 第 579 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 580 / 第 580 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 581 / 第 581 行** — `/// Returns ImplicitGemm tensor B size in number of elements`
+  - **EN**: Inline comment explaining intent: `Returns ImplicitGemm tensor B size in number of elements`.
+  - **CN**: 行内注释说明意图：`Returns ImplicitGemm tensor B size in number of elements`。
+- **Line 582 / 第 582 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 583 / 第 583 行** — `int64_t implicit_gemm_tensor_b_size(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 584 / 第 584 行** — `  Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 585 / 第 585 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 586 / 第 586 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 587 / 第 587 行** — `    case cutlass::conv::Operator::kFprop: return problem_size.filter_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 588 / 第 588 行** — `    case cutlass::conv::Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 589 / 第 589 行** — `    case cutlass::conv::Operator::kDgrad: return problem_size.filter_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 590 / 第 590 行** — `    case cutlass::conv::Operator::kWgrad: return problem_size.activation_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 591 / 第 591 行** — `    default : break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 592 / 第 592 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 593 / 第 593 行** — `  return 0;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 594 / 第 594 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 595 / 第 595 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 596 / 第 596 行** — `/// Returns ImplicitGemm tensor C size in number of elements`
+  - **EN**: Inline comment explaining intent: `Returns ImplicitGemm tensor C size in number of elements`.
+  - **CN**: 行内注释说明意图：`Returns ImplicitGemm tensor C size in number of elements`。
+- **Line 597 / 第 597 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 598 / 第 598 行** — `int64_t implicit_gemm_tensor_c_size(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 599 / 第 599 行** — `  Operator conv_operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 600 / 第 600 行** — `  Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 601 / 第 601 行** — `  switch (conv_operator) {`
+  - **EN**: Starts a switch statement.
+  - **CN**: 开始一个 switch 语句。
+- **Line 602 / 第 602 行** — `    case cutlass::conv::Operator::kFprop: return problem_size.output_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 603 / 第 603 行** — `    case cutlass::conv::Operator::kDeconv:`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 604 / 第 604 行** — `    case cutlass::conv::Operator::kDgrad: return problem_size.activation_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 605 / 第 605 行** — `    case cutlass::conv::Operator::kWgrad: return problem_size.filter_size();`
+  - **EN**: Marks one branch inside the surrounding switch.
+  - **CN**: 标记外层 switch 中的一个分支。
+- **Line 606 / 第 606 行** — `    default : break;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 607 / 第 607 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 608 / 第 608 行** — `  return 0;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 609 / 第 609 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 610 / 第 610 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 611 / 第 611 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 612 / 第 612 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 613 / 第 613 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 614 / 第 614 行** — `//                                  Strided dgrad helper functions                                 //`
+  - **EN**: Inline comment explaining intent: `Strided dgrad helper functions                                 //`.
+  - **CN**: 行内注释说明意图：`Strided dgrad helper functions                                 //`。
+- **Line 615 / 第 615 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 616 / 第 616 行** — `// Returns number of CTAs tile M to cover valid MMAs per starting filter postion`
+  - **EN**: Inline comment explaining intent: `Returns number of CTAs tile M to cover valid MMAs per starting filter postion`.
+  - **CN**: 行内注释说明意图：`Returns number of CTAs tile M to cover valid MMAs per starting filter postion`。
+- **Line 617 / 第 617 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 618 / 第 618 行** — `int strided_dgrad_tile_m_per_filter(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 619 / 第 619 行** — `  Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 620 / 第 620 行** — `  int tile_size_m) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 621 / 第 621 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 622 / 第 622 行** — `  // Compute NHW rows in Dx output that needs MMA per starting filter position`
+  - **EN**: Inline comment explaining intent: `Compute NHW rows in Dx output that needs MMA per starting filter position`.
+  - **CN**: 行内注释说明意图：`Compute NHW rows in Dx output that needs MMA per starting filter position`。
+- **Line 623 / 第 623 行** — `  int rows_h_per_filter = (problem_size.H + problem_size.stride_h - 1) / problem_size.stride_h;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 624 / 第 624 行** — `  int rows_w_per_filter = (problem_size.W + problem_size.stride_w - 1) / problem_size.stride_w;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 625 / 第 625 行** — `  int rows_nhw_per_filter = problem_size.N * rows_h_per_filter * rows_w_per_filter;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 626 / 第 626 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 627 / 第 627 行** — `  // Number of CTAs tile M to cover valid MMAs per starting filter postion`
+  - **EN**: Inline comment explaining intent: `Number of CTAs tile M to cover valid MMAs per starting filter postion`.
+  - **CN**: 行内注释说明意图：`Number of CTAs tile M to cover valid MMAs per starting filter postion`。
+- **Line 628 / 第 628 行** — `  int tile_m_per_filter = (rows_nhw_per_filter + tile_size_m - 1) / tile_size_m;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 629 / 第 629 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 630 / 第 630 行** — `  return tile_m_per_filter;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 631 / 第 631 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 632 / 第 632 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 633 / 第 633 行** — `// Computes starting Dx coord (h, w) for given starting filter postion`
+  - **EN**: Inline comment explaining intent: `Computes starting Dx coord (h, w) for given starting filter postion`.
+  - **CN**: 行内注释说明意图：`Computes starting Dx coord (h, w) for given starting filter postion`。
+- **Line 634 / 第 634 行** — `CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 635 / 第 635 行** — `void strided_dgrad_starting_coords(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 636 / 第 636 行** — `  Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 637 / 第 637 行** — `  FastDivmod const &stride_h_divmod, FastDivmod const &stride_w_divmod,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 638 / 第 638 行** — `  int r, int s,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 639 / 第 639 行** — `  int &start_h, int &start_w) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 640 / 第 640 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 641 / 第 641 行** — `  // function locals for remainder by fast divmod`
+  - **EN**: Inline comment explaining intent: `function locals for remainder by fast divmod`.
+  - **CN**: 行内注释说明意图：`function locals for remainder by fast divmod`。
+- **Line 642 / 第 642 行** — `  int pad_h_rem_, pad_w_rem_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 643 / 第 643 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 644 / 第 644 行** — `  // start_h  = std::abs(problem_size.stride_h - ((problem_size.pad_h % problem_size.stride_h) - r)) % problem_size.stride_h;`
+  - **EN**: Inline comment explaining intent: `start_h  = std::abs(problem_size.stride_h - ((problem_size.pad_h % problem_size.stride_h) - r)) ...`.
+  - **CN**: 行内注释说明意图：`start_h  = std::abs(problem_size.stride_h - ((problem_size.pad_h % problem_size.stride_h) - r)) ...`。
+- **Line 645 / 第 645 行** — `  stride_h_divmod.divmod(pad_h_rem_, problem_size.pad_h);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 646 / 第 646 行** — `  int r_ = absolute_value(problem_size.stride_h - (pad_h_rem_ - r));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 647 / 第 647 行** — `  stride_h_divmod.divmod(start_h, r_);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 648 / 第 648 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 649 / 第 649 行** — `  //start_w  = std::abs(problem_size.stride_w - ((problem_size.pad_w % problem_size.stride_w) - s)) % problem_size.stride_w;`
+  - **EN**: Inline comment explaining intent: `start_w  = std::abs(problem_size.stride_w - ((problem_size.pad_w % problem_size.stride_w) - s)) ...`.
+  - **CN**: 行内注释说明意图：`start_w  = std::abs(problem_size.stride_w - ((problem_size.pad_w % problem_size.stride_w) - s)) ...`。
+- **Line 650 / 第 650 行** — `  stride_w_divmod.divmod(pad_w_rem_, problem_size.pad_w);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 651 / 第 651 行** — `  int s_ = absolute_value(problem_size.stride_w - (pad_w_rem_ - s));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 652 / 第 652 行** — `  stride_w_divmod.divmod(start_w, s_);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 653 / 第 653 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 654 / 第 654 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 655 / 第 655 行** — `} // namespace conv`
+  - **EN**: Closes namespace `conv`.
+  - **CN**: 关闭命名空间 `conv`。
+- **Line 656 / 第 656 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 657 / 第 657 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 658 / 第 658 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Implicit GEMM / 隐式 GEMM
+- Problem shapes / 问题形状
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/tensor_coord.h` — CUTLASS dependency `cutlass/tensor_coord.h` / CUTLASS 依赖 `cutlass/tensor_coord.h`
+- `cutlass/fast_math.h` — CUTLASS dependency `cutlass/fast_math.h` / CUTLASS 依赖 `cutlass/fast_math.h`
+- `cutlass/gemm/gemm_enumerated_types.h` — CUTLASS GEMM primitive `cutlass/gemm/gemm_enumerated_types.h` / CUTLASS GEMM 原语 `cutlass/gemm/gemm_enumerated_types.h`
+- `cutlass/matrix_coord.h` — CUTLASS dependency `cutlass/matrix_coord.h` / CUTLASS 依赖 `cutlass/matrix_coord.h`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/functional.h` — CUTLASS dependency `cutlass/functional.h` / CUTLASS 依赖 `cutlass/functional.h`

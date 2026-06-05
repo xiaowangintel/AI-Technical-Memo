@@ -1,0 +1,1564 @@
+# gemm_with_broadcast_f16n_f16n_f16n_tensorop_f32_sm75.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/device/gemm_with_broadcast_f16n_f16n_f16n_tensorop_f32_sm75.cu`
+
+## Purpose / 目的
+- EN: This file follows the brief "Tests for device-wide GEMM interface" and encodes the concrete kernel variants exercised by the test cases for SM75.
+- CN: 该文件用于设备级 GEMM 接口的测试，并给出了在 SM75 上由测试用例实际覆盖的具体内核变体。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `/*! \file`
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 33**: `    \brief Tests for device-wide GEMM interface`
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 34**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `#include "cutlass/cutlass.h"`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- **Line 39**: `#include "cutlass/functional.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `#include "cutlass/gemm/kernel/default_gemm_with_broadcast.h"`
+  - EN: Provides a CUTLASS GEMM kernel policy builder used by this file.
+  - CN: 提供该文件使用的 CUTLASS GEMM 内核策略构建器。
+- **Line 42**: `#include "cutlass/gemm/device/gemm_universal_adapter.h"`
+  - EN: Adapts a kernel type to the universal device GEMM interface.
+  - CN: 将内核类型适配到通用设备 GEMM 接口。
+- **Line 43**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: `#include "cutlass/epilogue/thread/linear_combination_bias_elementwise.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 45**: `#include "cutlass/epilogue/thread/linear_combination_bias_relu.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 46**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 47**: `#include "../../common/cutlass_unit_test.h"`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 50**: `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 51**: `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- **Line 52**: `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 53**: `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 54**: `#include "cutlass/util/reference/host/gemm.h"`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- **Line 55**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 56**: `#include "testbed_gemm_with_broadcast.h"`
+  - EN: Provides local testbed helpers shared by neighboring GEMM tests.
+  - CN: 提供相邻 GEMM 测试共享的本地测试平台辅助工具。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 59**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 60**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 61**: `/// Computes:`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 62**: `///`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 63**: `///  Z = GEMM+Bias+ReLu`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 64**: `///  T = Relu conditional`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 65**: `///`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 66**: `template <typename Gemm>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 67**: `struct GemmWithBiasReluReferenceOp {`
+  - EN: Declares `struct GemmWithBiasReluReferenceOp`, which groups related data or behavior.
+  - CN: 声明 `struct GemmWithBiasReluReferenceOp`，用于组织相关数据或行为。
+- **Line 68**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 69**: `  using OutputOp = typename Gemm::GemmKernel::Epilogue::OutputOp;`
+  - EN: Creates alias `OutputOp` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `OutputOp`。
+- **Line 70**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 71**: `  using ElementCompute = typename OutputOp::ElementCompute;`
+  - EN: Creates alias `ElementCompute` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementCompute`。
+- **Line 72**: `  using ElementZ = typename OutputOp::ElementZ;`
+  - EN: Creates alias `ElementZ` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementZ`。
+- **Line 73**: `  using ElementT = typename OutputOp::ElementT;`
+  - EN: Creates alias `ElementT` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementT`。
+- **Line 74**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 75**: `  typename OutputOp::BinaryOp binary_op;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 76**: `  typename OutputOp::ElementwiseOp elementwise_op;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 77**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 78**: `  GemmWithBiasReluReferenceOp() { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 79**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 80**: `  void operator()(ElementZ &Z, ElementT &T, ElementCompute gemm, ElementCompute bias) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 81**: `    `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 82**: `    ElementCompute kThreshold = ElementCompute();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 83**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 84**: `    ElementCompute z_full = binary_op(gemm, bias);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 85**: `    `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 86**: `    bool conditional = (z_full >= kThreshold);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `    if (!conditional) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 89**: `      z_full = kThreshold;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 90**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 91**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 92**: `    Z = ElementZ(z_full);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 93**: `    T = ElementT(conditional);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 94**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 95**: `};`
+  - EN: Closes the scope for `struct GemmWithBiasReluReferenceOp`.
+  - CN: 结束 `struct GemmWithBiasReluReferenceOp` 的作用域。
+- **Line 96**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 97**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 98**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 99**: `#if defined(CUTLASS_ARCH_MMA_SM75_SUPPORTED)`
+  - EN: Compiles the following code only when `CUTLASS_ARCH_MMA_SM75_SUPPORTED` is available.
+  - CN: 仅当 `CUTLASS_ARCH_MMA_SM75_SUPPORTED` 可用时才编译后续代码。
+- **Line 100**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 101**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 102**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 103**: `TEST(SM75_Device_GemmWithBroadcast_GELU_f16n_f16n_f16n_tensor_op_f32, 128x128x32_64x64x8) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 104**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 105**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasElementwise<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 106**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 107**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 108**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 109**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 110**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 111**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 112**: `    cutlass::epilogue::thread::GELU_taylor<float>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 113**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 114**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 115**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 116**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 117**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 118**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 119**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 120**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 121**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 122**: `      cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 123**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 124**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 125**: `      cutlass::gemm::GemmShape<16, 8, 8>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 126**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 127**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 128**: `      2,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 129**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 130**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 131**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 132**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 133**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 134**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 135**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 136**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 137**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 138**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 139**: `TEST(SM70_Device_GemmWithBroadcast_GELU_f16n_f16n_f16n_tensor_op_f32, 128x128x32_64x64x8) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 140**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 141**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasElementwise<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 142**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 143**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 144**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 145**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 146**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 147**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 148**: `    cutlass::epilogue::thread::GELU_taylor<float>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 149**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 150**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 151**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 152**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 153**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 154**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 155**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 156**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 157**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 158**: `      cutlass::arch::Sm70,`
+  - EN: Targets the `Sm70` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm70`。
+- **Line 159**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 160**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 161**: `      cutlass::gemm::GemmShape<8, 8, 4>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 162**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 163**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 164**: `      2,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 165**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 166**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 167**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 168**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 169**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 170**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 171**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 172**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 173**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 174**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 175**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 176**: `TEST(SM75_Device_GemmWithBroadcast_RELU_f16n_f16n_f16n_tensor_op_f32, 128x128x32_64x64x8) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 177**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 178**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasRelu<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 179**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 180**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 181**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 182**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 183**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 184**: `    true`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 185**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 186**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 187**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 188**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 189**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 190**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 191**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 192**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 193**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 194**: `      cutlass::arch::Sm75,`
+  - EN: Targets the `Sm75` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm75`。
+- **Line 195**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 196**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 197**: `      cutlass::gemm::GemmShape<16, 8, 8>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 198**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 199**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 200**: `      2,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 201**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 202**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 203**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 204**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 205**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 206**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm, GemmWithBiasReluReferenceOp<Gemm> >();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 207**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 208**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 209**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 210**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 211**: `TEST(SM70_Device_GemmWithBroadcast_RELU_f16n_f16n_f16n_tensor_op_f32, 128x128x32_64x64x8) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 212**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 213**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasRelu<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 214**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 215**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 216**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 217**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 218**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 219**: `    true`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 220**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 221**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 222**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 223**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 224**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 225**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 226**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 227**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 228**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 229**: `      cutlass::arch::Sm70,`
+  - EN: Targets the `Sm70` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm70`。
+- **Line 230**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 231**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 232**: `      cutlass::gemm::GemmShape<8, 8, 4>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 233**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 234**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 235**: `      2,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 236**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 237**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 238**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 239**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 240**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 241**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm, GemmWithBiasReluReferenceOp<Gemm> >();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 242**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 243**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 244**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 245**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 246**: `#endif  // if defiend(CUTLASS_ARCH_MMA_SM75_SUPPORTED)`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 247**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 248**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 249**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 250**: `#if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`
+  - EN: Compiles the following code only when `CUTLASS_ARCH_MMA_SM80_SUPPORTED` is available.
+  - CN: 仅当 `CUTLASS_ARCH_MMA_SM80_SUPPORTED` 可用时才编译后续代码。
+- **Line 251**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 252**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 253**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 254**: `TEST(SM80_Device_GemmWithBroadcast_GELU_f16n_f16n_f16n_tensor_op_f32, 128x128_32x5_64x64x32_16x8x16) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 255**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 256**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasElementwise<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 257**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 258**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 259**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 260**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 261**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 262**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 263**: `    cutlass::epilogue::thread::GELU_taylor<float>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 264**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 265**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 266**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 267**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 268**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 269**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 270**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 271**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 272**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 273**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 274**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 275**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 276**: `      cutlass::gemm::GemmShape<16, 8, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 277**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 278**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 279**: `      5,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 280**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 281**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 282**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 283**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 284**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 285**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 286**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 287**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 288**: `TEST(SM80_Device_GemmWithBroadcast_RELU_f16n_f16n_f16n_tensor_op_f32, 128x128_32x5_64x64x32_16x8x16) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 289**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 290**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasRelu<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 291**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 292**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 293**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 294**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 295**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 296**: `    true`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 297**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 298**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 299**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 300**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 301**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 302**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 303**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 304**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 305**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 306**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 307**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 308**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 309**: `      cutlass::gemm::GemmShape<16, 8, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 310**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 311**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 312**: `      5,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 313**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 314**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 315**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 316**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 317**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 318**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm, GemmWithBiasReluReferenceOp<Gemm>>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 319**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 320**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 321**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 322**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 323**: `TEST(SM80_Device_GemmWithBroadcast_GELU_f16n_f16n_f16n_tensor_op_f32, 128x128_32x4_64x64x32_16x8x16) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 324**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 325**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasElementwise<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 326**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 327**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 328**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 329**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 330**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 331**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 332**: `    cutlass::epilogue::thread::GELU_taylor<float>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 333**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 334**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 335**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 336**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 337**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 338**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 339**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 340**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 341**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 342**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 343**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 344**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 345**: `      cutlass::gemm::GemmShape<16, 8, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 346**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 347**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 348**: `      4,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 349**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 350**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 351**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 352**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 353**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 354**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 355**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 356**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 357**: `TEST(SM80_Device_GemmWithBroadcast_RELU_f16n_f16n_f16n_tensor_op_f32, 128x128_32x4_64x64x32_16x8x16) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 358**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 359**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasRelu<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 360**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 361**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 362**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 363**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 364**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 365**: `    true`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 366**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 367**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 368**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 369**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 370**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 371**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 372**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 373**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 374**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 375**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 376**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 377**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 378**: `      cutlass::gemm::GemmShape<16, 8, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 379**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 380**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 381**: `      4,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 382**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 383**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 384**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 385**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 386**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 387**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm, GemmWithBiasReluReferenceOp<Gemm>>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 388**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 389**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 390**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 391**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 392**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 393**: `TEST(SM80_Device_GemmWithBroadcast_GELU_f16n_f16n_f16n_tensor_op_f32, 128x128_32x3_64x64x32_16x8x16) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 394**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 395**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasElementwise<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 396**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 397**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 398**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 399**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 400**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 401**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 402**: `    cutlass::epilogue::thread::GELU_taylor<float>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 403**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 404**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 405**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 406**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 407**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 408**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 409**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 410**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 411**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 412**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 413**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 414**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 415**: `      cutlass::gemm::GemmShape<16, 8, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 416**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 417**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 418**: `      3,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 419**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 420**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 421**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 422**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 423**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 424**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 425**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 426**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 427**: `TEST(SM80_Device_GemmWithBroadcast_RELU_f16n_f16n_f16n_tensor_op_f32, 128x128_32x3_64x64x32_16x8x16) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 428**: `  `
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 429**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasRelu<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 430**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 431**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 432**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 433**: `    cutlass::half_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 434**: `    8,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 435**: `    true`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 436**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 437**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 438**: `  using GemmKernel = `
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 439**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 440**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 441**: `      cutlass::half_t, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 8,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 442**: `      cutlass::half_t, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 443**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 444**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 445**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 446**: `      cutlass::gemm::GemmShape<128, 128, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 447**: `      cutlass::gemm::GemmShape<64, 64, 32>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 448**: `      cutlass::gemm::GemmShape<16, 8, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 449**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 450**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 451**: `      3,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 452**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 453**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 454**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 455**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 456**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 457**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm, GemmWithBiasReluReferenceOp<Gemm> >();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 458**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 459**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 460**: `TEST(SM80_Device_GemmWithBroadcast_RELU_f32n_f32n_f32n_tensor_op_f32, 64x64_16x10_32x32x16_16x8x8) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 461**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 462**: `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationBiasRelu<`
+  - EN: Creates type alias `EpilogueOutputOp` to simplify later code.
+  - CN: 创建类型别名 `EpilogueOutputOp` 以简化后续代码。
+- **Line 463**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 464**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 465**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 466**: `    float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 467**: `    4,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 468**: `    false`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 469**: `  >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 470**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 471**: `  using GemmKernel =`
+  - EN: Creates type alias `GemmKernel` to simplify later code.
+  - CN: 创建类型别名 `GemmKernel` 以简化后续代码。
+- **Line 472**: `    typename cutlass::gemm::kernel::DefaultGemmWithBroadcast<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 473**: `      float, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 4,    // transposed B operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 474**: `      float, cutlass::layout::RowMajor, cutlass::ComplexTransform::kNone, 4,    // transposed A operand`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 475**: `      float, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 476**: `      float,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 477**: `      cutlass::arch::OpClassTensorOp,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 478**: `      cutlass::arch::Sm80,`
+  - EN: Targets the `Sm80` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm80`。
+- **Line 479**: `      cutlass::gemm::GemmShape<64, 64, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 480**: `      cutlass::gemm::GemmShape<32, 32, 16>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 481**: `      cutlass::gemm::GemmShape<16, 8, 8>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 482**: `      EpilogueOutputOp,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 483**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>,`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 484**: `      10,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 485**: `      cutlass::arch::OpMultiplyAdd`
+  - EN: Selects the multiply-add operator class used by the math instructions.
+  - CN: 选择数学指令使用的乘加算子类别。
+- **Line 486**: `  >::GemmKernel;`
+  - EN: Finishes the alias by selecting the kernel type produced by the CUTLASS policy builder.
+  - CN: 通过选择 CUTLASS 策略构建器生成的内核类型来完成该别名。
+- **Line 487**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 488**: `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 489**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 490**: `  test::gemm::device::TestAllGemmWithBroadcast<Gemm, GemmWithBiasReluReferenceOp<Gemm> >();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 491**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 492**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 493**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 494**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 495**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 496**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Uses GoogleTest-style test cases to instantiate and run specific kernel configurations.
+  - CN: 使用 GoogleTest 风格测试用例实例化并运行特定内核配置。
+- `GemmUniversalAdapter`
+  - EN: Wraps a kernel type in the universal runtime interface expected by the testbed.
+  - CN: 将内核类型封装为测试平台所需的通用运行时接口。
+- `GemmShape<`
+  - EN: Encodes threadblock, warp, and instruction tile sizes that determine kernel decomposition.
+  - CN: 编码线程块、warp 和指令级 tile 尺寸，以决定内核分解方式。
+- `Sm80`
+  - EN: Targets NVIDIA Ampere-class SM80 kernels.
+  - CN: 面向 NVIDIA Ampere 架构的 SM80 内核。
+- `Sm75`
+  - EN: Targets NVIDIA Turing-class SM75 kernels.
+  - CN: 面向 NVIDIA Turing 架构的 SM75 内核。
+- `Sm70`
+  - EN: Targets NVIDIA Volta-class SM70 kernels.
+  - CN: 面向 NVIDIA Volta 架构的 SM70 内核。
+
+## Dependencies / 依赖关系
+- `<iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- `cutlass/cutlass.h`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- `cutlass/functional.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/gemm/kernel/default_gemm_with_broadcast.h`
+  - EN: Provides a CUTLASS GEMM kernel policy builder used by this file.
+  - CN: 提供该文件使用的 CUTLASS GEMM 内核策略构建器。
+- `cutlass/gemm/device/gemm_universal_adapter.h`
+  - EN: Adapts a kernel type to the universal device GEMM interface.
+  - CN: 将内核类型适配到通用设备 GEMM 接口。
+- `cutlass/epilogue/thread/linear_combination_bias_elementwise.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/epilogue/thread/linear_combination_bias_relu.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- `testbed_gemm_with_broadcast.h`
+  - EN: Provides local testbed helpers shared by neighboring GEMM tests.
+  - CN: 提供相邻 GEMM 测试共享的本地测试平台辅助工具。

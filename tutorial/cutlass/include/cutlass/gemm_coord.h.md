@@ -1,0 +1,1207 @@
+# gemm_coord.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/gemm_coord.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/gemm_coord.h`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/gemm_coord.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes "cutlass/coord.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/coord.h"，以便本文件使用该依赖中的声明。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L37**: <code>namespace gemm {</code>
+  - EN: Opens namespace `gemm` to scope the following declarations.
+  - CN: 打开命名空间 `gemm`，为后续声明提供作用域。
+- **L38**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L39**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>/// Shape of a matrix multiply-add operation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L42**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L43**: <code>  /// Rows of matrix product</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L44**: <code>  int M = 1,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L45**: <code>  /// Columns of matrix product</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L46**: <code>  int N = 1,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L47**: <code>  /// Inner dimension of matrix product</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L48**: <code>  int K = 1</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L49**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L50**: <code>struct GemmShape {</code>
+  - EN: Declares or defines the struct `GemmShape`.
+  - CN: 声明或定义 struct `GemmShape`。
+- **L51**: <code>  static int const kM = M;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L52**: <code>  static int const kN = N;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L53**: <code>  static int const kK = K;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L54**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L55**: <code>  static int const kMN = M * N;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L56**: <code>  static int const kMK = M * K;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L57**: <code>  static int const kKN = N * K;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L58**: <code>  static int const kMNK = M * N * K;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L59**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L60**: <code>  static int const kCount = kMNK;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L61**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L62**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L63**: <code>  // Static member functions</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L64**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>  /// Returns a Coord object</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L67**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L68**: <code>  static Coord&lt;3&gt; toCoord() {</code>
+  - EN: Starts the definition body for `toCoord`.
+  - CN: 开始 `toCoord` 的定义体。
+- **L69**: <code>    return make_Coord(kM, kN, kK);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L70**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L71**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L72**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L73**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>/// Type alias of the transpose of a GemmShape</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L76**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L77**: <code>  /// concept: GemmShape</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L78**: <code>  typename Shape</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L79**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L80**: <code>using GemmShapeTranspose = GemmShape&lt;Shape::kN, Shape::kM, Shape::kK&gt;;</code>
+  - EN: Defines the alias `GemmShapeTranspose` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `GemmShapeTranspose`。
+- **L81**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L82**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L83**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L84**: <code>/// GemmCoord is a structure derived from Coord&lt;3&gt; that specifies a location within the</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L85**: <code>/// coordinate space of a GEMM problem.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L86**: <code>struct GemmCoord : public Coord&lt;3, int&gt; {</code>
+  - EN: Declares or defines the struct `GemmCoord`.
+  - CN: 声明或定义 struct `GemmCoord`。
+- **L87**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L88**: <code>  /// Integer-valued index</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L89**: <code>  typedef int Index;</code>
+  - EN: Creates a type alias with the older `typedef` syntax.
+  - CN: 使用较旧的 `typedef` 语法创建类型别名。
+- **L90**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L91**: <code>  /// Base type is a Coord of rank=3</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L92**: <code>  typedef Coord&lt;3, Index&gt; Base;</code>
+  - EN: Creates a type alias with the older `typedef` syntax.
+  - CN: 使用较旧的 `typedef` 语法创建类型别名。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <code>  /// GEMM M dimension - rows of the output C matrix</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L95**: <code>  static int const kM = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L96**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L97**: <code>  /// GEMM N dimension - columns of the output C matrix</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L98**: <code>  static int const kN = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L99**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L100**: <code>  /// GEMM K dimension - inner dimension of the GEMM problem</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L101**: <code>  static int const kK = 2;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L104**: <code>  // Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L105**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L106**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L107**: <code>  /// Default ctor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L108**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L109**: <code>  GemmCoord() { }</code>
+  - EN: Starts the definition body for `GemmCoord`.
+  - CN: 开始 `GemmCoord` 的定义体。
+- **L110**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L111**: <code>  /// Constructs from Coord&lt;3&gt; and a batch</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L112**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L113**: <code>  GemmCoord(Coord&lt;3, Index&gt; const&amp; coord): Base(make_Coord(coord[0], coord[1], coord[2])) { }</code>
+  - EN: Starts the definition body for `GemmCoord`.
+  - CN: 开始 `GemmCoord` 的定义体。
+- **L114**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L115**: <code>  /// Helper to construct from a K, N, M, batch variables</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L116**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L117**: <code>  GemmCoord(Index m, Index n, Index k): Base(make_Coord(m, n, k)) { }</code>
+  - EN: Starts the definition body for `GemmCoord`.
+  - CN: 开始 `GemmCoord` 的定义体。
+- **L118**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L119**: <code>  /// Returns the GEMM M coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L120**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L121**: <code>  Index const&amp;  m() const { return this-&gt;at(kM); }</code>
+  - EN: Starts the definition body for `m`.
+  - CN: 开始 `m` 的定义体。
+- **L122**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L123**: <code>  /// Returns reference to the GEMM M coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L124**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L125**: <code>  Index &amp; m() { return this-&gt;at(kM); }</code>
+  - EN: Starts the definition body for `m`.
+  - CN: 开始 `m` 的定义体。
+- **L126**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L127**: <code>  /// Returns the GEMM N coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L128**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L129**: <code>  Index const&amp;  n() const { return this-&gt;at(kN); }</code>
+  - EN: Starts the definition body for `n`.
+  - CN: 开始 `n` 的定义体。
+- **L130**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L131**: <code>  /// Returns reference to the GEMM N coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L132**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L133**: <code>  Index &amp; n() { return this-&gt;at(kN); }</code>
+  - EN: Starts the definition body for `n`.
+  - CN: 开始 `n` 的定义体。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>  /// Returns the GEMM K coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L136**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L137**: <code>  Index const&amp;  k() const { return this-&gt;at(kK); }</code>
+  - EN: Starts the definition body for `k`.
+  - CN: 开始 `k` 的定义体。
+- **L138**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L139**: <code>  /// Returns reference to the GEMM K coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L140**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L141**: <code>  Index &amp; k() { return this-&gt;at(kK); }</code>
+  - EN: Starts the definition body for `k`.
+  - CN: 开始 `k` 的定义体。
+- **L142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L143**: <code>  /// Obtains a Coord&lt;3&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L144**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L145**: <code>  Coord&lt;3&gt; mnk() const {</code>
+  - EN: Starts the definition body for `mnk`.
+  - CN: 开始 `mnk` 的定义体。
+- **L146**: <code>    return make_Coord(m(), n(), k());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L147**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L148**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L149**: <code>  /// Obtains a Coord&lt;3&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L150**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L151**: <code>  Coord&lt;3&gt; knm() const {</code>
+  - EN: Starts the definition body for `knm`.
+  - CN: 开始 `knm` 的定义体。
+- **L152**: <code>    return make_Coord(k(), n(), m());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L153**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L154**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L155**: <code>  /// Obtains a Coord&lt;2&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L156**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L157**: <code>  Coord&lt;2&gt; nm() const {</code>
+  - EN: Starts the definition body for `nm`.
+  - CN: 开始 `nm` 的定义体。
+- **L158**: <code>    return make_Coord(n(), m());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L159**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L160**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L161**: <code>  /// Obtains a Coord&lt;2&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L162**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L163**: <code>  Coord&lt;2&gt; mn() const {</code>
+  - EN: Starts the definition body for `mn`.
+  - CN: 开始 `mn` 的定义体。
+- **L164**: <code>    return make_Coord(m(), n());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L165**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L166**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L167**: <code>  /// Obtains a Coord&lt;2&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L168**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L169**: <code>  Coord&lt;2&gt; mk() const {</code>
+  - EN: Starts the definition body for `mk`.
+  - CN: 开始 `mk` 的定义体。
+- **L170**: <code>    return make_Coord(m(), k());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L171**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L172**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L173**: <code>  /// Obtains a Coord&lt;2&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L174**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L175**: <code>  Coord&lt;2&gt; km() const {</code>
+  - EN: Starts the definition body for `km`.
+  - CN: 开始 `km` 的定义体。
+- **L176**: <code>    return make_Coord(k(), m());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L177**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L178**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L179**: <code>  /// Obtains a Coord&lt;2&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L180**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L181**: <code>  Coord&lt;2&gt; nk() const {</code>
+  - EN: Starts the definition body for `nk`.
+  - CN: 开始 `nk` 的定义体。
+- **L182**: <code>    return make_Coord(n(), k());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L183**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L184**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L185**: <code>  /// Obtains a Coord&lt;2&gt; from GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L186**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L187**: <code>  Coord&lt;2&gt; kn() const {</code>
+  - EN: Starts the definition body for `kn`.
+  - CN: 开始 `kn` 的定义体。
+- **L188**: <code>    return make_Coord(k(), n());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L189**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L190**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L191**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L192**: <code>  // Coord operators</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L193**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L194**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L195**: <code>  /// Element-wise addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L196**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L197**: <code>  GemmCoord operator+(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator+`.
+  - CN: 开始 `operator+` 的定义体。
+- **L198**: <code>    return GemmCoord(Base::operator+(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L199**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L200**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L201**: <code>  /// Element-wise subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L202**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L203**: <code>  GemmCoord operator-(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator-`.
+  - CN: 开始 `operator-` 的定义体。
+- **L204**: <code>    return GemmCoord(Base::operator-(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L205**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L206**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L207**: <code>  /// Element-wise multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L208**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L209**: <code>  GemmCoord operator*(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L210**: <code>    return GemmCoord(Base::operator*(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L211**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L212**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L213**: <code>  /// Element-wise division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L214**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L215**: <code>  GemmCoord operator/(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L216**: <code>    return GemmCoord(Base::operator/(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L217**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L218**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L219**: <code>  /// In-place addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L220**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L221**: <code>  GemmCoord&amp; operator+=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator+=`.
+  - CN: 开始 `operator+=` 的定义体。
+- **L222**: <code>    Base::operator+=(b);</code>
+  - EN: Declares the callable or operator `operator+=`.
+  - CN: 声明可调用对象或运算符 `operator+=`。
+- **L223**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L224**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L225**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L226**: <code>  /// In-place subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L227**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L228**: <code>  GemmCoord&amp; operator-=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator-=`.
+  - CN: 开始 `operator-=` 的定义体。
+- **L229**: <code>    Base::operator-=(b);</code>
+  - EN: Declares the callable or operator `operator-=`.
+  - CN: 声明可调用对象或运算符 `operator-=`。
+- **L230**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L231**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L232**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L233**: <code>  /// In-place multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L234**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L235**: <code>  GemmCoord&amp; operator*=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator*=`.
+  - CN: 开始 `operator*=` 的定义体。
+- **L236**: <code>    Base::operator*=(b);</code>
+  - EN: Declares the callable or operator `operator*=`.
+  - CN: 声明可调用对象或运算符 `operator*=`。
+- **L237**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L238**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>  /// In-place division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L241**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L242**: <code>  GemmCoord&amp; operator/=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator/=`.
+  - CN: 开始 `operator/=` 的定义体。
+- **L243**: <code>    Base::operator/=(b);</code>
+  - EN: Declares the callable or operator `operator/=`.
+  - CN: 声明可调用对象或运算符 `operator/=`。
+- **L244**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L245**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L246**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L247**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L248**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L249**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L250**: <code>/// BatchedGemmCoord is a structure derived from Coord&lt;4&gt; that specifies a location within the</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L251**: <code>/// coordinate space of a batched GEMM problem.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L252**: <code>struct BatchedGemmCoord : public Coord&lt;4, int&gt; {</code>
+  - EN: Declares or defines the struct `BatchedGemmCoord`.
+  - CN: 声明或定义 struct `BatchedGemmCoord`。
+- **L253**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L254**: <code>  /// Integer-valued index</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L255**: <code>  typedef int Index;</code>
+  - EN: Creates a type alias with the older `typedef` syntax.
+  - CN: 使用较旧的 `typedef` 语法创建类型别名。
+- **L256**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L257**: <code>  /// Base type is a Coord of rank=4</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L258**: <code>  typedef Coord&lt;4, Index&gt; Base;</code>
+  - EN: Creates a type alias with the older `typedef` syntax.
+  - CN: 使用较旧的 `typedef` 语法创建类型别名。
+- **L259**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L260**: <code>  /// GEMM M dimension - rows of the output C matrix</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L261**: <code>  static int const kM = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L262**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L263**: <code>  /// GEMM N dimension - columns of the output C matrix</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L264**: <code>  static int const kN = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L265**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L266**: <code>  /// GEMM K dimension - inner dimension of the GEMM problem</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L267**: <code>  static int const kK = 2;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L268**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L269**: <code>  /// GEMM Batch dimension - inner dimension of the GEMM problem</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L270**: <code>  static int const kBatch = 3;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L271**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L272**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L273**: <code>  // Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L274**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L275**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L276**: <code>  /// Default ctor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L277**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L278**: <code>  BatchedGemmCoord() { }</code>
+  - EN: Starts the definition body for `BatchedGemmCoord`.
+  - CN: 开始 `BatchedGemmCoord` 的定义体。
+- **L279**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L280**: <code>  /// Constructs from Coord&lt;4&gt;</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L281**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L282**: <code>  BatchedGemmCoord(Base const&amp; coord): Base(coord) { }</code>
+  - EN: Starts the definition body for `BatchedGemmCoord`.
+  - CN: 开始 `BatchedGemmCoord` 的定义体。
+- **L283**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L284**: <code>  /// Helper to construct from a K, N, M, and batch variables</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L285**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L286**: <code>  BatchedGemmCoord(Index m, Index n, Index k, Index b): Base(make_Coord(m, n, k, b)) { }</code>
+  - EN: Starts the definition body for `BatchedGemmCoord`.
+  - CN: 开始 `BatchedGemmCoord` 的定义体。
+- **L287**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L288**: <code>  /// Returns the GEMM M coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L289**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L290**: <code>  Index const&amp;  m() const { return this-&gt;at(kM); }</code>
+  - EN: Starts the definition body for `m`.
+  - CN: 开始 `m` 的定义体。
+- **L291**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L292**: <code>  /// Returns reference to the GEMM M coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L293**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L294**: <code>  Index &amp; m() { return this-&gt;at(kM); }</code>
+  - EN: Starts the definition body for `m`.
+  - CN: 开始 `m` 的定义体。
+- **L295**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L296**: <code>  /// Returns the GEMM N coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L297**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L298**: <code>  Index const&amp;  n() const { return this-&gt;at(kN); }</code>
+  - EN: Starts the definition body for `n`.
+  - CN: 开始 `n` 的定义体。
+- **L299**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L300**: <code>  /// Returns reference to the GEMM N coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L301**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L302**: <code>  Index &amp; n() { return this-&gt;at(kN); }</code>
+  - EN: Starts the definition body for `n`.
+  - CN: 开始 `n` 的定义体。
+- **L303**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L304**: <code>  /// Returns the GEMM K coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L305**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L306**: <code>  Index const&amp;  k() const { return this-&gt;at(kK); }</code>
+  - EN: Starts the definition body for `k`.
+  - CN: 开始 `k` 的定义体。
+- **L307**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L308**: <code>  /// Returns reference to the GEMM K coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L309**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L310**: <code>  Index &amp; k() { return this-&gt;at(kK); }</code>
+  - EN: Starts the definition body for `k`.
+  - CN: 开始 `k` 的定义体。
+- **L311**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L312**: <code>  /// Returns the GEMM batch coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L313**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L314**: <code>  Index const&amp;  batch() const { return this-&gt;at(kBatch); }</code>
+  - EN: Starts the definition body for `batch`.
+  - CN: 开始 `batch` 的定义体。
+- **L315**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L316**: <code>  /// Returns reference to the GEMM batch coordinate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L317**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L318**: <code>  Index &amp; batch() { return this-&gt;at(kBatch); }</code>
+  - EN: Starts the definition body for `batch`.
+  - CN: 开始 `batch` 的定义体。
+- **L319**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L320**: <code>  /// Obtains a GemmCoord from BatchedGemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L321**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L322**: <code>  GemmCoord mnk() const {</code>
+  - EN: Starts the definition body for `mnk`.
+  - CN: 开始 `mnk` 的定义体。
+- **L323**: <code>    return GemmCoord(m(), n(), k());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L324**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L325**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L326**: <code>  /// Obtains a Coord&lt;4&gt; from BatchedGemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L327**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L328**: <code>  Coord&lt;4&gt; mnkb() const {</code>
+  - EN: Starts the definition body for `mnkb`.
+  - CN: 开始 `mnkb` 的定义体。
+- **L329**: <code>    return make_Coord(m(), n(), k(), batch());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L330**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L331**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L332**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L333**: <code>  // Coord operators</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L334**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L335**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L336**: <code>  /// Element-wise addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L337**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L338**: <code>  BatchedGemmCoord operator+(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator+`.
+  - CN: 开始 `operator+` 的定义体。
+- **L339**: <code>    return BatchedGemmCoord(Base::operator+(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L340**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L341**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L342**: <code>  /// Element-wise subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L343**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L344**: <code>  BatchedGemmCoord operator-(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator-`.
+  - CN: 开始 `operator-` 的定义体。
+- **L345**: <code>    return BatchedGemmCoord(Base::operator-(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L346**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L347**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L348**: <code>  /// Element-wise multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L349**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L350**: <code>  BatchedGemmCoord operator*(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L351**: <code>    return BatchedGemmCoord(Base::operator*(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L352**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L353**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L354**: <code>  /// Element-wise division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L355**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L356**: <code>  BatchedGemmCoord operator/(Base const&amp; b) const {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L357**: <code>    return BatchedGemmCoord(Base::operator/(b));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L358**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L359**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L360**: <code>  /// In-place addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L361**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L362**: <code>  BatchedGemmCoord&amp; operator+=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator+=`.
+  - CN: 开始 `operator+=` 的定义体。
+- **L363**: <code>    Base::operator+=(b);</code>
+  - EN: Declares the callable or operator `operator+=`.
+  - CN: 声明可调用对象或运算符 `operator+=`。
+- **L364**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L365**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L366**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L367**: <code>  /// In-place subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L368**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L369**: <code>  BatchedGemmCoord&amp; operator-=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator-=`.
+  - CN: 开始 `operator-=` 的定义体。
+- **L370**: <code>    Base::operator-=(b);</code>
+  - EN: Declares the callable or operator `operator-=`.
+  - CN: 声明可调用对象或运算符 `operator-=`。
+- **L371**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L372**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L373**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L374**: <code>  /// In-place multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L375**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L376**: <code>  BatchedGemmCoord&amp; operator*=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator*=`.
+  - CN: 开始 `operator*=` 的定义体。
+- **L377**: <code>    Base::operator*=(b);</code>
+  - EN: Declares the callable or operator `operator*=`.
+  - CN: 声明可调用对象或运算符 `operator*=`。
+- **L378**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L379**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L380**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L381**: <code>  /// In-place division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L382**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L383**: <code>  BatchedGemmCoord&amp; operator/=(Base const&amp; b) {</code>
+  - EN: Starts the definition body for `operator/=`.
+  - CN: 开始 `operator/=` 的定义体。
+- **L384**: <code>    Base::operator/=(b);</code>
+  - EN: Declares the callable or operator `operator/=`.
+  - CN: 声明可调用对象或运算符 `operator/=`。
+- **L385**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L386**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L387**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L388**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L389**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L390**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L391**: <code>} // namespace gemm</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L392**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L393**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L394**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Symbol focus: `GemmShape` / 重点符号：`GemmShape`
+- Symbol focus: `toCoord` / 重点符号：`toCoord`
+- Symbol focus: `make_Coord` / 重点符号：`make_Coord`
+- Symbol focus: `GemmShapeTranspose` / 重点符号：`GemmShapeTranspose`
+- Symbol focus: `GemmCoord` / 重点符号：`GemmCoord`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/coord.h"`

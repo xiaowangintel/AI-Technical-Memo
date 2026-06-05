@@ -1,0 +1,1146 @@
+# device_memory.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/device_memory.h`
+**Purpose / 用途**: Provides CUDA device utilities for memory. / 提供与 内存 相关的 CUDA 设备端工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code> * \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L36** <code> * \brief C++ interface to CUDA device memory management functions.</code>
+  - EN: Comment that documents intent or context: "\brief C++ interface to CUDA device memory management functions.".
+  - CN: 用于说明意图或上下文的注释："\brief C++ interface to CUDA device memory management functions."。
+- **L37** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &lt;memory&gt;</code>
+  - EN: Includes `memory` so this file can use memory-management helpers.
+  - CN: 引入 `memory`，使当前文件可以使用内存管理辅助工具。
+- **L40** <code>#include &lt;sstream&gt;</code>
+  - EN: Includes `sstream` so this file can use string-based stream utilities.
+  - CN: 引入 `sstream`，使当前文件可以使用基于字符串的流工具。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>#include &quot;cutlass/platform/platform.h&quot;</code>
+  - EN: Includes `cutlass/platform/platform.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/platform/platform.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>#include &quot;cutlass/trace.h&quot;</code>
+  - EN: Includes `cutlass/trace.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/trace.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L45** <code>#include &quot;exceptions.h&quot;</code>
+  - EN: Includes `exceptions.h` so this file can use project-specific declarations from `exceptions.h`.
+  - CN: 引入 `exceptions.h`，使当前文件可以使用来自 `exceptions.h` 的项目专用声明。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L48** <code>namespace device_memory {</code>
+  - EN: Opens namespace `device_memory` to group related symbols.
+  - CN: 打开命名空间 `device_memory`，用于归组相关符号。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L51** <code> * Allocation lifetime</code>
+  - EN: Comment that documents intent or context: "Allocation lifetime".
+  - CN: 用于说明意图或上下文的注释："Allocation lifetime"。
+- **L52** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>/// Allocate a buffer of \p count elements of type \p T on the current CUDA device</code>
+  - EN: Comment that documents intent or context: "Allocate a buffer of \p count elements of type \p T on the current CUDA device".
+  - CN: 用于说明意图或上下文的注释："Allocate a buffer of \p count elements of type \p T on the current CUDA device"。
+- **L55** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L56** <code>T* allocate(size_t count = 1) {</code>
+  - EN: Begins the definition of function or method `allocate`.
+  - CN: 开始定义函数或方法 `allocate`。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>  T* ptr = 0;</code>
+  - EN: Assigns or initializes `ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ptr` 进行赋值或初始化。
+- **L59** <code>  size_t bytes = count * sizeof_bits&lt;T&gt;::value / 8;</code>
+  - EN: Assigns or initializes `bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bytes` 进行赋值或初始化。
+- **L60** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L61** <code>  cudaError_t cuda_error = cudaMalloc((void**)&amp;ptr, bytes);</code>
+  - EN: Declares function or method `cudaMalloc` without defining it here.
+  - CN: 声明函数或方法 `cudaMalloc`，但不在此处给出定义。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>  if (cuda_error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L64** <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 0)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L65** <code>    std::ostringstream os;</code>
+  - EN: Declares the symbol `os` in the current scope.
+  - CN: 在当前作用域中声明符号 `os`。
+- **L66** <code>    os &lt;&lt; &quot;cutlass::device_memory::allocate: cudaMalloc failed: bytes=&quot; &lt;&lt; bytes;</code>
+  - EN: Assigns or initializes `bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bytes` 进行赋值或初始化。
+- **L67** <code>    CUTLASS_TRACE_HOST(os.str());</code>
+  - EN: Declares function or method `str` without defining it here.
+  - CN: 声明函数或方法 `str`，但不在此处给出定义。
+- **L68** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L69** <code>    throw cuda_exception(&quot;Failed to allocate memory&quot;, cuda_error);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L70** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L71** <code>#if (CUTLASS_DEBUG_TRACE_LEVEL &gt; 1)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L72** <code>  else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L73** <code>    std::ostringstream os;</code>
+  - EN: Declares the symbol `os` in the current scope.
+  - CN: 在当前作用域中声明符号 `os`。
+- **L74** <code>    os &lt;&lt; &quot;cutlass::device_memory::allocate: Successful cudaMalloc: bytes=&quot; &lt;&lt; bytes;</code>
+  - EN: Assigns or initializes `bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bytes` 进行赋值或初始化。
+- **L75** <code>    CUTLASS_TRACE_HOST(os.str());</code>
+  - EN: Declares function or method `str` without defining it here.
+  - CN: 声明函数或方法 `str`，但不在此处给出定义。
+- **L76** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L77** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>  return ptr;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L80** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>/// Free the buffer pointed to by \p ptr</code>
+  - EN: Comment that documents intent or context: "Free the buffer pointed to by \p ptr".
+  - CN: 用于说明意图或上下文的注释："Free the buffer pointed to by \p ptr"。
+- **L83** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L84** <code>void free(T* ptr) {</code>
+  - EN: Begins the definition of function or method `free`.
+  - CN: 开始定义函数或方法 `free`。
+- **L85** <code>  if (ptr) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L86** <code>    cudaError_t cuda_error = (cudaFree(ptr));</code>
+  - EN: Declares function or method `cudaFree` without defining it here.
+  - CN: 声明函数或方法 `cudaFree`，但不在此处给出定义。
+- **L87** <code>    if (cuda_error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L88** <code>      throw cuda_exception(&quot;Failed to free device memory&quot;, cuda_error);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L89** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L90** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L91** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L94** <code> * Data movement</code>
+  - EN: Comment that documents intent or context: "Data movement".
+  - CN: 用于说明意图或上下文的注释："Data movement"。
+- **L95** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L98** <code>void copy(T* dst, T const* src, size_t count, cudaMemcpyKind kind) {</code>
+  - EN: Begins the definition of function or method `copy`.
+  - CN: 开始定义函数或方法 `copy`。
+- **L99** <code>  size_t bytes = count * sizeof_bits&lt;T&gt;::value / 8;</code>
+  - EN: Assigns or initializes `bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bytes` 进行赋值或初始化。
+- **L100** <code>  if (bytes == 0 &amp;&amp; count &gt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L101** <code>    bytes = 1;</code>
+  - EN: Assigns or initializes `bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bytes` 进行赋值或初始化。
+- **L102** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L103** <code>  cudaError_t cuda_error = (cudaMemcpy(dst, src, bytes, kind));</code>
+  - EN: Declares function or method `cudaMemcpy` without defining it here.
+  - CN: 声明函数或方法 `cudaMemcpy`，但不在此处给出定义。
+- **L104** <code>  if (cuda_error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L105** <code>    std::ostringstream os;</code>
+  - EN: Declares the symbol `os` in the current scope.
+  - CN: 在当前作用域中声明符号 `os`。
+- **L106** <code>    os &lt;&lt; &quot;cutlass::device_memory::copy: cudaMemcpy() failed: &quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `cudaMemcpy`.
+  - CN: 开始或继续与 `cudaMemcpy` 相关的签名/调用语法。
+- **L107** <code>       &lt;&lt; &quot;dst=&quot; &lt;&lt; dst &lt;&lt; &quot;, src=&quot; &lt;&lt; src</code>
+  - EN: Assigns or initializes `dst` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `dst` 进行赋值或初始化。
+- **L108** <code>       &lt;&lt; &quot;, bytes=&quot; &lt;&lt; bytes &lt;&lt; &quot;, count=&quot; &lt;&lt; count;</code>
+  - EN: Assigns or initializes `bytes` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bytes` 进行赋值或初始化。
+- **L109** <code>    if (kind == cudaMemcpyHostToDevice) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L110** <code>      os &lt;&lt; &quot;, kind=cudaMemcpyHostToDevice&quot;;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L111** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L112** <code>    else if (kind == cudaMemcpyDeviceToHost) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L113** <code>      os &lt;&lt; &quot;, kind=cudaMemcpyDeviceToHost&quot;;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L114** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>    else if (kind == cudaMemcpyDeviceToDevice) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L116** <code>      os &lt;&lt; &quot;, kind=cudaMemcpyDeviceToDevice&quot;;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L117** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L118** <code>    else if (kind == cudaMemcpyHostToHost) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L119** <code>      os &lt;&lt; &quot;, kind=cudaMemcpyHostToHost&quot;;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L120** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L121** <code>    else if (kind == cudaMemcpyDefault) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L122** <code>      os &lt;&lt; &quot;, kind=cudaMemcpyDefault&quot;;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L123** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L124** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L125** <code>      os &lt;&lt; &quot;, kind=Unknown&quot;;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L126** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L127** <code>    os &lt;&lt; &quot;, error: &quot; &lt;&lt; cudaGetErrorString(cuda_error);</code>
+  - EN: Declares function or method `cudaGetErrorString` without defining it here.
+  - CN: 声明函数或方法 `cudaGetErrorString`，但不在此处给出定义。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>    throw cuda_exception(os.str().c_str(), cuda_error);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L130** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L131** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L132** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L133** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L134** <code>void copy_to_device(T* dst, T const* src, size_t count = 1) {</code>
+  - EN: Begins the definition of function or method `copy_to_device`.
+  - CN: 开始定义函数或方法 `copy_to_device`。
+- **L135** <code>  copy(dst, src, count, cudaMemcpyHostToDevice);</code>
+  - EN: Declares function or method `copy` without defining it here.
+  - CN: 声明函数或方法 `copy`，但不在此处给出定义。
+- **L136** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L137** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L138** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L139** <code>void copy_to_host(T* dst, T const* src, size_t count = 1) {</code>
+  - EN: Begins the definition of function or method `copy_to_host`.
+  - CN: 开始定义函数或方法 `copy_to_host`。
+- **L140** <code>  copy(dst, src, count, cudaMemcpyDeviceToHost);</code>
+  - EN: Declares function or method `copy` without defining it here.
+  - CN: 声明函数或方法 `copy`，但不在此处给出定义。
+- **L141** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L142** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L143** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L144** <code>void copy_device_to_device(T* dst, T const* src, size_t count = 1) {</code>
+  - EN: Begins the definition of function or method `copy_device_to_device`.
+  - CN: 开始定义函数或方法 `copy_device_to_device`。
+- **L145** <code>  copy(dst, src, count, cudaMemcpyDeviceToDevice);</code>
+  - EN: Declares function or method `copy` without defining it here.
+  - CN: 声明函数或方法 `copy`，但不在此处给出定义。
+- **L146** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L147** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L148** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L149** <code>void copy_host_to_host(T* dst, T const* src, size_t count = 1) {</code>
+  - EN: Begins the definition of function or method `copy_host_to_host`.
+  - CN: 开始定义函数或方法 `copy_host_to_host`。
+- **L150** <code>  copy(dst, src, count, cudaMemcpyHostToHost);</code>
+  - EN: Declares function or method `copy` without defining it here.
+  - CN: 声明函数或方法 `copy`，但不在此处给出定义。
+- **L151** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L152** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L153** <code>/// Copies elements from device memory to host-side range</code>
+  - EN: Comment that documents intent or context: "Copies elements from device memory to host-side range".
+  - CN: 用于说明意图或上下文的注释："Copies elements from device memory to host-side range"。
+- **L154** <code>template &lt;typename OutputIterator, typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L155** <code>void insert_to_host(OutputIterator begin, OutputIterator end, T const* device_begin) {</code>
+  - EN: Begins the definition of function or method `insert_to_host`.
+  - CN: 开始定义函数或方法 `insert_to_host`。
+- **L156** <code>  size_t elements = end - begin;</code>
+  - EN: Assigns or initializes `elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `elements` 进行赋值或初始化。
+- **L157** <code>  copy_to_host(&amp;*begin, device_begin, elements);</code>
+  - EN: Declares function or method `copy_to_host` without defining it here.
+  - CN: 声明函数或方法 `copy_to_host`，但不在此处给出定义。
+- **L158** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>/// Copies elements to device memory from host-side range</code>
+  - EN: Comment that documents intent or context: "Copies elements to device memory from host-side range".
+  - CN: 用于说明意图或上下文的注释："Copies elements to device memory from host-side range"。
+- **L161** <code>template &lt;typename T, typename InputIterator&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L162** <code>void insert_to_device(T* device_begin, InputIterator begin, InputIterator end) {</code>
+  - EN: Begins the definition of function or method `insert_to_device`.
+  - CN: 开始定义函数或方法 `insert_to_device`。
+- **L163** <code>  size_t elements = end - begin;</code>
+  - EN: Assigns or initializes `elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `elements` 进行赋值或初始化。
+- **L164** <code>  copy_to_device(device_begin, &amp;*begin, elements);</code>
+  - EN: Declares function or method `copy_to_device` without defining it here.
+  - CN: 声明函数或方法 `copy_to_device`，但不在此处给出定义。
+- **L165** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L166** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L167** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L168** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L169** <code>}  // namespace device_memory</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L172** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L173** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L174** <code>class DeviceAllocation {</code>
+  - EN: Begins the declaration of class `DeviceAllocation`.
+  - CN: 开始声明 class `DeviceAllocation`。
+- **L175** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L176** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L177** <code>  /// Delete functor for CUDA device memory</code>
+  - EN: Comment that documents intent or context: "Delete functor for CUDA device memory".
+  - CN: 用于说明意图或上下文的注释："Delete functor for CUDA device memory"。
+- **L178** <code>  struct deleter {</code>
+  - EN: Begins the declaration of struct `deleter`.
+  - CN: 开始声明 struct `deleter`。
+- **L179** <code>    void operator()(T* ptr) {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L180** <code>      cudaError_t cuda_error = (cudaFree(ptr));</code>
+  - EN: Declares function or method `cudaFree` without defining it here.
+  - CN: 声明函数或方法 `cudaFree`，但不在此处给出定义。
+- **L181** <code>      if (cuda_error != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L182** <code>        // noexcept</code>
+  - EN: Comment that documents intent or context: "noexcept".
+  - CN: 用于说明意图或上下文的注释："noexcept"。
+- **L183** <code>        //                throw cuda_exception(&quot;cudaFree() failed&quot;, cuda_error);</code>
+  - EN: Comment that documents intent or context: "throw cuda_exception("cudaFree() failed", cuda_error);".
+  - CN: 用于说明意图或上下文的注释："throw cuda_exception("cudaFree() failed", cuda_error);"。
+- **L184** <code>        return;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L185** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L186** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L187** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L190** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L191** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L192** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>  /// Number of elements of T allocated on the current CUDA device</code>
+  - EN: Comment that documents intent or context: "Number of elements of T allocated on the current CUDA device".
+  - CN: 用于说明意图或上下文的注释："Number of elements of T allocated on the current CUDA device"。
+- **L195** <code>  size_t capacity;</code>
+  - EN: Declares the symbol `capacity` in the current scope.
+  - CN: 在当前作用域中声明符号 `capacity`。
+- **L196** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L197** <code>  /// Smart pointer</code>
+  - EN: Comment that documents intent or context: "Smart pointer".
+  - CN: 用于说明意图或上下文的注释："Smart pointer"。
+- **L198** <code>  platform::unique_ptr&lt;T, deleter&gt; smart_ptr;</code>
+  - EN: Declares the symbol `smart_ptr` in the current scope.
+  - CN: 在当前作用域中声明符号 `smart_ptr`。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L203** <code>  // Static methods</code>
+  - EN: Comment that documents intent or context: "Static methods".
+  - CN: 用于说明意图或上下文的注释："Static methods"。
+- **L204** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L205** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L206** <code>  /// Static member to compute the number of bytes needed for a given number of elements</code>
+  - EN: Comment that documents intent or context: "Static member to compute the number of bytes needed for a given number of elements".
+  - CN: 用于说明意图或上下文的注释："Static member to compute the number of bytes needed for a given number of elements"。
+- **L207** <code>  static size_t bytes(size_t elements) {</code>
+  - EN: Begins the definition of function or method `bytes`.
+  - CN: 开始定义函数或方法 `bytes`。
+- **L208** <code>    if (sizeof_bits&lt;T&gt;::value &lt; 8) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L209** <code>      size_t const kElementsPerByte = 8 / sizeof_bits&lt;T&gt;::value;</code>
+  - EN: Assigns or initializes `kElementsPerByte` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kElementsPerByte` 进行赋值或初始化。
+- **L210** <code>      return elements / kElementsPerByte;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L211** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L212** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L213** <code>      size_t const kBytesPerElement = sizeof_bits&lt;T&gt;::value / 8;</code>
+  - EN: Assigns or initializes `kBytesPerElement` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kBytesPerElement` 进行赋值或初始化。
+- **L214** <code>      return elements * kBytesPerElement;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L215** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L216** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L217** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L218** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L219** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L220** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L221** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L222** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L223** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L224** <code>  /// Constructor: allocates no memory</code>
+  - EN: Comment that documents intent or context: "Constructor: allocates no memory".
+  - CN: 用于说明意图或上下文的注释："Constructor: allocates no memory"。
+- **L225** <code>  DeviceAllocation() : capacity(0) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `capacity`.
+  - CN: 开始或继续与 `capacity` 相关的签名/调用语法。
+- **L226** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L227** <code>  /// Constructor: allocates \p capacity elements on the current CUDA device</code>
+  - EN: Comment that documents intent or context: "Constructor: allocates \p capacity elements on the current CUDA device".
+  - CN: 用于说明意图或上下文的注释："Constructor: allocates \p capacity elements on the current CUDA device"。
+- **L228** <code>  DeviceAllocation(size_t _capacity) : </code>
+  - EN: Begins the definition of function or method `DeviceAllocation`.
+  - CN: 开始定义函数或方法 `DeviceAllocation`。
+- **L229** <code>    smart_ptr(device_memory::allocate&lt;T&gt;(_capacity)), capacity(_capacity) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `capacity`.
+  - CN: 开始或继续与 `capacity` 相关的签名/调用语法。
+- **L230** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L231** <code>  /// Constructor: allocates \p capacity elements on the current CUDA device taking ownership of the allocation</code>
+  - EN: Comment that documents intent or context: "Constructor: allocates \p capacity elements on the current CUDA device taking ownership of the allocation".
+  - CN: 用于说明意图或上下文的注释："Constructor: allocates \p capacity elements on the current CUDA device taking ownership of the allocation"。
+- **L232** <code>  DeviceAllocation(T *ptr, size_t _capacity) : smart_ptr(ptr), capacity(_capacity) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `capacity`.
+  - CN: 开始或继续与 `capacity` 相关的签名/调用语法。
+- **L233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L234** <code>  /// Copy constructor</code>
+  - EN: Comment that documents intent or context: "Copy constructor".
+  - CN: 用于说明意图或上下文的注释："Copy constructor"。
+- **L235** <code>  DeviceAllocation(DeviceAllocation const &amp;p): </code>
+  - EN: Begins the definition of function or method `DeviceAllocation`.
+  - CN: 开始定义函数或方法 `DeviceAllocation`。
+- **L236** <code>    smart_ptr(device_memory::allocate&lt;T&gt;(p.capacity)), capacity(p.capacity) {</code>
+  - EN: Begins the definition of function or method `capacity`.
+  - CN: 开始定义函数或方法 `capacity`。
+- **L237** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L238** <code>    device_memory::copy_device_to_device(smart_ptr.get(), p.get(), capacity);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L239** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L240** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L241** <code>  /// Move constructor</code>
+  - EN: Comment that documents intent or context: "Move constructor".
+  - CN: 用于说明意图或上下文的注释："Move constructor"。
+- **L242** <code>  DeviceAllocation(DeviceAllocation &amp;&amp;p): capacity(0) {</code>
+  - EN: Begins the definition of function or method `capacity`.
+  - CN: 开始定义函数或方法 `capacity`。
+- **L243** <code>    std::swap(smart_ptr, p.smart_ptr);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L244** <code>    std::swap(capacity, p.capacity);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L245** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>  /// Destructor</code>
+  - EN: Comment that documents intent or context: "Destructor".
+  - CN: 用于说明意图或上下文的注释："Destructor"。
+- **L248** <code>  ~DeviceAllocation() { reset(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `reset`.
+  - CN: 开始或继续与 `reset` 相关的签名/调用语法。
+- **L249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L250** <code>  /// Returns a pointer to the managed object</code>
+  - EN: Comment that documents intent or context: "Returns a pointer to the managed object".
+  - CN: 用于说明意图或上下文的注释："Returns a pointer to the managed object"。
+- **L251** <code>  T* get() const { return smart_ptr.get(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  /// Releases the ownership of the managed object (without deleting) and resets capacity to zero</code>
+  - EN: Comment that documents intent or context: "Releases the ownership of the managed object (without deleting) and resets capacity to zero".
+  - CN: 用于说明意图或上下文的注释："Releases the ownership of the managed object (without deleting) and resets capacity to zero"。
+- **L254** <code>  T* release() {</code>
+  - EN: Begins the definition of function or method `release`.
+  - CN: 开始定义函数或方法 `release`。
+- **L255** <code>    capacity = 0;</code>
+  - EN: Assigns or initializes `capacity` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `capacity` 进行赋值或初始化。
+- **L256** <code>    return smart_ptr.release();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L257** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L258** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L259** <code>  /// Deletes the managed object and resets capacity to zero</code>
+  - EN: Comment that documents intent or context: "Deletes the managed object and resets capacity to zero".
+  - CN: 用于说明意图或上下文的注释："Deletes the managed object and resets capacity to zero"。
+- **L260** <code>  void reset() {</code>
+  - EN: Begins the definition of function or method `reset`.
+  - CN: 开始定义函数或方法 `reset`。
+- **L261** <code>    capacity = 0;</code>
+  - EN: Assigns or initializes `capacity` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `capacity` 进行赋值或初始化。
+- **L262** <code>    smart_ptr.reset();</code>
+  - EN: Declares function or method `reset` without defining it here.
+  - CN: 声明函数或方法 `reset`，但不在此处给出定义。
+- **L263** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L264** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L265** <code>  /// Deletes managed object, if owned, and allocates a new object</code>
+  - EN: Comment that documents intent or context: "Deletes managed object, if owned, and allocates a new object".
+  - CN: 用于说明意图或上下文的注释："Deletes managed object, if owned, and allocates a new object"。
+- **L266** <code>  void reset(size_t _capacity) {</code>
+  - EN: Begins the definition of function or method `reset`.
+  - CN: 开始定义函数或方法 `reset`。
+- **L267** <code>    reset(device_memory::allocate&lt;T&gt;(_capacity), _capacity);</code>
+  - EN: Declares function or method `allocate<T>` without defining it here.
+  - CN: 声明函数或方法 `allocate<T>`，但不在此处给出定义。
+- **L268** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L269** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L270** <code>  /// Deletes managed object, if owned, and replaces its reference with a given pointer and capacity</code>
+  - EN: Comment that documents intent or context: "Deletes managed object, if owned, and replaces its reference with a given pointer and capacity".
+  - CN: 用于说明意图或上下文的注释："Deletes managed object, if owned, and replaces its reference with a given pointer and capacity"。
+- **L271** <code>  void reset(T* _ptr, size_t _capacity) {</code>
+  - EN: Begins the definition of function or method `reset`.
+  - CN: 开始定义函数或方法 `reset`。
+- **L272** <code>    smart_ptr.reset(_ptr);</code>
+  - EN: Declares function or method `reset` without defining it here.
+  - CN: 声明函数或方法 `reset`，但不在此处给出定义。
+- **L273** <code>    capacity = _capacity;</code>
+  - EN: Assigns or initializes `capacity` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `capacity` 进行赋值或初始化。
+- **L274** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>  /// Allocates a new buffer and copies the old buffer into it. The old buffer is then released.</code>
+  - EN: Comment that documents intent or context: "Allocates a new buffer and copies the old buffer into it. The old buffer is then released.".
+  - CN: 用于说明意图或上下文的注释："Allocates a new buffer and copies the old buffer into it. The old buffer is then released."。
+- **L277** <code>  void reallocate(size_t new_capacity) {</code>
+  - EN: Begins the definition of function or method `reallocate`.
+  - CN: 开始定义函数或方法 `reallocate`。
+- **L278** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L279** <code>    platform::unique_ptr&lt;T, deleter&gt; new_allocation(device_memory::allocate&lt;T&gt;(new_capacity));</code>
+  - EN: Declares function or method `allocate<T>` without defining it here.
+  - CN: 声明函数或方法 `allocate<T>`，但不在此处给出定义。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>    device_memory::copy_device_to_device(</code>
+  - EN: Begins or continues the signature/call syntax involving `copy_device_to_device`.
+  - CN: 开始或继续与 `copy_device_to_device` 相关的签名/调用语法。
+- **L282** <code>      new_allocation.get(), </code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L283** <code>      smart_ptr.get(), </code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L284** <code>      std::min(new_capacity, capacity));</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L285** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L286** <code>    std::swap(smart_ptr, new_allocation);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L287** <code>    std::swap(new_capacity, capacity);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L288** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>  /// Returns the number of elements</code>
+  - EN: Comment that documents intent or context: "Returns the number of elements".
+  - CN: 用于说明意图或上下文的注释："Returns the number of elements"。
+- **L291** <code>  size_t size() const {</code>
+  - EN: Begins the definition of function or method `size`.
+  - CN: 开始定义函数或方法 `size`。
+- **L292** <code>    return capacity;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L293** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L294** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L295** <code>  /// Returns the number of bytes needed to store the allocation</code>
+  - EN: Comment that documents intent or context: "Returns the number of bytes needed to store the allocation".
+  - CN: 用于说明意图或上下文的注释："Returns the number of bytes needed to store the allocation"。
+- **L296** <code>  size_t bytes() const {</code>
+  - EN: Begins the definition of function or method `bytes`.
+  - CN: 开始定义函数或方法 `bytes`。
+- **L297** <code>    return bytes(capacity);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L298** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L299** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L300** <code>  /// Returns a pointer to the object owned by *this</code>
+  - EN: Comment that documents intent or context: "Returns a pointer to the object owned by *this".
+  - CN: 用于说明意图或上下文的注释："Returns a pointer to the object owned by *this"。
+- **L301** <code>  T* operator-&gt;() const { return smart_ptr.get(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L302** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L303** <code>  /// Returns the deleter object which would be used for destruction of the managed object.</code>
+  - EN: Comment that documents intent or context: "Returns the deleter object which would be used for destruction of the managed object.".
+  - CN: 用于说明意图或上下文的注释："Returns the deleter object which would be used for destruction of the managed object."。
+- **L304** <code>  deleter&amp; get_deleter() { return smart_ptr.get_deleter(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `get_deleter`.
+  - CN: 开始或继续与 `get_deleter` 相关的签名/调用语法。
+- **L305** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L306** <code>  /// Returns the deleter object which would be used for destruction of the managed object (const)</code>
+  - EN: Comment that documents intent or context: "Returns the deleter object which would be used for destruction of the managed object (const)".
+  - CN: 用于说明意图或上下文的注释："Returns the deleter object which would be used for destruction of the managed object (const)"。
+- **L307** <code>  const deleter&amp; get_deleter() const { return smart_ptr.get_deleter(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `get_deleter`.
+  - CN: 开始或继续与 `get_deleter` 相关的签名/调用语法。
+- **L308** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L309** <code>  /// Copies a device-side memory allocation</code>
+  - EN: Comment that documents intent or context: "Copies a device-side memory allocation".
+  - CN: 用于说明意图或上下文的注释："Copies a device-side memory allocation"。
+- **L310** <code>  DeviceAllocation &amp; operator=(DeviceAllocation const &amp;p) {</code>
+  - EN: Assigns or initializes `operator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operator` 进行赋值或初始化。
+- **L311** <code>    if (capacity != p.capacity) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L312** <code>      smart_ptr.reset(device_memory::allocate&lt;T&gt;(p.capacity));</code>
+  - EN: Declares function or method `allocate<T>` without defining it here.
+  - CN: 声明函数或方法 `allocate<T>`，但不在此处给出定义。
+- **L313** <code>      capacity = p.capacity;</code>
+  - EN: Assigns or initializes `capacity` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `capacity` 进行赋值或初始化。
+- **L314** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L315** <code>    device_memory::copy_device_to_device(smart_ptr.get(), p.get(), capacity);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L316** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L317** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L318** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L319** <code>  /// Move assignment</code>
+  - EN: Comment that documents intent or context: "Move assignment".
+  - CN: 用于说明意图或上下文的注释："Move assignment"。
+- **L320** <code>  DeviceAllocation &amp; operator=(DeviceAllocation &amp;&amp; p) {</code>
+  - EN: Assigns or initializes `operator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operator` 进行赋值或初始化。
+- **L321** <code>    std::swap(smart_ptr, p.smart_ptr);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L322** <code>    std::swap(capacity, p.capacity);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L323** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L324** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>  /// Copies the entire allocation from another location in device memory.</code>
+  - EN: Comment that documents intent or context: "Copies the entire allocation from another location in device memory.".
+  - CN: 用于说明意图或上下文的注释："Copies the entire allocation from another location in device memory."。
+- **L327** <code>  void copy_from_device(T const *ptr) const {</code>
+  - EN: Begins the definition of function or method `copy_from_device`.
+  - CN: 开始定义函数或方法 `copy_from_device`。
+- **L328** <code>    copy_from_device(ptr, capacity);</code>
+  - EN: Declares function or method `copy_from_device` without defining it here.
+  - CN: 声明函数或方法 `copy_from_device`，但不在此处给出定义。
+- **L329** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L331** <code>  /// Copies a given number of elements from device memory</code>
+  - EN: Comment that documents intent or context: "Copies a given number of elements from device memory".
+  - CN: 用于说明意图或上下文的注释："Copies a given number of elements from device memory"。
+- **L332** <code>  void copy_from_device(T const *ptr, size_t elements) const {</code>
+  - EN: Begins the definition of function or method `copy_from_device`.
+  - CN: 开始定义函数或方法 `copy_from_device`。
+- **L333** <code>    device_memory::copy_device_to_device(get(), ptr, elements);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L334** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L335** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L336** <code>  void copy_to_device(T *ptr) const {</code>
+  - EN: Begins the definition of function or method `copy_to_device`.
+  - CN: 开始定义函数或方法 `copy_to_device`。
+- **L337** <code>    copy_to_device(ptr, capacity);</code>
+  - EN: Declares function or method `copy_to_device` without defining it here.
+  - CN: 声明函数或方法 `copy_to_device`，但不在此处给出定义。
+- **L338** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L339** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L340** <code>  void copy_to_device(T *ptr, size_t elements) const {</code>
+  - EN: Begins the definition of function or method `copy_to_device`.
+  - CN: 开始定义函数或方法 `copy_to_device`。
+- **L341** <code>    device_memory::copy_device_to_device(ptr, get(), elements);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L342** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L343** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L344** <code>  void copy_from_host(T const *ptr) const {</code>
+  - EN: Begins the definition of function or method `copy_from_host`.
+  - CN: 开始定义函数或方法 `copy_from_host`。
+- **L345** <code>    copy_from_host(ptr, capacity);</code>
+  - EN: Declares function or method `copy_from_host` without defining it here.
+  - CN: 声明函数或方法 `copy_from_host`，但不在此处给出定义。
+- **L346** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L347** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L348** <code>  void copy_from_host(T const *ptr, size_t elements) const {</code>
+  - EN: Begins the definition of function or method `copy_from_host`.
+  - CN: 开始定义函数或方法 `copy_from_host`。
+- **L349** <code>    device_memory::copy_to_device(get(), ptr, elements);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L350** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L351** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L352** <code>  void copy_to_host(T *ptr) const {</code>
+  - EN: Begins the definition of function or method `copy_to_host`.
+  - CN: 开始定义函数或方法 `copy_to_host`。
+- **L353** <code>    copy_to_host(ptr, capacity);</code>
+  - EN: Declares function or method `copy_to_host` without defining it here.
+  - CN: 声明函数或方法 `copy_to_host`，但不在此处给出定义。
+- **L354** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L355** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L356** <code>  void copy_to_host(T *ptr, size_t elements) const {</code>
+  - EN: Begins the definition of function or method `copy_to_host`.
+  - CN: 开始定义函数或方法 `copy_to_host`。
+- **L357** <code>    device_memory::copy_to_host(ptr, get(), elements); </code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L358** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L359** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L360** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L361** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L362** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L363** <code>namespace device_memory {</code>
+  - EN: Opens namespace `device_memory` to group related symbols.
+  - CN: 打开命名空间 `device_memory`，用于归组相关符号。
+- **L364** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L365** <code>/// Device allocation abstraction that tracks size and capacity</code>
+  - EN: Comment that documents intent or context: "Device allocation abstraction that tracks size and capacity".
+  - CN: 用于说明意图或上下文的注释："Device allocation abstraction that tracks size and capacity"。
+- **L366** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L367** <code>using allocation = cutlass::DeviceAllocation&lt;T&gt;;</code>
+  - EN: Introduces the type or namespace alias `allocation`.
+  - CN: 引入类型或命名空间别名 `allocation`。
+- **L368** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L369** <code>}  // namespace device_memory</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L370** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L371** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L372** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L373** <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L374** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L375** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- GPU resource and memory management / GPU 资源与内存管理
+
+## Dependencies / 依赖关系
+
+- <code>memory</code> — memory-management helpers / 内存管理辅助工具
+- <code>sstream</code> — string-based stream utilities / 基于字符串的流工具
+- <code>cutlass/platform/platform.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/trace.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>exceptions.h</code> — project-specific declarations from `exceptions.h` / 来自 `exceptions.h` 的项目专用声明

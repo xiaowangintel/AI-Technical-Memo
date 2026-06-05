@@ -1,0 +1,2288 @@
+# quaternion.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/quaternion.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Defines a densely packed quaternion object intended for storing data in registers and executing quaternion operations within a CUDA or host thread." and defines related CUTLASS facilities in `include/cutlass/quaternion.h`.
+- CN: 该头文件以注释摘要“Defines a densely packed quaternion object intended for storing data in registers and executing quaternion operations within a CUDA or host thread.”引入，并在 `include/cutlass/quaternion.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Defines a densely packed quaternion object intended for storing data in registers and</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <code>    executing quaternion operations within a CUDA or host thread.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L34**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L36**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L37**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes "cutlass/functional.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/functional.h"，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &quot;cutlass/array.h&quot;</code>
+  - EN: Includes "cutlass/array.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/array.h"，以便本文件使用该依赖中的声明。
+- **L40**: <code>#include &quot;cutlass/real.h&quot;</code>
+  - EN: Includes "cutlass/real.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/real.h"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes "cutlass/coord.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/coord.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/matrix.h&quot;</code>
+  - EN: Includes "cutlass/matrix.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/matrix.h"，以便本文件使用该依赖中的声明。
+- **L43**: <code>#include &quot;cutlass/fast_math.h&quot;</code>
+  - EN: Includes "cutlass/fast_math.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/fast_math.h"，以便本文件使用该依赖中的声明。
+- **L44**: <code>#include &quot;cutlass/layout/vector.h&quot;</code>
+  - EN: Includes "cutlass/layout/vector.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/layout/vector.h"，以便本文件使用该依赖中的声明。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>/// Quaternion: xi + yj + zk + w</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L51**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L52**: <code>  typename Element_ = float      ///&lt; element type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L53**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L54**: <code>class Quaternion : public Array&lt;Element_, 4&gt; {</code>
+  - EN: Declares or defines the class `Quaternion`.
+  - CN: 声明或定义 class `Quaternion`。
+- **L55**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>  /// Logical rank of tensor index space</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L58**: <code>  static int const kRank = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L59**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L60**: <code>  /// Number of elements</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L61**: <code>  static int const kExtent = 4;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L62**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L63**: <code>  /// Base class is a four-element array</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L64**: <code>  using Base = Array&lt;Element_, kExtent&gt;;</code>
+  - EN: Defines the alias `Base` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Base`。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>  /// Element type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L67**: <code>  using Element = typename Base::Element;</code>
+  - EN: Defines the alias `Element` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Element`。
+- **L68**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L69**: <code>  /// Reference type to an element</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L70**: <code>  using Reference = typename Base::reference;</code>
+  - EN: Defines the alias `Reference` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Reference`。
+- **L71**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L72**: <code>  /// Index type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L73**: <code>  using Index = int;</code>
+  - EN: Defines the alias `Index` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Index`。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>  /// Quaternion storage - imaginary part</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L76**: <code>  static int const kX = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L77**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L78**: <code>  /// Quaternion storage - imaginary part</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L79**: <code>  static int const kY = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>  /// Quaternion storage - imaginary part</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L82**: <code>  static int const kZ = 2;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L83**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L84**: <code>  /// Quaternion storage - real part</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L85**: <code>  static int const kW = 3;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L86**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L87**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L88**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L89**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L90**: <code>  // Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L91**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L92**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L93**: <code>  /// Constructs a quaternion q = 0</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L94**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L95**: <code>  Quaternion() {</code>
+  - EN: Starts the definition body for `Quaternion`.
+  - CN: 开始 `Quaternion` 的定义体。
+- **L96**: <code>    Base::at(kX) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L97**: <code>    Base::at(kY) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L98**: <code>    Base::at(kZ) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L99**: <code>    Base::at(kW) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L100**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L101**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L102**: <code>  /// Constructs a quaternion q = w + 0*i + 0*j + 0*k</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L103**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L104**: <code>  Quaternion(</code>
+  - EN: Begins or continues the signature/parameter list for `Quaternion`.
+  - CN: 开始或继续 `Quaternion` 的签名/参数列表。
+- **L105**: <code>    Element w_</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L106**: <code>  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L107**: <code>    Base::at(kX) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L108**: <code>    Base::at(kY) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L109**: <code>    Base::at(kZ) = Element();</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L110**: <code>    Base::at(kW) = w_;</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L111**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L112**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L113**: <code>  /// Constructs a quaternion q = w + x*i + y*j + z*k</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L114**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L115**: <code>  Quaternion(</code>
+  - EN: Begins or continues the signature/parameter list for `Quaternion`.
+  - CN: 开始或继续 `Quaternion` 的签名/参数列表。
+- **L116**: <code>    Element x_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L117**: <code>    Element y_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L118**: <code>    Element z_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L119**: <code>    Element w_</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L120**: <code>  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L121**: <code>    Base::at(kX) = x_;</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L122**: <code>    Base::at(kY) = y_;</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L123**: <code>    Base::at(kZ) = z_;</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L124**: <code>    Base::at(kW) = w_;</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L125**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L126**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L127**: <code>  /// Constructs a quaternion from a vector representing the imaginary part and a real number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L128**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L129**: <code>  Quaternion(</code>
+  - EN: Begins or continues the signature/parameter list for `Quaternion`.
+  - CN: 开始或继续 `Quaternion` 的签名/参数列表。
+- **L130**: <code>    Matrix3x1&lt;Element&gt; const &amp;imag_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L131**: <code>    Element w_ = Element()</code>
+  - EN: Provides part of the signature or implementation for `Element`.
+  - CN: 提供 `Element` 的签名或实现的一部分。
+- **L132**: <code>  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L133**: <code>    Base::at(kX) = imag_[0];</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L134**: <code>    Base::at(kY) = imag_[1];</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L135**: <code>    Base::at(kZ) = imag_[2];</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L136**: <code>    Base::at(kW) = w_;</code>
+  - EN: Declares the callable or operator `at`.
+  - CN: 声明可调用对象或运算符 `at`。
+- **L137**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L138**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L139**: <code>  /// Returns a reference to the element at a given Coord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L140**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L141**: <code>  Reference at(Index idx) const {</code>
+  - EN: Starts the definition body for `at`.
+  - CN: 开始 `at` 的定义体。
+- **L142**: <code>    return Base::at(idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L143**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L144**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L145**: <code>  /// Returns a reference to the element at a given Coord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L146**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L147**: <code>  Reference at(Index idx) {</code>
+  - EN: Starts the definition body for `at`.
+  - CN: 开始 `at` 的定义体。
+- **L148**: <code>    return Base::at(idx);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L149**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L150**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L151**: <code>  /// Accesses the x element of the imaginary part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L152**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L153**: <code>  Element x() const {</code>
+  - EN: Starts the definition body for `x`.
+  - CN: 开始 `x` 的定义体。
+- **L154**: <code>    return Base::at(kX);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L155**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L156**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L157**: <code>  /// Accesses the x element of the imaginary part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L158**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L159**: <code>  Reference x() {</code>
+  - EN: Starts the definition body for `x`.
+  - CN: 开始 `x` 的定义体。
+- **L160**: <code>    return Base::at(kX);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L161**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L162**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L163**: <code>  /// Accesses the y element of the imaginary part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L164**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L165**: <code>  Element y() const {</code>
+  - EN: Starts the definition body for `y`.
+  - CN: 开始 `y` 的定义体。
+- **L166**: <code>    return Base::at(kY);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L167**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L168**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L169**: <code>  /// Accesses the y element of the imaginary part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L170**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L171**: <code>  Reference y() {</code>
+  - EN: Starts the definition body for `y`.
+  - CN: 开始 `y` 的定义体。
+- **L172**: <code>    return Base::at(kY);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L173**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L174**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L175**: <code>  /// Accesses the z element of the imaginary part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L176**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L177**: <code>  Element z() const {</code>
+  - EN: Starts the definition body for `z`.
+  - CN: 开始 `z` 的定义体。
+- **L178**: <code>    return Base::at(kZ);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L179**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L180**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L181**: <code>  /// Accesses the z element of the imaginary part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L182**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L183**: <code>  Reference z() {</code>
+  - EN: Starts the definition body for `z`.
+  - CN: 开始 `z` 的定义体。
+- **L184**: <code>    return Base::at(kZ);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L185**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L186**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L187**: <code>  /// Accesses the real part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L188**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L189**: <code>  Element w() const {</code>
+  - EN: Starts the definition body for `w`.
+  - CN: 开始 `w` 的定义体。
+- **L190**: <code>    return Base::at(kW);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L191**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L192**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L193**: <code>  /// Accesses the real part of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L194**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L195**: <code>  Reference w() {</code>
+  - EN: Starts the definition body for `w`.
+  - CN: 开始 `w` 的定义体。
+- **L196**: <code>    return Base::at(kW);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L197**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L198**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L199**: <code>  /// Returns the pure imaginary part of the quaternion as a 3-vector</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L200**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L201**: <code>  Matrix3x1&lt;Element&gt; pure() const {</code>
+  - EN: Starts the definition body for `pure`.
+  - CN: 开始 `pure` 的定义体。
+- **L202**: <code>    return Matrix3x1&lt;Element&gt;(x(), y(), z());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L203**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L204**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L205**: <code>  /// Returns a quaternion representation of a spatial rotation given a unit-length axis and</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L206**: <code>  /// a rotation in radians.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L207**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L208**: <code>  static Quaternion&lt;Element&gt; rotation(</code>
+  - EN: Begins or continues the signature/parameter list for `rotation`.
+  - CN: 开始或继续 `rotation` 的签名/参数列表。
+- **L209**: <code>    Matrix3x1&lt;Element&gt; const &amp;axis_unit,    ///&lt; axis of rotation (assumed to be unit length)</code>
+  - EN: Provides part of the signature or implementation for `rotation`.
+  - CN: 提供 `rotation` 的签名或实现的一部分。
+- **L210**: <code>    Element theta) {                        ///&lt; angular rotation in radians</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L211**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L212**: <code>    Element s = fast_sin(theta / Element(2));</code>
+  - EN: Declares the callable or operator `fast_sin`.
+  - CN: 声明可调用对象或运算符 `fast_sin`。
+- **L213**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L214**: <code>    return Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L215**: <code>      s * axis_unit[0],</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L216**: <code>      s * axis_unit[1],</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L217**: <code>      s * axis_unit[2],</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L218**: <code>      fast_cos(theta / Element(2))</code>
+  - EN: Provides part of the signature or implementation for `fast_cos`.
+  - CN: 提供 `fast_cos` 的签名或实现的一部分。
+- **L219**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L220**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L221**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L222**: <code>  /// Returns a quaternion representation of a spatial rotation represented as a</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L223**: <code>  /// unit-length rotation axis (r_x, r_y, r_z) and an angular rotation in radians</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L224**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L225**: <code>  static Quaternion&lt;Element&gt; rotation(</code>
+  - EN: Begins or continues the signature/parameter list for `rotation`.
+  - CN: 开始或继续 `rotation` 的签名/参数列表。
+- **L226**: <code>    Element r_x,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L227**: <code>    Element r_y,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L228**: <code>    Element r_z,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L229**: <code>    Element theta) {                      ///&lt; angular rotation in radians</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L230**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L231**: <code>    return rotation({r_x, r_y, r_z}, theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L232**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L233**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L234**: <code>  /// Geometric rotation of a 3-element vector</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L235**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L236**: <code>  Matrix3x1&lt;Element&gt; rotate(Matrix3x1&lt;Element&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `rotate`.
+  - CN: 开始 `rotate` 的定义体。
+- **L237**: <code>    return (*this * Quaternion&lt;Element&gt;(rhs, 0) * reciprocal(*this)).pure();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L238**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>  /// Inverse rotation operation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L241**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L242**: <code>  Matrix3x1&lt;Element&gt; rotate_inv(Matrix3x1&lt;Element&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `rotate_inv`.
+  - CN: 开始 `rotate_inv` 的定义体。
+- **L243**: <code>    return (reciprocal(*this) * Quaternion&lt;Element&gt;(rhs, 0) * *this).pure();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L244**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L245**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L246**: <code>  /// Rotates a 3-vector assuming this is a unit quaternion (a spinor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L247**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L248**: <code>  Matrix3x1&lt;Element&gt; spinor(Matrix3x1&lt;Element&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `spinor`.
+  - CN: 开始 `spinor` 的定义体。
+- **L249**: <code>    return (*this * Quaternion&lt;Element&gt;(rhs, 0) * conj(*this)).pure();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L250**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <code>  /// Inverse rotation of 3-vector assuming this is a unit quaternion (a spinor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L253**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L254**: <code>  Matrix3x1&lt;Element&gt; spinor_inv(Matrix3x1&lt;Element&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `spinor_inv`.
+  - CN: 开始 `spinor_inv` 的定义体。
+- **L255**: <code>    return (conj(*this) * Quaternion&lt;Element&gt;(rhs, 0) * *this).pure();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L256**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L257**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L258**: <code>  /// In-place addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L259**: <code>  template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L260**: <code>  CUTLASS_HOST_DEVICE </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L261**: <code>  Quaternion&lt;Element&gt; &amp;operator+=(Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator+=`.
+  - CN: 开始 `operator+=` 的定义体。
+- **L262**: <code>    *this = (*this + rhs);</code>
+  - EN: Declares the callable or operator `this`.
+  - CN: 声明可调用对象或运算符 `this`。
+- **L263**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L264**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L265**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L266**: <code>  /// In-place subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L267**: <code>  template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L268**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L269**: <code>  Quaternion&lt;Element&gt; &amp;operator-=(Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator-=`.
+  - CN: 开始 `operator-=` 的定义体。
+- **L270**: <code>    *this = (*this - rhs);</code>
+  - EN: Declares the callable or operator `this`.
+  - CN: 声明可调用对象或运算符 `this`。
+- **L271**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L272**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L273**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L274**: <code>  /// In-place multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L275**: <code>  template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L276**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L277**: <code>  Quaternion&lt;Element&gt; &amp;operator*=(Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator*=`.
+  - CN: 开始 `operator*=` 的定义体。
+- **L278**: <code>    *this = (*this * rhs);</code>
+  - EN: Declares the callable or operator `this`.
+  - CN: 声明可调用对象或运算符 `this`。
+- **L279**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L280**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L281**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L282**: <code>  /// Scalar multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L283**: <code>  template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L284**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L285**: <code>  Quaternion&lt;Element&gt; &amp;operator*=(Element s) {</code>
+  - EN: Starts the definition body for `operator*=`.
+  - CN: 开始 `operator*=` 的定义体。
+- **L286**: <code>    *this = (*this * s);</code>
+  - EN: Declares the callable or operator `this`.
+  - CN: 声明可调用对象或运算符 `this`。
+- **L287**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L288**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L289**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L290**: <code>  /// In-place Division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L291**: <code>  template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L292**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L293**: <code>  Quaternion&lt;Element&gt; &amp;operator/=(Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator/=`.
+  - CN: 开始 `operator/=` 的定义体。
+- **L294**: <code>    *this = (*this / rhs);</code>
+  - EN: Declares the callable or operator `this`.
+  - CN: 声明可调用对象或运算符 `this`。
+- **L295**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L296**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L297**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L298**: <code>  /// In-place Division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L299**: <code>  template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L300**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L301**: <code>  Quaternion&lt;Element&gt; &amp;operator/=(Element s) {</code>
+  - EN: Starts the definition body for `operator/=`.
+  - CN: 开始 `operator/=` 的定义体。
+- **L302**: <code>    *this = (*this / s);</code>
+  - EN: Declares the callable or operator `this`.
+  - CN: 声明可调用对象或运算符 `this`。
+- **L303**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L304**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L305**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L306**: <code>  /// Computes a 3x3 rotation matrix (row-major representation)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L307**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L308**: <code>  Matrix3x3&lt;Element&gt; as_rotation_matrix_3x3() const {</code>
+  - EN: Starts the definition body for `as_rotation_matrix_3x3`.
+  - CN: 开始 `as_rotation_matrix_3x3` 的定义体。
+- **L309**: <code>    Matrix3x3&lt;Element&gt; m(</code>
+  - EN: Begins or continues the signature/parameter list for `m`.
+  - CN: 开始或继续 `m` 的签名/参数列表。
+- **L310**: <code>      w() * w() + x() * x() - y() * y() - z() * z(),</code>
+  - EN: Begins or continues the signature/parameter list for `w`.
+  - CN: 开始或继续 `w` 的签名/参数列表。
+- **L311**: <code>      2 * x() * y() - 2 * w() * z(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L312**: <code>      2 * x() * z() + 2 * w() * y(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L313**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L314**: <code>      2 * x() * y() + 2 * w() * z(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L315**: <code>      w() * w() - x() * x() + y() * y() - z() * z(),</code>
+  - EN: Begins or continues the signature/parameter list for `w`.
+  - CN: 开始或继续 `w` 的签名/参数列表。
+- **L316**: <code>      2 * y() * z() - 2 * w() * x(),</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L317**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L318**: <code>      2 * x() * z() - 2 * w() * y(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L319**: <code>      2 * y() * z() + 2 * w() * x(),</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L320**: <code>      w() * w() - x() * x() - y() * y() + z() * z()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L321**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L322**: <code>    return m;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L323**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L324**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L325**: <code>  /// Computes a 4x4 rotation matrix (row-major representation)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L326**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L327**: <code>  Matrix4x4&lt;Element&gt; as_rotation_matrix_4x4() const {</code>
+  - EN: Starts the definition body for `as_rotation_matrix_4x4`.
+  - CN: 开始 `as_rotation_matrix_4x4` 的定义体。
+- **L328**: <code>    Matrix4x4&lt;Element&gt; m = Matrix4x4&lt;Element&gt;::identity();</code>
+  - EN: Declares the callable or operator `identity`.
+  - CN: 声明可调用对象或运算符 `identity`。
+- **L329**: <code>    m.set_slice_3x3(as_rotation_matrix_3x3());</code>
+  - EN: Declares the callable or operator `set_slice_3x3`.
+  - CN: 声明可调用对象或运算符 `set_slice_3x3`。
+- **L330**: <code>    return m;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L331**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L332**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L333**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L334**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L335**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L336**: <code>/// Constructs a quaternion that is non-zero only in its real element.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L337**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L338**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L339**: <code>Quaternion&lt;Element&gt; make_Quaternion(</code>
+  - EN: Begins or continues the signature/parameter list for `make_Quaternion`.
+  - CN: 开始或继续 `make_Quaternion` 的签名/参数列表。
+- **L340**: <code>  Element w) {                                ///&lt; real part</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L341**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L342**: <code>  return Quaternion&lt;Element&gt;(w);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L343**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L344**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L345**: <code>/// Constructs a quaternion from a vector and real</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L346**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L347**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L348**: <code>Quaternion&lt;Element&gt; make_Quaternion(</code>
+  - EN: Begins or continues the signature/parameter list for `make_Quaternion`.
+  - CN: 开始或继续 `make_Quaternion` 的签名/参数列表。
+- **L349**: <code>  Matrix3x1&lt;Element&gt; const &amp;imag,             ///&lt; imaginary party as a vector</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L350**: <code>  Element w) {                                ///&lt; real part</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L351**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L352**: <code>  return Quaternion&lt;Element&gt;(imag, w);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L353**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L354**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L355**: <code>/// Constructs a quaternion from a unit-length rotation axis and a rotation </code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L356**: <code>/// angle in radians</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L357**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L358**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L359**: <code>Quaternion&lt;Element&gt; make_QuaternionRotation(</code>
+  - EN: Begins or continues the signature/parameter list for `make_QuaternionRotation`.
+  - CN: 开始或继续 `make_QuaternionRotation` 的签名/参数列表。
+- **L360**: <code>  Matrix3x1&lt;Element&gt; const &amp;axis_unit,        ///&lt; rotation axis (unit-length)</code>
+  - EN: Provides part of the signature or implementation for `axis`.
+  - CN: 提供 `axis` 的签名或实现的一部分。
+- **L361**: <code>  Element w) {                                ///&lt; rotation angle in radians</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L362**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L363**: <code>  return Quaternion&lt;Element&gt;::rotation(axis_unit, w);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L364**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L365**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L366**: <code>/// Constructs a quaternion q = xi + yj + zk + w</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L367**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L368**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L369**: <code>Quaternion&lt;Element&gt; make_Quaternion(Element x, Element y, Element z, Element w) {</code>
+  - EN: Starts the definition body for `make_Quaternion`.
+  - CN: 开始 `make_Quaternion` 的定义体。
+- **L370**: <code>  return Quaternion&lt;Element&gt;(x, y, z, w);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L371**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L372**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L373**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L374**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L375**: <code>/// Returns the real part of the quaternion number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L376**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L377**: <code>CUTLASS_HOST_DEVICE </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L378**: <code>Element const &amp;real(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L379**: <code>  return q.w();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L380**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L381**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L382**: <code>/// Returns the real part of the quaternion number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L383**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L384**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L385**: <code>Element &amp;real(Quaternion&lt;Element&gt; &amp;q) {</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L386**: <code>  return q.w();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L387**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L388**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L389**: <code>/// Returns the magnitude of the quaternion number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L390**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L391**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L392**: <code>Element abs(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `abs`.
+  - CN: 开始 `abs` 的定义体。
+- **L393**: <code>  return fast_sqrt(norm(q));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L394**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L395**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L396**: <code>/// Quaternion conjugate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L397**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L398**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L399**: <code>Quaternion&lt;Element&gt; conj(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `conj`.
+  - CN: 开始 `conj` 的定义体。
+- **L400**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L401**: <code>    -q.x(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L402**: <code>    -q.y(),</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L403**: <code>    -q.z(),</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L404**: <code>    q.w()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L405**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L406**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L407**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L408**: <code>/// Computes the squared magnitude of the quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L409**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L410**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L411**: <code>Element norm(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `norm`.
+  - CN: 开始 `norm` 的定义体。
+- **L412**: <code>  return q.x() * q.x() + q.y() * q.y() + q.z() * q.z() + q.w() * q.w();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L413**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L414**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L415**: <code>/// Quaternion reciprocal</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L416**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L417**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L418**: <code>Quaternion&lt;Element&gt; reciprocal(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `reciprocal`.
+  - CN: 开始 `reciprocal` 的定义体。
+- **L419**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L420**: <code>  Element nsq = norm(q);</code>
+  - EN: Declares the callable or operator `norm`.
+  - CN: 声明可调用对象或运算符 `norm`。
+- **L421**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L422**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L423**: <code>    -q.x() / nsq,</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L424**: <code>    -q.y() / nsq,</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L425**: <code>    -q.z() / nsq,</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L426**: <code>    q.w() / nsq</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L427**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L428**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L429**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L430**: <code>/// Returns a unit-length quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L431**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L432**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L433**: <code>Quaternion&lt;Element&gt; unit(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `unit`.
+  - CN: 开始 `unit` 的定义体。
+- **L434**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L435**: <code>  Element rcp_mag = Element(1) / abs(q);</code>
+  - EN: Declares the callable or operator `Element`.
+  - CN: 声明可调用对象或运算符 `Element`。
+- **L436**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L437**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L438**: <code>    q.x() * rcp_mag,</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L439**: <code>    q.y() * rcp_mag,</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L440**: <code>    q.z() * rcp_mag,</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L441**: <code>    q.w() * rcp_mag</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L442**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L443**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L444**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L445**: <code>/// Quaternion exponential</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L446**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L447**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L448**: <code>Quaternion&lt;Element&gt; exp(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `exp`.
+  - CN: 开始 `exp` 的定义体。
+- **L449**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L450**: <code>  Element exp_ = fast_exp(q.w());</code>
+  - EN: Declares the callable or operator `fast_exp`.
+  - CN: 声明可调用对象或运算符 `fast_exp`。
+- **L451**: <code>  Element imag_norm = fast_sqrt(q.x() * q.x() + q.y() * q.y() + q.z() * q.z());</code>
+  - EN: Declares the callable or operator `fast_sqrt`.
+  - CN: 声明可调用对象或运算符 `fast_sqrt`。
+- **L452**: <code>  Element sin_norm = fast_sin(imag_norm);</code>
+  - EN: Declares the callable or operator `fast_sin`.
+  - CN: 声明可调用对象或运算符 `fast_sin`。
+- **L453**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L454**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L455**: <code>    exp_ * q.x() * sin_norm / imag_norm,</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L456**: <code>    exp_ * q.y() * sin_norm / imag_norm,</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L457**: <code>    exp_ * q.z() * sin_norm / imag_norm,</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L458**: <code>    exp_ * fast_cos(imag_norm)</code>
+  - EN: Provides part of the signature or implementation for `fast_cos`.
+  - CN: 提供 `fast_cos` 的签名或实现的一部分。
+- **L459**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L460**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L461**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L462**: <code>/// Quaternion natural logarithm</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L463**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L464**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L465**: <code>Quaternion&lt;Element&gt; log(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `log`.
+  - CN: 开始 `log` 的定义体。
+- **L466**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L467**: <code>  Element v = fast_sqrt(q.x() * q.x() + q.y() * q.y() + q.z() * q.z());</code>
+  - EN: Declares the callable or operator `fast_sqrt`.
+  - CN: 声明可调用对象或运算符 `fast_sqrt`。
+- **L468**: <code>  Element s = fast_acos(q.w() / abs(q)) / v;</code>
+  - EN: Declares the callable or operator `fast_acos`.
+  - CN: 声明可调用对象或运算符 `fast_acos`。
+- **L469**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L470**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L471**: <code>    q.x() * s,</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L472**: <code>    q.y() * s,</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L473**: <code>    q.z() * s,</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L474**: <code>    fast_log(q.w())</code>
+  - EN: Provides part of the signature or implementation for `fast_log`.
+  - CN: 提供 `fast_log` 的签名或实现的一部分。
+- **L475**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L476**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L477**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L478**: <code>/// Gets the rotation angle from a unit-length quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L479**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L480**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L481**: <code>Element get_rotation_angle(Quaternion&lt;Element&gt; const &amp;q_unit) {</code>
+  - EN: Starts the definition body for `get_rotation_angle`.
+  - CN: 开始 `get_rotation_angle` 的定义体。
+- **L482**: <code>  return fast_acos(q_unit.w()) * Element(2);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L483**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L484**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L485**: <code>/// Gets the rotation axis from a unit-length quaternion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L486**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L487**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L488**: <code>Matrix3x1&lt;Element&gt; get_rotation_axis(Quaternion&lt;Element&gt; const &amp;q_unit) {</code>
+  - EN: Starts the definition body for `get_rotation_axis`.
+  - CN: 开始 `get_rotation_axis` 的定义体。
+- **L489**: <code>  return q_unit.pure().unit();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L490**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L491**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L492**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L493**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L494**: <code>/// Equality operator</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L495**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L496**: <code>CUTLASS_HOST_DEVICE </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L497**: <code>bool operator==(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator==`.
+  - CN: 开始 `operator==` 的定义体。
+- **L498**: <code>  return lhs.x() == rhs.x() &amp;&amp;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L499**: <code>    lhs.y() == rhs.y() &amp;&amp;</code>
+  - EN: Provides part of the signature or implementation for `y`.
+  - CN: 提供 `y` 的签名或实现的一部分。
+- **L500**: <code>    lhs.z() == rhs.z() &amp;&amp;</code>
+  - EN: Provides part of the signature or implementation for `z`.
+  - CN: 提供 `z` 的签名或实现的一部分。
+- **L501**: <code>    lhs.w() == rhs.w();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L502**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L503**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L504**: <code>/// Inequality operator</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L505**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L506**: <code>CUTLASS_HOST_DEVICE </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L507**: <code>bool operator!=(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator!=`.
+  - CN: 开始 `operator!=` 的定义体。
+- **L508**: <code>  return !(lhs == rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L509**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L510**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L511**: <code>/// Quaternion scalar multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L512**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L513**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L514**: <code>Quaternion&lt;Element&gt; operator*(Quaternion&lt;Element&gt; q, Element s) {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L515**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L516**: <code>    q.x() * s,</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L517**: <code>    q.y() * s,</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L518**: <code>    q.z() * s,</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L519**: <code>    q.w() * s</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L520**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L521**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L522**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L523**: <code>/// Quaternion scalar multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L524**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L525**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L526**: <code>Quaternion&lt;Element&gt; operator*(Element s, Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L527**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L528**: <code>    s * q.x(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L529**: <code>    s * q.y(),</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L530**: <code>    s * q.z(),</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L531**: <code>    s * q.w()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L532**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L533**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L534**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L535**: <code>/// Quaternion scalar division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L536**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L537**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L538**: <code>Quaternion&lt;Element&gt; operator/(Quaternion&lt;Element&gt; const &amp;q, Element s) {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L539**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L540**: <code>    q.x() / s,</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L541**: <code>    q.y() / s,</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L542**: <code>    q.z() / s,</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L543**: <code>    q.w() / s</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L544**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L545**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L546**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L547**: <code>/// Quaternion unary negation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L548**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L549**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L550**: <code>Quaternion&lt;Element&gt; operator-(Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `operator-`.
+  - CN: 开始 `operator-` 的定义体。
+- **L551**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L552**: <code>    -q.x(),</code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L553**: <code>    -q.y(),</code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L554**: <code>    -q.z(),</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L555**: <code>    -q.w()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L556**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L557**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L558**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L559**: <code>/// Quaternion addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L560**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L561**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L562**: <code>Quaternion&lt;Element&gt; operator+(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator+`.
+  - CN: 开始 `operator+` 的定义体。
+- **L563**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L564**: <code>    lhs.x() + rhs.x(), </code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L565**: <code>    lhs.y() + rhs.y(), </code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L566**: <code>    lhs.z() + rhs.z(), </code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L567**: <code>    lhs.w() + rhs.w()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L568**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L569**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L570**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L571**: <code>/// Quaternion subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L572**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L573**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L574**: <code>Quaternion&lt;Element&gt; operator-(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator-`.
+  - CN: 开始 `operator-` 的定义体。
+- **L575**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L576**: <code>    lhs.x() - rhs.x(), </code>
+  - EN: Begins or continues the signature/parameter list for `x`.
+  - CN: 开始或继续 `x` 的签名/参数列表。
+- **L577**: <code>    lhs.y() - rhs.y(), </code>
+  - EN: Begins or continues the signature/parameter list for `y`.
+  - CN: 开始或继续 `y` 的签名/参数列表。
+- **L578**: <code>    lhs.z() - rhs.z(), </code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L579**: <code>    lhs.w() - rhs.w()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L580**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L581**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L582**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L583**: <code>/// Quaternion product</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L584**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L585**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L586**: <code>Quaternion&lt;Element&gt; operator*(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L587**: <code>  return make_Quaternion(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L588**: <code>    lhs.w() * rhs.x() + rhs.w() * lhs.x() + lhs.y() * rhs.z() - lhs.z() * rhs.y(),</code>
+  - EN: Begins or continues the signature/parameter list for `w`.
+  - CN: 开始或继续 `w` 的签名/参数列表。
+- **L589**: <code>    lhs.w() * rhs.y() + rhs.w() * lhs.y() + lhs.z() * rhs.x() - lhs.x() * rhs.z(),</code>
+  - EN: Begins or continues the signature/parameter list for `w`.
+  - CN: 开始或继续 `w` 的签名/参数列表。
+- **L590**: <code>    lhs.w() * rhs.z() + rhs.w() * lhs.z() + lhs.x() * rhs.y() - lhs.y() * rhs.x(),</code>
+  - EN: Begins or continues the signature/parameter list for `w`.
+  - CN: 开始或继续 `w` 的签名/参数列表。
+- **L591**: <code>    lhs.w() * rhs.w() - lhs.x() * rhs.x() - lhs.y() * rhs.y() - lhs.z() * rhs.z()</code>
+  - EN: Provides part of the signature or implementation for `w`.
+  - CN: 提供 `w` 的签名或实现的一部分。
+- **L592**: <code>  );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L593**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L594**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L595**: <code>/// Quaternion division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L596**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L597**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L598**: <code>Quaternion&lt;Element&gt; operator/(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L599**: <code>  return lhs * reciprocal(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L600**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L601**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L602**: <code>/// Quaternion scalar division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L603**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L604**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L605**: <code>Quaternion&lt;Element&gt; operator/(Element s, Quaternion&lt;Element&gt; const &amp;q) {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L606**: <code>  return s * reciprocal(q);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L607**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L608**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L609**: <code>/// Comparison </code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L610**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L611**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L612**: <code>bool operator&lt;(Quaternion&lt;Element&gt; const &amp;lhs, Quaternion&lt;Element&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator<`.
+  - CN: 开始 `operator<` 的定义体。
+- **L613**: <code>  return true; </code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L614**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L615**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L616**: <code>/// Rotates a 3-vector assuming this is a unit quaternion (a spinor). This avoids computing</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L617**: <code>/// a reciprocal.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L618**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L619**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L620**: <code>Matrix3x1&lt;Element&gt; spinor_rotation(</code>
+  - EN: Begins or continues the signature/parameter list for `spinor_rotation`.
+  - CN: 开始或继续 `spinor_rotation` 的签名/参数列表。
+- **L621**: <code>  Quaternion&lt;Element&gt; const &amp;spinor,        /// unit-length quaternion</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L622**: <code>  Matrix3x1&lt;Element&gt; const &amp;rhs) {          /// arbitrary 3-vector</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L623**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L624**: <code>  return (spinor * Quaternion&lt;Element&gt;(rhs, 0) * conj(spinor)).pure();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L625**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L626**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L627**: <code>/// Inverse rotation of 3-vector assuming this is a unit quaternion (a spinor). This avoids computing</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L628**: <code>/// a reciprocal.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L629**: <code>template &lt;typename  Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L630**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L631**: <code>Matrix3x1&lt;Element&gt; spinor_rotation_inv(</code>
+  - EN: Begins or continues the signature/parameter list for `spinor_rotation_inv`.
+  - CN: 开始或继续 `spinor_rotation_inv` 的签名/参数列表。
+- **L632**: <code>  Quaternion&lt;Element&gt; const &amp;spinor,        /// unit-length quaternion</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L633**: <code>  Matrix3x1&lt;Element&gt; const &amp;rhs) {          /// arbitrary 3-vector</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L634**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L635**: <code>  return (conj(spinor) * Quaternion&lt;Element&gt;(rhs, 0) * spinor).pure();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L636**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L637**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L638**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L639**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L640**: <code>/// Partial specialization for Quaternion-valued type.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L641**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L642**: <code>struct RealType&lt; Quaternion&lt;T&gt; &gt; {</code>
+  - EN: Declares or defines the struct `RealType`.
+  - CN: 声明或定义 struct `RealType`。
+- **L643**: <code>  using Type = T;</code>
+  - EN: Defines the alias `Type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Type`。
+- **L644**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L645**: <code>  /// Number of elements</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L646**: <code>  static int const kExtent = Quaternion&lt;T&gt;::kExtent;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L647**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L648**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L649**: <code>  static Quaternion&lt;T&gt; from_real(double x) {</code>
+  - EN: Starts the definition body for `from_real`.
+  - CN: 开始 `from_real` 的定义体。
+- **L650**: <code>    return Quaternion&lt;T&gt;(static_cast&lt;T&gt;(x));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L651**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L652**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L653**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L654**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L655**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L656**: <code>// Factories</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L657**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L658**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L659**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L660**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L661**: <code>cutlass::Quaternion&lt;half_t&gt; from_real&lt;cutlass::Quaternion&lt;half_t&gt; &gt;(double r) {</code>
+  - EN: Starts the definition body for `half_t`.
+  - CN: 开始 `half_t` 的定义体。
+- **L662**: <code>  return cutlass::Quaternion&lt;half_t&gt;(half_t(r));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L663**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L664**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L665**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L666**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L667**: <code>cutlass::Quaternion&lt;float&gt; from_real&lt;cutlass::Quaternion&lt;float&gt; &gt;(double r) {</code>
+  - EN: Starts the definition body for `float`.
+  - CN: 开始 `float` 的定义体。
+- **L668**: <code>  return cutlass::Quaternion&lt;float&gt;(float(r));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L669**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L670**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L671**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L672**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L673**: <code>cutlass::Quaternion&lt;double&gt; from_real&lt;cutlass::Quaternion&lt;double&gt; &gt;(double r) {</code>
+  - EN: Starts the definition body for `double`.
+  - CN: 开始 `double` 的定义体。
+- **L674**: <code>  return cutlass::Quaternion&lt;double&gt;(r);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L675**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L676**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L677**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L678**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L679**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L680**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L681**: <code>// functional.h numeric specializations</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L682**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L683**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L684**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L685**: <code>struct multiplies&lt;Quaternion&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `multiplies`.
+  - CN: 声明或定义 struct `multiplies`。
+- **L686**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L687**: <code>  Quaternion&lt;T&gt; operator()(Quaternion&lt;T&gt; lhs, Quaternion&lt;T&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L688**: <code>    lhs = lhs * rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L689**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L690**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L691**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L692**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L693**: <code>/// Squares with optional conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L694**: <code>template &lt;typename T, typename Output&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L695**: <code>struct magnitude_squared&lt;Quaternion&lt;T&gt;, Output&gt; {</code>
+  - EN: Declares or defines the struct `magnitude_squared`.
+  - CN: 声明或定义 struct `magnitude_squared`。
+- **L696**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L697**: <code>  Output operator()(Quaternion&lt;T&gt; lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L698**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L699**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L700**: <code>    Output y_w = Output(lhs.w());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L701**: <code>    Output y_x = Output(lhs.x());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L702**: <code>    Output y_y = Output(lhs.y());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L703**: <code>    Output y_z = Output(lhs.z());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L704**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L705**: <code>    return mul_op(y_w, y_w) + mul_op(y_x, y_x) + mul_op(y_y, y_y) + \</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L706**: <code>           mul_op(y_z, y_z);</code>
+  - EN: Declares the callable or operator `mul_op`.
+  - CN: 声明可调用对象或运算符 `mul_op`。
+- **L707**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L708**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L709**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L710**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L711**: <code>struct multiply_add&lt;Quaternion&lt;T&gt;, Quaternion&lt;T&gt;, Quaternion&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `multiply_add`.
+  - CN: 声明或定义 struct `multiply_add`。
+- **L712**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L713**: <code>  Quaternion&lt;T&gt; operator()(</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L714**: <code>    Quaternion&lt;T&gt; const &amp;a,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L715**: <code>    Quaternion&lt;T&gt; const &amp;b,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L716**: <code>    Quaternion&lt;T&gt; const &amp;c) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L717**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L718**: <code>    T x = c.x();</code>
+  - EN: Declares the callable or operator `x`.
+  - CN: 声明可调用对象或运算符 `x`。
+- **L719**: <code>    T y = c.y();</code>
+  - EN: Declares the callable or operator `y`.
+  - CN: 声明可调用对象或运算符 `y`。
+- **L720**: <code>    T z = c.z();</code>
+  - EN: Declares the callable or operator `z`.
+  - CN: 声明可调用对象或运算符 `z`。
+- **L721**: <code>    T w = c.w();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L722**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L723**: <code>    x += a.w() * b.x();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L724**: <code>    x += b.w() * a.x();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L725**: <code>    x += a.y() * b.z();</code>
+  - EN: Declares the callable or operator `y`.
+  - CN: 声明可调用对象或运算符 `y`。
+- **L726**: <code>    x += -a.z() * b.y(),</code>
+  - EN: Begins or continues the signature/parameter list for `z`.
+  - CN: 开始或继续 `z` 的签名/参数列表。
+- **L727**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L728**: <code>    y += a.w() * b.y();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L729**: <code>    y += b.w() * a.y();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L730**: <code>    y += a.z() * b.x();</code>
+  - EN: Declares the callable or operator `z`.
+  - CN: 声明可调用对象或运算符 `z`。
+- **L731**: <code>    y += -a.x() * b.z();</code>
+  - EN: Declares the callable or operator `x`.
+  - CN: 声明可调用对象或运算符 `x`。
+- **L732**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L733**: <code>    z += a.w() * b.z();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L734**: <code>    z += b.w() * a.z();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L735**: <code>    z += a.x() * b.y();</code>
+  - EN: Declares the callable or operator `x`.
+  - CN: 声明可调用对象或运算符 `x`。
+- **L736**: <code>    z += -a.y() * b.x();</code>
+  - EN: Declares the callable or operator `y`.
+  - CN: 声明可调用对象或运算符 `y`。
+- **L737**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L738**: <code>    w += a.w() * b.w();</code>
+  - EN: Declares the callable or operator `w`.
+  - CN: 声明可调用对象或运算符 `w`。
+- **L739**: <code>    w += -a.x() * b.x();</code>
+  - EN: Declares the callable or operator `x`.
+  - CN: 声明可调用对象或运算符 `x`。
+- **L740**: <code>    w += -a.y() * b.y();</code>
+  - EN: Declares the callable or operator `y`.
+  - CN: 声明可调用对象或运算符 `y`。
+- **L741**: <code>    w += -a.z() * b.z();</code>
+  - EN: Declares the callable or operator `z`.
+  - CN: 声明可调用对象或运算符 `z`。
+- **L742**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L743**: <code>    return cutlass::make_Quaternion(x, y, z, w);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L744**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L745**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L746**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L747**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L748**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L749**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L750**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L751**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L752**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Symbol focus: `Quaternion` / 重点符号：`Quaternion`
+- Symbol focus: `Base` / 重点符号：`Base`
+- Symbol focus: `Element` / 重点符号：`Element`
+- Symbol focus: `Reference` / 重点符号：`Reference`
+- Symbol focus: `Index` / 重点符号：`Index`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/functional.h"`
+  - `"cutlass/array.h"`
+  - `"cutlass/real.h"`
+  - `"cutlass/coord.h"`
+  - `"cutlass/matrix.h"`
+  - `"cutlass/fast_math.h"`
+  - `"cutlass/layout/vector.h"`

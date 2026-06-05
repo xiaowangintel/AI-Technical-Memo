@@ -1,0 +1,2912 @@
+# ast_preprocessor.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/ast_preprocessor.py`
+
+## Purpose / 作用
+- EN: This module defines the `DSLPreprocessor` class, which acts as a Python preprocessor.
+- CN: 该模块的文档字符串将其描述为：This module defines the `DSLPreprocessor` class, which acts as a Python preprocessor.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module defines the \`DSLPreprocessor\` class, which acts as a Python preprocessor.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `It uses Python's AST and rewrites specific Python statements such as \`for\` and \`if-else\`.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `The preprocessor operates on the following constructs:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L17** `    - \`for\` loops:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L18** `        - Rewrites \`for\` loops with the \`@loop_selector\` decorator.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L19** `        - Supports \`range\`, \`range_dynamic\` for loop iteration.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L20** `    - \`if-elif-else\` statements:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L21** `        - Rewrites conditional statements with the \`@if_selector\` decorator.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L22** `        - Supports \`dynamic_expr\` and \`const_expr\` in the condition expressions.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `Additionally, both \`for\` loops and \`if-else\` statements require \`yield\`` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L25** `operation generation. The preprocessor handles this by:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L26** `    - Using a \`ScopeManager\` to track symbols across different scopes during AST traversal.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L27** `    - Identifying read-only, read-write, and active variables for DSL constructs.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L28** `    - Generating \`yield\` operations for symbols that are classified as read-write or write.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `It is designed to be generic and can handle \`for\` and \`if\` constructs from other dialects.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L31** `In such cases, the user's DSL should implement \`@loop_selector\` and \`@if_selector\`` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L32** `to generate dialect-specific operations for \`for\` and \`if\` statements.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L33** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `import ast` — **EN:** Imports ast for later use. **CN:** 导入 ast 供后续使用。
+- **L36** `import contextlib` — **EN:** Imports contextlib for later use. **CN:** 导入 contextlib 供后续使用。
+- **L37** `import importlib` — **EN:** Imports importlib for later use. **CN:** 导入 importlib 供后续使用。
+- **L38** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L39** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L40** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L41** `import textwrap` — **EN:** Imports textwrap for later use. **CN:** 导入 textwrap 供后续使用。
+- **L42** `import types` — **EN:** Imports types for later use. **CN:** 导入 types 供后续使用。
+- **L43** `import warnings` — **EN:** Imports warnings for later use. **CN:** 导入 warnings 供后续使用。
+- **L44** `from collections.abc import Callable, Generator, Iterable, Iterator` — **EN:** Imports Callable, Generator, Iterable, Iterator from `collections.abc`. **CN:** 从 `collections.abc` 导入 Callable, Generator, Iterable, Iterator。
+- **L45** `from dataclasses import dataclass, field` — **EN:** Imports dataclass, field from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass, field。
+- **L46** `from typing import Any, TypeVar` — **EN:** Imports Any, TypeVar from `typing`. **CN:** 从 `typing` 导入 Any, TypeVar。
+- **L47** `from types import ModuleType` — **EN:** Imports ModuleType from `types`. **CN:** 从 `types` 导入 ModuleType。
+- **L48** `from copy import deepcopy` — **EN:** Imports deepcopy from `copy`. **CN:** 从 `copy` 导入 deepcopy。
+- **L49** `from itertools import chain` — **EN:** Imports chain from `itertools`. **CN:** 从 `itertools` 导入 chain。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `from .common import *` — **EN:** Imports * from `.common`. **CN:** 从 `.common` 导入 *。
+- **L52** `from .utils.logger import log` — **EN:** Imports log from `.utils.logger`. **CN:** 从 `.utils.logger` 导入 log。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `class OrderedSet:` — **EN:** Defines class `OrderedSet`. **CN:** 定义类 `OrderedSet`。
+- **L56** `    """` — **EN:** Starts the docstring for the class `OrderedSet`. **CN:** 开始说明 class `OrderedSet` 的文档字符串。
+- **L57** `    A deterministic set implementation for ordered operations.` — **EN:** Continues the docstring for the class `OrderedSet`. **CN:** 继续说明 class `OrderedSet` 的文档字符串。
+- **L58** `    """` — **EN:** Ends the docstring for the class `OrderedSet`. **CN:** 结束说明 class `OrderedSet` 的文档字符串。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    def __init__(self, iterable: Iterable[str] | None = None) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L61** `        self._dict: dict[str, None] = dict.fromkeys(iterable or [])` — **EN:** Assigns a typed value to self._dict. **CN:** 为 self._dict 赋予带类型标注的值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    def add(self, item: str) -> None:` — **EN:** Defines function `add`. **CN:** 定义函数 `add`。
+- **L64** `        self._dict[item] = None` — **EN:** Assigns a value to self._dict[item]. **CN:** 将一个值赋给 self._dict[item]。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    def __iter__(self) -> Iterator[str]:` — **EN:** Defines function `__iter__`. **CN:** 定义函数 `__iter__`。
+- **L67** `        return iter(self._dict)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    def __contains__(self, item: object) -> bool:` — **EN:** Defines function `__contains__`. **CN:** 定义函数 `__contains__`。
+- **L70** `        return item in self._dict` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    def __and__(self, other: "OrderedSet") -> "OrderedSet":` — **EN:** Defines function `__and__`. **CN:** 定义函数 `__and__`。
+- **L73** `        return OrderedSet(key for key in self._dict if key in other)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    def __or__(self, other: "OrderedSet") -> "OrderedSet":` — **EN:** Defines function `__or__`. **CN:** 定义函数 `__or__`。
+- **L76** `        new_dict = self._dict.copy()` — **EN:** Assigns a value to new_dict. **CN:** 将一个值赋给 new_dict。
+- **L77** `        new_dict.update(dict.fromkeys(other))` — **EN:** Invokes `new_dict.update` as a standalone call. **CN:** 以独立语句方式调用 `new_dict.update`。
+- **L78** `        return OrderedSet(new_dict)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `    def __sub__(self, other: "OrderedSet") -> "OrderedSet":` — **EN:** Defines function `__sub__`. **CN:** 定义函数 `__sub__`。
+- **L81** `        return OrderedSet(key for key in self._dict if key not in other)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `    def __bool__(self) -> bool:` — **EN:** Defines function `__bool__`. **CN:** 定义函数 `__bool__`。
+- **L84** `        return bool(self._dict)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    def intersections(self, others: list[set[str]]) -> "OrderedSet":` — **EN:** Defines function `intersections`. **CN:** 定义函数 `intersections`。
+- **L87** `        """Compute the intersection of this set with multiple other sets.` — **EN:** Starts the docstring for the function `intersections`. **CN:** 开始说明 function `intersections` 的文档字符串。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `        :param others: A list of sets to compute intersections with` — **EN:** Continues the docstring for the function `intersections`. **CN:** 继续说明 function `intersections` 的文档字符串。
+- **L90** `        :type others: list[set[str]]` — **EN:** Continues the docstring for the function `intersections`. **CN:** 继续说明 function `intersections` 的文档字符串。
+- **L91** `        :return: A new ordered set containing elements that appear in this set` — **EN:** Continues the docstring for the function `intersections`. **CN:** 继续说明 function `intersections` 的文档字符串。
+- **L92** `            and at least one of the other sets` — **EN:** Continues the docstring for the function `intersections`. **CN:** 继续说明 function `intersections` 的文档字符串。
+- **L93** `        """` — **EN:** Ends the docstring for the function `intersections`. **CN:** 结束说明 function `intersections` 的文档字符串。
+- **L94** `        result = OrderedSet()` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L95** `        for key in self._dict:` — **EN:** Starts a loop assigning items from `self._dict` to `key`. **CN:** 开始一个循环，将 `self._dict` 的元素赋给 `key`。
+- **L96** `            for other in reversed(others):` — **EN:** Starts a loop assigning items from `reversed(others)` to `other`. **CN:** 开始一个循环，将 `reversed(others)` 的元素赋给 `other`。
+- **L97** `                if key in other:` — **EN:** Starts a conditional branch guarded by `key in other`. **CN:** 开始一个由 `key in other` 控制的条件分支。
+- **L98** `                    result.add(key)` — **EN:** Invokes `result.add` as a standalone call. **CN:** 以独立语句方式调用 `result.add`。
+- **L99** `                    break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L100** `        return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L104** `class ImportInfo:` — **EN:** Defines class `ImportInfo`. **CN:** 定义类 `ImportInfo`。
+- **L105** `    """` — **EN:** Starts the docstring for the class `ImportInfo`. **CN:** 开始说明 class `ImportInfo` 的文档字符串。
+- **L106** `    Information about an import expression.` — **EN:** Continues the docstring for the class `ImportInfo`. **CN:** 继续说明 class `ImportInfo` 的文档字符串。
+- **L107** `    """` — **EN:** Ends the docstring for the class `ImportInfo`. **CN:** 结束说明 class `ImportInfo` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    module_path: str` — **EN:** Assigns a typed value to module_path. **CN:** 为 module_path 赋予带类型标注的值。
+- **L110** `    attr_name: str | None` — **EN:** Assigns a typed value to attr_name. **CN:** 为 attr_name 赋予带类型标注的值。
+- **L111** `    alias_name: str` — **EN:** Assigns a typed value to alias_name. **CN:** 为 alias_name 赋予带类型标注的值。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L115** `class TryImportInfo:` — **EN:** Defines class `TryImportInfo`. **CN:** 定义类 `TryImportInfo`。
+- **L116** `    """` — **EN:** Starts the docstring for the class `TryImportInfo`. **CN:** 开始说明 class `TryImportInfo` 的文档字符串。
+- **L117** `    Represents information about a try-import block in the AST.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `    This dataclass is used to capture and organize the import statements that appear` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L120** `    within the different clauses of a try-except-else-finally block. Each field holds` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L121** `    a list of import statements (or related nodes) that are encountered in the corresponding` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L122** `    clause of the try block.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `    Attributes:` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L125** `        try_imports (list): Import statements found in the 'try' clause.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L126** `        except_imports (list): Import statements found in any 'except' clauses.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L127** `        else_imports (list): Import statements found in the 'else' clause, if present.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L128** `        finally_imports (list): Import statements found in the 'finally' clause, if present.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    This structure allows the preprocessor to track and process imports that are conditionally` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L131** `    executed depending on exception handling logic.` — **EN:** Continues the docstring for the class `TryImportInfo`. **CN:** 继续说明 class `TryImportInfo` 的文档字符串。
+- **L132** `    """` — **EN:** Ends the docstring for the class `TryImportInfo`. **CN:** 结束说明 class `TryImportInfo` 的文档字符串。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `    try_imports: "list[ImportInfo | TryImportInfo]"` — **EN:** Assigns a typed value to try_imports. **CN:** 为 try_imports 赋予带类型标注的值。
+- **L135** `    except_imports: "list[ImportInfo | TryImportInfo]"` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L136** `    else_imports: "list[ImportInfo | TryImportInfo]"` — **EN:** Assigns a typed value to else_imports. **CN:** 为 else_imports 赋予带类型标注的值。
+- **L137** `    finally_imports: "list[ImportInfo | TryImportInfo]"` — **EN:** Assigns a typed value to finally_imports. **CN:** 为 finally_imports 赋予带类型标注的值。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L141** `class ScopeManager:` — **EN:** Defines class `ScopeManager`. **CN:** 定义类 `ScopeManager`。
+- **L142** `    """` — **EN:** Starts the docstring for the class `ScopeManager`. **CN:** 开始说明 class `ScopeManager` 的文档字符串。
+- **L143** `    Manages symbol scopes during AST traversal.` — **EN:** Continues the docstring for the class `ScopeManager`. **CN:** 继续说明 class `ScopeManager` 的文档字符串。
+- **L144** `    Manage nested scopes during transformations.` — **EN:** Continues the docstring for the class `ScopeManager`. **CN:** 继续说明 class `ScopeManager` 的文档字符串。
+- **L145** `    """` — **EN:** Ends the docstring for the class `ScopeManager`. **CN:** 结束说明 class `ScopeManager` 的文档字符串。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `    scopes: list[set[str]]` — **EN:** Assigns a typed value to scopes. **CN:** 为 scopes 赋予带类型标注的值。
+- **L148** `    callables: list[set[str]]` — **EN:** Assigns a typed value to callables. **CN:** 为 callables 赋予带类型标注的值。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L151** `    def create(cls) -> "ScopeManager":` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L152** `        return cls([], [])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `    def add_to_scope(self, name: str) -> None:` — **EN:** Defines function `add_to_scope`. **CN:** 定义函数 `add_to_scope`。
+- **L155** `        if name == "_":` — **EN:** Starts a conditional branch guarded by `name == '_'`. **CN:** 开始一个由 `name == '_'` 控制的条件分支。
+- **L156** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L157** `        self.scopes[-1].add(name)` — **EN:** Invokes `self.scopes[-1].add` as a standalone call. **CN:** 以独立语句方式调用 `self.scopes[-1].add`。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    def add_to_callables(self, name: str) -> None:` — **EN:** Defines function `add_to_callables`. **CN:** 定义函数 `add_to_callables`。
+- **L160** `        if not self.callables:` — **EN:** Starts a conditional branch guarded by `not self.callables`. **CN:** 开始一个由 `not self.callables` 控制的条件分支。
+- **L161** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L162** `        self.callables[-1].add(name)` — **EN:** Invokes `self.callables[-1].add` as a standalone call. **CN:** 以独立语句方式调用 `self.callables[-1].add`。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    def get_active_symbols(self) -> list[set[str]]:` — **EN:** Defines function `get_active_symbols`. **CN:** 定义函数 `get_active_symbols`。
+- **L165** `        return self.scopes.copy()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    def get_active_callables(self) -> list[set[str]]:` — **EN:** Defines function `get_active_callables`. **CN:** 定义函数 `get_active_callables`。
+- **L168** `        return self.callables.copy()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    @contextlib.contextmanager` — **EN:** Applies decorator `contextlib.contextmanager` to the following definition. **CN:** 将装饰器 `contextlib.contextmanager` 应用于后面的定义。
+- **L171** `    def enter_local_scope(self) -> Generator[None, None, None]:` — **EN:** Defines function `enter_local_scope`. **CN:** 定义函数 `enter_local_scope`。
+- **L172** `        """` — **EN:** Starts the docstring for the function `enter_local_scope`. **CN:** 开始说明 function `enter_local_scope` 的文档字符串。
+- **L173** `        Context manager for entering a new local variable and callable scope.` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `        This is conceptually Python's local scope, such as within a function or class definition.` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `        Use this in a \`\`with\`\` statement to temporarily push a new, empty set for both variable and callable` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L178** `        tracking onto the respective ScopeManager stacks. These sets accumulate any new symbols` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L179** `        introduced within the local context. When the context manager exits, the local sets are popped,` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L180** `        restoring the previous scope state.` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `        **Example**` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L183** `            .. code-block:: python` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `                with scope_manager.enter_local_scope():` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L186** `                    # Symbols defined here are local to this scope` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L187** `                    ...` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `        :yields: None` — **EN:** Continues the docstring for the function `enter_local_scope`. **CN:** 继续说明 function `enter_local_scope` 的文档字符串。
+- **L190** `        """` — **EN:** Ends the docstring for the function `enter_local_scope`. **CN:** 结束说明 function `enter_local_scope` 的文档字符串。
+- **L191** `        self.scopes.append(set())` — **EN:** Invokes `self.scopes.append` as a standalone call. **CN:** 以独立语句方式调用 `self.scopes.append`。
+- **L192** `        self.callables.append(set())` — **EN:** Invokes `self.callables.append` as a standalone call. **CN:** 以独立语句方式调用 `self.callables.append`。
+- **L193** `        yield` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L194** `        self.scopes.pop()` — **EN:** Invokes `self.scopes.pop` as a standalone call. **CN:** 以独立语句方式调用 `self.scopes.pop`。
+- **L195** `        self.callables.pop()` — **EN:** Invokes `self.callables.pop` as a standalone call. **CN:** 以独立语句方式调用 `self.callables.pop`。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `    @contextlib.contextmanager` — **EN:** Applies decorator `contextlib.contextmanager` to the following definition. **CN:** 将装饰器 `contextlib.contextmanager` 应用于后面的定义。
+- **L198** `    def enter_control_flow_scope(self) -> Generator[None, None, None]:` — **EN:** Defines function `enter_control_flow_scope`. **CN:** 定义函数 `enter_control_flow_scope`。
+- **L199** `        """` — **EN:** Starts the docstring for the function `enter_control_flow_scope`. **CN:** 开始说明 function `enter_control_flow_scope` 的文档字符串。
+- **L200** `        Context manager for entering a new dynamic control-flow scope.` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `        This scope rule diverge from Python's local scope, variables defined here are discarded after exiting the block, but callables are kept in parent scope.` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `        This context manager pushes a new, empty variable scope onto the stack for the` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L205** `        duration of a control-flow block (such as within loops or if/else blocks). Variables` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L206** `        introduced inside this block are tracked separately and discarded after exiting the block.` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L207** `        Callable symbol scopes are not affected.` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `        :yields: None` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `        **Example**` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L212** `            .. code-block:: python` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `                with scope_manager.enter_control_flow_scope():` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L215** `                    # Variables defined here are local to this control-flow scope` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L216** `                    ...` — **EN:** Continues the docstring for the function `enter_control_flow_scope`. **CN:** 继续说明 function `enter_control_flow_scope` 的文档字符串。
+- **L217** `        """` — **EN:** Ends the docstring for the function `enter_control_flow_scope`. **CN:** 结束说明 function `enter_control_flow_scope` 的文档字符串。
+- **L218** `        self.scopes.append(set())` — **EN:** Invokes `self.scopes.append` as a standalone call. **CN:** 以独立语句方式调用 `self.scopes.append`。
+- **L219** `        yield` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L220** `        self.scopes.pop()` — **EN:** Invokes `self.scopes.pop` as a standalone call. **CN:** 以独立语句方式调用 `self.scopes.pop`。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `class Region:` — **EN:** Defines class `Region`. **CN:** 定义类 `Region`。
+- **L224** `    """` — **EN:** Starts the docstring for the class `Region`. **CN:** 开始说明 class `Region` 的文档字符串。
+- **L225** `    Context manager for handling regions during AST transformations.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `    This class is used to manage region-scoped state during DSL preprocessing.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L228** `    It is responsible for tracking and collecting new statements generated while` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L229** `    visiting and transforming regions, such as the bodies of AST nodes representing` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L230** `    constructs like loops or conditional blocks.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `    Upon entering a region (using a \`\`with\`\` statement), the region is pushed onto` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L233** `    the session's \`\`region_stack\`\`, and prepares a place for new statements to be collected.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L234** `    On exit, the region is popped from the stack and any temporary state is cleaned up.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `    Parameters` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L237** `    ----------` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L238** `    session_data : SessionData` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L239** `        The shared session context for the AST preprocessor, which holds the region stack.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L240** `    owning_node : Optional[ast.stmt], default=None` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L241** `        If provided, the AST statement node that owns this region; new statements will be append to _new_value of this new node.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L242** `    new_value : Optional[list[ast.stmt]], default=None` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L243** `        If provided, a list for collecting new statements for this region.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `    Methods` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L246** `    -------` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L247** `    __enter__()` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L248** `        Enter the region context, mutate state as needed.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L249** `    __exit__(exc_type, exc_value, traceback)` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L250** `        Exit the context, clean up state.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L251** `    append_new_stmts(stmts)` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L252** `        Append new AST statements to the region's collection.` — **EN:** Continues the docstring for the class `Region`. **CN:** 继续说明 class `Region` 的文档字符串。
+- **L253** `    """` — **EN:** Ends the docstring for the class `Region`. **CN:** 结束说明 class `Region` 的文档字符串。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L256** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L257** `        session_data: "SessionData",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L258** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L259** `        owning_node: ast.stmt | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L260** `        new_value: list[ast.stmt] | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L261** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L262** `        self.session_data = session_data` — **EN:** Assigns a value to self.session_data. **CN:** 将一个值赋给 self.session_data。
+- **L263** `        self.owning_node = owning_node` — **EN:** Assigns a value to self.owning_node. **CN:** 将一个值赋给 self.owning_node。
+- **L264** `        self.new_value = new_value` — **EN:** Assigns a value to self.new_value. **CN:** 将一个值赋给 self.new_value。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    def __enter__(self) -> "Region":` — **EN:** Defines function `__enter__`. **CN:** 定义函数 `__enter__`。
+- **L267** `        if self.new_value is not None or isinstance(self.owning_node, ast.stmt):` — **EN:** Starts a conditional branch guarded by `self.new_value is not None or isinstance(self.owning_node...`. **CN:** 开始一个由 `self.new_value is not None or isinstance(self.owning_node...` 控制的条件分支。
+- **L268** `            self.session_data.region_stack.append(self)` — **EN:** Invokes `self.session_data.region_stack.append` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.region_stack.append`。
+- **L269** `        if self.owning_node is not None:` — **EN:** Starts a conditional branch guarded by `self.owning_node is not None`. **CN:** 开始一个由 `self.owning_node is not None` 控制的条件分支。
+- **L270** `            self.owning_node._new_value = []  # type: ignore[attr-defined]` — **EN:** Assigns a value to self.owning_node._new_value. **CN:** 将一个值赋给 self.owning_node._new_value。
+- **L271** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `    def __exit__(` — **EN:** Defines function `__exit__`. **CN:** 定义函数 `__exit__`。
+- **L274** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L275** `        exc_type: type[BaseException] | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `        exc_value: BaseException | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `        traceback: types.TracebackType | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L279** `        if self.new_value is not None or isinstance(self.owning_node, ast.stmt):` — **EN:** Starts a conditional branch guarded by `self.new_value is not None or isinstance(self.owning_node...`. **CN:** 开始一个由 `self.new_value is not None or isinstance(self.owning_node...` 控制的条件分支。
+- **L280** `            self.session_data.region_stack.pop()` — **EN:** Invokes `self.session_data.region_stack.pop` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.region_stack.pop`。
+- **L281** `        if self.owning_node is not None:` — **EN:** Starts a conditional branch guarded by `self.owning_node is not None`. **CN:** 开始一个由 `self.owning_node is not None` 控制的条件分支。
+- **L282** `            delattr(self.owning_node, "_new_value")` — **EN:** Invokes `delattr` as a standalone call. **CN:** 以独立语句方式调用 `delattr`。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `    def append_new_stmts(self, stmts: list[ast.stmt]) -> None:` — **EN:** Defines function `append_new_stmts`. **CN:** 定义函数 `append_new_stmts`。
+- **L285** `        """` — **EN:** Starts the docstring for the function `append_new_stmts`. **CN:** 开始说明 function `append_new_stmts` 的文档字符串。
+- **L286** `        Append a list of statements to the region's collection.` — **EN:** Continues the docstring for the function `append_new_stmts`. **CN:** 继续说明 function `append_new_stmts` 的文档字符串。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `        Parameters` — **EN:** Continues the docstring for the function `append_new_stmts`. **CN:** 继续说明 function `append_new_stmts` 的文档字符串。
+- **L289** `        ----------` — **EN:** Continues the docstring for the function `append_new_stmts`. **CN:** 继续说明 function `append_new_stmts` 的文档字符串。
+- **L290** `        stmts : list[ast.stmt]` — **EN:** Continues the docstring for the function `append_new_stmts`. **CN:** 继续说明 function `append_new_stmts` 的文档字符串。
+- **L291** `            The AST statements to append to this region.` — **EN:** Continues the docstring for the function `append_new_stmts`. **CN:** 继续说明 function `append_new_stmts` 的文档字符串。
+- **L292** `        """` — **EN:** Ends the docstring for the function `append_new_stmts`. **CN:** 结束说明 function `append_new_stmts` 的文档字符串。
+- **L293** `        if self.owning_node is not None:` — **EN:** Starts a conditional branch guarded by `self.owning_node is not None`. **CN:** 开始一个由 `self.owning_node is not None` 控制的条件分支。
+- **L294** `            self.owning_node._new_value.extend(stmts)  # type: ignore[attr-defined]` — **EN:** Invokes `self.owning_node._new_value.extend` as a standalone call. **CN:** 以独立语句方式调用 `self.owning_node._new_value.extend`。
+- **L295** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L296** `            assert self.new_value is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L297** `            self.new_value.extend(stmts)` — **EN:** Invokes `self.new_value.extend` as a standalone call. **CN:** 以独立语句方式调用 `self.new_value.extend`。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L301** `class SessionData:` — **EN:** Defines class `SessionData`. **CN:** 定义类 `SessionData`。
+- **L302** `    """` — **EN:** Starts the docstring for the class `SessionData`. **CN:** 开始说明 class `SessionData` 的文档字符串。
+- **L303** `    Session data for the DSL preprocessor.` — **EN:** Continues the docstring for the class `SessionData`. **CN:** 继续说明 class `SessionData` 的文档字符串。
+- **L304** `    """` — **EN:** Ends the docstring for the class `SessionData`. **CN:** 结束说明 class `SessionData` 的文档字符串。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `    counter: int = 0  # Unique function names for multiple loops` — **EN:** Assigns a typed value to counter. **CN:** 为 counter 赋予带类型标注的值。
+- **L307** `    scope_manager: ScopeManager = field(default_factory=ScopeManager.create)` — **EN:** Assigns a typed value to scope_manager. **CN:** 为 scope_manager 赋予带类型标注的值。
+- **L308** `    function_counter: int = 0` — **EN:** Assigns a typed value to function_counter. **CN:** 为 function_counter 赋予带类型标注的值。
+- **L309** `    function_name: str = "<unknown function>"` — **EN:** Assigns a typed value to function_name. **CN:** 为 function_name 赋予带类型标注的值。
+- **L310** `    class_name: str | None = None` — **EN:** Assigns a typed value to class_name. **CN:** 为 class_name 赋予带类型标注的值。
+- **L311** `    file_name: str = "<unknown filename>"` — **EN:** Assigns a typed value to file_name. **CN:** 为 file_name 赋予带类型标注的值。
+- **L312** `    function_globals: dict[str, Any] | None = None` — **EN:** Assigns a typed value to function_globals. **CN:** 为 function_globals 赋予带类型标注的值。
+- **L313** `    import_top_module: bool = False` — **EN:** Assigns a typed value to import_top_module. **CN:** 为 import_top_module 赋予带类型标注的值。
+- **L314** `    region_stack: list[Region] = field(default_factory=list)` — **EN:** Assigns a typed value to region_stack. **CN:** 为 region_stack 赋予带类型标注的值。
+- **L315** `    generator_targets: list[str] = field(default_factory=list)` — **EN:** Assigns a typed value to generator_targets. **CN:** 为 generator_targets 赋予带类型标注的值。
+- **L316** `    lambda_args: list[str] = field(default_factory=list)` — **EN:** Assigns a typed value to lambda_args. **CN:** 为 lambda_args 赋予带类型标注的值。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `    @contextlib.contextmanager` — **EN:** Applies decorator `contextlib.contextmanager` to the following definition. **CN:** 将装饰器 `contextlib.contextmanager` 应用于后面的定义。
+- **L319** `    def set_current_class_name(self, class_name: str) -> Generator[None, None, None]:` — **EN:** Defines function `set_current_class_name`. **CN:** 定义函数 `set_current_class_name`。
+- **L320** `        old_class_name = self.class_name` — **EN:** Assigns a value to old_class_name. **CN:** 将一个值赋给 old_class_name。
+- **L321** `        self.class_name = class_name` — **EN:** Assigns a value to self.class_name. **CN:** 将一个值赋给 self.class_name。
+- **L322** `        yield` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L323** `        self.class_name = old_class_name` — **EN:** Assigns a value to self.class_name. **CN:** 将一个值赋给 self.class_name。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `    @contextlib.contextmanager` — **EN:** Applies decorator `contextlib.contextmanager` to the following definition. **CN:** 将装饰器 `contextlib.contextmanager` 应用于后面的定义。
+- **L326** `    def set_current_function_name(` — **EN:** Defines function `set_current_function_name`. **CN:** 定义函数 `set_current_function_name`。
+- **L327** `        self, function_name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L328** `    ) -> Generator[None, None, None]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L329** `        old_function_name = self.function_name` — **EN:** Assigns a value to old_function_name. **CN:** 将一个值赋给 old_function_name。
+- **L330** `        self.function_name = function_name` — **EN:** Assigns a value to self.function_name. **CN:** 将一个值赋给 self.function_name。
+- **L331** `        yield` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L332** `        self.function_name = old_function_name` — **EN:** Assigns a value to self.function_name. **CN:** 将一个值赋给 self.function_name。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `def _create_module_attribute(` — **EN:** Defines function `_create_module_attribute`. **CN:** 定义函数 `_create_module_attribute`。
+- **L336** `    func_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L337** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L338** `    use_base_dsl: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L339** `    submodule_name: str | None = "ast_helpers",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L340** `    lineno: int | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `    col_offset: int | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `) -> ast.Attribute:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L343** `    """Creates an AST node representing a qualified attribute access to a function in a module or submodule.` — **EN:** Starts the docstring for the function `_create_module_attribute`. **CN:** 开始说明 function `_create_module_attribute` 的文档字符串。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `    :param func_name: The attribute or function name to access` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L346** `    :type func_name: str` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L347** `    :param top_module_name: The top-level module name, defaults to "_dsl_"` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L348** `    :type top_module_name: str, optional` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L349** `    :param submodule_name: The submodule name to access within the top module,` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L350** `        defaults to "ast_helpers"` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L351** `    :type submodule_name: str, optional` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L352** `    :param lineno: The line number to use for AST node location, defaults to None` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L353** `    :type lineno: int, optional` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L354** `    :param col_offset: The column offset to use for AST node location, defaults to None` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L355** `    :type col_offset: int, optional` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L356** `    :return: An AST Attribute node corresponding to the desired attribute access,` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L357** `        with optional location info` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L358** `    :rtype: ast.Attribute` — **EN:** Continues the docstring for the function `_create_module_attribute`. **CN:** 继续说明 function `_create_module_attribute` 的文档字符串。
+- **L359** `    """` — **EN:** Ends the docstring for the function `_create_module_attribute`. **CN:** 结束说明 function `_create_module_attribute` 的文档字符串。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** `    # If we simply copy location from origin node, it contains a way to wide range, which cause location in traceback to be wrong.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L362** `    def set_location(` — **EN:** Defines function `set_location`. **CN:** 定义函数 `set_location`。
+- **L363** `        node: ast.expr, lineno: int | None, col_offset: int | None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L364** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L365** `        if lineno is None or col_offset is None:` — **EN:** Starts a conditional branch guarded by `lineno is None or col_offset is None`. **CN:** 开始一个由 `lineno is None or col_offset is None` 控制的条件分支。
+- **L366** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L367** `        node.lineno = lineno` — **EN:** Assigns a value to node.lineno. **CN:** 将一个值赋给 node.lineno。
+- **L368** `        node.end_lineno = lineno` — **EN:** Assigns a value to node.end_lineno. **CN:** 将一个值赋给 node.end_lineno。
+- **L369** `        node.col_offset = col_offset` — **EN:** Assigns a value to node.col_offset. **CN:** 将一个值赋给 node.col_offset。
+- **L370** `        node.end_col_offset = col_offset` — **EN:** Assigns a value to node.end_col_offset. **CN:** 将一个值赋给 node.end_col_offset。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    base: ast.expr = ast.Name(` — **EN:** Assigns a typed value to base. **CN:** 为 base 赋予带类型标注的值。
+- **L373** `        id="__base_dsl__" if use_base_dsl else "__module_dsl__", ctx=ast.Load()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `    set_location(base, lineno, col_offset)` — **EN:** Invokes `set_location` as a standalone call. **CN:** 以独立语句方式调用 `set_location`。
+- **L376** `    if submodule_name:` — **EN:** Starts a conditional branch guarded by `submodule_name`. **CN:** 开始一个由 `submodule_name` 控制的条件分支。
+- **L377** `        base = ast.Attribute(value=base, attr=submodule_name, ctx=ast.Load())` — **EN:** Assigns a value to base. **CN:** 将一个值赋给 base。
+- **L378** `        set_location(base, lineno, col_offset)` — **EN:** Invokes `set_location` as a standalone call. **CN:** 以独立语句方式调用 `set_location`。
+- **L379** `    result = ast.Attribute(value=base, attr=func_name, ctx=ast.Load())` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L380** `    set_location(result, lineno, col_offset)` — **EN:** Invokes `set_location` as a standalone call. **CN:** 以独立语句方式调用 `set_location`。
+- **L381** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** `_ComprehensionT = TypeVar(` — **EN:** Assigns a value to _ComprehensionT. **CN:** 将一个值赋给 _ComprehensionT。
+- **L385** `    "_ComprehensionT", ast.ListComp, ast.SetComp, ast.GeneratorExp, ast.DictComp` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** `class DSLPreprocessor(ast.NodeTransformer):` — **EN:** Defines class `DSLPreprocessor` with bases ast.NodeTransformer. **CN:** 定义类 `DSLPreprocessor`，其基类为 ast.NodeTransformer。
+- **L390** `    """` — **EN:** Starts the docstring for the class `DSLPreprocessor`. **CN:** 开始说明 class `DSLPreprocessor` 的文档字符串。
+- **L391** `    A preprocessor for transforming Python ASTs. It supports:` — **EN:** Continues the docstring for the class `DSLPreprocessor`. **CN:** 继续说明 class `DSLPreprocessor` 的文档字符串。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `    - Rewriting \`for\` loops with the \`@loop_selector\` decorator.` — **EN:** Continues the docstring for the class `DSLPreprocessor`. **CN:** 继续说明 class `DSLPreprocessor` 的文档字符串。
+- **L394** `    - Rewriting \`if-elif-else\` statements with the \`@if_selector\` decorator.` — **EN:** Continues the docstring for the class `DSLPreprocessor`. **CN:** 继续说明 class `DSLPreprocessor` 的文档字符串。
+- **L395** `    - Generating \`yield\` operations for read-write or write symbols.` — **EN:** Continues the docstring for the class `DSLPreprocessor`. **CN:** 继续说明 class `DSLPreprocessor` 的文档字符串。
+- **L396** `    """` — **EN:** Ends the docstring for the class `DSLPreprocessor`. **CN:** 结束说明 class `DSLPreprocessor` 的文档字符串。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `    DECORATOR_FOR_STATEMENT = "loop_selector"` — **EN:** Assigns a value to DECORATOR_FOR_STATEMENT. **CN:** 将一个值赋给 DECORATOR_FOR_STATEMENT。
+- **L399** `    DECORATOR_IF_STATEMENT = "if_selector"` — **EN:** Assigns a value to DECORATOR_IF_STATEMENT. **CN:** 将一个值赋给 DECORATOR_IF_STATEMENT。
+- **L400** `    DECORATOR_WHILE_STATEMENT = "while_selector"` — **EN:** Assigns a value to DECORATOR_WHILE_STATEMENT. **CN:** 将一个值赋给 DECORATOR_WHILE_STATEMENT。
+- **L401** `    IF_EXECUTOR = "if_executor"` — **EN:** Assigns a value to IF_EXECUTOR. **CN:** 将一个值赋给 IF_EXECUTOR。
+- **L402** `    IFEXP_EXECUTOR = "ifExp_executor"` — **EN:** Assigns a value to IFEXP_EXECUTOR. **CN:** 将一个值赋给 IFEXP_EXECUTOR。
+- **L403** `    WHILE_EXECUTOR = "while_executor"` — **EN:** Assigns a value to WHILE_EXECUTOR. **CN:** 将一个值赋给 WHILE_EXECUTOR。
+- **L404** `    ASSERT_EXECUTOR = "assert_executor"` — **EN:** Assigns a value to ASSERT_EXECUTOR. **CN:** 将一个值赋给 ASSERT_EXECUTOR。
+- **L405** `    IMPLICIT_DOWNCAST_NUMERIC_TYPE = "implicitDowncastNumericType"` — **EN:** Assigns a value to IMPLICIT_DOWNCAST_NUMERIC_TYPE. **CN:** 将一个值赋给 IMPLICIT_DOWNCAST_NUMERIC_TYPE。
+- **L406** `    SUPPORTED_FOR_RANGE_STATEMENTS = {"range", "range_dynamic", "range_constexpr"}` — **EN:** Assigns a value to SUPPORTED_FOR_RANGE_STATEMENTS. **CN:** 将一个值赋给 SUPPORTED_FOR_RANGE_STATEMENTS。
+- **L407** `    CONST_EXPR_NAME = {"const_expr", "target_version"}` — **EN:** Assigns a value to CONST_EXPR_NAME. **CN:** 将一个值赋给 CONST_EXPR_NAME。
+- **L408** `    COMPARE_EXECUTOR = "compare_executor"` — **EN:** Assigns a value to COMPARE_EXECUTOR. **CN:** 将一个值赋给 COMPARE_EXECUTOR。
+- **L409** `    BUILTIN_REDIRECTOR = "redirect_builtin_function"` — **EN:** Assigns a value to BUILTIN_REDIRECTOR. **CN:** 将一个值赋给 BUILTIN_REDIRECTOR。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `    def generic_visit(self, node: ast.AST) -> ast.AST:` — **EN:** Defines function `generic_visit`. **CN:** 定义函数 `generic_visit`。
+- **L412** `        """` — **EN:** Starts the docstring for the function `generic_visit`. **CN:** 开始说明 function `generic_visit` 的文档字符串。
+- **L413** `        Copy of :meth:\`ast.NodeTransformer.generic_visit\` with support for inserting statements during expression visits.` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `        This version provides the same recursive traversal and transformation as the standard` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L416** `        \`\`generic_visit\`\`, but extends it to allow statement insertion when visiting expressions.` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L417** `        This is particularly useful for DSL AST processing that needs to emit new statements within` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L418** `        regions associated with expression nodes (e.g., using the \`\`Region\`\` context manager).` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L420** `        :param node: The AST node to process.` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L421** `        :type node: ast.AST` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L422** `        :return: The transformed AST node.` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L423** `        :rtype: ast.AST` — **EN:** Continues the docstring for the function `generic_visit`. **CN:** 继续说明 function `generic_visit` 的文档字符串。
+- **L424** `        """` — **EN:** Ends the docstring for the function `generic_visit`. **CN:** 结束说明 function `generic_visit` 的文档字符串。
+- **L425** `        for field, old_value in ast.iter_fields(node):` — **EN:** Starts a loop assigning items from `ast.iter_fields(node)` to `(field, old_value)`. **CN:** 开始一个循环，将 `ast.iter_fields(node)` 的元素赋给 `(field, old_value)`。
+- **L426** `            if isinstance(old_value, list):` — **EN:** Starts a conditional branch guarded by `isinstance(old_value, list)`. **CN:** 开始一个由 `isinstance(old_value, list)` 控制的条件分支。
+- **L427** `                with Region(self.session_data, owning_node=node):  # type: ignore[arg-type]` — **EN:** Starts a context-managed block using Region(self.session_data, owning_node=node). **CN:** 开始一个使用 Region(self.session_data, owning_node=node) 的上下文管理代码块。
+- **L428** `                    for value in old_value:` — **EN:** Starts a loop assigning items from `old_value` to `value`. **CN:** 开始一个循环，将 `old_value` 的元素赋给 `value`。
+- **L429** `                        if isinstance(value, ast.AST):` — **EN:** Starts a conditional branch guarded by `isinstance(value, ast.AST)`. **CN:** 开始一个由 `isinstance(value, ast.AST)` 控制的条件分支。
+- **L430** `                            value = self.visit(value)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L431** `                            if value is None:` — **EN:** Starts a conditional branch guarded by `value is None`. **CN:** 开始一个由 `value is None` 控制的条件分支。
+- **L432** `                                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L433** `                            elif not isinstance(value, ast.AST):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L434** `                                node._new_value.extend(value)  # type: ignore[attr-defined]` — **EN:** Invokes `node._new_value.extend` as a standalone call. **CN:** 以独立语句方式调用 `node._new_value.extend`。
+- **L435** `                                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L436** `                        node._new_value.append(value)  # type: ignore[attr-defined]` — **EN:** Invokes `node._new_value.append` as a standalone call. **CN:** 以独立语句方式调用 `node._new_value.append`。
+- **L437** `                    old_value[:] = node._new_value  # type: ignore[attr-defined]` — **EN:** Assigns a value to old_value[:]. **CN:** 将一个值赋给 old_value[:]。
+- **L438** `            elif isinstance(old_value, ast.AST):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L439** `                new_node = self.visit(old_value)` — **EN:** Assigns a value to new_node. **CN:** 将一个值赋给 new_node。
+- **L440** `                if new_node is None:` — **EN:** Starts a conditional branch guarded by `new_node is None`. **CN:** 开始一个由 `new_node is None` 控制的条件分支。
+- **L441** `                    delattr(node, field)` — **EN:** Invokes `delattr` as a standalone call. **CN:** 以独立语句方式调用 `delattr`。
+- **L442** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L443** `                    setattr(node, field, new_node)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L444** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** `    def __init__(self, client_module_name: list[str]) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L447** `        super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L448** `        # Persistent state` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L449** `        self.processed_functions: set[Callable[..., Any]] = set()` — **EN:** Assigns a typed value to self.processed_functions. **CN:** 为 self.processed_functions 赋予带类型标注的值。
+- **L450** `        self.client_module_name = client_module_name` — **EN:** Assigns a value to self.client_module_name. **CN:** 将一个值赋给 self.client_module_name。
+- **L451** `        self.module_cache: dict[ModuleType, list[ImportInfo | TryImportInfo]] = {}` — **EN:** Assigns a typed value to self.module_cache. **CN:** 为 self.module_cache 赋予带类型标注的值。
+- **L452** `        self._session_data: SessionData | None = None` — **EN:** Assigns a typed value to self._session_data. **CN:** 为 self._session_data 赋予带类型标注的值。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `    @contextlib.contextmanager` — **EN:** Applies decorator `contextlib.contextmanager` to the following definition. **CN:** 将装饰器 `contextlib.contextmanager` 应用于后面的定义。
+- **L455** `    def get_session(self) -> Generator["DSLPreprocessor", None, None]:` — **EN:** Defines function `get_session`. **CN:** 定义函数 `get_session`。
+- **L456** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L457** `            self._session_data = SessionData()` — **EN:** Assigns a value to self._session_data. **CN:** 将一个值赋给 self._session_data。
+- **L458** `            yield self` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L459** `        finally:` — **EN:** Starts cleanup code that always runs. **CN:** 开始始终会执行的清理代码。
+- **L460** `            self._session_data = None` — **EN:** Assigns a value to self._session_data. **CN:** 将一个值赋给 self._session_data。
+- **L461** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L462** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L463** `    def session_data(self) -> SessionData:` — **EN:** Defines function `session_data`. **CN:** 定义函数 `session_data`。
+- **L464** `        assert self._session_data is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L465** `            "Please start a session before accessing session data"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `        return self._session_data` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** `    def _get_imports_from_ast(` — **EN:** Defines function `_get_imports_from_ast`. **CN:** 定义函数 `_get_imports_from_ast`。
+- **L470** `        self, node: ast.AST, module: ModuleType` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L471** `    ) -> list[ImportInfo | TryImportInfo]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L472** `        """` — **EN:** Starts the docstring for the function `_get_imports_from_ast`. **CN:** 开始说明 function `_get_imports_from_ast` 的文档字符串。
+- **L473** `        Recursively extracts all import statements from the given AST node.` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `        This method traverses the AST of a Python module and collects information about all` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L476** `        import statements, including standard imports, from-imports (with support for relative imports),` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L477** `        and imports that appear within try/except/finally blocks. For try blocks, it also handles` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L478** `        imports that may be conditionally executed in except, else, or finally clauses, specifically` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L479** `        looking for handlers that catch ImportError, ModuleNotFoundError, or Exception.` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L480** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L481** `        Args:` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L482** `            node: The AST node (typically an ast.Module) to search for import statements.` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L483** `            module: The Python module object corresponding to the AST, used for resolving relative imports.` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** `        Returns:` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L486** `            A list of ImportInfo and TryImportInfo objects representing all discovered imports in the AST.` — **EN:** Continues the docstring for the function `_get_imports_from_ast`. **CN:** 继续说明 function `_get_imports_from_ast` 的文档字符串。
+- **L487** `        """` — **EN:** Ends the docstring for the function `_get_imports_from_ast`. **CN:** 结束说明 function `_get_imports_from_ast` 的文档字符串。
+- **L488** `        imports: list[ImportInfo | TryImportInfo] = []` — **EN:** Assigns a typed value to imports. **CN:** 为 imports 赋予带类型标注的值。
+- **L489** `        alias: Callable[[ast.alias], str] = lambda n: n.asname if n.asname else n.name` — **EN:** Assigns a typed value to alias. **CN:** 为 alias 赋予带类型标注的值。
+- **L490** `        for child_node in ast.iter_child_nodes(node):` — **EN:** Starts a loop assigning items from `ast.iter_child_nodes(node)` to `child_node`. **CN:** 开始一个循环，将 `ast.iter_child_nodes(node)` 的元素赋给 `child_node`。
+- **L491** `            if isinstance(child_node, ast.Import):` — **EN:** Starts a conditional branch guarded by `isinstance(child_node, ast.Import)`. **CN:** 开始一个由 `isinstance(child_node, ast.Import)` 控制的条件分支。
+- **L492** `                for name in child_node.names:` — **EN:** Starts a loop assigning items from `child_node.names` to `name`. **CN:** 开始一个循环，将 `child_node.names` 的元素赋给 `name`。
+- **L493** `                    imports.append(` — **EN:** Invokes `imports.append` as a standalone call. **CN:** 以独立语句方式调用 `imports.append`。
+- **L494** `                        ImportInfo(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `                            module_path=name.name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** `                            attr_name=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L497** `                            alias_name=alias(name),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L498** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L499** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** `            elif isinstance(child_node, ast.ImportFrom):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L501** `                module_name = child_node.module` — **EN:** Assigns a value to module_name. **CN:** 将一个值赋给 module_name。
+- **L502** `                if child_node.level > 0:` — **EN:** Starts a conditional branch guarded by `child_node.level > 0`. **CN:** 开始一个由 `child_node.level > 0` 控制的条件分支。
+- **L503** `                    # Handle relative imports.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L504** `                    if module.__package__:` — **EN:** Starts a conditional branch guarded by `module.__package__`. **CN:** 开始一个由 `module.__package__` 控制的条件分支。
+- **L505** `                        package_name = module.__package__.rsplit(` — **EN:** Assigns a value to package_name. **CN:** 将一个值赋给 package_name。
+- **L506** `                            ".", child_node.level - 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L507** `                        )[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L508** `                        # For \`from . import x\`, module name is None, just use package name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L509** `                        if module_name:` — **EN:** Starts a conditional branch guarded by `module_name`. **CN:** 开始一个由 `module_name` 控制的条件分支。
+- **L510** `                            module_name = f"{package_name}.{module_name}"` — **EN:** Assigns a value to module_name. **CN:** 将一个值赋给 module_name。
+- **L511** `                        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L512** `                            module_name = package_name` — **EN:** Assigns a value to module_name. **CN:** 将一个值赋给 module_name。
+- **L513** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L514** `                        # Handle typically some local import like:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L515** `                        # from .common_dense_gemm import DenseGemmKernel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L516** `                        # where there is no __package__, either None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L517** `                        # when in __main__ or '' otherwise.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L518** `                        module_name = f"{module_name}"` — **EN:** Assigns a value to module_name. **CN:** 将一个值赋给 module_name。
+- **L519** `                for name in child_node.names:` — **EN:** Starts a loop assigning items from `child_node.names` to `name`. **CN:** 开始一个循环，将 `child_node.names` 的元素赋给 `name`。
+- **L520** `                    imports.append(` — **EN:** Invokes `imports.append` as a standalone call. **CN:** 以独立语句方式调用 `imports.append`。
+- **L521** `                        ImportInfo(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `                            module_path=module_name or "",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `                            attr_name=name.name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `                            alias_name=alias(name),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `            # ast.TryStar is introduced in Python 3.11. Can't use directly in Python 3.10 and lower.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L528** `            elif isinstance(child_node, (ast.Try, getattr(ast, "TryStar", ast.Try))):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L529** `                # Handle try-catch` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L530** `                try_imports = self._get_imports_from_ast(` — **EN:** Assigns a value to try_imports. **CN:** 将一个值赋给 try_imports。
+- **L531** `                    ast.Module(body=child_node.body, type_ignores=[]),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `                    module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L533** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L534** `                # search handler for ImportError or ModuleNotFoundError` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L535** `                except_imports: list[ImportInfo | TryImportInfo] = []` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L536** `                for handler in child_node.handlers:  # type: ignore[attr-defined]` — **EN:** Starts a loop assigning items from `child_node.handlers` to `handler`. **CN:** 开始一个循环，将 `child_node.handlers` 的元素赋给 `handler`。
+- **L537** `                    if handler.type == None or handler.type.id in [` — **EN:** Starts a conditional branch guarded by `handler.type == None or handler.type.id in ['ImportError'...`. **CN:** 开始一个由 `handler.type == None or handler.type.id in ['ImportError'...` 控制的条件分支。
+- **L538** `                        "ImportError",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L539** `                        "ModuleNotFoundError",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L540** `                        "Exception",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L541** `                    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L542** `                        except_imports = self._get_imports_from_ast(` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L543** `                            ast.Module(body=handler.body, type_ignores=[]), module` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `                        break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L546** `                else_imports = self._get_imports_from_ast(` — **EN:** Assigns a value to else_imports. **CN:** 将一个值赋给 else_imports。
+- **L547** `                    ast.Module(body=child_node.orelse, type_ignores=[]),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `                    module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `                finally_imports = self._get_imports_from_ast(` — **EN:** Assigns a value to finally_imports. **CN:** 将一个值赋给 finally_imports。
+- **L551** `                    ast.Module(body=child_node.finalbody, type_ignores=[]),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L552** `                    module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** `                imports.append(` — **EN:** Invokes `imports.append` as a standalone call. **CN:** 以独立语句方式调用 `imports.append`。
+- **L555** `                    TryImportInfo(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L556** `                        try_imports, except_imports, else_imports, finally_imports` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L557** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L558** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L559** `        return imports` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L560** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L561** `    def _get_module_imports(` — **EN:** Defines function `_get_module_imports`. **CN:** 定义函数 `_get_module_imports`。
+- **L562** `        self, decorated_func: Callable[..., Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L563** `    ) -> list[ImportInfo | TryImportInfo]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L564** `        """Extract imports from the module containing the decorated function"""` — **EN:** Docstring line documenting the function `_get_module_imports`. **CN:** 文档字符串行，用于说明 function `_get_module_imports`。
+- **L565** `        imports: list[ImportInfo | TryImportInfo] = []` — **EN:** Assigns a typed value to imports. **CN:** 为 imports 赋予带类型标注的值。
+- **L566** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L567** `        # Get the module containing the decorated function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L568** `        if module := inspect.getmodule(decorated_func):` — **EN:** Starts a conditional branch guarded by `(module := inspect.getmodule(decorated_func))`. **CN:** 开始一个由 `(module := inspect.getmodule(decorated_func))` 控制的条件分支。
+- **L569** `            if module in self.module_cache:` — **EN:** Starts a conditional branch guarded by `module in self.module_cache`. **CN:** 开始一个由 `module in self.module_cache` 控制的条件分支。
+- **L570** `                return self.module_cache[module]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L571** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L572** `                # Get the module source code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L573** `                source = inspect.getsource(module)` — **EN:** Assigns a value to source. **CN:** 将一个值赋给 source。
+- **L574** `                module_ast = ast.parse(source)` — **EN:** Assigns a value to module_ast. **CN:** 将一个值赋给 module_ast。
+- **L575** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L576** `                imports = self._get_imports_from_ast(module_ast, module)` — **EN:** Assigns a value to imports. **CN:** 将一个值赋给 imports。
+- **L577** `                self.module_cache[module] = imports` — **EN:** Assigns a value to self.module_cache[module]. **CN:** 将一个值赋给 self.module_cache[module]。
+- **L578** `            except (IOError, TypeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L579** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L581** `        return imports` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L582** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L583** `    def try_import_first_and_then_local_import(self, module_path: str) -> ModuleType:` — **EN:** Defines function `try_import_first_and_then_local_import`. **CN:** 定义函数 `try_import_first_and_then_local_import`。
+- **L584** `        @contextlib.contextmanager` — **EN:** Applies decorator `contextlib.contextmanager` to the following definition. **CN:** 将装饰器 `contextlib.contextmanager` 应用于后面的定义。
+- **L585** `        def local_import(module_path: str) -> Generator[ModuleType, None, None]:` — **EN:** Defines function `local_import`. **CN:** 定义函数 `local_import`。
+- **L586** `            # Directory where some local import might happen:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L587** `            local_dir = os.path.dirname(self.session_data.file_name)` — **EN:** Assigns a value to local_dir. **CN:** 将一个值赋给 local_dir。
+- **L588** `            # Momentarily insert the directory where the local import` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L589** `            # used to happen, so the import can find the module.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L590** `            sys.path.insert(0, local_dir)` — **EN:** Invokes `sys.path.insert` as a standalone call. **CN:** 以独立语句方式调用 `sys.path.insert`。
+- **L591** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L592** `                yield importlib.import_module(module_path)` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L593** `            finally:` — **EN:** Starts cleanup code that always runs. **CN:** 开始始终会执行的清理代码。
+- **L594** `                # Clean up even in the case of an exception.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L595** `                sys.path.pop(0)` — **EN:** Invokes `sys.path.pop` as a standalone call. **CN:** 以独立语句方式调用 `sys.path.pop`。
+- **L596** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L597** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L598** `            # Try the normal import first.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L599** `            return importlib.import_module(module_path)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L600** `        except (ImportError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L601** `            # If the normal import failed, tried a local import because we might` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L602** `            # have lost track of sys.path changes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L603** `            with local_import(module_path) as module:` — **EN:** Starts a context-managed block using local_import(module_path). **CN:** 开始一个使用 local_import(module_path) 的上下文管理代码块。
+- **L604** `                return module` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L605** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L606** `    def exec_import(` — **EN:** Defines function `exec_import`. **CN:** 定义函数 `exec_import`。
+- **L607** `        self, import_info: ImportInfo, exec_globals: dict[str, Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L608** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L609** `        module_path, attr_name, alias_name = (` — **EN:** Assigns a value to (module_path, attr_name, alias_name). **CN:** 将一个值赋给 (module_path, attr_name, alias_name)。
+- **L610** `            import_info.module_path,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** `            import_info.attr_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `            import_info.alias_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** `        module = self.try_import_first_and_then_local_import(module_path)` — **EN:** Assigns a value to module. **CN:** 将一个值赋给 module。
+- **L615** `        if attr_name:` — **EN:** Starts a conditional branch guarded by `attr_name`. **CN:** 开始一个由 `attr_name` 控制的条件分支。
+- **L616** `            if attr_name == "*":` — **EN:** Starts a conditional branch guarded by `attr_name == '*'`. **CN:** 开始一个由 `attr_name == '*'` 控制的条件分支。
+- **L617** `                if hasattr(module, "__all__"):` — **EN:** Starts a conditional branch guarded by `hasattr(module, '__all__')`. **CN:** 开始一个由 `hasattr(module, '__all__')` 控制的条件分支。
+- **L618** `                    attrs = module.__all__` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L619** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L620** `                    attrs = [name for name in dir(module) if not name.startswith("_")]` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L621** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L622** `                attrs = [attr_name]` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L623** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L624** `            for attr in attrs:` — **EN:** Starts a loop assigning items from `attrs` to `attr`. **CN:** 开始一个循环，将 `attrs` 的元素赋给 `attr`。
+- **L625** `                alias = attr if attr_name == "*" else alias_name` — **EN:** Assigns a value to alias. **CN:** 将一个值赋给 alias。
+- **L626** `                exec_globals[alias] = getattr(module, attr)` — **EN:** Assigns a value to exec_globals[alias]. **CN:** 将一个值赋给 exec_globals[alias]。
+- **L627** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L628** `            exec_globals[alias_name] = module` — **EN:** Assigns a value to exec_globals[alias_name]. **CN:** 将一个值赋给 exec_globals[alias_name]。
+- **L629** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L630** `    def exec_imports(` — **EN:** Defines function `exec_imports`. **CN:** 定义函数 `exec_imports`。
+- **L631** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L632** `        import_infos: list[ImportInfo | TryImportInfo],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L633** `        exec_globals: dict[str, Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L634** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L635** `        for import_info in import_infos:` — **EN:** Starts a loop assigning items from `import_infos` to `import_info`. **CN:** 开始一个循环，将 `import_infos` 的元素赋给 `import_info`。
+- **L636** `            if isinstance(import_info, ImportInfo):` — **EN:** Starts a conditional branch guarded by `isinstance(import_info, ImportInfo)`. **CN:** 开始一个由 `isinstance(import_info, ImportInfo)` 控制的条件分支。
+- **L637** `                try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L638** `                    self.exec_import(import_info, exec_globals)` — **EN:** Invokes `self.exec_import` as a standalone call. **CN:** 以独立语句方式调用 `self.exec_import`。
+- **L639** `                except (ImportError, AttributeError) as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L640** `                    raise ImportError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L641** `                        f"Failed to import {import_info.module_path}: {str(e)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L642** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L643** `            elif isinstance(import_info, TryImportInfo):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L644** `                try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L645** `                    self.exec_imports(import_info.try_imports, exec_globals)` — **EN:** Invokes `self.exec_imports` as a standalone call. **CN:** 以独立语句方式调用 `self.exec_imports`。
+- **L646** `                except (ImportError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L647** `                    self.exec_imports(import_info.except_imports, exec_globals)` — **EN:** Invokes `self.exec_imports` as a standalone call. **CN:** 以独立语句方式调用 `self.exec_imports`。
+- **L648** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L649** `                    self.exec_imports(import_info.else_imports, exec_globals)` — **EN:** Invokes `self.exec_imports` as a standalone call. **CN:** 以独立语句方式调用 `self.exec_imports`。
+- **L650** `                finally:` — **EN:** Starts cleanup code that always runs. **CN:** 开始始终会执行的清理代码。
+- **L651** `                    self.exec_imports(import_info.finally_imports, exec_globals)` — **EN:** Invokes `self.exec_imports` as a standalone call. **CN:** 以独立语句方式调用 `self.exec_imports`。
+- **L652** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L653** `    def exec(` — **EN:** Defines function `exec`. **CN:** 定义函数 `exec`。
+- **L654** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L655** `        function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L656** `        original_function: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L657** `        code_object: types.CodeType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L658** `        exec_globals: dict[str, Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L659** `    ) -> Callable[..., Any] | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L660** `        """Requires an active DSL preprocessor session."""` — **EN:** Docstring line documenting the function `exec`. **CN:** 文档字符串行，用于说明 function `exec`。
+- **L661** `        # Get imports from the original module` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L662** `        module_imports = self._get_module_imports(original_function)` — **EN:** Assigns a value to module_imports. **CN:** 将一个值赋给 module_imports。
+- **L663** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L664** `        # Import all required modules` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L665** `        self.exec_imports(module_imports, exec_globals)` — **EN:** Invokes `self.exec_imports` as a standalone call. **CN:** 以独立语句方式调用 `self.exec_imports`。
+- **L666** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L667** `        # Execute the transformed code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L668** `        log().info(` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L669** `            "ASTPreprocessor Executing transformed code for function [%s]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L670** `            function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `        exec(code_object, exec_globals)` — **EN:** Invokes `exec` as a standalone call. **CN:** 以独立语句方式调用 `exec`。
+- **L673** `        return exec_globals.get(function_name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L674** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L675** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L676** `    def print_ast(transformed_tree: ast.AST | None = None) -> None:` — **EN:** Defines function `print_ast`. **CN:** 定义函数 `print_ast`。
+- **L677** `        print("#", "-" * 40, "Transformed AST", "-" * 40)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L678** `        unparsed_code = ast.unparse(transformed_tree)  # type: ignore[arg-type]` — **EN:** Assigns a value to unparsed_code. **CN:** 将一个值赋给 unparsed_code。
+- **L679** `        print(unparsed_code)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L680** `        print("#", "-" * 40, "End Transformed AST", "-" * 40)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L681** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L682** `    def make_func_param_name(self, base_name: str, used_names: Iterable[str]) -> str:` — **EN:** Defines function `make_func_param_name`. **CN:** 定义函数 `make_func_param_name`。
+- **L683** `        """Generate a unique parameter name that doesn't collide with existing names."""` — **EN:** Docstring line documenting the function `make_func_param_name`. **CN:** 文档字符串行，用于说明 function `make_func_param_name`。
+- **L684** `        if base_name not in used_names:` — **EN:** Starts a conditional branch guarded by `base_name not in used_names`. **CN:** 开始一个由 `base_name not in used_names` 控制的条件分支。
+- **L685** `            return base_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `        i = 0` — **EN:** Assigns a value to i. **CN:** 将一个值赋给 i。
+- **L688** `        while f"{base_name}_{i}" in used_names:` — **EN:** Starts a while-loop guarded by `f'{base_name}_{i}' in used_names`. **CN:** 开始一个由 `f'{base_name}_{i}' in used_names` 控制的 while 循环。
+- **L689** `            i += 1` — **EN:** Updates i in place. **CN:** 原地更新 i。
+- **L690** `        return f"{base_name}_{i}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L691** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L692** `    def _inject_default_arg_values(` — **EN:** Defines function `_inject_default_arg_values`. **CN:** 定义函数 `_inject_default_arg_values`。
+- **L693** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L694** `        function_pointer: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L695** `        func_ast: ast.FunctionDef,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L696** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L697** `        """Inject default-argument values whose source-level names are unresolvable.` — **EN:** Starts the docstring for the function `_inject_default_arg_values`. **CN:** 开始说明 function `_inject_default_arg_values` 的文档字符串。
+- **L698** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L699** `        When a decorated function uses \`\`_param=name\`\` where \`\`name\`\` is a local` — **EN:** Continues the docstring for the function `_inject_default_arg_values`. **CN:** 继续说明 function `_inject_default_arg_values` 的文档字符串。
+- **L700** `        in an enclosing factory, \`\`exec()\`\` needs \`\`name\`\` in its namespace.` — **EN:** Continues the docstring for the function `_inject_default_arg_values`. **CN:** 继续说明 function `_inject_default_arg_values` 的文档字符串。
+- **L701** `        We use \`\`inspect.signature\`\` for runtime default values and the` — **EN:** Continues the docstring for the function `_inject_default_arg_values`. **CN:** 继续说明 function `_inject_default_arg_values` 的文档字符串。
+- **L702** `        already-parsed *func_ast* for the source-level name each default` — **EN:** Continues the docstring for the function `_inject_default_arg_values`. **CN:** 继续说明 function `_inject_default_arg_values` 的文档字符串。
+- **L703** `        references.` — **EN:** Continues the docstring for the function `_inject_default_arg_values`. **CN:** 继续说明 function `_inject_default_arg_values` 的文档字符串。
+- **L704** `        """` — **EN:** Ends the docstring for the function `_inject_default_arg_values`. **CN:** 结束说明 function `_inject_default_arg_values` 的文档字符串。
+- **L705** `        exec_globals = self.session_data.function_globals` — **EN:** Assigns a value to exec_globals. **CN:** 将一个值赋给 exec_globals。
+- **L706** `        if exec_globals is None:` — **EN:** Starts a conditional branch guarded by `exec_globals is None`. **CN:** 开始一个由 `exec_globals is None` 控制的条件分支。
+- **L707** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L708** `        sig = inspect.signature(function_pointer)` — **EN:** Assigns a value to sig. **CN:** 将一个值赋给 sig。
+- **L709** `        params_with_defaults = {` — **EN:** Assigns a value to params_with_defaults. **CN:** 将一个值赋给 params_with_defaults。
+- **L710** `            name: param.default` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L711** `            for name, param in sig.parameters.items()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L712** `            if param.default is not inspect.Parameter.empty` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L713** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** `        if not params_with_defaults:` — **EN:** Starts a conditional branch guarded by `not params_with_defaults`. **CN:** 开始一个由 `not params_with_defaults` 控制的条件分支。
+- **L715** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L716** `        # Build map: parameter name → AST default node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L717** `        # (covers both positional and keyword-only parameters)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L718** `        ast_defaults: dict[str, ast.expr] = {}` — **EN:** Assigns a typed value to ast_defaults. **CN:** 为 ast_defaults 赋予带类型标注的值。
+- **L719** `        all_args = func_ast.args.posonlyargs + func_ast.args.args` — **EN:** Assigns a value to all_args. **CN:** 将一个值赋给 all_args。
+- **L720** `        offset = len(all_args) - len(func_ast.args.defaults)` — **EN:** Assigns a value to offset. **CN:** 将一个值赋给 offset。
+- **L721** `        for i, default_node in enumerate(func_ast.args.defaults):` — **EN:** Starts a loop assigning items from `enumerate(func_ast.args.defaults)` to `(i, default_node)`. **CN:** 开始一个循环，将 `enumerate(func_ast.args.defaults)` 的元素赋给 `(i, default_node)`。
+- **L722** `            ast_defaults[all_args[offset + i].arg] = default_node` — **EN:** Assigns a value to ast_defaults[all_args[offset + i].arg]. **CN:** 将一个值赋给 ast_defaults[all_args[offset + i].arg]。
+- **L723** `        for kwarg, kw_default in zip(func_ast.args.kwonlyargs, func_ast.args.kw_defaults):` — **EN:** Starts a loop assigning items from `zip(func_ast.args.kwonlyargs, func_ast.args.kw_...` to `(kwarg, kw_default)`. **CN:** 开始一个循环，将 `zip(func_ast.args.kwonlyargs, func_ast.args.kw_...` 的元素赋给 `(kwarg, kw_default)`。
+- **L724** `            if kw_default is not None:` — **EN:** Starts a conditional branch guarded by `kw_default is not None`. **CN:** 开始一个由 `kw_default is not None` 控制的条件分支。
+- **L725** `                ast_defaults[kwarg.arg] = kw_default` — **EN:** Assigns a value to ast_defaults[kwarg.arg]. **CN:** 将一个值赋给 ast_defaults[kwarg.arg]。
+- **L726** `        for param_name, default_val in params_with_defaults.items():` — **EN:** Starts a loop assigning items from `params_with_defaults.items()` to `(param_name, default_val)`. **CN:** 开始一个循环，将 `params_with_defaults.items()` 的元素赋给 `(param_name, default_val)`。
+- **L727** `            ast_node = ast_defaults.get(param_name)` — **EN:** Assigns a value to ast_node. **CN:** 将一个值赋给 ast_node。
+- **L728** `            if isinstance(ast_node, ast.Name) and ast_node.id not in exec_globals:` — **EN:** Starts a conditional branch guarded by `isinstance(ast_node, ast.Name) and ast_node.id not in exe...`. **CN:** 开始一个由 `isinstance(ast_node, ast.Name) and ast_node.id not in exe...` 控制的条件分支。
+- **L729** `                exec_globals[ast_node.id] = default_val` — **EN:** Assigns a value to exec_globals[ast_node.id]. **CN:** 将一个值赋给 exec_globals[ast_node.id]。
+- **L730** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L731** `    def transform_function(` — **EN:** Defines function `transform_function`. **CN:** 定义函数 `transform_function`。
+- **L732** `        self, func_name: str, function_pointer: Callable[..., Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L733** `    ) -> list[ast.stmt]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L734** `        """` — **EN:** Starts the docstring for the function `transform_function`. **CN:** 开始说明 function `transform_function` 的文档字符串。
+- **L735** `        Transforms a function.` — **EN:** Continues the docstring for the function `transform_function`. **CN:** 继续说明 function `transform_function` 的文档字符串。
+- **L736** `        """` — **EN:** Ends the docstring for the function `transform_function`. **CN:** 结束说明 function `transform_function` 的文档字符串。
+- **L737** `        # Skip if the function has already been processed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L738** `        if function_pointer in self.processed_functions:` — **EN:** Starts a conditional branch guarded by `function_pointer in self.processed_functions`. **CN:** 开始一个由 `function_pointer in self.processed_functions` 控制的条件分支。
+- **L739** `            log().info(` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L740** `                "ASTPreprocessor Skipping already processed function [%s]", func_name` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L741** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L742** `            return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L743** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L744** `        # Step 1. Parse the given function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L745** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L746** `            file_name = inspect.getsourcefile(function_pointer) or "<unknown>"` — **EN:** Assigns a value to file_name. **CN:** 将一个值赋给 file_name。
+- **L747** `            lines, start_line = inspect.getsourcelines(function_pointer)` — **EN:** Assigns a value to (lines, start_line). **CN:** 将一个值赋给 (lines, start_line)。
+- **L748** `            dedented_source = textwrap.dedent("".join(lines))` — **EN:** Assigns a value to dedented_source. **CN:** 将一个值赋给 dedented_source。
+- **L749** `            tree = ast.parse(dedented_source, filename=file_name)` — **EN:** Assigns a value to tree. **CN:** 将一个值赋给 tree。
+- **L750** `            # Bump the line numbers so they match the real source file` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L751** `            ast.increment_lineno(tree, start_line - 1)` — **EN:** Invokes `ast.increment_lineno` as a standalone call. **CN:** 以独立语句方式调用 `ast.increment_lineno`。
+- **L752** `        except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L753** `            # Under REPL mode, there is no way to get source of a function object, error out` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L754** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L755** `                f"Failed to parse function {func_name}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** `                suggestion="DSL does not support REPL mode, save the function to a file instead.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L757** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L759** `        # Step 1.2 Check the decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L760** `        if not self.check_decorator(tree.body[0]):` — **EN:** Starts a conditional branch guarded by `not self.check_decorator(tree.body[0])`. **CN:** 开始一个由 `not self.check_decorator(tree.body[0])` 控制的条件分支。
+- **L761** `            log().info(` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L762** `                "[%s] - Skipping function due to missing decorator",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L763** `                func_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L764** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L765** `            return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L766** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L767** `        self.processed_functions.add(function_pointer)` — **EN:** Invokes `self.processed_functions.add` as a standalone call. **CN:** 以独立语句方式调用 `self.processed_functions.add`。
+- **L768** `        log().info("ASTPreprocessor Transforming function [%s]", func_name)` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L769** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L770** `        # Step 1.3 Inject default-argument values from enclosing scopes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L771** `        # When a decorated function uses \`_param=name\` where \`name\` is a` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L772** `        # local in the enclosing factory, exec() needs \`name\` in its` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L773** `        # namespace.  We use the already-parsed AST to find source-level` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L774** `        # names and inspect.signature to get runtime values.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L775** `        func_def = tree.body[0]` — **EN:** Assigns a value to func_def. **CN:** 将一个值赋给 func_def。
+- **L776** `        assert isinstance(func_def, ast.FunctionDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L777** `        self._inject_default_arg_values(function_pointer, func_def)` — **EN:** Invokes `self._inject_default_arg_values` as a standalone call. **CN:** 以独立语句方式调用 `self._inject_default_arg_values`。
+- **L778** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L779** `        # Step 2. Transform the function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L780** `        transformed_tree = self.visit(tree)` — **EN:** Assigns a value to transformed_tree. **CN:** 将一个值赋给 transformed_tree。
+- **L781** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L782** `        # Step 3. Import cutlass and base_dsl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L783** `        top_module_name = ".".join(self.client_module_name)` — **EN:** Assigns a value to top_module_name. **CN:** 将一个值赋给 top_module_name。
+- **L784** `        import_stmts = []` — **EN:** Assigns a value to import_stmts. **CN:** 将一个值赋给 import_stmts。
+- **L785** `        if self.session_data.import_top_module:` — **EN:** Starts a conditional branch guarded by `self.session_data.import_top_module`. **CN:** 开始一个由 `self.session_data.import_top_module` 控制的条件分支。
+- **L786** `            import_stmts.append(` — **EN:** Invokes `import_stmts.append` as a standalone call. **CN:** 以独立语句方式调用 `import_stmts.append`。
+- **L787** `                ast.Import(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** `                    names=[ast.alias(name=top_module_name, asname="__module_dsl__")]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L789** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `        import_stmts.append(` — **EN:** Invokes `import_stmts.append` as a standalone call. **CN:** 以独立语句方式调用 `import_stmts.append`。
+- **L792** `            ast.Import(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L793** `                names=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L794** `                    ast.alias(name=f"{top_module_name}.base_dsl", asname="__base_dsl__")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L795** `                ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L796** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L797** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L798** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L799** `        assert len(transformed_tree.body) == 1` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L800** `        assert isinstance(transformed_tree.body[0], ast.FunctionDef)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L801** `        transformed_tree.body[0].body = import_stmts + transformed_tree.body[0].body` — **EN:** Assigns a value to transformed_tree.body[0].body. **CN:** 将一个值赋给 transformed_tree.body[0].body。
+- **L802** `        # Remove all decorators from top level function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L803** `        transformed_tree.body[0].decorator_list = []` — **EN:** Assigns a value to transformed_tree.body[0].decorator_list. **CN:** 将一个值赋给 transformed_tree.body[0].decorator_list。
+- **L804** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L805** `        # Step 4. Wrap the function with nonlocal captures, if has any` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L806** `        # if the function has a nonlocal variable, wrap it in a function and return the function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L807** `        # pseudo code:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L808** `        # def foo():` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L809** `        #      nonlocal_var_0 = None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L810** `        #      nonlocal_var_1 = None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L811** `        #      def foo(args):` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L812** `        #          ...` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L813** `        #      return foo` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L814** `        # foo = foo()` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L815** `        nonlocals = {v: None for v in function_pointer.__code__.co_freevars}` — **EN:** Assigns a value to nonlocals. **CN:** 将一个值赋给 nonlocals。
+- **L816** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L817** `        if len(nonlocals) > 0:` — **EN:** Starts a conditional branch guarded by `len(nonlocals) > 0`. **CN:** 开始一个由 `len(nonlocals) > 0` 控制的条件分支。
+- **L818** `            assignments = []` — **EN:** Assigns a value to assignments. **CN:** 将一个值赋给 assignments。
+- **L819** `            for n, _ in nonlocals.items():` — **EN:** Starts a loop assigning items from `nonlocals.items()` to `(n, _)`. **CN:** 开始一个循环，将 `nonlocals.items()` 的元素赋给 `(n, _)`。
+- **L820** `                assignments.append(` — **EN:** Invokes `assignments.append` as a standalone call. **CN:** 以独立语句方式调用 `assignments.append`。
+- **L821** `                    ast.Assign(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L822** `                        targets=[ast.Name(id=n, ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** `                        value=ast.Constant(value=None),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L825** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L827** `            return_expr = [ast.Return(value=ast.Name(id=func_name, ctx=ast.Load()))]` — **EN:** Assigns a value to return_expr. **CN:** 将一个值赋给 return_expr。
+- **L828** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L829** `            wrapper_fcn = ast.FunctionDef(` — **EN:** Assigns a value to wrapper_fcn. **CN:** 将一个值赋给 wrapper_fcn。
+- **L830** `                name=func_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L831** `                args=ast.arguments(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L832** `                    posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L833** `                    args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L834** `                    kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L835** `                    kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L836** `                    defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L837** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L838** `                body=assignments + transformed_tree.body + return_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L839** `                decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L840** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L841** `            invoke = ast.Call(` — **EN:** Assigns a value to invoke. **CN:** 将一个值赋给 invoke。
+- **L842** `                func=ast.Name(id=func_name, ctx=ast.Load()), args=[], keywords=[]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L844** `            assign = ast.Assign(` — **EN:** Assigns a value to assign. **CN:** 将一个值赋给 assign。
+- **L845** `                targets=[ast.Name(id=func_name, ctx=ast.Store())], value=invoke` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L846** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L847** `            transformed_tree.body = [wrapper_fcn, assign]` — **EN:** Assigns a value to transformed_tree.body. **CN:** 将一个值赋给 transformed_tree.body。
+- **L848** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L849** `        # Step 4. Import cutlass and base_dsl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L850** `        ast.fix_missing_locations(transformed_tree)` — **EN:** Invokes `ast.fix_missing_locations` as a standalone call. **CN:** 以独立语句方式调用 `ast.fix_missing_locations`。
+- **L851** `        combined_body = transformed_tree.body` — **EN:** Assigns a value to combined_body. **CN:** 将一个值赋给 combined_body。
+- **L852** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L853** `        # Step 5. Return the transformed tree` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L854** `        return combined_body` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L855** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L856** `    def check_early_exit(self, tree: ast.AST, kind: str) -> None:` — **EN:** Defines function `check_early_exit`. **CN:** 定义函数 `check_early_exit`。
+- **L857** `        """` — **EN:** Starts the docstring for the function `check_early_exit`. **CN:** 开始说明 function `check_early_exit` 的文档字符串。
+- **L858** `        Checks if a given region or scope in the provided Python code has early exits.` — **EN:** Continues the docstring for the function `check_early_exit`. **CN:** 继续说明 function `check_early_exit` 的文档字符串。
+- **L859** `        """` — **EN:** Ends the docstring for the function `check_early_exit`. **CN:** 结束说明 function `check_early_exit` 的文档字符串。
+- **L860** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L861** `        class EarlyExitChecker(ast.NodeVisitor):` — **EN:** Defines class `EarlyExitChecker` with bases ast.NodeVisitor. **CN:** 定义类 `EarlyExitChecker`，其基类为 ast.NodeVisitor。
+- **L862** `            def __init__(self, kind: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L863** `                self.has_early_exit = False` — **EN:** Assigns a value to self.has_early_exit. **CN:** 将一个值赋给 self.has_early_exit。
+- **L864** `                self.early_exit_node: ast.AST | None = None` — **EN:** Assigns a typed value to self.early_exit_node. **CN:** 为 self.early_exit_node 赋予带类型标注的值。
+- **L865** `                self.early_exit_type: str | None = None` — **EN:** Assigns a typed value to self.early_exit_type. **CN:** 为 self.early_exit_type 赋予带类型标注的值。
+- **L866** `                self.kind = kind` — **EN:** Assigns a value to self.kind. **CN:** 将一个值赋给 self.kind。
+- **L867** `                self.loop_nest_level = 0` — **EN:** Assigns a value to self.loop_nest_level. **CN:** 将一个值赋给 self.loop_nest_level。
+- **L868** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L869** `            def visit_Return(self, node: ast.Return) -> None:` — **EN:** Defines function `visit_Return`. **CN:** 定义函数 `visit_Return`。
+- **L870** `                self.has_early_exit = True` — **EN:** Assigns a value to self.has_early_exit. **CN:** 将一个值赋给 self.has_early_exit。
+- **L871** `                self.early_exit_node = node` — **EN:** Assigns a value to self.early_exit_node. **CN:** 将一个值赋给 self.early_exit_node。
+- **L872** `                self.early_exit_type = "return"` — **EN:** Assigns a value to self.early_exit_type. **CN:** 将一个值赋给 self.early_exit_type。
+- **L873** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L874** `            def visit_Raise(self, node: ast.Raise) -> None:` — **EN:** Defines function `visit_Raise`. **CN:** 定义函数 `visit_Raise`。
+- **L875** `                self.has_early_exit = True` — **EN:** Assigns a value to self.has_early_exit. **CN:** 将一个值赋给 self.has_early_exit。
+- **L876** `                self.early_exit_node = node` — **EN:** Assigns a value to self.early_exit_node. **CN:** 将一个值赋给 self.early_exit_node。
+- **L877** `                self.early_exit_type = "raise"` — **EN:** Assigns a value to self.early_exit_type. **CN:** 将一个值赋给 self.early_exit_type。
+- **L878** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L879** `            def visit_Break(self, node: ast.Break) -> None:` — **EN:** Defines function `visit_Break`. **CN:** 定义函数 `visit_Break`。
+- **L880** `                # For break/continue in inner loops, we don't consider it as early exit` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L881** `                if self.loop_nest_level == 0 and self.kind != "if":` — **EN:** Starts a conditional branch guarded by `self.loop_nest_level == 0 and self.kind != 'if'`. **CN:** 开始一个由 `self.loop_nest_level == 0 and self.kind != 'if'` 控制的条件分支。
+- **L882** `                    self.has_early_exit = True` — **EN:** Assigns a value to self.has_early_exit. **CN:** 将一个值赋给 self.has_early_exit。
+- **L883** `                    self.early_exit_node = node` — **EN:** Assigns a value to self.early_exit_node. **CN:** 将一个值赋给 self.early_exit_node。
+- **L884** `                    self.early_exit_type = "break"` — **EN:** Assigns a value to self.early_exit_type. **CN:** 将一个值赋给 self.early_exit_type。
+- **L885** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L886** `            def visit_Continue(self, node: ast.Continue) -> None:` — **EN:** Defines function `visit_Continue`. **CN:** 定义函数 `visit_Continue`。
+- **L887** `                if self.loop_nest_level == 0 and self.kind != "if":` — **EN:** Starts a conditional branch guarded by `self.loop_nest_level == 0 and self.kind != 'if'`. **CN:** 开始一个由 `self.loop_nest_level == 0 and self.kind != 'if'` 控制的条件分支。
+- **L888** `                    self.has_early_exit = True` — **EN:** Assigns a value to self.has_early_exit. **CN:** 将一个值赋给 self.has_early_exit。
+- **L889** `                    self.early_exit_node = node` — **EN:** Assigns a value to self.early_exit_node. **CN:** 将一个值赋给 self.early_exit_node。
+- **L890** `                    self.early_exit_type = "continue"` — **EN:** Assigns a value to self.early_exit_type. **CN:** 将一个值赋给 self.early_exit_type。
+- **L891** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L892** `            def visit_For(self, node: ast.For) -> None:` — **EN:** Defines function `visit_For`. **CN:** 定义函数 `visit_For`。
+- **L893** `                self.loop_nest_level += 1` — **EN:** Updates self.loop_nest_level in place. **CN:** 原地更新 self.loop_nest_level。
+- **L894** `                self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L895** `                self.loop_nest_level -= 1` — **EN:** Updates self.loop_nest_level in place. **CN:** 原地更新 self.loop_nest_level。
+- **L896** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L897** `            def visit_While(self, node: ast.While) -> None:` — **EN:** Defines function `visit_While`. **CN:** 定义函数 `visit_While`。
+- **L898** `                self.loop_nest_level += 1` — **EN:** Updates self.loop_nest_level in place. **CN:** 原地更新 self.loop_nest_level。
+- **L899** `                self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L900** `                self.loop_nest_level -= 1` — **EN:** Updates self.loop_nest_level in place. **CN:** 原地更新 self.loop_nest_level。
+- **L901** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L902** `            def visit_FunctionDef(self, node: ast.FunctionDef) -> None:` — **EN:** Defines function `visit_FunctionDef`. **CN:** 定义函数 `visit_FunctionDef`。
+- **L903** `                # Stop at nested function def` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L904** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L905** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L906** `        checker = EarlyExitChecker(kind)` — **EN:** Assigns a value to checker. **CN:** 将一个值赋给 checker。
+- **L907** `        checker.generic_visit(tree)` — **EN:** Invokes `checker.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `checker.generic_visit`。
+- **L908** `        if not checker.has_early_exit:` — **EN:** Starts a conditional branch guarded by `not checker.has_early_exit`. **CN:** 开始一个由 `not checker.has_early_exit` 控制的条件分支。
+- **L909** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L910** `        raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L911** `            message=f"Early exit ({checker.early_exit_type}) is not allowed in \`{self.session_data.function_name}\`"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L912** `            + (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L913** `                f" in \`{self.session_data.class_name}\`"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L914** `                if self.session_data.class_name` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L915** `                else ""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L916** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L917** `            filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L918** `            snippet=ast.unparse(tree),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L919** `            suggestion=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L920** `                "If predicates are constant expression, write like "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L921** `                "\`if const_expr(...)\` or \`for ... in range_constexpr(...)\`. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L922** `                "In that case, early exit will be executed by Python "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L923** `                "interpreter, so it's supported."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L924** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L925** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L926** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L927** `    def is_node_constexpr(self, node: ast.If | ast.While) -> bool:` — **EN:** Defines function `is_node_constexpr`. **CN:** 定义函数 `is_node_constexpr`。
+- **L928** `        """` — **EN:** Starts the docstring for the function `is_node_constexpr`. **CN:** 开始说明 function `is_node_constexpr` 的文档字符串。
+- **L929** `        Determines if the node is a constexpr.` — **EN:** Continues the docstring for the function `is_node_constexpr`. **CN:** 继续说明 function `is_node_constexpr` 的文档字符串。
+- **L930** `        Supported nodes are if, while statements.` — **EN:** Continues the docstring for the function `is_node_constexpr`. **CN:** 继续说明 function `is_node_constexpr` 的文档字符串。
+- **L931** `        """` — **EN:** Ends the docstring for the function `is_node_constexpr`. **CN:** 结束说明 function `is_node_constexpr` 的文档字符串。
+- **L932** `        if isinstance(node, ast.If) or isinstance(node, ast.While):` — **EN:** Starts a conditional branch guarded by `isinstance(node, ast.If) or isinstance(node, ast.While)`. **CN:** 开始一个由 `isinstance(node, ast.If) or isinstance(node, ast.While)` 控制的条件分支。
+- **L933** `            if isinstance(node.test, ast.Call):` — **EN:** Starts a conditional branch guarded by `isinstance(node.test, ast.Call)`. **CN:** 开始一个由 `isinstance(node.test, ast.Call)` 控制的条件分支。
+- **L934** `                func = node.test.func` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L935** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L936** `                if (` — **EN:** Starts a conditional branch guarded by `isinstance(func, ast.Attribute) and func.attr in self.CON...`. **CN:** 开始一个由 `isinstance(func, ast.Attribute) and func.attr in self.CON...` 控制的条件分支。
+- **L937** `                    isinstance(func, ast.Attribute)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L938** `                    and func.attr in self.CONST_EXPR_NAME` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L939** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L940** `                    return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L941** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L942** `                elif isinstance(func, ast.Name) and func.id in self.CONST_EXPR_NAME:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L943** `                    return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L944** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L945** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L946** `    def _get_range_kind(` — **EN:** Defines function `_get_range_kind`. **CN:** 定义函数 `_get_range_kind`。
+- **L947** `        self, iter_node: ast.expr` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L948** `    ) -> tuple[str | None, bool | None, bool | None]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L949** `        """` — **EN:** Starts the docstring for the function `_get_range_kind`. **CN:** 开始说明 function `_get_range_kind` 的文档字符串。
+- **L950** `        Return "range", "range_dynamic", "range_constexpr" or None for the iterable` — **EN:** Continues the docstring for the function `_get_range_kind`. **CN:** 继续说明 function `_get_range_kind` 的文档字符串。
+- **L951** `        """` — **EN:** Ends the docstring for the function `_get_range_kind`. **CN:** 结束说明 function `_get_range_kind` 的文档字符串。
+- **L952** `        if isinstance(iter_node, ast.Call):` — **EN:** Starts a conditional branch guarded by `isinstance(iter_node, ast.Call)`. **CN:** 开始一个由 `isinstance(iter_node, ast.Call)` 控制的条件分支。
+- **L953** `            func = iter_node.func` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L954** `            if (` — **EN:** Starts a conditional branch guarded by `isinstance(func, ast.Name) and func.id in self.SUPPORTED_...`. **CN:** 开始一个由 `isinstance(func, ast.Name) and func.id in self.SUPPORTED_...` 控制的条件分支。
+- **L955** `                isinstance(func, ast.Name)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L956** `                and func.id in self.SUPPORTED_FOR_RANGE_STATEMENTS` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L957** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L958** `                return func.id, True, len(iter_node.keywords) != 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L959** `            if (` — **EN:** Starts a conditional branch guarded by `isinstance(func, ast.Attribute) and func.attr in self.SUP...`. **CN:** 开始一个由 `isinstance(func, ast.Attribute) and func.attr in self.SUP...` 控制的条件分支。
+- **L960** `                isinstance(func, ast.Attribute)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L961** `                and func.attr in self.SUPPORTED_FOR_RANGE_STATEMENTS` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L962** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L963** `                return func.attr, False, len(iter_node.keywords) != 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L964** `        return None, None, None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L965** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L966** `    def transform(` — **EN:** Defines function `transform`. **CN:** 定义函数 `transform`。
+- **L967** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L968** `        original_function: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L969** `        exec_globals: dict[str, Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L970** `        callee_rewrite: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L971** `    ) -> ast.Module:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L972** `        """` — **EN:** Starts the docstring for the function `transform`. **CN:** 开始说明 function `transform` 的文档字符串。
+- **L973** `        Transforms the provided function using the preprocessor.` — **EN:** Continues the docstring for the function `transform`. **CN:** 继续说明 function `transform` 的文档字符串。
+- **L974** `        Requires an active DSL preprocessor session.` — **EN:** Continues the docstring for the function `transform`. **CN:** 继续说明 function `transform` 的文档字符串。
+- **L975** `        """` — **EN:** Ends the docstring for the function `transform`. **CN:** 结束说明 function `transform` 的文档字符串。
+- **L976** `        self.session_data.file_name = (` — **EN:** Assigns a value to self.session_data.file_name. **CN:** 将一个值赋给 self.session_data.file_name。
+- **L977** `            inspect.getsourcefile(original_function) or "<unknown>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L978** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L979** `        self.session_data.function_globals = exec_globals` — **EN:** Assigns a value to self.session_data.function_globals. **CN:** 将一个值赋给 self.session_data.function_globals。
+- **L980** `        transformed_tree = self.transform_function(` — **EN:** Assigns a value to transformed_tree. **CN:** 将一个值赋给 transformed_tree。
+- **L981** `            original_function.__name__, original_function` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L982** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L983** `        self.session_data.function_globals = None` — **EN:** Assigns a value to self.session_data.function_globals. **CN:** 将一个值赋给 self.session_data.function_globals。
+- **L984** `        unified_tree = ast.Module(body=transformed_tree, type_ignores=[])` — **EN:** Assigns a value to unified_tree. **CN:** 将一个值赋给 unified_tree。
+- **L985** `        unified_tree = ast.fix_missing_locations(unified_tree)` — **EN:** Assigns a value to unified_tree. **CN:** 将一个值赋给 unified_tree。
+- **L986** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L987** `        return unified_tree` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L988** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L989** `    def analyze_region_variables(` — **EN:** Defines function `analyze_region_variables`. **CN:** 定义函数 `analyze_region_variables`。
+- **L990** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L991** `        node: ast.For | ast.If | ast.While,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L992** `        active_symbols: list[set[str]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L993** `        active_callables: list[set[str]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L994** `    ) -> tuple[list[str], int, list[str]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L995** `        """` — **EN:** Starts the docstring for the function `analyze_region_variables`. **CN:** 开始说明 function `analyze_region_variables` 的文档字符串。
+- **L996** `        Analyze variables in different code regions to identify read-only, write-only,` — **EN:** Continues the docstring for the function `analyze_region_variables`. **CN:** 继续说明 function `analyze_region_variables` 的文档字符串。
+- **L997** `        and active variables for DSL constructs.` — **EN:** Continues the docstring for the function `analyze_region_variables`. **CN:** 继续说明 function `analyze_region_variables` 的文档字符串。
+- **L998** `        """` — **EN:** Ends the docstring for the function `analyze_region_variables`. **CN:** 结束说明 function `analyze_region_variables` 的文档字符串。
+- **L999** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1000** `        # we need orderedset to keep the insertion order the same. otherwise generated IR is different each time` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1001** `        write_args = OrderedSet()` — **EN:** Assigns a value to write_args. **CN:** 将一个值赋给 write_args。
+- **L1002** `        invoked_args = OrderedSet()` — **EN:** Assigns a value to invoked_args. **CN:** 将一个值赋给 invoked_args。
+- **L1003** `        called_functions = OrderedSet()` — **EN:** Assigns a value to called_functions. **CN:** 将一个值赋给 called_functions。
+- **L1004** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1005** `        class RegionAnalyzer(ast.NodeVisitor):` — **EN:** Defines class `RegionAnalyzer` with bases ast.NodeVisitor. **CN:** 定义类 `RegionAnalyzer`，其基类为 ast.NodeVisitor。
+- **L1006** `            force_store = False` — **EN:** Assigns a value to force_store. **CN:** 将一个值赋给 force_store。
+- **L1007** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1008** `            def visit_Name(self, node: ast.Name) -> None:` — **EN:** Defines function `visit_Name`. **CN:** 定义函数 `visit_Name`。
+- **L1009** `                """` — **EN:** Starts the docstring for the function `visit_Name`. **CN:** 开始说明 function `visit_Name` 的文档字符串。
+- **L1010** `                Mark every store as write.` — **EN:** Continues the docstring for the function `visit_Name`. **CN:** 继续说明 function `visit_Name` 的文档字符串。
+- **L1011** `                """` — **EN:** Ends the docstring for the function `visit_Name`. **CN:** 结束说明 function `visit_Name` 的文档字符串。
+- **L1012** `                if isinstance(node.ctx, ast.Store) or self.force_store:` — **EN:** Starts a conditional branch guarded by `isinstance(node.ctx, ast.Store) or self.force_store`. **CN:** 开始一个由 `isinstance(node.ctx, ast.Store) or self.force_store` 控制的条件分支。
+- **L1013** `                    write_args.add(node.id)` — **EN:** Invokes `write_args.add` as a standalone call. **CN:** 以独立语句方式调用 `write_args.add`。
+- **L1014** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1015** `            def visit_Subscript(self, node: ast.Subscript) -> None:` — **EN:** Defines function `visit_Subscript`. **CN:** 定义函数 `visit_Subscript`。
+- **L1016** `                # When subscript occurs on the lhs of an assignment, the \`Name\` is still a load, but \`Subscript\` is marked as \`Store\`.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1017** `                # We need to force the store for the \`Name\` to be marked as write.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1018** `                if isinstance(node.ctx, ast.Store):` — **EN:** Starts a conditional branch guarded by `isinstance(node.ctx, ast.Store)`. **CN:** 开始一个由 `isinstance(node.ctx, ast.Store)` 控制的条件分支。
+- **L1019** `                    self.force_store = True` — **EN:** Assigns a value to self.force_store. **CN:** 将一个值赋给 self.force_store。
+- **L1020** `                    self.visit(node.value)` — **EN:** Invokes `self.visit` as a standalone call. **CN:** 以独立语句方式调用 `self.visit`。
+- **L1021** `                    self.force_store = False` — **EN:** Assigns a value to self.force_store. **CN:** 将一个值赋给 self.force_store。
+- **L1022** `                    self.visit(node.slice)` — **EN:** Invokes `self.visit` as a standalone call. **CN:** 以独立语句方式调用 `self.visit`。
+- **L1023** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1024** `                    self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1025** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1026** `            def visit_Assign(self, node: ast.Assign) -> None:` — **EN:** Defines function `visit_Assign`. **CN:** 定义函数 `visit_Assign`。
+- **L1027** `                self.force_store = True` — **EN:** Assigns a value to self.force_store. **CN:** 将一个值赋给 self.force_store。
+- **L1028** `                [self.visit(target) for target in node.targets]` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L1029** `                self.force_store = False` — **EN:** Assigns a value to self.force_store. **CN:** 将一个值赋给 self.force_store。
+- **L1030** `                self.visit(node.value)` — **EN:** Invokes `self.visit` as a standalone call. **CN:** 以独立语句方式调用 `self.visit`。
+- **L1031** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1032** `            def visit_AugAssign(self, node: ast.AugAssign) -> None:` — **EN:** Defines function `visit_AugAssign`. **CN:** 定义函数 `visit_AugAssign`。
+- **L1033** `                self.force_store = True` — **EN:** Assigns a value to self.force_store. **CN:** 将一个值赋给 self.force_store。
+- **L1034** `                self.visit(node.target)` — **EN:** Invokes `self.visit` as a standalone call. **CN:** 以独立语句方式调用 `self.visit`。
+- **L1035** `                self.force_store = False` — **EN:** Assigns a value to self.force_store. **CN:** 将一个值赋给 self.force_store。
+- **L1036** `                self.visit(node.value)` — **EN:** Invokes `self.visit` as a standalone call. **CN:** 以独立语句方式调用 `self.visit`。
+- **L1037** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1038** `            @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1039** `            def get_call_base(func_node: ast.expr) -> str | None:` — **EN:** Defines function `get_call_base`. **CN:** 定义函数 `get_call_base`。
+- **L1040** `                # If the .value is another Attribute, keep digging` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1041** `                if isinstance(func_node, ast.Attribute):` — **EN:** Starts a conditional branch guarded by `isinstance(func_node, ast.Attribute)`. **CN:** 开始一个由 `isinstance(func_node, ast.Attribute)` 控制的条件分支。
+- **L1042** `                    if isinstance(func_node.value, ast.Attribute):` — **EN:** Starts a conditional branch guarded by `isinstance(func_node.value, ast.Attribute)`. **CN:** 开始一个由 `isinstance(func_node.value, ast.Attribute)` 控制的条件分支。
+- **L1043** `                        return RegionAnalyzer.get_call_base(func_node.value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1044** `                    # If the .value is a Name, that's our base` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1045** `                    elif isinstance(func_node.value, ast.Name):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1046** `                        return func_node.value.id` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1047** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1048** `                        # Could be something else (lambda, call, etc.)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1049** `                        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1050** `                elif isinstance(func_node, ast.Name):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1051** `                    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1052** `                return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1053** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1054** `            @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1055** `            def get_function_name(func_node: ast.Call) -> str | None:` — **EN:** Defines function `get_function_name`. **CN:** 定义函数 `get_function_name`。
+- **L1056** `                if isinstance(func_node.func, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(func_node.func, ast.Name)`. **CN:** 开始一个由 `isinstance(func_node.func, ast.Name)` 控制的条件分支。
+- **L1057** `                    function_name = func_node.func.id` — **EN:** Assigns a value to function_name. **CN:** 将一个值赋给 function_name。
+- **L1058** `                # Check if it's a method or attribute call` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1059** `                elif isinstance(func_node.func, ast.Attribute):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1060** `                    function_name = func_node.func.attr` — **EN:** Assigns a value to function_name. **CN:** 将一个值赋给 function_name。
+- **L1061** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1062** `                    function_name = None` — **EN:** Assigns a value to function_name. **CN:** 将一个值赋给 function_name。
+- **L1063** `                return function_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1064** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1065** `            def visit_Call(self, node: ast.Call) -> None:` — **EN:** Defines function `visit_Call`. **CN:** 定义函数 `visit_Call`。
+- **L1066** `                base_name = RegionAnalyzer.get_call_base(node.func)` — **EN:** Assigns a value to base_name. **CN:** 将一个值赋给 base_name。
+- **L1067** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1068** `                if isinstance(node.func, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(node.func, ast.Name)`. **CN:** 开始一个由 `isinstance(node.func, ast.Name)` 控制的条件分支。
+- **L1069** `                    func_name = node.func.id` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L1070** `                    called_functions.add(func_name)` — **EN:** Invokes `called_functions.add` as a standalone call. **CN:** 以独立语句方式调用 `called_functions.add`。
+- **L1071** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1072** `                # Classes are mutable by default. Mark them as write. If they are` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1073** `                # dataclass(frozen=True), treat them as read in runtime.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1074** `                if base_name is not None and base_name not in ("self"):` — **EN:** Starts a conditional branch guarded by `base_name is not None and base_name not in 'self'`. **CN:** 开始一个由 `base_name is not None and base_name not in 'self'` 控制的条件分支。
+- **L1075** `                    invoked_args.add(base_name)` — **EN:** Invokes `invoked_args.add` as a standalone call. **CN:** 以独立语句方式调用 `invoked_args.add`。
+- **L1076** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1077** `                self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1078** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1079** `        analyzer = RegionAnalyzer()` — **EN:** Assigns a value to analyzer. **CN:** 将一个值赋给 analyzer。
+- **L1080** `        analyzer.visit(ast.Module(body=node.body, type_ignores=[]))` — **EN:** Invokes `analyzer.visit` as a standalone call. **CN:** 以独立语句方式调用 `analyzer.visit`。
+- **L1081** `        if node.orelse:` — **EN:** Starts a conditional branch guarded by `node.orelse`. **CN:** 开始一个由 `node.orelse` 控制的条件分支。
+- **L1082** `            analyzer.visit(ast.Module(body=node.orelse, type_ignores=[]))` — **EN:** Invokes `analyzer.visit` as a standalone call. **CN:** 以独立语句方式调用 `analyzer.visit`。
+- **L1083** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1084** `        # While's loop condition is executed n times, as loop body` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1085** `        # So collect the variables used in the loop condition` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1086** `        if isinstance(node, ast.While):` — **EN:** Starts a conditional branch guarded by `isinstance(node, ast.While)`. **CN:** 开始一个由 `isinstance(node, ast.While)` 控制的条件分支。
+- **L1087** `            analyzer.visit(ast.Module(body=node.test, type_ignores=[]))  # type: ignore[arg-type]` — **EN:** Invokes `analyzer.visit` as a standalone call. **CN:** 以独立语句方式调用 `analyzer.visit`。
+- **L1088** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1089** `        # If arg is both write and invoke, remove from invoked_args` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1090** `        invoked_args = invoked_args - write_args` — **EN:** Assigns a value to invoked_args. **CN:** 将一个值赋给 invoked_args。
+- **L1091** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1092** `        write_args_list: list[str] = list(write_args.intersections(active_symbols))` — **EN:** Assigns a typed value to write_args_list. **CN:** 为 write_args_list 赋予带类型标注的值。
+- **L1093** `        invoked_args_list: list[str] = list(invoked_args.intersections(active_symbols))` — **EN:** Assigns a typed value to invoked_args_list. **CN:** 为 invoked_args_list 赋予带类型标注的值。
+- **L1094** `        called_functions_list: list[str] = list(` — **EN:** Assigns a typed value to called_functions_list. **CN:** 为 called_functions_list 赋予带类型标注的值。
+- **L1095** `            called_functions.intersections(active_callables)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1096** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1097** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1098** `            write_args_list + invoked_args_list,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1099** `            len(write_args_list),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1100** `            called_functions_list,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1101** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1103** `    def extract_range_args(` — **EN:** Defines function `extract_range_args`. **CN:** 定义函数 `extract_range_args`。
+- **L1104** `        self, iter_node: ast.Call` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1105** `    ) -> tuple[ast.expr, ast.expr, ast.expr, bool]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1106** `        args = iter_node.args` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L1107** `        if len(args) == 1:` — **EN:** Starts a conditional branch guarded by `len(args) == 1`. **CN:** 开始一个由 `len(args) == 1` 控制的条件分支。
+- **L1108** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1109** `                self.visit(ast.Constant(value=0)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1110** `                self.visit(args[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1111** `                self.visit(ast.Constant(value=1)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1112** `                False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1113** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1114** `        elif len(args) == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1115** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1116** `                self.visit(args[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1117** `                self.visit(args[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1118** `                self.visit(ast.Constant(value=1)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1119** `                False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1120** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1121** `        elif len(args) == 3:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1122** `            return self.visit(args[0]), self.visit(args[1]), self.visit(args[2]), True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1123** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1124** `            raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1125** `                "Unsupported number of arguments in range",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1126** `                filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1127** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1129** `    def extract_unroll_args(self, iter_node: ast.Call) -> tuple[ast.expr, ast.expr]:` — **EN:** Defines function `extract_unroll_args`. **CN:** 定义函数 `extract_unroll_args`。
+- **L1130** `        keywords = {kw.arg: kw.value for kw in iter_node.keywords}` — **EN:** Assigns a value to keywords. **CN:** 将一个值赋给 keywords。
+- **L1131** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1132** `            keywords.get("unroll", ast.Constant(value=-1)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1133** `            keywords.get("unroll_full", ast.Constant(value=False)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1134** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1136** `    def issue_deprecation_warning(` — **EN:** Defines function `issue_deprecation_warning`. **CN:** 定义函数 `issue_deprecation_warning`。
+- **L1137** `        self, *, message: str, category: type[Warning], filename: str, lineno: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1138** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1139** `        warnings.simplefilter("always", category)  # turn off filter` — **EN:** Invokes `warnings.simplefilter` as a standalone call. **CN:** 以独立语句方式调用 `warnings.simplefilter`。
+- **L1140** `        warnings.warn_explicit(` — **EN:** Invokes `warnings.warn_explicit` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn_explicit`。
+- **L1141** `            message, category=category, filename=filename, lineno=lineno` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1142** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1143** `        warnings.simplefilter("default", category)  # reset filter` — **EN:** Invokes `warnings.simplefilter` as a standalone call. **CN:** 以独立语句方式调用 `warnings.simplefilter`。
+- **L1144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1145** `    def extract_prefetch_stages_args(self, iter_node: ast.Call) -> ast.expr:` — **EN:** Defines function `extract_prefetch_stages_args`. **CN:** 定义函数 `extract_prefetch_stages_args`。
+- **L1146** `        keywords = {kw.arg: kw.value for kw in iter_node.keywords}` — **EN:** Assigns a value to keywords. **CN:** 将一个值赋给 keywords。
+- **L1147** `        if "pipelining" in keywords:` — **EN:** Starts a conditional branch guarded by `'pipelining' in keywords`. **CN:** 开始一个由 `'pipelining' in keywords` 控制的条件分支。
+- **L1148** `            self.issue_deprecation_warning(` — **EN:** Invokes `self.issue_deprecation_warning` as a standalone call. **CN:** 以独立语句方式调用 `self.issue_deprecation_warning`。
+- **L1149** `                message="pipelining is deprecated, use prefetch_stages instead",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1150** `                category=DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1151** `                filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1152** `                lineno=iter_node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1153** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1154** `            return keywords.get("pipelining", ast.Constant(value=None))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1155** `        return keywords.get("prefetch_stages", ast.Constant(value=None))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1157** `    def extract_vectorize_args(self, iter_node: ast.Call) -> ast.expr:` — **EN:** Defines function `extract_vectorize_args`. **CN:** 定义函数 `extract_vectorize_args`。
+- **L1158** `        keywords = {kw.arg: kw.value for kw in iter_node.keywords}` — **EN:** Assigns a value to keywords. **CN:** 将一个值赋给 keywords。
+- **L1159** `        return keywords.get("vectorize", ast.Constant(value=None))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1161** `    def extract_at_least_once_args(self, iter_node: ast.Call) -> ast.expr:` — **EN:** Defines function `extract_at_least_once_args`. **CN:** 定义函数 `extract_at_least_once_args`。
+- **L1162** `        keywords = {kw.arg: kw.value for kw in iter_node.keywords}` — **EN:** Assigns a value to keywords. **CN:** 将一个值赋给 keywords。
+- **L1163** `        return keywords.get("at_least_once", ast.Constant(value=False))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1165** `    def create_loop_function(` — **EN:** Defines function `create_loop_function`. **CN:** 定义函数 `create_loop_function`。
+- **L1166** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1167** `        func_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1168** `        node: ast.For,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1169** `        start: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1170** `        stop: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1171** `        step: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1172** `        unroll: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1173** `        unroll_full: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1174** `        prefetch_stages: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1175** `        vectorize: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1176** `        at_least_once: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1177** `        write_args: list[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1178** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1179** `    ) -> ast.FunctionDef:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1180** `        """` — **EN:** Starts the docstring for the function `create_loop_function`. **CN:** 开始说明 function `create_loop_function` 的文档字符串。
+- **L1181** `        Creates a loop body function with the \`loop_selector\` decorator.` — **EN:** Continues the docstring for the function `create_loop_function`. **CN:** 继续说明 function `create_loop_function` 的文档字符串。
+- **L1182** `        """` — **EN:** Ends the docstring for the function `create_loop_function`. **CN:** 结束说明 function `create_loop_function` 的文档字符串。
+- **L1183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1184** `        assert isinstance(node.target, ast.Name)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1185** `        func_args = [ast.arg(arg=node.target.id, annotation=None)]` — **EN:** Assigns a value to func_args. **CN:** 将一个值赋给 func_args。
+- **L1186** `        func_args += [ast.arg(arg=var, annotation=None) for var in write_args]` — **EN:** Updates func_args in place. **CN:** 原地更新 func_args。
+- **L1187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1188** `        # Create the loop body` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1189** `        transformed_body: list[ast.stmt] = []` — **EN:** Assigns a typed value to transformed_body. **CN:** 为 transformed_body 赋予带类型标注的值。
+- **L1190** `        with Region(self.session_data, new_value=transformed_body):` — **EN:** Starts a context-managed block using Region(self.session_data, new_value=transformed_body). **CN:** 开始一个使用 Region(self.session_data, new_value=transformed_body) 的上下文管理代码块。
+- **L1191** `            for stmt in node.body:` — **EN:** Starts a loop assigning items from `node.body` to `stmt`. **CN:** 开始一个循环，将 `node.body` 的元素赋给 `stmt`。
+- **L1192** `                transformed_stmt = self.visit(` — **EN:** Assigns a value to transformed_stmt. **CN:** 将一个值赋给 transformed_stmt。
+- **L1193** `                    stmt` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1194** `                )  # Recursively visit inner statements` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1195** `                if isinstance(transformed_stmt, list):` — **EN:** Starts a conditional branch guarded by `isinstance(transformed_stmt, list)`. **CN:** 开始一个由 `isinstance(transformed_stmt, list)` 控制的条件分支。
+- **L1196** `                    transformed_body.extend(transformed_stmt)` — **EN:** Invokes `transformed_body.extend` as a standalone call. **CN:** 以独立语句方式调用 `transformed_body.extend`。
+- **L1197** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1198** `                    transformed_body.append(transformed_stmt)` — **EN:** Invokes `transformed_body.append` as a standalone call. **CN:** 以独立语句方式调用 `transformed_body.append`。
+- **L1199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1200** `        # Handle the return for a single iterated argument correctly` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1201** `        if len(write_args) == 0:` — **EN:** Starts a conditional branch guarded by `len(write_args) == 0`. **CN:** 开始一个由 `len(write_args) == 0` 控制的条件分支。
+- **L1202** `            transformed_body.append(ast.Return())` — **EN:** Invokes `transformed_body.append` as a standalone call. **CN:** 以独立语句方式调用 `transformed_body.append`。
+- **L1203** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1204** `            transformed_body.append(` — **EN:** Invokes `transformed_body.append` as a standalone call. **CN:** 以独立语句方式调用 `transformed_body.append`。
+- **L1205** `                ast.Return(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1206** `                    value=ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1207** `                        elts=[ast.Name(id=var, ctx=ast.Load()) for var in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1208** `                        ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1209** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1210** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1211** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1213** `        # Define the decorator with parameters` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1214** `        decorator = ast.copy_location(` — **EN:** Assigns a value to decorator. **CN:** 将一个值赋给 decorator。
+- **L1215** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1216** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1217** `                    self.DECORATOR_FOR_STATEMENT,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1218** `                    lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1219** `                    col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1220** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1221** `                args=[start, stop, step],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1222** `                keywords=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1223** `                    ast.keyword(arg="unroll", value=unroll),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1224** `                    ast.keyword(arg="unroll_full", value=unroll_full),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1225** `                    ast.keyword(arg="prefetch_stages", value=prefetch_stages),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1226** `                    ast.keyword(arg="vectorize", value=vectorize),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1227** `                    ast.keyword(arg="at_least_once", value=at_least_once),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1228** `                    ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1229** `                        arg="write_args",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1230** `                        value=self.generate_get_locals_or_none_call(write_args),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1231** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1232** `                    ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1233** `                        arg="full_write_args_count",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1234** `                        value=ast.Constant(value=full_write_args_count),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1235** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1236** `                    ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1237** `                        arg="write_args_names",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1238** `                        value=ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1239** `                            elts=[ast.Constant(value=arg) for arg in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1240** `                            ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1241** `                        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1242** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1243** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1244** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1245** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1246** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1248** `        return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1249** `            ast.FunctionDef(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1250** `                name=func_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1251** `                args=ast.arguments(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1252** `                    posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1253** `                    args=func_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1254** `                    kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1255** `                    kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1256** `                    defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1257** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1258** `                body=transformed_body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1259** `                decorator_list=[decorator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1260** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1261** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1262** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1264** `    def visit_BoolOp(self, node: ast.BoolOp) -> ast.expr:` — **EN:** Defines function `visit_BoolOp`. **CN:** 定义函数 `visit_BoolOp`。
+- **L1265** `        # Visit child nodes first` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1266** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1268** `        # It is necessary to expand short circuit evaluation explicit here` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1269** `        # Although we do not support inline if-else for IR generation, this is actually evaluated in Python` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1270** `        # So it's fine here` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1271** `        # Transform "and" to "and_"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1272** `        if isinstance(node.op, ast.And):` — **EN:** Starts a conditional branch guarded by `isinstance(node.op, ast.And)`. **CN:** 开始一个由 `isinstance(node.op, ast.And)` 控制的条件分支。
+- **L1273** `            # Create an if-else statement in AST form` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1274** `            # if type(lhs) == bool and lhs == False:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1275** `            #     return lhs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1276** `            # else` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1277** `            #     return and_(lhs, rhs)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1278** `            short_circuit_value = ast.Constant(value=False)` — **EN:** Assigns a value to short_circuit_value. **CN:** 将一个值赋给 short_circuit_value。
+- **L1279** `            helper_func = _create_module_attribute(` — **EN:** Assigns a value to helper_func. **CN:** 将一个值赋给 helper_func。
+- **L1280** `                "and_",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1281** `                use_base_dsl=False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1282** `                submodule_name=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1283** `                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1284** `                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1285** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1286** `            self.session_data.import_top_module = True` — **EN:** Assigns a value to self.session_data.import_top_module. **CN:** 将一个值赋给 self.session_data.import_top_module。
+- **L1287** `        # Transform "or" to "or_"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1288** `        elif isinstance(node.op, ast.Or):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1289** `            # Create an if-else statement in AST form` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1290** `            # if type(lhs) == bool and lhs == True:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1291** `            #     return lhs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1292** `            # else` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1293** `            #     return or_(lhs, rhs)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1294** `            short_circuit_value = ast.Constant(value=True)` — **EN:** Assigns a value to short_circuit_value. **CN:** 将一个值赋给 short_circuit_value。
+- **L1295** `            helper_func = _create_module_attribute(` — **EN:** Assigns a value to helper_func. **CN:** 将一个值赋给 helper_func。
+- **L1296** `                "or_",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1297** `                use_base_dsl=False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1298** `                submodule_name=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1299** `                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1300** `                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1301** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1302** `            self.session_data.import_top_module = True` — **EN:** Assigns a value to self.session_data.import_top_module. **CN:** 将一个值赋给 self.session_data.import_top_module。
+- **L1303** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1304** `            # BoolOp should be either And or Or` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1305** `            raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1306** `                f"Unsupported boolean operation: {node.op}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1307** `                filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1308** `                snippet=ast.unparse(node),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1309** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1311** `        def short_circuit_eval(` — **EN:** Defines function `short_circuit_eval`. **CN:** 定义函数 `short_circuit_eval`。
+- **L1312** `            value: ast.expr, short_circuit_value: ast.Constant` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1313** `        ) -> ast.BoolOp:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1314** `            return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1315** `                ast.BoolOp(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1316** `                    op=ast.And(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1317** `                    values=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1318** `                        ast.Compare(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1319** `                            left=ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1320** `                                func=ast.Name(id="type", ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1321** `                                args=[value],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1322** `                                keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1323** `                            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1324** `                            ops=[ast.Eq()],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1325** `                            comparators=[ast.Name(id="bool", ctx=ast.Load())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1326** `                        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1327** `                        ast.Compare(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1328** `                            left=value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1329** `                            ops=[ast.Eq()],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1330** `                            comparators=[short_circuit_value],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1331** `                        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1332** `                    ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1333** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1334** `                node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1335** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1337** `        lhs = node.values[0]` — **EN:** Assigns a value to lhs. **CN:** 将一个值赋给 lhs。
+- **L1338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1339** `        for i in range(1, len(node.values)):` — **EN:** Starts a loop assigning items from `range(1, len(node.values))` to `i`. **CN:** 开始一个循环，将 `range(1, len(node.values))` 的元素赋给 `i`。
+- **L1340** `            test = short_circuit_eval(lhs, short_circuit_value)` — **EN:** Assigns a value to test. **CN:** 将一个值赋给 test。
+- **L1341** `            lhs = ast.copy_location(` — **EN:** Assigns a value to lhs. **CN:** 将一个值赋给 lhs。
+- **L1342** `                ast.IfExp(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1343** `                    test=test,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1344** `                    body=lhs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1345** `                    orelse=ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1346** `                        func=helper_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1347** `                        args=[lhs, node.values[i]],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1348** `                        keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1349** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1350** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1351** `                node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1352** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1354** `        return lhs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1356** `    def visit_UnaryOp(self, node: ast.UnaryOp) -> ast.expr:` — **EN:** Defines function `visit_UnaryOp`. **CN:** 定义函数 `visit_UnaryOp`。
+- **L1357** `        # Visit child nodes first` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1358** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1360** `        # Transform "not" to "~" as we overload __invert__` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1361** `        if isinstance(node.op, ast.Not):` — **EN:** Starts a conditional branch guarded by `isinstance(node.op, ast.Not)`. **CN:** 开始一个由 `isinstance(node.op, ast.Not)` 控制的条件分支。
+- **L1362** `            func_name = _create_module_attribute(` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L1363** `                "not_",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1364** `                use_base_dsl=False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1365** `                submodule_name=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1366** `                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1367** `                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1368** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1369** `            self.session_data.import_top_module = True` — **EN:** Assigns a value to self.session_data.import_top_module. **CN:** 将一个值赋给 self.session_data.import_top_module。
+- **L1370** `            return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1371** `                ast.Call(func=func_name, args=[node.operand], keywords=[]), node` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1372** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1373** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1374** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1375** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1376** `    def _insert_range_value_check(self, node: ast.For) -> None:` — **EN:** Defines function `_insert_range_value_check`. **CN:** 定义函数 `_insert_range_value_check`。
+- **L1377** `        """` — **EN:** Starts the docstring for the function `_insert_range_value_check`. **CN:** 开始说明 function `_insert_range_value_check` 的文档字符串。
+- **L1378** `        Insert a check for range arguments` — **EN:** Continues the docstring for the function `_insert_range_value_check`. **CN:** 继续说明 function `_insert_range_value_check` 的文档字符串。
+- **L1379** `        """` — **EN:** Ends the docstring for the function `_insert_range_value_check`. **CN:** 结束说明 function `_insert_range_value_check` 的文档字符串。
+- **L1380** `        assert isinstance(node.iter, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1381** `        range_inputs = node.iter.args` — **EN:** Assigns a value to range_inputs. **CN:** 将一个值赋给 range_inputs。
+- **L1382** `        check_call = ast.copy_location(` — **EN:** Assigns a value to check_call. **CN:** 将一个值赋给 check_call。
+- **L1383** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1384** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1385** `                    "range_value_check", lineno=node.lineno, col_offset=node.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1386** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1387** `                args=range_inputs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1388** `                keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1389** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1390** `            node.iter,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1391** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1392** `        node.iter = ast.copy_location(` — **EN:** Assigns a value to node.iter. **CN:** 将一个值赋给 node.iter。
+- **L1393** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1394** `                func=ast.Name(id="range", ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1395** `                args=[ast.Starred(value=check_call, ctx=ast.Load())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1396** `                keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1397** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1398** `            node.iter,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1399** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1401** `    def _insert_cf_symbol_check(self, func: ast.expr) -> ast.Expr:` — **EN:** Defines function `_insert_cf_symbol_check`. **CN:** 定义函数 `_insert_cf_symbol_check`。
+- **L1402** `        """` — **EN:** Starts the docstring for the function `_insert_cf_symbol_check`. **CN:** 开始说明 function `_insert_cf_symbol_check` 的文档字符串。
+- **L1403** `        Insert a check for range symbol` — **EN:** Continues the docstring for the function `_insert_cf_symbol_check`. **CN:** 继续说明 function `_insert_cf_symbol_check` 的文档字符串。
+- **L1404** `        """` — **EN:** Ends the docstring for the function `_insert_cf_symbol_check`. **CN:** 结束说明 function `_insert_cf_symbol_check` 的文档字符串。
+- **L1405** `        check_call = ast.copy_location(` — **EN:** Assigns a value to check_call. **CN:** 将一个值赋给 check_call。
+- **L1406** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1407** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1408** `                    "cf_symbol_check", lineno=func.lineno, col_offset=func.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1409** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1410** `                args=[deepcopy(func)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1411** `                keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1412** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1413** `            func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1414** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1415** `        return ast.Expr(check_call)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1417** `    def visit_For(self, node: ast.For) -> ast.For | list[ast.stmt]:` — **EN:** Defines function `visit_For`. **CN:** 定义函数 `visit_For`。
+- **L1418** `        # For static for loop (for with range_constexpr or not range based for), preprocessor keeps the loop.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1419** `        range_kind, is_builtin_range, has_keyword = self._get_range_kind(node.iter)` — **EN:** Assigns a value to (range_kind, is_builtin_range, has_keyword). **CN:** 将一个值赋给 (range_kind, is_builtin_range, has_keyword)。
+- **L1420** `        if range_kind == "range_constexpr" or range_kind == None:` — **EN:** Starts a conditional branch guarded by `range_kind == 'range_constexpr' or range_kind == None`. **CN:** 开始一个由 `range_kind == 'range_constexpr' or range_kind == None` 控制的条件分支。
+- **L1421** `            self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1422** `            if range_kind == "range_constexpr":` — **EN:** Starts a conditional branch guarded by `range_kind == 'range_constexpr'`. **CN:** 开始一个由 `range_kind == 'range_constexpr'` 控制的条件分支。
+- **L1423** `                assert isinstance(node.iter, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1424** `                check_call = self._insert_cf_symbol_check(node.iter.func)` — **EN:** Assigns a value to check_call. **CN:** 将一个值赋给 check_call。
+- **L1425** `                # Rewrite range_constexpr to range` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1426** `                node.iter.func = ast.Name(id="range", ctx=ast.Load())` — **EN:** Assigns a value to node.iter.func. **CN:** 将一个值赋给 node.iter.func。
+- **L1427** `                self._insert_range_value_check(node)` — **EN:** Invokes `self._insert_range_value_check` as a standalone call. **CN:** 以独立语句方式调用 `self._insert_range_value_check`。
+- **L1428** `                return [check_call, node]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1429** `            return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1431** `        active_symbols = self.session_data.scope_manager.get_active_symbols()` — **EN:** Assigns a value to active_symbols. **CN:** 将一个值赋给 active_symbols。
+- **L1432** `        active_callables = self.session_data.scope_manager.get_active_callables()` — **EN:** Assigns a value to active_callables. **CN:** 将一个值赋给 active_callables。
+- **L1433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1434** `        with self.session_data.scope_manager.enter_control_flow_scope():` — **EN:** Starts a context-managed block using self.session_data.scope_manager.enter_control_flow_scope(). **CN:** 开始一个使用 self.session_data.scope_manager.enter_control_flow_scope() 的上下文管理代码块。
+- **L1435** `            if isinstance(node.target, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(node.target, ast.Name)`. **CN:** 开始一个由 `isinstance(node.target, ast.Name)` 控制的条件分支。
+- **L1436** `                self.session_data.scope_manager.add_to_scope(node.target.id)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L1437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1438** `            if range_kind == "range_dynamic":` — **EN:** Starts a conditional branch guarded by `range_kind == 'range_dynamic'`. **CN:** 开始一个由 `range_kind == 'range_dynamic'` 控制的条件分支。
+- **L1439** `                # Generate a warning` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1440** `                self.issue_deprecation_warning(` — **EN:** Invokes `self.issue_deprecation_warning` as a standalone call. **CN:** 以独立语句方式调用 `self.issue_deprecation_warning`。
+- **L1441** `                    message="range_dynamic is deprecated and will be removed in the future, please remove it.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1442** `                    category=DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1443** `                    filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1444** `                    lineno=node.iter.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1445** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1447** `            is_prefixed_range = range_kind == "range" and not is_builtin_range` — **EN:** Assigns a value to is_prefixed_range. **CN:** 将一个值赋给 is_prefixed_range。
+- **L1448** `            check_call: ast.Expr | None = None  # type: ignore[no-redef]` — **EN:** Assigns a typed value to check_call. **CN:** 为 check_call 赋予带类型标注的值。
+- **L1449** `            if range_kind == "range_dynamic" or is_prefixed_range:` — **EN:** Starts a conditional branch guarded by `range_kind == 'range_dynamic' or is_prefixed_range`. **CN:** 开始一个由 `range_kind == 'range_dynamic' or is_prefixed_range` 控制的条件分支。
+- **L1450** `                assert isinstance(node.iter, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1451** `                if not is_prefixed_range:` — **EN:** Starts a conditional branch guarded by `not is_prefixed_range`. **CN:** 开始一个由 `not is_prefixed_range` 控制的条件分支。
+- **L1452** `                    check_call = self._insert_cf_symbol_check(node.iter.func)` — **EN:** Assigns a value to check_call. **CN:** 将一个值赋给 check_call。
+- **L1453** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1454** `                    assert isinstance(node.iter.func, ast.Attribute)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1455** `                    check_call = self._insert_cf_symbol_check(node.iter.func.value)` — **EN:** Assigns a value to check_call. **CN:** 将一个值赋给 check_call。
+- **L1456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1457** `            new_for_node = self.transform_for_loop(` — **EN:** Assigns a value to new_for_node. **CN:** 将一个值赋给 new_for_node。
+- **L1458** `                node, active_symbols, active_callables` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1459** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1460** `            if check_call is not None:` — **EN:** Starts a conditional branch guarded by `check_call is not None`. **CN:** 开始一个由 `check_call is not None` 控制的条件分支。
+- **L1461** `                new_for_node = [check_call] + new_for_node` — **EN:** Assigns a value to new_for_node. **CN:** 将一个值赋给 new_for_node。
+- **L1462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1463** `        return new_for_node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1465** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1466** `    def _hoist_expr_to_assignments(expr: ast.expr, name: str) -> ast.Assign:` — **EN:** Defines function `_hoist_expr_to_assignments`. **CN:** 定义函数 `_hoist_expr_to_assignments`。
+- **L1467** `        return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1468** `            ast.Assign(targets=[ast.Name(id=name, ctx=ast.Store())], value=expr), expr` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1469** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1471** `    def _build_select_and_assign(` — **EN:** Defines function `_build_select_and_assign`. **CN:** 定义函数 `_build_select_and_assign`。
+- **L1472** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1473** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1474** `        name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1475** `        test: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1476** `        body: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1477** `        orelse: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1478** `        location: ast.AST,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1479** `    ) -> ast.Assign:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1480** `        node = ast.copy_location(` — **EN:** Assigns a value to node. **CN:** 将一个值赋给 node。
+- **L1481** `            ast.Assign(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1482** `                targets=[ast.Name(id=name, ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1483** `                value=ast.IfExp(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1484** `                    test=test,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1485** `                    body=body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1486** `                    orelse=orelse,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1487** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1488** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1489** `            location,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1490** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1491** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1493** `    def _handle_negative_step(` — **EN:** Defines function `_handle_negative_step`. **CN:** 定义函数 `_handle_negative_step`。
+- **L1494** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1495** `        node: ast.For,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1496** `        start_expr: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1497** `        stop_expr: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1498** `        step_expr: ast.expr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1499** `    ) -> tuple[ast.Name, ast.Name, ast.Name, list[ast.stmt]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1500** `        # hoist start, stop, step to assignments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1501** `        start_ori_name = f"start_ori_{self.session_data.counter}"` — **EN:** Assigns a value to start_ori_name. **CN:** 将一个值赋给 start_ori_name。
+- **L1502** `        start = self._hoist_expr_to_assignments(start_expr, start_ori_name)` — **EN:** Assigns a value to start. **CN:** 将一个值赋给 start。
+- **L1503** `        stop_ori_name = f"stop_ori_{self.session_data.counter}"` — **EN:** Assigns a value to stop_ori_name. **CN:** 将一个值赋给 stop_ori_name。
+- **L1504** `        stop = self._hoist_expr_to_assignments(stop_expr, stop_ori_name)` — **EN:** Assigns a value to stop. **CN:** 将一个值赋给 stop。
+- **L1505** `        step_ori_name = f"step_ori_{self.session_data.counter}"` — **EN:** Assigns a value to step_ori_name. **CN:** 将一个值赋给 step_ori_name。
+- **L1506** `        step = self._hoist_expr_to_assignments(step_expr, step_ori_name)` — **EN:** Assigns a value to step. **CN:** 将一个值赋给 step。
+- **L1507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1508** `        extra_exprs: list[ast.stmt] = [start, stop, step]` — **EN:** Assigns a typed value to extra_exprs. **CN:** 为 extra_exprs 赋予带类型标注的值。
+- **L1509** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1510** `        # Handle possible negative step, generates the following code in Python:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1511** `        # isNegative = step < 0` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1512** `        isNegative_name = f"isNegative_{self.session_data.counter}"` — **EN:** Assigns a value to isNegative_name. **CN:** 将一个值赋给 isNegative_name。
+- **L1513** `        isNegative = ast.copy_location(` — **EN:** Assigns a value to isNegative. **CN:** 将一个值赋给 isNegative。
+- **L1514** `            ast.Assign(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1515** `                targets=[ast.Name(id=isNegative_name, ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1516** `                value=ast.Compare(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1517** `                    left=ast.Name(id=step_ori_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1518** `                    ops=[ast.Lt()],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1519** `                    comparators=[ast.Constant(value=0)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1520** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1521** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1522** `            step,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1523** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1525** `        # start = stop if isNegative else start` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1526** `        start_name = f"start_{self.session_data.counter}"` — **EN:** Assigns a value to start_name. **CN:** 将一个值赋给 start_name。
+- **L1527** `        start = self._build_select_and_assign(` — **EN:** Assigns a value to start. **CN:** 将一个值赋给 start。
+- **L1528** `            name=start_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1529** `            test=ast.Name(id=isNegative_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1530** `            body=ast.Name(id=stop_ori_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1531** `            orelse=ast.Name(id=start_ori_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1532** `            location=start,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1533** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1535** `        # stop = start if isNegative else stop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1536** `        stop_name = f"stop_{self.session_data.counter}"` — **EN:** Assigns a value to stop_name. **CN:** 将一个值赋给 stop_name。
+- **L1537** `        stop = self._build_select_and_assign(` — **EN:** Assigns a value to stop. **CN:** 将一个值赋给 stop。
+- **L1538** `            name=stop_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1539** `            test=ast.Name(id=isNegative_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1540** `            body=ast.Name(id=start_ori_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1541** `            orelse=ast.Name(id=stop_ori_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1542** `            location=stop,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1543** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1545** `        # step = -step if isNegative else step` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1546** `        step_name = f"step_{self.session_data.counter}"` — **EN:** Assigns a value to step_name. **CN:** 将一个值赋给 step_name。
+- **L1547** `        step = self._build_select_and_assign(` — **EN:** Assigns a value to step. **CN:** 将一个值赋给 step。
+- **L1548** `            name=step_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1549** `            test=ast.Name(id=isNegative_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1550** `            body=ast.UnaryOp(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1551** `                op=ast.USub(), operand=ast.Name(id=step_ori_name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1552** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1553** `            orelse=ast.Name(id=step_ori_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1554** `            location=step,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1555** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1556** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1557** `        # offset = start + stop if isNegative else 0` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1558** `        offset_name = f"offset_{self.session_data.counter}"` — **EN:** Assigns a value to offset_name. **CN:** 将一个值赋给 offset_name。
+- **L1559** `        offset = self._build_select_and_assign(` — **EN:** Assigns a value to offset. **CN:** 将一个值赋给 offset。
+- **L1560** `            name=offset_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1561** `            test=ast.Name(id=isNegative_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1562** `            body=ast.BinOp(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1563** `                op=ast.Add(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1564** `                left=ast.Name(id=start_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1565** `                right=ast.Name(id=stop_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1566** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1567** `            orelse=ast.Constant(value=0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1568** `            location=node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1569** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1571** `        with Region(self.session_data, new_value=extra_exprs):` — **EN:** Starts a context-managed block using Region(self.session_data, new_value=extra_exprs). **CN:** 开始一个使用 Region(self.session_data, new_value=extra_exprs) 的上下文管理代码块。
+- **L1572** `            extra_exprs.append(self.generic_visit(isNegative))  # type: ignore[arg-type]` — **EN:** Invokes `extra_exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `extra_exprs.append`。
+- **L1573** `            extra_exprs.append(self.generic_visit(start))  # type: ignore[arg-type]` — **EN:** Invokes `extra_exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `extra_exprs.append`。
+- **L1574** `            extra_exprs.append(self.generic_visit(stop))  # type: ignore[arg-type]` — **EN:** Invokes `extra_exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `extra_exprs.append`。
+- **L1575** `            extra_exprs.append(self.generic_visit(step))  # type: ignore[arg-type]` — **EN:** Invokes `extra_exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `extra_exprs.append`。
+- **L1576** `            extra_exprs.append(self.generic_visit(offset))  # type: ignore[arg-type]` — **EN:** Invokes `extra_exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `extra_exprs.append`。
+- **L1577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1578** `        # Add this to begining of loop body` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1579** `        # for i in range(start, stop, step):` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1580** `        #     i = offset - i if isNegative else i` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1581** `        assert isinstance(node.target, ast.Name)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1582** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1583** `        target_name = node.target.id` — **EN:** Assigns a value to target_name. **CN:** 将一个值赋给 target_name。
+- **L1584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1585** `        if target_name != "_":` — **EN:** Starts a conditional branch guarded by `target_name != '_'`. **CN:** 开始一个由 `target_name != '_'` 控制的条件分支。
+- **L1586** `            # if target_name is _, skip the assign back` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1587** `            target = self._build_select_and_assign(` — **EN:** Assigns a value to target. **CN:** 将一个值赋给 target。
+- **L1588** `                name=target_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1589** `                test=ast.Name(id=isNegative_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1590** `                body=ast.BinOp(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1591** `                    op=ast.Sub(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1592** `                    left=ast.Name(id=offset_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1593** `                    right=ast.Name(id=target_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1594** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1595** `                orelse=ast.Name(id=target_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1596** `                location=node.target,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1597** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1598** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1599** `            node.body.insert(0, target)` — **EN:** Invokes `node.body.insert` as a standalone call. **CN:** 以独立语句方式调用 `node.body.insert`。
+- **L1600** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1601** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1602** `            ast.Name(id=start_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1603** `            ast.Name(id=stop_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1604** `            ast.Name(id=step_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1605** `            extra_exprs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1606** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1607** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1608** `    def _create_closure_check_call(` — **EN:** Defines function `_create_closure_check_call`. **CN:** 定义函数 `_create_closure_check_call`。
+- **L1609** `        self, called_closures: list[str], node: ast.stmt` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1610** `    ) -> ast.Expr:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1611** `        return ast.Expr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1612** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1613** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1614** `                    "closure_check",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1615** `                    lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1616** `                    col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1617** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1618** `                args=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1619** `                    ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1620** `                        elts=[ast.Name(id=c, ctx=ast.Load()) for c in called_closures],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1621** `                        ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1622** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1623** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1624** `                keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1625** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1626** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1627** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1628** `    def transform_for_loop(` — **EN:** Defines function `transform_for_loop`. **CN:** 定义函数 `transform_for_loop`。
+- **L1629** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1630** `        node: ast.For,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1631** `        active_symbols: list[set[str]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1632** `        active_callables: list[set[str]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1633** `    ) -> list[ast.stmt]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1634** `        # Check for early exit and raise exception` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1635** `        self.check_early_exit(node, "for")` — **EN:** Invokes `self.check_early_exit` as a standalone call. **CN:** 以独立语句方式调用 `self.check_early_exit`。
+- **L1636** `        if node.orelse:` — **EN:** Starts a conditional branch guarded by `node.orelse`. **CN:** 开始一个由 `node.orelse` 控制的条件分支。
+- **L1637** `            raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1638** `                "dynamic for loop with else is not supported",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1639** `                filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1640** `                snippet=ast.unparse(node),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1641** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1642** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1643** `        # Get loop target variable name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1644** `        target_var_name: str | None = None` — **EN:** Assigns a typed value to target_var_name. **CN:** 为 target_var_name 赋予带类型标注的值。
+- **L1645** `        target_var_is_active_before_loop = False` — **EN:** Assigns a value to target_var_is_active_before_loop. **CN:** 将一个值赋给 target_var_is_active_before_loop。
+- **L1646** `        if isinstance(node.target, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(node.target, ast.Name)`. **CN:** 开始一个由 `isinstance(node.target, ast.Name)` 控制的条件分支。
+- **L1647** `            target_var_name = node.target.id` — **EN:** Assigns a value to target_var_name. **CN:** 将一个值赋给 target_var_name。
+- **L1648** `            for idx, active_symbol in enumerate(active_symbols):` — **EN:** Starts a loop assigning items from `enumerate(active_symbols)` to `(idx, active_symbol)`. **CN:** 开始一个循环，将 `enumerate(active_symbols)` 的元素赋给 `(idx, active_symbol)`。
+- **L1649** `                if target_var_name in active_symbol:` — **EN:** Starts a conditional branch guarded by `target_var_name in active_symbol`. **CN:** 开始一个由 `target_var_name in active_symbol` 控制的条件分支。
+- **L1650** `                    target_var_is_active_before_loop = True` — **EN:** Assigns a value to target_var_is_active_before_loop. **CN:** 将一个值赋给 target_var_is_active_before_loop。
+- **L1651** `                    active_symbols[idx] = active_symbol - {target_var_name}` — **EN:** Assigns a value to active_symbols[idx]. **CN:** 将一个值赋给 active_symbols[idx]。
+- **L1652** `                    break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L1653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1654** `        # Add necessary exprs to handle this` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1655** `        if target_var_is_active_before_loop:` — **EN:** Starts a conditional branch guarded by `target_var_is_active_before_loop`. **CN:** 开始一个由 `target_var_is_active_before_loop` 控制的条件分支。
+- **L1656** `            assert target_var_name is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1657** `            loop_carried_var_name = f"loop_carried_var_{self.session_data.counter}"` — **EN:** Assigns a value to loop_carried_var_name. **CN:** 将一个值赋给 loop_carried_var_name。
+- **L1658** `            pre_loop_expr = ast.copy_location(` — **EN:** Assigns a value to pre_loop_expr. **CN:** 将一个值赋给 pre_loop_expr。
+- **L1659** `                ast.Assign(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1660** `                    targets=[ast.Name(id=loop_carried_var_name, ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1661** `                    value=ast.Name(id=target_var_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1662** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1663** `                node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1664** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1665** `            # append an extra assignment to the loop carried variable` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1666** `            node.body.append(` — **EN:** Invokes `node.body.append` as a standalone call. **CN:** 以独立语句方式调用 `node.body.append`。
+- **L1667** `                ast.copy_location(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1668** `                    ast.Assign(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1669** `                        targets=[ast.Name(id=loop_carried_var_name, ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1670** `                        value=ast.Name(id=target_var_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1671** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1672** `                    node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1673** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1674** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1675** `            active_symbols.append({loop_carried_var_name})` — **EN:** Invokes `active_symbols.append` as a standalone call. **CN:** 以独立语句方式调用 `active_symbols.append`。
+- **L1676** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1677** `        assert isinstance(node.iter, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1678** `        start_expr, stop_expr, step_expr, has_step = self.extract_range_args(node.iter)` — **EN:** Assigns a value to (start_expr, stop_expr, step_expr, has_step). **CN:** 将一个值赋给 (start_expr, stop_expr, step_expr, has_step)。
+- **L1679** `        unroll, unroll_full = self.extract_unroll_args(node.iter)` — **EN:** Assigns a value to (unroll, unroll_full). **CN:** 将一个值赋给 (unroll, unroll_full)。
+- **L1680** `        prefetch_stages = self.extract_prefetch_stages_args(node.iter)` — **EN:** Assigns a value to prefetch_stages. **CN:** 将一个值赋给 prefetch_stages。
+- **L1681** `        vectorize = self.extract_vectorize_args(node.iter)` — **EN:** Assigns a value to vectorize. **CN:** 将一个值赋给 vectorize。
+- **L1682** `        at_least_once = self.extract_at_least_once_args(node.iter)` — **EN:** Assigns a value to at_least_once. **CN:** 将一个值赋给 at_least_once。
+- **L1683** `        write_args, full_write_args_count, called_closures = (` — **EN:** Assigns a value to (write_args, full_write_args_count, called_closures). **CN:** 将一个值赋给 (write_args, full_write_args_count, called_closures)。
+- **L1684** `            self.analyze_region_variables(node, active_symbols, active_callables)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1685** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1687** `        has_positive_step = (` — **EN:** Assigns a value to has_positive_step. **CN:** 将一个值赋给 has_positive_step。
+- **L1688** `            isinstance(step_expr, ast.Constant)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1689** `            and isinstance(step_expr.value, (int, float))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1690** `            and step_expr.value > 0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1691** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1692** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1693** `        if (` — **EN:** Starts a conditional branch guarded by `has_step and self.client_module_name[0] == 'cutlass' and ...`. **CN:** 开始一个由 `has_step and self.client_module_name[0] == 'cutlass' and ...` 控制的条件分支。
+- **L1694** `            has_step` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1695** `            and self.client_module_name[0] == "cutlass"` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1696** `            and not has_positive_step` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1697** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1698** `            start_n, stop_n, step_n, exprs = self._handle_negative_step(` — **EN:** Assigns a value to (start_n, stop_n, step_n, exprs). **CN:** 将一个值赋给 (start_n, stop_n, step_n, exprs)。
+- **L1699** `                node, start_expr, stop_expr, step_expr` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1700** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1701** `            start: ast.expr = start_n` — **EN:** Assigns a typed value to start. **CN:** 为 start 赋予带类型标注的值。
+- **L1702** `            stop: ast.expr = stop_n` — **EN:** Assigns a typed value to stop. **CN:** 为 stop 赋予带类型标注的值。
+- **L1703** `            step: ast.expr = step_n` — **EN:** Assigns a typed value to step. **CN:** 为 step 赋予带类型标注的值。
+- **L1704** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1705** `            start, stop, step = start_expr, stop_expr, step_expr` — **EN:** Assigns a value to (start, stop, step). **CN:** 将一个值赋给 (start, stop, step)。
+- **L1706** `            exprs: list[ast.stmt] = []  # type: ignore[no-redef]` — **EN:** Assigns a typed value to exprs. **CN:** 为 exprs 赋予带类型标注的值。
+- **L1707** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1708** `        if target_var_is_active_before_loop:` — **EN:** Starts a conditional branch guarded by `target_var_is_active_before_loop`. **CN:** 开始一个由 `target_var_is_active_before_loop` 控制的条件分支。
+- **L1709** `            exprs.append(pre_loop_expr)` — **EN:** Invokes `exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `exprs.append`。
+- **L1710** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1711** `        if called_closures:` — **EN:** Starts a conditional branch guarded by `called_closures`. **CN:** 开始一个由 `called_closures` 控制的条件分支。
+- **L1712** `            exprs.append(self._create_closure_check_call(called_closures, node))` — **EN:** Invokes `exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `exprs.append`。
+- **L1713** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1714** `        func_name = f"loop_body_{self.session_data.counter}"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L1715** `        self.session_data.counter += 1` — **EN:** Updates self.session_data.counter in place. **CN:** 原地更新 self.session_data.counter。
+- **L1716** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1717** `        func_def = self.create_loop_function(` — **EN:** Assigns a value to func_def. **CN:** 将一个值赋给 func_def。
+- **L1718** `            func_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1719** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1720** `            start,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1721** `            stop,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1722** `            step,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1723** `            unroll,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1724** `            unroll_full,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1725** `            prefetch_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1726** `            vectorize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1727** `            at_least_once,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1728** `            write_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1729** `            full_write_args_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1730** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1731** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1732** `        assign = self.create_cf_call(func_name, write_args, node)` — **EN:** Assigns a value to assign. **CN:** 将一个值赋给 assign。
+- **L1733** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1734** `        # This should work fine as it modifies the AST structure` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1735** `        exprs = exprs + [func_def] + assign` — **EN:** Assigns a value to exprs. **CN:** 将一个值赋给 exprs。
+- **L1736** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1737** `        if target_var_is_active_before_loop:` — **EN:** Starts a conditional branch guarded by `target_var_is_active_before_loop`. **CN:** 开始一个由 `target_var_is_active_before_loop` 控制的条件分支。
+- **L1738** `            assert target_var_name is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1739** `            exprs.append(` — **EN:** Invokes `exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `exprs.append`。
+- **L1740** `                ast.copy_location(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1741** `                    ast.Assign(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1742** `                        targets=[ast.Name(id=target_var_name, ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1743** `                        value=ast.Name(id=loop_carried_var_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1744** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1745** `                    node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1746** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1747** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1748** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1749** `        return exprs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1750** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1751** `    def visit_Assert(self, node: ast.Assert) -> ast.Expr:` — **EN:** Defines function `visit_Assert`. **CN:** 定义函数 `visit_Assert`。
+- **L1752** `        test = self.visit(node.test)` — **EN:** Assigns a value to test. **CN:** 将一个值赋给 test。
+- **L1753** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1754** `        args = [ast.keyword(arg="test", value=test)]` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L1755** `        if node.msg:` — **EN:** Starts a conditional branch guarded by `node.msg`. **CN:** 开始一个由 `node.msg` 控制的条件分支。
+- **L1756** `            msg = self.visit(node.msg)` — **EN:** Assigns a value to msg. **CN:** 将一个值赋给 msg。
+- **L1757** `            args.append(ast.keyword(arg="msg", value=msg))` — **EN:** Invokes `args.append` as a standalone call. **CN:** 以独立语句方式调用 `args.append`。
+- **L1758** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1759** `        # Rewrite to assert_executor(test, msg)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1760** `        new_node = ast.Expr(` — **EN:** Assigns a value to new_node. **CN:** 将一个值赋给 new_node。
+- **L1761** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1762** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1763** `                    self.ASSERT_EXECUTOR, lineno=node.lineno, col_offset=node.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1764** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1765** `                args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1766** `                keywords=args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1767** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1768** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1769** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1770** `        # Propagate line number from original node to new node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1771** `        ast.copy_location(new_node, node)` — **EN:** Invokes `ast.copy_location` as a standalone call. **CN:** 以独立语句方式调用 `ast.copy_location`。
+- **L1772** `        return new_node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1773** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1774** `    def processFormattedValue(self, node: ast.FormattedValue) -> ast.Call:` — **EN:** Defines function `processFormattedValue`. **CN:** 定义函数 `processFormattedValue`。
+- **L1775** `        """` — **EN:** Starts the docstring for the function `processFormattedValue`. **CN:** 开始说明 function `processFormattedValue` 的文档字符串。
+- **L1776** `        Converts an ast.FormattedValue node into a runtime representation of an ast.FormattedValue.` — **EN:** Continues the docstring for the function `processFormattedValue`. **CN:** 继续说明 function `processFormattedValue` 的文档字符串。
+- **L1777** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1778** `        This function takes an ast.FormattedValue node and converts it into a runtime representation of ast.FormattedValue.` — **EN:** Continues the docstring for the function `processFormattedValue`. **CN:** 继续说明 function `processFormattedValue` 的文档字符串。
+- **L1779** `        """` — **EN:** Ends the docstring for the function `processFormattedValue`. **CN:** 结束说明 function `processFormattedValue` 的文档字符串。
+- **L1780** `        keywords: list[ast.keyword] = []` — **EN:** Assigns a typed value to keywords. **CN:** 为 keywords 赋予带类型标注的值。
+- **L1781** `        if node.conversion != -1:` — **EN:** Starts a conditional branch guarded by `node.conversion != -1`. **CN:** 开始一个由 `node.conversion != -1` 控制的条件分支。
+- **L1782** `            keywords.append(` — **EN:** Invokes `keywords.append` as a standalone call. **CN:** 以独立语句方式调用 `keywords.append`。
+- **L1783** `                ast.keyword(arg="conversion", value=ast.Constant(value=node.conversion))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1784** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1785** `        if node.format_spec:` — **EN:** Starts a conditional branch guarded by `node.format_spec`. **CN:** 开始一个由 `node.format_spec` 控制的条件分支。
+- **L1786** `            assert isinstance(node.format_spec, ast.JoinedStr)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1787** `            keywords.append(` — **EN:** Invokes `keywords.append` as a standalone call. **CN:** 以独立语句方式调用 `keywords.append`。
+- **L1788** `                ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1789** `                    arg="format_spec",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1790** `                    value=ast.List(elts=node.format_spec.values, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1791** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1792** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1793** `        call = ast.Call(` — **EN:** Assigns a value to call. **CN:** 将一个值赋给 call。
+- **L1794** `            func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1795** `                "FormattedValue",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1796** `                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1797** `                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1798** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1799** `            args=[node.value],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1800** `            keywords=keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1801** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1802** `        return ast.copy_location(call, node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1803** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1804** `    def processFString(self, node: ast.Call) -> ast.Call:` — **EN:** Defines function `processFString`. **CN:** 定义函数 `processFString`。
+- **L1805** `        """` — **EN:** Starts the docstring for the function `processFString`. **CN:** 开始说明 function `processFString` 的文档字符串。
+- **L1806** `        Converts an f-string node into a runtime representation of an f-string.` — **EN:** Continues the docstring for the function `processFString`. **CN:** 继续说明 function `processFString` 的文档字符串。
+- **L1807** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1808** `        This function takes an ast.JoinedStr node and converts it into a list of elements,` — **EN:** Continues the docstring for the function `processFString`. **CN:** 继续说明 function `processFString` 的文档字符串。
+- **L1809** `        where each element is either a literal string or a FormattedValue.` — **EN:** Continues the docstring for the function `processFString`. **CN:** 继续说明 function `processFString` 的文档字符串。
+- **L1810** `        The FormattedValue is converted into a runtime representation of ast.FormattedValue.` — **EN:** Continues the docstring for the function `processFString`. **CN:** 继续说明 function `processFString` 的文档字符串。
+- **L1811** `        """` — **EN:** Ends the docstring for the function `processFString`. **CN:** 结束说明 function `processFString` 的文档字符串。
+- **L1812** `        elements: list[ast.expr] = []` — **EN:** Assigns a typed value to elements. **CN:** 为 elements 赋予带类型标注的值。
+- **L1813** `        joinedStr = node.args[0]` — **EN:** Assigns a value to joinedStr. **CN:** 将一个值赋给 joinedStr。
+- **L1814** `        assert isinstance(joinedStr, ast.JoinedStr)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1815** `        for component in joinedStr.values:` — **EN:** Starts a loop assigning items from `joinedStr.values` to `component`. **CN:** 开始一个循环，将 `joinedStr.values` 的元素赋给 `component`。
+- **L1816** `            if isinstance(component, ast.Constant):` — **EN:** Starts a conditional branch guarded by `isinstance(component, ast.Constant)`. **CN:** 开始一个由 `isinstance(component, ast.Constant)` 控制的条件分支。
+- **L1817** `                elements.append(component)` — **EN:** Invokes `elements.append` as a standalone call. **CN:** 以独立语句方式调用 `elements.append`。
+- **L1818** `            elif isinstance(component, ast.FormattedValue):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1819** `                elements.append(self.processFormattedValue(component))` — **EN:** Invokes `elements.append` as a standalone call. **CN:** 以独立语句方式调用 `elements.append`。
+- **L1820** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1821** `                raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1822** `                    f"Unsupported component type in f-string: {type(component)}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1823** `                    filename=self.session_data.file_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1824** `                    snippet=ast.unparse(component),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1825** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1826** `        call = ast.Call(` — **EN:** Assigns a value to call. **CN:** 将一个值赋给 call。
+- **L1827** `            func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1828** `                "fstring_decompose",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1829** `                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1830** `                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1831** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1832** `            args=[ast.copy_location(ast.List(elts=elements, ctx=ast.Load()), node)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1833** `            keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1834** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1835** `        return ast.copy_location(call, node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1836** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1837** `    def visit_Call(self, node: ast.Call) -> ast.Call:` — **EN:** Defines function `visit_Call`. **CN:** 定义函数 `visit_Call`。
+- **L1838** `        func = self.visit(node.func)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L1839** `        # Visit args and kwargs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1840** `        node.args = [self.visit(arg) for arg in node.args]` — **EN:** Assigns a value to node.args. **CN:** 将一个值赋给 node.args。
+- **L1841** `        node.keywords = [self.visit(kwarg) for kwarg in node.keywords]` — **EN:** Assigns a value to node.keywords. **CN:** 将一个值赋给 node.keywords。
+- **L1842** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1843** `        # Rewrite call to some built-in functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1844** `        if isinstance(func, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(func, ast.Name)`. **CN:** 开始一个由 `isinstance(func, ast.Name)` 控制的条件分支。
+- **L1845** `            # AST rewrite only redirect call to bool to bool_cast` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1846** `            # If \`bool\` escapes as a symbol, usually it means type check, do not rewrite it` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1847** `            if func.id == "bool":` — **EN:** Starts a conditional branch guarded by `func.id == 'bool'`. **CN:** 开始一个由 `func.id == 'bool'` 控制的条件分支。
+- **L1848** `                return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1849** `                    ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1850** `                        func=ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1851** `                            func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1852** `                                self.BUILTIN_REDIRECTOR,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1853** `                                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1854** `                                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1855** `                            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1856** `                            args=[func],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1857** `                            keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1858** `                        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1859** `                        args=[node.args[0]],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1860** `                        keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1861** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1862** `                    node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1863** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1864** `            elif func.id == "super" and node.args == [] and node.keywords == []:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1865** `                # If it's a Python3 argument free super(), rewrite to old style super with args` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1866** `                # So if this call is under dynamic control flow, it still works.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1867** `                return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1868** `                    ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1869** `                        func=func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1870** `                        args=node.args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1871** `                        + [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1872** `                            ast.Attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1873** `                                value=ast.Name(id="self", ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1874** `                                attr="__class__",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1875** `                                ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1876** `                            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1877** `                            ast.Name(id="self", ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1878** `                        ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1879** `                        keywords=node.keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1880** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1881** `                    node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1882** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1883** `            elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1884** `                func.id in ("printf", "print_runtime")` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1885** `                and len(node.args) > 0` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1886** `                and isinstance(node.args[0], ast.JoinedStr)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1887** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1888** `                node.args = [` — **EN:** Assigns a value to node.args. **CN:** 将一个值赋给 node.args。
+- **L1889** `                    ast.Starred(value=self.processFString(node), ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1890** `                ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1891** `        elif isinstance(func, ast.Attribute) and isinstance(func.value, ast.Name):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1892** `            if (` — **EN:** Starts a conditional branch guarded by `func.attr in ('printf', 'print_runtime') and len(node.arg...`. **CN:** 开始一个由 `func.attr in ('printf', 'print_runtime') and len(node.arg...` 控制的条件分支。
+- **L1893** `                func.attr in ("printf", "print_runtime")` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1894** `                and len(node.args) > 0` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1895** `                and isinstance(node.args[0], ast.JoinedStr)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1896** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1897** `                node.args = [` — **EN:** Assigns a value to node.args. **CN:** 将一个值赋给 node.args。
+- **L1898** `                    ast.Starred(value=self.processFString(node), ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1899** `                ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1900** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1901** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1902** `                def create_downcast_call(arg: ast.expr) -> ast.Call:` — **EN:** Defines function `create_downcast_call`. **CN:** 定义函数 `create_downcast_call`。
+- **L1903** `                    return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1904** `                        ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1905** `                            func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1906** `                                self.IMPLICIT_DOWNCAST_NUMERIC_TYPE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1907** `                                submodule_name="typing",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1908** `                                lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1909** `                                col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1910** `                            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1911** `                            args=[arg],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1912** `                            keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1913** `                        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1914** `                        arg,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1915** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1916** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1917** `                fn_globals = self.session_data.function_globals` — **EN:** Assigns a value to fn_globals. **CN:** 将一个值赋给 fn_globals。
+- **L1918** `                module = fn_globals.get(func.value.id) if fn_globals else None` — **EN:** Assigns a value to module. **CN:** 将一个值赋给 module。
+- **L1919** `                if isinstance(module, ModuleType) and (` — **EN:** Starts a conditional branch guarded by `isinstance(module, ModuleType) and (module.__package__ or...`. **CN:** 开始一个由 `isinstance(module, ModuleType) and (module.__package__ or...` 控制的条件分支。
+- **L1920** `                    module.__package__ or ""` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1921** `                ).endswith("._mlir.dialects"):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1922** `                    # Check if argument is Numeric, if so, call ir_value()` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1923** `                    args: list[ast.expr] = []` — **EN:** Assigns a typed value to args. **CN:** 为 args 赋予带类型标注的值。
+- **L1924** `                    for arg in node.args:` — **EN:** Starts a loop assigning items from `node.args` to `arg`. **CN:** 开始一个循环，将 `node.args` 的元素赋给 `arg`。
+- **L1925** `                        args.append(create_downcast_call(arg))` — **EN:** Invokes `args.append` as a standalone call. **CN:** 以独立语句方式调用 `args.append`。
+- **L1926** `                    kwargs: list[ast.keyword] = []` — **EN:** Assigns a typed value to kwargs. **CN:** 为 kwargs 赋予带类型标注的值。
+- **L1927** `                    for kwarg in node.keywords:` — **EN:** Starts a loop assigning items from `node.keywords` to `kwarg`. **CN:** 开始一个循环，将 `node.keywords` 的元素赋给 `kwarg`。
+- **L1928** `                        kwargs.append(` — **EN:** Invokes `kwargs.append` as a standalone call. **CN:** 以独立语句方式调用 `kwargs.append`。
+- **L1929** `                            ast.copy_location(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1930** `                                ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1931** `                                    arg=kwarg.arg,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1932** `                                    value=create_downcast_call(kwarg.value),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1933** `                                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1934** `                                kwarg,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1935** `                            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1936** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1937** `                    return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1938** `                        ast.Call(func=func, args=args, keywords=kwargs), node` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1939** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1940** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1941** `            node.func = self.visit(node.func)` — **EN:** Assigns a value to node.func. **CN:** 将一个值赋给 node.func。
+- **L1942** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1943** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1944** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1945** `    def visit_ClassDef(self, node: ast.ClassDef) -> ast.AST:` — **EN:** Defines function `visit_ClassDef`. **CN:** 定义函数 `visit_ClassDef`。
+- **L1946** `        with self.session_data.set_current_class_name(node.name):` — **EN:** Starts a context-managed block using self.session_data.set_current_class_name(node.name). **CN:** 开始一个使用 self.session_data.set_current_class_name(node.name) 的上下文管理代码块。
+- **L1947** `            return self.generic_visit(node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1948** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1949** `    def _visit_target(self, target: ast.expr) -> None:` — **EN:** Defines function `_visit_target`. **CN:** 定义函数 `_visit_target`。
+- **L1950** `        if isinstance(target, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(target, ast.Name)`. **CN:** 开始一个由 `isinstance(target, ast.Name)` 控制的条件分支。
+- **L1951** `            self.session_data.scope_manager.add_to_scope(target.id)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L1952** `        elif isinstance(target, ast.Tuple):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1953** `            for t in target.elts:` — **EN:** Starts a loop assigning items from `target.elts` to `t`. **CN:** 开始一个循环，将 `target.elts` 的元素赋给 `t`。
+- **L1954** `                if isinstance(t, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(t, ast.Name)`. **CN:** 开始一个由 `isinstance(t, ast.Name)` 控制的条件分支。
+- **L1955** `                    self.session_data.scope_manager.add_to_scope(t.id)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L1956** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1957** `    def visit_Assign(self, node: ast.Assign) -> ast.stmt | list[ast.stmt]:` — **EN:** Defines function `visit_Assign`. **CN:** 定义函数 `visit_Assign`。
+- **L1958** `        for target in node.targets:` — **EN:** Starts a loop assigning items from `node.targets` to `target`. **CN:** 开始一个循环，将 `node.targets` 的元素赋给 `target`。
+- **L1959** `            self._visit_target(target)` — **EN:** Invokes `self._visit_target` as a standalone call. **CN:** 以独立语句方式调用 `self._visit_target`。
+- **L1960** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1961** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1962** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1963** `    def visit_AugAssign(self, node: ast.AugAssign) -> ast.AugAssign | list[ast.stmt]:` — **EN:** Defines function `visit_AugAssign`. **CN:** 定义函数 `visit_AugAssign`。
+- **L1964** `        self._visit_target(node.target)` — **EN:** Invokes `self._visit_target` as a standalone call. **CN:** 以独立语句方式调用 `self._visit_target`。
+- **L1965** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1966** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1967** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1968** `    def visit_Return(self, node: ast.Return) -> ast.stmt | list[ast.stmt]:` — **EN:** Defines function `visit_Return`. **CN:** 定义函数 `visit_Return`。
+- **L1969** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1970** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1971** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1972** `    def visit_Expr(self, node: ast.Expr) -> ast.stmt | list[ast.stmt]:` — **EN:** Defines function `visit_Expr`. **CN:** 定义函数 `visit_Expr`。
+- **L1973** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1974** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1975** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1976** `    def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AnnAssign:` — **EN:** Defines function `visit_AnnAssign`. **CN:** 定义函数 `visit_AnnAssign`。
+- **L1977** `        self._visit_target(node.target)` — **EN:** Invokes `self._visit_target` as a standalone call. **CN:** 以独立语句方式调用 `self._visit_target`。
+- **L1978** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L1979** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1980** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1981** `    def visit_Name(self, node: ast.Name) -> ast.Name | ast.Call:` — **EN:** Defines function `visit_Name`. **CN:** 定义函数 `visit_Name`。
+- **L1982** `        isLoad = isinstance(node.ctx, ast.Load)` — **EN:** Assigns a value to isLoad. **CN:** 将一个值赋给 isLoad。
+- **L1983** `        if node.id in ["max", "min", "any", "all", "exec", "eval"] and isLoad:` — **EN:** Starts a conditional branch guarded by `node.id in ['max', 'min', 'any', 'all', 'exec', 'eval'] a...`. **CN:** 开始一个由 `node.id in ['max', 'min', 'any', 'all', 'exec', 'eval'] a...` 控制的条件分支。
+- **L1984** `            return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1985** `                ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1986** `                    func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1987** `                        self.BUILTIN_REDIRECTOR,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1988** `                        lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1989** `                        col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1990** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1991** `                    args=[node],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1992** `                    keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1993** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1994** `                node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1995** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1996** `        elif node.id == "_" and isLoad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1997** `            raise DSLAstPreprocessorError("Read '_' is not allowed")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1998** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1999** `            self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2000** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2001** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2002** `    def get_dsl_decorator_index(self, decorator_list: list[ast.expr]) -> Any:` — **EN:** Defines function `get_dsl_decorator_index`. **CN:** 定义函数 `get_dsl_decorator_index`。
+- **L2003** `        for i, d in enumerate(decorator_list):` — **EN:** Starts a loop assigning items from `enumerate(decorator_list)` to `(i, d)`. **CN:** 开始一个循环，将 `enumerate(decorator_list)` 的元素赋给 `(i, d)`。
+- **L2004** `            if isinstance(d, ast.Call):` — **EN:** Starts a conditional branch guarded by `isinstance(d, ast.Call)`. **CN:** 开始一个由 `isinstance(d, ast.Call)` 控制的条件分支。
+- **L2005** `                if isinstance(d.func, ast.Attribute):` — **EN:** Starts a conditional branch guarded by `isinstance(d.func, ast.Attribute)`. **CN:** 开始一个由 `isinstance(d.func, ast.Attribute)` 控制的条件分支。
+- **L2006** `                    if d.func.attr in ["jit", "kernel"]:` — **EN:** Starts a conditional branch guarded by `d.func.attr in ['jit', 'kernel']`. **CN:** 开始一个由 `d.func.attr in ['jit', 'kernel']` 控制的条件分支。
+- **L2007** `                        if d.keywords == []:` — **EN:** Starts a conditional branch guarded by `d.keywords == []`. **CN:** 开始一个由 `d.keywords == []` 控制的条件分支。
+- **L2008** `                            return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2009** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2010** `                        # Keep existing preprocess behavior unchanged.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2011** `                        for keyword in d.keywords:` — **EN:** Starts a loop assigning items from `d.keywords` to `keyword`. **CN:** 开始一个循环，将 `d.keywords` 的元素赋给 `keyword`。
+- **L2012** `                            if keyword.arg == "preprocess":` — **EN:** Starts a conditional branch guarded by `keyword.arg == 'preprocess'`. **CN:** 开始一个由 `keyword.arg == 'preprocess'` 控制的条件分支。
+- **L2013** `                                try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L2014** `                                    if isinstance(keyword.value, ast.Constant):` — **EN:** Starts a conditional branch guarded by `isinstance(keyword.value, ast.Constant)`. **CN:** 开始一个由 `isinstance(keyword.value, ast.Constant)` 控制的条件分支。
+- **L2015** `                                        return keyword.value.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2016** `                                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2017** `                                        return ast.literal_eval(keyword.value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2018** `                                except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L2019** `                                    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L2020** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2021** `                        keyword_names = {` — **EN:** Assigns a value to keyword_names. **CN:** 将一个值赋给 keyword_names。
+- **L2022** `                            keyword.arg` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2023** `                            for keyword in d.keywords` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2024** `                            if keyword.arg is not None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2025** `                        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2026** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2027** `                        # New behavior for kernel function attributes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2028** `                        # Limit this expansion to kernel decorator with` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2029** `                        # an explicit \`attributes=\` keyword.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2030** `                        if d.func.attr == "kernel" and "attributes" in keyword_names:` — **EN:** Starts a conditional branch guarded by `d.func.attr == 'kernel' and 'attributes' in keyword_names`. **CN:** 开始一个由 `d.func.attr == 'kernel' and 'attributes' in keyword_names` 控制的条件分支。
+- **L2031** `                            return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2032** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2033** `            elif isinstance(d, ast.Attribute):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2034** `                if d.attr in ["jit", "kernel"]:` — **EN:** Starts a conditional branch guarded by `d.attr in ['jit', 'kernel']`. **CN:** 开始一个由 `d.attr in ['jit', 'kernel']` 控制的条件分支。
+- **L2035** `                    return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2036** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2037** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2038** `    def check_decorator(self, node: ast.AST) -> bool:` — **EN:** Defines function `check_decorator`. **CN:** 定义函数 `check_decorator`。
+- **L2039** `        """` — **EN:** Starts the docstring for the function `check_decorator`. **CN:** 开始说明 function `check_decorator` 的文档字符串。
+- **L2040** `        Check if the function has the correct decorator for preprocessing.` — **EN:** Continues the docstring for the function `check_decorator`. **CN:** 继续说明 function `check_decorator` 的文档字符串。
+- **L2041** `        """` — **EN:** Ends the docstring for the function `check_decorator`. **CN:** 结束说明 function `check_decorator` 的文档字符串。
+- **L2042** `        if not isinstance(node, ast.FunctionDef):` — **EN:** Starts a conditional branch guarded by `not isinstance(node, ast.FunctionDef)`. **CN:** 开始一个由 `not isinstance(node, ast.FunctionDef)` 控制的条件分支。
+- **L2043** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2044** `        decorator_list = node.decorator_list` — **EN:** Assigns a value to decorator_list. **CN:** 将一个值赋给 decorator_list。
+- **L2045** `        if len(decorator_list) == 0:` — **EN:** Starts a conditional branch guarded by `len(decorator_list) == 0`. **CN:** 开始一个由 `len(decorator_list) == 0` 控制的条件分支。
+- **L2046** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2047** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2048** `        dsl_decorator_index = self.get_dsl_decorator_index(decorator_list)` — **EN:** Assigns a value to dsl_decorator_index. **CN:** 将一个值赋给 dsl_decorator_index。
+- **L2049** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2050** `        if (` — **EN:** Starts a conditional branch guarded by `dsl_decorator_index is not None and dsl_decorator_index <...`. **CN:** 开始一个由 `dsl_decorator_index is not None and dsl_decorator_index <...` 控制的条件分支。
+- **L2051** `            dsl_decorator_index is not None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2052** `            and dsl_decorator_index < len(decorator_list) - 1` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2053** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2054** `            decorator = ast.unparse(decorator_list[dsl_decorator_index])` — **EN:** Assigns a value to decorator. **CN:** 将一个值赋给 decorator。
+- **L2055** `            raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2056** `                f"\`{decorator}\` decorator must be the inner most decorator",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2057** `                suggestion=f"Please move the \`{decorator}\` decorator to the inner most position",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2058** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2059** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2060** `        return dsl_decorator_index is not None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2061** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2062** `    def remove_dsl_decorator(self, decorator_list: list[ast.expr]) -> list[ast.expr]:` — **EN:** Defines function `remove_dsl_decorator`. **CN:** 定义函数 `remove_dsl_decorator`。
+- **L2063** `        """` — **EN:** Starts the docstring for the function `remove_dsl_decorator`. **CN:** 开始说明 function `remove_dsl_decorator` 的文档字符串。
+- **L2064** `        Remove .jit and .kernel decorators` — **EN:** Continues the docstring for the function `remove_dsl_decorator`. **CN:** 继续说明 function `remove_dsl_decorator` 的文档字符串。
+- **L2065** `        The decorator can be in two forms:` — **EN:** Continues the docstring for the function `remove_dsl_decorator`. **CN:** 继续说明 function `remove_dsl_decorator` 的文档字符串。
+- **L2066** `        - @jit(...)` — **EN:** Continues the docstring for the function `remove_dsl_decorator`. **CN:** 继续说明 function `remove_dsl_decorator` 的文档字符串。
+- **L2067** `        - @jit` — **EN:** Continues the docstring for the function `remove_dsl_decorator`. **CN:** 继续说明 function `remove_dsl_decorator` 的文档字符串。
+- **L2068** `        """` — **EN:** Ends the docstring for the function `remove_dsl_decorator`. **CN:** 结束说明 function `remove_dsl_decorator` 的文档字符串。
+- **L2069** `        new_decorator_list = []` — **EN:** Assigns a value to new_decorator_list. **CN:** 将一个值赋给 new_decorator_list。
+- **L2070** `        decorator_names = ["jit", "kernel"]` — **EN:** Assigns a value to decorator_names. **CN:** 将一个值赋给 decorator_names。
+- **L2071** `        for d in decorator_list:` — **EN:** Starts a loop assigning items from `decorator_list` to `d`. **CN:** 开始一个循环，将 `decorator_list` 的元素赋给 `d`。
+- **L2072** `            is_jit_or_kernel = False` — **EN:** Assigns a value to is_jit_or_kernel. **CN:** 将一个值赋给 is_jit_or_kernel。
+- **L2073** `            if isinstance(d, ast.Call):` — **EN:** Starts a conditional branch guarded by `isinstance(d, ast.Call)`. **CN:** 开始一个由 `isinstance(d, ast.Call)` 控制的条件分支。
+- **L2074** `                if isinstance(d.func, ast.Attribute):` — **EN:** Starts a conditional branch guarded by `isinstance(d.func, ast.Attribute)`. **CN:** 开始一个由 `isinstance(d.func, ast.Attribute)` 控制的条件分支。
+- **L2075** `                    if d.func.attr in decorator_names:` — **EN:** Starts a conditional branch guarded by `d.func.attr in decorator_names`. **CN:** 开始一个由 `d.func.attr in decorator_names` 控制的条件分支。
+- **L2076** `                        is_jit_or_kernel = True` — **EN:** Assigns a value to is_jit_or_kernel. **CN:** 将一个值赋给 is_jit_or_kernel。
+- **L2077** `            elif isinstance(d, ast.Attribute):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L2078** `                if d.attr in decorator_names:` — **EN:** Starts a conditional branch guarded by `d.attr in decorator_names`. **CN:** 开始一个由 `d.attr in decorator_names` 控制的条件分支。
+- **L2079** `                    is_jit_or_kernel = True` — **EN:** Assigns a value to is_jit_or_kernel. **CN:** 将一个值赋给 is_jit_or_kernel。
+- **L2080** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2081** `            if not is_jit_or_kernel:` — **EN:** Starts a conditional branch guarded by `not is_jit_or_kernel`. **CN:** 开始一个由 `not is_jit_or_kernel` 控制的条件分支。
+- **L2082** `                new_decorator_list.append(d)` — **EN:** Invokes `new_decorator_list.append` as a standalone call. **CN:** 以独立语句方式调用 `new_decorator_list.append`。
+- **L2083** `        return new_decorator_list` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2084** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2085** `    def visit_Global(self, node: ast.Global) -> None:` — **EN:** Defines function `visit_Global`. **CN:** 定义函数 `visit_Global`。
+- **L2086** `        raise DSLAstPreprocessorError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2087** `            "\`global\` is not supported in DSL",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2088** `            suggestion="Please explicitly pass in global variables as arguments",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2089** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2090** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2091** `    def visit_Nonlocal(self, node: ast.Nonlocal) -> ast.Nonlocal:` — **EN:** Defines function `visit_Nonlocal`. **CN:** 定义函数 `visit_Nonlocal`。
+- **L2092** `        active_symbols = self.session_data.scope_manager.get_active_symbols()` — **EN:** Assigns a value to active_symbols. **CN:** 将一个值赋给 active_symbols。
+- **L2093** `        nonlocal_names = OrderedSet(node.names)` — **EN:** Assigns a value to nonlocal_names. **CN:** 将一个值赋给 nonlocal_names。
+- **L2094** `        intersect = nonlocal_names.intersections(active_symbols)` — **EN:** Assigns a value to intersect. **CN:** 将一个值赋给 intersect。
+- **L2095** `        for name in node.names:` — **EN:** Starts a loop assigning items from `node.names` to `name`. **CN:** 开始一个循环，将 `node.names` 的元素赋给 `name`。
+- **L2096** `            if name not in intersect:` — **EN:** Starts a conditional branch guarded by `name not in intersect`. **CN:** 开始一个由 `name not in intersect` 控制的条件分支。
+- **L2097** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L2098** `                    (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2099** `                        f"\`{ast.unparse(node)}\` is referring to \`{name}\` which is not tracked by current JIT context, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2100** `                        "this is not supported in DSL"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2101** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2102** `                    suggestion="Please explicitly pass in nonlocal variables as arguments",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2103** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2104** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2105** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2107** `    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:` — **EN:** Defines function `visit_FunctionDef`. **CN:** 定义函数 `visit_FunctionDef`。
+- **L2108** `        # Add self to active symbols of parent scope` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2109** `        self.session_data.scope_manager.add_to_callables(node.name)` — **EN:** Invokes `self.session_data.scope_manager.add_to_callables` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_callables`。
+- **L2110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2111** `        with (` — **EN:** Starts a context-managed block using self.session_data.scope_manager.enter_local_scope(), self.session_data.set_current_function_name(node.name). **CN:** 开始一个使用 self.session_data.scope_manager.enter_local_scope(), self.session_data.set_current_function_name(node.name) 的上下文管理代码块。
+- **L2112** `            self.session_data.scope_manager.enter_local_scope(),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2113** `            self.session_data.set_current_function_name(node.name),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2114** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2115** `            self.session_data.function_counter += 1` — **EN:** Updates self.session_data.function_counter in place. **CN:** 原地更新 self.session_data.function_counter。
+- **L2116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2117** `            # Add function name and arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2118** `            self.session_data.scope_manager.add_to_scope(node.name)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L2119** `            for arg in node.args.args:` — **EN:** Starts a loop assigning items from `node.args.args` to `arg`. **CN:** 开始一个循环，将 `node.args.args` 的元素赋给 `arg`。
+- **L2120** `                self.session_data.scope_manager.add_to_scope(arg.arg)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L2121** `                arg.annotation = None` — **EN:** Assigns a value to arg.annotation. **CN:** 将一个值赋给 arg.annotation。
+- **L2122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2123** `            for arg in node.args.kwonlyargs:` — **EN:** Starts a loop assigning items from `node.args.kwonlyargs` to `arg`. **CN:** 开始一个循环，将 `node.args.kwonlyargs` 的元素赋给 `arg`。
+- **L2124** `                self.session_data.scope_manager.add_to_scope(arg.arg)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L2125** `                arg.annotation = None` — **EN:** Assigns a value to arg.annotation. **CN:** 将一个值赋给 arg.annotation。
+- **L2126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2127** `            for arg in node.args.posonlyargs:` — **EN:** Starts a loop assigning items from `node.args.posonlyargs` to `arg`. **CN:** 开始一个循环，将 `node.args.posonlyargs` 的元素赋给 `arg`。
+- **L2128** `                self.session_data.scope_manager.add_to_scope(arg.arg)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L2129** `                arg.annotation = None` — **EN:** Assigns a value to arg.annotation. **CN:** 将一个值赋给 arg.annotation。
+- **L2130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2131** `            self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2133** `        # Remove .jit and .kernel decorators` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2134** `        node.decorator_list = self.remove_dsl_decorator(node.decorator_list)` — **EN:** Assigns a value to node.decorator_list. **CN:** 将一个值赋给 node.decorator_list。
+- **L2135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2136** `        # Remove return annotation from processed AST to avoid symbol requirement` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2137** `        node.returns = None` — **EN:** Assigns a value to node.returns. **CN:** 将一个值赋给 node.returns。
+- **L2138** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2140** `    def visit_With(self, node: ast.With) -> ast.AST:` — **EN:** Defines function `visit_With`. **CN:** 定义函数 `visit_With`。
+- **L2141** `        for item in node.items:` — **EN:** Starts a loop assigning items from `node.items` to `item`. **CN:** 开始一个循环，将 `node.items` 的元素赋给 `item`。
+- **L2142** `            if isinstance(item.optional_vars, ast.Name):` — **EN:** Starts a conditional branch guarded by `isinstance(item.optional_vars, ast.Name)`. **CN:** 开始一个由 `isinstance(item.optional_vars, ast.Name)` 控制的条件分支。
+- **L2143** `                self.session_data.scope_manager.add_to_scope(item.optional_vars.id)` — **EN:** Invokes `self.session_data.scope_manager.add_to_scope` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.scope_manager.add_to_scope`。
+- **L2144** `        return self.generic_visit(node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2146** `    def visit_While(self, node: ast.While) -> ast.While | list[ast.stmt]:` — **EN:** Defines function `visit_While`. **CN:** 定义函数 `visit_While`。
+- **L2147** `        # Constexpr doesn't get preprocessed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2148** `        if self.is_node_constexpr(node):` — **EN:** Starts a conditional branch guarded by `self.is_node_constexpr(node)`. **CN:** 开始一个由 `self.is_node_constexpr(node)` 控制的条件分支。
+- **L2149** `            self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2150** `            assert isinstance(node.test, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L2151** `            check = self._insert_cf_symbol_check(node.test.func)` — **EN:** Assigns a value to check. **CN:** 将一个值赋给 check。
+- **L2152** `            return [check, node]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2154** `        active_symbols = self.session_data.scope_manager.get_active_symbols()` — **EN:** Assigns a value to active_symbols. **CN:** 将一个值赋给 active_symbols。
+- **L2155** `        active_callables = self.session_data.scope_manager.get_active_callables()` — **EN:** Assigns a value to active_callables. **CN:** 将一个值赋给 active_callables。
+- **L2156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2157** `        with self.session_data.scope_manager.enter_control_flow_scope():` — **EN:** Starts a context-managed block using self.session_data.scope_manager.enter_control_flow_scope(). **CN:** 开始一个使用 self.session_data.scope_manager.enter_control_flow_scope() 的上下文管理代码块。
+- **L2158** `            self.check_early_exit(node, "while")` — **EN:** Invokes `self.check_early_exit` as a standalone call. **CN:** 以独立语句方式调用 `self.check_early_exit`。
+- **L2159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2160** `            write_args, full_write_args_count, called_closures = (` — **EN:** Assigns a value to (write_args, full_write_args_count, called_closures). **CN:** 将一个值赋给 (write_args, full_write_args_count, called_closures)。
+- **L2161** `                self.analyze_region_variables(node, active_symbols, active_callables)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2162** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2163** `            exprs = []` — **EN:** Assigns a value to exprs. **CN:** 将一个值赋给 exprs。
+- **L2164** `            if called_closures:` — **EN:** Starts a conditional branch guarded by `called_closures`. **CN:** 开始一个由 `called_closures` 控制的条件分支。
+- **L2165** `                exprs.append(self._create_closure_check_call(called_closures, node))` — **EN:** Invokes `exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `exprs.append`。
+- **L2166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2167** `            func_name = f"while_region_{self.session_data.counter}"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L2168** `            self.session_data.counter += 1` — **EN:** Updates self.session_data.counter in place. **CN:** 原地更新 self.session_data.counter。
+- **L2169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2170** `            func_def = self.create_while_function(` — **EN:** Assigns a value to func_def. **CN:** 将一个值赋给 func_def。
+- **L2171** `                func_name, node, write_args, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2172** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2173** `            assign = self.create_cf_call(func_name, write_args, node)` — **EN:** Assigns a value to assign. **CN:** 将一个值赋给 assign。
+- **L2174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2175** `        return exprs + [func_def] + assign` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2177** `    def create_cf_call(` — **EN:** Defines function `create_cf_call`. **CN:** 定义函数 `create_cf_call`。
+- **L2178** `        self, func_name: str, yield_args: list[str], node: ast.stmt` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2179** `    ) -> list[ast.stmt]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2180** `        """Creates the assignment statement for the if function call"""` — **EN:** Docstring line documenting the function `create_cf_call`. **CN:** 文档字符串行，用于说明 function `create_cf_call`。
+- **L2181** `        if not yield_args:` — **EN:** Starts a conditional branch guarded by `not yield_args`. **CN:** 开始一个由 `not yield_args` 控制的条件分支。
+- **L2182** `            return [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2183** `                ast.copy_location(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2184** `                    ast.Expr(value=ast.Name(id=func_name, ctx=ast.Load())), node` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2185** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2186** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2187** `        has_self = False` — **EN:** Assigns a value to has_self. **CN:** 将一个值赋给 has_self。
+- **L2188** `        for i, arg in enumerate(yield_args):` — **EN:** Starts a loop assigning items from `enumerate(yield_args)` to `(i, arg)`. **CN:** 开始一个循环，将 `enumerate(yield_args)` 的元素赋给 `(i, arg)`。
+- **L2189** `            if arg == "self":` — **EN:** Starts a conditional branch guarded by `arg == 'self'`. **CN:** 开始一个由 `arg == 'self'` 控制的条件分支。
+- **L2190** `                has_self = True` — **EN:** Assigns a value to has_self. **CN:** 将一个值赋给 has_self。
+- **L2191** `                yield_args[i] = "yield_self"` — **EN:** Assigns a value to yield_args[i]. **CN:** 将一个值赋给 yield_args[i]。
+- **L2192** `                break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L2193** `        if len(yield_args) == 1:` — **EN:** Starts a conditional branch guarded by `len(yield_args) == 1`. **CN:** 开始一个由 `len(yield_args) == 1` 控制的条件分支。
+- **L2194** `            assign = ast.Assign(` — **EN:** Assigns a value to assign. **CN:** 将一个值赋给 assign。
+- **L2195** `                targets=[ast.Name(id=yield_args[0], ctx=ast.Store())],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2196** `                value=ast.Name(id=func_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2197** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2198** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2199** `            assign = ast.Assign(` — **EN:** Assigns a value to assign. **CN:** 将一个值赋给 assign。
+- **L2200** `                targets=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2201** `                    ast.Tuple(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2202** `                        elts=[ast.Name(id=var, ctx=ast.Store()) for var in yield_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2203** `                        ctx=ast.Store(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2204** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2205** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2206** `                value=ast.Name(id=func_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2207** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2209** `        if has_self:` — **EN:** Starts a conditional branch guarded by `has_self`. **CN:** 开始一个由 `has_self` 控制的条件分支。
+- **L2210** `            fix_self = ast.Expr(` — **EN:** Assigns a value to fix_self. **CN:** 将一个值赋给 fix_self。
+- **L2211** `                value=ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2212** `                    func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2213** `                        "copy_members", lineno=node.lineno, col_offset=node.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2214** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2215** `                    args=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2216** `                        ast.Name(id="self", ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2217** `                        ast.Name(id="yield_self", ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2218** `                    ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2219** `                    keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2220** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2221** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2222** `            return [ast.copy_location(assign, node), ast.copy_location(fix_self, node)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2223** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2224** `            return [ast.copy_location(assign, node)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2226** `    def _visit_Comprehension(` — **EN:** Defines function `_visit_Comprehension`. **CN:** 定义函数 `_visit_Comprehension`。
+- **L2227** `        self, node: _ComprehensionT, ele_visitor: Callable[..., Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2228** `    ) -> _ComprehensionT:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2229** `        node.generators = [self.visit(generator) for generator in node.generators]` — **EN:** Assigns a value to node.generators. **CN:** 将一个值赋给 node.generators。
+- **L2230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2231** `        targets: list[str] = []` — **EN:** Assigns a typed value to targets. **CN:** 为 targets 赋予带类型标注的值。
+- **L2232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2233** `        class NameCollector(ast.NodeVisitor):` — **EN:** Defines class `NameCollector` with bases ast.NodeVisitor. **CN:** 定义类 `NameCollector`，其基类为 ast.NodeVisitor。
+- **L2234** `            def visit_Name(self, node: ast.Name) -> None:` — **EN:** Defines function `visit_Name`. **CN:** 定义函数 `visit_Name`。
+- **L2235** `                if isinstance(node.ctx, ast.Store):` — **EN:** Starts a conditional branch guarded by `isinstance(node.ctx, ast.Store)`. **CN:** 开始一个由 `isinstance(node.ctx, ast.Store)` 控制的条件分支。
+- **L2236** `                    targets.append(node.id)` — **EN:** Invokes `targets.append` as a standalone call. **CN:** 以独立语句方式调用 `targets.append`。
+- **L2237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2238** `        # Collect generator targets` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2239** `        collector = NameCollector()` — **EN:** Assigns a value to collector. **CN:** 将一个值赋给 collector。
+- **L2240** `        [collector.visit(generator) for generator in node.generators]` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L2241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2242** `        self.session_data.generator_targets = targets` — **EN:** Assigns a value to self.session_data.generator_targets. **CN:** 将一个值赋给 self.session_data.generator_targets。
+- **L2243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2244** `        ele_visitor(node)` — **EN:** Invokes `ele_visitor` as a standalone call. **CN:** 以独立语句方式调用 `ele_visitor`。
+- **L2245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2246** `        self.session_data.generator_targets = []` — **EN:** Assigns a value to self.session_data.generator_targets. **CN:** 将一个值赋给 self.session_data.generator_targets。
+- **L2247** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2249** `    def visit_DictComp(self, node: ast.DictComp) -> ast.DictComp:` — **EN:** Defines function `visit_DictComp`. **CN:** 定义函数 `visit_DictComp`。
+- **L2250** `        def key_value_visitor(n: ast.DictComp) -> None:` — **EN:** Defines function `key_value_visitor`. **CN:** 定义函数 `key_value_visitor`。
+- **L2251** `            n.key = self.visit(n.key)` — **EN:** Assigns a value to n.key. **CN:** 将一个值赋给 n.key。
+- **L2252** `            n.value = self.visit(n.value)` — **EN:** Assigns a value to n.value. **CN:** 将一个值赋给 n.value。
+- **L2253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2254** `        return self._visit_Comprehension(node, key_value_visitor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2256** `    def visit_Lambda(self, node: ast.Lambda) -> ast.Lambda:` — **EN:** Defines function `visit_Lambda`. **CN:** 定义函数 `visit_Lambda`。
+- **L2257** `        current_lambda_args = len(self.session_data.lambda_args)` — **EN:** Assigns a value to current_lambda_args. **CN:** 将一个值赋给 current_lambda_args。
+- **L2258** `        for arg in node.args.args:` — **EN:** Starts a loop assigning items from `node.args.args` to `arg`. **CN:** 开始一个循环，将 `node.args.args` 的元素赋给 `arg`。
+- **L2259** `            self.session_data.lambda_args.append(arg.arg)` — **EN:** Invokes `self.session_data.lambda_args.append` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.lambda_args.append`。
+- **L2260** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2261** `        node.body = self.visit(node.body)` — **EN:** Assigns a value to node.body. **CN:** 将一个值赋给 node.body。
+- **L2262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2263** `        self.session_data.lambda_args = self.session_data.lambda_args[` — **EN:** Assigns a value to self.session_data.lambda_args. **CN:** 将一个值赋给 self.session_data.lambda_args。
+- **L2264** `            :current_lambda_args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2265** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2267** `        return node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2269** `    def visit_ListComp(self, node: ast.ListComp) -> ast.ListComp:` — **EN:** Defines function `visit_ListComp`. **CN:** 定义函数 `visit_ListComp`。
+- **L2270** `        return self._visit_Comprehension(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2271** `            node, lambda n: setattr(n, "elt", self.visit(n.elt))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2272** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2274** `    def visit_GeneratorExp(self, node: ast.GeneratorExp) -> ast.GeneratorExp:` — **EN:** Defines function `visit_GeneratorExp`. **CN:** 定义函数 `visit_GeneratorExp`。
+- **L2275** `        return self._visit_Comprehension(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2276** `            node, lambda n: setattr(n, "elt", self.visit(n.elt))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2277** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2279** `    def visit_SetComp(self, node: ast.SetComp) -> ast.SetComp:` — **EN:** Defines function `visit_SetComp`. **CN:** 定义函数 `visit_SetComp`。
+- **L2280** `        return self._visit_Comprehension(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2281** `            node, lambda n: setattr(n, "elt", self.visit(n.elt))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2282** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2284** `    def visit_IfExp(self, node: ast.IfExp) -> ast.Call:` — **EN:** Defines function `visit_IfExp`. **CN:** 定义函数 `visit_IfExp`。
+- **L2285** `        """` — **EN:** Starts the docstring for the function `visit_IfExp`. **CN:** 开始说明 function `visit_IfExp` 的文档字符串。
+- **L2286** `        Transforms an inline if-else (ternary) expression into runtime-dispatched` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2287** `        control flow using synthesized function definitions for each branch.` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2289** `        This converts an expression of the form \`\`x if cond else y\`\` into two local` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2290** `        function blocks (for the \`\`then\`\` and \`\`else\`\` branches), inserts those blocks` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2291** `        just before the current statement, and produces a call to the conditional executor.` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2293** `        This lets the DSL infrastructure analyze and dispatch dynamic inline conditionals` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2294** `        in a uniform way at runtime.` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2295** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2296** `        Parameters` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2297** `        ----------` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2298** `        node : ast.IfExp` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2299** `            The AST node representing the inline if-else expression.` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2301** `        Returns` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2302** `        -------` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2303** `        ast.Call` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2304** `            An AST node that calls the conditional expression executor, referencing` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2305** `            the synthesized blocks and the predicate.` — **EN:** Continues the docstring for the function `visit_IfExp`. **CN:** 继续说明 function `visit_IfExp` 的文档字符串。
+- **L2306** `        """` — **EN:** Ends the docstring for the function `visit_IfExp`. **CN:** 结束说明 function `visit_IfExp` 的文档字符串。
+- **L2307** `        # Create unique names for the then and else branch function blocks` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2308** `        then_block_name = f"ifexp_then_block_{self.session_data.counter}"` — **EN:** Assigns a value to then_block_name. **CN:** 将一个值赋给 then_block_name。
+- **L2309** `        else_block_name = f"ifexp_else_block_{self.session_data.counter}"` — **EN:** Assigns a value to else_block_name. **CN:** 将一个值赋给 else_block_name。
+- **L2310** `        self.session_data.counter += 1` — **EN:** Updates self.session_data.counter in place. **CN:** 原地更新 self.session_data.counter。
+- **L2311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2312** `        # Define the then-block function, with no arguments and returning the visited body` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2313** `        then_block_def = ast.FunctionDef(` — **EN:** Assigns a value to then_block_def. **CN:** 将一个值赋给 then_block_def。
+- **L2314** `            name=then_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2315** `            args=ast.arguments(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2316** `                posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2317** `                args=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2318** `                    ast.arg(arg=target, annotation=None)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2319** `                    for target in chain(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2320** `                        self.session_data.generator_targets,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2321** `                        self.session_data.lambda_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2322** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2323** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2324** `                kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2325** `                kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2326** `                defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2327** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2328** `            body=[ast.Return(value=self.visit(node.body))],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2329** `            decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2330** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2331** `        # Define the else-block function, with no arguments and returning the visited orelse` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2332** `        else_block_def = ast.FunctionDef(` — **EN:** Assigns a value to else_block_def. **CN:** 将一个值赋给 else_block_def。
+- **L2333** `            name=else_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2334** `            args=ast.arguments(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2335** `                posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2336** `                args=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2337** `                    ast.arg(arg=target, annotation=None)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2338** `                    for target in chain(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2339** `                        self.session_data.generator_targets,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2340** `                        self.session_data.lambda_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2341** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2342** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2343** `                kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2344** `                kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2345** `                defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2346** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2347** `            body=[ast.Return(value=self.visit(node.orelse))],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2348** `            decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2349** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2351** `        # Insert the block definitions into the most recent (innermost) region before the statement` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2352** `        self.session_data.region_stack[-1].append_new_stmts(` — **EN:** Invokes `self.session_data.region_stack[-1].append_new_stmts` as a standalone call. **CN:** 以独立语句方式调用 `self.session_data.region_stack[-1].append_new_stmts`。
+- **L2353** `            [then_block_def, else_block_def]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2354** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2356** `        # Create the executor call node, wiring up the predicate and newly synthesized blocks` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2357** `        executor_call = ast.Call(` — **EN:** Assigns a value to executor_call. **CN:** 将一个值赋给 executor_call。
+- **L2358** `            func=_create_module_attribute(self.IFEXP_EXECUTOR),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2359** `            args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2360** `            keywords=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2361** `                ast.keyword(arg="pred", value=self.visit(node.test)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2362** `                ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2363** `                    arg="block_args",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2364** `                    value=ast.Tuple(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2365** `                        elts=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2366** `                            ast.Name(id=name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2367** `                            for name in chain(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2368** `                                self.session_data.generator_targets,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2369** `                                self.session_data.lambda_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2370** `                            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2371** `                        ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2372** `                        ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2373** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2374** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2375** `                ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2376** `                    arg="then_block", value=ast.Name(id=then_block_name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2377** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2378** `                ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2379** `                    arg="else_block", value=ast.Name(id=else_block_name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2380** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2381** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2382** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2384** `        # Return the transformed executor call node at the original location in the AST` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2385** `        return ast.copy_location(executor_call, node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2387** `    cmpops = {` — **EN:** Assigns a value to cmpops. **CN:** 将一个值赋给 cmpops。
+- **L2388** `        "Eq": "==",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2389** `        "NotEq": "!=",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2390** `        "Lt": "<",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2391** `        "LtE": "<=",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2392** `        "Gt": ">",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2393** `        "GtE": ">=",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2394** `        "Is": "is",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2395** `        "IsNot": "is not",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2396** `        "In": "in",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2397** `        "NotIn": "not in",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2398** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2400** `    def compare_ops_to_str(self, node: ast.Compare) -> ast.List:` — **EN:** Defines function `compare_ops_to_str`. **CN:** 定义函数 `compare_ops_to_str`。
+- **L2401** `        names: list[ast.expr] = [` — **EN:** Assigns a typed value to names. **CN:** 为 names 赋予带类型标注的值。
+- **L2402** `            ast.Constant(value=self.cmpops[op.__class__.__name__]) for op in node.ops` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2403** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2404** `        return ast.List(elts=names, ctx=ast.Load())` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2406** `    def visit_Compare(self, node: ast.Compare) -> ast.Call:` — **EN:** Defines function `visit_Compare`. **CN:** 定义函数 `visit_Compare`。
+- **L2407** `        self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2409** `        comparator_strs = self.compare_ops_to_str(node)` — **EN:** Assigns a value to comparator_strs. **CN:** 将一个值赋给 comparator_strs。
+- **L2410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2411** `        keywords = [` — **EN:** Assigns a value to keywords. **CN:** 将一个值赋给 keywords。
+- **L2412** `            ast.keyword(arg="left", value=node.left),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2413** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2414** `                arg="comparators", value=ast.List(elts=node.comparators, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2415** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2416** `            ast.keyword(arg="ops", value=comparator_strs),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2417** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2418** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2419** `        call = ast.copy_location(` — **EN:** Assigns a value to call. **CN:** 将一个值赋给 call。
+- **L2420** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2421** `                func=_create_module_attribute(self.COMPARE_EXECUTOR),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2422** `                args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2423** `                keywords=keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2424** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2425** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2426** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2428** `        return call` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2430** `    def visit_If(self, node: ast.If) -> ast.If | list[ast.stmt]:` — **EN:** Defines function `visit_If`. **CN:** 定义函数 `visit_If`。
+- **L2431** `        # const_expr doesn't get preprocessed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2432** `        if self.is_node_constexpr(node):` — **EN:** Starts a conditional branch guarded by `self.is_node_constexpr(node)`. **CN:** 开始一个由 `self.is_node_constexpr(node)` 控制的条件分支。
+- **L2433** `            self.generic_visit(node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2434** `            assert isinstance(node.test, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L2435** `            check = self._insert_cf_symbol_check(node.test.func)` — **EN:** Assigns a value to check. **CN:** 将一个值赋给 check。
+- **L2436** `            return [check, node]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2438** `        active_symbols = self.session_data.scope_manager.get_active_symbols()` — **EN:** Assigns a value to active_symbols. **CN:** 将一个值赋给 active_symbols。
+- **L2439** `        active_callables = self.session_data.scope_manager.get_active_callables()` — **EN:** Assigns a value to active_callables. **CN:** 将一个值赋给 active_callables。
+- **L2440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2441** `        with self.session_data.scope_manager.enter_control_flow_scope():` — **EN:** Starts a context-managed block using self.session_data.scope_manager.enter_control_flow_scope(). **CN:** 开始一个使用 self.session_data.scope_manager.enter_control_flow_scope() 的上下文管理代码块。
+- **L2442** `            self.check_early_exit(node, "if")` — **EN:** Invokes `self.check_early_exit` as a standalone call. **CN:** 以独立语句方式调用 `self.check_early_exit`。
+- **L2443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2444** `            yield_args, full_write_args_count, called_closures = (` — **EN:** Assigns a value to (yield_args, full_write_args_count, called_closures). **CN:** 将一个值赋给 (yield_args, full_write_args_count, called_closures)。
+- **L2445** `                self.analyze_region_variables(node, active_symbols, active_callables)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2446** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2447** `            exprs = []` — **EN:** Assigns a value to exprs. **CN:** 将一个值赋给 exprs。
+- **L2448** `            if called_closures:` — **EN:** Starts a conditional branch guarded by `called_closures`. **CN:** 开始一个由 `called_closures` 控制的条件分支。
+- **L2449** `                exprs.append(self._create_closure_check_call(called_closures, node))` — **EN:** Invokes `exprs.append` as a standalone call. **CN:** 以独立语句方式调用 `exprs.append`。
+- **L2450** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2451** `            func_name = f"if_region_{self.session_data.counter}"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L2452** `            self.session_data.counter += 1` — **EN:** Updates self.session_data.counter in place. **CN:** 原地更新 self.session_data.counter。
+- **L2453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2454** `            func_def = self.create_if_function(` — **EN:** Assigns a value to func_def. **CN:** 将一个值赋给 func_def。
+- **L2455** `                func_name, node, yield_args, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2456** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2457** `            assign = self.create_cf_call(func_name, yield_args, node)` — **EN:** Assigns a value to assign. **CN:** 将一个值赋给 assign。
+- **L2458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2459** `        return exprs + [func_def] + assign` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2461** `    def generate_get_locals_or_none_call(self, write_args: list[str]) -> ast.Call:` — **EN:** Defines function `generate_get_locals_or_none_call`. **CN:** 定义函数 `generate_get_locals_or_none_call`。
+- **L2462** `        return ast.Call(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2463** `            func=_create_module_attribute("get_locals_or_none"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2464** `            args=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2465** `                ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2466** `                    func=ast.Name(id="locals", ctx=ast.Load()), args=[], keywords=[]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2467** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2468** `                ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2469** `                    elts=[ast.Constant(value=arg) for arg in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2470** `                    ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2471** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2472** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2473** `            keywords=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2474** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2476** `    def create_if_function(` — **EN:** Defines function `create_if_function`. **CN:** 定义函数 `create_if_function`。
+- **L2477** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2478** `        func_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2479** `        node: ast.If,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2480** `        write_args: list[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2481** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2482** `    ) -> ast.FunctionDef:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2483** `        test_expr = self.visit(node.test)` — **EN:** Assigns a value to test_expr. **CN:** 将一个值赋给 test_expr。
+- **L2484** `        pred_name = self.make_func_param_name("pred", write_args)` — **EN:** Assigns a value to pred_name. **CN:** 将一个值赋给 pred_name。
+- **L2485** `        func_args = [ast.arg(arg=pred_name, annotation=None)]` — **EN:** Assigns a value to func_args. **CN:** 将一个值赋给 func_args。
+- **L2486** `        func_args += [ast.arg(arg=var, annotation=None) for var in write_args]` — **EN:** Updates func_args in place. **CN:** 原地更新 func_args。
+- **L2487** `        func_args_then_else = [ast.arg(arg=var, annotation=None) for var in write_args]` — **EN:** Assigns a value to func_args_then_else. **CN:** 将一个值赋给 func_args_then_else。
+- **L2488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2489** `        then_body: list[ast.stmt] = []` — **EN:** Assigns a typed value to then_body. **CN:** 为 then_body 赋予带类型标注的值。
+- **L2490** `        with (` — **EN:** Starts a context-managed block using Region(self.session_data, new_value=then_body), self.session_data.scope_manager.enter_control_flow_scope(). **CN:** 开始一个使用 Region(self.session_data, new_value=then_body), self.session_data.scope_manager.enter_control_flow_scope() 的上下文管理代码块。
+- **L2491** `            Region(self.session_data, new_value=then_body),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2492** `            self.session_data.scope_manager.enter_control_flow_scope(),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2493** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2494** `            for stmt in node.body:` — **EN:** Starts a loop assigning items from `node.body` to `stmt`. **CN:** 开始一个循环，将 `node.body` 的元素赋给 `stmt`。
+- **L2495** `                transformed_stmt = self.visit(` — **EN:** Assigns a value to transformed_stmt. **CN:** 将一个值赋给 transformed_stmt。
+- **L2496** `                    stmt` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2497** `                )  # Recursively visit inner statements` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2498** `                if isinstance(transformed_stmt, list):` — **EN:** Starts a conditional branch guarded by `isinstance(transformed_stmt, list)`. **CN:** 开始一个由 `isinstance(transformed_stmt, list)` 控制的条件分支。
+- **L2499** `                    then_body.extend(transformed_stmt)` — **EN:** Invokes `then_body.extend` as a standalone call. **CN:** 以独立语句方式调用 `then_body.extend`。
+- **L2500** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2501** `                    then_body.append(transformed_stmt)` — **EN:** Invokes `then_body.append` as a standalone call. **CN:** 以独立语句方式调用 `then_body.append`。
+- **L2502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2503** `        # Create common return list for all blocks` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2504** `        return_list = ast.List(` — **EN:** Assigns a value to return_list. **CN:** 将一个值赋给 return_list。
+- **L2505** `            elts=[ast.Name(id=var, ctx=ast.Load()) for var in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2506** `            ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2507** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2509** `        # Create common function arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2510** `        func_decorator_arguments = ast.arguments(` — **EN:** Assigns a value to func_decorator_arguments. **CN:** 将一个值赋给 func_decorator_arguments。
+- **L2511** `            posonlyargs=[], args=func_args, kwonlyargs=[], kw_defaults=[], defaults=[]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2512** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2513** `        func_then_else_arguments = ast.arguments(` — **EN:** Assigns a value to func_then_else_arguments. **CN:** 将一个值赋给 func_then_else_arguments。
+- **L2514** `            posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2515** `            args=func_args_then_else,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2516** `            kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2517** `            kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2518** `            defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2519** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2521** `        then_block_name = f"then_block_{self.session_data.counter}"` — **EN:** Assigns a value to then_block_name. **CN:** 将一个值赋给 then_block_name。
+- **L2522** `        else_block_name = f"else_block_{self.session_data.counter}"` — **EN:** Assigns a value to else_block_name. **CN:** 将一个值赋给 else_block_name。
+- **L2523** `        elif_region_name = f"elif_region_{self.session_data.counter}"` — **EN:** Assigns a value to elif_region_name. **CN:** 将一个值赋给 elif_region_name。
+- **L2524** `        self.session_data.counter += 1` — **EN:** Updates self.session_data.counter in place. **CN:** 原地更新 self.session_data.counter。
+- **L2525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2526** `        # Create then block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2527** `        then_block = ast.copy_location(` — **EN:** Assigns a value to then_block. **CN:** 将一个值赋给 then_block。
+- **L2528** `            ast.FunctionDef(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2529** `                name=then_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2530** `                args=func_then_else_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2531** `                body=then_body + [ast.Return(value=return_list)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2532** `                decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2533** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2534** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2535** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2536** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2537** `        # Decorator keywords` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2538** `        decorator_keywords = [` — **EN:** Assigns a value to decorator_keywords. **CN:** 将一个值赋给 decorator_keywords。
+- **L2539** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2540** `                arg="pred", value=test_expr` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2541** `            ),  # ast.Name(id="pred", ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2542** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2543** `                arg="write_args",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2544** `                value=self.generate_get_locals_or_none_call(write_args),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2545** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2546** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2547** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2548** `        # Create decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2549** `        decorator = ast.copy_location(` — **EN:** Assigns a value to decorator. **CN:** 将一个值赋给 decorator。
+- **L2550** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2551** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2552** `                    self.DECORATOR_IF_STATEMENT,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2553** `                    lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2554** `                    col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2555** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2556** `                args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2557** `                keywords=decorator_keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2558** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2559** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2560** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2562** `        # Executor keywords` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2563** `        execute_keywords = [` — **EN:** Assigns a value to execute_keywords. **CN:** 将一个值赋给 execute_keywords。
+- **L2564** `            ast.keyword(arg="pred", value=ast.Name(id=pred_name, ctx=ast.Load())),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2565** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2566** `                arg="write_args",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2567** `                value=ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2568** `                    elts=[ast.Name(id=arg, ctx=ast.Load()) for arg in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2569** `                    ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2570** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2571** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2572** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2573** `                arg="full_write_args_count",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2574** `                value=ast.Constant(value=full_write_args_count),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2575** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2576** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2577** `                arg="write_args_names",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2578** `                value=ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2579** `                    elts=[ast.Constant(value=arg) for arg in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2580** `                    ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2581** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2582** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2583** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2584** `                arg="then_block", value=ast.Name(id=then_block_name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2585** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2586** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2587** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2588** `        # Handle different cases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2589** `        if not write_args and node.orelse == []:` — **EN:** Starts a conditional branch guarded by `not write_args and node.orelse == []`. **CN:** 开始一个由 `not write_args and node.orelse == []` 控制的条件分支。
+- **L2590** `            # No write_args case - only then_block needed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2591** `            execute_call = ast.copy_location(` — **EN:** Assigns a value to execute_call. **CN:** 将一个值赋给 execute_call。
+- **L2592** `                ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2593** `                    func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2594** `                        self.IF_EXECUTOR, lineno=node.lineno, col_offset=node.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2595** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2596** `                    args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2597** `                    keywords=execute_keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2598** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2599** `                node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2600** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2601** `            func_body = [then_block, ast.Return(value=execute_call)]` — **EN:** Assigns a value to func_body. **CN:** 将一个值赋给 func_body。
+- **L2602** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2603** `            # Create else block based on node.orelse` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2604** `            if node.orelse:` — **EN:** Starts a conditional branch guarded by `node.orelse`. **CN:** 开始一个由 `node.orelse` 控制的条件分支。
+- **L2605** `                if len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If):` — **EN:** Starts a conditional branch guarded by `len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)`. **CN:** 开始一个由 `len(node.orelse) == 1 and isinstance(node.orelse[0], ast.If)` 控制的条件分支。
+- **L2606** `                    # Handle elif case` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2607** `                    elif_node = node.orelse[0]` — **EN:** Assigns a value to elif_node. **CN:** 将一个值赋给 elif_node。
+- **L2608** `                    nested_if_name = elif_region_name` — **EN:** Assigns a value to nested_if_name. **CN:** 将一个值赋给 nested_if_name。
+- **L2609** `                    # AST cannot distinguish between the following two cases:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2610** `                    #     elif pred:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2611** `                    # and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2612** `                    #     else:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2613** `                    #         if pred:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2614** `                    # And under both cases, the \`pred\` can be a const_expr, so we need to handle it here.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2615** `                    if self.is_node_constexpr(elif_node):` — **EN:** Starts a conditional branch guarded by `self.is_node_constexpr(elif_node)`. **CN:** 开始一个由 `self.is_node_constexpr(elif_node)` 控制的条件分支。
+- **L2616** `                        self.generic_visit(elif_node)` — **EN:** Invokes `self.generic_visit` as a standalone call. **CN:** 以独立语句方式调用 `self.generic_visit`。
+- **L2617** `                        assert isinstance(elif_node.test, ast.Call)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L2618** `                        check = self._insert_cf_symbol_check(elif_node.test.func)` — **EN:** Assigns a value to check. **CN:** 将一个值赋给 check。
+- **L2619** `                        else_block = ast.FunctionDef(` — **EN:** Assigns a value to else_block. **CN:** 将一个值赋给 else_block。
+- **L2620** `                            name=else_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2621** `                            args=func_then_else_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2622** `                            body=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2623** `                                check,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2624** `                                elif_node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2625** `                                ast.Return(value=return_list),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2626** `                            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2627** `                            decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2628** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2629** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2630** `                        # Recursion for nested elif` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2631** `                        nested_if = self.create_if_function(` — **EN:** Assigns a value to nested_if. **CN:** 将一个值赋给 nested_if。
+- **L2632** `                            nested_if_name, elif_node, write_args, full_write_args_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2633** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2634** `                        else_block = ast.FunctionDef(` — **EN:** Assigns a value to else_block. **CN:** 将一个值赋给 else_block。
+- **L2635** `                            name=else_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2636** `                            args=func_then_else_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2637** `                            body=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2638** `                                nested_if,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2639** `                                ast.Return(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2640** `                                    value=ast.Name(id=nested_if_name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2641** `                                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2642** `                            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2643** `                            decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2644** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2645** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2646** `                    else_body: list[ast.stmt] = []` — **EN:** Assigns a typed value to else_body. **CN:** 为 else_body 赋予带类型标注的值。
+- **L2647** `                    with (` — **EN:** Starts a context-managed block using Region(self.session_data, new_value=else_body), self.session_data.scope_manager.enter_control_flow_scope(). **CN:** 开始一个使用 Region(self.session_data, new_value=else_body), self.session_data.scope_manager.enter_control_flow_scope() 的上下文管理代码块。
+- **L2648** `                        Region(self.session_data, new_value=else_body),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2649** `                        self.session_data.scope_manager.enter_control_flow_scope(),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2650** `                    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2651** `                        for stmt in node.orelse:` — **EN:** Starts a loop assigning items from `node.orelse` to `stmt`. **CN:** 开始一个循环，将 `node.orelse` 的元素赋给 `stmt`。
+- **L2652** `                            transformed_stmt = self.visit(` — **EN:** Assigns a value to transformed_stmt. **CN:** 将一个值赋给 transformed_stmt。
+- **L2653** `                                stmt` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2654** `                            )  # Recursively visit inner statements` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2655** `                            if isinstance(transformed_stmt, list):` — **EN:** Starts a conditional branch guarded by `isinstance(transformed_stmt, list)`. **CN:** 开始一个由 `isinstance(transformed_stmt, list)` 控制的条件分支。
+- **L2656** `                                else_body.extend(transformed_stmt)` — **EN:** Invokes `else_body.extend` as a standalone call. **CN:** 以独立语句方式调用 `else_body.extend`。
+- **L2657** `                            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2658** `                                else_body.append(transformed_stmt)` — **EN:** Invokes `else_body.append` as a standalone call. **CN:** 以独立语句方式调用 `else_body.append`。
+- **L2659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2660** `                    # Regular else block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2661** `                    else_block = ast.FunctionDef(` — **EN:** Assigns a value to else_block. **CN:** 将一个值赋给 else_block。
+- **L2662** `                        name=else_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2663** `                        args=func_then_else_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2664** `                        body=else_body + [ast.Return(value=return_list)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2665** `                        decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2666** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2667** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2668** `                # Default else block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2669** `                else_block = ast.FunctionDef(` — **EN:** Assigns a value to else_block. **CN:** 将一个值赋给 else_block。
+- **L2670** `                    name=else_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2671** `                    args=func_then_else_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2672** `                    body=[ast.Return(value=return_list)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2673** `                    decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2674** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2675** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2676** `            # Add else_block to execute keywords` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2677** `            execute_keywords.append(` — **EN:** Invokes `execute_keywords.append` as a standalone call. **CN:** 以独立语句方式调用 `execute_keywords.append`。
+- **L2678** `                ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2679** `                    arg="else_block", value=ast.Name(id=else_block_name, ctx=ast.Load())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2680** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2681** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2682** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2683** `            execute_call = ast.copy_location(` — **EN:** Assigns a value to execute_call. **CN:** 将一个值赋给 execute_call。
+- **L2684** `                ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2685** `                    func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2686** `                        self.IF_EXECUTOR, lineno=node.lineno, col_offset=node.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2687** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2688** `                    args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2689** `                    keywords=execute_keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2690** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2691** `                node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2692** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2693** `            func_body = [` — **EN:** Assigns a value to func_body. **CN:** 将一个值赋给 func_body。
+- **L2694** `                then_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2695** `                ast.copy_location(else_block, node),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2696** `                ast.Return(value=execute_call),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2697** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2698** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2699** `        return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2700** `            ast.FunctionDef(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2701** `                name=func_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2702** `                args=func_decorator_arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2703** `                body=func_body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2704** `                decorator_list=[decorator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2705** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2706** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2707** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2708** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2709** `    def create_while_function(` — **EN:** Defines function `create_while_function`. **CN:** 定义函数 `create_while_function`。
+- **L2710** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2711** `        func_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2712** `        node: ast.While,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2713** `        write_args: list[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2714** `        full_write_args_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L2715** `    ) -> ast.FunctionDef:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L2716** `        """Create a while function that looks like:` — **EN:** Starts the docstring for the function `create_while_function`. **CN:** 开始说明 function `create_while_function` 的文档字符串。
+- **L2717** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2718** `        @while_selector(pred, write_args=[])` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2719** `        def while_region(pred, write_args):` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2720** `            def while_before_block(*write_args):` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2721** `                # Note that during eval of pred can possibly alter yield_args` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2722** `                return *pred, write_args` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2723** `            def while_after_block(*write_args):` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2724** `                ...loop_body_transformed...` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2725** `                return write_args` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2726** `            return self.while_executor(pred, write_args,` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2727** `                while_before_block, while_after_block, constexpr)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2728** `        write_args = while_region(pred, write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2729** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2730** `        Which will later be executed as psuedo-code:` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2731** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2732** `        # Dynamic mode:` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2733** `        scf.WhileOp(types(write_args), write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2734** `        with InsertionPoint(before_block):` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2735** `            cond, write_args = while_before_block(*write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2736** `            scf.ConditionOp(cond, write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2737** `        with InsertionPoint(after_block):` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2738** `            write_args = while_after_block(write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2739** `            scf.YieldOp(write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2740** `        return while_op.results_` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2741** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2742** `        # Const mode:` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2743** `        cond, write_args = while_before_block(write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2744** `        while pred:` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2745** `            write_args = body_block(write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2746** `            cond, write_args = while_before_block(write_args)` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2747** `        return write_args` — **EN:** Continues the docstring for the function `create_while_function`. **CN:** 继续说明 function `create_while_function` 的文档字符串。
+- **L2748** `        """` — **EN:** Ends the docstring for the function `create_while_function`. **CN:** 结束说明 function `create_while_function` 的文档字符串。
+- **L2749** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2750** `        # Section: decorator construction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2751** `        decorator_keywords = [` — **EN:** Assigns a value to decorator_keywords. **CN:** 将一个值赋给 decorator_keywords。
+- **L2752** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2753** `                arg="write_args",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2754** `                value=self.generate_get_locals_or_none_call(write_args),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2755** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2756** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2757** `        decorator = ast.copy_location(` — **EN:** Assigns a value to decorator. **CN:** 将一个值赋给 decorator。
+- **L2758** `            ast.Call(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2759** `                func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2760** `                    self.DECORATOR_WHILE_STATEMENT,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2761** `                    lineno=node.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2762** `                    col_offset=node.col_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2763** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2764** `                args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2765** `                keywords=decorator_keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2766** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2767** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2768** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2769** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2770** `        # Section: Shared initialization for before and after blocks` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2771** `        while_before_block_name = f"while_before_block_{self.session_data.counter}"` — **EN:** Assigns a value to while_before_block_name. **CN:** 将一个值赋给 while_before_block_name。
+- **L2772** `        while_after_block_name = f"while_after_block_{self.session_data.counter}"` — **EN:** Assigns a value to while_after_block_name. **CN:** 将一个值赋给 while_after_block_name。
+- **L2773** `        self.session_data.counter += 1` — **EN:** Updates self.session_data.counter in place. **CN:** 原地更新 self.session_data.counter。
+- **L2774** `        block_args_args = [ast.arg(arg=var, annotation=None) for var in write_args]` — **EN:** Assigns a value to block_args_args. **CN:** 将一个值赋给 block_args_args。
+- **L2775** `        block_args = ast.arguments(` — **EN:** Assigns a value to block_args. **CN:** 将一个值赋给 block_args。
+- **L2776** `            posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2777** `            args=block_args_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2778** `            kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2779** `            kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2780** `            defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2781** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2782** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2783** `        yield_args_ast_name_list = ast.List(` — **EN:** Assigns a value to yield_args_ast_name_list. **CN:** 将一个值赋给 yield_args_ast_name_list。
+- **L2784** `            elts=[ast.Name(id=var, ctx=ast.Load()) for var in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2785** `            ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2786** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2787** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2788** `        # Section: while_before_block FunctionDef, which contains condition` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2789** `        while_before_stmts: list[ast.stmt] = []` — **EN:** Assigns a typed value to while_before_stmts. **CN:** 为 while_before_stmts 赋予带类型标注的值。
+- **L2790** `        with Region(self.session_data, new_value=while_before_stmts):` — **EN:** Starts a context-managed block using Region(self.session_data, new_value=while_before_stmts). **CN:** 开始一个使用 Region(self.session_data, new_value=while_before_stmts) 的上下文管理代码块。
+- **L2791** `            test_expr = ast.copy_location(self.visit(node.test), node.test)` — **EN:** Assigns a value to test_expr. **CN:** 将一个值赋给 test_expr。
+- **L2792** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2793** `        while_before_return_list = ast.List(` — **EN:** Assigns a value to while_before_return_list. **CN:** 将一个值赋给 while_before_return_list。
+- **L2794** `            elts=[test_expr, yield_args_ast_name_list],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2795** `            ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2796** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2797** `        while_before_stmts.append(ast.Return(value=while_before_return_list))` — **EN:** Invokes `while_before_stmts.append` as a standalone call. **CN:** 以独立语句方式调用 `while_before_stmts.append`。
+- **L2798** `        while_before_block = ast.copy_location(` — **EN:** Assigns a value to while_before_block. **CN:** 将一个值赋给 while_before_block。
+- **L2799** `            ast.FunctionDef(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2800** `                name=while_before_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2801** `                args=block_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2802** `                body=while_before_stmts,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2803** `                decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2804** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2805** `            test_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2806** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2807** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2808** `        # Section: while_after_block FunctionDef, which contains loop body` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2809** `        while_after_stmts: list[ast.stmt] = []` — **EN:** Assigns a typed value to while_after_stmts. **CN:** 为 while_after_stmts 赋予带类型标注的值。
+- **L2810** `        with Region(self.session_data, new_value=while_after_stmts):` — **EN:** Starts a context-managed block using Region(self.session_data, new_value=while_after_stmts). **CN:** 开始一个使用 Region(self.session_data, new_value=while_after_stmts) 的上下文管理代码块。
+- **L2811** `            for stmt in node.body:` — **EN:** Starts a loop assigning items from `node.body` to `stmt`. **CN:** 开始一个循环，将 `node.body` 的元素赋给 `stmt`。
+- **L2812** `                transformed_stmt = self.visit(` — **EN:** Assigns a value to transformed_stmt. **CN:** 将一个值赋给 transformed_stmt。
+- **L2813** `                    stmt` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2814** `                )  # Recursively visit inner statements` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2815** `                if isinstance(transformed_stmt, list):` — **EN:** Starts a conditional branch guarded by `isinstance(transformed_stmt, list)`. **CN:** 开始一个由 `isinstance(transformed_stmt, list)` 控制的条件分支。
+- **L2816** `                    while_after_stmts.extend(transformed_stmt)` — **EN:** Invokes `while_after_stmts.extend` as a standalone call. **CN:** 以独立语句方式调用 `while_after_stmts.extend`。
+- **L2817** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L2818** `                    while_after_stmts.append(transformed_stmt)` — **EN:** Invokes `while_after_stmts.append` as a standalone call. **CN:** 以独立语句方式调用 `while_after_stmts.append`。
+- **L2819** `        while_after_stmts.append(ast.Return(value=yield_args_ast_name_list))` — **EN:** Invokes `while_after_stmts.append` as a standalone call. **CN:** 以独立语句方式调用 `while_after_stmts.append`。
+- **L2820** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2821** `        while_after_block = ast.copy_location(` — **EN:** Assigns a value to while_after_block. **CN:** 将一个值赋给 while_after_block。
+- **L2822** `            ast.FunctionDef(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2823** `                name=while_after_block_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2824** `                args=block_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2825** `                body=while_after_stmts,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2826** `                decorator_list=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2827** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2828** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2829** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2830** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2831** `        # Section: Execute via executor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2832** `        execute_keywords = [` — **EN:** Assigns a value to execute_keywords. **CN:** 将一个值赋给 execute_keywords。
+- **L2833** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2834** `                arg="write_args",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2835** `                value=ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2836** `                    elts=[ast.Name(id=arg, ctx=ast.Load()) for arg in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2837** `                    ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2838** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2839** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2840** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2841** `                arg="full_write_args_count",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2842** `                value=ast.Constant(value=full_write_args_count),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2843** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2844** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2845** `                arg="while_before_block",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2846** `                value=ast.Name(id=while_before_block_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2847** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2848** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2849** `                arg="while_after_block",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2850** `                value=ast.Name(id=while_after_block_name, ctx=ast.Load()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2851** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2852** `            ast.keyword(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2853** `                arg="write_args_names",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2854** `                value=ast.List(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2855** `                    elts=[ast.Constant(value=arg) for arg in write_args],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2856** `                    ctx=ast.Load(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2857** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2858** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2859** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2860** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2861** `        execute_call = ast.Call(` — **EN:** Assigns a value to execute_call. **CN:** 将一个值赋给 execute_call。
+- **L2862** `            func=_create_module_attribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2863** `                self.WHILE_EXECUTOR, lineno=node.lineno, col_offset=node.col_offset` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2864** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2865** `            args=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2866** `            keywords=execute_keywords,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2867** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2868** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2869** `        # Putting everything together, FunctionDef for while_region` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L2870** `        func_args_args = [ast.arg(arg=var, annotation=None) for var in write_args]` — **EN:** Assigns a value to func_args_args. **CN:** 将一个值赋给 func_args_args。
+- **L2871** `        func_args = ast.arguments(` — **EN:** Assigns a value to func_args. **CN:** 将一个值赋给 func_args。
+- **L2872** `            posonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2873** `            args=func_args_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2874** `            kwonlyargs=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2875** `            kw_defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2876** `            defaults=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2877** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2878** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L2879** `        return ast.copy_location(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L2880** `            ast.FunctionDef(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2881** `                name=func_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2882** `                args=func_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2883** `                body=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2884** `                    while_before_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2885** `                    while_after_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2886** `                    ast.Return(value=execute_call),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2887** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2888** `                decorator_list=[decorator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2889** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2890** `            node,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L2891** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.ast_preprocessor`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.ast_preprocessor`。
+- EN: Module docstring summary: This module defines the `DSLPreprocessor` class, which acts as a Python preprocessor. CN: 模块文档摘要为：This module defines the `DSLPreprocessor` class, which acts as a Python preprocessor.
+- EN: Top-level classes: OrderedSet, ImportInfo, TryImportInfo, ScopeManager, Region, SessionData, DSLPreprocessor CN: 顶层类包括：OrderedSet, ImportInfo, TryImportInfo, ScopeManager, Region, SessionData, DSLPreprocessor
+- EN: Top-level functions: _create_module_attribute CN: 顶层函数包括：_create_module_attribute
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .common:*, .utils.logger:log CN: 内部依赖：.common:*, .utils.logger:log
+- EN: External or standard-library dependencies: ast, contextlib, importlib, inspect, os, sys, textwrap, types, warnings, collections.abc:Callable,Generator,Iterable,Iterator, dataclasses:dataclass,field, typing:Any,TypeVar, types:ModuleType, copy:deepcopy, itertools:chain CN: 外部或标准库依赖：ast, contextlib, importlib, inspect, os, sys, textwrap, types, warnings, collections.abc:Callable,Generator,Iterable,Iterator, dataclasses:dataclass,field, typing:Any,TypeVar, types:ModuleType, copy:deepcopy, itertools:chain

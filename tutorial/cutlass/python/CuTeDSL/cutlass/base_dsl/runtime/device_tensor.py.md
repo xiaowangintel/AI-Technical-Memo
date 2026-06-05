@@ -1,0 +1,147 @@
+# device_tensor.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/runtime/device_tensor.py`
+
+## Purpose / 作用
+- EN: Defines 6 functions (allocate, deallocate, copy_to_gpu, copy_from_gpu, ... (+2 more)) in `CuTeDSL.cutlass.base_dsl.runtime.device_tensor`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.runtime.device_tensor` 定义了 6 个函数（allocate, deallocate, copy_to_gpu, copy_from_gpu, ... (+2 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import copy` — **EN:** Imports copy for later use. **CN:** 导入 copy 供后续使用。
+- **L13** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `from . import cuda as cuda_helpers` — **EN:** Imports cuda as cuda_helpers from the current package. **CN:** 从当前包导入 cuda as cuda_helpers。
+- **L16** `from .tensor_descriptor import *` — **EN:** Imports * from `.tensor_descriptor`. **CN:** 从 `.tensor_descriptor` 导入 *。
+- **L17** `from ..common import *` — **EN:** Imports * from `..common`. **CN:** 从 `..common` 导入 *。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `def allocate(tensor: TensorDescriptor, stream: Any = None) -> None:` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L21** `    """` — **EN:** Starts the docstring for the function `allocate`. **CN:** 开始说明 function `allocate` 的文档字符串。
+- **L22** `    Allocates GPU memory` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L23** `    """` — **EN:** Ends the docstring for the function `allocate`. **CN:** 结束说明 function `allocate` 的文档字符串。
+- **L24** `    if tensor._check_is_managed_by_framework():` — **EN:** Starts a conditional branch guarded by `tensor._check_is_managed_by_framework()`. **CN:** 开始一个由 `tensor._check_is_managed_by_framework()` 控制的条件分支。
+- **L25** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L26** `            "GPU tensors are managed by the framework and cannot be modified."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    if not tensor.device_pointer is None:` — **EN:** Starts a conditional branch guarded by `not tensor.device_pointer is None`. **CN:** 开始一个由 `not tensor.device_pointer is None` 控制的条件分支。
+- **L29** `        raise DSLRuntimeError("Tensor is already allocated on the device.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `    tensor.device_pointer = cuda_helpers.allocate(tensor.size_in_bytes, stream)` — **EN:** Assigns a value to tensor.device_pointer. **CN:** 将一个值赋给 tensor.device_pointer。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `    log().info("Allocate done tensor=[%s] dev_ptr=[%s]", tensor, tensor.device_pointer)  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `def deallocate(tensor: TensorDescriptor, stream: Any = None) -> None:` — **EN:** Defines function `deallocate`. **CN:** 定义函数 `deallocate`。
+- **L37** `    """` — **EN:** Starts the docstring for the function `deallocate`. **CN:** 开始说明 function `deallocate` 的文档字符串。
+- **L38** `    Deallocates GPU memory` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L39** `    """` — **EN:** Ends the docstring for the function `deallocate`. **CN:** 结束说明 function `deallocate` 的文档字符串。
+- **L40** `    if tensor._check_is_managed_by_framework():` — **EN:** Starts a conditional branch guarded by `tensor._check_is_managed_by_framework()`. **CN:** 开始一个由 `tensor._check_is_managed_by_framework()` 控制的条件分支。
+- **L41** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L42** `            "GPU tensors are managed by the framework and cannot be modified."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    if tensor.device_pointer is None:` — **EN:** Starts a conditional branch guarded by `tensor.device_pointer is None`. **CN:** 开始一个由 `tensor.device_pointer is None` 控制的条件分支。
+- **L45** `        raise DSLRuntimeError("Tensor is not allocated on the device.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    log().info(  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L48** `        "Deallocating done tensor=[%s] dev_ptr=[%s]", tensor, tensor.device_pointer` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `    cuda_helpers.deallocate(tensor.device_pointer, stream)` — **EN:** Invokes `cuda_helpers.deallocate` as a standalone call. **CN:** 以独立语句方式调用 `cuda_helpers.deallocate`。
+- **L52** `    tensor.device_pointer = None` — **EN:** Assigns a value to tensor.device_pointer. **CN:** 将一个值赋给 tensor.device_pointer。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `def copy_to_gpu(` — **EN:** Defines function `copy_to_gpu`. **CN:** 定义函数 `copy_to_gpu`。
+- **L56** `    tensor: TensorDescriptor, do_allocate: bool = True, stream: Any = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `) -> TensorDescriptor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L58** `    """` — **EN:** Starts the docstring for the function `copy_to_gpu`. **CN:** 开始说明 function `copy_to_gpu` 的文档字符串。
+- **L59** `    Copies data from host memory to the GPU memory.` — **EN:** Continues the docstring for the function `copy_to_gpu`. **CN:** 继续说明 function `copy_to_gpu` 的文档字符串。
+- **L60** `    If do_allocate is True, it first calls allocate` — **EN:** Continues the docstring for the function `copy_to_gpu`. **CN:** 继续说明 function `copy_to_gpu` 的文档字符串。
+- **L61** `    """` — **EN:** Ends the docstring for the function `copy_to_gpu`. **CN:** 结束说明 function `copy_to_gpu` 的文档字符串。
+- **L62** `    log().info("copyin tensor=[%s] dev_ptr=[%s]", tensor, tensor.device_pointer)  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L63** `    if do_allocate:` — **EN:** Starts a conditional branch guarded by `do_allocate`. **CN:** 开始一个由 `do_allocate` 控制的条件分支。
+- **L64** `        allocate(tensor, stream)` — **EN:** Invokes `allocate` as a standalone call. **CN:** 以独立语句方式调用 `allocate`。
+- **L65** `    cuda_helpers.memcpy_h2d(` — **EN:** Invokes `cuda_helpers.memcpy_h2d` as a standalone call. **CN:** 以独立语句方式调用 `cuda_helpers.memcpy_h2d`。
+- **L66** `        tensor.data_ptr, tensor.device_pointer, tensor.size_in_bytes, stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `    log().info("copyin done tensor=[%s] dev_ptr=[%s]", tensor, tensor.device_pointer)  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L69** `    return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `def copy_from_gpu(` — **EN:** Defines function `copy_from_gpu`. **CN:** 定义函数 `copy_from_gpu`。
+- **L73** `    tensor: TensorDescriptor, do_deallocate: bool = True, stream: Any = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L74** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L75** `    """` — **EN:** Starts the docstring for the function `copy_from_gpu`. **CN:** 开始说明 function `copy_from_gpu` 的文档字符串。
+- **L76** `    Copies data from GPU memory back to the host.` — **EN:** Continues the docstring for the function `copy_from_gpu`. **CN:** 继续说明 function `copy_from_gpu` 的文档字符串。
+- **L77** `    If do_deallocate is True, it calls deallocate` — **EN:** Continues the docstring for the function `copy_from_gpu`. **CN:** 继续说明 function `copy_from_gpu` 的文档字符串。
+- **L78** `    """` — **EN:** Ends the docstring for the function `copy_from_gpu`. **CN:** 结束说明 function `copy_from_gpu` 的文档字符串。
+- **L79** `    log().info("copyout tensor=[%s] dev_ptr=[%s]", tensor, tensor.device_pointer)  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L80** `    if tensor._check_is_managed_by_framework():` — **EN:** Starts a conditional branch guarded by `tensor._check_is_managed_by_framework()`. **CN:** 开始一个由 `tensor._check_is_managed_by_framework()` 控制的条件分支。
+- **L81** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L82** `            "GPU tensors are managed by the framework and cannot be modified."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `    if tensor.device_pointer is None:` — **EN:** Starts a conditional branch guarded by `tensor.device_pointer is None`. **CN:** 开始一个由 `tensor.device_pointer is None` 控制的条件分支。
+- **L85** `        raise DSLRuntimeError("Tensor is not allocated on the device.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    cuda_helpers.memcpy_d2h(` — **EN:** Invokes `cuda_helpers.memcpy_d2h` as a standalone call. **CN:** 以独立语句方式调用 `cuda_helpers.memcpy_d2h`。
+- **L88** `        tensor.data_ptr, tensor.device_pointer, tensor.size_in_bytes, stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    if do_deallocate:` — **EN:** Starts a conditional branch guarded by `do_deallocate`. **CN:** 开始一个由 `do_deallocate` 控制的条件分支。
+- **L91** `        deallocate(tensor, stream)` — **EN:** Invokes `deallocate` as a standalone call. **CN:** 以独立语句方式调用 `deallocate`。
+- **L92** `    log().info(  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L93** `        "copyout done tensor=[%s] dev_ptr=[%s]", tensor, tensor.device_pointer` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `def to_gpu(tensor: Any, stream: Any = None) -> TensorDescriptor:` — **EN:** Defines function `to_gpu`. **CN:** 定义函数 `to_gpu`。
+- **L98** `    """` — **EN:** Starts the docstring for the function `to_gpu`. **CN:** 开始说明 function `to_gpu` 的文档字符串。
+- **L99** `    Copies the tensor to the GPU memory from Host memory` — **EN:** Continues the docstring for the function `to_gpu`. **CN:** 继续说明 function `to_gpu` 的文档字符串。
+- **L100** `    """` — **EN:** Ends the docstring for the function `to_gpu`. **CN:** 结束说明 function `to_gpu` 的文档字符串。
+- **L101** `    if isinstance(tensor, TensorDescriptor):` — **EN:** Starts a conditional branch guarded by `isinstance(tensor, TensorDescriptor)`. **CN:** 开始一个由 `isinstance(tensor, TensorDescriptor)` 控制的条件分支。
+- **L102** `        new_tensor = copy.copy(tensor)` — **EN:** Assigns a value to new_tensor. **CN:** 将一个值赋给 new_tensor。
+- **L103** `        copy_to_gpu(new_tensor, stream=stream)` — **EN:** Invokes `copy_to_gpu` as a standalone call. **CN:** 以独立语句方式调用 `copy_to_gpu`。
+- **L104** `        return new_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    if TensorDescriptor.can_transformed_to_dlpack(tensor):` — **EN:** Starts a conditional branch guarded by `TensorDescriptor.can_transformed_to_dlpack(tensor)`. **CN:** 开始一个由 `TensorDescriptor.can_transformed_to_dlpack(tensor)` 控制的条件分支。
+- **L107** `        new_tensor = TensorDescriptor(tensor)` — **EN:** Assigns a value to new_tensor. **CN:** 将一个值赋给 new_tensor。
+- **L108** `        copy_to_gpu(new_tensor, stream=stream)` — **EN:** Invokes `copy_to_gpu` as a standalone call. **CN:** 以独立语句方式调用 `copy_to_gpu`。
+- **L109** `        return new_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `    raise DSLRuntimeError("Unsupported type")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `def from_gpu(tensor: Any, stream: Any = None) -> TensorDescriptor:` — **EN:** Defines function `from_gpu`. **CN:** 定义函数 `from_gpu`。
+- **L115** `    """` — **EN:** Starts the docstring for the function `from_gpu`. **CN:** 开始说明 function `from_gpu` 的文档字符串。
+- **L116** `    Copies the tensor to the GPU memory from Host memory` — **EN:** Continues the docstring for the function `from_gpu`. **CN:** 继续说明 function `from_gpu` 的文档字符串。
+- **L117** `    """` — **EN:** Ends the docstring for the function `from_gpu`. **CN:** 结束说明 function `from_gpu` 的文档字符串。
+- **L118** `    if isinstance(tensor, TensorDescriptor):` — **EN:** Starts a conditional branch guarded by `isinstance(tensor, TensorDescriptor)`. **CN:** 开始一个由 `isinstance(tensor, TensorDescriptor)` 控制的条件分支。
+- **L119** `        new_tensor = copy.copy(tensor)` — **EN:** Assigns a value to new_tensor. **CN:** 将一个值赋给 new_tensor。
+- **L120** `        copy_from_gpu(new_tensor, stream=stream)` — **EN:** Invokes `copy_from_gpu` as a standalone call. **CN:** 以独立语句方式调用 `copy_from_gpu`。
+- **L121** `        return new_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    if TensorDescriptor.can_transformed_to_dlpack(tensor):` — **EN:** Starts a conditional branch guarded by `TensorDescriptor.can_transformed_to_dlpack(tensor)`. **CN:** 开始一个由 `TensorDescriptor.can_transformed_to_dlpack(tensor)` 控制的条件分支。
+- **L124** `        new_tensor = TensorDescriptor(tensor)` — **EN:** Assigns a value to new_tensor. **CN:** 将一个值赋给 new_tensor。
+- **L125** `        copy_from_gpu(new_tensor, stream=stream)` — **EN:** Invokes `copy_from_gpu` as a standalone call. **CN:** 以独立语句方式调用 `copy_from_gpu`。
+- **L126** `        return new_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    raise DSLRuntimeError("Unsupported type")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.runtime.device_tensor`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.runtime.device_tensor`。
+- EN: Top-level functions: allocate, deallocate, copy_to_gpu, copy_from_gpu, to_gpu, from_gpu CN: 顶层函数包括：allocate, deallocate, copy_to_gpu, copy_from_gpu, to_gpu, from_gpu
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .:cuda, .tensor_descriptor:*, ..common:* CN: 内部依赖：.:cuda, .tensor_descriptor:*, ..common:*
+- EN: External or standard-library dependencies: copy, typing:Any CN: 外部或标准库依赖：copy, typing:Any

@@ -1,0 +1,990 @@
+# tree_utils.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/utils/tree_utils.py`
+
+## Purpose / 作用
+- EN: Defines 4 classes (DSLTreeFlattenError, NodeType, PyTreeDef, Leaf) and 28 functions (_flatten_mlir_values, _unflatten_mlir_values, unzip2, unzip3, ... (+24 more)) in `CuTeDSL.cutlass.base_dsl.utils.tree_utils`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.utils.tree_utils` 定义了 4 个类（DSLTreeFlattenError, NodeType, PyTreeDef, Leaf） 和 28 个函数（_flatten_mlir_values, _unflatten_mlir_values, unzip2, unzip3, ... (+24 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from collections.abc import Callable, Iterable, Iterator` — **EN:** Imports Callable, Iterable, Iterator from `collections.abc`. **CN:** 从 `collections.abc` 导入 Callable, Iterable, Iterator。
+- **L13** `from typing import Any, NamedTuple, get_origin` — **EN:** Imports Any, NamedTuple, get_origin from `typing`. **CN:** 从 `typing` 导入 Any, NamedTuple, get_origin。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `import dataclasses` — **EN:** Imports dataclasses for later use. **CN:** 导入 dataclasses 供后续使用。
+- **L16** `import itertools as it` — **EN:** Imports itertools as it for later use. **CN:** 导入 itertools as it 供后续使用。
+- **L17** `from types import SimpleNamespace` — **EN:** Imports SimpleNamespace from `types`. **CN:** 从 `types` 导入 SimpleNamespace。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from ..typing import as_numeric, Numeric, Constexpr, implements_dynamic_expression` — **EN:** Imports as_numeric, Numeric, Constexpr, implements_dynamic_expression from `..typing`. **CN:** 从 `..typing` 导入 as_numeric, Numeric, Constexpr, implements_dynamic_expression。
+- **L20** `from .._mlir_helpers.arith import ArithValue` — **EN:** Imports ArithValue from `.._mlir_helpers.arith`. **CN:** 从 `.._mlir_helpers.arith` 导入 ArithValue。
+- **L21** `from ..common import DSLBaseError` — **EN:** Imports DSLBaseError from `..common`. **CN:** 从 `..common` 导入 DSLBaseError。
+- **L22** `from ..._mlir import ir` — **EN:** Imports ir from `..._mlir`. **CN:** 从 `..._mlir` 导入 ir。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `def _flatten_mlir_values(values: Any) -> list[ir.Value]:` — **EN:** Defines function `_flatten_mlir_values`. **CN:** 定义函数 `_flatten_mlir_values`。
+- **L26** `    """` — **EN:** Starts the docstring for the function `_flatten_mlir_values`. **CN:** 开始说明 function `_flatten_mlir_values` 的文档字符串。
+- **L27** `    Flatten a nested dict/list structure of MLIR values into a flat list.` — **EN:** Continues the docstring for the function `_flatten_mlir_values`. **CN:** 继续说明 function `_flatten_mlir_values` 的文档字符串。
+- **L28** `    Local copy to avoid circular imports with dsl.py.` — **EN:** Continues the docstring for the function `_flatten_mlir_values`. **CN:** 继续说明 function `_flatten_mlir_values` 的文档字符串。
+- **L29** `    """` — **EN:** Ends the docstring for the function `_flatten_mlir_values`. **CN:** 结束说明 function `_flatten_mlir_values` 的文档字符串。
+- **L30** `    if values is None:` — **EN:** Starts a conditional branch guarded by `values is None`. **CN:** 开始一个由 `values is None` 控制的条件分支。
+- **L31** `        return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L32** `    elif isinstance(values, ir.Value):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L33** `        return [values]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L34** `    elif isinstance(values, dict):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L35** `        result = []` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L36** `        for v in values.values():` — **EN:** Starts a loop assigning items from `values.values()` to `v`. **CN:** 开始一个循环，将 `values.values()` 的元素赋给 `v`。
+- **L37** `            result.extend(_flatten_mlir_values(v))` — **EN:** Invokes `result.extend` as a standalone call. **CN:** 以独立语句方式调用 `result.extend`。
+- **L38** `        return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L39** `    elif isinstance(values, list):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L40** `        result = []` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L41** `        for v in values:` — **EN:** Starts a loop assigning items from `values` to `v`. **CN:** 开始一个循环，将 `values` 的元素赋给 `v`。
+- **L42** `            result.extend(_flatten_mlir_values(v))` — **EN:** Invokes `result.extend` as a standalone call. **CN:** 以独立语句方式调用 `result.extend`。
+- **L43** `        return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L44** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L45** `        return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `def _unflatten_mlir_values(flat_values: Any, template: Any) -> Any:` — **EN:** Defines function `_unflatten_mlir_values`. **CN:** 定义函数 `_unflatten_mlir_values`。
+- **L49** `    """` — **EN:** Starts the docstring for the function `_unflatten_mlir_values`. **CN:** 开始说明 function `_unflatten_mlir_values` 的文档字符串。
+- **L50** `    Reconstruct a nested dict/list structure from a flat list of MLIR values.` — **EN:** Continues the docstring for the function `_unflatten_mlir_values`. **CN:** 继续说明 function `_unflatten_mlir_values` 的文档字符串。
+- **L51** `    Local copy to avoid circular imports with dsl.py.` — **EN:** Continues the docstring for the function `_unflatten_mlir_values`. **CN:** 继续说明 function `_unflatten_mlir_values` 的文档字符串。
+- **L52** `    """` — **EN:** Ends the docstring for the function `_unflatten_mlir_values`. **CN:** 结束说明 function `_unflatten_mlir_values` 的文档字符串。
+- **L53** `    if not hasattr(flat_values, "__next__"):` — **EN:** Starts a conditional branch guarded by `not hasattr(flat_values, '__next__')`. **CN:** 开始一个由 `not hasattr(flat_values, '__next__')` 控制的条件分支。
+- **L54** `        flat_values = iter(flat_values)` — **EN:** Assigns a value to flat_values. **CN:** 将一个值赋给 flat_values。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `    if template is None:` — **EN:** Starts a conditional branch guarded by `template is None`. **CN:** 开始一个由 `template is None` 控制的条件分支。
+- **L57** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L58** `    elif isinstance(template, ir.Value):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L59** `        return next(flat_values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L60** `    elif isinstance(template, dict):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L61** `        return {k: _unflatten_mlir_values(flat_values, v) for k, v in template.items()}` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** `    elif isinstance(template, list):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L63** `        return [_unflatten_mlir_values(flat_values, v) for v in template]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L64** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L65** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `NoneType = type(None)` — **EN:** Assigns a value to NoneType. **CN:** 将一个值赋给 NoneType。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `# Tree Utilsß` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `class DSLTreeFlattenError(DSLBaseError):` — **EN:** Defines class `DSLTreeFlattenError` with bases DSLBaseError. **CN:** 定义类 `DSLTreeFlattenError`，其基类为 DSLBaseError。
+- **L76** `    """Exception raised when tree flattening fails due to unsupported types."""` — **EN:** Docstring line documenting the class `DSLTreeFlattenError`. **CN:** 文档字符串行，用于说明 class `DSLTreeFlattenError`。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    def __init__(self, msg: str, type_str: str):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L79** `        super().__init__(msg)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L80** `        self.type_str = type_str` — **EN:** Assigns a value to self.type_str. **CN:** 将一个值赋给 self.type_str。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `def unzip2(pairs: Iterable[tuple[Any, Any]]) -> tuple[list[Any], list[Any]]:` — **EN:** Defines function `unzip2`. **CN:** 定义函数 `unzip2`。
+- **L84** `    """Unzip a sequence of pairs into two lists."""` — **EN:** Docstring line documenting the function `unzip2`. **CN:** 文档字符串行，用于说明 function `unzip2`。
+- **L85** `    lst1, lst2 = [], []` — **EN:** Assigns a value to (lst1, lst2). **CN:** 将一个值赋给 (lst1, lst2)。
+- **L86** `    for x1, x2 in pairs:` — **EN:** Starts a loop assigning items from `pairs` to `(x1, x2)`. **CN:** 开始一个循环，将 `pairs` 的元素赋给 `(x1, x2)`。
+- **L87** `        lst1.append(x1)` — **EN:** Invokes `lst1.append` as a standalone call. **CN:** 以独立语句方式调用 `lst1.append`。
+- **L88** `        lst2.append(x2)` — **EN:** Invokes `lst2.append` as a standalone call. **CN:** 以独立语句方式调用 `lst2.append`。
+- **L89** `    return lst1, lst2` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `def unzip3(` — **EN:** Defines function `unzip3`. **CN:** 定义函数 `unzip3`。
+- **L93** `    triples: Iterable[tuple[Any, Any, Any]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `) -> tuple[list[Any], list[Any], list[Any]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L95** `    """Unzip a sequence of triples into three lists."""` — **EN:** Docstring line documenting the function `unzip3`. **CN:** 文档字符串行，用于说明 function `unzip3`。
+- **L96** `    lst1, lst2, lst3 = [], [], []` — **EN:** Assigns a value to (lst1, lst2, lst3). **CN:** 将一个值赋给 (lst1, lst2, lst3)。
+- **L97** `    for x1, x2, x3 in triples:` — **EN:** Starts a loop assigning items from `triples` to `(x1, x2, x3)`. **CN:** 开始一个循环，将 `triples` 的元素赋给 `(x1, x2, x3)`。
+- **L98** `        lst1.append(x1)` — **EN:** Invokes `lst1.append` as a standalone call. **CN:** 以独立语句方式调用 `lst1.append`。
+- **L99** `        lst2.append(x2)` — **EN:** Invokes `lst2.append` as a standalone call. **CN:** 以独立语句方式调用 `lst2.append`。
+- **L100** `        lst3.append(x3)` — **EN:** Invokes `lst3.append` as a standalone call. **CN:** 以独立语句方式调用 `lst3.append`。
+- **L101** `    return lst1, lst2, lst3` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `def get_fully_qualified_class_name(x: Any) -> str:` — **EN:** Defines function `get_fully_qualified_class_name`. **CN:** 定义函数 `get_fully_qualified_class_name`。
+- **L105** `    """` — **EN:** Starts the docstring for the function `get_fully_qualified_class_name`. **CN:** 开始说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L106** `    Get the fully qualified class name of an object.` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `    Args:` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L109** `        x: Any object` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `    Returns:` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L112** `        str: Fully qualified class name in format 'module.class_name'` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    Example:` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L115** `        >>> get_fully_qualified_class_name([1, 2, 3])` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L116** `        'builtins.list'` — **EN:** Continues the docstring for the function `get_fully_qualified_class_name`. **CN:** 继续说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L117** `    """` — **EN:** Ends the docstring for the function `get_fully_qualified_class_name`. **CN:** 结束说明 function `get_fully_qualified_class_name` 的文档字符串。
+- **L118** `    return f"{x.__class__.__module__}.{x.__class__.__qualname__}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `def is_frozen_dataclass(obj_or_cls: Any) -> bool:` — **EN:** Defines function `is_frozen_dataclass`. **CN:** 定义函数 `is_frozen_dataclass`。
+- **L122** `    """` — **EN:** Starts the docstring for the function `is_frozen_dataclass`. **CN:** 开始说明 function `is_frozen_dataclass` 的文档字符串。
+- **L123** `    Check if an object or class is a frozen dataclass.` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    Args:` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L126** `        obj_or_cls: Either a dataclass instance or class` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    Returns:` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L129** `        bool: True if the object/class is a dataclass declared with frozen=True,` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L130** `              False otherwise` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    Example:` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L133** `        >>> from dataclasses import dataclass` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L134** `        >>> @dataclass(frozen=True)` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L135** `        ... class Point:` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L136** `        ...     x: int` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L137** `        ...     y: int` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L138** `        >>> is_frozen_dataclass(Point)` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L139** `        True` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L140** `        >>> is_frozen_dataclass(Point(1, 2))` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L141** `        True` — **EN:** Continues the docstring for the function `is_frozen_dataclass`. **CN:** 继续说明 function `is_frozen_dataclass` 的文档字符串。
+- **L142** `    """` — **EN:** Ends the docstring for the function `is_frozen_dataclass`. **CN:** 结束说明 function `is_frozen_dataclass` 的文档字符串。
+- **L143** `    cls = obj_or_cls if isinstance(obj_or_cls, type) else obj_or_cls.__class__` — **EN:** Assigns a value to cls. **CN:** 将一个值赋给 cls。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L146** `        dataclasses.is_dataclass(cls)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `        and getattr(cls, "__dataclass_params__", None) is not None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `        and cls.__dataclass_params__.frozen  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `def is_namedtuple_instance(x: Any) -> bool:` — **EN:** Defines function `is_namedtuple_instance`. **CN:** 定义函数 `is_namedtuple_instance`。
+- **L153** `    """` — **EN:** Starts the docstring for the function `is_namedtuple_instance`. **CN:** 开始说明 function `is_namedtuple_instance` 的文档字符串。
+- **L154** `    Check if an object is an instance of a :class:\`typing.NamedTuple\` subclass.` — **EN:** Continues the docstring for the function `is_namedtuple_instance`. **CN:** 继续说明 function `is_namedtuple_instance` 的文档字符串。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    Args:` — **EN:** Continues the docstring for the function `is_namedtuple_instance`. **CN:** 继续说明 function `is_namedtuple_instance` 的文档字符串。
+- **L157** `        x: Any object to check` — **EN:** Continues the docstring for the function `is_namedtuple_instance`. **CN:** 继续说明 function `is_namedtuple_instance` 的文档字符串。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    Returns:` — **EN:** Continues the docstring for the function `is_namedtuple_instance`. **CN:** 继续说明 function `is_namedtuple_instance` 的文档字符串。
+- **L160** `        bool: True if *x* is a NamedTuple instance, False otherwise` — **EN:** Continues the docstring for the function `is_namedtuple_instance`. **CN:** 继续说明 function `is_namedtuple_instance` 的文档字符串。
+- **L161** `    """` — **EN:** Ends the docstring for the function `is_namedtuple_instance`. **CN:** 结束说明 function `is_namedtuple_instance` 的文档字符串。
+- **L162** `    t = type(x)` — **EN:** Assigns a value to t. **CN:** 将一个值赋给 t。
+- **L163** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** `        issubclass(t, tuple)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `        and hasattr(t, "_fields")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `        and isinstance(t._fields, tuple)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `def is_constexpr_field(field: dataclasses.Field) -> bool:` — **EN:** Defines function `is_constexpr_field`. **CN:** 定义函数 `is_constexpr_field`。
+- **L171** `    """` — **EN:** Starts the docstring for the function `is_constexpr_field`. **CN:** 开始说明 function `is_constexpr_field` 的文档字符串。
+- **L172** `    Check if a field is a constexpr field.` — **EN:** Continues the docstring for the function `is_constexpr_field`. **CN:** 继续说明 function `is_constexpr_field` 的文档字符串。
+- **L173** `    """` — **EN:** Ends the docstring for the function `is_constexpr_field`. **CN:** 结束说明 function `is_constexpr_field` 的文档字符串。
+- **L174** `    if field.type is Constexpr:` — **EN:** Starts a conditional branch guarded by `field.type is Constexpr`. **CN:** 开始一个由 `field.type is Constexpr` 控制的条件分支。
+- **L175** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L176** `    elif get_origin(field.type) is Constexpr:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L177** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L178** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L182** `# PyTreeDef` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L183** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `class NodeType(NamedTuple):` — **EN:** Defines class `NodeType` with bases NamedTuple. **CN:** 定义类 `NodeType`，其基类为 NamedTuple。
+- **L187** `    """` — **EN:** Starts the docstring for the class `NodeType`. **CN:** 开始说明 class `NodeType` 的文档字符串。
+- **L188** `    Represents a node in a pytree structure.` — **EN:** Continues the docstring for the class `NodeType`. **CN:** 继续说明 class `NodeType` 的文档字符串。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    Attributes:` — **EN:** Continues the docstring for the class `NodeType`. **CN:** 继续说明 class `NodeType` 的文档字符串。
+- **L191** `        name: String representation of the node type` — **EN:** Continues the docstring for the class `NodeType`. **CN:** 继续说明 class `NodeType` 的文档字符串。
+- **L192** `        to_iterable: Function to convert node to iterable form` — **EN:** Continues the docstring for the class `NodeType`. **CN:** 继续说明 class `NodeType` 的文档字符串。
+- **L193** `        from_iterable: Function to reconstruct node from iterable form` — **EN:** Continues the docstring for the class `NodeType`. **CN:** 继续说明 class `NodeType` 的文档字符串。
+- **L194** `    """` — **EN:** Ends the docstring for the class `NodeType`. **CN:** 结束说明 class `NodeType` 的文档字符串。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L197** `    to_iterable: Callable` — **EN:** Assigns a typed value to to_iterable. **CN:** 为 to_iterable 赋予带类型标注的值。
+- **L198** `    from_iterable: Callable` — **EN:** Assigns a typed value to from_iterable. **CN:** 为 from_iterable 赋予带类型标注的值。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `class PyTreeDef(NamedTuple):` — **EN:** Defines class `PyTreeDef` with bases NamedTuple. **CN:** 定义类 `PyTreeDef`，其基类为 NamedTuple。
+- **L202** `    """` — **EN:** Starts the docstring for the class `PyTreeDef`. **CN:** 开始说明 class `PyTreeDef` 的文档字符串。
+- **L203** `    Represents the structure definition of a pytree.` — **EN:** Continues the docstring for the class `PyTreeDef`. **CN:** 继续说明 class `PyTreeDef` 的文档字符串。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `    Attributes:` — **EN:** Continues the docstring for the class `PyTreeDef`. **CN:** 继续说明 class `PyTreeDef` 的文档字符串。
+- **L206** `        node_type: The type of this node` — **EN:** Continues the docstring for the class `PyTreeDef`. **CN:** 继续说明 class `PyTreeDef` 的文档字符串。
+- **L207** `        node_metadata: SimpleNamespace metadata associated with this node` — **EN:** Continues the docstring for the class `PyTreeDef`. **CN:** 继续说明 class `PyTreeDef` 的文档字符串。
+- **L208** `        child_treedefs: Tuple of child tree definitions` — **EN:** Continues the docstring for the class `PyTreeDef`. **CN:** 继续说明 class `PyTreeDef` 的文档字符串。
+- **L209** `    """` — **EN:** Ends the docstring for the class `PyTreeDef`. **CN:** 结束说明 class `PyTreeDef` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    node_type: NodeType` — **EN:** Assigns a typed value to node_type. **CN:** 为 node_type 赋予带类型标注的值。
+- **L212** `    node_metadata: SimpleNamespace` — **EN:** Assigns a typed value to node_metadata. **CN:** 为 node_metadata 赋予带类型标注的值。
+- **L213** `    child_treedefs: tuple["PyTreeDef", ...]` — **EN:** Assigns a typed value to child_treedefs. **CN:** 为 child_treedefs 赋予带类型标注的值。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `@dataclasses.dataclass(frozen=True)` — **EN:** Applies decorator `dataclasses.dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclasses.dataclass(frozen=True)` 应用于后面的定义。
+- **L217** `class Leaf:` — **EN:** Defines class `Leaf`. **CN:** 定义类 `Leaf`。
+- **L218** `    """` — **EN:** Starts the docstring for the class `Leaf`. **CN:** 开始说明 class `Leaf` 的文档字符串。
+- **L219** `    Represents a leaf node in a pytree structure.` — **EN:** Continues the docstring for the class `Leaf`. **CN:** 继续说明 class `Leaf` 的文档字符串。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    Attributes:` — **EN:** Continues the docstring for the class `Leaf`. **CN:** 继续说明 class `Leaf` 的文档字符串。
+- **L222** `        is_numeric: Whether this leaf contains a \`Numeric\` value` — **EN:** Continues the docstring for the class `Leaf`. **CN:** 继续说明 class `Leaf` 的文档字符串。
+- **L223** `        is_none: Whether this leaf represents None` — **EN:** Continues the docstring for the class `Leaf`. **CN:** 继续说明 class `Leaf` 的文档字符串。
+- **L224** `        node_metadata: SimpleNamespace metadata associated with this leaf` — **EN:** Continues the docstring for the class `Leaf`. **CN:** 继续说明 class `Leaf` 的文档字符串。
+- **L225** `        ir_type_str: String representation of the IR type` — **EN:** Continues the docstring for the class `Leaf`. **CN:** 继续说明 class `Leaf` 的文档字符串。
+- **L226** `    """` — **EN:** Ends the docstring for the class `Leaf`. **CN:** 结束说明 class `Leaf` 的文档字符串。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `    is_numeric: bool = False` — **EN:** Assigns a typed value to is_numeric. **CN:** 为 is_numeric 赋予带类型标注的值。
+- **L229** `    is_none: bool = False` — **EN:** Assigns a typed value to is_none. **CN:** 为 is_none 赋予带类型标注的值。
+- **L230** `    node_metadata: SimpleNamespace | None = None` — **EN:** Assigns a typed value to node_metadata. **CN:** 为 node_metadata 赋予带类型标注的值。
+- **L231** `    ir_type_str: str | None = None` — **EN:** Assigns a typed value to ir_type_str. **CN:** 为 ir_type_str 赋予带类型标注的值。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `# Default to_iterable and from_iterable` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L236** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `def extract_dataclass_members(x: Any) -> tuple[list[str], list[Any], list[str]]:` — **EN:** Defines function `extract_dataclass_members`. **CN:** 定义函数 `extract_dataclass_members`。
+- **L240** `    """` — **EN:** Starts the docstring for the function `extract_dataclass_members`. **CN:** 开始说明 function `extract_dataclass_members` 的文档字符串。
+- **L241** `    Extract non-method, non-function attributes from a dataclass instance.` — **EN:** Continues the docstring for the function `extract_dataclass_members`. **CN:** 继续说明 function `extract_dataclass_members` 的文档字符串。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `    Args:` — **EN:** Continues the docstring for the function `extract_dataclass_members`. **CN:** 继续说明 function `extract_dataclass_members` 的文档字符串。
+- **L244** `        x: A dataclass instance` — **EN:** Continues the docstring for the function `extract_dataclass_members`. **CN:** 继续说明 function `extract_dataclass_members` 的文档字符串。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `    Returns:` — **EN:** Continues the docstring for the function `extract_dataclass_members`. **CN:** 继续说明 function `extract_dataclass_members` 的文档字符串。
+- **L247** `        tuple: (field_names, field_values, constexpr_fields) lists` — **EN:** Continues the docstring for the function `extract_dataclass_members`. **CN:** 继续说明 function `extract_dataclass_members` 的文档字符串。
+- **L248** `    """` — **EN:** Ends the docstring for the function `extract_dataclass_members`. **CN:** 结束说明 function `extract_dataclass_members` 的文档字符串。
+- **L249** `    fields = [field.name for field in dataclasses.fields(x)]` — **EN:** Assigns a value to fields. **CN:** 将一个值赋给 fields。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    # If the dataclass has extra fields, raise an error` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L252** `    for k in x.__dict__.keys():` — **EN:** Starts a loop assigning items from `x.__dict__.keys()` to `k`. **CN:** 开始一个循环，将 `x.__dict__.keys()` 的元素赋给 `k`。
+- **L253** `        if k not in fields:` — **EN:** Starts a conditional branch guarded by `k not in fields`. **CN:** 开始一个由 `k not in fields` 控制的条件分支。
+- **L254** `            raise DSLTreeFlattenError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L255** `                f"\`{x}\` has extra field \`{k}\`",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `                type_str=get_fully_qualified_class_name(x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `    if not fields:` — **EN:** Starts a conditional branch guarded by `not fields`. **CN:** 开始一个由 `not fields` 控制的条件分支。
+- **L260** `        return [], [], []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `    # record constexpr fields` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L263** `    members = []` — **EN:** Assigns a value to members. **CN:** 将一个值赋给 members。
+- **L264** `    constexpr_fields = []` — **EN:** Assigns a value to constexpr_fields. **CN:** 将一个值赋给 constexpr_fields。
+- **L265** `    for field in dataclasses.fields(x):` — **EN:** Starts a loop assigning items from `dataclasses.fields(x)` to `field`. **CN:** 开始一个循环，将 `dataclasses.fields(x)` 的元素赋给 `field`。
+- **L266** `        if is_constexpr_field(field):` — **EN:** Starts a conditional branch guarded by `is_constexpr_field(field)`. **CN:** 开始一个由 `is_constexpr_field(field)` 控制的条件分支。
+- **L267** `            constexpr_fields.append(field.name)` — **EN:** Invokes `constexpr_fields.append` as a standalone call. **CN:** 以独立语句方式调用 `constexpr_fields.append`。
+- **L268** `            fields.remove(field.name)` — **EN:** Invokes `fields.remove` as a standalone call. **CN:** 以独立语句方式调用 `fields.remove`。
+- **L269** `            v = getattr(x, field.name)` — **EN:** Assigns a value to v. **CN:** 将一个值赋给 v。
+- **L270** `            if implements_dynamic_expression(v):` — **EN:** Starts a conditional branch guarded by `implements_dynamic_expression(v)`. **CN:** 开始一个由 `implements_dynamic_expression(v)` 控制的条件分支。
+- **L271** `                raise DSLTreeFlattenError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L272** `                    f"\`{x}\` has dynamic expression field \`{field.name}\` with a Constexpr type annotation \`{field.type}\`",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `                    type_str=get_fully_qualified_class_name(x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L276** `            members.append(getattr(x, field.name))` — **EN:** Invokes `members.append` as a standalone call. **CN:** 以独立语句方式调用 `members.append`。
+- **L277** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L278** `    return fields, members, constexpr_fields` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `def default_dataclass_to_iterable(x: Any) -> tuple[SimpleNamespace, list[Any]]:` — **EN:** Defines function `default_dataclass_to_iterable`. **CN:** 定义函数 `default_dataclass_to_iterable`。
+- **L282** `    """` — **EN:** Starts the docstring for the function `default_dataclass_to_iterable`. **CN:** 开始说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L283** `    Convert a dataclass instance to iterable form for tree flattening.` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `    Extracts all non-method, non-function attributes that don't start with '__'` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L286** `    and returns them along with metadata about the dataclass.` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `    Args:` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L289** `        x: A dataclass instance` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `    Returns:` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L292** `        tuple: (metadata, members) where metadata contains type info and field names,` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L293** `               and members is the list of attribute values` — **EN:** Continues the docstring for the function `default_dataclass_to_iterable`. **CN:** 继续说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L294** `    """` — **EN:** Ends the docstring for the function `default_dataclass_to_iterable`. **CN:** 结束说明 function `default_dataclass_to_iterable` 的文档字符串。
+- **L295** `    fields, members, constexpr_fields = extract_dataclass_members(x)` — **EN:** Assigns a value to (fields, members, constexpr_fields). **CN:** 将一个值赋给 (fields, members, constexpr_fields)。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `    metadata = SimpleNamespace(` — **EN:** Assigns a value to metadata. **CN:** 将一个值赋给 metadata。
+- **L298** `        type_str=get_fully_qualified_class_name(x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `        fields=fields,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `        constexpr_fields=constexpr_fields,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `        original_obj=x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `    return metadata, members` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `def set_dataclass_attributes(` — **EN:** Defines function `set_dataclass_attributes`. **CN:** 定义函数 `set_dataclass_attributes`。
+- **L307** `    instance: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `    fields: list[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `    values: Iterable[Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `    is_frozen: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `    constexpr_fields: list[str],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L313** `    """` — **EN:** Starts the docstring for the function `set_dataclass_attributes`. **CN:** 开始说明 function `set_dataclass_attributes` 的文档字符串。
+- **L314** `    Set attributes on a dataclass instance.` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** `    Args:` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L317** `        instance: The dataclass instance` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L318** `        fields: List of field names` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L319** `        values: Iterable of field values` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L320** `        is_frozen: Whether the dataclass is frozen` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    Returns:` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L323** `        The instance with attributes set` — **EN:** Continues the docstring for the function `set_dataclass_attributes`. **CN:** 继续说明 function `set_dataclass_attributes` 的文档字符串。
+- **L324** `    """` — **EN:** Ends the docstring for the function `set_dataclass_attributes`. **CN:** 结束说明 function `set_dataclass_attributes` 的文档字符串。
+- **L325** `    if not fields:` — **EN:** Starts a conditional branch guarded by `not fields`. **CN:** 开始一个由 `not fields` 控制的条件分支。
+- **L326** `        return instance` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `    if is_frozen:` — **EN:** Starts a conditional branch guarded by `is_frozen`. **CN:** 开始一个由 `is_frozen` 控制的条件分支。
+- **L329** `        kwargs = dict(zip(fields, values))` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L330** `        for field in constexpr_fields:` — **EN:** Starts a loop assigning items from `constexpr_fields` to `field`. **CN:** 开始一个循环，将 `constexpr_fields` 的元素赋给 `field`。
+- **L331** `            kwargs[field] = getattr(instance, field)` — **EN:** Assigns a value to kwargs[field]. **CN:** 将一个值赋给 kwargs[field]。
+- **L332** `        return dataclasses.replace(instance, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L333** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L334** `        for field, value in zip(fields, values):` — **EN:** Starts a loop assigning items from `zip(fields, values)` to `(field, value)`. **CN:** 开始一个循环，将 `zip(fields, values)` 的元素赋给 `(field, value)`。
+- **L335** `            setattr(instance, field, value)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `    return instance` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** `def default_dataclass_from_iterable(` — **EN:** Defines function `default_dataclass_from_iterable`. **CN:** 定义函数 `default_dataclass_from_iterable`。
+- **L341** `    metadata: SimpleNamespace, children: Iterable[Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L343** `    """` — **EN:** Starts the docstring for the function `default_dataclass_from_iterable`. **CN:** 开始说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L344** `    Reconstruct a dataclass instance from iterable form.` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `    Handles both regular and frozen dataclasses appropriately.` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    Args:` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L349** `        metadata: Metadata containing type information and field names` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L350** `        children: Iterable of attribute values to reconstruct the instance` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `    Returns:` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L353** `        The reconstructed dataclass instance` — **EN:** Continues the docstring for the function `default_dataclass_from_iterable`. **CN:** 继续说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L354** `    """` — **EN:** Ends the docstring for the function `default_dataclass_from_iterable`. **CN:** 结束说明 function `default_dataclass_from_iterable` 的文档字符串。
+- **L355** `    instance = metadata.original_obj` — **EN:** Assigns a value to instance. **CN:** 将一个值赋给 instance。
+- **L356** `    is_frozen = is_frozen_dataclass(instance)` — **EN:** Assigns a value to is_frozen. **CN:** 将一个值赋给 is_frozen。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `    return set_dataclass_attributes(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L359** `        instance, metadata.fields, children, is_frozen, metadata.constexpr_fields` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** `def namedtuple_to_iterable(x: Any) -> tuple[SimpleNamespace, list[Any]]:` — **EN:** Defines function `namedtuple_to_iterable`. **CN:** 定义函数 `namedtuple_to_iterable`。
+- **L364** `    """` — **EN:** Starts the docstring for the function `namedtuple_to_iterable`. **CN:** 开始说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L365** `    Convert a :class:\`typing.NamedTuple\` instance to iterable form.` — **EN:** Continues the docstring for the function `namedtuple_to_iterable`. **CN:** 继续说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** `    Args:` — **EN:** Continues the docstring for the function `namedtuple_to_iterable`. **CN:** 继续说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L368** `        x: A NamedTuple instance` — **EN:** Continues the docstring for the function `namedtuple_to_iterable`. **CN:** 继续说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L370** `    Returns:` — **EN:** Continues the docstring for the function `namedtuple_to_iterable`. **CN:** 继续说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L371** `        tuple: (metadata, field_values) where metadata stores the field names` — **EN:** Continues the docstring for the function `namedtuple_to_iterable`. **CN:** 继续说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L372** `               and original object for later reconstruction` — **EN:** Continues the docstring for the function `namedtuple_to_iterable`. **CN:** 继续说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L373** `    """` — **EN:** Ends the docstring for the function `namedtuple_to_iterable`. **CN:** 结束说明 function `namedtuple_to_iterable` 的文档字符串。
+- **L374** `    fields = list(type(x)._fields)` — **EN:** Assigns a value to fields. **CN:** 将一个值赋给 fields。
+- **L375** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L376** `        SimpleNamespace(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `            type_str=get_fully_qualified_class_name(x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `            fields=fields,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `            original_obj=x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `        list(x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L385** `def namedtuple_from_iterable(metadata: SimpleNamespace, children: Iterable[Any]) -> Any:` — **EN:** Defines function `namedtuple_from_iterable`. **CN:** 定义函数 `namedtuple_from_iterable`。
+- **L386** `    """` — **EN:** Starts the docstring for the function `namedtuple_from_iterable`. **CN:** 开始说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L387** `    Reconstruct a :class:\`typing.NamedTuple\` instance from iterable form.` — **EN:** Continues the docstring for the function `namedtuple_from_iterable`. **CN:** 继续说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** `    Args:` — **EN:** Continues the docstring for the function `namedtuple_from_iterable`. **CN:** 继续说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L390** `        metadata: Metadata produced by :func:\`namedtuple_to_iterable\`` — **EN:** Continues the docstring for the function `namedtuple_from_iterable`. **CN:** 继续说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L391** `        children: Iterable of reconstructed field values` — **EN:** Continues the docstring for the function `namedtuple_from_iterable`. **CN:** 继续说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `    Returns:` — **EN:** Continues the docstring for the function `namedtuple_from_iterable`. **CN:** 继续说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L394** `        A new NamedTuple instance of the original type` — **EN:** Continues the docstring for the function `namedtuple_from_iterable`. **CN:** 继续说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L395** `    """` — **EN:** Ends the docstring for the function `namedtuple_from_iterable`. **CN:** 结束说明 function `namedtuple_from_iterable` 的文档字符串。
+- **L396** `    return type(metadata.original_obj)(*children)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `def dynamic_expression_to_iterable(x: Any) -> tuple[SimpleNamespace, list[Any] | None]:` — **EN:** Defines function `dynamic_expression_to_iterable`. **CN:** 定义函数 `dynamic_expression_to_iterable`。
+- **L400** `    """` — **EN:** Starts the docstring for the function `dynamic_expression_to_iterable`. **CN:** 开始说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L401** `    Convert a dynamic expression to iterable form.` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L403** `    Uses the object's \`__extract_mlir_values__\` method to extract MLIR values.` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `    Args:` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L406** `        x: A dynamic expression object` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** `    Returns:` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L409** `        tuple: (metadata, mlir_values) where metadata marks this as a dynamic expression` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L410** `               and mlir_values are the extracted MLIR values` — **EN:** Continues the docstring for the function `dynamic_expression_to_iterable`. **CN:** 继续说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L411** `    """` — **EN:** Ends the docstring for the function `dynamic_expression_to_iterable`. **CN:** 结束说明 function `dynamic_expression_to_iterable` 的文档字符串。
+- **L412** `    extracted = x.__extract_mlir_values__()` — **EN:** Assigns a value to extracted. **CN:** 将一个值赋给 extracted。
+- **L413** `    if extracted is None:` — **EN:** Starts a conditional branch guarded by `extracted is None`. **CN:** 开始一个由 `extracted is None` 控制的条件分支。
+- **L414** `        # Preserve None so the caller's "children is None" check still triggers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L415** `        # DSLTreeFlattenError for types whose __extract_mlir_values__ returns None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L416** `        # (e.g. runtime._Pointer inheriting an unimplemented ABC stub).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L417** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L418** `            SimpleNamespace(is_dynamic_expression=1, original_obj=x, template=None),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `            None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** `    flattened = _flatten_mlir_values(extracted)` — **EN:** Assigns a value to flattened. **CN:** 将一个值赋给 flattened。
+- **L423** `    if not flattened and extracted:` — **EN:** Starts a conditional branch guarded by `not flattened and extracted`. **CN:** 开始一个由 `not flattened and extracted` 控制的条件分支。
+- **L424** `        # extracted is non-empty but flatten produced nothing -- this means` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L425** `        # __extract_mlir_values__ returned non-ir.Value items (e.g. Python ints` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L426** `        # before they are promoted to MLIR values).  Fall back to passing the raw` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L427** `        # values as children, which preserves the old (pre-flatten) behavior and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L428** `        # lets _tree_flatten raise DSLTreeFlattenError for unsupported types.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L429** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L430** `            SimpleNamespace(is_dynamic_expression=1, original_obj=x, template=None),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `            extracted,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L435** `        SimpleNamespace(is_dynamic_expression=1, original_obj=x, template=extracted),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `        flattened,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `def dynamic_expression_from_iterable(` — **EN:** Defines function `dynamic_expression_from_iterable`. **CN:** 定义函数 `dynamic_expression_from_iterable`。
+- **L441** `    metadata: SimpleNamespace, children: Iterable[Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L442** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L443** `    """` — **EN:** Starts the docstring for the function `dynamic_expression_from_iterable`. **CN:** 开始说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L444** `    Reconstruct a dynamic expression from iterable form.` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** `    Uses the object's \`__new_from_mlir_values__\` method to reconstruct from MLIR values.` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `    Args:` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L449** `        metadata: Metadata containing the original object` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L450** `        children: Iterable of MLIR values to reconstruct from` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `    Returns:` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L453** `        The reconstructed dynamic expression object` — **EN:** Continues the docstring for the function `dynamic_expression_from_iterable`. **CN:** 继续说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L454** `    """` — **EN:** Ends the docstring for the function `dynamic_expression_from_iterable`. **CN:** 结束说明 function `dynamic_expression_from_iterable` 的文档字符串。
+- **L455** `    children_list = list(children)` — **EN:** Assigns a value to children_list. **CN:** 将一个值赋给 children_list。
+- **L456** `    # If we have a template, unflatten the values back to the original structure` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L457** `    if hasattr(metadata, "template") and metadata.template is not None:` — **EN:** Starts a conditional branch guarded by `hasattr(metadata, 'template') and metadata.template is no...`. **CN:** 开始一个由 `hasattr(metadata, 'template') and metadata.template is no...` 控制的条件分支。
+- **L458** `        values = _unflatten_mlir_values(children_list, metadata.template)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L459** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L460** `        values = children_list` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L461** `    return metadata.original_obj.__new_from_mlir_values__(values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L464** `def default_dict_to_iterable(x: Any) -> tuple[SimpleNamespace, list[Any]]:` — **EN:** Defines function `default_dict_to_iterable`. **CN:** 定义函数 `default_dict_to_iterable`。
+- **L465** `    """` — **EN:** Starts the docstring for the function `default_dict_to_iterable`. **CN:** 开始说明 function `default_dict_to_iterable` 的文档字符串。
+- **L466** `    Convert a dict to iterable form.` — **EN:** Continues the docstring for the function `default_dict_to_iterable`. **CN:** 继续说明 function `default_dict_to_iterable` 的文档字符串。
+- **L467** `    """` — **EN:** Ends the docstring for the function `default_dict_to_iterable`. **CN:** 结束说明 function `default_dict_to_iterable` 的文档字符串。
+- **L468** `    if isinstance(x, SimpleNamespace):` — **EN:** Starts a conditional branch guarded by `isinstance(x, SimpleNamespace)`. **CN:** 开始一个由 `isinstance(x, SimpleNamespace)` 控制的条件分支。
+- **L469** `        keys = list(x.__dict__.keys())` — **EN:** Assigns a value to keys. **CN:** 将一个值赋给 keys。
+- **L470** `        values = list(x.__dict__.values())` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L471** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L472** `        keys = list(x.keys())` — **EN:** Assigns a value to keys. **CN:** 将一个值赋给 keys。
+- **L473** `        values = list(x.values())` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L476** `        SimpleNamespace(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `            type_str=get_fully_qualified_class_name(x), original_obj=x, fields=keys` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `        values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L483** `def default_dict_from_iterable(` — **EN:** Defines function `default_dict_from_iterable`. **CN:** 定义函数 `default_dict_from_iterable`。
+- **L484** `    metadata: SimpleNamespace, children: Iterable[Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L485** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L486** `    """` — **EN:** Starts the docstring for the function `default_dict_from_iterable`. **CN:** 开始说明 function `default_dict_from_iterable` 的文档字符串。
+- **L487** `    Reconstruct a dict from iterable form.` — **EN:** Continues the docstring for the function `default_dict_from_iterable`. **CN:** 继续说明 function `default_dict_from_iterable` 的文档字符串。
+- **L488** `    """` — **EN:** Ends the docstring for the function `default_dict_from_iterable`. **CN:** 结束说明 function `default_dict_from_iterable` 的文档字符串。
+- **L489** `    instance = metadata.original_obj` — **EN:** Assigns a value to instance. **CN:** 将一个值赋给 instance。
+- **L490** `    fields = metadata.fields` — **EN:** Assigns a value to fields. **CN:** 将一个值赋给 fields。
+- **L491** `    is_simple_namespace = isinstance(instance, SimpleNamespace)` — **EN:** Assigns a value to is_simple_namespace. **CN:** 将一个值赋给 is_simple_namespace。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `    for k, v in zip(fields, children):` — **EN:** Starts a loop assigning items from `zip(fields, children)` to `(k, v)`. **CN:** 开始一个循环，将 `zip(fields, children)` 的元素赋给 `(k, v)`。
+- **L494** `        if is_simple_namespace:` — **EN:** Starts a conditional branch guarded by `is_simple_namespace`. **CN:** 开始一个由 `is_simple_namespace` 控制的条件分支。
+- **L495** `            setattr(instance, k, v)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L496** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L497** `            instance[k] = v` — **EN:** Assigns a value to instance[k]. **CN:** 将一个值赋给 instance[k]。
+- **L498** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L499** `    return instance` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L503** `# Register pytree nodes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L504** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L505** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L506** `_node_types: dict[type, NodeType] = {}` — **EN:** Assigns a typed value to _node_types. **CN:** 为 _node_types 赋予带类型标注的值。
+- **L507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** `def register_pytree_node(ty: type, to_iter: Callable, from_iter: Callable) -> NodeType:` — **EN:** Defines function `register_pytree_node`. **CN:** 定义函数 `register_pytree_node`。
+- **L510** `    """` — **EN:** Starts the docstring for the function `register_pytree_node`. **CN:** 开始说明 function `register_pytree_node` 的文档字符串。
+- **L511** `    Register a new node type for pytree operations.` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L513** `    Args:` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L514** `        ty: The type to register` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L515** `        to_iter: Function to convert instances of this type to iterable form` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L516** `        from_iter: Function to reconstruct instances of this type from iterable form` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `    Returns:` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L519** `        NodeType: The created NodeType instance` — **EN:** Continues the docstring for the function `register_pytree_node`. **CN:** 继续说明 function `register_pytree_node` 的文档字符串。
+- **L520** `    """` — **EN:** Ends the docstring for the function `register_pytree_node`. **CN:** 结束说明 function `register_pytree_node` 的文档字符串。
+- **L521** `    nt = NodeType(str(ty), to_iter, from_iter)` — **EN:** Assigns a value to nt. **CN:** 将一个值赋给 nt。
+- **L522** `    _node_types[ty] = nt` — **EN:** Assigns a value to _node_types[ty]. **CN:** 将一个值赋给 _node_types[ty]。
+- **L523** `    return nt` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** `def register_default_node_types() -> None:` — **EN:** Defines function `register_default_node_types`. **CN:** 定义函数 `register_default_node_types`。
+- **L527** `    """Register default node types for pytree operations."""` — **EN:** Docstring line documenting the function `register_default_node_types`. **CN:** 文档字符串行，用于说明 function `register_default_node_types`。
+- **L528** `    default_registrations = [` — **EN:** Assigns a value to default_registrations. **CN:** 将一个值赋给 default_registrations。
+- **L529** `        (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `            tuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `            lambda t: (SimpleNamespace(length=len(t)), list(t)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `            lambda _, xs: tuple(xs),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L533** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L534** `        (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `            list,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `            lambda l: (SimpleNamespace(length=len(l)), list(l)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L537** `            lambda _, xs: list(xs),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L538** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L539** `        (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L540** `            dict,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** `            default_dict_to_iterable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L542** `            default_dict_from_iterable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `        (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `            SimpleNamespace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L546** `            default_dict_to_iterable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L547** `            default_dict_from_iterable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** `    for ty, to_iter, from_iter in default_registrations:` — **EN:** Starts a loop assigning items from `default_registrations` to `(ty, to_iter, from_iter)`. **CN:** 开始一个循环，将 `default_registrations` 的元素赋给 `(ty, to_iter, from_iter)`。
+- **L552** `        register_pytree_node(ty, to_iter, from_iter)` — **EN:** Invokes `register_pytree_node` as a standalone call. **CN:** 以独立语句方式调用 `register_pytree_node`。
+- **L553** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** `# Initialize default registrations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L556** `register_default_node_types()` — **EN:** Invokes `register_default_node_types` as a standalone call. **CN:** 以独立语句方式调用 `register_default_node_types`。
+- **L557** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L558** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L559** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L560** `# tree_flatten and tree_unflatten` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L561** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L562** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L563** `"""` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L564** `Behavior of tree_flatten and tree_unflatten, for example:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `\`\`\`python` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** `    a = (1, 2, 3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** `    b = MyClass(a=1, b =[1,2,3])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `\`\`\`` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L571** `yields the following tree:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L572** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L573** `\`\`\`python` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L574** `    tree_a = PyTreeDef(type = 'tuple',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L575** `                       metadata = {length = 3},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L576** `                       children = [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L577** `                           Leaf(type = int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L578** `                           Leaf(type = int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L579** `                           Leaf(type = int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L580** `                       ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `                       )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `    flattened_a = [1, 2, 3]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `    tree_b = PyTreeDef(type = 'MyClass',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `                       metadata = {fields = ['a','b']},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `                       children = [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** `                           PyTreeDef(type = \`list\`,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `                                     metadata = {length = 3},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `                                     children = [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `                                          Leaf(type=\`int\`),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `                                          Leaf(type=\`int\`),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `                                          Leaf(type=\`int\`),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `                                     ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `                           ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `                           Leaf(type=int),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L595** `                       ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L596** `                       )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** `    flattened_b = [1, 1, 2, 3]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L598** `\`\`\`` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L600** `Passing the flattened values and PyTreeDef to tree_unflatten to reconstruct the original structure.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** `\`\`\` python` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L603** `    unflattened_a = tree_unflatten(tree_a, flattened_a)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `    unflattened_b = tree_unflatten(tree_b, flattened_b)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `\`\`\`` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L606** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L607** `yields the following structure:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L608** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L609** `\`\`\` python` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `    unflattened_a = (1, 2, 3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** `    unflattened_b = MyClass(a=1, b =[1,2,3])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `\`\`\`` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L614** `unflattened_a should be structurally identical to a, and unflattened_b should be structurally identical to b.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L615** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L616** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L618** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L619** `def tree_flatten(` — **EN:** Defines function `tree_flatten`. **CN:** 定义函数 `tree_flatten`。
+- **L620** `    x: Any, return_ir_values: bool = True` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L621** `) -> tuple[list[Any], list[ir.Attribute], PyTreeDef | Leaf]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L622** `    """` — **EN:** Starts the docstring for the function `tree_flatten`. **CN:** 开始说明 function `tree_flatten` 的文档字符串。
+- **L623** `    Flatten a nested structure into a flat list of values and a tree definition.` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L624** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L625** `    This function recursively traverses nested data structures (trees) and` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L626** `    flattens them into a linear list of leaf values, while preserving the` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L627** `    structure information in a PyTreeDef.` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L628** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L629** `    Args:` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L630** `        x: The nested structure to flatten` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L631** `        return_ir_values: Whether to return ir.Values instead of original values` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L632** `    Returns:` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L633** `        tuple: (flat_values, flat_attributes, treedef) where flat_values is a list of leaf values` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L634** `               and flat_attributes is a list of attributes for the leaf values` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L635** `               and treedef is the tree structure definition` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L637** `    Raises:` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L638** `        DSLTreeFlattenError: If the structure contains unsupported types` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L640** `    Example:` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L641** `        >>> tree_flatten([1, [2, 3], 4])` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L642** `        ([1, 2, 3, 4], PyTreeDef(...))` — **EN:** Continues the docstring for the function `tree_flatten`. **CN:** 继续说明 function `tree_flatten` 的文档字符串。
+- **L643** `    """` — **EN:** Ends the docstring for the function `tree_flatten`. **CN:** 结束说明 function `tree_flatten` 的文档字符串。
+- **L644** `    children_iter, child_attrs_iter, treedef = _tree_flatten(x, return_ir_values)` — **EN:** Assigns a value to (children_iter, child_attrs_iter, treedef). **CN:** 将一个值赋给 (children_iter, child_attrs_iter, treedef)。
+- **L645** `    return list(children_iter), list[ir.Attribute](child_attrs_iter), treedef` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L646** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L648** `def get_registered_node_types_or_insert(x: Any) -> NodeType | None:` — **EN:** Defines function `get_registered_node_types_or_insert`. **CN:** 定义函数 `get_registered_node_types_or_insert`。
+- **L649** `    """` — **EN:** Starts the docstring for the function `get_registered_node_types_or_insert`. **CN:** 开始说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L650** `    Get the registered node type for an object, registering it if necessary.` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L652** `    This function checks if a type is already registered for pytree operations.` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L653** `    If not, it automatically registers the type based on its characteristics:` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L654** `    - Dynamic expressions get registered with dynamic expression handlers` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L655** `    - Dataclasses get registered with default dataclass handlers` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L656** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L657** `    Args:` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L658** `        x: The object to get or register a node type for` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L660** `    Returns:` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L661** `        NodeType or None: The registered node type, or None if the type` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L662** `                         cannot be registered` — **EN:** Continues the docstring for the function `get_registered_node_types_or_insert`. **CN:** 继续说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L663** `    """` — **EN:** Ends the docstring for the function `get_registered_node_types_or_insert`. **CN:** 结束说明 function `get_registered_node_types_or_insert` 的文档字符串。
+- **L664** `    node_type = _node_types.get(type(x))` — **EN:** Assigns a value to node_type. **CN:** 将一个值赋给 node_type。
+- **L665** `    if node_type:` — **EN:** Starts a conditional branch guarded by `node_type`. **CN:** 开始一个由 `node_type` 控制的条件分支。
+- **L666** `        return node_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L667** `    elif implements_dynamic_expression(x):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L668** `        # If a class implements DynamicExpression protocol, register it before default dataclass one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L669** `        return register_pytree_node(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L670** `            type(x), dynamic_expression_to_iterable, dynamic_expression_from_iterable` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `    elif is_namedtuple_instance(x):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L673** `        # NamedTuples are pytree containers: flatten to field values, rebuild via constructor.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L674** `        # Checked before dataclass because NamedTuples are tuples, not dataclasses.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L675** `        return register_pytree_node(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L676** `            type(x), namedtuple_to_iterable, namedtuple_from_iterable` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** `    elif dataclasses.is_dataclass(x):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L679** `        return register_pytree_node(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L680** `            type(x), default_dataclass_to_iterable, default_dataclass_from_iterable` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L683** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L684** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L685** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L686** `def create_leaf_for_value(` — **EN:** Defines function `create_leaf_for_value`. **CN:** 定义函数 `create_leaf_for_value`。
+- **L687** `    x: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L688** `    is_numeric: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L689** `    is_none: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L690** `    node_metadata: SimpleNamespace | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L691** `    ir_type_str: str | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L692** `) -> Leaf:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L693** `    """` — **EN:** Starts the docstring for the function `create_leaf_for_value`. **CN:** 开始说明 function `create_leaf_for_value` 的文档字符串。
+- **L694** `    Create a Leaf node for a given value.` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L695** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L696** `    Args:` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L697** `        x: The value to create a leaf for` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L698** `        is_numeric: Whether this is a numeric value` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L699** `        is_none: Whether this represents None` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L700** `        node_metadata: Optional metadata` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L701** `        ir_type_str: Optional IR type string` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L702** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L703** `    Returns:` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L704** `        Leaf: The created leaf node` — **EN:** Continues the docstring for the function `create_leaf_for_value`. **CN:** 继续说明 function `create_leaf_for_value` 的文档字符串。
+- **L705** `    """` — **EN:** Ends the docstring for the function `create_leaf_for_value`. **CN:** 结束说明 function `create_leaf_for_value` 的文档字符串。
+- **L706** `    return Leaf(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L707** `        is_numeric=is_numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `        is_none=is_none,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** `        node_metadata=node_metadata,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L710** `        ir_type_str=ir_type_str or (str(x.type) if hasattr(x, "type") else None),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L711** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L712** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L713** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L714** `def _tree_flatten(` — **EN:** Defines function `_tree_flatten`. **CN:** 定义函数 `_tree_flatten`。
+- **L715** `    x: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L716** `    return_ir_values: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L717** `) -> tuple[Iterable[Any], Iterable[ir.Attribute], PyTreeDef | Leaf]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L718** `    """` — **EN:** Starts the docstring for the function `_tree_flatten`. **CN:** 开始说明 function `_tree_flatten` 的文档字符串。
+- **L719** `    Internal function to flatten a tree structure.` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L720** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L721** `    This is the core implementation of tree flattening that handles different` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L722** `    types of objects including None, ArithValue, ir.Value, Numeric types,` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L723** `    and registered pytree node types.` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L724** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L725** `    Args:` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L726** `        x: The object to flatten` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L727** `        return_ir_values: Whether to return ir.Value instead of original values` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L728** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L729** `    Returns:` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L730** `        tuple: (flattened_values, flattened_attributes, treedef) where flattened_values is an iterable` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L731** `               of leaf values, flattened_attributes is an iterable of leaf attributes` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L732** `               and treedef is the tree structure` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L733** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L734** `    Raises:` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L735** `        DSLTreeFlattenError: If the object type is not supported` — **EN:** Continues the docstring for the function `_tree_flatten`. **CN:** 继续说明 function `_tree_flatten` 的文档字符串。
+- **L736** `    """` — **EN:** Ends the docstring for the function `_tree_flatten`. **CN:** 结束说明 function `_tree_flatten` 的文档字符串。
+- **L737** `    if x is None:` — **EN:** Starts a conditional branch guarded by `x is None`. **CN:** 开始一个由 `x is None` 控制的条件分支。
+- **L738** `        return [], [], create_leaf_for_value(x, is_none=True)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L739** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L740** `    elif isinstance(x, ArithValue) and implements_dynamic_expression(x):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L741** `        v = (` — **EN:** Assigns a value to v. **CN:** 将一个值赋给 v。
+- **L742** `            _flatten_mlir_values(x.__extract_mlir_values__())` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L743** `            if return_ir_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L744** `            else [x]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** `        a = (` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L747** `            [ir.DictAttr.get({})]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** `            if not hasattr(x, "__extract_mlir_attributes__")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L749** `            else x.__extract_mlir_attributes__()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L750** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L752** `            v,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L753** `            a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `            create_leaf_for_value(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `                x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** `                node_metadata=SimpleNamespace(is_dynamic_expression=1, original_obj=x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L757** `                ir_type_str=str(x.type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L760** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L761** `    elif isinstance(x, ArithValue):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L762** `        return [x], [ir.DictAttr.get({})], create_leaf_for_value(x, is_numeric=True)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L763** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L764** `    elif implements_dynamic_expression(x) and isinstance(x, ir.Value):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L765** `        # Only for ir.Value subclasses (e.g. ctm.Pointer). Check before plain ir.Value` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L766** `        # so they are unflattened via __new_from_mlir_values__. Other dynamic` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L767** `        # expressions (e.g. TmemAllocator with 2 values) use the registered/node path.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L768** `        v = _flatten_mlir_values(x.__extract_mlir_values__())` — **EN:** Assigns a value to v. **CN:** 将一个值赋给 v。
+- **L769** `        a = (` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L770** `            [ir.DictAttr.get({})]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `            if not hasattr(x, "__extract_mlir_attributes__")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L772** `            else x.__extract_mlir_attributes__()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L775** `            v,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L776** `            a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L777** `            create_leaf_for_value(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** `                x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L779** `                node_metadata=SimpleNamespace(is_dynamic_expression=1, original_obj=x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L780** `                ir_type_str=str(v[0].type) if v else "unknown",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L781** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L782** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L783** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L784** `    elif isinstance(x, ir.Value):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L785** `        return [x], [ir.DictAttr.get({})], create_leaf_for_value(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L786** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L787** `    elif isinstance(x, Numeric):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L788** `        v = (` — **EN:** Assigns a value to v. **CN:** 将一个值赋给 v。
+- **L789** `            _flatten_mlir_values(x.__extract_mlir_values__())  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `            if return_ir_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `            else [x]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L793** `        a = (` — **EN:** Assigns a value to a. **CN:** 将一个值赋给 a。
+- **L794** `            [ir.DictAttr.get({})]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L795** `            if not hasattr(x, "__extract_mlir_attributes__")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L796** `            else x.__extract_mlir_attributes__()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L797** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L798** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L799** `            v,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L800** `            a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L801** `            create_leaf_for_value(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L802** `                x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L803** `                node_metadata=SimpleNamespace(is_dynamic_expression=1, original_obj=x),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L804** `                ir_type_str=str(type(x).mlir_type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L805** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L806** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L808** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L809** `        node_type = get_registered_node_types_or_insert(x)` — **EN:** Assigns a value to node_type. **CN:** 将一个值赋给 node_type。
+- **L810** `        if node_type:` — **EN:** Starts a conditional branch guarded by `node_type`. **CN:** 开始一个由 `node_type` 控制的条件分支。
+- **L811** `            node_metadata, children = node_type.to_iterable(x)` — **EN:** Assigns a value to (node_metadata, children). **CN:** 将一个值赋给 (node_metadata, children)。
+- **L812** `            if children is None:` — **EN:** Starts a conditional branch guarded by `children is None`. **CN:** 开始一个由 `children is None` 控制的条件分支。
+- **L813** `                # Flatten should not return None, it should return an empty list for real empty cases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L814** `                raise DSLTreeFlattenError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L815** `                    "Flatten Error: children is None", get_fully_qualified_class_name(x)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `            children_flat, child_attrs_flat, child_trees = unzip3(` — **EN:** Assigns a value to (children_flat, child_attrs_flat, child_trees). **CN:** 将一个值赋给 (children_flat, child_attrs_flat, child_trees)。
+- **L818** `                map(lambda child: _tree_flatten(child, return_ir_values), children)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L819** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L820** `            flattened = it.chain.from_iterable(children_flat)` — **EN:** Assigns a value to flattened. **CN:** 将一个值赋给 flattened。
+- **L821** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L822** `            if hasattr(x, "__extract_mlir_attributes__"):` — **EN:** Starts a conditional branch guarded by `hasattr(x, '__extract_mlir_attributes__')`. **CN:** 开始一个由 `hasattr(x, '__extract_mlir_attributes__')` 控制的条件分支。
+- **L823** `                # If x has extract mlir attributes it overrides the child's default attributes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L824** `                child_attrs_flat = [x.__extract_mlir_attributes__()] * len(` — **EN:** Assigns a value to child_attrs_flat. **CN:** 将一个值赋给 child_attrs_flat。
+- **L825** `                    child_attrs_flat` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L827** `            child_attrs_flattened = it.chain.from_iterable(child_attrs_flat)` — **EN:** Assigns a value to child_attrs_flattened. **CN:** 将一个值赋给 child_attrs_flattened。
+- **L828** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L829** `                flattened,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L830** `                child_attrs_flattened,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L831** `                PyTreeDef(node_type, node_metadata, tuple(child_trees)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L832** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L833** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L834** `        # Try to convert to numeric` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L835** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L836** `            numeric = as_numeric(x)` — **EN:** Assigns a value to numeric. **CN:** 将一个值赋给 numeric。
+- **L837** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L838** `                [numeric.ir_value() if return_ir_values else x],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L839** `                [ir.DictAttr.get({})],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L840** `                create_leaf_for_value(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L841** `                    is_numeric=True, ir_type_str=str(type(numeric).mlir_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L842** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L844** `        except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L845** `            raise DSLTreeFlattenError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L846** `                "Flatten Error", get_fully_qualified_class_name(x)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L847** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L848** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L849** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L850** `def tree_unflatten(treedef: PyTreeDef, xs: list[Any]) -> Any:` — **EN:** Defines function `tree_unflatten`. **CN:** 定义函数 `tree_unflatten`。
+- **L851** `    """` — **EN:** Starts the docstring for the function `tree_unflatten`. **CN:** 开始说明 function `tree_unflatten` 的文档字符串。
+- **L852** `    Reconstruct a nested structure from a flat list of values and tree definition.` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L853** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L854** `    This is the inverse operation of tree_flatten. It takes the flattened` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L855** `    values and the tree structure definition to reconstruct the original` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L856** `    nested structure.` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L857** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L858** `    Args:` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L859** `        treedef: The tree structure definition from tree_flatten` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L860** `        xs: List of flat values to reconstruct from` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L861** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L862** `    Returns:` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L863** `        The reconstructed nested structure` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L864** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L865** `    Example:` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L866** `        >>> flat_values, _, treedef = tree_flatten([1, [2, 3], 4])` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L867** `        >>> tree_unflatten(treedef, flat_values)` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L868** `        [1, [2, 3], 4]` — **EN:** Continues the docstring for the function `tree_unflatten`. **CN:** 继续说明 function `tree_unflatten` 的文档字符串。
+- **L869** `    """` — **EN:** Ends the docstring for the function `tree_unflatten`. **CN:** 结束说明 function `tree_unflatten` 的文档字符串。
+- **L870** `    return _tree_unflatten(treedef, iter(xs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L871** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L872** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L873** `def _tree_unflatten(treedef: PyTreeDef | Leaf, xs: Iterator[Any]) -> Any:` — **EN:** Defines function `_tree_unflatten`. **CN:** 定义函数 `_tree_unflatten`。
+- **L874** `    """` — **EN:** Starts the docstring for the function `_tree_unflatten`. **CN:** 开始说明 function `_tree_unflatten` 的文档字符串。
+- **L875** `    Internal function to reconstruct a tree structure.` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L876** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L877** `    This is the core implementation of tree unflattening that handles` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L878** `    different types of tree definitions including Leaf nodes and PyTreeDef nodes.` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L879** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L880** `    Args:` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L881** `        treedef: The tree structure definition` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L882** `        xs: Iterator of flat values to reconstruct from` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L883** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L884** `    Returns:` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L885** `        The reconstructed object` — **EN:** Continues the docstring for the function `_tree_unflatten`. **CN:** 继续说明 function `_tree_unflatten` 的文档字符串。
+- **L886** `    """` — **EN:** Ends the docstring for the function `_tree_unflatten`. **CN:** 结束说明 function `_tree_unflatten` 的文档字符串。
+- **L887** `    if isinstance(treedef, Leaf):` — **EN:** Starts a conditional branch guarded by `isinstance(treedef, Leaf)`. **CN:** 开始一个由 `isinstance(treedef, Leaf)` 控制的条件分支。
+- **L888** `        if getattr(treedef, "is_none", False):` — **EN:** Starts a conditional branch guarded by `getattr(treedef, 'is_none', False)`. **CN:** 开始一个由 `getattr(treedef, 'is_none', False)` 控制的条件分支。
+- **L889** `            return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L890** `        metadata = getattr(treedef, "node_metadata", None)` — **EN:** Assigns a value to metadata. **CN:** 将一个值赋给 metadata。
+- **L891** `        if metadata and getattr(metadata, "is_dynamic_expression", False):` — **EN:** Starts a conditional branch guarded by `metadata and getattr(metadata, 'is_dynamic_expression', F...`. **CN:** 开始一个由 `metadata and getattr(metadata, 'is_dynamic_expression', F...` 控制的条件分支。
+- **L892** `            return metadata.original_obj.__new_from_mlir_values__([next(xs)])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L893** `        if getattr(treedef, "is_numeric", False):` — **EN:** Starts a conditional branch guarded by `getattr(treedef, 'is_numeric', False)`. **CN:** 开始一个由 `getattr(treedef, 'is_numeric', False)` 控制的条件分支。
+- **L894** `            return as_numeric(next(xs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L895** `        return next(xs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L896** `    elif isinstance(treedef, PyTreeDef):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L897** `        children = (_tree_unflatten(t, xs) for t in treedef.child_treedefs)` — **EN:** Assigns a value to children. **CN:** 将一个值赋给 children。
+- **L898** `        return treedef.node_type.from_iterable(treedef.node_metadata, children)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L899** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L900** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L901** `def _check_tree_equal(lhs: PyTreeDef | Leaf, rhs: PyTreeDef | Leaf) -> bool:` — **EN:** Defines function `_check_tree_equal`. **CN:** 定义函数 `_check_tree_equal`。
+- **L902** `    """` — **EN:** Starts the docstring for the function `_check_tree_equal`. **CN:** 开始说明 function `_check_tree_equal` 的文档字符串。
+- **L903** `    Check if two tree definitions are structurally equal.` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L904** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L905** `    This is a helper function for check_tree_equal that recursively compares` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L906** `    tree structures.` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L907** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L908** `    Args:` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L909** `        lhs: Left tree definition (PyTreeDef or Leaf)` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L910** `        rhs: Right tree definition (PyTreeDef or Leaf)` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L911** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L912** `    Returns:` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L913** `        bool: True if the trees are structurally equal, False otherwise` — **EN:** Continues the docstring for the function `_check_tree_equal`. **CN:** 继续说明 function `_check_tree_equal` 的文档字符串。
+- **L914** `    """` — **EN:** Ends the docstring for the function `_check_tree_equal`. **CN:** 结束说明 function `_check_tree_equal` 的文档字符串。
+- **L915** `    if isinstance(lhs, Leaf) and isinstance(rhs, Leaf):` — **EN:** Starts a conditional branch guarded by `isinstance(lhs, Leaf) and isinstance(rhs, Leaf)`. **CN:** 开始一个由 `isinstance(lhs, Leaf) and isinstance(rhs, Leaf)` 控制的条件分支。
+- **L916** `        return lhs.is_none == rhs.is_none and lhs.ir_type_str == rhs.ir_type_str` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L917** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L918** `    elif isinstance(lhs, PyTreeDef) and isinstance(rhs, PyTreeDef):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L919** `        lhs_metadata = lhs.node_metadata` — **EN:** Assigns a value to lhs_metadata. **CN:** 将一个值赋给 lhs_metadata。
+- **L920** `        rhs_metadata = rhs.node_metadata` — **EN:** Assigns a value to rhs_metadata. **CN:** 将一个值赋给 rhs_metadata。
+- **L921** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L922** `        lhs_fields = getattr(lhs_metadata, "fields", [])` — **EN:** Assigns a value to lhs_fields. **CN:** 将一个值赋给 lhs_fields。
+- **L923** `        rhs_fields = getattr(rhs_metadata, "fields", [])` — **EN:** Assigns a value to rhs_fields. **CN:** 将一个值赋给 rhs_fields。
+- **L924** `        lhs_constexpr_fields = getattr(lhs_metadata, "constexpr_fields", [])` — **EN:** Assigns a value to lhs_constexpr_fields. **CN:** 将一个值赋给 lhs_constexpr_fields。
+- **L925** `        rhs_constexpr_fields = getattr(rhs_metadata, "constexpr_fields", [])` — **EN:** Assigns a value to rhs_constexpr_fields. **CN:** 将一个值赋给 rhs_constexpr_fields。
+- **L926** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L927** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L928** `            lhs.node_type == rhs.node_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L929** `            and lhs_fields == rhs_fields` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L930** `            and lhs_constexpr_fields == rhs_constexpr_fields` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L931** `            and len(lhs.child_treedefs) == len(rhs.child_treedefs)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L932** `            and all(map(_check_tree_equal, lhs.child_treedefs, rhs.child_treedefs))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L933** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L934** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L935** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L936** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L937** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L938** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L939** `def check_tree_equal(lhs: PyTreeDef, rhs: PyTreeDef) -> int:` — **EN:** Defines function `check_tree_equal`. **CN:** 定义函数 `check_tree_equal`。
+- **L940** `    """` — **EN:** Starts the docstring for the function `check_tree_equal`. **CN:** 开始说明 function `check_tree_equal` 的文档字符串。
+- **L941** `    Check if two tree definitions are equal and return the index of first difference.` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L942** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L943** `    This function compares two tree definitions and returns the index of the` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L944** `    first child that differs, or -1 if they are completely equal.` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L945** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L946** `    Args:` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L947** `        lhs: Left tree definition` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L948** `        rhs: Right tree definition` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L949** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L950** `    Returns:` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L951** `        int: Index of the first differing child, or -1 if trees are equal` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L952** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L953** `    Example:` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L954** `        >>> treedef1 = tree_flatten([1, [2, 3]])[2]` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L955** `        >>> treedef2 = tree_flatten([1, [2, 4]])[2]` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L956** `        >>> check_tree_equal(treedef1, treedef2)` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L957** `        1  # The second child differs` — **EN:** Continues the docstring for the function `check_tree_equal`. **CN:** 继续说明 function `check_tree_equal` 的文档字符串。
+- **L958** `    """` — **EN:** Ends the docstring for the function `check_tree_equal`. **CN:** 结束说明 function `check_tree_equal` 的文档字符串。
+- **L959** `    assert len(lhs.child_treedefs) == len(rhs.child_treedefs)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L960** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L961** `    def find_first_difference(` — **EN:** Defines function `find_first_difference`. **CN:** 定义函数 `find_first_difference`。
+- **L962** `        index_and_pair: tuple[int, tuple[PyTreeDef, PyTreeDef]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L963** `    ) -> int:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L964** `        index, (l, r) = index_and_pair` — **EN:** Assigns a value to (index, (l, r)). **CN:** 将一个值赋给 (index, (l, r))。
+- **L965** `        return index if not _check_tree_equal(l, r) else -1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L966** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L967** `    differences = map(` — **EN:** Assigns a value to differences. **CN:** 将一个值赋给 differences。
+- **L968** `        find_first_difference, enumerate(zip(lhs.child_treedefs, rhs.child_treedefs))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L969** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L970** `    return next((diff for diff in differences if diff != -1), -1)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.utils.tree_utils`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.utils.tree_utils`。
+- EN: Top-level classes: DSLTreeFlattenError, NodeType, PyTreeDef, Leaf CN: 顶层类包括：DSLTreeFlattenError, NodeType, PyTreeDef, Leaf
+- EN: Top-level functions: _flatten_mlir_values, _unflatten_mlir_values, unzip2, unzip3, get_fully_qualified_class_name, is_frozen_dataclass, is_namedtuple_instance, is_constexpr_field, extract_dataclass_members, default_dataclass_to_iterable, set_dataclass_attributes, default_dataclass_from_iterable, ... (+16 more) CN: 顶层函数包括：_flatten_mlir_values, _unflatten_mlir_values, unzip2, unzip3, get_fully_qualified_class_name, is_frozen_dataclass, is_namedtuple_instance, is_constexpr_field, extract_dataclass_members, default_dataclass_to_iterable, set_dataclass_attributes, default_dataclass_from_iterable, ... (+16 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..typing:as_numeric,Numeric,Constexpr,implements_dynamic_expression, .._mlir_helpers.arith:ArithValue, ..common:DSLBaseError, ..._mlir:ir CN: 内部依赖：..typing:as_numeric,Numeric,Constexpr,implements_dynamic_expression, .._mlir_helpers.arith:ArithValue, ..common:DSLBaseError, ..._mlir:ir
+- EN: External or standard-library dependencies: collections.abc:Callable,Iterable,Iterator, typing:Any,NamedTuple,get_origin, dataclasses, itertools, types:SimpleNamespace CN: 外部或标准库依赖：collections.abc:Callable,Iterable,Iterator, typing:Any,NamedTuple,get_origin, dataclasses, itertools, types:SimpleNamespace

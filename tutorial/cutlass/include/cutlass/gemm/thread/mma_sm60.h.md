@@ -1,0 +1,1194 @@
+# mma_sm60.h — Code Analysis / 代码分析
+
+## Source / 源文件
+
+`include/cutlass/gemm/thread/mma_sm60.h`
+
+## Purpose / 用途
+
+**EN:** Templates exposing architecture support for multiply-add operations /.
+
+**CN:** 面向 SM60 时代 SIMD/DP4A 类指令特化的线程级 MMA 构件。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code> — **EN:** Starts the file header comment block that carries the license notice. **CN:** 开始文件头注释块，这里承载许可证说明。
+- **L2** <code>* Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L3** <code>* SPDX-License-Identifier: BSD-3-Clause</code> — **EN:** States the SPDX license identifier for automated tooling. **CN:** 给出 SPDX 许可证标识，便于自动化工具识别。
+- **L4** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L5** <code>* Redistribution and use in source and binary forms, with or without</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L6** <code>* modification, are permitted provided that the following conditions are met:</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L7** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L8** <code>* 1. Redistributions of source code must retain the above copyright notice, this</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L9** <code>* list of conditions and the following disclaimer.</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L10** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L11** <code>* 2. Redistributions in binary form must reproduce the above copyright notice,</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L12** <code>* this list of conditions and the following disclaimer in the documentation</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L13** <code>* and/or other materials provided with the distribution.</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L14** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L15** <code>* 3. Neither the name of the copyright holder nor the names of its</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L16** <code>* contributors may be used to endorse or promote products derived from</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L17** <code>* this software without specific prior written permission.</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L18** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L19** <code>* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L20** <code>* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L21** <code>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L22** <code>* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L23** <code>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L24** <code>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L25** <code>* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L26** <code>* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L27** <code>* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L28** <code>* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L29** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L30** <code>**************************************************************************************************/</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L31** <code>/*! \file</code> — **EN:** Marks this comment as the file-level documentation block. **CN:** 将该注释标记为文件级文档块。
+- **L32** <code>\brief Templates exposing architecture support for multiply-add operations</code> — **EN:** Provides a short summary of the header’s responsibility. **CN:** 给出该头文件职责的简短摘要。
+- **L33** <code>*/</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L34** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L35** <code>#pragma once</code> — **EN:** Uses a pragma guard so the header is included only once per translation unit. **CN:** 使用 pragma 保护，确保同一翻译单元中只包含一次该头文件。
+- **L36** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L37** <code>#include &quot;cutlass/cutlass.h&quot;</code> — **EN:** Includes `cutlass/cutlass.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/cutlass.h`，以获得 CUTLASS 基础工具与类型。
+- **L38** <code>#include &quot;cutlass/tensor_ref.h&quot;</code> — **EN:** Includes `cutlass/tensor_ref.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/tensor_ref.h`，以获得 CUTLASS 基础工具与类型。
+- **L39** <code>#include &quot;cutlass/layout/matrix.h&quot;</code> — **EN:** Includes `cutlass/layout/matrix.h` to access matrix layout descriptors. **CN:** 引入 `cutlass/layout/matrix.h`，以获得 矩阵布局描述类型。
+- **L40** <code>#include &quot;cutlass/gemm/gemm.h&quot;</code> — **EN:** Includes `cutlass/gemm/gemm.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/gemm.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L41** <code>#include &quot;cutlass/gemm/thread/mma.h&quot;</code> — **EN:** Includes `cutlass/gemm/thread/mma.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/thread/mma.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L42** <code>#include &quot;cutlass/functional.h&quot;</code> — **EN:** Includes `cutlass/functional.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/functional.h`，以获得 CUTLASS 基础工具与类型。
+- **L43** <code>#include &quot;cutlass/reduction/thread/reduce.h&quot;</code> — **EN:** Includes `cutlass/reduction/thread/reduce.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/reduction/thread/reduce.h`，以获得 CUTLASS 基础工具与类型。
+- **L44** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L45** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L46** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L47** <code>namespace cutlass {</code> — **EN:** Opens namespace `cutlass` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `cutlass`，把后续声明放入正确的 CUTLASS 作用域。
+- **L48** <code>namespace gemm {</code> — **EN:** Opens namespace `gemm` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `gemm`，把后续声明放入正确的 CUTLASS 作用域。
+- **L49** <code>namespace thread {</code> — **EN:** Opens namespace `thread` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `thread`，把后续声明放入正确的 CUTLASS 作用域。
+- **L50** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L51** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L52** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L53** <code>namespace detail {</code> — **EN:** Opens namespace `detail` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `detail`，把后续声明放入正确的 CUTLASS 作用域。
+- **L54** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L55** <code>/// Structure to compute the matrix product for HFMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L56** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L57** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L58** <code>typename Shape,</code> — **EN:** Continues the current implementation using `Shape`. **CN:** 使用 `Shape` 继续当前实现。
+- **L59** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L60** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L61** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L62** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L63** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L64** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L65** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L66** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L67** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L68** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L69** <code>/// Type of GEMM inner vs outer product</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L70** <code>bool</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L71** <code>&gt;</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L72** <code>struct Mma_HFMA2;</code> — **EN:** Declares struct `Mma_HFMA2`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2`，用于组织相关数据或策略行为。
+- **L73** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L74** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L75** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L76** <code>// Specialization for NNN  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L77** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L78** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L79** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L80** <code>struct Mma_HFMA2 &lt;</code> — **EN:** Declares struct `Mma_HFMA2 <`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2 <`，用于组织相关数据或策略行为。
+- **L81** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L82** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L83** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L84** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L85** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L86** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L87** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L88** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L89** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L90** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L91** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L92** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L93** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L94** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L95** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L96** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L97** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L98** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L99** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L100** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L101** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L102** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L103** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L104** <code>!(Shape::kM % 2),</code> — **EN:** Continues the current implementation using `Shape::kM`. **CN:** 使用 `Shape::kM` 继续当前实现。
+- **L105** <code>&quot;Mma_HFMA2 requires the M dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `M`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `M` 继续当前实现。
+- **L106** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L107** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L108** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L109** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L110** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L111** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L112** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L113** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L114** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L115** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L116** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L117** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L118** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L119** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L120** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L121** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L122** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L123** <code>/// Use 1x1x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L124** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L125** <code>gemm::GemmShape&lt;2,1,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L126** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L127** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L128** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L129** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L130** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L131** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L132** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L133** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L134** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L135** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L136** <code>Array&lt;half_t, 2&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L137** <code>Array&lt;half_t, 1&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L138** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L139** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L140** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L141** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L142** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L143** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L144** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L145** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L146** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L147** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L148** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L149** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L150** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[n*Shape::kM/2 + m] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L151** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L152** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L153** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L154** <code>ptr_A[k*Shape::kM/2 + m],</code> — **EN:** Continues the current implementation using `ptr_A`, `k`, `Shape::kM`, `m`. **CN:** 使用 `ptr_A`, `k`, `Shape::kM`, `m` 继续当前实现。
+- **L155** <code>ptr_B[n*Shape::kK + k],</code> — **EN:** Continues the current implementation using `ptr_B`, `n`, `Shape::kK`, `k`. **CN:** 使用 `ptr_B`, `n`, `Shape::kK`, `k` 继续当前实现。
+- **L156** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L157** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L158** <code>ptr_D[n*Shape::kM/2 + m] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L159** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L160** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L161** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L162** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L163** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L164** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L165** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L166** <code>// Specialization for NNT  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L167** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L168** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L169** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L170** <code>struct Mma_HFMA2&lt;</code> — **EN:** Declares struct `Mma_HFMA2<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2<`，用于组织相关数据或策略行为。
+- **L171** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L172** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L173** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L174** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L175** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L176** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L177** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L178** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L179** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L180** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L181** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L182** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L183** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L184** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L185** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L186** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L187** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L188** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L189** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L190** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L191** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L192** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L193** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L194** <code>!(Shape::kN % 2),</code> — **EN:** Continues the current implementation using `Shape::kN`. **CN:** 使用 `Shape::kN` 继续当前实现。
+- **L195** <code>&quot;Mma_HFMA2 requires the N dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `N`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `N` 继续当前实现。
+- **L196** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L197** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L198** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L199** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L200** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L201** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L202** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L203** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L204** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L205** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L206** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L207** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L208** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L209** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L210** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L211** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L212** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L213** <code>/// Use 1x2x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L214** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L215** <code>gemm::GemmShape&lt;1,2,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L216** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L217** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L218** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L219** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L220** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L221** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L222** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L223** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L224** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L225** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L226** <code>Array&lt;half_t, 1&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L227** <code>Array&lt;half_t, 2&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L228** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L229** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L230** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L231** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L232** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L233** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L234** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L235** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L236** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L237** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L238** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L239** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L240** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[m*Shape::kN/2 + n] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L241** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L242** <code>Array&lt;half_t, 2&gt; tmp_B;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp_B`. **CN:** 完成一条与 `Array`, `half_t`, `tmp_B` 相关的声明。
+- **L243** <code>tmp_B[0] = ptr_B-&gt;at(2*n*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L244** <code>tmp_B[1] = ptr_B-&gt;at((2*n+1)*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L245** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L246** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L247** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L248** <code>ptr_A[k*Shape::kM + m],</code> — **EN:** Continues the current implementation using `ptr_A`, `k`, `Shape::kM`, `m`. **CN:** 使用 `ptr_A`, `k`, `Shape::kM`, `m` 继续当前实现。
+- **L249** <code>tmp_B,</code> — **EN:** Continues the current implementation using `tmp_B`. **CN:** 使用 `tmp_B` 继续当前实现。
+- **L250** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L251** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L252** <code>ptr_D[m*Shape::kN/2 + n] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L253** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L254** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L255** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L256** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L257** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L258** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L259** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L260** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L261** <code>// Specialization for NTN  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L262** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L263** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L264** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L265** <code>struct Mma_HFMA2 &lt;</code> — **EN:** Declares struct `Mma_HFMA2 <`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2 <`，用于组织相关数据或策略行为。
+- **L266** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L267** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L268** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L269** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L270** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L271** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L272** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L273** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L274** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L275** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L276** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L277** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L278** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L279** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L280** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L281** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L282** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L283** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L284** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L285** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L286** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L287** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L288** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L289** <code>!(Shape::kM % 2),</code> — **EN:** Continues the current implementation using `Shape::kM`. **CN:** 使用 `Shape::kM` 继续当前实现。
+- **L290** <code>&quot;Mma_HFMA2 requires the GEMM M dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `GEMM`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `GEMM` 继续当前实现。
+- **L291** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L292** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L293** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L294** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L295** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L296** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L297** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L298** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L299** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L300** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L301** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L302** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L303** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L304** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L305** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L306** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L307** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L308** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L309** <code>gemm::GemmShape&lt;2,1,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L310** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L311** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L312** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L313** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L314** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L315** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L316** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L317** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L318** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L319** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L320** <code>Array&lt;half_t, 2&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L321** <code>Array&lt;half_t, 1&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L322** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L323** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L324** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L325** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L326** <code>for (int k = 0; k &lt; Shape::kK / Mma::Shape::kK; ++k) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L327** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L328** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L329** <code>for (int m = 0; m &lt; Shape::kM / Mma::Shape::kM; ++m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L330** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L331** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L332** <code>for (int n = 0; n &lt; Shape::kN / Mma::Shape::kN; ++n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L333** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L334** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[m + n * Shape::kM/2] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L335** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L336** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L337** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L338** <code>ptr_A[m + k * Shape::kM/2],</code> — **EN:** Continues the current implementation using `ptr_A`, `m`, `k`, `Shape::kM`. **CN:** 使用 `ptr_A`, `m`, `k`, `Shape::kM` 继续当前实现。
+- **L339** <code>ptr_B[k * Shape::kN + n],</code> — **EN:** Continues the current implementation using `ptr_B`, `k`, `Shape::kN`, `n`. **CN:** 使用 `ptr_B`, `k`, `Shape::kN`, `n` 继续当前实现。
+- **L340** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L341** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L342** <code>ptr_D[m + n * Shape::kM/2] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L343** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L344** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L345** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L346** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L347** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L348** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L349** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L350** <code>// Specialization for NTT  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L351** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L352** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L353** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L354** <code>struct Mma_HFMA2&lt;</code> — **EN:** Declares struct `Mma_HFMA2<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2<`，用于组织相关数据或策略行为。
+- **L355** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L356** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L357** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L358** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L359** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L360** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L361** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L362** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L363** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L364** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L365** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L366** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L367** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L368** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L369** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L370** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L371** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L372** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L373** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L374** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L375** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L376** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L377** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L378** <code>!(Shape::kN % 2),</code> — **EN:** Continues the current implementation using `Shape::kN`. **CN:** 使用 `Shape::kN` 继续当前实现。
+- **L379** <code>&quot;Mma_HFMA2 requires the N dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `N`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `N` 继续当前实现。
+- **L380** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L381** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L382** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L383** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L384** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L385** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L386** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L387** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L388** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L389** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L390** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L391** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L392** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L393** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L394** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L395** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L396** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L397** <code>/// Use 1x2x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L398** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L399** <code>gemm::GemmShape&lt;1,2,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L400** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L401** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L402** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L403** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L404** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L405** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L406** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L407** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L408** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L409** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L410** <code>Array&lt;half_t, 1&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L411** <code>Array&lt;half_t, 2&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L412** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L413** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L414** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L415** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L416** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L417** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L418** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L419** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L420** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L421** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L422** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L423** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L424** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[m*Shape::kN/2 + n] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L425** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L426** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L427** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L428** <code>ptr_A[k*Shape::kM + m],</code> — **EN:** Continues the current implementation using `ptr_A`, `k`, `Shape::kM`, `m`. **CN:** 使用 `ptr_A`, `k`, `Shape::kM`, `m` 继续当前实现。
+- **L429** <code>ptr_B[k*Shape::kN/2 + n],</code> — **EN:** Continues the current implementation using `ptr_B`, `k`, `Shape::kN`, `n`. **CN:** 使用 `ptr_B`, `k`, `Shape::kN`, `n` 继续当前实现。
+- **L430** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L431** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L432** <code>ptr_D[m*Shape::kN/2 + n] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L433** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L434** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L435** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L436** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L437** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L438** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L439** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L440** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L441** <code>// Specialization for TNN  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L442** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L443** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L444** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L445** <code>struct Mma_HFMA2 &lt;</code> — **EN:** Declares struct `Mma_HFMA2 <`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2 <`，用于组织相关数据或策略行为。
+- **L446** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L447** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L448** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L449** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L450** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L451** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L452** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L453** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L454** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L455** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L456** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L457** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L458** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L459** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L460** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L461** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L462** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L463** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L464** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L465** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L466** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L467** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L468** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L469** <code>!(Shape::kM % 2),</code> — **EN:** Continues the current implementation using `Shape::kM`. **CN:** 使用 `Shape::kM` 继续当前实现。
+- **L470** <code>&quot;Mma_HFMA2 requires the M dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `M`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `M` 继续当前实现。
+- **L471** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L472** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L473** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L474** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L475** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L476** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L477** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L478** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L479** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L480** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L481** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L482** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L483** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L484** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L485** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L486** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L487** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L488** <code>/// Use 1x1x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L489** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L490** <code>gemm::GemmShape&lt;2,1,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L491** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L492** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L493** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L494** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L495** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L496** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L497** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L498** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L499** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L500** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L501** <code>Array&lt;half_t, 2&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L502** <code>Array&lt;half_t, 1&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L503** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L504** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L505** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L506** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L507** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L508** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L509** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L510** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L511** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L512** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L513** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L514** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L515** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[n*Shape::kM/2 + m] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L516** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L517** <code>Array&lt;half_t, 2&gt; tmp_A;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp_A`. **CN:** 完成一条与 `Array`, `half_t`, `tmp_A` 相关的声明。
+- **L518** <code>tmp_A[0] = ptr_A-&gt;at(2*m*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L519** <code>tmp_A[1] = ptr_A-&gt;at((2*m+1)*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L520** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L521** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L522** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L523** <code>tmp_A,</code> — **EN:** Continues the current implementation using `tmp_A`. **CN:** 使用 `tmp_A` 继续当前实现。
+- **L524** <code>ptr_B[n*Shape::kK + k],</code> — **EN:** Continues the current implementation using `ptr_B`, `n`, `Shape::kK`, `k`. **CN:** 使用 `ptr_B`, `n`, `Shape::kK`, `k` 继续当前实现。
+- **L525** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L526** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L527** <code>ptr_D[n*Shape::kM/2 + m] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L528** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L529** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L530** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L531** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L532** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L533** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L534** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L535** <code>// Specialization for TNT  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L536** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L537** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L538** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L539** <code>struct Mma_HFMA2 &lt;</code> — **EN:** Declares struct `Mma_HFMA2 <`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2 <`，用于组织相关数据或策略行为。
+- **L540** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L541** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L542** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L543** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L544** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L545** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L546** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L547** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L548** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L549** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L550** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L551** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L552** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L553** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L554** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L555** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L556** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L557** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L558** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L559** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L560** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L561** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L562** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L563** <code>!(Shape::kN % 2),</code> — **EN:** Continues the current implementation using `Shape::kN`. **CN:** 使用 `Shape::kN` 继续当前实现。
+- **L564** <code>&quot;Mma_HFMA2 requires the N dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `N`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `N` 继续当前实现。
+- **L565** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L566** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L567** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L568** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L569** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L570** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L571** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L572** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L573** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L574** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L575** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L576** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L577** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L578** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L579** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L580** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L581** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L582** <code>/// Use 1x2x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L583** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L584** <code>gemm::GemmShape&lt;1,2,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L585** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L586** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L587** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L588** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L589** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L590** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L591** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L592** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L593** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L594** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L595** <code>Array&lt;half_t, 1&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L596** <code>Array&lt;half_t, 2&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L597** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L598** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L599** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L600** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L601** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L602** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L603** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L604** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L605** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L606** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L607** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L608** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L609** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[m*Shape::kN/2 + n] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L610** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L611** <code>Array&lt;half_t, 2&gt; tmp_B;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp_B`. **CN:** 完成一条与 `Array`, `half_t`, `tmp_B` 相关的声明。
+- **L612** <code>tmp_B[0] = ptr_B-&gt;at(2*n*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L613** <code>tmp_B[1] = ptr_B-&gt;at((2*n+1)*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L614** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L615** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L616** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L617** <code>ptr_A[m*Shape::kK + k],</code> — **EN:** Continues the current implementation using `ptr_A`, `m`, `Shape::kK`, `k`. **CN:** 使用 `ptr_A`, `m`, `Shape::kK`, `k` 继续当前实现。
+- **L618** <code>tmp_B,</code> — **EN:** Continues the current implementation using `tmp_B`. **CN:** 使用 `tmp_B` 继续当前实现。
+- **L619** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L620** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L621** <code>ptr_D[m*Shape::kN/2 + n] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L622** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L623** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L624** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L625** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L626** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L627** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L628** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L629** <code>// Specialization for TTN  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L630** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L631** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L632** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L633** <code>struct Mma_HFMA2 &lt;</code> — **EN:** Declares struct `Mma_HFMA2 <`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2 <`，用于组织相关数据或策略行为。
+- **L634** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L635** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L636** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L637** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L638** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L639** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L640** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L641** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L642** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L643** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L644** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L645** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L646** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L647** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L648** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L649** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L650** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L651** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L652** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L653** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L654** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L655** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L656** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L657** <code>!(Shape::kM % 2),</code> — **EN:** Continues the current implementation using `Shape::kM`. **CN:** 使用 `Shape::kM` 继续当前实现。
+- **L658** <code>&quot;Mma_HFMA2 requires the M dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `M`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `M` 继续当前实现。
+- **L659** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L660** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L661** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L662** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L663** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L664** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L665** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L666** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L667** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L668** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L669** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L670** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L671** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L672** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L673** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L674** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L675** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L676** <code>/// Use 1x2x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L677** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L678** <code>gemm::GemmShape&lt;2,1,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L679** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L680** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L681** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L682** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L683** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L684** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L685** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L686** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L687** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L688** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L689** <code>Array&lt;half_t, 2&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L690** <code>Array&lt;half_t, 1&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L691** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L692** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L693** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L694** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L695** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L696** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L697** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L698** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L699** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L700** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L701** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L702** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L703** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[n*Shape::kM/2 + m] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L704** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L705** <code>Array&lt;half_t, 2&gt; tmp_A;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp_A`. **CN:** 完成一条与 `Array`, `half_t`, `tmp_A` 相关的声明。
+- **L706** <code>tmp_A[0] = ptr_A-&gt;at(2*m*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L707** <code>tmp_A[1] = ptr_A-&gt;at((2*m+1)*Shape::kK + k);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L708** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L709** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L710** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L711** <code>tmp_A,</code> — **EN:** Continues the current implementation using `tmp_A`. **CN:** 使用 `tmp_A` 继续当前实现。
+- **L712** <code>ptr_B[k*Shape::kN + n],</code> — **EN:** Continues the current implementation using `ptr_B`, `k`, `Shape::kN`, `n`. **CN:** 使用 `ptr_B`, `k`, `Shape::kN`, `n` 继续当前实现。
+- **L713** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L714** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L715** <code>ptr_D[n*Shape::kM/2 + m] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L716** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L717** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L718** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L719** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L720** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L721** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L722** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L723** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L724** <code>// Specialization for TTT  //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L725** <code>/////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L726** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L727** <code>template &lt;typename Shape_&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L728** <code>struct Mma_HFMA2&lt;</code> — **EN:** Declares struct `Mma_HFMA2<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2<`，用于组织相关数据或策略行为。
+- **L729** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L730** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L731** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L732** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L733** <code>true</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L734** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L735** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L736** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L737** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L738** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L739** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L740** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L741** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L742** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L743** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L744** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L745** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L746** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L747** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L748** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L749** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L750** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L751** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L752** <code>!(Shape::kN % 2),</code> — **EN:** Continues the current implementation using `Shape::kN`. **CN:** 使用 `Shape::kN` 继续当前实现。
+- **L753** <code>&quot;Mma_HFMA2 requires the N dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `N`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `N` 继续当前实现。
+- **L754** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L755** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L756** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L757** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L758** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L759** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L760** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L761** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L762** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L763** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L764** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L765** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L766** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L767** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L768** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L769** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L770** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L771** <code>/// Use 1x2x1 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L772** <code>using Mma = arch::Mma&lt;</code> — **EN:** Introduces alias or imported name `Mma = arch::Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Mma = arch::Mma<`，便于在当前作用域中复用。
+- **L773** <code>gemm::GemmShape&lt;1,2,1&gt;,</code> — **EN:** Continues the current implementation using `gemm::GemmShape`. **CN:** 使用 `gemm::GemmShape` 继续当前实现。
+- **L774** <code>1,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L775** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L776** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L777** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L778** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L779** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L780** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L781** <code>arch::OpMultiplyAdd&gt;;</code> — **EN:** Completes a declaration involving `arch::OpMultiplyAdd`. **CN:** 完成一条与 `arch::OpMultiplyAdd` 相关的声明。
+- **L782** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L783** <code>Array&lt;half_t, 2&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 2&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L784** <code>Array&lt;half_t, 1&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 1&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L785** <code>Array&lt;half_t, 2&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L786** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L787** <code>Mma mma;</code> — **EN:** Completes a declaration involving `Mma`, `mma`. **CN:** 完成一条与 `Mma`, `mma` 相关的声明。
+- **L788** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L789** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L790** <code>for(auto k=0; k &lt;  Shape::kK / Mma::Shape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L791** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L792** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L793** <code>for(auto n=0; n &lt; Shape::kN / Mma::Shape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L794** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L795** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L796** <code>for(auto m=0; m &lt; Shape::kM / Mma::Shape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L797** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L798** <code>Array&lt;half_t, 2&gt; tmp { ptr_D[m*Shape::kN/2 + n] };</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp`. **CN:** 完成一条与 `Array`, `half_t`, `tmp` 相关的声明。
+- **L799** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L800** <code>mma(</code> — **EN:** Continues the current implementation using `mma`. **CN:** 使用 `mma` 继续当前实现。
+- **L801** <code>tmp,</code> — **EN:** Continues the current implementation using `tmp`. **CN:** 使用 `tmp` 继续当前实现。
+- **L802** <code>ptr_A[m*Shape::kK + k],</code> — **EN:** Continues the current implementation using `ptr_A`, `m`, `Shape::kK`, `k`. **CN:** 使用 `ptr_A`, `m`, `Shape::kK`, `k` 继续当前实现。
+- **L803** <code>ptr_B[k*Shape::kN/2 + n],</code> — **EN:** Continues the current implementation using `ptr_B`, `k`, `Shape::kN`, `n`. **CN:** 使用 `ptr_B`, `k`, `Shape::kN`, `n` 继续当前实现。
+- **L804** <code>tmp);</code> — **EN:** Completes a declaration involving `tmp`. **CN:** 完成一条与 `tmp` 相关的声明。
+- **L805** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L806** <code>ptr_D[m*Shape::kN/2 + n] = tmp;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L807** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L808** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L809** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L810** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L811** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L812** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L813** <code>/////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L814** <code>// Specialization for TNT + Inner Product  or 1x1x2K + LayoutC = T //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L815** <code>/////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L816** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L817** <code>template &lt;typename Shape_, typename LayoutA, typename LayoutB&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L818** <code>struct Mma_HFMA2&lt;</code> — **EN:** Declares struct `Mma_HFMA2<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2<`，用于组织相关数据或策略行为。
+- **L819** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L820** <code>LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L821** <code>LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L822** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L823** <code>false</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L824** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L825** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L826** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L827** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L828** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L829** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L830** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L831** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L832** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L833** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L834** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L835** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L836** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L837** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L838** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L839** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L840** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L841** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L842** <code>!(Shape::kK % 2),</code> — **EN:** Continues the current implementation using `Shape::kK`. **CN:** 使用 `Shape::kK` 继续当前实现。
+- **L843** <code>&quot;Mma_HFMA2 requires the K dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `K`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `K` 继续当前实现。
+- **L844** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L845** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L846** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L847** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L848** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L849** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L850** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L851** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L852** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L853** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L854** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L855** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L856** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L857** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L858** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L859** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L860** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L861** <code>/// Use 1x1x2 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L862** <code>using GemmShape = gemm::GemmShape&lt;1,1,2&gt;;</code> — **EN:** Introduces alias or imported name `GemmShape = gemm::GemmShape<1,1,2>` for easier reuse in this scope. **CN:** 引入别名或导入名 `GemmShape = gemm::GemmShape<1,1,2>`，便于在当前作用域中复用。
+- **L863** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L864** <code>Array&lt;half_t, 1&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 1&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L865** <code>Array&lt;half_t, 2&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L866** <code>Array&lt;half_t, 2&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L867** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L868** <code>// Inner product is calculated using MACs, followed by final reduction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L869** <code>multiply_add&lt;Array&lt;half_t, 2&gt;&gt; mac;</code> — **EN:** Completes a declaration involving `multiply_add`, `Array`, `half_t`. **CN:** 完成一条与 `multiply_add`, `Array`, `half_t` 相关的声明。
+- **L870** <code>cutlass::reduction::thread::Reduce&lt; plus&lt;half_t&gt;, Array&lt;half_t, 2&gt; &gt; reduce;</code> — **EN:** Completes a declaration involving `cutlass::reduction::thread::Reduce`, `plus`, `half_t`. **CN:** 完成一条与 `cutlass::reduction::thread::Reduce`, `plus`, `half_t` 相关的声明。
+- **L871** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L872** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L873** <code>for(auto n=0; n &lt; Shape::kN / GemmShape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L874** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L875** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L876** <code>for(auto m=0; m &lt; Shape::kM / GemmShape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L877** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L878** <code>Array&lt;half_t, 2&gt; tmp_C;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp_C`. **CN:** 完成一条与 `Array`, `half_t`, `tmp_C` 相关的声明。
+- **L879** <code>tmp_C.clear();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L880** <code>Array&lt;half_t, 1&gt; *ptr_tmp_C = reinterpret_cast&lt;Array&lt;half_t, 1&gt; *&gt;(&amp;tmp_C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L881** <code>ptr_tmp_C[0] = ptr_D[n*Shape::kM + m];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L882** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L883** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L884** <code>for(auto k=0; k &lt;  Shape::kK / GemmShape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L885** <code>tmp_C = mac(ptr_A[m*Shape::kK/2 + k], ptr_B[n*Shape::kK/2 + k], tmp_C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L886** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L887** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L888** <code>Array&lt;half_t, 1&gt; res;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `res`. **CN:** 完成一条与 `Array`, `half_t`, `res` 相关的声明。
+- **L889** <code>Array&lt;half_t, 1&gt; *ptr_res = &amp;res;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L890** <code>res = reduce(tmp_C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L891** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L892** <code>ptr_D[m*Shape::kN + n] = ptr_res[0];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L893** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L894** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L895** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L896** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L897** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L898** <code>/////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L899** <code>// Specialization for TNN + Inner Product  or 1x1x2K + LayoutC = N //</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L900** <code>/////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L901** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L902** <code>template &lt;typename Shape_, typename LayoutA, typename LayoutB&gt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L903** <code>struct Mma_HFMA2&lt;</code> — **EN:** Declares struct `Mma_HFMA2<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma_HFMA2<`，用于组织相关数据或策略行为。
+- **L904** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L905** <code>LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L906** <code>LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L907** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L908** <code>false</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L909** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L910** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L911** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L912** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L913** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L914** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L915** <code>using FragmentA = Array&lt;half_t, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<half_t, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<half_t, Shape::kMK>`，便于在当前作用域中复用。
+- **L916** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L917** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L918** <code>using FragmentB = Array&lt;half_t, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<half_t, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<half_t, Shape::kKN>`，便于在当前作用域中复用。
+- **L919** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L920** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L921** <code>using FragmentC = Array&lt;half_t, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<half_t, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<half_t, Shape::kMN>`，便于在当前作用域中复用。
+- **L922** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L923** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L924** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L925** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L926** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L927** <code>!(Shape::kK % 2),</code> — **EN:** Continues the current implementation using `Shape::kK`. **CN:** 使用 `Shape::kK` 继续当前实现。
+- **L928** <code>&quot;Mma_HFMA2 requires the K dimension to be divisible by 2.&quot;</code> — **EN:** Continues the current implementation using `Mma_HFMA2`, `requires`, `the`, `K`. **CN:** 使用 `Mma_HFMA2`, `requires`, `the`, `K` 继续当前实现。
+- **L929** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L930** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L931** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L932** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L933** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L934** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L935** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L936** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L937** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L938** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L939** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L940** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L941** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L942** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L943** <code>/// Initialize output with input</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L944** <code>D = C;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L945** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L946** <code>/// Use 1x1x2 HFMA2 sequence for bulk of computation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L947** <code>using GemmShape= gemm::GemmShape&lt;1,1,2&gt;;</code> — **EN:** Introduces alias or imported name `GemmShape= gemm::GemmShape<1,1,2>` for easier reuse in this scope. **CN:** 引入别名或导入名 `GemmShape= gemm::GemmShape<1,1,2>`，便于在当前作用域中复用。
+- **L948** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L949** <code>Array&lt;half_t, 1&gt; *ptr_D = reinterpret_cast&lt;Array&lt;half_t, 1&gt; *&gt;(&amp;D);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L950** <code>Array&lt;half_t, 2&gt; const *ptr_A = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;A);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L951** <code>Array&lt;half_t, 2&gt; const *ptr_B = reinterpret_cast&lt;Array&lt;half_t, 2&gt; const *&gt;(&amp;B);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L952** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L953** <code>// Inner product is calculated using MACs, followed by final reduction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L954** <code>multiply_add&lt;Array&lt;half_t, 2&gt;&gt; mac;</code> — **EN:** Completes a declaration involving `multiply_add`, `Array`, `half_t`. **CN:** 完成一条与 `multiply_add`, `Array`, `half_t` 相关的声明。
+- **L955** <code>cutlass::reduction::thread::Reduce&lt; plus&lt;half_t&gt;, Array&lt;half_t, 2&gt; &gt; reduce;</code> — **EN:** Completes a declaration involving `cutlass::reduction::thread::Reduce`, `plus`, `half_t`. **CN:** 完成一条与 `cutlass::reduction::thread::Reduce`, `plus`, `half_t` 相关的声明。
+- **L956** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L957** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L958** <code>for(auto n=0; n &lt; Shape::kN / GemmShape::kN; n++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L959** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L960** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L961** <code>for(auto m=0; m &lt; Shape::kM / GemmShape::kM; m++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L962** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L963** <code>Array&lt;half_t, 2&gt; tmp_C;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `tmp_C`. **CN:** 完成一条与 `Array`, `half_t`, `tmp_C` 相关的声明。
+- **L964** <code>tmp_C.clear();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L965** <code>Array&lt;half_t, 1&gt; *ptr_tmp_C = reinterpret_cast&lt;Array&lt;half_t, 1&gt; *&gt;(&amp;tmp_C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L966** <code>ptr_tmp_C[0] = ptr_D[n*Shape::kM + m];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L967** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L968** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L969** <code>for(auto k=0; k &lt;  Shape::kK / GemmShape::kK; k++){</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L970** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L971** <code>tmp_C = mac(ptr_A[m*Shape::kK/2 + k], ptr_B[n*Shape::kK/2 + k], tmp_C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L972** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L973** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L974** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L975** <code>Array&lt;half_t, 1&gt; res;</code> — **EN:** Completes a declaration involving `Array`, `half_t`, `res`. **CN:** 完成一条与 `Array`, `half_t`, `res` 相关的声明。
+- **L976** <code>Array&lt;half_t, 1&gt; *ptr_res = &amp;res;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L977** <code>res = reduce(tmp_C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L978** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L979** <code>ptr_D[n*Shape::kM + m] = ptr_res[0];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L980** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L981** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L982** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L983** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L984** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L985** <code>} // namespace detail</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L986** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L987** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L988** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L989** <code>/// Structure to compute the matrix product</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L990** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L991** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L992** <code>typename Shape_, typename LayoutA, typename LayoutB, typename LayoutC</code> — **EN:** Continues the current implementation using `Shape_`, `LayoutA`, `LayoutB`, `LayoutC`. **CN:** 使用 `Shape_`, `LayoutA`, `LayoutB`, `LayoutC` 继续当前实现。
+- **L993** <code>&gt;</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L994** <code>struct Mma&lt;</code> — **EN:** Declares struct `Mma<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma<`，用于组织相关数据或策略行为。
+- **L995** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L996** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L997** <code>LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L998** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L999** <code>LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L1000** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1001** <code>LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L1002** <code>arch::OpMultiplyAdd</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L1003** <code>&gt; {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L1004** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1005** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1006** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L1007** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1008** <code>/// Data type of operand A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1009** <code>using ElementA = half_t;</code> — **EN:** Introduces alias or imported name `ElementA = half_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementA = half_t`，便于在当前作用域中复用。
+- **L1010** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1011** <code>/// Data type of operand B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1012** <code>using ElementB = half_t;</code> — **EN:** Introduces alias or imported name `ElementB = half_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementB = half_t`，便于在当前作用域中复用。
+- **L1013** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1014** <code>/// Element type of operand C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1015** <code>using ElementC = half_t;</code> — **EN:** Introduces alias or imported name `ElementC = half_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementC = half_t`，便于在当前作用域中复用。
+- **L1016** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1017** <code>/// Underlying mathematical operator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1018** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L1019** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1020** <code>/// A operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1021** <code>using FragmentA = Array&lt;ElementA, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<ElementA, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<ElementA, Shape::kMK>`，便于在当前作用域中复用。
+- **L1022** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1023** <code>/// B operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1024** <code>using FragmentB = Array&lt;ElementB, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<ElementB, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<ElementB, Shape::kKN>`，便于在当前作用域中复用。
+- **L1025** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1026** <code>/// C operand storage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1027** <code>using FragmentC = Array&lt;ElementC, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<ElementC, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<ElementC, Shape::kMN>`，便于在当前作用域中复用。
+- **L1028** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1029** <code>static bool const a_row_major = platform::is_same&lt; LayoutA, layout::RowMajor&gt;::value;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1030** <code>static bool const b_column_major = platform::is_same&lt; LayoutB, layout::ColumnMajor&gt;::value;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1031** <code>static bool const c_row_major = platform::is_same&lt; LayoutC, layout::RowMajor&gt;::value;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1032** <code>static bool const c_column_major = platform::is_same&lt; LayoutC, layout::ColumnMajor&gt;::value;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1033** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1034** <code>static bool const m_mod2 = !(Shape::kM % 2);</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1035** <code>static bool const n_mod2 = !(Shape::kN % 2);</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1036** <code>static bool const k_mod2 = !(Shape::kK % 2);</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1037** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1038** <code>// HFMA based MMA optimizations are of 2 types :</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1039** <code>// 1. Inner product</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1040** <code>// 2. Outer product</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1041** <code>// It is chosen based on LayoutC (for outer product gemm) or</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1042** <code>// Using LayoutA and LayoutB or shape=1x1x2K (for inner product gemms)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1043** <code>// If all fails, we choose the generic MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1044** <code>static bool const use_outer_prod = (c_column_major &amp;&amp; m_mod2) || (c_row_major &amp;&amp; n_mod2);</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1045** <code>static bool const use_inner_prod = (a_row_major &amp;&amp; b_column_major &amp;&amp; k_mod2) || (Shape::kM==1 &amp;&amp; Shape::kN==1 &amp;&amp; k_mod2);</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1046** <code>static bool const use_optimized =  (use_outer_prod || use_inner_prod);</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1047** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1048** <code>using ArchMmaOperator = typename platform::conditional&lt; use_optimized,</code> — **EN:** Introduces alias or imported name `ArchMmaOperator = typename platform::conditional< use_optimized,` for easier reuse in this scope. **CN:** 引入别名或导入名 `ArchMmaOperator = typename platform::conditional< use_optimized,`，便于在当前作用域中复用。
+- **L1049** <code>detail::Mma_HFMA2&lt;Shape, LayoutA, LayoutB, LayoutC, use_outer_prod&gt;,</code> — **EN:** Continues the current implementation using `detail::Mma_HFMA2`, `Shape`, `LayoutA`, `LayoutB`. **CN:** 使用 `detail::Mma_HFMA2`, `Shape`, `LayoutA`, `LayoutB` 继续当前实现。
+- **L1050** <code>MmaGeneric &lt;Shape, ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, Operator&gt;</code> — **EN:** Continues the current implementation using `MmaGeneric`, `Shape`, `ElementA`, `LayoutA`. **CN:** 使用 `MmaGeneric`, `Shape`, `ElementA`, `LayoutA` 继续当前实现。
+- **L1051** <code>&gt;::type;</code> — **EN:** Completes a declaration involving `type`. **CN:** 完成一条与 `type` 相关的声明。
+- **L1052** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1053** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1054** <code>// Methods</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1055** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1056** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1057** <code>/// Computes a matrix product D = A * B + C</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1058** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1059** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L1060** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L1061** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L1062** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L1063** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L1064** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1065** <code>ArchMmaOperator mma;</code> — **EN:** Completes a declaration involving `ArchMmaOperator`, `mma`. **CN:** 完成一条与 `ArchMmaOperator`, `mma` 相关的声明。
+- **L1066** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1067** <code>mma(D, A, B, C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1068** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1069** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1070** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1071** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1072** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1073** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1074** <code>namespace detail {</code> — **EN:** Opens namespace `detail` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `detail`，把后续声明放入正确的 CUTLASS 作用域。
+- **L1075** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1076** <code>/// Determines whether to enable thread::Gemm&lt;&gt; specializations compatible with SM50</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1077** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L1078** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L1079** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1080** <code>typename LayoutB&gt;</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L1081** <code>struct EnableMma_Crow_SM60 {</code> — **EN:** Declares struct `EnableMma_Crow_SM60`, which packages related data or policy behavior. **CN:** 声明结构体 `EnableMma_Crow_SM60`，用于组织相关数据或策略行为。
+- **L1082** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1083** <code>static bool const kIsConventionalLayout =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1084** <code>(platform::is_same&lt;LayoutA, layout::RowMajor&gt;::value ||</code> — **EN:** Continues the current implementation using `platform::is_same`, `LayoutA`, `layout::RowMajor`, `value`. **CN:** 使用 `platform::is_same`, `LayoutA`, `layout::RowMajor`, `value` 继续当前实现。
+- **L1085** <code>platform::is_same&lt;LayoutA, layout::ColumnMajor&gt;::value) &amp;&amp;</code> — **EN:** Continues the current implementation using `platform::is_same`, `LayoutA`, `layout::ColumnMajor`, `value`. **CN:** 使用 `platform::is_same`, `LayoutA`, `layout::ColumnMajor`, `value` 继续当前实现。
+- **L1086** <code>(platform::is_same&lt;LayoutB, layout::RowMajor&gt;::value ||</code> — **EN:** Continues the current implementation using `platform::is_same`, `LayoutB`, `layout::RowMajor`, `value`. **CN:** 使用 `platform::is_same`, `LayoutB`, `layout::RowMajor`, `value` 继续当前实现。
+- **L1087** <code>platform::is_same&lt;LayoutB, layout::ColumnMajor&gt;::value);</code> — **EN:** Completes a declaration involving `platform::is_same`, `LayoutB`, `layout::ColumnMajor`. **CN:** 完成一条与 `platform::is_same`, `LayoutB`, `layout::ColumnMajor` 相关的声明。
+- **L1088** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1089** <code>static bool const value = kIsConventionalLayout;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1090** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1091** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1092** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1093** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1094** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1095** <code>/// Computes matrix product when C is row-major</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1096** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L1097** <code>/// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1098** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L1099** <code>typename LayoutA_,</code> — **EN:** Continues the current implementation using `LayoutA_`. **CN:** 使用 `LayoutA_` 继续当前实现。
+- **L1100** <code>typename LayoutB_</code> — **EN:** Continues the current implementation using `LayoutB_`. **CN:** 使用 `LayoutB_` 继续当前实现。
+- **L1101** <code>&gt;</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L1102** <code>struct Mma&lt;</code> — **EN:** Declares struct `Mma<`, which packages related data or policy behavior. **CN:** 声明结构体 `Mma<`，用于组织相关数据或策略行为。
+- **L1103** <code>Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L1104** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1105** <code>LayoutA_,</code> — **EN:** Continues the current implementation using `LayoutA_`. **CN:** 使用 `LayoutA_` 继续当前实现。
+- **L1106** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1107** <code>LayoutB_,</code> — **EN:** Continues the current implementation using `LayoutB_`. **CN:** 使用 `LayoutB_` 继续当前实现。
+- **L1108** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1109** <code>layout::RowMajor,</code> — **EN:** Continues the current implementation using `layout::RowMajor`. **CN:** 使用 `layout::RowMajor` 继续当前实现。
+- **L1110** <code>arch::OpMultiplyAdd,</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L1111** <code>typename platform::enable_if&lt;detail::EnableMma_Crow_SM60&lt;</code> — **EN:** Continues the current implementation using `platform::enable_if`, `detail::EnableMma_Crow_SM60`. **CN:** 使用 `platform::enable_if`, `detail::EnableMma_Crow_SM60` 继续当前实现。
+- **L1112** <code>LayoutA_,</code> — **EN:** Continues the current implementation using `LayoutA_`. **CN:** 使用 `LayoutA_` 继续当前实现。
+- **L1113** <code>LayoutB_</code> — **EN:** Continues the current implementation using `LayoutB_`. **CN:** 使用 `LayoutB_` 继续当前实现。
+- **L1114** <code>&gt;::value&gt;::type&gt;{</code> — **EN:** Continues the current implementation using `value`, `type`. **CN:** 使用 `value`, `type` 继续当前实现。
+- **L1115** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1116** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L1117** <code>using ElementA = half_t;</code> — **EN:** Introduces alias or imported name `ElementA = half_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementA = half_t`，便于在当前作用域中复用。
+- **L1118** <code>using LayoutA = LayoutA_;</code> — **EN:** Introduces alias or imported name `LayoutA = LayoutA_` for easier reuse in this scope. **CN:** 引入别名或导入名 `LayoutA = LayoutA_`，便于在当前作用域中复用。
+- **L1119** <code>using ElementB = half_t;</code> — **EN:** Introduces alias or imported name `ElementB = half_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementB = half_t`，便于在当前作用域中复用。
+- **L1120** <code>using LayoutB = LayoutB_;</code> — **EN:** Introduces alias or imported name `LayoutB = LayoutB_` for easier reuse in this scope. **CN:** 引入别名或导入名 `LayoutB = LayoutB_`，便于在当前作用域中复用。
+- **L1121** <code>using ElementC = half_t;</code> — **EN:** Introduces alias or imported name `ElementC = half_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementC = half_t`，便于在当前作用域中复用。
+- **L1122** <code>using LayoutC = layout::RowMajor;</code> — **EN:** Introduces alias or imported name `LayoutC = layout::RowMajor` for easier reuse in this scope. **CN:** 引入别名或导入名 `LayoutC = layout::RowMajor`，便于在当前作用域中复用。
+- **L1123** <code>using Operator = arch::OpMultiplyAdd;</code> — **EN:** Introduces alias or imported name `Operator = arch::OpMultiplyAdd` for easier reuse in this scope. **CN:** 引入别名或导入名 `Operator = arch::OpMultiplyAdd`，便于在当前作用域中复用。
+- **L1124** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1125** <code>using TransposeMma = Mma&lt;</code> — **EN:** Introduces alias or imported name `TransposeMma = Mma<` for easier reuse in this scope. **CN:** 引入别名或导入名 `TransposeMma = Mma<`，便于在当前作用域中复用。
+- **L1126** <code>GemmShapeTranspose&lt;Shape&gt;,</code> — **EN:** Continues the current implementation using `GemmShapeTranspose`, `Shape`. **CN:** 使用 `GemmShapeTranspose`, `Shape` 继续当前实现。
+- **L1127** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1128** <code>typename layout::LayoutTranspose&lt;LayoutB&gt;::type,</code> — **EN:** Continues the current implementation using `layout::LayoutTranspose`, `LayoutB`, `type`. **CN:** 使用 `layout::LayoutTranspose`, `LayoutB`, `type` 继续当前实现。
+- **L1129** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1130** <code>typename layout::LayoutTranspose&lt;LayoutA&gt;::type,</code> — **EN:** Continues the current implementation using `layout::LayoutTranspose`, `LayoutA`, `type`. **CN:** 使用 `layout::LayoutTranspose`, `LayoutA`, `type` 继续当前实现。
+- **L1131** <code>half_t,</code> — **EN:** Continues the current implementation using `half_t`. **CN:** 使用 `half_t` 继续当前实现。
+- **L1132** <code>layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `layout::ColumnMajor`. **CN:** 使用 `layout::ColumnMajor` 继续当前实现。
+- **L1133** <code>arch::OpMultiplyAdd,</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L1134** <code>bool&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L1135** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1136** <code>using FragmentA = Array&lt;ElementA, Shape::kMK&gt;;</code> — **EN:** Introduces alias or imported name `FragmentA = Array<ElementA, Shape::kMK>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentA = Array<ElementA, Shape::kMK>`，便于在当前作用域中复用。
+- **L1137** <code>using FragmentB = Array&lt;ElementB, Shape::kKN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentB = Array<ElementB, Shape::kKN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentB = Array<ElementB, Shape::kKN>`，便于在当前作用域中复用。
+- **L1138** <code>using FragmentC = Array&lt;ElementC, Shape::kMN&gt;;</code> — **EN:** Introduces alias or imported name `FragmentC = Array<ElementC, Shape::kMN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `FragmentC = Array<ElementC, Shape::kMN>`，便于在当前作用域中复用。
+- **L1139** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1140** <code>using ArchMmaOperator = typename TransposeMma::ArchMmaOperator;</code> — **EN:** Introduces alias or imported name `ArchMmaOperator = typename TransposeMma::ArchMmaOperator` for easier reuse in this scope. **CN:** 引入别名或导入名 `ArchMmaOperator = typename TransposeMma::ArchMmaOperator`，便于在当前作用域中复用。
+- **L1141** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1142** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1143** <code>void operator()(</code> — **EN:** Declares or defines the call operator that makes the object behave like a functor. **CN:** 声明或定义函数调用运算符，使对象表现得像函数对象。
+- **L1144** <code>FragmentC &amp; D,</code> — **EN:** Continues the current implementation using `FragmentC`, `D`. **CN:** 使用 `FragmentC`, `D` 继续当前实现。
+- **L1145** <code>FragmentA const &amp; A,</code> — **EN:** Continues the current implementation using `FragmentA`, `A`. **CN:** 使用 `FragmentA`, `A` 继续当前实现。
+- **L1146** <code>FragmentB const &amp; B,</code> — **EN:** Continues the current implementation using `FragmentB`, `B`. **CN:** 使用 `FragmentB`, `B` 继续当前实现。
+- **L1147** <code>FragmentC const &amp; C) {</code> — **EN:** Continues the current implementation using `FragmentC`, `C`. **CN:** 使用 `FragmentC`, `C` 继续当前实现。
+- **L1148** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1149** <code>TransposeMma mma;</code> — **EN:** Completes a declaration involving `TransposeMma`, `mma`. **CN:** 完成一条与 `TransposeMma`, `mma` 相关的声明。
+- **L1150** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1151** <code>mma(D, B, A, C);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1152** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1153** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1154** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1155** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1156** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1157** <code>} // namespace thread</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L1158** <code>} // namespace gemm</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L1159** <code>} // namespace cutlass</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L1160** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1161** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+
+## Key Concepts / 关键概念
+
+- **EN:** Theme: this header focuses on thread-level MMA building blocks specialized for SM60-era SIMD and DP4A-style instructions.
+  **CN:** 主题：该头文件重点处理面向 SM60 时代 SIMD/DP4A 类指令特化的线程级 MMA 构件。
+- **EN:** Primary declarations include `Mma_HFMA2`, `Shape`, `FragmentA`, `FragmentB`, `FragmentC`, `Operator`.
+  **CN:** 主要声明包括 `Mma_HFMA2`、`Shape`、`FragmentA`、`FragmentB`、`FragmentC`、`Operator`。
+- **EN:** Main namespaces: `cutlass`, `gemm`, `thread`, `detail`.
+  **CN:** 主要命名空间：`cutlass`、`gemm`、`thread`、`detail`。
+
+## Dependencies / 依赖关系
+
+- `cutlass/cutlass.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/tensor_ref.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/layout/matrix.h` — **EN:** Provides matrix layout descriptors. **CN:** 提供 矩阵布局描述类型。
+- `cutlass/gemm/gemm.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/gemm/thread/mma.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/functional.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/reduction/thread/reduce.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。

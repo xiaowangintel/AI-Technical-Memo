@@ -1,0 +1,4710 @@
+# testbed.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/warp/testbed.h`
+
+## Purpose / 目的
+- EN: This header defines the warp-level GEMM testbed: it stages operand tiles in shared memory, lets one warp execute MMA instructions, and compares the produced fragment against a host reference result.
+- CN: 该头文件定义了 warp 级 GEMM 测试平台：它先将操作数 tile 暂存到共享内存，再让一个 warp 执行 MMA 指令，并将得到的片段与主机参考结果比较。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1**: <code>/***************************************************************************************************</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: <code> **************************************************************************************************/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: <code>/*! \file</code>
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: <code>    \brief Unit tests for thread-level GEMM</code>
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: <code>*/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: <code>#pragma once</code>
+  - EN: Ensures this header is included only once per translation unit.
+  - CN: 确保该头文件在一个编译单元中只被包含一次。
+- **Line 36**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Defines core CUTLASS types, tags, and shared utilities.
+  - CN: 定义 CUTLASS 的核心类型、标签与共享工具。
+- **Line 38**: <code>#include &quot;cutlass/aligned_buffer.h&quot;</code>
+  - EN: Provides statically aligned storage containers used for fragments or shared-memory staging.
+  - CN: 提供用于片段或共享内存暂存的静态对齐存储容器。
+- **Line 39**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Defines CUTLASS numeric wrapper types used across tests.
+  - CN: 定义测试中使用的 CUTLASS 数值包装类型。
+- **Line 40**: <code>#include &quot;cutlass/subbyte_reference.h&quot;</code>
+  - EN: Provides references and helpers for packed sub-byte element types.
+  - CN: 为打包的子字节元素类型提供引用与辅助工具。
+- **Line 41**: <code>#include &quot;cutlass/platform/platform.h&quot;</code>
+  - EN: Provides platform-compatibility type traits and helper utilities.
+  - CN: 提供平台兼容类型萃取与辅助工具。
+- **Line 42**: <code>#include &quot;cutlass/arch/arch.h&quot;</code>
+  - EN: Declares architecture tags and lane-level helpers used by low-level kernels.
+  - CN: 声明架构标签以及低层内核使用的 lane 级辅助工具。
+- **Line 43**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: <code>#include &quot;cutlass/util/host_tensor.h&quot;</code>
+  - EN: Provides host/device tensor containers used by the testbeds.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 45**: <code>#include &quot;cutlass/util/tensor_view_io.h&quot;</code>
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 46**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 47**: <code>#include &quot;cutlass/util/distribution.h&quot;</code>
+  - EN: Defines supported random and structured tensor initialization distributions.
+  - CN: 定义支持的随机与结构化张量初始化分布。
+- **Line 48**: <code>#include &quot;cutlass/util/reference/host/gemm.h&quot;</code>
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性检查的 CPU 参考 GEMM 实现。
+- **Line 49**: <code>#include &quot;cutlass/util/reference/host/gemm_complex.h&quot;</code>
+  - EN: Provides host reference implementations for complex GEMM.
+  - CN: 提供复数 GEMM 的主机参考实现。
+- **Line 50**: <code>#include &quot;cutlass/util/reference/host/tensor_compare.h&quot;</code>
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 51**: <code>#include &quot;cutlass/util/reference/host/tensor_copy.h&quot;</code>
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 52**: <code>#include &quot;cutlass/util/reference/host/tensor_fill.h&quot;</code>
+  - EN: Provides deterministic and randomized tensor initialization helpers.
+  - CN: 提供确定性和随机化的张量初始化辅助函数。
+- **Line 53**: <code>#include &quot;cutlass/util/host_reorder.h&quot;</code>
+  - EN: Provides host-side data reordering helpers for specialized layouts.
+  - CN: 提供面向特化布局的主机侧数据重排辅助工具。
+- **Line 54**: <code>#include &quot;cutlass/util/host_uncompress.h&quot;</code>
+  - EN: Provides host-side utilities that expand compressed sparse operand representations.
+  - CN: 提供展开压缩稀疏操作数表示的主机侧辅助工具。
+- **Line 55**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 56**: <code>namespace test {</code>
+  - EN: Opens namespace `test` to organize related declarations.
+  - CN: 打开命名空间 `test`，用于组织相关声明。
+- **Line 57**: <code>namespace gemm {</code>
+  - EN: Opens namespace `gemm` to organize related declarations.
+  - CN: 打开命名空间 `gemm`，用于组织相关声明。
+- **Line 58**: <code>namespace warp {</code>
+  - EN: Opens namespace `warp` to organize related declarations.
+  - CN: 打开命名空间 `warp`，用于组织相关声明。
+- **Line 59**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 60**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 61**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 62**: <code>/// Test kernel</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 63**: <code>template &lt;typename Mma, typename ThreadblockShape&gt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 64**: <code>__global__ void kernel(</code>
+  - EN: Declares a CUDA kernel that runs on the device and is launched by the testbed.
+  - CN: 声明一个在设备上运行并由测试平台启动的 CUDA 内核。
+- **Line 65**: <code>  typename Mma::ElementC *output_C, </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 66**: <code>  typename Mma::ElementA const *input_A,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 67**: <code>  typename Mma::ElementB const *input_B,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 68**: <code>  typename Mma::ElementC const *input_C,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 69**: <code>  int iterations = 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 70**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 71**: <code>  // Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.</code>
+  - EN: Adds an inline comment about the nearby code: Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.
+  - CN: 添加关于附近代码的行内注释：Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.
+- **Line 72**: <code>  __shared__ cutlass::AlignedBuffer&lt;</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 73**: <code>    typename Mma::ElementA, ThreadblockShape::kM * ThreadblockShape::kK&gt; smem_buffer_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 74**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 75**: <code>  __shared__ cutlass::AlignedBuffer&lt;</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 76**: <code>    typename Mma::ElementB, ThreadblockShape::kN * ThreadblockShape::kK&gt; smem_buffer_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 77**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 78**: <code>  if (threadIdx.x == 0) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 79**: <code>    typename Mma::ElementA *smem_ptr_A = smem_buffer_A.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 80**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 81**: <code>    for (size_t i = 0; i &lt; smem_buffer_A.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 82**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementA&gt;::get(smem_ptr_A, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 83**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 84**: <code>              typename Mma::ElementA&gt;::type&gt;::get(input_A, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 85**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 86**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 87**: <code>    typename Mma::ElementB *smem_ptr_B = smem_buffer_B.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 88**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 89**: <code>    for (size_t i = 0; i &lt; smem_buffer_B.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 90**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementB&gt;::get(smem_ptr_B, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 91**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 92**: <code>              typename Mma::ElementB&gt;::type&gt;::get(input_B, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 93**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 94**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 95**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 96**: <code>  __syncthreads();</code>
+  - EN: Synchronizes the threadblock so all staged shared-memory data is visible before fragment loads.
+  - CN: 同步线程块，确保在加载片段前共享内存中的暂存数据都已可见。
+- **Line 97**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 98**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 99**: <code>  // Construct warp-level matrix product</code>
+  - EN: Adds an inline comment about the nearby code: Construct warp-level matrix product
+  - CN: 添加关于附近代码的行内注释：Construct warp-level matrix product
+- **Line 100**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 101**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 102**: <code>  using FragmentA = typename Mma::FragmentA;</code>
+  - EN: Creates type alias `FragmentA` to simplify later code.
+  - CN: 创建类型别名 `FragmentA` 以简化后续代码。
+- **Line 103**: <code>  using FragmentB = typename Mma::FragmentB;</code>
+  - EN: Creates type alias `FragmentB` to simplify later code.
+  - CN: 创建类型别名 `FragmentB` 以简化后续代码。
+- **Line 104**: <code>  using FragmentC = typename Mma::FragmentC;</code>
+  - EN: Creates type alias `FragmentC` to simplify later code.
+  - CN: 创建类型别名 `FragmentC` 以简化后续代码。
+- **Line 105**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 106**: <code>  typename Mma::LayoutA layout_A = Mma::LayoutA::packed({ThreadblockShape::kM, ThreadblockShape::kK});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 107**: <code>  typename Mma::LayoutB layout_B = Mma::LayoutB::packed({ThreadblockShape::kK, ThreadblockShape::kN});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 108**: <code>  typename Mma::LayoutC layout_C = Mma::LayoutC::packed({Mma::Shape::kM, Mma::Shape::kN});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 109**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 110**: <code>  typename Mma::IteratorA iter_A({smem_buffer_A.data(), layout_A}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 111**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: <code>  typename Mma::IteratorB iter_B({smem_buffer_B.data(), layout_B}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 113**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 114**: <code>  FragmentA frag_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 115**: <code>  FragmentB frag_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 116**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 117**: <code>  FragmentC accum;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 118**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 119**: <code>  Mma mma;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 120**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 121**: <code>  accum.clear();</code>
+  - EN: Initializes the accumulator fragment to zero before the MMA loop begins.
+  - CN: 在 MMA 循环开始前把累加片段清零。
+- **Line 122**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: <code>  CUTLASS_PRAGMA_NO_UNROLL</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 124**: <code>  for (int iter = 0; iter &lt; iterations; ++iter) {     // place in loop that is not unrolled </code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 125**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 126**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 127**: <code>    for (int k = 0; k &lt; ThreadblockShape::kK;</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 128**: <code>         k += Mma::Policy::MmaShape::kK) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 129**: <code>      iter_A.load(frag_A);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 130**: <code>      iter_B.load(frag_B);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 131**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 132**: <code>      ++iter_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 133**: <code>      ++iter_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 134**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 135**: <code>      mma(accum, frag_A, frag_B, accum);</code>
+  - EN: Invokes the MMA operator to perform one matrix multiply-accumulate step on the loaded fragments.
+  - CN: 调用 MMA 算子，对已加载的片段执行一次矩阵乘加步骤。
+- **Line 136**: <code>    }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 137**: <code>  }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 138**: <code>  </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 139**: <code>  typename Mma::IteratorC iter_C({output_C, layout_C}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 140**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 141**: <code>  iter_C.store(accum);</code>
+  - EN: Stores the computed accumulator fragment back to the output tile.
+  - CN: 将计算完成的累加片段写回输出 tile。
+- **Line 142**: <code>}</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 143**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 144**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 145**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 146**: <code>/// Structure to compute the matrix product</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 147**: <code>template &lt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 148**: <code>  /// Warp-level matrix multiply-accumulate</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 149**: <code>  typename Mma_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 150**: <code>  /// Size of threadblock-scoped shape used to store SMEM</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 151**: <code>  typename ThreadblockShape_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 152**: <code>  /// The inner product operation performed by GEMM </code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 153**: <code>  typename Operator_ = cutlass::arch::OpMultiplyAdd</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 154**: <code>&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 155**: <code>struct Testbed {</code>
+  - EN: Declares `struct Testbed`, which groups related data or behavior.
+  - CN: 声明 `struct Testbed`，用于组织相关数据或行为。
+- **Line 156**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 157**: <code>  /// Thread-level matrix multiply-accumulate operator</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 158**: <code>  using Mma = Mma_;</code>
+  - EN: Creates type alias `Mma` to simplify later code.
+  - CN: 创建类型别名 `Mma` 以简化后续代码。
+- **Line 159**: <code>  using ThreadblockShape = ThreadblockShape_;</code>
+  - EN: Defines alias `ThreadblockShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `ThreadblockShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 160**: <code>  using Operator = Operator_;</code>
+  - EN: Creates type alias `Operator` to simplify later code.
+  - CN: 创建类型别名 `Operator` 以简化后续代码。
+- **Line 161**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 162**: <code>  using Shape = typename Mma::Shape;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 163**: <code>  using ElementA = typename Mma::ElementA;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 164**: <code>  using LayoutA = typename Mma::LayoutA;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 165**: <code>  using ElementB = typename Mma::ElementB;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 166**: <code>  using LayoutB = typename Mma::LayoutB;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 167**: <code>  using ElementC = typename Mma::ElementC;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 168**: <code>  using LayoutC = typename Mma::LayoutC;</code>
+  - EN: Defines `LayoutC` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutC`，以固定某个操作数或输出的内存布局。
+- **Line 169**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 170**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 171**: <code>  // Data members</code>
+  - EN: Adds an inline comment about the nearby code: Data members
+  - CN: 添加关于附近代码的行内注释：Data members
+- **Line 172**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 173**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 174**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 175**: <code>  cutlass::HostTensor&lt;ElementB, LayoutB&gt; tensor_B;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 176**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_C;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 177**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_computed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 178**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_reference;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 179**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 180**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 181**: <code>  // Methods</code>
+  - EN: Adds an inline comment about the nearby code: Methods
+  - CN: 添加关于附近代码的行内注释：Methods
+- **Line 182**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 183**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 184**: <code>  /// Allocates workspace in device memory</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 185**: <code>  Testbed() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 186**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 187**: <code>    tensor_A.reset(cutlass::make_Coord(ThreadblockShape::kM, ThreadblockShape::kK));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 188**: <code>    tensor_B.reset(cutlass::make_Coord(ThreadblockShape::kK, ThreadblockShape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 189**: <code>    tensor_C.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 190**: <code>    tensor_D_computed.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 191**: <code>    tensor_D_reference.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 192**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 193**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 194**: <code>  /// Returns true if the CUDA device is sufficient to execute the kernel.</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 195**: <code>  bool sufficient() const {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 196**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 197**: <code>    cudaDeviceProp properties;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 198**: <code>    int device_idx;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 199**: <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 200**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 201**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 202**: <code>      throw std::runtime_error(&quot;cudaGetDevice() API call failed.&quot;);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 203**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 204**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 205**: <code>    result = cudaGetDeviceProperties(&amp;properties, device_idx);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 206**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 207**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 208**: <code>      throw std::runtime_error(&quot;cudaGetDeviceProperties() failed&quot;);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 209**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 210**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 211**: <code>    if (properties.major == 9) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 212**: <code>      // NVIDIA Hopper drops support for several data types</code>
+  - EN: Adds an inline comment about the nearby code: NVIDIA Hopper drops support for several data types
+  - CN: 添加关于附近代码的行内注释：NVIDIA Hopper drops support for several data types
+- **Line 213**: <code>      if (</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 214**: <code>        cutlass::sizeof_bits&lt;ElementA&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 215**: <code>        cutlass::sizeof_bits&lt;ElementB&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 216**: <code>        cutlass::sizeof_bits&lt;ElementC&gt;::value &lt; 8) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 217**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 218**: <code>        return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 219**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 220**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 221**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 222**: <code>    return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 223**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 224**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 225**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 226**: <code>  /// Runs the test</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 227**: <code>  bool run(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 228**: <code>      cutlass::Distribution::Kind init_A = cutlass::Distribution::Uniform,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 229**: <code>      cutlass::Distribution::Kind init_B = cutlass::Distribution::Uniform) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 230**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 231**: <code>    if (!sufficient()) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 232**: <code>      return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 233**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 234**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 235**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 236**: <code>    // initialize device memory</code>
+  - EN: Adds an inline comment about the nearby code: initialize device memory
+  - CN: 添加关于附近代码的行内注释：initialize device memory
+- **Line 237**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 238**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 239**: <code>    if (init_A == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 240**: <code>      int scope_max = 8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 241**: <code>      int scope_min = -8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 242**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 243**: <code>      if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 244**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 245**: <code>        scope_min = -2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 246**: <code>      } else if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 247**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 248**: <code>        scope_min = 0;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 249**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 250**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 251**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 252**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 253**: <code>      cutlass::reference::host::BlockFillRandomUniform(tensor_A.host_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 254**: <code>        tensor_A.capacity(), seed, scope_max, scope_min, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 255**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 256**: <code>    } else if (init_A == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 257**: <code>      cutlass::reference::host::BlockFillSequential(tensor_A.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 258**: <code>                                                    tensor_A.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 259**: <code>    } else if (init_A == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 260**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_A.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 261**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 262**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 263**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 264**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 265**: <code>    if (init_B == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 266**: <code>      int scope_max = 8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 267**: <code>      int scope_min = -8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 268**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 269**: <code>      if (cutlass::sizeof_bits&lt;ElementB&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 270**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 271**: <code>        scope_min = -2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 272**: <code>      } else if (cutlass::sizeof_bits&lt;ElementB&gt;::value == 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 273**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 274**: <code>        scope_min = 0;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 275**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 276**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 277**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 278**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 279**: <code>      cutlass::reference::host::BlockFillRandomUniform(tensor_B.host_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 280**: <code>        tensor_B.capacity(), seed, scope_max, scope_min, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 281**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 282**: <code>    } else if (init_B == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 283**: <code>      cutlass::reference::host::BlockFillSequential(tensor_B.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 284**: <code>                                                    tensor_B.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 285**: <code>    } else if (init_B == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 286**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_B.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 287**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 288**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 289**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 290**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 291**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 292**: <code>      tensor_C.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 293**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 294**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 295**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 296**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 297**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 298**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 299**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 300**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 301**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 302**: <code>      tensor_D_reference.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 303**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 304**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 305**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 306**: <code>    tensor_A.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 307**: <code>    tensor_B.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 308**: <code>    tensor_C.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 309**: <code>    tensor_D_computed.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 310**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 311**: <code>    // launch kernel</code>
+  - EN: Adds an inline comment about the nearby code: launch kernel
+  - CN: 添加关于附近代码的行内注释：launch kernel
+- **Line 312**: <code>    kernel&lt;Mma, ThreadblockShape&gt;&lt;&lt;&lt; dim3(1, 1), dim3(32, 1, 1) &gt;&gt;&gt;(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 313**: <code>      tensor_D_computed.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 314**: <code>      tensor_A.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 315**: <code>      tensor_B.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 316**: <code>      tensor_C.device_data());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 317**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 318**: <code>    // verify no errors</code>
+  - EN: Adds an inline comment about the nearby code: verify no errors
+  - CN: 添加关于附近代码的行内注释：verify no errors
+- **Line 319**: <code>    cudaError_t result = cudaDeviceSynchronize();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 320**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 321**: <code>    EXPECT_EQ(result, cudaSuccess) &lt;&lt; &quot;CUDA ERROR: &quot; &lt;&lt; cudaGetErrorString(result);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 322**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 323**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 324**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 325**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 326**: <code>    tensor_D_computed.sync_host();</code>
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 327**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 328**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 329**: <code>    // Reference implementation</code>
+  - EN: Adds an inline comment about the nearby code: Reference implementation
+  - CN: 添加关于附近代码的行内注释：Reference implementation
+- **Line 330**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 331**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 332**: <code>    cutlass::reference::host::Gemm&lt;ElementA, LayoutA, ElementB, LayoutB,</code>
+  - EN: Refers to the host reference GEMM implementation used to compute the expected result.
+  - CN: 引用主机参考 GEMM 实现，用于计算期望结果。
+- **Line 333**: <code>                                   ElementC, LayoutC, ElementC, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 334**: <code>                                   Operator&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 335**: <code>        reference_gemm;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 336**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 337**: <code>    reference_gemm(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 338**: <code>      {Shape::kM, Shape::kN, ThreadblockShape::kK},</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 339**: <code>      ElementC(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 340**: <code>      tensor_A.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 341**: <code>      tensor_B.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 342**: <code>      ElementC(0),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 343**: <code>      tensor_D_reference.host_ref()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 344**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 345**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 346**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 347**: <code>    // Verify equivalence</code>
+  - EN: Adds an inline comment about the nearby code: Verify equivalence
+  - CN: 添加关于附近代码的行内注释：Verify equivalence
+- **Line 348**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 349**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 350**: <code>    // compare</code>
+  - EN: Adds an inline comment about the nearby code: compare
+  - CN: 添加关于附近代码的行内注释：compare
+- **Line 351**: <code>    bool passed = cutlass::reference::host::TensorEquals(</code>
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 352**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 353**: <code>      tensor_D_reference.host_view()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 354**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 355**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 356**: <code>    EXPECT_TRUE(passed);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 357**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 358**: <code>    if (!passed) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 359**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 360**: <code>      cutlass::TensorView&lt;ElementA, cutlass::layout::ColumnMajor&gt; tensor_A_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 361**: <code>        tensor_A.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 362**: <code>        tensor_A.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 363**: <code>        tensor_A.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 364**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 365**: <code>      cutlass::TensorView&lt;ElementB, cutlass::layout::RowMajor&gt; tensor_B_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 366**: <code>        tensor_B.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 367**: <code>        tensor_B.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 368**: <code>        tensor_B.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 369**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 370**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementA&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementA&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 371**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 372**: <code>        &lt;&lt; &quot;A:\n&quot; &lt;&lt; tensor_A.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 373**: <code>        &lt;&lt; &quot;A(physical - stride: &quot; &lt;&lt; tensor_A.stride()[0] </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 374**: <code>        &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_A.extent() &lt;&lt; &quot;):\n&quot; &lt;&lt; tensor_A_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 375**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 376**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementB&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementB&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 377**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 378**: <code>        &lt;&lt; &quot;B:\n&quot; &lt;&lt; tensor_B.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 379**: <code>        &lt;&lt; &quot;B(physical - stride: &quot; &lt;&lt; tensor_B.stride()[0] </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 380**: <code>        &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_B.extent() &lt;&lt; &quot;):\n&quot; &lt;&lt; tensor_B_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 381**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 382**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 383**: <code>        &lt;&lt; &quot;C:\n&quot; &lt;&lt; tensor_C.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 384**: <code>        &lt;&lt; &quot;Reference:\n&quot; &lt;&lt; tensor_D_reference.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 385**: <code>        &lt;&lt; &quot;Computed:\n&quot; &lt;&lt; tensor_D_computed.host_view() &lt;&lt; std::endl;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 386**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 387**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 388**: <code>    return passed;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 389**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 390**: <code>};</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 391**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 392**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 393**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 394**: <code>/// Structure to compute the matrix product</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 395**: <code>template &lt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 396**: <code>  /// Warp-level matrix multiply-accumulate</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 397**: <code>  typename Mma_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 398**: <code>  /// Size of threadblock-scoped shape used to store SMEM</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 399**: <code>  typename ThreadblockShape_</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 400**: <code>&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 401**: <code>struct TestbedComplex {</code>
+  - EN: Declares `struct TestbedComplex`, which groups related data or behavior.
+  - CN: 声明 `struct TestbedComplex`，用于组织相关数据或行为。
+- **Line 402**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 403**: <code>  /// Thread-level matrix multiply-accumulate operator</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 404**: <code>  using Mma = Mma_;</code>
+  - EN: Creates type alias `Mma` to simplify later code.
+  - CN: 创建类型别名 `Mma` 以简化后续代码。
+- **Line 405**: <code>  using ThreadblockShape = ThreadblockShape_;</code>
+  - EN: Defines alias `ThreadblockShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `ThreadblockShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 406**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 407**: <code>  using Shape = typename Mma::Shape;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 408**: <code>  using ElementA = typename Mma::ElementA;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 409**: <code>  using LayoutA = typename Mma::LayoutA;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 410**: <code>  using ElementB = typename Mma::ElementB;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 411**: <code>  using LayoutB = typename Mma::LayoutB;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 412**: <code>  using ElementC = typename Mma::ElementC;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 413**: <code>  using LayoutC = typename Mma::LayoutC;</code>
+  - EN: Defines `LayoutC` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutC`，以固定某个操作数或输出的内存布局。
+- **Line 414**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 415**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 416**: <code>  // Data members</code>
+  - EN: Adds an inline comment about the nearby code: Data members
+  - CN: 添加关于附近代码的行内注释：Data members
+- **Line 417**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 418**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 419**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 420**: <code>  cutlass::HostTensor&lt;ElementB, LayoutB&gt; tensor_B;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 421**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_C;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 422**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_computed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 423**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_reference;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 424**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 425**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 426**: <code>  // Methods</code>
+  - EN: Adds an inline comment about the nearby code: Methods
+  - CN: 添加关于附近代码的行内注释：Methods
+- **Line 427**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 428**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 429**: <code>  /// Allocates workspace in device memory</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 430**: <code>  TestbedComplex() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 431**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 432**: <code>    tensor_A.reset(cutlass::make_Coord(ThreadblockShape::kM, ThreadblockShape::kK));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 433**: <code>    tensor_B.reset(cutlass::make_Coord(ThreadblockShape::kK, ThreadblockShape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 434**: <code>    tensor_C.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 435**: <code>    tensor_D_computed.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 436**: <code>    tensor_D_reference.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 437**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 438**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 439**: <code>  /// Returns true if the CUDA device is sufficient to execute the kernel.</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 440**: <code>  bool sufficient() const {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 441**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 442**: <code>    cudaDeviceProp properties;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 443**: <code>    int device_idx;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 444**: <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 445**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 446**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 447**: <code>      throw std::runtime_error(&quot;cudaGetDevice() API call failed.&quot;);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 448**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 449**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 450**: <code>    result = cudaGetDeviceProperties(&amp;properties, device_idx);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 451**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 452**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 453**: <code>      throw std::runtime_error(&quot;cudaGetDeviceProperties() failed&quot;);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 454**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 455**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 456**: <code>    if (properties.major == 9) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 457**: <code>      // NVIDIA Hopper drops support for several data types</code>
+  - EN: Adds an inline comment about the nearby code: NVIDIA Hopper drops support for several data types
+  - CN: 添加关于附近代码的行内注释：NVIDIA Hopper drops support for several data types
+- **Line 458**: <code>      if (</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 459**: <code>        cutlass::sizeof_bits&lt;ElementA&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 460**: <code>        cutlass::sizeof_bits&lt;ElementB&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 461**: <code>        cutlass::sizeof_bits&lt;ElementC&gt;::value &lt; 8) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 462**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 463**: <code>        return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 464**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 465**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 466**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 467**: <code>    return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 468**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 469**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 470**: <code>  /// Runs the test</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 471**: <code>  bool run(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 472**: <code>      cutlass::Distribution::Kind init_A = cutlass::Distribution::Uniform,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 473**: <code>      cutlass::Distribution::Kind init_B = cutlass::Distribution::Uniform) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 474**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 475**: <code>    if (!sufficient()) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 476**: <code>      return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 477**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 478**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 479**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 480**: <code>    // initialize device memory</code>
+  - EN: Adds an inline comment about the nearby code: initialize device memory
+  - CN: 添加关于附近代码的行内注释：initialize device memory
+- **Line 481**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 482**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 483**: <code>    if (init_A == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 484**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 485**: <code>      cutlass::reference::host::TensorFillRandomUniform(tensor_A.host_view(),</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 486**: <code>                                                        seed, 8, -8, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 487**: <code>    } else if (init_A == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 488**: <code>      cutlass::reference::host::BlockFillSequential(tensor_A.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 489**: <code>                                                    tensor_A.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 490**: <code>    } else if (init_A == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 491**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_A.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 492**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 493**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 494**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 495**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 496**: <code>    if (init_B == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 497**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 498**: <code>      cutlass::reference::host::TensorFillRandomUniform(tensor_B.host_view(),</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 499**: <code>                                                        seed + 16, 8, -8, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 500**: <code>    } else if (init_B == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 501**: <code>      cutlass::reference::host::BlockFillSequential(tensor_B.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 502**: <code>                                                    tensor_B.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 503**: <code>    } else if (init_B == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 504**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_B.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 505**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 506**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 507**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 508**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 509**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 510**: <code>      tensor_C.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 511**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 512**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 513**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 514**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 515**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 516**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 517**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 518**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 519**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 520**: <code>      tensor_D_reference.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 521**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 522**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 523**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 524**: <code>    tensor_A.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 525**: <code>    tensor_B.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 526**: <code>    tensor_C.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 527**: <code>    tensor_D_computed.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 528**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 529**: <code>    // launch kernel</code>
+  - EN: Adds an inline comment about the nearby code: launch kernel
+  - CN: 添加关于附近代码的行内注释：launch kernel
+- **Line 530**: <code>    kernel&lt;Mma, ThreadblockShape&gt;&lt;&lt;&lt; dim3(1, 1), dim3(32, 1, 1) &gt;&gt;&gt;(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 531**: <code>      tensor_D_computed.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 532**: <code>      tensor_A.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 533**: <code>      tensor_B.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 534**: <code>      tensor_C.device_data());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 535**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 536**: <code>    // verify no errors</code>
+  - EN: Adds an inline comment about the nearby code: verify no errors
+  - CN: 添加关于附近代码的行内注释：verify no errors
+- **Line 537**: <code>    cudaError_t result = cudaDeviceSynchronize();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 538**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 539**: <code>    EXPECT_EQ(result, cudaSuccess) &lt;&lt; &quot;CUDA ERROR: &quot; &lt;&lt; cudaGetErrorString(result);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 540**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 541**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 542**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 543**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 544**: <code>    tensor_D_computed.sync_host();</code>
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 545**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 546**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 547**: <code>    // Reference implementation</code>
+  - EN: Adds an inline comment about the nearby code: Reference implementation
+  - CN: 添加关于附近代码的行内注释：Reference implementation
+- **Line 548**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 549**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 550**: <code>    cutlass::reference::host::GemmComplex(</code>
+  - EN: Refers to the host reference GEMM implementation used to compute the expected result.
+  - CN: 引用主机参考 GEMM 实现，用于计算期望结果。
+- **Line 551**: <code>      {Shape::kM, Shape::kN, ThreadblockShape::kK},</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 552**: <code>      ElementC(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 553**: <code>      tensor_A.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 554**: <code>      Mma::kTransformA,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 555**: <code>      tensor_B.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 556**: <code>      Mma::kTransformB,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 557**: <code>      ElementC(0),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 558**: <code>      tensor_C.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 559**: <code>      tensor_D_reference.host_ref()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 560**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 561**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 562**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 563**: <code>    // Verify equivalence</code>
+  - EN: Adds an inline comment about the nearby code: Verify equivalence
+  - CN: 添加关于附近代码的行内注释：Verify equivalence
+- **Line 564**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 565**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 566**: <code>    // compare</code>
+  - EN: Adds an inline comment about the nearby code: compare
+  - CN: 添加关于附近代码的行内注释：compare
+- **Line 567**: <code>    bool passed = cutlass::reference::host::TensorEquals(</code>
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 568**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 569**: <code>      tensor_D_reference.host_view()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 570**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 571**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 572**: <code>    EXPECT_TRUE(passed);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 573**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 574**: <code>    if (!passed) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 575**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 576**: <code>      cutlass::TensorView&lt;ElementA, cutlass::layout::ColumnMajor&gt; tensor_A_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 577**: <code>        tensor_A.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 578**: <code>        tensor_A.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 579**: <code>        tensor_A.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 580**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 581**: <code>      cutlass::TensorView&lt;ElementB, cutlass::layout::RowMajor&gt; tensor_B_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 582**: <code>        tensor_B.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 583**: <code>        tensor_B.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 584**: <code>        tensor_B.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 585**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 586**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementA&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementA&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 587**: <code>      std::cout </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 588**: <code>        &lt;&lt; &quot;A:\n&quot; &lt;&lt; tensor_A.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 589**: <code>        &lt;&lt; &quot;A(physical - stride: &quot; &lt;&lt; tensor_A.stride()[0] &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_A.extent() &lt;&lt; &quot;):\n&quot; &lt;&lt; tensor_A_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 590**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 591**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementB&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementB&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 592**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 593**: <code>        &lt;&lt; &quot;B:\n&quot; &lt;&lt; tensor_B.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 594**: <code>        &lt;&lt; &quot;B(physical - stride: &quot; &lt;&lt; tensor_B.stride()[0] &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_B.extent() &lt;&lt;&quot;):\n&quot; &lt;&lt; tensor_B_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 595**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 596**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 597**: <code>        &lt;&lt; &quot;C:\n&quot; &lt;&lt; tensor_C.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 598**: <code>        &lt;&lt; &quot;Reference:\n&quot; &lt;&lt; tensor_D_reference.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 599**: <code>        &lt;&lt; &quot;Computed:\n&quot; &lt;&lt; tensor_D_computed.host_view() &lt;&lt; std::endl;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 600**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 601**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 602**: <code>    return passed;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 603**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 604**: <code>};</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 605**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 606**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 607**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 608**: <code>/// Test kernel</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 609**: <code>template &lt;typename Mma, typename ThreadblockShape&gt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 610**: <code>__global__ void kernel_transform(</code>
+  - EN: Declares a CUDA kernel that runs on the device and is launched by the testbed.
+  - CN: 声明一个在设备上运行并由测试平台启动的 CUDA 内核。
+- **Line 611**: <code>  typename Mma::ElementC *output_C, </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 612**: <code>  typename Mma::ElementA const *input_A,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 613**: <code>  typename Mma::ElementB const *input_B,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 614**: <code>  typename Mma::ElementC const *input_C,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 615**: <code>  int iterations = 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 616**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 617**: <code>  // Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.</code>
+  - EN: Adds an inline comment about the nearby code: Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.
+  - CN: 添加关于附近代码的行内注释：Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.
+- **Line 618**: <code>  __shared__ cutlass::AlignedBuffer&lt;</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 619**: <code>    typename Mma::ElementA, ThreadblockShape::kM * ThreadblockShape::kK&gt; smem_buffer_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 620**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 621**: <code>  __shared__ cutlass::AlignedBuffer&lt;</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 622**: <code>    typename Mma::ElementB, ThreadblockShape::kN * ThreadblockShape::kK&gt; smem_buffer_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 623**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 624**: <code>  if (threadIdx.x == 0) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 625**: <code>    typename Mma::ElementA *smem_ptr_A = smem_buffer_A.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 626**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 627**: <code>    for (size_t i = 0; i &lt; smem_buffer_A.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 628**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementA&gt;::get(smem_ptr_A, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 629**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 630**: <code>              typename Mma::ElementA&gt;::type&gt;::get(input_A, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 631**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 632**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 633**: <code>    typename Mma::ElementB *smem_ptr_B = smem_buffer_B.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 634**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 635**: <code>    for (size_t i = 0; i &lt; smem_buffer_B.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 636**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementB&gt;::get(smem_ptr_B, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 637**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 638**: <code>              typename Mma::ElementB&gt;::type&gt;::get(input_B, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 639**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 640**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 641**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 642**: <code>  __syncthreads();</code>
+  - EN: Synchronizes the threadblock so all staged shared-memory data is visible before fragment loads.
+  - CN: 同步线程块，确保在加载片段前共享内存中的暂存数据都已可见。
+- **Line 643**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 644**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 645**: <code>  // Construct warp-level matrix product</code>
+  - EN: Adds an inline comment about the nearby code: Construct warp-level matrix product
+  - CN: 添加关于附近代码的行内注释：Construct warp-level matrix product
+- **Line 646**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 647**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 648**: <code>  using FragmentA = typename Mma::FragmentA;</code>
+  - EN: Creates type alias `FragmentA` to simplify later code.
+  - CN: 创建类型别名 `FragmentA` 以简化后续代码。
+- **Line 649**: <code>  using FragmentB = typename Mma::FragmentB;</code>
+  - EN: Creates type alias `FragmentB` to simplify later code.
+  - CN: 创建类型别名 `FragmentB` 以简化后续代码。
+- **Line 650**: <code>  using FragmentC = typename Mma::FragmentC;</code>
+  - EN: Creates type alias `FragmentC` to simplify later code.
+  - CN: 创建类型别名 `FragmentC` 以简化后续代码。
+- **Line 651**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 652**: <code>  using TransformedFragmentA = typename Mma::TransformedFragmentA;</code>
+  - EN: Creates type alias `TransformedFragmentA` to simplify later code.
+  - CN: 创建类型别名 `TransformedFragmentA` 以简化后续代码。
+- **Line 653**: <code>  using TransformedFragmentB = typename Mma::TransformedFragmentB;</code>
+  - EN: Creates type alias `TransformedFragmentB` to simplify later code.
+  - CN: 创建类型别名 `TransformedFragmentB` 以简化后续代码。
+- **Line 654**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 655**: <code>  typename Mma::LayoutA layout_A = Mma::LayoutA::packed({ThreadblockShape::kM, ThreadblockShape::kK});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 656**: <code>  typename Mma::LayoutB layout_B = Mma::LayoutB::packed({ThreadblockShape::kK, ThreadblockShape::kN});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 657**: <code>  typename Mma::LayoutC layout_C = Mma::LayoutC::packed({Mma::Shape::kM, Mma::Shape::kN});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 658**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 659**: <code>  typename Mma::IteratorA iter_A({smem_buffer_A.data(), layout_A}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 660**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 661**: <code>  typename Mma::IteratorB iter_B({smem_buffer_B.data(), layout_B}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 662**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 663**: <code>  FragmentA loaded_frag_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 664**: <code>  FragmentB loaded_frag_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 665**: <code>  TransformedFragmentA transformed_frag_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 666**: <code>  TransformedFragmentB transformed_frag_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 667**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 668**: <code>  FragmentC accum;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 669**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 670**: <code>  Mma mma;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 671**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 672**: <code>  accum.clear();</code>
+  - EN: Initializes the accumulator fragment to zero before the MMA loop begins.
+  - CN: 在 MMA 循环开始前把累加片段清零。
+- **Line 673**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 674**: <code>  CUTLASS_PRAGMA_NO_UNROLL</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 675**: <code>  for (int iter = 0; iter &lt; iterations; ++iter) {     // place in loop that is not unrolled </code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 676**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 677**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 678**: <code>    for (int k = 0; k &lt; ThreadblockShape::kK;</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 679**: <code>         k += Mma::Policy::MmaShape::kK) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 680**: <code>      iter_A.load(loaded_frag_A);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 681**: <code>      iter_B.load(loaded_frag_B);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 682**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 683**: <code>      ++iter_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 684**: <code>      ++iter_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 685**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 686**: <code>      mma.transform(transformed_frag_A, transformed_frag_B, loaded_frag_A,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 687**: <code>                    loaded_frag_B);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 688**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 689**: <code>      mma(accum, transformed_frag_A, transformed_frag_B, accum);</code>
+  - EN: Invokes the MMA operator to perform one matrix multiply-accumulate step on the loaded fragments.
+  - CN: 调用 MMA 算子，对已加载的片段执行一次矩阵乘加步骤。
+- **Line 690**: <code>    }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 691**: <code>  }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 692**: <code>  </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 693**: <code>  typename Mma::IteratorC iter_C({output_C, layout_C}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 694**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 695**: <code>  iter_C.store(accum);</code>
+  - EN: Stores the computed accumulator fragment back to the output tile.
+  - CN: 将计算完成的累加片段写回输出 tile。
+- **Line 696**: <code>}</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 697**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 698**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 699**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 700**: <code>/// Structure to compute the matrix product</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 701**: <code>template &lt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 702**: <code>  /// Warp-level matrix multiply-accumulate</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 703**: <code>  typename Mma_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 704**: <code>  /// Size of threadblock-scoped shape used to store SMEM</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 705**: <code>  typename ThreadblockShape_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 706**: <code>  /// The innter product operation performed by GEMM </code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 707**: <code>  typename Operator_ = cutlass::arch::OpMultiplyAdd</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 708**: <code>&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 709**: <code>struct TransformTestbed {</code>
+  - EN: Declares `struct TransformTestbed`, which groups related data or behavior.
+  - CN: 声明 `struct TransformTestbed`，用于组织相关数据或行为。
+- **Line 710**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 711**: <code>  /// Thread-level matrix multiply-accumulate operator</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 712**: <code>  using Mma = Mma_;</code>
+  - EN: Creates type alias `Mma` to simplify later code.
+  - CN: 创建类型别名 `Mma` 以简化后续代码。
+- **Line 713**: <code>  using ThreadblockShape = ThreadblockShape_;</code>
+  - EN: Defines alias `ThreadblockShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `ThreadblockShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 714**: <code>  using Operator = Operator_;</code>
+  - EN: Creates type alias `Operator` to simplify later code.
+  - CN: 创建类型别名 `Operator` 以简化后续代码。
+- **Line 715**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 716**: <code>  using Shape = typename Mma::Shape;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 717**: <code>  using ElementA = typename Mma::ElementA;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 718**: <code>  using LayoutA = typename Mma::LayoutA;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 719**: <code>  using ElementB = typename Mma::ElementB;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 720**: <code>  using LayoutB = typename Mma::LayoutB;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 721**: <code>  using ElementC = typename Mma::ElementC;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 722**: <code>  using LayoutC = typename Mma::LayoutC;</code>
+  - EN: Defines `LayoutC` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutC`，以固定某个操作数或输出的内存布局。
+- **Line 723**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 724**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 725**: <code>  // Data members</code>
+  - EN: Adds an inline comment about the nearby code: Data members
+  - CN: 添加关于附近代码的行内注释：Data members
+- **Line 726**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 727**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 728**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 729**: <code>  cutlass::HostTensor&lt;ElementB, LayoutB&gt; tensor_B;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 730**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_C;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 731**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_computed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 732**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_reference;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 733**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 734**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 735**: <code>  // Methods</code>
+  - EN: Adds an inline comment about the nearby code: Methods
+  - CN: 添加关于附近代码的行内注释：Methods
+- **Line 736**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 737**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 738**: <code>  /// Allocates workspace in device memory</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 739**: <code>  TransformTestbed() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 740**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 741**: <code>    tensor_A.reset(cutlass::make_Coord(ThreadblockShape::kM, ThreadblockShape::kK));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 742**: <code>    tensor_B.reset(cutlass::make_Coord(ThreadblockShape::kK, ThreadblockShape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 743**: <code>    tensor_C.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 744**: <code>    tensor_D_computed.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 745**: <code>    tensor_D_reference.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 746**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 747**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 748**: <code>  /// Returns true if the CUDA device is sufficient to execute the kernel.</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 749**: <code>  bool sufficient() const {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 750**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 751**: <code>    cudaDeviceProp properties;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 752**: <code>    int device_idx;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 753**: <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 754**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 755**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 756**: <code>      throw std::runtime_error(&quot;cudaGetDevice() API call failed.&quot;);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 757**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 758**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 759**: <code>    result = cudaGetDeviceProperties(&amp;properties, device_idx);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 760**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 761**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 762**: <code>      throw std::runtime_error(&quot;cudaGetDeviceProperties() failed&quot;);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 763**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 764**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 765**: <code>    if (properties.major == 9) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 766**: <code>      // NVIDIA Hopper drops support for several data types</code>
+  - EN: Adds an inline comment about the nearby code: NVIDIA Hopper drops support for several data types
+  - CN: 添加关于附近代码的行内注释：NVIDIA Hopper drops support for several data types
+- **Line 767**: <code>      if (</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 768**: <code>        cutlass::sizeof_bits&lt;ElementA&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 769**: <code>        cutlass::sizeof_bits&lt;ElementB&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 770**: <code>        cutlass::sizeof_bits&lt;ElementC&gt;::value &lt; 8) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 771**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 772**: <code>        return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 773**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 774**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 775**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 776**: <code>    return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 777**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 778**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 779**: <code>  /// Runs the test</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 780**: <code>  bool run(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 781**: <code>      cutlass::Distribution::Kind init_A = cutlass::Distribution::Uniform,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 782**: <code>      cutlass::Distribution::Kind init_B = cutlass::Distribution::Uniform) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 783**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 784**: <code>    if (!sufficient()) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 785**: <code>      return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 786**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 787**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 788**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 789**: <code>    // initialize device memory</code>
+  - EN: Adds an inline comment about the nearby code: initialize device memory
+  - CN: 添加关于附近代码的行内注释：initialize device memory
+- **Line 790**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 791**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 792**: <code>    if (init_A == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 793**: <code>      int scope_max = 8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 794**: <code>      int scope_min = -8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 795**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 796**: <code>      if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 797**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 798**: <code>        scope_min = -2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 799**: <code>      } else if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 800**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 801**: <code>        scope_min = 0;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 802**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 803**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 804**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 805**: <code>      cutlass::reference::host::TensorFillRandomUniform(</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 806**: <code>          tensor_A.host_view(), seed, scope_max, scope_min, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 807**: <code>    } else if (init_A == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 808**: <code>      cutlass::reference::host::BlockFillSequential(tensor_A.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 809**: <code>                                                    tensor_A.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 810**: <code>    } else if (init_A == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 811**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_A.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 812**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 813**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 814**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 815**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 816**: <code>    if (init_B == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 817**: <code>      int scope_max = 8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 818**: <code>      int scope_min = -8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 819**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 820**: <code>      if (cutlass::sizeof_bits&lt;ElementB&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 821**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 822**: <code>        scope_min = -2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 823**: <code>      } else if (cutlass::sizeof_bits&lt;ElementB&gt;::value == 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 824**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 825**: <code>        scope_min = 0;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 826**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 827**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 828**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 829**: <code>      cutlass::reference::host::TensorFillRandomUniform(</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 830**: <code>          tensor_B.host_view(), seed + 16, scope_max, scope_min, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 831**: <code>    } else if (init_B == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 832**: <code>      cutlass::reference::host::BlockFillSequential(tensor_B.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 833**: <code>                                                    tensor_B.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 834**: <code>    } else if (init_B == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 835**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_B.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 836**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 837**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 838**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 839**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 840**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 841**: <code>      tensor_C.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 842**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 843**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 844**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 845**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 846**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 847**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 848**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 849**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 850**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 851**: <code>      tensor_D_reference.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 852**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 853**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 854**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 855**: <code>    tensor_A.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 856**: <code>    tensor_B.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 857**: <code>    tensor_C.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 858**: <code>    tensor_D_computed.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 859**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 860**: <code>    // launch kernel</code>
+  - EN: Adds an inline comment about the nearby code: launch kernel
+  - CN: 添加关于附近代码的行内注释：launch kernel
+- **Line 861**: <code>    kernel_transform&lt;Mma, ThreadblockShape&gt;&lt;&lt;&lt;dim3(1, 1), dim3(32, 1, 1)&gt;&gt;&gt;(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 862**: <code>        tensor_D_computed.device_data(), tensor_A.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 863**: <code>        tensor_B.device_data(), tensor_C.device_data());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 864**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 865**: <code>    // verify no errors</code>
+  - EN: Adds an inline comment about the nearby code: verify no errors
+  - CN: 添加关于附近代码的行内注释：verify no errors
+- **Line 866**: <code>    cudaError_t result = cudaDeviceSynchronize();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 867**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 868**: <code>    EXPECT_EQ(result, cudaSuccess) &lt;&lt; &quot;CUDA ERROR: &quot; &lt;&lt; cudaGetErrorString(result);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 869**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 870**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 871**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 872**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 873**: <code>    tensor_D_computed.sync_host();</code>
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 874**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 875**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 876**: <code>    // Reference implementation</code>
+  - EN: Adds an inline comment about the nearby code: Reference implementation
+  - CN: 添加关于附近代码的行内注释：Reference implementation
+- **Line 877**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 878**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 879**: <code>    cutlass::reference::host::Gemm&lt;ElementA, LayoutA, ElementB, LayoutB,</code>
+  - EN: Refers to the host reference GEMM implementation used to compute the expected result.
+  - CN: 引用主机参考 GEMM 实现，用于计算期望结果。
+- **Line 880**: <code>                                   ElementC, LayoutC, ElementC, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 881**: <code>                                   Operator&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 882**: <code>        reference_gemm;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 883**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 884**: <code>    reference_gemm(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 885**: <code>      {Shape::kM, Shape::kN, ThreadblockShape::kK},</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 886**: <code>      ElementC(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 887**: <code>      tensor_A.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 888**: <code>      tensor_B.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 889**: <code>      ElementC(0),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 890**: <code>      tensor_D_reference.host_ref()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 891**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 892**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 893**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 894**: <code>    // Verify equivalence</code>
+  - EN: Adds an inline comment about the nearby code: Verify equivalence
+  - CN: 添加关于附近代码的行内注释：Verify equivalence
+- **Line 895**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 896**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 897**: <code>    // compare</code>
+  - EN: Adds an inline comment about the nearby code: compare
+  - CN: 添加关于附近代码的行内注释：compare
+- **Line 898**: <code>    bool passed = cutlass::reference::host::TensorEquals(</code>
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 899**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 900**: <code>      tensor_D_reference.host_view()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 901**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 902**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 903**: <code>    EXPECT_TRUE(passed);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 904**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 905**: <code>    if (!passed) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 906**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 907**: <code>      cutlass::TensorView&lt;ElementA, cutlass::layout::ColumnMajor&gt; tensor_A_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 908**: <code>        tensor_A.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 909**: <code>        tensor_A.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 910**: <code>        tensor_A.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 911**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 912**: <code>      cutlass::TensorView&lt;ElementB, cutlass::layout::RowMajor&gt; tensor_B_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 913**: <code>        tensor_B.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 914**: <code>        tensor_B.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 915**: <code>        tensor_B.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 916**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 917**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementA&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementA&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 918**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 919**: <code>        &lt;&lt; &quot;A:\n&quot; &lt;&lt; tensor_A.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 920**: <code>        &lt;&lt; &quot;A(physical - stride: &quot; &lt;&lt; tensor_A.stride()[0] &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_A.extent() &lt;&lt; &quot;):\n&quot; &lt;&lt; tensor_A_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 921**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 922**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementB&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementB&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 923**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 924**: <code>        &lt;&lt; &quot;B:\n&quot; &lt;&lt; tensor_B.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 925**: <code>        &lt;&lt; &quot;B(physical - stride: &quot; &lt;&lt; tensor_B.stride()[0] &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_B.extent() &lt;&lt; &quot;):\n&quot; &lt;&lt; tensor_B_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 926**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 927**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 928**: <code>        &lt;&lt; &quot;C:\n&quot; &lt;&lt; tensor_C.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 929**: <code>        &lt;&lt; &quot;Reference:\n&quot; &lt;&lt; tensor_D_reference.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 930**: <code>        &lt;&lt; &quot;Computed:\n&quot; &lt;&lt; tensor_D_computed.host_view() &lt;&lt; std::endl;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 931**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 932**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 933**: <code>    return passed;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 934**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 935**: <code>};</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 936**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 937**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 938**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 939**: <code>/// Structure to compute the matrix product</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 940**: <code>template &lt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 941**: <code>  /// Warp-level matrix multiply-accumulate</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 942**: <code>  typename Mma_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 943**: <code>  /// Size of threadblock-scoped shape used to store SMEM</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 944**: <code>  typename ThreadblockShape_</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 945**: <code>&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 946**: <code>struct TransformedTestbedComplex {</code>
+  - EN: Declares `struct TransformedTestbedComplex`, which groups related data or behavior.
+  - CN: 声明 `struct TransformedTestbedComplex`，用于组织相关数据或行为。
+- **Line 947**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 948**: <code>  /// Thread-level matrix multiply-accumulate operator</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 949**: <code>  using Mma = Mma_;</code>
+  - EN: Creates type alias `Mma` to simplify later code.
+  - CN: 创建类型别名 `Mma` 以简化后续代码。
+- **Line 950**: <code>  using ThreadblockShape = ThreadblockShape_;</code>
+  - EN: Defines alias `ThreadblockShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `ThreadblockShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 951**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 952**: <code>  using Shape = typename Mma::Shape;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 953**: <code>  using ElementA = typename Mma::ElementA;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 954**: <code>  using LayoutA = typename Mma::LayoutA;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 955**: <code>  using ElementB = typename Mma::ElementB;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 956**: <code>  using LayoutB = typename Mma::LayoutB;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 957**: <code>  using ElementC = typename Mma::ElementC;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 958**: <code>  using LayoutC = typename Mma::LayoutC;</code>
+  - EN: Defines `LayoutC` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutC`，以固定某个操作数或输出的内存布局。
+- **Line 959**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 960**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 961**: <code>  // Data members</code>
+  - EN: Adds an inline comment about the nearby code: Data members
+  - CN: 添加关于附近代码的行内注释：Data members
+- **Line 962**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 963**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 964**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 965**: <code>  cutlass::HostTensor&lt;ElementB, LayoutB&gt; tensor_B;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 966**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_C;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 967**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_computed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 968**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_reference;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 969**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 970**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 971**: <code>  // Methods</code>
+  - EN: Adds an inline comment about the nearby code: Methods
+  - CN: 添加关于附近代码的行内注释：Methods
+- **Line 972**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 973**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 974**: <code>  /// Allocates workspace in device memory</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 975**: <code>  TransformedTestbedComplex() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 976**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 977**: <code>    tensor_A.reset(cutlass::make_Coord(ThreadblockShape::kM, ThreadblockShape::kK));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 978**: <code>    tensor_B.reset(cutlass::make_Coord(ThreadblockShape::kK, ThreadblockShape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 979**: <code>    tensor_C.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 980**: <code>    tensor_D_computed.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 981**: <code>    tensor_D_reference.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 982**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 983**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 984**: <code>  /// Returns true if the CUDA device is sufficient to execute the kernel.</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 985**: <code>  bool sufficient() const {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 986**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 987**: <code>    cudaDeviceProp properties;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 988**: <code>    int device_idx;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 989**: <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 990**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 991**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 992**: <code>      throw std::runtime_error(&quot;cudaGetDevice() API call failed.&quot;);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 993**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 994**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 995**: <code>    result = cudaGetDeviceProperties(&amp;properties, device_idx);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 996**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 997**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 998**: <code>      throw std::runtime_error(&quot;cudaGetDeviceProperties() failed&quot;);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 999**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1000**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1001**: <code>    if (properties.major == 9) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1002**: <code>      // NVIDIA Hopper drops support for several data types</code>
+  - EN: Adds an inline comment about the nearby code: NVIDIA Hopper drops support for several data types
+  - CN: 添加关于附近代码的行内注释：NVIDIA Hopper drops support for several data types
+- **Line 1003**: <code>      if (</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1004**: <code>        cutlass::sizeof_bits&lt;ElementA&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1005**: <code>        cutlass::sizeof_bits&lt;ElementB&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1006**: <code>        cutlass::sizeof_bits&lt;ElementC&gt;::value &lt; 8) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1007**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1008**: <code>        return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1009**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1010**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1011**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1012**: <code>    return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1013**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1014**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1015**: <code>  /// Runs the test</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1016**: <code>  bool run(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1017**: <code>      cutlass::Distribution::Kind init_A = cutlass::Distribution::Uniform,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1018**: <code>      cutlass::Distribution::Kind init_B = cutlass::Distribution::Uniform) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1019**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1020**: <code>    if (!sufficient()) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1021**: <code>      return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1022**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1023**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1024**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1025**: <code>    // initialize device memory</code>
+  - EN: Adds an inline comment about the nearby code: initialize device memory
+  - CN: 添加关于附近代码的行内注释：initialize device memory
+- **Line 1026**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1027**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1028**: <code>    if (init_A == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1029**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1030**: <code>      cutlass::reference::host::TensorFillRandomUniform(tensor_A.host_view(),</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 1031**: <code>                                                        seed, 8, -8, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1032**: <code>    } else if (init_A == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1033**: <code>      cutlass::reference::host::BlockFillSequential(tensor_A.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 1034**: <code>                                                    tensor_A.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1035**: <code>    } else if (init_A == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1036**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_A.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1037**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1038**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1039**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1040**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1041**: <code>    if (init_B == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1042**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1043**: <code>      cutlass::reference::host::TensorFillRandomUniform(tensor_B.host_view(),</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 1044**: <code>                                                        seed + 16, 8, -8, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1045**: <code>    } else if (init_B == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1046**: <code>      cutlass::reference::host::BlockFillSequential(tensor_B.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 1047**: <code>                                                    tensor_B.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1048**: <code>    } else if (init_B == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1049**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_B.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1050**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1051**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1052**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1053**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1054**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1055**: <code>      tensor_C.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1056**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1057**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1058**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1059**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1060**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1061**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1062**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1063**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1064**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1065**: <code>      tensor_D_reference.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1066**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1067**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1068**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1069**: <code>    tensor_A.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1070**: <code>    tensor_B.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1071**: <code>    tensor_C.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1072**: <code>    tensor_D_computed.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1073**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1074**: <code>    // launch kernel</code>
+  - EN: Adds an inline comment about the nearby code: launch kernel
+  - CN: 添加关于附近代码的行内注释：launch kernel
+- **Line 1075**: <code>    kernel_transform&lt;Mma, ThreadblockShape&gt;&lt;&lt;&lt; dim3(1, 1), dim3(32, 1, 1) &gt;&gt;&gt;(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1076**: <code>      tensor_D_computed.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1077**: <code>      tensor_A.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1078**: <code>      tensor_B.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1079**: <code>      tensor_C.device_data());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1080**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1081**: <code>    // verify no errors</code>
+  - EN: Adds an inline comment about the nearby code: verify no errors
+  - CN: 添加关于附近代码的行内注释：verify no errors
+- **Line 1082**: <code>    cudaError_t result = cudaDeviceSynchronize();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1083**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1084**: <code>    EXPECT_EQ(result, cudaSuccess) &lt;&lt; &quot;CUDA ERROR: &quot; &lt;&lt; cudaGetErrorString(result);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1085**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1086**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1087**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1088**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1089**: <code>    tensor_D_computed.sync_host();</code>
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 1090**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1091**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1092**: <code>    // Reference implementation</code>
+  - EN: Adds an inline comment about the nearby code: Reference implementation
+  - CN: 添加关于附近代码的行内注释：Reference implementation
+- **Line 1093**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1094**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1095**: <code>    cutlass::reference::host::GemmComplex(</code>
+  - EN: Refers to the host reference GEMM implementation used to compute the expected result.
+  - CN: 引用主机参考 GEMM 实现，用于计算期望结果。
+- **Line 1096**: <code>      {Shape::kM, Shape::kN, ThreadblockShape::kK},</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1097**: <code>      ElementC(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1098**: <code>      tensor_A.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1099**: <code>      Mma::kTransformA,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1100**: <code>      tensor_B.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1101**: <code>      Mma::kTransformB,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1102**: <code>      ElementC(0),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1103**: <code>      tensor_C.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1104**: <code>      tensor_D_reference.host_ref()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1105**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1106**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1107**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1108**: <code>    // Verify equivalence</code>
+  - EN: Adds an inline comment about the nearby code: Verify equivalence
+  - CN: 添加关于附近代码的行内注释：Verify equivalence
+- **Line 1109**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1110**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1111**: <code>    // compare</code>
+  - EN: Adds an inline comment about the nearby code: compare
+  - CN: 添加关于附近代码的行内注释：compare
+- **Line 1112**: <code>    bool passed = cutlass::reference::host::TensorEquals(</code>
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 1113**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1114**: <code>      tensor_D_reference.host_view()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1115**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1116**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1117**: <code>    EXPECT_TRUE(passed);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1118**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1119**: <code>    if (!passed) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1120**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1121**: <code>      cutlass::TensorView&lt;ElementA, cutlass::layout::ColumnMajor&gt; tensor_A_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1122**: <code>        tensor_A.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1123**: <code>        tensor_A.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1124**: <code>        tensor_A.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1125**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1126**: <code>      cutlass::TensorView&lt;ElementB, cutlass::layout::RowMajor&gt; tensor_B_physical(</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1127**: <code>        tensor_B.host_data(), </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1128**: <code>        tensor_B.stride()[0], </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1129**: <code>        tensor_B.extent());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1130**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1131**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementA&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementA&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1132**: <code>      std::cout </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1133**: <code>        &lt;&lt; &quot;A:\n&quot; &lt;&lt; tensor_A.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1134**: <code>        &lt;&lt; &quot;A(physical - stride: &quot; &lt;&lt; tensor_A.stride()[0] &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_A.extent() &lt;&lt; &quot;):\n&quot; &lt;&lt; tensor_A_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1135**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1136**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementB&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementB&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1137**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1138**: <code>        &lt;&lt; &quot;B:\n&quot; &lt;&lt; tensor_B.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1139**: <code>        &lt;&lt; &quot;B(physical - stride: &quot; &lt;&lt; tensor_B.stride()[0] &lt;&lt; &quot;, extent: &quot; &lt;&lt; tensor_B.extent() &lt;&lt;&quot;):\n&quot; &lt;&lt; tensor_B_physical &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1140**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1141**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1142**: <code>        &lt;&lt; &quot;C:\n&quot; &lt;&lt; tensor_C.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1143**: <code>        &lt;&lt; &quot;Reference:\n&quot; &lt;&lt; tensor_D_reference.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1144**: <code>        &lt;&lt; &quot;Computed:\n&quot; &lt;&lt; tensor_D_computed.host_view() &lt;&lt; std::endl;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1145**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1146**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1147**: <code>    return passed;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1148**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1149**: <code>};</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1150**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1151**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1152**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1153**: <code>/// Test kernel</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1154**: <code>template &lt;typename Mma, typename ThreadblockShape&gt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 1155**: <code>__global__ void sparse_kernel(</code>
+  - EN: Declares a CUDA kernel that runs on the device and is launched by the testbed.
+  - CN: 声明一个在设备上运行并由测试平台启动的 CUDA 内核。
+- **Line 1156**: <code>  typename Mma::ElementC *output_C, </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1157**: <code>  typename Mma::ElementA const *input_A,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1158**: <code>  typename Mma::ElementB const *input_B,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1159**: <code>  typename Mma::ElementC const *input_C,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1160**: <code>  typename Mma::ElementE const *input_E,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1161**: <code>  int iterations = 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1162**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1163**: <code>  // Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.</code>
+  - EN: Adds an inline comment about the nearby code: Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.
+  - CN: 添加关于附近代码的行内注释：Use AlignedBuffer to store trivially copyable objects in unions and __shared__ buffers.
+- **Line 1164**: <code>  __shared__ cutlass::AlignedBuffer&lt;typename Mma::ElementA,</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 1165**: <code>                                    ThreadblockShape::kM *</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1166**: <code>                                        ThreadblockShape::kK / Mma::kSparse&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1167**: <code>      smem_buffer_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1168**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1169**: <code>  __shared__ cutlass::AlignedBuffer&lt;</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 1170**: <code>    typename Mma::ElementB, ThreadblockShape::kN * ThreadblockShape::kK&gt; smem_buffer_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1171**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1172**: <code>  __shared__ cutlass::AlignedBuffer&lt;</code>
+  - EN: Declares a shared-memory buffer that holds one staged operand tile for the warp-level kernel.
+  - CN: 声明一个共享内存缓冲区，用于在 warp 级内核中暂存一个操作数 tile。
+- **Line 1173**: <code>      typename Mma::ElementE, Mma::Shape::kM * Mma::Shape::kK /</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1174**: <code>                                  Mma::kSparse / Mma::kElementsPerElementE&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1175**: <code>      smem_buffer_E;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1176**: <code>  </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1177**: <code>  __syncthreads();</code>
+  - EN: Synchronizes the threadblock so all staged shared-memory data is visible before fragment loads.
+  - CN: 同步线程块，确保在加载片段前共享内存中的暂存数据都已可见。
+- **Line 1178**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1179**: <code>  if (threadIdx.x == 0) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1180**: <code>    typename Mma::ElementA *smem_ptr_A = smem_buffer_A.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1181**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1182**: <code>    for (size_t i = 0; i &lt; smem_buffer_A.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 1183**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementA&gt;::get(smem_ptr_A, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 1184**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 1185**: <code>              typename Mma::ElementA&gt;::type&gt;::get(input_A, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1186**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 1187**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1188**: <code>    typename Mma::ElementB *smem_ptr_B = smem_buffer_B.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1189**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1190**: <code>    for (size_t i = 0; i &lt; smem_buffer_B.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 1191**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementB&gt;::get(smem_ptr_B, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 1192**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 1193**: <code>              typename Mma::ElementB&gt;::type&gt;::get(input_B, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1194**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 1195**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1196**: <code>    typename Mma::ElementE *smem_ptr_E = smem_buffer_E.data();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1197**: <code>    #pragma unroll 1</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1198**: <code>    for (size_t i = 0; i &lt; smem_buffer_E.size(); ++i) {</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 1199**: <code>      cutlass::ReferenceFactory&lt;typename Mma::ElementE&gt;::get(smem_ptr_E, i) =</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 1200**: <code>          cutlass::ReferenceFactory&lt;typename cutlass::platform::remove_const&lt;</code>
+  - EN: Accesses scalar elements through CUTLASS reference helpers so regular and packed element types can be handled uniformly.
+  - CN: 通过 CUTLASS 的引用辅助工具访问标量元素，从而统一处理常规类型和打包元素类型。
+- **Line 1201**: <code>              typename Mma::ElementE&gt;::type&gt;::get(input_E, i);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1202**: <code>    }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 1203**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1204**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1205**: <code>  __syncthreads();</code>
+  - EN: Synchronizes the threadblock so all staged shared-memory data is visible before fragment loads.
+  - CN: 同步线程块，确保在加载片段前共享内存中的暂存数据都已可见。
+- **Line 1206**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1207**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1208**: <code>  // Construct warp-level matrix product</code>
+  - EN: Adds an inline comment about the nearby code: Construct warp-level matrix product
+  - CN: 添加关于附近代码的行内注释：Construct warp-level matrix product
+- **Line 1209**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1210**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1211**: <code>  using FragmentA = typename Mma::FragmentA;</code>
+  - EN: Creates type alias `FragmentA` to simplify later code.
+  - CN: 创建类型别名 `FragmentA` 以简化后续代码。
+- **Line 1212**: <code>  using FragmentB = typename Mma::FragmentB;</code>
+  - EN: Creates type alias `FragmentB` to simplify later code.
+  - CN: 创建类型别名 `FragmentB` 以简化后续代码。
+- **Line 1213**: <code>  using FragmentC = typename Mma::FragmentC;</code>
+  - EN: Creates type alias `FragmentC` to simplify later code.
+  - CN: 创建类型别名 `FragmentC` 以简化后续代码。
+- **Line 1214**: <code>  using FragmentE = typename Mma::FragmentE;</code>
+  - EN: Creates type alias `FragmentE` to simplify later code.
+  - CN: 创建类型别名 `FragmentE` 以简化后续代码。
+- **Line 1215**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1216**: <code>  typename Mma::LayoutA layout_A = Mma::LayoutA::packed(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1217**: <code>      {ThreadblockShape::kM, ThreadblockShape::kK / Mma::kSparse});</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1218**: <code>  typename Mma::LayoutB layout_B =</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1219**: <code>      Mma::LayoutB::packed({ThreadblockShape::kK, ThreadblockShape::kN});</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1220**: <code>  typename Mma::LayoutC layout_C = Mma::LayoutC::packed({Mma::Shape::kM, Mma::Shape::kN});</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1221**: <code>  typename Mma::LayoutE layout_E =</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1222**: <code>      Mma::LayoutE::packed({Mma::Shape::kM * Mma::kInterleaved,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1223**: <code>                            Mma::Shape::kK / Mma::kSparse /</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1224**: <code>                                Mma::kElementsPerElementE / Mma::kInterleaved});</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1225**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1226**: <code>  typename Mma::IteratorA iter_A({smem_buffer_A.data(), layout_A}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 1227**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1228**: <code>  typename Mma::IteratorB iter_B({smem_buffer_B.data(), layout_B}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 1229**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1230**: <code>  typename Mma::IteratorE iter_E({smem_buffer_E.data(), layout_E}, cutlass::arch::LaneId());</code>
+  - EN: Uses the current lane ID so the iterator can compute fragment coordinates for each warp lane.
+  - CN: 使用当前 lane ID，使迭代器能够为每个 warp lane 计算片段坐标。
+- **Line 1231**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1232**: <code>  FragmentA frag_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1233**: <code>  FragmentB frag_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1234**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1235**: <code>  FragmentC accum;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1236**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1237**: <code>  FragmentE frag_E;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1238**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1239**: <code>  Mma mma;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1240**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1241**: <code>  accum.clear();</code>
+  - EN: Initializes the accumulator fragment to zero before the MMA loop begins.
+  - CN: 在 MMA 循环开始前把累加片段清零。
+- **Line 1242**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1243**: <code>  CUTLASS_PRAGMA_NO_UNROLL</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1244**: <code>  for (int iter = 0; iter &lt; iterations; ++iter) {     // place in loop that is not unrolled </code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 1245**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1246**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1247**: <code>    for (int k = 0; k &lt; ThreadblockShape::kK;</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 1248**: <code>         k += Mma::Policy::MmaShape::kK) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1249**: <code>      iter_A.load(frag_A);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 1250**: <code>      iter_B.load(frag_B);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 1251**: <code>      iter_E.load(frag_E);</code>
+  - EN: Loads the next operand fragment through the iterator into per-warp registers.
+  - CN: 通过迭代器把下一个操作数片段加载到 warp 私有寄存器中。
+- **Line 1252**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1253**: <code>      ++iter_A;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1254**: <code>      ++iter_B;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1255**: <code>      ++iter_E;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1256**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1257**: <code>      mma(accum, frag_A, frag_B, accum, frag_E);</code>
+  - EN: Invokes the MMA operator to perform one matrix multiply-accumulate step on the loaded fragments.
+  - CN: 调用 MMA 算子，对已加载的片段执行一次矩阵乘加步骤。
+- **Line 1258**: <code>    }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1259**: <code>  }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 1260**: <code>  </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1261**: <code>  typename Mma::IteratorC iter_C({output_C, layout_C}, cutlass::arch::LaneId());</code>
+  - EN: Declares a CUTLASS fragment iterator that maps storage onto warp-level fragments.
+  - CN: 声明一个 CUTLASS 片段迭代器，用于把存储映射为 warp 级片段。
+- **Line 1262**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1263**: <code>  iter_C.store(accum);</code>
+  - EN: Stores the computed accumulator fragment back to the output tile.
+  - CN: 将计算完成的累加片段写回输出 tile。
+- **Line 1264**: <code>}</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 1265**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1266**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1267**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1268**: <code>/// Structure to compute the matrix product</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1269**: <code>template &lt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 1270**: <code>  /// Warp-level matrix multiply-accumulate</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1271**: <code>  typename Mma_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1272**: <code>  /// Size of threadblock-scoped shape used to store SMEM</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1273**: <code>  typename ThreadblockShape_,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1274**: <code>  /// The innter product operation performed by GEMM </code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1275**: <code>  typename Operator_ = cutlass::arch::OpMultiplyAdd</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1276**: <code>&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1277**: <code>struct SparseTestbed {</code>
+  - EN: Declares `struct SparseTestbed`, which groups related data or behavior.
+  - CN: 声明 `struct SparseTestbed`，用于组织相关数据或行为。
+- **Line 1278**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1279**: <code>  /// Thread-level matrix multiply-accumulate operator</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1280**: <code>  using Mma = Mma_;</code>
+  - EN: Creates type alias `Mma` to simplify later code.
+  - CN: 创建类型别名 `Mma` 以简化后续代码。
+- **Line 1281**: <code>  using ThreadblockShape = ThreadblockShape_;</code>
+  - EN: Defines alias `ThreadblockShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `ThreadblockShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 1282**: <code>  using Operator = Operator_;</code>
+  - EN: Creates type alias `Operator` to simplify later code.
+  - CN: 创建类型别名 `Operator` 以简化后续代码。
+- **Line 1283**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1284**: <code>  using Shape = typename Mma::Shape;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 1285**: <code>  using ElementA = typename Mma::ElementA;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 1286**: <code>  using LayoutA = typename Mma::LayoutA;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 1287**: <code>  using ElementB = typename Mma::ElementB;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 1288**: <code>  using LayoutB = typename Mma::LayoutB;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 1289**: <code>  using ElementC = typename Mma::ElementC;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 1290**: <code>  using LayoutC = typename Mma::LayoutC;</code>
+  - EN: Defines `LayoutC` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutC`，以固定某个操作数或输出的内存布局。
+- **Line 1291**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1292**: <code>  static int const Sparse = Mma::kSparse;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1293**: <code>  static int const MetaSizeInBits = Mma::kMetaSizeInBits;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1294**: <code>  static int const MaxID2 = Mma::kMaxID2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1295**: <code>  static int const Interleaved = Mma::kInterleaved;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1296**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1297**: <code>  using ElementE = typename Mma::ElementE;</code>
+  - EN: Creates type alias `ElementE` to simplify later code.
+  - CN: 创建类型别名 `ElementE` 以简化后续代码。
+- **Line 1298**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1299**: <code>  static int const ElementsPerElementE = Mma::kElementsPerElementE;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1300**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1301**: <code>  using LayoutE = cutlass::layout::RowMajor;</code>
+  - EN: Creates type alias `LayoutE` to simplify later code.
+  - CN: 创建类型别名 `LayoutE` 以简化后续代码。
+- **Line 1302**: <code>  using ReorderedLayoutE =</code>
+  - EN: Creates type alias `ReorderedLayoutE` to simplify later code.
+  - CN: 创建类型别名 `ReorderedLayoutE` 以简化后续代码。
+- **Line 1303**: <code>      cutlass::layout::ColumnMajorInterleaved&lt;Interleaved&gt;;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1304**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1305**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1306**: <code>  // Data members</code>
+  - EN: Adds an inline comment about the nearby code: Data members
+  - CN: 添加关于附近代码的行内注释：Data members
+- **Line 1307**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1308**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1309**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1310**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A_uncompressed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1311**: <code>  cutlass::HostTensor&lt;ElementB, LayoutB&gt; tensor_B;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1312**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_C;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1313**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_computed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1314**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_reference;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1315**: <code>  cutlass::HostTensor&lt;ElementE, LayoutE&gt; tensor_E;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1316**: <code>  cutlass::HostTensor&lt;ElementE, ReorderedLayoutE&gt; tensor_E_reordered;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 1317**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1318**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1319**: <code>  // Methods</code>
+  - EN: Adds an inline comment about the nearby code: Methods
+  - CN: 添加关于附近代码的行内注释：Methods
+- **Line 1320**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1321**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1322**: <code>  /// Allocates workspace in device memory</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1323**: <code>  SparseTestbed() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1324**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1325**: <code>    tensor_A.reset(cutlass::make_Coord(ThreadblockShape::kM,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1326**: <code>                                       ThreadblockShape::kK / Sparse));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1327**: <code>    tensor_A_uncompressed.reset(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1328**: <code>        cutlass::make_Coord(ThreadblockShape::kM, ThreadblockShape::kK));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1329**: <code>    tensor_B.reset(cutlass::make_Coord(ThreadblockShape::kK, ThreadblockShape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1330**: <code>    tensor_C.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1331**: <code>    tensor_D_computed.reset(cutlass::make_Coord(Shape::kM, Shape::kN));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1332**: <code>    tensor_D_reference.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1333**: <code>    tensor_E.reset(cutlass::make_Coord(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1334**: <code>        Shape::kM, Shape::kK / Sparse / ElementsPerElementE));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1335**: <code>    tensor_E_reordered.reset(cutlass::make_Coord(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1336**: <code>        Shape::kM, Shape::kK / Sparse / ElementsPerElementE));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1337**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1338**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1339**: <code>  /// Returns true if the CUDA device is sufficient to execute the kernel.</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1340**: <code>  bool sufficient() const {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1341**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1342**: <code>    cudaDeviceProp properties;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1343**: <code>    int device_idx;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1344**: <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 1345**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1346**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1347**: <code>      throw std::runtime_error(&quot;cudaGetDevice() API call failed.&quot;);</code>
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 1348**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1349**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1350**: <code>    result = cudaGetDeviceProperties(&amp;properties, device_idx);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 1351**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1352**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1353**: <code>      throw std::runtime_error(&quot;cudaGetDeviceProperties() failed&quot;);</code>
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 1354**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1355**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1356**: <code>    if (properties.major == 9) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1357**: <code>      // NVIDIA Hopper drops support for several data types</code>
+  - EN: Adds an inline comment about the nearby code: NVIDIA Hopper drops support for several data types
+  - CN: 添加关于附近代码的行内注释：NVIDIA Hopper drops support for several data types
+- **Line 1358**: <code>      if (</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1359**: <code>        cutlass::sizeof_bits&lt;ElementA&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1360**: <code>        cutlass::sizeof_bits&lt;ElementB&gt;::value &lt; 8 ||</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1361**: <code>        cutlass::sizeof_bits&lt;ElementC&gt;::value &lt; 8) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1362**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1363**: <code>        return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1364**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1365**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1366**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1367**: <code>    return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1368**: <code>  }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1369**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1370**: <code>  /// Runs the test</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1371**: <code>  bool run(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1372**: <code>      cutlass::Distribution::Kind init_A = cutlass::Distribution::Uniform,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1373**: <code>      cutlass::Distribution::Kind init_B = cutlass::Distribution::Uniform,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1374**: <code>      cutlass::Distribution::Kind init_E = cutlass::Distribution::Uniform) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1375**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1376**: <code>    if (!sufficient()) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1377**: <code>      return true;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1378**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1379**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1380**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1381**: <code>    // initialize device memory</code>
+  - EN: Adds an inline comment about the nearby code: initialize device memory
+  - CN: 添加关于附近代码的行内注释：initialize device memory
+- **Line 1382**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1383**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1384**: <code>    if (init_A == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1385**: <code>      int scope_max = 8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1386**: <code>      int scope_min = -8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1387**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1388**: <code>      if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1389**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1390**: <code>        scope_min = -2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1391**: <code>      } else if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1392**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1393**: <code>        scope_min = 0;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1394**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1395**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1396**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1397**: <code>      cutlass::reference::host::TensorFillRandomUniform(</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 1398**: <code>          tensor_A.host_view(), seed, scope_max, scope_min, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1399**: <code>    } else if (init_A == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1400**: <code>      cutlass::reference::host::BlockFillSequential(tensor_A.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 1401**: <code>                                                    tensor_A.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1402**: <code>    } else if (init_A == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1403**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_A.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1404**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1405**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1406**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1407**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1408**: <code>    if (init_B == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1409**: <code>      int scope_max = 8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1410**: <code>      int scope_min = -8;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1411**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1412**: <code>      if (cutlass::sizeof_bits&lt;ElementB&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1413**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1414**: <code>        scope_min = -2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1415**: <code>      } else if (cutlass::sizeof_bits&lt;ElementB&gt;::value == 1) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1416**: <code>        scope_max = 2;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1417**: <code>        scope_min = 0;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1418**: <code>      }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1419**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1420**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1421**: <code>      cutlass::reference::host::TensorFillRandomUniform(</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 1422**: <code>          tensor_B.host_view(), seed + 16, scope_max, scope_min, 0);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1423**: <code>    } else if (init_B == cutlass::Distribution::Sequential) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1424**: <code>      cutlass::reference::host::BlockFillSequential(tensor_B.host_data(),</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 1425**: <code>                                                    tensor_B.capacity());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1426**: <code>    } else if (init_B == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1427**: <code>      cutlass::reference::host::TensorFillIdentity(tensor_B.host_view());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1428**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1429**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1430**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1431**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1432**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1433**: <code>      tensor_C.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1434**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1435**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1436**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1437**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1438**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1439**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1440**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1441**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1442**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1443**: <code>      tensor_D_reference.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1444**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1445**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1446**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1447**: <code>    if (init_E == cutlass::Distribution::Uniform) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1448**: <code>      uint64_t seed = 7;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1449**: <code>      cutlass::reference::host::TensorFillRandomSparseMeta(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1450**: <code>          tensor_E.host_view(), seed, MetaSizeInBits);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1451**: <code>    } else if (init_E == cutlass::Distribution::Identity) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 1452**: <code>      uint32_t content = (MaxID2 == 1) ? 0x44444444 : 0x4444;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1453**: <code>      cutlass::reference::host::TensorFill(tensor_E.host_view(),</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 1454**: <code>                                           (ElementE)(content));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1455**: <code>    } else {</code>
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1456**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1457**: <code>    }</code>
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1458**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1459**: <code>    cutlass::reorder_meta(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1460**: <code>        tensor_E_reordered.host_ref(), tensor_E.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1461**: <code>        {Shape::kM, Shape::kN, Shape::kK / Sparse / ElementsPerElementE});</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1462**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1463**: <code>    tensor_A.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1464**: <code>    tensor_B.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1465**: <code>    tensor_C.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1466**: <code>    tensor_D_computed.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1467**: <code>    tensor_E_reordered.sync_device();</code>
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1468**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1469**: <code>    // launch kernel</code>
+  - EN: Adds an inline comment about the nearby code: launch kernel
+  - CN: 添加关于附近代码的行内注释：launch kernel
+- **Line 1470**: <code>    sparse_kernel&lt;Mma, ThreadblockShape&gt;&lt;&lt;&lt; dim3(1, 1), dim3(32, 1, 1) &gt;&gt;&gt;(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1471**: <code>      tensor_D_computed.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1472**: <code>      tensor_A.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1473**: <code>      tensor_B.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1474**: <code>      tensor_C.device_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1475**: <code>      tensor_E_reordered.device_data());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1476**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1477**: <code>    // verify no errors</code>
+  - EN: Adds an inline comment about the nearby code: verify no errors
+  - CN: 添加关于附近代码的行内注释：verify no errors
+- **Line 1478**: <code>    cudaError_t result = cudaDeviceSynchronize();</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1479**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1480**: <code>    EXPECT_EQ(result, cudaSuccess) &lt;&lt; &quot;CUDA ERROR: &quot; &lt;&lt; cudaGetErrorString(result);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1481**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1482**: <code>      return false;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1483**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1484**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1485**: <code>    tensor_D_computed.sync_host();</code>
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 1486**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1487**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1488**: <code>    // Reference implementation</code>
+  - EN: Adds an inline comment about the nearby code: Reference implementation
+  - CN: 添加关于附近代码的行内注释：Reference implementation
+- **Line 1489**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1490**: <code>    cutlass::uncompress(tensor_A_uncompressed.host_ref(), tensor_A.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1491**: <code>                        tensor_E.host_ref(), Shape::kM, Shape::kK);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1492**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1493**: <code>    cutlass::reference::host::Gemm&lt;ElementA, LayoutA, ElementB, LayoutB,</code>
+  - EN: Refers to the host reference GEMM implementation used to compute the expected result.
+  - CN: 引用主机参考 GEMM 实现，用于计算期望结果。
+- **Line 1494**: <code>                                   ElementC, LayoutC, ElementC, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1495**: <code>                                   Operator&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1496**: <code>        reference_gemm;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1497**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1498**: <code>    reference_gemm(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1499**: <code>      {Shape::kM, Shape::kN, ThreadblockShape::kK},</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1500**: <code>      ElementC(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1501**: <code>      tensor_A_uncompressed.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1502**: <code>      tensor_B.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1503**: <code>      ElementC(0),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1504**: <code>      tensor_D_reference.host_ref()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1505**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1506**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1507**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1508**: <code>    // Verify equivalence</code>
+  - EN: Adds an inline comment about the nearby code: Verify equivalence
+  - CN: 添加关于附近代码的行内注释：Verify equivalence
+- **Line 1509**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 1510**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1511**: <code>    // compare</code>
+  - EN: Adds an inline comment about the nearby code: compare
+  - CN: 添加关于附近代码的行内注释：compare
+- **Line 1512**: <code>    bool passed = cutlass::reference::host::TensorEquals(</code>
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 1513**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1514**: <code>      tensor_D_reference.host_view()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1515**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1516**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1517**: <code>    EXPECT_TRUE(passed);</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1518**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1519**: <code>    if (!passed) {</code>
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1520**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementA&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementA&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1521**: <code>      std::cout &lt;&lt; &quot;A:\n&quot; &lt;&lt; tensor_A.host_view() &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1522**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1523**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementB&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementB&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1524**: <code>      std::cout &lt;&lt; &quot;B:\n&quot; &lt;&lt; tensor_B.host_view() &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1525**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1526**: <code>      std::cout &lt;&lt;&quot;cutlass::sizeof_bits&lt;ElementB&gt;::value = &quot;&lt;&lt;cutlass::sizeof_bits&lt;ElementE&gt;::value&lt;&lt;&quot;\n&quot;;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 1527**: <code>      std::cout &lt;&lt; &quot;E:\n&quot; &lt;&lt; tensor_E.host_view() &lt;&lt; &quot;\n\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1528**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1529**: <code>      std::cout</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1530**: <code>        &lt;&lt; &quot;C:\n&quot; &lt;&lt; tensor_C.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1531**: <code>        &lt;&lt; &quot;Reference:\n&quot; &lt;&lt; tensor_D_reference.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1532**: <code>        &lt;&lt; &quot;Computed:\n&quot; &lt;&lt; tensor_D_computed.host_view() &lt;&lt; &quot;\n&quot;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1533**: <code>    }</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1534**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1535**: <code>    return passed;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 1536**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 1537**: <code>};</code>
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1538**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1539**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 1540**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1541**: <code>} // namespace warp</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1542**: <code>} // namespace gemm</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1543**: <code>} // namespace test</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+
+## Key Concepts / 关键概念
+
+- `warp-level MMA`
+  - EN: The file focuses on warp-scoped MMA, where lanes cooperate to load fragments and execute matrix-multiply instructions.
+  - CN: 该文件关注 warp 作用域的 MMA，其中各个 lane 协作加载片段并执行矩阵乘法指令。
+- `shared-memory staging`
+  - EN: The warp testbed stages operand tiles in shared memory before iterator-based fragment loads.
+  - CN: warp 测试平台会先把操作数 tile 放入共享内存，再通过迭代器方式加载片段。
+- `HostTensor`
+  - EN: HostTensor wrappers manage host/device storage, synchronization, and views used by the testbed.
+  - CN: HostTensor 封装负责管理测试平台所需的主机/设备存储、同步与视图。
+- `reference validation`
+  - EN: The testbed compares computed results against a host-generated reference tensor.
+  - CN: 测试平台会将计算结果与主机生成的参考张量进行比较。
+- `capability gating`
+  - EN: Some tests query device properties before running instructions that require sufficient hardware support.
+  - CN: 部分测试会在运行需要特定硬件支持的指令前查询设备属性。
+
+## Dependencies / 依赖
+
+- `cutlass/cutlass.h`
+  - EN: Defines core CUTLASS types, tags, and shared utilities.
+  - CN: 定义 CUTLASS 的核心类型、标签与共享工具。
+- `cutlass/aligned_buffer.h`
+  - EN: Provides statically aligned storage containers used for fragments or shared-memory staging.
+  - CN: 提供用于片段或共享内存暂存的静态对齐存储容器。
+- `cutlass/numeric_types.h`
+  - EN: Defines CUTLASS numeric wrapper types used across tests.
+  - CN: 定义测试中使用的 CUTLASS 数值包装类型。
+- `cutlass/subbyte_reference.h`
+  - EN: Provides references and helpers for packed sub-byte element types.
+  - CN: 为打包的子字节元素类型提供引用与辅助工具。
+- `cutlass/platform/platform.h`
+  - EN: Provides platform-compatibility type traits and helper utilities.
+  - CN: 提供平台兼容类型萃取与辅助工具。
+- `cutlass/arch/arch.h`
+  - EN: Declares architecture tags and lane-level helpers used by low-level kernels.
+  - CN: 声明架构标签以及低层内核使用的 lane 级辅助工具。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbeds.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/distribution.h`
+  - EN: Defines supported random and structured tensor initialization distributions.
+  - CN: 定义支持的随机与结构化张量初始化分布。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性检查的 CPU 参考 GEMM 实现。
+- `cutlass/util/reference/host/gemm_complex.h`
+  - EN: Provides host reference implementations for complex GEMM.
+  - CN: 提供复数 GEMM 的主机参考实现。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic and randomized tensor initialization helpers.
+  - CN: 提供确定性和随机化的张量初始化辅助函数。
+- `cutlass/util/host_reorder.h`
+  - EN: Provides host-side data reordering helpers for specialized layouts.
+  - CN: 提供面向特化布局的主机侧数据重排辅助工具。
+- `cutlass/util/host_uncompress.h`
+  - EN: Provides host-side utilities that expand compressed sparse operand representations.
+  - CN: 提供展开压缩稀疏操作数表示的主机侧辅助工具。

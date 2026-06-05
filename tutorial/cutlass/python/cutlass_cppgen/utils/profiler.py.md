@@ -1,0 +1,216 @@
+# profiler.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/utils/profiler.py`
+
+## Purpose / 作用
+- EN: Profiler based on the cuda events
+- CN: 该模块的文档字符串将其描述为：Profiler based on the cuda events
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Profiler based on the cuda events` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L38** `import subprocess` — **EN:** Imports subprocess for later use. **CN:** 导入 subprocess 供后续使用。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L41** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L42** `cudart =  lazy_import("cuda.cudart")` — **EN:** Assigns a value to cudart. **CN:** 将一个值赋给 cudart。
+- **L43** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `from cutlass_cppgen import CUTLASS_PATH` — **EN:** Imports CUTLASS_PATH from `cutlass_cppgen`. **CN:** 从 `cutlass_cppgen` 导入 CUTLASS_PATH。
+- **L46** `from cutlass_cppgen.backend.library import DataTypeSize` — **EN:** Imports DataTypeSize from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 DataTypeSize。
+- **L47** `from cutlass_cppgen.op.op import OperationBase` — **EN:** Imports OperationBase from `cutlass_cppgen.op.op`. **CN:** 从 `cutlass_cppgen.op.op` 导入 OperationBase。
+- **L48** `from cutlass_cppgen.shape import GemmCoord` — **EN:** Imports GemmCoord from `cutlass_cppgen.shape`. **CN:** 从 `cutlass_cppgen.shape` 导入 GemmCoord。
+- **L49** `from cutlass_cppgen.utils.datatypes import is_numpy_tensor` — **EN:** Imports is_numpy_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_numpy_tensor。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `class GpuTimer:` — **EN:** Defines class `GpuTimer`. **CN:** 定义类 `GpuTimer`。
+- **L53** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L54** `        self.events = [` — **EN:** Assigns a value to self.events. **CN:** 将一个值赋给 self.events。
+- **L55** `            cuda.cuEventCreate(cuda.CUevent_flags.CU_EVENT_DEFAULT)[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `            cuda.cuEventCreate(cuda.CUevent_flags.CU_EVENT_DEFAULT)[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    def start(self, stream=None):` — **EN:** Defines function `start`. **CN:** 定义函数 `start`。
+- **L60** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L61** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `        (err,) = cuda.cuEventRecord(self.events[0], stream)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L64** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L65** `            raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `    def stop(self, stream=None):` — **EN:** Defines function `stop`. **CN:** 定义函数 `stop`。
+- **L68** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L69** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `        (err,) = cuda.cuEventRecord(self.events[1], stream)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L72** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L73** `            raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    def stop_and_wait(self, stream=None):` — **EN:** Defines function `stop_and_wait`. **CN:** 定义函数 `stop_and_wait`。
+- **L77** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L78** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `        self.stop(stream)` — **EN:** Invokes `self.stop` as a standalone call. **CN:** 以独立语句方式调用 `self.stop`。
+- **L81** `        if stream:` — **EN:** Starts a conditional branch guarded by `stream`. **CN:** 开始一个由 `stream` 控制的条件分支。
+- **L82** `            (err,) = cuda.cuStreamSynchronize(stream)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L83** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L84** `                raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L85** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L86** `            (err,) = cudart.cudaDeviceSynchronize()` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L87** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L88** `                raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    def duration(self, iterations=1):` — **EN:** Defines function `duration`. **CN:** 定义函数 `duration`。
+- **L91** `        err, duration = cuda.cuEventElapsedTime(self.events[0], self.events[1])` — **EN:** Assigns a value to (err, duration). **CN:** 将一个值赋给 (err, duration)。
+- **L92** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L93** `            raise RuntimeError(f"CUDA Error {str(err)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L94** `        return duration / float(iterations)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `class CUDAEventProfiler:` — **EN:** Defines class `CUDAEventProfiler`. **CN:** 定义类 `CUDAEventProfiler`。
+- **L98** `    def __init__(self, op: OperationBase, warmup_iterations: int=500, iterations: int=500, *args, **kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L99** `        self.arguments = op.run(*args, **kwargs)` — **EN:** Assigns a value to self.arguments. **CN:** 将一个值赋给 self.arguments。
+- **L100** `        self.operation = op.operation` — **EN:** Assigns a value to self.operation. **CN:** 将一个值赋给 self.operation。
+- **L101** `        self.warmup_iterations = warmup_iterations` — **EN:** Assigns a value to self.warmup_iterations. **CN:** 将一个值赋给 self.warmup_iterations。
+- **L102** `        self.iterations = iterations` — **EN:** Assigns a value to self.iterations. **CN:** 将一个值赋给 self.iterations。
+- **L103** `        self.timer = GpuTimer()` — **EN:** Assigns a value to self.timer. **CN:** 将一个值赋给 self.timer。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L106** `    # Cutlass Python Interface Profiler` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    def __call__(self):` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L110** `        for _ in range(self.warmup_iterations):` — **EN:** Starts a loop assigning items from `range(self.warmup_iterations)` to `_`. **CN:** 开始一个循环，将 `range(self.warmup_iterations)` 的元素赋给 `_`。
+- **L111** `            self.operation.run(self.arguments)` — **EN:** Invokes `self.operation.run` as a standalone call. **CN:** 以独立语句方式调用 `self.operation.run`。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `        self.timer.start()` — **EN:** Invokes `self.timer.start` as a standalone call. **CN:** 以独立语句方式调用 `self.timer.start`。
+- **L114** `        for _ in range(self.iterations):` — **EN:** Starts a loop assigning items from `range(self.iterations)` to `_`. **CN:** 开始一个循环，将 `range(self.iterations)` 的元素赋给 `_`。
+- **L115** `            self.operation.run(self.arguments)` — **EN:** Invokes `self.operation.run` as a standalone call. **CN:** 以独立语句方式调用 `self.operation.run`。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `        self.timer.stop_and_wait()` — **EN:** Invokes `self.timer.stop_and_wait` as a standalone call. **CN:** 以独立语句方式调用 `self.timer.stop_and_wait`。
+- **L118** `        runtime = self.timer.duration(self.iterations)` — **EN:** Assigns a value to runtime. **CN:** 将一个值赋给 runtime。
+- **L119** `        return runtime` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L122** `    # CUTLASS Profiler` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L123** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    def run_cutlass_profiler(self):` — **EN:** Defines function `run_cutlass_profiler`. **CN:** 定义函数 `run_cutlass_profiler`。
+- **L126** `        alpha = 1.0` — **EN:** Assigns a value to alpha. **CN:** 将一个值赋给 alpha。
+- **L127** `        beta = 1.0` — **EN:** Assigns a value to beta. **CN:** 将一个值赋给 beta。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `        profiler_path = CUTLASS_PATH + "/build/tools/profiler/cutlass_profiler"` — **EN:** Assigns a value to profiler_path. **CN:** 将一个值赋给 profiler_path。
+- **L130** `        kernel_name = self.operation.procedural_name()` — **EN:** Assigns a value to kernel_name. **CN:** 将一个值赋给 kernel_name。
+- **L131** `        verification_providers = "device"` — **EN:** Assigns a value to verification_providers. **CN:** 将一个值赋给 verification_providers。
+- **L132** `        provider = "cutlass"` — **EN:** Assigns a value to provider. **CN:** 将一个值赋给 provider。
+- **L133** `        problem_size = self.arguments.problem_size` — **EN:** Assigns a value to problem_size. **CN:** 将一个值赋给 problem_size。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `        if "cutlass3x" in kernel_name:` — **EN:** Starts a conditional branch guarded by `'cutlass3x' in kernel_name`. **CN:** 开始一个由 `'cutlass3x' in kernel_name` 控制的条件分支。
+- **L136** `            # cutlass3x generator only have column-major output` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L137** `            layout_name = self.operation.layout_name_3x()` — **EN:** Assigns a value to layout_name. **CN:** 将一个值赋给 layout_name。
+- **L138** `            if layout_name[-1] == "t":` — **EN:** Starts a conditional branch guarded by `layout_name[-1] == 't'`. **CN:** 开始一个由 `layout_name[-1] == 't'` 控制的条件分支。
+- **L139** `                new_layout_name = "".join(["n" for l in layout_name if l == "t" or "t"])` — **EN:** Assigns a value to new_layout_name. **CN:** 将一个值赋给 new_layout_name。
+- **L140** `                problem_size = GemmCoord(problem_size.n, problem_size.m, problem_size.k)` — **EN:** Assigns a value to problem_size. **CN:** 将一个值赋给 problem_size。
+- **L141** `                kernel_name = kernel_name.replace(layout_name, new_layout_name)` — **EN:** Assigns a value to kernel_name. **CN:** 将一个值赋给 kernel_name。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `        batch_count = self.arguments.batch_count` — **EN:** Assigns a value to batch_count. **CN:** 将一个值赋给 batch_count。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `        cmd = f"{profiler_path} --kernels={kernel_name} --verification-providers={verification_providers} " \` — **EN:** Assigns a value to cmd. **CN:** 将一个值赋给 cmd。
+- **L146** `              f"--providers={provider} --m={problem_size.m()} --n={problem_size.n()} --k={problem_size.k()} " \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `              f"--batch_count={batch_count} --alpha={alpha} --beta={beta} "\` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `              f"--warmup-iterations={self.warmup_iterations} --profiling-iterations={self.iterations}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `        result = subprocess.getoutput(cmd)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `        m = re.search(r"Runtime:\s+(?P<runtime>\d+.\d+)", result)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L153** `        runtime = float(m.group("runtime"))` — **EN:** Assigns a value to runtime. **CN:** 将一个值赋给 runtime。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        m = re.search(r"Bytes:\s+(?P<bytes>\d+)", result)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L156** `        bytes = int(m.group("bytes"))` — **EN:** Assigns a value to bytes. **CN:** 将一个值赋给 bytes。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `        m = re.search(r"FLOPs:\s+(?P<flops>\d+)", result)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L159** `        flops = int(m.group("flops"))` — **EN:** Assigns a value to flops. **CN:** 将一个值赋给 flops。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `        # check if the problem size matches` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L162** `        assert bytes == self.bytes(problem_size, batch_count, beta)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L163** `        assert flops == self.flops(problem_size, batch_count, beta)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `        return runtime` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    def bytes(self, problem_size, batch_count=1, beta=0.0):` — **EN:** Defines function `bytes`. **CN:** 定义函数 `bytes`。
+- **L168** `        m = problem_size.m()` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L169** `        n = problem_size.n()` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L170** `        k = problem_size.k()` — **EN:** Assigns a value to k. **CN:** 将一个值赋给 k。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `        bytes = (` — **EN:** Assigns a value to bytes. **CN:** 将一个值赋给 bytes。
+- **L173** `            (DataTypeSize[self.operation.A.element] * m // 8) * k` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `            + (DataTypeSize[self.operation.B.element] * n // 8) * k` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `            + (DataTypeSize[self.operation.C.element] * m // 8) * n` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `        if beta != 0:` — **EN:** Starts a conditional branch guarded by `beta != 0`. **CN:** 开始一个由 `beta != 0` 控制的条件分支。
+- **L179** `            bytes += (DataTypeSize[self.operation.C.element] * m // 8) * n` — **EN:** Updates bytes in place. **CN:** 原地更新 bytes。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `        bytes *= batch_count` — **EN:** Updates bytes in place. **CN:** 原地更新 bytes。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `        return bytes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `    def flops(self, problem_size, batch_count=1, beta=0.0):` — **EN:** Defines function `flops`. **CN:** 定义函数 `flops`。
+- **L186** `        m = problem_size.m()` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L187** `        n = problem_size.n()` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L188** `        k = problem_size.k()` — **EN:** Assigns a value to k. **CN:** 将一个值赋给 k。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `        flops_ = (m * n * k) * 2 * batch_count` — **EN:** Assigns a value to flops_. **CN:** 将一个值赋给 flops_。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `        if beta != 0:` — **EN:** Starts a conditional branch guarded by `beta != 0`. **CN:** 开始一个由 `beta != 0` 控制的条件分支。
+- **L193** `            flops_ += m * n * batch_count * 2` — **EN:** Updates flops_ in place. **CN:** 原地更新 flops_。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** `        return flops_` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.utils.profiler`. CN: 模块名为 `cutlass_cppgen.utils.profiler`。
+- EN: Module docstring summary: Profiler based on the cuda events CN: 模块文档摘要为：Profiler based on the cuda events
+- EN: Top-level classes: GpuTimer, CUDAEventProfiler CN: 顶层类包括：GpuTimer, CUDAEventProfiler
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen:CUTLASS_PATH, cutlass_cppgen.backend.library:DataTypeSize, cutlass_cppgen.op.op:OperationBase, cutlass_cppgen.shape:GemmCoord, cutlass_cppgen.utils.datatypes:is_numpy_tensor CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen:CUTLASS_PATH, cutlass_cppgen.backend.library:DataTypeSize, cutlass_cppgen.op.op:OperationBase, cutlass_cppgen.shape:GemmCoord, cutlass_cppgen.utils.datatypes:is_numpy_tensor
+- EN: External or standard-library dependencies: re, subprocess, numpy CN: 外部或标准库依赖：re, subprocess, numpy

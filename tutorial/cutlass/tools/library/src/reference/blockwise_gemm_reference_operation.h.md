@@ -1,0 +1,2907 @@
+# blockwise_gemm_reference_operation.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/src/reference/blockwise_gemm_reference_operation.h`
+**Purpose / 用途**: Implements or registers reference blockwise GEMM reference operation functionality used by the CUTLASS library runtime. / 实现或注册 CUTLASS 运行时库使用的参考 分块 GEMM 功能。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>  \brief Defines reference operations for blockwise/groupwise GEMM operation kinds in CUTLASS Library</code>
+  - EN: Comment that documents intent or context: "\brief Defines reference operations for blockwise/groupwise GEMM operation kinds in CUTLASS Library".
+  - CN: 用于说明意图或上下文的注释："\brief Defines reference operations for blockwise/groupwise GEMM operation kinds in CUTLASS Library"。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &lt;iostream&gt;</code>
+  - EN: Includes `iostream` so this file can use standard stream input/output support.
+  - CN: 引入 `iostream`，使当前文件可以使用标准流输入输出支持。
+- **L40** <code>#include &lt;sstream&gt;</code>
+  - EN: Includes `sstream` so this file can use string-based stream utilities.
+  - CN: 引入 `sstream`，使当前文件可以使用基于字符串的流工具。
+- **L41** <code>#include &lt;cstring&gt;</code>
+  - EN: Includes `cstring` so this file can use APIs or definitions from `cstring`.
+  - CN: 引入 `cstring`，使当前文件可以使用来自 `cstring` 的 API 或定义。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L46** <code>#include &quot;cutlass/library/manifest.h&quot;</code>
+  - EN: Includes `cutlass/library/manifest.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/manifest.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L47** <code>#include &quot;cutlass/library/util.h&quot;</code>
+  - EN: Includes `cutlass/library/util.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/util.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L48** <code>#include &quot;cutlass/util/packed_stride.hpp&quot;</code>
+  - EN: Includes `cutlass/util/packed_stride.hpp` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/packed_stride.hpp`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L49** <code>#include &quot;library_internal.h&quot;</code>
+  - EN: Includes `library_internal.h` so this file can use project-specific declarations from `library_internal.h`.
+  - CN: 引入 `library_internal.h`，使当前文件可以使用来自 `library_internal.h` 的项目专用声明。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>#include &quot;cutlass/util/reference/host/gett.hpp&quot;</code>
+  - EN: Includes `cutlass/util/reference/host/gett.hpp` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/reference/host/gett.hpp`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L52** <code>#include &quot;cutlass/detail/blockwise_scale_layout.hpp&quot;</code>
+  - EN: Includes `cutlass/detail/blockwise_scale_layout.hpp` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/detail/blockwise_scale_layout.hpp`，使当前文件可以使用CUTLASS 通用声明。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L57** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L58** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L59** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L60** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L61** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L62** <code>  Provider Provider_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L63** <code>  typename ElementA_, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L64** <code>  typename LayoutA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L65** <code>  typename LayoutSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L66** <code>  typename ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L67** <code>  typename ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L68** <code>  typename LayoutB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L69** <code>  typename LayoutSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L70** <code>  typename ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L71** <code>  typename ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L72** <code>  typename LayoutC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L73** <code>  typename ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L74** <code>  typename ElementAccumulator_ = ElementCompute_,</code>
+  - EN: Assigns or initializes `ElementAccumulator_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator_` 进行赋值或初始化。
+- **L75** <code>  typename ElementD_ = ElementC_,</code>
+  - EN: Assigns or initializes `ElementD_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementD_` 进行赋值或初始化。
+- **L76** <code>  typename ConvertOp_ = NumericConverter&lt;ElementD_, ElementCompute_&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp_` 进行赋值或初始化。
+- **L77** <code>  typename InnerProductOp_ = multiply_add&lt;ElementAccumulator_&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp_` 进行赋值或初始化。
+- **L78** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L79** <code>class BlockwiseGemmReferenceOperation : public Operation {</code>
+  - EN: Begins the declaration of class `BlockwiseGemmReferenceOperation`.
+  - CN: 开始声明 class `BlockwiseGemmReferenceOperation`。
+- **L80** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L81** <code>  static Provider const kProvider = Provider_;</code>
+  - EN: Assigns or initializes `kProvider` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kProvider` 进行赋值或初始化。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>  using ElementA = ElementA_;</code>
+  - EN: Introduces the type or namespace alias `ElementA`.
+  - CN: 引入类型或命名空间别名 `ElementA`。
+- **L84** <code>  using LayoutA = LayoutA_;</code>
+  - EN: Introduces the type or namespace alias `LayoutA`.
+  - CN: 引入类型或命名空间别名 `LayoutA`。
+- **L85** <code>  using ElementSFA = ElementSFA_;</code>
+  - EN: Introduces the type or namespace alias `ElementSFA`.
+  - CN: 引入类型或命名空间别名 `ElementSFA`。
+- **L86** <code>  using ElementB = ElementB_;</code>
+  - EN: Introduces the type or namespace alias `ElementB`.
+  - CN: 引入类型或命名空间别名 `ElementB`。
+- **L87** <code>  using LayoutB = LayoutB_;</code>
+  - EN: Introduces the type or namespace alias `LayoutB`.
+  - CN: 引入类型或命名空间别名 `LayoutB`。
+- **L88** <code>  using ElementSFB = ElementSFB_;</code>
+  - EN: Introduces the type or namespace alias `ElementSFB`.
+  - CN: 引入类型或命名空间别名 `ElementSFB`。
+- **L89** <code>  using ElementC = ElementC_;</code>
+  - EN: Introduces the type or namespace alias `ElementC`.
+  - CN: 引入类型或命名空间别名 `ElementC`。
+- **L90** <code>  using LayoutC = LayoutC_;</code>
+  - EN: Introduces the type or namespace alias `LayoutC`.
+  - CN: 引入类型或命名空间别名 `LayoutC`。
+- **L91** <code>  using ElementD = ElementD_;</code>
+  - EN: Introduces the type or namespace alias `ElementD`.
+  - CN: 引入类型或命名空间别名 `ElementD`。
+- **L92** <code>  using ElementCompute = ElementCompute_;</code>
+  - EN: Introduces the type or namespace alias `ElementCompute`.
+  - CN: 引入类型或命名空间别名 `ElementCompute`。
+- **L93** <code>  using ElementAccumulator = ElementAccumulator_;</code>
+  - EN: Introduces the type or namespace alias `ElementAccumulator`.
+  - CN: 引入类型或命名空间别名 `ElementAccumulator`。
+- **L94** <code>  using ConvertOp = ConvertOp_;</code>
+  - EN: Introduces the type or namespace alias `ConvertOp`.
+  - CN: 引入类型或命名空间别名 `ConvertOp`。
+- **L95** <code>  using InnerProductOp = InnerProductOp_;</code>
+  - EN: Introduces the type or namespace alias `InnerProductOp`.
+  - CN: 引入类型或命名空间别名 `InnerProductOp`。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>protected:</code>
+  - EN: Sets the following members to `protected` visibility.
+  - CN: 将后续成员的可见性设置为 `protected`。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>  /// Storage for the name string</code>
+  - EN: Comment that documents intent or context: "Storage for the name string".
+  - CN: 用于说明意图或上下文的注释："Storage for the name string"。
+- **L100** <code>  std::string name_;</code>
+  - EN: Declares the symbol `name_` in the current scope.
+  - CN: 在当前作用域中声明符号 `name_`。
+- **L101** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L102** <code>  ///</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L103** <code>  BlockwiseGemmDescription description_;</code>
+  - EN: Declares the symbol `description_` in the current scope.
+  - CN: 在当前作用域中声明符号 `description_`。
+- **L104** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L105** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code>  /// Constructor</code>
+  - EN: Comment that documents intent or context: "Constructor".
+  - CN: 用于说明意图或上下文的注释："Constructor"。
+- **L108** <code>  BlockwiseGemmReferenceOperation(int SFMVecSize_, int SFNVecSize_, int SFKVecSize_)</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockwiseGemmReferenceOperation`.
+  - CN: 开始或继续与 `BlockwiseGemmReferenceOperation` 相关的签名/调用语法。
+- **L109** <code>    : SFMVecSize(SFMVecSize_), SFNVecSize(SFNVecSize_), SFKVecSize(SFKVecSize_) {</code>
+  - EN: Begins the definition of function or method `SFKVecSize`.
+  - CN: 开始定义函数或方法 `SFKVecSize`。
+- **L110** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>    // Basic information</code>
+  - EN: Comment that documents intent or context: "Basic information".
+  - CN: 用于说明意图或上下文的注释："Basic information"。
+- **L112** <code>    description_.provider = kProvider;</code>
+  - EN: Assigns or initializes `provider` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `provider` 进行赋值或初始化。
+- **L113** <code>    description_.kind = OperationKind::kBlockwiseGemm;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L114** <code>    description_.gemm_kind = GemmKind::kUniversal;</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>    // Tensor description</code>
+  - EN: Comment that documents intent or context: "Tensor description".
+  - CN: 用于说明意图或上下文的注释："Tensor description"。
+- **L117** <code>    description_.A = make_TensorDescription&lt;ElementA, LayoutA&gt;();</code>
+  - EN: Declares function or method `LayoutA>` without defining it here.
+  - CN: 声明函数或方法 `LayoutA>`，但不在此处给出定义。
+- **L118** <code>    description_.SFA = make_TensorDescription&lt;ElementSFA, LayoutSFA_&gt;();</code>
+  - EN: Declares function or method `LayoutSFA_>` without defining it here.
+  - CN: 声明函数或方法 `LayoutSFA_>`，但不在此处给出定义。
+- **L119** <code>    description_.B = make_TensorDescription&lt;ElementB, LayoutB&gt;();</code>
+  - EN: Declares function or method `LayoutB>` without defining it here.
+  - CN: 声明函数或方法 `LayoutB>`，但不在此处给出定义。
+- **L120** <code>    description_.SFB = make_TensorDescription&lt;ElementSFB, LayoutSFB_&gt;();</code>
+  - EN: Declares function or method `LayoutSFB_>` without defining it here.
+  - CN: 声明函数或方法 `LayoutSFB_>`，但不在此处给出定义。
+- **L121** <code>    description_.C = make_TensorDescription&lt;ElementC, LayoutC&gt;();</code>
+  - EN: Declares function or method `LayoutC>` without defining it here.
+  - CN: 声明函数或方法 `LayoutC>`，但不在此处给出定义。
+- **L122** <code>    description_.D = make_TensorDescription&lt;ElementD, LayoutC&gt;();</code>
+  - EN: Declares function or method `LayoutC>` without defining it here.
+  - CN: 声明函数或方法 `LayoutC>`，但不在此处给出定义。
+- **L123** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>    // Epilogue compute and accumulator type description</code>
+  - EN: Comment that documents intent or context: "Epilogue compute and accumulator type description".
+  - CN: 用于说明意图或上下文的注释："Epilogue compute and accumulator type description"。
+- **L125** <code>    description_.element_epilogue = NumericTypeMap&lt;ElementCompute&gt;::kId;</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L126** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L127** <code>    description_.tile_description.math_instruction.element_accumulator =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>      NumericTypeMap&lt;ElementAccumulator&gt;::kId;</code>
+  - EN: Declares the symbol `kId` in the current scope.
+  - CN: 在当前作用域中声明符号 `kId`。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>    // Compute capability for gemm reference</code>
+  - EN: Comment that documents intent or context: "Compute capability for gemm reference".
+  - CN: 用于说明意图或上下文的注释："Compute capability for gemm reference"。
+- **L131** <code>    description_.tile_description.minimum_compute_capability = </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L132** <code>      (kProvider == Provider::kReferenceDevice ? 50 : 0);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L133** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L134** <code>    description_.tile_description.maximum_compute_capability = 1024;</code>
+  - EN: Assigns or initializes `maximum_compute_capability` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `maximum_compute_capability` 进行赋值或初始化。
+- **L135** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L136** <code>    description_.SFMVecSize = SFMVecSize;</code>
+  - EN: Assigns or initializes `SFMVecSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `SFMVecSize` 进行赋值或初始化。
+- **L137** <code>    description_.SFNVecSize = SFNVecSize;</code>
+  - EN: Assigns or initializes `SFNVecSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `SFNVecSize` 进行赋值或初始化。
+- **L138** <code>    description_.SFKVecSize = SFKVecSize;</code>
+  - EN: Assigns or initializes `SFKVecSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `SFKVecSize` 进行赋值或初始化。
+- **L139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L140** <code>    // Procedural name</code>
+  - EN: Comment that documents intent or context: "Procedural name".
+  - CN: 用于说明意图或上下文的注释："Procedural name"。
+- **L141** <code>    std::stringstream ss;</code>
+  - EN: Declares the symbol `ss` in the current scope.
+  - CN: 在当前作用域中声明符号 `ss`。
+- **L142** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L143** <code>    ss &lt;&lt; &quot;gemm&quot;  </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>      &lt;&lt; &quot;_reference_&quot; &lt;&lt; to_string(description_.provider)</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L145** <code>      &lt;&lt; &quot;_&quot; &lt;&lt; to_string(description_.A.element) &lt;&lt; to_string(description_.A.layout)</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L146** <code>      &lt;&lt; &quot;_&quot; &lt;&lt; to_string(description_.SFA.element) &lt;&lt; SFMVecSize &lt;&lt; &quot;x&quot; &lt;&lt; SFKVecSize &lt;&lt; to_string(description_.SFA.layout)</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L147** <code>      &lt;&lt; &quot;_&quot; &lt;&lt; to_string(description_.B.element) &lt;&lt; to_string(description_.B.layout)</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L148** <code>      &lt;&lt; &quot;_&quot; &lt;&lt; to_string(description_.SFB.element)  &lt;&lt; SFNVecSize &lt;&lt; &quot;x&quot; &lt;&lt; SFKVecSize &lt;&lt; to_string(description_.SFB.layout)</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L149** <code>      &lt;&lt; &quot;_&quot; &lt;&lt; to_string(description_.C.element) &lt;&lt; to_string(description_.C.layout)</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L150** <code>      &lt;&lt; &quot;_&quot; &lt;&lt; to_string(description_.tile_description.math_instruction.element_accumulator);</code>
+  - EN: Declares function or method `to_string` without defining it here.
+  - CN: 声明函数或方法 `to_string`，但不在此处给出定义。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>    name_ = ss.str();</code>
+  - EN: Declares function or method `str` without defining it here.
+  - CN: 声明函数或方法 `str`，但不在此处给出定义。
+- **L153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L154** <code>    description_.name = name_.c_str();</code>
+  - EN: Declares function or method `c_str` without defining it here.
+  - CN: 声明函数或方法 `c_str`，但不在此处给出定义。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>    // Epilogue compute and accumulator type description</code>
+  - EN: Comment that documents intent or context: "Epilogue compute and accumulator type description".
+  - CN: 用于说明意图或上下文的注释："Epilogue compute and accumulator type description"。
+- **L157** <code>    description_.element_epilogue = NumericTypeMap&lt;ElementCompute&gt;::kId;</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L158** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L159** <code>    description_.tile_description.math_instruction.element_accumulator =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L160** <code>      NumericTypeMap&lt;ElementAccumulator&gt;::kId;</code>
+  - EN: Declares the symbol `kId` in the current scope.
+  - CN: 在当前作用域中声明符号 `kId`。
+- **L161** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L163** <code>  /// Returns the description of the GEMM operation</code>
+  - EN: Comment that documents intent or context: "Returns the description of the GEMM operation".
+  - CN: 用于说明意图或上下文的注释："Returns the description of the GEMM operation"。
+- **L164** <code>  virtual OperationDescription const &amp; description() const {</code>
+  - EN: Begins the definition of function or method `description`.
+  - CN: 开始定义函数或方法 `description`。
+- **L165** <code>    return description_;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L166** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L167** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L168** <code>  virtual Status can_implement(</code>
+  - EN: Begins or continues the signature/call syntax involving `can_implement`.
+  - CN: 开始或继续与 `can_implement` 相关的签名/调用语法。
+- **L169** <code>    void const *configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L170** <code>    void const *arguments) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L172** <code>    return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L173** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L174** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L175** <code>  virtual uint64_t get_host_workspace_size(</code>
+  - EN: Begins or continues the signature/call syntax involving `get_host_workspace_size`.
+  - CN: 开始或继续与 `get_host_workspace_size` 相关的签名/调用语法。
+- **L176** <code>    void const *configuration) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L177** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L178** <code>    return sizeof(GemmUniversalConfiguration);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L179** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>  virtual uint64_t get_device_workspace_size(</code>
+  - EN: Begins or continues the signature/call syntax involving `get_device_workspace_size`.
+  - CN: 开始或继续与 `get_device_workspace_size` 相关的签名/调用语法。
+- **L182** <code>    void const *configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L183** <code>    void const *arguments = nullptr) const {</code>
+  - EN: Assigns or initializes `arguments` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `arguments` 进行赋值或初始化。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>    return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L186** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L187** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L188** <code>  virtual Status initialize(</code>
+  - EN: Begins or continues the signature/call syntax involving `initialize`.
+  - CN: 开始或继续与 `initialize` 相关的签名/调用语法。
+- **L189** <code>    void const *configuration,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L190** <code>    void *host_workspace,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L191** <code>    void *device_workspace = nullptr,</code>
+  - EN: Assigns or initializes `device_workspace` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_workspace` 进行赋值或初始化。
+- **L192** <code>    cudaStream_t stream = nullptr) const {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L193** <code>    return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L194** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L195** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L196** <code>  virtual Status run(</code>
+  - EN: Begins or continues the signature/call syntax involving `run`.
+  - CN: 开始或继续与 `run` 相关的签名/调用语法。
+- **L197** <code>    void const *arguments,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L198** <code>    void *host_workspace,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L199** <code>    void *device_workspace = nullptr,</code>
+  - EN: Assigns or initializes `device_workspace` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_workspace` 进行赋值或初始化。
+- **L200** <code>    cudaStream_t stream = nullptr) const {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L201** <code>    using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L202** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L203** <code>    BlockwiseGemmArguments const &amp;args = *static_cast&lt;BlockwiseGemmArguments const *&gt;(arguments);</code>
+  - EN: Assigns or initializes `args` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `args` 进行赋值或初始化。
+- **L204** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L205** <code>    // Construct cute::Tensor A/B/C </code>
+  - EN: Comment that documents intent or context: "Construct cute::Tensor A/B/C".
+  - CN: 用于说明意图或上下文的注释："Construct cute::Tensor A/B/C"。
+- **L206** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L207** <code>    int M = args.problem_size.m();</code>
+  - EN: Declares function or method `m` without defining it here.
+  - CN: 声明函数或方法 `m`，但不在此处给出定义。
+- **L208** <code>    int N = args.problem_size.n();</code>
+  - EN: Declares function or method `n` without defining it here.
+  - CN: 声明函数或方法 `n`，但不在此处给出定义。
+- **L209** <code>    int K = args.problem_size.k();</code>
+  - EN: Declares function or method `k` without defining it here.
+  - CN: 声明函数或方法 `k`，但不在此处给出定义。
+- **L210** <code>    int L = args.batch_count;</code>
+  - EN: Assigns or initializes `L` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `L` 进行赋值或初始化。
+- **L211** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L212** <code>    auto problem_shape_MNKL = cute::make_shape(M, N, K, L);</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L213** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L214** <code>    auto alpha = *(static_cast&lt;ElementCompute const*&gt;(args.alpha));</code>
+  - EN: Assigns or initializes `alpha` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `alpha` 进行赋值或初始化。
+- **L215** <code>    auto beta = *(static_cast&lt;ElementCompute const*&gt;(args.beta));</code>
+  - EN: Assigns or initializes `beta` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta` 进行赋值或初始化。
+- **L216** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L217** <code>    using StrideA = cutlass::gemm::TagToStrideA_t&lt;LayoutA&gt;;</code>
+  - EN: Introduces the type or namespace alias `StrideA`.
+  - CN: 引入类型或命名空间别名 `StrideA`。
+- **L218** <code>    using StrideB = cutlass::gemm::TagToStrideB_t&lt;LayoutB&gt;;</code>
+  - EN: Introduces the type or namespace alias `StrideB`.
+  - CN: 引入类型或命名空间别名 `StrideB`。
+- **L219** <code>    using StrideC = cutlass::gemm::TagToStrideC_t&lt;LayoutC&gt;;</code>
+  - EN: Introduces the type or namespace alias `StrideC`.
+  - CN: 引入类型或命名空间别名 `StrideC`。
+- **L220** <code>    using StrideD = cutlass::gemm::TagToStrideC_t&lt;LayoutC&gt;;</code>
+  - EN: Introduces the type or namespace alias `StrideD`.
+  - CN: 引入类型或命名空间别名 `StrideD`。
+- **L221** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L222** <code>    auto stride_a = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, L));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L223** <code>    auto stride_b = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, L));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L224** <code>    auto stride_c = cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, L));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L225** <code>    auto stride_d = cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, L));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L226** <code>    using BlockwiseConfig = cutlass::detail::RuntimeBlockwiseScaleConfig&lt;&gt;;</code>
+  - EN: Introduces the type or namespace alias `BlockwiseConfig`.
+  - CN: 引入类型或命名空间别名 `BlockwiseConfig`。
+- **L227** <code>    auto A = cute::make_tensor(static_cast&lt;ElementA const*&gt;(args.A),</code>
+  - EN: Begins or continues the signature/call syntax involving `make_tensor`.
+  - CN: 开始或继续与 `make_tensor` 相关的签名/调用语法。
+- **L228** <code>        cute::make_layout(cute::make_shape(M, K, L), stride_a));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L229** <code>    auto SfA = make_tensor(static_cast&lt;ElementSFA const*&gt;(args.SFA), BlockwiseConfig::tile_atom_to_shape_SFA(problem_shape_MNKL, cute::make_tuple(SFMVecSize, SFNVecSize, SFKVecSize)));</code>
+  - EN: Declares function or method `make_tuple` without defining it here.
+  - CN: 声明函数或方法 `make_tuple`，但不在此处给出定义。
+- **L230** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L231** <code>    auto B = cute::make_tensor(static_cast&lt;ElementB const*&gt;(args.B),</code>
+  - EN: Begins or continues the signature/call syntax involving `make_tensor`.
+  - CN: 开始或继续与 `make_tensor` 相关的签名/调用语法。
+- **L232** <code>        cute::make_layout(cute::make_shape(N, K, L), stride_b));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L233** <code>    auto SfB = make_tensor(static_cast&lt;ElementSFB const*&gt;(args.SFB), BlockwiseConfig::tile_atom_to_shape_SFB(problem_shape_MNKL, cute::make_tuple(SFMVecSize, SFNVecSize, SFKVecSize)));</code>
+  - EN: Declares function or method `make_tuple` without defining it here.
+  - CN: 声明函数或方法 `make_tuple`，但不在此处给出定义。
+- **L234** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L235** <code>    auto C = [&amp;]() {</code>
+  - EN: Assigns or initializes `C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `C` 进行赋值或初始化。
+- **L236** <code>      if constexpr (not is_same_v&lt;ElementC, void&gt;) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L237** <code>        return cute::make_tensor(static_cast&lt;ElementC const*&gt;(args.C),</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L238** <code>            cute::make_layout(cute::make_shape(M, N, L), stride_c));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L239** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L240** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L241** <code>        return cute::make_tensor(static_cast&lt;ElementD const*&gt;(nullptr),</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L242** <code>            cute::make_layout(cute::make_shape(M, N, L), stride_c));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L243** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L244** <code>    }();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L245** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L246** <code>    auto D = cute::make_tensor(static_cast&lt;ElementD *&gt;(args.D),</code>
+  - EN: Begins or continues the signature/call syntax involving `make_tensor`.
+  - CN: 开始或继续与 `make_tensor` 相关的签名/调用语法。
+- **L247** <code>        cute::make_layout(cute::make_shape(M, N, L), stride_d));</code>
+  - EN: Declares function or method `make_shape` without defining it here.
+  - CN: 声明函数或方法 `make_shape`，但不在此处给出定义。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>    cutlass::reference::host::GettBlockScalingMainloopParams&lt;ElementAccumulator, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L250** <code>        decltype(A), decltype(SfA), </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L251** <code>        decltype(B), decltype(SfB)&gt; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L252** <code>        mainloop_params{A, SfA, B, SfB};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L253** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L254** <code>    //  W/O SF generation</code>
+  - EN: Comment that documents intent or context: "W/O SF generation".
+  - CN: 用于说明意图或上下文的注释："W/O SF generation"。
+- **L255** <code>    cutlass::reference::host::GettEpilogueParams&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L256** <code>        ElementCompute, ElementAccumulator, ElementAccumulator, ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L257** <code>        decltype(C), decltype(D)&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L258** <code>        epilogue_params{alpha, beta, C, D};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L259** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L260** <code>    cutlass::reference::host::Gemm3x(mainloop_params, epilogue_params);</code>
+  - EN: Declares function or method `Gemm3x` without defining it here.
+  - CN: 声明函数或方法 `Gemm3x`，但不在此处给出定义。
+- **L261** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L262** <code>    return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L263** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L264** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L265** <code>private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L266** <code>  int SFMVecSize;</code>
+  - EN: Declares the symbol `SFMVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFMVecSize`。
+- **L267** <code>  int SFNVecSize;</code>
+  - EN: Declares the symbol `SFNVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFNVecSize`。
+- **L268** <code>  int SFKVecSize;</code>
+  - EN: Declares the symbol `SFKVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFKVecSize`。
+- **L269** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L272** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L273** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L274** <code>  typename ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L275** <code>  typename ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L276** <code>  typename ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L277** <code>  typename ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L278** <code>  typename ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L279** <code>  typename ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L280** <code>  typename ElementAccumulator_ = ElementCompute_,</code>
+  - EN: Assigns or initializes `ElementAccumulator_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator_` 进行赋值或初始化。
+- **L281** <code>  typename ElementD_ = ElementC_,</code>
+  - EN: Assigns or initializes `ElementD_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementD_` 进行赋值或初始化。
+- **L282** <code>  typename ConvertOp_ = NumericConverter&lt;ElementD_, ElementCompute_&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp_` 进行赋值或初始化。
+- **L283** <code>  typename InnerProductOp_ = multiply_add&lt;ElementAccumulator_&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp_` 进行赋值或初始化。
+- **L284** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L285** <code>void make_blockwise_gemm(Manifest &amp;manifest, int SFMVecSize, int SFNVecSize, int SFKVecSize) {</code>
+  - EN: Begins the definition of function or method `make_blockwise_gemm`.
+  - CN: 开始定义函数或方法 `make_blockwise_gemm`。
+- **L286** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L287** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L288** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L289** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L290** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L291** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L292** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L293** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L294** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L295** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L296** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L297** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L298** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L299** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L300** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L301** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L302** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L303** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L306** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L307** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L308** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L309** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L310** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L311** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L312** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L313** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L314** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L315** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L316** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L317** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L318** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L319** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L320** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L321** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L322** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L323** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L324** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L325** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L326** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L327** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L328** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L329** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L330** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L331** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L332** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L333** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L334** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L335** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L336** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L337** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L338** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L339** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L340** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L341** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L342** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L343** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L344** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L345** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L346** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L347** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L348** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L349** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L350** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L351** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L352** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L353** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L354** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L355** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L356** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L357** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L358** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L359** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L360** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L361** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L362** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L365** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L366** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L367** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L368** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L369** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L370** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L371** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L372** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L373** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L374** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L375** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L376** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L377** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L378** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L379** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L380** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L381** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L382** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L383** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L384** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L385** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L386** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L387** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L388** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L389** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L390** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L391** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L392** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L393** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L394** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L395** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L396** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L397** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L398** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L399** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L400** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L401** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L402** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L403** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L404** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L405** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L406** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L407** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L408** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L409** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L410** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L411** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L412** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L413** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L414** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L415** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L416** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L417** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L418** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L419** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L420** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L421** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L422** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L423** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L424** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L425** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L426** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L427** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L428** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L429** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L430** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L431** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L432** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L433** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L434** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L435** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L436** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L437** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L438** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L439** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L440** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L441** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L442** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L443** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L444** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L445** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L446** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L447** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L448** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L449** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L450** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L451** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L452** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L453** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L454** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L455** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L456** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L457** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L458** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L459** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L460** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L461** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L462** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L463** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L464** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L465** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L466** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L467** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L468** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L469** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L470** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L471** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L472** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L473** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L474** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L475** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L476** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L477** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L478** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L479** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L480** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L481** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L482** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L483** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L484** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L485** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L486** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L487** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L488** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L489** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L490** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L491** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L492** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L493** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L494** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L495** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L496** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L497** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L498** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L499** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L500** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L501** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L502** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L503** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L504** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L505** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L506** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L507** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L508** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L509** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L510** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L511** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L512** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L513** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L514** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L515** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L516** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L517** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L518** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L519** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L520** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L521** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L522** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L523** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L524** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L525** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L526** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L527** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L528** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L529** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L530** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L531** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L532** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L533** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L534** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L535** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L536** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L537** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L538** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L539** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L540** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L541** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L542** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L543** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L544** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L545** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L546** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L547** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L548** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L549** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L550** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L551** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L552** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L553** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L554** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L555** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L556** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L557** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L558** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L559** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L560** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L561** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L562** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L563** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L564** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L565** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L566** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L567** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L568** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L569** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L570** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L571** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L572** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L573** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L574** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L575** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L576** <code>  manifest.append(new BlockwiseGemmReferenceOperation&lt;</code>
+  - EN: Begins or continues the signature/call syntax involving `append`.
+  - CN: 开始或继续与 `append` 相关的签名/调用语法。
+- **L577** <code>    Provider::kReferenceHost,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L578** <code>    ElementA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L579** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L580** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L581** <code>    ElementSFA_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L582** <code>    ElementB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L583** <code>    cutlass::layout::RowMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L584** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L585** <code>    ElementSFB_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L586** <code>    ElementC_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L587** <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L588** <code>    ElementCompute_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L589** <code>    ElementAccumulator_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L590** <code>    ElementD_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L591** <code>    ConvertOp_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L592** <code>    InnerProductOp_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L593** <code>  &gt;(SFMVecSize, SFNVecSize, SFKVecSize));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L594** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L595** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L596** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L597** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L598** <code>template&lt;class ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L599** <code>         class ElementD&gt;</code>
+  - EN: Begins the declaration of class `ElementD`.
+  - CN: 开始声明 class `ElementD`。
+- **L600** <code>void initialize_blockwise_gemm_reference_operations_given_C_and_D(Manifest &amp;manifest) {</code>
+  - EN: Begins the definition of function or method `initialize_blockwise_gemm_reference_operations_given_C_and_D`.
+  - CN: 开始定义函数或方法 `initialize_blockwise_gemm_reference_operations_given_C_and_D`。
+- **L601** <code>  // E4M3 FP8 variants</code>
+  - EN: Comment that documents intent or context: "E4M3 FP8 variants".
+  - CN: 用于说明意图或上下文的注释："E4M3 FP8 variants"。
+- **L602** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L603** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L604** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L605** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L606** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L607** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L608** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L609** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L610** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L611** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L612** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L613** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L614** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L615** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L616** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L617** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L618** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L619** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L620** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L621** <code>  &gt;(manifest, 64, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L622** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L623** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L624** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L625** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L626** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L627** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L628** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L629** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L630** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L631** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L632** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L633** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L634** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L635** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L636** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L637** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L638** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L639** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L640** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L641** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L642** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L643** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L644** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L645** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L646** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L647** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L648** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L649** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L650** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L651** <code>  // E5M2 FP8 variants</code>
+  - EN: Comment that documents intent or context: "E5M2 FP8 variants".
+  - CN: 用于说明意图或上下文的注释："E5M2 FP8 variants"。
+- **L652** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L653** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L654** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L655** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L656** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L657** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L658** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L659** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L660** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L661** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L662** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L663** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L664** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L665** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L666** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L667** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L668** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L669** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L670** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L671** <code>  &gt;(manifest, 64, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L672** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L673** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L674** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L675** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L676** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L677** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L678** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L679** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L680** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L681** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L682** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L683** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L684** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L685** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L686** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L687** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L688** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L689** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L690** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L691** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L692** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L693** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L694** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L695** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L696** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L697** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L698** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L699** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L700** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L701** <code>  // Mixed E4M3 x E5M2 variants</code>
+  - EN: Comment that documents intent or context: "Mixed E4M3 x E5M2 variants".
+  - CN: 用于说明意图或上下文的注释："Mixed E4M3 x E5M2 variants"。
+- **L702** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L703** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L704** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L705** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L706** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L707** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L708** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L709** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L710** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L711** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L712** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L713** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L714** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L715** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L716** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L717** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L718** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L719** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L720** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L721** <code>  &gt;(manifest, 64, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L722** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L723** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L724** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L725** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L726** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L727** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L728** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L729** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L730** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L731** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L732** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L733** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L734** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L735** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L736** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L737** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L738** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L739** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L740** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L741** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L742** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L743** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L744** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L745** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L746** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L747** <code>    float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float /*SFA*/, float_e5m2_t /*B*/, float /*SFB*/,"。
+- **L748** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L749** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L750** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L751** <code>  // Mixed E5M2 x E4M3 variants</code>
+  - EN: Comment that documents intent or context: "Mixed E5M2 x E4M3 variants".
+  - CN: 用于说明意图或上下文的注释："Mixed E5M2 x E4M3 variants"。
+- **L752** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L753** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L754** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L755** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L756** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L757** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L758** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L759** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L760** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L761** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L762** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L763** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L764** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L765** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L766** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L767** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L768** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L769** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L770** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L771** <code>  &gt;(manifest, 64, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L772** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L773** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L774** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L775** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L776** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L777** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L778** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L779** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L780** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L781** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L782** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L783** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L784** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L785** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L786** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L787** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L788** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L789** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L790** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L791** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L792** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L793** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L794** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L795** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L796** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L797** <code>    float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e5m2_t /*A*/, float /*SFA*/, float_e4m3_t /*B*/, float /*SFB*/,"。
+- **L798** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L799** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L800** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L801** <code>  // E2M3 FP6 variants</code>
+  - EN: Comment that documents intent or context: "E2M3 FP6 variants".
+  - CN: 用于说明意图或上下文的注释："E2M3 FP6 variants"。
+- **L802** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L803** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L804** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L805** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L806** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L807** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L808** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L809** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L810** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L811** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L812** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L813** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L814** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L815** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L816** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L817** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L818** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L819** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L820** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L821** <code>  &gt;(manifest, 64, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L822** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L823** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L824** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L825** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L826** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L827** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L828** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L829** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L830** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L831** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L832** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L833** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L834** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L835** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L836** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L837** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L838** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L839** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L840** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L841** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L842** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L843** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L844** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L845** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L846** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L847** <code>    float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float /*SFA*/, float_e2m3_t /*B*/, float /*SFB*/,"。
+- **L848** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L849** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L850** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L851** <code>  // E3M2 FP6 variants</code>
+  - EN: Comment that documents intent or context: "E3M2 FP6 variants".
+  - CN: 用于说明意图或上下文的注释："E3M2 FP6 variants"。
+- **L852** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L853** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L854** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L855** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L856** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L857** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L858** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L859** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L860** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L861** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L862** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L863** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L864** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L865** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L866** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L867** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L868** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L869** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L870** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L871** <code>  &gt;(manifest, 64, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L872** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L873** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L874** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L875** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L876** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L877** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L878** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L879** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L880** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L881** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L882** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L883** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L884** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L885** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L886** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L887** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L888** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L889** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L890** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L891** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L892** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L893** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L894** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L895** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L896** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L897** <code>    float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float /*SFA*/, float_e3m2_t /*B*/, float /*SFB*/,"。
+- **L898** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L899** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L900** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L901** <code>  // E2M1 FP4 variants</code>
+  - EN: Comment that documents intent or context: "E2M1 FP4 variants".
+  - CN: 用于说明意图或上下文的注释："E2M1 FP4 variants"。
+- **L902** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L903** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L904** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L905** <code>  &gt;(manifest, 1, 1 , 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L906** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L907** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L908** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L909** <code>  &gt;(manifest, 1, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L910** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L911** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L912** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L913** <code>  &gt;(manifest, 128, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L914** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L915** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L916** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L917** <code>  &gt;(manifest, 128, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L918** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L919** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L920** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L921** <code>  &gt;(manifest, 64, 1, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L922** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L923** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L924** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L925** <code>  &gt;(manifest, 64, 128, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L926** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L927** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L928** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L929** <code>  &gt;(manifest, 128, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L930** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L931** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L932** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L933** <code>  &gt;(manifest, 1, 32, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L934** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L935** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L936** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L937** <code>  &gt;(manifest, 128, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L938** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L939** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L940** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L941** <code>  &gt;(manifest, 1, 64, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L942** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L943** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L944** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L945** <code>  &gt;(manifest, 128, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L946** <code>  make_blockwise_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L947** <code>    float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float /*SFA*/, float_e2m1_t /*B*/, float /*SFB*/,"。
+- **L948** <code>    ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D*/</code>
+  - EN: Comment that documents intent or context: "ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D".
+  - CN: 用于说明意图或上下文的注释："ElementC /*C*/, float /*Compute*/, float /*Accum*/, ElementD /*D"。
+- **L949** <code>  &gt;(manifest, 1, 256, 128);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L950** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L951** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L952** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L953** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L954** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L955** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L956** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L957** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L958** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L959** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L960** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Linear algebra kernels and metadata / 线性代数内核与元数据
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>iostream</code> — standard stream input/output support / 标准流输入输出支持
+- <code>sstream</code> — string-based stream utilities / 基于字符串的流工具
+- <code>cstring</code> — APIs or definitions from `cstring` / 来自 `cstring` 的 API 或定义
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/manifest.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/util.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/util/packed_stride.hpp</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>library_internal.h</code> — project-specific declarations from `library_internal.h` / 来自 `library_internal.h` 的项目专用声明
+- <code>cutlass/util/reference/host/gett.hpp</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/detail/blockwise_scale_layout.hpp</code> — general CUTLASS declarations / CUTLASS 通用声明

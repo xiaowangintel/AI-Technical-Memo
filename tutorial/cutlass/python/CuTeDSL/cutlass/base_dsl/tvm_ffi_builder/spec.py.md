@@ -1,0 +1,547 @@
+# spec.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/tvm_ffi_builder/spec.py`
+
+## Purpose / 作用
+- EN: Kernel specification classes for TVM-FFI function parameters.
+- CN: 该模块的文档字符串将其描述为：Kernel specification classes for TVM-FFI function parameters.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""Kernel specification classes for TVM-FFI function parameters."""` — **EN:** Docstring line documenting the module `module`. **CN:** 文档字符串行，用于说明 module `module`。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from abc import ABC` — **EN:** Imports ABC from `abc`. **CN:** 从 `abc` 导入 ABC。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from collections.abc import Sequence` — **EN:** Imports Sequence from `collections.abc`. **CN:** 从 `collections.abc` 导入 Sequence。
+- **L17** `from typing import Optional, Union` — **EN:** Imports Optional, Union from `typing`. **CN:** 从 `typing` 导入 Optional, Union。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L20** `    import tvm_ffi` — **EN:** Imports tvm_ffi for later use. **CN:** 导入 tvm_ffi 供后续使用。
+- **L21** `except ModuleNotFoundError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L22** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `class DefaultConfig:` — **EN:** Defines class `DefaultConfig`. **CN:** 定义类 `DefaultConfig`。
+- **L26** `    """Default configuration with context manager support."""` — **EN:** Docstring line documenting the class `DefaultConfig`. **CN:** 文档字符串行，用于说明 class `DefaultConfig`。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `    _current: Optional["DefaultConfig"] = None` — **EN:** Assigns a typed value to _current. **CN:** 为 _current 赋予带类型标注的值。
+- **L29** `    _old_current: Optional["DefaultConfig"] = None` — **EN:** Assigns a typed value to _old_current. **CN:** 为 _old_current 赋予带类型标注的值。
+- **L30** `    device_type: str` — **EN:** Assigns a typed value to device_type. **CN:** 为 device_type 赋予带类型标注的值。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `    def __init__(self, *, device_type: Optional[str] = None) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L33** `        """Initialize a default configuration.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L36** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L37** `        device_type : str, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L38** `            The device type (e.g., "cpu", "cuda", "metal"). If None, copies from current config.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L39** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L40** `        if device_type is None:` — **EN:** Starts a conditional branch guarded by `device_type is None`. **CN:** 开始一个由 `device_type is None` 控制的条件分支。
+- **L41** `            device_type = DefaultConfig.current().device_type  # type: ignore[union-attr]` — **EN:** Assigns a value to device_type. **CN:** 将一个值赋给 device_type。
+- **L42** `        self.device_type = device_type` — **EN:** Assigns a value to self.device_type. **CN:** 将一个值赋给 self.device_type。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    def __enter__(self) -> "DefaultConfig":` — **EN:** Defines function `__enter__`. **CN:** 定义函数 `__enter__`。
+- **L45** `        """Enter the context manager."""` — **EN:** Docstring line documenting the function `__enter__`. **CN:** 文档字符串行，用于说明 function `__enter__`。
+- **L46** `        self._old_current = DefaultConfig._current` — **EN:** Assigns a value to self._old_current. **CN:** 将一个值赋给 self._old_current。
+- **L47** `        DefaultConfig._current = self` — **EN:** Assigns a value to DefaultConfig._current. **CN:** 将一个值赋给 DefaultConfig._current。
+- **L48** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    def __exit__(` — **EN:** Defines function `__exit__`. **CN:** 定义函数 `__exit__`。
+- **L51** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `        exc_type: Optional[type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L53** `        exc_val: Optional[BaseException],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L54** `        exc_tb: Optional[object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L56** `        """Exit the context manager."""` — **EN:** Docstring line documenting the function `__exit__`. **CN:** 文档字符串行，用于说明 function `__exit__`。
+- **L57** `        DefaultConfig._current = self._old_current` — **EN:** Assigns a value to DefaultConfig._current. **CN:** 将一个值赋给 DefaultConfig._current。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L60** `    def current(cls) -> Optional["DefaultConfig"]:` — **EN:** Defines function `current`. **CN:** 定义函数 `current`。
+- **L61** `        """Get the current default configuration.` — **EN:** Starts the docstring for the function `current`. **CN:** 开始说明 function `current` 的文档字符串。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `        Returns` — **EN:** Continues the docstring for the function `current`. **CN:** 继续说明 function `current` 的文档字符串。
+- **L64** `        -------` — **EN:** Continues the docstring for the function `current`. **CN:** 继续说明 function `current` 的文档字符串。
+- **L65** `        Optional[DefaultConfig]` — **EN:** Continues the docstring for the function `current`. **CN:** 继续说明 function `current` 的文档字符串。
+- **L66** `            The current default configuration.` — **EN:** Continues the docstring for the function `current`. **CN:** 继续说明 function `current` 的文档字符串。
+- **L67** `        """` — **EN:** Ends the docstring for the function `current`. **CN:** 结束说明 function `current` 的文档字符串。
+- **L68** `        return cls._current` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L71** `    def _set_init_default_config(cls) -> None:` — **EN:** Defines function `_set_init_default_config`. **CN:** 定义函数 `_set_init_default_config`。
+- **L72** `        """Set the initial default configuration."""` — **EN:** Docstring line documenting the function `_set_init_default_config`. **CN:** 文档字符串行，用于说明 function `_set_init_default_config`。
+- **L73** `        current = cls.__new__(cls)` — **EN:** Assigns a value to current. **CN:** 将一个值赋给 current。
+- **L74** `        current.device_type = "cuda"` — **EN:** Assigns a value to current.device_type. **CN:** 将一个值赋给 current.device_type。
+- **L75** `        cls._current = current` — **EN:** Assigns a value to cls._current. **CN:** 将一个值赋给 cls._current。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `# Initialize the default config to cuda` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `DefaultConfig._set_init_default_config()` — **EN:** Invokes `DefaultConfig._set_init_default_config` as a standalone call. **CN:** 以独立语句方式调用 `DefaultConfig._set_init_default_config`。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `class Param(ABC):` — **EN:** Defines class `Param` with bases ABC. **CN:** 定义类 `Param`，其基类为 ABC。
+- **L83** `    """Base class for all parameters."""` — **EN:** Docstring line documenting the class `Param`. **CN:** 文档字符串行，用于说明 class `Param`。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `class Var(Param):` — **EN:** Defines class `Var` with bases Param. **CN:** 定义类 `Var`，其基类为 Param。
+- **L87** `    """variables: pointer, integer, floating-point, boolean, etc.` — **EN:** Starts the docstring for the class `Var`. **CN:** 开始说明 class `Var` 的文档字符串。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    Parameters` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L90** `    ----------` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L91** `    name : str` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L92** `        The parameter name.` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L93** `    dtype : str | tvm_ffi.dtype` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L94** `        The data type of the parameter.` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L95** `    divisibility: Optional[int]` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L96** `        The divisibility of the parameter, by default None.` — **EN:** Continues the docstring for the class `Var`. **CN:** 继续说明 class `Var` 的文档字符串。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    """` — **EN:** Ends the docstring for the class `Var`. **CN:** 结束说明 class `Var` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L101** `    dtype: "tvm_ffi.dtype"` — **EN:** Assigns a typed value to dtype. **CN:** 为 dtype 赋予带类型标注的值。
+- **L102** `    divisibility: Optional[int]` — **EN:** Assigns a typed value to divisibility. **CN:** 为 divisibility 赋予带类型标注的值。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L105** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L106** `        name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L107** `        dtype: Union[str, "tvm_ffi.dtype"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L109** `        divisibility: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L110** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L111** `        """Initialize a Var parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L114** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L115** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L116** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L117** `        dtype : str | tvm_ffi.dtype` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L118** `            The data type of the parameter.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L121** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L122** `        self.dtype = tvm_ffi.dtype(dtype)` — **EN:** Assigns a value to self.dtype. **CN:** 将一个值赋给 self.dtype。
+- **L123** `        self.divisibility = divisibility` — **EN:** Assigns a value to self.divisibility. **CN:** 将一个值赋给 self.divisibility。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `class Shape(Param):` — **EN:** Defines class `Shape` with bases Param. **CN:** 定义类 `Shape`，其基类为 Param。
+- **L127** `    """Shape parameter.` — **EN:** Starts the docstring for the class `Shape`. **CN:** 开始说明 class `Shape` 的文档字符串。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `    Parameters` — **EN:** Continues the docstring for the class `Shape`. **CN:** 继续说明 class `Shape` 的文档字符串。
+- **L130** `    ----------` — **EN:** Continues the docstring for the class `Shape`. **CN:** 继续说明 class `Shape` 的文档字符串。
+- **L131** `    name : str` — **EN:** Continues the docstring for the class `Shape`. **CN:** 继续说明 class `Shape` 的文档字符串。
+- **L132** `        The parameter name.` — **EN:** Continues the docstring for the class `Shape`. **CN:** 继续说明 class `Shape` 的文档字符串。
+- **L133** `    shape: list[int | Var]` — **EN:** Continues the docstring for the class `Shape`. **CN:** 继续说明 class `Shape` 的文档字符串。
+- **L134** `        The shape of the parameter.` — **EN:** Continues the docstring for the class `Shape`. **CN:** 继续说明 class `Shape` 的文档字符串。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    """` — **EN:** Ends the docstring for the class `Shape`. **CN:** 结束说明 class `Shape` 的文档字符串。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L139** `    shape: list[Union[int, Var]]` — **EN:** Assigns a typed value to shape. **CN:** 为 shape 赋予带类型标注的值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L142** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L143** `        name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `        shape: list[Union[int, Var]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L146** `        """Initialize a Shape parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L149** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L150** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L151** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L152** `        shape : list[int | Var]` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L153** `            The shape of the parameter.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        unpack_shape: bool` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L156** `            Whether to unpack the shape into list of arguments when calling` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L157** `            the call provider function.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L158** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L159** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L160** `        self.shape = shape` — **EN:** Assigns a value to self.shape. **CN:** 将一个值赋给 self.shape。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `class Tensor(Param):` — **EN:** Defines class `Tensor` with bases Param. **CN:** 定义类 `Tensor`，其基类为 Param。
+- **L164** `    """Tensor parameter.` — **EN:** Starts the docstring for the class `Tensor`. **CN:** 开始说明 class `Tensor` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    Parameters` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L167** `    ----------` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L168** `    name : str` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L169** `        The parameter name.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L170** `    dtype : str | tvm_ffi.dtype` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L171** `        The data type of the parameter.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L172** `    shape : Sequence[int | Var]` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L173** `        The shape of the parameter.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L174** `    device_type : int` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L175** `        The device type of the parameter.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L176** `    device_id : Var` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L177** `        The device id of the parameter.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L178** `    strides : Optional[Sequence[Var]], optional` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L179** `        The strides of the parameter, by default None.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L180** `    """` — **EN:** Ends the docstring for the class `Tensor`. **CN:** 结束说明 class `Tensor` 的文档字符串。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L183** `    shape: list[Union[int, Var]]` — **EN:** Assigns a typed value to shape. **CN:** 为 shape 赋予带类型标注的值。
+- **L184** `    dtype: "tvm_ffi.dtype"` — **EN:** Assigns a typed value to dtype. **CN:** 为 dtype 赋予带类型标注的值。
+- **L185** `    strides: Optional[list[Var]]` — **EN:** Assigns a typed value to strides. **CN:** 为 strides 赋予带类型标注的值。
+- **L186** `    dlpack_device_type: int` — **EN:** Assigns a typed value to dlpack_device_type. **CN:** 为 dlpack_device_type 赋予带类型标注的值。
+- **L187** `    device_id: Var` — **EN:** Assigns a typed value to device_id. **CN:** 为 device_id 赋予带类型标注的值。
+- **L188** `    map_tensor_dtype_f4x2_to_f4: bool` — **EN:** Assigns a typed value to map_tensor_dtype_f4x2_to_f4. **CN:** 为 map_tensor_dtype_f4x2_to_f4 赋予带类型标注的值。
+- **L189** `    data_alignment: Optional[int]` — **EN:** Assigns a typed value to data_alignment. **CN:** 为 data_alignment 赋予带类型标注的值。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L192** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L193** `        name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `        shape: Sequence[Union[int, Var]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `        dtype: Union[str, "tvm_ffi.dtype"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `        device_type: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `        device_id: Optional[Var] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L199** `        strides: Optional[Sequence[Var]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L200** `        map_tensor_dtype_f4x2_to_f4: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L201** `        data_alignment: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L202** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L203** `        """Initialize a Tensor parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L206** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L207** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L208** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L209** `        device_type : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L210** `            The device type of the parameter.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L211** `        shape : Sequence[int | Var]` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L212** `            The shape of the parameter.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L213** `        dtype : str | tvm_ffi.dtype` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L214** `            The data type of the parameter.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L215** `        strides : Optional[Sequence[Var]], optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L216** `            The strides of the parameter, by default None.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L217** `        map_tensor_dtype_f4x2_to_f4: bool` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L218** `            Whether to map tensor dtype float4x2 to float4 for internal use.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L219** `        data_alignment: Optional[int], optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L220** `            The data alignment of the parameter, by default None.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L221** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L222** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L223** `        self.data = Var(name + ".data", tvm_ffi.dtype("handle"))` — **EN:** Assigns a value to self.data. **CN:** 将一个值赋给 self.data。
+- **L224** `        self.shape: list[Union[int, Var]] = list(shape)` — **EN:** Assigns a typed value to self.shape. **CN:** 为 self.shape 赋予带类型标注的值。
+- **L225** `        self.dtype = tvm_ffi.dtype(dtype)` — **EN:** Assigns a value to self.dtype. **CN:** 将一个值赋给 self.dtype。
+- **L226** `        self.strides: Optional[list[Var]] = (` — **EN:** Assigns a typed value to self.strides. **CN:** 为 self.strides 赋予带类型标注的值。
+- **L227** `            list(strides) if strides is not None else None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `        self.data_alignment = data_alignment` — **EN:** Assigns a value to self.data_alignment. **CN:** 将一个值赋给 self.data_alignment。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `        # Use default device type if none specified` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L232** `        if device_type is None:` — **EN:** Starts a conditional branch guarded by `device_type is None`. **CN:** 开始一个由 `device_type is None` 控制的条件分支。
+- **L233** `            device_type = DefaultConfig.current().device_type  # type: ignore[union-attr]` — **EN:** Assigns a value to device_type. **CN:** 将一个值赋给 device_type。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `        example_device = tvm_ffi.device(device_type, 0)` — **EN:** Assigns a value to example_device. **CN:** 将一个值赋给 example_device。
+- **L236** `        self.dlpack_device_type = example_device.dlpack_device_type()` — **EN:** Assigns a value to self.dlpack_device_type. **CN:** 将一个值赋给 self.dlpack_device_type。
+- **L237** `        self.device_type_name = example_device.type` — **EN:** Assigns a value to self.device_type_name. **CN:** 将一个值赋给 self.device_type_name。
+- **L238** `        if device_id is None:` — **EN:** Starts a conditional branch guarded by `device_id is None`. **CN:** 开始一个由 `device_id is None` 控制的条件分支。
+- **L239** `            self.device_id = Var(name + ".device.index", tvm_ffi.dtype("int32"))` — **EN:** Assigns a value to self.device_id. **CN:** 将一个值赋给 self.device_id。
+- **L240** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L241** `            self.device_id = device_id` — **EN:** Assigns a value to self.device_id. **CN:** 将一个值赋给 self.device_id。
+- **L242** `        self.map_tensor_dtype_f4x2_to_f4 = map_tensor_dtype_f4x2_to_f4` — **EN:** Assigns a value to self.map_tensor_dtype_f4x2_to_f4. **CN:** 将一个值赋给 self.map_tensor_dtype_f4x2_to_f4。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `class Stream(Param):` — **EN:** Defines class `Stream` with bases Param. **CN:** 定义类 `Stream`，其基类为 Param。
+- **L246** `    """Stream parameter."""` — **EN:** Docstring line documenting the class `Stream`. **CN:** 文档字符串行，用于说明 class `Stream`。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L249** `    var: Var` — **EN:** Assigns a typed value to var. **CN:** 为 var 赋予带类型标注的值。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    def __init__(self, name: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L252** `        """Initialize a Stream parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L255** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L256** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L257** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L258** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L259** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L260** `        self.var = Var(name, tvm_ffi.dtype("handle"))` — **EN:** Assigns a value to self.var. **CN:** 将一个值赋给 self.var。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `class EnvStream(Param):` — **EN:** Defines class `EnvStream` with bases Param. **CN:** 定义类 `EnvStream`，其基类为 Param。
+- **L264** `    """EnvStream parameter.` — **EN:** Starts the docstring for the class `EnvStream`. **CN:** 开始说明 class `EnvStream` 的文档字符串。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    Note` — **EN:** Continues the docstring for the class `EnvStream`. **CN:** 继续说明 class `EnvStream` 的文档字符串。
+- **L267** `    ----` — **EN:** Continues the docstring for the class `EnvStream`. **CN:** 继续说明 class `EnvStream` 的文档字符串。
+- **L268** `    This parameter spec indicates that we expect` — **EN:** Continues the docstring for the class `EnvStream`. **CN:** 继续说明 class `EnvStream` 的文档字符串。
+- **L269** `    to call the function with TVMFFIEnvGetStream to get the stream` — **EN:** Continues the docstring for the class `EnvStream`. **CN:** 继续说明 class `EnvStream` 的文档字符串。
+- **L270** `    and it is not part of the FFI function signature.` — **EN:** Continues the docstring for the class `EnvStream`. **CN:** 继续说明 class `EnvStream` 的文档字符串。
+- **L271** `    """` — **EN:** Ends the docstring for the class `EnvStream`. **CN:** 结束说明 class `EnvStream` 的文档字符串。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L274** `    var: Var` — **EN:** Assigns a typed value to var. **CN:** 为 var 赋予带类型标注的值。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `    def __init__(self, name: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L277** `        """Initialize a EnvStream parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L279** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L280** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L281** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L282** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L283** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L284** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L285** `        self.var = Var(name, tvm_ffi.dtype("handle"))` — **EN:** Assigns a value to self.var. **CN:** 将一个值赋给 self.var。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `class DataPointer(Param):` — **EN:** Defines class `DataPointer` with bases Param. **CN:** 定义类 `DataPointer`，其基类为 Param。
+- **L289** `    """Data pointer parameter.` — **EN:** Starts the docstring for the class `DataPointer`. **CN:** 开始说明 class `DataPointer` 的文档字符串。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `    The main difference between DataPointer and Var with handle type` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L292** `    is that DataPointer can contain address space information.` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L293** `    We also allow passing in int as data pointer, so it can` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L294** `    conveniently support torch.Tensor.data_ptr() as input.` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L295** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L296** `    Parameters` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L297** `    ----------` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L298** `    name : str` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L299** `        The parameter name.` — **EN:** Continues the docstring for the class `DataPointer`. **CN:** 继续说明 class `DataPointer` 的文档字符串。
+- **L300** `    """` — **EN:** Ends the docstring for the class `DataPointer`. **CN:** 结束说明 class `DataPointer` 的文档字符串。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L303** `    var: Var` — **EN:** Assigns a typed value to var. **CN:** 为 var 赋予带类型标注的值。
+- **L304** `    address_space: Optional[int]` — **EN:** Assigns a typed value to address_space. **CN:** 为 address_space 赋予带类型标注的值。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `    def __init__(self, name: str, address_space: Optional[int] = None) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L307** `        """Initialize a DataPointer parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L310** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L311** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L312** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L313** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L314** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L315** `        self.var = Var(name, tvm_ffi.dtype("handle"))` — **EN:** Assigns a value to self.var. **CN:** 将一个值赋给 self.var。
+- **L316** `        self.address_space = address_space` — **EN:** Assigns a value to self.address_space. **CN:** 将一个值赋给 self.address_space。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `class ConstNone(Param):` — **EN:** Defines class `ConstNone` with bases Param. **CN:** 定义类 `ConstNone`，其基类为 Param。
+- **L320** `    """ConstNone parameter.` — **EN:** Starts the docstring for the class `ConstNone`. **CN:** 开始说明 class `ConstNone` 的文档字符串。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    Parameters` — **EN:** Continues the docstring for the class `ConstNone`. **CN:** 继续说明 class `ConstNone` 的文档字符串。
+- **L323** `    ----------` — **EN:** Continues the docstring for the class `ConstNone`. **CN:** 继续说明 class `ConstNone` 的文档字符串。
+- **L324** `    name : str` — **EN:** Continues the docstring for the class `ConstNone`. **CN:** 继续说明 class `ConstNone` 的文档字符串。
+- **L325** `        The parameter name.` — **EN:** Continues the docstring for the class `ConstNone`. **CN:** 继续说明 class `ConstNone` 的文档字符串。
+- **L326** `    """` — **EN:** Ends the docstring for the class `ConstNone`. **CN:** 结束说明 class `ConstNone` 的文档字符串。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `    def __init__(self, name: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L331** `        """Initialize a ConstExpr parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L334** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L335** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L336** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L337** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L338** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `class TupleParam(Param):` — **EN:** Defines class `TupleParam` with bases Param. **CN:** 定义类 `TupleParam`，其基类为 Param。
+- **L342** `    """Tuple parameter.` — **EN:** Starts the docstring for the class `TupleParam`. **CN:** 开始说明 class `TupleParam` 的文档字符串。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `    Parameters` — **EN:** Continues the docstring for the class `TupleParam`. **CN:** 继续说明 class `TupleParam` 的文档字符串。
+- **L345** `    ----------` — **EN:** Continues the docstring for the class `TupleParam`. **CN:** 继续说明 class `TupleParam` 的文档字符串。
+- **L346** `    name : str` — **EN:** Continues the docstring for the class `TupleParam`. **CN:** 继续说明 class `TupleParam` 的文档字符串。
+- **L347** `        The parameter name.` — **EN:** Continues the docstring for the class `TupleParam`. **CN:** 继续说明 class `TupleParam` 的文档字符串。
+- **L348** `    """` — **EN:** Ends the docstring for the class `TupleParam`. **CN:** 结束说明 class `TupleParam` 的文档字符串。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `    name: str` — **EN:** Assigns a typed value to name. **CN:** 为 name 赋予带类型标注的值。
+- **L351** `    params: list[Param]` — **EN:** Assigns a typed value to params. **CN:** 为 params 赋予带类型标注的值。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** `    def __init__(self, name: str, params: list[Param]) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L354** `        """Initialize a TupleParam parameter.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L356** `        Parameters` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L357** `        ----------` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L358** `        name : str` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L359** `            The parameter name.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L360** `        params : list[Param]` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L361** `            The parameters of the tuple.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L362** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L363** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L364** `        self.params = params` — **EN:** Assigns a value to self.params. **CN:** 将一个值赋给 self.params。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** `def format_param_type(param: Param) -> str:` — **EN:** Defines function `format_param_type`. **CN:** 定义函数 `format_param_type`。
+- **L368** `    """Format a parameter type as a string, recursively handling nested types.` — **EN:** Starts the docstring for the function `format_param_type`. **CN:** 开始说明 function `format_param_type` 的文档字符串。
+- **L369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L370** `    Parameters` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L371** `    ----------` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L372** `    param : Param` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L373** `        The parameter to format.` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L374** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L375** `    Returns` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L376** `    -------` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L377** `    str` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L378** `        The formatted type string.` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L379** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L380** `    Raises` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L381** `    ------` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L382** `    TypeError` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L383** `        If an unsupported parameter type is encountered.` — **EN:** Continues the docstring for the function `format_param_type`. **CN:** 继续说明 function `format_param_type` 的文档字符串。
+- **L384** `    """` — **EN:** Ends the docstring for the function `format_param_type`. **CN:** 结束说明 function `format_param_type` 的文档字符串。
+- **L385** `    if isinstance(param, Var):` — **EN:** Starts a conditional branch guarded by `isinstance(param, Var)`. **CN:** 开始一个由 `isinstance(param, Var)` 控制的条件分支。
+- **L386** `        return str(param.dtype)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L387** `    elif isinstance(param, Tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L388** `        # Format tensor shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L389** `        shape_strs = []` — **EN:** Assigns a value to shape_strs. **CN:** 将一个值赋给 shape_strs。
+- **L390** `        for dim in param.shape:` — **EN:** Starts a loop assigning items from `param.shape` to `dim`. **CN:** 开始一个循环，将 `param.shape` 的元素赋给 `dim`。
+- **L391** `            if isinstance(dim, Var):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, Var)`. **CN:** 开始一个由 `isinstance(dim, Var)` 控制的条件分支。
+- **L392** `                shape_strs.append(dim.name)` — **EN:** Invokes `shape_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `shape_strs.append`。
+- **L393** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L394** `                shape_strs.append(str(dim))` — **EN:** Invokes `shape_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `shape_strs.append`。
+- **L395** `        shape_str = "[" + ", ".join(shape_strs) + "]"` — **EN:** Assigns a value to shape_str. **CN:** 将一个值赋给 shape_str。
+- **L396** `        return f"Tensor({shape_str}, {param.dtype})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L397** `    elif isinstance(param, Shape):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L398** `        # Format shape parameter` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L399** `        shape_strs = []` — **EN:** Assigns a value to shape_strs. **CN:** 将一个值赋给 shape_strs。
+- **L400** `        for dim in param.shape:` — **EN:** Starts a loop assigning items from `param.shape` to `dim`. **CN:** 开始一个循环，将 `param.shape` 的元素赋给 `dim`。
+- **L401** `            if isinstance(dim, Var):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, Var)`. **CN:** 开始一个由 `isinstance(dim, Var)` 控制的条件分支。
+- **L402** `                shape_strs.append(dim.name)` — **EN:** Invokes `shape_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `shape_strs.append`。
+- **L403** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L404** `                shape_strs.append(str(dim))` — **EN:** Invokes `shape_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `shape_strs.append`。
+- **L405** `        shape_str = "[" + ", ".join(shape_strs) + "]"` — **EN:** Assigns a value to shape_str. **CN:** 将一个值赋给 shape_str。
+- **L406** `        return f"Shape({shape_str})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L407** `    elif isinstance(param, Stream):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L408** `        return "Stream"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L409** `    elif isinstance(param, DataPointer):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L410** `        return "DataPointer"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L411** `    elif isinstance(param, ConstNone):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L412** `        return "None"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L413** `    elif isinstance(param, TupleParam):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L414** `        # Recursively format tuple elements` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L415** `        element_types = [format_param_type(p) for p in param.params]` — **EN:** Assigns a value to element_types. **CN:** 将一个值赋给 element_types。
+- **L416** `        return f"Tuple[{', '.join(element_types)}]"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L417** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L418** `        raise TypeError(f"Unsupported parameter type: {type(param)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `def signature(name: str, params: list[Param]) -> str:` — **EN:** Defines function `signature`. **CN:** 定义函数 `signature`。
+- **L422** `    """Generate a function signature string from name and parameters.` — **EN:** Starts the docstring for the function `signature`. **CN:** 开始说明 function `signature` 的文档字符串。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    Parameters` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L425** `    ----------` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L426** `    name : str` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L427** `        The function name.` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L428** `    params : list[Param]` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L429** `        List of parameter objects (Var or Tensor).` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `    Returns` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L432** `    -------` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L433** `    str` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L434** `        The formatted function signature.` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `    Raises` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L437** `    ------` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L438** `    ValueError` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L439** `        If an unknown parameter type is encountered.` — **EN:** Continues the docstring for the function `signature`. **CN:** 继续说明 function `signature` 的文档字符串。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** `    """` — **EN:** Ends the docstring for the function `signature`. **CN:** 结束说明 function `signature` 的文档字符串。
+- **L442** `    param_strs = []` — **EN:** Assigns a value to param_strs. **CN:** 将一个值赋给 param_strs。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `    for param in params:` — **EN:** Starts a loop assigning items from `params` to `param`. **CN:** 开始一个循环，将 `params` 的元素赋给 `param`。
+- **L445** `        if isinstance(param, EnvStream):` — **EN:** Starts a conditional branch guarded by `isinstance(param, EnvStream)`. **CN:** 开始一个由 `isinstance(param, EnvStream)` 控制的条件分支。
+- **L446** `            # env stream is not part of the FFI function signature` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L447** `            # continue to skip append` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L448** `            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L449** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L450** `        param_type = format_param_type(param)` — **EN:** Assigns a value to param_type. **CN:** 将一个值赋给 param_type。
+- **L451** `        param_str = f"{param.name}: {param_type}"  # type: ignore[attr-defined]` — **EN:** Assigns a value to param_str. **CN:** 将一个值赋给 param_str。
+- **L452** `        param_strs.append(param_str)` — **EN:** Invokes `param_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `param_strs.append`。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `    return f"{name}({', '.join(param_strs)})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `def create_map_tensor_dtype_f4x2_to_f4_spec(f4_tensor_spec: Tensor) -> Tensor:` — **EN:** Defines function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 定义函数 `create_map_tensor_dtype_f4x2_to_f4_spec`。
+- **L458** `    """` — **EN:** Starts the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 开始说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L459** `    Create a new Tensor spec that can be translated to f4 via f4x2->f4 conversion.` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `    Parameters` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L462** `    ----------` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L463** `    f4_tensor_spec : Tensor` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L464** `        The original Tensor spec that declares a f4 tensor.` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L465** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L466** `    Returns` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L467** `    -------` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L468** `    Tensor` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L469** `        The new Tensor spec that can be translated to f4 via f4x2->f4 conversion.` — **EN:** Continues the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 继续说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L470** `    """` — **EN:** Ends the docstring for the function `create_map_tensor_dtype_f4x2_to_f4_spec`. **CN:** 结束说明 function `create_map_tensor_dtype_f4x2_to_f4_spec` 的文档字符串。
+- **L471** `    if f4_tensor_spec.dtype != tvm_ffi.dtype("float4_e2m1fn"):` — **EN:** Starts a conditional branch guarded by `f4_tensor_spec.dtype != tvm_ffi.dtype('float4_e2m1fn')`. **CN:** 开始一个由 `f4_tensor_spec.dtype != tvm_ffi.dtype('float4_e2m1fn')` 控制的条件分支。
+- **L472** `        raise ValueError("f4_tensor_spec must be a float4 tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L474** `    def find_stride_one_index() -> int:` — **EN:** Defines function `find_stride_one_index`. **CN:** 定义函数 `find_stride_one_index`。
+- **L475** `        if f4_tensor_spec.strides is None:` — **EN:** Starts a conditional branch guarded by `f4_tensor_spec.strides is None`. **CN:** 开始一个由 `f4_tensor_spec.strides is None` 控制的条件分支。
+- **L476** `            return len(f4_tensor_spec.shape) - 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L477** `        for i, stride in enumerate(f4_tensor_spec.strides):` — **EN:** Starts a loop assigning items from `enumerate(f4_tensor_spec.strides)` to `(i, stride)`. **CN:** 开始一个循环，将 `enumerate(f4_tensor_spec.strides)` 的元素赋给 `(i, stride)`。
+- **L478** `            if isinstance(stride, int) and stride == 1:` — **EN:** Starts a conditional branch guarded by `isinstance(stride, int) and stride == 1`. **CN:** 开始一个由 `isinstance(stride, int) and stride == 1` 控制的条件分支。
+- **L479** `                return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L480** `        raise ValueError("Cannot find dimension with stride=1")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L481** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L482** `    stride_one_index = find_stride_one_index()` — **EN:** Assigns a value to stride_one_index. **CN:** 将一个值赋给 stride_one_index。
+- **L483** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L484** `    def divisibility_divide_by_2(value: Var) -> Optional[int]:` — **EN:** Defines function `divisibility_divide_by_2`. **CN:** 定义函数 `divisibility_divide_by_2`。
+- **L485** `        if value.divisibility is not None:` — **EN:** Starts a conditional branch guarded by `value.divisibility is not None`. **CN:** 开始一个由 `value.divisibility is not None` 控制的条件分支。
+- **L486** `            if value.divisibility % 2 != 0:` — **EN:** Starts a conditional branch guarded by `value.divisibility % 2 != 0`. **CN:** 开始一个由 `value.divisibility % 2 != 0` 控制的条件分支。
+- **L487** `                raise ValueError(f"Dimension with stride=1 must be divisible by 2")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L488** `            return value.divisibility // 2` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L489** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `    def map_shape(index: int, value: Union[int, Var]) -> Union[int, Var]:` — **EN:** Defines function `map_shape`. **CN:** 定义函数 `map_shape`。
+- **L492** `        if index == stride_one_index:` — **EN:** Starts a conditional branch guarded by `index == stride_one_index`. **CN:** 开始一个由 `index == stride_one_index` 控制的条件分支。
+- **L493** `            if isinstance(value, int):` — **EN:** Starts a conditional branch guarded by `isinstance(value, int)`. **CN:** 开始一个由 `isinstance(value, int)` 控制的条件分支。
+- **L494** `                if value % 2 != 0:` — **EN:** Starts a conditional branch guarded by `value % 2 != 0`. **CN:** 开始一个由 `value % 2 != 0` 控制的条件分支。
+- **L495** `                    raise ValueError(f"Dimension {index} with stride=1 must be even")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L496** `                return value // 2` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L497** `            # create a new var with the same name and dtype` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L498** `            return Var(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L499** `                value.name, value.dtype, divisibility=divisibility_divide_by_2(value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L501** `        return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `    def map_stride(index: int, value: Union[int, Var]) -> Union[int, Var]:` — **EN:** Defines function `map_stride`. **CN:** 定义函数 `map_stride`。
+- **L504** `        if index != stride_one_index:` — **EN:** Starts a conditional branch guarded by `index != stride_one_index`. **CN:** 开始一个由 `index != stride_one_index` 控制的条件分支。
+- **L505** `            if isinstance(value, int):` — **EN:** Starts a conditional branch guarded by `isinstance(value, int)`. **CN:** 开始一个由 `isinstance(value, int)` 控制的条件分支。
+- **L506** `                if value % 2 != 0:` — **EN:** Starts a conditional branch guarded by `value % 2 != 0`. **CN:** 开始一个由 `value % 2 != 0` 控制的条件分支。
+- **L507** `                    raise ValueError(f"Dimension {index} with stride != 1 must be even")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L508** `                return value // 2` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L509** `            # create a new var with the same name and dtype` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L510** `            return Var(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L511** `                value.name, value.dtype, divisibility=divisibility_divide_by_2(value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `        return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `    new_shape = [map_shape(i, x) for i, x in enumerate(f4_tensor_spec.shape)]` — **EN:** Assigns a value to new_shape. **CN:** 将一个值赋给 new_shape。
+- **L516** `    if f4_tensor_spec.strides is not None:` — **EN:** Starts a conditional branch guarded by `f4_tensor_spec.strides is not None`. **CN:** 开始一个由 `f4_tensor_spec.strides is not None` 控制的条件分支。
+- **L517** `        new_strides = [map_stride(i, x) for i, x in enumerate(f4_tensor_spec.strides)]` — **EN:** Assigns a value to new_strides. **CN:** 将一个值赋给 new_strides。
+- **L518** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L519** `        new_strides = None` — **EN:** Assigns a value to new_strides. **CN:** 将一个值赋给 new_strides。
+- **L520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L521** `    return Tensor(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L522** `        f4_tensor_spec.name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `        new_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `        dtype=tvm_ffi.dtype("float4_e2m1fnx2"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `        strides=new_strides,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `        map_tensor_dtype_f4x2_to_f4=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.tvm_ffi_builder.spec`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.tvm_ffi_builder.spec`。
+- EN: Module docstring summary: Kernel specification classes for TVM-FFI function parameters. CN: 模块文档摘要为：Kernel specification classes for TVM-FFI function parameters.
+- EN: Top-level classes: DefaultConfig, Param, Var, Shape, Tensor, Stream, EnvStream, DataPointer, ConstNone, TupleParam CN: 顶层类包括：DefaultConfig, Param, Var, Shape, Tensor, Stream, EnvStream, DataPointer, ConstNone, TupleParam
+- EN: Top-level functions: format_param_type, signature, create_map_tensor_dtype_f4x2_to_f4_spec CN: 顶层函数包括：format_param_type, signature, create_map_tensor_dtype_f4x2_to_f4_spec
+
+## Dependencies / 依赖
+- EN: External or standard-library dependencies: abc:ABC, collections.abc:Sequence, typing:Optional,Union, tvm_ffi CN: 外部或标准库依赖：abc:ABC, collections.abc:Sequence, typing:Optional,Union, tvm_ffi

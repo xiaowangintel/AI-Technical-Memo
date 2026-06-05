@@ -1,0 +1,382 @@
+# datatypes.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/utils/datatypes.py`
+
+## Purpose / 作用
+- EN: Utility functions for converting between frontend datatypes and CUTLASS datatypes
+- CN: 该模块的文档字符串将其描述为：Utility functions for converting between frontend datatypes and CUTLASS datatypes
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utility functions for converting between frontend datatypes and CUTLASS datatypes` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L38** `from cutlass_library import (` — **EN:** Imports DataTypeSize, MathOperation, MathInstruction from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeSize, MathOperation, MathInstruction。
+- **L39** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    MathOperation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    MathInstruction` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `from cutlass_cppgen.backend.library import (` — **EN:** Imports TileDescription from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 TileDescription。
+- **L44** `    TileDescription,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `bfloat16_available = None` — **EN:** Assigns a value to bfloat16_available. **CN:** 将一个值赋给 bfloat16_available。
+- **L48** `cupy_available = None` — **EN:** Assigns a value to cupy_available. **CN:** 将一个值赋给 cupy_available。
+- **L49** `numpy_available = None` — **EN:** Assigns a value to numpy_available. **CN:** 将一个值赋给 numpy_available。
+- **L50** `torch_available = None` — **EN:** Assigns a value to torch_available. **CN:** 将一个值赋给 torch_available。
+- **L51** `_library_to_cupy_dict = None` — **EN:** Assigns a value to _library_to_cupy_dict. **CN:** 将一个值赋给 _library_to_cupy_dict。
+- **L52** `_library_to_numpy_dict = None` — **EN:** Assigns a value to _library_to_numpy_dict. **CN:** 将一个值赋给 _library_to_numpy_dict。
+- **L53** `_library_to_torch_dict = None` — **EN:** Assigns a value to _library_to_torch_dict. **CN:** 将一个值赋给 _library_to_torch_dict。
+- **L54** `_torch_to_library_dict = None` — **EN:** Assigns a value to _torch_to_library_dict. **CN:** 将一个值赋给 _torch_to_library_dict。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `def is_numpy_available():` — **EN:** Defines function `is_numpy_available`. **CN:** 定义函数 `is_numpy_available`。
+- **L58** `    global numpy_available, _library_to_numpy_dict` — **EN:** Declares numpy_available, _library_to_numpy_dict as module-level globals. **CN:** 将 numpy_available, _library_to_numpy_dict 声明为模块级全局变量。
+- **L59** `    if numpy_available is None:` — **EN:** Starts a conditional branch guarded by `numpy_available is None`. **CN:** 开始一个由 `numpy_available is None` 控制的条件分支。
+- **L60** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L61** `            import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `            numpy_available = True` — **EN:** Assigns a value to numpy_available. **CN:** 将一个值赋给 numpy_available。
+- **L64** `            _library_to_numpy_dict = {` — **EN:** Assigns a value to _library_to_numpy_dict. **CN:** 将一个值赋给 _library_to_numpy_dict。
+- **L65** `                cutlass_cppgen.DataType.f16: np.float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `                cutlass_cppgen.DataType.f32: np.float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `                cutlass_cppgen.DataType.f64: np.float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `                cutlass_cppgen.DataType.s8: np.int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `                cutlass_cppgen.DataType.s32: np.int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `        except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L72** `            numpy_available = False` — **EN:** Assigns a value to numpy_available. **CN:** 将一个值赋给 numpy_available。
+- **L73** `            _library_to_numpy_dict = {}` — **EN:** Assigns a value to _library_to_numpy_dict. **CN:** 将一个值赋给 _library_to_numpy_dict。
+- **L74** `    return numpy_available` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `def is_numpy_tensor(inp) -> bool:` — **EN:** Defines function `is_numpy_tensor`. **CN:** 定义函数 `is_numpy_tensor`。
+- **L78** `    if is_numpy_available():` — **EN:** Starts a conditional branch guarded by `is_numpy_available()`. **CN:** 开始一个由 `is_numpy_available()` 控制的条件分支。
+- **L79** `        import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L80** `        return isinstance(inp, np.ndarray)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `def numpy_library_type(inp) -> cutlass_cppgen.DataType:` — **EN:** Defines function `numpy_library_type`. **CN:** 定义函数 `numpy_library_type`。
+- **L85** `    if is_numpy_available():` — **EN:** Starts a conditional branch guarded by `is_numpy_available()`. **CN:** 开始一个由 `is_numpy_available()` 控制的条件分支。
+- **L86** `        import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L87** `        if inp == np.float16:` — **EN:** Starts a conditional branch guarded by `inp == np.float16`. **CN:** 开始一个由 `inp == np.float16` 控制的条件分支。
+- **L88** `            return cutlass_cppgen.DataType.f16` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** `        elif inp == np.float32:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L90** `            return cutlass_cppgen.DataType.f32` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** `        elif inp == np.float64:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L92** `            return cutlass_cppgen.DataType.f64` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** `        elif inp == np.int8:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L94** `            return cutlass_cppgen.DataType.s8` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L95** `        elif inp == np.int32:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L96** `            return cutlass_cppgen.DataType.s32` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `def numpy_type(inp):` — **EN:** Defines function `numpy_type`. **CN:** 定义函数 `numpy_type`。
+- **L101** `    return _library_to_numpy_dict.get(inp, None)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `def is_cupy_available():` — **EN:** Defines function `is_cupy_available`. **CN:** 定义函数 `is_cupy_available`。
+- **L105** `    global cupy_available` — **EN:** Declares cupy_available as module-level globals. **CN:** 将 cupy_available 声明为模块级全局变量。
+- **L106** `    if cupy_available is None:` — **EN:** Starts a conditional branch guarded by `cupy_available is None`. **CN:** 开始一个由 `cupy_available is None` 控制的条件分支。
+- **L107** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L108** `            import cupy as cp` — **EN:** Imports cupy as cp for later use. **CN:** 导入 cupy as cp 供后续使用。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `            cupy_available = True` — **EN:** Assigns a value to cupy_available. **CN:** 将一个值赋给 cupy_available。
+- **L111** `            _library_to_cupy_dict = {` — **EN:** Assigns a value to _library_to_cupy_dict. **CN:** 将一个值赋给 _library_to_cupy_dict。
+- **L112** `                cutlass_cppgen.DataType.f16: cp.float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `                cutlass_cppgen.DataType.f32: cp.float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `                cutlass_cppgen.DataType.f64: cp.float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `                cutlass_cppgen.DataType.s8: cp.int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `                cutlass_cppgen.DataType.s32: cp.int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L119** `            cupy_available = False` — **EN:** Assigns a value to cupy_available. **CN:** 将一个值赋给 cupy_available。
+- **L120** `            _library_to_cupy_dict = {}` — **EN:** Assigns a value to _library_to_cupy_dict. **CN:** 将一个值赋给 _library_to_cupy_dict。
+- **L121** `    return cupy_available` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `def is_cupy_tensor(inp) -> bool:` — **EN:** Defines function `is_cupy_tensor`. **CN:** 定义函数 `is_cupy_tensor`。
+- **L125** `    if is_cupy_available():` — **EN:** Starts a conditional branch guarded by `is_cupy_available()`. **CN:** 开始一个由 `is_cupy_available()` 控制的条件分支。
+- **L126** `        import cupy as cp` — **EN:** Imports cupy as cp for later use. **CN:** 导入 cupy as cp 供后续使用。
+- **L127** `        return isinstance(inp, cp.ndarray)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `def cupy_library_type(inp) -> cutlass_cppgen.DataType:` — **EN:** Defines function `cupy_library_type`. **CN:** 定义函数 `cupy_library_type`。
+- **L132** `    if is_cupy_available():` — **EN:** Starts a conditional branch guarded by `is_cupy_available()`. **CN:** 开始一个由 `is_cupy_available()` 控制的条件分支。
+- **L133** `        import cupy as cp` — **EN:** Imports cupy as cp for later use. **CN:** 导入 cupy as cp 供后续使用。
+- **L134** `        if inp == cp.float16:` — **EN:** Starts a conditional branch guarded by `inp == cp.float16`. **CN:** 开始一个由 `inp == cp.float16` 控制的条件分支。
+- **L135** `            return cutlass_cppgen.DataType.f16` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L136** `        elif inp == cp.float32:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L137** `            return cutlass_cppgen.DataType.f32` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L138** `        elif inp == cp.float64:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L139** `            return cutlass_cppgen.DataType.f64` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `def cupy_type(inp):` — **EN:** Defines function `cupy_type`. **CN:** 定义函数 `cupy_type`。
+- **L144** `    return _library_to_cupy_dict.get(inp, None)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `def is_torch_available():` — **EN:** Defines function `is_torch_available`. **CN:** 定义函数 `is_torch_available`。
+- **L148** `    global torch_available, _library_to_torch_dict, _torch_to_library_dict` — **EN:** Declares torch_available, _library_to_torch_dict, _torch_to_library_dict as module-level globals. **CN:** 将 torch_available, _library_to_torch_dict, _torch_to_library_dict 声明为模块级全局变量。
+- **L149** `    if torch_available is None:` — **EN:** Starts a conditional branch guarded by `torch_available is None`. **CN:** 开始一个由 `torch_available is None` 控制的条件分支。
+- **L150** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L151** `            import torch` — **EN:** Imports torch for later use. **CN:** 导入 torch 供后续使用。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `            torch_available = True` — **EN:** Assigns a value to torch_available. **CN:** 将一个值赋给 torch_available。
+- **L154** `            _torch_to_library_dict = {` — **EN:** Assigns a value to _torch_to_library_dict. **CN:** 将一个值赋给 _torch_to_library_dict。
+- **L155** `                torch.half: cutlass_cppgen.DataType.f16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `                torch.float16: cutlass_cppgen.DataType.f16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `                torch.bfloat16: cutlass_cppgen.DataType.bf16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `                torch.float: cutlass_cppgen.DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `                torch.float32: cutlass_cppgen.DataType.f32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `                torch.double: cutlass_cppgen.DataType.f64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `                torch.float64: cutlass_cppgen.DataType.f64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `                torch.int8: cutlass_cppgen.DataType.s8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `                torch.int32: cutlass_cppgen.DataType.s32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `                torch.uint8: cutlass_cppgen.DataType.u8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `            _library_to_torch_dict = {` — **EN:** Assigns a value to _library_to_torch_dict. **CN:** 将一个值赋给 _library_to_torch_dict。
+- **L168** `                cutlass_cppgen.DataType.f16: torch.half,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `                cutlass_cppgen.DataType.f16: torch.float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `                cutlass_cppgen.DataType.bf16: torch.bfloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `                cutlass_cppgen.DataType.f32: torch.float,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `                cutlass_cppgen.DataType.f32: torch.float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `                cutlass_cppgen.DataType.f64: torch.double,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `                cutlass_cppgen.DataType.f64: torch.float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `                cutlass_cppgen.DataType.s8: torch.int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `                cutlass_cppgen.DataType.s32: torch.int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `                cutlass_cppgen.DataType.u8: torch.uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `            def possibly_add_type(torch_type_name, cutlass_type):` — **EN:** Defines function `possibly_add_type`. **CN:** 定义函数 `possibly_add_type`。
+- **L181** `                # Only try adding the type if the version of torch being used supports it` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L182** `                if hasattr(torch, torch_type_name):` — **EN:** Starts a conditional branch guarded by `hasattr(torch, torch_type_name)`. **CN:** 开始一个由 `hasattr(torch, torch_type_name)` 控制的条件分支。
+- **L183** `                    torch_type = getattr(torch, torch_type_name)` — **EN:** Assigns a value to torch_type. **CN:** 将一个值赋给 torch_type。
+- **L184** `                    _torch_to_library_dict[torch_type] = cutlass_type` — **EN:** Assigns a value to _torch_to_library_dict[torch_type]. **CN:** 将一个值赋给 _torch_to_library_dict[torch_type]。
+- **L185** `                    _library_to_torch_dict[cutlass_type] = torch_type` — **EN:** Assigns a value to _library_to_torch_dict[cutlass_type]. **CN:** 将一个值赋给 _library_to_torch_dict[cutlass_type]。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `            possibly_add_type("float8_e4m3fn", cutlass_cppgen.DataType.e4m3)` — **EN:** Invokes `possibly_add_type` as a standalone call. **CN:** 以独立语句方式调用 `possibly_add_type`。
+- **L188** `            possibly_add_type("float8_e5m2", cutlass_cppgen.DataType.e5m2)` — **EN:** Invokes `possibly_add_type` as a standalone call. **CN:** 以独立语句方式调用 `possibly_add_type`。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `        except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L191** `            torch_available = False` — **EN:** Assigns a value to torch_available. **CN:** 将一个值赋给 torch_available。
+- **L192** `            _torch_to_library_dict = {}` — **EN:** Assigns a value to _torch_to_library_dict. **CN:** 将一个值赋给 _torch_to_library_dict。
+- **L193** `            _library_to_torch_dict = {}` — **EN:** Assigns a value to _library_to_torch_dict. **CN:** 将一个值赋给 _library_to_torch_dict。
+- **L194** `    return torch_available` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `def is_torch_tensor(inp) -> bool:` — **EN:** Defines function `is_torch_tensor`. **CN:** 定义函数 `is_torch_tensor`。
+- **L198** `    if is_torch_available():` — **EN:** Starts a conditional branch guarded by `is_torch_available()`. **CN:** 开始一个由 `is_torch_available()` 控制的条件分支。
+- **L199** `        import torch` — **EN:** Imports torch for later use. **CN:** 导入 torch 供后续使用。
+- **L200** `        return isinstance(inp, torch.Tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L201** `    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `def torch_library_type(inp) -> cutlass_cppgen.DataType:` — **EN:** Defines function `torch_library_type`. **CN:** 定义函数 `torch_library_type`。
+- **L205** `    return _torch_to_library_dict.get(inp, None)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `def torch_type(inp):` — **EN:** Defines function `torch_type`. **CN:** 定义函数 `torch_type`。
+- **L209** `    return _library_to_torch_dict.get(inp, None)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `def is_bfloat16_available():` — **EN:** Defines function `is_bfloat16_available`. **CN:** 定义函数 `is_bfloat16_available`。
+- **L213** `    global bfloat16_available` — **EN:** Declares bfloat16_available as module-level globals. **CN:** 将 bfloat16_available 声明为模块级全局变量。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `    if bfloat16_available is None:` — **EN:** Starts a conditional branch guarded by `bfloat16_available is None`. **CN:** 开始一个由 `bfloat16_available is None` 控制的条件分支。
+- **L216** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L217** `            import bfloat16` — **EN:** Imports bfloat16 for later use. **CN:** 导入 bfloat16 供后续使用。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `            bfloat16_available = True` — **EN:** Assigns a value to bfloat16_available. **CN:** 将一个值赋给 bfloat16_available。
+- **L220** `        except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L221** `            bfloat16_available = False` — **EN:** Assigns a value to bfloat16_available. **CN:** 将一个值赋给 bfloat16_available。
+- **L222** `    return bfloat16_available` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `def bfloat16_library_type(inp) -> cutlass_cppgen.DataType:` — **EN:** Defines function `bfloat16_library_type`. **CN:** 定义函数 `bfloat16_library_type`。
+- **L226** `    if is_bfloat16_available():` — **EN:** Starts a conditional branch guarded by `is_bfloat16_available()`. **CN:** 开始一个由 `is_bfloat16_available()` 控制的条件分支。
+- **L227** `        import bfloat16` — **EN:** Imports bfloat16 for later use. **CN:** 导入 bfloat16 供后续使用。
+- **L228** `        if inp == bfloat16.bfloat16:` — **EN:** Starts a conditional branch guarded by `inp == bfloat16.bfloat16`. **CN:** 开始一个由 `inp == bfloat16.bfloat16` 控制的条件分支。
+- **L229** `            return cutlass_cppgen.DataType.bf16` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `def bfloat16_type(inp):` — **EN:** Defines function `bfloat16_type`. **CN:** 定义函数 `bfloat16_type`。
+- **L233** `    if is_bfloat16_available():` — **EN:** Starts a conditional branch guarded by `is_bfloat16_available()`. **CN:** 开始一个由 `is_bfloat16_available()` 控制的条件分支。
+- **L234** `        import bfloat16` — **EN:** Imports bfloat16 for later use. **CN:** 导入 bfloat16 供后续使用。
+- **L235** `        if inp == cutlass_cppgen.DataType.bf16:` — **EN:** Starts a conditional branch guarded by `inp == cutlass_cppgen.DataType.bf16`. **CN:** 开始一个由 `inp == cutlass_cppgen.DataType.bf16` 控制的条件分支。
+- **L236** `            return bfloat16.bfloat16` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `def library_type(inp):` — **EN:** Defines function `library_type`. **CN:** 定义函数 `library_type`。
+- **L240** `    if inp in DataTypeSize:` — **EN:** Starts a conditional branch guarded by `inp in DataTypeSize`. **CN:** 开始一个由 `inp in DataTypeSize` 控制的条件分支。
+- **L241** `        return inp` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `    for cvt_fn in [` — **EN:** Starts a loop assigning items from `[bfloat16_library_type, cupy_library_type, nump...` to `cvt_fn`. **CN:** 开始一个循环，将 `[bfloat16_library_type, cupy_library_type, nump...` 的元素赋给 `cvt_fn`。
+- **L244** `        bfloat16_library_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L245** `        cupy_library_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L246** `        numpy_library_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L247** `        torch_library_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L248** `    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L249** `        out = cvt_fn(inp)` — **EN:** Assigns a value to out. **CN:** 将一个值赋给 out。
+- **L250** `        if out is not None:` — **EN:** Starts a conditional branch guarded by `out is not None`. **CN:** 开始一个由 `out is not None` 控制的条件分支。
+- **L251** `            return out` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `    raise Exception(f"No available conversion from type {inp} to a library type.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `def _tensor_from_numpy(np_tensor):` — **EN:** Defines function `_tensor_from_numpy`. **CN:** 定义函数 `_tensor_from_numpy`。
+- **L257** `    dtype = library_type(np_tensor.dtype)` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L258** `    if np_tensor.flags.c_contiguous:` — **EN:** Starts a conditional branch guarded by `np_tensor.flags.c_contiguous`. **CN:** 开始一个由 `np_tensor.flags.c_contiguous` 控制的条件分支。
+- **L259** `        layout = cutlass_cppgen.LayoutType.RowMajor` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L260** `    elif np_tensor.flags.f_contiguous:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L261** `        layout = cutlass_cppgen.LayoutType.ColumnMajor` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L262** `    return (dtype, layout)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `def _tensor_from_torch(pt_tensor):` — **EN:** Defines function `_tensor_from_torch`. **CN:** 定义函数 `_tensor_from_torch`。
+- **L266** `    dtype = library_type(pt_tensor.dtype)` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L267** `    return (dtype, cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `def get_datatype_and_layout(tensor):` — **EN:** Defines function `get_datatype_and_layout`. **CN:** 定义函数 `get_datatype_and_layout`。
+- **L271** `    if (is_numpy_tensor(tensor) or is_cupy_tensor(tensor)):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(tensor) or is_cupy_tensor(tensor)`. **CN:** 开始一个由 `is_numpy_tensor(tensor) or is_cupy_tensor(tensor)` 控制的条件分支。
+- **L272** `        return _tensor_from_numpy(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L273** `    elif is_torch_tensor(tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L274** `        return _tensor_from_torch(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L275** `    elif isinstance(tensor, float) or isinstance(tensor, int):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L276** `        return (cutlass_cppgen.DataType.f32, cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L277** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L278** `        raise Exception(f"Unable to convert tensor of type {type(tensor)} to Python-bound CUTLASS datatype and layout.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `def get_tensor_shape(tensor, op="GEMM"):` — **EN:** Defines function `get_tensor_shape`. **CN:** 定义函数 `get_tensor_shape`。
+- **L282** `    if (is_numpy_tensor(tensor) or is_cupy_tensor(tensor)):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(tensor) or is_cupy_tensor(tensor)`. **CN:** 开始一个由 `is_numpy_tensor(tensor) or is_cupy_tensor(tensor)` 控制的条件分支。
+- **L283** `        return tensor.shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L284** `    elif is_torch_tensor(tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L285** `        size = tensor.size()` — **EN:** Assigns a value to size. **CN:** 将一个值赋给 size。
+- **L286** `        if op == "CONV":` — **EN:** Starts a conditional branch guarded by `op == 'CONV'`. **CN:** 开始一个由 `op == 'CONV'` 控制的条件分支。
+- **L287** `            # PyTorch Tensors have shape NCHW` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L288** `            return (size[0], size[2], size[3], size[1])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L289** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L290** `            return tuple(tensor.size())` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L291** `    elif isinstance(tensor, float) or isinstance(tensor, int):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L292** `        return (1,)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L293** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L294** `        raise Exception(f"Unable to convert tensor of type {type(tensor)} to Python-bound CUTLASS datatype and layout.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L295** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `_math_operation_value_map = {x.value: x for x in MathOperation}` — **EN:** Assigns a value to _math_operation_value_map. **CN:** 将一个值赋给 _math_operation_value_map。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `def backend_math_operation(math_op: MathOperation):` — **EN:** Defines function `backend_math_operation`. **CN:** 定义函数 `backend_math_operation`。
+- **L301** `    if math_op.value not in _math_operation_value_map.keys():` — **EN:** Starts a conditional branch guarded by `math_op.value not in _math_operation_value_map.keys()`. **CN:** 开始一个由 `math_op.value not in _math_operation_value_map.keys()` 控制的条件分支。
+- **L302** `        raise Exception(f"Unable to convert math operation of type {math_op} to backend math operation.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L303** `    return _math_operation_value_map[math_op.value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `def construct_backend_td(td: cutlass_cppgen.TileDescription,` — **EN:** Defines function `construct_backend_td`. **CN:** 定义函数 `construct_backend_td`。
+- **L307** `                         kernel_schedule: cutlass_cppgen.KernelScheduleType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `                         epilogue_schedule: cutlass_cppgen.EpilogueScheduleType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `                         tile_scheduler: cutlass_cppgen.TileSchedulerType) -> TileDescription:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `    mi = td.math_instruction` — **EN:** Assigns a value to mi. **CN:** 将一个值赋给 mi。
+- **L311** `    backend_mi = MathInstruction(` — **EN:** Assigns a value to backend_mi. **CN:** 将一个值赋给 backend_mi。
+- **L312** `        mi.instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `        mi.element_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `        mi.element_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `        mi.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `        mi.opcode_class,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `        backend_math_operation(mi.math_operation)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `    cluster_shape = td.cluster_shape if hasattr(td, "cluster_shape") else [1, 1, 1]` — **EN:** Assigns a value to cluster_shape. **CN:** 将一个值赋给 cluster_shape。
+- **L320** `    return TileDescription(td.threadblock_shape, td.stages, td.warp_count,` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L321** `                           backend_mi, cluster_shape, kernel_schedule, epilogue_schedule, tile_scheduler)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L323** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L324** `def td_from_profiler_op(op) -> TileDescription:` — **EN:** Defines function `td_from_profiler_op`. **CN:** 定义函数 `td_from_profiler_op`。
+- **L325** `    """` — **EN:** Starts the docstring for the function `td_from_profiler_op`. **CN:** 开始说明 function `td_from_profiler_op` 的文档字符串。
+- **L326** `    Converts the profiler's TileDescription in \`\`op\`\` into the backend TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_op`. **CN:** 继续说明 function `td_from_profiler_op` 的文档字符串。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `    :param op: profiler Operation` — **EN:** Continues the docstring for the function `td_from_profiler_op`. **CN:** 继续说明 function `td_from_profiler_op` 的文档字符串。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `    :returns: backend TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_op`. **CN:** 继续说明 function `td_from_profiler_op` 的文档字符串。
+- **L331** `    :rtype: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_op`. **CN:** 继续说明 function `td_from_profiler_op` 的文档字符串。
+- **L332** `    """` — **EN:** Ends the docstring for the function `td_from_profiler_op`. **CN:** 结束说明 function `td_from_profiler_op` 的文档字符串。
+- **L333** `    kschedule = op.kernel_schedule if hasattr(op, 'kernel_schedule') else None` — **EN:** Assigns a value to kschedule. **CN:** 将一个值赋给 kschedule。
+- **L334** `    eschedule = op.epilogue_schedule if hasattr(op, 'epilogue_schedule') else None` — **EN:** Assigns a value to eschedule. **CN:** 将一个值赋给 eschedule。
+- **L335** `    tschedule = op.tile_scheduler if hasattr(op, 'tile_scheduler') else None` — **EN:** Assigns a value to tschedule. **CN:** 将一个值赋给 tschedule。
+- **L336** `    return construct_backend_td(op.tile_description, kschedule, eschedule, tschedule)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L339** `def td_from_profiler_td(td: TileDescription) -> TileDescription:` — **EN:** Defines function `td_from_profiler_td`. **CN:** 定义函数 `td_from_profiler_td`。
+- **L340** `    """` — **EN:** Starts the docstring for the function `td_from_profiler_td`. **CN:** 开始说明 function `td_from_profiler_td` 的文档字符串。
+- **L341** `    Converts the profiler's TileDescription into the backend TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_td`. **CN:** 继续说明 function `td_from_profiler_td` 的文档字符串。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `    :param td: profiler TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_td`. **CN:** 继续说明 function `td_from_profiler_td` 的文档字符串。
+- **L344** `    :type td: cutlass_cppgen.TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_td`. **CN:** 继续说明 function `td_from_profiler_td` 的文档字符串。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `    :returns: backend TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_td`. **CN:** 继续说明 function `td_from_profiler_td` 的文档字符串。
+- **L347** `    :rtype: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `td_from_profiler_td`. **CN:** 继续说明 function `td_from_profiler_td` 的文档字符串。
+- **L348** `    """` — **EN:** Ends the docstring for the function `td_from_profiler_td`. **CN:** 结束说明 function `td_from_profiler_td` 的文档字符串。
+- **L349** `    return construct_backend_td(td, kernel_schedule=None, epilogue_schedule=None, tile_scheduler=None)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `def to_camel_case(snake_str):` — **EN:** Defines function `to_camel_case`. **CN:** 定义函数 `to_camel_case`。
+- **L353** `    return "".join(x.capitalize() for x in snake_str.lower().split("_"))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L354** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L356** `def getattr_enum(obj, attr_name):` — **EN:** Defines function `getattr_enum`. **CN:** 定义函数 `getattr_enum`。
+- **L357** `    # The attr_name is under the snake_case` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L358** `    camel_attr = to_camel_case(attr_name)` — **EN:** Assigns a value to camel_attr. **CN:** 将一个值赋给 camel_attr。
+- **L359** `    if hasattr(obj, camel_attr):` — **EN:** Starts a conditional branch guarded by `hasattr(obj, camel_attr)`. **CN:** 开始一个由 `hasattr(obj, camel_attr)` 控制的条件分支。
+- **L360** `        return getattr(obj, camel_attr)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L361** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L362** `        raise Exception(f"Invalid option: {attr_name}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.utils.datatypes`. CN: 模块名为 `cutlass_cppgen.utils.datatypes`。
+- EN: Module docstring summary: Utility functions for converting between frontend datatypes and CUTLASS datatypes CN: 模块文档摘要为：Utility functions for converting between frontend datatypes and CUTLASS datatypes
+- EN: Top-level functions: is_numpy_available, is_numpy_tensor, numpy_library_type, numpy_type, is_cupy_available, is_cupy_tensor, cupy_library_type, cupy_type, is_torch_available, is_torch_tensor, torch_library_type, torch_type, ... (+14 more) CN: 顶层函数包括：is_numpy_available, is_numpy_tensor, numpy_library_type, numpy_type, is_cupy_available, is_cupy_tensor, cupy_library_type, cupy_type, is_torch_available, is_torch_tensor, torch_library_type, torch_type, ... (+14 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen, cutlass_library:DataTypeSize,MathOperation,MathInstruction, cutlass_cppgen.backend.library:TileDescription CN: 内部依赖：cutlass_cppgen, cutlass_library:DataTypeSize,MathOperation,MathInstruction, cutlass_cppgen.backend.library:TileDescription
+- EN: External or standard-library dependencies: numpy, cupy, torch, bfloat16 CN: 外部或标准库依赖：numpy, cupy, torch, bfloat16

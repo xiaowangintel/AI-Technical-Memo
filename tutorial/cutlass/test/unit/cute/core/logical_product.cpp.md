@@ -1,0 +1,682 @@
+# logical_product.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/logical_product.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `logical product` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `logical product` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 35**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 38**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: `template <class LayoutA, class LayoutB>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 40**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 41**: `test_logical_product(LayoutA const& layoutA,`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 42**: `                     LayoutB const& layoutB)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 43**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 44**: `  auto layoutR = logical_product(layoutA, layoutB);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 45**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: `  CUTLASS_TRACE_HOST(shape(layoutA)  << " x " << shape(layoutB)  << "  =>  " << shape(layoutR) );`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 47**: `  CUTLASS_TRACE_HOST(stride(layoutA) << "   " << stride(layoutB) << "  =>  " << stride(layoutR));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `  ASSERT_EQ(rank(layoutR), 2);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 50**: `  ASSERT_TRUE(layoutA == layout<0>(layoutR));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 51**: `  ASSERT_TRUE(compatible(layoutB, layout<1>(layoutR)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 52**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 53**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 54**: `TEST(CuTe_core, Logical_product)`
+  - EN: Declares GoogleTest case `CuTe_core::Logical_product` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Logical_product`，用于验证一个具体的 CuTe 场景。
+- **Line 55**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 56**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 57**: `    auto vec  = Layout<_1,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 58**: `    auto tile = Layout<_1,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 59**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 60**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 61**: `  }`
+  - EN: Closes the scope for `test CuTe_core::Logical_product`.
+  - CN: 结束 `test CuTe_core::Logical_product` 的作用域。
+- **Line 62**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 63**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 64**: `    auto vec  = Layout<_1,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 65**: `    auto tile = Layout<_1,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 66**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 68**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 69**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 71**: `    auto vec  = Layout<_1,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 72**: `    auto tile = Layout<_1,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 73**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 74**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 75**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 76**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 77**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 78**: `    auto vec  = Layout<_1,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 79**: `    auto tile = Layout<_1,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 80**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 81**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 82**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 83**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 84**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 85**: `    auto vec  = Layout<_3,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 86**: `    auto tile = Layout<_4,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 89**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 90**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 91**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 92**: `    auto vec  = Layout<_3,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 93**: `    auto tile = Layout<_4,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 94**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 95**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 96**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 97**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 98**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 99**: `    auto vec  = Layout<_3,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 100**: `    auto tile = Layout<_4,_0>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 101**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 102**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 103**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 104**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 105**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 106**: `    auto vec  = Layout<_3,_2>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 107**: `    auto tile = Layout<_4,_1>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 108**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 109**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 110**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 113**: `    auto vec = make_layout(Shape<_3>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 114**: `    auto tile = make_layout(Shape<_2,_4>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 115**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 116**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 117**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 118**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 119**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 120**: `    auto vec = make_layout(Shape<_2,_4>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 121**: `    auto tile = make_layout(Shape<_3>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 122**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 124**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 125**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 126**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 127**: `    auto vec = make_layout(Shape<_8,Shape<_2,_2>>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 128**: `    auto tile = make_layout(Shape<_4>{}, Stride<_2>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 129**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 130**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 131**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 132**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 133**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 134**: `    auto vec = make_layout(Shape<_2,_2>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 135**: `    auto tile = make_layout(Shape<_3,_3>{}, Stride<_3,_1>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 136**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 137**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 138**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 139**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 140**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 141**: `    auto vec = make_layout(Shape<_3>{}, Stride<_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 142**: `    auto tile = make_layout(Shape<_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 143**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 144**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 145**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 146**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 147**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 148**: `    auto vec = make_layout(Shape<_3>{}, Stride<_2>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 149**: `    auto tile = make_layout(Shape<_4>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 150**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 151**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 152**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 153**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 154**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 155**: `    auto vec = make_layout(Shape<_3>{}, Stride<_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 156**: `    auto tile = make_layout(Shape<_128>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 157**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 158**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 159**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 160**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 161**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 162**: `    auto vec = make_layout(Shape<_3>{}, Stride<_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 163**: `    auto tile = make_layout(Shape<_8,_8>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 166**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 167**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 168**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 169**: `    auto vec = make_layout(Shape<_3>{}, Stride<_32>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 170**: `    auto tile = make_layout(Shape<_8,_8>{}, Stride<_8,_1>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 171**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 172**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 173**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 174**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 175**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 176**: `    auto vec = make_layout(Shape<Shape<_4,_2>>{}, Stride<Stride<_1,_16>>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 177**: `    auto tile = make_layout(Shape<_4,_4>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 178**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 179**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 180**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 181**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 182**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 183**: `    auto vec = make_layout(Shape<Shape<_4,_2>>{}, Stride<Stride<_1,_16>>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 184**: `    auto tile = make_layout(Shape<_4,_2>{}, Stride<_2,_1>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 185**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 186**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 187**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 188**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 189**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 190**: `    auto vec = make_layout(Shape<Shape<_2,_2>,Shape<_2, _2>>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 191**: `                           Stride<Stride<_1,_4>,Stride<_8,_32>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 192**: `    auto tile = make_layout(Shape<_2,_2>{}, Stride<_1,_2>{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 193**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 194**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 195**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 196**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 197**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 198**: `    auto vec = make_layout(Shape<Shape<_2,_2>,Shape<_2, _2>>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 199**: `                           Stride<Stride<_1,_4>,Stride<_8,_32>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 200**: `    auto tile = make_layout(Shape<_2,_2>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 201**: `                            Stride<_2,_1>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 202**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 203**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 204**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 205**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 206**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 207**: `    auto vec = make_layout(Shape <Shape <_4,_6>>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 208**: `                           Stride<Stride<_1,_6>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 209**: `    auto tile = make_layout(Shape <_3>{},`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 210**: `                            Stride<_1>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 211**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 212**: `    test_logical_product(vec, tile);`
+  - EN: Builds a product structure from multiple logical mode spaces.
+  - CN: 从多个逻辑模式空间构造乘积结构。
+- **Line 213**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 214**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `ASSERT_`
+  - EN: Uses a stronger assertion that aborts the current test when a prerequisite fails.
+  - CN: 使用更强的断言；当前置条件失败时会立即中止当前测试。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `logical_product(`
+  - EN: Builds a product layout that combines multiple mode spaces.
+  - CN: 构造乘积布局，以组合多个模式空间。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。

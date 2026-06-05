@@ -1,0 +1,487 @@
+# distribution.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/distribution.h`
+**Purpose / 用途**: Declares data-distribution helpers used to initialize tensors for tests and examples. / 声明用于初始化测试和示例张量的数据分布辅助工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L32** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L33** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L34** <code>    \brief This header contains a class to parametrize a statistical distribution function.</code>
+  - EN: Comment that documents intent or context: "\brief This header contains a class to parametrize a statistical distribution function.".
+  - CN: 用于说明意图或上下文的注释："\brief This header contains a class to parametrize a statistical distribution function."。
+- **L35** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &lt;ostream&gt;</code>
+  - EN: Includes `ostream` so this file can use output stream support.
+  - CN: 引入 `ostream`，使当前文件可以使用输出流支持。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>/// Distribution type</code>
+  - EN: Comment that documents intent or context: "Distribution type".
+  - CN: 用于说明意图或上下文的注释："Distribution type"。
+- **L44** <code>struct Distribution {</code>
+  - EN: Begins the declaration of struct `Distribution`.
+  - CN: 开始声明 struct `Distribution`。
+- **L45** <code>  /// Variant types</code>
+  - EN: Comment that documents intent or context: "Variant types".
+  - CN: 用于说明意图或上下文的注释："Variant types"。
+- **L46** <code>  enum Kind { Invalid, Uniform, Gaussian, Identity, Sequential, AllZeros, AllOnes };</code>
+  - EN: Begins the declaration of enum `Kind`.
+  - CN: 开始声明 enum `Kind`。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>  /// Distribution state</code>
+  - EN: Comment that documents intent or context: "Distribution state".
+  - CN: 用于说明意图或上下文的注释："Distribution state"。
+- **L49** <code>  union {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L50** <code>    /// Uniform distribution</code>
+  - EN: Comment that documents intent or context: "Uniform distribution".
+  - CN: 用于说明意图或上下文的注释："Uniform distribution"。
+- **L51** <code>    struct {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L52** <code>      double min;</code>
+  - EN: Declares the symbol `min` in the current scope.
+  - CN: 在当前作用域中声明符号 `min`。
+- **L53** <code>      double max;</code>
+  - EN: Declares the symbol `max` in the current scope.
+  - CN: 在当前作用域中声明符号 `max`。
+- **L54** <code>      // Percent elements set to NaN</code>
+  - EN: Comment that documents intent or context: "Percent elements set to NaN".
+  - CN: 用于说明意图或上下文的注释："Percent elements set to NaN"。
+- **L55** <code>      double pnan;</code>
+  - EN: Declares the symbol `pnan` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnan`。
+- **L56** <code>    } uniform;</code>
+  - EN: Declares the symbol `uniform` in the current scope.
+  - CN: 在当前作用域中声明符号 `uniform`。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>    /// Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Gaussian distribution"。
+- **L59** <code>    struct {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L60** <code>      double mean;</code>
+  - EN: Declares the symbol `mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `mean`。
+- **L61** <code>      double stddev;</code>
+  - EN: Declares the symbol `stddev` in the current scope.
+  - CN: 在当前作用域中声明符号 `stddev`。
+- **L62** <code>      double pnz;</code>
+  - EN: Declares the symbol `pnz` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnz`。
+- **L63** <code>      double pnzA;</code>
+  - EN: Declares the symbol `pnzA` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnzA`。
+- **L64** <code>      double pnzB;</code>
+  - EN: Declares the symbol `pnzB` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnzB`。
+- **L65** <code>      double pnzC;</code>
+  - EN: Declares the symbol `pnzC` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnzC`。
+- **L66** <code>    } gaussian;</code>
+  - EN: Declares the symbol `gaussian` in the current scope.
+  - CN: 在当前作用域中声明符号 `gaussian`。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>    /// Elements are linear combination of row and column index</code>
+  - EN: Comment that documents intent or context: "Elements are linear combination of row and column index".
+  - CN: 用于说明意图或上下文的注释："Elements are linear combination of row and column index"。
+- **L69** <code>    struct {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L70** <code>      double start;</code>
+  - EN: Declares the symbol `start` in the current scope.
+  - CN: 在当前作用域中声明符号 `start`。
+- **L71** <code>      double delta;</code>
+  - EN: Declares the symbol `delta` in the current scope.
+  - CN: 在当前作用域中声明符号 `delta`。
+- **L72** <code>    } sequential;</code>
+  - EN: Declares the symbol `sequential` in the current scope.
+  - CN: 在当前作用域中声明符号 `sequential`。
+- **L73** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>  /// Active variant kind</code>
+  - EN: Comment that documents intent or context: "Active variant kind".
+  - CN: 用于说明意图或上下文的注释："Active variant kind"。
+- **L76** <code>  Kind kind;</code>
+  - EN: Declares the symbol `kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `kind`。
+- **L77** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L78** <code>  /// Random values are cast to integer after scaling by this power of two</code>
+  - EN: Comment that documents intent or context: "Random values are cast to integer after scaling by this power of two".
+  - CN: 用于说明意图或上下文的注释："Random values are cast to integer after scaling by this power of two"。
+- **L79** <code>  int int_scale;</code>
+  - EN: Declares the symbol `int_scale` in the current scope.
+  - CN: 在当前作用域中声明符号 `int_scale`。
+- **L80** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L81** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L82** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L83** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L84** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L85** <code>  Distribution() : kind(Invalid), int_scale(0) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `int_scale`.
+  - CN: 开始或继续与 `int_scale` 相关的签名/调用语法。
+- **L86** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L87** <code>/// Configures distribution as uniform random</code>
+  - EN: Comment that documents intent or context: "Configures distribution as uniform random".
+  - CN: 用于说明意图或上下文的注释："Configures distribution as uniform random"。
+- **L88** <code>  Distribution &amp;set_uniform(double _min, double _max, int _int_scale = 0, double _pnan = 0) {</code>
+  - EN: Begins the definition of function or method `set_uniform`.
+  - CN: 开始定义函数或方法 `set_uniform`。
+- **L89** <code>    kind = Uniform;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L90** <code>    uniform.min = _min;</code>
+  - EN: Assigns or initializes `min` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `min` 进行赋值或初始化。
+- **L91** <code>    uniform.max = _max;</code>
+  - EN: Assigns or initializes `max` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max` 进行赋值或初始化。
+- **L92** <code>    int_scale = _int_scale;</code>
+  - EN: Assigns or initializes `int_scale` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale` 进行赋值或初始化。
+- **L93** <code>    uniform.pnan = _pnan;</code>
+  - EN: Assigns or initializes `pnan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnan` 进行赋值或初始化。
+- **L94** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L95** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>  /// Configures distribution as Gaussian distribution</code>
+  - EN: Comment that documents intent or context: "Configures distribution as Gaussian distribution".
+  - CN: 用于说明意图或上下文的注释："Configures distribution as Gaussian distribution"。
+- **L98** <code>  Distribution &amp;set_gaussian(double _mean, double _stddev, int _int_scale = 0, double _pnz = 1.0) {</code>
+  - EN: Begins the definition of function or method `set_gaussian`.
+  - CN: 开始定义函数或方法 `set_gaussian`。
+- **L99** <code>    kind = Gaussian;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L100** <code>    gaussian.mean = _mean;</code>
+  - EN: Assigns or initializes `mean` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `mean` 进行赋值或初始化。
+- **L101** <code>    gaussian.stddev = _stddev;</code>
+  - EN: Assigns or initializes `stddev` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stddev` 进行赋值或初始化。
+- **L102** <code>    gaussian.pnz = _pnz;</code>
+  - EN: Assigns or initializes `pnz` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnz` 进行赋值或初始化。
+- **L103** <code>    gaussian.pnzA = _pnz;</code>
+  - EN: Assigns or initializes `pnzA` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnzA` 进行赋值或初始化。
+- **L104** <code>    gaussian.pnzB = _pnz;</code>
+  - EN: Assigns or initializes `pnzB` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnzB` 进行赋值或初始化。
+- **L105** <code>    gaussian.pnzC = _pnz;</code>
+  - EN: Assigns or initializes `pnzC` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pnzC` 进行赋值或初始化。
+- **L106** <code>    int_scale = _int_scale;</code>
+  - EN: Assigns or initializes `int_scale` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale` 进行赋值或初始化。
+- **L107** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L108** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>  /// Sets identity</code>
+  - EN: Comment that documents intent or context: "Sets identity".
+  - CN: 用于说明意图或上下文的注释："Sets identity"。
+- **L111** <code>  Distribution &amp;set_identity() {</code>
+  - EN: Begins the definition of function or method `set_identity`.
+  - CN: 开始定义函数或方法 `set_identity`。
+- **L112** <code>    kind = Identity;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L113** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L114** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>  /// Sets sequential</code>
+  - EN: Comment that documents intent or context: "Sets sequential".
+  - CN: 用于说明意图或上下文的注释："Sets sequential"。
+- **L117** <code>  Distribution &amp;set_sequential(double start, double delta, int _int_scale = 0) {</code>
+  - EN: Begins the definition of function or method `set_sequential`.
+  - CN: 开始定义函数或方法 `set_sequential`。
+- **L118** <code>    kind = Sequential;</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L119** <code>    sequential.start = start;</code>
+  - EN: Assigns or initializes `start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `start` 进行赋值或初始化。
+- **L120** <code>    sequential.delta = delta;</code>
+  - EN: Assigns or initializes `delta` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `delta` 进行赋值或初始化。
+- **L121** <code>    int_scale = _int_scale;</code>
+  - EN: Assigns or initializes `int_scale` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `int_scale` 进行赋值或初始化。
+- **L122** <code>    return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L123** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L124** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L125** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L126** <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>/// Prints a Distribution to ostream</code>
+  - EN: Comment that documents intent or context: "Prints a Distribution to ostream".
+  - CN: 用于说明意图或上下文的注释："Prints a Distribution to ostream"。
+- **L131** <code>inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, cutlass::Distribution const &amp;dist) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L132** <code>  switch (dist.kind) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L133** <code>    case cutlass::Distribution::Uniform:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L134** <code>      out &lt;&lt; &quot;uniform, min: &quot; &lt;&lt; dist.uniform.min &lt;&lt; &quot;, max: &quot; &lt;&lt; dist.uniform.max</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L135** <code>          &lt;&lt; &quot;, pnan: &quot; &lt;&lt; dist.uniform.pnan;</code>
+  - EN: Declares the symbol `pnan` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnan`。
+- **L136** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L137** <code>    case cutlass::Distribution::Gaussian:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L138** <code>      out &lt;&lt; &quot;gaussian, mean: &quot; &lt;&lt; dist.gaussian.mean &lt;&lt; &quot;, stddev: &quot; &lt;&lt; dist.gaussian.stddev</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L139** <code>          &lt;&lt; &quot;, pnzA: &quot; &lt;&lt; dist.gaussian.pnzA &lt;&lt; &quot;, pnzB: &quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L140** <code>          &lt;&lt; dist.gaussian.pnzB &lt;&lt; &quot;, pnzC: &quot; &lt;&lt; dist.gaussian.pnzC;</code>
+  - EN: Declares the symbol `pnzC` in the current scope.
+  - CN: 在当前作用域中声明符号 `pnzC`。
+- **L141** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L142** <code>    case cutlass::Distribution::Identity:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L143** <code>      out &lt;&lt; &quot;identity&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L145** <code>    case cutlass::Distribution::Sequential:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L146** <code>      out &lt;&lt; &quot;sequential&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L147** <code>      break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L148** <code>    default:</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L149** <code>      out &lt;&lt; &quot;unknown&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L150** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>  out &lt;&lt; &quot;, int_scale: &quot; &lt;&lt; dist.int_scale;</code>
+  - EN: Declares the symbol `int_scale` in the current scope.
+  - CN: 在当前作用域中声明符号 `int_scale`。
+- **L153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L154** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L155** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L156** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L157** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>ostream</code> — output stream support / 输出流支持

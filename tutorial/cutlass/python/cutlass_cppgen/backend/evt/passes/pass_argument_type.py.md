@@ -1,0 +1,139 @@
+# pass_argument_type.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/passes/pass_argument_type.py`
+
+## Purpose / 作用
+- EN: Construct the epilogue visitor argument type
+- CN: 该模块的文档字符串将其描述为：Construct the epilogue visitor argument type
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Construct the epilogue visitor argument type` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_cppgen.backend.c_types import visitor_factory` — **EN:** Imports visitor_factory from `cutlass_cppgen.backend.c_types`. **CN:** 从 `cutlass_cppgen.backend.c_types` 导入 visitor_factory。
+- **L38** `from cutlass_cppgen.backend.evt.ir import TopoVisitorNode` — **EN:** Imports TopoVisitorNode from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 TopoVisitorNode。
+- **L39** `from cutlass_cppgen.backend.evt.passes.pass_dag_2_tree import PassDAG2Tree` — **EN:** Imports PassDAG2Tree from `cutlass_cppgen.backend.evt.passes.pass_dag_2_tree`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_dag_2_tree` 导入 PassDAG2Tree。
+- **L40** `from cutlass_cppgen.backend.evt.passes.pass_get_impl import PassGetImpl` — **EN:** Imports PassGetImpl from `cutlass_cppgen.backend.evt.passes.pass_get_impl`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_get_impl` 导入 PassGetImpl。
+- **L41** `from cutlass_cppgen.backend.evt.passes.pass_manager import EVTPassBase` — **EN:** Imports EVTPassBase from `cutlass_cppgen.backend.evt.passes.pass_manager`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_manager` 导入 EVTPassBase。
+- **L42** `from cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation import PassShapeTypePropagation` — **EN:** Imports PassShapeTypePropagation from `cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation` 导入 PassShapeTypePropagation。
+- **L43** `from cutlass_cppgen.backend.evt.passes.util import cc_map` — **EN:** Imports cc_map from `cutlass_cppgen.backend.evt.passes.util`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.util` 导入 cc_map。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `class PassGetArgumentType(EVTPassBase):` — **EN:** Defines class `PassGetArgumentType` with bases EVTPassBase. **CN:** 定义类 `PassGetArgumentType`，其基类为 EVTPassBase。
+- **L47** `    """` — **EN:** Starts the docstring for the class `PassGetArgumentType`. **CN:** 开始说明 class `PassGetArgumentType` 的文档字符串。
+- **L48** `    Construct the epilogue visitor argument type` — **EN:** Continues the docstring for the class `PassGetArgumentType`. **CN:** 继续说明 class `PassGetArgumentType` 的文档字符串。
+- **L49** `    """` — **EN:** Ends the docstring for the class `PassGetArgumentType`. **CN:** 结束说明 class `PassGetArgumentType` 的文档字符串。
+- **L50** `    dependencies = [` — **EN:** Assigns a value to dependencies. **CN:** 将一个值赋给 dependencies。
+- **L51** `        PassShapeTypePropagation,     # The Layout of all nodes must be set` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `        PassDAG2Tree,                 # The type of each node must be set` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `        PassGetImpl                   # The DAG subgraphs must be set` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `    def requires(self) -> None:` — **EN:** Defines function `requires`. **CN:** 定义函数 `requires`。
+- **L57** `        # Check "D" is in the node list` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L58** `        if cc_map[self.cc] in [90, 100] and (not self.dag_ir.has_node("D")):` — **EN:** Starts a conditional branch guarded by `cc_map[self.cc] in [90, 100] and (not self.dag_ir.has_nod...`. **CN:** 开始一个由 `cc_map[self.cc] in [90, 100] and (not self.dag_ir.has_nod...` 控制的条件分支。
+- **L59** `            raise SyntaxError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L60** `                "Sm90+ EVT requires the epilogue to have a returned tensor D, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `                "but the variable 'D' is not found in the return values.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    def call(self):` — **EN:** Defines function `call`. **CN:** 定义函数 `call`。
+- **L64** `        nodes = self.dag_ir.nodes_topological_order()` — **EN:** Assigns a value to nodes. **CN:** 将一个值赋给 nodes。
+- **L65** `        self.argument_types = {}` — **EN:** Assigns a value to self.argument_types. **CN:** 将一个值赋给 self.argument_types。
+- **L66** `        for node in nodes:` — **EN:** Starts a loop assigning items from `nodes` to `node`. **CN:** 开始一个循环，将 `nodes` 的元素赋给 `node`。
+- **L67** `            meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L68** `            if not meta.disabled:` — **EN:** Starts a conditional branch guarded by `not meta.disabled`. **CN:** 开始一个由 `not meta.disabled` 控制的条件分支。
+- **L69** `                self.argument_types[node] = meta.underlying_impl.argument_type` — **EN:** Assigns a value to self.argument_types[node]. **CN:** 将一个值赋给 self.argument_types[node]。
+- **L70** `            if node == "D" and cc_map[self.cc] in [90, 100]:` — **EN:** Starts a conditional branch guarded by `node == 'D' and cc_map[self.cc] in [90, 100]`. **CN:** 开始一个由 `node == 'D' and cc_map[self.cc] in [90, 100]` 控制的条件分支。
+- **L71** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L72** `            if isinstance(meta, TopoVisitorNode):` — **EN:** Starts a conditional branch guarded by `isinstance(meta, TopoVisitorNode)`. **CN:** 开始一个由 `isinstance(meta, TopoVisitorNode)` 控制的条件分支。
+- **L73** `                self.get_dag_argument_type(node)` — **EN:** Invokes `self.get_dag_argument_type` as a standalone call. **CN:** 以独立语句方式调用 `self.get_dag_argument_type`。
+- **L74** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L75** `                self.get_evt_argument_type(node)` — **EN:** Invokes `self.get_evt_argument_type` as a standalone call. **CN:** 以独立语句方式调用 `self.get_evt_argument_type`。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `        self.cc_specific_method(self.set_argument_type)()` — **EN:** Invokes `self.cc_specific_method(self.set_argument_type)` as a standalone call. **CN:** 以独立语句方式调用 `self.cc_specific_method(self.set_argument_type)`。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    def get_evt_argument_type(self, node):` — **EN:** Defines function `get_evt_argument_type`. **CN:** 定义函数 `get_evt_argument_type`。
+- **L80** `        # Sort the input nodes by edge weight` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L81** `        input_types = [self.argument_types[child] for child in self.dag_ir.get_all_inputs(node)]` — **EN:** Assigns a value to input_types. **CN:** 将一个值赋给 input_types。
+- **L82** `        if len(input_types) > 0:` — **EN:** Starts a conditional branch guarded by `len(input_types) > 0`. **CN:** 开始一个由 `len(input_types) > 0` 控制的条件分支。
+- **L83** `            self.argument_types[node] = visitor_factory(` — **EN:** Assigns a value to self.argument_types[node]. **CN:** 将一个值赋给 self.argument_types[node]。
+- **L84** `                input_types + [self.argument_types[node],], self.dag_ir.get_all_inputs(node) + [node,])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    def get_dag_argument_type(self, node):` — **EN:** Defines function `get_dag_argument_type`. **CN:** 定义函数 `get_dag_argument_type`。
+- **L87** `        meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L88** `        subgraph = meta.subgraph` — **EN:** Assigns a value to subgraph. **CN:** 将一个值赋给 subgraph。
+- **L89** `        subgraph_nodes = subgraph.nodes_topological_order()` — **EN:** Assigns a value to subgraph_nodes. **CN:** 将一个值赋给 subgraph_nodes。
+- **L90** `        # Visit the unvisited nodes in subgraph` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `        for n in subgraph_nodes:` — **EN:** Starts a loop assigning items from `subgraph_nodes` to `n`. **CN:** 开始一个循环，将 `subgraph_nodes` 的元素赋给 `n`。
+- **L92** `            m = subgraph.get_node_meta(n)` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L93** `            if m.disabled:` — **EN:** Starts a conditional branch guarded by `m.disabled`. **CN:** 开始一个由 `m.disabled` 控制的条件分支。
+- **L94** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L95** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L96** `                self.argument_types[n] = m.underlying_impl.argument_type` — **EN:** Assigns a value to self.argument_types[n]. **CN:** 将一个值赋给 self.argument_types[n]。
+- **L97** `        input_types = [self.argument_types[child] for child in subgraph_nodes[:-1]]` — **EN:** Assigns a value to input_types. **CN:** 将一个值赋给 input_types。
+- **L98** `        if len(input_types) > 0:` — **EN:** Starts a conditional branch guarded by `len(input_types) > 0`. **CN:** 开始一个由 `len(input_types) > 0` 控制的条件分支。
+- **L99** `            self.argument_types[node] = visitor_factory(input_types, subgraph_nodes[:-1])` — **EN:** Assigns a value to self.argument_types[node]. **CN:** 将一个值赋给 self.argument_types[node]。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `    def set_argument_type(self):` — **EN:** Defines function `set_argument_type`. **CN:** 定义函数 `set_argument_type`。
+- **L102** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    def sm90_set_argument_type(self):` — **EN:** Defines function `sm90_set_argument_type`. **CN:** 定义函数 `sm90_set_argument_type`。
+- **L105** `        self.dag_ir.epilogue_thread_type = self.argument_types[self.dag_ir.get_all_inputs("D")[0]]` — **EN:** Assigns a value to self.dag_ir.epilogue_thread_type. **CN:** 将一个值赋给 self.dag_ir.epilogue_thread_type。
+- **L106** `        # Get the tensorD argument type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** `        self.dag_ir.arg_d_type = self.dag_ir.get_node_meta("D").underlying_impl.argument_type_d` — **EN:** Assigns a value to self.dag_ir.arg_d_type. **CN:** 将一个值赋给 self.dag_ir.arg_d_type。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `        # Get the tensorC argument type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `        if self.dag_ir.has_node("C"):` — **EN:** Starts a conditional branch guarded by `self.dag_ir.has_node('C')`. **CN:** 开始一个由 `self.dag_ir.has_node('C')` 控制的条件分支。
+- **L111** `            self.dag_ir.arg_c_type = self.dag_ir.get_node_meta("C").underlying_impl.argument_type_c` — **EN:** Assigns a value to self.dag_ir.arg_c_type. **CN:** 将一个值赋给 self.dag_ir.arg_c_type。
+- **L112** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L113** `            self.dag_ir.arg_c_type = self.dag_ir.arg_d_type` — **EN:** Assigns a value to self.dag_ir.arg_c_type. **CN:** 将一个值赋给 self.dag_ir.arg_c_type。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    def sm100_set_argument_type(self):` — **EN:** Defines function `sm100_set_argument_type`. **CN:** 定义函数 `sm100_set_argument_type`。
+- **L116** `        self.sm90_set_argument_type()` — **EN:** Invokes `self.sm90_set_argument_type` as a standalone call. **CN:** 以独立语句方式调用 `self.sm90_set_argument_type`。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    def sm80_set_argument_type(self):` — **EN:** Defines function `sm80_set_argument_type`. **CN:** 定义函数 `sm80_set_argument_type`。
+- **L119** `        nodes = self.dag_ir.nodes_topological_order()` — **EN:** Assigns a value to nodes. **CN:** 将一个值赋给 nodes。
+- **L120** `        self.dag_ir.epilogue_thread_type = self.argument_types[nodes[-1]]` — **EN:** Assigns a value to self.dag_ir.epilogue_thread_type. **CN:** 将一个值赋给 self.dag_ir.epilogue_thread_type。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.passes.pass_argument_type`. CN: 模块名为 `cutlass_cppgen.backend.evt.passes.pass_argument_type`。
+- EN: Module docstring summary: Construct the epilogue visitor argument type CN: 模块文档摘要为：Construct the epilogue visitor argument type
+- EN: Top-level classes: PassGetArgumentType CN: 顶层类包括：PassGetArgumentType
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.backend.c_types:visitor_factory, cutlass_cppgen.backend.evt.ir:TopoVisitorNode, cutlass_cppgen.backend.evt.passes.pass_dag_2_tree:PassDAG2Tree, cutlass_cppgen.backend.evt.passes.pass_get_impl:PassGetImpl, cutlass_cppgen.backend.evt.passes.pass_manager:EVTPassBase, cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation:PassShapeTypePropagation, cutlass_cppgen.backend.evt.passes.util:cc_map CN: 内部依赖：cutlass_cppgen.backend.c_types:visitor_factory, cutlass_cppgen.backend.evt.ir:TopoVisitorNode, cutlass_cppgen.backend.evt.passes.pass_dag_2_tree:PassDAG2Tree, cutlass_cppgen.backend.evt.passes.pass_get_impl:PassGetImpl, cutlass_cppgen.backend.evt.passes.pass_manager:EVTPassBase, cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation:PassShapeTypePropagation, cutlass_cppgen.backend.evt.passes.util:cc_map

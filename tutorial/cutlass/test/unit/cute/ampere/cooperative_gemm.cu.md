@@ -1,0 +1,2110 @@
+# cooperative_gemm.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/ampere/cooperative_gemm.cu`
+
+## Purpose / 用途
+- EN: This Ampere / SM80-era CuTe test validates the `cooperative gemm` path, covering architecture-specific tensor movement, layout mapping, or matrix-instruction behavior.
+- CN: 这个面向 Ampere / SM80 时代 的 CuTe 测试验证 `cooperative gemm` 路径，覆盖架构特定的张量搬运、布局映射或矩阵指令行为。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 35**: `#include <cute/swizzle.hpp> // cute::Swizzle`
+  - EN: Provides CuTe swizzle mappings used to model shared-memory permutations.
+  - CN: 提供用于建模共享内存置换的 CuTe swizzle 映射。
+- **Line 36**: `#include <cute/swizzle_layout.hpp> // cute::compose(cute::Swizzle)`
+  - EN: Provides layout wrappers that combine base layouts with swizzle transforms.
+  - CN: 提供把基础布局与 swizzle 变换组合起来的布局包装器。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `#include "../cooperative_gemm_common.hpp"`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 39**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 40**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 41**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 42**: `TEST(SM80_CuTe_Ampere, CooperativeGemm1_Half_MMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 43**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 44**: `  using value_type = cutlass::half_t;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 45**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 47**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 48**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 49**: `        MMA_Atom<SM80_16x8x8_F16F16F16F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 50**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 51**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 52**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 53**: `  test_cooperative_gemm_col_major_layout<thread_block_size, value_type>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 54**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA` 的作用域。
+- **Line 55**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 56**: `TEST(SM80_CuTe_Ampere, CooperativeGemm2_Double_MMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 57**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 58**: `  using value_type = double;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 59**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 60**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 61**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 62**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 63**: `        MMA_Atom<SM80_8x8x4_F64F64F64F64_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 64**: `         Layout<Shape<_2,_2,_1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 65**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 66**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: `  test_cooperative_gemm_col_major_layout<thread_block_size, value_type>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 68**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA` 的作用域。
+- **Line 69**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: `TEST(SM80_CuTe_Ampere, CooperativeGemm3_Half_MMA_CustomSmemLayouts) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm3_Half_MMA_CustomSmemLayouts` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm3_Half_MMA_CustomSmemLayouts`，用于验证一个具体的 CuTe 场景。
+- **Line 71**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 72**: `  constexpr uint32_t max_vec_bits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 73**: `  using value_type = cutlass::half_t;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 74**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 75**: `  auto shape_mnk = Shape<_128, _128, _128>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 76**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 77**: `    TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 78**: `      MMA_Atom<SM80_16x8x16_F16F16F16F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 79**: `      Layout<Shape<_2, _2, _1>>, // 2x2x1 thread group`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 80**: `      Tile<_32, _32, _16> // 32x32x16 MMA for LDSM, 1x2x1 value group\``
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 81**: `    >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 82**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 83**: `  auto smem_a_atom_layout = Layout<Shape<_64, _8>, Stride< _1,_64>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 84**: `  auto smem_b_atom_layout = Layout<Shape< _8,_32>, Stride<_32, _1>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 85**: `  auto smem_c_atom_layout = make_layout(select<0,1>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 86**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 87**: `  test_cooperative_gemm_col_major_layout<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 88**: `                                         max_vec_bits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 89**: `                                         value_type,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 90**: `                                         value_type,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 91**: `                                         value_type>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 92**: `    (smem_a_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 93**: `    smem_b_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 94**: `    smem_c_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 95**: `    shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 96**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm3_Half_MMA_CustomSmemLayouts`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm3_Half_MMA_CustomSmemLayouts` 的作用域。
+- **Line 97**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 98**: `TEST(SM80_CuTe_Ampere, CooperativeGemm4_Half_MMA_SwizzledSmemLayouts) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm4_Half_MMA_SwizzledSmemLayouts` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm4_Half_MMA_SwizzledSmemLayouts`，用于验证一个具体的 CuTe 场景。
+- **Line 99**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 100**: `  constexpr uint32_t max_vec_bits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 101**: `  using value_type = cutlass::half_t;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 102**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 103**: `  auto shape_mnk = Shape<_128, _128, _128>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 104**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 105**: `    TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 106**: `      MMA_Atom<SM80_16x8x16_F16F16F16F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 107**: `      Layout<Shape<_2, _2, _1>>, // 2x2x1 thread group`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 108**: `      Tile<_32, _32, _16> // 32x32x16 MMA for LDSM, 1x2x1 value group\``
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 109**: `    >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 110**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 111**: `  // RowMajor`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 112**: `  auto smem_a_atom_layout =`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 113**: `    composition(Swizzle<3,3,3>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 114**: `                Layout<Shape < _8,_64>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 115**: `                       Stride<_64, _1>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 116**: `  // ColMajor`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 117**: `  auto smem_b_atom_layout =`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 118**: `    composition(Swizzle<3,3,3>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 119**: `                Layout<Shape <_64, _8>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 120**: `                       Stride< _1,_64>>{});`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 121**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 122**: `  auto smem_c_atom_layout = make_layout(select<0, 1>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 123**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 124**: `  auto gmem_a_layout = make_layout(select<0, 2>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 125**: `  auto gmem_b_layout = make_layout(select<1, 2>(shape_mnk), GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 126**: `  auto gmem_c_layout = make_layout(select<0, 1>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 127**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 128**: `  auto smem_a_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 129**: `      smem_a_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 130**: `      make_shape(shape<0>(gmem_a_layout), shape<1>(gmem_a_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 131**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 132**: `  auto smem_b_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 133**: `      smem_b_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 134**: `      make_shape(shape<0>(gmem_b_layout), shape<1>(gmem_b_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 135**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 136**: `  auto smem_c_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 137**: `      smem_c_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 138**: `      make_shape(shape<0>(gmem_c_layout), shape<1>(gmem_c_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 139**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 140**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 141**: `                        max_vec_bits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 142**: `                        value_type,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 143**: `                        value_type,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 144**: `                        value_type>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 145**: `    (gmem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 146**: `     gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 147**: `     gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 148**: `     smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 149**: `     smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 150**: `     smem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 151**: `     tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 152**: `     cute::identity{}, // TransformLoadA`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 153**: `     cute::identity{}, // TransformLoadB`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 154**: `     cute::identity{}, // TransformLoadC`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 155**: `     cute::identity{}, // TransformStoreC`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 156**: `     SM75_U32x4_LDSM_N{}, // A`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 157**: `     SM75_U16x8_LDSM_T{}, // B`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 158**: `     AutoVectorizingCopyWithAssumedAlignment<128>{}); // C`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 159**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm4_Half_MMA_SwizzledSmemLayouts`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm4_Half_MMA_SwizzledSmemLayouts` 的作用域。
+- **Line 160**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 161**: `TEST(SM80_CuTe_Ampere, CooperativeGemm5_Double_MMA_SwizzledSmemLayouts) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm5_Double_MMA_SwizzledSmemLayouts` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm5_Double_MMA_SwizzledSmemLayouts`，用于验证一个具体的 CuTe 场景。
+- **Line 162**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 163**: `  constexpr uint32_t max_vec_bits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 164**: `  using value_type = double;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 165**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 166**: `  auto shape_mnk = Shape<_128, _64, _16>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 167**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 168**: `      TiledMMA<MMA_Atom<SM80_8x8x4_F64F64F64F64_TN>,        // Atom`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 169**: `               Layout<Shape<_2, _2, _1>>,                   // Atom layout`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 170**: `               Tile<Layout<Shape<_16, _2>, Stride<_2, _1>>, // 32x32x4 MMA with perm for load vectorization`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 171**: `                    Layout<Shape<_16, _2>, Stride<_2, _1>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 172**: `                    Underscore>>{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 173**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 174**: `  auto smem_a_atom_layout =`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 175**: `      composition(Swizzle<2,2,2>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 176**: `                  Layout<Shape <_16, _4>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 177**: `                         Stride< _1,_16>>{}); // M, K`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 178**: `  auto smem_b_atom_layout =`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 179**: `      composition(Swizzle<2,2,2>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 180**: `                  Layout<Shape <_16, _4>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 181**: `                         Stride< _1,_16>>{}); // N, K`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 182**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 183**: `  auto smem_c_atom_layout = make_layout(select<0, 1>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 184**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 185**: `  auto gmem_a_layout = make_layout(select<0, 2>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 186**: `  auto gmem_b_layout = make_layout(select<1, 2>(shape_mnk), GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 187**: `  auto gmem_c_layout = make_layout(select<0, 1>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 188**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 189**: `  auto smem_a_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 190**: `      smem_a_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 191**: `      make_shape(shape<0>(gmem_a_layout), shape<1>(gmem_a_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 192**: `  auto smem_b_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 193**: `      smem_b_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 194**: `      make_shape(shape<0>(gmem_b_layout), shape<1>(gmem_b_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 195**: `  auto smem_c_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 196**: `      smem_c_atom_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 197**: `      make_shape(shape<0>(gmem_c_layout), shape<1>(gmem_c_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 198**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 199**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 200**: `                        max_vec_bits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 201**: `                        value_type,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 202**: `                        value_type,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 203**: `                        value_type>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 204**: `    (gmem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 205**: `     gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 206**: `     gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 207**: `     smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 208**: `     smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 209**: `     smem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 210**: `     tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 211**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm5_Double_MMA_SwizzledSmemLayouts`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm5_Double_MMA_SwizzledSmemLayouts` 的作用域。
+- **Line 212**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 213**: `TEST(SM80_CuTe_Ampere, CooperativeGemm6_MixedPrecisionFP16FP32_MMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm6_MixedPrecisionFP16FP32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm6_MixedPrecisionFP16FP32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 214**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 215**: `  constexpr uint32_t max_vec_bits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 216**: `  using TA = cutlass::half_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 217**: `  using TB = cutlass::half_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 218**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 219**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 220**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 221**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 222**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 223**: `        MMA_Atom<SM80_16x8x8_F32F16F16F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 224**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 225**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 226**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 227**: `  test_cooperative_gemm_col_major_layout<thread_block_size, max_vec_bits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 228**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm6_MixedPrecisionFP16FP32_MMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm6_MixedPrecisionFP16FP32_MMA` 的作用域。
+- **Line 229**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 230**: `TEST(SM80_CuTe_Ampere, CooperativeGemm7_MixedPrecisionBF16FP32_MMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm7_MixedPrecisionBF16FP32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm7_MixedPrecisionBF16FP32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 231**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 232**: `  constexpr uint32_t max_vec_bits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 233**: `  using TA = cutlass::bfloat16_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 234**: `  using TB = cutlass::bfloat16_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 235**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 236**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 237**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 238**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 239**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 240**: `        MMA_Atom<SM80_16x8x8_F32BF16BF16F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 241**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 242**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 243**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 244**: `  test_cooperative_gemm_col_major_layout<thread_block_size, max_vec_bits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 245**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm7_MixedPrecisionBF16FP32_MMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm7_MixedPrecisionBF16FP32_MMA` 的作用域。
+- **Line 246**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 247**: `TEST(SM80_CuTe_Ampere, CooperativeGemm8_MixedPrecisionTF32FP32_MMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 248**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 249**: `  constexpr uint32_t max_vec_bits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 250**: `  using TA = cutlass::tfloat32_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 251**: `  using TB = cutlass::tfloat32_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 252**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 253**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 254**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 255**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 256**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 257**: `        MMA_Atom<SM80_16x8x8_F32TF32TF32F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 258**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 259**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 260**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 261**: `  test_cooperative_gemm_col_major_layout<thread_block_size, max_vec_bits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 262**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_MMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_MMA` 的作用域。
+- **Line 263**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 264**: `TEST(SM80_CuTe_Ampere, CooperativeGemm9_C64C64C64_MMA_Dynamic) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA_Dynamic` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA_Dynamic`，用于验证一个具体的 CuTe 场景。
+- **Line 265**: `  constexpr uint32_t thread_block_size = 256;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 266**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 267**: `  using TA = cutlass::complex<double>;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 268**: `  using TB = cutlass::complex<double>;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 269**: `  using TC = cutlass::complex<double>;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 270**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 271**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 272**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 273**: `        MMA_Atom<SM80_8x8x4_C64C64C64C64_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 274**: `        Layout<Shape<_4, _4, _1>, Stride<_1, _4, _0>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 275**: `        Tile<Underscore, Underscore, Underscore>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 276**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 277**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 278**: `  auto a_layout = make_layout(Shape<Int<13>,Int<35>>{}, make_stride(44, 1));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 279**: `  auto b_layout = make_layout(Shape< Int<7>, Int<35>>{}, make_stride(44, 1));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 280**: `  auto c_layout = make_layout(Shape<Int<13>,  Int<7>>{}, make_stride(1, 30));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 281**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 282**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 283**: `                        MaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 284**: `                        TA, TB, TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 285**: `    (a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 286**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 287**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 288**: `     a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 289**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 290**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 291**: `     tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 292**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA_Dynamic`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA_Dynamic` 的作用域。
+- **Line 293**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 294**: `TEST(SM80_CuTe_Ampere, CooperativeGemm9_C64C64C64_MMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 295**: `  constexpr uint32_t thread_block_size = 256;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 296**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 297**: `  using TA = cutlass::complex<double>;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 298**: `  using TB = cutlass::complex<double>;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 299**: `  using TC = cutlass::complex<double>;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 300**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 301**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 302**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 303**: `        MMA_Atom<SM80_8x8x4_C64C64C64C64_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 304**: `        Layout<Shape<_4, _4, _1>, Stride<_1, _4, _0>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 305**: `        Tile<Underscore, Underscore, Underscore>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 306**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 307**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 308**: `  auto a_layout = Layout<Shape<Int<13>,Int<35>>, Stride<Int<44>, Int<1> >>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 309**: `  auto b_layout = Layout<Shape< Int<7>, Int<35>>, Stride<Int<44>, Int<1> >>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 310**: `  auto c_layout = Layout<Shape<Int<13>,  Int<7>>, Stride< Int<1>, Int<30>>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 311**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 312**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 313**: `                        MaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 314**: `                        TA, TB, TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 315**: `    (a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 316**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 317**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 318**: `     a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 319**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 320**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 321**: `     tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 322**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm9_C64C64C64_MMA` 的作用域。
+- **Line 323**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 324**: `TEST(SM80_CuTe_Ampere, CooperativeGemm10_F16F64F16_FMA) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm10_F16F64F16_FMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm10_F16F64F16_FMA`，用于验证一个具体的 CuTe 场景。
+- **Line 325**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 326**: `  constexpr uint32_t thread_block_size = 256;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 327**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 328**: `  using TA = cutlass::half_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 329**: `  using TB = double;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 330**: `  using TC = cutlass::half_t;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 331**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 332**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 333**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 334**: `        MMA_Atom<UniversalFMA<half_t, half_t, double, half_t>>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 335**: `        Layout<Shape<_16, _16, _1>, Stride<_1, _16, _0>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 336**: `        Tile<Underscore, Underscore, Underscore>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 337**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 338**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 339**: `  auto a_layout = Layout<Shape<Int<64>,Int<64>>, Stride<Int<64>, Int< 1>>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 340**: `  auto b_layout = Layout<Shape<Int<64>,Int<64>>, Stride<Int< 1>, Int<64>>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 341**: `  auto c_layout = Layout<Shape<Int<64>,Int<64>>, Stride<Int< 1>, Int<64>>>{};`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 342**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 343**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 344**: `                        MaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 345**: `                        TA,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 346**: `                        TB,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 347**: `                        TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 348**: `    (a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 349**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 350**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 351**: `     a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 352**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 353**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 354**: `     tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 355**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm10_F16F64F16_FMA`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm10_F16F64F16_FMA` 的作用域。
+- **Line 356**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 357**: `TEST(SM80_CuTe_Ampere, CooperativeGemmComposedStride) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemmComposedStride` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemmComposedStride`，用于验证一个具体的 CuTe 场景。
+- **Line 358**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 359**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 360**: `  constexpr int MaxVecBits = 16;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 361**: `  using T = cute::half_t;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 362**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 363**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 364**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 365**: `        MMA_Atom<SM80_16x8x16_F16F16F16F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 366**: `        Layout<Shape<_2, _2, _1>, Stride<_1, _2, _0>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 367**: `        Tile<Underscore, Underscore, Underscore>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 368**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 369**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 370**: `  auto swizzle = cute::Swizzle<3, 3, 3>{};`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 371**: `  auto offset = cute::_0{};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 372**: `  auto atom_tile_right = cute::make_layout(cute::Shape<cute::_8, cute::_64>{}, cute::LayoutRight{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 373**: `  auto FP16AtomLayoutRight = cute::composition(swizzle, offset, atom_tile_right);`
+  - EN: Composes two mappings so the output of one becomes the input of another.
+  - CN: 把两个映射组合起来，使一个的输出成为另一个的输入。
+- **Line 374**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 375**: `  auto shape = cute::Shape<cute::Int<128>, cute::Int<128>>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 376**: `  auto global_a_layout = cute::make_layout(shape, cute::LayoutRight{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 377**: `  auto global_b_layout = cute::make_layout(shape, cute::LayoutLeft{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 378**: `  auto global_c_layout = cute::make_layout(shape, cute::LayoutRight{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 379**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 380**: `  // This is for A row major, B col major according to CUTLASS default configs`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 381**: `  auto a_layout = cute::tile_to_shape(FP16AtomLayoutRight, global_a_layout);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 382**: `  auto b_layout = cute::tile_to_shape(FP16AtomLayoutRight, global_b_layout);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 383**: `  auto c_layout = global_c_layout;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 384**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 385**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 386**: `                        MaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 387**: `                        T, T, T>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 388**: `    (a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 389**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 390**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 391**: `     a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 392**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 393**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 394**: `     tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 395**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemmComposedStride`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemmComposedStride` 的作用域。
+- **Line 396**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 397**: `TEST(SM80_CuTe_Ampere, CooperativeGemm8_MixedPrecisionTF32FP32_Transform) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_Transform` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_Transform`，用于验证一个具体的 CuTe 场景。
+- **Line 398**: `  constexpr uint32_t thread_block_size = 64;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 399**: `  constexpr uint32_t max_vec_bits = 16;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 400**: `  using TA = cutlass::tfloat32_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 401**: `  using TB = cutlass::tfloat32_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 402**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 403**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 404**: `  auto shape_mnk = Shape<C<9>, C<9>, C<9>>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 405**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 406**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 407**: `        MMA_Atom<SM80_16x8x8_F32TF32TF32F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 408**: `        Layout<Shape<_1, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 409**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 410**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 411**: `  test_cooperative_gemm_col_major_layout<thread_block_size, max_vec_bits, TA, TB, TC>`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 412**: `    (shape_mnk, tiled_mma, cute::negate{}, cute::negate{}, cute::negate{}, cute::negate{});`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 413**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_Transform`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_Transform` 的作用域。
+- **Line 414**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 415**: `TEST(SM80_CuTe_Ampere, CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecision) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecision` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecision`，用于验证一个具体的 CuTe 场景。
+- **Line 416**: `  constexpr uint32_t thread_block_size = 64;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 417**: `  constexpr uint32_t max_vec_bits = 16;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 418**: `  using InputTA = cutlass::half_t;`
+  - EN: Creates alias `InputTA` to simplify a verbose type or expression.
+  - CN: 创建别名 `InputTA`，以简化较长的类型或表达式。
+- **Line 419**: `  using InputTB = cutlass::half_t;`
+  - EN: Creates alias `InputTB` to simplify a verbose type or expression.
+  - CN: 创建别名 `InputTB`，以简化较长的类型或表达式。
+- **Line 420**: `  using InputTC = cutlass::half_t;`
+  - EN: Creates alias `InputTC` to simplify a verbose type or expression.
+  - CN: 创建别名 `InputTC`，以简化较长的类型或表达式。
+- **Line 421**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 422**: `  using ComputeTA = cutlass::tfloat32_t;`
+  - EN: Creates alias `ComputeTA` to simplify a verbose type or expression.
+  - CN: 创建别名 `ComputeTA`，以简化较长的类型或表达式。
+- **Line 423**: `  using ComputeTB = cutlass::tfloat32_t;`
+  - EN: Creates alias `ComputeTB` to simplify a verbose type or expression.
+  - CN: 创建别名 `ComputeTB`，以简化较长的类型或表达式。
+- **Line 424**: `  using ComputeTC = float;`
+  - EN: Creates alias `ComputeTC` to simplify a verbose type or expression.
+  - CN: 创建别名 `ComputeTC`，以简化较长的类型或表达式。
+- **Line 425**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 426**: `  auto shape_mnk = Shape<C<9>, C<9>, C<9>>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 427**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 428**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 429**: `        MMA_Atom<SM80_16x8x8_F32TF32TF32F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 430**: `        Layout<Shape<_1, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 431**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 432**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 433**: `  test_cooperative_gemm_col_major_layout<thread_block_size, max_vec_bits, InputTA, InputTB, InputTC>`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 434**: `    (shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 435**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecision`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecision` 的作用域。
+- **Line 436**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 437**: `TEST(SM80_CuTe_Ampere, CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecisionReg) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecisionReg` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecisionReg`，用于验证一个具体的 CuTe 场景。
+- **Line 438**: `  constexpr uint32_t thread_block_size = 64;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 439**: `  constexpr uint32_t max_vec_bits = 16;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 440**: `  using InputTA = cutlass::half_t;`
+  - EN: Creates alias `InputTA` to simplify a verbose type or expression.
+  - CN: 创建别名 `InputTA`，以简化较长的类型或表达式。
+- **Line 441**: `  using InputTB = cutlass::half_t;`
+  - EN: Creates alias `InputTB` to simplify a verbose type or expression.
+  - CN: 创建别名 `InputTB`，以简化较长的类型或表达式。
+- **Line 442**: `  using InputTC = cutlass::half_t;`
+  - EN: Creates alias `InputTC` to simplify a verbose type or expression.
+  - CN: 创建别名 `InputTC`，以简化较长的类型或表达式。
+- **Line 443**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 444**: `  using ComputeTA = cutlass::tfloat32_t;`
+  - EN: Creates alias `ComputeTA` to simplify a verbose type or expression.
+  - CN: 创建别名 `ComputeTA`，以简化较长的类型或表达式。
+- **Line 445**: `  using ComputeTB = cutlass::tfloat32_t;`
+  - EN: Creates alias `ComputeTB` to simplify a verbose type or expression.
+  - CN: 创建别名 `ComputeTB`，以简化较长的类型或表达式。
+- **Line 446**: `  using ComputeTC = float;`
+  - EN: Creates alias `ComputeTC` to simplify a verbose type or expression.
+  - CN: 创建别名 `ComputeTC`，以简化较长的类型或表达式。
+- **Line 447**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 448**: `  auto shape_mnk = Shape<C<9>, C<9>, C<9>>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 449**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 450**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 451**: `        MMA_Atom<SM80_16x8x8_F32TF32TF32F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 452**: `        Layout<Shape<_1, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 453**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 454**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 455**: `  test_cooperative_gemm_col_major_layout_rmem_c<thread_block_size, max_vec_bits, InputTA, InputTB, InputTC>`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 456**: `    (shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 457**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecisionReg`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm8_MixedPrecisionTF32FP32_TransformPrecisionReg` 的作用域。
+- **Line 458**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 459**: `TEST(SM80_CuTe_Ampere, CooperativeGemm1_Half_MMA_Reg) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA_Reg` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA_Reg`，用于验证一个具体的 CuTe 场景。
+- **Line 460**: `  using value_type = cutlass::half_t;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 461**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 462**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 463**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 464**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 465**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 466**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 467**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 468**: `        MMA_Atom<SM80_16x8x8_F16F16F16F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 469**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 470**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 471**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 472**: `  test_cooperative_gemm_col_major_layout_rmem_c<thread_block_size, value_type>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 473**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA_Reg`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm1_Half_MMA_Reg` 的作用域。
+- **Line 474**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 475**: `TEST(SM80_CuTe_Ampere, CooperativeGemm2_Double_MMA_Reg) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Reg` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Reg`，用于验证一个具体的 CuTe 场景。
+- **Line 476**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 477**: `  using value_type = double;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 478**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 479**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 480**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 481**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 482**: `        MMA_Atom<SM80_8x8x4_F64F64F64F64_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 483**: `         Layout<Shape<_2,_2,_1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 484**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 485**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 486**: `  test_cooperative_gemm_col_major_layout_rmem_c<thread_block_size, value_type>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 487**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Reg`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Reg` 的作用域。
+- **Line 488**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 489**: `TEST(SM80_CuTe_Ampere, CooperativeGemm2_Double_MMA_Predicated_Reg) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Predicated_Reg` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Predicated_Reg`，用于验证一个具体的 CuTe 场景。
+- **Line 490**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 491**: `  using value_type = double;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 492**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 493**: `  auto shape_mnk = Shape<C<62>, C<62>, C<62>>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 494**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 495**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 496**: `        MMA_Atom<SM80_8x8x4_F64F64F64F64_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 497**: `         Layout<Shape<_2,_2,_1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 498**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 499**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 500**: `  test_cooperative_gemm_col_major_layout_rmem_c<thread_block_size, value_type>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 501**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Predicated_Reg`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemm2_Double_MMA_Predicated_Reg` 的作用域。
+- **Line 502**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 503**: `TEST(SM80_CuTe_Ampere, CooperativeGemmLDSMx2) {`
+  - EN: Declares GoogleTest case `SM80_CuTe_Ampere::CooperativeGemmLDSMx2` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM80_CuTe_Ampere::CooperativeGemmLDSMx2`，用于验证一个具体的 CuTe 场景。
+- **Line 504**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 505**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 506**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 507**: `  using TA = cute::half_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 508**: `  using TB = cute::half_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 509**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 510**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 511**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 512**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 513**: `        MMA_Atom<SM80_16x8x16_F32F16F16F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 514**: `        Layout<Shape<_2, _2, _1>, Stride<_1, _2, _0>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 515**: `        Tile<_32, _16, _16>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 516**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 517**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 518**: `  auto global_a_layout = make_layout(Shape<_32, _32>{}, LayoutRight{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 519**: `  auto global_b_layout = make_layout(Shape<_16, _32>{}, LayoutRight{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 520**: `  auto global_c_layout = make_layout(Shape<_32, _16>{}, LayoutRight{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 521**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 522**: `  test_cooperative_gemm<thread_block_size,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 523**: `                        MaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 524**: `                        TA, TB, TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 525**: `    (global_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 526**: `     global_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 527**: `     global_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 528**: `     global_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 529**: `     global_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 530**: `     global_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 531**: `     tiled_mma, `
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 532**: `     identity{}, `
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 533**: `     identity{},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 534**: `     identity{},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 535**: `     identity{},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 536**: `     SM75_U32x4_LDSM_N{},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 537**: `     SM75_U32x2_LDSM_N{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 538**: `}`
+  - EN: Closes the scope for `test SM80_CuTe_Ampere::CooperativeGemmLDSMx2`.
+  - CN: 结束 `test SM80_CuTe_Ampere::CooperativeGemmLDSMx2` 的作用域。
+- **Line 539**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 540**: `#if (__CUDACC_VER_MAJOR__ > 12) || (__CUDACC_VER_MAJOR__ == 12 && __CUDACC_VER_MINOR__ >= 8)`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 541**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 542**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e4m3e4m3f32_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 543**: `  using TA = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 544**: `  using TB = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 545**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 546**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 547**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 548**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 549**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 550**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 551**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 552**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 553**: `        MMA_Atom<SM89_16x8x32_F32E4M3E4M3F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 554**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 555**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 556**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 557**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 558**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f32_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f32_MMA` 的作用域。
+- **Line 559**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 560**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e4m3e5m2f32_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 561**: `  using TA = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 562**: `  using TB = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 563**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 564**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 565**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 566**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 567**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 568**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 569**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 570**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 571**: `        MMA_Atom<SM89_16x8x32_F32E4M3E5M2F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 572**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 573**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 574**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 575**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 576**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f32_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f32_MMA` 的作用域。
+- **Line 577**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 578**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e5m2e4m3f32_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 579**: `  using TA = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 580**: `  using TB = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 581**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 582**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 583**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 584**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 585**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 586**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 587**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 588**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 589**: `        MMA_Atom<SM89_16x8x32_F32E5M2E4M3F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 590**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 591**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 592**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 593**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 594**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f32_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f32_MMA` 的作用域。
+- **Line 595**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 596**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e5m2e5m2f32_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f32_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f32_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 597**: `  using TA = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 598**: `  using TB = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 599**: `  using TC = float;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 600**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 601**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 602**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 603**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 604**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 605**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 606**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 607**: `        MMA_Atom<SM89_16x8x32_F32E5M2E5M2F32_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 608**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 609**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 610**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 611**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 612**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f32_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f32_MMA` 的作用域。
+- **Line 613**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 614**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e4m3e4m3f16_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f16_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f16_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 615**: `  using TA = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 616**: `  using TB = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 617**: `  using TC = cute::half_t;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 618**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 619**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 620**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 621**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 622**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 623**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 624**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 625**: `        MMA_Atom<SM89_16x8x32_F16E4M3E4M3F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 626**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 627**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 628**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 629**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 630**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f16_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e4m3e4m3f16_MMA` 的作用域。
+- **Line 631**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 632**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e4m3e5m2f16_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f16_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f16_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 633**: `  using TA = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 634**: `  using TB = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 635**: `  using TC = cute::half_t;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 636**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 637**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 638**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 639**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 640**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 641**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 642**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 643**: `        MMA_Atom<SM89_16x8x32_F16E4M3E5M2F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 644**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 645**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 646**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 647**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 648**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f16_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e4m3e5m2f16_MMA` 的作用域。
+- **Line 649**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 650**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e5m2e4m3f16_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f16_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f16_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 651**: `  using TA = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 652**: `  using TB = cutlass::float_e4m3_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 653**: `  using TC = cute::half_t;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 654**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 655**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 656**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 657**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 658**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 659**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 660**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 661**: `        MMA_Atom<SM89_16x8x32_F16E5M2E4M3F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 662**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 663**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 664**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 665**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 666**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f16_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e5m2e4m3f16_MMA` 的作用域。
+- **Line 667**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 668**: `TEST(SM89_CuTe_Ada, CooperativeGemm_e5m2e5m2f16_MMA) {`
+  - EN: Declares GoogleTest case `SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f16_MMA` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f16_MMA`，用于验证一个具体的 CuTe 场景。
+- **Line 669**: `  using TA = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 670**: `  using TB = cutlass::float_e5m2_t;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 671**: `  using TC = cute::half_t;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 672**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 673**: `  constexpr uint32_t thread_block_size = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 674**: `  constexpr int MaxVecBits = 128;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 675**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 676**: `  auto shape_mnk = Shape<_64, _64, _64>{};`
+  - EN: Refers to a compile-time shape used in a layout or tensor definition.
+  - CN: 引用在布局或张量定义中使用的编译期形状。
+- **Line 677**: `  auto tiled_mma =`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 678**: `      TiledMMA<`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 679**: `        MMA_Atom<SM89_16x8x32_F16E5M2E5M2F16_TN>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 680**: `        Layout<Shape<_2, _2, _1>>`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 681**: `      >{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 682**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 683**: `  test_cooperative_gemm_col_major_layout<thread_block_size, MaxVecBits, TA, TB, TC>(shape_mnk, tiled_mma);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 684**: `}`
+  - EN: Closes the scope for `test SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f16_MMA`.
+  - CN: 结束 `test SM89_CuTe_Ada::CooperativeGemm_e5m2e5m2f16_MMA` 的作用域。
+- **Line 685**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 686**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `composition(`
+  - EN: Composes multiple layout transforms into one mapping.
+  - CN: 把多个布局变换组合成一个映射。
+- `Swizzle<`
+  - EN: Models swizzled address mappings that match hardware-friendly shared-memory layouts.
+  - CN: 建模 swizzle 地址映射，以匹配硬件友好的共享内存布局。
+- `gemm`
+  - EN: Connects the test to tiled matrix-multiply orchestration concepts.
+  - CN: 把该测试与分块矩阵乘法调度概念联系起来。
+- `tiled-gemm`
+  - EN: The file relates layout/tensor primitives to tiled GEMM execution.
+  - CN: 该文件把布局/张量原语与分块 GEMM 执行联系起来。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- `cute/swizzle.hpp`
+  - EN: Provides CuTe swizzle mappings used to model shared-memory permutations.
+  - CN: 提供用于建模共享内存置换的 CuTe swizzle 映射。
+- `cute/swizzle_layout.hpp`
+  - EN: Provides layout wrappers that combine base layouts with swizzle transforms.
+  - CN: 提供把基础布局与 swizzle 变换组合起来的布局包装器。
+- `../cooperative_gemm_common.hpp`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。

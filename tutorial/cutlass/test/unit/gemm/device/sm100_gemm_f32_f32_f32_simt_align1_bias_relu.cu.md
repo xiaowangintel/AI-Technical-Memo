@@ -1,0 +1,1074 @@
+# sm100_gemm_f32_f32_f32_simt_align1_bias_relu.cu — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/sm100_gemm_f32_f32_f32_simt_align1_bias_relu.cu`
+- 中文：`test/unit/gemm/device/sm100_gemm_f32_f32_f32_simt_align1_bias_relu.cu`
+
+## Purpose / 目的
+- EN: This file defines SM100 TensorOp GEMM tests for the configuration encoded in `sm100_gemm_f32_f32_f32_simt_align1_bias_relu`. The file-level brief is: "Tests for device-wide GEMM interface (SGEMM)."
+- 中文：该文件为 `sm100_gemm_f32_f32_f32_simt_align1_bias_relu` 所编码的配置定义了 SM100 TensorOp GEMM 测试。 文件级摘要为：“Tests for device-wide GEMM interface (SGEMM)”。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L32** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L33** `    \brief Tests for device-wide GEMM interface (SGEMM)`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L34** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L35** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L36** `#include "cutlass/cutlass.h"`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- **L37** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L38** `#include "cutlass/numeric_types.h"`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- **L39** `#include "cutlass/arch/mma_sm100.h"`
+  - EN: Includes `cutlass/arch/mma_sm100.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/arch/mma_sm100.h`，这是该测试编译单元所需的依赖。
+- **L40** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L41** `#include "cutlass/gemm/device/gemm_universal_adapter.h"`
+  - EN: Provides the universal adapter that wraps a CUTLASS 3.x GEMM kernel for launch.
+  - 中文：提供通用适配器，用于封装并启动 CUTLASS 3.x GEMM 内核。
+- **L42** `#include "cutlass/gemm/kernel/gemm_universal.hpp"`
+  - EN: Defines the universal GEMM kernel composition used by modern CUTLASS tests.
+  - 中文：定义现代 CUTLASS 测试使用的通用 GEMM 内核组合。
+- **L43** `#include "cutlass/gemm/collective/collective_builder.hpp"`
+  - EN: Builds the GEMM mainloop collective from architecture, tile, and datatype parameters.
+  - 中文：根据架构、tile 和数据类型参数构建 GEMM 主循环 collective。
+- **L44** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L45** `#include "cutlass/epilogue/dispatch_policy.hpp"`
+  - EN: Defines epilogue scheduling policy tags used by collective builders.
+  - 中文：定义 collective builder 使用的 epilogue 调度策略标签。
+- **L46** `#include "cutlass/epilogue/collective/collective_builder.hpp"`
+  - EN: Builds the epilogue collective that writes GEMM results to memory.
+  - 中文：构建将 GEMM 结果写回内存的 epilogue collective。
+- **L47** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L48** `#include "cute/tensor.hpp"`
+  - EN: Provides CUTE tensor abstractions used to describe tiled tensor layouts.
+  - 中文：提供 CUTE 张量抽象，用于描述分块张量布局。
+- **L49** `#include "cute/atom/mma_atom.hpp"`
+  - EN: Provides CUTE MMA atom definitions used to model tensor-core operations.
+  - 中文：提供 CUTE MMA 原子定义，用于描述 Tensor Core 运算。
+- **L50** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L51** `#include "../../common/cutlass_unit_test.h"`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- **L52** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L53** `#include "gemm_testbed_3x.hpp"`
+  - EN: Includes `gemm_testbed_3x.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `gemm_testbed_3x.hpp`，这是该测试编译单元所需的依赖。
+- **L54** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L55** `#if defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)`
+  - EN: Begins a conditional-compilation region guarded by `defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)`.
+  - 中文：开始一个由 `defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)` 控制的条件编译区域。
+- **L56** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L57** `TEST(SM100Only_Device_Gemm_f32n_f32t_f32n_simt_f32_align1_bias_relu, 128x128x16) {`
+  - EN: Defines GoogleTest case `SM100Only_Device_Gemm_f32n_f32t_f32n_simt_f32_align1_bias_relu.128x128x16` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100Only_Device_Gemm_f32n_f32t_f32n_simt_f32_align1_bias_relu.128x128x16`，用于覆盖一个 GEMM 场景。
+- **L58** `  // NT layout`
+  - EN: Adds a human-readable comment for the next code region: NT layout.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：NT layout。
+- **L59** `  using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L60** `  using LayoutA = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutA` for a column-major memory layout.
+  - 中文：为 `LayoutA` 创建别名，对应 列主序内存布局。
+- **L61** `  using LayoutB = cutlass::layout::RowMajor;`
+  - EN: Creates the alias `LayoutB` for a row-major memory layout.
+  - 中文：为 `LayoutB` 创建别名，对应 行主序内存布局。
+- **L62** `  using LayoutC = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。
+- **L63** `  using LayoutD = LayoutC;`
+  - EN: Creates the alias `LayoutD` for the helper type `LayoutC`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `LayoutC`。
+- **L64** `  using ElementA = float;`
+  - EN: Creates the alias `ElementA` for the scalar type `float`.
+  - 中文：为 `ElementA` 创建别名，对应 标量类型 `float`。
+- **L65** `  using ElementB = float;`
+  - EN: Creates the alias `ElementB` for the scalar type `float`.
+  - 中文：为 `ElementB` 创建别名，对应 标量类型 `float`。
+- **L66** `  using ElementC = float;`
+  - EN: Creates the alias `ElementC` for the scalar type `float`.
+  - 中文：为 `ElementC` 创建别名，对应 标量类型 `float`。
+- **L67** `  using ElementD = float;`
+  - EN: Creates the alias `ElementD` for the scalar type `float`.
+  - 中文：为 `ElementD` 创建别名，对应 标量类型 `float`。
+- **L68** `  using ElementAccumulator = float;`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。
+- **L69** `  using ElementCompute = float;`
+  - EN: Creates the alias `ElementCompute` for the scalar type `float`.
+  - 中文：为 `ElementCompute` 创建别名，对应 标量类型 `float`。
+- **L70** `  using ElementBias = float;`
+  - EN: Creates the alias `ElementBias` for the scalar type `float`.
+  - 中文：为 `ElementBias` 创建别名，对应 标量类型 `float`。
+- **L71** `  using TileShape = Shape<_128, _128, _16>;`
+  - EN: Creates the alias `TileShape` for a compile-time shape `Shape<_128, _128, _16>`.
+  - 中文：为 `TileShape` 创建别名，对应 编译期形状 `Shape<_128, _128, _16>`。
+- **L72** `  using ClusterShape = Shape<_1, _1, _1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1, _1, _1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1, _1, _1>`。
+- **L73** `  static constexpr int kAlignmentA = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentA = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentA = 1;`。
+- **L74** `  static constexpr int kAlignmentB = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentB = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentB = 1;`。
+- **L75** `  static constexpr int kAlignmentC = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentC = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentC = 1;`。
+- **L76** `  static constexpr int kAlignmentD = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentD = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentD = 1;`。
+- **L77** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L78** `  // Mainloop`
+  - EN: Adds a human-readable comment for the next code region: Mainloop.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Mainloop。
+- **L79** `  using CollectiveMainloop = cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM mainloop.
+  - 中文：开始实例化用于 GEMM 主循环的 collective builder。
+- **L80** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L81** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L82** `    ElementA, LayoutA, kAlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L83** `    ElementB, LayoutB, kAlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L84** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L85** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L86** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L87** `    cutlass::gemm::collective::StageCount<3>,`
+  - EN: Supplies the stage-count policy for pipeline buffering.
+  - 中文：提供流水线缓冲使用的阶段数策略。
+- **L88** `    cutlass::gemm::KernelMultistage`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L89** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L90** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L91** `  // Epilogue`
+  - EN: Adds a human-readable comment for the next code region: Epilogue.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Epilogue。
+- **L92** `  // Treat Clamp as Relu`
+  - EN: Adds a human-readable comment for the next code region: Treat Clamp as Relu.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Treat Clamp as Relu。
+- **L93** `  using FusionOp = cutlass::epilogue::fusion::LinCombPerRowBiasEltAct<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L94** `    cutlass::epilogue::thread::Clamp, ElementD, ElementCompute, ElementBias, ElementC, ElementCompute, kAlignmentD`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L95** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L96** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L97** `  using CollectiveEpilogue = cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM epilogue.
+  - 中文：开始实例化用于 GEMM epilogue 的 collective builder。
+- **L98** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L99** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L100** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L101** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L102** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L103** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L104** `    ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L105** `    ElementC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L106** `    LayoutC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L107** `    kAlignmentC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L108** `    ElementD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L109** `    LayoutD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L110** `    kAlignmentD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L111** `    cutlass::epilogue::EpilogueSimtVectorized`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L112** `    ,FusionOp`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L113** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L114** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L115** `  // Kernel`
+  - EN: Adds a human-readable comment for the next code region: Kernel.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Kernel。
+- **L116** `  using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L117** `      Shape<int,int,int,int>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L118** `      CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L119** `      CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L120** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L121** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L122** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L123** `  bool result = test::gemm::device::TestSmallFusion<Gemm>(2.0, 6.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L124** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result)` evaluates to true, marking the test as passed.
+  - 中文：检查 `result)` 的结果是否为真，以判定测试通过。
+- **L125** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L126** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L127** `TEST(SM100Only_Device_Gemm_f32n_f32t_f32n_simt_f32_align1_bias_relu, 128x256x16) {`
+  - EN: Defines GoogleTest case `SM100Only_Device_Gemm_f32n_f32t_f32n_simt_f32_align1_bias_relu.128x256x16` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100Only_Device_Gemm_f32n_f32t_f32n_simt_f32_align1_bias_relu.128x256x16`，用于覆盖一个 GEMM 场景。
+- **L128** `  // NT layout`
+  - EN: Adds a human-readable comment for the next code region: NT layout.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：NT layout。
+- **L129** `  using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L130** `  using LayoutA = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutA` for a column-major memory layout.
+  - 中文：为 `LayoutA` 创建别名，对应 列主序内存布局。
+- **L131** `  using LayoutB = cutlass::layout::RowMajor;`
+  - EN: Creates the alias `LayoutB` for a row-major memory layout.
+  - 中文：为 `LayoutB` 创建别名，对应 行主序内存布局。
+- **L132** `  using LayoutC = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。
+- **L133** `  using LayoutD = LayoutC;`
+  - EN: Creates the alias `LayoutD` for the helper type `LayoutC`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `LayoutC`。
+- **L134** `  using ElementA = float;`
+  - EN: Creates the alias `ElementA` for the scalar type `float`.
+  - 中文：为 `ElementA` 创建别名，对应 标量类型 `float`。
+- **L135** `  using ElementB = float;`
+  - EN: Creates the alias `ElementB` for the scalar type `float`.
+  - 中文：为 `ElementB` 创建别名，对应 标量类型 `float`。
+- **L136** `  using ElementC = float;`
+  - EN: Creates the alias `ElementC` for the scalar type `float`.
+  - 中文：为 `ElementC` 创建别名，对应 标量类型 `float`。
+- **L137** `  using ElementD = float;`
+  - EN: Creates the alias `ElementD` for the scalar type `float`.
+  - 中文：为 `ElementD` 创建别名，对应 标量类型 `float`。
+- **L138** `  using ElementAccumulator = float;`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。
+- **L139** `  using ElementCompute = float;`
+  - EN: Creates the alias `ElementCompute` for the scalar type `float`.
+  - 中文：为 `ElementCompute` 创建别名，对应 标量类型 `float`。
+- **L140** `  using ElementBias = float;`
+  - EN: Creates the alias `ElementBias` for the scalar type `float`.
+  - 中文：为 `ElementBias` 创建别名，对应 标量类型 `float`。
+- **L141** `  using TileShape = Shape<_128, _256, _16>;`
+  - EN: Creates the alias `TileShape` for a compile-time shape `Shape<_128, _256, _16>`.
+  - 中文：为 `TileShape` 创建别名，对应 编译期形状 `Shape<_128, _256, _16>`。
+- **L142** `  using ClusterShape = Shape<_1, _1, _1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1, _1, _1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1, _1, _1>`。
+- **L143** `  static constexpr int kAlignmentA = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentA = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentA = 1;`。
+- **L144** `  static constexpr int kAlignmentB = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentB = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentB = 1;`。
+- **L145** `  static constexpr int kAlignmentC = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentC = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentC = 1;`。
+- **L146** `  static constexpr int kAlignmentD = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentD = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentD = 1;`。
+- **L147** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L148** `  // Mainloop`
+  - EN: Adds a human-readable comment for the next code region: Mainloop.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Mainloop。
+- **L149** `  using CollectiveMainloop = cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM mainloop.
+  - 中文：开始实例化用于 GEMM 主循环的 collective builder。
+- **L150** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L151** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L152** `    ElementA, LayoutA, kAlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L153** `    ElementB, LayoutB, kAlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L154** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L155** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L156** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L157** `    cutlass::gemm::collective::StageCount<3>,`
+  - EN: Supplies the stage-count policy for pipeline buffering.
+  - 中文：提供流水线缓冲使用的阶段数策略。
+- **L158** `    cutlass::gemm::KernelMultistage`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L159** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L160** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L161** `  // Epilogue`
+  - EN: Adds a human-readable comment for the next code region: Epilogue.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Epilogue。
+- **L162** `  // Treat Clamp as Relu`
+  - EN: Adds a human-readable comment for the next code region: Treat Clamp as Relu.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Treat Clamp as Relu。
+- **L163** `  using FusionOp = cutlass::epilogue::fusion::LinCombPerRowBiasEltAct<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L164** `    cutlass::epilogue::thread::Clamp, ElementD, ElementCompute, ElementBias, ElementC, ElementCompute, kAlignmentD`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L165** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L166** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L167** `  using CollectiveEpilogue = cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM epilogue.
+  - 中文：开始实例化用于 GEMM epilogue 的 collective builder。
+- **L168** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L169** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L170** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L171** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L172** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L173** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L174** `    ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L175** `    ElementC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L176** `    LayoutC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L177** `    kAlignmentC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L178** `    ElementD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L179** `    LayoutD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L180** `    kAlignmentD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L181** `    cutlass::epilogue::EpilogueSimtVectorized`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L182** `    ,FusionOp`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L183** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L184** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L185** `  // Kernel`
+  - EN: Adds a human-readable comment for the next code region: Kernel.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Kernel。
+- **L186** `  using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L187** `      Shape<int,int,int,int>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L188** `      CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L189** `      CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L190** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L191** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L192** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L193** `  bool result = test::gemm::device::TestSmallFusion<Gemm>(2.0, 0.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L194** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result)` evaluates to true, marking the test as passed.
+  - 中文：检查 `result)` 的结果是否为真，以判定测试通过。
+- **L195** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L196** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L197** `TEST(SM100Only_Device_Gemm_f32t_f32n_f32n_simt_f32_align1_bias_relu, 64x128x16) {`
+  - EN: Defines GoogleTest case `SM100Only_Device_Gemm_f32t_f32n_f32n_simt_f32_align1_bias_relu.64x128x16` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100Only_Device_Gemm_f32t_f32n_f32n_simt_f32_align1_bias_relu.64x128x16`，用于覆盖一个 GEMM 场景。
+- **L198** `  // NT layout`
+  - EN: Adds a human-readable comment for the next code region: NT layout.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：NT layout。
+- **L199** `  using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L200** `  using LayoutA = cutlass::layout::RowMajor;`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。
+- **L201** `  using LayoutB = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。
+- **L202** `  using LayoutC = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。
+- **L203** `  using LayoutD = LayoutC;`
+  - EN: Creates the alias `LayoutD` for the helper type `LayoutC`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `LayoutC`。
+- **L204** `  using ElementA = float;`
+  - EN: Creates the alias `ElementA` for the scalar type `float`.
+  - 中文：为 `ElementA` 创建别名，对应 标量类型 `float`。
+- **L205** `  using ElementB = float;`
+  - EN: Creates the alias `ElementB` for the scalar type `float`.
+  - 中文：为 `ElementB` 创建别名，对应 标量类型 `float`。
+- **L206** `  using ElementC = float;`
+  - EN: Creates the alias `ElementC` for the scalar type `float`.
+  - 中文：为 `ElementC` 创建别名，对应 标量类型 `float`。
+- **L207** `  using ElementD = float;`
+  - EN: Creates the alias `ElementD` for the scalar type `float`.
+  - 中文：为 `ElementD` 创建别名，对应 标量类型 `float`。
+- **L208** `  using ElementAccumulator = float;`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。
+- **L209** `  using ElementCompute = float;`
+  - EN: Creates the alias `ElementCompute` for the scalar type `float`.
+  - 中文：为 `ElementCompute` 创建别名，对应 标量类型 `float`。
+- **L210** `  using ElementBias = float;`
+  - EN: Creates the alias `ElementBias` for the scalar type `float`.
+  - 中文：为 `ElementBias` 创建别名，对应 标量类型 `float`。
+- **L211** `  using TileShape = Shape<_64, _128, _16>;`
+  - EN: Creates the alias `TileShape` for a compile-time shape `Shape<_64, _128, _16>`.
+  - 中文：为 `TileShape` 创建别名，对应 编译期形状 `Shape<_64, _128, _16>`。
+- **L212** `  using ClusterShape = Shape<_1, _1, _1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1, _1, _1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1, _1, _1>`。
+- **L213** `  static constexpr int kAlignmentA = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentA = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentA = 1;`。
+- **L214** `  static constexpr int kAlignmentB = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentB = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentB = 1;`。
+- **L215** `  static constexpr int kAlignmentC = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentC = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentC = 1;`。
+- **L216** `  static constexpr int kAlignmentD = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentD = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentD = 1;`。
+- **L217** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L218** `  // Mainloop`
+  - EN: Adds a human-readable comment for the next code region: Mainloop.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Mainloop。
+- **L219** `  using CollectiveMainloop = cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM mainloop.
+  - 中文：开始实例化用于 GEMM 主循环的 collective builder。
+- **L220** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L221** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L222** `    ElementA, LayoutA, kAlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L223** `    ElementB, LayoutB, kAlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L224** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L225** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L226** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L227** `    cutlass::gemm::collective::StageCount<3>,`
+  - EN: Supplies the stage-count policy for pipeline buffering.
+  - 中文：提供流水线缓冲使用的阶段数策略。
+- **L228** `    cutlass::gemm::KernelMultistage`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L229** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L230** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L231** `  // Epilogue`
+  - EN: Adds a human-readable comment for the next code region: Epilogue.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Epilogue。
+- **L232** `  // Treat Clamp as Relu`
+  - EN: Adds a human-readable comment for the next code region: Treat Clamp as Relu.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Treat Clamp as Relu。
+- **L233** `  using FusionOp = cutlass::epilogue::fusion::LinCombPerRowBiasEltAct<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L234** `    cutlass::epilogue::thread::Clamp, ElementD, ElementCompute, ElementBias, ElementC, ElementCompute, kAlignmentD`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L235** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L236** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L237** `  using CollectiveEpilogue = cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM epilogue.
+  - 中文：开始实例化用于 GEMM epilogue 的 collective builder。
+- **L238** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L239** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L240** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L241** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L242** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L243** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L244** `    ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L245** `    ElementC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L246** `    LayoutC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L247** `    kAlignmentC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L248** `    ElementD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L249** `    LayoutD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L250** `    kAlignmentD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L251** `    cutlass::epilogue::EpilogueSimtVectorized`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L252** `    ,FusionOp`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L253** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L254** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L255** `  // Kernel`
+  - EN: Adds a human-readable comment for the next code region: Kernel.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Kernel。
+- **L256** `  using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L257** `      Shape<int,int,int,int>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L258** `      CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L259** `      CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L260** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L261** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L262** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L263** `  bool result = test::gemm::device::TestSmallFusion<Gemm>(2.0, 6.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L264** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result)` evaluates to true, marking the test as passed.
+  - 中文：检查 `result)` 的结果是否为真，以判定测试通过。
+- **L265** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L266** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L267** `TEST(SM100Only_Device_Gemm_f32t_f32n_f32n_simt_f32_align1_bias_relu, 64x32x16) {`
+  - EN: Defines GoogleTest case `SM100Only_Device_Gemm_f32t_f32n_f32n_simt_f32_align1_bias_relu.64x32x16` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100Only_Device_Gemm_f32t_f32n_f32n_simt_f32_align1_bias_relu.64x32x16`，用于覆盖一个 GEMM 场景。
+- **L268** `  // NT layout`
+  - EN: Adds a human-readable comment for the next code region: NT layout.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：NT layout。
+- **L269** `  using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L270** `  using LayoutA = cutlass::layout::RowMajor;`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。
+- **L271** `  using LayoutB = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。
+- **L272** `  using LayoutC = cutlass::layout::ColumnMajor;`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。
+- **L273** `  using LayoutD = LayoutC;`
+  - EN: Creates the alias `LayoutD` for the helper type `LayoutC`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `LayoutC`。
+- **L274** `  using ElementA = float;`
+  - EN: Creates the alias `ElementA` for the scalar type `float`.
+  - 中文：为 `ElementA` 创建别名，对应 标量类型 `float`。
+- **L275** `  using ElementB = float;`
+  - EN: Creates the alias `ElementB` for the scalar type `float`.
+  - 中文：为 `ElementB` 创建别名，对应 标量类型 `float`。
+- **L276** `  using ElementC = float;`
+  - EN: Creates the alias `ElementC` for the scalar type `float`.
+  - 中文：为 `ElementC` 创建别名，对应 标量类型 `float`。
+- **L277** `  using ElementD = float;`
+  - EN: Creates the alias `ElementD` for the scalar type `float`.
+  - 中文：为 `ElementD` 创建别名，对应 标量类型 `float`。
+- **L278** `  using ElementAccumulator = float;`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。
+- **L279** `  using ElementCompute = float;`
+  - EN: Creates the alias `ElementCompute` for the scalar type `float`.
+  - 中文：为 `ElementCompute` 创建别名，对应 标量类型 `float`。
+- **L280** `  using ElementBias = float;`
+  - EN: Creates the alias `ElementBias` for the scalar type `float`.
+  - 中文：为 `ElementBias` 创建别名，对应 标量类型 `float`。
+- **L281** `  using TileShape = Shape<_64, _32, _16>;`
+  - EN: Creates the alias `TileShape` for a compile-time shape `Shape<_64, _32, _16>`.
+  - 中文：为 `TileShape` 创建别名，对应 编译期形状 `Shape<_64, _32, _16>`。
+- **L282** `  using ClusterShape = Shape<_1, _1, _1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1, _1, _1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1, _1, _1>`。
+- **L283** `  static constexpr int kAlignmentA = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentA = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentA = 1;`。
+- **L284** `  static constexpr int kAlignmentB = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentB = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentB = 1;`。
+- **L285** `  static constexpr int kAlignmentC = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentC = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentC = 1;`。
+- **L286** `  static constexpr int kAlignmentD = 1;`
+  - EN: Completes the statement `static constexpr int kAlignmentD = 1;`.
+  - 中文：完成语句 `static constexpr int kAlignmentD = 1;`。
+- **L287** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L288** `  // Mainloop`
+  - EN: Adds a human-readable comment for the next code region: Mainloop.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Mainloop。
+- **L289** `  using CollectiveMainloop = cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM mainloop.
+  - 中文：开始实例化用于 GEMM 主循环的 collective builder。
+- **L290** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L291** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L292** `    ElementA, LayoutA, kAlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L293** `    ElementB, LayoutB, kAlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L294** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L295** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L296** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L297** `    cutlass::gemm::collective::StageCount<3>,`
+  - EN: Supplies the stage-count policy for pipeline buffering.
+  - 中文：提供流水线缓冲使用的阶段数策略。
+- **L298** `    cutlass::gemm::KernelMultistage`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L299** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L300** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L301** `  // Epilogue`
+  - EN: Adds a human-readable comment for the next code region: Epilogue.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Epilogue。
+- **L302** `  // Treat Clamp as Relu`
+  - EN: Adds a human-readable comment for the next code region: Treat Clamp as Relu.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Treat Clamp as Relu。
+- **L303** `  using FusionOp = cutlass::epilogue::fusion::LinCombPerRowBiasEltAct<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L304** `    cutlass::epilogue::thread::Clamp, ElementD, ElementCompute, ElementBias, ElementC, ElementCompute, kAlignmentD`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L305** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L306** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L307** `  using CollectiveEpilogue = cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Begins a collective-builder instantiation for the GEMM epilogue.
+  - 中文：开始实例化用于 GEMM epilogue 的 collective builder。
+- **L308** `    cutlass::arch::Sm100,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L309** `    cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L310** `    TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L311** `    ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L312** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L313** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L314** `    ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L315** `    ElementC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L316** `    LayoutC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L317** `    kAlignmentC,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L318** `    ElementD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L319** `    LayoutD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L320** `    kAlignmentD,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L321** `    cutlass::epilogue::EpilogueSimtVectorized`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L322** `    ,FusionOp`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L323** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L324** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L325** `  // Kernel`
+  - EN: Adds a human-readable comment for the next code region: Kernel.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Kernel。
+- **L326** `  using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L327** `      Shape<int,int,int,int>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L328** `      CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L329** `      CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L330** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L331** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L332** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L333** `  bool result = test::gemm::device::TestSmallFusion<Gemm>(2.0, 0.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L334** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result)` evaluates to true, marking the test as passed.
+  - 中文：检查 `result)` 的结果是否为真，以判定测试通过。
+- **L335** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L336** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L337** `#endif // defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)`
+  - EN: Closes the current conditional-compilation block.
+  - 中文：结束当前条件编译块。
+
+## Key Concepts / 关键概念
+- EN: CUTLASS 3.x universal GEMM adapter
+  - 中文：CUTLASS 3.x 通用 GEMM 适配器
+- EN: Collective-builder based kernel composition
+  - 中文：基于 CollectiveBuilder 的内核组合
+- EN: GoogleTest test cases
+  - 中文：GoogleTest 测试用例
+- EN: SIMT operator class
+  - 中文：SIMT 运算类别
+- EN: SM100 feature guards
+  - 中文：SM100 特性编译保护
+- EN: Architecture-specific kernel specialization
+  - 中文：面向特定架构的内核特化
+
+## Dependencies / 依赖关系
+- `cutlass/cutlass.h`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- `cutlass/numeric_types.h`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- `cutlass/arch/mma_sm100.h`
+  - EN: Includes `cutlass/arch/mma_sm100.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/arch/mma_sm100.h`，这是该测试编译单元所需的依赖。
+- `cutlass/gemm/device/gemm_universal_adapter.h`
+  - EN: Provides the universal adapter that wraps a CUTLASS 3.x GEMM kernel for launch.
+  - 中文：提供通用适配器，用于封装并启动 CUTLASS 3.x GEMM 内核。
+- `cutlass/gemm/kernel/gemm_universal.hpp`
+  - EN: Defines the universal GEMM kernel composition used by modern CUTLASS tests.
+  - 中文：定义现代 CUTLASS 测试使用的通用 GEMM 内核组合。
+- `cutlass/gemm/collective/collective_builder.hpp`
+  - EN: Builds the GEMM mainloop collective from architecture, tile, and datatype parameters.
+  - 中文：根据架构、tile 和数据类型参数构建 GEMM 主循环 collective。
+- `cutlass/epilogue/dispatch_policy.hpp`
+  - EN: Defines epilogue scheduling policy tags used by collective builders.
+  - 中文：定义 collective builder 使用的 epilogue 调度策略标签。
+- `cutlass/epilogue/collective/collective_builder.hpp`
+  - EN: Builds the epilogue collective that writes GEMM results to memory.
+  - 中文：构建将 GEMM 结果写回内存的 epilogue collective。
+- `cute/tensor.hpp`
+  - EN: Provides CUTE tensor abstractions used to describe tiled tensor layouts.
+  - 中文：提供 CUTE 张量抽象，用于描述分块张量布局。
+- `cute/atom/mma_atom.hpp`
+  - EN: Provides CUTE MMA atom definitions used to model tensor-core operations.
+  - 中文：提供 CUTE MMA 原子定义，用于描述 Tensor Core 运算。
+- `../../common/cutlass_unit_test.h`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- `gemm_testbed_3x.hpp`
+  - EN: Includes `gemm_testbed_3x.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `gemm_testbed_3x.hpp`，这是该测试编译单元所需的依赖。

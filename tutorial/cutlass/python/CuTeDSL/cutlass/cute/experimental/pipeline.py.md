@@ -1,0 +1,1071 @@
+# pipeline.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/experimental/pipeline.py`
+
+## Purpose / 作用
+- EN: Convenience pipeline classes that hide elect_one synchronization complexity
+- CN: 该模块的文档字符串将其描述为：Convenience pipeline classes that hide elect_one synchronization complexity
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `Convenience pipeline classes that hide elect_one synchronization complexity` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L17** `from typing import NoReturn, Optional` — **EN:** Imports NoReturn, Optional from `typing`. **CN:** 从 `typing` 导入 NoReturn, Optional。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L22** `from cutlass.base_dsl.typing import Int32` — **EN:** Imports Int32 from `cutlass.base_dsl.typing`. **CN:** 从 `cutlass.base_dsl.typing` 导入 Int32。
+- **L23** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L24** `from cutlass._mlir.dialects import lir as cutlass_lir_ir` — **EN:** Imports lir as cutlass_lir_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 lir as cutlass_lir_ir。
+- **L25** `from cutlass._mlir.dialects.core import OperationTypeEnum` — **EN:** Imports OperationTypeEnum from `cutlass._mlir.dialects.core`. **CN:** 从 `cutlass._mlir.dialects.core` 导入 OperationTypeEnum。
+- **L26** `from cutlass.cute.typing import Boolean` — **EN:** Imports Boolean from `cutlass.cute.typing`. **CN:** 从 `cutlass.cute.typing` 导入 Boolean。
+- **L27** `from cutlass.cute.experimental.core import (` — **EN:** Imports create_pipeline, producer_acquire, get_pipeline_produce_stage, get_pipeline_consume_stage, producer_commit, consumer_release, ... (+13 more) from `cutlass.cute.experimental.core`. **CN:** 从 `cutlass.cute.experimental.core` 导入 create_pipeline, producer_acquire, get_pipeline_produce_stage, get_pipeline_consume_stage, producer_commit, consumer_release, ... (+13 more)。
+- **L28** `    create_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    producer_acquire,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    get_pipeline_produce_stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    get_pipeline_consume_stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    producer_commit,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    consumer_release,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    pipeline_advance_iterator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    PipelineState,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    consumer_wait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    consumer_tail,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    create_circular_buffer_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    circular_buffer_pipeline_consume,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    circular_buffer_pipeline_consumer_release,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    circular_buffer_pipeline_advance_iterator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    mbarrier_expect_tx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    normalize_skip_wait_token,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    producer_try_acquire,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    consumer_try_wait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    SkipWaitToken,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `from cutlass.cutlass_dsl import CuteExperimentalDSL` — **EN:** Imports CuteExperimentalDSL from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 CuteExperimentalDSL。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `from ..typing import Pointer` — **EN:** Imports Pointer from `..typing`. **CN:** 从 `..typing` 导入 Pointer。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `class GenericPipelineBase:` — **EN:** Defines class `GenericPipelineBase`. **CN:** 定义类 `GenericPipelineBase`。
+- **L55** `    """Base class for pipeline convenience wrappers"""` — **EN:** Docstring line documenting the class `GenericPipelineBase`. **CN:** 文档字符串行，用于说明 class `GenericPipelineBase`。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L58** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `        raw_pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L61** `        producer_state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L62** `        consumer_state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L64** `        self.raw_pipeline = raw_pipeline` — **EN:** Assigns a value to self.raw_pipeline. **CN:** 将一个值赋给 self.raw_pipeline。
+- **L65** `        self.num_stages = num_stages` — **EN:** Assigns a value to self.num_stages. **CN:** 将一个值赋给 self.num_stages。
+- **L66** `        # For convenience class, we always manage state internally` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `        self.producer_state = producer_state` — **EN:** Assigns a value to self.producer_state. **CN:** 将一个值赋给 self.producer_state。
+- **L68** `        self.consumer_state = consumer_state` — **EN:** Assigns a value to self.consumer_state. **CN:** 将一个值赋给 self.consumer_state。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    def __extract_mlir_values__(self) -> list:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L71** `        """Extract MLIR values for DynamicExpression protocol."""` — **EN:** Docstring line documenting the function `__extract_mlir_values__`. **CN:** 文档字符串行，用于说明 function `__extract_mlir_values__`。
+- **L72** `        # raw_pipeline is always ir.OpResult from create_pipeline (no __extract_mlir_values__)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** `        pipeline_values = [self.raw_pipeline]` — **EN:** Assigns a value to pipeline_values. **CN:** 将一个值赋给 pipeline_values。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `        # Create DSL types and extract their underlying MLIR values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L76** `        num_stages_dsl = Int32(self.num_stages)` — **EN:** Assigns a value to num_stages_dsl. **CN:** 将一个值赋给 num_stages_dsl。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `        # Pipeline states are already MLIR values (PipelineState objects)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `        producer_state_values = [self.producer_state]` — **EN:** Assigns a value to producer_state_values. **CN:** 将一个值赋给 producer_state_values。
+- **L80** `        consumer_state_values = [self.consumer_state]` — **EN:** Assigns a value to consumer_state_values. **CN:** 将一个值赋给 consumer_state_values。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** `            pipeline_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `            + [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `                num_stages_dsl.__extract_mlir_values__()[0],  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `            + producer_state_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `            + consumer_state_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L92** `    def __new_from_mlir_values__(cls, values: list) -> "GenericPipelineBase":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L93** `        """Reconstruct object from MLIR values."""` — **EN:** Docstring line documenting the function `__new_from_mlir_values__`. **CN:** 文档字符串行，用于说明 function `__new_from_mlir_values__`。
+- **L94** `        # Parse the known structure: [pipeline] + [num_stages, producer_flag, consumer_flag] + [producer_state] + [consumer_state]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L95** `        # All lir_* objects are single MLIR values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `        raw_pipeline = values[0]  # Always single ir.OpResult` — **EN:** Assigns a value to raw_pipeline. **CN:** 将一个值赋给 raw_pipeline。
+- **L97** `        num_stages_val = values[1]` — **EN:** Assigns a value to num_stages_val. **CN:** 将一个值赋给 num_stages_val。
+- **L98** `        producer_state = values[2]  # Always single PipelineState` — **EN:** Assigns a value to producer_state. **CN:** 将一个值赋给 producer_state。
+- **L99** `        consumer_state = values[3]  # Always single PipelineState` — **EN:** Assigns a value to consumer_state. **CN:** 将一个值赋给 consumer_state。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `        num_stages_dsl = Int32(0).__new_from_mlir_values__([num_stages_val])  # type: ignore[attr-defined]` — **EN:** Assigns a value to num_stages_dsl. **CN:** 将一个值赋给 num_stages_dsl。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `        return cls(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `            num_stages_dsl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    def producer_acquire(self) -> "GenericPipelineBase":` — **EN:** Defines function `producer_acquire`. **CN:** 定义函数 `producer_acquire`。
+- **L111** `        """Acquire producer state."""` — **EN:** Docstring line documenting the function `producer_acquire`. **CN:** 文档字符串行，用于说明 function `producer_acquire`。
+- **L112** `        producer_acquire(self.raw_pipeline, self.producer_state)` — **EN:** Invokes `producer_acquire` as a standalone call. **CN:** 以独立语句方式调用 `producer_acquire`。
+- **L113** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    def producer_try_acquire(self, *, token: Optional[SkipWaitToken] = None) -> Boolean:` — **EN:** Defines function `producer_try_acquire`. **CN:** 定义函数 `producer_try_acquire`。
+- **L116** `        """Try to acquire the next producer stage without blocking."""` — **EN:** Docstring line documenting the function `producer_try_acquire`. **CN:** 文档字符串行，用于说明 function `producer_try_acquire`。
+- **L117** `        return producer_try_acquire(self.raw_pipeline, self.producer_state, token=token)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `    def get_producer_stage(self) -> ir.Value:` — **EN:** Defines function `get_producer_stage`. **CN:** 定义函数 `get_producer_stage`。
+- **L120** `        """Get producer stage."""` — **EN:** Docstring line documenting the function `get_producer_stage`. **CN:** 文档字符串行，用于说明 function `get_producer_stage`。
+- **L121** `        return get_pipeline_produce_stage(self.raw_pipeline, self.producer_state)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    def get_consumer_stage(self) -> ir.Value:` — **EN:** Defines function `get_consumer_stage`. **CN:** 定义函数 `get_consumer_stage`。
+- **L124** `        """Get consumer stage."""` — **EN:** Docstring line documenting the function `get_consumer_stage`. **CN:** 文档字符串行，用于说明 function `get_consumer_stage`。
+- **L125** `        return get_pipeline_consume_stage(self.raw_pipeline, self.consumer_state)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    # Instance methods that can now be used directly in kernel context` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L128** `    def producer_acquire_and_get_stage(` — **EN:** Defines function `producer_acquire_and_get_stage`. **CN:** 定义函数 `producer_acquire_and_get_stage`。
+- **L129** `        self, *, token: Optional[SkipWaitToken] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L130** `    ) -> tuple[ir.Value, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L131** `        """Acquire a producer stage and return its stage token/index.` — **EN:** Starts the docstring for the function `producer_acquire_and_get_stage`. **CN:** 开始说明 function `producer_acquire_and_get_stage` 的文档字符串。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `        When \`token\` is provided, reuse the preceding \`producer_try_acquire()\`` — **EN:** Continues the docstring for the function `producer_acquire_and_get_stage`. **CN:** 继续说明 function `producer_acquire_and_get_stage` 的文档字符串。
+- **L134** `        result and keep the internal state at the acquired stage so a following` — **EN:** Continues the docstring for the function `producer_acquire_and_get_stage`. **CN:** 继续说明 function `producer_acquire_and_get_stage` 的文档字符串。
+- **L135** `        \`producer_commit_and_advance()\` retires the same stage.` — **EN:** Continues the docstring for the function `producer_acquire_and_get_stage`. **CN:** 继续说明 function `producer_acquire_and_get_stage` 的文档字符串。
+- **L136** `        """` — **EN:** Ends the docstring for the function `producer_acquire_and_get_stage`. **CN:** 结束说明 function `producer_acquire_and_get_stage` 的文档字符串。
+- **L137** `        if token is None:` — **EN:** Starts a conditional branch guarded by `token is None`. **CN:** 开始一个由 `token is None` 控制的条件分支。
+- **L138** `            self.producer_acquire()` — **EN:** Invokes `self.producer_acquire` as a standalone call. **CN:** 以独立语句方式调用 `self.producer_acquire`。
+- **L139** `            return get_pipeline_produce_stage(self.raw_pipeline, self.producer_state)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `        skip_wait = normalize_skip_wait_token(token)` — **EN:** Assigns a value to skip_wait. **CN:** 将一个值赋给 skip_wait。
+- **L142** `        stage_state = cutlass_lir_ir.ProducerAcquireOp(` — **EN:** Assigns a value to stage_state. **CN:** 将一个值赋给 stage_state。
+- **L143** `            self.raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `            self.producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `            skipWait=skip_wait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `        ).outState` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `        self.producer_state = stage_state` — **EN:** Assigns a value to self.producer_state. **CN:** 将一个值赋给 self.producer_state。
+- **L148** `        stage_token, stage_idx = get_pipeline_produce_stage(` — **EN:** Assigns a value to (stage_token, stage_idx). **CN:** 将一个值赋给 (stage_token, stage_idx)。
+- **L149** `            self.raw_pipeline, stage_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `        return stage_token, stage_idx` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `    def producer_commit(self) -> "GenericPipelineBase":` — **EN:** Defines function `producer_commit`. **CN:** 定义函数 `producer_commit`。
+- **L154** `        """Commit producer state."""` — **EN:** Docstring line documenting the function `producer_commit`. **CN:** 文档字符串行，用于说明 function `producer_commit`。
+- **L155** `        producer_commit(self.raw_pipeline, self.producer_state)` — **EN:** Invokes `producer_commit` as a standalone call. **CN:** 以独立语句方式调用 `producer_commit`。
+- **L156** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    def consumer_try_wait(self, *, token: Optional[SkipWaitToken] = None) -> Boolean:` — **EN:** Defines function `consumer_try_wait`. **CN:** 定义函数 `consumer_try_wait`。
+- **L159** `        """Try to wait for the next consumer stage without blocking."""` — **EN:** Docstring line documenting the function `consumer_try_wait`. **CN:** 文档字符串行，用于说明 function `consumer_try_wait`。
+- **L160** `        return consumer_try_wait(self.raw_pipeline, self.consumer_state, token=token)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `    def consumer_release(self) -> "GenericPipelineBase":` — **EN:** Defines function `consumer_release`. **CN:** 定义函数 `consumer_release`。
+- **L163** `        """Release consumer state."""` — **EN:** Docstring line documenting the function `consumer_release`. **CN:** 文档字符串行，用于说明 function `consumer_release`。
+- **L164** `        consumer_release(self.raw_pipeline, self.consumer_state)` — **EN:** Invokes `consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `consumer_release`。
+- **L165** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    def producer_commit_and_advance(self) -> "GenericPipelineBase":` — **EN:** Defines function `producer_commit_and_advance`. **CN:** 定义函数 `producer_commit_and_advance`。
+- **L168** `        """Combined producer commit + advance with automatic elect_one using internal state."""` — **EN:** Docstring line documenting the function `producer_commit_and_advance`. **CN:** 文档字符串行，用于说明 function `producer_commit_and_advance`。
+- **L169** `        self.producer_commit()` — **EN:** Invokes `self.producer_commit` as a standalone call. **CN:** 以独立语句方式调用 `self.producer_commit`。
+- **L170** `        # Update internal state in-place for better performance` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L171** `        self.producer_state = pipeline_advance_iterator(` — **EN:** Assigns a value to self.producer_state. **CN:** 将一个值赋给 self.producer_state。
+- **L172** `            self.raw_pipeline, self.producer_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `    def consumer_wait_and_get_stage(` — **EN:** Defines function `consumer_wait_and_get_stage`. **CN:** 定义函数 `consumer_wait_and_get_stage`。
+- **L177** `        self, *, token: Optional[SkipWaitToken] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L178** `    ) -> tuple[ir.Value, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L179** `        """Wait for a consumer stage and return its stage token/index.` — **EN:** Starts the docstring for the function `consumer_wait_and_get_stage`. **CN:** 开始说明 function `consumer_wait_and_get_stage` 的文档字符串。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `        When \`token\` is provided, reuse the preceding \`consumer_try_wait()\`` — **EN:** Continues the docstring for the function `consumer_wait_and_get_stage`. **CN:** 继续说明 function `consumer_wait_and_get_stage` 的文档字符串。
+- **L182** `        result and keep the internal state at the consumed stage so a following` — **EN:** Continues the docstring for the function `consumer_wait_and_get_stage`. **CN:** 继续说明 function `consumer_wait_and_get_stage` 的文档字符串。
+- **L183** `        \`consumer_release_and_advance()\` retires the same stage.` — **EN:** Continues the docstring for the function `consumer_wait_and_get_stage`. **CN:** 继续说明 function `consumer_wait_and_get_stage` 的文档字符串。
+- **L184** `        """` — **EN:** Ends the docstring for the function `consumer_wait_and_get_stage`. **CN:** 结束说明 function `consumer_wait_and_get_stage` 的文档字符串。
+- **L185** `        if token is None:` — **EN:** Starts a conditional branch guarded by `token is None`. **CN:** 开始一个由 `token is None` 控制的条件分支。
+- **L186** `            self.consumer_wait()` — **EN:** Invokes `self.consumer_wait` as a standalone call. **CN:** 以独立语句方式调用 `self.consumer_wait`。
+- **L187** `            return get_pipeline_consume_stage(self.raw_pipeline, self.consumer_state)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `        skip_wait = normalize_skip_wait_token(token)` — **EN:** Assigns a value to skip_wait. **CN:** 将一个值赋给 skip_wait。
+- **L190** `        stage_state = cutlass_lir_ir.ConsumerWaitOp(` — **EN:** Assigns a value to stage_state. **CN:** 将一个值赋给 stage_state。
+- **L191** `            self.raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `            self.consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `            skipWait=skip_wait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `        ).outState` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `        self.consumer_state = stage_state` — **EN:** Assigns a value to self.consumer_state. **CN:** 将一个值赋给 self.consumer_state。
+- **L196** `        stage_token, stage_idx = get_pipeline_consume_stage(` — **EN:** Assigns a value to (stage_token, stage_idx). **CN:** 将一个值赋给 (stage_token, stage_idx)。
+- **L197** `            self.raw_pipeline, stage_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `        return stage_token, stage_idx` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    def consumer_wait(` — **EN:** Defines function `consumer_wait`. **CN:** 定义函数 `consumer_wait`。
+- **L202** `        self, state: Optional[PipelineState] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L203** `    ) -> "GenericPipelineBase":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L204** `        """Wait for consumer to be ready."""` — **EN:** Docstring line documenting the function `consumer_wait`. **CN:** 文档字符串行，用于说明 function `consumer_wait`。
+- **L205** `        if state:` — **EN:** Starts a conditional branch guarded by `state`. **CN:** 开始一个由 `state` 控制的条件分支。
+- **L206** `            consumer_wait(self.raw_pipeline, state)` — **EN:** Invokes `consumer_wait` as a standalone call. **CN:** 以独立语句方式调用 `consumer_wait`。
+- **L207** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L208** `            consumer_wait(self.raw_pipeline, self.consumer_state)` — **EN:** Invokes `consumer_wait` as a standalone call. **CN:** 以独立语句方式调用 `consumer_wait`。
+- **L209** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    def consumer_release_and_advance(self) -> "GenericPipelineBase":` — **EN:** Defines function `consumer_release_and_advance`. **CN:** 定义函数 `consumer_release_and_advance`。
+- **L212** `        """Combined consumer release + advance with automatic elect_one using internal state."""` — **EN:** Docstring line documenting the function `consumer_release_and_advance`. **CN:** 文档字符串行，用于说明 function `consumer_release_and_advance`。
+- **L213** `        self.consumer_release()` — **EN:** Invokes `self.consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `self.consumer_release`。
+- **L214** `        # Update internal state in-place for better performance` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L215** `        self.consumer_state = pipeline_advance_iterator(` — **EN:** Assigns a value to self.consumer_state. **CN:** 将一个值赋给 self.consumer_state。
+- **L216** `            self.raw_pipeline, self.consumer_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** `    def consumer_tail(self) -> "GenericPipelineBase":` — **EN:** Defines function `consumer_tail`. **CN:** 定义函数 `consumer_tail`。
+- **L221** `        """Combined consumer tail with automatic elect_one using internal state."""` — **EN:** Docstring line documenting the function `consumer_tail`. **CN:** 文档字符串行，用于说明 function `consumer_tail`。
+- **L222** `        consumer_tail(self.raw_pipeline, self.consumer_state)` — **EN:** Invokes `consumer_tail` as a standalone call. **CN:** 以独立语句方式调用 `consumer_tail`。
+- **L223** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    def increment_state(self, state: PipelineState) -> ir.Value:` — **EN:** Defines function `increment_state`. **CN:** 定义函数 `increment_state`。
+- **L226** `        """Advance the input state w/o modifying current pipeline"""` — **EN:** Docstring line documenting the function `increment_state`. **CN:** 文档字符串行，用于说明 function `increment_state`。
+- **L227** `        return pipeline_advance_iterator(self.raw_pipeline, state)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `class GenericPipeline(GenericPipelineBase):` — **EN:** Defines class `GenericPipeline` with bases GenericPipelineBase. **CN:** 定义类 `GenericPipeline`，其基类为 GenericPipelineBase。
+- **L231** `    """` — **EN:** Starts the docstring for the class `GenericPipeline`. **CN:** 开始说明 class `GenericPipeline` 的文档字符串。
+- **L232** `    Generic pipeline for any combination of producer and consumer.` — **EN:** Continues the docstring for the class `GenericPipeline`. **CN:** 继续说明 class `GenericPipeline` 的文档字符串。
+- **L233** `    """` — **EN:** Ends the docstring for the class `GenericPipeline`. **CN:** 结束说明 class `GenericPipeline` 的文档字符串。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L236** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L237** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `        producer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L239** `        consumer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `        producer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `        consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L242** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L243** `    ) -> "GenericPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L244** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L245** `        Create a generic pipeline with parameterized producer and consumer.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `        Args:` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L248** `            producer: Producer operation type` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L249** `            consumer: Consumer operation type` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L250** `            producer_arv_count: Producer arrival count` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L251** `            consumer_arv_count: Consumer arrival count` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L252** `            num_stages: Number of pipeline stages` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L253** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L254** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L255** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `            producer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            consumer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `            producer_arv_count=producer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `            consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `        return GenericPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L263** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `def _validate_umma_operation_type(operation_type: OperationTypeEnum) -> None:` — **EN:** Defines function `_validate_umma_operation_type`. **CN:** 定义函数 `_validate_umma_operation_type`。
+- **L271** `    if operation_type not in [` — **EN:** Starts a conditional branch guarded by `operation_type not in [OperationTypeEnum.SM100_MMA_1SM_SS...`. **CN:** 开始一个由 `operation_type not in [OperationTypeEnum.SM100_MMA_1SM_SS...` 控制的条件分支。
+- **L272** `        OperationTypeEnum.SM100_MMA_1SM_SS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L273** `        OperationTypeEnum.SM100_MMA_1SM_TS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L274** `        OperationTypeEnum.SM100_MMA_2SM_SS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L275** `        OperationTypeEnum.SM100_MMA_2SM_TS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `        OperationTypeEnum.SM100_MMA_SCALED_1SM_SS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `        OperationTypeEnum.SM100_MMA_SCALED_1SM_TS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `        OperationTypeEnum.SM100_MMA_SCALED_2SM_SS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `        OperationTypeEnum.SM100_MMA_SCALED_2SM_TS,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L281** `        raise ValueError(f"Invalid UMMA operation type: {operation_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `def _is_2sm_umma_operation_type(operation_type: OperationTypeEnum) -> bool:` — **EN:** Defines function `_is_2sm_umma_operation_type`. **CN:** 定义函数 `_is_2sm_umma_operation_type`。
+- **L285** `    """Check if the operation type is a 2SM UMMA operation."""` — **EN:** Docstring line documenting the function `_is_2sm_umma_operation_type`. **CN:** 文档字符串行，用于说明 function `_is_2sm_umma_operation_type`。
+- **L286** `    return operation_type in [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L287** `        OperationTypeEnum.SM100_MMA_2SM_SS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `        OperationTypeEnum.SM100_MMA_2SM_TS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `        OperationTypeEnum.SM100_MMA_SCALED_2SM_SS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `        OperationTypeEnum.SM100_MMA_SCALED_2SM_TS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** `def _is_multicast_tma_operation_type(operation_type: OperationTypeEnum) -> bool:` — **EN:** Defines function `_is_multicast_tma_operation_type`. **CN:** 定义函数 `_is_multicast_tma_operation_type`。
+- **L295** `    """Check if the operation type is a multicast TMA load."""` — **EN:** Docstring line documenting the function `_is_multicast_tma_operation_type`. **CN:** 文档字符串行，用于说明 function `_is_multicast_tma_operation_type`。
+- **L296** `    return operation_type in [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L297** `        OperationTypeEnum.SM90_TMA_LOAD_MULTICAST,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `        OperationTypeEnum.SM100_TMA_LOAD_2SM_MULTICAST,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `class TMAToUMMAPipeline(GenericPipelineBase):` — **EN:** Defines class `TMAToUMMAPipeline` with bases GenericPipelineBase. **CN:** 定义类 `TMAToUMMAPipeline`，其基类为 GenericPipelineBase。
+- **L303** `    """` — **EN:** Starts the docstring for the class `TMAToUMMAPipeline`. **CN:** 开始说明 class `TMAToUMMAPipeline` 的文档字符串。
+- **L304** `    Pipeline for TMA to UMMA.` — **EN:** Continues the docstring for the class `TMAToUMMAPipeline`. **CN:** 继续说明 class `TMAToUMMAPipeline` 的文档字符串。
+- **L305** `    """` — **EN:** Ends the docstring for the class `TMAToUMMAPipeline`. **CN:** 结束说明 class `TMAToUMMAPipeline` 的文档字符串。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L308** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L309** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        tma_operation_type: Optional[OperationTypeEnum] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        cluster_layout_vmnk: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `    ) -> "TMAToUMMAPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L315** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L316** `        Create a TMA to UMMA pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `        Args:` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L319** `            num_stages: Number of pipeline stages.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L320** `            mma_operation_type: UMMA operation type (e.g., SM100_MMA_1SM_SS).` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L321** `            tma_operation_type: TMA operation type. Defaults to SM90_TMA_LOAD.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L322** `            cluster_layout_vmnk: Cluster layout in (v, m, n, k) order. Required` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L323** `                whenever the selected TMA load spans more than one CTA, i.e.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L324** `                for any 2SM or multicast \`tma_operation_type\`. This layout is` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L325** `                the source of truth for CTA identity and v-pair membership. The` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L326** `                m/n/k dimensions can be dynamic.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L327** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L328** `        _validate_umma_operation_type(` — **EN:** Invokes `_validate_umma_operation_type` as a standalone call. **CN:** 以独立语句方式调用 `_validate_umma_operation_type`。
+- **L329** `            mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `        if tma_operation_type is None:` — **EN:** Starts a conditional branch guarded by `tma_operation_type is None`. **CN:** 开始一个由 `tma_operation_type is None` 控制的条件分支。
+- **L333** `            tma_operation_type = OperationTypeEnum.SM90_TMA_LOAD` — **EN:** Assigns a value to tma_operation_type. **CN:** 将一个值赋给 tma_operation_type。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `        if _is_multicast_tma_operation_type(tma_operation_type):` — **EN:** Starts a conditional branch guarded by `_is_multicast_tma_operation_type(tma_operation_type)`. **CN:** 开始一个由 `_is_multicast_tma_operation_type(tma_operation_type)` 控制的条件分支。
+- **L336** `            if cluster_layout_vmnk is None:` — **EN:** Starts a conditional branch guarded by `cluster_layout_vmnk is None`. **CN:** 开始一个由 `cluster_layout_vmnk is None` 控制的条件分支。
+- **L337** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L338** `                    "cluster_layout_vmnk is required when using multicast TMA loads"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `            return TMAToUMMAPipeline._create_with_multicast_mask(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L341** `                num_stages=num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** `                tma_operation_type=tma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `                mma_operation_type=mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `                cluster_layout_vmnk=cluster_layout_vmnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** `        if tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM:` — **EN:** Starts a conditional branch guarded by `tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM`. **CN:** 开始一个由 `tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM` 控制的条件分支。
+- **L348** `            if cluster_layout_vmnk is None:` — **EN:** Starts a conditional branch guarded by `cluster_layout_vmnk is None`. **CN:** 开始一个由 `cluster_layout_vmnk is None` 控制的条件分支。
+- **L349** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L350** `                    "cluster_layout_vmnk is required if using 2CTA MMA with TMA"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** `            cta_rank_in_cluster = cute.arch.make_warp_uniform(` — **EN:** Assigns a value to cta_rank_in_cluster. **CN:** 将一个值赋给 cta_rank_in_cluster。
+- **L354** `                cute.arch.block_idx_in_cluster()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `            cta_in_cluster_coord_vmnk = cluster_layout_vmnk.get_flat_coord(` — **EN:** Assigns a value to cta_in_cluster_coord_vmnk. **CN:** 将一个值赋给 cta_in_cluster_coord_vmnk。
+- **L357** `                cta_rank_in_cluster` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `            arrival_mask = cute.make_layout_image_mask(` — **EN:** Assigns a value to arrival_mask. **CN:** 将一个值赋给 arrival_mask。
+- **L360** `                cluster_layout_vmnk, cta_in_cluster_coord_vmnk, mode=0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** `            raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L364** `                num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `                tma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `                mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `                producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `                consumer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `                arrival_mask=arrival_mask,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `        elif tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L372** `            raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L373** `                num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `                tma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `                mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `                producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `                consumer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L380** `            raise ValueError(f"Invalid tma_operation_type: {tma_operation_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L381** `        return TMAToUMMAPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L382** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L388** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L389** `    def create_with_mask(` — **EN:** Defines function `create_with_mask`. **CN:** 定义函数 `create_with_mask`。
+- **L390** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L391** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L392** `        tma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L393** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L394** `        cluster_layout_vmnk: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L395** `    ) -> "TMAToUMMAPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L396** `        """Backward-compatible alias. Prefer create(tma_operation_type=...MULTICAST)."""` — **EN:** Docstring line documenting the function `create_with_mask`. **CN:** 文档字符串行，用于说明 function `create_with_mask`。
+- **L397** `        return TMAToUMMAPipeline._create_with_multicast_mask(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L398** `            num_stages=num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** `            tma_operation_type=tma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L400** `            mma_operation_type=mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `            cluster_layout_vmnk=cluster_layout_vmnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L405** `    def _create_with_multicast_mask(` — **EN:** Defines function `_create_with_multicast_mask`. **CN:** 定义函数 `_create_with_multicast_mask`。
+- **L406** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L407** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L408** `        tma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L409** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L410** `        cluster_layout_vmnk: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L411** `    ) -> "TMAToUMMAPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L412** `        """Internal: compute TMA multicast masks from cluster layout."""` — **EN:** Docstring line documenting the function `_create_with_multicast_mask`. **CN:** 文档字符串行，用于说明 function `_create_with_multicast_mask`。
+- **L413** `        tma_mcast_proj_A = 2  # multicast across CTAs in same row` — **EN:** Assigns a value to tma_mcast_proj_A. **CN:** 将一个值赋给 tma_mcast_proj_A。
+- **L414** `        tma_mcast_proj_B = 1  # multicast across CTAs in same column` — **EN:** Assigns a value to tma_mcast_proj_B. **CN:** 将一个值赋给 tma_mcast_proj_B。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `        cta_rank_in_cluster = cute.arch.make_warp_uniform(` — **EN:** Assigns a value to cta_rank_in_cluster. **CN:** 将一个值赋给 cta_rank_in_cluster。
+- **L417** `            cute.arch.block_idx_in_cluster()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `        cta_in_cluster_coord_vmnk = cluster_layout_vmnk.get_flat_coord(` — **EN:** Assigns a value to cta_in_cluster_coord_vmnk. **CN:** 将一个值赋给 cta_in_cluster_coord_vmnk。
+- **L420** `            cta_rank_in_cluster` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L423** `        # For 2CTA MMA (v-size==2), the peer CTA is the other v-slice (xor 1).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L424** `        # For 1CTA MMA (v-size==1), the peer is the local CTA (no flip).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L425** `        v_size = cute.size(cluster_layout_vmnk.shape[0])  # type: ignore[index]` — **EN:** Assigns a value to v_size. **CN:** 将一个值赋给 v_size。
+- **L426** `        peer_v = (` — **EN:** Assigns a value to peer_v. **CN:** 将一个值赋给 peer_v。
+- **L427** `            (cta_in_cluster_coord_vmnk[0] ^ 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `            if cutlass.const_expr(v_size > 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `            else cta_in_cluster_coord_vmnk[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `        cta_in_cluster_coord_vmnk_peer = (` — **EN:** Assigns a value to cta_in_cluster_coord_vmnk_peer. **CN:** 将一个值赋给 cta_in_cluster_coord_vmnk_peer。
+- **L432** `            peer_v,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `            *cta_in_cluster_coord_vmnk[1:],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `        arrival_mask_a = cute.nvgpu.cpasync.create_tma_multicast_mask(` — **EN:** Assigns a value to arrival_mask_a. **CN:** 将一个值赋给 arrival_mask_a。
+- **L437** `            cluster_layout_vmnk, cta_in_cluster_coord_vmnk, tma_mcast_proj_A` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `        arrival_mask_b = cute.nvgpu.cpasync.create_tma_multicast_mask(` — **EN:** Assigns a value to arrival_mask_b. **CN:** 将一个值赋给 arrival_mask_b。
+- **L440** `            cluster_layout_vmnk, cta_in_cluster_coord_vmnk, tma_mcast_proj_B` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `        arrival_mask_a_peer = cute.nvgpu.cpasync.create_tma_multicast_mask(` — **EN:** Assigns a value to arrival_mask_a_peer. **CN:** 将一个值赋给 arrival_mask_a_peer。
+- **L444** `            cluster_layout_vmnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `            cta_in_cluster_coord_vmnk_peer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** `            mcast_mode=tma_mcast_proj_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `        arrival_mask_b_peer = cute.nvgpu.cpasync.create_tma_multicast_mask(` — **EN:** Assigns a value to arrival_mask_b_peer. **CN:** 将一个值赋给 arrival_mask_b_peer。
+- **L449** `            cluster_layout_vmnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `            cta_in_cluster_coord_vmnk_peer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `            mcast_mode=tma_mcast_proj_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `        # if 1SM MMA, arrival_mask_a_peer==arrival_mask_a && arrival_mask_b==arrival_mask_b_peer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L455** `        arrival_mask_c = (` — **EN:** Assigns a value to arrival_mask_c. **CN:** 将一个值赋给 arrival_mask_c。
+- **L456** `            arrival_mask_a | arrival_mask_a_peer | arrival_mask_b | arrival_mask_b_peer` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L457** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `        num_mcast_ctas_a = cute.size(cluster_layout_vmnk.shape[2])  # type: ignore[index]` — **EN:** Assigns a value to num_mcast_ctas_a. **CN:** 将一个值赋给 num_mcast_ctas_a。
+- **L460** `        num_mcast_ctas_b = cute.size(cluster_layout_vmnk.shape[1])  # type: ignore[index]` — **EN:** Assigns a value to num_mcast_ctas_b. **CN:** 将一个值赋给 num_mcast_ctas_b。
+- **L461** `        num_mcast_participants = num_mcast_ctas_a + num_mcast_ctas_b - 1` — **EN:** Assigns a value to num_mcast_participants. **CN:** 将一个值赋给 num_mcast_participants。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L464** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `            tma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `            mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `            producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `            consumer_arv_count=num_mcast_participants,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `            arrival_mask=arrival_mask_c,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `        return TMAToUMMAPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L472** `            raw_pipeline, num_stages, producer_state, consumer_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `    def producer_commit(self) -> "TMAToUMMAPipeline":` — **EN:** Defines function `producer_commit`. **CN:** 定义函数 `producer_commit`。
+- **L476** `        """` — **EN:** Starts the docstring for the function `producer_commit`. **CN:** 开始说明 function `producer_commit` 的文档字符串。
+- **L477** `        Commit producer state.` — **EN:** Continues the docstring for the function `producer_commit`. **CN:** 继续说明 function `producer_commit` 的文档字符串。
+- **L478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L479** `        For 2SM MMA, only leader CTA commits during production as MMA` — **EN:** Continues the docstring for the function `producer_commit`. **CN:** 继续说明 function `producer_commit` 的文档字符串。
+- **L480** `        is issued by leader. Compiler generates the if-leader-cta-branch` — **EN:** Continues the docstring for the function `producer_commit`. **CN:** 继续说明 function `producer_commit` 的文档字符串。
+- **L481** `        internally to preserve a symmetric acquire-commit pattern.` — **EN:** Continues the docstring for the function `producer_commit`. **CN:** 继续说明 function `producer_commit` 的文档字符串。
+- **L482** `        """` — **EN:** Ends the docstring for the function `producer_commit`. **CN:** 结束说明 function `producer_commit` 的文档字符串。
+- **L483** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L484** `            super().producer_commit()` — **EN:** Invokes `super().producer_commit` as a standalone call. **CN:** 以独立语句方式调用 `super().producer_commit`。
+- **L485** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** `    def consumer_release(self) -> "TMAToUMMAPipeline":` — **EN:** Defines function `consumer_release`. **CN:** 定义函数 `consumer_release`。
+- **L488** `        """Release consumer state."""` — **EN:** Docstring line documenting the function `consumer_release`. **CN:** 文档字符串行，用于说明 function `consumer_release`。
+- **L489** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L490** `            super().consumer_release()` — **EN:** Invokes `super().consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `super().consumer_release`。
+- **L491** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L494** `class TMAToUMMACircularPipeline(TMAToUMMAPipeline):` — **EN:** Defines class `TMAToUMMACircularPipeline` with bases TMAToUMMAPipeline. **CN:** 定义类 `TMAToUMMACircularPipeline`，其基类为 TMAToUMMAPipeline。
+- **L495** `    """` — **EN:** Starts the docstring for the class `TMAToUMMACircularPipeline`. **CN:** 开始说明 class `TMAToUMMACircularPipeline` 的文档字符串。
+- **L496** `    Circular Buffer Pipeline for TMA to UMMA.` — **EN:** Continues the docstring for the class `TMAToUMMACircularPipeline`. **CN:** 继续说明 class `TMAToUMMACircularPipeline` 的文档字符串。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `    This class wraps a TMAToUMMAPipeline and adds circular buffer semantics,` — **EN:** Continues the docstring for the class `TMAToUMMACircularPipeline`. **CN:** 继续说明 class `TMAToUMMACircularPipeline` 的文档字符串。
+- **L499** `    allowing fine-grained control over chunk-wise consumption within pipeline stages.` — **EN:** Continues the docstring for the class `TMAToUMMACircularPipeline`. **CN:** 继续说明 class `TMAToUMMACircularPipeline` 的文档字符串。
+- **L500** `    """` — **EN:** Ends the docstring for the class `TMAToUMMACircularPipeline`. **CN:** 结束说明 class `TMAToUMMACircularPipeline` 的文档字符串。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L503** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L504** `        raw_pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L505** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L506** `        producer_state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L507** `        consumer_state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L508** `        circular_buffer_state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L509** `        count_per_stage: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L510** `        count_per_iteration: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L511** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L512** `        super().__init__(raw_pipeline, num_stages, producer_state, consumer_state)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L513** `        self.circular_buffer_state = circular_buffer_state` — **EN:** Assigns a value to self.circular_buffer_state. **CN:** 将一个值赋给 self.circular_buffer_state。
+- **L514** `        self.count_per_stage = count_per_stage` — **EN:** Assigns a value to self.count_per_stage. **CN:** 将一个值赋给 self.count_per_stage。
+- **L515** `        self.count_per_iteration = count_per_iteration` — **EN:** Assigns a value to self.count_per_iteration. **CN:** 将一个值赋给 self.count_per_iteration。
+- **L516** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L517** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L518** `    def create(  # type: ignore[override]` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L519** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L520** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L521** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L522** `        count_per_stage: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L523** `        count_per_iteration: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L524** `        tma_operation_type: Optional[OperationTypeEnum] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L525** `        cluster_layout_vmnk: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L526** `    ) -> "TMAToUMMACircularPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L527** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L528** `        Create a TMA to UMMA circular buffer pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L529** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L530** `        Args:` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L531** `            num_stages: Number of pipeline stages` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L532** `            mma_operation_type: MMA operation type` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L533** `            count_per_stage: Number of units (chunks) per pipeline stage` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L534** `            count_per_iteration: Number of units (chunks) consumed per iteration` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L535** `            tma_operation_type: TMA operation type (optional, defaults to SM90_TMA_LOAD)` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L536** `            cluster_layout_vmnk: Cluster layout in (v, m, n, k) order. Required` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L537** `                whenever the selected TMA load spans more than one CTA (2SM or` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L538** `                multicast).` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L539** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L540** `        Returns:` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L541** `            TMAToUMMACircularPipeline: A circular buffer pipeline instance` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L542** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L543** `        base_pipeline = TMAToUMMAPipeline.create(` — **EN:** Assigns a value to base_pipeline. **CN:** 将一个值赋给 base_pipeline。
+- **L544** `            num_stages=num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `            mma_operation_type=mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L546** `            tma_operation_type=tma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L547** `            cluster_layout_vmnk=cluster_layout_vmnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** `        # Create the circular buffer pipeline state on top` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L551** `        circular_buffer_state = create_circular_buffer_pipeline(` — **EN:** Assigns a value to circular_buffer_state. **CN:** 将一个值赋给 circular_buffer_state。
+- **L552** `            base_pipeline.raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `            base_pipeline.consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** `            stages=num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L555** `            count_per_stage=count_per_stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L556** `            count_per_iteration=count_per_iteration,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L557** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L558** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L559** `        return TMAToUMMACircularPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L560** `            base_pipeline.raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L561** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** `            base_pipeline.producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L563** `            base_pipeline.consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L564** `            circular_buffer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L565** `            count_per_stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `            count_per_iteration,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L569** `    def __extract_mlir_values__(self) -> list:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L570** `        """Extract MLIR values for DynamicExpression protocol."""` — **EN:** Docstring line documenting the function `__extract_mlir_values__`. **CN:** 文档字符串行，用于说明 function `__extract_mlir_values__`。
+- **L571** `        # Get base values from parent: [pipeline, num_stages, producer_state, consumer_state]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L572** `        base_values = super().__extract_mlir_values__()` — **EN:** Assigns a value to base_values. **CN:** 将一个值赋给 base_values。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `        # Add circular buffer specific values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L575** `        count_per_stage_dsl = Int32(self.count_per_stage)` — **EN:** Assigns a value to count_per_stage_dsl. **CN:** 将一个值赋给 count_per_stage_dsl。
+- **L576** `        count_per_iteration_dsl = Int32(self.count_per_iteration)` — **EN:** Assigns a value to count_per_iteration_dsl. **CN:** 将一个值赋给 count_per_iteration_dsl。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L579** `            base_values` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L580** `            + [count_per_stage_dsl.__extract_mlir_values__()[0]]  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `            + [count_per_iteration_dsl.__extract_mlir_values__()[0]]  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `            + [self.circular_buffer_state]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L586** `    def __new_from_mlir_values__(cls, values: list) -> "TMAToUMMACircularPipeline":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L587** `        """Reconstruct object from MLIR values."""` — **EN:** Docstring line documenting the function `__new_from_mlir_values__`. **CN:** 文档字符串行，用于说明 function `__new_from_mlir_values__`。
+- **L588** `        # Parse: [pipeline, num_stages, producer_state, consumer_state, count_per_stage, count_per_iteration, circular_buffer_state]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L589** `        raw_pipeline = values[0]` — **EN:** Assigns a value to raw_pipeline. **CN:** 将一个值赋给 raw_pipeline。
+- **L590** `        num_stages_val = values[1]` — **EN:** Assigns a value to num_stages_val. **CN:** 将一个值赋给 num_stages_val。
+- **L591** `        producer_state = values[2]` — **EN:** Assigns a value to producer_state. **CN:** 将一个值赋给 producer_state。
+- **L592** `        consumer_state = values[3]` — **EN:** Assigns a value to consumer_state. **CN:** 将一个值赋给 consumer_state。
+- **L593** `        count_per_stage_val = values[4]` — **EN:** Assigns a value to count_per_stage_val. **CN:** 将一个值赋给 count_per_stage_val。
+- **L594** `        count_per_iteration_val = values[5]` — **EN:** Assigns a value to count_per_iteration_val. **CN:** 将一个值赋给 count_per_iteration_val。
+- **L595** `        circular_buffer_state = values[6]` — **EN:** Assigns a value to circular_buffer_state. **CN:** 将一个值赋给 circular_buffer_state。
+- **L596** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L597** `        # Extract Python values from DSL objects` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L598** `        temp_int = Int32(0)` — **EN:** Assigns a value to temp_int. **CN:** 将一个值赋给 temp_int。
+- **L599** `        num_stages = temp_int.__new_from_mlir_values__([num_stages_val]).value  # type: ignore[attr-defined]` — **EN:** Assigns a value to num_stages. **CN:** 将一个值赋给 num_stages。
+- **L600** `        count_per_stage = temp_int.__new_from_mlir_values__([count_per_stage_val]).value  # type: ignore[attr-defined]` — **EN:** Assigns a value to count_per_stage. **CN:** 将一个值赋给 count_per_stage。
+- **L601** `        count_per_iteration = temp_int.__new_from_mlir_values__(  # type: ignore[attr-defined]` — **EN:** Assigns a value to count_per_iteration. **CN:** 将一个值赋给 count_per_iteration。
+- **L602** `            [count_per_iteration_val]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L603** `        ).value` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L605** `        return cls(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L606** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L607** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L608** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `            circular_buffer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** `            count_per_stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `            count_per_iteration,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L615** `    def consumer_wait(self) -> "TMAToUMMACircularPipeline":  # type: ignore[override]` — **EN:** Defines function `consumer_wait`. **CN:** 定义函数 `consumer_wait`。
+- **L616** `        """Wait for consumer to be ready (uses circular buffer consume)."""` — **EN:** Docstring line documenting the function `consumer_wait`. **CN:** 文档字符串行，用于说明 function `consumer_wait`。
+- **L617** `        circular_buffer_pipeline_consume(self.raw_pipeline, self.circular_buffer_state)` — **EN:** Invokes `circular_buffer_pipeline_consume` as a standalone call. **CN:** 以独立语句方式调用 `circular_buffer_pipeline_consume`。
+- **L618** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L620** `    def consumer_release(self) -> "TMAToUMMACircularPipeline":` — **EN:** Defines function `consumer_release`. **CN:** 定义函数 `consumer_release`。
+- **L621** `        """Release consumer state (uses circular buffer consumer release)."""` — **EN:** Docstring line documenting the function `consumer_release`. **CN:** 文档字符串行，用于说明 function `consumer_release`。
+- **L622** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L623** `            circular_buffer_pipeline_consumer_release(` — **EN:** Invokes `circular_buffer_pipeline_consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `circular_buffer_pipeline_consumer_release`。
+- **L624** `                self.raw_pipeline, self.circular_buffer_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L625** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L627** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L628** `    def consumer_release_and_advance(self) -> "TMAToUMMACircularPipeline":` — **EN:** Defines function `consumer_release_and_advance`. **CN:** 定义函数 `consumer_release_and_advance`。
+- **L629** `        """Combined consumer release + advance using circular buffer semantics."""` — **EN:** Docstring line documenting the function `consumer_release_and_advance`. **CN:** 文档字符串行，用于说明 function `consumer_release_and_advance`。
+- **L630** `        self.consumer_release()` — **EN:** Invokes `self.consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `self.consumer_release`。
+- **L631** `        # Update circular buffer state` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L632** `        self.circular_buffer_state = circular_buffer_pipeline_advance_iterator(` — **EN:** Assigns a value to self.circular_buffer_state. **CN:** 将一个值赋给 self.circular_buffer_state。
+- **L633** `            self.raw_pipeline, self.circular_buffer_state` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L637** `    def get_consumer_stage(self) -> None:` — **EN:** Defines function `get_consumer_stage`. **CN:** 定义函数 `get_consumer_stage`。
+- **L638** `        """Get consumer stage - unsupported for circular buffer pipeline."""` — **EN:** Docstring line documenting the function `get_consumer_stage`. **CN:** 文档字符串行，用于说明 function `get_consumer_stage`。
+- **L639** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L640** `            "get_consumer_stage() is not supported for TMAToUMMACircularPipeline."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L641** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L642** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L643** `    def consumer_wait_and_get_stage(` — **EN:** Defines function `consumer_wait_and_get_stage`. **CN:** 定义函数 `consumer_wait_and_get_stage`。
+- **L644** `        self, *, token: Optional[SkipWaitToken] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L645** `    ) -> NoReturn:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L646** `        """Combined consumer wait + get_stage - unsupported for circular buffer pipeline."""` — **EN:** Docstring line documenting the function `consumer_wait_and_get_stage`. **CN:** 文档字符串行，用于说明 function `consumer_wait_and_get_stage`。
+- **L647** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L648** `            "consumer_wait_and_get_stage() is not supported for TMAToUMMACircularPipeline."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L649** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L651** `    def consumer_tail(self) -> NoReturn:` — **EN:** Defines function `consumer_tail`. **CN:** 定义函数 `consumer_tail`。
+- **L652** `        """Consumer tail - unsupported for circular buffer pipeline."""` — **EN:** Docstring line documenting the function `consumer_tail`. **CN:** 文档字符串行，用于说明 function `consumer_tail`。
+- **L653** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L654** `            "consumer_tail() is not supported for TMAToUMMACircularPipeline."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L655** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L657** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L658** `class TMAToAsyncPipeline(GenericPipelineBase):` — **EN:** Defines class `TMAToAsyncPipeline` with bases GenericPipelineBase. **CN:** 定义类 `TMAToAsyncPipeline`，其基类为 GenericPipelineBase。
+- **L659** `    """` — **EN:** Starts the docstring for the class `TMAToAsyncPipeline`. **CN:** 开始说明 class `TMAToAsyncPipeline` 的文档字符串。
+- **L660** `    Pipeline for TMA to * (except UMMA).` — **EN:** Continues the docstring for the class `TMAToAsyncPipeline`. **CN:** 继续说明 class `TMAToAsyncPipeline` 的文档字符串。
+- **L661** `    """` — **EN:** Ends the docstring for the class `TMAToAsyncPipeline`. **CN:** 结束说明 class `TMAToAsyncPipeline` 的文档字符串。
+- **L662** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L663** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L664** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L665** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L666** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L667** `        consumer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L668** `        consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L669** `    ) -> "TMAToAsyncPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L670** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L671** `        Create a TMA to * (except UMMA) pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L672** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L673** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L674** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L675** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `            OperationTypeEnum.SM90_TMA_LOAD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `            consumer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** `            producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L679** `            consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L680** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** `        return TMAToAsyncPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L682** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L684** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L686** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L687** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L688** `    def producer_commit(self) -> "TMAToAsyncPipeline":` — **EN:** Defines function `producer_commit`. **CN:** 定义函数 `producer_commit`。
+- **L689** `        """Commit producer state."""` — **EN:** Docstring line documenting the function `producer_commit`. **CN:** 文档字符串行，用于说明 function `producer_commit`。
+- **L690** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L691** `            super().producer_commit()` — **EN:** Invokes `super().producer_commit` as a standalone call. **CN:** 以独立语句方式调用 `super().producer_commit`。
+- **L692** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L693** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L694** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L695** `class AsyncToUMMAPipeline(GenericPipelineBase):` — **EN:** Defines class `AsyncToUMMAPipeline` with bases GenericPipelineBase. **CN:** 定义类 `AsyncToUMMAPipeline`，其基类为 GenericPipelineBase。
+- **L696** `    """` — **EN:** Starts the docstring for the class `AsyncToUMMAPipeline`. **CN:** 开始说明 class `AsyncToUMMAPipeline` 的文档字符串。
+- **L697** `    Pipeline for * (except TMA) to UMMA.` — **EN:** Continues the docstring for the class `AsyncToUMMAPipeline`. **CN:** 继续说明 class `AsyncToUMMAPipeline` 的文档字符串。
+- **L698** `    """` — **EN:** Ends the docstring for the class `AsyncToUMMAPipeline`. **CN:** 结束说明 class `AsyncToUMMAPipeline` 的文档字符串。
+- **L699** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L700** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L701** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L702** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L703** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L704** `        producer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L705** `        producer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L706** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L707** `    ) -> "AsyncToUMMAPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L708** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L709** `        Create a * (except TMA) to UMMA pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L710** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L711** `        _validate_umma_operation_type(` — **EN:** Invokes `_validate_umma_operation_type` as a standalone call. **CN:** 以独立语句方式调用 `_validate_umma_operation_type`。
+- **L712** `            mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L713** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L715** `        if producer == OperationTypeEnum.SM90_TMA_LOAD:` — **EN:** Starts a conditional branch guarded by `producer == OperationTypeEnum.SM90_TMA_LOAD`. **CN:** 开始一个由 `producer == OperationTypeEnum.SM90_TMA_LOAD` 控制的条件分支。
+- **L716** `            raise ValueError("TMA to UMMA is not supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L717** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L718** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L719** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L720** `            producer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L721** `            mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L722** `            producer_arv_count=producer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L723** `            consumer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L724** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L725** `        return AsyncToUMMAPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L726** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L731** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L732** `    def consumer_release(self) -> "AsyncToUMMAPipeline":` — **EN:** Defines function `consumer_release`. **CN:** 定义函数 `consumer_release`。
+- **L733** `        """Release consumer state."""` — **EN:** Docstring line documenting the function `consumer_release`. **CN:** 文档字符串行，用于说明 function `consumer_release`。
+- **L734** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L735** `            super().consumer_release()` — **EN:** Invokes `super().consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `super().consumer_release`。
+- **L736** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L737** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L738** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L739** `class UMMAtoAsyncPipeline(GenericPipelineBase):` — **EN:** Defines class `UMMAtoAsyncPipeline` with bases GenericPipelineBase. **CN:** 定义类 `UMMAtoAsyncPipeline`，其基类为 GenericPipelineBase。
+- **L740** `    """` — **EN:** Starts the docstring for the class `UMMAtoAsyncPipeline`. **CN:** 开始说明 class `UMMAtoAsyncPipeline` 的文档字符串。
+- **L741** `    Pipeline for UMMA to * (except TMA).` — **EN:** Continues the docstring for the class `UMMAtoAsyncPipeline`. **CN:** 继续说明 class `UMMAtoAsyncPipeline` 的文档字符串。
+- **L742** `    """` — **EN:** Ends the docstring for the class `UMMAtoAsyncPipeline`. **CN:** 结束说明 class `UMMAtoAsyncPipeline` 的文档字符串。
+- **L743** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L744** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L745** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L746** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L747** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L748** `        consumer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L749** `        consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L750** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L751** `        cluster_layout_vmnk: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L752** `    ) -> "UMMAtoAsyncPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L753** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L754** `        Create a UMMA to * (except TMA) pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L755** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L756** `        For 2SM MMA, provide cluster_layout_vmnk for proper mask computation.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L757** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L758** `        _validate_umma_operation_type(` — **EN:** Invokes `_validate_umma_operation_type` as a standalone call. **CN:** 以独立语句方式调用 `_validate_umma_operation_type`。
+- **L759** `            mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L760** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L761** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L762** `        if consumer == OperationTypeEnum.SM90_TMA_LOAD:` — **EN:** Starts a conditional branch guarded by `consumer == OperationTypeEnum.SM90_TMA_LOAD`. **CN:** 开始一个由 `consumer == OperationTypeEnum.SM90_TMA_LOAD` 控制的条件分支。
+- **L763** `            raise ValueError("UMMA to TMA is not supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L764** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L765** `        if _is_2sm_umma_operation_type(mma_operation_type):` — **EN:** Starts a conditional branch guarded by `_is_2sm_umma_operation_type(mma_operation_type)`. **CN:** 开始一个由 `_is_2sm_umma_operation_type(mma_operation_type)` 控制的条件分支。
+- **L766** `            if cluster_layout_vmnk is None:` — **EN:** Starts a conditional branch guarded by `cluster_layout_vmnk is None`. **CN:** 开始一个由 `cluster_layout_vmnk is None` 控制的条件分支。
+- **L767** `                raise ValueError("cluster_layout_vmnk cannot be None if using 2SM MMA")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L768** `            return UMMAtoAsyncPipeline.create_with_mask(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L769** `                num_stages=num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L770** `                consumer_type=consumer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `                consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L772** `                mma_operation_type=mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `                cluster_layout_vmnk=cluster_layout_vmnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L775** `        else:  # 1SM MMA` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L776** `            raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L777** `                num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** `                mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L779** `                consumer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L780** `                producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L781** `                consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L782** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L783** `            return UMMAtoAsyncPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L784** `                raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L785** `                num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L786** `                producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L787** `                consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L789** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L790** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L791** `    def create_with_mask(` — **EN:** Defines function `create_with_mask`. **CN:** 定义函数 `create_with_mask`。
+- **L792** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L793** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L794** `        consumer_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L795** `        consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L796** `        mma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L797** `        cluster_layout_vmnk: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L798** `    ) -> "UMMAtoAsyncPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L799** `        """` — **EN:** Starts the docstring for the function `create_with_mask`. **CN:** 开始说明 function `create_with_mask` 的文档字符串。
+- **L800** `        Create a UMMA to * pipeline with arrival mask for 2CTA operations.` — **EN:** Continues the docstring for the function `create_with_mask`. **CN:** 继续说明 function `create_with_mask` 的文档字符串。
+- **L801** `        """` — **EN:** Ends the docstring for the function `create_with_mask`. **CN:** 结束说明 function `create_with_mask` 的文档字符串。
+- **L802** `        tmem_sync_mask = cutlass.pipeline.PipelineUmmaAsync._compute_tmem_sync_mask(` — **EN:** Assigns a value to tmem_sync_mask. **CN:** 将一个值赋给 tmem_sync_mask。
+- **L803** `            cta_layout_vmnk=cluster_layout_vmnk` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L804** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L805** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L806** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** `            mma_operation_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L808** `            consumer_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `            producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** `            consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L811** `            arrival_mask=tmem_sync_mask,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L812** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L813** `        return UMMAtoAsyncPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L814** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L815** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L818** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L819** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L820** `    def producer_commit(self) -> "UMMAtoAsyncPipeline":` — **EN:** Defines function `producer_commit`. **CN:** 定义函数 `producer_commit`。
+- **L821** `        """Commit producer state."""` — **EN:** Docstring line documenting the function `producer_commit`. **CN:** 文档字符串行，用于说明 function `producer_commit`。
+- **L822** `        with cute.arch.elect_one():` — **EN:** Starts a context-managed block using cute.arch.elect_one(). **CN:** 开始一个使用 cute.arch.elect_one() 的上下文管理代码块。
+- **L823** `            super().producer_commit()` — **EN:** Invokes `super().producer_commit` as a standalone call. **CN:** 以独立语句方式调用 `super().producer_commit`。
+- **L824** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L825** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L826** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L827** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L828** `class TMAStorePipeline:` — **EN:** Defines class `TMAStorePipeline`. **CN:** 定义类 `TMAStorePipeline`。
+- **L829** `    """` — **EN:** Starts the docstring for the class `TMAStorePipeline`. **CN:** 开始说明 class `TMAStorePipeline` 的文档字符串。
+- **L830** `    TMA Store Pipeline modeling SMEM producer (store to smem operations) to TMA consumer (TMA store to global) pipeline.` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L831** `    A number of epilogue warps participate in the pipeline as producers, and one of them is designated as the consumer to perform TMA store.` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L832** `    Named barrier is used to synchronize all warps so that producers write SMEM after the pipeline stage is available, and the consumer waits for all producers before issuing TMA store.` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L833** `    The canonical pipeline flow is:` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L834** `    1. acquire_sync(): wait for pipeline stage availability + barrier` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L835** `    2. Each producer performs SMEM writes` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L836** `    3. commit_sync(): fence SMEM writes + barrier` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L837** `    4. Consumer performs TMA store` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L838** `    5. release_advance(): commit TMA store + advance stage` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L839** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L840** `    Args:` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L841** `        stages: Number of pipeline stages (type parameter)` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L842** `        arv_count: Number of threads participating in barriers` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L843** `        barrier_id: Barrier ID for synchronization` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L844** `        tma_warp_id: Which warp issues TMA stores (None = no TMA operations)` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L845** `        index: Initial stage index` — **EN:** Continues the docstring for the class `TMAStorePipeline`. **CN:** 继续说明 class `TMAStorePipeline` 的文档字符串。
+- **L846** `    """` — **EN:** Ends the docstring for the class `TMAStorePipeline`. **CN:** 结束说明 class `TMAStorePipeline` 的文档字符串。
+- **L847** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L848** `    stages: cutlass.Constexpr[int]` — **EN:** Assigns a typed value to stages. **CN:** 为 stages 赋予带类型标注的值。
+- **L849** `    arv_count: int` — **EN:** Assigns a typed value to arv_count. **CN:** 为 arv_count 赋予带类型标注的值。
+- **L850** `    barrier_id: int` — **EN:** Assigns a typed value to barrier_id. **CN:** 为 barrier_id 赋予带类型标注的值。
+- **L851** `    tma_warp_id: int` — **EN:** Assigns a typed value to tma_warp_id. **CN:** 为 tma_warp_id 赋予带类型标注的值。
+- **L852** `    index: int = 0` — **EN:** Assigns a typed value to index. **CN:** 为 index 赋予带类型标注的值。
+- **L853** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L854** `    def get_num_stages(self) -> int:` — **EN:** Defines function `get_num_stages`. **CN:** 定义函数 `get_num_stages`。
+- **L855** `        return self.stages  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L856** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L857** `    def acquire_sync(self) -> "TMAStorePipeline":` — **EN:** Defines function `acquire_sync`. **CN:** 定义函数 `acquire_sync`。
+- **L858** `        """` — **EN:** Starts the docstring for the function `acquire_sync`. **CN:** 开始说明 function `acquire_sync` 的文档字符串。
+- **L859** `        Acquire pipeline stage and synchronize all warps.` — **EN:** Continues the docstring for the function `acquire_sync`. **CN:** 继续说明 function `acquire_sync` 的文档字符串。
+- **L860** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L861** `        TMA warp waits for previous TMA operation to the same stage to complete (allowing writes to other stages to be in flight).` — **EN:** Continues the docstring for the function `acquire_sync`. **CN:** 继续说明 function `acquire_sync` 的文档字符串。
+- **L862** `        All warps then synchronize before producers write to SMEM.` — **EN:** Continues the docstring for the function `acquire_sync`. **CN:** 继续说明 function `acquire_sync` 的文档字符串。
+- **L863** `        """` — **EN:** Ends the docstring for the function `acquire_sync`. **CN:** 结束说明 function `acquire_sync` 的文档字符串。
+- **L864** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L865** `        @CuteExperimentalDSL.jit` — **EN:** Applies decorator `CuteExperimentalDSL.jit` to the following definition. **CN:** 将装饰器 `CuteExperimentalDSL.jit` 应用于后面的定义。
+- **L866** `        def acquire_sync_impl() -> "TMAStorePipeline":` — **EN:** Defines function `acquire_sync_impl`. **CN:** 定义函数 `acquire_sync_impl`。
+- **L867** `            # Only TMA warp needs to wait for bulk async operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L868** `            warp_idx = cute.arch.warp_idx()` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L869** `            warp_idx = cute.arch.make_warp_uniform(warp_idx)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L870** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L871** `            # Use Python if with @Cutlass_LIR.jit preprocessor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L872** `            if warp_idx == self.tma_warp_id:` — **EN:** Starts a conditional branch guarded by `warp_idx == self.tma_warp_id`. **CN:** 开始一个由 `warp_idx == self.tma_warp_id` 控制的条件分支。
+- **L873** `                # Allow N-1 TMA operations in flight for pipelining` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L874** `                # Now we can use the compile-time constant from type parameter` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L875** `                num_stages = self.get_num_stages()` — **EN:** Assigns a value to num_stages. **CN:** 将一个值赋给 num_stages。
+- **L876** `                wait_count = num_stages - 1 if num_stages > 1 else 0` — **EN:** Assigns a value to wait_count. **CN:** 将一个值赋给 wait_count。
+- **L877** `                cute.arch.cp_async_bulk_wait_group(wait_count, read=True)` — **EN:** Invokes `cute.arch.cp_async_bulk_wait_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_wait_group`。
+- **L878** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L879** `            # All warps must synchronize before producers write to SMEM` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L880** `            self._barrier()` — **EN:** Invokes `self._barrier` as a standalone call. **CN:** 以独立语句方式调用 `self._barrier`。
+- **L881** `            return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L882** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L883** `        return acquire_sync_impl()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L884** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L885** `    def commit_sync(self) -> "TMAStorePipeline":` — **EN:** Defines function `commit_sync`. **CN:** 定义函数 `commit_sync`。
+- **L886** `        """` — **EN:** Starts the docstring for the function `commit_sync`. **CN:** 开始说明 function `commit_sync` 的文档字符串。
+- **L887** `        Fence SMEM writes and synchronize all warps.` — **EN:** Continues the docstring for the function `commit_sync`. **CN:** 继续说明 function `commit_sync` 的文档字符串。
+- **L888** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L889** `        All warps fence their SMEM writes to make them visible to consumer` — **EN:** Continues the docstring for the function `commit_sync`. **CN:** 继续说明 function `commit_sync` 的文档字符串。
+- **L890** `        All warps then synchronize before TMA store operation.` — **EN:** Continues the docstring for the function `commit_sync`. **CN:** 继续说明 function `commit_sync` 的文档字符串。
+- **L891** `        """` — **EN:** Ends the docstring for the function `commit_sync`. **CN:** 结束说明 function `commit_sync` 的文档字符串。
+- **L892** `        # All warps fence their SMEM writes for TMA visibility` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L893** `        cute.arch.fence_proxy("async.shared", space="cta")` — **EN:** Invokes `cute.arch.fence_proxy` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.fence_proxy`。
+- **L894** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L895** `        # All warps synchronize before TMA store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L896** `        self._barrier()` — **EN:** Invokes `self._barrier` as a standalone call. **CN:** 以独立语句方式调用 `self._barrier`。
+- **L897** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L898** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L899** `    def release_advance(self) -> "TMAStorePipeline":` — **EN:** Defines function `release_advance`. **CN:** 定义函数 `release_advance`。
+- **L900** `        """` — **EN:** Starts the docstring for the function `release_advance`. **CN:** 开始说明 function `release_advance` 的文档字符串。
+- **L901** `        Release current stage and advance to next stage.` — **EN:** Continues the docstring for the function `release_advance`. **CN:** 继续说明 function `release_advance` 的文档字符串。
+- **L902** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L903** `        TMA warp commits the TMA store operations to a bulk group.` — **EN:** Continues the docstring for the function `release_advance`. **CN:** 继续说明 function `release_advance` 的文档字符串。
+- **L904** `        All warps advance to the next pipeline stage.` — **EN:** Continues the docstring for the function `release_advance`. **CN:** 继续说明 function `release_advance` 的文档字符串。
+- **L905** `        """` — **EN:** Ends the docstring for the function `release_advance`. **CN:** 结束说明 function `release_advance` 的文档字符串。
+- **L906** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L907** `        @CuteExperimentalDSL.jit` — **EN:** Applies decorator `CuteExperimentalDSL.jit` to the following definition. **CN:** 将装饰器 `CuteExperimentalDSL.jit` 应用于后面的定义。
+- **L908** `        def release_advance_impl() -> "TMAStorePipeline":` — **EN:** Defines function `release_advance_impl`. **CN:** 定义函数 `release_advance_impl`。
+- **L909** `            # Only TMA warp commits the TMA operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L910** `            warp_idx = cute.arch.warp_idx()` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L911** `            warp_idx = cute.arch.make_warp_uniform(warp_idx)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L912** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L913** `            # Use Python if with @Cutlass_LIR.jit preprocessor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L914** `            if warp_idx == self.tma_warp_id:` — **EN:** Starts a conditional branch guarded by `warp_idx == self.tma_warp_id`. **CN:** 开始一个由 `warp_idx == self.tma_warp_id` 控制的条件分支。
+- **L915** `                cute.arch.cp_async_bulk_commit_group()` — **EN:** Invokes `cute.arch.cp_async_bulk_commit_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_commit_group`。
+- **L916** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L917** `            # All warps advance to next stage` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L918** `            self.index = (self.index + 1) % self.get_num_stages()` — **EN:** Assigns a value to self.index. **CN:** 将一个值赋给 self.index。
+- **L919** `            return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L920** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L921** `        return release_advance_impl()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L922** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L923** `    def get_index(self) -> int:` — **EN:** Defines function `get_index`. **CN:** 定义函数 `get_index`。
+- **L924** `        """Get current pipeline stage index."""` — **EN:** Docstring line documenting the function `get_index`. **CN:** 文档字符串行，用于说明 function `get_index`。
+- **L925** `        return self.index` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L926** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L927** `    def tail(self) -> "TMAStorePipeline":` — **EN:** Defines function `tail`. **CN:** 定义函数 `tail`。
+- **L928** `        """` — **EN:** Starts the docstring for the function `tail`. **CN:** 开始说明 function `tail` 的文档字符串。
+- **L929** `        Wait for all remaining TMA operations to complete.` — **EN:** Continues the docstring for the function `tail`. **CN:** 继续说明 function `tail` 的文档字符串。
+- **L930** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L931** `        Should be called at the end of the pipeline to ensure all TMA stores finish.` — **EN:** Continues the docstring for the function `tail`. **CN:** 继续说明 function `tail` 的文档字符串。
+- **L932** `        """` — **EN:** Ends the docstring for the function `tail`. **CN:** 结束说明 function `tail` 的文档字符串。
+- **L933** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L934** `        @CuteExperimentalDSL.jit` — **EN:** Applies decorator `CuteExperimentalDSL.jit` to the following definition. **CN:** 将装饰器 `CuteExperimentalDSL.jit` 应用于后面的定义。
+- **L935** `        def tail_impl() -> "TMAStorePipeline":` — **EN:** Defines function `tail_impl`. **CN:** 定义函数 `tail_impl`。
+- **L936** `            warp_idx = cute.arch.warp_idx()` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L937** `            warp_idx = cute.arch.make_warp_uniform(warp_idx)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L938** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L939** `            # Use Python if with @Cutlass_LIR.jit preprocessor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L940** `            if warp_idx == self.tma_warp_id:` — **EN:** Starts a conditional branch guarded by `warp_idx == self.tma_warp_id`. **CN:** 开始一个由 `warp_idx == self.tma_warp_id` 控制的条件分支。
+- **L941** `                # Wait for all TMA operations to complete` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L942** `                cute.arch.cp_async_bulk_wait_group(0, read=True)` — **EN:** Invokes `cute.arch.cp_async_bulk_wait_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_wait_group`。
+- **L943** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L944** `            self._barrier()` — **EN:** Invokes `self._barrier` as a standalone call. **CN:** 以独立语句方式调用 `self._barrier`。
+- **L945** `            return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L946** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L947** `        return tail_impl()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L948** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L949** `    def _barrier(self) -> None:` — **EN:** Defines function `_barrier`. **CN:** 定义函数 `_barrier`。
+- **L950** `        """Internal barrier synchronization."""` — **EN:** Docstring line documenting the function `_barrier`. **CN:** 文档字符串行，用于说明 function `_barrier`。
+- **L951** `        cute.arch.barrier(` — **EN:** Invokes `cute.arch.barrier` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier`。
+- **L952** `            barrier_id=self.barrier_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L953** `            number_of_threads=self.arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L954** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L955** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L956** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L957** `class GroupedGemmSchedulerPipeline(GenericPipelineBase):` — **EN:** Defines class `GroupedGemmSchedulerPipeline` with bases GenericPipelineBase. **CN:** 定义类 `GroupedGemmSchedulerPipeline`，其基类为 GenericPipelineBase。
+- **L958** `    """` — **EN:** Starts the docstring for the class `GroupedGemmSchedulerPipeline`. **CN:** 开始说明 class `GroupedGemmSchedulerPipeline` 的文档字符串。
+- **L959** `    Pipeline for a dedicated scheduler warp producing tile info into SMEM,` — **EN:** Continues the docstring for the class `GroupedGemmSchedulerPipeline`. **CN:** 继续说明 class `GroupedGemmSchedulerPipeline` 的文档字符串。
+- **L960** `    consumed by all other warps.` — **EN:** Continues the docstring for the class `GroupedGemmSchedulerPipeline`. **CN:** 继续说明 class `GroupedGemmSchedulerPipeline` 的文档字符串。
+- **L961** `    """` — **EN:** Ends the docstring for the class `GroupedGemmSchedulerPipeline`. **CN:** 结束说明 class `GroupedGemmSchedulerPipeline` 的文档字符串。
+- **L962** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L963** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L964** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L965** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L966** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L967** `        producer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L968** `        consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L969** `    ) -> "GroupedGemmSchedulerPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L970** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L971** `        Create a grouped gemm scheduler pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L972** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L973** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L974** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L975** `            OperationTypeEnum.SW_STATIC_PERSISTENT_TILE_SCHEDULER,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L976** `            OperationTypeEnum.LDS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L977** `            producer_arv_count=producer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L978** `            consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L979** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L980** `        return GroupedGemmSchedulerPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L981** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L982** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L983** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L984** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L985** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L986** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L987** `    def consumer_wait(self) -> "GroupedGemmSchedulerPipeline":  # type: ignore[override]` — **EN:** Defines function `consumer_wait`. **CN:** 定义函数 `consumer_wait`。
+- **L988** `        """Wait for consumer to be ready."""` — **EN:** Docstring line documenting the function `consumer_wait`. **CN:** 文档字符串行，用于说明 function `consumer_wait`。
+- **L989** `        consumer_wait(self.raw_pipeline, self.consumer_state)` — **EN:** Invokes `consumer_wait` as a standalone call. **CN:** 以独立语句方式调用 `consumer_wait`。
+- **L990** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L991** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L992** `    def consumer_release(self) -> "GroupedGemmSchedulerPipeline":` — **EN:** Defines function `consumer_release`. **CN:** 定义函数 `consumer_release`。
+- **L993** `        """Release consumer state."""` — **EN:** Docstring line documenting the function `consumer_release`. **CN:** 文档字符串行，用于说明 function `consumer_release`。
+- **L994** `        consumer_release(self.raw_pipeline, self.consumer_state)` — **EN:** Invokes `consumer_release` as a standalone call. **CN:** 以独立语句方式调用 `consumer_release`。
+- **L995** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L996** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L997** `    def producer_commit_and_advance(self) -> "GroupedGemmSchedulerPipeline":` — **EN:** Defines function `producer_commit_and_advance`. **CN:** 定义函数 `producer_commit_and_advance`。
+- **L998** `        """Commit producer state and advance to next stage."""` — **EN:** Docstring line documenting the function `producer_commit_and_advance`. **CN:** 文档字符串行，用于说明 function `producer_commit_and_advance`。
+- **L999** `        super().producer_commit_and_advance()` — **EN:** Invokes `super().producer_commit_and_advance` as a standalone call. **CN:** 以独立语句方式调用 `super().producer_commit_and_advance`。
+- **L1000** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1001** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1002** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1003** `class CLCPipeline(GenericPipelineBase):` — **EN:** Defines class `CLCPipeline` with bases GenericPipelineBase. **CN:** 定义类 `CLCPipeline`，其基类为 GenericPipelineBase。
+- **L1004** `    """` — **EN:** Starts the docstring for the class `CLCPipeline`. **CN:** 开始说明 class `CLCPipeline` 的文档字符串。
+- **L1005** `    Pipeline for tile scheduling (using CLC) to all warps.` — **EN:** Continues the docstring for the class `CLCPipeline`. **CN:** 继续说明 class `CLCPipeline` 的文档字符串。
+- **L1006** `    """` — **EN:** Ends the docstring for the class `CLCPipeline`. **CN:** 结束说明 class `CLCPipeline` 的文档字符串。
+- **L1007** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1008** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1009** `    def create(` — **EN:** Defines function `create`. **CN:** 定义函数 `create`。
+- **L1010** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1011** `        num_stages: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1012** `        consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1013** `    ) -> "CLCPipeline":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1014** `        """` — **EN:** Starts the docstring for the function `create`. **CN:** 开始说明 function `create` 的文档字符串。
+- **L1015** `        Create a CLC to consumer pipeline.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L1016** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1017** `        The consumer includes mma, tma, epilogue, and scheduler.` — **EN:** Continues the docstring for the function `create`. **CN:** 继续说明 function `create` 的文档字符串。
+- **L1018** `        """` — **EN:** Ends the docstring for the function `create`. **CN:** 结束说明 function `create` 的文档字符串。
+- **L1019** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1020** `        raw_pipeline, producer_state, consumer_state = create_pipeline(` — **EN:** Assigns a value to (raw_pipeline, producer_state, consumer_state). **CN:** 将一个值赋给 (raw_pipeline, producer_state, consumer_state)。
+- **L1021** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1022** `            OperationTypeEnum.SM100_LAUNCH_CONTROL,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1023** `            OperationTypeEnum.LDS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1024** `            producer_arv_count=1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1025** `            consumer_arv_count=consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1026** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1027** `        return CLCPipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1028** `            raw_pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1029** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1030** `            producer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1031** `            consumer_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1032** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1033** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1034** `    def producer_commit(self) -> "CLCPipeline":` — **EN:** Defines function `producer_commit`. **CN:** 定义函数 `producer_commit`。
+- **L1035** `        """Commit producer state."""` — **EN:** Docstring line documenting the function `producer_commit`. **CN:** 文档字符串行，用于说明 function `producer_commit`。
+- **L1036** `        producer_commit(self.raw_pipeline, self.producer_state)` — **EN:** Invokes `producer_commit` as a standalone call. **CN:** 以独立语句方式调用 `producer_commit`。
+- **L1037** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1038** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1039** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L1040** `    def get_response_size() -> int:` — **EN:** Defines function `get_response_size`. **CN:** 定义函数 `get_response_size`。
+- **L1041** `        """` — **EN:** Starts the docstring for the function `get_response_size`. **CN:** 开始说明 function `get_response_size` 的文档字符串。
+- **L1042** `        Returns the size in bytes of a CLC response.` — **EN:** Continues the docstring for the function `get_response_size`. **CN:** 继续说明 function `get_response_size` 的文档字符串。
+- **L1043** `        """` — **EN:** Ends the docstring for the function `get_response_size`. **CN:** 结束说明 function `get_response_size` 的文档字符串。
+- **L1044** `        return 16` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1045** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1046** `    def expect_response(self, mbar_ptr: Pointer) -> None:` — **EN:** Defines function `expect_response`. **CN:** 定义函数 `expect_response`。
+- **L1047** `        """` — **EN:** Starts the docstring for the function `expect_response`. **CN:** 开始说明 function `expect_response` 的文档字符串。
+- **L1048** `        Increments the expected transaction count of a CLC response.` — **EN:** Continues the docstring for the function `expect_response`. **CN:** 继续说明 function `expect_response` 的文档字符串。
+- **L1049** `        """` — **EN:** Ends the docstring for the function `expect_response`. **CN:** 结束说明 function `expect_response` 的文档字符串。
+- **L1050** `        mbarrier_expect_tx(mbar_ptr, self.get_response_size(), cute.arch.lane_idx())` — **EN:** Invokes `mbarrier_expect_tx` as a standalone call. **CN:** 以独立语句方式调用 `mbarrier_expect_tx`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.experimental.pipeline`. CN: 模块名为 `CuTeDSL.cutlass.cute.experimental.pipeline`。
+- EN: Module docstring summary: Convenience pipeline classes that hide elect_one synchronization complexity CN: 模块文档摘要为：Convenience pipeline classes that hide elect_one synchronization complexity
+- EN: Top-level classes: GenericPipelineBase, GenericPipeline, TMAToUMMAPipeline, TMAToUMMACircularPipeline, TMAToAsyncPipeline, AsyncToUMMAPipeline, UMMAtoAsyncPipeline, TMAStorePipeline, GroupedGemmSchedulerPipeline, CLCPipeline CN: 顶层类包括：GenericPipelineBase, GenericPipeline, TMAToUMMAPipeline, TMAToUMMACircularPipeline, TMAToAsyncPipeline, AsyncToUMMAPipeline, UMMAtoAsyncPipeline, TMAStorePipeline, GroupedGemmSchedulerPipeline, CLCPipeline
+- EN: Top-level functions: _validate_umma_operation_type, _is_2sm_umma_operation_type, _is_multicast_tma_operation_type CN: 顶层函数包括：_validate_umma_operation_type, _is_2sm_umma_operation_type, _is_multicast_tma_operation_type
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass, cutlass.cute, cutlass.base_dsl.typing:Int32, cutlass._mlir:ir, cutlass._mlir.dialects:lir, cutlass._mlir.dialects.core:OperationTypeEnum, cutlass.cute.typing:Boolean, cutlass.cute.experimental.core:create_pipeline,producer_acquire,get_pipeline_produce_stage,get_pipeline_consume_stage,producer_commit,consumer_release,pipeline_advance_iterator,PipelineState,consumer_wait,consumer_tail,create_circular_buffer_pipeline,circular_buffer_pipeline_consume,circular_buffer_pipeline_consumer_release,circular_buffer_pipeline_advance_iterator,mbarrier_expect_tx,normalize_skip_wait_token,producer_try_acquire,consumer_try_wait,SkipWaitToken, cutlass.cutlass_dsl:CuteExperimentalDSL, ..typing:Pointer CN: 内部依赖：cutlass, cutlass.cute, cutlass.base_dsl.typing:Int32, cutlass._mlir:ir, cutlass._mlir.dialects:lir, cutlass._mlir.dialects.core:OperationTypeEnum, cutlass.cute.typing:Boolean, cutlass.cute.experimental.core:create_pipeline,producer_acquire,get_pipeline_produce_stage,get_pipeline_consume_stage,producer_commit,consumer_release,pipeline_advance_iterator,PipelineState,consumer_wait,consumer_tail,create_circular_buffer_pipeline,circular_buffer_pipeline_consume,circular_buffer_pipeline_consumer_release,circular_buffer_pipeline_advance_iterator,mbarrier_expect_tx,normalize_skip_wait_token,producer_try_acquire,consumer_try_wait,SkipWaitToken, cutlass.cutlass_dsl:CuteExperimentalDSL, ..typing:Pointer
+- EN: External or standard-library dependencies: dataclasses:dataclass, typing:NoReturn,Optional CN: 外部或标准库依赖：dataclasses:dataclass, typing:NoReturn,Optional

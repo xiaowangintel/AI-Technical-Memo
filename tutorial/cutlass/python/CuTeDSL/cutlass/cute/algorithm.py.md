@@ -1,0 +1,665 @@
+# algorithm.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/algorithm.py`
+
+## Purpose / 作用
+- EN: Defines 9 functions (gemm, _make_copy_atom, basic_copy, basic_copy_if, ... (+5 more)) in `CuTeDSL.cutlass.cute.algorithm`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.algorithm` 定义了 9 个函数（gemm, _make_copy_atom, basic_copy, basic_copy_if, ... (+5 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L13** `import math` — **EN:** Imports math for later use. **CN:** 导入 math 供后续使用。
+- **L14** `from typing import Optional, Dict, Any, List, Tuple, Type, Union` — **EN:** Imports Optional, Dict, Any, List, Tuple, Type, ... (+1 more) from `typing`. **CN:** 从 `typing` 导入 Optional, Dict, Any, List, Tuple, Type, ... (+1 more)。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `from cutlass.cutlass_dsl import (` — **EN:** Imports for_generate, yield_out, if_generate, dsl_user_op, LoopUnroll from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 for_generate, yield_out, if_generate, dsl_user_op, LoopUnroll。
+- **L18** `    for_generate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    yield_out,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    if_generate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    dsl_user_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    LoopUnroll,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L25** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `from .typing import Numeric, Tensor, Int64, Int16, AddressSpace` — **EN:** Imports Numeric, Tensor, Int64, Int16, AddressSpace from `.typing`. **CN:** 从 `.typing` 导入 Numeric, Tensor, Int64, Int16, AddressSpace。
+- **L28** `from .core import (` — **EN:** Imports rank, is_static, size, make_layout, make_ptr, max_common_layout, ... (+4 more) from `.core`. **CN:** 从 `.core` 导入 rank, is_static, size, make_layout, make_ptr, max_common_layout, ... (+4 more)。
+- **L29** `    rank,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    is_static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    make_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    make_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    max_common_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    logical_divide,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    append_ones,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    group_modes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    slice_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `from .atom import (` — **EN:** Imports MmaAtom, CopyAtom, make_atom, _normalize_variadic_tensor_operand, copy_atom_call from `.atom`. **CN:** 从 `.atom` 导入 MmaAtom, CopyAtom, make_atom, _normalize_variadic_tensor_operand, copy_atom_call。
+- **L41** `    MmaAtom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    CopyAtom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    make_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    _normalize_variadic_tensor_operand,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    copy_atom_call,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `from .nvgpu.common import (` — **EN:** Imports CacheEvictionPriority, CopyG2ROp, CopyR2GOp, CopyS2ROp, CopyR2SOp from `.nvgpu.common`. **CN:** 从 `.nvgpu.common` 导入 CacheEvictionPriority, CopyG2ROp, CopyR2GOp, CopyS2ROp, CopyR2SOp。
+- **L48** `    CacheEvictionPriority,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    CopyG2ROp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    CopyR2GOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    CopyS2ROp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    CopyR2SOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L57** `def gemm(` — **EN:** Defines function `gemm`. **CN:** 定义函数 `gemm`。
+- **L58** `    atom: MmaAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `    d: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `    a: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L61** `    b: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L62** `    c: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L64** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L65** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L66** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L67** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L68** `    """The GEMM algorithm.` — **EN:** Starts the docstring for the function `gemm`. **CN:** 开始说明 function `gemm` 的文档字符串。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    Computes \`\`D <- A * B + C\`\` where \`\`C\`\` and \`\`D\`\` can alias. Note that some MMA Atoms (e.g.` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L71** `    warpgroup-wide or tcgen05 MMAs) require manually setting an "accumulate" boolean field.` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `    All tensors must be partitioned according to the provided MMA Atom.` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    For MMA Atoms that require single-threaded execution, the gemm op automatically handles thread` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L76** `    election internally. Manual thread selection is not required in such cases.` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    Following dispatch rules are supported:` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `    - Dispatch [1]: (V) x (V) => (V)          => (V,1,1) x (V,1,1) => (V,1,1)` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L81** `    - Dispatch [2]: (M) x (N) => (M,N)        => (1,M,1) x (1,N,1) => (1,M,N)` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L82** `    - Dispatch [3]: (M,K) x (N,K) => (M,N)    => (1,M,K) x (1,N,K) => (1,M,N)` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L83** `    - Dispatch [4]: (V,M) x (V,N) => (V,M,N)  => (V,M,1) x (V,N,1) => (V,M,N)` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L84** `    - Dispatch [5]: (V,M,K) x (V,N,K) => (V,M,N)` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    The operands \`a\` and \`b\` are variadic, each containing a variable number of tensors:` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `    - For regular GEMM, \`a\` and \`b\` contain the GEMM A and B tensors respectively.` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L89** `    - For GEMM with auxiliary operands, \`a\` and \`b\` contain the GEMM A and B tensors followed by` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L90** `      their respective auxiliary tensors. For example:` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `      - For BlockScaledGemm, \`a\` = [A, SFA] and \`b\` = [B, SFB].` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    :param atom: MMA atom` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L95** `    :type atom: MmaAtom` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L96** `    :param d: Destination tensor (output accumulator)` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L97** `    :type d: Tensor` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L98** `    :param a: A tensor or list of tensors containing the GEMM A tensor and optional auxiliary tensors` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L99** `    :type a: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L100** `    :param b: B tensor or list of tensors containing the GEMM B tensor and optional auxiliary tensors` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L101** `    :type b: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L102** `    :param c: Input accumulator tensor` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L103** `    :type c: Tensor` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L104** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L105** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L106** `    :param ip: Insertion point for MLIR, defaults to None` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L107** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L108** `    :param kwargs: Additional keyword arguments` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L109** `    :type kwargs: dict` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L110** `    :return: None` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L111** `    :rtype: None` — **EN:** Continues the docstring for the function `gemm`. **CN:** 继续说明 function `gemm` 的文档字符串。
+- **L112** `    """` — **EN:** Ends the docstring for the function `gemm`. **CN:** 结束说明 function `gemm` 的文档字符串。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    # Normalize A/B to lists for variadic IR operands, while keeping old API working.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L115** `    a_list = _normalize_variadic_tensor_operand(a, "a")` — **EN:** Assigns a value to a_list. **CN:** 将一个值赋给 a_list。
+- **L116** `    b_list = _normalize_variadic_tensor_operand(b, "b")` — **EN:** Assigns a value to b_list. **CN:** 将一个值赋给 b_list。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    # Rank validations based on the primary A/B tensors (guaranteed non-empty)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L119** `    a_rank = rank(a_list[0].shape)` — **EN:** Assigns a value to a_rank. **CN:** 将一个值赋给 a_rank。
+- **L120** `    b_rank = rank(b_list[0].shape)` — **EN:** Assigns a value to b_rank. **CN:** 将一个值赋给 b_rank。
+- **L121** `    c_rank = rank(c.shape)` — **EN:** Assigns a value to c_rank. **CN:** 将一个值赋给 c_rank。
+- **L122** `    d_rank = rank(d.shape)` — **EN:** Assigns a value to d_rank. **CN:** 将一个值赋给 d_rank。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `    if a_rank != b_rank:` — **EN:** Starts a conditional branch guarded by `a_rank != b_rank`. **CN:** 开始一个由 `a_rank != b_rank` 控制的条件分支。
+- **L125** `        raise ValueError("\`a\` and \`b\` must have the same rank")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    if c_rank != d_rank:` — **EN:** Starts a conditional branch guarded by `c_rank != d_rank`. **CN:** 开始一个由 `c_rank != d_rank` 控制的条件分支。
+- **L128** `        raise ValueError("\`c\` and \`d\` must have the same rank")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    if a_rank == 1:` — **EN:** Starts a conditional branch guarded by `a_rank == 1`. **CN:** 开始一个由 `a_rank == 1` 控制的条件分支。
+- **L131** `        if c_rank > 2:` — **EN:** Starts a conditional branch guarded by `c_rank > 2`. **CN:** 开始一个由 `c_rank > 2` 控制的条件分支。
+- **L132** `            raise ValueError("\`c\` must have rank <= 2 when \`a\` has rank 1")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L133** `    elif a_rank == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L134** `        if c_rank not in (2, 3):` — **EN:** Starts a conditional branch guarded by `c_rank not in (2, 3)`. **CN:** 开始一个由 `c_rank not in (2, 3)` 控制的条件分支。
+- **L135** `            raise ValueError("\`c\` must have rank 2 or 3 when \`a\` has rank 2")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L136** `    elif a_rank == 3:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L137** `        if c_rank != 3:` — **EN:** Starts a conditional branch guarded by `c_rank != 3`. **CN:** 开始一个由 `c_rank != 3` 控制的条件分支。
+- **L138** `            raise ValueError("\`c\` must have rank 3 when \`a\` has rank 3")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `    value = atom._unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L141** `    a_vals = [t.value for t in a_list]` — **EN:** Assigns a value to a_vals. **CN:** 将一个值赋给 a_vals。
+- **L142** `    b_vals = [t.value for t in b_list]` — **EN:** Assigns a value to b_vals. **CN:** 将一个值赋给 b_vals。
+- **L143** `    return _cute_ir.gemm(value, d.value, a_vals, b_vals, c.value, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `def _make_copy_atom(` — **EN:** Defines function `_make_copy_atom`. **CN:** 定义函数 `_make_copy_atom`。
+- **L147** `    copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L148** `    num_bits_per_copy: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L149** `    src_memspace: AddressSpace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L150** `    dst_memspace: AddressSpace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L152** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L153** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `    **mem_attrs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L155** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L156** `    """Create a copy atom, using the universal copy by default.` — **EN:** Starts the docstring for the function `_make_copy_atom`. **CN:** 开始说明 function `_make_copy_atom` 的文档字符串。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    When no \`\`mem_attrs\`\` are provided, the universal copy atom is used.` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L159** `    Otherwise, the function dispatches to a specialized copy op based on the` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L160** `    source/destination memory spaces and forwards the memory attributes:` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L161** `      - gmem -> rmem: \`\`CopyG2ROp\`\`` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L162** `      - rmem -> gmem: \`\`CopyR2GOp\`\`` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L163** `      - smem -> rmem: \`\`CopyS2ROp\`\`` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L164** `      - rmem -> smem: \`\`CopyR2SOp\`\`` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    A \`\`ValueError\`\` is raised if no specialized op matches the memory-space pair.` — **EN:** Continues the docstring for the function `_make_copy_atom`. **CN:** 继续说明 function `_make_copy_atom` 的文档字符串。
+- **L167** `    """` — **EN:** Ends the docstring for the function `_make_copy_atom`. **CN:** 结束说明 function `_make_copy_atom` 的文档字符串。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `    if not mem_attrs:` — **EN:** Starts a conditional branch guarded by `not mem_attrs`. **CN:** 开始一个由 `not mem_attrs` 控制的条件分支。
+- **L170** `        atom_type = _cute_nvgpu_ir.CopyAtomSIMTSyncCopyType.get(` — **EN:** Assigns a value to atom_type. **CN:** 将一个值赋给 atom_type。
+- **L171** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `            num_bits_per_copy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `        return make_atom(atom_type, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `    # Specialized path: dispatch based on memory spaces.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L177** `    op: Union[` — **EN:** Assigns a typed value to op. **CN:** 为 op 赋予带类型标注的值。
+- **L178** `        CopyG2ROp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `        CopyR2GOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `        CopyS2ROp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `        CopyR2SOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `    if src_memspace == AddressSpace.gmem and dst_memspace == AddressSpace.rmem:` — **EN:** Starts a conditional branch guarded by `src_memspace == AddressSpace.gmem and dst_memspace == Add...`. **CN:** 开始一个由 `src_memspace == AddressSpace.gmem and dst_memspace == Add...` 控制的条件分支。
+- **L184** `        op = CopyG2ROp()` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L185** `    elif src_memspace == AddressSpace.rmem and dst_memspace == AddressSpace.gmem:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L186** `        op = CopyR2GOp()` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L187** `    elif src_memspace == AddressSpace.smem and dst_memspace == AddressSpace.rmem:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L188** `        op = CopyS2ROp()` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L189** `    elif src_memspace == AddressSpace.rmem and dst_memspace == AddressSpace.smem:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L190** `        op = CopyR2SOp()` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L191** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L192** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L193** `            f"Memory attributes {set(mem_attrs)} are not supported for "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `            f"{src_memspace} -> {dst_memspace} copies (no specialized op available)."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `    trait = op._make_trait(` — **EN:** Assigns a value to trait. **CN:** 将一个值赋给 trait。
+- **L197** `        copy_internal_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        num_bits_per_copy=num_bits_per_copy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        **mem_attrs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `    return trait.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L207** `def basic_copy(` — **EN:** Defines function `basic_copy`. **CN:** 定义函数 `basic_copy`。
+- **L208** `    src: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L209** `    dst: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L210** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L211** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L212** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L213** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L214** `    """Performs a basic element-wise copy.` — **EN:** Starts the docstring for the function `basic_copy`. **CN:** 开始说明 function `basic_copy` 的文档字符串。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `    This functions **assumes** the following pre-conditions:` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L217** `    1. \`size(src) == size(dst)\`` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `    When the \`src\` and \`dst\` shapes are static, the pre-conditions are actually verified and the` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L220** `    element-wise loop is fully unrolled.` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `    :param src: Source tensor` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L223** `    :type src: Tensor` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L224** `    :param dst: Destination tensor` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L225** `    :type dst: Tensor` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L226** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L227** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L228** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L229** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `basic_copy`. **CN:** 继续说明 function `basic_copy` 的文档字符串。
+- **L230** `    """` — **EN:** Ends the docstring for the function `basic_copy`. **CN:** 结束说明 function `basic_copy` 的文档字符串。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `    if is_static(src.shape) and is_static(dst.shape):` — **EN:** Starts a conditional branch guarded by `is_static(src.shape) and is_static(dst.shape)`. **CN:** 开始一个由 `is_static(src.shape) and is_static(dst.shape)` 控制的条件分支。
+- **L233** `        simt_copy_ty = _cute_nvgpu_ir.CopyAtomSIMTSyncCopyType.get(` — **EN:** Assigns a value to simt_copy_ty. **CN:** 将一个值赋给 simt_copy_ty。
+- **L234** `            src.element_type.mlir_type,  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `            src.element_type.width,  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `        simt_copy = make_atom(simt_copy_ty, loc=loc, ip=ip)` — **EN:** Assigns a value to simt_copy. **CN:** 将一个值赋给 simt_copy。
+- **L238** `        return _cute_ir.copy(simt_copy, [src.value], [dst.value], loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `    s = size(dst, loc=loc, ip=ip)` — **EN:** Assigns a value to s. **CN:** 将一个值赋给 s。
+- **L241** `    # Always generate an scf.for Op when one of the tensors is dynamic` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L242** `    for i in for_generate(0, s, loc=loc, ip=ip):` — **EN:** Starts a loop assigning items from `for_generate(0, s, loc=loc, ip=ip)` to `i`. **CN:** 开始一个循环，将 `for_generate(0, s, loc=loc, ip=ip)` 的元素赋给 `i`。
+- **L243** `        dst[i] = src[i]` — **EN:** Assigns a value to dst[i]. **CN:** 将一个值赋给 dst[i]。
+- **L244** `        yield_out()` — **EN:** Invokes `yield_out` as a standalone call. **CN:** 以独立语句方式调用 `yield_out`。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L248** `def basic_copy_if(` — **EN:** Defines function `basic_copy_if`. **CN:** 定义函数 `basic_copy_if`。
+- **L249** `    pred: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L250** `    src: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L251** `    dst: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L252** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L253** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L254** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L255** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L256** `    """Performs a basic predicated element-wise copy.` — **EN:** Starts the docstring for the function `basic_copy_if`. **CN:** 开始说明 function `basic_copy_if` 的文档字符串。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `    This functions **assumes** the following pre-conditions:` — **EN:** Continues the docstring for the function `basic_copy_if`. **CN:** 继续说明 function `basic_copy_if` 的文档字符串。
+- **L259** `    1. \`size(src) == size(dst)\`` — **EN:** Continues the docstring for the function `basic_copy_if`. **CN:** 继续说明 function `basic_copy_if` 的文档字符串。
+- **L260** `    2. \`size(src) == size(pred)\`` — **EN:** Continues the docstring for the function `basic_copy_if`. **CN:** 继续说明 function `basic_copy_if` 的文档字符串。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `    When all shapes are static, the pre-conditions are actually verified and the element-wise loop` — **EN:** Continues the docstring for the function `basic_copy_if`. **CN:** 继续说明 function `basic_copy_if` 的文档字符串。
+- **L263** `    is fully unrolled.` — **EN:** Continues the docstring for the function `basic_copy_if`. **CN:** 继续说明 function `basic_copy_if` 的文档字符串。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `    """` — **EN:** Ends the docstring for the function `basic_copy_if`. **CN:** 结束说明 function `basic_copy_if` 的文档字符串。
+- **L266** `    if src.element_type.width != dst.element_type.width:  # type: ignore[union-attr]` — **EN:** Starts a conditional branch guarded by `src.element_type.width != dst.element_type.width`. **CN:** 开始一个由 `src.element_type.width != dst.element_type.width` 控制的条件分支。
+- **L267** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L268** `            "basic_copy_if currently only supports equal source and destination "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `            "element type bit width"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L272** `    if is_static(src.shape) and is_static(dst.shape) and is_static(pred.shape):` — **EN:** Starts a conditional branch guarded by `is_static(src.shape) and is_static(dst.shape) and is_stat...`. **CN:** 开始一个由 `is_static(src.shape) and is_static(dst.shape) and is_stat...` 控制的条件分支。
+- **L273** `        return _basic_copy_if_static(pred, src, dst, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L274** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L275** `    s = size(dst, loc=loc, ip=ip)` — **EN:** Assigns a value to s. **CN:** 将一个值赋给 s。
+- **L276** `    # Always generate an scf.for Op when one of the tensors is dynamic` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L277** `    for i in for_generate(0, s, loc=loc, ip=ip):` — **EN:** Starts a loop assigning items from `for_generate(0, s, loc=loc, ip=ip)` to `i`. **CN:** 开始一个循环，将 `for_generate(0, s, loc=loc, ip=ip)` 的元素赋给 `i`。
+- **L278** `        if_generate(pred[i], lambda: dst.__setitem__(i, src[i]), loc=loc, ip=ip)` — **EN:** Invokes `if_generate` as a standalone call. **CN:** 以独立语句方式调用 `if_generate`。
+- **L279** `        yield_out()` — **EN:** Invokes `yield_out` as a standalone call. **CN:** 以独立语句方式调用 `yield_out`。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `# Version of basic_copy_if when src and dst have static shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L283** `# - verify size(src) == size(dst) == size(prd)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L284** `# - fully unroll the loop for now` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L285** `def _basic_copy_if_static(` — **EN:** Defines function `_basic_copy_if_static`. **CN:** 定义函数 `_basic_copy_if_static`。
+- **L286** `    pred: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L287** `    src: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L288** `    dst: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L289** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L290** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L291** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L292** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L293** `    assert is_static(src.shape) and is_static(dst.shape) and is_static(pred.shape)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L294** `    if size(src, loc=loc, ip=ip) != size(dst, loc=loc, ip=ip):` — **EN:** Starts a conditional branch guarded by `size(src, loc=loc, ip=ip) != size(dst, loc=loc, ip=ip)`. **CN:** 开始一个由 `size(src, loc=loc, ip=ip) != size(dst, loc=loc, ip=ip)` 控制的条件分支。
+- **L295** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L296** `            "basic_copy expects the size of source, destination, and predicate tensors to match"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `    # Fully unrolled loop in the static case for now` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L299** `    for i in range(size(dst, loc=loc, ip=ip)):` — **EN:** Starts a loop assigning items from `range(size(dst, loc=loc, ip=ip))` to `i`. **CN:** 开始一个循环，将 `range(size(dst, loc=loc, ip=ip))` 的元素赋给 `i`。
+- **L300** `        if_generate(pred[i], lambda: dst.__setitem__(i, src[i]), loc=loc, ip=ip)` — **EN:** Invokes `if_generate` as a standalone call. **CN:** 以独立语句方式调用 `if_generate`。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L304** `def autovec_copy(` — **EN:** Defines function `autovec_copy`. **CN:** 定义函数 `autovec_copy`。
+- **L305** `    src: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `    dst: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L307** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `    l1c_evict_priority: CacheEvictionPriority = CacheEvictionPriority.EVICT_NORMAL,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L312** `    """` — **EN:** Starts the docstring for the function `autovec_copy`. **CN:** 开始说明 function `autovec_copy` 的文档字符串。
+- **L313** `    Auto-vectorization SIMT copy policy.` — **EN:** Continues the docstring for the function `autovec_copy`. **CN:** 继续说明 function `autovec_copy` 的文档字符串。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `    Given a source and destination tensors that are statically shaped, this policy` — **EN:** Continues the docstring for the function `autovec_copy`. **CN:** 继续说明 function `autovec_copy` 的文档字符串。
+- **L316** `    figures out the largest safe vector width that the copy instruction can take` — **EN:** Continues the docstring for the function `autovec_copy`. **CN:** 继续说明 function `autovec_copy` 的文档字符串。
+- **L317** `    and performs the copy. Any extra memory attributes are forwarded to the specialized` — **EN:** Continues the docstring for the function `autovec_copy`. **CN:** 继续说明 function `autovec_copy` 的文档字符串。
+- **L318** `    copy op.` — **EN:** Continues the docstring for the function `autovec_copy`. **CN:** 继续说明 function `autovec_copy` 的文档字符串。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    """` — **EN:** Ends the docstring for the function `autovec_copy`. **CN:** 结束说明 function `autovec_copy` 的文档字符串。
+- **L321** `    if src.element_type.width != dst.element_type.width:  # type: ignore[union-attr]` — **EN:** Starts a conditional branch guarded by `src.element_type.width != dst.element_type.width`. **CN:** 开始一个由 `src.element_type.width != dst.element_type.width` 控制的条件分支。
+- **L322** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L323** `            "autovec_copy only supports equal source and destination "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `            f"element type bit widths, got {src.element_type} and {dst.element_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `    # We are going to dispatch to copy-with-atom which requires shapes to be static` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L328** `    if not is_static(src.shape) or not is_static(dst.shape):` — **EN:** Starts a conditional branch guarded by `not is_static(src.shape) or not is_static(dst.shape)`. **CN:** 开始一个由 `not is_static(src.shape) or not is_static(dst.shape)` 控制的条件分支。
+- **L329** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L330** `            "autovec_copy expects source and destination tensors to be statically shaped"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `    vec_layout = max_common_layout(src, dst, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_layout. **CN:** 将一个值赋给 vec_layout。
+- **L334** `    num_common_elements = size(vec_layout, loc=loc, ip=ip)` — **EN:** Assigns a value to num_common_elements. **CN:** 将一个值赋给 num_common_elements。
+- **L335** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L336** `    # Next we construct an upper-bound on the number bits that can be vectorized by considering` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L337** `    # - the maximum alignment of the layouts` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L338** `    # - the maximum alignment of the pointers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** `    upper_bound = math.gcd(src.layout.max_alignment, dst.layout.max_alignment)  # type: ignore[union-attr]` — **EN:** Assigns a value to upper_bound. **CN:** 将一个值赋给 upper_bound。
+- **L341** `    upper_bound = math.gcd(upper_bound, num_common_elements)` — **EN:** Assigns a value to upper_bound. **CN:** 将一个值赋给 upper_bound。
+- **L342** `    upper_bound *= src.element_type.width  # type: ignore[union-attr]` — **EN:** Updates upper_bound in place. **CN:** 原地更新 upper_bound。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `    # For our instructions, the alignment of the pointer is an upper bound to the vector width` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L345** `    # max_alignment, as opposed to alignment, takes into account possible address swizzling` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L346** `    upper_bound = math.gcd(upper_bound, src.iterator.max_alignment * 8)  # type: ignore[union-attr]` — **EN:** Assigns a value to upper_bound. **CN:** 将一个值赋给 upper_bound。
+- **L347** `    upper_bound = math.gcd(upper_bound, dst.iterator.max_alignment * 8)  # type: ignore[union-attr]` — **EN:** Assigns a value to upper_bound. **CN:** 将一个值赋给 upper_bound。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** `    # Finally, we put a cap at 256b` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L350** `    num_bits_per_copy = math.gcd(upper_bound, 256)` — **EN:** Assigns a value to num_bits_per_copy. **CN:** 将一个值赋给 num_bits_per_copy。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `    if (num_common_elements > 1) and (num_bits_per_copy % 8 == 0):` — **EN:** Starts a conditional branch guarded by `num_common_elements > 1 and num_bits_per_copy % 8 == 0`. **CN:** 开始一个由 `num_common_elements > 1 and num_bits_per_copy % 8 == 0` 控制的条件分支。
+- **L353** `        num_common_elements = num_bits_per_copy // src.element_type.width  # type: ignore[union-attr]` — **EN:** Assigns a value to num_common_elements. **CN:** 将一个值赋给 num_common_elements。
+- **L354** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L355** `        # 2 step logical divides ensuring that the divides are valid at every step` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L356** `        vec_src = logical_divide(src, vec_layout, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_src. **CN:** 将一个值赋给 vec_src。
+- **L357** `        vec_dst = logical_divide(dst, vec_layout, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L358** `        tiled_src = logical_divide(` — **EN:** Assigns a value to tiled_src. **CN:** 将一个值赋给 tiled_src。
+- **L359** `            vec_src, make_layout(num_common_elements, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `        tiled_dst = logical_divide(` — **EN:** Assigns a value to tiled_dst. **CN:** 将一个值赋给 tiled_dst。
+- **L362** `            vec_dst, make_layout(num_common_elements, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L365** `        # Forward memory attributes that differ from their defaults so _make_copy_atom` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L366** `        # falls back to the universal copy when no specialisation is needed.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L367** `        mem_attrs = {}` — **EN:** Assigns a value to mem_attrs. **CN:** 将一个值赋给 mem_attrs。
+- **L368** `        if l1c_evict_priority != CacheEvictionPriority.EVICT_NORMAL:` — **EN:** Starts a conditional branch guarded by `l1c_evict_priority != CacheEvictionPriority.EVICT_NORMAL`. **CN:** 开始一个由 `l1c_evict_priority != CacheEvictionPriority.EVICT_NORMAL` 控制的条件分支。
+- **L369** `            mem_attrs["l1c_evict_priority"] = l1c_evict_priority` — **EN:** Assigns a value to mem_attrs['l1c_evict_priority']. **CN:** 将一个值赋给 mem_attrs['l1c_evict_priority']。
+- **L370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L371** `        simt_copy_atom = _make_copy_atom(` — **EN:** Assigns a value to simt_copy_atom. **CN:** 将一个值赋给 simt_copy_atom。
+- **L372** `            src.element_type,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `            num_bits_per_copy,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `            src.iterator.memspace,  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `            dst.iterator.memspace,  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `            **mem_attrs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `        return _cute_ir.copy(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L381** `            simt_copy_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `            [tiled_src.value],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `            [tiled_dst.value],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L388** `    # Failed to vectorize, use a basic copy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L389** `    basic_copy(src, dst, loc=loc, ip=ip)` — **EN:** Invokes `basic_copy` as a standalone call. **CN:** 以独立语句方式调用 `basic_copy`。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `def _parse_tma_multicast_args(` — **EN:** Defines function `_parse_tma_multicast_args`. **CN:** 定义函数 `_parse_tma_multicast_args`。
+- **L393** `    kwargs: Dict[str, Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L394** `) -> List[Tuple[str, ir.Attribute]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L395** `    """` — **EN:** Starts the docstring for the function `_parse_tma_multicast_args`. **CN:** 开始说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L396** `    Parse multicast-related kwargs and return a list of (attr_name, attr) pairs.` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `    This function consumes the following key from kwargs if present:` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L399** `      - 'tma_multicast': dict with keys:` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L400** `          { 'cluster_shape': (m, n), 'multicast_dim': 'M' or 'N',` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L401** `            'use_2cta_mma_inst': bool, 'from_block_api': bool }` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L403** `    Returns:` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L404** `      List of (attr_name, ir.Attribute) pairs to be attached to the op.` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L405** `      Recognized attributes:` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L406** `        - ('multicast_layout', #cute.layout<...>)` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L407** `        - ('use_2cta', unit) when use_2cta_mma_inst is True` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L408** `        - ('from_block_api', unit) when from_block_api is True` — **EN:** Continues the docstring for the function `_parse_tma_multicast_args`. **CN:** 继续说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L409** `    """` — **EN:** Ends the docstring for the function `_parse_tma_multicast_args`. **CN:** 结束说明 function `_parse_tma_multicast_args` 的文档字符串。
+- **L410** `    attr_pairs: List[Tuple[str, ir.Attribute]] = []` — **EN:** Assigns a typed value to attr_pairs. **CN:** 为 attr_pairs 赋予带类型标注的值。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** `    # Pop known keys to avoid leaking to trait unpack` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L413** `    tma_multicast = kwargs.pop("tma_multicast", None)` — **EN:** Assigns a value to tma_multicast. **CN:** 将一个值赋给 tma_multicast。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `    if tma_multicast is None:` — **EN:** Starts a conditional branch guarded by `tma_multicast is None`. **CN:** 开始一个由 `tma_multicast is None` 控制的条件分支。
+- **L416** `        return attr_pairs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L417** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L418** `    if not isinstance(tma_multicast, dict):` — **EN:** Starts a conditional branch guarded by `not isinstance(tma_multicast, dict)`. **CN:** 开始一个由 `not isinstance(tma_multicast, dict)` 控制的条件分支。
+- **L419** `        raise TypeError("tma_multicast must be a dict")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `    # Validate required keys` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L422** `    required_keys = ["cluster_shape", "multicast_dim"]` — **EN:** Assigns a value to required_keys. **CN:** 将一个值赋给 required_keys。
+- **L423** `    for key in required_keys:` — **EN:** Starts a loop assigning items from `required_keys` to `key`. **CN:** 开始一个循环，将 `required_keys` 的元素赋给 `key`。
+- **L424** `        if key not in tma_multicast:` — **EN:** Starts a conditional branch guarded by `key not in tma_multicast`. **CN:** 开始一个由 `key not in tma_multicast` 控制的条件分支。
+- **L425** `            raise KeyError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L426** `                f"tma_multicast is missing required key '{key}'. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `                f"Expected keys: {required_keys}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L430** `    multicast_dim = tma_multicast["multicast_dim"]` — **EN:** Assigns a value to multicast_dim. **CN:** 将一个值赋给 multicast_dim。
+- **L431** `    if multicast_dim not in ("M", "N"):` — **EN:** Starts a conditional branch guarded by `multicast_dim not in ('M', 'N')`. **CN:** 开始一个由 `multicast_dim not in ('M', 'N')` 控制的条件分支。
+- **L432** `        raise ValueError(f"multicast_dim must be 'M' or 'N', got '{multicast_dim}'")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** `    cluster_m, cluster_n = tma_multicast["cluster_shape"]` — **EN:** Assigns a value to (cluster_m, cluster_n). **CN:** 将一个值赋给 (cluster_m, cluster_n)。
+- **L435** `    direction = "(1,0)" if multicast_dim == "M" else "(0,1)"` — **EN:** Assigns a value to direction. **CN:** 将一个值赋给 direction。
+- **L436** `    layout_str = f"({cluster_m},{cluster_n}):{direction}"` — **EN:** Assigns a value to layout_str. **CN:** 将一个值赋给 layout_str。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `    attr_pairs.append(` — **EN:** Invokes `attr_pairs.append` as a standalone call. **CN:** 以独立语句方式调用 `attr_pairs.append`。
+- **L439** `        (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `            "multicast_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `            ir.Attribute.parse(f'#cute.layout<"{layout_str}">'),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `    if tma_multicast.get("from_block_api", False):` — **EN:** Starts a conditional branch guarded by `tma_multicast.get('from_block_api', False)`. **CN:** 开始一个由 `tma_multicast.get('from_block_api', False)` 控制的条件分支。
+- **L445** `        attr_pairs.append(("from_block_api", ir.UnitAttr.get()))` — **EN:** Invokes `attr_pairs.append` as a standalone call. **CN:** 以独立语句方式调用 `attr_pairs.append`。
+- **L446** `    if tma_multicast.get("use_2cta_mma_inst", False):` — **EN:** Starts a conditional branch guarded by `tma_multicast.get('use_2cta_mma_inst', False)`. **CN:** 开始一个由 `tma_multicast.get('use_2cta_mma_inst', False)` 控制的条件分支。
+- **L447** `        attr_pairs.append(("use_2cta", ir.UnitAttr.get()))` — **EN:** Invokes `attr_pairs.append` as a standalone call. **CN:** 以独立语句方式调用 `attr_pairs.append`。
+- **L448** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L449** `    return attr_pairs` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L450** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L453** `def copy(` — **EN:** Defines function `copy`. **CN:** 定义函数 `copy`。
+- **L454** `    atom: CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L455** `    src: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L456** `    dst: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L457** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L458** `    pred: Optional[Tensor] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L459** `    unroll_factor: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L460** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L461** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L462** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L463** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L464** `    """Facilitates data transfer between two tensors conforming to layout profile \`\`(V, Rest...)\`\`.` — **EN:** Starts the docstring for the function `copy`. **CN:** 开始说明 function `copy` 的文档字符串。
+- **L465** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L466** `    :param atom: Copy atom specifying the transfer operation` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L467** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L468** `    :param src: Source tensor or list of tensors with layout profile \`\`(V, Rest...)\`\`` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L469** `    :type src: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L470** `    :param dst: Destination tensor or list of tensors with layout profile \`\`(V, Rest...)\`\`` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L471** `    :type dst: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L472** `    :param pred: Optional predication tensor for conditional transfers, defaults to None` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L473** `    :type pred: Optional[Tensor], optional` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L474** `    :param unroll_factor: Optional unroll count for loop over Rest... modes, defaults to None for fully unroll when Rest... modes are static` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L475** `    :type unroll_factor: Optional[int], optional` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L476** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L477** `    :type loc: Any, optional` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L478** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L479** `    :type ip: Any, optional` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L480** `    :param kwargs: Additional copy atom specific arguments` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L481** `    :type kwargs: Dict[str, Any]` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L482** `    :raises TypeError: If source and destination element type bit widths differ` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L483** `    :raises ValueError: If source and destination ranks differ` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L484** `    :raises ValueError: If source and destination mode-1 sizes differ` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L485** `    :raises NotImplementedError: If \`\`V-mode\`\` rank exceeds 2` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L486** `    :return: None` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L487** `    :rtype: None` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L489** `    The \`\`V-mode\`\` represents either:` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `    - A singular mode directly consumable by the provided Copy Atom` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L492** `    - A composite mode requiring recursive decomposition, structured as \`\`(V, Rest...)\`\`,` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L493** `      and src/dst layout like \`\`((V, Rest...), Rest...)\`\`` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `    The algorithm recursively processes the \`\`V-mode\`\`, decomposing it until reaching the minimum granularity` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L496** `    compatible with the provided Copy Atom's requirements.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `    Source and destination tensors must be partitioned in accordance with the Copy Atom specifications.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L499** `    Post-partitioning, both tensors will exhibit a \`\`(V, Rest...)\`\` layout profile.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** `    The operands \`src\` and \`dst\` are variadic, each containing a variable number of tensors:` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `    - For regular copy, \`src\` and \`dst\` contain single source and destination tensors respectively.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L504** `    - For copy with auxiliary operands, \`src\` and \`dst\` contain the primary tensors followed by` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L505** `      their respective auxiliary tensors.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    **Precondition:** The size of mode 1 must be equal for both source and destination tensors:` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L508** `    \`\`size(src, mode=[1]) == size(dst, mode=[1])\`\`` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L509** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L510** `    **Examples**:` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** `    TMA copy operation with multicast functionality:` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L513** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L514** `    .. code-block:: python` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L515** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L516** `        cute.copy(tma_atom, src, dst, tma_bar_ptr=mbar_ptr, mcast_mask=mask, cache_policy=policy)` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `    Optional predication is supported through an additional tensor parameter. For partitioned tensors with` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L519** `    logical profile \`\`((ATOM_V,ATOM_REST),REST,...)\`\`, the predication tensor must maintain profile` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L520** `    compatibility with \`\`(ATOM_REST,REST,...)\`\`.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L521** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L522** `    For Copy Atoms requiring single-threaded execution, thread election is managed automatically by the` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L523** `    copy operation. External thread selection mechanisms are not necessary.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L525** `    .. note::` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `        - Certain Atoms may require additional operation-specific keyword arguments.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L528** `        - Current implementation limits \`\`V-mode\`\` rank to 2 or less. Support for higher ranks is planned` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L529** `          for future releases.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L531** `    """` — **EN:** Ends the docstring for the function `copy`. **CN:** 结束说明 function `copy` 的文档字符串。
+- **L532** `    # Normalize src/dst to lists for variadic IR operands` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L533** `    src_list = _normalize_variadic_tensor_operand(src, "src")` — **EN:** Assigns a value to src_list. **CN:** 将一个值赋给 src_list。
+- **L534** `    dst_list = _normalize_variadic_tensor_operand(dst, "dst")` — **EN:** Assigns a value to dst_list. **CN:** 将一个值赋给 dst_list。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** `    # Validate primary tensors (first element)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L537** `    src_primary = src_list[0]` — **EN:** Assigns a value to src_primary. **CN:** 将一个值赋给 src_primary。
+- **L538** `    dst_primary = dst_list[0]` — **EN:** Assigns a value to dst_primary. **CN:** 将一个值赋给 dst_primary。
+- **L539** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L540** `    if isinstance(` — **EN:** Starts a conditional branch guarded by `isinstance(src_primary.type, _cute_ir.MemRefType) and isi...`. **CN:** 开始一个由 `isinstance(src_primary.type, _cute_ir.MemRefType) and isi...` 控制的条件分支。
+- **L541** `        src_primary.type,  # type: ignore[attr-defined]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L542** `        _cute_ir.MemRefType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L543** `    ) and isinstance(` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L544** `        dst_primary.type,  # type: ignore[attr-defined]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L545** `        _cute_ir.MemRefType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L546** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L547** `        if (` — **EN:** Starts a conditional branch guarded by `len(dst_list) == 1 and src_primary.element_type.width != ...`. **CN:** 开始一个由 `len(dst_list) == 1 and src_primary.element_type.width != ...` 控制的条件分支。
+- **L548** `            len(dst_list) == 1` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L549** `            and src_primary.element_type.width != dst_primary.element_type.width  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L550** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L551** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L552** `                "\`copy\` currently only supports equal source and destination "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `                "element type bit width"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `    if unroll_factor is not None:` — **EN:** Starts a conditional branch guarded by `unroll_factor is not None`. **CN:** 开始一个由 `unroll_factor is not None` 控制的条件分支。
+- **L557** `        if not isinstance(unroll_factor, int) or unroll_factor < 1:` — **EN:** Starts a conditional branch guarded by `not isinstance(unroll_factor, int) or unroll_factor < 1`. **CN:** 开始一个由 `not isinstance(unroll_factor, int) or unroll_factor < 1` 控制的条件分支。
+- **L558** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L559** `                f"unroll_factor must be a positive integer, but got {unroll_factor}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L560** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L562** `    if rank(src_primary) != rank(dst_primary):` — **EN:** Starts a conditional branch guarded by `rank(src_primary) != rank(dst_primary)`. **CN:** 开始一个由 `rank(src_primary) != rank(dst_primary)` 控制的条件分支。
+- **L563** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L564** `            "Expected source and destination tensors to have the same rank, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L565** `            f"but got {rank(src_primary)} and {rank(dst_primary)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L568** `    # Canonicalize all tensors to at least rank-2` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L569** `    src_list = [group_modes(append_ones(t, up_to_rank=2), 1) for t in src_list]  # type: ignore[call-overload]` — **EN:** Assigns a value to src_list. **CN:** 将一个值赋给 src_list。
+- **L570** `    dst_list = [group_modes(append_ones(t, up_to_rank=2), 1) for t in dst_list]  # type: ignore[call-overload]` — **EN:** Assigns a value to dst_list. **CN:** 将一个值赋给 dst_list。
+- **L571** `    if pred is not None:` — **EN:** Starts a conditional branch guarded by `pred is not None`. **CN:** 开始一个由 `pred is not None` 控制的条件分支。
+- **L572** `        pred = group_modes(append_ones(pred, up_to_rank=2), 1)  # type: ignore[call-overload]` — **EN:** Assigns a value to pred. **CN:** 将一个值赋给 pred。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `    # Recompute primary references after canonicalization` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L575** `    src_primary = src_list[0]` — **EN:** Assigns a value to src_primary. **CN:** 将一个值赋给 src_primary。
+- **L576** `    dst_primary = dst_list[0]` — **EN:** Assigns a value to dst_primary. **CN:** 将一个值赋给 dst_primary。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `    if is_static(src_primary.shape[1]) and is_static(dst_primary.shape[1]):  # type: ignore[index]` — **EN:** Starts a conditional branch guarded by `is_static(src_primary.shape[1]) and is_static(dst_primary...`. **CN:** 开始一个由 `is_static(src_primary.shape[1]) and is_static(dst_primary...` 控制的条件分支。
+- **L579** `        if size(src_primary, mode=[1]) != size(dst_primary, mode=[1]):` — **EN:** Starts a conditional branch guarded by `size(src_primary, mode=[1]) != size(dst_primary, mode=[1])`. **CN:** 开始一个由 `size(src_primary, mode=[1]) != size(dst_primary, mode=[1])` 控制的条件分支。
+- **L580** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L581** `                "Expected source and destination tensors to have the same size in mode-1, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `                f"but got {size(src_primary, mode=[1])} and {size(dst_primary, mode=[1])}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** `    multicast_attr_pairs = _parse_tma_multicast_args(kwargs)` — **EN:** Assigns a value to multicast_attr_pairs. **CN:** 将一个值赋给 multicast_attr_pairs。
+- **L586** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L587** `    # Unroll the loop per specified unroll_factor for static RestM case` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L588** `    if is_static(src_primary.shape[1]) and unroll_factor is not None:  # type: ignore[index]` — **EN:** Starts a conditional branch guarded by `is_static(src_primary.shape[1]) and unroll_factor is not ...`. **CN:** 开始一个由 `is_static(src_primary.shape[1]) and unroll_factor is not ...` 控制的条件分支。
+- **L589** `        unroll_factor = LoopUnroll(count=unroll_factor)` — **EN:** Assigns a value to unroll_factor. **CN:** 将一个值赋给 unroll_factor。
+- **L590** `        for i in for_generate(` — **EN:** Starts a loop assigning items from `for_generate(0, stop=size(src_primary, mode=[1]...` to `i`. **CN:** 开始一个循环，将 `for_generate(0, stop=size(src_primary, mode=[1]...` 的元素赋给 `i`。
+- **L591** `            0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L592** `            stop=size(src_primary, mode=[1], loc=loc, ip=ip),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L593** `            unroll=unroll_factor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L594** `            loc=loc,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L595** `            ip=ip,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L596** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L597** `            src_atom = [slice_(src, (None, i), loc=loc, ip=ip) for src in src_list]` — **EN:** Assigns a value to src_atom. **CN:** 将一个值赋给 src_atom。
+- **L598** `            dst_atom = [slice_(dst, (None, i), loc=loc, ip=ip) for dst in dst_list]` — **EN:** Assigns a value to dst_atom. **CN:** 将一个值赋给 dst_atom。
+- **L599** `            pred_atom = (` — **EN:** Assigns a value to pred_atom. **CN:** 将一个值赋给 pred_atom。
+- **L600** `                slice_(pred, (None, i), loc=loc, ip=ip) if pred is not None else None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L602** `            copy_atom_call(` — **EN:** Invokes `copy_atom_call` as a standalone call. **CN:** 以独立语句方式调用 `copy_atom_call`。
+- **L603** `                atom, src_atom, dst_atom, pred=pred_atom, loc=loc, ip=ip, **kwargs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `            yield_out()` — **EN:** Invokes `yield_out` as a standalone call. **CN:** 以独立语句方式调用 `yield_out`。
+- **L606** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L607** `        value = atom._unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L608** `        pred_value = pred.value if isinstance(pred, Tensor) else pred` — **EN:** Assigns a value to pred_value. **CN:** 将一个值赋给 pred_value。
+- **L609** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L610** `        src_vals = [t.value for t in src_list]` — **EN:** Assigns a value to src_vals. **CN:** 将一个值赋给 src_vals。
+- **L611** `        dst_vals = [t.value for t in dst_list]` — **EN:** Assigns a value to dst_vals. **CN:** 将一个值赋给 dst_vals。
+- **L612** `        op = _cute_ir.copy(value, src_vals, dst_vals, pred=pred_value, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L613** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L614** `        for name, attr in multicast_attr_pairs:` — **EN:** Starts a loop assigning items from `multicast_attr_pairs` to `(name, attr)`. **CN:** 开始一个循环，将 `multicast_attr_pairs` 的元素赋给 `(name, attr)`。
+- **L615** `            op.attributes[name] = attr` — **EN:** Assigns a value to op.attributes[name]. **CN:** 将一个值赋给 op.attributes[name]。
+- **L616** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L617** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L618** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L619** `def prefetch(` — **EN:** Defines function `prefetch`. **CN:** 定义函数 `prefetch`。
+- **L620** `    atom: CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L621** `    src: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L622** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L623** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L624** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L625** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L626** `    """` — **EN:** Starts the docstring for the function `prefetch`. **CN:** 开始说明 function `prefetch` 的文档字符串。
+- **L627** `    The Prefetch algorithm.` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L628** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L629** `    The "prefetch" expects source tensors to be partitioned according to the provided Copy Atom.` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L630** `    Prefetch is used for loading tensors from global memory to L2.` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `    Prefetch accepts Copy Atom but not all are allowed. Currently, only supports TMA prefetch.` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L633** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L634** `    .. code-block:: python` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L635** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L636** `        cute.prefetch(tma_prefetch, src)` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L637** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L638** `    For Copy Atoms that require single-threaded execution, the copy op automatically handles thread` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L639** `    election internally. Manual thread selection is not required in such cases.` — **EN:** Continues the docstring for the function `prefetch`. **CN:** 继续说明 function `prefetch` 的文档字符串。
+- **L640** `    """` — **EN:** Ends the docstring for the function `prefetch`. **CN:** 结束说明 function `prefetch` 的文档字符串。
+- **L641** `    dummy_tma_bar_ptr = make_ptr(Int64, 0, AddressSpace.smem, loc=loc, ip=ip)` — **EN:** Assigns a value to dummy_tma_bar_ptr. **CN:** 将一个值赋给 dummy_tma_bar_ptr。
+- **L642** `    dummy_mcast_mask = Int16(0)` — **EN:** Assigns a value to dummy_mcast_mask. **CN:** 将一个值赋给 dummy_mcast_mask。
+- **L643** `    value = atom._unpack(` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L644** `        loc=loc, ip=ip, tma_bar_ptr=dummy_tma_bar_ptr, mcast_mask=dummy_mcast_mask` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L646** `    return _cute_ir.prefetch(value, src.value, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.algorithm`. CN: 模块名为 `CuTeDSL.cutlass.cute.algorithm`。
+- EN: Top-level functions: gemm, _make_copy_atom, basic_copy, basic_copy_if, _basic_copy_if_static, autovec_copy, _parse_tma_multicast_args, copy, prefetch CN: 顶层函数包括：gemm, _make_copy_atom, basic_copy, basic_copy_if, _basic_copy_if_static, autovec_copy, _parse_tma_multicast_args, copy, prefetch
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir:ir, cutlass.cutlass_dsl:for_generate,yield_out,if_generate,dsl_user_op,LoopUnroll, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, .typing:Numeric,Tensor,Int64,Int16,AddressSpace, .core:rank,is_static,size,make_layout,make_ptr,max_common_layout,logical_divide,append_ones,group_modes,slice_, .atom:MmaAtom,CopyAtom,make_atom,_normalize_variadic_tensor_operand,copy_atom_call, .nvgpu.common:CacheEvictionPriority,CopyG2ROp,CopyR2GOp,CopyS2ROp,CopyR2SOp CN: 内部依赖：cutlass._mlir:ir, cutlass.cutlass_dsl:for_generate,yield_out,if_generate,dsl_user_op,LoopUnroll, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, .typing:Numeric,Tensor,Int64,Int16,AddressSpace, .core:rank,is_static,size,make_layout,make_ptr,max_common_layout,logical_divide,append_ones,group_modes,slice_, .atom:MmaAtom,CopyAtom,make_atom,_normalize_variadic_tensor_operand,copy_atom_call, .nvgpu.common:CacheEvictionPriority,CopyG2ROp,CopyR2GOp,CopyS2ROp,CopyR2SOp
+- EN: External or standard-library dependencies: math, typing:Optional,Dict,Any,List,Tuple,Type,Union CN: 外部或标准库依赖：math, typing:Optional,Dict,Any,List,Tuple,Type,Union

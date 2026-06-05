@@ -1,0 +1,1658 @@
+# test_dense_gemm_fp8_2xacc.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/examples/CuTeDSL/hopper/test_dense_gemm_fp8_2xacc.py`
+**Purpose / 用途**: This file defines automated tests for test dense gemm fp8 2xacc. / 该文件定义了针对 test dense gemm fp8 2xacc 的自动化测试。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `"""`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 30 / 第30行**
+  - Code / 代码: `Pytest test suite for hopper/dense_gemm_fp8_2xacc.py.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 31 / 第31行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 32 / 第32行**
+  - Code / 代码: `Test organization`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 33 / 第33行**
+  - Code / 代码: `-----------------`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 34 / 第34行**
+  - Code / 代码: `L0 — compile-only tests (skip_ref_check=True, iterations=0)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 35 / 第35行**
+  - Code / 代码: `    Verify that the kernel compiles for a broad range of configurations`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 36 / 第36行**
+  - Code / 代码: `    without running on the GPU.  Fast (~1-3 s each).`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 37 / 第37行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 38 / 第38行**
+  - Code / 代码: `L1 — correctness tests (GPU execution, checked against torch.einsum)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 39 / 第39行**
+  - Code / 代码: `    Verify numerical correctness for the key configurations.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 40 / 第40行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 41 / 第41行**
+  - Code / 代码: `Benchmark — performance tests (skip_ref_check=True, warmup + timed iterations)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 42 / 第42行**
+  - Code / 代码: `    Report execution time and TFLOPS for representative problem sizes.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 43 / 第43行**
+  - Code / 代码: `    Marked with @pytest.mark.bench; skipped by default unless -m bench is passed.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 44 / 第44行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 45 / 第45行**
+  - Code / 代码: `Coverage`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 46 / 第46行**
+  - Code / 代码: `--------`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 47 / 第47行**
+  - Code / 代码: `* All tile shapes: (64,64), (128,64), (128,128), (128,256)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 48 / 第48行**
+  - Code / 代码: `* All cluster shapes: (1,1), (2,1), (1,2), (2,2)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 49 / 第49行**
+  - Code / 代码: `* All output dtypes: Float16, Float32, Float8E4M3FN`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 50 / 第50行**
+  - Code / 代码: `* mma_promotion_interval: 4, 8, 16`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 51 / 第51行**
+  - Code / 代码: `* Non-trivial scale factors (scale_a != 1.0 or scale_b != 1.0)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 52 / 第52行**
+  - Code / 代码: `* Batched GEMM (L > 1)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 53 / 第53行**
+  - Code / 代码: `* Large LLM-like problem sizes in benchmark`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 54 / 第54行**
+  - Code / 代码: `"""`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 55 / 第55行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 56 / 第56行**
+  - Code / 代码: `import pytest`
+  - EN: Imports `pytest` so its symbols are available to the test module.
+  - CN: 导入 `pytest`，使其符号可供该测试模块使用。
+- **Line 57 / 第57行**
+  - Code / 代码: `import cutlass`
+  - EN: Imports `cutlass` so its symbols are available to the test module.
+  - CN: 导入 `cutlass`，使其符号可供该测试模块使用。
+- **Line 58 / 第58行**
+  - Code / 代码: `from hopper.dense_gemm_fp8_2xacc import run`
+  - EN: Imports selected symbols from `hopper.dense_gemm_fp8_2xacc` for later use.
+  - CN: 从 `hopper.dense_gemm_fp8_2xacc` 导入选定符号以供后续使用。
+- **Line 59 / 第59行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 60 / 第60行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 61 / 第61行**
+  - Code / 代码: `# Type aliases`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 62 / 第62行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 63 / 第63行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 64 / 第64行**
+  - Code / 代码: `F16 = cutlass.Float16`
+  - EN: Defines module-level constant `F16` used later in the file.
+  - CN: 定义模块级常量 `F16`，供后续代码使用。
+- **Line 65 / 第65行**
+  - Code / 代码: `F32 = cutlass.Float32`
+  - EN: Defines module-level constant `F32` used later in the file.
+  - CN: 定义模块级常量 `F32`，供后续代码使用。
+- **Line 66 / 第66行**
+  - Code / 代码: `F8E4 = cutlass.Float8E4M3FN`
+  - EN: Defines module-level constant `F8E4` used later in the file.
+  - CN: 定义模块级常量 `F8E4`，供后续代码使用。
+- **Line 67 / 第67行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 68 / 第68行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 69 / 第69行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 70 / 第70行**
+  - Code / 代码: `# Shared invocation helpers`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 71 / 第71行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 72 / 第72行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 73 / 第73行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 74 / 第74行**
+  - Code / 代码: `def _run_compile(`
+  - EN: Defines function `_run_compile`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_run_compile`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 75 / 第75行**
+  - Code / 代码: `    mnkl=(2048, 2048, 2048, 1),`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 76 / 第76行**
+  - Code / 代码: `    tile_shape_mn=(128, 128),`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 77 / 第77行**
+  - Code / 代码: `    cluster_shape_mn=(1, 1),`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 78 / 第78行**
+  - Code / 代码: `    c_dtype=F16,`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 79 / 第79行**
+  - Code / 代码: `    mma_promotion_interval=4,`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 80 / 第80行**
+  - Code / 代码: `    scale_a_val=1.0,`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 81 / 第81行**
+  - Code / 代码: `    scale_b_val=1.0,`
+  - EN: Continues the multi-line function signature for `_run_compile`.
+  - CN: 继续 `_run_compile` 的多行函数签名。
+- **Line 82 / 第82行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_run_compile`.
+  - CN: 完成 `_run_compile` 的多行函数签名。
+- **Line 83 / 第83行**
+  - Code / 代码: `    """Compile-only helper: JIT-compiles and runs the kernel once without validation.`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 84 / 第84行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 85 / 第85行**
+  - Code / 代码: `    Uses iterations=1 (not 0) because testing.benchmark divides by iterations.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 86 / 第86行**
+  - Code / 代码: `    skip_ref_check=True ensures no reference comparison is performed.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 87 / 第87行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 88 / 第88行**
+  - Code / 代码: `    run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 89 / 第89行**
+  - Code / 代码: `        mnkl=mnkl,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 90 / 第90行**
+  - Code / 代码: `        c_dtype=c_dtype,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 91 / 第91行**
+  - Code / 代码: `        tile_shape_mn=tile_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 92 / 第92行**
+  - Code / 代码: `        cluster_shape_mn=cluster_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 93 / 第93行**
+  - Code / 代码: `        mma_promotion_interval=mma_promotion_interval,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 94 / 第94行**
+  - Code / 代码: `        scale_a_val=scale_a_val,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 95 / 第95行**
+  - Code / 代码: `        scale_b_val=scale_b_val,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 96 / 第96行**
+  - Code / 代码: `        tolerance=0.1,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 97 / 第97行**
+  - Code / 代码: `        warmup_iterations=0,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 98 / 第98行**
+  - Code / 代码: `        iterations=1,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 99 / 第99行**
+  - Code / 代码: `        skip_ref_check=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 100 / 第100行**
+  - Code / 代码: `        use_cold_l2=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 101 / 第101行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 102 / 第102行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 103 / 第103行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 104 / 第104行**
+  - Code / 代码: `def _run_correctness(`
+  - EN: Defines function `_run_correctness`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_run_correctness`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 105 / 第105行**
+  - Code / 代码: `    mnkl=(2048, 2048, 2048, 1),`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 106 / 第106行**
+  - Code / 代码: `    tile_shape_mn=(128, 128),`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 107 / 第107行**
+  - Code / 代码: `    cluster_shape_mn=(1, 1),`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 108 / 第108行**
+  - Code / 代码: `    c_dtype=F16,`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 109 / 第109行**
+  - Code / 代码: `    mma_promotion_interval=4,`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 110 / 第110行**
+  - Code / 代码: `    scale_a_val=1.0,`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 111 / 第111行**
+  - Code / 代码: `    scale_b_val=1.0,`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 112 / 第112行**
+  - Code / 代码: `    tolerance=0.1,`
+  - EN: Continues the multi-line function signature for `_run_correctness`.
+  - CN: 继续 `_run_correctness` 的多行函数签名。
+- **Line 113 / 第113行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_run_correctness`.
+  - CN: 完成 `_run_correctness` 的多行函数签名。
+- **Line 114 / 第114行**
+  - Code / 代码: `    """Correctness helper: runs kernel and validates against torch.einsum reference."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 115 / 第115行**
+  - Code / 代码: `    run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 116 / 第116行**
+  - Code / 代码: `        mnkl=mnkl,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 117 / 第117行**
+  - Code / 代码: `        c_dtype=c_dtype,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 118 / 第118行**
+  - Code / 代码: `        tile_shape_mn=tile_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 119 / 第119行**
+  - Code / 代码: `        cluster_shape_mn=cluster_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 120 / 第120行**
+  - Code / 代码: `        mma_promotion_interval=mma_promotion_interval,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 121 / 第121行**
+  - Code / 代码: `        scale_a_val=scale_a_val,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 122 / 第122行**
+  - Code / 代码: `        scale_b_val=scale_b_val,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 123 / 第123行**
+  - Code / 代码: `        tolerance=tolerance,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 124 / 第124行**
+  - Code / 代码: `        warmup_iterations=0,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 125 / 第125行**
+  - Code / 代码: `        iterations=1,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 126 / 第126行**
+  - Code / 代码: `        skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 127 / 第127行**
+  - Code / 代码: `        use_cold_l2=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 128 / 第128行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 129 / 第129行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 130 / 第130行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 131 / 第131行**
+  - Code / 代码: `def _run_benchmark(`
+  - EN: Defines function `_run_benchmark`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_run_benchmark`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 132 / 第132行**
+  - Code / 代码: `    mnkl,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 133 / 第133行**
+  - Code / 代码: `    tile_shape_mn,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 134 / 第134行**
+  - Code / 代码: `    cluster_shape_mn,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 135 / 第135行**
+  - Code / 代码: `    c_dtype=F16,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 136 / 第136行**
+  - Code / 代码: `    mma_promotion_interval=4,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 137 / 第137行**
+  - Code / 代码: `    warmup_iterations=20,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 138 / 第138行**
+  - Code / 代码: `    iterations=100,`
+  - EN: Continues the multi-line function signature for `_run_benchmark`.
+  - CN: 继续 `_run_benchmark` 的多行函数签名。
+- **Line 139 / 第139行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_run_benchmark`.
+  - CN: 完成 `_run_benchmark` 的多行函数签名。
+- **Line 140 / 第140行**
+  - Code / 代码: `    """Benchmark helper: runs kernel with warmup and returns (exec_us, tflops)."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 141 / 第141行**
+  - Code / 代码: `    m, n, k, l = mnkl`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 142 / 第142行**
+  - Code / 代码: `    flops = 2.0 * m * n * k * l`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 143 / 第143行**
+  - Code / 代码: `    exec_us = run(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 144 / 第144行**
+  - Code / 代码: `        mnkl=mnkl,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 145 / 第145行**
+  - Code / 代码: `        c_dtype=c_dtype,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 146 / 第146行**
+  - Code / 代码: `        tile_shape_mn=tile_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 147 / 第147行**
+  - Code / 代码: `        cluster_shape_mn=cluster_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 148 / 第148行**
+  - Code / 代码: `        mma_promotion_interval=mma_promotion_interval,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 149 / 第149行**
+  - Code / 代码: `        scale_a_val=1.0,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 150 / 第150行**
+  - Code / 代码: `        scale_b_val=1.0,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 151 / 第151行**
+  - Code / 代码: `        tolerance=0.1,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 152 / 第152行**
+  - Code / 代码: `        warmup_iterations=warmup_iterations,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 153 / 第153行**
+  - Code / 代码: `        iterations=iterations,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 154 / 第154行**
+  - Code / 代码: `        skip_ref_check=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 155 / 第155行**
+  - Code / 代码: `        use_cold_l2=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 156 / 第156行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 157 / 第157行**
+  - Code / 代码: `    tflops = flops / (exec_us * 1e-6) / 1e12`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 158 / 第158行**
+  - Code / 代码: `    return exec_us, tflops`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 159 / 第159行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 160 / 第160行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 161 / 第161行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 162 / 第162行**
+  - Code / 代码: `# L0 — tile shape coverage`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 163 / 第163行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 164 / 第164行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 165 / 第165行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 166 / 第166行**
+  - Code / 代码: `@pytest.mark.L0`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 167 / 第167行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 168 / 第168行**
+  - Code / 代码: `    "tile_shape_mn, mnkl",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 169 / 第169行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 170 / 第170行**
+  - Code / 代码: `        pytest.param((128, 256), (2048, 2048, 2048, 1), id="tile128x256"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 171 / 第171行**
+  - Code / 代码: `        pytest.param((128, 128), (2048, 2048, 2048, 1), id="tile128x128"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 172 / 第172行**
+  - Code / 代码: `        pytest.param((128, 64),  (2048, 2048, 2048, 1), id="tile128x64"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 173 / 第173行**
+  - Code / 代码: `        pytest.param((64,  64),  (2048, 2048, 2048, 1), id="tile64x64"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 174 / 第174行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 175 / 第175行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 176 / 第176行**
+  - Code / 代码: `def test_l0_tile_shapes(tile_shape_mn, mnkl):`
+  - EN: Defines function `test_l0_tile_shapes`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l0_tile_shapes`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 177 / 第177行**
+  - Code / 代码: `    """All valid tile shapes compile."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 178 / 第178行**
+  - Code / 代码: `    _run_compile(mnkl=mnkl, tile_shape_mn=tile_shape_mn)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 179 / 第179行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 180 / 第180行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 181 / 第181行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 182 / 第182行**
+  - Code / 代码: `# L0 — cluster shape coverage`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 183 / 第183行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 184 / 第184行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 185 / 第185行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 186 / 第186行**
+  - Code / 代码: `@pytest.mark.L0`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 187 / 第187行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 188 / 第188行**
+  - Code / 代码: `    "cluster_shape_mn",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 189 / 第189行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 190 / 第190行**
+  - Code / 代码: `        pytest.param((1, 1), id="cluster1x1"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 191 / 第191行**
+  - Code / 代码: `        pytest.param((2, 1), id="cluster2x1"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 192 / 第192行**
+  - Code / 代码: `        pytest.param((1, 2), id="cluster1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 193 / 第193行**
+  - Code / 代码: `        pytest.param((2, 2), id="cluster2x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 194 / 第194行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 195 / 第195行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 196 / 第196行**
+  - Code / 代码: `def test_l0_cluster_shapes(cluster_shape_mn):`
+  - EN: Defines function `test_l0_cluster_shapes`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l0_cluster_shapes`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 197 / 第197行**
+  - Code / 代码: `    """All valid cluster shapes compile (tile 128x128, 2048^3)."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 198 / 第198行**
+  - Code / 代码: `    _run_compile(mnkl=(2048, 2048, 2048, 1), tile_shape_mn=(128, 128),`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 199 / 第199行**
+  - Code / 代码: `                 cluster_shape_mn=cluster_shape_mn)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 200 / 第200行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 201 / 第201行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 202 / 第202行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 203 / 第203行**
+  - Code / 代码: `# L0 — output dtype coverage`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 204 / 第204行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 205 / 第205行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 206 / 第206行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 207 / 第207行**
+  - Code / 代码: `@pytest.mark.L0`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 208 / 第208行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 209 / 第209行**
+  - Code / 代码: `    "c_dtype",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 210 / 第210行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 211 / 第211行**
+  - Code / 代码: `        pytest.param(F16,  id="Float16"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 212 / 第212行**
+  - Code / 代码: `        pytest.param(F32,  id="Float32"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 213 / 第213行**
+  - Code / 代码: `        pytest.param(F8E4, id="Float8E4M3FN"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 214 / 第214行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 215 / 第215行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 216 / 第216行**
+  - Code / 代码: `def test_l0_output_dtypes(c_dtype):`
+  - EN: Defines function `test_l0_output_dtypes`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l0_output_dtypes`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 217 / 第217行**
+  - Code / 代码: `    """All supported output dtypes compile."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 218 / 第218行**
+  - Code / 代码: `    _run_compile(c_dtype=c_dtype)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 219 / 第219行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 220 / 第220行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 221 / 第221行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 222 / 第222行**
+  - Code / 代码: `# L0 — mma_promotion_interval coverage`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 223 / 第223行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 224 / 第224行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 225 / 第225行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 226 / 第226行**
+  - Code / 代码: `@pytest.mark.L0`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 227 / 第227行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 228 / 第228行**
+  - Code / 代码: `    "mma_promotion_interval",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 229 / 第229行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 230 / 第230行**
+  - Code / 代码: `        pytest.param(4,  id="interval4"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 231 / 第231行**
+  - Code / 代码: `        pytest.param(8,  id="interval8"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 232 / 第232行**
+  - Code / 代码: `        pytest.param(16, id="interval16"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 233 / 第233行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 234 / 第234行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 235 / 第235行**
+  - Code / 代码: `def test_l0_mma_promotion_intervals(mma_promotion_interval):`
+  - EN: Defines function `test_l0_mma_promotion_intervals`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l0_mma_promotion_intervals`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 236 / 第236行**
+  - Code / 代码: `    """All representative mma_promotion_interval values compile."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 237 / 第237行**
+  - Code / 代码: `    _run_compile(mma_promotion_interval=mma_promotion_interval)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 238 / 第238行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 239 / 第239行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 240 / 第240行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 241 / 第241行**
+  - Code / 代码: `# L1 — correctness: tile shapes`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 242 / 第242行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 243 / 第243行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 244 / 第244行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 245 / 第245行**
+  - Code / 代码: `@pytest.mark.L0(0)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 246 / 第246行**
+  - Code / 代码: `@pytest.mark.L1`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 247 / 第247行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 248 / 第248行**
+  - Code / 代码: `    "tile_shape_mn, mnkl",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 249 / 第249行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 250 / 第250行**
+  - Code / 代码: `        pytest.param((128, 256), (2048, 2048, 2048, 1), id="tile128x256"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 251 / 第251行**
+  - Code / 代码: `        pytest.param((128, 128), (2048, 2048, 2048, 1), id="tile128x128"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 252 / 第252行**
+  - Code / 代码: `        pytest.param((128, 64),  (2048, 2048, 2048, 1), id="tile128x64"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 253 / 第253行**
+  - Code / 代码: `        pytest.param((64,  64),  (2048, 2048, 2048, 1), id="tile64x64"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 254 / 第254行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 255 / 第255行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 256 / 第256行**
+  - Code / 代码: `def test_l1_tile_shapes(tile_shape_mn, mnkl):`
+  - EN: Defines function `test_l1_tile_shapes`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l1_tile_shapes`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 257 / 第257行**
+  - Code / 代码: `    """All tile shapes produce numerically correct results."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 258 / 第258行**
+  - Code / 代码: `    _run_correctness(mnkl=mnkl, tile_shape_mn=tile_shape_mn)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 259 / 第259行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 260 / 第260行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 261 / 第261行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 262 / 第262行**
+  - Code / 代码: `# L1 — correctness: cluster shapes (multicast paths)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 263 / 第263行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 264 / 第264行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 265 / 第265行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 266 / 第266行**
+  - Code / 代码: `@pytest.mark.L0(0)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 267 / 第267行**
+  - Code / 代码: `@pytest.mark.L1`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 268 / 第268行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 269 / 第269行**
+  - Code / 代码: `    "cluster_shape_mn",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 270 / 第270行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 271 / 第271行**
+  - Code / 代码: `        pytest.param((1, 1), id="cluster1x1"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 272 / 第272行**
+  - Code / 代码: `        pytest.param((2, 1), id="cluster2x1"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 273 / 第273行**
+  - Code / 代码: `        pytest.param((1, 2), id="cluster1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 274 / 第274行**
+  - Code / 代码: `        pytest.param((2, 2), id="cluster2x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 275 / 第275行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 276 / 第276行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 277 / 第277行**
+  - Code / 代码: `def test_l1_cluster_shapes(cluster_shape_mn):`
+  - EN: Defines function `test_l1_cluster_shapes`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l1_cluster_shapes`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 278 / 第278行**
+  - Code / 代码: `    """All cluster shapes (including A/B multicast paths) produce correct results."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 279 / 第279行**
+  - Code / 代码: `    _run_correctness(mnkl=(2048, 2048, 2048, 1), tile_shape_mn=(128, 128),`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 280 / 第280行**
+  - Code / 代码: `                     cluster_shape_mn=cluster_shape_mn)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 281 / 第281行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 282 / 第282行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 283 / 第283行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 284 / 第284行**
+  - Code / 代码: `# L1 — correctness: output dtypes`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 285 / 第285行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 286 / 第286行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 287 / 第287行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 288 / 第288行**
+  - Code / 代码: `@pytest.mark.L0(0)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 289 / 第289行**
+  - Code / 代码: `@pytest.mark.L1`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 290 / 第290行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 291 / 第291行**
+  - Code / 代码: `    "c_dtype, tolerance",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 292 / 第292行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 293 / 第293行**
+  - Code / 代码: `        pytest.param(F16,  0.1,  id="Float16"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 294 / 第294行**
+  - Code / 代码: `        pytest.param(F32,  0.1,  id="Float32"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 295 / 第295行**
+  - Code / 代码: `        pytest.param(F8E4, 0.5,  id="Float8E4M3FN"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 296 / 第296行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 297 / 第297行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 298 / 第298行**
+  - Code / 代码: `def test_l1_output_dtypes(c_dtype, tolerance):`
+  - EN: Defines function `test_l1_output_dtypes`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l1_output_dtypes`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 299 / 第299行**
+  - Code / 代码: `    """All supported output dtypes produce correct results."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 300 / 第300行**
+  - Code / 代码: `    _run_correctness(c_dtype=c_dtype, tolerance=tolerance)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 301 / 第301行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 302 / 第302行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 303 / 第303行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 304 / 第304行**
+  - Code / 代码: `# L1 — correctness: mma_promotion_interval`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 305 / 第305行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 306 / 第306行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 307 / 第307行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 308 / 第308行**
+  - Code / 代码: `@pytest.mark.L0(0)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 309 / 第309行**
+  - Code / 代码: `@pytest.mark.L1`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 310 / 第310行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 311 / 第311行**
+  - Code / 代码: `    "mma_promotion_interval",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 312 / 第312行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 313 / 第313行**
+  - Code / 代码: `        pytest.param(4,  id="interval4"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 314 / 第314行**
+  - Code / 代码: `        pytest.param(8,  id="interval8"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 315 / 第315行**
+  - Code / 代码: `        pytest.param(16, id="interval16"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 316 / 第316行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 317 / 第317行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 318 / 第318行**
+  - Code / 代码: `def test_l1_mma_promotion_intervals(mma_promotion_interval):`
+  - EN: Defines function `test_l1_mma_promotion_intervals`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l1_mma_promotion_intervals`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 319 / 第319行**
+  - Code / 代码: `    """Different mma_promotion_interval values all produce correct results."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 320 / 第320行**
+  - Code / 代码: `    _run_correctness(mma_promotion_interval=mma_promotion_interval)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 321 / 第321行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 322 / 第322行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 323 / 第323行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 324 / 第324行**
+  - Code / 代码: `# L1 — correctness: non-trivial scale factors`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 325 / 第325行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 326 / 第326行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 327 / 第327行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 328 / 第328行**
+  - Code / 代码: `@pytest.mark.L0(0)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 329 / 第329行**
+  - Code / 代码: `@pytest.mark.L1`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 330 / 第330行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 331 / 第331行**
+  - Code / 代码: `    "scale_a_val, scale_b_val",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 332 / 第332行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 333 / 第333行**
+  - Code / 代码: `        pytest.param(0.5,  2.0,  id="scale_a0.5_b2.0"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 334 / 第334行**
+  - Code / 代码: `        pytest.param(0.25, 4.0,  id="scale_a0.25_b4.0"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 335 / 第335行**
+  - Code / 代码: `        pytest.param(2.0,  0.5,  id="scale_a2.0_b0.5"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 336 / 第336行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 337 / 第337行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 338 / 第338行**
+  - Code / 代码: `def test_l1_scale_factors(scale_a_val, scale_b_val):`
+  - EN: Defines function `test_l1_scale_factors`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l1_scale_factors`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 339 / 第339行**
+  - Code / 代码: `    """Non-trivial scale_a * scale_b factors are applied correctly."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 340 / 第340行**
+  - Code / 代码: `    _run_correctness(scale_a_val=scale_a_val, scale_b_val=scale_b_val)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 341 / 第341行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 342 / 第342行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 343 / 第343行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 344 / 第344行**
+  - Code / 代码: `# L1 — correctness: batched GEMM (L > 1)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 345 / 第345行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 346 / 第346行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 347 / 第347行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 348 / 第348行**
+  - Code / 代码: `@pytest.mark.L0(0)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 349 / 第349行**
+  - Code / 代码: `@pytest.mark.L1`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 350 / 第350行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 351 / 第351行**
+  - Code / 代码: `    "mnkl",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 352 / 第352行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 353 / 第353行**
+  - Code / 代码: `        pytest.param((1024, 1024, 1024, 2), id="L2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 354 / 第354行**
+  - Code / 代码: `        pytest.param((512,  512,  512,  4), id="L4"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 355 / 第355行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 356 / 第356行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 357 / 第357行**
+  - Code / 代码: `def test_l1_batched(mnkl):`
+  - EN: Defines function `test_l1_batched`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_l1_batched`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 358 / 第358行**
+  - Code / 代码: `    """Batched GEMM (L > 1) produces correct results for each batch entry."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 359 / 第359行**
+  - Code / 代码: `    _run_correctness(mnkl=mnkl, tile_shape_mn=(128, 128), cluster_shape_mn=(1, 1))`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 360 / 第360行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 361 / 第361行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 362 / 第362行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 363 / 第363行**
+  - Code / 代码: `# Benchmark — representative problem sizes`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 364 / 第364行**
+  - Code / 代码: `# Skipped by default; run with: pytest -m bench -s`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 365 / 第365行**
+  - Code / 代码: `# ---------------------------------------------------------------------------`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 366 / 第366行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 367 / 第367行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 368 / 第368行**
+  - Code / 代码: `@pytest.mark.bench`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 369 / 第369行**
+  - Code / 代码: `@pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 370 / 第370行**
+  - Code / 代码: `    "mnkl, tile_shape_mn, cluster_shape_mn, mma_promotion_interval, label",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 371 / 第371行**
+  - Code / 代码: `    [`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 372 / 第372行**
+  - Code / 代码: `        # Square 4096^3 — tile / cluster sweep`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 373 / 第373行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (1, 1), 4,  "4096^3  tile=128x128  cluster=1x1",  id="4096-128x128-1x1"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 374 / 第374行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (1, 2), 4,  "4096^3  tile=128x128  cluster=1x2",  id="4096-128x128-1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 375 / 第375行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (2, 2), 4,  "4096^3  tile=128x128  cluster=2x2",  id="4096-128x128-2x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 376 / 第376行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 256), (1, 2), 4,  "4096^3  tile=128x256  cluster=1x2",  id="4096-128x256-1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 377 / 第377行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 256), (2, 2), 4,  "4096^3  tile=128x256  cluster=2x2",  id="4096-128x256-2x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 378 / 第378行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 64),  (1, 2), 4,  "4096^3  tile=128x64   cluster=1x2",  id="4096-128x64-1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 379 / 第379行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (64,  64),  (1, 2), 4,  "4096^3  tile=64x64    cluster=1x2",  id="4096-64x64-1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 380 / 第380行**
+  - Code / 代码: `        # LLM-like: 8192x8192x4096`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 381 / 第381行**
+  - Code / 代码: `        pytest.param((8192, 8192, 4096, 1), (128, 128), (1, 2), 4,  "8192x8192x4096  tile=128x128  cluster=1x2", id="llm-128x128-1x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 382 / 第382行**
+  - Code / 代码: `        pytest.param((8192, 8192, 4096, 1), (128, 256), (2, 2), 4,  "8192x8192x4096  tile=128x256  cluster=2x2", id="llm-128x256-2x2"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 383 / 第383行**
+  - Code / 代码: `        # mma_promotion_interval sweep (shows precision/performance trade-off)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 384 / 第384行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (1, 2), 4,  "4096^3  interval=4",  id="4096-interval4"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 385 / 第385行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (1, 2), 8,  "4096^3  interval=8",  id="4096-interval8"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 386 / 第386行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (1, 2), 16, "4096^3  interval=16", id="4096-interval16"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 387 / 第387行**
+  - Code / 代码: `        # FP8 output`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 388 / 第388行**
+  - Code / 代码: `        pytest.param((4096, 4096, 4096, 1), (128, 128), (1, 2), 4,  "4096^3  out=FP8E4M3", id="4096-fp8-out"),`
+  - EN: Defines one named parameterized test case.
+  - CN: 定义一个带名称的参数化测试用例。
+- **Line 389 / 第389行**
+  - Code / 代码: `    ],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 390 / 第390行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 391 / 第391行**
+  - Code / 代码: `def test_bench(mnkl, tile_shape_mn, cluster_shape_mn, mma_promotion_interval, label, capsys):`
+  - EN: Defines function `test_bench`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_bench`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 392 / 第392行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 393 / 第393行**
+  - Code / 代码: `    Performance benchmark — run with: pytest -m bench -s`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 394 / 第394行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 395 / 第395行**
+  - Code / 代码: `    Reports execution time (µs) and achieved TFLOPS for each configuration.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 396 / 第396行**
+  - Code / 代码: `    No pass/fail threshold is enforced; results are printed to stdout.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 397 / 第397行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 398 / 第398行**
+  - Code / 代码: `    exec_us, tflops = _run_benchmark(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 399 / 第399行**
+  - Code / 代码: `        mnkl=mnkl,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 400 / 第400行**
+  - Code / 代码: `        tile_shape_mn=tile_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 401 / 第401行**
+  - Code / 代码: `        cluster_shape_mn=cluster_shape_mn,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 402 / 第402行**
+  - Code / 代码: `        mma_promotion_interval=mma_promotion_interval,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 403 / 第403行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 404 / 第404行**
+  - Code / 代码: `    with capsys.disabled():`
+  - EN: Enters a context manager that manages setup and cleanup automatically.
+  - CN: 进入上下文管理器，以自动管理设置与清理。
+- **Line 405 / 第405行**
+  - Code / 代码: `        print(f"\n[BENCH] {label:<55} {exec_us:>10.1f} us  {tflops:>8.2f} TFLOPS")`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+
+## Key Concepts / 关键概念
+
+- **EN**: Uses pytest markers, parametrization, or hooks to organize automated test coverage.
+  **CN**: 使用 pytest 的标记、参数化或钩子来组织自动化测试覆盖。
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Relates to CuTeDSL-based examples or testing utilities.
+  **CN**: 与基于 CuTeDSL 的示例或测试工具有关。
+- **EN**: Focuses on GEMM kernels, configurations, or correctness checks.
+  **CN**: 聚焦 GEMM 内核、配置或正确性检查。
+- **EN**: Exercises FP8 data types or FP8-oriented kernel paths.
+  **CN**: 测试 FP8 数据类型或面向 FP8 的内核路径。
+- **EN**: Expands one test body into many concrete runtime configurations.
+  **CN**: 将一个测试体扩展为多个具体运行配置。
+
+## Dependencies / 依赖项
+
+- `pytest`
+  - EN: Provides the Python test runner, markers, and parametrization helpers.
+  - CN: 提供 Python 测试运行器、标记与参数化辅助功能。
+- `cutlass`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `hopper.dense_gemm_fp8_2xacc`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。

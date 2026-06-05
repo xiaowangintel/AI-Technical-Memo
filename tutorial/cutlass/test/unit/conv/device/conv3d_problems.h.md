@@ -1,0 +1,937 @@
+# conv3d_problems.h — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device/conv3d_problems.h`
+**Purpose / 用途**: Implicit GEMM testbed sizes for Conv2d problem. The file instantiates and runs tests for 3D, with concrete type aliases and builders declared in the source. / 该文件为对应卷积内核提供测试覆盖。 这里针对 3 维 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief Implicit GEMM testbed sizes for Conv2d problem`
+  - **EN**: Records the file-level brief description: Implicit GEMM testbed sizes for Conv2d problem.
+  - **CN**: 记录文件级简述：Implicit GEMM testbed sizes for Conv2d problem。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `#pragma once`
+  - **EN**: Makes this header idempotent by preventing multiple inclusion.
+  - **CN**: 通过防止重复包含，让该头文件具备幂等性。
+- **L35** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L36** `#include "../../common/cutlass_unit_test.h"`
+  - **EN**: Shared CUTLASS unit-test harness used by older convolution tests.
+  - **CN**: 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- **L37** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L38** `#include "cutlass/cutlass.h"`
+  - **EN**: Core CUTLASS definitions, architecture tags, and status types.
+  - **CN**: CUTLASS 核心定义、架构标签和状态类型。
+- **L39** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L40** `#include "cutlass/aligned_buffer.h"`
+  - **EN**: Provides `cutlass/aligned_buffer.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/aligned_buffer.h`，使本文件能够使用相关 API 或辅助工具。
+- **L41** `#include "cutlass/numeric_types.h"`
+  - **EN**: Numeric scalar types such as half, bf16, tf32, and fp8 wrappers.
+  - **CN**: 提供 half、bf16、tf32、fp8 等数值标量类型封装。
+- **L42** `#include "cutlass/layout/matrix.h"`
+  - **EN**: Layout descriptors that define how tensors are mapped in memory.
+  - **CN**: 描述张量内存映射方式的布局描述符。
+- **L43** `#include "cutlass/layout/tensor.h"`
+  - **EN**: Layout descriptors that define how tensors are mapped in memory.
+  - **CN**: 描述张量内存映射方式的布局描述符。
+- **L44** `#include "cutlass/layout/pitch_linear.h"`
+  - **EN**: Layout descriptors that define how tensors are mapped in memory.
+  - **CN**: 描述张量内存映射方式的布局描述符。
+- **L45** `#include "cutlass/core_io.h"`
+  - **EN**: Provides `cutlass/core_io.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/core_io.h`，使本文件能够使用相关 API 或辅助工具。
+- **L46** `#include "cutlass/util/host_tensor.h"`
+  - **EN**: Host/device tensor wrapper used to allocate storage and transfer data.
+  - **CN**: 主机/设备张量封装，用于分配存储并传输数据。
+- **L47** `#include "cutlass/util/tensor_view_io.h"`
+  - **EN**: Tensor printing helpers for debugging layouts and values.
+  - **CN**: 用于调试布局和值的张量打印辅助工具。
+- **L48** `#include "cutlass/conv/convolution.h"`
+  - **EN**: Provides `cutlass/conv/convolution.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/conv/convolution.h`，使本文件能够使用相关 API 或辅助工具。
+- **L49** `#include "cutlass/conv/conv2d_problem_size.h"`
+  - **EN**: Provides `cutlass/conv/conv2d_problem_size.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/conv/conv2d_problem_size.h`，使本文件能够使用相关 API 或辅助工具。
+- **L50** `#include "cutlass/conv/conv3d_problem_size.h"`
+  - **EN**: Provides `cutlass/conv/conv3d_problem_size.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/conv/conv3d_problem_size.h`，使本文件能够使用相关 API 或辅助工具。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L52** `namespace test {`
+  - **EN**: Opens namespace `test` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `test`。
+- **L53** `namespace conv {`
+  - **EN**: Opens namespace `conv` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `conv`。
+- **L54** `namespace device {`
+  - **EN**: Opens namespace `device` for the surrounding declarations.
+  - **CN**: 为周围声明打开命名空间 `device`。
+- **L55** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L56** `using Conv3dProblemVector = std::vector<cutlass::conv::Conv3dProblemSize>;`
+  - **EN**: Creates the helper type alias `Conv3dProblemVector` for later declarations.
+  - **CN**: 创建辅助类型别名 `Conv3dProblemVector`，供后续声明使用。
+- **L57** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L58** `////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L59** `/// Structure TestbedConv3dProblemSizes initializes and holds conv default and `
+  - **EN**: Comment explaining: Structure TestbedConv3dProblemSizes initializes and holds conv default and.
+  - **CN**: 说明性注释：Structure TestbedConv3dProblemSizes initializes and holds conv default and。
+- **L60** `/// important network sizes`
+  - **EN**: Comment explaining: important network sizes.
+  - **CN**: 说明性注释：important network sizes。
+- **L61** `////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L62** `struct TestbedConv3dProblemSizes {`
+  - **EN**: Starts the declaration of struct `TestbedConv3dProblemSizes`.
+  - **CN**: 开始声明结构体 `TestbedConv3dProblemSizes`。
+- **L63** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L64** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L65** `  // Data members`
+  - **EN**: Comment explaining: Data members.
+  - **CN**: 说明性注释：Data members。
+- **L66** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L67** `  int minimum_channel_size;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L68** `  Conv3dProblemVector conv3d_default_sizes;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L69** `  Conv3dProblemVector conv3d_vnet_medical_sizes;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L70** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L71** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L72** `  // Methods`
+  - **EN**: Comment explaining: Methods.
+  - **CN**: 说明性注释：Methods。
+- **L73** `  //`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L74** `  /// Default ctor`
+  - **EN**: Comment explaining: Default ctor.
+  - **CN**: 说明性注释：Default ctor。
+- **L75** `  TestbedConv3dProblemSizes(int minimum_channel_size_ = 64): minimum_channel_size (minimum_channel_size_) { `
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L77** `    initialize_conv3d_default_sizes();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L78** `    initialize_conv3d_vnet_medical_sizes(conv3d_vnet_medical_sizes, 1 /*batch-size*/);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L79** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L80** `    filter_all();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L81** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L82** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L83** `  /// Eliminates some illegal cases`
+  - **EN**: Comment explaining: Eliminates some illegal cases.
+  - **CN**: 说明性注释：Eliminates some illegal cases。
+- **L84** `  void filter_all() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L85** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L86** `    Conv3dProblemVector *problems_vectors[] = {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L87** `      &conv3d_default_sizes,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L88** `      &conv3d_vnet_medical_sizes`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L89** `    };`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L90** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L91** `    for (Conv3dProblemVector *problems : problems_vectors) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L92** `      Conv3dProblemVector filtered;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L93** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L94** `      for (cutlass::conv::Conv3dProblemSize const & problem : *problems) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L95** `        if (!(problem.C % minimum_channel_size)) {`
+  - **EN**: Begins a conditional branch.
+  - **CN**: 开始一个条件分支。
+- **L96** `          filtered.push_back(problem);`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L97** `        }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L98** `      }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L99** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L100** `      *problems = filtered;`
+  - **EN**: Comment explaining: problems = filtered;.
+  - **CN**: 说明性注释：problems = filtered;。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `    } `
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L102** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L103** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L104** `  // Add a few standard convolution problem sizes`
+  - **EN**: Comment explaining: Add a few standard convolution problem sizes.
+  - **CN**: 说明性注释：Add a few standard convolution problem sizes。
+- **L105** `  void initialize_conv3d_default_sizes() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L106** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L107** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L108** `      {1, 1, 3, 3, minimum_channel_size}, // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L109** `      {8, 1, 1, 1, minimum_channel_size}, // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L110** `      cutlass::Coord<3>({0, 0, 0}),       // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L111** `      cutlass::Coord<3>({1, 1, 1}),       // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L112** `      cutlass::Coord<3>({1, 1, 1})        // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L113** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L114** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L115** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L116** `      {1, 1, 1, 8, minimum_channel_size}, // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L117** `      {8, 1, 1, 3, minimum_channel_size},   // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L118** `      cutlass::Coord<3>({1, 1, 1}),         // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L119** `      cutlass::Coord<3>({1, 1, 1}),         // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L120** `      cutlass::Coord<3>({1, 1, 1})          // dilation (dilation_d, dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L121** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L122** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L123** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L124** `      {1, 1, 1, 8, minimum_channel_size},   // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L125** `      {8, 1, 1, 3, minimum_channel_size},   // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `      CUTLASS_STL_NAMESPACE::make_tuple(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L127** `        cutlass::Coord<3>({1, 1, 1}),       // near padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L128** `        cutlass::Coord<3>({0, 0, 0})        // far padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L129** `      ),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L130** `      cutlass::Coord<3>({1, 1, 1}),         // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L131** `      cutlass::Coord<3>({1, 1, 1})          // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L132** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L133** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L134** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L135** `      {1, 8, 8, 8, minimum_channel_size}, // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L136** `      {8, 3, 3, 3, minimum_channel_size},   // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L137** `      cutlass::Coord<3>({1, 1, 1}),         // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L138** `      cutlass::Coord<3>({1, 1, 1}),         // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L139** `      cutlass::Coord<3>({1, 1, 1})          // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L140** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L141** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L142** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L143** `      {1, 8, 8, 8, minimum_channel_size},    // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L144** `      {8, 3, 3, 3, minimum_channel_size},    // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L145** `      CUTLASS_STL_NAMESPACE::make_tuple(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L146** `        cutlass::Coord<3>({1, 1, 1}),       // near padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L147** `        cutlass::Coord<3>({0, 0, 0})        // far padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L148** `      ),`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L149** `      cutlass::Coord<3>({1, 1, 1}),          // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L150** `      cutlass::Coord<3>({1, 1, 1})           // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L152** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L153** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L154** `      {1, 16, 16, 16, minimum_channel_size}, // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L155** `      {8, 3, 3, 3, minimum_channel_size},   // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L156** `      cutlass::Coord<3>({1, 1, 1}),         // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L157** `      cutlass::Coord<3>({1, 1, 1}),         // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L158** `      cutlass::Coord<3>({1, 1, 1})          // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L159** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L160** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L161** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L162** `      {1, 1, 15, 19, 160},              // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L163** `      {224, 1, 3, 6, 160},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L164** `      cutlass::Coord<3>({0, 0, 0}),     // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L165** `      cutlass::Coord<3>({1, 1, 1}),     // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L166** `      cutlass::Coord<3>({1, 1, 1})      // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L167** `    )); `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L168** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L169** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L170** `      {1, 2, 1, 1, minimum_channel_size},  // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L171** `      {8, 2, 1, 1, minimum_channel_size},  // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L172** `      cutlass::Coord<3>({0, 0, 0}),        // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L173** `      cutlass::Coord<3>({1, 1, 1}),        // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L174** `      cutlass::Coord<3>({1, 1, 1})         // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L175** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L177** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L178** `      {1,  1, 7, 7, minimum_channel_size}, // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L179** `      {16, 1, 3, 3, minimum_channel_size}, // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L180** `      cutlass::Coord<3>({0, 0, 0}),        // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L181** `      cutlass::Coord<3>({1, 1, 1}),        // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L182** `      cutlass::Coord<3>({1, 1, 1})         // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L183** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L184** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L185** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L186** `    conv3d_default_sizes.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L187** `      {1, 11, 15, 19, 64},              // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L188** `      {32, 4, 3, 6, 64},                // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L189** `      cutlass::Coord<3>({2, 1, 3}),     // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L190** `      cutlass::Coord<3>({1, 1, 1}),     // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L191** `      cutlass::Coord<3>({1, 1, 1})      // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L192** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L193** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L194** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L195** `  // Add vnet layers to unit testing sizes `
+  - **EN**: Comment explaining: Add vnet layers to unit testing sizes.
+  - **CN**: 说明性注释：Add vnet layers to unit testing sizes。
+- **L196** `  void initialize_conv3d_vnet_medical_sizes(Conv3dProblemVector &conv3d_problem_vector, int batch_size = 1) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L197** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L198** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L199** `      {batch_size, 32, 32, 32, 16},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L200** `      {32, 2, 2, 2, 16},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `      cutlass::Coord<3>({0, 0, 0}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L202** `      cutlass::Coord<3>({2, 2, 2}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L203** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L204** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L205** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L206** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L207** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L208** `      {batch_size, 16, 16, 16, 32},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L209** `      {32, 3, 3, 3, 32},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L210** `      cutlass::Coord<3>({1, 1, 1}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L211** `      cutlass::Coord<3>({1, 1, 1}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L212** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L213** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L214** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L215** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L216** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L217** `      {batch_size, 16, 16, 16, 32},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L218** `      {64, 2, 2, 2, 32},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L219** `      cutlass::Coord<3>({0, 0, 0}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L220** `      cutlass::Coord<3>({2, 2, 2}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L221** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L222** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L223** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L224** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L225** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `      {batch_size, 8, 8, 8, 64},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L227** `      {64, 3, 3, 3, 64},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L228** `      cutlass::Coord<3>({1, 1, 1}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L229** `      cutlass::Coord<3>({1, 1, 1}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L230** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L231** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L232** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L233** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L234** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L235** `      {batch_size, 8, 8, 8, 64},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L236** `      {128, 2, 2, 2, 64},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L237** `      cutlass::Coord<3>({0, 0, 0}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L238** `      cutlass::Coord<3>({2, 2, 2}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L239** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L240** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L241** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L242** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L243** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L244** `      {batch_size, 4, 4, 4, 128},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L245** `      {128, 3, 3, 3, 128},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L246** `      cutlass::Coord<3>({1, 1, 1}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L247** `      cutlass::Coord<3>({1, 1, 1}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L248** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L249** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L250** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L252** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L253** `      {batch_size, 8, 8, 8, 128},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L254** `      {128, 3, 3, 3, 128},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L255** `      cutlass::Coord<3>({1, 1, 1}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L256** `      cutlass::Coord<3>({1, 1, 1}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L257** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L258** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L259** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L260** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L261** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L262** `      {batch_size, 16, 16, 16, 64},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L263** `      {64, 3, 3, 3, 64},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L264** `      cutlass::Coord<3>({1, 1, 1}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L265** `      cutlass::Coord<3>({1, 1, 1}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L266** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L267** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L268** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L269** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L270** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L271** `      {batch_size, 32, 32, 32, 16},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L272** `      {64, 2, 2, 2, 16},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L273** `      cutlass::Coord<3>({0, 0, 0}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L274** `      cutlass::Coord<3>({2, 2, 2}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L275** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 276-293 / 第276-293行
+
+- **L276** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L277** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L278** `  `
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L279** `    conv3d_problem_vector.push_back(cutlass::conv::Conv3dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L280** `      {batch_size, 16, 16, 16, 32},     // input size  (NDHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L281** `      {128, 2, 2, 2, 32},              // filter size (KTRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L282** `      cutlass::Coord<3>({0, 0, 0}),    // padding (pad_d, pad_h, pad_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L283** `      cutlass::Coord<3>({2, 2, 2}),    // stride (stride_d, stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L284** `      cutlass::Coord<3>({1, 1, 1})     // dilation (dilation_d, dilation_h, dilation_w) `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L285** `    ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L286** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L287** `  }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L288** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L289** `};`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L290** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L291** `} // namespace device`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L292** `} // namespace conv`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L293** `} // namespace test`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+## Key Concepts / 关键概念
+- The file packages reusable convolution test logic around compile-time kernel descriptions. / 该文件围绕编译期内核描述封装了可复用的卷积测试逻辑。
+## Dependencies / 依赖项
+- `../../common/cutlass_unit_test.h` — Shared CUTLASS unit-test harness used by older convolution tests. / 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- `cutlass/cutlass.h` — Core CUTLASS definitions, architecture tags, and status types. / CUTLASS 核心定义、架构标签和状态类型。
+- `cutlass/aligned_buffer.h` — Provides `cutlass/aligned_buffer.h` so this file can use the related API or helper utilities. / 提供 `cutlass/aligned_buffer.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/numeric_types.h` — Numeric scalar types such as half, bf16, tf32, and fp8 wrappers. / 提供 half、bf16、tf32、fp8 等数值标量类型封装。
+- `cutlass/layout/matrix.h` — Layout descriptors that define how tensors are mapped in memory. / 描述张量内存映射方式的布局描述符。
+- `cutlass/layout/tensor.h` — Layout descriptors that define how tensors are mapped in memory. / 描述张量内存映射方式的布局描述符。
+- `cutlass/layout/pitch_linear.h` — Layout descriptors that define how tensors are mapped in memory. / 描述张量内存映射方式的布局描述符。
+- `cutlass/core_io.h` — Provides `cutlass/core_io.h` so this file can use the related API or helper utilities. / 提供 `cutlass/core_io.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/util/host_tensor.h` — Host/device tensor wrapper used to allocate storage and transfer data. / 主机/设备张量封装，用于分配存储并传输数据。
+- `cutlass/util/tensor_view_io.h` — Tensor printing helpers for debugging layouts and values. / 用于调试布局和值的张量打印辅助工具。
+- `cutlass/conv/convolution.h` — Provides `cutlass/conv/convolution.h` so this file can use the related API or helper utilities. / 提供 `cutlass/conv/convolution.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/conv/conv2d_problem_size.h` — Provides `cutlass/conv/conv2d_problem_size.h` so this file can use the related API or helper utilities. / 提供 `cutlass/conv/conv2d_problem_size.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/conv/conv3d_problem_size.h` — Provides `cutlass/conv/conv3d_problem_size.h` so this file can use the related API or helper utilities. / 提供 `cutlass/conv/conv3d_problem_size.h`，使本文件能够使用相关 API 或辅助工具。

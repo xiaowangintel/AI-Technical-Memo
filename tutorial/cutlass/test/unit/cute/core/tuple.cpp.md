@@ -1,0 +1,2755 @@
+# tuple.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/tuple.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `tuple` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `tuple` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <cassert>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 37**: `#include <cstdint>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 38**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: `#include <tuple>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 40**: `#include <cute/container/tuple.hpp>`
+  - EN: Provides CuTe tuple containers used in compile-time and runtime tuple tests.
+  - CN: 提供在编译期与运行期元组测试中使用的 CuTe 元组容器。
+- **Line 41**: `#include <cute/algorithm/tuple_algorithms.hpp>`
+  - EN: Provides tuple algorithms such as product, max, and inner_product.
+  - CN: 提供 product、max、inner_product 等元组算法。
+- **Line 42**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 43**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: `TEST(CuTe_core, Tuple)`
+  - EN: Declares GoogleTest case `CuTe_core::Tuple` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Tuple`，用于验证一个具体的 CuTe 场景。
+- **Line 45**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 46**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 47**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 48**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 49**: `  CUTLASS_TRACE_HOST("SIMPLE STATIC AND DYNAMIC TUPLES");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 50**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `  using tuple_2d_s_type = tuple<_8, _4>;                            // (8,4)`
+  - EN: Creates alias `tuple_2d_s_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_2d_s_type`，以简化较长的类型或表达式。
+- **Line 53**: `  using tuple_3d_s_type = tuple<_8, _4, _2>;                        // (8,4,2)`
+  - EN: Creates alias `tuple_3d_s_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_3d_s_type`，以简化较长的类型或表达式。
+- **Line 54**: `  using tuple_3h_s_type = tuple<tuple<_1, _2>, _8, _2>;             // ((1,2),8,2)`
+  - EN: Creates alias `tuple_3h_s_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_3h_s_type`，以简化较长的类型或表达式。
+- **Line 55**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 56**: `  using tuple_2d_d_type = tuple<int, int>;                          // (8,4)`
+  - EN: Creates alias `tuple_2d_d_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_2d_d_type`，以简化较长的类型或表达式。
+- **Line 57**: `  using tuple_3d_d_type = tuple<int, int, int>;                     // (8,4,2)`
+  - EN: Creates alias `tuple_3d_d_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_3d_d_type`，以简化较长的类型或表达式。
+- **Line 58**: `  using tuple_3h_d_type = tuple<tuple<int, int>, int, int>;         // ((1,2),8,2)`
+  - EN: Creates alias `tuple_3h_d_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_3h_d_type`，以简化较长的类型或表达式。
+- **Line 59**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 60**: `  using tuple_2d_m_type = tuple<_8, int>;                           // (8,4)`
+  - EN: Creates alias `tuple_2d_m_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_2d_m_type`，以简化较长的类型或表达式。
+- **Line 61**: `  using tuple_3d_m_type = tuple<int, int, _2>;                      // (8,4,2)`
+  - EN: Creates alias `tuple_3d_m_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_3d_m_type`，以简化较长的类型或表达式。
+- **Line 62**: `  using tuple_3h_m_type = tuple<tuple<int, _2>, int, int>;          // ((1,2),8,2)`
+  - EN: Creates alias `tuple_3h_m_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_3h_m_type`，以简化较长的类型或表达式。
+- **Line 63**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 64**: `  tuple_2d_s_type tuple_2d_s;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 65**: `  tuple_3d_s_type tuple_3d_s;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 66**: `  tuple_3h_s_type tuple_3h_s;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 67**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 68**: `  tuple_2d_d_type tuple_2d_d(8,4);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 69**: `  tuple_3d_d_type tuple_3d_d(8,4,2);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 70**: `  tuple_3h_d_type tuple_3h_d(tuple<int,int>(1,2),8,2);`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 71**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 72**: `  tuple_2d_m_type tuple_2d_m(_8{}, 4);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 73**: `  tuple_3d_m_type tuple_3d_m(8,4,_2{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 74**: `  tuple_3h_m_type tuple_3h_m(tuple<int,_2>(1,_2{}),8,2);`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 75**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 76**: `  CUTLASS_TRACE_HOST(tuple_2d_s << (is_static<tuple_2d_s_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 77**: `            << "sizeof = " << sizeof(tuple_2d_s_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 78**: `  ASSERT_TRUE(is_static<tuple_2d_s_type>::value == true);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 79**: `  ASSERT_TRUE(sizeof(tuple_2d_s_type) == 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 80**: `  ASSERT_TRUE(std::is_empty<tuple_2d_s_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 81**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 82**: `  CUTLASS_TRACE_HOST(tuple_3d_s << (is_static<tuple_3d_s_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 83**: `            << "sizeof = " << sizeof(tuple_3d_s_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 84**: `  ASSERT_TRUE(is_static<tuple_3d_s_type>::value == true);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 85**: `  ASSERT_TRUE(sizeof(tuple_3d_s_type) == 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 86**: `  ASSERT_TRUE(std::is_empty<tuple_3d_s_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `  CUTLASS_TRACE_HOST(tuple_3h_s << (is_static<tuple_3h_s_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 89**: `            << "sizeof = " << sizeof(tuple_3h_s_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 90**: `  ASSERT_TRUE(is_static<tuple_3h_s_type>::value == true);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 91**: `  ASSERT_TRUE(sizeof(tuple_3h_s_type) == 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 92**: `  ASSERT_TRUE(std::is_empty<tuple_3h_s_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 93**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 94**: `  CUTLASS_TRACE_HOST(tuple_2d_d << (is_static<tuple_2d_d_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 95**: `            << "sizeof = " << sizeof(tuple_2d_d_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 96**: `  ASSERT_TRUE(is_static<tuple_2d_d_type>::value == false);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 97**: `  ASSERT_TRUE(sizeof(tuple_2d_d_type) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 98**: `  ASSERT_TRUE(!std::is_empty<tuple_2d_d_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 99**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 100**: `  CUTLASS_TRACE_HOST(tuple_3d_d << (is_static<tuple_3d_d_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 101**: `            << "sizeof = " << sizeof(tuple_3d_d_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 102**: `  ASSERT_TRUE(is_static<tuple_3d_d_type>::value == false);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 103**: `  ASSERT_TRUE(sizeof(tuple_3d_d_type) == 12);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 104**: `  ASSERT_TRUE(!std::is_empty<tuple_3d_d_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 105**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 106**: `  CUTLASS_TRACE_HOST(tuple_3h_d << (is_static<tuple_3h_d_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 107**: `            << "sizeof = " << sizeof(tuple_3h_d_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 108**: `  ASSERT_TRUE(is_static<tuple_3h_d_type>::value == false);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 109**: `  ASSERT_TRUE(sizeof(tuple_3h_d_type) == 16);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 110**: `  ASSERT_TRUE(!std::is_empty<tuple_3h_d_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: `  CUTLASS_TRACE_HOST(tuple_2d_m << (is_static<tuple_2d_m_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 113**: `            << "sizeof = " << sizeof(tuple_2d_m_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 114**: `  ASSERT_TRUE(is_static<tuple_2d_m_type>::value == false);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 115**: `  ASSERT_TRUE(sizeof(tuple_2d_m_type) == 4);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 116**: `  ASSERT_TRUE(!std::is_empty<tuple_2d_m_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 117**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 118**: `  CUTLASS_TRACE_HOST(tuple_3d_m << (is_static<tuple_3d_m_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 119**: `            << "sizeof = " << sizeof(tuple_3d_m_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 120**: `  ASSERT_TRUE(is_static<tuple_3d_m_type>::value == false);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 121**: `  ASSERT_TRUE(sizeof(tuple_3d_m_type) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 122**: `  ASSERT_TRUE(!std::is_empty<tuple_3d_m_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 123**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 124**: `  CUTLASS_TRACE_HOST(tuple_3h_m << (is_static<tuple_3h_m_type>::value ? "  Static  " : "  Dynamic  ")`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 125**: `            << "sizeof = " << sizeof(tuple_3h_m_type));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 126**: `  ASSERT_TRUE(is_static<tuple_3h_m_type>::value == false);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 127**: `  ASSERT_TRUE(sizeof(tuple_3h_m_type) == 12);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 128**: `  ASSERT_TRUE(!std::is_empty<tuple_3h_m_type>::value);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 129**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 130**: `  ASSERT_TRUE(sizeof(cute::tuple<_1, _1, cute::tuple<int32_t>>) == 4);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 131**: `  ASSERT_TRUE(sizeof(cute::tuple<_1, _0, cute::tuple<int32_t>>) == 4);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 132**: `  ASSERT_TRUE(sizeof(cute::tuple<_1, cute::tuple<_1, int32_t>>) == 4);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 133**: `  ASSERT_TRUE(sizeof(cute::tuple<_1, cute::tuple<_0, int32_t>>) == 4);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 134**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 135**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 136**: `  CUTLASS_TRACE_HOST("SIMPLE TUPLE OPS");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 137**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 138**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 139**: `  CUTLASS_TRACE_HOST("product(" << tuple_2d_s << ") => " << product(tuple_2d_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 140**: `  CUTE_STATIC_ASSERT_V(product(tuple_2d_s) == _32{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 141**: `  CUTLASS_TRACE_HOST("product(" << tuple_3d_s << ") => " << product(tuple_3d_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 142**: `  CUTE_STATIC_ASSERT_V(product(tuple_3d_s) == _64{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 143**: `  CUTLASS_TRACE_HOST("product(" << tuple_3h_s << ") => " << product(tuple_3h_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 144**: `  CUTE_STATIC_ASSERT_V(product(tuple_3h_s) == _32{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 145**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 146**: `  CUTLASS_TRACE_HOST("product(" << tuple_2d_d << ") => " << product(tuple_2d_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 147**: `  ASSERT_TRUE(product(tuple_2d_d) == 32);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 148**: `  CUTLASS_TRACE_HOST("product(" << tuple_3d_d << ") => " << product(tuple_3d_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 149**: `  ASSERT_TRUE(product(tuple_3d_d) == 64);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 150**: `  CUTLASS_TRACE_HOST("product(" << tuple_3h_d << ") => " << product(tuple_3h_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 151**: `  ASSERT_TRUE(product(tuple_3h_d) == 32);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 152**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 153**: `  CUTLASS_TRACE_HOST("product(" << tuple_2d_m << ") => " << product(tuple_2d_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 154**: `  ASSERT_TRUE(product(tuple_2d_m) == 32);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 155**: `  CUTLASS_TRACE_HOST("product(" << tuple_3d_m << ") => " << product(tuple_3d_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 156**: `  ASSERT_TRUE(product(tuple_3d_m) == 64);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 157**: `  CUTLASS_TRACE_HOST("product(" << tuple_3h_m << ") => " << product(tuple_3h_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 158**: `  ASSERT_TRUE(product(tuple_3h_m) == 32);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 159**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 160**: `  CUTLASS_TRACE_HOST("max(" << tuple_2d_s << ") => " << max(tuple_2d_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 161**: `  CUTE_STATIC_ASSERT_V(max(tuple_2d_s) == _8{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 162**: `  CUTLASS_TRACE_HOST("max(" << tuple_3d_s << ") => " << max(tuple_3d_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 163**: `  CUTE_STATIC_ASSERT_V(max(tuple_3d_s) == _8{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 164**: `  CUTLASS_TRACE_HOST("max(" << tuple_3h_s << ") => " << max(tuple_3h_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 165**: `  CUTE_STATIC_ASSERT_V(max(tuple_3h_s) == _8{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 166**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 167**: `  CUTLASS_TRACE_HOST("max(" << tuple_2d_d << ") => " << max(tuple_2d_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 168**: `  ASSERT_TRUE(max(tuple_2d_d) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 169**: `  CUTLASS_TRACE_HOST("max(" << tuple_3d_d << ") => " << max(tuple_3d_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 170**: `  ASSERT_TRUE(max(tuple_3d_d) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 171**: `  CUTLASS_TRACE_HOST("max(" << tuple_3h_d << ") => " << max(tuple_3h_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 172**: `  ASSERT_TRUE(max(tuple_3h_d) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 173**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 174**: `  CUTLASS_TRACE_HOST("max(" << tuple_2d_m << ") => " << max(tuple_2d_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 175**: `  ASSERT_TRUE(max(tuple_2d_m) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 176**: `  CUTLASS_TRACE_HOST("max(" << tuple_3d_m << ") => " << max(tuple_3d_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 177**: `  ASSERT_TRUE(max(tuple_3d_m) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 178**: `  CUTLASS_TRACE_HOST("max(" << tuple_3h_m << ") => " << max(tuple_3h_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 179**: `  ASSERT_TRUE(max(tuple_3h_m) == 8);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 180**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 181**: `  // 2d s|d|m`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 182**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_2d_s << ", " << tuple_2d_s << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 183**: `            << inner_product(tuple_2d_s, tuple_2d_s));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 184**: `  CUTE_STATIC_ASSERT_V(inner_product(tuple_2d_s, tuple_2d_s) == Int<80>{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 185**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_2d_d << ", " << tuple_2d_d << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 186**: `            << inner_product(tuple_2d_d, tuple_2d_d));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 187**: `  ASSERT_TRUE(inner_product(tuple_2d_d, tuple_2d_d) == 80);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 188**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_2d_m << ", " << tuple_2d_m << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 189**: `            << inner_product(tuple_2d_m, tuple_2d_m));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 190**: `  ASSERT_TRUE(inner_product(tuple_2d_m, tuple_2d_m) == 80);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 191**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 192**: `  // 3d s|d|m`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 193**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_3d_s << ", " << tuple_3d_s << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 194**: `            << inner_product(tuple_3d_s, tuple_3d_s));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 195**: `  CUTE_STATIC_ASSERT_V(inner_product(tuple_3d_s, tuple_3d_s) == Int<84>{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 196**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_3d_d << ", " << tuple_3d_d << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 197**: `            << inner_product(tuple_3d_d, tuple_3d_d));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 198**: `  ASSERT_TRUE(inner_product(tuple_3d_d, tuple_3d_d) == 84);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 199**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_3d_m << ", " << tuple_3d_m << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 200**: `            << inner_product(tuple_3d_m, tuple_3d_m));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 201**: `  ASSERT_TRUE(inner_product(tuple_3d_m, tuple_3d_m) == 84);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 202**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 203**: `  // 3h s|d|m`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 204**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_3h_s << ", " << tuple_3h_s << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 205**: `            << inner_product(tuple_3h_s, tuple_3h_s));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 206**: `  CUTE_STATIC_ASSERT_V(inner_product(tuple_3h_s, tuple_3h_s) == Int<73>{});`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 207**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_3h_d << ", " << tuple_3h_d << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 208**: `            << inner_product(tuple_3h_d, tuple_3h_d));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 209**: `  ASSERT_TRUE(inner_product(tuple_3h_d, tuple_3h_d) == 73);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 210**: `  CUTLASS_TRACE_HOST("inner_product(" << tuple_3h_m << ", " << tuple_3h_m << ") => "`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 211**: `            << inner_product(tuple_3h_m, tuple_3h_m));`
+  - EN: Computes the multiplicative product of tuple or shape components.
+  - CN: 计算元组或形状各分量的乘积。
+- **Line 212**: `  ASSERT_TRUE(inner_product(tuple_3h_m, tuple_3h_m) == 73);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 213**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 214**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_2d_s << ") => " << compact_col_major(tuple_2d_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 215**: `  CUTE_STATIC_ASSERT_V((compact_col_major(tuple_2d_s) == make_tuple(_1{},_8{})));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 216**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_3d_s << ") => " << compact_col_major(tuple_3d_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 217**: `  CUTE_STATIC_ASSERT_V((compact_col_major(tuple_3d_s) == make_tuple(_1{},_8{},_32{})));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 218**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_3h_s << ") => " << compact_col_major(tuple_3h_s));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 219**: `  CUTE_STATIC_ASSERT_V((compact_col_major(tuple_3h_s) == make_tuple(make_tuple(_0{},_1{}),_2{},_16{})));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 220**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 221**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_2d_d << ") => " << compact_col_major(tuple_2d_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 222**: `  ASSERT_TRUE((compact_col_major(tuple_2d_d) == make_tuple(_1{},8)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 223**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_3d_d << ") => " << compact_col_major(tuple_3d_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 224**: `  ASSERT_TRUE((compact_col_major(tuple_3d_d) == make_tuple(_1{},8,32)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 225**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_3h_d << ") => " << compact_col_major(tuple_3h_d));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 226**: `  ASSERT_TRUE((compact_col_major(tuple_3h_d) == make_tuple(make_tuple(_1{},1),2,16)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 227**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 228**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_2d_m << ") => " << compact_col_major(tuple_2d_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 229**: `  ASSERT_TRUE((compact_col_major(tuple_2d_m) == make_tuple(_1{},_8{})));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 230**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_3d_m << ") => " << compact_col_major(tuple_3d_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 231**: `  ASSERT_TRUE((compact_col_major(tuple_3d_m) == make_tuple(_1{},8,32)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 232**: `  CUTLASS_TRACE_HOST("col_major(" << tuple_3h_m << ") => " << compact_col_major(tuple_3h_m));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 233**: `  ASSERT_TRUE((compact_col_major(tuple_3h_m) == make_tuple(make_tuple(_1{},1),2,16)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 234**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 235**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 236**: `  CUTLASS_TRACE_HOST("SLICING TUPLES");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 237**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 238**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 239**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 240**: `    auto a = Coord<_2,_3,_4,Coord<_5,_6>>{};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 241**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 242**: `    CUTLASS_TRACE_HOST("a = " << a);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 243**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 244**: `    CUTLASS_TRACE_HOST("a(1) = " << slice(1, a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 245**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 246**: `    CUTLASS_TRACE_HOST("a(_) = " << slice(_, a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 247**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 248**: `    CUTLASS_TRACE_HOST("a(_,1,_,_) = " << slice(make_coord(_,1,_,_), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 249**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 250**: `    CUTLASS_TRACE_HOST("a(_,1,_,(_,_)) = " << slice(make_coord(_,1,_,make_coord(_,_)), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 251**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 252**: `    CUTLASS_TRACE_HOST("a(_,1,_,(_,2)) = " << slice(make_coord(_,1,_,make_coord(_,2)), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 253**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 254**: `    CUTLASS_TRACE_HOST("a(_,1,_,(1,2)) = " << slice(make_coord(_,1,_,make_coord(1,2)), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 255**: `  }`
+  - EN: Closes the scope for `test CuTe_core::Tuple`.
+  - CN: 结束 `test CuTe_core::Tuple` 的作用域。
+- **Line 256**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 257**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 258**: `  CUTLASS_TRACE_HOST("DICING TUPLES");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 259**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 260**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 261**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 262**: `    auto a = Coord<_2,_3,_4,Coord<_5,_6>>{};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 263**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 264**: `    CUTLASS_TRACE_HOST("a = " << a);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 265**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 266**: `    CUTLASS_TRACE_HOST("a(1) = " << dice(1, a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 267**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 268**: `    CUTLASS_TRACE_HOST("a(_) = " << dice(_, a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 269**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 270**: `    CUTLASS_TRACE_HOST("a(_,1,_,_) = " << dice(make_coord(_,1,_,_), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 271**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 272**: `    CUTLASS_TRACE_HOST("a(_,1,_,(_,_)) = " << dice(make_coord(_,1,_,make_coord(_,_)), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 273**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 274**: `    CUTLASS_TRACE_HOST("a(_,1,_,(_,2)) = " << dice(make_coord(_,1,_,make_coord(_,2)), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 275**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 276**: `    CUTLASS_TRACE_HOST("a(_,1,_,(1,2)) = " << dice(make_coord(_,1,_,make_coord(1,2)), a));`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 277**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 278**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 279**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 280**: `namespace pt_test {`
+  - EN: Opens namespace `pt_test` to organize related helpers or tests.
+  - CN: 打开命名空间 `pt_test`，用于组织相关辅助代码或测试。
+- **Line 281**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 282**: `template <class T>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 283**: `struct Nonempty {`
+  - EN: Declares `struct Nonempty`, which packages related state or helper behavior.
+  - CN: 声明 `struct Nonempty`，用于封装相关状态或辅助行为。
+- **Line 284**: `  T datum;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 285**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 286**: `  Nonempty(T const& t) : datum{t} {}`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 287**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 288**: `  friend bool operator==(Nonempty<T> const& lhs, Nonempty<T> const& rhs) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 289**: `    return lhs.datum == rhs.datum;`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 290**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 291**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 292**: `  friend bool operator!=(Nonempty<T> const& lhs, Nonempty<T> const& rhs) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 293**: `    return !(lhs == rhs);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 294**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 295**: `};`
+  - EN: Closes the scope for `struct Nonempty`.
+  - CN: 结束 `struct Nonempty` 的作用域。
+- **Line 296**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 297**: `template <int V>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 298**: `struct Empty {`
+  - EN: Declares `struct Empty`, which packages related state or helper behavior.
+  - CN: 声明 `struct Empty`，用于封装相关状态或辅助行为。
+- **Line 299**: `  template <int W>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 300**: `  friend bool operator==(Empty<V> const&, Empty<W> const&) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 301**: `    return V == W;`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 302**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 303**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 304**: `  template <int W>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 305**: `  friend bool operator!=(Empty<V> const& lhs, Empty<W> const& rhs) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 306**: `    return !(lhs == rhs);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 307**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 308**: `};`
+  - EN: Closes the scope for `struct Empty`.
+  - CN: 结束 `struct Empty` 的作用域。
+- **Line 309**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 310**: `// std::tuple`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 311**: `static_assert(cute::is_standard_layout_v<std::tuple<>>); // it happens to be`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 312**: `static_assert(cute::is_standard_layout_v<std::tuple<int>>); // it happens to be`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 313**: `static_assert(cute::is_standard_layout_v<std::tuple<double>>); // it happens to be`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 314**: `static_assert(not cute::is_standard_layout_v<std::tuple<int, double>>); // it's not`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 315**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 316**: `// cute::tuple`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 317**: `static_assert(cute::is_standard_layout_v<cute::tuple<>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 318**: `static_assert(cute::is_standard_layout_v<cute::tuple<int>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 319**: `static_assert(cute::is_standard_layout_v<cute::tuple<double>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 320**: `static_assert(cute::is_standard_layout_v<cute::tuple<int, double>>);  // it is`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 321**: `static_assert(cute::is_standard_layout_v<cute::tuple<int, int, int, int>>);  // it is`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 322**: `static_assert(cute::is_standard_layout_v<cute::tuple<int, cute::tuple<int, int>, int>>);  // it is`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 323**: `static_assert(cute::is_standard_layout_v<cute::tuple<int, cute::tuple<Empty<0>, Empty<0>>, int>>);  // it is`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 324**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 325**: `//////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 326**: `// tuple test starts here`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 327**: `//////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 328**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 329**: `template <`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 330**: `  class ExpectedPackedType,`
+  - EN: Declares `class ExpectedPackedType`, which packages related state or helper behavior.
+  - CN: 声明 `class ExpectedPackedType`，用于封装相关状态或辅助行为。
+- **Line 331**: `  size_t ExpectedPackedSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 332**: `  class ... Args>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 333**: `constexpr void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 334**: `test_packed_type_alias([[maybe_unused]] ExpectedPackedType packed, std::tuple<Args...> unpacked)`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 335**: `{`
+  - EN: Opens the scope for `class ExpectedPackedType`.
+  - CN: 为 `class ExpectedPackedType` 打开作用域。
+- **Line 336**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 337**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 338**: `  if constexpr ((cute::is_standard_layout_v<Args> && ...)) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 339**: `    static_assert(cute::is_standard_layout_v<tuple<Args...>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 340**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 341**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 342**: `  if constexpr ((cute::is_empty_v<Args> && ...)) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 343**: `    static_assert(cute::is_empty_v<tuple<Args...>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 344**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 345**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 346**: `  static_assert(cute::tuple_size_v<tuple<Args...>> == sizeof...(Args));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 347**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 348**: `  auto test_element = [unpacked] (auto index) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 349**: `    static_assert(cute::is_same_v<`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 350**: `      std::tuple_element_t<index, tuple<Args...>>,`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 351**: `      std::tuple_element_t<index, std::tuple<Args...>>`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 352**: `    >);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 353**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 354**: `    tuple<Args...> sl = cute::apply(unpacked, [](auto... a){ return cute::make_tuple(a...); });`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 355**: `    EXPECT_EQ(std::get<index>(unpacked), cute::get<index>(sl));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 356**: `  };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 357**: `  cute::for_each(std::make_index_sequence<sizeof...(Args)>(), test_element);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 358**: `}`
+  - EN: Closes the scope for `class ExpectedPackedType`.
+  - CN: 结束 `class ExpectedPackedType` 的作用域。
+- **Line 359**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 360**: `void test_packed_type_aliases() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 361**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 362**: `  test_packed_type_alias<tuple<>, 0>({}, {});`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 363**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 364**: `  test_packed_type_alias<tuple<int>, 1, int>({7}, {7});`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 365**: `  test_packed_type_alias<tuple<double>, 1, double>({1.5}, {1.5});`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 366**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 367**: `  // Make sure that class types are handled the same as scalar types`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 368**: `  test_packed_type_alias<tuple<Nonempty<int>>, 1, Nonempty<int>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 369**: `    {Nonempty{7}}, {Nonempty{7}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 370**: `  test_packed_type_alias<tuple<Nonempty<double>>, 1, Nonempty<double>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 371**: `    {Nonempty{1.5}}, {Nonempty{1.5}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 372**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 373**: `  test_packed_type_alias<tuple<>, 0, Empty<0>>({}, {});`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 374**: `  test_packed_type_alias<tuple<>, 0, Empty<0>, Empty<1>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 375**: `    {}, {Empty<0>{}, Empty<1>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 376**: `  test_packed_type_alias<tuple<>, 0, Empty<0>, Empty<1>, Empty<2>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 377**: `    {}, {Empty<0>{}, Empty<1>{}, Empty<2>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 378**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 379**: `  test_packed_type_alias<tuple<int>, 1, Empty<0>, int>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 380**: `    {7}, {Empty<0>{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 381**: `  test_packed_type_alias<tuple<int>, 1, int, Empty<0>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 382**: `    {7}, {7, Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 383**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 384**: `  test_packed_type_alias<tuple<int>, 1, int, Empty<0>, Empty<1>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 385**: `    {7}, {7, Empty<0>{}, Empty<1>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 386**: `  test_packed_type_alias<tuple<int>, 1, Empty<0>, int, Empty<1>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 387**: `    {7}, {Empty<0>{}, 7, Empty<1>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 388**: `  test_packed_type_alias<tuple<int>, 1, Empty<0>, Empty<1>, int>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 389**: `    {7}, {Empty<0>{}, Empty<1>{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 390**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 391**: `  test_packed_type_alias<tuple<int, double>, 2, int, double, Empty<0>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 392**: `    {7, 1.5}, {7, 1.5, Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 393**: `  test_packed_type_alias<tuple<int, double>, 2, int, Empty<0>, double>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 394**: `    {7, 1.5}, {7, Empty<0>{}, 1.5});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 395**: `  test_packed_type_alias<tuple<int, double>, 2, int, double, Empty<0>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 396**: `    {7, 1.5}, {7, 1.5, Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 397**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 398**: `  test_packed_type_alias<tuple<int, double>, 2, int, double, Empty<0>, Empty<1>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 399**: `    {7, 1.5}, {7, 1.5, Empty<0>{}, Empty<1>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 400**: `  test_packed_type_alias<tuple<int, double>, 2, int, Empty<0>, double, Empty<1>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 401**: `    {7, 1.5}, {7, Empty<0>{}, 1.5, Empty<1>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 402**: `  test_packed_type_alias<tuple<int, double>, 2, int, Empty<0>, Empty<1>, double>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 403**: `    {7, 1.5}, {7, Empty<0>{}, Empty<1>{}, 1.5});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 404**: `  test_packed_type_alias<tuple<int, double>, 2, Empty<0>, int, Empty<1>, double>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 405**: `    {7, 1.5}, {Empty<0>{}, 7, Empty<1>{}, 1.5});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 406**: `  test_packed_type_alias<tuple<int, double>, 2, Empty<0>, Empty<1>, int, double>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 407**: `    {7, 1.5}, {Empty<0>{}, Empty<1>{}, 7, 1.5});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 408**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 409**: `  test_packed_type_alias<tuple<int, double, float>, 3, Empty<0>, int, double, float>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 410**: `    {7, 1.5, 2.5f}, {Empty<0>{}, 7, 1.5, 2.5f});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 411**: `  test_packed_type_alias<tuple<int, double, float>, 3, int, Empty<0>, double, float>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 412**: `    {7, 1.5, 2.5f}, {7, Empty<0>{}, 1.5, 2.5f});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 413**: `  test_packed_type_alias<tuple<int, double, float>, 3, int, double, Empty<0>, float>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 414**: `    {7, 1.5, 2.5f}, {7, 1.5, Empty<0>{}, 2.5f});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 415**: `  test_packed_type_alias<tuple<int, double, float>, 3, int, double, float, Empty<0>>(`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 416**: `    {7, 1.5, 2.5f}, {7, 1.5, 2.5f, Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 417**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 418**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 419**: `template <class Tuple, size_t Which, class ExpectedElementType>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 420**: `constexpr bool test_tuple_element() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 421**: `  return cute::is_same_v<std::tuple_element_t<Which, Tuple>, ExpectedElementType>;`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 422**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 423**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 424**: `void test_tuple_elements() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 425**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 426**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 427**: `  static_assert(test_tuple_element<std::tuple<Empty<0>>, 0, Empty<0>>());`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 428**: `  static_assert(test_tuple_element<tuple<Empty<0>>, 0, Empty<0>>());`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 429**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 430**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 431**: `// A default-constructible type.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 432**: `template <size_t Value>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 433**: `struct DefaultConstructible {};`
+  - EN: Declares `struct DefaultConstructible`, which packages related state or helper behavior.
+  - CN: 声明 `struct DefaultConstructible`，用于封装相关状态或辅助行为。
+- **Line 434**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 435**: `void test_default_constructibility() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 436**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 437**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 438**: `    [[maybe_unused]] tuple<> t_p_0;`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 439**: `    [[maybe_unused]] tuple<DefaultConstructible<0>> t_p_1;`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 440**: `    [[maybe_unused]] tuple<DefaultConstructible<0>, DefaultConstructible<1>> t_p_2;`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 441**: `    [[maybe_unused]] tuple<DefaultConstructible<0>, int, DefaultConstructible<1>> t_p_3;`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 442**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 443**: `}`
+  - EN: Closes the scope for `struct DefaultConstructible`.
+  - CN: 结束 `struct DefaultConstructible` 的作用域。
+- **Line 444**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 445**: `void test_sizes_and_not_storing_empty_types() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 446**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 447**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 448**: `  [[maybe_unused]] tuple<`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 449**: `    int,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 450**: `    pt_test::Empty<0>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 451**: `    double`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 452**: `  > pt{42, pt_test::Empty<0>{}, 1.5};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 453**: `  static_assert(cute::is_standard_layout_v<decltype(pt)>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 454**: `  // packed_result_type must only store the packed tuple,`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 455**: `  // and not the integer_sequence(s) used to access it.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 456**: `  // The latter can be represented entirely at compile time as types.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 457**: `  struct { int i; double j; } IntDouble;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 458**: `  static_assert(sizeof(pt) == sizeof(IntDouble));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 459**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 460**: `  EXPECT_EQ(cute::get<0>(pt), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 461**: `  EXPECT_EQ(cute::get<1>(pt), pt_test::Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 462**: `  EXPECT_EQ(cute::get<2>(pt), 1.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 463**: `  tuple<`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 464**: `    pt_test::Empty<0>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 465**: `    pt_test::Empty<1>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 466**: `    tuple<`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 467**: `      pt_test::Empty<0>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 468**: `      pt_test::Empty<1>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 469**: `      tuple<pt_test::Empty<0>, tuple<>>`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 470**: `    >`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 471**: `  > pt_empty{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 472**: `  static_assert(cute::is_empty_v<decltype(pt_empty)>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 473**: `  static_assert(cute::is_standard_layout_v<decltype(pt_empty)>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 474**: `  static_assert(sizeof(pt_empty) == 1);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 475**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 476**: `  // Template arguments must be default constructible,`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 477**: `  // and tuple itself needs a default constructor.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 478**: `  [[maybe_unused]] tuple<`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 479**: `    tuple<int, pt_test::Empty<2>>,`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 480**: `    double,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 481**: `    pt_test::Empty<3>> pt2;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 482**: `  static_assert(cute::is_standard_layout_v<decltype(pt2)>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 483**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 484**: `  // cute::tuple, like the original cute::tuple, does not`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 485**: `  // promise to have working CTAD (constructor template argument`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 486**: `  // deduction).`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 487**: `  [[maybe_unused]] tuple<`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 488**: `    tuple<int, pt_test::Empty<0>>,`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 489**: `    pt_test::Empty<1>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 490**: `  > pt3{`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 491**: `    tuple<int, pt_test::Empty<0>>{42, pt_test::Empty<0>{}},`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 492**: `    pt_test::Empty<1>{}`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 493**: `  };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 494**: `  static_assert(cute::is_standard_layout_v<decltype(pt3)>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 495**: `  static_assert(cute::is_same_v<`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 496**: `    cute::tuple_element_t<0, decltype(pt3)>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 497**: `    tuple<int, pt_test::Empty<0>>>);`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 498**: `  static_assert(cute::is_same_v<`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 499**: `    cute::tuple_element_t<1, decltype(pt3)>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 500**: `    pt_test::Empty<1>>);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 501**: `  static_assert(cute::tuple_size_v<cute::tuple_element_t<0, decltype(pt3)>> == 2u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 502**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 503**: `  tuple<int, pt_test::Empty<0>> pt3_0 = cute::get<0>(pt3);`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 504**: `  auto pt3_0_1 = cute::get<1>(pt3_0);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 505**: `  static_assert(cute::is_same_v<decltype(pt3_0_1), pt_test::Empty<0>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 506**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 507**: `  EXPECT_EQ(cute::get<0>(cute::get<0>(pt3)), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 508**: `  EXPECT_EQ(cute::get<1>(cute::get<0>(pt3)), pt_test::Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 509**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 510**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 511**: `} // namespace test`
+  - EN: Closes the scope for `namespace pt_test`.
+  - CN: 结束 `namespace pt_test` 的作用域。
+- **Line 512**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 513**: `TEST(CuTe_core, PackedTuple)`
+  - EN: Declares GoogleTest case `CuTe_core::PackedTuple` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::PackedTuple`，用于验证一个具体的 CuTe 场景。
+- **Line 514**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 515**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 516**: `  CUTLASS_TRACE_HOST("tuple");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 517**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 518**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 519**: `  pt_test::test_packed_type_aliases();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 520**: `  pt_test::test_tuple_elements();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 521**: `  pt_test::test_default_constructibility();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 522**: `  pt_test::test_sizes_and_not_storing_empty_types();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 523**: `}`
+  - EN: Closes the scope for `test CuTe_core::PackedTuple`.
+  - CN: 结束 `test CuTe_core::PackedTuple` 的作用域。
+- **Line 524**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 525**: `TEST(CuTe_core, PackedTupleGet) {`
+  - EN: Declares GoogleTest case `CuTe_core::PackedTupleGet` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::PackedTupleGet`，用于验证一个具体的 CuTe 场景。
+- **Line 526**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 527**: `  using pt_test::Empty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 528**: `  using pt_test::Nonempty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 529**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 530**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 531**: `    using tuple_type = tuple<int>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 532**: `    tuple_type pt{42};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 533**: `    static_assert(cute::tuple_size_v<tuple_type> == 1u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 534**: `    static_assert(cute::is_same_v<cute::tuple_element_t<0, tuple_type>, int>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 535**: `    EXPECT_EQ(cute::get<0>(pt), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 536**: `    cute::get<0>(pt) = 43;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 537**: `    EXPECT_EQ(cute::get<0>(pt), 43);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 538**: `  }`
+  - EN: Closes the scope for `test CuTe_core::PackedTupleGet`.
+  - CN: 结束 `test CuTe_core::PackedTupleGet` 的作用域。
+- **Line 539**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 540**: `    using tuple_type = tuple<int>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 541**: `    tuple_type const pt{42};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 542**: `    EXPECT_EQ(cute::get<0>(pt), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 543**: `    static_assert(cute::is_same_v<decltype(cute::get<0>(pt)), int const&>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 544**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 545**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 546**: `    EXPECT_EQ(cute::get<0>(tuple<int>{42}), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 547**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 548**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 549**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 550**: `    using tuple_type = tuple<pt_test::Empty<0>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 551**: `    tuple_type pt;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 552**: `    static_assert(cute::tuple_size_v<tuple_type> == 1u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 553**: `    static_assert(cute::is_same_v<cute::tuple_element_t<0, tuple_type>, pt_test::Empty<0>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 554**: `    EXPECT_EQ(cute::get<0>(pt), pt_test::Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 555**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 556**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 557**: `    using tuple_type = tuple<pt_test::Empty<0>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 558**: `    tuple_type const pt;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 559**: `    EXPECT_EQ(cute::get<0>(pt), pt_test::Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 560**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 561**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 562**: `    using tuple_type = tuple<pt_test::Empty<0>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 563**: `    EXPECT_EQ(cute::get<0>(tuple_type{}), pt_test::Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 564**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 565**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 566**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 567**: `    using tuple_type = tuple<int, double>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 568**: `    tuple_type pt{1, 2.5};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 569**: `    static_assert(cute::tuple_size_v<tuple_type> == 2u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 570**: `    static_assert(cute::is_same_v<cute::tuple_element_t<0, tuple_type>, int>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 571**: `    static_assert(cute::is_same_v<cute::tuple_element_t<1, tuple_type>, double>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 572**: `    EXPECT_EQ(cute::get<0>(pt), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 573**: `    cute::get<0>(pt) = 2;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 574**: `    EXPECT_EQ(cute::get<0>(pt), 2);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 575**: `    EXPECT_EQ(cute::get<1>(pt), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 576**: `    cute::get<1>(pt) = 3.5;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 577**: `    EXPECT_EQ(cute::get<1>(pt), 3.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 578**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 579**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 580**: `    using tuple_type = tuple<int, double>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 581**: `    tuple_type const pt{1, 2.5};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 582**: `    EXPECT_EQ(cute::get<0>(pt), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 583**: `    static_assert(cute::is_same_v<decltype(cute::get<0>(pt)), int const&>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 584**: `    EXPECT_EQ(cute::get<1>(pt), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 585**: `    static_assert(cute::is_same_v<decltype(cute::get<1>(pt)), double const&>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 586**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 587**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 588**: `    using tuple_type = tuple<int, double>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 589**: `    EXPECT_EQ(cute::get<0>(tuple_type{1, 2.5}), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 590**: `    EXPECT_EQ(cute::get<1>(tuple_type{1, 2.5}), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 591**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 592**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 593**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 594**: `    using tuple_type = tuple<Empty<0>, double>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 595**: `    tuple_type pt{Empty<0>{}, 2.5};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 596**: `    static_assert(cute::tuple_size_v<tuple_type> == 2u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 597**: `    static_assert(cute::is_same_v<cute::tuple_element_t<0, tuple_type>, Empty<0>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 598**: `    static_assert(cute::is_same_v<cute::tuple_element_t<1, tuple_type>, double>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 599**: `    EXPECT_EQ(cute::get<0>(pt), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 600**: `    EXPECT_EQ(cute::get<1>(pt), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 601**: `    cute::get<1>(pt) = 3.5;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 602**: `    EXPECT_EQ(cute::get<1>(pt), 3.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 603**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 604**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 605**: `    using tuple_type = tuple<Empty<0>, double>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 606**: `    tuple_type const pt{Empty<0>{}, 2.5};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 607**: `    EXPECT_EQ(cute::get<0>(pt), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 608**: `    static_assert(cute::is_same_v<decltype(cute::get<0>(pt)), Empty<0>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 609**: `    EXPECT_EQ(cute::get<1>(pt), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 610**: `    static_assert(cute::is_same_v<decltype(cute::get<1>(pt)), double const&>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 611**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 612**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 613**: `    using tuple_type = tuple<Empty<0>, double>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 614**: `    EXPECT_EQ(cute::get<0>(tuple_type{Empty<0>{}, 2.5}), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 615**: `    EXPECT_EQ(cute::get<1>(tuple_type{Empty<0>{}, 2.5}), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 616**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 617**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 618**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 619**: `    using tuple_type = tuple<int, double, Nonempty<float>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 620**: `    tuple_type pt{1, 2.5, Nonempty{3.25f}};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 621**: `    static_assert(cute::tuple_size_v<tuple_type> == 3u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 622**: `    static_assert(cute::is_same_v<cute::tuple_element_t<0, tuple_type>, int>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 623**: `    static_assert(cute::is_same_v<cute::tuple_element_t<1, tuple_type>, double>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 624**: `    static_assert(cute::is_same_v<cute::tuple_element_t<2, tuple_type>, Nonempty<float>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 625**: `    EXPECT_EQ(cute::get<0>(pt), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 626**: `    EXPECT_EQ(cute::get<1>(pt), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 627**: `    EXPECT_EQ(cute::get<2>(pt), Nonempty{3.25f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 628**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 629**: `    cute::get<0>(pt) = 42;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 630**: `    EXPECT_EQ(cute::get<0>(pt), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 631**: `    cute::get<1>(pt) = 4.5;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 632**: `    EXPECT_EQ(cute::get<1>(pt), 4.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 633**: `    cute::get<2>(pt) = Nonempty<float>{3.75f};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 634**: `    EXPECT_EQ(cute::get<2>(pt), Nonempty<float>{3.75f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 635**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 636**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 637**: `    using tuple_type = tuple<int, double, Nonempty<float>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 638**: `    tuple_type const pt{1, 2.5, Nonempty{3.25f}};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 639**: `    EXPECT_EQ(cute::get<0>(pt), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 640**: `    EXPECT_EQ(cute::get<1>(pt), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 641**: `    EXPECT_EQ(cute::get<2>(pt), Nonempty{3.25f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 642**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 643**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 644**: `    using tuple_type = tuple<int, double, Nonempty<float>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 645**: `    EXPECT_EQ((cute::get<0>(tuple_type{1, 2.5, Nonempty{3.25f}})), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 646**: `    EXPECT_EQ((cute::get<1>(tuple_type{1, 2.5, Nonempty{3.25f}})), 2.5);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 647**: `    EXPECT_EQ((cute::get<2>(tuple_type{1, 2.5, Nonempty{3.25f}})), Nonempty{3.25f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 648**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 649**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 650**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 651**: `    using tuple_type = tuple<int, Empty<0>, Nonempty<float>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 652**: `    tuple<int, Empty<0>, Nonempty<float>> pt{1, Empty<0>{}, Nonempty{3.25f}};`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 653**: `    static_assert(cute::tuple_size_v<tuple_type> == 3u);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 654**: `    static_assert(cute::is_same_v<cute::tuple_element_t<0, tuple_type>, int>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 655**: `    static_assert(cute::is_same_v<cute::tuple_element_t<1, tuple_type>, Empty<0>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 656**: `    static_assert(cute::is_same_v<cute::tuple_element_t<2, tuple_type>, Nonempty<float>>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 657**: `    EXPECT_EQ(cute::get<0>(pt), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 658**: `    EXPECT_EQ(cute::get<1>(pt), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 659**: `    EXPECT_EQ(cute::get<2>(pt), Nonempty{3.25f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 660**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 661**: `    cute::get<0>(pt) = 42;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 662**: `    EXPECT_EQ(cute::get<0>(pt), 42);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 663**: `    cute::get<2>(pt) = Nonempty<float>{3.75f};`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 664**: `    EXPECT_EQ(cute::get<2>(pt), Nonempty<float>{3.75f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 665**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 666**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 667**: `    using tuple_type = tuple<int, Empty<0>, Nonempty<float>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 668**: `    tuple_type const pt{1, Empty<0>{}, Nonempty{3.25f}};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 669**: `    EXPECT_EQ(cute::get<0>(pt), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 670**: `    EXPECT_EQ(cute::get<1>(pt), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 671**: `    EXPECT_EQ(cute::get<2>(pt), Nonempty{3.25f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 672**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 673**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 674**: `    using tuple_type = tuple<int, Empty<0>, Nonempty<float>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 675**: `    EXPECT_EQ((cute::get<0>(tuple_type{1, Empty<0>{}, Nonempty{3.25f}})), 1);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 676**: `    EXPECT_EQ((cute::get<1>(tuple_type{1, Empty<0>{}, Nonempty{3.25f}})), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 677**: `    EXPECT_EQ((cute::get<2>(tuple_type{1, Empty<0>{}, Nonempty{3.25f}})), Nonempty{3.25f});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 678**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 679**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 680**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 681**: `TEST(CuTe_core, PackedTupleGetValueCategory) {`
+  - EN: Declares GoogleTest case `CuTe_core::PackedTupleGetValueCategory` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::PackedTupleGetValueCategory`，用于验证一个具体的 CuTe 场景。
+- **Line 682**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 683**: `  using pt_test::Empty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 684**: `  using pt_test::Nonempty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 685**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 686**: `  tuple<Nonempty<int>, int, Empty<42>> tup(Nonempty<int>{42}, 7, Empty<42>{});`
+  - EN: Refers to a CuTe tuple type used to encode nested compile-time or runtime structure.
+  - CN: 引用一个 CuTe 元组类型，用于编码嵌套的编译期或运行期结构。
+- **Line 687**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 688**: `  // Lvalue ref`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 689**: `  decltype(auto) t0 = cute::get<0>(tup);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 690**: `  decltype(auto) t1 = cute::get<1>(tup);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 691**: `  decltype(auto) t2 = cute::get<2>(tup);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 692**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 693**: `  EXPECT_TRUE((cute::is_same_v<decltype(t0), Nonempty<int>&>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 694**: `  EXPECT_TRUE((cute::is_same_v<decltype(t1), int&>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 695**: `  EXPECT_TRUE((cute::is_same_v<decltype(t2), Empty<42>>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 696**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 697**: `  // Const lvalue ref`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 698**: `  auto const& ctup = tup;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 699**: `  decltype(auto) ct0 = cute::get<0>(ctup);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 700**: `  decltype(auto) ct1 = cute::get<1>(ctup);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 701**: `  decltype(auto) ct2 = cute::get<2>(ctup);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 702**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 703**: `  EXPECT_TRUE((cute::is_same_v<decltype(ct0), Nonempty<int> const&>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 704**: `  EXPECT_TRUE((cute::is_same_v<decltype(ct1), int const&>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 705**: `  EXPECT_TRUE((cute::is_same_v<decltype(ct2), Empty<42>>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 706**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 707**: `  // Rvalue ref`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 708**: `  decltype(auto) r0 = cute::get<0>(cute::move(tup));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 709**: `  decltype(auto) r1 = cute::get<1>(cute::move(tup));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 710**: `  decltype(auto) r2 = cute::get<2>(cute::move(tup));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 711**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 712**: `  EXPECT_TRUE((cute::is_same_v<decltype(r0), Nonempty<int>&&>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 713**: `  EXPECT_TRUE((cute::is_same_v<decltype(r1), int&&>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 714**: `  EXPECT_TRUE((cute::is_same_v<decltype(r2), Empty<42>>));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 715**: `}`
+  - EN: Closes the scope for `test CuTe_core::PackedTupleGetValueCategory`.
+  - CN: 结束 `test CuTe_core::PackedTupleGetValueCategory` 的作用域。
+- **Line 716**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 717**: `namespace pt_test {`
+  - EN: Opens namespace `pt_test` to organize related helpers or tests.
+  - CN: 打开命名空间 `pt_test`，用于组织相关辅助代码或测试。
+- **Line 718**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 719**: `// An empty class type to which Empty is convertible.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 720**: `template <int Value>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 721**: `struct ConvertibleFromEmpty {`
+  - EN: Declares `struct ConvertibleFromEmpty`, which packages related state or helper behavior.
+  - CN: 声明 `struct ConvertibleFromEmpty`，用于封装相关状态或辅助行为。
+- **Line 722**: `  constexpr ConvertibleFromEmpty() = default;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 723**: `  constexpr ConvertibleFromEmpty(Empty<Value>) {}`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 724**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 725**: `  template <int OtherValue>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 726**: `  friend constexpr bool operator==(ConvertibleFromEmpty<Value> const&, ConvertibleFromEmpty<OtherValue> const&) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 727**: `    return Value == OtherValue;`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 728**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 729**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 730**: `  template <int OtherValue>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 731**: `  friend constexpr bool operator!=(ConvertibleFromEmpty<Value> const& lhs, ConvertibleFromEmpty<OtherValue> const& rhs) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 732**: `    return !(lhs == rhs);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 733**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 734**: `};`
+  - EN: Closes the scope for `struct ConvertibleFromEmpty`.
+  - CN: 结束 `struct ConvertibleFromEmpty` 的作用域。
+- **Line 735**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 736**: `} // end namespace pt_test`
+  - EN: Closes the scope for `namespace pt_test`.
+  - CN: 结束 `namespace pt_test` 的作用域。
+- **Line 737**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 738**: `TEST(CuTe_core, PackedTupleConstexprDefaultConstruction) {`
+  - EN: Declares GoogleTest case `CuTe_core::PackedTupleConstexprDefaultConstruction` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::PackedTupleConstexprDefaultConstruction`，用于验证一个具体的 CuTe 场景。
+- **Line 739**: `  // Make sure that tuple's default constructor is constexpr.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 740**: `  // MSVC makes this a bit more challenging than usual.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 741**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 742**: `  using pt_test::Empty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 743**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 744**: `    [[maybe_unused]] constexpr cute::eso::ESO_t<Empty<0>> eso1{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 745**: `    [[maybe_unused]] constexpr cute::eso::ESO_t<int64_t> eso2{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 746**: `  }`
+  - EN: Closes the scope for `test CuTe_core::PackedTupleConstexprDefaultConstruction`.
+  - CN: 结束 `test CuTe_core::PackedTupleConstexprDefaultConstruction` 的作用域。
+- **Line 747**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 748**: `    [[maybe_unused]] constexpr cute::eso::ESO_t<Empty<0>, Empty<1>> eso0{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 749**: `    [[maybe_unused]] constexpr cute::eso::ESO_t<int64_t, Empty<1>> eso1{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 750**: `    [[maybe_unused]] constexpr cute::eso::ESO_t<Empty<0>, int64_t> eso2{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 751**: `    [[maybe_unused]] constexpr cute::eso::ESO_t<int64_t, int64_t> eso3{};`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 752**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 753**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 754**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 755**: `TEST(CuTe_core, PackedTupleConvertingConstruction) {`
+  - EN: Declares GoogleTest case `CuTe_core::PackedTupleConvertingConstruction` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::PackedTupleConvertingConstruction`，用于验证一个具体的 CuTe 场景。
+- **Line 756**: `  using cute::tuple;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 757**: `  using pt_test::ConvertibleFromEmpty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 758**: `  using pt_test::Empty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 759**: `  using pt_test::Nonempty;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 760**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 761**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 762**: `    using tuple_type = cute::tuple<Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 763**: `    [[maybe_unused]] tuple_type t(7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 764**: `    EXPECT_EQ(cute::get<0>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 765**: `  }`
+  - EN: Closes the scope for `test CuTe_core::PackedTupleConvertingConstruction`.
+  - CN: 结束 `test CuTe_core::PackedTupleConvertingConstruction` 的作用域。
+- **Line 766**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 767**: `    using tuple_type = tuple<Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 768**: `    [[maybe_unused]] tuple_type t(7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 769**: `    EXPECT_EQ(cute::get<0>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 770**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 771**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 772**: `    using tuple_type = cute::tuple<ConvertibleFromEmpty<0>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 773**: `    [[maybe_unused]] tuple_type t(Empty<0>{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 774**: `    EXPECT_EQ(cute::get<0>(t), ConvertibleFromEmpty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 775**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 776**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 777**: `    using tuple_type = tuple<ConvertibleFromEmpty<0>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 778**: `    [[maybe_unused]] tuple_type t(Empty<0>{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 779**: `    EXPECT_EQ(cute::get<0>(t), ConvertibleFromEmpty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 780**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 781**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 782**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 783**: `    using tuple_type = cute::tuple<float, Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 784**: `    [[maybe_unused]] tuple_type t(1.5f, 7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 785**: `    EXPECT_EQ(cute::get<0>(t), 1.5f);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 786**: `    EXPECT_EQ(cute::get<1>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 787**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 788**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 789**: `    using tuple_type = tuple<float, Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 790**: `    [[maybe_unused]] tuple_type t(1.5f, 7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 791**: `    EXPECT_EQ(cute::get<0>(t), 1.5f);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 792**: `    EXPECT_EQ(cute::get<1>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 793**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 794**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 795**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 796**: `    using tuple_type = cute::tuple<Empty<0>, Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 797**: `    [[maybe_unused]] tuple_type t(Empty<0>{}, 7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 798**: `    EXPECT_EQ(cute::get<0>(t), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 799**: `    EXPECT_EQ(cute::get<1>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 800**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 801**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 802**: `    using tuple_type = tuple<Empty<0>, Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 803**: `    [[maybe_unused]] tuple_type t(Empty<0>{}, 7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 804**: `    EXPECT_EQ(cute::get<0>(t), Empty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 805**: `    EXPECT_EQ(cute::get<1>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 806**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 807**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 808**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 809**: `    using tuple_type = cute::tuple<ConvertibleFromEmpty<0>, Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 810**: `    [[maybe_unused]] tuple_type t(Empty<0>{}, 7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 811**: `    EXPECT_EQ(cute::get<0>(t), ConvertibleFromEmpty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 812**: `    EXPECT_EQ(cute::get<1>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 813**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 814**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 815**: `    using tuple_type = tuple<ConvertibleFromEmpty<0>, Nonempty<int>>;`
+  - EN: Creates alias `tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `tuple_type`，以简化较长的类型或表达式。
+- **Line 816**: `    [[maybe_unused]] tuple_type t(Empty<0>{}, 7);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 817**: `    EXPECT_EQ(cute::get<0>(t), ConvertibleFromEmpty<0>{});`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 818**: `    EXPECT_EQ(cute::get<1>(t), Nonempty<int>(7));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 819**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 820**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 821**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 822**: `    using inner_tuple_type = cute::tuple<Empty<0>>;`
+  - EN: Creates alias `inner_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `inner_tuple_type`，以简化较长的类型或表达式。
+- **Line 823**: `    using outer_tuple_type = cute::tuple<inner_tuple_type>;`
+  - EN: Creates alias `outer_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `outer_tuple_type`，以简化较长的类型或表达式。
+- **Line 824**: `    [[maybe_unused]] outer_tuple_type t(inner_tuple_type{Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 825**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 826**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 827**: `    using inner_tuple_type = tuple<Empty<0>>;`
+  - EN: Creates alias `inner_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `inner_tuple_type`，以简化较长的类型或表达式。
+- **Line 828**: `    using outer_tuple_type = tuple<inner_tuple_type>;`
+  - EN: Creates alias `outer_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `outer_tuple_type`，以简化较长的类型或表达式。
+- **Line 829**: `    [[maybe_unused]] outer_tuple_type t(inner_tuple_type{Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 830**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 831**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 832**: `    using inner_tuple_type = cute::tuple<ConvertibleFromEmpty<0>>;`
+  - EN: Creates alias `inner_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `inner_tuple_type`，以简化较长的类型或表达式。
+- **Line 833**: `    using outer_tuple_type = cute::tuple<inner_tuple_type>;`
+  - EN: Creates alias `outer_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `outer_tuple_type`，以简化较长的类型或表达式。
+- **Line 834**: `    [[maybe_unused]] outer_tuple_type t(inner_tuple_type{Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 835**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 836**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 837**: `    using inner_tuple_type = tuple<ConvertibleFromEmpty<0>>;`
+  - EN: Creates alias `inner_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `inner_tuple_type`，以简化较长的类型或表达式。
+- **Line 838**: `    using outer_tuple_type = tuple<inner_tuple_type>;`
+  - EN: Creates alias `outer_tuple_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `outer_tuple_type`，以简化较长的类型或表达式。
+- **Line 839**: `    [[maybe_unused]] outer_tuple_type t(inner_tuple_type{Empty<0>{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 840**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 841**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 842**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 843**: `namespace test {`
+  - EN: Opens namespace `test` to organize related helpers or tests.
+  - CN: 打开命名空间 `test`，用于组织相关辅助代码或测试。
+- **Line 844**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 845**: `template <size_t ExpectedIndex, class X, class Tuple>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 846**: `void test_tuple_find(Tuple const& t) {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 847**: `  auto index = cute::find<X>(t);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 848**: `  static_assert(decltype(index)::value == ExpectedIndex);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 849**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 850**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 851**: `template <template <class...> class Tuple>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 852**: `void test_tuple_find_all() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 853**: `  using test::test_tuple_find;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 854**: `  using cute::_1;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 855**: `  using cute::_2;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 856**: `  using cute::_4;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 857**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 858**: `  test_tuple_find<0, _1>(Tuple<_1>{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 859**: `  test_tuple_find<1, _2>(Tuple<_1>{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 860**: `  test_tuple_find<0, int>(Tuple<int>{7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 861**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 862**: `  test_tuple_find<0, _1>(Tuple<_1, _2>{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 863**: `  test_tuple_find<0, _1>(Tuple<_1, int>{_1{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 864**: `  test_tuple_find<0, float>(Tuple<float, int>{15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 865**: `  test_tuple_find<1, _2>(Tuple<_1, _2>{});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 866**: `  test_tuple_find<1, int>(Tuple<_1, int>{_1{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 867**: `  test_tuple_find<1, int>(Tuple<float, int>{15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 868**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 869**: `  test_tuple_find<0, _1>(Tuple<_1, _2, _4>{_1{}, _2{}, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 870**: `  test_tuple_find<0, _1>(Tuple<_1, _2, int>{_1{}, _2{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 871**: `  test_tuple_find<0, _1>(Tuple<_1, float, _4>{_1{}, 15.5f, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 872**: `  test_tuple_find<0, _1>(Tuple<_1, float, int>{_1{}, 15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 873**: `  test_tuple_find<0, double>(Tuple<double, _2, _4>{105.5, _2{}, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 874**: `  test_tuple_find<0, double>(Tuple<double, float, _4>{105.5, 15.5f, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 875**: `  test_tuple_find<0, double>(Tuple<double, float, int>{105.5, 15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 876**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 877**: `  test_tuple_find<1, _2>(Tuple<_1, _2, _4>{_1{}, _2{}, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 878**: `  test_tuple_find<1, _2>(Tuple<_1, _2, int>{_1{}, _2{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 879**: `  test_tuple_find<1, float>(Tuple<_1, float, _4>{_1{}, 15.5f, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 880**: `  test_tuple_find<1, float>(Tuple<_1, float, int>{_1{}, 15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 881**: `  test_tuple_find<1, _2>(Tuple<double, _2, _4>{105.5, _2{}, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 882**: `  test_tuple_find<1, float>(Tuple<double, float, _4>{105.5, 15.5f, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 883**: `  test_tuple_find<1, float>(Tuple<double, float, int>{105.5, 15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 884**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 885**: `  test_tuple_find<2, _4>(Tuple<_1, _2, _4>{_1{}, _2{}, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 886**: `  test_tuple_find<2, int>(Tuple<_1, _2, int>{_1{}, _2{}, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 887**: `  test_tuple_find<2, _4>(Tuple<_1, float, _4>{_1{}, 15.5f, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 888**: `  test_tuple_find<2, int>(Tuple<_1, float, int>{_1{}, 15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 889**: `  test_tuple_find<2, _4>(Tuple<double, _2, _4>{105.5, _2{}, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 890**: `  test_tuple_find<2, _4>(Tuple<double, float, _4>{105.5, 15.5f, _4{}});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 891**: `  test_tuple_find<2, int>(Tuple<double, float, int>{105.5, 15.5f, 7});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 892**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 893**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 894**: `} // end namespace test`
+  - EN: Closes the scope for `namespace test`.
+  - CN: 结束 `namespace test` 的作用域。
+- **Line 895**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 896**: `TEST(CuTe_core, TupleFind)`
+  - EN: Declares GoogleTest case `CuTe_core::TupleFind` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::TupleFind`，用于验证一个具体的 CuTe 场景。
+- **Line 897**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 898**: `  test::test_tuple_find_all<cute::tuple>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 899**: `}`
+  - EN: Closes the scope for `test CuTe_core::TupleFind`.
+  - CN: 结束 `test CuTe_core::TupleFind` 的作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `ASSERT_`
+  - EN: Uses a stronger assertion that aborts the current test when a prerequisite fails.
+  - CN: 使用更强的断言；当前置条件失败时会立即中止当前测试。
+- `CUTE_STATIC_ASSERT_V`
+  - EN: Checks a CuTe expression at compile time, which is important for layout algebra and type-level reasoning.
+  - CN: 在编译期检查 CuTe 表达式，这对布局代数和类型级推导非常重要。
+- `static_assert`
+  - EN: Checks a property at compile time before the binary can be produced.
+  - CN: 在生成二进制文件之前，于编译期检查某个性质。
+- `tuple<`
+  - EN: Represents nested static or dynamic tuples used to encode shapes and metadata.
+  - CN: 表示嵌套的静态或动态元组，用于编码形状和元数据。
+- `tuple-structure`
+  - EN: The test emphasizes nested tuple structure, static integers, and tuple algorithms.
+  - CN: 该测试强调嵌套元组结构、静态整数以及元组算法。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cassert`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `cstdint`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `tuple`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `cute/container/tuple.hpp`
+  - EN: Provides CuTe tuple containers used in compile-time and runtime tuple tests.
+  - CN: 提供在编译期与运行期元组测试中使用的 CuTe 元组容器。
+- `cute/algorithm/tuple_algorithms.hpp`
+  - EN: Provides tuple algorithms such as product, max, and inner_product.
+  - CN: 提供 product、max、inner_product 等元组算法。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。

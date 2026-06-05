@@ -1,0 +1,2162 @@
+# test_sharding.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/utils/test_sharding.py`
+**Purpose / 用途**: This file implements pytest sharding, marker handling, and test-selection policy for CUTLASS Python tests. / 该文件为 CUTLASS Python 测试实现 pytest 分片、标记处理与测试选择策略。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 30 / 第30行**
+  - Code / 代码: `import os`
+  - EN: Imports `os` so its symbols are available to the test module.
+  - CN: 导入 `os`，使其符号可供该测试模块使用。
+- **Line 31 / 第31行**
+  - Code / 代码: `import math`
+  - EN: Imports `math` so its symbols are available to the test module.
+  - CN: 导入 `math`，使其符号可供该测试模块使用。
+- **Line 32 / 第32行**
+  - Code / 代码: `import random`
+  - EN: Imports `random` so its symbols are available to the test module.
+  - CN: 导入 `random`，使其符号可供该测试模块使用。
+- **Line 33 / 第33行**
+  - Code / 代码: `from collections import defaultdict, UserDict`
+  - EN: Imports selected symbols from `collections` for later use.
+  - CN: 从 `collections` 导入选定符号以供后续使用。
+- **Line 34 / 第34行**
+  - Code / 代码: `from pathlib import Path`
+  - EN: Imports selected symbols from `pathlib` for later use.
+  - CN: 从 `pathlib` 导入选定符号以供后续使用。
+- **Line 35 / 第35行**
+  - Code / 代码: `import inspect`
+  - EN: Imports `inspect` so its symbols are available to the test module.
+  - CN: 导入 `inspect`，使其符号可供该测试模块使用。
+- **Line 36 / 第36行**
+  - Code / 代码: `import re`
+  - EN: Imports `re` so its symbols are available to the test module.
+  - CN: 导入 `re`，使其符号可供该测试模块使用。
+- **Line 37 / 第37行**
+  - Code / 代码: `import sys`
+  - EN: Imports `sys` so its symbols are available to the test module.
+  - CN: 导入 `sys`，使其符号可供该测试模块使用。
+- **Line 38 / 第38行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 39 / 第39行**
+  - Code / 代码: `import pytest`
+  - EN: Imports `pytest` so its symbols are available to the test module.
+  - CN: 导入 `pytest`，使其符号可供该测试模块使用。
+- **Line 40 / 第40行**
+  - Code / 代码: `from _pytest.assertion.util import running_on_ci`
+  - EN: Imports selected symbols from `_pytest.assertion.util` for later use.
+  - CN: 从 `_pytest.assertion.util` 导入选定符号以供后续使用。
+- **Line 41 / 第41行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 42 / 第42行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 43 / 第43行**
+  - Code / 代码: `# The dict class to record the default SMs for all subtests under certain directory.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 44 / 第44行**
+  - Code / 代码: `class DefaultSMs(UserDict):`
+  - EN: Declares class `DefaultSMs` to group related tests or helpers.
+  - CN: 声明类 `DefaultSMs`，用于组织相关测试或辅助逻辑。
+- **Line 45 / 第45行**
+  - Code / 代码: `    def __init__(self, config):`
+  - EN: Defines function `__init__`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `__init__`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 46 / 第46行**
+  - Code / 代码: `        super().__init__()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 47 / 第47行**
+  - Code / 代码: `        self.rootdir = os.path.abspath(config.rootdir)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 48 / 第48行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 49 / 第49行**
+  - Code / 代码: `    def __setitem__(self, conftest_file, sms):`
+  - EN: Defines function `__setitem__`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `__setitem__`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 50 / 第50行**
+  - Code / 代码: `        dir_path = os.path.dirname(os.path.abspath(conftest_file))`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 51 / 第51行**
+  - Code / 代码: `        rel_path = os.path.relpath(dir_path, self.rootdir)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 52 / 第52行**
+  - Code / 代码: `        if isinstance(sms, (list, set)):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 53 / 第53行**
+  - Code / 代码: `            sms = [str(sm) for sm in sms]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 54 / 第54行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 55 / 第55行**
+  - Code / 代码: `            sms = [str(sms)]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 56 / 第56行**
+  - Code / 代码: `        self.data[rel_path] = sms`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 57 / 第57行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 58 / 第58行**
+  - Code / 代码: `    def __getitem__(self, test_file):`
+  - EN: Defines function `__getitem__`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `__getitem__`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 59 / 第59行**
+  - Code / 代码: `        dir_path = os.path.dirname(os.path.abspath(test_file))`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 60 / 第60行**
+  - Code / 代码: `        rel_path = os.path.relpath(dir_path, self.rootdir)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 61 / 第61行**
+  - Code / 代码: `        sms = None`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 62 / 第62行**
+  - Code / 代码: `        if rel_path in self.data:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 63 / 第63行**
+  - Code / 代码: `            sms = self.data[rel_path]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 64 / 第64行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 65 / 第65行**
+  - Code / 代码: `            for parent in Path(rel_path).parents:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 66 / 第66行**
+  - Code / 代码: `                if str(parent) in self.data:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 67 / 第67行**
+  - Code / 代码: `                    sms = self.data[str(parent)]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 68 / 第68行**
+  - Code / 代码: `                    break`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 69 / 第69行**
+  - Code / 代码: `        return sms`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 70 / 第70行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 71 / 第71行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 72 / 第72行**
+  - Code / 代码: `def pytest_addoption(parser):`
+  - EN: Defines function `pytest_addoption`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `pytest_addoption`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 73 / 第73行**
+  - Code / 代码: `    group = parser.getgroup(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 74 / 第74行**
+  - Code / 代码: `        "test_sharding",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 75 / 第75行**
+  - Code / 代码: `        "Test sharding for pytest. ",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 76 / 第76行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 77 / 第77行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 78 / 第78行**
+  - Code / 代码: `    group.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 79 / 第79行**
+  - Code / 代码: `        "--test-level",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 80 / 第80行**
+  - Code / 代码: `        type=str,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 81 / 第81行**
+  - Code / 代码: `        default="L2",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 82 / 第82行**
+  - Code / 代码: `        choices=["L0", "L1", "L2"],`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 83 / 第83行**
+  - Code / 代码: `        help="Test level to run",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 84 / 第84行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 85 / 第85行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 86 / 第86行**
+  - Code / 代码: `    group.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 87 / 第87行**
+  - Code / 代码: `        "--random-seed", type=int, default=0, help="Seed for random subtest selection"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 88 / 第88行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 89 / 第89行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 90 / 第90行**
+  - Code / 代码: `    group.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 91 / 第91行**
+  - Code / 代码: `        "--target-cc",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 92 / 第92行**
+  - Code / 代码: `        type=int,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 93 / 第93行**
+  - Code / 代码: `        default=None,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 94 / 第94行**
+  - Code / 代码: `        help="The target device compute capability to run on",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 95 / 第95行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 96 / 第96行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 97 / 第97行**
+  - Code / 代码: `    group.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 98 / 第98行**
+  - Code / 代码: `        "--runtime-sm",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 99 / 第99行**
+  - Code / 代码: `        type=str,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 100 / 第100行**
+  - Code / 代码: `        default=None,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 101 / 第101行**
+  - Code / 代码: `        help="The runtime SM for current test session.",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 102 / 第102行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 103 / 第103行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 104 / 第104行**
+  - Code / 代码: `    group.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 105 / 第105行**
+  - Code / 代码: `        "--deselect-not-run",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 106 / 第106行**
+  - Code / 代码: `        action="store_true",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 107 / 第107行**
+  - Code / 代码: `        help="Deselect the skipped, invalid, excluded test cases.",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 108 / 第108行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 109 / 第109行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 110 / 第110行**
+  - Code / 代码: `    group.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 111 / 第111行**
+  - Code / 代码: `        "--only-large-case",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 112 / 第112行**
+  - Code / 代码: `        action="store_true",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 113 / 第113行**
+  - Code / 代码: `        help="Only select the test cases marked by @pytest.mark.large_case(...). This option implies --deselect-not-run.",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 114 / 第114行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 115 / 第115行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 116 / 第116行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 117 / 第117行**
+  - Code / 代码: `@pytest.hookimpl(tryfirst=True)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 118 / 第118行**
+  - Code / 代码: `def pytest_configure(config):`
+  - EN: Defines function `pytest_configure`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `pytest_configure`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 119 / 第119行**
+  - Code / 代码: `    seed = config.getoption("--random-seed")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 120 / 第120行**
+  - Code / 代码: `    random.seed(seed)`
+  - EN: Seeds a random-number generator so test behavior stays reproducible.
+  - CN: 为随机数生成器设定种子，以保持测试行为可复现。
+- **Line 121 / 第121行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 122 / 第122行**
+  - Code / 代码: `    config.default_SMs = DefaultSMs(config)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 123 / 第123行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 124 / 第124行**
+  - Code / 代码: `    # Register custom markers`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 125 / 第125行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 126 / 第126行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 127 / 第127行**
+  - Code / 代码: `        "L0(ratio: float=1.0, filter: Callable=lambda: True): mark test to run on test level 0.\n"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 128 / 第128行**
+  - Code / 代码: `        "The 'ratio' value stands for the probability of each test case being selected from all subtests of a certain test function. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 129 / 第129行**
+  - Code / 代码: `        "The valid range of 'ratio' is [0, 1.0]. '0' means explicitly exclude the test case(s). "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 130 / 第130行**
+  - Code / 代码: `        "'1' means explicitly select the test case(s). The default value is 1. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 131 / 第131行**
+  - Code / 代码: `        "If a test case isn't explicitly marked, then it is implicitly tagged with 'pytest.mark.L0(1)'.\n"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 132 / 第132行**
+  - Code / 代码: `        "The 'filter' argument should be a callable that returns a boolean to indicate "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 133 / 第133行**
+  - Code / 代码: `        "if the current test case is included(True)/excluded(False). All the valid parameters of the test function "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 134 / 第134行**
+  - Code / 代码: `        "will be automatically set in its locals, so test writers can use them directly. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 135 / 第135行**
+  - Code / 代码: `        "By using the filter function, more flexible test case selections can be applied.\n"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 136 / 第136行**
+  - Code / 代码: `        "The mark decorator used at lower-level can override the same mark used at higher-level. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 137 / 第137行**
+  - Code / 代码: `        "For example, 'pytest.mark.L0(0)' at parameter-level can override 'pytest.mark.L0(ratio=1)' at function-level.\n"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 138 / 第138行**
+  - Code / 代码: `        "Note that when the mark is used at parameter-level, the ratio value other than 0 or 1 is meaningless.\n"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 139 / 第139行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 140 / 第140行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 141 / 第141行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 142 / 第142行**
+  - Code / 代码: `        "L1(ratio: float=1.0, filter: Callable=lambda: True): same as L0, but for test level 1.",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 143 / 第143行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 144 / 第144行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 145 / 第145行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 146 / 第146行**
+  - Code / 代码: `        "L2(ratio: float=1.0, filter: Callable=lambda: True): same as L0, but for test level 2.",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 147 / 第147行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 148 / 第148行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 149 / 第149行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 150 / 第150行**
+  - Code / 代码: `        "invalid_case(checker: Callable=lambda: True): marker to indicate certain test cases as invalid, and skip them when pytest collects test cases.\n"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 151 / 第151行**
+  - Code / 代码: `        "The 'checker' argument should be a callable that returns True or a string to describe the invalid reason if it's an invalid case. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 152 / 第152行**
+  - Code / 代码: `        "Otherwise, return False, empty string or None. The test case parameters will be automatically set in the checker's locals, test writers can use them directly. ",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 153 / 第153行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 154 / 第154行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 155 / 第155行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 156 / 第156行**
+  - Code / 代码: `        "xfail_case(checker: Callable=lambda: 'expected to fail'): marker to mark a test case as xfail given the parameters of the test function.\n"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 157 / 第157行**
+  - Code / 代码: `        "The test function parameters will be automatically set in the checker's locals, so test writers can use them directly. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 158 / 第158行**
+  - Code / 代码: `        "If it's an xfail case, return a string to describe the xfail reason. Otherwise return None. This is similar to pytest.xfail(reason='xfail reason'). "`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 159 / 第159行**
+  - Code / 代码: `        "If you want to be more specific as to why the test is failing, the checker can return a single exception like TypeError, "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 160 / 第160行**
+  - Code / 代码: `        "or a tuple of exception along with the regex string that matches the string representation of the exception, i.e. (RuntimeError, 'error string'). "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 161 / 第161行**
+  - Code / 代码: `        "This is similar to pytest.raises(expected_exception, match='error string').",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 162 / 第162行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 163 / 第163行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 164 / 第164行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 165 / 第165行**
+  - Code / 代码: `        "large_case(checker: Callable=lambda: True): marker to tag certain test cases that will occupy a large chunk of memory.\n"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 166 / 第166行**
+  - Code / 代码: `        "The 'checker' argument should be a callable that returns True if it's a large case. Otherwise, return False. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 167 / 第167行**
+  - Code / 代码: `        "The test function parameters will be automatically set in the checker's locals, so test writers can use them directly. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 168 / 第168行**
+  - Code / 代码: `        "Note that the large cases are skipped by default. They will only be selected when the command line option '--only-large-case' is specified.",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 169 / 第169行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 170 / 第170行**
+  - Code / 代码: `    config.addinivalue_line(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 171 / 第171行**
+  - Code / 代码: `        "markers",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 172 / 第172行**
+  - Code / 代码: `        "arch(sms: List[str]): mark test to run on specific architectures.",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 173 / 第173行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 174 / 第174行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 175 / 第175行**
+  - Code / 代码: `    config.lvl_mark_values = mark_values(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 176 / 第176行**
+  - Code / 代码: `        ("ratio", 1.0, lambda x: 0 <= x <= 1.0, None),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 177 / 第177行**
+  - Code / 代码: `        ("filter", lambda: True, lambda x: callable(x), None),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 178 / 第178行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 179 / 第179行**
+  - Code / 代码: `    config.shard_mark_values = mark_values(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 180 / 第180行**
+  - Code / 代码: `        ("size", None, lambda x: type(x) is int and x > 0, None),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 181 / 第181行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 182 / 第182行**
+  - Code / 代码: `    config.invalid_case_mark_values = mark_values(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 183 / 第183行**
+  - Code / 代码: `        ("checker", lambda: True, lambda x: callable(x), None),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 184 / 第184行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 185 / 第185行**
+  - Code / 代码: `    config.xfail_case_mark_values = mark_values(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 186 / 第186行**
+  - Code / 代码: `        ("checker", lambda: "expected to fail", lambda x: callable(x), None),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 187 / 第187行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 188 / 第188行**
+  - Code / 代码: `    config.large_case_mark_values = mark_values(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 189 / 第189行**
+  - Code / 代码: `        ("checker", lambda: True, lambda x: callable(x), None),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 190 / 第190行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 191 / 第191行**
+  - Code / 代码: `    config.arch_mark_values = mark_values(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 192 / 第192行**
+  - Code / 代码: `        (`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 193 / 第193行**
+  - Code / 代码: `            "sms",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 194 / 第194行**
+  - Code / 代码: `            None,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 195 / 第195行**
+  - Code / 代码: `            lambda x: isinstance(x, (list, str, int)),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 196 / 第196行**
+  - Code / 代码: `            lambda x: [str(x)] if not isinstance(x, list) else [str(sm) for sm in x],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 197 / 第197行**
+  - Code / 代码: `        ),`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 198 / 第198行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 199 / 第199行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 200 / 第200行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 201 / 第201行**
+  - Code / 代码: `def mark_values(*args_list):`
+  - EN: Defines function `mark_values`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `mark_values`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 202 / 第202行**
+  - Code / 代码: `    def gen_mark_value(mark):`
+  - EN: Defines function `gen_mark_value`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `gen_mark_value`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 203 / 第203行**
+  - Code / 代码: `        assert len(mark.args) <= len(`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 204 / 第204行**
+  - Code / 代码: `            args_list`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 205 / 第205行**
+  - Code / 代码: `        ), f"The marker '{mark.name}' specifies more arguments than expected!"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 206 / 第206行**
+  - Code / 代码: `        for idx, (key, default_value, validator, formatter) in enumerate(args_list):`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 207 / 第207行**
+  - Code / 代码: `            if idx < len(mark.args):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 208 / 第208行**
+  - Code / 代码: `                value = mark.args[idx]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 209 / 第209行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 210 / 第210行**
+  - Code / 代码: `                value = mark.kwargs.get(key, default_value)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 211 / 第211行**
+  - Code / 代码: `            assert validator(`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 212 / 第212行**
+  - Code / 代码: `                value`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 213 / 第213行**
+  - Code / 代码: `            ), f"The value '{value}' for 'pytest.mark.{mark.name}({key}=...)' is invalid!"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 214 / 第214行**
+  - Code / 代码: `            if formatter:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 215 / 第215行**
+  - Code / 代码: `                value = formatter(value)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 216 / 第216行**
+  - Code / 代码: `            yield value`
+  - EN: Yields a value from a generator-style helper.
+  - CN: 从生成器风格的辅助函数中产出一个值。
+- **Line 217 / 第217行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 218 / 第218行**
+  - Code / 代码: `    supported_args = set(arg[0] for arg in args_list)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 219 / 第219行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 220 / 第220行**
+  - Code / 代码: `    def get_mark_values(mark):`
+  - EN: Defines function `get_mark_values`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `get_mark_values`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 221 / 第221行**
+  - Code / 代码: `        assert (`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 222 / 第222行**
+  - Code / 代码: `            set(mark.kwargs.keys()) <= supported_args`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 223 / 第223行**
+  - Code / 代码: `        ), f"The marker '{mark.name}' used unknown arguments: {set(mark.kwargs.keys()) - supported_args}.\n"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 224 / 第224行**
+  - Code / 代码: `        return tuple(gen_mark_value(mark))`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 225 / 第225行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 226 / 第226行**
+  - Code / 代码: `    return get_mark_values`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 227 / 第227行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 228 / 第228行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 229 / 第229行**
+  - Code / 代码: `def params_in_context(func):`
+  - EN: Defines function `params_in_context`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `params_in_context`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 230 / 第230行**
+  - Code / 代码: `    if defined_params := inspect.signature(func).parameters.keys():`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 231 / 第231行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 232 / 第232行**
+  - Code / 代码: `        def wrapper(full_params):`
+  - EN: Defines function `wrapper`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `wrapper`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 233 / 第233行**
+  - Code / 代码: `            return func(*[full_params[k] for k in defined_params])`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 234 / 第234行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 235 / 第235行**
+  - Code / 代码: `    else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 236 / 第236行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 237 / 第237行**
+  - Code / 代码: `        def wrapper(full_params):`
+  - EN: Defines function `wrapper`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `wrapper`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 238 / 第238行**
+  - Code / 代码: `            context = func.__globals__.copy()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 239 / 第239行**
+  - Code / 代码: `            context.update(full_params)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 240 / 第240行**
+  - Code / 代码: `            return eval(func.__code__, context)`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 241 / 第241行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 242 / 第242行**
+  - Code / 代码: `    return wrapper`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 243 / 第243行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 244 / 第244行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 245 / 第245行**
+  - Code / 代码: `def pytest_collection_modifyitems(config, items):`
+  - EN: Defines function `pytest_collection_modifyitems`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `pytest_collection_modifyitems`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 246 / 第246行**
+  - Code / 代码: `    test_level = config.getoption("--test-level")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 247 / 第247行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 248 / 第248行**
+  - Code / 代码: `    if runtime_sm := config.getoption("--runtime-sm"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 249 / 第249行**
+  - Code / 代码: `        assert re.match(r"^\d+[af]?$", runtime_sm), f"Invalid runtime SM: {runtime_sm}"`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 250 / 第250行**
+  - Code / 代码: `        compatible_SMs = [runtime_sm]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 251 / 第251行**
+  - Code / 代码: `    elif target_cc := config.getoption("--target-cc"):`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 252 / 第252行**
+  - Code / 代码: `        if target_cc < 90:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 253 / 第253行**
+  - Code / 代码: `            compatible_SMs = {f"{target_cc}"}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 254 / 第254行**
+  - Code / 代码: `        elif target_cc == 90:`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 255 / 第255行**
+  - Code / 代码: `            compatible_SMs = {f"{target_cc}a", f"{target_cc}"}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 256 / 第256行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 257 / 第257行**
+  - Code / 代码: `            compatible_SMs = {f"{target_cc}a", f"{target_cc}f", f"{target_cc}"}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 258 / 第258行**
+  - Code / 代码: `    else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 259 / 第259行**
+  - Code / 代码: `        script_dir = os.path.dirname(os.path.abspath(__file__))`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 260 / 第260行**
+  - Code / 代码: `        if script_dir not in sys.path:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 261 / 第261行**
+  - Code / 代码: `            sys.path.append(script_dir)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 262 / 第262行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 263 / 第263行**
+  - Code / 代码: `        from device_info import compute_capability`
+  - EN: Imports selected symbols from `device_info` for later use.
+  - CN: 从 `device_info` 导入选定符号以供后续使用。
+- **Line 264 / 第264行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 265 / 第265行**
+  - Code / 代码: `        if compute_capability:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 266 / 第266行**
+  - Code / 代码: `            target_cc = int(compute_capability)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 267 / 第267行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 268 / 第268行**
+  - Code / 代码: `            raise SystemError("Failed to get CUDA compute capability!")`
+  - EN: Raises an exception to report an invalid or unexpected state.
+  - CN: 抛出异常以报告无效或意外状态。
+- **Line 269 / 第269行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 270 / 第270行**
+  - Code / 代码: `        if target_cc < 90:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 271 / 第271行**
+  - Code / 代码: `            compatible_SMs = {f"{target_cc}"}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 272 / 第272行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 273 / 第273行**
+  - Code / 代码: `            compatible_SMs = {f"{target_cc}a"}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 274 / 第274行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 275 / 第275行**
+  - Code / 代码: `    item_runnable_SMs = defaultdict(list)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 276 / 第276行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 277 / 第277行**
+  - Code / 代码: `    item_groups = defaultdict(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 278 / 第278行**
+  - Code / 代码: `        lambda: {`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 279 / 第279行**
+  - Code / 代码: `            "ratio": None,  # random selection ratio of test function`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 280 / 第280行**
+  - Code / 代码: `            "candidates": [],  # candidates of test function`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 281 / 第281行**
+  - Code / 代码: `            "invalid": [],  # marked by invalid_case`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 282 / 第282行**
+  - Code / 代码: `            "excluded": [],  # marked by skip or L0(ratio=0)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 283 / 第283行**
+  - Code / 代码: `            "arch_excluded": [],  # arch not matched`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 284 / 第284行**
+  - Code / 代码: `            "force_selected": [],  # marked by L0(ratio=1.0)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 285 / 第285行**
+  - Code / 代码: `            "rand_selected": [],  # randomly selected`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 286 / 第286行**
+  - Code / 代码: `            "rand_skipped": [],  # randomly skipped`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 287 / 第287行**
+  - Code / 代码: `        }`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 288 / 第288行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 289 / 第289行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 290 / 第290行**
+  - Code / 代码: `    def get_closest_level_mark(item_):`
+  - EN: Defines function `get_closest_level_mark`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `get_closest_level_mark`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 291 / 第291行**
+  - Code / 代码: `        if test_level and (lvl_ := item_.get_closest_marker(test_level)):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 292 / 第292行**
+  - Code / 代码: `            ratio_, filter_ = config.lvl_mark_values(lvl_)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 293 / 第293行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 294 / 第294行**
+  - Code / 代码: `            ratio_ = 1.0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 295 / 第295行**
+  - Code / 代码: `            filter_ = lambda: True`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 296 / 第296行**
+  - Code / 代码: `        return ratio_, filter_`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 297 / 第297行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 298 / 第298行**
+  - Code / 代码: `    def get_closest_arch_mark(item_):`
+  - EN: Defines function `get_closest_arch_mark`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `get_closest_arch_mark`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 299 / 第299行**
+  - Code / 代码: `        if hasattr(item_, "callspec"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 300 / 第300行**
+  - Code / 代码: `            for mark in item_.callspec.marks:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 301 / 第301行**
+  - Code / 代码: `                if mark.name == "arch":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 302 / 第302行**
+  - Code / 代码: `                    sms, *_ = config.arch_mark_values(mark)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 303 / 第303行**
+  - Code / 代码: `                    return sms`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 304 / 第304行**
+  - Code / 代码: `        if mark := item_.get_closest_marker("arch"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 305 / 第305行**
+  - Code / 代码: `            sms, *_ = config.arch_mark_values(mark)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 306 / 第306行**
+  - Code / 代码: `            return sms`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 307 / 第307行**
+  - Code / 代码: `        if running_on_ci():`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 308 / 第308行**
+  - Code / 代码: `            return config.default_SMs[item_.fspath]`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 309 / 第309行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 310 / 第310行**
+  - Code / 代码: `            return None`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 311 / 第311行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 312 / 第312行**
+  - Code / 代码: `    for item in items:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 313 / 第313行**
+  - Code / 代码: `        func_name = item.nodeid[: len(item.originalname) - len(item.name)]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 314 / 第314行**
+  - Code / 代码: `        params = item.callspec.params if hasattr(item, "callspec") else {}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 315 / 第315行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 316 / 第316行**
+  - Code / 代码: `        if item.get_closest_marker("skip"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 317 / 第317行**
+  - Code / 代码: `            continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 318 / 第318行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 319 / 第319行**
+  - Code / 代码: `        # check if the test case is valid`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 320 / 第320行**
+  - Code / 代码: `        if invalid_case := item.get_closest_marker("invalid_case"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 321 / 第321行**
+  - Code / 代码: `            checker, *_ = config.invalid_case_mark_values(invalid_case)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 322 / 第322行**
+  - Code / 代码: `            checker_ = params_in_context(checker)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 323 / 第323行**
+  - Code / 代码: `            if msg := checker_(params):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 324 / 第324行**
+  - Code / 代码: `                invalid_reason = (`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 325 / 第325行**
+  - Code / 代码: `                    msg if isinstance(msg, str) else "invalid params combination"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 326 / 第326行**
+  - Code / 代码: `                )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 327 / 第327行**
+  - Code / 代码: `                item_groups[func_name]["invalid"].append((item, invalid_reason))`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 328 / 第328行**
+  - Code / 代码: `                continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 329 / 第329行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 330 / 第330行**
+  - Code / 代码: `        # check if the test case is compatible with the target arch`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 331 / 第331行**
+  - Code / 代码: `        sms = get_closest_arch_mark(item)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 332 / 第332行**
+  - Code / 代码: `        if sms is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 333 / 第333行**
+  - Code / 代码: `            # assume compatible if no arch mark found`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 334 / 第334行**
+  - Code / 代码: `            item_runnable_SMs[item.nodeid].extend(compatible_SMs)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 335 / 第335行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 336 / 第336行**
+  - Code / 代码: `            for sm in sms:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 337 / 第337行**
+  - Code / 代码: `                if sm in compatible_SMs:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 338 / 第338行**
+  - Code / 代码: `                    item_runnable_SMs[item.nodeid].append(sm)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 339 / 第339行**
+  - Code / 代码: `        if not item_runnable_SMs[item.nodeid]:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 340 / 第340行**
+  - Code / 代码: `            item_groups[func_name]["arch_excluded"].append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 341 / 第341行**
+  - Code / 代码: `            continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 342 / 第342行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 343 / 第343行**
+  - Code / 代码: `        if hasattr(item, "callspec"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 344 / 第344行**
+  - Code / 代码: `            param_args_cnt = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 345 / 第345行**
+  - Code / 代码: `            for mark in item.own_markers:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 346 / 第346行**
+  - Code / 代码: `                if mark.name == "parametrize":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 347 / 第347行**
+  - Code / 代码: `                    param_args_cnt += 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 348 / 第348行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 349 / 第349行**
+  - Code / 代码: `            # clean up the level marks from parameter-level`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 350 / 第350行**
+  - Code / 代码: `            if param_args_cnt > 0:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 351 / 第351行**
+  - Code / 代码: `                refined_marks = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 352 / 第352行**
+  - Code / 代码: `                for mark in reversed(item.callspec.marks):`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 353 / 第353行**
+  - Code / 代码: `                    if mark.name != test_level:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 354 / 第354行**
+  - Code / 代码: `                        refined_marks.append(mark)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 355 / 第355行**
+  - Code / 代码: `                    assert mark is item.own_markers[-1]`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 356 / 第356行**
+  - Code / 代码: `                    item.own_markers.pop()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 357 / 第357行**
+  - Code / 代码: `                item.own_markers.extend(reversed(refined_marks))`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 358 / 第358行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 359 / 第359行**
+  - Code / 代码: `            # get the function-level ratio and filter`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 360 / 第360行**
+  - Code / 代码: `            ratio, flt = get_closest_level_mark(item)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 361 / 第361行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 362 / 第362行**
+  - Code / 代码: `            # check the function-level filter`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 363 / 第363行**
+  - Code / 代码: `            flt_ = params_in_context(flt)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 364 / 第364行**
+  - Code / 代码: `            if not flt_(params):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 365 / 第365行**
+  - Code / 代码: `                ratio = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 366 / 第366行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 367 / 第367行**
+  - Code / 代码: `            # gather the parameter-level selection count and check the malformed usage`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 368 / 第368行**
+  - Code / 代码: `            param_selection_cnt = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 369 / 第369行**
+  - Code / 代码: `            for mark in item.callspec.marks:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 370 / 第370行**
+  - Code / 代码: `                if test_level and mark.name == test_level:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 371 / 第371行**
+  - Code / 代码: `                    param_ratio, *_ = config.lvl_mark_values(mark)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 372 / 第372行**
+  - Code / 代码: `                    assert param_ratio in [0, 1], (`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 373 / 第373行**
+  - Code / 代码: `                        f"The 'ratio' parameter can only be 1/True or 0/False (but now it's {param_ratio}) to denote mandatorily selecting or excluding current test case "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 374 / 第374行**
+  - Code / 代码: `                        f"for testing when the marker '{test_level}' is used at the parameter-level.\n"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 375 / 第375行**
+  - Code / 代码: `                        f'Irregular subtest: "{item.nodeid}"'`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 376 / 第376行**
+  - Code / 代码: `                    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 377 / 第377行**
+  - Code / 代码: `                    if param_ratio == 0:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 378 / 第378行**
+  - Code / 代码: `                        # force deselect the test case`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 379 / 第379行**
+  - Code / 代码: `                        ratio = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 380 / 第380行**
+  - Code / 代码: `                    else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 381 / 第381行**
+  - Code / 代码: `                        param_selection_cnt += 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 382 / 第382行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 383 / 第383行**
+  - Code / 代码: `            assert param_args_cnt >= param_selection_cnt`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 384 / 第384行**
+  - Code / 代码: `            # force select the test case at parameter-level`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 385 / 第385行**
+  - Code / 代码: `            if param_args_cnt != 0 and param_args_cnt == param_selection_cnt:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 386 / 第386行**
+  - Code / 代码: `                ratio = 1.0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 387 / 第387行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 388 / 第388行**
+  - Code / 代码: `            ratio, _ = get_closest_level_mark(item)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 389 / 第389行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 390 / 第390行**
+  - Code / 代码: `        # check if the test case is large`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 391 / 第391行**
+  - Code / 代码: `        if large_case := item.get_closest_marker("large_case"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 392 / 第392行**
+  - Code / 代码: `            checker, *_ = config.large_case_mark_values(large_case)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 393 / 第393行**
+  - Code / 代码: `            checker_ = params_in_context(checker)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 394 / 第394行**
+  - Code / 代码: `            if bool(checker_(params)) ^ bool(config.getoption("--only-large-case")):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 395 / 第395行**
+  - Code / 代码: `                item_groups[func_name]["excluded"].append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 396 / 第396行**
+  - Code / 代码: `                continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 397 / 第397行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 398 / 第398行**
+  - Code / 代码: `            if config.getoption("--only-large-case"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 399 / 第399行**
+  - Code / 代码: `                item_groups[func_name]["excluded"].append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 400 / 第400行**
+  - Code / 代码: `                continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 401 / 第401行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 402 / 第402行**
+  - Code / 代码: `        if ratio > 0:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 403 / 第403行**
+  - Code / 代码: `            if ratio == 1.0:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 404 / 第404行**
+  - Code / 代码: `                item_groups[func_name]["force_selected"].append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 405 / 第405行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 406 / 第406行**
+  - Code / 代码: `                item_groups[func_name]["candidates"].append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 407 / 第407行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 408 / 第408行**
+  - Code / 代码: `                if item_groups[func_name]["ratio"] is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 409 / 第409行**
+  - Code / 代码: `                    item_groups[func_name]["ratio"] = ratio`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 410 / 第410行**
+  - Code / 代码: `                assert item_groups[func_name]["ratio"] == ratio, (`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 411 / 第411行**
+  - Code / 代码: `                    f"The ratio of subtests for {func_name} is not consistent.\n"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 412 / 第412行**
+  - Code / 代码: `                    f'First occurrence: {item_groups[func_name]["candidates"][0].nodeid} -> {item_groups[func_name]["ratio"]}\n'`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 413 / 第413行**
+  - Code / 代码: `                    f"Current: {item.nodeid} -> {ratio}"`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 414 / 第414行**
+  - Code / 代码: `                )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 415 / 第415行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 416 / 第416行**
+  - Code / 代码: `            item_groups[func_name]["excluded"].append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 417 / 第417行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 418 / 第418行**
+  - Code / 代码: `    # Randomly select subtests`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 419 / 第419行**
+  - Code / 代码: `    for func_name, test_info in item_groups.items():`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 420 / 第420行**
+  - Code / 代码: `        if test_info["candidates"]:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 421 / 第421行**
+  - Code / 代码: `            if test_info["ratio"] <= 0 or test_info["ratio"] > 1.0:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 422 / 第422行**
+  - Code / 代码: `                raise ValueError("Split ratio must be between (0, 1.0]")`
+  - EN: Raises an exception to report an invalid or unexpected state.
+  - CN: 抛出异常以报告无效或意外状态。
+- **Line 423 / 第423行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 424 / 第424行**
+  - Code / 代码: `            random.shuffle(test_info["candidates"])`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 425 / 第425行**
+  - Code / 代码: `            split_point = math.ceil(test_info["ratio"] * len(test_info["candidates"]))`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 426 / 第426行**
+  - Code / 代码: `            test_info["rand_selected"] += test_info["candidates"][:split_point]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 427 / 第427行**
+  - Code / 代码: `            test_info["rand_skipped"] += test_info["candidates"][split_point:]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 428 / 第428行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 429 / 第429行**
+  - Code / 代码: `    # Assign markers to each subtest`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 430 / 第430行**
+  - Code / 代码: `    for test_info in item_groups.values():`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 431 / 第431行**
+  - Code / 代码: `        for item, invalid_reason in test_info["invalid"]:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 432 / 第432行**
+  - Code / 代码: `            item.add_marker(pytest.mark.skip(reason=invalid_reason), append=False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 433 / 第433行**
+  - Code / 代码: `        for item in test_info["excluded"]:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 434 / 第434行**
+  - Code / 代码: `            item.add_marker(pytest.mark.skip(reason=f"non-{test_level}"), append=False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 435 / 第435行**
+  - Code / 代码: `        for item in test_info["arch_excluded"]:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 436 / 第436行**
+  - Code / 代码: `            item.add_marker(pytest.mark.skip(reason=f"arch not matched"), append=False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 437 / 第437行**
+  - Code / 代码: `        for item in test_info["rand_skipped"]:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 438 / 第438行**
+  - Code / 代码: `            item.add_marker(pytest.mark.skip(reason=f"randomly"), append=False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 439 / 第439行**
+  - Code / 代码: `        for item in test_info["force_selected"] + test_info["rand_selected"]:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 440 / 第440行**
+  - Code / 代码: `            item.add_marker(f"{test_level}", append=False)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 441 / 第441行**
+  - Code / 代码: `            item.add_marker(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 442 / 第442行**
+  - Code / 代码: `                pytest.mark.arch(sms=item_runnable_SMs[item.nodeid]), append=False`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 443 / 第443行**
+  - Code / 代码: `            )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 444 / 第444行**
+  - Code / 代码: `            if any(`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 445 / 第445行**
+  - Code / 代码: `                "report_resource_usage" == name`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 446 / 第446行**
+  - Code / 代码: `                for name, _ in config.pluginmanager.list_name_plugin()`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 447 / 第447行**
+  - Code / 代码: `            ):`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 448 / 第448行**
+  - Code / 代码: `                # item.add_marker(pytest.mark.report_uss(interval=0.1), append=False)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 449 / 第449行**
+  - Code / 代码: `                # item.add_marker(pytest.mark.report_duration, append=False)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 450 / 第450行**
+  - Code / 代码: `                ...`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 451 / 第451行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 452 / 第452行**
+  - Code / 代码: `    if config.getoption("--deselect-not-run") or config.getoption("--only-large-case"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 453 / 第453行**
+  - Code / 代码: `        selected = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 454 / 第454行**
+  - Code / 代码: `        deselected = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 455 / 第455行**
+  - Code / 代码: `        for item in items:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 456 / 第456行**
+  - Code / 代码: `            if item.get_closest_marker("skip"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 457 / 第457行**
+  - Code / 代码: `                deselected.append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 458 / 第458行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 459 / 第459行**
+  - Code / 代码: `                selected.append(item)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 460 / 第460行**
+  - Code / 代码: `        items[:] = selected`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 461 / 第461行**
+  - Code / 代码: `        config.hook.pytest_deselected(items=deselected)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 462 / 第462行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 463 / 第463行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 464 / 第464行**
+  - Code / 代码: `@pytest.hookimpl(hookwrapper=True)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 465 / 第465行**
+  - Code / 代码: `def pytest_runtest_makereport(item, call):`
+  - EN: Defines function `pytest_runtest_makereport`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `pytest_runtest_makereport`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 466 / 第466行**
+  - Code / 代码: `    outcome = yield`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 467 / 第467行**
+  - Code / 代码: `    report = outcome.get_result()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 468 / 第468行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 469 / 第469行**
+  - Code / 代码: `    if report.outcome != "skipped" and call.when == "call":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 470 / 第470行**
+  - Code / 代码: `        if xfail_case := item.get_closest_marker("xfail_case"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 471 / 第471行**
+  - Code / 代码: `            params = item.callspec.params if hasattr(item, "callspec") else {}`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 472 / 第472行**
+  - Code / 代码: `            checker, *_ = item.config.xfail_case_mark_values(xfail_case)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 473 / 第473行**
+  - Code / 代码: `            checker_ = params_in_context(checker)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 474 / 第474行**
+  - Code / 代码: `            if xfail_info := checker_(params):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 475 / 第475行**
+  - Code / 代码: `                if report.outcome == "passed":`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 476 / 第476行**
+  - Code / 代码: `                    report.wasxfail = "expected to fail, but passed"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 477 / 第477行**
+  - Code / 代码: `                else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 478 / 第478行**
+  - Code / 代码: `                    if isinstance(xfail_info, str):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 479 / 第479行**
+  - Code / 代码: `                        report.outcome = "skipped"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 480 / 第480行**
+  - Code / 代码: `                        report.wasxfail = xfail_info`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 481 / 第481行**
+  - Code / 代码: `                    elif isinstance(xfail_info, tuple):`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 482 / 第482行**
+  - Code / 代码: `                        if isinstance(call.excinfo.value, xfail_info[0]):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 483 / 第483行**
+  - Code / 代码: `                            if re.search(xfail_info[1], str(call.excinfo.value)):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 484 / 第484行**
+  - Code / 代码: `                                report.outcome = "skipped"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 485 / 第485行**
+  - Code / 代码: `                                report.wasxfail = str(call.excinfo.value)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 486 / 第486行**
+  - Code / 代码: `                            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 487 / 第487行**
+  - Code / 代码: `                                report.longrepr = f"Expect '{xfail_info[1]}', but got '{call.excinfo.value}'"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 488 / 第488行**
+  - Code / 代码: `                        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 489 / 第489行**
+  - Code / 代码: `                            report.longrepr = f"Expect '{xfail_info[0]}', but got '{type(call.excinfo.value)}'"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 490 / 第490行**
+  - Code / 代码: `                    else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 491 / 第491行**
+  - Code / 代码: `                        if isinstance(call.excinfo.value, xfail_info):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 492 / 第492行**
+  - Code / 代码: `                            report.outcome = "skipped"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 493 / 第493行**
+  - Code / 代码: `                            report.wasxfail = str(call.excinfo.value)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 494 / 第494行**
+  - Code / 代码: `                        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 495 / 第495行**
+  - Code / 代码: `                            report.longrepr = f"Expect exception '{xfail_info}', but got '{type(call.excinfo.value)}'"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 496 / 第496行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 497 / 第497行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 498 / 第498行**
+  - Code / 代码: `def pytest_report_collectionfinish(config, start_path, items):`
+  - EN: Defines function `pytest_report_collectionfinish`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `pytest_report_collectionfinish`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 499 / 第499行**
+  - Code / 代码: `    if not config.getoption("--collect-only"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 500 / 第500行**
+  - Code / 代码: `        return`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 501 / 第501行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 502 / 第502行**
+  - Code / 代码: `    report = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 503 / 第503行**
+  - Code / 代码: `    selected_count = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 504 / 第504行**
+  - Code / 代码: `    for item in items:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 505 / 第505行**
+  - Code / 代码: `        additional_info = ""`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 506 / 第506行**
+  - Code / 代码: `        if skip_mark := item.get_closest_marker("skip"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 507 / 第507行**
+  - Code / 代码: `            status = "SKIPPED"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 508 / 第508行**
+  - Code / 代码: `            additional_info = skip_mark.kwargs.get("reason", "")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 509 / 第509行**
+  - Code / 代码: `        else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 510 / 第510行**
+  - Code / 代码: `            status = "SELECTED"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 511 / 第511行**
+  - Code / 代码: `            if sms := item.get_closest_marker("arch").kwargs.get("sms"):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 512 / 第512行**
+  - Code / 代码: `                additional_info += f"SMs {','.join(sms)}"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 513 / 第513行**
+  - Code / 代码: `            selected_count += 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 514 / 第514行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 515 / 第515行**
+  - Code / 代码: `        line = f"SHARDING {item.nodeid} ({status}:{additional_info})"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 516 / 第516行**
+  - Code / 代码: `        report.append(line)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 517 / 第517行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 518 / 第518行**
+  - Code / 代码: `    report.append(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 519 / 第519行**
+  - Code / 代码: `        f"\n{len(items)} tests collected, {selected_count} tests selected, {len(items) - selected_count} tests skipped."`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 520 / 第520行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 521 / 第521行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 522 / 第522行**
+  - Code / 代码: `    if report:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 523 / 第523行**
+  - Code / 代码: `        return [`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 524 / 第524行**
+  - Code / 代码: `            "\n============= Sharding Report Start =============\n",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 525 / 第525行**
+  - Code / 代码: `            *report,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 526 / 第526行**
+  - Code / 代码: `            "\n=============  Sharding Report End  =============\n",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 527 / 第527行**
+  - Code / 代码: `        ]`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+
+## Key Concepts / 关键概念
+
+- **EN**: Uses pytest markers, parametrization, or hooks to organize automated test coverage.
+  **CN**: 使用 pytest 的标记、参数化或钩子来组织自动化测试覆盖。
+- **EN**: Implements or uses sharding logic to split test execution.
+  **CN**: 实现或使用分片逻辑来切分测试执行。
+- **EN**: Expands one test body into many concrete runtime configurations.
+  **CN**: 将一个测试体扩展为多个具体运行配置。
+
+## Dependencies / 依赖项
+
+- `os`
+  - EN: Provides environment-variable or filesystem helpers.
+  - CN: 提供环境变量或文件系统辅助功能。
+- `math`
+  - EN: Provides math helpers used in size calculations or filtering.
+  - CN: 提供尺寸计算或筛选所需的数学辅助函数。
+- `random`
+  - EN: Provides random selection or reproducible sharding behavior.
+  - CN: 提供随机选择或可复现的分片行为。
+- `collections`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `pathlib`
+  - EN: Provides path manipulation helpers.
+  - CN: 提供路径处理辅助功能。
+- `inspect`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `re`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `sys`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `pytest`
+  - EN: Provides the Python test runner, markers, and parametrization helpers.
+  - CN: 提供 Python 测试运行器、标记与参数化辅助功能。
+- `_pytest.assertion.util`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `device_info`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。

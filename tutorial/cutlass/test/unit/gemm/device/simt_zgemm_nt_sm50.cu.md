@@ -1,0 +1,2466 @@
+# simt_zgemm_nt_sm50.cu — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/simt_zgemm_nt_sm50.cu`
+- 中文：`test/unit/gemm/device/simt_zgemm_nt_sm50.cu`
+
+## Purpose / 目的
+- EN: This file defines SIMT device-GEMM tests for `simt_zgemm_nt_sm50` and validates multiple tiling choices on SM50. The file-level brief is: "Tests for device-wide GEMM interface." The filename layout token indicates non-transposed A / transposed B.
+- 中文：该文件为 `simt_zgemm_nt_sm50` 定义了 SIMT 设备级 GEMM 测试，并在 SM50 上验证多种分块配置。 文件级摘要为：“设备级 GEMM 接口测试”。 文件名中的布局标记表示 A 不转置 / B 转置。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L32** `    \brief Tests for device-wide GEMM interface`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L33** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L34** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L35** `#include <iostream>`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- **L36** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L37** `#include "cutlass/cutlass.h"`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- **L38** `#include "cutlass/gemm/device/gemm.h"`
+  - EN: Declares the classic device-level GEMM front-end used in CUTLASS 2.x style tests.
+  - 中文：声明经典的设备级 GEMM 前端，常见于 CUTLASS 2.x 风格测试。
+- **L39** `#include "cutlass/numeric_types.h"`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- **L40** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L41** `#include "../../common/cutlass_unit_test.h"`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- **L42** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L43** `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host-side tensor containers for reference data and verification.
+  - 中文：提供主机端张量容器，用于参考数据与结果校验。
+- **L44** `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides tensor printing and inspection helpers.
+  - 中文：提供张量打印与查看辅助工具。
+- **L45** `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides host reference routines that fill tensors with test data.
+  - 中文：提供在主机端填充测试张量的参考实现。
+- **L46** `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host reference tensor copy routines.
+  - 中文：提供主机端张量拷贝参考实现。
+- **L47** `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides host reference tensor comparison utilities.
+  - 中文：提供主机端张量比较工具。
+- **L48** `#include "cutlass/util/reference/host/gemm.h"`
+  - EN: Provides a host reference GEMM implementation for correctness checking.
+  - 中文：提供主机端参考 GEMM 实现，用于正确性校验。
+- **L49** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L50** `#include "testbed.h"`
+  - EN: Provides shared GEMM testbed helpers used by these device-level tests.
+  - 中文：提供这些设备级测试共用的 GEMM testbed 辅助代码。
+- **L51** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L52** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L53** `// Elements / Thread:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L54** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L55** `//     Warps / Block:   1 x   1`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   1.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L56** `//       Threadblock:   8 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:   8 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L57** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 8x32x8_8x32x1_2x4_4x8_1x1, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.8x32x8_8x32x1_2x4_4x8_1x1` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.8x32x8_8x32x1_2x4_4x8_1x1`。
+- **L58** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L59** `    using ThreadblockShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 32, 8>`。
+- **L60** `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 32, 8>`。
+- **L61** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L62** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L63** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L64** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L65** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L66** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L67** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L68** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L69** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L70** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L71** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L72** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L73** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L74** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L75** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L76** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L77** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L78** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L79** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L80** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L81** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L82** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L83** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L84** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L85** `//     Warps / Block:   1 x   1`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   1.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L86** `//       Threadblock:  16 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  16 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L87** `CUTLASS_TEST_L0(SM50_device_zgemm_nt, 16x32x8_16x32x1_4x4_4x8_1x1, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.16x32x8_16x32x1_4x4_4x8_1x1` through the `CUTLASS_TEST_L0` macro.
+  - 中文：通过 `CUTLASS_TEST_L0` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.16x32x8_16x32x1_4x4_4x8_1x1`。
+- **L88** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L89** `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L90** `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L91** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L92** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L93** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L94** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L95** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L96** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L97** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L98** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L99** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L100** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L101** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L102** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L103** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L104** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L105** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L106** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L107** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L108** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L109** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L110** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L111** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L112** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L113** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L114** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L115** `//     Warps / Block:   1 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L116** `//       Threadblock:   8 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:   8 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L117** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 8x32x8_8x16x1_2x2_4x8_1x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.8x32x8_8x16x1_2x2_4x8_1x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.8x32x8_8x16x1_2x2_4x8_1x2`。
+- **L118** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L119** `    using ThreadblockShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 32, 8>`。
+- **L120** `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 16, 8>`。
+- **L121** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L122** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L123** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L124** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L125** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L126** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L127** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L128** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L129** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L130** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L131** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L132** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L133** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L134** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L135** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L136** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L137** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L138** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L139** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L140** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L141** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L142** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L143** `// Elements / Thread:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L144** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L145** `//     Warps / Block:   1 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L146** `//       Threadblock:   8 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:   8 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L147** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 8x64x8_8x32x1_2x4_4x8_1x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.8x64x8_8x32x1_2x4_4x8_1x2` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.8x64x8_8x32x1_2x4_4x8_1x2`。
+- **L148** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L149** `    using ThreadblockShape = cutlass::gemm::GemmShape<8, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 64, 8>`。
+- **L150** `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 32, 8>`。
+- **L151** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L152** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L153** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L154** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L155** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L156** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L157** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L158** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L159** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L160** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L161** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L162** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L163** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L164** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L165** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L166** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L167** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L168** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L169** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L170** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L171** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L172** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L173** `// Elements / Thread:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L174** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L175** `//     Warps / Block:   1 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L176** `//       Threadblock:  16 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  16 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L177** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 16x32x8_16x16x1_4x2_4x8_1x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.16x32x8_16x16x1_4x2_4x8_1x2` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.16x32x8_16x16x1_4x2_4x8_1x2`。
+- **L178** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L179** `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L180** `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 16, 8>`。
+- **L181** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L182** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L183** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L184** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L185** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L186** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L187** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L188** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L189** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L190** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L191** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L192** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L193** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L194** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L195** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L196** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L197** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L198** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L199** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L200** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L201** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L202** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L203** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L204** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L205** `//     Warps / Block:   1 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L206** `//       Threadblock:  16 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  16 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L207** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 16x64x8_16x32x1_4x4_4x8_1x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.16x64x8_16x32x1_4x4_4x8_1x2` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.16x64x8_16x32x1_4x4_4x8_1x2`。
+- **L208** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L209** `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 64, 8>`。
+- **L210** `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L211** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L212** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L213** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L214** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L215** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L216** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L217** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L218** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L219** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L220** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L221** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L222** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L223** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L224** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L225** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L226** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L227** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L228** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L229** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L230** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L231** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L232** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L233** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L234** `//    Threads / Warp:   8 x   4`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   8 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L235** `//     Warps / Block:   1 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   1 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L236** `//       Threadblock:  32 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L237** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 32x32x8_32x16x1_4x4_8x4_1x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x32x8_32x16x1_4x4_8x4_1x2` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x32x8_32x16x1_4x4_8x4_1x2`。
+- **L238** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L239** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 32, 8>`。
+- **L240** `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 16, 8>`。
+- **L241** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L242** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L243** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L244** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L245** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L246** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L247** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L248** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L249** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L250** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L251** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L252** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L253** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L254** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L255** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L256** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L257** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L258** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L259** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L260** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L261** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L262** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L263** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L264** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L265** `//     Warps / Block:   2 x   1`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   1.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L266** `//       Threadblock:  32 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L267** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 32x32x8_16x32x1_4x4_4x8_2x1, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x32x8_16x32x1_4x4_4x8_2x1` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x32x8_16x32x1_4x4_4x8_2x1`。
+- **L268** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L269** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 32, 8>`。
+- **L270** `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L271** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L272** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L273** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L274** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L275** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L276** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L277** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L278** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L279** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L280** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L281** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L282** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L283** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L284** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L285** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L286** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L287** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L288** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L289** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L290** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L291** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L292** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L293** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L294** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L295** `//     Warps / Block:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L296** `//       Threadblock:  16 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  16 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L297** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 16x32x8_8x16x1_2x2_4x8_2x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.16x32x8_8x16x1_2x2_4x8_2x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.16x32x8_8x16x1_2x2_4x8_2x2`。
+- **L298** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L299** `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L300** `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 16, 8>`。
+- **L301** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L302** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L303** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L304** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L305** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L306** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L307** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L308** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L309** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L310** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L311** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L312** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L313** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L314** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L315** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L316** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L317** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L318** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L319** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L320** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L321** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L322** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L323** `// Elements / Thread:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L324** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L325** `//     Warps / Block:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L326** `//       Threadblock:  16 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  16 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L327** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 16x64x8_8x32x1_2x4_4x8_2x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.16x64x8_8x32x1_2x4_4x8_2x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.16x64x8_8x32x1_2x4_4x8_2x2`。
+- **L328** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L329** `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 64, 8>`。
+- **L330** `    using WarpShape = cutlass::gemm::GemmShape<8, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 32, 8>`。
+- **L331** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L332** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L333** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L334** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L335** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L336** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L337** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L338** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L339** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L340** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L341** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L342** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L343** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L344** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L345** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L346** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L347** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L348** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L349** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L350** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L351** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L352** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L353** `// Elements / Thread:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L354** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L355** `//     Warps / Block:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L356** `//       Threadblock:  32 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L357** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 32x32x8_16x16x1_4x2_4x8_2x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x32x8_16x16x1_4x2_4x8_2x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x32x8_16x16x1_4x2_4x8_2x2`。
+- **L358** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L359** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 32, 8>`。
+- **L360** `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 16, 8>`。
+- **L361** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L362** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L363** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L364** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L365** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L366** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L367** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L368** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L369** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L370** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L371** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L372** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L373** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L374** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L375** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L376** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L377** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L378** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L379** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L380** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L381** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L382** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L383** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L384** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L385** `//     Warps / Block:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L386** `//       Threadblock:  32 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L387** `CUTLASS_TEST_L0(SM50_device_zgemm_nt, 32x64x8_16x32x1_4x4_4x8_2x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x64x8_16x32x1_4x4_4x8_2x2` through the `CUTLASS_TEST_L0` macro.
+  - 中文：通过 `CUTLASS_TEST_L0` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x64x8_16x32x1_4x4_4x8_2x2`。
+- **L388** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L389** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 64, 8>`。
+- **L390** `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L391** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L392** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L393** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L394** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L395** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L396** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L397** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L398** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L399** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L400** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L401** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L402** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L403** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L404** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L405** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L406** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L407** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L408** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L409** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L410** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L411** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L412** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L413** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L414** `//    Threads / Warp:   8 x   4`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   8 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L415** `//     Warps / Block:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L416** `//       Threadblock:  64 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  64 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L417** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 64x32x8_32x16x1_4x4_8x4_2x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.64x32x8_32x16x1_4x4_8x4_2x2` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.64x32x8_32x16x1_4x4_8x4_2x2`。
+- **L418** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L419** `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<64, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<64, 32, 8>`。
+- **L420** `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 16, 8>`。
+- **L421** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L422** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L423** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L424** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L425** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L426** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L427** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L428** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L429** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L430** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L431** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L432** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L433** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L434** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L435** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L436** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L437** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L438** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L439** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L440** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L441** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L442** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L443** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L444** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L445** `//     Warps / Block:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L446** `//       Threadblock:  16 x  64 x 16`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  16 x  64 x 16.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L447** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 16x64x16_8x16x1_2x2_4x8_2x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.16x64x16_8x16x1_2x2_4x8_2x4` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.16x64x16_8x16x1_2x2_4x8_2x4`。
+- **L448** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L449** `    using ThreadblockShape = cutlass::gemm::GemmShape<16, 64, 16>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 64, 16>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 64, 16>`。
+- **L450** `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 16>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 16, 16>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 16, 16>`。
+- **L451** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L452** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L453** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L454** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L455** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L456** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L457** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L458** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L459** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L460** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L461** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L462** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L463** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L464** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L465** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L466** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L467** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L468** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L469** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L470** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L471** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L472** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L473** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L474** `//    Threads / Warp:   8 x   4`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   8 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L475** `//     Warps / Block:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L476** `//       Threadblock:  32 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L477** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 32x32x8_16x8x1_2x2_8x4_2x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x32x8_16x8x1_2x2_8x4_2x4` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x32x8_16x8x1_2x2_8x4_2x4`。
+- **L478** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L479** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 32, 8>`。
+- **L480** `    using WarpShape = cutlass::gemm::GemmShape<16, 8, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 8, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 8, 8>`。
+- **L481** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L482** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L483** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L484** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L485** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L486** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L487** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L488** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L489** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L490** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L491** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L492** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L493** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L494** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L495** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L496** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L497** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L498** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L499** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L500** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L501** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L502** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L503** `// Elements / Thread:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L504** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L505** `//     Warps / Block:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L506** `//       Threadblock:  32 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L507** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 32x64x8_16x16x1_4x2_4x8_2x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x64x8_16x16x1_4x2_4x8_2x4` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x64x8_16x16x1_4x2_4x8_2x4`。
+- **L508** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L509** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 64, 8>`。
+- **L510** `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 16, 8>`。
+- **L511** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L512** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L513** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L514** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L515** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L516** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L517** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L518** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L519** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L520** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L521** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L522** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L523** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L524** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L525** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L526** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L527** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L528** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L529** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L530** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L531** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L532** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L533** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L534** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L535** `//     Warps / Block:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L536** `//       Threadblock:  32 x 128 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x 128 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L537** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 32x128x8_16x32x1_4x4_4x8_2x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x128x8_16x32x1_4x4_4x8_2x4` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x128x8_16x32x1_4x4_4x8_2x4`。
+- **L538** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L539** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 128, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 128, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 128, 8>`。
+- **L540** `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L541** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L542** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L543** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L544** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L545** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L546** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L547** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L548** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L549** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L550** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L551** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L552** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L553** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L554** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L555** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L556** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L557** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L558** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L559** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L560** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L561** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L562** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L563** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L564** `//    Threads / Warp:   8 x   4`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   8 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L565** `//     Warps / Block:   2 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   2 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L566** `//       Threadblock:  64 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  64 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L567** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 64x64x8_32x16x1_4x4_8x4_2x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.64x64x8_32x16x1_4x4_8x4_2x4` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.64x64x8_32x16x1_4x4_8x4_2x4`。
+- **L568** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L569** `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<64, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<64, 64, 8>`。
+- **L570** `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 16, 8>`。
+- **L571** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L572** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L573** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L574** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L575** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L576** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L577** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L578** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L579** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L580** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L581** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L582** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L583** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L584** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L585** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L586** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L587** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L588** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L589** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L590** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L591** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L592** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L593** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L594** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L595** `//     Warps / Block:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L596** `//       Threadblock:  32 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L597** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 32x32x8_8x16x1_2x2_4x8_4x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x32x8_8x16x1_2x2_4x8_4x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x32x8_8x16x1_2x2_4x8_4x2`。
+- **L598** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L599** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 32, 8>`。
+- **L600** `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 16, 8>`。
+- **L601** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L602** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L603** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L604** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L605** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L606** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L607** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L608** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L609** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L610** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L611** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L612** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L613** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L614** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L615** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L616** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L617** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L618** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L619** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L620** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L621** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L622** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L623** `// Elements / Thread:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L624** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L625** `//     Warps / Block:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L626** `//       Threadblock:  64 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  64 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L627** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 64x32x8_16x16x1_4x2_4x8_4x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.64x32x8_16x16x1_4x2_4x8_4x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.64x32x8_16x16x1_4x2_4x8_4x2`。
+- **L628** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L629** `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<64, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<64, 32, 8>`。
+- **L630** `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 16, 8>`。
+- **L631** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L632** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L633** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L634** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L635** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L636** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L637** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L638** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L639** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L640** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L641** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L642** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L643** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L644** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L645** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L646** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L647** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L648** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L649** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L650** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L651** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L652** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L653** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L654** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L655** `//     Warps / Block:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L656** `//       Threadblock:  64 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  64 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L657** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 64x64x8_16x32x1_4x4_4x8_4x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.64x64x8_16x32x1_4x4_4x8_4x2` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.64x64x8_16x32x1_4x4_4x8_4x2`。
+- **L658** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L659** `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<64, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<64, 64, 8>`。
+- **L660** `    using WarpShape = cutlass::gemm::GemmShape<16, 32, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 32, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 32, 8>`。
+- **L661** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L662** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L663** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L664** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L665** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L666** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L667** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L668** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L669** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L670** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L671** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L672** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L673** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L674** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L675** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L676** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L677** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L678** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L679** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L680** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L681** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L682** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L683** `// Elements / Thread:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L684** `//    Threads / Warp:   8 x   4`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   8 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L685** `//     Warps / Block:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L686** `//       Threadblock: 128 x  32 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock: 128 x  32 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L687** `CUTLASS_TEST_L1(SM50_device_zgemm_nt, 128x32x8_32x16x1_4x4_8x4_4x2, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.128x32x8_32x16x1_4x4_8x4_4x2` through the `CUTLASS_TEST_L1` macro.
+  - 中文：通过 `CUTLASS_TEST_L1` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.128x32x8_32x16x1_4x4_8x4_4x2`。
+- **L688** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L689** `    using ThreadblockShape = cutlass::gemm::GemmShape<128, 32, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<128, 32, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<128, 32, 8>`。
+- **L690** `    using WarpShape = cutlass::gemm::GemmShape<32, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 16, 8>`。
+- **L691** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L692** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L693** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L694** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L695** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L696** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L697** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L698** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L699** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L700** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L701** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L702** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L703** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L704** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L705** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L706** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L707** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L708** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L709** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L710** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L711** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L712** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L713** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L714** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L715** `//     Warps / Block:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L716** `//       Threadblock:  32 x  64 x 16`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  32 x  64 x 16.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L717** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 32x64x16_8x16x1_2x2_4x8_4x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.32x64x16_8x16x1_2x2_4x8_4x4` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.32x64x16_8x16x1_2x2_4x8_4x4`。
+- **L718** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L719** `    using ThreadblockShape = cutlass::gemm::GemmShape<32, 64, 16>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<32, 64, 16>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<32, 64, 16>`。
+- **L720** `    using WarpShape = cutlass::gemm::GemmShape<8, 16, 16>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<8, 16, 16>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<8, 16, 16>`。
+- **L721** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L722** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L723** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L724** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L725** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L726** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L727** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L728** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L729** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L730** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L731** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L732** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L733** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L734** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L735** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L736** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L737** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L738** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L739** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L740** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L741** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L742** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L743** `// Elements / Thread:   2 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   2 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L744** `//    Threads / Warp:   8 x   4`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   8 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L745** `//     Warps / Block:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L746** `//       Threadblock:  64 x  32 x 16`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  64 x  32 x 16.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L747** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 64x32x16_16x8x1_2x2_8x4_4x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.64x32x16_16x8x1_2x2_8x4_4x4` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.64x32x16_16x8x1_2x2_8x4_4x4`。
+- **L748** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L749** `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 32, 16>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<64, 32, 16>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<64, 32, 16>`。
+- **L750** `    using WarpShape = cutlass::gemm::GemmShape<16, 8, 16>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 8, 16>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 8, 16>`。
+- **L751** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L752** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L753** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L754** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L755** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L756** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L757** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L758** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L759** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L760** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L761** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L762** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L763** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L764** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L765** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L766** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L767** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L768** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L769** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L770** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L771** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L772** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L773** `// Elements / Thread:   4 x   2`
+  - EN: Documents part of the launch or tiling geometry: Elements / Thread:   4 x   2.
+  - 中文：记录启动或分块几何信息的一部分：每线程处理元素数。
+- **L774** `//    Threads / Warp:   4 x   8`
+  - EN: Documents part of the launch or tiling geometry: Threads / Warp:   4 x   8.
+  - 中文：记录启动或分块几何信息的一部分：每个 Warp 的线程排布。
+- **L775** `//     Warps / Block:   4 x   4`
+  - EN: Documents part of the launch or tiling geometry: Warps / Block:   4 x   4.
+  - 中文：记录启动或分块几何信息的一部分：每个线程块中的 Warp 排布。
+- **L776** `//       Threadblock:  64 x  64 x  8`
+  - EN: Documents part of the launch or tiling geometry: Threadblock:  64 x  64 x  8.
+  - 中文：记录启动或分块几何信息的一部分：线程块形状。
+- **L777** `CUTLASS_TEST_L2(SM50_device_zgemm_nt, 64x64x8_16x16x1_4x2_4x8_4x4, {`
+  - EN: Registers CUTLASS test `SM50_device_zgemm_nt.64x64x8_16x16x1_4x2_4x8_4x4` through the `CUTLASS_TEST_L2` macro.
+  - 中文：通过 `CUTLASS_TEST_L2` 宏注册 CUTLASS 测试 `SM50_device_zgemm_nt.64x64x8_16x16x1_4x2_4x8_4x4`。
+- **L778** `    using precision = cutlass::complex<double>;`
+  - EN: Creates the alias `precision` for the complex-double type.
+  - 中文：为 `precision` 创建别名，对应 复数 double 类型。
+- **L779** `    using ThreadblockShape = cutlass::gemm::GemmShape<64, 64, 8>;`
+  - EN: Creates the alias `ThreadblockShape` for a compile-time shape `cutlass::gemm::GemmShape<64, 64, 8>`.
+  - 中文：为 `ThreadblockShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<64, 64, 8>`。
+- **L780** `    using WarpShape = cutlass::gemm::GemmShape<16, 16, 8>;`
+  - EN: Creates the alias `WarpShape` for a compile-time shape `cutlass::gemm::GemmShape<16, 16, 8>`.
+  - 中文：为 `WarpShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<16, 16, 8>`。
+- **L781** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L782** `    static int const kEpilogueElementsPerAccess = 1;`
+  - EN: Defines compile-time constant `kEpilogueElementsPerAccess` as `1`.
+  - 中文：将编译期常量 `kEpilogueElementsPerAccess` 定义为 `1`。
+- **L783** `    using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - EN: Creates the alias `InstructionShape` for a compile-time shape `cutlass::gemm::GemmShape<1, 1, 1>`.
+  - 中文：为 `InstructionShape` 创建别名，对应 编译期形状 `cutlass::gemm::GemmShape<1, 1, 1>`。
+- **L784** `    using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L785** `        precision, kEpilogueElementsPerAccess, precision, precision>;`
+  - EN: Completes the statement `precision, kEpilogueElementsPerAccess, precision, precision>;`.
+  - 中文：完成语句 `precision, kEpilogueElementsPerAccess, precision, precision>;`。
+- **L786** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L787** `    using Gemm = cutlass::gemm::device::Gemm<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L788** `        precision, cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L789** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L790** `        precision, cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L791** `        precision,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L792** `        cutlass::arch::OpClassSimt,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L793** `        cutlass::arch::Sm50,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L794** `        ThreadblockShape, WarpShape, InstructionShape,`
+  - EN: Supplies the threadblock, warp, and instruction shapes for this GEMM specialization.
+  - 中文：提供该 GEMM 特化所需的线程块、warp 与指令形状。
+- **L795** `        EpilogueOutputOp,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L796** `        cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L797** `        2 // Stages`
+  - EN: Provides a literal numeric argument `2` for the surrounding definition. The inline comment documents: Stages.
+  - 中文：为外围定义提供字面量参数 `2`。 行尾注释说明：这里说明该数字表示流水线阶段数。
+- **L798** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L799** `    EXPECT_TRUE(test::gemm::device::TestAllGemm<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemm<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemm<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L800** `} )`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L801** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+
+## Key Concepts / 关键概念
+- EN: Classic device-level GEMM instantiation
+  - 中文：经典设备级 GEMM 实例化
+- EN: CUTLASS test registration macros
+  - 中文：CUTLASS 测试注册宏
+- EN: Exhaustive GEMM validation
+  - 中文：全量 GEMM 正确性校验
+- EN: SIMT operator class
+  - 中文：SIMT 运算类别
+- EN: Linear-combination epilogue operator
+  - 中文：线性组合 epilogue 输出算子
+- EN: Architecture-specific kernel specialization
+  - 中文：面向特定架构的内核特化
+
+## Dependencies / 依赖关系
+- `iostream`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- `cutlass/cutlass.h`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- `cutlass/gemm/device/gemm.h`
+  - EN: Declares the classic device-level GEMM front-end used in CUTLASS 2.x style tests.
+  - 中文：声明经典的设备级 GEMM 前端，常见于 CUTLASS 2.x 风格测试。
+- `cutlass/numeric_types.h`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- `../../common/cutlass_unit_test.h`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host-side tensor containers for reference data and verification.
+  - 中文：提供主机端张量容器，用于参考数据与结果校验。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides tensor printing and inspection helpers.
+  - 中文：提供张量打印与查看辅助工具。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides host reference routines that fill tensors with test data.
+  - 中文：提供在主机端填充测试张量的参考实现。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host reference tensor copy routines.
+  - 中文：提供主机端张量拷贝参考实现。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides host reference tensor comparison utilities.
+  - 中文：提供主机端张量比较工具。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides a host reference GEMM implementation for correctness checking.
+  - 中文：提供主机端参考 GEMM 实现，用于正确性校验。
+- `testbed.h`
+  - EN: Provides shared GEMM testbed helpers used by these device-level tests.
+  - 中文：提供这些设备级测试共用的 GEMM testbed 辅助代码。

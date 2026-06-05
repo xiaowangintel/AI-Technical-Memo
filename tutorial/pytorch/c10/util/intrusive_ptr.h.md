@@ -1,0 +1,1520 @@
+# intrusive_ptr.h — Code Analysis / 代码分析
+
+## Source / 来源
+- **File / 文件**: `c10/util/intrusive_ptr.h`
+- **Repository / 仓库**: `pytorch` (`/root/xw/pytorch`)
+- **Purpose (EN)**: Implements intrusive reference counting, weak references, and ownership-safe smart-pointer utilities.
+- **Purpose (CN)**: 实现侵入式引用计数、弱引用以及保证所有权安全的智能指针工具。
+
+## Line-by-Line Analysis / 逐行分析
+### Lines 1-33
+```cpp
+#pragma once
+
+#include <c10/util/Exception.h>
+#include <c10/util/MaybeOwned.h>
+#include <atomic>
+#include <climits>
+#include <memory>
+#include <type_traits>
+
+namespace pybind11 {
+template <typename, typename...>
+class class_;
+}
+
+namespace torch::utils {
+class PyObjectPreservation;
+}
+
+namespace c10 {
+class intrusive_ptr_target;
+namespace raw {
+namespace weak_intrusive_ptr {
+inline void incref(intrusive_ptr_target* self);
+}
+namespace intrusive_ptr {
+inline void incref(intrusive_ptr_target* self);
+}
+
+// constructor tag used by intrusive_ptr constructors
+struct DontIncreaseRefcount {};
+} // namespace raw
+
+namespace detail {
+```
+- **EN**: This block assembles the compilation dependencies, pulling in local PyTorch/c10 headers such as c10/util/Exception.h, c10/util/MaybeOwned.h; standard-library headers such as atomic, climits, memory, and 1 more. The preprocessor guard keeps declarations single-instanced when this header is included transitively. The namespace declarations place the code inside pybind11, torch::utils, c10, and 4 more, matching the surrounding subsystem. It introduces or extends class_, PyObjectPreservation, intrusive_ptr_target, and 1 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `incref`, which updates reference counts and ownership state for shared objects. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects.
+- **CN**: 这一段组织编译依赖，引入了本地 PyTorch/c10 头文件，如 c10/util/Exception.h、c10/util/MaybeOwned.h；标准库头文件，如 atomic、climits、memory 等共 4 项。 预处理器保护用于避免头文件在传递包含时被重复展开。 命名空间声明把代码放入 pybind11、torch::utils、c10 等共 7 项 中，与周边子系统保持一致。 它引入或扩展了 class_、PyObjectPreservation、intrusive_ptr_target 等共 4 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `incref`，其作用是更新共享对象的引用计数与所有权状态。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。
+
+### Lines 34-65
+```cpp
+constexpr uint64_t kImpracticallyHugeReferenceCount = 0x0FFFFFFF;
+constexpr uint64_t kImpracticallyHugeWeakReferenceCount =
+    (kImpracticallyHugeReferenceCount << 32);
+constexpr uint64_t kReferenceCountOne = 1;
+constexpr uint64_t kWeakReferenceCountOne = (kReferenceCountOne << 32);
+constexpr uint64_t kUniqueRef = (kReferenceCountOne | kWeakReferenceCountOne);
+// Indicates whether the object has a PyObject wrapper.
+constexpr uint64_t kHasPyObject = (uint64_t(1) << 63);
+
+template <class TTarget>
+struct intrusive_target_default_null_type final {
+  static constexpr TTarget* singleton() noexcept {
+    return nullptr;
+  }
+};
+
+template <class TTarget, class ToNullType, class FromNullType>
+TTarget* assign_ptr_(TTarget* rhs) {
+  if (FromNullType::singleton() == rhs) {
+    return ToNullType::singleton();
+  } else {
+    return rhs;
+  }
+}
+
+inline uint32_t refcount(uint64_t combined_refcount) {
+  return static_cast<uint32_t>(combined_refcount);
+}
+
+inline uint32_t weakcount(uint64_t combined_refcount) {
+  return static_cast<uint32_t>((combined_refcount & ~kHasPyObject) >> 32);
+}
+```
+- **EN**: It introduces or extends TTarget, intrusive_target_default_null_type, TTarget, and 2 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `weakcount`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 TTarget、intrusive_target_default_null_type、TTarget 等共 5 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `weakcount`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 67-100
+```cpp
+inline bool has_pyobject(uint64_t combined_refcount) {
+  return (combined_refcount & kHasPyObject) != 0;
+}
+
+inline bool is_uniquely_owned(uint64_t combined_refcount) {
+  return (combined_refcount & ~detail::kHasPyObject) == detail::kUniqueRef;
+}
+
+// The only requirement for refcount increment is that it happens-before
+// decrement, so no additional memory ordering is needed.
+inline uint64_t atomic_combined_refcount_increment(
+    std::atomic<uint64_t>& combined_refcount,
+    uint64_t inc) {
+  return combined_refcount.fetch_add(inc, std::memory_order_relaxed) + inc;
+}
+
+inline uint32_t atomic_weakcount_increment(
+    std::atomic<uint64_t>& combined_refcount) {
+  return detail::weakcount(atomic_combined_refcount_increment(
+      combined_refcount, kWeakReferenceCountOne));
+}
+
+// The requirement is that all modifications to the managed object happen-before
+// invocation of the managed object destructor, and that allocation of the
+// managed object storage happens-before deallocation of the storage.
+//
+// To get this ordering, all non-final decrements must synchronize-with the
+// final decrement. So all non-final decrements have to store-release while the
+// final decrement has to load-acquire, either directly or with the help of
+// fences. But it's easiest just to have all decrements be acq-rel. And it turns
+// out, on modern architectures and chips, it's also fastest.
+inline uint64_t atomic_combined_refcount_decrement(
+    std::atomic<uint64_t>& combined_refcount,
+    uint64_t dec) {
+```
+- **EN**: This chunk defines `atomic_combined_refcount_decrement`, which updates reference counts and ownership state for shared objects. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段定义了 `atomic_combined_refcount_decrement`，其作用是更新共享对象的引用计数与所有权状态。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 101-124
+```cpp
+  return combined_refcount.fetch_sub(dec, std::memory_order_acq_rel) - dec;
+}
+
+inline uint32_t atomic_weakcount_decrement(
+    std::atomic<uint64_t>& combined_refcount) {
+  return detail::weakcount(atomic_combined_refcount_decrement(
+      combined_refcount, kWeakReferenceCountOne));
+}
+
+template <class T, class = void>
+struct TargetTraits {
+  static constexpr bool can_have_pyobject = false;
+};
+
+} // namespace detail
+
+/**
+ * intrusive_ptr<T> is an alternative to shared_ptr<T> that has better
+ * performance because it does the refcounting intrusively
+ * (i.e. in a member of the object itself).
+ * Your class T needs to inherit from intrusive_ptr_target to allow it to be
+ * used in an intrusive_ptr<T>. Your class's constructor should not allow
+ *`this` to escape to other threads or create an intrusive_ptr from `this`.
+ */
+```
+- **EN**: It introduces or extends T, TargetTraits, T, which define the main data structures or interfaces for this portion of the file. This chunk defines `weakcount`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 T、TargetTraits、T，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `weakcount`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 126-159
+```cpp
+// Note [Stack allocated intrusive_ptr_target safety]
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// A well known problem with std::enable_shared_from_this is that it
+// allows you to create a std::shared_ptr from a stack allocated object,
+// which is totally bogus because the object will die once you return
+// from the stack.  In intrusive_ptr, we can detect that this has occurred,
+// because we set the refcount/weakcount of objects which inherit from
+// intrusive_ptr_target to zero, *unless* we can prove that the object
+// was dynamically allocated (e.g., via make_intrusive).
+//
+// Thus, whenever you transmute a T* into a intrusive_ptr<T>, we check
+// and make sure that the refcount isn't zero (or, a more subtle
+// test for weak_intrusive_ptr<T>, for which the refcount may validly
+// be zero, but the weak refcount better not be zero), because that
+// tells us if the object was allocated by us.  If it wasn't, no
+// intrusive_ptr for you!
+
+// NOLINTNEXTLINE(cppcoreguidelines-virtual-class-destructor)
+class C10_API intrusive_ptr_target {
+  // Note [Weak references for intrusive refcounting]
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // Here's the scheme:
+  //
+  //  - refcount == number of strong references to the object
+  //    weakcount == number of weak references to the object,
+  //      plus one more if refcount > 0
+  //    An invariant: refcount > 0  =>  weakcount > 0
+  //
+  //  - c10::StorageImpl stays live as long as there are any strong
+  //    or weak pointers to it (weakcount > 0, since strong
+  //    references count as a +1 to weakcount)
+  //
+  //  - finalizers are called and data_ptr is deallocated when refcount == 0
+  //
+```
+- **EN**: It introduces or extends C10_API, which define the main data structures or interfaces for this portion of the file. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 C10_API，这些类型定义了本段涉及的主要数据结构或接口。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 160-191
+```cpp
+  //  - Once refcount == 0, it can never again be > 0 (the transition
+  //    from > 0 to == 0 is monotonic)
+  //
+  //  - When you access c10::StorageImpl via a weak pointer, you must
+  //    atomically increment the use count, if it is greater than 0.
+  //    If it is not, you must report that the storage is dead.
+  //
+  //.We use a single combined count for refcount and weakcount so that
+  // we can atomically operate on both at the same time for performance
+  // and defined behaviors.
+  //
+  // Note [PyObject preservation for Tensor and Storages]
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // intrusive_ptr has special support for preserving PyObject wrappers
+  // for TensorImpl and StorageImpl. The most significant bit (kHasPyObject) of
+  // the combined_refcount_ is used to indicate whether the object has a
+  // PyObject wrapper.
+  //
+  //   - The PyObject, if it exists, holds a strong reference to the
+  //     intrusive_ptr_target.
+  //
+  //   - When the refcount goes from 1 to 2, we incref the PyObject.
+  //
+  //   - When the refcount goes from 2 to 1, we decref the PyObject.
+  //
+  // In other words, the intrusive_ptr keeps the PyObject alive as long as there
+  // are other C++ references to the intrusive_ptr_target.
+
+  mutable std::atomic<uint64_t> combined_refcount_;
+  static_assert(sizeof(std::atomic<uint64_t>) == 8);
+  static_assert(alignof(std::atomic<uint64_t>) == 8);
+  static_assert(std::atomic<uint64_t>::is_always_lock_free);
+```
+- **EN**: This chunk declares `static_assert`, which implements a reusable low-level helper for higher-level runtime code. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants.
+- **CN**: 这一段声明了 `static_assert`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。
+
+### Lines 193-226
+```cpp
+  template <typename T, typename NullType>
+  friend class intrusive_ptr;
+  friend inline void raw::intrusive_ptr::incref(intrusive_ptr_target* self);
+
+  template <typename T, typename NullType>
+  friend class weak_intrusive_ptr;
+  friend inline void raw::weak_intrusive_ptr::incref(
+      intrusive_ptr_target* self);
+
+  template <typename T>
+  friend struct ExclusivelyOwnedTensorTraits;
+
+  friend class torch::utils::PyObjectPreservation;
+
+ protected:
+  // protected destructor. We never want to destruct intrusive_ptr_target*
+  // directly.
+  virtual ~intrusive_ptr_target() {
+// Disable -Wterminate and -Wexceptions so we're allowed to use assertions
+// (i.e. throw exceptions) in a destructor.
+// We also have to disable -Wunknown-warning-option and -Wpragmas, because
+// some other compilers don't know about -Wterminate or -Wexceptions and
+// will show a warning about unknown warning options otherwise.
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+#pragma warning( \
+    disable : 4297) // function assumed not to throw an exception but does
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wterminate"
+#pragma GCC diagnostic ignored "-Wexceptions"
+#endif
+```
+- **EN**: It introduces or extends intrusive_ptr, weak_intrusive_ptr, ExclusivelyOwnedTensorTraits, and 1 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `~intrusive_ptr_target`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption.
+- **CN**: 它引入或扩展了 intrusive_ptr、weak_intrusive_ptr、ExclusivelyOwnedTensorTraits 等共 4 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `~intrusive_ptr_target`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。
+
+### Lines 227-256
+```cpp
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+        // Second condition is there to accommodate
+        // unsafe_adapt_non_heap_allocated: since we are doing our own
+        // deallocation in that case, it is correct for each
+        // expected_decref to have happened (some user code tried to
+        // decref and thus free the object, but it didn't happen right
+        // away) or not (no user code tried to free the object, and
+        // now it's getting destroyed through whatever mechanism the
+        // caller of unsafe_adapt_non_heap_allocated wanted to
+        // use). We choose our reference count such that the count
+        // will not dip below kImpracticallyHugeReferenceCount regardless.
+        refcount() == 0 ||
+            refcount() >= detail::kImpracticallyHugeReferenceCount,
+        "Tried to destruct an intrusive_ptr_target that still has intrusive_ptr to it; refcount was ",
+        refcount());
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+        // See ~intrusive_ptr for optimization that will frequently result in 1
+        // at destruction time.
+        weakcount() == 1 || weakcount() == 0 ||
+            weakcount() == detail::kImpracticallyHugeReferenceCount - 1 ||
+            weakcount() == detail::kImpracticallyHugeReferenceCount,
+        "Tried to destruct an intrusive_ptr_target that still has weak_intrusive_ptr to it");
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#else
+#pragma GCC diagnostic pop
+#endif
+  }
+
+  constexpr intrusive_ptr_target() noexcept : combined_refcount_(0) {}
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `intrusive_ptr_target`, which implements a reusable low-level helper for higher-level runtime code. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `intrusive_ptr_target`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。
+
+### Lines 258-288
+```cpp
+  // intrusive_ptr_target supports copy and move: but refcount and weakcount
+  // don't participate (since they are intrinsic properties of the memory
+  // location)
+  intrusive_ptr_target(intrusive_ptr_target&& /*other*/) noexcept
+      : intrusive_ptr_target() {}
+
+  intrusive_ptr_target& operator=(intrusive_ptr_target&& /*other*/) noexcept {
+    return *this;
+  }
+
+  intrusive_ptr_target(const intrusive_ptr_target& /*other*/) noexcept
+      : intrusive_ptr_target() {}
+
+  intrusive_ptr_target& operator=(
+      const intrusive_ptr_target& /*other*/) noexcept {
+    return *this;
+  }
+
+ private:
+  /**
+   * This is called when refcount reaches zero.
+   * You can override this to release expensive resources.
+   * There might still be weak references, so your object might not get
+   * destructed yet, but you can assume the object isn't used anymore,
+   * i.e. no more calls to methods or accesses to members (we just can't
+   * destruct it yet because we need the weakcount accessible).
+   *
+   * If there are no weak references (i.e. your class is about to be
+   * destructed), this function WILL NOT be called.
+   */
+  virtual void release_resources() {}
+```
+- **EN**: It introduces or extends is, which define the main data structures or interfaces for this portion of the file. This chunk defines `members`, which implements a reusable low-level helper for higher-level runtime code. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 is，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `members`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 290-321
+```cpp
+  /**
+   * These two methods are called when the refcount transitions between one
+   * and two and the object has a PyObject wrapper.
+   */
+  virtual void incref_pyobject() const noexcept {}
+  virtual void decref_pyobject() const noexcept {}
+  virtual bool try_incref_pyobject() const noexcept {
+    return false;
+  }
+
+  uint32_t refcount(std::memory_order order = std::memory_order_relaxed) const {
+    return detail::refcount(combined_refcount_.load(order));
+  }
+
+  uint32_t weakcount(
+      std::memory_order order = std::memory_order_relaxed) const {
+    return detail::weakcount(combined_refcount_.load(order));
+  }
+};
+
+namespace detail {
+
+#ifndef C10_MOBILE
+template <>
+struct TargetTraits<c10::intrusive_ptr_target> {
+  // A generic intrusive_ptr<intrusive_ptr_target> may actually be a TensorImpl
+  // or StorageImpl, so we have to allow for PyObject support.
+  static constexpr bool can_have_pyobject = true;
+};
+#endif
+
+} // namespace detail
+```
+- **EN**: The preprocessor guard keeps declarations single-instanced when this header is included transitively. The namespace declarations place the code inside detail, matching the surrounding subsystem. It introduces or extends TargetTraits, which define the main data structures or interfaces for this portion of the file. This chunk defines `weakcount`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 预处理器保护用于避免头文件在传递包含时被重复展开。 命名空间声明把代码放入 detail 中，与周边子系统保持一致。 它引入或扩展了 TargetTraits，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `weakcount`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 323-352
+```cpp
+template <class TTarget, class NullType>
+class weak_intrusive_ptr;
+
+template <
+    class TTarget,
+    class NullType = detail::intrusive_target_default_null_type<TTarget>>
+class intrusive_ptr final {
+ private:
+//  the following static assert would be nice to have but it requires
+//  the target class T to be fully defined when intrusive_ptr<T> is instantiated
+//  this is a problem for classes that contain pointers to themselves
+//  static_assert(
+//      std::is_base_of_v<intrusive_ptr_target, TTarget>,
+//      "intrusive_ptr can only be used for classes that inherit from
+//      intrusive_ptr_target.");
+#ifndef _WIN32
+  // This static_assert triggers on MSVC
+  //  error C2131: expression did not evaluate to a constant
+  static_assert(
+      // NOLINTNEXTLINE(misc-redundant-expression)
+      NullType::singleton() == NullType::singleton(),
+      "NullType must have a constexpr singleton() method");
+#endif
+  static_assert(
+      std::is_base_of_v<
+          TTarget,
+          std::remove_pointer_t<decltype(NullType::singleton())>>,
+      "NullType::singleton() must return a element_type* pointer");
+
+  TTarget* target_;
+```
+- **EN**: The preprocessor guard keeps declarations single-instanced when this header is included transitively. It introduces or extends TTarget, NullType, weak_intrusive_ptr, and 4 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `static_assert`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 预处理器保护用于避免头文件在传递包含时被重复展开。 它引入或扩展了 TTarget、NullType、weak_intrusive_ptr 等共 7 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `static_assert`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 354-386
+```cpp
+  template <typename T>
+  friend struct ExclusivelyOwnedTensorTraits;
+  template <class TTarget2, class NullType2>
+  friend class intrusive_ptr;
+  friend class weak_intrusive_ptr<TTarget, NullType>;
+
+  // Make pybind11::class_ be a friend class of intrusive_ptr, so that custom
+  // smart holder in pybind11 could access the private constructor of
+  // intrusive_ptr(T*) which took the ownership of the object. This is required
+  // by customer holder macro PYBIND11_DECLARE_HOLDER_TYPE, where it uses
+  // intrusive_ptr(TTarget*) to initialize and take ownership of the object. For
+  // details, see
+  // https://pybind11.readthedocs.io/en/stable/advanced/smart_ptrs.html#custom-smart-pointers
+  template <typename, typename...>
+  friend class pybind11::class_;
+
+  void retain_() noexcept {
+    if (target_ != NullType::singleton()) {
+      uint64_t combined = detail::atomic_combined_refcount_increment(
+          target_->combined_refcount_, detail::kReferenceCountOne);
+      uint32_t new_refcount = detail::refcount(combined);
+      TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+          new_refcount != 1,
+          "intrusive_ptr: Cannot increase refcount after it reached zero.");
+
+      if constexpr (detail::TargetTraits<TTarget>::can_have_pyobject) {
+        // If the refcount transitioned from 1 to 2, we need to incref the
+        // PyObject. In other words, we need to ensure that the PyObject stays
+        // alive now that we have a C++ reference to this object in addition to
+        // the PyObject itself.
+        if (detail::has_pyobject(combined) && detail::refcount(combined) == 2) {
+          target_->incref_pyobject();
+        }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. It introduces or extends ExclusivelyOwnedTensorTraits, TTarget2, NullType2, and 4 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `incref_pyobject`, which updates reference counts and ownership state for shared objects. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 它引入或扩展了 ExclusivelyOwnedTensorTraits、TTarget2、NullType2 等共 7 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `incref_pyobject`，其作用是更新共享对象的引用计数与所有权状态。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。
+
+### Lines 387-413
+```cpp
+      } else {
+        TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+            !detail::has_pyobject(combined),
+            "TargetTraits indicates that type cannot have PyObject, but refcount has PyObject bit set.");
+      }
+    }
+  }
+
+  void reset_() noexcept {
+    if (target_ != NullType::singleton()) {
+      reset_not_null_(target_);
+    }
+  }
+
+  // C10_NOINLINE to keep binary size a bit smaller. We pass TTarget* here
+  // to avoid an extra pointer dereference in the call from reset_().
+  C10_NOINLINE static void reset_not_null_(TTarget* target) noexcept {
+    if (detail::is_uniquely_owned(
+            target->combined_refcount_.load(std::memory_order_acquire))) {
+      // Both counts are 1, so there are no weak references and
+      // we are releasing the last strong reference. No other
+      // threads can observe the effects of this target deletion
+      // call (e.g. calling use_count()) without a data race.
+      target->combined_refcount_.store(0, std::memory_order_relaxed);
+      delete target;
+      return;
+    }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `call`, which implements a reusable low-level helper for higher-level runtime code. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `call`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 415-441
+```cpp
+    auto combined_refcount = detail::atomic_combined_refcount_decrement(
+        target->combined_refcount_, detail::kReferenceCountOne);
+    uint32_t new_refcount = detail::refcount(combined_refcount);
+    bool has_pyobject = detail::has_pyobject(combined_refcount);
+    if (new_refcount == 0) {
+      if (detail::weakcount(combined_refcount) == 1) {
+        delete target;
+        return;
+      }
+      // See comment above about weakcount. As long as refcount>0,
+      // weakcount is one larger than the actual number of weak references.
+      // So we need to decrement it here.
+      release_resources_and_decrement_weakrefs_(target);
+    } else if constexpr (detail::TargetTraits<TTarget>::can_have_pyobject) {
+      // If the refcount transitioned from 2 to 1, we need to decref the
+      // PyObject. In other words, we don't want to keep the PyObject alive if
+      // there are no C++ references to this object other than the PyObject
+      // itself.
+      if (has_pyobject && new_refcount == 1) {
+        target->decref_pyobject();
+      }
+    } else {
+      TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+          !has_pyobject,
+          "TargetTraits indicates that type cannot have PyObject, but refcount has PyObject bit set.");
+    }
+  }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `decref_pyobject`, which updates reference counts and ownership state for shared objects. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `decref_pyobject`，其作用是更新共享对象的引用计数与所有权状态。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 443-476
+```cpp
+  C10_NOINLINE static void release_resources_and_decrement_weakrefs_(
+      TTarget* target) noexcept {
+    // justification for const_cast: release_resources is basically a
+    // destructor and a destructor always mutates the object, even for
+    // const objects.
+    const_cast<std::remove_const_t<TTarget>*>(target)->release_resources();
+    if (detail::atomic_weakcount_decrement(target->combined_refcount_) == 0) {
+      delete target;
+    }
+  }
+
+  // raw pointer constructors are not public because we shouldn't make
+  // intrusive_ptr out of raw pointers except from inside the make_intrusive(),
+  // reclaim() and weak_intrusive_ptr::lock() implementations.
+
+  // This constructor will increase the ref counter for you.
+  // This constructor will be used by the make_intrusive(), and also pybind11,
+  // which wrap the intrusive_ptr holder around the raw pointer and incref
+  // correspondingly (pybind11 requires raw pointer constructor to incref by
+  // default).
+  explicit intrusive_ptr(TTarget* target)
+      : intrusive_ptr(target, raw::DontIncreaseRefcount{}) {
+    if (target_ != NullType::singleton()) {
+      // We just created result.target_, so we know no other thread has
+      // access to it, so we know we needn't care about memory ordering.
+      // (On x86_64, a store with memory_order_relaxed generates a plain old
+      // `mov`, whereas an atomic increment does a lock-prefixed `add`, which is
+      // much more expensive: https://godbolt.org/z/eKPzj8.)
+      TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+          target_->combined_refcount_.load(std::memory_order_relaxed) == 0,
+          "intrusive_ptr: Newly-created target had non-zero refcounts. Does its "
+          "constructor do something strange like incref or create an "
+          "intrusive_ptr from `this`?");
+      target_->combined_refcount_.store(
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `make_intrusive`, which constructs derived state from the current inputs and invariants. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `make_intrusive`，其作用是根据当前输入与不变量构建派生状态。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。
+
+### Lines 477-503
+```cpp
+          detail::kUniqueRef, std::memory_order_relaxed);
+    }
+  }
+
+ public:
+  using element_type = TTarget;
+
+  intrusive_ptr() noexcept
+      : intrusive_ptr(NullType::singleton(), raw::DontIncreaseRefcount{}) {}
+
+  /* implicit */ intrusive_ptr(std::nullptr_t) noexcept
+      : intrusive_ptr(NullType::singleton(), raw::DontIncreaseRefcount{}) {}
+
+  // This constructor will not increase the ref counter for you.
+  // We use the tagged dispatch mechanism to explicitly mark this constructor
+  // to not increase the refcount
+  explicit intrusive_ptr(
+      TTarget* target,
+      raw::DontIncreaseRefcount /*unused*/) noexcept
+      : target_(target) {}
+
+  explicit intrusive_ptr(std::unique_ptr<TTarget> rhs) noexcept
+      : intrusive_ptr(rhs.release()) {}
+
+  intrusive_ptr(intrusive_ptr&& rhs) noexcept : target_(rhs.target_) {
+    rhs.target_ = NullType::singleton();
+  }
+```
+- **EN**: It introduces or extends element_type, which define the main data structures or interfaces for this portion of the file. This chunk defines `singleton`, which converts one representation into another form used by nearby runtime code. Dispatch-oriented logic computes or queries backend/functionality state so later calls reach the correct kernel path. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically.
+- **CN**: 它引入或扩展了 element_type，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `singleton`，其作用是把一种表示转换为附近运行时代码使用的另一种形式。 面向分发的逻辑会计算或查询后端/功能状态，从而让后续调用进入正确的内核路径。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。
+
+### Lines 505-537
+```cpp
+  template <class From, class FromNullType>
+  // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+  /* implicit */ intrusive_ptr(intrusive_ptr<From, FromNullType>&& rhs) noexcept
+      : target_(
+            detail::assign_ptr_<TTarget, NullType, FromNullType>(rhs.target_)) {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. intrusive_ptr move constructor got pointer of wrong type.");
+    rhs.target_ = FromNullType::singleton();
+  }
+
+  intrusive_ptr(const intrusive_ptr& rhs) : target_(rhs.target_) {
+    retain_();
+  }
+
+  template <class From, class FromNullType>
+  /* implicit */ intrusive_ptr(const intrusive_ptr<From, FromNullType>& rhs)
+      : target_(
+            detail::assign_ptr_<TTarget, NullType, FromNullType>(rhs.target_)) {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. intrusive_ptr copy constructor got pointer of wrong type.");
+    retain_();
+  }
+
+  ~intrusive_ptr() noexcept {
+    reset_();
+  }
+
+  intrusive_ptr& operator=(intrusive_ptr&& rhs) & noexcept {
+    // NOLINTNEXTLINE(*assign*)
+    return this->template operator= <TTarget, NullType>(std::move(rhs));
+  }
+```
+- **EN**: It introduces or extends From, FromNullType, From, and 1 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `reset_`, which maintains lookup structures and hashing behavior for fast metadata access. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 From、FromNullType、From 等共 4 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `reset_`，其作用是维护查找结构与哈希行为，以便快速访问元数据。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 539-570
+```cpp
+  template <class From, class FromNullType>
+  intrusive_ptr& operator=(intrusive_ptr<From, FromNullType>&& rhs) & noexcept {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. intrusive_ptr move assignment got pointer of wrong type.");
+    intrusive_ptr tmp = std::move(rhs);
+    swap(tmp);
+    return *this;
+  }
+
+  // Assignment is implemented using copy and swap. That's safe for self
+  // assignment.
+  // NOLINTNEXTLINE(bugprone-unhandled-self-assignment)
+  intrusive_ptr& operator=(const intrusive_ptr& rhs) & noexcept {
+    // NOLINTNEXTLINE(*assign-operator, *assignment-signature)
+    return this->template operator= <TTarget, NullType>(rhs);
+  }
+
+  template <class From, class FromNullType>
+  intrusive_ptr& operator=(
+      const intrusive_ptr<From, NullType>& rhs) & noexcept {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. intrusive_ptr copy assignment got pointer of wrong type.");
+    intrusive_ptr tmp = rhs;
+    swap(tmp);
+    return *this;
+  }
+
+  TTarget* get() const noexcept {
+    return target_;
+  }
+```
+- **EN**: It introduces or extends From, FromNullType, copy, and 2 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `get`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 From、FromNullType、copy 等共 5 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `get`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 572-603
+```cpp
+  TTarget& operator*() const noexcept {
+    return *target_;
+  }
+
+  TTarget* operator->() const noexcept {
+    return target_;
+  }
+
+  operator bool() const noexcept {
+    return target_ != NullType::singleton();
+  }
+
+  void reset() noexcept {
+    reset_();
+    target_ = NullType::singleton();
+  }
+
+  void swap(intrusive_ptr& rhs) noexcept {
+    std::swap(target_, rhs.target_);
+  }
+
+  // We do a lot of null-pointer checks in our code, good to have this be cheap.
+  bool defined() const noexcept {
+    return target_ != NullType::singleton();
+  }
+
+  uint32_t use_count() const noexcept {
+    if (target_ == NullType::singleton()) {
+      return 0;
+    }
+    return target_->refcount(std::memory_order_relaxed);
+  }
+```
+- **EN**: This chunk defines `refcount`, which updates reference counts and ownership state for shared objects. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段定义了 `refcount`，其作用是更新共享对象的引用计数与所有权状态。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 605-637
+```cpp
+  uint32_t weak_use_count() const noexcept {
+    if (target_ == NullType::singleton()) {
+      return 0;
+    }
+    return target_->weakcount(std::memory_order_relaxed);
+  }
+
+  bool unique() const noexcept {
+    return use_count() == 1;
+  }
+
+  /**
+   * Stronger than unique() in that it must not have any weakrefs as well.
+   */
+  bool is_uniquely_owned() const noexcept {
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(target_ != NullType::singleton());
+    return detail::is_uniquely_owned(
+        target_->combined_refcount_.load(std::memory_order_acquire));
+  }
+
+  /**
+   * Returns an owning (!) pointer to the underlying object and makes the
+   * intrusive_ptr instance invalid. That means the refcount is not decreased.
+   * You *must* put the returned pointer back into a intrusive_ptr using
+   * intrusive_ptr::reclaim(ptr) to properly destruct it.
+   * This is helpful for C APIs.
+   */
+  TTarget* release() noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Assign)
+    TTarget* result = target_;
+    target_ = NullType::singleton();
+    return result;
+  }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `singleton`, which converts one representation into another form used by nearby runtime code. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `singleton`，其作用是把一种表示转换为附近运行时代码使用的另一种形式。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 639-672
+```cpp
+  /**
+   * Takes an owning pointer to TTarget* and creates an intrusive_ptr that takes
+   * over ownership. That means the refcount is not increased.
+   * This is the counter-part to intrusive_ptr::release() and the pointer
+   * passed in *must* have been created using intrusive_ptr::release().
+   */
+  static intrusive_ptr reclaim(TTarget* owning_ptr) {
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+        owning_ptr == NullType::singleton() || owning_ptr->refcount() == 0 ||
+            owning_ptr->weakcount(),
+        "TTarget violates the invariant that refcount > 0  =>  weakcount > 0");
+    return intrusive_ptr(owning_ptr, raw::DontIncreaseRefcount{});
+  }
+
+  /**
+   * Takes an owning pointer to TTarget* and creates an intrusive_ptr
+   * representing a new reference, i.e. the raw pointer retains
+   * ownership.
+   */
+  static intrusive_ptr reclaim_copy(TTarget* owning_ptr) {
+    auto ret = reclaim(owning_ptr);
+    ret.retain_();
+    return ret;
+  }
+
+  /**
+   * Allocate a heap object with args and wrap it inside a intrusive_ptr and
+   * incref. This is a helper function to let make_intrusive() access private
+   * intrusive_ptr constructors.
+   */
+  template <class... Args>
+  static intrusive_ptr make(Args&&... args) {
+    return intrusive_ptr(new TTarget(std::forward<Args>(args)...));
+  }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. It introduces or extends intrusive_ptr, which define the main data structures or interfaces for this portion of the file. This chunk defines `intrusive_ptr`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 它引入或扩展了 intrusive_ptr，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `intrusive_ptr`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 674-707
+```cpp
+  /**
+   * Turn a new instance of TTarget (e.g., literally allocated
+   * using new TTarget(...) into an intrusive_ptr.  If possible,
+   * use intrusive_ptr::make instead which statically guarantees
+   * that the allocation was done properly.
+   *
+   * At the moment, the only reason this method exists is because
+   * pybind11 holder types expect to be able to allocate in
+   * this way (because pybind11 handles the new allocation itself).
+   */
+  static intrusive_ptr unsafe_steal_from_new(TTarget* raw_ptr) {
+    return intrusive_ptr(raw_ptr);
+  }
+
+  /**
+   * Turn an instance of TTarget that should not be reference counted
+   * (e.g., allocated into an arena with placement new) into an
+   * intrusive_ptr. This is gratuitously unsafe and should only be
+   * used if you can guarantee that the pointer will not escape and be
+   * refcounted as normal.
+   *
+   * `expected_decrefs` is a debugging parameter: it indicates the
+   * number of strong owners the intrusive_ptr_target in question is
+   * expected to get. In most use cases, this will likely be 1.
+   *
+   * The reason this method exists is for manually sharing
+   * StorageImpls across Tensors in the static runtime. It needs
+   * access to private intrusive_ptr members so that the refcounts can
+   * be initialized to custom values.
+   */
+  static intrusive_ptr unsafe_adapt_non_heap_allocated(
+      TTarget* raw_ptr,
+      uint32_t expected_decrefs) {
+    intrusive_ptr result(raw_ptr, raw::DontIncreaseRefcount{});
+```
+- **EN**: It introduces or extends new, which define the main data structures or interfaces for this portion of the file. This chunk defines `unsafe_adapt_non_heap_allocated`, which manages allocation, reuse, or release decisions for runtime memory. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 new，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `unsafe_adapt_non_heap_allocated`，其作用是管理运行时内存的分配、复用或释放决策。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 708-741
+```cpp
+    // kImpracticallyHugeReferenceCount is impractically huge for a reference
+    // count, while being in no danger of overflowing uint32_t. We actually only
+    // need to initialize the refcount to 2 -- we are just doing an unbalanced
+    // incref to prevent the non-heap-allocated target from being
+    // freed, and we are optimizing that incref by directly
+    // initializing the refcounts rather than doing an expensive
+    // atomic increment. The reason to use kImpracticallyHugeReferenceCount is
+    // to accommodate the debug assertions in ~intrusive_ptr_target.
+#ifdef NDEBUG
+    expected_decrefs = 0;
+#endif
+    result.target_->combined_refcount_.store(
+        detail::refcount(
+            detail::kImpracticallyHugeReferenceCount + expected_decrefs) |
+            detail::kImpracticallyHugeWeakReferenceCount,
+        std::memory_order_relaxed);
+    return result;
+  }
+
+  /**
+   * Turn a **non-owning raw pointer** to an intrusive_ptr.  It is
+   * the moral equivalent of enable_shared_from_this on a shared pointer.
+   *
+   * This method is only valid for objects that are already live.  If
+   * you are looking for the moral equivalent of unique_ptr<T>(T*)
+   * constructor, see steal_from_new.
+   *
+   * TODO: https://github.com/pytorch/pytorch/issues/56482
+   */
+  static intrusive_ptr unsafe_reclaim_from_nonowning(TTarget* raw_ptr) {
+    // See Note [Stack allocated intrusive_ptr_target safety]
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+        raw_ptr == NullType::singleton() || raw_ptr->refcount() > 0,
+        "intrusive_ptr: Can only reclaim pointers that are owned by someone");
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `unique_ptr<T>`, which implements a reusable low-level helper for higher-level runtime code. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `unique_ptr<T>`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 742-769
+```cpp
+    auto ptr = reclaim(raw_ptr); // doesn't increase refcount
+    ptr.retain_();
+    return ptr;
+  }
+};
+
+template <
+    class TTarget,
+    class NullType = detail::intrusive_target_default_null_type<TTarget>,
+    class... Args>
+inline intrusive_ptr<TTarget, NullType> make_intrusive(Args&&... args) {
+  return intrusive_ptr<TTarget, NullType>::make(std::forward<Args>(args)...);
+}
+
+template <class TTarget, class NullType>
+inline void swap(
+    intrusive_ptr<TTarget, NullType>& lhs,
+    intrusive_ptr<TTarget, NullType>& rhs) noexcept {
+  lhs.swap(rhs);
+}
+
+// To allow intrusive_ptr inside std::map or std::set, we need operator<
+template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+inline bool operator<(
+    const intrusive_ptr<TTarget1, NullType1>& lhs,
+    const intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return lhs.get() < rhs.get();
+}
+```
+- **EN**: It introduces or extends TTarget, NullType, TTarget, and 5 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `get`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 TTarget、NullType、TTarget 等共 8 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `get`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 771-804
+```cpp
+template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+inline bool operator==(
+    const intrusive_ptr<TTarget1, NullType1>& lhs,
+    const intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return lhs.get() == rhs.get();
+}
+
+template <class TTarget1, class NullType1>
+inline bool operator==(
+    const intrusive_ptr<TTarget1, NullType1>& lhs,
+    std::nullptr_t) noexcept {
+  return lhs.get() == nullptr;
+}
+
+template <class TTarget2, class NullType2>
+inline bool operator==(
+    std::nullptr_t,
+    const intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return nullptr == rhs.get();
+}
+
+template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+inline bool operator!=(
+    const intrusive_ptr<TTarget1, NullType1>& lhs,
+    const intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return !operator==(lhs, rhs);
+}
+
+template <class TTarget1, class NullType1>
+inline bool operator!=(
+    const intrusive_ptr<TTarget1, NullType1>& lhs,
+    std::nullptr_t) noexcept {
+  return !operator==(lhs, nullptr);
+}
+```
+- **EN**: It introduces or extends TTarget1, NullType1, TTarget2, and 11 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `get`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 TTarget1、NullType1、TTarget2 等共 14 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `get`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 806-838
+```cpp
+template <class TTarget2, class NullType2>
+inline bool operator!=(
+    std::nullptr_t,
+    const intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return !operator==(nullptr, rhs);
+}
+template <typename T>
+struct MaybeOwnedTraits<c10::intrusive_ptr<T>> {
+  using owned_type = c10::intrusive_ptr<T>;
+  using borrow_type = c10::intrusive_ptr<T>;
+
+  static borrow_type createBorrow(const owned_type& from) {
+    return borrow_type::reclaim(from.get());
+  }
+
+  static void assignBorrow(borrow_type& lhs, const borrow_type& rhs) {
+    lhs.release();
+    lhs = borrow_type::reclaim(rhs.get());
+  }
+
+  static void destroyBorrow(borrow_type& toDestroy) {
+    toDestroy.release();
+  }
+
+  static const owned_type& referenceFromBorrow(
+      const borrow_type& borrow) noexcept {
+    return borrow;
+  }
+
+  static const owned_type* pointerFromBorrow(
+      const borrow_type& borrow) noexcept {
+    return &borrow;
+  }
+```
+- **EN**: It introduces or extends TTarget2, NullType2, MaybeOwnedTraits, and 2 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `pointerFromBorrow`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 TTarget2、NullType2、MaybeOwnedTraits 等共 5 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `pointerFromBorrow`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 840-869
+```cpp
+  static bool debugBorrowIsValid(const borrow_type& /*borrow*/) noexcept {
+    return true;
+  }
+};
+
+template <
+    typename TTarget,
+    class NullType = detail::intrusive_target_default_null_type<TTarget>>
+class weak_intrusive_ptr final {
+ private:
+  static_assert(
+      std::is_base_of_v<intrusive_ptr_target, TTarget>,
+      "intrusive_ptr can only be used for classes that inherit from intrusive_ptr_target.");
+#ifndef _WIN32
+  // This static_assert triggers on MSVC
+  //  error C2131: expression did not evaluate to a constant
+  static_assert(
+      NullType::singleton() == NullType::singleton(),
+      "NullType must have a constexpr singleton() method");
+#endif
+  static_assert(
+      std::is_base_of_v<
+          TTarget,
+          std::remove_pointer_t<decltype(NullType::singleton())>>,
+      "NullType::singleton() must return a element_type* pointer");
+
+  TTarget* target_;
+
+  template <class TTarget2, class NullType2>
+  friend class weak_intrusive_ptr;
+```
+- **EN**: The preprocessor guard keeps declarations single-instanced when this header is included transitively. It introduces or extends NullType, weak_intrusive_ptr, TTarget2, and 2 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `static_assert`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 预处理器保护用于避免头文件在传递包含时被重复展开。 它引入或扩展了 NullType、weak_intrusive_ptr、TTarget2 等共 5 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `static_assert`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 871-902
+```cpp
+  void retain_() {
+    if (target_ != NullType::singleton()) {
+      uint32_t new_weakcount =
+          detail::atomic_weakcount_increment(target_->combined_refcount_);
+      TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+          new_weakcount != 1,
+          "weak_intrusive_ptr: Cannot increase weakcount after it reached zero.");
+    }
+  }
+
+  void reset_() noexcept {
+    if (target_ != NullType::singleton() &&
+        detail::atomic_weakcount_decrement(target_->combined_refcount_) == 0) {
+      // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDelete)
+      delete target_;
+    }
+    target_ = NullType::singleton();
+  }
+
+  constexpr explicit weak_intrusive_ptr(TTarget* target) : target_(target) {}
+
+ public:
+  using element_type = TTarget;
+
+  explicit weak_intrusive_ptr(const intrusive_ptr<TTarget, NullType>& ptr)
+      : weak_intrusive_ptr(ptr.get()) {
+    retain_();
+  }
+
+  weak_intrusive_ptr(weak_intrusive_ptr&& rhs) noexcept : target_(rhs.target_) {
+    rhs.target_ = NullType::singleton();
+  }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. It introduces or extends element_type, which define the main data structures or interfaces for this portion of the file. This chunk defines `weak_intrusive_ptr`, which implements a reusable low-level helper for higher-level runtime code. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 它引入或扩展了 element_type，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `weak_intrusive_ptr`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。
+
+### Lines 904-933
+```cpp
+  template <class From, class FromNullType>
+  /* implicit */ weak_intrusive_ptr(
+      // NOLINTNEXTLINE(cppcoreguidelines-rvalue-reference-param-not-moved)
+      weak_intrusive_ptr<From, FromNullType>&& rhs) noexcept
+      : target_(
+            detail::assign_ptr_<TTarget, NullType, FromNullType>(rhs.target_)) {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. weak_intrusive_ptr move constructor got pointer of wrong type.");
+    rhs.target_ = FromNullType::singleton();
+  }
+
+  weak_intrusive_ptr(const weak_intrusive_ptr& rhs) : target_(rhs.target_) {
+    retain_();
+  }
+
+  template <class From, class FromNullType>
+  /* implicit */ weak_intrusive_ptr(
+      const weak_intrusive_ptr<From, FromNullType>& rhs)
+      : target_(
+            detail::assign_ptr_<TTarget, NullType, FromNullType>(rhs.target_)) {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. weak_intrusive_ptr copy constructor got pointer of wrong type.");
+    retain_();
+  }
+
+  ~weak_intrusive_ptr() noexcept {
+    reset_();
+  }
+```
+- **EN**: It introduces or extends From, FromNullType, From, and 1 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `reset_`, which maintains lookup structures and hashing behavior for fast metadata access. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently.
+- **CN**: 它引入或扩展了 From、FromNullType、From 等共 4 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `reset_`，其作用是维护查找结构与哈希行为，以便快速访问元数据。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。
+
+### Lines 935-964
+```cpp
+  weak_intrusive_ptr& operator=(weak_intrusive_ptr&& rhs) & noexcept {
+    // NOLINTNEXTLINE(*assign*)
+    return this->template operator= <TTarget, NullType>(std::move(rhs));
+  }
+
+  template <class From, class FromNullType>
+  weak_intrusive_ptr& operator=(
+      weak_intrusive_ptr<From, FromNullType>&& rhs) & noexcept {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. weak_intrusive_ptr move assignment got pointer of wrong type.");
+    weak_intrusive_ptr tmp = std::move(rhs);
+    swap(tmp);
+    return *this;
+  }
+
+  weak_intrusive_ptr& operator=(const weak_intrusive_ptr& rhs) & noexcept {
+    if (this == &rhs) {
+      return *this;
+    }
+    // NOLINTNEXTLINE(*assign*)
+    return this->template operator= <TTarget, NullType>(rhs);
+  }
+
+  weak_intrusive_ptr& operator=(
+      const intrusive_ptr<TTarget, NullType>& rhs) & noexcept {
+    weak_intrusive_ptr tmp(rhs);
+    swap(tmp);
+    return *this;
+  }
+```
+- **EN**: It introduces or extends From, FromNullType, which define the main data structures or interfaces for this portion of the file. This chunk defines `tmp`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 From、FromNullType，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `tmp`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 966-999
+```cpp
+  template <class From, class FromNullType>
+  weak_intrusive_ptr& operator=(
+      const weak_intrusive_ptr<From, NullType>& rhs) & noexcept {
+    static_assert(
+        std::is_convertible_v<From*, TTarget*>,
+        "Type mismatch. weak_intrusive_ptr copy assignment got pointer of wrong type.");
+    weak_intrusive_ptr tmp = rhs;
+    swap(tmp);
+    return *this;
+  }
+
+  void reset() noexcept {
+    reset_();
+  }
+
+  void swap(weak_intrusive_ptr& rhs) noexcept {
+    TTarget* tmp = target_;
+    target_ = rhs.target_;
+    rhs.target_ = tmp;
+  }
+
+  // NB: This should ONLY be used by the std::hash implementation
+  // for weak_intrusive_ptr.  Another way you could do this is
+  // friend std::hash<weak_intrusive_ptr>, but this triggers two
+  // bugs:
+  //
+  //  (1) It triggers an nvcc bug, where std::hash in a friend class
+  //      declaration gets preprocessed into hash, which then cannot
+  //      actually be found.  The error in this case looks like:
+  //
+  //        error: no template named 'hash'; did you mean 'std::hash'?
+  //
+  //  (2) On OS X, std::hash is declared as a struct, not a class.
+  //      This twings:
+```
+- **EN**: It introduces or extends From, FromNullType, which define the main data structures or interfaces for this portion of the file. This chunk defines `reset_`, which maintains lookup structures and hashing behavior for fast metadata access. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 From、FromNullType，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `reset_`，其作用是维护查找结构与哈希行为，以便快速访问元数据。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1000-1029
+```cpp
+  //
+  //        error: class 'hash' was previously declared as a struct
+  //        [-Werror,-Wmismatched-tags]
+  //
+  // Both of these are work-aroundable, but on the whole, I decided
+  // it would be simpler and easier to make work if we just expose
+  // an unsafe getter for target_
+  //
+  TTarget* _unsafe_get_target() const noexcept {
+    return target_;
+  }
+
+  uint32_t use_count() const noexcept {
+    if (target_ == NullType::singleton()) {
+      return 0;
+    }
+    return target_->refcount(
+        std::memory_order_relaxed); // refcount, not weakcount!
+  }
+
+  uint32_t weak_use_count() const noexcept {
+    if (target_ == NullType::singleton()) {
+      return 0;
+    }
+    return target_->weakcount(std::memory_order_relaxed);
+  }
+
+  bool expired() const noexcept {
+    return use_count() == 0;
+  }
+```
+- **EN**: This chunk defines `expired`, which implements a reusable low-level helper for higher-level runtime code. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段定义了 `expired`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1031-1061
+```cpp
+  intrusive_ptr<TTarget, NullType> lock() const noexcept {
+    if (target_ == NullType::singleton()) {
+      return intrusive_ptr<TTarget, NullType>();
+    } else {
+      bool increfed = false;
+      auto combined_refcount =
+          target_->combined_refcount_.load(std::memory_order_relaxed);
+      do {
+        if (detail::refcount(combined_refcount) == 0) {
+          // Object already destructed, no strong references left anymore.
+          // Return nullptr.
+          return intrusive_ptr<TTarget, NullType>();
+        }
+        if constexpr (detail::TargetTraits<TTarget>::can_have_pyobject) {
+          if (detail::has_pyobject(combined_refcount) &&
+              detail::refcount(combined_refcount) == 1 && !increfed) {
+            // Object has a python wrapper with no other C++ references.
+            // We need to to incref the Python object before we acquire a
+            // strong reference to the C++ object to avoid a situation
+            // where the Python object is deallocated concurrently.
+            if (!target_->try_incref_pyobject()) {
+              return intrusive_ptr<TTarget, NullType>();
+            }
+            increfed = true;
+          }
+        }
+      } while (!target_->combined_refcount_.compare_exchange_weak(
+          combined_refcount,
+          combined_refcount + detail::kReferenceCountOne,
+          std::memory_order_acquire,
+          std::memory_order_relaxed));
+```
+- **EN**: This chunk defines `constexpr`, which implements a reusable low-level helper for higher-level runtime code. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Synchronization primitives protect shared state and make concurrent updates deterministic enough for runtime use. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段定义了 `constexpr`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 同步原语用于保护共享状态，并让并发更新在运行时场景下保持足够确定。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1063-1086
+```cpp
+      if constexpr (detail::TargetTraits<TTarget>::can_have_pyobject) {
+        if (increfed && detail::refcount(combined_refcount) != 1) {
+          target_->decref_pyobject();
+        }
+      }
+
+      return intrusive_ptr<TTarget, NullType>(
+          target_, raw::DontIncreaseRefcount{});
+    }
+  }
+
+  /**
+   * Returns an owning (but still only weakly referenced) pointer to the
+   * underlying object and makes the weak_intrusive_ptr instance invalid.
+   * That means the weakcount is not decreased.
+   * You *must* put the returned pointer back into a weak_intrusive_ptr using
+   * weak_intrusive_ptr::reclaim(ptr) to properly destruct it.
+   * This is helpful for C APIs.
+   */
+  TTarget* release() noexcept {
+    TTarget* result = target_;
+    target_ = NullType::singleton();
+    return result;
+  }
+```
+- **EN**: This chunk defines `singleton`, which converts one representation into another form used by nearby runtime code. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段定义了 `singleton`，其作用是把一种表示转换为附近运行时代码使用的另一种形式。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1088-1118
+```cpp
+  /**
+   * Takes an owning (but must be weakly referenced) pointer to TTarget* and
+   * creates a weak_intrusive_ptr that takes over ownership.
+   * This means that the weakcount is not increased.
+   * This is the counter-part to weak_intrusive_ptr::release() and the pointer
+   * passed in *must* have been created using weak_intrusive_ptr::release().
+   */
+  static weak_intrusive_ptr reclaim(TTarget* owning_weak_ptr) {
+    // See Note [Stack allocated intrusive_ptr_target safety]
+    // if refcount > 0, weakcount must be >1 for weak references to exist.
+    // see weak counting explanation at top of this file.
+    // if refcount == 0, weakcount only must be >0.
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(
+        owning_weak_ptr == NullType::singleton() ||
+            owning_weak_ptr->weakcount() > 1 ||
+            (owning_weak_ptr->refcount() == 0 &&
+             owning_weak_ptr->weakcount() > 0),
+        "weak_intrusive_ptr: Can only weak_intrusive_ptr::reclaim() owning pointers that were created using weak_intrusive_ptr::release().");
+    return weak_intrusive_ptr(owning_weak_ptr);
+  }
+
+  /**
+   * Takes a pointer to TTarget* (may be weak or strong) and creates a
+   * new weak_intrusive_ptr representing a new weak reference, i.e.
+   * the raw pointer retains ownership.
+   */
+  static weak_intrusive_ptr reclaim_copy(TTarget* owning_ptr) {
+    auto ret = reclaim(owning_ptr);
+    ret.retain_();
+    return ret;
+  }
+```
+- **EN**: This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. It introduces or extends weak_intrusive_ptr, weak_intrusive_ptr, which define the main data structures or interfaces for this portion of the file. This chunk defines `retain_`, which implements a reusable low-level helper for higher-level runtime code. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Memory-management logic tracks ownership, requested sizes, reuse opportunities, or allocator configuration. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 它引入或扩展了 weak_intrusive_ptr、weak_intrusive_ptr，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `retain_`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 内存管理逻辑会跟踪所有权、申请尺寸、复用机会或分配器配置。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1120-1150
+```cpp
+  template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+  friend bool operator<(
+      const weak_intrusive_ptr<TTarget1, NullType1>& lhs,
+      const weak_intrusive_ptr<TTarget2, NullType2>& rhs) noexcept;
+  template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+  friend bool operator==(
+      const weak_intrusive_ptr<TTarget1, NullType1>& lhs,
+      const weak_intrusive_ptr<TTarget2, NullType2>& rhs) noexcept;
+};
+
+template <class TTarget, class NullType>
+inline void swap(
+    weak_intrusive_ptr<TTarget, NullType>& lhs,
+    weak_intrusive_ptr<TTarget, NullType>& rhs) noexcept {
+  lhs.swap(rhs);
+}
+
+// To allow weak_intrusive_ptr inside std::map or std::set, we need operator<
+template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+inline bool operator<(
+    const weak_intrusive_ptr<TTarget1, NullType1>& lhs,
+    const weak_intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return lhs.target_ < rhs.target_;
+}
+
+template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+inline bool operator==(
+    const weak_intrusive_ptr<TTarget1, NullType1>& lhs,
+    const weak_intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return lhs.target_ == rhs.target_;
+}
+```
+- **EN**: It introduces or extends TTarget1, NullType1, TTarget2, and 15 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `swap`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 它引入或扩展了 TTarget1、NullType1、TTarget2 等共 18 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `swap`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1152-1184
+```cpp
+template <class TTarget1, class NullType1, class TTarget2, class NullType2>
+inline bool operator!=(
+    const weak_intrusive_ptr<TTarget1, NullType1>& lhs,
+    const weak_intrusive_ptr<TTarget2, NullType2>& rhs) noexcept {
+  return !operator==(lhs, rhs);
+}
+
+// Alias for documentary purposes, to more easily distinguish
+// weak raw intrusive pointers from intrusive pointers.
+using weak_intrusive_ptr_target = intrusive_ptr_target;
+
+// This namespace provides some methods for working with
+// raw pointers that subclass intrusive_ptr_target.  They are not provided
+// as methods on intrusive_ptr_target, because ideally you would not need these
+// methods at all (use smart pointers), but if you are dealing with legacy code
+// that still needs to pass around raw pointers, you may find these quite
+// useful.
+//
+// An important usage note: some functions are only valid if you have a
+// strong raw pointer to the object, while others are only valid if you
+// have a weak raw pointer to the object.  ONLY call intrusive_ptr namespace
+// functions on strong pointers, and weak_intrusive_ptr namespace functions
+// on weak pointers.  If you mix it up, you may get an assert failure.
+namespace raw {
+
+namespace intrusive_ptr {
+
+// WARNING: Unlike the reclaim() API, it is NOT valid to pass
+// NullType::singleton to this function
+inline void incref(intrusive_ptr_target* self) {
+  if (self) {
+    uint64_t combined = detail::atomic_combined_refcount_increment(
+        self->combined_refcount_, detail::kReferenceCountOne);
+```
+- **EN**: The namespace declarations place the code inside raw, intrusive_ptr, matching the surrounding subsystem. It introduces or extends TTarget1, NullType1, TTarget2, and 2 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `atomic_combined_refcount_increment`, which updates reference counts and ownership state for shared objects. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Looping logic walks collections, device tables, or metadata arrays so the same rule is applied systematically. Conditional branches split fast paths, error cases, and special-case invariants. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 命名空间声明把代码放入 raw、intrusive_ptr 中，与周边子系统保持一致。 它引入或扩展了 TTarget1、NullType1、TTarget2 等共 5 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `atomic_combined_refcount_increment`，其作用是更新共享对象的引用计数与所有权状态。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 循环逻辑会遍历集合、设备表或元数据数组，从而把同一规则系统地应用到每个元素。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1186-1219
+```cpp
+#ifndef C10_MOBILE
+    if (detail::has_pyobject(combined) && detail::refcount(combined) == 2) {
+      self->incref_pyobject();
+    }
+#else
+    TORCH_INTERNAL_ASSERT_DEBUG_ONLY(!detail::has_pyobject(combined));
+#endif
+  }
+}
+
+// WARNING: Unlike the reclaim() API, it is NOT valid to pass
+// NullType::singleton to this function
+inline void decref(intrusive_ptr_target* self) {
+  // Let it die
+  c10::intrusive_ptr<intrusive_ptr_target>::reclaim(self);
+  // NB: Caller still has 'self' pointer, but it's now invalid.
+  // If you want more safety, used the actual c10::intrusive_ptr class
+}
+
+template <typename T>
+inline T* make_weak(T* self) {
+  // NB: 'this' is a strong pointer, but we return a weak pointer
+  auto ptr = c10::intrusive_ptr<T>::reclaim(self);
+  c10::weak_intrusive_ptr<T> wptr(ptr);
+  ptr.release();
+  return wptr.release();
+}
+
+inline uint32_t use_count(intrusive_ptr_target* self) {
+  auto ptr = c10::intrusive_ptr<intrusive_ptr_target>::reclaim(self);
+  auto r = ptr.use_count();
+  ptr.release();
+  return r;
+}
+```
+- **EN**: The preprocessor guard keeps declarations single-instanced when this header is included transitively. This chunk introduces or expands unit-test cases that encode the expected behavior and regression boundaries of the target component. This chunk defines `use_count`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Preprocessor and exported-macro usage adapts the code to compiler, platform, and visibility constraints. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Conditional branches split fast paths, error cases, and special-case invariants. Assertions and failure paths make invalid states fail early instead of silently propagating corruption. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 预处理器保护用于避免头文件在传递包含时被重复展开。 这一段引入或扩展了单元测试用例，用来编码目标组件的预期行为与回归边界。 这一段定义了 `use_count`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 预处理器与导出宏的使用让代码适配编译器、平台以及可见性约束。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 条件分支用于区分快速路径、错误场景以及特殊情况不变量。 断言与失败路径让非法状态尽早暴露，而不是悄悄传播错误。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1221-1252
+```cpp
+} // namespace intrusive_ptr
+
+namespace weak_intrusive_ptr {
+
+inline void incref(weak_intrusive_ptr_target* self) {
+  detail::atomic_weakcount_increment(self->combined_refcount_);
+}
+
+inline void decref(weak_intrusive_ptr_target* self) {
+  // Let it die
+  c10::weak_intrusive_ptr<intrusive_ptr_target>::reclaim(self);
+  // NB: You still "have" the 'self' pointer, but it's now invalid.
+  // If you want more safety, used the actual c10::weak_intrusive_ptr class
+}
+
+template <typename T>
+inline T* lock(T* self) {
+  auto wptr = c10::weak_intrusive_ptr<T>::reclaim(self);
+  auto ptr = wptr.lock();
+  wptr.release();
+  return ptr.release();
+}
+
+// This gives the STRONG refcount of a WEAK pointer
+inline uint32_t use_count(weak_intrusive_ptr_target* self) {
+  auto wptr = c10::weak_intrusive_ptr<intrusive_ptr_target>::reclaim(self);
+  auto r = wptr.use_count();
+  wptr.release();
+  return r;
+}
+
+} // namespace weak_intrusive_ptr
+```
+- **EN**: The namespace declarations place the code inside weak_intrusive_ptr, matching the surrounding subsystem. This chunk defines `use_count`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 命名空间声明把代码放入 weak_intrusive_ptr 中，与周边子系统保持一致。 这一段定义了 `use_count`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+### Lines 1254-1273
+```cpp
+} // namespace raw
+
+} // namespace c10
+
+namespace std {
+// To allow intrusive_ptr and weak_intrusive_ptr inside std::unordered_map or
+// std::unordered_set, we need std::hash
+template <class TTarget, class NullType>
+struct hash<c10::intrusive_ptr<TTarget, NullType>> {
+  size_t operator()(const c10::intrusive_ptr<TTarget, NullType>& x) const {
+    return std::hash<TTarget*>()(x.get());
+  }
+};
+template <class TTarget, class NullType>
+struct hash<c10::weak_intrusive_ptr<TTarget, NullType>> {
+  size_t operator()(const c10::weak_intrusive_ptr<TTarget, NullType>& x) const {
+    return std::hash<TTarget*>()(x._unsafe_get_target());
+  }
+};
+} // namespace std
+```
+- **EN**: The namespace declarations place the code inside std, matching the surrounding subsystem. It introduces or extends TTarget, NullType, hash, and 3 more, which define the main data structures or interfaces for this portion of the file. This chunk defines `_unsafe_get_target`, which implements a reusable low-level helper for higher-level runtime code. Template machinery keeps the implementation reusable across scalar types, pointer targets, or backend-specific policies. Reference-count operations preserve strong/weak ownership invariants for shared runtime objects. Container logic organizes metadata, caches, or lookup state so surrounding code can access it efficiently. The tail returns accumulated results or hands the updated state back to the caller.
+- **CN**: 命名空间声明把代码放入 std 中，与周边子系统保持一致。 它引入或扩展了 TTarget、NullType、hash 等共 6 项，这些类型定义了本段涉及的主要数据结构或接口。 这一段定义了 `_unsafe_get_target`，其作用是实现供更高层运行时代码复用的底层辅助逻辑。 模板机制让实现能够在标量类型、指针目标或后端策略之间复用。 引用计数操作用于维护共享运行时对象的强/弱所有权不变量。 容器逻辑用于组织元数据、缓存或查找状态，从而让周边代码能够高效访问。 末尾会返回累积结果，或把更新后的状态交还给调用方。
+
+
+## Key Concepts / 关键概念
+- **Utility layer**
+  - EN: Provides low-level c10 utilities for ownership, containers, hashing, type traits, errors, and portability.
+  - CN: 提供 c10 的底层工具能力，包括所有权管理、容器、哈希、类型萃取、错误处理与可移植性支持。
+- **class_**
+  - EN: `class_` is one of the dominant symbols declared or implemented in this file.
+  - CN: `class_` 是本文件声明或实现的关键符号之一。
+- **PyObjectPreservation**
+  - EN: `PyObjectPreservation` is one of the dominant symbols declared or implemented in this file.
+  - CN: `PyObjectPreservation` 是本文件声明或实现的关键符号之一。
+- **Tensor representation**
+  - EN: Owns tensor metadata, storage linkage, and dispatch-visible state.
+  - CN: 持有张量元数据、存储关联关系以及对分发可见的状态。
+- **Storage ownership**
+  - EN: Separates raw memory ownership from higher-level tensor metadata.
+  - CN: 把原始内存所有权与更高层的张量元数据解耦。
+- **Intrusive ownership**
+  - EN: Uses embedded refcounts instead of external control blocks to manage object lifetimes.
+  - CN: 使用嵌入式引用计数而非外部控制块来管理对象生命周期。
+
+## Dependencies / 依赖关系
+- **Internal includes / 内部依赖**: `c10/util/Exception.h`、`c10/util/MaybeOwned.h`
+- **Third-party includes / 第三方依赖**: 无
+- **Standard includes / 标准库依赖**: `atomic`、`climits`、`memory`、`type_traits`
+- **System includes / 系统依赖**: 无
+- **Namespaces / 命名空间**: `pybind11`、`torch::utils`、`c10`、`raw`、`weak_intrusive_ptr`、`intrusive_ptr`、`detail`、`std`
+- **Representative symbols / 代表性符号**: `class_`、`PyObjectPreservation`、`intrusive_ptr_target`、`DontIncreaseRefcount`、`TTarget`、`intrusive_target_default_null_type`、`ToNullType`、`FromNullType`、`T`、`TargetTraits`

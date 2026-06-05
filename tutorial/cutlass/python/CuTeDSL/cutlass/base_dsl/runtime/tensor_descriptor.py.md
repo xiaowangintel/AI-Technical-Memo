@@ -1,0 +1,231 @@
+# tensor_descriptor.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/runtime/tensor_descriptor.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (TensorDescriptor) and 2 functions (from_tensor, to_tensor) in `CuTeDSL.cutlass.base_dsl.runtime.tensor_descriptor`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.runtime.tensor_descriptor` 定义了 1 个类（TensorDescriptor） 和 2 个函数（from_tensor, to_tensor）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `# Helpers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L13** `import itertools, operator` — **EN:** Imports itertools, operator for later use. **CN:** 导入 itertools, operator 供后续使用。
+- **L14** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L15** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from . import dlpack_types as _dpack` — **EN:** Imports dlpack_types as _dpack from the current package. **CN:** 从当前包导入 dlpack_types as _dpack。
+- **L18** `from .dlpack_runtime import (  # type: ignore[import-not-found]` — **EN:** Imports dlpack_to_tensor_desc, get_tensor_desc_data_ptr, get_tensor_desc_is_in_device, get_tensor_desc_element_type, get_tensor_desc_shape, get_tensor_desc_stride, ... (+6 more) from `.dlpack_runtime`. **CN:** 从 `.dlpack_runtime` 导入 dlpack_to_tensor_desc, get_tensor_desc_data_ptr, get_tensor_desc_is_in_device, get_tensor_desc_element_type, get_tensor_desc_shape, get_tensor_desc_stride, ... (+6 more)。
+- **L19** `    dlpack_to_tensor_desc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    get_tensor_desc_data_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    get_tensor_desc_is_in_device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    get_tensor_desc_element_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    get_tensor_desc_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    get_tensor_desc_stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    get_tensor_desc_element_size_in_bytes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    get_tensor_desc_ndim,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    get_tensor_desc_dtype_code,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    get_tensor_desc_dtype_bits,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    get_tensor_desc_device_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    get_tensor_desc_device_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `from ..utils.logger import log` — **EN:** Imports log from `..utils.logger`. **CN:** 从 `..utils.logger` 导入 log。
+- **L34** `from ..common import *` — **EN:** Imports * from `..common`. **CN:** 从 `..common` 导入 *。
+- **L35** `from ..typing import (` — **EN:** Imports Boolean, Float8E5M2, Int64, Int32, Int16, Int8, ... (+8 more) from `..typing`. **CN:** 从 `..typing` 导入 Boolean, Float8E5M2, Int64, Int32, Int16, Int8, ... (+8 more)。
+- **L36** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    Int16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    Uint64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    Uint32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    Uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    Float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    Float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    BFloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `class TensorDescriptor:` — **EN:** Defines class `TensorDescriptor`. **CN:** 定义类 `TensorDescriptor`。
+- **L54** `    def __init__(self, tensor: Any) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L55** `        """Initialize with a tensor that supports the DLPack protocol.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `        Args:` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L58** `            tensor: Any tensor object that implements __dlpack__ and __dlpack_device__` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L59** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `        self.tensor = tensor` — **EN:** Assigns a value to self.tensor. **CN:** 将一个值赋给 self.tensor。
+- **L62** `        self._capsule = dlpack_to_tensor_desc(tensor)` — **EN:** Assigns a value to self._capsule. **CN:** 将一个值赋给 self._capsule。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `        self.data_ptr = get_tensor_desc_data_ptr(self._capsule)` — **EN:** Assigns a value to self.data_ptr. **CN:** 将一个值赋给 self.data_ptr。
+- **L65** `        self.device_type = get_tensor_desc_device_type(self._capsule)` — **EN:** Assigns a value to self.device_type. **CN:** 将一个值赋给 self.device_type。
+- **L66** `        self.device_type = _dpack.DLDeviceType(self.device_type)` — **EN:** Assigns a value to self.device_type. **CN:** 将一个值赋给 self.device_type。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `        if self.device_type == _dpack.DLDeviceType.kDLGPU:` — **EN:** Starts a conditional branch guarded by `self.device_type == _dpack.DLDeviceType.kDLGPU`. **CN:** 开始一个由 `self.device_type == _dpack.DLDeviceType.kDLGPU` 控制的条件分支。
+- **L69** `            self.device_pointer = self.data_ptr` — **EN:** Assigns a value to self.device_pointer. **CN:** 将一个值赋给 self.device_pointer。
+- **L70** `        elif self.device_type == _dpack.DLDeviceType.kDLCPU:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L71** `            self.device_pointer = None` — **EN:** Assigns a value to self.device_pointer. **CN:** 将一个值赋给 self.device_pointer。
+- **L72** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L73** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** `                f"DLPack device type is not supported {self.dl_tensor.device.device_type}"  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `        log().info("TensorDescriptor is created = [%s]", self)  # type: ignore[union-attr]` — **EN:** Invokes `log().info` as a standalone call. **CN:** 以独立语句方式调用 `log().info`。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L80** `    def can_transformed_to_dlpack(dl_tensor: object) -> bool:` — **EN:** Defines function `can_transformed_to_dlpack`. **CN:** 定义函数 `can_transformed_to_dlpack`。
+- **L81** `        if not hasattr(dl_tensor, "__dlpack__") or not hasattr(` — **EN:** Starts a conditional branch guarded by `not hasattr(dl_tensor, '__dlpack__') or not hasattr(dl_te...`. **CN:** 开始一个由 `not hasattr(dl_tensor, '__dlpack__') or not hasattr(dl_te...` 控制的条件分支。
+- **L82** `            dl_tensor, "__dlpack_device__"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L83** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L84** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L88** `    def is_in_device(self) -> bool:` — **EN:** Defines function `is_in_device`. **CN:** 定义函数 `is_in_device`。
+- **L89** `        """Check if the tensor is stored on a device."""` — **EN:** Docstring line documenting the function `is_in_device`. **CN:** 文档字符串行，用于说明 function `is_in_device`。
+- **L90** `        return not self.device_pointer is None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L93** `    def device_id(self) -> int:` — **EN:** Defines function `device_id`. **CN:** 定义函数 `device_id`。
+- **L94** `        """Return device id where tensor resides."""` — **EN:** Docstring line documenting the function `device_id`. **CN:** 文档字符串行，用于说明 function `device_id`。
+- **L95** `        if self.is_in_device:` — **EN:** Starts a conditional branch guarded by `self.is_in_device`. **CN:** 开始一个由 `self.is_in_device` 控制的条件分支。
+- **L96** `            return get_tensor_desc_device_id(self._capsule)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** `        return -1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L100** `    def pointer(self) -> Any:` — **EN:** Defines function `pointer`. **CN:** 定义函数 `pointer`。
+- **L101** `        """` — **EN:** Starts the docstring for the function `pointer`. **CN:** 开始说明 function `pointer` 的文档字符串。
+- **L102** `        Returns the pointer to the tensor data. This is either the device pointer or the data pointer if the data is not` — **EN:** Continues the docstring for the function `pointer`. **CN:** 继续说明 function `pointer` 的文档字符串。
+- **L103** `        in a device.` — **EN:** Continues the docstring for the function `pointer`. **CN:** 继续说明 function `pointer` 的文档字符串。
+- **L104** `        """` — **EN:** Ends the docstring for the function `pointer`. **CN:** 结束说明 function `pointer` 的文档字符串。
+- **L105** `        return self.device_pointer if self.device_pointer is not None else self.data_ptr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L108** `    def element_type(self) -> type:` — **EN:** Defines function `element_type`. **CN:** 定义函数 `element_type`。
+- **L109** `        """Return the corresponding Python type based on DLPack dtype metadata."""` — **EN:** Docstring line documenting the function `element_type`. **CN:** 文档字符串行，用于说明 function `element_type`。
+- **L110** `        str_element_type = get_tensor_desc_element_type(self._capsule)` — **EN:** Assigns a value to str_element_type. **CN:** 将一个值赋给 str_element_type。
+- **L111** `        dtype_map = {` — **EN:** Assigns a value to dtype_map. **CN:** 将一个值赋给 dtype_map。
+- **L112** `            # bool is 8bit from numpy and torch` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L113** `            "Bool": Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `            "Int64": Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `            "Int32": Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `            "Int16": Int16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `            "Int8": Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `            "UInt64": Uint64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `            "UInt32": Uint32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `            "UInt16": Uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `            "UInt8": Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            "Float64": Float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `            "Float32": Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `            "Float16": Float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `            "BFloat16": BFloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `            "Float8E5M2": Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `        if str_element_type not in dtype_map:` — **EN:** Starts a conditional branch guarded by `str_element_type not in dtype_map`. **CN:** 开始一个由 `str_element_type not in dtype_map` 控制的条件分支。
+- **L130** `            raise KeyError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L131** `                f"Unsupported element type in dlpack: '{str_element_type}'. Supported types are: {list(dtype_map.keys())}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `        return dtype_map[str_element_type]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L137** `    def shape(self) -> tuple[int, ...]:` — **EN:** Defines function `shape`. **CN:** 定义函数 `shape`。
+- **L138** `        """Return the shape of the tensor."""` — **EN:** Docstring line documenting the function `shape`. **CN:** 文档字符串行，用于说明 function `shape`。
+- **L139** `        return get_tensor_desc_shape(self._capsule)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L142** `    def rank(self) -> int:` — **EN:** Defines function `rank`. **CN:** 定义函数 `rank`。
+- **L143** `        """Return the rank of the tensor."""` — **EN:** Docstring line documenting the function `rank`. **CN:** 文档字符串行，用于说明 function `rank`。
+- **L144** `        return get_tensor_desc_ndim(self._capsule)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L147** `    def strides(self) -> tuple[int, ...]:` — **EN:** Defines function `strides`. **CN:** 定义函数 `strides`。
+- **L148** `        """Return the rank of the tensor."""` — **EN:** Docstring line documenting the function `strides`. **CN:** 文档字符串行，用于说明 function `strides`。
+- **L149** `        return get_tensor_desc_stride(self._capsule)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L152** `    def element_size_in_bytes(self) -> int:` — **EN:** Defines function `element_size_in_bytes`. **CN:** 定义函数 `element_size_in_bytes`。
+- **L153** `        """Calculate the element size in bytes of the DLPack tensor."""` — **EN:** Docstring line documenting the function `element_size_in_bytes`. **CN:** 文档字符串行，用于说明 function `element_size_in_bytes`。
+- **L154** `        return get_tensor_desc_element_size_in_bytes(self._capsule)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L157** `    def size_in_bytes(self) -> int:` — **EN:** Defines function `size_in_bytes`. **CN:** 定义函数 `size_in_bytes`。
+- **L158** `        """Calculate the total size in bytes of the DLPack tensor."""` — **EN:** Docstring line documenting the function `size_in_bytes`. **CN:** 文档字符串行，用于说明 function `size_in_bytes`。
+- **L159** `        # Calculate the number of elements using the shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L160** `        ndim = get_tensor_desc_ndim(self._capsule)` — **EN:** Assigns a value to ndim. **CN:** 将一个值赋给 ndim。
+- **L161** `        shape = get_tensor_desc_shape(self._capsule)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L162** `        num_elements = 1` — **EN:** Assigns a value to num_elements. **CN:** 将一个值赋给 num_elements。
+- **L163** `        for i in range(ndim):` — **EN:** Starts a loop assigning items from `range(ndim)` to `i`. **CN:** 开始一个循环，将 `range(ndim)` 的元素赋给 `i`。
+- **L164** `            num_elements *= shape[i]` — **EN:** Updates num_elements in place. **CN:** 原地更新 num_elements。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `        # Total bytes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L167** `        total_bytes = self.element_size_in_bytes * num_elements` — **EN:** Assigns a value to total_bytes. **CN:** 将一个值赋给 total_bytes。
+- **L168** `        return total_bytes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L171** `        """Return a compact string representation of the device_tensor with a tensor prefix."""` — **EN:** Docstring line documenting the function `__str__`. **CN:** 文档字符串行，用于说明 function `__str__`。
+- **L172** `        # Extract shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L173** `        shape = "x".join(map(str, self.shape))` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `        # Extract dtype` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L176** `        dtype_code = get_tensor_desc_dtype_code(self._capsule)` — **EN:** Assigns a value to dtype_code. **CN:** 将一个值赋给 dtype_code。
+- **L177** `        dtype_bits = get_tensor_desc_dtype_bits(self._capsule)` — **EN:** Assigns a value to dtype_bits. **CN:** 将一个值赋给 dtype_bits。
+- **L178** `        dtype = (` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L179** `            f"i{dtype_bits}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `            if dtype_code == _dpack.DLDataTypeCode.kDLInt` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `            else f"f{dtype_bits}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `        # Extract device` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L185** `        device_type = "cpu" if not self.is_in_device else "gpu"` — **EN:** Assigns a value to device_type. **CN:** 将一个值赋给 device_type。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        return f"tensor<{shape}x{dtype}>_{device_type}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `    def _check_is_managed_by_framework(self) -> bool:` — **EN:** Defines function `_check_is_managed_by_framework`. **CN:** 定义函数 `_check_is_managed_by_framework`。
+- **L190** `        """` — **EN:** Starts the docstring for the function `_check_is_managed_by_framework`. **CN:** 开始说明 function `_check_is_managed_by_framework` 的文档字符串。
+- **L191** `        Ensure the tensor is not managed by the framework (e.g., GPU tensor).` — **EN:** Continues the docstring for the function `_check_is_managed_by_framework`. **CN:** 继续说明 function `_check_is_managed_by_framework` 的文档字符串。
+- **L192** `        Raises an exception if the tensor is framework-managed.` — **EN:** Continues the docstring for the function `_check_is_managed_by_framework`. **CN:** 继续说明 function `_check_is_managed_by_framework` 的文档字符串。
+- **L193** `        """` — **EN:** Ends the docstring for the function `_check_is_managed_by_framework`. **CN:** 结束说明 function `_check_is_managed_by_framework` 的文档字符串。
+- **L194** `        return self.device_type == _dpack.DLDeviceType.kDLGPU` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L197** `    def is_compatible(maybe_tensor_descriptor: object) -> bool:` — **EN:** Defines function `is_compatible`. **CN:** 定义函数 `is_compatible`。
+- **L198** `        """Check if the object is a TensorDescriptor or can be converted to one."""` — **EN:** Docstring line documenting the function `is_compatible`. **CN:** 文档字符串行，用于说明 function `is_compatible`。
+- **L199** `        return isinstance(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L200** `            maybe_tensor_descriptor, TensorDescriptor` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        ) or TensorDescriptor.can_transformed_to_dlpack(maybe_tensor_descriptor)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `def from_tensor(tensor: Any) -> TensorDescriptor:` — **EN:** Defines function `from_tensor`. **CN:** 定义函数 `from_tensor`。
+- **L205** `    """Create a TensorDescriptor from a tensor object."""` — **EN:** Docstring line documenting the function `from_tensor`. **CN:** 文档字符串行，用于说明 function `from_tensor`。
+- **L206** `    return TensorDescriptor(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `def to_tensor(tensor_descriptor: TensorDescriptor) -> Any:` — **EN:** Defines function `to_tensor`. **CN:** 定义函数 `to_tensor`。
+- **L210** `    """Return tensor object from tensor descriptor."""` — **EN:** Docstring line documenting the function `to_tensor`. **CN:** 文档字符串行，用于说明 function `to_tensor`。
+- **L211** `    return tensor_descriptor.tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.runtime.tensor_descriptor`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.runtime.tensor_descriptor`。
+- EN: Top-level classes: TensorDescriptor CN: 顶层类包括：TensorDescriptor
+- EN: Top-level functions: from_tensor, to_tensor CN: 顶层函数包括：from_tensor, to_tensor
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .:dlpack_types, .dlpack_runtime:dlpack_to_tensor_desc,get_tensor_desc_data_ptr,get_tensor_desc_is_in_device,get_tensor_desc_element_type,get_tensor_desc_shape,get_tensor_desc_stride,get_tensor_desc_element_size_in_bytes,get_tensor_desc_ndim,get_tensor_desc_dtype_code,get_tensor_desc_dtype_bits,get_tensor_desc_device_type,get_tensor_desc_device_id, ..utils.logger:log, ..common:*, ..typing:Boolean,Float8E5M2,Int64,Int32,Int16,Int8,Uint64,Uint32,Uint16,Uint8,Float64,Float32,Float16,BFloat16 CN: 内部依赖：.:dlpack_types, .dlpack_runtime:dlpack_to_tensor_desc,get_tensor_desc_data_ptr,get_tensor_desc_is_in_device,get_tensor_desc_element_type,get_tensor_desc_shape,get_tensor_desc_stride,get_tensor_desc_element_size_in_bytes,get_tensor_desc_ndim,get_tensor_desc_dtype_code,get_tensor_desc_dtype_bits,get_tensor_desc_device_type,get_tensor_desc_device_id, ..utils.logger:log, ..common:*, ..typing:Boolean,Float8E5M2,Int64,Int32,Int16,Int8,Uint64,Uint32,Uint16,Uint8,Float64,Float32,Float16,BFloat16
+- EN: External or standard-library dependencies: itertools, operator, ctypes, typing:Any CN: 外部或标准库依赖：itertools, operator, ctypes, typing:Any

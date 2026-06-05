@@ -1,0 +1,301 @@
+# collective_builder.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/collective/collective_builder.hpp`
+**Purpose / 用途**: Used to specify stage counts or dispatch to automatic computation of stage count. / 提供卷积 collective 组合、builder 逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 32 / 第 32 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 33 / 第 33 行** — `#include "cutlass/detail/dependent_false.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/detail/dependent_false.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/detail/dependent_false.hpp`。
+- **Line 34 / 第 34 行** — `#include "cutlass/conv/collective/collective_conv.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/collective/collective_conv.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/collective/collective_conv.hpp`。
+- **Line 35 / 第 35 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 36 / 第 36 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 37 / 第 37 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 38 / 第 38 行** — `namespace cutlass::conv::collective {`
+  - **EN**: Opens namespace `cutlass::conv::collective` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv::collective`。
+- **Line 39 / 第 39 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 40 / 第 40 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `// Used to specify stage counts or dispatch to automatic computation of stage count`
+  - **EN**: Inline comment explaining intent: `Used to specify stage counts or dispatch to automatic computation of stage count`.
+  - **CN**: 行内注释说明意图：`Used to specify stage counts or dispatch to automatic computation of stage count`。
+- **Line 43 / 第 43 行** — `template<int num_stages>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 44 / 第 44 行** — `struct StageCount {`
+  - **EN**: Starts the definition of struct `StageCount`.
+  - **CN**: 开始定义 struct `StageCount`。
+- **Line 45 / 第 45 行** — `  static constexpr int value = num_stages;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 46 / 第 46 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 47 / 第 47 行** — `  StageCount() = default;`
+  - **EN**: Declares a defaulted special member function.
+  - **CN**: 声明一个默认实现的特殊成员函数。
+- **Line 48 / 第 48 行** — `  explicit StageCount(cute::Int<num_stages>) {}`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 49 / 第 49 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `template<int carveout_bytes>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 52 / 第 52 行** — `struct StageCountAutoCarveout {`
+  - **EN**: Starts the definition of struct `StageCountAutoCarveout`.
+  - **CN**: 开始定义 struct `StageCountAutoCarveout`。
+- **Line 53 / 第 53 行** — `  static constexpr int bytes = carveout_bytes;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 54 / 第 54 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 55 / 第 55 行** — `  StageCountAutoCarveout() = default;`
+  - **EN**: Declares a defaulted special member function.
+  - **CN**: 声明一个默认实现的特殊成员函数。
+- **Line 56 / 第 56 行** — `  explicit StageCountAutoCarveout(cute::Int<carveout_bytes>) {}`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 57 / 第 57 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 58 / 第 58 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 59 / 第 59 行** — `// Used to automatically let the builder pick the kernel schedule.`
+  - **EN**: Inline comment explaining intent: `Used to automatically let the builder pick the kernel schedule.`.
+  - **CN**: 行内注释说明意图：`Used to automatically let the builder pick the kernel schedule.`。
+- **Line 60 / 第 60 行** — `// Can be overridden with kernel schedule tags in cutlass/conv/dispatch_policy.hpp`
+  - **EN**: Inline comment explaining intent: `Can be overridden with kernel schedule tags in cutlass/conv/dispatch_policy.hpp`.
+  - **CN**: 行内注释说明意图：`Can be overridden with kernel schedule tags in cutlass/conv/dispatch_policy.hpp`。
+- **Line 61 / 第 61 行** — `struct KernelScheduleAuto {};`
+  - **EN**: Starts the definition of struct `KernelScheduleAuto`.
+  - **CN**: 开始定义 struct `KernelScheduleAuto`。
+- **Line 62 / 第 62 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 63 / 第 63 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 64 / 第 64 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 65 / 第 65 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 66 / 第 66 行** — `  class ArchTag,`
+  - **EN**: Adds template parameter specifier `class ArchTag`.
+  - **CN**: 补充模板参数说明符 `class ArchTag`。
+- **Line 67 / 第 67 行** — `  class OpClass,`
+  - **EN**: Adds template parameter specifier `class OpClass`.
+  - **CN**: 补充模板参数说明符 `class OpClass`。
+- **Line 68 / 第 68 行** — `  conv::Operator,`
+  - **EN**: Adds template parameter specifier `conv::Operator`.
+  - **CN**: 补充模板参数说明符 `conv::Operator`。
+- **Line 69 / 第 69 行** — `  class ElementA,`
+  - **EN**: Adds template parameter specifier `class ElementA`.
+  - **CN**: 补充模板参数说明符 `class ElementA`。
+- **Line 70 / 第 70 行** — `  class GmemLayoutA,`
+  - **EN**: Adds template parameter specifier `class GmemLayoutA`.
+  - **CN**: 补充模板参数说明符 `class GmemLayoutA`。
+- **Line 71 / 第 71 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 72 / 第 72 行** — `  class ElementB,`
+  - **EN**: Adds template parameter specifier `class ElementB`.
+  - **CN**: 补充模板参数说明符 `class ElementB`。
+- **Line 73 / 第 73 行** — `  class GmemLayoutB,`
+  - **EN**: Adds template parameter specifier `class GmemLayoutB`.
+  - **CN**: 补充模板参数说明符 `class GmemLayoutB`。
+- **Line 74 / 第 74 行** — `  int AlignmentB,`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 75 / 第 75 行** — `  class ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `class ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `class ElementAccumulator`。
+- **Line 76 / 第 76 行** — `  class TileShape_MNK,`
+  - **EN**: Adds template parameter specifier `class TileShape_MNK`.
+  - **CN**: 补充模板参数说明符 `class TileShape_MNK`。
+- **Line 77 / 第 77 行** — `  class ClusterShape_MNK,`
+  - **EN**: Adds template parameter specifier `class ClusterShape_MNK`.
+  - **CN**: 补充模板参数说明符 `class ClusterShape_MNK`。
+- **Line 78 / 第 78 行** — `  class StageCountType,`
+  - **EN**: Adds template parameter specifier `class StageCountType`.
+  - **CN**: 补充模板参数说明符 `class StageCountType`。
+- **Line 79 / 第 79 行** — `  class KernelScheduleType,`
+  - **EN**: Adds template parameter specifier `class KernelScheduleType`.
+  - **CN**: 补充模板参数说明符 `class KernelScheduleType`。
+- **Line 80 / 第 80 行** — `  class Enable = void`
+  - **EN**: Adds template parameter specifier `class Enable = void`.
+  - **CN**: 补充模板参数说明符 `class Enable = void`。
+- **Line 81 / 第 81 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 82 / 第 82 行** — `struct CollectiveBuilder {`
+  - **EN**: Starts the definition of struct `CollectiveBuilder`.
+  - **CN**: 开始定义 struct `CollectiveBuilder`。
+- **Line 83 / 第 83 行** — `  static_assert(cutlass::detail::dependent_false<ElementA>, "Could not build a collective for given parameters.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 84 / 第 84 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 85 / 第 85 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 86 / 第 86 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 87 / 第 87 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 88 / 第 88 行** — `} // namespace cutlass::conv::collective`
+  - **EN**: Closes namespace `cutlass::conv::collective`.
+  - **CN**: 关闭命名空间 `cutlass::conv::collective`。
+- **Line 89 / 第 89 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 90 / 第 90 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 91 / 第 91 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 92 / 第 92 行** — `#include "builders/sm90_gmma_builder.inl"`
+  - **EN**: Includes inline implementation file `builders/sm90_gmma_builder.inl`.
+  - **CN**: 引入内联实现文件 `builders/sm90_gmma_builder.inl`。
+- **Line 93 / 第 93 行** — `#include "builders/sm100_umma_builder.inl" `
+  - **EN**: Includes inline implementation file `builders/sm100_umma_builder.inl`.
+  - **CN**: 引入内联实现文件 `builders/sm100_umma_builder.inl`。
+- **Line 94 / 第 94 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+- Dispatch policy / 调度策略
+
+## Dependencies / 依赖
+- `cutlass/detail/dependent_false.hpp` — Internal helper `cutlass/detail/dependent_false.hpp` / 内部辅助头 `cutlass/detail/dependent_false.hpp`
+- `cutlass/conv/collective/collective_conv.hpp` — CUTLASS convolution component `cutlass/conv/collective/collective_conv.hpp` / CUTLASS 卷积组件 `cutlass/conv/collective/collective_conv.hpp`
+- `builders/sm90_gmma_builder.inl` — Inline implementation file `builders/sm90_gmma_builder.inl` / 内联实现文件 `builders/sm90_gmma_builder.inl`
+- `builders/sm100_umma_builder.inl` — Inline implementation file `builders/sm100_umma_builder.inl` / 内联实现文件 `builders/sm100_umma_builder.inl`

@@ -1,0 +1,922 @@
+# cuda.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/runtime/cuda.py`
+
+## Purpose / 作用
+- EN: This module provides CUDA Python helper functions
+- CN: 该模块的文档字符串将其描述为：This module provides CUDA Python helper functions
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides CUDA Python helper functions` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from functools import lru_cache` — **EN:** Imports lru_cache from `functools`. **CN:** 从 `functools` 导入 lru_cache。
+- **L17** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L18** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L19** `from enum import IntEnum` — **EN:** Imports IntEnum from `enum`. **CN:** 从 `enum` 导入 IntEnum。
+- **L20** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L21** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L22** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `import cuda.bindings.driver as cuda` — **EN:** Imports cuda.bindings.driver as cuda for later use. **CN:** 导入 cuda.bindings.driver as cuda 供后续使用。
+- **L25** `import cuda.bindings.runtime as cudart` — **EN:** Imports cuda.bindings.runtime as cudart for later use. **CN:** 导入 cuda.bindings.runtime as cudart 供后续使用。
+- **L26** `import cuda.bindings.nvrtc as nvrtc` — **EN:** Imports cuda.bindings.nvrtc as nvrtc for later use. **CN:** 导入 cuda.bindings.nvrtc as nvrtc 供后续使用。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `# Local module imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `from ..utils.logger import log as _log` — **EN:** Imports log as _log from `..utils.logger`. **CN:** 从 `..utils.logger` 导入 log as _log。
+- **L30** `from ..common import *` — **EN:** Imports * from `..common`. **CN:** 从 `..common` 导入 *。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L33** `# Enums` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L34** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L39** `# Utils` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L40** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `def _cudaGetErrorEnum(error: Any) -> Any:` — **EN:** Defines function `_cudaGetErrorEnum`. **CN:** 定义函数 `_cudaGetErrorEnum`。
+- **L44** `    """` — **EN:** Starts the docstring for the function `_cudaGetErrorEnum`. **CN:** 开始说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L45** `    Get the error name of a CUDA error.` — **EN:** Continues the docstring for the function `_cudaGetErrorEnum`. **CN:** 继续说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L46** `    :param error: The CUDA error.` — **EN:** Continues the docstring for the function `_cudaGetErrorEnum`. **CN:** 继续说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L47** `    :type error: cuda.CUresult or nvrtc.nvrtcResult` — **EN:** Continues the docstring for the function `_cudaGetErrorEnum`. **CN:** 继续说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L48** `    :raise DSLRuntimeError: If the error type is unknown.` — **EN:** Continues the docstring for the function `_cudaGetErrorEnum`. **CN:** 继续说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L49** `    :return: The error name.` — **EN:** Continues the docstring for the function `_cudaGetErrorEnum`. **CN:** 继续说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L50** `    :rtype: str` — **EN:** Continues the docstring for the function `_cudaGetErrorEnum`. **CN:** 继续说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L51** `    """` — **EN:** Ends the docstring for the function `_cudaGetErrorEnum`. **CN:** 结束说明 function `_cudaGetErrorEnum` 的文档字符串。
+- **L52** `    if isinstance(error, cuda.CUresult):` — **EN:** Starts a conditional branch guarded by `isinstance(error, cuda.CUresult)`. **CN:** 开始一个由 `isinstance(error, cuda.CUresult)` 控制的条件分支。
+- **L53** `        err, name = cuda.cuGetErrorName(error)` — **EN:** Assigns a value to (err, name). **CN:** 将一个值赋给 (err, name)。
+- **L54** `        return name if err == cuda.CUresult.CUDA_SUCCESS else "<unknown>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** `    elif isinstance(error, cudart.cudaError_t):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L56** `        return cudart.cudaGetErrorName(error)[1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** `    elif isinstance(error, nvrtc.nvrtcResult):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L58** `        return nvrtc.nvrtcGetErrorString(error)[1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L60** `        raise DSLRuntimeError("Unknown error type: {}".format(error))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `def _get_gpu_arch_info(major: int, minor: int) -> tuple[str, str, list[str]]:` — **EN:** Defines function `_get_gpu_arch_info`. **CN:** 定义函数 `_get_gpu_arch_info`。
+- **L64** `    """` — **EN:** Starts the docstring for the function `_get_gpu_arch_info`. **CN:** 开始说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L65** `    Get GPU architecture information and compatibility details.` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L66** `    Return [Unknown, f"sm_{major}{minor}", [f"sm_{major}{minor}"]] if the major and minor version is not in the map.` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L67** `    :param major: The major version of the CUDA device.` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L68** `                  usually obtained by calling cuda.cuDeviceGetAttribute(cuda.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR, device)` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L69** `    :type major: int` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L70** `    :param minor: The minor version of the CUDA device.` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L71** `                  usually obtained by calling cuda.cuDeviceGetAttribute(cuda.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR, device)` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L72** `    :type minor: int` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L73** `    :return: The GPU architecture information.` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L74** `    :rtype: tuple(str, str, list[str])` — **EN:** Continues the docstring for the function `_get_gpu_arch_info`. **CN:** 继续说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L75** `    """` — **EN:** Ends the docstring for the function `_get_gpu_arch_info`. **CN:** 结束说明 function `_get_gpu_arch_info` 的文档字符串。
+- **L76** `    gpu_arch_map = {` — **EN:** Assigns a value to gpu_arch_map. **CN:** 将一个值赋给 gpu_arch_map。
+- **L77** `        (7, 0): ("Volta", "sm_70", ["sm_70"]),  # V100` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `        (7, 5): ("Turing", "sm_75", ["sm_75"]),  # RTX 20 Series, Quadro RTX` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        (8, 0): ("Ampere", "sm_80", ["sm_80"]),  # A100` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `        (8, 6): ("Ampere", "sm_86", ["sm_86", "sm_80"]),  # RTX 30 Series` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `        (8, 9): ("Ada", "sm_89", ["sm_89", "sm_86"]),  # RTX 40 Series` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `        (8, 7): ("Ampere", "sm_87", ["sm_87", "sm_86", "sm_80"]),  # A10, A40` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `        (9, 0): ("Hopper", "sm_90a", ["sm_90a"]),  # H100` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `        (10, 0): ("Blackwell", "sm_100a", ["sm_100a"]),  # B200` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `        (10, 3): ("Blackwell", "sm_103a", ["sm_103a"]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `        (12, 0): (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `            "Blackwell",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `            "sm_120a",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `            ["sm_120a"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `        ),  # RTX PRO 6000 / RTX 50 Series` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    return gpu_arch_map.get(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** `        (major, minor), ("Unknown", f"sm_{major}{minor}", [f"sm_{major}{minor}"])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `def get_compute_capability_major_minor(` — **EN:** Defines function `get_compute_capability_major_minor`. **CN:** 定义函数 `get_compute_capability_major_minor`。
+- **L98** `    device_id: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L99** `) -> tuple[int | None, int | None]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L100** `    """` — **EN:** Starts the docstring for the function `get_compute_capability_major_minor`. **CN:** 开始说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L101** `    Get the compute capability of the CUDA device.` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L102** `    :param device_id: The ID of the CUDA device.` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L103** `    :type device_id: int` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L104** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L105** `    :return: The compute capability of the CUDA device as a tuple of (major, minor).` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L106** `    :rtype: tuple(int, int)` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L107** `    Example: (8, 0) for Ampere, (9, 0) for Hopper, (10, 0) for Blackwell.` — **EN:** Continues the docstring for the function `get_compute_capability_major_minor`. **CN:** 继续说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L108** `    """` — **EN:** Ends the docstring for the function `get_compute_capability_major_minor`. **CN:** 结束说明 function `get_compute_capability_major_minor` 的文档字符串。
+- **L109** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L110** `        checkCudaErrors(cuda.cuInit(0))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L111** `        device = checkCudaErrors(cuda.cuDeviceGet(device_id))` — **EN:** Assigns a value to device. **CN:** 将一个值赋给 device。
+- **L112** `        major = checkCudaErrors(` — **EN:** Assigns a value to major. **CN:** 将一个值赋给 major。
+- **L113** `            cuda.cuDeviceGetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `                cuda.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `                device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        minor = checkCudaErrors(` — **EN:** Assigns a value to minor. **CN:** 将一个值赋给 minor。
+- **L119** `            cuda.cuDeviceGetAttribute(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `                cuda.CUdevice_attribute.CU_DEVICE_ATTRIBUTE_COMPUTE_CAPABILITY_MINOR,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `                device,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `        return major, minor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L125** `    except RuntimeError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L126** `        _log().info(f"Failed to get CUDA compute capability: {e}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L127** `        return None, None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L131** `class DeviceInfo:` — **EN:** Defines class `DeviceInfo`. **CN:** 定义类 `DeviceInfo`。
+- **L132** `    """` — **EN:** Starts the docstring for the class `DeviceInfo`. **CN:** 开始说明 class `DeviceInfo` 的文档字符串。
+- **L133** `    Data class to store CUDA device information.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    :param device_count: The number of CUDA devices.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L136** `    :type device_count: int` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L137** `    :param current_device: The current CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L138** `    :type current_device: int` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L139** `    :param device_name: The name of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L140** `    :type device_name: str` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L141** `    :param major_version: The major version of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L142** `    :type major_version: int` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L143** `    :param minor_version: The minor version of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L144** `    :type minor_version: int` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L145** `    :param arch_name: The name of the CUDA architecture.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L146** `    :type arch_name: str` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L147** `    :param sm_arch: The SM architecture of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L148** `    :type sm_arch: str` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L149** `    :param compatible_archs: The compatible SM architectures of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L150** `    :type compatible_archs: list[str]` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L151** `    :param memory_gb: The total memory of the CUDA device in GB.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L152** `    :type memory_gb: float` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L153** `    :param target_arch: The target architecture of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L154** `    :type target_arch: str` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L155** `    :param error_message: The error message of the CUDA device.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L156** `    :type error_message: str` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L157** `    :param initialization_failed: Whether the CUDA initialization failed.` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L158** `    :type initialization_failed: bool` — **EN:** Continues the docstring for the class `DeviceInfo`. **CN:** 继续说明 class `DeviceInfo` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    """` — **EN:** Ends the docstring for the class `DeviceInfo`. **CN:** 结束说明 class `DeviceInfo` 的文档字符串。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `    device_count: int = 0` — **EN:** Assigns a typed value to device_count. **CN:** 为 device_count 赋予带类型标注的值。
+- **L163** `    current_device: int = 0` — **EN:** Assigns a typed value to current_device. **CN:** 为 current_device 赋予带类型标注的值。
+- **L164** `    device_name: str | None = None` — **EN:** Assigns a typed value to device_name. **CN:** 为 device_name 赋予带类型标注的值。
+- **L165** `    major_version: int | None = None` — **EN:** Assigns a typed value to major_version. **CN:** 为 major_version 赋予带类型标注的值。
+- **L166** `    minor_version: int | None = None` — **EN:** Assigns a typed value to minor_version. **CN:** 为 minor_version 赋予带类型标注的值。
+- **L167** `    arch_name: str | None = None` — **EN:** Assigns a typed value to arch_name. **CN:** 为 arch_name 赋予带类型标注的值。
+- **L168** `    sm_arch: str | None = None` — **EN:** Assigns a typed value to sm_arch. **CN:** 为 sm_arch 赋予带类型标注的值。
+- **L169** `    compatible_archs: list[str] | None = None` — **EN:** Assigns a typed value to compatible_archs. **CN:** 为 compatible_archs 赋予带类型标注的值。
+- **L170** `    memory_gb: float | None = None` — **EN:** Assigns a typed value to memory_gb. **CN:** 为 memory_gb 赋予带类型标注的值。
+- **L171** `    target_arch: str | None = None` — **EN:** Assigns a typed value to target_arch. **CN:** 为 target_arch 赋予带类型标注的值。
+- **L172** `    error_message: str | None = None` — **EN:** Assigns a typed value to error_message. **CN:** 为 error_message 赋予带类型标注的值。
+- **L173** `    initialization_failed: bool = False` — **EN:** Assigns a typed value to initialization_failed. **CN:** 为 initialization_failed 赋予带类型标注的值。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `    def pretty_str(self) -> str:` — **EN:** Defines function `pretty_str`. **CN:** 定义函数 `pretty_str`。
+- **L176** `        """` — **EN:** Starts the docstring for the function `pretty_str`. **CN:** 开始说明 function `pretty_str` 的文档字符串。
+- **L177** `        Convert DeviceInfo to a formatted string for display.` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L178** `        :return: The formatted string.` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L179** `        :rtype: str` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L180** `        Example:` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L181** `        On success:` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L182** `            CUDA devices available: <device_count> (current: <current_device>)` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L183** `           - Architecture: <arch_name> (<sm_arch>)` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L184** `           - Compatible SM archs: <compatible_archs>` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L185** `           - Total Memory: <memory_gb> GB` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L186** `        On failure:` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L187** `            1. CUDA initialization failed` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L188** `            2. Failed to get GPU info: <error_message>` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L189** `            3. No devices available` — **EN:** Continues the docstring for the function `pretty_str`. **CN:** 继续说明 function `pretty_str` 的文档字符串。
+- **L190** `        """` — **EN:** Ends the docstring for the function `pretty_str`. **CN:** 结束说明 function `pretty_str` 的文档字符串。
+- **L191** `        info = ""` — **EN:** Assigns a value to info. **CN:** 将一个值赋给 info。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `        if self.initialization_failed:` — **EN:** Starts a conditional branch guarded by `self.initialization_failed`. **CN:** 开始一个由 `self.initialization_failed` 控制的条件分支。
+- **L194** `            return f"{Colors.BOLD}- CUDA initialization failed{Colors.RESET}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `        if self.error_message:` — **EN:** Starts a conditional branch guarded by `self.error_message`. **CN:** 开始一个由 `self.error_message` 控制的条件分支。
+- **L197** `            return f"{Colors.BOLD}- Failed to get GPU info: {self.error_message}{Colors.RESET}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `        if self.device_count > 0:` — **EN:** Starts a conditional branch guarded by `self.device_count > 0`. **CN:** 开始一个由 `self.device_count > 0` 控制的条件分支。
+- **L200** `            info += f"{Colors.BOLD}- CUDA devices available: {self.device_count} (current: {self.current_device})\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `            if self.major_version is not None and self.minor_version is not None:` — **EN:** Starts a conditional branch guarded by `self.major_version is not None and self.minor_version is ...`. **CN:** 开始一个由 `self.major_version is not None and self.minor_version is ...` 控制的条件分支。
+- **L203** `                info += f"- Architecture: {Colors.BLUE}{self.arch_name}{Colors.RESET} ({Colors.GREEN}{self.sm_arch}{Colors.RESET})\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L204** `                info += f"- Compatible SM archs: {Colors.GREEN}{', '.join(self.compatible_archs or [])}{Colors.RESET}\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `                if self.memory_gb is not None:` — **EN:** Starts a conditional branch guarded by `self.memory_gb is not None`. **CN:** 开始一个由 `self.memory_gb is not None` 控制的条件分支。
+- **L207** `                    info += f"- Total Memory: {Colors.BLUE}{self.memory_gb:.2f} GB{Colors.RESET}\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L210** `                info += f"- Compute capability: unknown\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L211** `                info += f"- SM arch: unknown{Colors.RESET}\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L212** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L213** `            info += f"- No devices available\n"` — **EN:** Updates info in place. **CN:** 原地更新 info。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `        return info` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `def get_device_info() -> DeviceInfo:` — **EN:** Defines function `get_device_info`. **CN:** 定义函数 `get_device_info`。
+- **L219** `    """` — **EN:** Starts the docstring for the function `get_device_info`. **CN:** 开始说明 function `get_device_info` 的文档字符串。
+- **L220** `    Get detailed information about CUDA devices.` — **EN:** Continues the docstring for the function `get_device_info`. **CN:** 继续说明 function `get_device_info` 的文档字符串。
+- **L221** `    :return: A DeviceInfo dataclass with device information.` — **EN:** Continues the docstring for the function `get_device_info`. **CN:** 继续说明 function `get_device_info` 的文档字符串。
+- **L222** `    :rtype: DeviceInfo` — **EN:** Continues the docstring for the function `get_device_info`. **CN:** 继续说明 function `get_device_info` 的文档字符串。
+- **L223** `    """` — **EN:** Ends the docstring for the function `get_device_info`. **CN:** 结束说明 function `get_device_info` 的文档字符串。
+- **L224** `    device_info = DeviceInfo()` — **EN:** Assigns a value to device_info. **CN:** 将一个值赋给 device_info。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `    # Initialize CUDA if not already initialized` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L227** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L228** `        result = cuda.cuInit(0)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L229** `        if result[0].value:  # Check for error` — **EN:** Starts a conditional branch guarded by `result[0].value`. **CN:** 开始一个由 `result[0].value` 控制的条件分支。
+- **L230** `            device_info.initialization_failed = True` — **EN:** Assigns a value to device_info.initialization_failed. **CN:** 将一个值赋给 device_info.initialization_failed。
+- **L231** `            return device_info` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L232** `    except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L233** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L236** `        # Get device count` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L237** `        result = cuda.cuDeviceGetCount()` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L238** `        device_info.device_count = result[1] if result[0].value == 0 else 0` — **EN:** Assigns a value to device_info.device_count. **CN:** 将一个值赋给 device_info.device_count。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `        if device_info.device_count > 0:` — **EN:** Starts a conditional branch guarded by `device_info.device_count > 0`. **CN:** 开始一个由 `device_info.device_count > 0` 控制的条件分支。
+- **L241** `            # Get current device` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L242** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L243** `                result = cuda.cuCtxGetDevice()` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L244** `                if result[0].value == 0:` — **EN:** Starts a conditional branch guarded by `result[0].value == 0`. **CN:** 开始一个由 `result[0].value == 0` 控制的条件分支。
+- **L245** `                    device_info.current_device = result[1]` — **EN:** Assigns a value to device_info.current_device. **CN:** 将一个值赋给 device_info.current_device。
+- **L246** `            except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L247** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `            # Get device name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L250** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L251** `                name_result = cuda.cuDeviceGetName(100, device_info.current_device)` — **EN:** Assigns a value to name_result. **CN:** 将一个值赋给 name_result。
+- **L252** `                if name_result[0].value == 0:` — **EN:** Starts a conditional branch guarded by `name_result[0].value == 0`. **CN:** 开始一个由 `name_result[0].value == 0` 控制的条件分支。
+- **L253** `                    device_info.device_name = name_result[1]` — **EN:** Assigns a value to device_info.device_name. **CN:** 将一个值赋给 device_info.device_name。
+- **L254** `            except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L255** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `            # Get compute capability and architecture info` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L258** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L259** `                major, minor = get_compute_capability_major_minor(` — **EN:** Assigns a value to (major, minor). **CN:** 将一个值赋给 (major, minor)。
+- **L260** `                    device_info.current_device` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `                # Check if we successfully got the compute capability` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L264** `                if major is not None and minor is not None:` — **EN:** Starts a conditional branch guarded by `major is not None and minor is not None`. **CN:** 开始一个由 `major is not None and minor is not None` 控制的条件分支。
+- **L265** `                    device_info.major_version = major` — **EN:** Assigns a value to device_info.major_version. **CN:** 将一个值赋给 device_info.major_version。
+- **L266** `                    device_info.minor_version = minor` — **EN:** Assigns a value to device_info.minor_version. **CN:** 将一个值赋给 device_info.minor_version。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `                    arch_name, sm_arch, compatible_archs = _get_gpu_arch_info(` — **EN:** Assigns a value to (arch_name, sm_arch, compatible_archs). **CN:** 将一个值赋给 (arch_name, sm_arch, compatible_archs)。
+- **L269** `                        device_info.major_version, device_info.minor_version` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L272** `                    device_info.arch_name = arch_name` — **EN:** Assigns a value to device_info.arch_name. **CN:** 将一个值赋给 device_info.arch_name。
+- **L273** `                    device_info.sm_arch = sm_arch` — **EN:** Assigns a value to device_info.sm_arch. **CN:** 将一个值赋给 device_info.sm_arch。
+- **L274** `                    device_info.compatible_archs = compatible_archs` — **EN:** Assigns a value to device_info.compatible_archs. **CN:** 将一个值赋给 device_info.compatible_archs。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `                    # Get memory info` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L277** `                    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L278** `                        total_mem = cuda.cuDeviceTotalMem(device_info.current_device)` — **EN:** Assigns a value to total_mem. **CN:** 将一个值赋给 total_mem。
+- **L279** `                        if total_mem[0].value == 0:` — **EN:** Starts a conditional branch guarded by `total_mem[0].value == 0`. **CN:** 开始一个由 `total_mem[0].value == 0` 控制的条件分支。
+- **L280** `                            device_info.memory_gb = total_mem[1] / (` — **EN:** Assigns a value to device_info.memory_gb. **CN:** 将一个值赋给 device_info.memory_gb。
+- **L281** `                                1024 * 1024 * 1024` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `                            )  # Convert to GB` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `                    except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L284** `                        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `            except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L287** `                pass  # Compute capability info will remain None` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L290** `        device_info.error_message = str(e)` — **EN:** Assigns a value to device_info.error_message. **CN:** 将一个值赋给 device_info.error_message。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `    return device_info` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `def checkCudaErrors(result: Any) -> Any:` — **EN:** Defines function `checkCudaErrors`. **CN:** 定义函数 `checkCudaErrors`。
+- **L296** `    """Check CUDA errors and provide detailed error messages.` — **EN:** Starts the docstring for the function `checkCudaErrors`. **CN:** 开始说明 function `checkCudaErrors` 的文档字符串。
+- **L297** `    :param result: The result of the CUDA operation.` — **EN:** Continues the docstring for the function `checkCudaErrors`. **CN:** 继续说明 function `checkCudaErrors` 的文档字符串。
+- **L298** `    :type result: tuple(CUresult, ...)` — **EN:** Continues the docstring for the function `checkCudaErrors`. **CN:** 继续说明 function `checkCudaErrors` 的文档字符串。
+- **L299** `    :raise DSLCudaRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `checkCudaErrors`. **CN:** 继续说明 function `checkCudaErrors` 的文档字符串。
+- **L300** `    :return: The result of the CUDA operation, excluding the first element(CUresult) of the tuple` — **EN:** Continues the docstring for the function `checkCudaErrors`. **CN:** 继续说明 function `checkCudaErrors` 的文档字符串。
+- **L301** `    :rtype: tuple()` — **EN:** Continues the docstring for the function `checkCudaErrors`. **CN:** 继续说明 function `checkCudaErrors` 的文档字符串。
+- **L302** `    """` — **EN:** Ends the docstring for the function `checkCudaErrors`. **CN:** 结束说明 function `checkCudaErrors` 的文档字符串。
+- **L303** `    if result[0].value:` — **EN:** Starts a conditional branch guarded by `result[0].value`. **CN:** 开始一个由 `result[0].value` 控制的条件分支。
+- **L304** `        error_code = result[0].value` — **EN:** Assigns a value to error_code. **CN:** 将一个值赋给 error_code。
+- **L305** `        error_name = _cudaGetErrorEnum(result[0])` — **EN:** Assigns a value to error_name. **CN:** 将一个值赋给 error_name。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `        raise DSLCudaRuntimeError(error_code, error_name)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    if len(result) == 1:` — **EN:** Starts a conditional branch guarded by `len(result) == 1`. **CN:** 开始一个由 `len(result) == 1` 控制的条件分支。
+- **L310** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L311** `    elif len(result) == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L312** `        return result[1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L313** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L314** `        return result[1:]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L318** `# Driver Helpers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L319** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L320** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `def get_current_device() -> Any:` — **EN:** Defines function `get_current_device`. **CN:** 定义函数 `get_current_device`。
+- **L323** `    """` — **EN:** Starts the docstring for the function `get_current_device`. **CN:** 开始说明 function `get_current_device` 的文档字符串。
+- **L324** `    Gets the current device on the active context.` — **EN:** Continues the docstring for the function `get_current_device`. **CN:** 继续说明 function `get_current_device` 的文档字符串。
+- **L325** `    :return: The current device.` — **EN:** Continues the docstring for the function `get_current_device`. **CN:** 继续说明 function `get_current_device` 的文档字符串。
+- **L326** `    :rtype: cuda.CUdevice` — **EN:** Continues the docstring for the function `get_current_device`. **CN:** 继续说明 function `get_current_device` 的文档字符串。
+- **L327** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_current_device`. **CN:** 继续说明 function `get_current_device` 的文档字符串。
+- **L328** `    """` — **EN:** Ends the docstring for the function `get_current_device`. **CN:** 结束说明 function `get_current_device` 的文档字符串。
+- **L329** `    _log().info(f"cuCtxGetDevice")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L330** `    dev = checkCudaErrors(cuda.cuCtxGetDevice())` — **EN:** Assigns a value to dev. **CN:** 将一个值赋给 dev。
+- **L331** `    _log().info(f"{dev} <-- cuCtxGetDevice")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L332** `    return dev` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `def get_device(device_id: int) -> Any:` — **EN:** Defines function `get_device`. **CN:** 定义函数 `get_device`。
+- **L336** `    """` — **EN:** Starts the docstring for the function `get_device`. **CN:** 开始说明 function `get_device` 的文档字符串。
+- **L337** `    Gets a device given its ordinal.` — **EN:** Continues the docstring for the function `get_device`. **CN:** 继续说明 function `get_device` 的文档字符串。
+- **L338** `    :param device_id: The ID of the device.` — **EN:** Continues the docstring for the function `get_device`. **CN:** 继续说明 function `get_device` 的文档字符串。
+- **L339** `    :type device_id: int` — **EN:** Continues the docstring for the function `get_device`. **CN:** 继续说明 function `get_device` 的文档字符串。
+- **L340** `    :return: The device.` — **EN:** Continues the docstring for the function `get_device`. **CN:** 继续说明 function `get_device` 的文档字符串。
+- **L341** `    :rtype: cuda.CUdevice` — **EN:** Continues the docstring for the function `get_device`. **CN:** 继续说明 function `get_device` 的文档字符串。
+- **L342** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_device`. **CN:** 继续说明 function `get_device` 的文档字符串。
+- **L343** `    """` — **EN:** Ends the docstring for the function `get_device`. **CN:** 结束说明 function `get_device` 的文档字符串。
+- **L344** `    _log().info(f"cuDeviceGet {device_id}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L345** `    dev = checkCudaErrors(cuda.cuDeviceGet(device_id))` — **EN:** Assigns a value to dev. **CN:** 将一个值赋给 dev。
+- **L346** `    _log().info(f"{dev} <-- cuDeviceGet")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L347** `    return dev` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `@lru_cache(maxsize=1)` — **EN:** Applies decorator `lru_cache(maxsize=1)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=1)` 应用于后面的定义。
+- **L352** `def _create_cuda_context(device_id: int = 0, flags: int = 0) -> Any:` — **EN:** Defines function `_create_cuda_context`. **CN:** 定义函数 `_create_cuda_context`。
+- **L353** `    """Creates and caches a new CUDA context. Cached to prevent duplicate` — **EN:** Starts the docstring for the function `_create_cuda_context`. **CN:** 开始说明 function `_create_cuda_context` 的文档字符串。
+- **L354** `    context creation, which would cause CUDA_ERROR_OUT_OF_MEMORY."""` — **EN:** Ends the docstring for the function `_create_cuda_context`. **CN:** 结束说明 function `_create_cuda_context` 的文档字符串。
+- **L355** `    cuDevice = get_device(device_id)` — **EN:** Assigns a value to cuDevice. **CN:** 将一个值赋给 cuDevice。
+- **L356** `    _log().info(f"cuCtxCreate {0} {cuDevice}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L357** `    if cuda.CUDA_VERSION >= 13000:` — **EN:** Starts a conditional branch guarded by `cuda.CUDA_VERSION >= 13000`. **CN:** 开始一个由 `cuda.CUDA_VERSION >= 13000` 控制的条件分支。
+- **L358** `        # Use cuCtxCreate_v4 API with explicit CUctxCreateParams None, since v2` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L359** `        # and v3 API has been removed from CTK 13.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L360** `        # See https://github.com/NVIDIA/cuda-python/pull/792` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L361** `        context = checkCudaErrors(cuda.cuCtxCreate(None, 0, cuDevice))` — **EN:** Assigns a value to context. **CN:** 将一个值赋给 context。
+- **L362** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L363** `        context = checkCudaErrors(cuda.cuCtxCreate(0, cuDevice))` — **EN:** Assigns a value to context. **CN:** 将一个值赋给 context。
+- **L364** `    _log().info(f"{context} <-- cuCtxCreate")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L365** `    return context` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L368** `def initialize_cuda_context(device_id: int = 0, flags: int = 0) -> Any:` — **EN:** Defines function `initialize_cuda_context`. **CN:** 定义函数 `initialize_cuda_context`。
+- **L369** `    """` — **EN:** Starts the docstring for the function `initialize_cuda_context`. **CN:** 开始说明 function `initialize_cuda_context` 的文档字符串。
+- **L370** `    Initializes the CUDA context for a specified device.` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L371** `    :param device_id: The ID of the device.` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L372** `    :type device_id: int` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L373** `    :param flags: The flags for the CUDA context.` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L374** `    :type flags: int` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L375** `    :return: The context.` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L376** `    :rtype: cuda.CUcontext` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L377** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `initialize_cuda_context`. **CN:** 继续说明 function `initialize_cuda_context` 的文档字符串。
+- **L378** `    """` — **EN:** Ends the docstring for the function `initialize_cuda_context`. **CN:** 结束说明 function `initialize_cuda_context` 的文档字符串。
+- **L379** `    # Initialize CUDA Driver API` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L380** `    _log().info(f"cuInit {flags}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L381** `    checkCudaErrors(cuda.cuInit(flags))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `    driver_version = get_driver_version()` — **EN:** Assigns a value to driver_version. **CN:** 将一个值赋给 driver_version。
+- **L384** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L385** `    # Check the CUDA driver version works for the installed cuda-python package` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L386** `    if driver_version < 13000 and cuda.CUDA_VERSION >= 13000:` — **EN:** Starts a conditional branch guarded by `driver_version < 13000 and cuda.CUDA_VERSION >= 13000`. **CN:** 开始一个由 `driver_version < 13000 and cuda.CUDA_VERSION >= 13000` 控制的条件分支。
+- **L387** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L388** `            f"CUDA driver version {driver_version} is below the minimum required version for the installed cuda-python package {cuda.CUDA_VERSION}.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `            suggestion=f"Consider updating your NVIDIA driver to version 580 or above. Or install cuda-python package with version 12.9 or below.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `    # Check if a valid CUDA context already exists (e.g., created by PyTorch or` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L393** `    # another framework). Reusing it avoids creating redundant contexts, which can` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L394** `    # cause CUDA_ERROR_OUT_OF_MEMORY in multi-process setups (e.g., pytest-xdist` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L395** `    # with many workers sharing a single GPU). This check is intentionally not` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L396** `    # cached so that it always reflects the current state of the CUDA context` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L397** `    # stack — an external framework may destroy or replace its context at any time.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L398** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L399** `        result = cuda.cuCtxGetCurrent()` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L400** `        if not result[0].value and result[1] is not None:` — **EN:** Starts a conditional branch guarded by `not result[0].value and result[1] is not None`. **CN:** 开始一个由 `not result[0].value and result[1] is not None` 控制的条件分支。
+- **L401** `            # Validate that the context is usable by querying its device` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L402** `            dev_result = cuda.cuCtxGetDevice()` — **EN:** Assigns a value to dev_result. **CN:** 将一个值赋给 dev_result。
+- **L403** `            if not dev_result[0].value:` — **EN:** Starts a conditional branch guarded by `not dev_result[0].value`. **CN:** 开始一个由 `not dev_result[0].value` 控制的条件分支。
+- **L404** `                # Only reuse if the context's device matches the requested one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L405** `                if int(dev_result[1]) == device_id:` — **EN:** Starts a conditional branch guarded by `int(dev_result[1]) == device_id`. **CN:** 开始一个由 `int(dev_result[1]) == device_id` 控制的条件分支。
+- **L406** `                    _log().info(` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L407** `                        f"Reusing existing CUDA context: {result[1]} "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** `                        f"(device: {dev_result[1]})"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L409** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `                    return result[1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L411** `    except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L412** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L414** `    # No usable external context — create one (cached to prevent duplicates).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L415** `    return _create_cuda_context(device_id, flags)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L417** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L418** `def device_primary_context_retain(device: Any) -> Any:` — **EN:** Defines function `device_primary_context_retain`. **CN:** 定义函数 `device_primary_context_retain`。
+- **L419** `    """` — **EN:** Starts the docstring for the function `device_primary_context_retain`. **CN:** 开始说明 function `device_primary_context_retain` 的文档字符串。
+- **L420** `    Retains the primary context on the device.` — **EN:** Continues the docstring for the function `device_primary_context_retain`. **CN:** 继续说明 function `device_primary_context_retain` 的文档字符串。
+- **L421** `    :param device: The device.` — **EN:** Continues the docstring for the function `device_primary_context_retain`. **CN:** 继续说明 function `device_primary_context_retain` 的文档字符串。
+- **L422** `    :type device: cuda.CUdevice` — **EN:** Continues the docstring for the function `device_primary_context_retain`. **CN:** 继续说明 function `device_primary_context_retain` 的文档字符串。
+- **L423** `    :return: The context.` — **EN:** Continues the docstring for the function `device_primary_context_retain`. **CN:** 继续说明 function `device_primary_context_retain` 的文档字符串。
+- **L424** `    :rtype: cuda.CUcontext` — **EN:** Continues the docstring for the function `device_primary_context_retain`. **CN:** 继续说明 function `device_primary_context_retain` 的文档字符串。
+- **L425** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `device_primary_context_retain`. **CN:** 继续说明 function `device_primary_context_retain` 的文档字符串。
+- **L426** `    """` — **EN:** Ends the docstring for the function `device_primary_context_retain`. **CN:** 结束说明 function `device_primary_context_retain` 的文档字符串。
+- **L427** `    _log().info(f"cuDevicePrimaryCtxRetain {device}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L428** `    return checkCudaErrors(cuda.cuDevicePrimaryCtxRetain(device))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `def device_primary_context_release(device: Any) -> None:` — **EN:** Defines function `device_primary_context_release`. **CN:** 定义函数 `device_primary_context_release`。
+- **L432** `    """` — **EN:** Starts the docstring for the function `device_primary_context_release`. **CN:** 开始说明 function `device_primary_context_release` 的文档字符串。
+- **L433** `    Releases the primary context on the device.` — **EN:** Continues the docstring for the function `device_primary_context_release`. **CN:** 继续说明 function `device_primary_context_release` 的文档字符串。
+- **L434** `    :param device: The device.` — **EN:** Continues the docstring for the function `device_primary_context_release`. **CN:** 继续说明 function `device_primary_context_release` 的文档字符串。
+- **L435** `    :type device: cuda.CUdevice` — **EN:** Continues the docstring for the function `device_primary_context_release`. **CN:** 继续说明 function `device_primary_context_release` 的文档字符串。
+- **L436** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `device_primary_context_release`. **CN:** 继续说明 function `device_primary_context_release` 的文档字符串。
+- **L437** `    """` — **EN:** Ends the docstring for the function `device_primary_context_release`. **CN:** 结束说明 function `device_primary_context_release` 的文档字符串。
+- **L438** `    _log().info(f"cuDevicePrimaryCtxRelease {device}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L439** `    checkCudaErrors(cuda.cuDevicePrimaryCtxRelease(device))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** `class DevicePrimaryContext:` — **EN:** Defines class `DevicePrimaryContext`. **CN:** 定义类 `DevicePrimaryContext`。
+- **L443** `    """` — **EN:** Starts the docstring for the class `DevicePrimaryContext`. **CN:** 开始说明 class `DevicePrimaryContext` 的文档字符串。
+- **L444** `    Owns a reference to a device primary context and ensures it is released once` — **EN:** Continues the docstring for the class `DevicePrimaryContext`. **CN:** 继续说明 class `DevicePrimaryContext` 的文档字符串。
+- **L445** `    the object is no longer alive.` — **EN:** Continues the docstring for the class `DevicePrimaryContext`. **CN:** 继续说明 class `DevicePrimaryContext` 的文档字符串。
+- **L446** `    """` — **EN:** Ends the docstring for the class `DevicePrimaryContext`. **CN:** 结束说明 class `DevicePrimaryContext` 的文档字符串。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `    def __init__(self, device: Any) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L449** `        self.device = device` — **EN:** Assigns a value to self.device. **CN:** 将一个值赋给 self.device。
+- **L450** `        self.context = device_primary_context_retain(self.device)` — **EN:** Assigns a value to self.context. **CN:** 将一个值赋给 self.context。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `    def __del__(self) -> None:` — **EN:** Defines function `__del__`. **CN:** 定义函数 `__del__`。
+- **L453** `        device_primary_context_release(self.device)` — **EN:** Invokes `device_primary_context_release` as a standalone call. **CN:** 以独立语句方式调用 `device_primary_context_release`。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** `def load_cubin_module(cubin_file: str) -> Any:` — **EN:** Defines function `load_cubin_module`. **CN:** 定义函数 `load_cubin_module`。
+- **L457** `    """` — **EN:** Starts the docstring for the function `load_cubin_module`. **CN:** 开始说明 function `load_cubin_module` 的文档字符串。
+- **L458** `    Loads a CUBIN file and returns the module.` — **EN:** Continues the docstring for the function `load_cubin_module`. **CN:** 继续说明 function `load_cubin_module` 的文档字符串。
+- **L459** `    :param cubin_file: The path to the CUBIN file.` — **EN:** Continues the docstring for the function `load_cubin_module`. **CN:** 继续说明 function `load_cubin_module` 的文档字符串。
+- **L460** `    :type cubin_file: str` — **EN:** Continues the docstring for the function `load_cubin_module`. **CN:** 继续说明 function `load_cubin_module` 的文档字符串。
+- **L461** `    :return: The module.` — **EN:** Continues the docstring for the function `load_cubin_module`. **CN:** 继续说明 function `load_cubin_module` 的文档字符串。
+- **L462** `    :rtype: cuda.CUmodule` — **EN:** Continues the docstring for the function `load_cubin_module`. **CN:** 继续说明 function `load_cubin_module` 的文档字符串。
+- **L463** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `load_cubin_module`. **CN:** 继续说明 function `load_cubin_module` 的文档字符串。
+- **L464** `    """` — **EN:** Ends the docstring for the function `load_cubin_module`. **CN:** 结束说明 function `load_cubin_module` 的文档字符串。
+- **L465** `    # Load CUBIN file as binary data` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L466** `    _log().info(f"read cubin {cubin_file}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L467** `    with open(cubin_file, "rb") as f:` — **EN:** Starts a context-managed block using open(cubin_file, 'rb'). **CN:** 开始一个使用 open(cubin_file, 'rb') 的上下文管理代码块。
+- **L468** `        cubin_data = f.read()` — **EN:** Assigns a value to cubin_data. **CN:** 将一个值赋给 cubin_data。
+- **L469** `    # Load module data` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L470** `    _log().info(f"cuModuleLoadData {np.char.array(cubin_data).ctypes.data}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L471** `    module = checkCudaErrors(` — **EN:** Assigns a value to module. **CN:** 将一个值赋给 module。
+- **L472** `        cuda.cuModuleLoadData(np.char.array(cubin_data).ctypes.data)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `    return module` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L477** `def unload_cubin_module(module: Any) -> None:` — **EN:** Defines function `unload_cubin_module`. **CN:** 定义函数 `unload_cubin_module`。
+- **L478** `    """` — **EN:** Starts the docstring for the function `unload_cubin_module`. **CN:** 开始说明 function `unload_cubin_module` 的文档字符串。
+- **L479** `    Unloads a CUBIN module.` — **EN:** Continues the docstring for the function `unload_cubin_module`. **CN:** 继续说明 function `unload_cubin_module` 的文档字符串。
+- **L480** `    :param module: The module.` — **EN:** Continues the docstring for the function `unload_cubin_module`. **CN:** 继续说明 function `unload_cubin_module` 的文档字符串。
+- **L481** `    :type module: cuda.CUmodule` — **EN:** Continues the docstring for the function `unload_cubin_module`. **CN:** 继续说明 function `unload_cubin_module` 的文档字符串。
+- **L482** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `unload_cubin_module`. **CN:** 继续说明 function `unload_cubin_module` 的文档字符串。
+- **L483** `    """` — **EN:** Ends the docstring for the function `unload_cubin_module`. **CN:** 结束说明 function `unload_cubin_module` 的文档字符串。
+- **L484** `    _log().info(f"cuModuleUnload {module}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L485** `    checkCudaErrors(cuda.cuModuleUnload(module))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L488** `def load_cubin_module_data(cubin_data: bytes) -> Any:` — **EN:** Defines function `load_cubin_module_data`. **CN:** 定义函数 `load_cubin_module_data`。
+- **L489** `    """` — **EN:** Starts the docstring for the function `load_cubin_module_data`. **CN:** 开始说明 function `load_cubin_module_data` 的文档字符串。
+- **L490** `    Loads a CUBIN from data and returns the module.` — **EN:** Continues the docstring for the function `load_cubin_module_data`. **CN:** 继续说明 function `load_cubin_module_data` 的文档字符串。
+- **L491** `    :param cubin_data: The binary data of the CUBIN.` — **EN:** Continues the docstring for the function `load_cubin_module_data`. **CN:** 继续说明 function `load_cubin_module_data` 的文档字符串。
+- **L492** `    :type cubin_data: bytes` — **EN:** Continues the docstring for the function `load_cubin_module_data`. **CN:** 继续说明 function `load_cubin_module_data` 的文档字符串。
+- **L493** `    :return: The module.` — **EN:** Continues the docstring for the function `load_cubin_module_data`. **CN:** 继续说明 function `load_cubin_module_data` 的文档字符串。
+- **L494** `    :rtype: cuda.CUmodule` — **EN:** Continues the docstring for the function `load_cubin_module_data`. **CN:** 继续说明 function `load_cubin_module_data` 的文档字符串。
+- **L495** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `load_cubin_module_data`. **CN:** 继续说明 function `load_cubin_module_data` 的文档字符串。
+- **L496** `    """` — **EN:** Ends the docstring for the function `load_cubin_module_data`. **CN:** 结束说明 function `load_cubin_module_data` 的文档字符串。
+- **L497** `    # Load module data` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L498** `    _log().info(f"cuModuleLoadData {np.char.array(cubin_data).ctypes.data}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L499** `    module = checkCudaErrors(` — **EN:** Assigns a value to module. **CN:** 将一个值赋给 module。
+- **L500** `        cuda.cuModuleLoadData(np.char.array(cubin_data).ctypes.data)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L501** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L502** `    return module` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L503** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L504** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L505** `def get_kernel_function(module: Any, kernel_name: str) -> Any:` — **EN:** Defines function `get_kernel_function`. **CN:** 定义函数 `get_kernel_function`。
+- **L506** `    """` — **EN:** Starts the docstring for the function `get_kernel_function`. **CN:** 开始说明 function `get_kernel_function` 的文档字符串。
+- **L507** `    Retrieves the kernel function from the module.` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L508** `    :param module: The module.` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L509** `    :type module: cuda.CUmodule` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L510** `    :param kernel_name: The name of the kernel.` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L511** `    :type kernel_name: str` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L512** `    :return: The kernel function.` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L513** `    :rtype: cuda.CUfunction` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L514** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_kernel_function`. **CN:** 继续说明 function `get_kernel_function` 的文档字符串。
+- **L515** `    """` — **EN:** Ends the docstring for the function `get_kernel_function`. **CN:** 结束说明 function `get_kernel_function` 的文档字符串。
+- **L516** `    _log().info(f"cuModuleGetFunction {module} {kernel_name}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L517** `    kernel = checkCudaErrors(` — **EN:** Assigns a value to kernel. **CN:** 将一个值赋给 kernel。
+- **L518** `        cuda.cuModuleGetFunction(module, bytes(kernel_name, "utf-8"))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L519** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L520** `    _log().info(f"{kernel} <-- cuModuleGetFunction")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L521** `    return kernel` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L524** `def load_library(cubin_file: str) -> Any:` — **EN:** Defines function `load_library`. **CN:** 定义函数 `load_library`。
+- **L525** `    """` — **EN:** Starts the docstring for the function `load_library`. **CN:** 开始说明 function `load_library` 的文档字符串。
+- **L526** `    Loads a CUBIN file and returns the library.` — **EN:** Continues the docstring for the function `load_library`. **CN:** 继续说明 function `load_library` 的文档字符串。
+- **L527** `    :param cubin_file: The path to the CUBIN file.` — **EN:** Continues the docstring for the function `load_library`. **CN:** 继续说明 function `load_library` 的文档字符串。
+- **L528** `    :type cubin_file: str` — **EN:** Continues the docstring for the function `load_library`. **CN:** 继续说明 function `load_library` 的文档字符串。
+- **L529** `    :return: The library.` — **EN:** Continues the docstring for the function `load_library`. **CN:** 继续说明 function `load_library` 的文档字符串。
+- **L530** `    :rtype: cuda.CUlibrary` — **EN:** Continues the docstring for the function `load_library`. **CN:** 继续说明 function `load_library` 的文档字符串。
+- **L531** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `load_library`. **CN:** 继续说明 function `load_library` 的文档字符串。
+- **L532** `    """` — **EN:** Ends the docstring for the function `load_library`. **CN:** 结束说明 function `load_library` 的文档字符串。
+- **L533** `    # Load CUBIN file as binary data` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L534** `    _log().info(f"read cubin {cubin_file}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L535** `    with open(cubin_file, "rb") as f:` — **EN:** Starts a context-managed block using open(cubin_file, 'rb'). **CN:** 开始一个使用 open(cubin_file, 'rb') 的上下文管理代码块。
+- **L536** `        cubin_data = f.read()` — **EN:** Assigns a value to cubin_data. **CN:** 将一个值赋给 cubin_data。
+- **L537** `    return load_library_data(cubin_data)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L540** `def unload_library(library: Any) -> None:` — **EN:** Defines function `unload_library`. **CN:** 定义函数 `unload_library`。
+- **L541** `    """` — **EN:** Starts the docstring for the function `unload_library`. **CN:** 开始说明 function `unload_library` 的文档字符串。
+- **L542** `    Unloads a CUBIN library.` — **EN:** Continues the docstring for the function `unload_library`. **CN:** 继续说明 function `unload_library` 的文档字符串。
+- **L543** `    :param library: The library.` — **EN:** Continues the docstring for the function `unload_library`. **CN:** 继续说明 function `unload_library` 的文档字符串。
+- **L544** `    :type library: cuda.CUlibrary` — **EN:** Continues the docstring for the function `unload_library`. **CN:** 继续说明 function `unload_library` 的文档字符串。
+- **L545** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `unload_library`. **CN:** 继续说明 function `unload_library` 的文档字符串。
+- **L546** `    """` — **EN:** Ends the docstring for the function `unload_library`. **CN:** 结束说明 function `unload_library` 的文档字符串。
+- **L547** `    _log().info(f"cuLibraryUnload {library}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L548** `    checkCudaErrors(cuda.cuLibraryUnload(library))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L549** `    _log().info(f"cuLibraryUnload done {library}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L552** `def load_library_data(cubin_data: bytes | int) -> Any:` — **EN:** Defines function `load_library_data`. **CN:** 定义函数 `load_library_data`。
+- **L553** `    """` — **EN:** Starts the docstring for the function `load_library_data`. **CN:** 开始说明 function `load_library_data` 的文档字符串。
+- **L554** `    Loads a CUBIN from data and returns the library.` — **EN:** Continues the docstring for the function `load_library_data`. **CN:** 继续说明 function `load_library_data` 的文档字符串。
+- **L555** `    :param cubin_data: The binary data of the CUBIN.` — **EN:** Continues the docstring for the function `load_library_data`. **CN:** 继续说明 function `load_library_data` 的文档字符串。
+- **L556** `    :type cubin_data: bytes or ctypes.c_void_p` — **EN:** Continues the docstring for the function `load_library_data`. **CN:** 继续说明 function `load_library_data` 的文档字符串。
+- **L557** `    :return: The library.` — **EN:** Continues the docstring for the function `load_library_data`. **CN:** 继续说明 function `load_library_data` 的文档字符串。
+- **L558** `    :rtype: cuda.CUlibrary` — **EN:** Continues the docstring for the function `load_library_data`. **CN:** 继续说明 function `load_library_data` 的文档字符串。
+- **L559** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `load_library_data`. **CN:** 继续说明 function `load_library_data` 的文档字符串。
+- **L560** `    """` — **EN:** Ends the docstring for the function `load_library_data`. **CN:** 结束说明 function `load_library_data` 的文档字符串。
+- **L561** `    # Load module data` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L562** `    if isinstance(cubin_data, bytes):` — **EN:** Starts a conditional branch guarded by `isinstance(cubin_data, bytes)`. **CN:** 开始一个由 `isinstance(cubin_data, bytes)` 控制的条件分支。
+- **L563** `        cubin_data = np.char.array(cubin_data).ctypes.data` — **EN:** Assigns a value to cubin_data. **CN:** 将一个值赋给 cubin_data。
+- **L564** `    _log().info(f"cuLibraryLoadData {cubin_data}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `    library = checkCudaErrors(` — **EN:** Assigns a value to library. **CN:** 将一个值赋给 library。
+- **L567** `        cuda.cuLibraryLoadData(cubin_data, None, None, 0, None, None, 0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `    return library` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L571** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L572** `def get_library_kernel(library: Any, kernel_name: str) -> Any:` — **EN:** Defines function `get_library_kernel`. **CN:** 定义函数 `get_library_kernel`。
+- **L573** `    """` — **EN:** Starts the docstring for the function `get_library_kernel`. **CN:** 开始说明 function `get_library_kernel` 的文档字符串。
+- **L574** `    Retrieves the kernel from the library.` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L575** `    :param library: The library.` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L576** `    :type library: cuda.CUlibrary` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L577** `    :param kernel_name: The name of the kernel.` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L578** `    :type kernel_name: str` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L579** `    :return: The kernel.` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L580** `    :rtype: cuda.CUfunction` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L581** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_library_kernel`. **CN:** 继续说明 function `get_library_kernel` 的文档字符串。
+- **L582** `    """` — **EN:** Ends the docstring for the function `get_library_kernel`. **CN:** 结束说明 function `get_library_kernel` 的文档字符串。
+- **L583** `    _log().info(f"cuLibraryGetKernel {library} {kernel_name}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L584** `    kernel = checkCudaErrors(` — **EN:** Assigns a value to kernel. **CN:** 将一个值赋给 kernel。
+- **L585** `        cuda.cuLibraryGetKernel(library, bytes(kernel_name, "utf-8"))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `    _log().info(f"{kernel} <-- cuLibraryGetKernel")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L588** `    return kernel` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L589** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L590** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L591** `def get_function_from_kernel(kernel: Any) -> Any:` — **EN:** Defines function `get_function_from_kernel`. **CN:** 定义函数 `get_function_from_kernel`。
+- **L592** `    """` — **EN:** Starts the docstring for the function `get_function_from_kernel`. **CN:** 开始说明 function `get_function_from_kernel` 的文档字符串。
+- **L593** `    Retrieves the kernel function from the kernel.` — **EN:** Continues the docstring for the function `get_function_from_kernel`. **CN:** 继续说明 function `get_function_from_kernel` 的文档字符串。
+- **L594** `    :param kernel: The kernel.` — **EN:** Continues the docstring for the function `get_function_from_kernel`. **CN:** 继续说明 function `get_function_from_kernel` 的文档字符串。
+- **L595** `    :type kernel: cuda.CUfunction` — **EN:** Continues the docstring for the function `get_function_from_kernel`. **CN:** 继续说明 function `get_function_from_kernel` 的文档字符串。
+- **L596** `    :return: The kernel function.` — **EN:** Continues the docstring for the function `get_function_from_kernel`. **CN:** 继续说明 function `get_function_from_kernel` 的文档字符串。
+- **L597** `    :rtype: cuda.CUfunction` — **EN:** Continues the docstring for the function `get_function_from_kernel`. **CN:** 继续说明 function `get_function_from_kernel` 的文档字符串。
+- **L598** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_function_from_kernel`. **CN:** 继续说明 function `get_function_from_kernel` 的文档字符串。
+- **L599** `    """` — **EN:** Ends the docstring for the function `get_function_from_kernel`. **CN:** 结束说明 function `get_function_from_kernel` 的文档字符串。
+- **L600** `    _log().info(f"cuKernelGetFunction {kernel}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L601** `    kernel_fn = checkCudaErrors(cuda.cuKernelGetFunction(kernel))` — **EN:** Assigns a value to kernel_fn. **CN:** 将一个值赋给 kernel_fn。
+- **L602** `    _log().info(f"{kernel_fn} <-- cuKernelGetFunction")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L603** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L604** `    return kernel_fn` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L605** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L606** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L607** `def load_library_from_file(file_path: str | os.PathLike[str]) -> Any:` — **EN:** Defines function `load_library_from_file`. **CN:** 定义函数 `load_library_from_file`。
+- **L608** `    """` — **EN:** Starts the docstring for the function `load_library_from_file`. **CN:** 开始说明 function `load_library_from_file` 的文档字符串。
+- **L609** `    Loads a file, e.g., cubin, and returns the library` — **EN:** Continues the docstring for the function `load_library_from_file`. **CN:** 继续说明 function `load_library_from_file` 的文档字符串。
+- **L610** `    :param file_path: The path to the file.` — **EN:** Continues the docstring for the function `load_library_from_file`. **CN:** 继续说明 function `load_library_from_file` 的文档字符串。
+- **L611** `    :type file_path: str or Path` — **EN:** Continues the docstring for the function `load_library_from_file`. **CN:** 继续说明 function `load_library_from_file` 的文档字符串。
+- **L612** `    :return: The library.` — **EN:** Continues the docstring for the function `load_library_from_file`. **CN:** 继续说明 function `load_library_from_file` 的文档字符串。
+- **L613** `    :rtype: cuda.CUlibrary` — **EN:** Continues the docstring for the function `load_library_from_file`. **CN:** 继续说明 function `load_library_from_file` 的文档字符串。
+- **L614** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `load_library_from_file`. **CN:** 继续说明 function `load_library_from_file` 的文档字符串。
+- **L615** `    """` — **EN:** Ends the docstring for the function `load_library_from_file`. **CN:** 结束说明 function `load_library_from_file` 的文档字符串。
+- **L616** `    _log().info(f"cuLibraryLoadFromFile {file_path}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L617** `    library = checkCudaErrors(` — **EN:** Assigns a value to library. **CN:** 将一个值赋给 library。
+- **L618** `        cuda.cuLibraryLoadFromFile(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L619** `            fileName=str(file_path).encode(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L620** `            jitOptions=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L621** `            jitOptionsValues=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L622** `            numJitOptions=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L623** `            libraryOptions=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L624** `            libraryOptionValues=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L625** `            numLibraryOptions=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `    _log().info(f"{library} <-- cuLibraryLoadFromFile")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L629** `    return library` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `def launch_kernel(` — **EN:** Defines function `launch_kernel`. **CN:** 定义函数 `launch_kernel`。
+- **L633** `    kernel: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L634** `    grid_dims: tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L635** `    block_dims: tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L636** `    stream: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L637** `    smem_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L638** `    kernel_args: Any | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L639** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L640** `    """` — **EN:** Starts the docstring for the function `launch_kernel`. **CN:** 开始说明 function `launch_kernel` 的文档字符串。
+- **L641** `    Launches the CUDA kernel.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L642** `    :param kernel: The kernel.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L643** `    :type kernel: cuda.CUfunction` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L644** `    :param grid_dims: The grid dimensions.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L645** `    :type grid_dims: tuple(int, int, int)` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L646** `    :param block_dims: The block dimensions.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L647** `    :type block_dims: tuple(int, int, int)` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L648** `    :param stream: The stream.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L649** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L650** `    :param smem_size: The shared memory size.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L651** `    :type smem_size: int` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L652** `    :param kernel_args: The kernel arguments.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L653** `    :type kernel_args: tuple` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L654** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L655** `    Example:` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L656** `    \`\`\`` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L657** `    launch_kernel(kernel, (1, 1, 1), (1, 1, 1), stream, 0, (1, 2, 3))` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L658** `    \`\`\`` — **EN:** Continues the docstring for the function `launch_kernel`. **CN:** 继续说明 function `launch_kernel` 的文档字符串。
+- **L659** `    """` — **EN:** Ends the docstring for the function `launch_kernel`. **CN:** 结束说明 function `launch_kernel` 的文档字符串。
+- **L660** `    _log().info(` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L661** `        f"cuLaunchKernel {kernel} grid={grid_dims} blocks={block_dims} smem_size={smem_size} stream={stream} {kernel_args}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L663** `    checkCudaErrors(` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L664** `        cuda.cuLaunchKernel(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** `            kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L666** `            grid_dims[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L667** `            grid_dims[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L668** `            grid_dims[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L669** `            block_dims[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L670** `            block_dims[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** `            block_dims[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `            smem_size,  # Shared memory size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `            stream,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `            kernel_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L675** `            0,  # Extra parameters` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L680** `def stream_sync(stream: Any) -> None:` — **EN:** Defines function `stream_sync`. **CN:** 定义函数 `stream_sync`。
+- **L681** `    """` — **EN:** Starts the docstring for the function `stream_sync`. **CN:** 开始说明 function `stream_sync` 的文档字符串。
+- **L682** `    Synchronizes the CUDA stream.` — **EN:** Continues the docstring for the function `stream_sync`. **CN:** 继续说明 function `stream_sync` 的文档字符串。
+- **L683** `    :param stream: The stream.` — **EN:** Continues the docstring for the function `stream_sync`. **CN:** 继续说明 function `stream_sync` 的文档字符串。
+- **L684** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `stream_sync`. **CN:** 继续说明 function `stream_sync` 的文档字符串。
+- **L685** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `stream_sync`. **CN:** 继续说明 function `stream_sync` 的文档字符串。
+- **L686** `    """` — **EN:** Ends the docstring for the function `stream_sync`. **CN:** 结束说明 function `stream_sync` 的文档字符串。
+- **L687** `    _log().info(f"cuStreamSynchronize {stream}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L688** `    checkCudaErrors(cuda.cuStreamSynchronize(stream))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L689** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L690** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L691** `def stream_create(id: int = 0) -> Any:` — **EN:** Defines function `stream_create`. **CN:** 定义函数 `stream_create`。
+- **L692** `    """` — **EN:** Starts the docstring for the function `stream_create`. **CN:** 开始说明 function `stream_create` 的文档字符串。
+- **L693** `    Creates the CUDA stream.` — **EN:** Continues the docstring for the function `stream_create`. **CN:** 继续说明 function `stream_create` 的文档字符串。
+- **L694** `    :param id: The ID of the stream.` — **EN:** Continues the docstring for the function `stream_create`. **CN:** 继续说明 function `stream_create` 的文档字符串。
+- **L695** `    :type id: int` — **EN:** Continues the docstring for the function `stream_create`. **CN:** 继续说明 function `stream_create` 的文档字符串。
+- **L696** `    :return: The stream.` — **EN:** Continues the docstring for the function `stream_create`. **CN:** 继续说明 function `stream_create` 的文档字符串。
+- **L697** `    :rtype: cuda.CUstream` — **EN:** Continues the docstring for the function `stream_create`. **CN:** 继续说明 function `stream_create` 的文档字符串。
+- **L698** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `stream_create`. **CN:** 继续说明 function `stream_create` 的文档字符串。
+- **L699** `    """` — **EN:** Ends the docstring for the function `stream_create`. **CN:** 结束说明 function `stream_create` 的文档字符串。
+- **L700** `    _log().info(f"cuStreamCreate {id}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L701** `    stream = checkCudaErrors(cuda.cuStreamCreate(id))` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L702** `    _log().info(f"{stream} <-- cuStreamCreate")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L703** `    return stream` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L704** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L705** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L706** `def stream_destroy(stream: Any) -> None:` — **EN:** Defines function `stream_destroy`. **CN:** 定义函数 `stream_destroy`。
+- **L707** `    """` — **EN:** Starts the docstring for the function `stream_destroy`. **CN:** 开始说明 function `stream_destroy` 的文档字符串。
+- **L708** `    Destroys the CUDA stream.` — **EN:** Continues the docstring for the function `stream_destroy`. **CN:** 继续说明 function `stream_destroy` 的文档字符串。
+- **L709** `    :param stream: The stream.` — **EN:** Continues the docstring for the function `stream_destroy`. **CN:** 继续说明 function `stream_destroy` 的文档字符串。
+- **L710** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `stream_destroy`. **CN:** 继续说明 function `stream_destroy` 的文档字符串。
+- **L711** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `stream_destroy`. **CN:** 继续说明 function `stream_destroy` 的文档字符串。
+- **L712** `    """` — **EN:** Ends the docstring for the function `stream_destroy`. **CN:** 结束说明 function `stream_destroy` 的文档字符串。
+- **L713** `    _log().info(f"cuStreamDestroy {stream}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L714** `    checkCudaErrors(cuda.cuStreamDestroy(stream))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L715** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L716** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L717** `def context_destroy(context: Any) -> None:` — **EN:** Defines function `context_destroy`. **CN:** 定义函数 `context_destroy`。
+- **L718** `    """` — **EN:** Starts the docstring for the function `context_destroy`. **CN:** 开始说明 function `context_destroy` 的文档字符串。
+- **L719** `    Destroys the CUDA context.` — **EN:** Continues the docstring for the function `context_destroy`. **CN:** 继续说明 function `context_destroy` 的文档字符串。
+- **L720** `    :param context: The context.` — **EN:** Continues the docstring for the function `context_destroy`. **CN:** 继续说明 function `context_destroy` 的文档字符串。
+- **L721** `    :type context: cuda.CUcontext` — **EN:** Continues the docstring for the function `context_destroy`. **CN:** 继续说明 function `context_destroy` 的文档字符串。
+- **L722** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `context_destroy`. **CN:** 继续说明 function `context_destroy` 的文档字符串。
+- **L723** `    """` — **EN:** Ends the docstring for the function `context_destroy`. **CN:** 结束说明 function `context_destroy` 的文档字符串。
+- **L724** `    _log().info(f"cuCtxDestroy {context}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L725** `    checkCudaErrors(cuda.cuCtxDestroy(context))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L726** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L727** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L728** `def allocate(size_in_bytes: int, stream: Any | None = None) -> Any:` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L729** `    """` — **EN:** Starts the docstring for the function `allocate`. **CN:** 开始说明 function `allocate` 的文档字符串。
+- **L730** `    Allocate device memory based on numpy host array size.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L731** `    :param size_in_bytes: The size of the memory to allocate.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L732** `    :type size_in_bytes: int` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L733** `    :param stream: The stream.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L734** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L735** `    :return: The device memory.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L736** `    :rtype: cuda.CUdeviceptr` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L737** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L738** `    """` — **EN:** Ends the docstring for the function `allocate`. **CN:** 结束说明 function `allocate` 的文档字符串。
+- **L739** `    _log().info("Allocate size_in_bytes=[%s] stream=[%s]", size_in_bytes, stream)` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L740** `    if stream is None:` — **EN:** Starts a conditional branch guarded by `stream is None`. **CN:** 开始一个由 `stream is None` 控制的条件分支。
+- **L741** `        device_memory = checkCudaErrors(cuda.cuMemAlloc(size_in_bytes))` — **EN:** Assigns a value to device_memory. **CN:** 将一个值赋给 device_memory。
+- **L742** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L743** `        device_memory = checkCudaErrors(cuda.cuMemAllocAsync(size_in_bytes, stream))` — **EN:** Assigns a value to device_memory. **CN:** 将一个值赋给 device_memory。
+- **L744** `    _log().info("Allocated [%s]", device_memory)` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L745** `    return device_memory` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L746** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L747** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L748** `def deallocate(device_pointer: Any, stream: Any | None = None) -> None:` — **EN:** Defines function `deallocate`. **CN:** 定义函数 `deallocate`。
+- **L749** `    """` — **EN:** Starts the docstring for the function `deallocate`. **CN:** 开始说明 function `deallocate` 的文档字符串。
+- **L750** `    Deallocate the specified device memory pointer.` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L751** `    :param device_pointer: The device memory pointer.` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L752** `    :type device_pointer: cuda.CUdeviceptr` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L753** `    :param stream: The stream.` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L754** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L755** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `deallocate`. **CN:** 继续说明 function `deallocate` 的文档字符串。
+- **L756** `    """` — **EN:** Ends the docstring for the function `deallocate`. **CN:** 结束说明 function `deallocate` 的文档字符串。
+- **L757** `    _log().info(` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L758** `        "Deallocate device_pointer=[%s] stream=[%s]", hex(int(device_pointer)), stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L760** `    if stream is None:` — **EN:** Starts a conditional branch guarded by `stream is None`. **CN:** 开始一个由 `stream is None` 控制的条件分支。
+- **L761** `        checkCudaErrors(cuda.cuMemFree(device_pointer))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L762** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L763** `        checkCudaErrors(cuda.cuMemFreeAsync(device_pointer, stream))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L764** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L765** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L766** `def memcpy_h2d(` — **EN:** Defines function `memcpy_h2d`. **CN:** 定义函数 `memcpy_h2d`。
+- **L767** `    host_pointer: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L768** `    device_pointer: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L769** `    size_in_bytes: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L770** `    stream: Any | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L771** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L772** `    """` — **EN:** Starts the docstring for the function `memcpy_h2d`. **CN:** 开始说明 function `memcpy_h2d` 的文档字符串。
+- **L773** `    Copy data from host to device memory` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L774** `    if stream is None, the copy is synchronous otherwise it is asynchronous.` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L775** `    :param host_pointer: The host contiguous memory pointer.` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L776** `    :type host_pointer: cuda.CUdeviceptr` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L777** `    :param device_pointer: The device memory pointer.` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L778** `    :type device_pointer: cuda.CUdeviceptr` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L779** `    :param size_in_bytes: The size of the memory to copy.` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L780** `    :type size_in_bytes: int` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L781** `    :param stream: The stream. default to None.` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L782** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L783** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `memcpy_h2d`. **CN:** 继续说明 function `memcpy_h2d` 的文档字符串。
+- **L784** `    """` — **EN:** Ends the docstring for the function `memcpy_h2d`. **CN:** 结束说明 function `memcpy_h2d` 的文档字符串。
+- **L785** `    _log().info(` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L786** `        "Copy host-to-device host_pointer[%s] device_ptr=[%s] size_in_bytes=[%s] stream=[%s]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L787** `        hex(host_pointer),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** `        hex(int(device_pointer)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L789** `        size_in_bytes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `        stream,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `    if stream is None:` — **EN:** Starts a conditional branch guarded by `stream is None`. **CN:** 开始一个由 `stream is None` 控制的条件分支。
+- **L793** `        checkCudaErrors(cuda.cuMemcpyHtoD(device_pointer, host_pointer, size_in_bytes))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L794** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L795** `        checkCudaErrors(` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L796** `            cuda.cuMemcpyHtoDAsync(device_pointer, host_pointer, size_in_bytes, stream)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L797** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L798** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L799** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L800** `def memcpy_d2h(` — **EN:** Defines function `memcpy_d2h`. **CN:** 定义函数 `memcpy_d2h`。
+- **L801** `    host_pointer: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L802** `    device_pointer: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L803** `    size_in_bytes: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L804** `    stream: Any | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L805** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L806** `    """` — **EN:** Starts the docstring for the function `memcpy_d2h`. **CN:** 开始说明 function `memcpy_d2h` 的文档字符串。
+- **L807** `    Copy data from device to host memory` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L808** `    if stream is None, the copy is synchronous otherwise it is asynchronous.` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L809** `    :param host_pointer: The host contiguous memory pointer.` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L810** `    :type host_pointer: cuda.CUdeviceptr` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L811** `    :param device_pointer: The device memory pointer.` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L812** `    :type device_pointer: cuda.CUdeviceptr` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L813** `    :param size_in_bytes: The size of the memory to copy.` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L814** `    :type size_in_bytes: int` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L815** `    :param stream: The stream. default to None.` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L816** `    :type stream: cuda.CUstream` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L817** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `memcpy_d2h`. **CN:** 继续说明 function `memcpy_d2h` 的文档字符串。
+- **L818** `    """` — **EN:** Ends the docstring for the function `memcpy_d2h`. **CN:** 结束说明 function `memcpy_d2h` 的文档字符串。
+- **L819** `    _log().info(` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L820** `        "Copy device-host-to device_pointer=[%s] host_pointer[%s]  size_in_bytes=[%s] stream=[%s]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L821** `        hex(int(device_pointer)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L822** `        hex(host_pointer),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** `        size_in_bytes,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** `        stream,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L825** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** `    if stream is None:` — **EN:** Starts a conditional branch guarded by `stream is None`. **CN:** 开始一个由 `stream is None` 控制的条件分支。
+- **L827** `        checkCudaErrors(cuda.cuMemcpyDtoH(host_pointer, device_pointer, size_in_bytes))` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L828** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L829** `        checkCudaErrors(` — **EN:** Invokes `checkCudaErrors` as a standalone call. **CN:** 以独立语句方式调用 `checkCudaErrors`。
+- **L830** `            cuda.cuMemcpyDtoHAsync(host_pointer, device_pointer, size_in_bytes, stream)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L831** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L832** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L833** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L834** `def default_stream() -> Any:` — **EN:** Defines function `default_stream`. **CN:** 定义函数 `default_stream`。
+- **L835** `    """` — **EN:** Starts the docstring for the function `default_stream`. **CN:** 开始说明 function `default_stream` 的文档字符串。
+- **L836** `    Returns the default stream.` — **EN:** Continues the docstring for the function `default_stream`. **CN:** 继续说明 function `default_stream` 的文档字符串。
+- **L837** `    :return: The default stream.` — **EN:** Continues the docstring for the function `default_stream`. **CN:** 继续说明 function `default_stream` 的文档字符串。
+- **L838** `    :rtype: cuda.CUstream` — **EN:** Continues the docstring for the function `default_stream`. **CN:** 继续说明 function `default_stream` 的文档字符串。
+- **L839** `    """` — **EN:** Ends the docstring for the function `default_stream`. **CN:** 结束说明 function `default_stream` 的文档字符串。
+- **L840** `    return cuda.CUstream(0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L841** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L842** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L843** `@lru_cache(maxsize=1)` — **EN:** Applies decorator `lru_cache(maxsize=1)` to the following definition. **CN:** 将装饰器 `lru_cache(maxsize=1)` 应用于后面的定义。
+- **L844** `def get_driver_version() -> Any:` — **EN:** Defines function `get_driver_version`. **CN:** 定义函数 `get_driver_version`。
+- **L845** `    """` — **EN:** Starts the docstring for the function `get_driver_version`. **CN:** 开始说明 function `get_driver_version` 的文档字符串。
+- **L846** `    Returns the CUDA driver version.` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L847** `    Note: the value is cached after the first call.` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L848** `    :return: The CUDA driver version.` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L849** `    :rtype: int` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L850** `    Example:` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L851** `        version = get_driver_version()` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L852** `        print(f"CUDA driver version: {version}")` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L853** `        >>> 12050` — **EN:** Continues the docstring for the function `get_driver_version`. **CN:** 继续说明 function `get_driver_version` 的文档字符串。
+- **L854** `    """` — **EN:** Ends the docstring for the function `get_driver_version`. **CN:** 结束说明 function `get_driver_version` 的文档字符串。
+- **L855** `    return checkCudaErrors(cuda.cuDriverGetVersion())` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L856** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L857** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L858** `def set_kernel_attribute(` — **EN:** Defines function `set_kernel_attribute`. **CN:** 定义函数 `set_kernel_attribute`。
+- **L859** `    kernel: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L860** `    attribute: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L861** `    value: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L862** `    device: Any | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L863** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L864** `    """` — **EN:** Starts the docstring for the function `set_kernel_attribute`. **CN:** 开始说明 function `set_kernel_attribute` 的文档字符串。
+- **L865** `    Sets a CUDA kernel attribute.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L866** `    If the device is not provided, the attribute is set for the current device.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L867** `    and cuda.cuFuncSetAttribute is called.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L868** `    Otherwise, cuda.cuKernelSetAttribute is called.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L869** `    :param kernel: The kernel.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L870** `    :type kernel: cuda.CUfunction` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L871** `    :param attribute: The attribute.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L872** `    :type attribute: cuda.CUfunction_attribute` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L873** `    :param value: The value.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L874** `    :type value: int` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L875** `    :param device: The device.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L876** `    :type device: cuda.CUdevice` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L877** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `set_kernel_attribute`. **CN:** 继续说明 function `set_kernel_attribute` 的文档字符串。
+- **L878** `    """` — **EN:** Ends the docstring for the function `set_kernel_attribute`. **CN:** 结束说明 function `set_kernel_attribute` 的文档字符串。
+- **L879** `    if device is None:` — **EN:** Starts a conditional branch guarded by `device is None`. **CN:** 开始一个由 `device is None` 控制的条件分支。
+- **L880** `        _log().info(f"cuFuncSetAttribute {kernel} {attribute} {value}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L881** `        return checkCudaErrors(cuda.cuFuncSetAttribute(kernel, attribute, value))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L882** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L883** `        _log().info(f"cuKernelSetAttribute {attribute} {value} {kernel} {device}")` — **EN:** Invokes `_log().info` as a standalone call. **CN:** 以独立语句方式调用 `_log().info`。
+- **L884** `        return checkCudaErrors(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L885** `            cuda.cuKernelSetAttribute(attribute, value, kernel, device)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L886** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L887** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L888** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L889** `def get_device_attribute(attribute: Any, device_id: int = 0) -> Any:` — **EN:** Defines function `get_device_attribute`. **CN:** 定义函数 `get_device_attribute`。
+- **L890** `    """` — **EN:** Starts the docstring for the function `get_device_attribute`. **CN:** 开始说明 function `get_device_attribute` 的文档字符串。
+- **L891** `    Gets a CUDA device attribute.` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L892** `    :param attribute: The attribute.` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L893** `    :type attribute: cuda.CUdevice_attribute` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L894** `    :param device_id: The ID of the device.` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L895** `    :type device_id: int` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L896** `    :return: The attribute value.` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L897** `    :rtype: int` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L898** `    :raise DSLRuntimeError: If the CUDA operation fails.` — **EN:** Continues the docstring for the function `get_device_attribute`. **CN:** 继续说明 function `get_device_attribute` 的文档字符串。
+- **L899** `    """` — **EN:** Ends the docstring for the function `get_device_attribute`. **CN:** 结束说明 function `get_device_attribute` 的文档字符串。
+- **L900** `    device = checkCudaErrors(cuda.cuDeviceGet(device_id))` — **EN:** Assigns a value to device. **CN:** 将一个值赋给 device。
+- **L901** `    return checkCudaErrors(cuda.cuDeviceGetAttribute(attribute, device))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.runtime.cuda`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.runtime.cuda`。
+- EN: Module docstring summary: This module provides CUDA Python helper functions CN: 模块文档摘要为：This module provides CUDA Python helper functions
+- EN: Top-level classes: DeviceInfo, DevicePrimaryContext CN: 顶层类包括：DeviceInfo, DevicePrimaryContext
+- EN: Top-level functions: _cudaGetErrorEnum, _get_gpu_arch_info, get_compute_capability_major_minor, get_device_info, checkCudaErrors, get_current_device, get_device, _create_cuda_context, initialize_cuda_context, device_primary_context_retain, device_primary_context_release, load_cubin_module, ... (+22 more) CN: 顶层函数包括：_cudaGetErrorEnum, _get_gpu_arch_info, get_compute_capability_major_minor, get_device_info, checkCudaErrors, get_current_device, get_device, _create_cuda_context, initialize_cuda_context, device_primary_context_retain, device_primary_context_release, load_cubin_module, ... (+22 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..utils.logger:log, ..common:* CN: 内部依赖：..utils.logger:log, ..common:*
+- EN: External or standard-library dependencies: functools:lru_cache, dataclasses:dataclass, typing:Any, enum:IntEnum, numpy, os, ctypes, cuda.bindings.driver, cuda.bindings.runtime, cuda.bindings.nvrtc CN: 外部或标准库依赖：functools:lru_cache, dataclasses:dataclass, typing:Any, enum:IntEnum, numpy, os, ctypes, cuda.bindings.driver, cuda.bindings.runtime, cuda.bindings.nvrtc

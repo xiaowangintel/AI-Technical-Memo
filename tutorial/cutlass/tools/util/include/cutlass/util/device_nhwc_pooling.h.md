@@ -1,0 +1,1741 @@
+# device_nhwc_pooling.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/device_nhwc_pooling.h`
+**Purpose / 用途**: Provides CUDA device utilities for nhwc pooling. / 提供与 nhwc pooling 相关的 CUDA 设备端工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code> * \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L36** <code> * \brief cuda kernels to do avg/max pooling on a device memory tensor with NHWC layout.</code>
+  - EN: Comment that documents intent or context: "\brief cuda kernels to do avg/max pooling on a device memory tensor with NHWC layout.".
+  - CN: 用于说明意图或上下文的注释："\brief cuda kernels to do avg/max pooling on a device memory tensor with NHWC layout."。
+- **L37** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/layout/tensor.h&quot;</code>
+  - EN: Includes `cutlass/layout/tensor.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/tensor.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L41** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L42** <code>#include &quot;cutlass/tensor_coord.h&quot;</code>
+  - EN: Includes `cutlass/tensor_coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/tensor_ref.h&quot;</code>
+  - EN: Includes `cutlass/tensor_ref.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_ref.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>#include &quot;device_utils.h&quot;</code>
+  - EN: Includes `device_utils.h` so this file can use project-specific declarations from `device_utils.h`.
+  - CN: 引入 `device_utils.h`，使当前文件可以使用来自 `device_utils.h` 的项目专用声明。
+- **L45** <code>#include &lt;cfloat&gt;</code>
+  - EN: Includes `cfloat` so this file can use APIs or definitions from `cfloat`.
+  - CN: 引入 `cfloat`，使当前文件可以使用来自 `cfloat` 的 API 或定义。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>/** \brief interface to do avg/max pooling on a device memory tensor with NHWC layout.</code>
+  - EN: Comment that documents intent or context: "\brief interface to do avg/max pooling on a device memory tensor with NHWC layout.".
+  - CN: 用于说明意图或上下文的注释："\brief interface to do avg/max pooling on a device memory tensor with NHWC layout."。
+- **L50** <code> * \tparam T: data type</code>
+  - EN: Comment that documents intent or context: "\tparam T: data type".
+  - CN: 用于说明意图或上下文的注释："\tparam T: data type"。
+- **L51** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L52** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L53** <code>void pooling_nhwc(cutlass::Tensor4DCoord input_tensor_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `pooling_nhwc`.
+  - CN: 开始或继续与 `pooling_nhwc` 相关的签名/调用语法。
+- **L54** <code>                  cutlass::Tensor4DCoord filter_tensor_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L55** <code>                  cutlass::Tensor4DCoord output_tensor_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L56** <code>                  cutlass::MatrixCoord padding,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L57** <code>                  cutlass::MatrixCoord stride,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L58** <code>                  TensorRef&lt;T, layout::TensorNHWC&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L59** <code>                  TensorRef&lt;T, layout::TensorNHWC&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L60** <code>                  int poolingType, //0 for avg pooling ; 1 for max pooling</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>                  cudaStream_t stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>/** get the output size of pooling</code>
+  - EN: Comment that documents intent or context: "get the output size of pooling".
+  - CN: 用于说明意图或上下文的注释："get the output size of pooling"。
+- **L64** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L65** <code>inline int getOutputSize(int H_W, int padding, int kernel_size, int stride)</code>
+  - EN: Begins or continues the signature/call syntax involving `getOutputSize`.
+  - CN: 开始或继续与 `getOutputSize` 相关的签名/调用语法。
+- **L66** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L67** <code>    return (H_W + 2 * padding - kernel_size) / stride + 1;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L68** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L69** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L70** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L71** <code> * input is [N, H, W, C]</code>
+  - EN: Comment that documents intent or context: "input is [N, H, W, C]".
+  - CN: 用于说明意图或上下文的注释："input is [N, H, W, C]"。
+- **L72** <code> * assume stride == kernel_size</code>
+  - EN: Comment that documents intent or context: "assume stride == kernel_size".
+  - CN: 用于说明意图或上下文的注释："assume stride == kernel_size"。
+- **L73** <code> * output_h = (H + 2*padding_H - kernel_H)/stride_H</code>
+  - EN: Comment that documents intent or context: "output_h = (H + 2*padding_H - kernel_H)/stride_H".
+  - CN: 用于说明意图或上下文的注释："output_h = (H + 2*padding_H - kernel_H)/stride_H"。
+- **L74** <code> * output_w = (W + 2*padding_W - kernel_W)/stride_W</code>
+  - EN: Comment that documents intent or context: "output_w = (W + 2*padding_W - kernel_W)/stride_W".
+  - CN: 用于说明意图或上下文的注释："output_w = (W + 2*padding_W - kernel_W)/stride_W"。
+- **L75** <code> * output is [N, output_h, output_w, C]</code>
+  - EN: Comment that documents intent or context: "output is [N, output_h, output_w, C]".
+  - CN: 用于说明意图或上下文的注释："output is [N, output_h, output_w, C]"。
+- **L76** <code> * grid(N, output_h, output_w)</code>
+  - EN: Comment that documents intent or context: "grid(N, output_h, output_w)".
+  - CN: 用于说明意图或上下文的注释："grid(N, output_h, output_w)"。
+- **L77** <code> * block(min(C, 256)) :</code>
+  - EN: Comment that documents intent or context: "block(min(C, 256)) :".
+  - CN: 用于说明意图或上下文的注释："block(min(C, 256)) :"。
+- **L78** <code> * each block deals with C elements of output when each thread deals with ((C + 255)/256 element of output)</code>
+  - EN: Comment that documents intent or context: "each block deals with C elements of output when each thread deals with ((C + 255)/256 element of output)".
+  - CN: 用于说明意图或上下文的注释："each block deals with C elements of output when each thread deals with ((C + 255)/256 element of output)"。
+- **L79** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L80** <code>template&lt;typename T, bool IS_AVG_POOLING&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L81** <code>__global__ void pooling_nhwc_element1_kernel(T* output,</code>
+  - EN: Begins or continues the signature/call syntax involving `pooling_nhwc_element1_kernel`.
+  - CN: 开始或继续与 `pooling_nhwc_element1_kernel` 相关的签名/调用语法。
+- **L82** <code>                                             const T* input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L83** <code>                                             const int N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L84** <code>                                             const int H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L85** <code>                                             const int W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L86** <code>                                             const int C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L87** <code>                                             const int output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L88** <code>                                             const int output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L89** <code>                                             const int kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L90** <code>                                             const int kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L91** <code>                                             const int stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L92** <code>                                             const int stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L93** <code>                                             const int padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L94** <code>                                             const int padding_W)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L95** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L96** <code>  const int tid = threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L97** <code>  const int n_idx = blockIdx.x;</code>
+  - EN: Assigns or initializes `n_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `n_idx` 进行赋值或初始化。
+- **L98** <code>  const int output_h_idx = blockIdx.y;</code>
+  - EN: Assigns or initializes `output_h_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_h_idx` 进行赋值或初始化。
+- **L99** <code>  const int output_w_idx = blockIdx.z;</code>
+  - EN: Assigns or initializes `output_w_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_w_idx` 进行赋值或初始化。
+- **L100** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L101** <code>  int h_start_idx = output_h_idx * stride_H - padding_H;</code>
+  - EN: Assigns or initializes `h_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_start_idx` 进行赋值或初始化。
+- **L102** <code>  int h_end_idx = h_start_idx + kernel_H;</code>
+  - EN: Assigns or initializes `h_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_end_idx` 进行赋值或初始化。
+- **L103** <code>  h_start_idx = (h_start_idx &lt; 0) ? 0 : h_start_idx;</code>
+  - EN: Assigns or initializes `h_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_start_idx` 进行赋值或初始化。
+- **L104** <code>  h_end_idx = h_end_idx &gt; H ? H : h_end_idx;</code>
+  - EN: Assigns or initializes `h_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_end_idx` 进行赋值或初始化。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>  int w_start_idx = output_w_idx * stride_W - padding_W;</code>
+  - EN: Assigns or initializes `w_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_start_idx` 进行赋值或初始化。
+- **L107** <code>  int w_end_idx = w_start_idx + kernel_W;</code>
+  - EN: Assigns or initializes `w_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_end_idx` 进行赋值或初始化。
+- **L108** <code>  w_start_idx = (w_start_idx &lt; 0) ? 0 : w_start_idx;</code>
+  - EN: Assigns or initializes `w_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_start_idx` 进行赋值或初始化。
+- **L109** <code>  w_end_idx = w_end_idx &gt; W ? W : w_end_idx;</code>
+  - EN: Assigns or initializes `w_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_end_idx` 进行赋值或初始化。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>  input += n_idx * H * W * C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L112** <code>  output += ((n_idx * output_H + output_h_idx) * output_W + output_w_idx) * C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L113** <code>  const int kernel_size2 = kernel_H * kernel_W;</code>
+  - EN: Assigns or initializes `kernel_size2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kernel_size2` 进行赋值或初始化。
+- **L114** <code>  for (int c_idx = tid; c_idx &lt; C; c_idx += blockDim.x) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L115** <code>    float pooling;</code>
+  - EN: Declares the symbol `pooling` in the current scope.
+  - CN: 在当前作用域中声明符号 `pooling`。
+- **L116** <code>    if (IS_AVG_POOLING){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L117** <code>      pooling = 0.0f;</code>
+  - EN: Assigns or initializes `pooling` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pooling` 进行赋值或初始化。
+- **L118** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L119** <code>    else{</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L120** <code>      pooling = -FLT_MAX;</code>
+  - EN: Assigns or initializes `pooling` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pooling` 进行赋值或初始化。
+- **L121** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L122** <code>    for (int h = h_start_idx; h &lt; h_end_idx; h++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L123** <code>      for (int w = w_start_idx; w &lt; w_end_idx; w++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L124** <code>        const int idx = (h * W + w) * C;</code>
+  - EN: Assigns or initializes `idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `idx` 进行赋值或初始化。
+- **L125** <code>        const float tmp = static_cast&lt;float&gt;(input[idx + c_idx]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L126** <code>        if (IS_AVG_POOLING){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L127** <code>          pooling = pooling + tmp;</code>
+  - EN: Assigns or initializes `pooling` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pooling` 进行赋值或初始化。
+- **L128** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L129** <code>        else{</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L130** <code>          pooling = pooling &gt; tmp ? pooling : tmp;</code>
+  - EN: Assigns or initializes `pooling` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pooling` 进行赋值或初始化。
+- **L131** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L132** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L133** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>    T output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L136** <code>    if (IS_AVG_POOLING){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L137** <code>      output_val = T(pooling/kernel_size2);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L138** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L139** <code>    else{</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L140** <code>      output_val = T(pooling);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L141** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L142** <code>    output[c_idx] = output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L143** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L144** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>template&lt;typename T2, typename T, bool IS_AVG_POOLING&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L147** <code>__global__ void pooling_nhwc_element2_kernel(T2* output,</code>
+  - EN: Begins or continues the signature/call syntax involving `pooling_nhwc_element2_kernel`.
+  - CN: 开始或继续与 `pooling_nhwc_element2_kernel` 相关的签名/调用语法。
+- **L148** <code>                                             const T2* input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L149** <code>                                             const int N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L150** <code>                                             const int H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L151** <code>                                             const int W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L152** <code>                                             const int C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L153** <code>                                             const int output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L154** <code>                                             const int output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L155** <code>                                             const int kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L156** <code>                                             const int kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L157** <code>                                             const int stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L158** <code>                                             const int stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L159** <code>                                             const int padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L160** <code>                                             const int padding_W)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L161** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L162** <code>  const int tid = threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L163** <code>  const int n_idx = blockIdx.x;</code>
+  - EN: Assigns or initializes `n_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `n_idx` 进行赋值或初始化。
+- **L164** <code>  const int output_h_idx = blockIdx.y;</code>
+  - EN: Assigns or initializes `output_h_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_h_idx` 进行赋值或初始化。
+- **L165** <code>  const int output_w_idx = blockIdx.z;</code>
+  - EN: Assigns or initializes `output_w_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_w_idx` 进行赋值或初始化。
+- **L166** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L167** <code>  int h_start_idx = output_h_idx * stride_H - padding_H;</code>
+  - EN: Assigns or initializes `h_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_start_idx` 进行赋值或初始化。
+- **L168** <code>  int h_end_idx = h_start_idx + kernel_H;</code>
+  - EN: Assigns or initializes `h_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_end_idx` 进行赋值或初始化。
+- **L169** <code>  h_start_idx = (h_start_idx &lt; 0) ? 0 : h_start_idx;</code>
+  - EN: Assigns or initializes `h_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_start_idx` 进行赋值或初始化。
+- **L170** <code>  h_end_idx = h_end_idx &gt; H ? H : h_end_idx;</code>
+  - EN: Assigns or initializes `h_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h_end_idx` 进行赋值或初始化。
+- **L171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L172** <code>  int w_start_idx = output_w_idx * stride_W - padding_W;</code>
+  - EN: Assigns or initializes `w_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_start_idx` 进行赋值或初始化。
+- **L173** <code>  int w_end_idx = w_start_idx + kernel_W;</code>
+  - EN: Assigns or initializes `w_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_end_idx` 进行赋值或初始化。
+- **L174** <code>  w_start_idx = (w_start_idx &lt; 0) ? 0 : w_start_idx;</code>
+  - EN: Assigns or initializes `w_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_start_idx` 进行赋值或初始化。
+- **L175** <code>  w_end_idx = w_end_idx &gt; W ? W : w_end_idx;</code>
+  - EN: Assigns or initializes `w_end_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w_end_idx` 进行赋值或初始化。
+- **L176** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L177** <code>  input += n_idx * H * W * C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L178** <code>  output += ((n_idx * output_H + output_h_idx) * output_W + output_w_idx) * C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L179** <code>  const int kernel_size2 = kernel_H * kernel_W;</code>
+  - EN: Assigns or initializes `kernel_size2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kernel_size2` 进行赋值或初始化。
+- **L180** <code>  for (int c_idx = tid; c_idx &lt; C; c_idx += blockDim.x) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L181** <code>    float2 pooling;</code>
+  - EN: Declares the symbol `pooling` in the current scope.
+  - CN: 在当前作用域中声明符号 `pooling`。
+- **L182** <code>    if (IS_AVG_POOLING) { </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L183** <code>      pooling = {0.0f, 0.0f};</code>
+  - EN: Assigns or initializes `pooling` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pooling` 进行赋值或初始化。
+- **L184** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L185** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L186** <code>      pooling = {-FLT_MAX, -FLT_MAX};</code>
+  - EN: Assigns or initializes `pooling` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `pooling` 进行赋值或初始化。
+- **L187** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L188** <code>    for (int h = h_start_idx; h &lt; h_end_idx; h++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L189** <code>      for (int w = w_start_idx; w &lt; w_end_idx; w++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L190** <code>        const int idx = (h * W + w) * C;</code>
+  - EN: Assigns or initializes `idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `idx` 进行赋值或初始化。
+- **L191** <code>        const T2 tmp = input[idx + c_idx];</code>
+  - EN: Assigns or initializes `tmp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp` 进行赋值或初始化。
+- **L192** <code>        const float2 tmp_flt2 = {static_cast&lt;float&gt;(tmp.x), static_cast&lt;float&gt;(tmp.y)};</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L193** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L194** <code>          pooling.x += tmp_flt2.x;</code>
+  - EN: Declares the symbol `x` in the current scope.
+  - CN: 在当前作用域中声明符号 `x`。
+- **L195** <code>          pooling.y += tmp_flt2.y;</code>
+  - EN: Declares the symbol `y` in the current scope.
+  - CN: 在当前作用域中声明符号 `y`。
+- **L196** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L197** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L198** <code>          pooling.x = pooling.x &gt; tmp_flt2.x ? pooling.x : tmp_flt2.x;</code>
+  - EN: Assigns or initializes `x` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `x` 进行赋值或初始化。
+- **L199** <code>          pooling.y = pooling.y &gt; tmp_flt2.y ? pooling.y : tmp_flt2.y;</code>
+  - EN: Assigns or initializes `y` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `y` 进行赋值或初始化。
+- **L200** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L201** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L202** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L203** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L204** <code>    T2 output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L205** <code>    if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L206** <code>      output_val.x = T(pooling.x/kernel_size2);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L207** <code>      output_val.y = T(pooling.y/kernel_size2);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L208** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L209** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L210** <code>      output_val.x = T(pooling.x);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L211** <code>      output_val.y = T(pooling.y);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L212** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L213** <code>    output[c_idx] = output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L214** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L215** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L216** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L217** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L218** <code> * output [N, 1, 1, C]</code>
+  - EN: Comment that documents intent or context: "output [N, 1, 1, C]".
+  - CN: 用于说明意图或上下文的注释："output [N, 1, 1, C]"。
+- **L219** <code> * input [N, H, W, C]</code>
+  - EN: Comment that documents intent or context: "input [N, H, W, C]".
+  - CN: 用于说明意图或上下文的注释："input [N, H, W, C]"。
+- **L220** <code> * grid(C, N)</code>
+  - EN: Comment that documents intent or context: "grid(C, N)".
+  - CN: 用于说明意图或上下文的注释："grid(C, N)"。
+- **L221** <code> * block(block_size) -- each block deals with H*W/block_size elements;</code>
+  - EN: Comment that documents intent or context: "block(block_size) -- each block deals with H*W/block_size elements;".
+  - CN: 用于说明意图或上下文的注释："block(block_size) -- each block deals with H*W/block_size elements;"。
+- **L222** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L223** <code>template&lt;typename T, bool IS_AVG_POOLING&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>__global__ void pooling_nxhTo1x1_element1_kernel(</code>
+  - EN: Begins or continues the signature/call syntax involving `pooling_nxhTo1x1_element1_kernel`.
+  - CN: 开始或继续与 `pooling_nxhTo1x1_element1_kernel` 相关的签名/调用语法。
+- **L225** <code>    T* output, const T* input, const int N, const int HW, const int C)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L226** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L227** <code>    const int c_idx = blockIdx.x;</code>
+  - EN: Assigns or initializes `c_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_idx` 进行赋值或初始化。
+- **L228** <code>    const int n_idx = blockIdx.y;</code>
+  - EN: Assigns or initializes `n_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `n_idx` 进行赋值或初始化。
+- **L229** <code>    float pooling[1];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L230** <code>    if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L231** <code>      pooling[0] = 0.0f;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L232** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L233** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L234** <code>      pooling[0] = -FLT_MAX;</code>
+  - EN: Declares the symbol `FLT_MAX` in the current scope.
+  - CN: 在当前作用域中声明符号 `FLT_MAX`。
+- **L235** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L236** <code>    const size_t input_offset = n_idx * HW * C + c_idx;</code>
+  - EN: Assigns or initializes `input_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `input_offset` 进行赋值或初始化。
+- **L237** <code>    input += input_offset;</code>
+  - EN: Declares the symbol `input_offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `input_offset`。
+- **L238** <code>    const size_t output_offset = n_idx * C + c_idx;</code>
+  - EN: Assigns or initializes `output_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_offset` 进行赋值或初始化。
+- **L239** <code>    output += output_offset;</code>
+  - EN: Declares the symbol `output_offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_offset`。
+- **L240** <code>    int tid = threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L241** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L242** <code>    for (int index = tid; index &lt; HW; index += blockDim.x) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L243** <code>        float val = static_cast&lt;float&gt;(input[index * C]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L244** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L245** <code>          pooling[0] += val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L246** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L247** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L248** <code>          pooling[0] = pooling[0] &gt; val ? pooling[0] : val;</code>
+  - EN: Declares the symbol `val` in the current scope.
+  - CN: 在当前作用域中声明符号 `val`。
+- **L249** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L250** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L251** <code>    if (blockDim.x &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L252** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L253** <code>          warpReduceSum&lt;float, 1&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L255** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L256** <code>          warpReduceMax&lt;float, 1&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L257** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L258** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L259** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L260** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L261** <code>          blockReduceSum&lt;float, 1&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L262** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L263** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L264** <code>          blockReduceMax&lt;float, 1&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L265** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L266** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L267** <code>    __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L268** <code>    if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L269** <code>        T output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L270** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L271** <code>          output_val = T(pooling[0] / HW);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L272** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L273** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L274** <code>          output_val = T(pooling[0]);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L275** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L276** <code>        output[0] = output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L277** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L278** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L279** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L282** <code> * output [N, 1, 1, C]</code>
+  - EN: Comment that documents intent or context: "output [N, 1, 1, C]".
+  - CN: 用于说明意图或上下文的注释："output [N, 1, 1, C]"。
+- **L283** <code> * input [N, H, W, C]</code>
+  - EN: Comment that documents intent or context: "input [N, H, W, C]".
+  - CN: 用于说明意图或上下文的注释："input [N, H, W, C]"。
+- **L284** <code> * grid(C/2, N)</code>
+  - EN: Comment that documents intent or context: "grid(C/2, N)".
+  - CN: 用于说明意图或上下文的注释："grid(C/2, N)"。
+- **L285** <code> * block(block_size) -- each thread deals with H*W/block_size * 2 elements;</code>
+  - EN: Comment that documents intent or context: "block(block_size) -- each thread deals with H*W/block_size * 2 elements;".
+  - CN: 用于说明意图或上下文的注释："block(block_size) -- each thread deals with H*W/block_size * 2 elements;"。
+- **L286** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L287** <code>template&lt;typename T2, typename T, bool IS_AVG_POOLING&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L288** <code>__global__ void pooling_nxhTo1x1_element2_kernel(</code>
+  - EN: Begins or continues the signature/call syntax involving `pooling_nxhTo1x1_element2_kernel`.
+  - CN: 开始或继续与 `pooling_nxhTo1x1_element2_kernel` 相关的签名/调用语法。
+- **L289** <code>    T2* output, const T2* input, const int N, const int HW, const int C)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L290** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L291** <code>    const int c_idx = blockIdx.x;</code>
+  - EN: Assigns or initializes `c_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_idx` 进行赋值或初始化。
+- **L292** <code>    const int n_idx = blockIdx.y;</code>
+  - EN: Assigns or initializes `n_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `n_idx` 进行赋值或初始化。
+- **L293** <code>    float pooling[2];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L294** <code>    if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L295** <code>      pooling[0] = pooling[1] = 0.0f;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L296** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L297** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L298** <code>      pooling[0] = pooling[1] = -FLT_MAX;</code>
+  - EN: Declares the symbol `FLT_MAX` in the current scope.
+  - CN: 在当前作用域中声明符号 `FLT_MAX`。
+- **L299** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L300** <code>    const int C_2 = C / 2;</code>
+  - EN: Assigns or initializes `C_2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `C_2` 进行赋值或初始化。
+- **L301** <code>    const size_t input_offset = n_idx * HW * C_2 + c_idx;</code>
+  - EN: Assigns or initializes `input_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `input_offset` 进行赋值或初始化。
+- **L302** <code>    input += input_offset;</code>
+  - EN: Declares the symbol `input_offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `input_offset`。
+- **L303** <code>    const size_t output_offset = n_idx * C_2 + c_idx;</code>
+  - EN: Assigns or initializes `output_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_offset` 进行赋值或初始化。
+- **L304** <code>    output += output_offset;</code>
+  - EN: Declares the symbol `output_offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_offset`。
+- **L305** <code>    int tid = threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L306** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L307** <code>    for (int index = tid; index &lt; HW; index += blockDim.x) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L308** <code>        T2 val = input[index * C_2];</code>
+  - EN: Assigns or initializes `val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `val` 进行赋值或初始化。
+- **L309** <code>        float2 val_flt2 = {static_cast&lt;float&gt;(val.x), static_cast&lt;float&gt;(val.y)};</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L310** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L311** <code>          pooling[0] += val_flt2.x;</code>
+  - EN: Declares the symbol `x` in the current scope.
+  - CN: 在当前作用域中声明符号 `x`。
+- **L312** <code>          pooling[1] += val_flt2.y;</code>
+  - EN: Declares the symbol `y` in the current scope.
+  - CN: 在当前作用域中声明符号 `y`。
+- **L313** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L314** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L315** <code>          pooling[0] = pooling[0] &gt; val_flt2.x ? pooling[0] : val_flt2.x;</code>
+  - EN: Declares the symbol `x` in the current scope.
+  - CN: 在当前作用域中声明符号 `x`。
+- **L316** <code>          pooling[1] = pooling[1] &gt; val_flt2.y ? pooling[1] : val_flt2.y;</code>
+  - EN: Declares the symbol `y` in the current scope.
+  - CN: 在当前作用域中声明符号 `y`。
+- **L317** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L318** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L319** <code>    if (blockDim.x &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L320** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L321** <code>          warpReduceSum&lt;float, 2&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L322** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L323** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L324** <code>          warpReduceMax&lt;float, 2&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L325** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L326** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L327** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L328** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L329** <code>          blockReduceSum&lt;float, 2&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L330** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L331** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L332** <code>          blockReduceMax&lt;float, 2&gt;(pooling);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L334** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L335** <code>    __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L336** <code>    if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L337** <code>        T2 output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L338** <code>        if (IS_AVG_POOLING) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L339** <code>          output_val.x = T(pooling[0] / HW);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L340** <code>          output_val.y = T(pooling[1] / HW);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L341** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L342** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L343** <code>          output_val.x = T(pooling[0]);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L344** <code>          output_val.y = T(pooling[1]);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L345** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L346** <code>        output[0] = output_val;</code>
+  - EN: Declares the symbol `output_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_val`。
+- **L347** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L348** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L349** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L350** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L351** <code>void pooling_nhwc(cutlass::Tensor4DCoord input_tensor_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `pooling_nhwc`.
+  - CN: 开始或继续与 `pooling_nhwc` 相关的签名/调用语法。
+- **L352** <code>                  cutlass::Tensor4DCoord filter_tensor_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L353** <code>                  cutlass::Tensor4DCoord output_tensor_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L354** <code>                  cutlass::Tensor4DCoord padding,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L355** <code>                  cutlass::MatrixCoord stride,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L356** <code>                  TensorRef&lt;T, layout::TensorNHWC&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L357** <code>                  TensorRef&lt;T, layout::TensorNHWC&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L358** <code>                  int poolingType, //0 for avg pooling ; 1 for max pooling</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L359** <code>                  cudaStream_t stream) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L360** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L361** <code>  assert(input_tensor_size.n() == output_tensor_size.n() &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `n`.
+  - CN: 开始或继续与 `n` 相关的签名/调用语法。
+- **L362** <code>         input_tensor_size.c() == output_tensor_size.c());</code>
+  - EN: Declares function or method `c` without defining it here.
+  - CN: 声明函数或方法 `c`，但不在此处给出定义。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>  const int N = input_tensor_size.n();</code>
+  - EN: Declares function or method `n` without defining it here.
+  - CN: 声明函数或方法 `n`，但不在此处给出定义。
+- **L365** <code>  const int H = input_tensor_size.h();</code>
+  - EN: Declares function or method `h` without defining it here.
+  - CN: 声明函数或方法 `h`，但不在此处给出定义。
+- **L366** <code>  const int W = input_tensor_size.w();</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L367** <code>  const int C = input_tensor_size.c();</code>
+  - EN: Declares function or method `c` without defining it here.
+  - CN: 声明函数或方法 `c`，但不在此处给出定义。
+- **L368** <code>  const int padding_H = padding.h();</code>
+  - EN: Declares function or method `h` without defining it here.
+  - CN: 声明函数或方法 `h`，但不在此处给出定义。
+- **L369** <code>  const int padding_W = padding.w();</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L370** <code>  const int kernel_H = filter_tensor_size.h();</code>
+  - EN: Declares function or method `h` without defining it here.
+  - CN: 声明函数或方法 `h`，但不在此处给出定义。
+- **L371** <code>  const int kernel_W = filter_tensor_size.w();</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L372** <code>  const int stride_H = stride.row();</code>
+  - EN: Declares function or method `row` without defining it here.
+  - CN: 声明函数或方法 `row`，但不在此处给出定义。
+- **L373** <code>  const int stride_W = stride.column();</code>
+  - EN: Declares function or method `column` without defining it here.
+  - CN: 声明函数或方法 `column`，但不在此处给出定义。
+- **L374** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L375** <code>  const int output_H = getOutputSize(H, padding_H, kernel_H, stride_H);</code>
+  - EN: Declares function or method `getOutputSize` without defining it here.
+  - CN: 声明函数或方法 `getOutputSize`，但不在此处给出定义。
+- **L376** <code>  const int output_W = getOutputSize(W, padding_W, kernel_W, stride_W);</code>
+  - EN: Declares function or method `getOutputSize` without defining it here.
+  - CN: 声明函数或方法 `getOutputSize`，但不在此处给出定义。
+- **L377** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L378** <code>  assert(output_tensor_size.h() == output_H &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `h`.
+  - CN: 开始或继续与 `h` 相关的签名/调用语法。
+- **L379** <code>         output_tensor_size.w() == output_W);</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L380** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L381** <code>  if (C % 2 != 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L382** <code>    if ((H == kernel_H &amp;&amp; padding_H == 0) &amp;&amp; (W == kernel_W &amp;&amp; padding_W == 0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L383** <code>      dim3 grid(C, N);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L384** <code>      dim3 block(256);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L385** <code>      if (H*W &lt; block.x){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L386** <code>        block.x = (H*W + 31)/32*32;</code>
+  - EN: Assigns or initializes `x` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `x` 进行赋值或初始化。
+- **L387** <code>      } </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L388** <code>      if (poolingType == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L389** <code>        pooling_nxhTo1x1_element1_kernel&lt;T, true&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L390** <code>          ref_output.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L391** <code>          ref_input.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L392** <code>          N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L393** <code>          H*W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L394** <code>          C);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L395** <code>      } // if (poolingType == 0)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L396** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L397** <code>        pooling_nxhTo1x1_element1_kernel&lt;T, false&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L398** <code>          ref_output.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L399** <code>          ref_input.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L400** <code>          N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L401** <code>          H*W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L402** <code>          C);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L403** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L404** <code>    } // if ((H == kernel_H &amp;&amp; padding_H == 0) &amp;&amp; (W == kernel_W &amp;&amp; padding_W == 0))</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L405** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L406** <code>      dim3 grid(N, output_H, output_W);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L407** <code>      dim3 block(256);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L408** <code>      if (C &lt; block.x) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L409** <code>        block.x = C;</code>
+  - EN: Assigns or initializes `x` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `x` 进行赋值或初始化。
+- **L410** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L411** <code>      if (poolingType == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L412** <code>        pooling_nhwc_element1_kernel&lt;T, true&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L413** <code>          ref_output.data(), </code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L414** <code>          ref_input.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L415** <code>          N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L416** <code>          H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L417** <code>          W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L418** <code>          C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L419** <code>          output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L420** <code>          output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L421** <code>          kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L422** <code>          kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L423** <code>          stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L424** <code>          stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L425** <code>          padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L426** <code>          padding_W);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L427** <code>      } // if (poolingType == 0)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L428** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L429** <code>        pooling_nhwc_element1_kernel&lt;T, false&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L430** <code>          ref_output.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L431** <code>          ref_input.data(),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L432** <code>          N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L433** <code>          H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L434** <code>          W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L435** <code>          C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L436** <code>          output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L437** <code>          output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L438** <code>          kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L439** <code>          kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L440** <code>          stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L441** <code>          stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L442** <code>          padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L443** <code>          padding_W);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L444** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L445** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L446** <code>  } // if (C % 2 != 0))</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L447** <code>  else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L448** <code>    if ((H == kernel_H &amp;&amp; padding_H == 0) &amp;&amp; (W == kernel_W &amp;&amp; padding_W == 0)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L449** <code>      dim3 grid(C/2, N);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L450** <code>      dim3 block(256);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L451** <code>      if (H*W &lt; block.x){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L452** <code>        block.x = (H*W + 31)/32*32;</code>
+  - EN: Assigns or initializes `x` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `x` 进行赋值或初始化。
+- **L453** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L454** <code>      if (poolingType == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L455** <code>        if (std::is_same&lt;T, float&gt;::value) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L456** <code>          pooling_nxhTo1x1_element2_kernel&lt;float2, float, true&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L457** <code>            (float2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L458** <code>            (const float2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L459** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L460** <code>            H*W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L461** <code>            C);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L462** <code>        } // if (std::is_same&lt;T, float&gt;::value)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L463** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L464** <code>          pooling_nxhTo1x1_element2_kernel&lt;half2, half, true&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L465** <code>            (half2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L466** <code>            (const half2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L467** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L468** <code>            H*W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L469** <code>            C);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L470** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L471** <code>      } // if (poolingType == 0)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L472** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L473** <code>        if (std::is_same&lt;T, float&gt;::value) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L474** <code>          pooling_nxhTo1x1_element2_kernel&lt;float2, float, false&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L475** <code>            (float2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L476** <code>            (const float2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L477** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L478** <code>            H*W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L479** <code>            C);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L480** <code>        } // if (std::is_same&lt;T, float&gt;::value)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L481** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L482** <code>          pooling_nxhTo1x1_element2_kernel&lt;half2, half, false&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L483** <code>            (half2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L484** <code>            (const half2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L485** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L486** <code>            H*W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L487** <code>            C);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L488** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L489** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L490** <code>    } // if ((H == kernel_H &amp;&amp; padding_H == 0) &amp;&amp; (W == kernel_W &amp;&amp; padding_W == 0))</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L491** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L492** <code>      dim3 grid(N, output_H, output_W);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L493** <code>      dim3 block(256);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L494** <code>      if (C/2 &lt; block.x) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L495** <code>        block.x = C/2;</code>
+  - EN: Assigns or initializes `x` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `x` 进行赋值或初始化。
+- **L496** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L497** <code>      if (poolingType == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L498** <code>        if (std::is_same&lt;T, float&gt;::value) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L499** <code>          pooling_nhwc_element2_kernel&lt;float2, float, true&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L500** <code>            (float2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L501** <code>            (const float2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L502** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L503** <code>            H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L504** <code>            W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L505** <code>            C/2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L506** <code>            output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L507** <code>            output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L508** <code>            kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L509** <code>            kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L510** <code>            stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L511** <code>            stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L512** <code>            padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L513** <code>            padding_W);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L514** <code>        } // if (std::is_same&lt;T, float&gt;::value)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L515** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L516** <code>          pooling_nhwc_element2_kernel&lt;half2, half, true&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L517** <code>            (half2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L518** <code>            (const half2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L519** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L520** <code>            H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L521** <code>            W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L522** <code>            C/2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L523** <code>            output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L524** <code>            output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L525** <code>            kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L526** <code>            kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L527** <code>            stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L528** <code>            stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L529** <code>            padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L530** <code>            padding_W);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L531** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L532** <code>      } // if (poolingType == 0)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L533** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L534** <code>        if (std::is_same&lt;T, float&gt;::value) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L535** <code>          pooling_nhwc_element2_kernel&lt;float2, float, false&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L536** <code>            (float2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L537** <code>            (const float2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L538** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L539** <code>            H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L540** <code>            W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L541** <code>            C/2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L542** <code>            output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L543** <code>            output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L544** <code>            kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L545** <code>            kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L546** <code>            stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L547** <code>            stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L548** <code>            padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L549** <code>            padding_W);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L550** <code>        } // if (std::is_same&lt;T, float&gt;::value)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L551** <code>        else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L552** <code>          pooling_nhwc_element2_kernel&lt;half2, half, false&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L553** <code>            (half2*)(ref_output.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L554** <code>            (const half2*)(ref_input.data()),</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L555** <code>            N,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L556** <code>            H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L557** <code>            W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L558** <code>            C/2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L559** <code>            output_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L560** <code>            output_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L561** <code>            kernel_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L562** <code>            kernel_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L563** <code>            stride_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L564** <code>            stride_W,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L565** <code>            padding_H,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L566** <code>            padding_W);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L567** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L568** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L569** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L570** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L571** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L572** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L573** <code>} //namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/tensor.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_ref.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>device_utils.h</code> — project-specific declarations from `device_utils.h` / 来自 `device_utils.h` 的项目专用声明
+- <code>cfloat</code> — APIs or definitions from `cfloat` / 来自 `cfloat` 的 API 或定义

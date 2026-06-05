@@ -1,0 +1,1138 @@
+# CMakeLists.txt — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/self_contained_includes/CMakeLists.txt`
+**Purpose / 用途**: This CMake file registers non-unit test subdirectories and placeholder targets for the CUTLASS test tree. / 该 CMake 文件为 CUTLASS 测试树注册非单元测试子目录与占位目标。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `# The purpose of this target is to check if the following header files are self-contained,`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 30 / 第30行**
+  - Code / 代码: `# i.e. they can be included in a source file without needing to include other headers before it.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 31 / 第31行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 32 / 第32行**
+  - Code / 代码: `set(header_files_to_check`
+  - EN: Sets a CMake variable used later in configuration.
+  - CN: 设置后续配置会使用的 CMake 变量。
+- **Line 33 / 第33行**
+  - Code / 代码: `    # cutlass`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 34 / 第34行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 35 / 第35行**
+  - Code / 代码: `    # cutlass/gemm/kernel`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 36 / 第36行**
+  - Code / 代码: `    cutlass/gemm/kernel/default_gemm.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 37 / 第37行**
+  - Code / 代码: `    cutlass/gemm/kernel/default_gemm_complex.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 38 / 第38行**
+  - Code / 代码: `    cutlass/gemm/kernel/gemm_universal_decl.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 39 / 第39行**
+  - Code / 代码: `    # cutlass/gemm/kernel/sm90_gemm_warpspecialized.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 40 / 第40行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 41 / 第41行**
+  - Code / 代码: `    # cute`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 42 / 第42行**
+  - Code / 代码: `    cute/config.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 43 / 第43行**
+  - Code / 代码: `    cute/int_tuple.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 44 / 第44行**
+  - Code / 代码: `    cute/layout.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 45 / 第45行**
+  - Code / 代码: `    cute/layout_composed.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 46 / 第46行**
+  - Code / 代码: `    cute/pointer.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 47 / 第47行**
+  - Code / 代码: `    cute/pointer_base.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 48 / 第48行**
+  - Code / 代码: `    cute/pointer_flagged.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 49 / 第49行**
+  - Code / 代码: `    cute/pointer_swizzle.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 50 / 第50行**
+  - Code / 代码: `    cute/stride.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 51 / 第51行**
+  - Code / 代码: `    cute/swizzle.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 52 / 第52行**
+  - Code / 代码: `    cute/swizzle_layout.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 53 / 第53行**
+  - Code / 代码: `    cute/tensor.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 54 / 第54行**
+  - Code / 代码: `    cute/tensor_impl.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 55 / 第55行**
+  - Code / 代码: `    cute/underscore.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 56 / 第56行**
+  - Code / 代码: `    # cute/algorithm`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 57 / 第57行**
+  - Code / 代码: `    cute/algorithm/axpby.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 58 / 第58行**
+  - Code / 代码: `    cute/algorithm/clear.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 59 / 第59行**
+  - Code / 代码: `    # cute/algorithm/cooperative_copy.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 60 / 第60行**
+  - Code / 代码: `    cute/algorithm/cooperative_gemm.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 61 / 第61行**
+  - Code / 代码: `    # cute/algorithm/copy.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 62 / 第62行**
+  - Code / 代码: `    cute/algorithm/fill.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 63 / 第63行**
+  - Code / 代码: `    cute/algorithm/functional.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 64 / 第64行**
+  - Code / 代码: `    # cute/algorithm/gemm.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 65 / 第65行**
+  - Code / 代码: `    cute/algorithm/prefer.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 66 / 第66行**
+  - Code / 代码: `    # cute/algorithm/prefetch.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 67 / 第67行**
+  - Code / 代码: `    cute/algorithm/tensor_algorithms.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 68 / 第68行**
+  - Code / 代码: `    cute/algorithm/tuple_algorithms.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 69 / 第69行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 70 / 第70行**
+  - Code / 代码: `    # cute/container`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 71 / 第71行**
+  - Code / 代码: `    cute/container/alignment.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 72 / 第72行**
+  - Code / 代码: `    cute/container/array.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 73 / 第73行**
+  - Code / 代码: `    cute/container/array_aligned.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 74 / 第74行**
+  - Code / 代码: `    cute/container/array_subbyte.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 75 / 第75行**
+  - Code / 代码: `    cute/container/bit_field.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 76 / 第76行**
+  - Code / 代码: `    cute/container/cuda_types.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 77 / 第77行**
+  - Code / 代码: `    cute/container/tuple.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 78 / 第78行**
+  - Code / 代码: `    cute/container/type_list.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 79 / 第79行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 80 / 第80行**
+  - Code / 代码: `    # cute/numeric`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 81 / 第81行**
+  - Code / 代码: `    cute/numeric/arithmetic_tuple.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 82 / 第82行**
+  - Code / 代码: `    cute/numeric/complex.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 83 / 第83行**
+  - Code / 代码: `    cute/numeric/int.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 84 / 第84行**
+  - Code / 代码: `    cute/numeric/integer_sequence.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 85 / 第85行**
+  - Code / 代码: `    cute/numeric/integral_ratio.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 86 / 第86行**
+  - Code / 代码: `    cute/numeric/math.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 87 / 第87行**
+  - Code / 代码: `    cute/numeric/numeric_types.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 88 / 第88行**
+  - Code / 代码: `    cute/numeric/real.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 89 / 第89行**
+  - Code / 代码: `    cute/numeric/integral_constant.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 90 / 第90行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 91 / 第91行**
+  - Code / 代码: `    # cute/util`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 92 / 第92行**
+  - Code / 代码: `    cute/util/debug.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 93 / 第93行**
+  - Code / 代码: `    cute/util/print.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 94 / 第94行**
+  - Code / 代码: `    cute/util/type_traits.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 95 / 第95行**
+  - Code / 代码: `    # cute/arch`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 96 / 第96行**
+  - Code / 代码: `    cute/arch/cluster_sm90.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 97 / 第97行**
+  - Code / 代码: `    cute/arch/copy.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 98 / 第98行**
+  - Code / 代码: `    cute/arch/copy_sm50.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 99 / 第99行**
+  - Code / 代码: `    cute/arch/copy_sm75.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 100 / 第100行**
+  - Code / 代码: `    cute/arch/copy_sm80.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 101 / 第101行**
+  - Code / 代码: `    cute/arch/copy_sm90.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 102 / 第102行**
+  - Code / 代码: `    cute/arch/copy_sm90_desc.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 103 / 第103行**
+  - Code / 代码: `    cute/arch/copy_sm90_tma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 104 / 第104行**
+  - Code / 代码: `    cute/arch/mma_sm61.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 105 / 第105行**
+  - Code / 代码: `    cute/arch/mma_sm70.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 106 / 第106行**
+  - Code / 代码: `    cute/arch/mma_sm75.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 107 / 第107行**
+  - Code / 代码: `    cute/arch/mma_sm80.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 108 / 第108行**
+  - Code / 代码: `    cute/arch/mma_sm90.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 109 / 第109行**
+  - Code / 代码: `    cute/arch/mma_sm90_desc.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 110 / 第110行**
+  - Code / 代码: `    cute/arch/mma_sm90_gmma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 111 / 第111行**
+  - Code / 代码: `    cute/arch/mma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 112 / 第112行**
+  - Code / 代码: `    cute/arch/util.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 113 / 第113行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 114 / 第114行**
+  - Code / 代码: `    cute/arch/cluster_sm100.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 115 / 第115行**
+  - Code / 代码: `    cute/arch/copy_sm100.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 116 / 第116行**
+  - Code / 代码: `    cute/arch/copy_sm100_tma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 117 / 第117行**
+  - Code / 代码: `    cute/arch/mma_sm100.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 118 / 第118行**
+  - Code / 代码: `    cute/arch/mma_sm100_desc.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 119 / 第119行**
+  - Code / 代码: `    cute/arch/mma_sm100_umma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 120 / 第120行**
+  - Code / 代码: `    # cute/arch/tmem_allocator_sm100.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 121 / 第121行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 122 / 第122行**
+  - Code / 代码: `    # cute/atom`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 123 / 第123行**
+  - Code / 代码: `    # cute/atom/copy_atom.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 124 / 第124行**
+  - Code / 代码: `    # cute/atom/copy_traits.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 125 / 第125行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm50.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 126 / 第126行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm75.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 127 / 第127行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm80.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 128 / 第128行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm90.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 129 / 第129行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm90_im2col.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 130 / 第130行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm90_tma.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 131 / 第131行**
+  - Code / 代码: `    # cute/atom/copy_traits_sm90_tma_swizzle.hpp`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 132 / 第132行**
+  - Code / 代码: `    cute/atom/mma_atom.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 133 / 第133行**
+  - Code / 代码: `    cute/atom/mma_traits.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 134 / 第134行**
+  - Code / 代码: `    cute/atom/mma_traits_sm61.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 135 / 第135行**
+  - Code / 代码: `    cute/atom/mma_traits_sm70.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 136 / 第136行**
+  - Code / 代码: `    cute/atom/mma_traits_sm75.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 137 / 第137行**
+  - Code / 代码: `    cute/atom/mma_traits_sm80.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 138 / 第138行**
+  - Code / 代码: `    cute/atom/mma_traits_sm90.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 139 / 第139行**
+  - Code / 代码: `    cute/atom/mma_traits_sm90_gmma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 140 / 第140行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 141 / 第141行**
+  - Code / 代码: `    cute/atom/mma_traits_sm100.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 142 / 第142行**
+  - Code / 代码: `    cute/atom/partitioner.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 143 / 第143行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 144 / 第144行**
+  - Code / 代码: `    # cutlass`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 145 / 第145行**
+  - Code / 代码: `    cutlass/aligned_buffer.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 146 / 第146行**
+  - Code / 代码: `    cutlass/array.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 147 / 第147行**
+  - Code / 代码: `    cutlass/array_planar_complex.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 148 / 第148行**
+  - Code / 代码: `    cutlass/array_subbyte.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 149 / 第149行**
+  - Code / 代码: `    cutlass/barrier.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 150 / 第150行**
+  - Code / 代码: `    cutlass/bfloat16.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 151 / 第151行**
+  - Code / 代码: `    cutlass/blas3.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 152 / 第152行**
+  - Code / 代码: `    cutlass/blas3_types.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 153 / 第153行**
+  - Code / 代码: `    cutlass/block_striped.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 154 / 第154行**
+  - Code / 代码: `    cutlass/cluster_launch.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 155 / 第155行**
+  - Code / 代码: `    cutlass/complex.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 156 / 第156行**
+  - Code / 代码: `    cutlass/constants.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 157 / 第157行**
+  - Code / 代码: `    cutlass/coord.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 158 / 第158行**
+  - Code / 代码: `    cutlass/core_io.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 159 / 第159行**
+  - Code / 代码: `    cutlass/cuda_host_adapter.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 160 / 第160行**
+  - Code / 代码: `    cutlass/cutlass.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 161 / 第161行**
+  - Code / 代码: `    cutlass/device_kernel.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 162 / 第162行**
+  - Code / 代码: `    cutlass/fast_math.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 163 / 第163行**
+  - Code / 代码: `    cutlass/float8.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 164 / 第164行**
+  - Code / 代码: `    # cutlass/floating_point_nvrtc.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 165 / 第165行**
+  - Code / 代码: `    cutlass/functional.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 166 / 第166行**
+  - Code / 代码: `    cutlass/gemm_coord.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 167 / 第167行**
+  - Code / 代码: `    cutlass/gemm_coord.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 168 / 第168行**
+  - Code / 代码: `    cutlass/half.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 169 / 第169行**
+  - Code / 代码: `    cutlass/integer_subbyte.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 170 / 第170行**
+  - Code / 代码: `    cutlass/kernel_hardware_info.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 171 / 第171行**
+  - Code / 代码: `    cutlass/kernel_hardware_info.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 172 / 第172行**
+  - Code / 代码: `    cutlass/kernel_launch.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 173 / 第173行**
+  - Code / 代码: `    cutlass/matrix.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 174 / 第174行**
+  - Code / 代码: `    cutlass/matrix_coord.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 175 / 第175行**
+  - Code / 代码: `    cutlass/matrix_shape.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 176 / 第176行**
+  - Code / 代码: `    cutlass/numeric_conversion.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 177 / 第177行**
+  - Code / 代码: `    cutlass/numeric_size.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 178 / 第178行**
+  - Code / 代码: `    cutlass/numeric_types.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 179 / 第179行**
+  - Code / 代码: `    cutlass/pitch_linear_coord.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 180 / 第180行**
+  - Code / 代码: `    cutlass/predicate_vector.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 181 / 第181行**
+  - Code / 代码: `    cutlass/quaternion.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 182 / 第182行**
+  - Code / 代码: `    cutlass/real.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 183 / 第183行**
+  - Code / 代码: `    cutlass/relatively_equal.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 184 / 第184行**
+  - Code / 代码: `    cutlass/semaphore.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 185 / 第185行**
+  - Code / 代码: `    cutlass/subbyte_reference.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 186 / 第186行**
+  - Code / 代码: `    cutlass/tensor_coord.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 187 / 第187行**
+  - Code / 代码: `    cutlass/tensor_ref.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 188 / 第188行**
+  - Code / 代码: `    cutlass/tensor_ref_planar_complex.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 189 / 第189行**
+  - Code / 代码: `    cutlass/tensor_view.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 190 / 第190行**
+  - Code / 代码: `    cutlass/tensor_view_planar_complex.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 191 / 第191行**
+  - Code / 代码: `    cutlass/tfloat32.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 192 / 第192行**
+  - Code / 代码: `    cutlass/trace.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 193 / 第193行**
+  - Code / 代码: `    cutlass/uint128.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 194 / 第194行**
+  - Code / 代码: `    cutlass/version.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 195 / 第195行**
+  - Code / 代码: `    cutlass/wmma_array.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 196 / 第196行**
+  - Code / 代码: `    cutlass/workspace.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 197 / 第197行**
+  - Code / 代码: `    cutlass/exmy_base.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 198 / 第198行**
+  - Code / 代码: `    cutlass/float_subbyte.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 199 / 第199行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 200 / 第200行**
+  - Code / 代码: `    # cutlass/platform`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 201 / 第201行**
+  - Code / 代码: `    cutlass/platform/platform.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 202 / 第202行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 203 / 第203行**
+  - Code / 代码: `    # cutlass/pipeline`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 204 / 第204行**
+  - Code / 代码: `    cutlass/pipeline/pipeline.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 205 / 第205行**
+  - Code / 代码: `    cutlass/pipeline/sm90_pipeline.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 206 / 第206行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 207 / 第207行**
+  - Code / 代码: `    cutlass/pipeline/sm100_pipeline.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 208 / 第208行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 209 / 第209行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 210 / 第210行**
+  - Code / 代码: `    # cutlass/detail`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 211 / 第211行**
+  - Code / 代码: `    cutlass/detail/cluster.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 212 / 第212行**
+  - Code / 代码: `    cutlass/detail/collective.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 213 / 第213行**
+  - Code / 代码: `    cutlass/detail/dependent_false.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 214 / 第214行**
+  - Code / 代码: `    cutlass/detail/helper_macros.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 215 / 第215行**
+  - Code / 代码: `    cutlass/detail/layout.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 216 / 第216行**
+  - Code / 代码: `    cutlass/detail/mma.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 217 / 第217行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 218 / 第218行**
+  - Code / 代码: `    cutlass/detail/sm100_blockscaled_layout.hpp`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 219 / 第219行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 220 / 第220行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 221 / 第221行**
+  - Code / 代码: `    # cutlass/arch`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 222 / 第222行**
+  - Code / 代码: `    cutlass/arch/arch.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 223 / 第223行**
+  - Code / 代码: `    cutlass/arch/barrier.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 224 / 第224行**
+  - Code / 代码: `    cutlass/arch/cache_operation.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 225 / 第225行**
+  - Code / 代码: `    cutlass/arch/config.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 226 / 第226行**
+  - Code / 代码: `    cutlass/arch/grid_dependency_control.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 227 / 第227行**
+  - Code / 代码: `    cutlass/arch/memory.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 228 / 第228行**
+  - Code / 代码: `    # cutlass/arch/memory_sm75.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 229 / 第229行**
+  - Code / 代码: `    # cutlass/arch/memory_sm80.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 230 / 第230行**
+  - Code / 代码: `    cutlass/arch/mma.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 231 / 第231行**
+  - Code / 代码: `    # cutlass/arch/mma_sm50.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 232 / 第232行**
+  - Code / 代码: `    # cutlass/arch/mma_sm60.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 233 / 第233行**
+  - Code / 代码: `    # cutlass/arch/mma_sm61.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 234 / 第234行**
+  - Code / 代码: `    # cutlass/arch/mma_sm70.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 235 / 第235行**
+  - Code / 代码: `    # cutlass/arch/mma_sm75.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 236 / 第236行**
+  - Code / 代码: `    # cutlass/arch/mma_sm80.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 237 / 第237行**
+  - Code / 代码: `    # cutlass/arch/mma_sm89.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 238 / 第238行**
+  - Code / 代码: `    # cutlass/arch/mma_sm90.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 239 / 第239行**
+  - Code / 代码: `    cutlass/arch/mma_sparse_sm80.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 240 / 第240行**
+  - Code / 代码: `    cutlass/arch/mma_sparse_sm89.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 241 / 第241行**
+  - Code / 代码: `    # cutlass/arch/simd.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 242 / 第242行**
+  - Code / 代码: `    # cutlass/arch/simd_sm60.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 243 / 第243行**
+  - Code / 代码: `    # cutlass/arch/simd_sm61.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 244 / 第244行**
+  - Code / 代码: `    cutlass/arch/reg_reconfig.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 245 / 第245行**
+  - Code / 代码: `    cutlass/arch/wmma.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 246 / 第246行**
+  - Code / 代码: `    # cutlass/arch/wmma_sm70.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 247 / 第247行**
+  - Code / 代码: `    # cutlass/arch/wmma_sm72.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 248 / 第248行**
+  - Code / 代码: `    # cutlass/arch/wmma_sm75.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 249 / 第249行**
+  - Code / 代码: `    # cutlass/arch/wmma_sm80.h`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 250 / 第250行**
+  - Code / 代码: `     # cutlass/layout`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 251 / 第251行**
+  - Code / 代码: `    cutlass/layout/layout.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 252 / 第252行**
+  - Code / 代码: `    cutlass/layout/matrix.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 253 / 第253行**
+  - Code / 代码: `    cutlass/layout/permute.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 254 / 第254行**
+  - Code / 代码: `    cutlass/layout/pitch_linear.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 255 / 第255行**
+  - Code / 代码: `    cutlass/layout/tensor.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 256 / 第256行**
+  - Code / 代码: `    cutlass/layout/tensor_op_multiplicand_sm70.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 257 / 第257行**
+  - Code / 代码: `    cutlass/layout/tensor_op_multiplicand_sm75.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 258 / 第258行**
+  - Code / 代码: `    cutlass/layout/tensor_op_multiplicand_sm80.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 259 / 第259行**
+  - Code / 代码: `    cutlass/layout/vector.h`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 260 / 第260行**
+  - Code / 代码: `)`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 261 / 第261行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 262 / 第262行**
+  - Code / 代码: `# for each header in _header_files:`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 263 / 第263行**
+  - Code / 代码: `#   create a .cu file with the same name as the header's path, except with / replaced with #`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 264 / 第264行**
+  - Code / 代码: `#   have the .cu file include that header`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 265 / 第265行**
+  - Code / 代码: `set(_gen_source_files "")`
+  - EN: Sets a CMake variable used later in configuration.
+  - CN: 设置后续配置会使用的 CMake 变量。
+- **Line 266 / 第266行**
+  - Code / 代码: `foreach(header_file ${header_files_to_check})`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 267 / 第267行**
+  - Code / 代码: `  string(REPLACE "/" "#" header_file_esc ${header_file})`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 268 / 第268行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 269 / 第269行**
+  - Code / 代码: `  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/${header_file_esc}.cu"`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 270 / 第270行**
+  - Code / 代码: `       "#include <${header_file}>")`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 271 / 第271行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 272 / 第272行**
+  - Code / 代码: `  list(APPEND _gen_source_files`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 273 / 第273行**
+  - Code / 代码: `       "${CMAKE_CURRENT_BINARY_DIR}/${header_file_esc}.cu")`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 274 / 第274行**
+  - Code / 代码: `endforeach()`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 275 / 第275行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 276 / 第276行**
+  - Code / 代码: `# build all generated .cu files into a single library`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 277 / 第277行**
+  - Code / 代码: `cutlass_add_library(test_self_contained_includes MODULE ${_gen_source_files})`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 278 / 第278行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Focuses on GEMM kernels, configurations, or correctness checks.
+  **CN**: 聚焦 GEMM 内核、配置或正确性检查。
+- **EN**: Covers sparse layouts, compressed operands, or sparse-kernel behavior.
+  **CN**: 覆盖稀疏布局、压缩操作数或稀疏内核行为。
+- **EN**: Uses CMake logic to register or configure test targets.
+  **CN**: 使用 CMake 逻辑来注册或配置测试目标。
+
+## Dependencies / 依赖项
+
+- `(none detected)`
+  - EN: No explicit import/include dependency was detected in the file header.
+  - CN: 在文件头部未检测到显式的导入/包含依赖。

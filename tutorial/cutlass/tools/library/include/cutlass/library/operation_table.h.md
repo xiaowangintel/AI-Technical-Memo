@@ -1,0 +1,2737 @@
+# operation_table.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/include/cutlass/library/operation_table.h`
+**Purpose / 用途**: Declares or implements lookup tables for runtime operation dispatch. / 声明或实现运行时算子分发所需的查找表。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L32** <code>  \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L33** <code>  \brief Defines a data structure in which a set of functionally equivalent library::Operation</code>
+  - EN: Comment that documents intent or context: "\brief Defines a data structure in which a set of functionally equivalent library::Operation".
+  - CN: 用于说明意图或上下文的注释："\brief Defines a data structure in which a set of functionally equivalent library::Operation"。
+- **L34** <code>        instances may be queried.</code>
+  - EN: Comment that documents intent or context: "instances may be queried.".
+  - CN: 用于说明意图或上下文的注释："instances may be queried."。
+- **L35** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L38** <code>#include &lt;fstream&gt;</code>
+  - EN: Includes `fstream` so this file can use file stream utilities.
+  - CN: 引入 `fstream`，使当前文件可以使用文件流工具。
+- **L39** <code>#include &lt;iosfwd&gt;</code>
+  - EN: Includes `iosfwd` so this file can use APIs or definitions from `iosfwd`.
+  - CN: 引入 `iosfwd`，使当前文件可以使用来自 `iosfwd` 的 API 或定义。
+- **L40** <code>#include &lt;unordered_map&gt;</code>
+  - EN: Includes `unordered_map` so this file can use hash-map containers.
+  - CN: 引入 `unordered_map`，使当前文件可以使用哈希映射容器。
+- **L41** <code>#include &lt;algorithm&gt;</code>
+  - EN: Includes `algorithm` so this file can use standard algorithms.
+  - CN: 引入 `algorithm`，使当前文件可以使用标准算法。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L44** <code>#include &quot;cutlass/library/manifest.h&quot;</code>
+  - EN: Includes `cutlass/library/manifest.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/manifest.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L45** <code>#include &quot;cutlass/library/util.h&quot;</code>
+  - EN: Includes `cutlass/library/util.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/util.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L46** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L49** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L52** <code>//                          Data Structures for Gemm Functional Maps</code>
+  - EN: Comment that documents intent or context: "Data Structures for Gemm Functional Maps".
+  - CN: 用于说明意图或上下文的注释："Data Structures for Gemm Functional Maps"。
+- **L53** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>/// Tuple uniquely identifying Gemm functional behavior</code>
+  - EN: Comment that documents intent or context: "Tuple uniquely identifying Gemm functional behavior".
+  - CN: 用于说明意图或上下文的注释："Tuple uniquely identifying Gemm functional behavior"。
+- **L56** <code>struct GemmFunctionalKey {</code>
+  - EN: Begins the declaration of struct `GemmFunctionalKey`.
+  - CN: 开始声明 struct `GemmFunctionalKey`。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>  Provider provider;</code>
+  - EN: Declares the symbol `provider` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider`。
+- **L59** <code>  GemmKind gemm_kind;</code>
+  - EN: Declares the symbol `gemm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_kind`。
+- **L60** <code>  NumericTypeID element_compute;</code>
+  - EN: Declares the symbol `element_compute` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_compute`。
+- **L61** <code>  NumericTypeID element_scalar;</code>
+  - EN: Declares the symbol `element_scalar` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_scalar`。
+- **L62** <code>  NumericTypeID element_A;</code>
+  - EN: Declares the symbol `element_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_A`。
+- **L63** <code>  LayoutTypeID layout_A;</code>
+  - EN: Declares the symbol `layout_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_A`。
+- **L64** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L65** <code>  NumericTypeID element_B;</code>
+  - EN: Declares the symbol `element_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_B`。
+- **L66** <code>  LayoutTypeID layout_B;</code>
+  - EN: Declares the symbol `layout_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_B`。
+- **L67** <code>  ComplexTransform transform_B;</code>
+  - EN: Declares the symbol `transform_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_B`。
+- **L68** <code>  NumericTypeID element_C;</code>
+  - EN: Declares the symbol `element_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_C`。
+- **L69** <code>  LayoutTypeID layout_C;</code>
+  - EN: Declares the symbol `layout_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_C`。
+- **L70** <code>  NumericTypeID element_D;</code>
+  - EN: Declares the symbol `element_D` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_D`。
+- **L71** <code>  LayoutTypeID layout_D;</code>
+  - EN: Declares the symbol `layout_D` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_D`。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L74** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L75** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L78** <code>  GemmFunctionalKey(</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmFunctionalKey`.
+  - CN: 开始或继续与 `GemmFunctionalKey` 相关的签名/调用语法。
+- **L79** <code>    Provider provider,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L80** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L81** <code>    NumericTypeID element_compute = NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_compute` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_compute` 进行赋值或初始化。
+- **L82** <code>    NumericTypeID element_scalar = NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_scalar` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_scalar` 进行赋值或初始化。
+- **L83** <code>    NumericTypeID element_A = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_A` 进行赋值或初始化。
+- **L84** <code>    LayoutTypeID layout_A = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_A` 进行赋值或初始化。
+- **L85** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L86** <code>    NumericTypeID element_B = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_B` 进行赋值或初始化。
+- **L87** <code>    LayoutTypeID layout_B = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_B` 进行赋值或初始化。
+- **L88** <code>    ComplexTransform transform_B = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L89** <code>    NumericTypeID element_C = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_C` 进行赋值或初始化。
+- **L90** <code>    LayoutTypeID layout_C = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_C` 进行赋值或初始化。
+- **L91** <code>    NumericTypeID element_D = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_D` 进行赋值或初始化。
+- **L92** <code>    LayoutTypeID layout_D = LayoutTypeID::kColumnMajor</code>
+  - EN: Assigns or initializes `layout_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_D` 进行赋值或初始化。
+- **L93** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L94** <code>    provider(provider),</code>
+  - EN: Begins or continues the signature/call syntax involving `provider`.
+  - CN: 开始或继续与 `provider` 相关的签名/调用语法。
+- **L95** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L96** <code>    element_compute(element_compute),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_compute`.
+  - CN: 开始或继续与 `element_compute` 相关的签名/调用语法。
+- **L97** <code>    element_scalar(element_scalar),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_scalar`.
+  - CN: 开始或继续与 `element_scalar` 相关的签名/调用语法。
+- **L98** <code>    element_A(element_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_A`.
+  - CN: 开始或继续与 `element_A` 相关的签名/调用语法。
+- **L99** <code>    layout_A(layout_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_A`.
+  - CN: 开始或继续与 `layout_A` 相关的签名/调用语法。
+- **L100** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L101** <code>    element_B(element_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_B`.
+  - CN: 开始或继续与 `element_B` 相关的签名/调用语法。
+- **L102** <code>    layout_B(layout_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_B`.
+  - CN: 开始或继续与 `layout_B` 相关的签名/调用语法。
+- **L103** <code>    transform_B(transform_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L104** <code>    element_C(element_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_C`.
+  - CN: 开始或继续与 `element_C` 相关的签名/调用语法。
+- **L105** <code>    layout_C(layout_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_C`.
+  - CN: 开始或继续与 `layout_C` 相关的签名/调用语法。
+- **L106** <code>    element_D(element_D),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_D`.
+  - CN: 开始或继续与 `element_D` 相关的签名/调用语法。
+- **L107** <code>    layout_D(layout_D)</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_D`.
+  - CN: 开始或继续与 `layout_D` 相关的签名/调用语法。
+- **L108** <code>  { }</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L111** <code>  bool operator==(GemmFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L112** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L113** <code>      (provider == rhs.provider) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L114** <code>      (gemm_kind == rhs.gemm_kind) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L115** <code>      (element_compute == rhs.element_compute) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L116** <code>      (element_scalar == rhs.element_scalar) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L117** <code>      (element_A == rhs.element_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>      (layout_A == rhs.layout_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L119** <code>      (transform_A == rhs.transform_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L120** <code>      (element_B == rhs.element_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>      (layout_B == rhs.layout_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L122** <code>      (transform_B == rhs.transform_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L123** <code>      (element_C == rhs.element_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L124** <code>      (layout_C == rhs.layout_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L125** <code>      (element_D == rhs.element_D) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L126** <code>      (layout_D == rhs.layout_D);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L127** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L130** <code>  bool operator!=(GemmFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L131** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L132** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L133** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L136** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L137** <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L138** <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, cutlass::library::GemmFunctionalKey const &amp;k) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L140** <code>  out &lt;&lt; &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L141** <code>    &lt;&lt; &quot;         provider: &quot; &lt;&lt; to_string(k.provider) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L142** <code>    &lt;&lt; &quot;        gemm_kind: &quot; &lt;&lt; to_string(k.gemm_kind) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L143** <code>    &lt;&lt; &quot;  element_compute: &quot; &lt;&lt; to_string(k.element_compute) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L144** <code>    &lt;&lt; &quot;   element_scalar: &quot; &lt;&lt; to_string(k.element_scalar) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L145** <code>    &lt;&lt; &quot;        element_A: &quot; &lt;&lt; to_string(k.element_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L146** <code>    &lt;&lt; &quot;         layout_A: &quot; &lt;&lt; to_string(k.layout_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L147** <code>    &lt;&lt; &quot;      transform_A: &quot; &lt;&lt; to_string(k.transform_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L148** <code>    &lt;&lt; &quot;        element_B: &quot; &lt;&lt; to_string(k.element_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L149** <code>    &lt;&lt; &quot;         layout_B: &quot; &lt;&lt; to_string(k.layout_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L150** <code>    &lt;&lt; &quot;      transform_B: &quot; &lt;&lt; to_string(k.transform_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L151** <code>    &lt;&lt; &quot;        element_C: &quot; &lt;&lt; to_string(k.element_C) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L152** <code>    &lt;&lt; &quot;         layout_C: &quot; &lt;&lt; to_string(k.layout_C) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L153** <code>    &lt;&lt; &quot;        element_D: &quot; &lt;&lt; to_string(k.element_D) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L154** <code>    &lt;&lt; &quot;         layout_D: &quot; &lt;&lt; to_string(k.layout_D) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L155** <code>    &lt;&lt; &quot;}&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L156** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L157** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L158** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L161** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L162** <code>/// Hash function for GemmFunctionalKey</code>
+  - EN: Comment that documents intent or context: "Hash function for GemmFunctionalKey".
+  - CN: 用于说明意图或上下文的注释："Hash function for GemmFunctionalKey"。
+- **L163** <code>struct GemmFunctionalKeyHasher {</code>
+  - EN: Begins the declaration of struct `GemmFunctionalKeyHasher`.
+  - CN: 开始声明 struct `GemmFunctionalKeyHasher`。
+- **L164** <code>  using IntHash = std::hash&lt;int&gt;;</code>
+  - EN: Introduces the type or namespace alias `IntHash`.
+  - CN: 引入类型或命名空间别名 `IntHash`。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>  static size_t rotl(size_t key, int shl) {</code>
+  - EN: Begins the definition of function or method `rotl`.
+  - CN: 开始定义函数或方法 `rotl`。
+- **L168** <code>    return (key &lt;&lt; shl) | (key &gt;&gt; (sizeof(key)*8u - static_cast&lt;size_t&gt;(shl)));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L169** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L172** <code>  size_t operator()(GemmFunctionalKey const &amp;key) const {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L173** <code>    IntHash hash;</code>
+  - EN: Declares the symbol `hash` in the current scope.
+  - CN: 在当前作用域中声明符号 `hash`。
+- **L174** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L175** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L176** <code>      rotl(hash(int(key.provider)),        1) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L177** <code>      rotl(hash(int(key.gemm_kind)),       2) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L178** <code>      rotl(hash(int(key.element_compute)), 3) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L179** <code>      rotl(hash(int(key.element_scalar)),  4) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L180** <code>      rotl(hash(int(key.element_A)),       5) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L181** <code>      rotl(hash(int(key.layout_A)),        6) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L182** <code>      rotl(hash(int(key.transform_A)),     7) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L183** <code>      rotl(hash(int(key.element_B)),       8) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L184** <code>      rotl(hash(int(key.layout_B)),        9) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L185** <code>      rotl(hash(int(key.transform_B)),    10) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L186** <code>      rotl(hash(int(key.element_C)),      11) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L187** <code>      rotl(hash(int(key.layout_C)),       12) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L188** <code>      rotl(hash(int(key.element_D)),      13) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L189** <code>      rotl(hash(int(key.layout_D)),       14);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L190** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L191** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L192** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L193** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L194** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L195** <code>/// Establishes a partial ordering to search for GEMM operators</code>
+  - EN: Comment that documents intent or context: "Establishes a partial ordering to search for GEMM operators".
+  - CN: 用于说明意图或上下文的注释："Establishes a partial ordering to search for GEMM operators"。
+- **L196** <code>struct GemmPreferenceKey {</code>
+  - EN: Begins the declaration of struct `GemmPreferenceKey`.
+  - CN: 开始声明 struct `GemmPreferenceKey`。
+- **L197** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L198** <code>  int compute_capability;</code>
+  - EN: Declares the symbol `compute_capability` in the current scope.
+  - CN: 在当前作用域中声明符号 `compute_capability`。
+- **L199** <code>  int alignment;</code>
+  - EN: Declares the symbol `alignment` in the current scope.
+  - CN: 在当前作用域中声明符号 `alignment`。
+- **L200** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L201** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L202** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L203** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L204** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L205** <code>  GemmPreferenceKey(): compute_capability(), alignment() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `alignment`.
+  - CN: 开始或继续与 `alignment` 相关的签名/调用语法。
+- **L206** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L207** <code>  GemmPreferenceKey(int cc, int alignment): compute_capability(cc), alignment(alignment) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `alignment`.
+  - CN: 开始或继续与 `alignment` 相关的签名/调用语法。
+- **L208** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L209** <code>  bool operator&lt;(GemmPreferenceKey const &amp;rhs) const {</code>
+  - EN: Begins the definition of function or method `operator<`.
+  - CN: 开始定义函数或方法 `operator<`。
+- **L210** <code>    return (compute_capability &lt; rhs.compute_capability) ||</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L211** <code>      ((compute_capability == rhs.compute_capability) &amp;&amp; (alignment &lt; rhs.alignment));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L213** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L214** <code>  bool operator==(GemmPreferenceKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L215** <code>    return compute_capability == rhs.compute_capability;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L216** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L217** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L218** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L219** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L222** <code>std::ostream&amp; operator&lt;&lt; (std::ostream&amp; out, const cutlass::library::GemmPreferenceKey&amp; key) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L223** <code>    out &lt;&lt; &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>      &lt;&lt; &quot;compute_capability : &quot; &lt;&lt; key.compute_capability &lt;&lt; std::endl</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L225** <code>      &lt;&lt; &quot;alignment          : &quot; &lt;&lt; key.alignment &lt;&lt; std::endl</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L226** <code>      &lt;&lt; &quot;}&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L227** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L228** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L229** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L230** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L231** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L232** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L233** <code>/// Maps minimum compute capability onto a vector of possible operations</code>
+  - EN: Comment that documents intent or context: "Maps minimum compute capability onto a vector of possible operations".
+  - CN: 用于说明意图或上下文的注释："Maps minimum compute capability onto a vector of possible operations"。
+- **L234** <code>using GemmOperationVectorMap = std::map&lt;</code>
+  - EN: Introduces the type or namespace alias `GemmOperationVectorMap`.
+  - CN: 引入类型或命名空间别名 `GemmOperationVectorMap`。
+- **L235** <code>  GemmPreferenceKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L236** <code>  std::vector&lt;Operation const *&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L237** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L238** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L239** <code>/// Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm</code>
+  - EN: Comment that documents intent or context: "Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm".
+  - CN: 用于说明意图或上下文的注释："Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm"。
+- **L240** <code>using GemmOperationFunctionalMap = std::unordered_map&lt;</code>
+  - EN: Introduces the type or namespace alias `GemmOperationFunctionalMap`.
+  - CN: 引入类型或命名空间别名 `GemmOperationFunctionalMap`。
+- **L241** <code>  GemmFunctionalKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L242** <code>  GemmOperationVectorMap,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L243** <code>  GemmFunctionalKeyHasher</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L244** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L245** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L250** <code>//                          Data Structures for BlockScaled Gemm Functional Maps</code>
+  - EN: Comment that documents intent or context: "Data Structures for BlockScaled Gemm Functional Maps".
+  - CN: 用于说明意图或上下文的注释："Data Structures for BlockScaled Gemm Functional Maps"。
+- **L251** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>/// Tuple uniquely identifying Gemm functional behavior</code>
+  - EN: Comment that documents intent or context: "Tuple uniquely identifying Gemm functional behavior".
+  - CN: 用于说明意图或上下文的注释："Tuple uniquely identifying Gemm functional behavior"。
+- **L254** <code>struct BlockScaledGemmFunctionalKey {</code>
+  - EN: Begins the declaration of struct `BlockScaledGemmFunctionalKey`.
+  - CN: 开始声明 struct `BlockScaledGemmFunctionalKey`。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>  Provider provider;</code>
+  - EN: Declares the symbol `provider` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider`。
+- **L257** <code>  GemmKind gemm_kind;</code>
+  - EN: Declares the symbol `gemm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_kind`。
+- **L258** <code>  OperationKind kind;</code>
+  - EN: Declares the symbol `kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `kind`。
+- **L259** <code>  NumericTypeID element_compute;</code>
+  - EN: Declares the symbol `element_compute` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_compute`。
+- **L260** <code>  NumericTypeID element_scalar;</code>
+  - EN: Declares the symbol `element_scalar` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_scalar`。
+- **L261** <code>  NumericTypeID element_A;</code>
+  - EN: Declares the symbol `element_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_A`。
+- **L262** <code>  LayoutTypeID layout_A;</code>
+  - EN: Declares the symbol `layout_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_A`。
+- **L263** <code>  NumericTypeID element_SFA;</code>
+  - EN: Declares the symbol `element_SFA` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_SFA`。
+- **L264** <code>  NumericTypeID element_B;</code>
+  - EN: Declares the symbol `element_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_B`。
+- **L265** <code>  LayoutTypeID layout_B;</code>
+  - EN: Declares the symbol `layout_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_B`。
+- **L266** <code>  NumericTypeID element_SFB;</code>
+  - EN: Declares the symbol `element_SFB` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_SFB`。
+- **L267** <code>  NumericTypeID element_C;</code>
+  - EN: Declares the symbol `element_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_C`。
+- **L268** <code>  LayoutTypeID layout_C;</code>
+  - EN: Declares the symbol `layout_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_C`。
+- **L269** <code>  NumericTypeID element_D;</code>
+  - EN: Declares the symbol `element_D` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_D`。
+- **L270** <code>  LayoutTypeID layout_D;</code>
+  - EN: Declares the symbol `layout_D` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_D`。
+- **L271** <code>  NumericTypeID element_SFD; </code>
+  - EN: Declares the symbol `element_SFD` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_SFD`。
+- **L272** <code>  LayoutTypeID layout_SFD; </code>
+  - EN: Declares the symbol `layout_SFD` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_SFD`。
+- **L273** <code>  int SFVecSize;</code>
+  - EN: Declares the symbol `SFVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFVecSize`。
+- **L274** <code>  int EpilogueSFVecSize; </code>
+  - EN: Declares the symbol `EpilogueSFVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `EpilogueSFVecSize`。
+- **L275** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L276** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L277** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L278** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L279** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L280** <code>  BlockScaledGemmFunctionalKey(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockScaledGemmFunctionalKey`.
+  - CN: 开始或继续与 `BlockScaledGemmFunctionalKey` 相关的签名/调用语法。
+- **L281** <code>    Provider provider,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L282** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L283** <code>    OperationKind kind = OperationKind::kBlockScaledGemm,</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L284** <code>    NumericTypeID element_compute = NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_compute` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_compute` 进行赋值或初始化。
+- **L285** <code>    NumericTypeID element_scalar = NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_scalar` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_scalar` 进行赋值或初始化。
+- **L286** <code>    NumericTypeID element_A = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_A` 进行赋值或初始化。
+- **L287** <code>    LayoutTypeID layout_A = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_A` 进行赋值或初始化。
+- **L288** <code>    NumericTypeID element_SFA = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_SFA` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_SFA` 进行赋值或初始化。
+- **L289** <code>    NumericTypeID element_B = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_B` 进行赋值或初始化。
+- **L290** <code>    LayoutTypeID layout_B = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_B` 进行赋值或初始化。
+- **L291** <code>    NumericTypeID element_SFB = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_SFB` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_SFB` 进行赋值或初始化。
+- **L292** <code>    NumericTypeID element_C = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_C` 进行赋值或初始化。
+- **L293** <code>    LayoutTypeID layout_C = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_C` 进行赋值或初始化。
+- **L294** <code>    NumericTypeID element_D = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_D` 进行赋值或初始化。
+- **L295** <code>    LayoutTypeID layout_D = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_D` 进行赋值或初始化。
+- **L296** <code>    NumericTypeID element_SFD = NumericTypeID::kF16, </code>
+  - EN: Assigns or initializes `element_SFD` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_SFD` 进行赋值或初始化。
+- **L297** <code>    LayoutTypeID layout_SFD = LayoutTypeID::kRowMajor, </code>
+  - EN: Assigns or initializes `layout_SFD` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_SFD` 进行赋值或初始化。
+- **L298** <code>    int sf_vec_size = 32</code>
+  - EN: Assigns or initializes `sf_vec_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sf_vec_size` 进行赋值或初始化。
+- **L299** <code>    , int epilogue_sf_vec_size = 32 </code>
+  - EN: Assigns or initializes `epilogue_sf_vec_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `epilogue_sf_vec_size` 进行赋值或初始化。
+- **L300** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L301** <code>    provider(provider),</code>
+  - EN: Begins or continues the signature/call syntax involving `provider`.
+  - CN: 开始或继续与 `provider` 相关的签名/调用语法。
+- **L302** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L303** <code>    kind(kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `kind`.
+  - CN: 开始或继续与 `kind` 相关的签名/调用语法。
+- **L304** <code>    element_compute(element_compute),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_compute`.
+  - CN: 开始或继续与 `element_compute` 相关的签名/调用语法。
+- **L305** <code>    element_scalar(element_scalar),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_scalar`.
+  - CN: 开始或继续与 `element_scalar` 相关的签名/调用语法。
+- **L306** <code>    element_A(element_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_A`.
+  - CN: 开始或继续与 `element_A` 相关的签名/调用语法。
+- **L307** <code>    layout_A(layout_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_A`.
+  - CN: 开始或继续与 `layout_A` 相关的签名/调用语法。
+- **L308** <code>    element_SFA(element_SFA),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_SFA`.
+  - CN: 开始或继续与 `element_SFA` 相关的签名/调用语法。
+- **L309** <code>    element_B(element_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_B`.
+  - CN: 开始或继续与 `element_B` 相关的签名/调用语法。
+- **L310** <code>    layout_B(layout_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_B`.
+  - CN: 开始或继续与 `layout_B` 相关的签名/调用语法。
+- **L311** <code>    element_SFB(element_SFB),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_SFB`.
+  - CN: 开始或继续与 `element_SFB` 相关的签名/调用语法。
+- **L312** <code>    element_C(element_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_C`.
+  - CN: 开始或继续与 `element_C` 相关的签名/调用语法。
+- **L313** <code>    layout_C(layout_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_C`.
+  - CN: 开始或继续与 `layout_C` 相关的签名/调用语法。
+- **L314** <code>    element_D(element_D),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_D`.
+  - CN: 开始或继续与 `element_D` 相关的签名/调用语法。
+- **L315** <code>    layout_D(layout_D),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_D`.
+  - CN: 开始或继续与 `layout_D` 相关的签名/调用语法。
+- **L316** <code>    element_SFD(element_SFD), </code>
+  - EN: Begins or continues the signature/call syntax involving `element_SFD`.
+  - CN: 开始或继续与 `element_SFD` 相关的签名/调用语法。
+- **L317** <code>    layout_SFD(layout_SFD), </code>
+  - EN: Begins or continues the signature/call syntax involving `layout_SFD`.
+  - CN: 开始或继续与 `layout_SFD` 相关的签名/调用语法。
+- **L318** <code>    SFVecSize(sf_vec_size)</code>
+  - EN: Begins or continues the signature/call syntax involving `SFVecSize`.
+  - CN: 开始或继续与 `SFVecSize` 相关的签名/调用语法。
+- **L319** <code>    , EpilogueSFVecSize(epilogue_sf_vec_size) </code>
+  - EN: Begins or continues the signature/call syntax involving `EpilogueSFVecSize`.
+  - CN: 开始或继续与 `EpilogueSFVecSize` 相关的签名/调用语法。
+- **L320** <code>  { }</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L321** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L322** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L323** <code>  bool operator==(BlockScaledGemmFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L324** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L325** <code>      (provider == rhs.provider) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L326** <code>      (gemm_kind == rhs.gemm_kind) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L327** <code>      (kind == rhs.kind) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L328** <code>      (element_compute == rhs.element_compute) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L329** <code>      (element_scalar == rhs.element_scalar) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L330** <code>      (element_A == rhs.element_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L331** <code>      (layout_A == rhs.layout_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L332** <code>      (element_SFA == rhs.element_SFA) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>      (element_B == rhs.element_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L334** <code>      (layout_B == rhs.layout_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L335** <code>      (element_SFB == rhs.element_SFB) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L336** <code>      (element_C == rhs.element_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L337** <code>      (layout_C == rhs.layout_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L338** <code>      (element_D == rhs.element_D) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L339** <code>      (layout_D == rhs.layout_D) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L340** <code>      (element_SFD == rhs.element_SFD) &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L341** <code>      (layout_SFD == rhs.layout_SFD) &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L342** <code>      (SFVecSize == rhs.SFVecSize) </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L343** <code>      &amp;&amp; (EpilogueSFVecSize == rhs.EpilogueSFVecSize) </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L344** <code>      ;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L345** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L346** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L347** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L348** <code>  bool operator!=(BlockScaledGemmFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L349** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L350** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L351** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L353** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L354** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L355** <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L356** <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, cutlass::library::BlockScaledGemmFunctionalKey const &amp;k) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L357** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L358** <code>  out &lt;&lt; &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L359** <code>    &lt;&lt; &quot;         provider: &quot; &lt;&lt; to_string(k.provider) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L360** <code>    &lt;&lt; &quot;        gemm_kind: &quot; &lt;&lt; to_string(k.gemm_kind) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L361** <code>    &lt;&lt; &quot;             kind: &quot; &lt;&lt; to_string(k.kind) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L362** <code>    &lt;&lt; &quot;  element_compute: &quot; &lt;&lt; to_string(k.element_compute) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L363** <code>    &lt;&lt; &quot;   element_scalar: &quot; &lt;&lt; to_string(k.element_scalar) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L364** <code>    &lt;&lt; &quot;        element_A: &quot; &lt;&lt; to_string(k.element_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L365** <code>    &lt;&lt; &quot;         layout_A: &quot; &lt;&lt; to_string(k.layout_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L366** <code>    &lt;&lt; &quot;      element_SFA: &quot; &lt;&lt; to_string(k.element_SFA) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L367** <code>    &lt;&lt; &quot;        element_B: &quot; &lt;&lt; to_string(k.element_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L368** <code>    &lt;&lt; &quot;         layout_B: &quot; &lt;&lt; to_string(k.layout_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L369** <code>    &lt;&lt; &quot;      element_SFB: &quot; &lt;&lt; to_string(k.element_SFB) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L370** <code>    &lt;&lt; &quot;        element_C: &quot; &lt;&lt; to_string(k.element_C) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L371** <code>    &lt;&lt; &quot;         layout_C: &quot; &lt;&lt; to_string(k.layout_C) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L372** <code>    &lt;&lt; &quot;        element_D: &quot; &lt;&lt; to_string(k.element_D) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L373** <code>    &lt;&lt; &quot;         layout_D: &quot; &lt;&lt; to_string(k.layout_D) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L374** <code>    &lt;&lt; &quot;      element_SFD: &quot; &lt;&lt; to_string(k.element_SFD) &lt;&lt; &quot;\n&quot; </code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L375** <code>    &lt;&lt; &quot;       layout_SFD: &quot; &lt;&lt; to_string(k.layout_SFD) &lt;&lt; &quot;\n&quot; </code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L376** <code>    &lt;&lt; &quot;        SFVecSize: &quot; &lt;&lt; k.SFVecSize &lt;&lt; &quot;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L377** <code>    &lt;&lt; &quot;EpilogueSFVecSize: &quot; &lt;&lt; k.EpilogueSFVecSize &lt;&lt; &quot;\n&quot; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L378** <code>    &lt;&lt; &quot;}&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L379** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L380** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L381** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L382** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L383** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L384** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L385** <code>/// Hash function for BlockScaledGemmFunctionalKeyHasher</code>
+  - EN: Comment that documents intent or context: "Hash function for BlockScaledGemmFunctionalKeyHasher".
+  - CN: 用于说明意图或上下文的注释："Hash function for BlockScaledGemmFunctionalKeyHasher"。
+- **L386** <code>struct  BlockScaledGemmFunctionalKeyHasher {</code>
+  - EN: Begins the declaration of struct `BlockScaledGemmFunctionalKeyHasher`.
+  - CN: 开始声明 struct `BlockScaledGemmFunctionalKeyHasher`。
+- **L387** <code>  using IntHash = std::hash&lt;int&gt;;</code>
+  - EN: Introduces the type or namespace alias `IntHash`.
+  - CN: 引入类型或命名空间别名 `IntHash`。
+- **L388** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L389** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L390** <code>  static size_t rotl(size_t key, int shl) {</code>
+  - EN: Begins the definition of function or method `rotl`.
+  - CN: 开始定义函数或方法 `rotl`。
+- **L391** <code>    return (key &lt;&lt; shl) | (key &gt;&gt; (sizeof(key)*8u - static_cast&lt;size_t&gt;(shl)));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L392** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L393** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L394** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L395** <code>  size_t operator()(BlockScaledGemmFunctionalKey const &amp;key) const {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L396** <code>    IntHash hash;</code>
+  - EN: Declares the symbol `hash` in the current scope.
+  - CN: 在当前作用域中声明符号 `hash`。
+- **L397** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L398** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L399** <code>      rotl(hash(int(key.provider)),           1) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L400** <code>      rotl(hash(int(key.gemm_kind)),          2) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L401** <code>      rotl(hash(int(key.kind)),               3) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L402** <code>      rotl(hash(int(key.element_compute)),    4) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L403** <code>      rotl(hash(int(key.element_scalar)),     5) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L404** <code>      rotl(hash(int(key.element_A)),          6) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L405** <code>      rotl(hash(int(key.layout_A)),           7) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L406** <code>      rotl(hash(int(key.element_SFA)),        8) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L407** <code>      rotl(hash(int(key.element_B)),          9) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L408** <code>      rotl(hash(int(key.layout_B)),          10) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L409** <code>      rotl(hash(int(key.element_SFB)),       11) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L410** <code>      rotl(hash(int(key.element_C)),         12) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L411** <code>      rotl(hash(int(key.layout_C)),          13) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L412** <code>      rotl(hash(int(key.element_D)),         14) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L413** <code>      rotl(hash(int(key.layout_D)),          15) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L414** <code>      rotl(hash(int(key.element_SFD)),       16) ^ </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L415** <code>      rotl(hash(int(key.layout_SFD)),        17) ^ </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L416** <code>      rotl(hash(int(key.SFVecSize)),         18) ^ </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L417** <code>      rotl(hash(int(key.EpilogueSFVecSize)), 19)   </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L418** <code>      ;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L419** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L420** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L421** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L422** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L423** <code>/// Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm</code>
+  - EN: Comment that documents intent or context: "Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm".
+  - CN: 用于说明意图或上下文的注释："Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm"。
+- **L424** <code>using BlockScaledGemmOperationFunctionalMap = std::unordered_map&lt;</code>
+  - EN: Introduces the type or namespace alias `BlockScaledGemmOperationFunctionalMap`.
+  - CN: 引入类型或命名空间别名 `BlockScaledGemmOperationFunctionalMap`。
+- **L425** <code>  BlockScaledGemmFunctionalKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L426** <code>  GemmOperationVectorMap,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L427** <code>  BlockScaledGemmFunctionalKeyHasher</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L428** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L429** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L430** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L431** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L432** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L433** <code>//                          Data Structures for Blockwise Gemm Functional Maps</code>
+  - EN: Comment that documents intent or context: "Data Structures for Blockwise Gemm Functional Maps".
+  - CN: 用于说明意图或上下文的注释："Data Structures for Blockwise Gemm Functional Maps"。
+- **L434** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L435** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L436** <code>/// Tuple uniquely identifying Gemm functional behavior</code>
+  - EN: Comment that documents intent or context: "Tuple uniquely identifying Gemm functional behavior".
+  - CN: 用于说明意图或上下文的注释："Tuple uniquely identifying Gemm functional behavior"。
+- **L437** <code>struct BlockwiseGemmFunctionalKey {</code>
+  - EN: Begins the declaration of struct `BlockwiseGemmFunctionalKey`.
+  - CN: 开始声明 struct `BlockwiseGemmFunctionalKey`。
+- **L438** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L439** <code>  Provider provider;</code>
+  - EN: Declares the symbol `provider` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider`。
+- **L440** <code>  GemmKind gemm_kind;</code>
+  - EN: Declares the symbol `gemm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_kind`。
+- **L441** <code>  OperationKind kind;</code>
+  - EN: Declares the symbol `kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `kind`。
+- **L442** <code>  NumericTypeID element_compute;</code>
+  - EN: Declares the symbol `element_compute` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_compute`。
+- **L443** <code>  NumericTypeID element_scalar;</code>
+  - EN: Declares the symbol `element_scalar` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_scalar`。
+- **L444** <code>  NumericTypeID element_A;</code>
+  - EN: Declares the symbol `element_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_A`。
+- **L445** <code>  LayoutTypeID layout_A;</code>
+  - EN: Declares the symbol `layout_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_A`。
+- **L446** <code>  NumericTypeID element_SFA;</code>
+  - EN: Declares the symbol `element_SFA` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_SFA`。
+- **L447** <code>  NumericTypeID element_B;</code>
+  - EN: Declares the symbol `element_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_B`。
+- **L448** <code>  LayoutTypeID layout_B;</code>
+  - EN: Declares the symbol `layout_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_B`。
+- **L449** <code>  NumericTypeID element_SFB;</code>
+  - EN: Declares the symbol `element_SFB` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_SFB`。
+- **L450** <code>  NumericTypeID element_C;</code>
+  - EN: Declares the symbol `element_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_C`。
+- **L451** <code>  LayoutTypeID layout_C;</code>
+  - EN: Declares the symbol `layout_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_C`。
+- **L452** <code>  NumericTypeID element_D;</code>
+  - EN: Declares the symbol `element_D` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_D`。
+- **L453** <code>  LayoutTypeID layout_D;</code>
+  - EN: Declares the symbol `layout_D` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_D`。
+- **L454** <code>  int SFMVecSize;</code>
+  - EN: Declares the symbol `SFMVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFMVecSize`。
+- **L455** <code>  int SFNVecSize;</code>
+  - EN: Declares the symbol `SFNVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFNVecSize`。
+- **L456** <code>  int SFKVecSize;</code>
+  - EN: Declares the symbol `SFKVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFKVecSize`。
+- **L457** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L458** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L459** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L460** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L461** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L462** <code>  BlockwiseGemmFunctionalKey(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockwiseGemmFunctionalKey`.
+  - CN: 开始或继续与 `BlockwiseGemmFunctionalKey` 相关的签名/调用语法。
+- **L463** <code>    Provider provider,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L464** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L465** <code>    OperationKind kind = OperationKind::kBlockwiseGemm,</code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L466** <code>    NumericTypeID element_compute = NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_compute` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_compute` 进行赋值或初始化。
+- **L467** <code>    NumericTypeID element_scalar = NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_scalar` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_scalar` 进行赋值或初始化。
+- **L468** <code>    NumericTypeID element_A = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_A` 进行赋值或初始化。
+- **L469** <code>    LayoutTypeID layout_A = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_A` 进行赋值或初始化。
+- **L470** <code>    NumericTypeID element_SFA = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_SFA` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_SFA` 进行赋值或初始化。
+- **L471** <code>    NumericTypeID element_B = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_B` 进行赋值或初始化。
+- **L472** <code>    LayoutTypeID layout_B = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_B` 进行赋值或初始化。
+- **L473** <code>    NumericTypeID element_SFB = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_SFB` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_SFB` 进行赋值或初始化。
+- **L474** <code>    NumericTypeID element_C = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_C` 进行赋值或初始化。
+- **L475** <code>    LayoutTypeID layout_C = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_C` 进行赋值或初始化。
+- **L476** <code>    NumericTypeID element_D = NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_D` 进行赋值或初始化。
+- **L477** <code>    LayoutTypeID layout_D = LayoutTypeID::kColumnMajor,</code>
+  - EN: Assigns or initializes `layout_D` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_D` 进行赋值或初始化。
+- **L478** <code>    int sfm_vec_size = 32,</code>
+  - EN: Assigns or initializes `sfm_vec_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sfm_vec_size` 进行赋值或初始化。
+- **L479** <code>    int sfn_vec_size = 32,</code>
+  - EN: Assigns or initializes `sfn_vec_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sfn_vec_size` 进行赋值或初始化。
+- **L480** <code>    int sfk_vec_size = 32</code>
+  - EN: Assigns or initializes `sfk_vec_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `sfk_vec_size` 进行赋值或初始化。
+- **L481** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L482** <code>    provider(provider),</code>
+  - EN: Begins or continues the signature/call syntax involving `provider`.
+  - CN: 开始或继续与 `provider` 相关的签名/调用语法。
+- **L483** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L484** <code>    kind(kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `kind`.
+  - CN: 开始或继续与 `kind` 相关的签名/调用语法。
+- **L485** <code>    element_compute(element_compute),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_compute`.
+  - CN: 开始或继续与 `element_compute` 相关的签名/调用语法。
+- **L486** <code>    element_scalar(element_scalar),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_scalar`.
+  - CN: 开始或继续与 `element_scalar` 相关的签名/调用语法。
+- **L487** <code>    element_A(element_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_A`.
+  - CN: 开始或继续与 `element_A` 相关的签名/调用语法。
+- **L488** <code>    layout_A(layout_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_A`.
+  - CN: 开始或继续与 `layout_A` 相关的签名/调用语法。
+- **L489** <code>    element_SFA(element_SFA),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_SFA`.
+  - CN: 开始或继续与 `element_SFA` 相关的签名/调用语法。
+- **L490** <code>    element_B(element_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_B`.
+  - CN: 开始或继续与 `element_B` 相关的签名/调用语法。
+- **L491** <code>    layout_B(layout_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_B`.
+  - CN: 开始或继续与 `layout_B` 相关的签名/调用语法。
+- **L492** <code>    element_SFB(element_SFB),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_SFB`.
+  - CN: 开始或继续与 `element_SFB` 相关的签名/调用语法。
+- **L493** <code>    element_C(element_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_C`.
+  - CN: 开始或继续与 `element_C` 相关的签名/调用语法。
+- **L494** <code>    layout_C(layout_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_C`.
+  - CN: 开始或继续与 `layout_C` 相关的签名/调用语法。
+- **L495** <code>    element_D(element_D),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_D`.
+  - CN: 开始或继续与 `element_D` 相关的签名/调用语法。
+- **L496** <code>    layout_D(layout_D),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_D`.
+  - CN: 开始或继续与 `layout_D` 相关的签名/调用语法。
+- **L497** <code>    SFMVecSize(sfm_vec_size),</code>
+  - EN: Begins or continues the signature/call syntax involving `SFMVecSize`.
+  - CN: 开始或继续与 `SFMVecSize` 相关的签名/调用语法。
+- **L498** <code>    SFNVecSize(sfn_vec_size),</code>
+  - EN: Begins or continues the signature/call syntax involving `SFNVecSize`.
+  - CN: 开始或继续与 `SFNVecSize` 相关的签名/调用语法。
+- **L499** <code>    SFKVecSize(sfk_vec_size)</code>
+  - EN: Begins or continues the signature/call syntax involving `SFKVecSize`.
+  - CN: 开始或继续与 `SFKVecSize` 相关的签名/调用语法。
+- **L500** <code>  { }</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L501** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L502** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L503** <code>  bool operator==(BlockwiseGemmFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L504** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L505** <code>      (provider == rhs.provider) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L506** <code>      (gemm_kind == rhs.gemm_kind) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L507** <code>      (kind == rhs.kind) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L508** <code>      (element_compute == rhs.element_compute) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L509** <code>      (element_scalar == rhs.element_scalar) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L510** <code>      (element_A == rhs.element_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L511** <code>      (layout_A == rhs.layout_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L512** <code>      (element_SFA == rhs.element_SFA) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L513** <code>      (element_B == rhs.element_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L514** <code>      (layout_B == rhs.layout_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L515** <code>      (element_SFB == rhs.element_SFB) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L516** <code>      (element_C == rhs.element_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L517** <code>      (layout_C == rhs.layout_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L518** <code>      (element_D == rhs.element_D) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L519** <code>      (layout_D == rhs.layout_D) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L520** <code>      (SFMVecSize == rhs.SFMVecSize) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L521** <code>      (SFNVecSize == rhs.SFNVecSize) &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L522** <code>      (SFKVecSize == rhs.SFKVecSize);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L523** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L524** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L525** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L526** <code>  bool operator!=(BlockwiseGemmFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L527** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L528** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L529** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L530** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L531** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L532** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L533** <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L534** <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, cutlass::library::BlockwiseGemmFunctionalKey const &amp;k) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L535** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L536** <code>  out &lt;&lt; &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L537** <code>    &lt;&lt; &quot;         provider: &quot; &lt;&lt; to_string(k.provider) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L538** <code>    &lt;&lt; &quot;        gemm_kind: &quot; &lt;&lt; to_string(k.gemm_kind) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L539** <code>    &lt;&lt; &quot;             kind: &quot; &lt;&lt; to_string(k.kind) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L540** <code>    &lt;&lt; &quot;  element_compute: &quot; &lt;&lt; to_string(k.element_compute) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L541** <code>    &lt;&lt; &quot;   element_scalar: &quot; &lt;&lt; to_string(k.element_scalar) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L542** <code>    &lt;&lt; &quot;        element_A: &quot; &lt;&lt; to_string(k.element_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L543** <code>    &lt;&lt; &quot;         layout_A: &quot; &lt;&lt; to_string(k.layout_A) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L544** <code>    &lt;&lt; &quot;      element_SFA: &quot; &lt;&lt; to_string(k.element_SFA) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L545** <code>    &lt;&lt; &quot;        element_B: &quot; &lt;&lt; to_string(k.element_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L546** <code>    &lt;&lt; &quot;         layout_B: &quot; &lt;&lt; to_string(k.layout_B) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L547** <code>    &lt;&lt; &quot;      element_SFB: &quot; &lt;&lt; to_string(k.element_SFB) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L548** <code>    &lt;&lt; &quot;        element_C: &quot; &lt;&lt; to_string(k.element_C) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L549** <code>    &lt;&lt; &quot;         layout_C: &quot; &lt;&lt; to_string(k.layout_C) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L550** <code>    &lt;&lt; &quot;        element_D: &quot; &lt;&lt; to_string(k.element_D) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L551** <code>    &lt;&lt; &quot;         layout_D: &quot; &lt;&lt; to_string(k.layout_D) &lt;&lt; &quot;\n&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L552** <code>    &lt;&lt; &quot;        SFMVecSize: &quot; &lt;&lt; k.SFMVecSize &lt;&lt; &quot;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L553** <code>    &lt;&lt; &quot;        SFNVecSize: &quot; &lt;&lt; k.SFNVecSize &lt;&lt; &quot;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L554** <code>    &lt;&lt; &quot;        SFKVecSize: &quot; &lt;&lt; k.SFKVecSize &lt;&lt; &quot;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L555** <code>    &lt;&lt; &quot;}&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L556** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L557** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L558** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L559** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L560** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L561** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L562** <code>/// Hash function for BlockwiseGemmFunctionalKeyHasher</code>
+  - EN: Comment that documents intent or context: "Hash function for BlockwiseGemmFunctionalKeyHasher".
+  - CN: 用于说明意图或上下文的注释："Hash function for BlockwiseGemmFunctionalKeyHasher"。
+- **L563** <code>struct  BlockwiseGemmFunctionalKeyHasher {</code>
+  - EN: Begins the declaration of struct `BlockwiseGemmFunctionalKeyHasher`.
+  - CN: 开始声明 struct `BlockwiseGemmFunctionalKeyHasher`。
+- **L564** <code>  using IntHash = std::hash&lt;int&gt;;</code>
+  - EN: Introduces the type or namespace alias `IntHash`.
+  - CN: 引入类型或命名空间别名 `IntHash`。
+- **L565** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L566** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L567** <code>  static size_t rotl(size_t key, int shl) {</code>
+  - EN: Begins the definition of function or method `rotl`.
+  - CN: 开始定义函数或方法 `rotl`。
+- **L568** <code>    return (key &lt;&lt; shl) | (key &gt;&gt; (sizeof(key)*8u - static_cast&lt;size_t&gt;(shl)));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L569** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L570** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L571** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L572** <code>  size_t operator()(BlockwiseGemmFunctionalKey const &amp;key) const {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L573** <code>    IntHash hash;</code>
+  - EN: Declares the symbol `hash` in the current scope.
+  - CN: 在当前作用域中声明符号 `hash`。
+- **L574** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L575** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L576** <code>      rotl(hash(int(key.provider)),           1) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L577** <code>      rotl(hash(int(key.gemm_kind)),          2) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L578** <code>      rotl(hash(int(key.kind)),               3) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L579** <code>      rotl(hash(int(key.element_compute)),    4) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L580** <code>      rotl(hash(int(key.element_scalar)),     5) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L581** <code>      rotl(hash(int(key.element_A)),          6) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L582** <code>      rotl(hash(int(key.layout_A)),           7) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L583** <code>      rotl(hash(int(key.element_SFA)),        8) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L584** <code>      rotl(hash(int(key.element_B)),          9) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L585** <code>      rotl(hash(int(key.layout_B)),          10) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L586** <code>      rotl(hash(int(key.element_SFB)),       11) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L587** <code>      rotl(hash(int(key.element_C)),         12) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L588** <code>      rotl(hash(int(key.layout_C)),          13) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L589** <code>      rotl(hash(int(key.element_D)),         14) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L590** <code>      rotl(hash(int(key.layout_D)),          15) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L591** <code>      rotl(hash(int(key.SFMVecSize)),        16) ^ </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L592** <code>      rotl(hash(int(key.SFNVecSize)),        17) ^ </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L593** <code>      rotl(hash(int(key.SFKVecSize)),        18) </code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L594** <code>      ;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L595** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L596** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L597** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L598** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L599** <code>/// Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm</code>
+  - EN: Comment that documents intent or context: "Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm".
+  - CN: 用于说明意图或上下文的注释："Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm"。
+- **L600** <code>using BlockwiseGemmOperationFunctionalMap = std::unordered_map&lt;</code>
+  - EN: Introduces the type or namespace alias `BlockwiseGemmOperationFunctionalMap`.
+  - CN: 引入类型或命名空间别名 `BlockwiseGemmOperationFunctionalMap`。
+- **L601** <code>  BlockwiseGemmFunctionalKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L602** <code>  GemmOperationVectorMap,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L603** <code>  BlockwiseGemmFunctionalKeyHasher</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L604** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L605** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L606** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L607** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L608** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L609** <code>//                          Data Structures for Conv Functional Maps</code>
+  - EN: Comment that documents intent or context: "Data Structures for Conv Functional Maps".
+  - CN: 用于说明意图或上下文的注释："Data Structures for Conv Functional Maps"。
+- **L610** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L611** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L612** <code>/// Tuple uniquely identifying conv2d functional behavior</code>
+  - EN: Comment that documents intent or context: "Tuple uniquely identifying conv2d functional behavior".
+  - CN: 用于说明意图或上下文的注释："Tuple uniquely identifying conv2d functional behavior"。
+- **L613** <code>struct ConvFunctionalKey {</code>
+  - EN: Begins the declaration of struct `ConvFunctionalKey`.
+  - CN: 开始声明 struct `ConvFunctionalKey`。
+- **L614** <code>  library::Provider provider;</code>
+  - EN: Declares the symbol `provider` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider`。
+- **L615** <code>  library::ConvKind conv_kind;</code>
+  - EN: Declares the symbol `conv_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `conv_kind`。
+- **L616** <code>  library::NumericTypeID element_A;</code>
+  - EN: Declares the symbol `element_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_A`。
+- **L617** <code>  library::LayoutTypeID layout_A;</code>
+  - EN: Declares the symbol `layout_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_A`。
+- **L618** <code>  library::NumericTypeID element_B;</code>
+  - EN: Declares the symbol `element_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_B`。
+- **L619** <code>  library::LayoutTypeID layout_B;</code>
+  - EN: Declares the symbol `layout_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_B`。
+- **L620** <code>  library::NumericTypeID element_C;</code>
+  - EN: Declares the symbol `element_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_C`。
+- **L621** <code>  library::LayoutTypeID layout_C;</code>
+  - EN: Declares the symbol `layout_C` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout_C`。
+- **L622** <code>  library::NumericTypeID element_accumulator;</code>
+  - EN: Declares the symbol `element_accumulator` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_accumulator`。
+- **L623** <code>  library::NumericTypeID element_compute;</code>
+  - EN: Declares the symbol `element_compute` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_compute`。
+- **L624** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L625** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L626** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L627** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L628** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L629** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L630** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L631** <code>  ConvFunctionalKey(</code>
+  - EN: Begins or continues the signature/call syntax involving `ConvFunctionalKey`.
+  - CN: 开始或继续与 `ConvFunctionalKey` 相关的签名/调用语法。
+- **L632** <code>    library::Provider provider = library::Provider::kInvalid,</code>
+  - EN: Assigns or initializes `provider` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `provider` 进行赋值或初始化。
+- **L633** <code>    library::ConvKind conv_kind = library::ConvKind::kFprop,</code>
+  - EN: Assigns or initializes `conv_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `conv_kind` 进行赋值或初始化。
+- **L634** <code>    library::NumericTypeID element_A = library::NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_A` 进行赋值或初始化。
+- **L635** <code>    library::LayoutTypeID layout_A = library::LayoutTypeID::kTensorNHWC,</code>
+  - EN: Assigns or initializes `layout_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_A` 进行赋值或初始化。
+- **L636** <code>    library::NumericTypeID element_B = library::NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_B` 进行赋值或初始化。
+- **L637** <code>    library::LayoutTypeID layout_B = library::LayoutTypeID::kTensorNHWC,</code>
+  - EN: Assigns or initializes `layout_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_B` 进行赋值或初始化。
+- **L638** <code>    library::NumericTypeID element_C = library::NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_C` 进行赋值或初始化。
+- **L639** <code>    library::LayoutTypeID layout_C = library::LayoutTypeID::kTensorNHWC,</code>
+  - EN: Assigns or initializes `layout_C` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_C` 进行赋值或初始化。
+- **L640** <code>    library::NumericTypeID element_accumulator = library::NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_accumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_accumulator` 进行赋值或初始化。
+- **L641** <code>    library::NumericTypeID element_compute = library::NumericTypeID::kF32</code>
+  - EN: Assigns or initializes `element_compute` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_compute` 进行赋值或初始化。
+- **L642** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L643** <code>    provider(provider),</code>
+  - EN: Begins or continues the signature/call syntax involving `provider`.
+  - CN: 开始或继续与 `provider` 相关的签名/调用语法。
+- **L644** <code>    conv_kind(conv_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `conv_kind`.
+  - CN: 开始或继续与 `conv_kind` 相关的签名/调用语法。
+- **L645** <code>    element_A(element_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_A`.
+  - CN: 开始或继续与 `element_A` 相关的签名/调用语法。
+- **L646** <code>    layout_A(layout_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_A`.
+  - CN: 开始或继续与 `layout_A` 相关的签名/调用语法。
+- **L647** <code>    element_B(element_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_B`.
+  - CN: 开始或继续与 `element_B` 相关的签名/调用语法。
+- **L648** <code>    layout_B(layout_B),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_B`.
+  - CN: 开始或继续与 `layout_B` 相关的签名/调用语法。
+- **L649** <code>    element_C(element_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_C`.
+  - CN: 开始或继续与 `element_C` 相关的签名/调用语法。
+- **L650** <code>    layout_C(layout_C),</code>
+  - EN: Begins or continues the signature/call syntax involving `layout_C`.
+  - CN: 开始或继续与 `layout_C` 相关的签名/调用语法。
+- **L651** <code>    element_accumulator(element_accumulator),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_accumulator`.
+  - CN: 开始或继续与 `element_accumulator` 相关的签名/调用语法。
+- **L652** <code>    element_compute(element_compute)</code>
+  - EN: Begins or continues the signature/call syntax involving `element_compute`.
+  - CN: 开始或继续与 `element_compute` 相关的签名/调用语法。
+- **L653** <code>  { }</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L654** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L655** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L656** <code>  bool operator==(ConvFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L657** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L658** <code>      (provider == rhs.provider) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L659** <code>      (conv_kind == rhs.conv_kind) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L660** <code>      (element_A == rhs.element_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L661** <code>      (layout_A == rhs.layout_A) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L662** <code>      (element_B == rhs.element_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L663** <code>      (layout_B == rhs.layout_B) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L664** <code>      (element_C == rhs.element_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L665** <code>      (layout_C == rhs.layout_C) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L666** <code>      (element_accumulator == rhs.element_accumulator) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L667** <code>      (element_compute == rhs.element_compute);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L668** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L669** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L670** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L671** <code>  bool operator!=(ConvFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L672** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L673** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L674** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L675** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L676** <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L677** <code>std::ostream&amp; operator&lt;&lt; (std::ostream&amp; out, const cutlass::library::ConvFunctionalKey&amp; key) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L678** <code>    out &lt;&lt; &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L679** <code>      &lt;&lt; &quot;provider: &quot; &lt;&lt; to_string(key.provider) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L680** <code>      &lt;&lt; &quot;conv_kind: &quot; &lt;&lt; to_string(key.conv_kind) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L681** <code>      &lt;&lt; &quot;element_A: &quot; &lt;&lt; to_string(key.element_A) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L682** <code>      &lt;&lt; &quot;layout_A: &quot; &lt;&lt; to_string(key.layout_A) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L683** <code>      &lt;&lt; &quot;element_B: &quot; &lt;&lt; to_string(key.element_B) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L684** <code>      &lt;&lt; &quot;layout_B: &quot; &lt;&lt; to_string(key.layout_B) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L685** <code>      &lt;&lt; &quot;element_C: &quot; &lt;&lt; to_string(key.element_C) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L686** <code>      &lt;&lt; &quot;layout_C: &quot; &lt;&lt; to_string(key.layout_C) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L687** <code>      &lt;&lt; &quot;element_accumulator: &quot; &lt;&lt; to_string(key.element_accumulator) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L688** <code>      &lt;&lt; &quot;element_compute: &quot; &lt;&lt; to_string(key.element_compute) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L689** <code>      &lt;&lt; &quot;}&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L690** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L691** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L692** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L693** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L694** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L695** <code>struct ConvFunctionalKeyHasher {</code>
+  - EN: Begins the declaration of struct `ConvFunctionalKeyHasher`.
+  - CN: 开始声明 struct `ConvFunctionalKeyHasher`。
+- **L696** <code>  using IntHash = std::hash&lt;int&gt;;</code>
+  - EN: Introduces the type or namespace alias `IntHash`.
+  - CN: 引入类型或命名空间别名 `IntHash`。
+- **L697** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L698** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L699** <code>  static size_t rotl(size_t key, int shl) {</code>
+  - EN: Begins the definition of function or method `rotl`.
+  - CN: 开始定义函数或方法 `rotl`。
+- **L700** <code>    return (key &lt;&lt; shl) | (key &gt;&gt; (sizeof(key)*8u - static_cast&lt;size_t&gt;(shl)));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L701** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L702** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L703** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L704** <code>  size_t operator()(ConvFunctionalKey const &amp;key) const {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L705** <code>    IntHash hash;</code>
+  - EN: Declares the symbol `hash` in the current scope.
+  - CN: 在当前作用域中声明符号 `hash`。
+- **L706** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L707** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L708** <code>      rotl(hash(int(key.provider)), 1) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L709** <code>      rotl(hash(int(key.conv_kind)), 2) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L710** <code>      rotl(hash(int(key.element_A)), 3) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L711** <code>      rotl(hash(int(key.layout_A)), 4) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L712** <code>      rotl(hash(int(key.element_B)), 5) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L713** <code>      rotl(hash(int(key.layout_B)), 6) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L714** <code>      rotl(hash(int(key.element_C)), 7) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L715** <code>      rotl(hash(int(key.layout_C)), 8) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L716** <code>      rotl(hash(int(key.element_accumulator)), 9) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L717** <code>      rotl(hash(int(key.element_compute)), 10);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L718** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L719** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L720** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L721** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L722** <code>/// Establishes a partial ordering to search for Conv2d operators</code>
+  - EN: Comment that documents intent or context: "Establishes a partial ordering to search for Conv2d operators".
+  - CN: 用于说明意图或上下文的注释："Establishes a partial ordering to search for Conv2d operators"。
+- **L723** <code>struct ConvPreferenceKey {</code>
+  - EN: Begins the declaration of struct `ConvPreferenceKey`.
+  - CN: 开始声明 struct `ConvPreferenceKey`。
+- **L724** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L725** <code>  int compute_capability;</code>
+  - EN: Declares the symbol `compute_capability` in the current scope.
+  - CN: 在当前作用域中声明符号 `compute_capability`。
+- **L726** <code>  IteratorAlgorithmID iterator_algorithm;</code>
+  - EN: Declares the symbol `iterator_algorithm` in the current scope.
+  - CN: 在当前作用域中声明符号 `iterator_algorithm`。
+- **L727** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L728** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L729** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L730** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L731** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L732** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L733** <code>  ConvPreferenceKey(): compute_capability(), iterator_algorithm() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `iterator_algorithm`.
+  - CN: 开始或继续与 `iterator_algorithm` 相关的签名/调用语法。
+- **L734** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L735** <code>  ConvPreferenceKey(int cc, IteratorAlgorithmID iterator_algorithm):</code>
+  - EN: Begins the definition of function or method `ConvPreferenceKey`.
+  - CN: 开始定义函数或方法 `ConvPreferenceKey`。
+- **L736** <code>    compute_capability(cc), iterator_algorithm(iterator_algorithm) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `iterator_algorithm`.
+  - CN: 开始或继续与 `iterator_algorithm` 相关的签名/调用语法。
+- **L737** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L738** <code>  bool operator&lt;(ConvPreferenceKey const &amp;rhs) const {</code>
+  - EN: Begins the definition of function or method `operator<`.
+  - CN: 开始定义函数或方法 `operator<`。
+- **L739** <code>    return (compute_capability &lt; rhs.compute_capability) ||</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L740** <code>      ((compute_capability == rhs.compute_capability) &amp;&amp; (iterator_algorithm &lt; rhs.iterator_algorithm));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L741** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L742** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L743** <code>  bool operator==(ConvPreferenceKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L744** <code>    return (compute_capability == rhs.compute_capability) &amp;&amp;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L745** <code>          (iterator_algorithm == rhs.iterator_algorithm);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L746** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L747** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L748** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L749** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L750** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L751** <code>/// Maps minimum compute capability onto a vector of possible operations</code>
+  - EN: Comment that documents intent or context: "Maps minimum compute capability onto a vector of possible operations".
+  - CN: 用于说明意图或上下文的注释："Maps minimum compute capability onto a vector of possible operations"。
+- **L752** <code>using ConvOperationVectorMap = std::map&lt;</code>
+  - EN: Introduces the type or namespace alias `ConvOperationVectorMap`.
+  - CN: 引入类型或命名空间别名 `ConvOperationVectorMap`。
+- **L753** <code>  ConvPreferenceKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L754** <code>  std::vector&lt;Operation const *&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L755** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L756** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L757** <code>/// Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm</code>
+  - EN: Comment that documents intent or context: "Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm".
+  - CN: 用于说明意图或上下文的注释："Maps a GemmFunctionalKey onto a vector of Operation * objects expected to be of kind kGemm"。
+- **L758** <code>using ConvOperationFunctionalMap = std::unordered_map&lt;</code>
+  - EN: Introduces the type or namespace alias `ConvOperationFunctionalMap`.
+  - CN: 引入类型或命名空间别名 `ConvOperationFunctionalMap`。
+- **L759** <code>  ConvFunctionalKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L760** <code>  ConvOperationVectorMap,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L761** <code>  ConvFunctionalKeyHasher</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L762** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L763** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L764** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L765** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L766** <code>/// Tuple uniquely identifying conv2d functional behavior</code>
+  - EN: Comment that documents intent or context: "Tuple uniquely identifying conv2d functional behavior".
+  - CN: 用于说明意图或上下文的注释："Tuple uniquely identifying conv2d functional behavior"。
+- **L767** <code>struct ReductionFunctionalKey {</code>
+  - EN: Begins the declaration of struct `ReductionFunctionalKey`.
+  - CN: 开始声明 struct `ReductionFunctionalKey`。
+- **L768** <code>  library::Provider provider;</code>
+  - EN: Declares the symbol `provider` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider`。
+- **L769** <code>  library::NumericTypeID element_workspace;</code>
+  - EN: Declares the symbol `element_workspace` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_workspace`。
+- **L770** <code>  library::NumericTypeID element_accumulator;</code>
+  - EN: Declares the symbol `element_accumulator` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_accumulator`。
+- **L771** <code>  library::NumericTypeID element_output;</code>
+  - EN: Declares the symbol `element_output` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_output`。
+- **L772** <code>  library::NumericTypeID element_compute;</code>
+  - EN: Declares the symbol `element_compute` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_compute`。
+- **L773** <code>  library::MathOperationID reduce_math_op;</code>
+  - EN: Declares the symbol `reduce_math_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `reduce_math_op`。
+- **L774** <code>  library::EpilogueKind epilogue_math_op;</code>
+  - EN: Declares the symbol `epilogue_math_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `epilogue_math_op`。
+- **L775** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L776** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L777** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L778** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L779** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L780** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L781** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L782** <code>  ReductionFunctionalKey(</code>
+  - EN: Begins or continues the signature/call syntax involving `ReductionFunctionalKey`.
+  - CN: 开始或继续与 `ReductionFunctionalKey` 相关的签名/调用语法。
+- **L783** <code>    library::Provider provider = library::Provider::kInvalid,</code>
+  - EN: Assigns or initializes `provider` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `provider` 进行赋值或初始化。
+- **L784** <code>    library::NumericTypeID element_workspace = library::NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_workspace` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_workspace` 进行赋值或初始化。
+- **L785** <code>    library::NumericTypeID element_accumulator = library::NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_accumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_accumulator` 进行赋值或初始化。
+- **L786** <code>    library::NumericTypeID element_output = library::NumericTypeID::kF16,</code>
+  - EN: Assigns or initializes `element_output` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_output` 进行赋值或初始化。
+- **L787** <code>    library::NumericTypeID element_compute = library::NumericTypeID::kF32,</code>
+  - EN: Assigns or initializes `element_compute` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_compute` 进行赋值或初始化。
+- **L788** <code>    library::MathOperationID reduce_math_op = library::MathOperationID::kAdd,</code>
+  - EN: Assigns or initializes `reduce_math_op` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `reduce_math_op` 进行赋值或初始化。
+- **L789** <code>    library::EpilogueKind epilogue_math_op = library::EpilogueKind::kLinearCombination</code>
+  - EN: Assigns or initializes `epilogue_math_op` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `epilogue_math_op` 进行赋值或初始化。
+- **L790** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L791** <code>    provider(provider),</code>
+  - EN: Begins or continues the signature/call syntax involving `provider`.
+  - CN: 开始或继续与 `provider` 相关的签名/调用语法。
+- **L792** <code>    element_workspace(element_workspace),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_workspace`.
+  - CN: 开始或继续与 `element_workspace` 相关的签名/调用语法。
+- **L793** <code>    element_accumulator(element_accumulator),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_accumulator`.
+  - CN: 开始或继续与 `element_accumulator` 相关的签名/调用语法。
+- **L794** <code>    element_output(element_output),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_output`.
+  - CN: 开始或继续与 `element_output` 相关的签名/调用语法。
+- **L795** <code>    element_compute(element_compute),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_compute`.
+  - CN: 开始或继续与 `element_compute` 相关的签名/调用语法。
+- **L796** <code>    reduce_math_op(reduce_math_op),</code>
+  - EN: Begins or continues the signature/call syntax involving `reduce_math_op`.
+  - CN: 开始或继续与 `reduce_math_op` 相关的签名/调用语法。
+- **L797** <code>    epilogue_math_op(epilogue_math_op)</code>
+  - EN: Begins or continues the signature/call syntax involving `epilogue_math_op`.
+  - CN: 开始或继续与 `epilogue_math_op` 相关的签名/调用语法。
+- **L798** <code>  { }</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L799** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L800** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L801** <code>  bool operator==(ReductionFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L802** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L803** <code>      (provider == rhs.provider) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L804** <code>      (element_workspace == rhs.element_workspace) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L805** <code>      (element_accumulator == rhs.element_accumulator) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L806** <code>      (element_output == rhs.element_output) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L807** <code>      (element_compute == rhs.element_compute) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L808** <code>      (reduce_math_op == rhs.reduce_math_op) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L809** <code>      (epilogue_math_op == rhs.epilogue_math_op);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L810** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L811** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L812** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L813** <code>  bool operator!=(ReductionFunctionalKey const &amp;rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L814** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L815** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L816** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L817** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L818** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L819** <code>struct ReductionFunctionalKeyHasher {</code>
+  - EN: Begins the declaration of struct `ReductionFunctionalKeyHasher`.
+  - CN: 开始声明 struct `ReductionFunctionalKeyHasher`。
+- **L820** <code>  using IntHash = std::hash&lt;int&gt;;</code>
+  - EN: Introduces the type or namespace alias `IntHash`.
+  - CN: 引入类型或命名空间别名 `IntHash`。
+- **L821** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L822** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L823** <code>  static size_t rotl(size_t key, int shl) {</code>
+  - EN: Begins the definition of function or method `rotl`.
+  - CN: 开始定义函数或方法 `rotl`。
+- **L824** <code>    return (key &lt;&lt; shl) | (key &gt;&gt; (sizeof(key)*8u - static_cast&lt;size_t&gt;(shl)));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L825** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L826** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L827** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L828** <code>  size_t operator()(ReductionFunctionalKey const &amp;key) const {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L829** <code>    IntHash hash;</code>
+  - EN: Declares the symbol `hash` in the current scope.
+  - CN: 在当前作用域中声明符号 `hash`。
+- **L830** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L831** <code>    return</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L832** <code>      rotl(hash(int(key.provider)), 1) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L833** <code>      rotl(hash(int(key.element_workspace)), 2) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L834** <code>      rotl(hash(int(key.element_accumulator)), 3) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L835** <code>      rotl(hash(int(key.element_output)), 4) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L836** <code>      rotl(hash(int(key.element_compute)), 5) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L837** <code>      rotl(hash(int(key.reduce_math_op)), 6) ^</code>
+  - EN: Begins or continues the signature/call syntax involving `int`.
+  - CN: 开始或继续与 `int` 相关的签名/调用语法。
+- **L838** <code>      rotl(hash(int(key.epilogue_math_op)), 7);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L839** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L840** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L841** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L842** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L843** <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L844** <code>std::ostream&amp; operator&lt;&lt; (std::ostream&amp; out, const ReductionFunctionalKey&amp; key) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L845** <code>    out &lt;&lt; &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L846** <code>      &lt;&lt; &quot;provider: &quot; &lt;&lt; library::to_string(key.provider) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L847** <code>      &lt;&lt; &quot;element_workspace   : &quot; &lt;&lt; library::to_string(key.element_workspace) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L848** <code>      &lt;&lt; &quot;element_accumulator : &quot; &lt;&lt; library::to_string(key.element_accumulator) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L849** <code>      &lt;&lt; &quot;element_output      : &quot; &lt;&lt; library::to_string(key.element_output) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L850** <code>      &lt;&lt; &quot;element_compute     : &quot; &lt;&lt; library::to_string(key.element_compute) &lt;&lt; std::endl</code>
+  - EN: Begins or continues the signature/call syntax involving `to_string`.
+  - CN: 开始或继续与 `to_string` 相关的签名/调用语法。
+- **L851** <code>      &lt;&lt; &quot;}&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L852** <code>  return out;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L853** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L854** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L855** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L856** <code>// ReductionOperationFunctionalMap has NO preference key and a single instance per functional key</code>
+  - EN: Comment that documents intent or context: "ReductionOperationFunctionalMap has NO preference key and a single instance per functional key".
+  - CN: 用于说明意图或上下文的注释："ReductionOperationFunctionalMap has NO preference key and a single instance per functional key"。
+- **L857** <code>// i.e. only one tile size configuration per functional key</code>
+  - EN: Comment that documents intent or context: "i.e. only one tile size configuration per functional key".
+  - CN: 用于说明意图或上下文的注释："i.e. only one tile size configuration per functional key"。
+- **L858** <code>using ReductionOperationFunctionalMap = std::unordered_map&lt;</code>
+  - EN: Introduces the type or namespace alias `ReductionOperationFunctionalMap`.
+  - CN: 引入类型或命名空间别名 `ReductionOperationFunctionalMap`。
+- **L859** <code>  ReductionFunctionalKey,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L860** <code>  library::Operation const *,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L861** <code>  ReductionFunctionalKeyHasher</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L862** <code>&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L863** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L864** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L865** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L866** <code>/// Table of cutlass::library::Operation instances</code>
+  - EN: Comment that documents intent or context: "Table of cutlass::library::Operation instances".
+  - CN: 用于说明意图或上下文的注释："Table of cutlass::library::Operation instances"。
+- **L867** <code>class OperationTable {</code>
+  - EN: Begins the declaration of class `OperationTable`.
+  - CN: 开始声明 class `OperationTable`。
+- **L868** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L869** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L870** <code>  /// Map of all operations of type kGemm</code>
+  - EN: Comment that documents intent or context: "Map of all operations of type kGemm".
+  - CN: 用于说明意图或上下文的注释："Map of all operations of type kGemm"。
+- **L871** <code>  // provider (kCUTLASS)</code>
+  - EN: Comment that documents intent or context: "provider (kCUTLASS)".
+  - CN: 用于说明意图或上下文的注释："provider (kCUTLASS)"。
+- **L872** <code>  GemmOperationFunctionalMap gemm_operations;</code>
+  - EN: Declares the symbol `gemm_operations` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_operations`。
+- **L873** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L874** <code>  // provider (kCUTLASS, kReferenceHost, kReferenceDevice)                        </code>
+  - EN: Comment that documents intent or context: "provider (kCUTLASS, kReferenceHost, kReferenceDevice)".
+  - CN: 用于说明意图或上下文的注释："provider (kCUTLASS, kReferenceHost, kReferenceDevice)"。
+- **L875** <code>  BlockScaledGemmOperationFunctionalMap block_scaled_gemm_operations;             </code>
+  - EN: Declares the symbol `block_scaled_gemm_operations` in the current scope.
+  - CN: 在当前作用域中声明符号 `block_scaled_gemm_operations`。
+- **L876** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L877** <code>  // provider (kCUTLASS, kReferenceHost, kReferenceDevice)                        </code>
+  - EN: Comment that documents intent or context: "provider (kCUTLASS, kReferenceHost, kReferenceDevice)".
+  - CN: 用于说明意图或上下文的注释："provider (kCUTLASS, kReferenceHost, kReferenceDevice)"。
+- **L878** <code>  BlockwiseGemmOperationFunctionalMap blockwise_gemm_operations;             </code>
+  - EN: Declares the symbol `blockwise_gemm_operations` in the current scope.
+  - CN: 在当前作用域中声明符号 `blockwise_gemm_operations`。
+- **L879** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L880** <code>  /// Map of all operations of type kConv2d</code>
+  - EN: Comment that documents intent or context: "Map of all operations of type kConv2d".
+  - CN: 用于说明意图或上下文的注释："Map of all operations of type kConv2d"。
+- **L881** <code>  // provider (kCUTLASS, kReferenceHost, kReferenceDevice)</code>
+  - EN: Comment that documents intent or context: "provider (kCUTLASS, kReferenceHost, kReferenceDevice)".
+  - CN: 用于说明意图或上下文的注释："provider (kCUTLASS, kReferenceHost, kReferenceDevice)"。
+- **L882** <code>  ConvOperationFunctionalMap conv2d_operations;</code>
+  - EN: Declares the symbol `conv2d_operations` in the current scope.
+  - CN: 在当前作用域中声明符号 `conv2d_operations`。
+- **L883** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L884** <code>  /// Map of all operations of type kConv3d</code>
+  - EN: Comment that documents intent or context: "Map of all operations of type kConv3d".
+  - CN: 用于说明意图或上下文的注释："Map of all operations of type kConv3d"。
+- **L885** <code>  // provider (kCUTLASS, kReferenceHost, kReferenceDevice)</code>
+  - EN: Comment that documents intent or context: "provider (kCUTLASS, kReferenceHost, kReferenceDevice)".
+  - CN: 用于说明意图或上下文的注释："provider (kCUTLASS, kReferenceHost, kReferenceDevice)"。
+- **L886** <code>  ConvOperationFunctionalMap conv3d_operations;</code>
+  - EN: Declares the symbol `conv3d_operations` in the current scope.
+  - CN: 在当前作用域中声明符号 `conv3d_operations`。
+- **L887** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L888** <code>  /// Map of all operations of type kConv2d</code>
+  - EN: Comment that documents intent or context: "Map of all operations of type kConv2d".
+  - CN: 用于说明意图或上下文的注释："Map of all operations of type kConv2d"。
+- **L889** <code>  // provider (kCUTLASS)</code>
+  - EN: Comment that documents intent or context: "provider (kCUTLASS)".
+  - CN: 用于说明意图或上下文的注释："provider (kCUTLASS)"。
+- **L890** <code>  ReductionOperationFunctionalMap reduction_operations;</code>
+  - EN: Declares the symbol `reduction_operations` in the current scope.
+  - CN: 在当前作用域中声明符号 `reduction_operations`。
+- **L891** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L892** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L893** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L894** <code>  void append(Manifest const &amp;manifest);</code>
+  - EN: Declares function or method `append` without defining it here.
+  - CN: 声明函数或方法 `append`，但不在此处给出定义。
+- **L895** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L896** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L897** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L898** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L899** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L900** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L901** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L902** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L903** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L904** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L905** <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, cutlass::library::GemmFunctionalKey const &amp;k);</code>
+  - EN: Declares function or method `operator<<` without defining it here.
+  - CN: 声明函数或方法 `operator<<`，但不在此处给出定义。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>fstream</code> — file stream utilities / 文件流工具
+- <code>iosfwd</code> — APIs or definitions from `iosfwd` / 来自 `iosfwd` 的 API 或定义
+- <code>unordered_map</code> — hash-map containers / 哈希映射容器
+- <code>algorithm</code> — standard algorithms / 标准算法
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/manifest.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/util.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据

@@ -1,0 +1,435 @@
+# heuristics.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/heuristics.py`
+
+## Purpose / 作用
+- EN: Utilities for selecting CUTLASS library kernels based on problem description
+- CN: 该模块的文档字符串将其描述为：Utilities for selecting CUTLASS library kernels based on problem description
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utilities for selecting CUTLASS library kernels based on problem description` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** `import json` — **EN:** Imports json for later use. **CN:** 导入 json 供后续使用。
+- **L37** `import csv` — **EN:** Imports csv for later use. **CN:** 导入 csv 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L40** `  import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L41** `  if hasattr(builtins, "CUTLASS_IGNORE_PACKAGE") and CUTLASS_IGNORE_PACKAGE == True:` — **EN:** Starts a conditional branch guarded by `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...`. **CN:** 开始一个由 `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...` 控制的条件分支。
+- **L42** `    raise ImportError("Disabling attempt to import cutlass_library")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L43** `  from cutlass_library.library import *` — **EN:** Imports * from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 *。
+- **L44** `  from cutlass_library.generator import *` — **EN:** Imports * from `cutlass_library.generator`. **CN:** 从 `cutlass_library.generator` 导入 *。
+- **L45** `  from cutlass_library.heuristics_provider import *` — **EN:** Imports * from `cutlass_library.heuristics_provider`. **CN:** 从 `cutlass_library.heuristics_provider` 导入 *。
+- **L46** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L47** `  from library import *` — **EN:** Imports * from `library`. **CN:** 从 `library` 导入 *。
+- **L48** `  from generator import *` — **EN:** Imports * from `generator`. **CN:** 从 `generator` 导入 *。
+- **L49** `  from heuristics_provider import *` — **EN:** Imports * from `heuristics_provider`. **CN:** 从 `heuristics_provider` 导入 *。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L52** `  from .sm90_utils import (` — **EN:** Imports get_valid_schedules, generate_data_types_from_math_instruction, fix_alignments from `.sm90_utils`. **CN:** 从 `.sm90_utils` 导入 get_valid_schedules, generate_data_types_from_math_instruction, fix_alignments。
+- **L53** `    get_valid_schedules,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    generate_data_types_from_math_instruction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    fix_alignments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `  )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L58** `  from sm90_utils import (` — **EN:** Imports get_valid_schedules, generate_data_types_from_math_instruction, fix_alignments from `sm90_utils`. **CN:** 从 `sm90_utils` 导入 get_valid_schedules, generate_data_types_from_math_instruction, fix_alignments。
+- **L59** `    get_valid_schedules,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `    generate_data_types_from_math_instruction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `    fix_alignments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `  )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `_LOGGER = logging.getLogger(__name__)` — **EN:** Assigns a value to _LOGGER. **CN:** 将一个值赋给 _LOGGER。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `dtype_map = {v: k for k, v in DataTypeNames.items()}` — **EN:** Assigns a value to dtype_map. **CN:** 将一个值赋给 dtype_map。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `def serialize_heuristics_results_to_json(problems_with_configs, outfile_path):` — **EN:** Defines function `serialize_heuristics_results_to_json`. **CN:** 定义函数 `serialize_heuristics_results_to_json`。
+- **L69** `  """` — **EN:** Starts the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 开始说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L70** `  Utilitiy function to write heuristics results to a json file for debug` — **EN:** Continues the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 继续说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `  args:` — **EN:** Continues the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 继续说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L73** `    problems_with_configs: List of problems provided to the heuristic, with a list of operations added to each problem dict` — **EN:** Continues the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 继续说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L74** `    outfile_path: Outfile path` — **EN:** Continues the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 继续说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `  returns:` — **EN:** Continues the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 继续说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L77** `    None` — **EN:** Continues the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 继续说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L78** `  """` — **EN:** Ends the docstring for the function `serialize_heuristics_results_to_json`. **CN:** 结束说明 function `serialize_heuristics_results_to_json` 的文档字符串。
+- **L79** `  pc_copy = problems_with_configs.copy()` — **EN:** Assigns a value to pc_copy. **CN:** 将一个值赋给 pc_copy。
+- **L80** `  for p in pc_copy:` — **EN:** Starts a loop assigning items from `pc_copy` to `p`. **CN:** 开始一个循环，将 `pc_copy` 的元素赋给 `p`。
+- **L81** `    for k, v in p.items():` — **EN:** Starts a loop assigning items from `p.items()` to `(k, v)`. **CN:** 开始一个循环，将 `p.items()` 的元素赋给 `(k, v)`。
+- **L82** `      if isinstance(v, DataType):` — **EN:** Starts a conditional branch guarded by `isinstance(v, DataType)`. **CN:** 开始一个由 `isinstance(v, DataType)` 控制的条件分支。
+- **L83** `        p[k] = DataTypeNames[v]` — **EN:** Assigns a value to p[k]. **CN:** 将一个值赋给 p[k]。
+- **L84** `      elif isinstance(v, LayoutType):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L85** `        p[k] = ShortLayoutTypeNames[v]` — **EN:** Assigns a value to p[k]. **CN:** 将一个值赋给 p[k]。
+- **L86** `    configs = p['configs']` — **EN:** Assigns a value to configs. **CN:** 将一个值赋给 configs。
+- **L87** `    for c in configs:` — **EN:** Starts a loop assigning items from `configs` to `c`. **CN:** 开始一个循环，将 `configs` 的元素赋给 `c`。
+- **L88** `      for k, v in c.items():` — **EN:** Starts a loop assigning items from `c.items()` to `(k, v)`. **CN:** 开始一个循环，将 `c.items()` 的元素赋给 `(k, v)`。
+- **L89** `        if isinstance(v, DataType):` — **EN:** Starts a conditional branch guarded by `isinstance(v, DataType)`. **CN:** 开始一个由 `isinstance(v, DataType)` 控制的条件分支。
+- **L90** `          c[k] = DataTypeNames[v]` — **EN:** Assigns a value to c[k]. **CN:** 将一个值赋给 c[k]。
+- **L91** `        elif isinstance(v, LayoutType):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L92** `          c[k] = ShortLayoutTypeNames[v]` — **EN:** Assigns a value to c[k]. **CN:** 将一个值赋给 c[k]。
+- **L93** `  with open(outfile_path, 'w') as f:` — **EN:** Starts a context-managed block using open(outfile_path, 'w'). **CN:** 开始一个使用 open(outfile_path, 'w') 的上下文管理代码块。
+- **L94** `    json.dump(pc_copy, f, indent=2)` — **EN:** Invokes `json.dump` as a standalone call. **CN:** 以独立语句方式调用 `json.dump`。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `def get_single_gemm_config(m, n, k, batch_count, layouts, dtypes, alignment_a, alignment_b, voidC=False, use_fast_acc=True, count=1, provider=None):` — **EN:** Defines function `get_single_gemm_config`. **CN:** 定义函数 `get_single_gemm_config`。
+- **L97** `  """` — **EN:** Starts the docstring for the function `get_single_gemm_config`. **CN:** 开始说明 function `get_single_gemm_config` 的文档字符串。
+- **L98** `  Get heuristic-suggested GEMM kernel configurations for a single GEMM problem.` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `  args:` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L101** `    m, n, k: GEMM dimensions` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L102** `    batch_count: batch count` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L103** `    layouts: tuple of layouts of type LayoutType` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L104** `    use_fast_acc: Use fast accumulation for FP8. Ignored for other precisions` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L105** `    count: Number of configs to return` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L106** `    provider: Heuristics provider to use` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `  returns:` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L109** `    A list of dictionaries containing the suggested kernel configurations and additional info from the input required to define a Cutlass GemmOperation, with the following keys:` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L110** `      - 'cta_tile_m', 'cta_tile_m', 'cta_tile_k': CTA tile size` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L111** `      - 'instr_tile_m', 'instr_tile_n', 'instr_tile_k': Instruction tile size` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L112** `      - 'stages': kernel pipeline stage count` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L113** `      - 'cluster_m', 'cluster_n', 'cluster_k': cluster size` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L114** `      - 'layout_a', 'layout_b': input tensor layouts of type LayoutType` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L115** `      - 'alignment_a', 'alignment_b': input tensor alignments, in count of elements` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L116** `      - 'dtype_a', 'dtype_b', 'dtype_acc': dtypes of a, b, and accumulator, of type DataType` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L117** `      - 'swizzle_size' : suggested threadblock swizzle ` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L118** `      - 'split_k_slices': number of partitions of the k dimension for splitK` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L119** `      - 'raster_order': raster order for CTAs over output tiles ('along_m' or 'along_n')` — **EN:** Continues the docstring for the function `get_single_gemm_config`. **CN:** 继续说明 function `get_single_gemm_config` 的文档字符串。
+- **L120** `  """` — **EN:** Ends the docstring for the function `get_single_gemm_config`. **CN:** 结束说明 function `get_single_gemm_config` 的文档字符串。
+- **L121** `  if provider is None:` — **EN:** Starts a conditional branch guarded by `provider is None`. **CN:** 开始一个由 `provider is None` 控制的条件分支。
+- **L122** `    provider = MatmulHeuristics()` — **EN:** Assigns a value to provider. **CN:** 将一个值赋给 provider。
+- **L123** `  return provider.get_configs(m, n, k, batch_count, dtypes, layouts, alignment_a, alignment_b, voidC=voidC, use_fast_acc=use_fast_acc, count=count)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `def get_gemm_configs(problems, provider=None, count=1):` — **EN:** Defines function `get_gemm_configs`. **CN:** 定义函数 `get_gemm_configs`。
+- **L126** `  """` — **EN:** Starts the docstring for the function `get_gemm_configs`. **CN:** 开始说明 function `get_gemm_configs` 的文档字符串。
+- **L127** `  Get heuristic-suggested GEMM kernel configurations for a set of GEMM problems.` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `  args:` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L130** `    problems: List of dictionaries describing GEMM problems with the following keys:` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L131** `      - 'm', 'n', 'k': Matrix dimensions (required)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L132** `      - 'dtype_a': Data type of matrix A (required)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L133** `      - 'dtype_b': Data type of matrix B (required)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L134** `      - 'dtype_c': Data type of matrix C (default: None)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L135** `      - 'dtype_d': Data type of matrix D (required)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L136** `      - 'dtype_acc': Compute data type (default 'f32')` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L137** `      - 'layout': Operation layout (e.g. 'tnt')` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L138** `      - 'alignment_a': Memory access granularity of A, in units of elements (default: 16 bytes equivalent elements)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L139** `      - 'alignment_b': Memory access granularity of B, in units of elements (default: 16 bytes equivalent elements)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L140** `      - 'alpha': Scalar multiplier for A*B (default: 1.0)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L141** `      - 'beta': Scalar multiplier for C (default: 0.0)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L142** `      - 'batch_count': Number of GEMM operations in batch (default: 1)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L143** `      - 'use_fast_acc': Enable fast accumulation for FP8 on Hopper (default: True)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L144** `    provider: Heuristics provider to use` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L145** `    count: Number of configurations to return per problem (defualt: 1)` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `  returns:` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L148** `    A copy of the input dictionary, with key \`configs\` added containing the selected gemm configs` — **EN:** Continues the docstring for the function `get_gemm_configs`. **CN:** 继续说明 function `get_gemm_configs` 的文档字符串。
+- **L149** `  """` — **EN:** Ends the docstring for the function `get_gemm_configs`. **CN:** 结束说明 function `get_gemm_configs` 的文档字符串。
+- **L150** `  ret = []` — **EN:** Assigns a value to ret. **CN:** 将一个值赋给 ret。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `  for problem in problems:` — **EN:** Starts a loop assigning items from `problems` to `problem`. **CN:** 开始一个循环，将 `problems` 的元素赋给 `problem`。
+- **L153** `    problem = problem.copy()` — **EN:** Assigns a value to problem. **CN:** 将一个值赋给 problem。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L156** `      m = problem['m']` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L157** `      n = problem['n']` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L158** `      k = problem['k']` — **EN:** Assigns a value to k. **CN:** 将一个值赋给 k。
+- **L159** `      dtype_a = problem['dtype_a']` — **EN:** Assigns a value to dtype_a. **CN:** 将一个值赋给 dtype_a。
+- **L160** `      dtype_b = problem['dtype_b']` — **EN:** Assigns a value to dtype_b. **CN:** 将一个值赋给 dtype_b。
+- **L161** `      dtype_d = problem['dtype_d']` — **EN:** Assigns a value to dtype_d. **CN:** 将一个值赋给 dtype_d。
+- **L162** `      layout = problem['layout']` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L163** `    except KeyError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L164** `      _LOGGER.error(f"Missing required parameter {e} for problem {problem}")` — **EN:** Invokes `_LOGGER.error` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.error`。
+- **L165** `      raise` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    operation = problem.get('operation', 'gemm')` — **EN:** Assigns a value to operation. **CN:** 将一个值赋给 operation。
+- **L168** `    batch_count = problem.get('batch_count', 1)` — **EN:** Assigns a value to batch_count. **CN:** 将一个值赋给 batch_count。
+- **L169** `    dtype_acc = problem.get('dtype_acc', 'f32')` — **EN:** Assigns a value to dtype_acc. **CN:** 将一个值赋给 dtype_acc。
+- **L170** `    dtype_c = problem.get('dtype_c', None)` — **EN:** Assigns a value to dtype_c. **CN:** 将一个值赋给 dtype_c。
+- **L171** `    alpha = problem.get('alpha', 1.0)` — **EN:** Assigns a value to alpha. **CN:** 将一个值赋给 alpha。
+- **L172** `    beta = problem.get('beta', 0.0)` — **EN:** Assigns a value to beta. **CN:** 将一个值赋给 beta。
+- **L173** `    use_fast_acc = problem.get('use_fast_acc', True)` — **EN:** Assigns a value to use_fast_acc. **CN:** 将一个值赋给 use_fast_acc。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `    if operation != OperationKindNames[OperationKind.Gemm]:` — **EN:** Starts a conditional branch guarded by `operation != OperationKindNames[OperationKind.Gemm]`. **CN:** 开始一个由 `operation != OperationKindNames[OperationKind.Gemm]` 控制的条件分支。
+- **L176** `      raise ValueError(f"Unsupported operation {operation}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L177** `    if not (len(layout) == 3 and all(c in "nt" for c in layout)):` — **EN:** Starts a conditional branch guarded by `not (len(layout) == 3 and all((c in 'nt' for c in layout)))`. **CN:** 开始一个由 `not (len(layout) == 3 and all((c in 'nt' for c in layout)))` 控制的条件分支。
+- **L178** `      raise ValueError(f"layout must be a 3-character string containing only 'n' or 't', got {layout}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L179** `    layouts = tuple(LayoutType.RowMajor if l == 't' else LayoutType.ColumnMajor for l in layout)` — **EN:** Assigns a value to layouts. **CN:** 将一个值赋给 layouts。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L182** `      dtype_list = [dtype_a.lower(), dtype_b.lower(), dtype_acc.lower(), dtype_c.lower() if dtype_c is not None else dtype_d.lower(), dtype_d.lower()]` — **EN:** Assigns a value to dtype_list. **CN:** 将一个值赋给 dtype_list。
+- **L183** `      dtypes = tuple(dtype_map[dt] for dt in dtype_list)` — **EN:** Assigns a value to dtypes. **CN:** 将一个值赋给 dtypes。
+- **L184** `    except KeyError as dt:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L185** `      _LOGGER.error(f"Unsupported data type: {dt}")` — **EN:** Invokes `_LOGGER.error` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.error`。
+- **L186** `      raise` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `    alignment_a = problem.get('alignment_a', 128 // DataTypeSize[dtypes[0]])` — **EN:** Assigns a value to alignment_a. **CN:** 将一个值赋给 alignment_a。
+- **L189** `    alignment_b = problem.get('alignment_b', 128 // DataTypeSize[dtypes[1]])` — **EN:** Assigns a value to alignment_b. **CN:** 将一个值赋给 alignment_b。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `    configs = get_single_gemm_config(m, n, k, batch_count, layouts, dtypes, alignment_a, alignment_b, beta==0.0, use_fast_acc, count, provider)` — **EN:** Assigns a value to configs. **CN:** 将一个值赋给 configs。
+- **L192** `    problem['configs'] = configs` — **EN:** Assigns a value to problem['configs']. **CN:** 将一个值赋给 problem['configs']。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `    ret.append(problem)` — **EN:** Invokes `ret.append` as a standalone call. **CN:** 以独立语句方式调用 `ret.append`。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `  return ret` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `def generate_sm100_from_heuristics_configs(manifest, cuda_version, kernel_configs):` — **EN:** Defines function `generate_sm100_from_heuristics_configs`. **CN:** 定义函数 `generate_sm100_from_heuristics_configs`。
+- **L200** `  """` — **EN:** Starts the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 开始说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L201** `  Generate CUTLASS operations based on the list of configs provided by the heuristic provider` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `  args:` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L204** `    manifest: manifest argument to which to add operations, or None to just return the operations without a manifest (for pruning an existing manifest)` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L205** `    cuda_version: Cuda compiler version for generating cutlass operations` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L206** `    kernel_configs: list of configs generated by the heuristic` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `  returns:` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L209** `    (configs, operations): a list of heuristic-provided kernel configs along with a one-to-one corresponding list of the generated operations` — **EN:** Continues the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L210** `  """` — **EN:** Ends the docstring for the function `generate_sm100_from_heuristics_configs`. **CN:** 结束说明 function `generate_sm100_from_heuristics_configs` 的文档字符串。
+- **L211** `  min_cc = 100` — **EN:** Assigns a value to min_cc. **CN:** 将一个值赋给 min_cc。
+- **L212** `  max_cc = 101` — **EN:** Assigns a value to max_cc. **CN:** 将一个值赋给 max_cc。
+- **L213** `  if manifest is None:` — **EN:** Starts a conditional branch guarded by `manifest is None`. **CN:** 开始一个由 `manifest is None` 控制的条件分支。
+- **L214** `    # Use a dummy manifest so we can use existing CreateGemmOperator functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L215** `    manifest = Manifest()` — **EN:** Assigns a value to manifest. **CN:** 将一个值赋给 manifest。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** `  configs = []` — **EN:** Assigns a value to configs. **CN:** 将一个值赋给 configs。
+- **L218** `  operations = []` — **EN:** Assigns a value to operations. **CN:** 将一个值赋给 operations。
+- **L219** `  for config in kernel_configs:` — **EN:** Starts a loop assigning items from `kernel_configs` to `config`. **CN:** 开始一个循环，将 `kernel_configs` 的元素赋给 `config`。
+- **L220** `    layout = ([config['layout_a'], config['alignment_a']], [config['layout_b'], config['alignment_b']], [config['layout_d'], 128 // DataTypeSize[config['dtype_d']]])` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L221** `    element_a, element_b, element_accumulator, element_c, element_d = config['dtype_a'], config['dtype_b'], config['dtype_acc'], config['dtype_c'], config['dtype_d']` — **EN:** Assigns a value to (element_a, element_b, element_accumulator, element_c, el.... **CN:** 将一个值赋给 (element_a, element_b, element_accumulator, element_c, el...。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `    # nvMMH assumes 2sm instruction for !(cluster_m % 2)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L224** `    is_2sm = config['cluster_m'] % 2 == 0` — **EN:** Assigns a value to is_2sm. **CN:** 将一个值赋给 is_2sm。
+- **L225** `    instruction_shape = [(2 * config['cta_tile_m']) if is_2sm else config['cta_tile_m'], config['cta_tile_n'], config['cta_tile_k'] // 4]` — **EN:** Assigns a value to instruction_shape. **CN:** 将一个值赋给 instruction_shape。
+- **L226** `    math_instruction = MathInstruction(` — **EN:** Assigns a value to math_instruction. **CN:** 将一个值赋给 math_instruction。
+- **L227** `      instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `      element_a, element_b, element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `      MathOperation.multiply_add` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `    data_types = [` — **EN:** Assigns a value to data_types. **CN:** 将一个值赋给 data_types。
+- **L234** `      {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `        "a_type"   : math_instruction.element_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        "b_type"   : math_instruction.element_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `        "c_type"   : DataType.void if config['voidC'] else math_instruction.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        "d_type"   : element_d,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `        "acc_type" : math_instruction.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        "epi_type" : math_instruction.element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `      }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `    tile_multiplier = (config['cluster_m'] // (2 if is_2sm else 1), config['cluster_n'], config['cluster_k'])` — **EN:** Assigns a value to tile_multiplier. **CN:** 将一个值赋给 tile_multiplier。
+- **L245** `    tile_description = TileDescription(` — **EN:** Assigns a value to tile_description. **CN:** 将一个值赋给 tile_description。
+- **L246** `      [instruction_shape[0] * tile_multiplier[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `       instruction_shape[1] * tile_multiplier[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `       instruction_shape[2] * 4 * tile_multiplier[2]],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `      0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `      [4,1,1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `      math_instruction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `      min_cc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `      max_cc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `      cluster_shape=(config['cluster_m'], config['cluster_n'], config['cluster_k'])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `    schedules = []` — **EN:** Assigns a value to schedules. **CN:** 将一个值赋给 schedules。
+- **L258** `    if is_2sm:` — **EN:** Starts a conditional branch guarded by `is_2sm`. **CN:** 开始一个由 `is_2sm` 控制的条件分支。
+- **L259** `      schedules.append([KernelScheduleType.TmaWarpSpecialized2SmSm100, EpilogueScheduleType.TmaWarpSpecialized2Sm])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L260** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L261** `      schedules.append([KernelScheduleType.TmaWarpSpecialized1SmSm100, EpilogueScheduleType.TmaWarpSpecialized1Sm])` — **EN:** Invokes `schedules.append` as a standalone call. **CN:** 以独立语句方式调用 `schedules.append`。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `    for o in CreateGemmUniversal3xOperator(manifest, [layout], [tile_description], data_types, schedules, tile_schedulers=[TileSchedulerType.Default, TileSchedulerType.StreamK], gemm_kind=GemmKind.Universal3x):` — **EN:** Starts a loop assigning items from `CreateGemmUniversal3xOperator(manifest, [layout...` to `o`. **CN:** 开始一个循环，将 `CreateGemmUniversal3xOperator(manifest, [layout...` 的元素赋给 `o`。
+- **L264** `      configs.append(config)` — **EN:** Invokes `configs.append` as a standalone call. **CN:** 以独立语句方式调用 `configs.append`。
+- **L265** `      operations.append(o)` — **EN:** Invokes `operations.append` as a standalone call. **CN:** 以独立语句方式调用 `operations.append`。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `  return configs, operations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `def generate_sm90_from_heuristics_configs(manifest, cuda_version, kernel_configs):` — **EN:** Defines function `generate_sm90_from_heuristics_configs`. **CN:** 定义函数 `generate_sm90_from_heuristics_configs`。
+- **L272** `  """` — **EN:** Starts the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 开始说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L273** `  Generate CUTLASS operations based on the list of configs provided by the heuristic provider` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L274** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L275** `  args:` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L276** `    manifest: manifest argument to which to add operations, or None to just return the operations without a manifest (for pruning an existing manifest)` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L277** `    cuda_version: Cuda compiler version for generating cutlass operations` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L278** `    kernel_configs: list of configs generated by the heuristic` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `  returns:` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L281** `    (configs, operations): a list of heuristic-provided kernel configs along with a one-to-one corresponding list of the generated operations` — **EN:** Continues the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 继续说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L282** `  """` — **EN:** Ends the docstring for the function `generate_sm90_from_heuristics_configs`. **CN:** 结束说明 function `generate_sm90_from_heuristics_configs` 的文档字符串。
+- **L283** `  min_cc, max_cc = 90, 90` — **EN:** Assigns a value to (min_cc, max_cc). **CN:** 将一个值赋给 (min_cc, max_cc)。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `  if manifest is None:` — **EN:** Starts a conditional branch guarded by `manifest is None`. **CN:** 开始一个由 `manifest is None` 控制的条件分支。
+- **L286** `    # Use a dummy manifest so we can use existing CreateGemmOperator functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L287** `    manifest = Manifest()` — **EN:** Assigns a value to manifest. **CN:** 将一个值赋给 manifest。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `  configs = []` — **EN:** Assigns a value to configs. **CN:** 将一个值赋给 configs。
+- **L290** `  operations = []` — **EN:** Assigns a value to operations. **CN:** 将一个值赋给 operations。
+- **L291** `  for config in kernel_configs:` — **EN:** Starts a loop assigning items from `kernel_configs` to `config`. **CN:** 开始一个循环，将 `kernel_configs` 的元素赋给 `config`。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `    is_aligned = (config['alignment_a'] * DataTypeSize[config['dtype_a']] >= 128) and (config['alignment_b'] * DataTypeSize[config['dtype_b']] >= 128)` — **EN:** Assigns a value to is_aligned. **CN:** 将一个值赋给 is_aligned。
+- **L294** `    layout = ([config['layout_a'], config['alignment_a']], [config['layout_b'], config['alignment_b']], [LayoutType.ColumnMajor, 1])` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L295** `    element_a, element_b, element_accumulator, element_c, element_d = config['dtype_a'], config['dtype_b'], config['dtype_acc'], config['dtype_c'], config['dtype_d']` — **EN:** Assigns a value to (element_a, element_b, element_accumulator, element_c, el.... **CN:** 将一个值赋给 (element_a, element_b, element_accumulator, element_c, el...。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `    # instr shape and warp config are unused for emitting 3x collective builder code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L298** `    dummy_instr_shape = [0, 0, 0]` — **EN:** Assigns a value to dummy_instr_shape. **CN:** 将一个值赋给 dummy_instr_shape。
+- **L299** `    math_instruction = MathInstruction(` — **EN:** Assigns a value to math_instruction. **CN:** 将一个值赋给 math_instruction。
+- **L300** `      dummy_instr_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `      element_a, element_b, element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `      OpcodeClass.TensorOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `      MathOperation.multiply_add` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `    data_types = generate_data_types_from_math_instruction(math_instruction, element_source=element_c, element_dest=element_d)` — **EN:** Assigns a value to data_types. **CN:** 将一个值赋给 data_types。
+- **L307** `    if is_aligned:` — **EN:** Starts a conditional branch guarded by `is_aligned`. **CN:** 开始一个由 `is_aligned` 控制的条件分支。
+- **L308** `      layout = fix_alignments(data_types, layout, alignment_bits=128)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `    # instr shape and warp config are unused for emitting 3x collective builder code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L311** `    dummy_warp_count = [0, 0, 0]` — **EN:** Assigns a value to dummy_warp_count. **CN:** 将一个值赋给 dummy_warp_count。
+- **L312** `    tile_description = TileDescription(` — **EN:** Assigns a value to tile_description. **CN:** 将一个值赋给 tile_description。
+- **L313** `      [config['cta_tile_m'], config['cta_tile_n'], config['cta_tile_k']],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `      0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `      dummy_warp_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `      math_instruction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `      min_cc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `      max_cc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `      cluster_shape=(config['cluster_m'], config['cluster_n'], config['cluster_k'])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    schedules, stream_k_schedules = get_valid_schedules(` — **EN:** Assigns a value to (schedules, stream_k_schedules). **CN:** 将一个值赋给 (schedules, stream_k_schedules)。
+- **L323** `      tile_description=tile_description,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `      cuda_version=cuda_version,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `      is_aligned=is_aligned,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `      data_types=data_types,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `      instantiation_level=9000, # don't prune schedules: we didn't get any schedule suggestion from the heuristic` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** `      layout=layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L329** `      gemm_kind=GemmKind.Universal3x,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** `      enable_fp8_fast_acc=config['use_fast_acc']` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `    if len(schedules):` — **EN:** Starts a conditional branch guarded by `len(schedules)`. **CN:** 开始一个由 `len(schedules)` 控制的条件分支。
+- **L334** `      for o in CreateGemmUniversal3xOperator(manifest, [layout], [tile_description], data_types, schedules, gemm_kind=GemmKind.Universal3x):` — **EN:** Starts a loop assigning items from `CreateGemmUniversal3xOperator(manifest, [layout...` to `o`. **CN:** 开始一个循环，将 `CreateGemmUniversal3xOperator(manifest, [layout...` 的元素赋给 `o`。
+- **L335** `        configs.append(config)` — **EN:** Invokes `configs.append` as a standalone call. **CN:** 以独立语句方式调用 `configs.append`。
+- **L336** `        operations.append(o)` — **EN:** Invokes `operations.append` as a standalone call. **CN:** 以独立语句方式调用 `operations.append`。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `    if len(stream_k_schedules):` — **EN:** Starts a conditional branch guarded by `len(stream_k_schedules)`. **CN:** 开始一个由 `len(stream_k_schedules)` 控制的条件分支。
+- **L339** `      for o in CreateGemmUniversal3xOperator(manifest, [layout], [tile_description], data_types,` — **EN:** Starts a loop assigning items from `CreateGemmUniversal3xOperator(manifest, [layout...` to `o`. **CN:** 开始一个循环，将 `CreateGemmUniversal3xOperator(manifest, [layout...` 的元素赋给 `o`。
+- **L340** `                                    stream_k_schedules,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `                                    tile_schedulers=[TileSchedulerType.StreamK]):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `        configs.append(config)` — **EN:** Invokes `configs.append` as a standalone call. **CN:** 以独立语句方式调用 `configs.append`。
+- **L343** `        operations.append(o)` — **EN:** Invokes `operations.append` as a standalone call. **CN:** 以独立语句方式调用 `operations.append`。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `  return configs, operations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `def filter_manifest_and_write_heuristics_file(manifest, args):` — **EN:** Defines function `filter_manifest_and_write_heuristics_file`. **CN:** 定义函数 `filter_manifest_and_write_heuristics_file`。
+- **L349** `  """` — **EN:** Starts the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 开始说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L350** `  Prune a manifest according to heuristics suggestions from the problems file` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `  args:` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L353** `    manifest: Cutlass manifest to prune` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L354** `    args: generator.py args, requires:` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L355** `      - args.heuristics_problems_file` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L356** `      - args.heuristics_gpu` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L357** `      - args.heuristics_testlist_file` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `  returns:` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L360** `    A list of dictionaries, each of which has information about an operation and a problem from the input problems` — **EN:** Continues the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 继续说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L361** `  """` — **EN:** Ends the docstring for the function `filter_manifest_and_write_heuristics_file`. **CN:** 结束说明 function `filter_manifest_and_write_heuristics_file` 的文档字符串。
+- **L362** `  heuristics_problems = []` — **EN:** Assigns a value to heuristics_problems. **CN:** 将一个值赋给 heuristics_problems。
+- **L363** `  with open(args.heuristics_problems_file, 'r') as f:` — **EN:** Starts a context-managed block using open(args.heuristics_problems_file, 'r'). **CN:** 开始一个使用 open(args.heuristics_problems_file, 'r') 的上下文管理代码块。
+- **L364** `    heuristics_problems = json.load(f)` — **EN:** Assigns a value to heuristics_problems. **CN:** 将一个值赋给 heuristics_problems。
+- **L365** `  gpu = None if (args.heuristics_gpu == "auto" or args.heuristics_gpu == "") else args.heuristics_gpu` — **EN:** Assigns a value to gpu. **CN:** 将一个值赋给 gpu。
+- **L366** `  mmh = MatmulHeuristics(gpu=gpu)` — **EN:** Assigns a value to mmh. **CN:** 将一个值赋给 mmh。
+- **L367** `  if any(('100' in arch) for arch in args.architectures.split(';')):` — **EN:** Starts a conditional branch guarded by `any(('100' in arch for arch in args.architectures.split('...`. **CN:** 开始一个由 `any(('100' in arch for arch in args.architectures.split('...` 控制的条件分支。
+- **L368** `    mmh.set_cta_div_n(64)` — **EN:** Invokes `mmh.set_cta_div_n` as a standalone call. **CN:** 以独立语句方式调用 `mmh.set_cta_div_n`。
+- **L369** `  problems_with_configs = get_gemm_configs(heuristics_problems, provider=mmh, count=args.heuristics_configs_per_problem)` — **EN:** Assigns a value to problems_with_configs. **CN:** 将一个值赋给 problems_with_configs。
+- **L370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L371** `  all_configs_and_operations = []` — **EN:** Assigns a value to all_configs_and_operations. **CN:** 将一个值赋给 all_configs_and_operations。
+- **L372** `  operations = []` — **EN:** Assigns a value to operations. **CN:** 将一个值赋给 operations。
+- **L373** `  for problem in problems_with_configs:` — **EN:** Starts a loop assigning items from `problems_with_configs` to `problem`. **CN:** 开始一个循环，将 `problems_with_configs` 的元素赋给 `problem`。
+- **L374** `    if any('90' in arch for arch in args.architectures.split(';')):` — **EN:** Starts a conditional branch guarded by `any(('90' in arch for arch in args.architectures.split(';...`. **CN:** 开始一个由 `any(('90' in arch for arch in args.architectures.split(';...` 控制的条件分支。
+- **L375** `        problem_configs, problem_operations = generate_sm90_from_heuristics_configs(None if args.heuristics_restrict_kernels else manifest, args.cuda_version, problem['configs'])` — **EN:** Assigns a value to (problem_configs, problem_operations). **CN:** 将一个值赋给 (problem_configs, problem_operations)。
+- **L376** `    if any(('100' in arch) or ('101' in arch) for arch in args.architectures.split(';')):` — **EN:** Starts a conditional branch guarded by `any(('100' in arch or '101' in arch for arch in args.arch...`. **CN:** 开始一个由 `any(('100' in arch or '101' in arch for arch in args.arch...` 控制的条件分支。
+- **L377** `        problem_configs, problem_operations = generate_sm100_from_heuristics_configs(None if args.heuristics_restrict_kernels else manifest, args.cuda_version, problem['configs'])` — **EN:** Assigns a value to (problem_configs, problem_operations). **CN:** 将一个值赋给 (problem_configs, problem_operations)。
+- **L378** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L379** `    operations += problem_operations` — **EN:** Updates operations in place. **CN:** 原地更新 operations。
+- **L380** `    problem_without_configs = {k: v for k, v in problem.items() if k != 'configs'}` — **EN:** Assigns a value to problem_without_configs. **CN:** 将一个值赋给 problem_without_configs。
+- **L381** `    with_problem_size = [{'operation_name': o.procedural_name(), **problem_without_configs, **c} for c, o in zip(problem_configs, problem_operations)]` — **EN:** Assigns a value to with_problem_size. **CN:** 将一个值赋给 with_problem_size。
+- **L382** `    all_configs_and_operations += with_problem_size` — **EN:** Updates all_configs_and_operations in place. **CN:** 原地更新 all_configs_and_operations。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** `  for operation in operations:` — **EN:** Starts a loop assigning items from `operations` to `operation`. **CN:** 开始一个循环，将 `operations` 的元素赋给 `operation`。
+- **L385** `    manifest.add_kernel_filter(f"^{operation.procedural_name()}$")` — **EN:** Invokes `manifest.add_kernel_filter` as a standalone call. **CN:** 以独立语句方式调用 `manifest.add_kernel_filter`。
+- **L386** `  if not all_configs_and_operations:` — **EN:** Starts a conditional branch guarded by `not all_configs_and_operations`. **CN:** 开始一个由 `not all_configs_and_operations` 控制的条件分支。
+- **L387** `    raise Exception("No valid configurations generated")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L388** `  write_profiler_testlist_to_csv(all_configs_and_operations, args.heuristics_testlist_file)` — **EN:** Invokes `write_profiler_testlist_to_csv` as a standalone call. **CN:** 以独立语句方式调用 `write_profiler_testlist_to_csv`。
+- **L389** `  return all_configs_and_operations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `def write_profiler_testlist_to_csv(configs_list, outfile_path):` — **EN:** Defines function `write_profiler_testlist_to_csv`. **CN:** 定义函数 `write_profiler_testlist_to_csv`。
+- **L392** `  """` — **EN:** Starts the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 开始说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L393** `  Write a list of configs to a testlist to be consumed by cutlass_profiler` — **EN:** Continues the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 继续说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `  args:` — **EN:** Continues the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 继续说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L396** `    configs_list: List of kernel configs along with runtime arguments and any other columns to include in the CSV, expressed as a list of dictionaries` — **EN:** Continues the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 继续说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L397** `    outfile_path: Outfile path` — **EN:** Continues the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 继续说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `  returns:` — **EN:** Continues the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 继续说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L400** `    None` — **EN:** Continues the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 继续说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L401** `  """` — **EN:** Ends the docstring for the function `write_profiler_testlist_to_csv`. **CN:** 结束说明 function `write_profiler_testlist_to_csv` 的文档字符串。
+- **L402** `  profiler_testlist = configs_list.copy()` — **EN:** Assigns a value to profiler_testlist. **CN:** 将一个值赋给 profiler_testlist。
+- **L403** `  for c in profiler_testlist:` — **EN:** Starts a loop assigning items from `profiler_testlist` to `c`. **CN:** 开始一个循环，将 `profiler_testlist` 的元素赋给 `c`。
+- **L404** `    for k, v in c.items():` — **EN:** Starts a loop assigning items from `c.items()` to `(k, v)`. **CN:** 开始一个循环，将 `c.items()` 的元素赋给 `(k, v)`。
+- **L405** `      if isinstance(v, DataType):` — **EN:** Starts a conditional branch guarded by `isinstance(v, DataType)`. **CN:** 开始一个由 `isinstance(v, DataType)` 控制的条件分支。
+- **L406** `        c[k] = DataTypeNames[v]` — **EN:** Assigns a value to c[k]. **CN:** 将一个值赋给 c[k]。
+- **L407** `      elif isinstance(v, LayoutType):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L408** `        c[k] = ShortLayoutTypeNames[v]` — **EN:** Assigns a value to c[k]. **CN:** 将一个值赋给 c[k]。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** `  with open(outfile_path, mode='w', newline='') as ofile:` — **EN:** Starts a context-managed block using open(outfile_path, mode='w', newline=''). **CN:** 开始一个使用 open(outfile_path, mode='w', newline='') 的上下文管理代码块。
+- **L411** `    k_names = profiler_testlist[0].keys()` — **EN:** Assigns a value to k_names. **CN:** 将一个值赋给 k_names。
+- **L412** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L413** `    writer = csv.DictWriter(ofile, fieldnames=k_names)` — **EN:** Assigns a value to writer. **CN:** 将一个值赋给 writer。
+- **L414** `    writer.writeheader()` — **EN:** Invokes `writer.writeheader` as a standalone call. **CN:** 以独立语句方式调用 `writer.writeheader`。
+- **L415** `    writer.writerows(profiler_testlist)` — **EN:** Invokes `writer.writerows` as a standalone call. **CN:** 以独立语句方式调用 `writer.writerows`。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.heuristics`. CN: 模块名为 `cutlass_library.heuristics`。
+- EN: Module docstring summary: Utilities for selecting CUTLASS library kernels based on problem description CN: 模块文档摘要为：Utilities for selecting CUTLASS library kernels based on problem description
+- EN: Top-level functions: serialize_heuristics_results_to_json, get_single_gemm_config, get_gemm_configs, generate_sm100_from_heuristics_configs, generate_sm90_from_heuristics_configs, filter_manifest_and_write_heuristics_file, write_profiler_testlist_to_csv CN: 顶层函数包括：serialize_heuristics_results_to_json, get_single_gemm_config, get_gemm_configs, generate_sm100_from_heuristics_configs, generate_sm90_from_heuristics_configs, filter_manifest_and_write_heuristics_file, write_profiler_testlist_to_csv
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library.library:*, cutlass_library.generator:*, cutlass_library.heuristics_provider:*, .sm90_utils:get_valid_schedules,generate_data_types_from_math_instruction,fix_alignments CN: 内部依赖：cutlass_library.library:*, cutlass_library.generator:*, cutlass_library.heuristics_provider:*, .sm90_utils:get_valid_schedules,generate_data_types_from_math_instruction,fix_alignments
+- EN: External or standard-library dependencies: json, csv, builtins, library:*, generator:*, heuristics_provider:*, sm90_utils:get_valid_schedules,generate_data_types_from_math_instruction,fix_alignments CN: 外部或标准库依赖：json, csv, builtins, library:*, generator:*, heuristics_provider:*, sm90_utils:get_valid_schedules,generate_data_types_from_math_instruction,fix_alignments

@@ -1,0 +1,662 @@
+# tvm_ffi_provider.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cutlass_dsl/tvm_ffi_provider.py`
+
+## Purpose / 作用
+- EN: Defines 4 classes (TVMFFICuteCallProvider, TVMFFIJitCompiledFunctionBase, TVMFFIJitCompiledFunction, TVMFFIJitCompiledFunctionWithKwargs) and 4 functions (_inplace_hide_symbols, _get_format_from_object_file_path, _flatten_dataclass_arg, supports_kwargs_wrapper) in `CuTeDSL.cutlass.cutlass_dsl.tvm_ffi_provider`.
+- CN: 该模块 `CuTeDSL.cutlass.cutlass_dsl.tvm_ffi_provider` 定义了 4 个类（TVMFFICuteCallProvider, TVMFFIJitCompiledFunctionBase, TVMFFIJitCompiledFunction, TVMFFIJitCompiledFunctionWithKwargs） 和 4 个函数（_inplace_hide_symbols, _get_format_from_object_file_path, _flatten_dataclass_arg, supports_kwargs_wrapper）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from dataclasses import is_dataclass, fields as dataclass_fields` — **EN:** Imports is_dataclass, fields as dataclass_fields from `dataclasses`. **CN:** 从 `dataclasses` 导入 is_dataclass, fields as dataclass_fields。
+- **L13** `from typing import Any, Callable, List, Optional, cast` — **EN:** Imports Any, Callable, List, Optional, cast from `typing`. **CN:** 从 `typing` 导入 Any, Callable, List, Optional, cast。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `from cutlass.base_dsl.utils.tree_utils import is_constexpr_field` — **EN:** Imports is_constexpr_field from `cutlass.base_dsl.utils.tree_utils`. **CN:** 从 `cutlass.base_dsl.utils.tree_utils` 导入 is_constexpr_field。
+- **L16** `from cutlass.base_dsl.tvm_ffi_builder import (` — **EN:** Imports DynamicParamPackCallProvider, CallContext, rename_tvm_ffi_function, spec from `cutlass.base_dsl.tvm_ffi_builder`. **CN:** 从 `cutlass.base_dsl.tvm_ffi_builder` 导入 DynamicParamPackCallProvider, CallContext, rename_tvm_ffi_function, spec。
+- **L17** `    DynamicParamPackCallProvider,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    CallContext,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    rename_tvm_ffi_function,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    spec,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `from cutlass.base_dsl.export import get_export_module` — **EN:** Imports get_export_module from `cutlass.base_dsl.export`. **CN:** 从 `cutlass.base_dsl.export` 导入 get_export_module。
+- **L23** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L24** `from cutlass._mlir.dialects import llvm` — **EN:** Imports llvm from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 llvm。
+- **L25** `from cutlass._mlir._mlir_libs._cutlass_ir import _aot_support` — **EN:** Imports _aot_support from `cutlass._mlir._mlir_libs._cutlass_ir`. **CN:** 从 `cutlass._mlir._mlir_libs._cutlass_ir` 导入 _aot_support。
+- **L26** `from cutlass.cutlass_dsl.cuda_jit_executor import CudaDialectJitCompiledFunction` — **EN:** Imports CudaDialectJitCompiledFunction from `cutlass.cutlass_dsl.cuda_jit_executor`. **CN:** 从 `cutlass.cutlass_dsl.cuda_jit_executor` 导入 CudaDialectJitCompiledFunction。
+- **L27** `from cutlass.base_dsl.jit_executor import JitExecutor` — **EN:** Imports JitExecutor from `cutlass.base_dsl.jit_executor`. **CN:** 从 `cutlass.base_dsl.jit_executor` 导入 JitExecutor。
+- **L28** `from cutlass.base_dsl.common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `cutlass.base_dsl.common`. **CN:** 从 `cutlass.base_dsl.common` 导入 DSLRuntimeError。
+- **L29** `import tvm_ffi` — **EN:** Imports tvm_ffi for later use. **CN:** 导入 tvm_ffi 供后续使用。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `class TVMFFICuteCallProvider(DynamicParamPackCallProvider):` — **EN:** Defines class `TVMFFICuteCallProvider` with bases DynamicParamPackCallProvider. **CN:** 定义类 `TVMFFICuteCallProvider`，其基类为 DynamicParamPackCallProvider。
+- **L33** `    """Cute call provider that uses cute call convention."""` — **EN:** Docstring line documenting the class `TVMFFICuteCallProvider`. **CN:** 文档字符串行，用于说明 class `TVMFFICuteCallProvider`。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `    cuda_device_index: Optional[ir.Value]` — **EN:** Assigns a typed value to cuda_device_index. **CN:** 为 cuda_device_index 赋予带类型标注的值。
+- **L36** `    cuda_error_handle_block: Optional[ir.Block]` — **EN:** Assigns a typed value to cuda_error_handle_block. **CN:** 为 cuda_error_handle_block 赋予带类型标注的值。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `    def __init__(self, target_func: str, has_gpu_module: bool = True):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L39** `        super().__init__(target_func, struct_call=True)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L40** `        self.cuda_global_state_symbol = f"__{target_func}_cuda_state"` — **EN:** Assigns a value to self.cuda_global_state_symbol. **CN:** 将一个值赋给 self.cuda_global_state_symbol。
+- **L41** `        self.cuda_device_index = None` — **EN:** Assigns a value to self.cuda_device_index. **CN:** 将一个值赋给 self.cuda_device_index。
+- **L42** `        self.cuda_error_handle_block = None` — **EN:** Assigns a value to self.cuda_error_handle_block. **CN:** 将一个值赋给 self.cuda_error_handle_block。
+- **L43** `        self.has_gpu_module = has_gpu_module` — **EN:** Assigns a value to self.has_gpu_module. **CN:** 将一个值赋给 self.has_gpu_module。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `    def get_callee_struct_for_param_tensor(` — **EN:** Defines function `get_callee_struct_for_param_tensor`. **CN:** 定义函数 `get_callee_struct_for_param_tensor`。
+- **L46** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `        param: spec.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `        current_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L49** `        data: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `        shape: list[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L51** `        strides: list[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `        flatten_struct: ir.Type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L53** `    ) -> ir.Type:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L54** `        """Routine used to override the tensor passing struct convention"""` — **EN:** Docstring line documenting the function `get_callee_struct_for_param_tensor`. **CN:** 文档字符串行，用于说明 function `get_callee_struct_for_param_tensor`。
+- **L55** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L56** `            if param.dlpack_device_type == tvm_ffi.DLDeviceType.kDLCPU:` — **EN:** Starts a conditional branch guarded by `param.dlpack_device_type == tvm_ffi.DLDeviceType.kDLCPU`. **CN:** 开始一个由 `param.dlpack_device_type == tvm_ffi.DLDeviceType.kDLCPU` 控制的条件分支。
+- **L57** `                data_type = self.ptr_type` — **EN:** Assigns a value to data_type. **CN:** 将一个值赋给 data_type。
+- **L58** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L59** `                data_type = self.gpu_ptr_type` — **EN:** Assigns a value to data_type. **CN:** 将一个值赋给 data_type。
+- **L60** `            strides_type = (` — **EN:** Assigns a value to strides_type. **CN:** 将一个值赋给 strides_type。
+- **L61** `                self.struct_type(fields=[x.type for x in strides])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `                if len(strides) != 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `                else strides[0].type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `            shape_type = (` — **EN:** Assigns a value to shape_type. **CN:** 将一个值赋给 shape_type。
+- **L66** `                self.struct_type(fields=[x.type for x in shape])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `                if len(shape) != 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `                else shape[0].type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `            shape_stride_tuple_type = self.struct_type(` — **EN:** Assigns a value to shape_stride_tuple_type. **CN:** 将一个值赋给 shape_stride_tuple_type。
+- **L71** `                fields=[shape_type, strides_type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `            tensor_type = self.struct_type(fields=[data_type, shape_stride_tuple_type])` — **EN:** Assigns a value to tensor_type. **CN:** 将一个值赋给 tensor_type。
+- **L74** `            return tensor_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    def pack_param_shape(` — **EN:** Defines function `pack_param_shape`. **CN:** 定义函数 `pack_param_shape`。
+- **L77** `        self, current_block: ir.Block, context: CallContext, param: spec.Shape` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L78** `    ) -> tuple[tuple[ir.Type], tuple[ir.Value]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L79** `        """Pack a shape parameter to a struct."""` — **EN:** Docstring line documenting the function `pack_param_shape`. **CN:** 文档字符串行，用于说明 function `pack_param_shape`。
+- **L80** `        allocas: list[ir.Value] = []` — **EN:** Assigns a typed value to allocas. **CN:** 为 allocas 赋予带类型标注的值。
+- **L81** `        arg_types: list[ir.Type] = []` — **EN:** Assigns a typed value to arg_types. **CN:** 为 arg_types 赋予带类型标注的值。
+- **L82** `        for dim in param.shape:` — **EN:** Starts a loop assigning items from `param.shape` to `dim`. **CN:** 开始一个循环，将 `param.shape` 的元素赋给 `dim`。
+- **L83** `            if isinstance(dim, spec.Var):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, spec.Var)`. **CN:** 开始一个由 `isinstance(dim, spec.Var)` 控制的条件分支。
+- **L84** `                allocas.append(` — **EN:** Invokes `allocas.append` as a standalone call. **CN:** 以独立语句方式调用 `allocas.append`。
+- **L85** `                    self.pack_values_to_alloca(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `                        current_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `                        context.entry_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `                        [context.matched_var_binding[dim]],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `                    )[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                arg_types.append(context.matched_var_binding[dim].type)` — **EN:** Invokes `arg_types.append` as a standalone call. **CN:** 以独立语句方式调用 `arg_types.append`。
+- **L92** `        return tuple(arg_types), tuple(allocas)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    def declare_extern_funcs(` — **EN:** Defines function `declare_extern_funcs`. **CN:** 定义函数 `declare_extern_funcs`。
+- **L95** `        self, current_block: ir.Block, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L96** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L97** `        """Append the error handling function to the current block."""` — **EN:** Docstring line documenting the function `declare_extern_funcs`. **CN:** 文档字符串行，用于说明 function `declare_extern_funcs`。
+- **L98** `        assert context.builder is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L99** `        with ir.InsertionPoint(context.module.body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(context.module.body). **CN:** 开始一个使用 ir.InsertionPoint(context.module.body) 的上下文管理代码块。
+- **L100** `            context.builder.find_or_declare_extern_func(` — **EN:** Invokes `context.builder.find_or_declare_extern_func` as a standalone call. **CN:** 以独立语句方式调用 `context.builder.find_or_declare_extern_func`。
+- **L101** `                "cuda_dialect_get_error_name",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `                [self.i32_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `                self.ptr_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `            context.builder.find_or_declare_extern_func(` — **EN:** Invokes `context.builder.find_or_declare_extern_func` as a standalone call. **CN:** 以独立语句方式调用 `context.builder.find_or_declare_extern_func`。
+- **L106** `                "_cudaGetDevice",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `                [self.ptr_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `                self.i32_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `            context.builder.find_or_declare_extern_func(` — **EN:** Invokes `context.builder.find_or_declare_extern_func` as a standalone call. **CN:** 以独立语句方式调用 `context.builder.find_or_declare_extern_func`。
+- **L111** `                "_cudaSetDevice",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `                [self.i32_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `                self.i32_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `            context.builder.find_or_declare_extern_func(` — **EN:** Invokes `context.builder.find_or_declare_extern_func` as a standalone call. **CN:** 以独立语句方式调用 `context.builder.find_or_declare_extern_func`。
+- **L116** `                "cuda_dialect_init_library_once",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `                [self.ptr_type, self.ptr_type, self.ptr_type, self.ptr_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `                self.i32_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `            context.builder.find_or_declare_extern_func(` — **EN:** Invokes `context.builder.find_or_declare_extern_func` as a standalone call. **CN:** 以独立语句方式调用 `context.builder.find_or_declare_extern_func`。
+- **L121** `                "cuda_dialect_unload_library_once",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `                [self.ptr_type],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `                self.void_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    def insert_lazy_init_cuda(` — **EN:** Defines function `insert_lazy_init_cuda`. **CN:** 定义函数 `insert_lazy_init_cuda`。
+- **L128** `        self, current_block: ir.Block, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L129** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L130** `        """Insert the lazy init cuda function."""` — **EN:** Docstring line documenting the function `insert_lazy_init_cuda`. **CN:** 文档字符串行，用于说明 function `insert_lazy_init_cuda`。
+- **L131** `        assert context.builder is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L132** `        # create global private static that is initialized to nullptr` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `        with ir.InsertionPoint(context.module.body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(context.module.body). **CN:** 开始一个使用 ir.InsertionPoint(context.module.body) 的上下文管理代码块。
+- **L134** `            parsed_op = ir.Operation.parse(` — **EN:** Assigns a value to parsed_op. **CN:** 将一个值赋给 parsed_op。
+- **L135** `                f"llvm.mlir.global private @{self.cuda_global_state_symbol}(0 : i64) : i64"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `            context.module.body.append(parsed_op)` — **EN:** Invokes `context.module.body.append` as a standalone call. **CN:** 以独立语句方式调用 `context.module.body.append`。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L140** `            cuda_global_state_ptr = self.address_of(` — **EN:** Assigns a value to cuda_global_state_ptr. **CN:** 将一个值赋给 cuda_global_state_ptr。
+- **L141** `                self.cuda_global_state_symbol, self.ptr_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L145** `            cuda_init_ptr = self.address_of("cuda_init", self.ptr_type)` — **EN:** Assigns a value to cuda_init_ptr. **CN:** 将一个值赋给 cuda_init_ptr。
+- **L146** `            cuda_load_to_device_ptr = self.address_of(` — **EN:** Assigns a value to cuda_load_to_device_ptr. **CN:** 将一个值赋给 cuda_load_to_device_ptr。
+- **L147** `                "cuda_load_to_device", self.ptr_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            set_error_ptr = self.address_of(` — **EN:** Assigns a value to set_error_ptr. **CN:** 将一个值赋给 set_error_ptr。
+- **L150** `                "TVMFFIErrorSetRaisedFromCStr", self.ptr_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L154** `            # Call the callback function with the loaded ptr value` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L155** `            init_result = llvm.call(` — **EN:** Assigns a value to init_result. **CN:** 将一个值赋给 init_result。
+- **L156** `                result=self.i32_type,  # function returns i32` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `                callee="cuda_dialect_init_library_once",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `                callee_operands=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `                    cuda_global_state_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `                    cuda_init_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `                    cuda_load_to_device_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `                    set_error_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `                op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `                op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `            # Create blocks for conditional branching` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L168** `            error_block = current_block.create_after()` — **EN:** Assigns a value to error_block. **CN:** 将一个值赋给 error_block。
+- **L169** `            success_block = error_block.create_after()` — **EN:** Assigns a value to success_block. **CN:** 将一个值赋给 success_block。
+- **L170** `            # Check if initialization failed (non-zero return code)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L171** `            llvm.cond_br(` — **EN:** Invokes `llvm.cond_br` as a standalone call. **CN:** 以独立语句方式调用 `llvm.cond_br`。
+- **L172** `                self.equal(init_result, self.i32(0)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `                true_dest_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `                false_dest_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `                true_dest=success_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `                false_dest=error_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `        # Error block: return the error code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L179** `        # error is already set by cuda_dialect_init_library_once` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L180** `        with ir.InsertionPoint(error_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(error_block). **CN:** 开始一个使用 ir.InsertionPoint(error_block) 的上下文管理代码块。
+- **L181** `            llvm.return_(arg=self.i32(-1))` — **EN:** Invokes `llvm.return_` as a standalone call. **CN:** 以独立语句方式调用 `llvm.return_`。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `        # Continue with success block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L184** `        return success_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    def append_unload_to_global_dtors(` — **EN:** Defines function `append_unload_to_global_dtors`. **CN:** 定义函数 `append_unload_to_global_dtors`。
+- **L187** `        self, current_block: ir.Block, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L188** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L189** `        """Append the cuda_dialect_unload_library_once function to the global destructor list."""` — **EN:** Docstring line documenting the function `append_unload_to_global_dtors`. **CN:** 文档字符串行，用于说明 function `append_unload_to_global_dtors`。
+- **L190** `        unload_func_symbol = "cuda_dialect_unload_library_once"` — **EN:** Assigns a value to unload_func_symbol. **CN:** 将一个值赋给 unload_func_symbol。
+- **L191** `        # define a private function to call the extern function, we need this wrapper function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L192** `        # since llvm.mlir.global_dtors require the dtor defined in the module` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L193** `        unload_func_wrapper_symbol = f"__dtor_{unload_func_symbol}"` — **EN:** Assigns a value to unload_func_wrapper_symbol. **CN:** 将一个值赋给 unload_func_wrapper_symbol。
+- **L194** `        with ir.InsertionPoint(context.module.body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(context.module.body). **CN:** 开始一个使用 ir.InsertionPoint(context.module.body) 的上下文管理代码块。
+- **L195** `            params, entry_block = self.function(` — **EN:** Assigns a value to (params, entry_block). **CN:** 将一个值赋给 (params, entry_block)。
+- **L196** `                name=unload_func_wrapper_symbol,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `                params_type=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `                ret_type=self.void_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `                internal=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `            with ir.InsertionPoint(entry_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(entry_block). **CN:** 开始一个使用 ir.InsertionPoint(entry_block) 的上下文管理代码块。
+- **L202** `                llvm.call(` — **EN:** Invokes `llvm.call` as a standalone call. **CN:** 以独立语句方式调用 `llvm.call`。
+- **L203** `                    result=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `                    callee=unload_func_symbol,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `                    callee_operands=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `                        self.address_of(self.cuda_global_state_symbol, self.ptr_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `                    ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `                    op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `                    op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `                llvm.return_()` — **EN:** Invokes `llvm.return_` as a standalone call. **CN:** 以独立语句方式调用 `llvm.return_`。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `        # find or create the global destructors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L214** `        global_dtors_list: list[ir.Operation] = self.find_operations_in_module(` — **EN:** Assigns a typed value to global_dtors_list. **CN:** 为 global_dtors_list 赋予带类型标注的值。
+- **L215** `            context.module, "llvm.mlir.global_dtors"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `        if len(global_dtors_list) == 0:` — **EN:** Starts a conditional branch guarded by `len(global_dtors_list) == 0`. **CN:** 开始一个由 `len(global_dtors_list) == 0` 控制的条件分支。
+- **L218** `            # create the global destructors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L219** `            with ir.InsertionPoint(context.module.body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(context.module.body). **CN:** 开始一个使用 ir.InsertionPoint(context.module.body) 的上下文管理代码块。
+- **L220** `                global_dtors = llvm.mlir_global_dtors(` — **EN:** Assigns a value to global_dtors. **CN:** 将一个值赋给 global_dtors。
+- **L221** `                    dtors=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `                    priorities=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `                    data=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L226** `            # use the existing global destructors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L227** `            global_dtors = global_dtors_list[0]` — **EN:** Assigns a value to global_dtors. **CN:** 将一个值赋给 global_dtors。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `        # append the unload function to the global destructors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L230** `        global_dtors.attributes["dtors"] += [` — **EN:** Updates global_dtors.attributes['dtors'] in place. **CN:** 原地更新 global_dtors.attributes['dtors']。
+- **L231** `            ir.FlatSymbolRefAttr.get(unload_func_wrapper_symbol)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `        global_dtors.attributes["priorities"] += [` — **EN:** Updates global_dtors.attributes['priorities'] in place. **CN:** 原地更新 global_dtors.attributes['priorities']。
+- **L234** `            ir.IntegerAttr.get(self.i32_type, 65535)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `        ]  # the default priority` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        global_dtors.attributes["data"] += [` — **EN:** Updates global_dtors.attributes['data'] in place. **CN:** 原地更新 global_dtors.attributes['data']。
+- **L237** `            ir.FlatSymbolRefAttr.get(unload_func_wrapper_symbol)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        ]  # the data will not be used, but we need to pass something to satisfy the llvm.mlir.global_dtors op` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `    def check_cuda_error(` — **EN:** Defines function `check_cuda_error`. **CN:** 定义函数 `check_cuda_error`。
+- **L243** `        self, code: ir.Value, current_block: ir.Block, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L244** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L245** `        """Check if the CUDA error is raised and return the error string if so.` — **EN:** Starts the docstring for the function `check_cuda_error`. **CN:** 开始说明 function `check_cuda_error` 的文档字符串。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `        Uses a shared error handling block to avoid code duplication. The error code` — **EN:** Continues the docstring for the function `check_cuda_error`. **CN:** 继续说明 function `check_cuda_error` 的文档字符串。
+- **L248** `        is passed as a block argument to the shared error handler.` — **EN:** Continues the docstring for the function `check_cuda_error`. **CN:** 继续说明 function `check_cuda_error` 的文档字符串。
+- **L249** `        """` — **EN:** Ends the docstring for the function `check_cuda_error`. **CN:** 结束说明 function `check_cuda_error` 的文档字符串。
+- **L250** `        assert self.cuda_error_handle_block is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L251** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L252** `            # check if the call is successful` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L253** `            success_block = current_block.create_after()` — **EN:** Assigns a value to success_block. **CN:** 将一个值赋给 success_block。
+- **L254** `            # Check if call is successful (zero return code means success)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L255** `            self.cond_br(` — **EN:** Invokes `self.cond_br` as a standalone call. **CN:** 以独立语句方式调用 `self.cond_br`。
+- **L256** `                cond=self.equal(code, self.i32(0)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `                true_block=success_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `                false_block=self.cuda_error_handle_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `                branch_weights=self.BRANCH_WEIGHTS_LIKELY,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `                false_dest_operands=[code],  # Pass error code to shared error block` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `        return success_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `    def set_cuda_device_if_mismatch(` — **EN:** Defines function `set_cuda_device_if_mismatch`. **CN:** 定义函数 `set_cuda_device_if_mismatch`。
+- **L265** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L266** `        current_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L267** `        context: CallContext,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L268** `        current_device: Optional[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L269** `        target_device: Optional[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L270** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L271** `        """Set the CUDA device index if it differs from the target device."""` — **EN:** Docstring line documenting the function `set_cuda_device_if_mismatch`. **CN:** 文档字符串行，用于说明 function `set_cuda_device_if_mismatch`。
+- **L272** `        # If either device is None, no switching needed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L273** `        if current_device is None:` — **EN:** Starts a conditional branch guarded by `current_device is None`. **CN:** 开始一个由 `current_device is None` 控制的条件分支。
+- **L274** `            assert target_device is None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L275** `            return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L277** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L278** `            # Check if devices are different` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L279** `            devices_differ = self.not_equal(current_device, target_device)` — **EN:** Assigns a value to devices_differ. **CN:** 将一个值赋给 devices_differ。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `            # Create blocks for conditional device switching` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L282** `            switch_device_block = current_block.create_after()` — **EN:** Assigns a value to switch_device_block. **CN:** 将一个值赋给 switch_device_block。
+- **L283** `            continuation_block = switch_device_block.create_after()` — **EN:** Assigns a value to continuation_block. **CN:** 将一个值赋给 continuation_block。
+- **L284** `            # For this specific case, avoid branch weights for now` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L285** `            # mainly to avoid too drastic reordering of the code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L286** `            self.cond_br(` — **EN:** Invokes `self.cond_br` as a standalone call. **CN:** 以独立语句方式调用 `self.cond_br`。
+- **L287** `                cond=devices_differ,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `                true_block=switch_device_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `                false_block=continuation_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `        # Switch device block: call cudaSetDevice` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L293** `        with ir.InsertionPoint(switch_device_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(switch_device_block). **CN:** 开始一个使用 ir.InsertionPoint(switch_device_block) 的上下文管理代码块。
+- **L294** `            result = llvm.call(` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L295** `                result=self.i32_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `                callee="_cudaSetDevice",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `                callee_operands=[target_device],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `                op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `                op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `        # Check for errors and branch to continuation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L303** `        switch_device_block = self.check_cuda_error(` — **EN:** Assigns a value to switch_device_block. **CN:** 将一个值赋给 switch_device_block。
+- **L304** `            result, switch_device_block, context` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `        with ir.InsertionPoint(switch_device_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(switch_device_block). **CN:** 开始一个使用 ir.InsertionPoint(switch_device_block) 的上下文管理代码块。
+- **L307** `            self.br(continuation_block)` — **EN:** Invokes `self.br` as a standalone call. **CN:** 以独立语句方式调用 `self.br`。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `        return continuation_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L311** `    def generate_llvm_call(` — **EN:** Defines function `generate_llvm_call`. **CN:** 定义函数 `generate_llvm_call`。
+- **L312** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        current_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `        call_operands: list[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `        context: CallContext,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L317** `        """Generate the LLVM call operation and check if the call is successful."""` — **EN:** Docstring line documenting the function `generate_llvm_call`. **CN:** 文档字符串行，用于说明 function `generate_llvm_call`。
+- **L318** `        assert context.builder is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L319** `        old_cuda_device_index: Optional[ir.Value] = None` — **EN:** Assigns a typed value to old_cuda_device_index. **CN:** 为 old_cuda_device_index 赋予带类型标注的值。
+- **L320** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L321** `        # If we need to manage CUDA device context` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L322** `        if self.cuda_device_index is not None:` — **EN:** Starts a conditional branch guarded by `self.cuda_device_index is not None`. **CN:** 开始一个由 `self.cuda_device_index is not None` 控制的条件分支。
+- **L323** `            # Create an alloca in the entry block to store the current device index` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L324** `            device_index_alloca = context.builder.create_alloca(` — **EN:** Assigns a value to device_index_alloca. **CN:** 将一个值赋给 device_index_alloca。
+- **L325** `                context.entry_block, self.i32_type, array_size=1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `            # Get the current device` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L329** `            with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L330** `                get_device_result = llvm.call(` — **EN:** Assigns a value to get_device_result. **CN:** 将一个值赋给 get_device_result。
+- **L331** `                    result=self.i32_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `                    callee="_cudaGetDevice",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `                    callee_operands=[device_index_alloca],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `                    op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `                    op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `            current_block = self.check_cuda_error(` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L338** `                get_device_result, current_block, context` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `            # Load the current device index from the alloca` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L342** `            with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L343** `                old_cuda_device_index = llvm.load(self.i32_type, device_index_alloca)` — **EN:** Assigns a value to old_cuda_device_index. **CN:** 将一个值赋给 old_cuda_device_index。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `            # Switch to target device if different` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L346** `            current_block = self.set_cuda_device_if_mismatch(` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L347** `                current_block, context, old_cuda_device_index, self.cuda_device_index` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `        # Execute the main call` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L351** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L352** `            result = llvm.call(` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L353** `                result=self.i32_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `                callee=self.target_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `                callee_operands=call_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `                op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `                op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `        # Restore the original device BEFORE checking for errors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L361** `        # This ensures device is restored even if the main call failed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L362** `        current_block = self.set_cuda_device_if_mismatch(` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L363** `            current_block, context, self.cuda_device_index, old_cuda_device_index` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `        # Now check for errors from the main call` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L367** `        current_block = self.check_cuda_error(result, current_block, context)` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L370** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L371** `    def find_cuda_device_index_from_params(` — **EN:** Defines function `find_cuda_device_index_from_params`. **CN:** 定义函数 `find_cuda_device_index_from_params`。
+- **L372** `        self, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L373** `    ) -> Optional[ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L374** `        """Find the CUDA device index from tensor parameters."""` — **EN:** Docstring line documenting the function `find_cuda_device_index_from_params`. **CN:** 文档字符串行，用于说明 function `find_cuda_device_index_from_params`。
+- **L375** `        for param in context.params:` — **EN:** Starts a loop assigning items from `context.params` to `param`. **CN:** 开始一个循环，将 `context.params` 的元素赋给 `param`。
+- **L376** `            if (` — **EN:** Starts a conditional branch guarded by `isinstance(param, spec.Tensor) and param.dlpack_device_ty...`. **CN:** 开始一个由 `isinstance(param, spec.Tensor) and param.dlpack_device_ty...` 控制的条件分支。
+- **L377** `                isinstance(param, spec.Tensor)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L378** `                and param.dlpack_device_type != tvm_ffi.DLDeviceType.kDLCPU` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L379** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L380** `                return context.matched_var_binding[param.device_id]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L381** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `    def create_shared_cuda_error_block(` — **EN:** Defines function `create_shared_cuda_error_block`. **CN:** 定义函数 `create_shared_cuda_error_block`。
+- **L384** `        self, current_block: ir.Block, context: CallContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L385** `    ) -> ir.Block:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L386** `        """Create a shared error handling block for all CUDA errors."""` — **EN:** Docstring line documenting the function `create_shared_cuda_error_block`. **CN:** 文档字符串行，用于说明 function `create_shared_cuda_error_block`。
+- **L387** `        assert context.builder is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L388** `        # Create the shared error block after the current block (setup phase)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L389** `        # This block will be branched to from multiple error checking sites` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L390** `        # It accepts the error code as a block argument` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L391** `        error_block = current_block.create_after()` — **EN:** Assigns a value to error_block. **CN:** 将一个值赋给 error_block。
+- **L392** `        error_code = error_block.add_argument(self.i32_type, ir.Location.unknown())` — **EN:** Assigns a value to error_code. **CN:** 将一个值赋给 error_code。
+- **L393** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L394** `        # Populate the error block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L395** `        with ir.InsertionPoint(error_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(error_block). **CN:** 开始一个使用 ir.InsertionPoint(error_block) 的上下文管理代码块。
+- **L396** `            error_str = llvm.call(` — **EN:** Assigns a value to error_str. **CN:** 将一个值赋给 error_str。
+- **L397** `                result=self.ptr_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** `                callee="cuda_dialect_get_error_name",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** `                callee_operands=[error_code],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L400** `                op_bundle_sizes=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `                op_bundle_operands=[],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `            # Raise error and return -1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L404** `            context.builder.raise_error_and_return(` — **EN:** Invokes `context.builder.raise_error_and_return` as a standalone call. **CN:** 以独立语句方式调用 `context.builder.raise_error_and_return`。
+- **L405** `                error_kind="RuntimeError",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L406** `                error_message_parts=["CUDA Error: ", error_str],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `        return error_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `    def __call__(self, current_block: ir.Block, context: CallContext) -> ir.Block:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L412** `        current_block = self.declare_extern_funcs(current_block, context)` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L413** `        if self.has_gpu_module:` — **EN:** Starts a conditional branch guarded by `self.has_gpu_module`. **CN:** 开始一个由 `self.has_gpu_module` 控制的条件分支。
+- **L414** `            current_block = self.insert_lazy_init_cuda(current_block, context)` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L415** `            current_block = self.append_unload_to_global_dtors(current_block, context)` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L416** `        # Create shared CUDA error handling block after the setup blocks` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L417** `        # This reduces code duplication - all CUDA errors branch to this single block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L418** `        self.cuda_error_handle_block = self.create_shared_cuda_error_block(` — **EN:** Assigns a value to self.cuda_error_handle_block. **CN:** 将一个值赋给 self.cuda_error_handle_block。
+- **L419** `            current_block, context` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `        # setup device index, will be set around the call to the target function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L422** `        self.cuda_device_index = self.find_cuda_device_index_from_params(context)` — **EN:** Assigns a value to self.cuda_device_index. **CN:** 将一个值赋给 self.cuda_device_index。
+- **L423** `        current_block = super().__call__(current_block, context)` — **EN:** Assigns a value to current_block. **CN:** 将一个值赋给 current_block。
+- **L424** `        self.cuda_device_index = None` — **EN:** Assigns a value to self.cuda_device_index. **CN:** 将一个值赋给 self.cuda_device_index。
+- **L425** `        self.cuda_error_handle_block = None` — **EN:** Assigns a value to self.cuda_error_handle_block. **CN:** 将一个值赋给 self.cuda_error_handle_block。
+- **L426** `        # reset the device index and error block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L427** `        return current_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L428** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L430** `def _inplace_hide_symbols(` — **EN:** Defines function `_inplace_hide_symbols`. **CN:** 定义函数 `_inplace_hide_symbols`。
+- **L431** `    ir_module: ir.Module, hide_check: Callable[[str], bool]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L432** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L433** `    """Walk through the IRModule, hide functions that do not yet have linkage set.` — **EN:** Starts the docstring for the function `_inplace_hide_symbols`. **CN:** 开始说明 function `_inplace_hide_symbols` 的文档字符串。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `    @param ir_module: The ir module to hide the symbols.` — **EN:** Continues the docstring for the function `_inplace_hide_symbols`. **CN:** 继续说明 function `_inplace_hide_symbols` 的文档字符串。
+- **L436** `    @param hide_check: The callback to check if the symbol should be hidden.` — **EN:** Continues the docstring for the function `_inplace_hide_symbols`. **CN:** 继续说明 function `_inplace_hide_symbols` 的文档字符串。
+- **L437** `    @return: The ir module with the symbols hidden.` — **EN:** Continues the docstring for the function `_inplace_hide_symbols`. **CN:** 继续说明 function `_inplace_hide_symbols` 的文档字符串。
+- **L438** `    """` — **EN:** Ends the docstring for the function `_inplace_hide_symbols`. **CN:** 结束说明 function `_inplace_hide_symbols` 的文档字符串。
+- **L439** `    defined_symbols: set[str] = set()` — **EN:** Assigns a typed value to defined_symbols. **CN:** 为 defined_symbols 赋予带类型标注的值。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** `    def walk_llvm_func_op(op: ir.Operation) -> ir.WalkResult:` — **EN:** Defines function `walk_llvm_func_op`. **CN:** 定义函数 `walk_llvm_func_op`。
+- **L442** `        # not a declaration` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L443** `        if (` — **EN:** Starts a conditional branch guarded by `op.name == 'llvm.func' and len(op.opview.operation.region...`. **CN:** 开始一个由 `op.name == 'llvm.func' and len(op.opview.operation.region...` 控制的条件分支。
+- **L444** `            op.name == "llvm.func"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L445** `            and len(op.opview.operation.regions) > 0` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L446** `            and len(op.opview.operation.regions[0].blocks) > 0` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L447** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L448** `            func_name = op.attributes["sym_name"].value` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L449** `            defined_symbols.add(func_name)` — **EN:** Invokes `defined_symbols.add` as a standalone call. **CN:** 以独立语句方式调用 `defined_symbols.add`。
+- **L450** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L451** `        return ir.WalkResult.ADVANCE` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L452** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L453** `    def walk_and_hide_symbols(op: ir.Operation) -> ir.WalkResult:` — **EN:** Defines function `walk_and_hide_symbols`. **CN:** 定义函数 `walk_and_hide_symbols`。
+- **L454** `        # Handle llvm.func operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L455** `        if op.name == "llvm.func":` — **EN:** Starts a conditional branch guarded by `op.name == 'llvm.func'`. **CN:** 开始一个由 `op.name == 'llvm.func'` 控制的条件分支。
+- **L456** `            func_name = op.attributes["sym_name"].value` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L457** `            # Only set linkage if it doesn't already have one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L458** `            if func_name in defined_symbols and hide_check(func_name):` — **EN:** Starts a conditional branch guarded by `func_name in defined_symbols and hide_check(func_name)`. **CN:** 开始一个由 `func_name in defined_symbols and hide_check(func_name)` 控制的条件分支。
+- **L459** `                # Set to internal linkage to hide the symbol` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L460** `                op.attributes["linkage"] = ir.Attribute.parse("#llvm.linkage<internal>")` — **EN:** Assigns a value to op.attributes['linkage']. **CN:** 将一个值赋给 op.attributes['linkage']。
+- **L461** `        return ir.WalkResult.ADVANCE` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `    with ir_module.context:` — **EN:** Starts a context-managed block using ir_module.context. **CN:** 开始一个使用 ir_module.context 的上下文管理代码块。
+- **L464** `        ir_module.operation.walk(walk_llvm_func_op)` — **EN:** Invokes `ir_module.operation.walk` as a standalone call. **CN:** 以独立语句方式调用 `ir_module.operation.walk`。
+- **L465** `        ir_module.operation.walk(walk_and_hide_symbols)` — **EN:** Invokes `ir_module.operation.walk` as a standalone call. **CN:** 以独立语句方式调用 `ir_module.operation.walk`。
+- **L466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `def _get_format_from_object_file_path(object_file_path: str) -> str:` — **EN:** Defines function `_get_format_from_object_file_path`. **CN:** 定义函数 `_get_format_from_object_file_path`。
+- **L469** `    format = object_file_path.split(".")[-1]` — **EN:** Assigns a value to format. **CN:** 将一个值赋给 format。
+- **L470** `    if format not in ("o", "ll", "bc"):` — **EN:** Starts a conditional branch guarded by `format not in ('o', 'll', 'bc')`. **CN:** 开始一个由 `format not in ('o', 'll', 'bc')` 控制的条件分支。
+- **L471** `        return "o"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L472** `    return format` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `def _flatten_dataclass_arg(arg: Any) -> Any:` — **EN:** Defines function `_flatten_dataclass_arg`. **CN:** 定义函数 `_flatten_dataclass_arg`。
+- **L476** `    """Recursively flatten a dataclass argument into a tuple for TVM FFI runtime.` — **EN:** Starts the docstring for the function `_flatten_dataclass_arg`. **CN:** 开始说明 function `_flatten_dataclass_arg` 的文档字符串。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** `    TVM FFI expects tuple/array for TupleParam specs. NamedTuples work because` — **EN:** Continues the docstring for the function `_flatten_dataclass_arg`. **CN:** 继续说明 function `_flatten_dataclass_arg` 的文档字符串。
+- **L479** `    they are tuples, but dataclass instances need explicit flattening.` — **EN:** Continues the docstring for the function `_flatten_dataclass_arg`. **CN:** 继续说明 function `_flatten_dataclass_arg` 的文档字符串。
+- **L480** `    """` — **EN:** Ends the docstring for the function `_flatten_dataclass_arg`. **CN:** 结束说明 function `_flatten_dataclass_arg` 的文档字符串。
+- **L481** `    if is_dataclass(arg) and not isinstance(arg, type):` — **EN:** Starts a conditional branch guarded by `is_dataclass(arg) and (not isinstance(arg, type))`. **CN:** 开始一个由 `is_dataclass(arg) and (not isinstance(arg, type))` 控制的条件分支。
+- **L482** `        values = []` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L483** `        for f in dataclass_fields(arg):` — **EN:** Starts a loop assigning items from `dataclass_fields(arg)` to `f`. **CN:** 开始一个循环，将 `dataclass_fields(arg)` 的元素赋给 `f`。
+- **L484** `            if is_constexpr_field(f):` — **EN:** Starts a conditional branch guarded by `is_constexpr_field(f)`. **CN:** 开始一个由 `is_constexpr_field(f)` 控制的条件分支。
+- **L485** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L486** `            values.append(_flatten_dataclass_arg(getattr(arg, f.name)))` — **EN:** Invokes `values.append` as a standalone call. **CN:** 以独立语句方式调用 `values.append`。
+- **L487** `        return tuple(values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L488** `    return arg` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `class TVMFFIJitCompiledFunctionBase(CudaDialectJitCompiledFunction):` — **EN:** Defines class `TVMFFIJitCompiledFunctionBase` with bases CudaDialectJitCompiledFunction. **CN:** 定义类 `TVMFFIJitCompiledFunctionBase`，其基类为 CudaDialectJitCompiledFunction。
+- **L492** `    """Base class for TVM FFI compiled function."""` — **EN:** Docstring line documenting the class `TVMFFIJitCompiledFunctionBase`. **CN:** 文档字符串行，用于说明 class `TVMFFIJitCompiledFunctionBase`。
+- **L493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L494** `    def __init__(self, *args: Any, **kwargs: Any) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L495** `        super().__init__(*args, **kwargs)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `    # use direct call to the tvm_ffi.Function.__call__` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L498** `    # to avoid most of python overhead` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L499** `    __call__ = tvm_ffi.Function.__call__` — **EN:** Assigns a value to __call__. **CN:** 将一个值赋给 __call__。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** `    def to(self, device: Optional[int] = None) -> JitExecutor:` — **EN:** Defines function `to`. **CN:** 定义函数 `to`。
+- **L502** `        """TVM FFI function itself is already support all devices."""` — **EN:** Docstring line documenting the function `to`. **CN:** 文档字符串行，用于说明 function `to`。
+- **L503** `        return cast(JitExecutor, self)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L504** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L505** `    def run_compiled_program(self, exe_args: list[Any]) -> int | None:` — **EN:** Defines function `run_compiled_program`. **CN:** 定义函数 `run_compiled_program`。
+- **L506** `        """Run the compiled program. This override is needed for implicit compile and execution."""` — **EN:** Docstring line documenting the function `run_compiled_program`. **CN:** 文档字符串行，用于说明 function `run_compiled_program`。
+- **L507** `        return cast(int | None, self.__call__(*exe_args))  # type: ignore[misc]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** `    def export_to_c(  # type: ignore[override]` — **EN:** Defines function `export_to_c`. **CN:** 定义函数 `export_to_c`。
+- **L510** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L511** `        object_file_path: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L512** `        function_name: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L513** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L514** `        enable_pic: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L515** `        export_only_tvm_ffi_symbols: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L516** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L517** `        """Export the TVM FFI function to an object file.` — **EN:** Starts the docstring for the function `export_to_c`. **CN:** 开始说明 function `export_to_c` 的文档字符串。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `        :param object_file_path: The path to the object file.` — **EN:** Continues the docstring for the function `export_to_c`. **CN:** 继续说明 function `export_to_c` 的文档字符串。
+- **L520** `        :param function_name: The name of the function to export.` — **EN:** Continues the docstring for the function `export_to_c`. **CN:** 继续说明 function `export_to_c` 的文档字符串。
+- **L521** `        :param enable_pic: Whether to enable PIC relocation needed for shared library loading.` — **EN:** Continues the docstring for the function `export_to_c`. **CN:** 继续说明 function `export_to_c` 的文档字符串。
+- **L522** `        :param export_only_tvm_ffi_symbols: Only export TVM FFI symbols (hide all others).` — **EN:** Continues the docstring for the function `export_to_c`. **CN:** 继续说明 function `export_to_c` 的文档字符串。
+- **L523** `        :param host_target_triple: If not provided, the current host target is used.` — **EN:** Continues the docstring for the function `export_to_c`. **CN:** 继续说明 function `export_to_c` 的文档字符串。
+- **L524** `        """` — **EN:** Ends the docstring for the function `export_to_c`. **CN:** 结束说明 function `export_to_c` 的文档字符串。
+- **L525** `        internal_symbol_prefix = "__cute_internal_" + function_name  # type: ignore[operator]` — **EN:** Assigns a value to internal_symbol_prefix. **CN:** 将一个值赋给 internal_symbol_prefix。
+- **L526** `        mod = self.ir_module` — **EN:** Assigns a value to mod. **CN:** 将一个值赋给 mod。
+- **L527** `        mod = get_export_module(` — **EN:** Assigns a value to mod. **CN:** 将一个值赋给 mod。
+- **L528** `            self.ir_module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L529** `            internal_symbol_prefix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `            preserve_symbols={f"__tvm_ffi_{self.function_name}"},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L533** `        rename_tvm_ffi_function(mod, self.function_name, function_name)  # type: ignore[arg-type]` — **EN:** Invokes `rename_tvm_ffi_function` as a standalone call. **CN:** 以独立语句方式调用 `rename_tvm_ffi_function`。
+- **L534** `        if export_only_tvm_ffi_symbols:` — **EN:** Starts a conditional branch guarded by `export_only_tvm_ffi_symbols`. **CN:** 开始一个由 `export_only_tvm_ffi_symbols` 控制的条件分支。
+- **L535** `            _inplace_hide_symbols(mod, lambda x: not x.startswith("__tvm_ffi"))` — **EN:** Invokes `_inplace_hide_symbols` as a standalone call. **CN:** 以独立语句方式调用 `_inplace_hide_symbols`。
+- **L536** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L537** `        format = _get_format_from_object_file_path(object_file_path)` — **EN:** Assigns a value to format. **CN:** 将一个值赋给 format。
+- **L538** `        out_bytes = _aot_support.export_module_to_bytes(` — **EN:** Assigns a value to out_bytes. **CN:** 将一个值赋给 out_bytes。
+- **L539** `            mod, format=format, opt_level=3, enable_pic=enable_pic` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L540** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L542** `        with open(object_file_path, "wb") as f:` — **EN:** Starts a context-managed block using open(object_file_path, 'wb'). **CN:** 开始一个使用 open(object_file_path, 'wb') 的上下文管理代码块。
+- **L543** `            f.write(out_bytes)` — **EN:** Invokes `f.write` as a standalone call. **CN:** 以独立语句方式调用 `f.write`。
+- **L544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L545** `    def _create_tvm_ffi_function(self) -> Optional["tvm_ffi.Function"]:` — **EN:** Defines function `_create_tvm_ffi_function`. **CN:** 定义函数 `_create_tvm_ffi_function`。
+- **L546** `        """Create the tvm_ffi.Function from the current execution engine.` — **EN:** Starts the docstring for the function `_create_tvm_ffi_function`. **CN:** 开始说明 function `_create_tvm_ffi_function` 的文档字符串。
+- **L547** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L548** `        When the base class hands us an MlirExecutionEngine (MCJIT), we` — **EN:** Continues the docstring for the function `_create_tvm_ffi_function`. **CN:** 继续说明 function `_create_tvm_ffi_function` 的文档字符串。
+- **L549** `        replace it with a BinaryExecutionEngine (JITLink) to avoid` — **EN:** Continues the docstring for the function `_create_tvm_ffi_function`. **CN:** 继续说明 function `_create_tvm_ffi_function` 的文档字符串。
+- **L550** `        non-deterministic SIGSEGV with duplicate .text ELF sections in` — **EN:** Continues the docstring for the function `_create_tvm_ffi_function`. **CN:** 继续说明 function `_create_tvm_ffi_function` 的文档字符串。
+- **L551** `        multi-process torchrun workloads.` — **EN:** Continues the docstring for the function `_create_tvm_ffi_function`. **CN:** 继续说明 function `_create_tvm_ffi_function` 的文档字符串。
+- **L552** `        """` — **EN:** Ends the docstring for the function `_create_tvm_ffi_function`. **CN:** 结束说明 function `_create_tvm_ffi_function` 的文档字符串。
+- **L553** `        if self.engine is not None:` — **EN:** Starts a conditional branch guarded by `self.engine is not None`. **CN:** 开始一个由 `self.engine is not None` 控制的条件分支。
+- **L554** `            from cutlass._mlir._mlir_libs._cutlass_ir._execution_engine import (` — **EN:** Imports BinaryExecutionEngine from `cutlass._mlir._mlir_libs._cutlass_ir._execution_engine`. **CN:** 从 `cutlass._mlir._mlir_libs._cutlass_ir._execution_engine` 导入 BinaryExecutionEngine。
+- **L555** `                BinaryExecutionEngine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L556** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L557** `            from cutlass.base_dsl.env_manager import get_prefix_dsl_libs` — **EN:** Imports get_prefix_dsl_libs from `cutlass.base_dsl.env_manager`. **CN:** 从 `cutlass.base_dsl.env_manager` 导入 get_prefix_dsl_libs。
+- **L558** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L559** `            obj = _aot_support.export_module_to_bytes(` — **EN:** Assigns a value to obj. **CN:** 将一个值赋给 obj。
+- **L560** `                self.ir_module, format="o", opt_level=3, enable_pic=True` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L561** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** `            libs_str = get_prefix_dsl_libs("CUTE_DSL")` — **EN:** Assigns a value to libs_str. **CN:** 将一个值赋给 libs_str。
+- **L563** `            shared_libs = libs_str.split(":") if libs_str else []` — **EN:** Assigns a value to shared_libs. **CN:** 将一个值赋给 shared_libs。
+- **L564** `            self.engine = BinaryExecutionEngine(` — **EN:** Assigns a value to self.engine. **CN:** 将一个值赋给 self.engine。
+- **L565** `                obj,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `                shared_libs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** `                True,  # useJitLink` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L570** `            tvm_ffi_function_ptr = self.engine.lookup("__tvm_ffi_" + self.function_name)` — **EN:** Assigns a value to tvm_ffi_function_ptr. **CN:** 将一个值赋给 tvm_ffi_function_ptr。
+- **L571** `            tvm_ffi_function = tvm_ffi.Function.__from_extern_c__(` — **EN:** Assigns a value to tvm_ffi_function. **CN:** 将一个值赋给 tvm_ffi_function。
+- **L572** `                tvm_ffi_function_ptr, keep_alive_object=self.engine` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L574** `            return tvm_ffi_function` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L575** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `class TVMFFIJitCompiledFunction(tvm_ffi.Function, TVMFFIJitCompiledFunctionBase):` — **EN:** Defines class `TVMFFIJitCompiledFunction` with bases tvm_ffi.Function, TVMFFIJitCompiledFunctionBase. **CN:** 定义类 `TVMFFIJitCompiledFunction`，其基类为 tvm_ffi.Function, TVMFFIJitCompiledFunctionBase。
+- **L579** `    """TVM FFI Function that directly subclasses the tvm_ffi.Function for pos only arguments."""` — **EN:** Docstring line documenting the class `TVMFFIJitCompiledFunction`. **CN:** 文档字符串行，用于说明 class `TVMFFIJitCompiledFunction`。
+- **L580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L581** `    def __init__(self, *args: Any, **kwargs: Any) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L582** `        TVMFFIJitCompiledFunctionBase.__init__(self, *args, **kwargs)` — **EN:** Invokes `TVMFFIJitCompiledFunctionBase.__init__` as a standalone call. **CN:** 以独立语句方式调用 `TVMFFIJitCompiledFunctionBase.__init__`。
+- **L583** `        # initialize the tvm_ffi.Function from the current execution engine` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L584** `        if self.__chandle__() != 0:` — **EN:** Starts a conditional branch guarded by `self.__chandle__() != 0`. **CN:** 开始一个由 `self.__chandle__() != 0` 控制的条件分支。
+- **L585** `            raise DSLRuntimeError("TVM FFI function is already initialized")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L586** `        tvm_ffi_function = self._create_tvm_ffi_function()` — **EN:** Assigns a value to tvm_ffi_function. **CN:** 将一个值赋给 tvm_ffi_function。
+- **L587** `        if tvm_ffi_function is not None:` — **EN:** Starts a conditional branch guarded by `tvm_ffi_function is not None`. **CN:** 开始一个由 `tvm_ffi_function is not None` 控制的条件分支。
+- **L588** `            # move the handle from the tvm_ffi.Function to the current instance` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L589** `            self.__move_handle_from__(tvm_ffi_function)` — **EN:** Invokes `self.__move_handle_from__` as a standalone call. **CN:** 以独立语句方式调用 `self.__move_handle_from__`。
+- **L590** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L591** `    def __call__(self, *args: Any) -> Any:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L592** `        args = tuple(_flatten_dataclass_arg(a) for a in args)` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L593** `        return tvm_ffi.Function.__call__(self, *args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L594** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L595** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L596** `class TVMFFIJitCompiledFunctionWithKwargs(TVMFFIJitCompiledFunctionBase):` — **EN:** Defines class `TVMFFIJitCompiledFunctionWithKwargs` with bases TVMFFIJitCompiledFunctionBase. **CN:** 定义类 `TVMFFIJitCompiledFunctionWithKwargs`，其基类为 TVMFFIJitCompiledFunctionBase。
+- **L597** `    """TVM FFI Function with kwargs wrapper support"""` — **EN:** Docstring line documenting the class `TVMFFIJitCompiledFunctionWithKwargs`. **CN:** 文档字符串行，用于说明 class `TVMFFIJitCompiledFunctionWithKwargs`。
+- **L598** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L599** `    def __init__(self, *args: Any, **kwargs: Any) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L600** `        assert "kwargs_wrapper_spec" in kwargs, "kwargs_wrapper_spec is required"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L601** `        kwargs_wrapper_spec = kwargs.pop("kwargs_wrapper_spec")` — **EN:** Assigns a value to kwargs_wrapper_spec. **CN:** 将一个值赋给 kwargs_wrapper_spec。
+- **L602** `        super().__init__(*args, **kwargs)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L603** `        # initialize the tvm_ffi.Function from the current execution engine` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L604** `        self._tvm_ffi_function = self._create_tvm_ffi_function()` — **EN:** Assigns a value to self._tvm_ffi_function. **CN:** 将一个值赋给 self._tvm_ffi_function。
+- **L605** `        assert self._tvm_ffi_function is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L606** `        if kwargs_wrapper_spec.kwonly_names or kwargs_wrapper_spec.arg_defaults:` — **EN:** Starts a conditional branch guarded by `kwargs_wrapper_spec.kwonly_names or kwargs_wrapper_spec.a...`. **CN:** 开始一个由 `kwargs_wrapper_spec.kwonly_names or kwargs_wrapper_spec.a...` 控制的条件分支。
+- **L607** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L608** `                from tvm_ffi.utils import kwargs_wrapper` — **EN:** Imports kwargs_wrapper from `tvm_ffi.utils`. **CN:** 从 `tvm_ffi.utils` 导入 kwargs_wrapper。
+- **L609** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L610** `                self._kwargs_wrapper = kwargs_wrapper.make_kwargs_wrapper(` — **EN:** Assigns a value to self._kwargs_wrapper. **CN:** 将一个值赋给 self._kwargs_wrapper。
+- **L611** `                    self._tvm_ffi_function,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `                    arg_names=kwargs_wrapper_spec.arg_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `                    arg_defaults=kwargs_wrapper_spec.arg_defaults,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** `                    kwonly_names=kwargs_wrapper_spec.kwonly_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L615** `                    kwonly_defaults=kwargs_wrapper_spec.kwonly_defaults,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** `            except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L618** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L619** `                    "install apache-tvm-ffi>=0.1.5 to enable kwargs/defaults"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L620** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L621** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L622** `            # positional only is probably fine` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L623** `            self._kwargs_wrapper = self._tvm_ffi_function` — **EN:** Assigns a value to self._kwargs_wrapper. **CN:** 将一个值赋给 self._kwargs_wrapper。
+- **L624** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L625** `    def __call__(self, *args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L626** `        """Call the TVM FFI function with kwargs wrapper."""` — **EN:** Docstring line documenting the function `__call__`. **CN:** 文档字符串行，用于说明 function `__call__`。
+- **L627** `        args = tuple(_flatten_dataclass_arg(a) for a in args)` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L628** `        kwargs = {k: _flatten_dataclass_arg(v) for k, v in kwargs.items()}` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L629** `        return self._kwargs_wrapper(*args, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L631** `    def __tvm_ffi_object__(self) -> Optional["tvm_ffi.Function"]:` — **EN:** Defines function `__tvm_ffi_object__`. **CN:** 定义函数 `__tvm_ffi_object__`。
+- **L632** `        return self._tvm_ffi_function` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L633** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L634** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L635** `def supports_kwargs_wrapper() -> bool:` — **EN:** Defines function `supports_kwargs_wrapper`. **CN:** 定义函数 `supports_kwargs_wrapper`。
+- **L636** `    """Check if the kwargs wrapper is supported."""` — **EN:** Docstring line documenting the function `supports_kwargs_wrapper`. **CN:** 文档字符串行，用于说明 function `supports_kwargs_wrapper`。
+- **L637** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L638** `        from tvm_ffi.utils import kwargs_wrapper` — **EN:** Imports kwargs_wrapper from `tvm_ffi.utils`. **CN:** 从 `tvm_ffi.utils` 导入 kwargs_wrapper。
+- **L639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L640** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L641** `    except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L642** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cutlass_dsl.tvm_ffi_provider`. CN: 模块名为 `CuTeDSL.cutlass.cutlass_dsl.tvm_ffi_provider`。
+- EN: Top-level classes: TVMFFICuteCallProvider, TVMFFIJitCompiledFunctionBase, TVMFFIJitCompiledFunction, TVMFFIJitCompiledFunctionWithKwargs CN: 顶层类包括：TVMFFICuteCallProvider, TVMFFIJitCompiledFunctionBase, TVMFFIJitCompiledFunction, TVMFFIJitCompiledFunctionWithKwargs
+- EN: Top-level functions: _inplace_hide_symbols, _get_format_from_object_file_path, _flatten_dataclass_arg, supports_kwargs_wrapper CN: 顶层函数包括：_inplace_hide_symbols, _get_format_from_object_file_path, _flatten_dataclass_arg, supports_kwargs_wrapper
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.utils.tree_utils:is_constexpr_field, cutlass.base_dsl.tvm_ffi_builder:DynamicParamPackCallProvider,CallContext,rename_tvm_ffi_function,spec, cutlass.base_dsl.export:get_export_module, cutlass._mlir:ir, cutlass._mlir.dialects:llvm, cutlass._mlir._mlir_libs._cutlass_ir:_aot_support, cutlass.cutlass_dsl.cuda_jit_executor:CudaDialectJitCompiledFunction, cutlass.base_dsl.jit_executor:JitExecutor, cutlass.base_dsl.common:DSLRuntimeError, cutlass._mlir._mlir_libs._cutlass_ir._execution_engine:BinaryExecutionEngine, cutlass.base_dsl.env_manager:get_prefix_dsl_libs CN: 内部依赖：cutlass.base_dsl.utils.tree_utils:is_constexpr_field, cutlass.base_dsl.tvm_ffi_builder:DynamicParamPackCallProvider,CallContext,rename_tvm_ffi_function,spec, cutlass.base_dsl.export:get_export_module, cutlass._mlir:ir, cutlass._mlir.dialects:llvm, cutlass._mlir._mlir_libs._cutlass_ir:_aot_support, cutlass.cutlass_dsl.cuda_jit_executor:CudaDialectJitCompiledFunction, cutlass.base_dsl.jit_executor:JitExecutor, cutlass.base_dsl.common:DSLRuntimeError, cutlass._mlir._mlir_libs._cutlass_ir._execution_engine:BinaryExecutionEngine, cutlass.base_dsl.env_manager:get_prefix_dsl_libs
+- EN: External or standard-library dependencies: dataclasses:is_dataclass,fields, typing:Any,Callable,List,Optional,cast, tvm_ffi, tvm_ffi.utils:kwargs_wrapper CN: 外部或标准库依赖：dataclasses:is_dataclass,fields, typing:Any,Callable,List,Optional,cast, tvm_ffi, tvm_ffi.utils:kwargs_wrapper

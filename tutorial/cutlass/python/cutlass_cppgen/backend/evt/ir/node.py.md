@@ -1,0 +1,326 @@
+# node.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/ir/node.py`
+
+## Purpose / 作用
+- EN: Base & visitor classes of DAGIR Nodes
+- CN: 该模块的文档字符串将其描述为：Base & visitor classes of DAGIR Nodes
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Base & visitor classes of DAGIR Nodes` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L38** `from re import sub` — **EN:** Imports sub from `re`. **CN:** 从 `re` 导入 sub。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `from cutlass_library import LayoutType` — **EN:** Imports LayoutType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 LayoutType。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `from cutlass_cppgen.backend.evt.ir.layout_algorithm import _list_to_tuple, _reverse_tuple` — **EN:** Imports _list_to_tuple, _reverse_tuple from `cutlass_cppgen.backend.evt.ir.layout_algorithm`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.layout_algorithm` 导入 _list_to_tuple, _reverse_tuple。
+- **L43** `from cutlass_cppgen.backend.evt.ir.tensor import Tensor` — **EN:** Imports Tensor from `cutlass_cppgen.backend.evt.ir.tensor`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.tensor` 导入 Tensor。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `class TupleEmitter:` — **EN:** Defines class `TupleEmitter`. **CN:** 定义类 `TupleEmitter`。
+- **L47** `    """` — **EN:** Starts the docstring for the class `TupleEmitter`. **CN:** 开始说明 class `TupleEmitter` 的文档字符串。
+- **L48** `    Emit the cute tuple to C++ code` — **EN:** Continues the docstring for the class `TupleEmitter`. **CN:** 继续说明 class `TupleEmitter` 的文档字符串。
+- **L49** `    """` — **EN:** Ends the docstring for the class `TupleEmitter`. **CN:** 结束说明 class `TupleEmitter` 的文档字符串。
+- **L50** `    def __init__(self, stride_dtype):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L51** `        self.stride_dtype = stride_dtype` — **EN:** Assigns a value to self.stride_dtype. **CN:** 将一个值赋给 self.stride_dtype。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `    def emit(self, py_tuple):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L54** `        if isinstance(py_tuple, int):` — **EN:** Starts a conditional branch guarded by `isinstance(py_tuple, int)`. **CN:** 开始一个由 `isinstance(py_tuple, int)` 控制的条件分支。
+- **L55** `            if py_tuple in [0, 1]:` — **EN:** Starts a conditional branch guarded by `py_tuple in [0, 1]`. **CN:** 开始一个由 `py_tuple in [0, 1]` 控制的条件分支。
+- **L56** `                return f"cute::Int<{py_tuple}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L58** `                return f"{self.stride_dtype}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** `        elif isinstance(py_tuple, tuple):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L60** `            decl = "cute::Stride<"` — **EN:** Assigns a value to decl. **CN:** 将一个值赋给 decl。
+- **L61** `            for item in py_tuple:` — **EN:** Starts a loop assigning items from `py_tuple` to `item`. **CN:** 开始一个循环，将 `py_tuple` 的元素赋给 `item`。
+- **L62** `                decl += self.emit(item) + ", "` — **EN:** Updates decl in place. **CN:** 原地更新 decl。
+- **L63** `            return decl[:-2] + ">"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L64** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L65** `            raise ValueError(f"TupleEmitter.emit only accepts tuple or int, got {type(py_tuple).__name__}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `class ImplBase:` — **EN:** Defines class `ImplBase`. **CN:** 定义类 `ImplBase`。
+- **L69** `    """` — **EN:** Starts the docstring for the class `ImplBase`. **CN:** 开始说明 class `ImplBase` 的文档字符串。
+- **L70** `    Base class for Node Implementation` — **EN:** Continues the docstring for the class `ImplBase`. **CN:** 继续说明 class `ImplBase` 的文档字符串。
+- **L71** `    """` — **EN:** Ends the docstring for the class `ImplBase`. **CN:** 结束说明 class `ImplBase` 的文档字符串。
+- **L72** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L73** `        self.node = node` — **EN:** Assigns a value to self.node. **CN:** 将一个值赋给 self.node。
+- **L74** `        self.name = node.name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L75** `        self.tensor = node.tensor` — **EN:** Assigns a value to self.tensor. **CN:** 将一个值赋给 self.tensor。
+- **L76** `        self._type_decl = None` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L77** `        self.tuple_emitter = TupleEmitter("int64_t")` — **EN:** Assigns a value to self.tuple_emitter. **CN:** 将一个值赋给 self.tuple_emitter。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L80** `    def stride_dtype(self):` — **EN:** Defines function `stride_dtype`. **CN:** 定义函数 `stride_dtype`。
+- **L81** `        return self.tuple_emitter.stride_dtype` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `    @stride_dtype.setter` — **EN:** Applies decorator `stride_dtype.setter` to the following definition. **CN:** 将装饰器 `stride_dtype.setter` 应用于后面的定义。
+- **L84** `    def stride_dtype(self, stride_dtype):` — **EN:** Defines function `stride_dtype`. **CN:** 定义函数 `stride_dtype`。
+- **L85** `        self.tuple_emitter.stride_dtype = stride_dtype` — **EN:** Assigns a value to self.tuple_emitter.stride_dtype. **CN:** 将一个值赋给 self.tuple_emitter.stride_dtype。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L88** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L89** `        """` — **EN:** Starts the docstring for the function `match`. **CN:** 开始说明 function `match` 的文档字符串。
+- **L90** `        Match function used in get_underlying_impl` — **EN:** Continues the docstring for the function `match`. **CN:** 继续说明 function `match` 的文档字符串。
+- **L91** `        """` — **EN:** Ends the docstring for the function `match`. **CN:** 结束说明 function `match` 的文档字符串。
+- **L92** `        raise NotImplementedError(f"The \`match\` function is not defined.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L95** `    def argument_type(self):` — **EN:** Defines function `argument_type`. **CN:** 定义函数 `argument_type`。
+- **L96** `        """` — **EN:** Starts the docstring for the function `argument_type`. **CN:** 开始说明 function `argument_type` 的文档字符串。
+- **L97** `        Default class for Argument Type` — **EN:** Continues the docstring for the function `argument_type`. **CN:** 继续说明 function `argument_type` 的文档字符串。
+- **L98** `        """` — **EN:** Ends the docstring for the function `argument_type`. **CN:** 结束说明 function `argument_type` 的文档字符串。
+- **L99** `        class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L100** `            _fields_ = []` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `            def __init__(self, *args, **kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L103** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `        return _Argument` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L108** `    def name_camel(self) -> str:` — **EN:** Defines function `name_camel`. **CN:** 定义函数 `name_camel`。
+- **L109** `        """` — **EN:** Starts the docstring for the function `name_camel`. **CN:** 开始说明 function `name_camel` 的文档字符串。
+- **L110** `        Return the CamelCase name.` — **EN:** Continues the docstring for the function `name_camel`. **CN:** 继续说明 function `name_camel` 的文档字符串。
+- **L111** `        """` — **EN:** Ends the docstring for the function `name_camel`. **CN:** 结束说明 function `name_camel` 的文档字符串。
+- **L112** `        return sub(r"(_|-)+", " ", self.name).title().replace(" ", "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L115** `    def stride_mnl(self):` — **EN:** Defines function `stride_mnl`. **CN:** 定义函数 `stride_mnl`。
+- **L116** `        """` — **EN:** Starts the docstring for the function `stride_mnl`. **CN:** 开始说明 function `stride_mnl` 的文档字符串。
+- **L117** `        Typename StrideMNL` — **EN:** Continues the docstring for the function `stride_mnl`. **CN:** 继续说明 function `stride_mnl` 的文档字符串。
+- **L118** `        """` — **EN:** Ends the docstring for the function `stride_mnl`. **CN:** 结束说明 function `stride_mnl` 的文档字符串。
+- **L119** `        stride = _list_to_tuple([self.stride[-2], self.stride[-1]] + list(_reverse_tuple(tuple(self.stride[:-2]))))` — **EN:** Assigns a value to stride. **CN:** 将一个值赋给 stride。
+- **L120** `        return self.tuple_emitter.emit(stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `    def get_non_constant_stride(self, py_tuple):` — **EN:** Defines function `get_non_constant_stride`. **CN:** 定义函数 `get_non_constant_stride`。
+- **L123** `        if isinstance(py_tuple, int):` — **EN:** Starts a conditional branch guarded by `isinstance(py_tuple, int)`. **CN:** 开始一个由 `isinstance(py_tuple, int)` 控制的条件分支。
+- **L124** `            if py_tuple not in [0, 1]:` — **EN:** Starts a conditional branch guarded by `py_tuple not in [0, 1]`. **CN:** 开始一个由 `py_tuple not in [0, 1]` 控制的条件分支。
+- **L125** `                return py_tuple` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L127** `                return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** `        non_constant_stride = []` — **EN:** Assigns a value to non_constant_stride. **CN:** 将一个值赋给 non_constant_stride。
+- **L129** `        for item in py_tuple:` — **EN:** Starts a loop assigning items from `py_tuple` to `item`. **CN:** 开始一个循环，将 `py_tuple` 的元素赋给 `item`。
+- **L130** `            item_out = self.get_non_constant_stride(item)` — **EN:** Assigns a value to item_out. **CN:** 将一个值赋给 item_out。
+- **L131** `            if item_out:` — **EN:** Starts a conditional branch guarded by `item_out`. **CN:** 开始一个由 `item_out` 控制的条件分支。
+- **L132** `                non_constant_stride.append(item_out)` — **EN:** Invokes `non_constant_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `non_constant_stride.append`。
+- **L133** `        return tuple(non_constant_stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    def get_stride_mnl(self):` — **EN:** Defines function `get_stride_mnl`. **CN:** 定义函数 `get_stride_mnl`。
+- **L136** `        """` — **EN:** Starts the docstring for the function `get_stride_mnl`. **CN:** 开始说明 function `get_stride_mnl` 的文档字符串。
+- **L137** `        Get the non-zero stride mnl. This is used in argument construction` — **EN:** Continues the docstring for the function `get_stride_mnl`. **CN:** 继续说明 function `get_stride_mnl` 的文档字符串。
+- **L138** `        """` — **EN:** Ends the docstring for the function `get_stride_mnl`. **CN:** 结束说明 function `get_stride_mnl` 的文档字符串。
+- **L139** `        stride = _list_to_tuple([self.stride[-2], self.stride[-1]] + list(_reverse_tuple(tuple(self.stride[:-2]))))` — **EN:** Assigns a value to stride. **CN:** 将一个值赋给 stride。
+- **L140** `        return stride` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    def get_smem_size(self, *args, **kwargs):` — **EN:** Defines function `get_smem_size`. **CN:** 定义函数 `get_smem_size`。
+- **L143** `        """` — **EN:** Starts the docstring for the function `get_smem_size`. **CN:** 开始说明 function `get_smem_size` 的文档字符串。
+- **L144** `        Get the shared memory size and alignment of current node` — **EN:** Continues the docstring for the function `get_smem_size`. **CN:** 继续说明 function `get_smem_size` 的文档字符串。
+- **L145** `        """` — **EN:** Ends the docstring for the function `get_smem_size`. **CN:** 结束说明 function `get_smem_size` 的文档字符串。
+- **L146** `        return (0, 1)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `class NoOpImpl(ImplBase):` — **EN:** Defines class `NoOpImpl` with bases ImplBase. **CN:** 定义类 `NoOpImpl`，其基类为 ImplBase。
+- **L150** `    """` — **EN:** Starts the docstring for the class `NoOpImpl`. **CN:** 开始说明 class `NoOpImpl` 的文档字符串。
+- **L151** `    The NoOpImpl does nothing but forward its input to users` — **EN:** Continues the docstring for the class `NoOpImpl`. **CN:** 继续说明 class `NoOpImpl` 的文档字符串。
+- **L152** `    """` — **EN:** Ends the docstring for the class `NoOpImpl`. **CN:** 结束说明 class `NoOpImpl` 的文档字符串。
+- **L153** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L154** `        super().__init__(node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L157** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L158** `        if node.op == "store":` — **EN:** Starts a conditional branch guarded by `node.op == 'store'`. **CN:** 开始一个由 `node.op == 'store'` 控制的条件分支。
+- **L159** `            # Store that is not output is a No OP` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L160** `            return not node.is_output` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `class NodeBase:` — **EN:** Defines class `NodeBase`. **CN:** 定义类 `NodeBase`。
+- **L164** `    """` — **EN:** Starts the docstring for the class `NodeBase`. **CN:** 开始说明 class `NodeBase` 的文档字符串。
+- **L165** `    Base class of DAG Node` — **EN:** Continues the docstring for the class `NodeBase`. **CN:** 继续说明 class `NodeBase` 的文档字符串。
+- **L166** `    """` — **EN:** Ends the docstring for the class `NodeBase`. **CN:** 结束说明 class `NodeBase` 的文档字符串。
+- **L167** `    def __init__(self, name: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L168** `        self.name = name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L169** `        self.underlying_impl = None` — **EN:** Assigns a value to self.underlying_impl. **CN:** 将一个值赋给 self.underlying_impl。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `        self._tensor = None` — **EN:** Assigns a value to self._tensor. **CN:** 将一个值赋给 self._tensor。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `        # Whether the node is disabled for emit` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L174** `        self.disabled = False` — **EN:** Assigns a value to self.disabled. **CN:** 将一个值赋给 self.disabled。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L177** `    def name_camel(self) -> str:` — **EN:** Defines function `name_camel`. **CN:** 定义函数 `name_camel`。
+- **L178** `        """` — **EN:** Starts the docstring for the function `name_camel`. **CN:** 开始说明 function `name_camel` 的文档字符串。
+- **L179** `        Return the CamelCase name.` — **EN:** Continues the docstring for the function `name_camel`. **CN:** 继续说明 function `name_camel` 的文档字符串。
+- **L180** `        """` — **EN:** Ends the docstring for the function `name_camel`. **CN:** 结束说明 function `name_camel` 的文档字符串。
+- **L181** `        return self.underlying_impl.name_camel` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L184** `    def tensor(self) -> Tensor:` — **EN:** Defines function `tensor`. **CN:** 定义函数 `tensor`。
+- **L185** `        """` — **EN:** Starts the docstring for the function `tensor`. **CN:** 开始说明 function `tensor` 的文档字符串。
+- **L186** `        Return the output tensor (concept: cutlass_cppgen.backend.evt.ir.tensor)` — **EN:** Continues the docstring for the function `tensor`. **CN:** 继续说明 function `tensor` 的文档字符串。
+- **L187** `        """` — **EN:** Ends the docstring for the function `tensor`. **CN:** 结束说明 function `tensor` 的文档字符串。
+- **L188** `        return self._tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    @tensor.setter` — **EN:** Applies decorator `tensor.setter` to the following definition. **CN:** 将装饰器 `tensor.setter` 应用于后面的定义。
+- **L191** `    def tensor(self, kwargs):` — **EN:** Defines function `tensor`. **CN:** 定义函数 `tensor`。
+- **L192** `        """` — **EN:** Starts the docstring for the function `tensor`. **CN:** 开始说明 function `tensor` 的文档字符串。
+- **L193** `        Setting the tensor` — **EN:** Continues the docstring for the function `tensor`. **CN:** 继续说明 function `tensor` 的文档字符串。
+- **L194** `        """` — **EN:** Ends the docstring for the function `tensor`. **CN:** 结束说明 function `tensor` 的文档字符串。
+- **L195** `        self._tensor = Tensor(**kwargs)` — **EN:** Assigns a value to self._tensor. **CN:** 将一个值赋给 self._tensor。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L198** `    # Helper functions for type/shape propagation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L199** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    def shape_propagation(self, input_node_metas):` — **EN:** Defines function `shape_propagation`. **CN:** 定义函数 `shape_propagation`。
+- **L202** `        """` — **EN:** Starts the docstring for the function `shape_propagation`. **CN:** 开始说明 function `shape_propagation` 的文档字符串。
+- **L203** `        Infer shape from input nodes` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L204** `        General Broadcasting Rules from NumPy` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L205** `        When operating on two arrays, we compare their shapes element-wise.` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L206** `        It starts with the trailing (i.e. rightmost) dimension and works its` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L207** `        way left. Two dimensions are compatible when` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L208** `        1. they are equal` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L209** `        2. one of them is 1` — **EN:** Continues the docstring for the function `shape_propagation`. **CN:** 继续说明 function `shape_propagation` 的文档字符串。
+- **L210** `        """` — **EN:** Ends the docstring for the function `shape_propagation`. **CN:** 结束说明 function `shape_propagation` 的文档字符串。
+- **L211** `        if self._tensor is not None:` — **EN:** Starts a conditional branch guarded by `self._tensor is not None`. **CN:** 开始一个由 `self._tensor is not None` 控制的条件分支。
+- **L212** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `        shape = None` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L215** `        for src in input_node_metas:` — **EN:** Starts a loop assigning items from `input_node_metas` to `src`. **CN:** 开始一个循环，将 `input_node_metas` 的元素赋给 `src`。
+- **L216** `            src_shape = src.tensor.shape` — **EN:** Assigns a value to src_shape. **CN:** 将一个值赋给 src_shape。
+- **L217** `            if shape is None:` — **EN:** Starts a conditional branch guarded by `shape is None`. **CN:** 开始一个由 `shape is None` 控制的条件分支。
+- **L218** `                shape = src_shape` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L219** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L220** `                len_difference = len(shape) - len(src_shape)` — **EN:** Assigns a value to len_difference. **CN:** 将一个值赋给 len_difference。
+- **L221** `                if len_difference > 0:` — **EN:** Starts a conditional branch guarded by `len_difference > 0`. **CN:** 开始一个由 `len_difference > 0` 控制的条件分支。
+- **L222** `                    for _ in range(len_difference):` — **EN:** Starts a loop assigning items from `range(len_difference)` to `_`. **CN:** 开始一个循环，将 `range(len_difference)` 的元素赋给 `_`。
+- **L223** `                        src_shape = [1, ] + list(src_shape)` — **EN:** Assigns a value to src_shape. **CN:** 将一个值赋给 src_shape。
+- **L224** `                elif len_difference < 0:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L225** `                    for _ in range(-len_difference):` — **EN:** Starts a loop assigning items from `range(-len_difference)` to `_`. **CN:** 开始一个循环，将 `range(-len_difference)` 的元素赋给 `_`。
+- **L226** `                        shape = [1, ] + list(shape)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L227** `                broadcasted_shape = []` — **EN:** Assigns a value to broadcasted_shape. **CN:** 将一个值赋给 broadcasted_shape。
+- **L228** `                # Infer broadcast shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L229** `                for shape_dim, src_dim in zip(reversed(shape), reversed(src_shape)):` — **EN:** Starts a loop assigning items from `zip(reversed(shape), reversed(src_shape))` to `(shape_dim, src_dim)`. **CN:** 开始一个循环，将 `zip(reversed(shape), reversed(src_shape))` 的元素赋给 `(shape_dim, src_dim)`。
+- **L230** `                    if shape_dim == 1:` — **EN:** Starts a conditional branch guarded by `shape_dim == 1`. **CN:** 开始一个由 `shape_dim == 1` 控制的条件分支。
+- **L231** `                        broadcasted_shape = [src_dim, ] + list(broadcasted_shape)` — **EN:** Assigns a value to broadcasted_shape. **CN:** 将一个值赋给 broadcasted_shape。
+- **L232** `                    elif src_dim == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L233** `                        broadcasted_shape = [shape_dim, ] + list(broadcasted_shape)` — **EN:** Assigns a value to broadcasted_shape. **CN:** 将一个值赋给 broadcasted_shape。
+- **L234** `                    elif shape_dim == src_dim:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L235** `                        broadcasted_shape = [shape_dim, ] + list(broadcasted_shape)` — **EN:** Assigns a value to broadcasted_shape. **CN:** 将一个值赋给 broadcasted_shape。
+- **L236** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L237** `                        error_msg = "Dimension mismatch between "` — **EN:** Assigns a value to error_msg. **CN:** 将一个值赋给 error_msg。
+- **L238** `                        for src_ in input_node_metas:` — **EN:** Starts a loop assigning items from `input_node_metas` to `src_`. **CN:** 开始一个循环，将 `input_node_metas` 的元素赋给 `src_`。
+- **L239** `                            error_msg += f"{src_.name}{src_.tensor.shape}, "` — **EN:** Updates error_msg in place. **CN:** 原地更新 error_msg。
+- **L240** `                        error_msg = error_msg[:-2] + "."` — **EN:** Assigns a value to error_msg. **CN:** 将一个值赋给 error_msg。
+- **L241** `                        raise RuntimeError(error_msg)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L242** `                shape = tuple(broadcasted_shape)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `        self._tensor = Tensor(element=self.element_output, shape=shape, layout_tag=LayoutType.RowMajor)` — **EN:** Assigns a value to self._tensor. **CN:** 将一个值赋给 self._tensor。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `    def type_propagation(self, *args, **kwargs):` — **EN:** Defines function `type_propagation`. **CN:** 定义函数 `type_propagation`。
+- **L247** `        """` — **EN:** Starts the docstring for the function `type_propagation`. **CN:** 开始说明 function `type_propagation` 的文档字符串。
+- **L248** `        Each node is associated with two data types: \`element\` and \`element_output\`.` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L249** `        The \`element_output\` is the type of return array of the node. The \`element\`` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L250** `        has specific meaning for different node types.` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L251** `        * Load Node: data type of tensor in gmem` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L252** `        * Compute Node: element compute` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L253** `        * Store Node: data type of tensor in gmem` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L254** `        This function must be overloaded in the derived classes` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L255** `        """` — **EN:** Ends the docstring for the function `type_propagation`. **CN:** 结束说明 function `type_propagation` 的文档字符串。
+- **L256** `        raise NotImplementedError(f"Function \`type_propagation\` is not overloaded in {self.__class__.__name__}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `    def broadcast_propagation(self, input_node_metas: 'list[NodeBase]'):` — **EN:** Defines function `broadcast_propagation`. **CN:** 定义函数 `broadcast_propagation`。
+- **L259** `        """` — **EN:** Starts the docstring for the function `broadcast_propagation`. **CN:** 开始说明 function `broadcast_propagation` 的文档字符串。
+- **L260** `        Propagate the broadcast in the reversed topological order.` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L261** `        For example:` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L262** `            C[l, m, n] = A[m, 1] + B[l, m, n]` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L263** `        After the broadcast propagation, it will be come` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L264** `            C[l, m, n] = A[l, m, n] + B[l, m, n]` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L265** `        and each tensor will have a proper stride accessing the underlying tensor` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L266** `        """` — **EN:** Ends the docstring for the function `broadcast_propagation`. **CN:** 结束说明 function `broadcast_propagation` 的文档字符串。
+- **L267** `        if self.tensor is None:` — **EN:** Starts a conditional branch guarded by `self.tensor is None`. **CN:** 开始一个由 `self.tensor is None` 控制的条件分支。
+- **L268** `            raise RuntimeError(f"The tensor of node {self.name} is unknown.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L269** `        for child in input_node_metas:` — **EN:** Starts a loop assigning items from `input_node_metas` to `child`. **CN:** 开始一个循环，将 `input_node_metas` 的元素赋给 `child`。
+- **L270** `            child.tensor.broadcast(self.tensor.shape)` — **EN:** Invokes `child.tensor.broadcast` as a standalone call. **CN:** 以独立语句方式调用 `child.tensor.broadcast`。
+- **L271** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L272** `    def get_underlying_impl(self, problem_size: tuple):` — **EN:** Defines function `get_underlying_impl`. **CN:** 定义函数 `get_underlying_impl`。
+- **L273** `        """` — **EN:** Starts the docstring for the function `get_underlying_impl`. **CN:** 开始说明 function `get_underlying_impl` 的文档字符串。
+- **L274** `        Get the underlying implementation of the current node.` — **EN:** Continues the docstring for the function `get_underlying_impl`. **CN:** 继续说明 function `get_underlying_impl` 的文档字符串。
+- **L275** `        """` — **EN:** Ends the docstring for the function `get_underlying_impl`. **CN:** 结束说明 function `get_underlying_impl` 的文档字符串。
+- **L276** `        if self.tensor is None:` — **EN:** Starts a conditional branch guarded by `self.tensor is None`. **CN:** 开始一个由 `self.tensor is None` 控制的条件分支。
+- **L277** `            raise RuntimeError(f"The Layout of node {self.name} is unknown. Please call PassShapeTypePropagation first.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L279** `        for impl in self.possible_impls:` — **EN:** Starts a loop assigning items from `self.possible_impls` to `impl`. **CN:** 开始一个循环，将 `self.possible_impls` 的元素赋给 `impl`。
+- **L280** `            if impl.match(self, problem_size):` — **EN:** Starts a conditional branch guarded by `impl.match(self, problem_size)`. **CN:** 开始一个由 `impl.match(self, problem_size)` 控制的条件分支。
+- **L281** `                self.underlying_impl = impl(self)` — **EN:** Assigns a value to self.underlying_impl. **CN:** 将一个值赋给 self.underlying_impl。
+- **L282** `                break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `        if self.underlying_impl is None:` — **EN:** Starts a conditional branch guarded by `self.underlying_impl is None`. **CN:** 开始一个由 `self.underlying_impl is None` 控制的条件分支。
+- **L285** `            raise NotImplementedError(f"No matching op for node {self.name} with stride {self.tensor.stride}.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L288** `# Visitor Nodes & Impls` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L289** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `class TopoVisitorImpl(ImplBase):` — **EN:** Defines class `TopoVisitorImpl` with bases ImplBase. **CN:** 定义类 `TopoVisitorImpl`，其基类为 ImplBase。
+- **L292** `    """` — **EN:** Starts the docstring for the class `TopoVisitorImpl`. **CN:** 开始说明 class `TopoVisitorImpl` 的文档字符串。
+- **L293** `    Impl for topological visitor` — **EN:** Continues the docstring for the class `TopoVisitorImpl`. **CN:** 继续说明 class `TopoVisitorImpl` 的文档字符串。
+- **L294** `    """` — **EN:** Ends the docstring for the class `TopoVisitorImpl`. **CN:** 结束说明 class `TopoVisitorImpl` 的文档字符串。
+- **L295** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L296** `        super().__init__(node.output_node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L297** `        self.name = node.name` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L298** `        self.element_output = node.output_node.element_output` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `class TopoVisitorNode(NodeBase):` — **EN:** Defines class `TopoVisitorNode` with bases NodeBase. **CN:** 定义类 `TopoVisitorNode`，其基类为 NodeBase。
+- **L301** `    def __init__(self, name: str, subgraph, output_node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L302** `        super().__init__(name)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L303** `        self.subgraph = subgraph` — **EN:** Assigns a value to self.subgraph. **CN:** 将一个值赋给 self.subgraph。
+- **L304** `        self.output_node = output_node` — **EN:** Assigns a value to self.output_node. **CN:** 将一个值赋给 self.output_node。
+- **L305** `        self.op = "dag"` — **EN:** Assigns a value to self.op. **CN:** 将一个值赋给 self.op。
+- **L306** `        self.underlying_impl = TopoVisitorImpl(self)` — **EN:** Assigns a value to self.underlying_impl. **CN:** 将一个值赋给 self.underlying_impl。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.ir.node`. CN: 模块名为 `cutlass_cppgen.backend.evt.ir.node`。
+- EN: Module docstring summary: Base & visitor classes of DAGIR Nodes CN: 模块文档摘要为：Base & visitor classes of DAGIR Nodes
+- EN: Top-level classes: TupleEmitter, ImplBase, NoOpImpl, NodeBase, TopoVisitorImpl, TopoVisitorNode CN: 顶层类包括：TupleEmitter, ImplBase, NoOpImpl, NodeBase, TopoVisitorImpl, TopoVisitorNode
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:LayoutType, cutlass_cppgen.backend.evt.ir.layout_algorithm:_list_to_tuple,_reverse_tuple, cutlass_cppgen.backend.evt.ir.tensor:Tensor CN: 内部依赖：cutlass_library:LayoutType, cutlass_cppgen.backend.evt.ir.layout_algorithm:_list_to_tuple,_reverse_tuple, cutlass_cppgen.backend.evt.ir.tensor:Tensor
+- EN: External or standard-library dependencies: ctypes, re:sub CN: 外部或标准库依赖：ctypes, re:sub

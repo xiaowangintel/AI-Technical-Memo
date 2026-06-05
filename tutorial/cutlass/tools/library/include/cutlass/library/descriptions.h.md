@@ -1,0 +1,2476 @@
+# descriptions.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/include/cutlass/library/descriptions.h`
+**Purpose / 用途**: Declares metadata and type descriptions used by the CUTLASS library runtime. / 声明 CUTLASS 运行时库使用的元数据与类型描述。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>#include &lt;cutlass/library/types.h&gt;</code>
+  - EN: Includes `cutlass/library/types.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/types.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L35** <code>#include &lt;cutlass/blas3_types.h&gt;</code>
+  - EN: Includes `cutlass/blas3_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/blas3_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L36** <code>#include &lt;cutlass/gemm_coord.h&gt;</code>
+  - EN: Includes `cutlass/gemm_coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/gemm_coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>#include &lt;optional&gt;</code>
+  - EN: Includes `optional` so this file can use APIs or definitions from `optional`.
+  - CN: 引入 `optional`，使当前文件可以使用来自 `optional` 的 API 或定义。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L43** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>struct MathInstructionDescription {</code>
+  - EN: Begins the declaration of struct `MathInstructionDescription`.
+  - CN: 开始声明 struct `MathInstructionDescription`。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>  /// Shape of the target math instruction</code>
+  - EN: Comment that documents intent or context: "Shape of the target math instruction".
+  - CN: 用于说明意图或上下文的注释："Shape of the target math instruction"。
+- **L50** <code>  cutlass::gemm::GemmCoord instruction_shape;</code>
+  - EN: Declares the symbol `instruction_shape` in the current scope.
+  - CN: 在当前作用域中声明符号 `instruction_shape`。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>  /// Describes the data type of the internal accumulator</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the internal accumulator".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the internal accumulator"。
+- **L53** <code>  NumericTypeID element_accumulator;</code>
+  - EN: Declares the symbol `element_accumulator` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_accumulator`。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>  /// Classification of math instruction</code>
+  - EN: Comment that documents intent or context: "Classification of math instruction".
+  - CN: 用于说明意图或上下文的注释："Classification of math instruction"。
+- **L56** <code>  OpcodeClassID opcode_class;</code>
+  - EN: Declares the symbol `opcode_class` in the current scope.
+  - CN: 在当前作用域中声明符号 `opcode_class`。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>  /// Type of math operation performed</code>
+  - EN: Comment that documents intent or context: "Type of math operation performed".
+  - CN: 用于说明意图或上下文的注释："Type of math operation performed"。
+- **L59** <code>  MathOperationID math_operation;</code>
+  - EN: Declares the symbol `math_operation` in the current scope.
+  - CN: 在当前作用域中声明符号 `math_operation`。
+- **L60** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L61** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L62** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L63** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L64** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L65** <code>  MathInstructionDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `MathInstructionDescription`.
+  - CN: 开始或继续与 `MathInstructionDescription` 相关的签名/调用语法。
+- **L66** <code>    cutlass::gemm::GemmCoord instruction_shape = cutlass::gemm::GemmCoord(),</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmCoord`.
+  - CN: 开始或继续与 `GemmCoord` 相关的签名/调用语法。
+- **L67** <code>    NumericTypeID element_accumulator = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_accumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_accumulator` 进行赋值或初始化。
+- **L68** <code>    OpcodeClassID opcode_class = OpcodeClassID::kInvalid,</code>
+  - EN: Assigns or initializes `opcode_class` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `opcode_class` 进行赋值或初始化。
+- **L69** <code>    MathOperationID math_operation = MathOperationID::kMultiplyAdd</code>
+  - EN: Assigns or initializes `math_operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `math_operation` 进行赋值或初始化。
+- **L70** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L71** <code>    instruction_shape(instruction_shape), </code>
+  - EN: Begins or continues the signature/call syntax involving `instruction_shape`.
+  - CN: 开始或继续与 `instruction_shape` 相关的签名/调用语法。
+- **L72** <code>    element_accumulator(element_accumulator), </code>
+  - EN: Begins or continues the signature/call syntax involving `element_accumulator`.
+  - CN: 开始或继续与 `element_accumulator` 相关的签名/调用语法。
+- **L73** <code>    opcode_class(opcode_class),</code>
+  - EN: Begins or continues the signature/call syntax involving `opcode_class`.
+  - CN: 开始或继续与 `opcode_class` 相关的签名/调用语法。
+- **L74** <code>    math_operation(math_operation) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `math_operation`.
+  - CN: 开始或继续与 `math_operation` 相关的签名/调用语法。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>  // Equality operator</code>
+  - EN: Comment that documents intent or context: "Equality operator".
+  - CN: 用于说明意图或上下文的注释："Equality operator"。
+- **L77** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L78** <code>  bool operator==(MathInstructionDescription const&amp; rhs) const{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L79** <code>    return (</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L80** <code>      (instruction_shape == rhs.instruction_shape) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L81** <code>      (element_accumulator == rhs.element_accumulator) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L82** <code>      (opcode_class == rhs.opcode_class) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L83** <code>      (math_operation == rhs.math_operation));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L84** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>  // Inequality operator</code>
+  - EN: Comment that documents intent or context: "Inequality operator".
+  - CN: 用于说明意图或上下文的注释："Inequality operator"。
+- **L87** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L88** <code>  bool operator!=(MathInstructionDescription const&amp; rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L89** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L90** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>/// Structure describing the tiled structure of a GEMM-like computation</code>
+  - EN: Comment that documents intent or context: "Structure describing the tiled structure of a GEMM-like computation".
+  - CN: 用于说明意图或上下文的注释："Structure describing the tiled structure of a GEMM-like computation"。
+- **L95** <code>struct TileDescription {</code>
+  - EN: Begins the declaration of struct `TileDescription`.
+  - CN: 开始声明 struct `TileDescription`。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>  /// Describes the shape of a threadblock (in elements)</code>
+  - EN: Comment that documents intent or context: "Describes the shape of a threadblock (in elements)".
+  - CN: 用于说明意图或上下文的注释："Describes the shape of a threadblock (in elements)"。
+- **L98** <code>  cutlass::gemm::GemmCoord threadblock_shape;</code>
+  - EN: Declares the symbol `threadblock_shape` in the current scope.
+  - CN: 在当前作用域中声明符号 `threadblock_shape`。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>  /// Describes the number of pipeline stages in the threadblock-scoped mainloop</code>
+  - EN: Comment that documents intent or context: "Describes the number of pipeline stages in the threadblock-scoped mainloop".
+  - CN: 用于说明意图或上下文的注释："Describes the number of pipeline stages in the threadblock-scoped mainloop"。
+- **L101** <code>  int threadblock_stages;</code>
+  - EN: Declares the symbol `threadblock_stages` in the current scope.
+  - CN: 在当前作用域中声明符号 `threadblock_stages`。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>  /// Number of warps in each logical dimension</code>
+  - EN: Comment that documents intent or context: "Number of warps in each logical dimension".
+  - CN: 用于说明意图或上下文的注释："Number of warps in each logical dimension"。
+- **L104** <code>  cutlass::gemm::GemmCoord warp_count;</code>
+  - EN: Declares the symbol `warp_count` in the current scope.
+  - CN: 在当前作用域中声明符号 `warp_count`。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>  /// Core math instruction</code>
+  - EN: Comment that documents intent or context: "Core math instruction".
+  - CN: 用于说明意图或上下文的注释："Core math instruction"。
+- **L107** <code>  MathInstructionDescription math_instruction;</code>
+  - EN: Declares the symbol `math_instruction` in the current scope.
+  - CN: 在当前作用域中声明符号 `math_instruction`。
+- **L108** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L109** <code>  /// Minimum compute capability (e.g. 70, 75) of a device eligible to run the operation.</code>
+  - EN: Comment that documents intent or context: "Minimum compute capability (e.g. 70, 75) of a device eligible to run the operation.".
+  - CN: 用于说明意图或上下文的注释："Minimum compute capability (e.g. 70, 75) of a device eligible to run the operation."。
+- **L110** <code>  int minimum_compute_capability;</code>
+  - EN: Declares the symbol `minimum_compute_capability` in the current scope.
+  - CN: 在当前作用域中声明符号 `minimum_compute_capability`。
+- **L111** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L112** <code>  /// Minimum compute capability (e.g. 70, 75) of a device eligible to run the operation.</code>
+  - EN: Comment that documents intent or context: "Minimum compute capability (e.g. 70, 75) of a device eligible to run the operation.".
+  - CN: 用于说明意图或上下文的注释："Minimum compute capability (e.g. 70, 75) of a device eligible to run the operation."。
+- **L113** <code>  int maximum_compute_capability;</code>
+  - EN: Declares the symbol `maximum_compute_capability` in the current scope.
+  - CN: 在当前作用域中声明符号 `maximum_compute_capability`。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>  /// Describes the shape of a cluster (in blocks)</code>
+  - EN: Comment that documents intent or context: "Describes the shape of a cluster (in blocks)".
+  - CN: 用于说明意图或上下文的注释："Describes the shape of a cluster (in blocks)"。
+- **L116** <code>  cutlass::gemm::GemmCoord cluster_shape;</code>
+  - EN: Declares the symbol `cluster_shape` in the current scope.
+  - CN: 在当前作用域中声明符号 `cluster_shape`。
+- **L117** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L118** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L119** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L120** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L121** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>  TileDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `TileDescription`.
+  - CN: 开始或继续与 `TileDescription` 相关的签名/调用语法。
+- **L123** <code>    cutlass::gemm::GemmCoord threadblock_shape = cutlass::gemm::GemmCoord(),</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmCoord`.
+  - CN: 开始或继续与 `GemmCoord` 相关的签名/调用语法。
+- **L124** <code>    int threadblock_stages = 0,</code>
+  - EN: Assigns or initializes `threadblock_stages` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `threadblock_stages` 进行赋值或初始化。
+- **L125** <code>    cutlass::gemm::GemmCoord warp_count = cutlass::gemm::GemmCoord(),</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmCoord`.
+  - CN: 开始或继续与 `GemmCoord` 相关的签名/调用语法。
+- **L126** <code>    MathInstructionDescription math_instruction = MathInstructionDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `MathInstructionDescription`.
+  - CN: 开始或继续与 `MathInstructionDescription` 相关的签名/调用语法。
+- **L127** <code>    int minimum_compute_capability = 0,</code>
+  - EN: Assigns or initializes `minimum_compute_capability` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `minimum_compute_capability` 进行赋值或初始化。
+- **L128** <code>    int maximum_compute_capability = 0,</code>
+  - EN: Assigns or initializes `maximum_compute_capability` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `maximum_compute_capability` 进行赋值或初始化。
+- **L129** <code>    cutlass::gemm::GemmCoord cluster_shape = cutlass::gemm::GemmCoord(1,1,1)</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmCoord`.
+  - CN: 开始或继续与 `GemmCoord` 相关的签名/调用语法。
+- **L130** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L131** <code>    threadblock_shape(threadblock_shape), </code>
+  - EN: Begins or continues the signature/call syntax involving `threadblock_shape`.
+  - CN: 开始或继续与 `threadblock_shape` 相关的签名/调用语法。
+- **L132** <code>    threadblock_stages(threadblock_stages), </code>
+  - EN: Begins or continues the signature/call syntax involving `threadblock_stages`.
+  - CN: 开始或继续与 `threadblock_stages` 相关的签名/调用语法。
+- **L133** <code>    warp_count(warp_count),</code>
+  - EN: Begins or continues the signature/call syntax involving `warp_count`.
+  - CN: 开始或继续与 `warp_count` 相关的签名/调用语法。
+- **L134** <code>    math_instruction(math_instruction),</code>
+  - EN: Begins or continues the signature/call syntax involving `math_instruction`.
+  - CN: 开始或继续与 `math_instruction` 相关的签名/调用语法。
+- **L135** <code>    minimum_compute_capability(minimum_compute_capability),</code>
+  - EN: Begins or continues the signature/call syntax involving `minimum_compute_capability`.
+  - CN: 开始或继续与 `minimum_compute_capability` 相关的签名/调用语法。
+- **L136** <code>    maximum_compute_capability(maximum_compute_capability),</code>
+  - EN: Begins or continues the signature/call syntax involving `maximum_compute_capability`.
+  - CN: 开始或继续与 `maximum_compute_capability` 相关的签名/调用语法。
+- **L137** <code>    cluster_shape(cluster_shape) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `cluster_shape`.
+  - CN: 开始或继续与 `cluster_shape` 相关的签名/调用语法。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>  // Equality operator</code>
+  - EN: Comment that documents intent or context: "Equality operator".
+  - CN: 用于说明意图或上下文的注释："Equality operator"。
+- **L140** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L141** <code>  bool operator==(TileDescription const&amp; rhs) const{</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L142** <code>    return (</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L143** <code>      (threadblock_shape == rhs.threadblock_shape) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>      (threadblock_stages == rhs.threadblock_stages) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L145** <code>      (warp_count == rhs.warp_count) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L146** <code>      (math_instruction == rhs.math_instruction) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L147** <code>      (minimum_compute_capability == rhs.minimum_compute_capability) &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L148** <code>      (maximum_compute_capability == rhs.maximum_compute_capability));</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L149** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>  // Inequality operator</code>
+  - EN: Comment that documents intent or context: "Inequality operator".
+  - CN: 用于说明意图或上下文的注释："Inequality operator"。
+- **L152** <code>  inline</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L153** <code>  bool operator!=(TileDescription const&amp; rhs) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L154** <code>    return !(*this == rhs);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L155** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L156** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L157** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L158** <code>/// High-level description of an operation</code>
+  - EN: Comment that documents intent or context: "High-level description of an operation".
+  - CN: 用于说明意图或上下文的注释："High-level description of an operation"。
+- **L159** <code>struct OperationDescription {</code>
+  - EN: Begins the declaration of struct `OperationDescription`.
+  - CN: 开始声明 struct `OperationDescription`。
+- **L160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L161** <code>  /// Unique identifier describing the operation</code>
+  - EN: Comment that documents intent or context: "Unique identifier describing the operation".
+  - CN: 用于说明意图或上下文的注释："Unique identifier describing the operation"。
+- **L162** <code>  char const * name;</code>
+  - EN: Declares the symbol `name` in the current scope.
+  - CN: 在当前作用域中声明符号 `name`。
+- **L163** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L164** <code>  /// Operation provider</code>
+  - EN: Comment that documents intent or context: "Operation provider".
+  - CN: 用于说明意图或上下文的注释："Operation provider"。
+- **L165** <code>  Provider provider;</code>
+  - EN: Declares the symbol `provider` in the current scope.
+  - CN: 在当前作用域中声明符号 `provider`。
+- **L166** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L167** <code>  /// Kind of operation</code>
+  - EN: Comment that documents intent or context: "Kind of operation".
+  - CN: 用于说明意图或上下文的注释："Kind of operation"。
+- **L168** <code>  OperationKind kind;</code>
+  - EN: Declares the symbol `kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `kind`。
+- **L169** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L170** <code>  /// Describes the tiled structure of a GEMM-like computation</code>
+  - EN: Comment that documents intent or context: "Describes the tiled structure of a GEMM-like computation".
+  - CN: 用于说明意图或上下文的注释："Describes the tiled structure of a GEMM-like computation"。
+- **L171** <code>  TileDescription tile_description;</code>
+  - EN: Declares the symbol `tile_description` in the current scope.
+  - CN: 在当前作用域中声明符号 `tile_description`。
+- **L172** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L173** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L174** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L175** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L176** <code>  OperationDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `OperationDescription`.
+  - CN: 开始或继续与 `OperationDescription` 相关的签名/调用语法。
+- **L177** <code>    char const * name = &quot;unknown&quot;,</code>
+  - EN: Assigns or initializes `name` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `name` 进行赋值或初始化。
+- **L178** <code>    Provider provider = Provider::kInvalid,</code>
+  - EN: Assigns or initializes `provider` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `provider` 进行赋值或初始化。
+- **L179** <code>    OperationKind kind = OperationKind::kInvalid, </code>
+  - EN: Assigns or initializes `kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kind` 进行赋值或初始化。
+- **L180** <code>    TileDescription const&amp;  tile_description = TileDescription()</code>
+  - EN: Begins or continues the signature/call syntax involving `TileDescription`.
+  - CN: 开始或继续与 `TileDescription` 相关的签名/调用语法。
+- **L181** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L182** <code>    name(name), provider(provider), kind(kind), tile_description(tile_description) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `tile_description`.
+  - CN: 开始或继续与 `tile_description` 相关的签名/调用语法。
+- **L183** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>/// Structure describing the properties of a tensor</code>
+  - EN: Comment that documents intent or context: "Structure describing the properties of a tensor".
+  - CN: 用于说明意图或上下文的注释："Structure describing the properties of a tensor"。
+- **L186** <code>struct TensorDescription {</code>
+  - EN: Begins the declaration of struct `TensorDescription`.
+  - CN: 开始声明 struct `TensorDescription`。
+- **L187** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L188** <code>  /// Numeric type of an individual element</code>
+  - EN: Comment that documents intent or context: "Numeric type of an individual element".
+  - CN: 用于说明意图或上下文的注释："Numeric type of an individual element"。
+- **L189** <code>  NumericTypeID element;</code>
+  - EN: Declares the symbol `element` in the current scope.
+  - CN: 在当前作用域中声明符号 `element`。
+- **L190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L191** <code>  /// Enumerant identifying the layout function for the tensor</code>
+  - EN: Comment that documents intent or context: "Enumerant identifying the layout function for the tensor".
+  - CN: 用于说明意图或上下文的注释："Enumerant identifying the layout function for the tensor"。
+- **L192** <code>  LayoutTypeID layout;</code>
+  - EN: Declares the symbol `layout` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout`。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>  /// Alignment restriction on pointers, strides, and extents</code>
+  - EN: Comment that documents intent or context: "Alignment restriction on pointers, strides, and extents".
+  - CN: 用于说明意图或上下文的注释："Alignment restriction on pointers, strides, and extents"。
+- **L195** <code>  int alignment;</code>
+  - EN: Declares the symbol `alignment` in the current scope.
+  - CN: 在当前作用域中声明符号 `alignment`。
+- **L196** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L197** <code>  /// log2() of the maximum extent of each dimension</code>
+  - EN: Comment that documents intent or context: "log2() of the maximum extent of each dimension".
+  - CN: 用于说明意图或上下文的注释："log2() of the maximum extent of each dimension"。
+- **L198** <code>  int log_extent_range;</code>
+  - EN: Declares the symbol `log_extent_range` in the current scope.
+  - CN: 在当前作用域中声明符号 `log_extent_range`。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>  /// log2() of the maximum value each relevant stride may have</code>
+  - EN: Comment that documents intent or context: "log2() of the maximum value each relevant stride may have".
+  - CN: 用于说明意图或上下文的注释："log2() of the maximum value each relevant stride may have"。
+- **L201** <code>  int log_stride_range;</code>
+  - EN: Declares the symbol `log_stride_range` in the current scope.
+  - CN: 在当前作用域中声明符号 `log_stride_range`。
+- **L202** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L203** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L204** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L205** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L206** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L207** <code>  TensorDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L208** <code>    NumericTypeID element = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element` 进行赋值或初始化。
+- **L209** <code>    LayoutTypeID layout = LayoutTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `layout` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout` 进行赋值或初始化。
+- **L210** <code>    int alignment = 1,</code>
+  - EN: Assigns or initializes `alignment` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `alignment` 进行赋值或初始化。
+- **L211** <code>    int log_extent_range = 24,</code>
+  - EN: Assigns or initializes `log_extent_range` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `log_extent_range` 进行赋值或初始化。
+- **L212** <code>    int log_stride_range = 24</code>
+  - EN: Assigns or initializes `log_stride_range` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `log_stride_range` 进行赋值或初始化。
+- **L213** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L214** <code>    element(element), </code>
+  - EN: Begins or continues the signature/call syntax involving `element`.
+  - CN: 开始或继续与 `element` 相关的签名/调用语法。
+- **L215** <code>    layout(layout), </code>
+  - EN: Begins or continues the signature/call syntax involving `layout`.
+  - CN: 开始或继续与 `layout` 相关的签名/调用语法。
+- **L216** <code>    alignment(alignment), </code>
+  - EN: Begins or continues the signature/call syntax involving `alignment`.
+  - CN: 开始或继续与 `alignment` 相关的签名/调用语法。
+- **L217** <code>    log_extent_range(log_extent_range), </code>
+  - EN: Begins or continues the signature/call syntax involving `log_extent_range`.
+  - CN: 开始或继续与 `log_extent_range` 相关的签名/调用语法。
+- **L218** <code>    log_stride_range(log_stride_range)  { }</code>
+  - EN: Begins or continues the signature/call syntax involving `log_stride_range`.
+  - CN: 开始或继续与 `log_stride_range` 相关的签名/调用语法。
+- **L219** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L222** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L223** <code>/// Description of all GEMM computations</code>
+  - EN: Comment that documents intent or context: "Description of all GEMM computations".
+  - CN: 用于说明意图或上下文的注释："Description of all GEMM computations"。
+- **L224** <code>struct GemmDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `GemmDescription`.
+  - CN: 开始声明 struct `GemmDescription`。
+- **L225** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L226** <code>  /// Indicates the kind of GEMM performed</code>
+  - EN: Comment that documents intent or context: "Indicates the kind of GEMM performed".
+  - CN: 用于说明意图或上下文的注释："Indicates the kind of GEMM performed"。
+- **L227** <code>  GemmKind gemm_kind;</code>
+  - EN: Declares the symbol `gemm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_kind`。
+- **L228** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L229** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L230** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L231** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L232** <code>  /// Describes the B operand</code>
+  - EN: Comment that documents intent or context: "Describes the B operand".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand"。
+- **L233** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L234** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L235** <code>  /// Describes the source matrix</code>
+  - EN: Comment that documents intent or context: "Describes the source matrix".
+  - CN: 用于说明意图或上下文的注释："Describes the source matrix"。
+- **L236** <code>  TensorDescription C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L237** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L238** <code>  /// Describes the destination matrix</code>
+  - EN: Comment that documents intent or context: "Describes the destination matrix".
+  - CN: 用于说明意图或上下文的注释："Describes the destination matrix"。
+- **L239** <code>  TensorDescription D;</code>
+  - EN: Declares the symbol `D` in the current scope.
+  - CN: 在当前作用域中声明符号 `D`。
+- **L240** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L241** <code>  /// Describes the sparse meta matrices</code>
+  - EN: Comment that documents intent or context: "Describes the sparse meta matrices".
+  - CN: 用于说明意图或上下文的注释："Describes the sparse meta matrices"。
+- **L242** <code>  TensorDescription E;</code>
+  - EN: Declares the symbol `E` in the current scope.
+  - CN: 在当前作用域中声明符号 `E`。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L245** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>  /// Describes the structure of parallel reductions</code>
+  - EN: Comment that documents intent or context: "Describes the structure of parallel reductions".
+  - CN: 用于说明意图或上下文的注释："Describes the structure of parallel reductions"。
+- **L248** <code>  SplitKMode split_k_mode;</code>
+  - EN: Declares the symbol `split_k_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `split_k_mode`。
+- **L249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L250** <code>  /// Transformation on A operand</code>
+  - EN: Comment that documents intent or context: "Transformation on A operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on A operand"。
+- **L251** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  /// Transformation on B operand</code>
+  - EN: Comment that documents intent or context: "Transformation on B operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on B operand"。
+- **L254** <code>  ComplexTransform transform_B;</code>
+  - EN: Declares the symbol `transform_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_B`。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L257** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L258** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L259** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L260** <code>  GemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmDescription`.
+  - CN: 开始或继续与 `GemmDescription` 相关的签名/调用语法。
+- **L261** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L262** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L263** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L264** <code>    TensorDescription const&amp; C = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L265** <code>    TensorDescription const&amp; D = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L266** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L267** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L268** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L269** <code>    ComplexTransform transform_B = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L270** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L271** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L272** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L273** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L274** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L275** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L276** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L277** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L278** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L279** <code>    transform_B(transform_B) {} </code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L280** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L281** <code>  GemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmDescription`.
+  - CN: 开始或继续与 `GemmDescription` 相关的签名/调用语法。
+- **L282** <code>    OperationDescription op_desc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L283** <code>    GemmKind gemm_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L284** <code>    TensorDescription const&amp; A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L285** <code>    TensorDescription const&amp; B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L286** <code>    TensorDescription const&amp; C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L287** <code>    TensorDescription const&amp; D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L288** <code>    NumericTypeID element_epilogue,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L289** <code>    SplitKMode split_k_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L290** <code>    ComplexTransform transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L291** <code>    ComplexTransform transform_B</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L292** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L293** <code>    OperationDescription(op_desc),</code>
+  - EN: Begins or continues the signature/call syntax involving `OperationDescription`.
+  - CN: 开始或继续与 `OperationDescription` 相关的签名/调用语法。
+- **L294** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L295** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L296** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L297** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L298** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L299** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L300** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L301** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L302** <code>    transform_B(transform_B) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L303** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>struct BlockScaleDescription {</code>
+  - EN: Begins the declaration of struct `BlockScaleDescription`.
+  - CN: 开始声明 struct `BlockScaleDescription`。
+- **L306** <code>  /// Describes the SFA operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFA operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFA operand"。
+- **L307** <code>  TensorDescription SFA;</code>
+  - EN: Declares the symbol `SFA` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFA`。
+- **L308** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L309** <code>  /// Describes the SFB operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFB operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFB operand"。
+- **L310** <code>  TensorDescription SFB;</code>
+  - EN: Declares the symbol `SFB` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFB`。
+- **L311** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L312** <code>  /// Describes the SFD operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFD operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFD operand"。
+- **L313** <code>  TensorDescription SFD;</code>
+  - EN: Declares the symbol `SFD` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFD`。
+- **L314** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L315** <code>  /// Describes the input ScaleFactor VectorSize</code>
+  - EN: Comment that documents intent or context: "Describes the input ScaleFactor VectorSize".
+  - CN: 用于说明意图或上下文的注释："Describes the input ScaleFactor VectorSize"。
+- **L316** <code>  int SFMVecSize;</code>
+  - EN: Declares the symbol `SFMVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFMVecSize`。
+- **L317** <code>  int SFNVecSize;</code>
+  - EN: Declares the symbol `SFNVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFNVecSize`。
+- **L318** <code>  int SFKVecSize;</code>
+  - EN: Declares the symbol `SFKVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFKVecSize`。
+- **L319** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L320** <code>  /// Describes the Output ScaleFactor VectorSize</code>
+  - EN: Comment that documents intent or context: "Describes the Output ScaleFactor VectorSize".
+  - CN: 用于说明意图或上下文的注释："Describes the Output ScaleFactor VectorSize"。
+- **L321** <code>  int EpilogueSFVecSize;</code>
+  - EN: Declares the symbol `EpilogueSFVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `EpilogueSFVecSize`。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>  /// Describes the underlying kind of scaling: </code>
+  - EN: Comment that documents intent or context: "Describes the underlying kind of scaling:".
+  - CN: 用于说明意图或上下文的注释："Describes the underlying kind of scaling:"。
+- **L324** <code>  /// Tensor Core supported (BlockScaled) or manual scaling (Blockwise)</code>
+  - EN: Comment that documents intent or context: "Tensor Core supported (BlockScaled) or manual scaling (Blockwise)".
+  - CN: 用于说明意图或上下文的注释："Tensor Core supported (BlockScaled) or manual scaling (Blockwise)"。
+- **L325** <code>  OperationKind kind;</code>
+  - EN: Declares the symbol `kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `kind`。
+- **L326** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L327** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L328** <code>struct GroupedGemmDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `GroupedGemmDescription`.
+  - CN: 开始声明 struct `GroupedGemmDescription`。
+- **L329** <code>  GemmDescription gemm;</code>
+  - EN: Declares the symbol `gemm` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm`。
+- **L330** <code>  std::optional&lt;BlockScaleDescription&gt; block_scales;</code>
+  - EN: Declares the symbol `block_scales` in the current scope.
+  - CN: 在当前作用域中声明符号 `block_scales`。
+- **L331** <code>  bool is_moe{false};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L332** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L333** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L334** <code>/// Description of all GEMM computations</code>
+  - EN: Comment that documents intent or context: "Description of all GEMM computations".
+  - CN: 用于说明意图或上下文的注释："Description of all GEMM computations"。
+- **L335** <code>struct BlockScaledGemmDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `BlockScaledGemmDescription`.
+  - CN: 开始声明 struct `BlockScaledGemmDescription`。
+- **L336** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L337** <code>  /// Indicates the kind of GEMM performed</code>
+  - EN: Comment that documents intent or context: "Indicates the kind of GEMM performed".
+  - CN: 用于说明意图或上下文的注释："Indicates the kind of GEMM performed"。
+- **L338** <code>  GemmKind gemm_kind;</code>
+  - EN: Declares the symbol `gemm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_kind`。
+- **L339** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L340** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L341** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L342** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L343** <code>  /// Describes the B operand</code>
+  - EN: Comment that documents intent or context: "Describes the B operand".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand"。
+- **L344** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L345** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L346** <code>  /// Describes the source matrix</code>
+  - EN: Comment that documents intent or context: "Describes the source matrix".
+  - CN: 用于说明意图或上下文的注释："Describes the source matrix"。
+- **L347** <code>  TensorDescription C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L348** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L349** <code>  /// Describes the destination matrix</code>
+  - EN: Comment that documents intent or context: "Describes the destination matrix".
+  - CN: 用于说明意图或上下文的注释："Describes the destination matrix"。
+- **L350** <code>  TensorDescription D;</code>
+  - EN: Declares the symbol `D` in the current scope.
+  - CN: 在当前作用域中声明符号 `D`。
+- **L351** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L352** <code>  /// Describes the sparse meta matrices</code>
+  - EN: Comment that documents intent or context: "Describes the sparse meta matrices".
+  - CN: 用于说明意图或上下文的注释："Describes the sparse meta matrices"。
+- **L353** <code>  TensorDescription E;</code>
+  - EN: Declares the symbol `E` in the current scope.
+  - CN: 在当前作用域中声明符号 `E`。
+- **L354** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L355** <code>  /// Describes the SFA operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFA operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFA operand"。
+- **L356** <code>  TensorDescription SFA;</code>
+  - EN: Declares the symbol `SFA` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFA`。
+- **L357** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L358** <code>  /// Describes the SFB operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFB operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFB operand"。
+- **L359** <code>  TensorDescription SFB;</code>
+  - EN: Declares the symbol `SFB` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFB`。
+- **L360** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L361** <code>  /// Describes the SFD operand </code>
+  - EN: Comment that documents intent or context: "Describes the SFD operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFD operand"。
+- **L362** <code>  TensorDescription SFD; </code>
+  - EN: Declares the symbol `SFD` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFD`。
+- **L363** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L364** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L365** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L366** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L367** <code>  /// Describes the structure of parallel reductions</code>
+  - EN: Comment that documents intent or context: "Describes the structure of parallel reductions".
+  - CN: 用于说明意图或上下文的注释："Describes the structure of parallel reductions"。
+- **L368** <code>  SplitKMode split_k_mode;</code>
+  - EN: Declares the symbol `split_k_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `split_k_mode`。
+- **L369** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L370** <code>  /// Transformation on A operand</code>
+  - EN: Comment that documents intent or context: "Transformation on A operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on A operand"。
+- **L371** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L372** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L373** <code>  /// Transformation on B operand</code>
+  - EN: Comment that documents intent or context: "Transformation on B operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on B operand"。
+- **L374** <code>  ComplexTransform transform_B;</code>
+  - EN: Declares the symbol `transform_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_B`。
+- **L375** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L376** <code>  /// Describes the input ScaleFactor VectorSize </code>
+  - EN: Comment that documents intent or context: "Describes the input ScaleFactor VectorSize".
+  - CN: 用于说明意图或上下文的注释："Describes the input ScaleFactor VectorSize"。
+- **L377** <code>  int SFVecSize;</code>
+  - EN: Declares the symbol `SFVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFVecSize`。
+- **L378** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L379** <code>  /// Describes the Output ScaleFactor VectorSize </code>
+  - EN: Comment that documents intent or context: "Describes the Output ScaleFactor VectorSize".
+  - CN: 用于说明意图或上下文的注释："Describes the Output ScaleFactor VectorSize"。
+- **L380** <code>  int EpilogueSFVecSize;</code>
+  - EN: Declares the symbol `EpilogueSFVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `EpilogueSFVecSize`。
+- **L381** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L382** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L383** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L384** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L385** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L386** <code>  BlockScaledGemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockScaledGemmDescription`.
+  - CN: 开始或继续与 `BlockScaledGemmDescription` 相关的签名/调用语法。
+- **L387** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L388** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L389** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L390** <code>    TensorDescription const&amp; C = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L391** <code>    TensorDescription const&amp; D = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L392** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L393** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L394** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L395** <code>    ComplexTransform transform_B = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L396** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L397** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L398** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L399** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L400** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L401** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L402** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L403** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L404** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L405** <code>    transform_B(transform_B) {} </code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L406** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L407** <code>  BlockScaledGemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockScaledGemmDescription`.
+  - CN: 开始或继续与 `BlockScaledGemmDescription` 相关的签名/调用语法。
+- **L408** <code>    OperationDescription op_desc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L409** <code>    GemmKind gemm_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L410** <code>    TensorDescription const&amp; A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L411** <code>    TensorDescription const&amp; B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L412** <code>    TensorDescription const&amp; C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L413** <code>    TensorDescription const&amp; D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L414** <code>    NumericTypeID element_epilogue,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L415** <code>    SplitKMode split_k_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L416** <code>    ComplexTransform transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L417** <code>    ComplexTransform transform_B</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L418** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L419** <code>    OperationDescription(op_desc),</code>
+  - EN: Begins or continues the signature/call syntax involving `OperationDescription`.
+  - CN: 开始或继续与 `OperationDescription` 相关的签名/调用语法。
+- **L420** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L421** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L422** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L423** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L424** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L425** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L426** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L427** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L428** <code>    transform_B(transform_B) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L429** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L430** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L431** <code>/// Description of all GEMM computations</code>
+  - EN: Comment that documents intent or context: "Description of all GEMM computations".
+  - CN: 用于说明意图或上下文的注释："Description of all GEMM computations"。
+- **L432** <code>struct BlockwiseGemmDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `BlockwiseGemmDescription`.
+  - CN: 开始声明 struct `BlockwiseGemmDescription`。
+- **L433** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L434** <code>  /// Indicates the kind of GEMM performed</code>
+  - EN: Comment that documents intent or context: "Indicates the kind of GEMM performed".
+  - CN: 用于说明意图或上下文的注释："Indicates the kind of GEMM performed"。
+- **L435** <code>  GemmKind gemm_kind;</code>
+  - EN: Declares the symbol `gemm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm_kind`。
+- **L436** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L437** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L438** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L439** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L440** <code>  /// Describes the B operand</code>
+  - EN: Comment that documents intent or context: "Describes the B operand".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand"。
+- **L441** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L442** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L443** <code>  /// Describes the source matrix</code>
+  - EN: Comment that documents intent or context: "Describes the source matrix".
+  - CN: 用于说明意图或上下文的注释："Describes the source matrix"。
+- **L444** <code>  TensorDescription C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L445** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L446** <code>  /// Describes the destination matrix</code>
+  - EN: Comment that documents intent or context: "Describes the destination matrix".
+  - CN: 用于说明意图或上下文的注释："Describes the destination matrix"。
+- **L447** <code>  TensorDescription D;</code>
+  - EN: Declares the symbol `D` in the current scope.
+  - CN: 在当前作用域中声明符号 `D`。
+- **L448** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L449** <code>  /// Describes the SFA operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFA operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFA operand"。
+- **L450** <code>  TensorDescription SFA;</code>
+  - EN: Declares the symbol `SFA` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFA`。
+- **L451** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L452** <code>  /// Describes the SFB operand</code>
+  - EN: Comment that documents intent or context: "Describes the SFB operand".
+  - CN: 用于说明意图或上下文的注释："Describes the SFB operand"。
+- **L453** <code>  TensorDescription SFB;</code>
+  - EN: Declares the symbol `SFB` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFB`。
+- **L454** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L455** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L456** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L457** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L458** <code>  /// Describes the structure of parallel reductions</code>
+  - EN: Comment that documents intent or context: "Describes the structure of parallel reductions".
+  - CN: 用于说明意图或上下文的注释："Describes the structure of parallel reductions"。
+- **L459** <code>  SplitKMode split_k_mode;</code>
+  - EN: Declares the symbol `split_k_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `split_k_mode`。
+- **L460** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L461** <code>  /// Transformation on A operand</code>
+  - EN: Comment that documents intent or context: "Transformation on A operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on A operand"。
+- **L462** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L463** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L464** <code>  /// Transformation on B operand</code>
+  - EN: Comment that documents intent or context: "Transformation on B operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on B operand"。
+- **L465** <code>  ComplexTransform transform_B;</code>
+  - EN: Declares the symbol `transform_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_B`。
+- **L466** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L467** <code>  /// Describes the input ScaleFactor VectorSize </code>
+  - EN: Comment that documents intent or context: "Describes the input ScaleFactor VectorSize".
+  - CN: 用于说明意图或上下文的注释："Describes the input ScaleFactor VectorSize"。
+- **L468** <code>  int SFMVecSize;</code>
+  - EN: Declares the symbol `SFMVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFMVecSize`。
+- **L469** <code>  int SFNVecSize;</code>
+  - EN: Declares the symbol `SFNVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFNVecSize`。
+- **L470** <code>  int SFKVecSize;</code>
+  - EN: Declares the symbol `SFKVecSize` in the current scope.
+  - CN: 在当前作用域中声明符号 `SFKVecSize`。
+- **L471** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L472** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L473** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L474** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L475** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L476** <code>  BlockwiseGemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockwiseGemmDescription`.
+  - CN: 开始或继续与 `BlockwiseGemmDescription` 相关的签名/调用语法。
+- **L477** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L478** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L479** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L480** <code>    TensorDescription const&amp; C = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L481** <code>    TensorDescription const&amp; D = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L482** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L483** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L484** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L485** <code>    ComplexTransform transform_B = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L486** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L487** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L488** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L489** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L490** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L491** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L492** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L493** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L494** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L495** <code>    transform_B(transform_B) {} </code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L496** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L497** <code>  BlockwiseGemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `BlockwiseGemmDescription`.
+  - CN: 开始或继续与 `BlockwiseGemmDescription` 相关的签名/调用语法。
+- **L498** <code>    OperationDescription op_desc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L499** <code>    GemmKind gemm_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L500** <code>    TensorDescription const&amp; A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L501** <code>    TensorDescription const&amp; B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L502** <code>    TensorDescription const&amp; C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L503** <code>    TensorDescription const&amp; D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L504** <code>    NumericTypeID element_epilogue,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L505** <code>    SplitKMode split_k_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L506** <code>    ComplexTransform transform_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L507** <code>    ComplexTransform transform_B</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L508** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L509** <code>    OperationDescription(op_desc),</code>
+  - EN: Begins or continues the signature/call syntax involving `OperationDescription`.
+  - CN: 开始或继续与 `OperationDescription` 相关的签名/调用语法。
+- **L510** <code>    gemm_kind(gemm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm_kind`.
+  - CN: 开始或继续与 `gemm_kind` 相关的签名/调用语法。
+- **L511** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L512** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L513** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L514** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L515** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L516** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L517** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L518** <code>    transform_B(transform_B) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L519** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L520** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L521** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L522** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L523** <code>/// Description for structured sparse GEMMs.</code>
+  - EN: Comment that documents intent or context: "Description for structured sparse GEMMs.".
+  - CN: 用于说明意图或上下文的注释："Description for structured sparse GEMMs."。
+- **L524** <code>struct SparseGemmDescription : public GemmDescription {</code>
+  - EN: Begins the declaration of struct `SparseGemmDescription`.
+  - CN: 开始声明 struct `SparseGemmDescription`。
+- **L525** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L526** <code>  /// Description structure for structured sparse GEMM</code>
+  - EN: Comment that documents intent or context: "Description structure for structured sparse GEMM".
+  - CN: 用于说明意图或上下文的注释："Description structure for structured sparse GEMM"。
+- **L527** <code>  SparseGemmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `SparseGemmDescription`.
+  - CN: 开始或继续与 `SparseGemmDescription` 相关的签名/调用语法。
+- **L528** <code>    GemmKind gemm_kind = GemmKind::kGemm,</code>
+  - EN: Assigns or initializes `gemm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gemm_kind` 进行赋值或初始化。
+- **L529** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L530** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L531** <code>    TensorDescription const&amp; C = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L532** <code>    TensorDescription const&amp; D = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L533** <code>    TensorDescription const&amp; E = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L534** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L535** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L536** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L537** <code>    ComplexTransform transform_B = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L538** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L539** <code>    GemmDescription(gemm_kind, A, B, C, D, element_epilogue, split_k_mode, transform_A, transform_B)</code>
+  - EN: Begins or continues the signature/call syntax involving `GemmDescription`.
+  - CN: 开始或继续与 `GemmDescription` 相关的签名/调用语法。
+- **L540** <code>     {this-&gt;E = E;}</code>
+  - EN: Assigns or initializes `E` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `E` 进行赋值或初始化。
+- **L541** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L542** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L543** <code>/// Description of all Reduction operations</code>
+  - EN: Comment that documents intent or context: "Description of all Reduction operations".
+  - CN: 用于说明意图或上下文的注释："Description of all Reduction operations"。
+- **L544** <code>struct ReductionDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `ReductionDescription`.
+  - CN: 开始声明 struct `ReductionDescription`。
+- **L545** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L546** <code>  /// Describes the data type of workspace</code>
+  - EN: Comment that documents intent or context: "Describes the data type of workspace".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of workspace"。
+- **L547** <code>  NumericTypeID element_workspace;</code>
+  - EN: Declares the symbol `element_workspace` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_workspace`。
+- **L548** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L549** <code>  /// Describes the data type of final output</code>
+  - EN: Comment that documents intent or context: "Describes the data type of final output".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of final output"。
+- **L550** <code>  NumericTypeID element_output;</code>
+  - EN: Declares the symbol `element_output` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_output`。
+- **L551** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L552** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L553** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L554** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L555** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L556** <code>/// Description of all Rank K update computations (SYRK, HERK, SYR2K, HER2K)</code>
+  - EN: Comment that documents intent or context: "Description of all Rank K update computations (SYRK, HERK, SYR2K, HER2K)".
+  - CN: 用于说明意图或上下文的注释："Description of all Rank K update computations (SYRK, HERK, SYR2K, HER2K)"。
+- **L557** <code>struct RankKDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `RankKDescription`.
+  - CN: 开始声明 struct `RankKDescription`。
+- **L558** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L559** <code>  /// Indicates which device template is used (universal or regular)</code>
+  - EN: Comment that documents intent or context: "Indicates which device template is used (universal or regular)".
+  - CN: 用于说明意图或上下文的注释："Indicates which device template is used (universal or regular)"。
+- **L560** <code>  RankKKind rank_k_kind;</code>
+  - EN: Declares the symbol `rank_k_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `rank_k_kind`。
+- **L561** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L562** <code>  /// Number of rank update (rank k or rank 2k)</code>
+  - EN: Comment that documents intent or context: "Number of rank update (rank k or rank 2k)".
+  - CN: 用于说明意图或上下文的注释："Number of rank update (rank k or rank 2k)"。
+- **L563** <code>  int num_ranks;</code>
+  - EN: Declares the symbol `num_ranks` in the current scope.
+  - CN: 在当前作用域中声明符号 `num_ranks`。
+- **L564** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L565** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L566** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L567** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L568** <code>  /// Describes the B operand (used only for SYR2K and HER2K)</code>
+  - EN: Comment that documents intent or context: "Describes the B operand (used only for SYR2K and HER2K)".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand (used only for SYR2K and HER2K)"。
+- **L569** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L570** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L571** <code>  /// Describes the source and destination matrices</code>
+  - EN: Comment that documents intent or context: "Describes the source and destination matrices".
+  - CN: 用于说明意图或上下文的注释："Describes the source and destination matrices"。
+- **L572** <code>  TensorDescription C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L573** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L574** <code>  /// Describes the fill mode for matrix C</code>
+  - EN: Comment that documents intent or context: "Describes the fill mode for matrix C".
+  - CN: 用于说明意图或上下文的注释："Describes the fill mode for matrix C"。
+- **L575** <code>  FillMode fill_mode;</code>
+  - EN: Declares the symbol `fill_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `fill_mode`。
+- **L576** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L577** <code>  /// Describes the blas mode (symmetric/hermitian)</code>
+  - EN: Comment that documents intent or context: "Describes the blas mode (symmetric/hermitian)".
+  - CN: 用于说明意图或上下文的注释："Describes the blas mode (symmetric/hermitian)"。
+- **L578** <code>  BlasMode blas_mode;</code>
+  - EN: Declares the symbol `blas_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `blas_mode`。
+- **L579** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L580** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L581** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L582** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L583** <code>  /// Describes the structure of parallel reductions</code>
+  - EN: Comment that documents intent or context: "Describes the structure of parallel reductions".
+  - CN: 用于说明意图或上下文的注释："Describes the structure of parallel reductions"。
+- **L584** <code>  SplitKMode split_k_mode;</code>
+  - EN: Declares the symbol `split_k_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `split_k_mode`。
+- **L585** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L586** <code>  /// Transformation on A operand</code>
+  - EN: Comment that documents intent or context: "Transformation on A operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on A operand"。
+- **L587** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L588** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L589** <code>  /// Transformation on B operand</code>
+  - EN: Comment that documents intent or context: "Transformation on B operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on B operand"。
+- **L590** <code>  ComplexTransform transform_B;</code>
+  - EN: Declares the symbol `transform_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_B`。
+- **L591** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L592** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L593** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L594** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L595** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L596** <code>  RankKDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `RankKDescription`.
+  - CN: 开始或继续与 `RankKDescription` 相关的签名/调用语法。
+- **L597** <code>    RankKKind rank_k_kind = RankKKind::kUniversal,</code>
+  - EN: Assigns or initializes `rank_k_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rank_k_kind` 进行赋值或初始化。
+- **L598** <code>    int num_ranks = 1,</code>
+  - EN: Assigns or initializes `num_ranks` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `num_ranks` 进行赋值或初始化。
+- **L599** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L600** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L601** <code>    TensorDescription const&amp; C = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L602** <code>    FillMode fill_mode = FillMode::kInvalid,</code>
+  - EN: Assigns or initializes `fill_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `fill_mode` 进行赋值或初始化。
+- **L603** <code>    BlasMode blas_mode = BlasMode::kInvalid,</code>
+  - EN: Assigns or initializes `blas_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blas_mode` 进行赋值或初始化。
+- **L604** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L605** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L606** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L607** <code>    ComplexTransform transform_B = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L608** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L609** <code>    rank_k_kind(rank_k_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `rank_k_kind`.
+  - CN: 开始或继续与 `rank_k_kind` 相关的签名/调用语法。
+- **L610** <code>    num_ranks(num_ranks),</code>
+  - EN: Begins or continues the signature/call syntax involving `num_ranks`.
+  - CN: 开始或继续与 `num_ranks` 相关的签名/调用语法。
+- **L611** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L612** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L613** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L614** <code>    fill_mode(fill_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `fill_mode`.
+  - CN: 开始或继续与 `fill_mode` 相关的签名/调用语法。
+- **L615** <code>    blas_mode(blas_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `blas_mode`.
+  - CN: 开始或继续与 `blas_mode` 相关的签名/调用语法。
+- **L616** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L617** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L618** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L619** <code>    transform_B(transform_B) {} </code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L620** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L621** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L622** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L623** <code>/// Description of all TRMM computations</code>
+  - EN: Comment that documents intent or context: "Description of all TRMM computations".
+  - CN: 用于说明意图或上下文的注释："Description of all TRMM computations"。
+- **L624** <code>struct TrmmDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `TrmmDescription`.
+  - CN: 开始声明 struct `TrmmDescription`。
+- **L625** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L626** <code>  /// Indicates the kind of TRMM performed</code>
+  - EN: Comment that documents intent or context: "Indicates the kind of TRMM performed".
+  - CN: 用于说明意图或上下文的注释："Indicates the kind of TRMM performed"。
+- **L627** <code>  TrmmKind trmm_kind;</code>
+  - EN: Declares the symbol `trmm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `trmm_kind`。
+- **L628** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L629** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L630** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L631** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L632** <code>  /// Describes the side mode for matrix A</code>
+  - EN: Comment that documents intent or context: "Describes the side mode for matrix A".
+  - CN: 用于说明意图或上下文的注释："Describes the side mode for matrix A"。
+- **L633** <code>  SideMode side_mode;</code>
+  - EN: Declares the symbol `side_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `side_mode`。
+- **L634** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L635** <code>  /// Describes the fill mode for matrix A</code>
+  - EN: Comment that documents intent or context: "Describes the fill mode for matrix A".
+  - CN: 用于说明意图或上下文的注释："Describes the fill mode for matrix A"。
+- **L636** <code>  FillMode fill_mode;</code>
+  - EN: Declares the symbol `fill_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `fill_mode`。
+- **L637** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L638** <code>  /// Describes the diag type for matrix A</code>
+  - EN: Comment that documents intent or context: "Describes the diag type for matrix A".
+  - CN: 用于说明意图或上下文的注释："Describes the diag type for matrix A"。
+- **L639** <code>  DiagType diag_type;</code>
+  - EN: Declares the symbol `diag_type` in the current scope.
+  - CN: 在当前作用域中声明符号 `diag_type`。
+- **L640** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L641** <code>  /// Describes the B operand</code>
+  - EN: Comment that documents intent or context: "Describes the B operand".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand"。
+- **L642** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L643** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L644** <code>  /// Describes the source and destination matrices</code>
+  - EN: Comment that documents intent or context: "Describes the source and destination matrices".
+  - CN: 用于说明意图或上下文的注释："Describes the source and destination matrices"。
+- **L645** <code>  TensorDescription D;</code>
+  - EN: Declares the symbol `D` in the current scope.
+  - CN: 在当前作用域中声明符号 `D`。
+- **L646** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L647** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L648** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L649** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L650** <code>  /// Describes the structure of parallel reductions</code>
+  - EN: Comment that documents intent or context: "Describes the structure of parallel reductions".
+  - CN: 用于说明意图或上下文的注释："Describes the structure of parallel reductions"。
+- **L651** <code>  SplitKMode split_k_mode;</code>
+  - EN: Declares the symbol `split_k_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `split_k_mode`。
+- **L652** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L653** <code>  /// Transformation on A operand</code>
+  - EN: Comment that documents intent or context: "Transformation on A operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on A operand"。
+- **L654** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L655** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L656** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L657** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L658** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L659** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L660** <code>  TrmmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `TrmmDescription`.
+  - CN: 开始或继续与 `TrmmDescription` 相关的签名/调用语法。
+- **L661** <code>    TrmmKind trmm_kind = TrmmKind::kUniversal,</code>
+  - EN: Assigns or initializes `trmm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `trmm_kind` 进行赋值或初始化。
+- **L662** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L663** <code>    SideMode side_mode = SideMode::kInvalid,</code>
+  - EN: Assigns or initializes `side_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `side_mode` 进行赋值或初始化。
+- **L664** <code>    FillMode fill_mode = FillMode::kInvalid,</code>
+  - EN: Assigns or initializes `fill_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `fill_mode` 进行赋值或初始化。
+- **L665** <code>    DiagType diag_type = DiagType::kInvalid,</code>
+  - EN: Assigns or initializes `diag_type` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `diag_type` 进行赋值或初始化。
+- **L666** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L667** <code>    TensorDescription const&amp; D = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L668** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L669** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L670** <code>    ComplexTransform transform_A = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L671** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L672** <code>    trmm_kind(trmm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `trmm_kind`.
+  - CN: 开始或继续与 `trmm_kind` 相关的签名/调用语法。
+- **L673** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L674** <code>    side_mode(side_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `side_mode`.
+  - CN: 开始或继续与 `side_mode` 相关的签名/调用语法。
+- **L675** <code>    fill_mode(fill_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `fill_mode`.
+  - CN: 开始或继续与 `fill_mode` 相关的签名/调用语法。
+- **L676** <code>    diag_type(diag_type),</code>
+  - EN: Begins or continues the signature/call syntax involving `diag_type`.
+  - CN: 开始或继续与 `diag_type` 相关的签名/调用语法。
+- **L677** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L678** <code>    D(D),</code>
+  - EN: Begins or continues the signature/call syntax involving `D`.
+  - CN: 开始或继续与 `D` 相关的签名/调用语法。
+- **L679** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L680** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L681** <code>    transform_A(transform_A) {} </code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L682** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L683** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L684** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L685** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L686** <code>/// Description of all SYMM/HEMM update computations</code>
+  - EN: Comment that documents intent or context: "Description of all SYMM/HEMM update computations".
+  - CN: 用于说明意图或上下文的注释："Description of all SYMM/HEMM update computations"。
+- **L687** <code>struct SymmDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `SymmDescription`.
+  - CN: 开始声明 struct `SymmDescription`。
+- **L688** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L689** <code>  /// Indicates which device template is used (universal or regular)</code>
+  - EN: Comment that documents intent or context: "Indicates which device template is used (universal or regular)".
+  - CN: 用于说明意图或上下文的注释："Indicates which device template is used (universal or regular)"。
+- **L690** <code>  SymmKind symm_kind;</code>
+  - EN: Declares the symbol `symm_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `symm_kind`。
+- **L691** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L692** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L693** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L694** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L695** <code>  /// Describes the B operand </code>
+  - EN: Comment that documents intent or context: "Describes the B operand".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand"。
+- **L696** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L697** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L698** <code>  /// Describes the source and destination matrices</code>
+  - EN: Comment that documents intent or context: "Describes the source and destination matrices".
+  - CN: 用于说明意图或上下文的注释："Describes the source and destination matrices"。
+- **L699** <code>  TensorDescription C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L700** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L701** <code>  /// Describes the side mode for matrix A</code>
+  - EN: Comment that documents intent or context: "Describes the side mode for matrix A".
+  - CN: 用于说明意图或上下文的注释："Describes the side mode for matrix A"。
+- **L702** <code>  SideMode side_mode;</code>
+  - EN: Declares the symbol `side_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `side_mode`。
+- **L703** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L704** <code>  /// Describes the fill mode for matrix A</code>
+  - EN: Comment that documents intent or context: "Describes the fill mode for matrix A".
+  - CN: 用于说明意图或上下文的注释："Describes the fill mode for matrix A"。
+- **L705** <code>  FillMode fill_mode;</code>
+  - EN: Declares the symbol `fill_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `fill_mode`。
+- **L706** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L707** <code>  /// Describes the blas mode (symmetric/hermitian)</code>
+  - EN: Comment that documents intent or context: "Describes the blas mode (symmetric/hermitian)".
+  - CN: 用于说明意图或上下文的注释："Describes the blas mode (symmetric/hermitian)"。
+- **L708** <code>  BlasMode blas_mode;</code>
+  - EN: Declares the symbol `blas_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `blas_mode`。
+- **L709** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L710** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L711** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L712** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L713** <code>  /// Describes the structure of parallel reductions</code>
+  - EN: Comment that documents intent or context: "Describes the structure of parallel reductions".
+  - CN: 用于说明意图或上下文的注释："Describes the structure of parallel reductions"。
+- **L714** <code>  SplitKMode split_k_mode;</code>
+  - EN: Declares the symbol `split_k_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `split_k_mode`。
+- **L715** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L716** <code>  /// Transformation on A operand</code>
+  - EN: Comment that documents intent or context: "Transformation on A operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on A operand"。
+- **L717** <code>  ComplexTransform transform_A;</code>
+  - EN: Declares the symbol `transform_A` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_A`。
+- **L718** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L719** <code>  /// Transformation on B operand</code>
+  - EN: Comment that documents intent or context: "Transformation on B operand".
+  - CN: 用于说明意图或上下文的注释："Transformation on B operand"。
+- **L720** <code>  ComplexTransform transform_B;</code>
+  - EN: Declares the symbol `transform_B` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform_B`。
+- **L721** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L722** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L723** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L724** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L725** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L726** <code>  SymmDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `SymmDescription`.
+  - CN: 开始或继续与 `SymmDescription` 相关的签名/调用语法。
+- **L727** <code>    SymmKind symm_kind = SymmKind::kUniversal,</code>
+  - EN: Assigns or initializes `symm_kind` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `symm_kind` 进行赋值或初始化。
+- **L728** <code>    TensorDescription const&amp; A = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L729** <code>    TensorDescription const&amp; B = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L730** <code>    TensorDescription const&amp; C = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L731** <code>    SideMode side_mode = SideMode::kInvalid,</code>
+  - EN: Assigns or initializes `side_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `side_mode` 进行赋值或初始化。
+- **L732** <code>    FillMode fill_mode = FillMode::kInvalid,</code>
+  - EN: Assigns or initializes `fill_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `fill_mode` 进行赋值或初始化。
+- **L733** <code>    BlasMode blas_mode = BlasMode::kInvalid,</code>
+  - EN: Assigns or initializes `blas_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blas_mode` 进行赋值或初始化。
+- **L734** <code>    NumericTypeID element_epilogue = NumericTypeID::kInvalid,</code>
+  - EN: Assigns or initializes `element_epilogue` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_epilogue` 进行赋值或初始化。
+- **L735** <code>    SplitKMode split_k_mode = SplitKMode::kNone,</code>
+  - EN: Assigns or initializes `split_k_mode` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `split_k_mode` 进行赋值或初始化。
+- **L736** <code>    ComplexTransform transform_A = ComplexTransform::kNone,</code>
+  - EN: Assigns or initializes `transform_A` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_A` 进行赋值或初始化。
+- **L737** <code>    ComplexTransform transform_B = ComplexTransform::kNone</code>
+  - EN: Assigns or initializes `transform_B` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `transform_B` 进行赋值或初始化。
+- **L738** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L739** <code>    symm_kind(symm_kind),</code>
+  - EN: Begins or continues the signature/call syntax involving `symm_kind`.
+  - CN: 开始或继续与 `symm_kind` 相关的签名/调用语法。
+- **L740** <code>    A(A),</code>
+  - EN: Begins or continues the signature/call syntax involving `A`.
+  - CN: 开始或继续与 `A` 相关的签名/调用语法。
+- **L741** <code>    B(B),</code>
+  - EN: Begins or continues the signature/call syntax involving `B`.
+  - CN: 开始或继续与 `B` 相关的签名/调用语法。
+- **L742** <code>    C(C),</code>
+  - EN: Begins or continues the signature/call syntax involving `C`.
+  - CN: 开始或继续与 `C` 相关的签名/调用语法。
+- **L743** <code>    side_mode(side_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `side_mode`.
+  - CN: 开始或继续与 `side_mode` 相关的签名/调用语法。
+- **L744** <code>    fill_mode(fill_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `fill_mode`.
+  - CN: 开始或继续与 `fill_mode` 相关的签名/调用语法。
+- **L745** <code>    blas_mode(blas_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `blas_mode`.
+  - CN: 开始或继续与 `blas_mode` 相关的签名/调用语法。
+- **L746** <code>    element_epilogue(element_epilogue),</code>
+  - EN: Begins or continues the signature/call syntax involving `element_epilogue`.
+  - CN: 开始或继续与 `element_epilogue` 相关的签名/调用语法。
+- **L747** <code>    split_k_mode(split_k_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `split_k_mode`.
+  - CN: 开始或继续与 `split_k_mode` 相关的签名/调用语法。
+- **L748** <code>    transform_A(transform_A),</code>
+  - EN: Begins or continues the signature/call syntax involving `transform_A`.
+  - CN: 开始或继续与 `transform_A` 相关的签名/调用语法。
+- **L749** <code>    transform_B(transform_B) {} </code>
+  - EN: Begins or continues the signature/call syntax involving `transform_B`.
+  - CN: 开始或继续与 `transform_B` 相关的签名/调用语法。
+- **L750** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L751** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L752** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L753** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L754** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L755** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L756** <code>/// Description of all Conv2d operations</code>
+  - EN: Comment that documents intent or context: "Description of all Conv2d operations".
+  - CN: 用于说明意图或上下文的注释："Description of all Conv2d operations"。
+- **L757** <code>struct ConvDescription : public OperationDescription {</code>
+  - EN: Begins the declaration of struct `ConvDescription`.
+  - CN: 开始声明 struct `ConvDescription`。
+- **L758** <code>  /// Describes the convolution dimension support (2D or 3D)</code>
+  - EN: Comment that documents intent or context: "Describes the convolution dimension support (2D or 3D)".
+  - CN: 用于说明意图或上下文的注释："Describes the convolution dimension support (2D or 3D)"。
+- **L759** <code>  int conv_dim;</code>
+  - EN: Declares the symbol `conv_dim` in the current scope.
+  - CN: 在当前作用域中声明符号 `conv_dim`。
+- **L760** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L761** <code>  /// Describes the kind of convolution</code>
+  - EN: Comment that documents intent or context: "Describes the kind of convolution".
+  - CN: 用于说明意图或上下文的注释："Describes the kind of convolution"。
+- **L762** <code>  ConvKind conv_kind;</code>
+  - EN: Declares the symbol `conv_kind` in the current scope.
+  - CN: 在当前作用域中声明符号 `conv_kind`。
+- **L763** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L764** <code>  /// Describes the type of iterator algorithm (analytic or precomputed)</code>
+  - EN: Comment that documents intent or context: "Describes the type of iterator algorithm (analytic or precomputed)".
+  - CN: 用于说明意图或上下文的注释："Describes the type of iterator algorithm (analytic or precomputed)"。
+- **L765** <code>  IteratorAlgorithmID iterator_algorithm;</code>
+  - EN: Declares the symbol `iterator_algorithm` in the current scope.
+  - CN: 在当前作用域中声明符号 `iterator_algorithm`。
+- **L766** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L767** <code>  /// Describes the A operand</code>
+  - EN: Comment that documents intent or context: "Describes the A operand".
+  - CN: 用于说明意图或上下文的注释："Describes the A operand"。
+- **L768** <code>  TensorDescription A;</code>
+  - EN: Declares the symbol `A` in the current scope.
+  - CN: 在当前作用域中声明符号 `A`。
+- **L769** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L770** <code>  /// Describes the B operand</code>
+  - EN: Comment that documents intent or context: "Describes the B operand".
+  - CN: 用于说明意图或上下文的注释："Describes the B operand"。
+- **L771** <code>  TensorDescription B;</code>
+  - EN: Declares the symbol `B` in the current scope.
+  - CN: 在当前作用域中声明符号 `B`。
+- **L772** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L773** <code>  /// Describes the C operand</code>
+  - EN: Comment that documents intent or context: "Describes the C operand".
+  - CN: 用于说明意图或上下文的注释："Describes the C operand"。
+- **L774** <code>  TensorDescription C;</code>
+  - EN: Declares the symbol `C` in the current scope.
+  - CN: 在当前作用域中声明符号 `C`。
+- **L775** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L776** <code>  /// Describes the data type of the scalars passed to the epilogue</code>
+  - EN: Comment that documents intent or context: "Describes the data type of the scalars passed to the epilogue".
+  - CN: 用于说明意图或上下文的注释："Describes the data type of the scalars passed to the epilogue"。
+- **L777** <code>  NumericTypeID element_epilogue;</code>
+  - EN: Declares the symbol `element_epilogue` in the current scope.
+  - CN: 在当前作用域中声明符号 `element_epilogue`。
+- **L778** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L779** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L780** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L781** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L782** <code>  // Returns Activation TensorDescription</code>
+  - EN: Comment that documents intent or context: "Returns Activation TensorDescription".
+  - CN: 用于说明意图或上下文的注释："Returns Activation TensorDescription"。
+- **L783** <code>  TensorDescription activation() const {</code>
+  - EN: Begins the definition of function or method `activation`.
+  - CN: 开始定义函数或方法 `activation`。
+- **L784** <code>    switch(conv_kind) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L785** <code>      case library::ConvKind::kFprop : return A;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L786** <code>      case library::ConvKind::kDgrad : return C;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L787** <code>      case library::ConvKind::kWgrad : return B;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L788** <code>      default : throw std::runtime_error(&quot;Invalid Conv Operator (fprop, dgrad, wgrad)&quot;);</code>
+  - EN: Declares function or method `Operator` without defining it here.
+  - CN: 声明函数或方法 `Operator`，但不在此处给出定义。
+- **L789** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L790** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L791** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L792** <code>  // Returns Filter TensorDescription</code>
+  - EN: Comment that documents intent or context: "Returns Filter TensorDescription".
+  - CN: 用于说明意图或上下文的注释："Returns Filter TensorDescription"。
+- **L793** <code>  TensorDescription filter() const {</code>
+  - EN: Begins the definition of function or method `filter`.
+  - CN: 开始定义函数或方法 `filter`。
+- **L794** <code>    switch(conv_kind) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L795** <code>      case library::ConvKind::kFprop : return B;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L796** <code>      case library::ConvKind::kDgrad : return B;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L797** <code>      case library::ConvKind::kWgrad : return C;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L798** <code>      default : throw std::runtime_error(&quot;Invalid Conv Operator (fprop, dgrad, wgrad)&quot;);</code>
+  - EN: Declares function or method `Operator` without defining it here.
+  - CN: 声明函数或方法 `Operator`，但不在此处给出定义。
+- **L799** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L800** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L801** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L802** <code>  // Returns Output TensorDescription</code>
+  - EN: Comment that documents intent or context: "Returns Output TensorDescription".
+  - CN: 用于说明意图或上下文的注释："Returns Output TensorDescription"。
+- **L803** <code>  TensorDescription output() const {</code>
+  - EN: Begins the definition of function or method `output`.
+  - CN: 开始定义函数或方法 `output`。
+- **L804** <code>    switch(conv_kind) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L805** <code>      case library::ConvKind::kFprop : return C;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L806** <code>      case library::ConvKind::kDgrad : return A;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L807** <code>      case library::ConvKind::kWgrad : return A;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L808** <code>      default : throw std::runtime_error(&quot;Invalid Conv Operator (fprop, dgrad, wgrad)&quot;);</code>
+  - EN: Declares function or method `Operator` without defining it here.
+  - CN: 声明函数或方法 `Operator`，但不在此处给出定义。
+- **L809** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L810** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L811** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L812** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L813** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L814** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L815** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L816** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L817** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L818** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L819** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Tooling entry points and command-line handling / 工具入口与命令行处理
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/library/types.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/blas3_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/gemm_coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>optional</code> — APIs or definitions from `optional` / 来自 `optional` 的 API 或定义

@@ -1,0 +1,3822 @@
+# mixed_input_utils.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/detail/collective/mixed_input_utils.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/detail/collective/mixed_input_utils.hpp`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/detail/collective/mixed_input_utils.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L32**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L33**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L34**: <code>#include &quot;cutlass/numeric_conversion.h&quot;</code>
+  - EN: Includes "cutlass/numeric_conversion.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_conversion.h"，以便本文件使用该依赖中的声明。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>#include &quot;cute/util/type_traits.hpp&quot;</code>
+  - EN: Includes "cute/util/type_traits.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/util/type_traits.hpp"，以便本文件使用该依赖中的声明。
+- **L37**: <code>#include &quot;cute/arch/copy_sm90.hpp&quot;</code>
+  - EN: Includes "cute/arch/copy_sm90.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/arch/copy_sm90.hpp"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;cute/numeric/arithmetic_tuple.hpp&quot;</code>
+  - EN: Includes "cute/numeric/arithmetic_tuple.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/numeric/arithmetic_tuple.hpp"，以便本文件使用该依赖中的声明。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L44**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L45**: <code>// The universal converter</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L46**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L47**: <code>  class SrcType,</code>
+  - EN: Declares or defines the class `SrcType`.
+  - CN: 声明或定义 class `SrcType`。
+- **L48**: <code>  class DstType,</code>
+  - EN: Declares or defines the class `DstType`.
+  - CN: 声明或定义 class `DstType`。
+- **L49**: <code>  class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L50**: <code>  class LayoutOut</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L51**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L52**: <code>struct LayoutAwareConvertImpl {</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L53**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L54**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L55**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L56**: <code>    cute::Tensor&lt;EngineIn, LayoutIn&gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L57**: <code>    cute::Tensor&lt;EngineOut, LayoutOut&gt;    &amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L58**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L59**: <code>    static_assert(cute::is_same_v&lt;SrcType, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L60**: <code>                  cute::is_same_v&lt;DstType, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L61**: <code>    static_assert(cute::cosize_v&lt;LayoutIn&gt; == cute::cosize_v&lt;LayoutOut&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L62**: <code>    constexpr int N = decltype(cute::max_common_vector(LayoutIn{}, LayoutOut{})){};</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L63**: <code>    using SrcArray = cutlass::Array&lt;SrcType, N&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L64**: <code>    using DstArray = cutlass::Array&lt;DstType, N&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L65**: <code>    using Converter = cutlass::NumericArrayConverter&lt;DstType,</code>
+  - EN: Defines the alias `Converter` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Converter`。
+- **L66**: <code>                                                     SrcType,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L67**: <code>                                                     N,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L68**: <code>                                                     cutlass::FloatRoundStyle::round_to_nearest&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L69**: <code>    auto&amp;&amp; src_vm = cute::recast&lt;SrcArray&gt;(src);</code>
+  - EN: Declares the callable or operator `SrcArray`.
+  - CN: 声明可调用对象或运算符 `SrcArray`。
+- **L70**: <code>    auto&amp;&amp; dst_vm = cute::recast&lt;DstArray&gt;(dst);</code>
+  - EN: Declares the callable or operator `DstArray`.
+  - CN: 声明可调用对象或运算符 `DstArray`。
+- **L71**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L72**: <code>    for (int i = 0; i &lt; src_vm.size(); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L73**: <code>      dst_vm(i) = Converter::convert(src_vm(i));</code>
+  - EN: Declares the callable or operator `dst_vm`.
+  - CN: 声明可调用对象或运算符 `dst_vm`。
+- **L74**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L75**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L76**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L77**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L78**: <code>// Specialization for INT4 -&gt; BF16 with [02461357] value order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L79**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L80**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L81**: <code>  cutlass::int4b_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L82**: <code>  cutlass::bfloat16_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L83**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L84**: <code>  cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L85**: <code>&gt; {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L86**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L87**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L88**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L89**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L90**: <code>                 cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L91**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L92**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L93**: <code>                 cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L94**: <code>                &gt;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L95**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L96**: <code>    static_assert(cute::is_same_v&lt;cutlass::int4b_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L97**: <code>                  cute::is_same_v&lt;cutlass::bfloat16_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L98**: <code>    using SrcArray = cutlass::Array&lt;cutlass::int4b_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L99**: <code>    using DstArray = cutlass::Array&lt;cutlass::bfloat16_t, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L100**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L101**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L102**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L103**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L104**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L105**: <code>    for (size_t ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L106**: <code>      r[ii] = src_reg &gt;&gt; (4 * (ii));</code>
+  - EN: Declares the callable or operator `src_reg`.
+  - CN: 声明可调用对象或运算符 `src_reg`。
+- **L107**: <code>      static constexpr uint32_t xor_mask = 0x43084308;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L108**: <code>      static constexpr uint32_t lo_mask  = 0x000F000F;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L109**: <code>      static constexpr uint32_t immLut   = (0xf0 &amp; 0xcc) ^ 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L110**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L111**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L112**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L113**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L114**: <code>          : &quot;+r&quot;(r[ii])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L115**: <code>          : &quot;n&quot;(lo_mask), &quot;n&quot;(xor_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L116**: <code>      static constexpr uint32_t lo_bias = xor_mask; // 0x43084308, {136, 136}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L117**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L118**: <code>        __nv_bfloat162&amp; bf16x2_val = reinterpret_cast&lt;__nv_bfloat162&amp;&gt;(r[ii]);</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L119**: <code>        bf16x2_val = __hsub2(bf16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hsub2`.
+  - CN: 开始或继续 `__hsub2` 的签名/参数列表。
+- **L120**: <code>                              reinterpret_cast&lt;const __nv_bfloat162&amp;&gt;(lo_bias));</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L121**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L122**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L123**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L124**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L125**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L126**: <code>// Specialization for UINT4 -&gt; BF16 with [02461357] value order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L127**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L128**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L129**: <code>  cutlass::uint4b_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L130**: <code>  cutlass::bfloat16_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L131**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L132**: <code>  cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L133**: <code>&gt; {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L134**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L135**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L136**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L137**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L138**: <code>                cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L139**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L140**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L141**: <code>                 cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L142**: <code>                &gt;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L143**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L144**: <code>    static_assert(cute::is_same_v&lt;cutlass::uint4b_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L145**: <code>                  cute::is_same_v&lt;cutlass::bfloat16_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L146**: <code>    using SrcArray = cutlass::Array&lt;cutlass::uint4b_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L147**: <code>    using DstArray = cutlass::Array&lt;cutlass::bfloat16_t, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L148**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L149**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L150**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L151**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L152**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L153**: <code>    for (size_t ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L154**: <code>      r[ii] = src_reg &gt;&gt; (4 * (ii));</code>
+  - EN: Declares the callable or operator `src_reg`.
+  - CN: 声明可调用对象或运算符 `src_reg`。
+- **L155**: <code>      static constexpr uint32_t or_mask = 0x43004300;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L156**: <code>      static constexpr uint32_t lo_mask = 0x000F000F;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L157**: <code>      static constexpr uint32_t immLut  = (0xf0 &amp; 0xcc) | 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L158**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L159**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L160**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L161**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L162**: <code>          : &quot;+r&quot;(r[ii])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L163**: <code>          : &quot;n&quot;(lo_mask), &quot;n&quot;(or_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L164**: <code>      static constexpr uint32_t lo_bias = or_mask; // 0x43004300, {128, 128}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L165**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L166**: <code>        __nv_bfloat162&amp; bf16x2_val = reinterpret_cast&lt;__nv_bfloat162&amp;&gt;(r[ii]);</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L167**: <code>        bf16x2_val = __hsub2(bf16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hsub2`.
+  - CN: 开始或继续 `__hsub2` 的签名/参数列表。
+- **L168**: <code>                             reinterpret_cast&lt;const __nv_bfloat162&amp;&gt;(lo_bias));</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L169**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L170**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L171**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L172**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L173**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L174**: <code>// Specialization for INT4 -&gt; FP16 with [02461357] value order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L175**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L176**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L177**: <code>  cutlass::int4b_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L178**: <code>  cutlass::half_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L179**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L180**: <code>  cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L181**: <code>&gt; {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L182**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L183**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L184**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L185**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L186**: <code>                cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L187**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L188**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L189**: <code>                cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L190**: <code>                &gt;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L191**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L192**: <code>    static_assert(cute::is_same_v&lt;cutlass::int4b_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L193**: <code>                  cute::is_same_v&lt;cutlass::half_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L194**: <code>    using SrcArray = cutlass::Array&lt;cutlass::int4b_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L195**: <code>    using DstArray = cutlass::Array&lt;cutlass::half_t, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L196**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L197**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L198**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L199**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L200**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L201**: <code>    for (int ii = 0; ii &lt; RegArray::kElements; ii += 2) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L202**: <code>      auto src_ = src_reg &gt;&gt; (4 * (ii));</code>
+  - EN: Declares the callable or operator `src_reg`.
+  - CN: 声明可调用对象或运算符 `src_reg`。
+- **L203**: <code>      r[ii + 0] = src_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L204**: <code>      r[ii + 1] = src_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L205**: <code>      static constexpr uint32_t lo_xor_mask = 0x64086408;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L206**: <code>      static constexpr uint32_t hi_xor_mask = 0x64806480;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L207**: <code>      static constexpr uint32_t lo_mask     = 0x000F000F;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L208**: <code>      static constexpr uint32_t hi_mask     = 0x00F000F0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L209**: <code>      static constexpr uint32_t immLut      = (0xf0 &amp; 0xcc) ^ 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L210**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L211**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L212**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L213**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L214**: <code>          : &quot;+r&quot;(r[ii + 0])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L215**: <code>          : &quot;n&quot;(lo_mask), &quot;n&quot;(lo_xor_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L216**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L217**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L218**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L219**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L220**: <code>          : &quot;+r&quot;(r[ii + 1])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L221**: <code>          : &quot;n&quot;(hi_mask), &quot;n&quot;(hi_xor_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L222**: <code>      static constexpr uint32_t lo_bias  = 0x64086408; // {1032, 1032}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L223**: <code>      static constexpr uint32_t hi_bias  = 0xD480D480; // {-72, -72}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L224**: <code>      static constexpr uint32_t hi_scale = 0x2C002C00; // {1/16, 1/16}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L225**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L226**: <code>        half2&amp; fp16x2_val = reinterpret_cast&lt;__half2&amp;&gt;(r[ii + 0]);</code>
+  - EN: Declares the callable or operator `__half2`.
+  - CN: 声明可调用对象或运算符 `__half2`。
+- **L227**: <code>        fp16x2_val = __hsub2(fp16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hsub2`.
+  - CN: 开始或继续 `__hsub2` 的签名/参数列表。
+- **L228**: <code>                             reinterpret_cast&lt;const half2&amp;&gt;(lo_bias));</code>
+  - EN: Declares the callable or operator `half2`.
+  - CN: 声明可调用对象或运算符 `half2`。
+- **L229**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L230**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L231**: <code>        half2&amp; fp16x2_val = reinterpret_cast&lt;__half2&amp;&gt;(r[ii + 1]);</code>
+  - EN: Declares the callable or operator `__half2`.
+  - CN: 声明可调用对象或运算符 `__half2`。
+- **L232**: <code>        fp16x2_val = __hfma2(fp16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hfma2`.
+  - CN: 开始或继续 `__hfma2` 的签名/参数列表。
+- **L233**: <code>                              reinterpret_cast&lt;const half2&amp;&gt;(hi_scale),</code>
+  - EN: Begins or continues the signature/parameter list for `half2`.
+  - CN: 开始或继续 `half2` 的签名/参数列表。
+- **L234**: <code>                              reinterpret_cast&lt;const half2&amp;&gt;(hi_bias));</code>
+  - EN: Declares the callable or operator `half2`.
+  - CN: 声明可调用对象或运算符 `half2`。
+- **L235**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L236**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L237**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L238**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>// Specialization for UINT4 -&gt; FP16 with [02461357] value order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L241**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L242**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L243**: <code>  cutlass::uint4b_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L244**: <code>  cutlass::half_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L245**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L246**: <code>  cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L247**: <code>&gt; {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L248**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L249**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L250**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L251**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L252**: <code>                cute::Layout&lt;cute::Shape&lt;_2,_4&gt;, cute::Stride&lt;_4,_1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L253**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L254**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L255**: <code>                cute::Layout&lt;_8&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L256**: <code>                &gt;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L257**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L258**: <code>    static_assert(cute::is_same_v&lt;cutlass::uint4b_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L259**: <code>                  cute::is_same_v&lt;cutlass::half_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L260**: <code>    using SrcArray = cutlass::Array&lt;cutlass::uint4b_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L261**: <code>    using DstArray = cutlass::Array&lt;cutlass::half_t, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L262**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L263**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L264**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L265**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L266**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L267**: <code>    for (int ii = 0; ii &lt; RegArray::kElements; ii += 2) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L268**: <code>      auto src_ = src_reg &gt;&gt; (4 * (ii));</code>
+  - EN: Declares the callable or operator `src_reg`.
+  - CN: 声明可调用对象或运算符 `src_reg`。
+- **L269**: <code>      r[ii + 0] = src_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L270**: <code>      r[ii + 1] = src_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L271**: <code>      static constexpr uint32_t or_mask = 0x64006400;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L272**: <code>      static constexpr uint32_t lo_mask = 0x000F000F;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L273**: <code>      static constexpr uint32_t hi_mask = 0x00F000F0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L274**: <code>      static constexpr uint32_t immLut  = (0xf0 &amp; 0xcc) | 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L275**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L276**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L277**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L278**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L279**: <code>          : &quot;+r&quot;(r[ii])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L280**: <code>          : &quot;n&quot;(lo_mask), &quot;n&quot;(or_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L281**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L282**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L283**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L284**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L285**: <code>          : &quot;+r&quot;(r[ii + 1])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L286**: <code>          : &quot;n&quot;(hi_mask), &quot;n&quot;(or_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L287**: <code>      static constexpr uint32_t lo_bias  = or_mask;    // 0x64006400, {1024, 1024}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L288**: <code>      static constexpr uint32_t hi_bias  = 0xD400D400; // {-64, -64}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L289**: <code>      static constexpr uint32_t hi_scale = 0x2C002C00; // {1/16, 1/16}</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L290**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L291**: <code>        half2&amp; fp16x2_val = reinterpret_cast&lt;__half2&amp;&gt;(r[ii + 0]);</code>
+  - EN: Declares the callable or operator `__half2`.
+  - CN: 声明可调用对象或运算符 `__half2`。
+- **L292**: <code>        fp16x2_val = __hsub2(fp16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hsub2`.
+  - CN: 开始或继续 `__hsub2` 的签名/参数列表。
+- **L293**: <code>                             reinterpret_cast&lt;const half2&amp;&gt;(lo_bias));</code>
+  - EN: Declares the callable or operator `half2`.
+  - CN: 声明可调用对象或运算符 `half2`。
+- **L294**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L295**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L296**: <code>        half2&amp; fp16x2_val = reinterpret_cast&lt;__half2&amp;&gt;(r[ii + 1]);</code>
+  - EN: Declares the callable or operator `__half2`.
+  - CN: 声明可调用对象或运算符 `__half2`。
+- **L297**: <code>        fp16x2_val = __hfma2(fp16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hfma2`.
+  - CN: 开始或继续 `__hfma2` 的签名/参数列表。
+- **L298**: <code>                             reinterpret_cast&lt;const half2&amp;&gt;(hi_scale),</code>
+  - EN: Begins or continues the signature/parameter list for `half2`.
+  - CN: 开始或继续 `half2` 的签名/参数列表。
+- **L299**: <code>                             reinterpret_cast&lt;const half2&amp;&gt;(hi_bias));</code>
+  - EN: Declares the callable or operator `half2`.
+  - CN: 声明可调用对象或运算符 `half2`。
+- **L300**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L301**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L302**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L303**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L304**: <code>/*</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L305**: <code>// Specialization for E5M2 -&gt; FP16 with [3120] value order</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L306**: <code>template &lt;&gt;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L307**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L308**: <code>  cutlass::float_e5m2_t,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L309**: <code>  cutlass::half_t,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L310**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_2&gt;, cute::Stride&lt;_2,_1&gt;&gt;,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L311**: <code>  cute::Layout&lt;_4&gt;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L312**: <code>&gt; {</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L313**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L314**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L315**: <code>  static void convert(</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L316**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L317**: <code>                cute::Layout&lt;cute::Shape&lt;_2,_2&gt;, cute::Stride&lt;_2,_1&gt;&gt;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L318**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L319**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L320**: <code>                cute::Layout&lt;_4&gt;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L321**: <code>                &gt;&amp; dst) {</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L322**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L323**: <code>    static_assert(cute::is_same_v&lt;cutlass::float_e5m2_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L324**: <code>                  cute::is_same_v&lt;cutlass::half_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L325**: <code>    using SrcArray = cutlass::Array&lt;cutlass::float_e5m2_t, 8&gt;;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L326**: <code>    using DstArray = cutlass::Array&lt;cutlass::half_t, 8&gt;;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L327**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L328**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L329**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L330**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L331**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L332**: <code>    for (int ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L333**: <code>      // in registers: a3, a1, a2, a0</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L334**: <code>      r[RegArray::kElements - ii - 1] = src_reg &lt;&lt; (8 * (ii));</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L335**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L336**: <code>      static constexpr uint32_t and_mask = 0xFF00FF00;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L337**: <code>      asm volatile(</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L338**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L339**: <code>          &quot;  and.b32 %0, %0, %1;\n&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L340**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L341**: <code>          : &quot;+r&quot;(r[ii])</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L342**: <code>          : &quot;n&quot;(and_mask));</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L343**: <code>    }</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L344**: <code>  }</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L345**: <code>};</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L346**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L347**: <code>// Specialization for INT8 -&gt; BF16 with [3120] value order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L348**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L349**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L350**: <code>  int8_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L351**: <code>  cutlass::bfloat16_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L352**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_2&gt;, cute::Stride&lt;_2,_1&gt;&gt;,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L353**: <code>  cute::Layout&lt;_4&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L354**: <code>&gt; {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L355**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L356**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L357**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L358**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L359**: <code>                cute::Layout&lt;cute::Shape&lt;_2,_2&gt;, cute::Stride&lt;_2,_1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L360**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L361**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L362**: <code>                cute::Layout&lt;_4&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L363**: <code>                &gt;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L364**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L365**: <code>    static_assert(cute::is_same_v&lt;int8_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L366**: <code>                  cute::is_same_v&lt;cutlass::bfloat16_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L367**: <code>    using SrcArray = cutlass::Array&lt;int8_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L368**: <code>    using DstArray = cutlass::Array&lt;cutlass::bfloat16_t, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L369**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L370**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L371**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L372**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L373**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L374**: <code>    for (int ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L375**: <code>      uint32_t tmp0, tmp1;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L376**: <code>      r[ii] = src_reg &gt;&gt; (8 * (ii));</code>
+  - EN: Declares the callable or operator `src_reg`.
+  - CN: 声明可调用对象或运算符 `src_reg`。
+- **L377**: <code>      static constexpr uint32_t or_mask    = 0x43004300;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L378**: <code>      static constexpr uint32_t and_mask_0 = 0x007F007F;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L379**: <code>      static constexpr uint32_t and_mask_1 = 0x00800080;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L380**: <code>      static constexpr uint32_t immLut     = (0xf0 &amp; 0xcc) | 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L381**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L382**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L383**: <code>          &quot;  lop3.b32 %0, %1, %2, %3, %4;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L384**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L385**: <code>          : &quot;=r&quot;(tmp0)</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L386**: <code>          : &quot;r&quot;(r[ii]), &quot;n&quot;(and_mask_0), &quot;n&quot;(or_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `r`.
+  - CN: 声明可调用对象或运算符 `r`。
+- **L387**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L388**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L389**: <code>          &quot;  lop3.b32 %0, %1, %2, %3, %4;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L390**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L391**: <code>          : &quot;=r&quot;(tmp1)</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L392**: <code>          : &quot;r&quot;(r[ii]), &quot;n&quot;(and_mask_1), &quot;n&quot;(or_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `r`.
+  - CN: 声明可调用对象或运算符 `r`。
+- **L393**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L394**: <code>        __nv_bfloat162&amp; bf16x2_val = reinterpret_cast&lt;__nv_bfloat162&amp;&gt;(r[ii]);</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L395**: <code>        bf16x2_val = __hsub2(reinterpret_cast&lt;__nv_bfloat162 const&amp;&gt;(tmp0),</code>
+  - EN: Begins or continues the signature/parameter list for `__hsub2`.
+  - CN: 开始或继续 `__hsub2` 的签名/参数列表。
+- **L396**: <code>                             reinterpret_cast&lt;__nv_bfloat162 const&amp;&gt;(tmp1));</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L397**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L398**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L399**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L400**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L401**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L402**: <code>// Specialization for INT8 -&gt; FP16 with [3120] value order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L403**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L404**: <code>struct LayoutAwareConvertImpl&lt;</code>
+  - EN: Declares or defines the struct `LayoutAwareConvertImpl`.
+  - CN: 声明或定义 struct `LayoutAwareConvertImpl`。
+- **L405**: <code>  int8_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L406**: <code>  cutlass::half_t,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L407**: <code>  cute::Layout&lt;cute::Shape&lt;_2,_2&gt;, cute::Stride&lt;_2,_1&gt;&gt;,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L408**: <code>  cute::Layout&lt;_4&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L409**: <code>&gt; {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L410**: <code>  template&lt;class EngineIn, class EngineOut&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L411**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L412**: <code>  static void convert(</code>
+  - EN: Begins or continues the signature/parameter list for `convert`.
+  - CN: 开始或继续 `convert` 的签名/参数列表。
+- **L413**: <code>    cute::Tensor&lt;EngineIn,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L414**: <code>                cute::Layout&lt;cute::Shape&lt;_2,_2&gt;, cute::Stride&lt;_2,_1&gt;&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L415**: <code>                &gt; const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L416**: <code>    cute::Tensor&lt;EngineOut,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L417**: <code>                cute::Layout&lt;_4&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L418**: <code>                &gt;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L419**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L420**: <code>    static_assert(cute::is_same_v&lt;int8_t, typename EngineIn::value_type&gt; &amp;&amp;</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L421**: <code>                  cute::is_same_v&lt;cutlass::half_t, typename EngineOut::value_type&gt;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L422**: <code>    using SrcArray = cutlass::Array&lt;int8_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L423**: <code>    using DstArray = cutlass::Array&lt;cutlass::half_t, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L424**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L425**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L426**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L427**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L428**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L429**: <code>    for (int ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L430**: <code>      r[ii] = src_reg &gt;&gt; (8 * (ii));</code>
+  - EN: Declares the callable or operator `src_reg`.
+  - CN: 声明可调用对象或运算符 `src_reg`。
+- **L431**: <code>      static constexpr uint32_t xor_mask = 0x64806480;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L432**: <code>      static constexpr uint32_t and_mask = 0x00FF00FF;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L433**: <code>      static constexpr uint32_t immLut   = (0xf0 &amp; 0xcc) ^ 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L434**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L435**: <code>          &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L436**: <code>          &quot;  lop3.b32 %0, %0, %1, %2, %3;\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L437**: <code>          &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L438**: <code>          : &quot;+r&quot;(r[ii])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L439**: <code>          : &quot;n&quot;(and_mask), &quot;n&quot;(xor_mask), &quot;n&quot;(immLut));</code>
+  - EN: Declares the callable or operator `n`.
+  - CN: 声明可调用对象或运算符 `n`。
+- **L440**: <code>      {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L441**: <code>        static constexpr uint32_t bias = 0x64806480;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L442**: <code>        __half2&amp; fp16x2_val = reinterpret_cast&lt;__half2&amp;&gt;(r[ii]);</code>
+  - EN: Declares the callable or operator `__half2`.
+  - CN: 声明可调用对象或运算符 `__half2`。
+- **L443**: <code>        fp16x2_val = __hsub2(fp16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hsub2`.
+  - CN: 开始或继续 `__hsub2` 的签名/参数列表。
+- **L444**: <code>                             reinterpret_cast&lt;__half2 const&amp;&gt;(bias));</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L445**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L446**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L447**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L448**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L449**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L450**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L451**: <code>  class EngineIn,</code>
+  - EN: Declares or defines the class `EngineIn`.
+  - CN: 声明或定义 class `EngineIn`。
+- **L452**: <code>  class EngineOut,</code>
+  - EN: Declares or defines the class `EngineOut`.
+  - CN: 声明或定义 class `EngineOut`。
+- **L453**: <code>  class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L454**: <code>  class LayoutOut</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L455**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L456**: <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L457**: <code>void LayoutAwareConvert( // Accept mutable temporaries</code>
+  - EN: Begins or continues the signature/parameter list for `LayoutAwareConvert`.
+  - CN: 开始或继续 `LayoutAwareConvert` 的签名/参数列表。
+- **L458**: <code>  cute::Tensor&lt;EngineIn, LayoutIn&gt;   const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L459**: <code>  cute::Tensor&lt;EngineOut, LayoutOut&gt;     &amp;&amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L460**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L461**: <code>  LayoutAwareConvert(src, dst);</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L462**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L463**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L464**: <code>  class EngineIn,</code>
+  - EN: Declares or defines the class `EngineIn`.
+  - CN: 声明或定义 class `EngineIn`。
+- **L465**: <code>  class EngineOut,</code>
+  - EN: Declares or defines the class `EngineOut`.
+  - CN: 声明或定义 class `EngineOut`。
+- **L466**: <code>  class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L467**: <code>  class LayoutOut</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L468**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L469**: <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L470**: <code>void LayoutAwareConvert(</code>
+  - EN: Begins or continues the signature/parameter list for `LayoutAwareConvert`.
+  - CN: 开始或继续 `LayoutAwareConvert` 的签名/参数列表。
+- **L471**: <code>  cute::Tensor&lt;EngineIn, LayoutIn&gt;   const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L472**: <code>  cute::Tensor&lt;EngineOut, LayoutOut&gt;      &amp; dst) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L473**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L474**: <code>  using SrcType = typename EngineIn::value_type;</code>
+  - EN: Defines the alias `SrcType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcType`。
+- **L475**: <code>  using DstType = typename EngineOut::value_type;</code>
+  - EN: Defines the alias `DstType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstType`。
+- **L476**: <code>  Tensor src_vm = coalesce(src);</code>
+  - EN: Declares the callable or operator `coalesce`.
+  - CN: 声明可调用对象或运算符 `coalesce`。
+- **L477**: <code>  Tensor dst_vm = coalesce(dst);</code>
+  - EN: Declares the callable or operator `coalesce`.
+  - CN: 声明可调用对象或运算符 `coalesce`。
+- **L478**: <code>  Layout src_layout = src_vm.layout();</code>
+  - EN: Declares the callable or operator `layout`.
+  - CN: 声明可调用对象或运算符 `layout`。
+- **L479**: <code>  Layout dst_layout = dst_vm.layout();</code>
+  - EN: Declares the callable or operator `layout`.
+  - CN: 声明可调用对象或运算符 `layout`。
+- **L480**: <code>  LayoutAwareConvertImpl&lt;SrcType,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L481**: <code>                         DstType,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L482**: <code>                         decltype(src_layout),</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L483**: <code>                         decltype(dst_layout)&gt;::convert(src_vm, dst_vm);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L484**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L485**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L486**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L487**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L488**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L489**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L490**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L491**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L492**: <code>  namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L493**: <code>    enum class ConversionMode {</code>
+  - EN: Declares or defines the class `ConversionMode`.
+  - CN: 声明或定义 class `ConversionMode`。
+- **L494**: <code>      DirectConvert,              // A * B</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L495**: <code>      ConvertAndScale,            // (scale * A) * B</code>
+  - EN: Provides part of the signature or implementation for `ConvertAndScale`.
+  - CN: 提供 `ConvertAndScale` 的签名或实现的一部分。
+- **L496**: <code>      ConvertAndScaleWithZero     // (scale * A + zeros) * B</code>
+  - EN: Provides part of the signature or implementation for `ConvertAndScaleWithZero`.
+  - CN: 提供 `ConvertAndScaleWithZero` 的签名或实现的一部分。
+- **L497**: <code>    };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L498**: <code>  } // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L499**: <code>} //namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L500**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L501**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L502**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L503**: <code>namespace cutlass::gemm::collective::detail {</code>
+  - EN: Opens namespace `cutlass::gemm::collective::detail` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::gemm::collective::detail`，为后续声明提供作用域。
+- **L504**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L505**: <code>template &lt;class PointerType&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L506**: <code>static constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L507**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L508**: <code>auto get_logical_ptr(PointerType const* ptr) {</code>
+  - EN: Starts the definition body for `get_logical_ptr`.
+  - CN: 开始 `get_logical_ptr` 的定义体。
+- **L509**: <code>  return cute::recast_ptr&lt;PointerType const&gt;(ptr);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L510**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L511**: <code>template&lt;int Stages, class LayoutAtom, class TileShape, class Stride&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L512**: <code>static constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L513**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L514**: <code>auto get_smem_layout(LayoutAtom layout_atom, TileShape const&amp; tile_shape, Stride const&amp; stride) {</code>
+  - EN: Starts the definition body for `get_smem_layout`.
+  - CN: 开始 `get_smem_layout` 的定义体。
+- **L515**: <code>  if constexpr (not cute::is_layout&lt;Stride&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L516**: <code>    return tile_to_shape(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L517**: <code>      layout_atom,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L518**: <code>      append(tile_shape, Int&lt;Stages&gt;{}),</code>
+  - EN: Starts the definition body for `append`.
+  - CN: 开始 `append` 的定义体。
+- **L519**: <code>      cute::conditional_t&lt; ::cutlass::gemm::detail::is_major&lt;0,Stride&gt;(), Step&lt;_2,_1,_3&gt;, Step&lt;_1,_2,_3&gt;&gt;{});</code>
+  - EN: Declares the callable or operator `Stride`.
+  - CN: 声明可调用对象或运算符 `Stride`。
+- **L520**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L521**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L522**: <code>    auto gmem_tile = composition(stride, tile_shape);</code>
+  - EN: Declares the callable or operator `composition`.
+  - CN: 声明可调用对象或运算符 `composition`。
+- **L523**: <code>    return make_layout_like(append(gmem_tile, make_layout(Int&lt;Stages&gt;{}, 0)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L524**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L525**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L526**: <code>template&lt;class Shape, class Stride&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L527**: <code>static constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L528**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L529**: <code>auto get_gmem_layout(Shape const&amp; shape, Stride const&amp; stride) {</code>
+  - EN: Starts the definition body for `get_gmem_layout`.
+  - CN: 开始 `get_gmem_layout` 的定义体。
+- **L530**: <code>  if constexpr (not cute::is_layout&lt;Stride&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L531**: <code>    return make_layout(shape, stride);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L532**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L533**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L534**: <code>    return stride;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L535**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L536**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L537**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L538**: <code>template&lt;class Collective&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L539**: <code>struct MixedInputUtils {</code>
+  - EN: Declares or defines the struct `MixedInputUtils`.
+  - CN: 声明或定义 struct `MixedInputUtils`。
+- **L540**: <code>private:</code>
+  - EN: Sets the `private` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `private`。
+- **L541**: <code>  using ConversionMode = cutlass::detail::ConversionMode;</code>
+  - EN: Defines the alias `ConversionMode` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ConversionMode`。
+- **L542**: <code>  using KernelSchedule = typename Collective::KernelSchedule;</code>
+  - EN: Defines the alias `KernelSchedule` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `KernelSchedule`。
+- **L543**: <code>  using SmemLayoutA = typename Collective::SmemLayoutA;</code>
+  - EN: Defines the alias `SmemLayoutA` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SmemLayoutA`。
+- **L544**: <code>  using SmemLayoutB = typename Collective::SmemLayoutB;</code>
+  - EN: Defines the alias `SmemLayoutB` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SmemLayoutB`。
+- **L545**: <code>  using SmemLayoutScale = typename Collective::SmemLayoutScale;</code>
+  - EN: Defines the alias `SmemLayoutScale` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SmemLayoutScale`。
+- **L546**: <code>  using SwappedElementA = typename Collective::SwappedElementA;</code>
+  - EN: Defines the alias `SwappedElementA` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SwappedElementA`。
+- **L547**: <code>  using SwappedElementB = typename Collective::SwappedElementB;</code>
+  - EN: Defines the alias `SwappedElementB` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SwappedElementB`。
+- **L548**: <code>  using RealSwappedElementA = typename Collective::RealSwappedElementA;</code>
+  - EN: Defines the alias `RealSwappedElementA` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RealSwappedElementA`。
+- **L549**: <code>  using RealSwappedElementB = typename Collective::RealSwappedElementB;</code>
+  - EN: Defines the alias `RealSwappedElementB` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RealSwappedElementB`。
+- **L550**: <code>  using ElementScale = typename Collective::ElementScale;</code>
+  - EN: Defines the alias `ElementScale` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementScale`。
+- **L551**: <code>  using ElementZero = typename Collective::ElementZero;</code>
+  - EN: Defines the alias `ElementZero` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementZero`。
+- **L552**: <code>  using SmemCopyAtomScale = typename Collective::SmemCopyAtomScale;</code>
+  - EN: Defines the alias `SmemCopyAtomScale` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SmemCopyAtomScale`。
+- **L553**: <code>  static constexpr auto KernelConversionMode = Collective::KernelConversionMode;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L554**: <code>  static constexpr auto ModeHasScales = Collective::ModeHasScales;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L555**: <code>  static constexpr auto UseScaleLookupTable = Collective::UseScaleLookupTable;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L556**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L557**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L558**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L559**: <code>  elements_per_smem_scale() {</code>
+  - EN: Starts the definition body for `elements_per_smem_scale`.
+  - CN: 开始 `elements_per_smem_scale` 的定义体。
+- **L560**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L561**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L562**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L563**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L564**: <code>      return cute::cosize_v&lt;SmemLayoutScale&gt;;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L565**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L566**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L567**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Type not handled in scale smem allocation.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L568**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L569**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L570**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L571**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L572**: <code>  elements_per_smem_zero() {</code>
+  - EN: Starts the definition body for `elements_per_smem_zero`.
+  - CN: 开始 `elements_per_smem_zero` 的定义体。
+- **L573**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert ||</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L574**: <code>                  KernelConversionMode == ConversionMode::ConvertAndScale ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L575**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L576**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L577**: <code>    else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L578**: <code>      return cute::cosize_v&lt;SmemLayoutScale&gt;;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L579**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L580**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L581**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Type not handled in scale smem allocation.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L582**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L583**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L584**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L585**: <code>  // These methods use some the public members of the class. For that reason, we define them after the public section.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L586**: <code>  static constexpr uint32_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L587**: <code>  compute_tma_transaction_bytes_mk() {</code>
+  - EN: Starts the definition body for `compute_tma_transaction_bytes_mk`.
+  - CN: 开始 `compute_tma_transaction_bytes_mk` 的定义体。
+- **L588**: <code>    return cutlass::bits_to_bytes(size&lt;0&gt;(SmemLayoutA{}) * size&lt;1&gt;(SmemLayoutA{}) * static_cast&lt;uint32_t&gt;(cute::sizeof_bits_v&lt;SwappedElementA&gt;));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L589**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L590**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L591**: <code>  static constexpr uint32_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L592**: <code>  compute_tma_transaction_bytes_nk() {</code>
+  - EN: Starts the definition body for `compute_tma_transaction_bytes_nk`.
+  - CN: 开始 `compute_tma_transaction_bytes_nk` 的定义体。
+- **L593**: <code>    return cutlass::bits_to_bytes(size&lt;0&gt;(SmemLayoutB{}) * size&lt;1&gt;(SmemLayoutB{}) * static_cast&lt;uint32_t&gt;(cute::sizeof_bits_v&lt;SwappedElementB&gt;));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L594**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L595**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L596**: <code>  static constexpr uint32_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L597**: <code>  compute_tma_transaction_bytes_extra() {</code>
+  - EN: Starts the definition body for `compute_tma_transaction_bytes_extra`.
+  - CN: 开始 `compute_tma_transaction_bytes_extra` 的定义体。
+- **L598**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L599**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L600**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L601**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L602**: <code>      constexpr uint32_t scale_tx_bytes = cutlass::bits_to_bytes(size&lt;0&gt;(SmemLayoutScale{}) * size&lt;1&gt;(SmemLayoutScale{}) * static_cast&lt;uint32_t&gt;(cute::sizeof_bits_v&lt;ElementScale&gt;));</code>
+  - EN: Declares the callable or operator `bits_to_bytes`.
+  - CN: 声明可调用对象或运算符 `bits_to_bytes`。
+- **L603**: <code>      static_assert(scale_tx_bytes % 128 == 0, &quot;Each scale stage must be 128B aligned.&quot;); // required by TMA</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L604**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L605**: <code>        return scale_tx_bytes;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L606**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L607**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L608**: <code>        // Scale and zero share smem layout</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L609**: <code>        constexpr uint32_t zero_tx_bytes = cutlass::bits_to_bytes(size&lt;0&gt;(SmemLayoutScale{}) * size&lt;1&gt;(SmemLayoutScale{}) * static_cast&lt;uint32_t&gt;(cute::sizeof_bits_v&lt;ElementZero&gt;));</code>
+  - EN: Declares the callable or operator `bits_to_bytes`.
+  - CN: 声明可调用对象或运算符 `bits_to_bytes`。
+- **L610**: <code>        static_assert(zero_tx_bytes % 128 == 0, &quot;Each zero stage must be 128B aligned.&quot;); // required by TMA</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L611**: <code>        return scale_tx_bytes + zero_tx_bytes;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L612**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L613**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L614**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Type not handled in tma transaction bytes computation.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L615**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L616**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L617**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L618**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Type not handled in tma transaction bytes computation.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L619**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L620**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L621**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L622**: <code>  static constexpr uint32_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L623**: <code>  compute_tma_transaction_bytes_extra_transform() {</code>
+  - EN: Starts the definition body for `compute_tma_transaction_bytes_extra_transform`.
+  - CN: 开始 `compute_tma_transaction_bytes_extra_transform` 的定义体。
+- **L624**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L625**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L626**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L627**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L628**: <code>      constexpr uint32_t scale_tx_bytes = cutlass::bits_to_bytes(cosize(take&lt;0,3&gt;(SmemLayoutScale{})) * static_cast&lt;uint32_t&gt;(cute::sizeof_bits_v&lt;ElementScale&gt;));</code>
+  - EN: Declares the callable or operator `bits_to_bytes`.
+  - CN: 声明可调用对象或运算符 `bits_to_bytes`。
+- **L629**: <code>      static_assert(scale_tx_bytes % 128 == 0, &quot;Each scale stage must be 128B aligned.&quot;); // required by TMA</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L630**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L631**: <code>        return scale_tx_bytes;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L632**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L633**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L634**: <code>        // Scale and zero share smem layout</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L635**: <code>        constexpr uint32_t zero_tx_bytes = cutlass::bits_to_bytes(cosize(take&lt;0,3&gt;(SmemLayoutScale{})) * static_cast&lt;uint32_t&gt;(cute::sizeof_bits_v&lt;ElementZero&gt;));</code>
+  - EN: Declares the callable or operator `bits_to_bytes`.
+  - CN: 声明可调用对象或运算符 `bits_to_bytes`。
+- **L636**: <code>        static_assert(zero_tx_bytes % 128 == 0, &quot;Each zero stage must be 128B aligned.&quot;); // required by TMA</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L637**: <code>        return scale_tx_bytes + zero_tx_bytes;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L638**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L639**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L640**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Type not handled in tma transaction bytes computation.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L641**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L642**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L643**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L644**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Type not handled in tma transaction bytes computation.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L645**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L646**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L647**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L648**: <code>  /// Utilities to copy A and extra inputs from smem to RF</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L649**: <code>  template &lt;class SmemTiledCopyA,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L650**: <code>            class TensorASmemView,</code>
+  - EN: Declares or defines the class `TensorASmemView`.
+  - CN: 声明或定义 class `TensorASmemView`。
+- **L651**: <code>            class TensorACopyView,</code>
+  - EN: Declares or defines the class `TensorACopyView`.
+  - CN: 声明或定义 class `TensorACopyView`。
+- **L652**: <code>            class... Ts,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L653**: <code>            class... Us</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L654**: <code>            &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L655**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L656**: <code>  static void copy_tensors_MK(</code>
+  - EN: Begins or continues the signature/parameter list for `copy_tensors_MK`.
+  - CN: 开始或继续 `copy_tensors_MK` 的签名/参数列表。
+- **L657**: <code>    SmemTiledCopyA const&amp; smem_tiled_copy_A,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L658**: <code>    TensorASmemView const&amp; tCsA,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L659**: <code>    TensorACopyView&amp; tCrA_copy_view,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L660**: <code>    cute::tuple&lt;Ts...&gt; const&amp; partitioned_mma_extra_info,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L661**: <code>    cute::tuple&lt;Us...&gt; const&amp; tiled_copy_and_views,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L662**: <code>    int k_block,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L663**: <code>    int read_stage) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L664**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L665**: <code>    copy(smem_tiled_copy_A, tCsA(_,_,k_block,read_stage), tCrA_copy_view(_,_,k_block));</code>
+  - EN: Declares the callable or operator `copy`.
+  - CN: 声明可调用对象或运算符 `copy`。
+- **L666**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L667**: <code>    if (k_block == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L668**: <code>      // We are starting a new k-tile so copy the scale</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L669**: <code>      if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L670**: <code>        // nothing to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L671**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L672**: <code>      else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L673**: <code>        auto smem_tiled_copy_S = cute::get&lt;0&gt;(tiled_copy_and_views);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L674**: <code>        auto tCrS_copy_view    = cute::get&lt;1&gt;(tiled_copy_and_views);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L675**: <code>        auto tCsS              = cute::get&lt;0&gt;(partitioned_mma_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L676**: <code>        copy(smem_tiled_copy_S, tCsS(_,_,k_block,read_stage), tCrS_copy_view(_,_,k_block));</code>
+  - EN: Declares the callable or operator `copy`.
+  - CN: 声明可调用对象或运算符 `copy`。
+- **L677**: <code>        if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L678**: <code>          // Nothing extra to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L679**: <code>        } else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L680**: <code>          auto tCsZ              = cute::get&lt;2&gt;(partitioned_mma_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L681**: <code>          auto tCrZ_copy_view    = cute::get&lt;2&gt;(tiled_copy_and_views);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L682**: <code>          copy(smem_tiled_copy_S, tCsZ(_,_,k_block,read_stage), tCrZ_copy_view(_,_,k_block));</code>
+  - EN: Declares the callable or operator `copy`.
+  - CN: 声明可调用对象或运算符 `copy`。
+- **L683**: <code>        } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L684**: <code>          static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L685**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L686**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L687**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L688**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L689**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L690**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L691**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L692**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L693**: <code>  /// (Designed for separate transform pipeline in Blackwell)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L694**: <code>  /// Utilities to copy extra inputs from smem to RF</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L695**: <code>  template &lt;class... Ts&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L696**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L697**: <code>  static void copy_scale_zeros_for_transform(</code>
+  - EN: Begins or continues the signature/parameter list for `copy_scale_zeros_for_transform`.
+  - CN: 开始或继续 `copy_scale_zeros_for_transform` 的签名/参数列表。
+- **L698**: <code>    cute::tuple&lt;Ts...&gt; &amp; partitioned_transform_extra_info,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L699**: <code>    int load2transform_consumer_index) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L700**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L701**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L702**: <code>      // nothing to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L703**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L704**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L705**: <code>      auto smem_tiled_copy_S = cute::get&lt;0&gt;(partitioned_transform_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L706**: <code>      auto&amp;&amp; scales          = cute::get&lt;1&gt;(partitioned_transform_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L707**: <code>      using ScaleType        = decltype(scales);</code>
+  - EN: Defines the alias `ScaleType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ScaleType`。
+- **L708**: <code>      auto tSrS              = make_tensor(scales.data(), scales.layout());</code>
+  - EN: Declares the callable or operator `make_tensor`.
+  - CN: 声明可调用对象或运算符 `make_tensor`。
+- **L709**: <code>      auto tSsS              = cute::get&lt;2&gt;(partitioned_transform_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L710**: <code>      copy(smem_tiled_copy_S, tSsS(_,_,_,_,load2transform_consumer_index), tSrS);</code>
+  - EN: Declares the callable or operator `copy`.
+  - CN: 声明可调用对象或运算符 `copy`。
+- **L711**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L712**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L713**: <code>        // Nothing extra to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L714**: <code>      } else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L715**: <code>        auto&amp;&amp; zeros           = cute::get&lt;3&gt;(partitioned_transform_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L716**: <code>        using ZeroType         = decltype(zeros);</code>
+  - EN: Defines the alias `ZeroType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ZeroType`。
+- **L717**: <code>        auto tZrZ              = make_tensor(zeros.data(), zeros.layout());</code>
+  - EN: Declares the callable or operator `make_tensor`.
+  - CN: 声明可调用对象或运算符 `make_tensor`。
+- **L718**: <code>        auto tZsZ              = cute::get&lt;4&gt;(partitioned_transform_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L719**: <code>        copy(smem_tiled_copy_S, tZsZ(_,_,_,_,load2transform_consumer_index), tZrZ);</code>
+  - EN: Declares the callable or operator `copy`.
+  - CN: 声明可调用对象或运算符 `copy`。
+- **L720**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L721**: <code>      } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L722**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L723**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L724**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L725**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L726**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L727**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L728**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L729**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L730**: <code>  // Helper functions to select packing for conversion</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L731**: <code>  template &lt;class SrcType,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L732**: <code>            class DstType,</code>
+  - EN: Declares or defines the class `DstType`.
+  - CN: 声明或定义 class `DstType`。
+- **L733**: <code>            int Cosize&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L734**: <code>  struct select_packing { // Naive packing policy</code>
+  - EN: Declares or defines the struct `select_packing`.
+  - CN: 声明或定义 struct `select_packing`。
+- **L735**: <code>    static constexpr auto value() {</code>
+  - EN: Starts the definition body for `value`.
+  - CN: 开始 `value` 的定义体。
+- **L736**: <code>      return Int&lt;cute::gcd(Cosize, 32 / cute::min(sizeof_bits_v&lt;SrcType&gt;, sizeof_bits_v&lt;DstType&gt;))&gt;{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L737**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L738**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L739**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L740**: <code>  // The core converter uses a lookup table to converts i4 -&gt; 8 bit value.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L741**: <code>  template &lt;class EngineIn,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L742**: <code>            class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L743**: <code>            class EngineOut,</code>
+  - EN: Declares or defines the class `EngineOut`.
+  - CN: 声明或定义 class `EngineOut`。
+- **L744**: <code>            class LayoutOut,</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L745**: <code>            class EngineScale,</code>
+  - EN: Declares or defines the class `EngineScale`.
+  - CN: 声明或定义 class `EngineScale`。
+- **L746**: <code>            class LayoutScale&gt;</code>
+  - EN: Declares or defines the class `LayoutScale`.
+  - CN: 声明或定义 class `LayoutScale`。
+- **L747**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L748**: <code>  static void lookup_table_convert( // Accept mutable temporaries</code>
+  - EN: Begins or continues the signature/parameter list for `lookup_table_convert`.
+  - CN: 开始或继续 `lookup_table_convert` 的签名/参数列表。
+- **L749**: <code>    Tensor&lt;EngineIn, LayoutIn&gt;       const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L750**: <code>    Tensor&lt;EngineOut, LayoutOut&gt;         &amp;&amp; dst,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L751**: <code>    Tensor&lt;EngineScale, LayoutScale&gt; const&amp; scales_neg,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L752**: <code>    Tensor&lt;EngineScale, LayoutScale&gt; const&amp; scales_pos) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L753**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L754**: <code>    lookup_table_convert(src, dst, scales_neg, scales_pos);</code>
+  - EN: Declares the callable or operator `lookup_table_convert`.
+  - CN: 声明可调用对象或运算符 `lookup_table_convert`。
+- **L755**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L756**: <code>  template &lt;class EngineIn,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L757**: <code>            class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L758**: <code>            class EngineOut,</code>
+  - EN: Declares or defines the class `EngineOut`.
+  - CN: 声明或定义 class `EngineOut`。
+- **L759**: <code>            class LayoutOut,</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L760**: <code>            class EngineScale,</code>
+  - EN: Declares or defines the class `EngineScale`.
+  - CN: 声明或定义 class `EngineScale`。
+- **L761**: <code>            class LayoutScale&gt;</code>
+  - EN: Declares or defines the class `LayoutScale`.
+  - CN: 声明或定义 class `LayoutScale`。
+- **L762**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L763**: <code>  static void lookup_table_convert(</code>
+  - EN: Begins or continues the signature/parameter list for `lookup_table_convert`.
+  - CN: 开始或继续 `lookup_table_convert` 的签名/参数列表。
+- **L764**: <code>    Tensor&lt;EngineIn, LayoutIn&gt;       const&amp; src,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L765**: <code>    Tensor&lt;EngineOut, LayoutOut&gt;          &amp; dst,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L766**: <code>    Tensor&lt;EngineScale, LayoutScale&gt; const&amp; scales_neg,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L767**: <code>    Tensor&lt;EngineScale, LayoutScale&gt; const&amp; scales_pos) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L768**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L769**: <code>    constexpr int N = cute::cosize(LayoutIn{});</code>
+  - EN: Declares the callable or operator `cosize`.
+  - CN: 声明可调用对象或运算符 `cosize`。
+- **L770**: <code>    static_assert(N == 4 || N == 8);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L771**: <code>    static_assert(cosize(LayoutScale{}) &lt;= N / 4,</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L772**: <code>                  &quot;at least 4 consecutive weights must share the same scale.&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L773**: <code>    using SrcArray = cutlass::Array&lt;cutlass::int4b_t, 8&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L774**: <code>    using DstArray = cutlass::Array&lt;RealSwappedElementB, 8&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L775**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, N / 4, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L776**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L777**: <code>    // View the input as reg</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L778**: <code>    auto&amp;&amp; src_reg = cute::recast&lt;uint32_t&gt;(src)(0);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L779**: <code>    auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst)(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L780**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L781**: <code>    // Determines if to get from the signed or unsigned candidates</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L782**: <code>    static constexpr uint32_t immLut = (0xf0 &amp; 0xcc) | 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L783**: <code>    uint32_t sign; // ((reg &amp; 0x88888888) | 0x64206420) &gt;&gt; 1</code>
+  - EN: Provides part of the signature or implementation for `sign`.
+  - CN: 提供 `sign` 的签名或实现的一部分。
+- **L784**: <code>    asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L785**: <code>      &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L786**: <code>      &quot;  lop3.b32 %0, %1, %2, %3, %4;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L787**: <code>      &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L788**: <code>      : &quot;=r&quot;(sign)</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L789**: <code>      : &quot;r&quot;(src_reg), &quot;n&quot;(0x88888888), &quot;n&quot;(0x64206420), &quot;n&quot;(immLut)</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L790**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L791**: <code>    sign = sign &gt;&gt; 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L792**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L793**: <code>    // Ignore sign bit when indexing into LUT</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L794**: <code>    uint32_t lut_idx = src_reg &amp; 0x77777777;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L795**: <code>    Tensor scales_neg_ = cute::filter(scales_neg);</code>
+  - EN: Declares the callable or operator `filter`.
+  - CN: 声明可调用对象或运算符 `filter`。
+- **L796**: <code>    Tensor scales_pos_ = cute::filter(scales_pos);</code>
+  - EN: Declares the callable or operator `filter`.
+  - CN: 声明可调用对象或运算符 `filter`。
+- **L797**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L798**: <code>    for (int i = 0; i &lt; N / 4; ++i, lut_idx &gt;&gt;=16, sign &gt;&gt;=16) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L799**: <code>      auto&amp;&amp; scale_neg_ = reinterpret_cast&lt;cutlass::Array&lt;uint32_t, 2&gt; const&amp;&gt;(scales_neg_(i));</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L800**: <code>      auto&amp;&amp; scale_pos_ = reinterpret_cast&lt;cutlass::Array&lt;uint32_t, 2&gt; const&amp;&gt;(scales_pos_(i));</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L801**: <code>      asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L802**: <code>        &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L803**: <code>        &quot;  .reg .b32 pos, neg                    ;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L804**: <code>        &quot;  prmt .b32 neg, %3, %4, %1             ;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L805**: <code>        &quot;  prmt .b32 pos, %5, %6, %1             ;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L806**: <code>        &quot;  prmt .b32 %0, pos, neg, %2            ;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L807**: <code>        &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L808**: <code>        : &quot;=r&quot;(r[i])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L809**: <code>        : &quot;r&quot;(lut_idx), &quot;r&quot;(sign), &quot;r&quot;(scale_neg_[0]), &quot;r&quot;(scale_neg_[1]), &quot;r&quot;(scale_pos_[0]), &quot;r&quot;(scale_pos_[1])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L810**: <code>      );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L811**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L812**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L813**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L814**: <code>  /// Utilities to dequantize A.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L815**: <code>  template &lt;class Layout&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L816**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L817**: <code>  static void static_check_scale(Layout const&amp; tensor) {</code>
+  - EN: Starts the definition body for `static_check_scale`.
+  - CN: 开始 `static_check_scale` 的定义体。
+- **L818**: <code>    static_assert(shape&lt;0&gt;(Layout{}) &gt;= 4 &amp;&amp; stride&lt;0&gt;(Layout{}) == 0, &quot;At least 4 adjacent weights in a thread must share the same scale.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L819**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L820**: <code>  template &lt;class Engine,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L821**: <code>            class Layout&gt;</code>
+  - EN: Declares or defines the class `Layout`.
+  - CN: 声明或定义 class `Layout`。
+- **L822**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L823**: <code>  static void static_check_scale(Tensor&lt;Engine, Layout&gt; const&amp; tensor) {</code>
+  - EN: Starts the definition body for `static_check_scale`.
+  - CN: 开始 `static_check_scale` 的定义体。
+- **L824**: <code>    static_check_scale(flatten(Layout{}));</code>
+  - EN: Declares the callable or operator `static_check_scale`.
+  - CN: 声明可调用对象或运算符 `static_check_scale`。
+- **L825**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L826**: <code>  template &lt;class EngineIn,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L827**: <code>            class EngineOut,</code>
+  - EN: Declares or defines the class `EngineOut`.
+  - CN: 声明或定义 class `EngineOut`。
+- **L828**: <code>            class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L829**: <code>            class LayoutOut,</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L830**: <code>            class... Ts&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L831**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L832**: <code>  static void dequantize_A_kblock(</code>
+  - EN: Begins or continues the signature/parameter list for `dequantize_A_kblock`.
+  - CN: 开始或继续 `dequantize_A_kblock` 的签名/参数列表。
+- **L833**: <code>    Tensor&lt;EngineIn, LayoutIn&gt; const&amp; tCrA_load,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L834**: <code>    Tensor&lt;EngineOut, LayoutOut&gt;&amp; tCrA_mma,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L835**: <code>    cute::tuple&lt;Ts...&gt;&amp; partitioned_extra_info,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L836**: <code>    int const k_block) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L837**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L838**: <code>    static_assert(is_rmem&lt;EngineIn&gt;::value, &quot;Input tensor for A conversion must come from registers&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L839**: <code>    static_assert(is_rmem&lt;EngineOut&gt;::value, &quot;Output tensor for A conversion must come from registers&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L840**: <code>    static_assert(cosize_v&lt;LayoutIn&gt; == cosize_v&lt;LayoutOut&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L841**: <code>    static_assert(size_v&lt;LayoutIn&gt; == cosize_v&lt;LayoutIn&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L842**: <code>    static_assert(size_v&lt;LayoutOut&gt; == cosize_v&lt;LayoutOut&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L843**: <code>    using SrcType = typename EngineIn::value_type;</code>
+  - EN: Defines the alias `SrcType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcType`。
+- **L844**: <code>    using DstType = typename EngineOut::value_type;</code>
+  - EN: Defines the alias `DstType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstType`。
+- **L845**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L846**: <code>    Tensor src = tCrA_load(_, _, k_block);</code>
+  - EN: Declares the callable or operator `tCrA_load`.
+  - CN: 声明可调用对象或运算符 `tCrA_load`。
+- **L847**: <code>    Tensor dst = tCrA_mma(_, _, k_block);</code>
+  - EN: Declares the callable or operator `tCrA_mma`.
+  - CN: 声明可调用对象或运算符 `tCrA_mma`。
+- **L848**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L849**: <code>    CUTE_STATIC_ASSERT_V(size(src(_, 0)) == cosize(src(_, 0).layout()),</code>
+  - EN: Begins or continues the signature/parameter list for `CUTE_STATIC_ASSERT_V`.
+  - CN: 开始或继续 `CUTE_STATIC_ASSERT_V` 的签名/参数列表。
+- **L850**: <code>                         &quot;The first mode of tensor src must be contiguous in memory&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L851**: <code>    // try to make the size of the first mode equal to 32bit</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L852**: <code>    int constexpr NumValPerSrcReg = cute::min(decltype(size(src(_, 0)))::value,</code>
+  - EN: Begins or continues the signature/parameter list for `min`.
+  - CN: 开始或继续 `min` 的签名/参数列表。
+- **L853**: <code>                                              ceil_div(32, sizeof_bits_v&lt;SrcType&gt;));</code>
+  - EN: Declares the callable or operator `ceil_div`.
+  - CN: 声明可调用对象或运算符 `ceil_div`。
+- **L854**: <code>    Tensor src_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(src, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L855**: <code>    Tensor dst_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(dst, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L856**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L857**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L858**: <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L859**: <code>      for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L860**: <code>        LayoutAwareConvert(src_vm(_, i), dst_vm(_, i));</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L861**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L862**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L863**: <code>    else if constexpr (UseScaleLookupTable) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L864**: <code>      constexpr int num_elements = decltype(size(src))::value;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L865**: <code>      static_assert(is_same_v&lt;RealSwappedElementA, cutlass::int4b_t&gt; || is_same_v&lt;RealSwappedElementA, cutlass::float_e2m1_t&gt;, </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L866**: <code>                    &quot;Lookup table supports int4b_t (Two&#x27;s Complement) and float_e2m1_t (E2M1/FP4) quant types.&quot;);</code>
+  - EN: Declares the callable or operator `int4b_t`.
+  - CN: 声明可调用对象或运算符 `int4b_t`。
+- **L867**: <code>      static_assert(sizeof_bits_v&lt;ElementScale&gt; == 64, &quot;Lookup table only supports 8 8bit scale values now.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L868**: <code>      static_assert(num_elements % 4 == 0 &amp;&amp; num_elements &gt;= 4, &quot;Lookup table requires a vector size of 4x when converting.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L869**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L870**: <code>      Tensor tCrS_neg = cute::get&lt;1&gt;(partitioned_extra_info);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L871**: <code>      auto&amp;&amp; tCrS_pos = cute::get&lt;2&gt;(partitioned_extra_info); // modification to its value is needed</code>
+  - EN: Provides part of the signature or implementation for `get`.
+  - CN: 提供 `get` 的签名或实现的一部分。
+- **L872**: <code>      Tensor scales_neg = tCrS_neg(_, _, k_block);</code>
+  - EN: Declares the callable or operator `tCrS_neg`.
+  - CN: 声明可调用对象或运算符 `tCrS_neg`。
+- **L873**: <code>      Tensor scales_pos = tCrS_pos(_, _, k_block);</code>
+  - EN: Declares the callable or operator `tCrS_pos`.
+  - CN: 声明可调用对象或运算符 `tCrS_pos`。
+- **L874**: <code>      CUTE_STATIC_ASSERT_V(cute::size(src) == cute::size(scales_neg));</code>
+  - EN: Declares the callable or operator `CUTE_STATIC_ASSERT_V`.
+  - CN: 声明可调用对象或运算符 `CUTE_STATIC_ASSERT_V`。
+- **L875**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L876**: <code>      static_check_scale(scales_neg);</code>
+  - EN: Declares the callable or operator `static_check_scale`.
+  - CN: 声明可调用对象或运算符 `static_check_scale`。
+- **L877**: <code>      static_check_scale(scales_pos);</code>
+  - EN: Declares the callable or operator `static_check_scale`.
+  - CN: 声明可调用对象或运算符 `static_check_scale`。
+- **L878**: <code>      Tensor scales_neg_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(scales_neg, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L879**: <code>      Tensor scales_pos_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(scales_pos, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L880**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L881**: <code>      if (k_block == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L882**: <code>        Tensor scales_neg_vm_ = filter(scales_neg_vm);</code>
+  - EN: Declares the callable or operator `filter`.
+  - CN: 声明可调用对象或运算符 `filter`。
+- **L883**: <code>        Tensor scales_pos_vm_ = filter(scales_pos_vm);</code>
+  - EN: Declares the callable or operator `filter`.
+  - CN: 声明可调用对象或运算符 `filter`。
+- **L884**: <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L885**: <code>        for (int i = 0; i &lt; size(scales_neg_vm_.layout()); ++i)</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L886**: <code>        {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L887**: <code>          auto&amp;&amp; scale_neg_ = reinterpret_cast&lt;cutlass::Array&lt;uint32_t, 2&gt; const&amp;&gt;(scales_neg_vm_(i));</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L888**: <code>          auto&amp;&amp; scale_pos_ = reinterpret_cast&lt;cutlass::Array&lt;uint32_t, 2&gt;      &amp;&gt;(scales_pos_vm_(i));</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L889**: <code>          </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L890**: <code>          // Accept CUTLASS pseudo-FP as well</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L891**: <code>          if constexpr (cutlass::platform::is_floating_point&lt;RealSwappedElementA&gt;::value ||</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L892**: <code>                        cute::is_same_v&lt;RealSwappedElementA, cutlass::float_e2m1_t&gt;) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L893**: <code>            // E2M1 (FP4): Sign-magnitude encoding - simple sign flip with two XORs</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L894**: <code>            asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L895**: <code>                &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L896**: <code>                &quot;  xor .b32 %0, %2, %4;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L897**: <code>                &quot;  xor .b32 %1, %3, %4;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L898**: <code>                &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L899**: <code>                : &quot;=r&quot;(scale_pos_[0]), &quot;=r&quot;(scale_pos_[1])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L900**: <code>                : &quot;r&quot;(scale_neg_[0]), &quot;r&quot;(scale_neg_[1]), &quot;n&quot;(0x80808080)</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L901**: <code>              );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L902**: <code>          } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L903**: <code>            // INT4: Two&#x27;s complement encoding - reorder and sign flip with lop3</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L904**: <code>            constexpr uint32_t immLut = (0xf0 &amp; 0xcc) ^ 0xaa;</code>
+  - EN: Declares the callable or operator `immLut`.
+  - CN: 声明可调用对象或运算符 `immLut`。
+- **L905**: <code>            asm volatile(</code>
+  - EN: Begins or continues the signature/parameter list for `volatile`.
+  - CN: 开始或继续 `volatile` 的签名/参数列表。
+- **L906**: <code>                &quot;{\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L907**: <code>                &quot;  lop3 .b32 %0, %2, %4, %5, %6;\n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L908**: <code>                &quot;  xor  .b32 %1, %3, %5;        \n&quot; \</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L909**: <code>                &quot;}\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L910**: <code>                : &quot;=r&quot;(scale_pos_[0]), &quot;=r&quot;(scale_pos_[1])</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L911**: <code>                : &quot;r&quot;(scale_neg_[0]), &quot;r&quot;(scale_neg_[1]), &quot;n&quot;(0xFFFFFF00), &quot;n&quot;(0x80808080), &quot;n&quot;(immLut)</code>
+  - EN: Provides part of the signature or implementation for `r`.
+  - CN: 提供 `r` 的签名或实现的一部分。
+- **L912**: <code>              );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L913**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L914**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L915**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L916**: <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L917**: <code>      for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L918**: <code>        lookup_table_convert(src_vm(_, i), dst_vm(_, i), scales_neg_vm(_, i), scales_pos_vm(_, i));</code>
+  - EN: Declares the callable or operator `lookup_table_convert`.
+  - CN: 声明可调用对象或运算符 `lookup_table_convert`。
+- **L919**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L920**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L921**: <code>    else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L922**: <code>      Tensor scales = cute::get&lt;1&gt;(partitioned_extra_info)(_, _, k_block);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L923**: <code>      CUTE_STATIC_ASSERT_V(size(src) == size(scales));</code>
+  - EN: Declares the callable or operator `CUTE_STATIC_ASSERT_V`.
+  - CN: 声明可调用对象或运算符 `CUTE_STATIC_ASSERT_V`。
+- **L924**: <code>      Tensor scales_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(scales, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L925**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L926**: <code>      if constexpr (is_same_v&lt;DstType, ElementScale&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L927**: <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L928**: <code>        for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L929**: <code>          LayoutAwareConvert(src_vm(_, i), dst_vm(_, i));</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L930**: <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L931**: <code>          for (int j = 0; j &lt; size&lt;0&gt;(dst_vm); ++j) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L932**: <code>            dst_vm(j, i) *= scales_vm(j, i);</code>
+  - EN: Declares the callable or operator `dst_vm`.
+  - CN: 声明可调用对象或运算符 `dst_vm`。
+- **L933**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L934**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L935**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L936**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L937**: <code>        auto stage = make_tensor_like&lt;ElementScale&gt;(src_vm(_, 0));</code>
+  - EN: Declares the callable or operator `ElementScale`.
+  - CN: 声明可调用对象或运算符 `ElementScale`。
+- **L938**: <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L939**: <code>        for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L940**: <code>          LayoutAwareConvert(src_vm(_, i), stage);</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L941**: <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L942**: <code>          for (int j = 0; j &lt; size&lt;0&gt;(dst_vm); ++j) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L943**: <code>            stage(j) *= scales_vm(j, i);</code>
+  - EN: Declares the callable or operator `stage`.
+  - CN: 声明可调用对象或运算符 `stage`。
+- **L944**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L945**: <code>          LayoutAwareConvert(stage, dst_vm(_, i));</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L946**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L947**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L948**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L949**: <code>    else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L950**: <code>      static_assert(is_same_v&lt;ElementScale, ElementZero&gt;, &quot;ElementScale and ElementZero must be the same.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L951**: <code>      Tensor scales = cute::get&lt;1&gt;(partitioned_extra_info)(_, _, k_block);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L952**: <code>      Tensor zeros  = cute::get&lt;3&gt;(partitioned_extra_info)(_, _, k_block);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L953**: <code>      CUTE_STATIC_ASSERT_V(size(src) == size(scales));</code>
+  - EN: Declares the callable or operator `CUTE_STATIC_ASSERT_V`.
+  - CN: 声明可调用对象或运算符 `CUTE_STATIC_ASSERT_V`。
+- **L954**: <code>      CUTE_STATIC_ASSERT_V(size(src) == size(zeros));</code>
+  - EN: Declares the callable or operator `CUTE_STATIC_ASSERT_V`.
+  - CN: 声明可调用对象或运算符 `CUTE_STATIC_ASSERT_V`。
+- **L955**: <code>      Tensor scales_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(scales, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L956**: <code>      Tensor zeros_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(zeros, Int&lt;NumValPerSrcReg&gt;{}));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L957**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L958**: <code>      if constexpr (is_same_v&lt;DstType, ElementScale&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L959**: <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L960**: <code>        for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L961**: <code>          LayoutAwareConvert(src_vm(_, i), dst_vm(_, i));</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L962**: <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L963**: <code>          for (int j = 0; j &lt; size&lt;0&gt;(dst_vm); ++j) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L964**: <code>            dst_vm(j, i) = dst_vm(j, i) * scales_vm(j, i) + zeros_vm(j, i);</code>
+  - EN: Declares the callable or operator `dst_vm`.
+  - CN: 声明可调用对象或运算符 `dst_vm`。
+- **L965**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L966**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L967**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L968**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L969**: <code>        auto stage = make_tensor_like&lt;ElementScale&gt;(src_vm(_, 0));</code>
+  - EN: Declares the callable or operator `ElementScale`.
+  - CN: 声明可调用对象或运算符 `ElementScale`。
+- **L970**: <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L971**: <code>        for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L972**: <code>          LayoutAwareConvert(src_vm(_, i), stage);</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L973**: <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L974**: <code>          for (int j = 0; j &lt; size&lt;0&gt;(dst_vm); ++j) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L975**: <code>            stage(j) = stage(j) * scales_vm(j, i) + zeros_vm(j, i);</code>
+  - EN: Declares the callable or operator `stage`.
+  - CN: 声明可调用对象或运算符 `stage`。
+- **L976**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L977**: <code>          LayoutAwareConvert(stage, dst_vm(_, i));</code>
+  - EN: Declares the callable or operator `LayoutAwareConvert`.
+  - CN: 声明可调用对象或运算符 `LayoutAwareConvert`。
+- **L978**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L979**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L980**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L981**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L982**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;No A data is loaded.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L983**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L984**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L985**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L986**: <code>  /// (Designed for separate transform pipeline in Blackwell)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L987**: <code>  /// Utilities to dequantize A.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L988**: <code>  template &lt;class EngineIn,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L989**: <code>            class EngineOut,</code>
+  - EN: Declares or defines the class `EngineOut`.
+  - CN: 声明或定义 class `EngineOut`。
+- **L990**: <code>            class LayoutIn,</code>
+  - EN: Declares or defines the class `LayoutIn`.
+  - CN: 声明或定义 class `LayoutIn`。
+- **L991**: <code>            class LayoutOut,</code>
+  - EN: Declares or defines the class `LayoutOut`.
+  - CN: 声明或定义 class `LayoutOut`。
+- **L992**: <code>            class... Ts&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L993**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L994**: <code>  static void dequantize_A_kblock_for_transform(</code>
+  - EN: Begins or continues the signature/parameter list for `dequantize_A_kblock_for_transform`.
+  - CN: 开始或继续 `dequantize_A_kblock_for_transform` 的签名/参数列表。
+- **L995**: <code>    Tensor&lt;EngineIn, LayoutIn&gt; const&amp; tArA,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L996**: <code>    Tensor&lt;EngineOut, LayoutOut&gt;&amp; tArACompute,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L997**: <code>    cute::tuple&lt;Ts...&gt; const&amp; partitioned_extra_info,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L998**: <code>    int const k_block) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L999**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1000**: <code>    static_assert(is_rmem&lt;EngineIn&gt;::value, &quot;Input tensor for A conversion must come from registers&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1001**: <code>    static_assert(is_rmem&lt;EngineOut&gt;::value, &quot;Output tensor for A conversion must come from registers&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1002**: <code>    static_assert(cosize_v&lt;LayoutIn&gt; == cosize_v&lt;LayoutOut&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1003**: <code>    static_assert(size_v&lt;LayoutIn&gt; == cosize_v&lt;LayoutIn&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1004**: <code>    static_assert(size_v&lt;LayoutOut&gt; == cosize_v&lt;LayoutOut&gt;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1005**: <code>    using SrcType = typename EngineIn::value_type;</code>
+  - EN: Defines the alias `SrcType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcType`。
+- **L1006**: <code>    using DstType = typename EngineOut::value_type;</code>
+  - EN: Defines the alias `DstType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstType`。
+- **L1007**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1008**: <code>    auto src = tArA(_, _, _, k_block);</code>
+  - EN: Declares the callable or operator `tArA`.
+  - CN: 声明可调用对象或运算符 `tArA`。
+- **L1009**: <code>    auto dst = tArACompute(_, _, _, k_block);</code>
+  - EN: Declares the callable or operator `tArACompute`.
+  - CN: 声明可调用对象或运算符 `tArACompute`。
+- **L1010**: <code>    constexpr int num_elements = decltype(size(src))::value;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1011**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1012**: <code>    constexpr int pack = decltype(select_packing&lt;SrcType, DstType, num_elements&gt;::value())::value;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1013**: <code>    using Converter = cutlass::NumericArrayConverter&lt;DstType, SrcType, pack, cutlass::FloatRoundStyle::round_to_nearest&gt;;</code>
+  - EN: Defines the alias `Converter` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Converter`。
+- **L1014**: <code>    using SrcArray = cutlass::Array&lt;SrcType, pack&gt;;</code>
+  - EN: Defines the alias `SrcArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SrcArray`。
+- **L1015**: <code>    using DstArray = cutlass::Array&lt;DstType, pack&gt;;</code>
+  - EN: Defines the alias `DstArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DstArray`。
+- **L1016**: <code>    constexpr int DstElementsPerReg = 32 / sizeof_bits_v&lt;DstType&gt;;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1017**: <code>    using RegArray = cutlass::AlignedArray&lt;uint32_t, pack / DstElementsPerReg, sizeof(DstArray)&gt;;</code>
+  - EN: Defines the alias `RegArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `RegArray`。
+- **L1018**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1019**: <code>    auto src_arr = recast&lt;SrcArray&gt;(src);</code>
+  - EN: Declares the callable or operator `SrcArray`.
+  - CN: 声明可调用对象或运算符 `SrcArray`。
+- **L1020**: <code>    auto dst_arr = recast&lt;DstArray&gt;(dst);</code>
+  - EN: Declares the callable or operator `DstArray`.
+  - CN: 声明可调用对象或运算符 `DstArray`。
+- **L1021**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1022**: <code>    Tensor dst_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(dst, pack));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L1023**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1024**: <code>    cute::transform(src_arr, dst_arr, Converter::convert);</code>
+  - EN: Declares the callable or operator `transform`.
+  - CN: 声明可调用对象或运算符 `transform`。
+- **L1025**: <code>    </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1026**: <code>    if constexpr (ModeHasScales) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1027**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1028**: <code>      auto const&amp; scales = cute::get&lt;1&gt;(partitioned_extra_info)(_,_,_,k_block);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L1029**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1030**: <code>      CUTE_STATIC_ASSERT_V(size(src) == size(scales));</code>
+  - EN: Declares the callable or operator `CUTE_STATIC_ASSERT_V`.
+  - CN: 声明可调用对象或运算符 `CUTE_STATIC_ASSERT_V`。
+- **L1031**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1032**: <code>      if constexpr (is_same_v&lt;DstType, ElementScale&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1033**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1034**: <code>        using ScaleArray = cutlass::Array&lt;ElementScale, pack&gt;;</code>
+  - EN: Defines the alias `ScaleArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ScaleArray`。
+- **L1035**: <code>        auto scale_arr = recast&lt;ScaleArray&gt;(filter_zeros(scales));</code>
+  - EN: Declares the callable or operator `ScaleArray`.
+  - CN: 声明可调用对象或运算符 `ScaleArray`。
+- **L1036**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1037**: <code>        if constexpr (is_same_v&lt;DstType, cutlass::bfloat16_t&gt;){</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1038**: <code>          Tensor scales_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(scales, pack));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L1039**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1040**: <code>          for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i){</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1041**: <code>            auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst_vm(_,i))(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L1042**: <code>            auto&amp;&amp; scale_reg = cute::recast&lt;RegArray&gt;(scales_vm(_,i))(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L1043**: <code>            CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1044**: <code>            for (size_t ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1045**: <code>              __nv_bfloat162&amp; bf16x2_val = reinterpret_cast&lt;__nv_bfloat162&amp;&gt;(r[ii]);</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L1046**: <code>              bf16x2_val = __hmul2(bf16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hmul2`.
+  - CN: 开始或继续 `__hmul2` 的签名/参数列表。
+- **L1047**: <code>                                  reinterpret_cast&lt;const __nv_bfloat162&amp;&gt;(scale_reg[ii]));</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L1048**: <code>            }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1049**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1050**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1051**: <code>        else{</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L1052**: <code>          cute::transform(dst_arr, scale_arr, dst_arr, cute::multiplies{});</code>
+  - EN: Declares the callable or operator `transform`.
+  - CN: 声明可调用对象或运算符 `transform`。
+- **L1053**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1054**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1055**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1056**: <code>         // Do Nothing</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1057**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1058**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1059**: <code>        static_assert(is_same_v&lt;ElementScale, ElementZero&gt;, &quot;ElementScale and ElementZero must be the same.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1060**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1061**: <code>        auto const&amp; zeros = cute::get&lt;3&gt;(partitioned_extra_info)(_,_,_,k_block);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L1062**: <code>        CUTE_STATIC_ASSERT_V(size(src) == size(zeros));</code>
+  - EN: Declares the callable or operator `CUTE_STATIC_ASSERT_V`.
+  - CN: 声明可调用对象或运算符 `CUTE_STATIC_ASSERT_V`。
+- **L1063**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1064**: <code>        if constexpr (is_same_v&lt;DstType, ElementZero&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1065**: <code>          using ZeroArray = cutlass::Array&lt;ElementZero, pack&gt;;</code>
+  - EN: Defines the alias `ZeroArray` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ZeroArray`。
+- **L1066**: <code>          auto zero_arr = recast&lt;ZeroArray&gt;(filter_zeros(zeros));</code>
+  - EN: Declares the callable or operator `ZeroArray`.
+  - CN: 声明可调用对象或运算符 `ZeroArray`。
+- **L1067**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1068**: <code>        if constexpr (is_same_v&lt;DstType, cutlass::bfloat16_t&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1069**: <code>          Tensor zeros_vm = cute::group_modes&lt;1,-1&gt;(cute::zipped_divide(zeros, pack));</code>
+  - EN: Declares the callable or operator `group_modes`.
+  - CN: 声明可调用对象或运算符 `group_modes`。
+- **L1070**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1071**: <code>          for (int i = 0; i &lt; size&lt;1&gt;(dst_vm); ++i){</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1072**: <code>            auto&amp;&amp; r       = cute::recast&lt;RegArray&gt;(dst_vm(_,i))(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L1073**: <code>            auto&amp;&amp; zero_reg = cute::recast&lt;RegArray&gt;(zeros_vm(_,i))(0);</code>
+  - EN: Declares the callable or operator `RegArray`.
+  - CN: 声明可调用对象或运算符 `RegArray`。
+- **L1074**: <code>            CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1075**: <code>            for (size_t ii = 0; ii &lt; RegArray::kElements; ++ii) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1076**: <code>              __nv_bfloat162&amp; bf16x2_val = reinterpret_cast&lt;__nv_bfloat162&amp;&gt;(r[ii]);</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L1077**: <code>              bf16x2_val = __hadd2(bf16x2_val,</code>
+  - EN: Begins or continues the signature/parameter list for `__hadd2`.
+  - CN: 开始或继续 `__hadd2` 的签名/参数列表。
+- **L1078**: <code>                                  reinterpret_cast&lt;const __nv_bfloat162&amp;&gt;(zero_reg[ii]));</code>
+  - EN: Declares the callable or operator `__nv_bfloat162`.
+  - CN: 声明可调用对象或运算符 `__nv_bfloat162`。
+- **L1079**: <code>            }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1080**: <code>          }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1081**: <code>        }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1082**: <code>        else{</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L1083**: <code>          cute::transform(dst_arr, zero_arr, dst_arr, cute::plus{});</code>
+  - EN: Declares the callable or operator `transform`.
+  - CN: 声明可调用对象或运算符 `transform`。
+- **L1084**: <code>         }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1085**: <code>       }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1086**: <code>     }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1087**: <code>     else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1088**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled for input partitioning.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1089**: <code>     }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1090**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1091**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1092**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1093**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1094**: <code>  /// Utilities for any additional inputs inside of the TMA load</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1095**: <code>  template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1096**: <code>    class Params,</code>
+  - EN: Declares or defines the class `Params`.
+  - CN: 声明或定义 class `Params`。
+- **L1097**: <code>    class TensorStorage,</code>
+  - EN: Declares or defines the class `TensorStorage`.
+  - CN: 声明或定义 class `TensorStorage`。
+- **L1098**: <code>    class... Ts</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1099**: <code>  &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1100**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1101**: <code>  static auto partition_extra_tma_inputs(</code>
+  - EN: Begins or continues the signature/parameter list for `partition_extra_tma_inputs`.
+  - CN: 开始或继续 `partition_extra_tma_inputs` 的签名/参数列表。
+- **L1102**: <code>    Params const&amp; mainloop_params,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1103**: <code>    cute::tuple&lt;Ts...&gt; const&amp; load_inputs,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1104**: <code>    TensorStorage&amp; shared_tensors,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1105**: <code>    uint2 const&amp; cluster_local_block_id,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1106**: <code>    int const m_coord,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1107**: <code>    int const l_coord) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L1108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1109**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1110**: <code>      return cute::make_tuple();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1111**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1112**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1113**: <code>      Tensor sS  = make_tensor(make_smem_ptr(shared_tensors.smem_scale.begin()), SmemLayoutScale{}); // (BLK_M,BLK_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1114**: <code>      Tensor gS_mkl = get&lt;2&gt;(load_inputs);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L1115**: <code>      auto block_tma_s = mainloop_params.tma_load_scale.get_slice(cluster_local_block_id.y);</code>
+  - EN: Declares the callable or operator `get_slice`.
+  - CN: 声明可调用对象或运算符 `get_slice`。
+- **L1116**: <code>      Tensor gS = gS_mkl(_,_,m_coord,_,l_coord);                                                  // (BLK_M,BLK_K,k)</code>
+  - EN: Provides part of the signature or implementation for `gS_mkl`.
+  - CN: 提供 `gS_mkl` 的签名或实现的一部分。
+- **L1117**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1118**: <code>      Tensor tSgS = block_tma_s.partition_S(gS);</code>
+  - EN: Declares the callable or operator `partition_S`.
+  - CN: 声明可调用对象或运算符 `partition_S`。
+- **L1119**: <code>      Tensor tSsS = block_tma_s.partition_D(sS);                                              // (TMA,TMA_M,TMA_K,PIPE)</code>
+  - EN: Provides part of the signature or implementation for `partition_D`.
+  - CN: 提供 `partition_D` 的签名或实现的一部分。
+- **L1120**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1121**: <code>        return cute::make_tuple(tSgS, tSsS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1122**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1123**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1124**: <code>        Tensor sZ  = make_tensor(make_smem_ptr(shared_tensors.smem_zero.begin()), SmemLayoutScale{}); // (BLK_M,BLK_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1125**: <code>        Tensor gZ_mkl = get&lt;3&gt;(load_inputs);</code>
+  - EN: Declares the callable or operator `get`.
+  - CN: 声明可调用对象或运算符 `get`。
+- **L1126**: <code>        auto block_tma_z = mainloop_params.tma_load_zero.get_slice(cluster_local_block_id.y);</code>
+  - EN: Declares the callable or operator `get_slice`.
+  - CN: 声明可调用对象或运算符 `get_slice`。
+- **L1127**: <code>        Tensor gZ = gZ_mkl(_,_,m_coord,_,l_coord);                                            // (BLK_M,BLK_K,k)</code>
+  - EN: Provides part of the signature or implementation for `gZ_mkl`.
+  - CN: 提供 `gZ_mkl` 的签名或实现的一部分。
+- **L1128**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1129**: <code>        Tensor tZgZ = block_tma_z.partition_S(gZ);</code>
+  - EN: Declares the callable or operator `partition_S`.
+  - CN: 声明可调用对象或运算符 `partition_S`。
+- **L1130**: <code>        Tensor tZsZ = block_tma_z.partition_D(sZ);                                            // (TMA,TMA_M,TMA_K,PIPE)</code>
+  - EN: Provides part of the signature or implementation for `partition_D`.
+  - CN: 提供 `partition_D` 的签名或实现的一部分。
+- **L1131**: <code>        return cute::make_tuple(tSgS, tSsS, tZgZ, tZsZ);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1132**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1133**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1134**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled for input partitioning.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1135**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1136**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1137**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1138**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled for input partitioning.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1139**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1140**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1141**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1142**: <code>  /// Utilities for partitioning extra inputs for loading from smem in the mainloop.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1143**: <code>  template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1144**: <code>    class ThreadMma,</code>
+  - EN: Declares or defines the class `ThreadMma`.
+  - CN: 声明或定义 class `ThreadMma`。
+- **L1145**: <code>    class TensorStorage</code>
+  - EN: Declares or defines the class `TensorStorage`.
+  - CN: 声明或定义 class `TensorStorage`。
+- **L1146**: <code>  &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1147**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1148**: <code>  static auto partition_extra_mma_info(</code>
+  - EN: Begins or continues the signature/parameter list for `partition_extra_mma_info`.
+  - CN: 开始或继续 `partition_extra_mma_info` 的签名/参数列表。
+- **L1149**: <code>    ThreadMma const&amp; mma_thread_slice,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1150**: <code>    TensorStorage&amp; shared_tensors) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L1151**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1152**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1153**: <code>      // nothing to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1154**: <code>      return cute::make_tuple();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1155**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1156**: <code>    else if constexpr (UseScaleLookupTable) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1157**: <code>      Tensor sS = make_tensor(make_smem_ptr(shared_tensors.smem_scale.begin()), SmemLayoutScale{});// (BLK_M,BLK_SCALE_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1158**: <code>      Tensor tCsS = mma_thread_slice.partition_A(sS);</code>
+  - EN: Declares the callable or operator `partition_A`.
+  - CN: 声明可调用对象或运算符 `partition_A`。
+- **L1159**: <code>      Tensor tCrS_neg = make_tensor&lt;ElementScale&gt;(mma_thread_slice.partition_fragment_A(sS(_,_,Int&lt;0&gt;{})).layout());</code>
+  - EN: Declares the callable or operator `ElementScale`.
+  - CN: 声明可调用对象或运算符 `ElementScale`。
+- **L1160**: <code>      Tensor tCrS_pos = make_tensor&lt;ElementScale&gt;(mma_thread_slice.partition_fragment_A(sS(_,_,Int&lt;0&gt;{})).layout());</code>
+  - EN: Declares the callable or operator `ElementScale`.
+  - CN: 声明可调用对象或运算符 `ElementScale`。
+- **L1161**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1162**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1163**: <code>        return cute::make_tuple(tCsS, tCrS_neg, tCrS_pos);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1164**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1165**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1166**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1167**: <code>      Tensor sS = make_tensor(make_smem_ptr(shared_tensors.smem_scale.begin()), SmemLayoutScale{});// (BLK_M,BLK_SCALE_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1168**: <code>      Tensor tCsS = mma_thread_slice.partition_A(sS);</code>
+  - EN: Declares the callable or operator `partition_A`.
+  - CN: 声明可调用对象或运算符 `partition_A`。
+- **L1169**: <code>      Tensor tCrS = make_tensor&lt;ElementScale&gt;(mma_thread_slice.partition_fragment_A(sS(_,_,Int&lt;0&gt;{})).layout());</code>
+  - EN: Declares the callable or operator `ElementScale`.
+  - CN: 声明可调用对象或运算符 `ElementScale`。
+- **L1170**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1171**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1172**: <code>        return cute::make_tuple(tCsS, tCrS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1173**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1174**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1175**: <code>        Tensor sZ = make_tensor(make_smem_ptr(shared_tensors.smem_zero.begin()), SmemLayoutScale{});// (BLK_M,BLK_SCALE_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1176**: <code>        Tensor tCsZ = mma_thread_slice.partition_A(sZ);</code>
+  - EN: Declares the callable or operator `partition_A`.
+  - CN: 声明可调用对象或运算符 `partition_A`。
+- **L1177**: <code>        Tensor tCrZ = make_tensor&lt;ElementZero&gt;(mma_thread_slice.partition_fragment_A(sZ(_,_,Int&lt;0&gt;{})).layout());</code>
+  - EN: Declares the callable or operator `ElementZero`.
+  - CN: 声明可调用对象或运算符 `ElementZero`。
+- **L1178**: <code>        return cute::make_tuple(tCsS, tCrS, tCsZ, tCrZ);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1179**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1180**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1181**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1182**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1183**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1184**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1185**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1186**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1187**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1189**: <code>  template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1190**: <code>    class TiledMma,</code>
+  - EN: Declares or defines the class `TiledMma`.
+  - CN: 声明或定义 class `TiledMma`。
+- **L1191**: <code>    class TiledCopy,</code>
+  - EN: Declares or defines the class `TiledCopy`.
+  - CN: 声明或定义 class `TiledCopy`。
+- **L1192**: <code>    class TensorStorage</code>
+  - EN: Declares or defines the class `TensorStorage`.
+  - CN: 声明或定义 class `TensorStorage`。
+- **L1193**: <code>  &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1194**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1195**: <code>  static auto partition_extra_transform_info(</code>
+  - EN: Begins or continues the signature/parameter list for `partition_extra_transform_info`.
+  - CN: 开始或继续 `partition_extra_transform_info` 的签名/参数列表。
+- **L1196**: <code>    TiledMma const&amp; tiled_mma,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1197**: <code>    TiledCopy const&amp; smem_tiled_copy_S,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1198**: <code>    TensorStorage&amp; shared_storage) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L1199**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1200**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1201**: <code>      // nothing to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1202**: <code>      return cute::make_tuple();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1203**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1204**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1205**: <code>      ThrMMA cta_mma = TiledMma{}.get_slice(blockIdx.x % size(typename TiledMma::AtomThrID{}));</code>
+  - EN: Declares the callable or operator `get_slice`.
+  - CN: 声明可调用对象或运算符 `get_slice`。
+- **L1206**: <code>      auto smem_thr_copy_S = smem_tiled_copy_S.get_slice(threadIdx.x % 128);</code>
+  - EN: Declares the callable or operator `get_slice`.
+  - CN: 声明可调用对象或运算符 `get_slice`。
+- **L1207**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1208**: <code>      Tensor sS = make_tensor(make_smem_ptr(shared_storage.input.smem_scale.begin()), SmemLayoutScale{}); // (BLK_M,BLK_SCALE_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1209**: <code>      Tensor tSsS = smem_thr_copy_S.partition_S(sS);</code>
+  - EN: Declares the callable or operator `partition_S`.
+  - CN: 声明可调用对象或运算符 `partition_S`。
+- **L1210**: <code>      Tensor tSrS = make_tensor&lt;ElementScale&gt;(tSsS(_,_,_,_,0).shape());</code>
+  - EN: Declares the callable or operator `ElementScale`.
+  - CN: 声明可调用对象或运算符 `ElementScale`。
+- **L1211**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1212**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1213**: <code>        return cute::make_tuple(smem_tiled_copy_S, tSrS, tSsS);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1214**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1215**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1216**: <code>        Tensor sZ = make_tensor(make_smem_ptr(shared_storage.input.smem_zero.begin()), SmemLayoutScale{});// (BLK_M,BLK_SCALE_K,PIPE)</code>
+  - EN: Starts the definition body for `make_tensor`.
+  - CN: 开始 `make_tensor` 的定义体。
+- **L1217**: <code>        Tensor tZsZ = smem_thr_copy_S.partition_S(sZ);</code>
+  - EN: Declares the callable or operator `partition_S`.
+  - CN: 声明可调用对象或运算符 `partition_S`。
+- **L1218**: <code>        Tensor tZrZ = make_tensor&lt;ElementZero&gt;(tZsZ(_,_,_,_,0).shape());</code>
+  - EN: Declares the callable or operator `ElementZero`.
+  - CN: 声明可调用对象或运算符 `ElementZero`。
+- **L1219**: <code>        return cute::make_tuple(smem_tiled_copy_S, tSrS, tSsS, tZrZ, tZsZ);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1220**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1221**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1222**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1223**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1224**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1225**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1226**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1227**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1228**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1229**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1230**: <code>  /// Returns the tiled copy and copy views for the extra inputs.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1231**: <code>  template &lt;class TiledMma, class... Ts&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1232**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1233**: <code>  static auto retile_extra_mma_info(</code>
+  - EN: Begins or continues the signature/parameter list for `retile_extra_mma_info`.
+  - CN: 开始或继续 `retile_extra_mma_info` 的签名/参数列表。
+- **L1234**: <code>    TiledMma const&amp; tiled_mma,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1235**: <code>    cute::tuple&lt;Ts...&gt;&amp; partitioned_extra_info,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L1236**: <code>    int const warp_group_thread_idx) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L1237**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1238**: <code>    if constexpr (KernelConversionMode == ConversionMode::DirectConvert) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1239**: <code>      // nothing to do</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1240**: <code>      return cute::make_tuple();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1241**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1242**: <code>    else if constexpr (ModeHasScales) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1243**: <code>      auto smem_tiled_copy_S = make_tiled_copy_A(SmemCopyAtomScale{}, tiled_mma);</code>
+  - EN: Declares the callable or operator `make_tiled_copy_A`.
+  - CN: 声明可调用对象或运算符 `make_tiled_copy_A`。
+- **L1244**: <code>      auto smem_thr_copy_S   = smem_tiled_copy_S.get_thread_slice(warp_group_thread_idx);</code>
+  - EN: Declares the callable or operator `get_thread_slice`.
+  - CN: 声明可调用对象或运算符 `get_thread_slice`。
+- **L1245**: <code>      Tensor tCrS_copy_view  = smem_thr_copy_S.retile_D(cute::get&lt;1&gt;(partitioned_extra_info));        // (CPY,CPY_M,CPY_K)</code>
+  - EN: Provides part of the signature or implementation for `retile_D`.
+  - CN: 提供 `retile_D` 的签名或实现的一部分。
+- **L1246**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1247**: <code>      if constexpr (KernelConversionMode == ConversionMode::ConvertAndScale) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1248**: <code>        return cute::make_tuple(smem_tiled_copy_S, tCrS_copy_view);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1249**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1250**: <code>      else if constexpr (KernelConversionMode == ConversionMode::ConvertAndScaleWithZero) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L1251**: <code>        Tensor tCrZ_copy_view  = smem_thr_copy_S.retile_D(cute::get&lt;3&gt;(partitioned_extra_info));      // (CPY,CPY_M,CPY_K)</code>
+  - EN: Provides part of the signature or implementation for `retile_D`.
+  - CN: 提供 `retile_D` 的签名或实现的一部分。
+- **L1252**: <code>        return cute::make_tuple(smem_tiled_copy_S, tCrS_copy_view, tCrZ_copy_view);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1253**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1254**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1255**: <code>        static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1256**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1257**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1258**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L1259**: <code>      static_assert(cutlass::detail::dependent_false&lt;KernelSchedule&gt;, &quot;Conversion mode not handled in A -&gt; RF path.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L1260**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1261**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1262**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1263**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1264**: <code>} // cutlass::gemm::collective::detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Symbol focus: `SrcType` / 重点符号：`SrcType`
+- Symbol focus: `DstType` / 重点符号：`DstType`
+- Symbol focus: `LayoutIn` / 重点符号：`LayoutIn`
+- Symbol focus: `LayoutOut` / 重点符号：`LayoutOut`
+- Symbol focus: `LayoutAwareConvertImpl` / 重点符号：`LayoutAwareConvertImpl`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/numeric_conversion.h"`
+  - `"cute/util/type_traits.hpp"`
+  - `"cute/arch/copy_sm90.hpp"`
+  - `"cute/numeric/arithmetic_tuple.hpp"`

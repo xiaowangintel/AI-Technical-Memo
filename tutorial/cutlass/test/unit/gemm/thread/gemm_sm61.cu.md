@@ -1,0 +1,294 @@
+# gemm_sm61.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/thread/gemm_sm61.cu`
+
+## Purpose / 目的
+- EN: This file instantiates thread-level GEMM unit tests for SM61, varying small GEMM shapes and row/column-major layout combinations while reusing the local thread testbed.
+- CN: 该文件为 SM61 实例化线程级 GEMM 单元测试，在复用本地线程测试平台的同时覆盖小型 GEMM 形状以及行主/列主布局组合。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1**: <code>/***************************************************************************************************</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: <code> **************************************************************************************************/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: <code>/*! \file</code>
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: <code>    \brief Unit tests for thread-level GEMM</code>
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: <code>*/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: <code>#include &quot;../../common/cutlass_unit_test.h&quot;</code>
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 36**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: <code>#include &quot;cutlass/gemm/thread/mma.h&quot;</code>
+  - EN: Declares the thread-level matrix-multiply-accumulate operator used by these tests.
+  - CN: 声明这些测试使用的线程级矩阵乘加算子。
+- **Line 38**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: <code>#include &quot;testbed.h&quot;</code>
+  - EN: Provides the local GEMM testbed that allocates tensors, launches kernels, and validates outputs.
+  - CN: 提供本地 GEMM 测试平台，用于分配张量、启动内核并验证输出。
+- **Line 40**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 42**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 43**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 44**: <code>//</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 45**: <code>// Compute capability SM61</code>
+  - EN: Adds an inline comment about the nearby code: Compute capability SM61
+  - CN: 添加关于附近代码的行内注释：Compute capability SM61
+- **Line 46**: <code>//</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 47**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 48**: <code>TEST(SM61_Igemm_thread, col_row_1x1x4) {</code>
+  - EN: Starts GoogleTest case `SM61_Igemm_thread / col_row_1x1x4`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM61_Igemm_thread / col_row_1x1x4`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 49**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: <code>  test::gemm::thread::Testbed&lt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 51**: <code>    cutlass::gemm::GemmShape&lt;1, 1, 4&gt;,</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 52**: <code>    int8_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 53**: <code>    cutlass::layout::RowMajor,</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 54**: <code>    int8_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 55**: <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 56**: <code>    int32_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 57**: <code>    cutlass::layout::ColumnMajor</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 58**: <code>  &gt;().run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 59**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 60**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 61**: <code>TEST(SM61_Igemm_thread, col_row_2x3x4) {</code>
+  - EN: Starts GoogleTest case `SM61_Igemm_thread / col_row_2x3x4`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM61_Igemm_thread / col_row_2x3x4`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 62**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 63**: <code>  test::gemm::thread::Testbed&lt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 64**: <code>    cutlass::gemm::GemmShape&lt;2, 3, 4&gt;,</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 65**: <code>    int8_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 66**: <code>    cutlass::layout::RowMajor,</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 67**: <code>    int8_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 68**: <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 69**: <code>    int32_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 70**: <code>    cutlass::layout::ColumnMajor</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 71**: <code>  &gt;().run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 72**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 73**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 74**: <code>TEST(SM61_Igemm_thread, col_row_8x8x4) {</code>
+  - EN: Starts GoogleTest case `SM61_Igemm_thread / col_row_8x8x4`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM61_Igemm_thread / col_row_8x8x4`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 75**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 76**: <code>  test::gemm::thread::Testbed&lt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 77**: <code>    cutlass::gemm::GemmShape&lt;8, 8, 4&gt;,</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 78**: <code>    int8_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 79**: <code>    cutlass::layout::RowMajor,</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 80**: <code>    int8_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 81**: <code>    cutlass::layout::ColumnMajor,</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 82**: <code>    int32_t,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 83**: <code>    cutlass::layout::ColumnMajor</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 84**: <code>  &gt;().run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 85**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 86**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 87**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+
+## Key Concepts / 关键概念
+
+- `thread-level MMA`
+  - EN: The file focuses on a single-thread MMA operator, so each test validates tiny GEMM shapes without warp-level cooperation.
+  - CN: 该文件关注单线程 MMA 算子，因此每个测试都在不依赖 warp 协作的情况下验证小型 GEMM 形状。
+- `GemmShape`
+  - EN: Tile shapes are encoded explicitly, so each test documents the M/N/K sizes handled by the chosen MMA operator.
+  - CN: tile 形状通过显式类型编码，因此每个测试都直接说明了所选 MMA 算子处理的 M/N/K 尺寸。
+
+## Dependencies / 依赖
+
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/gemm/thread/mma.h`
+  - EN: Declares the thread-level matrix-multiply-accumulate operator used by these tests.
+  - CN: 声明这些测试使用的线程级矩阵乘加算子。
+- `testbed.h`
+  - EN: Provides the local GEMM testbed that allocates tensors, launches kernels, and validates outputs.
+  - CN: 提供本地 GEMM 测试平台，用于分配张量、启动内核并验证输出。

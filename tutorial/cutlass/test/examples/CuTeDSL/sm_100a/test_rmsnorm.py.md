@@ -1,0 +1,839 @@
+# test_rmsnorm.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/examples/CuTeDSL/sm_100a/test_rmsnorm.py`
+**Purpose / 用途**: This file defines automated tests for test rmsnorm. / 该文件定义了针对 test rmsnorm 的自动化测试。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `"""`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 30 / 第30行**
+  - Code / 代码: `Unit tests for RMSNorm implementation on Blackwell (SM100).`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 31 / 第31行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 32 / 第32行**
+  - Code / 代码: `Tests various configurations of:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 33 / 第33行**
+  - Code / 代码: `- Data types: Float16, BFloat16, Float32`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 34 / 第34行**
+  - Code / 代码: `- Hidden dimensions: small to very large N`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 35 / 第35行**
+  - Code / 代码: `- Batch sizes: M from 1 to large values`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 36 / 第36行**
+  - Code / 代码: `- With and without learnable weight`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 37 / 第37行**
+  - Code / 代码: `- Cluster mode for large N (SM90+/SM100)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 38 / 第38行**
+  - Code / 代码: `"""`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 39 / 第39行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 40 / 第40行**
+  - Code / 代码: `import pytest`
+  - EN: Imports `pytest` so its symbols are available to the test module.
+  - CN: 导入 `pytest`，使其符号可供该测试模块使用。
+- **Line 41 / 第41行**
+  - Code / 代码: `import torch`
+  - EN: Imports `torch` so its symbols are available to the test module.
+  - CN: 导入 `torch`，使其符号可供该测试模块使用。
+- **Line 42 / 第42行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 43 / 第43行**
+  - Code / 代码: `import cutlass`
+  - EN: Imports `cutlass` so its symbols are available to the test module.
+  - CN: 导入 `cutlass`，使其符号可供该测试模块使用。
+- **Line 44 / 第44行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 45 / 第45行**
+  - Code / 代码: `from blackwell.rmsnorm import (`
+  - EN: Imports selected symbols from `blackwell.rmsnorm` for later use.
+  - CN: 从 `blackwell.rmsnorm` 导入选定符号以供后续使用。
+- **Line 46 / 第46行**
+  - Code / 代码: `    run,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 47 / 第47行**
+  - Code / 代码: `    get_sm_version,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 48 / 第48行**
+  - Code / 代码: `    supports_cluster,`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 49 / 第49行**
+  - Code / 代码: `)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 50 / 第50行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 51 / 第51行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 52 / 第52行**
+  - Code / 代码: `class TestRMSNormArchitecture:`
+  - EN: Declares class `TestRMSNormArchitecture` to group related tests or helpers.
+  - CN: 声明类 `TestRMSNormArchitecture`，用于组织相关测试或辅助逻辑。
+- **Line 53 / 第53行**
+  - Code / 代码: `    """Test architecture detection and cluster support."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 54 / 第54行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 55 / 第55行**
+  - Code / 代码: `    def test_get_sm_version(self):`
+  - EN: Defines function `test_get_sm_version`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_get_sm_version`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 56 / 第56行**
+  - Code / 代码: `        """Test SM version detection."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 57 / 第57行**
+  - Code / 代码: `        sm_version = get_sm_version()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 58 / 第58行**
+  - Code / 代码: `        assert sm_version >= 70, f"Got SM{sm_version}, expected at least SM70"`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 59 / 第59行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 60 / 第60行**
+  - Code / 代码: `    def test_supports_cluster(self):`
+  - EN: Defines function `test_supports_cluster`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_supports_cluster`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 61 / 第61行**
+  - Code / 代码: `        """Test cluster support detection."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 62 / 第62行**
+  - Code / 代码: `        sm_version = get_sm_version()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 63 / 第63行**
+  - Code / 代码: `        expected = sm_version >= 90`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 64 / 第64行**
+  - Code / 代码: `        assert supports_cluster() == expected`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 65 / 第65行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 66 / 第66行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 67 / 第67行**
+  - Code / 代码: `class TestRMSNormCorrectness:`
+  - EN: Declares class `TestRMSNormCorrectness` to group related tests or helpers.
+  - CN: 声明类 `TestRMSNormCorrectness`，用于组织相关测试或辅助逻辑。
+- **Line 68 / 第68行**
+  - Code / 代码: `    """Test correctness of RMSNorm kernel."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 69 / 第69行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 70 / 第70行**
+  - Code / 代码: `    @pytest.mark.parametrize("M", [1, 8, 32, 128, 256])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 71 / 第71行**
+  - Code / 代码: `    @pytest.mark.parametrize("N", [256, 512, 1024, 2048, 4096, 8192])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 72 / 第72行**
+  - Code / 代码: `    @pytest.mark.parametrize(`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 73 / 第73行**
+  - Code / 代码: `        "dtype",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 74 / 第74行**
+  - Code / 代码: `        [cutlass.Float16, cutlass.BFloat16],`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 75 / 第75行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 76 / 第76行**
+  - Code / 代码: `    def test_rmsnorm_correctness(self, M, N, dtype):`
+  - EN: Defines function `test_rmsnorm_correctness`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_rmsnorm_correctness`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 77 / 第77行**
+  - Code / 代码: `        """Test RMSNorm against reference implementation."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 78 / 第78行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 79 / 第79行**
+  - Code / 代码: `            M=M,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 80 / 第80行**
+  - Code / 代码: `            N=N,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 81 / 第81行**
+  - Code / 代码: `            dtype=dtype,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 82 / 第82行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 83 / 第83行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 84 / 第84行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 85 / 第85行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 86 / 第86行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 87 / 第87行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 88 / 第88行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 89 / 第89行**
+  - Code / 代码: `    @pytest.mark.parametrize("N", [256, 1024, 4096, 8192])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 90 / 第90行**
+  - Code / 代码: `    def test_rmsnorm_without_weight(self, N):`
+  - EN: Defines function `test_rmsnorm_without_weight`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_rmsnorm_without_weight`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 91 / 第91行**
+  - Code / 代码: `        """Test RMSNorm without weight parameter."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 92 / 第92行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 93 / 第93行**
+  - Code / 代码: `            M=32,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 94 / 第94行**
+  - Code / 代码: `            N=N,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 95 / 第95行**
+  - Code / 代码: `            dtype=cutlass.Float16,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 96 / 第96行**
+  - Code / 代码: `            has_weight=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 97 / 第97行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 98 / 第98行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 99 / 第99行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 100 / 第100行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 101 / 第101行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 102 / 第102行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 103 / 第103行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 104 / 第104行**
+  - Code / 代码: `class TestRMSNormClusterPath:`
+  - EN: Declares class `TestRMSNormClusterPath` to group related tests or helpers.
+  - CN: 声明类 `TestRMSNormClusterPath`，用于组织相关测试或辅助逻辑。
+- **Line 105 / 第105行**
+  - Code / 代码: `    """Test the cluster path for large N (SM90+/SM100 only)."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 106 / 第106行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 107 / 第107行**
+  - Code / 代码: `    @pytest.mark.skipif(not supports_cluster(), reason="Cluster not supported on this GPU")`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 108 / 第108行**
+  - Code / 代码: `    @pytest.mark.parametrize("N", [32768, 65536])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 109 / 第109行**
+  - Code / 代码: `    def test_cluster_path_correctness(self, N):`
+  - EN: Defines function `test_cluster_path_correctness`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_cluster_path_correctness`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 110 / 第110行**
+  - Code / 代码: `        """Test cluster path produces correct results."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 111 / 第111行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 112 / 第112行**
+  - Code / 代码: `            M=32,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 113 / 第113行**
+  - Code / 代码: `            N=N,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 114 / 第114行**
+  - Code / 代码: `            dtype=cutlass.Float16,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 115 / 第115行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 116 / 第116行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 117 / 第117行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 118 / 第118行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 119 / 第119行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 120 / 第120行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 121 / 第121行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 122 / 第122行**
+  - Code / 代码: `class TestRMSNormLargeN:`
+  - EN: Declares class `TestRMSNormLargeN` to group related tests or helpers.
+  - CN: 声明类 `TestRMSNormLargeN`，用于组织相关测试或辅助逻辑。
+- **Line 123 / 第123行**
+  - Code / 代码: `    """Test RMSNorm with large N values."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 124 / 第124行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 125 / 第125行**
+  - Code / 代码: `    @pytest.mark.parametrize("N", [8192, 16384, 32768])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 126 / 第126行**
+  - Code / 代码: `    def test_large_hidden_dim(self, N):`
+  - EN: Defines function `test_large_hidden_dim`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_large_hidden_dim`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 127 / 第127行**
+  - Code / 代码: `        """Test with large N."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 128 / 第128行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 129 / 第129行**
+  - Code / 代码: `            M=32,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 130 / 第130行**
+  - Code / 代码: `            N=N,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 131 / 第131行**
+  - Code / 代码: `            dtype=cutlass.Float16,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 132 / 第132行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 133 / 第133行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 134 / 第134行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 135 / 第135行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 136 / 第136行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 137 / 第137行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 138 / 第138行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 139 / 第139行**
+  - Code / 代码: `    @pytest.mark.parametrize("M", [1024, 4096, 16384])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 140 / 第140行**
+  - Code / 代码: `    def test_large_batch_dim(self, M):`
+  - EN: Defines function `test_large_batch_dim`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_large_batch_dim`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 141 / 第141行**
+  - Code / 代码: `        """Test with large M (batch) dimension."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 142 / 第142行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 143 / 第143行**
+  - Code / 代码: `            M=M,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 144 / 第144行**
+  - Code / 代码: `            N=4096,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 145 / 第145行**
+  - Code / 代码: `            dtype=cutlass.Float16,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 146 / 第146行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 147 / 第147行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 148 / 第148行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 149 / 第149行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 150 / 第150行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 151 / 第151行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 152 / 第152行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 153 / 第153行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 154 / 第154行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 155 / 第155行**
+  - Code / 代码: `class TestRMSNormEdgeCases:`
+  - EN: Declares class `TestRMSNormEdgeCases` to group related tests or helpers.
+  - CN: 声明类 `TestRMSNormEdgeCases`，用于组织相关测试或辅助逻辑。
+- **Line 156 / 第156行**
+  - Code / 代码: `    """Test edge cases for RMSNorm."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 157 / 第157行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 158 / 第158行**
+  - Code / 代码: `    def test_single_row(self):`
+  - EN: Defines function `test_single_row`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_single_row`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 159 / 第159行**
+  - Code / 代码: `        """Test with M=1."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 160 / 第160行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 161 / 第161行**
+  - Code / 代码: `            M=1,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 162 / 第162行**
+  - Code / 代码: `            N=1024,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 163 / 第163行**
+  - Code / 代码: `            dtype=cutlass.Float16,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 164 / 第164行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 165 / 第165行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 166 / 第166行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 167 / 第167行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 168 / 第168行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 169 / 第169行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 170 / 第170行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 171 / 第171行**
+  - Code / 代码: `    def test_many_rows(self):`
+  - EN: Defines function `test_many_rows`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_many_rows`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 172 / 第172行**
+  - Code / 代码: `        """Test with many rows."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 173 / 第173行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 174 / 第174行**
+  - Code / 代码: `            M=8192,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 175 / 第175行**
+  - Code / 代码: `            N=4096,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 176 / 第176行**
+  - Code / 代码: `            dtype=cutlass.Float16,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 177 / 第177行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 178 / 第178行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 179 / 第179行**
+  - Code / 代码: `            tolerance=1e-2,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 180 / 第180行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 181 / 第181行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 182 / 第182行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 183 / 第183行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 184 / 第184行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 185 / 第185行**
+  - Code / 代码: `class TestRMSNormFloat32:`
+  - EN: Declares class `TestRMSNormFloat32` to group related tests or helpers.
+  - CN: 声明类 `TestRMSNormFloat32`，用于组织相关测试或辅助逻辑。
+- **Line 186 / 第186行**
+  - Code / 代码: `    """Test RMSNorm with Float32 data type."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 187 / 第187行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 188 / 第188行**
+  - Code / 代码: `    @pytest.mark.parametrize("N", [256, 1024, 4096])`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 189 / 第189行**
+  - Code / 代码: `    def test_float32_correctness(self, N):`
+  - EN: Defines function `test_float32_correctness`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_float32_correctness`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 190 / 第190行**
+  - Code / 代码: `        """Test Float32 RMSNorm correctness."""`
+  - EN: Adds a one-line Python docstring that documents the surrounding object.
+  - CN: 添加单行 Python 文档字符串，用于说明周围对象。
+- **Line 191 / 第191行**
+  - Code / 代码: `        run(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 192 / 第192行**
+  - Code / 代码: `            M=32,`
+  - EN: Defines module-level constant `M` used later in the file.
+  - CN: 定义模块级常量 `M`，供后续代码使用。
+- **Line 193 / 第193行**
+  - Code / 代码: `            N=N,`
+  - EN: Defines module-level constant `N` used later in the file.
+  - CN: 定义模块级常量 `N`，供后续代码使用。
+- **Line 194 / 第194行**
+  - Code / 代码: `            dtype=cutlass.Float32,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 195 / 第195行**
+  - Code / 代码: `            has_weight=True,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 196 / 第196行**
+  - Code / 代码: `            eps=1e-6,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 197 / 第197行**
+  - Code / 代码: `            tolerance=1e-4,  # Tighter tolerance for FP32`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 198 / 第198行**
+  - Code / 代码: `            skip_ref_check=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 199 / 第199行**
+  - Code / 代码: `            benchmark=False,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 200 / 第200行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+
+## Key Concepts / 关键概念
+
+- **EN**: Uses pytest markers, parametrization, or hooks to organize automated test coverage.
+  **CN**: 使用 pytest 的标记、参数化或钩子来组织自动化测试覆盖。
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Relates to CuTeDSL-based examples or testing utilities.
+  **CN**: 与基于 CuTeDSL 的示例或测试工具有关。
+- **EN**: Covers RMSNorm behavior or related fused kernels.
+  **CN**: 覆盖 RMSNorm 行为或相关融合内核。
+- **EN**: Expands one test body into many concrete runtime configurations.
+  **CN**: 将一个测试体扩展为多个具体运行配置。
+
+## Dependencies / 依赖项
+
+- `pytest`
+  - EN: Provides the Python test runner, markers, and parametrization helpers.
+  - CN: 提供 Python 测试运行器、标记与参数化辅助功能。
+- `torch`
+  - EN: Provides tensor creation, GPU execution, and reference math helpers.
+  - CN: 提供张量创建、GPU 执行与参考数学辅助功能。
+- `cutlass`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `blackwell.rmsnorm`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。

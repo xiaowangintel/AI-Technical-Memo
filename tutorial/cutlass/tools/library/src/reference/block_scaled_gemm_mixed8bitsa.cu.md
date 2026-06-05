@@ -1,0 +1,1082 @@
+# block_scaled_gemm_mixed8bitsa.cu — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/src/reference/block_scaled_gemm_mixed8bitsa.cu`
+**Purpose / 用途**: Implements or registers reference block scaled GEMM mixed8bitsa functionality used by the CUTLASS library runtime. / 实现或注册 CUTLASS 运行时库使用的参考 块缩放 GEMM 功能。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>   \brief Instantiates GEMM reference implementations.</code>
+  - EN: Comment that documents intent or context: "\brief Instantiates GEMM reference implementations.".
+  - CN: 用于说明意图或上下文的注释："\brief Instantiates GEMM reference implementations."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L38** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L39** <code>#include &quot;cutlass/library/manifest.h&quot;</code>
+  - EN: Includes `cutlass/library/manifest.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/manifest.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>#include &quot;block_scaled_gemm_reference_operation.h&quot;</code>
+  - EN: Includes `block_scaled_gemm_reference_operation.h` so this file can use project-specific declarations from `block_scaled_gemm_reference_operation.h`.
+  - CN: 引入 `block_scaled_gemm_reference_operation.h`，使当前文件可以使用来自 `block_scaled_gemm_reference_operation.h` 的项目专用声明。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L46** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>void initialize_block_scaled_gemm_reference_operations_mixed8bitsa(Manifest &amp;manifest) {</code>
+  - EN: Begins the definition of function or method `initialize_block_scaled_gemm_reference_operations_mixed8bitsa`.
+  - CN: 开始定义函数或方法 `initialize_block_scaled_gemm_reference_operations_mixed8bitsa`。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>  ////////////////////////////////////////////////////////////////////////////////////////////////////////// </code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L53** <code>  // SFVectorSize = 32 with MxF8F6F4 instructions</code>
+  - EN: Comment that documents intent or context: "SFVectorSize = 32 with MxF8F6F4 instructions".
+  - CN: 用于说明意图或上下文的注释："SFVectorSize = 32 with MxF8F6F4 instructions"。
+- **L54** <code>  //////////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L55** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L56** <code>  // (float_e2m3_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e2m3_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e2m3_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)"。
+- **L57** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L58** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L59** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L60** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L62** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L63** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L64** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L65** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L66** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L67** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L68** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L69** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L70** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L71** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L72** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L73** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L74** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L75** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>  // (float_e4m3_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e4m3_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e4m3_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)"。
+- **L78** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L79** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L80** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L81** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L84** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L85** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L86** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L87** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L88** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L89** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L90** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L91** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L94** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L95** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L96** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L99** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L100** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L101** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L104** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L105** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L106** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>  // (float_e2m3_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e2m3_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e2m3_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)"。
+- **L109** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L110** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L111** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L112** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L113** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L114** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L115** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L116** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L117** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L119** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L120** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L121** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L122** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L125** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L126** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L127** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>  // (float_e2m1_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e2m1_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e2m1_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)"。
+- **L130** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L131** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L132** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L133** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L136** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L137** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L138** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L140** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L141** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L142** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L143** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L146** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L147** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L148** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L149** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L150** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L151** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L152** <code>    half_t  /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t  /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t  /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t  /*D*/, 32 /*SFVecSize"。
+- **L153** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L154** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L155** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L156** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L157** <code>    half_t  /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t  /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t  /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t  /*D*/, 32 /*SFVecSize"。
+- **L158** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>  // (float_e4m3_t * float_ue8m0_t) * (float_e2m1_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e4m3_t * float_ue8m0_t) * (float_e2m1_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e4m3_t * float_ue8m0_t) * (float_e2m1_t * float_ue8m0_t)"。
+- **L161** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L163** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L164** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L166** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L168** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L169** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L172** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L173** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L174** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L177** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L178** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L179** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>  // (float_e4m3_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e4m3_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e4m3_t * float_ue8m0_t) * (float_e4m3_t * float_ue8m0_t)"。
+- **L182** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L183** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L184** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L185** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L186** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L187** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L188** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L189** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L190** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L191** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L192** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L193** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L194** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L195** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L196** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L197** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L198** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L199** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L200** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L203** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L204** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L205** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L206** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L207** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L208** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L209** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L210** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L211** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L213** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L214** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L215** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L216** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L217** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L218** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L219** <code>    float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e4m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L220** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L221** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L222** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L223** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L225** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L226** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L227** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L228** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L229** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L230** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L231** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L232** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L234** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L235** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L236** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L237** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L238** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L239** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L240** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e4m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L241** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L242** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L243** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L244** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L245** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>  // (float_e3m2_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e3m2_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e3m2_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)"。
+- **L248** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L249** <code>    float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L250** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L251** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>    float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L255** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L256** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L257** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L258** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L259** <code>    float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L260** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L261** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L262** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L263** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L265** <code>    float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L266** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L267** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L268** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L269** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L270** <code>    make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L271** <code>    float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e3m2_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L272** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L273** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L274** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L275** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L277** <code>  // (float_e2m1_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e2m1_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e2m1_t * float_ue8m0_t) * (float_e2m3_t * float_ue8m0_t)"。
+- **L278** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L279** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L280** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L281** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L282** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L283** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L284** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L285** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L286** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L287** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L288** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L289** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L290** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L291** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L292** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L293** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L294** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L295** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L296** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L297** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L298** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L299** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L300** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L301** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L302** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L303** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L306** <code>    float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m1_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m3_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L307** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L308** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L309** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L310** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L311** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L312** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L313** <code>  // (float_e2m3_t * float_ue8m0_t) * (float_e2m1_t * float_ue8m0_t)</code>
+  - EN: Comment that documents intent or context: "(float_e2m3_t * float_ue8m0_t) * (float_e2m1_t * float_ue8m0_t)".
+  - CN: 用于说明意图或上下文的注释："(float_e2m3_t * float_ue8m0_t) * (float_e2m1_t * float_ue8m0_t)"。
+- **L314** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L315** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L316** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float  /*D*/, 32 /*SFVecSize"。
+- **L317** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L318** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L319** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L320** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L321** <code>    void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："void  /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L322** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L323** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L324** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L325** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L326** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize"。
+- **L327** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L328** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L329** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L330** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L331** <code>    half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, void /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize"。
+- **L332** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L334** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L335** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L336** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L337** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e3m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L338** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L339** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L340** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L341** <code>  make_block_scaled_gemm&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L342** <code>    float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,</code>
+  - EN: Comment that documents intent or context: "float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,".
+  - CN: 用于说明意图或上下文的注释："float_e2m3_t /*A*/, float_ue8m0_t /*SFA*/, float_e2m1_t /*B*/, float_ue8m0_t /*SFB*/,"。
+- **L343** <code>    half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,</code>
+  - EN: Comment that documents intent or context: "half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,".
+  - CN: 用于说明意图或上下文的注释："half_t /*C*/, float /*Compute*/, float_ue8m0_t /*SFD*/, float /*Accum*/, float_e5m2_t /*D*/, 32 /*SFVecSize*/,"。
+- **L344** <code>    32 /*EpilogueSFVecSize*/</code>
+  - EN: Comment that documents intent or context: "32 /*EpilogueSFVecSize".
+  - CN: 用于说明意图或上下文的注释："32 /*EpilogueSFVecSize"。
+- **L345** <code>  &gt;(manifest);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L346** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L347** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L348** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L349** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L350** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L351** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L352** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L353** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L354** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Linear algebra kernels and metadata / 线性代数内核与元数据
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/manifest.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>block_scaled_gemm_reference_operation.h</code> — project-specific declarations from `block_scaled_gemm_reference_operation.h` / 来自 `block_scaled_gemm_reference_operation.h` 的项目专用声明

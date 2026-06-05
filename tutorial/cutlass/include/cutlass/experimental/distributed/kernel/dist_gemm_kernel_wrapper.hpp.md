@@ -1,0 +1,734 @@
+# dist_gemm_kernel_wrapper.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/experimental/distributed/kernel/dist_gemm_kernel_wrapper.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/experimental/distributed/kernel/dist_gemm_kernel_wrapper.hpp`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/experimental/distributed/kernel/dist_gemm_kernel_wrapper.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2024 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*!</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L32**: <code>  \file Distributed GEMM Kernel Wrapper</code>
+  - EN: Doxygen file tag indicating that the comment documents the whole file.
+  - CN: Doxygen 文件标签，说明该注释用于描述整个文件。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>  Prepends CUTLASS 3 GEMM kernels with barriers and other necessary instructions to exectue</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>  a Distributed GEMM stage.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L36**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L37**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L38**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cutlass/arch/grid_dependency_control.h&quot;</code>
+  - EN: Includes "cutlass/arch/grid_dependency_control.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/arch/grid_dependency_control.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/gemm/gemm.h&quot;</code>
+  - EN: Includes "cutlass/gemm/gemm.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/gemm/gemm.h"，以便本文件使用该依赖中的声明。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>#include &quot;cutlass/experimental/distributed/kernel/detail.hpp&quot;</code>
+  - EN: Includes "cutlass/experimental/distributed/kernel/detail.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/experimental/distributed/kernel/detail.hpp"，以便本文件使用该依赖中的声明。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>namespace cutlass::distributed::kernel {</code>
+  - EN: Opens namespace `cutlass::distributed::kernel` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::distributed::kernel`，为后续声明提供作用域。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>// Allow all CUTLASS 3.X GEMM kernels</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L53**: <code>template &lt;typename GemmKernel_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L54**: <code>struct SupportsDistributedGemm: cutlass::gemm::detail::IsCutlass3GemmKernel&lt;GemmKernel_&gt; {};</code>
+  - EN: Declares or defines the struct `SupportsDistributedGemm`.
+  - CN: 声明或定义 struct `SupportsDistributedGemm`。
+- **L55**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L56**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L57**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L58**: <code>/*!</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L59**: <code>  DistributedGemmKernelWrapper is a wrapper around a GEMM kernel.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L60**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L61**: <code>  Depending on the underlying distribution policy/schedule, it prepends the underlying local GEMM</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L62**: <code>  kernel with a few additional instructions that gate the execution of the GEMM on buffers being</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L63**: <code>  ready for stages/iterations &gt; 0.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L64**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>template &lt;class GemmKernel_, class DistSchedule_, class Enable = void&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L67**: <code>struct DistributedGemmKernelWrapper;</code>
+  - EN: Declares or defines the struct `DistributedGemmKernelWrapper`.
+  - CN: 声明或定义 struct `DistributedGemmKernelWrapper`。
+- **L68**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L69**: <code>template &lt;class GemmKernel_, class DistSchedule_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L70**: <code>struct DistributedGemmKernelWrapper&lt;</code>
+  - EN: Declares or defines the struct `DistributedGemmKernelWrapper`.
+  - CN: 声明或定义 struct `DistributedGemmKernelWrapper`。
+- **L71**: <code>  GemmKernel_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L72**: <code>  DistSchedule_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L73**: <code>  cute::enable_if_t&lt;detail::SupportsDistributedGemm&lt;GemmKernel_&gt;::value&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L74**: <code>  &gt;: GemmKernel_</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L75**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L76**: <code>  using DistSchedule = DistSchedule_;</code>
+  - EN: Defines the alias `DistSchedule` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `DistSchedule`。
+- **L77**: <code>  using TP = typename DistSchedule::TP;</code>
+  - EN: Defines the alias `TP` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TP`。
+- **L78**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L79**: <code>  static constexpr bool KernelWritesArrivalFlag = DistSchedule::KernelWritesArrivalFlag;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>  using BaseKernel = GemmKernel_;</code>
+  - EN: Defines the alias `BaseKernel` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BaseKernel`。
+- **L82**: <code>  using BaseArguments = typename BaseKernel::Arguments;</code>
+  - EN: Defines the alias `BaseArguments` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BaseArguments`。
+- **L83**: <code>  using BaseParams = typename BaseKernel::Params;</code>
+  - EN: Defines the alias `BaseParams` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BaseParams`。
+- **L84**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L85**: <code>  //static_assert(BaseKernel::ArchTag::kMinComputeCapability == 90, &quot;DistGEMM only supports Hopper GEMMs for now.&quot;);</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L86**: <code>  static_assert(not cute::is_same_v&lt;typename BaseKernel::ElementC, void&gt;, &quot;DistributedGEMM epilogues must have a source.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L87**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L88**: <code>  using ElementFlag = uint32_t;</code>
+  - EN: Defines the alias `ElementFlag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementFlag`。
+- **L89**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L90**: <code>  // Device side arguments</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L91**: <code>  struct DistributedArguments {</code>
+  - EN: Declares or defines the struct `DistributedArguments`.
+  - CN: 声明或定义 struct `DistributedArguments`。
+- **L92**: <code>    int device_idx = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L93**: <code>    int iteration = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L94**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L95**: <code>    void* self_flag_ptr{nullptr};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L96**: <code>    void* peer_flag_ptr{nullptr};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L97**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L98**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L99**: <code>  struct PackedArguments {</code>
+  - EN: Declares or defines the struct `PackedArguments`.
+  - CN: 声明或定义 struct `PackedArguments`。
+- **L100**: <code>    BaseArguments base{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L101**: <code>    DistributedArguments distributed{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L102**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L103**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L104**: <code>  struct DistributedParams {</code>
+  - EN: Declares or defines the struct `DistributedParams`.
+  - CN: 声明或定义 struct `DistributedParams`。
+- **L105**: <code>    int device_idx = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L106**: <code>    int iteration = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L107**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L108**: <code>    ElementFlag* self_flag_ptr_{nullptr};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L109**: <code>    ElementFlag* peer_flag_ptr_{nullptr};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L110**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L111**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L112**: <code>  // Kernel entry point API</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L113**: <code>  struct PackedParams {</code>
+  - EN: Declares or defines the struct `PackedParams`.
+  - CN: 声明或定义 struct `PackedParams`。
+- **L114**: <code>    BaseParams base{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L115**: <code>    DistributedParams distributed{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L116**: <code>  };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L117**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L118**: <code>  using Params = PackedParams;</code>
+  - EN: Defines the alias `Params` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Params`。
+- **L119**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L120**: <code>  // Convert to underlying arguments. In this case, a simple copy for the aliased type.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L121**: <code>  static</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L122**: <code>  PackedParams</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L123**: <code>  to_underlying_arguments(PackedArguments const&amp; args, void* workspace) {</code>
+  - EN: Starts the definition body for `to_underlying_arguments`.
+  - CN: 开始 `to_underlying_arguments` 的定义体。
+- **L124**: <code>    CUTLASS_TRACE_HOST(&quot;distributed::to_underlying_arguments():&quot;);</code>
+  - EN: Declares the callable or operator `CUTLASS_TRACE_HOST`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_TRACE_HOST`。
+- **L125**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L126**: <code>    auto kernel_params = BaseKernel::to_underlying_arguments(args.base, workspace);</code>
+  - EN: Declares the callable or operator `to_underlying_arguments`.
+  - CN: 声明可调用对象或运算符 `to_underlying_arguments`。
+- **L127**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L128**: <code>    DistributedParams dist_params = {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L129**: <code>        args.distributed.device_idx,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L130**: <code>        args.distributed.iteration,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L131**: <code>        reinterpret_cast&lt;ElementFlag*&gt;(args.distributed.self_flag_ptr),</code>
+  - EN: Begins or continues the signature/parameter list for `ElementFlag`.
+  - CN: 开始或继续 `ElementFlag` 的签名/参数列表。
+- **L132**: <code>        reinterpret_cast&lt;ElementFlag*&gt;(args.distributed.peer_flag_ptr)</code>
+  - EN: Provides part of the signature or implementation for `ElementFlag`.
+  - CN: 提供 `ElementFlag` 的签名或实现的一部分。
+- **L133**: <code>    };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>    return {kernel_params, dist_params};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L136**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L137**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L138**: <code>  static bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L139**: <code>  can_implement(BaseArguments const&amp; args) {</code>
+  - EN: Starts the definition body for `can_implement`.
+  - CN: 开始 `can_implement` 的定义体。
+- **L140**: <code>    return BaseKernel::can_implement(args);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L141**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L143**: <code>  static bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L144**: <code>  can_implement(PackedArguments const&amp; args) {</code>
+  - EN: Starts the definition body for `can_implement`.
+  - CN: 开始 `can_implement` 的定义体。
+- **L145**: <code>    return BaseKernel::can_implement(args.base);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L146**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L147**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L148**: <code>  static size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L149**: <code>  get_workspace_size(BaseArguments const&amp; args) {</code>
+  - EN: Starts the definition body for `get_workspace_size`.
+  - CN: 开始 `get_workspace_size` 的定义体。
+- **L150**: <code>    return BaseKernel::get_workspace_size(args);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L151**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L153**: <code>  static size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L154**: <code>  get_workspace_size(PackedArguments const&amp; args) {</code>
+  - EN: Starts the definition body for `get_workspace_size`.
+  - CN: 开始 `get_workspace_size` 的定义体。
+- **L155**: <code>    return BaseKernel::get_workspace_size(args.base);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L156**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L157**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L158**: <code>  static cutlass::Status</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L159**: <code>  initialize_workspace(BaseArguments const&amp; args, void* workspace = nullptr, cudaStream_t stream = nullptr,</code>
+  - EN: Begins or continues the signature/parameter list for `initialize_workspace`.
+  - CN: 开始或继续 `initialize_workspace` 的签名/参数列表。
+- **L160**: <code>    CudaHostAdapter* cuda_adapter = nullptr) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L161**: <code>    return BaseKernel::initialize_workspace(args, workspace, stream, cuda_adapter);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L162**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L163**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L164**: <code>  static cutlass::Status</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L165**: <code>  initialize_workspace(PackedArguments const&amp; args, void* workspace = nullptr, cudaStream_t stream = nullptr,</code>
+  - EN: Begins or continues the signature/parameter list for `initialize_workspace`.
+  - CN: 开始或继续 `initialize_workspace` 的签名/参数列表。
+- **L166**: <code>    CudaHostAdapter* cuda_adapter = nullptr) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L167**: <code>    return BaseKernel::initialize_workspace(args.base, workspace, stream, cuda_adapter);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L168**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L169**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L170**: <code>  /// Computes the grid shape</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L171**: <code>  static dim3</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L172**: <code>  get_grid_shape(PackedParams const&amp; params) {</code>
+  - EN: Starts the definition body for `get_grid_shape`.
+  - CN: 开始 `get_grid_shape` 的定义体。
+- **L173**: <code>    return BaseKernel::get_grid_shape(params.base);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L174**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L175**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L176**: <code>  static dim3</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L177**: <code>  get_grid_shape(BaseParams const&amp; params) {</code>
+  - EN: Starts the definition body for `get_grid_shape`.
+  - CN: 开始 `get_grid_shape` 的定义体。
+- **L178**: <code>    return BaseKernel::get_grid_shape(params);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L179**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L180**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L181**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L182**: <code>  void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L183**: <code>  barrier_buffer(PackedParams const&amp; params) {</code>
+  - EN: Starts the definition body for `barrier_buffer`.
+  - CN: 开始 `barrier_buffer` 的定义体。
+- **L184**: <code>    if (params.distributed.iteration &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L185**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L186**: <code>      ElementFlag comm_iter = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L187**: <code>      detail::ld_without_cache(comm_iter, params.distributed.self_flag_ptr_);</code>
+  - EN: Declares the callable or operator `ld_without_cache`.
+  - CN: 声明可调用对象或运算符 `ld_without_cache`。
+- **L188**: <code>      while (comm_iter == 0) {</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L189**: <code>        detail::ld_without_cache(comm_iter, params.distributed.self_flag_ptr_);</code>
+  - EN: Declares the callable or operator `ld_without_cache`.
+  - CN: 声明可调用对象或运算符 `ld_without_cache`。
+- **L190**: <code>        __nanosleep(40);</code>
+  - EN: Declares the callable or operator `__nanosleep`.
+  - CN: 声明可调用对象或运算符 `__nanosleep`。
+- **L191**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L192**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L193**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L194**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L195**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L196**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L197**: <code>  void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L198**: <code>  maybe_signal_arrival(PackedParams const&amp; params) {</code>
+  - EN: Starts the definition body for `maybe_signal_arrival`.
+  - CN: 开始 `maybe_signal_arrival` 的定义体。
+- **L199**: <code>    if constexpr (KernelWritesArrivalFlag) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L200**: <code>      if (blockIdx.x == 0 &amp;&amp; blockIdx.y == 0 &amp;&amp; blockIdx.z == 0 &amp;&amp;</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L201**: <code>          threadIdx.x == 0 &amp;&amp; threadIdx.y == 0 &amp;&amp; threadIdx.z == 0 &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L202**: <code>          params.distributed.iteration &gt; 0) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L203**: <code>        *reinterpret_cast&lt;ElementFlag*&gt;(params.distributed.peer_flag_ptr_) = 1;</code>
+  - EN: Declares the callable or operator `ElementFlag`.
+  - CN: 声明可调用对象或运算符 `ElementFlag`。
+- **L204**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L205**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L206**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L207**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L208**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L209**: <code>  void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L210**: <code>  operator()(PackedParams const&amp; params, char* smem_buf) {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L211**: <code>    // Launch next grid as soon as possible</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L212**: <code>    arch::launch_dependent_grids();</code>
+  - EN: Declares the callable or operator `launch_dependent_grids`.
+  - CN: 声明可调用对象或运算符 `launch_dependent_grids`。
+- **L213**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L214**: <code>    // Wait on previous kernels to flush their memory.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L215**: <code>    arch::wait_on_dependent_grids();</code>
+  - EN: Declares the callable or operator `wait_on_dependent_grids`.
+  - CN: 声明可调用对象或运算符 `wait_on_dependent_grids`。
+- **L216**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L217**: <code>    // Optionally write arrivals for the previous stage/iteration.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L218**: <code>    maybe_signal_arrival(params);</code>
+  - EN: Declares the callable or operator `maybe_signal_arrival`.
+  - CN: 声明可调用对象或运算符 `maybe_signal_arrival`。
+- **L219**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L220**: <code>    // Spin-wait on an arrival flag, make sure the respective buffers are ready.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L221**: <code>    // If the buffered operand is memcpied into, it would wait on its local flag.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L222**: <code>    // If it&#x27;s a remote buffer that is accessed directly, it would wait on its remote flag.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L223**: <code>    barrier_buffer(params);</code>
+  - EN: Declares the callable or operator `barrier_buffer`.
+  - CN: 声明可调用对象或运算符 `barrier_buffer`。
+- **L224**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L225**: <code>    // Perform local gemm</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L226**: <code>    BaseKernel gemm;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L227**: <code>    gemm(params.base, smem_buf);</code>
+  - EN: Declares the callable or operator `gemm`.
+  - CN: 声明可调用对象或运算符 `gemm`。
+- **L228**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L229**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L230**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L231**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L232**: <code>} // namespace cutlass::distributed::kernel</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L233**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L234**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L235**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Operator overloads / 运算符重载
+- Symbol focus: `SupportsDistributedGemm` / 重点符号：`SupportsDistributedGemm`
+- Symbol focus: `GemmKernel_` / 重点符号：`GemmKernel_`
+- Symbol focus: `DistributedGemmKernelWrapper` / 重点符号：`DistributedGemmKernelWrapper`
+- Symbol focus: `DistSchedule` / 重点符号：`DistSchedule`
+- Symbol focus: `TP` / 重点符号：`TP`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/arch/grid_dependency_control.h"`
+  - `"cutlass/gemm/gemm.h"`
+  - `"cutlass/experimental/distributed/kernel/detail.hpp"`

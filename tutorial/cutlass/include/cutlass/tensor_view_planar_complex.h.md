@@ -1,0 +1,936 @@
+# tensor_view_planar_complex.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/tensor_view_planar_complex.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Defines a structure containing strides and a pointer to tensor data." and defines related CUTLASS facilities in `include/cutlass/tensor_view_planar_complex.h`.
+- CN: 该头文件以注释摘要“Defines a structure containing strides and a pointer to tensor data.”引入，并在 `include/cutlass/tensor_view_planar_complex.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Defines a structure containing strides and a pointer to tensor data.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>    TensorView is derived from TensorRef and contributes bounds to the tensor&#x27;s index space. Thus,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>    it is a complete mathematical object and may be used in tensor algorithms. It is decoupled from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L36**: <code>    data storage and is therefore lightweight and may be embedded in larger tensor objects or</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L37**: <code>    memory structures.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L38**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L39**: <code>    See cutlass/tensor_ref.h for more details about the mapping of the logical tensor index space to</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L40**: <code>    linear memory.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L41**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L44**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L45**: <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L46**: <code>#include &lt;cmath&gt;</code>
+  - EN: Includes <cmath> so this file can use declarations from that dependency.
+  - CN: 包含 <cmath>，以便本文件使用该依赖中的声明。
+- **L47**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L48**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L49**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L50**: <code>#include &quot;cutlass/tensor_ref_planar_complex.h&quot;</code>
+  - EN: Includes "cutlass/tensor_ref_planar_complex.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/tensor_ref_planar_complex.h"，以便本文件使用该依赖中的声明。
+- **L51**: <code>#include &quot;cutlass/tensor_view.h&quot; // cutlass::TensorView</code>
+  - EN: Includes "cutlass/tensor_view.h" // cutlass::TensorView so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/tensor_view.h" // cutlass::TensorView，以便本文件使用该依赖中的声明。
+- **L52**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L53**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L54**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L55**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L58**: <code>  /// Data type of element stored within tensor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L59**: <code>  typename Element_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L60**: <code>  /// Maps a Coord&lt;Rank_&gt; in the logical tensor index space to the internal n-D array</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L61**: <code>  typename Layout_</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L62**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L63**: <code>class TensorViewPlanarComplex : public TensorRefPlanarComplex&lt;Element_, Layout_&gt; {</code>
+  - EN: Declares or defines the class `TensorViewPlanarComplex`.
+  - CN: 声明或定义 class `TensorViewPlanarComplex`。
+- **L64**: <code> public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>  /// Base tensor reference</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L67**: <code>  using Base = cutlass::TensorRefPlanarComplex&lt;Element_, Layout_&gt;;</code>
+  - EN: Defines the alias `Base` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Base`。
+- **L68**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L69**: <code>  /// Mapping function from logical coordinate to internal n-D array</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L70**: <code>  using Layout = Layout_;</code>
+  - EN: Defines the alias `Layout` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Layout`。
+- **L71**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L72**: <code>  /// TensorRef pointing to constant memory</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L73**: <code>  using ConstTensorRef = typename Base::ConstTensorRef;</code>
+  - EN: Defines the alias `ConstTensorRef` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ConstTensorRef`。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>  /// Underlying TensorRef type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L76**: <code>  using TensorRef = Base;</code>
+  - EN: Defines the alias `TensorRef` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TensorRef`。
+- **L77**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L78**: <code>  /// Data type of individual access</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L79**: <code>  using Element = Element_;</code>
+  - EN: Defines the alias `Element` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Element`。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>  /// Reference type to an element</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L82**: <code>  using Reference = Element &amp;;</code>
+  - EN: Defines the alias `Reference` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Reference`。
+- **L83**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L84**: <code>  /// Logical rank of tensor index space</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L85**: <code>  static int const kRank = Layout::kRank;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L86**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L87**: <code>  /// Index type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L88**: <code>  using Index = typename Layout::Index;</code>
+  - EN: Defines the alias `Index` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Index`。
+- **L89**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L90**: <code>  /// Long index used for pointer offsets</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L91**: <code>  using LongIndex = typename Layout::LongIndex;</code>
+  - EN: Defines the alias `LongIndex` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `LongIndex`。
+- **L92**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L93**: <code>  /// Coordinate in logical tensor space</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L94**: <code>  using TensorCoord = typename Layout::TensorCoord;</code>
+  - EN: Defines the alias `TensorCoord` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TensorCoord`。
+- **L95**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L96**: <code>  /// Coordinate in storage n-D array</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L97**: <code>  using Stride = typename Layout::Stride;</code>
+  - EN: Defines the alias `Stride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Stride`。
+- **L98**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L99**: <code>  /// TensorView pointing to constant memory</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L100**: <code>  using ConstTensorView = TensorViewPlanarComplex&lt;</code>
+  - EN: Defines the alias `ConstTensorView` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ConstTensorView`。
+- **L101**: <code>    typename platform::remove_const&lt;Element&gt;::type const,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L102**: <code>    Layout&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L103**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L104**: <code>  /// TensorView pointing to non-constant memory</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L105**: <code>  using NonConstTensorView = TensorViewPlanarComplex&lt;</code>
+  - EN: Defines the alias `NonConstTensorView` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `NonConstTensorView`。
+- **L106**: <code>    typename platform::remove_const&lt;Element&gt;::type,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L107**: <code>    Layout&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L109**: <code>  /// Require at least rank=1. Mathematically, a rank=0 tensor would be considered to be a</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L110**: <code>  /// scalar, but degenerate cases such as these are difficult to accommodate without</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L111**: <code>  /// extensive C++ metaprogramming or support for zero-length arrays.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L112**: <code>  static_assert(kRank &gt; 0, &quot;Cannot define a zero-rank TensorRef&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L114**: <code> private:</code>
+  - EN: Sets the `private` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `private`。
+- **L115**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L116**: <code>  /// View extent</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L117**: <code>  TensorCoord extent_;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L118**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L119**: <code> public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L120**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L121**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L122**: <code>  // Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L123**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L124**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L125**: <code>  /// Constructs a TensorView object</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L126**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L127**: <code>  TensorViewPlanarComplex(TensorCoord const &amp;extent = TensorCoord()): extent_(extent) {</code>
+  - EN: Starts the definition body for `TensorViewPlanarComplex`.
+  - CN: 开始 `TensorViewPlanarComplex` 的定义体。
+- **L128**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L129**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L130**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L131**: <code>  /// Constructs a TensorView object</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L132**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L133**: <code>  TensorViewPlanarComplex(</code>
+  - EN: Begins or continues the signature/parameter list for `TensorViewPlanarComplex`.
+  - CN: 开始或继续 `TensorViewPlanarComplex` 的签名/参数列表。
+- **L134**: <code>    Element *ptr,                         ///&lt; pointer to start of tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L135**: <code>    Layout const &amp;layout,                 ///&lt; layout object containing stride and mapping function</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L136**: <code>    LongIndex imaginary_stride,           ///&lt; stride between real and imaginary part</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L137**: <code>    TensorCoord const &amp;extent             ///&lt; size of the view in logical coordinates</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L138**: <code>  ):</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L139**: <code>    Base(ptr, layout, imaginary_stride), extent_(extent) {</code>
+  - EN: Starts the definition body for `Base`.
+  - CN: 开始 `Base` 的定义体。
+- **L140**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L141**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L143**: <code>  /// Constructs a TensorView object</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L144**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L145**: <code>  TensorViewPlanarComplex(</code>
+  - EN: Begins or continues the signature/parameter list for `TensorViewPlanarComplex`.
+  - CN: 开始或继续 `TensorViewPlanarComplex` 的签名/参数列表。
+- **L146**: <code>    TensorRef const &amp;ref,                 ///&lt; pointer and layout object referencing a tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L147**: <code>    TensorCoord const &amp;extent             ///&lt; logical size of tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L148**: <code>  ):</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L149**: <code>    Base(ref), extent_(extent) {</code>
+  - EN: Starts the definition body for `Base`.
+  - CN: 开始 `Base` 的定义体。
+- **L150**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L151**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L153**: <code>  /// Converting constructor from TensorRef to non-constant data.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L154**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L155**: <code>  TensorViewPlanarComplex(</code>
+  - EN: Begins or continues the signature/parameter list for `TensorViewPlanarComplex`.
+  - CN: 开始或继续 `TensorViewPlanarComplex` 的签名/参数列表。
+- **L156**: <code>    NonConstTensorView const &amp;view        ///&lt; TensorView to non-const data</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L157**: <code>  ):</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L158**: <code>    Base(view), extent_(view.extent_) { }</code>
+  - EN: Starts the definition body for `Base`.
+  - CN: 开始 `Base` 的定义体。
+- **L159**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L160**: <code>  /// Updates the pointer and layout object</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L161**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L162**: <code>  void reset(Element* ptr, Layout const &amp;layout, LongIndex imaginary_stride, TensorCoord size) {</code>
+  - EN: Starts the definition body for `reset`.
+  - CN: 开始 `reset` 的定义体。
+- **L163**: <code>    Base::reset(ptr, layout, imaginary_stride);</code>
+  - EN: Declares the callable or operator `reset`.
+  - CN: 声明可调用对象或运算符 `reset`。
+- **L164**: <code>    this-&gt;resize(extent_);</code>
+  - EN: Declares the callable or operator `resize`.
+  - CN: 声明可调用对象或运算符 `resize`。
+- **L165**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L166**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L167**: <code>  /// Changes the size of the view without affecting pointer or layout</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L168**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L169**: <code>  void resize(TensorCoord extent) {</code>
+  - EN: Starts the definition body for `resize`.
+  - CN: 开始 `resize` 的定义体。
+- **L170**: <code>    this-&gt;extent_ = extent;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L171**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L172**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L173**: <code>  /// Returns the extent of the view (the size along each logical dimension).</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L174**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L175**: <code>  TensorCoord const&amp; extent() const { return extent_; }</code>
+  - EN: Starts the definition body for `extent`.
+  - CN: 开始 `extent` 的定义体。
+- **L176**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L177**: <code>  /// Returns the extent along a particular logical dimension.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L178**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L179**: <code>  Index extent(int dim) const { return extent_.at(dim); }</code>
+  - EN: Starts the definition body for `extent`.
+  - CN: 开始 `extent` 的定义体。
+- **L180**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L181**: <code>  /// Determines whether a location is within a tensor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L182**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L183**: <code>  bool contains(TensorCoord const&amp; coord) const {</code>
+  - EN: Starts the definition body for `contains`.
+  - CN: 开始 `contains` 的定义体。
+- **L184**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L185**: <code>    for (int dim = 0; dim &lt; kRank; ++dim) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L186**: <code>      if (!(coord[dim] &gt;= 0 &amp;&amp; coord[dim] &lt; extent(dim))) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L187**: <code>        return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L188**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L189**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L190**: <code>    return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L191**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L192**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L193**: <code>  /// Returns a TensorRef pointing to the first element of the tensor.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L194**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L195**: <code>  Base ref() const {</code>
+  - EN: Starts the definition body for `ref`.
+  - CN: 开始 `ref` 的定义体。
+- **L196**: <code>    return Base(this-&gt;data(), this-&gt;layout(), this-&gt;imaginary_stride());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L197**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L198**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L199**: <code>  /// Returns a TensorRef pointing to the first element of the tensor.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L200**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L201**: <code>  ConstTensorRef const_ref() const {</code>
+  - EN: Starts the definition body for `const_ref`.
+  - CN: 开始 `const_ref` 的定义体。
+- **L202**: <code>    return ConstTensorRef(this-&gt;data(), this-&gt;layout());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L203**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L204**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L205**: <code>  /// Returns a TensorView to const data</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L206**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L207**: <code>  ConstTensorView const_view() const {</code>
+  - EN: Starts the definition body for `const_view`.
+  - CN: 开始 `const_view` 的定义体。
+- **L208**: <code>    return ConstTensorView(const_ref(), extent_);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L209**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L210**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L211**: <code>  /// Returns a Tensor_view given location and size quantities</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L212**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L213**: <code>  TensorViewPlanarComplex subview(</code>
+  - EN: Begins or continues the signature/parameter list for `subview`.
+  - CN: 开始或继续 `subview` 的签名/参数列表。
+- **L214**: <code>    TensorCoord extent,                               ///&lt; extent of the resulting view</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L215**: <code>    TensorCoord const&amp; location = TensorCoord()       ///&lt; resulting view&#x27;s origin within the old view</code>
+  - EN: Provides part of the signature or implementation for `TensorCoord`.
+  - CN: 提供 `TensorCoord` 的签名或实现的一部分。
+- **L216**: <code>  ) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L217**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L218**: <code>    TensorViewPlanarComplex result(this-&gt;ref(), extent.clamp(extent_ - location));</code>
+  - EN: Declares the callable or operator `result`.
+  - CN: 声明可调用对象或运算符 `result`。
+- **L219**: <code>    result.add_coord_offset(location);</code>
+  - EN: Declares the callable or operator `add_coord_offset`.
+  - CN: 声明可调用对象或运算符 `add_coord_offset`。
+- **L220**: <code>    return result; </code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L221**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L222**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L223**: <code>  /// Returns the number of scalar elements needed to store tensor.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L224**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L225**: <code>  size_t capacity() const {</code>
+  - EN: Starts the definition body for `capacity`.
+  - CN: 开始 `capacity` 的定义体。
+- **L226**: <code>    return Base::layout().capacity(extent_);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L227**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L228**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L229**: <code>  /// Returns a TensorView offset by a given amount</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L230**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L231**: <code>  TensorViewPlanarComplex operator+(</code>
+  - EN: Begins or continues the signature/parameter list for `operator+`.
+  - CN: 开始或继续 `operator+` 的签名/参数列表。
+- **L232**: <code>    TensorCoord const&amp; b            ///&lt; offset in the logical coordinate space of the tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L233**: <code>  ) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L234**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L235**: <code>    TensorViewPlanarComplex result(*this);</code>
+  - EN: Declares the callable or operator `result`.
+  - CN: 声明可调用对象或运算符 `result`。
+- **L236**: <code>    result.add_pointer_offset(this-&gt;offset(b));</code>
+  - EN: Declares the callable or operator `add_pointer_offset`.
+  - CN: 声明可调用对象或运算符 `add_pointer_offset`。
+- **L237**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L238**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>  /// Returns a TensorRef offset by a given amount</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L241**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L242**: <code>  TensorViewPlanarComplex&amp; operator+=(</code>
+  - EN: Begins or continues the signature/parameter list for `operator+=`.
+  - CN: 开始或继续 `operator+=` 的签名/参数列表。
+- **L243**: <code>    TensorCoord const&amp; b            ///&lt; offset in the logical coordinate space of the tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L244**: <code>  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L245**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L246**: <code>    this-&gt;add_pointer_offset(this-&gt;offset(b));</code>
+  - EN: Declares the callable or operator `add_pointer_offset`.
+  - CN: 声明可调用对象或运算符 `add_pointer_offset`。
+- **L247**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L248**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L249**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L250**: <code>  /// Returns a TensorRef offset by a given amount</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L251**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L252**: <code>  TensorViewPlanarComplex operator-(</code>
+  - EN: Begins or continues the signature/parameter list for `operator-`.
+  - CN: 开始或继续 `operator-` 的签名/参数列表。
+- **L253**: <code>    TensorCoord const&amp; b            ///&lt; offset in the logical coordinate space of the tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L254**: <code>  ) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L255**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L256**: <code>    TensorRef result(*this);</code>
+  - EN: Declares the callable or operator `result`.
+  - CN: 声明可调用对象或运算符 `result`。
+- **L257**: <code>    result.add_pointer_offset(-this-&gt;offset(b));</code>
+  - EN: Declares the callable or operator `add_pointer_offset`.
+  - CN: 声明可调用对象或运算符 `add_pointer_offset`。
+- **L258**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L259**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L260**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L261**: <code>  /// Returns a TensorRef offset by a given amount</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L262**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L263**: <code>  TensorViewPlanarComplex&amp; operator-=(</code>
+  - EN: Begins or continues the signature/parameter list for `operator-=`.
+  - CN: 开始或继续 `operator-=` 的签名/参数列表。
+- **L264**: <code>    TensorCoord const&amp; b            ///&lt; offset in the logical coordinate space of the tensor</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L265**: <code>  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L266**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L267**: <code>    this-&gt;add_pointer_offset(-this-&gt;offset(b));</code>
+  - EN: Declares the callable or operator `add_pointer_offset`.
+  - CN: 声明可调用对象或运算符 `add_pointer_offset`。
+- **L268**: <code>    return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L269**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L270**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L271**: <code>  /// TensorRef to real-valued tensor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L272**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L273**: <code>  cutlass::TensorView&lt;Element, Layout&gt; view_real() const {</code>
+  - EN: Starts the definition body for `view_real`.
+  - CN: 开始 `view_real` 的定义体。
+- **L274**: <code>    return cutlass::TensorView&lt;Element, Layout&gt;(this-&gt;data(), this-&gt;layout(), extent_);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L275**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L276**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L277**: <code>  /// TensorRef to real-valued tensor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L278**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L279**: <code>  cutlass::TensorView&lt;Element, Layout&gt; view_imag() const {</code>
+  - EN: Starts the definition body for `view_imag`.
+  - CN: 开始 `view_imag` 的定义体。
+- **L280**: <code>    return cutlass::TensorView&lt;Element, Layout&gt;(this-&gt;imaginary_data(), this-&gt;layout(), extent_);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L281**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L282**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L283**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L284**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L285**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L286**: <code>/// Constructs a TensorRef, deducing types from arguments.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L287**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L288**: <code>  typename Element,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L289**: <code>  typename Layout</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L290**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L291**: <code>CUTLASS_HOST_DEVICE TensorViewPlanarComplex&lt;Element, Layout&gt; make_TensorViewPlanarComplex(</code>
+  - EN: Begins or continues the signature/parameter list for `make_TensorViewPlanarComplex`.
+  - CN: 开始或继续 `make_TensorViewPlanarComplex` 的签名/参数列表。
+- **L292**: <code>  Element *ptr, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L293**: <code>  Layout const &amp;layout,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L294**: <code>  typename Layout::LongIndex imaginary_stride,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L295**: <code>  typename Layout::TensorCoord const &amp;extent) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L296**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L297**: <code>  return TensorViewPlanarComplex&lt;Element, Layout&gt;(ptr, layout, imaginary_stride, extent);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L298**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L299**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L300**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L301**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L302**: <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Conditional compilation / 条件编译
+- Complex arithmetic support / 复数运算支持
+- Symbol focus: `TensorViewPlanarComplex` / 重点符号：`TensorViewPlanarComplex`
+- Symbol focus: `Base` / 重点符号：`Base`
+- Symbol focus: `Layout` / 重点符号：`Layout`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/tensor_ref_planar_complex.h"`
+  - `"cutlass/tensor_view.h" // cutlass::TensorView`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `<cmath>`

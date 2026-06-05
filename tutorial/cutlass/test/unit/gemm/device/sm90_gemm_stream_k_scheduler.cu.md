@@ -1,0 +1,1049 @@
+# sm90_gemm_stream_k_scheduler.cu — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/sm90_gemm_stream_k_scheduler.cu`
+- 中文：`test/unit/gemm/device/sm90_gemm_stream_k_scheduler.cu`
+
+## Purpose / 目的
+- EN: This file contains tests that the stream-k scheduler covers the entire problem space tailored to the configuration encoded in `sm90_gemm_stream_k_scheduler`. The file-level brief is: "Tests that the stream-K scheduler covers the entire problem space."
+- 中文：该文件包含针对 `sm90_gemm_stream_k_scheduler` 配置定制的 CUTLASS GEMM 测试。 文件级摘要为：“Tests that the stream-K scheduler covers the entire problem space”。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L32** `    \brief Tests that the stream-K scheduler covers the entire problem space.`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L33** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L34** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L35** `#include "cutlass/cluster_launch.hpp"`
+  - EN: Includes `cutlass/cluster_launch.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/cluster_launch.hpp`，这是该测试编译单元所需的依赖。
+- **L36** `#include "cutlass/kernel_hardware_info.hpp"`
+  - EN: Includes `cutlass/kernel_hardware_info.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/kernel_hardware_info.hpp`，这是该测试编译单元所需的依赖。
+- **L37** `#include "cutlass/gemm/kernel/sm90_tile_scheduler_stream_k.hpp"`
+  - EN: Includes `cutlass/gemm/kernel/sm90_tile_scheduler_stream_k.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/gemm/kernel/sm90_tile_scheduler_stream_k.hpp`，这是该测试编译单元所需的依赖。
+- **L38** `#include "cutlass/util/device_memory.h"`
+  - EN: Includes `cutlass/util/device_memory.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/device_memory.h`，这是该测试编译单元所需的依赖。
+- **L39** `#include "cutlass/util/reference/device/tensor_fill.h"`
+  - EN: Includes `cutlass/util/reference/device/tensor_fill.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/reference/device/tensor_fill.h`，这是该测试编译单元所需的依赖。
+- **L40** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L41** `#include "../../common/cutlass_unit_test.h"`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- **L42** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L43** `// Grids are launched with clusters enabled in these tests,`
+  - EN: Adds a human-readable comment for the next code region: Grids are launched with clusters enabled in these tests,.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Grids are launched with clusters enabled in these tests,。
+- **L44** `// so the CTK version must support cluster launching.`
+  - EN: Adds a human-readable comment for the next code region: so the CTK version must support cluster launching..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：so the CTK version must support cluster launching.。
+- **L45** `#if defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)`
+  - EN: Begins a conditional-compilation region guarded by `defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)`.
+  - 中文：开始一个由 `defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)` 控制的条件编译区域。
+- **L46** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L47** `using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L48** `using ProblemShape_MNKL = Shape<int, int, int, int>;`
+  - EN: Creates the alias `ProblemShape_MNKL` for a compile-time shape `Shape<int, int, int, int>`.
+  - 中文：为 `ProblemShape_MNKL` 创建别名，对应 编译期形状 `Shape<int, int, int, int>`。
+- **L49** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L50** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L51** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L52** `/// Kernel for getting each piece of work for a given block from the scheduler and logging`
+  - EN: Adds a human-readable comment for the next code region: / Kernel for getting each piece of work for a given block from the scheduler and logging.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Kernel for getting each piece of work for a given block from the scheduler and logging。
+- **L53** `/// the K iterations visited by the block.`
+  - EN: Adds a human-readable comment for the next code region: / the K iterations visited by the block..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ the K iterations visited by the block.。
+- **L54** `template <`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L55** `  class Scheduler,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L56** `  class TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L57** `  class ClusterShape`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L58** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L59** `__global__`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L60** `void`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L61** `run_scheduler(int* visit_counters, typename Scheduler::Params params, TileShape tile_shape, ClusterShape cluster_shape, ProblemShape_MNKL problem_shape_mnkl) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L62** `  Scheduler scheduler{params};`
+  - EN: Completes the statement `Scheduler scheduler{params};`.
+  - 中文：完成语句 `Scheduler scheduler{params};`。
+- **L63** `  auto work_tile_info = scheduler.get_current_work();`
+  - EN: Completes the statement `auto work_tile_info = scheduler.get_current_work();`.
+  - 中文：完成语句 `auto work_tile_info = scheduler.get_current_work();`。
+- **L64** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L65** `  while (work_tile_info.is_valid()) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L66** `    // Increment counters to indicate coverage`
+  - EN: Adds a human-readable comment for the next code region: Increment counters to indicate coverage.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Increment counters to indicate coverage。
+- **L67** `    auto tile_idx = Scheduler::output_tile_index(params, work_tile_info);`
+  - EN: Completes the statement `auto tile_idx = Scheduler::output_tile_index(params, work_tile_info);`.
+  - 中文：完成语句 `auto tile_idx = Scheduler::output_tile_index(params, work_tile_info);`。
+- **L68** `    auto offset = tile_idx * params.divmod_tiles_per_output_tile_.divisor + work_tile_info.K_idx;`
+  - EN: Completes the statement `auto offset = tile_idx * params.divmod_tiles_per_output_tile_.divisor + work_tile_info.K_idx;`.
+  - 中文：完成语句 `auto offset = tile_idx * params.divmod_tiles_per_output_tile_.divisor + work_tile_info.K_idx;`。
+- **L69** `    for (auto i = 0; i < work_tile_info.k_tile_count; ++i) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L70** `      // Use atomicAdd because the visit counters are shared by multiple thread blocks.`
+  - EN: Adds a human-readable comment for the next code region: Use atomicAdd because the visit counters are shared by multiple thread blocks..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Use atomicAdd because the visit counters are shared by multiple thread blocks.。
+- **L71** `      // While having more than one block increment the same counter indicates failure,`
+  - EN: Adds a human-readable comment for the next code region: While having more than one block increment the same counter indicates failure,.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：While having more than one block increment the same counter indicates failure,。
+- **L72** `      // we need to ensure that this behavior is captured (by having both increments reflected).`
+  - EN: Adds a human-readable comment for the next code region: we need to ensure that this behavior is captured (by having both increments reflected)..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：we need to ensure that this behavior is captured (by having both increments reflected).。
+- **L73** `      atomicAdd(visit_counters + offset + i, 1);`
+  - EN: Completes the statement `atomicAdd(visit_counters + offset + i, 1);`.
+  - 中文：完成语句 `atomicAdd(visit_counters + offset + i, 1);`。
+- **L74** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L75** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L76** `    bool continue_current = scheduler.continue_current_work(work_tile_info);`
+  - EN: Completes the statement `bool continue_current = scheduler.continue_current_work(work_tile_info);`.
+  - 中文：完成语句 `bool continue_current = scheduler.continue_current_work(work_tile_info);`。
+- **L77** `    if (!continue_current) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L78** `      scheduler.advance_to_next_work();`
+  - EN: Completes the statement `scheduler.advance_to_next_work();`.
+  - 中文：完成语句 `scheduler.advance_to_next_work();`。
+- **L79** `      work_tile_info = scheduler.get_current_work();`
+  - EN: Completes the statement `work_tile_info = scheduler.get_current_work();`.
+  - 中文：完成语句 `work_tile_info = scheduler.get_current_work();`。
+- **L80** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L81** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L82** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L83** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L84** `/// Host-side wrapper for launching the kernel to test the scheduler.`
+  - EN: Adds a human-readable comment for the next code region: / Host-side wrapper for launching the kernel to test the scheduler..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Host-side wrapper for launching the kernel to test the scheduler.。
+- **L85** `template <`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L86** `  class TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L87** `  class ClusterShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L88** `  uint32_t NumMmaWarpGroups = 2`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L89** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L90** `bool`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L91** `test_scheduler(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L92** `  ProblemShape_MNKL problem_shape_mnkl,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L93** `  TileShape tile_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L94** `  ClusterShape cluster_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L95** `  int sm_count,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L96** `  int splits=1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L97** `  bool expect_data_parallel=false) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L98** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L99** `  using Scheduler = cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamK<TileShape, ClusterShape>;`
+  - EN: Creates the alias `Scheduler` for a scheduler policy `cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamK<TileShape, ClusterShape>`.
+  - 中文：为 `Scheduler` 创建别名，对应 调度策略 `cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamK<TileShape, ClusterShape>`。
+- **L100** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L101** `  cutlass::KernelHardwareInfo hw_info{0, sm_count};`
+  - EN: Completes the statement `cutlass::KernelHardwareInfo hw_info{0, sm_count};`.
+  - 中文：完成语句 `cutlass::KernelHardwareInfo hw_info{0, sm_count};`。
+- **L102** `  auto params = Scheduler::to_underlying_arguments(problem_shape_mnkl, tile_shape, cluster_shape, hw_info, {splits}, nullptr);`
+  - EN: Completes the statement `auto params = Scheduler::to_underlying_arguments(problem_shape_mnkl, tile_shape, cluster_shape, hw_info, {splits}, nullptr);`.
+  - 中文：完成语句 `auto params = Scheduler::to_underlying_arguments(problem_shape_mnkl, tile_shape, cluster_shape, hw_info, {splits}, nullptr);`。
+- **L103** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L104** `  typename Scheduler::Arguments args{};`
+  - EN: Completes the statement `typename Scheduler::Arguments args{};`.
+  - 中文：完成语句 `typename Scheduler::Arguments args{};`。
+- **L105** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L106** `  // Set up the grid for the problem`
+  - EN: Adds a human-readable comment for the next code region: Set up the grid for the problem.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Set up the grid for the problem。
+- **L107** `  dim3 grid = Scheduler::get_grid_shape(params, problem_shape_mnkl, tile_shape, cluster_shape, hw_info, args);`
+  - EN: Completes the statement `dim3 grid = Scheduler::get_grid_shape(params, problem_shape_mnkl, tile_shape, cluster_shape, hw_info, args);`.
+  - 中文：完成语句 `dim3 grid = Scheduler::get_grid_shape(params, problem_shape_mnkl, tile_shape, cluster_shape, hw_info, args);`。
+- **L108** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L109** `  auto print_info = [&]() {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L110** `    std::cout << "Failed with problem size "`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L111** `      << size<0>(problem_shape_mnkl) << "x"`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L112** `      << size<1>(problem_shape_mnkl) << "x"`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L113** `      << size<2>(problem_shape_mnkl) << "x"`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L114** `      << size<3>(problem_shape_mnkl)`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L115** `      << " and grid size " << grid.x << "x"`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L116** `      << grid.y << "x" << grid.z`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L117** `      << " splits=" << params.divmod_splits_.divisor`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L118** `      << " k_iter=" << params.divmod_tiles_per_output_tile_.divisor`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L119** `      << " big_units_=" << params.big_units_`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L120** `      << " big_groups_=" << params.big_groups_`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L121** `      << " sk_tiles=" << params.sk_tiles_`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L122** `      << " sk_units=" << params.sk_units_`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L123** `      << " k_tiles_per_sk_unit=" << params.divmod_k_tiles_per_sk_unit_.divisor`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L124** `      << " k_tiles_per_sk_big_unit=" << params.divmod_k_tiles_per_sk_big_unit_.divisor`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L125** `      << " units_per_problem=" << params.units_per_problem_`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L126** `      << " groups=" << params.divmod_sk_groups_.divisor << std::endl;`
+  - EN: Completes the statement `<< " groups=" << params.divmod_sk_groups_.divisor << std::endl;`.
+  - 中文：完成语句 `<< " groups=" << params.divmod_sk_groups_.divisor << std::endl;`。
+- **L127** `  };`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L128** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L129** `  // If we expect the schedule to be data-parallel only, ensure that no stream-K tiles are launched.`
+  - EN: Adds a human-readable comment for the next code region: If we expect the schedule to be data-parallel only, ensure that no stream-K tiles are launched..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：If we expect the schedule to be data-parallel only, ensure that no stream-K tiles are launched.。
+- **L130** `  if (expect_data_parallel && params.sk_tiles_ != 0) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L131** `    print_info();`
+  - EN: Completes the statement `print_info();`.
+  - 中文：完成语句 `print_info();`。
+- **L132** `    std::cout << "Expected stream-K to select a data-parallel decomposition." << std::endl;`
+  - EN: Completes the statement `std::cout << "Expected stream-K to select a data-parallel decomposition." << std::endl;`.
+  - 中文：完成语句 `std::cout << "Expected stream-K to select a data-parallel decomposition." << std::endl;`。
+- **L133** `    return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L134** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L135** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L136** `  // Allocate counters indicating the number of times each k iteration of each output tile has been visited`
+  - EN: Adds a human-readable comment for the next code region: Allocate counters indicating the number of times each k iteration of each output tile has been visited.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Allocate counters indicating the number of times each k iteration of each output tile has been visited。
+- **L137** `  auto [blk_m, blk_n, blk_l] = Scheduler::get_tiled_cta_shape_mnl(problem_shape_mnkl, tile_shape, cluster_shape);`
+  - EN: Completes the statement `auto [blk_m, blk_n, blk_l] = Scheduler::get_tiled_cta_shape_mnl(problem_shape_mnkl, tile_shape, cluster_shape);`.
+  - 中文：完成语句 `auto [blk_m, blk_n, blk_l] = Scheduler::get_tiled_cta_shape_mnl(problem_shape_mnkl, tile_shape, cluster_shape);`。
+- **L138** `  auto total_counters = blk_m * blk_n * blk_l * params.divmod_tiles_per_output_tile_.divisor;`
+  - EN: Completes the statement `auto total_counters = blk_m * blk_n * blk_l * params.divmod_tiles_per_output_tile_.divisor;`.
+  - 中文：完成语句 `auto total_counters = blk_m * blk_n * blk_l * params.divmod_tiles_per_output_tile_.divisor;`。
+- **L139** `  cutlass::DeviceAllocation<int> visit_counters(total_counters);`
+  - EN: Completes the statement `cutlass::DeviceAllocation<int> visit_counters(total_counters);`.
+  - 中文：完成语句 `cutlass::DeviceAllocation<int> visit_counters(total_counters);`。
+- **L140** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L141** `  // Initialize counters to zero`
+  - EN: Adds a human-readable comment for the next code region: Initialize counters to zero.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Initialize counters to zero。
+- **L142** `  cudaError_t err = cudaMemset((void*)visit_counters.get(), 0, sizeof(int) * total_counters);`
+  - EN: Completes the statement `cudaError_t err = cudaMemset((void*)visit_counters.get(), 0, sizeof(int) * total_counters);`.
+  - 中文：完成语句 `cudaError_t err = cudaMemset((void*)visit_counters.get(), 0, sizeof(int) * total_counters);`。
+- **L143** `  if (err != cudaSuccess) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L144** `    print_info();`
+  - EN: Completes the statement `print_info();`.
+  - 中文：完成语句 `print_info();`。
+- **L145** `    std::cout << __FILE__ << ":" << __LINE__ << " cudaMemset failed with error: " << cudaGetErrorString(err) << std::endl;`
+  - EN: Completes the statement `std::cout << __FILE__ << ":" << __LINE__ << " cudaMemset failed with error: " << cudaGetErrorString(err) << std::endl;`.
+  - 中文：完成语句 `std::cout << __FILE__ << ":" << __LINE__ << " cudaMemset failed with error: " << cudaGetErrorString(err) << std::endl;`。
+- **L146** `    return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L147** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L148** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L149** `  // Set up cluster and cluster launch. This is needed even for this simple kernel because`
+  - EN: Adds a human-readable comment for the next code region: Set up cluster and cluster launch. This is needed even for this simple kernel because.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Set up cluster and cluster launch. This is needed even for this simple kernel because。
+- **L150** `  // the SM90 scheduler needs to be able to query the CTA id within a cluster, which requires`
+  - EN: Adds a human-readable comment for the next code region: the SM90 scheduler needs to be able to query the CTA id within a cluster, which requires.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：the SM90 scheduler needs to be able to query the CTA id within a cluster, which requires。
+- **L151** `  // explicitly launching with clusters.`
+  - EN: Adds a human-readable comment for the next code region: explicitly launching with clusters..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：explicitly launching with clusters.。
+- **L152** `  dim3 cluster{`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L153** `    static_cast<uint32_t>(cute::get<0>(ClusterShape{})),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L154** `    static_cast<uint32_t>(cute::get<1>(ClusterShape{})),`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L155** `    static_cast<uint32_t>(cute::get<2>(ClusterShape{}))`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L156** `  };`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L157** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L158** `  cudaLaunchConfig_t launch_config;`
+  - EN: Completes the statement `cudaLaunchConfig_t launch_config;`.
+  - 中文：完成语句 `cudaLaunchConfig_t launch_config;`。
+- **L159** `  launch_config.gridDim = grid;`
+  - EN: Completes the statement `launch_config.gridDim = grid;`.
+  - 中文：完成语句 `launch_config.gridDim = grid;`。
+- **L160** `  launch_config.blockDim = {1, 1, 1};`
+  - EN: Completes the statement `launch_config.blockDim = {1, 1, 1};`.
+  - 中文：完成语句 `launch_config.blockDim = {1, 1, 1};`。
+- **L161** `  launch_config.dynamicSmemBytes = 0;`
+  - EN: Completes the statement `launch_config.dynamicSmemBytes = 0;`.
+  - 中文：完成语句 `launch_config.dynamicSmemBytes = 0;`。
+- **L162** `  launch_config.stream = NULL;`
+  - EN: Completes the statement `launch_config.stream = NULL;`.
+  - 中文：完成语句 `launch_config.stream = NULL;`。
+- **L163** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L164** `  cudaLaunchAttribute launch_attribute[1];`
+  - EN: Completes the statement `cudaLaunchAttribute launch_attribute[1];`.
+  - 中文：完成语句 `cudaLaunchAttribute launch_attribute[1];`。
+- **L165** `  launch_attribute[0].id = cudaLaunchAttributeClusterDimension;`
+  - EN: Completes the statement `launch_attribute[0].id = cudaLaunchAttributeClusterDimension;`.
+  - 中文：完成语句 `launch_attribute[0].id = cudaLaunchAttributeClusterDimension;`。
+- **L166** `  launch_attribute[0].val.clusterDim.x = cluster.x;`
+  - EN: Completes the statement `launch_attribute[0].val.clusterDim.x = cluster.x;`.
+  - 中文：完成语句 `launch_attribute[0].val.clusterDim.x = cluster.x;`。
+- **L167** `  launch_attribute[0].val.clusterDim.y = cluster.y;`
+  - EN: Completes the statement `launch_attribute[0].val.clusterDim.y = cluster.y;`.
+  - 中文：完成语句 `launch_attribute[0].val.clusterDim.y = cluster.y;`。
+- **L168** `  launch_attribute[0].val.clusterDim.z = cluster.z;`
+  - EN: Completes the statement `launch_attribute[0].val.clusterDim.z = cluster.z;`.
+  - 中文：完成语句 `launch_attribute[0].val.clusterDim.z = cluster.z;`。
+- **L169** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L170** `  launch_config.attrs = launch_attribute;`
+  - EN: Completes the statement `launch_config.attrs = launch_attribute;`.
+  - 中文：完成语句 `launch_config.attrs = launch_attribute;`。
+- **L171** `  launch_config.numAttrs = 1;`
+  - EN: Completes the statement `launch_config.numAttrs = 1;`.
+  - 中文：完成语句 `launch_config.numAttrs = 1;`。
+- **L172** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L173** `  void const* kernel = (void const*) run_scheduler<Scheduler, TileShape, ClusterShape>;`
+  - EN: Completes the statement `void const* kernel = (void const*) run_scheduler<Scheduler, TileShape, ClusterShape>;`.
+  - 中文：完成语句 `void const* kernel = (void const*) run_scheduler<Scheduler, TileShape, ClusterShape>;`。
+- **L174** `  int* counters_ptr = visit_counters.get();`
+  - EN: Completes the statement `int* counters_ptr = visit_counters.get();`.
+  - 中文：完成语句 `int* counters_ptr = visit_counters.get();`。
+- **L175** `  void* kernel_params[] = {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L176** `    &counters_ptr,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L177** `    &params,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L178** `    &tile_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L179** `    &cluster_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L180** `    &problem_shape_mnkl`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L181** `  };`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L182** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L183** `  // Run the scheduler to completion and log visits to each k iteration`
+  - EN: Adds a human-readable comment for the next code region: Run the scheduler to completion and log visits to each k iteration.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Run the scheduler to completion and log visits to each k iteration。
+- **L184** `  err = cudaLaunchKernelExC(&launch_config, kernel, kernel_params);`
+  - EN: Completes the statement `err = cudaLaunchKernelExC(&launch_config, kernel, kernel_params);`.
+  - 中文：完成语句 `err = cudaLaunchKernelExC(&launch_config, kernel, kernel_params);`。
+- **L185** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L186** `  if (err != cudaSuccess) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L187** `    print_info();`
+  - EN: Completes the statement `print_info();`.
+  - 中文：完成语句 `print_info();`。
+- **L188** `    std::cout << __FILE__ << ":" << __LINE__`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L189** `              << " cudaLaunchKernelExC failed with error: "`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L190** `              << cudaGetErrorString(err) << std::endl;`
+  - EN: Completes the statement `<< cudaGetErrorString(err) << std::endl;`.
+  - 中文：完成语句 `<< cudaGetErrorString(err) << std::endl;`。
+- **L191** `    return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L192** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L193** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L194** `  err = cudaDeviceSynchronize();`
+  - EN: Completes the statement `err = cudaDeviceSynchronize();`.
+  - 中文：完成语句 `err = cudaDeviceSynchronize();`。
+- **L195** `  if (err != cudaSuccess) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L196** `    print_info();`
+  - EN: Completes the statement `print_info();`.
+  - 中文：完成语句 `print_info();`。
+- **L197** `    std::cout << __FILE__ << ":" << __LINE__`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L198** `              << " scheduler kernel failed with error: "`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L199** `              << cudaGetErrorString(err) << std::endl;`
+  - EN: Completes the statement `<< cudaGetErrorString(err) << std::endl;`.
+  - 中文：完成语句 `<< cudaGetErrorString(err) << std::endl;`。
+- **L200** `    return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L201** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L202** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L203** `  // Copy visit counts back to host and ensure that all entries are ones`
+  - EN: Adds a human-readable comment for the next code region: Copy visit counts back to host and ensure that all entries are ones.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Copy visit counts back to host and ensure that all entries are ones。
+- **L204** `  std::vector<int> host_visit_counts(total_counters);`
+  - EN: Completes the statement `std::vector<int> host_visit_counts(total_counters);`.
+  - 中文：完成语句 `std::vector<int> host_visit_counts(total_counters);`。
+- **L205** `  visit_counters.copy_to_host(host_visit_counts.data());`
+  - EN: Completes the statement `visit_counters.copy_to_host(host_visit_counts.data());`.
+  - 中文：完成语句 `visit_counters.copy_to_host(host_visit_counts.data());`。
+- **L206** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L207** `  for (size_t i = 0; i < host_visit_counts.size(); ++i) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L208** `    if (host_visit_counts[i] != 1) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L209** `      print_info();`
+  - EN: Completes the statement `print_info();`.
+  - 中文：完成语句 `print_info();`。
+- **L210** `      std::cout << "Error at idx: " << i << ". Got count " << host_visit_counts[i] << std::endl;`
+  - EN: Completes the statement `std::cout << "Error at idx: " << i << ". Got count " << host_visit_counts[i] << std::endl;`.
+  - 中文：完成语句 `std::cout << "Error at idx: " << i << ". Got count " << host_visit_counts[i] << std::endl;`。
+- **L211** `      return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L212** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L213** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L214** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L215** `  return true;`
+  - EN: Completes the statement `return true;`.
+  - 中文：完成语句 `return true;`。
+- **L216** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L217** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L218** `/// Executes tests of the scheduler with a sweep across problem size K`
+  - EN: Adds a human-readable comment for the next code region: / Executes tests of the scheduler with a sweep across problem size K.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Executes tests of the scheduler with a sweep across problem size K。
+- **L219** `template <`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L220** `  class TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L221** `  class ClusterShape`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L222** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L223** `bool sweep_k(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L224** `  ProblemShape_MNKL problem_shape_mnkl,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L225** `  TileShape tile_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L226** `  ClusterShape cluster_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L227** `  int sm_count,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L228** `  int splits=1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L229** `  bool expect_data_parallel=false,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L230** `  int k_start=128,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L231** `  int k_stop=16384,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L232** `  int k_step=0) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L233** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L234** `  if (k_step == 0) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L235** `    k_step = 4 * cute::size<2>(tile_shape);`
+  - EN: Completes the statement `k_step = 4 * cute::size<2>(tile_shape);`.
+  - 中文：完成语句 `k_step = 4 * cute::size<2>(tile_shape);`。
+- **L236** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L237** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L238** `  for (int k = k_start; k <= k_stop; k += k_step) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L239** `    ProblemShape_MNKL problem{get<0>(problem_shape_mnkl), get<1>(problem_shape_mnkl), k, get<3>(problem_shape_mnkl)};`
+  - EN: Completes the statement `ProblemShape_MNKL problem{get<0>(problem_shape_mnkl), get<1>(problem_shape_mnkl), k, get<3>(problem_shape_mnkl)};`.
+  - 中文：完成语句 `ProblemShape_MNKL problem{get<0>(problem_shape_mnkl), get<1>(problem_shape_mnkl), k, get<3>(problem_shape_mnkl)};`。
+- **L240** `    bool passed = test_scheduler(problem, tile_shape, cluster_shape, sm_count, splits, expect_data_parallel);`
+  - EN: Completes the statement `bool passed = test_scheduler(problem, tile_shape, cluster_shape, sm_count, splits, expect_data_parallel);`.
+  - 中文：完成语句 `bool passed = test_scheduler(problem, tile_shape, cluster_shape, sm_count, splits, expect_data_parallel);`。
+- **L241** `    if (!passed) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L242** `      return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L243** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L244** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L245** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L246** `  return true;`
+  - EN: Completes the statement `return true;`.
+  - 中文：完成语句 `return true;`。
+- **L247** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L248** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L249** `/// Executes tests of the scheduler that are expected to result in a data-parallel schedule.`
+  - EN: Adds a human-readable comment for the next code region: / Executes tests of the scheduler that are expected to result in a data-parallel schedule..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Executes tests of the scheduler that are expected to result in a data-parallel schedule.。
+- **L250** `/// This function assumes that the problem, tile, and cluster shape, alongside the SM count,`
+  - EN: Adds a human-readable comment for the next code region: / This function assumes that the problem, tile, and cluster shape, alongside the SM count,.
+  - 中文：为后续代码区域添加可读性注释：说明这里给出了 tile 或 cluster 形状。。
+- **L251** `/// are such that the problem executes only full waves on the device.`
+  - EN: Adds a human-readable comment for the next code region: / are such that the problem executes only full waves on the device..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ are such that the problem executes only full waves on the device.。
+- **L252** `template <`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L253** `  class TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L254** `  class ClusterShape`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L255** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L256** `bool test_data_parallel(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L257** `  int blocks_m,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L258** `  int blocks_n,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L259** `  TileShape tile_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L260** `  ClusterShape cluster_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L261** `  int sm_count) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L262** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L263** `  // Since the configuration passed in executes only full waves, increasing`
+  - EN: Adds a human-readable comment for the next code region: Since the configuration passed in executes only full waves, increasing.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Since the configuration passed in executes only full waves, increasing。
+- **L264** `  // the batch dimension simply results in running more full waves.`
+  - EN: Adds a human-readable comment for the next code region: the batch dimension simply results in running more full waves..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：the batch dimension simply results in running more full waves.。
+- **L265** `  for (int l = 1; l < 4; ++l) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L266** `    ProblemShape_MNKL problem_shape{`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L267** `      size<0>(tile_shape) * blocks_m, size<1>(tile_shape) * blocks_n, 1, l};`
+  - EN: Completes the statement `size<0>(tile_shape) * blocks_m, size<1>(tile_shape) * blocks_n, 1, l};`.
+  - 中文：完成语句 `size<0>(tile_shape) * blocks_m, size<1>(tile_shape) * blocks_n, 1, l};`。
+- **L268** `    bool passed = sweep_k(problem_shape, tile_shape, cluster_shape, sm_count, /*splits=*/1, /*expect_data_parallel=*/true);`
+  - EN: Completes the statement `bool passed = sweep_k(problem_shape, tile_shape, cluster_shape, sm_count, /*splits=*/1, /*expect_data_parallel=*/true);`.
+  - 中文：完成语句 `bool passed = sweep_k(problem_shape, tile_shape, cluster_shape, sm_count, /*splits=*/1, /*expect_data_parallel=*/true);`。
+- **L269** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L270** `    if (!passed) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L271** `      return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L272** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L273** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L274** `  return true;`
+  - EN: Completes the statement `return true;`.
+  - 中文：完成语句 `return true;`。
+- **L275** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L276** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L277** `/// Executes tests of the scheduler on the generic stream-K decomposition.`
+  - EN: Adds a human-readable comment for the next code region: / Executes tests of the scheduler on the generic stream-K decomposition..
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Executes tests of the scheduler on the generic stream-K decomposition.。
+- **L278** `template <`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L279** `  class TileShape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L280** `  class ClusterShape`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L281** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L282** `bool test_stream_k(`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L283** `  TileShape tile_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L284** `  ClusterShape cluster_shape,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L285** `  int sm_count) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L286** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L287** `  int tile_m = size<0>(tile_shape);`
+  - EN: Completes the statement `int tile_m = size<0>(tile_shape);`.
+  - 中文：完成语句 `int tile_m = size<0>(tile_shape);`。
+- **L288** `  int tile_n = size<1>(tile_shape);`
+  - EN: Completes the statement `int tile_n = size<1>(tile_shape);`.
+  - 中文：完成语句 `int tile_n = size<1>(tile_shape);`。
+- **L289** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L290** `  for (int m_blocks = 1; m_blocks <= 24; ++m_blocks) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L291** `    for (int n_blocks = 1; n_blocks <= 24; ++n_blocks) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L292** `      for (int l = 1; l < 4; ++l) {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L293** `        ProblemShape_MNKL problem{m_blocks * tile_m, n_blocks * tile_n, 1, l};`
+  - EN: Completes the statement `ProblemShape_MNKL problem{m_blocks * tile_m, n_blocks * tile_n, 1, l};`.
+  - 中文：完成语句 `ProblemShape_MNKL problem{m_blocks * tile_m, n_blocks * tile_n, 1, l};`。
+- **L294** `        if (!sweep_k(problem, tile_shape, cluster_shape, sm_count)) {`
+  - EN: Starts a runtime conditional statement.
+  - 中文：开始一个运行时条件判断语句。
+- **L295** `          return false;`
+  - EN: Completes the statement `return false;`.
+  - 中文：完成语句 `return false;`。
+- **L296** `        }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L297** `      }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L298** `    }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L299** `  }`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L300** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L301** `  return true;`
+  - EN: Completes the statement `return true;`.
+  - 中文：完成语句 `return true;`。
+- **L302** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L303** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L304** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L305** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L306** `TEST(SM90_Device_Gemm_stream_k_scheduler, 256x128x64_2x1x1) {`
+  - EN: Defines GoogleTest case `SM90_Device_Gemm_stream_k_scheduler.256x128x64_2x1x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM90_Device_Gemm_stream_k_scheduler.256x128x64_2x1x1`，用于覆盖一个 GEMM 场景。
+- **L307** `  using TileShape_MNK = Shape<_256,_128,_64>;`
+  - EN: Creates the alias `TileShape_MNK` for a compile-time shape `Shape<_256,_128,_64>`.
+  - 中文：为 `TileShape_MNK` 创建别名，对应 编译期形状 `Shape<_256,_128,_64>`。
+- **L308** `  using ClusterShape_MNK = Shape<_2,_1,_1>;`
+  - EN: Creates the alias `ClusterShape_MNK` for a compile-time shape `Shape<_2,_1,_1>`.
+  - 中文：为 `ClusterShape_MNK` 创建别名，对应 编译期形状 `Shape<_2,_1,_1>`。
+- **L309** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L310** `  TileShape_MNK tile_shape;`
+  - EN: Completes the statement `TileShape_MNK tile_shape;`.
+  - 中文：完成语句 `TileShape_MNK tile_shape;`。
+- **L311** `  ClusterShape_MNK cluster_shape;`
+  - EN: Completes the statement `ClusterShape_MNK cluster_shape;`.
+  - 中文：完成语句 `ClusterShape_MNK cluster_shape;`。
+- **L312** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L313** `  // Test various data-parallel cases`
+  - EN: Adds a human-readable comment for the next code region: Test various data-parallel cases.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Test various data-parallel cases。
+- **L314** `  EXPECT_TRUE(test_data_parallel(/*blocks_m=*/ 4, /*blocks_n=*/ 4, tile_shape, cluster_shape, /*sm_count=*/ 16));`
+  - EN: Checks that `test_data_parallel(/*blocks_m=*/ 4, /*blocks_n=*/ 4, tile_shape, cluster_shape, /*sm_count=*/ 16)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_data_parallel(/*blocks_m=*/ 4, /*blocks_n=*/ 4, tile_shape, cluster_shape, /*sm_count=*/ 16)` 的结果是否为真，以判定测试通过。
+- **L315** `  EXPECT_TRUE(test_data_parallel(/*blocks_m=*/16, /*blocks_n=*/ 4, tile_shape, cluster_shape, /*sm_count=*/ 64));`
+  - EN: Checks that `test_data_parallel(/*blocks_m=*/16, /*blocks_n=*/ 4, tile_shape, cluster_shape, /*sm_count=*/ 64)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_data_parallel(/*blocks_m=*/16, /*blocks_n=*/ 4, tile_shape, cluster_shape, /*sm_count=*/ 64)` 的结果是否为真，以判定测试通过。
+- **L316** `  EXPECT_TRUE(test_data_parallel(/*blocks_m=*/ 8, /*blocks_n=*/27, tile_shape, cluster_shape, /*sm_count=*/108));`
+  - EN: Checks that `test_data_parallel(/*blocks_m=*/ 8, /*blocks_n=*/27, tile_shape, cluster_shape, /*sm_count=*/108)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_data_parallel(/*blocks_m=*/ 8, /*blocks_n=*/27, tile_shape, cluster_shape, /*sm_count=*/108)` 的结果是否为真，以判定测试通过。
+- **L317** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L318** `  // Test various stream-K cases`
+  - EN: Adds a human-readable comment for the next code region: Test various stream-K cases.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Test various stream-K cases。
+- **L319** `  EXPECT_TRUE(test_stream_k(tile_shape, cluster_shape, /*sm_count=*/ 16));`
+  - EN: Checks that `test_stream_k(tile_shape, cluster_shape, /*sm_count=*/ 16)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_stream_k(tile_shape, cluster_shape, /*sm_count=*/ 16)` 的结果是否为真，以判定测试通过。
+- **L320** `  EXPECT_TRUE(test_stream_k(tile_shape, cluster_shape, /*sm_count=*/ 64));`
+  - EN: Checks that `test_stream_k(tile_shape, cluster_shape, /*sm_count=*/ 64)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_stream_k(tile_shape, cluster_shape, /*sm_count=*/ 64)` 的结果是否为真，以判定测试通过。
+- **L321** `  EXPECT_TRUE(test_stream_k(tile_shape, cluster_shape, /*sm_count=*/108));`
+  - EN: Checks that `test_stream_k(tile_shape, cluster_shape, /*sm_count=*/108)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_stream_k(tile_shape, cluster_shape, /*sm_count=*/108)` 的结果是否为真，以判定测试通过。
+- **L322** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L323** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L324** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L325** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L326** `TEST(SM90_Device_Gemm_stream_k_scheduler, 128x128x64_2x1x1) {`
+  - EN: Defines GoogleTest case `SM90_Device_Gemm_stream_k_scheduler.128x128x64_2x1x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM90_Device_Gemm_stream_k_scheduler.128x128x64_2x1x1`，用于覆盖一个 GEMM 场景。
+- **L327** `  using TileShape_MNK = Shape<_128,_128,_64>;`
+  - EN: Creates the alias `TileShape_MNK` for a compile-time shape `Shape<_128,_128,_64>`.
+  - 中文：为 `TileShape_MNK` 创建别名，对应 编译期形状 `Shape<_128,_128,_64>`。
+- **L328** `  using ClusterShape_MNK = Shape<_2,_1,_1>;`
+  - EN: Creates the alias `ClusterShape_MNK` for a compile-time shape `Shape<_2,_1,_1>`.
+  - 中文：为 `ClusterShape_MNK` 创建别名，对应 编译期形状 `Shape<_2,_1,_1>`。
+- **L329** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L330** `  TileShape_MNK tile_shape;`
+  - EN: Completes the statement `TileShape_MNK tile_shape;`.
+  - 中文：完成语句 `TileShape_MNK tile_shape;`。
+- **L331** `  ClusterShape_MNK cluster_shape;`
+  - EN: Completes the statement `ClusterShape_MNK cluster_shape;`.
+  - 中文：完成语句 `ClusterShape_MNK cluster_shape;`。
+- **L332** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L333** `  EXPECT_TRUE(test_scheduler({128, 512, 2048, 1}, tile_shape, cluster_shape, 114));`
+  - EN: Checks that `test_scheduler({128, 512, 2048, 1}, tile_shape, cluster_shape, 114)` evaluates to true, marking the test as passed.
+  - 中文：检查 `test_scheduler({128, 512, 2048, 1}, tile_shape, cluster_shape, 114)` 的结果是否为真，以判定测试通过。
+- **L334** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L335** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L336** `#endif // defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)`
+  - EN: Closes the current conditional-compilation block.
+  - 中文：结束当前条件编译块。
+- **L337** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L338** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+
+## Key Concepts / 关键概念
+- EN: GoogleTest test cases
+  - 中文：GoogleTest 测试用例
+
+## Dependencies / 依赖关系
+- `cutlass/cluster_launch.hpp`
+  - EN: Includes `cutlass/cluster_launch.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/cluster_launch.hpp`，这是该测试编译单元所需的依赖。
+- `cutlass/kernel_hardware_info.hpp`
+  - EN: Includes `cutlass/kernel_hardware_info.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/kernel_hardware_info.hpp`，这是该测试编译单元所需的依赖。
+- `cutlass/gemm/kernel/sm90_tile_scheduler_stream_k.hpp`
+  - EN: Includes `cutlass/gemm/kernel/sm90_tile_scheduler_stream_k.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/gemm/kernel/sm90_tile_scheduler_stream_k.hpp`，这是该测试编译单元所需的依赖。
+- `cutlass/util/device_memory.h`
+  - EN: Includes `cutlass/util/device_memory.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/device_memory.h`，这是该测试编译单元所需的依赖。
+- `cutlass/util/reference/device/tensor_fill.h`
+  - EN: Includes `cutlass/util/reference/device/tensor_fill.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/util/reference/device/tensor_fill.h`，这是该测试编译单元所需的依赖。
+- `../../common/cutlass_unit_test.h`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。

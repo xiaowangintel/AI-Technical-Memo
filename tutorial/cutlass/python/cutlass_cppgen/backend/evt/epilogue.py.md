@@ -1,0 +1,188 @@
+# epilogue.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/epilogue.py`
+
+## Purpose / 作用
+- EN: Epilogue Visitor interface for compiling, and running visitor-based epilogue.
+- CN: 该模块的文档字符串将其描述为：Epilogue Visitor interface for compiling, and running visitor-based epilogue.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Epilogue Visitor interface for compiling, and running visitor-based epilogue.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L40** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L41** `from cutlass_library import DataType` — **EN:** Imports DataType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType。
+- **L42** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `from cutlass_cppgen.backend.epilogue import EpilogueFunctorBase` — **EN:** Imports EpilogueFunctorBase from `cutlass_cppgen.backend.epilogue`. **CN:** 从 `cutlass_cppgen.backend.epilogue` 导入 EpilogueFunctorBase。
+- **L45** `import cutlass_cppgen.backend.evt.backend` — **EN:** Imports cutlass_cppgen.backend.evt.backend for later use. **CN:** 导入 cutlass_cppgen.backend.evt.backend 供后续使用。
+- **L46** `from cutlass_cppgen.backend.frontend import TensorFrontend` — **EN:** Imports TensorFrontend from `cutlass_cppgen.backend.frontend`. **CN:** 从 `cutlass_cppgen.backend.frontend` 导入 TensorFrontend。
+- **L47** `from cutlass_cppgen.utils.datatypes import is_numpy_tensor` — **EN:** Imports is_numpy_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_numpy_tensor。
+- **L48** `from cutlass_cppgen.backend.evt.passes.util import cc_map` — **EN:** Imports cc_map from `cutlass_cppgen.backend.evt.passes.util`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.util` 导入 cc_map。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `class EpilogueFunctorVisitor(EpilogueFunctorBase):` — **EN:** Defines class `EpilogueFunctorVisitor` with bases EpilogueFunctorBase. **CN:** 定义类 `EpilogueFunctorVisitor`，其基类为 EpilogueFunctorBase。
+- **L52** `    """` — **EN:** Starts the docstring for the class `EpilogueFunctorVisitor`. **CN:** 开始说明 class `EpilogueFunctorVisitor` 的文档字符串。
+- **L53** `    Apply an epilogue functor described by the epilogue EVT` — **EN:** Continues the docstring for the class `EpilogueFunctorVisitor`. **CN:** 继续说明 class `EpilogueFunctorVisitor` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    :param cc: compute capability` — **EN:** Continues the docstring for the class `EpilogueFunctorVisitor`. **CN:** 继续说明 class `EpilogueFunctorVisitor` 的文档字符串。
+- **L56** `    :param visitor_frontend: user-provide visitor frontend` — **EN:** Continues the docstring for the class `EpilogueFunctorVisitor`. **CN:** 继续说明 class `EpilogueFunctorVisitor` 的文档字符串。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `    """` — **EN:** Ends the docstring for the class `EpilogueFunctorVisitor`. **CN:** 结束说明 class `EpilogueFunctorVisitor` 的文档字符串。
+- **L59** `    def __init__(self, cc: int, visitor, element_compute=DataType.f32) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L60** `        # Type of Emitter based on CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L61** `        self.emit_cls = getattr(cutlass_cppgen.backend.evt.backend, f"Sm{cc_map[cc]}Emitter")` — **EN:** Assigns a value to self.emit_cls. **CN:** 将一个值赋给 self.emit_cls。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `        # Visitor Types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `        self.visitor = visitor` — **EN:** Assigns a value to self.visitor. **CN:** 将一个值赋给 self.visitor。
+- **L65** `        self.graph = visitor.dag_ir` — **EN:** Assigns a value to self.graph. **CN:** 将一个值赋给 self.graph。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `        # Data types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `        self.element_epilogue = element_compute # element compute` — **EN:** Assigns a value to self.element_epilogue. **CN:** 将一个值赋给 self.element_epilogue。
+- **L69** `        self.element_output = self.graph.get_node_meta('D').underlying_impl.element` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `        # Epilogue Thread Type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `        epilogue_thread_type = self.visitor.epilogue_thread_type` — **EN:** Assigns a value to epilogue_thread_type. **CN:** 将一个值赋给 epilogue_thread_type。
+- **L73** `        if cc_map[cc] in [90, 100]:` — **EN:** Starts a conditional branch guarded by `cc_map[cc] in [90, 100]`. **CN:** 开始一个由 `cc_map[cc] in [90, 100]` 控制的条件分支。
+- **L74** `            self.arg_c_type = self.visitor.arg_c_type` — **EN:** Assigns a value to self.arg_c_type. **CN:** 将一个值赋给 self.arg_c_type。
+- **L75** `            self.arg_d_type = self.visitor.arg_d_type` — **EN:** Assigns a value to self.arg_d_type. **CN:** 将一个值赋给 self.arg_d_type。
+- **L76** `        output_names = self.visitor.return_names` — **EN:** Assigns a value to output_names. **CN:** 将一个值赋给 output_names。
+- **L77** `        reduction_names = self.visitor.reduction_names` — **EN:** Assigns a value to reduction_names. **CN:** 将一个值赋给 reduction_names。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `        # Epilogue stages specialized for sm80 kernel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L80** `        if cc == 80:` — **EN:** Starts a conditional branch guarded by `cc == 80`. **CN:** 开始一个由 `cc == 80` 控制的条件分支。
+- **L81** `            if hasattr(self.visitor, "epilogue_stages"):` — **EN:** Starts a conditional branch guarded by `hasattr(self.visitor, 'epilogue_stages')`. **CN:** 开始一个由 `hasattr(self.visitor, 'epilogue_stages')` 控制的条件分支。
+- **L82** `                self.epilogue_stages = self.visitor.epilogue_stages` — **EN:** Assigns a value to self.epilogue_stages. **CN:** 将一个值赋给 self.epilogue_stages。
+- **L83** `                assert self.epilogue_stages <= 2, "Only supports Stages <=2 in SM80 Epilogue"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `        # Epilogue Argument Type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L86** `        class _Arguments(ctypes.Structure):` — **EN:** Defines class `_Arguments` with bases ctypes.Structure. **CN:** 定义类 `_Arguments`，其基类为 ctypes.Structure。
+- **L87** `            """` — **EN:** Starts the docstring for the class `_Arguments`. **CN:** 开始说明 class `_Arguments` 的文档字符串。
+- **L88** `            Concepts:` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L89** `            class _EpilogueArguments(ctypes.Structure):` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L90** `                _fields_ = [` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L91** `                    ("epilogue", _Arguments), <- this class` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L92** `                    ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L93** `                    ("stride_C", StrideBatched_),` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L94** `                    ("ptr_D", ctypes.c_void_p),` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L95** `                    ("stride_D", StrideBatched_)` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L96** `                ]` — **EN:** Continues the docstring for the class `_Arguments`. **CN:** 继续说明 class `_Arguments` 的文档字符串。
+- **L97** `            """` — **EN:** Ends the docstring for the class `_Arguments`. **CN:** 结束说明 class `_Arguments` 的文档字符串。
+- **L98** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L99** `                ("output_op", epilogue_thread_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `            def __init__(self, kwargs: dict) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L103** `                # The user-input kwargs is a dict of (name: tensors)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L104** `                # We first convert all of them to device pointers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L105** `                ptr_kwargs = {}` — **EN:** Assigns a value to ptr_kwargs. **CN:** 将一个值赋给 ptr_kwargs。
+- **L106** `                for key in kwargs.keys():` — **EN:** Starts a loop assigning items from `kwargs.keys()` to `key`. **CN:** 开始一个循环，将 `kwargs.keys()` 的元素赋给 `key`。
+- **L107** `                    is_output = key in output_names and key not in reduction_names` — **EN:** Assigns a value to is_output. **CN:** 将一个值赋给 is_output。
+- **L108** `                    ptr_kwargs[key] = self.get_tensor_ptr(key, kwargs, is_output)` — **EN:** Assigns a value to ptr_kwargs[key]. **CN:** 将一个值赋给 ptr_kwargs[key]。
+- **L109** `                # Initialize the thread arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `                self.output_op = epilogue_thread_type(ptr_kwargs)` — **EN:** Assigns a value to self.output_op. **CN:** 将一个值赋给 self.output_op。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `            def get_tensor_ptr(self, tensor_name, kwargs, is_output=False):` — **EN:** Defines function `get_tensor_ptr`. **CN:** 定义函数 `get_tensor_ptr`。
+- **L113** `                """` — **EN:** Starts the docstring for the function `get_tensor_ptr`. **CN:** 开始说明 function `get_tensor_ptr` 的文档字符串。
+- **L114** `                Helper function for extracting device pointer` — **EN:** Continues the docstring for the function `get_tensor_ptr`. **CN:** 继续说明 function `get_tensor_ptr` 的文档字符串。
+- **L115** `                """` — **EN:** Ends the docstring for the function `get_tensor_ptr`. **CN:** 结束说明 function `get_tensor_ptr` 的文档字符串。
+- **L116** `                # Skip the special tensors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L117** `                if cc in [90, 100]:` — **EN:** Starts a conditional branch guarded by `cc in [90, 100]`. **CN:** 开始一个由 `cc in [90, 100]` 控制的条件分支。
+- **L118** `                    if tensor_name in ["C", "D"]:` — **EN:** Starts a conditional branch guarded by `tensor_name in ['C', 'D']`. **CN:** 开始一个由 `tensor_name in ['C', 'D']` 控制的条件分支。
+- **L119** `                        return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L120** `                if tensor_name not in kwargs.keys():` — **EN:** Starts a conditional branch guarded by `tensor_name not in kwargs.keys()`. **CN:** 开始一个由 `tensor_name not in kwargs.keys()` 控制的条件分支。
+- **L121** `                    raise ValueError(f"Tensor {tensor_name} is not provided.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L122** `                tensor = kwargs[tensor_name]` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `                # For float scalar constant, directly return the value` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `                if isinstance(tensor, float):` — **EN:** Starts a conditional branch guarded by `isinstance(tensor, float)`. **CN:** 开始一个由 `isinstance(tensor, float)` 控制的条件分支。
+- **L126** `                    return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `                # The tensor frontend returns a device buffer for np.ndarray` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L129** `                # and device ptr for other frontends` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L130** `                buffer_or_ptr = TensorFrontend.argument(tensor, is_output)` — **EN:** Assigns a value to buffer_or_ptr. **CN:** 将一个值赋给 buffer_or_ptr。
+- **L131** `                if is_numpy_tensor(tensor):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(tensor)`. **CN:** 开始一个由 `is_numpy_tensor(tensor)` 控制的条件分支。
+- **L132** `                    # Remember the host tensor for later synchronization` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `                    setattr(self, f"{tensor_name}_buffer", buffer_or_ptr)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L134** `                    setattr(self, f"{tensor_name}_host", tensor)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L135** `                    return int(buffer_or_ptr.ptr)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L136** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L137** `                    return int(buffer_or_ptr)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `            def sync(self):` — **EN:** Defines function `sync`. **CN:** 定义函数 `sync`。
+- **L140** `                """` — **EN:** Starts the docstring for the function `sync`. **CN:** 开始说明 function `sync` 的文档字符串。
+- **L141** `                Synchronize the results from device to host` — **EN:** Continues the docstring for the function `sync`. **CN:** 继续说明 function `sync` 的文档字符串。
+- **L142** `                """` — **EN:** Ends the docstring for the function `sync`. **CN:** 结束说明 function `sync` 的文档字符串。
+- **L143** `                for name in output_names:` — **EN:** Starts a loop assigning items from `output_names` to `name`. **CN:** 开始一个循环，将 `output_names` 的元素赋给 `name`。
+- **L144** `                    if hasattr(self, f"{name}_host"):` — **EN:** Starts a conditional branch guarded by `hasattr(self, f'{name}_host')`. **CN:** 开始一个由 `hasattr(self, f'{name}_host')` 控制的条件分支。
+- **L145** `                        host_tensor = getattr(self, f"{name}_host")` — **EN:** Assigns a value to host_tensor. **CN:** 将一个值赋给 host_tensor。
+- **L146** `                        tensor_ptr = getattr(self, f"{name}_buffer").ptr` — **EN:** Assigns a value to tensor_ptr. **CN:** 将一个值赋给 tensor_ptr。
+- **L147** `                        (err,) = cuda.cuMemcpyDtoH(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L148** `                            host_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `                            tensor_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `                            host_tensor.size * host_tensor.itemsize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `                        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L153** `                            raise RuntimeError("CUDA Error %s" % str(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        self.epilogue_type = _Arguments` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    def emit(self, operation):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L158** `        """` — **EN:** Starts the docstring for the function `emit`. **CN:** 开始说明 function `emit` 的文档字符串。
+- **L159** `        Emit the C++ code` — **EN:** Continues the docstring for the function `emit`. **CN:** 继续说明 function `emit` 的文档字符串。
+- **L160** `        """` — **EN:** Ends the docstring for the function `emit`. **CN:** 结束说明 function `emit` 的文档字符串。
+- **L161** `        emitter = self.emit_cls(operation, self.graph)` — **EN:** Assigns a value to emitter. **CN:** 将一个值赋给 emitter。
+- **L162** `        return emitter.emit()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    def get_smem_size(self, tile_description):` — **EN:** Defines function `get_smem_size`. **CN:** 定义函数 `get_smem_size`。
+- **L165** `        """` — **EN:** Starts the docstring for the function `get_smem_size`. **CN:** 开始说明 function `get_smem_size` 的文档字符串。
+- **L166** `        Get the shared memory size in bytes` — **EN:** Continues the docstring for the function `get_smem_size`. **CN:** 继续说明 function `get_smem_size` 的文档字符串。
+- **L167** `        """` — **EN:** Ends the docstring for the function `get_smem_size`. **CN:** 结束说明 function `get_smem_size` 的文档字符串。
+- **L168** `        return self.visitor.get_smem_size(tile_description)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.epilogue`. CN: 模块名为 `cutlass_cppgen.backend.evt.epilogue`。
+- EN: Module docstring summary: Epilogue Visitor interface for compiling, and running visitor-based epilogue. CN: 模块文档摘要为：Epilogue Visitor interface for compiling, and running visitor-based epilogue.
+- EN: Top-level classes: EpilogueFunctorVisitor CN: 顶层类包括：EpilogueFunctorVisitor
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:DataType, cutlass_cppgen.backend.epilogue:EpilogueFunctorBase, cutlass_cppgen.backend.evt.backend, cutlass_cppgen.backend.frontend:TensorFrontend, cutlass_cppgen.utils.datatypes:is_numpy_tensor, cutlass_cppgen.backend.evt.passes.util:cc_map CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:DataType, cutlass_cppgen.backend.epilogue:EpilogueFunctorBase, cutlass_cppgen.backend.evt.backend, cutlass_cppgen.backend.frontend:TensorFrontend, cutlass_cppgen.utils.datatypes:is_numpy_tensor, cutlass_cppgen.backend.evt.passes.util:cc_map
+- EN: External or standard-library dependencies: ctypes, numpy CN: 外部或标准库依赖：ctypes, numpy

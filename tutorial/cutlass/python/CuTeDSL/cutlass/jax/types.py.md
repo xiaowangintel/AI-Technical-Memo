@@ -1,0 +1,606 @@
+# types.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/jax/types.py`
+
+## Purpose / 作用
+- EN: Defines 5 classes (TensorSpec, JaxArray, JaxArrayValue, JaxTracedArray, ... (+1 more)) and 10 functions (row_major_layout, default_tensor_mode, default_tensor_spec, _expand_divisibility, ... (+6 more)) in `CuTeDSL.cutlass.jax.types`.
+- CN: 该模块 `CuTeDSL.cutlass.jax.types` 定义了 5 个类（TensorSpec, JaxArray, JaxArrayValue, JaxTracedArray, ... (+1 more)） 和 10 个函数（row_major_layout, default_tensor_mode, default_tensor_spec, _expand_divisibility, ... (+6 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional, Sequence` — **EN:** Imports Optional, Sequence from `typing`. **CN:** 从 `typing` 导入 Optional, Sequence。
+- **L13** `from dataclasses import dataclass, field` — **EN:** Imports dataclass, field from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass, field。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import jax` — **EN:** Imports jax for later use. **CN:** 导入 jax 供后续使用。
+- **L17** `import jax.numpy as jnp` — **EN:** Imports jax.numpy as jnp for later use. **CN:** 导入 jax.numpy as jnp 供后续使用。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L20** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L21** `from cutlass.cute.runtime import from_dlpack as _from_dlpack` — **EN:** Imports from_dlpack as _from_dlpack from `cutlass.cute.runtime`. **CN:** 从 `cutlass.cute.runtime` 导入 from_dlpack as _from_dlpack。
+- **L22** `from cutlass.cute import AddressSpace` — **EN:** Imports AddressSpace from `cutlass.cute`. **CN:** 从 `cutlass.cute` 导入 AddressSpace。
+- **L23** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L24** `from cutlass._mlir.dialects import llvm, arith` — **EN:** Imports llvm, arith from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 llvm, arith。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `JAX_DTYPE_TO_CUTLASS_DTYPE = {` — **EN:** Assigns a value to JAX_DTYPE_TO_CUTLASS_DTYPE. **CN:** 将一个值赋给 JAX_DTYPE_TO_CUTLASS_DTYPE。
+- **L27** `    jnp.bool.dtype: cutlass.Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    jnp.int4.dtype: cutlass.Int4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    jnp.int8.dtype: cutlass.Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    jnp.int16.dtype: cutlass.Int16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    jnp.int32.dtype: cutlass.Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    jnp.int64.dtype: cutlass.Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    jnp.uint8.dtype: cutlass.Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    jnp.uint16.dtype: cutlass.Uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    jnp.uint32.dtype: cutlass.Uint32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    jnp.uint64.dtype: cutlass.Uint64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    jnp.bfloat16.dtype: cutlass.BFloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    jnp.float16.dtype: cutlass.Float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    jnp.float32.dtype: cutlass.Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    jnp.float64.dtype: cutlass.Float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    jnp.float8_e8m0fnu.dtype: cutlass.Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    jnp.float8_e5m2.dtype: cutlass.Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    jnp.float8_e4m3.dtype: cutlass.Float8E4M3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    jnp.float8_e4m3fn.dtype: cutlass.Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    jnp.float8_e4m3b11fnuz.dtype: cutlass.Float8E4M3B11FNUZ,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    jnp.float4_e2m1fn.dtype: cutlass.Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `CUTLASS_DTYPE_TO_JAX_DTYPE = {` — **EN:** Assigns a value to CUTLASS_DTYPE_TO_JAX_DTYPE. **CN:** 将一个值赋给 CUTLASS_DTYPE_TO_JAX_DTYPE。
+- **L49** `    value: key for key, value in JAX_DTYPE_TO_CUTLASS_DTYPE.items()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `DEFAULT_CUTLASS_DEVICE_MEMSPACE = AddressSpace.gmem` — **EN:** Assigns a value to DEFAULT_CUTLASS_DEVICE_MEMSPACE. **CN:** 将一个值赋给 DEFAULT_CUTLASS_DEVICE_MEMSPACE。
+- **L53** `DEFAULT_CUTLASS_DEVICE_BUFFER_ALIGNMENT = 256` — **EN:** Assigns a value to DEFAULT_CUTLASS_DEVICE_BUFFER_ALIGNMENT. **CN:** 将一个值赋给 DEFAULT_CUTLASS_DEVICE_BUFFER_ALIGNMENT。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `@jax.tree_util.register_dataclass` — **EN:** Applies decorator `jax.tree_util.register_dataclass` to the following definition. **CN:** 将装饰器 `jax.tree_util.register_dataclass` 应用于后面的定义。
+- **L57** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L58** `class TensorSpec:` — **EN:** Defines class `TensorSpec`. **CN:** 定义类 `TensorSpec`。
+- **L59** `    """Specifies the layout and metadata for a JAX array passed to a CuTe kernel.` — **EN:** Starts the docstring for the class `TensorSpec`. **CN:** 开始说明 class `TensorSpec` 的文档字符串。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    TensorSpec controls how a JAX array's dimensions are mapped to a cute.Tensor` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L62** `    during jit lowering, including stride ordering, mode permutation, and whether` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L63** `    shapes/strides are compiled as static constants.` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    Attributes:` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L66** `        layout: A minor-to-major stride ordering in CuTeDSL convention. \`\`layout[i]\`\`` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L67** `            gives the stride rank of dimension \`\`i\`\`, where rank 0 means the smallest` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L68** `            (innermost) stride. For example, row-major order for a 3-D tensor is` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L69** `            \`\`(2, 1, 0)\`\`. If \`\`None\`\`, row-major is assumed. Use` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L70** `            :func:\`jax_to_cutlass_layout_order\` to convert from JAX's major-to-minor` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L71** `            convention.` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L72** `        mode: A permutation that maps the stride-ordered dimensions to the mode` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L73** `            positions of the resulting \`\`cute.Layout\`\`. For example, \`\`mode=(2, 0, 1)\`\`` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L74** `            reorders an \`\`(M, K, L)\`\` layout into \`\`(K, L, M)\`\` mode order inside the` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L75** `            kernel. If \`\`None\`\`, modes match the natural dimension order \`\`(0, 1, ..., N-1)\`\`.` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L76** `        static: If \`\`True\`\`, shapes and strides are compiled as static \`\`constexpr\`\`` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L77** `            values, which may enable additional compiler optimisations. Kernels that` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L78** `            do not support static shapes will raise a compile error. Must be \`\`False\`\`` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L79** `            when any dimension is symbolic (e.g. under \`\`jax.export\`\`).` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L80** `        ptr_assumed_align: Assumed byte alignment of the tensor's data pointer.` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L81** `            Overrides the default of 256 bytes. Rarely needs to change.` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L82** `        divisibility: Optional per-mode divisibility hints. If a single int is passed` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L83** `            divisibility will be applied to the leading (stride=1) dimension only.` — **EN:** Continues the docstring for the class `TensorSpec`. **CN:** 继续说明 class `TensorSpec` 的文档字符串。
+- **L84** `    """` — **EN:** Ends the docstring for the class `TensorSpec`. **CN:** 结束说明 class `TensorSpec` 的文档字符串。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    # Minor-to-major stride ordering in CuTeDSL convention (layout[i] = stride rank` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L87** `    # of dimension i, 0 = innermost). Defaults to row-major if None.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `    layout: tuple[int, ...] | None = field(metadata=dict(static=True), default=None)` — **EN:** Assigns a typed value to layout. **CN:** 为 layout 赋予带类型标注的值。
+- **L89** `    # Permutation from stride-ordered dimensions to cute.Layout mode positions.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L90** `    # Defaults to identity (0, 1, ..., N-1) if None.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `    mode: tuple[int, ...] | None = field(metadata=dict(static=True), default=None)` — **EN:** Assigns a typed value to mode. **CN:** 为 mode 赋予带类型标注的值。
+- **L92** `    # If True, shapes and strides are embedded as compile-time constants.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L93** `    # Must be False for symbolic/dynamic shapes (e.g. jax.export).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L94** `    static: bool = field(metadata=dict(static=True), default=None)` — **EN:** Assigns a typed value to static. **CN:** 为 static 赋予带类型标注的值。
+- **L95** `    # Assumed alignment (bytes) of the data pointer. Default matches XLA's 256-byte alignment.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `    ptr_assumed_align: int = field(` — **EN:** Assigns a typed value to ptr_assumed_align. **CN:** 为 ptr_assumed_align 赋予带类型标注的值。
+- **L97** `        metadata=dict(static=True), default=DEFAULT_CUTLASS_DEVICE_BUFFER_ALIGNMENT` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    # Per-mode divisibility hints.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L100** `    divisibility: tuple[int | None, ...] | int | None = field(` — **EN:** Assigns a typed value to divisibility. **CN:** 为 divisibility 赋予带类型标注的值。
+- **L101** `        metadata=dict(static=True), default=None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `def row_major_layout(shaped):` — **EN:** Defines function `row_major_layout`. **CN:** 定义函数 `row_major_layout`。
+- **L106** `    """Returns the CuTeDSL minor-to-major stride ordering for a row-major (C-contiguous) tensor.` — **EN:** Starts the docstring for the function `row_major_layout`. **CN:** 开始说明 function `row_major_layout` 的文档字符串。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `    In CuTeDSL convention, \`\`layout[i]\`\` is the stride rank of dimension \`\`i\`\`,` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L109** `    where rank 0 denotes the innermost (stride-1) dimension.  Row-major means the` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L110** `    last dimension is innermost, so the result is \`\`(N-1, N-2, ..., 1, 0)\`\` for an` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L111** `    N-dimensional tensor.` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    Example::` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `        row_major_layout((M, K, N))  # → (2, 1, 0)` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `    Args:` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L118** `        shaped: An object with a \`\`.shape\`\` attribute, or a shape tuple/sequence.` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    Returns:` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L121** `        A tuple of length N representing the minor-to-major ordering.` — **EN:** Continues the docstring for the function `row_major_layout`. **CN:** 继续说明 function `row_major_layout` 的文档字符串。
+- **L122** `    """` — **EN:** Ends the docstring for the function `row_major_layout`. **CN:** 结束说明 function `row_major_layout` 的文档字符串。
+- **L123** `    if hasattr(shaped, "shape"):` — **EN:** Starts a conditional branch guarded by `hasattr(shaped, 'shape')`. **CN:** 开始一个由 `hasattr(shaped, 'shape')` 控制的条件分支。
+- **L124** `        shaped = shaped.shape` — **EN:** Assigns a value to shaped. **CN:** 将一个值赋给 shaped。
+- **L125** `    return tuple(reversed(range(len(shaped))))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `def default_tensor_mode(shaped):` — **EN:** Defines function `default_tensor_mode`. **CN:** 定义函数 `default_tensor_mode`。
+- **L129** `    """Returns the identity mode permutation for an N-dimensional tensor.` — **EN:** Starts the docstring for the function `default_tensor_mode`. **CN:** 开始说明 function `default_tensor_mode` 的文档字符串。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    The mode permutation maps stride-ordered dimensions to \`\`cute.Layout\`\` mode` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L132** `    positions.  The default identity \`\`(0, 1, ..., N-1)\`\` leaves the mode order` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L133** `    unchanged relative to the dimension order.` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    Args:` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L136** `        shaped: An object with a \`\`.shape\`\` attribute, or a shape tuple/sequence.` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    Returns:` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L139** `        A tuple \`\`(0, 1, ..., N-1)\`\` of length N.` — **EN:** Continues the docstring for the function `default_tensor_mode`. **CN:** 继续说明 function `default_tensor_mode` 的文档字符串。
+- **L140** `    """` — **EN:** Ends the docstring for the function `default_tensor_mode`. **CN:** 结束说明 function `default_tensor_mode` 的文档字符串。
+- **L141** `    if hasattr(shaped, "shape"):` — **EN:** Starts a conditional branch guarded by `hasattr(shaped, 'shape')`. **CN:** 开始一个由 `hasattr(shaped, 'shape')` 控制的条件分支。
+- **L142** `        shaped = shaped.shape` — **EN:** Assigns a value to shaped. **CN:** 将一个值赋给 shaped。
+- **L143** `    return tuple(range(len(shaped)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `def default_tensor_spec(shaped) -> TensorSpec:` — **EN:** Defines function `default_tensor_spec`. **CN:** 定义函数 `default_tensor_spec`。
+- **L147** `    """Returns a :class:\`TensorSpec\` with row-major layout and identity mode ordering.` — **EN:** Starts the docstring for the function `default_tensor_spec`. **CN:** 开始说明 function `default_tensor_spec` 的文档字符串。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    Equivalent to::` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `        TensorSpec(layout=(N-1, ..., 1, 0), mode=(0, 1, ..., N-1), divisibility=(D0, D1, ... DN-1))` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `    This is appropriate for standard row-major (C-contiguous) JAX arrays that` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L154** `    do not require dimension reordering inside the kernel.` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    Divisibility hints are inferred only for concrete integer dimensions.` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L157** `    Symbolic dimensions always produce \`\`None\`\` for their slot; pass an` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L158** `    explicit \`\`TensorSpec\`\` with \`\`divisibility\`\` set if you need alignment` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L159** `    hints for symbolic shapes.` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    Args:` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L162** `        shaped: An object with a \`\`.shape\`\` attribute, or a shape tuple/sequence.` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    Returns:` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L165** `        A :class:\`TensorSpec\` with \`\`layout\`\` set to row-major minor-to-major order` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L166** `        and \`\`mode\`\` set to the identity permutation.` — **EN:** Continues the docstring for the function `default_tensor_spec`. **CN:** 继续说明 function `default_tensor_spec` 的文档字符串。
+- **L167** `    """` — **EN:** Ends the docstring for the function `default_tensor_spec`. **CN:** 结束说明 function `default_tensor_spec` 的文档字符串。
+- **L168** `    if hasattr(shaped, "shape"):` — **EN:** Starts a conditional branch guarded by `hasattr(shaped, 'shape')`. **CN:** 开始一个由 `hasattr(shaped, 'shape')` 控制的条件分支。
+- **L169** `        shaped = shaped.shape` — **EN:** Assigns a value to shaped. **CN:** 将一个值赋给 shaped。
+- **L170** `    inferred = tuple(d if isinstance(d, int) else None for d in shaped)` — **EN:** Assigns a value to inferred. **CN:** 将一个值赋给 inferred。
+- **L171** `    divisibility = inferred if any(d is not None for d in inferred) else None` — **EN:** Assigns a value to divisibility. **CN:** 将一个值赋给 divisibility。
+- **L172** `    return TensorSpec(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L173** `        layout=row_major_layout(shaped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `        mode=default_tensor_mode(shaped),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `        divisibility=divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `def _expand_divisibility(` — **EN:** Defines function `_expand_divisibility`. **CN:** 定义函数 `_expand_divisibility`。
+- **L180** `    divisibility, order: tuple[int, ...], ndim: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `) -> tuple[int | None, ...] | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L182** `    """Expand a divisibility spec to a full per-dimension tuple.` — **EN:** Starts the docstring for the function `_expand_divisibility`. **CN:** 开始说明 function `_expand_divisibility` 的文档字符串。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `    A bare \`\`int\`\` is placed at the leading-dimension slot (where` — **EN:** Continues the docstring for the function `_expand_divisibility`. **CN:** 继续说明 function `_expand_divisibility` 的文档字符串。
+- **L185** `    \`\`order[i] == 0\`\`, i.e. stride == 1) and \`\`None\`\` everywhere else.` — **EN:** Continues the docstring for the function `_expand_divisibility`. **CN:** 继续说明 function `_expand_divisibility` 的文档字符串。
+- **L186** `    A tuple is returned unchanged.  \`\`None\`\` returns \`\`None\`\`.` — **EN:** Continues the docstring for the function `_expand_divisibility`. **CN:** 继续说明 function `_expand_divisibility` 的文档字符串。
+- **L187** `    """` — **EN:** Ends the docstring for the function `_expand_divisibility`. **CN:** 结束说明 function `_expand_divisibility` 的文档字符串。
+- **L188** `    if divisibility is None or isinstance(divisibility, tuple):` — **EN:** Starts a conditional branch guarded by `divisibility is None or isinstance(divisibility, tuple)`. **CN:** 开始一个由 `divisibility is None or isinstance(divisibility, tuple)` 控制的条件分支。
+- **L189** `        return divisibility` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L190** `    leading = order.index(0)` — **EN:** Assigns a value to leading. **CN:** 将一个值赋给 leading。
+- **L191** `    result = [None] * ndim` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L192** `    result[leading] = divisibility` — **EN:** Assigns a value to result[leading]. **CN:** 将一个值赋给 result[leading]。
+- **L193** `    return tuple(result)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `def cutlass_to_jax_layout_order(` — **EN:** Defines function `cutlass_to_jax_layout_order`. **CN:** 定义函数 `cutlass_to_jax_layout_order`。
+- **L197** `    layout: Sequence[int] | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `) -> Sequence[int] | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L199** `    """Converts a CuTeDSL layout order (minor-to-major) to JAX layout order (major-to-minor).` — **EN:** Starts the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 开始说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    CuTeDSL uses minor-to-major ordering: \`\`layout[i]\`\` is the stride rank of` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L202** `    dimension \`\`i\`\` (0 = innermost).  JAX uses major-to-minor ordering: position` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L203** `    \`\`j\`\` in the result is the dimension index of the \`\`j\`\`-th outermost axis.` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `    Example::` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** `        cutlass_to_jax_layout_order((2, 1, 0))  # row-major → (0, 1, 2)` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L208** `        cutlass_to_jax_layout_order((0, 1, 2))  # col-major → (2, 1, 0)` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `    Args:` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L211** `        layout: Minor-to-major stride permutation, or \`\`None\`\` (returned unchanged).` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `    Returns:` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L214** `        Major-to-minor axis permutation compatible with \`\`jax.Array.layout\`\`, or \`\`None\`\`.` — **EN:** Continues the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 继续说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L215** `    """` — **EN:** Ends the docstring for the function `cutlass_to_jax_layout_order`. **CN:** 结束说明 function `cutlass_to_jax_layout_order` 的文档字符串。
+- **L216** `    if layout is None:` — **EN:** Starts a conditional branch guarded by `layout is None`. **CN:** 开始一个由 `layout is None` 控制的条件分支。
+- **L217** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** `    return tuple(sorted(range(len(layout)), key=lambda i: layout[i], reverse=True))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `def jax_to_cutlass_layout_order(` — **EN:** Defines function `jax_to_cutlass_layout_order`. **CN:** 定义函数 `jax_to_cutlass_layout_order`。
+- **L222** `    layout: Sequence[int] | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L223** `) -> Sequence[int] | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L224** `    """Converts a JAX layout order (major-to-minor) to CuTeDSL layout order (minor-to-major).` — **EN:** Starts the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 开始说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `    JAX uses major-to-minor ordering: position \`\`j\`\` is the dimension index of the` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L227** `    \`\`j\`\`-th outermost axis.  CuTeDSL uses minor-to-major ordering: \`\`layout[i]\`\`` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L228** `    is the stride rank of dimension \`\`i\`\` (0 = innermost).` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `    This is the inverse of :func:\`cutlass_to_jax_layout_order\`.` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `    Example::` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `        jax_to_cutlass_layout_order((0, 1, 2))  # row-major → (2, 1, 0)` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L235** `        jax_to_cutlass_layout_order((2, 1, 0))  # col-major → (0, 1, 2)` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L236** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L237** `    Args:` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L238** `        layout: Major-to-minor axis permutation, or \`\`None\`\` (returned unchanged).` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `    Returns:` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L241** `        Minor-to-major stride permutation for use as :attr:\`TensorSpec.layout\`, or \`\`None\`\`.` — **EN:** Continues the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 继续说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L242** `    """` — **EN:** Ends the docstring for the function `jax_to_cutlass_layout_order`. **CN:** 结束说明 function `jax_to_cutlass_layout_order` 的文档字符串。
+- **L243** `    if layout is None:` — **EN:** Starts a conditional branch guarded by `layout is None`. **CN:** 开始一个由 `layout is None` 控制的条件分支。
+- **L244** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L245** `    inv = [0] * len(layout)` — **EN:** Assigns a value to inv. **CN:** 将一个值赋给 inv。
+- **L246** `    for i, p in enumerate(layout):` — **EN:** Starts a loop assigning items from `enumerate(layout)` to `(i, p)`. **CN:** 开始一个循环，将 `enumerate(layout)` 的元素赋给 `(i, p)`。
+- **L247** `        inv[p] = len(layout) - 1 - i` — **EN:** Assigns a value to inv[p]. **CN:** 将一个值赋给 inv[p]。
+- **L248** `    return tuple(inv)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `def jax_to_cutlass_dtype(dtype):` — **EN:** Defines function `jax_to_cutlass_dtype`. **CN:** 定义函数 `jax_to_cutlass_dtype`。
+- **L252** `    """Gets the corresponding cutlass dtype given a jax dtype."""` — **EN:** Docstring line documenting the function `jax_to_cutlass_dtype`. **CN:** 文档字符串行，用于说明 function `jax_to_cutlass_dtype`。
+- **L253** `    dtype = jnp.dtype(dtype)` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L254** `    if dtype not in JAX_DTYPE_TO_CUTLASS_DTYPE:` — **EN:** Starts a conditional branch guarded by `dtype not in JAX_DTYPE_TO_CUTLASS_DTYPE`. **CN:** 开始一个由 `dtype not in JAX_DTYPE_TO_CUTLASS_DTYPE` 控制的条件分支。
+- **L255** `        raise ValueError(f"Jax dtype [{dtype}] has no equivalent cutlass dtype.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L256** `    return JAX_DTYPE_TO_CUTLASS_DTYPE[dtype]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `def cutlass_to_jax_dtype(dtype):` — **EN:** Defines function `cutlass_to_jax_dtype`. **CN:** 定义函数 `cutlass_to_jax_dtype`。
+- **L260** `    """Gets the corresponding cutlass dtype given a jax dtype."""` — **EN:** Docstring line documenting the function `cutlass_to_jax_dtype`. **CN:** 文档字符串行，用于说明 function `cutlass_to_jax_dtype`。
+- **L261** `    if dtype not in CUTLASS_DTYPE_TO_JAX_DTYPE:` — **EN:** Starts a conditional branch guarded by `dtype not in CUTLASS_DTYPE_TO_JAX_DTYPE`. **CN:** 开始一个由 `dtype not in CUTLASS_DTYPE_TO_JAX_DTYPE` 控制的条件分支。
+- **L262** `        raise ValueError(f"Cutlass dtype [{dtype}] has no equivalent jax dtype.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L263** `    return CUTLASS_DTYPE_TO_JAX_DTYPE[dtype]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `def from_dlpack(array, assumed_align: int = DEFAULT_CUTLASS_DEVICE_BUFFER_ALIGNMENT):` — **EN:** Defines function `from_dlpack`. **CN:** 定义函数 `from_dlpack`。
+- **L267** `    """Convert jax.Array to a DL pack tensor."""` — **EN:** Docstring line documenting the function `from_dlpack`. **CN:** 文档字符串行，用于说明 function `from_dlpack`。
+- **L268** `    return _from_dlpack(array, assumed_align=assumed_align)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `def _validate_permutation(name: str, perm, shape):` — **EN:** Defines function `_validate_permutation`. **CN:** 定义函数 `_validate_permutation`。
+- **L272** `    if len(perm) != len(shape):` — **EN:** Starts a conditional branch guarded by `len(perm) != len(shape)`. **CN:** 开始一个由 `len(perm) != len(shape)` 控制的条件分支。
+- **L273** `        raise ValueError(f"{name} must be same length as shape", perm, shape)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L274** `    for s in perm:` — **EN:** Starts a loop assigning items from `perm` to `s`. **CN:** 开始一个循环，将 `perm` 的元素赋给 `s`。
+- **L275** `        if s < 0 or s >= len(shape):` — **EN:** Starts a conditional branch guarded by `s < 0 or s >= len(shape)`. **CN:** 开始一个由 `s < 0 or s >= len(shape)` 控制的条件分支。
+- **L276** `            raise ValueError(f"Invalid index {s} in {name}", perm, shape)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L277** `    if len(set(perm)) != len(perm):` — **EN:** Starts a conditional branch guarded by `len(set(perm)) != len(perm)`. **CN:** 开始一个由 `len(set(perm)) != len(perm)` 控制的条件分支。
+- **L278** `        raise ValueError(f"{name} has duplicate indices", perm)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `class JaxArray:` — **EN:** Defines class `JaxArray`. **CN:** 定义类 `JaxArray`。
+- **L282** `    """Base class for JaxArray argument type.` — **EN:** Starts the docstring for the class `JaxArray`. **CN:** 开始说明 class `JaxArray` 的文档字符串。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `    JaxArray provides glue between XLA/JAX FFI tensors and cute.Tensor.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `    The following fields/properties provide control over the conversion` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L287** `    to cute.Tensor as part of jax.jit lowering. These properties are` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L288** `    constexpr and compiled into the kernel.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L290** `    1. dtype: The tensor data type defined by the jax array.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L291** `    2. shape: The tensor shape defined at jit tracing time. This shape` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L292** `              can be concrete or symbolic in the case of jax.export.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L293** `    3. mem_space: The memory space of the tensor. Defaults to gmem.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L294** `    4. assumed_align: The alignment of the tensor. Defaults to XLA alignment.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L295** `    5. order: Specifies the order of the shape to determine strides.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L296** `    6. mode: Specifies how to map ordered elements to the modes od a cute.Layout.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L297** `    7. static: If True, tensor shapes and strides are compiled statically.` — **EN:** Continues the docstring for the class `JaxArray`. **CN:** 继续说明 class `JaxArray` 的文档字符串。
+- **L298** `    """` — **EN:** Ends the docstring for the class `JaxArray`. **CN:** 结束说明 class `JaxArray` 的文档字符串。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L301** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L302** `        dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L303** `        shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L304** `        mem_space,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `        assumed_align,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `        order=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L307** `        mode=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `        static=False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `        divisibility=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L311** `        self.dtype = dtype` — **EN:** Assigns a value to self.dtype. **CN:** 将一个值赋给 self.dtype。
+- **L312** `        self.shape = tuple(shape)` — **EN:** Assigns a value to self.shape. **CN:** 将一个值赋给 self.shape。
+- **L313** `        self.ndim = len(self.shape)` — **EN:** Assigns a value to self.ndim. **CN:** 将一个值赋给 self.ndim。
+- **L314** `        self.mem_space = mem_space` — **EN:** Assigns a value to self.mem_space. **CN:** 将一个值赋给 self.mem_space。
+- **L315** `        self.assumed_align = assumed_align` — **EN:** Assigns a value to self.assumed_align. **CN:** 将一个值赋给 self.assumed_align。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `        if order is None:` — **EN:** Starts a conditional branch guarded by `order is None`. **CN:** 开始一个由 `order is None` 控制的条件分支。
+- **L318** `            order = row_major_layout(shape)` — **EN:** Assigns a value to order. **CN:** 将一个值赋给 order。
+- **L319** `        if mode is None:` — **EN:** Starts a conditional branch guarded by `mode is None`. **CN:** 开始一个由 `mode is None` 控制的条件分支。
+- **L320** `            mode = default_tensor_mode(shape)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `        _validate_permutation("order", order, shape)` — **EN:** Invokes `_validate_permutation` as a standalone call. **CN:** 以独立语句方式调用 `_validate_permutation`。
+- **L323** `        _validate_permutation("mode", mode, shape)` — **EN:** Invokes `_validate_permutation` as a standalone call. **CN:** 以独立语句方式调用 `_validate_permutation`。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `        self.order = tuple(order)` — **EN:** Assigns a value to self.order. **CN:** 将一个值赋给 self.order。
+- **L326** `        self.mode = tuple(mode)` — **EN:** Assigns a value to self.mode. **CN:** 将一个值赋给 self.mode。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `        if any([jax.export.is_symbolic_dim(s) for s in self.shape]) and static:` — **EN:** Starts a conditional branch guarded by `any([jax.export.is_symbolic_dim(s) for s in self.shape]) ...`. **CN:** 开始一个由 `any([jax.export.is_symbolic_dim(s) for s in self.shape]) ...` 控制的条件分支。
+- **L329** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L330** `                f"{self.shape} contains one or more symbolic dimensions requires static=False"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `        self.static = static` — **EN:** Assigns a value to self.static. **CN:** 将一个值赋给 self.static。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** `        if divisibility is not None:` — **EN:** Starts a conditional branch guarded by `divisibility is not None`. **CN:** 开始一个由 `divisibility is not None` 控制的条件分支。
+- **L335** `            divisibility = _expand_divisibility(divisibility, self.order, self.ndim)` — **EN:** Assigns a value to divisibility. **CN:** 将一个值赋给 divisibility。
+- **L336** `            divisibility = tuple(divisibility)` — **EN:** Assigns a value to divisibility. **CN:** 将一个值赋给 divisibility。
+- **L337** `            if len(divisibility) != len(shape):` — **EN:** Starts a conditional branch guarded by `len(divisibility) != len(shape)`. **CN:** 开始一个由 `len(divisibility) != len(shape)` 控制的条件分支。
+- **L338** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L339** `                    "divisibility must be same length as shape", divisibility, shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `            for d in divisibility:` — **EN:** Starts a loop assigning items from `divisibility` to `d`. **CN:** 开始一个循环，将 `divisibility` 的元素赋给 `d`。
+- **L342** `                if not (d is None or isinstance(d, int)):` — **EN:** Starts a conditional branch guarded by `not (d is None or isinstance(d, int))`. **CN:** 开始一个由 `not (d is None or isinstance(d, int))` 控制的条件分支。
+- **L343** `                    raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L344** `                        f"divisibility entries must be None or integer, got {d!r}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `        self.divisibility = divisibility` — **EN:** Assigns a value to self.divisibility. **CN:** 将一个值赋给 self.divisibility。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** `class JaxArrayValue(JaxArray):` — **EN:** Defines class `JaxArrayValue` with bases JaxArray. **CN:** 定义类 `JaxArrayValue`，其基类为 JaxArray。
+- **L350** `    """The IR representation of the JaxArray."""` — **EN:** Docstring line documenting the class `JaxArrayValue`. **CN:** 文档字符串行，用于说明 class `JaxArrayValue`。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L353** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L354** `        ir_value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L355** `        dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L356** `        shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L357** `        mem_space,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `        assumed_align,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L359** `        order,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L360** `        mode,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L361** `        static,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L362** `        divisibility=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L363** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L364** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L365** `            dtype, shape, mem_space, assumed_align, order, mode, static, divisibility` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `        self.value = ir_value` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `    def __str__(self):` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L370** `        return f"JaxArrayValue<{self.value}:{self.dtype}:{self.shape}:{self.order}:{self.mode}:{self.static}:{self.divisibility}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    def __repr__(self):` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L373** `        return str(self)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L374** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L375** `    def _make_ordered_layout_dynamic_strides(` — **EN:** Defines function `_make_ordered_layout_dynamic_strides`. **CN:** 定义函数 `_make_ordered_layout_dynamic_strides`。
+- **L376** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L377** `        shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L378** `        order: tuple[int, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L379** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L380** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L381** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L382** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L383** `        i32 = ir.IntegerType.get_signless(32)` — **EN:** Assigns a value to i32. **CN:** 将一个值赋给 i32。
+- **L384** `        pairs = sorted(zip(shape, order), key=lambda x: x[1])` — **EN:** Assigns a value to pairs. **CN:** 将一个值赋给 pairs。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `        # Compute strides for each element in order.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L387** `        strides = [1]  # static 1 for leading` — **EN:** Assigns a value to strides. **CN:** 将一个值赋给 strides。
+- **L388** `        if len(shape) > 1:` — **EN:** Starts a conditional branch guarded by `len(shape) > 1`. **CN:** 开始一个由 `len(shape) > 1` 控制的条件分支。
+- **L389** `            strides.append(pairs[0][0])` — **EN:** Invokes `strides.append` as a standalone call. **CN:** 以独立语句方式调用 `strides.append`。
+- **L390** `        for i in range(len(pairs) - 2):` — **EN:** Starts a loop assigning items from `range(len(pairs) - 2)` to `i`. **CN:** 开始一个循环，将 `range(len(pairs) - 2)` 的元素赋给 `i`。
+- **L391** `            strides.append(arith.muli(pairs[i + 1][0], strides[-1]))` — **EN:** Invokes `strides.append` as a standalone call. **CN:** 以独立语句方式调用 `strides.append`。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `        # Apply the order to strides` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L394** `        strides_ordered = []` — **EN:** Assigns a value to strides_ordered. **CN:** 将一个值赋给 strides_ordered。
+- **L395** `        for i in range(len(shape)):` — **EN:** Starts a loop assigning items from `range(len(shape))` to `i`. **CN:** 开始一个循环，将 `range(len(shape))` 的元素赋给 `i`。
+- **L396** `            strides_ordered.append(strides[order[i]])` — **EN:** Invokes `strides_ordered.append` as a standalone call. **CN:** 以独立语句方式调用 `strides_ordered.append`。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `        # Shapes are expected to be int32 so truncate to that before creating layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L399** `        shape_i32 = tuple(arith.trunci(i32, s) for s in shape)` — **EN:** Assigns a value to shape_i32. **CN:** 将一个值赋给 shape_i32。
+- **L400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L401** `        # Apply per-mode divisibility assumptions so the compiler can exploit alignment.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L402** `        if self.divisibility is not None:` — **EN:** Starts a conditional branch guarded by `self.divisibility is not None`. **CN:** 开始一个由 `self.divisibility is not None` 控制的条件分支。
+- **L403** `            assumed = []` — **EN:** Assigns a value to assumed. **CN:** 将一个值赋给 assumed。
+- **L404** `            for s32, div_spec, static_s in zip(` — **EN:** Starts a loop assigning items from `zip(shape_i32, self.divisibility, self.shape)` to `(s32, div_spec, static_s)`. **CN:** 开始一个循环，将 `zip(shape_i32, self.divisibility, self.shape)` 的元素赋给 `(s32, div_spec, static_s)`。
+- **L405** `                shape_i32, self.divisibility, self.shape` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L406** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L407** `                if isinstance(static_s, int):` — **EN:** Starts a conditional branch guarded by `isinstance(static_s, int)`. **CN:** 开始一个由 `isinstance(static_s, int)` 控制的条件分支。
+- **L408** `                    # Pure static shape is known even though a dynamic shape is` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L409** `                    # used. We can assume the exact shape here. We keep the shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L410** `                    # as a dynamic value to avoid breaking code that may expect` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L411** `                    # a dynamic value.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L412** `                    assumed.append(cute.assume(s32, divby=static_s))` — **EN:** Invokes `assumed.append` as a standalone call. **CN:** 以独立语句方式调用 `assumed.append`。
+- **L413** `                elif div_spec is not None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L414** `                    # Using a dynamic value so apply the div_spec if its provided.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L415** `                    assumed.append(cute.assume(s32, divby=div_spec))` — **EN:** Invokes `assumed.append` as a standalone call. **CN:** 以独立语句方式调用 `assumed.append`。
+- **L416** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L417** `                    # No divisibility specification for this shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L418** `                    assumed.append(s32)` — **EN:** Invokes `assumed.append` as a standalone call. **CN:** 以独立语句方式调用 `assumed.append`。
+- **L419** `            shape_i32 = tuple(assumed)` — **EN:** Assigns a value to shape_i32. **CN:** 将一个值赋给 shape_i32。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `        return cute.make_layout(shape_i32, stride=tuple(strides_ordered))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L423** `    def _load_dynamic_shapes(` — **EN:** Defines function `_load_dynamic_shapes`. **CN:** 定义函数 `_load_dynamic_shapes`。
+- **L424** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L425** `        ffi_buffer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L426** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L427** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L428** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L429** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L430** `        i64 = ir.IntegerType.get_signless(64)` — **EN:** Assigns a value to i64. **CN:** 将一个值赋给 i64。
+- **L431** `        shape_array = llvm.extractvalue(` — **EN:** Assigns a value to shape_array. **CN:** 将一个值赋给 shape_array。
+- **L432** `            llvm.PointerType.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `            ffi_buffer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `            [1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L439** `        shape_i64 = []` — **EN:** Assigns a value to shape_i64. **CN:** 将一个值赋给 shape_i64。
+- **L440** `        for i in range(len(self.shape)):` — **EN:** Starts a loop assigning items from `range(len(self.shape))` to `i`. **CN:** 开始一个循环，将 `range(len(self.shape))` 的元素赋给 `i`。
+- **L441** `            r = llvm.getelementptr(` — **EN:** Assigns a value to r. **CN:** 将一个值赋给 r。
+- **L442** `                llvm.PointerType.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `                shape_array,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `                [],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `                no_wrap_flags=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** `                raw_constant_indices=ir.DenseI32ArrayAttr.get([i]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `                elem_type=i64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `            shape_i64.append(llvm.load(i64, r, loc=loc, ip=ip))` — **EN:** Invokes `shape_i64.append` as a standalone call. **CN:** 以独立语句方式调用 `shape_i64.append`。
+- **L452** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L453** `        return tuple(shape_i64)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `    def _load_pointer(` — **EN:** Defines function `_load_pointer`. **CN:** 定义函数 `_load_pointer`。
+- **L456** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L457** `        ffi_buffer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L458** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L459** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L460** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L461** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L462** `        raw_ptr = llvm.extractvalue(` — **EN:** Assigns a value to raw_ptr. **CN:** 将一个值赋给 raw_ptr。
+- **L463** `            llvm.PointerType.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `            ffi_buffer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `            [0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `        return cute.make_ptr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L470** `            self.dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `            raw_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `            self.mem_space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `            assumed_align=self.assumed_align,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** `    def get_tensor(` — **EN:** Defines function `get_tensor`. **CN:** 定义函数 `get_tensor`。
+- **L479** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L480** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L481** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L482** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L483** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L484** `        ffi_buffer_type = llvm.StructType.get_literal(` — **EN:** Assigns a value to ffi_buffer_type. **CN:** 将一个值赋给 ffi_buffer_type。
+- **L485** `            [llvm.PointerType.get(), llvm.PointerType.get()]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L488** `        ffi_buffer = llvm.load(ffi_buffer_type, self.value, loc=loc, ip=ip)` — **EN:** Assigns a value to ffi_buffer. **CN:** 将一个值赋给 ffi_buffer。
+- **L489** `        pointer = self._load_pointer(ffi_buffer)` — **EN:** Assigns a value to pointer. **CN:** 将一个值赋给 pointer。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `        if self.static:` — **EN:** Starts a conditional branch guarded by `self.static`. **CN:** 开始一个由 `self.static` 控制的条件分支。
+- **L492** `            shape = tuple(self.shape)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L493** `            layout = cute.make_ordered_layout(shape, order=self.order, loc=loc, ip=ip)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L494** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L495** `            shape = self._load_dynamic_shapes(ffi_buffer)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L496** `            layout = self._make_ordered_layout_dynamic_strides(` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L497** `                shape, self.order, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L498** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L499** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L500** `        # Apply mode order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L501** `        if self.mode is not None:` — **EN:** Starts a conditional branch guarded by `self.mode is not None`. **CN:** 开始一个由 `self.mode is not None` 控制的条件分支。
+- **L502** `            layout = cute.select(layout, self.mode, loc=loc, ip=ip)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L503** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L504** `        return cute.make_tensor(pointer, layout, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L505** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L506** `    def __extract_mlir_values__(self):` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L507** `        return [self.value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** `    def __new_from_mlir_values__(self, values):` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L510** `        return JaxArrayValue(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L511** `            values[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `            self.dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `            self.shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L514** `            self.mem_space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L515** `            self.assumed_align,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `            self.order,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L517** `            self.mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L518** `            self.static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L519** `            self.divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L520** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L521** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L523** `class JaxTracedArray(JaxArray):` — **EN:** Defines class `JaxTracedArray` with bases JaxArray. **CN:** 定义类 `JaxTracedArray`，其基类为 JaxArray。
+- **L524** `    """Represents a traced array value that is used for cute.compile.` — **EN:** Starts the docstring for the class `JaxTracedArray`. **CN:** 开始说明 class `JaxTracedArray` 的文档字符串。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** `    Traced values are not real tensors or allocated on the device.` — **EN:** Continues the docstring for the class `JaxTracedArray`. **CN:** 继续说明 class `JaxTracedArray` 的文档字符串。
+- **L527** `    """` — **EN:** Ends the docstring for the class `JaxTracedArray`. **CN:** 结束说明 class `JaxTracedArray` 的文档字符串。
+- **L528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L529** `    def __str__(self):` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L530** `        return f"JaxTracedArray<{self.dtype}:{self.shape}:{self.order}:{self.mode}:{self.static}:{self.divisibility}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `    def __repr__(self):` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L533** `        return str(self)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L535** `    def __get_mlir_types__(self):` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L536** `        # Struct passed as opaque object.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L537** `        return [llvm.PointerType.get()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** `    def __new_from_mlir_values__(self, values):` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L540** `        return JaxArrayValue(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L541** `            values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L542** `            self.dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `            self.shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `            self.mem_space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `            self.assumed_align,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L546** `            self.order,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L547** `            self.mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `            self.static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `            self.divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L551** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L552** `    def __c_pointers__(self):` — **EN:** Defines function `__c_pointers__`. **CN:** 定义函数 `__c_pointers__`。
+- **L553** `        return [0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `class JaxArrayList:` — **EN:** Defines class `JaxArrayList`. **CN:** 定义类 `JaxArrayList`。
+- **L557** `    """Holds list of JaxArray or JaxTracedArray.` — **EN:** Starts the docstring for the class `JaxArrayList`. **CN:** 开始说明 class `JaxArrayList` 的文档字符串。
+- **L558** `    This class facilitates conversion of JaxTracedArray to JaxArray when crossing` — **EN:** Continues the docstring for the class `JaxArrayList`. **CN:** 继续说明 class `JaxArrayList` 的文档字符串。
+- **L559** `    the jit boundary.` — **EN:** Continues the docstring for the class `JaxArrayList`. **CN:** 继续说明 class `JaxArrayList` 的文档字符串。
+- **L560** `    """` — **EN:** Ends the docstring for the class `JaxArrayList`. **CN:** 结束说明 class `JaxArrayList` 的文档字符串。
+- **L561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L562** `    def __init__(self, arrays: Sequence[JaxArray]):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L563** `        self.arrays = tuple(arrays)` — **EN:** Assigns a value to self.arrays. **CN:** 将一个值赋给 self.arrays。
+- **L564** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L565** `    def __getitem__(self, idx):` — **EN:** Defines function `__getitem__`. **CN:** 定义函数 `__getitem__`。
+- **L566** `        return self.arrays[idx]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L567** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L568** `    def __len__(self):` — **EN:** Defines function `__len__`. **CN:** 定义函数 `__len__`。
+- **L569** `        return len(self.arrays)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L571** `    def __iter__(self):` — **EN:** Defines function `__iter__`. **CN:** 定义函数 `__iter__`。
+- **L572** `        return iter(self.arrays)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `    def __c_pointers__(self):` — **EN:** Defines function `__c_pointers__`. **CN:** 定义函数 `__c_pointers__`。
+- **L575** `        return [x.__c_pointers__()[0] for x in self.arrays]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** `    def __get_mlir_types__(self):` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L578** `        return [x.__get_mlir_types__()[0] for x in self.arrays]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L579** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L580** `    def __extract_mlir_values__(self):` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L581** `        return [x.__extract_mlir_values__()[0] for x in self.arrays]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L582** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L583** `    def __new_from_mlir_values__(self, values):` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L584** `        return JaxArrayList(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L585** `            [x.__new_from_mlir_values__(v) for x, v in zip(self.arrays, values)]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.jax.types`. CN: 模块名为 `CuTeDSL.cutlass.jax.types`。
+- EN: Top-level classes: TensorSpec, JaxArray, JaxArrayValue, JaxTracedArray, JaxArrayList CN: 顶层类包括：TensorSpec, JaxArray, JaxArrayValue, JaxTracedArray, JaxArrayList
+- EN: Top-level functions: row_major_layout, default_tensor_mode, default_tensor_spec, _expand_divisibility, cutlass_to_jax_layout_order, jax_to_cutlass_layout_order, jax_to_cutlass_dtype, cutlass_to_jax_dtype, from_dlpack, _validate_permutation CN: 顶层函数包括：row_major_layout, default_tensor_mode, default_tensor_spec, _expand_divisibility, cutlass_to_jax_layout_order, jax_to_cutlass_layout_order, jax_to_cutlass_dtype, cutlass_to_jax_dtype, from_dlpack, _validate_permutation
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass, cutlass.cute, cutlass.cute.runtime:from_dlpack, cutlass.cute:AddressSpace, cutlass._mlir:ir, cutlass._mlir.dialects:llvm,arith CN: 内部依赖：cutlass, cutlass.cute, cutlass.cute.runtime:from_dlpack, cutlass.cute:AddressSpace, cutlass._mlir:ir, cutlass._mlir.dialects:llvm,arith
+- EN: External or standard-library dependencies: typing:Optional,Sequence, dataclasses:dataclass,field, jax, jax.numpy CN: 外部或标准库依赖：typing:Optional,Sequence, dataclasses:dataclass,field, jax, jax.numpy

@@ -1,0 +1,487 @@
+# test_hicache_storage_mooncake_backend.py — Code Analysis / 代码分析
+
+## Source / 来源
+- **File**: `test/registered/hicache/test_hicache_storage_mooncake_backend.py`
+- **Repository**: sgl-project/sglang
+- **Purpose**: This test module validates hicache storage mooncake backend behavior in SGLang's hicache area. It prepares inputs, exercises runtime paths, and checks expected results or regressions. / 该测试模块验证 SGLang 在 hicache 领域中与 hicache storage mooncake backend 相关的行为。它会准备输入、执行运行路径，并检查预期结果或回归情况。
+
+## Line-by-Line Analysis / 逐行分析
+### Lines 1-5: supporting statements / 辅助语句
+```python
+"""
+Benchmark tests for HiCache Storage with Mooncake backend.
+Usage:
+    python3.10 -m pytest test/registered/hicache/test_hicache_storage_mooncake_backend.py -v
+"""
+```
+**EN:** This block contains supporting statements that connect surrounding definitions and keep module state consistent.
+**CN:** 该代码块包含衔接周围定义的辅助语句，用于保持模块状态一致。
+
+### Lines 7-22: module imports and dependencies / 模块导入与依赖
+```python
+import os
+import subprocess
+import time
+import unittest
+
+import requests
+from test_hicache_storage_file_backend import HiCacheStorageBaseMixin
+
+from sglang.test.ci.ci_register import register_cuda_ci
+from sglang.test.test_utils import (
+    DEFAULT_MLA_MODEL_NAME_FOR_TEST,
+    CustomTestCase,
+    find_available_port,
+    get_gpu_count,
+    is_in_ci,
+)
+```
+**EN:** This block imports the modules needed by the rest of the file, including `os`, `subprocess`, `time`, `unittest`.
+**CN:** 该代码块导入后续实现所需的模块，其中包括 `os`, `subprocess`, `time`, `unittest`。
+
+### Lines 24-24: CI registration and metadata / CI 注册与元数据
+```python
+register_cuda_ci(est_time=236, stage="base-b", runner_config="2-gpu-large")
+```
+**EN:** This block registers the test with the continuous-integration harness and records scheduling metadata through register_cuda_ci.
+**CN:** 该代码块通过 register_cuda_ci 等调用将测试注册到持续集成框架，并记录调度元数据。
+
+### Lines 27-27: class HiCacheStorageMooncakeBackendBaseMixin declaration / 类 HiCacheStorageMooncakeBackendBaseMixin 声明
+```python
+class HiCacheStorageMooncakeBackendBaseMixin(HiCacheStorageBaseMixin):
+```
+**EN:** This section introduces the class and any class-level context used by later methods. It inherits from `HiCacheStorageBaseMixin`.
+**CN:** 该部分引入类定义以及后续方法会使用的类级上下文。 它继承自 `HiCacheStorageBaseMixin`。
+
+### Lines 28-32: class-level constants and configuration for `HiCacheStorageMooncakeBackendBaseMixin` / 类级常量与配置
+```python
+    """Base mixin class with common setup and utilities"""
+
+    # Default port ranges for Mooncake services - can be overridden in subclasses
+    mooncake_master_port_base = 50051
+    mooncake_metadata_port_base = 8080
+```
+**EN:** This block defines shared names such as `mooncake_master_port_base`, `mooncake_metadata_port_base`. These values centralize configuration that later tests or helpers reuse.
+**CN:** 该代码块定义了 `mooncake_master_port_base`, `mooncake_metadata_port_base` 等共享名称，用于集中保存后续测试或辅助逻辑会复用的配置。
+
+### Lines 34-49: setUpClass setup routine / setUpClass 初始化流程
+```python
+    @classmethod
+    def setUpClass(cls):
+        """Set up test environment and launch Mooncake services before server setup"""
+        # Find available ports for Mooncake services to avoid conflicts
+        cls.mooncake_master_port = find_available_port(
+            HiCacheStorageMooncakeBackendBaseMixin.mooncake_master_port_base
+        )
+        cls.mooncake_metadata_port = find_available_port(
+            HiCacheStorageMooncakeBackendBaseMixin.mooncake_metadata_port_base
+        )
+
+        # Start Mooncake services first
+        cls._start_mooncake_services()
+
+        # Call parent setup
+        super().setUpClass()
+```
+**EN:** Set up test environment and launch Mooncake services before server setup This routine prepares shared fixtures, models, or runtime state before the assertions execute.
+**CN:** Set up test environment and launch Mooncake services before server setup 该流程会在断言执行前准备共享夹具、模型或运行状态。
+
+### Lines 51-58: tearDownClass cleanup routine / tearDownClass 清理流程
+```python
+    @classmethod
+    def tearDownClass(cls):
+        """Clean up Mooncake services after server teardown"""
+        # Call parent teardown first
+        super().tearDownClass()
+
+        # Stop Mooncake services
+        cls._stop_mooncake_services()
+```
+**EN:** Clean up Mooncake services after server teardown This routine releases resources and restores state after the related tests finish.
+**CN:** Clean up Mooncake services after server teardown 该流程会在相关测试结束后释放资源并恢复状态。
+
+### Lines 60-105: method start mooncake services / 方法 start mooncake services
+```python
+    @classmethod
+    def _start_mooncake_services(cls):
+        """Start Mooncake metadata and master services with configurable ports and readiness detection"""
+        print("Starting Mooncake services...")
+        print(
+            f"Using master port: {cls.mooncake_master_port}, metadata port: {cls.mooncake_metadata_port}"
+        )
+
+        # Start metadata service with configurable port
+        try:
+            # Start metadata server with port configuration
+            cls.metadata_service_process = subprocess.Popen(
+                [
+                    "python3",
+                    "-m",
+                    "mooncake.http_metadata_server",
+                    "--port",
+                    str(cls.mooncake_metadata_port),
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                preexec_fn=os.setsid,  # Create new process group
+            )
+            print(
+                f"Mooncake metadata service started on port {cls.mooncake_metadata_port}"
+            )
+        except (FileNotFoundError, subprocess.SubprocessError) as e:
+            print(f"Warning: Could not start Mooncake metadata service: {e}")
+            cls.metadata_service_process = None
+
+        # Start master service with configurable port
+        try:
+            # Start master server with port configuration
+            cls.master_service_process = subprocess.Popen(
+                ["mooncake_master", "--port", str(cls.mooncake_master_port)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                preexec_fn=os.setsid,  # Create new process group
+            )
+            print(f"Mooncake master service started on port {cls.mooncake_master_port}")
+        except (FileNotFoundError, subprocess.SubprocessError) as e:
+            print(f"Warning: Could not start Mooncake master service: {e}")
+            cls.master_service_process = None
+
+        # Wait for services to be ready instead of fixed sleep
+        cls._wait_for_mooncake_services_ready()
+```
+**EN:** Start Mooncake metadata and master services with configurable ports and readiness detection This block implements `_start_mooncake_services` and captures one focused piece of the module's behavior.
+**CN:** Start Mooncake metadata and master services with configurable ports and readiness detection 该代码块实现 `_start_mooncake_services`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 107-166: method wait for mooncake services ready / 方法 wait for mooncake services ready
+```python
+    @classmethod
+    def _wait_for_mooncake_services_ready(cls, timeout: int = 30) -> bool:
+        """Wait for Mooncake services to be ready by checking their endpoints"""
+        print("Waiting for Mooncake services to be ready...")
+
+        start_time = time.time()
+        services_ready = False
+
+        while time.time() - start_time < timeout:
+            try:
+                # Check metadata service
+                metadata_ready = False
+                if (
+                    cls.metadata_service_process
+                    and cls.metadata_service_process.poll() is None
+                ):
+                    try:
+                        # Try to connect to the metadata service
+                        metadata_url = (
+                            f"http://127.0.0.1:{cls.mooncake_metadata_port}/metadata"
+                        )
+                        response = requests.get(metadata_url, timeout=2)
+                        if response.status_code == 200:
+                            metadata_ready = True
+                            print("Mooncake metadata service is ready")
+                    except (requests.RequestException, ConnectionError):
+                        # Service might not be fully started yet
+                        pass
+
+                # Check master service (if it has a health endpoint)
+                master_ready = False
+                if (
+                    cls.master_service_process
+                    and cls.master_service_process.poll() is None
+                ):
+                    # For now, we'll assume master service is ready if process is running
+                    # and it's been a few seconds since startup
+                    if (
+                        time.time() - start_time > 5
+                    ):  # Give master service time to initialize
+                        master_ready = True
+                        print("Mooncake master service is ready")
+
+                # Both services should be ready
+                if metadata_ready and master_ready:
+                    services_ready = True
+                    print("All Mooncake services are ready")
+                    break
+
+            except Exception as e:
+                print(f"Error checking service readiness: {e}")
+
+            time.sleep(2)
+
+        if not services_ready:
+            print(
+                "Warning: Mooncake services may not be fully ready, continuing anyway..."
+            )
+
+        return services_ready
+```
+**EN:** Wait for Mooncake services to be ready by checking their endpoints This block implements `_wait_for_mooncake_services_ready` and captures one focused piece of the module's behavior.
+**CN:** Wait for Mooncake services to be ready by checking their endpoints 该代码块实现 `_wait_for_mooncake_services_ready`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 168-189: method stop mooncake services / 方法 stop mooncake services
+```python
+    @classmethod
+    def _stop_mooncake_services(cls):
+        """Stop Mooncake services"""
+        print("Stopping Mooncake services...")
+
+        # Stop metadata service
+        if hasattr(cls, "metadata_service_process") and cls.metadata_service_process:
+            try:
+                os.killpg(os.getpgid(cls.metadata_service_process.pid), 9)
+                cls.metadata_service_process.wait(timeout=5)
+                print("Mooncake metadata service stopped")
+            except (ProcessLookupError, subprocess.TimeoutExpired, OSError) as e:
+                print(f"Warning: Could not stop Mooncake metadata service: {e}")
+
+        # Stop master service
+        if hasattr(cls, "master_service_process") and cls.master_service_process:
+            try:
+                os.killpg(os.getpgid(cls.master_service_process.pid), 9)
+                cls.master_service_process.wait(timeout=5)
+                print("Mooncake master service stopped")
+            except (ProcessLookupError, subprocess.TimeoutExpired, OSError) as e:
+                print(f"Warning: Could not stop Mooncake master service: {e}")
+```
+**EN:** Stop Mooncake services This block implements `_stop_mooncake_services` and captures one focused piece of the module's behavior.
+**CN:** Stop Mooncake services 该代码块实现 `_stop_mooncake_services`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 191-211: method get additional server args and env / 方法 get additional server args and env
+```python
+    @classmethod
+    def _get_additional_server_args_and_env(cls):
+        """Get additional server arguments specific to configuration - override in subclasses"""
+
+        server_args = {
+            "--tp-size": 2,
+            "--hicache-ratio": 2,
+            "--hicache-storage-backend": "mooncake",
+        }
+
+        # Set the environment variables for Mooncake using dynamic ports
+        env_vars = {
+            "MOONCAKE_MASTER": f"127.0.0.1:{cls.mooncake_master_port}",
+            "MOONCAKE_PROTOCOL": "tcp",
+            "MC_MS_AUTO_DISC": "0",
+            "MOONCAKE_DEVICE": "",
+            "MOONCAKE_TE_META_DATA_SERVER": f"http://127.0.0.1:{cls.mooncake_metadata_port}/metadata",
+            "MOONCAKE_GLOBAL_SEGMENT_SIZE": "4294967296",  # 4 GiB
+        }
+
+        return server_args, env_vars
+```
+**EN:** Get additional server arguments specific to configuration - override in subclasses This block implements `_get_additional_server_args_and_env` and captures one focused piece of the module's behavior.
+**CN:** Get additional server arguments specific to configuration - override in subclasses 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 214-228: supporting statements / 辅助语句
+```python
+'''
+# Same as #10131, layer first layout test TODO(mateng): will make it work
+class TestMooncakeBackendLayerFirstLayout(
+    HiCacheStorageMooncakeBackendBaseMixin, CustomTestCase
+):
+    """Layer first layout tests for HiCache-Mooncake backend"""
+
+    @classmethod
+    def _get_additional_server_args_and_env(cls):
+        """Get additional server arguments specific to configuration - override in subclasses"""
+        server_args, env_vars = super()._get_additional_server_args_and_env()
+        server_args["--hicache-mem-layout"] = "layer_first"
+        server_args["--hicache-io-backend"] = "direct"
+        return server_args, env_vars
+'''
+```
+**EN:** This block contains supporting statements that connect surrounding definitions and keep module state consistent.
+**CN:** 该代码块包含衔接周围定义的辅助语句，用于保持模块状态一致。
+
+### Lines 231-234: class TestMooncakeBackendPageFirstLayout declaration / 类 TestMooncakeBackendPageFirstLayout 声明
+```python
+@unittest.skipIf(is_in_ci(), "To reduce the CI execution time.")
+class TestMooncakeBackendPageFirstLayout(
+    HiCacheStorageMooncakeBackendBaseMixin, CustomTestCase
+):
+```
+**EN:** This section introduces the class and any class-level context used by later methods. It inherits from `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`.
+**CN:** 该部分引入类定义以及后续方法会使用的类级上下文。 它继承自 `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`。
+
+### Lines 235-235: supporting statements / 辅助语句
+```python
+    """Page first layout tests for HiCache-Mooncake backend"""
+```
+**EN:** This block contains supporting statements that connect surrounding definitions and keep module state consistent.
+**CN:** 该代码块包含衔接周围定义的辅助语句，用于保持模块状态一致。
+
+### Lines 237-242: method get additional server args and env / 方法 get additional server args and env
+```python
+    @classmethod
+    def _get_additional_server_args_and_env(cls):
+        """Get additional server arguments specific to configuration - override in subclasses"""
+        server_args, env_vars = super()._get_additional_server_args_and_env()
+        server_args["--hicache-mem-layout"] = "page_first"
+        return server_args, env_vars
+```
+**EN:** Get additional server arguments specific to configuration - override in subclasses This block implements `_get_additional_server_args_and_env` and captures one focused piece of the module's behavior.
+**CN:** Get additional server arguments specific to configuration - override in subclasses 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 245-247: class TestMooncakeBackendMLAModel declaration / 类 TestMooncakeBackendMLAModel 声明
+```python
+class TestMooncakeBackendMLAModel(
+    HiCacheStorageMooncakeBackendBaseMixin, CustomTestCase
+):
+```
+**EN:** This section introduces the class and any class-level context used by later methods. It inherits from `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`.
+**CN:** 该部分引入类定义以及后续方法会使用的类级上下文。 它继承自 `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`。
+
+### Lines 248-248: supporting statements / 辅助语句
+```python
+    """MLA Model tests for HiCache-Mooncake backend"""
+```
+**EN:** This block contains supporting statements that connect surrounding definitions and keep module state consistent.
+**CN:** 该代码块包含衔接周围定义的辅助语句，用于保持模块状态一致。
+
+### Lines 250-253: method get model name / 方法 get model name
+```python
+    @classmethod
+    def _get_model_name(cls):
+        """Use MLA model for testing"""
+        return DEFAULT_MLA_MODEL_NAME_FOR_TEST
+```
+**EN:** Use MLA model for testing This block implements `_get_model_name` and captures one focused piece of the module's behavior.
+**CN:** Use MLA model for testing 该代码块实现 `_get_model_name`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 255-261: method get additional server args and env / 方法 get additional server args and env
+```python
+    @classmethod
+    def _get_additional_server_args_and_env(cls):
+        """Get additional server arguments specific to configuration - override in subclasses"""
+        server_args, env_vars = super()._get_additional_server_args_and_env()
+        server_args["--hicache-mem-layout"] = "page_first"
+        server_args["--tp-size"] = 2
+        return server_args, env_vars
+```
+**EN:** Get additional server arguments specific to configuration - override in subclasses This block implements `_get_additional_server_args_and_env` and captures one focused piece of the module's behavior.
+**CN:** Get additional server arguments specific to configuration - override in subclasses 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 264-267: class TestMooncakeBackendQwen330BCP2 declaration / 类 TestMooncakeBackendQwen330BCP2 声明
+```python
+@unittest.skipUnless(get_gpu_count() >= 2, "Requires at least 2 CUDA GPUs for TP2+CP2")
+class TestMooncakeBackendQwen330BCP2(
+    HiCacheStorageMooncakeBackendBaseMixin, CustomTestCase
+):
+```
+**EN:** This section introduces the class and any class-level context used by later methods. It inherits from `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`.
+**CN:** 该部分引入类定义以及后续方法会使用的类级上下文。 它继承自 `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`。
+
+### Lines 268-268: supporting statements / 辅助语句
+```python
+    """Qwen3-30B with Mooncake HiCache storage, CP2, and TP2."""
+```
+**EN:** This block contains supporting statements that connect surrounding definitions and keep module state consistent.
+**CN:** 该代码块包含衔接周围定义的辅助语句，用于保持模块状态一致。
+
+### Lines 270-272: method get model name / 方法 get model name
+```python
+    @classmethod
+    def _get_model_name(cls):
+        return "Qwen/Qwen3-30B-A3B-FP8"
+```
+**EN:** This block implements `_get_model_name` and captures one focused piece of the module's behavior.
+**CN:** 该代码块实现 `_get_model_name`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 274-294: method get additional server args and env / 方法 get additional server args and env
+```python
+    @classmethod
+    def _get_additional_server_args_and_env(cls):
+        server_args, env_vars = super()._get_additional_server_args_and_env()
+        server_args.update(
+            {
+                "--tp-size": 2,
+                "--moe-dp-size": 2,
+                "--attn-cp-size": 2,
+                "--enable-prefill-context-parallel": True,
+                "--trust-remote-code": True,
+                "--cuda-graph-max-bs": 32,
+                "--max-running-requests": 32,
+                "--max-total-tokens": 8192,
+                "--model-loader-extra-config": (
+                    '{"enable_multithread_load": true, "num_threads": 64}'
+                ),
+                "--hicache-mem-layout": "page_first_direct",
+                "--hicache-io-backend": "direct",
+            }
+        )
+        return server_args, env_vars
+```
+**EN:** This block implements `_get_additional_server_args_and_env` and captures one focused piece of the module's behavior.
+**CN:** 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 297-299: class TestMooncakeBackendAccuracy declaration / 类 TestMooncakeBackendAccuracy 声明
+```python
+class TestMooncakeBackendAccuracy(
+    HiCacheStorageMooncakeBackendBaseMixin, CustomTestCase
+):
+```
+**EN:** This section introduces the class and any class-level context used by later methods. It inherits from `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`.
+**CN:** 该部分引入类定义以及后续方法会使用的类级上下文。 它继承自 `HiCacheStorageMooncakeBackendBaseMixin`, `CustomTestCase`。
+
+### Lines 300-300: supporting statements / 辅助语句
+```python
+    """Accuracy tests for HiCache-Mooncake backend"""
+```
+**EN:** This block contains supporting statements that connect surrounding definitions and keep module state consistent.
+**CN:** 该代码块包含衔接周围定义的辅助语句，用于保持模块状态一致。
+
+### Lines 302-310: method get additional server args and env / 方法 get additional server args and env
+```python
+    @classmethod
+    def _get_additional_server_args_and_env(cls):
+        """Get additional server arguments specific to configuration - override in subclasses"""
+        server_args, env_vars = super()._get_additional_server_args_and_env()
+        server_args["--hicache-ratio"] = 1.5
+        server_args["--tp-size"] = 2
+        server_args["--hicache-mem-layout"] = "page_first_direct"
+        server_args["--hicache-io-backend"] = "direct"
+        return server_args, env_vars
+```
+**EN:** Get additional server arguments specific to configuration - override in subclasses This block implements `_get_additional_server_args_and_env` and captures one focused piece of the module's behavior.
+**CN:** Get additional server arguments specific to configuration - override in subclasses 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+
+### Lines 312-316: test case eval accuracy / 测试用例 eval accuracy
+```python
+    def test_eval_accuracy(self):
+        """Test eval accuracy with cache persistence across cache flushes"""
+        from test_hicache_storage_file_backend import run_eval_accuracy_test
+
+        run_eval_accuracy_test(self)
+```
+**EN:** Test eval accuracy with cache persistence across cache flushes This test exercises `test_eval_accuracy` by arranging inputs, invoking the relevant path, and checking the expected outcome.
+**CN:** Test eval accuracy with cache persistence across cache flushes 该测试通过准备输入、调用相关路径并检查期望结果来验证 `test_eval_accuracy`。
+
+### Lines 319-320: direct execution entry point / 直接执行入口
+```python
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
+```
+**EN:** This block enables the file to run as a script and dispatches into the module's test runner or main entry point.
+**CN:** 该代码块使文件可以直接作为脚本运行，并转入模块的测试运行器或主入口。
+
+## Key Concepts / 关键概念
+- `HiCacheStorageMooncakeBackendBaseMixin`: Base mixin class with common setup and utilities / 用于组织相关测试、夹具或辅助方法。
+- `TestMooncakeBackendPageFirstLayout`: Page first layout tests for HiCache-Mooncake backend / 用于组织相关测试、夹具或辅助方法。
+- `TestMooncakeBackendMLAModel`: MLA Model tests for HiCache-Mooncake backend / 用于组织相关测试、夹具或辅助方法。
+- `TestMooncakeBackendQwen330BCP2`: Qwen3-30B with Mooncake HiCache storage, CP2, and TP2. / 用于组织相关测试、夹具或辅助方法。
+- `TestMooncakeBackendAccuracy`: Accuracy tests for HiCache-Mooncake backend / 用于组织相关测试、夹具或辅助方法。
+- `HiCacheStorageMooncakeBackendBaseMixin.setUpClass`: Set up test environment and launch Mooncake services before server setup / 该流程会在断言执行前准备共享夹具、模型或运行状态。
+- `HiCacheStorageMooncakeBackendBaseMixin.tearDownClass`: Clean up Mooncake services after server teardown / 该流程会在相关测试结束后释放资源并恢复状态。
+- `HiCacheStorageMooncakeBackendBaseMixin._start_mooncake_services`: Start Mooncake metadata and master services with configurable ports and readiness detection / 该代码块实现 `_start_mooncake_services`，承担模块行为中的一个聚焦逻辑片段。
+- `HiCacheStorageMooncakeBackendBaseMixin._wait_for_mooncake_services_ready`: Wait for Mooncake services to be ready by checking their endpoints / 该代码块实现 `_wait_for_mooncake_services_ready`，承担模块行为中的一个聚焦逻辑片段。
+- `HiCacheStorageMooncakeBackendBaseMixin._stop_mooncake_services`: Stop Mooncake services / 该代码块实现 `_stop_mooncake_services`，承担模块行为中的一个聚焦逻辑片段。
+- `HiCacheStorageMooncakeBackendBaseMixin._get_additional_server_args_and_env`: Get additional server arguments specific to configuration - override in subclasses / 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+- `TestMooncakeBackendPageFirstLayout._get_additional_server_args_and_env`: Get additional server arguments specific to configuration - override in subclasses / 该代码块实现 `_get_additional_server_args_and_env`，承担模块行为中的一个聚焦逻辑片段。
+
+## Dependencies / 依赖关系
+- **Standard library / 标准库**: `os`, `subprocess`, `time`, `unittest`
+- **Third-party modules / 第三方模块**: `requests`, `test_hicache_storage_file_backend`
+- **Internal modules / 内部模块**: `sglang.test.ci.ci_register`, `sglang.test.test_utils`
+
+- **Total lines / 总行数**: 320

@@ -1,0 +1,998 @@
+# dist_gemm_1d_schedules.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/experimental/distributed/schedules/dist_gemm_1d_schedules.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/experimental/distributed/schedules/dist_gemm_1d_schedules.hpp`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/experimental/distributed/schedules/dist_gemm_1d_schedules.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2024 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*!</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L32**: <code>  \file 1-D Distributed GEMM Schedules</code>
+  - EN: Doxygen file tag indicating that the comment documents the whole file.
+  - CN: Doxygen 文件标签，说明该注释用于描述整个文件。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>  NOTE: This API is __experimental__ and will change heavily over time. Particularly the use of</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>  CuTe layouts as integer functions in defining iteration-to-tile mappings is over-expressive and</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L36**: <code>  leaves plenty of room for incorrect/unexpected behavior.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L37**: <code>  Please proceed with caution when modifying these schedules or defining new ones.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L38**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L39**: <code>  Device/iteration mappings are defined with CuTe layouts, </code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L40**: <code>  since they are functions from integers to integers as well.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L41**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L42**: <code>  Each mapping is defined as a linear function of 2 variables (rank-2 layout):</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L43**: <code>   First variable (mode) is device index, second variable (mode) is iteration.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L44**: <code>   A constant is also added to the final result as an offset value. This is a temporary workaround</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L45**: <code>   so that identity ownership mappings in the final iteration can be guaranteed for the schedules</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L46**: <code>   currently implemented.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L47**: <code>  How are these mappings defined?</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L48**: <code>    Each schedule represents a unique parallel matrix multiplication algorithm, which describes how</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L49**: <code>    matrices/tensors are distributed among TP GPUs.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L50**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L51**: <code>    Depending on the algorithm, access patterns (GPU to tile or (GPU, iteration) to tile) mappings)</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L52**: <code>    are not necessarily going to be the identity function.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>  Pitfalls:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L55**: <code>    The current representation uses CuTe layouts as arbitrary linear functions that map</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L56**: <code>    (GPU, iteration) to tile indices.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L57**: <code>    This approach is over-expressive, and therefore makes a lot of assumptions on the part of the</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L58**: <code>    developer in how these mappings are defined. This can easily lead to incorrect implementations</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L59**: <code>    if not handled carefully.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L60**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L61**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L62**: <code>  Assumption made in all schedules: TP == number of iterations (stages)</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L63**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L64**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L65**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L66**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L67**: <code>#include &quot;cute/layout.hpp&quot;</code>
+  - EN: Includes "cute/layout.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/layout.hpp"，以便本文件使用该依赖中的声明。
+- **L68**: <code>#include &quot;cute/tensor.hpp&quot;</code>
+  - EN: Includes "cute/tensor.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/tensor.hpp"，以便本文件使用该依赖中的声明。
+- **L69**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L70**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L71**: <code>#include &quot;cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp&quot;</code>
+  - EN: Includes "cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp"，以便本文件使用该依赖中的声明。
+- **L72**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L73**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>namespace cutlass::distributed::schedules {</code>
+  - EN: Opens namespace `cutlass::distributed::schedules` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::distributed::schedules`，为后续声明提供作用域。
+- **L76**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L77**: <code>// GEMM + Reduce Scatter</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L78**: <code>// A and B are tiled along the K mode, which means each GPU gets an [M, K / TP]-shaped slice of A,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L79**: <code>// and an [N, K / TP] slice of B.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L80**: <code>// A is further tiled along the M mode, so that each stage/iteration computes a GEMM of shape</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L81**: <code>// [M / TP, N, K / TP], and the epilogue will perform the reduction by reading its C tensor directly</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L82**: <code>// from the left peer&#x27;s previous D buffer.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L83**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L84**: <code>// Below is an illustration of the tiling and iteration mappings for this pattern in the TP=4 case:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L85**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L86**: <code>//   Rows correspond to the M mode, columns correspond to the K mode for A and B and N mode for </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L87**: <code>//   C and D.  Because sharding is done along K, each column of tiles is owned by one GPU.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L88**: <code>//   Values in the grid correspond to the iteration/stage accessing the tile.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L89**: <code>//   * means the same tile is accessed in all iterations/stages.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L90**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L91**: <code>//         Tensor A                             Tensor B              </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L92**: <code>//                                                                    </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L93**: <code>//  GPU0  GPU1  GPU2  GPU3              GPU0  GPU1  GPU2  GPU3        </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L94**: <code>// |-----|-----|-----|-----|           |-----|-----|-----|-----|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L95**: <code>// |     |     |     |     |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L96**: <code>// |  3  |  0  |  1  |  2  |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L97**: <code>// |_____|_____|_____|_____|           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L98**: <code>// |     |     |     |     |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L99**: <code>// |  2  |  3  |  0  |  1  |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L100**: <code>// |_____|_____|_____|_____|           |  *  |  *  |  *  |  *  |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L101**: <code>// |     |     |     |     |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L102**: <code>// |  1  |  2  |  3  |  0  |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L103**: <code>// |_____|_____|_____|_____|           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L104**: <code>// |     |     |     |     |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L105**: <code>// |  0  |  1  |  2  |  3  |           |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L106**: <code>// |_____|_____|_____|_____|           |_____|_____|_____|_____|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L107**: <code>//                                                                    </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L108**: <code>//                          M x K                               N x K </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L109**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L110**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L111**: <code>//              Tensor C                            Tensor D              </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L112**: <code>//              (Peer&#x27;s D)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L113**: <code>//                                         </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L114**: <code>//                                                                        </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L115**: <code>//      |-----------------------|           |-----------------------|     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L116**: <code>//      |                       |           |                       |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L117**: <code>// GPU0 |         1,2,3         |      GPU0 |           *           |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L118**: <code>//      |_______________________|           |_______________________|     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L119**: <code>//      |                       |           |                       |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L120**: <code>// GPU1 |         1,2,3         |      GPU1 |           *           |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L121**: <code>//      |_______________________|           |_______________________|     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L122**: <code>//      |                       |           |                       |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L123**: <code>// GPU2 |         1,2,3         |      GPU2 |           *           |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L124**: <code>//      |_______________________|           |_______________________|     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L125**: <code>//      |                       |           |                       |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L126**: <code>// GPU3 |         1,2,3         |      GPU3 |           *           |     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L127**: <code>//      |_______________________|           |_______________________|     </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L128**: <code>//                                                                        </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L129**: <code>//                               M x N                               M x N</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L130**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L131**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L132**: <code>//  Tensor A&#x27;s access pattern can be expressed as follows as a function of GPU index and iteration:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L133**: <code>//    tile_idx = ((device_idx - 1) - iter + TP) % TP</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L134**: <code>//  </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L135**: <code>//  and can be expressed with the following CuTe layout:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L136**: <code>//    (TP, TP) : (1, -1)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L137**: <code>//  with ProcessorOffset = -1</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L138**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L139**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L140**: <code>//  Note: Since this schedule does not expose any communication, iteration 0 has no reduction step,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L141**: <code>//  therefore epilogue is sourceless in iteration 0, and in the rest of the iterations the epilogue</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L142**: <code>//  source is a remote pointer to Tensor D owned by its left peer.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L143**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L144**: <code>//  Left peer is simply (device_idx - 1 + TP) % TP, which is expressed with the following CuTe layout:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L145**: <code>//    (TP, TP) : (1, 0)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L146**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L147**: <code>template &lt;class TP_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L148**: <code>struct ReduceScatter1D_TilingA_RotatingC: BaseSchedule&lt;</code>
+  - EN: Declares or defines the struct `ReduceScatter1D_TilingA_RotatingC`.
+  - CN: 声明或定义 struct `ReduceScatter1D_TilingA_RotatingC`。
+- **L149**: <code>    TP_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L150**: <code>    /* ProcessorTiler_ = */ cute::Shape&lt;_1, _1, TP_, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L151**: <code>    /* IterationTiler_ = */ cute::Shape&lt;TP_, _1, _1, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L152**: <code>    /* PeerDeviceMapping_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _0&gt;&gt;,                             // (left neighbor) = (device_idx + ProcessorOffset + TP) % TP, with ProcessorOffset = -1</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L153**: <code>    /* IterationMappingM_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _m1&gt;&gt;,                            // = (device_idx + ProcessorOffset - iter + TP) % TP, with ProcessorOffset = -1</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L154**: <code>    /* IterationMappingN_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::N == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L155**: <code>    /* IterationMappingK_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::K == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L156**: <code>    /* IterationMappingL_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::L == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L157**: <code>    /* ProcessorOffset_ = */ _m1,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L158**: <code>    /* MemcpyA_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L159**: <code>    /* MemcpyB_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L160**: <code>    /* KernelWritesArrivalFlag_ = */ true,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L161**: <code>    /* NumBuffersA_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L162**: <code>    /* NumBuffersB_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L163**: <code>    /* NumBuffersC_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L164**: <code>    /* NumBuffersD_  = */ TP_{} - 1&gt; {};</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L165**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L166**: <code>// This schedule is similar to ReduceScatter1D_TilingA_RotatingC, but with the second tiling</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L167**: <code>// done along N instead of M. All other details remain unchanged.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L168**: <code>template &lt;class TP_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L169**: <code>struct ReduceScatter1D_TilingB_RotatingC: BaseSchedule&lt;</code>
+  - EN: Declares or defines the struct `ReduceScatter1D_TilingB_RotatingC`.
+  - CN: 声明或定义 struct `ReduceScatter1D_TilingB_RotatingC`。
+- **L170**: <code>    TP_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L171**: <code>    /* ProcessorTiler_ = */ cute::Shape&lt;_1, _1, TP_, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L172**: <code>    /* IterationTiler_ = */ cute::Shape&lt;_1, TP_, _1, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L173**: <code>    /* PeerDeviceMapping_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _0&gt;&gt;,                             // (left neighbor) = (device_idx + ProcessorOffset + TP) % TP, with ProcessorOffset = -1</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L174**: <code>    /* IterationMappingM_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::N == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L175**: <code>    /* IterationMappingN_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _m1&gt;&gt;,                            // = (device_idx + ProcessorOffset - iter + TP) % TP, with ProcessorOffset = -1</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L176**: <code>    /* IterationMappingK_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::K == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L177**: <code>    /* IterationMappingL_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::L == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L178**: <code>    /* ProcessorOffset_ = */ _m1,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L179**: <code>    /* MemcpyA_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L180**: <code>    /* MemcpyB_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L181**: <code>    /* KernelWritesArrivalFlag_ = */ true,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L182**: <code>    /* NumBuffersA_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L183**: <code>    /* NumBuffersB_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L184**: <code>    /* NumBuffersC_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L185**: <code>    /* NumBuffersD_  = */ TP_{} - 1&gt; {};</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L186**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L187**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L188**: <code>// AllGather + GEMM</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L189**: <code>// A and B are tiled along the N mode, which means each GPU allgathers A,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L190**: <code>// and operates with an [N / TP, K] slice of B.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L191**: <code>// For pipelining, A is further tiled along the M mode, so that each stage/iteration computes a</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L192**: <code>// GEMM of shape [M / TP, N / TP, K], and concurrently we copy a peer&#x27;s A slice into a local buffer</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L193**: <code>// for the next stage/iteration.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L194**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L195**: <code>// Below is an illustration of the tiling and iteration mappings for this pattern in the TP=4 case:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L196**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L197**: <code>//   Rows correspond to the M mode, columns correspond to the K mode for A and B and N mode for </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L198**: <code>//   C and D.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L199**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L200**: <code>//   Since this is a pipelined schedule without exposed communication, the first iteration starts</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L201**: <code>//   off immediately and operates on local slices of A and B. In the rest of the iterations, each</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L202**: <code>//   GPU accesses a slice of A copied from a peer GPU while it was busy with the last stage.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L203**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L204**: <code>//   Values in the following grids correspond to the peer buffer accessed by each GPU during</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L205**: <code>//   different iterations:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L206**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L207**: <code>//              Tensor A                         Tensor A               </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L208**: <code>//               iter 0                           iter 1                </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L209**: <code>//                                                                      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L210**: <code>//      |-----------------------|        |-----------------------|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L211**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L212**: <code>// GPU0 |           0           |        |           1           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L213**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L214**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L215**: <code>// GPU1 |           1           |        |           2           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L216**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L217**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L218**: <code>// GPU2 |           2           |        |           3           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L219**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L220**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L221**: <code>// GPU3 |           3           |        |           0           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L222**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L223**: <code>//                                                                      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L224**: <code>//                               M x K                            M x K </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L225**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L226**: <code>//              Tensor A                         Tensor A               </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L227**: <code>//               iter 2                           iter 3                </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L228**: <code>//                                                                      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L229**: <code>//      |-----------------------|        |-----------------------|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L230**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L231**: <code>// GPU0 |           2           |        |           3           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L232**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L233**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L234**: <code>// GPU1 |           3           |        |           0           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L235**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L236**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L237**: <code>// GPU2 |           0           |        |           1           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L238**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L239**: <code>//      |                       |        |                       |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L240**: <code>// GPU3 |           1           |        |           2           |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L241**: <code>//      |_______________________|        |_______________________|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L242**: <code>//                                                                      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L243**: <code>//                               M x K                            M x K </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L244**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L245**: <code>//   Values in the following grids correspond to the tile accessed during each iteration.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L246**: <code>//   * means the same tile is accessed in all iterations/stages.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L247**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L248**: <code>//              Tensor B                             Tensor C/D               </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L249**: <code>//                                                                          </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L250**: <code>//                                                                          </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L251**: <code>//      |-----------------------|            |-----|-----|-----|-----|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L252**: <code>//      |                       |            |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L253**: <code>// GPU0 |           *           |       GPU0 |  0  |  1  |  2  |  3  |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L254**: <code>//      |_______________________|            |_____|_____|_____|_____|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L255**: <code>//      |                       |            |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L256**: <code>// GPU1 |           *           |       GPU1 |  3  |  0  |  1  |  2  |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L257**: <code>//      |_______________________|            |_____|_____|_____|_____|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L258**: <code>//      |                       |            |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L259**: <code>// GPU2 |           *           |       GPU2 |  2  |  3  |  0  |  1  |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L260**: <code>//      |_______________________|            |_____|_____|_____|_____|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L261**: <code>//      |                       |            |     |     |     |     |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L262**: <code>// GPU3 |           *           |       GPU3 |  1  |  2  |  3  |  0  |      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L263**: <code>//      |_______________________|            |_____|_____|_____|_____|      </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L264**: <code>//                                                                          </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L265**: <code>//                               N x K                                M x N </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L266**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L267**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L268**: <code>//  Tensor C/D&#x27;s access pattern can be expressed as follows as a function of GPU index and iteration:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L269**: <code>//    tile_idx = (device_idx + iter) % TP</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L270**: <code>//  </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L271**: <code>//  and can be expressed with the following CuTe layout:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L272**: <code>//    (TP, TP) : (1, 1)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L273**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L274**: <code>//  This schedule does not need a ProcessorOffset constant.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L275**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L276**: <code>//  Peer devices from which A slices are copied is also expressed with the same function and CuTe</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L277**: <code>//  layout.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L278**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L279**: <code>template &lt;class TP_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L280**: <code>struct AllGather1D_TilingCD_RotatingA: BaseSchedule&lt;</code>
+  - EN: Declares or defines the struct `AllGather1D_TilingCD_RotatingA`.
+  - CN: 声明或定义 struct `AllGather1D_TilingCD_RotatingA`。
+- **L281**: <code>    TP_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L282**: <code>    /* ProcessorTiler_ = */ cute::Shape&lt;_1, TP_, _1, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L283**: <code>    /* IterationTiler_ = */ cute::Shape&lt;TP_, _1, _1, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L284**: <code>    /* PeerDeviceMapping_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _1&gt;&gt;,                             // = device_idx + iter</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L285**: <code>    /* IterationMappingM_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _1&gt;&gt;,                             // = device_idx + iter</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L286**: <code>    /* IterationMappingN_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::N == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L287**: <code>    /* IterationMappingK_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::K == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L288**: <code>    /* IterationMappingL_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::L == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L289**: <code>    /* ProcessorOffset_ = */ _0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L290**: <code>    /* MemcpyA_ = */ true,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L291**: <code>    /* MemcpyB_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L292**: <code>    /* KernelWritesArrivalFlag_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L293**: <code>    /* NumBuffersA_ = */ TP_{} - 1,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L294**: <code>    /* NumBuffersB_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L295**: <code>    /* NumBuffersC_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L296**: <code>    /* NumBuffersD_ = */ 0&gt;{};</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L297**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L298**: <code>// This schedule is similar to AllGather1D_TilingCD_RotatingA, but with the order of tiling</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L299**: <code>// swapped from N then M to M then N. This means slices of B are rotated around GPUs instead of</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L300**: <code>// slices of A. All other details remain unchanged.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L301**: <code>template &lt;class TP_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L302**: <code>struct AllGather1D_TilingCD_RotatingB: BaseSchedule&lt;</code>
+  - EN: Declares or defines the struct `AllGather1D_TilingCD_RotatingB`.
+  - CN: 声明或定义 struct `AllGather1D_TilingCD_RotatingB`。
+- **L303**: <code>    TP_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L304**: <code>    /* ProcessorTiler_ = */ cute::Shape&lt;TP_, _1, _1, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L305**: <code>    /* IterationTiler_ = */ cute::Shape&lt;_1, TP_, _1, _1&gt;,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L306**: <code>    /* PeerDeviceMapping_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _1&gt;&gt;,                             // = device_idx + iter</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L307**: <code>    /* IterationMappingM_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::M == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L308**: <code>    /* IterationMappingN_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_1, _1&gt;&gt;,                             // = device_idx + iter</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L309**: <code>    /* IterationMappingK_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::K == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L310**: <code>    /* IterationMappingL_ = */ cute::Layout&lt;cute::Shape&lt;TP_, TP_&gt;, cute::Stride&lt;_0, _0&gt;&gt;,                             // (IterationTiler::L == 1) = 0</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L311**: <code>    /* ProcessorOffset_ = */ _0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L312**: <code>    /* MemcpyA_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L313**: <code>    /* MemcpyB_ = */ true,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L314**: <code>    /* KernelWritesArrivalFlag_ = */ false,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L315**: <code>    /* NumBuffersA_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L316**: <code>    /* NumBuffersB_ = */ TP_{} - 1,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L317**: <code>    /* NumBuffersC_ = */ 0,</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L318**: <code>    /* NumBuffersD_ = */ 0&gt;{};</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L319**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L320**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L321**: <code>} // namespace cutlass::distributed::schedules</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L322**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L323**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L324**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Symbol focus: `variables` / 重点符号：`variables`
+- Symbol focus: `variable` / 重点符号：`variable`
+- Symbol focus: `patterns` / 重点符号：`patterns`
+- Symbol focus: `iterations` / 重点符号：`iterations`
+- Symbol focus: `TP_` / 重点符号：`TP_`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cute/layout.hpp"`
+  - `"cute/tensor.hpp"`
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/experimental/distributed/schedules/dist_gemm_base_schedule.hpp"`

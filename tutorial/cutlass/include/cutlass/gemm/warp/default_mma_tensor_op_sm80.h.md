@@ -1,0 +1,409 @@
+# default_mma_tensor_op_sm80.h — Code Analysis / 代码分析
+
+## Source / 源文件
+
+`include/cutlass/gemm/warp/default_mma_tensor_op_sm80.h`
+
+## Purpose / 用途
+
+**EN:** Default warp-level GEMM operators selected by data type, size, and layouts of operands. /.
+
+**CN:** 默认的 SM80 Tensor Core MMA 配置。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code> — **EN:** Starts the file header comment block that carries the license notice. **CN:** 开始文件头注释块，这里承载许可证说明。
+- **L2** <code>* Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L3** <code>* SPDX-License-Identifier: BSD-3-Clause</code> — **EN:** States the SPDX license identifier for automated tooling. **CN:** 给出 SPDX 许可证标识，便于自动化工具识别。
+- **L4** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L5** <code>* Redistribution and use in source and binary forms, with or without</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L6** <code>* modification, are permitted provided that the following conditions are met:</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L7** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L8** <code>* 1. Redistributions of source code must retain the above copyright notice, this</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L9** <code>* list of conditions and the following disclaimer.</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L10** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L11** <code>* 2. Redistributions in binary form must reproduce the above copyright notice,</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L12** <code>* this list of conditions and the following disclaimer in the documentation</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L13** <code>* and/or other materials provided with the distribution.</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L14** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L15** <code>* 3. Neither the name of the copyright holder nor the names of its</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L16** <code>* contributors may be used to endorse or promote products derived from</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L17** <code>* this software without specific prior written permission.</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L18** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L19** <code>* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L20** <code>* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L21** <code>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L22** <code>* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L23** <code>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L24** <code>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L25** <code>* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L26** <code>* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L27** <code>* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L28** <code>* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L29** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L30** <code>**************************************************************************************************/</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L31** <code>/*! \file</code> — **EN:** Marks this comment as the file-level documentation block. **CN:** 将该注释标记为文件级文档块。
+- **L32** <code>\brief Default warp-level GEMM operators selected by data type, size, and layouts of operands.</code> — **EN:** Provides a short summary of the header’s responsibility. **CN:** 给出该头文件职责的简短摘要。
+- **L33** <code>*/</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L34** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L35** <code>#pragma once</code> — **EN:** Uses a pragma guard so the header is included only once per translation unit. **CN:** 使用 pragma 保护，确保同一翻译单元中只包含一次该头文件。
+- **L36** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L37** <code>#include &quot;cutlass/cutlass.h&quot;</code> — **EN:** Includes `cutlass/cutlass.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/cutlass.h`，以获得 CUTLASS 基础工具与类型。
+- **L38** <code>#include &quot;cutlass/numeric_types.h&quot;</code> — **EN:** Includes `cutlass/numeric_types.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/numeric_types.h`，以获得 CUTLASS 基础工具与类型。
+- **L39** <code>#include &quot;cutlass/arch/mma.h&quot;</code> — **EN:** Includes `cutlass/arch/mma.h` to access architecture-specific instruction, memory, or pipeline primitives. **CN:** 引入 `cutlass/arch/mma.h`，以获得 架构相关的指令、内存或流水线原语。
+- **L40** <code>#include &quot;cutlass/gemm/warp/mma_tensor_op.h&quot;</code> — **EN:** Includes `cutlass/gemm/warp/mma_tensor_op.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/warp/mma_tensor_op.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L41** <code>#include &quot;cutlass/gemm/warp/mma_mixed_input_tensor_op.h&quot;</code> — **EN:** Includes `cutlass/gemm/warp/mma_mixed_input_tensor_op.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/warp/mma_mixed_input_tensor_op.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L42** <code>#include &quot;cutlass/gemm/warp/mma_tensor_op_fast_f32.h&quot;</code> — **EN:** Includes `cutlass/gemm/warp/mma_tensor_op_fast_f32.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/warp/mma_tensor_op_fast_f32.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L43** <code>#include &quot;cutlass/gemm/warp/default_mma_tensor_op.h&quot;</code> — **EN:** Includes `cutlass/gemm/warp/default_mma_tensor_op.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/warp/default_mma_tensor_op.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L44** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L45** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L46** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L47** <code>namespace cutlass {</code> — **EN:** Opens namespace `cutlass` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `cutlass`，把后续声明放入正确的 CUTLASS 作用域。
+- **L48** <code>namespace gemm {</code> — **EN:** Opens namespace `gemm` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `gemm`，把后续声明放入正确的 CUTLASS 作用域。
+- **L49** <code>namespace warp {</code> — **EN:** Opens namespace `warp` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `warp`，把后续声明放入正确的 CUTLASS 作用域。
+- **L50** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L51** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L52** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L53** <code>/// Partial Specialization - inputs and output types are float - uses BF16 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L54** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L55** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L56** <code>typename WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L57** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L58** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L59** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L60** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L61** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L62** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L63** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L64** <code>int PartitionsK,</code> — **EN:** Continues the current implementation using `PartitionsK`. **CN:** 使用 `PartitionsK` 继续当前实现。
+- **L65** <code>/// Store the accumulators in row major or column major.  Row major is used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L66** <code>/// when output layout is interleaved.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L67** <code>bool AccumulatorsInRowMajor&gt;</code> — **EN:** Continues the current implementation using `AccumulatorsInRowMajor`. **CN:** 使用 `AccumulatorsInRowMajor` 继续当前实现。
+- **L68** <code>struct DefaultMmaTensorOp&lt;</code> — **EN:** Declares struct `DefaultMmaTensorOp<`, which packages related data or policy behavior. **CN:** 声明结构体 `DefaultMmaTensorOp<`，用于组织相关数据或策略行为。
+- **L69** <code>WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L70** <code>GemmShape&lt;16, 8, 8&gt;,</code> — **EN:** Continues the current implementation using `GemmShape`. **CN:** 使用 `GemmShape` 继续当前实现。
+- **L71** <code>float, LayoutA,</code> — **EN:** Continues the current implementation using `float`, `LayoutA`. **CN:** 使用 `float`, `LayoutA` 继续当前实现。
+- **L72** <code>float, LayoutB,</code> — **EN:** Continues the current implementation using `float`, `LayoutB`. **CN:** 使用 `float`, `LayoutB` 继续当前实现。
+- **L73** <code>float, LayoutC,</code> — **EN:** Continues the current implementation using `float`, `LayoutC`. **CN:** 使用 `float`, `LayoutC` 继续当前实现。
+- **L74** <code>arch::OpMultiplyAddFastBF16,</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAddFastBF16`. **CN:** 使用 `arch::OpMultiplyAddFastBF16` 继续当前实现。
+- **L75** <code>PartitionsK, AccumulatorsInRowMajor&gt; {</code> — **EN:** Continues the current implementation using `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 使用 `PartitionsK`, `AccumulatorsInRowMajor` 继续当前实现。
+- **L76** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L77** <code>// Uses BF16 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L78** <code>using Policy = cutlass::gemm::warp::MmaTensorOpPolicy&lt;</code> — **EN:** Introduces alias or imported name `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<`，便于在当前作用域中复用。
+- **L79** <code>cutlass::arch::Mma&lt;</code> — **EN:** Continues the current implementation using `cutlass::arch::Mma`. **CN:** 使用 `cutlass::arch::Mma` 继续当前实现。
+- **L80** <code>GemmShape&lt;16, 8, 8&gt;,</code> — **EN:** Continues the current implementation using `GemmShape`. **CN:** 使用 `GemmShape` 继续当前实现。
+- **L81** <code>32,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L82** <code>bfloat16_t, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `bfloat16_t`, `cutlass::layout::RowMajor`. **CN:** 使用 `bfloat16_t`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L83** <code>bfloat16_t, cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `bfloat16_t`, `cutlass::layout::ColumnMajor`. **CN:** 使用 `bfloat16_t`, `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L84** <code>float, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `float`, `cutlass::layout::RowMajor`. **CN:** 使用 `float`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L85** <code>arch::OpMultiplyAdd</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L86** <code>&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L87** <code>cutlass::MatrixShape&lt;1, 1&gt; &gt;;</code> — **EN:** Completes a declaration involving `cutlass::MatrixShape`. **CN:** 完成一条与 `cutlass::MatrixShape` 相关的声明。
+- **L88** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L89** <code>// Define the warp-level tensor op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L90** <code>using Type = cutlass::gemm::warp::MmaTensorOp&lt;</code> — **EN:** Introduces alias or imported name `Type = cutlass::gemm::warp::MmaTensorOp<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Type = cutlass::gemm::warp::MmaTensorOp<`，便于在当前作用域中复用。
+- **L91** <code>WarpShape_, float, LayoutA, float, LayoutB, float, LayoutC,</code> — **EN:** Continues the current implementation using `WarpShape_`, `float`, `LayoutA`, `float`. **CN:** 使用 `WarpShape_`, `float`, `LayoutA`, `float` 继续当前实现。
+- **L92** <code>Policy, PartitionsK, AccumulatorsInRowMajor&gt;;</code> — **EN:** Completes a declaration involving `Policy`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 完成一条与 `Policy`, `PartitionsK`, `AccumulatorsInRowMajor` 相关的声明。
+- **L93** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L94** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L95** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L96** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L97** <code>/// Partial Specialization - inputs and output types are float - uses F16 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L98** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L99** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L100** <code>typename WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L101** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L102** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L103** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L104** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L105** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L106** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L107** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L108** <code>int PartitionsK,</code> — **EN:** Continues the current implementation using `PartitionsK`. **CN:** 使用 `PartitionsK` 继续当前实现。
+- **L109** <code>/// Store the accumulators in row major or column major.  Row major is used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L110** <code>/// when output layout is interleaved.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L111** <code>bool AccumulatorsInRowMajor&gt;</code> — **EN:** Continues the current implementation using `AccumulatorsInRowMajor`. **CN:** 使用 `AccumulatorsInRowMajor` 继续当前实现。
+- **L112** <code>struct DefaultMmaTensorOp&lt;</code> — **EN:** Declares struct `DefaultMmaTensorOp<`, which packages related data or policy behavior. **CN:** 声明结构体 `DefaultMmaTensorOp<`，用于组织相关数据或策略行为。
+- **L113** <code>WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L114** <code>GemmShape&lt;16, 8, 8&gt;,</code> — **EN:** Continues the current implementation using `GemmShape`. **CN:** 使用 `GemmShape` 继续当前实现。
+- **L115** <code>float, LayoutA,</code> — **EN:** Continues the current implementation using `float`, `LayoutA`. **CN:** 使用 `float`, `LayoutA` 继续当前实现。
+- **L116** <code>float, LayoutB,</code> — **EN:** Continues the current implementation using `float`, `LayoutB`. **CN:** 使用 `float`, `LayoutB` 继续当前实现。
+- **L117** <code>float, LayoutC,</code> — **EN:** Continues the current implementation using `float`, `LayoutC`. **CN:** 使用 `float`, `LayoutC` 继续当前实现。
+- **L118** <code>arch::OpMultiplyAddFastF16,</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAddFastF16`. **CN:** 使用 `arch::OpMultiplyAddFastF16` 继续当前实现。
+- **L119** <code>PartitionsK, AccumulatorsInRowMajor&gt; {</code> — **EN:** Continues the current implementation using `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 使用 `PartitionsK`, `AccumulatorsInRowMajor` 继续当前实现。
+- **L120** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L121** <code>// Uses F16 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L122** <code>using Policy = cutlass::gemm::warp::MmaTensorOpPolicy&lt;</code> — **EN:** Introduces alias or imported name `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<`，便于在当前作用域中复用。
+- **L123** <code>cutlass::arch::Mma&lt;</code> — **EN:** Continues the current implementation using `cutlass::arch::Mma`. **CN:** 使用 `cutlass::arch::Mma` 继续当前实现。
+- **L124** <code>GemmShape&lt;16, 8, 8&gt;,</code> — **EN:** Continues the current implementation using `GemmShape`. **CN:** 使用 `GemmShape` 继续当前实现。
+- **L125** <code>32,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L126** <code>half_t, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `half_t`, `cutlass::layout::RowMajor`. **CN:** 使用 `half_t`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L127** <code>half_t, cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `half_t`, `cutlass::layout::ColumnMajor`. **CN:** 使用 `half_t`, `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L128** <code>float, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `float`, `cutlass::layout::RowMajor`. **CN:** 使用 `float`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L129** <code>arch::OpMultiplyAdd</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L130** <code>&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L131** <code>cutlass::MatrixShape&lt;1, 1&gt; &gt;;</code> — **EN:** Completes a declaration involving `cutlass::MatrixShape`. **CN:** 完成一条与 `cutlass::MatrixShape` 相关的声明。
+- **L132** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L133** <code>// Define the warp-level tensor op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L134** <code>using Type = cutlass::gemm::warp::MmaTensorOp&lt;</code> — **EN:** Introduces alias or imported name `Type = cutlass::gemm::warp::MmaTensorOp<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Type = cutlass::gemm::warp::MmaTensorOp<`，便于在当前作用域中复用。
+- **L135** <code>WarpShape_, float, LayoutA, float, LayoutB, float, LayoutC,</code> — **EN:** Continues the current implementation using `WarpShape_`, `float`, `LayoutA`, `float`. **CN:** 使用 `WarpShape_`, `float`, `LayoutA`, `float` 继续当前实现。
+- **L136** <code>Policy, PartitionsK, AccumulatorsInRowMajor&gt;;</code> — **EN:** Completes a declaration involving `Policy`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 完成一条与 `Policy`, `PartitionsK`, `AccumulatorsInRowMajor` 相关的声明。
+- **L137** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L138** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L139** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L140** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L141** <code>/// Partial Specialization - inputs and output types are float - uses TF32 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L142** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L143** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L144** <code>typename WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L145** <code>/// Shape of target matrix multiply instruction (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L146** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L147** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L148** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L149** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L150** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L151** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L152** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L153** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L154** <code>int PartitionsK,</code> — **EN:** Continues the current implementation using `PartitionsK`. **CN:** 使用 `PartitionsK` 继续当前实现。
+- **L155** <code>/// Store the accumulators in row major or column major.  Row major is used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L156** <code>/// when output layout is interleaved.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L157** <code>bool AccumulatorsInRowMajor&gt;</code> — **EN:** Continues the current implementation using `AccumulatorsInRowMajor`. **CN:** 使用 `AccumulatorsInRowMajor` 继续当前实现。
+- **L158** <code>struct DefaultMmaTensorOp&lt;</code> — **EN:** Declares struct `DefaultMmaTensorOp<`, which packages related data or policy behavior. **CN:** 声明结构体 `DefaultMmaTensorOp<`，用于组织相关数据或策略行为。
+- **L159** <code>WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L160** <code>InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L161** <code>float, LayoutA,</code> — **EN:** Continues the current implementation using `float`, `LayoutA`. **CN:** 使用 `float`, `LayoutA` 继续当前实现。
+- **L162** <code>float, LayoutB,</code> — **EN:** Continues the current implementation using `float`, `LayoutB`. **CN:** 使用 `float`, `LayoutB` 继续当前实现。
+- **L163** <code>float, LayoutC,</code> — **EN:** Continues the current implementation using `float`, `LayoutC`. **CN:** 使用 `float`, `LayoutC` 继续当前实现。
+- **L164** <code>arch::OpMultiplyAdd, PartitionsK, AccumulatorsInRowMajor&gt; {</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 使用 `arch::OpMultiplyAdd`, `PartitionsK`, `AccumulatorsInRowMajor` 继续当前实现。
+- **L165** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L166** <code>// Uses TF32 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L167** <code>using Policy = cutlass::gemm::warp::MmaTensorOpPolicy&lt;</code> — **EN:** Introduces alias or imported name `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<`，便于在当前作用域中复用。
+- **L168** <code>cutlass::arch::Mma&lt;</code> — **EN:** Continues the current implementation using `cutlass::arch::Mma`. **CN:** 使用 `cutlass::arch::Mma` 继续当前实现。
+- **L169** <code>InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L170** <code>32,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L171** <code>tfloat32_t, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `tfloat32_t`, `cutlass::layout::RowMajor`. **CN:** 使用 `tfloat32_t`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L172** <code>tfloat32_t, cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `tfloat32_t`, `cutlass::layout::ColumnMajor`. **CN:** 使用 `tfloat32_t`, `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L173** <code>float, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `float`, `cutlass::layout::RowMajor`. **CN:** 使用 `float`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L174** <code>arch::OpMultiplyAdd</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L175** <code>&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L176** <code>cutlass::MatrixShape&lt;1, 1&gt; &gt;;</code> — **EN:** Completes a declaration involving `cutlass::MatrixShape`. **CN:** 完成一条与 `cutlass::MatrixShape` 相关的声明。
+- **L177** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L178** <code>// Define the warp-level tensor op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L179** <code>using Type = cutlass::gemm::warp::MmaTensorOp&lt;</code> — **EN:** Introduces alias or imported name `Type = cutlass::gemm::warp::MmaTensorOp<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Type = cutlass::gemm::warp::MmaTensorOp<`，便于在当前作用域中复用。
+- **L180** <code>WarpShape_, float, LayoutA, float, LayoutB, float, LayoutC,</code> — **EN:** Continues the current implementation using `WarpShape_`, `float`, `LayoutA`, `float`. **CN:** 使用 `WarpShape_`, `float`, `LayoutA`, `float` 继续当前实现。
+- **L181** <code>Policy, PartitionsK, AccumulatorsInRowMajor&gt;;</code> — **EN:** Completes a declaration involving `Policy`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 完成一条与 `Policy`, `PartitionsK`, `AccumulatorsInRowMajor` 相关的声明。
+- **L182** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L183** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L184** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L185** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L186** <code>/// Partial Specialization - inputs and output types are float - uses TF32 for Fast Accurate FP32</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L187** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L188** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L189** <code>typename WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L190** <code>/// Shape of target matrix multiply instruction (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L191** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L192** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L193** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L194** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L195** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L196** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L197** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L198** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L199** <code>int PartitionsK,</code> — **EN:** Continues the current implementation using `PartitionsK`. **CN:** 使用 `PartitionsK` 继续当前实现。
+- **L200** <code>/// Store the accumulators in row major or column major.  Row major is used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L201** <code>/// when output layout is interleaved.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L202** <code>bool AccumulatorsInRowMajor&gt;</code> — **EN:** Continues the current implementation using `AccumulatorsInRowMajor`. **CN:** 使用 `AccumulatorsInRowMajor` 继续当前实现。
+- **L203** <code>struct DefaultMmaTensorOp&lt;</code> — **EN:** Declares struct `DefaultMmaTensorOp<`, which packages related data or policy behavior. **CN:** 声明结构体 `DefaultMmaTensorOp<`，用于组织相关数据或策略行为。
+- **L204** <code>WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L205** <code>InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L206** <code>float, LayoutA,</code> — **EN:** Continues the current implementation using `float`, `LayoutA`. **CN:** 使用 `float`, `LayoutA` 继续当前实现。
+- **L207** <code>float, LayoutB,</code> — **EN:** Continues the current implementation using `float`, `LayoutB`. **CN:** 使用 `float`, `LayoutB` 继续当前实现。
+- **L208** <code>float, LayoutC,</code> — **EN:** Continues the current implementation using `float`, `LayoutC`. **CN:** 使用 `float`, `LayoutC` 继续当前实现。
+- **L209** <code>arch::OpMultiplyAddFastF32, PartitionsK, AccumulatorsInRowMajor&gt; {</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAddFastF32`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 使用 `arch::OpMultiplyAddFastF32`, `PartitionsK`, `AccumulatorsInRowMajor` 继续当前实现。
+- **L210** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L211** <code>// Uses TF32 internally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L212** <code>using Policy = cutlass::gemm::warp::MmaTensorOpPolicy&lt;</code> — **EN:** Introduces alias or imported name `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<`，便于在当前作用域中复用。
+- **L213** <code>cutlass::arch::Mma&lt;</code> — **EN:** Continues the current implementation using `cutlass::arch::Mma`. **CN:** 使用 `cutlass::arch::Mma` 继续当前实现。
+- **L214** <code>InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L215** <code>32,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L216** <code>cutlass::tfloat32_t, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `cutlass::tfloat32_t`, `cutlass::layout::RowMajor`. **CN:** 使用 `cutlass::tfloat32_t`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L217** <code>cutlass::tfloat32_t, cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `cutlass::tfloat32_t`, `cutlass::layout::ColumnMajor`. **CN:** 使用 `cutlass::tfloat32_t`, `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L218** <code>float, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `float`, `cutlass::layout::RowMajor`. **CN:** 使用 `float`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L219** <code>arch::OpMultiplyAdd</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L220** <code>&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L221** <code>cutlass::MatrixShape&lt;1, 1&gt; &gt;;</code> — **EN:** Completes a declaration involving `cutlass::MatrixShape`. **CN:** 完成一条与 `cutlass::MatrixShape` 相关的声明。
+- **L222** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L223** <code>// Define the warp-level tensor op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L224** <code>using Type = cutlass::gemm::warp::MmaTensorOpFastF32&lt;</code> — **EN:** Introduces alias or imported name `Type = cutlass::gemm::warp::MmaTensorOpFastF32<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Type = cutlass::gemm::warp::MmaTensorOpFastF32<`，便于在当前作用域中复用。
+- **L225** <code>WarpShape_, float, LayoutA, float, LayoutB, float, LayoutC,</code> — **EN:** Continues the current implementation using `WarpShape_`, `float`, `LayoutA`, `float`. **CN:** 使用 `WarpShape_`, `float`, `LayoutA`, `float` 继续当前实现。
+- **L226** <code>Policy, PartitionsK, AccumulatorsInRowMajor&gt;;</code> — **EN:** Completes a declaration involving `Policy`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 完成一条与 `Policy`, `PartitionsK`, `AccumulatorsInRowMajor` 相关的声明。
+- **L227** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L228** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L229** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L230** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L231** <code>/// Partial Specialization - inputs are mixed types  - uses wider datatype internally.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L232** <code>/// (e.g. F16 &lt;= F16 x S8 + F16, F16 &lt;= BF16 x S8 + F32)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L233** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L234** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L235** <code>typename WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L236** <code>/// Element type of A matrix</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L237** <code>typename ElementA,</code> — **EN:** Continues the current implementation using `ElementA`. **CN:** 使用 `ElementA` 继续当前实现。
+- **L238** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L239** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L240** <code>/// Element type of B matrix</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L241** <code>typename ElementB,</code> — **EN:** Continues the current implementation using `ElementB`. **CN:** 使用 `ElementB` 继续当前实现。
+- **L242** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L243** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L244** <code>/// Element type of C matrix</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L245** <code>typename ElementC,</code> — **EN:** Continues the current implementation using `ElementC`. **CN:** 使用 `ElementC` 继续当前实现。
+- **L246** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L247** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L248** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L249** <code>int PartitionsK,</code> — **EN:** Continues the current implementation using `PartitionsK`. **CN:** 使用 `PartitionsK` 继续当前实现。
+- **L250** <code>/// Store the accumulators in row major or column major.  Row major is used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L251** <code>/// when output layout is interleaved.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L252** <code>bool AccumulatorsInRowMajor&gt;</code> — **EN:** Continues the current implementation using `AccumulatorsInRowMajor`. **CN:** 使用 `AccumulatorsInRowMajor` 继续当前实现。
+- **L253** <code>struct DefaultMmaTensorOp&lt;</code> — **EN:** Declares struct `DefaultMmaTensorOp<`, which packages related data or policy behavior. **CN:** 声明结构体 `DefaultMmaTensorOp<`，用于组织相关数据或策略行为。
+- **L254** <code>WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L255** <code>GemmShape&lt;16, 8, 16&gt;,                 // InstructionShape</code> — **EN:** Continues the current implementation using `GemmShape`, `InstructionShape`. **CN:** 使用 `GemmShape`, `InstructionShape` 继续当前实现。
+- **L256** <code>ElementA,                             // Element type of A matrix in Global Memory</code> — **EN:** Continues the current implementation using `ElementA`, `Element`, `type`, `of`. **CN:** 使用 `ElementA`, `Element`, `type`, `of` 继续当前实现。
+- **L257** <code>LayoutA,                              // Layout of A matrix in Global Memory</code> — **EN:** Continues the current implementation using `LayoutA`, `Layout`, `of`, `A`. **CN:** 使用 `LayoutA`, `Layout`, `of`, `A` 继续当前实现。
+- **L258** <code>ElementB,                             // Element type of B matrix in Global Memory</code> — **EN:** Continues the current implementation using `ElementB`, `Element`, `type`, `of`. **CN:** 使用 `ElementB`, `Element`, `type`, `of` 继续当前实现。
+- **L259** <code>LayoutB,                              // Layout of B matrix in Global Memory</code> — **EN:** Continues the current implementation using `LayoutB`, `Layout`, `of`, `B`. **CN:** 使用 `LayoutB`, `Layout`, `of`, `B` 继续当前实现。
+- **L260** <code>ElementC,                             // Element type of C matrix in Global Memory</code> — **EN:** Continues the current implementation using `ElementC`, `Element`, `type`, `of`. **CN:** 使用 `ElementC`, `Element`, `type`, `of` 继续当前实现。
+- **L261** <code>LayoutC,                              // Layout of C matrix in Global Memory</code> — **EN:** Continues the current implementation using `LayoutC`, `Layout`, `of`, `C`. **CN:** 使用 `LayoutC`, `Layout`, `of`, `C` 继续当前实现。
+- **L262** <code>arch::OpMultiplyAddMixedInputUpcast,  // Tag to indicate mixed-input datatype, where narrower datatype is upcasted to wider datatype</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAddMixedInputUpcast`, `Tag`, `to`, `indicate`. **CN:** 使用 `arch::OpMultiplyAddMixedInputUpcast`, `Tag`, `to`, `indicate` 继续当前实现。
+- **L263** <code>PartitionsK, AccumulatorsInRowMajor&gt; {</code> — **EN:** Continues the current implementation using `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 使用 `PartitionsK`, `AccumulatorsInRowMajor` 继续当前实现。
+- **L264** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L265** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L266** <code>// Check if the ElementA and ElementB are of different data types</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L267** <code>static_assert(!platform::is_same&lt;ElementA, ElementB&gt;::value,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L268** <code>&quot;DefaultMmaTensorOp with arch::OpMultiplyAddMixedInputUpcast ElementA and ElementB cannot be of the same data type&quot;);</code> — **EN:** Completes a declaration involving `DefaultMmaTensorOp`, `with`, `arch::OpMultiplyAddMixedInputUpcast`. **CN:** 完成一条与 `DefaultMmaTensorOp`, `with`, `arch::OpMultiplyAddMixedInputUpcast` 相关的声明。
+- **L269** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L270** <code>// Data type used for internal computation - use the wider of the two data types for mma.sync operands</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L271** <code>using ElementOperand = typename platform::conditional&lt;(sizeof_bits&lt;ElementA&gt;::value &gt; sizeof_bits&lt;ElementB&gt;::value),</code> — **EN:** Introduces alias or imported name `ElementOperand = typename platform::conditional<(sizeof_bits<ElementA>::value > sizeof_bits<ElementB>::value),` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementOperand = typename platform::conditional<(sizeof_bits<ElementA>::value > sizeof_bits<ElementB>::value),`，便于在当前作用域中复用。
+- **L272** <code>ElementA, ElementB&gt;::type;</code> — **EN:** Completes a declaration involving `ElementA`, `ElementB`, `type`. **CN:** 完成一条与 `ElementA`, `ElementB`, `type` 相关的声明。
+- **L273** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L274** <code>// Operand datatypes in the internal MMA instruction - use the wider of the two data types</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L275** <code>using ElementAMma = ElementOperand;</code> — **EN:** Introduces alias or imported name `ElementAMma = ElementOperand` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementAMma = ElementOperand`，便于在当前作用域中复用。
+- **L276** <code>using ElementBMma = ElementOperand;</code> — **EN:** Introduces alias or imported name `ElementBMma = ElementOperand` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementBMma = ElementOperand`，便于在当前作用域中复用。
+- **L277** <code>using MmaElementC = ElementC;</code> — **EN:** Introduces alias or imported name `MmaElementC = ElementC` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaElementC = ElementC`，便于在当前作用域中复用。
+- **L278** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L279** <code>// Uses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L280** <code>using Policy = cutlass::gemm::warp::MmaTensorOpPolicy&lt;</code> — **EN:** Introduces alias or imported name `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<`，便于在当前作用域中复用。
+- **L281** <code>cutlass::arch::Mma&lt;</code> — **EN:** Continues the current implementation using `cutlass::arch::Mma`. **CN:** 使用 `cutlass::arch::Mma` 继续当前实现。
+- **L282** <code>GemmShape&lt;16, 8, 16&gt;,</code> — **EN:** Continues the current implementation using `GemmShape`. **CN:** 使用 `GemmShape` 继续当前实现。
+- **L283** <code>32,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L284** <code>ElementAMma, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `ElementAMma`, `cutlass::layout::RowMajor`. **CN:** 使用 `ElementAMma`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L285** <code>ElementBMma, cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `ElementBMma`, `cutlass::layout::ColumnMajor`. **CN:** 使用 `ElementBMma`, `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L286** <code>MmaElementC, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `MmaElementC`, `cutlass::layout::RowMajor`. **CN:** 使用 `MmaElementC`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L287** <code>arch::OpMultiplyAdd</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAdd`. **CN:** 使用 `arch::OpMultiplyAdd` 继续当前实现。
+- **L288** <code>&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L289** <code>cutlass::MatrixShape&lt;1, 1&gt; &gt;;</code> — **EN:** Completes a declaration involving `cutlass::MatrixShape`. **CN:** 完成一条与 `cutlass::MatrixShape` 相关的声明。
+- **L290** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L291** <code>// Define the warp-level tensor op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L292** <code>using Type = cutlass::gemm::warp::MmaMixedInputTensorOp&lt;</code> — **EN:** Introduces alias or imported name `Type = cutlass::gemm::warp::MmaMixedInputTensorOp<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Type = cutlass::gemm::warp::MmaMixedInputTensorOp<`，便于在当前作用域中复用。
+- **L293** <code>WarpShape_, ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code> — **EN:** Continues the current implementation using `WarpShape_`, `ElementA`, `LayoutA`, `ElementB`. **CN:** 使用 `WarpShape_`, `ElementA`, `LayoutA`, `ElementB` 继续当前实现。
+- **L294** <code>Policy, PartitionsK, AccumulatorsInRowMajor&gt;;</code> — **EN:** Completes a declaration involving `Policy`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 完成一条与 `Policy`, `PartitionsK`, `AccumulatorsInRowMajor` 相关的声明。
+- **L295** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L296** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L297** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L298** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L299** <code>/// Partial Specialization - inputs are mixed types  - uses wider datatype internally.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L300** <code>/// (e.g. S32 &lt;= S4 x S8 + S32, S32 &lt;= S8 x S4 + S32)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L301** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L302** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L303** <code>typename WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L304** <code>/// Element type of A matrix</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L305** <code>typename ElementA,</code> — **EN:** Continues the current implementation using `ElementA`. **CN:** 使用 `ElementA` 继续当前实现。
+- **L306** <code>/// Layout of A matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L307** <code>typename LayoutA,</code> — **EN:** Continues the current implementation using `LayoutA`. **CN:** 使用 `LayoutA` 继续当前实现。
+- **L308** <code>/// Element type of B matrix</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L309** <code>typename ElementB,</code> — **EN:** Continues the current implementation using `ElementB`. **CN:** 使用 `ElementB` 继续当前实现。
+- **L310** <code>/// Layout of B matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L311** <code>typename LayoutB,</code> — **EN:** Continues the current implementation using `LayoutB`. **CN:** 使用 `LayoutB` 继续当前实现。
+- **L312** <code>/// Element type of C matrix</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L313** <code>typename ElementC,</code> — **EN:** Continues the current implementation using `ElementC`. **CN:** 使用 `ElementC` 继续当前实现。
+- **L314** <code>/// Layout of C matrix (concept: MatrixLayout)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L315** <code>typename LayoutC,</code> — **EN:** Continues the current implementation using `LayoutC`. **CN:** 使用 `LayoutC` 继续当前实现。
+- **L316** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L317** <code>int PartitionsK,</code> — **EN:** Continues the current implementation using `PartitionsK`. **CN:** 使用 `PartitionsK` 继续当前实现。
+- **L318** <code>/// Store the accumulators in row major or column major.  Row major is used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L319** <code>/// when output layout is interleaved.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L320** <code>bool AccumulatorsInRowMajor&gt;</code> — **EN:** Continues the current implementation using `AccumulatorsInRowMajor`. **CN:** 使用 `AccumulatorsInRowMajor` 继续当前实现。
+- **L321** <code>struct DefaultMmaTensorOp&lt;</code> — **EN:** Declares struct `DefaultMmaTensorOp<`, which packages related data or policy behavior. **CN:** 声明结构体 `DefaultMmaTensorOp<`，用于组织相关数据或策略行为。
+- **L322** <code>WarpShape_,</code> — **EN:** Continues the current implementation using `WarpShape_`. **CN:** 使用 `WarpShape_` 继续当前实现。
+- **L323** <code>GemmShape&lt;16, 8, 32&gt;,                 // InstructionShape</code> — **EN:** Continues the current implementation using `GemmShape`, `InstructionShape`. **CN:** 使用 `GemmShape`, `InstructionShape` 继续当前实现。
+- **L324** <code>ElementA,                             // Element type of A matrix in Global Memory</code> — **EN:** Continues the current implementation using `ElementA`, `Element`, `type`, `of`. **CN:** 使用 `ElementA`, `Element`, `type`, `of` 继续当前实现。
+- **L325** <code>LayoutA,                              // Layout of A matrix in Global Memory</code> — **EN:** Continues the current implementation using `LayoutA`, `Layout`, `of`, `A`. **CN:** 使用 `LayoutA`, `Layout`, `of`, `A` 继续当前实现。
+- **L326** <code>ElementB,                             // Element type of B matrix in Global Memory</code> — **EN:** Continues the current implementation using `ElementB`, `Element`, `type`, `of`. **CN:** 使用 `ElementB`, `Element`, `type`, `of` 继续当前实现。
+- **L327** <code>LayoutB,                              // Layout of B matrix in Global Memory</code> — **EN:** Continues the current implementation using `LayoutB`, `Layout`, `of`, `B`. **CN:** 使用 `LayoutB`, `Layout`, `of`, `B` 继续当前实现。
+- **L328** <code>ElementC,                             // Element type of C matrix in Global Memory</code> — **EN:** Continues the current implementation using `ElementC`, `Element`, `type`, `of`. **CN:** 使用 `ElementC`, `Element`, `type`, `of` 继续当前实现。
+- **L329** <code>LayoutC,                              // Layout of C matrix in Global Memory</code> — **EN:** Continues the current implementation using `LayoutC`, `Layout`, `of`, `C`. **CN:** 使用 `LayoutC`, `Layout`, `of`, `C` 继续当前实现。
+- **L330** <code>arch::OpMultiplyAddMixedInputUpcast,  // Tag to indicate mixed-input datatype, where narrower datatype is upcasted to wider datatype</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAddMixedInputUpcast`, `Tag`, `to`, `indicate`. **CN:** 使用 `arch::OpMultiplyAddMixedInputUpcast`, `Tag`, `to`, `indicate` 继续当前实现。
+- **L331** <code>PartitionsK, AccumulatorsInRowMajor&gt; {</code> — **EN:** Continues the current implementation using `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 使用 `PartitionsK`, `AccumulatorsInRowMajor` 继续当前实现。
+- **L332** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L333** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L334** <code>// Check if the ElementA and ElementB are of different data types</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L335** <code>static_assert(!platform::is_same&lt;ElementA, ElementB&gt;::value,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L336** <code>&quot;DefaultMmaTensorOp with arch::OpMultiplyAddMixedInputUpcast ElementA and ElementB cannot be of the same data type&quot;);</code> — **EN:** Completes a declaration involving `DefaultMmaTensorOp`, `with`, `arch::OpMultiplyAddMixedInputUpcast`. **CN:** 完成一条与 `DefaultMmaTensorOp`, `with`, `arch::OpMultiplyAddMixedInputUpcast` 相关的声明。
+- **L337** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L338** <code>// Data type used for internal computation - use the wider of the two data types for mma.sync operands</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L339** <code>using ElementOperand = typename platform::conditional&lt;(sizeof_bits&lt;ElementA&gt;::value &gt; sizeof_bits&lt;ElementB&gt;::value),</code> — **EN:** Introduces alias or imported name `ElementOperand = typename platform::conditional<(sizeof_bits<ElementA>::value > sizeof_bits<ElementB>::value),` for easier reuse in this scope. **CN:** 引入别名或导入名 `ElementOperand = typename platform::conditional<(sizeof_bits<ElementA>::value > sizeof_bits<ElementB>::value),`，便于在当前作用域中复用。
+- **L340** <code>ElementA, ElementB&gt;::type;</code> — **EN:** Completes a declaration involving `ElementA`, `ElementB`, `type`. **CN:** 完成一条与 `ElementA`, `ElementB`, `type` 相关的声明。
+- **L341** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L342** <code>// Operand datatypes in the internal MMA instruction - use the wider of the two data types</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L343** <code>using MmaElementA = ElementOperand;</code> — **EN:** Introduces alias or imported name `MmaElementA = ElementOperand` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaElementA = ElementOperand`，便于在当前作用域中复用。
+- **L344** <code>using MmaElementB = ElementOperand;</code> — **EN:** Introduces alias or imported name `MmaElementB = ElementOperand` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaElementB = ElementOperand`，便于在当前作用域中复用。
+- **L345** <code>using MmaElementC = ElementC;</code> — **EN:** Introduces alias or imported name `MmaElementC = ElementC` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaElementC = ElementC`，便于在当前作用域中复用。
+- **L346** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L347** <code>// Uses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L348** <code>using Policy = cutlass::gemm::warp::MmaTensorOpPolicy&lt;</code> — **EN:** Introduces alias or imported name `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Policy = cutlass::gemm::warp::MmaTensorOpPolicy<`，便于在当前作用域中复用。
+- **L349** <code>cutlass::arch::Mma&lt;</code> — **EN:** Continues the current implementation using `cutlass::arch::Mma`. **CN:** 使用 `cutlass::arch::Mma` 继续当前实现。
+- **L350** <code>GemmShape&lt;16, 8, 32&gt;,</code> — **EN:** Continues the current implementation using `GemmShape`. **CN:** 使用 `GemmShape` 继续当前实现。
+- **L351** <code>32,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L352** <code>MmaElementA, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `MmaElementA`, `cutlass::layout::RowMajor`. **CN:** 使用 `MmaElementA`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L353** <code>MmaElementB, cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `MmaElementB`, `cutlass::layout::ColumnMajor`. **CN:** 使用 `MmaElementB`, `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L354** <code>MmaElementC, cutlass::layout::RowMajor,</code> — **EN:** Continues the current implementation using `MmaElementC`, `cutlass::layout::RowMajor`. **CN:** 使用 `MmaElementC`, `cutlass::layout::RowMajor` 继续当前实现。
+- **L355** <code>arch::OpMultiplyAddSaturate</code> — **EN:** Continues the current implementation using `arch::OpMultiplyAddSaturate`. **CN:** 使用 `arch::OpMultiplyAddSaturate` 继续当前实现。
+- **L356** <code>&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L357** <code>cutlass::MatrixShape&lt;1, 1&gt; &gt;;</code> — **EN:** Completes a declaration involving `cutlass::MatrixShape`. **CN:** 完成一条与 `cutlass::MatrixShape` 相关的声明。
+- **L358** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L359** <code>// Define the warp-level tensor op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L360** <code>using Type = cutlass::gemm::warp::MmaMixedInputTensorOp&lt;</code> — **EN:** Introduces alias or imported name `Type = cutlass::gemm::warp::MmaMixedInputTensorOp<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Type = cutlass::gemm::warp::MmaMixedInputTensorOp<`，便于在当前作用域中复用。
+- **L361** <code>WarpShape_, ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code> — **EN:** Continues the current implementation using `WarpShape_`, `ElementA`, `LayoutA`, `ElementB`. **CN:** 使用 `WarpShape_`, `ElementA`, `LayoutA`, `ElementB` 继续当前实现。
+- **L362** <code>Policy, PartitionsK, AccumulatorsInRowMajor&gt;;</code> — **EN:** Completes a declaration involving `Policy`, `PartitionsK`, `AccumulatorsInRowMajor`. **CN:** 完成一条与 `Policy`, `PartitionsK`, `AccumulatorsInRowMajor` 相关的声明。
+- **L363** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L364** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L365** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L366** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L367** <code>} // namespace warp</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L368** <code>} // namespace gemm</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L369** <code>} // namespace cutlass</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L370** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L371** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L372** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L373** <code>#include &quot;cutlass/gemm/warp/mma_complex_tensor_op_tile_iterator_sm80.h&quot;</code> — **EN:** Includes `cutlass/gemm/warp/mma_complex_tensor_op_tile_iterator_sm80.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/warp/mma_complex_tensor_op_tile_iterator_sm80.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L374** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L375** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+
+## Key Concepts / 关键概念
+
+- **EN:** Theme: this header focuses on default SM80 Tensor Core MMA configuration.
+  **CN:** 主题：该头文件重点处理默认的 SM80 Tensor Core MMA 配置。
+- **EN:** Primary declarations include `DefaultMmaTensorOp`, `Policy`, `Type`, `ElementOperand`, `ElementAMma`, `ElementBMma`.
+  **CN:** 主要声明包括 `DefaultMmaTensorOp`、`Policy`、`Type`、`ElementOperand`、`ElementAMma`、`ElementBMma`。
+- **EN:** Main namespaces: `cutlass`, `gemm`, `warp`.
+  **CN:** 主要命名空间：`cutlass`、`gemm`、`warp`。
+
+## Dependencies / 依赖关系
+
+- `cutlass/cutlass.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/numeric_types.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/arch/mma.h` — **EN:** Provides architecture-specific instruction, memory, or pipeline primitives. **CN:** 提供 架构相关的指令、内存或流水线原语。
+- `cutlass/gemm/warp/mma_tensor_op.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/gemm/warp/mma_mixed_input_tensor_op.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/gemm/warp/mma_tensor_op_fast_f32.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/gemm/warp/default_mma_tensor_op.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/gemm/warp/mma_complex_tensor_op_tile_iterator_sm80.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。

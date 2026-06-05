@@ -1,0 +1,3019 @@
+# default_deconv2d.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/kernel/default_deconv2d.h`
+**Purpose / 用途**: Defines a kernel for Deconv2d. / 提供kernel 级配置、默认模板配置、2D 卷积支持、反卷积支持。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 32 / 第 32 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 33 / 第 33 行** — `    \brief `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 34 / 第 34 行** — `    Default kernel-level implicit GEMM convolution definitions combine threadblock-scoped `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 35 / 第 35 行** — `      matrix multiply-add with the appropriate threadblock-scoped epilogue.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 36 / 第 36 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 37 / 第 37 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 38 / 第 38 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 39 / 第 39 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 40 / 第 40 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 41 / 第 41 行** — `#include "cutlass/conv/kernel/default_conv2d.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/kernel/default_conv2d.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/kernel/default_conv2d.h`。
+- **Line 42 / 第 42 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 43 / 第 43 行** — `#include "cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_analytic.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_analytic.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_analytic.h`。
+- **Line 44 / 第 44 行** — `#include "cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h" `
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h`。
+- **Line 45 / 第 45 行** — `#include "cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_analytic.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_analytic.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_analytic.h`。
+- **Line 46 / 第 46 行** — `#include "cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_optimized.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_optimized.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_optimized.h`。
+- **Line 47 / 第 47 行** — `#include "cutlass/conv/threadblock/conv2d_tile_iterator.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/threadblock/conv2d_tile_iterator.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_tile_iterator.h`。
+- **Line 48 / 第 48 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 49 / 第 49 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 52 / 第 52 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 53 / 第 53 行** — `namespace kernel {`
+  - **EN**: Opens namespace `kernel` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `kernel`。
+- **Line 54 / 第 54 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 55 / 第 55 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 56 / 第 56 行** — `/// Defines a kernel for Deconv2d`
+  - **EN**: Inline comment explaining intent: `Defines a kernel for Deconv2d`.
+  - **CN**: 行内注释说明意图：`Defines a kernel for Deconv2d`。
+- **Line 57 / 第 57 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 58 / 第 58 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 59 / 第 59 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 60 / 第 60 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 61 / 第 61 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 62 / 第 62 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 63 / 第 63 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 64 / 第 64 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 65 / 第 65 行** — `  typename OperatorClass,`
+  - **EN**: Adds template parameter specifier `typename OperatorClass`.
+  - **CN**: 补充模板参数说明符 `typename OperatorClass`。
+- **Line 66 / 第 66 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 67 / 第 67 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 68 / 第 68 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 69 / 第 69 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 70 / 第 70 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 71 / 第 71 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 72 / 第 72 行** — `  int Stages,`
+  - **EN**: Adds template parameter specifier `int Stages`.
+  - **CN**: 补充模板参数说明符 `int Stages`。
+- **Line 73 / 第 73 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 74 / 第 74 行** — `  conv::IteratorAlgorithm IteratorAlgorithm = IteratorAlgorithm::kOptimized,`
+  - **EN**: Adds template parameter specifier `conv::IteratorAlgorithm IteratorAlgorithm = IteratorAlgorithm::kOptimized`.
+  - **CN**: 补充模板参数说明符 `conv::IteratorAlgorithm IteratorAlgorithm = IteratorAlgorithm::kOptimized`。
+- **Line 75 / 第 75 行** — `  conv::StrideSupport StrideSupport = StrideSupport::kStrided,`
+  - **EN**: Adds template parameter specifier `conv::StrideSupport StrideSupport = StrideSupport::kStrided`.
+  - **CN**: 补充模板参数说明符 `conv::StrideSupport StrideSupport = StrideSupport::kStrided`。
+- **Line 76 / 第 76 行** — `  /// Access granularity of A matrix in units of elements`
+  - **EN**: Adds template parameter specifier `/// Access granularity of A matrix in units of elements`.
+  - **CN**: 补充模板参数说明符 `/// Access granularity of A matrix in units of elements`。
+- **Line 77 / 第 77 行** — `  int AlignmentA = 128 / cutlass::sizeof_bits<ElementA>::value,`
+  - **EN**: Adds template parameter specifier `int AlignmentA = 128 / cutlass::sizeof_bits<ElementA>::value`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA = 128 / cutlass::sizeof_bits<ElementA>::value`。
+- **Line 78 / 第 78 行** — `  /// Access granularity of B matrix in units of elements`
+  - **EN**: Adds template parameter specifier `/// Access granularity of B matrix in units of elements`.
+  - **CN**: 补充模板参数说明符 `/// Access granularity of B matrix in units of elements`。
+- **Line 79 / 第 79 行** — `  int AlignmentB = 128 / cutlass::sizeof_bits<ElementB>::value`
+  - **EN**: Adds template parameter specifier `int AlignmentB = 128 / cutlass::sizeof_bits<ElementB>::value`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB = 128 / cutlass::sizeof_bits<ElementB>::value`。
+- **Line 80 / 第 80 行** — `> struct DefaultDeconv2d;`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 81 / 第 81 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 82 / 第 82 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 83 / 第 83 行** — `//                            OpClassSimt convolutions `
+  - **EN**: Inline comment explaining intent: `OpClassSimt convolutions`.
+  - **CN**: 行内注释说明意图：`OpClassSimt convolutions`。
+- **Line 84 / 第 84 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 85 / 第 85 行** — `/// Defines a kernel for Deconv2d specialization for Analytic IteratorAlgorithm, `
+  - **EN**: Inline comment explaining intent: `Defines a kernel for Deconv2d specialization for Analytic IteratorAlgorithm,`.
+  - **CN**: 行内注释说明意图：`Defines a kernel for Deconv2d specialization for Analytic IteratorAlgorithm,`。
+- **Line 86 / 第 86 行** — `/// multi-stage pipeline, and FFMA-based mainloop for SM80`
+  - **EN**: Inline comment explaining intent: `multi-stage pipeline, and FFMA-based mainloop for SM80`.
+  - **CN**: 行内注释说明意图：`multi-stage pipeline, and FFMA-based mainloop for SM80`。
+- **Line 87 / 第 87 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 88 / 第 88 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 89 / 第 89 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 90 / 第 90 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 91 / 第 91 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 92 / 第 92 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 93 / 第 93 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 94 / 第 94 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 95 / 第 95 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 96 / 第 96 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 97 / 第 97 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 98 / 第 98 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 99 / 第 99 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 100 / 第 100 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 101 / 第 101 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 102 / 第 102 行** — `  int Stages,`
+  - **EN**: Adds template parameter specifier `int Stages`.
+  - **CN**: 补充模板参数说明符 `int Stages`。
+- **Line 103 / 第 103 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 104 / 第 104 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 105 / 第 105 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 106 / 第 106 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 107 / 第 107 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 108 / 第 108 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 109 / 第 109 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 110 / 第 110 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 111 / 第 111 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 112 / 第 112 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 113 / 第 113 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 114 / 第 114 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 115 / 第 115 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 116 / 第 116 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 117 / 第 117 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 118 / 第 118 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 119 / 第 119 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 120 / 第 120 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 121 / 第 121 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 122 / 第 122 行** — `  Stages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 123 / 第 123 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 124 / 第 124 行** — `  IteratorAlgorithm::kAnalytic,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 125 / 第 125 行** — `  conv::StrideSupport::kUnity,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 126 / 第 126 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 127 / 第 127 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 128 / 第 128 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 129 / 第 129 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 130 / 第 130 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 131 / 第 131 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 132 / 第 132 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 133 / 第 133 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 134 / 第 134 行** — `      Stages, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 135 / 第 135 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 136 / 第 136 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 137 / 第 137 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 138 / 第 138 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 139 / 第 139 行** — `    cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 140 / 第 140 行** — `      cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 141 / 第 141 行** — `      ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 142 / 第 142 行** — `      ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 143 / 第 143 行** — `      conv::StrideSupport::kUnity`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 144 / 第 144 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 145 / 第 145 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 146 / 第 146 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 147 / 第 147 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 148 / 第 148 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 149 / 第 149 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 150 / 第 150 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 151 / 第 151 行** — `    cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 152 / 第 152 行** — `      cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 153 / 第 153 行** — `      ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 154 / 第 154 行** — `      ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 155 / 第 155 行** — `      cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 156 / 第 156 行** — `      conv::GroupMode::kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 157 / 第 157 行** — `      true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 158 / 第 158 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 159 / 第 159 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 160 / 第 160 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 161 / 第 161 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 162 / 第 162 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 163 / 第 163 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 164 / 第 164 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 165 / 第 165 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 166 / 第 166 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 167 / 第 167 行** — `  using Mma = threadblock::ImplicitGemmMultistage<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 168 / 第 168 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 169 / 第 169 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 170 / 第 170 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 171 / 第 171 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 172 / 第 172 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 173 / 第 173 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 174 / 第 174 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 175 / 第 175 行** — `    MmaPolicy,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 176 / 第 176 行** — `    Stages `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 177 / 第 177 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 178 / 第 178 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 179 / 第 179 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 180 / 第 180 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimt<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 181 / 第 181 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 182 / 第 182 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 183 / 第 183 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 184 / 第 184 行** — `    EpilogueOutputOp::kCount,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 185 / 第 185 行** — `    false,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 186 / 第 186 行** — `    layout::NoPermute,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 187 / 第 187 行** — `    StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 188 / 第 188 行** — `    4`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 189 / 第 189 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 190 / 第 190 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 191 / 第 191 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 192 / 第 192 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolution<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 193 / 第 193 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 194 / 第 194 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 195 / 第 195 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 196 / 第 196 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 197 / 第 197 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 198 / 第 198 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 199 / 第 199 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 200 / 第 200 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 201 / 第 201 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 202 / 第 202 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 203 / 第 203 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 204 / 第 204 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 205 / 第 205 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 206 / 第 206 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 207 / 第 207 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 208 / 第 208 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 209 / 第 209 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 210 / 第 210 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 211 / 第 211 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 212 / 第 212 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 213 / 第 213 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 214 / 第 214 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 215 / 第 215 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 216 / 第 216 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 217 / 第 217 行** — `  int Stages,`
+  - **EN**: Adds template parameter specifier `int Stages`.
+  - **CN**: 补充模板参数说明符 `int Stages`。
+- **Line 218 / 第 218 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 219 / 第 219 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 220 / 第 220 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 221 / 第 221 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 222 / 第 222 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 223 / 第 223 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 224 / 第 224 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 225 / 第 225 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 226 / 第 226 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 227 / 第 227 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 228 / 第 228 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 229 / 第 229 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 230 / 第 230 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 231 / 第 231 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 232 / 第 232 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 233 / 第 233 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 234 / 第 234 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 235 / 第 235 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 236 / 第 236 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 237 / 第 237 行** — `  Stages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 238 / 第 238 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 239 / 第 239 行** — `  IteratorAlgorithm::kAnalytic,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 240 / 第 240 行** — `  conv::StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 241 / 第 241 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 242 / 第 242 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 243 / 第 243 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 244 / 第 244 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 245 / 第 245 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 246 / 第 246 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 247 / 第 247 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 248 / 第 248 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 249 / 第 249 行** — `      Stages, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 250 / 第 250 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 251 / 第 251 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 252 / 第 252 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 253 / 第 253 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 254 / 第 254 行** — `    cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 255 / 第 255 行** — `      cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 256 / 第 256 行** — `      ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 257 / 第 257 行** — `      ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 258 / 第 258 行** — `      conv::StrideSupport::kStrided`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 259 / 第 259 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 260 / 第 260 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 261 / 第 261 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 262 / 第 262 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 263 / 第 263 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 264 / 第 264 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 265 / 第 265 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 266 / 第 266 行** — `    cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 267 / 第 267 行** — `      cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 268 / 第 268 行** — `      ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 269 / 第 269 行** — `      ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 270 / 第 270 行** — `      cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 271 / 第 271 行** — `      conv::GroupMode::kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 272 / 第 272 行** — `      true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 273 / 第 273 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 274 / 第 274 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 275 / 第 275 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 276 / 第 276 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 277 / 第 277 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 278 / 第 278 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 279 / 第 279 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 280 / 第 280 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 281 / 第 281 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 282 / 第 282 行** — `  using Mma = threadblock::ImplicitGemmMultistage<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 283 / 第 283 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 284 / 第 284 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 285 / 第 285 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 286 / 第 286 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 287 / 第 287 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 288 / 第 288 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 289 / 第 289 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 290 / 第 290 行** — `    MmaPolicy,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 291 / 第 291 行** — `    Stages `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 292 / 第 292 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 293 / 第 293 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 294 / 第 294 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 295 / 第 295 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimtStridedDgrad<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 296 / 第 296 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 297 / 第 297 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 298 / 第 298 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 299 / 第 299 行** — `    EpilogueOutputOp::kCount`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 300 / 第 300 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 301 / 第 301 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 302 / 第 302 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 303 / 第 303 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolutionStridedDgrad<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 304 / 第 304 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 305 / 第 305 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 306 / 第 306 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 307 / 第 307 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 308 / 第 308 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 309 / 第 309 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 310 / 第 310 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 311 / 第 311 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 312 / 第 312 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 313 / 第 313 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 314 / 第 314 行** — `/// Defines a kernel for Deconv2d specialization for Optimized IteratorAlgorithm, `
+  - **EN**: Inline comment explaining intent: `Defines a kernel for Deconv2d specialization for Optimized IteratorAlgorithm,`.
+  - **CN**: 行内注释说明意图：`Defines a kernel for Deconv2d specialization for Optimized IteratorAlgorithm,`。
+- **Line 315 / 第 315 行** — `/// multi-stage pipeline, and FFMA-based mainloop for SM80`
+  - **EN**: Inline comment explaining intent: `multi-stage pipeline, and FFMA-based mainloop for SM80`.
+  - **CN**: 行内注释说明意图：`multi-stage pipeline, and FFMA-based mainloop for SM80`。
+- **Line 316 / 第 316 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 317 / 第 317 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 318 / 第 318 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 319 / 第 319 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 320 / 第 320 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 321 / 第 321 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 322 / 第 322 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 323 / 第 323 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 324 / 第 324 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 325 / 第 325 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 326 / 第 326 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 327 / 第 327 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 328 / 第 328 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 329 / 第 329 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 330 / 第 330 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 331 / 第 331 行** — `  int Stages,`
+  - **EN**: Adds template parameter specifier `int Stages`.
+  - **CN**: 补充模板参数说明符 `int Stages`。
+- **Line 332 / 第 332 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 333 / 第 333 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 334 / 第 334 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 335 / 第 335 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 336 / 第 336 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 337 / 第 337 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 338 / 第 338 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 339 / 第 339 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 340 / 第 340 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 341 / 第 341 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 342 / 第 342 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 343 / 第 343 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 344 / 第 344 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 345 / 第 345 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 346 / 第 346 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 347 / 第 347 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 348 / 第 348 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 349 / 第 349 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 350 / 第 350 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 351 / 第 351 行** — `  Stages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 352 / 第 352 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 353 / 第 353 行** — `  IteratorAlgorithm::kOptimized,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 354 / 第 354 行** — `  StrideSupport::kUnity,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 355 / 第 355 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 356 / 第 356 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 357 / 第 357 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 358 / 第 358 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 359 / 第 359 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 360 / 第 360 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 361 / 第 361 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 362 / 第 362 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 363 / 第 363 行** — `      Stages, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 364 / 第 364 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 365 / 第 365 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 366 / 第 366 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 367 / 第 367 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 368 / 第 368 行** — `    cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 369 / 第 369 行** — `      cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 370 / 第 370 行** — `      ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 371 / 第 371 行** — `      ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 372 / 第 372 行** — `      StrideSupport::kUnity`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 373 / 第 373 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 374 / 第 374 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 375 / 第 375 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 376 / 第 376 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 377 / 第 377 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 378 / 第 378 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 379 / 第 379 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 380 / 第 380 行** — `    cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 381 / 第 381 行** — `      cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 382 / 第 382 行** — `      ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 383 / 第 383 行** — `      ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 384 / 第 384 行** — `      cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 385 / 第 385 行** — `      true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 386 / 第 386 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 387 / 第 387 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 388 / 第 388 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 389 / 第 389 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 390 / 第 390 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 391 / 第 391 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 392 / 第 392 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 393 / 第 393 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 394 / 第 394 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 395 / 第 395 行** — `  using Mma = threadblock::ImplicitGemmMultistage<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 396 / 第 396 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 397 / 第 397 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 398 / 第 398 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 399 / 第 399 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 400 / 第 400 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 401 / 第 401 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 402 / 第 402 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 403 / 第 403 行** — `    MmaPolicy,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 404 / 第 404 行** — `    Stages `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 405 / 第 405 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 406 / 第 406 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 407 / 第 407 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 408 / 第 408 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimt<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 409 / 第 409 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 410 / 第 410 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 411 / 第 411 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 412 / 第 412 行** — `    EpilogueOutputOp::kCount,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 413 / 第 413 行** — `    false,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 414 / 第 414 行** — `    layout::NoPermute,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 415 / 第 415 行** — `    StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 416 / 第 416 行** — `    4`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 417 / 第 417 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 418 / 第 418 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 419 / 第 419 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 420 / 第 420 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolution<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 421 / 第 421 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 422 / 第 422 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 423 / 第 423 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 424 / 第 424 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 425 / 第 425 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 426 / 第 426 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 427 / 第 427 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 428 / 第 428 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 429 / 第 429 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 430 / 第 430 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 431 / 第 431 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 432 / 第 432 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 433 / 第 433 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 434 / 第 434 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 435 / 第 435 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 436 / 第 436 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 437 / 第 437 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 438 / 第 438 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 439 / 第 439 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 440 / 第 440 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 441 / 第 441 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 442 / 第 442 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 443 / 第 443 行** — `  int Stages,`
+  - **EN**: Adds template parameter specifier `int Stages`.
+  - **CN**: 补充模板参数说明符 `int Stages`。
+- **Line 444 / 第 444 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 445 / 第 445 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 446 / 第 446 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 447 / 第 447 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 448 / 第 448 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 449 / 第 449 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 450 / 第 450 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 451 / 第 451 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 452 / 第 452 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 453 / 第 453 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 454 / 第 454 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 455 / 第 455 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 456 / 第 456 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 457 / 第 457 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 458 / 第 458 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 459 / 第 459 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 460 / 第 460 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 461 / 第 461 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 462 / 第 462 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 463 / 第 463 行** — `  Stages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 464 / 第 464 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 465 / 第 465 行** — `  IteratorAlgorithm::kOptimized,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 466 / 第 466 行** — `  conv::StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 467 / 第 467 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 468 / 第 468 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 469 / 第 469 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 470 / 第 470 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 471 / 第 471 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 472 / 第 472 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 473 / 第 473 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 474 / 第 474 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 475 / 第 475 行** — `      Stages, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 476 / 第 476 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 477 / 第 477 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 478 / 第 478 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 479 / 第 479 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 480 / 第 480 行** — `    cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 481 / 第 481 行** — `      cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 482 / 第 482 行** — `      ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 483 / 第 483 行** — `      ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 484 / 第 484 行** — `      conv::StrideSupport::kStrided`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 485 / 第 485 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 486 / 第 486 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 487 / 第 487 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 488 / 第 488 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 489 / 第 489 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 490 / 第 490 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 491 / 第 491 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 492 / 第 492 行** — `    cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 493 / 第 493 行** — `      cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 494 / 第 494 行** — `      ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 495 / 第 495 行** — `      ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 496 / 第 496 行** — `      cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 497 / 第 497 行** — `      true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 498 / 第 498 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 499 / 第 499 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 500 / 第 500 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 501 / 第 501 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 502 / 第 502 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 503 / 第 503 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 504 / 第 504 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 505 / 第 505 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 506 / 第 506 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 507 / 第 507 行** — `  using Mma = threadblock::ImplicitGemmMultistage<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 508 / 第 508 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 509 / 第 509 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 510 / 第 510 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 511 / 第 511 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 512 / 第 512 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 513 / 第 513 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 514 / 第 514 行** — `    arch::CacheOperation::Always,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 515 / 第 515 行** — `    MmaPolicy,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 516 / 第 516 行** — `    Stages `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 517 / 第 517 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 518 / 第 518 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 519 / 第 519 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 520 / 第 520 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimtStridedDgrad<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 521 / 第 521 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 522 / 第 522 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 523 / 第 523 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 524 / 第 524 行** — `    EpilogueOutputOp::kCount`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 525 / 第 525 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 526 / 第 526 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 527 / 第 527 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 528 / 第 528 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolutionStridedDgrad<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 529 / 第 529 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 530 / 第 530 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 531 / 第 531 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 532 / 第 532 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 533 / 第 533 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 534 / 第 534 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 535 / 第 535 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 536 / 第 536 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 537 / 第 537 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 538 / 第 538 行** — `/// Defines a kernel for Deconv2d specialization for Analytic IteratorAlgorithm, `
+  - **EN**: Inline comment explaining intent: `Defines a kernel for Deconv2d specialization for Analytic IteratorAlgorithm,`.
+  - **CN**: 行内注释说明意图：`Defines a kernel for Deconv2d specialization for Analytic IteratorAlgorithm,`。
+- **Line 539 / 第 539 行** — `/// 2 stage pipeline, and FFMA-based mainloop for SM50`
+  - **EN**: Inline comment explaining intent: `2 stage pipeline, and FFMA-based mainloop for SM50`.
+  - **CN**: 行内注释说明意图：`2 stage pipeline, and FFMA-based mainloop for SM50`。
+- **Line 540 / 第 540 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 541 / 第 541 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 542 / 第 542 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 543 / 第 543 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 544 / 第 544 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 545 / 第 545 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 546 / 第 546 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 547 / 第 547 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 548 / 第 548 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 549 / 第 549 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 550 / 第 550 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 551 / 第 551 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 552 / 第 552 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 553 / 第 553 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 554 / 第 554 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 555 / 第 555 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 556 / 第 556 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 557 / 第 557 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 558 / 第 558 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 559 / 第 559 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 560 / 第 560 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 561 / 第 561 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 562 / 第 562 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 563 / 第 563 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 564 / 第 564 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 565 / 第 565 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 566 / 第 566 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 567 / 第 567 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 568 / 第 568 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 569 / 第 569 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 570 / 第 570 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 571 / 第 571 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 572 / 第 572 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 573 / 第 573 行** — `  2,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 574 / 第 574 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 575 / 第 575 行** — `  IteratorAlgorithm::kAnalytic,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 576 / 第 576 行** — `  conv::StrideSupport::kUnity,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 577 / 第 577 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 578 / 第 578 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 579 / 第 579 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 580 / 第 580 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 581 / 第 581 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 582 / 第 582 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 583 / 第 583 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 584 / 第 584 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 585 / 第 585 行** — `      2, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 586 / 第 586 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 587 / 第 587 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 588 / 第 588 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 589 / 第 589 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 590 / 第 590 行** — `    cutlass::conv::threadblock::TileIterator<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 591 / 第 591 行** — `      cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 592 / 第 592 行** — `        cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 593 / 第 593 行** — `        ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 594 / 第 594 行** — `        ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 595 / 第 595 行** — `        conv::StrideSupport::kUnity`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 596 / 第 596 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 597 / 第 597 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 598 / 第 598 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 599 / 第 599 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 600 / 第 600 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 601 / 第 601 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 602 / 第 602 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 603 / 第 603 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 604 / 第 604 行** — `    cutlass::conv::threadblock::TileIterator<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 605 / 第 605 行** — `      cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 606 / 第 606 行** — `        cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 607 / 第 607 行** — `        ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 608 / 第 608 行** — `        ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 609 / 第 609 行** — `        cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 610 / 第 610 行** — `        conv::GroupMode::kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 611 / 第 611 行** — `        true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 612 / 第 612 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 613 / 第 613 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 614 / 第 614 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 615 / 第 615 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 616 / 第 616 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 617 / 第 617 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 618 / 第 618 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 619 / 第 619 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 620 / 第 620 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 621 / 第 621 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 622 / 第 622 行** — `  using Mma = threadblock::ImplicitGemmPipelined<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 623 / 第 623 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 624 / 第 624 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 625 / 第 625 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 626 / 第 626 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 627 / 第 627 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 628 / 第 628 行** — `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 629 / 第 629 行** — `    LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 630 / 第 630 行** — `    MmaPolicy`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 631 / 第 631 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 632 / 第 632 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 633 / 第 633 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 634 / 第 634 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimt<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 635 / 第 635 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 636 / 第 636 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 637 / 第 637 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 638 / 第 638 行** — `    EpilogueOutputOp::kCount,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 639 / 第 639 行** — `    false,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 640 / 第 640 行** — `    layout::NoPermute,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 641 / 第 641 行** — `    StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 642 / 第 642 行** — `    4`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 643 / 第 643 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 644 / 第 644 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 645 / 第 645 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 646 / 第 646 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolution<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 647 / 第 647 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 648 / 第 648 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 649 / 第 649 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 650 / 第 650 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 651 / 第 651 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 652 / 第 652 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 653 / 第 653 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 654 / 第 654 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 655 / 第 655 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 656 / 第 656 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 657 / 第 657 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 658 / 第 658 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 659 / 第 659 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 660 / 第 660 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 661 / 第 661 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 662 / 第 662 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 663 / 第 663 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 664 / 第 664 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 665 / 第 665 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 666 / 第 666 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 667 / 第 667 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 668 / 第 668 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 669 / 第 669 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 670 / 第 670 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 671 / 第 671 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 672 / 第 672 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 673 / 第 673 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 674 / 第 674 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 675 / 第 675 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 676 / 第 676 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 677 / 第 677 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 678 / 第 678 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 679 / 第 679 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 680 / 第 680 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 681 / 第 681 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 682 / 第 682 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 683 / 第 683 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 684 / 第 684 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 685 / 第 685 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 686 / 第 686 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 687 / 第 687 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 688 / 第 688 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 689 / 第 689 行** — `  2,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 690 / 第 690 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 691 / 第 691 行** — `  IteratorAlgorithm::kAnalytic,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 692 / 第 692 行** — `  conv::StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 693 / 第 693 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 694 / 第 694 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 695 / 第 695 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 696 / 第 696 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 697 / 第 697 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 698 / 第 698 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 699 / 第 699 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 700 / 第 700 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 701 / 第 701 行** — `      2, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 702 / 第 702 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 703 / 第 703 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 704 / 第 704 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 705 / 第 705 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 706 / 第 706 行** — `    cutlass::conv::threadblock::TileIteratorStridedDgrad<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 707 / 第 707 行** — `      cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 708 / 第 708 行** — `        cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 709 / 第 709 行** — `        ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 710 / 第 710 行** — `        ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 711 / 第 711 行** — `        conv::StrideSupport::kStrided`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 712 / 第 712 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 713 / 第 713 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 714 / 第 714 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 715 / 第 715 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 716 / 第 716 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 717 / 第 717 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 718 / 第 718 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 719 / 第 719 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 720 / 第 720 行** — `    cutlass::conv::threadblock::TileIteratorStridedDgrad<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 721 / 第 721 行** — `      cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorAnalytic<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 722 / 第 722 行** — `        cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 723 / 第 723 行** — `        ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 724 / 第 724 行** — `        ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 725 / 第 725 行** — `        cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 726 / 第 726 行** — `        conv::GroupMode::kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 727 / 第 727 行** — `        true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 728 / 第 728 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 729 / 第 729 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 730 / 第 730 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 731 / 第 731 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 732 / 第 732 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 733 / 第 733 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 734 / 第 734 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 735 / 第 735 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 736 / 第 736 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 737 / 第 737 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 738 / 第 738 行** — `  using Mma = threadblock::ImplicitGemmPipelined<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 739 / 第 739 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 740 / 第 740 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 741 / 第 741 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 742 / 第 742 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 743 / 第 743 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 744 / 第 744 行** — `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 745 / 第 745 行** — `    LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 746 / 第 746 行** — `    MmaPolicy`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 747 / 第 747 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 748 / 第 748 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 749 / 第 749 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 750 / 第 750 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimtStridedDgrad<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 751 / 第 751 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 752 / 第 752 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 753 / 第 753 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 754 / 第 754 行** — `    EpilogueOutputOp::kCount`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 755 / 第 755 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 756 / 第 756 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 757 / 第 757 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 758 / 第 758 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolutionStridedDgrad<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 759 / 第 759 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 760 / 第 760 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 761 / 第 761 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 762 / 第 762 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 763 / 第 763 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 764 / 第 764 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 765 / 第 765 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 766 / 第 766 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 767 / 第 767 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 768 / 第 768 行** — `/// Defines a kernel for Deconv2d specialization for Optimized IteratorAlgorithm, `
+  - **EN**: Inline comment explaining intent: `Defines a kernel for Deconv2d specialization for Optimized IteratorAlgorithm,`.
+  - **CN**: 行内注释说明意图：`Defines a kernel for Deconv2d specialization for Optimized IteratorAlgorithm,`。
+- **Line 769 / 第 769 行** — `/// 2 stage pipeline, and FFMA-based mainloop for SM50`
+  - **EN**: Inline comment explaining intent: `2 stage pipeline, and FFMA-based mainloop for SM50`.
+  - **CN**: 行内注释说明意图：`2 stage pipeline, and FFMA-based mainloop for SM50`。
+- **Line 770 / 第 770 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 771 / 第 771 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 772 / 第 772 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 773 / 第 773 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 774 / 第 774 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 775 / 第 775 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 776 / 第 776 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 777 / 第 777 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 778 / 第 778 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 779 / 第 779 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 780 / 第 780 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 781 / 第 781 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 782 / 第 782 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 783 / 第 783 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 784 / 第 784 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 785 / 第 785 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 786 / 第 786 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 787 / 第 787 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 788 / 第 788 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 789 / 第 789 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 790 / 第 790 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 791 / 第 791 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 792 / 第 792 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 793 / 第 793 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 794 / 第 794 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 795 / 第 795 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 796 / 第 796 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 797 / 第 797 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 798 / 第 798 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 799 / 第 799 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 800 / 第 800 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 801 / 第 801 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 802 / 第 802 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 803 / 第 803 行** — `  2,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 804 / 第 804 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 805 / 第 805 行** — `  IteratorAlgorithm::kOptimized,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 806 / 第 806 行** — `  StrideSupport::kUnity,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 807 / 第 807 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 808 / 第 808 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 809 / 第 809 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 810 / 第 810 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 811 / 第 811 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 812 / 第 812 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 813 / 第 813 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 814 / 第 814 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 815 / 第 815 行** — `      2, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 816 / 第 816 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 817 / 第 817 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 818 / 第 818 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 819 / 第 819 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 820 / 第 820 行** — `    cutlass::conv::threadblock::TileIterator<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 821 / 第 821 行** — `      cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 822 / 第 822 行** — `        cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 823 / 第 823 行** — `        ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 824 / 第 824 行** — `        ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 825 / 第 825 行** — `        StrideSupport::kUnity`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 826 / 第 826 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 827 / 第 827 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 828 / 第 828 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 829 / 第 829 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 830 / 第 830 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 831 / 第 831 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 832 / 第 832 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 833 / 第 833 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 834 / 第 834 行** — `    cutlass::conv::threadblock::TileIterator<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 835 / 第 835 行** — `      cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 836 / 第 836 行** — `        cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 837 / 第 837 行** — `        ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 838 / 第 838 行** — `        ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 839 / 第 839 行** — `        cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 840 / 第 840 行** — `        true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 841 / 第 841 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 842 / 第 842 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 843 / 第 843 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 844 / 第 844 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 845 / 第 845 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 846 / 第 846 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 847 / 第 847 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 848 / 第 848 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 849 / 第 849 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 850 / 第 850 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 851 / 第 851 行** — `  using Mma = threadblock::ImplicitGemmPipelined<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 852 / 第 852 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 853 / 第 853 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 854 / 第 854 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 855 / 第 855 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 856 / 第 856 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 857 / 第 857 行** — `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 858 / 第 858 行** — `    LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 859 / 第 859 行** — `    MmaPolicy`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 860 / 第 860 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 861 / 第 861 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 862 / 第 862 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 863 / 第 863 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimt<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 864 / 第 864 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 865 / 第 865 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 866 / 第 866 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 867 / 第 867 行** — `    EpilogueOutputOp::kCount,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 868 / 第 868 行** — `    false,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 869 / 第 869 行** — `    layout::NoPermute,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 870 / 第 870 行** — `    StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 871 / 第 871 行** — `    4`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 872 / 第 872 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 873 / 第 873 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 874 / 第 874 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 875 / 第 875 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolution<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 876 / 第 876 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 877 / 第 877 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 878 / 第 878 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 879 / 第 879 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 880 / 第 880 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 881 / 第 881 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 882 / 第 882 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 883 / 第 883 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 884 / 第 884 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 885 / 第 885 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 886 / 第 886 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 887 / 第 887 行** — `  typename LayoutA,`
+  - **EN**: Adds template parameter specifier `typename LayoutA`.
+  - **CN**: 补充模板参数说明符 `typename LayoutA`。
+- **Line 888 / 第 888 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 889 / 第 889 行** — `  typename LayoutB,`
+  - **EN**: Adds template parameter specifier `typename LayoutB`.
+  - **CN**: 补充模板参数说明符 `typename LayoutB`。
+- **Line 890 / 第 890 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 891 / 第 891 行** — `  typename LayoutC,`
+  - **EN**: Adds template parameter specifier `typename LayoutC`.
+  - **CN**: 补充模板参数说明符 `typename LayoutC`。
+- **Line 892 / 第 892 行** — `  typename ElementAccumulator,`
+  - **EN**: Adds template parameter specifier `typename ElementAccumulator`.
+  - **CN**: 补充模板参数说明符 `typename ElementAccumulator`。
+- **Line 893 / 第 893 行** — `  typename ArchTag,`
+  - **EN**: Adds template parameter specifier `typename ArchTag`.
+  - **CN**: 补充模板参数说明符 `typename ArchTag`。
+- **Line 894 / 第 894 行** — `  typename ThreadblockShape,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockShape`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockShape`。
+- **Line 895 / 第 895 行** — `  typename WarpShape,`
+  - **EN**: Adds template parameter specifier `typename WarpShape`.
+  - **CN**: 补充模板参数说明符 `typename WarpShape`。
+- **Line 896 / 第 896 行** — `  typename InstructionShape,`
+  - **EN**: Adds template parameter specifier `typename InstructionShape`.
+  - **CN**: 补充模板参数说明符 `typename InstructionShape`。
+- **Line 897 / 第 897 行** — `  typename EpilogueOutputOp,`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp`。
+- **Line 898 / 第 898 行** — `  typename ThreadblockSwizzle,`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle`。
+- **Line 899 / 第 899 行** — `  typename MathOperatorTag,`
+  - **EN**: Adds template parameter specifier `typename MathOperatorTag`.
+  - **CN**: 补充模板参数说明符 `typename MathOperatorTag`。
+- **Line 900 / 第 900 行** — `  int AlignmentA,`
+  - **EN**: Adds template parameter specifier `int AlignmentA`.
+  - **CN**: 补充模板参数说明符 `int AlignmentA`。
+- **Line 901 / 第 901 行** — `  int AlignmentB`
+  - **EN**: Adds template parameter specifier `int AlignmentB`.
+  - **CN**: 补充模板参数说明符 `int AlignmentB`。
+- **Line 902 / 第 902 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 903 / 第 903 行** — `struct DefaultDeconv2d <`
+  - **EN**: Declares struct `DefaultDeconv2d`.
+  - **CN**: 声明 struct `DefaultDeconv2d`。
+- **Line 904 / 第 904 行** — `  ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 905 / 第 905 行** — `  LayoutA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 906 / 第 906 行** — `  ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 907 / 第 907 行** — `  LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 908 / 第 908 行** — `  ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 909 / 第 909 行** — `  LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 910 / 第 910 行** — `  ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 911 / 第 911 行** — `  arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 912 / 第 912 行** — `  ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 913 / 第 913 行** — `  ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 914 / 第 914 行** — `  WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 915 / 第 915 行** — `  InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 916 / 第 916 行** — `  EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 917 / 第 917 行** — `  ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 918 / 第 918 行** — `  2,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 919 / 第 919 行** — `  MathOperatorTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 920 / 第 920 行** — `  IteratorAlgorithm::kOptimized,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 921 / 第 921 行** — `  conv::StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 922 / 第 922 行** — `  AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 923 / 第 923 行** — `  AlignmentB`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 924 / 第 924 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 925 / 第 925 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 926 / 第 926 行** — `  // Define the core components from GEMM`
+  - **EN**: Inline comment explaining intent: `Define the core components from GEMM`.
+  - **CN**: 行内注释说明意图：`Define the core components from GEMM`。
+- **Line 927 / 第 927 行** — `  using MmaCore = typename cutlass::gemm::threadblock::DefaultMmaCore<`
+  - **EN**: Introduces type or value alias `MmaCore`.
+  - **CN**: 引入类型或值别名 `MmaCore`。
+- **Line 928 / 第 928 行** — `      ThreadblockShape, WarpShape, InstructionShape, ElementA, layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 929 / 第 929 行** — `      ElementB, layout::ColumnMajor, ElementAccumulator, layout::RowMajor, arch::OpClassSimt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 930 / 第 930 行** — `      2, MathOperatorTag>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 931 / 第 931 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 932 / 第 932 行** — `  // Define iterators over tiles from the A operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the A operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the A operand`。
+- **Line 933 / 第 933 行** — `  using ThreadMapA = typename MmaCore::IteratorThreadMapA;`
+  - **EN**: Introduces type or value alias `ThreadMapA`.
+  - **CN**: 引入类型或值别名 `ThreadMapA`。
+- **Line 934 / 第 934 行** — `  using IteratorA =`
+  - **EN**: Introduces type or value alias `IteratorA`.
+  - **CN**: 引入类型或值别名 `IteratorA`。
+- **Line 935 / 第 935 行** — `    cutlass::conv::threadblock::TileIteratorStridedDgrad<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 936 / 第 936 行** — `      cutlass::conv::threadblock::Conv2dDgradOutputGradientTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 937 / 第 937 行** — `        cutlass::MatrixShape<ThreadblockShape::kM, ThreadblockShape::kK>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 938 / 第 938 行** — `        ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 939 / 第 939 行** — `        ThreadMapA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 940 / 第 940 行** — `        conv::StrideSupport::kStrided`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 941 / 第 941 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 942 / 第 942 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 943 / 第 943 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 944 / 第 944 行** — `  using SmemIteratorA = typename MmaCore::SmemIteratorA;`
+  - **EN**: Introduces type or value alias `SmemIteratorA`.
+  - **CN**: 引入类型或值别名 `SmemIteratorA`。
+- **Line 945 / 第 945 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 946 / 第 946 行** — `  // Define iterators over tiles from the B operand`
+  - **EN**: Inline comment explaining intent: `Define iterators over tiles from the B operand`.
+  - **CN**: 行内注释说明意图：`Define iterators over tiles from the B operand`。
+- **Line 947 / 第 947 行** — `  using ThreadMapB = typename MmaCore::IteratorThreadMapB;`
+  - **EN**: Introduces type or value alias `ThreadMapB`.
+  - **CN**: 引入类型或值别名 `ThreadMapB`。
+- **Line 948 / 第 948 行** — `  using IteratorB =`
+  - **EN**: Introduces type or value alias `IteratorB`.
+  - **CN**: 引入类型或值别名 `IteratorB`。
+- **Line 949 / 第 949 行** — `    cutlass::conv::threadblock::TileIteratorStridedDgrad<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 950 / 第 950 行** — `      cutlass::conv::threadblock::Conv2dFpropFilterTileAccessIteratorOptimized<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 951 / 第 951 行** — `        cutlass::MatrixShape<ThreadblockShape::kK, ThreadblockShape::kN>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 952 / 第 952 行** — `        ElementB, LayoutB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 953 / 第 953 行** — `        ThreadMapB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 954 / 第 954 行** — `        cutlass::AlignedArray<ElementB, ThreadMapB::kElementsPerAccess>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 955 / 第 955 行** — `        true /*IsDeconv*/`
+  - **EN**: Documentation/comment text: `true /*IsDeconv`.
+  - **CN**: 文档/注释内容：`true /*IsDeconv`。
+- **Line 956 / 第 956 行** — `      >`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 957 / 第 957 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 958 / 第 958 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 959 / 第 959 行** — `  using SmemIteratorB = typename MmaCore::SmemIteratorB;`
+  - **EN**: Introduces type or value alias `SmemIteratorB`.
+  - **CN**: 引入类型或值别名 `SmemIteratorB`。
+- **Line 960 / 第 960 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 961 / 第 961 行** — `  // Warp-level GEMM components`
+  - **EN**: Inline comment explaining intent: `Warp-level GEMM components`.
+  - **CN**: 行内注释说明意图：`Warp-level GEMM components`。
+- **Line 962 / 第 962 行** — `  using WarpMmaSimtOp = typename MmaCore::MmaWarpSimt;`
+  - **EN**: Introduces type or value alias `WarpMmaSimtOp`.
+  - **CN**: 引入类型或值别名 `WarpMmaSimtOp`。
+- **Line 963 / 第 963 行** — `  using MmaPolicy = typename MmaCore::MmaPolicy;`
+  - **EN**: Introduces type or value alias `MmaPolicy`.
+  - **CN**: 引入类型或值别名 `MmaPolicy`。
+- **Line 964 / 第 964 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 965 / 第 965 行** — `  // Define the Mma`
+  - **EN**: Inline comment explaining intent: `Define the Mma`.
+  - **CN**: 行内注释说明意图：`Define the Mma`。
+- **Line 966 / 第 966 行** — `  using Mma = threadblock::ImplicitGemmPipelined<`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 967 / 第 967 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 968 / 第 968 行** — `    IteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 969 / 第 969 行** — `    SmemIteratorA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 970 / 第 970 行** — `    IteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 971 / 第 971 行** — `    SmemIteratorB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 972 / 第 972 行** — `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 973 / 第 973 行** — `    LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 974 / 第 974 行** — `    MmaPolicy`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 975 / 第 975 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 976 / 第 976 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 977 / 第 977 行** — `  // Define the epilogue`
+  - **EN**: Inline comment explaining intent: `Define the epilogue`.
+  - **CN**: 行内注释说明意图：`Define the epilogue`。
+- **Line 978 / 第 978 行** — `  using Epilogue = typename epilogue::threadblock::DefaultEpilogueSimtStridedDgrad<`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 979 / 第 979 行** — `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 980 / 第 980 行** — `    WarpMmaSimtOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 981 / 第 981 行** — `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 982 / 第 982 行** — `    EpilogueOutputOp::kCount`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 983 / 第 983 行** — `  >::Epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 984 / 第 984 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 985 / 第 985 行** — `  // Define the kernel`
+  - **EN**: Inline comment explaining intent: `Define the kernel`.
+  - **CN**: 行内注释说明意图：`Define the kernel`。
+- **Line 986 / 第 986 行** — `  using Kernel = cutlass::conv::kernel::ImplicitGemmConvolutionStridedDgrad<`
+  - **EN**: Introduces type or value alias `Kernel`.
+  - **CN**: 引入类型或值别名 `Kernel`。
+- **Line 987 / 第 987 行** — `    Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 988 / 第 988 行** — `    Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 989 / 第 989 行** — `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 990 / 第 990 行** — `    conv::Operator::kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 991 / 第 991 行** — `  >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 992 / 第 992 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 993 / 第 993 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 994 / 第 994 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 995 / 第 995 行** — `} // namespace kernel`
+  - **EN**: Closes namespace `kernel`.
+  - **CN**: 关闭命名空间 `kernel`。
+- **Line 996 / 第 996 行** — `} // namespace conv`
+  - **EN**: Closes namespace `conv`.
+  - **CN**: 关闭命名空间 `conv`。
+- **Line 997 / 第 997 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 998 / 第 998 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 999 / 第 999 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/conv/kernel/default_conv2d.h` — CUTLASS convolution component `cutlass/conv/kernel/default_conv2d.h` / CUTLASS 卷积组件 `cutlass/conv/kernel/default_conv2d.h`
+- `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_analytic.h` — CUTLASS convolution component `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_analytic.h` / CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_analytic.h`
+- `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h` — CUTLASS convolution component `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h` / CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h`
+- `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_analytic.h` — CUTLASS convolution component `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_analytic.h` / CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_analytic.h`
+- `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_optimized.h` — CUTLASS convolution component `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_optimized.h` / CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_fprop_filter_tile_access_iterator_optimized.h`
+- `cutlass/conv/threadblock/conv2d_tile_iterator.h` — CUTLASS convolution component `cutlass/conv/threadblock/conv2d_tile_iterator.h` / CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_tile_iterator.h`

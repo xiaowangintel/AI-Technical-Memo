@@ -1,0 +1,155 @@
+# arguments.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/arguments.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (ArgumentBase) in `cutlass_cppgen.backend.arguments`.
+- CN: 该模块 `cutlass_cppgen.backend.arguments` 定义了 1 个类（ArgumentBase）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `from math import prod` — **EN:** Imports prod from `math`. **CN:** 从 `math` 导入 prod。
+- **L34** `from typing import Union` — **EN:** Imports Union from `typing`. **CN:** 从 `typing` 导入 Union。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L39** `cudart = lazy_import("cuda.cudart")` — **EN:** Assigns a value to cudart. **CN:** 将一个值赋给 cudart。
+- **L40** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L43** `from cutlass_cppgen.backend.frontend import CupyFrontend, NumpyFrontend, TorchFrontend` — **EN:** Imports CupyFrontend, NumpyFrontend, TorchFrontend from `cutlass_cppgen.backend.frontend`. **CN:** 从 `cutlass_cppgen.backend.frontend` 导入 CupyFrontend, NumpyFrontend, TorchFrontend。
+- **L44** `from cutlass_cppgen.backend.memory_manager import DevicePtrWrapper` — **EN:** Imports DevicePtrWrapper from `cutlass_cppgen.backend.memory_manager`. **CN:** 从 `cutlass_cppgen.backend.memory_manager` 导入 DevicePtrWrapper。
+- **L45** `from cutlass_cppgen.utils.datatypes import is_cupy_tensor, is_numpy_tensor, is_torch_tensor` — **EN:** Imports is_cupy_tensor, is_numpy_tensor, is_torch_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_cupy_tensor, is_numpy_tensor, is_torch_tensor。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `class ArgumentBase:` — **EN:** Defines class `ArgumentBase`. **CN:** 定义类 `ArgumentBase`。
+- **L49** `    """` — **EN:** Starts the docstring for the class `ArgumentBase`. **CN:** 开始说明 class `ArgumentBase` 的文档字符串。
+- **L50** `    Base class for operation arguments` — **EN:** Continues the docstring for the class `ArgumentBase`. **CN:** 继续说明 class `ArgumentBase` 的文档字符串。
+- **L51** `    """` — **EN:** Ends the docstring for the class `ArgumentBase`. **CN:** 结束说明 class `ArgumentBase` 的文档字符串。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L54** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `        A: "Union[cuda.CUdeviceptr, np.ndarray, torch.Tensor, cp.ndarray]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `        B: "Union[cuda.CUdeviceptr, np.ndarray, torch.Tensor, cp.ndarray]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `        C: "Union[cuda.CUdeviceptr, np.ndarray, torch.Tensor, cp.ndarray]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `        D: "Union[cuda.CUdeviceptr, np.ndarray, torch.Tensor, cp.ndarray]",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `        **kwargs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L61** `        # tensor_C can be interpreted as the bias with bias=True in keyword args` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L62** `        self.bias = kwargs.get("bias", False)` — **EN:** Assigns a value to self.bias. **CN:** 将一个值赋给 self.bias。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `        self.stream = kwargs.get("stream", cuda.CUstream(0))` — **EN:** Assigns a value to self.stream. **CN:** 将一个值赋给 self.stream。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `        # RMM buffers used to track tensor lifetime` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `        self.buffers = {}` — **EN:** Assigns a value to self.buffers. **CN:** 将一个值赋给 self.buffers。
+- **L68** `        # Host tensor to copy the computed result back` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L69** `        self.host_tensors = {}` — **EN:** Assigns a value to self.host_tensors. **CN:** 将一个值赋给 self.host_tensors。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `        self.ptr_A = self.tensor_to_ptr(A, "A")` — **EN:** Assigns a value to self.ptr_A. **CN:** 将一个值赋给 self.ptr_A。
+- **L72** `        self.ptr_B = self.tensor_to_ptr(B, "B")` — **EN:** Assigns a value to self.ptr_B. **CN:** 将一个值赋给 self.ptr_B。
+- **L73** `        self.ptr_C = self.tensor_to_ptr(C, "C")` — **EN:** Assigns a value to self.ptr_C. **CN:** 将一个值赋给 self.ptr_C。
+- **L74** `        self.ptr_D = self.tensor_to_ptr(D, "D", is_output=True)` — **EN:** Assigns a value to self.ptr_D. **CN:** 将一个值赋给 self.ptr_D。
+- **L75** `        if C is not None:` — **EN:** Starts a conditional branch guarded by `C is not None`. **CN:** 开始一个由 `C is not None` 控制的条件分支。
+- **L76** `            if not isinstance(C, cuda.CUdeviceptr):` — **EN:** Starts a conditional branch guarded by `not isinstance(C, cuda.CUdeviceptr)`. **CN:** 开始一个由 `not isinstance(C, cuda.CUdeviceptr)` 控制的条件分支。
+- **L77** `                self.tensor_c_numel = prod(C.shape)` — **EN:** Assigns a value to self.tensor_c_numel. **CN:** 将一个值赋给 self.tensor_c_numel。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    def tensor_to_ptr(self, tensor, name, is_output=False):` — **EN:** Defines function `tensor_to_ptr`. **CN:** 定义函数 `tensor_to_ptr`。
+- **L80** `        """` — **EN:** Starts the docstring for the function `tensor_to_ptr`. **CN:** 开始说明 function `tensor_to_ptr` 的文档字符串。
+- **L81** `        Convert and remember the input tensor to cuda.CUdeviceptr used by cuda python` — **EN:** Continues the docstring for the function `tensor_to_ptr`. **CN:** 继续说明 function `tensor_to_ptr` 的文档字符串。
+- **L82** `        For numpy.ndarray, it also remembers the host buffer for synchronization` — **EN:** Continues the docstring for the function `tensor_to_ptr`. **CN:** 继续说明 function `tensor_to_ptr` 的文档字符串。
+- **L83** `        """` — **EN:** Ends the docstring for the function `tensor_to_ptr`. **CN:** 结束说明 function `tensor_to_ptr` 的文档字符串。
+- **L84** `        if tensor is None:` — **EN:** Starts a conditional branch guarded by `tensor is None`. **CN:** 开始一个由 `tensor is None` 控制的条件分支。
+- **L85** `            return cuda.CUdeviceptr(0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L86** `        if is_numpy_tensor(tensor):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(tensor)`. **CN:** 开始一个由 `is_numpy_tensor(tensor)` 控制的条件分支。
+- **L87** `            if is_output:` — **EN:** Starts a conditional branch guarded by `is_output`. **CN:** 开始一个由 `is_output` 控制的条件分支。
+- **L88** `                assert name` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L89** `            self.buffers[name] = NumpyFrontend.argument(tensor, is_output)` — **EN:** Assigns a value to self.buffers[name]. **CN:** 将一个值赋给 self.buffers[name]。
+- **L90** `            if is_output:` — **EN:** Starts a conditional branch guarded by `is_output`. **CN:** 开始一个由 `is_output` 控制的条件分支。
+- **L91** `                self.host_tensors[name] = tensor` — **EN:** Assigns a value to self.host_tensors[name]. **CN:** 将一个值赋给 self.host_tensors[name]。
+- **L92** `            return self.buffers[name].ptr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** `        elif is_torch_tensor(tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L94** `            return TorchFrontend.argument(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L95** `        elif isinstance(tensor, cuda.CUdeviceptr):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L96** `            return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** `        elif is_cupy_tensor(tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L98** `            return CupyFrontend.argument(tensor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L100** `            raise TypeError("Unsupported Frontend. Only support numpy and torch")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def sync(self, stream_sync=True):` — **EN:** Defines function `sync`. **CN:** 定义函数 `sync`。
+- **L103** `        if stream_sync:` — **EN:** Starts a conditional branch guarded by `stream_sync`. **CN:** 开始一个由 `stream_sync` 控制的条件分支。
+- **L104** `            (err,) = cudart.cudaDeviceSynchronize()` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L105** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L106** `                raise RuntimeError("CUDA Error %s" % str(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `        for key in self.host_tensors.keys():` — **EN:** Starts a loop assigning items from `self.host_tensors.keys()` to `key`. **CN:** 开始一个循环，将 `self.host_tensors.keys()` 的元素赋给 `key`。
+- **L109** `            host_tensor = self.host_tensors[key]` — **EN:** Assigns a value to host_tensor. **CN:** 将一个值赋给 host_tensor。
+- **L110** `            (err,) = cuda.cuMemcpyDtoH(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L111** `                host_tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `                self.buffers[key].ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `                host_tensor.size * host_tensor.itemsize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L116** `                raise RuntimeError("CUDA Error %s" % str(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `        self.free()` — **EN:** Invokes `self.free` as a standalone call. **CN:** 以独立语句方式调用 `self.free`。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    def free(self):` — **EN:** Defines function `free`. **CN:** 定义函数 `free`。
+- **L121** `        """` — **EN:** Starts the docstring for the function `free`. **CN:** 开始说明 function `free` 的文档字符串。
+- **L122** `        Frees allocated device-side memory` — **EN:** Continues the docstring for the function `free`. **CN:** 继续说明 function `free` 的文档字符串。
+- **L123** `        """` — **EN:** Ends the docstring for the function `free`. **CN:** 结束说明 function `free` 的文档字符串。
+- **L124** `        # Free any device memory allocated manually` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `        if not cutlass_cppgen.use_rmm:` — **EN:** Starts a conditional branch guarded by `not cutlass_cppgen.use_rmm`. **CN:** 开始一个由 `not cutlass_cppgen.use_rmm` 控制的条件分支。
+- **L126** `            for name, buf in self.buffers.items():` — **EN:** Starts a loop assigning items from `self.buffers.items()` to `(name, buf)`. **CN:** 开始一个循环，将 `self.buffers.items()` 的元素赋给 `(name, buf)`。
+- **L127** `                if isinstance(buf, DevicePtrWrapper):` — **EN:** Starts a conditional branch guarded by `isinstance(buf, DevicePtrWrapper)`. **CN:** 开始一个由 `isinstance(buf, DevicePtrWrapper)` 控制的条件分支。
+- **L128** `                    err, = cudart.cudaFree(buf.ptr)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L129** `                    if err != cudart.cudaError_t.cudaSuccess:` — **EN:** Starts a conditional branch guarded by `err != cudart.cudaError_t.cudaSuccess`. **CN:** 开始一个由 `err != cudart.cudaError_t.cudaSuccess` 控制的条件分支。
+- **L130** `                        raise RuntimeError(f"cudaFree failed with error {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `            if hasattr(self, "workspace_buffer") and isinstance(self.workspace_buffer, DevicePtrWrapper):` — **EN:** Starts a conditional branch guarded by `hasattr(self, 'workspace_buffer') and isinstance(self.wor...`. **CN:** 开始一个由 `hasattr(self, 'workspace_buffer') and isinstance(self.wor...` 控制的条件分支。
+- **L133** `                err, = cudart.cudaFree(self.workspace_buffer.ptr)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L134** `                if err != cudart.cudaError_t.cudaSuccess:` — **EN:** Starts a conditional branch guarded by `err != cudart.cudaError_t.cudaSuccess`. **CN:** 开始一个由 `err != cudart.cudaError_t.cudaSuccess` 控制的条件分支。
+- **L135** `                    raise RuntimeError(f"cudaFree failed with error {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L136** `                del self.workspace_buffer` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.arguments`. CN: 模块名为 `cutlass_cppgen.backend.arguments`。
+- EN: Top-level classes: ArgumentBase CN: 顶层类包括：ArgumentBase
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen, cutlass_cppgen.backend.frontend:CupyFrontend,NumpyFrontend,TorchFrontend, cutlass_cppgen.backend.memory_manager:DevicePtrWrapper, cutlass_cppgen.utils.datatypes:is_cupy_tensor,is_numpy_tensor,is_torch_tensor CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_cppgen, cutlass_cppgen.backend.frontend:CupyFrontend,NumpyFrontend,TorchFrontend, cutlass_cppgen.backend.memory_manager:DevicePtrWrapper, cutlass_cppgen.utils.datatypes:is_cupy_tensor,is_numpy_tensor,is_torch_tensor
+- EN: External or standard-library dependencies: math:prod, typing:Union, numpy CN: 外部或标准库依赖：math:prod, typing:Union, numpy

@@ -1,0 +1,216 @@
+# arch.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/arch.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (ArchMeta, Arch) in `CuTeDSL.cutlass.base_dsl.arch`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.arch` 定义了 2 个类（ArchMeta, Arch）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from collections.abc import Callable` — **EN:** Imports Callable from `collections.abc`. **CN:** 从 `collections.abc` 导入 Callable。
+- **L13** `from enum import Enum, EnumMeta` — **EN:** Imports Enum, EnumMeta from `enum`. **CN:** 从 `enum` 导入 Enum, EnumMeta。
+- **L14** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L15** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `class ArchMeta(EnumMeta):` — **EN:** Defines class `ArchMeta` with bases EnumMeta. **CN:** 定义类 `ArchMeta`，其基类为 EnumMeta。
+- **L19** `    """` — **EN:** Starts the docstring for the class `ArchMeta`. **CN:** 开始说明 class `ArchMeta` 的文档字符串。
+- **L20** `    Custom metaclass for Arch enum that supports dynamic aliases based on CUDA version.` — **EN:** Continues the docstring for the class `ArchMeta`. **CN:** 继续说明 class `ArchMeta` 的文档字符串。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `    - If cuda_version >= 13.0: sm_101/sm_101a/sm_101f are aliases of sm_110/sm_110a/sm_110f, use sm_110 as the canonical name` — **EN:** Continues the docstring for the class `ArchMeta`. **CN:** 继续说明 class `ArchMeta` 的文档字符串。
+- **L23** `    - Otherwise: sm_110/sm_110a/sm_110f are aliases of sm_101/sm_101a/sm_101f, use sm_101 as the canonical name` — **EN:** Continues the docstring for the class `ArchMeta`. **CN:** 继续说明 class `ArchMeta` 的文档字符串。
+- **L24** `    """` — **EN:** Ends the docstring for the class `ArchMeta`. **CN:** 结束说明 class `ArchMeta` 的文档字符串。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `    _arch_aliases: dict[str, str] = {}` — **EN:** Assigns a typed value to _arch_aliases. **CN:** 为 _arch_aliases 赋予带类型标注的值。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `    def __new__(` — **EN:** Defines function `__new__`. **CN:** 定义函数 `__new__`。
+- **L29** `        mcs, name: str, bases: tuple[type, ...], namespace: dict[str, Any]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L30** `    ) -> "ArchMeta":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L31** `        cls = super().__new__(mcs, name, bases, namespace)  # type: ignore[arg-type]` — **EN:** Assigns a value to cls. **CN:** 将一个值赋给 cls。
+- **L32** `        from .version_info import CUDA_VERSION` — **EN:** Imports CUDA_VERSION from `.version_info`. **CN:** 从 `.version_info` 导入 CUDA_VERSION。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `        if CUDA_VERSION.major >= 13:` — **EN:** Starts a conditional branch guarded by `CUDA_VERSION.major >= 13`. **CN:** 开始一个由 `CUDA_VERSION.major >= 13` 控制的条件分支。
+- **L35** `            # sm_101 -> sm_110, use sm_110 as the canonical name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L36** `            mcs._arch_aliases = {` — **EN:** Assigns a value to mcs._arch_aliases. **CN:** 将一个值赋给 mcs._arch_aliases。
+- **L37** `                "sm_101": "sm_110",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `                "sm_101a": "sm_110a",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `                "sm_101f": "sm_110f",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L42** `            # sm_110 -> sm_101, use sm_101 as the canonical name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L43** `            mcs._arch_aliases = {` — **EN:** Assigns a value to mcs._arch_aliases. **CN:** 将一个值赋给 mcs._arch_aliases。
+- **L44** `                "sm_110": "sm_101",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `                "sm_110a": "sm_101a",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `                "sm_110f": "sm_101f",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `        return cls` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    def __getattribute__(cls, name: str) -> Any:` — **EN:** Defines function `__getattribute__`. **CN:** 定义函数 `__getattribute__`。
+- **L51** `        # Use type.__getattribute__ to avoid recursion when accessing _arch_aliases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L52** `        aliases = type.__getattribute__(cls, "_arch_aliases")` — **EN:** Assigns a value to aliases. **CN:** 将一个值赋给 aliases。
+- **L53** `        if name in aliases:` — **EN:** Starts a conditional branch guarded by `name in aliases`. **CN:** 开始一个由 `name in aliases` 控制的条件分支。
+- **L54** `            # Redirect to the target member` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L55** `            return type.__getattribute__(cls, aliases[name])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L56** `        return super().__getattribute__(name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `    def __getitem__(cls, name: str) -> "Arch":  # type: ignore[override]` — **EN:** Defines function `__getitem__`. **CN:** 定义函数 `__getitem__`。
+- **L59** `        # Support Arch["sm_101"] style access` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `        if name in cls._arch_aliases:` — **EN:** Starts a conditional branch guarded by `name in cls._arch_aliases`. **CN:** 开始一个由 `name in cls._arch_aliases` 控制的条件分支。
+- **L61** `            return super().__getitem__(cls._arch_aliases[name])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** `        return super().__getitem__(name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `class Arch(Enum, metaclass=ArchMeta):` — **EN:** Defines class `Arch` with bases Enum. **CN:** 定义类 `Arch`，其基类为 Enum。
+- **L66** `    # sm_arch = (major, minor, suffix)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `    # Ampere` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `    sm_80 = (8, 0, "")` — **EN:** Assigns a value to sm_80. **CN:** 将一个值赋给 sm_80。
+- **L69** `    sm_86 = (8, 6, "")` — **EN:** Assigns a value to sm_86. **CN:** 将一个值赋给 sm_86。
+- **L70** `    sm_87 = (8, 7, "")` — **EN:** Assigns a value to sm_87. **CN:** 将一个值赋给 sm_87。
+- **L71** `    # Ada` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `    sm_89 = (8, 9, "")` — **EN:** Assigns a value to sm_89. **CN:** 将一个值赋给 sm_89。
+- **L73** `    # Hopper` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L74** `    sm_90 = (9, 0, "")` — **EN:** Assigns a value to sm_90. **CN:** 将一个值赋给 sm_90。
+- **L75** `    sm_90a = (9, 0, "a")` — **EN:** Assigns a value to sm_90a. **CN:** 将一个值赋给 sm_90a。
+- **L76** `    # Blackwell` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L77** `    sm_100 = (10, 0, "")` — **EN:** Assigns a value to sm_100. **CN:** 将一个值赋给 sm_100。
+- **L78** `    sm_100a = (10, 0, "a")` — **EN:** Assigns a value to sm_100a. **CN:** 将一个值赋给 sm_100a。
+- **L79** `    sm_100f = (10, 0, "f")` — **EN:** Assigns a value to sm_100f. **CN:** 将一个值赋给 sm_100f。
+- **L80** `    sm_101 = (10, 1, "")` — **EN:** Assigns a value to sm_101. **CN:** 将一个值赋给 sm_101。
+- **L81** `    sm_101a = (10, 1, "a")` — **EN:** Assigns a value to sm_101a. **CN:** 将一个值赋给 sm_101a。
+- **L82** `    sm_101f = (10, 1, "f")` — **EN:** Assigns a value to sm_101f. **CN:** 将一个值赋给 sm_101f。
+- **L83** `    sm_103 = (10, 3, "")` — **EN:** Assigns a value to sm_103. **CN:** 将一个值赋给 sm_103。
+- **L84** `    sm_103a = (10, 3, "a")` — **EN:** Assigns a value to sm_103a. **CN:** 将一个值赋给 sm_103a。
+- **L85** `    sm_103f = (10, 3, "f")` — **EN:** Assigns a value to sm_103f. **CN:** 将一个值赋给 sm_103f。
+- **L86** `    sm_110 = (11, 0, "")` — **EN:** Assigns a value to sm_110. **CN:** 将一个值赋给 sm_110。
+- **L87** `    sm_110a = (11, 0, "a")` — **EN:** Assigns a value to sm_110a. **CN:** 将一个值赋给 sm_110a。
+- **L88** `    sm_110f = (11, 0, "f")` — **EN:** Assigns a value to sm_110f. **CN:** 将一个值赋给 sm_110f。
+- **L89** `    sm_120 = (12, 0, "")` — **EN:** Assigns a value to sm_120. **CN:** 将一个值赋给 sm_120。
+- **L90** `    sm_120a = (12, 0, "a")` — **EN:** Assigns a value to sm_120a. **CN:** 将一个值赋给 sm_120a。
+- **L91** `    sm_120f = (12, 0, "f")` — **EN:** Assigns a value to sm_120f. **CN:** 将一个值赋给 sm_120f。
+- **L92** `    sm_121 = (12, 1, "")` — **EN:** Assigns a value to sm_121. **CN:** 将一个值赋给 sm_121。
+- **L93** `    sm_121a = (12, 1, "a")` — **EN:** Assigns a value to sm_121a. **CN:** 将一个值赋给 sm_121a。
+- **L94** `    sm_121f = (12, 1, "f")` — **EN:** Assigns a value to sm_121f. **CN:** 将一个值赋给 sm_121f。
+- **L95** `    def __init__(self, major: int, minor: int, suffix: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L96** `        self.major = major` — **EN:** Assigns a value to self.major. **CN:** 将一个值赋给 self.major。
+- **L97** `        self.minor = minor` — **EN:** Assigns a value to self.minor. **CN:** 将一个值赋给 self.minor。
+- **L98** `        self.suffix = suffix` — **EN:** Assigns a value to self.suffix. **CN:** 将一个值赋给 self.suffix。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    # attributes to get arch list of specific families` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L101** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L102** `    def AmpereArchs(cls) -> tuple["Arch", ...]:` — **EN:** Defines function `AmpereArchs`. **CN:** 定义函数 `AmpereArchs`。
+- **L103** `        return (Arch.sm_80, Arch.sm_86, Arch.sm_87)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L106** `    def AdaArchs(cls) -> tuple["Arch", ...]:` — **EN:** Defines function `AdaArchs`. **CN:** 定义函数 `AdaArchs`。
+- **L107** `        return (Arch.sm_89,)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L110** `    def HopperArchs(cls) -> tuple["Arch", ...]:` — **EN:** Defines function `HopperArchs`. **CN:** 定义函数 `HopperArchs`。
+- **L111** `        return (Arch.sm_90, Arch.sm_90a)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L114** `    def BlackwellArchs(cls) -> tuple["Arch", ...]:` — **EN:** Defines function `BlackwellArchs`. **CN:** 定义函数 `BlackwellArchs`。
+- **L115** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** `            Arch.sm_100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `            Arch.sm_100a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `            Arch.sm_100f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `            Arch.sm_101,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `            Arch.sm_101a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `            Arch.sm_101f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            Arch.sm_103,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `            Arch.sm_103a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `            Arch.sm_103f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `            Arch.sm_110,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `            Arch.sm_110a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `            Arch.sm_110f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `            Arch.sm_120,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `            Arch.sm_120a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `            Arch.sm_120f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `            Arch.sm_121,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `            Arch.sm_121a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `            Arch.sm_121f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L137** `        return self.name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L140** `        return f"Arch.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L143** `    def from_string(cls, arch_str: str) -> "Arch":` — **EN:** Defines function `from_string`. **CN:** 定义函数 `from_string`。
+- **L144** `        return cls[arch_str]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `    def to_string(self) -> str:` — **EN:** Defines function `to_string`. **CN:** 定义函数 `to_string`。
+- **L147** `        return self.name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L150** `    def filter(cls, criterion: Callable[["Arch"], bool]) -> list["Arch"]:` — **EN:** Defines function `filter`. **CN:** 定义函数 `filter`。
+- **L151** `        """` — **EN:** Starts the docstring for the function `filter`. **CN:** 开始说明 function `filter` 的文档字符串。
+- **L152** `        Filter the archs by the given criterion.` — **EN:** Continues the docstring for the function `filter`. **CN:** 继续说明 function `filter` 的文档字符串。
+- **L153** `        """` — **EN:** Ends the docstring for the function `filter`. **CN:** 结束说明 function `filter` 的文档字符串。
+- **L154** `        return [arch for arch in cls if criterion(arch)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    def is_family_of(self, arch: "Arch") -> bool:` — **EN:** Defines function `is_family_of`. **CN:** 定义函数 `is_family_of`。
+- **L157** `        """` — **EN:** Starts the docstring for the function `is_family_of`. **CN:** 开始说明 function `is_family_of` 的文档字符串。
+- **L158** `        Check if this arch is equal or higher in the same family than the given arch, so that the family-specific features can be used.` — **EN:** Continues the docstring for the function `is_family_of`. **CN:** 继续说明 function `is_family_of` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        Example:` — **EN:** Continues the docstring for the function `is_family_of`. **CN:** 继续说明 function `is_family_of` 的文档字符串。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `        .. code-block:: python` — **EN:** Continues the docstring for the function `is_family_of`. **CN:** 继续说明 function `is_family_of` 的文档字符串。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `            >>> arch = Arch.sm_103f` — **EN:** Continues the docstring for the function `is_family_of`. **CN:** 继续说明 function `is_family_of` 的文档字符串。
+- **L165** `            >>> arch.is_family_of(Arch.sm_100f)` — **EN:** Continues the docstring for the function `is_family_of`. **CN:** 继续说明 function `is_family_of` 的文档字符串。
+- **L166** `            True` — **EN:** Continues the docstring for the function `is_family_of`. **CN:** 继续说明 function `is_family_of` 的文档字符串。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `        """` — **EN:** Ends the docstring for the function `is_family_of`. **CN:** 结束说明 function `is_family_of` 的文档字符串。
+- **L169** `        # sm_101 is renamed to sm_110, sm_101f is family of sm_110f, but is not family of sm_100f` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L170** `        if self in [Arch.sm_101a, Arch.sm_101f]:` — **EN:** Starts a conditional branch guarded by `self in [Arch.sm_101a, Arch.sm_101f]`. **CN:** 开始一个由 `self in [Arch.sm_101a, Arch.sm_101f]` 控制的条件分支。
+- **L171** `            return arch.major == 11 and arch.minor >= 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L174** `            self.major == arch.major` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `            and self.minor >= arch.minor` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `            and self.suffix in ["a", "f"]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `    def __lt__(self, other: object) -> bool:` — **EN:** Defines function `__lt__`. **CN:** 定义函数 `__lt__`。
+- **L180** `        if not isinstance(other, Arch):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, Arch)`. **CN:** 开始一个由 `not isinstance(other, Arch)` 控制的条件分支。
+- **L181** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** `        return (self.major, self.minor) < (other.major, other.minor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `    def __le__(self, other: object) -> bool:` — **EN:** Defines function `__le__`. **CN:** 定义函数 `__le__`。
+- **L185** `        if not isinstance(other, Arch):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, Arch)`. **CN:** 开始一个由 `not isinstance(other, Arch)` 控制的条件分支。
+- **L186** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L187** `        return (self.major, self.minor) <= (other.major, other.minor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `    def __gt__(self, other: object) -> bool:` — **EN:** Defines function `__gt__`. **CN:** 定义函数 `__gt__`。
+- **L190** `        if not isinstance(other, Arch):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, Arch)`. **CN:** 开始一个由 `not isinstance(other, Arch)` 控制的条件分支。
+- **L191** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L192** `        return (self.major, self.minor) > (other.major, other.minor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `    def __ge__(self, other: object) -> bool:` — **EN:** Defines function `__ge__`. **CN:** 定义函数 `__ge__`。
+- **L195** `        if not isinstance(other, Arch):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, Arch)`. **CN:** 开始一个由 `not isinstance(other, Arch)` 控制的条件分支。
+- **L196** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L197** `        return (self.major, self.minor) >= (other.major, other.minor)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.arch`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.arch`。
+- EN: Top-level classes: ArchMeta, Arch CN: 顶层类包括：ArchMeta, Arch
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .version_info:CUDA_VERSION CN: 内部依赖：.version_info:CUDA_VERSION
+- EN: External or standard-library dependencies: collections.abc:Callable, enum:Enum,EnumMeta, re, typing:Any CN: 外部或标准库依赖：collections.abc:Callable, enum:Enum,EnumMeta, re, typing:Any

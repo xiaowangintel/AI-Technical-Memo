@@ -1,0 +1,40 @@
+# CMakeLists.txt — Code Analysis / 代码分析
+
+## Source / 来源
+
+| Item | English | 中文 |
+| --- | --- | --- |
+| File | `mlir/include/mlir/Dialect/NVGPU/CMakeLists.txt` | `mlir/include/mlir/Dialect/NVGPU/CMakeLists.txt` |
+| Repository | `llvm/llvm-project` | `llvm/llvm-project` |
+| Purpose | CMake configuration for mlir/include/mlir/Dialect/NVGPU. | 该文件为以下目录提供 CMake 配置：mlir/include/mlir/Dialect/NVGPU。 |
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-3 / 第 1-3 行
+
+```cmake
+   1: add_subdirectory(IR)
+   2: add_subdirectory(TransformOps)
+   3: add_subdirectory(Transforms)
+```
+
+- **EN:** Build Logic — This block describes targets, sources, or dependencies for the build system.
+  **CN:** 构建逻辑——这一段为构建系统描述目标、源码或依赖。
+- **EN L1:** This CMake command calls `add_subdirectory` to describe build behavior around `IR`.
+  **CN L1:** 该 CMake 命令调用 `add_subdirectory`，围绕 `IR` 描述构建行为。
+- **EN L2:** This CMake command calls `add_subdirectory` to describe build behavior around `TransformOps`.
+  **CN L2:** 该 CMake 命令调用 `add_subdirectory`，围绕 `TransformOps` 描述构建行为。
+- **EN L3:** This CMake command calls `add_subdirectory` to describe build behavior around `Transforms`.
+  **CN L3:** 该 CMake 命令调用 `add_subdirectory`，围绕 `Transforms` 描述构建行为。
+
+## Key Concepts / 关键概念
+
+- **add_subdirectory**  
+  EN: A build-system concept or command that influences how this directory is compiled.  
+  CN: 这是影响该目录编译方式的构建系统概念或命令。
+
+## Dependencies / 依赖关系
+
+- **`add_subdirectory`**  
+  EN: CMake command shaping build-time dependencies or target structure.  
+  CN: 用于塑造构建期依赖或目标结构的 CMake 命令。

@@ -1,0 +1,992 @@
+# depthwise_mma.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/thread/depthwise_mma.h`
+**Purpose / 用途**: Templates exposing architecture support for depthwise convolution. / 提供CUTLASS 卷积基础设施。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief Templates exposing architecture support for depthwise convolution`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 38 / 第 38 行** — `#include "cutlass/tensor_ref.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_ref.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_ref.h`。
+- **Line 39 / 第 39 行** — `#include "cutlass/layout/matrix.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/matrix.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/matrix.h`。
+- **Line 40 / 第 40 行** — `#include "cutlass/arch/mma.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/arch/mma.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/arch/mma.h`。
+- **Line 41 / 第 41 行** — `#include "cutlass/gemm/gemm.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/gemm.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/gemm.h`。
+- **Line 42 / 第 42 行** — `#include "cutlass/gemm/thread/mma.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/thread/mma.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/thread/mma.h`。
+- **Line 43 / 第 43 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 44 / 第 44 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 45 / 第 45 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 46 / 第 46 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 47 / 第 47 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 48 / 第 48 行** — `namespace thread {`
+  - **EN**: Opens namespace `thread` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `thread`。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 51 / 第 51 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 52 / 第 52 行** — `/// MMA operation`
+  - **EN**: Inline comment explaining intent: `MMA operation`.
+  - **CN**: 行内注释说明意图：`MMA operation`。
+- **Line 53 / 第 53 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 54 / 第 54 行** — `  /// Size of the matrix product (concept: GemmShape)`
+  - **EN**: Adds template parameter specifier `/// Size of the matrix product (concept: GemmShape)`.
+  - **CN**: 补充模板参数说明符 `/// Size of the matrix product (concept: GemmShape)`。
+- **Line 55 / 第 55 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 56 / 第 56 行** — `  /// Number of threads participating`
+  - **EN**: Adds template parameter specifier `/// Number of threads participating`.
+  - **CN**: 补充模板参数说明符 `/// Number of threads participating`。
+- **Line 57 / 第 57 行** — `  int kThreads_,`
+  - **EN**: Adds template parameter specifier `int kThreads_`.
+  - **CN**: 补充模板参数说明符 `int kThreads_`。
+- **Line 58 / 第 58 行** — `  /// Data type of A elements`
+  - **EN**: Adds template parameter specifier `/// Data type of A elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of A elements`。
+- **Line 59 / 第 59 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 60 / 第 60 行** — `  /// Data type of B elements`
+  - **EN**: Adds template parameter specifier `/// Data type of B elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of B elements`。
+- **Line 61 / 第 61 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 62 / 第 62 行** — `  /// Element type of C matrix`
+  - **EN**: Adds template parameter specifier `/// Element type of C matrix`.
+  - **CN**: 补充模板参数说明符 `/// Element type of C matrix`。
+- **Line 63 / 第 63 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 64 / 第 64 行** — `  /// Inner product operator`
+  - **EN**: Adds template parameter specifier `/// Inner product operator`.
+  - **CN**: 补充模板参数说明符 `/// Inner product operator`。
+- **Line 65 / 第 65 行** — `  typename Operator`
+  - **EN**: Adds template parameter specifier `typename Operator`.
+  - **CN**: 补充模板参数说明符 `typename Operator`。
+- **Line 66 / 第 66 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 67 / 第 67 行** — `struct ElementwiseInnerProduct;`
+  - **EN**: Declares struct `ElementwiseInnerProduct`.
+  - **CN**: 声明 struct `ElementwiseInnerProduct`。
+- **Line 68 / 第 68 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 69 / 第 69 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 70 / 第 70 行** — `/// General implementation`
+  - **EN**: Inline comment explaining intent: `General implementation`.
+  - **CN**: 行内注释说明意图：`General implementation`。
+- **Line 71 / 第 71 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 72 / 第 72 行** — `    /// Size of the matrix product (concept: GemmShape)`
+  - **EN**: Adds template parameter specifier `/// Size of the matrix product (concept: GemmShape)`.
+  - **CN**: 补充模板参数说明符 `/// Size of the matrix product (concept: GemmShape)`。
+- **Line 73 / 第 73 行** — `    typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 74 / 第 74 行** — `    /// Data type of A elements`
+  - **EN**: Adds template parameter specifier `/// Data type of A elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of A elements`。
+- **Line 75 / 第 75 行** — `    typename ElementA_,`
+  - **EN**: Adds template parameter specifier `typename ElementA_`.
+  - **CN**: 补充模板参数说明符 `typename ElementA_`。
+- **Line 76 / 第 76 行** — `    /// Data type of B elements`
+  - **EN**: Adds template parameter specifier `/// Data type of B elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of B elements`。
+- **Line 77 / 第 77 行** — `    typename ElementB_,`
+  - **EN**: Adds template parameter specifier `typename ElementB_`.
+  - **CN**: 补充模板参数说明符 `typename ElementB_`。
+- **Line 78 / 第 78 行** — `    /// Element type of C matrix`
+  - **EN**: Adds template parameter specifier `/// Element type of C matrix`.
+  - **CN**: 补充模板参数说明符 `/// Element type of C matrix`。
+- **Line 79 / 第 79 行** — `    typename ElementC_>`
+  - **EN**: Adds template parameter specifier `typename ElementC_>`.
+  - **CN**: 补充模板参数说明符 `typename ElementC_>`。
+- **Line 80 / 第 80 行** — `struct ElementwiseInnerProduct<Shape_, 1, ElementA_, ElementB_, ElementC_, arch::OpMultiplyAdd> {`
+  - **EN**: Adds template parameter specifier `struct ElementwiseInnerProduct<Shape_, 1, ElementA_, ElementB_, ElementC_, arch::OpMultiplyAdd> {`.
+  - **CN**: 补充模板参数说明符 `struct ElementwiseInnerProduct<Shape_, 1, ElementA_, ElementB_, ElementC_, arch::OpMultiplyAdd> {`。
+- **Line 81 / 第 81 行** — `  using Shape = Shape_;`
+  - **EN**: Adds template parameter specifier `using Shape = Shape_;`.
+  - **CN**: 补充模板参数说明符 `using Shape = Shape_;`。
+- **Line 82 / 第 82 行** — `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Adds template parameter specifier `using Operator = arch::OpMultiplyAdd;`.
+  - **CN**: 补充模板参数说明符 `using Operator = arch::OpMultiplyAdd;`。
+- **Line 83 / 第 83 行** — `  using ElementC = ElementC_;`
+  - **EN**: Adds template parameter specifier `using ElementC = ElementC_;`.
+  - **CN**: 补充模板参数说明符 `using ElementC = ElementC_;`。
+- **Line 84 / 第 84 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 85 / 第 85 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 86 / 第 86 行** — `  void operator()(Array<ElementC_, Shape::kN> &d,`
+  - **EN**: Adds template parameter specifier `void operator()(Array<ElementC_, Shape::kN> &d`.
+  - **CN**: 补充模板参数说明符 `void operator()(Array<ElementC_, Shape::kN> &d`。
+- **Line 87 / 第 87 行** — `                  Array<ElementA_, Shape::kN> const &a,`
+  - **EN**: Adds template parameter specifier `Array<ElementA_, Shape::kN> const &a`.
+  - **CN**: 补充模板参数说明符 `Array<ElementA_, Shape::kN> const &a`。
+- **Line 88 / 第 88 行** — `                  Array<ElementB_, Shape::kN> const &b,`
+  - **EN**: Adds template parameter specifier `Array<ElementB_, Shape::kN> const &b`.
+  - **CN**: 补充模板参数说明符 `Array<ElementB_, Shape::kN> const &b`。
+- **Line 89 / 第 89 行** — `                  Array<ElementC_, Shape::kN> const &c) {`
+  - **EN**: Adds template parameter specifier `Array<ElementC_, Shape::kN> const &c) {`.
+  - **CN**: 补充模板参数说明符 `Array<ElementC_, Shape::kN> const &c) {`。
+- **Line 90 / 第 90 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Adds template parameter specifier `CUTLASS_PRAGMA_UNROLL`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_PRAGMA_UNROLL`。
+- **Line 91 / 第 91 行** — `    for (int i = 0; i < Shape::kN; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < Shape::kN; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < Shape::kN; ++i) {`。
+- **Line 92 / 第 92 行** — `      d[i] = a[i] * b[i] + c[i];`
+  - **EN**: Adds template parameter specifier `d[i] = a[i] * b[i] + c[i];`.
+  - **CN**: 补充模板参数说明符 `d[i] = a[i] * b[i] + c[i];`。
+- **Line 93 / 第 93 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 94 / 第 94 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 95 / 第 95 行** — `};`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 96 / 第 96 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 97 / 第 97 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `/////////////////////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `/////////////////////////////////////////////////////////////////////////////////////////////////`。
+- **Line 98 / 第 98 行** — `/// Specialization of half_t`
+  - **EN**: Adds template parameter specifier `/// Specialization of half_t`.
+  - **CN**: 补充模板参数说明符 `/// Specialization of half_t`。
+- **Line 99 / 第 99 行** — `template <>`
+  - **EN**: Starts a template declaration.
+  - **CN**: 开始一个模板声明。
+- **Line 100 / 第 100 行** — `struct ElementwiseInnerProduct<`
+  - **EN**: Adds template parameter specifier `struct ElementwiseInnerProduct<`.
+  - **CN**: 补充模板参数说明符 `struct ElementwiseInnerProduct<`。
+- **Line 101 / 第 101 行** — `  gemm::GemmShape<2, 2, 1>,`
+  - **EN**: Adds template parameter specifier `gemm::GemmShape<2, 2, 1>`.
+  - **CN**: 补充模板参数说明符 `gemm::GemmShape<2, 2, 1>`。
+- **Line 102 / 第 102 行** — `  1,`
+  - **EN**: Adds template parameter specifier `1`.
+  - **CN**: 补充模板参数说明符 `1`。
+- **Line 103 / 第 103 行** — `  half_t,`
+  - **EN**: Adds template parameter specifier `half_t`.
+  - **CN**: 补充模板参数说明符 `half_t`。
+- **Line 104 / 第 104 行** — `  half_t,`
+  - **EN**: Adds template parameter specifier `half_t`.
+  - **CN**: 补充模板参数说明符 `half_t`。
+- **Line 105 / 第 105 行** — `  half_t,`
+  - **EN**: Adds template parameter specifier `half_t`.
+  - **CN**: 补充模板参数说明符 `half_t`。
+- **Line 106 / 第 106 行** — `  arch::OpMultiplyAdd> {`
+  - **EN**: Adds template parameter specifier `arch::OpMultiplyAdd> {`.
+  - **CN**: 补充模板参数说明符 `arch::OpMultiplyAdd> {`。
+- **Line 107 / 第 107 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 108 / 第 108 行** — `  using Shape = gemm::GemmShape<2, 2, 1>;`
+  - **EN**: Adds template parameter specifier `using Shape = gemm::GemmShape<2, 2, 1>;`.
+  - **CN**: 补充模板参数说明符 `using Shape = gemm::GemmShape<2, 2, 1>;`。
+- **Line 109 / 第 109 行** — `  using Operator =  arch::OpMultiplyAdd;`
+  - **EN**: Adds template parameter specifier `using Operator =  arch::OpMultiplyAdd;`.
+  - **CN**: 补充模板参数说明符 `using Operator =  arch::OpMultiplyAdd;`。
+- **Line 110 / 第 110 行** — `  using ElementC = half_t;`
+  - **EN**: Adds template parameter specifier `using ElementC = half_t;`.
+  - **CN**: 补充模板参数说明符 `using ElementC = half_t;`。
+- **Line 111 / 第 111 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 112 / 第 112 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 113 / 第 113 行** — `  void operator()(`
+  - **EN**: Adds template parameter specifier `void operator()(`.
+  - **CN**: 补充模板参数说明符 `void operator()(`。
+- **Line 114 / 第 114 行** — `    Array<half_t, 2> &d,`
+  - **EN**: Adds template parameter specifier `Array<half_t, 2> &d`.
+  - **CN**: 补充模板参数说明符 `Array<half_t, 2> &d`。
+- **Line 115 / 第 115 行** — `    Array<half_t, 2> const &a,`
+  - **EN**: Adds template parameter specifier `Array<half_t, 2> const &a`.
+  - **CN**: 补充模板参数说明符 `Array<half_t, 2> const &a`。
+- **Line 116 / 第 116 行** — `    Array<half_t, 2> const &b,`
+  - **EN**: Adds template parameter specifier `Array<half_t, 2> const &b`.
+  - **CN**: 补充模板参数说明符 `Array<half_t, 2> const &b`。
+- **Line 117 / 第 117 行** — `    Array<half_t, 2> const &c`
+  - **EN**: Adds template parameter specifier `Array<half_t, 2> const &c`.
+  - **CN**: 补充模板参数说明符 `Array<half_t, 2> const &c`。
+- **Line 118 / 第 118 行** — `  ) {`
+  - **EN**: Adds template parameter specifier `) {`.
+  - **CN**: 补充模板参数说明符 `) {`。
+- **Line 119 / 第 119 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 120 / 第 120 行** — `#if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 600))`
+  - **EN**: Adds template parameter specifier `#if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 600))`.
+  - **CN**: 补充模板参数说明符 `#if (defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 600))`。
+- **Line 121 / 第 121 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 122 / 第 122 行** — `    __half2 const & A = reinterpret_cast<__half2 const &>(a);`
+  - **EN**: Adds template parameter specifier `__half2 const & A = reinterpret_cast<__half2 const &>(a);`.
+  - **CN**: 补充模板参数说明符 `__half2 const & A = reinterpret_cast<__half2 const &>(a);`。
+- **Line 123 / 第 123 行** — `    __half2 const & B = reinterpret_cast<__half2 const &>(b);`
+  - **EN**: Adds template parameter specifier `__half2 const & B = reinterpret_cast<__half2 const &>(b);`.
+  - **CN**: 补充模板参数说明符 `__half2 const & B = reinterpret_cast<__half2 const &>(b);`。
+- **Line 124 / 第 124 行** — `    __half2 const & C = reinterpret_cast<__half2 const &>(c);`
+  - **EN**: Adds template parameter specifier `__half2 const & C = reinterpret_cast<__half2 const &>(c);`.
+  - **CN**: 补充模板参数说明符 `__half2 const & C = reinterpret_cast<__half2 const &>(c);`。
+- **Line 125 / 第 125 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 126 / 第 126 行** — `    __half2 tmp_D = __hfma2(A, B, C);`
+  - **EN**: Adds template parameter specifier `__half2 tmp_D = __hfma2(A, B, C);`.
+  - **CN**: 补充模板参数说明符 `__half2 tmp_D = __hfma2(A, B, C);`。
+- **Line 127 / 第 127 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 128 / 第 128 行** — `    d = reinterpret_cast<Array<half_t, 2> const &>(tmp_D);`
+  - **EN**: Adds template parameter specifier `d = reinterpret_cast<Array<half_t, 2> const &>(tmp_D);`.
+  - **CN**: 补充模板参数说明符 `d = reinterpret_cast<Array<half_t, 2> const &>(tmp_D);`。
+- **Line 129 / 第 129 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 130 / 第 130 行** — `#else`
+  - **EN**: Adds template parameter specifier `#else`.
+  - **CN**: 补充模板参数说明符 `#else`。
+- **Line 131 / 第 131 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Adds template parameter specifier `CUTLASS_PRAGMA_UNROLL`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_PRAGMA_UNROLL`。
+- **Line 132 / 第 132 行** — `    for (int i = 0; i < 2; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < 2; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < 2; ++i) {`。
+- **Line 133 / 第 133 行** — `      d[i] = a[i] * b[i] + c[i];`
+  - **EN**: Adds template parameter specifier `d[i] = a[i] * b[i] + c[i];`.
+  - **CN**: 补充模板参数说明符 `d[i] = a[i] * b[i] + c[i];`。
+- **Line 134 / 第 134 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 135 / 第 135 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 136 / 第 136 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 137 / 第 137 行** — `};`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 138 / 第 138 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 139 / 第 139 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `/////////////////////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `/////////////////////////////////////////////////////////////////////////////////////////////////`。
+- **Line 140 / 第 140 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 141 / 第 141 行** — `/// Structure to compute the matrix product`
+  - **EN**: Adds template parameter specifier `/// Structure to compute the matrix product`.
+  - **CN**: 补充模板参数说明符 `/// Structure to compute the matrix product`。
+- **Line 142 / 第 142 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 143 / 第 143 行** — `  /// Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Adds template parameter specifier `/// Size of the Gemm problem - concept: gemm::GemmShape<>`.
+  - **CN**: 补充模板参数说明符 `/// Size of the Gemm problem - concept: gemm::GemmShape<>`。
+- **Line 144 / 第 144 行** — `  typename Shape,`
+  - **EN**: Adds template parameter specifier `typename Shape`.
+  - **CN**: 补充模板参数说明符 `typename Shape`。
+- **Line 145 / 第 145 行** — `  /// Data type of A elements`
+  - **EN**: Adds template parameter specifier `/// Data type of A elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of A elements`。
+- **Line 146 / 第 146 行** — `  typename ElementA,`
+  - **EN**: Adds template parameter specifier `typename ElementA`.
+  - **CN**: 补充模板参数说明符 `typename ElementA`。
+- **Line 147 / 第 147 行** — `  /// Data type of B elements`
+  - **EN**: Adds template parameter specifier `/// Data type of B elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of B elements`。
+- **Line 148 / 第 148 行** — `  typename ElementB,`
+  - **EN**: Adds template parameter specifier `typename ElementB`.
+  - **CN**: 补充模板参数说明符 `typename ElementB`。
+- **Line 149 / 第 149 行** — `  /// Element type of C matrix`
+  - **EN**: Adds template parameter specifier `/// Element type of C matrix`.
+  - **CN**: 补充模板参数说明符 `/// Element type of C matrix`。
+- **Line 150 / 第 150 行** — `  typename ElementC,`
+  - **EN**: Adds template parameter specifier `typename ElementC`.
+  - **CN**: 补充模板参数说明符 `typename ElementC`。
+- **Line 151 / 第 151 行** — `  /// Concept: arch::OpMultiplyAdd or arch::Mma<>`
+  - **EN**: Adds template parameter specifier `/// Concept: arch::OpMultiplyAdd or arch::Mma<>`.
+  - **CN**: 补充模板参数说明符 `/// Concept: arch::OpMultiplyAdd or arch::Mma<>`。
+- **Line 152 / 第 152 行** — `  typename Operator = arch::OpMultiplyAdd,`
+  - **EN**: Adds template parameter specifier `typename Operator = arch::OpMultiplyAdd`.
+  - **CN**: 补充模板参数说明符 `typename Operator = arch::OpMultiplyAdd`。
+- **Line 153 / 第 153 行** — `  /// Used for partial specialization`
+  - **EN**: Adds template parameter specifier `/// Used for partial specialization`.
+  - **CN**: 补充模板参数说明符 `/// Used for partial specialization`。
+- **Line 154 / 第 154 行** — `  typename Enable = bool`
+  - **EN**: Adds template parameter specifier `typename Enable = bool`.
+  - **CN**: 补充模板参数说明符 `typename Enable = bool`。
+- **Line 155 / 第 155 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 156 / 第 156 行** — `struct DepthwiseDirectConvElementwiseInnerProduct;`
+  - **EN**: Declares struct `DepthwiseDirectConvElementwiseInnerProduct`.
+  - **CN**: 声明 struct `DepthwiseDirectConvElementwiseInnerProduct`。
+- **Line 157 / 第 157 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 158 / 第 158 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 159 / 第 159 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 160 / 第 160 行** — `/// Gemplate that handles all packed matrix layouts`
+  - **EN**: Inline comment explaining intent: `Gemplate that handles all packed matrix layouts`.
+  - **CN**: 行内注释说明意图：`Gemplate that handles all packed matrix layouts`。
+- **Line 161 / 第 161 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 162 / 第 162 行** — `  /// Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Adds template parameter specifier `/// Size of the Gemm problem - concept: gemm::GemmShape<>`.
+  - **CN**: 补充模板参数说明符 `/// Size of the Gemm problem - concept: gemm::GemmShape<>`。
+- **Line 163 / 第 163 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 164 / 第 164 行** — `  /// Data type of A elements`
+  - **EN**: Adds template parameter specifier `/// Data type of A elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of A elements`。
+- **Line 165 / 第 165 行** — `  typename ElementA_,`
+  - **EN**: Adds template parameter specifier `typename ElementA_`.
+  - **CN**: 补充模板参数说明符 `typename ElementA_`。
+- **Line 166 / 第 166 行** — `  /// Data type of B elements`
+  - **EN**: Adds template parameter specifier `/// Data type of B elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of B elements`。
+- **Line 167 / 第 167 行** — `  typename ElementB_,`
+  - **EN**: Adds template parameter specifier `typename ElementB_`.
+  - **CN**: 补充模板参数说明符 `typename ElementB_`。
+- **Line 168 / 第 168 行** — `  /// Element type of C matrix`
+  - **EN**: Adds template parameter specifier `/// Element type of C matrix`.
+  - **CN**: 补充模板参数说明符 `/// Element type of C matrix`。
+- **Line 169 / 第 169 行** — `  typename ElementC_,`
+  - **EN**: Adds template parameter specifier `typename ElementC_`.
+  - **CN**: 补充模板参数说明符 `typename ElementC_`。
+- **Line 170 / 第 170 行** — `  /// Operator used to compute GEMM`
+  - **EN**: Adds template parameter specifier `/// Operator used to compute GEMM`.
+  - **CN**: 补充模板参数说明符 `/// Operator used to compute GEMM`。
+- **Line 171 / 第 171 行** — `  typename Operator_`
+  - **EN**: Adds template parameter specifier `typename Operator_`.
+  - **CN**: 补充模板参数说明符 `typename Operator_`。
+- **Line 172 / 第 172 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 173 / 第 173 行** — `struct DepthwiseDirectConvElementwiseInnerProductGeneric {`
+  - **EN**: Starts the definition of struct `DepthwiseDirectConvElementwiseInnerProductGeneric`.
+  - **CN**: 开始定义 struct `DepthwiseDirectConvElementwiseInnerProductGeneric`。
+- **Line 174 / 第 174 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 175 / 第 175 行** — `  /// Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Inline comment explaining intent: `Size of the Gemm problem - concept: gemm::GemmShape<>`.
+  - **CN**: 行内注释说明意图：`Size of the Gemm problem - concept: gemm::GemmShape<>`。
+- **Line 176 / 第 176 行** — `  using Shape = Shape_;`
+  - **EN**: Introduces type or value alias `Shape`.
+  - **CN**: 引入类型或值别名 `Shape`。
+- **Line 177 / 第 177 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 178 / 第 178 行** — `  /// Data type of operand A`
+  - **EN**: Inline comment explaining intent: `Data type of operand A`.
+  - **CN**: 行内注释说明意图：`Data type of operand A`。
+- **Line 179 / 第 179 行** — `  using ElementA = ElementA_;`
+  - **EN**: Introduces type or value alias `ElementA`.
+  - **CN**: 引入类型或值别名 `ElementA`。
+- **Line 180 / 第 180 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 181 / 第 181 行** — `  /// Data type of operand B`
+  - **EN**: Inline comment explaining intent: `Data type of operand B`.
+  - **CN**: 行内注释说明意图：`Data type of operand B`。
+- **Line 182 / 第 182 行** — `  using ElementB = ElementB_;`
+  - **EN**: Introduces type or value alias `ElementB`.
+  - **CN**: 引入类型或值别名 `ElementB`。
+- **Line 183 / 第 183 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 184 / 第 184 行** — `  /// Element type of operand C`
+  - **EN**: Inline comment explaining intent: `Element type of operand C`.
+  - **CN**: 行内注释说明意图：`Element type of operand C`。
+- **Line 185 / 第 185 行** — `  using ElementC = ElementC_;`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 186 / 第 186 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 187 / 第 187 行** — `  /// Underlying mathematical operator`
+  - **EN**: Inline comment explaining intent: `Underlying mathematical operator`.
+  - **CN**: 行内注释说明意图：`Underlying mathematical operator`。
+- **Line 188 / 第 188 行** — `  using Operator = Operator_;`
+  - **EN**: Introduces type or value alias `Operator`.
+  - **CN**: 引入类型或值别名 `Operator`。
+- **Line 189 / 第 189 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 190 / 第 190 行** — `  /// A operand storage`
+  - **EN**: Inline comment explaining intent: `A operand storage`.
+  - **CN**: 行内注释说明意图：`A operand storage`。
+- **Line 191 / 第 191 行** — `  using FragmentA = Array<ElementA, Shape::kMN>;`
+  - **EN**: Introduces type or value alias `FragmentA`.
+  - **CN**: 引入类型或值别名 `FragmentA`。
+- **Line 192 / 第 192 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 193 / 第 193 行** — `  /// B operand storage`
+  - **EN**: Inline comment explaining intent: `B operand storage`.
+  - **CN**: 行内注释说明意图：`B operand storage`。
+- **Line 194 / 第 194 行** — `  using FragmentB = Array<ElementB, Shape::kN>;`
+  - **EN**: Introduces type or value alias `FragmentB`.
+  - **CN**: 引入类型或值别名 `FragmentB`。
+- **Line 195 / 第 195 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 196 / 第 196 行** — `  /// C operand storage`
+  - **EN**: Inline comment explaining intent: `C operand storage`.
+  - **CN**: 行内注释说明意图：`C operand storage`。
+- **Line 197 / 第 197 行** — `  using FragmentC = Array<ElementC, Shape::kMN>;`
+  - **EN**: Introduces type or value alias `FragmentC`.
+  - **CN**: 引入类型或值别名 `FragmentC`。
+- **Line 198 / 第 198 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 199 / 第 199 行** — `  /// Instruction`
+  - **EN**: Inline comment explaining intent: `Instruction`.
+  - **CN**: 行内注释说明意图：`Instruction`。
+- **Line 200 / 第 200 行** — `  using MmaOp = cutlass::conv::thread::ElementwiseInnerProduct<`
+  - **EN**: Introduces type or value alias `MmaOp`.
+  - **CN**: 引入类型或值别名 `MmaOp`。
+- **Line 201 / 第 201 行** — `    gemm::GemmShape<Shape::kN, Shape::kN, 1>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 202 / 第 202 行** — `    1,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 203 / 第 203 行** — `    ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 204 / 第 204 行** — `    ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 205 / 第 205 行** — `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 206 / 第 206 行** — `    Operator>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 207 / 第 207 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 208 / 第 208 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 209 / 第 209 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 210 / 第 210 行** — `  // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 211 / 第 211 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 212 / 第 212 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 213 / 第 213 行** — `  /// Computes a matrix product D = A * B + C`
+  - **EN**: Inline comment explaining intent: `Computes a matrix product D = A * B + C`.
+  - **CN**: 行内注释说明意图：`Computes a matrix product D = A * B + C`。
+- **Line 214 / 第 214 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 215 / 第 215 行** — `  void operator()(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 216 / 第 216 行** — `    FragmentC & D,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 217 / 第 217 行** — `    FragmentA const & A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 218 / 第 218 行** — `    FragmentB const & B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 219 / 第 219 行** — `    FragmentC const & C) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 220 / 第 220 行** — `    Array<ElementC, Shape::kN> *ptr_D = reinterpret_cast<Array<ElementC, Shape::kN> *>(&D);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 221 / 第 221 行** — `    Array<ElementA, Shape::kN> const *ptr_A =`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 222 / 第 222 行** — `        reinterpret_cast<Array<ElementA, Shape::kN> const *>(&A);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 223 / 第 223 行** — `    Array<ElementB, Shape::kN> const *ptr_B =`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 224 / 第 224 行** — `        reinterpret_cast<Array<ElementB, Shape::kN> const *>(&B);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 225 / 第 225 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 226 / 第 226 行** — `    MmaOp mma_op;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 227 / 第 227 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 228 / 第 228 行** — `    // Copy accumulators`
+  - **EN**: Inline comment explaining intent: `Copy accumulators`.
+  - **CN**: 行内注释说明意图：`Copy accumulators`。
+- **Line 229 / 第 229 行** — `    D = C;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 230 / 第 230 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 231 / 第 231 行** — `    // Compute matrix product`
+  - **EN**: Inline comment explaining intent: `Compute matrix product`.
+  - **CN**: 行内注释说明意图：`Compute matrix product`。
+- **Line 232 / 第 232 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 233 / 第 233 行** — `      for (int n = 0; n < Shape::kN / MmaOp::Shape::kN; ++n) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 234 / 第 234 行** — `        CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 235 / 第 235 行** — `        for (int m = 0; m < Shape::kM; ++m) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 236 / 第 236 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 237 / 第 237 行** — `          Array<ElementC, MmaOp::Shape::kN> tmpD = ptr_D[m * Shape::kN / MmaOp::Shape::kN + n];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 238 / 第 238 行** — `          Array<ElementA, MmaOp::Shape::kN> tmpA = ptr_A[m * Shape::kN / MmaOp::Shape::kN + n];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 239 / 第 239 行** — `          Array<ElementB, MmaOp::Shape::kN> tmpB = ptr_B[n];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 240 / 第 240 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 241 / 第 241 行** — `          mma_op(tmpD, tmpA, tmpB, tmpD);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 242 / 第 242 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 243 / 第 243 行** — `          ptr_D[m * Shape::kN / MmaOp::Shape::kN + n] = tmpD;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 244 / 第 244 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 245 / 第 245 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 246 / 第 246 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 247 / 第 247 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 248 / 第 248 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 249 / 第 249 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 250 / 第 250 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 251 / 第 251 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 252 / 第 252 行** — `/// Structure to compute the matrix product`
+  - **EN**: Inline comment explaining intent: `Structure to compute the matrix product`.
+  - **CN**: 行内注释说明意图：`Structure to compute the matrix product`。
+- **Line 253 / 第 253 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 254 / 第 254 行** — `  /// Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Adds template parameter specifier `/// Size of the Gemm problem - concept: gemm::GemmShape<>`.
+  - **CN**: 补充模板参数说明符 `/// Size of the Gemm problem - concept: gemm::GemmShape<>`。
+- **Line 255 / 第 255 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 256 / 第 256 行** — `    /// Data type of A elements`
+  - **EN**: Adds template parameter specifier `/// Data type of A elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of A elements`。
+- **Line 257 / 第 257 行** — `  typename ElementA_,`
+  - **EN**: Adds template parameter specifier `typename ElementA_`.
+  - **CN**: 补充模板参数说明符 `typename ElementA_`。
+- **Line 258 / 第 258 行** — `  /// Data type of B elements`
+  - **EN**: Adds template parameter specifier `/// Data type of B elements`.
+  - **CN**: 补充模板参数说明符 `/// Data type of B elements`。
+- **Line 259 / 第 259 行** — `  typename ElementB_,`
+  - **EN**: Adds template parameter specifier `typename ElementB_`.
+  - **CN**: 补充模板参数说明符 `typename ElementB_`。
+- **Line 260 / 第 260 行** — `  /// Element type of C matrix`
+  - **EN**: Adds template parameter specifier `/// Element type of C matrix`.
+  - **CN**: 补充模板参数说明符 `/// Element type of C matrix`。
+- **Line 261 / 第 261 行** — `  typename ElementC_`
+  - **EN**: Adds template parameter specifier `typename ElementC_`.
+  - **CN**: 补充模板参数说明符 `typename ElementC_`。
+- **Line 262 / 第 262 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 263 / 第 263 行** — `struct DepthwiseDirectConvElementwiseInnerProduct<`
+  - **EN**: Declares struct `DepthwiseDirectConvElementwiseInnerProduct`.
+  - **CN**: 声明 struct `DepthwiseDirectConvElementwiseInnerProduct`。
+- **Line 264 / 第 264 行** — `  Shape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 265 / 第 265 行** — `  ElementA_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 266 / 第 266 行** — `  ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 267 / 第 267 行** — `  ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 268 / 第 268 行** — `  arch::OpMultiplyAdd`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 269 / 第 269 行** — `  > {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 270 / 第 270 行** — `  /// Size of the Gemm problem - concept: gemm::GemmShape<>`
+  - **EN**: Inline comment explaining intent: `Size of the Gemm problem - concept: gemm::GemmShape<>`.
+  - **CN**: 行内注释说明意图：`Size of the Gemm problem - concept: gemm::GemmShape<>`。
+- **Line 271 / 第 271 行** — `  using Shape = Shape_;`
+  - **EN**: Introduces type or value alias `Shape`.
+  - **CN**: 引入类型或值别名 `Shape`。
+- **Line 272 / 第 272 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 273 / 第 273 行** — `  /// Data type of operand A`
+  - **EN**: Inline comment explaining intent: `Data type of operand A`.
+  - **CN**: 行内注释说明意图：`Data type of operand A`。
+- **Line 274 / 第 274 行** — `  using ElementA = ElementA_;`
+  - **EN**: Introduces type or value alias `ElementA`.
+  - **CN**: 引入类型或值别名 `ElementA`。
+- **Line 275 / 第 275 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 276 / 第 276 行** — `  /// Data type of operand B`
+  - **EN**: Inline comment explaining intent: `Data type of operand B`.
+  - **CN**: 行内注释说明意图：`Data type of operand B`。
+- **Line 277 / 第 277 行** — `  using ElementB = ElementB_;`
+  - **EN**: Introduces type or value alias `ElementB`.
+  - **CN**: 引入类型或值别名 `ElementB`。
+- **Line 278 / 第 278 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 279 / 第 279 行** — `  /// Element type of operand C`
+  - **EN**: Inline comment explaining intent: `Element type of operand C`.
+  - **CN**: 行内注释说明意图：`Element type of operand C`。
+- **Line 280 / 第 280 行** — `  using ElementC = ElementC_;`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 281 / 第 281 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 282 / 第 282 行** — `  /// Underlying mathematical operator`
+  - **EN**: Inline comment explaining intent: `Underlying mathematical operator`.
+  - **CN**: 行内注释说明意图：`Underlying mathematical operator`。
+- **Line 283 / 第 283 行** — `  using Operator = arch::OpMultiplyAdd;`
+  - **EN**: Introduces type or value alias `Operator`.
+  - **CN**: 引入类型或值别名 `Operator`。
+- **Line 284 / 第 284 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 285 / 第 285 行** — `  /// A operand storage`
+  - **EN**: Inline comment explaining intent: `A operand storage`.
+  - **CN**: 行内注释说明意图：`A operand storage`。
+- **Line 286 / 第 286 行** — `  using FragmentA =`
+  - **EN**: Introduces type or value alias `FragmentA`.
+  - **CN**: 引入类型或值别名 `FragmentA`。
+- **Line 287 / 第 287 行** — `      Array<ElementA, Shape::kMN>;  // output_tile_size per thread * groups_per_thread`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 288 / 第 288 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 289 / 第 289 行** — `  /// B operand storage`
+  - **EN**: Inline comment explaining intent: `B operand storage`.
+  - **CN**: 行内注释说明意图：`B operand storage`。
+- **Line 290 / 第 290 行** — `  using FragmentB = Array<ElementB, Shape::kN>;  // 1 * groups_per_thread`
+  - **EN**: Introduces type or value alias `FragmentB`.
+  - **CN**: 引入类型或值别名 `FragmentB`。
+- **Line 291 / 第 291 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 292 / 第 292 行** — `  /// C operand storage`
+  - **EN**: Inline comment explaining intent: `C operand storage`.
+  - **CN**: 行内注释说明意图：`C operand storage`。
+- **Line 293 / 第 293 行** — `  using FragmentC =`
+  - **EN**: Introduces type or value alias `FragmentC`.
+  - **CN**: 引入类型或值别名 `FragmentC`。
+- **Line 294 / 第 294 行** — `      Array<ElementC, Shape::kMN>;  // output_tile_size per thread * groups_per_thread`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 295 / 第 295 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 296 / 第 296 行** — `  static bool const use_optimized = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 297 / 第 297 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 298 / 第 298 行** — `  using ArchMmaOperator =  DepthwiseDirectConvElementwiseInnerProductGeneric<Shape,`
+  - **EN**: Introduces type or value alias `ArchMmaOperator`.
+  - **CN**: 引入类型或值别名 `ArchMmaOperator`。
+- **Line 299 / 第 299 行** — `                                                        ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 300 / 第 300 行** — `                                                        ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 301 / 第 301 行** — `                                                        ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 302 / 第 302 行** — `                                                        Operator>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 303 / 第 303 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 304 / 第 304 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 305 / 第 305 行** — `  // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 306 / 第 306 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 307 / 第 307 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 308 / 第 308 行** — `  /// Computes a matrix product D = A * B + C`
+  - **EN**: Inline comment explaining intent: `Computes a matrix product D = A * B + C`.
+  - **CN**: 行内注释说明意图：`Computes a matrix product D = A * B + C`。
+- **Line 309 / 第 309 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 310 / 第 310 行** — `  void operator()(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 311 / 第 311 行** — `    FragmentC & D,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 312 / 第 312 行** — `    FragmentA const & A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 313 / 第 313 行** — `    FragmentB const & B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 314 / 第 314 行** — `    FragmentC const & C) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 315 / 第 315 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 316 / 第 316 行** — `    ArchMmaOperator mma;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 317 / 第 317 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 318 / 第 318 行** — `    mma(D, A, B, C);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 319 / 第 319 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 320 / 第 320 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 321 / 第 321 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 322 / 第 322 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 323 / 第 323 行** — `} // namespace thread`
+  - **EN**: Closes namespace `thread`.
+  - **CN**: 关闭命名空间 `thread`。
+- **Line 324 / 第 324 行** — `} // namespace conv`
+  - **EN**: Closes namespace `conv`.
+  - **CN**: 关闭命名空间 `conv`。
+- **Line 325 / 第 325 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/tensor_ref.h` — CUTLASS dependency `cutlass/tensor_ref.h` / CUTLASS 依赖 `cutlass/tensor_ref.h`
+- `cutlass/layout/matrix.h` — Layout definition `cutlass/layout/matrix.h` / 布局定义 `cutlass/layout/matrix.h`
+- `cutlass/arch/mma.h` — Architecture-specific support `cutlass/arch/mma.h` / 架构特化支持 `cutlass/arch/mma.h`
+- `cutlass/gemm/gemm.h` — CUTLASS GEMM primitive `cutlass/gemm/gemm.h` / CUTLASS GEMM 原语 `cutlass/gemm/gemm.h`
+- `cutlass/gemm/thread/mma.h` — CUTLASS GEMM primitive `cutlass/gemm/thread/mma.h` / CUTLASS GEMM 原语 `cutlass/gemm/thread/mma.h`

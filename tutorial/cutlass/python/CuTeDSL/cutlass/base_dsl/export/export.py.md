@@ -1,0 +1,262 @@
+# export.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/export/export.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (SignatureProcessor) and 3 functions (get_export_module, encode_metadata_into_ir_module, decode_metadata_from_execution_engine) in `CuTeDSL.cutlass.base_dsl.export.export`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.export.export` 定义了 1 个类（SignatureProcessor） 和 3 个函数（get_export_module, encode_metadata_into_ir_module, decode_metadata_from_execution_engine）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L13** `import io` — **EN:** Imports io for later use. **CN:** 导入 io 供后续使用。
+- **L14** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from ..common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `..common`. **CN:** 从 `..common` 导入 DSLRuntimeError。
+- **L17** `from ..._mlir import ir` — **EN:** Imports ir from `..._mlir`. **CN:** 从 `..._mlir` 导入 ir。
+- **L18** `from ..._mlir.dialects import llvm` — **EN:** Imports llvm from `..._mlir.dialects`. **CN:** 从 `..._mlir.dialects` 导入 llvm。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `import json` — **EN:** Imports json for later use. **CN:** 导入 json 供后续使用。
+- **L21** `import base64` — **EN:** Imports base64 for later use. **CN:** 导入 base64 供后续使用。
+- **L22** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `args_spec_suffix = "args_spec"` — **EN:** Assigns a value to args_spec_suffix. **CN:** 将一个值赋给 args_spec_suffix。
+- **L25** `function_name_suffix = "function_name"` — **EN:** Assigns a value to function_name_suffix. **CN:** 将一个值赋给 function_name_suffix。
+- **L26** `kernel_info_suffix = "kernel_info"` — **EN:** Assigns a value to kernel_info_suffix. **CN:** 将一个值赋给 kernel_info_suffix。
+- **L27** `version_suffix = "version"` — **EN:** Assigns a value to version_suffix. **CN:** 将一个值赋给 version_suffix。
+- **L28** `c_string_suffix = "\0"` — **EN:** Assigns a value to c_string_suffix. **CN:** 将一个值赋给 c_string_suffix。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `def get_export_module(` — **EN:** Defines function `get_export_module`. **CN:** 定义函数 `get_export_module`。
+- **L32** `    ir_module: ir.Module,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L33** `    symbol_prefix: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L34** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L35** `    preserve_symbols: set[str] | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L36** `) -> ir.Module:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L37** `    """Get the export module which is cloned from the original compiled ir module, and add the prefix` — **EN:** Starts the docstring for the function `get_export_module`. **CN:** 开始说明 function `get_export_module` 的文档字符串。
+- **L38** `    to avoid the symbol conflict.` — **EN:** Continues the docstring for the function `get_export_module`. **CN:** 继续说明 function `get_export_module` 的文档字符串。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `    @param ir_module: The original compiled ir module. Comes from the JitCompiledFunction.ir_module.` — **EN:** Continues the docstring for the function `get_export_module`. **CN:** 继续说明 function `get_export_module` 的文档字符串。
+- **L41** `    @param symbol_prefix: The prefix name of the function. This is the unique identifier name of the function to avoid symbol conflict in the generated object file.` — **EN:** Continues the docstring for the function `get_export_module`. **CN:** 继续说明 function `get_export_module` 的文档字符串。
+- **L42** `    @param preserve_symbols: Optional symbols to preserve in the export module.` — **EN:** Continues the docstring for the function `get_export_module`. **CN:** 继续说明 function `get_export_module` 的文档字符串。
+- **L43** `    @return: The export module of the function.` — **EN:** Continues the docstring for the function `get_export_module`. **CN:** 继续说明 function `get_export_module` 的文档字符串。
+- **L44** `    """` — **EN:** Ends the docstring for the function `get_export_module`. **CN:** 结束说明 function `get_export_module` 的文档字符串。
+- **L45** `    # Add prefix for symbol names to avoid conflict with other functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L46** `    defined_symbols = set()` — **EN:** Assigns a value to defined_symbols. **CN:** 将一个值赋给 defined_symbols。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `    if preserve_symbols is None:` — **EN:** Starts a conditional branch guarded by `preserve_symbols is None`. **CN:** 开始一个由 `preserve_symbols is None` 控制的条件分支。
+- **L49** `        preserve_symbols = set()` — **EN:** Assigns a value to preserve_symbols. **CN:** 将一个值赋给 preserve_symbols。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `    def walk_llvm_func_op(op: ir.Operation) -> ir.WalkResult:` — **EN:** Defines function `walk_llvm_func_op`. **CN:** 定义函数 `walk_llvm_func_op`。
+- **L52** `        # not a declaration` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L53** `        if (` — **EN:** Starts a conditional branch guarded by `op.name == 'llvm.func' and len(op.opview.operation.region...`. **CN:** 开始一个由 `op.name == 'llvm.func' and len(op.opview.operation.region...` 控制的条件分支。
+- **L54** `            op.name == "llvm.func"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `            and len(op.opview.operation.regions) > 0` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L56** `            and len(op.opview.operation.regions[0].blocks) > 0` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L57** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L58** `            func_name = op.attributes["sym_name"].value` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L59** `            # skip preserving symbols` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `            if func_name in preserve_symbols:` — **EN:** Starts a conditional branch guarded by `func_name in preserve_symbols`. **CN:** 开始一个由 `func_name in preserve_symbols` 控制的条件分支。
+- **L61** `                return ir.WalkResult.ADVANCE` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** `            defined_symbols.add(func_name)` — **EN:** Invokes `defined_symbols.add` as a standalone call. **CN:** 以独立语句方式调用 `defined_symbols.add`。
+- **L63** `            op.attributes["sym_name"] = ir.StringAttr.get(` — **EN:** Assigns a value to op.attributes['sym_name']. **CN:** 将一个值赋给 op.attributes['sym_name']。
+- **L64** `                symbol_prefix + "_" + func_name` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `        return ir.WalkResult.ADVANCE` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    def walk_llvm_references(op: ir.Operation) -> ir.WalkResult:` — **EN:** Defines function `walk_llvm_references`. **CN:** 定义函数 `walk_llvm_references`。
+- **L69** `        # Rename function calls` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `        if op.name == "llvm.call" and op.attributes["callee"].value in defined_symbols:` — **EN:** Starts a conditional branch guarded by `op.name == 'llvm.call' and op.attributes['callee'].value ...`. **CN:** 开始一个由 `op.name == 'llvm.call' and op.attributes['callee'].value ...` 控制的条件分支。
+- **L71** `            op.attributes["callee"] = ir.FlatSymbolRefAttr.get(` — **EN:** Assigns a value to op.attributes['callee']. **CN:** 将一个值赋给 op.attributes['callee']。
+- **L72** `                symbol_prefix + "_" + op.attributes["callee"].value` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `        # Rename addressof references` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L75** `        elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L76** `            op.name == "llvm.mlir.addressof"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `            and op.attributes["global_name"].value in defined_symbols` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L78** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L79** `            op.attributes["global_name"] = ir.FlatSymbolRefAttr.get(` — **EN:** Assigns a value to op.attributes['global_name']. **CN:** 将一个值赋给 op.attributes['global_name']。
+- **L80** `                symbol_prefix + "_" + op.attributes["global_name"].value` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `        # Rename global_ctors references` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L83** `        elif op.name == "llvm.mlir.global_ctors" and "ctors" in op.attributes:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L84** `            ctors = list(op.attributes["ctors"])` — **EN:** Assigns a value to ctors. **CN:** 将一个值赋给 ctors。
+- **L85** `            renamed_ctors = []` — **EN:** Assigns a value to renamed_ctors. **CN:** 将一个值赋给 renamed_ctors。
+- **L86** `            for ctor in ctors:` — **EN:** Starts a loop assigning items from `ctors` to `ctor`. **CN:** 开始一个循环，将 `ctors` 的元素赋给 `ctor`。
+- **L87** `                if ctor.value in defined_symbols:` — **EN:** Starts a conditional branch guarded by `ctor.value in defined_symbols`. **CN:** 开始一个由 `ctor.value in defined_symbols` 控制的条件分支。
+- **L88** `                    renamed_ctors.append(` — **EN:** Invokes `renamed_ctors.append` as a standalone call. **CN:** 以独立语句方式调用 `renamed_ctors.append`。
+- **L89** `                        ir.FlatSymbolRefAttr.get(symbol_prefix + "_" + ctor.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L92** `                    renamed_ctors.append(ctor)` — **EN:** Invokes `renamed_ctors.append` as a standalone call. **CN:** 以独立语句方式调用 `renamed_ctors.append`。
+- **L93** `            if renamed_ctors:` — **EN:** Starts a conditional branch guarded by `renamed_ctors`. **CN:** 开始一个由 `renamed_ctors` 控制的条件分支。
+- **L94** `                op.attributes["ctors"] = ir.ArrayAttr.get(renamed_ctors)` — **EN:** Assigns a value to op.attributes['ctors']. **CN:** 将一个值赋给 op.attributes['ctors']。
+- **L95** `        # Rename global_dtors references` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `        elif op.name == "llvm.mlir.global_dtors" and "dtors" in op.attributes:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L97** `            dtors = list(op.attributes["dtors"])` — **EN:** Assigns a value to dtors. **CN:** 将一个值赋给 dtors。
+- **L98** `            renamed_dtors = []` — **EN:** Assigns a value to renamed_dtors. **CN:** 将一个值赋给 renamed_dtors。
+- **L99** `            for dtor in dtors:` — **EN:** Starts a loop assigning items from `dtors` to `dtor`. **CN:** 开始一个循环，将 `dtors` 的元素赋给 `dtor`。
+- **L100** `                if dtor.value in defined_symbols:` — **EN:** Starts a conditional branch guarded by `dtor.value in defined_symbols`. **CN:** 开始一个由 `dtor.value in defined_symbols` 控制的条件分支。
+- **L101** `                    renamed_dtors.append(` — **EN:** Invokes `renamed_dtors.append` as a standalone call. **CN:** 以独立语句方式调用 `renamed_dtors.append`。
+- **L102** `                        ir.FlatSymbolRefAttr.get(symbol_prefix + "_" + dtor.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L105** `                    renamed_dtors.append(dtor)` — **EN:** Invokes `renamed_dtors.append` as a standalone call. **CN:** 以独立语句方式调用 `renamed_dtors.append`。
+- **L106** `            if renamed_dtors:` — **EN:** Starts a conditional branch guarded by `renamed_dtors`. **CN:** 开始一个由 `renamed_dtors` 控制的条件分支。
+- **L107** `                op.attributes["dtors"] = ir.ArrayAttr.get(renamed_dtors)` — **EN:** Assigns a value to op.attributes['dtors']. **CN:** 将一个值赋给 op.attributes['dtors']。
+- **L108** `        return ir.WalkResult.ADVANCE` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    with ir.Context():` — **EN:** Starts a context-managed block using ir.Context(). **CN:** 开始一个使用 ir.Context() 的上下文管理代码块。
+- **L111** `        export_module = ir.Module.parse(str(ir_module))` — **EN:** Assigns a value to export_module. **CN:** 将一个值赋给 export_module。
+- **L112** `        # First pass: collect and rename function definitions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L113** `        export_module.operation.walk(walk_llvm_func_op)` — **EN:** Invokes `export_module.operation.walk` as a standalone call. **CN:** 以独立语句方式调用 `export_module.operation.walk`。
+- **L114** `        # Second pass: rename call and addressof references` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L115** `        export_module.operation.walk(walk_llvm_references)` — **EN:** Invokes `export_module.operation.walk` as a standalone call. **CN:** 以独立语句方式调用 `export_module.operation.walk`。
+- **L116** `    return export_module` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `class SignatureProcessor:` — **EN:** Defines class `SignatureProcessor`. **CN:** 定义类 `SignatureProcessor`。
+- **L120** `    """The signature processor. The signature may contain the dsl specific types. The base processor` — **EN:** Starts the docstring for the class `SignatureProcessor`. **CN:** 开始说明 class `SignatureProcessor` 的文档字符串。
+- **L121** `    class is used to define an interface for dumping and loading the signature."""` — **EN:** Ends the docstring for the class `SignatureProcessor`. **CN:** 结束说明 class `SignatureProcessor` 的文档字符串。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    def dumps(self, signature: inspect.Signature) -> bytes:` — **EN:** Defines function `dumps`. **CN:** 定义函数 `dumps`。
+- **L124** `        raise NotImplementedError("SignatureProcessor does not support dumps")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `    def loads(self, signature_bytes: bytes) -> inspect.Signature:` — **EN:** Defines function `loads`. **CN:** 定义函数 `loads`。
+- **L127** `        raise NotImplementedError("SignatureProcessor does not support loads")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `def encode_metadata_into_ir_module(` — **EN:** Defines function `encode_metadata_into_ir_module`. **CN:** 定义函数 `encode_metadata_into_ir_module`。
+- **L131** `    prefix: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L132** `    ir_module: ir.Module,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L133** `    signature: inspect.Signature,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L134** `    function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L135** `    kernel_info: dict,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L136** `    signature_processor: SignatureProcessor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `    object_file_version: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `) -> ir.Module:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L139** `    """Encode the executor metadata into the ir module. The metadata includes:` — **EN:** Starts the docstring for the function `encode_metadata_into_ir_module`. **CN:** 开始说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L140** `    1. args_spec: The args_spec of the python function.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L141** `    2. function_name: The name mangling function_name of the python host function.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L142** `    3. kernel_info: The kernel_info of the jit-compiled function including the kernel name and attributes.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L143** `    4. version: The version of the object file.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    @param prefix: The prefix name of the function. This is the unique identifier name of the function to avoid symbol conflict in the generated object file.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L146** `    @param ir_module: The ir module to encode the metadata into.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L147** `    @param args_spec: The args_spec of the python function.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L148** `    @param function_name: The name mangling function_name of the python host function.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L149** `    @param kernel_info: The kernel_info of the jit-compiled function including the kernel name and attributes.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L150** `    @param signature_processor: The signature processor. The signature may contain the dsl specific types. The processor will be used to dump and load the signature.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L151** `    @param object_file_version: The version of the object file.` — **EN:** Continues the docstring for the function `encode_metadata_into_ir_module`. **CN:** 继续说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L152** `    """` — **EN:** Ends the docstring for the function `encode_metadata_into_ir_module`. **CN:** 结束说明 function `encode_metadata_into_ir_module` 的文档字符串。
+- **L153** `    if not signature:` — **EN:** Starts a conditional branch guarded by `not signature`. **CN:** 开始一个由 `not signature` 控制的条件分支。
+- **L154** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L155** `            "signature is empty, please set the signature for the python jit function."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `    version = object_file_version + c_string_suffix` — **EN:** Assigns a value to version. **CN:** 将一个值赋给 version。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    signature_bytes = signature_processor.dumps(signature)` — **EN:** Assigns a value to signature_bytes. **CN:** 将一个值赋给 signature_bytes。
+- **L160** `    signature_str = base64.b64encode(signature_bytes).decode("utf-8") + c_string_suffix` — **EN:** Assigns a value to signature_str. **CN:** 将一个值赋给 signature_str。
+- **L161** `    packed_function_name = (` — **EN:** Assigns a value to packed_function_name. **CN:** 将一个值赋给 packed_function_name。
+- **L162** `        "_mlir_" + prefix + "__mlir_ciface_" + function_name + c_string_suffix` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `    with ir_module.context, ir.Location.unknown():` — **EN:** Starts a context-managed block using ir_module.context, ir.Location.unknown(). **CN:** 开始一个使用 ir_module.context, ir.Location.unknown() 的上下文管理代码块。
+- **L165** `        with ir.InsertionPoint(ir_module.body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(ir_module.body). **CN:** 开始一个使用 ir.InsertionPoint(ir_module.body) 的上下文管理代码块。
+- **L166** `            args_spec_op = llvm.GlobalOp(` — **EN:** Assigns a value to args_spec_op. **CN:** 将一个值赋给 args_spec_op。
+- **L167** `                sym_name="_".join([prefix, args_spec_suffix]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `                global_type=ir.Type.parse(f"!llvm.array<{len(signature_str)} x i8>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `                linkage=ir.Attribute.parse("#llvm.linkage<external>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `                value=ir.StringAttr.get(signature_str),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `            function_name_op = llvm.GlobalOp(` — **EN:** Assigns a value to function_name_op. **CN:** 将一个值赋给 function_name_op。
+- **L173** `                sym_name="_".join([prefix, function_name_suffix]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `                global_type=ir.Type.parse(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `                    f"!llvm.array<{len(packed_function_name)} x i8>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `                linkage=ir.Attribute.parse("#llvm.linkage<external>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `                value=ir.StringAttr.get(packed_function_name),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `            # pack the kernel_info from a dict to a global op.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L181** `            kernel_info = json.dumps(kernel_info) + c_string_suffix  # type: ignore[assignment]` — **EN:** Assigns a value to kernel_info. **CN:** 将一个值赋给 kernel_info。
+- **L182** `            kernel_info_op = llvm.GlobalOp(` — **EN:** Assigns a value to kernel_info_op. **CN:** 将一个值赋给 kernel_info_op。
+- **L183** `                sym_name="_".join([prefix, kernel_info_suffix]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `                global_type=ir.Type.parse(f"!llvm.array<{len(kernel_info)} x i8>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `                linkage=ir.Attribute.parse("#llvm.linkage<external>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `                value=ir.StringAttr.get(kernel_info),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `            version_op = llvm.GlobalOp(` — **EN:** Assigns a value to version_op. **CN:** 将一个值赋给 version_op。
+- **L189** `                sym_name="_".join([prefix, version_suffix]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `                global_type=ir.Type.parse(f"!llvm.array<{len(version)} x i8>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `                linkage=ir.Attribute.parse("#llvm.linkage<external>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `                value=ir.StringAttr.get(version),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** `    return ir_module` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `def decode_metadata_from_execution_engine(` — **EN:** Defines function `decode_metadata_from_execution_engine`. **CN:** 定义函数 `decode_metadata_from_execution_engine`。
+- **L199** `    prefix: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L200** `    execution_engine: "BinaryExecutionEngine",  # type: ignore[name-defined]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L201** `    signature_processor: SignatureProcessor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L202** `) -> tuple[inspect.Signature, str | None, dict, str | None]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L203** `    """Decode the executor metadata from the execution engine. The metadata includes:` — **EN:** Starts the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 开始说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L204** `    1. signature: The signature of the python function.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L205** `    2. function_name: The name mangling function_name of the python host function.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L206** `    3. kernel_info: The kernel_info of the jit-compiled function including the kernel name and attributes.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L207** `    4. version: The version of the object file.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `    @param prefix: The prefix name of the function. This is the unique identifier name of the function to avoid symbol conflict in the generated object file.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L210** `    @param execution_engine: The binary execution engine. This is the execution engine to load the cuda module.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L211** `    @param signature_processor: The signature processor. The signature may contain the dsl specific types. The processor will be used to dump and load the signature.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L212** `    @return: The signature, function_name, and kernel_info.` — **EN:** Continues the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 继续说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L213** `    """` — **EN:** Ends the docstring for the function `decode_metadata_from_execution_engine`. **CN:** 结束说明 function `decode_metadata_from_execution_engine` 的文档字符串。
+- **L214** `    args_spec_str_p = execution_engine.lookup("_".join([prefix, args_spec_suffix]))` — **EN:** Assigns a value to args_spec_str_p. **CN:** 将一个值赋给 args_spec_str_p。
+- **L215** `    function_name_str_p = execution_engine.lookup(` — **EN:** Assigns a value to function_name_str_p. **CN:** 将一个值赋给 function_name_str_p。
+- **L216** `        "_".join([prefix, function_name_suffix])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `    kernel_info_str_p = execution_engine.lookup("_".join([prefix, kernel_info_suffix]))` — **EN:** Assigns a value to kernel_info_str_p. **CN:** 将一个值赋给 kernel_info_str_p。
+- **L219** `    version_str_p = execution_engine.lookup("_".join([prefix, version_suffix]))` — **EN:** Assigns a value to version_str_p. **CN:** 将一个值赋给 version_str_p。
+- **L220** `    if args_spec_str_p:` — **EN:** Starts a conditional branch guarded by `args_spec_str_p`. **CN:** 开始一个由 `args_spec_str_p` 控制的条件分支。
+- **L221** `        args_spec_str = ctypes.c_char_p(args_spec_str_p).value.decode("utf-8")  # type: ignore[union-attr]` — **EN:** Assigns a value to args_spec_str. **CN:** 将一个值赋给 args_spec_str。
+- **L222** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L223** `        args_spec_str = None` — **EN:** Assigns a value to args_spec_str. **CN:** 将一个值赋给 args_spec_str。
+- **L224** `    # The StringAttr encodes the string as utf-8 format.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L225** `    if function_name_str_p:` — **EN:** Starts a conditional branch guarded by `function_name_str_p`. **CN:** 开始一个由 `function_name_str_p` 控制的条件分支。
+- **L226** `        function_name_str = ctypes.c_char_p(function_name_str_p).value.decode("utf-8")  # type: ignore[union-attr]` — **EN:** Assigns a value to function_name_str. **CN:** 将一个值赋给 function_name_str。
+- **L227** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L228** `        function_name_str = None` — **EN:** Assigns a value to function_name_str. **CN:** 将一个值赋给 function_name_str。
+- **L229** `    if kernel_info_str_p:` — **EN:** Starts a conditional branch guarded by `kernel_info_str_p`. **CN:** 开始一个由 `kernel_info_str_p` 控制的条件分支。
+- **L230** `        kernel_info_str = ctypes.c_char_p(kernel_info_str_p).value.decode("utf-8")  # type: ignore[union-attr]` — **EN:** Assigns a value to kernel_info_str. **CN:** 将一个值赋给 kernel_info_str。
+- **L231** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L232** `        kernel_info_str = None` — **EN:** Assigns a value to kernel_info_str. **CN:** 将一个值赋给 kernel_info_str。
+- **L233** `    if version_str_p:` — **EN:** Starts a conditional branch guarded by `version_str_p`. **CN:** 开始一个由 `version_str_p` 控制的条件分支。
+- **L234** `        version_str = ctypes.c_char_p(version_str_p).value.decode("utf-8")  # type: ignore[union-attr]` — **EN:** Assigns a value to version_str. **CN:** 将一个值赋给 version_str。
+- **L235** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L236** `        version_str = None` — **EN:** Assigns a value to version_str. **CN:** 将一个值赋给 version_str。
+- **L237** `    args_spec_bytes = base64.b64decode(args_spec_str)  # type: ignore[arg-type]` — **EN:** Assigns a value to args_spec_bytes. **CN:** 将一个值赋给 args_spec_bytes。
+- **L238** `    args_spec = signature_processor.loads(args_spec_bytes)` — **EN:** Assigns a value to args_spec. **CN:** 将一个值赋给 args_spec。
+- **L239** `    function_name = function_name_str` — **EN:** Assigns a value to function_name. **CN:** 将一个值赋给 function_name。
+- **L240** `    kernel_info = json.loads(kernel_info_str)  # type: ignore[arg-type]` — **EN:** Assigns a value to kernel_info. **CN:** 将一个值赋给 kernel_info。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `    return args_spec, function_name, kernel_info, version_str` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.export.export`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.export.export`。
+- EN: Top-level classes: SignatureProcessor CN: 顶层类包括：SignatureProcessor
+- EN: Top-level functions: get_export_module, encode_metadata_into_ir_module, decode_metadata_from_execution_engine CN: 顶层函数包括：get_export_module, encode_metadata_into_ir_module, decode_metadata_from_execution_engine
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..common:DSLRuntimeError, ..._mlir:ir, ..._mlir.dialects:llvm CN: 内部依赖：..common:DSLRuntimeError, ..._mlir:ir, ..._mlir.dialects:llvm
+- EN: External or standard-library dependencies: inspect, io, os, json, base64, ctypes CN: 外部或标准库依赖：inspect, io, os, json, base64, ctypes

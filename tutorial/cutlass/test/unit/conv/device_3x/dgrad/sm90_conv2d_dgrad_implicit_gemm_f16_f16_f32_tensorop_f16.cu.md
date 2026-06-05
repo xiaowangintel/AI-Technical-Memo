@@ -1,0 +1,1362 @@
+# sm90_conv2d_dgrad_implicit_gemm_f16_f16_f32_tensorop_f16.cu — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device_3x/dgrad/sm90_conv2d_dgrad_implicit_gemm_f16_f16_f32_tensorop_f16.cu`
+**Purpose / 用途**: Tests for device-wide CONV interface. The file instantiates and runs tests for 2D, data-gradient, SM90, with concrete type aliases and builders declared in the source. / 该文件为 CUTLASS 3.x 设备卷积内核提供测试覆盖。 这里针对 2 维、反向数据梯度、SM90 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief Tests for device-wide CONV interface`
+  - **EN**: Records the file-level brief description: Tests for device-wide CONV interface.
+  - **CN**: 记录文件级简述：Tests for device-wide CONV interface。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L35** `#include "cutlass_unit_test.h"`
+  - **EN**: CUTLASS unit-test harness and common GoogleTest wiring.
+  - **CN**: CUTLASS 单元测试框架以及通用 GoogleTest 接线代码。
+- **L36** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L37** `#include "cutlass/cutlass.h"`
+  - **EN**: Core CUTLASS definitions, architecture tags, and status types.
+  - **CN**: CUTLASS 核心定义、架构标签和状态类型。
+- **L38** `#include "cute/tensor.hpp"`
+  - **EN**: CuTe tensor primitives for shapes, layouts, and tiled tensor expressions.
+  - **CN**: 用于形状、布局和分块张量表达的 CuTe 张量原语。
+- **L39** `#include "cute/atom/mma_atom.hpp"`
+  - **EN**: CuTe MMA atom definitions used to describe tensor-core operations.
+  - **CN**: 用于描述张量核心运算的 CuTe MMA 原子定义。
+- **L40** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L41** `#include "cutlass/numeric_types.h"`
+  - **EN**: Numeric scalar types such as half, bf16, tf32, and fp8 wrappers.
+  - **CN**: 提供 half、bf16、tf32、fp8 等数值标量类型封装。
+- **L42** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L43** `#include "cutlass/conv/device/conv_universal_adapter.hpp"`
+  - **EN**: Device-facing adapter that turns a universal convolution kernel into a callable operator.
+  - **CN**: 将通用卷积内核封装为可调用设备算子的适配器。
+- **L44** `#include "cutlass/conv/kernel/conv_universal.hpp"`
+  - **EN**: Universal convolution kernel composition layer for CUTLASS 3.x.
+  - **CN**: CUTLASS 3.x 的通用卷积内核组合层。
+- **L45** `#include "cutlass/conv/collective/collective_builder.hpp"`
+  - **EN**: Builder that assembles convolution mainloop collectives from architecture and tile policies.
+  - **CN**: 根据架构与分块策略组装卷积主循环 collective 的构建器。
+- **L46** `#include "cutlass/epilogue/collective/collective_builder.hpp"`
+  - **EN**: Builder for CUTLASS 3.x epilogue collectives.
+  - **CN**: CUTLASS 3.x 尾处理（epilogue）collective 的构建器。
+- **L47** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L48** `#include "../testbed_conv.hpp"`
+  - **EN**: Shared ConvNd testbed that runs enumerated problem shapes against a device operator.
+  - **CN**: 共享的 ConvNd 测试平台，用于将枚举的问题规模运行到设备算子上。
+- **L49** `using namespace cute;`
+  - **EN**: Imports namespace `cute` into the current scope for shorter names.
+  - **CN**: 将命名空间 `cute` 引入当前作用域，以便使用更短名称。
+- **L50** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `#if defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - **EN**: Starts a compile-time conditional block guarded by `defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`.
+  - **CN**: 开始由 `defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)` 保护的编译期条件块。
+- **L52** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L53** `//////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L54** `// Tile shape 64x64x64`
+  - **EN**: Comment explaining: Tile shape 64x64x64.
+  - **CN**: 说明性注释：Tile shape 64x64x64。
+- **L55** `//////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L56** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L57** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L58** `// Cluster 2x1x1`
+  - **EN**: Comment explaining: Cluster 2x1x1.
+  - **CN**: 说明性注释：Cluster 2x1x1。
+- **L59** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L60** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L61** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 64x64x64_2x1x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_2x1x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_2x1x1`。
+- **L62** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+- **L63** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L64** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L65** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L66** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L67** `  using TileShapeMNK = Shape<_64, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L68** `  using ClusterShapeMNK = Shape<_2,_1,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L69** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L70** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L71** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L72** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L73** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L74** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L75** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L77** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L78** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L79** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L80** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L81** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L82** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L83** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L84** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L85** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L86** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L87** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+- **L88** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L89** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L90** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L91** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L92** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L93** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L94** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L95** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L96** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L97** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L98** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L99** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L100** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L102** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L103** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L104** `// Cluster 1x1x1`
+  - **EN**: Comment explaining: Cluster 1x1x1.
+  - **CN**: 说明性注释：Cluster 1x1x1。
+- **L105** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L106** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L107** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 64x64x64_1x1x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_1x1x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_1x1x1`。
+- **L108** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+- **L109** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L110** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L111** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L112** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L113** `  using TileShapeMNK = Shape<_64, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L114** `  using ClusterShapeMNK = Shape<_1,_1,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L115** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L116** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L117** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L118** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L119** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L120** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L121** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L122** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L123** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L124** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L125** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L127** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L128** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L129** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L130** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L131** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L132** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L133** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+- **L134** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L135** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L136** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L137** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L138** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L139** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L140** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L141** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L142** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L143** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L144** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L145** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L146** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L147** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L148** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L149** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L150** `// Cluster 1x2x1`
+  - **EN**: Comment explaining: Cluster 1x2x1.
+  - **CN**: 说明性注释：Cluster 1x2x1。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L152** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L153** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 64x64x64_1x2x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_1x2x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_1x2x1`。
+- **L154** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+- **L155** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L156** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L157** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L158** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L159** `  using TileShapeMNK = Shape<_64, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L160** `  using ClusterShapeMNK = Shape<_1,_2,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L161** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L162** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L163** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L164** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L165** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L166** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L167** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L168** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L169** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L170** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L171** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L172** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L173** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L174** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L175** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L177** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L178** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L179** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+- **L180** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L181** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L182** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L183** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L184** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L185** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L186** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L187** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L188** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L189** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L190** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L191** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L192** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L193** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L194** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L195** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L196** `// Cluster 2x2x1`
+  - **EN**: Comment explaining: Cluster 2x2x1.
+  - **CN**: 说明性注释：Cluster 2x2x1。
+- **L197** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L198** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L199** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 64x64x64_2x2x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_2x2x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.64x64x64_2x2x1`。
+- **L200** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L202** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L203** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L204** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L205** `  using TileShapeMNK = Shape<_64, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L206** `  using ClusterShapeMNK = Shape<_2,_2,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L207** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L208** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L209** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L210** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L211** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L212** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L213** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L214** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L215** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L216** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L217** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L218** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L219** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L220** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L221** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L222** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L223** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L224** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L225** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L227** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L228** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L229** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L230** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L231** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L232** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L233** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L234** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L235** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L236** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L237** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L238** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L239** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L240** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L241** `//////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L242** `// Tile shape 128x64x64`
+  - **EN**: Comment explaining: Tile shape 128x64x64.
+  - **CN**: 说明性注释：Tile shape 128x64x64。
+- **L243** `//////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L244** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L245** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L246** `// Cluster 1x1x1`
+  - **EN**: Comment explaining: Cluster 1x1x1.
+  - **CN**: 说明性注释：Cluster 1x1x1。
+- **L247** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L248** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L249** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 128x64x64_1x1x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_1x1x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_1x1x1`。
+- **L250** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L252** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L253** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L254** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L255** `  using TileShapeMNK = Shape<_128, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L256** `  using ClusterShapeMNK = Shape<_1,_1,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L257** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L258** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L259** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L260** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L261** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L262** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L263** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L264** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L265** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L266** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L267** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L268** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L269** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L270** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L271** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L272** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L273** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L274** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L275** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+
+### Lines 276-300 / 第276-300行
+
+- **L276** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L277** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L278** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L279** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L280** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L281** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L282** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L283** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L284** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L285** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L286** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L287** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L288** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L289** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L290** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L291** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L292** `// Cluster 2x1x1`
+  - **EN**: Comment explaining: Cluster 2x1x1.
+  - **CN**: 说明性注释：Cluster 2x1x1。
+- **L293** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L294** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L295** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 128x64x64_2x1x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_2x1x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_2x1x1`。
+- **L296** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+- **L297** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L298** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L299** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L300** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 301-325 / 第301-325行
+
+- **L301** `  using TileShapeMNK = Shape<_128, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L302** `  using ClusterShapeMNK = Shape<_2,_1,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L303** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L304** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L305** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L306** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L307** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L308** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L309** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L310** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L311** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L312** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L313** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L314** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L315** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L316** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L317** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L318** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L319** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L320** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L321** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+- **L322** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L323** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L324** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L325** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+
+### Lines 326-350 / 第326-350行
+
+- **L326** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L327** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L328** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L329** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L330** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L331** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L332** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L333** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L334** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L335** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L336** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L337** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L338** `// Cluster 1x2x1`
+  - **EN**: Comment explaining: Cluster 1x2x1.
+  - **CN**: 说明性注释：Cluster 1x2x1。
+- **L339** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L340** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L341** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 128x64x64_1x2x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_1x2x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_1x2x1`。
+- **L342** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+- **L343** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L344** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L345** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L346** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L347** `  using TileShapeMNK = Shape<_128, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L348** `  using ClusterShapeMNK = Shape<_1,_2,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L349** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L350** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+
+### Lines 351-375 / 第351-375行
+
+- **L351** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L352** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L353** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L354** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L355** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L356** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L357** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L358** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L359** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L360** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L361** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L362** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L363** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L364** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L365** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L366** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L367** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+- **L368** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L369** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L370** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L371** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L372** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L373** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L374** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L375** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+
+### Lines 376-400 / 第376-400行
+
+- **L376** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L377** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L378** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L379** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L380** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L381** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L382** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L383** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L384** `// Cluster 2x2x1`
+  - **EN**: Comment explaining: Cluster 2x2x1.
+  - **CN**: 说明性注释：Cluster 2x2x1。
+- **L385** `//`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L386** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L387** `TEST(SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16, 128x64x64_2x2x1) {`
+  - **EN**: Defines GoogleTest case `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_2x2x1`.
+  - **CN**: 定义 GoogleTest 用例 `SM90_device_conv2d_dgrad_implicitgemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f16.128x64x64_2x2x1`。
+- **L388** `  using ElementAct     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAct` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAct` 类型别名，供后续内核与 epilogue 定义使用。
+- **L389** `  using ElementFlt     = cutlass::half_t;`
+  - **EN**: Creates the `ElementFlt` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementFlt` 类型别名，供后续内核与 epilogue 定义使用。
+- **L390** `  using ElementOut     = float;`
+  - **EN**: Creates the `ElementOut` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOut` 类型别名，供后续内核与 epilogue 定义使用。
+- **L391** `  using ElementAcc     = cutlass::half_t;`
+  - **EN**: Creates the `ElementAcc` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAcc` 类型别名，供后续内核与 epilogue 定义使用。
+- **L392** `  using ElementCompute = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L393** `  using TileShapeMNK = Shape<_128, _64, Shape<_64>>;`
+  - **EN**: Creates the helper type alias `TileShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `TileShapeMNK`，供后续声明使用。
+- **L394** `  using ClusterShapeMNK = Shape<_2,_2,_1>;`
+  - **EN**: Creates the helper type alias `ClusterShapeMNK` for later declarations.
+  - **CN**: 创建辅助类型别名 `ClusterShapeMNK`，供后续声明使用。
+- **L395** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L396** `  using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - **EN**: Begins the epilogue collective alias that describes output staging and conversion.
+  - **CN**: 开始定义 epilogue collective 别名，用于描述输出阶段与类型转换。
+- **L397** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveEpilogue`.
+  - **CN**: 为 `CollectiveEpilogue` 指定目标 GPU 架构。
+- **L398** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L399** `      cutlass::epilogue::collective::EpilogueTileAuto,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L400** `      ElementAcc, ElementCompute,`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+
+### Lines 401-425 / 第401-425行
+
+- **L401** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L402** `      cutlass::half_t, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveEpilogue`.
+  - **CN**: 设置 `CollectiveEpilogue` 使用的一个张量布局。
+- **L403** `      cutlass::epilogue::TmaWarpSpecialized`
+  - **EN**: Continues supplying template arguments for `CollectiveEpilogue`.
+  - **CN**: 继续为 `CollectiveEpilogue` 提供模板参数。
+- **L404** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveEpilogue` as the selected collective operator type.
+  - **CN**: 将 `CollectiveEpilogue` 最终确定为选定的 collective 算子类型。
+- **L405** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L406** `  using CollectiveMainloop = typename cutlass::conv::collective::CollectiveBuilder<`
+  - **EN**: Begins the mainloop collective alias that describes the convolution data movement and MMA pipeline.
+  - **CN**: 开始定义 mainloop collective 别名，用于描述卷积数据搬运与 MMA 流水线。
+- **L407** `      cutlass::arch::Sm90, cutlass::arch::OpClassTensorOp,`
+  - **EN**: Specifies the target GPU architecture for `CollectiveMainloop`.
+  - **CN**: 为 `CollectiveMainloop` 指定目标 GPU 架构。
+- **L408** `      cutlass::conv::Operator::kDgrad,`
+  - **EN**: Marks `CollectiveMainloop` as a data-gradient convolution configuration.
+  - **CN**: 将 `CollectiveMainloop` 标记为反向数据梯度卷积配置。
+- **L409** `      ElementAct, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L410** `      ElementFlt, cutlass::layout::TensorNHWC, 8,`
+  - **EN**: Sets one of the tensor layouts used by `CollectiveMainloop`.
+  - **CN**: 设置 `CollectiveMainloop` 使用的一个张量布局。
+- **L411** `      ElementAcc,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L412** `      TileShapeMNK, ClusterShapeMNK,`
+  - **EN**: Continues supplying template arguments for `CollectiveMainloop`.
+  - **CN**: 继续为 `CollectiveMainloop` 提供模板参数。
+- **L413** `      cutlass::conv::collective::StageCountAutoCarveout<static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - **EN**: Lets CUTLASS choose the stage count for `CollectiveMainloop` after shared-memory carveout.
+  - **CN**: 让 CUTLASS 在预留共享内存后为 `CollectiveMainloop` 自动选择阶段数。
+- **L414** `      cutlass::conv::collective::KernelScheduleAuto`
+  - **EN**: Lets CUTLASS auto-select the kernel schedule for `CollectiveMainloop`.
+  - **CN**: 让 CUTLASS 为 `CollectiveMainloop` 自动选择内核调度。
+- **L415** `    >::CollectiveOp;`
+  - **EN**: Finalizes `CollectiveMainloop` as the selected collective operator type.
+  - **CN**: 将 `CollectiveMainloop` 最终确定为选定的 collective 算子类型。
+- **L416** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L417** `  using ProblemShape=cutlass::conv::ConvProblemShape<CollectiveMainloop::DispatchPolicy::ConvOp, CollectiveMainloop::DispatchPolicy::NumSpatialDimensions>;`
+  - **EN**: Aliases the convolution problem-shape type consumed by the universal kernel.
+  - **CN**: 为通用卷积内核要消费的问题形状类型创建别名。
+- **L418** `  using ConvKernel = cutlass::conv::kernel::ConvUniversal<`
+  - **EN**: Defines the kernel type alias `ConvKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `ConvKernel`，形成具体卷积内核。
+- **L419** `      ProblemShape,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L420** `      CollectiveMainloop,`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L421** `      CollectiveEpilogue`
+  - **EN**: Continues supplying template arguments for `ConvKernel`.
+  - **CN**: 继续为 `ConvKernel` 提供模板参数。
+- **L422** `    >;`
+  - **EN**: Closes the multi-line alias definition for `ConvKernel`.
+  - **CN**: 结束 `ConvKernel` 的多行别名定义。
+- **L423** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L424** `  using Conv = cutlass::conv::device::ConvUniversalAdapter<ConvKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv`。
+- **L425** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 426-429 / 第426-429行
+
+- **L426** `  EXPECT_TRUE(test::conv::device::TestAllConv<Conv>());`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L427** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L428** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L429** `#endif // defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - **EN**: Ends the current compile-time conditional block.
+  - **CN**: 结束当前编译期条件块。
+
+## Key Concepts / 关键概念
+- GoogleTest test cases encode each kernel variant as a compile-time instantiation that is exercised by a shared testbed. / GoogleTest 用例将每个内核变体编码为编译期实例化，并交由共享测试平台执行。
+- CUTLASS 3.x uses collective builders to compose mainloop and epilogue policies from architecture, layout, and tile parameters. / CUTLASS 3.x 使用 collective 构建器，根据架构、布局和分块参数组合 mainloop 与 epilogue 策略。
+- Problem-shape objects encode tensor extents, padding, stride, dilation, and grouping for each convolution scenario. / 问题形状对象编码了每个卷积场景的张量尺寸、padding、步幅、膨胀和分组信息。
+## Dependencies / 依赖项
+- `cutlass_unit_test.h` — CUTLASS unit-test harness and common GoogleTest wiring. / CUTLASS 单元测试框架以及通用 GoogleTest 接线代码。
+- `cutlass/cutlass.h` — Core CUTLASS definitions, architecture tags, and status types. / CUTLASS 核心定义、架构标签和状态类型。
+- `cute/tensor.hpp` — CuTe tensor primitives for shapes, layouts, and tiled tensor expressions. / 用于形状、布局和分块张量表达的 CuTe 张量原语。
+- `cute/atom/mma_atom.hpp` — CuTe MMA atom definitions used to describe tensor-core operations. / 用于描述张量核心运算的 CuTe MMA 原子定义。
+- `cutlass/numeric_types.h` — Numeric scalar types such as half, bf16, tf32, and fp8 wrappers. / 提供 half、bf16、tf32、fp8 等数值标量类型封装。
+- `cutlass/conv/device/conv_universal_adapter.hpp` — Device-facing adapter that turns a universal convolution kernel into a callable operator. / 将通用卷积内核封装为可调用设备算子的适配器。
+- `cutlass/conv/kernel/conv_universal.hpp` — Universal convolution kernel composition layer for CUTLASS 3.x. / CUTLASS 3.x 的通用卷积内核组合层。
+- `cutlass/conv/collective/collective_builder.hpp` — Builder that assembles convolution mainloop collectives from architecture and tile policies. / 根据架构与分块策略组装卷积主循环 collective 的构建器。
+- `cutlass/epilogue/collective/collective_builder.hpp` — Builder for CUTLASS 3.x epilogue collectives. / CUTLASS 3.x 尾处理（epilogue）collective 的构建器。
+- `../testbed_conv.hpp` — Shared ConvNd testbed that runs enumerated problem shapes against a device operator. / 共享的 ConvNd 测试平台，用于将枚举的问题规模运行到设备算子上。

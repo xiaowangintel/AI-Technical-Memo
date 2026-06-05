@@ -1,0 +1,701 @@
+# cutlass_profiler.cu — Code Analysis / 代码分析
+**Source / 源文件**: `tools/profiler/src/cutlass_profiler.cu`
+**Purpose / 用途**: Declares or implements the central CUTLASS profiler controller. / 声明或实现 CUTLASS profiler 的核心控制器。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>   \brief Execution environment</code>
+  - EN: Comment that documents intent or context: "\brief Execution environment".
+  - CN: 用于说明意图或上下文的注释："\brief Execution environment"。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#include &lt;iostream&gt;</code>
+  - EN: Includes `iostream` so this file can use standard stream input/output support.
+  - CN: 引入 `iostream`，使当前文件可以使用标准流输入输出支持。
+- **L36** <code>#include &lt;stdexcept&gt;</code>
+  - EN: Includes `stdexcept` so this file can use APIs or definitions from `stdexcept`.
+  - CN: 引入 `stdexcept`，使当前文件可以使用来自 `stdexcept` 的 API 或定义。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>// Profiler includes</code>
+  - EN: Comment that documents intent or context: "Profiler includes".
+  - CN: 用于说明意图或上下文的注释："Profiler includes"。
+- **L39** <code>#include &quot;cutlass/profiler/block_scaled_gemm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/block_scaled_gemm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/block_scaled_gemm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L40** <code>#include &quot;cutlass/profiler/blockwise_gemm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/blockwise_gemm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/blockwise_gemm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L41** <code>#include &quot;cutlass/profiler/conv2d_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/conv2d_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/conv2d_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L42** <code>#include &quot;cutlass/profiler/conv3d_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/conv3d_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/conv3d_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L43** <code>#include &quot;cutlass/profiler/cutlass_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/cutlass_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/cutlass_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L44** <code>#include &quot;cutlass/profiler/gemm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/gemm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/gemm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L45** <code>#include &quot;cutlass/profiler/grouped_gemm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/grouped_gemm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/grouped_gemm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L46** <code>#include &quot;cutlass/profiler/rank_2k_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/rank_2k_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/rank_2k_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L47** <code>#include &quot;cutlass/profiler/rank_k_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/rank_k_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/rank_k_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L48** <code>#include &quot;cutlass/profiler/sparse_gemm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/sparse_gemm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/sparse_gemm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L49** <code>#include &quot;cutlass/profiler/symm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/symm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/symm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L50** <code>#include &quot;cutlass/profiler/trmm_operation_profiler.h&quot;</code>
+  - EN: Includes `cutlass/profiler/trmm_operation_profiler.h` so this file can use CUTLASS profiler interfaces or helpers.
+  - CN: 引入 `cutlass/profiler/trmm_operation_profiler.h`，使当前文件可以使用CUTLASS profiler 接口或辅助工具。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L55** <code>namespace profiler {</code>
+  - EN: Opens namespace `profiler` to group related symbols.
+  - CN: 打开命名空间 `profiler`，用于归组相关符号。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L58** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L59** <code>CutlassProfiler::CutlassProfiler(</code>
+  - EN: Begins or continues the signature/call syntax involving `CutlassProfiler`.
+  - CN: 开始或继续与 `CutlassProfiler` 相关的签名/调用语法。
+- **L60** <code>  Options const &amp;options</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L62** <code>  options_(options) {</code>
+  - EN: Begins the definition of function or method `options_`.
+  - CN: 开始定义函数或方法 `options_`。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>  operation_profilers_.emplace_back(new GemmOperationProfiler(options));</code>
+  - EN: Declares function or method `GemmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `GemmOperationProfiler`，但不在此处给出定义。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>  operation_profilers_.emplace_back(new BlockScaledGemmOperationProfiler(options));</code>
+  - EN: Declares function or method `BlockScaledGemmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `BlockScaledGemmOperationProfiler`，但不在此处给出定义。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>  operation_profilers_.emplace_back(new BlockwiseGemmOperationProfiler(options));   </code>
+  - EN: Declares function or method `BlockwiseGemmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `BlockwiseGemmOperationProfiler`，但不在此处给出定义。
+- **L69** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L70** <code>  operation_profilers_.emplace_back(new SparseGemmOperationProfiler(options));</code>
+  - EN: Declares function or method `SparseGemmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `SparseGemmOperationProfiler`，但不在此处给出定义。
+- **L71** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L72** <code>  operation_profilers_.emplace_back(new Conv2dOperationProfiler(options));</code>
+  - EN: Declares function or method `Conv2dOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `Conv2dOperationProfiler`，但不在此处给出定义。
+- **L73** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L74** <code>  operation_profilers_.emplace_back(new Conv3dOperationProfiler(options));</code>
+  - EN: Declares function or method `Conv3dOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `Conv3dOperationProfiler`，但不在此处给出定义。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>  operation_profilers_.emplace_back(new RankKOperationProfiler(options));</code>
+  - EN: Declares function or method `RankKOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `RankKOperationProfiler`，但不在此处给出定义。
+- **L77** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L78** <code>  operation_profilers_.emplace_back(new Rank2KOperationProfiler(options));</code>
+  - EN: Declares function or method `Rank2KOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `Rank2KOperationProfiler`，但不在此处给出定义。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>  operation_profilers_.emplace_back(new TrmmOperationProfiler(options));</code>
+  - EN: Declares function or method `TrmmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `TrmmOperationProfiler`，但不在此处给出定义。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>  operation_profilers_.emplace_back(new SymmOperationProfiler(options));</code>
+  - EN: Declares function or method `SymmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `SymmOperationProfiler`，但不在此处给出定义。
+- **L83** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L84** <code>  operation_profilers_.emplace_back(new GroupedGemmOperationProfiler(options));</code>
+  - EN: Declares function or method `GroupedGemmOperationProfiler` without defining it here.
+  - CN: 声明函数或方法 `GroupedGemmOperationProfiler`，但不在此处给出定义。
+- **L85** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L86** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L87** <code>CutlassProfiler::~CutlassProfiler() {</code>
+  - EN: Begins the definition of function or method `~CutlassProfiler`.
+  - CN: 开始定义函数或方法 `~CutlassProfiler`。
+- **L88** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L89** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L90** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L91** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>/// Execute the program</code>
+  - EN: Comment that documents intent or context: "Execute the program".
+  - CN: 用于说明意图或上下文的注释："Execute the program"。
+- **L94** <code>int CutlassProfiler::operator()() {</code>
+  - EN: Begins the definition of function or method `operator`.
+  - CN: 开始定义函数或方法 `operator`。
+- **L95** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L96** <code>  if (options_.cmdline.num_naked_args() &gt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L97** <code>    std::cerr &lt;&lt; &quot;Unknown args: \n&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L98** <code>    options_.cmdline.print_naked_args(std::cerr);</code>
+  - EN: Declares function or method `print_naked_args` without defining it here.
+  - CN: 声明函数或方法 `print_naked_args`，但不在此处给出定义。
+- **L99** <code>    std::cerr &lt;&lt; &quot;\n\n\n&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L100** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L101** <code>    print_usage_(std::cout);</code>
+  - EN: Declares function or method `print_usage_` without defining it here.
+  - CN: 声明函数或方法 `print_usage_`，但不在此处给出定义。
+- **L102** <code>    return 1;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L103** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L104** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L105** <code>  if (options_.about.help) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L106** <code>    if (options_.operation_kind == library::OperationKind::kInvalid) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L107** <code>      print_usage_(std::cout);</code>
+  - EN: Declares function or method `print_usage_` without defining it here.
+  - CN: 声明函数或方法 `print_usage_`，但不在此处给出定义。
+- **L108** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L109** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L110** <code>      for (auto &amp; profiler : operation_profilers_) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L111** <code>        if (profiler-&gt;kind() == options_.operation_kind) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L112** <code>          profiler-&gt;print_usage(std::cout);</code>
+  - EN: Declares function or method `print_usage` without defining it here.
+  - CN: 声明函数或方法 `print_usage`，但不在此处给出定义。
+- **L113** <code>          profiler-&gt;print_examples(std::cout);</code>
+  - EN: Declares function or method `print_examples` without defining it here.
+  - CN: 声明函数或方法 `print_examples`，但不在此处给出定义。
+- **L114** <code>          return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L115** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L116** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L117** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L118** <code>    return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L119** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L120** <code>  else if (options_.about.version) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L121** <code>    options_.about.print_version(std::cout);</code>
+  - EN: Declares function or method `print_version` without defining it here.
+  - CN: 声明函数或方法 `print_version`，但不在此处给出定义。
+- **L122** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L123** <code>    std::cout &lt;&lt; std::endl;</code>
+  - EN: Declares the symbol `endl` in the current scope.
+  - CN: 在当前作用域中声明符号 `endl`。
+- **L124** <code>    return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L125** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L126** <code>  else if (options_.about.device_info) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L127** <code>    options_.device.print_device_info(std::cout);</code>
+  - EN: Declares function or method `print_device_info` without defining it here.
+  - CN: 声明函数或方法 `print_device_info`，但不在此处给出定义。
+- **L128** <code>    return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L129** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L130** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L131** <code>  if (options_.execution_mode == ExecutionMode::kProfile ||</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L132** <code>    options_.execution_mode == ExecutionMode::kDryRun ||</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L133** <code>    options_.execution_mode == ExecutionMode::kTrace) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>    // Profiles all operations</code>
+  - EN: Comment that documents intent or context: "Profiles all operations".
+  - CN: 用于说明意图或上下文的注释："Profiles all operations"。
+- **L136** <code>    return profile_();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L137** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L138** <code>  else if (options_.execution_mode == ExecutionMode::kEnumerate) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L139** <code>    // Enumerates all operations</code>
+  - EN: Comment that documents intent or context: "Enumerates all operations".
+  - CN: 用于说明意图或上下文的注释："Enumerates all operations"。
+- **L140** <code>    enumerate_();</code>
+  - EN: Declares function or method `enumerate_` without defining it here.
+  - CN: 声明函数或方法 `enumerate_`，但不在此处给出定义。
+- **L141** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L142** <code>  return 0;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L143** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L146** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L147** <code>/// Enumerates all operations</code>
+  - EN: Comment that documents intent or context: "Enumerates all operations".
+  - CN: 用于说明意图或上下文的注释："Enumerates all operations"。
+- **L148** <code>void CutlassProfiler::enumerate_() {</code>
+  - EN: Begins the definition of function or method `enumerate_`.
+  - CN: 开始定义函数或方法 `enumerate_`。
+- **L149** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L150** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>/// Profiles all operations</code>
+  - EN: Comment that documents intent or context: "Profiles all operations".
+  - CN: 用于说明意图或上下文的注释："Profiles all operations"。
+- **L153** <code>int CutlassProfiler::profile_() {</code>
+  - EN: Begins the definition of function or method `profile_`.
+  - CN: 开始定义函数或方法 `profile_`。
+- **L154** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L155** <code>  // Keep track of all device memory tensor in map</code>
+  - EN: Comment that documents intent or context: "Keep track of all device memory tensor in map".
+  - CN: 用于说明意图或上下文的注释："Keep track of all device memory tensor in map"。
+- **L156** <code>  DeviceContext device_context;</code>
+  - EN: Declares the symbol `device_context` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_context`。
+- **L157** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L158** <code>  int result = 0;</code>
+  - EN: Assigns or initializes `result` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `result` 进行赋值或初始化。
+- **L159** <code>  // For all profilers (e.g. gemm/sparse_gemm/conv2d...)</code>
+  - EN: Comment that documents intent or context: "For all profilers (e.g. gemm/sparse_gemm/conv2d...)".
+  - CN: 用于说明意图或上下文的注释："For all profilers (e.g. gemm/sparse_gemm/conv2d...)"。
+- **L160** <code>  for (auto &amp; profiler : operation_profilers_) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L161** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L162** <code>    if (options_.operation_kind == library::OperationKind::kInvalid ||</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L163** <code>        options_.operation_kind == profiler-&gt;kind()) {</code>
+  - EN: Begins the definition of function or method `kind`.
+  - CN: 开始定义函数或方法 `kind`。
+- **L164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L165** <code>      result = profiler-&gt;profile_all(options_, library::Singleton::get().manifest, device_context);</code>
+  - EN: Declares function or method `get` without defining it here.
+  - CN: 声明函数或方法 `get`，但不在此处给出定义。
+- **L166** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L167** <code>      // If some profile failed, terminate immediately</code>
+  - EN: Comment that documents intent or context: "If some profile failed, terminate immediately".
+  - CN: 用于说明意图或上下文的注释："If some profile failed, terminate immediately"。
+- **L168** <code>      if (result) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L169** <code>        return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L170** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L171** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L172** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L173** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L174** <code>  return result;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L175** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L176** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L177** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L179** <code>/// Prints all options</code>
+  - EN: Comment that documents intent or context: "Prints all options".
+  - CN: 用于说明意图或上下文的注释："Prints all options"。
+- **L180** <code>void CutlassProfiler::print_usage_(std::ostream &amp;out) {</code>
+  - EN: Begins the definition of function or method `print_usage_`.
+  - CN: 开始定义函数或方法 `print_usage_`。
+- **L181** <code>  options_.print_usage(out);</code>
+  - EN: Declares function or method `print_usage` without defining it here.
+  - CN: 声明函数或方法 `print_usage`，但不在此处给出定义。
+- **L182** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L183** <code>  out &lt;&lt; &quot;\nOperations:\n\n&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>  // For all profilers</code>
+  - EN: Comment that documents intent or context: "For all profilers".
+  - CN: 用于说明意图或上下文的注释："For all profilers"。
+- **L186** <code>  for (auto &amp; profiler : operation_profilers_) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L187** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>    std::string kind_str = library::to_string(profiler-&gt;kind());</code>
+  - EN: Declares function or method `kind` without defining it here.
+  - CN: 声明函数或方法 `kind`，但不在此处给出定义。
+- **L190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L191** <code>    size_t kAlignment = 40;</code>
+  - EN: Assigns or initializes `kAlignment` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kAlignment` 进行赋值或初始化。
+- **L192** <code>    size_t columns = 0;</code>
+  - EN: Assigns or initializes `columns` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `columns` 进行赋值或初始化。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>    if (kind_str.size() &lt; kAlignment) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L195** <code>      columns = kAlignment - kind_str.size();</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L196** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L197** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L198** <code>    out &lt;&lt; &quot;     &quot; &lt;&lt; kind_str &lt;&lt; std::string(columns, &#x27; &#x27;) &lt;&lt; profiler-&gt;description() &lt;&lt; &quot;\n&quot;;</code>
+  - EN: Declares function or method `description` without defining it here.
+  - CN: 声明函数或方法 `description`，但不在此处给出定义。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>  out &lt;&lt; &quot;\n\nFor details about a particular function, specify the function name with --help.\n\nExample:\n\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L203** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=Gemm --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L204** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=RankK --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L205** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=Trmm --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L206** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=Symm --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L207** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=Conv3d --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L208** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=Conv2d --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L209** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=SparseGemm --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L210** <code>    &lt;&lt; &quot;  $ cutlass_profiler --operation=GroupedGemm --help\n\n&quot;</code>
+  - EN: Assigns or initializes `operation` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operation` 进行赋值或初始化。
+- **L211** <code>  ;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L213** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L214** <code>/// Prints usage</code>
+  - EN: Comment that documents intent or context: "Prints usage".
+  - CN: 用于说明意图或上下文的注释："Prints usage"。
+- **L215** <code>void CutlassProfiler::print_options_(std::ostream &amp;out) {</code>
+  - EN: Begins the definition of function or method `print_options_`.
+  - CN: 开始定义函数或方法 `print_options_`。
+- **L216** <code>  options_.print_options(out);</code>
+  - EN: Declares function or method `print_options` without defining it here.
+  - CN: 声明函数或方法 `print_options`，但不在此处给出定义。
+- **L217** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L218** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L219** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>} // namespace profiler</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L222** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L223** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L224** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Profiler measurement flow and reporting / 性能分析流程与结果报告
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>iostream</code> — standard stream input/output support / 标准流输入输出支持
+- <code>stdexcept</code> — APIs or definitions from `stdexcept` / 来自 `stdexcept` 的 API 或定义
+- <code>cutlass/profiler/block_scaled_gemm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/blockwise_gemm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/conv2d_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/conv3d_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/cutlass_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/gemm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/grouped_gemm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/rank_2k_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/rank_k_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/sparse_gemm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/symm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具
+- <code>cutlass/profiler/trmm_operation_profiler.h</code> — CUTLASS profiler interfaces or helpers / CUTLASS profiler 接口或辅助工具

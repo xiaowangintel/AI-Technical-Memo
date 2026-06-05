@@ -1,0 +1,455 @@
+# gett.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/device/gett.hpp`
+**Purpose / 用途**: Provides a device-side reference implementation or helper for gett. / 为 gett 提供设备端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>  \brief GETT device reference code</code>
+  - EN: Comment that documents intent or context: "\brief GETT device reference code".
+  - CN: 用于说明意图或上下文的注释："\brief GETT device reference code"。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#include &lt;cute/tensor.hpp&gt;</code>
+  - EN: Includes `cute/tensor.hpp` so this file can use project-specific declarations from `tensor.hpp`.
+  - CN: 引入 `cute/tensor.hpp`，使当前文件可以使用来自 `tensor.hpp` 的项目专用声明。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>namespace cutlass::reference::device {</code>
+  - EN: Opens namespace `cutlass::reference::device` to group related symbols.
+  - CN: 打开命名空间 `cutlass::reference::device`，用于归组相关符号。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L41** <code>  class ATensor,</code>
+  - EN: Begins the declaration of class `ATensor`.
+  - CN: 开始声明 class `ATensor`。
+- **L42** <code>  class BTensor,</code>
+  - EN: Begins the declaration of class `BTensor`.
+  - CN: 开始声明 class `BTensor`。
+- **L43** <code>  class CTensor,</code>
+  - EN: Begins the declaration of class `CTensor`.
+  - CN: 开始声明 class `CTensor`。
+- **L44** <code>  class DTensor,</code>
+  - EN: Begins the declaration of class `DTensor`.
+  - CN: 开始声明 class `DTensor`。
+- **L45** <code>  class ElementAccumulator,</code>
+  - EN: Begins the declaration of class `ElementAccumulator`.
+  - CN: 开始声明 class `ElementAccumulator`。
+- **L46** <code>  class ElementEpilogue&gt;</code>
+  - EN: Begins the declaration of class `ElementEpilogue`.
+  - CN: 开始声明 class `ElementEpilogue`。
+- **L47** <code>__global__ static</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L48** <code>void</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L49** <code>gett_kernel(</code>
+  - EN: Begins or continues the signature/call syntax involving `gett_kernel`.
+  - CN: 开始或继续与 `gett_kernel` 相关的签名/调用语法。
+- **L50** <code>  DTensor       D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L51** <code>  ATensor const A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L52** <code>  BTensor const B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L53** <code>  CTensor const C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L54** <code>  ElementEpilogue alpha, ElementEpilogue beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L55** <code>  ElementAccumulator acc_init)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L56** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L57** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L58** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L59** <code>  static_assert(DTensor::rank == 3, &quot;(M,N,L)&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L60** <code>  static_assert(ATensor::rank == 3, &quot;(M,K,L)&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L61** <code>  static_assert(BTensor::rank == 3, &quot;(N,K,L)&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L62** <code>  static_assert(CTensor::rank == 3, &quot;(M,N,L)&quot;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>  assert(size&lt;0&gt;(A) == size&lt;0&gt;(D));  // M</code>
+  - EN: Begins or continues the signature/call syntax involving `size<0>`.
+  - CN: 开始或继续与 `size<0>` 相关的签名/调用语法。
+- **L65** <code>  assert(size&lt;0&gt;(C) == size&lt;0&gt;(D));  // M</code>
+  - EN: Begins or continues the signature/call syntax involving `size<0>`.
+  - CN: 开始或继续与 `size<0>` 相关的签名/调用语法。
+- **L66** <code>  assert(size&lt;0&gt;(B) == size&lt;1&gt;(D));  // N</code>
+  - EN: Begins or continues the signature/call syntax involving `size<1>`.
+  - CN: 开始或继续与 `size<1>` 相关的签名/调用语法。
+- **L67** <code>  assert(size&lt;1&gt;(C) == size&lt;1&gt;(D));  // N</code>
+  - EN: Begins or continues the signature/call syntax involving `size<1>`.
+  - CN: 开始或继续与 `size<1>` 相关的签名/调用语法。
+- **L68** <code>  assert(size&lt;1&gt;(A) == size&lt;1&gt;(B));  // K</code>
+  - EN: Begins or continues the signature/call syntax involving `size<1>`.
+  - CN: 开始或继续与 `size<1>` 相关的签名/调用语法。
+- **L69** <code>  assert(size&lt;2&gt;(A) == size&lt;2&gt;(D));  // L</code>
+  - EN: Begins or continues the signature/call syntax involving `size<2>`.
+  - CN: 开始或继续与 `size<2>` 相关的签名/调用语法。
+- **L70** <code>  assert(size&lt;2&gt;(B) == size&lt;2&gt;(D));  // L</code>
+  - EN: Begins or continues the signature/call syntax involving `size<2>`.
+  - CN: 开始或继续与 `size<2>` 相关的签名/调用语法。
+- **L71** <code>  assert(size&lt;2&gt;(C) == size&lt;2&gt;(D));  // L</code>
+  - EN: Begins or continues the signature/call syntax involving `size<2>`.
+  - CN: 开始或继续与 `size<2>` 相关的签名/调用语法。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>  NumericConverter&lt;ElementAccumulator, typename ATensor::value_type&gt; a_converter;</code>
+  - EN: Declares the symbol `a_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `a_converter`。
+- **L74** <code>  NumericConverter&lt;ElementAccumulator, typename BTensor::value_type&gt; b_converter;</code>
+  - EN: Declares the symbol `b_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `b_converter`。
+- **L75** <code>  NumericConverter&lt;ElementEpilogue, ElementAccumulator&gt; acc_converter;</code>
+  - EN: Declares the symbol `acc_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `acc_converter`。
+- **L76** <code>  NumericConverter&lt;ElementEpilogue, typename CTensor::value_type&gt; source_converter;</code>
+  - EN: Declares the symbol `source_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `source_converter`。
+- **L77** <code>  NumericConverter&lt;typename DTensor::value_type, ElementEpilogue&gt; output_converter;</code>
+  - EN: Declares the symbol `output_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_converter`。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>  // Thread id to each element of D</code>
+  - EN: Comment that documents intent or context: "Thread id to each element of D".
+  - CN: 用于说明意图或上下文的注释："Thread id to each element of D"。
+- **L80** <code>  for (int tid = threadIdx.x + blockDim.x * blockIdx.x;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L81** <code>       tid &lt; size(D);</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L82** <code>       tid += blockDim.x * gridDim.x) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L83** <code>    // (m,n,l) coordinate</code>
+  - EN: Comment that documents intent or context: "(m,n,l) coordinate".
+  - CN: 用于说明意图或上下文的注释："(m,n,l) coordinate"。
+- **L84** <code>    auto mnl_coord = idx2crd(tid, product_each(shape(D)));</code>
+  - EN: Declares function or method `shape` without defining it here.
+  - CN: 声明函数或方法 `shape`，但不在此处给出定义。
+- **L85** <code>    auto m = get&lt;0&gt;(mnl_coord);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L86** <code>    auto n = get&lt;1&gt;(mnl_coord);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L87** <code>    auto l = get&lt;2&gt;(mnl_coord);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L88** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L89** <code>    auto A_ml = A(m,_,l);</code>
+  - EN: Declares function or method `A` without defining it here.
+  - CN: 声明函数或方法 `A`，但不在此处给出定义。
+- **L90** <code>    auto B_nl = B(n,_,l);</code>
+  - EN: Declares function or method `B` without defining it here.
+  - CN: 声明函数或方法 `B`，但不在此处给出定义。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>    ElementAccumulator accum = ElementAccumulator(0);</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L93** <code>    for (int k = 0; k &lt; size&lt;1&gt;(A); ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L94** <code>      ElementAccumulator a = a_converter(A_ml(k));</code>
+  - EN: Declares function or method `A_ml` without defining it here.
+  - CN: 声明函数或方法 `A_ml`，但不在此处给出定义。
+- **L95** <code>      ElementAccumulator b = b_converter(B_nl(k));</code>
+  - EN: Declares function or method `B_nl` without defining it here.
+  - CN: 声明函数或方法 `B_nl`，但不在此处给出定义。
+- **L96** <code>      accum += a * b;</code>
+  - EN: Declares the symbol `b` in the current scope.
+  - CN: 在当前作用域中声明符号 `b`。
+- **L97** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>    ElementEpilogue scaled_output = (alpha * acc_converter(accum)) + (beta * source_converter(C(m,n,l)));</code>
+  - EN: Declares function or method `C` without defining it here.
+  - CN: 声明函数或方法 `C`，但不在此处给出定义。
+- **L100** <code>    D(m,n,l) = output_converter(scaled_output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L101** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L102** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L103** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L104** <code>// Most general version</code>
+  - EN: Comment that documents intent or context: "Most general version".
+  - CN: 用于说明意图或上下文的注释："Most general version"。
+- **L105** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L106** <code>  class ProblemShapeMNKL,</code>
+  - EN: Begins the declaration of class `ProblemShapeMNKL`.
+  - CN: 开始声明 class `ProblemShapeMNKL`。
+- **L107** <code>  class ElementA,</code>
+  - EN: Begins the declaration of class `ElementA`.
+  - CN: 开始声明 class `ElementA`。
+- **L108** <code>  class StrideA,</code>
+  - EN: Begins the declaration of class `StrideA`.
+  - CN: 开始声明 class `StrideA`。
+- **L109** <code>  class ElementB,</code>
+  - EN: Begins the declaration of class `ElementB`.
+  - CN: 开始声明 class `ElementB`。
+- **L110** <code>  class StrideB,</code>
+  - EN: Begins the declaration of class `StrideB`.
+  - CN: 开始声明 class `StrideB`。
+- **L111** <code>  class ElementAccumulator,</code>
+  - EN: Begins the declaration of class `ElementAccumulator`.
+  - CN: 开始声明 class `ElementAccumulator`。
+- **L112** <code>  class ElementC,</code>
+  - EN: Begins the declaration of class `ElementC`.
+  - CN: 开始声明 class `ElementC`。
+- **L113** <code>  class StrideC,</code>
+  - EN: Begins the declaration of class `StrideC`.
+  - CN: 开始声明 class `StrideC`。
+- **L114** <code>  class ElementD,</code>
+  - EN: Begins the declaration of class `ElementD`.
+  - CN: 开始声明 class `ElementD`。
+- **L115** <code>  class StrideD,</code>
+  - EN: Begins the declaration of class `StrideD`.
+  - CN: 开始声明 class `StrideD`。
+- **L116** <code>  class ElementEpilogue&gt;</code>
+  - EN: Begins the declaration of class `ElementEpilogue`.
+  - CN: 开始声明 class `ElementEpilogue`。
+- **L117** <code>void</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>gett(</code>
+  - EN: Begins or continues the signature/call syntax involving `gett`.
+  - CN: 开始或继续与 `gett` 相关的签名/调用语法。
+- **L119** <code>    ProblemShapeMNKL problem_shape_mnkl,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L120** <code>    ElementA const* ptr_A, StrideA stride_a_mkl,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L121** <code>    ElementB const* ptr_B, StrideB stride_b_nkl,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L122** <code>    ElementAccumulator _,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L123** <code>    ElementC const* ptr_C, StrideC stride_c_mnl,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L124** <code>    ElementD      * ptr_D, StrideD stride_d_mnl,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L125** <code>    ElementEpilogue alpha, ElementEpilogue beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L126** <code>    cudaStream_t stream = 0) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L127** <code>  using namespace cute;</code>
+  - EN: Introduces the type or namespace alias `namespace`.
+  - CN: 引入类型或命名空间别名 `namespace`。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>  static_assert(cute::rank(ProblemShapeMNKL{}) == 4);</code>
+  - EN: Declares function or method `rank` without defining it here.
+  - CN: 声明函数或方法 `rank`，但不在此处给出定义。
+- **L130** <code>  auto M = get&lt;0&gt;(problem_shape_mnkl);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L131** <code>  auto N = get&lt;1&gt;(problem_shape_mnkl);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L132** <code>  auto K = get&lt;2&gt;(problem_shape_mnkl);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L133** <code>  auto L = get&lt;3&gt;(problem_shape_mnkl);</code>
+  - EN: Declares function or method `get<3>` without defining it here.
+  - CN: 声明函数或方法 `get<3>`，但不在此处给出定义。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>  // Represent the full tensors</code>
+  - EN: Comment that documents intent or context: "Represent the full tensors".
+  - CN: 用于说明意图或上下文的注释："Represent the full tensors"。
+- **L136** <code>  auto A = make_tensor(make_gmem_ptr(ptr_A), make_shape(M,K,L), stride_a_mkl); // (M,K,L)</code>
+  - EN: Begins or continues the signature/call syntax involving `make_shape`.
+  - CN: 开始或继续与 `make_shape` 相关的签名/调用语法。
+- **L137** <code>  auto B = make_tensor(make_gmem_ptr(ptr_B), make_shape(N,K,L), stride_b_nkl); // (N,K,L)</code>
+  - EN: Begins or continues the signature/call syntax involving `make_shape`.
+  - CN: 开始或继续与 `make_shape` 相关的签名/调用语法。
+- **L138** <code>  auto C = make_tensor(make_gmem_ptr(ptr_C), make_shape(M,N,L), stride_c_mnl); // (M,N,L)</code>
+  - EN: Begins or continues the signature/call syntax involving `make_shape`.
+  - CN: 开始或继续与 `make_shape` 相关的签名/调用语法。
+- **L139** <code>  auto D = make_tensor(make_gmem_ptr(ptr_D), make_shape(M,N,L), stride_d_mnl); // (M,N,L)</code>
+  - EN: Begins or continues the signature/call syntax involving `make_shape`.
+  - CN: 开始或继续与 `make_shape` 相关的签名/调用语法。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>  dim3 dimBlock(256);</code>
+  - EN: Declares function or method `dimBlock` without defining it here.
+  - CN: 声明函数或方法 `dimBlock`，但不在此处给出定义。
+- **L142** <code>  dim3 dimGrid(240);</code>
+  - EN: Declares function or method `dimGrid` without defining it here.
+  - CN: 声明函数或方法 `dimGrid`，但不在此处给出定义。
+- **L143** <code>  gett_kernel&lt;&lt;&lt; dimGrid, dimBlock, 0, stream &gt;&gt;&gt;(D, A, B, C, alpha, beta, ElementAccumulator(0));</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L144** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>} // namespace cutlass::reference::device</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cute/tensor.hpp</code> — project-specific declarations from `tensor.hpp` / 来自 `tensor.hpp` 的项目专用声明

@@ -1,0 +1,382 @@
+# semaphore.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/semaphore.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Implementation of a CTA-wide semaphore for inter-CTA synchronization." and defines related CUTLASS facilities in `include/cutlass/semaphore.h`.
+- CN: 该头文件以注释摘要“Implementation of a CTA-wide semaphore for inter-CTA synchronization.”引入，并在 `include/cutlass/semaphore.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Implementation of a CTA-wide semaphore for inter-CTA synchronization.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L34**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L35**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L36**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L37**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L38**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L39**: <code>#include &quot;cutlass/array.h&quot;</code>
+  - EN: Includes "cutlass/array.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/array.h"，以便本文件使用该依赖中的声明。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/matrix_shape.h&quot;</code>
+  - EN: Includes "cutlass/matrix_shape.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/matrix_shape.h"，以便本文件使用该依赖中的声明。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>#include &quot;cutlass/gemm/gemm.h&quot;</code>
+  - EN: Includes "cutlass/gemm/gemm.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/gemm/gemm.h"，以便本文件使用该依赖中的声明。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>/// CTA-wide semaphore for inter-CTA synchronization.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L53**: <code>class Semaphore { </code>
+  - EN: Declares or defines the class `Semaphore`.
+  - CN: 声明或定义 class `Semaphore`。
+- **L54**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L55**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L56**: <code>  int *lock;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L57**: <code>  bool wait_thread;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L58**: <code>  int state;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L59**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L60**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L61**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L62**: <code>  /// Implements a semaphore to wait for a flag to reach a given value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L63**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L64**: <code>  Semaphore(int *lock_, int thread_id): </code>
+  - EN: Provides part of the signature or implementation for `Semaphore`.
+  - CN: 提供 `Semaphore` 的签名或实现的一部分。
+- **L65**: <code>    lock(lock_), </code>
+  - EN: Begins or continues the signature/parameter list for `lock`.
+  - CN: 开始或继续 `lock` 的签名/参数列表。
+- **L66**: <code>    wait_thread(thread_id &lt; 0 || thread_id == 0),</code>
+  - EN: Begins or continues the signature/parameter list for `wait_thread`.
+  - CN: 开始或继续 `wait_thread` 的签名/参数列表。
+- **L67**: <code>    state(-1) {</code>
+  - EN: Starts the definition body for `state`.
+  - CN: 开始 `state` 的定义体。
+- **L68**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L69**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L70**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L71**: <code>  /// Permit fetching the synchronization mechanism early</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L72**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L73**: <code>  void fetch() {</code>
+  - EN: Starts the definition body for `fetch`.
+  - CN: 开始 `fetch` 的定义体。
+- **L74**: <code>    if (wait_thread) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L75**: <code>      #if defined(__CUDA_ARCH__) &amp;&amp; __CUDA_ARCH__ &gt;= 700</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 700`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 700` 控制的条件编译块。
+- **L76**: <code>      asm volatile (&quot;ld.global.acquire.gpu.b32 %0, [%1];\n&quot; : &quot;=r&quot;(state) : &quot;l&quot;(lock));  </code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L77**: <code>      #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L78**: <code>      asm volatile (&quot;ld.global.cg.b32 %0, [%1];\n&quot; : &quot;=r&quot;(state) : &quot;l&quot;(lock));  </code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L79**: <code>      #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L80**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L81**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L82**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L83**: <code>  /// Gets the internal state</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L84**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L85**: <code>  int get_state() const {</code>
+  - EN: Starts the definition body for `get_state`.
+  - CN: 开始 `get_state` 的定义体。
+- **L86**: <code>    return state;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L87**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L88**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L89**: <code>  /// Waits until the semaphore is equal to the given value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L90**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L91**: <code>  void wait(int status = 0) {</code>
+  - EN: Starts the definition body for `wait`.
+  - CN: 开始 `wait` 的定义体。
+- **L92**: <code>    while( __syncthreads_and(state != status) ) {</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L93**: <code>      fetch();</code>
+  - EN: Declares the callable or operator `fetch`.
+  - CN: 声明可调用对象或运算符 `fetch`。
+- **L94**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L95**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L96**: <code>    __syncthreads();</code>
+  - EN: Declares the callable or operator `__syncthreads`.
+  - CN: 声明可调用对象或运算符 `__syncthreads`。
+- **L97**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L98**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L99**: <code>  /// Updates the lock with the given result</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L100**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L101**: <code>  void release(int status = 0) {</code>
+  - EN: Starts the definition body for `release`.
+  - CN: 开始 `release` 的定义体。
+- **L102**: <code>    __syncthreads();</code>
+  - EN: Declares the callable or operator `__syncthreads`.
+  - CN: 声明可调用对象或运算符 `__syncthreads`。
+- **L103**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L104**: <code>    if (wait_thread) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L105**: <code>      #if defined(__CUDA_ARCH__) &amp;&amp; __CUDA_ARCH__ &gt;= 700</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 700`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 700` 控制的条件编译块。
+- **L106**: <code>      asm volatile (&quot;st.global.release.gpu.b32 [%0], %1;\n&quot; : : &quot;l&quot;(lock), &quot;r&quot;(status));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L107**: <code>      #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L108**: <code>      asm volatile (&quot;st.global.cg.b32 [%0], %1;\n&quot; : : &quot;l&quot;(lock), &quot;r&quot;(status));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L109**: <code>      #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L110**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L111**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L112**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L114**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L115**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L116**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L117**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L118**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Namespaces / 命名空间
+- Host-device annotations / 主机设备限定符
+- Conditional compilation / 条件编译
+- Symbol focus: `Semaphore` / 重点符号：`Semaphore`
+- Symbol focus: `lock` / 重点符号：`lock`
+- Symbol focus: `wait_thread` / 重点符号：`wait_thread`
+- Symbol focus: `state` / 重点符号：`state`
+- Symbol focus: `fetch` / 重点符号：`fetch`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/array.h"`
+  - `"cutlass/numeric_types.h"`
+  - `"cutlass/matrix_shape.h"`
+  - `"cutlass/gemm/gemm.h"`

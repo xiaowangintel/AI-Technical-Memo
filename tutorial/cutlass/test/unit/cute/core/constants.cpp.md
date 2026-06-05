@@ -1,0 +1,211 @@
+# constants.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/constants.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `constants` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `constants` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 34**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: `#include <cute/numeric/integral_constant.hpp>`
+  - EN: Provides CuTe `numeric / integral_constant` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `numeric / integral_constant` 功能。
+- **Line 36**: `#include <cute/algorithm/tuple_algorithms.hpp>`
+  - EN: Provides tuple algorithms such as product, max, and inner_product.
+  - CN: 提供 product、max、inner_product 等元组算法。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `TEST(CuTe_core, MakeIntegerSequence) {`
+  - EN: Declares GoogleTest case `CuTe_core::MakeIntegerSequence` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::MakeIntegerSequence`，用于验证一个具体的 CuTe 场景。
+- **Line 39**: `  cute::for_each(cute::make_integer_sequence<uint32_t, 13>{}, [](auto c) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 40**: `    using c_type = decltype(c);`
+  - EN: Creates alias `c_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `c_type`，以简化较长的类型或表达式。
+- **Line 41**: `    constexpr auto c_value = c_type::value;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 42**: `    using expected_type = cute::integral_constant<uint32_t, c_value>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 43**: `    static_assert(cute::is_same_v<c_type, expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 44**: `    static_assert(cute::is_same_v<typename c_type::value_type, uint32_t>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 45**: `    static_assert(cute::is_constant<c_value, c_type>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 46**: `    static_assert(cute::is_constant<0, decltype(c * cute::Int<0>{})>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 47**: `    static_assert(cute::is_constant<2*c_value, decltype(c * cute::Int<2>{})>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 48**: `  });`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 49**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: `  cute::for_each(cute::make_integer_sequence<int64_t, 17>{}, [](auto c) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 51**: `    using c_type = decltype(c);`
+  - EN: Creates alias `c_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `c_type`，以简化较长的类型或表达式。
+- **Line 52**: `    constexpr auto c_value = c_type::value;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 53**: `    using expected_type = cute::integral_constant<int64_t, c_value>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 54**: `    static_assert(cute::is_same_v<c_type, expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 55**: `    static_assert(cute::is_same_v<typename c_type::value_type, int64_t>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 56**: `    static_assert(cute::is_constant<c_value, c_type>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 57**: `    static_assert(cute::is_constant<0, decltype(c * cute::Int<0>{})>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 58**: `    static_assert(cute::is_constant<2*c_value, decltype(c * cute::Int<2>{})>::value);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 59**: `  });`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 60**: `}`
+  - EN: Closes the scope for `test CuTe_core::MakeIntegerSequence`.
+  - CN: 结束 `test CuTe_core::MakeIntegerSequence` 的作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `static_assert`
+  - EN: Checks a property at compile time before the binary can be produced.
+  - CN: 在生成二进制文件之前，于编译期检查某个性质。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/numeric/integral_constant.hpp`
+  - EN: Provides CuTe `numeric / integral_constant` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `numeric / integral_constant` 功能。
+- `cute/algorithm/tuple_algorithms.hpp`
+  - EN: Provides tuple algorithms such as product, max, and inner_product.
+  - CN: 提供 product、max、inner_product 等元组算法。

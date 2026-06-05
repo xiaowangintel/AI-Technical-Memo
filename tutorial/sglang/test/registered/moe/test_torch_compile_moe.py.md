@@ -1,0 +1,152 @@
+# test_torch_compile_moe.py — Code Analysis / 代码分析
+
+## Source / 来源
+- **File**: `test/registered/moe/test_torch_compile_moe.py`
+- **Repository**: sgl-project/sglang
+- **Purpose**: This test module validates torch compile moe behavior in SGLang's moe area. It prepares inputs, exercises runtime paths, and checks expected results or regressions. / 该测试模块验证 SGLang 在 MoE 领域中与 torch compile moe 相关的行为。它会准备输入、执行运行路径，并检查预期结果或回归情况。
+
+## Line-by-Line Analysis / 逐行分析
+### Lines 1-17: module imports and dependencies / 模块导入与依赖
+```python
+import time
+import unittest
+from types import SimpleNamespace
+
+import requests
+
+from sglang.srt.utils import is_cuda, kill_process_tree
+from sglang.test.ci.ci_register import register_amd_ci, register_cuda_ci
+from sglang.test.run_eval import run_eval
+from sglang.test.test_utils import (
+    DEFAULT_SMALL_MOE_MODEL_NAME_FOR_TEST_BASE,
+    DEFAULT_TIMEOUT_FOR_SERVER_LAUNCH,
+    DEFAULT_URL_FOR_TEST,
+    CustomTestCase,
+    is_in_amd_ci,
+    popen_launch_server,
+)
+```
+**EN:** This block imports the modules needed by the rest of the file, including `time`, `unittest`, `types`, `requests`.
+**CN:** 该代码块导入后续实现所需的模块，其中包括 `time`, `unittest`, `types`, `requests`。
+
+### Lines 19-20: CI registration and metadata / CI 注册与元数据
+```python
+register_cuda_ci(est_time=130, stage="base-b", runner_config="1-gpu-large")
+register_amd_ci(est_time=1400, suite="stage-b-test-1-gpu-small-amd")
+```
+**EN:** This block registers the test with the continuous-integration harness and records scheduling metadata through register_cuda_ci, register_amd_ci.
+**CN:** 该代码块通过 register_cuda_ci, register_amd_ci 等调用将测试注册到持续集成框架，并记录调度元数据。
+
+### Lines 23-23: class TestTorchCompileMoe declaration / 类 TestTorchCompileMoe 声明
+```python
+class TestTorchCompileMoe(CustomTestCase):
+```
+**EN:** This section introduces the class and any class-level context used by later methods. It inherits from `CustomTestCase`.
+**CN:** 该部分引入类定义以及后续方法会使用的类级上下文。 它继承自 `CustomTestCase`。
+
+### Lines 24-33: setUpClass setup routine / setUpClass 初始化流程
+```python
+    @classmethod
+    def setUpClass(cls):
+        cls.model = DEFAULT_SMALL_MOE_MODEL_NAME_FOR_TEST_BASE
+        cls.base_url = DEFAULT_URL_FOR_TEST
+        cls.process = popen_launch_server(
+            cls.model,
+            cls.base_url,
+            timeout=DEFAULT_TIMEOUT_FOR_SERVER_LAUNCH,
+            other_args=["--enable-torch-compile", "--torch-compile-max-bs", "4"],
+        )
+```
+**EN:** This routine prepares shared fixtures, models, or runtime state before the assertions execute.
+**CN:** 该流程会在断言执行前准备共享夹具、模型或运行状态。
+
+### Lines 35-37: tearDownClass cleanup routine / tearDownClass 清理流程
+```python
+    @classmethod
+    def tearDownClass(cls):
+        kill_process_tree(cls.process.pid)
+```
+**EN:** This routine releases resources and restores state after the related tests finish.
+**CN:** 该流程会在相关测试结束后释放资源并恢复状态。
+
+### Lines 39-49: test case mmlu / 测试用例 mmlu
+```python
+    def test_mmlu(self):
+        args = SimpleNamespace(
+            base_url=self.base_url,
+            model=self.model,
+            eval_name="mmlu",
+            num_examples=64,
+            num_threads=32,
+        )
+
+        metrics = run_eval(args)
+        self.assertGreaterEqual(metrics["score"], 0.50)
+```
+**EN:** This test exercises `test_mmlu` by arranging inputs, invoking the relevant path, and checking the expected outcome.
+**CN:** 该测试通过准备输入、调用相关路径并检查期望结果来验证 `test_mmlu`。
+
+### Lines 51-63: helper routine run decode / 辅助流程 run decode
+```python
+    def run_decode(self, max_new_tokens):
+        response = requests.post(
+            self.base_url + "/generate",
+            json={
+                "text": "The capital of France is",
+                "sampling_params": {
+                    "temperature": 0,
+                    "max_new_tokens": max_new_tokens,
+                    "ignore_eos": True,
+                },
+            },
+        )
+        return response.json()
+```
+**EN:** This helper encapsulates `run_decode` so the surrounding tests can reuse setup, execution, or validation logic.
+**CN:** 该辅助函数封装了 `run_decode`，以便周围测试复用准备、执行或校验逻辑。
+
+### Lines 65-81: test case throughput / 测试用例 throughput
+```python
+    def test_throughput(self):
+        # Warmup
+        res = self.run_decode(16)
+
+        max_tokens = 256
+        tic = time.perf_counter()
+        res = self.run_decode(max_tokens)
+        tok = time.perf_counter()
+        print(f"{res=}")
+        throughput = max_tokens / (tok - tic)
+        if is_cuda():
+            self.assertGreaterEqual(throughput, 285)
+        elif is_in_amd_ci():
+            # relax for mi300x
+            self.assertGreaterEqual(throughput, 240)
+        else:
+            self.assertGreaterEqual(throughput, 270)
+```
+**EN:** This test exercises `test_throughput` by arranging inputs, invoking the relevant path, and checking the expected outcome.
+**CN:** 该测试通过准备输入、调用相关路径并检查期望结果来验证 `test_throughput`。
+
+### Lines 84-85: direct execution entry point / 直接执行入口
+```python
+if __name__ == "__main__":
+    unittest.main()
+```
+**EN:** This block enables the file to run as a script and dispatches into the module's test runner or main entry point.
+**CN:** 该代码块使文件可以直接作为脚本运行，并转入模块的测试运行器或主入口。
+
+## Key Concepts / 关键概念
+- `TestTorchCompileMoe`: Groups related tests, fixtures, or helper methods. / 用于组织相关测试、夹具或辅助方法。
+- `TestTorchCompileMoe.setUpClass`: This routine prepares shared fixtures, models, or runtime state before the assertions execute. / 该流程会在断言执行前准备共享夹具、模型或运行状态。
+- `TestTorchCompileMoe.tearDownClass`: This routine releases resources and restores state after the related tests finish. / 该流程会在相关测试结束后释放资源并恢复状态。
+- `TestTorchCompileMoe.test_mmlu`: This test exercises `test_mmlu` by arranging inputs, invoking the relevant path, and checking the expected outcome. / 该测试通过准备输入、调用相关路径并检查期望结果来验证 `test_mmlu`。
+- `TestTorchCompileMoe.run_decode`: This helper encapsulates `run_decode` so the surrounding tests can reuse setup, execution, or validation logic. / 该辅助函数封装了 `run_decode`，以便周围测试复用准备、执行或校验逻辑。
+- `TestTorchCompileMoe.test_throughput`: This test exercises `test_throughput` by arranging inputs, invoking the relevant path, and checking the expected outcome. / 该测试通过准备输入、调用相关路径并检查期望结果来验证 `test_throughput`。
+
+## Dependencies / 依赖关系
+- **Standard library / 标准库**: `time`, `unittest`, `types`
+- **Third-party modules / 第三方模块**: `requests`
+- **Internal modules / 内部模块**: `sglang.srt.utils`, `sglang.test.ci.ci_register`, `sglang.test.run_eval`, `sglang.test.test_utils`
+
+- **Total lines / 总行数**: 85

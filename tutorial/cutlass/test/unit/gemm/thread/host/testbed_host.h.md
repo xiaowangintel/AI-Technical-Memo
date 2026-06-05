@@ -1,0 +1,753 @@
+# testbed_host.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/thread/host/testbed_host.h`
+
+## Purpose / 目的
+- EN: This header defines a host-side thread GEMM testbed that exercises the same small MMA shapes without launching a device kernel, making it useful for CPU-visible correctness checks.
+- CN: 该头文件定义了主机侧线程 GEMM 测试平台，它在不启动设备内核的情况下覆盖相同的小型 MMA 形状，适合进行 CPU 可见的正确性检查。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1**: <code>/***************************************************************************************************</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: <code> **************************************************************************************************/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: <code>/*! \file</code>
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: <code>    \brief Unit tests for thread-level GEMM</code>
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: <code>*/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: <code>#pragma once</code>
+  - EN: Ensures this header is included only once per translation unit.
+  - CN: 确保该头文件在一个编译单元中只被包含一次。
+- **Line 36**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: <code>#include &quot;cutlass/gemm/thread/mma.h&quot;</code>
+  - EN: Declares the thread-level matrix-multiply-accumulate operator used by these tests.
+  - CN: 声明这些测试使用的线程级矩阵乘加算子。
+- **Line 38**: <code>#include &quot;cutlass/layout/vector.h&quot;</code>
+  - EN: Defines vectorized layout helpers used by specialized operand layouts.
+  - CN: 定义特化操作数布局使用的向量化布局辅助工具。
+- **Line 39**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 40**: <code>#include &quot;cutlass/util/host_tensor.h&quot;</code>
+  - EN: Provides host/device tensor containers used by the testbeds.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 41**: <code>#include &quot;cutlass/util/tensor_view_io.h&quot;</code>
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 42**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 43**: <code>#include &quot;cutlass/util/reference/host/tensor_copy.h&quot;</code>
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 44**: <code>#include &quot;cutlass/util/reference/host/tensor_fill.h&quot;</code>
+  - EN: Provides deterministic and randomized tensor initialization helpers.
+  - CN: 提供确定性和随机化的张量初始化辅助函数。
+- **Line 45**: <code>#include &quot;cutlass/util/reference/host/tensor_compare.h&quot;</code>
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 46**: <code>#include &quot;cutlass/util/reference/host/gemm.h&quot;</code>
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性检查的 CPU 参考 GEMM 实现。
+- **Line 47**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 48**: <code>namespace test {</code>
+  - EN: Opens namespace `test` to organize related declarations.
+  - CN: 打开命名空间 `test`，用于组织相关声明。
+- **Line 49**: <code>namespace gemm {</code>
+  - EN: Opens namespace `gemm` to organize related declarations.
+  - CN: 打开命名空间 `gemm`，用于组织相关声明。
+- **Line 50**: <code>namespace thread {</code>
+  - EN: Opens namespace `thread` to organize related declarations.
+  - CN: 打开命名空间 `thread`，用于组织相关声明。
+- **Line 51**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 53**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 54**: <code>/// Thread-level matrix multiply-accumulate</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 55**: <code>template &lt;typename Mma&gt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 56**: <code>void kernel(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 57**: <code>  typename Mma::ElementC *D,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 58**: <code>  typename Mma::ElementA const *A,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 59**: <code>  typename Mma::ElementB const *B,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 60**: <code>  typename Mma::ElementC const *C) {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 61**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 62**: <code>  auto ptr_D = reinterpret_cast&lt;cutlass::Array&lt;typename Mma::ElementC, Mma::Shape::kMN&gt; *&gt;(D);</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 63**: <code>  auto ptr_A = reinterpret_cast&lt;cutlass::Array&lt;typename Mma::ElementA, Mma::Shape::kMK&gt; const *&gt;(A);</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 64**: <code>  auto ptr_B = reinterpret_cast&lt;cutlass::Array&lt;typename Mma::ElementB, Mma::Shape::kKN&gt; const *&gt;(B);</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 65**: <code>  auto ptr_C = reinterpret_cast&lt;cutlass::Array&lt;typename Mma::ElementC, Mma::Shape::kMN&gt; const *&gt;(C);</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 66**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: <code>  Mma mma;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 68**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 69**: <code>  auto a = *ptr_A;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 70**: <code>  auto b = *ptr_B;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 71**: <code>  auto c = *ptr_C;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 72**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 73**: <code>  using Btype = typename Mma::ElementB;</code>
+  - EN: Creates type alias `Btype` to simplify later code.
+  - CN: 创建类型别名 `Btype` 以简化后续代码。
+- **Line 74**: <code>  cutlass::Array&lt;typename Mma::ElementC, Mma::Shape::kMN&gt; d;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 75**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 76**: <code>  mma(d, a, b, c);</code>
+  - EN: Invokes the MMA operator to perform one matrix multiply-accumulate step on the loaded fragments.
+  - CN: 调用 MMA 算子，对已加载的片段执行一次矩阵乘加步骤。
+- **Line 77**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 78**: <code>  *ptr_D = d;</code>
+  - EN: Performs a declaration, initialization, or state update used by the surrounding algorithm.
+  - CN: 执行一条供周围算法使用的声明、初始化或状态更新语句。
+- **Line 79**: <code>}</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 80**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 81**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 82**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 83**: <code>/// Structure to compute the matrix product</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 84**: <code>template &lt;</code>
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 85**: <code>  /// Size of the Gemm problem - concept: gemm::GemmShape&lt;&gt;</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 86**: <code>  typename Shape,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 87**: <code>  /// Data type of A elements</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 88**: <code>  typename ElementA,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 89**: <code>  /// Layout of A matrix (concept: MatrixLayout)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 90**: <code>  typename LayoutA,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 91**: <code>  /// Data type of B elements</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 92**: <code>  typename ElementB,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 93**: <code>  /// Layout of B matrix (concept: MatrixLayout)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 94**: <code>  typename LayoutB,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 95**: <code>  /// Element type of C matrix</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 96**: <code>  typename ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 97**: <code>  /// Layout of C matrix (concept: MatrixLayout)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 98**: <code>  typename LayoutC</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 99**: <code>&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 100**: <code>struct Testbed {</code>
+  - EN: Declares `struct Testbed`, which groups related data or behavior.
+  - CN: 声明 `struct Testbed`，用于组织相关数据或行为。
+- **Line 101**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 102**: <code>  /// Thread-level matrix multiply-accumulate operator</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 103**: <code>  using Mma = cutlass::gemm::thread::Mma&lt;</code>
+  - EN: Defines alias `Mma` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `Mma`。
+- **Line 104**: <code>    Shape,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 105**: <code>    ElementA,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 106**: <code>    LayoutA,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 107**: <code>    ElementB,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 108**: <code>    LayoutB,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 109**: <code>    ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 110**: <code>    LayoutC</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 111**: <code>  &gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 112**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 113**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 114**: <code>  // Data members</code>
+  - EN: Adds an inline comment about the nearby code: Data members
+  - CN: 添加关于附近代码的行内注释：Data members
+- **Line 115**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 116**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 117**: <code>  cutlass::HostTensor&lt;ElementA, LayoutA&gt; tensor_A;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 118**: <code>  cutlass::HostTensor&lt;ElementB, LayoutB&gt; tensor_B;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 119**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_C;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 120**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_computed;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 121**: <code>  cutlass::HostTensor&lt;ElementC, LayoutC&gt; tensor_D_reference;</code>
+  - EN: Declares a host/device tensor wrapper used to manage storage and synchronization.
+  - CN: 声明用于管理存储与同步的主机/设备张量封装。
+- **Line 122**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 124**: <code>  // Methods</code>
+  - EN: Adds an inline comment about the nearby code: Methods
+  - CN: 添加关于附近代码的行内注释：Methods
+- **Line 125**: <code>  //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 126**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 127**: <code>  /// Allocates workspace in device memory</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 128**: <code>  Testbed() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 129**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 130**: <code>    tensor_A.reset(cutlass::make_Coord(Shape::kM, Shape::kK), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 131**: <code>    tensor_B.reset(cutlass::make_Coord(Shape::kK, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 132**: <code>    tensor_C.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 133**: <code>    tensor_D_computed.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 134**: <code>    tensor_D_reference.reset(cutlass::make_Coord(Shape::kM, Shape::kN), false);</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 135**: <code>  }</code>
+  - EN: Closes the scope for `function or block`.
+  - CN: 结束 `function or block` 的作用域。
+- **Line 136**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 137**: <code>  /// Runs the test</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 138**: <code>  bool run() {</code>
+  - EN: Ends a signature or control header and opens the associated body.
+  - CN: 结束签名或控制头，并打开相应主体。
+- **Line 139**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 140**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 141**: <code>    // initialize device memory</code>
+  - EN: Adds an inline comment about the nearby code: initialize device memory
+  - CN: 添加关于附近代码的行内注释：initialize device memory
+- **Line 142**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 143**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 144**: <code>    cutlass::reference::host::detail::RandomUniformFunc&lt; ElementA &gt; tfill_rand_func( </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 145**: <code>      0,  // seed</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 146**: <code>      10, // max</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 147**: <code>      0,  // min</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 148**: <code>      0); // bits after decimal</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 149**: <code>                                                                              </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 150**: <code>    cutlass::reference::host::detail::TensorFillRandomUniformFunc&lt; ElementA, LayoutA &gt; tfill_rand(</code>
+  - EN: Initializes tensor data with uniformly distributed random values for broader coverage.
+  - CN: 用均匀分布随机值初始化张量数据，以获得更广泛的覆盖。
+- **Line 151**: <code>      tensor_A.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 152**: <code>      tfill_rand_func); </code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 153**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 154**: <code>    for (auto i=0; i&lt; Shape::kM; i++)</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 155**: <code>      for (auto j=0; j&lt; Shape::kK; j++)</code>
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 156**: <code>        tfill_rand(cutlass::make_Coord(i,j));</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 157**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 158**: <code>    cutlass::reference::host::BlockFillSequential(</code>
+  - EN: Fills tensor storage with a deterministic sequence so the expected output is reproducible.
+  - CN: 用确定性的顺序数列填充张量存储，使期望输出可复现。
+- **Line 159**: <code>      tensor_B.host_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 160**: <code>      tensor_B.capacity(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 161**: <code>      ElementB(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 162**: <code>      ElementB(2)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 163**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 164**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 166**: <code>      tensor_C.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 167**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 168**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 169**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 170**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 171**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 172**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 173**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 174**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 175**: <code>    cutlass::reference::host::TensorFill(</code>
+  - EN: Fills a tensor or tensor view with a chosen constant value.
+  - CN: 用指定常量值填充一个张量或张量视图。
+- **Line 176**: <code>      tensor_D_reference.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 177**: <code>      ElementC(0)</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 178**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 179**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 180**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 181**: <code>    // Host side call</code>
+  - EN: Adds an inline comment about the nearby code: Host side call
+  - CN: 添加关于附近代码的行内注释：Host side call
+- **Line 182**: <code>    kernel&lt;Mma&gt;(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 183**: <code>      tensor_D_computed.host_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 184**: <code>      tensor_A.host_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 185**: <code>      tensor_B.host_data(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 186**: <code>      tensor_C.host_data());</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 187**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 188**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 189**: <code>    // Reference implementation</code>
+  - EN: Adds an inline comment about the nearby code: Reference implementation
+  - CN: 添加关于附近代码的行内注释：Reference implementation
+- **Line 190**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 191**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 192**: <code>    cutlass::reference::host::Gemm&lt;ElementA, LayoutA, ElementB, LayoutB,</code>
+  - EN: Refers to the host reference GEMM implementation used to compute the expected result.
+  - CN: 引用主机参考 GEMM 实现，用于计算期望结果。
+- **Line 193**: <code>                                   ElementC, LayoutC, ElementC, ElementC&gt;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 194**: <code>        reference_gemm;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 195**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 196**: <code>    reference_gemm(</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 197**: <code>      {Shape::kM, Shape::kN, Shape::kK},</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 198**: <code>      ElementC(1),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 199**: <code>      tensor_A.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 200**: <code>      tensor_B.host_ref(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 201**: <code>      ElementC(0),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 202**: <code>      tensor_D_reference.host_ref()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 203**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 204**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 205**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 206**: <code>    // Verify equivalence</code>
+  - EN: Adds an inline comment about the nearby code: Verify equivalence
+  - CN: 添加关于附近代码的行内注释：Verify equivalence
+- **Line 207**: <code>    //</code>
+  - EN: Adds an inline comment about the nearby code: 
+  - CN: 添加关于附近代码的行内注释：
+- **Line 208**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 209**: <code>    // compare</code>
+  - EN: Adds an inline comment about the nearby code: compare
+  - CN: 添加关于附近代码的行内注释：compare
+- **Line 210**: <code>    bool passed = cutlass::reference::host::TensorEquals(</code>
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 211**: <code>      tensor_D_computed.host_view(),</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 212**: <code>      tensor_D_reference.host_view()</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 213**: <code>    );</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 214**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 215**: <code>    EXPECT_TRUE(passed)</code>
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 216**: <code>      &lt;&lt; &quot;A:\n&quot; &lt;&lt; tensor_A.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 217**: <code>      &lt;&lt; &quot;B:\n&quot; &lt;&lt; tensor_B.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 218**: <code>      &lt;&lt; &quot;C:\n&quot; &lt;&lt; tensor_C.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 219**: <code>      &lt;&lt; &quot;Reference:\n&quot; &lt;&lt; tensor_D_reference.host_view() &lt;&lt; &quot;\n\n&quot;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 220**: <code>      &lt;&lt; &quot;Computed:\n&quot; &lt;&lt; tensor_D_computed.host_view() &lt;&lt; std::endl;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 221**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 222**: <code>    </code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 223**: <code>    return passed;</code>
+  - EN: Returns a value or status from the current function.
+  - CN: 从当前函数返回一个值或状态。
+- **Line 224**: <code>  }</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 225**: <code>};</code>
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 226**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 227**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 228**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 229**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 230**: <code>} // namespace thread</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 231**: <code>} // namespace gemm</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 232**: <code>} // namespace test</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+
+## Key Concepts / 关键概念
+
+- `thread-level MMA`
+  - EN: The file focuses on a single-thread MMA operator, so each test validates tiny GEMM shapes without warp-level cooperation.
+  - CN: 该文件关注单线程 MMA 算子，因此每个测试都在不依赖 warp 协作的情况下验证小型 GEMM 形状。
+- `host reference path`
+  - EN: The host-oriented files validate small GEMM logic without depending on a GPU kernel launch.
+  - CN: 这些面向主机的文件在不依赖 GPU 内核启动的前提下验证小型 GEMM 逻辑。
+- `GemmShape`
+  - EN: Tile shapes are encoded explicitly, so each test documents the M/N/K sizes handled by the chosen MMA operator.
+  - CN: tile 形状通过显式类型编码，因此每个测试都直接说明了所选 MMA 算子处理的 M/N/K 尺寸。
+- `HostTensor`
+  - EN: HostTensor wrappers manage host/device storage, synchronization, and views used by the testbed.
+  - CN: HostTensor 封装负责管理测试平台所需的主机/设备存储、同步与视图。
+- `reference validation`
+  - EN: The testbed compares computed results against a host-generated reference tensor.
+  - CN: 测试平台会将计算结果与主机生成的参考张量进行比较。
+
+## Dependencies / 依赖
+
+- `cutlass/gemm/thread/mma.h`
+  - EN: Declares the thread-level matrix-multiply-accumulate operator used by these tests.
+  - CN: 声明这些测试使用的线程级矩阵乘加算子。
+- `cutlass/layout/vector.h`
+  - EN: Defines vectorized layout helpers used by specialized operand layouts.
+  - CN: 定义特化操作数布局使用的向量化布局辅助工具。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbeds.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic and randomized tensor initialization helpers.
+  - CN: 提供确定性和随机化的张量初始化辅助函数。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性检查的 CPU 参考 GEMM 实现。

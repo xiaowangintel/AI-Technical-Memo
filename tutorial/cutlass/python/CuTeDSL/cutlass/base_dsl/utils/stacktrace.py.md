@@ -1,0 +1,192 @@
+# stacktrace.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/utils/stacktrace.py`
+
+## Purpose / 作用
+- EN: This module provides stacktrace helper functions
+- CN: 该模块的文档字符串将其描述为：This module provides stacktrace helper functions
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides stacktrace helper functions` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L17** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L18** `import types` — **EN:** Imports types for later use. **CN:** 导入 types 供后续使用。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `def walk_to_top_module(start_path: str) -> str | None:` — **EN:** Defines function `walk_to_top_module`. **CN:** 定义函数 `walk_to_top_module`。
+- **L22** `    """` — **EN:** Starts the docstring for the function `walk_to_top_module`. **CN:** 开始说明 function `walk_to_top_module` 的文档字符串。
+- **L23** `    Walk up from the start_path to find the top-level Python module.` — **EN:** Continues the docstring for the function `walk_to_top_module`. **CN:** 继续说明 function `walk_to_top_module` 的文档字符串。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `    :param start_path: The path to start from.` — **EN:** Continues the docstring for the function `walk_to_top_module`. **CN:** 继续说明 function `walk_to_top_module` 的文档字符串。
+- **L26** `    :return: The path of the top-level module.` — **EN:** Continues the docstring for the function `walk_to_top_module`. **CN:** 继续说明 function `walk_to_top_module` 的文档字符串。
+- **L27** `    """` — **EN:** Ends the docstring for the function `walk_to_top_module`. **CN:** 结束说明 function `walk_to_top_module` 的文档字符串。
+- **L28** `    current_path = start_path` — **EN:** Assigns a value to current_path. **CN:** 将一个值赋给 current_path。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `    while True:` — **EN:** Starts a while-loop guarded by `True`. **CN:** 开始一个由 `True` 控制的 while 循环。
+- **L31** `        # Check if we are at the root directory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L32** `        if os.path.dirname(current_path) == current_path:` — **EN:** Starts a conditional branch guarded by `os.path.dirname(current_path) == current_path`. **CN:** 开始一个由 `os.path.dirname(current_path) == current_path` 控制的条件分支。
+- **L33** `            break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `        # Check for __init__.py` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L36** `        init_file_path = os.path.join(current_path, "__init__.py")` — **EN:** Assigns a value to init_file_path. **CN:** 将一个值赋给 init_file_path。
+- **L37** `        if os.path.isfile(init_file_path):` — **EN:** Starts a conditional branch guarded by `os.path.isfile(init_file_path)`. **CN:** 开始一个由 `os.path.isfile(init_file_path)` 控制的条件分支。
+- **L38** `            # If __init__.py exists, move up one level` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L39** `            current_path = os.path.dirname(current_path)` — **EN:** Assigns a value to current_path. **CN:** 将一个值赋给 current_path。
+- **L40** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L41** `            # If no __init__.py, we are not in a module; stop` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L42** `            break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    # If we reached the root without finding a module, return None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L45** `    if os.path.dirname(current_path) == current_path and not os.path.isfile(` — **EN:** Starts a conditional branch guarded by `os.path.dirname(current_path) == current_path and (not os...`. **CN:** 开始一个由 `os.path.dirname(current_path) == current_path and (not os...` 控制的条件分支。
+- **L46** `        os.path.join(current_path, "__init__.py")` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L48** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    # Return the path of the top-level module` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L51** `    return current_path` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `def _filter_internal_frames(` — **EN:** Defines function `_filter_internal_frames`. **CN:** 定义函数 `_filter_internal_frames`。
+- **L55** `    traceback: types.TracebackType | None, internal_path: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `) -> types.TracebackType | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L57** `    """` — **EN:** Starts the docstring for the function `_filter_internal_frames`. **CN:** 开始说明 function `_filter_internal_frames` 的文档字符串。
+- **L58** `    Filter out stack frames from the traceback that belong to the specified module path.` — **EN:** Continues the docstring for the function `_filter_internal_frames`. **CN:** 继续说明 function `_filter_internal_frames` 的文档字符串。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    This function removes stack frames from the traceback whose file paths start with` — **EN:** Continues the docstring for the function `_filter_internal_frames`. **CN:** 继续说明 function `_filter_internal_frames` 的文档字符串。
+- **L61** `    the given prefix_path, effectively hiding internal implementation details from` — **EN:** Continues the docstring for the function `_filter_internal_frames`. **CN:** 继续说明 function `_filter_internal_frames` 的文档字符串。
+- **L62** `    the error traceback shown to users.` — **EN:** Continues the docstring for the function `_filter_internal_frames`. **CN:** 继续说明 function `_filter_internal_frames` 的文档字符串。
+- **L63** `    """` — **EN:** Ends the docstring for the function `_filter_internal_frames`. **CN:** 结束说明 function `_filter_internal_frames` 的文档字符串。
+- **L64** `    iter_prev = None` — **EN:** Assigns a value to iter_prev. **CN:** 将一个值赋给 iter_prev。
+- **L65** `    iter_tb = traceback` — **EN:** Assigns a value to iter_tb. **CN:** 将一个值赋给 iter_tb。
+- **L66** `    while iter_tb is not None:` — **EN:** Starts a while-loop guarded by `iter_tb is not None`. **CN:** 开始一个由 `iter_tb is not None` 控制的 while 循环。
+- **L67** `        if os.path.abspath(iter_tb.tb_frame.f_code.co_filename).startswith(` — **EN:** Starts a conditional branch guarded by `os.path.abspath(iter_tb.tb_frame.f_code.co_filename).star...`. **CN:** 开始一个由 `os.path.abspath(iter_tb.tb_frame.f_code.co_filename).star...` 控制的条件分支。
+- **L68** `            internal_path` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L70** `            if iter_tb.tb_next:` — **EN:** Starts a conditional branch guarded by `iter_tb.tb_next`. **CN:** 开始一个由 `iter_tb.tb_next` 控制的条件分支。
+- **L71** `                if iter_prev:` — **EN:** Starts a conditional branch guarded by `iter_prev`. **CN:** 开始一个由 `iter_prev` 控制的条件分支。
+- **L72** `                    iter_prev.tb_next = iter_tb.tb_next` — **EN:** Assigns a value to iter_prev.tb_next. **CN:** 将一个值赋给 iter_prev.tb_next。
+- **L73** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L74** `                    traceback = iter_tb.tb_next` — **EN:** Assigns a value to traceback. **CN:** 将一个值赋给 traceback。
+- **L75** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L76** `            iter_prev = iter_tb` — **EN:** Assigns a value to iter_prev. **CN:** 将一个值赋给 iter_prev。
+- **L77** `        iter_tb = iter_tb.tb_next` — **EN:** Assigns a value to iter_tb. **CN:** 将一个值赋给 iter_tb。
+- **L78** `    return traceback` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `_generated_function_names: re.Pattern[str] = re.compile(` — **EN:** Assigns a typed value to _generated_function_names. **CN:** 为 _generated_function_names 赋予带类型标注的值。
+- **L82** `    r"^(loop_body|while_region|while_before_block|while_after_block|if_region|then_block|else_block|elif_region)_\d+$"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `def _filter_duplicated_frames(` — **EN:** Defines function `_filter_duplicated_frames`. **CN:** 定义函数 `_filter_duplicated_frames`。
+- **L87** `    traceback: types.TracebackType | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L88** `) -> types.TracebackType | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L89** `    """` — **EN:** Starts the docstring for the function `_filter_duplicated_frames`. **CN:** 开始说明 function `_filter_duplicated_frames` 的文档字符串。
+- **L90** `    Filter out duplicated stack frames from the traceback.` — **EN:** Continues the docstring for the function `_filter_duplicated_frames`. **CN:** 继续说明 function `_filter_duplicated_frames` 的文档字符串。
+- **L91** `    The function filters out consecutive frames that are in the same file and have the same line number.` — **EN:** Continues the docstring for the function `_filter_duplicated_frames`. **CN:** 继续说明 function `_filter_duplicated_frames` 的文档字符串。
+- **L92** `    In a sequence of consecutive frames, the logic prefers to keep the non-generated frame or the last frame.` — **EN:** Continues the docstring for the function `_filter_duplicated_frames`. **CN:** 继续说明 function `_filter_duplicated_frames` 的文档字符串。
+- **L93** `    """` — **EN:** Ends the docstring for the function `_filter_duplicated_frames`. **CN:** 结束说明 function `_filter_duplicated_frames` 的文档字符串。
+- **L94** `    iter_prev = None` — **EN:** Assigns a value to iter_prev. **CN:** 将一个值赋给 iter_prev。
+- **L95** `    iter_tb = traceback` — **EN:** Assigns a value to iter_tb. **CN:** 将一个值赋给 iter_tb。
+- **L96** `    while iter_tb is not None:` — **EN:** Starts a while-loop guarded by `iter_tb is not None`. **CN:** 开始一个由 `iter_tb is not None` 控制的 while 循环。
+- **L97** `        skip_current = False` — **EN:** Assigns a value to skip_current. **CN:** 将一个值赋给 skip_current。
+- **L98** `        skip_next = False` — **EN:** Assigns a value to skip_next. **CN:** 将一个值赋给 skip_next。
+- **L99** `        if iter_tb.tb_next:` — **EN:** Starts a conditional branch guarded by `iter_tb.tb_next`. **CN:** 开始一个由 `iter_tb.tb_next` 控制的条件分支。
+- **L100** `            current_filename = os.path.abspath(iter_tb.tb_frame.f_code.co_filename)` — **EN:** Assigns a value to current_filename. **CN:** 将一个值赋给 current_filename。
+- **L101** `            next_filename = os.path.abspath(iter_tb.tb_next.tb_frame.f_code.co_filename)` — **EN:** Assigns a value to next_filename. **CN:** 将一个值赋给 next_filename。
+- **L102** `            # if in the same file, check if the line number is the same` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `            if current_filename == next_filename:` — **EN:** Starts a conditional branch guarded by `current_filename == next_filename`. **CN:** 开始一个由 `current_filename == next_filename` 控制的条件分支。
+- **L104** `                current_lineno = iter_tb.tb_lineno` — **EN:** Assigns a value to current_lineno. **CN:** 将一个值赋给 current_lineno。
+- **L105** `                next_lineno = iter_tb.tb_next.tb_lineno` — **EN:** Assigns a value to next_lineno. **CN:** 将一个值赋给 next_lineno。
+- **L106** `                if current_lineno == next_lineno:` — **EN:** Starts a conditional branch guarded by `current_lineno == next_lineno`. **CN:** 开始一个由 `current_lineno == next_lineno` 控制的条件分支。
+- **L107** `                    # Same file and line number, check name, if current is generated, skip current, otherwise skip next` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L108** `                    name = iter_tb.tb_frame.f_code.co_name` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L109** `                    is_generated = bool(_generated_function_names.match(name))` — **EN:** Assigns a value to is_generated. **CN:** 将一个值赋给 is_generated。
+- **L110** `                    if is_generated:` — **EN:** Starts a conditional branch guarded by `is_generated`. **CN:** 开始一个由 `is_generated` 控制的条件分支。
+- **L111** `                        # Skip current` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L112** `                        skip_current = True` — **EN:** Assigns a value to skip_current. **CN:** 将一个值赋给 skip_current。
+- **L113** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L114** `                        # Skip next if it's generated, otherwise keep both` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L115** `                        next_name = iter_tb.tb_next.tb_frame.f_code.co_name` — **EN:** Assigns a value to next_name. **CN:** 将一个值赋给 next_name。
+- **L116** `                        skip_next = bool(_generated_function_names.match(next_name))` — **EN:** Assigns a value to skip_next. **CN:** 将一个值赋给 skip_next。
+- **L117** `        if skip_current:` — **EN:** Starts a conditional branch guarded by `skip_current`. **CN:** 开始一个由 `skip_current` 控制的条件分支。
+- **L118** `            if iter_prev:` — **EN:** Starts a conditional branch guarded by `iter_prev`. **CN:** 开始一个由 `iter_prev` 控制的条件分支。
+- **L119** `                iter_prev.tb_next = iter_tb.tb_next` — **EN:** Assigns a value to iter_prev.tb_next. **CN:** 将一个值赋给 iter_prev.tb_next。
+- **L120** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L121** `                traceback = iter_tb.tb_next` — **EN:** Assigns a value to traceback. **CN:** 将一个值赋给 traceback。
+- **L122** `        elif skip_next:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L123** `            assert iter_tb.tb_next is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L124** `            # if next is last frame, don't skip` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `            if iter_tb.tb_next.tb_next:` — **EN:** Starts a conditional branch guarded by `iter_tb.tb_next.tb_next`. **CN:** 开始一个由 `iter_tb.tb_next.tb_next` 控制的条件分支。
+- **L126** `                iter_tb.tb_next = iter_tb.tb_next.tb_next` — **EN:** Assigns a value to iter_tb.tb_next. **CN:** 将一个值赋给 iter_tb.tb_next。
+- **L127** `            iter_prev = iter_tb` — **EN:** Assigns a value to iter_prev. **CN:** 将一个值赋给 iter_prev。
+- **L128** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L129** `            iter_prev = iter_tb` — **EN:** Assigns a value to iter_prev. **CN:** 将一个值赋给 iter_prev。
+- **L130** `        iter_tb = iter_tb.tb_next` — **EN:** Assigns a value to iter_tb. **CN:** 将一个值赋给 iter_tb。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    return traceback` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `def filter_stackframe(` — **EN:** Defines function `filter_stackframe`. **CN:** 定义函数 `filter_stackframe`。
+- **L136** `    traceback: types.TracebackType | None, prefix_path: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `) -> types.TracebackType | None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L138** `    """` — **EN:** Starts the docstring for the function `filter_stackframe`. **CN:** 开始说明 function `filter_stackframe` 的文档字符串。
+- **L139** `    Filter out stack frames from the traceback that belong to the specified module path.` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    This function removes stack frames from the traceback whose file paths start with` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L142** `    the given prefix_path, effectively hiding internal implementation details from` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L143** `    the error traceback shown to users.` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    :param traceback: The traceback object to filter.` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L146** `    :param prefix_path: The path prefix to filter out from the traceback.` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L147** `    :return: The filtered traceback with internal frames removed.` — **EN:** Continues the docstring for the function `filter_stackframe`. **CN:** 继续说明 function `filter_stackframe` 的文档字符串。
+- **L148** `    """` — **EN:** Ends the docstring for the function `filter_stackframe`. **CN:** 结束说明 function `filter_stackframe` 的文档字符串。
+- **L149** `    # Step 1: filter internal frames` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L150** `    traceback = _filter_internal_frames(traceback, prefix_path)` — **EN:** Assigns a value to traceback. **CN:** 将一个值赋给 traceback。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    # Step 2: consolidate duplicated frames` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L153** `    return _filter_duplicated_frames(traceback)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `def filter_exception(value: BaseException, module_dir: str) -> None:` — **EN:** Defines function `filter_exception`. **CN:** 定义函数 `filter_exception`。
+- **L157** `    """` — **EN:** Starts the docstring for the function `filter_exception`. **CN:** 开始说明 function `filter_exception` 的文档字符串。
+- **L158** `    Filter out internal implementation details from exception traceback.` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    This function recursively processes an exception and its cause chain,` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L161** `    removing stack frames that belong to the specified module directory.` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L162** `    This helps to present cleaner error messages to users by hiding` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L163** `    implementation details.` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    :param value: The exception object to filter.` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L166** `    :param module_dir: The module directory path to filter out from tracebacks.` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L167** `    :return: The filtered exception with internal frames removed.` — **EN:** Continues the docstring for the function `filter_exception`. **CN:** 继续说明 function `filter_exception` 的文档字符串。
+- **L168** `    """` — **EN:** Ends the docstring for the function `filter_exception`. **CN:** 结束说明 function `filter_exception` 的文档字符串。
+- **L169** `    if hasattr(value, "__cause__") and value.__cause__:` — **EN:** Starts a conditional branch guarded by `hasattr(value, '__cause__') and value.__cause__`. **CN:** 开始一个由 `hasattr(value, '__cause__') and value.__cause__` 控制的条件分支。
+- **L170** `        filter_exception(value.__cause__, module_dir)` — **EN:** Invokes `filter_exception` as a standalone call. **CN:** 以独立语句方式调用 `filter_exception`。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `    if hasattr(value, "__traceback__"):` — **EN:** Starts a conditional branch guarded by `hasattr(value, '__traceback__')`. **CN:** 开始一个由 `hasattr(value, '__traceback__')` 控制的条件分支。
+- **L173** `        filter_stackframe(value.__traceback__, module_dir)` — **EN:** Invokes `filter_stackframe` as a standalone call. **CN:** 以独立语句方式调用 `filter_stackframe`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.utils.stacktrace`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.utils.stacktrace`。
+- EN: Module docstring summary: This module provides stacktrace helper functions CN: 模块文档摘要为：This module provides stacktrace helper functions
+- EN: Top-level functions: walk_to_top_module, _filter_internal_frames, _filter_duplicated_frames, filter_stackframe, filter_exception CN: 顶层函数包括：walk_to_top_module, _filter_internal_frames, _filter_duplicated_frames, filter_stackframe, filter_exception
+
+## Dependencies / 依赖
+- EN: External or standard-library dependencies: os, re, types CN: 外部或标准库依赖：os, re, types

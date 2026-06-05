@@ -1,0 +1,957 @@
+# pytorch.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/emit/pytorch.py`
+
+## Purpose / 作用
+- EN: Utilities for generating source for building a PyTorch CUDA extension that using a CUTLASS kernel.
+- CN: 该模块的文档字符串将其描述为：Utilities for generating source for building a PyTorch CUDA extension that using a CUTLASS kernel.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utilities for generating source for building a PyTorch CUDA extension that using a CUTLASS kernel.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `If specified, the extension can be JIT compiled via PyTorch's \`\`cpp_extension.load\`\` method.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `Example usage with JIT compilation:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `.. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L40** `.. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `    plan = cutlass_cppgen.op.Gemm(element=torch.float32, layout=cutlass_library.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L43** `    op = plan.construct()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L44** `    mod = cutlass_cppgen.emit.pytorch(op, 'cutlass_gemm', 80, jit=True)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `    # Generate inputs for the GEMM` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L47** `    A, B, C = [torch.ones((512, 512)).to('cuda') for _ in range(3)]` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `    # Run the module` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L50** `    D = mod.run(A, B, C)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `Example usage without JIT compilation:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `.. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L56** `.. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `    plan = cutlass_cppgen.op.Gemm(element=torch.float32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L59** `    op = plan.construct()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L60** `    cutlass_cppgen.emit.pytorch(op, 'cutlass_gemm', 80, jit=False, sourcedir='output')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `After this call, the directory \`\`output\`\` contains \`\`setup.py\`\`,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L63** `\`\`cutlass_gemm.cpp\`\`, and \`\`cutlass_gemm_kernel.cu\`\`. The module can be built from` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L64** `within \`\`output\`\` by running: \`\`TORCH_CUDA_ARCH_LIST="8.0" python setup.py develop --user\`\`.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `The module can later be used in Python via:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `.. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L69** `.. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    import torch` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L72** `    import cutlass_gemm` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    # Generate inputs for the GEMM` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L75** `    A, B, C = [torch.ones((512, 512)).to('cuda') for _ in range(3)]` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    # Run the module` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L78** `    D = cutlass_gemm.run(A, B, C)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L79** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L82** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `from cutlass_library import ConvKind, ConvKindNames, DataType, SubstituteTemplate` — **EN:** Imports ConvKind, ConvKindNames, DataType, SubstituteTemplate from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 ConvKind, ConvKindNames, DataType, SubstituteTemplate。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `from cutlass_cppgen import CUTLASS_PATH, logger, swizzle` — **EN:** Imports CUTLASS_PATH, logger, swizzle from `cutlass_cppgen`. **CN:** 从 `cutlass_cppgen` 导入 CUTLASS_PATH, logger, swizzle。
+- **L87** `from cutlass_cppgen.backend.gemm_operation import GemmOperationGrouped, GemmOperationUniversal` — **EN:** Imports GemmOperationGrouped, GemmOperationUniversal from `cutlass_cppgen.backend.gemm_operation`. **CN:** 从 `cutlass_cppgen.backend.gemm_operation` 导入 GemmOperationGrouped, GemmOperationUniversal。
+- **L88** `from cutlass_cppgen.backend.conv2d_operation import Conv2dOperation` — **EN:** Imports Conv2dOperation from `cutlass_cppgen.backend.conv2d_operation`. **CN:** 从 `cutlass_cppgen.backend.conv2d_operation` 导入 Conv2dOperation。
+- **L89** `from cutlass_cppgen.backend.library import ApiVersion` — **EN:** Imports ApiVersion from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 ApiVersion。
+- **L90** `from cutlass_cppgen.emit import common` — **EN:** Imports common from `cutlass_cppgen.emit`. **CN:** 从 `cutlass_cppgen.emit` 导入 common。
+- **L91** `from cutlass_cppgen.utils.datatypes import is_torch_available` — **EN:** Imports is_torch_available from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_torch_available。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `if is_torch_available():` — **EN:** Starts a conditional branch guarded by `is_torch_available()`. **CN:** 开始一个由 `is_torch_available()` 控制的条件分支。
+- **L94** `    import torch` — **EN:** Imports torch for later use. **CN:** 导入 torch 供后续使用。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `_PYTORCH_CUDA_TEMPLATE = common._CSTYLE_AUTOGEN_COMMENT + """` — **EN:** Assigns a value to _PYTORCH_CUDA_TEMPLATE. **CN:** 将一个值赋给 _PYTORCH_CUDA_TEMPLATE。
+- **L98** `#include <cuda_runtime.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L99** `#include <torch/extension.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L100** `#include <ATen/ATen.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L101** `#include <ATen/cuda/CUDAContext.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L102** `#include "cutlass/cutlass.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `#include "cutlass/util/device_memory.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `// helper function allocating the memory` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `void* device_memory_allocation(size_t size, int device_id=0) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    if (size > 0) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `        torch::Device device(torch::kCUDA, device_id);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `        cudaStream_t stream = at::cuda::getCurrentCUDAStream();` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `        torch::TensorOptions options = torch::TensorOptions().dtype(torch::kI8).device(device);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        at::Tensor device_tensor = torch::empty({(long)size,}, options);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        return reinterpret_cast<void*>(device_tensor.data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `    } else {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        return nullptr;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `${includes}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `${declaration}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `${impl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `_PYTORCH_GEMM_CPP_TEMPLATE = common._CSTYLE_AUTOGEN_COMMENT + """` — **EN:** Assigns a value to _PYTORCH_GEMM_CPP_TEMPLATE. **CN:** 将一个值赋给 _PYTORCH_GEMM_CPP_TEMPLATE。
+- **L124** `#include <torch/extension.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `#include <ATen/ATen.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L126** `#include <pybind11/stl.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `// CUDA forward declarations` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `at::Tensor ${name}_kernel(const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt, float alpha=1.f, float beta=0.f);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `// C++ interface` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `at::Tensor ${name}(const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt, float alpha=1.f, float beta=0.f) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `  return ${name}_kernel(A, B, C, alpha, beta);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `  m.def("run", py::overload_cast<const at::Tensor&, const at::Tensor&, at::optional<const at::Tensor>, float, float>(&${name}), py::arg("A"), py::arg("B"), py::arg("C") = nullptr, py::arg("alpha") = 1.f, py::arg("beta") = 0.f);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `_PYTORCH_GROUPED_GEMM_CPP_TEMPLATE = common._CSTYLE_AUTOGEN_COMMENT + """` — **EN:** Assigns a value to _PYTORCH_GROUPED_GEMM_CPP_TEMPLATE. **CN:** 将一个值赋给 _PYTORCH_GROUPED_GEMM_CPP_TEMPLATE。
+- **L142** `#include <torch/extension.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L143** `#include <ATen/ATen.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L144** `#include <pybind11/stl.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `// CUDA forward declarations` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `std::vector<at::Tensor> ${name}_kernel(const std::vector<at::Tensor>& A, const std::vector<at::Tensor>& B, at::optional<const std::vector<at::Tensor>> C=at::nullopt, float alpha=1.f, float beta=0.f);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `// C++ interface` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `std::vector<at::Tensor> ${name}(const std::vector<at::Tensor>& A, const std::vector<at::Tensor>& B, at::optional<const std::vector<at::Tensor>> C=at::nullopt, float alpha=1.f, float beta=0.f) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `  return ${name}_kernel(A, B, C, alpha, beta);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `  m.def("run", py::overload_cast<const std::vector<at::Tensor>&, const std::vector<at::Tensor>&, at::optional<const std::vector<at::Tensor>>, float, float>(&${name}),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        py::arg("A"), py::arg("B"), py::arg("C") = nullptr, py::arg("alpha") = 1.f, py::arg("beta") = 0.f);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `_PYTORCH_CONV2D_FPROP_CPP_TEMPLATE = common._CSTYLE_AUTOGEN_COMMENT + """` — **EN:** Assigns a value to _PYTORCH_CONV2D_FPROP_CPP_TEMPLATE. **CN:** 将一个值赋给 _PYTORCH_CONV2D_FPROP_CPP_TEMPLATE。
+- **L161** `#include <torch/extension.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L162** `#include <ATen/ATen.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L163** `#include <pybind11/stl.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `// CUDA forward declarations` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `at::Tensor ${name}_kernel(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `    const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `    float alpha=1.f, float beta=0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `    std::string split_k_mode="serial", int split_k_slices=1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `// C++ interface` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `at::Tensor ${name}(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `    const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `    float alpha=1.f, float beta=0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `    std::string split_k_mode="serial", int split_k_slices=1) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `    return ${name}_kernel(A, B, C, stride, padding, dilation, alpha, beta, split_k_mode, split_k_slices);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `  m.def("run",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `  py::overload_cast<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `    const at::Tensor&, const at::Tensor&, at::optional<const at::Tensor>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `    std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, float, float,  std::string, int>(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `        &${name}), py::arg("A"), py::arg("B"), py::arg("C") = nullptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `        py::arg("stride") = std::make_tuple(1, 1), py::arg("padding") = std::make_tuple(1, 1), py::arg("dilation") = std::make_tuple(1, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `        py::arg("alpha") = 1.f, py::arg("beta") = 0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `        py::arg("split_k_mode") = "serial", py::arg("split_k_slices") = 1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `_PYTORCH_CONV2D_GRAD_CPP_TEMPLATE = common._CSTYLE_AUTOGEN_COMMENT + """` — **EN:** Assigns a value to _PYTORCH_CONV2D_GRAD_CPP_TEMPLATE. **CN:** 将一个值赋给 _PYTORCH_CONV2D_GRAD_CPP_TEMPLATE。
+- **L194** `#include <torch/extension.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L195** `#include <ATen/ATen.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L196** `#include <pybind11/stl.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `// CUDA forward declarations` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `at::Tensor ${name}_kernel(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `    std::tuple<int, int, int, int> result_size, const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `    float alpha=1.f, float beta=0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `    std::string split_k_mode="serial", int split_k_slices=1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `// C++ interface` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `at::Tensor ${name}(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `    std::tuple<int, int, int, int> result_size, const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `    float alpha=1.f, float beta=0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `    std::string split_k_mode="serial", int split_k_slices=1) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `    return ${name}_kernel(result_size, A, B, C, stride, padding, dilation, alpha, beta, split_k_mode, split_k_slices);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `  m.def("run",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `  py::overload_cast<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `    std::tuple<int, int, int, int>, const at::Tensor&, const at::Tensor&, at::optional<const at::Tensor>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `    std::tuple<int, int>, std::tuple<int, int>, std::tuple<int, int>, float, float, std::string, int>(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `        &${name}), py::arg("result_size"), py::arg("A"), py::arg("B"), py::arg("C") = nullptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `        py::arg("stride") = std::make_tuple(1, 1), py::arg("padding") = std::make_tuple(1, 1), py::arg("dilation") = std::make_tuple(1, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `        py::arg("alpha") = 1.f, py::arg("beta") = 0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `        py::arg("split_k_mode") = "serial", py::arg("split_k_slices") = 1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `_PYTORCH_GEMM_INCLUDES = {` — **EN:** Assigns a value to _PYTORCH_GEMM_INCLUDES. **CN:** 将一个值赋给 _PYTORCH_GEMM_INCLUDES。
+- **L227** `    ApiVersion.v2x: """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `#include "cutlass/gemm/device/gemm_universal.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L229** `""",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `    ApiVersion.v3x: """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `#include "cutlass/gemm/device/gemm_universal_adapter.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L232** `#include "cutlass/gemm/collective/collective_builder.hpp"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L233** `#include "cutlass/gemm/device/gemm_universal_adapter.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L234** `#include "cutlass/gemm/kernel/gemm_universal.hpp"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `#include "cutlass/epilogue/collective/collective_builder.hpp"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L236** `#include "cutlass/util/packed_stride.hpp"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L237** `""",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `_PYTORCH_GROUPED_GEMM_INCLUDES = """` — **EN:** Assigns a value to _PYTORCH_GROUPED_GEMM_INCLUDES. **CN:** 将一个值赋给 _PYTORCH_GROUPED_GEMM_INCLUDES。
+- **L241** `#include "cutlass/gemm/kernel/default_gemm_grouped.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L242** `#include "cutlass/gemm/device/gemm_grouped.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L243** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `_PYTORCH_CONV2D_INCLUDES = """` — **EN:** Assigns a value to _PYTORCH_CONV2D_INCLUDES. **CN:** 将一个值赋给 _PYTORCH_CONV2D_INCLUDES。
+- **L246** `#include "cutlass/conv/kernel/default_conv2d_fprop.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L247** `#include "cutlass/conv/kernel/default_conv2d_dgrad.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L248** `#include "cutlass/conv/kernel/default_conv2d_wgrad.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L249** `#include "cutlass/conv/device/implicit_gemm_convolution.h"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L250** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** `_CUTLASS_TYPE_TO_TORCH_TYPE = {` — **EN:** Assigns a value to _CUTLASS_TYPE_TO_TORCH_TYPE. **CN:** 将一个值赋给 _CUTLASS_TYPE_TO_TORCH_TYPE。
+- **L253** `    DataType.f16: "torch::kF16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `    DataType.f32: "torch::kF32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `    DataType.f64: "torch::kF64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `    DataType.s8: "torch::kI8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `    DataType.s32: "torch::kI32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `    DataType.bf16: "torch::kBFloat16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L261** `_PYTORCH_GEMM_IMPL_TEMPLATE_2x = (` — **EN:** Assigns a value to _PYTORCH_GEMM_IMPL_TEMPLATE_2x. **CN:** 将一个值赋给 _PYTORCH_GEMM_IMPL_TEMPLATE_2x。
+- **L262** `    common._CUTLASS_KERNEL_RUN_GEMM_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `    + """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `at::Tensor ${name}_kernel(const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C, float alpha, float beta) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `    int M = A.size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `    int N = B.size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `    int K = A.size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** `    typename DeviceKernel::ElementC* ptrC = (C == at::nullopt) ?` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `                                            nullptr :` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `                                            reinterpret_cast<typename DeviceKernel::ElementC*>(C->contiguous().data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `    at::Tensor D = B.new_empty({M, N}, ${torch_type_C});` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `    cutlass::Status status = ${name}_kernel_run(M, N, K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `                                                reinterpret_cast<typename DeviceKernel::ElementA*>(A.contiguous().data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `                                                reinterpret_cast<typename DeviceKernel::ElementB*>(B.contiguous().data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `                                                ptrC,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `                                                reinterpret_cast<typename DeviceKernel::ElementC*>(D.contiguous().data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `                                                ElementCompute(alpha), ElementCompute(beta));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `    TORCH_CHECK(status == cutlass::Status::kSuccess, "CUTLASS kernel failed");` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `    return D;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `_PYTORCH_GEMM_IMPL_TEMPLATE_3x = (` — **EN:** Assigns a value to _PYTORCH_GEMM_IMPL_TEMPLATE_3x. **CN:** 将一个值赋给 _PYTORCH_GEMM_IMPL_TEMPLATE_3x。
+- **L288** `    common._CUTLASS_KERNEL_RUN_GEMM_3x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `    + """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `bool hw_info_queried = false;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `cutlass::KernelHardwareInfo hw_info;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `at::Tensor ${name}_kernel(const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C, float alpha, float beta) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `    int M = A.size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `    int N = B.size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `    int K = A.size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `    int L = 1;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `    // Query hardware info if we haven't already` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `    if (!hw_info_queried) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `        hw_info.device_id = 0;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `        hw_info.sm_count = cutlass::KernelHardwareInfo::query_device_multiprocessor_count(hw_info.device_id);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** `    typename DeviceKernel::ElementC* ptrC = (C == at::nullopt) ?` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `                                            nullptr :` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `                                            reinterpret_cast<typename DeviceKernel::ElementC*>(C->contiguous().data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `    at::Tensor D = B.new_empty({M, N}, ${torch_type_C});` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `    cutlass::Status status = ${name}_kernel_run(M, N, K, L,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** `                                                reinterpret_cast<typename DeviceKernel::ElementA*>(A.contiguous().data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L312** `                                                reinterpret_cast<typename DeviceKernel::ElementB*>(B.contiguous().data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `                                                ptrC,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `                                                reinterpret_cast<typename DeviceKernel::ElementC*>(D.contiguous().data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `                                                ElementCompute(alpha), ElementCompute(beta),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `                                                hw_info);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `    TORCH_CHECK(status == cutlass::Status::kSuccess, "CUTLASS kernel failed");` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `    return D;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `_PYTORCH_GROUPED_GEMM_IMPL_TEMPLATE = (` — **EN:** Assigns a value to _PYTORCH_GROUPED_GEMM_IMPL_TEMPLATE. **CN:** 将一个值赋给 _PYTORCH_GROUPED_GEMM_IMPL_TEMPLATE。
+- **L326** `    common._CUTLASS_KERNEL_RUN_GROUPED_GEMM_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `    + """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** `std::vector<at::Tensor> ${name}_kernel(const std::vector<at::Tensor>& A, const std::vector<at::Tensor>& B, at::optional<const std::vector<at::Tensor>> C, float alpha, float beta) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L329** `    size_t num = A.size();` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `    // To avoid performing many small cudaMallocs and host-to-device copies,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `    // we serialize the grouped GEMM arguments on the host, allocate one` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `    // large chunk of device memory, and perform a single cudaMemcpy to` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `    // copy the host data to the device. Allocation overheads could be` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `    // avoided by using a memory pool.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `    // Calculate the total size of the data to be copied from host to device` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `    size_t total_size = sizeof(cutlass::gemm::GemmCoord) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `                        sizeof(DeviceKernel::ElementA*) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `                        sizeof(DeviceKernel::ElementB*) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `                        sizeof(DeviceKernel::ElementC*) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** `                        sizeof(DeviceKernel::ElementC*) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `                        sizeof(int64_t) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `                        sizeof(int64_t) +` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `                        sizeof(int64_t);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `    total_size *= num;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    // num * sizeof(cutlass::gemm::GemmCoord) may leave one at a non-multiple` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `    // of sizeof(DeviceKernel::ElementA*) (which will be 64 on a 64-bit system).` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `    // To ensure that we don't end up having misaligned loads in the kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `    // we pad to the nearest multiple of 8.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `    //` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `    // Note that, even on a 32-bit system (for which sizeof(X*) will not equal` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `    // sizeof(int64_t)), only padding between the list of GemmCoords and the` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `    // list of ptr_As is sufficient because the set of four equal-length lists of pointers` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `    // (A*, B*, C*, D*) will ensure that the first list of int64_ts will always` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `    // start on a multiple of 8.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `    int64_t padding = 8 - (total_size % 8);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `    total_size += padding;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** `    uint8_t* host_data = new uint8_t[total_size];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `    cutlass::DeviceAllocation<uint8_t> device_data(total_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `    uint8_t* start = host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `    cutlass::gemm::GemmCoord* problem_sizes_host = reinterpret_cast<cutlass::gemm::GemmCoord*>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** `    // Apply the padding after the list of GemmCoords` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `    start += num * sizeof(cutlass::gemm::GemmCoord) + padding;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L370** `    int64_t ptr_A_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `    DeviceKernel::ElementA** ptr_A_host = reinterpret_cast<DeviceKernel::ElementA**>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `    start += num * sizeof(DeviceKernel::ElementA*);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L374** `    int64_t ptr_B_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L375** `    DeviceKernel::ElementB** ptr_B_host = reinterpret_cast<DeviceKernel::ElementB**>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `    start += num * sizeof(DeviceKernel::ElementB*);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `    int64_t ptr_C_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `    DeviceKernel::ElementC** ptr_C_host = reinterpret_cast<DeviceKernel::ElementC**>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** `    start += num * sizeof(DeviceKernel::ElementC*);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `    int64_t ptr_D_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `    DeviceKernel::ElementC** ptr_D_host = reinterpret_cast<DeviceKernel::ElementC**>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `    start += num * sizeof(DeviceKernel::ElementC*);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `    int64_t lda_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `    int64_t* lda_host = reinterpret_cast<int64_t*>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `    start += num * sizeof(int64_t);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L390** `    int64_t ldb_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** `    int64_t* ldb_host = reinterpret_cast<int64_t*>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** `    start += num * sizeof(int64_t);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L394** `    int64_t ldc_offset = start - host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `    int64_t* ldc_host = reinterpret_cast<int64_t*>(start);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `    start += num * sizeof(int64_t);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `    std::vector<at::Tensor> D(num);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `    bool need_C = (C != at::nullopt) && (beta != 0.f);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `    for (size_t i = 0; i < num; ++i) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `        int M = A[i].size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `        int N = B[i].size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** `        int K = A[i].size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** `        *(problem_sizes_host + i) = {M, N, K};` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L406** `        *(ptr_A_host + i) = reinterpret_cast<typename DeviceKernel::ElementA*>(A[i].contiguous().data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** `        *(ptr_B_host + i) = reinterpret_cast<typename DeviceKernel::ElementB*>(B[i].contiguous().data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `        if (need_C) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `            *(ptr_C_host + i) = reinterpret_cast<typename DeviceKernel::ElementC*>(C->at(i).contiguous().data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `        else {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `            *(ptr_C_host + i) = nullptr;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `        D[i] = B[i].new_empty({M, N}, ${torch_type_C});` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `        *(ptr_D_host + i) = reinterpret_cast<typename DeviceKernel::ElementC*>(D[i].contiguous().data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L419** `        *(lda_host + i) = DeviceKernel::LayoutA::packed({M, K}).stride(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        *(ldb_host + i) = DeviceKernel::LayoutB::packed({K, N}).stride(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `        *(ldc_host + i) = DeviceKernel::LayoutC::packed({M, N}).stride(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    device_data.copy_from_host(host_data);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L426** `    cutlass::Status status = ${name}_kernel_run(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `        num,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `        reinterpret_cast<cutlass::gemm::GemmCoord*>(device_data.get()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `        reinterpret_cast<DeviceKernel::ElementA**>(device_data.get() + ptr_A_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `        reinterpret_cast<DeviceKernel::ElementB**>(device_data.get() + ptr_B_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `        reinterpret_cast<DeviceKernel::ElementC**>(device_data.get() + ptr_C_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `        reinterpret_cast<DeviceKernel::ElementC**>(device_data.get() + ptr_D_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `        reinterpret_cast<int64_t*>(device_data.get() + lda_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `        reinterpret_cast<int64_t*>(device_data.get() + ldb_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `        reinterpret_cast<int64_t*>(device_data.get() + ldc_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `        reinterpret_cast<int64_t*>(device_data.get() + ldc_offset),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `        ElementCompute(alpha), ElementCompute(beta));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L439** `    delete[] host_data;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** `    TORCH_CHECK(status == cutlass::Status::kSuccess, "CUTLASS kernel failed");` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `    return D;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** `_PYTORCH_CONV2D_IMPL_TEMPLATE_2x = """` — **EN:** Assigns a value to _PYTORCH_CONV2D_IMPL_TEMPLATE_2x. **CN:** 将一个值赋给 _PYTORCH_CONV2D_IMPL_TEMPLATE_2x。
+- **L448** `    cudaStream_t stream = at::cuda::getCurrentCUDAStream();` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L450** `    cutlass::Status status = ${name}_kernel_run(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `        &problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `        reinterpret_cast<typename UnderlyingKernel::ElementA*>(A.data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `        reinterpret_cast<typename UnderlyingKernel::ElementB*>(B.data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** `        ptrC,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** `        reinterpret_cast<typename UnderlyingKernel::ElementC*>(D.data_ptr()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L456** `        alpha, beta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L457** `        split_k_mode, stream, B.device().index());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `    TORCH_CHECK(status == cutlass::Status::kSuccess, "CUTLASS kernel failed");` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `    return D;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L462** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L464** `_PYTORCH_CONV2D_FPROP_IMPL_TEMPLATE_2x = (` — **EN:** Assigns a value to _PYTORCH_CONV2D_FPROP_IMPL_TEMPLATE_2x. **CN:** 将一个值赋给 _PYTORCH_CONV2D_FPROP_IMPL_TEMPLATE_2x。
+- **L465** `    common._CUTLASS_KERNEL_RUN_CONV2D_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `    + """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `at::Tensor ${name}_kernel(const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `    float alpha=1.f, float beta=0.f, std::string split_k_mode="serial", int split_k_slices=1) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `    int N, H, W, C_, K, R, S, P, Q;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `    N = A.size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `    C_ = A.size(1);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `    H = A.size(2);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `    W = A.size(3);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** `    K = B.size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `    R = B.size(2);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `    S = B.size(3);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `    cutlass::conv::Conv2dProblemSize problem_size(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `        cutlass::Tensor4DCoord(N, H, W, C_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `        cutlass::Tensor4DCoord(K, R, S, C_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `        cutlass::Tensor4DCoord(std::get<0>(padding), std::get<0>(padding), std::get<1>(padding), std::get<1>(padding)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** `        cutlass::MatrixCoord(std::get<0>(stride), std::get<1>(stride)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `        cutlass::MatrixCoord(std::get<0>(dilation), std::get<1>(dilation)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `        cutlass::conv::Mode::kCrossCorrelation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `        split_k_slices` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `    );` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `    P = problem_size.P;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L491** `    Q = problem_size.Q;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `    typename UnderlyingKernel::ElementC* ptrC = (C == at::nullopt) ?` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L494** `                                            nullptr :` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `                                            reinterpret_cast<typename UnderlyingKernel::ElementC*>(C->data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `    torch::TensorOptions options = torch::TensorOptions().dtype(${torch_type_C}).device(B.device()).memory_format(at::MemoryFormat::ChannelsLast);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L498** `    at::Tensor D = torch::zeros({N, K, P, Q}, options);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L499** `""" + _PYTORCH_CONV2D_IMPL_TEMPLATE_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L503** `_PYTORCH_CONV2D_DGRAD_IMPL_TEMPLATE_2x = (` — **EN:** Assigns a value to _PYTORCH_CONV2D_DGRAD_IMPL_TEMPLATE_2x. **CN:** 将一个值赋给 _PYTORCH_CONV2D_DGRAD_IMPL_TEMPLATE_2x。
+- **L504** `    common._CUTLASS_KERNEL_RUN_CONV2D_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L505** `    + """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L506** `at::Tensor ${name}_kernel(std::tuple<int, int, int, int> input_size, const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L507** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1}, float alpha=1.f, float beta=0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L508** `    std::string split_k_mode="serial", int split_k_slices=1) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L509** `    int N, H, W, C_, K, R, S;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L510** `    N = std::get<0>(input_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L511** `    C_ = std::get<1>(input_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `    H = std::get<2>(input_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** `    W = std::get<3>(input_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `    K = B.size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `    R = B.size(2);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L517** `    S = B.size(3);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `    cutlass::conv::Conv2dProblemSize problem_size(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L520** `        cutlass::Tensor4DCoord(N, H, W, C_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L521** `        cutlass::Tensor4DCoord(K, R, S, C_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `        cutlass::Tensor4DCoord(std::get<0>(padding), std::get<0>(padding), std::get<1>(padding), std::get<1>(padding)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `        cutlass::MatrixCoord(std::get<0>(stride), std::get<1>(stride)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `        cutlass::MatrixCoord(std::get<0>(dilation), std::get<1>(dilation)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `        cutlass::conv::Mode::kCrossCorrelation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `        split_k_slices` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `    );` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L529** `    typename UnderlyingKernel::ElementC* ptrC = (C == at::nullopt) ?` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `                                            nullptr :` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `                                            reinterpret_cast<typename UnderlyingKernel::ElementC*>(C->data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L533** `    torch::TensorOptions options = torch::TensorOptions().dtype(${torch_type_C}).device(B.device()).memory_format(at::MemoryFormat::ChannelsLast);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L534** `    at::Tensor D = torch::empty({N, C_, H, W}, options);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `""" + _PYTORCH_CONV2D_IMPL_TEMPLATE_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** `_PYTORCH_CONV2D_WGRAD_IMPL_TEMPLATE_2x = (` — **EN:** Assigns a value to _PYTORCH_CONV2D_WGRAD_IMPL_TEMPLATE_2x. **CN:** 将一个值赋给 _PYTORCH_CONV2D_WGRAD_IMPL_TEMPLATE_2x。
+- **L540** `    common._CUTLASS_KERNEL_RUN_CONV2D_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** `    + """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L542** `at::Tensor ${name}_kernel(std::tuple<int, int, int, int> weight_size, const at::Tensor& A, const at::Tensor& B, at::optional<const at::Tensor> C=at::nullopt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `    std::tuple<int, int> stride={1, 1}, std::tuple<int, int> padding={0, 0}, std::tuple<int, int> dilation={1, 1}, float alpha=1.f, float beta=0.f,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `    std::string split_k_mode="serial", int split_k_slices=1) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** `    int N, H, W, C_, K, R, S;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L546** `    K = std::get<0>(weight_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L547** `    C_ = std::get<1>(weight_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `    R = std::get<2>(weight_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `    S = std::get<3>(weight_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** `    N = B.size(0);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L552** `    H = B.size(2);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `    W = B.size(3);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** `    cutlass::conv::Conv2dProblemSize problem_size(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L556** `        cutlass::Tensor4DCoord(N, H, W, C_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L557** `        cutlass::Tensor4DCoord(K, R, S, C_),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L558** `        cutlass::Tensor4DCoord(std::get<0>(padding), std::get<0>(padding), std::get<1>(padding), std::get<1>(padding)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L559** `        cutlass::MatrixCoord(std::get<0>(stride), std::get<1>(stride)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L560** `        cutlass::MatrixCoord(std::get<0>(dilation), std::get<1>(dilation)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L561** `        cutlass::conv::Mode::kCrossCorrelation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** `        split_k_slices` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L563** `    );` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L564** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L565** `    typename UnderlyingKernel::ElementC* ptrC = (C == at::nullopt) ?` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L566** `                                            nullptr :` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L567** `                                            reinterpret_cast<typename UnderlyingKernel::ElementC*>(C->data_ptr());` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L568** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L569** `    torch::TensorOptions options = torch::TensorOptions().dtype(${torch_type_C}).device(B.device()).memory_format(at::MemoryFormat::ChannelsLast);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `    at::Tensor D = torch::empty({K, C_, R, S}, options);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L571** `""" + _PYTORCH_CONV2D_IMPL_TEMPLATE_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L572** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L575** `_PYTORCH_SETUP_PY = common._PYSTYLE_AUTOGEN_COMMENT + """` — **EN:** Assigns a value to _PYTORCH_SETUP_PY. **CN:** 将一个值赋给 _PYTORCH_SETUP_PY。
+- **L576** `from setuptools import setup` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L577** `from torch.utils.cpp_extension import BuildExtension, CUDAExtension` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L578** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L579** `setup(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L580** `    name='${name}',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `    ext_modules=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `        CUDAExtension('${name}', [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `            '${name}.cpp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `            '${name}_kernel.cu',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `        ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L586** `        include_dirs=['${cutlass_path}/include', '${cutlass_path}/tools/util/include'],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `        extra_compile_args={` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `            'cxx': ['-std=c++17'],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `            'nvcc': ['-std=c++17', ${extra_compile_args}],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `        },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `        libraries=['cuda']` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `    ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `    cmdclass={` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L595** `        'build_ext': BuildExtension` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L596** `    })` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L598** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L600** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L601** `def _generate_setup(name: str, sourcedir: str, extra_compile_args: str=""):` — **EN:** Defines function `_generate_setup`. **CN:** 定义函数 `_generate_setup`。
+- **L602** `    """` — **EN:** Starts the docstring for the function `_generate_setup`. **CN:** 开始说明 function `_generate_setup` 的文档字符串。
+- **L603** `    Generates a setup.py file for the extension` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L604** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L605** `    :param name: name of the module to generate` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L606** `    :type name: str` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L607** `    :param sourcedir: directory to which generated source files should be written` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L608** `    :type sourcedir: str` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L609** `    :param extra_compile_args: additional arguments to pass to setup.py` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L610** `    :type extra_args: str` — **EN:** Continues the docstring for the function `_generate_setup`. **CN:** 继续说明 function `_generate_setup` 的文档字符串。
+- **L611** `    """` — **EN:** Ends the docstring for the function `_generate_setup`. **CN:** 结束说明 function `_generate_setup` 的文档字符串。
+- **L612** `    setup_py_file = os.path.join(sourcedir, "setup.py")` — **EN:** Assigns a value to setup_py_file. **CN:** 将一个值赋给 setup_py_file。
+- **L613** `    setup_source = SubstituteTemplate(` — **EN:** Assigns a value to setup_source. **CN:** 将一个值赋给 setup_source。
+- **L614** `        _PYTORCH_SETUP_PY, {"name": name, "cutlass_path": CUTLASS_PATH, "extra_compile_args": extra_compile_args}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L615** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `    with open(setup_py_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(setup_py_file, 'w'). **CN:** 开始一个使用 open(setup_py_file, 'w') 的上下文管理代码块。
+- **L617** `        outfile.write(setup_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L618** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L620** `class _ArchListSetter:` — **EN:** Defines class `_ArchListSetter`. **CN:** 定义类 `_ArchListSetter`。
+- **L621** `    """` — **EN:** Starts the docstring for the class `_ArchListSetter`. **CN:** 开始说明 class `_ArchListSetter` 的文档字符串。
+- **L622** `    Utility context manager for temporarily setting the value of the \`\`TORCH_CUDA_ARCH_LIST\`\`` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L623** `    environment variable when building a PyTorch CUDA module.` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L624** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L625** `    \`\`TORCH_CUDA_ARCH_LIST\`\` is a space-delmited list of compute capabilites for which a PyTorch` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L626** `    CUDA module should be compiled.` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L627** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L628** `    For example, \`\`TORCH_CUDA_ARCH_LIST="7.0 8.0"\`\` would result in the inclusion of` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L629** `    \`\`-gencode=arch=compute_70,code=sm_70\`\` and \`\`-gencode=arch=compute_80,code=sm_80\`\` in the` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L630** `    compilation of the module.` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `    This utility wraps the building of a PyTorch CUDA module with a setting of this environment` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L633** `    variable according to the current compute capability being targetted.` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L634** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L635** `    Example usage:` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L637** `    .. highlight:: python` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L638** `    .. code-block:: python` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L640** `        # Temporarily set TORCH_CUDA_ARCH_LIST="8.0"` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L641** `        with _ArchListSetter(80):` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L642** `            # Perform JIT compilation and loading of the module` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L643** `            mod = torch.utils.cpp_extension.load(...)` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L645** `    :param cc: compute capability` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L646** `    :type cc: int` — **EN:** Continues the docstring for the class `_ArchListSetter`. **CN:** 继续说明 class `_ArchListSetter` 的文档字符串。
+- **L647** `    """` — **EN:** Ends the docstring for the class `_ArchListSetter`. **CN:** 结束说明 class `_ArchListSetter` 的文档字符串。
+- **L648** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L649** `    _TORCH_CUDA_ARCH_LIST = "TORCH_CUDA_ARCH_LIST"` — **EN:** Assigns a value to _TORCH_CUDA_ARCH_LIST. **CN:** 将一个值赋给 _TORCH_CUDA_ARCH_LIST。
+- **L650** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L651** `    def __init__(self, cc: int):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L652** `        self.cc_str = ".".join(list(str(cc)))` — **EN:** Assigns a value to self.cc_str. **CN:** 将一个值赋给 self.cc_str。
+- **L653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L654** `    def __enter__(self):` — **EN:** Defines function `__enter__`. **CN:** 定义函数 `__enter__`。
+- **L655** `        """` — **EN:** Starts the docstring for the function `__enter__`. **CN:** 开始说明 function `__enter__` 的文档字符串。
+- **L656** `        Saves the old value of TORCH_CUDA_ARCH_LIST and reset it to the new value based on \`\`cc\`\`` — **EN:** Continues the docstring for the function `__enter__`. **CN:** 继续说明 function `__enter__` 的文档字符串。
+- **L657** `        """` — **EN:** Ends the docstring for the function `__enter__`. **CN:** 结束说明 function `__enter__` 的文档字符串。
+- **L658** `        self.old_arch_list = os.getenv(_ArchListSetter._TORCH_CUDA_ARCH_LIST)` — **EN:** Assigns a value to self.old_arch_list. **CN:** 将一个值赋给 self.old_arch_list。
+- **L659** `        os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST] = self.cc_str` — **EN:** Assigns a value to os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST]. **CN:** 将一个值赋给 os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST]。
+- **L660** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L661** `        return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L662** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L663** `    def __exit__(self, exc_type, exc_val, traceback):` — **EN:** Defines function `__exit__`. **CN:** 定义函数 `__exit__`。
+- **L664** `        """` — **EN:** Starts the docstring for the function `__exit__`. **CN:** 开始说明 function `__exit__` 的文档字符串。
+- **L665** `        Restores the old value of TORCH_CUDA_ARCH_LIST` — **EN:** Continues the docstring for the function `__exit__`. **CN:** 继续说明 function `__exit__` 的文档字符串。
+- **L666** `        """` — **EN:** Ends the docstring for the function `__exit__`. **CN:** 结束说明 function `__exit__` 的文档字符串。
+- **L667** `        if self.old_arch_list is None:` — **EN:** Starts a conditional branch guarded by `self.old_arch_list is None`. **CN:** 开始一个由 `self.old_arch_list is None` 控制的条件分支。
+- **L668** `            del os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST]` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L669** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L670** `            os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST] = self.old_arch_list` — **EN:** Assigns a value to os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST]. **CN:** 将一个值赋给 os.environ[_ArchListSetter._TORCH_CUDA_ARCH_LIST]。
+- **L671** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L672** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L673** `def _jit(name: str, cc: int, cpp_file: str, cuda_file: str):` — **EN:** Defines function `_jit`. **CN:** 定义函数 `_jit`。
+- **L674** `    """` — **EN:** Starts the docstring for the function `_jit`. **CN:** 开始说明 function `_jit` 的文档字符串。
+- **L675** `    JIT compiles and loads a PyTorch CUDA extension.` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L676** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L677** `    :param name: name of the module to generate` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L678** `    :type name: str` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L679** `    :param cc: compute capability of the device the module should target` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L680** `    :type cc: int` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L681** `    :param cpp_file: path to file containing extension's C++ interface` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L682** `    :type cpp_file: str` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L683** `    :param cuda_file: path to file containing extension's CUDA interface` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L684** `    :type cuda_file: str` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L685** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L686** `    :return: loaded PyTorch module` — **EN:** Continues the docstring for the function `_jit`. **CN:** 继续说明 function `_jit` 的文档字符串。
+- **L687** `    """` — **EN:** Ends the docstring for the function `_jit`. **CN:** 结束说明 function `_jit` 的文档字符串。
+- **L688** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L689** `    from torch.utils.cpp_extension import load` — **EN:** Imports load from `torch.utils.cpp_extension`. **CN:** 从 `torch.utils.cpp_extension` 导入 load。
+- **L690** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L691** `    extra_cuda_cflags = ["-std=c++17"]` — **EN:** Assigns a value to extra_cuda_cflags. **CN:** 将一个值赋给 extra_cuda_cflags。
+- **L692** `    if cc in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `cc in [90, 100, 101, 103]`. **CN:** 开始一个由 `cc in [90, 100, 101, 103]` 控制的条件分支。
+- **L693** `        # PyTorch does not currently add the sm_90a target when compute capability` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L694** `        # 9.0 is set within TORCH_CUDA_ARCH_LIST. Thus, we manually add the sm_90a target.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L695** `        extra_cuda_cflags.append(f"-gencode=arch=compute_{cc}a,code=sm_{cc}a")` — **EN:** Invokes `extra_cuda_cflags.append` as a standalone call. **CN:** 以独立语句方式调用 `extra_cuda_cflags.append`。
+- **L696** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L697** `    with _ArchListSetter(cc):` — **EN:** Starts a context-managed block using _ArchListSetter(cc). **CN:** 开始一个使用 _ArchListSetter(cc) 的上下文管理代码块。
+- **L698** `        jitmodule = load(` — **EN:** Assigns a value to jitmodule. **CN:** 将一个值赋给 jitmodule。
+- **L699** `            name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L700** `            [cpp_file, cuda_file],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L701** `            extra_cuda_cflags=extra_cuda_cflags,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L702** `            extra_include_paths=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L703** `                os.path.join(CUTLASS_PATH, "include"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** `                os.path.join(CUTLASS_PATH, "tools/util/include"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L705** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L706** `            extra_ldflags=["-lcuda"],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L707** `            verbose=(logger.level == logging.DEBUG)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** `    return jitmodule` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L710** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** `def _pytorch_gemm(op, name: str, cc: int, jit: bool = False, sourcedir: str = ""):` — **EN:** Defines function `_pytorch_gemm`. **CN:** 定义函数 `_pytorch_gemm`。
+- **L713** `    """` — **EN:** Starts the docstring for the function `_pytorch_gemm`. **CN:** 开始说明 function `_pytorch_gemm` 的文档字符串。
+- **L714** `    Generates source for building a PyTorch CUDA module that leverages the CUTLASS GEMM` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L715** `    specified by \`\`op\`\`. If the \`\`jit\`\` parameter is set to true, the module is just-in-time` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L716** `    compiled, loaded, and returned.` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L717** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L718** `    :param op: operation to emit in the module` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L719** `    :param name: name of the module to generate` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L720** `    :type name: str` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L721** `    :param cc: compute capability of the device the module should target` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L722** `    :type cc: int` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L723** `    :param jit: whether the module should be just-in-time compiled` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L724** `    :type jit: bool` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L725** `    :param sourcedir: directory to which generated source files should be written` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L726** `    :type sourcedir: str` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L727** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L728** `    :return: loaded PyTorch module if \`\`jit=True\`\` or \`\`None\`\` otherwise` — **EN:** Continues the docstring for the function `_pytorch_gemm`. **CN:** 继续说明 function `_pytorch_gemm` 的文档字符串。
+- **L729** `    """` — **EN:** Ends the docstring for the function `_pytorch_gemm`. **CN:** 结束说明 function `_pytorch_gemm` 的文档字符串。
+- **L730** `    if sourcedir != "" and not os.path.isdir(sourcedir):` — **EN:** Starts a conditional branch guarded by `sourcedir != '' and (not os.path.isdir(sourcedir))`. **CN:** 开始一个由 `sourcedir != '' and (not os.path.isdir(sourcedir))` 控制的条件分支。
+- **L731** `        os.makedirs(sourcedir)` — **EN:** Invokes `os.makedirs` as a standalone call. **CN:** 以独立语句方式调用 `os.makedirs`。
+- **L732** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L733** `    cuda_file = os.path.join(sourcedir, name + "_kernel.cu")` — **EN:** Assigns a value to cuda_file. **CN:** 将一个值赋给 cuda_file。
+- **L734** `    extra_kw = {}` — **EN:** Assigns a value to extra_kw. **CN:** 将一个值赋给 extra_kw。
+- **L735** `    if op.api == ApiVersion.v3x:` — **EN:** Starts a conditional branch guarded by `op.api == ApiVersion.v3x`. **CN:** 开始一个由 `op.api == ApiVersion.v3x` 控制的条件分支。
+- **L736** `        impl_template = _PYTORCH_GEMM_IMPL_TEMPLATE_3x` — **EN:** Assigns a value to impl_template. **CN:** 将一个值赋给 impl_template。
+- **L737** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L738** `        impl_template = _PYTORCH_GEMM_IMPL_TEMPLATE_2x` — **EN:** Assigns a value to impl_template. **CN:** 将一个值赋给 impl_template。
+- **L739** `        if op.swizzling_functor == swizzle.ThreadblockSwizzleStreamK:` — **EN:** Starts a conditional branch guarded by `op.swizzling_functor == swizzle.ThreadblockSwizzleStreamK`. **CN:** 开始一个由 `op.swizzling_functor == swizzle.ThreadblockSwizzleStreamK` 控制的条件分支。
+- **L740** `            extra_kw["args"] = common._CUTLASS_KERNEL_ARGS_2x_STREAM_K` — **EN:** Assigns a value to extra_kw['args']. **CN:** 将一个值赋给 extra_kw['args']。
+- **L741** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L742** `            extra_kw["args"] = common._CUTLASS_KERNEL_ARGS_2x` — **EN:** Assigns a value to extra_kw['args']. **CN:** 将一个值赋给 extra_kw['args']。
+- **L743** `    impl_template = (` — **EN:** Assigns a value to impl_template. **CN:** 将一个值赋给 impl_template。
+- **L744** `        _PYTORCH_GEMM_IMPL_TEMPLATE_3x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `        if op.api == ApiVersion.v3x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** `        else _PYTORCH_GEMM_IMPL_TEMPLATE_2x` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L747** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** `    cuda_impl = SubstituteTemplate(impl_template, {"name": name, **extra_kw})` — **EN:** Assigns a value to cuda_impl. **CN:** 将一个值赋给 cuda_impl。
+- **L749** `    cuda_source = SubstituteTemplate(` — **EN:** Assigns a value to cuda_source. **CN:** 将一个值赋给 cuda_source。
+- **L750** `        _PYTORCH_CUDA_TEMPLATE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** `        {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L752** `            "includes": _PYTORCH_GEMM_INCLUDES[op.api],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L753** `            "declaration": op.rt_module.emit(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `            "procedural_name": op.procedural_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `            "impl": cuda_impl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** `            "torch_type_C": _CUTLASS_TYPE_TO_TORCH_TYPE[op.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L757** `        },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `    with open(cuda_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(cuda_file, 'w'). **CN:** 开始一个使用 open(cuda_file, 'w') 的上下文管理代码块。
+- **L760** `        outfile.write(cuda_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L761** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L762** `    cpp_file = os.path.join(sourcedir, name + ".cpp")` — **EN:** Assigns a value to cpp_file. **CN:** 将一个值赋给 cpp_file。
+- **L763** `    cpp_source = SubstituteTemplate(` — **EN:** Assigns a value to cpp_source. **CN:** 将一个值赋给 cpp_source。
+- **L764** `        _PYTORCH_GEMM_CPP_TEMPLATE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L765** `        {"name": name, "description": f"CUTLASS {op.procedural_name()} GEMM"},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L766** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L767** `    with open(cpp_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(cpp_file, 'w'). **CN:** 开始一个使用 open(cpp_file, 'w') 的上下文管理代码块。
+- **L768** `        outfile.write(cpp_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L769** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L770** `    extra_compile_args = ""` — **EN:** Assigns a value to extra_compile_args. **CN:** 将一个值赋给 extra_compile_args。
+- **L771** `    if cc in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `cc in [90, 100, 101, 103]`. **CN:** 开始一个由 `cc in [90, 100, 101, 103]` 控制的条件分支。
+- **L772** `        extra_compile_args = f"'--generate-code=arch=compute_{cc}a,code=[sm_{cc}a]'"` — **EN:** Assigns a value to extra_compile_args. **CN:** 将一个值赋给 extra_compile_args。
+- **L773** `    _generate_setup(name, sourcedir, extra_compile_args)` — **EN:** Invokes `_generate_setup` as a standalone call. **CN:** 以独立语句方式调用 `_generate_setup`。
+- **L774** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L775** `    if jit:` — **EN:** Starts a conditional branch guarded by `jit`. **CN:** 开始一个由 `jit` 控制的条件分支。
+- **L776** `        return _jit(name, cc, cpp_file, cuda_file)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L777** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L778** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L779** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L780** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L781** `def _pytorch_grouped_gemm(` — **EN:** Defines function `_pytorch_grouped_gemm`. **CN:** 定义函数 `_pytorch_grouped_gemm`。
+- **L782** `    op, name: str, cc: int, jit: bool = False, sourcedir: str = ""` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L783** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L784** `    """` — **EN:** Starts the docstring for the function `_pytorch_grouped_gemm`. **CN:** 开始说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L785** `    Generates source for building a PyTorch CUDA module that leverages the CUTLASS grouped GEMM` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L786** `    specified by \`\`op\`\`. If the \`\`jit\`\` parameter is set to true, the module is just-in-time` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L787** `    compiled, loaded, and returned.` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L788** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L789** `    :param op: operation to emit in the module` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L790** `    :param name: name of the module to generate` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L791** `    :type name: str` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L792** `    :param cc: compute capability of the device the module should target` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L793** `    :type cc: int` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L794** `    :param jit: whether the module should be just-in-time compiled` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L795** `    :type jit: bool` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L796** `    :param sourcedir: directory to which generated source files should be written` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L797** `    :type sourcedir: str` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L798** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L799** `    :return: loaded PyTorch module if \`\`jit=True\`\` or \`\`None\`\` otherwise` — **EN:** Continues the docstring for the function `_pytorch_grouped_gemm`. **CN:** 继续说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L800** `    """` — **EN:** Ends the docstring for the function `_pytorch_grouped_gemm`. **CN:** 结束说明 function `_pytorch_grouped_gemm` 的文档字符串。
+- **L801** `    if op.api != ApiVersion.v2x:` — **EN:** Starts a conditional branch guarded by `op.api != ApiVersion.v2x`. **CN:** 开始一个由 `op.api != ApiVersion.v2x` 控制的条件分支。
+- **L802** `        raise Exception("Grouped GEMM is currently only supported for CUTLASS 2.x")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L803** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L804** `    if sourcedir != "" and not os.path.isdir(sourcedir):` — **EN:** Starts a conditional branch guarded by `sourcedir != '' and (not os.path.isdir(sourcedir))`. **CN:** 开始一个由 `sourcedir != '' and (not os.path.isdir(sourcedir))` 控制的条件分支。
+- **L805** `        os.makedirs(sourcedir)` — **EN:** Invokes `os.makedirs` as a standalone call. **CN:** 以独立语句方式调用 `os.makedirs`。
+- **L806** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L807** `    cuda_file = os.path.join(sourcedir, name + "_kernel.cu")` — **EN:** Assigns a value to cuda_file. **CN:** 将一个值赋给 cuda_file。
+- **L808** `    cuda_impl = SubstituteTemplate(_PYTORCH_GROUPED_GEMM_IMPL_TEMPLATE, {"name": name})` — **EN:** Assigns a value to cuda_impl. **CN:** 将一个值赋给 cuda_impl。
+- **L809** `    cuda_source = SubstituteTemplate(` — **EN:** Assigns a value to cuda_source. **CN:** 将一个值赋给 cuda_source。
+- **L810** `        _PYTORCH_CUDA_TEMPLATE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L811** `        {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L812** `            "includes": _PYTORCH_GROUPED_GEMM_INCLUDES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L813** `            "declaration": op.rt_module.emit(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L814** `            "procedural_name": op.procedural_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L815** `            "impl": cuda_impl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** `            "torch_type_C": _CUTLASS_TYPE_TO_TORCH_TYPE[op.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `        },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L818** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L819** `    with open(cuda_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(cuda_file, 'w'). **CN:** 开始一个使用 open(cuda_file, 'w') 的上下文管理代码块。
+- **L820** `        outfile.write(cuda_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L821** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L822** `    cpp_file = os.path.join(sourcedir, name + ".cpp")` — **EN:** Assigns a value to cpp_file. **CN:** 将一个值赋给 cpp_file。
+- **L823** `    cpp_source = SubstituteTemplate(` — **EN:** Assigns a value to cpp_source. **CN:** 将一个值赋给 cpp_source。
+- **L824** `        _PYTORCH_GROUPED_GEMM_CPP_TEMPLATE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L825** `        {"name": name, "description": f"CUTLASS {op.procedural_name()} grouped GEMM"},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L827** `    with open(cpp_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(cpp_file, 'w'). **CN:** 开始一个使用 open(cpp_file, 'w') 的上下文管理代码块。
+- **L828** `        outfile.write(cpp_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L829** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L830** `    _generate_setup(name, sourcedir)` — **EN:** Invokes `_generate_setup` as a standalone call. **CN:** 以独立语句方式调用 `_generate_setup`。
+- **L831** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L832** `    if jit:` — **EN:** Starts a conditional branch guarded by `jit`. **CN:** 开始一个由 `jit` 控制的条件分支。
+- **L833** `        return _jit(name, cc, cpp_file, cuda_file)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L834** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L835** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L836** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L837** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L838** `def _pytorch_conv2d(op, name: str, cc: int, jit: bool = False, sourcedir: str = ""):` — **EN:** Defines function `_pytorch_conv2d`. **CN:** 定义函数 `_pytorch_conv2d`。
+- **L839** `    """` — **EN:** Starts the docstring for the function `_pytorch_conv2d`. **CN:** 开始说明 function `_pytorch_conv2d` 的文档字符串。
+- **L840** `    Generates source for building a PyTorch CUDA module that leverages the CUTLASS Conv2d` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L841** `    specified by \`\`op\`\`. If the \`\`jit\`\` parameter is set to true, the module is just-in-time` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L842** `    compiled, loaded, and returned.` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L843** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L844** `    :param op: operation to emit in the module` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L845** `    :param name: name of the module to generate` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L846** `    :type name: str` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L847** `    :param cc: compute capability of the device the module should target` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L848** `    :type cc: int` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L849** `    :param jit: whether the module should be just-in-time compiled` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L850** `    :type jit: bool` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L851** `    :param sourcedir: directory to which generated source files should be written` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L852** `    :type sourcedir: str` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L853** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L854** `    Note that the when conv kind is \`dgrad\` or \`wgrad\`, the size of the input \`(N, C, H, W)\` or` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L855** `    weight \`(K, C, R, S)\` should be provided. This is because there are multiple valid solutions` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L856** `    for H/W/R/S given the same P/Q.` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L857** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L858** `    :return: loaded PyTorch module if \`\`jit=True\`\` or \`\`None\`\` otherwise` — **EN:** Continues the docstring for the function `_pytorch_conv2d`. **CN:** 继续说明 function `_pytorch_conv2d` 的文档字符串。
+- **L859** `    """` — **EN:** Ends the docstring for the function `_pytorch_conv2d`. **CN:** 结束说明 function `_pytorch_conv2d` 的文档字符串。
+- **L860** `    if sourcedir != "" and not os.path.isdir(sourcedir):` — **EN:** Starts a conditional branch guarded by `sourcedir != '' and (not os.path.isdir(sourcedir))`. **CN:** 开始一个由 `sourcedir != '' and (not os.path.isdir(sourcedir))` 控制的条件分支。
+- **L861** `        os.makedirs(sourcedir)` — **EN:** Invokes `os.makedirs` as a standalone call. **CN:** 以独立语句方式调用 `os.makedirs`。
+- **L862** `    cuda_file = os.path.join(sourcedir, name + "_kernel.cu")` — **EN:** Assigns a value to cuda_file. **CN:** 将一个值赋给 cuda_file。
+- **L863** `    extra_kw = {}` — **EN:** Assigns a value to extra_kw. **CN:** 将一个值赋给 extra_kw。
+- **L864** `    if op.conv_kind == ConvKind.Fprop:` — **EN:** Starts a conditional branch guarded by `op.conv_kind == ConvKind.Fprop`. **CN:** 开始一个由 `op.conv_kind == ConvKind.Fprop` 控制的条件分支。
+- **L865** `        impl_template = _PYTORCH_CONV2D_FPROP_IMPL_TEMPLATE_2x` — **EN:** Assigns a value to impl_template. **CN:** 将一个值赋给 impl_template。
+- **L866** `        cpp_template = _PYTORCH_CONV2D_FPROP_CPP_TEMPLATE` — **EN:** Assigns a value to cpp_template. **CN:** 将一个值赋给 cpp_template。
+- **L867** `    elif op.conv_kind == ConvKind.Dgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L868** `        impl_template = _PYTORCH_CONV2D_DGRAD_IMPL_TEMPLATE_2x` — **EN:** Assigns a value to impl_template. **CN:** 将一个值赋给 impl_template。
+- **L869** `        cpp_template = _PYTORCH_CONV2D_GRAD_CPP_TEMPLATE` — **EN:** Assigns a value to cpp_template. **CN:** 将一个值赋给 cpp_template。
+- **L870** `    elif op.conv_kind == ConvKind.Wgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L871** `        impl_template = _PYTORCH_CONV2D_WGRAD_IMPL_TEMPLATE_2x` — **EN:** Assigns a value to impl_template. **CN:** 将一个值赋给 impl_template。
+- **L872** `        cpp_template = _PYTORCH_CONV2D_GRAD_CPP_TEMPLATE` — **EN:** Assigns a value to cpp_template. **CN:** 将一个值赋给 cpp_template。
+- **L873** `    extra_kw["conv_kind_name"] = ConvKindNames[op.conv_kind].capitalize()` — **EN:** Assigns a value to extra_kw['conv_kind_name']. **CN:** 将一个值赋给 extra_kw['conv_kind_name']。
+- **L874** `    extra_kw["torch_type_C"] = _CUTLASS_TYPE_TO_TORCH_TYPE[op.C.element]` — **EN:** Assigns a value to extra_kw['torch_type_C']. **CN:** 将一个值赋给 extra_kw['torch_type_C']。
+- **L875** `    cuda_impl = SubstituteTemplate(impl_template, {"name": name, **extra_kw})` — **EN:** Assigns a value to cuda_impl. **CN:** 将一个值赋给 cuda_impl。
+- **L876** `    cuda_source = SubstituteTemplate(` — **EN:** Assigns a value to cuda_source. **CN:** 将一个值赋给 cuda_source。
+- **L877** `        _PYTORCH_CUDA_TEMPLATE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L878** `        {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L879** `            "includes": _PYTORCH_CONV2D_INCLUDES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L880** `            "declaration": op.rt_module.emit(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L881** `            "procedural_name": op.procedural_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L882** `            "impl": cuda_impl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L883** `            "torch_type_C": _CUTLASS_TYPE_TO_TORCH_TYPE[op.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L884** `        },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L885** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L886** `    with open(cuda_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(cuda_file, 'w'). **CN:** 开始一个使用 open(cuda_file, 'w') 的上下文管理代码块。
+- **L887** `        outfile.write(cuda_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L888** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L889** `    cpp_file = os.path.join(sourcedir, name + ".cpp")` — **EN:** Assigns a value to cpp_file. **CN:** 将一个值赋给 cpp_file。
+- **L890** `    cpp_source = SubstituteTemplate(` — **EN:** Assigns a value to cpp_source. **CN:** 将一个值赋给 cpp_source。
+- **L891** `        cpp_template,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L892** `        {"name": name, "description": f"CUTLASS {op.procedural_name()} Conv2d"},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L893** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L894** `    with open(cpp_file, "w") as outfile:` — **EN:** Starts a context-managed block using open(cpp_file, 'w'). **CN:** 开始一个使用 open(cpp_file, 'w') 的上下文管理代码块。
+- **L895** `        outfile.write(cpp_source)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L896** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L897** `    _generate_setup(name, sourcedir)` — **EN:** Invokes `_generate_setup` as a standalone call. **CN:** 以独立语句方式调用 `_generate_setup`。
+- **L898** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L899** `    if jit:` — **EN:** Starts a conditional branch guarded by `jit`. **CN:** 开始一个由 `jit` 控制的条件分支。
+- **L900** `        return _jit(name, cc, cpp_file, cuda_file)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L901** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L902** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L903** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L904** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L905** `def pytorch(op, name: str, cc: int, jit: bool = False, sourcedir: str = ""):` — **EN:** Defines function `pytorch`. **CN:** 定义函数 `pytorch`。
+- **L906** `    """` — **EN:** Starts the docstring for the function `pytorch`. **CN:** 开始说明 function `pytorch` 的文档字符串。
+- **L907** `    Generates source for building a PyTorch CUDA module that leverages the CUTLASS kernel` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L908** `    specified by \`\`op\`\`. If the \`\`jit\`\` parameter is set to true, the module is just-in-time` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L909** `    compiled, loaded, and returned.` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L910** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L911** `    The result of this method is files within \`\`sourcedir\`\` that can be used for building` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L912** `    a PyTorch module.` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L913** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L914** `    :param op: operation to emit in the module` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L915** `    :param name: name of the module to generate` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L916** `    :type name: str` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L917** `    :param cc: compute capability of the device the module should target` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L918** `    :type cc: int` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L919** `    :param jit: whether the module should be just-in-time compiled` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L920** `    :type jit: bool` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L921** `    :param sourcedir: directory to which generated source files should be written` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L922** `    :type sourcedir: str` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L923** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L924** `    :return: loaded PyTorch module (if \`\`jit=True\`\`) or None` — **EN:** Continues the docstring for the function `pytorch`. **CN:** 继续说明 function `pytorch` 的文档字符串。
+- **L925** `    """` — **EN:** Ends the docstring for the function `pytorch`. **CN:** 结束说明 function `pytorch` 的文档字符串。
+- **L926** `    device_op = op.device_op()` — **EN:** Assigns a value to device_op. **CN:** 将一个值赋给 device_op。
+- **L927** `    if isinstance(op, GemmOperationUniversal):` — **EN:** Starts a conditional branch guarded by `isinstance(op, GemmOperationUniversal)`. **CN:** 开始一个由 `isinstance(op, GemmOperationUniversal)` 控制的条件分支。
+- **L928** `        return _pytorch_gemm(device_op, name, cc, jit, sourcedir)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L929** `    elif isinstance(op, GemmOperationGrouped):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L930** `        return _pytorch_grouped_gemm(device_op, name, cc, jit, sourcedir)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L931** `    elif isinstance(op, Conv2dOperation):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L932** `        return _pytorch_conv2d(device_op, name, cc, jit, sourcedir)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L933** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L934** `        raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L935** `            f"Operation type {type(op)} is not currently supported for PyTorch emission."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L936** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.emit.pytorch`. CN: 模块名为 `cutlass_cppgen.emit.pytorch`。
+- EN: Module docstring summary: Utilities for generating source for building a PyTorch CUDA extension that using a CUTLASS kernel. CN: 模块文档摘要为：Utilities for generating source for building a PyTorch CUDA extension that using a CUTLASS kernel.
+- EN: Top-level classes: _ArchListSetter CN: 顶层类包括：_ArchListSetter
+- EN: Top-level functions: _generate_setup, _jit, _pytorch_gemm, _pytorch_grouped_gemm, _pytorch_conv2d, pytorch CN: 顶层函数包括：_generate_setup, _jit, _pytorch_gemm, _pytorch_grouped_gemm, _pytorch_conv2d, pytorch
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:ConvKind,ConvKindNames,DataType,SubstituteTemplate, cutlass_cppgen:CUTLASS_PATH,logger,swizzle, cutlass_cppgen.backend.gemm_operation:GemmOperationGrouped,GemmOperationUniversal, cutlass_cppgen.backend.conv2d_operation:Conv2dOperation, cutlass_cppgen.backend.library:ApiVersion, cutlass_cppgen.emit:common, cutlass_cppgen.utils.datatypes:is_torch_available CN: 内部依赖：cutlass_library:ConvKind,ConvKindNames,DataType,SubstituteTemplate, cutlass_cppgen:CUTLASS_PATH,logger,swizzle, cutlass_cppgen.backend.gemm_operation:GemmOperationGrouped,GemmOperationUniversal, cutlass_cppgen.backend.conv2d_operation:Conv2dOperation, cutlass_cppgen.backend.library:ApiVersion, cutlass_cppgen.emit:common, cutlass_cppgen.utils.datatypes:is_torch_available
+- EN: External or standard-library dependencies: logging, os, torch, torch.utils.cpp_extension:load CN: 外部或标准库依赖：logging, os, torch, torch.utils.cpp_extension:load

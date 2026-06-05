@@ -1,0 +1,1452 @@
+# split_test_cmake.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `tools/util/scripts/split_test_cmake.py`
+**Purpose / 用途**: This utility script splits large generated test CMake files into smaller chunks that are easier to manage. / 该工具脚本将大型生成式测试 CMake 文件拆分成更易管理的小块。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `#################################################################################################`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 2 / 第2行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 3 / 第3行**
+  - Code / 代码: `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 4 / 第4行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 5 / 第5行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 7 / 第7行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 10 / 第10行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 14 / 第14行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 18 / 第18行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 29 / 第29行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 30 / 第30行**
+  - Code / 代码: `#`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 31 / 第31行**
+  - Code / 代码: `#################################################################################################`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 32 / 第32行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 33 / 第33行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 34 / 第34行**
+  - Code / 代码: `"""`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 35 / 第35行**
+  - Code / 代码: `Given a set of test files to be included in a CMake target, this script extracts`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 36 / 第36行**
+  - Code / 代码: `the TEST definitions from each file, writes them into new files, and prints the names`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 37 / 第37行**
+  - Code / 代码: `of the new files so that they can be processed as part of a new CMake target.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 38 / 第38行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 39 / 第39行**
+  - Code / 代码: `For example, given a set of --src_files test_a.cu test_b.cu containing 3 and 2 TEST`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 40 / 第40行**
+  - Code / 代码: `definitions, respectively, this script would produce:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 41 / 第41行**
+  - Code / 代码: `    test_a_000.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 42 / 第42行**
+  - Code / 代码: `    test_a_001.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 43 / 第43行**
+  - Code / 代码: `    test_a_002.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 44 / 第44行**
+  - Code / 代码: `    test_b_000.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 45 / 第45行**
+  - Code / 代码: `    test_b_001.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 46 / 第46行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 47 / 第47行**
+  - Code / 代码: `The splitting follows a fairly rudimentary algorithm that does not support all valid C++ programs.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 48 / 第48行**
+  - Code / 代码: `We walk through a given input test file line by line. Any lines that are not within a TEST definition is added to a running`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 49 / 第49行**
+  - Code / 代码: `"filler" text. When a TEST definition is encountered, the current filler text becomes the prefix`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 50 / 第50行**
+  - Code / 代码: `for that test. All subsequent lines are considered to be part of the TEST definition until the`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 51 / 第51行**
+  - Code / 代码: `number of starting function braces ('{') match the number of closing function braces ('}'). When`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 52 / 第52行**
+  - Code / 代码: `these counts are equal, the TEST definition is considered to be completed. At this point, we return`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 53 / 第53行**
+  - Code / 代码: `to adding lines to the "filler" text until a new TEST definition is encountered. Any "filler" text`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 54 / 第54行**
+  - Code / 代码: `following a TEST definition is added to the suffix of that TEST definition (this is useful for finishing`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 55 / 第55行**
+  - Code / 代码: `off #if statements, as is common in unit tests.).`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 56 / 第56行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 57 / 第57行**
+  - Code / 代码: `A state machine illustrating this algorithm at a high level is provided in the source below.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 58 / 第58行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 59 / 第59行**
+  - Code / 代码: `Example: Suppose an input test \`test.cu\` has the following source:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 60 / 第60行**
+  - Code / 代码: `    // COPYRIGHT`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 61 / 第61行**
+  - Code / 代码: `    #include <iostream>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 62 / 第62行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 63 / 第63行**
+  - Code / 代码: `    #if defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 64 / 第64行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 65 / 第65行**
+  - Code / 代码: `    // Test #1`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 66 / 第66行**
+  - Code / 代码: `    TEST(SM90_a, 256x128x64_2x2x1) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 67 / 第67行**
+  - Code / 代码: `        std::cout << "Test #1" << std::endl;`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 68 / 第68行**
+  - Code / 代码: `    }`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 69 / 第69行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 70 / 第70行**
+  - Code / 代码: `    // Test #2`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 71 / 第71行**
+  - Code / 代码: `    TEST(SM90_b, 256x128x64_1x1x1) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 72 / 第72行**
+  - Code / 代码: `        std::cout << "Test #2" << std::endl;`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 73 / 第73行**
+  - Code / 代码: `    }`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 74 / 第74行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 75 / 第75行**
+  - Code / 代码: `    #endif defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 76 / 第76行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 77 / 第77行**
+  - Code / 代码: `The contents of the two resulting test files will be:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 78 / 第78行**
+  - Code / 代码: `  $ cat test_000.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 79 / 第79行**
+  - Code / 代码: `    // COPYRIGHT`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 80 / 第80行**
+  - Code / 代码: `    #include <iostream>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 81 / 第81行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 82 / 第82行**
+  - Code / 代码: `    #if defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 83 / 第83行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 84 / 第84行**
+  - Code / 代码: `    // Test #1`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 85 / 第85行**
+  - Code / 代码: `    TEST(SM90_a, 256x128x64_2x2x1) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 86 / 第86行**
+  - Code / 代码: `        std::cout << "Test #1" << std::endl;`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 87 / 第87行**
+  - Code / 代码: `    }`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 88 / 第88行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 89 / 第89行**
+  - Code / 代码: `    // Test #2`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 90 / 第90行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 91 / 第91行**
+  - Code / 代码: `    #endif defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 92 / 第92行**
+  - Code / 代码: `  $ cat test_001.cu`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 93 / 第93行**
+  - Code / 代码: `    // COPYRIGHT`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 94 / 第94行**
+  - Code / 代码: `    #include <iostream>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 95 / 第95行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 96 / 第96行**
+  - Code / 代码: `    #if defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 97 / 第97行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 98 / 第98行**
+  - Code / 代码: `    // Test #1`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 99 / 第99行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 100 / 第100行**
+  - Code / 代码: `    // Test #2`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 101 / 第101行**
+  - Code / 代码: `    TEST(SM90_b, 256x128x64_1x1x1) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 102 / 第102行**
+  - Code / 代码: `        std::cout << "Test #2" << std::endl;`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 103 / 第103行**
+  - Code / 代码: `    }`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 104 / 第104行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 105 / 第105行**
+  - Code / 代码: `    #endif defined(CUTLASS_ARCH_MMA_SM90_SUPPORTED)`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 106 / 第106行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 107 / 第107行**
+  - Code / 代码: `Notice that each of test_000.cu and test_001.cu contain comments that appear outside`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 108 / 第108行**
+  - Code / 代码: `the TEST definitions not included in each file. This is by design, as these`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 109 / 第109行**
+  - Code / 代码: `would be considered "filler" text.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 110 / 第110行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 111 / 第111行**
+  - Code / 代码: `As expected, some cases can't be handled. Below is a non-exhaustive list:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 112 / 第112行**
+  - Code / 代码: `    1. New TEST following the closing '}' of a TEST case on the same line:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 113 / 第113行**
+  - Code / 代码: `        TEST(x, y) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 114 / 第114行**
+  - Code / 代码: `            // Do stuff`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 115 / 第115行**
+  - Code / 代码: `        } TEST(a, b) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 116 / 第116行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 117 / 第117行**
+  - Code / 代码: `        In this case, "TEST(a, b) {" will be ignored`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 118 / 第118行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 119 / 第119行**
+  - Code / 代码: `    2. Preprocessor macros that occur midway through a test case and extend`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 120 / 第120行**
+  - Code / 代码: `       beyond the conclusion of a testcase`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 121 / 第121行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 122 / 第122行**
+  - Code / 代码: `       Example:`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 123 / 第123行**
+  - Code / 代码: `            TEST(a, b) {`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 124 / 第124行**
+  - Code / 代码: `                // Do stuff`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 125 / 第125行**
+  - Code / 代码: `        #if X`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 126 / 第126行**
+  - Code / 代码: `                // Do more stuff`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 127 / 第127行**
+  - Code / 代码: `            }`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 128 / 第128行**
+  - Code / 代码: `        #else`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 129 / 第129行**
+  - Code / 代码: `                // Do other stuff`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 130 / 第130行**
+  - Code / 代码: `            }`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 131 / 第131行**
+  - Code / 代码: `        #endif`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 132 / 第132行**
+  - Code / 代码: `"""`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 133 / 第133行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 134 / 第134行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 135 / 第135行**
+  - Code / 代码: `import argparse`
+  - EN: Imports `argparse` so its symbols are available to the test module.
+  - CN: 导入 `argparse`，使其符号可供该测试模块使用。
+- **Line 136 / 第136行**
+  - Code / 代码: `import enum`
+  - EN: Imports `enum` so its symbols are available to the test module.
+  - CN: 导入 `enum`，使其符号可供该测试模块使用。
+- **Line 137 / 第137行**
+  - Code / 代码: `import os`
+  - EN: Imports `os` so its symbols are available to the test module.
+  - CN: 导入 `os`，使其符号可供该测试模块使用。
+- **Line 138 / 第138行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 139 / 第139行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 140 / 第140行**
+  - Code / 代码: `parser = argparse.ArgumentParser()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 141 / 第141行**
+  - Code / 代码: `parser.add_argument("cmake_target", type=str,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 142 / 第142行**
+  - Code / 代码: `                    help="Name of the CMake target being generated.")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 143 / 第143行**
+  - Code / 代码: `parser.add_argument("src_dir", type=str,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 144 / 第144行**
+  - Code / 代码: `                    help="Path to the directory containing test files.")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 145 / 第145行**
+  - Code / 代码: `parser.add_argument("--src_files", nargs='+',`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 146 / 第146行**
+  - Code / 代码: `                    help="Files containing TEST instances to split.")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 147 / 第147行**
+  - Code / 代码: `parser.add_argument("--max_tests_per_file", type=int, default=1,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 148 / 第148行**
+  - Code / 代码: `                    help="Maximum number of TEST instances per file.")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 149 / 第149行**
+  - Code / 代码: `parser.add_argument("--dst_dir", type=str,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 150 / 第150行**
+  - Code / 代码: `                    help="Path to the directory to which to write new test files. If not set, uses src_dir.")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 151 / 第151行**
+  - Code / 代码: `args = parser.parse_args()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 152 / 第152行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 153 / 第153行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 154 / 第154行**
+  - Code / 代码: `if args.dst_dir == None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 155 / 第155行**
+  - Code / 代码: `    args.dst_dir = args.src_dir`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 156 / 第156行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 157 / 第157行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 158 / 第158行**
+  - Code / 代码: `class Testcase:`
+  - EN: Declares class `Testcase` to group related tests or helpers.
+  - CN: 声明类 `Testcase`，用于组织相关测试或辅助逻辑。
+- **Line 159 / 第159行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 160 / 第160行**
+  - Code / 代码: `    Lightweight tracker of test-case processing status`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 161 / 第161行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 162 / 第162行**
+  - Code / 代码: `    def __init__(self, prefix_text):`
+  - EN: Defines function `__init__`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `__init__`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 163 / 第163行**
+  - Code / 代码: `        # Any text that preceded the TEST definition that was`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 164 / 第164行**
+  - Code / 代码: `        # not part of another TEST definition`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 165 / 第165行**
+  - Code / 代码: `        self.prefix = prefix_text`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 166 / 第166行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 167 / 第167行**
+  - Code / 代码: `        # Any text within the TEST definition`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 168 / 第168行**
+  - Code / 代码: `        self.test = ""`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 169 / 第169行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 170 / 第170行**
+  - Code / 代码: `        # Any text that follows the completion of the TEST definition`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 171 / 第171行**
+  - Code / 代码: `        # and is not included in other TEST definitions`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 172 / 第172行**
+  - Code / 代码: `        self.suffix = ""`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 173 / 第173行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 174 / 第174行**
+  - Code / 代码: `        # Whether the test's definition has concluded`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 175 / 第175行**
+  - Code / 代码: `        self.completed = False`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 176 / 第176行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 177 / 第177行**
+  - Code / 代码: `        # Current balance of opening and closing curly brackets in`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 178 / 第178行**
+  - Code / 代码: `        # the TEST definition. '{' increments the count and '}' decrements it.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 179 / 第179行**
+  - Code / 代码: `        # A value of 0 (when self.completed == False) indicates that the test`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 180 / 第180行**
+  - Code / 代码: `        # has completed.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 181 / 第181行**
+  - Code / 代码: `        self.curly_bracket_balance = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 182 / 第182行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 183 / 第183行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 184 / 第184行**
+  - Code / 代码: `class ParseState(enum.Enum):`
+  - EN: Declares class `ParseState` to group related tests or helpers.
+  - CN: 声明类 `ParseState`，用于组织相关测试或辅助逻辑。
+- **Line 185 / 第185行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 186 / 第186行**
+  - Code / 代码: `      State machine for processing.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 187 / 第187行**
+  - Code / 代码: `      Transitions occur on each line encountered in the soruce file`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 188 / 第188行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 189 / 第189行**
+  - Code / 代码: `<blank>`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 190 / 第190行**
+  - Code / 代码: `      Line does not contain 'TEST('`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 191 / 第191行**
+  - Code / 代码: `                 +----+`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 192 / 第192行**
+  - Code / 代码: `                 |    |`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 193 / 第193行**
+  - Code / 代码: `                 |    v          'TEST('`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 194 / 第194行**
+  - Code / 代码: `               +--------+      encountered         +--------------------------+`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 195 / 第195行**
+  - Code / 代码: `        ------>| Filler | -----------------------> | TestDeclaredWaitingStart |`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 196 / 第196行**
+  - Code / 代码: `               +--------+                          +--------------------------+`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 197 / 第197行**
+  - Code / 代码: `                   ^                                         |`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 198 / 第198行**
+  - Code / 代码: ` Number of '{'     |                                         | First '{' encountered`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 199 / 第199行**
+  - Code / 代码: ` equals number of  |           +--------+                    |`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 200 / 第200行**
+  - Code / 代码: ` '}' encountered   +-----------| InTest | <------------------+`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 201 / 第201行**
+  - Code / 代码: `                               +--------+`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 202 / 第202行**
+  - Code / 代码: `                                 |    ^`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 203 / 第203行**
+  - Code / 代码: `                                 |    |`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 204 / 第204行**
+  - Code / 代码: `                                 +----+`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 205 / 第205行**
+  - Code / 代码: `                      Number of '{' encountered`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 206 / 第206行**
+  - Code / 代码: `                      exceeds number of '}' encountered`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 207 / 第207行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 208 / 第208行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 209 / 第209行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 210 / 第210行**
+  - Code / 代码: `    # Any text that is not part of a TEST case`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 211 / 第211行**
+  - Code / 代码: `    Filler = 0`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 212 / 第212行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 213 / 第213行**
+  - Code / 代码: `    # Processing text within the first { of the TEST case`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 214 / 第214行**
+  - Code / 代码: `    # and before the en of the final } of the TEST case`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 215 / 第215行**
+  - Code / 代码: `    InTest = 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 216 / 第216行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 217 / 第217行**
+  - Code / 代码: `    # Processing text from the start of the TEST definition`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 218 / 第218行**
+  - Code / 代码: `    # but before the first {. This could occur if the opening {`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 219 / 第219行**
+  - Code / 代码: `    # occurs on a separate line than the TEST definition.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 220 / 第220行**
+  - Code / 代码: `    TestDeclaredWaitingStart = 2`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 221 / 第221行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 222 / 第222行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 223 / 第223行**
+  - Code / 代码: `cmake_src_list = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 224 / 第224行**
+  - Code / 代码: `for filename in args.src_files:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 225 / 第225行**
+  - Code / 代码: `    if '.' not in filename:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 226 / 第226行**
+  - Code / 代码: `        # Add any non-filename arguments to the command list by default`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 227 / 第227行**
+  - Code / 代码: `        cmake_src_list.append(filename)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 228 / 第228行**
+  - Code / 代码: `        continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 229 / 第229行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 230 / 第230行**
+  - Code / 代码: `    if '/' in filename:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 231 / 第231行**
+  - Code / 代码: `        raise Exception(`
+  - EN: Raises an exception to report an invalid or unexpected state.
+  - CN: 抛出异常以报告无效或意外状态。
+- **Line 232 / 第232行**
+  - Code / 代码: `            f"Source files passed to {__file__} must be within the same directory "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 233 / 第233行**
+  - Code / 代码: `            "as the CMakeLists defining the target using the files. "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 234 / 第234行**
+  - Code / 代码: `            f"Provided path {filename} is in a different directory.")`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 235 / 第235行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 236 / 第236行**
+  - Code / 代码: `    full_filename = os.path.join(args.src_dir, filename)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 237 / 第237行**
+  - Code / 代码: `    with open(full_filename, 'r') as infile:`
+  - EN: Enters a context manager that manages setup and cleanup automatically.
+  - CN: 进入上下文管理器，以自动管理设置与清理。
+- **Line 238 / 第238行**
+  - Code / 代码: `        lines = infile.readlines()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 239 / 第239行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 240 / 第240行**
+  - Code / 代码: `    # Find the number of instances of "TEST("`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 241 / 第241行**
+  - Code / 代码: `    ntest = sum([1 for line in lines if "TEST(" in line])`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 242 / 第242行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 243 / 第243行**
+  - Code / 代码: `    if ntest <= args.max_tests_per_file:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 244 / 第244行**
+  - Code / 代码: `        # File contains fewer than max_tests_per_file TEST instances. It does`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 245 / 第245行**
+  - Code / 代码: `        # not need to be split`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 246 / 第246行**
+  - Code / 代码: `        cmake_src_list.append(filename)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 247 / 第247行**
+  - Code / 代码: `        continue`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 248 / 第248行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 249 / 第249行**
+  - Code / 代码: `    # Current state of the parsing state machine. We start with filler text`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 250 / 第250行**
+  - Code / 代码: `    state = ParseState.Filler`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 251 / 第251行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 252 / 第252行**
+  - Code / 代码: `    # List of individual TESTs found`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 253 / 第253行**
+  - Code / 代码: `    tests = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 254 / 第254行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 255 / 第255行**
+  - Code / 代码: `    # Ongoing text that is not included in a TEST definition. This will serve`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 256 / 第256行**
+  - Code / 代码: `    # as the prefix for any yet-to-be encountered TEST definitions.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 257 / 第257行**
+  - Code / 代码: `    filler_text = ""`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 258 / 第258行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 259 / 第259行**
+  - Code / 代码: `    def add_filler_text(text):`
+  - EN: Defines function `add_filler_text`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `add_filler_text`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 260 / 第260行**
+  - Code / 代码: `        global filler_text`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 261 / 第261行**
+  - Code / 代码: `        # Add new text to the ongoing filler text and to the suffixes of`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 262 / 第262行**
+  - Code / 代码: `        # any completed tests`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 263 / 第263行**
+  - Code / 代码: `        filler_text += text`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 264 / 第264行**
+  - Code / 代码: `        for i in range(len(tests)):`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 265 / 第265行**
+  - Code / 代码: `            if tests[i].completed:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 266 / 第266行**
+  - Code / 代码: `                tests[i].suffix += text`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 267 / 第267行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 268 / 第268行**
+  - Code / 代码: `    for line in lines:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 269 / 第269行**
+  - Code / 代码: `        if state == ParseState.Filler:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 270 / 第270行**
+  - Code / 代码: `            # We are not currently within a TEST definition.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 271 / 第271行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 272 / 第272行**
+  - Code / 代码: `            if 'TEST(' in line:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 273 / 第273行**
+  - Code / 代码: `                # We have encountered a new TEST( case. Any text preceding this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 274 / 第274行**
+  - Code / 代码: `                # must be added to the filler text (e.g., if we have a line of the form:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 275 / 第275行**
+  - Code / 代码: `                #   "static constexpr int Val = 4; TEST(blah) {"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 276 / 第276行**
+  - Code / 代码: `                #   then "static constexpr int Val = 4;" needs to be included in filler`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 277 / 第277行**
+  - Code / 代码: `                #   text, as it could be used by subsequent tests.)`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 278 / 第278行**
+  - Code / 代码: `                splits = line.split('TEST')`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 279 / 第279行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 280 / 第280行**
+  - Code / 代码: `                # There should not be more than one TEST definition on a given line`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 281 / 第281行**
+  - Code / 代码: `                assert len(splits) <= 2`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 282 / 第282行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 283 / 第283行**
+  - Code / 代码: `                if len(splits) > 1:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 284 / 第284行**
+  - Code / 代码: `                    if not splits[0].isspace():`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 285 / 第285行**
+  - Code / 代码: `                        # Only add text to filler if there are non-whitespace charcters`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 286 / 第286行**
+  - Code / 代码: `                        # preceding the TEST definition in the line`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 287 / 第287行**
+  - Code / 代码: `                        filler_text += splits[0]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 288 / 第288行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 289 / 第289行**
+  - Code / 代码: `                        # The new line is just the TEST-related line`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 290 / 第290行**
+  - Code / 代码: `                        line = 'TEST' + splits[-1]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 291 / 第291行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 292 / 第292行**
+  - Code / 代码: `                # Add tests and transtion to TestDeclaredWaitingStart state.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 293 / 第293行**
+  - Code / 代码: `                # Do not add the line to the test text of the new test case; this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 294 / 第294行**
+  - Code / 代码: `                # will be done in either the TestDeclaredWaitingStart state processing`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 295 / 第295行**
+  - Code / 代码: `                # below or in the InTest state processing below.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 296 / 第296行**
+  - Code / 代码: `                tests.append(Testcase(filler_text))`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 297 / 第297行**
+  - Code / 代码: `                state = ParseState.TestDeclaredWaitingStart`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 298 / 第298行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 299 / 第299行**
+  - Code / 代码: `                # Any remaining filler text is added to the running filler_text`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 300 / 第300行**
+  - Code / 代码: `                # which will be used as the prefix for any new tests, and to the`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 301 / 第301行**
+  - Code / 代码: `                # suffix of any completed tests`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 302 / 第302行**
+  - Code / 代码: `                add_filler_text(line)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 303 / 第303行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 304 / 第304行**
+  - Code / 代码: `        if state == ParseState.TestDeclaredWaitingStart:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 305 / 第305行**
+  - Code / 代码: `            # We have seen a TEST definition but have not yet seen its opening {.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 306 / 第306行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 307 / 第307行**
+  - Code / 代码: `            if '{' in line:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 308 / 第308行**
+  - Code / 代码: `                # The first curly bracket for the TEST definition has been found.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 309 / 第309行**
+  - Code / 代码: `                # Advance to state InTests. Do not add the line to the test's text`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 310 / 第310行**
+  - Code / 代码: `                # or change the curly-brace balance of the test; these will be done`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 311 / 第311行**
+  - Code / 代码: `                # when processing the state == ParseState.InTest condition below.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 312 / 第312行**
+  - Code / 代码: `                state = ParseState.InTest`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 313 / 第313行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 314 / 第314行**
+  - Code / 代码: `                tests[-1].test += line`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 315 / 第315行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 316 / 第316行**
+  - Code / 代码: `        if state == ParseState.InTest:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 317 / 第317行**
+  - Code / 代码: `            # We are currently within a TEST definition.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 318 / 第318行**
+  - Code / 代码: `            # Process lines character-by-character looking for opening and closing`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 319 / 第319行**
+  - Code / 代码: `            # braces. If we reach parity between opening and closing braces, the`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 320 / 第320行**
+  - Code / 代码: `            # test is considered done.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 321 / 第321行**
+  - Code / 代码: `            filler_text_to_add = ""`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 322 / 第322行**
+  - Code / 代码: `            for char in line:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 323 / 第323行**
+  - Code / 代码: `                if not tests[-1].completed:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 324 / 第324行**
+  - Code / 代码: `                    tests[-1].test += char`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 325 / 第325行**
+  - Code / 代码: `                    if char == '{':`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 326 / 第326行**
+  - Code / 代码: `                        tests[-1].curly_bracket_balance += 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 327 / 第327行**
+  - Code / 代码: `                    elif char == '}':`
+  - EN: Checks an alternate conditional branch.
+  - CN: 检查另一条条件分支。
+- **Line 328 / 第328行**
+  - Code / 代码: `                        tests[-1].curly_bracket_balance -= 1`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 329 / 第329行**
+  - Code / 代码: `                        if tests[-1].curly_bracket_balance == 0:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 330 / 第330行**
+  - Code / 代码: `                            tests[-1].completed = True`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 331 / 第331行**
+  - Code / 代码: `                else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 332 / 第332行**
+  - Code / 代码: `                    filler_text_to_add += char`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 333 / 第333行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 334 / 第334行**
+  - Code / 代码: `            if filler_text_to_add != "" and (not filler_text_to_add.isspace() or '\n' in filler_text_to_add):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 335 / 第335行**
+  - Code / 代码: `                add_filler_text('\n' + filler_text_to_add)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 336 / 第336行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 337 / 第337行**
+  - Code / 代码: `            if tests[-1].completed:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 338 / 第338行**
+  - Code / 代码: `                state = ParseState.Filler`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 339 / 第339行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 340 / 第340行**
+  - Code / 代码: `    # Write out the new files for tests`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 341 / 第341行**
+  - Code / 代码: `    filename_prefix, filename_suffix = filename.split('.')`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 342 / 第342行**
+  - Code / 代码: `    for i, test in enumerate(tests):`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 343 / 第343行**
+  - Code / 代码: `        assert test.completed`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 344 / 第344行**
+  - Code / 代码: `        new_filename = filename_prefix + '_' + str(i).zfill(3) + '.' + filename_suffix`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 345 / 第345行**
+  - Code / 代码: `        full_new_filename = os.path.join(args.dst_dir, new_filename)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 346 / 第346行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 347 / 第347行**
+  - Code / 代码: `        # Replace any '\' with '/'. CMake doesn't like '\'.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 348 / 第348行**
+  - Code / 代码: `        full_new_filename = full_new_filename.replace('\\', '/')`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 349 / 第349行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 350 / 第350行**
+  - Code / 代码: `        with open(full_new_filename, 'w') as outfile:`
+  - EN: Enters a context manager that manages setup and cleanup automatically.
+  - CN: 进入上下文管理器，以自动管理设置与清理。
+- **Line 351 / 第351行**
+  - Code / 代码: `            outfile.write(test.prefix + test.test + test.suffix)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 352 / 第352行**
+  - Code / 代码: `        cmake_src_list.append(full_new_filename)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 353 / 第353行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 354 / 第354行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 355 / 第355行**
+  - Code / 代码: `for cmake_file in cmake_src_list:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 356 / 第356行**
+  - Code / 代码: `    print(cmake_file)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses CMake logic to register or configure test targets.
+  **CN**: 使用 CMake 逻辑来注册或配置测试目标。
+
+## Dependencies / 依赖项
+
+- `argparse`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `enum`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `os`
+  - EN: Provides environment-variable or filesystem helpers.
+  - CN: 提供环境变量或文件系统辅助功能。

@@ -1,0 +1,724 @@
+# compact_xmajor.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/compact_xmajor.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `compact xmajor` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `compact xmajor` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 35**: `#include <cute/stride.hpp>`
+  - EN: Provides CuTe `stride` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `stride` 功能。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `TEST(CuTe_core, CompactColMajor_Static)`
+  - EN: Declares GoogleTest case `CuTe_core::CompactColMajor_Static` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::CompactColMajor_Static`，用于验证一个具体的 CuTe 场景。
+- **Line 38**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 39**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `  CUTE_STATIC_ASSERT_V((compact_col_major(Int<1>{}) == Int<0>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 42**: `  CUTE_STATIC_ASSERT_V((compact_col_major(Int<1>{}, Int<3>{}) == Int<0>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 43**: `  CUTE_STATIC_ASSERT_V((compact_col_major(Int<8>{}) == Int<1>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 44**: `  CUTE_STATIC_ASSERT_V((compact_col_major(Int<8>{}, Int<3>{}) == Int<3>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 45**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: `  CUTE_STATIC_ASSERT_V((compact_col_major(1) == Int<1>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 47**: `  CUTE_STATIC_ASSERT_V((compact_col_major(8) == Int<1>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 50**: `    auto test   = make_tuple(Int<4>{}, Int<8>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 51**: `    auto result = make_tuple(Int<1>{}, Int<4>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 52**: `    CUTE_STATIC_ASSERT_V((compact_col_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 53**: `  }`
+  - EN: Closes the scope for `test CuTe_core::CompactColMajor_Static`.
+  - CN: 结束 `test CuTe_core::CompactColMajor_Static` 的作用域。
+- **Line 54**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 55**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 56**: `    auto test   = make_tuple(Int<4>{}, Int<8>{}, Int< 2>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 57**: `    auto result = make_tuple(Int<1>{}, Int<4>{}, Int<32>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 58**: `    CUTE_STATIC_ASSERT_V((compact_col_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 59**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 60**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 61**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 62**: `    auto test   = make_tuple(Int<4>{}, Int<8>{}, Int<1>{}, Int< 2>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 63**: `    auto result = make_tuple(Int<1>{}, Int<4>{}, Int<0>{}, Int<32>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 64**: `    CUTE_STATIC_ASSERT_V((compact_col_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 65**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 66**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 68**: `    auto test   = make_tuple(make_tuple(Int<4>{}, Int<8>{}), Int<1>{}, Int< 2>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 69**: `    auto result = make_tuple(make_tuple(Int<1>{}, Int<4>{}), Int<0>{}, Int<32>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 70**: `    CUTE_STATIC_ASSERT_V((compact_col_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 71**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 72**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 73**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 74**: `    auto test   = make_tuple(Int<4>{}, make_tuple(Int<8>{}, Int<1>{}, Int< 2>{}));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 75**: `    auto result = make_tuple(Int<1>{}, make_tuple(Int<4>{}, Int<0>{}, Int<32>{}));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 76**: `    CUTE_STATIC_ASSERT_V((compact_col_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 77**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 78**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 79**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 80**: `    auto test   = make_tuple(Int<4>{}, make_tuple(Int<8>{}, Int<1>{}, make_tuple(Int< 2>{}, Int< 3>{})));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 81**: `    auto result = make_tuple(Int<1>{}, make_tuple(Int<4>{}, Int<0>{}, make_tuple(Int<32>{}, Int<64>{})));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 82**: `    CUTE_STATIC_ASSERT_V((compact_col_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 83**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 84**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 85**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 86**: `TEST(CuTe_core, CompactColMajor_Dynamic)`
+  - EN: Declares GoogleTest case `CuTe_core::CompactColMajor_Dynamic` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::CompactColMajor_Dynamic`，用于验证一个具体的 CuTe 场景。
+- **Line 87**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 88**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 89**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 90**: `  ASSERT_TRUE((compact_col_major(1) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 91**: `  ASSERT_TRUE((compact_col_major(1, 3) == 3));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 92**: `  ASSERT_TRUE((compact_col_major(8) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 93**: `  ASSERT_TRUE((compact_col_major(8, 3) == 3));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 94**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 95**: `  ASSERT_TRUE((compact_col_major(1) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 96**: `  ASSERT_TRUE((compact_col_major(8) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 97**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 98**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 99**: `    auto test   = make_tuple(4, 8);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 100**: `    auto result = make_tuple(1, 4);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 101**: `    ASSERT_TRUE((compact_col_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 102**: `  }`
+  - EN: Closes the scope for `test CuTe_core::CompactColMajor_Dynamic`.
+  - CN: 结束 `test CuTe_core::CompactColMajor_Dynamic` 的作用域。
+- **Line 103**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 104**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 105**: `    auto test   = make_tuple(4, 8,  2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 106**: `    auto result = make_tuple(1, 4, 32);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 107**: `    ASSERT_TRUE((compact_col_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 108**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 109**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 110**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 111**: `    auto test   = make_tuple(4, 8,  1,  2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 112**: `    auto result = make_tuple(1, 4, 32, 32);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 113**: `    ASSERT_TRUE((compact_col_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 114**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 115**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 116**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 117**: `    auto test   = make_tuple(make_tuple(4, 8),  1,  2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 118**: `    auto result = make_tuple(make_tuple(1, 4), 32, 32);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 119**: `    ASSERT_TRUE((compact_col_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 120**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 121**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 122**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 123**: `    auto test   = make_tuple(4, make_tuple(8,  1, 2));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 124**: `    auto result = make_tuple(1, make_tuple(4, 32, 32));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 125**: `    ASSERT_TRUE((compact_col_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 126**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 127**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 128**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 129**: `    auto test   = make_tuple(4, make_tuple(8,  1, make_tuple( 2, 3)));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 130**: `    auto result = make_tuple(1, make_tuple(4, 32, make_tuple(32, 64)));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 131**: `    ASSERT_TRUE((compact_col_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 132**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 133**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 134**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 135**: `TEST(CuTe_core, CompactRowMajor_Static)`
+  - EN: Declares GoogleTest case `CuTe_core::CompactRowMajor_Static` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::CompactRowMajor_Static`，用于验证一个具体的 CuTe 场景。
+- **Line 136**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 137**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 138**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 139**: `  CUTE_STATIC_ASSERT_V((compact_row_major(Int<1>{}) == Int<0>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 140**: `  CUTE_STATIC_ASSERT_V((compact_row_major(Int<1>{}, Int<3>{}) == Int<0>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 141**: `  CUTE_STATIC_ASSERT_V((compact_row_major(Int<8>{}) == Int<1>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 142**: `  CUTE_STATIC_ASSERT_V((compact_row_major(Int<8>{}, Int<3>{}) == Int<3>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 143**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 144**: `  CUTE_STATIC_ASSERT_V((compact_row_major(1) == Int<1>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 145**: `  CUTE_STATIC_ASSERT_V((compact_row_major(8) == Int<1>{}));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 146**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 147**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 148**: `    auto test   = make_tuple(Int<4>{}, Int<8>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 149**: `    auto result = make_tuple(Int<8>{}, Int<1>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 150**: `    CUTE_STATIC_ASSERT_V((compact_row_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 151**: `  }`
+  - EN: Closes the scope for `test CuTe_core::CompactRowMajor_Static`.
+  - CN: 结束 `test CuTe_core::CompactRowMajor_Static` 的作用域。
+- **Line 152**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 153**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 154**: `    auto test   = make_tuple(Int< 4>{}, Int<8>{}, Int<2>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 155**: `    auto result = make_tuple(Int<16>{}, Int<2>{}, Int<1>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 156**: `    CUTE_STATIC_ASSERT_V((compact_row_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 157**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 158**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 159**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 160**: `    auto test   = make_tuple(Int< 4>{}, Int<8>{}, Int<1>{}, Int<2>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 161**: `    auto result = make_tuple(Int<16>{}, Int<2>{}, Int<0>{}, Int<1>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 162**: `    CUTE_STATIC_ASSERT_V((compact_row_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 163**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 166**: `    auto test   = make_tuple(make_tuple(Int< 4>{}, Int<8>{}), Int<1>{}, Int<2>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 167**: `    auto result = make_tuple(make_tuple(Int<16>{}, Int<2>{}), Int<0>{}, Int<1>{});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 168**: `    CUTE_STATIC_ASSERT_V((compact_row_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 169**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 172**: `    auto test   = make_tuple(Int< 4>{}, make_tuple(Int<8>{}, Int<1>{}, Int<2>{}));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 173**: `    auto result = make_tuple(Int<16>{}, make_tuple(Int<2>{}, Int<0>{}, Int<1>{}));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 174**: `    CUTE_STATIC_ASSERT_V((compact_row_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 175**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 176**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 177**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 178**: `    auto test   = make_tuple(Int< 4>{}, make_tuple(Int<8>{}, Int<1>{}, make_tuple(Int<2>{}, Int<3>{})));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 179**: `    auto result = make_tuple(Int<48>{}, make_tuple(Int<6>{}, Int<0>{}, make_tuple(Int<3>{}, Int<1>{})));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 180**: `    CUTE_STATIC_ASSERT_V((compact_row_major(test) == result));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 181**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 182**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 183**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 184**: `TEST(CuTe_core, CompactRowMajor_Dynamic)`
+  - EN: Declares GoogleTest case `CuTe_core::CompactRowMajor_Dynamic` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::CompactRowMajor_Dynamic`，用于验证一个具体的 CuTe 场景。
+- **Line 185**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 186**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 187**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 188**: `  ASSERT_TRUE((compact_row_major(1) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 189**: `  ASSERT_TRUE((compact_row_major(1, 3) == 3));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 190**: `  ASSERT_TRUE((compact_row_major(8) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 191**: `  ASSERT_TRUE((compact_row_major(8, 3) == 3));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 192**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 193**: `  ASSERT_TRUE((compact_row_major(1) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 194**: `  ASSERT_TRUE((compact_row_major(8) == 1));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 195**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 196**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 197**: `    auto test   = make_tuple(4, 8);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 198**: `    auto result = make_tuple(8, 1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 199**: `    ASSERT_TRUE((compact_row_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 200**: `  }`
+  - EN: Closes the scope for `test CuTe_core::CompactRowMajor_Dynamic`.
+  - CN: 结束 `test CuTe_core::CompactRowMajor_Dynamic` 的作用域。
+- **Line 201**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 202**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 203**: `    auto test   = make_tuple( 4, 8, 2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 204**: `    auto result = make_tuple(16, 2, 1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 205**: `    ASSERT_TRUE((compact_row_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 206**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 207**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 208**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 209**: `    auto test   = make_tuple( 4, 8, 1, 2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 210**: `    auto result = make_tuple(16, 2, 2, 1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 211**: `    ASSERT_TRUE((compact_row_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 212**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 213**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 214**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 215**: `    auto test   = make_tuple(make_tuple( 4, 8), 1, 2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 216**: `    auto result = make_tuple(make_tuple(16, 2), 2, 1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 217**: `    ASSERT_TRUE((compact_row_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 218**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 219**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 220**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 221**: `    auto test   = make_tuple( 4, make_tuple(8, 1, 2));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 222**: `    auto result = make_tuple(16, make_tuple(2, 2, 1));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 223**: `    ASSERT_TRUE((compact_row_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 224**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 225**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 226**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 227**: `    auto test   = make_tuple( 4, make_tuple(8, 1, make_tuple(2, 3)));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 228**: `    auto result = make_tuple(48, make_tuple(6, 6, make_tuple(3, 1)));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 229**: `    ASSERT_TRUE((compact_row_major(test) == result));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 230**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 231**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `ASSERT_`
+  - EN: Uses a stronger assertion that aborts the current test when a prerequisite fails.
+  - CN: 使用更强的断言；当前置条件失败时会立即中止当前测试。
+- `CUTE_STATIC_ASSERT_V`
+  - EN: Checks a CuTe expression at compile time, which is important for layout algebra and type-level reasoning.
+  - CN: 在编译期检查 CuTe 表达式，这对布局代数和类型级推导非常重要。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/stride.hpp`
+  - EN: Provides CuTe `stride` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `stride` 功能。

@@ -1,0 +1,477 @@
+# _tvm_ffi_args_spec_converter.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/_tvm_ffi_args_spec_converter.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (SymIntId, ConverterContext) and 5 functions (_get_llvm_address_space_from_memspace, _is_gpu_memspace, _convert_single_arg, _tvm_ffi_args_spec_converter, ... (+1 more)) in `CuTeDSL.cutlass.cute._tvm_ffi_args_spec_converter`.
+- CN: 该模块 `CuTeDSL.cutlass.cute._tvm_ffi_args_spec_converter` 定义了 2 个类（SymIntId, ConverterContext） 和 5 个函数（_get_llvm_address_space_from_memspace, _is_gpu_memspace, _convert_single_arg, _tvm_ffi_args_spec_converter, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L13** `from dataclasses import is_dataclass, fields as dataclass_fields` — **EN:** Imports is_dataclass, fields as dataclass_fields from `dataclasses`. **CN:** 从 `dataclasses` 导入 is_dataclass, fields as dataclass_fields。
+- **L14** `from cutlass.base_dsl.tvm_ffi_builder import spec` — **EN:** Imports spec from `cutlass.base_dsl.tvm_ffi_builder`. **CN:** 从 `cutlass.base_dsl.tvm_ffi_builder` 导入 spec。
+- **L15** `from cutlass.base_dsl.jit_executor import ExecutionArgs` — **EN:** Imports ExecutionArgs from `cutlass.base_dsl.jit_executor`. **CN:** 从 `cutlass.base_dsl.jit_executor` 导入 ExecutionArgs。
+- **L16** `from cutlass.base_dsl.common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `cutlass.base_dsl.common`. **CN:** 从 `cutlass.base_dsl.common` 导入 DSLRuntimeError。
+- **L17** `from cutlass.base_dsl.utils.tree_utils import is_constexpr_field` — **EN:** Imports is_constexpr_field from `cutlass.base_dsl.utils.tree_utils`. **CN:** 从 `cutlass.base_dsl.utils.tree_utils` 导入 is_constexpr_field。
+- **L18** `from cutlass.cutlass_dsl import is_cute_algebra_type` — **EN:** Imports is_cute_algebra_type from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 is_cute_algebra_type。
+- **L19** `from cutlass._mlir.dialects import cute as _cute_ir` — **EN:** Imports cute as _cute_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 cute as _cute_ir。
+- **L20** `from .runtime import _FakeStream` — **EN:** Imports _FakeStream from `.runtime`. **CN:** 从 `.runtime` 导入 _FakeStream。
+- **L21** `from .typing import Tensor, Pointer, SymInt` — **EN:** Imports Tensor, Pointer, SymInt from `.typing`. **CN:** 从 `.typing` 导入 Tensor, Pointer, SymInt。
+- **L22** `from .typing import (` — **EN:** Imports Numeric, Boolean, Int4, Int8, Uint8, Int16, ... (+16 more) from `.typing`. **CN:** 从 `.typing` 导入 Numeric, Boolean, Int4, Int8, Uint8, Int16, ... (+16 more)。
+- **L23** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    Int4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    Int16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    Uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    Uint32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    Uint64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    Float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    BFloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    TFloat32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    Float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    Float6E2M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    Float6E3M2FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `import cuda.bindings.driver as cuda` — **EN:** Imports cuda.bindings.driver as cuda for later use. **CN:** 导入 cuda.bindings.driver as cuda 供后续使用。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `from types import UnionType` — **EN:** Imports UnionType from `types`. **CN:** 从 `types` 导入 UnionType。
+- **L49** `from typing import (` — **EN:** Imports List, Dict, Any, Optional, Union, get_origin, ... (+2 more) from `typing`. **CN:** 从 `typing` 导入 List, Dict, Any, Optional, Union, get_origin, ... (+2 more)。
+- **L50** `    List,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    Dict,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    Any,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    Optional,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    Union,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    get_origin,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    get_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    get_type_hints,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `NumericToTVMFFIDtype = {` — **EN:** Assigns a value to NumericToTVMFFIDtype. **CN:** 将一个值赋给 NumericToTVMFFIDtype。
+- **L62** `    Boolean: "bool",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `    Int4: "int4",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    Int8: "int8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    Uint8: "uint8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `    Int16: "int16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    Uint16: "uint16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `    Int32: "int32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `    Uint32: "uint32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    Int64: "int64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    Uint64: "uint64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `    Float16: "float16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `    BFloat16: "bfloat16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `    Float32: "float32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `    TFloat32: "float32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `    Float64: "float64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    Float8E5M2: "float8_e5m2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    Float8E4M3FN: "float8_e4m3fn",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `    Float8E8M0FNU: "float8_e8m0fnu",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    Float4E2M1FN: "float4_e2m1fn",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    Float6E2M3FN: "float6_e2m3fn",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    Float6E3M2FN: "float6_e3m2fn",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `AcceptableNumericTypesForScalar = [` — **EN:** Assigns a value to AcceptableNumericTypesForScalar. **CN:** 将一个值赋给 AcceptableNumericTypesForScalar。
+- **L86** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `    Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `    Int16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    Uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    Uint32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    Uint64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `    Float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `def _get_llvm_address_space_from_memspace(` — **EN:** Defines function `_get_llvm_address_space_from_memspace`. **CN:** 定义函数 `_get_llvm_address_space_from_memspace`。
+- **L101** `    memspace: _cute_ir.AddressSpace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L102** `) -> Optional[int]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L103** `    if memspace == _cute_ir.AddressSpace.gmem:` — **EN:** Starts a conditional branch guarded by `memspace == _cute_ir.AddressSpace.gmem`. **CN:** 开始一个由 `memspace == _cute_ir.AddressSpace.gmem` 控制的条件分支。
+- **L104** `        return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `def _is_gpu_memspace(` — **EN:** Defines function `_is_gpu_memspace`. **CN:** 定义函数 `_is_gpu_memspace`。
+- **L109** `    memspace: _cute_ir.AddressSpace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L110** `) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L111** `    return memspace != _cute_ir.AddressSpace.generic` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `class SymIntId:` — **EN:** Defines class `SymIntId`. **CN:** 定义类 `SymIntId`。
+- **L115** `    def __init__(self, sym_int: SymInt):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L116** `        self.sym_int = sym_int` — **EN:** Assigns a value to self.sym_int. **CN:** 将一个值赋给 self.sym_int。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    def __hash__(self) -> int:` — **EN:** Defines function `__hash__`. **CN:** 定义函数 `__hash__`。
+- **L119** `        return id(self.sym_int)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    def __eq__(self, other: object) -> bool:` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L122** `        if not isinstance(other, SymIntId):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, SymIntId)`. **CN:** 开始一个由 `not isinstance(other, SymIntId)` 控制的条件分支。
+- **L123** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L124** `        return self.sym_int is other.sym_int` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `class ConverterContext:` — **EN:** Defines class `ConverterContext`. **CN:** 定义类 `ConverterContext`。
+- **L128** `    """Context for managing variable allocation during TVM FFI args conversion."""` — **EN:** Docstring line documenting the class `ConverterContext`. **CN:** 文档字符串行，用于说明 class `ConverterContext`。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L131** `        self.num_dyn_shape_vars: int = 0` — **EN:** Assigns a typed value to self.num_dyn_shape_vars. **CN:** 为 self.num_dyn_shape_vars 赋予带类型标注的值。
+- **L132** `        self.num_dyn_stride_vars: int = 0` — **EN:** Assigns a typed value to self.num_dyn_stride_vars. **CN:** 为 self.num_dyn_stride_vars 赋予带类型标注的值。
+- **L133** `        self.num_device_id_vars: int = 0` — **EN:** Assigns a typed value to self.num_device_id_vars. **CN:** 为 self.num_device_id_vars 赋予带类型标注的值。
+- **L134** `        self.sym_int_id_mapping: Dict[SymIntId, spec.Var] = {}` — **EN:** Assigns a typed value to self.sym_int_id_mapping. **CN:** 为 self.sym_int_id_mapping 赋予带类型标注的值。
+- **L135** `        self.vdevice_to_device_id_mapping: Dict[tuple, spec.Var] = {}` — **EN:** Assigns a typed value to self.vdevice_to_device_id_mapping. **CN:** 为 self.vdevice_to_device_id_mapping 赋予带类型标注的值。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `    def alloc_shape_name(self) -> str:` — **EN:** Defines function `alloc_shape_name`. **CN:** 定义函数 `alloc_shape_name`。
+- **L138** `        """Allocate a new dynamic shape variable name."""` — **EN:** Docstring line documenting the function `alloc_shape_name`. **CN:** 文档字符串行，用于说明 function `alloc_shape_name`。
+- **L139** `        name = f"n{self.num_dyn_shape_vars}"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L140** `        self.num_dyn_shape_vars += 1` — **EN:** Updates self.num_dyn_shape_vars in place. **CN:** 原地更新 self.num_dyn_shape_vars。
+- **L141** `        return name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    def alloc_stride_name(self) -> str:` — **EN:** Defines function `alloc_stride_name`. **CN:** 定义函数 `alloc_stride_name`。
+- **L144** `        """Allocate a new dynamic stride variable name."""` — **EN:** Docstring line documenting the function `alloc_stride_name`. **CN:** 文档字符串行，用于说明 function `alloc_stride_name`。
+- **L145** `        name = f"s{self.num_dyn_stride_vars}"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L146** `        self.num_dyn_stride_vars += 1` — **EN:** Updates self.num_dyn_stride_vars in place. **CN:** 原地更新 self.num_dyn_stride_vars。
+- **L147** `        return name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    def alloc_or_reuse_symint_var(` — **EN:** Defines function `alloc_or_reuse_symint_var`. **CN:** 定义函数 `alloc_or_reuse_symint_var`。
+- **L150** `        self, value: SymInt, name_alloc_func: Any` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `    ) -> spec.Var:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L152** `        """Allocate or reuse a symbolic integer variable."""` — **EN:** Docstring line documenting the function `alloc_or_reuse_symint_var`. **CN:** 文档字符串行，用于说明 function `alloc_or_reuse_symint_var`。
+- **L153** `        sym_int_id = SymIntId(value)` — **EN:** Assigns a value to sym_int_id. **CN:** 将一个值赋给 sym_int_id。
+- **L154** `        if sym_int_id in self.sym_int_id_mapping:` — **EN:** Starts a conditional branch guarded by `sym_int_id in self.sym_int_id_mapping`. **CN:** 开始一个由 `sym_int_id in self.sym_int_id_mapping` 控制的条件分支。
+- **L155** `            return self.sym_int_id_mapping[sym_int_id]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L156** `        name = name_alloc_func()` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L157** `        if value.width == 32:` — **EN:** Starts a conditional branch guarded by `value.width == 32`. **CN:** 开始一个由 `value.width == 32` 控制的条件分支。
+- **L158** `            dtype = NumericToTVMFFIDtype[Int32]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L159** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L160** `            dtype = NumericToTVMFFIDtype[Int64]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L161** `        var = spec.Var(name, dtype, divisibility=value.divisibility)` — **EN:** Assigns a value to var. **CN:** 将一个值赋给 var。
+- **L162** `        self.sym_int_id_mapping[sym_int_id] = var` — **EN:** Assigns a value to self.sym_int_id_mapping[sym_int_id]. **CN:** 将一个值赋给 self.sym_int_id_mapping[sym_int_id]。
+- **L163** `        return var` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    def alloc_or_reuse_device_id(` — **EN:** Defines function `alloc_or_reuse_device_id`. **CN:** 定义函数 `alloc_or_reuse_device_id`。
+- **L166** `        self, device_type: str, vdevice_id: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L167** `    ) -> Optional[spec.Var]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L168** `        """Allocate or reuse a device_id variable for a given virtual device.` — **EN:** Starts the docstring for the function `alloc_or_reuse_device_id`. **CN:** 开始说明 function `alloc_or_reuse_device_id` 的文档字符串。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `        This function returns None for CPU tensors.` — **EN:** Continues the docstring for the function `alloc_or_reuse_device_id`. **CN:** 继续说明 function `alloc_or_reuse_device_id` 的文档字符串。
+- **L171** `        """` — **EN:** Ends the docstring for the function `alloc_or_reuse_device_id`. **CN:** 结束说明 function `alloc_or_reuse_device_id` 的文档字符串。
+- **L172** `        # Don't allocate device_id for CPU tensors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L173** `        if device_type == "cpu":` — **EN:** Starts a conditional branch guarded by `device_type == 'cpu'`. **CN:** 开始一个由 `device_type == 'cpu'` 控制的条件分支。
+- **L174** `            return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `        vdevice_key = (device_type, vdevice_id)` — **EN:** Assigns a value to vdevice_key. **CN:** 将一个值赋给 vdevice_key。
+- **L177** `        if vdevice_key in self.vdevice_to_device_id_mapping:` — **EN:** Starts a conditional branch guarded by `vdevice_key in self.vdevice_to_device_id_mapping`. **CN:** 开始一个由 `vdevice_key in self.vdevice_to_device_id_mapping` 控制的条件分支。
+- **L178** `            return self.vdevice_to_device_id_mapping[vdevice_key]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `        name = f"device_id{self.num_device_id_vars}"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L181** `        self.num_device_id_vars += 1` — **EN:** Updates self.num_device_id_vars in place. **CN:** 原地更新 self.num_device_id_vars。
+- **L182** `        device_id_var = spec.Var(name, "int32")` — **EN:** Assigns a value to device_id_var. **CN:** 将一个值赋给 device_id_var。
+- **L183** `        self.vdevice_to_device_id_mapping[vdevice_key] = device_id_var` — **EN:** Assigns a value to self.vdevice_to_device_id_mapping[vdevice_key]. **CN:** 将一个值赋给 self.vdevice_to_device_id_mapping[vdevice_key]。
+- **L184** `        return device_id_var` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `def _convert_single_arg(` — **EN:** Defines function `_convert_single_arg`. **CN:** 定义函数 `_convert_single_arg`。
+- **L188** `    arg: Any, arg_name: str, arg_type: Any, ctx: ConverterContext` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L189** `) -> spec.Param:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L190** `    """Convert a single argument to a spec.Param.` — **EN:** Starts the docstring for the function `_convert_single_arg`. **CN:** 开始说明 function `_convert_single_arg` 的文档字符串。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `    Parameters` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L193** `    ----------` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L194** `    arg : Any` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L195** `        The argument value to convert.` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L196** `    arg_name : str` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L197** `        The name of the argument.` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L198** `    arg_type : type` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L199** `        The type annotation of the argument.` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L200** `    ctx : ConverterContext` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L201** `        The converter context for managing variable allocation.` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `    Returns` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L204** `    -------` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L205** `    spec.Param` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L206** `        The converted parameter specification.` — **EN:** Continues the docstring for the function `_convert_single_arg`. **CN:** 继续说明 function `_convert_single_arg` 的文档字符串。
+- **L207** `    """` — **EN:** Ends the docstring for the function `_convert_single_arg`. **CN:** 结束说明 function `_convert_single_arg` 的文档字符串。
+- **L208** `    if arg is None:` — **EN:** Starts a conditional branch guarded by `arg is None`. **CN:** 开始一个由 `arg is None` 控制的条件分支。
+- **L209** `        return spec.ConstNone(arg_name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L210** `    elif isinstance(arg, Numeric) and arg.dtype in AcceptableNumericTypesForScalar:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L211** `        return spec.Var(arg_name, NumericToTVMFFIDtype[arg.dtype])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L212** `    elif arg_type in AcceptableNumericTypesForScalar:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L213** `        return spec.Var(arg_name, NumericToTVMFFIDtype[arg_type])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L214** `    elif is_cute_algebra_type(arg_type):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L215** `        shape = []` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L216** `        for i in range(len(arg)):` — **EN:** Starts a loop assigning items from `range(len(arg))` to `i`. **CN:** 开始一个循环，将 `range(len(arg))` 的元素赋给 `i`。
+- **L217** `            if isinstance(arg[i], int):` — **EN:** Starts a conditional branch guarded by `isinstance(arg[i], int)`. **CN:** 开始一个由 `isinstance(arg[i], int)` 控制的条件分支。
+- **L218** `                shape.append(arg[i])` — **EN:** Invokes `shape.append` as a standalone call. **CN:** 以独立语句方式调用 `shape.append`。
+- **L219** `            elif isinstance(arg[i], SymInt):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L220** `                shape.append(` — **EN:** Invokes `shape.append` as a standalone call. **CN:** 以独立语句方式调用 `shape.append`。
+- **L221** `                    ctx.alloc_or_reuse_symint_var(arg[i], ctx.alloc_shape_name)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L224** `                shape.append(` — **EN:** Invokes `shape.append` as a standalone call. **CN:** 以独立语句方式调用 `shape.append`。
+- **L225** `                    spec.Var(ctx.alloc_shape_name(), NumericToTVMFFIDtype[arg[i].dtype])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `        return spec.Shape(arg_name, shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L228** `    elif isinstance(arg, SymInt):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L229** `        if arg.width == 32:` — **EN:** Starts a conditional branch guarded by `arg.width == 32`. **CN:** 开始一个由 `arg.width == 32` 控制的条件分支。
+- **L230** `            dtype = NumericToTVMFFIDtype[Int32]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L231** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L232** `            dtype = NumericToTVMFFIDtype[Int64]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L233** `        return spec.Var(arg_name, dtype, divisibility=arg.divisibility)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L234** `    elif isinstance(arg, Tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L235** `        shapes = []` — **EN:** Assigns a value to shapes. **CN:** 将一个值赋给 shapes。
+- **L236** `        for i, dyn_mask in enumerate(arg.dynamic_shapes_mask):  # type: ignore[attr-defined]` — **EN:** Starts a loop assigning items from `enumerate(arg.dynamic_shapes_mask)` to `(i, dyn_mask)`. **CN:** 开始一个循环，将 `enumerate(arg.dynamic_shapes_mask)` 的元素赋给 `(i, dyn_mask)`。
+- **L237** `            if not dyn_mask:` — **EN:** Starts a conditional branch guarded by `not dyn_mask`. **CN:** 开始一个由 `not dyn_mask` 控制的条件分支。
+- **L238** `                shapes.append(arg.shape[i])  # type: ignore[index]` — **EN:** Invokes `shapes.append` as a standalone call. **CN:** 以独立语句方式调用 `shapes.append`。
+- **L239** `            elif isinstance(arg.shape[i], SymInt):  # type: ignore[index]` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L240** `                shapes.append(` — **EN:** Invokes `shapes.append` as a standalone call. **CN:** 以独立语句方式调用 `shapes.append`。
+- **L241** `                    ctx.alloc_or_reuse_symint_var(arg.shape[i], ctx.alloc_shape_name)  # type: ignore[arg-type, index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L244** `                shapes.append(` — **EN:** Invokes `shapes.append` as a standalone call. **CN:** 以独立语句方式调用 `shapes.append`。
+- **L245** `                    spec.Var(ctx.alloc_shape_name(), NumericToTVMFFIDtype[Int32])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `        strides = []` — **EN:** Assigns a value to strides. **CN:** 将一个值赋给 strides。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `        for i, dyn_mask in enumerate(arg.dynamic_strides_mask):  # type: ignore[attr-defined]` — **EN:** Starts a loop assigning items from `enumerate(arg.dynamic_strides_mask)` to `(i, dyn_mask)`. **CN:** 开始一个循环，将 `enumerate(arg.dynamic_strides_mask)` 的元素赋给 `(i, dyn_mask)`。
+- **L250** `            if not dyn_mask:` — **EN:** Starts a conditional branch guarded by `not dyn_mask`. **CN:** 开始一个由 `not dyn_mask` 控制的条件分支。
+- **L251** `                strides.append(arg.stride[i])  # type: ignore[index]` — **EN:** Invokes `strides.append` as a standalone call. **CN:** 以独立语句方式调用 `strides.append`。
+- **L252** `            elif isinstance(arg.stride[i], SymInt):  # type: ignore[index]` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L253** `                strides.append(` — **EN:** Invokes `strides.append` as a standalone call. **CN:** 以独立语句方式调用 `strides.append`。
+- **L254** `                    ctx.alloc_or_reuse_symint_var(arg.stride[i], ctx.alloc_stride_name)  # type: ignore[arg-type, index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L257** `                if hasattr(arg, "_use_32bit_stride") and arg._use_32bit_stride:` — **EN:** Starts a conditional branch guarded by `hasattr(arg, '_use_32bit_stride') and arg._use_32bit_stride`. **CN:** 开始一个由 `hasattr(arg, '_use_32bit_stride') and arg._use_32bit_stride` 控制的条件分支。
+- **L258** `                    dtype = NumericToTVMFFIDtype[Int32]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L259** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L260** `                    dtype = NumericToTVMFFIDtype[Int64]` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L261** `                strides.append(spec.Var(ctx.alloc_stride_name(), dtype))` — **EN:** Invokes `strides.append` as a standalone call. **CN:** 以独立语句方式调用 `strides.append`。
+- **L262** `        if hasattr(arg, "_tvm_ffi_tensor"):` — **EN:** Starts a conditional branch guarded by `hasattr(arg, '_tvm_ffi_tensor')`. **CN:** 开始一个由 `hasattr(arg, '_tvm_ffi_tensor')` 控制的条件分支。
+- **L263** `            tvm_ffi_tensor = arg._tvm_ffi_tensor` — **EN:** Assigns a value to tvm_ffi_tensor. **CN:** 将一个值赋给 tvm_ffi_tensor。
+- **L264** `            dtype = tvm_ffi_tensor.dtype` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L265** `            device_type = tvm_ffi_tensor.device.type` — **EN:** Assigns a value to device_type. **CN:** 将一个值赋给 device_type。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `            # Allocate device_id (returns None for CPU tensors)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L268** `            vdevice_id = tvm_ffi_tensor.device.index` — **EN:** Assigns a value to vdevice_id. **CN:** 将一个值赋给 vdevice_id。
+- **L269** `            device_id = ctx.alloc_or_reuse_device_id(device_type, vdevice_id)` — **EN:** Assigns a value to device_id. **CN:** 将一个值赋给 device_id。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `            tvm_ffi_cute_tensor = spec.Tensor(` — **EN:** Assigns a value to tvm_ffi_cute_tensor. **CN:** 将一个值赋给 tvm_ffi_cute_tensor。
+- **L272** `                arg_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `                shapes,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `                arg._tvm_ffi_tensor.dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `                strides=strides,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `                data_alignment=arg._assumed_align,  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `                device_type=device_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `                device_id=device_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L281** `            # for FakeTensor, strictly follow the shape and stride from the cute tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L282** `            device_type = "cuda" if _is_gpu_memspace(arg.memspace) else "cpu"` — **EN:** Assigns a value to device_type. **CN:** 将一个值赋给 device_type。
+- **L283** `            # Allocate device_id (returns None for CPU tensors)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L284** `            vdevice_id = 0  # For now, use vdevice_id = 0 for all GPU tensors` — **EN:** Assigns a value to vdevice_id. **CN:** 将一个值赋给 vdevice_id。
+- **L285** `            device_id = ctx.alloc_or_reuse_device_id(device_type, vdevice_id)` — **EN:** Assigns a value to device_id. **CN:** 将一个值赋给 device_id。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `            tvm_ffi_cute_tensor = spec.Tensor(` — **EN:** Assigns a value to tvm_ffi_cute_tensor. **CN:** 将一个值赋给 tvm_ffi_cute_tensor。
+- **L288** `                arg_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `                shapes,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `                NumericToTVMFFIDtype[arg.element_type],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `                strides=strides,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `                data_alignment=arg._assumed_align,  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `                device_type=device_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `                device_id=device_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `            if arg.element_type == Float4E2M1FN:` — **EN:** Starts a conditional branch guarded by `arg.element_type == Float4E2M1FN`. **CN:** 开始一个由 `arg.element_type == Float4E2M1FN` 控制的条件分支。
+- **L297** `                tvm_ffi_cute_tensor = spec.create_map_tensor_dtype_f4x2_to_f4_spec(` — **EN:** Assigns a value to tvm_ffi_cute_tensor. **CN:** 将一个值赋给 tvm_ffi_cute_tensor。
+- **L298** `                    tvm_ffi_cute_tensor` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `        return tvm_ffi_cute_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L301** `    elif isinstance(arg, Pointer) or arg_type == Pointer:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L302** `        address_space = None` — **EN:** Assigns a value to address_space. **CN:** 将一个值赋给 address_space。
+- **L303** `        if hasattr(arg, "memspace"):` — **EN:** Starts a conditional branch guarded by `hasattr(arg, 'memspace')`. **CN:** 开始一个由 `hasattr(arg, 'memspace')` 控制的条件分支。
+- **L304** `            address_space = _get_llvm_address_space_from_memspace(arg.memspace)` — **EN:** Assigns a value to address_space. **CN:** 将一个值赋给 address_space。
+- **L305** `        return spec.DataPointer(arg_name, address_space=address_space)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L306** `    elif isinstance(arg, _FakeStream):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L307** `        if arg.use_tvm_ffi_env_stream:` — **EN:** Starts a conditional branch guarded by `arg.use_tvm_ffi_env_stream`. **CN:** 开始一个由 `arg.use_tvm_ffi_env_stream` 控制的条件分支。
+- **L308** `            return spec.EnvStream(arg_name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L309** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L310** `            return spec.Stream(arg_name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L311** `    elif isinstance(arg, cuda.CUstream):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L312** `        return spec.Stream(arg_name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L313** `    elif arg_type is not inspect.Parameter.empty and hasattr(arg_type, "_fields"):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L314** `        # Handle NamedTuple - normalize to Tuple by order of fields, ignoring defaults` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L315** `        # Get field types from annotations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L316** `        type_hints = get_type_hints(arg_type)` — **EN:** Assigns a value to type_hints. **CN:** 将一个值赋给 type_hints。
+- **L317** `        tuple_element_types = [type_hints[field] for field in arg_type._fields]` — **EN:** Assigns a value to tuple_element_types. **CN:** 将一个值赋给 tuple_element_types。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `        # NamedTuples inherit from tuple, so we can check with isinstance(arg, tuple)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L320** `        if not isinstance(arg, tuple):` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, tuple)`. **CN:** 开始一个由 `not isinstance(arg, tuple)` 控制的条件分支。
+- **L321** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L322** `                f"Expected namedtuple for argument {arg_name}, got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `        if len(arg) != len(tuple_element_types):` — **EN:** Starts a conditional branch guarded by `len(arg) != len(tuple_element_types)`. **CN:** 开始一个由 `len(arg) != len(tuple_element_types)` 控制的条件分支。
+- **L325** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L326** `                f"NamedTuple length mismatch for argument {arg_name}: "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `                f"expected {len(tuple_element_types)}, got {len(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        # Recursively convert each tuple element` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L331** `        tuple_params = []` — **EN:** Assigns a value to tuple_params. **CN:** 将一个值赋给 tuple_params。
+- **L332** `        for i, (elem, elem_type) in enumerate(zip(arg, tuple_element_types)):` — **EN:** Starts a loop assigning items from `enumerate(zip(arg, tuple_element_types))` to `(i, (elem, elem_type))`. **CN:** 开始一个循环，将 `enumerate(zip(arg, tuple_element_types))` 的元素赋给 `(i, (elem, elem_type))`。
+- **L333** `            elem_name = f"{arg_name}[{i}]"` — **EN:** Assigns a value to elem_name. **CN:** 将一个值赋给 elem_name。
+- **L334** `            elem_param = _convert_single_arg(elem, elem_name, elem_type, ctx)` — **EN:** Assigns a value to elem_param. **CN:** 将一个值赋给 elem_param。
+- **L335** `            tuple_params.append(elem_param)` — **EN:** Invokes `tuple_params.append` as a standalone call. **CN:** 以独立语句方式调用 `tuple_params.append`。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `        return spec.TupleParam(arg_name, tuple_params)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L338** `    elif arg_type is not inspect.Parameter.empty and get_origin(arg_type) is tuple:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L339** `        # Handle Tuple[X, Y, ...] type annotations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L340** `        tuple_element_types = get_args(arg_type)  # type: ignore[assignment]` — **EN:** Assigns a value to tuple_element_types. **CN:** 将一个值赋给 tuple_element_types。
+- **L341** `        if not isinstance(arg, (tuple, list)):` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, (tuple, list))`. **CN:** 开始一个由 `not isinstance(arg, (tuple, list))` 控制的条件分支。
+- **L342** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L343** `                f"Expected tuple for argument {arg_name}, got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `        if len(arg) != len(tuple_element_types):` — **EN:** Starts a conditional branch guarded by `len(arg) != len(tuple_element_types)`. **CN:** 开始一个由 `len(arg) != len(tuple_element_types)` 控制的条件分支。
+- **L346** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L347** `                f"Tuple length mismatch for argument {arg_name}: "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `                f"expected {len(tuple_element_types)}, got {len(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `        # Recursively convert each tuple element` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L352** `        tuple_params = []` — **EN:** Assigns a value to tuple_params. **CN:** 将一个值赋给 tuple_params。
+- **L353** `        for i, (elem, elem_type) in enumerate(zip(arg, tuple_element_types)):` — **EN:** Starts a loop assigning items from `enumerate(zip(arg, tuple_element_types))` to `(i, (elem, elem_type))`. **CN:** 开始一个循环，将 `enumerate(zip(arg, tuple_element_types))` 的元素赋给 `(i, (elem, elem_type))`。
+- **L354** `            elem_name = f"{arg_name}[{i}]"` — **EN:** Assigns a value to elem_name. **CN:** 将一个值赋给 elem_name。
+- **L355** `            elem_param = _convert_single_arg(elem, elem_name, elem_type, ctx)` — **EN:** Assigns a value to elem_param. **CN:** 将一个值赋给 elem_param。
+- **L356** `            tuple_params.append(elem_param)` — **EN:** Invokes `tuple_params.append` as a standalone call. **CN:** 以独立语句方式调用 `tuple_params.append`。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `        return spec.TupleParam(arg_name, tuple_params)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L359** `    elif isinstance(arg, (tuple, list)):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L360** `        # Handle plain tuple type annotation without explicit element types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L361** `        # Recursively convert each tuple element with None as elem_type (un-annotated)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L362** `        tuple_params = []` — **EN:** Assigns a value to tuple_params. **CN:** 将一个值赋给 tuple_params。
+- **L363** `        for i, elem in enumerate(arg):` — **EN:** Starts a loop assigning items from `enumerate(arg)` to `(i, elem)`. **CN:** 开始一个循环，将 `enumerate(arg)` 的元素赋给 `(i, elem)`。
+- **L364** `            elem_name = f"{arg_name}[{i}]"` — **EN:** Assigns a value to elem_name. **CN:** 将一个值赋给 elem_name。
+- **L365** `            elem_param = _convert_single_arg(elem, elem_name, None, ctx)` — **EN:** Assigns a value to elem_param. **CN:** 将一个值赋给 elem_param。
+- **L366** `            tuple_params.append(elem_param)` — **EN:** Invokes `tuple_params.append` as a standalone call. **CN:** 以独立语句方式调用 `tuple_params.append`。
+- **L367** `        return spec.TupleParam(arg_name, tuple_params)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L368** `    elif isinstance(arg, bool):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L369** `        return spec.Var(arg_name, NumericToTVMFFIDtype[Boolean])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L370** `    elif isinstance(arg, int):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L371** `        # in cute.compile, unannotated const int is converted to int32` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L372** `        return spec.Var(arg_name, NumericToTVMFFIDtype[Int32])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L373** `    elif isinstance(arg, float):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L374** `        return spec.Var(arg_name, NumericToTVMFFIDtype[Float32])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L375** `    elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L376** `        is_dataclass(arg_type)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L377** `        if (arg_type is not None and arg_type is not inspect.Parameter.empty)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L378** `        else is_dataclass(type(arg))` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L379** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L380** `        dc_type = (` — **EN:** Assigns a value to dc_type. **CN:** 将一个值赋给 dc_type。
+- **L381** `            arg_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `            if (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `                arg_type is not None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `                and arg_type is not inspect.Parameter.empty` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `                and is_dataclass(arg_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `            else type(arg)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `        if not isinstance(arg, dc_type):` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, dc_type)`. **CN:** 开始一个由 `not isinstance(arg, dc_type)` 控制的条件分支。
+- **L390** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L391** `                f"Expected {dc_type.__name__} for argument {arg_name}, got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `        dc_fields = dataclass_fields(dc_type)` — **EN:** Assigns a value to dc_fields. **CN:** 将一个值赋给 dc_fields。
+- **L394** `        tuple_params = []` — **EN:** Assigns a value to tuple_params. **CN:** 将一个值赋给 tuple_params。
+- **L395** `        for f in dc_fields:` — **EN:** Starts a loop assigning items from `dc_fields` to `f`. **CN:** 开始一个循环，将 `dc_fields` 的元素赋给 `f`。
+- **L396** `            if is_constexpr_field(f):` — **EN:** Starts a conditional branch guarded by `is_constexpr_field(f)`. **CN:** 开始一个由 `is_constexpr_field(f)` 控制的条件分支。
+- **L397** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L398** `            field_value = getattr(arg, f.name)` — **EN:** Assigns a value to field_value. **CN:** 将一个值赋给 field_value。
+- **L399** `            field_name = f"{arg_name}.{f.name}"` — **EN:** Assigns a value to field_name. **CN:** 将一个值赋给 field_name。
+- **L400** `            field_type = f.type` — **EN:** Assigns a value to field_type. **CN:** 将一个值赋给 field_type。
+- **L401** `            tuple_params.append(` — **EN:** Invokes `tuple_params.append` as a standalone call. **CN:** 以独立语句方式调用 `tuple_params.append`。
+- **L402** `                _convert_single_arg(field_value, field_name, field_type, ctx)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** `        return spec.TupleParam(arg_name, tuple_params)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L405** `    elif arg_type is not None and (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L406** `        get_origin(arg_type) is UnionType or get_origin(arg_type) is Union` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L407** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L408** `        member_types = get_args(arg_type)` — **EN:** Assigns a value to member_types. **CN:** 将一个值赋给 member_types。
+- **L409** `        for member_type in member_types:` — **EN:** Starts a loop assigning items from `member_types` to `member_type`. **CN:** 开始一个循环，将 `member_types` 的元素赋给 `member_type`。
+- **L410** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L411** `                return _convert_single_arg(arg, arg_name, member_type, ctx)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L412** `            except DSLRuntimeError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L413** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L414** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L415** `            f"Unsupported argument type: {type(arg)} for union type: {arg_type}. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `            f"None of the union members matched: {member_types}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L419** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L420** `            f"Unsupported argument type: {type(arg)} for annotated type: {get_origin(arg_type)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `def _tvm_ffi_args_spec_converter(` — **EN:** Defines function `_tvm_ffi_args_spec_converter`. **CN:** 定义函数 `_tvm_ffi_args_spec_converter`。
+- **L425** `    function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L426** `    signature: inspect.Signature,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L427** `    full_args: List[Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L428** `    full_kwargs: Dict[str, Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L429** `) -> tuple[List[spec.Param], Any]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L430** `    """Convert cute algebra args to tvm ffi spec params.` — **EN:** Starts the docstring for the function `_tvm_ffi_args_spec_converter`. **CN:** 开始说明 function `_tvm_ffi_args_spec_converter` 的文档字符串。
+- **L431** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L432** `    This function converts the cute arguments specs to tvm ffi spec params.` — **EN:** Continues the docstring for the function `_tvm_ffi_args_spec_converter`. **CN:** 继续说明 function `_tvm_ffi_args_spec_converter` 的文档字符串。
+- **L433** `    """` — **EN:** Ends the docstring for the function `_tvm_ffi_args_spec_converter`. **CN:** 结束说明 function `_tvm_ffi_args_spec_converter` 的文档字符串。
+- **L434** `    exec_args = ExecutionArgs(signature, function_name)` — **EN:** Assigns a value to exec_args. **CN:** 将一个值赋给 exec_args。
+- **L435** `    rectified_args = exec_args.get_rectified_args_from_original_args(` — **EN:** Assigns a value to rectified_args. **CN:** 将一个值赋给 rectified_args。
+- **L436** `        full_args, full_kwargs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `    params = []` — **EN:** Assigns a value to params. **CN:** 将一个值赋给 params。
+- **L439** `    ctx = ConverterContext()` — **EN:** Assigns a value to ctx. **CN:** 将一个值赋给 ctx。
+- **L440** `    wrapper_extra_exclude_arg_names = []` — **EN:** Assigns a value to wrapper_extra_exclude_arg_names. **CN:** 将一个值赋给 wrapper_extra_exclude_arg_names。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** `    for arg, parameter in zip(rectified_args, exec_args.signature.parameters.values()):` — **EN:** Starts a loop assigning items from `zip(rectified_args, exec_args.signature.paramet...` to `(arg, parameter)`. **CN:** 开始一个循环，将 `zip(rectified_args, exec_args.signature.paramet...` 的元素赋给 `(arg, parameter)`。
+- **L443** `        arg_type = parameter.annotation` — **EN:** Assigns a value to arg_type. **CN:** 将一个值赋给 arg_type。
+- **L444** `        arg_name = parameter.name` — **EN:** Assigns a value to arg_name. **CN:** 将一个值赋给 arg_name。
+- **L445** `        param = _convert_single_arg(arg, arg_name, arg_type, ctx)` — **EN:** Assigns a value to param. **CN:** 将一个值赋给 param。
+- **L446** `        params.append(param)` — **EN:** Invokes `params.append` as a standalone call. **CN:** 以独立语句方式调用 `params.append`。
+- **L447** `        if isinstance(param, spec.EnvStream):` — **EN:** Starts a conditional branch guarded by `isinstance(param, spec.EnvStream)`. **CN:** 开始一个由 `isinstance(param, spec.EnvStream)` 控制的条件分支。
+- **L448** `            wrapper_extra_exclude_arg_names.append(arg_name)` — **EN:** Invokes `wrapper_extra_exclude_arg_names.append` as a standalone call. **CN:** 以独立语句方式调用 `wrapper_extra_exclude_arg_names.append`。
+- **L449** `    kwargs_wrapper_spec = exec_args.get_kwargs_wrapper_spec(` — **EN:** Assigns a value to kwargs_wrapper_spec. **CN:** 将一个值赋给 kwargs_wrapper_spec。
+- **L450** `        wrapper_extra_exclude_arg_names` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `    return params, kwargs_wrapper_spec` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `def attach_args_spec_converter(dsl: Any) -> None:` — **EN:** Defines function `attach_args_spec_converter`. **CN:** 定义函数 `attach_args_spec_converter`。
+- **L456** `    """Attach TVM FFI ABI interface postprocessor to the DSL instance."""` — **EN:** Docstring line documenting the function `attach_args_spec_converter`. **CN:** 文档字符串行，用于说明 function `attach_args_spec_converter`。
+- **L457** `    dsl._tvm_ffi_args_spec_converter = _tvm_ffi_args_spec_converter` — **EN:** Assigns a value to dsl._tvm_ffi_args_spec_converter. **CN:** 将一个值赋给 dsl._tvm_ffi_args_spec_converter。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute._tvm_ffi_args_spec_converter`. CN: 模块名为 `CuTeDSL.cutlass.cute._tvm_ffi_args_spec_converter`。
+- EN: Top-level classes: SymIntId, ConverterContext CN: 顶层类包括：SymIntId, ConverterContext
+- EN: Top-level functions: _get_llvm_address_space_from_memspace, _is_gpu_memspace, _convert_single_arg, _tvm_ffi_args_spec_converter, attach_args_spec_converter CN: 顶层函数包括：_get_llvm_address_space_from_memspace, _is_gpu_memspace, _convert_single_arg, _tvm_ffi_args_spec_converter, attach_args_spec_converter
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.tvm_ffi_builder:spec, cutlass.base_dsl.jit_executor:ExecutionArgs, cutlass.base_dsl.common:DSLRuntimeError, cutlass.base_dsl.utils.tree_utils:is_constexpr_field, cutlass.cutlass_dsl:is_cute_algebra_type, cutlass._mlir.dialects:cute, .runtime:_FakeStream, .typing:Tensor,Pointer,SymInt, .typing:Numeric,Boolean,Int4,Int8,Uint8,Int16,Uint16,Int32,Uint32,Int64,Uint64,Float16,BFloat16,Float32,TFloat32,Float64,Float6E2M3FN,Float6E3M2FN,Float8E5M2,Float8E4M3FN,Float8E8M0FNU,Float4E2M1FN CN: 内部依赖：cutlass.base_dsl.tvm_ffi_builder:spec, cutlass.base_dsl.jit_executor:ExecutionArgs, cutlass.base_dsl.common:DSLRuntimeError, cutlass.base_dsl.utils.tree_utils:is_constexpr_field, cutlass.cutlass_dsl:is_cute_algebra_type, cutlass._mlir.dialects:cute, .runtime:_FakeStream, .typing:Tensor,Pointer,SymInt, .typing:Numeric,Boolean,Int4,Int8,Uint8,Int16,Uint16,Int32,Uint32,Int64,Uint64,Float16,BFloat16,Float32,TFloat32,Float64,Float6E2M3FN,Float6E3M2FN,Float8E5M2,Float8E4M3FN,Float8E8M0FNU,Float4E2M1FN
+- EN: External or standard-library dependencies: dataclasses:is_dataclass,fields, cuda.bindings.driver, types:UnionType, typing:List,Dict,Any,Optional,Union,get_origin,get_args,get_type_hints, inspect CN: 外部或标准库依赖：dataclasses:is_dataclass,fields, cuda.bindings.driver, types:UnionType, typing:List,Dict,Any,Optional,Union,get_origin,get_args,get_type_hints, inspect

@@ -1,0 +1,1131 @@
+# gett_commandline.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/gett_commandline.hpp`
+**Purpose / 用途**: Provides shared CUTLASS utility support for `gett commandline`. / 为 `gett commandline` 提供共享的 CUTLASS 工具支持。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>  \brief GETT command line parser to gather semantic modes, their stride order, and extents.</code>
+  - EN: Comment that documents intent or context: "\brief GETT command line parser to gather semantic modes, their stride order, and extents.".
+  - CN: 用于说明意图或上下文的注释："\brief GETT command line parser to gather semantic modes, their stride order, and extents."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#include &lt;iostream&gt;</code>
+  - EN: Includes `iostream` so this file can use standard stream input/output support.
+  - CN: 引入 `iostream`，使当前文件可以使用标准流输入输出支持。
+- **L37** <code>#include &lt;iomanip&gt;</code>
+  - EN: Includes `iomanip` so this file can use formatted stream helpers.
+  - CN: 引入 `iomanip`，使当前文件可以使用格式化流辅助工具。
+- **L38** <code>#include &lt;utility&gt;</code>
+  - EN: Includes `utility` so this file can use general utility helpers.
+  - CN: 引入 `utility`，使当前文件可以使用通用辅助工具。
+- **L39** <code>#include &lt;type_traits&gt;</code>
+  - EN: Includes `type_traits` so this file can use compile-time type traits.
+  - CN: 引入 `type_traits`，使当前文件可以使用编译期类型特征。
+- **L40** <code>#include &lt;vector&gt;</code>
+  - EN: Includes `vector` so this file can use dynamic array containers.
+  - CN: 引入 `vector`，使当前文件可以使用动态数组容器。
+- **L41** <code>#include &lt;map&gt;</code>
+  - EN: Includes `map` so this file can use ordered associative containers.
+  - CN: 引入 `map`，使当前文件可以使用有序关联容器。
+- **L42** <code>#include &lt;algorithm&gt;</code>
+  - EN: Includes `algorithm` so this file can use standard algorithms.
+  - CN: 引入 `algorithm`，使当前文件可以使用标准算法。
+- **L43** <code>#include &lt;numeric&gt;</code>
+  - EN: Includes `numeric` so this file can use numeric algorithms.
+  - CN: 引入 `numeric`，使当前文件可以使用数值算法。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>#include &quot;cutlass/util/command_line.h&quot;</code>
+  - EN: Includes `cutlass/util/command_line.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/command_line.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>// Output shortcuts</code>
+  - EN: Comment that documents intent or context: "Output shortcuts".
+  - CN: 用于说明意图或上下文的注释："Output shortcuts"。
+- **L50** <code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, std::vector&lt;char&gt; data) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L51** <code>  for (auto&amp; a : data) os &lt;&lt; a;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L52** <code>  return os;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L53** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>template &lt;class T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L56** <code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; os, std::vector&lt;T&gt; data) {</code>
+  - EN: Begins the definition of function or method `operator<<`.
+  - CN: 开始定义函数或方法 `operator<<`。
+- **L57** <code>  for (auto&amp; a : data) os &lt;&lt; a &lt;&lt; &quot; &quot;;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L58** <code>  return os;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L59** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L60** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L61** <code>struct GettCommandLine {</code>
+  - EN: Begins the declaration of struct `GettCommandLine`.
+  - CN: 开始声明 struct `GettCommandLine`。
+- **L62** <code>  struct GettProblem {</code>
+  - EN: Begins the declaration of struct `GettProblem`.
+  - CN: 开始声明 struct `GettProblem`。
+- **L63** <code>    using extent_type = int;</code>
+  - EN: Introduces the type or namespace alias `extent_type`.
+  - CN: 引入类型或命名空间别名 `extent_type`。
+- **L64** <code>    using stride_type = int64_t;</code>
+  - EN: Introduces the type or namespace alias `stride_type`.
+  - CN: 引入类型或命名空间别名 `stride_type`。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>    // Row modes: appear in A and C/D</code>
+  - EN: Comment that documents intent or context: "Row modes: appear in A and C/D".
+  - CN: 用于说明意图或上下文的注释："Row modes: appear in A and C/D"。
+- **L67** <code>    std::vector&lt;extent_type&gt; M;</code>
+  - EN: Declares the symbol `M` in the current scope.
+  - CN: 在当前作用域中声明符号 `M`。
+- **L68** <code>    std::vector&lt;stride_type&gt; ldAm;</code>
+  - EN: Declares the symbol `ldAm` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldAm`。
+- **L69** <code>    std::vector&lt;stride_type&gt; ldCm;</code>
+  - EN: Declares the symbol `ldCm` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldCm`。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>    // Column modes: appear in B and C/D</code>
+  - EN: Comment that documents intent or context: "Column modes: appear in B and C/D".
+  - CN: 用于说明意图或上下文的注释："Column modes: appear in B and C/D"。
+- **L72** <code>    std::vector&lt;extent_type&gt; N;</code>
+  - EN: Declares the symbol `N` in the current scope.
+  - CN: 在当前作用域中声明符号 `N`。
+- **L73** <code>    std::vector&lt;stride_type&gt; ldBn;</code>
+  - EN: Declares the symbol `ldBn` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldBn`。
+- **L74** <code>    std::vector&lt;stride_type&gt; ldCn;  </code>
+  - EN: Declares the symbol `ldCn` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldCn`。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>    // Reduction modes: appear in A and B</code>
+  - EN: Comment that documents intent or context: "Reduction modes: appear in A and B".
+  - CN: 用于说明意图或上下文的注释："Reduction modes: appear in A and B"。
+- **L77** <code>    std::vector&lt;extent_type&gt; K;</code>
+  - EN: Declares the symbol `K` in the current scope.
+  - CN: 在当前作用域中声明符号 `K`。
+- **L78** <code>    std::vector&lt;stride_type&gt; ldAk;</code>
+  - EN: Declares the symbol `ldAk` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldAk`。
+- **L79** <code>    std::vector&lt;stride_type&gt; ldBk;</code>
+  - EN: Declares the symbol `ldBk` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldBk`。
+- **L80** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L81** <code>    // Batch modes: appear in all in/out tensors</code>
+  - EN: Comment that documents intent or context: "Batch modes: appear in all in/out tensors".
+  - CN: 用于说明意图或上下文的注释："Batch modes: appear in all in/out tensors"。
+- **L82** <code>    std::vector&lt;extent_type&gt; L;</code>
+  - EN: Declares the symbol `L` in the current scope.
+  - CN: 在当前作用域中声明符号 `L`。
+- **L83** <code>    std::vector&lt;stride_type&gt; ldAl;</code>
+  - EN: Declares the symbol `ldAl` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldAl`。
+- **L84** <code>    std::vector&lt;stride_type&gt; ldBl;</code>
+  - EN: Declares the symbol `ldBl` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldBl`。
+- **L85** <code>    std::vector&lt;stride_type&gt; ldCl;</code>
+  - EN: Declares the symbol `ldCl` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldCl`。
+- **L86** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L87** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L88** <code>  static GettProblem</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L89** <code>  parse(int argc, char const* argv[], bool parse_verbose = false) {</code>
+  - EN: Begins the definition of function or method `parse`.
+  - CN: 开始定义函数或方法 `parse`。
+- **L90** <code>    using extent_type = typename GettProblem::extent_type;</code>
+  - EN: Introduces the type or namespace alias `extent_type`.
+  - CN: 引入类型或命名空间别名 `extent_type`。
+- **L91** <code>    using stride_type = typename GettProblem::stride_type;</code>
+  - EN: Introduces the type or namespace alias `stride_type`.
+  - CN: 引入类型或命名空间别名 `stride_type`。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>    cutlass::CommandLine cmd(argc, argv);</code>
+  - EN: Constructs object `cmd` with the arguments provided in parentheses.
+  - CN: 使用括号中的参数构造对象 `cmd`。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>    // modeA</code>
+  - EN: Comment that documents intent or context: "modeA".
+  - CN: 用于说明意图或上下文的注释："modeA"。
+- **L96** <code>    std::vector&lt;char&gt; a_mode;</code>
+  - EN: Declares the symbol `a_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `a_mode`。
+- **L97** <code>    cmd.get_cmd_line_arguments(&quot;modeA&quot;, a_mode);</code>
+  - EN: Declares function or method `get_cmd_line_arguments` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_arguments`，但不在此处给出定义。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>    // modeB</code>
+  - EN: Comment that documents intent or context: "modeB".
+  - CN: 用于说明意图或上下文的注释："modeB"。
+- **L100** <code>    std::vector&lt;char&gt; b_mode;</code>
+  - EN: Declares the symbol `b_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `b_mode`。
+- **L101** <code>    cmd.get_cmd_line_arguments(&quot;modeB&quot;, b_mode);</code>
+  - EN: Declares function or method `get_cmd_line_arguments` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_arguments`，但不在此处给出定义。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>    // modeC</code>
+  - EN: Comment that documents intent or context: "modeC".
+  - CN: 用于说明意图或上下文的注释："modeC"。
+- **L104** <code>    std::vector&lt;char&gt; c_mode;</code>
+  - EN: Declares the symbol `c_mode` in the current scope.
+  - CN: 在当前作用域中声明符号 `c_mode`。
+- **L105** <code>    cmd.get_cmd_line_arguments(&quot;modeC&quot;, c_mode);</code>
+  - EN: Declares function or method `get_cmd_line_arguments` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_arguments`，但不在此处给出定义。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>    // mode_sizes</code>
+  - EN: Comment that documents intent or context: "mode_sizes".
+  - CN: 用于说明意图或上下文的注释："mode_sizes"。
+- **L109** <code>    std::map&lt;char,extent_type&gt; mode_size;</code>
+  - EN: Declares the symbol `mode_size` in the current scope.
+  - CN: 在当前作用域中声明符号 `mode_size`。
+- **L110** <code>    // First, initialize all modes in a, b, c to make sure they&#x27;re in map</code>
+  - EN: Comment that documents intent or context: "First, initialize all modes in a, b, c to make sure they're in map".
+  - CN: 用于说明意图或上下文的注释："First, initialize all modes in a, b, c to make sure they're in map"。
+- **L111** <code>    for (char a : a_mode) mode_size[a] = 1;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L112** <code>    for (char b : b_mode) mode_size[b] = 1;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L113** <code>    for (char c : c_mode) mode_size[c] = 1;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>    // Then, overwrite the ones in -extent</code>
+  - EN: Comment that documents intent or context: "Then, overwrite the ones in -extent".
+  - CN: 用于说明意图或上下文的注释："Then, overwrite the ones in -extent"。
+- **L116** <code>    std::vector&lt;std::pair&lt;std::string, std::string&gt; &gt; extent_tokens;</code>
+  - EN: Declares the symbol `extent_tokens` in the current scope.
+  - CN: 在当前作用域中声明符号 `extent_tokens`。
+- **L117** <code>    cmd.get_cmd_line_argument_pairs(&quot;extents&quot;, extent_tokens);</code>
+  - EN: Declares function or method `get_cmd_line_argument_pairs` without defining it here.
+  - CN: 声明函数或方法 `get_cmd_line_argument_pairs`，但不在此处给出定义。
+- **L118** <code>    for (auto e : extent_tokens) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L119** <code>      if (std::get&lt;0&gt;(e).size() &gt; 1) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L120** <code>        std::cerr &lt;&lt; &quot;ERROR: Mode name must only be 1 character long.\n&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>        print_usage();</code>
+  - EN: Declares function or method `print_usage` without defining it here.
+  - CN: 声明函数或方法 `print_usage`，但不在此处给出定义。
+- **L122** <code>        exit(1);</code>
+  - EN: Declares function or method `exit` without defining it here.
+  - CN: 声明函数或方法 `exit`，但不在此处给出定义。
+- **L123** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L124** <code>      char label = std::get&lt;0&gt;(e)[0];</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L125** <code>      int  size  = std::stoi(std::get&lt;1&gt;(e));</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L126** <code>      mode_size[label] = size;</code>
+  - EN: Declares the symbol `size` in the current scope.
+  - CN: 在当前作用域中声明符号 `size`。
+- **L127** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>    // Print out symbolic modes and their extents</code>
+  - EN: Comment that documents intent or context: "Print out symbolic modes and their extents".
+  - CN: 用于说明意图或上下文的注释："Print out symbolic modes and their extents"。
+- **L130** <code>    if (parse_verbose) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L131** <code>      std::cout &lt;&lt; &quot;C_&quot; &lt;&lt; c_mode &lt;&lt; &quot; = A_&quot; &lt;&lt; a_mode &lt;&lt; &quot; * B_&quot; &lt;&lt; b_mode &lt;&lt; &quot;\n&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L132** <code>      for (auto e : mode_size) std::cout &lt;&lt; &quot;     &quot; &lt;&lt; std::get&lt;0&gt;(e) &lt;&lt; &quot; : &quot; &lt;&lt; std::get&lt;1&gt;(e) &lt;&lt; &quot;\n&quot;;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L133** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L136** <code>    // Collect/Compute strides</code>
+  - EN: Comment that documents intent or context: "Collect/Compute strides".
+  - CN: 用于说明意图或上下文的注释："Collect/Compute strides"。
+- **L137** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>    std::map&lt;char,stride_type&gt; mode_ldA;</code>
+  - EN: Declares the symbol `mode_ldA` in the current scope.
+  - CN: 在当前作用域中声明符号 `mode_ldA`。
+- **L140** <code>    std::map&lt;char,stride_type&gt; mode_ldB;</code>
+  - EN: Declares the symbol `mode_ldB` in the current scope.
+  - CN: 在当前作用域中声明符号 `mode_ldB`。
+- **L141** <code>    std::map&lt;char,stride_type&gt; mode_ldC;</code>
+  - EN: Declares the symbol `mode_ldC` in the current scope.
+  - CN: 在当前作用域中声明符号 `mode_ldC`。
+- **L142** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L143** <code>    {</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L144** <code>      stride_type current;</code>
+  - EN: Declares the symbol `current` in the current scope.
+  - CN: 在当前作用域中声明符号 `current`。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>      current = 1;</code>
+  - EN: Assigns or initializes `current` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current` 进行赋值或初始化。
+- **L147** <code>      for (char a : a_mode) { mode_ldA[a] = current; current *= mode_size[a]; }</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>      current = 1;</code>
+  - EN: Assigns or initializes `current` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current` 进行赋值或初始化。
+- **L150** <code>      for (char b : b_mode) { mode_ldB[b] = current; current *= mode_size[b]; }</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>      current = 1;</code>
+  - EN: Assigns or initializes `current` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current` 进行赋值或初始化。
+- **L153** <code>      for (char c : c_mode) { mode_ldC[c] = current; current *= mode_size[c]; }</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L154** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L157** <code>    // Collect mode categories</code>
+  - EN: Comment that documents intent or context: "Collect mode categories".
+  - CN: 用于说明意图或上下文的注释："Collect mode categories"。
+- **L158** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>    std::vector&lt;char&gt; row_mode;  // rows</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L161** <code>    std::vector&lt;char&gt; col_mode;  // columns</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>    std::vector&lt;char&gt; red_mode;  // reductions</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L163** <code>    std::vector&lt;char&gt; bat_mode;  // batches</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L165** <code>    {</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L166** <code>      std::vector&lt;char&gt; a_label = a_mode;</code>
+  - EN: Assigns or initializes `a_label` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `a_label` 进行赋值或初始化。
+- **L167** <code>      std::vector&lt;char&gt; b_label = b_mode;</code>
+  - EN: Assigns or initializes `b_label` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `b_label` 进行赋值或初始化。
+- **L168** <code>      std::vector&lt;char&gt; c_label = c_mode;</code>
+  - EN: Assigns or initializes `c_label` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_label` 进行赋值或初始化。
+- **L169** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L170** <code>      std::sort(std::begin(a_label), std::end(a_label));</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L171** <code>      std::sort(std::begin(b_label), std::end(b_label));</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L172** <code>      std::sort(std::begin(c_label), std::end(c_label));</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L173** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L174** <code>      // std::set_intersections to find semantic category of each symbolic mode</code>
+  - EN: Comment that documents intent or context: "std::set_intersections to find semantic category of each symbolic mode".
+  - CN: 用于说明意图或上下文的注释："std::set_intersections to find semantic category of each symbolic mode"。
+- **L175** <code>      std::set_intersection(std::begin(a_label), std::end(a_label),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L176** <code>                            std::begin(c_label), std::end(c_label),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L177** <code>                            std::back_inserter(row_mode));</code>
+  - EN: Declares function or method `back_inserter` without defining it here.
+  - CN: 声明函数或方法 `back_inserter`，但不在此处给出定义。
+- **L178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L179** <code>      std::set_intersection(std::begin(b_label), std::end(b_label),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L180** <code>                            std::begin(c_label), std::end(c_label),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L181** <code>                            std::back_inserter(col_mode));</code>
+  - EN: Declares function or method `back_inserter` without defining it here.
+  - CN: 声明函数或方法 `back_inserter`，但不在此处给出定义。
+- **L182** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L183** <code>      std::set_intersection(std::begin(a_label), std::end(a_label),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L184** <code>                            std::begin(b_label), std::end(b_label),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L185** <code>                            std::back_inserter(red_mode));</code>
+  - EN: Declares function or method `back_inserter` without defining it here.
+  - CN: 声明函数或方法 `back_inserter`，但不在此处给出定义。
+- **L186** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L187** <code>      std::set_intersection(std::begin(row_mode), std::end(row_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L188** <code>                            std::begin(col_mode), std::end(col_mode),</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L189** <code>                            std::back_inserter(bat_mode));</code>
+  - EN: Declares function or method `back_inserter` without defining it here.
+  - CN: 声明函数或方法 `back_inserter`，但不在此处给出定义。
+- **L190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L191** <code>      // std::set_difference to remove batch modes from other semantic modes</code>
+  - EN: Comment that documents intent or context: "std::set_difference to remove batch modes from other semantic modes".
+  - CN: 用于说明意图或上下文的注释："std::set_difference to remove batch modes from other semantic modes"。
+- **L192** <code>      for (char l : bat_mode) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L193** <code>        row_mode.erase(std::remove(std::begin(row_mode), std::end(row_mode), l), std::end(row_mode));</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L194** <code>        col_mode.erase(std::remove(std::begin(col_mode), std::end(col_mode), l), std::end(col_mode));</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L195** <code>        red_mode.erase(std::remove(std::begin(red_mode), std::end(red_mode), l), std::end(red_mode));</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L196** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L197** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L198** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L199** <code>    // Print out the semantic association of each symbolic mode</code>
+  - EN: Comment that documents intent or context: "Print out the semantic association of each symbolic mode".
+  - CN: 用于说明意图或上下文的注释："Print out the semantic association of each symbolic mode"。
+- **L200** <code>    if (parse_verbose) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L201** <code>      std::cout &lt;&lt; &quot;  rows : &quot; &lt;&lt; row_mode &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L202** <code>      std::cout &lt;&lt; &quot;  cols : &quot; &lt;&lt; col_mode &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L203** <code>      std::cout &lt;&lt; &quot;  reds : &quot; &lt;&lt; red_mode &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L204** <code>      std::cout &lt;&lt; &quot;  bats : &quot; &lt;&lt; bat_mode &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L205** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L206** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L207** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L208** <code>    // Permute modes</code>
+  - EN: Comment that documents intent or context: "Permute modes".
+  - CN: 用于说明意图或上下文的注释："Permute modes"。
+- **L209** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L210** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L211** <code>    // Permute the batched modes to promote coalescing</code>
+  - EN: Comment that documents intent or context: "Permute the batched modes to promote coalescing".
+  - CN: 用于说明意图或上下文的注释："Permute the batched modes to promote coalescing"。
+- **L212** <code>    // Sort the batched modes by min(ldAl,ldBl) and in case of a tie by the size</code>
+  - EN: Comment that documents intent or context: "Sort the batched modes by min(ldAl,ldBl) and in case of a tie by the size".
+  - CN: 用于说明意图或上下文的注释："Sort the batched modes by min(ldAl,ldBl) and in case of a tie by the size"。
+- **L213** <code>    std::sort(std::begin(bat_mode), std::end(bat_mode), [&amp;](char l1, char l2) {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L214** <code>        return std::tie(std::min(mode_ldA[l1],mode_ldB[l1]),mode_size[l1])</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L215** <code>             &lt; std::tie(std::min(mode_ldA[l2],mode_ldB[l2]),mode_size[l2]);</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L216** <code>      });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L217** <code>    // Compute sizes and strides of ordered reduction modes</code>
+  - EN: Comment that documents intent or context: "Compute sizes and strides of ordered reduction modes".
+  - CN: 用于说明意图或上下文的注释："Compute sizes and strides of ordered reduction modes"。
+- **L218** <code>    std::vector&lt;extent_type&gt; L;</code>
+  - EN: Declares the symbol `L` in the current scope.
+  - CN: 在当前作用域中声明符号 `L`。
+- **L219** <code>    std::vector&lt;stride_type&gt; ldAl;</code>
+  - EN: Declares the symbol `ldAl` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldAl`。
+- **L220** <code>    std::vector&lt;stride_type&gt; ldBl;</code>
+  - EN: Declares the symbol `ldBl` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldBl`。
+- **L221** <code>    std::vector&lt;stride_type&gt; ldCl;</code>
+  - EN: Declares the symbol `ldCl` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldCl`。
+- **L222** <code>    for (char l : bat_mode) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L223** <code>      L.push_back(mode_size[l]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L224** <code>      ldAl.push_back(mode_ldA[l]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L225** <code>      ldBl.push_back(mode_ldB[l]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L226** <code>      ldCl.push_back(mode_ldC[l]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L227** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L228** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L229** <code>    // Permute the reduction modes to promote coalescing</code>
+  - EN: Comment that documents intent or context: "Permute the reduction modes to promote coalescing".
+  - CN: 用于说明意图或上下文的注释："Permute the reduction modes to promote coalescing"。
+- **L230** <code>    // Sort the reduction modes by min(ldAk,ldBk) and in case of a tie by the size</code>
+  - EN: Comment that documents intent or context: "Sort the reduction modes by min(ldAk,ldBk) and in case of a tie by the size".
+  - CN: 用于说明意图或上下文的注释："Sort the reduction modes by min(ldAk,ldBk) and in case of a tie by the size"。
+- **L231** <code>    std::sort(std::begin(red_mode), std::end(red_mode), [&amp;](char k1, char k2) {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L232** <code>        return std::tie(std::min(mode_ldA[k1],mode_ldB[k1]),mode_size[k1])</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L233** <code>             &lt; std::tie(std::min(mode_ldA[k2],mode_ldB[k2]),mode_size[k2]);</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L234** <code>      });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L235** <code>    // Compute sizes and strides of ordered reduction modes</code>
+  - EN: Comment that documents intent or context: "Compute sizes and strides of ordered reduction modes".
+  - CN: 用于说明意图或上下文的注释："Compute sizes and strides of ordered reduction modes"。
+- **L236** <code>    std::vector&lt;extent_type&gt; K;</code>
+  - EN: Declares the symbol `K` in the current scope.
+  - CN: 在当前作用域中声明符号 `K`。
+- **L237** <code>    std::vector&lt;stride_type&gt; ldAk;</code>
+  - EN: Declares the symbol `ldAk` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldAk`。
+- **L238** <code>    std::vector&lt;stride_type&gt; ldBk;</code>
+  - EN: Declares the symbol `ldBk` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldBk`。
+- **L239** <code>    for (char k : red_mode) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L240** <code>      K.push_back(mode_size[k]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L241** <code>      ldAk.push_back(mode_ldA[k]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L242** <code>      ldBk.push_back(mode_ldB[k]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L243** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L244** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L245** <code>    // Permute the row modes to promote coalescing</code>
+  - EN: Comment that documents intent or context: "Permute the row modes to promote coalescing".
+  - CN: 用于说明意图或上下文的注释："Permute the row modes to promote coalescing"。
+- **L246** <code>    // Sort the row modes by min(ldAm,ldCm) and in case of a tie by ldAm</code>
+  - EN: Comment that documents intent or context: "Sort the row modes by min(ldAm,ldCm) and in case of a tie by ldAm".
+  - CN: 用于说明意图或上下文的注释："Sort the row modes by min(ldAm,ldCm) and in case of a tie by ldAm"。
+- **L247** <code>    std::sort(std::begin(row_mode), std::end(row_mode), [&amp;](char m1, char m2) {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L248** <code>        return std::tie(std::min(mode_ldA[m1],mode_ldC[m1]),mode_ldA[m1])</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L249** <code>             &lt; std::tie(std::min(mode_ldA[m2],mode_ldC[m2]),mode_ldA[m2]);</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L250** <code>      });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L251** <code>    // Compute sizes and strides of ordered row modes</code>
+  - EN: Comment that documents intent or context: "Compute sizes and strides of ordered row modes".
+  - CN: 用于说明意图或上下文的注释："Compute sizes and strides of ordered row modes"。
+- **L252** <code>    std::vector&lt;extent_type&gt; M;</code>
+  - EN: Declares the symbol `M` in the current scope.
+  - CN: 在当前作用域中声明符号 `M`。
+- **L253** <code>    std::vector&lt;stride_type&gt; ldAm;</code>
+  - EN: Declares the symbol `ldAm` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldAm`。
+- **L254** <code>    std::vector&lt;stride_type&gt; ldCm;</code>
+  - EN: Declares the symbol `ldCm` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldCm`。
+- **L255** <code>    for (char m : row_mode) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L256** <code>      M.push_back(mode_size[m]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L257** <code>      ldAm.push_back(mode_ldA[m]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L258** <code>      ldCm.push_back(mode_ldC[m]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L259** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L260** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L261** <code>    // Permute the col modes to promote coalescing</code>
+  - EN: Comment that documents intent or context: "Permute the col modes to promote coalescing".
+  - CN: 用于说明意图或上下文的注释："Permute the col modes to promote coalescing"。
+- **L262** <code>    // Sort the col modes by min(ldBn,ldCn) and in case of a tie by ldBn</code>
+  - EN: Comment that documents intent or context: "Sort the col modes by min(ldBn,ldCn) and in case of a tie by ldBn".
+  - CN: 用于说明意图或上下文的注释："Sort the col modes by min(ldBn,ldCn) and in case of a tie by ldBn"。
+- **L263** <code>    std::sort(std::begin(col_mode), std::end(col_mode), [&amp;](char n1, char n2) {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L264** <code>        return std::tie(std::min(mode_ldB[n1],mode_ldC[n1]),mode_ldB[n1])</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L265** <code>             &lt; std::tie(std::min(mode_ldB[n2],mode_ldC[n2]),mode_ldB[n2]);</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L266** <code>      });</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L267** <code>    // Compute sizes and strides of ordered col modes</code>
+  - EN: Comment that documents intent or context: "Compute sizes and strides of ordered col modes".
+  - CN: 用于说明意图或上下文的注释："Compute sizes and strides of ordered col modes"。
+- **L268** <code>    std::vector&lt;extent_type&gt; N;</code>
+  - EN: Declares the symbol `N` in the current scope.
+  - CN: 在当前作用域中声明符号 `N`。
+- **L269** <code>    std::vector&lt;stride_type&gt; ldBn;</code>
+  - EN: Declares the symbol `ldBn` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldBn`。
+- **L270** <code>    std::vector&lt;stride_type&gt; ldCn;</code>
+  - EN: Declares the symbol `ldCn` in the current scope.
+  - CN: 在当前作用域中声明符号 `ldCn`。
+- **L271** <code>    for (char n : col_mode) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L272** <code>      N.push_back(mode_size[n]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L273** <code>      ldBn.push_back(mode_ldB[n]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L274** <code>      ldCn.push_back(mode_ldC[n]);</code>
+  - EN: Declares function or method `push_back` without defining it here.
+  - CN: 声明函数或方法 `push_back`，但不在此处给出定义。
+- **L275** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L276** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L277** <code>    if (parse_verbose) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L278** <code>      std::cout &lt;&lt; &quot;C_&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L279** <code>      if (! row_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L280** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; row_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L281** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L282** <code>      if (! col_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L283** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; col_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L284** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L285** <code>      if (! bat_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L286** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; bat_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L287** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L288** <code>      std::cout &lt;&lt; &quot; = A_&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L289** <code>      if (! row_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L290** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; row_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L291** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L292** <code>      if (! red_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L293** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; red_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L294** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L295** <code>      if (! bat_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L296** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; bat_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L297** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L298** <code>      std::cout &lt;&lt; &quot; * B_&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L299** <code>      if (! col_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L300** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; col_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L301** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L302** <code>      if (! red_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L303** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; red_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L304** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L305** <code>      if (! bat_mode.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L306** <code>        std::cout &lt;&lt; &quot;(&quot; &lt;&lt; bat_mode &lt;&lt; &quot;)&quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L307** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L308** <code>      std::cout &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L309** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L310** <code>      int M_size = std::accumulate(std::begin(M), std::end(M), 1, std::multiplies&lt;&gt;{});</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L311** <code>      int N_size = std::accumulate(std::begin(N), std::end(N), 1, std::multiplies&lt;&gt;{});</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L312** <code>      int K_size = std::accumulate(std::begin(K), std::end(K), 1, std::multiplies&lt;&gt;{});</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L313** <code>      int L_size = std::accumulate(std::begin(L), std::end(L), 1, std::multiplies&lt;&gt;{});</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L314** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L315** <code>      std::cout &lt;&lt; &quot;     M : (&quot; &lt;&lt; M_size &lt;&lt; &quot;) &quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L316** <code>      for (char m : row_mode) std::cout &lt;&lt; m &lt;&lt; &quot;:&quot; &lt;&lt; mode_size[m] &lt;&lt; &quot; &quot;;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L317** <code>      std::cout &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L318** <code>      std::cout &lt;&lt; &quot;     N : (&quot; &lt;&lt; N_size &lt;&lt; &quot;) &quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L319** <code>      for (char n : col_mode) std::cout &lt;&lt; n &lt;&lt; &quot;:&quot; &lt;&lt; mode_size[n] &lt;&lt; &quot; &quot;;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L320** <code>      std::cout &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L321** <code>      std::cout &lt;&lt; &quot;     K : (&quot; &lt;&lt; K_size &lt;&lt; &quot;) &quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L322** <code>      for (char k : red_mode) std::cout &lt;&lt; k &lt;&lt; &quot;:&quot; &lt;&lt; mode_size[k] &lt;&lt; &quot; &quot;;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L323** <code>      std::cout &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L324** <code>      std::cout &lt;&lt; &quot;     L : (&quot; &lt;&lt; L_size &lt;&lt; &quot;) &quot;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L325** <code>      for (char l : bat_mode) std::cout &lt;&lt; l &lt;&lt; &quot;:&quot; &lt;&lt; mode_size[l] &lt;&lt; &quot; &quot;;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L326** <code>      std::cout &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L327** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L328** <code>      std::cout &lt;&lt; &quot;  ldAm : &quot; &lt;&lt; ldAm &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L329** <code>      std::cout &lt;&lt; &quot;  ldAk : &quot; &lt;&lt; ldAk &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L330** <code>      std::cout &lt;&lt; &quot;  ldAl : &quot; &lt;&lt; ldAl &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L331** <code>      std::cout &lt;&lt; &quot;  ldBn : &quot; &lt;&lt; ldBn &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L332** <code>      std::cout &lt;&lt; &quot;  ldBk : &quot; &lt;&lt; ldBk &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>      std::cout &lt;&lt; &quot;  ldBl : &quot; &lt;&lt; ldBl &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L334** <code>      std::cout &lt;&lt; &quot;  ldCm : &quot; &lt;&lt; ldCm &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L335** <code>      std::cout &lt;&lt; &quot;  ldCn : &quot; &lt;&lt; ldCn &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L336** <code>      std::cout &lt;&lt; &quot;  ldCl : &quot; &lt;&lt; ldCl &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L337** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>    return {M, ldAm, ldCm,</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L340** <code>            N, ldBn, ldCn,   </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L341** <code>            K, ldAk, ldBk, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L342** <code>            L, ldAl, ldBl, ldCl}; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L343** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L344** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L345** <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L346** <code>  print_usage() {</code>
+  - EN: Begins the definition of function or method `print_usage`.
+  - CN: 开始定义函数或方法 `print_usage`。
+- **L347** <code>    std::cout &lt;&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L348** <code>      &quot;GETT problem command line parser:\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L349** <code>      &quot;  --modeA=&lt;m0,...&gt;\n&quot;</code>
+  - EN: Assigns or initializes `modeA` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `modeA` 进行赋值或初始化。
+- **L350** <code>      &quot;    A comma delimited list of characters that correspond to the row, reduction, and batch modes in A tensor.\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L351** <code>      &quot;    The semantic association of each symbolic mode is determined automatically.\n\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L353** <code>      &quot;  --modeB=&lt;m0,...&gt;\n&quot;</code>
+  - EN: Assigns or initializes `modeB` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `modeB` 进行赋值或初始化。
+- **L354** <code>      &quot;    A comma delimited list of characters that correspond to the column, reduction, and batch modes in B tensor.\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L355** <code>      &quot;    The semantic association of each symbolic mode is determined automatically.\n\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L356** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L357** <code>      &quot;  --modeC=&lt;m0,...&gt;\n&quot;</code>
+  - EN: Assigns or initializes `modeC` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `modeC` 进行赋值或初始化。
+- **L358** <code>      &quot;    A comma delimited list of characters that correspond to the row, column, and batch modes in B tensor.\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L359** <code>      &quot;    The semantic association of each symbolic mode is determined automatically.\n\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L360** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L361** <code>      &quot;  --extents=&lt;mode:extent,....&gt;\n&quot;</code>
+  - EN: Assigns or initializes `extents` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `extents` 进行赋值或初始化。
+- **L362** <code>      &quot;    A command delimited list of symbolic mode and its corresponding extent.\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L363** <code>      &quot;    Extents are defaulted to 1 if any are not provided.\n\n&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L364** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L365** <code>      &quot;Example usage: gett.exe --modeC=m,n,l --modeA=m,k,l --modeB=k,n,l --extents=m:4096,n:4096,k:4096\n&quot;;</code>
+  - EN: Assigns or initializes `modeC` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `modeC` 进行赋值或初始化。
+- **L366** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L367** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L368** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L369** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>iostream</code> — standard stream input/output support / 标准流输入输出支持
+- <code>iomanip</code> — formatted stream helpers / 格式化流辅助工具
+- <code>utility</code> — general utility helpers / 通用辅助工具
+- <code>type_traits</code> — compile-time type traits / 编译期类型特征
+- <code>vector</code> — dynamic array containers / 动态数组容器
+- <code>map</code> — ordered associative containers / 有序关联容器
+- <code>algorithm</code> — standard algorithms / 标准算法
+- <code>numeric</code> — numeric algorithms / 数值算法
+- <code>cutlass/util/command_line.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块

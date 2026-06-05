@@ -1,0 +1,326 @@
+# cluster.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/detail/cluster.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/detail/cluster.hpp`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/detail/cluster.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>#include &quot;cute/container/tuple.hpp&quot;</code>
+  - EN: Includes "cute/container/tuple.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/container/tuple.hpp"，以便本文件使用该依赖中的声明。
+- **L37**: <code>#include &quot;cute/arch/cluster_sm90.hpp&quot;</code>
+  - EN: Includes "cute/arch/cluster_sm90.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/arch/cluster_sm90.hpp"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;cutlass/trace.h&quot;</code>
+  - EN: Includes "cutlass/trace.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/trace.h"，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &quot;cute/layout.hpp&quot; // cute::make_shape</code>
+  - EN: Includes "cute/layout.hpp" // cute::make_shape so this file can use declarations from that dependency.
+  - CN: 包含 "cute/layout.hpp" // cute::make_shape，以便本文件使用该依赖中的声明。
+- **L40**: <code>#include &quot;cutlass/trace.h&quot; // CUTLASS_TRACE_HOST</code>
+  - EN: Includes "cutlass/trace.h" // CUTLASS_TRACE_HOST so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/trace.h" // CUTLASS_TRACE_HOST，以便本文件使用该依赖中的声明。
+- **L41**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L42**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>namespace cutlass::detail {</code>
+  - EN: Opens namespace `cutlass::detail` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::detail`，为后续声明提供作用域。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>// Returns either ClusterShape, if it is static, or a Shape&lt;int,int,Int&lt;1&gt;&gt; populated with the</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L47**: <code>// x and y dimensions of `dynamic_cluster_shape`.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L48**: <code>template &lt;class ClusterShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L49**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L50**: <code>static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L51**: <code>select_cluster_shape(ClusterShape cluster_shape, dim3 dynamic_cluster_shape) {</code>
+  - EN: Starts the definition body for `select_cluster_shape`.
+  - CN: 开始 `select_cluster_shape` 的定义体。
+- **L52**: <code>  return cute::conditional_return&lt;not cute::is_static_v&lt;ClusterShape&gt;&gt;(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L53**: <code>    make_shape(static_cast&lt;int&gt;(dynamic_cluster_shape.x), static_cast&lt;int&gt;(dynamic_cluster_shape.y), cute::Int&lt;1&gt;{}),</code>
+  - EN: Starts the definition body for `make_shape`.
+  - CN: 开始 `make_shape` 的定义体。
+- **L54**: <code>    cluster_shape);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L55**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>template &lt;class ClusterShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L58**: <code>CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L59**: <code>static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L60**: <code>select_cluster_shape(ClusterShape cluster_shape) {</code>
+  - EN: Starts the definition body for `select_cluster_shape`.
+  - CN: 开始 `select_cluster_shape` 的定义体。
+- **L61**: <code>  if constexpr (cute::is_static_v&lt;ClusterShape&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L62**: <code>    return cluster_shape;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L63**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L64**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L65**: <code>    dim3 dynamic_cluster_shape = cute::cluster_shape();</code>
+  - EN: Declares the callable or operator `cluster_shape`.
+  - CN: 声明可调用对象或运算符 `cluster_shape`。
+- **L66**: <code>    return make_shape(static_cast&lt;int&gt;(dynamic_cluster_shape.x), static_cast&lt;int&gt;(dynamic_cluster_shape.y), cute::Int&lt;1&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L67**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L68**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L69**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L70**: <code>// Dynamic cluster shape can_implement rule</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L71**: <code>template &lt;class AtomThrShapeMNK&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L72**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L73**: <code>bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L74**: <code>preferred_cluster_can_implement(dim3 cluster_shape, dim3 cluster_shape_fallback) {</code>
+  - EN: Starts the definition body for `preferred_cluster_can_implement`.
+  - CN: 开始 `preferred_cluster_can_implement` 的定义体。
+- **L75**: <code>  bool implementable{true};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L76**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L77**: <code>  // Runtime cluster shape should satisfy MMA requirements</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L78**: <code>  auto AtomThrShapeM = cute::size&lt;0&gt;(AtomThrShapeMNK{});</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L79**: <code>  implementable &amp;= (cluster_shape.x &gt; 0 &amp;&amp; cluster_shape.y &gt; 0 &amp;&amp; cluster_shape.z &gt; 0);</code>
+  - EN: Declares the callable or operator `implementable`.
+  - CN: 声明可调用对象或运算符 `implementable`。
+- **L80**: <code>  implementable &amp;= (cluster_shape.x % AtomThrShapeM == 0);</code>
+  - EN: Declares the callable or operator `implementable`.
+  - CN: 声明可调用对象或运算符 `implementable`。
+- **L81**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L82**: <code>  implementable &amp;= (cluster_shape_fallback.x &gt; 0 &amp;&amp; cluster_shape_fallback.y &gt; 0 &amp;&amp; cluster_shape_fallback.z &gt; 0);</code>
+  - EN: Declares the callable or operator `implementable`.
+  - CN: 声明可调用对象或运算符 `implementable`。
+- **L83**: <code>  implementable &amp;= (cluster_shape_fallback.x % AtomThrShapeM == 0);</code>
+  - EN: Declares the callable or operator `implementable`.
+  - CN: 声明可调用对象或运算符 `implementable`。
+- **L84**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L85**: <code>  // Only support pow2 runtime cluster shape for now</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L86**: <code>  implementable &amp;= ispow2(cluster_shape.x) &amp;&amp;</code>
+  - EN: Provides part of the signature or implementation for `ispow2`.
+  - CN: 提供 `ispow2` 的签名或实现的一部分。
+- **L87**: <code>                   ispow2(cluster_shape.y) &amp;&amp;</code>
+  - EN: Provides part of the signature or implementation for `ispow2`.
+  - CN: 提供 `ispow2` 的签名或实现的一部分。
+- **L88**: <code>                   ispow2(cluster_shape.z);</code>
+  - EN: Declares the callable or operator `ispow2`.
+  - CN: 声明可调用对象或运算符 `ispow2`。
+- **L89**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L90**: <code>  implementable &amp;= ispow2(cluster_shape_fallback.x) &amp;&amp;</code>
+  - EN: Provides part of the signature or implementation for `ispow2`.
+  - CN: 提供 `ispow2` 的签名或实现的一部分。
+- **L91**: <code>                   ispow2(cluster_shape_fallback.y) &amp;&amp;</code>
+  - EN: Provides part of the signature or implementation for `ispow2`.
+  - CN: 提供 `ispow2` 的签名或实现的一部分。
+- **L92**: <code>                   ispow2(cluster_shape_fallback.z);</code>
+  - EN: Declares the callable or operator `ispow2`.
+  - CN: 声明可调用对象或运算符 `ispow2`。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <code>  return implementable;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L95**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L96**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L97**: <code>} // namespace cutlass::detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L98**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L99**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Host-device annotations / 主机设备限定符
+- Symbol focus: `ClusterShape` / 重点符号：`ClusterShape`
+- Symbol focus: `select_cluster_shape` / 重点符号：`select_cluster_shape`
+- Symbol focus: `make_shape` / 重点符号：`make_shape`
+- Symbol focus: `constexpr` / 重点符号：`constexpr`
+- Symbol focus: `cluster_shape` / 重点符号：`cluster_shape`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cute/container/tuple.hpp"`
+  - `"cute/arch/cluster_sm90.hpp"`
+  - `"cutlass/trace.h"`
+  - `"cute/layout.hpp" // cute::make_shape`
+  - `"cutlass/trace.h" // CUTLASS_TRACE_HOST`

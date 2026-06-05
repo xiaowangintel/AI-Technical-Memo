@@ -1,0 +1,255 @@
+# sm90_implicit_gemm_tma_warpspecialized.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/kernel/sm90_implicit_gemm_tma_warpspecialized.hpp`
+**Purpose / 用途**: Provides kernel-level configuration, implicit GEMM support, SM90 specialization. / 提供kernel 级配置、隐式 GEMM 支持、SM90 特化。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 32 / 第 32 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 33 / 第 33 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 34 / 第 34 行** — `#include "cutlass/fast_math.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/fast_math.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/fast_math.h`。
+- **Line 35 / 第 35 行** — `#include "cutlass/kernel_hardware_info.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/kernel_hardware_info.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/kernel_hardware_info.hpp`。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `#include "cute/tensor.hpp"`
+  - **EN**: Includes CuTe dependency `cute/tensor.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/tensor.hpp`。
+- **Line 38 / 第 38 行** — `#include "cute/arch/cluster_sm90.hpp"`
+  - **EN**: Includes CuTe dependency `cute/arch/cluster_sm90.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/arch/cluster_sm90.hpp`。
+- **Line 39 / 第 39 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 40 / 第 40 行** — `#include "cutlass/conv/detail.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/detail.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/detail.hpp`。
+- **Line 41 / 第 41 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 42 / 第 42 行** — `#include "cutlass/conv/dispatch_policy.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/dispatch_policy.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/dispatch_policy.hpp`。
+- **Line 43 / 第 43 行** — `#include "cutlass/gemm/dispatch_policy.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/dispatch_policy.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/dispatch_policy.hpp`。
+- **Line 44 / 第 44 行** — `#include "cutlass/pipeline/sm90_pipeline.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/pipeline/sm90_pipeline.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/pipeline/sm90_pipeline.hpp`。
+- **Line 45 / 第 45 行** — `#include "cutlass/gemm/kernel/gemm_universal.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/kernel/gemm_universal.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/kernel/gemm_universal.hpp`。
+- **Line 46 / 第 46 行** — `#include "cutlass/gemm/kernel/tile_scheduler.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/kernel/tile_scheduler.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/kernel/tile_scheduler.hpp`。
+- **Line 47 / 第 47 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 48 / 第 48 行** — `///////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — `namespace cutlass::conv::kernel {`
+  - **EN**: Opens namespace `cutlass::conv::kernel` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv::kernel`。
+- **Line 51 / 第 51 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 52 / 第 52 行** — `///////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 53 / 第 53 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 54 / 第 54 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 55 / 第 55 行** — `  class ProblemShape_,`
+  - **EN**: Adds template parameter specifier `class ProblemShape_`.
+  - **CN**: 补充模板参数说明符 `class ProblemShape_`。
+- **Line 56 / 第 56 行** — `  class CollectiveMainloop_,`
+  - **EN**: Adds template parameter specifier `class CollectiveMainloop_`.
+  - **CN**: 补充模板参数说明符 `class CollectiveMainloop_`。
+- **Line 57 / 第 57 行** — `  class CollectiveEpilogue_,`
+  - **EN**: Adds template parameter specifier `class CollectiveEpilogue_`.
+  - **CN**: 补充模板参数说明符 `class CollectiveEpilogue_`。
+- **Line 58 / 第 58 行** — `  class TileScheduler_`
+  - **EN**: Adds template parameter specifier `class TileScheduler_`.
+  - **CN**: 补充模板参数说明符 `class TileScheduler_`。
+- **Line 59 / 第 59 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 60 / 第 60 行** — `class ConvUniversal<`
+  - **EN**: Declares class `ConvUniversal`.
+  - **CN**: 声明 class `ConvUniversal`。
+- **Line 61 / 第 61 行** — `  ProblemShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 62 / 第 62 行** — `  CollectiveMainloop_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 63 / 第 63 行** — `  CollectiveEpilogue_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 64 / 第 64 行** — `  TileScheduler_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 65 / 第 65 行** — `  cute::enable_if_t<cute::is_base_of_v<KernelImplicitTmaWarpSpecializedSm90, typename CollectiveMainloop_::DispatchPolicy::Schedule>>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 66 / 第 66 行** — `> : public cutlass::gemm::kernel::GemmUniversal< `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 67 / 第 67 行** — `  ProblemShape_, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 68 / 第 68 行** — `  CollectiveMainloop_, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 69 / 第 69 行** — `  CollectiveEpilogue_, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 70 / 第 70 行** — `  TileScheduler_`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 71 / 第 71 行** — `>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 72 / 第 72 行** — `{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 73 / 第 73 行** — `///////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 74 / 第 74 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 75 / 第 75 行** — `} // namespace cutlass::conv::kernel`
+  - **EN**: Closes namespace `cutlass::conv::kernel`.
+  - **CN**: 关闭命名空间 `cutlass::conv::kernel`。
+- **Line 76 / 第 76 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Epilogues / 尾处理
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/fast_math.h` — CUTLASS dependency `cutlass/fast_math.h` / CUTLASS 依赖 `cutlass/fast_math.h`
+- `cutlass/kernel_hardware_info.hpp` — CUTLASS dependency `cutlass/kernel_hardware_info.hpp` / CUTLASS 依赖 `cutlass/kernel_hardware_info.hpp`
+- `cute/tensor.hpp` — CuTe dependency `cute/tensor.hpp` / CuTe 依赖 `cute/tensor.hpp`
+- `cute/arch/cluster_sm90.hpp` — CuTe dependency `cute/arch/cluster_sm90.hpp` / CuTe 依赖 `cute/arch/cluster_sm90.hpp`
+- `cutlass/conv/detail.hpp` — CUTLASS convolution component `cutlass/conv/detail.hpp` / CUTLASS 卷积组件 `cutlass/conv/detail.hpp`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/conv/dispatch_policy.hpp` — CUTLASS convolution component `cutlass/conv/dispatch_policy.hpp` / CUTLASS 卷积组件 `cutlass/conv/dispatch_policy.hpp`
+- `cutlass/gemm/dispatch_policy.hpp` — CUTLASS GEMM primitive `cutlass/gemm/dispatch_policy.hpp` / CUTLASS GEMM 原语 `cutlass/gemm/dispatch_policy.hpp`
+- `cutlass/pipeline/sm90_pipeline.hpp` — CUTLASS dependency `cutlass/pipeline/sm90_pipeline.hpp` / CUTLASS 依赖 `cutlass/pipeline/sm90_pipeline.hpp`
+- `cutlass/gemm/kernel/gemm_universal.hpp` — CUTLASS GEMM primitive `cutlass/gemm/kernel/gemm_universal.hpp` / CUTLASS GEMM 原语 `cutlass/gemm/kernel/gemm_universal.hpp`
+- `cutlass/gemm/kernel/tile_scheduler.hpp` — CUTLASS GEMM primitive `cutlass/gemm/kernel/tile_scheduler.hpp` / CUTLASS GEMM 原语 `cutlass/gemm/kernel/tile_scheduler.hpp`

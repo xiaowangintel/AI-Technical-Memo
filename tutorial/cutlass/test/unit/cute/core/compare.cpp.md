@@ -1,0 +1,535 @@
+# compare.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/compare.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `compare` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `compare` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 35**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `TEST(CuTe_core, Compare_simple_2d_GenColMajor)`
+  - EN: Declares GoogleTest case `CuTe_core::Compare_simple_2d_GenColMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Compare_simple_2d_GenColMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 38**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 39**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `  // Simple 2D layout`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 42**: `  auto layout = make_layout(make_shape(Int<3>{}, Int<5>{}), GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 43**: `  CUTLASS_TRACE_HOST("Layout: " << layout);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 44**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 45**: `  for (int i = 0; i < size(layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 46**: `    auto coord_i = layout.get_hier_coord(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 47**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 48**: `    CUTLASS_TRACE_HOST(i << ": " << coord_i);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 49**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: `    EXPECT_TRUE(elem_less(coord_i, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 53**: `      auto coord_j = layout.get_hier_coord(j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 54**: `      CUTLASS_TRACE_HOST("  " << j << ": " << coord_j);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 55**: `      EXPECT_TRUE(elem_less(coord_j, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 56**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 57**: `      EXPECT_EQ((i < j), colex_less(coord_i,coord_j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 58**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 59**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 60**: `}`
+  - EN: Closes the scope for `test CuTe_core::Compare_simple_2d_GenColMajor`.
+  - CN: 结束 `test CuTe_core::Compare_simple_2d_GenColMajor` 的作用域。
+- **Line 61**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 62**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 63**: `TEST(CuTe_core, Compare_simple_2d_GenRowMajor)`
+  - EN: Declares GoogleTest case `CuTe_core::Compare_simple_2d_GenRowMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Compare_simple_2d_GenRowMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 64**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 65**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 66**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: `  auto layout = make_layout(make_shape(Int<3>{}, Int<5>{}), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 68**: `  CUTLASS_TRACE_HOST("Layout: " << layout);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 69**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: `  for (int i = 0; i < size(layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 71**: `    auto coord_i = layout.get_hier_coord(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 72**: `    CUTLASS_TRACE_HOST(i << ": " << coord_i);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 73**: `    EXPECT_TRUE(elem_less(coord_i, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 74**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 75**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 76**: `      auto coord_j = layout.get_hier_coord(j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 77**: `      EXPECT_TRUE(elem_less(coord_j, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 78**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 79**: `      EXPECT_EQ((i < j), lex_less(coord_i,coord_j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 80**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 81**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 82**: `}`
+  - EN: Closes the scope for `test CuTe_core::Compare_simple_2d_GenRowMajor`.
+  - CN: 结束 `test CuTe_core::Compare_simple_2d_GenRowMajor` 的作用域。
+- **Line 83**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 84**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 85**: `TEST(CuTe_core, Compare_simple_3d_GenColMajor)`
+  - EN: Declares GoogleTest case `CuTe_core::Compare_simple_3d_GenColMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Compare_simple_3d_GenColMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 86**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 87**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 88**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 89**: `  auto layout = make_layout(make_shape(Int<2>{}, Int<3>{}, Int<5>{}), GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 90**: `  CUTLASS_TRACE_HOST("Layout: " << layout);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 91**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 92**: `  for (int i = 0; i < size(layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 93**: `    auto coord_i = layout.get_hier_coord(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 94**: `    CUTLASS_TRACE_HOST(i << ": " << coord_i);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 95**: `    EXPECT_TRUE(elem_less(coord_i, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 96**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 97**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 98**: `      auto coord_j = layout.get_hier_coord(j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 99**: `      EXPECT_TRUE(elem_less(coord_j, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 100**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 101**: `      EXPECT_EQ((i < j), colex_less(coord_i,coord_j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 102**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 103**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 104**: `}`
+  - EN: Closes the scope for `test CuTe_core::Compare_simple_3d_GenColMajor`.
+  - CN: 结束 `test CuTe_core::Compare_simple_3d_GenColMajor` 的作用域。
+- **Line 105**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 106**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 107**: `TEST(CuTe_core, Compare_simple_3d_GenRowMajor)`
+  - EN: Declares GoogleTest case `CuTe_core::Compare_simple_3d_GenRowMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Compare_simple_3d_GenRowMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 108**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 109**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 110**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 111**: `  auto layout = make_layout(make_shape(Int<2>{}, Int<3>{}, Int<5>{}), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 112**: `  CUTLASS_TRACE_HOST("Layout: " << layout);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 113**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 114**: `  for (int i = 0; i < size(layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 115**: `    auto coord_i = layout.get_hier_coord(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 116**: `    CUTLASS_TRACE_HOST(i << ": " << coord_i);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 117**: `    EXPECT_TRUE(elem_less(coord_i, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 118**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 119**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 120**: `      auto coord_j = layout.get_hier_coord(j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 121**: `      EXPECT_TRUE(elem_less(coord_j, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 122**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: `      EXPECT_EQ((i < j), lex_less(coord_i,coord_j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 124**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 125**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 126**: `}`
+  - EN: Closes the scope for `test CuTe_core::Compare_simple_3d_GenRowMajor`.
+  - CN: 结束 `test CuTe_core::Compare_simple_3d_GenRowMajor` 的作用域。
+- **Line 127**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 128**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 129**: `TEST(CuTe_core, Compare_hierarchical_3d_GenColMajor)`
+  - EN: Declares GoogleTest case `CuTe_core::Compare_hierarchical_3d_GenColMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Compare_hierarchical_3d_GenColMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 130**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 131**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 132**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 133**: `  auto layout = make_layout(Shape<Shape<_3,_2>,Shape<_5,_2,_2>>{}, GenColMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 134**: `  CUTLASS_TRACE_HOST("Layout: " << layout);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 135**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 136**: `  for (int i = 0; i < size(layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 137**: `    auto coord_i = layout.get_hier_coord(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 138**: `    CUTLASS_TRACE_HOST(i << ": " << coord_i);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 139**: `    EXPECT_TRUE(elem_less(coord_i, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 140**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 141**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 142**: `      auto coord_j = layout.get_hier_coord(j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 143**: `      EXPECT_TRUE(elem_less(coord_j, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 144**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 145**: `      EXPECT_EQ((i < j), colex_less(coord_i,coord_j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 146**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 147**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 148**: `}`
+  - EN: Closes the scope for `test CuTe_core::Compare_hierarchical_3d_GenColMajor`.
+  - CN: 结束 `test CuTe_core::Compare_hierarchical_3d_GenColMajor` 的作用域。
+- **Line 149**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 150**: `TEST(CuTe_core, Compare_hierarchical_3d_GenRowMajor)`
+  - EN: Declares GoogleTest case `CuTe_core::Compare_hierarchical_3d_GenRowMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Compare_hierarchical_3d_GenRowMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 151**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 152**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 153**: `  auto layout = make_layout(Shape<Shape<_3,_2>,Shape<_5,_2,_2>>{}, GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 154**: `  CUTLASS_TRACE_HOST("Layout: " << layout);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 155**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 156**: `  for (int i = 0; i < size(layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 157**: `    auto coord_i = layout.get_hier_coord(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 158**: `    CUTLASS_TRACE_HOST(i << ": " << coord_i);`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 159**: `    EXPECT_TRUE(elem_less(coord_i, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 160**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 161**: `    for (int j = 0; j < size(layout); ++j) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 162**: `      auto coord_j = layout.get_hier_coord(j);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 163**: `      EXPECT_TRUE(elem_less(coord_j, shape(layout)));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `      EXPECT_EQ((i < j), lex_less(coord_i,coord_j));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 166**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 167**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 168**: `}`
+  - EN: Closes the scope for `test CuTe_core::Compare_hierarchical_3d_GenRowMajor`.
+  - CN: 结束 `test CuTe_core::Compare_hierarchical_3d_GenRowMajor` 的作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。

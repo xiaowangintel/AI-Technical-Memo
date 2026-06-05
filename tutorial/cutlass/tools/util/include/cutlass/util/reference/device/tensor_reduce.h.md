@@ -1,0 +1,1567 @@
+# tensor_reduce.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/device/tensor_reduce.h`
+**Purpose / 用途**: Provides a device-side reference implementation or helper for tensor reduce. / 为 tensor reduce 提供设备端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L32** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L33** <code>#include &lt;cmath&gt;</code>
+  - EN: Includes `cmath` so this file can use math routines.
+  - CN: 引入 `cmath`，使当前文件可以使用数学函数。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L36** <code>#include &quot;cutlass/complex.h&quot;</code>
+  - EN: Includes `cutlass/complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L37** <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes `cutlass/functional.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/functional.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L38** <code>#include &quot;cutlass/numeric_conversion.h&quot;</code>
+  - EN: Includes `cutlass/numeric_conversion.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_conversion.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/util/device_memory.h&quot;</code>
+  - EN: Includes `cutlass/util/device_memory.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/device_memory.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L41** <code>#include &quot;cutlass/util/reference/detail/linear_to_coordinate.h&quot;</code>
+  - EN: Includes `cutlass/util/reference/detail/linear_to_coordinate.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/reference/detail/linear_to_coordinate.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L46** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L47** <code>namespace device {</code>
+  - EN: Opens namespace `device` to group related symbols.
+  - CN: 打开命名空间 `device`，用于归组相关符号。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>namespace kernel {</code>
+  - EN: Opens namespace `kernel` to group related symbols.
+  - CN: 打开命名空间 `kernel`，用于归组相关符号。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L54** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L55** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L56** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L57** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L58** <code>  typename TransformOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L59** <code>  int kBlockSize = 128</code>
+  - EN: Assigns or initializes `kBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kBlockSize` 进行赋值或初始化。
+- **L60** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>__global__ void TensorTransformReducePartial(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReducePartial`.
+  - CN: 开始或继续与 `TensorTransformReducePartial` 相关的签名/调用语法。
+- **L62** <code>  TensorView&lt;Element, Layout&gt; view,     /// View of the tensor to reduce over</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L63** <code>  ComputeType identity,                 /// Identity element of the reduction operation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L64** <code>  ReduceOp reduce,                      /// Reduces an accumulated value with a transformed element: f(ComputeType, ComputeType) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `f`.
+  - CN: 开始或继续与 `f` 相关的签名/调用语法。
+- **L65** <code>  TransformOp transform,                /// Transforms the tensor element to ComputeType: g(Element) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `g`.
+  - CN: 开始或继续与 `g` 相关的签名/调用语法。
+- **L66** <code>  ComputeType *workspace) {             /// Device-side workspace for accumulating partial results. The reduced element is stored in workspace[0]</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L67** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>  int64_t idx = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `idx` 进行赋值或初始化。
+- **L69** <code>  int64_t size = view.size();</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>  __shared__ ComputeType scratchpad[kBlockSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>  for (; idx &lt; size; idx += blockDim.x * gridDim.x) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>    // Map linear thread ID onto tensor coordinate</code>
+  - EN: Comment that documents intent or context: "Map linear thread ID onto tensor coordinate".
+  - CN: 用于说明意图或上下文的注释："Map linear thread ID onto tensor coordinate"。
+- **L76** <code>    typename Layout::TensorCoord coord;</code>
+  - EN: Declares the symbol `coord` in the current scope.
+  - CN: 在当前作用域中声明符号 `coord`。
+- **L77** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L78** <code>    cutlass::reference::detail::LinearToCoordinate&lt;Layout::kRank&gt;()(coord, idx, view.extent());</code>
+  - EN: Declares function or method `extent` without defining it here.
+  - CN: 声明函数或方法 `extent`，但不在此处给出定义。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>    if (view.contains(coord)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>      // Fetch element</code>
+  - EN: Comment that documents intent or context: "Fetch element".
+  - CN: 用于说明意图或上下文的注释："Fetch element"。
+- **L83** <code>      Element x = view.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L84** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L85** <code>      // Transform </code>
+  - EN: Comment that documents intent or context: "Transform".
+  - CN: 用于说明意图或上下文的注释："Transform"。
+- **L86** <code>      identity = reduce(identity, transform(x));</code>
+  - EN: Declares function or method `transform` without defining it here.
+  - CN: 声明函数或方法 `transform`，但不在此处给出定义。
+- **L87** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L88** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>  scratchpad[threadIdx.x] = identity;</code>
+  - EN: Declares the symbol `identity` in the current scope.
+  - CN: 在当前作用域中声明符号 `identity`。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>  __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>  // One thread performs the final reduction and stores out. This could be enhanced via</code>
+  - EN: Comment that documents intent or context: "One thread performs the final reduction and stores out. This could be enhanced via".
+  - CN: 用于说明意图或上下文的注释："One thread performs the final reduction and stores out. This could be enhanced via"。
+- **L95** <code>  // a tree reduction and pipelining.</code>
+  - EN: Comment that documents intent or context: "a tree reduction and pipelining.".
+  - CN: 用于说明意图或上下文的注释："a tree reduction and pipelining."。
+- **L96** <code>  if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>    for (int i = 1; i &lt; kBlockSize; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L99** <code>      identity = reduce(identity, scratchpad[i]);</code>
+  - EN: Declares function or method `reduce` without defining it here.
+  - CN: 声明函数或方法 `reduce`，但不在此处给出定义。
+- **L100** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L101** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L102** <code>    workspace[blockIdx.x] = identity;</code>
+  - EN: Declares the symbol `identity` in the current scope.
+  - CN: 在当前作用域中声明符号 `identity`。
+- **L103** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L104** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L107** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L108** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L109** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L110** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L111** <code>  typename TransformOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L112** <code>  int kBlockSize = 128</code>
+  - EN: Assigns or initializes `kBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kBlockSize` 进行赋值或初始化。
+- **L113** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L114** <code>__global__ void TensorTransformReducePartial(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReducePartial`.
+  - CN: 开始或继续与 `TensorTransformReducePartial` 相关的签名/调用语法。
+- **L115** <code>  TensorView&lt;Element, Layout&gt; view_A,   /// View of the tensor to reduce over</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L116** <code>  TensorView&lt;Element, Layout&gt; view_B,   /// View of the tensor to reduce over</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L117** <code>  ComputeType identity,                 /// Identity element of the reduction operation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>  ReduceOp reduce,                      /// Reduces an accumulated value with a transformed element: f(ComputeType, ComputeType) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `f`.
+  - CN: 开始或继续与 `f` 相关的签名/调用语法。
+- **L119** <code>  TransformOp transform,                /// Transforms the tensor element to ComputeType: g(Element) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `g`.
+  - CN: 开始或继续与 `g` 相关的签名/调用语法。
+- **L120** <code>  ComputeType *workspace) {             /// Device-side workspace for accumulating partial results. The reduced element is stored in workspace[0]</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L122** <code>  int64_t idx = threadIdx.x + blockIdx.x * blockDim.x;</code>
+  - EN: Assigns or initializes `idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `idx` 进行赋值或初始化。
+- **L123** <code>  auto size = static_cast&lt;int64_t&gt;(view_A.size());</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L124** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L125** <code>  __shared__ ComputeType scratchpad[kBlockSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L126** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L127** <code>  for (; idx &lt; size; idx += blockDim.x * gridDim.x) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>    // Map linear thread ID onto tensor coordinate</code>
+  - EN: Comment that documents intent or context: "Map linear thread ID onto tensor coordinate".
+  - CN: 用于说明意图或上下文的注释："Map linear thread ID onto tensor coordinate"。
+- **L130** <code>    typename Layout::TensorCoord coord;</code>
+  - EN: Declares the symbol `coord` in the current scope.
+  - CN: 在当前作用域中声明符号 `coord`。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>    cutlass::reference::detail::LinearToCoordinate&lt;Layout::kRank&gt;()(coord, idx, view_A.extent());</code>
+  - EN: Declares function or method `extent` without defining it here.
+  - CN: 声明函数或方法 `extent`，但不在此处给出定义。
+- **L133** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L134** <code>    if (view_A.contains(coord)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L135** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L136** <code>      // Fetch element</code>
+  - EN: Comment that documents intent or context: "Fetch element".
+  - CN: 用于说明意图或上下文的注释："Fetch element"。
+- **L137** <code>      Element a = view_A.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L138** <code>      Element b = view_B.at(coord);</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L140** <code>      // Transform </code>
+  - EN: Comment that documents intent or context: "Transform".
+  - CN: 用于说明意图或上下文的注释："Transform"。
+- **L141** <code>      identity = reduce(identity, transform(a, b));</code>
+  - EN: Declares function or method `transform` without defining it here.
+  - CN: 声明函数或方法 `transform`，但不在此处给出定义。
+- **L142** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L143** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>  scratchpad[threadIdx.x] = identity;</code>
+  - EN: Declares the symbol `identity` in the current scope.
+  - CN: 在当前作用域中声明符号 `identity`。
+- **L146** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L147** <code>  __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>  // One thread performs the final reduction and stores out. This could be enhanced via</code>
+  - EN: Comment that documents intent or context: "One thread performs the final reduction and stores out. This could be enhanced via".
+  - CN: 用于说明意图或上下文的注释："One thread performs the final reduction and stores out. This could be enhanced via"。
+- **L150** <code>  // a tree reduction and pipelining.</code>
+  - EN: Comment that documents intent or context: "a tree reduction and pipelining.".
+  - CN: 用于说明意图或上下文的注释："a tree reduction and pipelining."。
+- **L151** <code>  if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L152** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L153** <code>    for (int i = 1; i &lt; kBlockSize; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L154** <code>      identity = reduce(identity, scratchpad[i]);</code>
+  - EN: Declares function or method `reduce` without defining it here.
+  - CN: 声明函数或方法 `reduce`，但不在此处给出定义。
+- **L155** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L156** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L157** <code>    workspace[blockIdx.x] = identity;</code>
+  - EN: Declares the symbol `identity` in the current scope.
+  - CN: 在当前作用域中声明符号 `identity`。
+- **L158** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L159** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L161** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L162** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L163** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L164** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L165** <code>  int kBlockSize = 32</code>
+  - EN: Assigns or initializes `kBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kBlockSize` 进行赋值或初始化。
+- **L166** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>__global__ void TensorTransformReduceFinalize(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduceFinalize`.
+  - CN: 开始或继续与 `TensorTransformReduceFinalize` 相关的签名/调用语法。
+- **L168** <code>  ComputeType *workspace, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L169** <code>  ComputeType identity,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L170** <code>  int workspace_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L171** <code>  ReduceOp reduce) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L172** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L173** <code>  __shared__ ComputeType scratchpad[kBlockSize];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L174** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L175** <code>  for (int idx = threadIdx.x; idx &lt; workspace_size; idx += kBlockSize) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L176** <code>    identity = reduce(identity, workspace[idx]);</code>
+  - EN: Declares function or method `reduce` without defining it here.
+  - CN: 声明函数或方法 `reduce`，但不在此处给出定义。
+- **L177** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L179** <code>  scratchpad[threadIdx.x] = identity;</code>
+  - EN: Declares the symbol `identity` in the current scope.
+  - CN: 在当前作用域中声明符号 `identity`。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>  __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L182** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L183** <code>  if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>    for (int i = 1; i &lt; kBlockSize; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L186** <code>      identity = reduce(identity, scratchpad[i]);</code>
+  - EN: Declares function or method `reduce` without defining it here.
+  - CN: 声明函数或方法 `reduce`，但不在此处给出定义。
+- **L187** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>    workspace[0] = identity;</code>
+  - EN: Declares the symbol `identity` in the current scope.
+  - CN: 在当前作用域中声明符号 `identity`。
+- **L190** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L191** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L192** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L193** <code>} // namespace kernel</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L194** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L195** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L196** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L197** <code>/// Transform-reduce operation over the elements of a tensor</code>
+  - EN: Comment that documents intent or context: "Transform-reduce operation over the elements of a tensor".
+  - CN: 用于说明意图或上下文的注释："Transform-reduce operation over the elements of a tensor"。
+- **L198** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L199** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L200** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L201** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L202** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L203** <code>  typename TransformOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L204** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L205** <code>ComputeType TensorTransformReduce(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduce`.
+  - CN: 开始或继续与 `TensorTransformReduce` 相关的签名/调用语法。
+- **L206** <code>  TensorView&lt;Element, Layout&gt; view,     /// View of the tensor to reduce over</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L207** <code>  ComputeType identity,                 /// Identity element of the reduction operation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L208** <code>  ReduceOp reduce,                      /// Reduces an accumulated value with a transformed element: f(ComputeType, ComputeType) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `f`.
+  - CN: 开始或继续与 `f` 相关的签名/调用语法。
+- **L209** <code>  TransformOp transform,                /// Transforms the tensor element to ComputeType: g(Element) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `g`.
+  - CN: 开始或继续与 `g` 相关的签名/调用语法。
+- **L210** <code>  ComputeType *workspace,               /// Device-side workspace for accumulating partial results. The reduced element is stored in workspace[0]</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L211** <code>  int workspace_size,                   /// Number of elements in workspace</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>  cudaStream_t stream = nullptr,        /// CUDA stream to launch into</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L213** <code>  bool copy_out = true                  /// If true, the value of workspace[0] is copied to host and returned. Otherwise, `identity` is returned.</code>
+  - EN: Assigns or initializes `copy_out` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `copy_out` 进行赋值或初始化。
+- **L214** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L215** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L216** <code>  int const kBlockSize = 128;</code>
+  - EN: Assigns or initializes `kBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kBlockSize` 进行赋值或初始化。
+- **L217** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L218** <code>  dim3 block(kBlockSize, 1);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L219** <code>  dim3 grid(workspace_size, 1);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L220** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L221** <code>  kernel::TensorTransformReducePartial&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L222** <code>    Element, Layout, ComputeType, ReduceOp, TransformOp, kBlockSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L223** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>    view, identity, reduce, transform, workspace</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L225** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L226** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L227** <code>  int const kFinalizeBlockSize = 32;</code>
+  - EN: Assigns or initializes `kFinalizeBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kFinalizeBlockSize` 进行赋值或初始化。
+- **L228** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L229** <code>  kernel::TensorTransformReduceFinalize&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L230** <code>    ComputeType, ReduceOp, kFinalizeBlockSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L231** <code>  &gt;&lt;&lt;&lt; dim3(1, 1), dim3(kFinalizeBlockSize, 1), 0, stream &gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `dim3`.
+  - CN: 开始或继续与 `dim3` 相关的签名/调用语法。
+- **L232** <code>    workspace, identity, workspace_size, reduce</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L233** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L234** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L235** <code>  cudaStreamSynchronize(stream);</code>
+  - EN: Declares function or method `cudaStreamSynchronize` without defining it here.
+  - CN: 声明函数或方法 `cudaStreamSynchronize`，但不在此处给出定义。
+- **L236** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L237** <code>  if (copy_out) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L238** <code>    cudaError_t result = cudaMemcpy(&amp;identity, workspace, sizeof(identity), cudaMemcpyDeviceToHost);</code>
+  - EN: Declares function or method `cudaMemcpy` without defining it here.
+  - CN: 声明函数或方法 `cudaMemcpy`，但不在此处给出定义。
+- **L239** <code>    if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L240** <code>      throw std::runtime_error(&quot;cudaMemcpy() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L241** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L242** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  return identity;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L245** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>/// Transform-reduce operation over the elements of two tensors, zipped together</code>
+  - EN: Comment that documents intent or context: "Transform-reduce operation over the elements of two tensors, zipped together".
+  - CN: 用于说明意图或上下文的注释："Transform-reduce operation over the elements of two tensors, zipped together"。
+- **L248** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L249** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L250** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L251** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L252** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L253** <code>  typename TransformOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L255** <code>ComputeType TensorTransformReduce(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduce`.
+  - CN: 开始或继续与 `TensorTransformReduce` 相关的签名/调用语法。
+- **L256** <code>  TensorView&lt;Element, Layout&gt; view_A,   /// View of the tensor to reduce over</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L257** <code>  TensorView&lt;Element, Layout&gt; view_B,   /// View of the tensor to reduce over</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L258** <code>  ComputeType identity,                 /// Identity element of the reduction operation</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L259** <code>  ReduceOp reduce,                      /// Reduces an accumulated value with a transformed element: f(ComputeType, ComputeType) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `f`.
+  - CN: 开始或继续与 `f` 相关的签名/调用语法。
+- **L260** <code>  TransformOp transform,                /// Transforms the tensor element to ComputeType: g(Element) =&gt; ComputeType</code>
+  - EN: Begins or continues the signature/call syntax involving `g`.
+  - CN: 开始或继续与 `g` 相关的签名/调用语法。
+- **L261** <code>  ComputeType *workspace,               /// Device-side workspace for accumulating partial results. The reduced element is stored in workspace[0]</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L262** <code>  int workspace_size,                   /// Number of elements in workspace</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L263** <code>  cudaStream_t stream = nullptr,        /// CUDA stream to launch into</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L264** <code>  bool copy_out = true                  /// If true, the value of workspace[0] is copied to host and returned. Otherwise, `identity` is returned.</code>
+  - EN: Assigns or initializes `copy_out` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `copy_out` 进行赋值或初始化。
+- **L265** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L266** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L267** <code>  if (view_A.extent() != view_B.extent()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L268** <code>    throw std::runtime_error(&quot;Extents must be equal.&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L269** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>  int const kBlockSize = 128;</code>
+  - EN: Assigns or initializes `kBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kBlockSize` 进行赋值或初始化。
+- **L272** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L273** <code>  dim3 block(kBlockSize, 1);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L274** <code>  dim3 grid(workspace_size, 1);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>  kernel::TensorTransformReducePartial&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L277** <code>    Element, Layout, ComputeType, ReduceOp, TransformOp, kBlockSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L278** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L279** <code>    view_A, view_B, identity, reduce, transform, workspace</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L280** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L281** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L282** <code>  int const kFinalizeBlockSize = 32;</code>
+  - EN: Assigns or initializes `kFinalizeBlockSize` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kFinalizeBlockSize` 进行赋值或初始化。
+- **L283** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L284** <code>  kernel::TensorTransformReduceFinalize&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L285** <code>    ComputeType, ReduceOp, kFinalizeBlockSize</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L286** <code>  &gt;&lt;&lt;&lt; dim3(1, 1), dim3(kFinalizeBlockSize, 1), 0, stream &gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `dim3`.
+  - CN: 开始或继续与 `dim3` 相关的签名/调用语法。
+- **L287** <code>    workspace, identity, workspace_size, reduce</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L288** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>  cudaStreamSynchronize(stream);</code>
+  - EN: Declares function or method `cudaStreamSynchronize` without defining it here.
+  - CN: 声明函数或方法 `cudaStreamSynchronize`，但不在此处给出定义。
+- **L291** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L292** <code>  if (copy_out) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L293** <code>    cudaError_t result = cudaMemcpy(&amp;identity, workspace, sizeof(identity), cudaMemcpyDeviceToHost);</code>
+  - EN: Declares function or method `cudaMemcpy` without defining it here.
+  - CN: 声明函数或方法 `cudaMemcpy`，但不在此处给出定义。
+- **L294** <code>    if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L295** <code>      throw std::runtime_error(&quot;cudaMemcpy() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L296** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L297** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L298** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L299** <code>  return identity;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L300** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L301** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L302** <code>/// Transform-reduce operation over the elements of a tensor. This helper allocates the device-side</code>
+  - EN: Comment that documents intent or context: "Transform-reduce operation over the elements of a tensor. This helper allocates the device-side".
+  - CN: 用于说明意图或上下文的注释："Transform-reduce operation over the elements of a tensor. This helper allocates the device-side"。
+- **L303** <code>/// workspace</code>
+  - EN: Comment that documents intent or context: "workspace".
+  - CN: 用于说明意图或上下文的注释："workspace"。
+- **L304** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L305** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L306** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L307** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L308** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L309** <code>  typename TransformOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L310** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L311** <code>ComputeType TensorTransformReduce(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduce`.
+  - CN: 开始或继续与 `TensorTransformReduce` 相关的签名/调用语法。
+- **L312** <code>  TensorView&lt;Element, Layout&gt; view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L313** <code>  ComputeType identity,            </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L314** <code>  ReduceOp reduce,                 </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L315** <code>  TransformOp transform,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L316** <code>  cudaStream_t stream = nullptr, </code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L317** <code>  int workspace_size = 0           </code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L318** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L319** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L320** <code>  // Optionally query for the SM count to size the workspace.</code>
+  - EN: Comment that documents intent or context: "Optionally query for the SM count to size the workspace.".
+  - CN: 用于说明意图或上下文的注释："Optionally query for the SM count to size the workspace."。
+- **L321** <code>  if (!workspace_size) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>    int device_idx = 0;</code>
+  - EN: Assigns or initializes `device_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_idx` 进行赋值或初始化。
+- **L324** <code>    cudaDeviceProp prop;</code>
+  - EN: Declares the symbol `prop` in the current scope.
+  - CN: 在当前作用域中声明符号 `prop`。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Declares function or method `cudaGetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDevice`，但不在此处给出定义。
+- **L327** <code>    if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L328** <code>      throw std::runtime_error(&quot;cudaGetDevice() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L329** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L331** <code>    result = cudaGetDeviceProperties(&amp;prop, device_idx);</code>
+  - EN: Declares function or method `cudaGetDeviceProperties` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDeviceProperties`，但不在此处给出定义。
+- **L332** <code>    if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L333** <code>      throw std::runtime_error(&quot;cudaGetDeviceProp() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L334** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L335** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L336** <code>    workspace_size = int(prop.multiProcessorCount);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L337** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>  DeviceAllocation&lt;ComputeType&gt; workspace(workspace_size);</code>
+  - EN: Declares function or method `workspace` without defining it here.
+  - CN: 声明函数或方法 `workspace`，但不在此处给出定义。
+- **L340** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L341** <code>  ComputeType output = TensorTransformReduce(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduce`.
+  - CN: 开始或继续与 `TensorTransformReduce` 相关的签名/调用语法。
+- **L342** <code>    view, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L343** <code>    identity, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L344** <code>    reduce, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L345** <code>    transform, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L346** <code>    workspace.get(), </code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L347** <code>    workspace_size, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L348** <code>    stream, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L349** <code>    true);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L350** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L351** <code>  return output;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L352** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L353** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L354** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L355** <code>/// Transform-reduce operation over the elements of a tensor. This helper allocates the device-side</code>
+  - EN: Comment that documents intent or context: "Transform-reduce operation over the elements of a tensor. This helper allocates the device-side".
+  - CN: 用于说明意图或上下文的注释："Transform-reduce operation over the elements of a tensor. This helper allocates the device-side"。
+- **L356** <code>/// workspace</code>
+  - EN: Comment that documents intent or context: "workspace".
+  - CN: 用于说明意图或上下文的注释："workspace"。
+- **L357** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L358** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L359** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L360** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L361** <code>  typename ReduceOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L362** <code>  typename TransformOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L363** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L364** <code>ComputeType TensorTransformReduce(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduce`.
+  - CN: 开始或继续与 `TensorTransformReduce` 相关的签名/调用语法。
+- **L365** <code>  TensorView&lt;Element, Layout&gt; view_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L366** <code>  TensorView&lt;Element, Layout&gt; view_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L367** <code>  ComputeType identity,            </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L368** <code>  ReduceOp reduce,                 </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L369** <code>  TransformOp transform,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L370** <code>  cudaStream_t stream = nullptr, </code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L371** <code>  int workspace_size = 0           </code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L372** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L373** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L374** <code>  // Optionally query for the SM count to size the workspace.</code>
+  - EN: Comment that documents intent or context: "Optionally query for the SM count to size the workspace.".
+  - CN: 用于说明意图或上下文的注释："Optionally query for the SM count to size the workspace."。
+- **L375** <code>  if (!workspace_size) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L376** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L377** <code>    int device_idx = 0;</code>
+  - EN: Assigns or initializes `device_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `device_idx` 进行赋值或初始化。
+- **L378** <code>    cudaDeviceProp prop;</code>
+  - EN: Declares the symbol `prop` in the current scope.
+  - CN: 在当前作用域中声明符号 `prop`。
+- **L379** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L380** <code>    cudaError_t result = cudaGetDevice(&amp;device_idx);</code>
+  - EN: Declares function or method `cudaGetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDevice`，但不在此处给出定义。
+- **L381** <code>    if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L382** <code>      throw std::runtime_error(&quot;cudaGetDevice() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L383** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L384** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L385** <code>    result = cudaGetDeviceProperties(&amp;prop, device_idx);</code>
+  - EN: Declares function or method `cudaGetDeviceProperties` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDeviceProperties`，但不在此处给出定义。
+- **L386** <code>    if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L387** <code>      throw std::runtime_error(&quot;cudaGetDeviceProp() failed&quot;);</code>
+  - EN: Raises an exception to signal an error or unsupported path.
+  - CN: 抛出异常以表示错误或不支持的路径。
+- **L388** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L389** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L390** <code>    workspace_size = int(prop.multiProcessorCount);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L391** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L392** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L393** <code>  DeviceAllocation&lt;ComputeType&gt; workspace(workspace_size);</code>
+  - EN: Declares function or method `workspace` without defining it here.
+  - CN: 声明函数或方法 `workspace`，但不在此处给出定义。
+- **L394** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L395** <code>  ComputeType output = TensorTransformReduce(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorTransformReduce`.
+  - CN: 开始或继续与 `TensorTransformReduce` 相关的签名/调用语法。
+- **L396** <code>    view_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L397** <code>    view_B, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L398** <code>    identity, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L399** <code>    reduce, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L400** <code>    transform, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L401** <code>    workspace.get(), </code>
+  - EN: Begins or continues the signature/call syntax involving `get`.
+  - CN: 开始或继续与 `get` 相关的签名/调用语法。
+- **L402** <code>    workspace_size, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L403** <code>    stream, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L404** <code>    true);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L405** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L406** <code>  return output;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L407** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L408** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L409** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L410** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L411** <code>/// Helper to compute the sum of the elements of a tensor</code>
+  - EN: Comment that documents intent or context: "Helper to compute the sum of the elements of a tensor".
+  - CN: 用于说明意图或上下文的注释："Helper to compute the sum of the elements of a tensor"。
+- **L412** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L413** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L414** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L415** <code>  typename ComputeType = Element</code>
+  - EN: Assigns or initializes `ComputeType` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ComputeType` 进行赋值或初始化。
+- **L416** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L417** <code>ComputeType TensorSum(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorSum`.
+  - CN: 开始或继续与 `TensorSum` 相关的签名/调用语法。
+- **L418** <code>  TensorView&lt;Element, Layout&gt; view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L419** <code>  ComputeType identity = ComputeType(),</code>
+  - EN: Begins or continues the signature/call syntax involving `ComputeType`.
+  - CN: 开始或继续与 `ComputeType` 相关的签名/调用语法。
+- **L420** <code>  cudaStream_t stream = nullptr,</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L421** <code>  int workspace_size = 0</code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L422** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L423** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L424** <code>  plus&lt;ComputeType&gt; reduce;</code>
+  - EN: Declares the symbol `reduce` in the current scope.
+  - CN: 在当前作用域中声明符号 `reduce`。
+- **L425** <code>  NumericConverter&lt;ComputeType, Element&gt; transform;</code>
+  - EN: Declares the symbol `transform` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform`。
+- **L426** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L427** <code>  return TensorTransformReduce(</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L428** <code>    view, identity, reduce, transform, stream, workspace_size);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L429** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L430** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L431** <code>/// Helper to compute the sum of the squares of the elements of a tensor</code>
+  - EN: Comment that documents intent or context: "Helper to compute the sum of the squares of the elements of a tensor".
+  - CN: 用于说明意图或上下文的注释："Helper to compute the sum of the squares of the elements of a tensor"。
+- **L432** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L433** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L434** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L435** <code>  typename ComputeType = Element</code>
+  - EN: Assigns or initializes `ComputeType` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ComputeType` 进行赋值或初始化。
+- **L436** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L437** <code>ComputeType TensorSumSq(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorSumSq`.
+  - CN: 开始或继续与 `TensorSumSq` 相关的签名/调用语法。
+- **L438** <code>  TensorView&lt;Element, Layout&gt; view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L439** <code>  ComputeType identity = ComputeType(),</code>
+  - EN: Begins or continues the signature/call syntax involving `ComputeType`.
+  - CN: 开始或继续与 `ComputeType` 相关的签名/调用语法。
+- **L440** <code>  cudaStream_t stream = nullptr,</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L441** <code>  int workspace_size = 0</code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L442** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L443** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L444** <code>  plus&lt;ComputeType&gt; reduce;</code>
+  - EN: Declares the symbol `reduce` in the current scope.
+  - CN: 在当前作用域中声明符号 `reduce`。
+- **L445** <code>  magnitude_squared&lt;Element, ComputeType&gt; transform;</code>
+  - EN: Declares the symbol `transform` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform`。
+- **L446** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L447** <code>  return TensorTransformReduce(</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L448** <code>    view, identity, reduce, transform, stream, workspace_size);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L449** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L450** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L451** <code>/// Helper to compute the norm of the elements of a tensor.</code>
+  - EN: Comment that documents intent or context: "Helper to compute the norm of the elements of a tensor.".
+  - CN: 用于说明意图或上下文的注释："Helper to compute the norm of the elements of a tensor."。
+- **L452** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L453** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L454** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L455** <code>  typename ComputeType = double</code>
+  - EN: Assigns or initializes `ComputeType` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ComputeType` 进行赋值或初始化。
+- **L456** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L457** <code>ComputeType TensorNorm(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorNorm`.
+  - CN: 开始或继续与 `TensorNorm` 相关的签名/调用语法。
+- **L458** <code>  TensorView&lt;Element, Layout&gt; view,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L459** <code>  ComputeType identity = ComputeType(),</code>
+  - EN: Begins or continues the signature/call syntax involving `ComputeType`.
+  - CN: 开始或继续与 `ComputeType` 相关的签名/调用语法。
+- **L460** <code>  cudaStream_t stream = nullptr,</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L461** <code>  int workspace_size = 0</code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L462** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L463** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L464** <code>  return std::sqrt(TensorSumSq(view, identity, stream, workspace_size));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L465** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L466** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L467** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L468** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L469** <code>/// Helper to compute the sum of the squares of the differences of two tensors</code>
+  - EN: Comment that documents intent or context: "Helper to compute the sum of the squares of the differences of two tensors".
+  - CN: 用于说明意图或上下文的注释："Helper to compute the sum of the squares of the differences of two tensors"。
+- **L470** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L471** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L472** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L473** <code>  typename ComputeType = double</code>
+  - EN: Assigns or initializes `ComputeType` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ComputeType` 进行赋值或初始化。
+- **L474** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L475** <code>ComputeType TensorSumSqDiff(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorSumSqDiff`.
+  - CN: 开始或继续与 `TensorSumSqDiff` 相关的签名/调用语法。
+- **L476** <code>  TensorView&lt;Element, Layout&gt; view_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L477** <code>  TensorView&lt;Element, Layout&gt; view_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L478** <code>  ComputeType identity = ComputeType(),</code>
+  - EN: Begins or continues the signature/call syntax involving `ComputeType`.
+  - CN: 开始或继续与 `ComputeType` 相关的签名/调用语法。
+- **L479** <code>  cudaStream_t stream = nullptr,</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L480** <code>  int workspace_size = 0</code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L481** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L482** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L483** <code>  plus&lt;ComputeType&gt; reduce;</code>
+  - EN: Declares the symbol `reduce` in the current scope.
+  - CN: 在当前作用域中声明符号 `reduce`。
+- **L484** <code>  magnitude_squared_difference&lt;Element, ComputeType&gt; transform;</code>
+  - EN: Declares the symbol `transform` in the current scope.
+  - CN: 在当前作用域中声明符号 `transform`。
+- **L485** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L486** <code>  return TensorTransformReduce(</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L487** <code>    view_A, view_B, identity, reduce, transform, stream, workspace_size);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L488** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L489** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L490** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L491** <code>/// Helper to compute the norm of the tensor computed as the difference of two tensors in memory</code>
+  - EN: Comment that documents intent or context: "Helper to compute the norm of the tensor computed as the difference of two tensors in memory".
+  - CN: 用于说明意图或上下文的注释："Helper to compute the norm of the tensor computed as the difference of two tensors in memory"。
+- **L492** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L493** <code>  typename Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L494** <code>  typename Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L495** <code>  typename ComputeType = double</code>
+  - EN: Assigns or initializes `ComputeType` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ComputeType` 进行赋值或初始化。
+- **L496** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L497** <code>ComputeType TensorNormDiff(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorNormDiff`.
+  - CN: 开始或继续与 `TensorNormDiff` 相关的签名/调用语法。
+- **L498** <code>  TensorView&lt;Element, Layout&gt; view_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L499** <code>  TensorView&lt;Element, Layout&gt; view_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L500** <code>  ComputeType identity = ComputeType(),</code>
+  - EN: Begins or continues the signature/call syntax involving `ComputeType`.
+  - CN: 开始或继续与 `ComputeType` 相关的签名/调用语法。
+- **L501** <code>  cudaStream_t stream = nullptr,</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L502** <code>  int workspace_size = 0</code>
+  - EN: Assigns or initializes `workspace_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `workspace_size` 进行赋值或初始化。
+- **L503** <code>) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L504** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L505** <code>  return std::sqrt(TensorSumSqDiff(view_A, view_B, identity, stream, workspace_size));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L506** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L508** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L509** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L510** <code>} // namespace device</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L511** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L512** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L513** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L514** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Reduction setup and result handling / 归约设置与结果处理
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cmath</code> — math routines / 数学函数
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/functional.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_conversion.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/device_memory.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/util/reference/detail/linear_to_coordinate.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块

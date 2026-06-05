@@ -1,0 +1,365 @@
+# copy.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/nvgpu/warp/copy.py`
+
+## Purpose / 作用
+- EN: Defines 13 classes (BaseOp, LdMatrix8x8x16bOp, LdMatrix8x8x16bTrait, LdMatrix8x16x8bOp, ... (+9 more)) in `CuTeDSL.cutlass.cute.nvgpu.warp.copy`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.nvgpu.warp.copy` 定义了 13 个类（BaseOp, LdMatrix8x8x16bOp, LdMatrix8x8x16bTrait, LdMatrix8x16x8bOp, ... (+9 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L13** `from typing import Any, Optional, Type` — **EN:** Imports Any, Optional, Type from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Type。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `from ..common import OpError` — **EN:** Imports OpError from `..common`. **CN:** 从 `..common` 导入 OpError。
+- **L19** `from ...core import _pack_shape` — **EN:** Imports _pack_shape from `...core`. **CN:** 从 `...core` 导入 _pack_shape。
+- **L20** `from ...typing import Numeric, Optional` — **EN:** Imports Numeric, Optional from `...typing`. **CN:** 从 `...typing` 导入 Numeric, Optional。
+- **L21** `from ...atom import CopyOp, Trait, make_atom` — **EN:** Imports CopyOp, Trait, make_atom from `...atom`. **CN:** 从 `...atom` 导入 CopyOp, Trait, make_atom。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L25** `class BaseOp(CopyOp):` — **EN:** Defines class `BaseOp` with bases CopyOp. **CN:** 定义类 `BaseOp`，其基类为 CopyOp。
+- **L26** `    """` — **EN:** Starts the docstring for the class `BaseOp`. **CN:** 开始说明 class `BaseOp` 的文档字符串。
+- **L27** `    Base class for warp-level matrix copy operations.` — **EN:** Continues the docstring for the class `BaseOp`. **CN:** 继续说明 class `BaseOp` 的文档字符串。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `    Provides shared validation and string formatting for warp load/store ops.` — **EN:** Continues the docstring for the class `BaseOp`. **CN:** 继续说明 class `BaseOp` 的文档字符串。
+- **L30** `    """` — **EN:** Ends the docstring for the class `BaseOp`. **CN:** 结束说明 class `BaseOp` 的文档字符串。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `    transpose: bool = False` — **EN:** Assigns a typed value to transpose. **CN:** 为 transpose 赋予带类型标注的值。
+- **L33** `    num_matrices: int = 1` — **EN:** Assigns a typed value to num_matrices. **CN:** 为 num_matrices 赋予带类型标注的值。
+- **L34** `    unpack_bits: Optional[int] = None` — **EN:** Assigns a typed value to unpack_bits. **CN:** 为 unpack_bits 赋予带类型标注的值。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L37** `        if not isinstance(self.transpose, bool):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.transpose, bool)`. **CN:** 开始一个由 `not isinstance(self.transpose, bool)` 控制的条件分支。
+- **L38** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L39** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `                "expects the 'transpose' Op parameter to be a bool instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L44** `        res = (` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L45** `            f"{self.__class__.__name__[:-2]} Copy Operation"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `            + f"\n  number of matrices = {self.num_matrices}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `        if self.transpose:` — **EN:** Starts a conditional branch guarded by `self.transpose`. **CN:** 开始一个由 `self.transpose` 控制的条件分支。
+- **L49** `            res += "\n  transposed"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L50** `        if self.unpack_bits is not None:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits is not None`. **CN:** 开始一个由 `self.unpack_bits is not None` 控制的条件分支。
+- **L51** `            res += f"\n  unpack {self.unpack_bits}b to 8b"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L52** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L56** `class LdMatrix8x8x16bOp(BaseOp):` — **EN:** Defines class `LdMatrix8x8x16bOp` with bases BaseOp. **CN:** 定义类 `LdMatrix8x8x16bOp`，其基类为 BaseOp。
+- **L57** `    """` — **EN:** Starts the docstring for the class `LdMatrix8x8x16bOp`. **CN:** 开始说明 class `LdMatrix8x8x16bOp` 的文档字符串。
+- **L58** `    8x8 \`\`ldmatrix\`\` Operation.` — **EN:** Continues the docstring for the class `LdMatrix8x8x16bOp`. **CN:** 继续说明 class `LdMatrix8x8x16bOp` 的文档字符串。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#warp-level-matrix-load-instruction-ldmatrix>\`__.` — **EN:** Continues the docstring for the class `LdMatrix8x8x16bOp`. **CN:** 继续说明 class `LdMatrix8x8x16bOp` 的文档字符串。
+- **L61** `    This operation corresponds to the \`\`.m8n8\`\` qualifier.` — **EN:** Continues the docstring for the class `LdMatrix8x8x16bOp`. **CN:** 继续说明 class `LdMatrix8x8x16bOp` 的文档字符串。
+- **L62** `    """` — **EN:** Ends the docstring for the class `LdMatrix8x8x16bOp`. **CN:** 结束说明 class `LdMatrix8x8x16bOp` 的文档字符串。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L65** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L66** `        if self.num_matrices not in [1, 2, 4]:` — **EN:** Starts a conditional branch guarded by `self.num_matrices not in [1, 2, 4]`. **CN:** 开始一个由 `self.num_matrices not in [1, 2, 4]` 控制的条件分支。
+- **L67** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L68** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `                "expects the 'num_matrices' Op parameter to be one of [1,2,4]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `        if self.unpack_bits is not None:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits is not None`. **CN:** 开始一个由 `self.unpack_bits is not None` 控制的条件分支。
+- **L72** `            raise OpError(self, "Op doesn't support unpacking")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L75** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L78** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L79** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L80** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L81** `    ) -> "LdMatrix8x8x16bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L82** `        mode = _pack_shape((8, 8), loc=loc, ip=ip)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L83** `        ty = _cute_nvgpu_ir.CopyAtomLdsmType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L84** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `            mode.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `            _cute_nvgpu_ir.LdsmSzPattern.u16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `            self.num_matrices,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `            ir.UnitAttr.get() if self.transpose else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `        return LdMatrix8x8x16bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `class LdMatrix8x8x16bTrait(Trait):` — **EN:** Defines class `LdMatrix8x8x16bTrait` with bases Trait. **CN:** 定义类 `LdMatrix8x8x16bTrait`，其基类为 Trait。
+- **L94** `    """Trait generated by \`\`LdMatrix8x8x16bOp\`\`."""` — **EN:** Docstring line documenting the class `LdMatrix8x8x16bTrait`. **CN:** 文档字符串行，用于说明 class `LdMatrix8x8x16bTrait`。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L100** `class LdMatrix8x16x8bOp(BaseOp):` — **EN:** Defines class `LdMatrix8x16x8bOp` with bases BaseOp. **CN:** 定义类 `LdMatrix8x16x8bOp`，其基类为 BaseOp。
+- **L101** `    """` — **EN:** Starts the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 开始说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L102** `    8x16 \`\`ldmatrix\`\` Operation with unpacking to 8b container.` — **EN:** Continues the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 继续说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L103** `    Packed source container is 16x4b elements with 64b padding` — **EN:** Continues the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 继续说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L104** `    or 16x6b elements with 32b padding (total 128b per 16 elements)` — **EN:** Continues the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 继续说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#warp-level-matrix-load-instruction-ldmatrix>\`__.` — **EN:** Continues the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 继续说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L107** `    This operation corresponds to the \`\`.m8n16\`\` and the \`\`.b4x16_p64\`\`, \`\`.b6x16_p32\`\` qualifiers.` — **EN:** Continues the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 继续说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L108** `    """` — **EN:** Ends the docstring for the class `LdMatrix8x16x8bOp`. **CN:** 结束说明 class `LdMatrix8x16x8bOp` 的文档字符串。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L111** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L112** `        if self.transpose:` — **EN:** Starts a conditional branch guarded by `self.transpose`. **CN:** 开始一个由 `self.transpose` 控制的条件分支。
+- **L113** `            raise OpError(self, "Op doesn't support transpose")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L114** `        if self.num_matrices not in [1, 2, 4]:` — **EN:** Starts a conditional branch guarded by `self.num_matrices not in [1, 2, 4]`. **CN:** 开始一个由 `self.num_matrices not in [1, 2, 4]` 控制的条件分支。
+- **L115** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L116** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `                "expects the 'num_matrices' Op parameter to be one of [1,2,4]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `        if self.unpack_bits not in [None, 4, 6]:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits not in [None, 4, 6]`. **CN:** 开始一个由 `self.unpack_bits not in [None, 4, 6]` 控制的条件分支。
+- **L120** `            raise OpError(self, "Op unpack bits must be 4 or 6 or None")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L123** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L128** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L129** `    ) -> "LdMatrix8x16x8bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L130** `        # LdMatrix8x16x8b without unpacking doesn't exist` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L131** `        # but is equivalent to LdMatrix8x8x16b` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L132** `        mode_n = 8 if self.unpack_bits is None else 16` — **EN:** Assigns a value to mode_n. **CN:** 将一个值赋给 mode_n。
+- **L133** `        mode = _pack_shape((8, mode_n), loc=loc, ip=ip)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L134** `        sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u16` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L135** `        if self.unpack_bits == 4:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits == 4`. **CN:** 开始一个由 `self.unpack_bits == 4` 控制的条件分支。
+- **L136** `            sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u4x16p64to8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L137** `        elif self.unpack_bits == 6:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L138** `            sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u6x16p32to8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L139** `        ty = _cute_nvgpu_ir.CopyAtomLdsmType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L140** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `            mode.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            sz_pattern,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `            self.num_matrices,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `            None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `        return LdMatrix8x16x8bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `class LdMatrix8x16x8bTrait(Trait):` — **EN:** Defines class `LdMatrix8x16x8bTrait` with bases Trait. **CN:** 定义类 `LdMatrix8x16x8bTrait`，其基类为 Trait。
+- **L150** `    """Trait generated by \`\`LdMatrix8x16x8bOp\`\`."""` — **EN:** Docstring line documenting the class `LdMatrix8x16x8bTrait`. **CN:** 文档字符串行，用于说明 class `LdMatrix8x16x8bTrait`。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L156** `class LdMatrix16x8x8bOp(BaseOp):` — **EN:** Defines class `LdMatrix16x8x8bOp` with bases BaseOp. **CN:** 定义类 `LdMatrix16x8x8bOp`，其基类为 BaseOp。
+- **L157** `    """` — **EN:** Starts the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 开始说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L158** `    16x8 8b \`\`ldmatrix\`\` Operation with transpose` — **EN:** Continues the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 继续说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    There is no direct PTX correspondance to this Op.` — **EN:** Continues the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 继续说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L161** `    This actually lowers to ldmatrix with the \`\`.m16n16\`\` qualifier and` — **EN:** Continues the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 继续说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L162** `    additional address and value permutations to match stmatrix.m16n8.trans.` — **EN:** Continues the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 继续说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L163** `    Useful for vectorizing with Ampere-style 8x8 matrix thread-value layouts` — **EN:** Continues the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 继续说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L164** `    """` — **EN:** Ends the docstring for the class `LdMatrix16x8x8bOp`. **CN:** 结束说明 class `LdMatrix16x8x8bOp` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L167** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L168** `        if not self.transpose:` — **EN:** Starts a conditional branch guarded by `not self.transpose`. **CN:** 开始一个由 `not self.transpose` 控制的条件分支。
+- **L169** `            raise OpError(self, "Op only supports transpose")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L170** `        if self.num_matrices not in [2, 4]:` — **EN:** Starts a conditional branch guarded by `self.num_matrices not in [2, 4]`. **CN:** 开始一个由 `self.num_matrices not in [2, 4]` 控制的条件分支。
+- **L171** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L172** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `                "expects the 'num_matrices' Op parameter to be one of [2,4]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `        if self.unpack_bits not in [None, 4, 6]:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits not in [None, 4, 6]`. **CN:** 开始一个由 `self.unpack_bits not in [None, 4, 6]` 控制的条件分支。
+- **L176** `            raise OpError(self, "Op unpack bits must be 4 or 6 or None")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L179** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L180** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L182** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L183** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L184** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `    ) -> "LdMatrix16x8x8bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L186** `        mode = _pack_shape((16, 8), loc=loc, ip=ip)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L187** `        sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L188** `        if self.unpack_bits == 4:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits == 4`. **CN:** 开始一个由 `self.unpack_bits == 4` 控制的条件分支。
+- **L189** `            sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u4x16p64to8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L190** `        elif self.unpack_bits == 6:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L191** `            sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u6x16p32to8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L192** `        ty = _cute_nvgpu_ir.CopyAtomLdsmType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L193** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `            mode.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `            sz_pattern,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `            self.num_matrices,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `            ir.UnitAttr.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `        return LdMatrix16x8x8bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `class LdMatrix16x8x8bTrait(Trait):` — **EN:** Defines class `LdMatrix16x8x8bTrait` with bases Trait. **CN:** 定义类 `LdMatrix16x8x8bTrait`，其基类为 Trait。
+- **L203** `    """Trait generated by \`\`LdMatrix16x8x8bOp\`\`."""` — **EN:** Docstring line documenting the class `LdMatrix16x8x8bTrait`. **CN:** 文档字符串行，用于说明 class `LdMatrix16x8x8bTrait`。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L209** `class LdMatrix16x16x8bOp(BaseOp):` — **EN:** Defines class `LdMatrix16x16x8bOp` with bases BaseOp. **CN:** 定义类 `LdMatrix16x16x8bOp`，其基类为 BaseOp。
+- **L210** `    """` — **EN:** Starts the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 开始说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L211** `    16x16 \`\`ldmatrix\`\` Operation with transpose and optional unpacking to 8b container.` — **EN:** Continues the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 继续说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L212** `    Packed source container is 16x4b elements with 64b padding` — **EN:** Continues the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 继续说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L213** `    or 16x6b elements with 32b padding (total 128b per 16 elements)` — **EN:** Continues the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 继续说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#warp-level-matrix-load-instruction-ldmatrix>\`__.` — **EN:** Continues the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 继续说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L216** `    This operation corresponds to the \`\`.m16n16\`\` and the \`\`.b4x16_p64\`\`,\`\`.b6x16_p32\`\`,\`\`.b8\`\` qualifiers.` — **EN:** Continues the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 继续说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L217** `    """` — **EN:** Ends the docstring for the class `LdMatrix16x16x8bOp`. **CN:** 结束说明 class `LdMatrix16x16x8bOp` 的文档字符串。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L220** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L221** `        if not self.transpose:` — **EN:** Starts a conditional branch guarded by `not self.transpose`. **CN:** 开始一个由 `not self.transpose` 控制的条件分支。
+- **L222** `            raise OpError(self, "Op only supports transpose")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L223** `        if self.num_matrices not in [1, 2]:` — **EN:** Starts a conditional branch guarded by `self.num_matrices not in [1, 2]`. **CN:** 开始一个由 `self.num_matrices not in [1, 2]` 控制的条件分支。
+- **L224** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L225** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `                "expects the 'num_matrices' Op parameter to be one of [1,2]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `        if self.unpack_bits not in [None, 4, 6]:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits not in [None, 4, 6]`. **CN:** 开始一个由 `self.unpack_bits not in [None, 4, 6]` 控制的条件分支。
+- **L229** `            raise OpError(self, "Op unpack bits must be 4 or 6 or None")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L232** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L233** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L234** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L235** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L236** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L237** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `    ) -> "LdMatrix16x16x8bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L239** `        mode = _pack_shape((16, 16), loc=loc, ip=ip)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L240** `        sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L241** `        if self.unpack_bits == 4:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits == 4`. **CN:** 开始一个由 `self.unpack_bits == 4` 控制的条件分支。
+- **L242** `            sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u4x16p64to8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L243** `        elif self.unpack_bits == 6:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L244** `            sz_pattern = _cute_nvgpu_ir.LdsmSzPattern.u6x16p32to8` — **EN:** Assigns a value to sz_pattern. **CN:** 将一个值赋给 sz_pattern。
+- **L245** `        ty = _cute_nvgpu_ir.CopyAtomLdsmType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L246** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            mode.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `            sz_pattern,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `            self.num_matrices,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `            ir.UnitAttr.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `        return LdMatrix16x16x8bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `class LdMatrix16x16x8bTrait(Trait):` — **EN:** Defines class `LdMatrix16x16x8bTrait` with bases Trait. **CN:** 定义类 `LdMatrix16x16x8bTrait`，其基类为 Trait。
+- **L256** `    """Trait generated by \`\`LdMatrix16x16x8bOp\`\`."""` — **EN:** Docstring line documenting the class `LdMatrix16x16x8bTrait`. **CN:** 文档字符串行，用于说明 class `LdMatrix16x16x8bTrait`。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L261** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L262** `class StMatrix8x8x16bOp(BaseOp):` — **EN:** Defines class `StMatrix8x8x16bOp` with bases BaseOp. **CN:** 定义类 `StMatrix8x8x16bOp`，其基类为 BaseOp。
+- **L263** `    """` — **EN:** Starts the docstring for the class `StMatrix8x8x16bOp`. **CN:** 开始说明 class `StMatrix8x8x16bOp` 的文档字符串。
+- **L264** `    8x8 \`\`stmatrix\`\` Operation.` — **EN:** Continues the docstring for the class `StMatrix8x8x16bOp`. **CN:** 继续说明 class `StMatrix8x8x16bOp` 的文档字符串。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#warp-level-matrix-instructions-stmatrix>\`__.` — **EN:** Continues the docstring for the class `StMatrix8x8x16bOp`. **CN:** 继续说明 class `StMatrix8x8x16bOp` 的文档字符串。
+- **L267** `    This operation corresponds to the \`\`m8n8\`\` qualifier.` — **EN:** Continues the docstring for the class `StMatrix8x8x16bOp`. **CN:** 继续说明 class `StMatrix8x8x16bOp` 的文档字符串。
+- **L268** `    """` — **EN:** Ends the docstring for the class `StMatrix8x8x16bOp`. **CN:** 结束说明 class `StMatrix8x8x16bOp` 的文档字符串。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L271** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L272** `        if self.num_matrices not in [1, 2, 4]:` — **EN:** Starts a conditional branch guarded by `self.num_matrices not in [1, 2, 4]`. **CN:** 开始一个由 `self.num_matrices not in [1, 2, 4]` 控制的条件分支。
+- **L273** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L274** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `                "expects the 'num_matrices' Op parameter to be one of [1,2,4]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `        if self.unpack_bits is not None:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits is not None`. **CN:** 开始一个由 `self.unpack_bits is not None` 控制的条件分支。
+- **L278** `            raise OpError(self, "Op doesn't support unpacking")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L281** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L282** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L283** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L284** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L285** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L286** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L287** `    ) -> "StMatrix8x8x16bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L288** `        mode = _pack_shape((8, 8), loc=loc, ip=ip)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L289** `        ty = _cute_nvgpu_ir.CopyAtomStsmType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L290** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `            mode.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `            self.num_matrices,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `            ir.UnitAttr.get() if self.transpose else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `        return StMatrix8x8x16bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `class StMatrix8x8x16bTrait(Trait):` — **EN:** Defines class `StMatrix8x8x16bTrait` with bases Trait. **CN:** 定义类 `StMatrix8x8x16bTrait`，其基类为 Trait。
+- **L299** `    """Trait generated by \`\`StMatrix8x8x16bOp\`\`."""` — **EN:** Docstring line documenting the class `StMatrix8x8x16bTrait`. **CN:** 文档字符串行，用于说明 class `StMatrix8x8x16bTrait`。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L305** `class StMatrix16x8x8bOp(BaseOp):` — **EN:** Defines class `StMatrix16x8x8bOp` with bases BaseOp. **CN:** 定义类 `StMatrix16x8x8bOp`，其基类为 BaseOp。
+- **L306** `    """` — **EN:** Starts the docstring for the class `StMatrix16x8x8bOp`. **CN:** 开始说明 class `StMatrix16x8x8bOp` 的文档字符串。
+- **L307** `    16x8 \`\`stmatrix\`\` Operation.` — **EN:** Continues the docstring for the class `StMatrix16x8x8bOp`. **CN:** 继续说明 class `StMatrix16x8x8bOp` 的文档字符串。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#warp-level-matrix-instructions-stmatrix>\`__.` — **EN:** Continues the docstring for the class `StMatrix16x8x8bOp`. **CN:** 继续说明 class `StMatrix16x8x8bOp` 的文档字符串。
+- **L310** `    This operation corresponds to the \`\`m16n8\`\` qualifier.` — **EN:** Continues the docstring for the class `StMatrix16x8x8bOp`. **CN:** 继续说明 class `StMatrix16x8x8bOp` 的文档字符串。
+- **L311** `    """` — **EN:** Ends the docstring for the class `StMatrix16x8x8bOp`. **CN:** 结束说明 class `StMatrix16x8x8bOp` 的文档字符串。
+- **L312** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L313** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L314** `        super().__post_init__()` — **EN:** Invokes `super().__post_init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__post_init__`。
+- **L315** `        if not self.transpose:` — **EN:** Starts a conditional branch guarded by `not self.transpose`. **CN:** 开始一个由 `not self.transpose` 控制的条件分支。
+- **L316** `            raise OpError(self, "Op only supports transpose")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L317** `        if self.num_matrices not in [1, 2, 4]:` — **EN:** Starts a conditional branch guarded by `self.num_matrices not in [1, 2, 4]`. **CN:** 开始一个由 `self.num_matrices not in [1, 2, 4]` 控制的条件分支。
+- **L318** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L319** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `                "expects the 'num_matrices' Op parameter to be one of [1,2,4]",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `        if self.unpack_bits is not None:` — **EN:** Starts a conditional branch guarded by `self.unpack_bits is not None`. **CN:** 开始一个由 `self.unpack_bits is not None` 控制的条件分支。
+- **L323** `            raise OpError(self, "Op doesn't support unpacking")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L326** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L327** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L328** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L329** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L330** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L331** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L332** `    ) -> "StMatrix16x8x8bTrait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L333** `        mode = _pack_shape((16, 8), loc=loc, ip=ip)` — **EN:** Assigns a value to mode. **CN:** 将一个值赋给 mode。
+- **L334** `        ty = _cute_nvgpu_ir.CopyAtomStsmType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L335** `            copy_internal_type.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `            mode.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `            self.num_matrices,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `            ir.UnitAttr.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `        return StMatrix16x8x8bTrait(make_atom(ty, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `class StMatrix16x8x8bTrait(Trait):` — **EN:** Defines class `StMatrix16x8x8bTrait` with bases Trait. **CN:** 定义类 `StMatrix16x8x8bTrait`，其基类为 Trait。
+- **L344** `    """Trait generated by \`\`StMatrix16x8x8bOp\`\`."""` — **EN:** Docstring line documenting the class `StMatrix16x8x8bTrait`. **CN:** 文档字符串行，用于说明 class `StMatrix16x8x8bTrait`。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.nvgpu.warp.copy`. CN: 模块名为 `CuTeDSL.cutlass.cute.nvgpu.warp.copy`。
+- EN: Top-level classes: BaseOp, LdMatrix8x8x16bOp, LdMatrix8x8x16bTrait, LdMatrix8x16x8bOp, LdMatrix8x16x8bTrait, LdMatrix16x8x8bOp, LdMatrix16x8x8bTrait, LdMatrix16x16x8bOp, LdMatrix16x16x8bTrait, StMatrix8x8x16bOp, StMatrix8x8x16bTrait, StMatrix16x8x8bOp, ... (+1 more) CN: 顶层类包括：BaseOp, LdMatrix8x8x16bOp, LdMatrix8x8x16bTrait, LdMatrix8x16x8bOp, LdMatrix8x16x8bTrait, LdMatrix16x8x8bOp, LdMatrix16x8x8bTrait, LdMatrix16x16x8bOp, LdMatrix16x16x8bTrait, StMatrix8x8x16bOp, StMatrix8x8x16bTrait, StMatrix16x8x8bOp, ... (+1 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir:ir, ..common:OpError, ...core:_pack_shape, ...typing:Numeric,Optional, ...atom:CopyOp,Trait,make_atom CN: 内部依赖：cutlass._mlir.dialects.cute_nvgpu, cutlass._mlir:ir, ..common:OpError, ...core:_pack_shape, ...typing:Numeric,Optional, ...atom:CopyOp,Trait,make_atom
+- EN: External or standard-library dependencies: dataclasses:dataclass, typing:Any,Optional,Type CN: 外部或标准库依赖：dataclasses:dataclass, typing:Any,Optional,Type

@@ -1,0 +1,1022 @@
+# core_io.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/core_io.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Helpers for printing cutlass/core objects" and defines related CUTLASS facilities in `include/cutlass/core_io.h`.
+- CN: 该头文件以注释摘要“Helpers for printing cutlass/core objects”引入，并在 `include/cutlass/core_io.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Helpers for printing cutlass/core objects</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L34**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>#include &lt;iostream&gt;</code>
+  - EN: Includes <iostream> so this file can use declarations from that dependency.
+  - CN: 包含 <iostream>，以便本文件使用该依赖中的声明。
+- **L37**: <code>#include &lt;typeinfo&gt;</code>
+  - EN: Includes <typeinfo> so this file can use declarations from that dependency.
+  - CN: 包含 <typeinfo>，以便本文件使用该依赖中的声明。
+- **L38**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L39**: <code>#include &quot;cutlass/array.h&quot;</code>
+  - EN: Includes "cutlass/array.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/array.h"，以便本文件使用该依赖中的声明。
+- **L40**: <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes "cutlass/coord.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/coord.h"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/matrix.h&quot;</code>
+  - EN: Includes "cutlass/matrix.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/matrix.h"，以便本文件使用该依赖中的声明。
+- **L43**: <code>#include &quot;cutlass/quaternion.h&quot;</code>
+  - EN: Includes "cutlass/quaternion.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/quaternion.h"，以便本文件使用该依赖中的声明。
+- **L44**: <code>#include &quot;cutlass/matrix_shape.h&quot;</code>
+  - EN: Includes "cutlass/matrix_shape.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/matrix_shape.h"，以便本文件使用该依赖中的声明。
+- **L45**: <code>#include &quot;cutlass/layout/pitch_linear.h&quot;</code>
+  - EN: Includes "cutlass/layout/pitch_linear.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/layout/pitch_linear.h"，以便本文件使用该依赖中的声明。
+- **L46**: <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes "cutlass/tensor_view.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/tensor_view.h"，以便本文件使用该依赖中的声明。
+- **L47**: <code>#include &quot;cutlass/gemm/gemm_enumerated_types.h&quot;</code>
+  - EN: Includes "cutlass/gemm/gemm_enumerated_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/gemm/gemm_enumerated_types.h"，以便本文件使用该依赖中的声明。
+- **L48**: <code>#include &quot;cutlass/conv/convolution.h&quot;</code>
+  - EN: Includes "cutlass/conv/convolution.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/conv/convolution.h"，以便本文件使用该依赖中的声明。
+- **L49**: <code>#include &quot;cutlass/conv/conv2d_problem_size.h&quot;</code>
+  - EN: Includes "cutlass/conv/conv2d_problem_size.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/conv/conv2d_problem_size.h"，以便本文件使用该依赖中的声明。
+- **L50**: <code>#include &quot;cutlass/conv/conv3d_problem_size.h&quot;</code>
+  - EN: Includes "cutlass/conv/conv3d_problem_size.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/conv/conv3d_problem_size.h"，以便本文件使用该依赖中的声明。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>/// Output operator for CUDA built-in dim3 type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L55**: <code>inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, dim3 d) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L56**: <code>  return out &lt;&lt; d.x &lt;&lt; &quot;, &quot; &lt;&lt; d.y &lt;&lt; &quot;, &quot; &lt;&lt; d.z;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L57**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L58**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L59**: <code>/// Output operator for CUDA built-in error type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L60**: <code>inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, cudaError_t error) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L61**: <code>  return out &lt;&lt; cudaGetErrorString(error);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L62**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L67**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L68**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L69**: <code>//                    stream operators for cutlass namespace                                     //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L70**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L71**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L72**: <code>template &lt;typename Element, int Rank&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L73**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L74**: <code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, Array&lt;Element, Rank&gt; const&amp; v) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L75**: <code>  for (int i = 0; i &lt; Rank; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L76**: <code>    out &lt;&lt; (i ? &quot;, &quot; : &quot;&quot;) &lt;&lt; v[i];</code>
+  - EN: Declares the callable or operator `out`.
+  - CN: 声明可调用对象或运算符 `out`。
+- **L77**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L78**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L79**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>template &lt;int Rank&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L82**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L83**: <code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, Coord&lt;Rank&gt; const&amp; coord) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L84**: <code>  for (int i = 0; i &lt; Rank; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L85**: <code>    out &lt;&lt; (i ? &quot;, &quot; : &quot;&quot;) &lt;&lt; coord[i];</code>
+  - EN: Declares the callable or operator `out`.
+  - CN: 声明可调用对象或运算符 `out`。
+- **L86**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L87**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L88**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L89**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L90**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L91**: <code>std::istream &amp; operator&gt;&gt;(std::istream &amp;stream, half_t &amp;x) {</code>
+  - EN: Starts the definition body for `operator>>`.
+  - CN: 开始 `operator>>` 的定义体。
+- **L92**: <code>  float tmp;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L93**: <code>  stream &gt;&gt; tmp;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L94**: <code>  x = static_cast&lt;cutlass::half_t&gt;(tmp);</code>
+  - EN: Declares the callable or operator `half_t`.
+  - CN: 声明可调用对象或运算符 `half_t`。
+- **L95**: <code>  return stream;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L96**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L97**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L98**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L99**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, half_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L100**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L101**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L104**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, bfloat16_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L105**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L106**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L107**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L108**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L109**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, tfloat32_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L110**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L111**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L112**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L114**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L115**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, float_e2m1_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L116**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L117**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L118**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L119**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L120**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, detail::float_e2m1_unpacksmem_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L121**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L122**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L123**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L124**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L125**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, float_e3m2_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L126**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L127**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L128**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L129**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L130**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, float_e2m3_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L131**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L132**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L133**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L134**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L135**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, detail::float_e3m2_unpacksmem_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L136**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L137**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L138**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L139**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L140**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, detail::float_e2m3_unpacksmem_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L141**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L142**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L143**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L144**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L145**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, float_ue8m0_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L146**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L147**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L148**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L149**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L150**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, float_ue4m3_t const &amp;x) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L151**: <code>  return out &lt;&lt; float(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L152**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L153**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L154**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L155**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L156**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L157**: <code>/// Helper to enable formatted printing of CUTLASS scalar types to an ostream</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L158**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L159**: <code>struct ScalarIO {</code>
+  - EN: Declares or defines the struct `ScalarIO`.
+  - CN: 声明或定义 struct `ScalarIO`。
+- **L160**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L161**: <code>  /// Value to print</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L162**: <code>  T value;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L163**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L164**: <code>  /// Default ctor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L165**: <code>  ScalarIO() { }</code>
+  - EN: Starts the definition body for `ScalarIO`.
+  - CN: 开始 `ScalarIO` 的定义体。
+- **L166**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L167**: <code>  /// Constructs from a value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L168**: <code>  ScalarIO(T value): value(value) {}</code>
+  - EN: Starts the definition body for `ScalarIO`.
+  - CN: 开始 `ScalarIO` 的定义体。
+- **L169**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L170**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L171**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L172**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L173**: <code>/// Default printing to ostream</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L174**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L175**: <code>inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, ScalarIO&lt;T&gt; const &amp;scalar) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L176**: <code>  return out &lt;&lt; scalar.value;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L177**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L178**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L179**: <code>/// Printing to ostream of int8_t as integer rather than character</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L180**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L181**: <code>inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, ScalarIO&lt;int8_t&gt; const &amp;scalar) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L182**: <code>  return out &lt;&lt; int(scalar.value);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L183**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L184**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L185**: <code>/// Printing to ostream of uint8_t as integer rather than character</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L186**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L187**: <code>inline std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, ScalarIO&lt;uint8_t&gt; const &amp;scalar) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L188**: <code>  return out &lt;&lt; unsigned(scalar.value);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L189**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L190**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L191**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L192**: <code>/// Default printing to ostream for MatrixShape</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L193**: <code>template &lt;int Row, int Column&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L194**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L195**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, MatrixShape&lt;Row, Column&gt; const &amp;matrix_shape) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L196**: <code>  out &lt;&lt; &quot;cutlass::MatrixShape::(kRow, kColumn) {&quot;</code>
+  - EN: Starts the definition body for `MatrixShape`.
+  - CN: 开始 `MatrixShape` 的定义体。
+- **L197**: <code>    &lt;&lt; cutlass::MatrixShape&lt;Row,Column&gt;::kRow &lt;&lt;&quot;,&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L198**: <code>    &lt;&lt; cutlass::MatrixShape&lt;Row,Column&gt;::kColumn &lt;&lt;&quot;}&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L199**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L200**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L201**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L202**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L203**: <code>/// Prints matrix to ostream</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L204**: <code>template &lt;typename Element, int Rows, int Columns&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L205**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, Matrix&lt;Element, Rows, Columns&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L206**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L207**: <code>  for (int i = 0; i &lt; Rows; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L208**: <code>    for (int j = 0; j &lt; Columns; ++j) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L209**: <code>      ScalarIO&lt;Element&gt; element(rhs.at(i, j));</code>
+  - EN: Declares the callable or operator `element`.
+  - CN: 声明可调用对象或运算符 `element`。
+- **L210**: <code>      out &lt;&lt; (j ? &quot;, &quot; : &quot;&quot;) &lt;&lt; element;</code>
+  - EN: Declares the callable or operator `out`.
+  - CN: 声明可调用对象或运算符 `out`。
+- **L211**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L212**: <code>    out &lt;&lt; &quot;\\n&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L213**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L214**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L215**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L216**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L217**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L218**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L219**: <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, Quaternion&lt;T&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L220**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L221**: <code>  out &lt;&lt; ScalarIO&lt;T&gt;(rhs.w()) &lt;&lt; &quot; &quot;;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L222**: <code>  if (rhs.x() &gt;= 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L223**: <code>    out &lt;&lt; &quot;+&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L224**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L225**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L226**: <code>  out &lt;&lt; ScalarIO&lt;T&gt;(rhs.x()) &lt;&lt; &quot;*i &quot;;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L227**: <code>  if (rhs.y() &gt;= 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L228**: <code>    out &lt;&lt; &quot;+&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L229**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L230**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L231**: <code>  out &lt;&lt; ScalarIO&lt;T&gt;(rhs.y()) &lt;&lt; &quot;*j &quot;;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L232**: <code>  if (rhs.z() &gt;= 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L233**: <code>    out &lt;&lt; &quot;+&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L234**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L235**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L236**: <code>  out &lt;&lt; ScalarIO&lt;T&gt;(rhs.z()) &lt;&lt; &quot;*k&quot;;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L237**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L238**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L239**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L240**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L241**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L242**: <code>//                         stream operators for cutlass::gemm namespace                          //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L243**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L244**: <code>namespace gemm {</code>
+  - EN: Opens namespace `gemm` to scope the following declarations.
+  - CN: 打开命名空间 `gemm`，为后续声明提供作用域。
+- **L245**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L246**: <code>/// Default printing to ostream for GemmShape</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L247**: <code>template &lt;int M, int N, int K&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L248**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L249**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, GemmShape&lt;M,N,K&gt; const &amp;gemm_shape) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L250**: <code>  out &lt;&lt; &quot;cutlass::gemm::GemmShape::(kM, kN, kK) {&quot;</code>
+  - EN: Starts the definition body for `GemmShape`.
+  - CN: 开始 `GemmShape` 的定义体。
+- **L251**: <code>    &lt;&lt; cutlass::gemm::GemmShape&lt;M,N,K&gt;::kM &lt;&lt;&quot;,&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L252**: <code>    &lt;&lt; cutlass::gemm::GemmShape&lt;M,N,K&gt;::kN &lt;&lt;&quot;,&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L253**: <code>    &lt;&lt; cutlass::gemm::GemmShape&lt;M,N,K&gt;::kK &lt;&lt; &quot;}&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L254**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L255**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L256**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L257**: <code>/// Default printing to ostream for GemmCoord</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L258**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L259**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, GemmCoord const &amp;gemm_coord) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L260**: <code>  out &lt;&lt; &quot;cutlass::gemm::GemmCoord {&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L261**: <code>    &lt;&lt; gemm_coord.m() &lt;&lt;&quot;,&quot;</code>
+  - EN: Provides part of the signature or implementation for `m`.
+  - CN: 提供 `m` 的签名或实现的一部分。
+- **L262**: <code>    &lt;&lt; gemm_coord.n() &lt;&lt;&quot;,&quot;</code>
+  - EN: Provides part of the signature or implementation for `n`.
+  - CN: 提供 `n` 的签名或实现的一部分。
+- **L263**: <code>    &lt;&lt; gemm_coord.k() &lt;&lt; &quot;}&quot;;</code>
+  - EN: Declares the callable or operator `k`.
+  - CN: 声明可调用对象或运算符 `k`。
+- **L264**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L265**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L266**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L267**: <code>} //namespace gemm</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L268**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L269**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L270**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L271**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L272**: <code>//                       stream operators for cutlass namespace                          //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L273**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L274**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L275**: <code>/// Default printing to ostream for PitchLinearShape</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L276**: <code>template &lt; int Contiguous, int Strided&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L277**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L278**: <code>std::ostream &amp; operator&lt;&lt;(std::ostream &amp;out, PitchLinearShape&lt;Contiguous, Strided&gt; const &amp;pitch_linear_shape) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L279**: <code>  out &lt;&lt; &quot;cutlass::PitchLinearShape:(kContiguous, kStrided) {&quot;</code>
+  - EN: Starts the definition body for `PitchLinearShape`.
+  - CN: 开始 `PitchLinearShape` 的定义体。
+- **L280**: <code>    &lt;&lt; cutlass::layout::PitchLinearShape&lt;Contiguous,Strided&gt;::kContiguous &lt;&lt;&quot;,&quot;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L281**: <code>    &lt;&lt; cutlass::layout::PitchLinearShape&lt;Contiguous,Strided&gt;::kStrided &lt;&lt;&quot;}&quot;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L282**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L283**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L284**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L285**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L286**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L287**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L288**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L289**: <code>//                         stream operators for cutlass::conv namespace                          //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L290**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L291**: <code>namespace conv {</code>
+  - EN: Opens namespace `conv` to scope the following declarations.
+  - CN: 打开命名空间 `conv`，为后续声明提供作用域。
+- **L292**: <code>/// Default printing to ostream for Conv2dProblemSize</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L293**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L294**: <code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, Conv2dProblemSize const&amp; problem) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L295**: <code>  out &lt;&lt; &quot;NHWC: (&quot; &lt;&lt; problem.N &lt;&lt; &quot;, &quot; &lt;&lt; problem.H &lt;&lt; &quot;, &quot; &lt;&lt; problem.W &lt;&lt; &quot;, &quot; &lt;&lt; problem.C &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `NHWC`.
+  - CN: 提供 `NHWC` 的签名或实现的一部分。
+- **L296**: <code>      &lt;&lt; &quot;KRSC: (&quot; &lt;&lt; problem.K &lt;&lt; &quot;, &quot; &lt;&lt; problem.R &lt;&lt; &quot;, &quot; &lt;&lt; problem.S &lt;&lt; &quot;, &quot; &lt;&lt; problem.C / problem.groups &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `KRSC`.
+  - CN: 提供 `KRSC` 的签名或实现的一部分。
+- **L297**: <code>      &lt;&lt; &quot;NPQK: (&quot; &lt;&lt; problem.N &lt;&lt; &quot;, &quot; &lt;&lt; problem.P &lt;&lt; &quot;, &quot; &lt;&lt; problem.Q &lt;&lt; &quot;, &quot; &lt;&lt; problem.K &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `NPQK`.
+  - CN: 提供 `NPQK` 的签名或实现的一部分。
+- **L298**: <code>      &lt;&lt; &quot;groups: (&quot; &lt;&lt; problem.groups &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `groups`.
+  - CN: 提供 `groups` 的签名或实现的一部分。
+- **L299**: <code>      &lt;&lt; &quot;Pad_h, Pad_w: (&quot; &lt;&lt; problem.pad_h &lt;&lt; &quot;, &quot; &lt;&lt; problem.pad_w &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `Pad_w`.
+  - CN: 提供 `Pad_w` 的签名或实现的一部分。
+- **L300**: <code>      &lt;&lt; &quot;Stride_h, Stride_w: (&quot; &lt;&lt; problem.stride_h &lt;&lt; &quot;, &quot; &lt;&lt; problem.stride_w &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `Stride_w`.
+  - CN: 提供 `Stride_w` 的签名或实现的一部分。
+- **L301**: <code>      &lt;&lt; &quot;Dilation_h, Dilation_w: (&quot; &lt;&lt; problem.dilation_h &lt;&lt; &quot;, &quot; &lt;&lt; problem.dilation_w &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `Dilation_w`.
+  - CN: 提供 `Dilation_w` 的签名或实现的一部分。
+- **L302**: <code>      &lt;&lt; &quot;split_k_slices: (&quot; &lt;&lt; problem.split_k_slices &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `split_k_slices`.
+  - CN: 提供 `split_k_slices` 的签名或实现的一部分。
+- **L303**: <code>      &lt;&lt; &quot;mode: (&quot; &lt;&lt; ((problem.mode==conv::Mode::kConvolution) ? &quot;conv&quot; : &quot;xcross&quot;) &lt;&lt; &quot;)&quot;;</code>
+  - EN: Declares the callable or operator `mode`.
+  - CN: 声明可调用对象或运算符 `mode`。
+- **L304**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L305**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L306**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L307**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L308**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L309**: <code>/// Default printing to ostream for Conv3dProblemSize</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L310**: <code>inline</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L311**: <code>std::ostream&amp; operator&lt;&lt;(std::ostream&amp; out, Conv3dProblemSize const&amp; problem) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L312**: <code>  out &lt;&lt; &quot;NDHWC: (&quot; &lt;&lt; problem.N &lt;&lt; &quot;, &quot; &lt;&lt; problem.D &lt;&lt; &quot;, &quot; &lt;&lt; problem.H &lt;&lt; &quot;, &quot; &lt;&lt; problem.W &lt;&lt; &quot;, &quot; &lt;&lt; problem.C &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `NDHWC`.
+  - CN: 提供 `NDHWC` 的签名或实现的一部分。
+- **L313**: <code>      &lt;&lt; &quot;KTRSC: (&quot; &lt;&lt; problem.K &lt;&lt; &quot;, &quot; &lt;&lt; problem.T &lt;&lt; &quot;, &quot; &lt;&lt; problem.R &lt;&lt; &quot;, &quot; &lt;&lt; problem.S &lt;&lt; &quot;, &quot; &lt;&lt; problem.C &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `KTRSC`.
+  - CN: 提供 `KTRSC` 的签名或实现的一部分。
+- **L314**: <code>      &lt;&lt; &quot;NZPQK: (&quot; &lt;&lt; problem.N &lt;&lt; &quot;, &quot; &lt;&lt; problem.Z &lt;&lt; &quot;, &quot; &lt;&lt; problem.P &lt;&lt; &quot;, &quot; &lt;&lt; problem.Q &lt;&lt; &quot;, &quot; &lt;&lt; problem.K &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `NZPQK`.
+  - CN: 提供 `NZPQK` 的签名或实现的一部分。
+- **L315**: <code>      &lt;&lt; &quot;pad_d, pad_h, pad_w: (&quot;  &lt;&lt; problem.pad_d &lt;&lt; &quot;, &quot; &lt;&lt; problem.pad_h &lt;&lt; &quot;, &quot; &lt;&lt; problem.pad_w &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `pad_w`.
+  - CN: 提供 `pad_w` 的签名或实现的一部分。
+- **L316**: <code>      &lt;&lt; &quot;stride_d, stride_h, stride_w: (&quot;  &lt;&lt; problem.stride_d &lt;&lt; &quot;, &quot; &lt;&lt; problem.stride_h &lt;&lt; &quot;, &quot; &lt;&lt; problem.stride_w &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `stride_w`.
+  - CN: 提供 `stride_w` 的签名或实现的一部分。
+- **L317**: <code>      &lt;&lt; &quot;dilation_d, dilation_h, dilation_w: (&quot;  &lt;&lt; problem.dilation_d &lt;&lt; &quot;, &quot; &lt;&lt; problem.dilation_h &lt;&lt; &quot;, &quot; &lt;&lt; problem.dilation_w &lt;&lt; &quot;)&quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `dilation_w`.
+  - CN: 提供 `dilation_w` 的签名或实现的一部分。
+- **L318**: <code>      &lt;&lt; &quot;split_k_slices: (&quot; &lt;&lt; problem.split_k_slices &lt;&lt; &quot;) &quot; &lt;&lt; std::endl</code>
+  - EN: Provides part of the signature or implementation for `split_k_slices`.
+  - CN: 提供 `split_k_slices` 的签名或实现的一部分。
+- **L319**: <code>      &lt;&lt; &quot;mode: (&quot; &lt;&lt; ((problem.mode==conv::Mode::kConvolution) ? &quot;conv&quot; : &quot;xcross&quot;) &lt;&lt; &quot;)&quot;;</code>
+  - EN: Declares the callable or operator `mode`.
+  - CN: 声明可调用对象或运算符 `mode`。
+- **L320**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L321**: <code>  return out;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L322**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L323**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L324**: <code>} // namespace conv</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L325**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L326**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L327**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L328**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Operator overloads / 运算符重载
+- Symbol focus: `operator<<` / 重点符号：`operator<<`
+- Symbol focus: `cudaGetErrorString` / 重点符号：`cudaGetErrorString`
+- Symbol focus: `out` / 重点符号：`out`
+- Symbol focus: `operator>>` / 重点符号：`operator>>`
+- Symbol focus: `half_t` / 重点符号：`half_t`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/array.h"`
+  - `"cutlass/coord.h"`
+  - `"cutlass/numeric_types.h"`
+  - `"cutlass/matrix.h"`
+  - `"cutlass/quaternion.h"`
+  - `"cutlass/matrix_shape.h"`
+  - `"cutlass/layout/pitch_linear.h"`
+  - `"cutlass/tensor_view.h"`
+  - `"cutlass/gemm/gemm_enumerated_types.h"`
+  - `"cutlass/conv/convolution.h"`
+  - `"cutlass/conv/conv2d_problem_size.h"`
+  - `"cutlass/conv/conv3d_problem_size.h"`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `<iostream>`
+  - `<typeinfo>`

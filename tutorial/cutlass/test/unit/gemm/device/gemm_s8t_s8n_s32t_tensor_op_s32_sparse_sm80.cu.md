@@ -1,0 +1,1435 @@
+# gemm_s8t_s8n_s32t_tensor_op_s32_sparse_sm80.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/device/gemm_s8t_s8n_s32t_tensor_op_s32_sparse_sm80.cu`
+
+## Purpose / 目的
+- EN: This file tests sparse device GEMM kernels that assume structured sparsity and verifies selected tile configurations on SM80.
+- CN: 该文件测试假定结构化稀疏性的稀疏设备 GEMM 内核，并验证 SM80 上选定的 tile 配置。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/**************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `/*! \file`
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: `    \brief Tests for device-wide GEMM interface`
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: `#include <iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `#include "../../common/cutlass_unit_test.h"`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 38**: `#include "cutlass/cutlass.h"`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- **Line 39**: `#include "cutlass/gemm/device/gemm_sparse_universal.h"`
+  - EN: Declares the device-level sparse GEMM interface.
+  - CN: 声明设备级稀疏 GEMM 接口。
+- **Line 40**: `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 41**: `#include "cutlass/util/reference/host/gemm.h"`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- **Line 42**: `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 43**: `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 44**: `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- **Line 45**: `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 46**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 47**: `#include "testbed_sparse.h"`
+  - EN: Local sparse GEMM testbed for generating sparse inputs and validating outputs.
+  - CN: 本地稀疏 GEMM 测试平台，用于生成稀疏输入并验证输出。
+- **Line 48**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 49**: `#if defined(CUTLASS_ARCH_SPARSE_MMA_SM80_SUPPORTED)`
+  - EN: Compiles the following code only when `CUTLASS_ARCH_SPARSE_MMA_SM80_SUPPORTED` is available.
+  - CN: 仅当 `CUTLASS_ARCH_SPARSE_MMA_SM80_SUPPORTED` 可用时才编译后续代码。
+- **Line 50**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 51**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 52**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 53**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x256x128_64x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 54**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 55**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 56**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 59**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 60**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 61**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 62**: `      cutlass::gemm::GemmShape<128, 256, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 63**: `      cutlass::gemm::GemmShape<64, 64, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 64**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 65**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 66**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 67**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 3>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 68**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 69**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 70**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 71**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 72**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 256x128x128_64x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 73**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 74**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 75**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 76**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 77**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 78**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 79**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 80**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 81**: `      cutlass::gemm::GemmShape<256, 128, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 82**: `      cutlass::gemm::GemmShape<64, 64, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 83**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 84**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 85**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 86**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 3>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 89**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 90**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 91**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x128x128_64x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 92**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 93**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 94**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 95**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 96**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 97**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 98**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 99**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 100**: `      cutlass::gemm::GemmShape<128, 128, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 101**: `      cutlass::gemm::GemmShape<64, 64, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 102**: `      cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 103**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 104**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 105**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 106**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 4>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 107**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 108**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 109**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 110**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 111**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 256x64x128_64x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 112**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 113**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 114**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 115**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 116**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 117**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 118**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 119**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 120**: `      cutlass::gemm::GemmShape<256, 64, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 121**: `      cutlass::gemm::GemmShape<64, 64, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 122**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 123**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 124**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 125**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 4>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 126**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 127**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 128**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 129**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 130**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 64x256x128_64x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 131**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 132**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 133**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 134**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 135**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 136**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 137**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 138**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 139**: `      cutlass::gemm::GemmShape<64, 256, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 140**: `      cutlass::gemm::GemmShape<64, 64, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 141**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 142**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 143**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 144**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 4>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 145**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 146**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 147**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 148**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 149**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 64x128x128_32x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 150**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 151**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 152**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 153**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 154**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 155**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 156**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 157**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 158**: `      cutlass::gemm::GemmShape<64, 128, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 159**: `      cutlass::gemm::GemmShape<32, 64, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 160**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 161**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 162**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 163**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 166**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 167**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 168**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x64x128_64x32x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 169**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 170**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 171**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 172**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 173**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 174**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 175**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 176**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 177**: `      cutlass::gemm::GemmShape<128, 64, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 178**: `      cutlass::gemm::GemmShape<64, 32, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 179**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 180**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 181**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 182**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 183**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 184**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 185**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 186**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 187**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 64x64x128_32x32x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 188**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 189**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 190**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 191**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 192**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 193**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 194**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 195**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 196**: `      cutlass::gemm::GemmShape<64, 64, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 197**: `      cutlass::gemm::GemmShape<32, 32, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 198**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 199**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 200**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 201**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 10>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 202**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 203**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 204**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 205**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 206**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x128x256_64x64x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 207**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 208**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 209**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 210**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 211**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 212**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 213**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 214**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 215**: `      cutlass::gemm::GemmShape<128, 128, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 216**: `      cutlass::gemm::GemmShape<64, 64, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 217**: `      cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 218**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 219**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 220**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 221**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 3>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 222**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 223**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 224**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 225**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 226**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x64x256_64x32x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 227**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 228**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 229**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 230**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 231**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 232**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 233**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 234**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 235**: `      cutlass::gemm::GemmShape<128, 64, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 236**: `      cutlass::gemm::GemmShape<64, 32, 256>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 237**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 238**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 239**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 240**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 4>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 241**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 242**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 243**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 244**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 245**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 64x64x256_32x32x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 246**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 247**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 248**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 249**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 250**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 251**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 252**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 253**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 254**: `      cutlass::gemm::GemmShape<64, 64, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 255**: `      cutlass::gemm::GemmShape<32, 32, 256>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 256**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 257**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 258**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 259**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 260**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 261**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 262**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 263**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 264**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 32x128x128_32x32x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 265**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 266**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 267**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 268**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 269**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 270**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 271**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 272**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 273**: `      cutlass::gemm::GemmShape<32, 128, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 274**: `      cutlass::gemm::GemmShape<32, 32, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 275**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 276**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 277**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 278**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 279**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 280**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 281**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 282**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 283**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 32x128x256_32x32x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 284**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 285**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 286**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 287**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 288**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 289**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 290**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 291**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 292**: `      cutlass::gemm::GemmShape<32, 128, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 293**: `      cutlass::gemm::GemmShape<32, 32, 256>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 294**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 295**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 296**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 297**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 3>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 298**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 299**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 300**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 301**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 302**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 32x256x128_32x64x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 303**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 304**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 305**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 306**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 307**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 308**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 309**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 310**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 311**: `      cutlass::gemm::GemmShape<32, 256, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 312**: `      cutlass::gemm::GemmShape<32, 64, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 313**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 314**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 315**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 316**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 4>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 317**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 318**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 319**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 320**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 321**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 16x128x256_16x32x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 322**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 323**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 324**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 325**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 326**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 327**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 328**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 329**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 330**: `      cutlass::gemm::GemmShape<16, 128, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 331**: `      cutlass::gemm::GemmShape<16, 32, 256>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 332**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 333**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 334**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 335**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 4>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 336**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 337**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 338**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 339**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 340**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x32x128_32x32x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 341**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 342**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 343**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 344**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 345**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 346**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 347**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 348**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 349**: `      cutlass::gemm::GemmShape<128, 32, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 350**: `      cutlass::gemm::GemmShape<32, 32, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 351**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 352**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 353**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 354**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 355**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 356**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 357**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 358**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 359**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x32x256_32x32x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 360**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 361**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 362**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 363**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 364**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 365**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 366**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 367**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 368**: `      cutlass::gemm::GemmShape<128, 32, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 369**: `      cutlass::gemm::GemmShape<32, 32, 256>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 370**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 371**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 372**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 373**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 3>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 374**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 375**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 376**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 377**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 378**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 256x32x128_64x32x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 379**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 380**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 381**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 382**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 383**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 384**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 385**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 386**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 387**: `      cutlass::gemm::GemmShape<256, 32, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 388**: `      cutlass::gemm::GemmShape<64, 32, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 389**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 390**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 391**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 392**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 393**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 394**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 395**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 396**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 397**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x16x128_32x16x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 398**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 399**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 400**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 401**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 402**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 403**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 404**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 405**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 406**: `      cutlass::gemm::GemmShape<128, 16, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 407**: `      cutlass::gemm::GemmShape<32, 16, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 408**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 409**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 410**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 411**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 412**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 413**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 414**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 415**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 416**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 128x16x256_32x16x256) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 417**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 418**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 419**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 420**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 421**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 422**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 423**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 424**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 425**: `      cutlass::gemm::GemmShape<128, 16, 256>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 426**: `      cutlass::gemm::GemmShape<32, 16, 256>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 427**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 428**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 429**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 430**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 431**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 432**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 433**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 434**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 435**: `TEST(SM80_Device_Sparse_Gemm_s8t_s8n_s32t_tensor_op_s32, 256x16x128_64x16x128) {`
+  - EN: Declares a unit test that instantiates one concrete kernel configuration and runs it through the shared harness.
+  - CN: 声明一个单元测试，用于实例化具体内核配置并通过共享测试框架运行。
+- **Line 436**: `  using ElementOutput = int32_t;`
+  - EN: Creates type alias `ElementOutput` to simplify later code.
+  - CN: 创建类型别名 `ElementOutput` 以简化后续代码。
+- **Line 437**: `  using ElementAccumulator = int32_t;`
+  - EN: Creates type alias `ElementAccumulator` to simplify later code.
+  - CN: 创建类型别名 `ElementAccumulator` 以简化后续代码。
+- **Line 438**: `  using ElementCompute = int32_t;`
+  - EN: Creates type alias `ElementCompute` to simplify later code.
+  - CN: 创建类型别名 `ElementCompute` 以简化后续代码。
+- **Line 439**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 440**: `  using Gemm = cutlass::gemm::device::GemmSparseUniversal<`
+  - EN: Creates type alias `Gemm` to simplify later code.
+  - CN: 创建类型别名 `Gemm` 以简化后续代码。
+- **Line 441**: `      int8_t, cutlass::layout::RowMajor, int8_t,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 442**: `      cutlass::layout::ColumnMajor, ElementOutput, cutlass::layout::RowMajor,`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 443**: `      ElementAccumulator, cutlass::arch::OpClassTensorOp, cutlass::arch::Sm80,`
+  - EN: Selects the hardware execution class used by the kernel.
+  - CN: 选择该内核使用的硬件执行类别。
+- **Line 444**: `      cutlass::gemm::GemmShape<256, 16, 128>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 445**: `      cutlass::gemm::GemmShape<64, 16, 128>, cutlass::gemm::GemmShape<16, 8, 64>,`
+  - EN: Specifies a GEMM tile shape, such as the threadblock, warp, instruction, or cluster shape.
+  - CN: 指定一个 GEMM tile 形状，例如线程块、warp、指令级或集群级形状。
+- **Line 446**: `      cutlass::epilogue::thread::LinearCombinationClamp<`
+  - EN: Configures the epilogue operator that converts accumulators into final output values.
+  - CN: 配置将累加结果转换为最终输出值的尾处理算子。
+- **Line 447**: `          ElementOutput, 128 / cutlass::sizeof_bits<ElementOutput>::value,`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 448**: `          ElementAccumulator, ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 449**: `      cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, 6>;`
+  - EN: Uses the default threadblock swizzle policy for mapping tiles onto the grid.
+  - CN: 使用默认的线程块 swizzle 策略将 tile 映射到网格上。
+- **Line 450**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 451**: `  EXPECT_TRUE(test::gemm::device::TestAllSparseGemm<Gemm>());`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 452**: `}`
+  - EN: Closes the scope for `test case`.
+  - CN: 结束 `test case` 的作用域。
+- **Line 453**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 454**: `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 455**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 456**: `#endif // defined(CUTLASS_ARCH_SPARSE_MMA_SM80_SUPPORTED)`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 457**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Uses GoogleTest-style test cases to instantiate and run specific kernel configurations.
+  - CN: 使用 GoogleTest 风格测试用例实例化并运行特定内核配置。
+- `GemmSparseUniversal`
+  - EN: Exercises CUTLASS sparse GEMM operators that assume structured sparsity in matrix operands.
+  - CN: 测试 CUTLASS 的稀疏 GEMM 算子，这些算子假定矩阵操作数具有结构化稀疏性。
+- `GemmShape<`
+  - EN: Encodes threadblock, warp, and instruction tile sizes that determine kernel decomposition.
+  - CN: 编码线程块、warp 和指令级 tile 尺寸，以决定内核分解方式。
+- `LinearCombinationClamp`
+  - EN: Uses a clamping epilogue to safely convert accumulators into the output element type.
+  - CN: 使用带截断的尾处理，将累加结果安全地转换为输出元素类型。
+- `Sm80`
+  - EN: Targets NVIDIA Ampere-class SM80 kernels.
+  - CN: 面向 NVIDIA Ampere 架构的 SM80 内核。
+- `structured-sparsity`
+  - EN: The kernels expect sparse metadata or compressed operands rather than dense matrix data.
+  - CN: 这些内核期望使用稀疏元数据或压缩后的操作数，而不是稠密矩阵数据。
+
+## Dependencies / 依赖关系
+- `<iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/cutlass.h`
+  - EN: Defines core CUTLASS types, status codes, and architecture tags.
+  - CN: 定义 CUTLASS 的核心类型、状态码和架构标签。
+- `cutlass/gemm/device/gemm_sparse_universal.h`
+  - EN: Declares the device-level sparse GEMM interface.
+  - CN: 声明设备级稀疏 GEMM 接口。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性校验的 CPU 参考 GEMM 实现。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `testbed_sparse.h`
+  - EN: Local sparse GEMM testbed for generating sparse inputs and validating outputs.
+  - CN: 本地稀疏 GEMM 测试平台，用于生成稀疏输入并验证输出。

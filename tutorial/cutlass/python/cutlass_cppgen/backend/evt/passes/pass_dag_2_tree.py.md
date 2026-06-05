@@ -1,0 +1,189 @@
+# pass_dag_2_tree.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/passes/pass_dag_2_tree.py`
+
+## Purpose / 作用
+- EN: Merge non-tree sub-graphs of the DAG IR into a single DAG.
+- CN: 该模块的文档字符串将其描述为：Merge non-tree sub-graphs of the DAG IR into a single DAG.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Merge non-tree sub-graphs of the DAG IR into a single DAG. The fused DAG will be implemented` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `by the topological visitor, while the rest of the graph will be implemented with the tree visitor.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L36** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `from copy import deepcopy` — **EN:** Imports deepcopy from `copy`. **CN:** 从 `copy` 导入 deepcopy。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `from cutlass_cppgen.backend.evt.ir import DAGIR, TopoVisitorNode` — **EN:** Imports DAGIR, TopoVisitorNode from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 DAGIR, TopoVisitorNode。
+- **L41** `from cutlass_cppgen.backend.evt.passes.pass_get_impl import PassGetImpl` — **EN:** Imports PassGetImpl from `cutlass_cppgen.backend.evt.passes.pass_get_impl`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_get_impl` 导入 PassGetImpl。
+- **L42** `from cutlass_cppgen.backend.evt.passes.pass_manager import EVTPassBase` — **EN:** Imports EVTPassBase from `cutlass_cppgen.backend.evt.passes.pass_manager`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_manager` 导入 EVTPassBase。
+- **L43** `from cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation import PassShapeTypePropagation` — **EN:** Imports PassShapeTypePropagation from `cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation` 导入 PassShapeTypePropagation。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `class PassDAG2Tree(EVTPassBase):` — **EN:** Defines class `PassDAG2Tree` with bases EVTPassBase. **CN:** 定义类 `PassDAG2Tree`，其基类为 EVTPassBase。
+- **L47** `    """` — **EN:** Starts the docstring for the class `PassDAG2Tree`. **CN:** 开始说明 class `PassDAG2Tree` 的文档字符串。
+- **L48** `    Convert the DAG IR to Tree by fusing subgraphs` — **EN:** Continues the docstring for the class `PassDAG2Tree`. **CN:** 继续说明 class `PassDAG2Tree` 的文档字符串。
+- **L49** `    """` — **EN:** Ends the docstring for the class `PassDAG2Tree`. **CN:** 结束说明 class `PassDAG2Tree` 的文档字符串。
+- **L50** `    dependencies = [` — **EN:** Assigns a value to dependencies. **CN:** 将一个值赋给 dependencies。
+- **L51** `        PassShapeTypePropagation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `        PassGetImpl` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    def call(self):` — **EN:** Defines function `call`. **CN:** 定义函数 `call`。
+- **L56** `        # Step 1: find the nodes that have multiple parents` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L57** `        multi_parent_nodes = []` — **EN:** Assigns a value to multi_parent_nodes. **CN:** 将一个值赋给 multi_parent_nodes。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `        for node in self.dag_ir.nodes_topological_order():` — **EN:** Starts a loop assigning items from `self.dag_ir.nodes_topological_order()` to `node`. **CN:** 开始一个循环，将 `self.dag_ir.nodes_topological_order()` 的元素赋给 `node`。
+- **L60** `            if self.dag_ir.out_degree(node) > 1:` — **EN:** Starts a conditional branch guarded by `self.dag_ir.out_degree(node) > 1`. **CN:** 开始一个由 `self.dag_ir.out_degree(node) > 1` 控制的条件分支。
+- **L61** `                multi_parent_nodes.append(node)` — **EN:** Invokes `multi_parent_nodes.append` as a standalone call. **CN:** 以独立语句方式调用 `multi_parent_nodes.append`。
+- **L62** `        # Step 2: find the lowest common ancestor (LCA) of all its parents` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L63** `        for node in multi_parent_nodes:` — **EN:** Starts a loop assigning items from `multi_parent_nodes` to `node`. **CN:** 开始一个循环，将 `multi_parent_nodes` 的元素赋给 `node`。
+- **L64** `            # A multi-parent node could be already fused by the previous node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L65** `            if not self.dag_ir.has_node(node):` — **EN:** Starts a conditional branch guarded by `not self.dag_ir.has_node(node)`. **CN:** 开始一个由 `not self.dag_ir.has_node(node)` 控制的条件分支。
+- **L66** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L67** `            # A node uncovered by the previous fusions can have out degree change` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `            # Case 1: it has <= 1 edges to the previously fused subgraph, no degree change` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L69** `            # Case 2: it has more than one edges to the previously fused subgraph, degree drops` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `            if self.dag_ir.out_degree(node) <= 1:` — **EN:** Starts a conditional branch guarded by `self.dag_ir.out_degree(node) <= 1`. **CN:** 开始一个由 `self.dag_ir.out_degree(node) <= 1` 控制的条件分支。
+- **L71** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `            # Otherwise, the node still` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L74** `            reachable_nodes = []` — **EN:** Assigns a value to reachable_nodes. **CN:** 将一个值赋给 reachable_nodes。
+- **L75** `            # Complexity: O(Dout*N)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L76** `            for parent in self.dag_ir.get_users(node):` — **EN:** Starts a loop assigning items from `self.dag_ir.get_users(node)` to `parent`. **CN:** 开始一个循环，将 `self.dag_ir.get_users(node)` 的元素赋给 `parent`。
+- **L77** `                reachable_nodes.append(set(self.dag_ir.all_reachable_nodes(parent)))` — **EN:** Invokes `reachable_nodes.append` as a standalone call. **CN:** 以独立语句方式调用 `reachable_nodes.append`。
+- **L78** `            # get the common reachable objects` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `            common_items = set.intersection(*reachable_nodes)` — **EN:** Assigns a value to common_items. **CN:** 将一个值赋给 common_items。
+- **L80** `            node_to_fuse = set.union(*reachable_nodes).difference(common_items)` — **EN:** Assigns a value to node_to_fuse. **CN:** 将一个值赋给 node_to_fuse。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `            lca = None` — **EN:** Assigns a value to lca. **CN:** 将一个值赋给 lca。
+- **L83** `            # If common ancestor exists, find the lowest one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L84** `            if len(common_items) > 0:` — **EN:** Starts a conditional branch guarded by `len(common_items) > 0`. **CN:** 开始一个由 `len(common_items) > 0` 控制的条件分支。
+- **L85** `                topo_order = self.dag_ir.nodes_topological_order()` — **EN:** Assigns a value to topo_order. **CN:** 将一个值赋给 topo_order。
+- **L86** `                topo_idx = -1` — **EN:** Assigns a value to topo_idx. **CN:** 将一个值赋给 topo_idx。
+- **L87** `                for item in common_items:` — **EN:** Starts a loop assigning items from `common_items` to `item`. **CN:** 开始一个循环，将 `common_items` 的元素赋给 `item`。
+- **L88** `                    if lca is None:` — **EN:** Starts a conditional branch guarded by `lca is None`. **CN:** 开始一个由 `lca is None` 控制的条件分支。
+- **L89** `                        lca = item` — **EN:** Assigns a value to lca. **CN:** 将一个值赋给 lca。
+- **L90** `                        topo_idx = topo_order.index(item)` — **EN:** Assigns a value to topo_idx. **CN:** 将一个值赋给 topo_idx。
+- **L91** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L92** `                        if topo_idx > topo_order.index(item):` — **EN:** Starts a conditional branch guarded by `topo_idx > topo_order.index(item)`. **CN:** 开始一个由 `topo_idx > topo_order.index(item)` 控制的条件分支。
+- **L93** `                            lca = item` — **EN:** Assigns a value to lca. **CN:** 将一个值赋给 lca。
+- **L94** `                            topo_idx = topo_order.index(item)` — **EN:** Assigns a value to topo_idx. **CN:** 将一个值赋给 topo_idx。
+- **L95** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L96** `                # there is no common ancestor for all the parents, we pack all the reachable` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L97** `                # nodes into a single DAG node as a fallback. The lca should be the input node of` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L98** `                # one of the output nodes with out_degree = 0` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L99** `                potential_output_nodes = []` — **EN:** Assigns a value to potential_output_nodes. **CN:** 将一个值赋给 potential_output_nodes。
+- **L100** `                for node in node_to_fuse:` — **EN:** Starts a loop assigning items from `node_to_fuse` to `node`. **CN:** 开始一个循环，将 `node_to_fuse` 的元素赋给 `node`。
+- **L101** `                    if self.dag_ir.out_degree(node) == 0:` — **EN:** Starts a conditional branch guarded by `self.dag_ir.out_degree(node) == 0`. **CN:** 开始一个由 `self.dag_ir.out_degree(node) == 0` 控制的条件分支。
+- **L102** `                        potential_output_nodes.append(node)` — **EN:** Invokes `potential_output_nodes.append` as a standalone call. **CN:** 以独立语句方式调用 `potential_output_nodes.append`。
+- **L103** `                if len(potential_output_nodes) == 0:` — **EN:** Starts a conditional branch guarded by `len(potential_output_nodes) == 0`. **CN:** 开始一个由 `len(potential_output_nodes) == 0` 控制的条件分支。
+- **L104** `                    raise RuntimeError(f"No output node with out degree = 0 found.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `                output_node = None` — **EN:** Assigns a value to output_node. **CN:** 将一个值赋给 output_node。
+- **L107** `                if (self.dag_ir.cc >= 90):` — **EN:** Starts a conditional branch guarded by `self.dag_ir.cc >= 90`. **CN:** 开始一个由 `self.dag_ir.cc >= 90` 控制的条件分支。
+- **L108** `                    # For SM90+, the lca should be the input node of D` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L109** `                    if (not self.dag_ir.has_node("D")):` — **EN:** Starts a conditional branch guarded by `not self.dag_ir.has_node('D')`. **CN:** 开始一个由 `not self.dag_ir.has_node('D')` 控制的条件分支。
+- **L110** `                        raise RuntimeError(f"D is not a node in the DAG IR.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L111** `                    output_node = "D"` — **EN:** Assigns a value to output_node. **CN:** 将一个值赋给 output_node。
+- **L112** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L113** `                    output_node = potential_output_nodes[0]` — **EN:** Assigns a value to output_node. **CN:** 将一个值赋给 output_node。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `                if (output_node is None):` — **EN:** Starts a conditional branch guarded by `output_node is None`. **CN:** 开始一个由 `output_node is None` 控制的条件分支。
+- **L116** `                    raise RuntimeError(f"No output node found.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L117** `                lca = self.dag_ir.get_all_inputs(output_node)[0]` — **EN:** Assigns a value to lca. **CN:** 将一个值赋给 lca。
+- **L118** `                node_to_fuse.remove(output_node)` — **EN:** Invokes `node_to_fuse.remove` as a standalone call. **CN:** 以独立语句方式调用 `node_to_fuse.remove`。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `            # The lca is the output node of the DAG node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L121** `            # Get the nodes to be fused` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L122** `            node_to_fuse.add(lca)` — **EN:** Invokes `node_to_fuse.add` as a standalone call. **CN:** 以独立语句方式调用 `node_to_fuse.add`。
+- **L123** `            # Get all the input nodes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L124** `            all_input_nodes = []` — **EN:** Assigns a value to all_input_nodes. **CN:** 将一个值赋给 all_input_nodes。
+- **L125** `            all_output_nodes = []` — **EN:** Assigns a value to all_output_nodes. **CN:** 将一个值赋给 all_output_nodes。
+- **L126** `            for node in node_to_fuse:` — **EN:** Starts a loop assigning items from `node_to_fuse` to `node`. **CN:** 开始一个循环，将 `node_to_fuse` 的元素赋给 `node`。
+- **L127** `                all_input_nodes.append(set(self.dag_ir.get_all_inputs(node)))` — **EN:** Invokes `all_input_nodes.append` as a standalone call. **CN:** 以独立语句方式调用 `all_input_nodes.append`。
+- **L128** `                all_output_nodes.append(set(self.dag_ir.get_users(node)))` — **EN:** Invokes `all_output_nodes.append` as a standalone call. **CN:** 以独立语句方式调用 `all_output_nodes.append`。
+- **L129** `            all_input_nodes = set.union(*all_input_nodes)` — **EN:** Assigns a value to all_input_nodes. **CN:** 将一个值赋给 all_input_nodes。
+- **L130** `            all_output_nodes = set.union(*all_output_nodes)` — **EN:** Assigns a value to all_output_nodes. **CN:** 将一个值赋给 all_output_nodes。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `            new_subgraph_nodes = set.union(node_to_fuse, all_input_nodes, all_output_nodes)` — **EN:** Assigns a value to new_subgraph_nodes. **CN:** 将一个值赋给 new_subgraph_nodes。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `            # Create the subgraph` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L135** `            subgraph_ = self.dag_ir._graph.subgraph(new_subgraph_nodes)` — **EN:** Assigns a value to subgraph_. **CN:** 将一个值赋给 subgraph_。
+- **L136** `            subgraph = DAGIR(self.dag_ir.cc)` — **EN:** Assigns a value to subgraph. **CN:** 将一个值赋给 subgraph。
+- **L137** `            for node in subgraph_.nodes:` — **EN:** Starts a loop assigning items from `subgraph_.nodes` to `node`. **CN:** 开始一个循环，将 `subgraph_.nodes` 的元素赋给 `node`。
+- **L138** `                meta = deepcopy(self.dag_ir.get_node_meta(node))` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L139** `                if node not in node_to_fuse:` — **EN:** Starts a conditional branch guarded by `node not in node_to_fuse`. **CN:** 开始一个由 `node not in node_to_fuse` 控制的条件分支。
+- **L140** `                    meta.disabled = True` — **EN:** Assigns a value to meta.disabled. **CN:** 将一个值赋给 meta.disabled。
+- **L141** `                subgraph.add_node(meta)` — **EN:** Invokes `subgraph.add_node` as a standalone call. **CN:** 以独立语句方式调用 `subgraph.add_node`。
+- **L142** `            for edge in subgraph_.edges:` — **EN:** Starts a loop assigning items from `subgraph_.edges` to `edge`. **CN:** 开始一个循环，将 `subgraph_.edges` 的元素赋给 `edge`。
+- **L143** `                subgraph.add_edge(edge[0], edge[1], self.dag_ir.get_edge_weight(edge[0], edge[1]))` — **EN:** Invokes `subgraph.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `subgraph.add_edge`。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `            # Create the fused node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L147** `            dag_node = TopoVisitorNode(` — **EN:** Assigns a value to dag_node. **CN:** 将一个值赋给 dag_node。
+- **L148** `                name=f"dag_{lca}", subgraph=subgraph,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `                output_node=self.dag_ir.get_node_meta(lca))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `            self.dag_ir.add_node(dag_node)` — **EN:** Invokes `self.dag_ir.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_node`。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `            # Add input edges` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L153** `            for idx, node in enumerate(all_input_nodes):` — **EN:** Starts a loop assigning items from `enumerate(all_input_nodes)` to `(idx, node)`. **CN:** 开始一个循环，将 `enumerate(all_input_nodes)` 的元素赋给 `(idx, node)`。
+- **L154** `                self.dag_ir.add_edge(node, dag_node.name, weight=idx)` — **EN:** Invokes `self.dag_ir.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_edge`。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `            # Replace all uses with DAG node (only 1 output node)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L157** `            self.dag_ir.replace_all_uses_with(lca, dag_node.name)` — **EN:** Invokes `self.dag_ir.replace_all_uses_with` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.replace_all_uses_with`。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `            # Remove all fused nodes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L160** `            node_to_fuse.remove(lca)` — **EN:** Invokes `node_to_fuse.remove` as a standalone call. **CN:** 以独立语句方式调用 `node_to_fuse.remove`。
+- **L161** `            for node in node_to_fuse:` — **EN:** Starts a loop assigning items from `node_to_fuse` to `node`. **CN:** 开始一个循环，将 `node_to_fuse` 的元素赋给 `node`。
+- **L162** `                self.dag_ir.remove_node(node)` — **EN:** Invokes `self.dag_ir.remove_node` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.remove_node`。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    def ensures(self) -> None:` — **EN:** Defines function `ensures`. **CN:** 定义函数 `ensures`。
+- **L165** `        # Ensure that after the pass, the resulting DAG becomes a tree` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L166** `        for node in self.dag_ir.nodes:` — **EN:** Starts a loop assigning items from `self.dag_ir.nodes` to `node`. **CN:** 开始一个循环，将 `self.dag_ir.nodes` 的元素赋给 `node`。
+- **L167** `            out_degree = self.dag_ir.out_degree(node)` — **EN:** Assigns a value to out_degree. **CN:** 将一个值赋给 out_degree。
+- **L168** `            if out_degree > 1:` — **EN:** Starts a conditional branch guarded by `out_degree > 1`. **CN:** 开始一个由 `out_degree > 1` 控制的条件分支。
+- **L169** `                raise RuntimeError(f"PassDAG2Tree failed. Node {node} still have outdegree = {out_degree}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.passes.pass_dag_2_tree`. CN: 模块名为 `cutlass_cppgen.backend.evt.passes.pass_dag_2_tree`。
+- EN: Module docstring summary: Merge non-tree sub-graphs of the DAG IR into a single DAG. CN: 模块文档摘要为：Merge non-tree sub-graphs of the DAG IR into a single DAG.
+- EN: Top-level classes: PassDAG2Tree CN: 顶层类包括：PassDAG2Tree
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.backend.evt.ir:DAGIR,TopoVisitorNode, cutlass_cppgen.backend.evt.passes.pass_get_impl:PassGetImpl, cutlass_cppgen.backend.evt.passes.pass_manager:EVTPassBase, cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation:PassShapeTypePropagation CN: 内部依赖：cutlass_cppgen.backend.evt.ir:DAGIR,TopoVisitorNode, cutlass_cppgen.backend.evt.passes.pass_get_impl:PassGetImpl, cutlass_cppgen.backend.evt.passes.pass_manager:EVTPassBase, cutlass_cppgen.backend.evt.passes.pass_shape_type_propagation:PassShapeTypePropagation
+- EN: External or standard-library dependencies: copy:deepcopy CN: 外部或标准库依赖：copy:deepcopy

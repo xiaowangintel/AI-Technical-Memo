@@ -1,0 +1,2366 @@
+# conv.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/host/conv.hpp`
+**Purpose / 用途**: Provides a host-side reference implementation or helper for conv. / 为 conv 提供主机端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>    \brief Reference implementation for CONV in host-side code.</code>
+  - EN: Comment that documents intent or context: "\brief Reference implementation for CONV in host-side code.".
+  - CN: 用于说明意图或上下文的注释："\brief Reference implementation for CONV in host-side code."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>#include &quot;cutlass/complex.h&quot;</code>
+  - EN: Includes `cutlass/complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/numeric_conversion.h&quot;</code>
+  - EN: Includes `cutlass/numeric_conversion.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_conversion.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/epilogue/thread/activation.h&quot;</code>
+  - EN: Includes `cutlass/epilogue/thread/activation.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/epilogue/thread/activation.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>#include &quot;cute/tensor.hpp&quot;</code>
+  - EN: Includes `cute/tensor.hpp` so this file can use project-specific declarations from `tensor.hpp`.
+  - CN: 引入 `cute/tensor.hpp`，使当前文件可以使用来自 `tensor.hpp` 的项目专用声明。
+- **L43** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L44** <code>#include &lt;cuda_runtime.h&gt;</code>
+  - EN: Includes `cuda_runtime.h` so this file can use project-specific declarations from `cuda_runtime.h`.
+  - CN: 引入 `cuda_runtime.h`，使当前文件可以使用来自 `cuda_runtime.h` 的项目专用声明。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>namespace cutlass::reference::host {</code>
+  - EN: Opens namespace `cutlass::reference::host` to group related symbols.
+  - CN: 打开命名空间 `cutlass::reference::host`，用于归组相关符号。
+- **L49** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L50** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to group related symbols.
+  - CN: 打开命名空间 `detail`，用于归组相关符号。
+- **L53** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L54** <code>template&lt;class EngineAct, class LayoutAct&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L55** <code>bool</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L56** <code>is_activation_in_bounds(</code>
+  - EN: Begins or continues the signature/call syntax involving `is_activation_in_bounds`.
+  - CN: 开始或继续与 `is_activation_in_bounds` 相关的签名/调用语法。
+- **L57** <code>    cute::Tensor&lt;EngineAct, LayoutAct&gt; const&amp; activation,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L58** <code>    int32_t n_, int32_t d_, int32_t h_, int32_t w_, int32_t c_, int32_t g_) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L59** <code>  return ((g_ &gt;= 0 &amp;&amp; g_ &lt; size&lt;5&gt;(activation)) &amp;&amp;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L60** <code>          (n_ &gt;= 0 &amp;&amp; n_ &lt; size&lt;4&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<4>`.
+  - CN: 开始或继续与 `size<4>` 相关的签名/调用语法。
+- **L61** <code>          (d_ &gt;= 0 &amp;&amp; d_ &lt; size&lt;3&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<3>`.
+  - CN: 开始或继续与 `size<3>` 相关的签名/调用语法。
+- **L62** <code>          (h_ &gt;= 0 &amp;&amp; h_ &lt; size&lt;2&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<2>`.
+  - CN: 开始或继续与 `size<2>` 相关的签名/调用语法。
+- **L63** <code>          (w_ &gt;= 0 &amp;&amp; w_ &lt; size&lt;1&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<1>`.
+  - CN: 开始或继续与 `size<1>` 相关的签名/调用语法。
+- **L64** <code>          (c_ &gt;= 0 &amp;&amp; c_ &lt; size&lt;0&gt;(activation)));</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L65** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L66** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L67** <code>template&lt;class EngineAct, class LayoutAct&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L68** <code>bool</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L69** <code>is_activation_in_bounds(</code>
+  - EN: Begins or continues the signature/call syntax involving `is_activation_in_bounds`.
+  - CN: 开始或继续与 `is_activation_in_bounds` 相关的签名/调用语法。
+- **L70** <code>    cute::Tensor&lt;EngineAct, LayoutAct&gt; const&amp; activation,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L71** <code>    int32_t n_, int32_t h_, int32_t w_, int32_t c_, int32_t g_) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L72** <code>  return ((g_ &gt;= 0 &amp;&amp; g_ &lt; size&lt;4&gt;(activation)) &amp;&amp;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L73** <code>          (n_ &gt;= 0 &amp;&amp; n_ &lt; size&lt;3&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<3>`.
+  - CN: 开始或继续与 `size<3>` 相关的签名/调用语法。
+- **L74** <code>          (h_ &gt;= 0 &amp;&amp; h_ &lt; size&lt;2&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<2>`.
+  - CN: 开始或继续与 `size<2>` 相关的签名/调用语法。
+- **L75** <code>          (w_ &gt;= 0 &amp;&amp; w_ &lt; size&lt;1&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<1>`.
+  - CN: 开始或继续与 `size<1>` 相关的签名/调用语法。
+- **L76** <code>          (c_ &gt;= 0 &amp;&amp; c_ &lt; size&lt;0&gt;(activation)));</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L77** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>template&lt;class EngineAct, class LayoutAct&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L80** <code>bool</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L81** <code>is_activation_in_bounds(</code>
+  - EN: Begins or continues the signature/call syntax involving `is_activation_in_bounds`.
+  - CN: 开始或继续与 `is_activation_in_bounds` 相关的签名/调用语法。
+- **L82** <code>    cute::Tensor&lt;EngineAct, LayoutAct&gt; const&amp; activation,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L83** <code>    int32_t n_, int32_t w_, int32_t c_, int32_t g_) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L84** <code>  return ((g_ &gt;= 0 &amp;&amp; g_ &lt; size&lt;3&gt;(activation)) &amp;&amp;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L85** <code>          (n_ &gt;= 0 &amp;&amp; n_ &lt; size&lt;2&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<2>`.
+  - CN: 开始或继续与 `size<2>` 相关的签名/调用语法。
+- **L86** <code>          (w_ &gt;= 0 &amp;&amp; w_ &lt; size&lt;1&gt;(activation)) &amp;&amp;</code>
+  - EN: Begins or continues the signature/call syntax involving `size<1>`.
+  - CN: 开始或继续与 `size<1>` 相关的签名/调用语法。
+- **L87** <code>          (c_ &gt;= 0 &amp;&amp; c_ &lt; size&lt;0&gt;(activation)));</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L88** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>} // namespace detail</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>template&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L93** <code>  class ElementAcc_,</code>
+  - EN: Begins the declaration of class `ElementAcc_`.
+  - CN: 开始声明 class `ElementAcc_`。
+- **L94** <code>  class ElementScalar_,</code>
+  - EN: Begins the declaration of class `ElementScalar_`.
+  - CN: 开始声明 class `ElementScalar_`。
+- **L95** <code>  class ElementCompute_,</code>
+  - EN: Begins the declaration of class `ElementCompute_`.
+  - CN: 开始声明 class `ElementCompute_`。
+- **L96** <code>  class ElementC_,</code>
+  - EN: Begins the declaration of class `ElementC_`.
+  - CN: 开始声明 class `ElementC_`。
+- **L97** <code>  class ElementOut_,</code>
+  - EN: Begins the declaration of class `ElementOut_`.
+  - CN: 开始声明 class `ElementOut_`。
+- **L98** <code>  bool ResidualAdd_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L99** <code>  class TensorAlpha_,</code>
+  - EN: Begins the declaration of class `TensorAlpha_`.
+  - CN: 开始声明 class `TensorAlpha_`。
+- **L100** <code>  class TensorBeta_,</code>
+  - EN: Begins the declaration of class `TensorBeta_`.
+  - CN: 开始声明 class `TensorBeta_`。
+- **L101** <code>  class TensorBias_,</code>
+  - EN: Begins the declaration of class `TensorBias_`.
+  - CN: 开始声明 class `TensorBias_`。
+- **L102** <code>  class ActivationFunctor_ = cutlass::epilogue::thread::Identity&lt;ElementCompute_&gt;</code>
+  - EN: Begins the declaration of class `ActivationFunctor_`.
+  - CN: 开始声明 class `ActivationFunctor_`。
+- **L103** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L104** <code>struct ConvEpilogueFusionParams {</code>
+  - EN: Begins the declaration of struct `ConvEpilogueFusionParams`.
+  - CN: 开始声明 struct `ConvEpilogueFusionParams`。
+- **L105** <code>  using ElementAcc = ElementAcc_;</code>
+  - EN: Introduces the type or namespace alias `ElementAcc`.
+  - CN: 引入类型或命名空间别名 `ElementAcc`。
+- **L106** <code>  using ElementScalar = ElementScalar_;</code>
+  - EN: Introduces the type or namespace alias `ElementScalar`.
+  - CN: 引入类型或命名空间别名 `ElementScalar`。
+- **L107** <code>  using ElementCompute = ElementCompute_;</code>
+  - EN: Introduces the type or namespace alias `ElementCompute`.
+  - CN: 引入类型或命名空间别名 `ElementCompute`。
+- **L108** <code>  using ElementC = ElementC_;</code>
+  - EN: Introduces the type or namespace alias `ElementC`.
+  - CN: 引入类型或命名空间别名 `ElementC`。
+- **L109** <code>  using ElementOut = ElementOut_;</code>
+  - EN: Introduces the type or namespace alias `ElementOut`.
+  - CN: 引入类型或命名空间别名 `ElementOut`。
+- **L110** <code>  using TensorAlpha = TensorAlpha_;</code>
+  - EN: Introduces the type or namespace alias `TensorAlpha`.
+  - CN: 引入类型或命名空间别名 `TensorAlpha`。
+- **L111** <code>  using TensorBeta = TensorBeta_;</code>
+  - EN: Introduces the type or namespace alias `TensorBeta`.
+  - CN: 引入类型或命名空间别名 `TensorBeta`。
+- **L112** <code>  using TensorBias = TensorBias_;</code>
+  - EN: Introduces the type or namespace alias `TensorBias`.
+  - CN: 引入类型或命名空间别名 `TensorBias`。
+- **L113** <code>  using ActivationFunctor = ActivationFunctor_;</code>
+  - EN: Introduces the type or namespace alias `ActivationFunctor`.
+  - CN: 引入类型或命名空间别名 `ActivationFunctor`。
+- **L114** <code>  static constexpr bool ResidualAdd = ResidualAdd_; // Source added after activation</code>
+  - EN: Assigns or initializes `ResidualAdd` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ResidualAdd` 进行赋值或初始化。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>  ElementScalar alpha = ElementScalar(1);</code>
+  - EN: Declares function or method `ElementScalar` without defining it here.
+  - CN: 声明函数或方法 `ElementScalar`，但不在此处给出定义。
+- **L117** <code>  ElementScalar beta = ElementScalar(0);</code>
+  - EN: Declares function or method `ElementScalar` without defining it here.
+  - CN: 声明函数或方法 `ElementScalar`，但不在此处给出定义。
+- **L118** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L119** <code>  TensorAlpha tensor_alpha{};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L120** <code>  TensorBeta tensor_beta{};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>  TensorBias tensor_bias{};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L122** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>template&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L125** <code>  cutlass::conv::Operator ConvOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L126** <code>  int NumSpatialDims,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L127** <code>  class TensorA,</code>
+  - EN: Begins the declaration of class `TensorA`.
+  - CN: 开始声明 class `TensorA`。
+- **L128** <code>  class TensorB,</code>
+  - EN: Begins the declaration of class `TensorB`.
+  - CN: 开始声明 class `TensorB`。
+- **L129** <code>  class TensorC,</code>
+  - EN: Begins the declaration of class `TensorC`.
+  - CN: 开始声明 class `TensorC`。
+- **L130** <code>  class TensorD,</code>
+  - EN: Begins the declaration of class `TensorD`.
+  - CN: 开始声明 class `TensorD`。
+- **L131** <code>  class ShapePadding,</code>
+  - EN: Begins the declaration of class `ShapePadding`.
+  - CN: 开始声明 class `ShapePadding`。
+- **L132** <code>  class StrideTraversal,</code>
+  - EN: Begins the declaration of class `StrideTraversal`.
+  - CN: 开始声明 class `StrideTraversal`。
+- **L133** <code>  class ShapeDilation,</code>
+  - EN: Begins the declaration of class `ShapeDilation`.
+  - CN: 开始声明 class `ShapeDilation`。
+- **L134** <code>  class EpilogueFusionParams</code>
+  - EN: Begins the declaration of class `EpilogueFusionParams`.
+  - CN: 开始声明 class `EpilogueFusionParams`。
+- **L135** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L136** <code>struct ConvReferenceImpl {</code>
+  - EN: Begins the declaration of struct `ConvReferenceImpl`.
+  - CN: 开始声明 struct `ConvReferenceImpl`。
+- **L137** <code>  // Hard code accumlulator type to float to avoid data lost in accumulating add.</code>
+  - EN: Comment that documents intent or context: "Hard code accumlulator type to float to avoid data lost in accumulating add.".
+  - CN: 用于说明意图或上下文的注释："Hard code accumlulator type to float to avoid data lost in accumulating add."。
+- **L138** <code>  using ElementAcc = cutlass::platform::conditional_t&lt;cutlass::platform::is_same_v&lt;typename EpilogueFusionParams::ElementAcc, double&gt;, double, float&gt;;</code>
+  - EN: Introduces the type or namespace alias `ElementAcc`.
+  - CN: 引入类型或命名空间别名 `ElementAcc`。
+- **L139** <code>  using ElementC = typename EpilogueFusionParams::ElementC;</code>
+  - EN: Introduces the type or namespace alias `ElementC`.
+  - CN: 引入类型或命名空间别名 `ElementC`。
+- **L140** <code>  using ElementOut = typename EpilogueFusionParams::ElementOut;</code>
+  - EN: Introduces the type or namespace alias `ElementOut`.
+  - CN: 引入类型或命名空间别名 `ElementOut`。
+- **L141** <code>  using ElementScalar = typename EpilogueFusionParams::ElementScalar;</code>
+  - EN: Introduces the type or namespace alias `ElementScalar`.
+  - CN: 引入类型或命名空间别名 `ElementScalar`。
+- **L142** <code>  using ElementCompute = typename EpilogueFusionParams::ElementCompute;</code>
+  - EN: Introduces the type or namespace alias `ElementCompute`.
+  - CN: 引入类型或命名空间别名 `ElementCompute`。
+- **L143** <code>  using ElementBias = typename EpilogueFusionParams::TensorBias::value_type;</code>
+  - EN: Introduces the type or namespace alias `ElementBias`.
+  - CN: 引入类型或命名空间别名 `ElementBias`。
+- **L144** <code>  using ActivationFunctor = typename EpilogueFusionParams::ActivationFunctor;</code>
+  - EN: Introduces the type or namespace alias `ActivationFunctor`.
+  - CN: 引入类型或命名空间别名 `ActivationFunctor`。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>  // Input related converter</code>
+  - EN: Comment that documents intent or context: "Input related converter".
+  - CN: 用于说明意图或上下文的注释："Input related converter"。
+- **L147** <code>  NumericConverter&lt;ElementCompute, ElementAcc&gt; acc_converter;</code>
+  - EN: Declares the symbol `acc_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `acc_converter`。
+- **L148** <code>  NumericConverter&lt;ElementCompute, ElementC&gt; residual_converter;</code>
+  - EN: Declares the symbol `residual_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `residual_converter`。
+- **L149** <code>  NumericConverter&lt;ElementCompute, ElementBias&gt; bias_converter;</code>
+  - EN: Declares the symbol `bias_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `bias_converter`。
+- **L150** <code>  // Scale related converter</code>
+  - EN: Comment that documents intent or context: "Scale related converter".
+  - CN: 用于说明意图或上下文的注释："Scale related converter"。
+- **L151** <code>  NumericConverter&lt;ElementCompute, ElementScalar&gt; scale_converter;</code>
+  - EN: Declares the symbol `scale_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `scale_converter`。
+- **L152** <code>  // Output related converter</code>
+  - EN: Comment that documents intent or context: "Output related converter".
+  - CN: 用于说明意图或上下文的注释："Output related converter"。
+- **L153** <code>  NumericConverter&lt;ElementOut, ElementCompute&gt; output_converter;</code>
+  - EN: Declares the symbol `output_converter` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_converter`。
+- **L154** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L155** <code>  EpilogueFusionParams&amp; epi_fusion_params_;</code>
+  - EN: Declares the symbol `epi_fusion_params_` in the current scope.
+  - CN: 在当前作用域中声明符号 `epi_fusion_params_`。
+- **L156** <code>  TensorA const&amp; tensor_a_;</code>
+  - EN: Declares the symbol `tensor_a_` in the current scope.
+  - CN: 在当前作用域中声明符号 `tensor_a_`。
+- **L157** <code>  TensorB const&amp; tensor_b_;</code>
+  - EN: Declares the symbol `tensor_b_` in the current scope.
+  - CN: 在当前作用域中声明符号 `tensor_b_`。
+- **L158** <code>  TensorC const&amp; tensor_c_;</code>
+  - EN: Declares the symbol `tensor_c_` in the current scope.
+  - CN: 在当前作用域中声明符号 `tensor_c_`。
+- **L159** <code>  TensorD&amp; tensor_d_;</code>
+  - EN: Declares the symbol `tensor_d_` in the current scope.
+  - CN: 在当前作用域中声明符号 `tensor_d_`。
+- **L160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L161** <code>  ShapePadding const&amp; padding_;</code>
+  - EN: Declares the symbol `padding_` in the current scope.
+  - CN: 在当前作用域中声明符号 `padding_`。
+- **L162** <code>  StrideTraversal const&amp; tstride_;</code>
+  - EN: Declares the symbol `tstride_` in the current scope.
+  - CN: 在当前作用域中声明符号 `tstride_`。
+- **L163** <code>  ShapeDilation const&amp; dilation_;</code>
+  - EN: Declares the symbol `dilation_` in the current scope.
+  - CN: 在当前作用域中声明符号 `dilation_`。
+- **L164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L165** <code>  // Epilogue activation operation</code>
+  - EN: Comment that documents intent or context: "Epilogue activation operation".
+  - CN: 用于说明意图或上下文的注释："Epilogue activation operation"。
+- **L166** <code>  ActivationFunctor epi_activation;</code>
+  - EN: Declares the symbol `epi_activation` in the current scope.
+  - CN: 在当前作用域中声明符号 `epi_activation`。
+- **L167** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L168** <code>  ConvReferenceImpl(</code>
+  - EN: Begins or continues the signature/call syntax involving `ConvReferenceImpl`.
+  - CN: 开始或继续与 `ConvReferenceImpl` 相关的签名/调用语法。
+- **L169** <code>    TensorA const&amp; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L170** <code>    TensorB const&amp; tensor_b,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L171** <code>    TensorC const&amp; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L172** <code>    TensorD&amp; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L173** <code>    ShapePadding const&amp; padding,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L174** <code>    StrideTraversal const&amp; tstride,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L175** <code>    ShapeDilation const&amp; dilation,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L176** <code>    EpilogueFusionParams&amp; epi_fusion_params)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L177** <code>  : tensor_a_(tensor_a),</code>
+  - EN: Begins or continues the signature/call syntax involving `tensor_a_`.
+  - CN: 开始或继续与 `tensor_a_` 相关的签名/调用语法。
+- **L178** <code>    tensor_b_(tensor_b),</code>
+  - EN: Begins or continues the signature/call syntax involving `tensor_b_`.
+  - CN: 开始或继续与 `tensor_b_` 相关的签名/调用语法。
+- **L179** <code>    tensor_c_(tensor_c),</code>
+  - EN: Begins or continues the signature/call syntax involving `tensor_c_`.
+  - CN: 开始或继续与 `tensor_c_` 相关的签名/调用语法。
+- **L180** <code>    tensor_d_(tensor_d),</code>
+  - EN: Begins or continues the signature/call syntax involving `tensor_d_`.
+  - CN: 开始或继续与 `tensor_d_` 相关的签名/调用语法。
+- **L181** <code>    padding_(padding),</code>
+  - EN: Begins or continues the signature/call syntax involving `padding_`.
+  - CN: 开始或继续与 `padding_` 相关的签名/调用语法。
+- **L182** <code>    tstride_(tstride),</code>
+  - EN: Begins or continues the signature/call syntax involving `tstride_`.
+  - CN: 开始或继续与 `tstride_` 相关的签名/调用语法。
+- **L183** <code>    dilation_(dilation),</code>
+  - EN: Begins or continues the signature/call syntax involving `dilation_`.
+  - CN: 开始或继续与 `dilation_` 相关的签名/调用语法。
+- **L184** <code>    epi_fusion_params_(epi_fusion_params)</code>
+  - EN: Begins or continues the signature/call syntax involving `epi_fusion_params_`.
+  - CN: 开始或继续与 `epi_fusion_params_` 相关的签名/调用语法。
+- **L185** <code>  {</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L186** <code>    static_assert(rank(ShapePadding{}) == rank(ShapeDilation{}));</code>
+  - EN: Declares function or method `rank` without defining it here.
+  - CN: 声明函数或方法 `rank`，但不在此处给出定义。
+- **L187** <code>    static_assert(rank(ShapePadding{}) == rank(StrideTraversal{}));</code>
+  - EN: Declares function or method `rank` without defining it here.
+  - CN: 声明函数或方法 `rank`，但不在此处给出定义。
+- **L188** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L189** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L190** <code>  void compute_reference() {</code>
+  - EN: Begins the definition of function or method `compute_reference`.
+  - CN: 开始定义函数或方法 `compute_reference`。
+- **L191** <code>    if constexpr (ConvOp == cutlass::conv::Operator::kFprop) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L192** <code>      fprop_reference(cute::Int&lt;NumSpatialDims&gt;{});</code>
+  - EN: Declares function or method `fprop_reference` without defining it here.
+  - CN: 声明函数或方法 `fprop_reference`，但不在此处给出定义。
+- **L193** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L194** <code>    else if constexpr (ConvOp == cutlass::conv::Operator::kDgrad) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L195** <code>      dgrad_reference(cute::Int&lt;NumSpatialDims&gt;{});</code>
+  - EN: Declares function or method `dgrad_reference` without defining it here.
+  - CN: 声明函数或方法 `dgrad_reference`，但不在此处给出定义。
+- **L196** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L197** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L198** <code>      wgrad_reference(cute::Int&lt;NumSpatialDims&gt;{});</code>
+  - EN: Declares function or method `wgrad_reference` without defining it here.
+  - CN: 声明函数或方法 `wgrad_reference`，但不在此处给出定义。
+- **L199** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L200** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L203** <code>  // Specialization for 1D fprop kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 1D fprop kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 1D fprop kernel"。
+- **L204** <code>  void fprop_reference(cute::Int&lt;1&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `fprop_reference`.
+  - CN: 开始定义函数或方法 `fprop_reference`。
+- **L205** <code>    int32_t G = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L206** <code>    int32_t N = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L207** <code>    int32_t Q = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L208** <code>    int32_t K = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L209** <code>    int32_t S = size&lt;1&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L210** <code>    int32_t C = size&lt;0&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L211** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L212** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L213** <code>  #pragma omp parallel for collapse(2)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L214** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L215** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L216** <code>      for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L217** <code>        for (int32_t q = 0; q &lt; Q; ++q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L218** <code>          for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L219** <code>            auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L220** <code>            for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L221** <code>              for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L222** <code>                int32_t w =  q * cute::get&lt;0&gt;(tstride_) - cute::get&lt;0&gt;(padding_) + s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L223** <code>                if (detail::is_activation_in_bounds(tensor_a_, n, w, c, g)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L224** <code>                  auto a = tensor_a_(c, w, n, g);</code>
+  - EN: Declares function or method `tensor_a_` without defining it here.
+  - CN: 声明函数或方法 `tensor_a_`，但不在此处给出定义。
+- **L225** <code>                  auto b = tensor_b_(c, s, k, g);</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L226** <code>                  accumulator += ElementAcc(a * b);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L227** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L228** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L229** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L230** <code>            ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L231** <code>              epi_fusion_params_.tensor_alpha[k] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L232** <code>            ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L233** <code>              epi_fusion_params_.tensor_beta[k] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L234** <code>            ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L235** <code>            if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L236** <code>              output += scale_converter(beta) * residual_converter(tensor_c_(k, q, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L237** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L238** <code>            if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L239** <code>              output += bias_converter(epi_fusion_params_.tensor_bias[k]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L240** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L241** <code>            output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L242** <code>            if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L243** <code>              output += scale_converter(beta) * residual_converter(tensor_c_(k, q, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L244** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L245** <code>            tensor_d_(k, q, n, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L246** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L247** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L248** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L249** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L250** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L251** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  // Specialization for 2D fprop kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 2D fprop kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 2D fprop kernel"。
+- **L254** <code>  void fprop_reference(cute::Int&lt;2&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `fprop_reference`.
+  - CN: 开始定义函数或方法 `fprop_reference`。
+- **L255** <code>    int32_t G = size&lt;4&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L256** <code>    int32_t N = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L257** <code>    int32_t P = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L258** <code>    int32_t Q = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L259** <code>    int32_t K = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L260** <code>    int32_t R = size&lt;2&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L261** <code>    int32_t S = size&lt;1&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L262** <code>    int32_t C = size&lt;0&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L265** <code>    #pragma omp parallel for collapse(3)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L266** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L267** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L268** <code>      for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L269** <code>        for (int32_t p = 0; p &lt; P; ++p) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L270** <code>          for (int32_t q = 0; q &lt; Q; ++q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L271** <code>            for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L272** <code>              auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L273** <code>              for (int32_t r = 0; r &lt; R; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L274** <code>                for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L275** <code>                  for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L276** <code>                    int32_t w =  q * cute::get&lt;0&gt;(tstride_) - cute::get&lt;0&gt;(padding_) + s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L277** <code>                    int32_t h =  p * cute::get&lt;1&gt;(tstride_) - cute::get&lt;1&gt;(padding_) + r * cute::get&lt;1&gt;(dilation_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L278** <code>                    if (detail::is_activation_in_bounds(tensor_a_, n, h, w, c, g)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L279** <code>                      auto a = tensor_a_(c, w, h, n, g);</code>
+  - EN: Declares function or method `tensor_a_` without defining it here.
+  - CN: 声明函数或方法 `tensor_a_`，但不在此处给出定义。
+- **L280** <code>                      auto b = tensor_b_(c, s, r, k, g);</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L281** <code>                      accumulator += ElementAcc(a * b);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L282** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L283** <code>                  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L284** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L285** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L286** <code>              ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L287** <code>                epi_fusion_params_.tensor_alpha[k] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L288** <code>              ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L289** <code>                epi_fusion_params_.tensor_beta[k] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L290** <code>              ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L291** <code>              if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L292** <code>                output += scale_converter(beta) * residual_converter(tensor_c_(k, q, p, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L293** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L294** <code>              if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L295** <code>                output += bias_converter(epi_fusion_params_.tensor_bias[k]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L296** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L297** <code>              output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L298** <code>              if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L299** <code>                output += scale_converter(beta) * residual_converter(tensor_c_(k, q, p, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L300** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L301** <code>              tensor_d_(k, q, p, n, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L302** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L303** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L304** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L305** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L306** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L307** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L308** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L309** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L310** <code>  // Specialization for 3D fprop kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 3D fprop kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 3D fprop kernel"。
+- **L311** <code>  void fprop_reference(cute::Int&lt;3&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `fprop_reference`.
+  - CN: 开始定义函数或方法 `fprop_reference`。
+- **L312** <code>    int32_t G = size&lt;5&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<5>` without defining it here.
+  - CN: 声明函数或方法 `size<5>`，但不在此处给出定义。
+- **L313** <code>    int32_t N = size&lt;4&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L314** <code>    int32_t Z = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L315** <code>    int32_t P = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L316** <code>    int32_t Q = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L317** <code>    int32_t K = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L318** <code>    int32_t T = size&lt;3&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L319** <code>    int32_t R = size&lt;2&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L320** <code>    int32_t S = size&lt;1&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L321** <code>    int32_t C = size&lt;0&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L324** <code>    #pragma omp parallel for collapse(3)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L325** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L326** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L327** <code>      for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L328** <code>        for (int32_t z = 0; z &lt; Z; ++z) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L329** <code>          for (int32_t p = 0; p &lt; P; ++p) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L330** <code>            for (int32_t q = 0; q &lt; Q; ++q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L331** <code>              for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L332** <code>                auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L333** <code>                for (int32_t t = 0; t &lt; T; ++t) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L334** <code>                  for (int32_t r = 0; r &lt; R; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L335** <code>                    for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L336** <code>                      for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L337** <code>                        int32_t w =  q * cute::get&lt;0&gt;(tstride_) - cute::get&lt;0&gt;(padding_) + s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L338** <code>                        int32_t h =  p * cute::get&lt;1&gt;(tstride_) - cute::get&lt;1&gt;(padding_) + r * cute::get&lt;1&gt;(dilation_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L339** <code>                        int32_t d =  z * cute::get&lt;2&gt;(tstride_) - cute::get&lt;2&gt;(padding_) + t * cute::get&lt;2&gt;(dilation_);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L340** <code>                        if (detail::is_activation_in_bounds(tensor_a_, n, d, h, w, c, g)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L341** <code>                          auto a = tensor_a_(c, w, h, d, n, g);</code>
+  - EN: Declares function or method `tensor_a_` without defining it here.
+  - CN: 声明函数或方法 `tensor_a_`，但不在此处给出定义。
+- **L342** <code>                          auto b = tensor_b_(c, s, r, t, k, g);</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L343** <code>                          accumulator += ElementAcc(a * b);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L344** <code>                        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L345** <code>                      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L346** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L347** <code>                  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L348** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L349** <code>                ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L350** <code>                  epi_fusion_params_.tensor_alpha[k] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L351** <code>                ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L352** <code>                  epi_fusion_params_.tensor_beta[k] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L353** <code>                ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L354** <code>                if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L355** <code>                  output += scale_converter(beta) * residual_converter(tensor_c_(k, q, p, z, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L356** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L357** <code>                if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L358** <code>                  output += bias_converter(epi_fusion_params_.tensor_bias[k]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L359** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L360** <code>                output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L361** <code>                if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L362** <code>                  output += scale_converter(beta) * residual_converter(tensor_c_(k, q, p, z, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L363** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L364** <code>                tensor_d_(k, q, p, z, n, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L365** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L366** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L367** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L368** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L369** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L370** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L371** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L372** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L373** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L374** <code>  // Specialization for 1D dgrad kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 1D dgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 1D dgrad kernel"。
+- **L375** <code>  void dgrad_reference(cute::Int&lt;1&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `dgrad_reference`.
+  - CN: 开始定义函数或方法 `dgrad_reference`。
+- **L376** <code>    int32_t G = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L377** <code>    int32_t N = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L378** <code>    int32_t W = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L379** <code>    int32_t C = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L380** <code>    int32_t K = size&lt;2&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L381** <code>    int32_t S = size&lt;1&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L382** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L383** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L384** <code>   #pragma omp parallel for collapse(2)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L385** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L386** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L387** <code>      for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L388** <code>        for (int32_t w = 0; w &lt; W; ++w) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L389** <code>          for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L390** <code>            auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L391** <code>            for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L392** <code>              for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L393** <code>                int32_t q = w + cute::get&lt;0&gt;(padding_) - s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L394** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L395** <code>                if (q % cute::get&lt;0&gt;(tstride_) == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L396** <code>                  q /= cute::get&lt;0&gt;(tstride_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L397** <code>                } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L398** <code>                  continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L399** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L400** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L401** <code>                if (detail::is_activation_in_bounds(tensor_a_, n, q, k, g)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L402** <code>                  accumulator += ElementAcc(tensor_a_(k, q, n, g) * tensor_b_(c, s, k, g));</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L403** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L404** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L405** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L406** <code>            ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data())</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L407** <code>              ? epi_fusion_params_.tensor_alpha[c] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L408** <code>            ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data())</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L409** <code>              ? epi_fusion_params_.tensor_beta[c] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L410** <code>            ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L411** <code>            if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L412** <code>              output += scale_converter(beta) * residual_converter(tensor_c_(c, w, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L413** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L414** <code>            if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L415** <code>              output += bias_converter(epi_fusion_params_.tensor_bias[c]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L416** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L417** <code>            output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L418** <code>            if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L419** <code>              output += scale_converter(beta) * residual_converter(tensor_c_(c, w, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L420** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L421** <code>            tensor_d_(c, w, n, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L422** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L423** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L424** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L425** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L426** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L427** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L428** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L429** <code>  // Specialization for 2D dgrad kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 2D dgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 2D dgrad kernel"。
+- **L430** <code>  void dgrad_reference(cute::Int&lt;2&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `dgrad_reference`.
+  - CN: 开始定义函数或方法 `dgrad_reference`。
+- **L431** <code>    int32_t G = size&lt;4&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L432** <code>    int32_t N = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L433** <code>    int32_t H = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L434** <code>    int32_t W = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L435** <code>    int32_t C = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L436** <code>    int32_t K = size&lt;3&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L437** <code>    int32_t R = size&lt;2&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L438** <code>    int32_t S = size&lt;1&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L439** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L440** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L441** <code>    #pragma omp parallel for collapse(3)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L442** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L443** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L444** <code>      for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L445** <code>        for (int32_t h = 0; h &lt; H; ++h) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L446** <code>          for (int32_t w = 0; w &lt; W; ++w) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L447** <code>            for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L448** <code>              auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L449** <code>              for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L450** <code>                for (int32_t r = 0; r &lt; R; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L451** <code>                  for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L452** <code>                    int32_t q = w + cute::get&lt;0&gt;(padding_) - s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L453** <code>                    int32_t p = h + cute::get&lt;1&gt;(padding_) - r * cute::get&lt;1&gt;(dilation_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L454** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L455** <code>                    if (q % cute::get&lt;0&gt;(tstride_) == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L456** <code>                      q /= cute::get&lt;0&gt;(tstride_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L457** <code>                    } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L458** <code>                      continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L459** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L460** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L461** <code>                    if (p % cute::get&lt;1&gt;(tstride_) == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L462** <code>                      p /= cute::get&lt;1&gt;(tstride_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L463** <code>                    } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L464** <code>                      continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L465** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L466** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L467** <code>                    if (detail::is_activation_in_bounds(tensor_a_, n, p, q, k, g)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L468** <code>                      accumulator += ElementAcc(tensor_a_(k, q, p, n, g) * tensor_b_(c, s, r, k, g));</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L469** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L470** <code>                  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L471** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L472** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L473** <code>              ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data())</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L474** <code>                ? epi_fusion_params_.tensor_alpha[c] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L475** <code>              ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data())</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L476** <code>                ? epi_fusion_params_.tensor_beta[c] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L477** <code>              ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L478** <code>              if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L479** <code>                output += scale_converter(beta) * residual_converter(tensor_c_(c, w, h, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L480** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L481** <code>              if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L482** <code>                output += bias_converter(epi_fusion_params_.tensor_bias[c]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L483** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L484** <code>              output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L485** <code>              if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L486** <code>                output += scale_converter(beta) * residual_converter(tensor_c_(c, w, h, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L487** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L488** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L489** <code>              tensor_d_(c, w, h, n, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L490** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L491** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L492** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L493** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L494** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L495** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L496** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L497** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L498** <code>  // Specialization for 3D dgrad kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 3D dgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 3D dgrad kernel"。
+- **L499** <code>  void dgrad_reference(cute::Int&lt;3&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `dgrad_reference`.
+  - CN: 开始定义函数或方法 `dgrad_reference`。
+- **L500** <code>    int32_t G = size&lt;5&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<5>` without defining it here.
+  - CN: 声明函数或方法 `size<5>`，但不在此处给出定义。
+- **L501** <code>    int32_t N = size&lt;4&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L502** <code>    int32_t D = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L503** <code>    int32_t H = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L504** <code>    int32_t W = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L505** <code>    int32_t C = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L506** <code>    int32_t K = size&lt;4&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L507** <code>    int32_t T = size&lt;3&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L508** <code>    int32_t R = size&lt;2&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L509** <code>    int32_t S = size&lt;1&gt;(tensor_b_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L510** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L511** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L512** <code>    #pragma omp parallel for collapse(3)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L513** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L514** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L515** <code>      for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L516** <code>        for (int32_t d = 0; d &lt; D; ++d) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L517** <code>          for (int32_t h = 0; h &lt; H; ++h) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L518** <code>            for (int32_t w = 0; w &lt; W; ++w) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L519** <code>              for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L520** <code>                auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L521** <code>                for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L522** <code>                  for (int32_t t = 0; t &lt; T; ++t) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L523** <code>                    for (int32_t r = 0; r &lt; R; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L524** <code>                      for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L525** <code>                        int32_t q = w + cute::get&lt;0&gt;(padding_) - s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L526** <code>                        int32_t p = h + cute::get&lt;1&gt;(padding_) - r * cute::get&lt;1&gt;(dilation_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L527** <code>                        int32_t z = d + cute::get&lt;2&gt;(padding_) - t * cute::get&lt;2&gt;(dilation_);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L528** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L529** <code>                        if (q % cute::get&lt;0&gt;(tstride_) == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L530** <code>                          q /= cute::get&lt;0&gt;(tstride_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L531** <code>                        } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L532** <code>                          continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L533** <code>                        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L534** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L535** <code>                        if (p % cute::get&lt;1&gt;(tstride_) == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L536** <code>                          p /= cute::get&lt;1&gt;(tstride_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L537** <code>                        } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L538** <code>                          continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L539** <code>                        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L540** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L541** <code>                        if (z % cute::get&lt;2&gt;(tstride_) == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L542** <code>                          z /= cute::get&lt;2&gt;(tstride_);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L543** <code>                        } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L544** <code>                          continue;</code>
+  - EN: Skips to the next iteration of the current loop.
+  - CN: 跳到当前循环的下一次迭代。
+- **L545** <code>                        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L546** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L547** <code>                        if (detail::is_activation_in_bounds(tensor_a_, n, z, p, q, k, g)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L548** <code>                          accumulator += ElementAcc(tensor_a_(k, q, p, z, n, g) * tensor_b_(c, s, r, t, k, g));</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L549** <code>                        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L550** <code>                      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L551** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L552** <code>                  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L553** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L554** <code>                ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data())</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L555** <code>                  ? epi_fusion_params_.tensor_alpha[c] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L556** <code>                ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data())</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L557** <code>                  ? epi_fusion_params_.tensor_beta[c] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L558** <code>                ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L559** <code>                if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L560** <code>                  output += scale_converter(beta) * residual_converter(tensor_c_(c, w, h, d, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L561** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L562** <code>                if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L563** <code>                  output += bias_converter(epi_fusion_params_.tensor_bias[c]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L564** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L565** <code>                output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L566** <code>                if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L567** <code>                  output += scale_converter(beta) * residual_converter(tensor_c_(c, w, h, d, n, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L568** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L569** <code>                tensor_d_(c, w, h, d, n, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L570** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L571** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L572** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L573** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L574** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L575** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L576** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L577** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L578** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L579** <code>  // Specialization for 1D wgrad kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 1D wgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 1D wgrad kernel"。
+- **L580** <code>  void wgrad_reference(cute::Int&lt;1&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `wgrad_reference`.
+  - CN: 开始定义函数或方法 `wgrad_reference`。
+- **L581** <code>    int32_t G = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L582** <code>    int32_t N =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L583** <code>        size&lt;2&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L584** <code>    int32_t Q =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L585** <code>        size&lt;1&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L586** <code>    int32_t K =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L587** <code>        size&lt;0&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L588** <code>    int32_t S = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L589** <code>    int32_t C = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L590** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L591** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L592** <code>    #pragma omp parallel for collapse(2)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L593** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L594** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L595** <code>      for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L596** <code>        for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L597** <code>          for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L598** <code>            auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L599** <code>            for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L600** <code>              for (int32_t q = 0; q &lt; Q; ++q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L601** <code>                int32_t w =  q * cute::get&lt;0&gt;(tstride_) - cute::get&lt;0&gt;(padding_) + s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L602** <code>                bool is_in_bounds =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L603** <code>                    detail::is_activation_in_bounds(tensor_b_, n, w, c, g);</code>
+  - EN: Declares function or method `is_activation_in_bounds` without defining it here.
+  - CN: 声明函数或方法 `is_activation_in_bounds`，但不在此处给出定义。
+- **L604** <code>                if (is_in_bounds) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L605** <code>                  auto act =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L606** <code>                      tensor_b_(c, w, n, g);</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L607** <code>                  auto xformed_act =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L608** <code>                      tensor_a_(k, q, n, g);</code>
+  - EN: Declares function or method `tensor_a_` without defining it here.
+  - CN: 声明函数或方法 `tensor_a_`，但不在此处给出定义。
+- **L609** <code>                  accumulator += ElementAcc(act * xformed_act);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L610** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L611** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L612** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L613** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L614** <code>            ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L615** <code>              epi_fusion_params_.tensor_alpha[c] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L616** <code>            ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L617** <code>              epi_fusion_params_.tensor_beta[c] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L618** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L619** <code>            ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L620** <code>            if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L621** <code>              output += scale_converter(beta) * residual_converter(tensor_c_(c, s, k, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L622** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L623** <code>            if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L624** <code>              output += bias_converter(epi_fusion_params_.tensor_bias[c]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L625** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L626** <code>            output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L627** <code>            if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L628** <code>              output += scale_converter(beta) * residual_converter(tensor_c_(c, s, k, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L629** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L630** <code>            tensor_d_(c, s, k, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L631** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L632** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L633** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L634** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L635** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L636** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L637** <code>  // Specialization for 2D wgrad kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 2D wgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 2D wgrad kernel"。
+- **L638** <code>  void wgrad_reference(cute::Int&lt;2&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `wgrad_reference`.
+  - CN: 开始定义函数或方法 `wgrad_reference`。
+- **L639** <code>    int32_t G = size&lt;4&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L640** <code>    int32_t N =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L641** <code>        size&lt;3&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L642** <code>    int32_t P =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L643** <code>        size&lt;2&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L644** <code>    int32_t Q =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L645** <code>        size&lt;1&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L646** <code>    int32_t K =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L647** <code>        size&lt;0&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L648** <code>    int32_t R = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L649** <code>    int32_t S = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L650** <code>    int32_t C = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L651** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L652** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L653** <code>    #pragma omp parallel for collapse(3)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L654** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L655** <code>    for (int32_t g = 0; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L656** <code>      for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L657** <code>        for (int32_t r = 0; r &lt; R; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L658** <code>          for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L659** <code>            for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L660** <code>              auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L661** <code>              for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L662** <code>                for (int32_t p = 0; p &lt; P; ++p) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L663** <code>                  for (int32_t q = 0; q &lt; Q; ++q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L664** <code>                    int32_t w =  q * cute::get&lt;0&gt;(tstride_) - cute::get&lt;0&gt;(padding_) + s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L665** <code>                    int32_t h =  p * cute::get&lt;1&gt;(tstride_) - cute::get&lt;1&gt;(padding_) + r * cute::get&lt;1&gt;(dilation_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L666** <code>                    bool is_in_bounds =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L667** <code>                        detail::is_activation_in_bounds(tensor_b_, n, h, w, c, g);</code>
+  - EN: Declares function or method `is_activation_in_bounds` without defining it here.
+  - CN: 声明函数或方法 `is_activation_in_bounds`，但不在此处给出定义。
+- **L668** <code>                    if (is_in_bounds) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L669** <code>                      auto act =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L670** <code>                          tensor_b_(c, w, h, n, g);</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L671** <code>                      auto xformed_act =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L672** <code>                          tensor_a_(k, q, p, n, g);</code>
+  - EN: Declares function or method `tensor_a_` without defining it here.
+  - CN: 声明函数或方法 `tensor_a_`，但不在此处给出定义。
+- **L673** <code>                      accumulator += ElementAcc(act * xformed_act);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L674** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L675** <code>                  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L676** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L677** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L678** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L679** <code>              ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L680** <code>                epi_fusion_params_.tensor_alpha[c] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L681** <code>              ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L682** <code>                epi_fusion_params_.tensor_beta[c] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L683** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L684** <code>              ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L685** <code>              if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L686** <code>                output += scale_converter(beta) * residual_converter(tensor_c_(c, s, r, k, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L687** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L688** <code>              if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L689** <code>                output += bias_converter(epi_fusion_params_.tensor_bias[c]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L690** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L691** <code>              output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L692** <code>              if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L693** <code>                output += scale_converter(beta) * residual_converter(tensor_c_(c, s, r, k, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L694** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L695** <code>              tensor_d_(c, s, r, k, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L696** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L697** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L698** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L699** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L700** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L701** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L702** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L703** <code>  // Specialization for 3D wgrad kernel</code>
+  - EN: Comment that documents intent or context: "Specialization for 3D wgrad kernel".
+  - CN: 用于说明意图或上下文的注释："Specialization for 3D wgrad kernel"。
+- **L704** <code>  void wgrad_reference(cute::Int&lt;3&gt; spatial_dims) {</code>
+  - EN: Begins the definition of function or method `wgrad_reference`.
+  - CN: 开始定义函数或方法 `wgrad_reference`。
+- **L705** <code>    int32_t G = size&lt;5&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<5>` without defining it here.
+  - CN: 声明函数或方法 `size<5>`，但不在此处给出定义。
+- **L706** <code>    int32_t N =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L707** <code>        size&lt;4&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<4>` without defining it here.
+  - CN: 声明函数或方法 `size<4>`，但不在此处给出定义。
+- **L708** <code>    int32_t Z =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L709** <code>        size&lt;3&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L710** <code>    int32_t P =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L711** <code>        size&lt;2&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L712** <code>    int32_t Q =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L713** <code>        size&lt;1&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L714** <code>    int32_t K =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L715** <code>        size&lt;0&gt;(tensor_a_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L716** <code>    int32_t T = size&lt;3&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<3>` without defining it here.
+  - CN: 声明函数或方法 `size<3>`，但不在此处给出定义。
+- **L717** <code>    int32_t R = size&lt;2&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<2>` without defining it here.
+  - CN: 声明函数或方法 `size<2>`，但不在此处给出定义。
+- **L718** <code>    int32_t S = size&lt;1&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L719** <code>    int32_t C = size&lt;0&gt;(tensor_d_);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L720** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L721** <code>#if defined(_OPENMP)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L722** <code>    #pragma omp parallel for collapse(3)</code>
+  - EN: Begins or continues the signature/call syntax involving `collapse`.
+  - CN: 开始或继续与 `collapse` 相关的签名/调用语法。
+- **L723** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L724** <code>    for (int32_t g = 0 ; g &lt; G; ++g) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L725** <code>      for (int32_t k = 0; k &lt; K; ++k) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L726** <code>        for (int32_t t = 0; t &lt; T; ++t) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L727** <code>          for (int32_t r = 0; r &lt; R; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L728** <code>            for (int32_t s = 0; s &lt; S; ++s) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L729** <code>              for (int32_t c = 0; c &lt; C; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L730** <code>                auto accumulator = ElementAcc(0);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L731** <code>                for (int32_t n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L732** <code>                  for (int32_t z = 0; z &lt; Z; ++z) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L733** <code>                    for (int32_t p = 0; p &lt; P; ++p) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L734** <code>                      for (int32_t q = 0; q &lt; Q; ++q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L735** <code>                        int32_t w =  q * cute::get&lt;0&gt;(tstride_) - cute::get&lt;0&gt;(padding_) + s * cute::get&lt;0&gt;(dilation_);</code>
+  - EN: Declares function or method `get<0>` without defining it here.
+  - CN: 声明函数或方法 `get<0>`，但不在此处给出定义。
+- **L736** <code>                        int32_t h =  p * cute::get&lt;1&gt;(tstride_) - cute::get&lt;1&gt;(padding_) + r * cute::get&lt;1&gt;(dilation_);</code>
+  - EN: Declares function or method `get<1>` without defining it here.
+  - CN: 声明函数或方法 `get<1>`，但不在此处给出定义。
+- **L737** <code>                        int32_t d =  z * cute::get&lt;2&gt;(tstride_) - cute::get&lt;2&gt;(padding_) + t * cute::get&lt;2&gt;(dilation_);</code>
+  - EN: Declares function or method `get<2>` without defining it here.
+  - CN: 声明函数或方法 `get<2>`，但不在此处给出定义。
+- **L738** <code>                        bool is_in_bounds =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L739** <code>                            detail::is_activation_in_bounds(tensor_b_, n, d, h, w, c, g);</code>
+  - EN: Declares function or method `is_activation_in_bounds` without defining it here.
+  - CN: 声明函数或方法 `is_activation_in_bounds`，但不在此处给出定义。
+- **L740** <code>                        if (is_in_bounds) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L741** <code>                          auto act =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L742** <code>                              tensor_b_(c, w, h, d, n, g);</code>
+  - EN: Declares function or method `tensor_b_` without defining it here.
+  - CN: 声明函数或方法 `tensor_b_`，但不在此处给出定义。
+- **L743** <code>                          auto xformed_act =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L744** <code>                              tensor_a_(k, q, p, z, n, g);</code>
+  - EN: Declares function or method `tensor_a_` without defining it here.
+  - CN: 声明函数或方法 `tensor_a_`，但不在此处给出定义。
+- **L745** <code>                          accumulator += ElementAcc(act * xformed_act);</code>
+  - EN: Declares function or method `ElementAcc` without defining it here.
+  - CN: 声明函数或方法 `ElementAcc`，但不在此处给出定义。
+- **L746** <code>                        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L747** <code>                      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L748** <code>                    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L749** <code>                  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L750** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L751** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L752** <code>                ElementScalar alpha = raw_pointer_cast(epi_fusion_params_.tensor_alpha.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L753** <code>                  epi_fusion_params_.tensor_alpha[c] : epi_fusion_params_.alpha;</code>
+  - EN: Declares the symbol `alpha` in the current scope.
+  - CN: 在当前作用域中声明符号 `alpha`。
+- **L754** <code>                ElementScalar beta = raw_pointer_cast(epi_fusion_params_.tensor_beta.data()) ?</code>
+  - EN: Begins or continues the signature/call syntax involving `data`.
+  - CN: 开始或继续与 `data` 相关的签名/调用语法。
+- **L755** <code>                  epi_fusion_params_.tensor_beta[c] : epi_fusion_params_.beta;</code>
+  - EN: Declares the symbol `beta` in the current scope.
+  - CN: 在当前作用域中声明符号 `beta`。
+- **L756** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L757** <code>                ElementCompute output = scale_converter(alpha) * acc_converter(accumulator);</code>
+  - EN: Declares function or method `acc_converter` without defining it here.
+  - CN: 声明函数或方法 `acc_converter`，但不在此处给出定义。
+- **L758** <code>                if (not EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L759** <code>                  output += scale_converter(beta) * residual_converter(tensor_c_(c, s, r, t, k, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L760** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L761** <code>                if (raw_pointer_cast(epi_fusion_params_.tensor_bias.data())) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L762** <code>                  output += bias_converter(epi_fusion_params_.tensor_bias[c]);</code>
+  - EN: Declares function or method `bias_converter` without defining it here.
+  - CN: 声明函数或方法 `bias_converter`，但不在此处给出定义。
+- **L763** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L764** <code>                output = epi_activation(output);</code>
+  - EN: Declares function or method `epi_activation` without defining it here.
+  - CN: 声明函数或方法 `epi_activation`，但不在此处给出定义。
+- **L765** <code>                if (EpilogueFusionParams::ResidualAdd) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L766** <code>                  output += scale_converter(beta) * residual_converter(tensor_c_(c, s, r, t, k, g));</code>
+  - EN: Declares function or method `tensor_c_` without defining it here.
+  - CN: 声明函数或方法 `tensor_c_`，但不在此处给出定义。
+- **L767** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L768** <code>                tensor_d_(c, s, r, t, k, g) = output_converter(output);</code>
+  - EN: Declares function or method `output_converter` without defining it here.
+  - CN: 声明函数或方法 `output_converter`，但不在此处给出定义。
+- **L769** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L770** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L771** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L772** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L773** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L774** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L775** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L776** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L777** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L778** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L779** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L780** <code>} // cutlass::reference::host</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L781** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L782** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_conversion.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/epilogue/thread/activation.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cute/tensor.hpp</code> — project-specific declarations from `tensor.hpp` / 来自 `tensor.hpp` 的项目专用声明
+- <code>cuda_runtime.h</code> — project-specific declarations from `cuda_runtime.h` / 来自 `cuda_runtime.h` 的项目专用声明

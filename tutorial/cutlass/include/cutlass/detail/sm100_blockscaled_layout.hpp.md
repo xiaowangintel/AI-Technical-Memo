@@ -1,0 +1,782 @@
+# sm100_blockscaled_layout.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/detail/sm100_blockscaled_layout.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Blocked Scale configs specific for SM100 BlockScaled MMA" and defines related CUTLASS facilities in `include/cutlass/detail/sm100_blockscaled_layout.hpp`.
+- CN: 该头文件以注释摘要“Blocked Scale configs specific for SM100 BlockScaled MMA”引入，并在 `include/cutlass/detail/sm100_blockscaled_layout.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L33**: <code>    \brief Blocked Scale configs specific for SM100 BlockScaled MMA</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L34**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L37**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L38**: <code>#include &quot;cutlass/layout/matrix.h&quot;</code>
+  - EN: Includes "cutlass/layout/matrix.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/layout/matrix.h"，以便本文件使用该依赖中的声明。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>#include &quot;cute/int_tuple.hpp&quot;</code>
+  - EN: Includes "cute/int_tuple.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/int_tuple.hpp"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cute/atom/mma_traits_sm100.hpp&quot;</code>
+  - EN: Includes "cute/atom/mma_traits_sm100.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/atom/mma_traits_sm100.hpp"，以便本文件使用该依赖中的声明。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>namespace cutlass::detail {</code>
+  - EN: Opens namespace `cutlass::detail` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::detail`，为后续声明提供作用域。
+- **L44**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L45**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L46**: <code>using namespace cute;</code>
+  - EN: Imports names from namespace `cute` into the current scope.
+  - CN: 将命名空间 `cute` 的名字导入当前作用域。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>template&lt;int SFVecSize, UMMA::Major major = UMMA::Major::K&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L49**: <code>struct Sm1xxBlockScaledBasicChunk {</code>
+  - EN: Declares or defines the struct `Sm1xxBlockScaledBasicChunk`.
+  - CN: 声明或定义 struct `Sm1xxBlockScaledBasicChunk`。
+- **L50**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L51**: <code>  using Blk_MN    = _128;</code>
+  - EN: Defines the alias `Blk_MN` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_MN`。
+- **L52**: <code>  using Blk_SF    =   _4; </code>
+  - EN: Defines the alias `Blk_SF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_SF`。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>  using SfKMajorAtom  = Layout&lt; Shape&lt; Shape&lt;_32,_4&gt;, Shape&lt;Int&lt;SFVecSize&gt;, _4&gt;&gt;, </code>
+  - EN: Defines the alias `SfKMajorAtom` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SfKMajorAtom`。
+- **L55**: <code>                               Stride&lt;Stride&lt;_16,_4&gt;, Stride&lt;           _0, _1&gt;&gt;&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L56**: <code>  using SfMNMajorAtom = Layout&lt; Shape&lt; Shape&lt;Int&lt;SFVecSize&gt;, _4&gt;,  Shape&lt;_32,_4&gt;&gt;, </code>
+  - EN: Defines the alias `SfMNMajorAtom` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SfMNMajorAtom`。
+- **L57**: <code>                               Stride&lt;Stride&lt;            _0, _1&gt;, Stride&lt;_16,_4&gt;&gt;&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L58**: <code>  using SfAtom    = cute::conditional_t&lt;major == UMMA::Major::K, SfKMajorAtom, SfMNMajorAtom&gt;;</code>
+  - EN: Defines the alias `SfAtom` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SfAtom`。
+- **L59**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L60**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L61**: <code>template&lt;int SFVecSize_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L62**: <code>struct Sm1xxBlockScaledConfig {</code>
+  - EN: Declares or defines the struct `Sm1xxBlockScaledConfig`.
+  - CN: 声明或定义 struct `Sm1xxBlockScaledConfig`。
+- **L63**: <code>  // We are creating the SFA and SFB tensors&#x27; layouts in the collective since they always have the same layout.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L64**: <code>  // k-major order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L65**: <code>  static constexpr int SFVecSize = SFVecSize_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L66**: <code>  using Sm1xxBlkScaledChunk = Sm1xxBlockScaledBasicChunk&lt;SFVecSize&gt;;</code>
+  - EN: Defines the alias `Sm1xxBlkScaledChunk` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Sm1xxBlkScaledChunk`。
+- **L67**: <code>  using Blk_MN = typename Sm1xxBlkScaledChunk::Blk_MN;</code>
+  - EN: Defines the alias `Blk_MN` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_MN`。
+- **L68**: <code>  using Blk_SF = typename Sm1xxBlkScaledChunk::Blk_SF; </code>
+  - EN: Defines the alias `Blk_SF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_SF`。
+- **L69**: <code>  using SfAtom = typename Sm1xxBlkScaledChunk::SfAtom;</code>
+  - EN: Defines the alias `SfAtom` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SfAtom`。
+- **L70**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L71**: <code>  using LayoutSF = decltype(blocked_product(SfAtom{}, make_layout( make_shape(int32_t(0), int32_t(0), int32_t(0)),</code>
+  - EN: Defines the alias `LayoutSF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `LayoutSF`。
+- **L72**: <code>                                                                  make_stride(int32_t(0),       _1{}, int32_t(0)))));</code>
+  - EN: Declares the callable or operator `make_stride`.
+  - CN: 声明可调用对象或运算符 `make_stride`。
+- **L73**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L74**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L75**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L76**: <code>  deduce_layoutSFA() {</code>
+  - EN: Starts the definition body for `deduce_layoutSFA`.
+  - CN: 开始 `deduce_layoutSFA` 的定义体。
+- **L77**: <code>    return LayoutSF{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L78**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L79**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L80**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L81**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L82**: <code>  deduce_layoutSFB() {</code>
+  - EN: Starts the definition body for `deduce_layoutSFB`.
+  - CN: 开始 `deduce_layoutSFB` 的定义体。
+- **L83**: <code>    return LayoutSF{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L84**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L85**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L86**: <code>  // The following function is provided for user fill dynamic problem size to the layout_SFA.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L87**: <code>  template &lt; class ProblemShape, class LayoutSFA = LayoutSF&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L88**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L89**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L90**: <code>  tile_atom_to_shape_SFA(ProblemShape problem_shape, LayoutSFA layout_sfa = LayoutSFA{}) {</code>
+  - EN: Starts the definition body for `tile_atom_to_shape_SFA`.
+  - CN: 开始 `tile_atom_to_shape_SFA` 的定义体。
+- **L91**: <code>    if constexpr (rank(ProblemShape{}) == 3) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L92**: <code>      auto [M, N, K] = problem_shape;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L93**: <code>      return tile_to_shape(SfAtom{}, make_shape(M,K), Step&lt;_2,_1&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L94**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L95**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L96**: <code>      auto [M, N, K, L] = problem_shape;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L97**: <code>      return tile_to_shape(SfAtom{}, make_shape(M,K,L), Step&lt;_2,_1,_3&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L98**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L99**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L100**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L101**: <code>  // The following function is provided for user fill dynamic problem size to the layout_SFB.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L102**: <code>  template &lt;class ProblemShape, class LayoutSFB = LayoutSF&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L103**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L104**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L105**: <code>  tile_atom_to_shape_SFB(ProblemShape problem_shape, LayoutSFB layout_sfb = LayoutSFB{}) {</code>
+  - EN: Starts the definition body for `tile_atom_to_shape_SFB`.
+  - CN: 开始 `tile_atom_to_shape_SFB` 的定义体。
+- **L106**: <code>    if constexpr (rank(ProblemShape{}) == 3) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L107**: <code>      auto [M, N, K] = problem_shape;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L108**: <code>      return tile_to_shape(SfAtom{}, make_shape(N,K), Step&lt;_2,_1&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L109**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L110**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L111**: <code>      auto [M, N, K, L] = problem_shape;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L112**: <code>      return tile_to_shape(SfAtom{}, make_shape(N,K,L), Step&lt;_2,_1,_3&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L113**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L114**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L115**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L116**: <code>  template&lt;class TiledMma, class TileShape_MNK&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L117**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L118**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L119**: <code>  deduce_smem_layoutSFA(TiledMma tiled_mma, TileShape_MNK tileshape_mnk) {</code>
+  - EN: Starts the definition body for `deduce_smem_layoutSFA`.
+  - CN: 开始 `deduce_smem_layoutSFA` 的定义体。
+- **L120**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L121**: <code>    constexpr int MMA_NSF = TiledMma::K / SFVecSize;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L122**: <code>    // Basic storage block for new Scaling Factor Layouts</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L123**: <code>    using mnBasicBlockShape  =  Shape&lt;_32,_4&gt;;</code>
+  - EN: Defines the alias `mnBasicBlockShape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mnBasicBlockShape`。
+- **L124**: <code>    using mnBasicBlockStride = Stride&lt;_16,_4&gt;;</code>
+  - EN: Defines the alias `mnBasicBlockStride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mnBasicBlockStride`。
+- **L125**: <code>    using kBasicBlockShape  = Shape&lt;Int&lt;SFVecSize&gt;, Int&lt;MMA_NSF&gt;&gt;;</code>
+  - EN: Defines the alias `kBasicBlockShape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `kBasicBlockShape`。
+- **L126**: <code>    using kBasicBlockStride = Stride&lt;_0, _1&gt;;</code>
+  - EN: Defines the alias `kBasicBlockStride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `kBasicBlockStride`。
+- **L127**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L128**: <code>    // ((MMA_TILE_M,MMA_TILE_K), MMA_M, MMA_K)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L129**: <code>    using MmaShapeA_MK = decltype(partition_shape_A(TiledMma{}, make_shape(cute::size&lt;0&gt;(TileShape_MNK{}),</code>
+  - EN: Defines the alias `MmaShapeA_MK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `MmaShapeA_MK`。
+- **L130**: <code>                                                                          cute::size&lt;2&gt;(TileShape_MNK{}))));</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L131**: <code>    // ((MMA_TILE_N,MMA_TILE_K), MMA_N, MMA_K)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L132**: <code>    using MmaShapeB_NK = decltype(partition_shape_B(TiledMma{}, make_shape(cute::size&lt;1&gt;(TileShape_MNK{}),</code>
+  - EN: Defines the alias `MmaShapeB_NK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `MmaShapeB_NK`。
+- **L133**: <code>                                                                          cute::size&lt;2&gt;(TileShape_MNK{}))));</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L134**: <code>    // A single indivisible block will hold 4 scale factors of 128 rows/columns (A/B matrix).</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L135**: <code>    // 4 is chosen to make consecutive 32bits of data to have scale factors for only a single row (col). 32bits corresponds to the TMEM word size </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L136**: <code>    using Blk_MN    = typename Sm1xxBlkScaledChunk::Blk_MN;</code>
+  - EN: Defines the alias `Blk_MN` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_MN`。
+- **L137**: <code>    using Blk_SF    = typename Sm1xxBlkScaledChunk::Blk_SF; </code>
+  - EN: Defines the alias `Blk_SF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_SF`。
+- **L138**: <code>    using Blk_Elems = decltype(Blk_MN{} * Blk_SF{});</code>
+  - EN: Defines the alias `Blk_Elems` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_Elems`。
+- **L139**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L140**: <code>    using TL_VMNK = typename TiledMma::ThrLayoutVMNK;</code>
+  - EN: Defines the alias `TL_VMNK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TL_VMNK`。
+- **L141**: <code>    constexpr TL_VMNK tl_vmnk{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L142**: <code>    constexpr int MMA_M = cute::size&lt;0&gt;(TileShape_MNK{}) / cute::size&lt;0&gt;(tl_vmnk);</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L143**: <code>    using mma_SFA_shape  = decltype( make_shape( prepend(Int&lt;MMA_M&gt;{}/Blk_MN{},  mnBasicBlockShape{}),  kBasicBlockShape{}));</code>
+  - EN: Defines the alias `mma_SFA_shape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mma_SFA_shape`。
+- **L144**: <code>    using mma_SFA_stride = decltype(make_stride( prepend(          Blk_Elems{}, mnBasicBlockStride{}), kBasicBlockStride{}));</code>
+  - EN: Defines the alias `mma_SFA_stride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mma_SFA_stride`。
+- **L145**: <code>    using sSFA_shape     = decltype( make_shape( mma_SFA_shape{}, _1{},   make_shape( Blk_SF{}/Int&lt;MMA_NSF&gt;{}, Int&lt;size&lt;2&gt;(TileShape_MNK{}) / SFVecSize / Blk_SF{}&gt;{})));</code>
+  - EN: Defines the alias `sSFA_shape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `sSFA_shape`。
+- **L146**: <code>    using sSFA_stride    = decltype(make_stride(mma_SFA_stride{}, _0{},  make_stride(          Int&lt;MMA_NSF&gt;{},                   Int&lt;MMA_M /Blk_MN{} * Blk_Elems{}&gt;{})));</code>
+  - EN: Defines the alias `sSFA_stride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `sSFA_stride`。
+- **L147**: <code>    using SmemLayoutAtomSFA = decltype(make_layout(sSFA_shape{}, sSFA_stride{}));</code>
+  - EN: Defines the alias `SmemLayoutAtomSFA` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SmemLayoutAtomSFA`。
+- **L148**: <code>    return SmemLayoutAtomSFA{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L149**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L150**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L151**: <code>  template&lt;class TiledMma, class TileShape_MNK&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L152**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L153**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L154**: <code>  deduce_smem_layoutSFB(TiledMma tiled_mma, TileShape_MNK tileshape_mnk) {</code>
+  - EN: Starts the definition body for `deduce_smem_layoutSFB`.
+  - CN: 开始 `deduce_smem_layoutSFB` 的定义体。
+- **L155**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L156**: <code>    constexpr int MMA_NSF = TiledMma::K / SFVecSize;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L157**: <code>    // Basic storage block for new Scaling Factor Layouts</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L158**: <code>    using mnBasicBlockShape  =  Shape&lt;_32,_4&gt;;</code>
+  - EN: Defines the alias `mnBasicBlockShape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mnBasicBlockShape`。
+- **L159**: <code>    using mnBasicBlockStride = Stride&lt;_16,_4&gt;;</code>
+  - EN: Defines the alias `mnBasicBlockStride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mnBasicBlockStride`。
+- **L160**: <code>    using kBasicBlockShape  = Shape&lt;Int&lt;SFVecSize&gt;, Int&lt;MMA_NSF&gt;&gt;;</code>
+  - EN: Defines the alias `kBasicBlockShape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `kBasicBlockShape`。
+- **L161**: <code>    using kBasicBlockStride = Stride&lt;_0, _1&gt;;</code>
+  - EN: Defines the alias `kBasicBlockStride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `kBasicBlockStride`。
+- **L162**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L163**: <code>    // ((MMA_TILE_M,MMA_TILE_K), MMA_M, MMA_K)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L164**: <code>    using MmaShapeA_MK = decltype(partition_shape_A(TiledMma{}, make_shape(cute::size&lt;0&gt;(TileShape_MNK{}),</code>
+  - EN: Defines the alias `MmaShapeA_MK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `MmaShapeA_MK`。
+- **L165**: <code>                                                                          cute::size&lt;2&gt;(TileShape_MNK{}))));</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L166**: <code>    // ((MMA_TILE_N,MMA_TILE_K), MMA_N, MMA_K)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L167**: <code>    using MmaShapeB_NK = decltype(partition_shape_B(TiledMma{}, make_shape(cute::size&lt;1&gt;(TileShape_MNK{}),</code>
+  - EN: Defines the alias `MmaShapeB_NK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `MmaShapeB_NK`。
+- **L168**: <code>                                                                          cute::size&lt;2&gt;(TileShape_MNK{}))));</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L169**: <code>    // A single indivisible block will hold 4 scale factors of 128 rows/columns (A/B matrix).</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L170**: <code>    // 4 is chosen to make consecutive 32bits of data to have scale factors for only a single row (col). 32bits corresponds to the TMEM word size </code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L171**: <code>    using Blk_MN    = typename Sm1xxBlkScaledChunk::Blk_MN;</code>
+  - EN: Defines the alias `Blk_MN` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_MN`。
+- **L172**: <code>    using Blk_SF    = typename Sm1xxBlkScaledChunk::Blk_SF; </code>
+  - EN: Defines the alias `Blk_SF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_SF`。
+- **L173**: <code>    using Blk_Elems = decltype(Blk_MN{} * Blk_SF{});</code>
+  - EN: Defines the alias `Blk_Elems` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_Elems`。
+- **L174**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L175**: <code>    using TL_VMNK = typename TiledMma::ThrLayoutVMNK;</code>
+  - EN: Defines the alias `TL_VMNK` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TL_VMNK`。
+- **L176**: <code>    constexpr TL_VMNK tl_vmnk{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L177**: <code>    constexpr int MMA_N = cute::size&lt;1&gt;(TileShape_MNK{});</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L178**: <code>    // If MMA_N is 192, we need to operate at MMA_N = 256 granularity for UTCCP to work for ScaleFactorB.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L179**: <code>    // Both TMA and UTCCP will transfer scale factor B as if we have 256 columns in B matrix.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L180**: <code>    constexpr int MMA_N_SFB = cutlass::ceil_div(MMA_N, Blk_MN{}) * Blk_MN{};</code>
+  - EN: Declares the callable or operator `ceil_div`.
+  - CN: 声明可调用对象或运算符 `ceil_div`。
+- **L181**: <code>    using mma_SFB_shape  = decltype(make_shape( prepend(   Int&lt;MMA_N_SFB&gt;{}/Blk_MN{},  mnBasicBlockShape{}),  kBasicBlockShape{}));</code>
+  - EN: Defines the alias `mma_SFB_shape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mma_SFB_shape`。
+- **L182**: <code>    using mma_SFB_stride = decltype(make_stride(prepend(                 Blk_Elems{}, mnBasicBlockStride{}), kBasicBlockStride{}));</code>
+  - EN: Defines the alias `mma_SFB_stride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `mma_SFB_stride`。
+- **L183**: <code>    using sSFB_shape     = decltype( make_shape( mma_SFB_shape{}, _1{},  make_shape( Blk_SF{}/Int&lt;MMA_NSF&gt;{}, Int&lt;size&lt;2&gt;(TileShape_MNK{}) / SFVecSize / Blk_SF{}&gt;{})));</code>
+  - EN: Defines the alias `sSFB_shape` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `sSFB_shape`。
+- **L184**: <code>    using sSFB_stride    = decltype(make_stride(mma_SFB_stride{}, _0{}, make_stride(         Int&lt;MMA_NSF&gt;{},               Int&lt;MMA_N_SFB / Blk_MN{} * Blk_Elems{}&gt;{})));</code>
+  - EN: Defines the alias `sSFB_stride` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `sSFB_stride`。
+- **L185**: <code>    using SmemLayoutAtomSFB = decltype(make_layout(sSFB_shape{}, sSFB_stride{}));</code>
+  - EN: Defines the alias `SmemLayoutAtomSFB` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SmemLayoutAtomSFB`。
+- **L186**: <code>    return SmemLayoutAtomSFB{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L187**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L188**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L189**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L190**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L191**: <code>template&lt;int SFVecSize_, UMMA::Major major = UMMA::Major::K&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L192**: <code>struct Sm1xxBlockScaledOutputConfig {</code>
+  - EN: Declares or defines the struct `Sm1xxBlockScaledOutputConfig`.
+  - CN: 声明或定义 struct `Sm1xxBlockScaledOutputConfig`。
+- **L193**: <code>  // We are creating the SFD tensors&#x27; layouts in the collective.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L194**: <code>  // k-major order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L195**: <code>  static constexpr int SFVecSize = SFVecSize_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L196**: <code>  using Sm1xxBlkScaledChunk = cutlass::detail::Sm1xxBlockScaledBasicChunk&lt;SFVecSize, major&gt;;</code>
+  - EN: Defines the alias `Sm1xxBlkScaledChunk` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Sm1xxBlkScaledChunk`。
+- **L197**: <code>  using Blk_MN = typename Sm1xxBlkScaledChunk::Blk_MN;</code>
+  - EN: Defines the alias `Blk_MN` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_MN`。
+- **L198**: <code>  using Blk_SF = typename Sm1xxBlkScaledChunk::Blk_SF; </code>
+  - EN: Defines the alias `Blk_SF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_SF`。
+- **L199**: <code>  using SfAtom = typename Sm1xxBlkScaledChunk::SfAtom;</code>
+  - EN: Defines the alias `SfAtom` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SfAtom`。
+- **L200**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L201**: <code>  using LayoutKMajorSF  = decltype(blocked_product(SfAtom{}, make_layout(make_shape (int32_t(0), int32_t(0), int32_t(0)),</code>
+  - EN: Defines the alias `LayoutKMajorSF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `LayoutKMajorSF`。
+- **L202**: <code>                                                                         make_stride(int32_t(0),       _1{}, int32_t(0)))));</code>
+  - EN: Declares the callable or operator `make_stride`.
+  - CN: 声明可调用对象或运算符 `make_stride`。
+- **L203**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L204**: <code>  using LayoutMNMajorSF = decltype(blocked_product(SfAtom{}, make_layout(make_shape (int32_t(0), int32_t(0), int32_t(0)),</code>
+  - EN: Defines the alias `LayoutMNMajorSF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `LayoutMNMajorSF`。
+- **L205**: <code>                                                                         make_stride(      _1{}, int32_t(0), int32_t(0)))));</code>
+  - EN: Declares the callable or operator `make_stride`.
+  - CN: 声明可调用对象或运算符 `make_stride`。
+- **L206**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L207**: <code>  using LayoutSF = cute::conditional_t&lt;major == UMMA::Major::K, LayoutKMajorSF, LayoutMNMajorSF&gt;;</code>
+  - EN: Defines the alias `LayoutSF` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `LayoutSF`。
+- **L208**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L209**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L210**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L211**: <code>  deduce_layoutSFD() {</code>
+  - EN: Starts the definition body for `deduce_layoutSFD`.
+  - CN: 开始 `deduce_layoutSFD` 的定义体。
+- **L212**: <code>    return LayoutSF{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L213**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L214**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L215**: <code>  // The following function is provided for user fill dynamic problem size to the layout_SFC.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L216**: <code>  template &lt;class ProblemShape, class LayoutSFD = LayoutSF&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L217**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L218**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L219**: <code>  tile_atom_to_shape_SFD(ProblemShape problem_shape, LayoutSFD layout_sfc = LayoutSFD{}) {</code>
+  - EN: Starts the definition body for `tile_atom_to_shape_SFD`.
+  - CN: 开始 `tile_atom_to_shape_SFD` 的定义体。
+- **L220**: <code>    auto problem_shape_MNKL = append&lt;4&gt;(problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L221**: <code>    auto [M, N, K, L] = problem_shape_MNKL;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L222**: <code>    if constexpr (major == UMMA::Major::K) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L223**: <code>      return tile_to_shape(SfAtom{}, make_shape(M,N,L), Step&lt;_2,_1,_3&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L224**: <code>    } </code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L225**: <code>    else { </code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L226**: <code>      return tile_to_shape(SfAtom{}, make_shape(M,N,L), Step&lt;_1,_2,_3&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L227**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L228**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L229**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L230**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L231**: <code>//// Describe the Scalefactor Tensor without VectorSize</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L232**: <code>struct Sm1xxBlockScaledTensorConfig {</code>
+  - EN: Declares or defines the struct `Sm1xxBlockScaledTensorConfig`.
+  - CN: 声明或定义 struct `Sm1xxBlockScaledTensorConfig`。
+- **L233**: <code>  // k-major order</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L234**: <code>  // The blockscaled tensor does not need to know vectorsize</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L235**: <code>  using Blk_M = _128;</code>
+  - EN: Defines the alias `Blk_M` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_M`。
+- **L236**: <code>  using Blk_N =   _4; </code>
+  - EN: Defines the alias `Blk_N` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Blk_N`。
+- **L237**: <code>  using SfAtom = Layout&lt; Shape&lt; Shape&lt;_32,_4&gt;,  Shape&lt;_4&gt;&gt;, </code>
+  - EN: Defines the alias `SfAtom` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `SfAtom`。
+- **L238**: <code>                        Stride&lt;Stride&lt;_16,_4&gt;, Stride&lt;_1&gt;&gt;&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>  template &lt;class ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L241**: <code>  CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L242**: <code>  static constexpr auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L243**: <code>  tile_atom_to_shape(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `tile_atom_to_shape`.
+  - CN: 开始 `tile_atom_to_shape` 的定义体。
+- **L244**: <code>    auto problem_shape_MNL = append&lt;3&gt;(problem_shape, 1);</code>
+  - EN: Declares the callable or operator `append`.
+  - CN: 声明可调用对象或运算符 `append`。
+- **L245**: <code>    auto [M, N, L] = problem_shape_MNL;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L246**: <code>    return tile_to_shape(SfAtom{}, make_shape(M,N,L), Step&lt;_2,_1,_3&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L247**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L248**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L249**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L250**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <code>} // namespace cutlass::detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Symbol focus: `Sm1xxBlockScaledBasicChunk` / 重点符号：`Sm1xxBlockScaledBasicChunk`
+- Symbol focus: `Blk_MN` / 重点符号：`Blk_MN`
+- Symbol focus: `Blk_SF` / 重点符号：`Blk_SF`
+- Symbol focus: `SfKMajorAtom` / 重点符号：`SfKMajorAtom`
+- Symbol focus: `SfMNMajorAtom` / 重点符号：`SfMNMajorAtom`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/layout/matrix.h"`
+  - `"cute/int_tuple.hpp"`
+  - `"cute/atom/mma_traits_sm100.hpp"`

@@ -1,0 +1,38 @@
+# dispatch.py — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `torch/fx/experimental/unification/dispatch.py`
+- **Repository / 仓库**: `pytorch/pytorch`
+- **Purpose (EN)**: Holds experimental tracing, shape reasoning, and transformation infrastructure built on FX.
+- **Purpose (CN)**: 存放基于 FX 的实验性跟踪、形状推理与变换基础设施。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-8
+```python
+from functools import partial
+
+from .multipledispatch import dispatch as _dispatch  # type: ignore[import]
+
+
+namespace = {}  # type: ignore[var-annotated]
+
+dispatch = partial(_dispatch, namespace=namespace)
+```
+- **EN**: This module-level block helps route operators through dispatch and decomposition helpers.
+- **CN**: 这个模块级代码块用于通过分发与分解辅助逻辑路由算子。
+
+## Key Concepts / 关键概念
+
+- **FX infrastructure / FX 基础设施**
+  - EN: The file extends the FX toolkit used for symbolic tracing and graph transformation.
+  - CN: 该文件扩展了用于符号跟踪和图变换的 FX 工具链。
+- **API boundaries / API 边界**
+  - EN: Imports, exports, and helper definitions in this file define how adjacent modules cooperate.
+  - CN: 本文件中的导入、导出与辅助定义共同界定了相邻模块之间的协作边界。
+## Dependencies / 依赖关系
+
+- **Internal PyTorch modules / PyTorch 内部模块**: `.multipledispatch`
+- **Standard library / 标准库**: `functools`
+- **Relationship summary / 关系总结**: Dependencies mainly support FX graph IR, tracing machinery, and graph transformation utilities. / 依赖关系主要支撑 FX 图中间表示、跟踪机制和图变换工具。

@@ -1,0 +1,330 @@
+# numeric_conversion.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/arch/numeric_conversion.py`
+
+## Purpose / 作用
+- EN: Defines 3 functions (cvt_i8_bf16_intrinsic, cvt_i4_bf16_intrinsic, sext_unpacked_i4_i8_intrinsic) in `CuTeDSL.cutlass.cute.arch.numeric_conversion`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.arch.numeric_conversion` 定义了 3 个函数（cvt_i8_bf16_intrinsic, cvt_i4_bf16_intrinsic, sext_unpacked_i4_i8_intrinsic）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L15** `from cutlass.base_dsl.common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `cutlass.base_dsl.common`. **CN:** 从 `cutlass.base_dsl.common` 导入 DSLRuntimeError。
+- **L16** `from cutlass.cutlass_dsl import BaseDSL, dsl_user_op` — **EN:** Imports BaseDSL, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 BaseDSL, dsl_user_op。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L19** `from cutlass._mlir.dialects import arith, vector` — **EN:** Imports arith, vector from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 arith, vector。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `from .nvvm_wrappers import (` — **EN:** Imports cvt_i8_bf16, cvt_i8x2_to_bf16x2, cvt_i8x4_to_bf16x4, cvt_f32x2_bf16x2, cvt_i8x4_to_f32x4, cvt_i8x2_to_f32x2, ... (+6 more) from `.nvvm_wrappers`. **CN:** 从 `.nvvm_wrappers` 导入 cvt_i8_bf16, cvt_i8x2_to_bf16x2, cvt_i8x4_to_bf16x4, cvt_f32x2_bf16x2, cvt_i8x4_to_f32x4, cvt_i8x2_to_f32x2, ... (+6 more)。
+- **L22** `    cvt_i8_bf16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    cvt_i8x2_to_bf16x2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    cvt_i8x4_to_bf16x4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    cvt_f32x2_bf16x2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    cvt_i8x4_to_f32x4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    cvt_i8x2_to_f32x2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    cvt_i4x8_to_bf16x8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    cvt_i4x4_to_bf16x4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    cvt_i4x2_to_bf16x2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    cvt_i4_bf16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    cvt_f32_bf16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    sext_unpacked_i4x4_to_i8x4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `from ..typing import Int4, Int8, Float32, BFloat16, Int32` — **EN:** Imports Int4, Int8, Float32, BFloat16, Int32 from `..typing`. **CN:** 从 `..typing` 导入 Int4, Int8, Float32, BFloat16, Int32。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L39** `def cvt_i8_bf16_intrinsic(` — **EN:** Defines function `cvt_i8_bf16_intrinsic`. **CN:** 定义函数 `cvt_i8_bf16_intrinsic`。
+- **L40** `    vec_i8: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L41** `    length: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L42** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L43** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L44** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L46** `    """` — **EN:** Starts the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 开始说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L47** `    Fast conversion from int8 to bfloat16. It converts a vector of int8 to a vector of bfloat16.` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `    :param vec_i8: The input vector of int8.` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L50** `    :type vec_i8: 1D vector of int8` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L51** `    :param length: The length of the input vector.` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L52** `    :type length: int` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L53** `    :return: The output 1D vector of bfloat16 with the same length as the input vector.` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L54** `    :rtype: 1D vector of bfloat16` — **EN:** Continues the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L55** `    """` — **EN:** Ends the docstring for the function `cvt_i8_bf16_intrinsic`. **CN:** 结束说明 function `cvt_i8_bf16_intrinsic` 的文档字符串。
+- **L56** `    arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L57** `    if arch not in cvt_i8_bf16_intrinsic.supported_archs:  # type: ignore[attr-defined]` — **EN:** Starts a conditional branch guarded by `arch not in cvt_i8_bf16_intrinsic.supported_archs`. **CN:** 开始一个由 `arch not in cvt_i8_bf16_intrinsic.supported_archs` 控制的条件分支。
+- **L58** `        raise DSLRuntimeError(f"cvt_i8_bf16_intrinsic is not supported on {arch}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L59** `    src_pos = 0` — **EN:** Assigns a value to src_pos. **CN:** 将一个值赋给 src_pos。
+- **L60** `    vec_i8x4_type = ir.VectorType.get([4], Int8.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i8x4_type. **CN:** 将一个值赋给 vec_i8x4_type。
+- **L61** `    vec_i8x2_type = ir.VectorType.get([2], Int8.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i8x2_type. **CN:** 将一个值赋给 vec_i8x2_type。
+- **L62** `    vec_f32x2_type = ir.VectorType.get([2], Float32.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_f32x2_type. **CN:** 将一个值赋给 vec_f32x2_type。
+- **L63** `    vec_dst_type = ir.VectorType.get([length], BFloat16.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_dst_type. **CN:** 将一个值赋给 vec_dst_type。
+- **L64** `    zero_attr = ir.FloatAttr.get(BFloat16.mlir_type, 0.0)` — **EN:** Assigns a value to zero_attr. **CN:** 将一个值赋给 zero_attr。
+- **L65** `    vec_dst = arith.ConstantOp(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L66** `        vec_dst_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `        ir.DenseElementsAttr.get_splat(vec_dst_type, zero_attr),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    ).result` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L72** `    # try to use vectorized version` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** `    if length >= 4:` — **EN:** Starts a conditional branch guarded by `length >= 4`. **CN:** 开始一个由 `length >= 4` 控制的条件分支。
+- **L74** `        num_vec4 = length // 4` — **EN:** Assigns a value to num_vec4. **CN:** 将一个值赋给 num_vec4。
+- **L75** `        for _ in range(num_vec4):` — **EN:** Starts a loop assigning items from `range(num_vec4)` to `_`. **CN:** 开始一个循环，将 `range(num_vec4)` 的元素赋给 `_`。
+- **L76** `            vec_i8x4 = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_i8x4. **CN:** 将一个值赋给 vec_i8x4。
+- **L77** `                vec_i8x4_type, vec_i8, [src_pos], [4], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `            if arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs:  # type: ignore[attr-defined]` — **EN:** Starts a conditional branch guarded by `arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs`. **CN:** 开始一个由 `arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs` 控制的条件分支。
+- **L80** `                vec_bf16x4 = cvt_i8x4_to_bf16x4(vec_i8x4, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_bf16x4. **CN:** 将一个值赋给 vec_bf16x4。
+- **L81** `                vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L82** `                    vec_bf16x4, vec_dst, [src_pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L85** `                vec_f32x4 = cvt_i8x4_to_f32x4(vec_i8x4, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_f32x4. **CN:** 将一个值赋给 vec_f32x4。
+- **L86** `                vec_f32x2_lo = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_f32x2_lo. **CN:** 将一个值赋给 vec_f32x2_lo。
+- **L87** `                    vec_f32x2_type, vec_f32x4, [0], [2], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `                vec_f32x2_hi = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_f32x2_hi. **CN:** 将一个值赋给 vec_f32x2_hi。
+- **L90** `                    vec_f32x2_type, vec_f32x4, [2], [2], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `                vec_bf16x2_lo = cvt_f32x2_bf16x2(vec_f32x2_lo, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_bf16x2_lo. **CN:** 将一个值赋给 vec_bf16x2_lo。
+- **L93** `                vec_bf16x2_hi = cvt_f32x2_bf16x2(vec_f32x2_hi, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_bf16x2_hi. **CN:** 将一个值赋给 vec_bf16x2_hi。
+- **L94** `                vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L95** `                    vec_bf16x2_lo, vec_dst, [src_pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `                vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L98** `                    vec_bf16x2_hi, vec_dst, [src_pos + 2], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `            src_pos += 4` — **EN:** Updates src_pos in place. **CN:** 原地更新 src_pos。
+- **L102** `            length -= 4` — **EN:** Updates length in place. **CN:** 原地更新 length。
+- **L103** `    if length >= 2:` — **EN:** Starts a conditional branch guarded by `length >= 2`. **CN:** 开始一个由 `length >= 2` 控制的条件分支。
+- **L104** `        vec_i8x2 = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_i8x2. **CN:** 将一个值赋给 vec_i8x2。
+- **L105** `            vec_i8x2_type, vec_i8, [src_pos], [2], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `        if arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs:  # type: ignore[attr-defined]` — **EN:** Starts a conditional branch guarded by `arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs`. **CN:** 开始一个由 `arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs` 控制的条件分支。
+- **L108** `            vec_bf16x2 = cvt_i8x2_to_bf16x2(vec_i8x2, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_bf16x2. **CN:** 将一个值赋给 vec_bf16x2。
+- **L109** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L110** `            vec_f32x2 = cvt_i8x2_to_f32x2(vec_i8x2, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_f32x2. **CN:** 将一个值赋给 vec_f32x2。
+- **L111** `            vec_bf16x2 = cvt_f32x2_bf16x2(vec_f32x2, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_bf16x2. **CN:** 将一个值赋给 vec_bf16x2。
+- **L112** `        vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L113** `            vec_bf16x2, vec_dst, [src_pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        src_pos += 2` — **EN:** Updates src_pos in place. **CN:** 原地更新 src_pos。
+- **L116** `        length -= 2` — **EN:** Updates length in place. **CN:** 原地更新 length。
+- **L117** `    if length >= 1:` — **EN:** Starts a conditional branch guarded by `length >= 1`. **CN:** 开始一个由 `length >= 1` 控制的条件分支。
+- **L118** `        if arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs:  # type: ignore[attr-defined]` — **EN:** Starts a conditional branch guarded by `arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs`. **CN:** 开始一个由 `arch in cvt_i8_bf16_intrinsic.s26_bf16_supported_archs` 控制的条件分支。
+- **L119** `            val_bf16 = cvt_i8_bf16(` — **EN:** Assigns a value to val_bf16. **CN:** 将一个值赋给 val_bf16。
+- **L120** `                vector.extractelement(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `                    vec_i8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `                    position=arith.constant(Int32.mlir_type, src_pos),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L130** `            src_i8 = vector.extractelement(` — **EN:** Assigns a value to src_i8. **CN:** 将一个值赋给 src_i8。
+- **L131** `                vec_i8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `                position=arith.constant(Int32.mlir_type, src_pos),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `            src_i32 = arith.ExtSIOp(Int32.mlir_type, src_i8, loc=loc, ip=ip)` — **EN:** Assigns a value to src_i32. **CN:** 将一个值赋给 src_i32。
+- **L137** `            src_f32 = arith.SIToFPOp(Float32.mlir_type, src_i32, loc=loc, ip=ip)` — **EN:** Assigns a value to src_f32. **CN:** 将一个值赋给 src_f32。
+- **L138** `            val_bf16 = cvt_f32_bf16(src_f32, loc=loc, ip=ip)` — **EN:** Assigns a value to val_bf16. **CN:** 将一个值赋给 val_bf16。
+- **L139** `        vec_dst = vector.insertelement(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L140** `            val_bf16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `            vec_dst,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            position=arith.constant(Int32.mlir_type, src_pos),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    return vec_dst` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L150** `def cvt_i4_bf16_intrinsic(` — **EN:** Defines function `cvt_i4_bf16_intrinsic`. **CN:** 定义函数 `cvt_i4_bf16_intrinsic`。
+- **L151** `    vec_i4: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L152** `    length: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L153** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `    with_shuffle: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L155** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L156** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L157** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L158** `    """` — **EN:** Starts the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 开始说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L159** `    Fast conversion from int4 to bfloat16. It converts a vector of int4 to a vector of bfloat16.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    :param vec_i4: The input vector of int4.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L162** `    :type vec_i4: 1D vector of int4` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L163** `    :param length: The length of the input vector.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L164** `    :type length: int` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L165** `    :param with_shuffle: Whether the input vec_i4 follows a specific shuffle pattern.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L166** `        If True, for consecutive 8 int4 values with indices of (0, 1, 2, 3, 4, 5, 6, 7),` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L167** `        the input elements are shuffled to (0, 2, 1, 3, 4, 6, 5, 7). For tailing elements less than 8,` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L168** `        the shuffle pattern is (0, 2, 1, 3) for 4 elements. No shuffle is needed for less than 4 elements.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L169** `        Shuffle could help to produce converted bf16 values in the natural order of (0, 1, 2 ,3 ,4 ,5 ,6 ,7)` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L170** `        without extra prmt instructions and thus better performance.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L171** `    :type with_shuffle: bool` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L172** `    :return: The output 1D vector of bfloat16 with the same length as the input vector.` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L173** `    :rtype: 1D vector of bfloat16` — **EN:** Continues the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 继续说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L174** `    """` — **EN:** Ends the docstring for the function `cvt_i4_bf16_intrinsic`. **CN:** 结束说明 function `cvt_i4_bf16_intrinsic` 的文档字符串。
+- **L175** `    arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L176** `    if arch not in cvt_i4_bf16_intrinsic.supported_archs:  # type: ignore[attr-defined]` — **EN:** Starts a conditional branch guarded by `arch not in cvt_i4_bf16_intrinsic.supported_archs`. **CN:** 开始一个由 `arch not in cvt_i4_bf16_intrinsic.supported_archs` 控制的条件分支。
+- **L177** `        raise DSLRuntimeError(f"cvt_i4_bf16_intrinsic is not supported on {arch}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L178** `    src_pos = 0` — **EN:** Assigns a value to src_pos. **CN:** 将一个值赋给 src_pos。
+- **L179** `    vec_i4x8_type = ir.VectorType.get([8], Int4.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i4x8_type. **CN:** 将一个值赋给 vec_i4x8_type。
+- **L180** `    vec_i4x4_type = ir.VectorType.get([4], Int4.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i4x4_type. **CN:** 将一个值赋给 vec_i4x4_type。
+- **L181** `    vec_i4x2_type = ir.VectorType.get([2], Int4.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i4x2_type. **CN:** 将一个值赋给 vec_i4x2_type。
+- **L182** `    vec_dst_type = ir.VectorType.get([length], BFloat16.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_dst_type. **CN:** 将一个值赋给 vec_dst_type。
+- **L183** `    zero_attr = ir.FloatAttr.get(BFloat16.mlir_type, 0.0)` — **EN:** Assigns a value to zero_attr. **CN:** 将一个值赋给 zero_attr。
+- **L184** `    vec_dst = arith.ConstantOp(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L185** `        vec_dst_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `        ir.DenseElementsAttr.get_splat(vec_dst_type, zero_attr),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `    ).result` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `    # try to use vectorized version` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L192** `    if length >= 8:` — **EN:** Starts a conditional branch guarded by `length >= 8`. **CN:** 开始一个由 `length >= 8` 控制的条件分支。
+- **L193** `        num_vec8 = length // 8` — **EN:** Assigns a value to num_vec8. **CN:** 将一个值赋给 num_vec8。
+- **L194** `        for _ in range(num_vec8):` — **EN:** Starts a loop assigning items from `range(num_vec8)` to `_`. **CN:** 开始一个循环，将 `range(num_vec8)` 的元素赋给 `_`。
+- **L195** `            vec_i4x8 = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_i4x8. **CN:** 将一个值赋给 vec_i4x8。
+- **L196** `                vec_i4x8_type, vec_i4, [src_pos], [8], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `            vec_bf16x8 = cvt_i4x8_to_bf16x8(` — **EN:** Assigns a value to vec_bf16x8. **CN:** 将一个值赋给 vec_bf16x8。
+- **L199** `                vec_i4x8, with_shuffle=with_shuffle, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `            vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L202** `                vec_bf16x8, vec_dst, [src_pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `            src_pos += 8` — **EN:** Updates src_pos in place. **CN:** 原地更新 src_pos。
+- **L205** `            length -= 8` — **EN:** Updates length in place. **CN:** 原地更新 length。
+- **L206** `    if length >= 4:` — **EN:** Starts a conditional branch guarded by `length >= 4`. **CN:** 开始一个由 `length >= 4` 控制的条件分支。
+- **L207** `        vec_i4x4 = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_i4x4. **CN:** 将一个值赋给 vec_i4x4。
+- **L208** `            vec_i4x4_type, vec_i4, [src_pos], [4], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `        vec_bf16x4 = cvt_i4x4_to_bf16x4(` — **EN:** Assigns a value to vec_bf16x4. **CN:** 将一个值赋给 vec_bf16x4。
+- **L211** `            vec_i4x4, with_shuffle=with_shuffle, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `        vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L214** `            vec_bf16x4, vec_dst, [src_pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `        src_pos += 4` — **EN:** Updates src_pos in place. **CN:** 原地更新 src_pos。
+- **L217** `        length -= 4` — **EN:** Updates length in place. **CN:** 原地更新 length。
+- **L218** `    if length >= 2:` — **EN:** Starts a conditional branch guarded by `length >= 2`. **CN:** 开始一个由 `length >= 2` 控制的条件分支。
+- **L219** `        vec_i4x2 = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_i4x2. **CN:** 将一个值赋给 vec_i4x2。
+- **L220** `            vec_i4x2_type, vec_i4, [src_pos], [2], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `        vec_bf16x2 = cvt_i4x2_to_bf16x2(` — **EN:** Assigns a value to vec_bf16x2. **CN:** 将一个值赋给 vec_bf16x2。
+- **L223** `            vec_i4x2, with_shuffle=with_shuffle, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `        vec_dst = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L226** `            vec_bf16x2, vec_dst, [src_pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `        src_pos += 2` — **EN:** Updates src_pos in place. **CN:** 原地更新 src_pos。
+- **L229** `        length -= 2` — **EN:** Updates length in place. **CN:** 原地更新 length。
+- **L230** `    if length >= 1:` — **EN:** Starts a conditional branch guarded by `length >= 1`. **CN:** 开始一个由 `length >= 1` 控制的条件分支。
+- **L231** `        val_bf16 = cvt_i4_bf16(` — **EN:** Assigns a value to val_bf16. **CN:** 将一个值赋给 val_bf16。
+- **L232** `            vector.extractelement(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `                vec_i4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `                position=arith.constant(Int32.mlir_type, src_pos),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `        vec_dst = vector.insertelement(` — **EN:** Assigns a value to vec_dst. **CN:** 将一个值赋给 vec_dst。
+- **L242** `            val_bf16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `            vec_dst,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `            position=arith.constant(Int32.mlir_type, src_pos),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `    return vec_dst` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L252** `def sext_unpacked_i4_i8_intrinsic(` — **EN:** Defines function `sext_unpacked_i4_i8_intrinsic`. **CN:** 定义函数 `sext_unpacked_i4_i8_intrinsic`。
+- **L253** `    vec_unpacked_i4: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L254** `    length: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L255** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L256** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L257** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L258** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L259** `    """` — **EN:** Starts the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 开始说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L260** `    Sign extend vector of int4 unpacked in 8b containers to packed int8` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `    :param vec_unpacked_i4: The input vector of unpacked int4.` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L263** `    :type vec_unpacked_i4: 1D vector of unpacked int4` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L264** `    :param length: The length of the input vector.` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L265** `    :type length: int` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L266** `    :return: The output 1D vector of int8 with the same length as the input vector.` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L267** `    :rtype: 1D vector of int8` — **EN:** Continues the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 继续说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L268** `    """` — **EN:** Ends the docstring for the function `sext_unpacked_i4_i8_intrinsic`. **CN:** 结束说明 function `sext_unpacked_i4_i8_intrinsic` 的文档字符串。
+- **L269** `    assert length % 4 == 0, "unsupported length"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `    vec_i8x4_type = ir.VectorType.get([4], Int8.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i8x4_type. **CN:** 将一个值赋给 vec_i8x4_type。
+- **L272** `    vec_i8_type = ir.VectorType.get([length], Int8.mlir_type, loc=loc)` — **EN:** Assigns a value to vec_i8_type. **CN:** 将一个值赋给 vec_i8_type。
+- **L273** `    zero_attr = ir.IntegerAttr.get(Int8.mlir_type, 0)` — **EN:** Assigns a value to zero_attr. **CN:** 将一个值赋给 zero_attr。
+- **L274** `    vec_i8 = arith.ConstantOp(` — **EN:** Assigns a value to vec_i8. **CN:** 将一个值赋给 vec_i8。
+- **L275** `        vec_i8_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `        ir.DenseElementsAttr.get_splat(vec_i8_type, zero_attr),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `    ).result` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `    for pos in range(0, length, 4):` — **EN:** Starts a loop assigning items from `range(0, length, 4)` to `pos`. **CN:** 开始一个循环，将 `range(0, length, 4)` 的元素赋给 `pos`。
+- **L282** `        vec_unpacked_i4x4 = vector.extract_strided_slice(` — **EN:** Assigns a value to vec_unpacked_i4x4. **CN:** 将一个值赋给 vec_unpacked_i4x4。
+- **L283** `            vec_i8x4_type, vec_unpacked_i4, [pos], [4], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `        vec_i8x4 = sext_unpacked_i4x4_to_i8x4(vec_unpacked_i4x4, loc=loc, ip=ip)` — **EN:** Assigns a value to vec_i8x4. **CN:** 将一个值赋给 vec_i8x4。
+- **L286** `        vec_i8 = vector.insert_strided_slice(` — **EN:** Assigns a value to vec_i8. **CN:** 将一个值赋给 vec_i8。
+- **L287** `            vec_i8x4, vec_i8, [pos], [1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L290** `    return vec_i8` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `# Expose supported architectures via the intrinsic symbol` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L294** `cvt_i8_bf16_intrinsic.supported_archs = (  # type: ignore[attr-defined]` — **EN:** Assigns a value to cvt_i8_bf16_intrinsic.supported_archs. **CN:** 将一个值赋给 cvt_i8_bf16_intrinsic.supported_archs。
+- **L295** `    *Arch.AmpereArchs(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `    *Arch.AdaArchs(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `    *Arch.HopperArchs(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `    *Arch.BlackwellArchs(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `cvt_i8_bf16_intrinsic.s26_bf16_supported_archs = (  # type: ignore[attr-defined]` — **EN:** Assigns a value to cvt_i8_bf16_intrinsic.s26_bf16_supported_archs. **CN:** 将一个值赋给 cvt_i8_bf16_intrinsic.s26_bf16_supported_archs。
+- **L301** `    Arch.sm_100a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `    Arch.sm_110a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `    Arch.sm_120a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `    Arch.sm_121a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `cvt_i4_bf16_intrinsic.supported_archs = (  # type: ignore[attr-defined]` — **EN:** Assigns a value to cvt_i4_bf16_intrinsic.supported_archs. **CN:** 将一个值赋给 cvt_i4_bf16_intrinsic.supported_archs。
+- **L307** `    Arch.sm_100a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `    Arch.sm_110a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `    Arch.sm_120a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `    Arch.sm_121a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.arch.numeric_conversion`. CN: 模块名为 `CuTeDSL.cutlass.cute.arch.numeric_conversion`。
+- EN: Top-level functions: cvt_i8_bf16_intrinsic, cvt_i4_bf16_intrinsic, sext_unpacked_i4_i8_intrinsic CN: 顶层函数包括：cvt_i8_bf16_intrinsic, cvt_i4_bf16_intrinsic, sext_unpacked_i4_i8_intrinsic
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.arch:Arch, cutlass.base_dsl.common:DSLRuntimeError, cutlass.cutlass_dsl:BaseDSL,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:arith,vector, .nvvm_wrappers:cvt_i8_bf16,cvt_i8x2_to_bf16x2,cvt_i8x4_to_bf16x4,cvt_f32x2_bf16x2,cvt_i8x4_to_f32x4,cvt_i8x2_to_f32x2,cvt_i4x8_to_bf16x8,cvt_i4x4_to_bf16x4,cvt_i4x2_to_bf16x2,cvt_i4_bf16,cvt_f32_bf16,sext_unpacked_i4x4_to_i8x4, ..typing:Int4,Int8,Float32,BFloat16,Int32 CN: 内部依赖：cutlass.base_dsl.arch:Arch, cutlass.base_dsl.common:DSLRuntimeError, cutlass.cutlass_dsl:BaseDSL,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:arith,vector, .nvvm_wrappers:cvt_i8_bf16,cvt_i8x2_to_bf16x2,cvt_i8x4_to_bf16x4,cvt_f32x2_bf16x2,cvt_i8x4_to_f32x4,cvt_i8x2_to_f32x2,cvt_i4x8_to_bf16x8,cvt_i4x4_to_bf16x4,cvt_i4x2_to_bf16x2,cvt_i4_bf16,cvt_f32_bf16,sext_unpacked_i4x4_to_i8x4, ..typing:Int4,Int8,Float32,BFloat16,Int32
+- EN: External or standard-library dependencies: typing:Optional CN: 外部或标准库依赖：typing:Optional

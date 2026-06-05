@@ -1,0 +1,254 @@
+# sm100_tmem_helper.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/detail/sm100_tmem_helper.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "TMEM Accumulator Helpers for SM100" and defines related CUTLASS facilities in `include/cutlass/detail/sm100_tmem_helper.hpp`.
+- CN: 该头文件以注释摘要“TMEM Accumulator Helpers for SM100”引入，并在 `include/cutlass/detail/sm100_tmem_helper.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2024 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L35**: <code>    \brief TMEM Accumulator Helpers for SM100</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L36**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L37**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L38**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>#include &quot;cute/tensor.hpp&quot;</code>
+  - EN: Includes "cute/tensor.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/tensor.hpp"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cute/atom/mma_atom.hpp&quot;</code>
+  - EN: Includes "cute/atom/mma_atom.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/atom/mma_atom.hpp"，以便本文件使用该依赖中的声明。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>namespace cutlass::detail{</code>
+  - EN: Opens namespace `cutlass::detail` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::detail`，为后续声明提供作用域。
+- **L45**: <code>constexpr uint32_t TmemColMask = 0x0000&#x27;FFFF;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L46**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L47**: <code>template &lt;class TmemTensor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L48**: <code>CUTE_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L49**: <code>static constexpr auto find_tmem_tensor_col_offset(TmemTensor tensor) {</code>
+  - EN: Starts the definition body for `find_tmem_tensor_col_offset`.
+  - CN: 开始 `find_tmem_tensor_col_offset` 的定义体。
+- **L50**: <code>  using namespace cute;</code>
+  - EN: Imports names from namespace `cute` into the current scope.
+  - CN: 将命名空间 `cute` 的名字导入当前作用域。
+- **L51**: <code>  return cosize(recast&lt;uint32_t&gt;(tensor).layout()) &amp; TmemColMask;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L52**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>template &lt;int AccumulatorPipelineStageCount, bool IsOverlappingAccum,</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L55**: <code>          class TiledMma, class AccumulatorShape,</code>
+  - EN: Declares or defines the class `TiledMma`.
+  - CN: 声明或定义 class `TiledMma`。
+- **L56**: <code>          class EpilogueTile&gt;</code>
+  - EN: Declares or defines the class `EpilogueTile`.
+  - CN: 声明或定义 class `EpilogueTile`。
+- **L57**: <code>CUTE_HOST_DEVICE </code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L58**: <code>static constexpr auto make_sm100_accumulator(TiledMma tiled_mma, AccumulatorShape acc_shape, EpilogueTile epilogue_tile) {</code>
+  - EN: Starts the definition body for `make_sm100_accumulator`.
+  - CN: 开始 `make_sm100_accumulator` 的定义体。
+- **L59**: <code>  using namespace cute;</code>
+  - EN: Imports names from namespace `cute` into the current scope.
+  - CN: 将命名空间 `cute` 的名字导入当前作用域。
+- **L60**: <code>  static_assert(rank(acc_shape) == 3 || (rank(acc_shape) == 4 &amp;&amp; IsOverlappingAccum == false), </code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L61**: <code>    &quot;Expect a rank &gt;= 3 accumulator shape compatible with an SM100 tiled mma, Overlapping accumulators is only available for non-complex kernels&quot;);</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L62**: <code>  if constexpr (IsOverlappingAccum) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L63**: <code>    Tensor accumulators_tmp = TiledMma::make_fragment_C(append(acc_shape, Int&lt;2&gt;{}));</code>
+  - EN: Declares the callable or operator `make_fragment_C`.
+  - CN: 声明可调用对象或运算符 `make_fragment_C`。
+- **L64**: <code>    return make_tensor(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L65**: <code>        accumulators_tmp.data(),</code>
+  - EN: Begins or continues the signature/parameter list for `data`.
+  - CN: 开始或继续 `data` 的签名/参数列表。
+- **L66**: <code>        shape(accumulators_tmp),</code>
+  - EN: Begins or continues the signature/parameter list for `shape`.
+  - CN: 开始或继续 `shape` 的签名/参数列表。
+- **L67**: <code>        replace&lt;3&gt;(</code>
+  - EN: Begins or continues the signature/parameter list for `replace`.
+  - CN: 开始或继续 `replace` 的签名/参数列表。
+- **L68**: <code>            stride(accumulators_tmp),</code>
+  - EN: Begins or continues the signature/parameter list for `stride`.
+  - CN: 开始或继续 `stride` 的签名/参数列表。
+- **L69**: <code>            Int&lt;(256 - size&lt;1&gt;(EpilogueTile{})) * stride&lt;0, 1&gt;(accumulators_tmp.layout())&gt;{}));</code>
+  - EN: Declares the callable or operator `Int`.
+  - CN: 声明可调用对象或运算符 `Int`。
+- **L70**: <code>  } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L71**: <code>    return TiledMma::make_fragment_C(append(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L72**: <code>        acc_shape,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L73**: <code>        Int&lt;AccumulatorPipelineStageCount&gt;{}));  // ((MMA_TILE_M,MMA_TILE_N),MMA_M,MMA_N,ACC_PIPE)</code>
+  - EN: Starts the definition body for `AccumulatorPipelineStageCount`.
+  - CN: 开始 `AccumulatorPipelineStageCount` 的定义体。
+- **L74**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L75**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L76**: <code>} // namespace cutlass::detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Symbol focus: `TmemTensor` / 重点符号：`TmemTensor`
+- Symbol focus: `find_tmem_tensor_col_offset` / 重点符号：`find_tmem_tensor_col_offset`
+- Symbol focus: `cosize` / 重点符号：`cosize`
+- Symbol focus: `TiledMma` / 重点符号：`TiledMma`
+- Symbol focus: `EpilogueTile` / 重点符号：`EpilogueTile`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cute/tensor.hpp"`
+  - `"cute/atom/mma_atom.hpp"`

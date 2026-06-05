@@ -1,0 +1,1339 @@
+# stsm.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/hopper/stsm.cu`
+
+## Purpose / 用途
+- EN: This Hopper / SM90-era CuTe test validates the `stsm` path, covering architecture-specific tensor movement, layout mapping, or matrix-instruction behavior.
+- CN: 这个面向 Hopper / SM90 时代 的 CuTe 测试验证 `stsm` 路径，覆盖架构特定的张量搬运、布局映射或矩阵指令行为。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <iostream>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <thrust/host_vector.h>`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- **Line 37**: `#include <thrust/device_vector.h>`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- **Line 38**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 40**: `#include <cute/arch/copy_sm90.hpp>`
+  - EN: Provides CuTe `arch / copy_sm90` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `arch / copy_sm90` 功能。
+- **Line 41**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 42**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 43**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: `template<class T>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 45**: `__global__ void`
+  - EN: Marks the next declaration as a CUDA kernel that will execute on the GPU.
+  - CN: 把后续声明标记为将在 GPU 上执行的 CUDA 内核。
+- **Line 46**: `stsm_test_device(uint16_t* g_in, uint16_t* g_out)`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 47**: `{`
+  - EN: Opens the scope for `CUDA kernel`.
+  - CN: 为 `CUDA kernel` 打开作用域。
+- **Line 48**: `  constexpr int count = sizeof(T) / 4;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 49**: `  int tid = threadIdx.x;`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 50**: `  int stride = blockDim.x;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `  // load input gmem -> rmem`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 53**: `  uint32_t reg[count];`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 54**: `  for (int i = 0; i < (sizeof(T) / 4); i++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 55**: `    reg[i] = reinterpret_cast<uint32_t*>(g_in)[tid + (stride * i)];`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 56**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `  __shared__ uint32_t smem[32 * count];`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 59**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 60**: `  // load rmem -> smem using STSM`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 61**: `  uint128_t* smem_ptr = reinterpret_cast<uint128_t*>(smem) + tid;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 62**: `  T*         rmem_ptr = reinterpret_cast<T*>(reg);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 63**: `  cute::copy_stsm(rmem_ptr, smem_ptr);`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 64**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 65**: `  __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 66**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 67**: `  // store output smem -> gmem`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 68**: `  for (int i = 0; i < (sizeof(T) / 4); i++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 69**: `    reinterpret_cast<uint32_t*>(g_out)[tid + (stride * i)] = smem[tid + (stride * i)];`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 70**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 71**: `}`
+  - EN: Closes the scope for `CUDA kernel`.
+  - CN: 结束 `CUDA kernel` 的作用域。
+- **Line 72**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 73**: `template <class TiledCopy, class SmemLayout>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 74**: `__global__ void`
+  - EN: Marks the next declaration as a CUDA kernel that will execute on the GPU.
+  - CN: 把后续声明标记为将在 GPU 上执行的 CUDA 内核。
+- **Line 75**: `stsm_test_device_cute(uint16_t* g_in, uint16_t* g_out,`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 76**: `                      TiledCopy tiled_copy, SmemLayout smem_layout)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 77**: `{`
+  - EN: Opens the scope for `CUDA kernel`.
+  - CN: 为 `CUDA kernel` 打开作用域。
+- **Line 78**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 79**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 80**: `  __shared__ uint16_t smem[size(smem_layout)];`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 81**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 82**: `  Tensor t_g_in  = make_tensor(make_gmem_ptr(g_in),  smem_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 83**: `  Tensor t_g_out = make_tensor(make_gmem_ptr(g_out), smem_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 84**: `  Tensor t_smem  = make_tensor(make_smem_ptr(smem),  smem_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 85**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 86**: `  int tid = threadIdx.x;`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `  auto thr_copy = tiled_copy.get_thread_slice(tid);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 89**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 90**: `  Tensor tXgX = thr_copy.partition_S(t_g_in);   // (V,M,N)`
+  - EN: Partitions the source-side tensor view according to a tiled copy object.
+  - CN: 根据分块复制对象对源侧张量视图进行分区。
+- **Line 91**: `  Tensor tXsX = thr_copy.partition_D(t_smem);   // (V,M,N)`
+  - EN: Partitions the destination-side tensor view according to a tiled copy object.
+  - CN: 根据分块复制对象对目标侧张量视图进行分区。
+- **Line 92**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 93**: `  Tensor tXrX = make_tensor<uint16_t>(shape(tXgX)); // (V,M,N)`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 94**: `  clear(tXrX);    // Just to make sure`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 95**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 96**: `/*`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 97**: `  if (thread0()) {`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 98**: `    print("tXsX: " ); print(tXsX.layout()); print("\n");`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 99**: `    print("tXgX: " ); print(tXgX.layout()); print("\n");`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 100**: `    print("tXrX: " ); print(tXrX.layout()); print("\n");`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 101**: `  }`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 102**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 103**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 104**: `  // Load input gmem -> rmem`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 105**: `  copy(tXgX, tXrX);`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 106**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 107**: `  // Copy rmem -> smem via tiled_copy (STSM, STS)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 108**: `  copy(tiled_copy, tXrX, tXsX);`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 109**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 110**: `  // Output smem -> gmem`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 111**: `  for (int i = tid; i < size(t_smem); i += size(tiled_copy)) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 112**: `    t_g_out(i) = t_smem(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 113**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 114**: `}`
+  - EN: Closes the scope for `CUDA kernel`.
+  - CN: 结束 `CUDA kernel` 的作用域。
+- **Line 115**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 116**: `#if CUDA_12_0_SM90_FEATURES_SUPPORTED`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 117**: `TEST(SM90_CuTe_Hopper, Stsm)`
+  - EN: Declares GoogleTest case `SM90_CuTe_Hopper::Stsm` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `SM90_CuTe_Hopper::Stsm`，用于验证一个具体的 CuTe 场景。
+- **Line 118**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 119**: `  constexpr int count = 1024;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 120**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 121**: `  thrust::host_vector<uint16_t> h_in(count);`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 122**: `  for (int i = 0; i < count; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 123**: `    h_in[i] = uint16_t(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 124**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 125**: `  thrust::device_vector<uint16_t> d_in = h_in;`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 126**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 127**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 128**: `  // STSM 1x (32b)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 129**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 130**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 131**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 132**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 133**: `  stsm_test_device<uint32_t><<<1, 32>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 134**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 135**: `    thrust::raw_pointer_cast(d_out.data()));`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 136**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 137**: `  for (int i = 0; i < 32; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 138**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 139**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 140**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 141**: `  CUTLASS_TRACE_HOST("STSM 1x stsm_test_device SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 142**: `  }`
+  - EN: Closes the scope for `test SM90_CuTe_Hopper::Stsm`.
+  - CN: 结束 `test SM90_CuTe_Hopper::Stsm` 的作用域。
+- **Line 143**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 144**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 145**: `  // STSM 2x (64b)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 146**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 147**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 148**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 149**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 150**: `  stsm_test_device<uint64_t><<<1, 32>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 151**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 152**: `    thrust::raw_pointer_cast(d_out.data()));`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 153**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 154**: `  for (int i = 0; i < 64; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 155**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 156**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 157**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 158**: `  CUTLASS_TRACE_HOST("STSM 2x stsm_test_device SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 159**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 160**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 161**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 162**: `  // STSM 4x (128b)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 163**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 165**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 166**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 167**: `  stsm_test_device<uint128_t><<<1, 32>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 168**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 169**: `    thrust::raw_pointer_cast(d_out.data()));`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 170**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 171**: `  for (int i = 0; i < 128; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 172**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 173**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 174**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 175**: `  CUTLASS_TRACE_HOST("STSM 4x stsm_test_device SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 176**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 177**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 178**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 179**: `  // CuTe STSM`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 180**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 181**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 182**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 183**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 184**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 185**: `  auto smem_layout = Layout<Shape <_32,Shape <_2, _4>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 186**: `                            Stride< _2,Stride<_1,_64>>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 187**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U32x1_STSM_N, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 188**: `                                    Layout<Shape<_32,_1>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 189**: `                                    Layout<Shape< _1,_8>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 190**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 191**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 192**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 193**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 194**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 195**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 196**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 197**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 198**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 199**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 200**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 201**: `  CUTLASS_TRACE_HOST("CuTe 32x8 interleaved U32x1_STSM_N SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 202**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 203**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 204**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 205**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 206**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 207**: `  auto smem_layout = Layout<Shape <_32,Shape <_2, _4>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 208**: `                            Stride< _2,Stride<_1,_64>>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 209**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U32x2_STSM_N, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 210**: `                                    Layout<Shape<_32,_1>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 211**: `                                    Layout<Shape< _1,_8>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 212**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 213**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 214**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 215**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 216**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 217**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 218**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 219**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 220**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 221**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 222**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 223**: `  CUTLASS_TRACE_HOST("CuTe 32x8 interleaved U32x2_STSM_N SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 224**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 225**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 226**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 227**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 228**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 229**: `  auto smem_layout = Layout<Shape <_32,Shape <_2, _4>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 230**: `                            Stride< _2,Stride<_1,_64>>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 231**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U32x4_STSM_N, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 232**: `                                    Layout<Shape<_32,_1>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 233**: `                                    Layout<Shape< _1,_8>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 234**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 235**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 236**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 237**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 238**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 239**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 240**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 241**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 242**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 243**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 244**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 245**: `  CUTLASS_TRACE_HOST("CuTe 32x8 interleaved U32x4_STSM_N SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 246**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 247**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 248**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 249**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 250**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 251**: `  auto smem_layout = Layout<Shape <_32,Shape <_2, _4>>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 252**: `                            Stride< _2,Stride<_1,_64>>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 253**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<UniversalCopy<uint16_t>, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 254**: `                                    Layout<Shape<_32,_1>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 255**: `                                    Layout<Shape< _1,_8>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 256**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 257**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 258**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 259**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 260**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 261**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 262**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 263**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 264**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 265**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 266**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 267**: `  CUTLASS_TRACE_HOST("CuTe 32x8 interleaved STSM.U16 SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 268**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 269**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 270**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 271**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 272**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 273**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 274**: `                            Stride< _1,_32>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 275**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U32x1_STSM_N, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 276**: `                                    Layout<Shape<_16,_2>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 277**: `                                    Layout<Shape< _2,_4>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 278**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 279**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 280**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 281**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 282**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 283**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 284**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 285**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 286**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 287**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 288**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 289**: `  CUTLASS_TRACE_HOST("CuTe 32x32 U32x1_STSM_N SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 290**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 291**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 292**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 293**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 294**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 295**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 296**: `                            Stride< _1,_32>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 297**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U32x2_STSM_N, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 298**: `                                    Layout<Shape<_16,_2>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 299**: `                                    Layout<Shape< _2,_4>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 300**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 301**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 302**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 303**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 304**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 305**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 306**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 307**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 308**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 309**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 310**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 311**: `  CUTLASS_TRACE_HOST("CuTe 32x32 U32x2_STSM_N SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 312**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 313**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 314**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 315**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 316**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 317**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 318**: `                            Stride< _1,_32>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 319**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U32x4_STSM_N, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 320**: `                                    Layout<Shape<_16,_2>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 321**: `                                    Layout<Shape< _2,_4>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 322**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 323**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 324**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 325**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 326**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 327**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 328**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 329**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 330**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 331**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 332**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 333**: `  CUTLASS_TRACE_HOST("CuTe 32x32 U32x4_STSM_N SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 334**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 335**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 336**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 337**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 338**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 339**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 340**: `                            Stride< _1,_32>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 341**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<UniversalCopy<uint16_t>, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 342**: `                                    Layout<Shape<_16,_2>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 343**: `                                    Layout<Shape< _2,_4>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 344**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 345**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 346**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 347**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 348**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 349**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 350**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 351**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 352**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 353**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 354**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 355**: `  CUTLASS_TRACE_HOST("CuTe 32x32 STSM.U16 SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 356**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 357**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 358**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 359**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 360**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 361**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 362**: `                            Stride<_32, _1>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 363**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U16x2_STSM_T, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 364**: `                                    Layout<Shape<_4,_8>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 365**: `                                    Layout<Shape<_2,_1>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 366**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 367**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 368**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 369**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 370**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 371**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 372**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 373**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 374**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 375**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 376**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 377**: `  CUTLASS_TRACE_HOST("CuTe 32x32 U16x2_STSM_T SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 378**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 379**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 380**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 381**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 382**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 383**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 384**: `                            Stride<_32, _1>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 385**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U16x4_STSM_T, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 386**: `                                    Layout<Shape<_4,_8>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 387**: `                                    Layout<Shape<_4,_1>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 388**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 389**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 390**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 391**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 392**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 393**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 394**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 395**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 396**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 397**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 398**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 399**: `  CUTLASS_TRACE_HOST("CuTe 32x32 U16x4_STSM_T SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 400**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 401**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 402**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 403**: `  thrust::device_vector<uint16_t> d_out(count);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 404**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 405**: `  auto smem_layout = Layout<Shape <_32,_32>,`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 406**: `                            Stride<_32, _1>>{};`
+  - EN: Refers to a compile-time stride pattern used by a layout.
+  - CN: 引用布局使用的编译期步长模式。
+- **Line 407**: `  auto tiled_copy = make_tiled_copy(Copy_Atom<SM90_U16x8_STSM_T, uint16_t>{},`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 408**: `                                    Layout<Shape<_4,_8>>{},`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 409**: `                                    Layout<Shape<_8,_1>>{});`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 410**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 411**: `  stsm_test_device_cute<<<1, int(size(tiled_copy))>>>(`
+  - EN: Refers to shared-memory store operations used in the test.
+  - CN: 引用该测试中使用的共享内存存储操作。
+- **Line 412**: `    thrust::raw_pointer_cast(d_in.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 413**: `    thrust::raw_pointer_cast(d_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 414**: `    tiled_copy,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 415**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 416**: `  thrust::host_vector<uint16_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 417**: `  for (int i = 0; i < size(smem_layout); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 418**: `    //printf("%d  %d\n", int(h_in[i]), int(h_out[i]));`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 419**: `    EXPECT_EQ(h_out[i], h_in[i]);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 420**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 421**: `  CUTLASS_TRACE_HOST("CuTe 32x32 U16x8_STSM_T SUCCESS\n");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 422**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 423**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 424**: `  CUTLASS_TRACE_HOST("PASS");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 425**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 426**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `Tensor`
+  - EN: Uses the CuTe tensor abstraction to bind memory pointers with layouts.
+  - CN: 使用 CuTe Tensor 抽象把内存指针与布局绑定起来。
+- `make_tensor`
+  - EN: Builds a CuTe tensor object from a pointer and a layout.
+  - CN: 从指针和布局构造一个 CuTe 张量对象。
+- `thrust::host_vector`
+  - EN: Uses a host container to prepare reference data on the CPU.
+  - CN: 使用主机端容器在 CPU 上准备参考数据。
+- `thrust::device_vector`
+  - EN: Uses a device container to allocate and copy GPU buffers.
+  - CN: 使用设备端容器来分配并复制 GPU 缓冲区。
+- `__global__`
+  - EN: Defines a CUDA kernel launched from the host for device-side validation.
+  - CN: 定义一个从主机启动的 CUDA 内核，用于设备端验证。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `iostream`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `thrust/host_vector.h`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- `thrust/device_vector.h`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- `cute/arch/copy_sm90.hpp`
+  - EN: Provides CuTe `arch / copy_sm90` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `arch / copy_sm90` 功能。

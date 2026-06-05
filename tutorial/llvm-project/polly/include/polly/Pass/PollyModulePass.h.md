@@ -1,0 +1,85 @@
+# PollyModulePass.h — Code Analysis / 代码分析
+
+## Source / 来源
+
+| Item | English | 中文 |
+| --- | --- | --- |
+| File | `polly/include/polly/Pass/PollyModulePass.h` | `polly/include/polly/Pass/PollyModulePass.h` |
+| Repository | `llvm-project` | `llvm-project` |
+| Purpose | Declares public Polly interfaces, passes, analyses, and data structures. The leading comment describes it as: Polly module pass. | 声明 Polly 的公共接口、Pass、分析能力与数据结构。 文件开头注释将其概括为：Polly module pass。 |
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-8
+
+````cpp
+//===------ PollyModulePass.h - Polly module pass -------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+````
+- **EN**: This block records the standard LLVM file banner and license metadata; preserves comments that explain intent, usage, or algorithmic background.
+- **CN**: 该代码块 给出 LLVM 标准文件头与许可证元数据; 保留用于解释意图、用法或算法背景的注释.
+
+### Lines 9-16
+
+````cpp
+#ifndef POLLY_PASS_POLLYMODULEPASS_H_
+#define POLLY_PASS_POLLYMODULEPASS_H_
+
+#include "polly/Pass/PhaseManager.h"
+#include "llvm/IR/PassManager.h"
+
+namespace polly {
+
+````
+- **EN**: This block imports Polly, LLVM-family headers needed by the surrounding code; uses preprocessor directives to control compilation, macros, or include guards; opens or organizes declarations inside a C++ namespace; defines macros like `POLLY_PASS_POLLYMODULEPASS_H_`.
+- **CN**: 该代码块 引入周边逻辑所需的 Polly、LLVM-family 头文件; 使用预处理指令控制编译、宏或头文件保护; 在 C++ 命名空间中组织声明或实现; 定义宏，例如 `POLLY_PASS_POLLYMODULEPASS_H_`.
+
+### Lines 17-27
+
+````cpp
+class PollyModulePass : public llvm::OptionalPassInfoMixin<PollyModulePass> {
+public:
+  PollyModulePass() {}
+  PollyModulePass(PollyPassOptions Opts) : Opts(std::move(Opts)) {}
+
+  llvm::PreservedAnalyses run(llvm::Module &M, llvm::ModuleAnalysisManager &);
+
+private:
+  PollyPassOptions Opts;
+};
+
+````
+- **EN**: This block declares or references types such as `PollyModulePass`; declares or defines routines around `PollyModulePass`, `run`.
+- **CN**: 该代码块 声明或引用类型，例如 `PollyModulePass`; 声明或定义与 `PollyModulePass`, `run` 相关的例程.
+
+### Lines 28-30
+
+````cpp
+} // namespace polly
+
+#endif /* POLLY_PASS_POLLYMODULEPASS_H_ */
+````
+- **EN**: This block uses preprocessor directives to control compilation, macros, or include guards.
+- **CN**: 该代码块 使用预处理指令控制编译、宏或头文件保护.
+
+## Key Concepts / 关键概念
+
+- **LLVM pass integration**
+  - **CN**: LLVM Pass 集成
+- **Template/type wrappers**
+  - **CN**: 模板与类型包装
+- **Public interface declarations**
+  - **CN**: 公共接口声明
+
+## Dependencies / 依赖关系
+
+- **Polly headers**: `polly/Pass/PhaseManager.h` — Direct Polly APIs, data structures, or pass interfaces used here.
+  **Polly headers（CN）**：`polly/Pass/PhaseManager.h` —— 此处直接使用的 Polly API、数据结构或 Pass 接口。
+- **LLVM-family headers**: `llvm/IR/PassManager.h` — LLVM/Clang/MLIR infrastructure for IR, passes, utilities, or diagnostics.
+  **LLVM-family headers（CN）**：`llvm/IR/PassManager.h` —— 用于 IR、Pass、工具或诊断的 LLVM/Clang/MLIR 基础设施。

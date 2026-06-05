@@ -1,0 +1,3140 @@
+# problem_space.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/profiler/include/cutlass/profiler/problem_space.h`
+**Purpose / 用途**: Declares or implements the profiler problem-space enumerator. / 声明或实现 profiler 的问题空间枚举逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/* \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L32** <code>   \brief </code>
+  - EN: Comment that documents intent or context: "\brief".
+  - CN: 用于说明意图或上下文的注释："\brief"。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>    &quot;Any sufficiently complicated C or Fortran program contains an ad-hoc, informally-specified, </code>
+  - EN: Comment that documents intent or context: ""Any sufficiently complicated C or Fortran program contains an ad-hoc, informally-specified,".
+  - CN: 用于说明意图或上下文的注释：""Any sufficiently complicated C or Fortran program contains an ad-hoc, informally-specified,"。
+- **L35** <code>     bug-ridden, slow implementation of half of Common Lisp.&quot;</code>
+  - EN: Comment that documents intent or context: "bug-ridden, slow implementation of half of Common Lisp."".
+  - CN: 用于说明意图或上下文的注释："bug-ridden, slow implementation of half of Common Lisp.""。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>      - Greenspun&#x27;s Tenth Rule of Programming</code>
+  - EN: Comment that documents intent or context: "- Greenspun's Tenth Rule of Programming".
+  - CN: 用于说明意图或上下文的注释："- Greenspun's Tenth Rule of Programming"。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code> </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>  cutlass::profiler::ProblemSpace defines a set of data structures which represent the Cartesian</code>
+  - EN: Comment that documents intent or context: "cutlass::profiler::ProblemSpace defines a set of data structures which represent the Cartesian".
+  - CN: 用于说明意图或上下文的注释："cutlass::profiler::ProblemSpace defines a set of data structures which represent the Cartesian"。
+- **L41** <code>  product of sequences defined by integer ranges, lists of scalars, and sets of enumerated types.</code>
+  - EN: Comment that documents intent or context: "product of sequences defined by integer ranges, lists of scalars, and sets of enumerated types.".
+  - CN: 用于说明意图或上下文的注释："product of sequences defined by integer ranges, lists of scalars, and sets of enumerated types."。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>  These permit a single invocation of the CUTLASS Profiler to iterate over a large set of problems,</code>
+  - EN: Comment that documents intent or context: "These permit a single invocation of the CUTLASS Profiler to iterate over a large set of problems,".
+  - CN: 用于说明意图或上下文的注释："These permit a single invocation of the CUTLASS Profiler to iterate over a large set of problems,"。
+- **L44** <code>  verify and profile various operations when they are compatible with the command line, and</code>
+  - EN: Comment that documents intent or context: "verify and profile various operations when they are compatible with the command line, and".
+  - CN: 用于说明意图或上下文的注释："verify and profile various operations when they are compatible with the command line, and"。
+- **L45** <code>  construct data tables of results that are convenient inputs to post processing in Excel or Pandas. </code>
+  - EN: Comment that documents intent or context: "construct data tables of results that are convenient inputs to post processing in Excel or Pandas.".
+  - CN: 用于说明意图或上下文的注释："construct data tables of results that are convenient inputs to post processing in Excel or Pandas."。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>  By executing multiple problems per invocation, startup overheads may be amortized across many</code>
+  - EN: Comment that documents intent or context: "By executing multiple problems per invocation, startup overheads may be amortized across many".
+  - CN: 用于说明意图或上下文的注释："By executing multiple problems per invocation, startup overheads may be amortized across many"。
+- **L48** <code>  kernel launches. </code>
+  - EN: Comment that documents intent or context: "kernel launches.".
+  - CN: 用于说明意图或上下文的注释："kernel launches."。
+- **L49** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>// Standard Library includes</code>
+  - EN: Comment that documents intent or context: "Standard Library includes".
+  - CN: 用于说明意图或上下文的注释："Standard Library includes"。
+- **L54** <code>#include &lt;string&gt;</code>
+  - EN: Includes `string` so this file can use string utilities.
+  - CN: 引入 `string`，使当前文件可以使用字符串工具。
+- **L55** <code>#include &lt;vector&gt;</code>
+  - EN: Includes `vector` so this file can use dynamic array containers.
+  - CN: 引入 `vector`，使当前文件可以使用动态数组容器。
+- **L56** <code>#include &lt;memory&gt;</code>
+  - EN: Includes `memory` so this file can use memory-management helpers.
+  - CN: 引入 `memory`，使当前文件可以使用内存管理辅助工具。
+- **L57** <code>#include &lt;unordered_map&gt;</code>
+  - EN: Includes `unordered_map` so this file can use hash-map containers.
+  - CN: 引入 `unordered_map`，使当前文件可以使用哈希映射容器。
+- **L58** <code>#include &lt;cstdlib&gt;</code>
+  - EN: Includes `cstdlib` so this file can use C standard utilities.
+  - CN: 引入 `cstdlib`，使当前文件可以使用C 标准工具。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>// CUTLASS Utility includes</code>
+  - EN: Comment that documents intent or context: "CUTLASS Utility includes".
+  - CN: 用于说明意图或上下文的注释："CUTLASS Utility includes"。
+- **L61** <code>#include &quot;cutlass/util/command_line.h&quot;</code>
+  - EN: Includes `cutlass/util/command_line.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/command_line.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>// CUTLASS Library includes</code>
+  - EN: Comment that documents intent or context: "CUTLASS Library includes".
+  - CN: 用于说明意图或上下文的注释："CUTLASS Library includes"。
+- **L64** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>// Profiler includes</code>
+  - EN: Comment that documents intent or context: "Profiler includes".
+  - CN: 用于说明意图或上下文的注释："Profiler includes"。
+- **L67** <code>#include &quot;enumerated_types.h&quot;</code>
+  - EN: Includes `enumerated_types.h` so this file can use project-specific declarations from `enumerated_types.h`.
+  - CN: 引入 `enumerated_types.h`，使当前文件可以使用来自 `enumerated_types.h` 的项目专用声明。
+- **L68** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L69** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L70** <code>namespace profiler {</code>
+  - EN: Opens namespace `profiler` to group related symbols.
+  - CN: 打开命名空间 `profiler`，用于归组相关符号。
+- **L71** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L72** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L73** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L74** <code>/// Defines the argument schema</code>
+  - EN: Comment that documents intent or context: "Defines the argument schema".
+  - CN: 用于说明意图或上下文的注释："Defines the argument schema"。
+- **L75** <code>struct ArgumentDescription {</code>
+  - EN: Begins the declaration of struct `ArgumentDescription`.
+  - CN: 开始声明 struct `ArgumentDescription`。
+- **L76** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L77** <code>  /// Type of argument</code>
+  - EN: Comment that documents intent or context: "Type of argument".
+  - CN: 用于说明意图或上下文的注释："Type of argument"。
+- **L78** <code>  ArgumentTypeID type;</code>
+  - EN: Declares the symbol `type` in the current scope.
+  - CN: 在当前作用域中声明符号 `type`。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>  /// Prioritized array of aliases used in command line parsing</code>
+  - EN: Comment that documents intent or context: "Prioritized array of aliases used in command line parsing".
+  - CN: 用于说明意图或上下文的注释："Prioritized array of aliases used in command line parsing"。
+- **L81** <code>  std::vector&lt;std::string&gt; aliases;</code>
+  - EN: Declares the symbol `aliases` in the current scope.
+  - CN: 在当前作用域中声明符号 `aliases`。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>  /// Description of argument</code>
+  - EN: Comment that documents intent or context: "Description of argument".
+  - CN: 用于说明意图或上下文的注释："Description of argument"。
+- **L84** <code>  std::string description;</code>
+  - EN: Declares the symbol `description` in the current scope.
+  - CN: 在当前作用域中声明符号 `description`。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L87** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L88** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L89** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L90** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L91** <code>  ArgumentDescription(): </code>
+  - EN: Begins the definition of function or method `ArgumentDescription`.
+  - CN: 开始定义函数或方法 `ArgumentDescription`。
+- **L92** <code>    type(ArgumentTypeID::kInvalid) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `type`.
+  - CN: 开始或继续与 `type` 相关的签名/调用语法。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>  /// Constructor with aliases</code>
+  - EN: Comment that documents intent or context: "Constructor with aliases".
+  - CN: 用于说明意图或上下文的注释："Constructor with aliases"。
+- **L95** <code>  ArgumentDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `ArgumentDescription`.
+  - CN: 开始或继续与 `ArgumentDescription` 相关的签名/调用语法。
+- **L96** <code>    ArgumentTypeID type_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L97** <code>    std::vector&lt;std::string&gt; const &amp;aliases_,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L98** <code>    std::string const &amp;description_</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L99** <code>  ):</code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L100** <code>    type(type_), aliases(aliases_), description(description_) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `description`.
+  - CN: 开始或继续与 `description` 相关的签名/调用语法。
+- **L101** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>/// Vector of arguments</code>
+  - EN: Comment that documents intent or context: "Vector of arguments".
+  - CN: 用于说明意图或上下文的注释："Vector of arguments"。
+- **L104** <code>using ArgumentDescriptionVector = std::vector&lt;ArgumentDescription&gt;;</code>
+  - EN: Introduces the type or namespace alias `ArgumentDescriptionVector`.
+  - CN: 引入类型或命名空间别名 `ArgumentDescriptionVector`。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>/// Base class for kernel arguments</code>
+  - EN: Comment that documents intent or context: "Base class for kernel arguments".
+  - CN: 用于说明意图或上下文的注释："Base class for kernel arguments"。
+- **L109** <code>struct KernelArgument {</code>
+  - EN: Begins the declaration of struct `KernelArgument`.
+  - CN: 开始声明 struct `KernelArgument`。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L112** <code>  // Type definitions</code>
+  - EN: Comment that documents intent or context: "Type definitions".
+  - CN: 用于说明意图或上下文的注释："Type definitions"。
+- **L113** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>  /// Value base class</code>
+  - EN: Comment that documents intent or context: "Value base class".
+  - CN: 用于说明意图或上下文的注释："Value base class"。
+- **L116** <code>  struct Value {</code>
+  - EN: Begins the declaration of struct `Value`.
+  - CN: 开始声明 struct `Value`。
+- **L117** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L118** <code>    KernelArgument const *argument;</code>
+  - EN: Declares the symbol `argument` in the current scope.
+  - CN: 在当前作用域中声明符号 `argument`。
+- **L119** <code>    bool not_null;</code>
+  - EN: Declares the symbol `not_null` in the current scope.
+  - CN: 在当前作用域中声明符号 `not_null`。
+- **L120** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L121** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L122** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L123** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L124** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L125** <code>    Value(</code>
+  - EN: Begins or continues the signature/call syntax involving `Value`.
+  - CN: 开始或继续与 `Value` 相关的签名/调用语法。
+- **L126** <code>      KernelArgument const *argument_ = nullptr, </code>
+  - EN: Assigns or initializes `argument_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `argument_` 进行赋值或初始化。
+- **L127** <code>      bool not_null_ = true</code>
+  - EN: Assigns or initializes `not_null_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `not_null_` 进行赋值或初始化。
+- **L128** <code>    ): argument(argument_), not_null(not_null_) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `not_null`.
+  - CN: 开始或继续与 `not_null` 相关的签名/调用语法。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>    virtual ~Value() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `~Value`.
+  - CN: 开始或继续与 `~Value` 相关的签名/调用语法。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>    virtual std::ostream &amp;print(std::ostream &amp;out) const =0;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L133** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>  /// Abstract base class to iterate over values within arguments</code>
+  - EN: Comment that documents intent or context: "Abstract base class to iterate over values within arguments".
+  - CN: 用于说明意图或上下文的注释："Abstract base class to iterate over values within arguments"。
+- **L136** <code>  struct ValueIterator {</code>
+  - EN: Begins the declaration of struct `ValueIterator`.
+  - CN: 开始声明 struct `ValueIterator`。
+- **L137** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L138** <code>    /// Indicates type of kernel argument</code>
+  - EN: Comment that documents intent or context: "Indicates type of kernel argument".
+  - CN: 用于说明意图或上下文的注释："Indicates type of kernel argument"。
+- **L139** <code>    KernelArgument const *argument;</code>
+  - EN: Declares the symbol `argument` in the current scope.
+  - CN: 在当前作用域中声明符号 `argument`。
+- **L140** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>    /// If the iterator points to an argument that is null, it needs to be distinguished</code>
+  - EN: Comment that documents intent or context: "If the iterator points to an argument that is null, it needs to be distinguished".
+  - CN: 用于说明意图或上下文的注释："If the iterator points to an argument that is null, it needs to be distinguished"。
+- **L142** <code>    /// from end.</code>
+  - EN: Comment that documents intent or context: "from end.".
+  - CN: 用于说明意图或上下文的注释："from end."。
+- **L143** <code>    bool null_argument;</code>
+  - EN: Declares the symbol `null_argument` in the current scope.
+  - CN: 在当前作用域中声明符号 `null_argument`。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L146** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L147** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>    /// Constructs a value iterator - no methods are valid if argument_ == nullptr</code>
+  - EN: Comment that documents intent or context: "Constructs a value iterator - no methods are valid if argument_ == nullptr".
+  - CN: 用于说明意图或上下文的注释："Constructs a value iterator - no methods are valid if argument_ == nullptr"。
+- **L150** <code>    ValueIterator(</code>
+  - EN: Begins or continues the signature/call syntax involving `ValueIterator`.
+  - CN: 开始或继续与 `ValueIterator` 相关的签名/调用语法。
+- **L151** <code>      KernelArgument const *argument_ = nullptr, </code>
+  - EN: Assigns or initializes `argument_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `argument_` 进行赋值或初始化。
+- **L152** <code>      bool null_argument_ = false): </code>
+  - EN: Assigns or initializes `null_argument_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `null_argument_` 进行赋值或初始化。
+- **L153** <code>      argument(argument_), null_argument(null_argument_) {</code>
+  - EN: Begins the definition of function or method `null_argument`.
+  - CN: 开始定义函数或方法 `null_argument`。
+- **L154** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L155** <code>      if (!argument_-&gt;not_null()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L156** <code>        null_argument = true;</code>
+  - EN: Assigns or initializes `null_argument` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `null_argument` 进行赋值或初始化。
+- **L157** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L158** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>    virtual ~ValueIterator() { }</code>
+  - EN: Begins or continues the signature/call syntax involving `~ValueIterator`.
+  - CN: 开始或继续与 `~ValueIterator` 相关的签名/调用语法。
+- **L161** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L162** <code>    /// Advances to next point in range</code>
+  - EN: Comment that documents intent or context: "Advances to next point in range".
+  - CN: 用于说明意图或上下文的注释："Advances to next point in range"。
+- **L163** <code>    virtual void operator++() = 0;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L165** <code>    /// Compares against another value iterator - must be of the same KernelArgument type</code>
+  - EN: Comment that documents intent or context: "Compares against another value iterator - must be of the same KernelArgument type".
+  - CN: 用于说明意图或上下文的注释："Compares against another value iterator - must be of the same KernelArgument type"。
+- **L166** <code>    virtual bool operator==(ValueIterator const &amp;it) const = 0;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L167** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L168** <code>    /// Returns a unique_ptr&lt;Value&gt; object pointing to a newly created value object</code>
+  - EN: Comment that documents intent or context: "Returns a unique_ptr<Value> object pointing to a newly created value object".
+  - CN: 用于说明意图或上下文的注释："Returns a unique_ptr<Value> object pointing to a newly created value object"。
+- **L169** <code>    virtual std::unique_ptr&lt;Value&gt; at() const = 0;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L170** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L171** <code>    /// Gets the type of the iterator</code>
+  - EN: Comment that documents intent or context: "Gets the type of the iterator".
+  - CN: 用于说明意图或上下文的注释："Gets the type of the iterator"。
+- **L172** <code>    ArgumentTypeID type() const {</code>
+  - EN: Begins the definition of function or method `type`.
+  - CN: 开始定义函数或方法 `type`。
+- **L173** <code>      return argument-&gt;description-&gt;type;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L174** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>    /// Helper to compute inequality</code>
+  - EN: Comment that documents intent or context: "Helper to compute inequality".
+  - CN: 用于说明意图或上下文的注释："Helper to compute inequality"。
+- **L177** <code>    bool operator!=(ValueIterator const &amp;it) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L178** <code>      return !(*this == it); </code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L179** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L181** <code>    std::ostream &amp;print(std::ostream &amp;out) const;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L182** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L183** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L184** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L185** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L186** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L187** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L188** <code>  /// Describes the argument</code>
+  - EN: Comment that documents intent or context: "Describes the argument".
+  - CN: 用于说明意图或上下文的注释："Describes the argument"。
+- **L189** <code>  ArgumentDescription const *description;</code>
+  - EN: Declares the symbol `description` in the current scope.
+  - CN: 在当前作用域中声明符号 `description`。
+- **L190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L191** <code>  /// Parent node</code>
+  - EN: Comment that documents intent or context: "Parent node".
+  - CN: 用于说明意图或上下文的注释："Parent node"。
+- **L192** <code>  KernelArgument *parent;</code>
+  - EN: Declares the symbol `parent` in the current scope.
+  - CN: 在当前作用域中声明符号 `parent`。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>  /// Sequence in which the kernel argument is to be iterated over. </code>
+  - EN: Comment that documents intent or context: "Sequence in which the kernel argument is to be iterated over.".
+  - CN: 用于说明意图或上下文的注释："Sequence in which the kernel argument is to be iterated over."。
+- **L195** <code>  /// Smaller means faster changing. -1 is don&#x27;t  care</code>
+  - EN: Comment that documents intent or context: "Smaller means faster changing. -1 is don't  care".
+  - CN: 用于说明意图或上下文的注释："Smaller means faster changing. -1 is don't  care"。
+- **L196** <code>  int ordinal;</code>
+  - EN: Declares the symbol `ordinal` in the current scope.
+  - CN: 在当前作用域中声明符号 `ordinal`。
+- **L197** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L198** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L199** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L200** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L203** <code>  KernelArgument(</code>
+  - EN: Begins or continues the signature/call syntax involving `KernelArgument`.
+  - CN: 开始或继续与 `KernelArgument` 相关的签名/调用语法。
+- **L204** <code>    ArgumentDescription const *description_ = nullptr,</code>
+  - EN: Assigns or initializes `description_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `description_` 进行赋值或初始化。
+- **L205** <code>    KernelArgument *parent_ = nullptr,</code>
+  - EN: Assigns or initializes `parent_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `parent_` 进行赋值或初始化。
+- **L206** <code>    int ordinal_ = -1</code>
+  - EN: Assigns or initializes `ordinal_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ordinal_` 进行赋值或初始化。
+- **L207** <code>  ): description(description_), parent(parent_), ordinal(ordinal_) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `ordinal`.
+  - CN: 开始或继续与 `ordinal` 相关的签名/调用语法。
+- **L208** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L209** <code>  virtual ~KernelArgument();</code>
+  - EN: Declares function or method `~KernelArgument` without defining it here.
+  - CN: 声明函数或方法 `~KernelArgument`，但不在此处给出定义。
+- **L210** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L211** <code>  /// Returns true if the kernel argument iself is empty</code>
+  - EN: Comment that documents intent or context: "Returns true if the kernel argument iself is empty".
+  - CN: 用于说明意图或上下文的注释："Returns true if the kernel argument iself is empty"。
+- **L212** <code>  virtual bool not_null() const =0;</code>
+  - EN: Declares function or method `not_null` without defining it here.
+  - CN: 声明函数或方法 `not_null`，但不在此处给出定义。
+- **L213** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L214** <code>  /// Returns a string name for debugging</code>
+  - EN: Comment that documents intent or context: "Returns a string name for debugging".
+  - CN: 用于说明意图或上下文的注释："Returns a string name for debugging"。
+- **L215** <code>  std::string qualified_name() const {</code>
+  - EN: Begins the definition of function or method `qualified_name`.
+  - CN: 开始定义函数或方法 `qualified_name`。
+- **L216** <code>    if (description) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L217** <code>      if (description-&gt;aliases.empty()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L218** <code>        return &quot;&lt;description_not_null_no_aliases&gt;&quot;;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L219** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L220** <code>      return description-&gt;aliases.front();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L221** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L222** <code>    return &quot;&lt;description_null&gt;&quot;;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L223** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L224** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L225** <code>  virtual std::unique_ptr&lt;ValueIterator&gt; begin() const =0;</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L226** <code>  virtual std::unique_ptr&lt;ValueIterator&gt; end() const =0;</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L227** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L228** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L229** <code>using KernelArgumentVector = std::vector&lt;std::unique_ptr&lt;KernelArgument&gt;&gt;;</code>
+  - EN: Introduces the type or namespace alias `KernelArgumentVector`.
+  - CN: 引入类型或命名空间别名 `KernelArgumentVector`。
+- **L230** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L231** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L232** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L233** <code>/// Defines a scalar argument type as a string that is lexically cast to the appropriate kernel</code>
+  - EN: Comment that documents intent or context: "Defines a scalar argument type as a string that is lexically cast to the appropriate kernel".
+  - CN: 用于说明意图或上下文的注释："Defines a scalar argument type as a string that is lexically cast to the appropriate kernel"。
+- **L234** <code>/// type.</code>
+  - EN: Comment that documents intent or context: "type.".
+  - CN: 用于说明意图或上下文的注释："type."。
+- **L235** <code>struct ScalarArgument : public KernelArgument {</code>
+  - EN: Begins the declaration of struct `ScalarArgument`.
+  - CN: 开始声明 struct `ScalarArgument`。
+- **L236** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L237** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L238** <code>  // Type definitions</code>
+  - EN: Comment that documents intent or context: "Type definitions".
+  - CN: 用于说明意图或上下文的注释："Type definitions"。
+- **L239** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L240** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L241** <code>  /// Value type</code>
+  - EN: Comment that documents intent or context: "Value type".
+  - CN: 用于说明意图或上下文的注释："Value type"。
+- **L242** <code>  struct ScalarValue : public KernelArgument::Value {</code>
+  - EN: Begins the declaration of struct `ScalarValue`.
+  - CN: 开始声明 struct `ScalarValue`。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>    std::string value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L245** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L246** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L247** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L248** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L250** <code>    ScalarValue(</code>
+  - EN: Begins or continues the signature/call syntax involving `ScalarValue`.
+  - CN: 开始或继续与 `ScalarValue` 相关的签名/调用语法。
+- **L251** <code>      std::string const &amp;value_ = &quot;&quot;,</code>
+  - EN: Assigns or initializes `value_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `value_` 进行赋值或初始化。
+- **L252** <code>      ScalarArgument const *argument = nullptr,</code>
+  - EN: Assigns or initializes `argument` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `argument` 进行赋值或初始化。
+- **L253** <code>      bool not_null_ = true</code>
+  - EN: Assigns or initializes `not_null_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `not_null_` 进行赋值或初始化。
+- **L254** <code>    );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>    virtual std::ostream &amp;print(std::ostream &amp;out) const;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L257** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L258** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L259** <code>  using ValueCollection = std::vector&lt;decltype(ScalarValue::value)&gt;;</code>
+  - EN: Introduces the type or namespace alias `ValueCollection`.
+  - CN: 引入类型或命名空间别名 `ValueCollection`。
+- **L260** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L261** <code>  /// Abstract base class to iterate over values within arguments</code>
+  - EN: Comment that documents intent or context: "Abstract base class to iterate over values within arguments".
+  - CN: 用于说明意图或上下文的注释："Abstract base class to iterate over values within arguments"。
+- **L262** <code>  struct ScalarValueIterator : public KernelArgument::ValueIterator {</code>
+  - EN: Begins the declaration of struct `ScalarValueIterator`.
+  - CN: 开始声明 struct `ScalarValueIterator`。
+- **L263** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L264** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L265** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L266** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L267** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L268** <code>    ValueCollection::const_iterator value_it;</code>
+  - EN: Declares the symbol `value_it` in the current scope.
+  - CN: 在当前作用域中声明符号 `value_it`。
+- **L269** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L270** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L271** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L272** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L273** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L274** <code>    explicit ScalarValueIterator(ScalarArgument const *argument = nullptr);</code>
+  - EN: Declares function or method `ScalarValueIterator` without defining it here.
+  - CN: 声明函数或方法 `ScalarValueIterator`，但不在此处给出定义。
+- **L275** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L276** <code>    virtual void operator++();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L277** <code>    virtual bool operator==(ValueIterator const &amp;it) const;</code>
+  - EN: Declares the symbol `const` in the current scope.
+  - CN: 在当前作用域中声明符号 `const`。
+- **L278** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L279** <code>    /// Gets the value pointed to</code>
+  - EN: Comment that documents intent or context: "Gets the value pointed to".
+  - CN: 用于说明意图或上下文的注释："Gets the value pointed to"。
+- **L280** <code>    virtual std::unique_ptr&lt;KernelArgument::Value&gt; at() const;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L281** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L282** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L283** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L284** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L285** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L286** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L287** <code>  /// Set of possible values</code>
+  - EN: Comment that documents intent or context: "Set of possible values".
+  - CN: 用于说明意图或上下文的注释："Set of possible values"。
+- **L288** <code>  ValueCollection values;</code>
+  - EN: Declares the symbol `values` in the current scope.
+  - CN: 在当前作用域中声明符号 `values`。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L291** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L292** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L293** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L294** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L295** <code>  explicit ScalarArgument(</code>
+  - EN: Begins or continues the signature/call syntax involving `ScalarArgument`.
+  - CN: 开始或继续与 `ScalarArgument` 相关的签名/调用语法。
+- **L296** <code>    ArgumentDescription const *description</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L297** <code>  ): </code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L298** <code>    KernelArgument(description) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `KernelArgument`.
+  - CN: 开始或继续与 `KernelArgument` 相关的签名/调用语法。
+- **L299** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L300** <code>  virtual bool not_null() const {</code>
+  - EN: Begins the definition of function or method `not_null`.
+  - CN: 开始定义函数或方法 `not_null`。
+- **L301** <code>    return !values.empty();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L302** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L303** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L304** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; begin() const;</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L305** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; end() const;</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L306** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L307** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L308** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L309** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L310** <code>/// Closed range supporting additive increment</code>
+  - EN: Comment that documents intent or context: "Closed range supporting additive increment".
+  - CN: 用于说明意图或上下文的注释："Closed range supporting additive increment"。
+- **L311** <code>struct Range {</code>
+  - EN: Begins the declaration of struct `Range`.
+  - CN: 开始声明 struct `Range`。
+- **L312** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L313** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L314** <code>  // Type definitions</code>
+  - EN: Comment that documents intent or context: "Type definitions".
+  - CN: 用于说明意图或上下文的注释："Type definitions"。
+- **L315** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L316** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L317** <code>  enum class Mode {</code>
+  - EN: Begins the declaration of enum class `Mode`.
+  - CN: 开始声明 enum class `Mode`。
+- **L318** <code>    kSequence,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L319** <code>    kRandom,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L320** <code>    kRandomLog2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L321** <code>    kInvalid</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L322** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L323** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L324** <code>  struct Iterator {</code>
+  - EN: Begins the declaration of struct `Iterator`.
+  - CN: 开始声明 struct `Iterator`。
+- **L325** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L326** <code>    int64_t value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L327** <code>    int64_t increment;</code>
+  - EN: Declares the symbol `increment` in the current scope.
+  - CN: 在当前作用域中声明符号 `increment`。
+- **L328** <code>    Range const *range;</code>
+  - EN: Declares the symbol `range` in the current scope.
+  - CN: 在当前作用域中声明符号 `range`。
+- **L329** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L330** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L331** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L332** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L333** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L334** <code>    Iterator(</code>
+  - EN: Begins or continues the signature/call syntax involving `Iterator`.
+  - CN: 开始或继续与 `Iterator` 相关的签名/调用语法。
+- **L335** <code>      int64_t value_ = 0, </code>
+  - EN: Assigns or initializes `value_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `value_` 进行赋值或初始化。
+- **L336** <code>      int64_t increment_ = 1,</code>
+  - EN: Assigns or initializes `increment_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `increment_` 进行赋值或初始化。
+- **L337** <code>      Range const *range_ = nullptr</code>
+  - EN: Assigns or initializes `range_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `range_` 进行赋值或初始化。
+- **L338** <code>    ): </code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L339** <code>      value(value_), increment(increment_), range(range_) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `range`.
+  - CN: 开始或继续与 `range` 相关的签名/调用语法。
+- **L340** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L341** <code>    Iterator &amp; operator++() {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L342** <code>      value += increment;</code>
+  - EN: Declares the symbol `increment` in the current scope.
+  - CN: 在当前作用域中声明符号 `increment`。
+- **L343** <code>      return *this;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L344** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L345** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L346** <code>    Iterator operator++(int) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L347** <code>      Iterator self(*this);</code>
+  - EN: Declares function or method `self` without defining it here.
+  - CN: 声明函数或方法 `self`，但不在此处给出定义。
+- **L348** <code>      ++(*this);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L349** <code>      return self;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L350** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L351** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L352** <code>    bool operator==(Iterator const &amp;it) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L353** <code>      return value == it.value;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L354** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L355** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L356** <code>    bool operator!=(Iterator const &amp;it) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L357** <code>      return !(*this == it);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L358** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L359** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L360** <code>    static int64_t round(int64_t value, int64_t divisible) {</code>
+  - EN: Begins the definition of function or method `round`.
+  - CN: 开始定义函数或方法 `round`。
+- **L361** <code>      int64_t rem = (value % divisible);</code>
+  - EN: Assigns or initializes `rem` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rem` 进行赋值或初始化。
+- **L362** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L363** <code>      // Round either up or down</code>
+  - EN: Comment that documents intent or context: "Round either up or down".
+  - CN: 用于说明意图或上下文的注释："Round either up or down"。
+- **L364** <code>      if (rem &gt; divisible / 2) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L365** <code>        value += (divisible - rem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L366** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L367** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L368** <code>        value -= rem;</code>
+  - EN: Declares the symbol `rem` in the current scope.
+  - CN: 在当前作用域中声明符号 `rem`。
+- **L369** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L370** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L371** <code>      return value;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L372** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L373** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L374** <code>    int64_t at() const {</code>
+  - EN: Begins the definition of function or method `at`.
+  - CN: 开始定义函数或方法 `at`。
+- **L375** <code>      if (!range) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L376** <code>        return value;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L377** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L378** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L379** <code>      switch (range-&gt;mode) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L380** <code>        case Mode::kSequence: return value;</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L381** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L382** <code>        case Mode::kRandom: {</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L383** <code>          double rnd = double(range-&gt;minimum) + </code>
+  - EN: Begins or continues the signature/call syntax involving `double`.
+  - CN: 开始或继续与 `double` 相关的签名/调用语法。
+- **L384** <code>            double(std::rand()) / double(RAND_MAX) * (double(range-&gt;maximum) - double(range-&gt;minimum));</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L385** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L386** <code>          int64_t value = int64_t(rnd);</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L387** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L388** <code>          return round(value, range-&gt;divisible);      </code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L389** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L390** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L391** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L392** <code>        case Mode::kRandomLog2: {</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L393** <code>          double lg2_minimum = std::log(double(range-&gt;minimum)) / std::log(2.0);</code>
+  - EN: Declares function or method `log` without defining it here.
+  - CN: 声明函数或方法 `log`，但不在此处给出定义。
+- **L394** <code>          double lg2_maximum = std::log(double(range-&gt;maximum)) / std::log(2.0);</code>
+  - EN: Declares function or method `log` without defining it here.
+  - CN: 声明函数或方法 `log`，但不在此处给出定义。
+- **L395** <code>          double rnd = lg2_minimum + double(std::rand()) / double(RAND_MAX) * (lg2_maximum - lg2_minimum);      </code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L396** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L397** <code>          int64_t value = int64_t(std::pow(2.0, rnd));</code>
+  - EN: Declares function or method `pow` without defining it here.
+  - CN: 声明函数或方法 `pow`，但不在此处给出定义。
+- **L398** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L399** <code>          return round(value, range-&gt;divisible);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L400** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L401** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L402** <code>        default: break;</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L403** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L404** <code>      return value;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L405** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L406** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L407** <code>    int64_t operator*() const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L408** <code>      return at();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L409** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L410** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L411** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L412** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L413** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L414** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L415** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L416** <code>  int64_t first;        ///&lt; first element in range</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L417** <code>  int64_t last;         ///&lt; last element in range</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L418** <code>  int64_t increment;    ///&lt; additive increment between values</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L419** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L420** <code>  Mode mode;            ///&lt; mode selection enables alternative values </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L421** <code>  int64_t minimum;      ///&lt; minimum value to return</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L422** <code>  int64_t maximum;      ///&lt; maximum value to return</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L423** <code>  int64_t divisible;    ///&lt; rounds value down to an integer multiple of this value </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L424** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L425** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L426** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L427** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L428** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L429** <code>  /// Default constructor - range acts as a scalar</code>
+  - EN: Comment that documents intent or context: "Default constructor - range acts as a scalar".
+  - CN: 用于说明意图或上下文的注释："Default constructor - range acts as a scalar"。
+- **L430** <code>  Range(int64_t first_ = 0): first(first_), last(first_), increment(1), mode(Mode::kSequence), minimum(0), maximum(0), divisible(1) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `divisible`.
+  - CN: 开始或继续与 `divisible` 相关的签名/调用语法。
+- **L431** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L432** <code>  /// Range acts as a range</code>
+  - EN: Comment that documents intent or context: "Range acts as a range".
+  - CN: 用于说明意图或上下文的注释："Range acts as a range"。
+- **L433** <code>  Range(</code>
+  - EN: Begins or continues the signature/call syntax involving `Range`.
+  - CN: 开始或继续与 `Range` 相关的签名/调用语法。
+- **L434** <code>    int64_t first_, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L435** <code>    int64_t last_, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L436** <code>    int64_t increment_ = 1,</code>
+  - EN: Assigns or initializes `increment_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `increment_` 进行赋值或初始化。
+- **L437** <code>    Mode mode_ = Mode::kSequence,</code>
+  - EN: Assigns or initializes `mode_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `mode_` 进行赋值或初始化。
+- **L438** <code>    int64_t minimum_ = 0,</code>
+  - EN: Assigns or initializes `minimum_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `minimum_` 进行赋值或初始化。
+- **L439** <code>    int64_t maximum_ = 0,</code>
+  - EN: Assigns or initializes `maximum_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `maximum_` 进行赋值或初始化。
+- **L440** <code>    int64_t divisible_ = 1</code>
+  - EN: Assigns or initializes `divisible_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `divisible_` 进行赋值或初始化。
+- **L441** <code>  ): first(first_), last(last_), increment(increment_), mode(mode_), minimum(minimum_), maximum(maximum_), divisible(divisible_) {</code>
+  - EN: Begins the definition of function or method `divisible`.
+  - CN: 开始定义函数或方法 `divisible`。
+- **L442** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L443** <code>    // Helpers to avoid constructing invalid ranges</code>
+  - EN: Comment that documents intent or context: "Helpers to avoid constructing invalid ranges".
+  - CN: 用于说明意图或上下文的注释："Helpers to avoid constructing invalid ranges"。
+- **L444** <code>    if (increment &gt; 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L445** <code>      if (last &lt; first) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L446** <code>        std::swap(last, first);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L447** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L448** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L449** <code>    else if (increment &lt; 0) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L450** <code>      if (first &lt; last) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L451** <code>        std::swap(last, first);</code>
+  - EN: Declares function or method `swap` without defining it here.
+  - CN: 声明函数或方法 `swap`，但不在此处给出定义。
+- **L452** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L453** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L454** <code>    else if (last != first) {</code>
+  - EN: Checks an additional condition when earlier branches did not match.
+  - CN: 在前面分支未命中时继续检查额外条件。
+- **L455** <code>      last = first;</code>
+  - EN: Assigns or initializes `last` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `last` 进行赋值或初始化。
+- **L456** <code>      increment = 1;</code>
+  - EN: Assigns or initializes `increment` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `increment` 进行赋值或初始化。
+- **L457** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L458** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L459** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L460** <code>  /// Helper to construct a sequence range</code>
+  - EN: Comment that documents intent or context: "Helper to construct a sequence range".
+  - CN: 用于说明意图或上下文的注释："Helper to construct a sequence range"。
+- **L461** <code>  static Range Sequence(int64_t first_, int64_t last_, int64_t increment_ = 1) {</code>
+  - EN: Begins the definition of function or method `Sequence`.
+  - CN: 开始定义函数或方法 `Sequence`。
+- **L462** <code>    return Range(first_, last_, increment_, Mode::kSequence);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L463** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L464** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L465** <code>  /// Helper to construct a range that is a random distribution </code>
+  - EN: Comment that documents intent or context: "Helper to construct a range that is a random distribution".
+  - CN: 用于说明意图或上下文的注释："Helper to construct a range that is a random distribution"。
+- **L466** <code>  static Range Random(int64_t minimum_, int64_t maximum_, int64_t count_, int64_t divisible_ = 1) {</code>
+  - EN: Begins the definition of function or method `Random`.
+  - CN: 开始定义函数或方法 `Random`。
+- **L467** <code>    return Range(1, count_, 1, Mode::kRandom, minimum_, maximum_, divisible_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L468** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L469** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L470** <code>  /// Helper to construct a range that is a random distribution over a log scale</code>
+  - EN: Comment that documents intent or context: "Helper to construct a range that is a random distribution over a log scale".
+  - CN: 用于说明意图或上下文的注释："Helper to construct a range that is a random distribution over a log scale"。
+- **L471** <code>  static Range RandomLog2(int64_t minimum_, int64_t maximum_, int64_t count_, int64_t divisible_ = 1) {</code>
+  - EN: Begins the definition of function or method `RandomLog2`.
+  - CN: 开始定义函数或方法 `RandomLog2`。
+- **L472** <code>    return Range(1, count_, 1, Mode::kRandomLog2, minimum_, maximum_, divisible_);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L473** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L474** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L475** <code>  /// Returns an iterator to the first element within the range</code>
+  - EN: Comment that documents intent or context: "Returns an iterator to the first element within the range".
+  - CN: 用于说明意图或上下文的注释："Returns an iterator to the first element within the range"。
+- **L476** <code>  Iterator begin() const {</code>
+  - EN: Begins the definition of function or method `begin`.
+  - CN: 开始定义函数或方法 `begin`。
+- **L477** <code>    return Iterator(first, increment, this);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L478** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L479** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L480** <code>  /// Returns an iterator to the first element *after* the range</code>
+  - EN: Comment that documents intent or context: "Returns an iterator to the first element *after* the range".
+  - CN: 用于说明意图或上下文的注释："Returns an iterator to the first element *after* the range"。
+- **L481** <code>  Iterator end() const {</code>
+  - EN: Begins the definition of function or method `end`.
+  - CN: 开始定义函数或方法 `end`。
+- **L482** <code>    return Iterator(first + ((last - first)/increment + 1) * increment, increment, this);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L483** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L484** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L485** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L486** <code>/// Integer-valued argument - represented as a list of integer-valued ranges</code>
+  - EN: Comment that documents intent or context: "Integer-valued argument - represented as a list of integer-valued ranges".
+  - CN: 用于说明意图或上下文的注释："Integer-valued argument - represented as a list of integer-valued ranges"。
+- **L487** <code>struct IntegerArgument : public KernelArgument {</code>
+  - EN: Begins the declaration of struct `IntegerArgument`.
+  - CN: 开始声明 struct `IntegerArgument`。
+- **L488** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L489** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L490** <code>  // Type definitions</code>
+  - EN: Comment that documents intent or context: "Type definitions".
+  - CN: 用于说明意图或上下文的注释："Type definitions"。
+- **L491** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L492** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L493** <code>  /// Value type</code>
+  - EN: Comment that documents intent or context: "Value type".
+  - CN: 用于说明意图或上下文的注释："Value type"。
+- **L494** <code>  struct IntegerValue : public KernelArgument::Value {</code>
+  - EN: Begins the declaration of struct `IntegerValue`.
+  - CN: 开始声明 struct `IntegerValue`。
+- **L495** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L496** <code>    int64_t value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L497** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L498** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L499** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L500** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L501** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L502** <code>    IntegerValue(</code>
+  - EN: Begins or continues the signature/call syntax involving `IntegerValue`.
+  - CN: 开始或继续与 `IntegerValue` 相关的签名/调用语法。
+- **L503** <code>      int64_t value_ = 0, </code>
+  - EN: Assigns or initializes `value_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `value_` 进行赋值或初始化。
+- **L504** <code>      IntegerArgument const *argument_ = nullptr, </code>
+  - EN: Assigns or initializes `argument_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `argument_` 进行赋值或初始化。
+- **L505** <code>      bool not_null_ = true</code>
+  - EN: Assigns or initializes `not_null_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `not_null_` 进行赋值或初始化。
+- **L506** <code>    );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L508** <code>    /// Pretty printer for debugging</code>
+  - EN: Comment that documents intent or context: "Pretty printer for debugging".
+  - CN: 用于说明意图或上下文的注释："Pretty printer for debugging"。
+- **L509** <code>    virtual std::ostream &amp;print(std::ostream &amp;out) const;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L510** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L511** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L512** <code>  /// Collection of ranges represent the IntegerArgument&#x27;s state</code>
+  - EN: Comment that documents intent or context: "Collection of ranges represent the IntegerArgument's state".
+  - CN: 用于说明意图或上下文的注释："Collection of ranges represent the IntegerArgument's state"。
+- **L513** <code>  using RangeCollection = std::vector&lt;Range&gt;;</code>
+  - EN: Introduces the type or namespace alias `RangeCollection`.
+  - CN: 引入类型或命名空间别名 `RangeCollection`。
+- **L514** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L515** <code>  /// Abstract base class to iterate over values within arguments</code>
+  - EN: Comment that documents intent or context: "Abstract base class to iterate over values within arguments".
+  - CN: 用于说明意图或上下文的注释："Abstract base class to iterate over values within arguments"。
+- **L516** <code>  struct IntegerValueIterator : public KernelArgument::ValueIterator {</code>
+  - EN: Begins the declaration of struct `IntegerValueIterator`.
+  - CN: 开始声明 struct `IntegerValueIterator`。
+- **L517** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L518** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L519** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L520** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L521** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L522** <code>    RangeCollection::const_iterator range_it;</code>
+  - EN: Declares the symbol `range_it` in the current scope.
+  - CN: 在当前作用域中声明符号 `range_it`。
+- **L523** <code>    Range::Iterator value_it;</code>
+  - EN: Declares the symbol `value_it` in the current scope.
+  - CN: 在当前作用域中声明符号 `value_it`。
+- **L524** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L525** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L526** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L527** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L528** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L529** <code>    IntegerValueIterator();</code>
+  - EN: Declares function or method `IntegerValueIterator` without defining it here.
+  - CN: 声明函数或方法 `IntegerValueIterator`，但不在此处给出定义。
+- **L530** <code>    IntegerValueIterator(IntegerArgument const *argument);</code>
+  - EN: Declares function or method `IntegerValueIterator` without defining it here.
+  - CN: 声明函数或方法 `IntegerValueIterator`，但不在此处给出定义。
+- **L531** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L532** <code>    virtual void operator++();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L533** <code>    virtual bool operator==(ValueIterator const &amp;it) const;</code>
+  - EN: Declares the symbol `const` in the current scope.
+  - CN: 在当前作用域中声明符号 `const`。
+- **L534** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L535** <code>    /// Gets the value pointed to</code>
+  - EN: Comment that documents intent or context: "Gets the value pointed to".
+  - CN: 用于说明意图或上下文的注释："Gets the value pointed to"。
+- **L536** <code>    virtual std::unique_ptr&lt;KernelArgument::Value&gt; at() const;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L537** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L538** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L539** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L540** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L541** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L542** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L543** <code>  /// Set of possible values</code>
+  - EN: Comment that documents intent or context: "Set of possible values".
+  - CN: 用于说明意图或上下文的注释："Set of possible values"。
+- **L544** <code>  RangeCollection ranges;</code>
+  - EN: Declares the symbol `ranges` in the current scope.
+  - CN: 在当前作用域中声明符号 `ranges`。
+- **L545** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L546** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L547** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L548** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L549** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L550** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L551** <code>  IntegerArgument(</code>
+  - EN: Begins or continues the signature/call syntax involving `IntegerArgument`.
+  - CN: 开始或继续与 `IntegerArgument` 相关的签名/调用语法。
+- **L552** <code>    ArgumentDescription const *description</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L553** <code>  ): </code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L554** <code>    KernelArgument(description) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `KernelArgument`.
+  - CN: 开始或继续与 `KernelArgument` 相关的签名/调用语法。
+- **L555** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L556** <code>  virtual bool not_null() const {</code>
+  - EN: Begins the definition of function or method `not_null`.
+  - CN: 开始定义函数或方法 `not_null`。
+- **L557** <code>    bool _not_null = !ranges.empty();</code>
+  - EN: Declares function or method `empty` without defining it here.
+  - CN: 声明函数或方法 `empty`，但不在此处给出定义。
+- **L558** <code>    return _not_null;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L559** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L560** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L561** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; begin() const;</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L562** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; end() const;</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L563** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L564** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L565** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L566** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L567** <code>/// Structure defining the data type of tensors</code>
+  - EN: Comment that documents intent or context: "Structure defining the data type of tensors".
+  - CN: 用于说明意图或上下文的注释："Structure defining the data type of tensors"。
+- **L568** <code>struct TensorArgument : public KernelArgument {</code>
+  - EN: Begins the declaration of struct `TensorArgument`.
+  - CN: 开始声明 struct `TensorArgument`。
+- **L569** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L570** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L571** <code>  // Type definitions</code>
+  - EN: Comment that documents intent or context: "Type definitions".
+  - CN: 用于说明意图或上下文的注释："Type definitions"。
+- **L572** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L573** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L574** <code>  struct TensorDescription {</code>
+  - EN: Begins the declaration of struct `TensorDescription`.
+  - CN: 开始声明 struct `TensorDescription`。
+- **L575** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L576** <code>    /// Data type of elements</code>
+  - EN: Comment that documents intent or context: "Data type of elements".
+  - CN: 用于说明意图或上下文的注释："Data type of elements"。
+- **L577** <code>    library::NumericTypeID element;</code>
+  - EN: Declares the symbol `element` in the current scope.
+  - CN: 在当前作用域中声明符号 `element`。
+- **L578** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L579** <code>    /// Layout definition</code>
+  - EN: Comment that documents intent or context: "Layout definition".
+  - CN: 用于说明意图或上下文的注释："Layout definition"。
+- **L580** <code>    library::LayoutTypeID layout;</code>
+  - EN: Declares the symbol `layout` in the current scope.
+  - CN: 在当前作用域中声明符号 `layout`。
+- **L581** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L582** <code>    /// Computed extent</code>
+  - EN: Comment that documents intent or context: "Computed extent".
+  - CN: 用于说明意图或上下文的注释："Computed extent"。
+- **L583** <code>    std::vector&lt;int&gt; extent;</code>
+  - EN: Declares the symbol `extent` in the current scope.
+  - CN: 在当前作用域中声明符号 `extent`。
+- **L584** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L585** <code>    /// Enables directly specifying stride value used to size tensor</code>
+  - EN: Comment that documents intent or context: "Enables directly specifying stride value used to size tensor".
+  - CN: 用于说明意图或上下文的注释："Enables directly specifying stride value used to size tensor"。
+- **L586** <code>    std::vector&lt;int&gt; stride;</code>
+  - EN: Declares the symbol `stride` in the current scope.
+  - CN: 在当前作用域中声明符号 `stride`。
+- **L587** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L588** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L589** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L590** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L591** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L592** <code>    TensorDescription(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L593** <code>      library::NumericTypeID element_ = library::NumericTypeID::kUnknown,</code>
+  - EN: Assigns or initializes `element_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element_` 进行赋值或初始化。
+- **L594** <code>      library::LayoutTypeID layout_ = library::LayoutTypeID::kUnknown,</code>
+  - EN: Assigns or initializes `layout_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout_` 进行赋值或初始化。
+- **L595** <code>      std::vector&lt;int&gt; extent_ = std::vector&lt;int&gt;(),</code>
+  - EN: Begins or continues the signature/call syntax involving `vector<int>`.
+  - CN: 开始或继续与 `vector<int>` 相关的签名/调用语法。
+- **L596** <code>      std::vector&lt;int&gt; stride_ = std::vector&lt;int&gt;()</code>
+  - EN: Begins or continues the signature/call syntax involving `vector<int>`.
+  - CN: 开始或继续与 `vector<int>` 相关的签名/调用语法。
+- **L597** <code>    ): </code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L598** <code>      element(element_), layout(layout_), extent(extent_), stride(stride_) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `stride`.
+  - CN: 开始或继续与 `stride` 相关的签名/调用语法。
+- **L599** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L600** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L601** <code>  using ValueCollection = std::vector&lt;TensorDescription&gt;;</code>
+  - EN: Introduces the type or namespace alias `ValueCollection`.
+  - CN: 引入类型或命名空间别名 `ValueCollection`。
+- **L602** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L603** <code>  /// Value structure</code>
+  - EN: Comment that documents intent or context: "Value structure".
+  - CN: 用于说明意图或上下文的注释："Value structure"。
+- **L604** <code>  struct TensorValue : public KernelArgument::Value {</code>
+  - EN: Begins the declaration of struct `TensorValue`.
+  - CN: 开始声明 struct `TensorValue`。
+- **L605** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L606** <code>    TensorDescription desc;</code>
+  - EN: Declares the symbol `desc` in the current scope.
+  - CN: 在当前作用域中声明符号 `desc`。
+- **L607** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L608** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L609** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L610** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L611** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L612** <code>    TensorValue(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorValue`.
+  - CN: 开始或继续与 `TensorValue` 相关的签名/调用语法。
+- **L613** <code>      TensorDescription const &amp;desc_ = TensorDescription(),</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorDescription`.
+  - CN: 开始或继续与 `TensorDescription` 相关的签名/调用语法。
+- **L614** <code>      TensorArgument const *argument_ = nullptr, </code>
+  - EN: Assigns or initializes `argument_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `argument_` 进行赋值或初始化。
+- **L615** <code>      bool not_null_ = true</code>
+  - EN: Assigns or initializes `not_null_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `not_null_` 进行赋值或初始化。
+- **L616** <code>    );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L617** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L618** <code>    /// Pretty printer for debugging</code>
+  - EN: Comment that documents intent or context: "Pretty printer for debugging".
+  - CN: 用于说明意图或上下文的注释："Pretty printer for debugging"。
+- **L619** <code>    virtual std::ostream &amp;print(std::ostream &amp;out) const;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L620** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L621** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L622** <code>  /// Abstract base class to iterate over values within arguments</code>
+  - EN: Comment that documents intent or context: "Abstract base class to iterate over values within arguments".
+  - CN: 用于说明意图或上下文的注释："Abstract base class to iterate over values within arguments"。
+- **L623** <code>  struct TensorValueIterator : public KernelArgument::ValueIterator {</code>
+  - EN: Begins the declaration of struct `TensorValueIterator`.
+  - CN: 开始声明 struct `TensorValueIterator`。
+- **L624** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L625** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L626** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L627** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L628** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L629** <code>    ValueCollection::const_iterator value_it;</code>
+  - EN: Declares the symbol `value_it` in the current scope.
+  - CN: 在当前作用域中声明符号 `value_it`。
+- **L630** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L631** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L632** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L633** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L634** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L635** <code>    explicit TensorValueIterator(TensorArgument const *argument_);</code>
+  - EN: Declares function or method `TensorValueIterator` without defining it here.
+  - CN: 声明函数或方法 `TensorValueIterator`，但不在此处给出定义。
+- **L636** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L637** <code>    virtual void operator++();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L638** <code>    virtual bool operator==(ValueIterator const &amp;it) const;</code>
+  - EN: Declares the symbol `const` in the current scope.
+  - CN: 在当前作用域中声明符号 `const`。
+- **L639** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L640** <code>    /// Gets the value pointed to</code>
+  - EN: Comment that documents intent or context: "Gets the value pointed to".
+  - CN: 用于说明意图或上下文的注释："Gets the value pointed to"。
+- **L641** <code>    virtual std::unique_ptr&lt;KernelArgument::Value&gt; at() const;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L642** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L643** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L644** <code>  /// Set of possible values</code>
+  - EN: Comment that documents intent or context: "Set of possible values".
+  - CN: 用于说明意图或上下文的注释："Set of possible values"。
+- **L645** <code>  ValueCollection values;</code>
+  - EN: Declares the symbol `values` in the current scope.
+  - CN: 在当前作用域中声明符号 `values`。
+- **L646** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L647** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L648** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L649** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L650** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L651** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L652** <code>  explicit TensorArgument(</code>
+  - EN: Begins or continues the signature/call syntax involving `TensorArgument`.
+  - CN: 开始或继续与 `TensorArgument` 相关的签名/调用语法。
+- **L653** <code>    ArgumentDescription const *description</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L654** <code>  ): </code>
+  - EN: Ends a Python signature header and starts the indented block below.
+  - CN: 结束 Python 签名头并开始下面的缩进代码块。
+- **L655** <code>    KernelArgument(description) { }</code>
+  - EN: Begins or continues the signature/call syntax involving `KernelArgument`.
+  - CN: 开始或继续与 `KernelArgument` 相关的签名/调用语法。
+- **L656** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L657** <code>  virtual bool not_null() const {</code>
+  - EN: Begins the definition of function or method `not_null`.
+  - CN: 开始定义函数或方法 `not_null`。
+- **L658** <code>    return !values.empty();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L659** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L660** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L661** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; begin() const;</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L662** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; end() const;</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L663** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L664** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L665** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L666** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L667** <code>/// Numeric data type</code>
+  - EN: Comment that documents intent or context: "Numeric data type".
+  - CN: 用于说明意图或上下文的注释："Numeric data type"。
+- **L668** <code>struct EnumeratedTypeArgument : public KernelArgument {</code>
+  - EN: Begins the declaration of struct `EnumeratedTypeArgument`.
+  - CN: 开始声明 struct `EnumeratedTypeArgument`。
+- **L669** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L670** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L671** <code>  // Type definitions</code>
+  - EN: Comment that documents intent or context: "Type definitions".
+  - CN: 用于说明意图或上下文的注释："Type definitions"。
+- **L672** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L673** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L674** <code>  struct EnumeratedTypeValue : public KernelArgument::Value {</code>
+  - EN: Begins the declaration of struct `EnumeratedTypeValue`.
+  - CN: 开始声明 struct `EnumeratedTypeValue`。
+- **L675** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L676** <code>    /// Data type of element</code>
+  - EN: Comment that documents intent or context: "Data type of element".
+  - CN: 用于说明意图或上下文的注释："Data type of element"。
+- **L677** <code>    std::string element;</code>
+  - EN: Declares the symbol `element` in the current scope.
+  - CN: 在当前作用域中声明符号 `element`。
+- **L678** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L679** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L680** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L681** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L682** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L683** <code>    EnumeratedTypeValue(</code>
+  - EN: Begins or continues the signature/call syntax involving `EnumeratedTypeValue`.
+  - CN: 开始或继续与 `EnumeratedTypeValue` 相关的签名/调用语法。
+- **L684** <code>      std::string const &amp;element_ = std::string(),</code>
+  - EN: Begins or continues the signature/call syntax involving `string`.
+  - CN: 开始或继续与 `string` 相关的签名/调用语法。
+- **L685** <code>      EnumeratedTypeArgument const *argument_ = nullptr, </code>
+  - EN: Assigns or initializes `argument_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `argument_` 进行赋值或初始化。
+- **L686** <code>      bool not_null_ = true</code>
+  - EN: Assigns or initializes `not_null_` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `not_null_` 进行赋值或初始化。
+- **L687** <code>    );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L688** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L689** <code>    /// Pretty printer for debugging</code>
+  - EN: Comment that documents intent or context: "Pretty printer for debugging".
+  - CN: 用于说明意图或上下文的注释："Pretty printer for debugging"。
+- **L690** <code>    virtual std::ostream &amp;print(std::ostream &amp;out) const;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L691** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L692** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L693** <code>  using ValueCollection = std::vector&lt;decltype(EnumeratedTypeValue::element)&gt;;</code>
+  - EN: Introduces the type or namespace alias `ValueCollection`.
+  - CN: 引入类型或命名空间别名 `ValueCollection`。
+- **L694** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L695** <code>  /// Abstract base class to iterate over values within arguments</code>
+  - EN: Comment that documents intent or context: "Abstract base class to iterate over values within arguments".
+  - CN: 用于说明意图或上下文的注释："Abstract base class to iterate over values within arguments"。
+- **L696** <code>  struct EnumeratedTypeValueIterator : public KernelArgument::ValueIterator {</code>
+  - EN: Begins the declaration of struct `EnumeratedTypeValueIterator`.
+  - CN: 开始声明 struct `EnumeratedTypeValueIterator`。
+- **L697** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L698** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L699** <code>    // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L700** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L701** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L702** <code>    ValueCollection::const_iterator value_it;</code>
+  - EN: Declares the symbol `value_it` in the current scope.
+  - CN: 在当前作用域中声明符号 `value_it`。
+- **L703** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L704** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L705** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L706** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L707** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L708** <code>    explicit EnumeratedTypeValueIterator(EnumeratedTypeArgument const *argument_ = nullptr);</code>
+  - EN: Declares function or method `EnumeratedTypeValueIterator` without defining it here.
+  - CN: 声明函数或方法 `EnumeratedTypeValueIterator`，但不在此处给出定义。
+- **L709** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L710** <code>    virtual void operator++();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L711** <code>    virtual bool operator==(ValueIterator const &amp;it) const;</code>
+  - EN: Declares the symbol `const` in the current scope.
+  - CN: 在当前作用域中声明符号 `const`。
+- **L712** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L713** <code>    /// Gets the value pointed to</code>
+  - EN: Comment that documents intent or context: "Gets the value pointed to".
+  - CN: 用于说明意图或上下文的注释："Gets the value pointed to"。
+- **L714** <code>    virtual std::unique_ptr&lt;KernelArgument::Value&gt; at() const;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L715** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L716** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L717** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L718** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L719** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L720** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L721** <code>  ValueCollection values;</code>
+  - EN: Declares the symbol `values` in the current scope.
+  - CN: 在当前作用域中声明符号 `values`。
+- **L722** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L723** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L724** <code>  // Members</code>
+  - EN: Comment that documents intent or context: "Members".
+  - CN: 用于说明意图或上下文的注释："Members"。
+- **L725** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L726** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L727** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L728** <code>  explicit EnumeratedTypeArgument(ArgumentDescription const *description):</code>
+  - EN: Begins the definition of function or method `EnumeratedTypeArgument`.
+  - CN: 开始定义函数或方法 `EnumeratedTypeArgument`。
+- **L729** <code>    KernelArgument(description) {}</code>
+  - EN: Begins or continues the signature/call syntax involving `KernelArgument`.
+  - CN: 开始或继续与 `KernelArgument` 相关的签名/调用语法。
+- **L730** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L731** <code>  virtual bool not_null() const {</code>
+  - EN: Begins the definition of function or method `not_null`.
+  - CN: 开始定义函数或方法 `not_null`。
+- **L732** <code>    return !values.empty();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L733** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L734** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L735** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; begin() const;</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L736** <code>  virtual std::unique_ptr&lt;KernelArgument::ValueIterator&gt; end() const;</code>
+  - EN: Declares function or method `end` without defining it here.
+  - CN: 声明函数或方法 `end`，但不在此处给出定义。
+- **L737** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L738** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L739** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L740** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L741** <code>/// Object storing the space argument values</code>
+  - EN: Comment that documents intent or context: "Object storing the space argument values".
+  - CN: 用于说明意图或上下文的注释："Object storing the space argument values"。
+- **L742** <code>class ProblemSpace {</code>
+  - EN: Begins the declaration of class `ProblemSpace`.
+  - CN: 开始声明 class `ProblemSpace`。
+- **L743** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L744** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L745** <code>  /// Tuple of arguments</code>
+  - EN: Comment that documents intent or context: "Tuple of arguments".
+  - CN: 用于说明意图或上下文的注释："Tuple of arguments"。
+- **L746** <code>  using Problem = std::vector&lt;std::unique_ptr&lt;KernelArgument::Value&gt;&gt;;</code>
+  - EN: Introduces the type or namespace alias `Problem`.
+  - CN: 引入类型或命名空间别名 `Problem`。
+- **L747** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L748** <code>  /// Type used to iterator over things</code>
+  - EN: Comment that documents intent or context: "Type used to iterator over things".
+  - CN: 用于说明意图或上下文的注释："Type used to iterator over things"。
+- **L749** <code>  using IteratorVector = std::vector&lt;std::unique_ptr&lt;KernelArgument::ValueIterator&gt;&gt;;</code>
+  - EN: Introduces the type or namespace alias `IteratorVector`.
+  - CN: 引入类型或命名空间别名 `IteratorVector`。
+- **L750** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L751** <code>  /// Iterates over points in the design space</code>
+  - EN: Comment that documents intent or context: "Iterates over points in the design space".
+  - CN: 用于说明意图或上下文的注释："Iterates over points in the design space"。
+- **L752** <code>  class Iterator {</code>
+  - EN: Begins the declaration of class `Iterator`.
+  - CN: 开始声明 class `Iterator`。
+- **L753** <code>  private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L754** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L755** <code>    /// One iterator per argument</code>
+  - EN: Comment that documents intent or context: "One iterator per argument".
+  - CN: 用于说明意图或上下文的注释："One iterator per argument"。
+- **L756** <code>    IteratorVector iterators;</code>
+  - EN: Declares the symbol `iterators` in the current scope.
+  - CN: 在当前作用域中声明符号 `iterators`。
+- **L757** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L758** <code>  public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L759** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L760** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L761** <code>    // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L762** <code>    //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L763** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L764** <code>    explicit Iterator();</code>
+  - EN: Declares function or method `Iterator` without defining it here.
+  - CN: 声明函数或方法 `Iterator`，但不在此处给出定义。
+- **L765** <code>    Iterator(ProblemSpace const &amp;problem_space);</code>
+  - EN: Declares function or method `Iterator` without defining it here.
+  - CN: 声明函数或方法 `Iterator`，但不在此处给出定义。
+- **L766** <code>    Iterator(Iterator &amp;&amp;it);</code>
+  - EN: Declares function or method `Iterator` without defining it here.
+  - CN: 声明函数或方法 `Iterator`，但不在此处给出定义。
+- **L767** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L768** <code>    // Rule of three</code>
+  - EN: Comment that documents intent or context: "Rule of three".
+  - CN: 用于说明意图或上下文的注释："Rule of three"。
+- **L769** <code>    Iterator(Iterator const &amp;) = delete;</code>
+  - EN: Declares function or method `Iterator` without defining it here.
+  - CN: 声明函数或方法 `Iterator`，但不在此处给出定义。
+- **L770** <code>    Iterator &amp;operator=(Iterator const &amp;it) = delete;</code>
+  - EN: Assigns or initializes `operator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `operator` 进行赋值或初始化。
+- **L771** <code>    ~Iterator() = default;</code>
+  - EN: Declares function or method `~Iterator` without defining it here.
+  - CN: 声明函数或方法 `~Iterator`，但不在此处给出定义。
+- **L772** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L773** <code>    /// Pre-increment - advances to next point in argument range</code>
+  - EN: Comment that documents intent or context: "Pre-increment - advances to next point in argument range".
+  - CN: 用于说明意图或上下文的注释："Pre-increment - advances to next point in argument range"。
+- **L774** <code>    void operator++();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L775** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L776** <code>    /// Gets the current argument value</code>
+  - EN: Comment that documents intent or context: "Gets the current argument value".
+  - CN: 用于说明意图或上下文的注释："Gets the current argument value"。
+- **L777** <code>    Problem at() const;</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L778** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L779** <code>    /// Moves iterator to end</code>
+  - EN: Comment that documents intent or context: "Moves iterator to end".
+  - CN: 用于说明意图或上下文的注释："Moves iterator to end"。
+- **L780** <code>    void move_to_end();</code>
+  - EN: Declares function or method `move_to_end` without defining it here.
+  - CN: 声明函数或方法 `move_to_end`，但不在此处给出定义。
+- **L781** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L782** <code>    /// Equality operator</code>
+  - EN: Comment that documents intent or context: "Equality operator".
+  - CN: 用于说明意图或上下文的注释："Equality operator"。
+- **L783** <code>    bool operator==(Iterator const &amp;it) const;</code>
+  - EN: Declares the symbol `const` in the current scope.
+  - CN: 在当前作用域中声明符号 `const`。
+- **L784** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L785** <code>    /// Inequality operator</code>
+  - EN: Comment that documents intent or context: "Inequality operator".
+  - CN: 用于说明意图或上下文的注释："Inequality operator"。
+- **L786** <code>    bool operator!=(Iterator const &amp;it) const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L787** <code>      return !(*this == it);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L788** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L789** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L790** <code>    /// Helper to call at() method</code>
+  - EN: Comment that documents intent or context: "Helper to call at() method".
+  - CN: 用于说明意图或上下文的注释："Helper to call at() method"。
+- **L791** <code>    Problem operator*() const {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L792** <code>      return at();</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L793** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L794** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L795** <code>    /// Helper to print iterator state</code>
+  - EN: Comment that documents intent or context: "Helper to print iterator state".
+  - CN: 用于说明意图或上下文的注释："Helper to print iterator state"。
+- **L796** <code>    std::ostream &amp; print(std::ostream &amp;out) const;</code>
+  - EN: Declares function or method `print` without defining it here.
+  - CN: 声明函数或方法 `print`，但不在此处给出定义。
+- **L797** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L798** <code>  private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L799** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L800** <code>    /// Helper for recursively constructing iterators</code>
+  - EN: Comment that documents intent or context: "Helper for recursively constructing iterators".
+  - CN: 用于说明意图或上下文的注释："Helper for recursively constructing iterators"。
+- **L801** <code>    void construct_(KernelArgument const *argument);</code>
+  - EN: Declares function or method `construct_` without defining it here.
+  - CN: 声明函数或方法 `construct_`，但不在此处给出定义。
+- **L802** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L803** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L804** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L805** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L806** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L807** <code>  // Data members</code>
+  - EN: Comment that documents intent or context: "Data members".
+  - CN: 用于说明意图或上下文的注释："Data members"。
+- **L808** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L809** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L810** <code>  KernelArgumentVector arguments;</code>
+  - EN: Declares the symbol `arguments` in the current scope.
+  - CN: 在当前作用域中声明符号 `arguments`。
+- **L811** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L812** <code>  /// Map of argument names to their position within the argument vector</code>
+  - EN: Comment that documents intent or context: "Map of argument names to their position within the argument vector".
+  - CN: 用于说明意图或上下文的注释："Map of argument names to their position within the argument vector"。
+- **L813** <code>  std::unordered_map&lt;std::string, size_t&gt; argument_index_map;</code>
+  - EN: Declares the symbol `argument_index_map` in the current scope.
+  - CN: 在当前作用域中声明符号 `argument_index_map`。
+- **L814** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L815** <code>public:</code>
+  - EN: Sets the following members to `public` visibility.
+  - CN: 将后续成员的可见性设置为 `public`。
+- **L816** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L817** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L818** <code>  // Methods</code>
+  - EN: Comment that documents intent or context: "Methods".
+  - CN: 用于说明意图或上下文的注释："Methods"。
+- **L819** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L820** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L821** <code>  /// Default ctor</code>
+  - EN: Comment that documents intent or context: "Default ctor".
+  - CN: 用于说明意图或上下文的注释："Default ctor"。
+- **L822** <code>  ProblemSpace() = default;</code>
+  - EN: Declares function or method `ProblemSpace` without defining it here.
+  - CN: 声明函数或方法 `ProblemSpace`，但不在此处给出定义。
+- **L823** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L824** <code>  /// Constructs a problem space from a vector of arguments. This vector must outlive</code>
+  - EN: Comment that documents intent or context: "Constructs a problem space from a vector of arguments. This vector must outlive".
+  - CN: 用于说明意图或上下文的注释："Constructs a problem space from a vector of arguments. This vector must outlive"。
+- **L825** <code>  /// the ProblemSpace object, which stores pointers to objects within the</code>
+  - EN: Comment that documents intent or context: "the ProblemSpace object, which stores pointers to objects within the".
+  - CN: 用于说明意图或上下文的注释："the ProblemSpace object, which stores pointers to objects within the"。
+- **L826** <code>  /// ArgumentDescriptionVector.</code>
+  - EN: Comment that documents intent or context: "ArgumentDescriptionVector.".
+  - CN: 用于说明意图或上下文的注释："ArgumentDescriptionVector."。
+- **L827** <code>  ProblemSpace(ArgumentDescriptionVector const &amp;schema, CommandLine const &amp;cmdline);</code>
+  - EN: Declares function or method `ProblemSpace` without defining it here.
+  - CN: 声明函数或方法 `ProblemSpace`，但不在此处给出定义。
+- **L828** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L829** <code>  Iterator begin() const;   // returns an iterator to the first point in the range</code>
+  - EN: Begins or continues the signature/call syntax involving `begin`.
+  - CN: 开始或继续与 `begin` 相关的签名/调用语法。
+- **L830** <code>  Iterator end() const;     // returns an iterator to the first point after the range</code>
+  - EN: Begins or continues the signature/call syntax involving `end`.
+  - CN: 开始或继续与 `end` 相关的签名/调用语法。
+- **L831** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L832** <code>  /// Returns the index of an argument by name</code>
+  - EN: Comment that documents intent or context: "Returns the index of an argument by name".
+  - CN: 用于说明意图或上下文的注释："Returns the index of an argument by name"。
+- **L833** <code>  size_t argument_index(char const *name) const;</code>
+  - EN: Declares function or method `argument_index` without defining it here.
+  - CN: 声明函数或方法 `argument_index`，但不在此处给出定义。
+- **L834** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L835** <code>  /// Gets all argument names as an ordered vector</code>
+  - EN: Comment that documents intent or context: "Gets all argument names as an ordered vector".
+  - CN: 用于说明意图或上下文的注释："Gets all argument names as an ordered vector"。
+- **L836** <code>  std::vector&lt;std::string&gt; argument_names() const;</code>
+  - EN: Declares function or method `argument_names` without defining it here.
+  - CN: 声明函数或方法 `argument_names`，但不在此处给出定义。
+- **L837** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L838** <code>  /// Returns the number of dimensions of the problem space</code>
+  - EN: Comment that documents intent or context: "Returns the number of dimensions of the problem space".
+  - CN: 用于说明意图或上下文的注释："Returns the number of dimensions of the problem space"。
+- **L839** <code>  size_t rank() const { return arguments.size(); }</code>
+  - EN: Begins or continues the signature/call syntax involving `size`.
+  - CN: 开始或继续与 `size` 相关的签名/调用语法。
+- **L840** <code> </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L841** <code>private:</code>
+  - EN: Sets the following members to `private` visibility.
+  - CN: 将后续成员的可见性设置为 `private`。
+- **L842** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L843** <code>  /// Helper for recursively cloning</code>
+  - EN: Comment that documents intent or context: "Helper for recursively cloning".
+  - CN: 用于说明意图或上下文的注释："Helper for recursively cloning"。
+- **L844** <code>  void clone_(</code>
+  - EN: Begins or continues the signature/call syntax involving `clone_`.
+  - CN: 开始或继续与 `clone_` 相关的签名/调用语法。
+- **L845** <code>    KernelArgumentVector &amp;kernel_args,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L846** <code>    ArgumentDescription const *arg_desc);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L847** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L848** <code>  /// Parses command line argument</code>
+  - EN: Comment that documents intent or context: "Parses command line argument".
+  - CN: 用于说明意图或上下文的注释："Parses command line argument"。
+- **L849** <code>  void parse_(</code>
+  - EN: Begins or continues the signature/call syntax involving `parse_`.
+  - CN: 开始或继续与 `parse_` 相关的签名/调用语法。
+- **L850** <code>    KernelArgument *arg,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L851** <code>    CommandLine const &amp;cmdline);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L852** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L853** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L854** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L855** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L856** <code>/// Lexically casts an argument to an int if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int if it is defined. Returns true if not null."。
+- **L857** <code>bool arg_as_int(int &amp;int_value, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_int` without defining it here.
+  - CN: 声明函数或方法 `arg_as_int`，但不在此处给出定义。
+- **L858** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L859** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L860** <code>bool arg_as_int(int64_t &amp;int_value, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_int` without defining it here.
+  - CN: 声明函数或方法 `arg_as_int`，但不在此处给出定义。
+- **L861** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L862** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L863** <code>bool arg_as_int(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_int`.
+  - CN: 开始或继续与 `arg_as_int` 相关的签名/调用语法。
+- **L864** <code>  int &amp;int_value,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L865** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L866** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L867** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L868** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L869** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L870** <code>bool arg_as_int(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_int`.
+  - CN: 开始或继续与 `arg_as_int` 相关的签名/调用语法。
+- **L871** <code>  int64_t &amp;int_value,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L872** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L873** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L874** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L875** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L876** <code>bool arg_as_bool(bool &amp;bool_value, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_bool` without defining it here.
+  - CN: 声明函数或方法 `arg_as_bool`，但不在此处给出定义。
+- **L877** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L878** <code>bool arg_as_bool(bool &amp;bool_value,</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_bool`.
+  - CN: 开始或继续与 `arg_as_bool` 相关的签名/调用语法。
+- **L879** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L880** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L881** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L882** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L883** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L884** <code>bool arg_as_NumericTypeID(library::NumericTypeID &amp;numeric_type, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_NumericTypeID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_NumericTypeID`，但不在此处给出定义。
+- **L885** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L886** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L887** <code>bool arg_as_NumericTypeID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_NumericTypeID`.
+  - CN: 开始或继续与 `arg_as_NumericTypeID` 相关的签名/调用语法。
+- **L888** <code>  library::NumericTypeID &amp;numeric_type,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L889** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L890** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L891** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L892** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L893** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L894** <code>bool arg_as_LayoutTypeID(library::LayoutTypeID &amp;layout_type, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_LayoutTypeID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_LayoutTypeID`，但不在此处给出定义。
+- **L895** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L896** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L897** <code>bool arg_as_LayoutTypeID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_LayoutTypeID`.
+  - CN: 开始或继续与 `arg_as_LayoutTypeID` 相关的签名/调用语法。
+- **L898** <code>  library::LayoutTypeID &amp;layout_type,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L899** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L900** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L901** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L902** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L903** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L904** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L905** <code>bool arg_as_OpcodeClassID(library::OpcodeClassID &amp;opcode_class, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_OpcodeClassID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_OpcodeClassID`，但不在此处给出定义。
+- **L906** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L907** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L908** <code>bool arg_as_OpcodeClassID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_OpcodeClassID`.
+  - CN: 开始或继续与 `arg_as_OpcodeClassID` 相关的签名/调用语法。
+- **L909** <code>  library::OpcodeClassID &amp;opcode_class,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L910** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L911** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L912** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L913** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L914** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L915** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L916** <code>bool arg_as_SplitKModeID(library::SplitKMode &amp;split_k_mode, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_SplitKModeID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_SplitKModeID`，但不在此处给出定义。
+- **L917** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L918** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L919** <code>bool arg_as_SplitKModeID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_SplitKModeID`.
+  - CN: 开始或继续与 `arg_as_SplitKModeID` 相关的签名/调用语法。
+- **L920** <code>  library::SplitKMode &amp;split_k_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L921** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L922** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L923** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L924** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L925** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L926** <code>bool arg_as_ConvModeID(library::ConvModeID &amp;conv_mode, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_ConvModeID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_ConvModeID`，但不在此处给出定义。
+- **L927** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L928** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L929** <code>bool arg_as_ConvModeID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_ConvModeID`.
+  - CN: 开始或继续与 `arg_as_ConvModeID` 相关的签名/调用语法。
+- **L930** <code>  library::ConvModeID &amp;conv_mode,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L931** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L932** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L933** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L934** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L935** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L936** <code>bool arg_as_IteratorAlgorithmID(library::IteratorAlgorithmID &amp;iterator_algorithm, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_IteratorAlgorithmID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_IteratorAlgorithmID`，但不在此处给出定义。
+- **L937** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L938** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L939** <code>bool arg_as_IteratorAlgorithmID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_IteratorAlgorithmID`.
+  - CN: 开始或继续与 `arg_as_IteratorAlgorithmID` 相关的签名/调用语法。
+- **L940** <code>  library::IteratorAlgorithmID &amp;iterator_algorithm,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L941** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L942** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L943** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L944** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L945** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L946** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L947** <code>bool arg_as_RuntimeDatatype(library::RuntimeDatatype &amp;runtime_datatype, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_RuntimeDatatype` without defining it here.
+  - CN: 声明函数或方法 `arg_as_RuntimeDatatype`，但不在此处给出定义。
+- **L948** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L949** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L950** <code>bool arg_as_RuntimeDatatype(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_RuntimeDatatype`.
+  - CN: 开始或继续与 `arg_as_RuntimeDatatype` 相关的签名/调用语法。
+- **L951** <code>  library::RuntimeDatatype &amp;runtime_datatype,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L952** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L953** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L954** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L955** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L956** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L957** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L958** <code>bool arg_as_RasterOrder(library::RasterOrder &amp;raster_order, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_RasterOrder` without defining it here.
+  - CN: 声明函数或方法 `arg_as_RasterOrder`，但不在此处给出定义。
+- **L959** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L960** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L961** <code>bool arg_as_RasterOrder(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_RasterOrder`.
+  - CN: 开始或继续与 `arg_as_RasterOrder` 相关的签名/调用语法。
+- **L962** <code>  library::RasterOrder &amp;raster_order,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L963** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L964** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L965** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L966** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L967** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L968** <code>bool arg_as_ProviderID(library::Provider &amp;provider, KernelArgument::Value const *value_ptr);</code>
+  - EN: Declares function or method `arg_as_ProviderID` without defining it here.
+  - CN: 声明函数或方法 `arg_as_ProviderID`，但不在此处给出定义。
+- **L969** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L970** <code>/// Lexically casts an argument to an int64 if it is defined. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to an int64 if it is defined. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to an int64 if it is defined. Returns true if not null."。
+- **L971** <code>bool arg_as_ProviderID(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_ProviderID`.
+  - CN: 开始或继续与 `arg_as_ProviderID` 相关的签名/调用语法。
+- **L972** <code>  library::Provider &amp;provider,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L973** <code>  char const *name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L974** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L975** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L976** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L977** <code>/// Lexically casts an argument to a given type stored in a byte array. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to a given type stored in a byte array. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to a given type stored in a byte array. Returns true if not null."。
+- **L978** <code>bool arg_as_scalar(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_scalar`.
+  - CN: 开始或继续与 `arg_as_scalar` 相关的签名/调用语法。
+- **L979** <code>  std::vector&lt;uint8_t&gt; &amp;bytes,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L980** <code>  library::NumericTypeID numeric_type, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L981** <code>  KernelArgument::Value const *value_ptr);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L982** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L983** <code>/// Lexically casts an argument to a given type stored in a byte array. Returns true if not null.</code>
+  - EN: Comment that documents intent or context: "Lexically casts an argument to a given type stored in a byte array. Returns true if not null.".
+  - CN: 用于说明意图或上下文的注释："Lexically casts an argument to a given type stored in a byte array. Returns true if not null."。
+- **L984** <code>bool arg_as_scalar(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_scalar`.
+  - CN: 开始或继续与 `arg_as_scalar` 相关的签名/调用语法。
+- **L985** <code>  std::vector&lt;uint8_t&gt; &amp;bytes,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L986** <code>  library::NumericTypeID numeric_type, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L987** <code>  char const *name, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L988** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L989** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L990** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L991** <code>bool arg_as_string(</code>
+  - EN: Begins or continues the signature/call syntax involving `arg_as_string`.
+  - CN: 开始或继续与 `arg_as_string` 相关的签名/调用语法。
+- **L992** <code>  std::string&amp; arg,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L993** <code>  char const* name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L994** <code>  ProblemSpace const&amp; problem_space,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L995** <code>  ProblemSpace::Problem const&amp; problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L996** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L997** <code>/// Returns true if a tensor description satisfies a `tensor` value</code>
+  - EN: Comment that documents intent or context: "Returns true if a tensor description satisfies a `tensor` value".
+  - CN: 用于说明意图或上下文的注释："Returns true if a tensor description satisfies a `tensor` value"。
+- **L998** <code>bool tensor_description_satisfies(</code>
+  - EN: Begins or continues the signature/call syntax involving `tensor_description_satisfies`.
+  - CN: 开始或继续与 `tensor_description_satisfies` 相关的签名/调用语法。
+- **L999** <code>  library::TensorDescription const &amp;tensor_desc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1000** <code>  TensorArgument::TensorValue const *value_ptr);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1001** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1002** <code>/// Returns true if a tensor description satisfies a `tensor` value</code>
+  - EN: Comment that documents intent or context: "Returns true if a tensor description satisfies a `tensor` value".
+  - CN: 用于说明意图或上下文的注释："Returns true if a tensor description satisfies a `tensor` value"。
+- **L1003** <code>bool tensor_description_satisfies(</code>
+  - EN: Begins or continues the signature/call syntax involving `tensor_description_satisfies`.
+  - CN: 开始或继续与 `tensor_description_satisfies` 相关的签名/调用语法。
+- **L1004** <code>  library::TensorDescription const &amp;tensor_desc,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1005** <code>  char const *name, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1006** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1007** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1008** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1009** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1010** <code>/// Returns true if a conv kind satisfies the value</code>
+  - EN: Comment that documents intent or context: "Returns true if a conv kind satisfies the value".
+  - CN: 用于说明意图或上下文的注释："Returns true if a conv kind satisfies the value"。
+- **L1011** <code>bool conv_kind_satisfies(</code>
+  - EN: Begins or continues the signature/call syntax involving `conv_kind_satisfies`.
+  - CN: 开始或继续与 `conv_kind_satisfies` 相关的签名/调用语法。
+- **L1012** <code>  library::ConvKind const &amp;conv_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1013** <code>  EnumeratedTypeArgument::EnumeratedTypeValue const *value_ptr);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1014** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1015** <code>/// Returns true if a conv kind satisfies the value</code>
+  - EN: Comment that documents intent or context: "Returns true if a conv kind satisfies the value".
+  - CN: 用于说明意图或上下文的注释："Returns true if a conv kind satisfies the value"。
+- **L1016** <code>bool conv_kind_satisfies(</code>
+  - EN: Begins or continues the signature/call syntax involving `conv_kind_satisfies`.
+  - CN: 开始或继续与 `conv_kind_satisfies` 相关的签名/调用语法。
+- **L1017** <code>  library::ConvKind const &amp;conv_kind,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1018** <code>  char const *name, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1019** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1020** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1021** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1022** <code>/// Returns true if a iterator algorithm satisfies the value</code>
+  - EN: Comment that documents intent or context: "Returns true if a iterator algorithm satisfies the value".
+  - CN: 用于说明意图或上下文的注释："Returns true if a iterator algorithm satisfies the value"。
+- **L1023** <code>bool iterator_algorithm_satisfies(</code>
+  - EN: Begins or continues the signature/call syntax involving `iterator_algorithm_satisfies`.
+  - CN: 开始或继续与 `iterator_algorithm_satisfies` 相关的签名/调用语法。
+- **L1024** <code>  library::IteratorAlgorithmID const &amp;iterator_algorithm,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1025** <code>  EnumeratedTypeArgument::EnumeratedTypeValue const *value_ptr);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1026** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1027** <code>/// Returns true if a iterator algorithm satisfies the value</code>
+  - EN: Comment that documents intent or context: "Returns true if a iterator algorithm satisfies the value".
+  - CN: 用于说明意图或上下文的注释："Returns true if a iterator algorithm satisfies the value"。
+- **L1028** <code>bool iterator_algorithm_satisfies(</code>
+  - EN: Begins or continues the signature/call syntax involving `iterator_algorithm_satisfies`.
+  - CN: 开始或继续与 `iterator_algorithm_satisfies` 相关的签名/调用语法。
+- **L1029** <code>  library::IteratorAlgorithmID const &amp;iterator_algorithm,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1030** <code>  char const *name, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1031** <code>  ProblemSpace const &amp;problem_space, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1032** <code>  ProblemSpace::Problem const &amp;problem);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1033** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1034** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1035** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1036** <code>} // namespace profiler</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1037** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1038** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1039** <code>////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Profiler measurement flow and reporting / 性能分析流程与结果报告
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>string</code> — string utilities / 字符串工具
+- <code>vector</code> — dynamic array containers / 动态数组容器
+- <code>memory</code> — memory-management helpers / 内存管理辅助工具
+- <code>unordered_map</code> — hash-map containers / 哈希映射容器
+- <code>cstdlib</code> — C standard utilities / C 标准工具
+- <code>cutlass/util/command_line.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>enumerated_types.h</code> — project-specific declarations from `enumerated_types.h` / 来自 `enumerated_types.h` 的项目专用声明

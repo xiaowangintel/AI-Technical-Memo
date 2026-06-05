@@ -1,0 +1,155 @@
+# sme-libc-memcpy-memmove.c — Code Analysis / 代码分析
+
+## Source / 来源
+- **File / 文件**: `compiler-rt/lib/builtins/aarch64/sme-libc-memcpy-memmove.c`
+- **Repository / 仓库**: `llvm-project` (`/root/xw/llvm-project`)
+- **Purpose / 目的**:
+  - **EN**: This file contains basic implementations of Scalable Matrix Extension (SME) compatible memcpy and memmove functions to be used when their assembly- optimized counterparts can't.
+  - **CN**: 实现 compiler-rt 内建运行时例程 `sme-libc-memcpy-memmove`，用于补足目标平台或编译器生成代码所需的基础运算。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-10 / 第 1-10 行
+```c
+   1 | //===----------------------------------------------------------------------===//
+   2 | //
+   3 | // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+   4 | // See https://llvm.org/LICENSE.txt for license information.
+   5 | // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+   6 | //
+   7 | //===----------------------------------------------------------------------===//
+   8 | ///
+   9 | /// \file
+  10 | /// This file contains basic implementations of Scalable Matrix Extension (SME)
+```
+- **Line 1 / 第 1 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 2 / 第 2 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 3 / 第 3 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 4 / 第 4 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 5 / 第 5 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 6 / 第 6 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 7 / 第 7 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 8 / 第 8 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 9 / 第 9 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 10 / 第 10 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+
+### Lines 11-20 / 第 11-20 行
+```c
+  11 | /// compatible memcpy and memmove functions to be used when their assembly-
+  12 | /// optimized counterparts can't.
+  13 | ///
+  14 | //===----------------------------------------------------------------------===//
+  15 | 
+  16 | #include <stddef.h>
+  17 | 
+  18 | static void *__arm_sc_memcpy_fwd(void *dest, const void *src,
+  19 |                                  size_t n) __arm_streaming_compatible {
+  20 |   unsigned char *destp = (unsigned char *)dest;
+```
+- **Line 11 / 第 11 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 12 / 第 12 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 13 / 第 13 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 14 / 第 14 行**: EN: Comment describing intent, behavior, or metadata. CN: 注释，用于说明意图、行为或元数据。
+- **Line 15 / 第 15 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 16 / 第 16 行**: EN: Includes `stddef.h` so this file can use its declarations. CN: 包含 `stddef.h`，以便当前文件使用其中的声明。
+- **Line 17 / 第 17 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 18 / 第 18 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 19 / 第 19 行**: EN: Starts a scoped declaration or implementation block. CN: 开始一个具作用域的声明或实现块。
+- **Line 20 / 第 20 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+
+### Lines 21-30 / 第 21-30 行
+```c
+  21 |   const unsigned char *srcp = (const unsigned char *)src;
+  22 | 
+  23 |   for (size_t i = 0; i < n; ++i)
+  24 |     destp[i] = srcp[i];
+  25 |   return dest;
+  26 | }
+  27 | 
+  28 | static void *__arm_sc_memcpy_rev(void *dest, const void *src,
+  29 |                                  size_t n) __arm_streaming_compatible {
+  30 |   unsigned char *destp = (unsigned char *)dest;
+```
+- **Line 21 / 第 21 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 22 / 第 22 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 23 / 第 23 行**: EN: Starts a loop over a range, iterator, or index sequence. CN: 开始一个遍历区间、迭代器或索引序列的循环。
+- **Line 24 / 第 24 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 25 / 第 25 行**: EN: Returns a value or transfers control to the caller. CN: 返回一个值，或将控制权交还给调用者。
+- **Line 26 / 第 26 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 27 / 第 27 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 28 / 第 28 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 29 / 第 29 行**: EN: Starts a scoped declaration or implementation block. CN: 开始一个具作用域的声明或实现块。
+- **Line 30 / 第 30 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+
+### Lines 31-40 / 第 31-40 行
+```c
+  31 |   const unsigned char *srcp = (const unsigned char *)src;
+  32 | 
+  33 |   while (n > 0) {
+  34 |     --n;
+  35 |     destp[n] = srcp[n];
+  36 |   }
+  37 |   return dest;
+  38 | }
+  39 | 
+  40 | extern void *__arm_sc_memcpy(void *__restrict dest, const void *__restrict src,
+```
+- **Line 31 / 第 31 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 32 / 第 32 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 33 / 第 33 行**: EN: Starts a loop that continues while the condition holds. CN: 开始一个在条件满足时持续执行的循环。
+- **Line 34 / 第 34 行**: EN: Performs a small step in the surrounding implementation. CN: 在周围实现中执行一个小步骤。
+- **Line 35 / 第 35 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 36 / 第 36 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 37 / 第 37 行**: EN: Returns a value or transfers control to the caller. CN: 返回一个值，或将控制权交还给调用者。
+- **Line 38 / 第 38 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 39 / 第 39 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 40 / 第 40 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+
+### Lines 41-50 / 第 41-50 行
+```c
+  41 |                              size_t n) __arm_streaming_compatible {
+  42 |   return __arm_sc_memcpy_fwd(dest, src, n);
+  43 | }
+  44 | 
+  45 | extern void *__arm_sc_memmove(void *dest, const void *src,
+  46 |                               size_t n) __arm_streaming_compatible {
+  47 |   unsigned char *destp = (unsigned char *)dest;
+  48 |   const unsigned char *srcp = (const unsigned char *)src;
+  49 | 
+  50 |   if ((srcp > (destp + n)) || (destp > (srcp + n)))
+```
+- **Line 41 / 第 41 行**: EN: Starts a scoped declaration or implementation block. CN: 开始一个具作用域的声明或实现块。
+- **Line 42 / 第 42 行**: EN: Returns a value or transfers control to the caller. CN: 返回一个值，或将控制权交还给调用者。
+- **Line 43 / 第 43 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+- **Line 44 / 第 44 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 45 / 第 45 行**: EN: Continues a multi-line declaration, call, or initializer. CN: 继续一个跨多行的声明、调用或初始化。
+- **Line 46 / 第 46 行**: EN: Starts a scoped declaration or implementation block. CN: 开始一个具作用域的声明或实现块。
+- **Line 47 / 第 47 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 48 / 第 48 行**: EN: Assigns or initializes state used by later logic. CN: 赋值或初始化后续逻辑要使用的状态。
+- **Line 49 / 第 49 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 50 / 第 50 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+
+### Lines 51-55 / 第 51-55 行
+```c
+  51 |     return __arm_sc_memcpy(dest, src, n);
+  52 |   if (srcp > destp)
+  53 |     return __arm_sc_memcpy_fwd(dest, src, n);
+  54 |   return __arm_sc_memcpy_rev(dest, src, n);
+  55 | }
+```
+- **Line 51 / 第 51 行**: EN: Returns a value or transfers control to the caller. CN: 返回一个值，或将控制权交还给调用者。
+- **Line 52 / 第 52 行**: EN: Checks a condition before executing the guarded branch. CN: 先检查条件，再执行受保护的分支。
+- **Line 53 / 第 53 行**: EN: Returns a value or transfers control to the caller. CN: 返回一个值，或将控制权交还给调用者。
+- **Line 54 / 第 54 行**: EN: Returns a value or transfers control to the caller. CN: 返回一个值，或将控制权交还给调用者。
+- **Line 55 / 第 55 行**: EN: Closes the current scope or block. CN: 关闭当前作用域或代码块。
+
+## Key Concepts / 关键概念
+
+- **EN**: compiler builtin lowering
+  - **CN**: 编译器 builtin 降级实现
+- **EN**: portable low-level arithmetic
+  - **CN**: 可移植的底层算术实现
+
+## Dependencies / 依赖关系
+
+- `stddef.h` — Standard library dependency / 标准库依赖

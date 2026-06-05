@@ -1,0 +1,3291 @@
+# fast_math.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/fast_math.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Math utilities" and defines related CUTLASS facilities in `include/cutlass/fast_math.h`.
+- CN: 该头文件以注释摘要“Math utilities”引入，并在 `include/cutlass/fast_math.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L33**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L34**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L35**: <code>#include CUDA_STD_HEADER(cstdint)</code>
+  - EN: Includes CUDA_STD_HEADER(cstdint) so this file can use declarations from that dependency.
+  - CN: 包含 CUDA_STD_HEADER(cstdint)，以便本文件使用该依赖中的声明。
+- **L36**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L37**: <code>#include &lt;cstdint&gt;</code>
+  - EN: Includes <cstdint> so this file can use declarations from that dependency.
+  - CN: 包含 <cstdint>，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &lt;cmath&gt;</code>
+  - EN: Includes <cmath> so this file can use declarations from that dependency.
+  - CN: 包含 <cmath>，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &lt;type_traits&gt;</code>
+  - EN: Includes <type_traits> so this file can use declarations from that dependency.
+  - CN: 包含 <type_traits>，以便本文件使用该依赖中的声明。
+- **L40**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L41**: <code>#if !defined(__QNX__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__QNX__)`.
+  - CN: 开始一个由 `!defined(__QNX__)` 控制的条件编译块。
+- **L42**: <code>#include CUDA_STD_HEADER(utility)</code>
+  - EN: Includes CUDA_STD_HEADER(utility) so this file can use declarations from that dependency.
+  - CN: 包含 CUDA_STD_HEADER(utility)，以便本文件使用该依赖中的声明。
+- **L43**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L44**: <code>#include &quot;cutlass/array.h&quot;</code>
+  - EN: Includes "cutlass/array.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/array.h"，以便本文件使用该依赖中的声明。
+- **L45**: <code>#include &quot;cutlass/uint128.h&quot;</code>
+  - EN: Includes "cutlass/uint128.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/uint128.h"，以便本文件使用该依赖中的声明。
+- **L46**: <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes "cutlass/coord.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/coord.h"，以便本文件使用该依赖中的声明。
+- **L47**: <code>#include &quot;cutlass/half.h&quot;</code>
+  - EN: Includes "cutlass/half.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/half.h"，以便本文件使用该依赖中的声明。
+- **L48**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L49**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L50**: <code> * \file</code>
+  - EN: Doxygen file tag indicating that the comment documents the whole file.
+  - CN: Doxygen 文件标签，说明该注释用于描述整个文件。
+- **L51**: <code> * \brief Math utilities</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L52**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L55**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L56**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L57**: <code>#if !defined(__QNX__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__QNX__)`.
+  - CN: 开始一个由 `!defined(__QNX__)` 控制的条件编译块。
+- **L58**: <code>using ::cuda::std::swap;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L59**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L60**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L61**: <code>CUTLASS_HOST_DEVICE void swap(T &amp;lhs, T &amp;rhs) {</code>
+  - EN: Starts the definition body for `swap`.
+  - CN: 开始 `swap` 的定义体。
+- **L62**: <code>  T tmp = lhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L63**: <code>  lhs = rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L64**: <code>  rhs = tmp;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L65**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L66**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L67**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L68**: <code>/******************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L69**: <code> * Static math utilities</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L70**: <code> ******************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L71**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L72**: <code>/// Mixed precision dot product</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L73**: <code>template &lt;typename Index, typename LongIndex, int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L74**: <code>CUTLASS_HOST_DEVICE LongIndex dot(</code>
+  - EN: Begins or continues the signature/parameter list for `dot`.
+  - CN: 开始或继续 `dot` 的签名/参数列表。
+- **L75**: <code>  Coord&lt;N, Index&gt; const &amp;coord,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L76**: <code>  Coord&lt;N, LongIndex&gt; const &amp;stride,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L77**: <code>  LongIndex acc = LongIndex()) {</code>
+  - EN: Starts the definition body for `LongIndex`.
+  - CN: 开始 `LongIndex` 的定义体。
+- **L78**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L79**: <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L80**: <code>  for (int n = 0; n &lt; N; ++n) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L81**: <code>    acc += LongIndex(coord[n]) * stride[n];</code>
+  - EN: Declares the callable or operator `LongIndex`.
+  - CN: 声明可调用对象或运算符 `LongIndex`。
+- **L82**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L83**: <code>  return acc;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L84**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L85**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L86**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L87**: <code> * Statically determine if N is a power-of-two</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L88**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L89**: <code>template &lt;int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L90**: <code>struct is_pow2 {</code>
+  - EN: Declares or defines the struct `is_pow2`.
+  - CN: 声明或定义 struct `is_pow2`。
+- **L91**: <code>  static bool const value = ((N &amp; (N - 1)) == 0);</code>
+  - EN: Declares the callable or operator `value`.
+  - CN: 声明可调用对象或运算符 `value`。
+- **L92**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L95**: <code> * Statically determine log2(N), rounded down</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L96**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L97**: <code>template &lt;int N, int CurrentVal = N, int Count = 0&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L98**: <code>struct log2_down {</code>
+  - EN: Declares or defines the struct `log2_down`.
+  - CN: 声明或定义 struct `log2_down`。
+- **L99**: <code>  /// Static logarithm value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L100**: <code>  enum { value = log2_down&lt;N, (CurrentVal &gt;&gt; 1), Count + 1&gt;::value };</code>
+  - EN: Declares the callable or operator `N`.
+  - CN: 声明可调用对象或运算符 `N`。
+- **L101**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>// Base case</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L104**: <code>template &lt;int N, int Count&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L105**: <code>struct log2_down&lt;N, 1, Count&gt; {</code>
+  - EN: Declares or defines the struct `log2_down`.
+  - CN: 声明或定义 struct `log2_down`。
+- **L106**: <code>  enum { value = Count };</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L107**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L109**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L110**: <code> * Statically determine log2(N), rounded up</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L111**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L112**: <code>template &lt;int N, int CurrentVal = N, int Count = 0&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L113**: <code>struct log2_up {</code>
+  - EN: Declares or defines the struct `log2_up`.
+  - CN: 声明或定义 struct `log2_up`。
+- **L114**: <code>  /// Static logarithm value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L115**: <code>  enum { value = log2_up&lt;N, (CurrentVal &gt;&gt; 1), Count + 1&gt;::value };</code>
+  - EN: Declares the callable or operator `N`.
+  - CN: 声明可调用对象或运算符 `N`。
+- **L116**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L117**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L118**: <code>// Base case</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L119**: <code>template &lt;int N, int Count&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L120**: <code>struct log2_up&lt;N, 1, Count&gt; {</code>
+  - EN: Declares or defines the struct `log2_up`.
+  - CN: 声明或定义 struct `log2_up`。
+- **L121**: <code>  enum { value = ((1 &lt;&lt; Count) &lt; N) ? Count + 1 : Count };</code>
+  - EN: Declares the callable or operator `value`.
+  - CN: 声明可调用对象或运算符 `value`。
+- **L122**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L123**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L124**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L125**: <code> * Statically estimate sqrt(N) to the nearest power-of-two</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L126**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L127**: <code>template &lt;int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L128**: <code>struct sqrt_est {</code>
+  - EN: Declares or defines the struct `sqrt_est`.
+  - CN: 声明或定义 struct `sqrt_est`。
+- **L129**: <code>  enum { value = 1 &lt;&lt; (log2_up&lt;N&gt;::value / 2) };</code>
+  - EN: Declares the callable or operator `value`.
+  - CN: 声明可调用对象或运算符 `value`。
+- **L130**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L131**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L132**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L133**: <code> * For performing a constant-division with a compile-time assertion that the</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L134**: <code> * Divisor evenly-divides the Dividend.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L135**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L136**: <code>template &lt;int Dividend, int Divisor&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L137**: <code>struct divide_assert {</code>
+  - EN: Declares or defines the struct `divide_assert`.
+  - CN: 声明或定义 struct `divide_assert`。
+- **L138**: <code>  enum { value = Dividend / Divisor };</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L139**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L140**: <code>  static_assert((Dividend % Divisor == 0), &quot;Not an even multiple&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L141**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L143**: <code>/******************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L144**: <code> * Rounding</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L145**: <code> ******************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L146**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L147**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L148**: <code> * Round dividend up to the nearest multiple of divisor</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L149**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L150**: <code>template &lt;typename dividend_t, typename divisor_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L151**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L152**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L153**: <code>dividend_t round_nearest(dividend_t dividend, divisor_t divisor) {</code>
+  - EN: Starts the definition body for `round_nearest`.
+  - CN: 开始 `round_nearest` 的定义体。
+- **L154**: <code>  return ((dividend + divisor - 1) / divisor) * divisor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L155**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L156**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L157**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L158**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L159**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L160**: <code>value_t abs_for_integer(value_t a) {</code>
+  - EN: Starts the definition body for `abs_for_integer`.
+  - CN: 开始 `abs_for_integer` 的定义体。
+- **L161**: <code>  return ((a &gt; value_t{0}) ? a : -a);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L162**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L163**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L164**: <code> * Greatest common divisor</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L165**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L166**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L167**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L168**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L169**: <code>value_t gcd(value_t a, value_t b) {</code>
+  - EN: Starts the definition body for `gcd`.
+  - CN: 开始 `gcd` 的定义体。
+- **L170**: <code>  for (;;) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L171**: <code>    if (a == value_t{0}) return cutlass::abs_for_integer(b);</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L172**: <code>    b %= a;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L173**: <code>    if (b == value_t{0}) return cutlass::abs_for_integer(a);</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L174**: <code>    a %= b;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L175**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L176**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L177**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L178**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L179**: <code> * Least common multiple</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L180**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L181**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L182**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L183**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L184**: <code>value_t lcm(value_t a, value_t b) {</code>
+  - EN: Starts the definition body for `lcm`.
+  - CN: 开始 `lcm` 的定义体。
+- **L185**: <code>  value_t temp = cutlass::gcd(a, b);</code>
+  - EN: Declares the callable or operator `gcd`.
+  - CN: 声明可调用对象或运算符 `gcd`。
+- **L186**: <code>  return (temp != value_t{0}) ? value_t(cutlass::abs_for_integer(a) / temp * cutlass::abs_for_integer(b)) : value_t{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L187**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L189**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L190**: <code> * Greatest common divisor</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L191**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L192**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L193**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L194**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L195**: <code>value_t gcd_cxx11(value_t a, value_t b) {</code>
+  - EN: Starts the definition body for `gcd_cxx11`.
+  - CN: 开始 `gcd_cxx11` 的定义体。
+- **L196**: <code>  return (a == value_t{0} || b == value_t{0}) ? cutlass::abs_for_integer(a | b) : cutlass::gcd_cxx11(b, a % b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L197**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L198**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L199**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L200**: <code> * Least common multiple</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L201**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L202**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L203**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L204**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L205**: <code>value_t lcm_cxx11(value_t a, value_t b) {</code>
+  - EN: Starts the definition body for `lcm_cxx11`.
+  - CN: 开始 `lcm_cxx11` 的定义体。
+- **L206**: <code>  return cutlass::gcd_cxx11(a, b) ? (cutlass::abs_for_integer(a) / cutlass::gcd_cxx11(a, b) *</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L207**: <code>                                    cutlass::abs_for_integer(b))</code>
+  - EN: Provides part of the signature or implementation for `abs_for_integer`.
+  - CN: 提供 `abs_for_integer` 的签名或实现的一部分。
+- **L208**: <code>                                  : value_t{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L209**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L210**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L211**: <code>/// Returns the smallest value in the half-open range [a, a+b) that is a multiple of b</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L212**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L213**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L214**: <code>int round_up(int a, int b) {</code>
+  - EN: Starts the definition body for `round_up`.
+  - CN: 开始 `round_up` 的定义体。
+- **L215**: <code>  return ((a + b - 1) / b) * b;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L216**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L217**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L218**: <code>/// Returns the ceiling of (a / b)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L219**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L220**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L221**: <code>int ceil_div(int a, int b) {</code>
+  - EN: Starts the definition body for `ceil_div`.
+  - CN: 开始 `ceil_div` 的定义体。
+- **L222**: <code>  return (a + b - 1) / b;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L223**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L224**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L225**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L226**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L227**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L228**: <code> * log2 computation, what&#x27;s the</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L229**: <code> * difference between the below codes and</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L230**: <code> * log2_up/down codes?</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L231**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L232**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L233**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L234**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L235**: <code>value_t clz(value_t x) {</code>
+  - EN: Starts the definition body for `clz`.
+  - CN: 开始 `clz` 的定义体。
+- **L236**: <code>  for (int i = 31; i &gt;= 0; --i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L237**: <code>    if ((1 &lt;&lt; i) &amp; x)</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L238**: <code>      return value_t(31 - i);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L239**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L240**: <code>  return value_t(32);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L241**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L242**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L243**: <code>template &lt;typename value_t&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L244**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L245**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L246**: <code>value_t find_log2(value_t x) {</code>
+  - EN: Starts the definition body for `find_log2`.
+  - CN: 开始 `find_log2` 的定义体。
+- **L247**: <code>  int a = int(31 - clz(x));</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L248**: <code>  a += (x &amp; (x - 1)) != 0;  // Round up, add 1 if not a power of 2.</code>
+  - EN: Provides part of the signature or implementation for `a`.
+  - CN: 提供 `a` 的签名或实现的一部分。
+- **L249**: <code>  return a;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L250**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L253**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L254**: <code> * Find divisor, using find_log2</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L255**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L256**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L257**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L258**: <code>void find_divisor(unsigned int&amp; mul, unsigned int&amp; shr, unsigned int denom) {</code>
+  - EN: Starts the definition body for `find_divisor`.
+  - CN: 开始 `find_divisor` 的定义体。
+- **L259**: <code>  if (denom == 1) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L260**: <code>    mul = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L261**: <code>    shr = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L262**: <code>  } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L263**: <code>    unsigned int p = 31 + find_log2(denom);</code>
+  - EN: Declares the callable or operator `find_log2`.
+  - CN: 声明可调用对象或运算符 `find_log2`。
+- **L264**: <code>    unsigned m = unsigned(((1ull &lt;&lt; p) + unsigned(denom) - 1) / unsigned(denom));</code>
+  - EN: Declares the callable or operator `unsigned`.
+  - CN: 声明可调用对象或运算符 `unsigned`。
+- **L265**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L266**: <code>    mul = m;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L267**: <code>    shr = p - 32;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L268**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L269**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L270**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L271**: <code>/**</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L272**: <code> * Find quotient and remainder using device-side intrinsics</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L273**: <code> */</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L274**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L275**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L276**: <code>void fast_divmod(int&amp; quo, int&amp; rem, int src, int div, unsigned int mul, unsigned int shr) {</code>
+  - EN: Starts the definition body for `fast_divmod`.
+  - CN: 开始 `fast_divmod` 的定义体。
+- **L277**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L278**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L279**: <code>  // Use IMUL.HI if div != 1, else simply copy the source.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L280**: <code>  quo = (div != 1) ? __umulhi(src, mul) &gt;&gt; shr : src;</code>
+  - EN: Declares the callable or operator `quo`.
+  - CN: 声明可调用对象或运算符 `quo`。
+- **L281**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L282**: <code>  quo = int((div != 1) ? int(((int64_t)src * mul) &gt;&gt; 32) &gt;&gt; shr : src);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L283**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L284**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L285**: <code>  // The remainder.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L286**: <code>  rem = src - (quo * div);</code>
+  - EN: Declares the callable or operator `src`.
+  - CN: 声明可调用对象或运算符 `src`。
+- **L287**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L288**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L289**: <code>// For long int input</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L290**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L291**: <code>CUTLASS_CONSTEXPR_IF_CXX17</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L292**: <code>void fast_divmod(int&amp; quo, int64_t&amp; rem, int64_t src, int div, unsigned int mul, unsigned int shr) {</code>
+  - EN: Starts the definition body for `fast_divmod`.
+  - CN: 开始 `fast_divmod` 的定义体。
+- **L293**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L294**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L295**: <code>  // Use IMUL.HI if div != 1, else simply copy the source.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L296**: <code>  quo = (div != 1) ? __umulhi(src, mul) &gt;&gt; shr : src;</code>
+  - EN: Declares the callable or operator `quo`.
+  - CN: 声明可调用对象或运算符 `quo`。
+- **L297**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L298**: <code>  quo = int((div != 1) ? ((src * mul) &gt;&gt; 32) &gt;&gt; shr : src);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L299**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L300**: <code>  // The remainder.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L301**: <code>  rem = src - (quo * div);</code>
+  - EN: Declares the callable or operator `src`.
+  - CN: 声明可调用对象或运算符 `src`。
+- **L302**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L303**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L304**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L305**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L306**: <code>/// Object to encapsulate the fast division+modulus operation.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L307**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L308**: <code>/// This object precomputes two values used to accelerate the computation and is best used</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L309**: <code>/// when the divisor is a grid-invariant. In this case, it may be computed in host code and</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L310**: <code>/// marshalled along other kernel arguments using the &#x27;Params&#x27; pattern.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L311**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L312**: <code>/// Example:</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L313**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L314**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L315**: <code>///   int quotient, remainder, dividend, divisor;</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L316**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L317**: <code>///   FastDivmod divmod(divisor);</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L318**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L319**: <code>///   divmod(quotient, remainder, dividend);</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L320**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L321**: <code>///   // quotient = (dividend / divisor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L322**: <code>///   // remainder = (dividend % divisor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L323**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L324**: <code>struct FastDivmod {</code>
+  - EN: Declares or defines the struct `FastDivmod`.
+  - CN: 声明或定义 struct `FastDivmod`。
+- **L325**: <code>  using value_div_type = int;</code>
+  - EN: Defines the alias `value_div_type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `value_div_type`。
+- **L326**: <code>  using value_mod_type = int64_t;</code>
+  - EN: Defines the alias `value_mod_type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `value_mod_type`。
+- **L327**: <code>  int32_t divisor = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L328**: <code>  uint32_t multiplier = 0u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L329**: <code>  uint32_t shift_right = 0u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L330**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L331**: <code>  // Find quotient and remainder using device-side intrinsics</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L332**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L333**: <code>  void fast_divmod(int&amp; quotient, int&amp; remainder, int dividend) const {</code>
+  - EN: Starts the definition body for `fast_divmod`.
+  - CN: 开始 `fast_divmod` 的定义体。
+- **L334**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L335**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L336**: <code>    // Use IMUL.HI if divisor != 1, else simply copy the source.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L337**: <code>    quotient = (divisor != 1) ? __umulhi(dividend, multiplier) &gt;&gt; shift_right : dividend;</code>
+  - EN: Declares the callable or operator `quotient`.
+  - CN: 声明可调用对象或运算符 `quotient`。
+- **L338**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L339**: <code>    quotient = int((divisor != 1) ? int(((int64_t)dividend * multiplier) &gt;&gt; 32) &gt;&gt; shift_right : dividend);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L340**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L341**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L342**: <code>    // The remainder.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L343**: <code>    remainder = dividend - (quotient * divisor);</code>
+  - EN: Declares the callable or operator `dividend`.
+  - CN: 声明可调用对象或运算符 `dividend`。
+- **L344**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L345**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L346**: <code>  /// For long int input</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L347**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L348**: <code>  void fast_divmod(int&amp; quotient, int64_t&amp; remainder, int64_t dividend) const {</code>
+  - EN: Starts the definition body for `fast_divmod`.
+  - CN: 开始 `fast_divmod` 的定义体。
+- **L349**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L350**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L351**: <code>    // Use IMUL.HI if divisor != 1, else simply copy the source.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L352**: <code>    quotient = (divisor != 1) ? __umulhi(dividend, multiplier) &gt;&gt; shift_right : dividend;</code>
+  - EN: Declares the callable or operator `quotient`.
+  - CN: 声明可调用对象或运算符 `quotient`。
+- **L353**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L354**: <code>    quotient = int((divisor != 1) ? ((dividend * multiplier) &gt;&gt; 32) &gt;&gt; shift_right : dividend);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L355**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L356**: <code>    // The remainder.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L357**: <code>    remainder = dividend - (quotient * divisor);</code>
+  - EN: Declares the callable or operator `dividend`.
+  - CN: 声明可调用对象或运算符 `dividend`。
+- **L358**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L359**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L360**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L361**: <code>  /// Construct the FastDivmod object, in host code ideally.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L362**: <code>  ///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L363**: <code>  /// This precomputes some values based on the divisor and is computationally expensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L364**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L365**: <code>  constexpr FastDivmod() = default;</code>
+  - EN: Declares the callable or operator `FastDivmod`.
+  - CN: 声明可调用对象或运算符 `FastDivmod`。
+- **L366**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L367**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L368**: <code>  FastDivmod(int divisor_): divisor(divisor_) {</code>
+  - EN: Starts the definition body for `FastDivmod`.
+  - CN: 开始 `FastDivmod` 的定义体。
+- **L369**: <code>    assert(divisor_ &gt;= 0);</code>
+  - EN: Declares the callable or operator `assert`.
+  - CN: 声明可调用对象或运算符 `assert`。
+- **L370**: <code>    if (divisor != 1) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L371**: <code>      unsigned int p = 31 + find_log2(divisor);</code>
+  - EN: Declares the callable or operator `find_log2`.
+  - CN: 声明可调用对象或运算符 `find_log2`。
+- **L372**: <code>      unsigned m = unsigned(((1ull &lt;&lt; p) + unsigned(divisor) - 1) / unsigned(divisor));</code>
+  - EN: Declares the callable or operator `unsigned`.
+  - CN: 声明可调用对象或运算符 `unsigned`。
+- **L373**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L374**: <code>      multiplier = m;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L375**: <code>      shift_right = p - 32;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L376**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L377**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L378**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L379**: <code>  /// Computes integer division and modulus using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L380**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L381**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L382**: <code>  void operator()(int &amp;quotient, int &amp;remainder, int dividend) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L383**: <code>    fast_divmod(quotient, remainder, dividend);</code>
+  - EN: Declares the callable or operator `fast_divmod`.
+  - CN: 声明可调用对象或运算符 `fast_divmod`。
+- **L384**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L385**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L386**: <code>  /// Computes integer division using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L387**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L388**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L389**: <code>  int div(int dividend) const {</code>
+  - EN: Starts the definition body for `div`.
+  - CN: 开始 `div` 的定义体。
+- **L390**: <code>    int quotient, remainder;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L391**: <code>    fast_divmod(quotient, remainder, dividend);</code>
+  - EN: Declares the callable or operator `fast_divmod`.
+  - CN: 声明可调用对象或运算符 `fast_divmod`。
+- **L392**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L393**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L394**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L395**: <code>  /// Alias for `div` to match the interface of FastDivmodU64</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L396**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L397**: <code>  int divide(int dividend) const {</code>
+  - EN: Starts the definition body for `divide`.
+  - CN: 开始 `divide` 的定义体。
+- **L398**: <code>    return div(dividend);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L399**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L400**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L401**: <code>  /// Computes integer division remainder using precomputed values.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L402**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L403**: <code>  int rem(int dividend) const {</code>
+  - EN: Starts the definition body for `rem`.
+  - CN: 开始 `rem` 的定义体。
+- **L404**: <code>    int quotient, remainder;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L405**: <code>    fast_divmod(quotient, remainder, dividend);</code>
+  - EN: Declares the callable or operator `fast_divmod`.
+  - CN: 声明可调用对象或运算符 `fast_divmod`。
+- **L406**: <code>    return remainder;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L407**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L408**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L409**: <code>  /// Alias for `rem`</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L410**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L411**: <code>  int remainder(int dividend) const {</code>
+  - EN: Starts the definition body for `remainder`.
+  - CN: 开始 `remainder` 的定义体。
+- **L412**: <code>    return rem(dividend);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L413**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L414**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L415**: <code>  /// Computes integer division and modulus using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L416**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L417**: <code>  ///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L418**: <code>  /// Simply returns the quotient</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L419**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L420**: <code>  int divmod(int &amp;remainder, int dividend) const {</code>
+  - EN: Starts the definition body for `divmod`.
+  - CN: 开始 `divmod` 的定义体。
+- **L421**: <code>    int quotient;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L422**: <code>    fast_divmod(quotient, remainder, dividend);</code>
+  - EN: Declares the callable or operator `fast_divmod`.
+  - CN: 声明可调用对象或运算符 `fast_divmod`。
+- **L423**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L424**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L425**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L426**: <code>  /// Computes integer division and modulus using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L427**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L428**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L429**: <code>  void operator()(int &amp;quotient, int64_t &amp;remainder, int64_t dividend) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L430**: <code>    fast_divmod(quotient, remainder, dividend);</code>
+  - EN: Declares the callable or operator `fast_divmod`.
+  - CN: 声明可调用对象或运算符 `fast_divmod`。
+- **L431**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L432**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L433**: <code>  /// Computes integer division and modulus using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L434**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L435**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L436**: <code>  int divmod(int64_t &amp;remainder, int64_t dividend) const {</code>
+  - EN: Starts the definition body for `divmod`.
+  - CN: 开始 `divmod` 的定义体。
+- **L437**: <code>    int quotient;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L438**: <code>    fast_divmod(quotient, remainder, dividend);</code>
+  - EN: Declares the callable or operator `fast_divmod`.
+  - CN: 声明可调用对象或运算符 `fast_divmod`。
+- **L439**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L440**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L441**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L442**: <code>  /// Returns the divisor when cast to integer</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L443**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L444**: <code>  operator int() const { return divisor; }</code>
+  - EN: Starts the definition body for `operatorint`.
+  - CN: 开始 `operatorint` 的定义体。
+- **L445**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L446**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L447**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L448**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L449**: <code>/// Object to encapsulate the fast division+modulus operation for 64b integer division.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L450**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L451**: <code>/// This object precomputes two values used to accelerate the computation and is best used</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L452**: <code>/// when the divisor is a grid-invariant. In this case, it may be computed in host code and</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L453**: <code>/// marshalled along other kernel arguments using the &#x27;Params&#x27; pattern.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L454**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L455**: <code>/// Example:</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L456**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L457**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L458**: <code>///   uint64_t quotient, remainder, dividend, divisor;</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L459**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L460**: <code>///   FastDivmodU64 divmod(divisor);</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L461**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L462**: <code>///   divmod(quotient, remainder, dividend);</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L463**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L464**: <code>///   // quotient = (dividend / divisor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L465**: <code>///   // remainder = (dividend % divisor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L466**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L467**: <code>struct FastDivmodU64 {</code>
+  - EN: Declares or defines the struct `FastDivmodU64`.
+  - CN: 声明或定义 struct `FastDivmodU64`。
+- **L468**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L469**: <code>  uint64_t divisor;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L470**: <code>  uint64_t multiplier;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L471**: <code>  unsigned int shift_right;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L472**: <code>  unsigned int round_up;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L473**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L474**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L475**: <code>  // Static methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L476**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L477**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L478**: <code>  /// Computes b, where 2^b is the greatest power of two that is less than or equal to x</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L479**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L480**: <code>  static uint32_t integer_log2(uint64_t x) {</code>
+  - EN: Starts the definition body for `integer_log2`.
+  - CN: 开始 `integer_log2` 的定义体。
+- **L481**: <code>    uint32_t n = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L482**: <code>    while (x &gt;&gt;= 1) {</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L483**: <code>      ++n;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L484**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L485**: <code>    return n;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L486**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L487**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L488**: <code>  /// Default ctor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L489**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L490**: <code>  FastDivmodU64(): divisor(0), multiplier(0), shift_right(0), round_up(0) { }</code>
+  - EN: Starts the definition body for `FastDivmodU64`.
+  - CN: 开始 `FastDivmodU64` 的定义体。
+- **L491**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L492**: <code>  /// Construct the FastDivmod object, in host code ideally.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L493**: <code>  ///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L494**: <code>  /// This precomputes some values based on the divisor and is computationally expensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L495**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L496**: <code>  FastDivmodU64(uint64_t divisor_): divisor(divisor_), multiplier(1), shift_right(0), round_up(0) {</code>
+  - EN: Starts the definition body for `FastDivmodU64`.
+  - CN: 开始 `FastDivmodU64` 的定义体。
+- **L497**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L498**: <code>    if (divisor) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L499**: <code>      shift_right = integer_log2(divisor);</code>
+  - EN: Declares the callable or operator `integer_log2`.
+  - CN: 声明可调用对象或运算符 `integer_log2`。
+- **L500**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L501**: <code>      if ((divisor &amp; (divisor - 1)) == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L502**: <code>        multiplier = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L503**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L504**: <code>      else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L505**: <code>        uint64_t power_of_two = (uint64_t(1) &lt;&lt; shift_right);</code>
+  - EN: Declares the callable or operator `power_of_two`.
+  - CN: 声明可调用对象或运算符 `power_of_two`。
+- **L506**: <code>        uint64_t multiplier_lo = uint128_t(0, power_of_two) / divisor;</code>
+  - EN: Declares the callable or operator `uint128_t`.
+  - CN: 声明可调用对象或运算符 `uint128_t`。
+- **L507**: <code>        multiplier = uint128_t(power_of_two, power_of_two) / divisor;</code>
+  - EN: Declares the callable or operator `uint128_t`.
+  - CN: 声明可调用对象或运算符 `uint128_t`。
+- **L508**: <code>        round_up = (multiplier_lo == multiplier ? 1 : 0);</code>
+  - EN: Declares the callable or operator `round_up`.
+  - CN: 声明可调用对象或运算符 `round_up`。
+- **L509**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L510**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L511**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L512**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L513**: <code>  /// Returns the quotient of floor(dividend / divisor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L514**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L515**: <code>  uint64_t divide(uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `divide`.
+  - CN: 开始 `divide` 的定义体。
+- **L516**: <code>    uint64_t quotient = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L517**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L518**: <code>    #ifdef __CUDA_ARCH__</code>
+  - EN: Starts a conditional-compilation block controlled by `__CUDA_ARCH__`.
+  - CN: 开始一个由 `__CUDA_ARCH__` 控制的条件编译块。
+- **L519**: <code>      uint64_t x = dividend;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L520**: <code>      if (multiplier) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L521**: <code>        x = __umul64hi(dividend + round_up, multiplier);</code>
+  - EN: Declares the callable or operator `__umul64hi`.
+  - CN: 声明可调用对象或运算符 `__umul64hi`。
+- **L522**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L523**: <code>      quotient = (x &gt;&gt; shift_right);</code>
+  - EN: Declares the callable or operator `quotient`.
+  - CN: 声明可调用对象或运算符 `quotient`。
+- **L524**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L525**: <code>      quotient = dividend / divisor;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L526**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L527**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L528**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L529**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L530**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L531**: <code>  /// Computes the remainder given a computed quotient and dividend</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L532**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L533**: <code>  uint64_t modulus(uint64_t quotient, uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `modulus`.
+  - CN: 开始 `modulus` 的定义体。
+- **L534**: <code>    return dividend - quotient * divisor;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L535**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L536**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L537**: <code>  /// Returns the quotient of floor(dividend / divisor) and computes the remainder</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L538**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L539**: <code>  uint64_t divmod(uint64_t &amp;remainder, uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `divmod`.
+  - CN: 开始 `divmod` 的定义体。
+- **L540**: <code>    uint64_t quotient = divide(dividend);</code>
+  - EN: Declares the callable or operator `divide`.
+  - CN: 声明可调用对象或运算符 `divide`。
+- **L541**: <code>    remainder = modulus(quotient, dividend);</code>
+  - EN: Declares the callable or operator `modulus`.
+  - CN: 声明可调用对象或运算符 `modulus`。
+- **L542**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L543**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L544**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L545**: <code>  /// Computes integer division and modulus using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L546**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L547**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L548**: <code>  void operator()(uint64_t &amp;quotient, uint64_t &amp;remainder, uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L549**: <code>    quotient = divmod(remainder, dividend);</code>
+  - EN: Declares the callable or operator `divmod`.
+  - CN: 声明可调用对象或运算符 `divmod`。
+- **L550**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L551**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L552**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L553**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L554**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L555**: <code>/// Object to encapsulate the fast division+modulus operation for 64b integer division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L556**: <code>/// in which the divisor is a power of two.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L557**: <code>struct FastDivmodU64Pow2 {</code>
+  - EN: Declares or defines the struct `FastDivmodU64Pow2`.
+  - CN: 声明或定义 struct `FastDivmodU64Pow2`。
+- **L558**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L559**: <code>  uint64_t divisor;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L560**: <code>  unsigned int shift_right;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L561**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L562**: <code>  /// Default ctor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L563**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L564**: <code>  FastDivmodU64Pow2(): divisor(0), shift_right(0) { }</code>
+  - EN: Starts the definition body for `FastDivmodU64Pow2`.
+  - CN: 开始 `FastDivmodU64Pow2` 的定义体。
+- **L565**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L566**: <code>  /// Construct the FastDivmod object, in host code ideally.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L567**: <code>  ///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L568**: <code>  /// This precomputes some values based on the divisor and is computationally expensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L569**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L570**: <code>  FastDivmodU64Pow2(uint64_t divisor_): divisor(divisor_), shift_right(FastDivmodU64::integer_log2(divisor_)) { }</code>
+  - EN: Starts the definition body for `FastDivmodU64Pow2`.
+  - CN: 开始 `FastDivmodU64Pow2` 的定义体。
+- **L571**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L572**: <code>  /// Returns the quotient of floor(dividend / divisor)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L573**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L574**: <code>  uint64_t divide(uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `divide`.
+  - CN: 开始 `divide` 的定义体。
+- **L575**: <code>    return dividend &gt;&gt; shift_right;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L576**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L577**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L578**: <code>  /// Computes the remainder given a computed quotient and dividend</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L579**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L580**: <code>  uint64_t modulus(uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `modulus`.
+  - CN: 开始 `modulus` 的定义体。
+- **L581**: <code>    // See https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#division-modulo-operations</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L582**: <code>    return dividend &amp; (divisor - 1);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L583**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L584**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L585**: <code>  /// Returns the quotient of floor(dividend / divisor) and computes the remainder</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L586**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L587**: <code>  uint64_t divmod(uint64_t &amp;remainder, uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `divmod`.
+  - CN: 开始 `divmod` 的定义体。
+- **L588**: <code>    uint64_t quotient = divide(dividend);</code>
+  - EN: Declares the callable or operator `divide`.
+  - CN: 声明可调用对象或运算符 `divide`。
+- **L589**: <code>    remainder = modulus(dividend);</code>
+  - EN: Declares the callable or operator `modulus`.
+  - CN: 声明可调用对象或运算符 `modulus`。
+- **L590**: <code>    return quotient;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L591**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L592**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L593**: <code>  /// Computes integer division and modulus using precomputed values. This is computationally</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L594**: <code>  /// inexpensive.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L595**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L596**: <code>  void operator()(uint64_t &amp;quotient, uint64_t &amp;remainder, uint64_t dividend) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L597**: <code>    quotient = divmod(remainder, dividend);</code>
+  - EN: Declares the callable or operator `divmod`.
+  - CN: 声明可调用对象或运算符 `divmod`。
+- **L598**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L599**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L600**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L601**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L602**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L603**: <code>/// Computes the coordinate decomposition from a linear index (64-bit linear index =&gt; coord&lt;int32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L604**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L605**: <code>/// This decomposition is accelerated by the FastDivmodU64 object. It is assumed that</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L606**: <code>/// a coordinate of &lt;Rank&gt; indices can be decomposed by &lt;Rank - 1&gt; div/mod operations.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L607**: <code>/// Note, is assumed that element divmod[0] divides by extent[1].</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L608**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L609**: <code>/// For example, assume 4-D coordinate (n, p, q, c) is mapped to a linear index `npqc`. This</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L610**: <code>/// can be decomposed via three divide and modulus operations:</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L611**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L612**: <code>///      c = npqc % C;         |  divmod[2] = FastDivmodU64(C)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L613**: <code>///    npq = npqc / C;         |   coord[3] = c</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L614**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L615**: <code>///      q =  npq % Q;         |  divmod[1] = FastDivmodU64(Q)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L616**: <code>///     np =  npq / Q;         |   coord[2] = q</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L617**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L618**: <code>///      p =   np % P;         |  divmod[0] = FastDivmodU64(P)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L619**: <code>///      n =   np / P;         |   coord[1] = p</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L620**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L621**: <code>///                            |   coord[0] = n</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L622**: <code>///</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L623**: <code>template &lt;int Rank&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L624**: <code>CUTLASS_HOST_DEVICE Coord&lt;Rank&gt; CoordinateDecomposition(</code>
+  - EN: Begins or continues the signature/parameter list for `CoordinateDecomposition`.
+  - CN: 开始或继续 `CoordinateDecomposition` 的签名/参数列表。
+- **L625**: <code>  uint64_t linear_idx,                    ///&lt; Linear index to decompose</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L626**: <code>  FastDivmodU64 const *divmod) {          ///&lt; Pointer to array of Rank-1 FastDivmodU64 objects</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L627**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L628**: <code>  static_assert(Rank &gt; 0, &quot;CoordinateDecomposition requires Rank=1 or greater.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L629**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L630**: <code>  Coord&lt;Rank&gt; coord;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L631**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L632**: <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L633**: <code>  for (int i = Rank; i &gt; 1; --i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L634**: <code>    uint64_t remainder;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L635**: <code>    linear_idx = divmod[i - 2].divmod(remainder, linear_idx);</code>
+  - EN: Declares the callable or operator `divmod`.
+  - CN: 声明可调用对象或运算符 `divmod`。
+- **L636**: <code>    coord[i - 1] = int(remainder);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L637**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L638**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L639**: <code>  coord[0] = int(linear_idx);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L640**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L641**: <code>  return coord;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L642**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L643**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L644**: <code>/// Computes the coordinate decomposition from a linear index (32-bit linear index =&gt; coord&lt;int32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L645**: <code>template &lt;int Rank&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L646**: <code>CUTLASS_HOST_DEVICE Coord&lt;Rank&gt; CoordinateDecomposition(</code>
+  - EN: Begins or continues the signature/parameter list for `CoordinateDecomposition`.
+  - CN: 开始或继续 `CoordinateDecomposition` 的签名/参数列表。
+- **L647**: <code>  int linear_idx,                    ///&lt; Linear index to decompose</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L648**: <code>  FastDivmod const *divmod) {          ///&lt; Pointer to array of Rank-1 FastDivmodU64 objects</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L649**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L650**: <code>  static_assert(Rank &gt; 0, &quot;CoordinateDecomposition requires Rank=1 or greater.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L651**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L652**: <code>  Coord&lt;Rank&gt; coord;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L653**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L654**: <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L655**: <code>  for (int i = Rank; i &gt; 1; --i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L656**: <code>    int remainder;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L657**: <code>    linear_idx = divmod[i - 2].divmod(remainder, linear_idx);</code>
+  - EN: Declares the callable or operator `divmod`.
+  - CN: 声明可调用对象或运算符 `divmod`。
+- **L658**: <code>    coord[i - 1] = int(remainder);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L659**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L660**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L661**: <code>  coord[0] = int(linear_idx);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L662**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L663**: <code>  return coord;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L664**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L665**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L666**: <code>template &lt;int Rank&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L667**: <code>CUTLASS_HOST_DEVICE Coord&lt;Rank&gt; CoordinateDecompositionLittleEndian(</code>
+  - EN: Begins or continues the signature/parameter list for `CoordinateDecompositionLittleEndian`.
+  - CN: 开始或继续 `CoordinateDecompositionLittleEndian` 的签名/参数列表。
+- **L668**: <code>  uint64_t linear_idx,                    ///&lt; Linear index to decompose</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L669**: <code>  FastDivmodU64 const *divmod) {          ///&lt; Pointer to array of Rank-1 FastDivmodU64 objects</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L670**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L671**: <code>  static_assert(Rank &gt; 0, &quot;CoordinateDecomposition requires Rank=1 or greater.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L672**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L673**: <code>  Coord&lt;Rank&gt; coord;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L674**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L675**: <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L676**: <code>  for (int i = 0; i &lt; Rank - 1; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L677**: <code>    uint64_t remainder;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L678**: <code>    linear_idx = divmod[i].divmod(remainder, linear_idx);</code>
+  - EN: Declares the callable or operator `divmod`.
+  - CN: 声明可调用对象或运算符 `divmod`。
+- **L679**: <code>    coord[i] = int(remainder);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L680**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L681**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L682**: <code>  coord[Rank - 1] = int(linear_idx);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L683**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L684**: <code>  return coord;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L685**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L686**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L687**: <code>/// Computes the coordinate decomposition from a linear index (32-bit linear index =&gt; coord&lt;int32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L688**: <code>template &lt;int Rank&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L689**: <code>CUTLASS_HOST_DEVICE Coord&lt;Rank&gt; CoordinateDecompositionLittleEndian(</code>
+  - EN: Begins or continues the signature/parameter list for `CoordinateDecompositionLittleEndian`.
+  - CN: 开始或继续 `CoordinateDecompositionLittleEndian` 的签名/参数列表。
+- **L690**: <code>  int linear_idx,                    ///&lt; Linear index to decompose</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L691**: <code>  FastDivmod const *divmod) {          ///&lt; Pointer to array of Rank-1 FastDivmodU64 objects</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L692**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L693**: <code>  static_assert(Rank &gt; 0, &quot;CoordinateDecomposition requires Rank=1 or greater.&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L694**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L695**: <code>  Coord&lt;Rank&gt; coord;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L696**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L697**: <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L698**: <code>  for (int i = 0; i &lt; Rank - 1; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L699**: <code>    int remainder;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L700**: <code>    linear_idx = divmod[i].divmod(remainder, linear_idx);</code>
+  - EN: Declares the callable or operator `divmod`.
+  - CN: 声明可调用对象或运算符 `divmod`。
+- **L701**: <code>    coord[i] = int(remainder);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L702**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L703**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L704**: <code>  coord[Rank - 1] = int(linear_idx);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L705**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L706**: <code>  return coord;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L707**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L708**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L709**: <code>/// Safely computes the offset of a linear index in bytes for all types</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L710**: <code>template &lt;typename Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L711**: <code>CUTLASS_HOST_DEVICE int64_t OffsetBytes(int64_t index) {</code>
+  - EN: Starts the definition body for `OffsetBytes`.
+  - CN: 开始 `OffsetBytes` 的定义体。
+- **L712**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L713**: <code>  static_assert(</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L714**: <code>    (sizeof_bits&lt;Element&gt;::value &gt;= 8 &amp;&amp; !(sizeof_bits&lt;Element&gt;::value % 8)) ||</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L715**: <code>    (sizeof_bits&lt;Element&gt;::value &lt;  8 &amp;&amp; !(8 % sizeof_bits&lt;Element&gt;::value)),</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L716**: <code>    &quot;Size of numeric type in bits must either be divisible by 8 bits, or 8 bits must be divisible by the size.&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L717**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L718**: <code>  if (sizeof_bits&lt;Element&gt;::value &gt;= 8) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L719**: <code>    return index * (sizeof_bits&lt;Element&gt;::value / 8);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L720**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L721**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L722**: <code>    int const kElementsPerByte = ((8 / sizeof_bits&lt;Element&gt;::value) + ((sizeof_bits&lt;Element&gt;::value &gt;= 8) ? 1 : 0));</code>
+  - EN: Declares the callable or operator `kElementsPerByte`.
+  - CN: 声明可调用对象或运算符 `kElementsPerByte`。
+- **L723**: <code>    return index / kElementsPerByte;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L724**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L725**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L726**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L727**: <code>CUTLASS_HOST_DEVICE int64_t OffsetBytes(int64_t index, int64_t element_sizeof_bits) {</code>
+  - EN: Starts the definition body for `OffsetBytes`.
+  - CN: 开始 `OffsetBytes` 的定义体。
+- **L728**: <code>  if (element_sizeof_bits &gt;= 8) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L729**: <code>    return index * (element_sizeof_bits / 8);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L730**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L731**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L732**: <code>    int64_t const kElementsPerByte = ((8 / element_sizeof_bits) + ((element_sizeof_bits &gt;= 8) ? 1 : 0));</code>
+  - EN: Declares the callable or operator `kElementsPerByte`.
+  - CN: 声明可调用对象或运算符 `kElementsPerByte`。
+- **L733**: <code>    return index / kElementsPerByte;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L734**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L735**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L736**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L737**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L738**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L739**: <code>// Min/Max</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L740**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L741**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L742**: <code>template &lt;int A, int B&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L743**: <code>struct Min {</code>
+  - EN: Declares or defines the struct `Min`.
+  - CN: 声明或定义 struct `Min`。
+- **L744**: <code>  static int const kValue = (A &lt; B) ? A : B;</code>
+  - EN: Declares the callable or operator `kValue`.
+  - CN: 声明可调用对象或运算符 `kValue`。
+- **L745**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L746**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L747**: <code>template &lt;int A, int B&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L748**: <code>struct Max {</code>
+  - EN: Declares or defines the struct `Max`.
+  - CN: 声明或定义 struct `Max`。
+- **L749**: <code>  static int const kValue = (A &gt; B) ? A : B;</code>
+  - EN: Declares the callable or operator `kValue`.
+  - CN: 声明可调用对象或运算符 `kValue`。
+- **L750**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L751**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L752**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L753**: <code>CUTLASS_CONSTEXPR_IF_CXX17 int const_min(int a, int b) {</code>
+  - EN: Starts the definition body for `const_min`.
+  - CN: 开始 `const_min` 的定义体。
+- **L754**: <code>    return (b &lt; a ? b : a);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L755**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L756**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L757**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L758**: <code>CUTLASS_CONSTEXPR_IF_CXX17 int const_max(int a, int b) {</code>
+  - EN: Starts the definition body for `const_max`.
+  - CN: 开始 `const_max` 的定义体。
+- **L759**: <code>    return (b &gt; a ? b : a);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L760**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L761**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L762**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L763**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L764**: <code>T fast_min(T a, T b) {</code>
+  - EN: Starts the definition body for `fast_min`.
+  - CN: 开始 `fast_min` 的定义体。
+- **L765**: <code>  return (b &lt; a ? b : a);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L766**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L767**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L768**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L769**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L770**: <code>float fast_min(float a, float b) {</code>
+  - EN: Starts the definition body for `fast_min`.
+  - CN: 开始 `fast_min` 的定义体。
+- **L771**: <code>  return fminf(a, b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L772**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L773**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L774**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L775**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L776**: <code>T fast_max(T a, T b) {</code>
+  - EN: Starts the definition body for `fast_max`.
+  - CN: 开始 `fast_max` 的定义体。
+- **L777**: <code>  return (a &lt; b ? b : a);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L778**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L779**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L780**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L781**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L782**: <code>float fast_max(float a, float b) {</code>
+  - EN: Starts the definition body for `fast_max`.
+  - CN: 开始 `fast_max` 的定义体。
+- **L783**: <code>  return fmaxf(a, b);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L784**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L785**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L786**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L787**: <code>float fast_cos(float theta) {</code>
+  - EN: Starts the definition body for `fast_cos`.
+  - CN: 开始 `fast_cos` 的定义体。
+- **L788**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L789**: <code>  return ::cosf(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L790**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L791**: <code>  return std::cos(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L792**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L793**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L794**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L795**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L796**: <code>double fast_cos(double theta) {</code>
+  - EN: Starts the definition body for `fast_cos`.
+  - CN: 开始 `fast_cos` 的定义体。
+- **L797**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L798**: <code>  return ::cos(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L799**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L800**: <code>  return std::cos(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L801**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L802**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L803**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L804**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L805**: <code>float fast_sin(float theta) {</code>
+  - EN: Starts the definition body for `fast_sin`.
+  - CN: 开始 `fast_sin` 的定义体。
+- **L806**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L807**: <code>  return ::sinf(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L808**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L809**: <code>  return std::sin(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L810**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L811**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L812**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L813**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L814**: <code>double fast_sin(double theta) {</code>
+  - EN: Starts the definition body for `fast_sin`.
+  - CN: 开始 `fast_sin` 的定义体。
+- **L815**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L816**: <code>  return ::sin(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L817**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L818**: <code>  return std::sin(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L819**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L820**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L821**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L822**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L823**: <code>float fast_acos(float theta) {</code>
+  - EN: Starts the definition body for `fast_acos`.
+  - CN: 开始 `fast_acos` 的定义体。
+- **L824**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L825**: <code>  return ::acosf(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L826**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L827**: <code>  return std::acos(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L828**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L829**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L830**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L831**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L832**: <code>double fast_acos(double theta) {</code>
+  - EN: Starts the definition body for `fast_acos`.
+  - CN: 开始 `fast_acos` 的定义体。
+- **L833**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L834**: <code>  return ::acos(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L835**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L836**: <code>  return std::acos(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L837**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L838**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L839**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L840**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L841**: <code>float fast_asin(float theta) {</code>
+  - EN: Starts the definition body for `fast_asin`.
+  - CN: 开始 `fast_asin` 的定义体。
+- **L842**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L843**: <code>  return ::asinf(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L844**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L845**: <code>  return std::asin(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L846**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L847**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L848**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L849**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L850**: <code>double fast_asin(double theta) {</code>
+  - EN: Starts the definition body for `fast_asin`.
+  - CN: 开始 `fast_asin` 的定义体。
+- **L851**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L852**: <code>  return ::asin(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L853**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L854**: <code>  return std::asin(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L855**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L856**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L857**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L858**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L859**: <code>float fast_sqrt(float theta) {</code>
+  - EN: Starts the definition body for `fast_sqrt`.
+  - CN: 开始 `fast_sqrt` 的定义体。
+- **L860**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L861**: <code>  return ::sqrtf(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L862**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L863**: <code>  return std::sqrt(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L864**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L865**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L866**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L867**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L868**: <code>double fast_sqrt(double theta) {</code>
+  - EN: Starts the definition body for `fast_sqrt`.
+  - CN: 开始 `fast_sqrt` 的定义体。
+- **L869**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L870**: <code>  return ::sqrt(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L871**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L872**: <code>  return std::sqrt(theta);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L873**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L874**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L875**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L876**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L877**: <code>float fast_exp(float x) {</code>
+  - EN: Starts the definition body for `fast_exp`.
+  - CN: 开始 `fast_exp` 的定义体。
+- **L878**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L879**: <code>  return ::expf(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L880**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L881**: <code>  return std::exp(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L882**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L883**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L884**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L885**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L886**: <code>double fast_exp(double x) {</code>
+  - EN: Starts the definition body for `fast_exp`.
+  - CN: 开始 `fast_exp` 的定义体。
+- **L887**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L888**: <code>  return ::exp(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L889**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L890**: <code>  return std::exp(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L891**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L892**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L893**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L894**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L895**: <code>half_t fast_exp(half_t x) {</code>
+  - EN: Starts the definition body for `fast_exp`.
+  - CN: 开始 `fast_exp` 的定义体。
+- **L896**: <code>  #if defined(__CUDA_ARCH__) &amp;&amp; (__CUDACC_VER_MAJOR__ &gt;= 10) &amp;&amp; (__CUDA_ARCH__ &gt;= 750)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 10) && (__CUDA_ARCH__ >= 750)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 10) && (__CUDA_ARCH__ >= 750)` 控制的条件编译块。
+- **L897**: <code>      return (half_t)(::hexp(x.to_half()));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L898**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L899**: <code>      return (half_t)(fast_exp(float(x)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L900**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L901**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L902**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L903**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L904**: <code>float fast_log(float x) {</code>
+  - EN: Starts the definition body for `fast_log`.
+  - CN: 开始 `fast_log` 的定义体。
+- **L905**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L906**: <code>  return ::logf(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L907**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L908**: <code>  return std::log(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L909**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L910**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L911**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L912**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L913**: <code>double fast_log(double x) {</code>
+  - EN: Starts the definition body for `fast_log`.
+  - CN: 开始 `fast_log` 的定义体。
+- **L914**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L915**: <code>  return ::log(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L916**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L917**: <code>  return std::log(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L918**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L919**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L920**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L921**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L922**: <code>float fast_tanh(float x) {</code>
+  - EN: Starts the definition body for `fast_tanh`.
+  - CN: 开始 `fast_tanh` 的定义体。
+- **L923**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L924**: <code>    #if (__CUDACC_VER_MAJOR__ &gt;= 11) &amp;&amp; (__CUDA_ARCH__ &gt;= 750)</code>
+  - EN: Starts a conditional-compilation block controlled by `(__CUDACC_VER_MAJOR__ >= 11) && (__CUDA_ARCH__ >= 750)`.
+  - CN: 开始一个由 `(__CUDACC_VER_MAJOR__ >= 11) && (__CUDA_ARCH__ >= 750)` 控制的条件编译块。
+- **L925**: <code>      float y;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L926**: <code>      asm volatile ( &quot;tanh.approx.f32 %0, %1; &quot; : &quot;=f&quot;(y) : &quot;f&quot;(x));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L927**: <code>      return y;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L928**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L929**: <code>      return ::tanhf(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L930**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L931**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L932**: <code>  return std::tanh(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L933**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L934**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L935**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L936**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L937**: <code>double fast_tanh(double x) {</code>
+  - EN: Starts the definition body for `fast_tanh`.
+  - CN: 开始 `fast_tanh` 的定义体。
+- **L938**: <code>  #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L939**: <code>  return ::tanh(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L940**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L941**: <code>  return std::tanh(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L942**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L943**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L944**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L945**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L946**: <code>half_t fast_tanh(half_t x) {</code>
+  - EN: Starts the definition body for `fast_tanh`.
+  - CN: 开始 `fast_tanh` 的定义体。
+- **L947**: <code>  #if defined(__CUDA_ARCH__) &amp;&amp; (__CUDACC_VER_MAJOR__ &gt;= 11) &amp;&amp; (__CUDA_ARCH__ &gt;= 750)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 11) && (__CUDA_ARCH__ >= 750)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 11) && (__CUDA_ARCH__ >= 750)` 控制的条件编译块。
+- **L948**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L949**: <code>  asm volatile ( &quot;tanh.approx.f16 %0, %1;&quot; : &quot;=h&quot;(x.raw()) : &quot;h&quot;(x.raw()));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L950**: <code>  return x;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L951**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L952**: <code>  #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L953**: <code>  return half_t(fast_tanh(float(x)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L954**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L955**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L956**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L957**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L958**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L959**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L960**: <code>struct fast_exp_op {</code>
+  - EN: Declares or defines the struct `fast_exp_op`.
+  - CN: 声明或定义 struct `fast_exp_op`。
+- **L961**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L962**: <code>  T operator()(T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L963**: <code>    return fast_exp(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L964**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L965**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L966**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L967**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; (__CUDACC_VER_MAJOR__ &gt;= 10) &amp;&amp; (__CUDA_ARCH__ &gt;= 750)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 10) && (__CUDA_ARCH__ >= 750)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 10) && (__CUDA_ARCH__ >= 750)` 控制的条件编译块。
+- **L968**: <code>template &lt;int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L969**: <code>struct fast_exp_op&lt;Array&lt;half_t, N&gt;&gt; {</code>
+  - EN: Declares or defines the struct `fast_exp_op`.
+  - CN: 声明或定义 struct `fast_exp_op`。
+- **L970**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L971**: <code>  Array&lt;half_t, N&gt; operator()(Array&lt;half_t, N&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L972**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L973**: <code>    Array&lt;half_t, N&gt; result;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L974**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L975**: <code>    // use x2 specialization</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L976**: <code>    __half2 const *in  = reinterpret_cast&lt;__half2 const *&gt;(&amp;rhs);</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L977**: <code>    __half2 *out = reinterpret_cast&lt;__half2 *&gt;(&amp;result);</code>
+  - EN: Declares the callable or operator `__half2`.
+  - CN: 声明可调用对象或运算符 `__half2`。
+- **L978**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L979**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L980**: <code>    for (int i = 0; i &lt; N / 2; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L981**: <code>      out[i] = ::h2exp(in[i]);</code>
+  - EN: Declares the callable or operator `h2exp`.
+  - CN: 声明可调用对象或运算符 `h2exp`。
+- **L982**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L983**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L984**: <code>    // residual</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L985**: <code>    if (N % 2) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L986**: <code>      half_t last = rhs[N - 1];</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L987**: <code>      result[N - 1] = half_t(::hexp(last.to_half()));</code>
+  - EN: Declares the callable or operator `half_t`.
+  - CN: 声明可调用对象或运算符 `half_t`。
+- **L988**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L989**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L990**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L991**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L992**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L993**: <code>#endif // #if defined(__CUDA_ARCH__)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L994**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L995**: <code>template &lt;typename T, int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L996**: <code>struct fast_exp_op&lt;Array&lt;T, N&gt;&gt; {</code>
+  - EN: Declares or defines the struct `fast_exp_op`.
+  - CN: 声明或定义 struct `fast_exp_op`。
+- **L997**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L998**: <code>  Array&lt;T, N&gt; operator()(Array&lt;T, N&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L999**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1000**: <code>    fast_exp_op&lt;T&gt; fast_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1001**: <code>    Array&lt;T, N&gt; y;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1002**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1003**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1004**: <code>    for (int i = 0; i &lt; N; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1005**: <code>      y[i] = fast_op(rhs[i]);</code>
+  - EN: Declares the callable or operator `fast_op`.
+  - CN: 声明可调用对象或运算符 `fast_op`。
+- **L1006**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1007**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1008**: <code>    return y;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1009**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1010**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1011**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1012**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1013**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1014**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1015**: <code>struct fast_tanh_op {</code>
+  - EN: Declares or defines the struct `fast_tanh_op`.
+  - CN: 声明或定义 struct `fast_tanh_op`。
+- **L1016**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1017**: <code>  T operator()(T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L1018**: <code>    return fast_tanh(rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1019**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1020**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1021**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1022**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; (__CUDACC_VER_MAJOR__ &gt;= 11) &amp;&amp; (__CUDA_ARCH__ &gt;= 750)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 11) && (__CUDA_ARCH__ >= 750)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDACC_VER_MAJOR__ >= 11) && (__CUDA_ARCH__ >= 750)` 控制的条件编译块。
+- **L1023**: <code>template &lt;int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1024**: <code>struct fast_tanh_op&lt;Array&lt;half_t, N&gt;&gt; {</code>
+  - EN: Declares or defines the struct `fast_tanh_op`.
+  - CN: 声明或定义 struct `fast_tanh_op`。
+- **L1025**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1026**: <code>  Array&lt;half_t, N&gt; operator()(Array&lt;half_t, N&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L1027**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1028**: <code>    Array&lt;half_t, N&gt; result;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1029**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1030**: <code>    // use x2 specialization</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1031**: <code>    uint32_t const *in  = reinterpret_cast&lt;uint32_t const *&gt;(&amp;rhs);</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L1032**: <code>    uint32_t *out = reinterpret_cast&lt;uint32_t *&gt;(&amp;result);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L1033**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1034**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1035**: <code>    for (int i = 0; i &lt; N / 2; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1036**: <code>      asm volatile (&quot;tanh.approx.f16x2 %0, %1;&quot; : &quot;=r&quot;(out[i]) : &quot;r&quot;(in[i]));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L1037**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1038**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1039**: <code>    // residual</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1040**: <code>    if (N % 2) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1041**: <code>      uint16_t const *in = reinterpret_cast&lt;uint16_t const *&gt;(&amp;rhs);</code>
+  - EN: Declares the callable or operator `const`.
+  - CN: 声明可调用对象或运算符 `const`。
+- **L1042**: <code>      uint16_t *out = reinterpret_cast&lt;uint16_t *&gt;(&amp;result);</code>
+  - EN: Declares the callable or operator `uint16_t`.
+  - CN: 声明可调用对象或运算符 `uint16_t`。
+- **L1043**: <code>      asm volatile (&quot;tanh.approx.f16 %0, %1;&quot; : &quot;=h&quot;(out[N - 1]) : &quot;h&quot;(in[N - 1]));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L1044**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1045**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1046**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1047**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1048**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1049**: <code>#endif // #if defined(__CUDA_ARCH__)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L1050**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1051**: <code>template &lt;typename T, int N&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1052**: <code>struct fast_tanh_op&lt;Array&lt;T, N&gt;&gt; {</code>
+  - EN: Declares or defines the struct `fast_tanh_op`.
+  - CN: 声明或定义 struct `fast_tanh_op`。
+- **L1053**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1054**: <code>  Array&lt;T, N&gt; operator()(Array&lt;T, N&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L1055**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1056**: <code>    fast_tanh_op&lt;T&gt; fast_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1057**: <code>    Array&lt;T, N&gt; y;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1058**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1059**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1060**: <code>    for (int i = 0; i &lt; N; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1061**: <code>      y[i] = fast_op(rhs[i]);</code>
+  - EN: Declares the callable or operator `fast_op`.
+  - CN: 声明可调用对象或运算符 `fast_op`。
+- **L1062**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1063**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1064**: <code>    return y;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1065**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1066**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1067**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1068**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1069**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1070**: <code>/// Absolute value function</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1071**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1072**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1073**: <code>T absolute_value(T x) {</code>
+  - EN: Starts the definition body for `absolute_value`.
+  - CN: 开始 `absolute_value` 的定义体。
+- **L1074**: <code>  if (x &lt; T()) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L1075**: <code>    return -x;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1076**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1077**: <code>  return x;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1078**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1079**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1080**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1081**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1082**: <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1083**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1084**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1085**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Conditional compilation / 条件编译
+- Fast math helpers / 快速数学辅助
+- Symbol focus: `swap` / 重点符号：`swap`
+- Symbol focus: `dot` / 重点符号：`dot`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/array.h"`
+  - `"cutlass/uint128.h"`
+  - `"cutlass/coord.h"`
+  - `"cutlass/half.h"`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `CUDA_STD_HEADER(cstdint)`
+  - `<cstdint>`
+  - `<cmath>`
+  - `<type_traits>`
+  - `CUDA_STD_HEADER(utility)`

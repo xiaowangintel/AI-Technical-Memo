@@ -1,0 +1,230 @@
+# sm90_shapes.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/sm90_shapes.py`
+
+## Purpose / 作用
+- EN: Valid WGMMA shapes, MMA multipliers, and cluster sizes for SM90, associated with levels.
+- CN: 该模块的文档字符串将其描述为：Valid WGMMA shapes, MMA multipliers, and cluster sizes for SM90, associated with levels.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Valid WGMMA shapes, MMA multipliers, and cluster sizes for SM90, associated with levels.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `These shape and level pairs are defined as dicts, where keys are shapes and values are their` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L36** `associated levels. If the user input level for that category (MMA multiplier, WGMMA shape, cluster` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L37** `size) is smaller than a shape's associated level, it will be excluded, and otherwise, included.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L38** `Higher levels are therefore less likely emitted, but lower levels are more emitted more frequently.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L39** `Level 0 is always emitted. The default behavior in \`generator.py\` is that level 1 is only emitted` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L40** `when the \`--kernel\` argument is non-empty.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L41** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `# NOTE: more combinations are possible here.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L44** `# Levels [0, 3] exist in order to control exactly what configs are generated in different dtypes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L45** `# The rest are only used in the exhaustive mode (when the corresponding level digit is 9).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L46** `# MMA multipliers are multiplied by MMA instruction shapes (WGMMA shapes) to get CTA shapes.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L47** `SM90_MMA_MULTIPLIERS = {` — **EN:** Assigns a value to SM90_MMA_MULTIPLIERS. **CN:** 将一个值赋给 SM90_MMA_MULTIPLIERS。
+- **L48** `    (2, 1, 4): 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    (1, 1, 4): 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    (4, 1, 4): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    (2, 2, 4): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    (2, 1, 8): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    (4, 1, 8): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    (1, 1, 8): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    (2, 2, 8): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    (2, 1, 16): 5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    (4, 1, 16): 5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    (1, 1, 16): 5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `    (2, 2, 16): 5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `# Level 0: only (1, 2, 1) -- fp8 dense gemms in pruned case` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L63** `# Level 1: clusters with 2 CTAs -- all but fp8 (s8, u8, f16, b16, f32, tf32) dense gemms in pruned case` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `# Level 2: clusters with 1 or 2 CTAs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L65** `# Level 3: clusters with 1, 2, or 4 CTAs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L66** `# Level 4: clusters with 1, 2, 4, or 8 CTAs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `# Level 5: clusters with 1, 2, 4, 8, or 16 CTAs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `SM90_CLUSTER_SIZES = {` — **EN:** Assigns a value to SM90_CLUSTER_SIZES. **CN:** 将一个值赋给 SM90_CLUSTER_SIZES。
+- **L69** `    (1, 2, 1): 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    (2, 1, 1): 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    (1, 1, 1): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `    (2, 2, 1): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `    (1, 4, 1): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `    (4, 1, 1): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `    (2, 4, 1): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `    (4, 2, 1): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    (1, 8, 1): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    (8, 1, 1): 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `    (4, 4, 1): 5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `# WGMMA shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L84** `# Level 0: "default" shape only,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `# Level 1: additional shapes for the unpruned case (tf32 only)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L86** `# Level 2: shapes that are all powers of 2` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L87** `# Level 3: all other shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `SM90_WGMMA_SHAPES_FP16_BF16_DENSE = {` — **EN:** Assigns a value to SM90_WGMMA_SHAPES_FP16_BF16_DENSE. **CN:** 将一个值赋给 SM90_WGMMA_SHAPES_FP16_BF16_DENSE。
+- **L89** `    (64, 8, 16): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    (64, 16, 16): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    (64, 24, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    (64, 32, 16): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    (64, 40, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    (64, 48, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `    (64, 56, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `    (64, 64, 16): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    (64, 72, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `    (64, 80, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    (64, 88, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    (64, 96, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    (64, 104, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    (64, 112, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `    (64, 120, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `    (64, 128, 16): 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `    (64, 136, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `    (64, 144, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    (64, 152, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `    (64, 160, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `    (64, 168, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `    (64, 176, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `    (64, 184, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `    (64, 192, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `    (64, 200, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `    (64, 208, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `    (64, 216, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    (64, 224, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `    (64, 232, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `    (64, 240, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `    (64, 248, 16): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `    (64, 256, 16): 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `SM90_WGMMA_SHAPES_TF32_DENSE = {` — **EN:** Assigns a value to SM90_WGMMA_SHAPES_TF32_DENSE. **CN:** 将一个值赋给 SM90_WGMMA_SHAPES_TF32_DENSE。
+- **L124** `    (64, 8, 8): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `    (64, 16, 8): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    (64, 24, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    (64, 32, 8): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `    (64, 40, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `    (64, 48, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `    (64, 56, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `    (64, 64, 8): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `    (64, 72, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `    (64, 80, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `    (64, 88, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `    (64, 96, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `    (64, 104, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    (64, 112, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    (64, 120, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `    (64, 128, 8): 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `    (64, 136, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `    (64, 144, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `    (64, 152, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `    (64, 160, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `    (64, 168, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `    (64, 176, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    (64, 184, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `    (64, 192, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `    (64, 200, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `    (64, 208, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `    (64, 216, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `    (64, 224, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `    (64, 232, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `    (64, 240, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `    (64, 248, 8): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `    (64, 256, 8): 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `SM90_WGMMA_SHAPES_FP8_DENSE = {` — **EN:** Assigns a value to SM90_WGMMA_SHAPES_FP8_DENSE. **CN:** 将一个值赋给 SM90_WGMMA_SHAPES_FP8_DENSE。
+- **L159** `    (64, 8, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    (64, 16, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `    (64, 24, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `    (64, 32, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `    (64, 40, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `    (64, 48, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `    (64, 56, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `    (64, 64, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `    (64, 72, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `    (64, 80, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `    (64, 88, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `    (64, 96, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `    (64, 104, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `    (64, 112, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `    (64, 120, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `    (64, 128, 32): 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    (64, 136, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `    (64, 144, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `    (64, 152, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `    (64, 160, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `    (64, 168, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `    (64, 176, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `    (64, 184, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `    (64, 192, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `    (64, 200, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `    (64, 208, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `    (64, 216, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `    (64, 224, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `    (64, 232, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `    (64, 240, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `    (64, 248, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `    (64, 256, 32): 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `SM90_WGMMA_SHAPES_INT8_DENSE = {` — **EN:** Assigns a value to SM90_WGMMA_SHAPES_INT8_DENSE. **CN:** 将一个值赋给 SM90_WGMMA_SHAPES_INT8_DENSE。
+- **L194** `    (64, 8, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `    (64, 16, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `    (64, 24, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `    (64, 32, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `    (64, 48, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `    (64, 64, 32): 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `    (64, 80, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `    (64, 96, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `    (64, 112, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `    (64, 128, 32): 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `    (64, 144, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `    (64, 160, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `    (64, 176, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `    (64, 192, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `    (64, 208, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `    (64, 224, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `    (64, 240, 32): 3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `    (64, 256, 32): 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.sm90_shapes`. CN: 模块名为 `cutlass_library.sm90_shapes`。
+- EN: Module docstring summary: Valid WGMMA shapes, MMA multipliers, and cluster sizes for SM90, associated with levels. CN: 模块文档摘要为：Valid WGMMA shapes, MMA multipliers, and cluster sizes for SM90, associated with levels.
+
+## Dependencies / 依赖
+- EN: No explicit module imports were found at module scope. CN: 在模块作用域中未发现显式导入。

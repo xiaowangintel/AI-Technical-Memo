@@ -1,0 +1,205 @@
+# tensormap_manager.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/tensormap_manager.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (TensorMapUpdateMode, TensorMapManager) in `CuTeDSL.cutlass.utils.tensormap_manager`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.tensormap_manager` 定义了 2 个类（TensorMapUpdateMode, TensorMapManager）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L13** `from enum import Enum, auto` — **EN:** Imports Enum, auto from `enum`. **CN:** 从 `enum` 导入 Enum, auto。
+- **L14** `from typing import Optional, Tuple` — **EN:** Imports Optional, Tuple from `typing`. **CN:** 从 `typing` 导入 Optional, Tuple。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L18** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L19** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L22** `from cutlass import const_expr` — **EN:** Imports const_expr from `cutlass`. **CN:** 从 `cutlass` 导入 const_expr。
+- **L23** `from cutlass.cute.core import AddressSpace as _CuteAddressSpace` — **EN:** Imports AddressSpace as _CuteAddressSpace from `cutlass.cute.core`. **CN:** 从 `cutlass.cute.core` 导入 AddressSpace as _CuteAddressSpace。
+- **L24** `from cutlass.cute.core import make_ptr as _cute_make_ptr` — **EN:** Imports make_ptr as _cute_make_ptr from `cutlass.cute.core`. **CN:** 从 `cutlass.cute.core` 导入 make_ptr as _cute_make_ptr。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `class TensorMapUpdateMode(Enum):` — **EN:** Defines class `TensorMapUpdateMode` with bases Enum. **CN:** 定义类 `TensorMapUpdateMode`，其基类为 Enum。
+- **L28** `    """` — **EN:** Starts the docstring for the class `TensorMapUpdateMode`. **CN:** 开始说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L29** `    Enum class defining tensor map update modes.` — **EN:** Continues the docstring for the class `TensorMapUpdateMode`. **CN:** 继续说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `    Modes:` — **EN:** Continues the docstring for the class `TensorMapUpdateMode`. **CN:** 继续说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L32** `    GMEM: Update tensormap in global memory` — **EN:** Continues the docstring for the class `TensorMapUpdateMode`. **CN:** 继续说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L33** `    SMEM: Load tensormap from global memory to shared memory,` — **EN:** Continues the docstring for the class `TensorMapUpdateMode`. **CN:** 继续说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L34** `    update it in shared memory, then store back to global memory` — **EN:** Continues the docstring for the class `TensorMapUpdateMode`. **CN:** 继续说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L35** `    """` — **EN:** Ends the docstring for the class `TensorMapUpdateMode`. **CN:** 结束说明 class `TensorMapUpdateMode` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `    GMEM = auto()  # Update tensormap in global memory` — **EN:** Assigns a value to GMEM. **CN:** 将一个值赋给 GMEM。
+- **L38** `    SMEM = auto()  # Update tensormap in shared memory` — **EN:** Assigns a value to SMEM. **CN:** 将一个值赋给 SMEM。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L42** `class TensorMapManager:` — **EN:** Defines class `TensorMapManager`. **CN:** 定义类 `TensorMapManager`。
+- **L43** `    """` — **EN:** Starts the docstring for the class `TensorMapManager`. **CN:** 开始说明 class `TensorMapManager` 的文档字符串。
+- **L44** `    Manages TensorMap operations including initialization and updates.` — **EN:** Continues the docstring for the class `TensorMapManager`. **CN:** 继续说明 class `TensorMapManager` 的文档字符串。
+- **L45** `    Provides utilities to convert tensormap pointer to across different memory spaces.` — **EN:** Continues the docstring for the class `TensorMapManager`. **CN:** 继续说明 class `TensorMapManager` 的文档字符串。
+- **L46** `    """` — **EN:** Ends the docstring for the class `TensorMapManager`. **CN:** 结束说明 class `TensorMapManager` 的文档字符串。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `    tensormap_update_mode: TensorMapUpdateMode` — **EN:** Assigns a typed value to tensormap_update_mode. **CN:** 为 tensormap_update_mode 赋予带类型标注的值。
+- **L49** `    bytes_per_tensormap: int` — **EN:** Assigns a typed value to bytes_per_tensormap. **CN:** 为 bytes_per_tensormap 赋予带类型标注的值。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `    # convert given cute.Pointer or cutlass.Int64 to a cute.Pointer to tensormap.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L52** `    # address_space: the address space of the resulting tensormap pointer. It could be generic or gmem` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L53** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L54** `    def get_tensormap_ptr(` — **EN:** Defines function `get_tensormap_ptr`. **CN:** 定义函数 `get_tensormap_ptr`。
+- **L55** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `        ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `        address_space: _cute_ir.AddressSpace = _cute_ir.AddressSpace.gmem,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L61** `    ) -> cute.Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L62** `        if address_space not in [` — **EN:** Starts a conditional branch guarded by `address_space not in [_cute_ir.AddressSpace.gmem, _cute_i...`. **CN:** 开始一个由 `address_space not in [_cute_ir.AddressSpace.gmem, _cute_i...` 控制的条件分支。
+- **L63** `            _cute_ir.AddressSpace.gmem,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L64** `            _cute_ir.AddressSpace.generic,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L65** `        ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L66** `            raise ValueError(f"Invalid address space: {address_space} for tensormap")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `        gmem_ptr_i64 = ptr.toint().ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to gmem_ptr_i64. **CN:** 将一个值赋给 gmem_ptr_i64。
+- **L69** `        gmem_ptr_i64_align_ty = _cute_ir.ConstrainedIntType.get(` — **EN:** Assigns a value to gmem_ptr_i64_align_ty. **CN:** 将一个值赋给 gmem_ptr_i64_align_ty。
+- **L70** `            self.bytes_per_tensormap, gmem_ptr_i64.type.width` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `        gmem_ptr_i64_align = _cute_ir.assume(` — **EN:** Assigns a value to gmem_ptr_i64_align. **CN:** 将一个值赋给 gmem_ptr_i64_align。
+- **L73** `            gmem_ptr_i64_align_ty, gmem_ptr_i64, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `        gmem_ptr_ty = _cute_ir.PtrType.get(` — **EN:** Assigns a value to gmem_ptr_ty. **CN:** 将一个值赋给 gmem_ptr_ty。
+- **L76** `            _cute_nvgpu_ir.TmaDescriptorTiledType.get(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `            address_space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `            self.bytes_per_tensormap,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `        return _cute_ir.inttoptr(gmem_ptr_ty, gmem_ptr_i64_align, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    # init tensormap pointed by dst_ptr with the one inside copy_atom.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L83** `    # dst_ptr should be pointing to a global memory location or a smem location` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L84** `    # warp_id specifies which warp to perform the initialization` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L86** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L87** `    def init_tensormap_from_atom(` — **EN:** Defines function `init_tensormap_from_atom`. **CN:** 定义函数 `init_tensormap_from_atom`。
+- **L88** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L89** `        copy_atom: cute.CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L90** `        dst_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L91** `        warp_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L92** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L93** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L95** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L96** `        warp_idx = cute.arch.warp_idx(loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L97** `        warp_idx = cute.arch.make_warp_uniform(warp_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L98** `        if warp_idx == warp_id:` — **EN:** Starts a conditional branch guarded by `warp_idx == warp_id`. **CN:** 开始一个由 `warp_idx == warp_id` 控制的条件分支。
+- **L99** `            with cute.arch.elect_one(loc=loc, ip=ip):` — **EN:** Starts a context-managed block using cute.arch.elect_one(loc=loc, ip=ip). **CN:** 开始一个使用 cute.arch.elect_one(loc=loc, ip=ip) 的上下文管理代码块。
+- **L100** `                cute.nvgpu.cpasync.copy_tensormap(copy_atom, dst_ptr, loc=loc, ip=ip)` — **EN:** Invokes `cute.nvgpu.cpasync.copy_tensormap` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.cpasync.copy_tensormap`。
+- **L101** `        cute.arch.sync_warp(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.sync_warp` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.sync_warp`。
+- **L102** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    # Perform a fence operation to ensure previous \`init_tensormap_from_atom\` calls have been completed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L105** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L106** `    def fence_tensormap_initialization(` — **EN:** Defines function `fence_tensormap_initialization`. **CN:** 定义函数 `fence_tensormap_initialization`。
+- **L107** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L109** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L110** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L111** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L112** `        if self.tensormap_update_mode == TensorMapUpdateMode.GMEM:` — **EN:** Starts a conditional branch guarded by `self.tensormap_update_mode == TensorMapUpdateMode.GMEM`. **CN:** 开始一个由 `self.tensormap_update_mode == TensorMapUpdateMode.GMEM` 控制的条件分支。
+- **L113** `            cute.arch.fence_acq_rel_cta(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.fence_acq_rel_cta` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.fence_acq_rel_cta`。
+- **L114** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    # Perform a fence operation to ensure previous \`update_tensormap\` calls have been completed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L117** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L118** `    def fence_tensormap_update(` — **EN:** Defines function `fence_tensormap_update`. **CN:** 定义函数 `fence_tensormap_update`。
+- **L119** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `        tensormap_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L125** `        cute.nvgpu.cpasync.fence_tma_desc_acquire(tensormap_ptr, loc=loc, ip=ip)` — **EN:** Invokes `cute.nvgpu.cpasync.fence_tma_desc_acquire` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.cpasync.fence_tma_desc_acquire`。
+- **L126** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L129** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L130** `    def update_tensormap(` — **EN:** Defines function `update_tensormap`. **CN:** 定义函数 `update_tensormap`。
+- **L131** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L132** `        tensor_gmem: Tuple[cute.Tensor, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L133** `        tma_copy_atom: Tuple[cute.CopyAtom, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L134** `        tensormap_gmem_ptr: Tuple[cute.Pointer, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L135** `        warp_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L136** `        tensormap_smem_ptr: Tuple[cute.Pointer, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L139** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L140** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L141** `        warp_idx = cute.arch.make_warp_uniform(` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L142** `            cute.arch.warp_idx(loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `        if const_expr(self.tensormap_update_mode == TensorMapUpdateMode.SMEM):` — **EN:** Starts a conditional branch guarded by `const_expr(self.tensormap_update_mode == TensorMapUpdateM...`. **CN:** 开始一个由 `const_expr(self.tensormap_update_mode == TensorMapUpdateM...` 控制的条件分支。
+- **L145** `            # Hoist SMEM pointer integer values into warp-uniform registers before` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `            # entering predicated blocks. This avoids predicated R2UR lowering on sm_90a.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L147** `            uniform_smem_ptrs = tuple(` — **EN:** Assigns a value to uniform_smem_ptrs. **CN:** 将一个值赋给 uniform_smem_ptrs。
+- **L148** `                _cute_make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `                    p.dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `                    cute.arch.make_warp_uniform(p.toint(), loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `                    mem_space=_CuteAddressSpace.smem,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `                    assumed_align=p.alignment,  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `                for p in tensormap_smem_ptr` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L157** `            uniform_smem_ptrs = tensormap_smem_ptr` — **EN:** Assigns a value to uniform_smem_ptrs. **CN:** 将一个值赋给 uniform_smem_ptrs。
+- **L158** `        # updates before touching tensormap in global memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L159** `        if warp_idx == warp_id:` — **EN:** Starts a conditional branch guarded by `warp_idx == warp_id`. **CN:** 开始一个由 `warp_idx == warp_id` 控制的条件分支。
+- **L160** `            if const_expr(self.tensormap_update_mode == TensorMapUpdateMode.SMEM):` — **EN:** Starts a conditional branch guarded by `const_expr(self.tensormap_update_mode == TensorMapUpdateM...`. **CN:** 开始一个由 `const_expr(self.tensormap_update_mode == TensorMapUpdateM...` 控制的条件分支。
+- **L161** `                for copy_atom, tensor, smem_ptr in zip(` — **EN:** Starts a loop assigning items from `zip(tma_copy_atom, tensor_gmem, uniform_smem_ptrs)` to `(copy_atom, tensor, smem_ptr)`. **CN:** 开始一个循环，将 `zip(tma_copy_atom, tensor_gmem, uniform_smem_ptrs)` 的元素赋给 `(copy_atom, tensor, smem_ptr)`。
+- **L162** `                    tma_copy_atom, tensor_gmem, uniform_smem_ptrs` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L163** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L164** `                    cute.nvgpu.cpasync.update_tma_descriptor(` — **EN:** Invokes `cute.nvgpu.cpasync.update_tma_descriptor` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.cpasync.update_tma_descriptor`。
+- **L165** `                        copy_atom, tensor, smem_ptr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `            # wait until it's safe to update tensormap in global memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L168** `            with cute.arch.elect_one(loc=loc, ip=ip):` — **EN:** Starts a context-managed block using cute.arch.elect_one(loc=loc, ip=ip). **CN:** 开始一个使用 cute.arch.elect_one(loc=loc, ip=ip) 的上下文管理代码块。
+- **L169** `                cute.arch.cp_async_bulk_commit_group(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cp_async_bulk_commit_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_commit_group`。
+- **L170** `                cute.arch.cp_async_bulk_wait_group(0, read=True, loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cp_async_bulk_wait_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_wait_group`。
+- **L171** `            cute.arch.sync_warp(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.sync_warp` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.sync_warp`。
+- **L172** `            # updates to tensormap in global memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L173** `            if const_expr(self.tensormap_update_mode == TensorMapUpdateMode.SMEM):` — **EN:** Starts a conditional branch guarded by `const_expr(self.tensormap_update_mode == TensorMapUpdateM...`. **CN:** 开始一个由 `const_expr(self.tensormap_update_mode == TensorMapUpdateM...` 控制的条件分支。
+- **L174** `                for gmem_ptr, smem_ptr in zip(tensormap_gmem_ptr, uniform_smem_ptrs):` — **EN:** Starts a loop assigning items from `zip(tensormap_gmem_ptr, uniform_smem_ptrs)` to `(gmem_ptr, smem_ptr)`. **CN:** 开始一个循环，将 `zip(tensormap_gmem_ptr, uniform_smem_ptrs)` 的元素赋给 `(gmem_ptr, smem_ptr)`。
+- **L175** `                    cute.nvgpu.cpasync.cp_fence_tma_desc_release(` — **EN:** Invokes `cute.nvgpu.cpasync.cp_fence_tma_desc_release` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.cpasync.cp_fence_tma_desc_release`。
+- **L176** `                        gmem_ptr, smem_ptr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L179** `                for copy_atom, tensor, gmem_ptr in zip(` — **EN:** Starts a loop assigning items from `zip(tma_copy_atom, tensor_gmem, tensormap_gmem_...` to `(copy_atom, tensor, gmem_ptr)`. **CN:** 开始一个循环，将 `zip(tma_copy_atom, tensor_gmem, tensormap_gmem_...` 的元素赋给 `(copy_atom, tensor, gmem_ptr)`。
+- **L180** `                    tma_copy_atom, tensor_gmem, tensormap_gmem_ptr` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L182** `                    cute.nvgpu.cpasync.update_tma_descriptor(` — **EN:** Invokes `cute.nvgpu.cpasync.update_tma_descriptor` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.cpasync.update_tma_descriptor`。
+- **L183** `                        copy_atom, tensor, gmem_ptr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `                cute.arch.sync_warp(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.sync_warp` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.sync_warp`。
+- **L186** `                cute.nvgpu.cpasync.fence_tma_desc_release(loc=loc, ip=ip)` — **EN:** Invokes `cute.nvgpu.cpasync.fence_tma_desc_release` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.cpasync.fence_tma_desc_release`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.tensormap_manager`. CN: 模块名为 `CuTeDSL.cutlass.utils.tensormap_manager`。
+- EN: Top-level classes: TensorMapUpdateMode, TensorMapManager CN: 顶层类包括：TensorMapUpdateMode, TensorMapManager
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, cutlass.cutlass_dsl:dsl_user_op, cutlass.cute, cutlass:const_expr, cutlass.cute.core:AddressSpace, cutlass.cute.core:make_ptr CN: 内部依赖：cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, cutlass.cutlass_dsl:dsl_user_op, cutlass.cute, cutlass:const_expr, cutlass.cute.core:AddressSpace, cutlass.cute.core:make_ptr
+- EN: External or standard-library dependencies: dataclasses:dataclass, enum:Enum,auto, typing:Optional,Tuple CN: 外部或标准库依赖：dataclasses:dataclass, enum:Enum,auto, typing:Optional,Tuple

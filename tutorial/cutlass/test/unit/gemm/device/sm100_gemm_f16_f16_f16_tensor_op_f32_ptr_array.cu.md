@@ -1,0 +1,1979 @@
+# sm100_gemm_f16_f16_f16_tensor_op_f32_ptr_array.cu — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/sm100_gemm_f16_f16_f16_tensor_op_f32_ptr_array.cu`
+- 中文：`test/unit/gemm/device/sm100_gemm_f16_f16_f16_tensor_op_f32_ptr_array.cu`
+
+## Purpose / 目的
+- EN: This file exercises pointer-array GEMM kernels on SM100 and validates the array-of-pointers launch path described by `sm100_gemm_f16_f16_f16_tensor_op_f32_ptr_array`. The file-level brief is: "Tests for device-wide Ptr-Array GEMM interface."
+- 中文：该文件在 SM100 上测试指针数组 GEMM 内核，并验证 `sm100_gemm_f16_f16_f16_tensor_op_f32_ptr_array` 描述的数组指针启动路径。 文件级摘要为：“设备级指针数组 GEMM 接口测试”。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L32** `    \brief Tests for device-wide Ptr-Array GEMM interface`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L33** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L34** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L35** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L36** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L37** `#include <iostream>`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- **L38** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L39** `#include "cutlass/cutlass.h"`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- **L40** `#include "cute/tensor.hpp"`
+  - EN: Provides CUTE tensor abstractions used to describe tiled tensor layouts.
+  - 中文：提供 CUTE 张量抽象，用于描述分块张量布局。
+- **L41** `#include "cute/atom/mma_atom.hpp"`
+  - EN: Provides CUTE MMA atom definitions used to model tensor-core operations.
+  - 中文：提供 CUTE MMA 原子定义，用于描述 Tensor Core 运算。
+- **L42** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L43** `#include "cutlass/numeric_types.h"`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- **L44** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L45** `#include "cutlass/gemm/device/gemm_universal_adapter.h"`
+  - EN: Provides the universal adapter that wraps a CUTLASS 3.x GEMM kernel for launch.
+  - 中文：提供通用适配器，用于封装并启动 CUTLASS 3.x GEMM 内核。
+- **L46** `#include "cutlass/gemm/kernel/gemm_universal.hpp"`
+  - EN: Defines the universal GEMM kernel composition used by modern CUTLASS tests.
+  - 中文：定义现代 CUTLASS 测试使用的通用 GEMM 内核组合。
+- **L47** `#include "cutlass/gemm/kernel/tile_scheduler.hpp"`
+  - EN: Provides tile-scheduler policies such as persistent or Stream-K scheduling.
+  - 中文：提供 tile 调度策略，例如 persistent 或 Stream-K 调度。
+- **L48** `#include "cutlass/gemm/collective/collective_builder.hpp"`
+  - EN: Builds the GEMM mainloop collective from architecture, tile, and datatype parameters.
+  - 中文：根据架构、tile 和数据类型参数构建 GEMM 主循环 collective。
+- **L49** `#include "cutlass/epilogue/collective/collective_builder.hpp"`
+  - EN: Builds the epilogue collective that writes GEMM results to memory.
+  - 中文：构建将 GEMM 结果写回内存的 epilogue collective。
+- **L50** `#include "cutlass/epilogue/collective/sm70_epilogue_vectorized.hpp"`
+  - EN: Provides vectorized epilogue helpers reused by CUTLASS epilogue assembly.
+  - 中文：提供 CUTLASS epilogue 组装过程中复用的向量化辅助组件。
+- **L51** `#include "cutlass/epilogue/collective/default_epilogue.hpp"`
+  - EN: Provides default epilogue assembly utilities.
+  - 中文：提供默认 epilogue 组装工具。
+- **L52** `#include "cutlass/epilogue/thread/linear_combination.h"`
+  - EN: Declares the standard linear-combination output operator for GEMM epilogues.
+  - 中文：声明 GEMM epilogue 常用的线性组合输出算子。
+- **L53** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L54** `#include "../../common/cutlass_unit_test.h"`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- **L55** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L56** `#include "gemm_testbed_3x_ptr_array.hpp"`
+  - EN: Provides pointer-array and grouped-GEMM test helpers for CUTLASS 3.x tests.
+  - 中文：提供 CUTLASS 3.x 指针数组与 grouped GEMM 测试辅助代码。
+- **L57** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L58** `#if defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)`
+  - EN: Begins a conditional-compilation region guarded by `defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)`.
+  - 中文：开始一个由 `defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)` 控制的条件编译区域。
+- **L59** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L60** `using namespace cute;`
+  - EN: Brings the `cute` namespace into local scope to shorten subsequent code.
+  - 中文：将 `cute` 命名空间引入当前作用域，简化后续代码书写。
+- **L61** `TEST(SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array, 64x128x64_1x1x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array.64x128x64_1x1x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array.64x128x64_1x1x1`，用于覆盖一个 GEMM 场景。
+- **L62** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L63** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L64** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L65** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L66** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L67** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L68** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L69** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L70** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L71** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L72** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L73** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L74** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L75** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L76** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L77** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L78** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L79** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L80** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L81** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L82** `using MmaTileShape = Shape<_64,_128,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_64,_128,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_64,_128,_64>`。
+- **L83** `using ClusterShape = Shape<_1,_1,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1,_1,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1,_1,_1>`。
+- **L84** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L85** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L86** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L87** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L88** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L89** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L90** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L91** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L92** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L93** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L94** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L95** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L96** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L97** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L98** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L99** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L100** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L101** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L102** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L103** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L104** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L105** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L106** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L107** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L108** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L109** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L110** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L111** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L112** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L113** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L114** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L115** `  bool result = TestSmall<Gemm>(1.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L116** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L117** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L118** `TEST(SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array, 128x128x64_1x2x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array.128x128x64_1x2x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array.128x128x64_1x2x1`，用于覆盖一个 GEMM 场景。
+- **L119** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L120** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L121** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L122** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L123** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L124** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L125** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L126** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L127** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L128** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L129** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L130** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L131** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L132** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L133** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L134** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L135** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L136** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L137** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L138** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L139** `using MmaTileShape = Shape<_128,_64,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_128,_64,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_128,_64,_64>`。
+- **L140** `using ClusterShape = Shape<_1,_2,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1,_2,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1,_2,_1>`。
+- **L141** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L142** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L143** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L144** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L145** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L146** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L147** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L148** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L149** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L150** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L151** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L152** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L153** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L154** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L155** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L156** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L157** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L158** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L159** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L160** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L161** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L162** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L163** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L164** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L165** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L166** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L167** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L168** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L169** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L170** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L171** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L172** `  bool result = TestSmall<Gemm>(1.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L173** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L174** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L175** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L176** `TEST(SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array, 128x64x64_1x2x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array.128x64x64_1x2x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_1sm_f32_ptr_array.128x64x64_1x2x1`，用于覆盖一个 GEMM 场景。
+- **L177** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L178** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L179** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L180** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L181** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L182** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L183** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L184** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L185** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L186** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L187** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L188** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L189** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L190** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L191** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L192** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L193** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L194** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L195** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L196** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L197** `using MmaTileShape = Shape<_128,_32,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_128,_32,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_128,_32,_64>`。
+- **L198** `using ClusterShape = Shape<_1,_2,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1,_2,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1,_2,_1>`。
+- **L199** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L200** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L201** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L202** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L203** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L204** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L205** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L206** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L207** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L208** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L209** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L210** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L211** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L212** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L213** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L214** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L215** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L216** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L217** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L218** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L219** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L220** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L221** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L222** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L223** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L224** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L225** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L226** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L227** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L228** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L229** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L230** `  bool result = TestSmall<Gemm>(3.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L231** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L232** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L233** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L234** `TEST(SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_2sm_f32_ptr_array, 256x128x64_2x1x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_2sm_f32_ptr_array.256x128x64_2x1x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_2sm_f32_ptr_array.256x128x64_2x1x1`，用于覆盖一个 GEMM 场景。
+- **L235** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L236** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L237** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L238** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L239** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L240** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L241** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L242** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L243** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L244** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L245** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L246** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L247** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L248** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L249** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L250** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L251** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L252** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L253** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L254** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L255** `using MmaTileShape = Shape<_256,_128,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_256,_128,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_256,_128,_64>`。
+- **L256** `using ClusterShape = Shape<_2,_1,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_2,_1,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_2,_1,_1>`。
+- **L257** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L258** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L259** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L260** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L261** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L262** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L263** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L264** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L265** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L266** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L267** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L268** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L269** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L270** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L271** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L272** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L273** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L274** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L275** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L276** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L277** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L278** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L279** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L280** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L281** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L282** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L283** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L284** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L285** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L286** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L287** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L288** `  bool result = TestSmall<Gemm>(1.0, 0.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L289** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L290** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L291** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L292** `TEST(SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_2sm_f32_ptr_array, 256x256x64_2x2x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_2sm_f32_ptr_array.256x256x64_2x2x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16n_f16n_tensor_op_2sm_f32_ptr_array.256x256x64_2x2x1`，用于覆盖一个 GEMM 场景。
+- **L293** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L294** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L295** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L296** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L297** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L298** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L299** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L300** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L301** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L302** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L303** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L304** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L305** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L306** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L307** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L308** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L309** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L310** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L311** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L312** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L313** `using MmaTileShape = Shape<_256,_128,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_256,_128,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_256,_128,_64>`。
+- **L314** `using ClusterShape = Shape<_2,_2,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_2,_2,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_2,_2,_1>`。
+- **L315** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L316** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L317** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L318** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L319** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L320** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L321** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L322** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L323** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L324** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L325** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L326** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L327** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L328** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L329** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L330** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L331** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L332** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L333** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L334** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L335** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L336** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L337** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L338** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L339** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L340** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L341** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L342** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L343** `  bool result = TestSmall<Gemm>(2.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L344** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L345** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L346** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L347** `TEST(SM100_Device_Gemm_f16n_f16t_f16t_tensor_op_1sm_f32_ptr_array, 64x128x64_1x1x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16n_f16t_f16t_tensor_op_1sm_f32_ptr_array.64x128x64_1x1x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16n_f16t_f16t_tensor_op_1sm_f32_ptr_array.64x128x64_1x1x1`，用于覆盖一个 GEMM 场景。
+- **L348** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L349** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L350** `using         LayoutA     = cutlass::layout::ColumnMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a column-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L351** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L352** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L353** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L354** `using         LayoutB     = cutlass::layout::RowMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a row-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L355** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L356** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L357** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L358** `using         LayoutC     = cutlass::layout::RowMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a row-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L359** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L360** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L361** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L362** `using         LayoutD     = cutlass::layout::RowMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a row-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L363** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L364** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L365** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L366** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L367** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L368** `using MmaTileShape = Shape<_64,_128,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_64,_128,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_64,_128,_64>`。
+- **L369** `using ClusterShape = Shape<_1,_1,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1,_1,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1,_1,_1>`。
+- **L370** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L371** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L372** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L373** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L374** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L375** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L376** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L377** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L378** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L379** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L380** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L381** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L382** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L383** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L384** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L385** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L386** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L387** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L388** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L389** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L390** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L391** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L392** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L393** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L394** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L395** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L396** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L397** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L398** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L399** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L400** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L401** `  bool result = TestSmall<Gemm>(1.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L402** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L403** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L404** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L405** `TEST(SM100_Device_Gemm_f16n_f16n_f16n_tensor_op_1sm_f32_ptr_array, 128x128x64_1x2x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16n_f16n_f16n_tensor_op_1sm_f32_ptr_array.128x128x64_1x2x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16n_f16n_f16n_tensor_op_1sm_f32_ptr_array.128x128x64_1x2x1`，用于覆盖一个 GEMM 场景。
+- **L406** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L407** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L408** `using         LayoutA     = cutlass::layout::ColumnMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a column-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L409** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L410** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L411** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L412** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L413** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L414** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L415** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L416** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L417** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L418** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L419** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L420** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L421** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L422** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L423** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L424** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L425** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L426** `using MmaTileShape = Shape<_128,_64,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_128,_64,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_128,_64,_64>`。
+- **L427** `using ClusterShape = Shape<_1,_2,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1,_2,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1,_2,_1>`。
+- **L428** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L429** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L430** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L431** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L432** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L433** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L434** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L435** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L436** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L437** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L438** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L439** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L440** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L441** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L442** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L443** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L444** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L445** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L446** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L447** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L448** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L449** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L450** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L451** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L452** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L453** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L454** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L455** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L456** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L457** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L458** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L459** `  bool result = TestSmall<Gemm>(1.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L460** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L461** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L462** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L463** `TEST(SM100_Device_Gemm_f16t_f16t_f16t_tensor_op_1sm_f32_ptr_array, 128x64x64_1x2x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16t_f16t_tensor_op_1sm_f32_ptr_array.128x64x64_1x2x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16t_f16t_tensor_op_1sm_f32_ptr_array.128x64x64_1x2x1`，用于覆盖一个 GEMM 场景。
+- **L464** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L465** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L466** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L467** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L468** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L469** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L470** `using         LayoutB     = cutlass::layout::RowMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a row-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L471** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L472** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L473** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L474** `using         LayoutC     = cutlass::layout::RowMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a row-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L475** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L476** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L477** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L478** `using         LayoutD     = cutlass::layout::RowMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a row-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L479** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L480** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L481** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L482** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L483** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L484** `using MmaTileShape = Shape<_128,_32,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_128,_32,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_128,_32,_64>`。
+- **L485** `using ClusterShape = Shape<_1,_2,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_1,_2,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_1,_2,_1>`。
+- **L486** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L487** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L488** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L489** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L490** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L491** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L492** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L493** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L494** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L495** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L496** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L497** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L498** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L499** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L500** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L501** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L502** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L503** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L504** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L505** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L506** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L507** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L508** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L509** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L510** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L511** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L512** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L513** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L514** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L515** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L516** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L517** `  bool result = TestSmall<Gemm>(3.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L518** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L519** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L520** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L521** `TEST(SM100_Device_Gemm_f16t_f16t_f16n_tensor_op_2sm_f32_ptr_array, 256x128x64_2x1x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16t_f16n_tensor_op_2sm_f32_ptr_array.256x128x64_2x1x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16t_f16n_tensor_op_2sm_f32_ptr_array.256x128x64_2x1x1`，用于覆盖一个 GEMM 场景。
+- **L522** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L523** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L524** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L525** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L526** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L527** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L528** `using         LayoutB     = cutlass::layout::RowMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a row-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L529** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L530** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L531** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L532** `using         LayoutC     = cutlass::layout::ColumnMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a column-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L533** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L534** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L535** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L536** `using         LayoutD     = cutlass::layout::ColumnMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a column-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L537** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L538** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L539** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L540** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L541** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L542** `using MmaTileShape = Shape<_256,_128,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_256,_128,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_256,_128,_64>`。
+- **L543** `using ClusterShape = Shape<_2,_1,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_2,_1,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_2,_1,_1>`。
+- **L544** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L545** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L546** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L547** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L548** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L549** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L550** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L551** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L552** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L553** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L554** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L555** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L556** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L557** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L558** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L559** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L560** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L561** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L562** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L563** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L564** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L565** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L566** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L567** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L568** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L569** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L570** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L571** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L572** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L573** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L574** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L575** `  bool result = TestSmall<Gemm>(1.0, 0.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L576** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L577** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L578** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L579** `TEST(SM100_Device_Gemm_f16t_f16t_f16t_tensor_op_2sm_f32_ptr_array, 256x256x64_2x2x1) {`
+  - EN: Defines GoogleTest case `SM100_Device_Gemm_f16t_f16t_f16t_tensor_op_2sm_f32_ptr_array.256x256x64_2x2x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM100_Device_Gemm_f16t_f16t_f16t_tensor_op_2sm_f32_ptr_array.256x256x64_2x2x1`，用于覆盖一个 GEMM 场景。
+- **L580** `// A matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: A matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：A 矩阵配置。
+- **L581** `using         ElementA    = cutlass::half_t;                                // Element type for A matrix operand`
+  - EN: Creates the alias `ElementA` for the CUTLASS half-precision type. The inline comment documents: Element type for A matrix operand.
+  - 中文：为 `ElementA` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L582** `using         LayoutA     = cutlass::layout::RowMajor;                      // Layout type for A matrix operand`
+  - EN: Creates the alias `LayoutA` for a row-major memory layout. The inline comment documents: Layout type for A matrix operand.
+  - 中文：为 `LayoutA` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L583** `constexpr int AlignmentA  = 128 / cutlass::sizeof_bits<ElementA>::value;    // Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentA` as `128 / cutlass::sizeof_bits<ElementA>::value`. The inline comment documents: Memory access granularity/alignment of A matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentA` 定义为 `128 / cutlass::sizeof_bits<ElementA>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L584** `// B matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: B matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：B 矩阵配置。
+- **L585** `using         ElementB    = cutlass::half_t;                                // Element type for B matrix operand`
+  - EN: Creates the alias `ElementB` for the CUTLASS half-precision type. The inline comment documents: Element type for B matrix operand.
+  - 中文：为 `ElementB` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L586** `using         LayoutB     = cutlass::layout::ColumnMajor;                   // Layout type for B matrix operand`
+  - EN: Creates the alias `LayoutB` for a column-major memory layout. The inline comment documents: Layout type for B matrix operand.
+  - 中文：为 `LayoutB` 创建别名，对应 列主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L587** `constexpr int AlignmentB  = 128 / cutlass::sizeof_bits<ElementB>::value;    // Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentB` as `128 / cutlass::sizeof_bits<ElementB>::value`. The inline comment documents: Memory access granularity/alignment of B matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentB` 定义为 `128 / cutlass::sizeof_bits<ElementB>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L588** `// C matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: C matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：C 矩阵配置。
+- **L589** `using         ElementC    = cutlass::half_t;                                // Element type for C matrix operands`
+  - EN: Creates the alias `ElementC` for the CUTLASS half-precision type. The inline comment documents: Element type for C matrix operands.
+  - 中文：为 `ElementC` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L590** `using         LayoutC     = cutlass::layout::RowMajor;                   // Layout type for C matrix operands`
+  - EN: Creates the alias `LayoutC` for a row-major memory layout. The inline comment documents: Layout type for C matrix operands.
+  - 中文：为 `LayoutC` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L591** `constexpr int AlignmentC  = 128 / cutlass::sizeof_bits<ElementC>::value;    // Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentC` as `128 / cutlass::sizeof_bits<ElementC>::value`. The inline comment documents: Memory access granularity/alignment of C matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentC` 定义为 `128 / cutlass::sizeof_bits<ElementC>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L592** `// D matrix configuration`
+  - EN: Adds a human-readable comment for the next code region: D matrix configuration.
+  - 中文：为后续代码区域添加可读性注释：D 矩阵配置。
+- **L593** `using         ElementD    = cutlass::half_t;                                // Element type for D matrix operands`
+  - EN: Creates the alias `ElementD` for the CUTLASS half-precision type. The inline comment documents: Element type for D matrix operands.
+  - 中文：为 `ElementD` 创建别名，对应 CUTLASS 半精度类型。 行尾注释说明：说明这里指定了元素类型。。
+- **L594** `using         LayoutD     = cutlass::layout::RowMajor;                   // Layout type for D matrix operands`
+  - EN: Creates the alias `LayoutD` for a row-major memory layout. The inline comment documents: Layout type for D matrix operands.
+  - 中文：为 `LayoutD` 创建别名，对应 行主序内存布局。 行尾注释说明：说明这里指定了内存布局类型。。
+- **L595** `constexpr int AlignmentD  = 128 / cutlass::sizeof_bits<ElementD>::value;    // Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes)`
+  - EN: Defines compile-time alignment constant `AlignmentD` as `128 / cutlass::sizeof_bits<ElementD>::value`. The inline comment documents: Memory access granularity/alignment of D matrix in units of elements (up to 16 bytes).
+  - 中文：将编译期对齐常量 `AlignmentD` 定义为 `128 / cutlass::sizeof_bits<ElementD>::value`。 行尾注释说明：说明这里给出了对齐或访存粒度要求。。
+- **L596** `// Core kernel configurations`
+  - EN: Adds a human-readable comment for the next code region: Core kernel configurations.
+  - 中文：为后续代码区域添加可读性注释：核心内核配置。
+- **L597** `using ElementAccumulator  = float;                                           // Element type for internal accumulation`
+  - EN: Creates the alias `ElementAccumulator` for the scalar type `float`. The inline comment documents: Element type for internal accumulation.
+  - 中文：为 `ElementAccumulator` 创建别名，对应 标量类型 `float`。 行尾注释说明：说明这里指定了元素类型。。
+- **L598** `using ArchTag             = cutlass::arch::Sm100;                            // Tag indicating the minimum SM that supports the intended feature`
+  - EN: Creates the alias `ArchTag` for the target architecture tag `cutlass::arch::Sm100`. The inline comment documents: Tag indicating the minimum SM that supports the intended feature.
+  - 中文：为 `ArchTag` 创建别名，对应 目标架构标签 `cutlass::arch::Sm100`。 行尾注释说明：行尾注释补充说明：Tag indicating the minimum SM that supports the intended feature。
+- **L599** `using OperatorClass       = cutlass::arch::OpClassTensorOp;                  // Operator class tag`
+  - EN: Creates the alias `OperatorClass` for the operator-class tag `cutlass::arch::OpClassTensorOp`. The inline comment documents: Operator class tag.
+  - 中文：为 `OperatorClass` 创建别名，对应 运算类别标签 `cutlass::arch::OpClassTensorOp`。 行尾注释说明：行尾注释补充说明：Operator class tag。
+- **L600** `using MmaTileShape = Shape<_256,_128,_64>;`
+  - EN: Creates the alias `MmaTileShape` for a compile-time shape `Shape<_256,_128,_64>`.
+  - 中文：为 `MmaTileShape` 创建别名，对应 编译期形状 `Shape<_256,_128,_64>`。
+- **L601** `using ClusterShape = Shape<_2,_2,_1>;`
+  - EN: Creates the alias `ClusterShape` for a compile-time shape `Shape<_2,_2,_1>`.
+  - 中文：为 `ClusterShape` 创建别名，对应 编译期形状 `Shape<_2,_2,_1>`。
+- **L602** `using KernelSchedule   = cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100;   // Kernel to launch`
+  - EN: Creates the alias `KernelSchedule` for the helper type `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`. The inline comment documents: Kernel to launch.
+  - 中文：为 `KernelSchedule` 创建别名，对应 辅助类型 `cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100`。 行尾注释说明：说明这里选择要启动的内核调度策略。。
+- **L603** `using EpilogueSchedule = cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm;          // Epilogue to launch`
+  - EN: Creates the alias `EpilogueSchedule` for the helper type `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`. The inline comment documents: Epilogue to launch.
+  - 中文：为 `EpilogueSchedule` 创建别名，对应 辅助类型 `cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm`。 行尾注释说明：说明这里选择要启动的 epilogue 调度策略。。
+- **L604** `using CollectiveEpilogue = typename cutlass::epilogue::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the epilogue collective for writing GEMM outputs.
+  - 中文：开始定义用于写回 GEMM 输出的 epilogue collective 别名。
+- **L605** `    cutlass::arch::Sm100, cutlass::arch::OpClassTensorOp,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L606** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L607** `    cutlass::epilogue::collective::EpilogueTileAuto,`
+  - EN: Requests automatic selection of the epilogue tile shape.
+  - 中文：请求自动选择 epilogue tile 形状。
+- **L608** `    ElementAccumulator, ElementAccumulator,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L609** `    ElementC, LayoutC, AlignmentC,`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L610** `    ElementD, LayoutD, AlignmentD,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L611** `    EpilogueSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L612** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L613** `using CollectiveMainloop = typename cutlass::gemm::collective::CollectiveBuilder<`
+  - EN: Starts the alias that builds the GEMM mainloop collective.
+  - 中文：开始定义 GEMM 主循环 collective 的别名。
+- **L614** `    ArchTag, OperatorClass,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L615** `    ElementA, LayoutA, AlignmentA,`
+  - EN: Passes operand A metadata into the builder.
+  - 中文：向 builder 传入操作数 A 的元数据。
+- **L616** `    ElementB, LayoutB, AlignmentB,`
+  - EN: Passes operand B metadata into the builder.
+  - 中文：向 builder 传入操作数 B 的元数据。
+- **L617** `    ElementAccumulator,`
+  - EN: Supplies the accumulator type for the math pipeline.
+  - 中文：提供数学流水线使用的累加器类型。
+- **L618** `    MmaTileShape, ClusterShape,`
+  - EN: Supplies the MMA tile shape and cluster shape.
+  - 中文：提供 MMA tile 形状与 cluster 形状。
+- **L619** `    cutlass::gemm::collective::StageCountAutoCarveout<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L620** `      static_cast<int>(sizeof(typename CollectiveEpilogue::SharedStorage))>,`
+  - EN: Computes a shared-memory carveout value at compile time.
+  - 中文：在编译期计算共享内存预留值。
+- **L621** `    KernelSchedule`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L622** `  >::CollectiveOp;`
+  - EN: Materializes the builder result as a concrete collective operation type.
+  - 中文：将 builder 的结果具体化为一个 collective operation 类型。
+- **L623** `using GemmKernel = cutlass::gemm::kernel::GemmUniversal<`
+  - EN: Starts the alias for the fully assembled GEMM kernel type.
+  - 中文：开始定义完整组装后的 GEMM 内核类型别名。
+- **L624** `    cutlass::gemm::ArrayProblemShape<Shape<int,int,int,int>>,`
+  - EN: Specifies an array-of-problems descriptor for ptr-array GEMM.
+  - 中文：为指针数组 GEMM 指定数组化问题描述符。
+- **L625** `    CollectiveMainloop,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L626** `    CollectiveEpilogue`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L627** `>;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L628** `  using namespace test::gemm::device;`
+  - EN: Brings the `test::gemm::device` namespace into local scope to shorten subsequent code.
+  - 中文：将 `test::gemm::device` 命名空间引入当前作用域，简化后续代码书写。
+- **L629** `  using Gemm = cutlass::gemm::device::GemmUniversalAdapter<GemmKernel>;`
+  - EN: Creates the alias `Gemm` for a device adapter around the kernel type.
+  - 中文：为 `Gemm` 创建别名，对应 对内核类型的设备端适配器。
+- **L630** `  bool result = TestSmall<Gemm>(2.0, 2.0);`
+  - EN: Invokes a testbed helper and stores its pass/fail result.
+  - 中文：调用 testbed 辅助函数并保存其通过/失败结果。
+- **L631** `  EXPECT_TRUE(result);`
+  - EN: Checks that `result` evaluates to true, marking the test as passed.
+  - 中文：检查 `result` 的结果是否为真，以判定测试通过。
+- **L632** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L633** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L634** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L635** `#endif // defined(CUTLASS_ARCH_MMA_SM100_SUPPORTED)`
+  - EN: Closes the current conditional-compilation block.
+  - 中文：结束当前条件编译块。
+
+## Key Concepts / 关键概念
+- EN: CUTLASS 3.x universal GEMM adapter
+  - 中文：CUTLASS 3.x 通用 GEMM 适配器
+- EN: Collective-builder based kernel composition
+  - 中文：基于 CollectiveBuilder 的内核组合
+- EN: GoogleTest test cases
+  - 中文：GoogleTest 测试用例
+- EN: Pointer-array GEMM problem descriptors
+  - 中文：指针数组 GEMM 问题描述符
+- EN: Tensor Core operator class
+  - 中文：Tensor Core 运算类别
+- EN: SM100 feature guards
+  - 中文：SM100 特性编译保护
+- EN: Architecture-specific kernel specialization
+  - 中文：面向特定架构的内核特化
+
+## Dependencies / 依赖关系
+- `iostream`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- `cutlass/cutlass.h`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- `cute/tensor.hpp`
+  - EN: Provides CUTE tensor abstractions used to describe tiled tensor layouts.
+  - 中文：提供 CUTE 张量抽象，用于描述分块张量布局。
+- `cute/atom/mma_atom.hpp`
+  - EN: Provides CUTE MMA atom definitions used to model tensor-core operations.
+  - 中文：提供 CUTE MMA 原子定义，用于描述 Tensor Core 运算。
+- `cutlass/numeric_types.h`
+  - EN: Defines CUTLASS numeric types, including low-precision and packed formats.
+  - 中文：定义 CUTLASS 数值类型，包括低精度与打包格式。
+- `cutlass/gemm/device/gemm_universal_adapter.h`
+  - EN: Provides the universal adapter that wraps a CUTLASS 3.x GEMM kernel for launch.
+  - 中文：提供通用适配器，用于封装并启动 CUTLASS 3.x GEMM 内核。
+- `cutlass/gemm/kernel/gemm_universal.hpp`
+  - EN: Defines the universal GEMM kernel composition used by modern CUTLASS tests.
+  - 中文：定义现代 CUTLASS 测试使用的通用 GEMM 内核组合。
+- `cutlass/gemm/kernel/tile_scheduler.hpp`
+  - EN: Provides tile-scheduler policies such as persistent or Stream-K scheduling.
+  - 中文：提供 tile 调度策略，例如 persistent 或 Stream-K 调度。
+- `cutlass/gemm/collective/collective_builder.hpp`
+  - EN: Builds the GEMM mainloop collective from architecture, tile, and datatype parameters.
+  - 中文：根据架构、tile 和数据类型参数构建 GEMM 主循环 collective。
+- `cutlass/epilogue/collective/collective_builder.hpp`
+  - EN: Builds the epilogue collective that writes GEMM results to memory.
+  - 中文：构建将 GEMM 结果写回内存的 epilogue collective。
+- `cutlass/epilogue/collective/sm70_epilogue_vectorized.hpp`
+  - EN: Provides vectorized epilogue helpers reused by CUTLASS epilogue assembly.
+  - 中文：提供 CUTLASS epilogue 组装过程中复用的向量化辅助组件。
+- `cutlass/epilogue/collective/default_epilogue.hpp`
+  - EN: Provides default epilogue assembly utilities.
+  - 中文：提供默认 epilogue 组装工具。
+- `cutlass/epilogue/thread/linear_combination.h`
+  - EN: Declares the standard linear-combination output operator for GEMM epilogues.
+  - 中文：声明 GEMM epilogue 常用的线性组合输出算子。
+- `../../common/cutlass_unit_test.h`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- `gemm_testbed_3x_ptr_array.hpp`
+  - EN: Provides pointer-array and grouped-GEMM test helpers for CUTLASS 3.x tests.
+  - 中文：提供 CUTLASS 3.x 指针数组与 grouped GEMM 测试辅助代码。

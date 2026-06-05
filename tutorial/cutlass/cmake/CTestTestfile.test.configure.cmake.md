@@ -1,0 +1,194 @@
+# CTestTestfile.test.configure.cmake — Code Analysis / 代码分析
+
+**Source / 源文件**: `cmake/CTestTestfile.test.configure.cmake`
+**Purpose / 用途**: This generated-style CMake fragment describes CTest configuration behavior for test setup. / 该类生成式 CMake 片段描述了测试配置阶段的 CTest 行为。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `#`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `if (CUTLASS_USE_EXTENDED_ADD_TEST_FORMAT)`
+  - EN: Starts a CMake conditional that selects test-build behavior.
+  - CN: 开始一个 CMake 条件分支，用于选择测试构建行为。
+- **Line 30 / 第30行**
+  - Code / 代码: `  # The longform/extended format allows generator expressions to be`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 31 / 第31行**
+  - Code / 代码: `  # expanded property and is useful in contexts where the files need`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 32 / 第32行**
+  - Code / 代码: `  # to be immediately included into being-processed cmake code.`
+  - EN: Adds a CMake comment that documents the nearby logic.
+  - CN: 添加 CMake 注释来说明邻近逻辑。
+- **Line 33 / 第33行**
+  - Code / 代码: `  add_test(NAME @TESTCASE_NAME@ COMMAND ${_CUTLASS_TEST_EXECUTION_ENVIRONMENT} "${TEST_EXE_PATH}" @TEST_COMMAND_OPTIONS@)`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 34 / 第34行**
+  - Code / 代码: `else()`
+  - EN: Switches to the alternate branch of the current CMake condition.
+  - CN: 切换到当前 CMake 条件的另一分支。
+- **Line 35 / 第35行**
+  - Code / 代码: `  add_test(@TESTCASE_NAME@ ${_CUTLASS_TEST_EXECUTION_ENVIRONMENT} "${TEST_EXE_PATH}" @TEST_COMMAND_OPTIONS@)`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 36 / 第36行**
+  - Code / 代码: `endif()`
+  - EN: Closes the current CMake conditional block.
+  - CN: 结束当前的 CMake 条件块。
+- **Line 37 / 第37行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 38 / 第38行**
+  - Code / 代码: `if (TEST_EXE_WORKING_DIRECTORY)`
+  - EN: Starts a CMake conditional that selects test-build behavior.
+  - CN: 开始一个 CMake 条件分支，用于选择测试构建行为。
+- **Line 39 / 第39行**
+  - Code / 代码: `  set_tests_properties(@TESTCASE_NAME@ PROPERTIES WORKING_DIRECTORY "${TEST_EXE_WORKING_DIRECTORY}")`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 40 / 第40行**
+  - Code / 代码: `endif()`
+  - EN: Closes the current CMake conditional block.
+  - CN: 结束当前的 CMake 条件块。
+- **Line 41 / 第41行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+- **Line 42 / 第42行**
+  - Code / 代码: `set_tests_properties(@TESTCASE_NAME@ PROPERTIES DISABLED @__DISABLE_TESTS@)`
+  - EN: Continues the CMake configuration logic.
+  - CN: 继续编写 CMake 配置逻辑。
+- **Line 43 / 第43行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate CMake sections.
+  - CN: 保留空行以分隔 CMake 片段。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses CMake logic to register or configure test targets.
+  **CN**: 使用 CMake 逻辑来注册或配置测试目标。
+
+## Dependencies / 依赖项
+
+- `(none detected)`
+  - EN: No explicit import/include dependency was detected in the file header.
+  - CN: 在文件头部未检测到显式的导入/包含依赖。

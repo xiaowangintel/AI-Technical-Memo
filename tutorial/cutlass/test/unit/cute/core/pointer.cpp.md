@@ -1,0 +1,352 @@
+# pointer.cpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/core/pointer.cpp`
+
+## Purpose / 用途
+- EN: This CuTe core unit test exercises the `pointer` primitive, checking compile-time and runtime properties of layouts, tuples, tensors, or algebraic transforms.
+- CN: 这个 CuTe 核心单元测试覆盖 `pointer` 原语，检查布局、元组、张量或代数变换的编译期与运行期性质。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include <cutlass/trace.h>`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <cute/pointer.hpp>`
+  - EN: Provides CuTe `pointer` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `pointer` 功能。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `TEST(CuTe_core, Pointer)`
+  - EN: Declares GoogleTest case `CuTe_core::Pointer` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `CuTe_core::Pointer`，用于验证一个具体的 CuTe 场景。
+- **Line 39**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 40**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 41**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 42**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 43**: `  CUTLASS_TRACE_HOST("CuTe pointer wrappers");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 44**: `  CUTLASS_TRACE_HOST("-------------------------------");`
+  - EN: Emits diagnostic output to make the test flow or intermediate values visible.
+  - CN: 输出诊断信息，使测试流程或中间值可见。
+- **Line 45**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: `  // Test T* overloads (T can be nonconst or const)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 47**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 48**: `    using T = float;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 49**: `    using expected_type = cute::gmem_ptr<T*>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 50**: `    T* p = nullptr;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `    // explicit template argument`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 53**: `    auto gmem_p0 = cute::make_gmem_ptr<T>(p);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 54**: `    static_assert(cute::is_same_v<decltype(gmem_p0), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 55**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 56**: `    // deduced template argument`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 57**: `    auto gmem_p1 = cute::make_gmem_ptr(p);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 58**: `    static_assert(cute::is_same_v<decltype(gmem_p1), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 59**: `  }`
+  - EN: Closes the scope for `test CuTe_core::Pointer`.
+  - CN: 结束 `test CuTe_core::Pointer` 的作用域。
+- **Line 60**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 61**: `    using T = float const;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 62**: `    using expected_type = cute::gmem_ptr<T*>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 63**: `    T* p = nullptr;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 64**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 65**: `    // explicit template argument`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 66**: `    auto gmem_p0 = cute::make_gmem_ptr<T>(p);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 67**: `    static_assert(cute::is_same_v<decltype(gmem_p0), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 68**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 69**: `    // deduced template argument`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 70**: `    auto gmem_p1 = cute::make_gmem_ptr(p);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 71**: `    static_assert(cute::is_same_v<decltype(gmem_p1), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 72**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 73**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 74**: `  // Test void* and void const* overloads`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 75**: `  // (these require an explicit template argument)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 76**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 77**: `    using T = float;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 78**: `    using expected_type = cute::gmem_ptr<T*>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 79**: `    void* p = nullptr;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 80**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 81**: `    auto gmem_p0 = cute::make_gmem_ptr<T>(p);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 82**: `    static_assert(cute::is_same_v<decltype(gmem_p0), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 83**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 84**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 85**: `    using T = float const;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 86**: `    using expected_type = cute::gmem_ptr<T*>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 87**: `    void const* p = nullptr;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 88**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 89**: `    auto gmem_p0 = cute::make_gmem_ptr<T>(p);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 90**: `    static_assert(cute::is_same_v<decltype(gmem_p0), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 91**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 92**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 93**: `  // Test nullptr_t overload.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 94**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 95**: `    using T = float;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 96**: `    using expected_type = cute::gmem_ptr<T*>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 97**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 98**: `    auto gmem_p0 = cute::make_gmem_ptr<T>(nullptr);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 99**: `    static_assert(cute::is_same_v<decltype(gmem_p0), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 100**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 101**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 102**: `    using T = float const;`
+  - EN: Creates alias `T` to simplify a verbose type or expression.
+  - CN: 创建别名 `T`，以简化较长的类型或表达式。
+- **Line 103**: `    using expected_type = cute::gmem_ptr<T*>;`
+  - EN: Creates alias `expected_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `expected_type`，以简化较长的类型或表达式。
+- **Line 104**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 105**: `    auto gmem_p0 = cute::make_gmem_ptr<T>(nullptr);`
+  - EN: Wraps a global-memory pointer so CuTe can bind it to a layout.
+  - CN: 包装全局内存指针，使 CuTe 能把它绑定到某个布局。
+- **Line 106**: `    static_assert(cute::is_same_v<decltype(gmem_p0), expected_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 107**: `  }`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 108**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `static_assert`
+  - EN: Checks a property at compile time before the binary can be produced.
+  - CN: 在生成二进制文件之前，于编译期检查某个性质。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/trace.h`
+  - EN: Provides tracing macros used to print intermediate values during tests.
+  - CN: 提供用于在测试中打印中间值的跟踪宏。
+- `cute/pointer.hpp`
+  - EN: Provides CuTe `pointer` functionality used by this file.
+  - CN: 提供该文件使用的 CuTe `pointer` 功能。

@@ -1,0 +1,515 @@
+# detail.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/experimental/distributed/device/detail.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Distributed gemm device layer helpers." and defines related CUTLASS facilities in `include/cutlass/experimental/distributed/device/detail.hpp`.
+- CN: 该头文件以注释摘要“Distributed gemm device layer helpers.”引入，并在 `include/cutlass/experimental/distributed/device/detail.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2024 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Distributed gemm device layer helpers.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L34**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L35**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L36**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L37**: <code>#include &quot;cute/layout.hpp&quot;</code>
+  - EN: Includes "cute/layout.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/layout.hpp"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;cute/tensor.hpp&quot;</code>
+  - EN: Includes "cute/tensor.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/tensor.hpp"，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>namespace cutlass::distributed::device::detail {</code>
+  - EN: Opens namespace `cutlass::distributed::device::detail` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::distributed::device::detail`，为后续声明提供作用域。
+- **L44**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>cutlass::Status check_cuda_status(cudaError_t status) {</code>
+  - EN: Starts the definition body for `check_cuda_status`.
+  - CN: 开始 `check_cuda_status` 的定义体。
+- **L47**: <code>  if (status != cudaSuccess) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L48**: <code>    auto result = cudaGetLastError();</code>
+  - EN: Declares the callable or operator `cudaGetLastError`.
+  - CN: 声明可调用对象或运算符 `cudaGetLastError`。
+- **L49**: <code>    CUTLASS_TRACE_HOST(&quot;  error message: &quot; &lt;&lt; cudaGetErrorString(result));</code>
+  - EN: Declares the callable or operator `CUTLASS_TRACE_HOST`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_TRACE_HOST`。
+- **L50**: <code>    return cutlass::Status::kErrorInternal;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L51**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L52**: <code>  return cutlass::Status::kSuccess;                   </code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L53**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L54**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L55**: <code>// DistGemmBufferHelper computes required buffer size and offsets for GEMM operands.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L56**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L57**: <code>  typename Tiler_, </code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L58**: <code>  typename ElementA_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L59**: <code>  typename ElementB_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L60**: <code>  typename ElementC_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L61**: <code>  typename ElementD_&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L62**: <code>struct DistGemmBufferHelper {</code>
+  - EN: Declares or defines the struct `DistGemmBufferHelper`.
+  - CN: 声明或定义 struct `DistGemmBufferHelper`。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>  using Tiler = Tiler_;</code>
+  - EN: Defines the alias `Tiler` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Tiler`。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>  using ElementA = ElementA_;</code>
+  - EN: Defines the alias `ElementA` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementA`。
+- **L67**: <code>  using ElementB = ElementB_;</code>
+  - EN: Defines the alias `ElementB` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementB`。
+- **L68**: <code>  using ElementC = ElementC_;</code>
+  - EN: Defines the alias `ElementC` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementC`。
+- **L69**: <code>  using ElementD = ElementD_;</code>
+  - EN: Defines the alias `ElementD` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementD`。
+- **L70**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L71**: <code>  static constexpr int NumBuffersA = Tiler::NumBuffersA;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L72**: <code>  static constexpr int NumBuffersB = Tiler::NumBuffersB;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L73**: <code>  static constexpr int NumBuffersC = Tiler::NumBuffersC;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L74**: <code>  static constexpr int NumBuffersD = Tiler::NumBuffersD;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L75**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L76**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L77**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L78**: <code>  get_buffer_size_a(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_size_a`.
+  - CN: 开始 `get_buffer_size_a` 的定义体。
+- **L79**: <code>    auto a_buffer_layout = cute::make_layout(</code>
+  - EN: Begins or continues the signature/parameter list for `make_layout`.
+  - CN: 开始或继续 `make_layout` 的签名/参数列表。
+- **L80**: <code>        cute::make_shape(NumBuffersA, Tiler::get_local_a_shape(problem_shape), sizeof(ElementA))</code>
+  - EN: Provides part of the signature or implementation for `make_shape`.
+  - CN: 提供 `make_shape` 的签名或实现的一部分。
+- **L81**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L82**: <code>    return size(a_buffer_layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L83**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L84**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L85**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L86**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L87**: <code>  get_buffer_size_b(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_size_b`.
+  - CN: 开始 `get_buffer_size_b` 的定义体。
+- **L88**: <code>    auto b_buffer_layout = cute::make_layout(</code>
+  - EN: Begins or continues the signature/parameter list for `make_layout`.
+  - CN: 开始或继续 `make_layout` 的签名/参数列表。
+- **L89**: <code>        cute::make_shape(NumBuffersB, Tiler::get_local_b_shape(problem_shape), sizeof(ElementB))</code>
+  - EN: Provides part of the signature or implementation for `make_shape`.
+  - CN: 提供 `make_shape` 的签名或实现的一部分。
+- **L90**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L91**: <code>    return size(b_buffer_layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L92**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L95**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L96**: <code>  get_buffer_size_c(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_size_c`.
+  - CN: 开始 `get_buffer_size_c` 的定义体。
+- **L97**: <code>    auto c_buffer_layout = cute::make_layout(</code>
+  - EN: Begins or continues the signature/parameter list for `make_layout`.
+  - CN: 开始或继续 `make_layout` 的签名/参数列表。
+- **L98**: <code>        cute::make_shape(NumBuffersC, Tiler::get_local_c_shape(problem_shape), sizeof(ElementC))</code>
+  - EN: Provides part of the signature or implementation for `make_shape`.
+  - CN: 提供 `make_shape` 的签名或实现的一部分。
+- **L99**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L100**: <code>    return size(c_buffer_layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L101**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L104**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L105**: <code>  get_buffer_size_d(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_size_d`.
+  - CN: 开始 `get_buffer_size_d` 的定义体。
+- **L106**: <code>    auto d_buffer_layout = cute::make_layout(</code>
+  - EN: Begins or continues the signature/parameter list for `make_layout`.
+  - CN: 开始或继续 `make_layout` 的签名/参数列表。
+- **L107**: <code>        cute::make_shape(NumBuffersD, Tiler::get_local_d_shape(problem_shape), sizeof(ElementD))</code>
+  - EN: Provides part of the signature or implementation for `make_shape`.
+  - CN: 提供 `make_shape` 的签名或实现的一部分。
+- **L108**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L109**: <code>    return size(d_buffer_layout);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L110**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L111**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L112**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L113**: <code>  static auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L114**: <code>  get_buffer_size(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_size`.
+  - CN: 开始 `get_buffer_size` 的定义体。
+- **L115**: <code>    size_t buffer_size = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L116**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L117**: <code>    if constexpr (NumBuffersA &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L118**: <code>      buffer_size += get_buffer_size_a(problem_shape);</code>
+  - EN: Declares the callable or operator `get_buffer_size_a`.
+  - CN: 声明可调用对象或运算符 `get_buffer_size_a`。
+- **L119**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L120**: <code>    if constexpr (NumBuffersB &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L121**: <code>      buffer_size += get_buffer_size_b(problem_shape);</code>
+  - EN: Declares the callable or operator `get_buffer_size_b`.
+  - CN: 声明可调用对象或运算符 `get_buffer_size_b`。
+- **L122**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L123**: <code>    if constexpr (NumBuffersC &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L124**: <code>      buffer_size += get_buffer_size_c(problem_shape);</code>
+  - EN: Declares the callable or operator `get_buffer_size_c`.
+  - CN: 声明可调用对象或运算符 `get_buffer_size_c`。
+- **L125**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L126**: <code>    if constexpr (NumBuffersD &gt; 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L127**: <code>      buffer_size += get_buffer_size_d(problem_shape);</code>
+  - EN: Declares the callable or operator `get_buffer_size_d`.
+  - CN: 声明可调用对象或运算符 `get_buffer_size_d`。
+- **L128**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L129**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L130**: <code>    return buffer_size;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L131**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L132**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L133**: <code>  // Buffer space: |  buffer_A  |  buffer_B  |  buffer_C  |  buffer_D  |</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L134**: <code>  // And buffer_{A,B,C,D}: |  iter 1  |  iter 2  | ... |  iter TP - 1 |</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L135**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L136**: <code>  static size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L137**: <code>  get_buffer_offset_A(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_offset_A`.
+  - CN: 开始 `get_buffer_offset_A` 的定义体。
+- **L138**: <code>    return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L139**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L140**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L141**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L142**: <code>  static size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L143**: <code>  get_buffer_offset_B(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_offset_B`.
+  - CN: 开始 `get_buffer_offset_B` 的定义体。
+- **L144**: <code>    return get_buffer_size_a(problem_shape);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L145**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L146**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L147**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L148**: <code>  static size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L149**: <code>  get_buffer_offset_C(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_offset_C`.
+  - CN: 开始 `get_buffer_offset_C` 的定义体。
+- **L150**: <code>    return get_buffer_size_a(problem_shape) + get_buffer_size_b(problem_shape);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L151**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L153**: <code>  template &lt;typename ProblemShape&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L154**: <code>  static size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L155**: <code>  get_buffer_offset_D(ProblemShape problem_shape) {</code>
+  - EN: Starts the definition body for `get_buffer_offset_D`.
+  - CN: 开始 `get_buffer_offset_D` 的定义体。
+- **L156**: <code>    return get_buffer_size_a(problem_shape) + get_buffer_size_b(problem_shape) + get_buffer_size_c(problem_shape);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L157**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L158**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L159**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L160**: <code>} // namespace cutlass::distributed::device::detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L161**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L162**: <code>///////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L163**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Symbol focus: `check_cuda_status` / 重点符号：`check_cuda_status`
+- Symbol focus: `cudaGetLastError` / 重点符号：`cudaGetLastError`
+- Symbol focus: `CUTLASS_TRACE_HOST` / 重点符号：`CUTLASS_TRACE_HOST`
+- Symbol focus: `DistGemmBufferHelper` / 重点符号：`DistGemmBufferHelper`
+- Symbol focus: `Tiler` / 重点符号：`Tiler`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cute/layout.hpp"`
+  - `"cute/tensor.hpp"`
+  - `"cutlass/cutlass.h"`

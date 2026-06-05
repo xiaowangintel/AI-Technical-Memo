@@ -1,0 +1,619 @@
+# distributed.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/distributed.py`
+
+## Purpose / 作用
+- EN: Defines 19 functions (atomicAdd, ld_bypass, multimem_red_release_gpu_add1, multimem_red_release_sys_add1, ... (+15 more)) in `CuTeDSL.cutlass.utils.distributed`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.distributed` 定义了 19 个函数（atomicAdd, ld_bypass, multimem_red_release_gpu_add1, multimem_red_release_sys_add1, ... (+15 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from functools import partial` — **EN:** Imports partial from `functools`. **CN:** 从 `functools` 导入 partial。
+- **L13** `from typing import Literal, Optional, Tuple, Type, Union` — **EN:** Imports Literal, Optional, Tuple, Type, Union from `typing`. **CN:** 从 `typing` 导入 Literal, Optional, Tuple, Type, Union。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L16** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L17** `from cutlass.cute.typing import Pointer, Int32` — **EN:** Imports Pointer, Int32 from `cutlass.cute.typing`. **CN:** 从 `cutlass.cute.typing` 导入 Pointer, Int32。
+- **L18** `from cutlass.cutlass_dsl import Numeric, T, dsl_user_op` — **EN:** Imports Numeric, T, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 Numeric, T, dsl_user_op。
+- **L19** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L20** `from cutlass._mlir.dialects import llvm` — **EN:** Imports llvm from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 llvm。
+- **L21** `from typing_extensions import deprecated` — **EN:** Imports deprecated from `typing_extensions`. **CN:** 从 `typing_extensions` 导入 deprecated。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L24** `    # Message Passing Lock & Unlock` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `    "multimem_red_add1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    "red_add1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    "spin_lock_atom_cas_relaxed_wait",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    "spin_lock_atom_cas_acquire_wait",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    "spin_lock_ld_lt_relaxed_wait",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    # Dispatch functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L31** `    "multimem_ld_reduce",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    "multimem_st",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    # Load & Store - 128-bit (16 bytes)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L34** `    "multimem_ld_reduce_8xf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    "multimem_ld_reduce_4xf32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    "multimem_ld_reduce_8xbf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    "multimem_ld_reduce_16xe4m3",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    "multimem_ld_reduce_16xe5m2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    # Load & Store - 64-bit (8 bytes)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L40** `    "multimem_ld_reduce_4xf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    "multimem_ld_reduce_2xf32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    "multimem_ld_reduce_4xbf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    "multimem_ld_reduce_8xe4m3",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    "multimem_ld_reduce_8xe5m2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    # Load & Store - 32-bit (4 bytes)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L46** `    "multimem_ld_reduce_2xf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    "multimem_ld_reduce_1xf32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    "multimem_ld_reduce_2xbf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    "multimem_ld_reduce_4xe4m3",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    "multimem_ld_reduce_4xe5m2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    # Store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L52** `    "multimem_st_4xb32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    "multimem_st_2xb32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    "multimem_st_1xb32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L58** `# Deprecated` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L59** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `@deprecated("atomicAdd is deprecated, use cute.arch.atomic_add instead")` — **EN:** Applies decorator `deprecated('atomicAdd is deprecated, use cute.arch.atomic...` to the following definition. **CN:** 将装饰器 `deprecated('atomicAdd is deprecated, use cute.arch.atomic...` 应用于后面的定义。
+- **L63** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L64** `def atomicAdd(` — **EN:** Defines function `atomicAdd`. **CN:** 定义函数 `atomicAdd`。
+- **L65** `    dst_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L66** `    val: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L67** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L68** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L70** `) -> Int32:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L71** `    return cute.arch.atomic_add(  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** `        ptr=dst_ptr.llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `        val=val,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `        sem="relaxed",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `        scope="sys",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `@deprecated(` — **EN:** Applies decorator `deprecated("ld_bypass is deprecated, use cute.arch.load w...` to the following definition. **CN:** 将装饰器 `deprecated("ld_bypass is deprecated, use cute.arch.load w...` 应用于后面的定义。
+- **L82** `    "ld_bypass is deprecated, use cute.arch.load with cop='cv' directly instead"` — **EN:** Applies decorator `deprecated("ld_bypass is deprecated, use cute.arch.load w...` to the following definition. **CN:** 将装饰器 `deprecated("ld_bypass is deprecated, use cute.arch.load w...` 应用于后面的定义。
+- **L83** `)` — **EN:** Applies decorator `deprecated("ld_bypass is deprecated, use cute.arch.load w...` to the following definition. **CN:** 将装饰器 `deprecated("ld_bypass is deprecated, use cute.arch.load w...` 应用于后面的定义。
+- **L84** `@cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L85** `def ld_bypass(input_tensor: cute.Tensor) -> cute.Tensor:` — **EN:** Defines function `ld_bypass`. **CN:** 定义函数 `ld_bypass`。
+- **L86** `    fragment = cute.make_rmem_tensor(input_tensor.layout, input_tensor.element_type)` — **EN:** Assigns a value to fragment. **CN:** 将一个值赋给 fragment。
+- **L87** `    copy_atom = cute.make_copy_atom(` — **EN:** Assigns a value to copy_atom. **CN:** 将一个值赋给 copy_atom。
+- **L88** `        cute.nvgpu.CopyUniversalOp(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `        input_tensor.element_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `        memory_order=cute.nvgpu.common.MemoryOrder.VOLATILE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `        memory_scope=cute.nvgpu.common.MemoryScope.SYS,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    cute.copy_atom_call(copy_atom, input_tensor, fragment)` — **EN:** Invokes `cute.copy_atom_call` as a standalone call. **CN:** 以独立语句方式调用 `cute.copy_atom_call`。
+- **L94** `    vals = fragment.load()` — **EN:** Assigns a value to vals. **CN:** 将一个值赋给 vals。
+- **L95** `    return vals` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L99** `# Message Passing Lock & Unlock` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L100** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L104** `def multimem_red_release_gpu_add1(` — **EN:** Defines function `multimem_red_release_gpu_add1`. **CN:** 定义函数 `multimem_red_release_gpu_add1`。
+- **L105** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L106** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L107** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L109** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L110** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L111** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        [lock_ptr.toint().ir_value(loc=loc, ip=ip)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        "multimem.red.release.gpu.global.add.s32 [$0], 1;",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        "l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L123** `def multimem_red_release_sys_add1(` — **EN:** Defines function `multimem_red_release_sys_add1`. **CN:** 定义函数 `multimem_red_release_sys_add1`。
+- **L124** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L128** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L129** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L130** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `        [lock_ptr.toint().ir_value(loc=loc, ip=ip)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        "multimem.red.release.sys.global.add.s32 [$0], 1;",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `        "l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L142** `def multimem_red_relaxed_gpu_add1(` — **EN:** Defines function `multimem_red_relaxed_gpu_add1`. **CN:** 定义函数 `multimem_red_relaxed_gpu_add1`。
+- **L143** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L147** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L148** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `        [lock_ptr.toint().ir_value(loc=loc, ip=ip)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `        "multimem.red.relaxed.gpu.global.add.s32 [$0], 1;",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `        "l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L160** `def multimem_red_relaxed_sys_add1(` — **EN:** Defines function `multimem_red_relaxed_sys_add1`. **CN:** 定义函数 `multimem_red_relaxed_sys_add1`。
+- **L161** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L162** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L163** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L164** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L165** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L166** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `        [lock_ptr.toint().ir_value(loc=loc, ip=ip)],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `        "multimem.red.relaxed.sys.global.add.s32 [$0], 1;",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `        "l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L178** `def multimem_red_add1(` — **EN:** Defines function `multimem_red_add1`. **CN:** 定义函数 `multimem_red_add1`。
+- **L179** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L180** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `    order: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L182** `    scope: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L183** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L184** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L186** `    """` — **EN:** Starts the docstring for the function `multimem_red_add1`. **CN:** 开始说明 function `multimem_red_add1` 的文档字符串。
+- **L187** `    add 1 to multicast ptr` — **EN:** Continues the docstring for the function `multimem_red_add1`. **CN:** 继续说明 function `multimem_red_add1` 的文档字符串。
+- **L188** `    """` — **EN:** Ends the docstring for the function `multimem_red_add1`. **CN:** 结束说明 function `multimem_red_add1` 的文档字符串。
+- **L189** `    if scope == "gpu":` — **EN:** Starts a conditional branch guarded by `scope == 'gpu'`. **CN:** 开始一个由 `scope == 'gpu'` 控制的条件分支。
+- **L190** `        if order == "release":` — **EN:** Starts a conditional branch guarded by `order == 'release'`. **CN:** 开始一个由 `order == 'release'` 控制的条件分支。
+- **L191** `            multimem_red_release_gpu_add1(lock_ptr=lock_ptr, loc=loc, ip=ip)` — **EN:** Invokes `multimem_red_release_gpu_add1` as a standalone call. **CN:** 以独立语句方式调用 `multimem_red_release_gpu_add1`。
+- **L192** `        elif order == "relaxed":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L193** `            multimem_red_relaxed_gpu_add1(lock_ptr=lock_ptr, loc=loc, ip=ip)` — **EN:** Invokes `multimem_red_relaxed_gpu_add1` as a standalone call. **CN:** 以独立语句方式调用 `multimem_red_relaxed_gpu_add1`。
+- **L194** `    elif scope == "sys":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L195** `        if order == "release":` — **EN:** Starts a conditional branch guarded by `order == 'release'`. **CN:** 开始一个由 `order == 'release'` 控制的条件分支。
+- **L196** `            multimem_red_release_sys_add1(lock_ptr=lock_ptr, loc=loc, ip=ip)` — **EN:** Invokes `multimem_red_release_sys_add1` as a standalone call. **CN:** 以独立语句方式调用 `multimem_red_release_sys_add1`。
+- **L197** `        elif order == "relaxed":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L198** `            multimem_red_relaxed_sys_add1(lock_ptr=lock_ptr, loc=loc, ip=ip)` — **EN:** Invokes `multimem_red_relaxed_sys_add1` as a standalone call. **CN:** 以独立语句方式调用 `multimem_red_relaxed_sys_add1`。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L202** `def red_add1(` — **EN:** Defines function `red_add1`. **CN:** 定义函数 `red_add1`。
+- **L203** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L204** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L205** `    order: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L206** `    scope: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L207** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L208** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L209** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L210** `    """` — **EN:** Starts the docstring for the function `red_add1`. **CN:** 开始说明 function `red_add1` 的文档字符串。
+- **L211** `    add 1 to unicast ptr` — **EN:** Continues the docstring for the function `red_add1`. **CN:** 继续说明 function `red_add1` 的文档字符串。
+- **L212** `    """` — **EN:** Ends the docstring for the function `red_add1`. **CN:** 结束说明 function `red_add1` 的文档字符串。
+- **L213** `    cute.arch.red(` — **EN:** Invokes `cute.arch.red` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.red`。
+- **L214** `        lock_ptr.llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `        Int32(1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `        op="add",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `        dtype="s32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `        sem=order,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `        scope=scope,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `@cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L226** `def spin_lock_atom_cas_relaxed_wait(` — **EN:** Defines function `spin_lock_atom_cas_relaxed_wait`. **CN:** 定义函数 `spin_lock_atom_cas_relaxed_wait`。
+- **L227** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `    expected_val: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `    reset_val: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `    scope: Literal["gpu", "sys"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L232** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L233** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L234** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L235** `    """` — **EN:** Starts the docstring for the function `spin_lock_atom_cas_relaxed_wait`. **CN:** 开始说明 function `spin_lock_atom_cas_relaxed_wait` 的文档字符串。
+- **L236** `    wait on a spin lock until the expected count is reached. Reset flag to reset_val if the expected count is reached.` — **EN:** Continues the docstring for the function `spin_lock_atom_cas_relaxed_wait`. **CN:** 继续说明 function `spin_lock_atom_cas_relaxed_wait` 的文档字符串。
+- **L237** `    """` — **EN:** Ends the docstring for the function `spin_lock_atom_cas_relaxed_wait`. **CN:** 结束说明 function `spin_lock_atom_cas_relaxed_wait` 的文档字符串。
+- **L238** `    result = 0` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L239** `    while result != expected_val:` — **EN:** Starts a while-loop guarded by `result != expected_val`. **CN:** 开始一个由 `result != expected_val` 控制的 while 循环。
+- **L240** `        result = cute.arch.atomic_cas(` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L241** `            ptr=lock_ptr.llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `            cmp=Int32(expected_val),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `            val=Int32(reset_val),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `            sem="relaxed",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `            scope=scope,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `@cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L252** `def spin_lock_atom_cas_acquire_wait(` — **EN:** Defines function `spin_lock_atom_cas_acquire_wait`. **CN:** 定义函数 `spin_lock_atom_cas_acquire_wait`。
+- **L253** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L254** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L255** `    expected_val: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L256** `    reset_val: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L257** `    scope: Literal["gpu", "sys"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L258** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L259** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L260** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L261** `    """` — **EN:** Starts the docstring for the function `spin_lock_atom_cas_acquire_wait`. **CN:** 开始说明 function `spin_lock_atom_cas_acquire_wait` 的文档字符串。
+- **L262** `    wait on a spin lock until the expected count is reached. Reset flag to reset_val if the expected count is reached.` — **EN:** Continues the docstring for the function `spin_lock_atom_cas_acquire_wait`. **CN:** 继续说明 function `spin_lock_atom_cas_acquire_wait` 的文档字符串。
+- **L263** `    """` — **EN:** Ends the docstring for the function `spin_lock_atom_cas_acquire_wait`. **CN:** 结束说明 function `spin_lock_atom_cas_acquire_wait` 的文档字符串。
+- **L264** `    result = 0` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L265** `    while result != expected_val:` — **EN:** Starts a while-loop guarded by `result != expected_val`. **CN:** 开始一个由 `result != expected_val` 控制的 while 循环。
+- **L266** `        result = cute.arch.atomic_cas(` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L267** `            ptr=lock_ptr.llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `            cmp=Int32(expected_val),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `            val=Int32(reset_val),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `            sem="acquire",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `            scope=scope,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L277** `@cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L278** `def spin_lock_ld_lt_relaxed_wait(` — **EN:** Defines function `spin_lock_ld_lt_relaxed_wait`. **CN:** 定义函数 `spin_lock_ld_lt_relaxed_wait`。
+- **L279** `    lock_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L281** `    expected_val: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L282** `    scope: Literal["gpu", "sys"],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L283** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L284** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L285** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L286** `    """` — **EN:** Starts the docstring for the function `spin_lock_ld_lt_relaxed_wait`. **CN:** 开始说明 function `spin_lock_ld_lt_relaxed_wait` 的文档字符串。
+- **L287** `    wait on a spin lock until the expected count is reached.` — **EN:** Continues the docstring for the function `spin_lock_ld_lt_relaxed_wait`. **CN:** 继续说明 function `spin_lock_ld_lt_relaxed_wait` 的文档字符串。
+- **L288** `    """` — **EN:** Ends the docstring for the function `spin_lock_ld_lt_relaxed_wait`. **CN:** 结束说明 function `spin_lock_ld_lt_relaxed_wait` 的文档字符串。
+- **L289** `    result = 0` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L290** `    while result < expected_val:` — **EN:** Starts a while-loop guarded by `result < expected_val`. **CN:** 开始一个由 `result < expected_val` 控制的 while 循环。
+- **L291** `        result = cute.arch.load(` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L292** `            lock_ptr.llvm_ptr,  # addr: Pointer to memory location` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `            Int32,  # dtype: Data type to load (Int32)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `            sem="relaxed",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `            scope=scope,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `            loc=loc,  # loc: Source location for debugging` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `            ip=ip,  # ip: Insertion point in IR` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L302** `# Multimem Load & Store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L303** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `# 128-bit (16 bytes) load-reduce base` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L307** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L308** `def multimem_ld_reduce_128bit_base(` — **EN:** Defines function `multimem_ld_reduce_128bit_base`. **CN:** 定义函数 `multimem_ld_reduce_128bit_base`。
+- **L309** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `    ptx_string: str = "",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `) -> Tuple[Int32, Int32, Int32, Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L315** `    mc_ptr_int = mc_ptr.toint(loc=loc, ip=ip).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to mc_ptr_int. **CN:** 将一个值赋给 mc_ptr_int。
+- **L316** `    return_struct = llvm.inline_asm(` — **EN:** Assigns a value to return_struct. **CN:** 将一个值赋给 return_struct。
+- **L317** `        ir.Type.parse("!llvm.struct<(i32,i32,i32,i32)>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `        [mc_ptr_int],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** `        ptx_string,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `        "=r,=r,=r,=r,l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `    return_regs = [llvm.extractvalue(T.i32(), return_struct, [i]) for i in range(4)]` — **EN:** Assigns a value to return_regs. **CN:** 将一个值赋给 return_regs。
+- **L327** `    return return_regs[0], return_regs[1], return_regs[2], return_regs[3]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `# 64-bit (8 bytes) load-reduce base` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L331** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L332** `def multimem_ld_reduce_64bit_base(` — **EN:** Defines function `multimem_ld_reduce_64bit_base`. **CN:** 定义函数 `multimem_ld_reduce_64bit_base`。
+- **L333** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L334** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L335** `    ptx_string: str = "",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L336** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L337** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L338** `) -> Tuple[Int32, Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L339** `    mc_ptr_int = mc_ptr.toint(loc=loc, ip=ip).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to mc_ptr_int. **CN:** 将一个值赋给 mc_ptr_int。
+- **L340** `    return_struct = llvm.inline_asm(` — **EN:** Assigns a value to return_struct. **CN:** 将一个值赋给 return_struct。
+- **L341** `        ir.Type.parse("!llvm.struct<(i32,i32)>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** `        [mc_ptr_int],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `        ptx_string,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `        "=r,=r,l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `    return_regs = [llvm.extractvalue(T.i32(), return_struct, [i]) for i in range(2)]` — **EN:** Assigns a value to return_regs. **CN:** 将一个值赋给 return_regs。
+- **L351** `    return return_regs[0], return_regs[1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `# 32-bit (4 bytes) load-reduce base` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L355** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L356** `def multimem_ld_reduce_32bit_base(` — **EN:** Defines function `multimem_ld_reduce_32bit_base`. **CN:** 定义函数 `multimem_ld_reduce_32bit_base`。
+- **L357** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L359** `    ptx_string: str = "",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L360** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L361** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L362** `) -> Tuple[Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L363** `    mc_ptr_int = mc_ptr.toint(loc=loc, ip=ip).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to mc_ptr_int. **CN:** 将一个值赋给 mc_ptr_int。
+- **L364** `    return_struct = llvm.inline_asm(` — **EN:** Assigns a value to return_struct. **CN:** 将一个值赋给 return_struct。
+- **L365** `        ir.Type.parse("!llvm.struct<(i32)>"),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `        [mc_ptr_int],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `        ptx_string,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `        "=r,l",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `    return_regs = [llvm.extractvalue(T.i32(), return_struct, [i]) for i in range(1)]` — **EN:** Assigns a value to return_regs. **CN:** 将一个值赋给 return_regs。
+- **L375** `    return (return_regs[0],)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `# 128-bit variants` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L379** `multimem_ld_reduce_8xf16 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_8xf16. **CN:** 将一个值赋给 multimem_ld_reduce_8xf16。
+- **L380** `    multimem_ld_reduce_128bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f32.v4.f16x2 {$0, $1, $2, $3}, [$4];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `multimem_ld_reduce_4xf32 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_4xf32. **CN:** 将一个值赋给 multimem_ld_reduce_4xf32。
+- **L384** `    multimem_ld_reduce_128bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `    ptx_string="multimem.ld_reduce.weak.global.add.v4.f32 {$0, $1, $2, $3}, [$4];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `multimem_ld_reduce_8xbf16 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_8xbf16. **CN:** 将一个值赋给 multimem_ld_reduce_8xbf16。
+- **L388** `    multimem_ld_reduce_128bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f32.v4.bf16x2 {$0, $1, $2, $3}, [$4];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** `multimem_ld_reduce_16xe4m3 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_16xe4m3. **CN:** 将一个值赋给 multimem_ld_reduce_16xe4m3。
+- **L392** `    multimem_ld_reduce_128bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f16.v4.e4m3x4 {$0, $1, $2, $3}, [$4];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `multimem_ld_reduce_16xe5m2 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_16xe5m2. **CN:** 将一个值赋给 multimem_ld_reduce_16xe5m2。
+- **L396** `    multimem_ld_reduce_128bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f16.v4.e5m2x4 {$0, $1, $2, $3}, [$4];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `# 64-bit variants` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L401** `multimem_ld_reduce_4xf16 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_4xf16. **CN:** 将一个值赋给 multimem_ld_reduce_4xf16。
+- **L402** `    multimem_ld_reduce_64bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f32.v2.f16x2 {$0, $1}, [$2];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** `multimem_ld_reduce_2xf32 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_2xf32. **CN:** 将一个值赋给 multimem_ld_reduce_2xf32。
+- **L406** `    multimem_ld_reduce_64bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** `    ptx_string="multimem.ld_reduce.weak.global.add.v2.f32 {$0, $1}, [$2];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L409** `multimem_ld_reduce_4xbf16 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_4xbf16. **CN:** 将一个值赋给 multimem_ld_reduce_4xbf16。
+- **L410** `    multimem_ld_reduce_64bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f32.v2.bf16x2 {$0, $1}, [$2];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `multimem_ld_reduce_8xe4m3 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_8xe4m3. **CN:** 将一个值赋给 multimem_ld_reduce_8xe4m3。
+- **L414** `    multimem_ld_reduce_64bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f16.v2.e4m3x4 {$0, $1}, [$2];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `multimem_ld_reduce_8xe5m2 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_8xe5m2. **CN:** 将一个值赋给 multimem_ld_reduce_8xe5m2。
+- **L418** `    multimem_ld_reduce_64bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f16.v2.e5m2x4 {$0, $1}, [$2];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** `# 32-bit variants` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L423** `multimem_ld_reduce_2xf16 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_2xf16. **CN:** 将一个值赋给 multimem_ld_reduce_2xf16。
+- **L424** `    multimem_ld_reduce_32bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f32.f16x2 {$0}, [$1];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `multimem_ld_reduce_1xf32 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_1xf32. **CN:** 将一个值赋给 multimem_ld_reduce_1xf32。
+- **L428** `    multimem_ld_reduce_32bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `    ptx_string="multimem.ld_reduce.weak.global.add.f32 {$0}, [$1];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `multimem_ld_reduce_2xbf16 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_2xbf16. **CN:** 将一个值赋给 multimem_ld_reduce_2xbf16。
+- **L432** `    multimem_ld_reduce_32bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f32.bf16x2 {$0}, [$1];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `multimem_ld_reduce_4xe4m3 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_4xe4m3. **CN:** 将一个值赋给 multimem_ld_reduce_4xe4m3。
+- **L436** `    multimem_ld_reduce_32bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f16.e4m3x4 {$0}, [$1];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `multimem_ld_reduce_4xe5m2 = partial(` — **EN:** Assigns a value to multimem_ld_reduce_4xe5m2. **CN:** 将一个值赋给 multimem_ld_reduce_4xe5m2。
+- **L440** `    multimem_ld_reduce_32bit_base,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `    ptx_string="multimem.ld_reduce.weak.global.add.acc::f16.e5m2x4 {$0}, [$1];",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L445** `# 128-bit store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L446** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L447** `def multimem_st_4xb32(` — **EN:** Defines function `multimem_st_4xb32`. **CN:** 定义函数 `multimem_st_4xb32`。
+- **L448** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L449** `    x: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L450** `    y: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L451** `    z: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L452** `    w: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L453** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L454** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L455** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L456** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L457** `    mc_ptr_int = mc_ptr.toint(loc=loc, ip=ip).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to mc_ptr_int. **CN:** 将一个值赋给 mc_ptr_int。
+- **L458** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L459** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `        [mc_ptr_int, x, y, z, w],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `        "multimem.st.weak.global.v4.f32 [$0], {$1, $2, $3, $4};",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L462** `        "l,r,r,r,r",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L470** `# 64-bit store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L471** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L472** `def multimem_st_2xb32(` — **EN:** Defines function `multimem_st_2xb32`. **CN:** 定义函数 `multimem_st_2xb32`。
+- **L473** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `    x: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L475** `    y: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L476** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L477** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L478** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L479** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L480** `    mc_ptr_int = mc_ptr.toint(loc=loc, ip=ip).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to mc_ptr_int. **CN:** 将一个值赋给 mc_ptr_int。
+- **L481** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L482** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `        [mc_ptr_int, x, y],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** `        "multimem.st.weak.global.v2.f32 [$0], {$1, $2};",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `        "l,r,r",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L490** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L491** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `# 32-bit store` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L494** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L495** `def multimem_st_1xb32(` — **EN:** Defines function `multimem_st_1xb32`. **CN:** 定义函数 `multimem_st_1xb32`。
+- **L496** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L497** `    x: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L498** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L499** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L500** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L501** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L502** `    mc_ptr_int = mc_ptr.toint(loc=loc, ip=ip).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to mc_ptr_int. **CN:** 将一个值赋给 mc_ptr_int。
+- **L503** `    llvm.inline_asm(` — **EN:** Invokes `llvm.inline_asm` as a standalone call. **CN:** 以独立语句方式调用 `llvm.inline_asm`。
+- **L504** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L505** `        [mc_ptr_int, x],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L506** `        "multimem.st.weak.global.f32 [$0], {$1};",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L507** `        "l,r",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L508** `        has_side_effects=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L509** `        asm_dialect=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L510** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L511** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L512** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L513** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L514** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L515** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L516** `# Dispatch Functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L517** `########################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L520** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L521** `def multimem_ld_reduce(` — **EN:** Defines function `multimem_ld_reduce`. **CN:** 定义函数 `multimem_ld_reduce`。
+- **L522** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L523** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L524** `    dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L525** `    num_elements: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L526** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L527** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L528** `) -> Union[Tuple[Int32, Int32, Int32, Int32], Tuple[Int32, Int32], Tuple[Int32]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L529** `    """` — **EN:** Starts the docstring for the function `multimem_ld_reduce`. **CN:** 开始说明 function `multimem_ld_reduce` 的文档字符串。
+- **L530** `    Dispatch to appropriate multimem_ld_reduce variant based on dtype and num_elements.` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `    Args:` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L533** `        mc_ptr: Multicast pointer to load from` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L534** `        dtype: Data type (e.g., cutlass.Float16, cutlass.Float32)` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L535** `        num_elements: Number of dtype elements to load (determines vector width)` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L536** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L537** `    Returns:` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L538** `        Tuple of registers (4 for 128-bit, 2 for 64-bit, 1 for 32-bit)` — **EN:** Continues the docstring for the function `multimem_ld_reduce`. **CN:** 继续说明 function `multimem_ld_reduce` 的文档字符串。
+- **L539** `    """` — **EN:** Ends the docstring for the function `multimem_ld_reduce`. **CN:** 结束说明 function `multimem_ld_reduce` 的文档字符串。
+- **L540** `    if dtype == cutlass.Float16:` — **EN:** Starts a conditional branch guarded by `dtype == cutlass.Float16`. **CN:** 开始一个由 `dtype == cutlass.Float16` 控制的条件分支。
+- **L541** `        if num_elements == 8:` — **EN:** Starts a conditional branch guarded by `num_elements == 8`. **CN:** 开始一个由 `num_elements == 8` 控制的条件分支。
+- **L542** `            return multimem_ld_reduce_8xf16(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L543** `        elif num_elements == 4:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L544** `            return multimem_ld_reduce_4xf16(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L545** `        elif num_elements == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L546** `            return multimem_ld_reduce_2xf16(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L547** `    elif dtype == cutlass.Float32:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L548** `        if num_elements == 4:` — **EN:** Starts a conditional branch guarded by `num_elements == 4`. **CN:** 开始一个由 `num_elements == 4` 控制的条件分支。
+- **L549** `            return multimem_ld_reduce_4xf32(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L550** `        elif num_elements == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L551** `            return multimem_ld_reduce_2xf32(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L552** `        elif num_elements == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L553** `            return multimem_ld_reduce_1xf32(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L554** `    elif dtype == cutlass.BFloat16:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L555** `        if num_elements == 8:` — **EN:** Starts a conditional branch guarded by `num_elements == 8`. **CN:** 开始一个由 `num_elements == 8` 控制的条件分支。
+- **L556** `            return multimem_ld_reduce_8xbf16(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L557** `        elif num_elements == 4:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L558** `            return multimem_ld_reduce_4xbf16(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L559** `        elif num_elements == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L560** `            return multimem_ld_reduce_2xbf16(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L561** `    elif dtype == cutlass.Float8E4M3FN:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L562** `        if num_elements == 16:` — **EN:** Starts a conditional branch guarded by `num_elements == 16`. **CN:** 开始一个由 `num_elements == 16` 控制的条件分支。
+- **L563** `            return multimem_ld_reduce_16xe4m3(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L564** `        elif num_elements == 8:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L565** `            return multimem_ld_reduce_8xe4m3(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L566** `        elif num_elements == 4:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L567** `            return multimem_ld_reduce_4xe4m3(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L568** `    elif dtype == cutlass.Float8E5M2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L569** `        if num_elements == 16:` — **EN:** Starts a conditional branch guarded by `num_elements == 16`. **CN:** 开始一个由 `num_elements == 16` 控制的条件分支。
+- **L570** `            return multimem_ld_reduce_16xe5m2(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L571** `        elif num_elements == 8:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L572** `            return multimem_ld_reduce_8xe5m2(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L573** `        elif num_elements == 4:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L574** `            return multimem_ld_reduce_4xe5m2(mc_ptr, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L575** `    raise ValueError(f"Unsupported dtype={dtype}, num_elements={num_elements}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L579** `def multimem_st(` — **EN:** Defines function `multimem_st`. **CN:** 定义函数 `multimem_st`。
+- **L580** `    mc_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L581** `    *regs: Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L582** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L583** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L584** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L585** `    """` — **EN:** Starts the docstring for the function `multimem_st`. **CN:** 开始说明 function `multimem_st` 的文档字符串。
+- **L586** `    Dispatch to appropriate multimem_st variant based on number of registers.` — **EN:** Continues the docstring for the function `multimem_st`. **CN:** 继续说明 function `multimem_st` 的文档字符串。
+- **L587** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L588** `    Args:` — **EN:** Continues the docstring for the function `multimem_st`. **CN:** 继续说明 function `multimem_st` 的文档字符串。
+- **L589** `        mc_ptr: Multicast pointer to store to` — **EN:** Continues the docstring for the function `multimem_st`. **CN:** 继续说明 function `multimem_st` 的文档字符串。
+- **L590** `        *regs: 1, 2, or 4 Int32 registers to store` — **EN:** Continues the docstring for the function `multimem_st`. **CN:** 继续说明 function `multimem_st` 的文档字符串。
+- **L591** `    """` — **EN:** Ends the docstring for the function `multimem_st`. **CN:** 结束说明 function `multimem_st` 的文档字符串。
+- **L592** `    num_regs = len(regs)` — **EN:** Assigns a value to num_regs. **CN:** 将一个值赋给 num_regs。
+- **L593** `    if num_regs == 4:` — **EN:** Starts a conditional branch guarded by `num_regs == 4`. **CN:** 开始一个由 `num_regs == 4` 控制的条件分支。
+- **L594** `        multimem_st_4xb32(mc_ptr, regs[0], regs[1], regs[2], regs[3], loc=loc, ip=ip)` — **EN:** Invokes `multimem_st_4xb32` as a standalone call. **CN:** 以独立语句方式调用 `multimem_st_4xb32`。
+- **L595** `    elif num_regs == 2:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L596** `        multimem_st_2xb32(mc_ptr, regs[0], regs[1], loc=loc, ip=ip)` — **EN:** Invokes `multimem_st_2xb32` as a standalone call. **CN:** 以独立语句方式调用 `multimem_st_2xb32`。
+- **L597** `    elif num_regs == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L598** `        multimem_st_1xb32(mc_ptr, regs[0], loc=loc, ip=ip)` — **EN:** Invokes `multimem_st_1xb32` as a standalone call. **CN:** 以独立语句方式调用 `multimem_st_1xb32`。
+- **L599** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L600** `        raise ValueError(f"Unsupported number of registers: {num_regs}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.distributed`. CN: 模块名为 `CuTeDSL.cutlass.utils.distributed`。
+- EN: Top-level functions: atomicAdd, ld_bypass, multimem_red_release_gpu_add1, multimem_red_release_sys_add1, multimem_red_relaxed_gpu_add1, multimem_red_relaxed_sys_add1, multimem_red_add1, red_add1, spin_lock_atom_cas_relaxed_wait, spin_lock_atom_cas_acquire_wait, spin_lock_ld_lt_relaxed_wait, multimem_ld_reduce_128bit_base, ... (+7 more) CN: 顶层函数包括：atomicAdd, ld_bypass, multimem_red_release_gpu_add1, multimem_red_release_sys_add1, multimem_red_relaxed_gpu_add1, multimem_red_relaxed_sys_add1, multimem_red_add1, red_add1, spin_lock_atom_cas_relaxed_wait, spin_lock_atom_cas_acquire_wait, spin_lock_ld_lt_relaxed_wait, multimem_ld_reduce_128bit_base, ... (+7 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass, cutlass.cute, cutlass.cute.typing:Pointer,Int32, cutlass.cutlass_dsl:Numeric,T,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:llvm CN: 内部依赖：cutlass, cutlass.cute, cutlass.cute.typing:Pointer,Int32, cutlass.cutlass_dsl:Numeric,T,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:llvm
+- EN: External or standard-library dependencies: functools:partial, typing:Literal,Optional,Tuple,Type,Union, typing_extensions:deprecated CN: 外部或标准库依赖：functools:partial, typing:Literal,Optional,Tuple,Type,Union, typing_extensions:deprecated

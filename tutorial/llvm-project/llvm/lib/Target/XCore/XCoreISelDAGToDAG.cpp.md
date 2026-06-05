@@ -1,0 +1,408 @@
+# XCoreISelDAGToDAG.cpp — Code Analysis / 代码分析
+
+## Source / 来源
+- **File / 文件**: `llvm/lib/Target/XCore/XCoreISelDAGToDAG.cpp`
+- **Repository / 仓库**: `llvm-project`
+- **Purpose / 作用**:
+  - **EN**: Implements DAG-to-DAG instruction selection that turns legalized SelectionDAG nodes into target machine instructions.
+  - **CN**: 实现 DAG-to-DAG 指令选择，把合法化后的 SelectionDAG 节点转换为目标机器指令。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-7
+```cpp
+//===-- XCoreISelDAGToDAG.cpp - A dag to dag inst selector for XCore ------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+```
+- **EN**: Contains the standard LLVM file banner, license notice, and high-level file description.
+- **CN**: 包含 LLVM 标准文件头、许可证声明以及该文件的高层说明。
+
+### Lines 8-21
+```cpp
+//
+// This file defines an instruction selector for the XCore target.
+//
+//===----------------------------------------------------------------------===//
+
+#include "XCore.h"
+#include "XCoreTargetMachine.h"
+#include "llvm/CodeGen/MachineFrameInfo.h"
+#include "llvm/CodeGen/MachineFunction.h"
+#include "llvm/CodeGen/SelectionDAG.h"
+#include "llvm/CodeGen/SelectionDAGISel.h"
+#include "llvm/CodeGen/TargetLowering.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/Function.h"
+```
+- **EN**: Pulls in the headers needed for this implementation, including `XCore.h`, `XCoreTargetMachine.h`, `llvm/CodeGen/MachineFrameInfo.h`, `llvm/CodeGen/MachineFunction.h`.
+- **CN**: 引入该实现所需的头文件，其中包括 `XCore.h`, `XCoreTargetMachine.h`, `llvm/CodeGen/MachineFrameInfo.h`, `llvm/CodeGen/MachineFunction.h`。
+
+### Lines 22-30
+```cpp
+#include "llvm/IR/Intrinsics.h"
+#include "llvm/IR/IntrinsicsXCore.h"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/Support/ErrorHandling.h"
+using namespace llvm;
+
+#define DEBUG_TYPE "xcore-isel"
+#define PASS_NAME "XCore DAG->DAG Pattern Instruction Selection"
+
+```
+- **EN**: Pulls in the headers needed for this implementation, including `llvm/IR/Intrinsics.h`, `llvm/IR/IntrinsicsXCore.h`, `llvm/IR/LLVMContext.h`, `llvm/Support/ErrorHandling.h`.
+- **CN**: 引入该实现所需的头文件，其中包括 `llvm/IR/Intrinsics.h`, `llvm/IR/IntrinsicsXCore.h`, `llvm/IR/LLVMContext.h`, `llvm/Support/ErrorHandling.h`。
+
+### Lines 31-39
+```cpp
+/// XCoreDAGToDAGISel - XCore specific code to select XCore machine
+/// instructions for SelectionDAG operations.
+///
+namespace {
+  class XCoreDAGToDAGISel : public SelectionDAGISel {
+
+  public:
+    XCoreDAGToDAGISel() = delete;
+
+```
+- **EN**: Introduces declarations for `XCoreDAGToDAGISel`, defining the data structures or interfaces used later in the file.
+- **CN**: 引入 `XCoreDAGToDAGISel` 等声明，定义本文件后续使用的数据结构或接口。
+
+### Lines 40-46
+```cpp
+    XCoreDAGToDAGISel(XCoreTargetMachine &TM, CodeGenOptLevel OptLevel)
+        : SelectionDAGISel(TM, OptLevel) {}
+
+    void Select(SDNode *N) override;
+    bool tryBRIND(SDNode *N);
+
+    /// getI32Imm - Return a target constant with the specified value, of type
+```
+- **EN**: Implements logic around `XCoreDAGToDAGISel`, `SelectionDAGISel`, `Select`, `tryBRIND`; this block returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `XCoreDAGToDAGISel`, `SelectionDAGISel`, `Select`, `tryBRIND` 实现具体逻辑；这一段返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 47-60
+```cpp
+    /// i32.
+    inline SDValue getI32Imm(unsigned Imm, const SDLoc &dl) {
+      return CurDAG->getTargetConstant(Imm, dl, MVT::i32);
+    }
+
+    inline bool immMskBitp(SDNode *inN) const {
+      ConstantSDNode *N = cast<ConstantSDNode>(inN);
+      uint32_t value = (uint32_t)N->getZExtValue();
+      if (!isMask_32(value)) {
+        return false;
+      }
+      int msksize = llvm::bit_width(value);
+      return (msksize >= 1 && msksize <= 8) ||
+              msksize == 16 || msksize == 24 || msksize == 32;
+```
+- **EN**: Implements logic around `getI32Imm`, `getTargetConstant`, `immMskBitp`, `cast<ConstantSDNode>`, ...; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `getI32Imm`, `getTargetConstant`, `immMskBitp`, `cast<ConstantSDNode>`, ... 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 61-69
+```cpp
+    }
+
+    // Complex Pattern Selectors.
+    bool SelectADDRspii(SDValue Addr, SDValue &Base, SDValue &Offset);
+
+    bool SelectInlineAsmMemoryOperand(const SDValue &Op,
+                                      InlineAsm::ConstraintCode ConstraintID,
+                                      std::vector<SDValue> &OutOps) override;
+
+```
+- **EN**: Implements logic around `SelectADDRspii`, `SelectInlineAsmMemoryOperand`; this block handles SelectionDAG-specific logic.
+- **CN**: 围绕 `SelectADDRspii`, `SelectInlineAsmMemoryOperand` 实现具体逻辑；这一段处理 SelectionDAG 专用逻辑。
+
+### Lines 70-83
+```cpp
+    // Include the pieces autogenerated from the target description.
+  #include "XCoreGenDAGISel.inc"
+  };
+
+  class XCoreDAGToDAGISelLegacy : public SelectionDAGISelLegacy {
+  public:
+    static char ID;
+    explicit XCoreDAGToDAGISelLegacy(XCoreTargetMachine &TM,
+                                     CodeGenOptLevel OptLevel)
+        : SelectionDAGISelLegacy(
+              ID, std::make_unique<XCoreDAGToDAGISel>(TM, OptLevel)) {}
+  };
+}  // end anonymous namespace
+
+```
+- **EN**: Pulls in the headers needed for this implementation, including `XCoreGenDAGISel.inc`.
+- **CN**: 引入该实现所需的头文件，其中包括 `XCoreGenDAGISel.inc`。
+
+### Lines 84-90
+```cpp
+char XCoreDAGToDAGISelLegacy::ID = 0;
+
+INITIALIZE_PASS(XCoreDAGToDAGISelLegacy, DEBUG_TYPE, PASS_NAME, false, false)
+
+/// createXCoreISelDag - This pass converts a legalized DAG into a
+/// XCore-specific DAG, ready for instruction scheduling.
+///
+```
+- **EN**: Implements logic around `INITIALIZE_PASS`; this block handles SelectionDAG-specific logic.
+- **CN**: 围绕 `INITIALIZE_PASS` 实现具体逻辑；这一段处理 SelectionDAG 专用逻辑。
+
+### Lines 91-104
+```cpp
+FunctionPass *llvm::createXCoreISelDag(XCoreTargetMachine &TM,
+                                       CodeGenOptLevel OptLevel) {
+  return new XCoreDAGToDAGISelLegacy(TM, OptLevel);
+}
+
+bool XCoreDAGToDAGISel::SelectADDRspii(SDValue Addr, SDValue &Base,
+                                       SDValue &Offset) {
+  FrameIndexSDNode *FIN = nullptr;
+  if ((FIN = dyn_cast<FrameIndexSDNode>(Addr))) {
+    Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+    Offset = CurDAG->getTargetConstant(0, SDLoc(Addr), MVT::i32);
+    return true;
+  }
+  if (Addr.getOpcode() == ISD::ADD) {
+```
+- **EN**: Implements logic around `createXCoreISelDag`, `XCoreDAGToDAGISelLegacy`, `SelectADDRspii`, `getTargetFrameIndex`, ...; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `createXCoreISelDag`, `XCoreDAGToDAGISelLegacy`, `SelectADDRspii`, `getTargetFrameIndex`, ... 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 105-118
+```cpp
+    ConstantSDNode *CN = nullptr;
+    if ((FIN = dyn_cast<FrameIndexSDNode>(Addr.getOperand(0)))
+      && (CN = dyn_cast<ConstantSDNode>(Addr.getOperand(1)))
+      && (CN->getSExtValue() % 4 == 0 && CN->getSExtValue() >= 0)) {
+      // Constant positive word offset from frame index
+      Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), MVT::i32);
+      Offset = CurDAG->getTargetConstant(CN->getSExtValue(), SDLoc(Addr),
+                                         MVT::i32);
+      return true;
+    }
+  }
+  return false;
+}
+
+```
+- **EN**: Implements logic around `dyn_cast<ConstantSDNode>`, `getSExtValue`, `getTargetFrameIndex`, `getTargetConstant`; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `dyn_cast<ConstantSDNode>`, `getSExtValue`, `getTargetFrameIndex`, `getTargetConstant` 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 119-132
+```cpp
+bool XCoreDAGToDAGISel::SelectInlineAsmMemoryOperand(
+    const SDValue &Op, InlineAsm::ConstraintCode ConstraintID,
+    std::vector<SDValue> &OutOps) {
+  SDValue Reg;
+  switch (ConstraintID) {
+  default: return true;
+  case InlineAsm::ConstraintCode::m: // Memory.
+    switch (Op.getOpcode()) {
+    default: return true;
+    case XCoreISD::CPRelativeWrapper:
+      Reg = CurDAG->getRegister(XCore::CP, MVT::i32);
+      break;
+    case XCoreISD::DPRelativeWrapper:
+      Reg = CurDAG->getRegister(XCore::DP, MVT::i32);
+```
+- **EN**: Implements logic around `SelectInlineAsmMemoryOperand`, `getRegister`; this block uses `switch`-based dispatch; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `SelectInlineAsmMemoryOperand`, `getRegister` 实现具体逻辑；这一段使用 `switch` 分派，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 133-140
+```cpp
+      break;
+    }
+  }
+  OutOps.push_back(Reg);
+  OutOps.push_back(Op.getOperand(0));
+  return false;
+}
+
+```
+- **EN**: Implements logic around `push_back`; this block returns target-specific results.
+- **CN**: 围绕 `push_back` 实现具体逻辑；这一段返回目标相关结果。
+
+### Lines 141-154
+```cpp
+void XCoreDAGToDAGISel::Select(SDNode *N) {
+  SDLoc dl(N);
+  switch (N->getOpcode()) {
+  default: break;
+  case ISD::Constant: {
+    uint64_t Val = N->getAsZExtVal();
+    if (immMskBitp(N)) {
+      // Transformation function: get the size of a mask
+      // Look for the first non-zero bit
+      SDValue MskSize = getI32Imm(llvm::bit_width((uint32_t)Val), dl);
+      ReplaceNode(
+          N, CurDAG->getMachineNode(XCore::MKMSK_rus, dl, MVT::i32, MskSize));
+      return;
+    }
+```
+- **EN**: Implements logic around `Select`, `dl`, `getAsZExtVal`, `getI32Imm`, ...; this block uses `switch`-based dispatch; applies conditional target rules; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `Select`, `dl`, `getAsZExtVal`, `getI32Imm`, ... 实现具体逻辑；这一段使用 `switch` 分派，应用条件化的目标规则，处理 SelectionDAG 专用逻辑。
+
+### Lines 155-168
+```cpp
+    else if (!isUInt<16>(Val)) {
+      SDValue CPIdx = CurDAG->getTargetConstantPool(
+          ConstantInt::get(Type::getInt32Ty(*CurDAG->getContext()), Val),
+          getTargetLowering()->getPointerTy(CurDAG->getDataLayout()));
+      SDNode *node = CurDAG->getMachineNode(XCore::LDWCP_lru6, dl, MVT::i32,
+                                            MVT::Other, CPIdx,
+                                            CurDAG->getEntryNode());
+      MachineMemOperand *MemOp =
+          MF->getMachineMemOperand(MachinePointerInfo::getConstantPool(*MF),
+                                   MachineMemOperand::MOLoad, 4, Align(4));
+      CurDAG->setNodeMemRefs(cast<MachineSDNode>(node), {MemOp});
+      ReplaceNode(N, node);
+      return;
+    }
+```
+- **EN**: Implements logic around `getTargetConstantPool`, `get`, `getTargetLowering`, `getMachineNode`, ...; this block applies conditional target rules; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `getTargetConstantPool`, `get`, `getTargetLowering`, `getMachineNode`, ... 实现具体逻辑；这一段应用条件化的目标规则，处理 SelectionDAG 专用逻辑。
+
+### Lines 169-179
+```cpp
+    break;
+  }
+  case ISD::BRIND:
+    if (tryBRIND(N))
+      return;
+    break;
+  // Other cases are autogenerated.
+  }
+  SelectCode(N);
+}
+
+```
+- **EN**: Implements logic around `SelectCode`; this block applies conditional target rules; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `SelectCode` 实现具体逻辑；这一段应用条件化的目标规则，处理 SelectionDAG 专用逻辑。
+
+### Lines 180-193
+```cpp
+/// Given a chain return a new chain where any appearance of Old is replaced
+/// by New. There must be at most one instruction between Old and Chain and
+/// this instruction must be a TokenFactor. Returns an empty SDValue if
+/// these conditions don't hold.
+static SDValue
+replaceInChain(SelectionDAG *CurDAG, SDValue Chain, SDValue Old, SDValue New)
+{
+  if (Chain == Old)
+    return New;
+  if (Chain->getOpcode() != ISD::TokenFactor)
+    return SDValue();
+  SmallVector<SDValue, 8> Ops;
+  bool found = false;
+  for (unsigned i = 0, e = Chain->getNumOperands(); i != e; ++i) {
+```
+- **EN**: Implements logic around `replaceInChain`, `SDValue`; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `replaceInChain`, `SDValue` 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 194-205
+```cpp
+    if (Chain->getOperand(i) == Old) {
+      Ops.push_back(New);
+      found = true;
+    } else {
+      Ops.push_back(Chain->getOperand(i));
+    }
+  }
+  if (!found)
+    return SDValue();
+  return CurDAG->getNode(ISD::TokenFactor, SDLoc(Chain), MVT::Other, Ops);
+}
+
+```
+- **EN**: Implements logic around `push_back`, `SDValue`, `getNode`; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `push_back`, `SDValue`, `getNode` 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 206-219
+```cpp
+bool XCoreDAGToDAGISel::tryBRIND(SDNode *N) {
+  SDLoc dl(N);
+  // (brind (int_xcore_checkevent (addr)))
+  SDValue Chain = N->getOperand(0);
+  SDValue Addr = N->getOperand(1);
+  if (Addr->getOpcode() != ISD::INTRINSIC_W_CHAIN)
+    return false;
+  unsigned IntNo = Addr->getConstantOperandVal(1);
+  if (IntNo != Intrinsic::xcore_checkevent)
+    return false;
+  SDValue nextAddr = Addr->getOperand(2);
+  SDValue CheckEventChainOut(Addr.getNode(), 1);
+  if (!CheckEventChainOut.use_empty()) {
+    // If the chain out of the checkevent intrinsic is an operand of the
+```
+- **EN**: Implements logic around `tryBRIND`, `dl`, `getOperand`, `getConstantOperandVal`, ...; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `tryBRIND`, `dl`, `getOperand`, `getConstantOperandVal`, ... 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 220-233
+```cpp
+    // indirect branch or used in a TokenFactor which is the operand of the
+    // indirect branch then build a new chain which uses the chain coming into
+    // the checkevent intrinsic instead.
+    SDValue CheckEventChainIn = Addr->getOperand(0);
+    SDValue NewChain = replaceInChain(CurDAG, Chain, CheckEventChainOut,
+                                      CheckEventChainIn);
+    if (!NewChain.getNode())
+      return false;
+    Chain = NewChain;
+  }
+  // Enable events on the thread using setsr 1 and then disable them immediately
+  // after with clrsr 1. If any resources owned by the thread are ready an event
+  // will be taken. If no resource is ready we branch to the address which was
+  // the operand to the checkevent intrinsic.
+```
+- **EN**: Implements logic around `getOperand`, `replaceInChain`; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `getOperand`, `replaceInChain` 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 234-247
+```cpp
+  SDValue constOne = getI32Imm(1, dl);
+  SDValue Glue =
+    SDValue(CurDAG->getMachineNode(XCore::SETSR_branch_u6, dl, MVT::Glue,
+                                   constOne, Chain), 0);
+  Glue =
+    SDValue(CurDAG->getMachineNode(XCore::CLRSR_branch_u6, dl, MVT::Glue,
+                                   constOne, Glue), 0);
+  if (nextAddr->getOpcode() == XCoreISD::PCRelativeWrapper &&
+      nextAddr->getOperand(0)->getOpcode() == ISD::TargetBlockAddress) {
+    CurDAG->SelectNodeTo(N, XCore::BRFU_lu6, MVT::Other,
+                         nextAddr->getOperand(0), Glue);
+    return true;
+  }
+  CurDAG->SelectNodeTo(N, XCore::BAU_1r, MVT::Other, nextAddr, Glue);
+```
+- **EN**: Implements logic around `getI32Imm`, `SDValue`, `getOperand`, `SelectNodeTo`; this block applies conditional target rules; returns target-specific results; handles SelectionDAG-specific logic.
+- **CN**: 围绕 `getI32Imm`, `SDValue`, `getOperand`, `SelectNodeTo` 实现具体逻辑；这一段应用条件化的目标规则，返回目标相关结果，处理 SelectionDAG 专用逻辑。
+
+### Lines 248-249
+```cpp
+  return true;
+}
+```
+- **EN**: Contains supporting implementation details for the surrounding backend logic.
+- **CN**: 包含周边后端逻辑所需的辅助实现细节。
+
+## Key Concepts / 关键概念
+
+- **Instruction selection / 指令选择**:
+  - **EN**: Matches legalized DAG nodes to concrete machine instructions
+  - **CN**: 把合法化后的 DAG 节点匹配为具体机器指令
+- **DAG legalization / DAG 合法化**:
+  - **EN**: Explains how generic IR-style operations are rewritten for this target
+  - **CN**: 说明如何把通用操作改写为该目标可接受的形式
+- **Machine-level codegen / 机器级代码生成**:
+  - **EN**: Operates after instruction selection on machine instructions and blocks
+  - **CN**: 在指令选择后处理机器指令与基本块
+
+## Dependencies / 依赖关系
+
+- **Direct includes / 直接包含**: `XCore.h`, `XCoreTargetMachine.h`, `llvm/CodeGen/MachineFrameInfo.h`, `llvm/CodeGen/MachineFunction.h`, `llvm/CodeGen/SelectionDAG.h`, `llvm/CodeGen/SelectionDAGISel.h`, `llvm/CodeGen/TargetLowering.h`, `llvm/IR/Constants.h`, `llvm/IR/Function.h`, `llvm/IR/Intrinsics.h`, `llvm/IR/IntrinsicsXCore.h`, `llvm/IR/LLVMContext.h` ... (+2 more)
+- **LLVM subsystems / LLVM 子系统**: CodeGen, IR, Support

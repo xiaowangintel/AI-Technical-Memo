@@ -1,0 +1,685 @@
+# conftest.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/examples/CuTeDSL/conftest.py`
+**Purpose / 用途**: This file provides shared pytest configuration, fixtures, and collection behavior for `test/examples/CuTeDSL`. / 该文件为 `test/examples/CuTeDSL` 提供共享的 pytest 配置、fixture 与收集行为。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `import os`
+  - EN: Imports `os` so its symbols are available to the test module.
+  - CN: 导入 `os`，使其符号可供该测试模块使用。
+- **Line 30 / 第30行**
+  - Code / 代码: `import sys`
+  - EN: Imports `sys` so its symbols are available to the test module.
+  - CN: 导入 `sys`，使其符号可供该测试模块使用。
+- **Line 31 / 第31行**
+  - Code / 代码: `from pathlib import Path`
+  - EN: Imports selected symbols from `pathlib` for later use.
+  - CN: 从 `pathlib` 导入选定符号以供后续使用。
+- **Line 32 / 第32行**
+  - Code / 代码: `import logging`
+  - EN: Imports `logging` so its symbols are available to the test module.
+  - CN: 导入 `logging`，使其符号可供该测试模块使用。
+- **Line 33 / 第33行**
+  - Code / 代码: `import hashlib`
+  - EN: Imports `hashlib` so its symbols are available to the test module.
+  - CN: 导入 `hashlib`，使其符号可供该测试模块使用。
+- **Line 34 / 第34行**
+  - Code / 代码: `import random`
+  - EN: Imports `random` so its symbols are available to the test module.
+  - CN: 导入 `random`，使其符号可供该测试模块使用。
+- **Line 35 / 第35行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 36 / 第36行**
+  - Code / 代码: `import pytest`
+  - EN: Imports `pytest` so its symbols are available to the test module.
+  - CN: 导入 `pytest`，使其符号可供该测试模块使用。
+- **Line 37 / 第37行**
+  - Code / 代码: `import torch`
+  - EN: Imports `torch` so its symbols are available to the test module.
+  - CN: 导入 `torch`，使其符号可供该测试模块使用。
+- **Line 38 / 第38行**
+  - Code / 代码: `import numpy as np`
+  - EN: Imports `numpy` so its symbols are available to the test module.
+  - CN: 导入 `numpy`，使其符号可供该测试模块使用。
+- **Line 39 / 第39行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 40 / 第40行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 41 / 第41行**
+  - Code / 代码: `project_root = Path(__file__).resolve().parent.parent.parent.parent`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 42 / 第42行**
+  - Code / 代码: `example_path = project_root / "examples" / "python" / "CuTeDSL"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 43 / 第43行**
+  - Code / 代码: `utils_path = project_root / "test" / "utils"`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 44 / 第44行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 45 / 第45行**
+  - Code / 代码: `# Import cutlass *before* adding example_path to sys.path.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 46 / 第46行**
+  - Code / 代码: `# The examples directory contains a \`jax/\` subdirectory that Python 3 treats`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 47 / 第47行**
+  - Code / 代码: `# as a namespace package.  If that directory is on sys.path first, cutlass's`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 48 / 第48行**
+  - Code / 代码: `# JAX-availability check (which does a bare \`import jax\`) incorrectly returns`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 49 / 第49行**
+  - Code / 代码: `# True, and the subsequent \`import jax.numpy\` fails with ModuleNotFoundError.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 50 / 第50行**
+  - Code / 代码: `# Importing cutlass here, while sys.path is still clean, avoids that race.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 51 / 第51行**
+  - Code / 代码: `import cutlass  # noqa: E402  (intentional early import)`
+  - EN: Imports `cutlass` so its symbols are available to the test module.
+  - CN: 导入 `cutlass`，使其符号可供该测试模块使用。
+- **Line 52 / 第52行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 53 / 第53行**
+  - Code / 代码: `sys.path.append(str(example_path))`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 54 / 第54行**
+  - Code / 代码: `sys.path.append(str(utils_path))`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 55 / 第55行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 56 / 第56行**
+  - Code / 代码: `# The helper class to prevent modification of sys.path from test files`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 57 / 第57行**
+  - Code / 代码: `# Only allow modification of sys.path from pytest monkeypatch API calls`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 58 / 第58行**
+  - Code / 代码: `class ImmutableSysPath(list):`
+  - EN: Declares class `ImmutableSysPath` to group related tests or helpers.
+  - CN: 声明类 `ImmutableSysPath`，用于组织相关测试或辅助逻辑。
+- **Line 59 / 第59行**
+  - Code / 代码: `    mutating_methods = {`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 60 / 第60行**
+  - Code / 代码: `        "append",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 61 / 第61行**
+  - Code / 代码: `        "extend",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 62 / 第62行**
+  - Code / 代码: `        "insert",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 63 / 第63行**
+  - Code / 代码: `        "remove",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 64 / 第64行**
+  - Code / 代码: `        "pop",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 65 / 第65行**
+  - Code / 代码: `        "clear",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 66 / 第66行**
+  - Code / 代码: `        "reverse",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 67 / 第67行**
+  - Code / 代码: `        "sort",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 68 / 第68行**
+  - Code / 代码: `        "__setitem__",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 69 / 第69行**
+  - Code / 代码: `        "__delitem__",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 70 / 第70行**
+  - Code / 代码: `    }`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 71 / 第71行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 72 / 第72行**
+  - Code / 代码: `    for mtd in mutating_methods:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 73 / 第73行**
+  - Code / 代码: `        def mutating_method(self, *args, mtd=mtd, **kwargs):`
+  - EN: Defines function `mutating_method`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `mutating_method`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 74 / 第74行**
+  - Code / 代码: `            frame = sys._getframe().f_back`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 75 / 第75行**
+  - Code / 代码: `            if (`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 76 / 第76行**
+  - Code / 代码: `                frame`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 77 / 第77行**
+  - Code / 代码: `                and hasattr(frame, "f_locals")`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 78 / 第78行**
+  - Code / 代码: `                and "__file__" in frame.f_locals`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 79 / 第79行**
+  - Code / 代码: `                and frame.f_locals["__file__"].startswith(str(project_root))`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 80 / 第80行**
+  - Code / 代码: `            ):`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 81 / 第81行**
+  - Code / 代码: `                err_msg = (`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 82 / 第82行**
+  - Code / 代码: `                    "Modification of sys.path is forbidden in test file! "`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 83 / 第83行**
+  - Code / 代码: `                    "Please use pytest monkeypatch.syspath_prepend(...) instead."`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 84 / 第84行**
+  - Code / 代码: `                )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 85 / 第85行**
+  - Code / 代码: `                raise RuntimeError(err_msg)`
+  - EN: Raises an exception to report an invalid or unexpected state.
+  - CN: 抛出异常以报告无效或意外状态。
+- **Line 86 / 第86行**
+  - Code / 代码: `            else:`
+  - EN: Starts the fallback branch of the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 87 / 第87行**
+  - Code / 代码: `                return getattr(super(), mtd)(*args, **kwargs)`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 88 / 第88行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 89 / 第89行**
+  - Code / 代码: `        locals()[mtd] = mutating_method`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 90 / 第90行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 91 / 第91行**
+  - Code / 代码: `    def __init__(self, initial=None):`
+  - EN: Defines function `__init__`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `__init__`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 92 / 第92行**
+  - Code / 代码: `        if initial is None:`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 93 / 第93行**
+  - Code / 代码: `            initial = []`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 94 / 第94行**
+  - Code / 代码: `        super().__init__(initial)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 95 / 第95行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 96 / 第96行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 97 / 第97行**
+  - Code / 代码: `sys.path = ImmutableSysPath(list(sys.path))`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 98 / 第98行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 99 / 第99行**
+  - Code / 代码: `pytest_plugins = ["test_sharding"]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 100 / 第100行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 101 / 第101行**
+  - Code / 代码: `def pytest_addoption(parser):`
+  - EN: Defines function `pytest_addoption`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `pytest_addoption`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 102 / 第102行**
+  - Code / 代码: `    parser.addoption(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 103 / 第103行**
+  - Code / 代码: `        "--sample-interval",`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 104 / 第104行**
+  - Code / 代码: `        action="store",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 105 / 第105行**
+  - Code / 代码: `        type=int,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 106 / 第106行**
+  - Code / 代码: `        default=4,`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 107 / 第107行**
+  - Code / 代码: `        help="If value x is provided, then 1 / x of random picked tests will be run",`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 108 / 第108行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 109 / 第109行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 110 / 第110行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 111 / 第111行**
+  - Code / 代码: `@pytest.fixture`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 112 / 第112行**
+  - Code / 代码: `def sample_interval(request):`
+  - EN: Defines function `sample_interval`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `sample_interval`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 113 / 第113行**
+  - Code / 代码: `    return request.config.getoption("--sample-interval")`
+  - EN: Returns a value from the current Python function.
+  - CN: 从当前 Python 函数返回一个值。
+- **Line 114 / 第114行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 115 / 第115行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 116 / 第116行**
+  - Code / 代码: `# Removes all StreamHandlers from loggers at the end of test session`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 117 / 第117行**
+  - Code / 代码: `# This prevents errors when atexit-registered functions try to use loggers`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 118 / 第118行**
+  - Code / 代码: `# whose handlers have already been closed during pytest teardown`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 119 / 第119行**
+  - Code / 代码: `@pytest.fixture(scope="session", autouse=True)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 120 / 第120行**
+  - Code / 代码: `def cleanup_logging_handlers():`
+  - EN: Defines function `cleanup_logging_handlers`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `cleanup_logging_handlers`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 121 / 第121行**
+  - Code / 代码: `    try:`
+  - EN: Starts an exception-handling region.
+  - CN: 开始一个异常处理区域。
+- **Line 122 / 第122行**
+  - Code / 代码: `        yield`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 123 / 第123行**
+  - Code / 代码: `    finally:`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 124 / 第124行**
+  - Code / 代码: `        loggers = [logging.getLogger()] + list(`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 125 / 第125行**
+  - Code / 代码: `            logging.Logger.manager.loggerDict.values()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 126 / 第126行**
+  - Code / 代码: `        )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 127 / 第127行**
+  - Code / 代码: `        for logger in loggers:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 128 / 第128行**
+  - Code / 代码: `            handlers = getattr(logger, "handlers", [])`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 129 / 第129行**
+  - Code / 代码: `            for handler in handlers:`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 130 / 第130行**
+  - Code / 代码: `                if isinstance(handler, logging.StreamHandler):`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 131 / 第131行**
+  - Code / 代码: `                    logger.removeHandler(handler)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 132 / 第132行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 133 / 第133行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 134 / 第134行**
+  - Code / 代码: `@pytest.fixture(autouse=True, scope="module")`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 135 / 第135行**
+  - Code / 代码: `def torch_sanity_check():`
+  - EN: Defines function `torch_sanity_check`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `torch_sanity_check`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 136 / 第136行**
+  - Code / 代码: `    if not torch.cuda.is_available():`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 137 / 第137行**
+  - Code / 代码: `        raise RuntimeError("GPU is required to run example tests!")`
+  - EN: Raises an exception to report an invalid or unexpected state.
+  - CN: 抛出异常以报告无效或意外状态。
+- **Line 138 / 第138行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 139 / 第139行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 140 / 第140行**
+  - Code / 代码: `@pytest.fixture(autouse=True)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 141 / 第141行**
+  - Code / 代码: `def torch_empty_cache():`
+  - EN: Defines function `torch_empty_cache`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `torch_empty_cache`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 142 / 第142行**
+  - Code / 代码: `    """`
+  - EN: Starts a Python docstring that explains the surrounding module, class, or function.
+  - CN: 开始一个 Python 文档字符串，用于说明周围的模块、类或函数。
+- **Line 143 / 第143行**
+  - Code / 代码: `    Automatically empty the torch CUDA cache at the end of each test, to reduce risk of OOM errors.`
+  - EN: Continues the current Python docstring with explanatory text.
+  - CN: 继续当前 Python 文档字符串中的说明文字。
+- **Line 144 / 第144行**
+  - Code / 代码: `    """`
+  - EN: Closes the active Python docstring block.
+  - CN: 结束当前的 Python 文档字符串块。
+- **Line 145 / 第145行**
+  - Code / 代码: `    yield`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 146 / 第146行**
+  - Code / 代码: `    if torch.cuda.is_available():`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 147 / 第147行**
+  - Code / 代码: `        torch.cuda.empty_cache()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 148 / 第148行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 149 / 第149行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 150 / 第150行**
+  - Code / 代码: `@pytest.fixture(autouse=True)`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 151 / 第151行**
+  - Code / 代码: `def random_seed(request):`
+  - EN: Defines function `random_seed`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `random_seed`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 152 / 第152行**
+  - Code / 代码: `    test_case = request.node.nodeid.split(os.sep)[-1]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 153 / 第153行**
+  - Code / 代码: `    seed = int(hashlib.md5(test_case.encode("utf-8")).hexdigest(), 16) % (2**32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 154 / 第154行**
+  - Code / 代码: `    random.seed(seed)`
+  - EN: Seeds a random-number generator so test behavior stays reproducible.
+  - CN: 为随机数生成器设定种子，以保持测试行为可复现。
+- **Line 155 / 第155行**
+  - Code / 代码: `    np.random.seed(seed)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 156 / 第156行**
+  - Code / 代码: `    if torch.cuda.is_available():`
+  - EN: Starts a conditional branch that selects behavior at runtime.
+  - CN: 开始一个条件分支，用于在运行时选择行为。
+- **Line 157 / 第157行**
+  - Code / 代码: `        torch.manual_seed(seed)`
+  - EN: Seeds a random-number generator so test behavior stays reproducible.
+  - CN: 为随机数生成器设定种子，以保持测试行为可复现。
+
+## Key Concepts / 关键概念
+
+- **EN**: Uses pytest markers, parametrization, or hooks to organize automated test coverage.
+  **CN**: 使用 pytest 的标记、参数化或钩子来组织自动化测试覆盖。
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Touches JAX-facing helpers or compatibility logic.
+  **CN**: 涉及面向 JAX 的辅助逻辑或兼容性代码。
+- **EN**: Relates to CuTeDSL-based examples or testing utilities.
+  **CN**: 与基于 CuTeDSL 的示例或测试工具有关。
+- **EN**: Implements or uses sharding logic to split test execution.
+  **CN**: 实现或使用分片逻辑来切分测试执行。
+
+## Dependencies / 依赖项
+
+- `os`
+  - EN: Provides environment-variable or filesystem helpers.
+  - CN: 提供环境变量或文件系统辅助功能。
+- `sys`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `pathlib`
+  - EN: Provides path manipulation helpers.
+  - CN: 提供路径处理辅助功能。
+- `logging`
+  - EN: Provides configurable logging used to quiet or inspect test execution.
+  - CN: 提供可配置日志功能，用于静默或检查测试执行。
+- `hashlib`
+  - EN: Provides a Python module used by this test file.
+  - CN: 提供该测试文件使用的 Python 模块。
+- `random`
+  - EN: Provides random selection or reproducible sharding behavior.
+  - CN: 提供随机选择或可复现的分片行为。
+- `pytest`
+  - EN: Provides the Python test runner, markers, and parametrization helpers.
+  - CN: 提供 Python 测试运行器、标记与参数化辅助功能。
+- `torch`
+  - EN: Provides tensor creation, GPU execution, and reference math helpers.
+  - CN: 提供张量创建、GPU 执行与参考数学辅助功能。
+- `numpy`
+  - EN: Provides array manipulation or numerical reference utilities.
+  - CN: 提供数组处理或数值参考工具。
+- `cutlass`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。

@@ -1,0 +1,2305 @@
+# trmm.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `include/cutlass/gemm/device/trmm.h`  
+**Purpose / 用途**: Implements the device-level TRMM wrapper for triangular matrix-matrix multiplication. / 实现三角矩阵乘法 TRMM 的设备级封装。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**: `/***************************************************************************************************`
+  - **EN**: Begins the file header comment block.
+  - **CN**: 开始文件头部注释块。
+- **Line 2 / 第2行**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 3 / 第3行**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 4 / 第4行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 5 / 第5行**: ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 6 / 第6行**: ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 7 / 第7行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 8 / 第8行**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 9 / 第9行**: ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 10 / 第10行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 11 / 第11行**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 12 / 第12行**: ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 13 / 第13行**: ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 14 / 第14行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 15 / 第15行**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 16 / 第16行**: ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 17 / 第17行**: ` * this software without specific prior written permission.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 18 / 第18行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 19 / 第19行**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 20 / 第20行**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 21 / 第21行**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 22 / 第22行**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 23 / 第23行**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 24 / 第24行**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 25 / 第25行**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 26 / 第26行**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 27 / 第27行**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 28 / 第28行**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 29 / 第29行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 30 / 第30行**: ` **************************************************************************************************/`
+  - **EN**: Closes the header comment block.
+  - **CN**: 关闭头部注释块。
+- **Line 31 / 第31行**: `/*! \file`
+  - **EN**: Begins a Doxygen file comment block.
+  - **CN**: 开始一个 Doxygen 文件注释块。
+- **Line 32 / 第32行**: `    \brief Template for a TRMM kernel. Does not compute batching or support split-K.`
+  - **EN**: Summarizes the file purpose for generated documentation.
+  - **CN**: 用一句话概括文件用途，供生成文档使用。
+- **Line 33 / 第33行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 34 / 第34行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 35 / 第35行**: `*/`
+  - **EN**: Closes the Doxygen comment block that introduced the file.
+  - **CN**: 关闭用于介绍该文件的 Doxygen 注释块。
+- **Line 36 / 第36行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 37 / 第37行**: `#pragma once`
+  - **EN**: Ensures the header is included only once per translation unit.
+  - **CN**: 确保该头文件在同一个编译单元中只会被包含一次。
+- **Line 38 / 第38行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 39 / 第39行**: `#include "cutlass/blas3.h"`
+  - **EN**: Includes `cutlass/blas3.h` so the wrapper can reuse required declarations. Provides supporting CUTLASS declarations required by this wrapper.
+  - **CN**: 包含 `cutlass/blas3.h`，以便该封装复用所需声明。提供该封装所需的 CUTLASS 支持性声明。
+- **Line 40 / 第40行**: `#include "cutlass/arch/arch.h"`
+  - **EN**: Includes `cutlass/arch/arch.h` so the wrapper can reuse required declarations. Provides architecture tags and architecture-specific traits.
+  - **CN**: 包含 `cutlass/arch/arch.h`，以便该封装复用所需声明。提供架构标签与架构相关 traits。
+- **Line 41 / 第41行**: `#include "cutlass/device_kernel.h"`
+  - **EN**: Includes `cutlass/device_kernel.h` so the wrapper can reuse required declarations. Supplies helpers for launching CUTLASS device kernels.
+  - **CN**: 包含 `cutlass/device_kernel.h`，以便该封装复用所需声明。提供启动 CUTLASS 设备内核所需的辅助工具。
+- **Line 42 / 第42行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 43 / 第43行**: `#include "cutlass/gemm/threadblock/threadblock_swizzle.h"`
+  - **EN**: Includes `cutlass/gemm/threadblock/threadblock_swizzle.h` so the wrapper can reuse required declarations. Defines threadblock swizzle policies for mapping tiles to CTAs.
+  - **CN**: 包含 `cutlass/gemm/threadblock/threadblock_swizzle.h`，以便该封装复用所需声明。定义把 tile 映射到 CTA 的 threadblock swizzle 策略。
+- **Line 44 / 第44行**: `#include "cutlass/gemm/kernel/trmm_universal.h"`
+  - **EN**: Includes `cutlass/gemm/kernel/trmm_universal.h` so the wrapper can reuse required declarations. Provides the underlying GEMM kernel or kernel-side parameter definitions.
+  - **CN**: 包含 `cutlass/gemm/kernel/trmm_universal.h`，以便该封装复用所需声明。提供底层 GEMM 内核或内核侧参数定义。
+- **Line 45 / 第45行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 46 / 第46行**: `#include "cutlass/gemm/kernel/default_trmm_universal.h"`
+  - **EN**: Includes `cutlass/gemm/kernel/default_trmm_universal.h` so the wrapper can reuse required declarations. Builds a default GEMM-kernel composition used by this device wrapper.
+  - **CN**: 包含 `cutlass/gemm/kernel/default_trmm_universal.h`，以便该封装复用所需声明。构建该设备封装所使用的默认 GEMM 内核组合。
+- **Line 47 / 第47行**: `#include "cutlass/gemm/device/default_gemm_configuration.h"`
+  - **EN**: Includes `cutlass/gemm/device/default_gemm_configuration.h` so the wrapper can reuse required declarations. Supplies default tile, alignment, and epilogue configuration choices.
+  - **CN**: 包含 `cutlass/gemm/device/default_gemm_configuration.h`，以便该封装复用所需声明。提供默认的 tile、对齐方式与 epilogue 配置选择。
+- **Line 48 / 第48行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 49 / 第49行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 50 / 第50行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 51 / 第51行**: `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` to scope the following declarations.
+  - **CN**: 打开命名空间 `cutlass`，为后续声明限定作用域。
+- **Line 52 / 第52行**: `namespace gemm {`
+  - **EN**: Opens namespace `gemm` to scope the following declarations.
+  - **CN**: 打开命名空间 `gemm`，为后续声明限定作用域。
+- **Line 53 / 第53行**: `namespace device {`
+  - **EN**: Opens namespace `device` to scope the following declarations.
+  - **CN**: 打开命名空间 `device`，为后续声明限定作用域。
+- **Line 54 / 第54行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 55 / 第55行**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 56 / 第56行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 57 / 第57行**: `/*! Trmm device-level operator. This is an interface to efficient CUTLASS TRMM kernels that may`
+  - **EN**: Begins a Doxygen file comment block.
+  - **CN**: 开始一个 Doxygen 文件注释块。
+- **Line 58 / 第58行**: `  be invoked from host code.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 59 / 第59行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 60 / 第60行**: `  The contributions of this class are:`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 61 / 第61行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 62 / 第62行**: `    1. At compile time, it maps data types and high-level structural parameters onto `
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 63 / 第63行**: `       specific CUTLASS components.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 64 / 第64行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 65 / 第65行**: `    2. At runtime, it maps logical arguments to TRMM problems to kernel parameters.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 66 / 第66行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 67 / 第67行**: `    3. At runtime, it launches kernels on the device.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 68 / 第68行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 69 / 第69行**: `  The intent is to provide a convenient mechanism for interacting with most plausible TRMM`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 70 / 第70行**: `  configurations for each supported architecture. Consequently, not all parameters are exposed`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 71 / 第71行**: `  to the top-level interface. Rather, sensible defaults at each level of the CUTLASS hierarchy`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 72 / 第72行**: `  are selected to tradeoff simplicity of the interface with flexibility. We expect `
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 73 / 第73行**: `  most configurations to be specified at this level. Applications with more exotic requirements `
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 74 / 第74行**: `  may construct their kernels of interest using CUTLASS components at the threadblock, warp, `
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 75 / 第75行**: `  and thread levels of abstraction.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 76 / 第76行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 77 / 第77行**: `  CUTLASS exposes computations using the functor design pattern in which objects compose some`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 78 / 第78行**: `  internal state with an overloaded function call operator. This enables decoupling of`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 79 / 第79行**: `  initialization from execution, possibly reducing overhead during steady state phases of`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 80 / 第80行**: `  application execution.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 81 / 第81行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 82 / 第82行**: `  CUTLASS device-level operators expose an Arguments structure encompassing each logical`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 83 / 第83行**: `  input to the computation. This is distinct from the kernel-level Params structure pattern`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 84 / 第84行**: `  which contains application-specific precomputed state needed by the device code.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 85 / 第85行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 86 / 第86行**: `  Example of a CUTLASS TRMM operator implementing the functionality of cuBLAS's STRMM NN`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 87 / 第87行**: `  is as follows:`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 88 / 第88行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 89 / 第89行**: `    //`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 90 / 第90行**: `    // Instantiate the CUTLASS TRMM operator.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 91 / 第91行**: `    //`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 92 / 第92行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 93 / 第93行**: `    cutlass::gemm::device::Trmm<`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 94 / 第94行**: `      float,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 95 / 第95行**: `      cutlass::layout::ColumnMajor,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 96 / 第96行**: `      cutlass::SideMode::kLeft,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 97 / 第97行**: `      cutlass::FillMode::kLower,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 98 / 第98行**: `      cutlass::DiagType::kNonUnit,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 99 / 第99行**: `      float,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 100 / 第100行**: `      cutlass::layout::ColumnMajor,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 101 / 第101行**: `      float,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 102 / 第102行**: `      cutlass::layout::ColumnMajor,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 103 / 第103行**: `    > trmm_op;`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 104 / 第104行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 105 / 第105行**: `    //`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 106 / 第106行**: `    // Launch the TRMM operation on the device`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 107 / 第107行**: `    //`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 108 / 第108行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 109 / 第109行**: `    cutlass::Status status = trmm_op({`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 110 / 第110行**: `      cutlass::gemm::GemmUniversalMode,   // Trmm Problem Mode`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 111 / 第111行**: `      {m, n, m/n},                        // GemmCoord problem_size (k is based on left- or right-side mode)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 112 / 第112行**: `      batch_count,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 113 / 第113行**: `      {alpha},                            // EpilogueOutputOp::Params epilogue_op_params`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 114 / 第114行**: `      void const * ptr_A,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 115 / 第115行**: `      void const * ptr_B,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 116 / 第116行**: `      void const * ptr_C,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 117 / 第117行**: `      int64_t batch_stride_A,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 118 / 第118行**: `      int64_t batch_stride_B,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 119 / 第119行**: `      int64_t batch_stride_C,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 120 / 第120行**: `      int lda,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 121 / 第121行**: `      int ldb,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 122 / 第122行**: `      int ldc`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 123 / 第123行**: `    });`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 124 / 第124行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 125 / 第125行**: `  A simplified view of the template is listed below.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 126 / 第126行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 127 / 第127行**: `    template <`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 128 / 第128行**: `      /// Element type for A matrix operand`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 129 / 第129行**: `      typename ElementA,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 130 / 第130行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 131 / 第131行**: `      /// Layout type for A matrix operand`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 132 / 第132行**: `      typename LayoutA,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 133 / 第133行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 134 / 第134行**: `      /// Side Mode for A (kLeft or kRight)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 135 / 第135行**: `      SideMode SideModeA,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 136 / 第136行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 137 / 第137行**: `      /// Fill Mode for A (kLower or kUpper)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 138 / 第138行**: `      FillMode FillModeA,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 139 / 第139行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 140 / 第140行**: `      /// DiagType for A (kNonUnit or kUnit)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 141 / 第141行**: `      DiagType DiagTypeA,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 142 / 第142行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 143 / 第143行**: `      /// Element type for B matrix operand`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 144 / 第144行**: `      typename ElementB,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 145 / 第145行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 146 / 第146行**: `      /// Layout type for B matrix operand`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 147 / 第147行**: `      typename LayoutB,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 148 / 第148行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 149 / 第149行**: `      /// Element type for C and D matrix operands`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 150 / 第150行**: `      typename ElementC,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 151 / 第151行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 152 / 第152行**: `      /// Layout type for C and D matrix operands`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 153 / 第153行**: `      typename LayoutC,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 154 / 第154行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 155 / 第155行**: `      /// Element type for internal accumulation`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 156 / 第156行**: `      typename ElementAccumulator,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 157 / 第157行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 158 / 第158行**: `      /// Operator class tag`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 159 / 第159行**: `      typename OperatorClass,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 160 / 第160行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 161 / 第161行**: `      /// Tag indicating architecture to tune for.  This is the minimum SM that`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 162 / 第162行**: `      /// supports the intended feature. The device kernel can be built`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 163 / 第163行**: `      /// targeting any SM larger than this number.`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 164 / 第164行**: `      typename ArchTag,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 165 / 第165行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 166 / 第166行**: `      /// Threadblock-level tile size (concept: GemmShape)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 167 / 第167行**: `      typename ThreadblockShape,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 168 / 第168行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 169 / 第169行**: `      /// Warp-level tile size (concept: GemmShape)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 170 / 第170行**: `      typename WarpShape,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 171 / 第171行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 172 / 第172行**: `      /// Warp-level tile size (concept: GemmShape)`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 173 / 第173行**: `      typename InstructionShape,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 174 / 第174行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 175 / 第175行**: `      /// Epilogue output operator`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 176 / 第176行**: `      typename EpilogueOutputOp,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 177 / 第177行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 178 / 第178行**: `      /// Threadblock-level swizzling operator`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 179 / 第179行**: `      typename ThreadblockSwizzle,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 180 / 第180行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 181 / 第181行**: `      /// Number of stages used in the pipelined mainloop`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 182 / 第182行**: `      int Stages,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 183 / 第183行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 184 / 第184行**: `      /// Access granularity of A matrix in units of elements`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 185 / 第185行**: `      int AlignmentA,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 186 / 第186行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 187 / 第187行**: `      /// Access granularity of B matrix in units of elements`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 188 / 第188行**: `      int AlignmentB,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 189 / 第189行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 190 / 第190行**: `      /// If true, kernel supports split-K with serial reduction`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 191 / 第191行**: `      bool SplitKSerial,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 192 / 第192行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 193 / 第193行**: `      /// Operation performed by TRMM`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 194 / 第194行**: `      typename Operator,`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 195 / 第195行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 196 / 第196行**: `      /// Complex elementwise transformation on A operand`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 197 / 第197行**: `      ComplexTransform TransformA`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 198 / 第198行**: `    >`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 199 / 第199行**: `    class Trmm;`
+  - **EN**: Continues the Doxygen file comment block.
+  - **CN**: 继续书写 Doxygen 文件注释块。
+- **Line 200 / 第200行**: `*/`
+  - **EN**: Closes the Doxygen comment block that introduced the file.
+  - **CN**: 关闭用于介绍该文件的 Doxygen 注释块。
+- **Line 201 / 第201行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 202 / 第202行**: `    /// Element type for A matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Element type for A matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Element type for A matrix operand
+- **Line 203 / 第203行**: `    typename ElementA_,`
+  - **EN**: Declares template parameter `ElementA_`. The nearby documentation says: Element type for A matrix operand
+  - **CN**: 声明模板参数 `ElementA_`。附近文档对它的说明是：Element type for A matrix operand
+- **Line 204 / 第204行**: `    /// Layout type for A matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Layout type for A matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Layout type for A matrix operand
+- **Line 205 / 第205行**: `    typename LayoutA_,`
+  - **EN**: Declares template parameter `LayoutA_`. The nearby documentation says: Layout type for A matrix operand
+  - **CN**: 声明模板参数 `LayoutA_`。附近文档对它的说明是：Layout type for A matrix operand
+- **Line 206 / 第206行**: `    /// Side Mode for A `
+  - **EN**: Documentation comment describing the next declaration: Side Mode for A
+  - **CN**: 文档注释，用于说明后续声明：Side Mode for A
+- **Line 207 / 第207行**: `    SideMode SideModeA,`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: Side Mode for A
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：Side Mode for A
+- **Line 208 / 第208行**: `    /// Fill Mode for A`
+  - **EN**: Documentation comment describing the next declaration: Fill Mode for A
+  - **CN**: 文档注释，用于说明后续声明：Fill Mode for A
+- **Line 209 / 第209行**: `    FillMode FillModeA,`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: Fill Mode for A
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：Fill Mode for A
+- **Line 210 / 第210行**: `    /// DiagType for A`
+  - **EN**: Documentation comment describing the next declaration: DiagType for A
+  - **CN**: 文档注释，用于说明后续声明：DiagType for A
+- **Line 211 / 第211行**: `    DiagType DiagTypeA,`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: DiagType for A
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：DiagType for A
+- **Line 212 / 第212行**: `    /// Element type for B matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Element type for B matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Element type for B matrix operand
+- **Line 213 / 第213行**: `    typename ElementB_,`
+  - **EN**: Declares template parameter `ElementB_`. The nearby documentation says: Element type for B matrix operand
+  - **CN**: 声明模板参数 `ElementB_`。附近文档对它的说明是：Element type for B matrix operand
+- **Line 214 / 第214行**: `    /// Layout type for B matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Layout type for B matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Layout type for B matrix operand
+- **Line 215 / 第215行**: `    typename LayoutB_,`
+  - **EN**: Declares template parameter `LayoutB_`. The nearby documentation says: Layout type for B matrix operand
+  - **CN**: 声明模板参数 `LayoutB_`。附近文档对它的说明是：Layout type for B matrix operand
+- **Line 216 / 第216行**: `    /// Element type for C and D matrix operands`
+  - **EN**: Documentation comment describing the next declaration: Element type for C and D matrix operands
+  - **CN**: 文档注释，用于说明后续声明：Element type for C and D matrix operands
+- **Line 217 / 第217行**: `    typename ElementC_,`
+  - **EN**: Declares template parameter `ElementC_`. The nearby documentation says: Element type for C and D matrix operands
+  - **CN**: 声明模板参数 `ElementC_`。附近文档对它的说明是：Element type for C and D matrix operands
+- **Line 218 / 第218行**: `    /// Layout type for C and D matrix operands`
+  - **EN**: Documentation comment describing the next declaration: Layout type for C and D matrix operands
+  - **CN**: 文档注释，用于说明后续声明：Layout type for C and D matrix operands
+- **Line 219 / 第219行**: `    typename LayoutC_,`
+  - **EN**: Declares template parameter `LayoutC_`. The nearby documentation says: Layout type for C and D matrix operands
+  - **CN**: 声明模板参数 `LayoutC_`。附近文档对它的说明是：Layout type for C and D matrix operands
+- **Line 220 / 第220行**: `    /// Element type for internal accumulation`
+  - **EN**: Documentation comment describing the next declaration: Element type for internal accumulation
+  - **CN**: 文档注释，用于说明后续声明：Element type for internal accumulation
+- **Line 221 / 第221行**: `    typename ElementAccumulator_ = ElementC_,`
+  - **EN**: Declares template parameter `ElementAccumulator_`. The nearby documentation says: Element type for internal accumulation
+  - **CN**: 声明模板参数 `ElementAccumulator_`。附近文档对它的说明是：Element type for internal accumulation
+- **Line 222 / 第222行**: `    /// Operator class tag`
+  - **EN**: Documentation comment describing the next declaration: Operator class tag
+  - **CN**: 文档注释，用于说明后续声明：Operator class tag
+- **Line 223 / 第223行**: `    typename OperatorClass_ = arch::OpClassTensorOp,`
+  - **EN**: Declares template parameter `OperatorClass_`. The nearby documentation says: Operator class tag
+  - **CN**: 声明模板参数 `OperatorClass_`。附近文档对它的说明是：Operator class tag
+- **Line 224 / 第224行**: `    /// Tag indicating architecture to tune for`
+  - **EN**: Documentation comment describing the next declaration: Tag indicating architecture to tune for
+  - **CN**: 文档注释，用于说明后续声明：Tag indicating architecture to tune for
+- **Line 225 / 第225行**: `    typename ArchTag_ = arch::Sm80,`
+  - **EN**: Declares template parameter `ArchTag_`. The nearby documentation says: Tag indicating architecture to tune for
+  - **CN**: 声明模板参数 `ArchTag_`。附近文档对它的说明是：Tag indicating architecture to tune for
+- **Line 226 / 第226行**: `    /// Threadblock-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Threadblock-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Threadblock-level tile size (concept: GemmShape)
+- **Line 227 / 第227行**: `    typename ThreadblockShape_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `ThreadblockShape_`. The nearby documentation says: Threadblock-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `ThreadblockShape_`。附近文档对它的说明是：Threadblock-level tile size (concept: GemmShape)
+- **Line 228 / 第228行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 229 / 第229行**: `        ElementAccumulator_>::ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 230 / 第230行**: `    /// Warp-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Warp-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Warp-level tile size (concept: GemmShape)
+- **Line 231 / 第231行**: `    typename WarpShape_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `WarpShape_`. The nearby documentation says: Warp-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `WarpShape_`。附近文档对它的说明是：Warp-level tile size (concept: GemmShape)
+- **Line 232 / 第232行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 233 / 第233行**: `        ElementAccumulator_>::WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 234 / 第234行**: `    /// Instruction-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Instruction-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Instruction-level tile size (concept: GemmShape)
+- **Line 235 / 第235行**: `    typename InstructionShape_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `InstructionShape_`. The nearby documentation says: Instruction-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `InstructionShape_`。附近文档对它的说明是：Instruction-level tile size (concept: GemmShape)
+- **Line 236 / 第236行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 237 / 第237行**: `        ElementAccumulator_>::InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 238 / 第238行**: `    /// Epilogue output operator`
+  - **EN**: Documentation comment describing the next declaration: Epilogue output operator
+  - **CN**: 文档注释，用于说明后续声明：Epilogue output operator
+- **Line 239 / 第239行**: `    typename EpilogueOutputOp_ = epilogue::thread::LinearCombination<`
+  - **EN**: Declares template parameter `EpilogueOutputOp_`. The nearby documentation says: Epilogue output operator
+  - **CN**: 声明模板参数 `EpilogueOutputOp_`。附近文档对它的说明是：Epilogue output operator
+- **Line 240 / 第240行**: `      ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 241 / 第241行**: `      128 / sizeof_bits<ElementC_>::value,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 242 / 第242行**: `      ElementAccumulator_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 243 / 第243行**: `      ElementAccumulator_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 244 / 第244行**: `      epilogue::thread::ScaleType::OnlyAlphaScaling`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 245 / 第245行**: `    >,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 246 / 第246行**: `    /// Threadblock-level swizzling operator`
+  - **EN**: Documentation comment describing the next declaration: Threadblock-level swizzling operator
+  - **CN**: 文档注释，用于说明后续声明：Threadblock-level swizzling operator
+- **Line 247 / 第247行**: `    typename ThreadblockSwizzle_ = threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Declares template parameter `ThreadblockSwizzle_`. The nearby documentation says: Threadblock-level swizzling operator
+  - **CN**: 声明模板参数 `ThreadblockSwizzle_`。附近文档对它的说明是：Threadblock-level swizzling operator
+- **Line 248 / 第248行**: `    /// Number of stages used in the pipelined mainloop`
+  - **EN**: Documentation comment describing the next declaration: Number of stages used in the pipelined mainloop
+  - **CN**: 文档注释，用于说明后续声明：Number of stages used in the pipelined mainloop
+- **Line 249 / 第249行**: `    int Stages =`
+  - **EN**: Declares template parameter `Stages`. The nearby documentation says: Number of stages used in the pipelined mainloop
+  - **CN**: 声明模板参数 `Stages`。附近文档对它的说明是：Number of stages used in the pipelined mainloop
+- **Line 250 / 第250行**: `        DefaultGemmConfiguration<OperatorClass_, ArchTag_, ElementA_, ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 251 / 第251行**: `                                 ElementC_, ElementAccumulator_>::kStages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 252 / 第252行**: `    /// Access granularity of A matrix in units of elements`
+  - **EN**: Documentation comment describing the next declaration: Access granularity of A matrix in units of elements
+  - **CN**: 文档注释，用于说明后续声明：Access granularity of A matrix in units of elements
+- **Line 253 / 第253行**: `    int AlignmentA =`
+  - **EN**: Declares template parameter `AlignmentA`. The nearby documentation says: Access granularity of A matrix in units of elements
+  - **CN**: 声明模板参数 `AlignmentA`。附近文档对它的说明是：Access granularity of A matrix in units of elements
+- **Line 254 / 第254行**: `        DefaultGemmConfiguration<OperatorClass_, ArchTag_, ElementA_, ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 255 / 第255行**: `                                 ElementC_, ElementAccumulator_>::kAlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 256 / 第256行**: `    /// Access granularity of B matrix in units of elements`
+  - **EN**: Documentation comment describing the next declaration: Access granularity of B matrix in units of elements
+  - **CN**: 文档注释，用于说明后续声明：Access granularity of B matrix in units of elements
+- **Line 257 / 第257行**: `    int AlignmentB =`
+  - **EN**: Declares template parameter `AlignmentB`. The nearby documentation says: Access granularity of B matrix in units of elements
+  - **CN**: 声明模板参数 `AlignmentB`。附近文档对它的说明是：Access granularity of B matrix in units of elements
+- **Line 258 / 第258行**: `        DefaultGemmConfiguration<OperatorClass_, ArchTag_, ElementA_, ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 259 / 第259行**: `                                 ElementC_, ElementAccumulator_>::kAlignmentB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 260 / 第260行**: `    /// If true, kernel supports split-K with serial reduction`
+  - **EN**: Documentation comment describing the next declaration: If true, kernel supports split-K with serial reduction
+  - **CN**: 文档注释，用于说明后续声明：If true, kernel supports split-K with serial reduction
+- **Line 261 / 第261行**: `    bool SplitKSerial = false,`
+  - **EN**: Declares template parameter `SplitKSerial`. The nearby documentation says: If true, kernel supports split-K with serial reduction
+  - **CN**: 声明模板参数 `SplitKSerial`。附近文档对它的说明是：If true, kernel supports split-K with serial reduction
+- **Line 262 / 第262行**: `    /// Operation performed by TRMM`
+  - **EN**: Documentation comment describing the next declaration: Operation performed by TRMM
+  - **CN**: 文档注释，用于说明后续声明：Operation performed by TRMM
+- **Line 263 / 第263行**: `    typename Operator_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `Operator_`. The nearby documentation says: Operation performed by TRMM
+  - **CN**: 声明模板参数 `Operator_`。附近文档对它的说明是：Operation performed by TRMM
+- **Line 264 / 第264行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 265 / 第265行**: `        ElementAccumulator_>::Operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 266 / 第266行**: `    /// Complex elementwise transformation on A operand`
+  - **EN**: Documentation comment describing the next declaration: Complex elementwise transformation on A operand
+  - **CN**: 文档注释，用于说明后续声明：Complex elementwise transformation on A operand
+- **Line 267 / 第267行**: `    ComplexTransform TransformA = ComplexTransform::kNone>`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: Complex elementwise transformation on A operand
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：Complex elementwise transformation on A operand
+- **Line 268 / 第268行**: `class Trmm {`
+  - **EN**: Declares template parameter `Trmm` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `Trmm`，用于定制生成出的封装。
+- **Line 269 / 第269行**: ` public:`
+  - **EN**: Switches to the `public` access section of the class.
+  - **CN**: 切换到类的 `public` 访问区域。
+- **Line 270 / 第270行**: `  using ElementA = ElementA_;`
+  - **EN**: Defines the alias `ElementA` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementA`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 271 / 第271行**: `  using LayoutA = LayoutA_;`
+  - **EN**: Defines the alias `LayoutA` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutA`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 272 / 第272行**: `  using TensorRefA = TensorRef<ElementA const, LayoutA>;`
+  - **EN**: Defines the alias `TensorRefA` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefA`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 273 / 第273行**: `  using ElementAKernel = typename platform::conditional<(SideModeA == SideMode::kRight), ElementB_, ElementA_>::type;`
+  - **EN**: Defines the alias `ElementAKernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementAKernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 274 / 第274行**: `  using LayoutAKernel = typename platform::conditional<(SideModeA == SideMode::kRight), LayoutB_, LayoutA_>::type;`
+  - **EN**: Defines the alias `LayoutAKernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutAKernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 275 / 第275行**: `  using ElementB = ElementB_;`
+  - **EN**: Defines the alias `ElementB` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementB`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 276 / 第276行**: `  using LayoutB = LayoutB_;`
+  - **EN**: Defines the alias `LayoutB` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutB`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 277 / 第277行**: `  using TensorRefB = TensorRef<ElementB const, LayoutB>;`
+  - **EN**: Defines the alias `TensorRefB` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefB`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 278 / 第278行**: `  using ElementBKernel = typename platform::conditional<(SideModeA == SideMode::kRight), ElementA_, ElementB_>::type;`
+  - **EN**: Defines the alias `ElementBKernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementBKernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 279 / 第279行**: `  using LayoutBKernel = typename platform::conditional<(SideModeA == SideMode::kRight), LayoutA_, LayoutB_>::type;`
+  - **EN**: Defines the alias `LayoutBKernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutBKernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 280 / 第280行**: `  using ElementC = ElementC_;`
+  - **EN**: Defines the alias `ElementC` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementC`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 281 / 第281行**: `  using LayoutC = LayoutC_;`
+  - **EN**: Defines the alias `LayoutC` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutC`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 282 / 第282行**: `  using TensorRefC = TensorRef<ElementC const, LayoutC>;`
+  - **EN**: Defines the alias `TensorRefC` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefC`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 283 / 第283行**: `  using TensorRefD = TensorRef<ElementC, LayoutC>;`
+  - **EN**: Defines the alias `TensorRefD` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefD`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 284 / 第284行**: `  using ElementAccumulator = ElementAccumulator_;`
+  - **EN**: Defines the alias `ElementAccumulator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementAccumulator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 285 / 第285行**: `  using OperatorClass = OperatorClass_;`
+  - **EN**: Defines the alias `OperatorClass` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `OperatorClass`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 286 / 第286行**: `  using ArchTag = ArchTag_;`
+  - **EN**: Defines the alias `ArchTag` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ArchTag`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 287 / 第287行**: `  using ThreadblockShape = ThreadblockShape_;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 288 / 第288行**: `  using WarpShape = WarpShape_;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 289 / 第289行**: `  using InstructionShape = InstructionShape_;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 290 / 第290行**: `  using EpilogueOutputOp = EpilogueOutputOp_;`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 291 / 第291行**: `  using ThreadblockSwizzle = ThreadblockSwizzle_;`
+  - **EN**: Defines the alias `ThreadblockSwizzle` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockSwizzle`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 292 / 第292行**: `  using Operator = Operator_;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 293 / 第293行**: `  static SideMode const kSideMode = SideModeA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 294 / 第294行**: `  static FillMode const kFillMode = FillModeA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 295 / 第295行**: `  static DiagType const kDiagType = DiagTypeA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 296 / 第296行**: `  static int const kStages = Stages;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 297 / 第297行**: `  static int const kAlignmentA = AlignmentA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 298 / 第298行**: `  static int const kAlignmentAKernel = (SideModeA == SideMode::kRight) ? AlignmentB : AlignmentA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 299 / 第299行**: `  static int const kAlignmentB = AlignmentB;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 300 / 第300行**: `  static int const kAlignmentBKernel = (SideModeA == SideMode::kRight) ? AlignmentA : AlignmentB;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 301 / 第301行**: `  static int const kAlignmentC = EpilogueOutputOp::kCount;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 302 / 第302行**: `  static bool const kSplitKSerial = SplitKSerial;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 303 / 第303行**: `  // Complex Transform don't apply to B`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 304 / 第304行**: `  static ComplexTransform const kTransformA = TransformA; `
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 305 / 第305行**: `  static ComplexTransform const kTransformB = ComplexTransform::kNone; `
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 306 / 第306行**: `  static ComplexTransform const kTransformAKernel = (SideModeA == SideMode::kRight) ? `
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 307 / 第307行**: `                                              ComplexTransform::kNone : TransformA;`
+  - **EN**: Declares template parameter `parameter` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `parameter`，用于定制生成出的封装。
+- **Line 308 / 第308行**: `  static ComplexTransform const kTransformBKernel = (SideModeA == SideMode::kRight) ? `
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 309 / 第309行**: `                                              TransformA : ComplexTransform::kNone;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 310 / 第310行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 311 / 第311行**: `  /// Define the kernel`
+  - **EN**: Documentation comment describing the next declaration: Define the kernel
+  - **CN**: 文档注释，用于说明后续声明：Define the kernel
+- **Line 312 / 第312行**: `  using TrmmKernel = typename kernel::DefaultTrmmUniversal<`
+  - **EN**: Defines the alias `TrmmKernel`. The nearby comment explains its role as: Define the kernel
+  - **CN**: 定义别名 `TrmmKernel`。附近注释说明其作用为：Define the kernel
+- **Line 313 / 第313行**: `    ElementAKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 314 / 第314行**: `    LayoutAKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 315 / 第315行**: `    kTransformAKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 316 / 第316行**: `    kAlignmentAKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 317 / 第317行**: `    ElementBKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 318 / 第318行**: `    LayoutBKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 319 / 第319行**: `    kTransformBKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 320 / 第320行**: `    kAlignmentBKernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 321 / 第321行**: `    kSideMode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 322 / 第322行**: `    kFillMode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 323 / 第323行**: `    kDiagType,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 324 / 第324行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 325 / 第325行**: `    LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 326 / 第326行**: `    ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 327 / 第327行**: `    OperatorClass,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 328 / 第328行**: `    ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 329 / 第329行**: `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 330 / 第330行**: `    WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 331 / 第331行**: `    InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 332 / 第332行**: `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 333 / 第333行**: `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 334 / 第334行**: `    kStages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 335 / 第335行**: `    kSplitKSerial,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 336 / 第336行**: `    Operator`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 337 / 第337行**: `  >::TrmmKernel;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 338 / 第338行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 339 / 第339行**: `  using Arguments = typename TrmmKernel::Arguments;`
+  - **EN**: Defines the alias `Arguments` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Arguments`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 340 / 第340行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 341 / 第341行**: `private:`
+  - **EN**: Switches to the `private` access section of the class.
+  - **CN**: 切换到类的 `private` 访问区域。
+- **Line 342 / 第342行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 343 / 第343行**: `  /// Kernel parameters object`
+  - **EN**: Documentation comment describing the next declaration: Kernel parameters object
+  - **CN**: 文档注释，用于说明后续声明：Kernel parameters object
+- **Line 344 / 第344行**: `  typename TrmmKernel::Params params_;`
+  - **EN**: Declares template parameter `TrmmKernel`. The nearby documentation says: Kernel parameters object
+  - **CN**: 声明模板参数 `TrmmKernel`。附近文档对它的说明是：Kernel parameters object
+- **Line 345 / 第345行**: `public:`
+  - **EN**: Switches to the `public` access section of the class.
+  - **CN**: 切换到类的 `public` 访问区域。
+- **Line 346 / 第346行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 347 / 第347行**: `  /// Constructs the TRMM.`
+  - **EN**: Documentation comment describing the next declaration: Constructs the TRMM.
+  - **CN**: 文档注释，用于说明后续声明：Constructs the TRMM.
+- **Line 348 / 第348行**: `  Trmm() { }`
+  - **EN**: Continues the declaration or definition of `Trmm`. The nearby comment says: Constructs the TRMM.
+  - **CN**: 继续书写 `Trmm` 的声明或定义。附近注释说明为：Constructs the TRMM.
+- **Line 349 / 第349行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 350 / 第350行**: `  /// Determines whether the TRMM can execute the given problem.`
+  - **EN**: Documentation comment describing the next declaration: Determines whether the TRMM can execute the given problem.
+  - **CN**: 文档注释，用于说明后续声明：Determines whether the TRMM can execute the given problem.
+- **Line 351 / 第351行**: `  static Status can_implement(Arguments const &args) {`
+  - **EN**: Begins the definition of `can_implement`. The nearby comment describes it as: Determines whether the TRMM can execute the given problem.
+  - **CN**: 开始定义 `can_implement`。附近注释对它的说明是：Determines whether the TRMM can execute the given problem.
+- **Line 352 / 第352行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 353 / 第353行**: `    if (!kSplitKSerial && args.batch_count > 1) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 354 / 第354行**: `      return Status::kErrorInvalidProblem;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 355 / 第355行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 356 / 第356行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 357 / 第357行**: `    Status status = TrmmKernel::can_implement(args);`
+  - **EN**: Declares or invokes `can_implement` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `can_implement`。
+- **Line 358 / 第358行**: `   `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 359 / 第359行**: `    if (SideModeA == SideMode::kInvalid) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 360 / 第360行**: `      return Status::kErrorInvalidProblem;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 361 / 第361行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 362 / 第362行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 363 / 第363行**: `    if (FillModeA == FillMode::kInvalid) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 364 / 第364行**: `      return Status::kErrorInvalidProblem;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 365 / 第365行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 366 / 第366行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 367 / 第367行**: `    if (DiagTypeA == DiagType::kInvalid) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 368 / 第368行**: `      return Status::kErrorInvalidProblem;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 369 / 第369行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 370 / 第370行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 371 / 第371行**: `    if (status != Status::kSuccess) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 372 / 第372行**: `      return status;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 373 / 第373行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 374 / 第374行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 375 / 第375行**: `    return Status::kSuccess;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 376 / 第376行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 377 / 第377行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 378 / 第378行**: `  /// Gets the workspace size`
+  - **EN**: Documentation comment describing the next declaration: Gets the workspace size
+  - **CN**: 文档注释，用于说明后续声明：Gets the workspace size
+- **Line 379 / 第379行**: `  static size_t get_workspace_size(Arguments const &args) {`
+  - **EN**: Begins the definition of `get_workspace_size`. The nearby comment describes it as: Gets the workspace size
+  - **CN**: 开始定义 `get_workspace_size`。附近注释对它的说明是：Gets the workspace size
+- **Line 380 / 第380行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 381 / 第381行**: `    size_t bytes = 0;`
+  - **EN**: Declares template parameter `bytes` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `bytes`，用于定制生成出的封装。
+- **Line 382 / 第382行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 383 / 第383行**: `    // Determine grid shape`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 384 / 第384行**: `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Declares or initializes `variable` for later use in the wrapper or launch path.
+  - **CN**: 声明或初始化 `variable`，供后续封装逻辑或启动路径使用。
+- **Line 385 / 第385行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 386 / 第386行**: `    cutlass::gemm::GemmCoord tiled_shape = threadblock_swizzle.get_tiled_shape(`
+  - **EN**: This line contributes to the signature or invocation of `get_tiled_shape`.
+  - **CN**: 这一行参与 `get_tiled_shape` 的签名或调用。
+- **Line 387 / 第387行**: `      args.problem_size, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 388 / 第388行**: `      {ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 389 / 第389行**: `      args.batch_count);`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 390 / 第390行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 391 / 第391行**: `    if (kSplitKSerial && args.batch_count > 1) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 392 / 第392行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 393 / 第393行**: `      bytes += sizeof(int) * size_t(tiled_shape.m()) * size_t(tiled_shape.n());`
+  - **EN**: Declares or invokes `sizeof` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `sizeof`。
+- **Line 394 / 第394行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 395 / 第395行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 396 / 第396行**: `    return bytes;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 397 / 第397行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 398 / 第398行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 399 / 第399行**: `  /// Initializes TRMM state from arguments.`
+  - **EN**: Documentation comment describing the next declaration: Initializes TRMM state from arguments.
+  - **CN**: 文档注释，用于说明后续声明：Initializes TRMM state from arguments.
+- **Line 400 / 第400行**: `  Status initialize(Arguments const &args, void *workspace = nullptr, cudaStream_t stream = nullptr) {`
+  - **EN**: Begins the definition of `initialize`. The nearby comment describes it as: Initializes TRMM state from arguments.
+  - **CN**: 开始定义 `initialize`。附近注释对它的说明是：Initializes TRMM state from arguments.
+- **Line 401 / 第401行**: ` `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 402 / 第402行**: `    // Determine grid shape`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 403 / 第403行**: `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Declares or initializes `variable` for later use in the wrapper or launch path.
+  - **CN**: 声明或初始化 `variable`，供后续封装逻辑或启动路径使用。
+- **Line 404 / 第404行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 405 / 第405行**: `    cutlass::gemm::GemmCoord grid_tiled_shape = threadblock_swizzle.get_tiled_shape(`
+  - **EN**: This line contributes to the signature or invocation of `get_tiled_shape`.
+  - **CN**: 这一行参与 `get_tiled_shape` 的签名或调用。
+- **Line 406 / 第406行**: `      args.problem_size, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 407 / 第407行**: `      {ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 408 / 第408行**: `      args.batch_count);`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 409 / 第409行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 410 / 第410行**: `    if (kSplitKSerial) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 411 / 第411行**: `      if (args.batch_count > 1) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 412 / 第412行**: `        if (!workspace) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 413 / 第413行**: `          return Status::kErrorWorkspaceNull;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 414 / 第414行**: `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 415 / 第415行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 416 / 第416行**: `        size_t bytes = get_workspace_size(args);`
+  - **EN**: Declares template parameter `get_workspace_size` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `get_workspace_size`，用于定制生成出的封装。
+- **Line 417 / 第417行**: `      `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 418 / 第418行**: `        cudaError_t result = cudaMemsetAsync(workspace, 0, bytes, stream);`
+  - **EN**: Declares or invokes `cudaMemsetAsync` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `cudaMemsetAsync`。
+- **Line 419 / 第419行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 420 / 第420行**: `        if (result != cudaSuccess) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 421 / 第421行**: `          return Status::kErrorInternal;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 422 / 第422行**: `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 423 / 第423行**: `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 424 / 第424行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 425 / 第425行**: `    else {`
+  - **EN**: Begins the fallback branch for the preceding condition.
+  - **CN**: 开始前一个条件判断的回退分支。
+- **Line 426 / 第426行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 427 / 第427行**: `      if (args.batch_count > 1) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 428 / 第428行**: `        return Status::kErrorInvalidProblem;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 429 / 第429行**: `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 430 / 第430行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 431 / 第431行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 432 / 第432行**: `    int gemm_k_size = args.problem_size.k();`
+  - **EN**: Declares template parameter `k` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `k`，用于定制生成出的封装。
+- **Line 433 / 第433行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 434 / 第434行**: `   // Swapping argument for A and B, if A was on the right side (problem size doesn't need to change here).`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 435 / 第435行**: `    if (kSideMode == SideMode::kRight) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 436 / 第436行**: `      // Initialize the Params structure`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 437 / 第437行**: `      params_ = typename TrmmKernel::Params{`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 438 / 第438行**: `        args.swapped_matrices(),`
+  - **EN**: This line contributes to the signature or invocation of `swapped_matrices`.
+  - **CN**: 这一行参与 `swapped_matrices` 的签名或调用。
+- **Line 439 / 第439行**: `        grid_tiled_shape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 440 / 第440行**: `        gemm_k_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 441 / 第441行**: `        static_cast<int *>(workspace)`
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 442 / 第442行**: `      };`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 443 / 第443行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 444 / 第444行**: `      return Status::kSuccess;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 445 / 第445行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 446 / 第446行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 447 / 第447行**: `    // Initialize the Params structure`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 448 / 第448行**: `    params_ = typename TrmmKernel::Params{`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 449 / 第449行**: `      args,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 450 / 第450行**: `      grid_tiled_shape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 451 / 第451行**: `      gemm_k_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 452 / 第452行**: `      static_cast<int *>(workspace)`
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 453 / 第453行**: `    };`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 454 / 第454行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 455 / 第455行**: `    return Status::kSuccess;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 456 / 第456行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 457 / 第457行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 458 / 第458行**: `  /// Lightweight update given a subset of arguments`
+  - **EN**: Documentation comment describing the next declaration: Lightweight update given a subset of arguments
+  - **CN**: 文档注释，用于说明后续声明：Lightweight update given a subset of arguments
+- **Line 459 / 第459行**: `  Status update(Arguments const &args, void *workspace = nullptr) {`
+  - **EN**: Begins the definition of `update`. The nearby comment describes it as: Lightweight update given a subset of arguments
+  - **CN**: 开始定义 `update`。附近注释对它的说明是：Lightweight update given a subset of arguments
+- **Line 460 / 第460行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 461 / 第461行**: `    if (kSplitKSerial && args.batch_count > 1) {  `
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 462 / 第462行**: `      if (!workspace) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 463 / 第463行**: `        return Status::kErrorWorkspaceNull;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 464 / 第464行**: `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 465 / 第465行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 466 / 第466行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 467 / 第467行**: `    size_t workspace_bytes = get_workspace_size(args);`
+  - **EN**: Declares template parameter `get_workspace_size` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `get_workspace_size`，用于定制生成出的封装。
+- **Line 468 / 第468行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 469 / 第469行**: `    if (workspace_bytes && !workspace) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 470 / 第470行**: `      return Status::kErrorWorkspaceNull;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 471 / 第471行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 472 / 第472行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 473 / 第473行**: `    params_.update(args, workspace);`
+  - **EN**: Declares or invokes `update` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `update`。
+- **Line 474 / 第474行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 475 / 第475行**: `    return Status::kSuccess;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 476 / 第476行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 477 / 第477行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 478 / 第478行**: `  /// Runs the kernel using initialized state.`
+  - **EN**: Documentation comment describing the next declaration: Runs the kernel using initialized state.
+  - **CN**: 文档注释，用于说明后续声明：Runs the kernel using initialized state.
+- **Line 479 / 第479行**: `  Status run(cudaStream_t stream = nullptr) {`
+  - **EN**: Begins the definition of `run`. The nearby comment describes it as: Runs the kernel using initialized state.
+  - **CN**: 开始定义 `run`。附近注释对它的说明是：Runs the kernel using initialized state.
+- **Line 480 / 第480行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 481 / 第481行**: `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Declares or initializes `variable` for later use in the wrapper or launch path.
+  - **CN**: 声明或初始化 `variable`，供后续封装逻辑或启动路径使用。
+- **Line 482 / 第482行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 483 / 第483行**: `    dim3 grid = threadblock_swizzle.get_grid_shape(params_.grid_tiled_shape);`
+  - **EN**: Declares or invokes `get_grid_shape` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `get_grid_shape`。
+- **Line 484 / 第484行**: `    dim3 block(TrmmKernel::kThreadCount, 1, 1);`
+  - **EN**: Declares or invokes `block` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `block`。
+- **Line 485 / 第485行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 486 / 第486行**: `    int smem_size = int(sizeof(typename TrmmKernel::SharedStorage));`
+  - **EN**: Declares template parameter `int` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `int`，用于定制生成出的封装。
+- **Line 487 / 第487行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 488 / 第488行**: `    if (smem_size >= (48 << 10)) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 489 / 第489行**: `      cudaError_t result = cudaFuncSetAttribute(Kernel<TrmmKernel>,`
+  - **EN**: This line contributes to the signature or invocation of `cudaFuncSetAttribute`.
+  - **CN**: 这一行参与 `cudaFuncSetAttribute` 的签名或调用。
+- **Line 490 / 第490行**: `                                    cudaFuncAttributeMaxDynamicSharedMemorySize,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 491 / 第491行**: `                                    smem_size);`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 492 / 第492行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 493 / 第493行**: `      if (result != cudaSuccess) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 494 / 第494行**: `        return Status::kErrorInternal;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 495 / 第495行**: `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 496 / 第496行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 497 / 第497行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 498 / 第498行**: `    cutlass::arch::synclog_setup();`
+  - **EN**: Declares or invokes `synclog_setup` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `synclog_setup`。
+- **Line 499 / 第499行**: `    cutlass::Kernel<TrmmKernel><<<grid, block, smem_size, stream>>>(params_);`
+  - **EN**: Declares or invokes `function` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `function`。
+- **Line 500 / 第500行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 501 / 第501行**: `    cudaError_t result = cudaGetLastError();`
+  - **EN**: Declares or invokes `cudaGetLastError` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `cudaGetLastError`。
+- **Line 502 / 第502行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 503 / 第503行**: `    return result == cudaSuccess ? Status::kSuccess : Status::kErrorInternal;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 504 / 第504行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 505 / 第505行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 506 / 第506行**: `  /// Runs the kernel using initialized state.`
+  - **EN**: Documentation comment describing the next declaration: Runs the kernel using initialized state.
+  - **CN**: 文档注释，用于说明后续声明：Runs the kernel using initialized state.
+- **Line 507 / 第507行**: `  Status operator()(cudaStream_t stream = nullptr) {`
+  - **EN**: Begins the definition of `operator()`. The nearby comment describes it as: Runs the kernel using initialized state.
+  - **CN**: 开始定义 `operator()`。附近注释对它的说明是：Runs the kernel using initialized state.
+- **Line 508 / 第508行**: `    return run(stream);`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 509 / 第509行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 510 / 第510行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 511 / 第511行**: `  /// Runs the kernel using initialized state.`
+  - **EN**: Documentation comment describing the next declaration: Runs the kernel using initialized state.
+  - **CN**: 文档注释，用于说明后续声明：Runs the kernel using initialized state.
+- **Line 512 / 第512行**: `  Status operator()(`
+  - **EN**: Continues the declaration or definition of `operator()`. The nearby comment says: Runs the kernel using initialized state.
+  - **CN**: 继续书写 `operator()` 的声明或定义。附近注释说明为：Runs the kernel using initialized state.
+- **Line 513 / 第513行**: `    Arguments const &args, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 514 / 第514行**: `    void *workspace = nullptr, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 515 / 第515行**: `    cudaStream_t stream = nullptr) {`
+  - **EN**: Declares or initializes `variable` for later use in the wrapper or launch path.
+  - **CN**: 声明或初始化 `variable`，供后续封装逻辑或启动路径使用。
+- **Line 516 / 第516行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 517 / 第517行**: `    Status status = initialize(args, workspace);`
+  - **EN**: Declares or invokes `initialize` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `initialize`。
+- **Line 518 / 第518行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 519 / 第519行**: `    if (status == Status::kSuccess) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 520 / 第520行**: `      status = run(stream);`
+  - **EN**: Declares or invokes `run` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `run`。
+- **Line 521 / 第521行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 522 / 第522行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 523 / 第523行**: `    return status;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 524 / 第524行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 525 / 第525行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 526 / 第526行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 527 / 第527行**: `/********************************************************************************************************`
+  - **EN**: Begins the file header comment block.
+  - **CN**: 开始文件头部注释块。
+- **Line 528 / 第528行**: `  TRMM has 4 combinations based on Layouts {RowMajor, ColumnMajor} x Side mode {LeftSide, RightSide}`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 529 / 第529行**: `  In templates and arguments to cutlass kernel, \`matrix A\` is always triangular, and \`matrix B\` is rectangular. `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 530 / 第530行**: `  (adhering to the cuBLAS convention)`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 531 / 第531行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 532 / 第532行**: `For the mainloop and trmm kernel, \`A\` and \`B\` points to left-side and right-side matrices, respectively.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 533 / 第533行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 534 / 第534行**: `  Thus, for LeftSide mode \`A\` and \`B\` points to \`matrix A\` and \`matrix B\`, respectively. While for `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 535 / 第535行**: `  the RightSide mode \`A\` and \`B\` points to \`matrix B\` and \`matrix A\`, respectively. `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 536 / 第536行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 537 / 第537行**: `  Additionally, CUTLASS GEMM epilogue is always RowMajor, and ColumnMajor output is achieved by `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 538 / 第538行**: `  transposing the GEMM problem. Thus, ColumnMajor output layout for TRMM requires:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 539 / 第539行**: `   - Transposing \`matrix A\` and \`matrix B\` layouts`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 540 / 第540行**: `   - Swapping problem size m and n values`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 541 / 第541行**: `   - Swapping LeftSide and RightSide mode`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 542 / 第542行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 543 / 第543行**: `  RowMajor output:    D = matrix A x matrix B`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 544 / 第544行**: `  ColumnMajor output: D = matrix A x matrix B -> Transpose (D) = Transpose(matrix B) x Transpose(matrix A)`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 545 / 第545行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 546 / 第546行**: `  {RowMajor, ColumnMajor} x Side Mode {LeftSide, RightSide} 4 cases:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 547 / 第547行**: `    1.  LeftSide mode and RowMajor output (default template)`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 548 / 第548行**: `    2.  LeftSide mode and ColumnMajor output `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 549 / 第549行**: `    3.  RightSide mode and RowMajor output`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 550 / 第550行**: `    4.  RightSide mode and ColumnMajor output`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 551 / 第551行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 552 / 第552行**: `  Mapping ColumnMajor output layout cases 2 and 4 to RowMajor efficient epilogue implementation:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 553 / 第553行**: `  `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 554 / 第554行**: `  Case 2 -> Case 3:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 555 / 第555行**: `      D_col = matrix A x matrix B (LeftSide mode) `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 556 / 第556行**: `   => Transpose(D_col) = Transpose(matrix B) x Transpose(matrix A) (RightSide mode)`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 557 / 第557行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 558 / 第558行**: `  swap pointers for \`A\` and \`B\` call GEMM mainloop with RowMajor efficient-epilogue`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 559 / 第559行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 560 / 第560行**: `  Case 4 -> Case 1:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 561 / 第561行**: `      D_col = matrix B x matrix A (RightSide mode) `
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 562 / 第562行**: `   => Transpose(D_col) = Transpose(matrix A) x Transpose(matrix B) (LeftSide mode)`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 563 / 第563行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 564 / 第564行**: `   call GEMM mainloop for with RowMajor efficient-epilogue`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 565 / 第565行**: `********************************************************************************************************/`
+  - **EN**: Closes the header comment block.
+  - **CN**: 关闭头部注释块。
+- **Line 566 / 第566行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 567 / 第567行**: `/// Partial specialization for column-major output exchanges problem size and operand.`
+  - **EN**: Documentation comment describing the next declaration: Partial specialization for column-major output exchanges problem size and operand.
+  - **CN**: 文档注释，用于说明后续声明：Partial specialization for column-major output exchanges problem size and operand.
+- **Line 568 / 第568行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 569 / 第569行**: `    /// Element type for A matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Element type for A matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Element type for A matrix operand
+- **Line 570 / 第570行**: `    typename ElementA_,`
+  - **EN**: Declares template parameter `ElementA_`. The nearby documentation says: Element type for A matrix operand
+  - **CN**: 声明模板参数 `ElementA_`。附近文档对它的说明是：Element type for A matrix operand
+- **Line 571 / 第571行**: `    /// Layout type for A matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Layout type for A matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Layout type for A matrix operand
+- **Line 572 / 第572行**: `    typename LayoutA_,`
+  - **EN**: Declares template parameter `LayoutA_`. The nearby documentation says: Layout type for A matrix operand
+  - **CN**: 声明模板参数 `LayoutA_`。附近文档对它的说明是：Layout type for A matrix operand
+- **Line 573 / 第573行**: `    /// Side Mode for A `
+  - **EN**: Documentation comment describing the next declaration: Side Mode for A
+  - **CN**: 文档注释，用于说明后续声明：Side Mode for A
+- **Line 574 / 第574行**: `    SideMode SideModeA,`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: Side Mode for A
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：Side Mode for A
+- **Line 575 / 第575行**: `    /// Fill Mode for A`
+  - **EN**: Documentation comment describing the next declaration: Fill Mode for A
+  - **CN**: 文档注释，用于说明后续声明：Fill Mode for A
+- **Line 576 / 第576行**: `    FillMode FillModeA,`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: Fill Mode for A
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：Fill Mode for A
+- **Line 577 / 第577行**: `    /// DiagType for A`
+  - **EN**: Documentation comment describing the next declaration: DiagType for A
+  - **CN**: 文档注释，用于说明后续声明：DiagType for A
+- **Line 578 / 第578行**: `    DiagType DiagTypeA,`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: DiagType for A
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：DiagType for A
+- **Line 579 / 第579行**: `    /// Element type for B matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Element type for B matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Element type for B matrix operand
+- **Line 580 / 第580行**: `    typename ElementB_,`
+  - **EN**: Declares template parameter `ElementB_`. The nearby documentation says: Element type for B matrix operand
+  - **CN**: 声明模板参数 `ElementB_`。附近文档对它的说明是：Element type for B matrix operand
+- **Line 581 / 第581行**: `    /// Layout type for B matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Layout type for B matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Layout type for B matrix operand
+- **Line 582 / 第582行**: `    typename LayoutB_,`
+  - **EN**: Declares template parameter `LayoutB_`. The nearby documentation says: Layout type for B matrix operand
+  - **CN**: 声明模板参数 `LayoutB_`。附近文档对它的说明是：Layout type for B matrix operand
+- **Line 583 / 第583行**: `    /// Element type for C and D matrix operands`
+  - **EN**: Documentation comment describing the next declaration: Element type for C and D matrix operands
+  - **CN**: 文档注释，用于说明后续声明：Element type for C and D matrix operands
+- **Line 584 / 第584行**: `    typename ElementC_,`
+  - **EN**: Declares template parameter `ElementC_`. The nearby documentation says: Element type for C and D matrix operands
+  - **CN**: 声明模板参数 `ElementC_`。附近文档对它的说明是：Element type for C and D matrix operands
+- **Line 585 / 第585行**: `    /// Element type for internal accumulation`
+  - **EN**: Documentation comment describing the next declaration: Element type for internal accumulation
+  - **CN**: 文档注释，用于说明后续声明：Element type for internal accumulation
+- **Line 586 / 第586行**: `    typename ElementAccumulator_,`
+  - **EN**: Declares template parameter `ElementAccumulator_`. The nearby documentation says: Element type for internal accumulation
+  - **CN**: 声明模板参数 `ElementAccumulator_`。附近文档对它的说明是：Element type for internal accumulation
+- **Line 587 / 第587行**: `    /// Operator class tag`
+  - **EN**: Documentation comment describing the next declaration: Operator class tag
+  - **CN**: 文档注释，用于说明后续声明：Operator class tag
+- **Line 588 / 第588行**: `    typename OperatorClass_,`
+  - **EN**: Declares template parameter `OperatorClass_`. The nearby documentation says: Operator class tag
+  - **CN**: 声明模板参数 `OperatorClass_`。附近文档对它的说明是：Operator class tag
+- **Line 589 / 第589行**: `    /// Tag indicating architecture to tune for`
+  - **EN**: Documentation comment describing the next declaration: Tag indicating architecture to tune for
+  - **CN**: 文档注释，用于说明后续声明：Tag indicating architecture to tune for
+- **Line 590 / 第590行**: `    typename ArchTag_,`
+  - **EN**: Declares template parameter `ArchTag_`. The nearby documentation says: Tag indicating architecture to tune for
+  - **CN**: 声明模板参数 `ArchTag_`。附近文档对它的说明是：Tag indicating architecture to tune for
+- **Line 591 / 第591行**: `    /// Threadblock-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Threadblock-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Threadblock-level tile size (concept: GemmShape)
+- **Line 592 / 第592行**: `    typename ThreadblockShape_,`
+  - **EN**: Declares template parameter `ThreadblockShape_`. The nearby documentation says: Threadblock-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `ThreadblockShape_`。附近文档对它的说明是：Threadblock-level tile size (concept: GemmShape)
+- **Line 593 / 第593行**: `    /// Warp-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Warp-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Warp-level tile size (concept: GemmShape)
+- **Line 594 / 第594行**: `    typename WarpShape_,`
+  - **EN**: Declares template parameter `WarpShape_`. The nearby documentation says: Warp-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `WarpShape_`。附近文档对它的说明是：Warp-level tile size (concept: GemmShape)
+- **Line 595 / 第595行**: `    /// Instruction-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Instruction-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Instruction-level tile size (concept: GemmShape)
+- **Line 596 / 第596行**: `    typename InstructionShape_,`
+  - **EN**: Declares template parameter `InstructionShape_`. The nearby documentation says: Instruction-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `InstructionShape_`。附近文档对它的说明是：Instruction-level tile size (concept: GemmShape)
+- **Line 597 / 第597行**: `    /// Epilogue output operator`
+  - **EN**: Documentation comment describing the next declaration: Epilogue output operator
+  - **CN**: 文档注释，用于说明后续声明：Epilogue output operator
+- **Line 598 / 第598行**: `    typename EpilogueOutputOp_,`
+  - **EN**: Declares template parameter `EpilogueOutputOp_`. The nearby documentation says: Epilogue output operator
+  - **CN**: 声明模板参数 `EpilogueOutputOp_`。附近文档对它的说明是：Epilogue output operator
+- **Line 599 / 第599行**: `    /// Threadblock-level swizzling operator`
+  - **EN**: Documentation comment describing the next declaration: Threadblock-level swizzling operator
+  - **CN**: 文档注释，用于说明后续声明：Threadblock-level swizzling operator
+- **Line 600 / 第600行**: `    typename ThreadblockSwizzle_,`
+  - **EN**: Declares template parameter `ThreadblockSwizzle_`. The nearby documentation says: Threadblock-level swizzling operator
+  - **CN**: 声明模板参数 `ThreadblockSwizzle_`。附近文档对它的说明是：Threadblock-level swizzling operator
+- **Line 601 / 第601行**: `    /// Number of stages used in the pipelined mainloop`
+  - **EN**: Documentation comment describing the next declaration: Number of stages used in the pipelined mainloop
+  - **CN**: 文档注释，用于说明后续声明：Number of stages used in the pipelined mainloop
+- **Line 602 / 第602行**: `    int Stages,`
+  - **EN**: Declares template parameter `Stages`. The nearby documentation says: Number of stages used in the pipelined mainloop
+  - **CN**: 声明模板参数 `Stages`。附近文档对它的说明是：Number of stages used in the pipelined mainloop
+- **Line 603 / 第603行**: `    /// Access granularity of A matrix in units of elements`
+  - **EN**: Documentation comment describing the next declaration: Access granularity of A matrix in units of elements
+  - **CN**: 文档注释，用于说明后续声明：Access granularity of A matrix in units of elements
+- **Line 604 / 第604行**: `    int AlignmentA,`
+  - **EN**: Declares template parameter `AlignmentA`. The nearby documentation says: Access granularity of A matrix in units of elements
+  - **CN**: 声明模板参数 `AlignmentA`。附近文档对它的说明是：Access granularity of A matrix in units of elements
+- **Line 605 / 第605行**: `    /// Access granularity of B matrix in units of elements`
+  - **EN**: Documentation comment describing the next declaration: Access granularity of B matrix in units of elements
+  - **CN**: 文档注释，用于说明后续声明：Access granularity of B matrix in units of elements
+- **Line 606 / 第606行**: `    int AlignmentB,`
+  - **EN**: Declares template parameter `AlignmentB`. The nearby documentation says: Access granularity of B matrix in units of elements
+  - **CN**: 声明模板参数 `AlignmentB`。附近文档对它的说明是：Access granularity of B matrix in units of elements
+- **Line 607 / 第607行**: `    /// If true, kernel supports split-K as a serial reduction`
+  - **EN**: Documentation comment describing the next declaration: If true, kernel supports split-K as a serial reduction
+  - **CN**: 文档注释，用于说明后续声明：If true, kernel supports split-K as a serial reduction
+- **Line 608 / 第608行**: `    bool SplitKSerial,`
+  - **EN**: Declares template parameter `SplitKSerial`. The nearby documentation says: If true, kernel supports split-K as a serial reduction
+  - **CN**: 声明模板参数 `SplitKSerial`。附近文档对它的说明是：If true, kernel supports split-K as a serial reduction
+- **Line 609 / 第609行**: `    /// Operation performed by TRMM`
+  - **EN**: Documentation comment describing the next declaration: Operation performed by TRMM
+  - **CN**: 文档注释，用于说明后续声明：Operation performed by TRMM
+- **Line 610 / 第610行**: `    typename Operator_,`
+  - **EN**: Declares template parameter `Operator_`. The nearby documentation says: Operation performed by TRMM
+  - **CN**: 声明模板参数 `Operator_`。附近文档对它的说明是：Operation performed by TRMM
+- **Line 611 / 第611行**: `    /// Complex elementwise transformation on A operand`
+  - **EN**: Documentation comment describing the next declaration: Complex elementwise transformation on A operand
+  - **CN**: 文档注释，用于说明后续声明：Complex elementwise transformation on A operand
+- **Line 612 / 第612行**: `    ComplexTransform TransformA>`
+  - **EN**: Declares template parameter `parameter`. The nearby documentation says: Complex elementwise transformation on A operand
+  - **CN**: 声明模板参数 `parameter`。附近文档对它的说明是：Complex elementwise transformation on A operand
+- **Line 613 / 第613行**: `class Trmm<ElementA_, LayoutA_, SideModeA, FillModeA, DiagTypeA,`
+  - **EN**: Declares template parameter `Trmm` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `Trmm`，用于定制生成出的封装。
+- **Line 614 / 第614行**: `           ElementB_, LayoutB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 615 / 第615行**: `           layout::ColumnMajor,  // partially specialized on LayoutC`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 616 / 第616行**: `           ElementAccumulator_, OperatorClass_, ArchTag_, ThreadblockShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 617 / 第617行**: `           WarpShape_, InstructionShape_, EpilogueOutputOp_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 618 / 第618行**: `           ThreadblockSwizzle_, Stages, AlignmentA, AlignmentB, SplitKSerial,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 619 / 第619行**: `           Operator_, TransformA> {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 620 / 第620行**: ` public:`
+  - **EN**: Switches to the `public` access section of the class.
+  - **CN**: 切换到类的 `public` 访问区域。
+- **Line 621 / 第621行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 622 / 第622行**: `  using ElementA = ElementA_;`
+  - **EN**: Defines the alias `ElementA` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementA`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 623 / 第623行**: `  using LayoutA = LayoutA_; `
+  - **EN**: Defines the alias `LayoutA` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutA`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 624 / 第624行**: `  using TensorRefA = TensorRef<ElementA const, LayoutA>;`
+  - **EN**: Defines the alias `TensorRefA` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefA`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 625 / 第625行**: `  using ElementB = ElementB_;`
+  - **EN**: Defines the alias `ElementB` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementB`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 626 / 第626行**: `  using LayoutB = LayoutB_;`
+  - **EN**: Defines the alias `LayoutB` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutB`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 627 / 第627行**: `  using TensorRefB = TensorRef<ElementB const, LayoutB>;`
+  - **EN**: Defines the alias `TensorRefB` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefB`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 628 / 第628行**: `  using ElementC = ElementC_;`
+  - **EN**: Defines the alias `ElementC` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementC`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 629 / 第629行**: `  using LayoutC = layout::ColumnMajor;`
+  - **EN**: Defines the alias `LayoutC` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutC`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 630 / 第630行**: `  using TensorRefC = TensorRef<ElementC const, LayoutC>;`
+  - **EN**: Defines the alias `TensorRefC` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefC`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 631 / 第631行**: `  using TensorRefD = TensorRef<ElementC, LayoutC>;`
+  - **EN**: Defines the alias `TensorRefD` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TensorRefD`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 632 / 第632行**: `  using ElementAccumulator = ElementAccumulator_;`
+  - **EN**: Defines the alias `ElementAccumulator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementAccumulator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 633 / 第633行**: `  using OperatorClass = OperatorClass_;`
+  - **EN**: Defines the alias `OperatorClass` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `OperatorClass`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 634 / 第634行**: `  using ArchTag = ArchTag_;`
+  - **EN**: Defines the alias `ArchTag` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ArchTag`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 635 / 第635行**: `  using ThreadblockShape = ThreadblockShape_;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 636 / 第636行**: `  using WarpShape = WarpShape_;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 637 / 第637行**: `  using InstructionShape = InstructionShape_;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 638 / 第638行**: `  using EpilogueOutputOp = EpilogueOutputOp_;`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 639 / 第639行**: `  using ThreadblockSwizzle = ThreadblockSwizzle_;`
+  - **EN**: Defines the alias `ThreadblockSwizzle` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockSwizzle`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 640 / 第640行**: `  using Operator = Operator_;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 641 / 第641行**: `  static SideMode const kSideMode = SideModeA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 642 / 第642行**: `  static FillMode const kFillMode = FillModeA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 643 / 第643行**: `  static DiagType const kDiagType = DiagTypeA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 644 / 第644行**: `  // Changing SideMode as we change the layout`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 645 / 第645行**: `  static SideMode const kSideModeT = (SideModeA == SideMode::kLeft) ?`
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 646 / 第646行**: `                                      SideMode::kRight : SideMode::kLeft;`
+  - **EN**: Declares template parameter `parameter` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `parameter`，用于定制生成出的封装。
+- **Line 647 / 第647行**: `  // Changing FillMode as we change the layout`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 648 / 第648行**: `  static FillMode const kFillModeT = (FillModeA == FillMode::kLower) ? `
+  - **EN**: This line contributes to the signature or invocation of `function`.
+  - **CN**: 这一行参与 `function` 的签名或调用。
+- **Line 649 / 第649行**: `                                      FillMode::kUpper : FillMode::kLower;`
+  - **EN**: Declares template parameter `parameter` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `parameter`，用于定制生成出的封装。
+- **Line 650 / 第650行**: `  static int const kStages = Stages;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 651 / 第651行**: `  static int const kAlignmentA = AlignmentA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 652 / 第652行**: `  static int const kAlignmentB = AlignmentB;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 653 / 第653行**: `  static ComplexTransform const kTransformA = TransformA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 654 / 第654行**: `  // Complex Transform don't apply to B`
+  - **EN**: Regular comment that labels or clarifies the following code.
+  - **CN**: 普通注释，用于标记或说明后续代码。
+- **Line 655 / 第655行**: `  static ComplexTransform const kTransformB = ComplexTransform::kNone; `
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 656 / 第656行**: `  static bool const kSplitKSerial = SplitKSerial;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 657 / 第657行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 658 / 第658行**: `  using UnderlyingOperator = Trmm<`
+  - **EN**: Defines the alias `UnderlyingOperator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `UnderlyingOperator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 659 / 第659行**: `    ElementA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 660 / 第660行**: `    typename layout::LayoutTranspose<LayoutA>::type,`
+  - **EN**: Declares template parameter `layout` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `layout`，用于定制生成出的封装。
+- **Line 661 / 第661行**: `    kSideModeT,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 662 / 第662行**: `    kFillModeT,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 663 / 第663行**: `    kDiagType,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 664 / 第664行**: `    ElementB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 665 / 第665行**: `    typename layout::LayoutTranspose<LayoutB>::type, `
+  - **EN**: Declares template parameter `layout` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `layout`，用于定制生成出的封装。
+- **Line 666 / 第666行**: `    ElementC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 667 / 第667行**: `    layout::RowMajor,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 668 / 第668行**: `    ElementAccumulator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 669 / 第669行**: `    OperatorClass,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 670 / 第670行**: `    ArchTag,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 671 / 第671行**: `    ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 672 / 第672行**: `    WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 673 / 第673行**: `    InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 674 / 第674行**: `    EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 675 / 第675行**: `    ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 676 / 第676行**: `    kStages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 677 / 第677行**: `    kAlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 678 / 第678行**: `    kAlignmentB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 679 / 第679行**: `    kSplitKSerial,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 680 / 第680行**: `    Operator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 681 / 第681行**: `    TransformA`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 682 / 第682行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 683 / 第683行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 684 / 第684行**: `  using Arguments = typename UnderlyingOperator::Arguments;`
+  - **EN**: Defines the alias `Arguments` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Arguments`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 685 / 第685行**: `  using TrmmKernel = typename UnderlyingOperator::TrmmKernel;`
+  - **EN**: Defines the alias `TrmmKernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `TrmmKernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 686 / 第686行**: `  static int const kAlignmentC = UnderlyingOperator::kAlignmentC;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 687 / 第687行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 688 / 第688行**: `private:`
+  - **EN**: Switches to the `private` access section of the class.
+  - **CN**: 切换到类的 `private` 访问区域。
+- **Line 689 / 第689行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 690 / 第690行**: `  UnderlyingOperator underlying_operator_;`
+  - **EN**: Declares or initializes `variable` for later use in the wrapper or launch path.
+  - **CN**: 声明或初始化 `variable`，供后续封装逻辑或启动路径使用。
+- **Line 691 / 第691行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 692 / 第692行**: `public:`
+  - **EN**: Switches to the `public` access section of the class.
+  - **CN**: 切换到类的 `public` 访问区域。
+- **Line 693 / 第693行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 694 / 第694行**: `  /// Constructs the TRMM.`
+  - **EN**: Documentation comment describing the next declaration: Constructs the TRMM.
+  - **CN**: 文档注释，用于说明后续声明：Constructs the TRMM.
+- **Line 695 / 第695行**: `  Trmm() { }`
+  - **EN**: Continues the declaration or definition of `Trmm`. The nearby comment says: Constructs the TRMM.
+  - **CN**: 继续书写 `Trmm` 的声明或定义。附近注释说明为：Constructs the TRMM.
+- **Line 696 / 第696行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 697 / 第697行**: `  /// Helper to construct a transposed equivalent for the underlying TRMM operator which is identical`
+  - **EN**: Documentation comment describing the next declaration: Helper to construct a transposed equivalent for the underlying TRMM operator which is identical
+  - **CN**: 文档注释，用于说明后续声明：Helper to construct a transposed equivalent for the underlying TRMM operator which is identical
+- **Line 698 / 第698行**: `  static Arguments to_underlying_arguments(Arguments const &args) {`
+  - **EN**: Begins the definition of `to_underlying_arguments`. The nearby comment describes it as: Helper to construct a transposed equivalent for the underlying TRMM operator which is identical
+  - **CN**: 开始定义 `to_underlying_arguments`。附近注释对它的说明是：Helper to construct a transposed equivalent for the underlying TRMM operator which is identical
+- **Line 699 / 第699行**: `    return args.transposed_problem_size();`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 700 / 第700行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 701 / 第701行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 702 / 第702行**: `  /// Determines whether the TRMM can execute the given problem.`
+  - **EN**: Documentation comment describing the next declaration: Determines whether the TRMM can execute the given problem.
+  - **CN**: 文档注释，用于说明后续声明：Determines whether the TRMM can execute the given problem.
+- **Line 703 / 第703行**: `  static Status can_implement(Arguments const &args) {`
+  - **EN**: Begins the definition of `can_implement`. The nearby comment describes it as: Determines whether the TRMM can execute the given problem.
+  - **CN**: 开始定义 `can_implement`。附近注释对它的说明是：Determines whether the TRMM can execute the given problem.
+- **Line 704 / 第704行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 705 / 第705行**: `    return UnderlyingOperator::can_implement(to_underlying_arguments(args));`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 706 / 第706行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 707 / 第707行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 708 / 第708行**: `  /// Gets the workspace size`
+  - **EN**: Documentation comment describing the next declaration: Gets the workspace size
+  - **CN**: 文档注释，用于说明后续声明：Gets the workspace size
+- **Line 709 / 第709行**: `  static size_t get_workspace_size(Arguments const &args) {`
+  - **EN**: Begins the definition of `get_workspace_size`. The nearby comment describes it as: Gets the workspace size
+  - **CN**: 开始定义 `get_workspace_size`。附近注释对它的说明是：Gets the workspace size
+- **Line 710 / 第710行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 711 / 第711行**: `    return UnderlyingOperator::get_workspace_size(to_underlying_arguments(args));`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 712 / 第712行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 713 / 第713行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 714 / 第714行**: `  /// Initializes TRMM state from arguments.`
+  - **EN**: Documentation comment describing the next declaration: Initializes TRMM state from arguments.
+  - **CN**: 文档注释，用于说明后续声明：Initializes TRMM state from arguments.
+- **Line 715 / 第715行**: `  Status initialize(Arguments const &args, void *workspace = nullptr, cudaStream_t stream = nullptr) {`
+  - **EN**: Begins the definition of `initialize`. The nearby comment describes it as: Initializes TRMM state from arguments.
+  - **CN**: 开始定义 `initialize`。附近注释对它的说明是：Initializes TRMM state from arguments.
+- **Line 716 / 第716行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 717 / 第717行**: `    return underlying_operator_.initialize(to_underlying_arguments(args), workspace, stream);`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 718 / 第718行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 719 / 第719行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 720 / 第720行**: `  /// Lightweight update given a subset of arguments`
+  - **EN**: Documentation comment describing the next declaration: Lightweight update given a subset of arguments
+  - **CN**: 文档注释，用于说明后续声明：Lightweight update given a subset of arguments
+- **Line 721 / 第721行**: `  Status update(Arguments const &args, void *workspace = nullptr) {`
+  - **EN**: Begins the definition of `update`. The nearby comment describes it as: Lightweight update given a subset of arguments
+  - **CN**: 开始定义 `update`。附近注释对它的说明是：Lightweight update given a subset of arguments
+- **Line 722 / 第722行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 723 / 第723行**: `    return underlying_operator_.update(to_underlying_arguments(args), workspace);`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 724 / 第724行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 725 / 第725行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 726 / 第726行**: `  /// Runs the kernel using initialized state.`
+  - **EN**: Documentation comment describing the next declaration: Runs the kernel using initialized state.
+  - **CN**: 文档注释，用于说明后续声明：Runs the kernel using initialized state.
+- **Line 727 / 第727行**: `  Status run(cudaStream_t stream = nullptr) {`
+  - **EN**: Begins the definition of `run`. The nearby comment describes it as: Runs the kernel using initialized state.
+  - **CN**: 开始定义 `run`。附近注释对它的说明是：Runs the kernel using initialized state.
+- **Line 728 / 第728行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 729 / 第729行**: `    return underlying_operator_.run(stream);`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 730 / 第730行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 731 / 第731行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 732 / 第732行**: `  /// Runs the kernel using initialized state.`
+  - **EN**: Documentation comment describing the next declaration: Runs the kernel using initialized state.
+  - **CN**: 文档注释，用于说明后续声明：Runs the kernel using initialized state.
+- **Line 733 / 第733行**: `  Status operator()(cudaStream_t stream = nullptr) {`
+  - **EN**: Begins the definition of `operator()`. The nearby comment describes it as: Runs the kernel using initialized state.
+  - **CN**: 开始定义 `operator()`。附近注释对它的说明是：Runs the kernel using initialized state.
+- **Line 734 / 第734行**: `    return run(stream);`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 735 / 第735行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 736 / 第736行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 737 / 第737行**: `  /// Runs the kernel using initialized state.`
+  - **EN**: Documentation comment describing the next declaration: Runs the kernel using initialized state.
+  - **CN**: 文档注释，用于说明后续声明：Runs the kernel using initialized state.
+- **Line 738 / 第738行**: `  Status operator()(`
+  - **EN**: Continues the declaration or definition of `operator()`. The nearby comment says: Runs the kernel using initialized state.
+  - **CN**: 继续书写 `operator()` 的声明或定义。附近注释说明为：Runs the kernel using initialized state.
+- **Line 739 / 第739行**: `    Arguments const &args, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 740 / 第740行**: `    void *workspace = nullptr, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 741 / 第741行**: `    cudaStream_t stream = nullptr) {`
+  - **EN**: Declares or initializes `variable` for later use in the wrapper or launch path.
+  - **CN**: 声明或初始化 `variable`，供后续封装逻辑或启动路径使用。
+- **Line 742 / 第742行**: `   `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 743 / 第743行**: `    Status status = initialize(args, workspace, stream);`
+  - **EN**: Declares or invokes `initialize` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `initialize`。
+- **Line 744 / 第744行**: `    `
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 745 / 第745行**: `    if (status == Status::kSuccess) {`
+  - **EN**: Begins a runtime condition that guards the following code path.
+  - **CN**: 开始一个运行时条件判断，用于保护后续代码路径。
+- **Line 746 / 第746行**: `      status = run(stream);`
+  - **EN**: Declares or invokes `run` within the wrapper logic.
+  - **CN**: 在封装逻辑中声明或调用 `run`。
+- **Line 747 / 第747行**: `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 748 / 第748行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 749 / 第749行**: `    return status;`
+  - **EN**: Returns the computed value or status to the caller.
+  - **CN**: 向调用者返回计算得到的值或状态。
+- **Line 750 / 第750行**: `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 关闭当前作用域。
+- **Line 751 / 第751行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 752 / 第752行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 753 / 第753行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 754 / 第754行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 755 / 第755行**: `} // namespace device`
+  - **EN**: Closes namespace `device`.
+  - **CN**: 关闭命名空间 `device`。
+- **Line 756 / 第756行**: `} // namespace gemm`
+  - **EN**: Closes namespace `gemm`.
+  - **CN**: 关闭命名空间 `gemm`。
+- **Line 757 / 第757行**: `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 758 / 第758行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 759 / 第759行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+
+## Key Concepts / 关键概念
+
+- **EN**: The header lives at CUTLASS's device API layer, where heavy template composition is turned into a callable host-side wrapper.  
+- **CN**: 该头文件位于 CUTLASS 的设备 API 层，把复杂的模板组合封装成可由主机调用的包装器。
+- **EN**: These BLAS-structured wrappers preserve mathematical structure such as symmetry, triangularity, or rank-update semantics while still using CUTLASS kernel machinery.  
+- **CN**: 这些面向 BLAS 结构化运算的封装会保留对称性、三角性或 rank-update 语义，同时继续复用 CUTLASS 内核机制。
+- **EN**: Most device wrappers expose a common lifecycle: argument validation, workspace sizing, initialization, and kernel launch.  
+- **CN**: 大多数设备封装都遵循共同生命周期：参数校验、工作区大小计算、初始化以及内核启动。
+
+## Dependencies / 依赖关系
+
+- `cutlass/blas3.h`: Provides supporting CUTLASS declarations required by this wrapper. / 提供该封装所需的 CUTLASS 支持性声明。
+- `cutlass/arch/arch.h`: Provides architecture tags and architecture-specific traits. / 提供架构标签与架构相关 traits。
+- `cutlass/device_kernel.h`: Supplies helpers for launching CUTLASS device kernels. / 提供启动 CUTLASS 设备内核所需的辅助工具。
+- `cutlass/gemm/threadblock/threadblock_swizzle.h`: Defines threadblock swizzle policies for mapping tiles to CTAs. / 定义把 tile 映射到 CTA 的 threadblock swizzle 策略。
+- `cutlass/gemm/kernel/trmm_universal.h`: Provides the underlying GEMM kernel or kernel-side parameter definitions. / 提供底层 GEMM 内核或内核侧参数定义。
+- `cutlass/gemm/kernel/default_trmm_universal.h`: Builds a default GEMM-kernel composition used by this device wrapper. / 构建该设备封装所使用的默认 GEMM 内核组合。
+- `cutlass/gemm/device/default_gemm_configuration.h`: Supplies default tile, alignment, and epilogue configuration choices. / 提供默认的 tile、对齐方式与 epilogue 配置选择。

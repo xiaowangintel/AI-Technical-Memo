@@ -1,0 +1,863 @@
+# simt_cgemm_tn_sm80.cu — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/simt_cgemm_tn_sm80.cu`
+- 中文：`test/unit/gemm/device/simt_cgemm_tn_sm80.cu`
+
+## Purpose / 目的
+- EN: This file defines SIMT device-GEMM tests for `simt_cgemm_tn_sm80` and validates multiple tiling choices on SM80. The file-level brief is: "Tests for device-wide GEMM interface." The filename layout token indicates transposed A / non-transposed B.
+- 中文：该文件为 `simt_cgemm_tn_sm80` 定义了 SIMT 设备级 GEMM 测试，并在 SM80 上验证多种分块配置。 文件级摘要为：“设备级 GEMM 接口测试”。 文件名中的布局标记表示 A 转置 / B 不转置。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L32** `    \brief Tests for device-wide GEMM interface`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L33** `    `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L34** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L35** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L36** `#include <iostream>`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- **L37** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L38** `#include "../../common/cutlass_unit_test.h"`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- **L39** `#include "cutlass/cutlass.h"`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- **L40** `#include "cutlass/gemm/device/gemm_complex.h"`
+  - EN: Includes `cutlass/gemm/device/gemm_complex.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/gemm/device/gemm_complex.h`，这是该测试编译单元所需的依赖。
+- **L41** `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host-side tensor containers for reference data and verification.
+  - 中文：提供主机端张量容器，用于参考数据与结果校验。
+- **L42** `#include "cutlass/util/reference/host/gemm.h"`
+  - EN: Provides a host reference GEMM implementation for correctness checking.
+  - 中文：提供主机端参考 GEMM 实现，用于正确性校验。
+- **L43** `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides host reference tensor comparison utilities.
+  - 中文：提供主机端张量比较工具。
+- **L44** `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host reference tensor copy routines.
+  - 中文：提供主机端张量拷贝参考实现。
+- **L45** `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides host reference routines that fill tensors with test data.
+  - 中文：提供在主机端填充测试张量的参考实现。
+- **L46** `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides tensor printing and inspection helpers.
+  - 中文：提供张量打印与查看辅助工具。
+- **L47** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L48** `#include "testbed_complex.h"`
+  - EN: Includes `testbed_complex.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `testbed_complex.h`，这是该测试编译单元所需的依赖。
+- **L49** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L50** `    `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L51** `#if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`
+  - EN: Begins a conditional-compilation region guarded by `defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`.
+  - 中文：开始一个由 `defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)` 控制的条件编译区域。
+- **L52** `////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L53** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L54** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 32x64x8_32x64x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.32x64x8_32x64x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.32x64x8_32x64x1`，用于覆盖一个 GEMM 场景。
+- **L55** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L56** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L57** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L58** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L59** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L60** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L61** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L62** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L63** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L64** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L65** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L66** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L67** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L68** `    cutlass::gemm::GemmShape<32, 64, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L69** `    cutlass::gemm::GemmShape<32, 32, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L70** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L71** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L72** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L73** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L74** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L75** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L76** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L77** `    4`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L78** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L79** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L80** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L81** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L82** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L83** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 64x64x8_32x64x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.64x64x8_32x64x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.64x64x8_32x64x1`，用于覆盖一个 GEMM 场景。
+- **L84** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L85** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L86** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L87** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L88** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L89** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L90** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L91** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L92** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L93** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L94** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L95** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L96** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L97** `    cutlass::gemm::GemmShape<64, 64, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L98** `    cutlass::gemm::GemmShape<32, 64, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L99** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L100** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L101** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L102** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L103** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L104** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L105** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L106** `    3,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L107** `    cutlass::ComplexTransform::kConjugate,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L108** `    cutlass::ComplexTransform::kConjugate`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L109** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L110** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L111** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L112** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L113** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L114** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 128x128x8_32x64x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x128x8_32x64x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x128x8_32x64x1`，用于覆盖一个 GEMM 场景。
+- **L115** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L116** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L117** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L118** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L119** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L120** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L121** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L122** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L123** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L124** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L125** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L126** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L127** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L128** `    cutlass::gemm::GemmShape<128, 128, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L129** `    cutlass::gemm::GemmShape<32, 64, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L130** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L131** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L132** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L133** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L134** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L135** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L136** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L137** `    3`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L138** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L139** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L140** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L141** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L142** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L143** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 64x128x8_32x64x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.64x128x8_32x64x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.64x128x8_32x64x1`，用于覆盖一个 GEMM 场景。
+- **L144** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L145** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L146** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L147** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L148** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L149** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L150** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L151** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L152** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L153** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L154** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L155** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L156** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L157** `    cutlass::gemm::GemmShape<64, 128, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L158** `    cutlass::gemm::GemmShape<32, 64, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L159** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L160** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L161** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L162** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L163** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L164** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L165** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L166** `    3,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L167** `    cutlass::ComplexTransform::kConjugate,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L168** `    cutlass::ComplexTransform::kConjugate`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L169** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L170** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L171** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L172** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L173** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L174** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 128x64x8_64x32x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x64x8_64x32x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x64x8_64x32x1`，用于覆盖一个 GEMM 场景。
+- **L175** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L176** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L177** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L178** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L179** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L180** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L181** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L182** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L183** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L184** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L185** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L186** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L187** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L188** `    cutlass::gemm::GemmShape<128, 64, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L189** `    cutlass::gemm::GemmShape<64, 32, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L190** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L191** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L192** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L193** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L194** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L195** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L196** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L197** `    3,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L198** `    cutlass::ComplexTransform::kConjugate,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L199** `    cutlass::ComplexTransform::kConjugate`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L200** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L201** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L202** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L203** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L204** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L205** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 128x128x8_64x64x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x128x8_64x64x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x128x8_64x64x1`，用于覆盖一个 GEMM 场景。
+- **L206** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L207** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L208** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L209** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L210** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L211** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L212** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L213** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L214** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L215** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L216** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L217** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L218** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L219** `    cutlass::gemm::GemmShape<128, 128, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L220** `    cutlass::gemm::GemmShape<64, 64, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L221** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L222** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L223** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L224** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L225** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L226** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L227** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L228** `    3`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L229** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L230** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L231** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L232** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L233** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L234** `TEST(SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32, 128x256x8_64x64x1) {`
+  - EN: Defines GoogleTest case `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x256x8_64x64x1` for one GEMM scenario.
+  - 中文：定义 GoogleTest 用例 `SM80_Device_Gemm_cf32t_cf32n_cf32t_simt_cf32.128x256x8_64x64x1`，用于覆盖一个 GEMM 场景。
+- **L235** `  `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L236** `  using Element = cutlass::complex<float>;`
+  - EN: Creates the alias `Element` for the complex-float type.
+  - 中文：为 `Element` 创建别名，对应 复数 float 类型。
+- **L237** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L238** `  using Gemm = cutlass::gemm::device::GemmComplex<`
+  - EN: Starts the alias for the device-facing GEMM wrapper type.
+  - 中文：开始定义面向设备调用的 GEMM 包装类型别名。
+- **L239** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L240** `    cutlass::layout::RowMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L241** `    Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L242** `    cutlass::layout::ColumnMajor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L243** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L244** `    cutlass::layout::RowMajor, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L245** `    Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L246** `    cutlass::arch::OpClassSimt, `
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L247** `    cutlass::arch::Sm80,`
+  - EN: Supplies architecture and operator-class tags.
+  - 中文：提供架构标签与运算类别标签。
+- **L248** `    cutlass::gemm::GemmShape<128, 256, 8>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L249** `    cutlass::gemm::GemmShape<64, 64, 8>, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L250** `    cutlass::gemm::GemmShape<1, 1, 1>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L251** `    cutlass::epilogue::thread::LinearCombination<`
+  - EN: Starts or continues the epilogue output-operator definition.
+  - 中文：开始或继续定义 epilogue 输出算子。
+- **L252** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L253** `        1,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L254** `        Element, `
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L255** `        Element>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L256** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>, `
+  - EN: Uses the default identity threadblock swizzle.
+  - 中文：使用默认的恒等 threadblock swizzle。
+- **L257** `    3,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L258** `    cutlass::ComplexTransform::kConjugate,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L259** `    cutlass::ComplexTransform::kConjugate`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L260** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L261** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L262** `  EXPECT_TRUE(test::gemm::device::TestAllGemmComplex<Gemm>());`
+  - EN: Checks that `test::gemm::device::TestAllGemmComplex<Gemm>()` evaluates to true, marking the test as passed.
+  - 中文：检查 `test::gemm::device::TestAllGemmComplex<Gemm>()` 的结果是否为真，以判定测试通过。
+- **L263** `}`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L264** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L265** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L266** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L267** `#endif // #if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`
+  - EN: Closes the current conditional-compilation block.
+  - 中文：结束当前条件编译块。
+- **L268** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L269** `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+
+## Key Concepts / 关键概念
+- EN: GoogleTest test cases
+  - 中文：GoogleTest 测试用例
+- EN: SIMT operator class
+  - 中文：SIMT 运算类别
+- EN: Linear-combination epilogue operator
+  - 中文：线性组合 epilogue 输出算子
+- EN: Architecture-specific kernel specialization
+  - 中文：面向特定架构的内核特化
+
+## Dependencies / 依赖关系
+- `iostream`
+  - EN: Provides standard C++ stream utilities, usually for debug or status output.
+  - 中文：提供标准 C++ 流工具，通常用于调试或状态输出。
+- `../../common/cutlass_unit_test.h`
+  - EN: Pulls in the CUTLASS unit-test harness and GoogleTest integration.
+  - 中文：引入 CUTLASS 单元测试框架以及 GoogleTest 集成。
+- `cutlass/cutlass.h`
+  - EN: Provides core CUTLASS definitions and common infrastructure.
+  - 中文：提供 CUTLASS 核心定义与通用基础设施。
+- `cutlass/gemm/device/gemm_complex.h`
+  - EN: Includes `cutlass/gemm/device/gemm_complex.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `cutlass/gemm/device/gemm_complex.h`，这是该测试编译单元所需的依赖。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host-side tensor containers for reference data and verification.
+  - 中文：提供主机端张量容器，用于参考数据与结果校验。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides a host reference GEMM implementation for correctness checking.
+  - 中文：提供主机端参考 GEMM 实现，用于正确性校验。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides host reference tensor comparison utilities.
+  - 中文：提供主机端张量比较工具。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host reference tensor copy routines.
+  - 中文：提供主机端张量拷贝参考实现。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides host reference routines that fill tensors with test data.
+  - 中文：提供在主机端填充测试张量的参考实现。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides tensor printing and inspection helpers.
+  - 中文：提供张量打印与查看辅助工具。
+- `testbed_complex.h`
+  - EN: Includes `testbed_complex.h`, a dependency needed by this test translation unit.
+  - 中文：引入 `testbed_complex.h`，这是该测试编译单元所需的依赖。

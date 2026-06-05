@@ -1,0 +1,2593 @@
+# complex.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/complex.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/complex.h`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/complex.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>#include &lt;cuComplex.h&gt;</code>
+  - EN: Includes <cuComplex.h> so this file can use declarations from that dependency.
+  - CN: 包含 <cuComplex.h>，以便本文件使用该依赖中的声明。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>#include &lt;cuda_fp16.h&gt;</code>
+  - EN: Includes <cuda_fp16.h> so this file can use declarations from that dependency.
+  - CN: 包含 <cuda_fp16.h>，以便本文件使用该依赖中的声明。
+- **L37**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L39**: <code>#include CUDA_STD_HEADER(cstdint)</code>
+  - EN: Includes CUDA_STD_HEADER(cstdint) so this file can use declarations from that dependency.
+  - CN: 包含 CUDA_STD_HEADER(cstdint)，以便本文件使用该依赖中的声明。
+- **L40**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L41**: <code>#include &lt;cstdint&gt;</code>
+  - EN: Includes <cstdint> so this file can use declarations from that dependency.
+  - CN: 包含 <cstdint>，以便本文件使用该依赖中的声明。
+- **L42**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L43**: <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes "cutlass/functional.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/functional.h"，以便本文件使用该依赖中的声明。
+- **L44**: <code>#include &quot;cutlass/platform/platform.h&quot;</code>
+  - EN: Includes "cutlass/platform/platform.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/platform/platform.h"，以便本文件使用该依赖中的声明。
+- **L45**: <code>#include &quot;cutlass/real.h&quot;</code>
+  - EN: Includes "cutlass/real.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/real.h"，以便本文件使用该依赖中的声明。
+- **L46**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L47**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L48**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L49**: <code>#include &quot;cutlass/fast_math.h&quot;</code>
+  - EN: Includes "cutlass/fast_math.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/fast_math.h"，以便本文件使用该依赖中的声明。
+- **L50**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L51**: <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L52**: <code>#include &lt;iosfwd&gt;</code>
+  - EN: Includes <iosfwd> so this file can use declarations from that dependency.
+  - CN: 包含 <iosfwd>，以便本文件使用该依赖中的声明。
+- **L53**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L54**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L55**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L58**: <code>/// Enumeraed type describing a transformation on a complex value.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L59**: <code>enum class ComplexTransform {</code>
+  - EN: Declares or defines the class `ComplexTransform`.
+  - CN: 声明或定义 class `ComplexTransform`。
+- **L60**: <code>  kNone,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L61**: <code>  kConjugate</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L62**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L65**: <code>/// Defines ComplexTransform inversions</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L66**: <code>template &lt;ComplexTransform kTransform&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L67**: <code>struct InvertComplexTransform;</code>
+  - EN: Declares or defines the struct `InvertComplexTransform`.
+  - CN: 声明或定义 struct `InvertComplexTransform`。
+- **L68**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L69**: <code>/// Invert ComplexTransform from kNone to kConjugate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L70**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L71**: <code>struct InvertComplexTransform&lt;ComplexTransform::kNone&gt; {</code>
+  - EN: Declares or defines the struct `InvertComplexTransform`.
+  - CN: 声明或定义 struct `InvertComplexTransform`。
+- **L72**: <code>  static ComplexTransform const transform = ComplexTransform::kConjugate;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L73**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>/// Invert ComplexTransform from kConjugate to kNone</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L76**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L77**: <code>struct InvertComplexTransform&lt;ComplexTransform::kConjugate&gt; {</code>
+  - EN: Declares or defines the struct `InvertComplexTransform`.
+  - CN: 声明或定义 struct `InvertComplexTransform`。
+- **L78**: <code>  static ComplexTransform const transform = ComplexTransform::kNone;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L79**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L80**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L81**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L82**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L83**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L84**: <code>// Accessors for CUDA complex types</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L85**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L86**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L87**: <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L88**: <code>/// Returns the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L89**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L90**: <code>float const &amp;real(cuFloatComplex const &amp;z) { return z.x; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L91**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L92**: <code>/// Returns the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L93**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L94**: <code>float &amp;real(cuFloatComplex &amp;z) { return z.x; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L95**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L96**: <code>/// Returns the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L97**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L98**: <code>double const &amp;real(cuDoubleComplex const &amp;z) { return z.x; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L99**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L100**: <code>/// Returns the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L101**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L102**: <code>double &amp;real(cuDoubleComplex &amp;z) { return z.x; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L103**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L104**: <code>/// Returns the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L105**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L106**: <code>float const &amp;imag(cuFloatComplex const &amp;z) { return z.y; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L107**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L108**: <code>/// Returns the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L109**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L110**: <code>float &amp;imag(cuFloatComplex &amp;z) { return z.y; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L111**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L112**: <code>/// Returns the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L113**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L114**: <code>double const &amp;imag(cuDoubleComplex const &amp;z) { return z.y; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L115**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L116**: <code>/// Returns the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L117**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L118**: <code>double &amp;imag(cuDoubleComplex &amp;z) { return z.y; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L119**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L120**: <code>// Returns the conjugate of the complex number</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L121**: <code>CUTLASS_HOST_DEVICE cuFloatComplex</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L122**: <code>conj(cuFloatComplex const&amp; z) {</code>
+  - EN: Starts the definition body for `conj`.
+  - CN: 开始 `conj` 的定义体。
+- **L123**: <code>  return make_cuFloatComplex(z.x, -z.y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L124**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L125**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L126**: <code>// Returns the conjugate of the complex number</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L127**: <code>CUTLASS_HOST_DEVICE cuDoubleComplex</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L128**: <code>conj(cuDoubleComplex const&amp; z) {</code>
+  - EN: Starts the definition body for `conj`.
+  - CN: 开始 `conj` 的定义体。
+- **L129**: <code>  return make_cuDoubleComplex(z.x, -z.y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L130**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L131**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L132**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L133**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>/// Class for representing and manipulating complex numbers with conversions from built-in CUDA</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L136**: <code>/// complex types.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L137**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L138**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L139**: <code>class complex</code>
+  - EN: Declares or defines the class `complex`.
+  - CN: 声明或定义 class `complex`。
+- **L140**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L141**: <code> public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L142**: <code>  /// Type alias for scalar type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L143**: <code>  using value_type = T;</code>
+  - EN: Defines the alias `value_type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `value_type`。
+- **L144**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L145**: <code> private:</code>
+  - EN: Sets the `private` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `private`。
+- **L146**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L147**: <code>  // Data members</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L148**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L149**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L150**: <code>  /// Real part</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L151**: <code>  T _real;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L153**: <code>  /// Imaginary part</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L154**: <code>  T _imag;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L155**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L156**: <code> public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L157**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L158**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L159**: <code>// Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L160**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L161**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L162**: <code>  /// Default constructor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L163**: <code>  complex() = default;</code>
+  - EN: Declares the callable or operator `complex`.
+  - CN: 声明可调用对象或运算符 `complex`。
+- **L164**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L165**: <code>  /// Constructor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L166**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L167**: <code>  complex(T r) : _real(r), _imag(T(0)) {}</code>
+  - EN: Starts the definition body for `complex`.
+  - CN: 开始 `complex` 的定义体。
+- **L168**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L169**: <code>  /// Constructor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L170**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L171**: <code>  complex(T r, T i) : _real(r), _imag(i) {}</code>
+  - EN: Starts the definition body for `complex`.
+  - CN: 开始 `complex` 的定义体。
+- **L172**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L173**: <code>  /// Constructor</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L174**: <code>  template&lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L175**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L176**: <code>  complex(complex&lt;A&gt; const &amp;z) : _real(static_cast&lt;T&gt;(z.real())), _imag(static_cast&lt;T&gt;(z.imag())) {}</code>
+  - EN: Starts the definition body for `complex`.
+  - CN: 开始 `complex` 的定义体。
+- **L177**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L178**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L179**: <code>  #if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L180**: <code>  /// Conversion from cuFloatComplex</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L181**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L182**: <code>  complex(cuFloatComplex const &amp;z) : _real(static_cast&lt;T&gt;(cuCrealf(z))), _imag(static_cast&lt;T&gt;(cuCimagf(z))) {}</code>
+  - EN: Starts the definition body for `complex`.
+  - CN: 开始 `complex` 的定义体。
+- **L183**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L184**: <code>  /// Conversion from cuDoubleComplex</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L185**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L186**: <code>  complex(cuDoubleComplex const &amp;z) : _real(static_cast&lt;T&gt;(cuCreal(z))), _imag(static_cast&lt;T&gt;(cuCimag(z))) {}</code>
+  - EN: Starts the definition body for `complex`.
+  - CN: 开始 `complex` 的定义体。
+- **L187**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L189**: <code>  /// Equality operator</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L190**: <code>  CUTLASS_HOST_DEVICE bool operator==(complex&lt;T&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator==`.
+  - CN: 开始 `operator==` 的定义体。
+- **L191**: <code>    return this-&gt;real() == rhs.real() &amp;&amp; this-&gt;imag() == rhs.imag();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L192**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L193**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L194**: <code>  /// Inequality operator</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L195**: <code>  CUTLASS_HOST_DEVICE bool operator!=(complex&lt;T&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator!=`.
+  - CN: 开始 `operator!=` 的定义体。
+- **L196**: <code>    return !(*this == rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L197**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L198**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L199**: <code>  /// Addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L200**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L201**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; operator+(complex&lt;A&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator+`.
+  - CN: 开始 `operator+` 的定义体。
+- **L202**: <code>    return complex&lt;T&gt;(this-&gt;real() + rhs.real(), this-&gt;imag() + rhs.imag());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L203**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L204**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L205**: <code>  /// Reduction into memory address.  Components may update out of order.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L206**: <code>  template &lt;typename OtherT&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L207**: <code>  CUTLASS_DEVICE void red(complex&lt;OtherT&gt; *ptr) const {</code>
+  - EN: Starts the definition body for `red`.
+  - CN: 开始 `red` 的定义体。
+- **L208**: <code>    static_assert(platform::is_same&lt;T, OtherT&gt;::value, &quot;Component type must match&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L209**: <code>    cutlass::atomic_add&lt;T&gt; reduce;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L210**: <code>    reduce(&amp;ptr-&gt;_real, _real);</code>
+  - EN: Declares the callable or operator `reduce`.
+  - CN: 声明可调用对象或运算符 `reduce`。
+- **L211**: <code>    reduce(&amp;ptr-&gt;_imag, _imag);</code>
+  - EN: Declares the callable or operator `reduce`.
+  - CN: 声明可调用对象或运算符 `reduce`。
+- **L212**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L213**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L214**: <code>  /// Reduction into memory address.  Components may update out of order.  (Half specialization)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L215**: <code>  CUTLASS_DEVICE void red(complex&lt;half_t&gt; *ptr) const {</code>
+  - EN: Starts the definition body for `red`.
+  - CN: 开始 `red` 的定义体。
+- **L216**: <code>    static_assert(platform::is_same&lt;T, half_t&gt;::value, &quot;Component type must match&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L217**: <code>    half2 *h2_ptr = reinterpret_cast&lt;half2*&gt;(ptr);</code>
+  - EN: Declares the callable or operator `half2`.
+  - CN: 声明可调用对象或运算符 `half2`。
+- **L218**: <code>    half2 h2_data = reinterpret_cast&lt;half2&amp;&gt;(*this);</code>
+  - EN: Declares the callable or operator `half2`.
+  - CN: 声明可调用对象或运算符 `half2`。
+- **L219**: <code>    cutlass::atomic_add&lt;half2&gt; reduce;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L220**: <code>    reduce(h2_ptr, h2_data);</code>
+  - EN: Declares the callable or operator `reduce`.
+  - CN: 声明可调用对象或运算符 `reduce`。
+- **L221**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L222**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L223**: <code>  /// Subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L224**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L225**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; operator-(complex&lt;A&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator-`.
+  - CN: 开始 `operator-` 的定义体。
+- **L226**: <code>    return complex&lt;T&gt;(this-&gt;real() - rhs.real(), this-&gt;imag() - rhs.imag());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L227**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L228**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L229**: <code>  /// Multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L230**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L231**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; operator*(complex&lt;A&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L232**: <code>    return complex&lt;T&gt;(this-&gt;real() * rhs.real() - this-&gt;imag() * rhs.imag(),</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L233**: <code>                      this-&gt;real() * rhs.imag() + this-&gt;imag() * rhs.real());</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L234**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L235**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L236**: <code>  /// Scalar Multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L237**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L238**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; operator*(A const &amp;s) const {</code>
+  - EN: Starts the definition body for `operator*`.
+  - CN: 开始 `operator*` 的定义体。
+- **L239**: <code>    return complex&lt;T&gt;(this-&gt;real() * s, this-&gt;imag() * s);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L240**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L241**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L242**: <code>  /// Division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L243**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L244**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; operator/(complex&lt;A&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L245**: <code>    T d = T(rhs.real() * rhs.real() + rhs.imag() * rhs.imag());</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L246**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L247**: <code>    return complex&lt;T&gt;(</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L248**: <code>      (real() * rhs.real() + imag() * rhs.imag()) / d,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L249**: <code>      (imag() * rhs.real() - real() * rhs.imag()) / d</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L250**: <code>    );</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L251**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L252**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L253**: <code>  /// Scalar Division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L254**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L255**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; operator/(A const &amp;s) const {</code>
+  - EN: Starts the definition body for `operator/`.
+  - CN: 开始 `operator/` 的定义体。
+- **L256**: <code>    return complex&lt;T&gt;(this-&gt;real() / s, this-&gt;imag() / s);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L257**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L258**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L259**: <code>  /// Addition</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L260**: <code>    template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L261**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; &amp;operator+=(complex&lt;A&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator+=`.
+  - CN: 开始 `operator+=` 的定义体。
+- **L262**: <code>      *this = *this + rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L263**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L264**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L265**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L266**: <code>  /// Subtraction</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L267**: <code>  template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L268**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; &amp;operator-=(complex&lt;A&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator-=`.
+  - CN: 开始 `operator-=` 的定义体。
+- **L269**: <code>      *this = *this - rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L270**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L271**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L272**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L273**: <code>  /// Multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L274**: <code>  template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L275**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; &amp;operator*=(complex&lt;A&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator*=`.
+  - CN: 开始 `operator*=` 的定义体。
+- **L276**: <code>      *this = *this * rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L277**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L278**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L279**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L280**: <code>  /// Scalar multiplication</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L281**: <code>  template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L282**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; &amp;operator*=(A s) {</code>
+  - EN: Starts the definition body for `operator*=`.
+  - CN: 开始 `operator*=` 的定义体。
+- **L283**: <code>      *this = *this * s;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L284**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L285**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L286**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L287**: <code>  /// Division</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L288**: <code>  template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L289**: <code>  CUTLASS_HOST_DEVICE complex&lt;T&gt; &amp;operator/=(complex&lt;A&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator/=`.
+  - CN: 开始 `operator/=` 的定义体。
+- **L290**: <code>      *this = *this / rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L291**: <code>      return *this;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L292**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L293**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L294**: <code>  /// Accesses the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L295**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L296**: <code>  T const &amp;real() const { return _real; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L297**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L298**: <code>  /// Accesses the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L299**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L300**: <code>  T &amp;real() { return _real; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L301**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L302**: <code>  /// Accesses the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L303**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L304**: <code>  T const &amp;imag() const { return _imag; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L305**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L306**: <code>  /// Accesses the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L307**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L308**: <code>  T &amp;imag() { return _imag; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L309**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L310**: <code>  /// Set the real part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L311**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L312**: <code>  void real(T real) { _real = real; }</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L313**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L314**: <code>  /// Set the imaginary part of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L315**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L316**: <code>  void imag(T imag) { _imag = imag; }</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L317**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L318**: <code>  #if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L319**: <code>  /// Converts to cuFloatComplex</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L320**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L321**: <code>  explicit operator cuFloatComplex() const { return make_cuFloatComplex(float(real()), float(imag())); }</code>
+  - EN: Starts the definition body for `operatorcuFloatComplex`.
+  - CN: 开始 `operatorcuFloatComplex` 的定义体。
+- **L322**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L323**: <code>  /// Converts to cuDoubleComplex</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L324**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L325**: <code>  explicit operator cuDoubleComplex() const { return make_cuDoubleComplex(real(), imag()); }</code>
+  - EN: Starts the definition body for `operatorcuDoubleComplex`.
+  - CN: 开始 `operatorcuDoubleComplex` 的定义体。
+- **L326**: <code>  #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L327**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L328**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L329**: <code>// Complex conjugate</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L330**: <code>template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L331**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; conj(complex&lt;T&gt; const&amp; z) {</code>
+  - EN: Starts the definition body for `conj`.
+  - CN: 开始 `conj` 的定义体。
+- **L332**: <code>  return {z.real(), -z.imag()};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L333**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L334**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L335**: <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L336**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L337**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L338**: <code>// Accessors for complex template</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L339**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L340**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L341**: <code>// Nonmember real and imag need to work for non-complex numbers too.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L342**: <code>// That means cutlass::complex, std::complex, cuda::std::complex, and</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L343**: <code>// any user-defined complex number type that looks like std::complex.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L344**: <code>// It&#x27;s reasonable to assume that a &quot;complex number type&quot; has</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L345**: <code>// zero-argument real() and imag() member functions returning</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L346**: <code>// non-void.  While cuFloatComplex and cuDoubleComplex lack those</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L347**: <code>// member functions, one-argument nonmember real and imag overloads</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L348**: <code>// for those types are defined above.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L349**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L350**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L351**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L352**: <code>template &lt;typename T, typename Enable = void&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L353**: <code>struct has_zero_argument_real_member_function :</code>
+  - EN: Declares or defines the struct `has_zero_argument_real_member_function`.
+  - CN: 声明或定义 struct `has_zero_argument_real_member_function`。
+- **L354**: <code>  cutlass::platform::false_type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L355**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L356**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L357**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L358**: <code>struct has_zero_argument_real_member_function&lt;T,</code>
+  - EN: Declares or defines the struct `has_zero_argument_real_member_function`.
+  - CN: 声明或定义 struct `has_zero_argument_real_member_function`。
+- **L359**: <code>  cutlass::platform::enable_if_t&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L360**: <code>    ! cutlass::platform::is_void_v&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L361**: <code>      decltype(cutlass::platform::declval&lt;T&gt;().real())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L362**: <code>    &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L363**: <code>  &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L364**: <code>&gt; : cutlass::platform::true_type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L365**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L366**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L367**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L368**: <code>constexpr bool has_zero_argument_real_member_function_v =</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L369**: <code>  has_zero_argument_real_member_function&lt;T&gt;::value;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L370**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L371**: <code>template &lt;typename T, typename Enable = void&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L372**: <code>struct has_zero_argument_imag_member_function :</code>
+  - EN: Declares or defines the struct `has_zero_argument_imag_member_function`.
+  - CN: 声明或定义 struct `has_zero_argument_imag_member_function`。
+- **L373**: <code>  cutlass::platform::false_type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L374**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L375**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L376**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L377**: <code>struct has_zero_argument_imag_member_function&lt;T,</code>
+  - EN: Declares or defines the struct `has_zero_argument_imag_member_function`.
+  - CN: 声明或定义 struct `has_zero_argument_imag_member_function`。
+- **L378**: <code>  cutlass::platform::enable_if_t&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L379**: <code>    ! cutlass::platform::is_void_v&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L380**: <code>      decltype(cutlass::platform::declval&lt;T&gt;().imag())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L381**: <code>    &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L382**: <code>  &gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L383**: <code>&gt; : cutlass::platform::true_type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L384**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L385**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L386**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L387**: <code>constexpr bool has_zero_argument_imag_member_function_v =</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L388**: <code>  has_zero_argument_imag_member_function&lt;T&gt;::value;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L389**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L390**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L391**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L392**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L393**: <code>CUTLASS_HOST_DEVICE auto real(T z) {</code>
+  - EN: Starts the definition body for `real`.
+  - CN: 开始 `real` 的定义体。
+- **L394**: <code>  if constexpr (detail::has_zero_argument_real_member_function_v&lt;T&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L395**: <code>    return z.real();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L396**: <code>  } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L397**: <code>    return z;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L398**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L399**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L400**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L401**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L402**: <code>CUTLASS_HOST_DEVICE auto imag(T z) {</code>
+  - EN: Starts the definition body for `imag`.
+  - CN: 开始 `imag` 的定义体。
+- **L403**: <code>  if constexpr (detail::has_zero_argument_imag_member_function_v&lt;T&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L404**: <code>    return z.imag();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L405**: <code>  } else {</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L406**: <code>    // Imaginary part of a non-complex input has the same type as the</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L407**: <code>    // input, and its value is zero.  CUTLASS assumes in this case</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L408**: <code>    // that value-initializing T is well-formed and results in zero.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L409**: <code>    return T{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L410**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L411**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L412**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L413**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L414**: <code>// Output operators</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L415**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L416**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L417**: <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L418**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L419**: <code>std::ostream &amp;operator&lt;&lt;(std::ostream &amp;out, complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `operator<<`.
+  - CN: 开始 `operator<<` 的定义体。
+- **L420**: <code>  T _r = real(z);</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L421**: <code>  T _i = imag(z);</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L422**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L423**: <code>  if (bool(_i)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L424**: <code>    return out &lt;&lt; _r &lt;&lt; &quot;+i&quot; &lt;&lt; _i;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L425**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L426**: <code>  return out &lt;&lt; _r;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L427**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L428**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L429**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L430**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L431**: <code>// Non-member operators defined for complex types</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L432**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L433**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L434**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L435**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L436**: <code>// Non-member functions defined for complex numbers</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L437**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L438**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L439**: <code>// abs returns the magnitude of the complex number.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L440**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L441**: <code>CUTLASS_HOST_DEVICE float abs(complex&lt;float&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `abs`.
+  - CN: 开始 `abs` 的定义体。
+- **L442**: <code>  return ::hypot(z.real(), z.imag());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L443**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L444**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L445**: <code>CUTLASS_HOST_DEVICE double abs(complex&lt;double&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `abs`.
+  - CN: 开始 `abs` 的定义体。
+- **L446**: <code>  return ::hypot(z.real(), z.imag());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L447**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L448**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L449**: <code>// In theory, it would make sense to add a complex&lt;long double&gt;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L450**: <code>// specialization of abs here, since hypot works for long double too.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L451**: <code>// In practice, long double doesn&#x27;t have a portable number of bits or</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L452**: <code>// behavior, so users who care about higher-precision floating-point</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L453**: <code>// computation should probably insist on an actual FP128 type.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L454**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L455**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L456**: <code>CUTLASS_HOST_DEVICE T abs(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `abs`.
+  - CN: 开始 `abs` 的定义体。
+- **L457**: <code>  // cutlass::complex permits all kinds of T, including types that</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L458**: <code>  // don&#x27;t have NaN.  For a generic floating-point type with Inf</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L459**: <code>  // and/or NaN, LAPACK&#x27;s DLAPY2 algorithm would make sense, as it</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L460**: <code>  // would handle issues like avoiding unwarranted overflow if</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L461**: <code>  // z.real() or z.imag() is slightly bigger than the square root of</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L462**: <code>  // the max finite number.  That could be a future improvement; for</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L463**: <code>  // now, the code just uses the naive algorithm.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L464**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L465**: <code>  // Use the &quot;swap two-step&quot; idiom so that argument-dependent lookup</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L466**: <code>  // can find any CUTLASS-specific overloads.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L467**: <code>  using cutlass::sqrt;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L468**: <code>  return sqrt(z.real() * z.real() + z.imag() * z.imag());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L469**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L470**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L471**: <code>/// Returns the magnitude of the complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L472**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L473**: <code>CUTLASS_HOST_DEVICE T arg(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `arg`.
+  - CN: 开始 `arg` 的定义体。
+- **L474**: <code>  return atan2(imag(z), real(z));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L475**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L476**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L477**: <code>/// Returns the squared magnitude of a real number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L478**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L479**: <code>CUTLASS_HOST_DEVICE T norm(T const &amp;z) {</code>
+  - EN: Starts the definition body for `norm`.
+  - CN: 开始 `norm` 的定义体。
+- **L480**: <code>    return z * z;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L481**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L482**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L483**: <code>/// Returns the squared magnitude of a real number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L484**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L485**: <code>CUTLASS_HOST_DEVICE int8_t norm(int8_t const &amp;z) {</code>
+  - EN: Starts the definition body for `norm`.
+  - CN: 开始 `norm` 的定义体。
+- **L486**: <code>    return static_cast&lt;int8_t&gt;(z * z);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L487**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L488**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L489**: <code>/// Returns the squared magnitude of a complex number</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L490**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L491**: <code>CUTLASS_HOST_DEVICE double norm(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `norm`.
+  - CN: 开始 `norm` 的定义体。
+- **L492**: <code>  return real(z) * real(z) + imag(z) * imag(z);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L493**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L494**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L495**: <code>/// Norm-accumulate calculation</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L496**: <code>template &lt;typename T, typename R&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L497**: <code>CUTLASS_HOST_DEVICE R norm_accumulate(T const &amp;x, R const &amp; accumulator) {</code>
+  - EN: Starts the definition body for `norm_accumulate`.
+  - CN: 开始 `norm_accumulate` 的定义体。
+- **L498**: <code>  return accumulator + static_cast&lt;R&gt;(x) * static_cast&lt;R&gt;(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L499**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L500**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L501**: <code>/// Norm accumulate specialized for complex types</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L502**: <code>template &lt;typename T, typename R&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L503**: <code>CUTLASS_HOST_DEVICE R norm_accumulate(complex&lt;T&gt; const &amp;z, R const &amp;accumulator) {</code>
+  - EN: Starts the definition body for `norm_accumulate`.
+  - CN: 开始 `norm_accumulate` 的定义体。
+- **L504**: <code>  return accumulator + static_cast&lt;R&gt;(real(z)) * static_cast&lt;R&gt;(real(z)) +</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L505**: <code>    static_cast&lt;R&gt;(imag(z)) * static_cast&lt;R&gt;(imag(z));</code>
+  - EN: Declares the callable or operator `R`.
+  - CN: 声明可调用对象或运算符 `R`。
+- **L506**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L507**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L508**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L509**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L510**: <code>template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L511**: <code>CUTLASS_HOST_DEVICE T conj_impl(T const&amp; z, cutlass::platform::true_type) {</code>
+  - EN: Starts the definition body for `conj_impl`.
+  - CN: 开始 `conj_impl` 的定义体。
+- **L512**: <code>  return conj(z);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L513**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L514**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L515**: <code>template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L516**: <code>CUTLASS_HOST_DEVICE T conj_impl(T const&amp; z, cutlass::platform::false_type) {</code>
+  - EN: Starts the definition body for `conj_impl`.
+  - CN: 开始 `conj_impl` 的定义体。
+- **L517**: <code>  return z;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L518**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L519**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L520**: <code>template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L521**: <code>CUTLASS_HOST_DEVICE T conj_impl(T const&amp; z) {</code>
+  - EN: Starts the definition body for `conj_impl`.
+  - CN: 开始 `conj_impl` 的定义体。
+- **L522**: <code>  constexpr bool use_unqualified_conj =</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L523**: <code>    ! cutlass::platform::is_arithmetic_v&lt;T&gt; &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L524**: <code>    ! detail::has_cutlass_conj_v&lt;T&gt; &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L525**: <code>    detail::has_unqualified_conj_v&lt;T&gt;;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L526**: <code>  return conj_impl(z, cutlass::platform::bool_constant&lt;use_unqualified_conj&gt;{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L527**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L528**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L529**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L530**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L531**: <code>// Return the complex conjugate of the input.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L532**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L533**: <code>// This MUST be a function and not a function object, because it may</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L534**: <code>// be common practice for downstream types to define specifically</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L535**: <code>// cutlass::conj overloads, instead of overloads in their namespace.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L536**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L537**: <code>// As a result of this being a function and not a function object,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L538**: <code>// CUTLASS code needs to declare &quot;using cutlass::conj;&quot; in scope and</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L539**: <code>// then call this function unqualified, just like std::swap.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L540**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L541**: <code>// If an overload already exists for cutlass::conj(T), that overload</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L542**: <code>// will be called instead of this one.  Otherwise:</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L543**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L544**: <code>// 1. for arithmetic types, return z;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L545**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L546**: <code>// 2. for types where (namespace-unqualified) conj(z) is well formed</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L547**: <code>//    and cutlass::conj(z) is NOT well formed, return conj(z); and,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L548**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L549**: <code>// 3. for everything else, return z.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L550**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L551**: <code>// Regarding (1), the C++ Standard Library makes std::conj always</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L552**: <code>// return std::complex, even for (noncomplex) arithmetic types.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L553**: <code>// cutlass::conj(T t) needs to return type T.  This follows the</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L554**: <code>// convention of linear algebra software like the BLAS, where</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L555**: <code>// &quot;conjugate transpose&quot; means the same thing as &quot;transpose&quot; for a</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L556**: <code>// matrix of noncomplex numbers.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L557**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L558**: <code>// Case (2) covers std::complex, cuda::std::complex, and non-Standard</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L559**: <code>// (including user-defined) complex number types (for which &quot;conj(z)&quot;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L560**: <code>// is findable via argument-dependent lookup, but does not live in the</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L561**: <code>// cutlass namespace).  It excludes cutlass::conj(z) in order to</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L562**: <code>// prevent infinite recursion.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L563**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L564**: <code>// Case (3) covers non-Standard non-complex number types.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L565**: <code>template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L566**: <code>CUTLASS_HOST_DEVICE T conj(T const&amp; z) {</code>
+  - EN: Starts the definition body for `conj`.
+  - CN: 开始 `conj` 的定义体。
+- **L567**: <code>  return detail::conj_impl(z);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L568**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L569**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L570**: <code>/// Projects the complex number z onto the Riemann sphere</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L571**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L572**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; proj(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `proj`.
+  - CN: 开始 `proj` 的定义体。
+- **L573**: <code>  T d = real(z) * real(z) + imag(z) * imag(z) + T(1);</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L574**: <code>  return complex&lt;T&gt;((T(2) * real(z)) / d, (T(2) * imag(z)) / d);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L575**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L576**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L577**: <code>/// Returns a complex number with magnitude r and phase theta</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L578**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L579**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; polar(T const &amp;r, T const &amp;theta = T()) {</code>
+  - EN: Starts the definition body for `polar`.
+  - CN: 开始 `polar` 的定义体。
+- **L580**: <code>  return complex&lt;T&gt;(r * cos(theta), r * sin(theta));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L581**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L582**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L583**: <code>/// Computes the complex exponential of z.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L584**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L585**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; exp(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `exp`.
+  - CN: 开始 `exp` 的定义体。
+- **L586**: <code>  return complex&lt;T&gt;(fast_exp(real(z)) * fast_cos(imag(z)), fast_exp(real(z)) * fast_sin(imag(z)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L587**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L588**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L589**: <code>/// Computes the log of z</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L590**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L591**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; log(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `log`.
+  - CN: 开始 `log` 的定义体。
+- **L592**: <code>  return complex&lt;T&gt;(log(abs(z)), arg(z));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L593**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L594**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L595**: <code>/// Computes the log base 10 of z</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L596**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L597**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; log10(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `log10`.
+  - CN: 开始 `log10` 的定义体。
+- **L598**: <code>  return log(z) / T(log(T(10)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L599**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L600**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L601**: <code>/// Computes the square root of complex number z</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L602**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L603**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; sqrt(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `sqrt`.
+  - CN: 开始 `sqrt` 的定义体。
+- **L604**: <code>  return sqrt(T(2)) / T(2) *</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L605**: <code>         complex&lt;T&gt;(sqrt(sqrt(norm(z)) + real(z)),</code>
+  - EN: Begins or continues the signature/parameter list for `T`.
+  - CN: 开始或继续 `T` 的签名/参数列表。
+- **L606**: <code>                    (imag(z) &lt; 0 ? T(-1) : T(1)) * sqrt(sqrt(norm(z)) - real(z)));</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L607**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L608**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L609**: <code>/// Computes the cosine of complex z.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L610**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L611**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; cos(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `cos`.
+  - CN: 开始 `cos` 的定义体。
+- **L612**: <code>  return (exp(z) + exp(-z)) / T(2);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L613**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L614**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L615**: <code>/// Computes the sin of complex z.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L616**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L617**: <code>CUTLASS_HOST_DEVICE complex&lt;T&gt; sin(complex&lt;T&gt; const &amp;z) {</code>
+  - EN: Starts the definition body for `sin`.
+  - CN: 开始 `sin` 的定义体。
+- **L618**: <code>  return (exp(-z) - exp(z)) * complex&lt;T&gt;(T(0), T(1) / T(2));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L619**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L620**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L621**: <code>/// Comparison</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L622**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L623**: <code>CUTLASS_HOST_DEVICE bool operator&lt;(complex&lt;T&gt; const &amp;lhs, complex&lt;T&gt; const &amp;rhs) {</code>
+  - EN: Starts the definition body for `operator<`.
+  - CN: 开始 `operator<` 的定义体。
+- **L624**: <code>  return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L625**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L626**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L627**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L628**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L629**: <code>/// Partial specialization for complex-valued type.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L630**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L631**: <code>struct RealType&lt; complex&lt;T&gt; &gt;</code>
+  - EN: Declares or defines the struct `RealType`.
+  - CN: 声明或定义 struct `RealType`。
+- **L632**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L633**: <code>  using Type = T;</code>
+  - EN: Defines the alias `Type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Type`。
+- **L634**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L635**: <code>  /// Number of elements</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L636**: <code>  static int const kExtent = 2;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L637**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L638**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L639**: <code>  static complex&lt;T&gt; from_real(double x) {</code>
+  - EN: Starts the definition body for `from_real`.
+  - CN: 开始 `from_real` 的定义体。
+- **L640**: <code>    return complex&lt;T&gt;(static_cast&lt;T&gt;(x));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L641**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L642**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L643**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L644**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L645**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L646**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L647**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L648**: <code>cutlass::complex&lt;half_t&gt; from_real&lt;cutlass::complex&lt;half_t&gt; &gt;(double r) {</code>
+  - EN: Starts the definition body for `half_t`.
+  - CN: 开始 `half_t` 的定义体。
+- **L649**: <code>  return cutlass::complex&lt;half_t&gt;(half_t(r));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L650**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L651**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L652**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L653**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L654**: <code>cutlass::complex&lt;float&gt; from_real&lt;cutlass::complex&lt;float&gt; &gt;(double r) {</code>
+  - EN: Starts the definition body for `float`.
+  - CN: 开始 `float` 的定义体。
+- **L655**: <code>  return cutlass::complex&lt;float&gt;(float(r));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L656**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L657**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L658**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L659**: <code>CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L660**: <code>cutlass::complex&lt;double&gt; from_real&lt;cutlass::complex&lt;double&gt; &gt;(double r) {</code>
+  - EN: Starts the definition body for `double`.
+  - CN: 开始 `double` 的定义体。
+- **L661**: <code>  return cutlass::complex&lt;double&gt;(r);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L662**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L663**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L664**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L665**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L666**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L667**: <code>struct is_complex {</code>
+  - EN: Declares or defines the struct `is_complex`.
+  - CN: 声明或定义 struct `is_complex`。
+- **L668**: <code>  static bool const value = false;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L669**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L670**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L671**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L672**: <code>struct is_complex&lt;complex&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `is_complex`.
+  - CN: 声明或定义 struct `is_complex`。
+- **L673**: <code>  static bool const value = true;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L674**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L675**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L676**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L677**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L678**: <code>// functional.h numeric specializations</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L679**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L680**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L681**: <code>/// Squares with optional conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L682**: <code>template &lt;typename T, typename Output&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L683**: <code>struct magnitude_squared&lt;complex&lt;T&gt;, Output&gt; {</code>
+  - EN: Declares or defines the struct `magnitude_squared`.
+  - CN: 声明或定义 struct `magnitude_squared`。
+- **L684**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L685**: <code>  Output operator()(complex&lt;T&gt; lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L686**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L687**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L688**: <code>    Output y_r = Output(lhs.real());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L689**: <code>    Output y_i = Output(lhs.imag());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L690**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L691**: <code>    return mul_op(y_r, y_r) + mul_op(y_i, y_i);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L692**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L693**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L694**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L695**: <code>/// Fused multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L696**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L697**: <code>struct multiply_add&lt;complex&lt;T&gt;, complex&lt;T&gt;, complex&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `multiply_add`.
+  - CN: 声明或定义 struct `multiply_add`。
+- **L698**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L699**: <code>  complex&lt;T&gt; operator()(</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L700**: <code>    complex&lt;T&gt; const &amp;a,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L701**: <code>    complex&lt;T&gt; const &amp;b,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L702**: <code>    complex&lt;T&gt; const &amp;c) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L703**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L704**: <code>    T real = c.real();</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L705**: <code>    T imag = c.imag();</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L706**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L707**: <code>    real += a.real() * b.real();</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L708**: <code>    real += -a.imag() * b.imag();</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L709**: <code>    imag += a.real() * b.imag();</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L710**: <code>    imag += a.imag () * b.real();</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L711**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L712**: <code>    return complex&lt;T&gt;{</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L713**: <code>      real,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L714**: <code>      imag</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L715**: <code>    };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L716**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L717**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L718**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L719**: <code>/// Fused multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L720**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L721**: <code>struct multiply_add&lt;complex&lt;T&gt;, T, complex&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `multiply_add`.
+  - CN: 声明或定义 struct `multiply_add`。
+- **L722**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L723**: <code>  complex&lt;T&gt; operator()(</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L724**: <code>    complex&lt;T&gt; const &amp;a,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L725**: <code>    T const &amp;b,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L726**: <code>    complex&lt;T&gt; const &amp;c) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L727**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L728**: <code>    T real = c.real();</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L729**: <code>    T imag = c.imag();</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L730**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L731**: <code>    real += a.real() * b;</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L732**: <code>    imag += a.imag () * b;</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L733**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L734**: <code>    return complex&lt;T&gt;{</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L735**: <code>      real,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L736**: <code>      imag</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L737**: <code>    };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L738**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L739**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L740**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L741**: <code>/// Fused multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L742**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L743**: <code>struct multiply_add&lt;T, complex&lt;T&gt;, complex&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `multiply_add`.
+  - CN: 声明或定义 struct `multiply_add`。
+- **L744**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L745**: <code>  complex&lt;T&gt; operator()(</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L746**: <code>    T const &amp;a,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L747**: <code>    complex&lt;T&gt; const &amp;b,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L748**: <code>    complex&lt;T&gt; const &amp;c) const {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L749**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L750**: <code>    T real = c.real();</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L751**: <code>    T imag = c.imag();</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L752**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L753**: <code>    real += a * b.real();</code>
+  - EN: Declares the callable or operator `real`.
+  - CN: 声明可调用对象或运算符 `real`。
+- **L754**: <code>    imag += a * b.imag();</code>
+  - EN: Declares the callable or operator `imag`.
+  - CN: 声明可调用对象或运算符 `imag`。
+- **L755**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L756**: <code>    return complex&lt;T&gt;{</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L757**: <code>      real,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L758**: <code>      imag</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L759**: <code>    };</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L760**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L761**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L762**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L763**: <code>/// Conjugate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L764**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L765**: <code>struct conjugate&lt;complex&lt;T&gt;&gt;  {</code>
+  - EN: Declares or defines the struct `conjugate`.
+  - CN: 声明或定义 struct `conjugate`。
+- **L766**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L767**: <code>  complex&lt;T&gt; operator()(complex&lt;T&gt; const &amp;a) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L768**: <code>    // Invoke the complex&lt;T&gt; overload specifically, rather than</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L769**: <code>    // wasting the compiler&#x27;s effort on overload resolution.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L770**: <code>    return cutlass::conj(a);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L771**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L772**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L773**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L774**: <code>#if ! defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `! defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `! defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L775**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L776**: <code>struct conjugate&lt;cuFloatComplex&gt;  {</code>
+  - EN: Declares or defines the struct `conjugate`.
+  - CN: 声明或定义 struct `conjugate`。
+- **L777**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L778**: <code>  cuFloatComplex operator()(cuFloatComplex const&amp; z) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L779**: <code>    return make_cuFloatComplex(z.x, -z.y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L780**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L781**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L782**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L783**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L784**: <code>struct conjugate&lt;cuDoubleComplex&gt;  {</code>
+  - EN: Declares or defines the struct `conjugate`.
+  - CN: 声明或定义 struct `conjugate`。
+- **L785**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L786**: <code>  cuDoubleComplex operator()(cuDoubleComplex const&amp; z) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L787**: <code>    return make_cuDoubleComplex(z.x, -z.y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L788**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L789**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L790**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L791**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L792**: <code>/// Computes the square of a difference with optional conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L793**: <code>template &lt;typename T, typename Output&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L794**: <code>struct magnitude_squared_difference&lt;complex&lt;T&gt;, Output&gt; {</code>
+  - EN: Declares or defines the struct `magnitude_squared_difference`.
+  - CN: 声明或定义 struct `magnitude_squared_difference`。
+- **L795**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L796**: <code>  Output operator()(complex&lt;T&gt; lhs, complex&lt;T&gt; rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L797**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L798**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L799**: <code>    Output y_r = Output(lhs.real()) - Output(rhs.real());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L800**: <code>    Output y_i = Output(lhs.imag()) - Output(rhs.imag());</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L801**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L802**: <code>    return mul_op(y_r, y_r) + mul_op(y_i, y_i);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L803**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L804**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L805**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L806**: <code>/// Reduces value into the data pointed to by ptr (complex&lt;T&gt; specialization)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L807**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L808**: <code>struct atomic_add&lt;complex&lt;T&gt;&gt; {</code>
+  - EN: Declares or defines the struct `atomic_add`.
+  - CN: 声明或定义 struct `atomic_add`。
+- **L809**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L810**: <code>  void operator()(complex&lt;T&gt; *ptr, const complex&lt;T&gt; &amp;data)</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L811**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L812**: <code>    data.red(ptr);</code>
+  - EN: Declares the callable or operator `red`.
+  - CN: 声明可调用对象或运算符 `red`。
+- **L813**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L814**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L815**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L816**: <code>// Maximal exponent reduction for zero-mantissa scaling factors: complex number uses its largest cartesian norm not abs</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L817**: <code>template &lt;typename TC, bool PropagateNaN = false&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L818**: <code>struct maximum_cartesian_norm_zero_mantissa_reduction {</code>
+  - EN: Declares or defines the struct `maximum_cartesian_norm_zero_mantissa_reduction`.
+  - CN: 声明或定义 struct `maximum_cartesian_norm_zero_mantissa_reduction`。
+- **L819**: <code>  using T = typename TC::value_type;</code>
+  - EN: Defines the alias `T` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `T`。
+- **L820**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L821**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L822**: <code>  T operator()(T const &amp;lhs, cutlass::complex&lt;T&gt; const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L823**: <code>    maximum_absolute_value_zero_mantissa_reduction&lt;T, PropagateNaN&gt; red_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L824**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L825**: <code>    return red_op(red_op(lhs, rhs.real()), rhs.imag());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L826**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L827**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L828**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L829**: <code>template &lt;typename TC, int N, bool PropagateNaN&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L830**: <code>struct maximum_cartesian_norm_zero_mantissa_reduction&lt;cutlass::Array&lt;TC, N&gt;, PropagateNaN&gt; {</code>
+  - EN: Declares or defines the struct `maximum_cartesian_norm_zero_mantissa_reduction`.
+  - CN: 声明或定义 struct `maximum_cartesian_norm_zero_mantissa_reduction`。
+- **L831**: <code>  using T = typename TC::value_type;</code>
+  - EN: Defines the alias `T` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `T`。
+- **L832**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L833**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L834**: <code>  T operator() (T const&amp; scalar, cutlass::Array&lt;TC, N&gt; const&amp; rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L835**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L836**: <code>    T result = scalar;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L837**: <code>    maximum_cartesian_norm_zero_mantissa_reduction&lt;TC, PropagateNaN&gt; scalar_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L838**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L839**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L840**: <code>    for (int i = 0; i &lt; N; ++i) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L841**: <code>      result = scalar_op(result, rhs[i]);</code>
+  - EN: Declares the callable or operator `scalar_op`.
+  - CN: 声明可调用对象或运算符 `scalar_op`。
+- **L842**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L843**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L844**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L845**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L846**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L847**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L848**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L849**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L850**: <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L851**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L852**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Conditional compilation / 条件编译
+- Complex arithmetic support / 复数运算支持
+- Symbol focus: `ComplexTransform` / 重点符号：`ComplexTransform`
+- Symbol focus: `InvertComplexTransform` / 重点符号：`InvertComplexTransform`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/functional.h"`
+  - `"cutlass/platform/platform.h"`
+  - `"cutlass/real.h"`
+  - `"cutlass/numeric_types.h"`
+  - `"cutlass/fast_math.h"`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `<cuComplex.h>`
+  - `<cuda_fp16.h>`
+  - `CUDA_STD_HEADER(cstdint)`
+  - `<cstdint>`
+  - `<iosfwd>`

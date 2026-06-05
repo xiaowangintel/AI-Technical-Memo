@@ -1,0 +1,376 @@
+# smem_allocator.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/smem_allocator.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (SmemAllocator) in `CuTeDSL.cutlass.utils.smem_allocator`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.smem_allocator` 定义了 1 个类（SmemAllocator）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Any, Optional, Type, Union, overload` — **EN:** Imports Any, Optional, Type, Union, overload from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Type, Union, overload。
+- **L13** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L16** `from cutlass.cute.arch import get_dyn_smem, get_dyn_smem_size` — **EN:** Imports get_dyn_smem, get_dyn_smem_size from `cutlass.cute.arch`. **CN:** 从 `cutlass.cute.arch` 导入 get_dyn_smem, get_dyn_smem_size。
+- **L17** `from cutlass.cute.tensor import _Tensor` — **EN:** Imports _Tensor from `cutlass.cute.tensor`. **CN:** 从 `cutlass.cute.tensor` 导入 _Tensor。
+- **L18** `from cutlass.cutlass_dsl import (` — **EN:** Imports SMEM_CAPACITY_MAP, CuTeDSL, Boolean, Int8, Numeric, NumericMeta, ... (+1 more) from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 SMEM_CAPACITY_MAP, CuTeDSL, Boolean, Int8, Numeric, NumericMeta, ... (+1 more)。
+- **L19** `    SMEM_CAPACITY_MAP,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    CuTeDSL,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    NumericMeta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    dsl_user_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L28** `from cutlass._mlir.dialects import cute as _cute_ir` — **EN:** Imports cute as _cute_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 cute as _cute_ir。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `class SmemAllocator:` — **EN:** Defines class `SmemAllocator`. **CN:** 定义类 `SmemAllocator`。
+- **L32** `    """A helper class for managing shared memory allocation on GPU.` — **EN:** Starts the docstring for the class `SmemAllocator`. **CN:** 开始说明 class `SmemAllocator` 的文档字符串。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `    This class manages shared memory and provides APIs for allocation of raw bytes,` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L35** `    numeric types, arrays, and tensors with specified layouts and alignments.` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `    .. note::` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L38** `        - The base pointer is aligned to 1024 bytes upon initialization.` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L39** `        - SmemAllocator will automatically calculate the usage upon kernel launch.` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L40** `        - There is no need to explicitly specify shared memory size in kernel launch.` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L41** `        - Currently only supports static layouts. Dynamic layouts are not supported.` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `    **Examples**:` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `    .. code-block:: python` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `        smem = SmemAllocator()` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `        # Allocate raw bytes` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L50** `        buf_ptr = smem.allocate(100)  # 100 bytes` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `        # Allocate numeric type` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L53** `        int8_ptr = smem.allocate(Int8)  # 1 byte` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `        # Define a struct` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L56** `        @cute.struct` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L57** `        class SharedStorage:` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L58** `            alpha: cutlass.Float32` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L59** `            x: cutlass.Int32` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `        # Allocate struct` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L62** `        struct_ptr = smem.allocate(SharedStorage)  # 8 bytes` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `        # use of struct members` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L65** `        struct_ptr.alpha = 1.0` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L66** `        struct_ptr.x = 2` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L67** `        x_ptr = struct_ptr.x.ptr` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `        # Allocate array` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L70** `        int8_array = smem.allocate_array(Int8, 10)  # 10 bytes` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `        # Allocate tensor` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L73** `        layout = cute.make_layout((16, 16))` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L74** `        tensor = smem.allocate_tensor(Int8, layout)  # 256 bytes` — **EN:** Continues the docstring for the class `SmemAllocator`. **CN:** 继续说明 class `SmemAllocator` 的文档字符串。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    """` — **EN:** Ends the docstring for the class `SmemAllocator`. **CN:** 结束说明 class `SmemAllocator` 的文档字符串。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L79** `    def capacity_in_bytes(compute_capability: Optional[str] = None) -> int:` — **EN:** Defines function `capacity_in_bytes`. **CN:** 定义函数 `capacity_in_bytes`。
+- **L80** `        """Get the shared memory capacity in bytes for a given compute capability.` — **EN:** Starts the docstring for the function `capacity_in_bytes`. **CN:** 开始说明 function `capacity_in_bytes` 的文档字符串。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `        Returns the maximum shared memory capacity in bytes available for the specified` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L83** `        GPU compute capability.` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `        :param compute_capability: The compute capability string (e.g. "70", "75", "80")` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L86** `        :type compute_capability: Optional[str]` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L87** `        :return: The shared memory capacity in bytes` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L88** `        :rtype: int` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L89** `        :raises ValueError: If the compute capability is not supported` — **EN:** Continues the docstring for the function `capacity_in_bytes`. **CN:** 继续说明 function `capacity_in_bytes` 的文档字符串。
+- **L90** `        """` — **EN:** Ends the docstring for the function `capacity_in_bytes`. **CN:** 结束说明 function `capacity_in_bytes` 的文档字符串。
+- **L91** `        if compute_capability is None:` — **EN:** Starts a conditional branch guarded by `compute_capability is None`. **CN:** 开始一个由 `compute_capability is None` 控制的条件分支。
+- **L92** `            arch = CuTeDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L93** `            compute_capability = f"sm_{arch.major}{arch.minor}"` — **EN:** Assigns a value to compute_capability. **CN:** 将一个值赋给 compute_capability。
+- **L94** `        if compute_capability not in SMEM_CAPACITY_MAP:` — **EN:** Starts a conditional branch guarded by `compute_capability not in SMEM_CAPACITY_MAP`. **CN:** 开始一个由 `compute_capability not in SMEM_CAPACITY_MAP` 控制的条件分支。
+- **L95** `            raise ValueError(f"Unsupported compute capability: {compute_capability}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L96** `        return SMEM_CAPACITY_MAP[compute_capability]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L99** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L100** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L101** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L102** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L103** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L104** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L105** `        """Initialize a new SmemAllocator instance.` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `        Creates a new shared memory allocator with a base pointer aligned to 1024 bytes.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L108** `        Tracks the allocator instance for memory management.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `        :param loc: Source location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L111** `        :type loc: Optional[ir.Location]` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L112** `        :param ip: Insertion point for MLIR operations, defaults to None` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L113** `        :type ip: Optional[ir.InsertionPoint]` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L114** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L115** `        self._base = get_dyn_smem(Int8, alignment=1024, loc=loc, ip=ip)` — **EN:** Assigns a value to self._base. **CN:** 将一个值赋给 self._base。
+- **L116** `        self._allocated_bytes = 0` — **EN:** Assigns a value to self._allocated_bytes. **CN:** 将一个值赋给 self._allocated_bytes。
+- **L117** `        CuTeDSL.track_smem_allocator(self, lambda cls: cls._allocated_bytes)  # type: ignore[attr-defined]` — **EN:** Invokes `CuTeDSL.track_smem_allocator` as a standalone call. **CN:** 以独立语句方式调用 `CuTeDSL.track_smem_allocator`。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `    @overload` — **EN:** Applies decorator `overload` to the following definition. **CN:** 将装饰器 `overload` 应用于后面的定义。
+- **L120** `    def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L121** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `        size_or_type: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `        byte_alignment: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `    ) -> cute.Pointer: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `    @overload` — **EN:** Applies decorator `overload` to the following definition. **CN:** 将装饰器 `overload` 应用于后面的定义。
+- **L130** `    def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L131** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L132** `        size_or_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L133** `        byte_alignment: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L134** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L135** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L136** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `    ) -> cute.Pointer: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `    @overload` — **EN:** Applies decorator `overload` to the following definition. **CN:** 将装饰器 `overload` 应用于后面的定义。
+- **L140** `    def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L141** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L142** `        size_or_type: cute.struct,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L143** `        byte_alignment: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L147** `    ) -> cute.Pointer: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L150** `    def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L151** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L152** `        size_or_type: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L153** `        byte_alignment: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L155** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L156** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L157** `    ) -> cute.Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L158** `        """Allocate a block of memory with specified size and alignment.` — **EN:** Starts the docstring for the function `allocate`. **CN:** 开始说明 function `allocate` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        This method allocates a block of shared memory with the specified size and alignment requirements.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L161** `        It supports allocating raw bytes, numeric types(as scalar value), and struct types.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `        :param size_or_type: The allocation specification, which can be:` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L164** `            - An integer specifying the number of bytes to allocate` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L165** `            - A Numeric type (e.g., Int8, Float32) to allocate space for one element` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L166** `            - A struct type to allocate space for the entire struct` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L167** `        :type size_or_type: Union[int, Type[Numeric], cute.struct]` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L168** `        :param byte_alignment: The minimum byte alignment requirement for the allocation, defaults to 1` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L169** `        :type byte_alignment: int, optional` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L170** `        :param loc: Source location information for debugging, defaults to None` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L171** `        :type loc: Optional[ir.Location]` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L172** `        :param ip: Insertion point for MLIR operations, defaults to None` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L173** `        :type ip: Optional[ir.InsertionPoint]` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L174** `        :return: For raw bytes and numeric types, returns a pointer to the allocated memory.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L175** `                For struct types, returns an initialized struct instance at the allocated location.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L176** `        :rtype: cute.Pointer` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L177** `        :raises ValueError: If size is negative or alignment is less than 1` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L178** `        :raises TypeError: If size_or_type is not an integer, Numeric type, or struct` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L179** `        :raises RuntimeError: If allocation would exceed available shared memory` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L180** `        """` — **EN:** Ends the docstring for the function `allocate`. **CN:** 结束说明 function `allocate` 的文档字符串。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `        if cute.is_integer(size_or_type):` — **EN:** Starts a conditional branch guarded by `cute.is_integer(size_or_type)`. **CN:** 开始一个由 `cute.is_integer(size_or_type)` 控制的条件分支。
+- **L183** `            size_in_bytes = size_or_type` — **EN:** Assigns a value to size_in_bytes. **CN:** 将一个值赋给 size_in_bytes。
+- **L184** `        elif isinstance(size_or_type, cute.struct):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L185** `            size_in_bytes = size_or_type.__sizeof__()` — **EN:** Assigns a value to size_in_bytes. **CN:** 将一个值赋给 size_in_bytes。
+- **L186** `            alignment = max(byte_alignment, size_or_type.__alignof__())` — **EN:** Assigns a value to alignment. **CN:** 将一个值赋给 alignment。
+- **L187** `            base_ptr = self.allocate(size_in_bytes, alignment, loc=loc, ip=ip)` — **EN:** Assigns a value to base_ptr. **CN:** 将一个值赋给 base_ptr。
+- **L188** `            return size_or_type(base_ptr)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** `        elif isinstance(` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L190** `            size_or_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L191** `            (` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L192** `                NumericMeta,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L193** `            ),` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L194** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L195** `            element_width = size_or_type.width if size_or_type is not Boolean else 8` — **EN:** Assigns a value to element_width. **CN:** 将一个值赋给 element_width。
+- **L196** `            size_in_bytes = cute.ceil_div(element_width, 8)` — **EN:** Assigns a value to size_in_bytes. **CN:** 将一个值赋给 size_in_bytes。
+- **L197** `            base_ptr = self.allocate(size_in_bytes, byte_alignment, loc=loc, ip=ip)` — **EN:** Assigns a value to base_ptr. **CN:** 将一个值赋给 base_ptr。
+- **L198** `            return cute.recast_ptr(base_ptr, dtype=size_or_type, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L199** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L200** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L201** `                f"Expected int, struct, or numeric type, but got {type(size_or_type)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `        if cute.is_static(size_in_bytes) and size_in_bytes < 0:` — **EN:** Starts a conditional branch guarded by `cute.is_static(size_in_bytes) and size_in_bytes < 0`. **CN:** 开始一个由 `cute.is_static(size_in_bytes) and size_in_bytes < 0` 控制的条件分支。
+- **L205** `            raise ValueError("size must be non-negative")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** `        if byte_alignment < 1:` — **EN:** Starts a conditional branch guarded by `byte_alignment < 1`. **CN:** 开始一个由 `byte_alignment < 1` 控制的条件分支。
+- **L208** `            raise ValueError("\`byte_alignment\` must be at least 1")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `        self._base = self._base.align(byte_alignment)` — **EN:** Assigns a value to self._base. **CN:** 将一个值赋给 self._base。
+- **L211** `        ptr = self._base` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L212** `        self._base += size_in_bytes` — **EN:** Updates self._base in place. **CN:** 原地更新 self._base。
+- **L213** `        if self._allocated_bytes % byte_alignment != 0:` — **EN:** Starts a conditional branch guarded by `self._allocated_bytes % byte_alignment != 0`. **CN:** 开始一个由 `self._allocated_bytes % byte_alignment != 0` 控制的条件分支。
+- **L214** `            self._allocated_bytes += (` — **EN:** Updates self._allocated_bytes in place. **CN:** 原地更新 self._allocated_bytes。
+- **L215** `                byte_alignment - self._allocated_bytes % byte_alignment` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `        self._allocated_bytes += size_in_bytes` — **EN:** Updates self._allocated_bytes in place. **CN:** 原地更新 self._allocated_bytes。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `        # Check bounds against available dynamic shared memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L220** `        cute.testing.assert_(` — **EN:** Invokes `cute.testing.assert_` as a standalone call. **CN:** 以独立语句方式调用 `cute.testing.assert_`。
+- **L221** `            self._allocated_bytes <= get_dyn_smem_size(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `            f"Allocation failed: shared memory allocation exceeds available memory set in kernel launch. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `            f"Allocated bytes: {self._allocated_bytes} bytes. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `            f"Please reduce the allocation or set a larger smem size in kernel launch.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `        return ptr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L231** `    def allocate_array(` — **EN:** Defines function `allocate_array`. **CN:** 定义函数 `allocate_array`。
+- **L232** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L233** `        element_type: Union[` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L234** `            Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L235** `        ],` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L236** `        num_elems: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L237** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `        byte_alignment: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L239** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `    ) -> cute.Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L242** `        """Allocate an array of elements in shared memory.` — **EN:** Starts the docstring for the function `allocate_array`. **CN:** 开始说明 function `allocate_array` 的文档字符串。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `        :param element_type: The type of elements to allocate` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L245** `        :type element_type: Union[Type[Numeric]]` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L246** `        :param num_elems: Number of elements to allocate, defaults to 1` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L247** `        :type num_elems: int, optional` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L248** `        :return: Pointer to the start of the allocated array` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L249** `        :rtype: cute.Pointer` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L250** `        :raises ValueError: If num_elems is less than 1` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L251** `        :raises TypeError: If element_type is not a Numeric type` — **EN:** Continues the docstring for the function `allocate_array`. **CN:** 继续说明 function `allocate_array` 的文档字符串。
+- **L252** `        """` — **EN:** Ends the docstring for the function `allocate_array`. **CN:** 结束说明 function `allocate_array` 的文档字符串。
+- **L253** `        if cute.is_static(num_elems) and num_elems < 1:` — **EN:** Starts a conditional branch guarded by `cute.is_static(num_elems) and num_elems < 1`. **CN:** 开始一个由 `cute.is_static(num_elems) and num_elems < 1` 控制的条件分支。
+- **L254** `            raise ValueError("num_elems must be at least 1")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L255** `        if not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(element_type, (NumericMeta,))`. **CN:** 开始一个由 `not isinstance(element_type, (NumericMeta,))` 控制的条件分支。
+- **L256** `            element_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L257** `            (` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L258** `                NumericMeta,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L259** `            ),` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L260** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L261** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L262** `                f"value_ty must be a type of Numeric, but got {element_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `        element_width = element_type.width if element_type is not Boolean else 8` — **EN:** Assigns a value to element_width. **CN:** 将一个值赋给 element_width。
+- **L266** `        byte_alignment = max(byte_alignment, element_width // 8)` — **EN:** Assigns a value to byte_alignment. **CN:** 将一个值赋给 byte_alignment。
+- **L267** `        ptr = self.allocate(` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L268** `            element_width * num_elems // 8, byte_alignment, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `        return cute.recast_ptr(ptr, dtype=element_type, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L274** `    def allocate_tensor(` — **EN:** Defines function `allocate_tensor`. **CN:** 定义函数 `allocate_tensor`。
+- **L275** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `        element_type: Union[Type[Numeric],],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `        layout: Union[int, cute.Layout, cute.ComposedLayout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `        byte_alignment: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `        swizzle: Optional[cute.Swizzle] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L281** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L282** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L283** `    ) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L284** `        """Allocate a tensor in shared memory.` — **EN:** Starts the docstring for the function `allocate_tensor`. **CN:** 开始说明 function `allocate_tensor` 的文档字符串。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `        Note: Currently only supports static layouts. Dynamic layouts are not supported.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `        :param element_type: The type of elements in the tensor` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L289** `        :type element_type: Union[Type[Numeric]]` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L290** `        :param layout: The layout specification for the tensor. Must be a static layout.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L291** `        :type layout: Union[int, cute.Layout, cute.ComposedLayout]` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L292** `        :param byte_alignment: The byte alignment requirement, defaults to 1` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L293** `        :type byte_alignment: int, optional` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L294** `        :param swizzle: Swizzle for position-dependent swizzling, defaults to None` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L295** `        :type swizzle: cute.Swizzle, optional` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L296** `        :return: The allocated tensor with specified properties` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L297** `        :rtype: cute.Tensor` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L298** `        :raises TypeError: If element_type is not a Numeric type, or if swizzle conflicts with layout` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L299** `        :raises ValueError: If allocation is not byte-aligned` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L300** `        :raises NotImplementedError: If dynamic layout is specified` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L301** `        """` — **EN:** Ends the docstring for the function `allocate_tensor`. **CN:** 结束说明 function `allocate_tensor` 的文档字符串。
+- **L302** `        if not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(element_type, (NumericMeta,))`. **CN:** 开始一个由 `not isinstance(element_type, (NumericMeta,))` 控制的条件分支。
+- **L303** `            element_type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L304** `            (` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `                NumericMeta,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `            ),` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L307** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L308** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L309** `                f"value_ty must be a type of Numeric, but got {element_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `        if (` — **EN:** Starts a conditional branch guarded by `(isinstance(layout, cute.ComposedLayout) and isinstance(l...`. **CN:** 开始一个由 `(isinstance(layout, cute.ComposedLayout) and isinstance(l...` 控制的条件分支。
+- **L313** `            isinstance(layout, cute.ComposedLayout)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `            and isinstance(layout.inner, cute.Swizzle)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L315** `        ) and (swizzle is not None):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L316** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L317** `                "Invalid tensor type: cannot be both iterator swizzle (PDSL) and swizzle layout(PISL) at the same time."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `        if isinstance(layout, int):` — **EN:** Starts a conditional branch guarded by `isinstance(layout, int)`. **CN:** 开始一个由 `isinstance(layout, int)` 控制的条件分支。
+- **L321** `            layout = cute.make_layout(layout)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L323** `        profile = layout(0, loc=loc, ip=ip)  # type: ignore[operator]` — **EN:** Assigns a value to profile. **CN:** 将一个值赋给 profile。
+- **L324** `        if isinstance(profile, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(profile, tuple)`. **CN:** 开始一个由 `isinstance(profile, tuple)` 控制的条件分支。
+- **L325** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L326** `                "cannot allocate a shared memory tensor with a non-integer iterator"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `        if not cute.is_static(layout):` — **EN:** Starts a conditional branch guarded by `not cute.is_static(layout)`. **CN:** 开始一个由 `not cute.is_static(layout)` 控制的条件分支。
+- **L330** `            raise NotImplementedError(f"dynamic layout is not supported: {layout}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `        # At least align the allocation to the natural alignment given by the element type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L333** `        element_width = element_type.width if element_type is not Boolean else 8` — **EN:** Assigns a value to element_width. **CN:** 将一个值赋给 element_width。
+- **L334** `        if element_width // 8 > byte_alignment:` — **EN:** Starts a conditional branch guarded by `element_width // 8 > byte_alignment`. **CN:** 开始一个由 `element_width // 8 > byte_alignment` 控制的条件分支。
+- **L335** `            byte_alignment = element_width // 8` — **EN:** Assigns a value to byte_alignment. **CN:** 将一个值赋给 byte_alignment。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `        # Relevant only for sub-byte data types: verify that the entire allocation is byte-aligned` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L338** `        cosize_in_bits = cute.cosize(layout, loc=loc, ip=ip) * element_width` — **EN:** Assigns a value to cosize_in_bits. **CN:** 将一个值赋给 cosize_in_bits。
+- **L339** `        assert isinstance(cosize_in_bits, int)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L340** `        if cosize_in_bits % 8 != 0:` — **EN:** Starts a conditional branch guarded by `cosize_in_bits % 8 != 0`. **CN:** 开始一个由 `cosize_in_bits % 8 != 0` 控制的条件分支。
+- **L341** `            raise ValueError("invalid allocation that is not byte-aligned")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `        num_bytes = cosize_in_bits // 8` — **EN:** Assigns a value to num_bytes. **CN:** 将一个值赋给 num_bytes。
+- **L344** `        ptr = self.allocate(num_bytes, byte_alignment, loc=loc, ip=ip)` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L345** `        ptr = cute.recast_ptr(ptr, swizzle, dtype=element_type, loc=loc, ip=ip)` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L346** `        tensor = cute.make_tensor(ptr, layout, loc=loc, ip=ip)` — **EN:** Assigns a value to tensor. **CN:** 将一个值赋给 tensor。
+- **L347** `        return _Tensor(tensor, dtype=element_type, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `# Set explicit signature for Sphinx documentation to avoid issues with @dsl_user_op decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L351** `SmemAllocator.__init__.__signature__ = inspect.Signature(  # type: ignore[attr-defined]` — **EN:** Assigns a value to SmemAllocator.__init__.__signature__. **CN:** 将一个值赋给 SmemAllocator.__init__.__signature__。
+- **L352** `    [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `        inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `get_smem_capacity_in_bytes = SmemAllocator.capacity_in_bytes` — **EN:** Assigns a value to get_smem_capacity_in_bytes. **CN:** 将一个值赋给 get_smem_capacity_in_bytes。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.smem_allocator`. CN: 模块名为 `CuTeDSL.cutlass.utils.smem_allocator`。
+- EN: Top-level classes: SmemAllocator CN: 顶层类包括：SmemAllocator
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute, cutlass.cute.arch:get_dyn_smem,get_dyn_smem_size, cutlass.cute.tensor:_Tensor, cutlass.cutlass_dsl:SMEM_CAPACITY_MAP,CuTeDSL,Boolean,Int8,Numeric,NumericMeta,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:cute CN: 内部依赖：cutlass.cute, cutlass.cute.arch:get_dyn_smem,get_dyn_smem_size, cutlass.cute.tensor:_Tensor, cutlass.cutlass_dsl:SMEM_CAPACITY_MAP,CuTeDSL,Boolean,Int8,Numeric,NumericMeta,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:cute
+- EN: External or standard-library dependencies: typing:Any,Optional,Type,Union,overload, inspect CN: 外部或标准库依赖：typing:Any,Optional,Type,Union,overload, inspect

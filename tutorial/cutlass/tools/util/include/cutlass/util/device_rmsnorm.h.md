@@ -1,0 +1,580 @@
+# device_rmsnorm.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/device_rmsnorm.h`
+**Purpose / 用途**: Provides CUDA device utilities for rmsnorm. / 提供与 rmsnorm 相关的 CUDA 设备端工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L35** <code>#include &quot;cutlass/layout/tensor.h&quot;</code>
+  - EN: Includes `cutlass/layout/tensor.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/tensor.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L36** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L37** <code>#include &quot;cutlass/tensor_coord.h&quot;</code>
+  - EN: Includes `cutlass/tensor_coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L38** <code>#include &quot;cutlass/tensor_ref.h&quot;</code>
+  - EN: Includes `cutlass/tensor_ref.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_ref.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/util/device_utils.h&quot;</code>
+  - EN: Includes `cutlass/util/device_utils.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/device_utils.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L40** <code>#include &lt;cfloat&gt;</code>
+  - EN: Includes `cfloat` so this file can use APIs or definitions from `cfloat`.
+  - CN: 引入 `cfloat`，使当前文件可以使用来自 `cfloat` 的 API 或定义。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L43** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L44** <code>__global__ void rmsnorm_twoPassAlgo_e8(float4 *output, const float4 *input,</code>
+  - EN: Begins or continues the signature/call syntax involving `rmsnorm_twoPassAlgo_e8`.
+  - CN: 开始或继续与 `rmsnorm_twoPassAlgo_e8` 相关的签名/调用语法。
+- **L45** <code>                                       const float4 *weight,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L46** <code>                                       const int m, const int n, float epsilon) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L47** <code>  const int m_idx = blockIdx.x;</code>
+  - EN: Assigns or initializes `m_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `m_idx` 进行赋值或初始化。
+- **L48** <code>  const int tid = threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L49** <code>  const int bdimx = blockDim.x;</code>
+  - EN: Assigns or initializes `bdimx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bdimx` 进行赋值或初始化。
+- **L50** <code>  __shared__ float s_mean;</code>
+  - EN: Declares the symbol `s_mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_mean`。
+- **L51** <code>  float local_sums[1] = {0.0f};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L52** <code>  const int n_8 = n / 8;</code>
+  - EN: Assigns or initializes `n_8` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `n_8` 进行赋值或初始化。
+- **L53** <code>  int offset = m_idx * n_8;</code>
+  - EN: Assigns or initializes `offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `offset` 进行赋值或初始化。
+- **L54** <code>  input += offset;</code>
+  - EN: Declares the symbol `offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `offset`。
+- **L55** <code>  output += offset;</code>
+  - EN: Declares the symbol `offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `offset`。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>  for (int index = tid; index &lt; n_8; index += bdimx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L58** <code>    const float4 local_val = input[index];</code>
+  - EN: Assigns or initializes `local_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val` 进行赋值或初始化。
+- **L59** <code>    const half2 *h1 = (half2 *)&amp;local_val.x;</code>
+  - EN: Assigns or initializes `h1` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h1` 进行赋值或初始化。
+- **L60** <code>    const half2 *h2 = (half2 *)&amp;local_val.y;</code>
+  - EN: Assigns or initializes `h2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h2` 进行赋值或初始化。
+- **L61** <code>    const half2 *h3 = (half2 *)&amp;local_val.z;</code>
+  - EN: Assigns or initializes `h3` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h3` 进行赋值或初始化。
+- **L62** <code>    const half2 *h4 = (half2 *)&amp;local_val.w;</code>
+  - EN: Assigns or initializes `h4` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h4` 进行赋值或初始化。
+- **L63** <code>    local_sums[0] += static_cast&lt;float&gt;(h1-&gt;x) * static_cast&lt;float&gt;(h1-&gt;x) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L64** <code>                     static_cast&lt;float&gt;(h1-&gt;y) * static_cast&lt;float&gt;(h1-&gt;y) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L65** <code>                     static_cast&lt;float&gt;(h2-&gt;x) * static_cast&lt;float&gt;(h2-&gt;x) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L66** <code>                     static_cast&lt;float&gt;(h2-&gt;y) * static_cast&lt;float&gt;(h2-&gt;y) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L67** <code>                     static_cast&lt;float&gt;(h3-&gt;x) * static_cast&lt;float&gt;(h3-&gt;x) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L68** <code>                     static_cast&lt;float&gt;(h3-&gt;y) * static_cast&lt;float&gt;(h3-&gt;y) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L69** <code>                     static_cast&lt;float&gt;(h4-&gt;x) * static_cast&lt;float&gt;(h4-&gt;x) +</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L70** <code>                     static_cast&lt;float&gt;(h4-&gt;y) * static_cast&lt;float&gt;(h4-&gt;y);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L71** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L72** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L73** <code>  if (blockDim.x &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L74** <code>    warpReduceSum&lt;float, 1&gt;(local_sums);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L75** <code>  } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L76** <code>    blockReduceSum&lt;float, 1&gt;(local_sums);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L77** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L78** <code>  if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L79** <code>    s_mean = rsqrtf(local_sums[0] / n + epsilon);</code>
+  - EN: Declares function or method `rsqrtf` without defining it here.
+  - CN: 声明函数或方法 `rsqrtf`，但不在此处给出定义。
+- **L80** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L81** <code>  __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>  for (int index = tid; index &lt; n_8; index += bdimx) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L84** <code>    const float4 local_val = input[index];</code>
+  - EN: Assigns or initializes `local_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val` 进行赋值或初始化。
+- **L85** <code>    const float4 weight_val = weight[index];</code>
+  - EN: Assigns or initializes `weight_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `weight_val` 进行赋值或初始化。
+- **L86** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L87** <code>    const half2 *l1 = (half2 *)&amp;local_val.x;</code>
+  - EN: Assigns or initializes `l1` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `l1` 进行赋值或初始化。
+- **L88** <code>    const half2 *l2 = (half2 *)&amp;local_val.y;</code>
+  - EN: Assigns or initializes `l2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `l2` 进行赋值或初始化。
+- **L89** <code>    const half2 *l3 = (half2 *)&amp;local_val.z;</code>
+  - EN: Assigns or initializes `l3` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `l3` 进行赋值或初始化。
+- **L90** <code>    const half2 *l4 = (half2 *)&amp;local_val.w;</code>
+  - EN: Assigns or initializes `l4` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `l4` 进行赋值或初始化。
+- **L91** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L92** <code>    const half2 *g1 = (half2 *)&amp;weight_val.x;</code>
+  - EN: Assigns or initializes `g1` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `g1` 进行赋值或初始化。
+- **L93** <code>    const half2 *g2 = (half2 *)&amp;weight_val.y;</code>
+  - EN: Assigns or initializes `g2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `g2` 进行赋值或初始化。
+- **L94** <code>    const half2 *g3 = (half2 *)&amp;weight_val.z;</code>
+  - EN: Assigns or initializes `g3` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `g3` 进行赋值或初始化。
+- **L95** <code>    const half2 *g4 = (half2 *)&amp;weight_val.w;</code>
+  - EN: Assigns or initializes `g4` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `g4` 进行赋值或初始化。
+- **L96** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L97** <code>    float4 tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L98** <code>    half2 *h1 = (half2 *)&amp;tmp.x;</code>
+  - EN: Assigns or initializes `h1` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h1` 进行赋值或初始化。
+- **L99** <code>    half2 *h2 = (half2 *)&amp;tmp.y;</code>
+  - EN: Assigns or initializes `h2` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h2` 进行赋值或初始化。
+- **L100** <code>    half2 *h3 = (half2 *)&amp;tmp.z;</code>
+  - EN: Assigns or initializes `h3` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h3` 进行赋值或初始化。
+- **L101** <code>    half2 *h4 = (half2 *)&amp;tmp.w;</code>
+  - EN: Assigns or initializes `h4` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h4` 进行赋值或初始化。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>    h1-&gt;x = half(static_cast&lt;float&gt;(l1-&gt;x) * s_mean * static_cast&lt;float&gt;(g1-&gt;x));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L104** <code>    h1-&gt;y = half(static_cast&lt;float&gt;(l1-&gt;y) * s_mean * static_cast&lt;float&gt;(g1-&gt;y));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L105** <code>    h2-&gt;x = half(static_cast&lt;float&gt;(l2-&gt;x) * s_mean * static_cast&lt;float&gt;(g2-&gt;x));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L106** <code>    h2-&gt;y = half(static_cast&lt;float&gt;(l2-&gt;y) * s_mean * static_cast&lt;float&gt;(g2-&gt;y));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L107** <code>    h3-&gt;x = half(static_cast&lt;float&gt;(l3-&gt;x) * s_mean * static_cast&lt;float&gt;(g3-&gt;x));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L108** <code>    h3-&gt;y = half(static_cast&lt;float&gt;(l3-&gt;y) * s_mean * static_cast&lt;float&gt;(g3-&gt;y));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L109** <code>    h4-&gt;x = half(static_cast&lt;float&gt;(l4-&gt;x) * s_mean * static_cast&lt;float&gt;(g4-&gt;x));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L110** <code>    h4-&gt;y = half(static_cast&lt;float&gt;(l4-&gt;y) * s_mean * static_cast&lt;float&gt;(g4-&gt;y));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L111** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L112** <code>    output[index] = tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L113** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L114** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>template&lt;typename T&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L117** <code>__global__ void rmsnorm_twoPassAlgo_e1(T* output,</code>
+  - EN: Begins or continues the signature/call syntax involving `rmsnorm_twoPassAlgo_e1`.
+  - CN: 开始或继续与 `rmsnorm_twoPassAlgo_e1` 相关的签名/调用语法。
+- **L118** <code>                                       const T* input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L119** <code>                                       const T* weight,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L120** <code>                                       const int m, const int n,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L121** <code>                                       float epsilon)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L122** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L123** <code>  const int m_idx = blockIdx.x;</code>
+  - EN: Assigns or initializes `m_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `m_idx` 进行赋值或初始化。
+- **L124** <code>  const int tid = threadIdx.x;</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L125** <code>  const int bdimx = blockDim.x;</code>
+  - EN: Assigns or initializes `bdimx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bdimx` 进行赋值或初始化。
+- **L126** <code>  __shared__ float s_mean;</code>
+  - EN: Declares the symbol `s_mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_mean`。
+- **L127** <code>  float local_sums[1] = {0.0f};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>  int offset = m_idx * n;</code>
+  - EN: Assigns or initializes `offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `offset` 进行赋值或初始化。
+- **L129** <code>  input += offset;</code>
+  - EN: Declares the symbol `offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `offset`。
+- **L130** <code>  output += offset;</code>
+  - EN: Declares the symbol `offset` in the current scope.
+  - CN: 在当前作用域中声明符号 `offset`。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>  for (int index = tid ; index &lt; n ; index += bdimx){</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L133** <code>    float local_val = static_cast&lt;float&gt;(input[index]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L134** <code>    local_sums[0] += local_val * local_val;</code>
+  - EN: Declares the symbol `local_val` in the current scope.
+  - CN: 在当前作用域中声明符号 `local_val`。
+- **L135** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L136** <code>  if (blockDim.x &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L137** <code>    warpReduceSum&lt;float, 1&gt;(local_sums);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L138** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L139** <code>  else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L140** <code>    blockReduceSum&lt;float, 1&gt;(local_sums);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L141** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L142** <code>  if (threadIdx.x == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L143** <code>    s_mean = rsqrtf(local_sums[0] / n + epsilon);</code>
+  - EN: Declares function or method `rsqrtf` without defining it here.
+  - CN: 声明函数或方法 `rsqrtf`，但不在此处给出定义。
+- **L144** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>  __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L146** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L147** <code>  for (int index = tid ; index &lt; n ; index += bdimx){</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L148** <code>    const T weight_val = weight[index];</code>
+  - EN: Assigns or initializes `weight_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `weight_val` 进行赋值或初始化。
+- **L149** <code>    const T local_val = input[index];</code>
+  - EN: Assigns or initializes `local_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val` 进行赋值或初始化。
+- **L150** <code>    output[index] = T(static_cast&lt;float&gt;(local_val) * s_mean * static_cast&lt;float&gt;(weight_val));</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L151** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L152** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L154** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L155** <code>void rmsnorm(cutlass::MatrixCoord tensor_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `rmsnorm`.
+  - CN: 开始或继续与 `rmsnorm` 相关的签名/调用语法。
+- **L156** <code>             TensorRef&lt;T, layout::RowMajor&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L157** <code>             TensorRef&lt;T, layout::RowMajor&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L158** <code>             TensorRef&lt;T, layout::RowMajor&gt; ref_weight,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L159** <code>             cudaStream_t stream, float epsilon = 1e-5f){</code>
+  - EN: Assigns or initializes `epsilon` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `epsilon` 进行赋值或初始化。
+- **L160** <code>  const int m = tensor_size.row();</code>
+  - EN: Declares function or method `row` without defining it here.
+  - CN: 声明函数或方法 `row`，但不在此处给出定义。
+- **L161** <code>  const int n = tensor_size.column();</code>
+  - EN: Declares function or method `column` without defining it here.
+  - CN: 声明函数或方法 `column`，但不在此处给出定义。
+- **L162** <code>  T* output = ref_output.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L163** <code>  const T* input = ref_input.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L164** <code>  const T* weight = ref_weight.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L165** <code>  dim3 grid(m);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L166** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L167** <code>  if (n % 8 == 0 &amp;&amp; std::is_same&lt;T, cutlass::half_t&gt;::value) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L168** <code>    dim3 block(cutlass::platform::min(1024, (n / 8 + 31) / 32 * 32));</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L169** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L170** <code>    rmsnorm_twoPassAlgo_e8&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L171** <code>        (float4 *)output, (const float4 *)input, (const float4 *)weight, m, n, epsilon);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L172** <code>  } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L173** <code>    dim3 block(cutlass::platform::min(1024, ((n + 31)/32 + 31)/32*32));</code>
+  - EN: Declares function or method `min` without defining it here.
+  - CN: 声明函数或方法 `min`，但不在此处给出定义。
+- **L174** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L175** <code>    rmsnorm_twoPassAlgo_e1&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L176** <code>        output, input, weight, m, n, epsilon);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L177** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L178** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L179** <code>  auto result = cudaGetLastError();</code>
+  - EN: Declares function or method `cudaGetLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaGetLastError`，但不在此处给出定义。
+- **L180** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L181** <code>    std::cerr &lt;&lt; &quot;CUDA error: &quot; &lt;&lt; cudaGetErrorString(result) &lt;&lt; std::endl;</code>
+  - EN: Declares function or method `cudaGetErrorString` without defining it here.
+  - CN: 声明函数或方法 `cudaGetErrorString`，但不在此处给出定义。
+- **L182** <code>    abort();</code>
+  - EN: Declares function or method `abort` without defining it here.
+  - CN: 声明函数或方法 `abort`，但不在此处给出定义。
+- **L183** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L185** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L186** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/tensor.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_ref.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/device_utils.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cfloat</code> — APIs or definitions from `cfloat` / 来自 `cfloat` 的 API 或定义

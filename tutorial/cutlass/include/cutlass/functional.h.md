@@ -1,0 +1,3488 @@
+# functional.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/functional.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Define basic numeric operators" and defines related CUTLASS facilities in `include/cutlass/functional.h`.
+- CN: 该头文件以注释摘要“Define basic numeric operators”引入，并在 `include/cutlass/functional.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>  /***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Define basic numeric operators</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L34**: <code>    This is inspired by the Standard Library&#x27;s &lt;functional&gt; header.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L36**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L37**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L38**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L40**: <code>#include &quot;cutlass/platform/platform.h&quot;</code>
+  - EN: Includes "cutlass/platform/platform.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/platform/platform.h"，以便本文件使用该依赖中的声明。
+- **L41**: <code>#include &quot;cutlass/detail/dependent_false.hpp&quot;</code>
+  - EN: Includes "cutlass/detail/dependent_false.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/detail/dependent_false.hpp"，以便本文件使用该依赖中的声明。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>#if defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L44**: <code>#include &quot;cutlass/floating_point_nvrtc.h&quot;</code>
+  - EN: Includes "cutlass/floating_point_nvrtc.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/floating_point_nvrtc.h"，以便本文件使用该依赖中的声明。
+- **L45**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L46**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L47**: <code>#include &lt;cuda_runtime.h&gt;</code>
+  - EN: Includes <cuda_runtime.h> so this file can use declarations from that dependency.
+  - CN: 包含 <cuda_runtime.h>，以便本文件使用该依赖中的声明。
+- **L48**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L49**: <code>#if defined(CUTLASS_ARCH_WMMA_ENABLED)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_ARCH_WMMA_ENABLED)`.
+  - CN: 开始一个由 `defined(CUTLASS_ARCH_WMMA_ENABLED)` 控制的条件编译块。
+- **L50**: <code>#include &lt;mma.h&gt;</code>
+  - EN: Includes <mma.h> so this file can use declarations from that dependency.
+  - CN: 包含 <mma.h>，以便本文件使用该依赖中的声明。
+- **L51**: <code>#endif // defined(CUTLASS_ARCH_WMMA_ENABLED)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L52**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L53**: <code>#ifdef _MSC_VER</code>
+  - EN: Starts a conditional-compilation block controlled by `_MSC_VER`.
+  - CN: 开始一个由 `_MSC_VER` 控制的条件编译块。
+- **L54**: <code>// Provides support for alternate operators such as &#x27;and&#x27;, &#x27;or&#x27;, ...</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L55**: <code>#include &lt;ciso646&gt;</code>
+  - EN: Includes <ciso646> so this file can use declarations from that dependency.
+  - CN: 包含 <ciso646>，以便本文件使用该依赖中的声明。
+- **L56**: <code>#include &lt;intrin.h&gt;</code>
+  - EN: Includes <intrin.h> so this file can use declarations from that dependency.
+  - CN: 包含 <intrin.h>，以便本文件使用该依赖中的声明。
+- **L57**: <code>#endif // _MSC_VER</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L58**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L59**: <code>#if defined(CUTLASS_ARCH_MMA_SM100A_ENABLED) || defined(CUTLASS_ARCH_MMA_SM100F_ENABLED) ||\</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_ARCH_MMA_SM100A_ENABLED) || defined(CUTLASS_ARCH_MMA_SM100F_ENABLED) ||\`.
+  - CN: 开始一个由 `defined(CUTLASS_ARCH_MMA_SM100A_ENABLED) || defined(CUTLASS_ARCH_MMA_SM100F_ENABLED) ||\` 控制的条件编译块。
+- **L60**: <code>    defined(CUTLASS_ARCH_MMA_SM103A_ENABLED) || defined(CUTLASS_ARCH_MMA_SM103F_ENABLED)</code>
+  - EN: Provides part of the signature or implementation for `defined`.
+  - CN: 提供 `defined` 的签名或实现的一部分。
+- **L61**: <code>#  define CUTLASS_ARCH_CREDUX_ENABLED</code>
+  - EN: Defines the macro or header-guard symbol `CUTLASS_ARCH_CREDUX_ENABLED`.
+  - CN: 定义宏或头文件保护符号 `CUTLASS_ARCH_CREDUX_ENABLED`。
+- **L62**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L67**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L68**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L69**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L70**: <code>  CUTLASS_HOST_DEVICE int32_t popcount(int32_t x) {</code>
+  - EN: Starts the definition body for `popcount`.
+  - CN: 开始 `popcount` 的定义体。
+- **L71**: <code>    #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L72**: <code>    return __popc(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L73**: <code>    #elif defined(__GNUC__) || defined(__clang__)</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L74**: <code>    return __builtin_popcount(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L75**: <code>    #elif (defined(_MSC_VER) &amp;&amp; !defined(_M_ARM64))</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L76**: <code>    return __popcnt(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L77**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L78**: <code>    int32_t count = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L79**: <code>    while (x) {</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L80**: <code>      count += x &amp; 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L81**: <code>      x &gt;&gt;= 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L82**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L83**: <code>    return count;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L84**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L85**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L86**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L87**: <code>  CUTLASS_HOST_DEVICE int64_t popcount(int64_t x) {</code>
+  - EN: Starts the definition body for `popcount`.
+  - CN: 开始 `popcount` 的定义体。
+- **L88**: <code>    #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L89**: <code>    return __popcll(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L90**: <code>    #elif defined(__GNUC__) || defined(__clang__)</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L91**: <code>    return __builtin_popcountll(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L92**: <code>    #elif (defined(_MSC_VER) &amp;&amp; !defined(_M_ARM64))</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L93**: <code>    return __popcnt64(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L94**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L95**: <code>    int64_t count = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L96**: <code>    while (x) {</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L97**: <code>      count += x &amp; 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L98**: <code>      x &gt;&gt;= 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L99**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L100**: <code>    return count;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L101**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L102**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L103**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L104**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L105**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L106**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L107**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L108**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L109**: <code>struct absolute_value_op {</code>
+  - EN: Declares or defines the struct `absolute_value_op`.
+  - CN: 声明或定义 struct `absolute_value_op`。
+- **L110**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L111**: <code>  T operator()(T lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L112**: <code>    return abs(lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L113**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L114**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L115**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L116**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L117**: <code>struct absolute_value_op&lt;float&gt; {</code>
+  - EN: Declares or defines the struct `absolute_value_op`.
+  - CN: 声明或定义 struct `absolute_value_op`。
+- **L118**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L119**: <code>  float operator()(float lhs) const { return fabs(lhs); }</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L120**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L121**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L122**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L123**: <code>struct plus {</code>
+  - EN: Declares or defines the struct `plus`.
+  - CN: 声明或定义 struct `plus`。
+- **L124**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L125**: <code>  T operator()(T lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L126**: <code>    lhs += rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L127**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L128**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L129**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L130**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L131**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L132**: <code>struct minus {</code>
+  - EN: Declares or defines the struct `minus`.
+  - CN: 声明或定义 struct `minus`。
+- **L133**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L134**: <code>  T operator()(T lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L135**: <code>    lhs -= rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L136**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L137**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L138**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L139**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L140**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L141**: <code>struct multiplies {</code>
+  - EN: Declares or defines the struct `multiplies`.
+  - CN: 声明或定义 struct `multiplies`。
+- **L142**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L143**: <code>  T operator()(T lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L144**: <code>    lhs *= rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L145**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L146**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L147**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L148**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L149**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L150**: <code>struct scale {</code>
+  - EN: Declares or defines the struct `scale`.
+  - CN: 声明或定义 struct `scale`。
+- **L151**: <code>  T const scaling_factor_;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L153**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L154**: <code>  scale(float scaling_factor) : scaling_factor_(scaling_factor) {</code>
+  - EN: Starts the definition body for `scale`.
+  - CN: 开始 `scale` 的定义体。
+- **L155**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L156**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L157**: <code>  T operator()(T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L158**: <code>    T result = rhs * scaling_factor_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L159**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L160**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L161**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L162**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L163**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; __CUDA_ARCH__ &gt;= 530</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 530`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 530` 控制的条件编译块。
+- **L164**: <code>/// Partial specializations needed when __CUDA_NO_HALF2_OPERATORS__ is set</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L165**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L166**: <code>struct plus&lt;__half2&gt; {</code>
+  - EN: Declares or defines the struct `plus`.
+  - CN: 声明或定义 struct `plus`。
+- **L167**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L168**: <code>  __half2 operator()(__half2 lhs, __half2 const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L169**: <code>    return __hadd2(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L170**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L171**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L172**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L173**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L174**: <code>struct minus&lt;__half2&gt; {</code>
+  - EN: Declares or defines the struct `minus`.
+  - CN: 声明或定义 struct `minus`。
+- **L175**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L176**: <code>  __half2 operator()(__half2 lhs, __half2 const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L177**: <code>    return __hsub2(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L178**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L179**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L180**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L181**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L182**: <code>struct multiplies&lt;__half2&gt; {</code>
+  - EN: Declares or defines the struct `multiplies`.
+  - CN: 声明或定义 struct `multiplies`。
+- **L183**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L184**: <code>  __half2 operator()(__half2 lhs, __half2 const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L185**: <code>    return __hmul2(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L186**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L187**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L189**: <code>/// Partial specializations needed when __CUDA_NO_HALF_OPERATORS__ is set</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L190**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L191**: <code>struct plus&lt;__half&gt; {</code>
+  - EN: Declares or defines the struct `plus`.
+  - CN: 声明或定义 struct `plus`。
+- **L192**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L193**: <code>  __half operator()(__half lhs, __half const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L194**: <code>    return __hadd(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L195**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L196**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L197**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L198**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L199**: <code>struct minus&lt;__half&gt; {</code>
+  - EN: Declares or defines the struct `minus`.
+  - CN: 声明或定义 struct `minus`。
+- **L200**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L201**: <code>  __half operator()(__half lhs, __half const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L202**: <code>    return __hsub(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L203**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L204**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L205**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L206**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L207**: <code>struct multiplies&lt;__half&gt; {</code>
+  - EN: Declares or defines the struct `multiplies`.
+  - CN: 声明或定义 struct `multiplies`。
+- **L208**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L209**: <code>  __half operator()(__half lhs, __half const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L210**: <code>    return __hmul(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L211**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L212**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L213**: <code>#endif // defined(__CUDA_ARCH__)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L214**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L215**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L216**: <code>/// Squares with optional conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L217**: <code>template &lt;typename T, typename Output = T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L218**: <code>struct square {</code>
+  - EN: Declares or defines the struct `square`.
+  - CN: 声明或定义 struct `square`。
+- **L219**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L220**: <code>  Output operator()(T lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L221**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L222**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L223**: <code>    Output y = Output(lhs);</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L224**: <code>    return mul_op(y, y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L225**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L226**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L227**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L228**: <code>/// Returns the magnitude squared of an element.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L229**: <code>template &lt;typename T, typename Output = T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L230**: <code>struct magnitude_squared {</code>
+  - EN: Declares or defines the struct `magnitude_squared`.
+  - CN: 声明或定义 struct `magnitude_squared`。
+- **L231**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L232**: <code>  Output operator()(T lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L233**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L234**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L235**: <code>    Output y = Output(lhs);</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L236**: <code>    return mul_op(y, y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L237**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L238**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>/// Computes the square of a difference with optional conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L241**: <code>template &lt;typename T, typename Output = T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L242**: <code>struct square_difference {</code>
+  - EN: Declares or defines the struct `square_difference`.
+  - CN: 声明或定义 struct `square_difference`。
+- **L243**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L244**: <code>  Output operator()(T lhs, T rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L245**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L246**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L247**: <code>    Output y = Output(lhs) - Output(rhs);</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L248**: <code>    return mul_op(y, y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L249**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L250**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <code>/// Computes the square of a difference with optional conversion</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L253**: <code>template &lt;typename T, typename Output = T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L254**: <code>struct magnitude_squared_difference {</code>
+  - EN: Declares or defines the struct `magnitude_squared_difference`.
+  - CN: 声明或定义 struct `magnitude_squared_difference`。
+- **L255**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L256**: <code>  Output operator()(T lhs, T rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L257**: <code>    multiplies&lt;Output&gt; mul_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L258**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L259**: <code>    Output y = Output(lhs) - Output(rhs);</code>
+  - EN: Declares the callable or operator `Output`.
+  - CN: 声明可调用对象或运算符 `Output`。
+- **L260**: <code>    return mul_op(y, y);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L261**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L262**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L263**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L264**: <code>// Computes the reciprocal square root</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L265**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L266**: <code>struct inverse_square_root;</code>
+  - EN: Declares or defines the struct `inverse_square_root`.
+  - CN: 声明或定义 struct `inverse_square_root`。
+- **L267**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L268**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L269**: <code>struct inverse_square_root&lt;float&gt; {</code>
+  - EN: Declares or defines the struct `inverse_square_root`.
+  - CN: 声明或定义 struct `inverse_square_root`。
+- **L270**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L271**: <code>  float operator()(float const &amp;lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L272**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L273**: <code>    return rsqrtf(lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L274**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L275**: <code>    return 1.f / std::sqrt(lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L276**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L277**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L278**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L279**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L280**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L281**: <code>struct inverse_square_root&lt;half_t&gt; {</code>
+  - EN: Declares or defines the struct `inverse_square_root`.
+  - CN: 声明或定义 struct `inverse_square_root`。
+- **L282**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L283**: <code>  half_t operator()(half_t const &amp;lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L284**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; (__CUDA_ARCH__ &gt; 520)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDA_ARCH__ > 520)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDA_ARCH__ > 520)` 控制的条件编译块。
+- **L285**: <code>    auto result = hrsqrt(reinterpret_cast&lt;__half const &amp;&gt;(lhs));</code>
+  - EN: Declares the callable or operator `hrsqrt`.
+  - CN: 声明可调用对象或运算符 `hrsqrt`。
+- **L286**: <code>    return reinterpret_cast&lt;half_t const &amp;&gt;(result);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L287**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L288**: <code>    return half_t(1.f / std::sqrt(half_t::convert(lhs)));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L289**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L290**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L291**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L292**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L293**: <code>/// Divides</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L294**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L295**: <code>struct divides {</code>
+  - EN: Declares or defines the struct `divides`.
+  - CN: 声明或定义 struct `divides`。
+- **L296**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L297**: <code>  T operator()(T lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L298**: <code>    lhs /= rhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L299**: <code>    return lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L300**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L301**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L302**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L303**: <code>/// reciprocal_approximate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L304**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L305**: <code>struct reciprocal_approximate {</code>
+  - EN: Declares or defines the struct `reciprocal_approximate`.
+  - CN: 声明或定义 struct `reciprocal_approximate`。
+- **L306**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L307**: <code>  T operator()(T lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L308**: <code>    return divides&lt;T&gt;{}(T(1), lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L309**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L310**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L311**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L312**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L313**: <code>struct reciprocal_approximate &lt;float&gt; {</code>
+  - EN: Declares or defines the struct `reciprocal_approximate`.
+  - CN: 声明或定义 struct `reciprocal_approximate`。
+- **L314**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L315**: <code>  float operator()(float lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L316**: <code>    float ret;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L317**: <code>    #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L318**: <code>      asm volatile (&quot;rcp.approx.f32 %0, %1;\n&quot; : &quot;=f&quot;(ret) : &quot;f&quot;(lhs));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L319**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L320**: <code>      ret = 1.0f / lhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L321**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L322**: <code>    return ret;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L323**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L324**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L325**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L326**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L327**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L328**: <code>struct reciprocal_approximate&lt;cutlass::float_ue8m0_t&gt; {</code>
+  - EN: Declares or defines the struct `reciprocal_approximate`.
+  - CN: 声明或定义 struct `reciprocal_approximate`。
+- **L329**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L330**: <code>  cutlass::float_ue8m0_t operator()(cutlass::float_ue8m0_t lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L331**: <code>    return cutlass::float_ue8m0_t::bitcast(static_cast&lt;uint8_t&gt;(static_cast&lt;uint8_t&gt;(254u) - lhs.storage));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L332**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L333**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L334**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L335**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L336**: <code>/// reciprocal_approximate with ftz</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L337**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L338**: <code>struct reciprocal_approximate_ftz :  reciprocal_approximate&lt;T&gt;</code>
+  - EN: Declares or defines the struct `reciprocal_approximate_ftz`.
+  - CN: 声明或定义 struct `reciprocal_approximate_ftz`。
+- **L339**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L340**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L341**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L342**: <code>struct reciprocal_approximate_ftz &lt;float&gt; {</code>
+  - EN: Declares or defines the struct `reciprocal_approximate_ftz`.
+  - CN: 声明或定义 struct `reciprocal_approximate_ftz`。
+- **L343**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L344**: <code>  float operator()(float lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L345**: <code>    float ret;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L346**: <code>    #if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L347**: <code>      asm volatile (&quot;rcp.approx.ftz.f32 %0, %1;\n&quot; : &quot;=f&quot;(ret) : &quot;f&quot;(lhs));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L348**: <code>    #else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L349**: <code>      if (std::fpclassify(lhs) == FP_SUBNORMAL) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L350**: <code>        lhs = 0.0f;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L351**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L352**: <code>      ret = 1.0f / lhs;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L353**: <code>      if (std::fpclassify(ret) == FP_SUBNORMAL) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L354**: <code>        ret = 0.0f;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L355**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L356**: <code>    #endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L357**: <code>    return ret;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L358**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L359**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L360**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L361**: <code>/// Negate</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L362**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L363**: <code>struct negate {</code>
+  - EN: Declares or defines the struct `negate`.
+  - CN: 声明或定义 struct `negate`。
+- **L364**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L365**: <code>  T operator()(T lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L366**: <code>    return -lhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L367**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L368**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L369**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L370**: <code>/// Greater equal</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L371**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L372**: <code>struct greater_equal {</code>
+  - EN: Declares or defines the struct `greater_equal`.
+  - CN: 声明或定义 struct `greater_equal`。
+- **L373**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L374**: <code>  bool operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L375**: <code>    return (lhs &gt;= rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L376**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L377**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L378**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L379**: <code>/// Greater</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L380**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L381**: <code>struct greater {</code>
+  - EN: Declares or defines the struct `greater`.
+  - CN: 声明或定义 struct `greater`。
+- **L382**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L383**: <code>  bool operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L384**: <code>    return (lhs &gt; rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L385**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L386**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L387**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L388**: <code>/// Less equal</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L389**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L390**: <code>struct less_equal {</code>
+  - EN: Declares or defines the struct `less_equal`.
+  - CN: 声明或定义 struct `less_equal`。
+- **L391**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L392**: <code>  bool operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L393**: <code>    return (lhs &lt;= rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L394**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L395**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L396**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L397**: <code>/// Less</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L398**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L399**: <code>struct less {</code>
+  - EN: Declares or defines the struct `less`.
+  - CN: 声明或定义 struct `less`。
+- **L400**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L401**: <code>  bool operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L402**: <code>    return (lhs &lt; rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L403**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L404**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L405**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L406**: <code>template &lt;typename T, bool PropagateNaN = false&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L407**: <code>struct maximum {</code>
+  - EN: Declares or defines the struct `maximum`.
+  - CN: 声明或定义 struct `maximum`。
+- **L408**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L409**: <code>  T operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L410**: <code>    if constexpr (PropagateNaN &amp;&amp; cutlass::platform::is_floating_point&lt;T&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L411**: <code>      using CUTLASS_CMATH_NAMESPACE :: isnan;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L412**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L413**: <code>      // Call isnan unqualified, so argument-dependent lookup (ADL)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L414**: <code>      // will find overloads such as cutlass::isnan(half_t).</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L415**: <code>      // Calling ::isnan or std::isnan directly would force</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L416**: <code>      // implicit conversions to float of custom number types</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L417**: <code>      // in the cutlass namespace (e.g., cutlass::half_t).</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L418**: <code>      return lhs &gt; rhs || isnan(lhs) ? lhs : rhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L419**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L420**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L421**: <code>      return (lhs &lt; rhs ? rhs : lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L422**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L423**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L424**: <code>    CUTE_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L425**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L426**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L427**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L428**: <code>// This is a subclass and not an alias</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L429**: <code>// in order to work around a known Clang issue,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L430**: <code>// where a template template parameter with one template parameter</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L431**: <code>// does not match classes that take multiple template parameters</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L432**: <code>// but have defaults for all but the first.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L433**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L434**: <code>struct maximum_with_default_nan_propagation : public maximum&lt;T&gt;</code>
+  - EN: Declares or defines the struct `maximum_with_default_nan_propagation`.
+  - CN: 声明或定义 struct `maximum_with_default_nan_propagation`。
+- **L435**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L436**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L437**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L438**: <code>struct maximum&lt;float, false&gt; {</code>
+  - EN: Declares or defines the struct `maximum`.
+  - CN: 声明或定义 struct `maximum`。
+- **L439**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L440**: <code>  float operator()(float const &amp;lhs, float const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L441**: <code>    return fmaxf(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L442**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L443**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L444**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L445**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L446**: <code>struct maximum&lt;float, true&gt; {</code>
+  - EN: Declares or defines the struct `maximum`.
+  - CN: 声明或定义 struct `maximum`。
+- **L447**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L448**: <code>  float operator()(float lhs, float rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L449**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; (__CUDA_ARCH__ &gt;= 800)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800)` 控制的条件编译块。
+- **L450**: <code>    float res;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L451**: <code>    asm volatile(&quot;max.NaN.f32 %0, %1, %2;\n&quot; : &quot;=f&quot;(res) : &quot;f&quot;(lhs), &quot;f&quot;(rhs));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L452**: <code>    return res;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L453**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L454**: <code>    using CUTLASS_CMATH_NAMESPACE :: isnan;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L455**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L456**: <code>    return lhs &gt; rhs || isnan(lhs) ? lhs : rhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L457**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L458**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L459**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L460**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L461**: <code>// This is a subclass and not an alias</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L462**: <code>// in order to work around a known Clang issue,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L463**: <code>// where a template template parameter with one template parameter</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L464**: <code>// does not match classes that take multiple template parameters</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L465**: <code>// but have defaults for all but the first.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L466**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L467**: <code>struct maximum_with_nan_propagation : maximum&lt;T, true&gt;</code>
+  - EN: Declares or defines the struct `maximum_with_nan_propagation`.
+  - CN: 声明或定义 struct `maximum_with_nan_propagation`。
+- **L468**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L469**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L470**: <code>// This alias exists for backwards compatibility only.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L471**: <code>// Please use the correctly spelled class template above.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L472**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L473**: <code>using maximum_with_nan_propogation = maximum_with_nan_propagation&lt;T&gt;;</code>
+  - EN: Defines the alias `maximum_with_nan_propogation` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `maximum_with_nan_propogation`。
+- **L474**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L475**: <code>template &lt;typename T, bool PropagateNaN = false&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L476**: <code>struct minimum {</code>
+  - EN: Declares or defines the struct `minimum`.
+  - CN: 声明或定义 struct `minimum`。
+- **L477**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L478**: <code>  T operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L479**: <code>    if constexpr (PropagateNaN &amp;&amp; cutlass::platform::is_floating_point&lt;T&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L480**: <code>      using CUTLASS_CMATH_NAMESPACE :: isnan;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L481**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L482**: <code>      return lhs &lt; rhs || isnan(lhs) ? lhs : rhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L483**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L484**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L485**: <code>      return (rhs &lt; lhs ? rhs : lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L486**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L487**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L488**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L489**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L490**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L491**: <code>struct minimum&lt;float, false&gt; {</code>
+  - EN: Declares or defines the struct `minimum`.
+  - CN: 声明或定义 struct `minimum`。
+- **L492**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L493**: <code>  float operator()(float const &amp;lhs, float const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L494**: <code>    return fminf(lhs, rhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L495**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L496**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L497**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L498**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L499**: <code>struct minimum&lt;float, true&gt; {</code>
+  - EN: Declares or defines the struct `minimum`.
+  - CN: 声明或定义 struct `minimum`。
+- **L500**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L501**: <code>  float operator()(float lhs, float rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L502**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; (__CUDA_ARCH__ &gt;= 800)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 800)` 控制的条件编译块。
+- **L503**: <code>    float res;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L504**: <code>    asm volatile(&quot;min.NaN.f32 %0, %1, %2;\n&quot; : &quot;=f&quot;(res) : &quot;f&quot;(lhs), &quot;f&quot;(rhs));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L505**: <code>    return res;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L506**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L507**: <code>    // No need for ADL; call std::isnan(float) on host and ::isnan(float) on device.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L508**: <code>    return lhs &lt; rhs || (CUTLASS_CMATH_NAMESPACE :: isnan(lhs)) ? lhs : rhs;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L509**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L510**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L511**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L512**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L513**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L514**: <code>struct minimum_with_nan_propagation : minimum&lt;T, true&gt; </code>
+  - EN: Declares or defines the struct `minimum_with_nan_propagation`.
+  - CN: 声明或定义 struct `minimum_with_nan_propagation`。
+- **L515**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L516**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L517**: <code>template &lt;typename T, bool PropagateNaN = false&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L518**: <code>struct maximum_absolute_value {</code>
+  - EN: Declares or defines the struct `maximum_absolute_value`.
+  - CN: 声明或定义 struct `maximum_absolute_value`。
+- **L519**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L520**: <code>  float operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L521**: <code>    absolute_value_op&lt;T&gt; abs_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L522**: <code>    maximum&lt;T, PropagateNaN&gt; max_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L523**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L524**: <code>    return max_op(abs_op(lhs), abs_op(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L525**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L526**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L527**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L528**: <code>// assumes the left operand is already an absolute value</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L529**: <code>template &lt;typename T, bool PropagateNaN = false&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L530**: <code>struct maximum_absolute_value_reduction {</code>
+  - EN: Declares or defines the struct `maximum_absolute_value_reduction`.
+  - CN: 声明或定义 struct `maximum_absolute_value_reduction`。
+- **L531**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L532**: <code>  float operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L533**: <code>    absolute_value_op&lt;T&gt; abs_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L534**: <code>    maximum&lt;T, PropagateNaN&gt; max_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L535**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L536**: <code>    return max_op(lhs, abs_op(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L537**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L538**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L539**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L540**: <code>// Maximal exponent reduction for zero-mantissa scaling factors</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L541**: <code>template &lt;typename T, bool PropagateNaN = false&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L542**: <code>struct maximum_absolute_value_zero_mantissa_reduction {</code>
+  - EN: Declares or defines the struct `maximum_absolute_value_zero_mantissa_reduction`.
+  - CN: 声明或定义 struct `maximum_absolute_value_zero_mantissa_reduction`。
+- **L543**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L544**: <code>  // Discard mantissa and sign bits for the input. Needs to specify the number of mantissa / exponent bits</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L545**: <code>  template &lt;typename T_, typename UI, int N_Mantissa&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L546**: <code>  static CUTLASS_HOST_DEVICE T_ discard_sign_mantissa_impl(T_ x) {</code>
+  - EN: Starts the definition body for `discard_sign_mantissa_impl`.
+  - CN: 开始 `discard_sign_mantissa_impl` 的定义体。
+- **L547**: <code>    static constexpr UI one = 1;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L548**: <code>    static constexpr UI n_mantissa = N_Mantissa;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L549**: <code>    static constexpr UI pos_sign = sizeof(T_) * 8 - 1; // Position of sign bit: bit width - 1.</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L550**: <code>    static constexpr UI mask = ~((one &lt;&lt; n_mantissa) - one) &amp; ~(one &lt;&lt; pos_sign);</code>
+  - EN: Declares the callable or operator `~`.
+  - CN: 声明可调用对象或运算符 `~`。
+- **L551**: <code>    static constexpr UI subnormal_cap = one &lt;&lt; n_mantissa;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L552**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L553**: <code>    UI out = *reinterpret_cast&lt;UI *&gt;(&amp;x) &amp; mask;</code>
+  - EN: Declares the callable or operator `UI`.
+  - CN: 声明可调用对象或运算符 `UI`。
+- **L554**: <code>    // Subnormals</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L555**: <code>    if (out == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L556**: <code>      out = subnormal_cap;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L557**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L558**: <code>    return *reinterpret_cast&lt;T_ *&gt;(&amp;out);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L559**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L560**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L561**: <code>  // Discard mantissa and sign bits s.t. multipling with this scaling factor only results in an exponent shift</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L562**: <code>  template &lt;typename T_&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L563**: <code>  static CUTLASS_HOST_DEVICE T_ discard_sign_mantissa(T_ x) {</code>
+  - EN: Starts the definition body for `discard_sign_mantissa`.
+  - CN: 开始 `discard_sign_mantissa` 的定义体。
+- **L564**: <code>    if constexpr (cute::is_same_v&lt;T_, float&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L565**: <code>      return discard_sign_mantissa_impl&lt;float , uint32_t, 23&gt;(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L566**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L567**: <code>    else if constexpr (cute::is_same_v&lt;T_, double&gt;) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L568**: <code>      return discard_sign_mantissa_impl&lt;double, uint64_t, 52&gt;(x);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L569**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L570**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L571**: <code>      static_assert(cutlass::detail::dependent_false&lt;T_&gt;, &quot;Can&#x27;t discard mantissa &amp; sign bits for unknown data type&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L572**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L573**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L574**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L575**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L576**: <code>  T operator()(T const &amp;lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L577**: <code>    cutlass::maximum&lt;T, PropagateNaN&gt; max_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L578**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L579**: <code>    return max_op(lhs, discard_sign_mantissa(rhs));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L580**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L581**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L582**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L583**: <code>/// Fused multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L584**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L585**: <code>struct multiply_add {</code>
+  - EN: Declares or defines the struct `multiply_add`.
+  - CN: 声明或定义 struct `multiply_add`。
+- **L586**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L587**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L588**: <code>    return C(a) * C(b) + c;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L589**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L590**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L591**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L592**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L593**: <code>struct square_and_plus {</code>
+  - EN: Declares or defines the struct `square_and_plus`.
+  - CN: 声明或定义 struct `square_and_plus`。
+- **L594**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L595**: <code>  T operator()(T lhs, T const &amp;rhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L596**: <code>    multiply_add&lt;T&gt; multiply_add_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L597**: <code>    return multiply_add_op(rhs, rhs, lhs);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L598**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L599**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L600**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L601**: <code>// Fused multiply-add that takes exactly one template parameter.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L602**: <code>// This is useful for working around a known Clang issue,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L603**: <code>// where a template template parameter with one template parameter</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L604**: <code>// does not match classes that take multiple template parameters</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L605**: <code>// but have defaults for all but the first.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L606**: <code>template &lt;typename A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L607**: <code>struct homogeneous_multiply_add : public multiply_add&lt;A, A, A&gt;</code>
+  - EN: Declares or defines the struct `homogeneous_multiply_add`.
+  - CN: 声明或定义 struct `homogeneous_multiply_add`。
+- **L608**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L609**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L610**: <code>/// Fused multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L611**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L612**: <code>struct multiply_add_relu0 {</code>
+  - EN: Declares or defines the struct `multiply_add_relu0`.
+  - CN: 声明或定义 struct `multiply_add_relu0`。
+- **L613**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L614**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L615**: <code>    maximum&lt;C&gt; mx;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L616**: <code>    return mx(C(a) * C(b) + c, C(0));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L617**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L618**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L619**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L620**: <code>/// Guarded-multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L621**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L622**: <code>struct guarded_multiply_add {</code>
+  - EN: Declares or defines the struct `guarded_multiply_add`.
+  - CN: 声明或定义 struct `guarded_multiply_add`。
+- **L623**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L624**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L625**: <code>    using CUTLASS_CMATH_NAMESPACE :: isnan;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L626**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L627**: <code>    if (isnan(a) || isnan(b)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L628**: <code>      return C(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L629**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L630**: <code>    return C(a) * C(b) + c;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L631**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L632**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L633**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L634**: <code>/// Guarded-multiply-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L635**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L636**: <code>struct guarded_multiply_add&lt;half_t, half_t, half_t&gt; {</code>
+  - EN: Declares or defines the struct `guarded_multiply_add`.
+  - CN: 声明或定义 struct `guarded_multiply_add`。
+- **L637**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L638**: <code>  half_t operator()(half_t const &amp;a, half_t const &amp;b, half_t const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L639**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; __CUDA_ARCH__ &gt;= 900</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 900`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 900` 控制的条件编译块。
+- **L640**: <code>    half_t result;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L641**: <code>    asm (&quot;fma.rn.oob.f16 %0, %1, %2, %3;\n&quot;</code>
+  - EN: Begins or continues the signature/parameter list for `asm`.
+  - CN: 开始或继续 `asm` 的签名/参数列表。
+- **L642**: <code>      : &quot;=h&quot;(*reinterpret_cast&lt;uint16_t*&gt;(&amp;result))</code>
+  - EN: Provides part of the signature or implementation for `h`.
+  - CN: 提供 `h` 的签名或实现的一部分。
+- **L643**: <code>      : &quot;h&quot;(*reinterpret_cast&lt;uint16_t const*&gt;(&amp;a)), &quot;h&quot;(*reinterpret_cast&lt;uint16_t const*&gt;(&amp;b)), &quot;h&quot;(*reinterpret_cast&lt;uint16_t const*&gt;(&amp;c)));</code>
+  - EN: Declares the callable or operator `h`.
+  - CN: 声明可调用对象或运算符 `h`。
+- **L644**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L645**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L646**: <code>    // Namespace-qualifying isnan as cutlass::isnan saves the compiler</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L647**: <code>    // the trouble of argument-dependent lookup.  Calling std::isnan or</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L648**: <code>    // ::isnan here would result in unwanted implicit conversion to float.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L649**: <code>    if (cutlass::isnan(a) || cutlass::isnan(b)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L650**: <code>      return half_t(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L651**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L652**: <code>    return a * b + c;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L653**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L654**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L655**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L656**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L657**: <code>/// Guarded-multiply-add-relu0</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L658**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L659**: <code>struct guarded_multiply_add_relu0 {</code>
+  - EN: Declares or defines the struct `guarded_multiply_add_relu0`.
+  - CN: 声明或定义 struct `guarded_multiply_add_relu0`。
+- **L660**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L661**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L662**: <code>    using CUTLASS_CMATH_NAMESPACE :: isnan;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L663**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L664**: <code>    if (isnan(a) || isnan(b)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L665**: <code>      return C(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L666**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L667**: <code>    maximum&lt;C&gt; mx;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L668**: <code>    return mx(C(a) * C(b) + c, C(0));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L669**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L670**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L671**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L672**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L673**: <code>struct guarded_multiply_add_relu0&lt;half_t, half_t, half_t&gt; {</code>
+  - EN: Declares or defines the struct `guarded_multiply_add_relu0`.
+  - CN: 声明或定义 struct `guarded_multiply_add_relu0`。
+- **L674**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L675**: <code>  half_t operator()(half_t const &amp;a, half_t const &amp;b, half_t const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L676**: <code>#if defined(__CUDA_ARCH__) &amp;&amp; __CUDA_ARCH__ &gt;= 900</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 900`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 900` 控制的条件编译块。
+- **L677**: <code>    half_t result;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L678**: <code>    asm (&quot;fma.rn.oob.relu.f16 %0, %1, %2, %3;\n&quot;</code>
+  - EN: Begins or continues the signature/parameter list for `asm`.
+  - CN: 开始或继续 `asm` 的签名/参数列表。
+- **L679**: <code>      : &quot;=h&quot;(*reinterpret_cast&lt;uint16_t*&gt;(&amp;result))</code>
+  - EN: Provides part of the signature or implementation for `h`.
+  - CN: 提供 `h` 的签名或实现的一部分。
+- **L680**: <code>      : &quot;h&quot;(*reinterpret_cast&lt;uint16_t const*&gt;(&amp;a)), &quot;h&quot;(*reinterpret_cast&lt;uint16_t const*&gt;(&amp;b)), &quot;h&quot;(*reinterpret_cast&lt;uint16_t const*&gt;(&amp;c)));</code>
+  - EN: Declares the callable or operator `h`.
+  - CN: 声明可调用对象或运算符 `h`。
+- **L681**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L682**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L683**: <code>    if (cutlass::isnan(a) || cutlass::isnan(b)) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L684**: <code>      return half_t(0);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L685**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L686**: <code>    maximum&lt;half_t&gt; mx;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L687**: <code>    return mx(a * b + c, half_t(0));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L688**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L689**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L690**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L691**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L692**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L693**: <code>/// Fused and-popc-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L694**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L695**: <code>struct and_popc_add {</code>
+  - EN: Declares or defines the struct `and_popc_add`.
+  - CN: 声明或定义 struct `and_popc_add`。
+- **L696**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L697**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L698**: <code>    A and_result = a &amp; b;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L699**: <code>    int32_t popc_result = detail::popcount(and_result);</code>
+  - EN: Declares the callable or operator `popcount`.
+  - CN: 声明可调用对象或运算符 `popcount`。
+- **L700**: <code>    return C(popc_result) + c;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L701**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L702**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L703**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L704**: <code>/// Fused and-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L705**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L706**: <code>struct and_add {</code>
+  - EN: Declares or defines the struct `and_add`.
+  - CN: 声明或定义 struct `and_add`。
+- **L707**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L708**: <code>  T operator()(T const &amp;a, T const &amp;b, T const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L709**: <code>    return ((a &amp; b) + c);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L710**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L711**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L712**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L713**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L714**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L715**: <code>/// Fused xor-popc-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L716**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L717**: <code>struct xor_popc_add {</code>
+  - EN: Declares or defines the struct `xor_popc_add`.
+  - CN: 声明或定义 struct `xor_popc_add`。
+- **L718**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L719**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L720**: <code>    A xor_result = a ^ b;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L721**: <code>    int32_t popc_result = detail::popcount(xor_result);</code>
+  - EN: Declares the callable or operator `popcount`.
+  - CN: 声明可调用对象或运算符 `popcount`。
+- **L722**: <code>    return C(popc_result) + c;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L723**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L724**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L725**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L726**: <code>/// Fused xor-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L727**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L728**: <code>struct xor_add {</code>
+  - EN: Declares or defines the struct `xor_add`.
+  - CN: 声明或定义 struct `xor_add`。
+- **L729**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L730**: <code>  T operator()(T const &amp;a, T const &amp;b, T const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L731**: <code>    return ((a ^ b) + c);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L732**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L733**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L734**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L735**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L736**: <code>/// Fused or-popc-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L737**: <code>template &lt;typename A, typename B = A, typename C = A&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L738**: <code>struct or_popc_add {</code>
+  - EN: Declares or defines the struct `or_popc_add`.
+  - CN: 声明或定义 struct `or_popc_add`。
+- **L739**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L740**: <code>  C operator()(A const &amp;a, B const &amp;b, C const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L741**: <code>    A or_result = a | b;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L742**: <code>    int32_t popc_result = detail::popcount(or_result);</code>
+  - EN: Declares the callable or operator `popcount`.
+  - CN: 声明可调用对象或运算符 `popcount`。
+- **L743**: <code>    return C(popc_result) + c;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L744**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L745**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L746**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L747**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L748**: <code>/// Fused or-add</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L749**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L750**: <code>struct or_add {</code>
+  - EN: Declares or defines the struct `or_add`.
+  - CN: 声明或定义 struct `or_add`。
+- **L751**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L752**: <code>  T operator()(T const &amp;a, T const &amp;b, T const &amp;c) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L753**: <code>    return ((a | b) + c);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L754**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L755**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L756**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L757**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L758**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L759**: <code>// Whether namespace-unqualified conj(t) for t of type T is</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L760**: <code>// well-formed.  This says whether the compiler can find</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L761**: <code>// namespace-unqualified conj(T) via argument-dependent lookup.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L762**: <code>// If so, then CUTLASS assumes that conj(t) returns</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L763**: <code>// the complex conjugate of t.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L764**: <code>template &lt;typename T, typename Enable = void&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L765**: <code>struct has_unqualified_conj : cutlass::platform::false_type</code>
+  - EN: Declares or defines the struct `has_unqualified_conj`.
+  - CN: 声明或定义 struct `has_unqualified_conj`。
+- **L766**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L767**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L768**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L769**: <code>struct has_unqualified_conj&lt;</code>
+  - EN: Declares or defines the struct `has_unqualified_conj`.
+  - CN: 声明或定义 struct `has_unqualified_conj`。
+- **L770**: <code>    T,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L771**: <code>    decltype(static_cast&lt;void&gt;(conj(cutlass::platform::declval&lt;T&gt;())), void())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L772**: <code>  &gt; : cutlass::platform::true_type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L773**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L774**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L775**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L776**: <code>constexpr bool has_unqualified_conj_v = has_unqualified_conj&lt;T&gt;::value;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L777**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L778**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L779**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L780**: <code>// forward declaration (needed for conjugate below)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L781**: <code>template&lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L782**: <code>CUTLASS_HOST_DEVICE T conj(T const&amp; z);</code>
+  - EN: Declares the callable or operator `conj`.
+  - CN: 声明可调用对象或运算符 `conj`。
+- **L783**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L784**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L785**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L786**: <code>// Whether cutlass::conj(t) for t of type T is well-formed.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L787**: <code>// If so, then CUTLASS assumes that cutlass::conj(t)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L788**: <code>// returns the complex conjugate of t.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L789**: <code>template &lt;typename T, typename Enable = void&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L790**: <code>struct has_cutlass_conj : cutlass::platform::false_type</code>
+  - EN: Declares or defines the struct `has_cutlass_conj`.
+  - CN: 声明或定义 struct `has_cutlass_conj`。
+- **L791**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L792**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L793**: <code>template&lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L794**: <code>struct has_cutlass_conj&lt;</code>
+  - EN: Declares or defines the struct `has_cutlass_conj`.
+  - CN: 声明或定义 struct `has_cutlass_conj`。
+- **L795**: <code>    T,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L796**: <code>    decltype(cutlass::conj(cutlass::platform::declval&lt;T&gt;()), void())</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L797**: <code>  &gt; : cutlass::platform::true_type</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L798**: <code>{};</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L799**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L800**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L801**: <code>constexpr bool has_cutlass_conj_v = has_cutlass_conj&lt;T&gt;::value;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L802**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L803**: <code>} // namespace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L804**: <code>  </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L805**: <code>// Return the complex conjugate of the input.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L806**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L807**: <code>// If the struct hasn&#x27;t already been specialized for type T, then</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L808**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L809**: <code>// 1. for arithmetic types, return z;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L810**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L811**: <code>// 2. for types where either (namespace-unqualified) conj(z) or</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L812**: <code>//    cutlass::conj(z) is well formed, declare &quot;using cutlass::conj;&quot;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L813**: <code>//    and return conj(z); and</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L814**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L815**: <code>// 3. for everything else, return z.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L816**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L817**: <code>// Regarding (1), the C++ Standard Library makes std::conj always</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L818**: <code>// return std::complex, even for (noncomplex) arithmetic types.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L819**: <code>// cutlass::conj(T t) needs to return type T.  This follows the</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L820**: <code>// convention of linear algebra software like the BLAS, where</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L821**: <code>// &quot;conjugate transpose&quot; means the same thing as &quot;transpose&quot; for a</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L822**: <code>// matrix of noncomplex numbers.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L823**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L824**: <code>// Case (2) covers std::complex, cuda::std::complex, and non-Standard</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L825**: <code>// (including user-defined) complex number types (for which &quot;conj(z)&quot;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L826**: <code>// is findable via argument-dependent lookup).  cutlass::conj has a</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L827**: <code>// totally generic overload, but a more type-specific overload in any</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L828**: <code>// namespace will take precedence.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L829**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L830**: <code>// Case (3) covers non-Standard non-complex number types.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L831**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L832**: <code>// Users should not generally need to specialize this struct for their</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L833**: <code>// own custom complex or noncomplex types.  The idiomatic way to</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L834**: <code>// identify a type T as &quot;complex&quot; is to make namespace-unqualified</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L835**: <code>// calls to conj(T) findable via argument-dependent lookup.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L836**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L837**: <code>struct conjugate {</code>
+  - EN: Declares or defines the struct `conjugate`.
+  - CN: 声明或定义 struct `conjugate`。
+- **L838**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L839**: <code>  T operator()(T const&amp; z) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L840**: <code>    if constexpr (cutlass::platform::is_arithmetic_v&lt;T&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L841**: <code>      return z;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L842**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L843**: <code>    else if constexpr (detail::has_unqualified_conj_v&lt;T&gt; || detail::has_cutlass_conj_v&lt;T&gt;) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L844**: <code>      using cutlass::conj;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L845**: <code>      return conj(z);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L846**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L847**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L848**: <code>      return z;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L849**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L850**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L851**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L852**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L853**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L854**: <code>struct first {</code>
+  - EN: Declares or defines the struct `first`.
+  - CN: 声明或定义 struct `first`。
+- **L855**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L856**: <code>  T operator()(T const &amp; first, T const &amp;...) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L857**: <code>    return first;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L858**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L859**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L860**: <code>  T operator()(T const &amp; first) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L861**: <code>    return first;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L862**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L863**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L864**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L865**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L866**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L867**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L868**: <code>struct logical_and {</code>
+  - EN: Declares or defines the struct `logical_and`.
+  - CN: 声明或定义 struct `logical_and`。
+- **L869**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L870**: <code>  T operator()(T const &amp;a, T const &amp;b) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L871**: <code>    return ((static_cast&lt;bool&gt;(a) &amp;&amp; static_cast&lt;bool&gt;(b)) ? T(1) : T());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L872**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L873**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L874**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L875**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L876**: <code>struct logical_or {</code>
+  - EN: Declares or defines the struct `logical_or`.
+  - CN: 声明或定义 struct `logical_or`。
+- **L877**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L878**: <code>  T operator()(T const &amp;a, T const &amp;b) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L879**: <code>    return ((static_cast&lt;bool&gt;(a) || static_cast&lt;bool&gt;(b)) ? T(1) : T());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L880**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L881**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L882**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L883**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L884**: <code>struct logical_not {</code>
+  - EN: Declares or defines the struct `logical_not`.
+  - CN: 声明或定义 struct `logical_not`。
+- **L885**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L886**: <code>  T operator()(T const &amp;a) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L887**: <code>    return T(!(a));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L888**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L889**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L890**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L891**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L892**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L893**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L894**: <code>struct bit_and {</code>
+  - EN: Declares or defines the struct `bit_and`.
+  - CN: 声明或定义 struct `bit_and`。
+- **L895**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L896**: <code>  T operator()(T const &amp;a, T const &amp;b) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L897**: <code>    return a &amp; b;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L898**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L899**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L900**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L901**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L902**: <code>struct bit_or {</code>
+  - EN: Declares or defines the struct `bit_or`.
+  - CN: 声明或定义 struct `bit_or`。
+- **L903**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L904**: <code>  T operator()(T const &amp;a, T const &amp;b) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L905**: <code>    return a | b;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L906**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L907**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L908**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L909**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L910**: <code>struct bit_not {</code>
+  - EN: Declares or defines the struct `bit_not`.
+  - CN: 声明或定义 struct `bit_not`。
+- **L911**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L912**: <code>  T operator()(T const &amp;a) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L913**: <code>    return ~a;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L914**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L915**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L916**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L917**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L918**: <code>struct bit_xor {</code>
+  - EN: Declares or defines the struct `bit_xor`.
+  - CN: 声明或定义 struct `bit_xor`。
+- **L919**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L920**: <code>  T operator()(T const &amp;a, T const &amp;b) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L921**: <code>    return a ^ b;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L922**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L923**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L924**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L925**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L926**: <code>/// Atomic reductions</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L927**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L928**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L929**: <code>struct atomic_add</code>
+  - EN: Declares or defines the struct `atomic_add`.
+  - CN: 声明或定义 struct `atomic_add`。
+- **L930**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L931**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L932**: <code>  void operator()(T *ptr, const T &amp;data)</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L933**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L934**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L935**: <code>    atomicAdd(ptr, data);</code>
+  - EN: Declares the callable or operator `atomicAdd`.
+  - CN: 声明可调用对象或运算符 `atomicAdd`。
+- **L936**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L937**: <code>    CUTLASS_UNUSED(ptr);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L938**: <code>    CUTLASS_UNUSED(data);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L939**: <code>    CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L940**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L941**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L942**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L943**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L944**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L945**: <code>struct atomic_add&lt;double&gt;</code>
+  - EN: Declares or defines the struct `atomic_add`.
+  - CN: 声明或定义 struct `atomic_add`。
+- **L946**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L947**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L948**: <code>  void operator()(double *ptr, const double &amp;data)</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L949**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L950**: <code>#if !defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `!defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L951**: <code>    CUTLASS_UNUSED(ptr);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L952**: <code>    CUTLASS_UNUSED(data);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L953**: <code>    CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L954**: <code>#elif (__CUDA_ARCH__ &gt;= 600)</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L955**: <code>    atomicAdd(ptr, data);</code>
+  - EN: Declares the callable or operator `atomicAdd`.
+  - CN: 声明可调用对象或运算符 `atomicAdd`。
+- **L956**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L957**: <code>    // Use CAS loop</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L958**: <code>    unsigned long long int* ptr_int = reinterpret_cast&lt;unsigned long long int*&gt;(ptr);</code>
+  - EN: Declares the callable or operator `int`.
+  - CN: 声明可调用对象或运算符 `int`。
+- **L959**: <code>    unsigned long long int old_int = *ptr_int;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L960**: <code>    unsigned long long int assumed_int;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L961**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L962**: <code>    do {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L963**: <code>      double update = data + __longlong_as_double(old_int);</code>
+  - EN: Declares the callable or operator `__longlong_as_double`.
+  - CN: 声明可调用对象或运算符 `__longlong_as_double`。
+- **L964**: <code>      assumed_int = old_int;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L965**: <code>      old_int = atomicCAS(ptr_int, assumed_int, __double_as_longlong(update));</code>
+  - EN: Declares the callable or operator `atomicCAS`.
+  - CN: 声明可调用对象或运算符 `atomicCAS`。
+- **L966**: <code>    } while (assumed_int != old_int);</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L967**: <code>#endif // (__CUDA_ARCH__ &gt;= 600)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L968**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L969**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L970**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L971**: <code>template&lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L972**: <code>struct atomic_add&lt;half2&gt;</code>
+  - EN: Declares or defines the struct `atomic_add`.
+  - CN: 声明或定义 struct `atomic_add`。
+- **L973**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L974**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L975**: <code>  void operator()(half2 *ptr, const half2 &amp;data)</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L976**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L977**: <code>#if !defined(__CUDA_ARCH__) || (defined(__CUDA_ARCH__)  &amp;&amp; (__CUDA_ARCH__ &lt; 600))</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDA_ARCH__) || (defined(__CUDA_ARCH__)  && (__CUDA_ARCH__ < 600))`.
+  - CN: 开始一个由 `!defined(__CUDA_ARCH__) || (defined(__CUDA_ARCH__)  && (__CUDA_ARCH__ < 600))` 控制的条件编译块。
+- **L978**: <code>      CUTLASS_UNUSED(ptr);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L979**: <code>      CUTLASS_UNUSED(data);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L980**: <code>      CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L981**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L982**: <code>    // Vector-2 atomic reduction requires .target sm_60 or higher</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L983**: <code>    uint32_t word = reinterpret_cast&lt;const uint32_t&amp;&gt;(data);</code>
+  - EN: Declares the callable or operator `uint32_t`.
+  - CN: 声明可调用对象或运算符 `uint32_t`。
+- **L984**: <code>    asm volatile (&quot;red.gpu.global.add.noftz.f16x2 [%0], %1;\n&quot; : : &quot;l&quot;(ptr), &quot;r&quot;(word));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L985**: <code>#endif // (__CUDA_ARCH__ &gt;= 600)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L986**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L987**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L988**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L989**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L990**: <code>using red [[deprecated(&quot;use atomic_add instead&quot;)]] = atomic_add&lt;T&gt;;</code>
+  - EN: Declares the callable or operator `deprecated`.
+  - CN: 声明可调用对象或运算符 `deprecated`。
+- **L991**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L992**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L993**: <code>struct atomic_maximum {</code>
+  - EN: Declares or defines the struct `atomic_maximum`.
+  - CN: 声明或定义 struct `atomic_maximum`。
+- **L994**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L995**: <code>  T operator()(T *ptr, T value) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L996**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L997**: <code>    return atomicMax(ptr, value);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L998**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L999**: <code>    CUTLASS_UNUSED(ptr);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L1000**: <code>    CUTLASS_UNUSED(value);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L1001**: <code>    CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L1002**: <code>    return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1003**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L1004**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1005**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1006**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1007**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1008**: <code>struct atomic_maximum&lt;float&gt; {</code>
+  - EN: Declares or defines the struct `atomic_maximum`.
+  - CN: 声明或定义 struct `atomic_maximum`。
+- **L1009**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1010**: <code>  float operator()(float *ptr, float value) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L1011**: <code>#if defined(__CUDA_ARCH__)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(__CUDA_ARCH__)`.
+  - CN: 开始一个由 `defined(__CUDA_ARCH__)` 控制的条件编译块。
+- **L1012**: <code>    // In device code, make sure that we do NOT try to use</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1013**: <code>    // std::signbit, as that won&#x27;t work if building with NVRTC.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1014**: <code>    // Instead, prefix &quot;::&quot; to call signbit from the global namespace,</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1015**: <code>    // which CUDA guarantees to work in device code without including</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1016**: <code>    // any headers.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1017**: <code>    //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1018**: <code>    return ! ::signbit(value) ?</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1019**: <code>      __int_as_float(atomicMax((int*)ptr, __float_as_int(value))) :</code>
+  - EN: Provides part of the signature or implementation for `__int_as_float`.
+  - CN: 提供 `__int_as_float` 的签名或实现的一部分。
+- **L1020**: <code>      __uint_as_float(atomicMin((unsigned int*)ptr, __float_as_uint(value)));</code>
+  - EN: Declares the callable or operator `__uint_as_float`.
+  - CN: 声明可调用对象或运算符 `__uint_as_float`。
+- **L1021**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L1022**: <code>    CUTLASS_UNUSED(ptr);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L1023**: <code>    CUTLASS_UNUSED(value);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L1024**: <code>    CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L1025**: <code>    return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1026**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L1027**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1028**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1029**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1030**: <code>// is_atomic</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1031**: <code>template &lt;class Fn&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1032**: <code>struct is_atomic : platform::false_type {};</code>
+  - EN: Declares or defines the struct `is_atomic`.
+  - CN: 声明或定义 struct `is_atomic`。
+- **L1033**: <code>template &lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1034**: <code>struct is_atomic&lt;atomic_add&lt;T&gt;&gt; : platform::true_type {};</code>
+  - EN: Declares or defines the struct `is_atomic`.
+  - CN: 声明或定义 struct `is_atomic`。
+- **L1035**: <code>template &lt;class T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1036**: <code>struct is_atomic&lt;atomic_maximum&lt;T&gt;&gt; : platform::true_type {};</code>
+  - EN: Declares or defines the struct `is_atomic`.
+  - CN: 声明或定义 struct `is_atomic`。
+- **L1037**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1038**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1039**: <code>//////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1040**: <code>/// Parallel Synchronization and Communication Instructions</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1041**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1042**: <code>struct redux_abs_max_nan_propagation_sync_warp;</code>
+  - EN: Declares or defines the struct `redux_abs_max_nan_propagation_sync_warp`.
+  - CN: 声明或定义 struct `redux_abs_max_nan_propagation_sync_warp`。
+- **L1043**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1044**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1045**: <code>struct redux_abs_max_nan_propagation_sync_warp &lt;float&gt;{</code>
+  - EN: Declares or defines the struct `redux_abs_max_nan_propagation_sync_warp`.
+  - CN: 声明或定义 struct `redux_abs_max_nan_propagation_sync_warp`。
+- **L1046**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1047**: <code>  float operator()(float const &amp;lhs) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L1048**: <code>#if defined(CUTLASS_ARCH_CREDUX_ENABLED)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_ARCH_CREDUX_ENABLED)`.
+  - CN: 开始一个由 `defined(CUTLASS_ARCH_CREDUX_ENABLED)` 控制的条件编译块。
+- **L1049**: <code>    float result;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1050**: <code>    asm volatile(&quot;redux.sync.max.abs.NaN.f32 %0, %1, 0xffffffff;\n&quot; : &quot;=f&quot;(result) : &quot;f&quot;(lhs));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L1051**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1052**: <code>#elif defined(__CUDA_ARCH__)</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L1053**: <code>    cutlass::maximum&lt;float, /*PropagateNaN*/true&gt; max_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1054**: <code>    int shuffle_width = 32;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1055**: <code>    float abs_max = cutlass::absolute_value_op&lt;float&gt;{}(lhs);</code>
+  - EN: Declares the callable or operator `float`.
+  - CN: 声明可调用对象或运算符 `float`。
+- **L1056**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1057**: <code>    for(int offset = shuffle_width / 2; offset &gt; 0; offset /= 2) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1058**: <code>      float value = __shfl_down_sync(0xffffffff, abs_max, offset, shuffle_width);</code>
+  - EN: Declares the callable or operator `__shfl_down_sync`.
+  - CN: 声明可调用对象或运算符 `__shfl_down_sync`。
+- **L1059**: <code>      abs_max = max_op(abs_max,value);</code>
+  - EN: Declares the callable or operator `max_op`.
+  - CN: 声明可调用对象或运算符 `max_op`。
+- **L1060**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1061**: <code>    // Broadcast the maximum to all threads participating in the reduction.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1062**: <code>    abs_max = __shfl_sync(0xffffffff, abs_max, 0, shuffle_width);</code>
+  - EN: Declares the callable or operator `__shfl_sync`.
+  - CN: 声明可调用对象或运算符 `__shfl_sync`。
+- **L1063**: <code>    return abs_max;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1064**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L1065**: <code>    CUTLASS_UNUSED(lhs);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L1066**: <code>    CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L1067**: <code>    return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1068**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L1069**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1070**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1071**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1072**: <code>template &lt;typename T&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1073**: <code>struct redux_abs_max_nan_propagation_sync_warp_t0t15_t16t31;</code>
+  - EN: Declares or defines the struct `redux_abs_max_nan_propagation_sync_warp_t0t15_t16t31`.
+  - CN: 声明或定义 struct `redux_abs_max_nan_propagation_sync_warp_t0t15_t16t31`。
+- **L1074**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1075**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1076**: <code>struct redux_abs_max_nan_propagation_sync_warp_t0t15_t16t31&lt;float&gt;{</code>
+  - EN: Declares or defines the struct `redux_abs_max_nan_propagation_sync_warp_t0t15_t16t31`.
+  - CN: 声明或定义 struct `redux_abs_max_nan_propagation_sync_warp_t0t15_t16t31`。
+- **L1077**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1078**: <code>  float operator()(float const &amp;max) const {</code>
+  - EN: Starts the definition body for `operator`.
+  - CN: 开始 `operator` 的定义体。
+- **L1079**: <code>#if defined(CUTLASS_ARCH_CREDUX_ENABLED)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_ARCH_CREDUX_ENABLED)`.
+  - CN: 开始一个由 `defined(CUTLASS_ARCH_CREDUX_ENABLED)` 控制的条件编译块。
+- **L1080**: <code>    int half_warp_idx = threadIdx.x / (NumThreadsPerWarp / 2);</code>
+  - EN: Declares the callable or operator `x`.
+  - CN: 声明可调用对象或运算符 `x`。
+- **L1081**: <code>    bool first_half_threads = (half_warp_idx % 2) == 0;</code>
+  - EN: Declares the callable or operator `first_half_threads`.
+  - CN: 声明可调用对象或运算符 `first_half_threads`。
+- **L1082**: <code>    float value0 =  first_half_threads ? max : 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1083**: <code>    float v0 = cutlass::redux_abs_max_nan_propagation_sync_warp&lt;float&gt;{}(value0);</code>
+  - EN: Declares the callable or operator `float`.
+  - CN: 声明可调用对象或运算符 `float`。
+- **L1084**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1085**: <code>    float value1 = !first_half_threads ? max : 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1086**: <code>    float v1 = cutlass::redux_abs_max_nan_propagation_sync_warp&lt;float&gt;{}(value1);</code>
+  - EN: Declares the callable or operator `float`.
+  - CN: 声明可调用对象或运算符 `float`。
+- **L1087**: <code>    return first_half_threads ? v0: v1;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1088**: <code>    </code>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1089**: <code>#elif defined(__CUDA_ARCH__)</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L1090**: <code>    float abs_max = cutlass::absolute_value_op&lt;float&gt;{}(max);</code>
+  - EN: Declares the callable or operator `float`.
+  - CN: 声明可调用对象或运算符 `float`。
+- **L1091**: <code>    cutlass::maximum&lt;float, /*PropagateNaN*/true&gt; max_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1092**: <code>    constexpr int shuffle_width = 16;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1093**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1094**: <code>    for(int offset = shuffle_width/2; offset &gt; 0; offset /= 2) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1095**: <code>      float value = __shfl_down_sync(0xffffffff, abs_max, offset, shuffle_width);</code>
+  - EN: Declares the callable or operator `__shfl_down_sync`.
+  - CN: 声明可调用对象或运算符 `__shfl_down_sync`。
+- **L1096**: <code>        abs_max  = max_op(abs_max,value);</code>
+  - EN: Declares the callable or operator `max_op`.
+  - CN: 声明可调用对象或运算符 `max_op`。
+- **L1097**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1098**: <code>    // Broadcast the maximum to all threads participating in the reduction.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1099**: <code>    abs_max = __shfl_sync(0xffffffff, abs_max, 0, shuffle_width);</code>
+  - EN: Declares the callable or operator `__shfl_sync`.
+  - CN: 声明可调用对象或运算符 `__shfl_sync`。
+- **L1100**: <code>    return abs_max;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1101**: <code>#else </code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L1102**: <code>    CUTLASS_UNUSED(max);</code>
+  - EN: Declares the callable or operator `CUTLASS_UNUSED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_UNUSED`。
+- **L1103**: <code>    CUTLASS_NOT_IMPLEMENTED();</code>
+  - EN: Declares the callable or operator `CUTLASS_NOT_IMPLEMENTED`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_NOT_IMPLEMENTED`。
+- **L1104**: <code>    return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1105**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L1106**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1107**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1109**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1110**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1111**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1112**: <code>// Partial specializations for nvcuda::wmma::fragment&lt;Use, m, n, k, T, Layout&gt;</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1113**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1114**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1115**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1116**: <code>#if defined(CUTLASS_ARCH_WMMA_ENABLED)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_ARCH_WMMA_ENABLED)`.
+  - CN: 开始一个由 `defined(CUTLASS_ARCH_WMMA_ENABLED)` 控制的条件编译块。
+- **L1117**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1118**: <code>template&lt;typename Use, int m, int n, int k, typename T, typename Layout&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1119**: <code>struct plus&lt;nvcuda::wmma::fragment&lt;Use, m, n, k, T, Layout&gt;&gt;</code>
+  - EN: Declares or defines the struct `plus`.
+  - CN: 声明或定义 struct `plus`。
+- **L1120**: <code>{</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L1121**: <code>  using Fragment = nvcuda::wmma::fragment&lt;Use, m, n, k, T, Layout&gt;;</code>
+  - EN: Defines the alias `Fragment` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Fragment`。
+- **L1122**: <code>  using ElementType = typename Fragment::element_type;</code>
+  - EN: Defines the alias `ElementType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `ElementType`。
+- **L1123**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1124**: <code>  CUTLASS_HOST_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1125**: <code>  Fragment operator()(Fragment const &amp;lhs, Fragment const &amp;rhs) const</code>
+  - EN: Provides part of the signature or implementation for `operator`.
+  - CN: 提供 `operator` 的签名或实现的一部分。
+- **L1126**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L1127**: <code>    Fragment result;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1128**: <code>    plus&lt;ElementType&gt; scalar_op;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L1129**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1130**: <code>    ElementType *result_elts = reinterpret_cast&lt;ElementType*&gt;(&amp;result);</code>
+  - EN: Declares the callable or operator `ElementType`.
+  - CN: 声明可调用对象或运算符 `ElementType`。
+- **L1131**: <code>    const ElementType *lhs_elts = reinterpret_cast&lt;const ElementType*&gt;(&amp;lhs);</code>
+  - EN: Declares the callable or operator `ElementType`.
+  - CN: 声明可调用对象或运算符 `ElementType`。
+- **L1132**: <code>    const ElementType *rhs_elts = reinterpret_cast&lt;const ElementType*&gt;(&amp;rhs);</code>
+  - EN: Declares the callable or operator `ElementType`.
+  - CN: 声明可调用对象或运算符 `ElementType`。
+- **L1133**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1134**: <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L1135**: <code>    for (int i = 0; i &lt; Fragment::num_elements; i++) {</code>
+  - EN: Starts a loop that iterates according to the control expression.
+  - CN: 开始一个按控制表达式迭代的循环。
+- **L1136**: <code>      result_elts[i] = scalar_op(lhs_elts[i], rhs_elts[i]);</code>
+  - EN: Declares the callable or operator `scalar_op`.
+  - CN: 声明可调用对象或运算符 `scalar_op`。
+- **L1137**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1138**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1139**: <code>    return result;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1140**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1141**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1142**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1143**: <code>#endif // defined(CUTLASS_ARCH_WMMA_ENABLED)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L1144**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1145**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1146**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1147**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1148**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1149**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1150**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1151**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Operator overloads / 运算符重载
+- Conditional compilation / 条件编译
+- Symbol focus: `defined` / 重点符号：`defined`
+- Symbol focus: `CUTLASS_ARCH_CREDUX_ENABLED` / 重点符号：`CUTLASS_ARCH_CREDUX_ENABLED`
+- Symbol focus: `popcount` / 重点符号：`popcount`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/numeric_types.h"`
+  - `"cutlass/platform/platform.h"`
+  - `"cutlass/detail/dependent_false.hpp"`
+  - `"cutlass/floating_point_nvrtc.h"`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `<cuda_runtime.h>`
+  - `<mma.h>`
+  - `<ciso646>`
+  - `<intrin.h>`

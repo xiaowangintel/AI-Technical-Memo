@@ -1,0 +1,516 @@
+# mlir_builder.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/tvm_ffi_builder/mlir_builder.py`
+
+## Purpose / 作用
+- EN: MLIR type builder and basic operations for LLVM dialect.
+- CN: 该模块的文档字符串将其描述为：MLIR type builder and basic operations for LLVM dialect.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""MLIR type builder and basic operations for LLVM dialect."""` — **EN:** Docstring line documenting the module `module`. **CN:** 文档字符串行，用于说明 module `module`。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from collections.abc import Sequence` — **EN:** Imports Sequence from `collections.abc`. **CN:** 从 `collections.abc` 导入 Sequence。
+- **L15** `from typing import Any, Optional` — **EN:** Imports Any, Optional from `typing`. **CN:** 从 `typing` 导入 Any, Optional。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from ..._mlir import ir` — **EN:** Imports ir from `..._mlir`. **CN:** 从 `..._mlir` 导入 ir。
+- **L18** `from ..._mlir.dialects import llvm` — **EN:** Imports llvm from `..._mlir.dialects`. **CN:** 从 `..._mlir.dialects` 导入 llvm。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `class MLIRTypeBuilder:` — **EN:** Defines class `MLIRTypeBuilder`. **CN:** 定义类 `MLIRTypeBuilder`。
+- **L22** `    """Builder for MLIR types and basic operations."""` — **EN:** Docstring line documenting the class `MLIRTypeBuilder`. **CN:** 文档字符串行，用于说明 class `MLIRTypeBuilder`。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `    BRANCH_WEIGHTS_LIKELY = (2000, 1)` — **EN:** Assigns a value to BRANCH_WEIGHTS_LIKELY. **CN:** 将一个值赋给 BRANCH_WEIGHTS_LIKELY。
+- **L25** `    BRANCH_WEIGHTS_UNLIKELY = (1, 2000)` — **EN:** Assigns a value to BRANCH_WEIGHTS_UNLIKELY. **CN:** 将一个值赋给 BRANCH_WEIGHTS_UNLIKELY。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L28** `        """Initialize the MLIR type builder."""` — **EN:** Docstring line documenting the function `__init__`. **CN:** 文档字符串行，用于说明 function `__init__`。
+- **L29** `        self.i32_type = ir.IntegerType.get_signless(32)` — **EN:** Assigns a value to self.i32_type. **CN:** 将一个值赋给 self.i32_type。
+- **L30** `        self.ui32_type = ir.IntegerType.get_unsigned(32)` — **EN:** Assigns a value to self.ui32_type. **CN:** 将一个值赋给 self.ui32_type。
+- **L31** `        self.i64_type = ir.IntegerType.get_signless(64)` — **EN:** Assigns a value to self.i64_type. **CN:** 将一个值赋给 self.i64_type。
+- **L32** `        self.i16_type = ir.IntegerType.get_signless(16)` — **EN:** Assigns a value to self.i16_type. **CN:** 将一个值赋给 self.i16_type。
+- **L33** `        self.i8_type = ir.IntegerType.get_signless(8)` — **EN:** Assigns a value to self.i8_type. **CN:** 将一个值赋给 self.i8_type。
+- **L34** `        self.i1_type = ir.IntegerType.get_signless(1)` — **EN:** Assigns a value to self.i1_type. **CN:** 将一个值赋给 self.i1_type。
+- **L35** `        self.f32_type = ir.Type.parse("f32")` — **EN:** Assigns a value to self.f32_type. **CN:** 将一个值赋给 self.f32_type。
+- **L36** `        self.f64_type = ir.Type.parse("f64")` — **EN:** Assigns a value to self.f64_type. **CN:** 将一个值赋给 self.f64_type。
+- **L37** `        self.ptr_type = llvm.PointerType.get()` — **EN:** Assigns a value to self.ptr_type. **CN:** 将一个值赋给 self.ptr_type。
+- **L38** `        self.gpu_ptr_type = llvm.PointerType.get(address_space=1)` — **EN:** Assigns a value to self.gpu_ptr_type. **CN:** 将一个值赋给 self.gpu_ptr_type。
+- **L39** `        # did not find a programmatic way to get the void type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L40** `        self.void_type = ir.Type.parse("!llvm.void")` — **EN:** Assigns a value to self.void_type. **CN:** 将一个值赋给 self.void_type。
+- **L41** `        self.llvm_internal_linkage = ir.Attribute.parse("#llvm.linkage<internal>")` — **EN:** Assigns a value to self.llvm_internal_linkage. **CN:** 将一个值赋给 self.llvm_internal_linkage。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `    def ptr_type_with_address_space(` — **EN:** Defines function `ptr_type_with_address_space`. **CN:** 定义函数 `ptr_type_with_address_space`。
+- **L44** `        self, address_space: Optional[int] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    ) -> ir.Type:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L46** `        """Get the pointer type with the given address space."""` — **EN:** Docstring line documenting the function `ptr_type_with_address_space`. **CN:** 文档字符串行，用于说明 function `ptr_type_with_address_space`。
+- **L47** `        if address_space is None or address_space == 0:` — **EN:** Starts a conditional branch guarded by `address_space is None or address_space == 0`. **CN:** 开始一个由 `address_space is None or address_space == 0` 控制的条件分支。
+- **L48** `            return self.ptr_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L49** `        return llvm.PointerType.get(address_space=address_space)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `    def as_attr(self, tp: ir.Type) -> ir.TypeAttr:` — **EN:** Defines function `as_attr`. **CN:** 定义函数 `as_attr`。
+- **L52** `        """Convert the type to a type attribute."""` — **EN:** Docstring line documenting the function `as_attr`. **CN:** 文档字符串行，用于说明 function `as_attr`。
+- **L53** `        return ir.TypeAttr.get(tp)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    def int_type(self, bits: int) -> ir.Type:` — **EN:** Defines function `int_type`. **CN:** 定义函数 `int_type`。
+- **L56** `        """Get the \`i<bits>\` type."""` — **EN:** Docstring line documenting the function `int_type`. **CN:** 文档字符串行，用于说明 function `int_type`。
+- **L57** `        return ir.IntegerType.get_signless(bits)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    def uint_type(self, bits: int) -> ir.Type:` — **EN:** Defines function `uint_type`. **CN:** 定义函数 `uint_type`。
+- **L60** `        """Get the \`ui<bits>\` type."""` — **EN:** Docstring line documenting the function `uint_type`. **CN:** 文档字符串行，用于说明 function `uint_type`。
+- **L61** `        return ir.IntegerType.get_unsigned(bits)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    def struct_type(` — **EN:** Defines function `struct_type`. **CN:** 定义函数 `struct_type`。
+- **L64** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L65** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L66** `        name: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L67** `        fields: Sequence[ir.Type] = (),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L68** `        packed: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `    ) -> ir.Type:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L70** `        """Get or create a struct type.` — **EN:** Starts the docstring for the function `struct_type`. **CN:** 开始说明 function `struct_type` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `        Parameters` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L73** `        ----------` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L74** `        name : Optional[str]` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L75** `            The name of the struct type. If not provided, a \`literal\` struct type is created,` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L76** `            which is identified by its fields only.` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L77** `        fields : Sequence[ir.Type]` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L78** `            The fields of the struct type.` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L79** `        packed : bool` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L80** `            Whether to create a packed struct type. If \`True\`, there is no padding between fields.` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L81** `            Otherwise, there might be padding` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L82** `            between fields to ensure alignment.` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `        See Also` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L85** `        --------` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L86** `        https://mlir.llvm.org/docs/Dialects/LLVM/#structure-types` — **EN:** Continues the docstring for the function `struct_type`. **CN:** 继续说明 function `struct_type` 的文档字符串。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `        """` — **EN:** Ends the docstring for the function `struct_type`. **CN:** 结束说明 function `struct_type` 的文档字符串。
+- **L89** `        if name is None:` — **EN:** Starts a conditional branch guarded by `name is None`. **CN:** 开始一个由 `name is None` 控制的条件分支。
+- **L90** `            return llvm.StructType.get_literal(fields, packed=packed)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L92** `            return llvm.StructType.new_identified(name, fields, packed=packed)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    def identified_struct_type(self, name: str) -> ir.Type:` — **EN:** Defines function `identified_struct_type`. **CN:** 定义函数 `identified_struct_type`。
+- **L95** `        """Get a previously created identified struct type by its name."""` — **EN:** Docstring line documenting the function `identified_struct_type`. **CN:** 文档字符串行，用于说明 function `identified_struct_type`。
+- **L96** `        return llvm.StructType.get_identified(name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    def func_type(self, *, params: Sequence[ir.Type] = (), ret: ir.Type) -> ir.Type:` — **EN:** Defines function `func_type`. **CN:** 定义函数 `func_type`。
+- **L99** `        """Get a function type.` — **EN:** Starts the docstring for the function `func_type`. **CN:** 开始说明 function `func_type` 的文档字符串。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `        Parameters` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L102** `        ----------` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L103** `        params : Sequence[ir.Type]` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L104** `            The parameters of the function type.` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L105** `        ret : ir.Type` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L106** `            The return type of the function type.` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `        See Also` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L109** `        --------` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L110** `        https://mlir.llvm.org/docs/Dialects/LLVM/#function-types` — **EN:** Continues the docstring for the function `func_type`. **CN:** 继续说明 function `func_type` 的文档字符串。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `        """` — **EN:** Ends the docstring for the function `func_type`. **CN:** 结束说明 function `func_type` 的文档字符串。
+- **L113** `        return ir.Type.parse(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** `            "!llvm.func<{} ({})>".format(str(ret), ", ".join(map(str, params)))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        )  # did not find a programmatic way to get the function type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `    def global_dtor_entry_type(self) -> ir.Type:` — **EN:** Defines function `global_dtor_entry_type`. **CN:** 定义函数 `global_dtor_entry_type`。
+- **L118** `        """Get the type of the global destructor entry.` — **EN:** Starts the docstring for the function `global_dtor_entry_type`. **CN:** 开始说明 function `global_dtor_entry_type` 的文档字符串。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `        See Also:` — **EN:** Continues the docstring for the function `global_dtor_entry_type`. **CN:** 继续说明 function `global_dtor_entry_type` 的文档字符串。
+- **L121** `        - https://llvm.org/docs/LangRef.html#the-llvm-global-dtors-global-variable` — **EN:** Continues the docstring for the function `global_dtor_entry_type`. **CN:** 继续说明 function `global_dtor_entry_type` 的文档字符串。
+- **L122** `        - https://mlir.llvm.org/docs/Dialects/LLVM/#llvmmlirglobal_dtors-llvmglobaldtorsop` — **EN:** Continues the docstring for the function `global_dtor_entry_type`. **CN:** 继续说明 function `global_dtor_entry_type` 的文档字符串。
+- **L123** `        """` — **EN:** Ends the docstring for the function `global_dtor_entry_type`. **CN:** 结束说明 function `global_dtor_entry_type` 的文档字符串。
+- **L124** `        return self.struct_type(fields=[self.i32_type, self.ptr_type, self.ptr_type])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `class MLIRBuilder(MLIRTypeBuilder):` — **EN:** Defines class `MLIRBuilder` with bases MLIRTypeBuilder. **CN:** 定义类 `MLIRBuilder`，其基类为 MLIRTypeBuilder。
+- **L128** `    """A builder for MLIR related types and operations.` — **EN:** Starts the docstring for the class `MLIRBuilder`. **CN:** 开始说明 class `MLIRBuilder` 的文档字符串。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    Convention:` — **EN:** Continues the docstring for the class `MLIRBuilder`. **CN:** 继续说明 class `MLIRBuilder` 的文档字符串。
+- **L131** `    all statement-generation methods expect we are inside a insertion point of the current_block.` — **EN:** Continues the docstring for the class `MLIRBuilder`. **CN:** 继续说明 class `MLIRBuilder` 的文档字符串。
+- **L132** `    If the statement terminates the current block, it will assign the new block to the current_block` — **EN:** Continues the docstring for the class `MLIRBuilder`. **CN:** 继续说明 class `MLIRBuilder` 的文档字符串。
+- **L133** `    but not set the insersion point.` — **EN:** Continues the docstring for the class `MLIRBuilder`. **CN:** 继续说明 class `MLIRBuilder` 的文档字符串。
+- **L134** `    """` — **EN:** Ends the docstring for the class `MLIRBuilder`. **CN:** 结束说明 class `MLIRBuilder` 的文档字符串。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L137** `        """Initialize the MLIR builder."""` — **EN:** Docstring line documenting the function `__init__`. **CN:** 文档字符串行，用于说明 function `__init__`。
+- **L138** `        super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L139** `        self.module: Optional[ir.Module] = None` — **EN:** Assigns a typed value to self.module. **CN:** 为 self.module 赋予带类型标注的值。
+- **L140** `        self.const_str_table: dict[str, ir.Value] = {}` — **EN:** Assigns a typed value to self.const_str_table. **CN:** 为 self.const_str_table 赋予带类型标注的值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `        self.get_element_extra_kwargs: dict[str, Any] = {}` — **EN:** Assigns a typed value to self.get_element_extra_kwargs. **CN:** 为 self.get_element_extra_kwargs 赋予带类型标注的值。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `    # create constants` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L145** `    def integer_constant(self, tp: ir.Type, value: int) -> ir.Value:` — **EN:** Defines function `integer_constant`. **CN:** 定义函数 `integer_constant`。
+- **L146** `        """Create an integer constant with the given type and value."""` — **EN:** Docstring line documenting the function `integer_constant`. **CN:** 文档字符串行，用于说明 function `integer_constant`。
+- **L147** `        return llvm.ConstantOp(tp, ir.IntegerAttr.get(tp, value)).res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    def i32(self, value: int) -> ir.Value:` — **EN:** Defines function `i32`. **CN:** 定义函数 `i32`。
+- **L150** `        """Create an i32 constant with the given value."""` — **EN:** Docstring line documenting the function `i32`. **CN:** 文档字符串行，用于说明 function `i32`。
+- **L151** `        return self.integer_constant(self.i32_type, value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `    def ui32(self, value: int) -> ir.Value:` — **EN:** Defines function `ui32`. **CN:** 定义函数 `ui32`。
+- **L154** `        """Create a ui32 constant with the given value."""` — **EN:** Docstring line documenting the function `ui32`. **CN:** 文档字符串行，用于说明 function `ui32`。
+- **L155** `        return self.integer_constant(self.ui32_type, value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    def i1(self, value: int) -> ir.Value:` — **EN:** Defines function `i1`. **CN:** 定义函数 `i1`。
+- **L158** `        """Create an i1 constant with the given value."""` — **EN:** Docstring line documenting the function `i1`. **CN:** 文档字符串行，用于说明 function `i1`。
+- **L159** `        return self.integer_constant(self.i1_type, value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    def i8(self, value: int) -> ir.Value:` — **EN:** Defines function `i8`. **CN:** 定义函数 `i8`。
+- **L162** `        """Create an i8 constant with the given value."""` — **EN:** Docstring line documenting the function `i8`. **CN:** 文档字符串行，用于说明 function `i8`。
+- **L163** `        return self.integer_constant(self.i8_type, value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    def i16(self, value: int) -> ir.Value:` — **EN:** Defines function `i16`. **CN:** 定义函数 `i16`。
+- **L166** `        """Create an i16 constant with the given value."""` — **EN:** Docstring line documenting the function `i16`. **CN:** 文档字符串行，用于说明 function `i16`。
+- **L167** `        return self.integer_constant(self.i16_type, value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `    def i64(self, value: int) -> ir.Value:` — **EN:** Defines function `i64`. **CN:** 定义函数 `i64`。
+- **L170** `        """Create an i64 constant with the given value."""` — **EN:** Docstring line documenting the function `i64`. **CN:** 文档字符串行，用于说明 function `i64`。
+- **L171** `        return self.integer_constant(self.i64_type, value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    def mul(self, lhs: ir.Value, rhs: ir.Value) -> ir.Value:` — **EN:** Defines function `mul`. **CN:** 定义函数 `mul`。
+- **L174** `        """Create a multiplication operation between two values."""` — **EN:** Docstring line documenting the function `mul`. **CN:** 文档字符串行，用于说明 function `mul`。
+- **L175** `        return llvm.mul(lhs, rhs, overflow_flags=llvm.IntegerOverflowFlags.none)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `    # expressions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L178** `    def not_equal(self, lhs: ir.Value, rhs: ir.Value) -> ir.Value:` — **EN:** Defines function `not_equal`. **CN:** 定义函数 `not_equal`。
+- **L179** `        """Create a not-equal comparison between two values."""` — **EN:** Docstring line documenting the function `not_equal`. **CN:** 文档字符串行，用于说明 function `not_equal`。
+- **L180** `        return llvm.icmp(llvm.ICmpPredicate.ne, lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    def equal(self, lhs: ir.Value, rhs: ir.Value) -> ir.Value:` — **EN:** Defines function `equal`. **CN:** 定义函数 `equal`。
+- **L183** `        """Create an equal comparison between two values."""` — **EN:** Docstring line documenting the function `equal`. **CN:** 文档字符串行，用于说明 function `equal`。
+- **L184** `        return llvm.icmp(llvm.ICmpPredicate.eq, lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    def or_(self, lhs: ir.Value, rhs: ir.Value) -> ir.Value:` — **EN:** Defines function `or_`. **CN:** 定义函数 `or_`。
+- **L187** `        """Create a logical OR operation between two values."""` — **EN:** Docstring line documenting the function `or_`. **CN:** 文档字符串行，用于说明 function `or_`。
+- **L188** `        return llvm.or_(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    def and_(self, lhs: ir.Value, rhs: ir.Value) -> ir.Value:` — **EN:** Defines function `and_`. **CN:** 定义函数 `and_`。
+- **L191** `        """Create a logical AND operation between two values."""` — **EN:** Docstring line documenting the function `and_`. **CN:** 文档字符串行，用于说明 function `and_`。
+- **L192** `        return llvm.and_(lhs, rhs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `    def not_(self, value: ir.Value) -> ir.Value:` — **EN:** Defines function `not_`. **CN:** 定义函数 `not_`。
+- **L195** `        """Create a logical NOT operation."""` — **EN:** Docstring line documenting the function `not_`. **CN:** 文档字符串行，用于说明 function `not_`。
+- **L196** `        # Ensure we're working with i1 type for boolean operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L197** `        if value.type != self.i1_type:` — **EN:** Starts a conditional branch guarded by `value.type != self.i1_type`. **CN:** 开始一个由 `value.type != self.i1_type` 控制的条件分支。
+- **L198** `            value = llvm.trunc(res=self.i1_type, arg=value)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L199** `        return llvm.xor(value, self.i1(1))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    def i64_divisible_const(self, value: ir.Value, align_const: int) -> ir.Value:` — **EN:** Defines function `i64_divisible_const`. **CN:** 定义函数 `i64_divisible_const`。
+- **L202** `        """Check if i64 value is divisible by align_const.` — **EN:** Starts the docstring for the function `i64_divisible_const`. **CN:** 开始说明 function `i64_divisible_const` 的文档字符串。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `        Parameters` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L205** `        ----------` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L206** `        value : ir.Value` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L207** `            The i64 value to check.` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L208** `        align_const : int` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L209** `            The alignment constant to check divisibility against.` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `        Returns` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L212** `        -------` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L213** `        ir.Value` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L214** `            A boolean value (i1) indicating if value is divisible by align_const.` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `        Notes` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L217** `        -----` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L218** `        Uses fast path (bitwise AND) when align_const is a power of two,` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L219** `        otherwise uses modulo operation.` — **EN:** Continues the docstring for the function `i64_divisible_const`. **CN:** 继续说明 function `i64_divisible_const` 的文档字符串。
+- **L220** `        """` — **EN:** Ends the docstring for the function `i64_divisible_const`. **CN:** 结束说明 function `i64_divisible_const` 的文档字符串。
+- **L221** `        # Check if align_const is a power of two` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L222** `        is_power_of_two = (align_const > 0) and (align_const & (align_const - 1)) == 0` — **EN:** Assigns a value to is_power_of_two. **CN:** 将一个值赋给 is_power_of_two。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `        if is_power_of_two:` — **EN:** Starts a conditional branch guarded by `is_power_of_two`. **CN:** 开始一个由 `is_power_of_two` 控制的条件分支。
+- **L225** `            # Fast path: use bitwise AND` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L226** `            # value is divisible by align_const iff (value & (align_const - 1)) == 0` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L227** `            mask = self.i64(align_const - 1)` — **EN:** Assigns a value to mask. **CN:** 将一个值赋给 mask。
+- **L228** `            masked = llvm.and_(value, mask)` — **EN:** Assigns a value to masked. **CN:** 将一个值赋给 masked。
+- **L229** `            return self.equal(masked, self.i64(0))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L230** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L231** `            # Slow path: use modulo operation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L232** `            align_val = self.i64(align_const)` — **EN:** Assigns a value to align_val. **CN:** 将一个值赋给 align_val。
+- **L233** `            remainder = llvm.urem(value, align_val)` — **EN:** Assigns a value to remainder. **CN:** 将一个值赋给 remainder。
+- **L234** `            return self.equal(remainder, self.i64(0))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `    def br(` — **EN:** Defines function `br`. **CN:** 定义函数 `br`。
+- **L237** `        self, target_block: ir.Block, *, args: Optional[list[ir.Value]] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L239** `        """Create an unconditional branch.` — **EN:** Starts the docstring for the function `br`. **CN:** 开始说明 function `br` 的文档字符串。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `        Parameters` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L242** `        ----------` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L243** `        target_block : ir.Block` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L244** `            The target block to branch to.` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L245** `        args : list[ir.Value], optional` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L246** `            The values to pass as arguments to the target block. If None,` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L247** `            no arguments are passed. The target block must have the same` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L248** `            number of arguments as values in this list.` — **EN:** Continues the docstring for the function `br`. **CN:** 继续说明 function `br` 的文档字符串。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `        """` — **EN:** Ends the docstring for the function `br`. **CN:** 结束说明 function `br` 的文档字符串。
+- **L251** `        if args is None:` — **EN:** Starts a conditional branch guarded by `args is None`. **CN:** 开始一个由 `args is None` 控制的条件分支。
+- **L252** `            llvm.br(dest=target_block, dest_operands=[])` — **EN:** Invokes `llvm.br` as a standalone call. **CN:** 以独立语句方式调用 `llvm.br`。
+- **L253** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L254** `            llvm.br(dest_operands=args, dest=target_block)` — **EN:** Invokes `llvm.br` as a standalone call. **CN:** 以独立语句方式调用 `llvm.br`。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `    def address_of(self, name: str, tp: ir.Type) -> ir.Value:` — **EN:** Defines function `address_of`. **CN:** 定义函数 `address_of`。
+- **L257** `        """Get the address of a global symbol."""` — **EN:** Docstring line documenting the function `address_of`. **CN:** 文档字符串行，用于说明 function `address_of`。
+- **L258** `        return llvm.AddressOfOp(tp, name).result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    def getelementptr(` — **EN:** Defines function `getelementptr`. **CN:** 定义函数 `getelementptr`。
+- **L261** `        self, ptr: ir.Value, constant_indices: Sequence[int], elem_type: ir.Type` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L262** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L263** `        """Create a getelementptr operation.` — **EN:** Starts the docstring for the function `getelementptr`. **CN:** 开始说明 function `getelementptr` 的文档字符串。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `        Parameters` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L266** `        ----------` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L267** `        ptr : ir.Value` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L268** `            The pointer to the element.` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L269** `        indices : Sequence[ir.Value]` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L270** `            The indices to the element.` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L271** `        elem_type : ir.Type` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L272** `            The type of the element.` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `        Returns` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L275** `        -------` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L276** `        ir.Value` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L277** `            The resulting element pointer.` — **EN:** Continues the docstring for the function `getelementptr`. **CN:** 继续说明 function `getelementptr` 的文档字符串。
+- **L278** `        """` — **EN:** Ends the docstring for the function `getelementptr`. **CN:** 结束说明 function `getelementptr` 的文档字符串。
+- **L279** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L280** `            return llvm.getelementptr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L281** `                self.ptr_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `                ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `                [],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `                raw_constant_indices=ir.DenseI32ArrayAttr.get(constant_indices),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `                elem_type=elem_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `                **self.get_element_extra_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `        except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L289** `            # compatibility with different LLVM versions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L290** `            self.get_element_extra_kwargs = {"no_wrap_flags": []}` — **EN:** Assigns a value to self.get_element_extra_kwargs. **CN:** 将一个值赋给 self.get_element_extra_kwargs。
+- **L291** `            return llvm.getelementptr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L292** `                self.ptr_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `                ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `                [],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `                raw_constant_indices=ir.DenseI32ArrayAttr.get(constant_indices),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `                elem_type=elem_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `                **self.get_element_extra_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `    def return_(self, ret: Optional[ir.Value] = None) -> None:` — **EN:** Defines function `return_`. **CN:** 定义函数 `return_`。
+- **L301** `        """Create a return statement."""` — **EN:** Docstring line documenting the function `return_`. **CN:** 文档字符串行，用于说明 function `return_`。
+- **L302** `        llvm.return_(arg=ret)` — **EN:** Invokes `llvm.return_` as a standalone call. **CN:** 以独立语句方式调用 `llvm.return_`。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `    def cond_br(` — **EN:** Defines function `cond_br`. **CN:** 定义函数 `cond_br`。
+- **L305** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `        cond: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L307** `        true_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `        false_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `        branch_weights: Optional[tuple[int, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `        true_dest_operands: Sequence[ir.Value] = (),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        false_dest_operands: Sequence[ir.Value] = (),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L314** `        """Create a conditional branch.` — **EN:** Starts the docstring for the function `cond_br`. **CN:** 开始说明 function `cond_br` 的文档字符串。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** `        Parameters` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L317** `        ----------` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L318** `        cond : ir.Value` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L319** `            The condition value (i1 type).` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L320** `        true_block : ir.Block` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L321** `            The block to branch to if condition is true.` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L322** `        false_block : ir.Block` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L323** `            The block to branch to if condition is false.` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L324** `        branch_weights : Optional[tuple[int, int]]` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L325** `            Optional branch weights [true_weight, false_weight] for optimization hints.` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L326** `            Higher values indicate higher probability. For example, (99, 1) indicates` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L327** `            the true branch is much more likely than the false branch.` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L328** `        true_dest_operands : Sequence[ir.Value]` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L329** `            Operands to pass to the true destination block.` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L330** `        false_dest_operands : Sequence[ir.Value]` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L331** `            Operands to pass to the false destination block.` — **EN:** Continues the docstring for the function `cond_br`. **CN:** 继续说明 function `cond_br` 的文档字符串。
+- **L332** `        """` — **EN:** Ends the docstring for the function `cond_br`. **CN:** 结束说明 function `cond_br` 的文档字符串。
+- **L333** `        if branch_weights is not None:` — **EN:** Starts a conditional branch guarded by `branch_weights is not None`. **CN:** 开始一个由 `branch_weights is not None` 控制的条件分支。
+- **L334** `            # Branch weights should be a tuple/list of two integers [true_weight, false_weight]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L335** `            if len(branch_weights) != 2:` — **EN:** Starts a conditional branch guarded by `len(branch_weights) != 2`. **CN:** 开始一个由 `len(branch_weights) != 2` 控制的条件分支。
+- **L336** `                raise ValueError("branch_weights must have exactly 2 elements")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L337** `            llvm.cond_br(` — **EN:** Invokes `llvm.cond_br` as a standalone call. **CN:** 以独立语句方式调用 `llvm.cond_br`。
+- **L338** `                cond,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `                true_dest_operands=true_dest_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `                false_dest_operands=false_dest_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `                true_dest=true_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** `                false_dest=false_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `                branch_weights=ir.DenseI32ArrayAttr.get(list(branch_weights)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L346** `            llvm.cond_br(` — **EN:** Invokes `llvm.cond_br` as a standalone call. **CN:** 以独立语句方式调用 `llvm.cond_br`。
+- **L347** `                cond,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `                true_dest_operands=true_dest_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `                false_dest_operands=false_dest_operands,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `                true_dest=true_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `                false_dest=false_block,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `    def define_global_string(self, content: str) -> str:` — **EN:** Defines function `define_global_string`. **CN:** 定义函数 `define_global_string`。
+- **L355** `        """Define a global string symbol with the given content using standard MLIR APIs."""` — **EN:** Docstring line documenting the function `define_global_string`. **CN:** 文档字符串行，用于说明 function `define_global_string`。
+- **L356** `        if content in self.const_str_table:` — **EN:** Starts a conditional branch guarded by `content in self.const_str_table`. **CN:** 开始一个由 `content in self.const_str_table` 控制的条件分支。
+- **L357** `            return self.const_str_table[content]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L358** `        symbol = f"__tvm_ffi__str_{len(self.const_str_table)}"` — **EN:** Assigns a value to symbol. **CN:** 将一个值赋给 symbol。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `        # The string_attr.value gives us the original string, but we need to escape it for` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L361** `        # MLIR parsing. Let's use a simple approach: escape quotes and backslashes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L362** `        escaped_content = content.replace("\\", "\\\\").replace('"', '\\"')` — **EN:** Assigns a value to escaped_content. **CN:** 将一个值赋给 escaped_content。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `        # Parse the MLIR string with proper escaping using the standard API` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L365** `        module_body = self.module.body  # type: ignore[union-attr]` — **EN:** Assigns a value to module_body. **CN:** 将一个值赋给 module_body。
+- **L366** `        with ir.InsertionPoint(module_body):` — **EN:** Starts a context-managed block using ir.InsertionPoint(module_body). **CN:** 开始一个使用 ir.InsertionPoint(module_body) 的上下文管理代码块。
+- **L367** `            parsed_op = ir.Operation.parse(` — **EN:** Assigns a value to parsed_op. **CN:** 将一个值赋给 parsed_op。
+- **L368** `                f'llvm.mlir.global private constant @{symbol}("{escaped_content}\\00")'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `            module_body.append(parsed_op)` — **EN:** Invokes `module_body.append` as a standalone call. **CN:** 以独立语句方式调用 `module_body.append`。
+- **L371** `            self.const_str_table[content] = symbol` — **EN:** Assigns a value to self.const_str_table[content]. **CN:** 将一个值赋给 self.const_str_table[content]。
+- **L372** `        return symbol` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L373** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L374** `    # function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L375** `    def function(` — **EN:** Defines function `function`. **CN:** 定义函数 `function`。
+- **L376** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L377** `        name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L378** `        params_type: Sequence[ir.Type],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L379** `        ret_type: ir.Type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L380** `        internal: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L381** `        llvm_func_attrs: Sequence[str] = (),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L382** `    ) -> tuple[list[ir.Value], ir.Block]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L383** `        """Create a function with the given signature."""` — **EN:** Docstring line documenting the function `function`. **CN:** 文档字符串行，用于说明 function `function`。
+- **L384** `        func_op = llvm.func(` — **EN:** Assigns a value to func_op. **CN:** 将一个值赋给 func_op。
+- **L385** `            name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `            function_type=self.as_attr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `                self.func_type(ret=ret_type, params=params_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `        if internal:` — **EN:** Starts a conditional branch guarded by `internal`. **CN:** 开始一个由 `internal` 控制的条件分支。
+- **L391** `            func_op.attributes["linkage"] = self.llvm_internal_linkage` — **EN:** Assigns a value to func_op.attributes['linkage']. **CN:** 将一个值赋给 func_op.attributes['linkage']。
+- **L392** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L393** `            func_op.attributes["llvm.emit_c_interface"] = ir.UnitAttr.get()` — **EN:** Assigns a value to func_op.attributes['llvm.emit_c_interface']. **CN:** 将一个值赋给 func_op.attributes['llvm.emit_c_interface']。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `        # Add LLVM function attributes via passthrough` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L396** `        if llvm_func_attrs:` — **EN:** Starts a conditional branch guarded by `llvm_func_attrs`. **CN:** 开始一个由 `llvm_func_attrs` 控制的条件分支。
+- **L397** `            func_op.attributes["passthrough"] = ir.ArrayAttr.get(` — **EN:** Assigns a value to func_op.attributes['passthrough']. **CN:** 将一个值赋给 func_op.attributes['passthrough']。
+- **L398** `                [ir.StringAttr.get(attr) for attr in llvm_func_attrs]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L401** `        params = []` — **EN:** Assigns a value to params. **CN:** 将一个值赋给 params。
+- **L402** `        func_body: Any = func_op.body` — **EN:** Assigns a typed value to func_body. **CN:** 为 func_body 赋予带类型标注的值。
+- **L403** `        if func_body is not None:` — **EN:** Starts a conditional branch guarded by `func_body is not None`. **CN:** 开始一个由 `func_body is not None` 控制的条件分支。
+- **L404** `            entry_block = ir.Block.create_at_start(func_body)` — **EN:** Assigns a value to entry_block. **CN:** 将一个值赋给 entry_block。
+- **L405** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L406** `            raise RuntimeError("Function body is None")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L407** `        for param_type in params_type:` — **EN:** Starts a loop assigning items from `params_type` to `param_type`. **CN:** 开始一个循环，将 `params_type` 的元素赋给 `param_type`。
+- **L408** `            params.append(entry_block.add_argument(param_type, ir.Location.unknown()))` — **EN:** Invokes `params.append` as a standalone call. **CN:** 以独立语句方式调用 `params.append`。
+- **L409** `        return params, entry_block` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `    def declare_extern_func(` — **EN:** Defines function `declare_extern_func`. **CN:** 定义函数 `declare_extern_func`。
+- **L412** `        self, name: str, params: Sequence[ir.Type], ret: ir.Type` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L413** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L414** `        """Define extern function."""` — **EN:** Docstring line documenting the function `declare_extern_func`. **CN:** 文档字符串行，用于说明 function `declare_extern_func`。
+- **L415** `        func_type = self.func_type(params=params, ret=ret)` — **EN:** Assigns a value to func_type. **CN:** 将一个值赋给 func_type。
+- **L416** `        func_op = llvm.func(` — **EN:** Assigns a value to func_op. **CN:** 将一个值赋给 func_op。
+- **L417** `            name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `            function_type=self.as_attr(func_type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `        func_op.attributes["llvm.linkage"] = ir.StringAttr.get("external")` — **EN:** Assigns a value to func_op.attributes['llvm.linkage']. **CN:** 将一个值赋给 func_op.attributes['llvm.linkage']。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** `    def create_alloca(` — **EN:** Defines function `create_alloca`. **CN:** 定义函数 `create_alloca`。
+- **L423** `        self, entry_block: ir.Block, alloca_type: ir.Type, array_size: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L424** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L425** `        """Create an alloca operation."""` — **EN:** Docstring line documenting the function `create_alloca`. **CN:** 文档字符串行，用于说明 function `create_alloca`。
+- **L426** `        with ir.InsertionPoint(entry_block.operations[0]):` — **EN:** Starts a context-managed block using ir.InsertionPoint(entry_block.operations[0]). **CN:** 开始一个使用 ir.InsertionPoint(entry_block.operations[0]) 的上下文管理代码块。
+- **L427** `            # declare the struct type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L428** `            alloca = llvm.alloca(` — **EN:** Assigns a value to alloca. **CN:** 将一个值赋给 alloca。
+- **L429** `                res=self.ptr_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `                elem_type=alloca_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `                array_size=self.i32(array_size),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `        return alloca` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `    def pack_values_to_alloca(` — **EN:** Defines function `pack_values_to_alloca`. **CN:** 定义函数 `pack_values_to_alloca`。
+- **L436** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L437** `        current_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L438** `        entry_block: ir.Block,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L439** `        values: Sequence[ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L440** `    ) -> tuple[ir.Type, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L441** `        """Pack values to an alloca that lays out in the order of the values.` — **EN:** Starts the docstring for the function `pack_values_to_alloca`. **CN:** 开始说明 function `pack_values_to_alloca` 的文档字符串。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `        Parameters` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L444** `        ----------` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L445** `        current_block : ir.Block` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L446** `            The current block.` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L447** `        entry_block : ir.Block` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L448** `            The entry block to create an alloca for the struct.` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L449** `        values : Sequence[ir.Value]` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L450** `            The values to pack.` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `        Returns` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L453** `        -------` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L454** `        tuple[ir.Type, ir.Value]` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L455** `            The struct type and the alloca.` — **EN:** Continues the docstring for the function `pack_values_to_alloca`. **CN:** 继续说明 function `pack_values_to_alloca` 的文档字符串。
+- **L456** `        """` — **EN:** Ends the docstring for the function `pack_values_to_alloca`. **CN:** 结束说明 function `pack_values_to_alloca` 的文档字符串。
+- **L457** `        # Declare the struct type from the values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L458** `        struct_type = self.struct_type(fields=[value.type for value in values])` — **EN:** Assigns a value to struct_type. **CN:** 将一个值赋给 struct_type。
+- **L459** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L460** `        # Create alloca using the helper method` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L461** `        alloca = self.create_alloca(entry_block, struct_type, array_size=1)` — **EN:** Assigns a value to alloca. **CN:** 将一个值赋给 alloca。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `        with ir.InsertionPoint(current_block):` — **EN:** Starts a context-managed block using ir.InsertionPoint(current_block). **CN:** 开始一个使用 ir.InsertionPoint(current_block) 的上下文管理代码块。
+- **L464** `            for index, value in enumerate(values):` — **EN:** Starts a loop assigning items from `enumerate(values)` to `(index, value)`. **CN:** 开始一个循环，将 `enumerate(values)` 的元素赋给 `(index, value)`。
+- **L465** `                # Get pointer to the field at the given index` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L466** `                field_ptr = self.getelementptr(` — **EN:** Assigns a value to field_ptr. **CN:** 将一个值赋给 field_ptr。
+- **L467** `                    alloca,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `                    [0, index],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `                    struct_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `                # Store the value into the field` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L472** `                llvm.store(value, field_ptr)` — **EN:** Invokes `llvm.store` as a standalone call. **CN:** 以独立语句方式调用 `llvm.store`。
+- **L473** `        return (struct_type, alloca)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `    def find_operations_in_module(` — **EN:** Defines function `find_operations_in_module`. **CN:** 定义函数 `find_operations_in_module`。
+- **L476** `        self, module: ir.Module, name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L477** `    ) -> list[ir.Operation]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L478** `        """Find operations in the module by the operation name."""` — **EN:** Docstring line documenting the function `find_operations_in_module`. **CN:** 文档字符串行，用于说明 function `find_operations_in_module`。
+- **L479** `        operations = []` — **EN:** Assigns a value to operations. **CN:** 将一个值赋给 operations。
+- **L480** `        for op in module.body:` — **EN:** Starts a loop assigning items from `module.body` to `op`. **CN:** 开始一个循环，将 `module.body` 的元素赋给 `op`。
+- **L481** `            if op.name == name:` — **EN:** Starts a conditional branch guarded by `op.name == name`. **CN:** 开始一个由 `op.name == name` 控制的条件分支。
+- **L482** `                operations.append(op)` — **EN:** Invokes `operations.append` as a standalone call. **CN:** 以独立语句方式调用 `operations.append`。
+- **L483** `        return operations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** `    def find_func_in_module(` — **EN:** Defines function `find_func_in_module`. **CN:** 定义函数 `find_func_in_module`。
+- **L486** `        self, module: ir.Module, name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L487** `    ) -> Optional[ir.Operation]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L488** `        """Find a function in the module."""` — **EN:** Docstring line documenting the function `find_func_in_module`. **CN:** 文档字符串行，用于说明 function `find_func_in_module`。
+- **L489** `        for op in module.body:` — **EN:** Starts a loop assigning items from `module.body` to `op`. **CN:** 开始一个循环，将 `module.body` 的元素赋给 `op`。
+- **L490** `            if op.name == "llvm.func":` — **EN:** Starts a conditional branch guarded by `op.name == 'llvm.func'`. **CN:** 开始一个由 `op.name == 'llvm.func'` 控制的条件分支。
+- **L491** `                # Get the function name from the sym_name attribute` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L492** `                if "sym_name" in op.attributes:` — **EN:** Starts a conditional branch guarded by `'sym_name' in op.attributes`. **CN:** 开始一个由 `'sym_name' in op.attributes` 控制的条件分支。
+- **L493** `                    func_name = str(op.attributes["sym_name"]).strip('"')` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L494** `                    if func_name == name:` — **EN:** Starts a conditional branch guarded by `func_name == name`. **CN:** 开始一个由 `func_name == name` 控制的条件分支。
+- **L495** `                        return op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L496** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.tvm_ffi_builder.mlir_builder`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.tvm_ffi_builder.mlir_builder`。
+- EN: Module docstring summary: MLIR type builder and basic operations for LLVM dialect. CN: 模块文档摘要为：MLIR type builder and basic operations for LLVM dialect.
+- EN: Top-level classes: MLIRTypeBuilder, MLIRBuilder CN: 顶层类包括：MLIRTypeBuilder, MLIRBuilder
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..._mlir:ir, ..._mlir.dialects:llvm CN: 内部依赖：..._mlir:ir, ..._mlir.dialects:llvm
+- EN: External or standard-library dependencies: collections.abc:Sequence, typing:Any,Optional CN: 外部或标准库依赖：collections.abc:Sequence, typing:Any,Optional

@@ -1,0 +1,1660 @@
+# library.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/library.py`
+
+## Purpose / 作用
+- EN: Data types and tags used for emitting CUTLASS C++ kernels
+- CN: 该模块的文档字符串将其描述为：Data types and tags used for emitting CUTLASS C++ kernels
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Data types and tags used for emitting CUTLASS C++ kernels` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L38** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `# The following block implements enum.auto() for Python 3.5 variants that don't include it such` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L41** `# as the default 3.5.2 on Ubuntu 16.04.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L42** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L43** `# https://codereview.stackexchange.com/questions/177309/reimplementing-pythons-enum-auto-for-compatibility` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L46** `  from enum import auto as enum_auto` — **EN:** Imports auto as enum_auto from `enum`. **CN:** 从 `enum` 导入 auto as enum_auto。
+- **L47** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L48** `  __cutlass_library_auto_enum = 0` — **EN:** Assigns a value to __cutlass_library_auto_enum. **CN:** 将一个值赋给 __cutlass_library_auto_enum。
+- **L49** `  def enum_auto() -> int:` — **EN:** Defines function `enum_auto`. **CN:** 定义函数 `enum_auto`。
+- **L50** `    global __cutlass_library_auto_enum` — **EN:** Declares __cutlass_library_auto_enum as module-level globals. **CN:** 将 __cutlass_library_auto_enum 声明为模块级全局变量。
+- **L51** `    i = __cutlass_library_auto_enum` — **EN:** Assigns a value to i. **CN:** 将一个值赋给 i。
+- **L52** `    __cutlass_library_auto_enum += 1` — **EN:** Updates __cutlass_library_auto_enum in place. **CN:** 原地更新 __cutlass_library_auto_enum。
+- **L53** `    return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L58** `class GeneratorTarget(enum.Enum):` — **EN:** Defines class `GeneratorTarget` with bases enum.Enum. **CN:** 定义类 `GeneratorTarget`，其基类为 enum.Enum。
+- **L59** `  Library = enum_auto()` — **EN:** Assigns a value to Library. **CN:** 将一个值赋给 Library。
+- **L60** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L61** `GeneratorTargetNames = {` — **EN:** Assigns a value to GeneratorTargetNames. **CN:** 将一个值赋给 GeneratorTargetNames。
+- **L62** `  GeneratorTarget.Library: 'library'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L69** `class DataType(enum.Enum):` — **EN:** Defines class `DataType` with bases enum.Enum. **CN:** 定义类 `DataType`，其基类为 enum.Enum。
+- **L70** `  void = enum_auto()  # primarily used to disable C tensor for epilogues` — **EN:** Assigns a value to void. **CN:** 将一个值赋给 void。
+- **L71** `  b1 = enum_auto()` — **EN:** Assigns a value to b1. **CN:** 将一个值赋给 b1。
+- **L72** `  u2 = enum_auto()` — **EN:** Assigns a value to u2. **CN:** 将一个值赋给 u2。
+- **L73** `  u4 = enum_auto()` — **EN:** Assigns a value to u4. **CN:** 将一个值赋给 u4。
+- **L74** `  u8 = enum_auto()` — **EN:** Assigns a value to u8. **CN:** 将一个值赋给 u8。
+- **L75** `  u16 = enum_auto()` — **EN:** Assigns a value to u16. **CN:** 将一个值赋给 u16。
+- **L76** `  u32 = enum_auto()` — **EN:** Assigns a value to u32. **CN:** 将一个值赋给 u32。
+- **L77** `  u64 = enum_auto()` — **EN:** Assigns a value to u64. **CN:** 将一个值赋给 u64。
+- **L78** `  s2 = enum_auto()` — **EN:** Assigns a value to s2. **CN:** 将一个值赋给 s2。
+- **L79** `  s4 = enum_auto()` — **EN:** Assigns a value to s4. **CN:** 将一个值赋给 s4。
+- **L80** `  s8 = enum_auto()` — **EN:** Assigns a value to s8. **CN:** 将一个值赋给 s8。
+- **L81** `  s16 = enum_auto()` — **EN:** Assigns a value to s16. **CN:** 将一个值赋给 s16。
+- **L82** `  s32 = enum_auto()` — **EN:** Assigns a value to s32. **CN:** 将一个值赋给 s32。
+- **L83** `  s64 = enum_auto()` — **EN:** Assigns a value to s64. **CN:** 将一个值赋给 s64。
+- **L84** `  e4m3 = enum_auto()` — **EN:** Assigns a value to e4m3. **CN:** 将一个值赋给 e4m3。
+- **L85** `  e5m2 = enum_auto()` — **EN:** Assigns a value to e5m2. **CN:** 将一个值赋给 e5m2。
+- **L86** `  f8 = enum_auto()    ` — **EN:** Assigns a value to f8. **CN:** 将一个值赋给 f8。
+- **L87** `  f6 = enum_auto()    ` — **EN:** Assigns a value to f6. **CN:** 将一个值赋给 f6。
+- **L88** `  f4 = enum_auto()    ` — **EN:** Assigns a value to f4. **CN:** 将一个值赋给 f4。
+- **L89** `  e3m2 = enum_auto()     ` — **EN:** Assigns a value to e3m2. **CN:** 将一个值赋给 e3m2。
+- **L90** `  e2m3 = enum_auto()     ` — **EN:** Assigns a value to e2m3. **CN:** 将一个值赋给 e2m3。
+- **L91** `  e2m1 = enum_auto()     ` — **EN:** Assigns a value to e2m1. **CN:** 将一个值赋给 e2m1。
+- **L92** `  ue8m0 = enum_auto()    ` — **EN:** Assigns a value to ue8m0. **CN:** 将一个值赋给 ue8m0。
+- **L93** `  ue4m3 = enum_auto()    ` — **EN:** Assigns a value to ue4m3. **CN:** 将一个值赋给 ue4m3。
+- **L94** `  f16 = enum_auto()` — **EN:** Assigns a value to f16. **CN:** 将一个值赋给 f16。
+- **L95** `  bf16 = enum_auto()` — **EN:** Assigns a value to bf16. **CN:** 将一个值赋给 bf16。
+- **L96** `  f32 = enum_auto()` — **EN:** Assigns a value to f32. **CN:** 将一个值赋给 f32。
+- **L97** `  tf32 = enum_auto()` — **EN:** Assigns a value to tf32. **CN:** 将一个值赋给 tf32。
+- **L98** `  f64 = enum_auto()` — **EN:** Assigns a value to f64. **CN:** 将一个值赋给 f64。
+- **L99** `  cf16 = enum_auto()` — **EN:** Assigns a value to cf16. **CN:** 将一个值赋给 cf16。
+- **L100** `  cbf16 = enum_auto()` — **EN:** Assigns a value to cbf16. **CN:** 将一个值赋给 cbf16。
+- **L101** `  cf32 = enum_auto()` — **EN:** Assigns a value to cf32. **CN:** 将一个值赋给 cf32。
+- **L102** `  ctf32 = enum_auto()` — **EN:** Assigns a value to ctf32. **CN:** 将一个值赋给 ctf32。
+- **L103** `  cf64 = enum_auto()` — **EN:** Assigns a value to cf64. **CN:** 将一个值赋给 cf64。
+- **L104** `  cs2 = enum_auto()` — **EN:** Assigns a value to cs2. **CN:** 将一个值赋给 cs2。
+- **L105** `  cs4 = enum_auto()` — **EN:** Assigns a value to cs4. **CN:** 将一个值赋给 cs4。
+- **L106** `  cs8 = enum_auto()` — **EN:** Assigns a value to cs8. **CN:** 将一个值赋给 cs8。
+- **L107** `  cs16 = enum_auto()` — **EN:** Assigns a value to cs16. **CN:** 将一个值赋给 cs16。
+- **L108** `  cs32 = enum_auto()` — **EN:** Assigns a value to cs32. **CN:** 将一个值赋给 cs32。
+- **L109** `  cs64 = enum_auto()` — **EN:** Assigns a value to cs64. **CN:** 将一个值赋给 cs64。
+- **L110** `  cu2 = enum_auto()` — **EN:** Assigns a value to cu2. **CN:** 将一个值赋给 cu2。
+- **L111** `  cu4 = enum_auto()` — **EN:** Assigns a value to cu4. **CN:** 将一个值赋给 cu4。
+- **L112** `  cu8 = enum_auto()` — **EN:** Assigns a value to cu8. **CN:** 将一个值赋给 cu8。
+- **L113** `  cu16 = enum_auto()` — **EN:** Assigns a value to cu16. **CN:** 将一个值赋给 cu16。
+- **L114** `  cu32 = enum_auto()` — **EN:** Assigns a value to cu32. **CN:** 将一个值赋给 cu32。
+- **L115** `  cu64 = enum_auto()` — **EN:** Assigns a value to cu64. **CN:** 将一个值赋给 cu64。
+- **L116** `  invalid = enum_auto()` — **EN:** Assigns a value to invalid. **CN:** 将一个值赋给 invalid。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L119** `ShortDataTypeNames = {` — **EN:** Assigns a value to ShortDataTypeNames. **CN:** 将一个值赋给 ShortDataTypeNames。
+- **L120** `  DataType.s32: 'i',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `  DataType.e4m3: 'e4m3',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `  DataType.e5m2: 'e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `  DataType.f16: 'h',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `  DataType.f32: 's',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `  DataType.f64: 'd',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `  DataType.cf32: 'c',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `  DataType.cf64: 'z',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `  DataType.f8: 'f8',      ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `  DataType.f6: 'f6',      ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `  DataType.f4: 'f4',      ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L134** `DataTypeNames = {` — **EN:** Assigns a value to DataTypeNames. **CN:** 将一个值赋给 DataTypeNames。
+- **L135** `  DataType.void: "void",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `  DataType.b1: "b1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `  DataType.u2: "u2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `  DataType.u4: "u4",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `  DataType.u8: "u8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `  DataType.u16: "u16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `  DataType.u32: "u32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `  DataType.u64: "u64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `  DataType.s2: "s2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `  DataType.s4: "s4",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `  DataType.s8: "s8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `  DataType.s16: "s16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `  DataType.s32: "s32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `  DataType.s64: "s64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `  DataType.e4m3: 'e4m3',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `  DataType.e5m2: 'e5m2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `  DataType.f8: 'f8',     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `  DataType.f6: 'f6',     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `  DataType.f4: 'f4',     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `  DataType.e2m3: 'e2m3',       ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `  DataType.e3m2: 'e3m2',       ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `  DataType.e2m1: 'e2m1',       ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `  DataType.ue8m0: 'ue8m0',     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `  DataType.ue4m3: 'ue4m3',     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `  DataType.f16: "f16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `  DataType.bf16: "bf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `  DataType.f32: "f32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `  DataType.tf32: "tf32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `  DataType.f64: "f64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `  DataType.cf16: "cf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `  DataType.cbf16: "cbf16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `  DataType.cf32: "cf32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `  DataType.ctf32: "ctf32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `  DataType.cf64: "cf64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `  DataType.cu2: "cu2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `  DataType.cu4: "cu4",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `  DataType.cu8: "cu8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `  DataType.cu16: "cu16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `  DataType.cu32: "cu32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `  DataType.cu64: "cu64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `  DataType.cs2: "cs2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `  DataType.cs4: "cs4",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `  DataType.cs8: "cs8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `  DataType.cs16: "cs16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `  DataType.cs32: "cs32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `  DataType.cs64: "cs64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `DataTypeTag = {` — **EN:** Assigns a value to DataTypeTag. **CN:** 将一个值赋给 DataTypeTag。
+- **L184** `  DataType.void: "void",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `  DataType.b1: "cutlass::uint1b_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `  DataType.u2: "cutlass::uint2b_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `  DataType.u4: "cutlass::uint4b_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `  DataType.u8: "uint8_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `  DataType.u16: "uint16_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `  DataType.u32: "uint32_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `  DataType.u64: "uint64_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `  DataType.s2: "cutlass::int2b_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `  DataType.s4: "cutlass::int4b_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** `  DataType.s8: "int8_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `  DataType.s16: "int16_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `  DataType.s32: "int32_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `  DataType.s64: "int64_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `  DataType.e4m3: 'cutlass::float_e4m3_t',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `  DataType.e5m2: 'cutlass::float_e5m2_t',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `  DataType.f8: 'cutlass::type_erased_dynamic_float8_t',      ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `  DataType.f6: 'cutlass::type_erased_dynamic_float6_t',      ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `  DataType.f4: 'cutlass::type_erased_dynamic_float4_t',      ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `  DataType.e2m3: 'cutlass::float_e2m3_t',                       ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `  DataType.e3m2: 'cutlass::float_e3m2_t',                       ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `  DataType.e2m1: 'cutlass::float_e2m1_t',                       ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `  DataType.ue8m0: 'cutlass::float_ue8m0_t',                     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `  DataType.ue4m3: 'cutlass::float_ue4m3_t',                     ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `  DataType.f16: "cutlass::half_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `  DataType.bf16: "cutlass::bfloat16_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `  DataType.f32: "float",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `  DataType.tf32: "cutlass::tfloat32_t",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `  DataType.f64: "double",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `  DataType.cf16: "cutlass::complex<cutlass::half_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `  DataType.cbf16: "cutlass::complex<cutlass::bfloat16_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `  DataType.cf32: "cutlass::complex<float>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `  DataType.ctf32: "cutlass::complex<cutlass::tfloat32_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `  DataType.cf64: "cutlass::complex<double>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `  DataType.cu2: "cutlass::complex<cutlass::uint2b_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `  DataType.cu4: "cutlass::complex<cutlass::uint4b_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `  DataType.cu8: "cutlass::complex<cutlass::uint8_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `  DataType.cu16: "cutlass::complex<cutlass::uint16_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `  DataType.cu32: "cutlass::complex<cutlass::uint32_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `  DataType.cu64: "cutlass::complex<cutlass::uint64_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `  DataType.cs2: "cutlass::complex<cutlass::int2b_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `  DataType.cs4: "cutlass::complex<cutlass::int4b_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `  DataType.cs8: "cutlass::complex<cutlass::int8_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `  DataType.cs16: "cutlass::complex<cutlass::int16_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `  DataType.cs32: "cutlass::complex<cutlass::int32_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `  DataType.cs64: "cutlass::complex<cutlass::int64_t>",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `DataTypeSize = {` — **EN:** Assigns a value to DataTypeSize. **CN:** 将一个值赋给 DataTypeSize。
+- **L233** `  DataType.void: 0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `  DataType.b1: 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `  DataType.u2: 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `  DataType.u4: 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `  DataType.u8: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `  DataType.u16: 16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `  DataType.u32: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `  DataType.u64: 64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `  DataType.s2: 2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `  DataType.s4: 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `  DataType.s8: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `  DataType.s16: 16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `  DataType.s32: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `  DataType.s64: 64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `  DataType.e4m3: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `  DataType.e5m2: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `  DataType.f8: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `  DataType.f6: 6,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `  DataType.f4: 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `  DataType.e2m3: 6,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `  DataType.e3m2: 6,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `  DataType.e2m1: 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `  DataType.ue8m0: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `  DataType.ue4m3: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `  DataType.f16: 16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `  DataType.bf16: 16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `  DataType.f32: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `  DataType.tf32: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `  DataType.f64: 64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `  DataType.cf16: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `  DataType.cbf16: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `  DataType.cf32: 64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `  DataType.ctf32: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `  DataType.cf64: 128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `  DataType.cu2: 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `  DataType.cu4: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `  DataType.cu8: 16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `  DataType.cu16: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `  DataType.cu32: 64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `  DataType.cu64: 128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `  DataType.cs2: 4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `  DataType.cs4: 8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `  DataType.cs8: 16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `  DataType.cs16: 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `  DataType.cs32: 64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `  DataType.cs64: 128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L282** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L283** `class BlasMode(enum.Enum):` — **EN:** Defines class `BlasMode` with bases enum.Enum. **CN:** 定义类 `BlasMode`，其基类为 enum.Enum。
+- **L284** `  symmetric = enum_auto()` — **EN:** Assigns a value to symmetric. **CN:** 将一个值赋给 symmetric。
+- **L285** `  hermitian = enum_auto()` — **EN:** Assigns a value to hermitian. **CN:** 将一个值赋给 hermitian。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L288** `BlasModeTag = {` — **EN:** Assigns a value to BlasModeTag. **CN:** 将一个值赋给 BlasModeTag。
+- **L289** `  BlasMode.symmetric: 'cutlass::BlasMode::kSymmetric',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `  BlasMode.hermitian: 'cutlass::BlasMode::kHermitian',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L294** `class ComplexTransform(enum.Enum):` — **EN:** Defines class `ComplexTransform` with bases enum.Enum. **CN:** 定义类 `ComplexTransform`，其基类为 enum.Enum。
+- **L295** `  none = enum_auto()` — **EN:** Assigns a value to none. **CN:** 将一个值赋给 none。
+- **L296** `  conj = enum_auto()` — **EN:** Assigns a value to conj. **CN:** 将一个值赋给 conj。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L299** `ComplexTransformTag = {` — **EN:** Assigns a value to ComplexTransformTag. **CN:** 将一个值赋给 ComplexTransformTag。
+- **L300** `  ComplexTransform.none: 'cutlass::ComplexTransform::kNone',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `  ComplexTransform.conj: 'cutlass::ComplexTransform::kConjugate',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `# Used for cutlass3x complex kernel collective mainloop builder instantiation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L305** `ComplexTransformTag3x = {` — **EN:** Assigns a value to ComplexTransformTag3x. **CN:** 将一个值赋给 ComplexTransformTag3x。
+- **L306** `  ComplexTransform.none: 'cute::identity',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `  ComplexTransform.conj: 'cute::conjugate',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L311** `RealComplexBijection = [` — **EN:** Assigns a value to RealComplexBijection. **CN:** 将一个值赋给 RealComplexBijection。
+- **L312** `  (DataType.f16, DataType.cf16),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `  (DataType.f32, DataType.cf32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `  (DataType.f64, DataType.cf64),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L318** `def is_complex(data_type):` — **EN:** Defines function `is_complex`. **CN:** 定义函数 `is_complex`。
+- **L319** `  for r, c in RealComplexBijection:` — **EN:** Starts a loop assigning items from `RealComplexBijection` to `(r, c)`. **CN:** 开始一个循环，将 `RealComplexBijection` 的元素赋给 `(r, c)`。
+- **L320** `    if data_type == c:` — **EN:** Starts a conditional branch guarded by `data_type == c`. **CN:** 开始一个由 `data_type == c` 控制的条件分支。
+- **L321** `      return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L322** `  return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L323** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L324** `def is_block_scaled(gemm_kind):` — **EN:** Defines function `is_block_scaled`. **CN:** 定义函数 `is_block_scaled`。
+- **L325** `  return gemm_kind in (GemmKind.BlockScaledUniversal3x, GemmKind.GroupedBlockScaledUniversal3x, GemmKind.BlockScaledSparseUniversal3x, ` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L326** `    GemmKind.BlockScaledMoeGroupedUniversal3x)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `def is_blockwise(gemm_kind):` — **EN:** Defines function `is_blockwise`. **CN:** 定义函数 `is_blockwise`。
+- **L329** `  return gemm_kind in (GemmKind.BlockwiseUniversal3x, GemmKind.GroupedBlockwiseUniversal3x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `def is_grouped(gemm_kind):` — **EN:** Defines function `is_grouped`. **CN:** 定义函数 `is_grouped`。
+- **L332** `  return gemm_kind in (GemmKind.GroupedUniversal3x, ` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L333** `    GemmKind.GroupedBlockScaledUniversal3x, GemmKind.GroupedBlockwiseUniversal3x)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `def is_moe(gemm_kind):` — **EN:** Defines function `is_moe`. **CN:** 定义函数 `is_moe`。
+- **L336** `  return gemm_kind in (GemmKind.MoeGroupedUniversal3x, GemmKind.BlockScaledMoeGroupedUniversal3x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L337** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L338** `def get_complex_from_real(real_type):` — **EN:** Defines function `get_complex_from_real`. **CN:** 定义函数 `get_complex_from_real`。
+- **L339** `  for r, c in RealComplexBijection:` — **EN:** Starts a loop assigning items from `RealComplexBijection` to `(r, c)`. **CN:** 开始一个循环，将 `RealComplexBijection` 的元素赋给 `(r, c)`。
+- **L340** `    if real_type == r:` — **EN:** Starts a conditional branch guarded by `real_type == r`. **CN:** 开始一个由 `real_type == r` 控制的条件分支。
+- **L341** `      return c` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L342** `  return DataType.invalid` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L345** `def get_real_from_complex(complex_type):` — **EN:** Defines function `get_real_from_complex`. **CN:** 定义函数 `get_real_from_complex`。
+- **L346** `  for r, c in RealComplexBijection:` — **EN:** Starts a loop assigning items from `RealComplexBijection` to `(r, c)`. **CN:** 开始一个循环，将 `RealComplexBijection` 的元素赋给 `(r, c)`。
+- **L347** `    if complex_type == c:` — **EN:** Starts a conditional branch guarded by `complex_type == c`. **CN:** 开始一个由 `complex_type == c` 控制的条件分支。
+- **L348** `      return r` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L349** `  return DataType.invalid` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `# TMA requires an alignment of 128 bits for all data types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L352** `def get_tma_alignment(data_type):` — **EN:** Defines function `get_tma_alignment`. **CN:** 定义函数 `get_tma_alignment`。
+- **L353** `  if data_type == DataType.void:` — **EN:** Starts a conditional branch guarded by `data_type == DataType.void`. **CN:** 开始一个由 `data_type == DataType.void` 控制的条件分支。
+- **L354** `    return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L355** `  elif DataTypeSize[data_type] == 6:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L356** `    return 128 # 96B alignment for 16U6 format ` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L357** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L358** `    return 128 // DataTypeSize[data_type]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L361** `class ComplexMultiplyOp(enum.Enum):` — **EN:** Defines class `ComplexMultiplyOp` with bases enum.Enum. **CN:** 定义类 `ComplexMultiplyOp`，其基类为 enum.Enum。
+- **L362** `  multiply_add = enum_auto()` — **EN:** Assigns a value to multiply_add. **CN:** 将一个值赋给 multiply_add。
+- **L363** `  gaussian = enum_auto()` — **EN:** Assigns a value to gaussian. **CN:** 将一个值赋给 gaussian。
+- **L364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L365** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L368** `class MathOperation(enum.Enum):` — **EN:** Defines class `MathOperation` with bases enum.Enum. **CN:** 定义类 `MathOperation`，其基类为 enum.Enum。
+- **L369** `  multiply_add = enum_auto()` — **EN:** Assigns a value to multiply_add. **CN:** 将一个值赋给 multiply_add。
+- **L370** `  multiply_add_saturate = enum_auto()` — **EN:** Assigns a value to multiply_add_saturate. **CN:** 将一个值赋给 multiply_add_saturate。
+- **L371** `  multiply_add_mixed_input_upcast = enum_auto()` — **EN:** Assigns a value to multiply_add_mixed_input_upcast. **CN:** 将一个值赋给 multiply_add_mixed_input_upcast。
+- **L372** `  xor_popc = enum_auto()` — **EN:** Assigns a value to xor_popc. **CN:** 将一个值赋给 xor_popc。
+- **L373** `  and_popc = enum_auto()` — **EN:** Assigns a value to and_popc. **CN:** 将一个值赋给 and_popc。
+- **L374** `  multiply_add_fast_bf16 = enum_auto()` — **EN:** Assigns a value to multiply_add_fast_bf16. **CN:** 将一个值赋给 multiply_add_fast_bf16。
+- **L375** `  multiply_add_fast_f16 = enum_auto()` — **EN:** Assigns a value to multiply_add_fast_f16. **CN:** 将一个值赋给 multiply_add_fast_f16。
+- **L376** `  multiply_add_fast_f32 = enum_auto()` — **EN:** Assigns a value to multiply_add_fast_f32. **CN:** 将一个值赋给 multiply_add_fast_f32。
+- **L377** `  multiply_add_complex_fast_f32 = enum_auto()` — **EN:** Assigns a value to multiply_add_complex_fast_f32. **CN:** 将一个值赋给 multiply_add_complex_fast_f32。
+- **L378** `  multiply_add_complex = enum_auto()` — **EN:** Assigns a value to multiply_add_complex. **CN:** 将一个值赋给 multiply_add_complex。
+- **L379** `  multiply_add_complex_gaussian = enum_auto()` — **EN:** Assigns a value to multiply_add_complex_gaussian. **CN:** 将一个值赋给 multiply_add_complex_gaussian。
+- **L380** `  multiply_add_fast_accum = enum_auto()` — **EN:** Assigns a value to multiply_add_fast_accum. **CN:** 将一个值赋给 multiply_add_fast_accum。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L383** `MathOperationTag = {` — **EN:** Assigns a value to MathOperationTag. **CN:** 将一个值赋给 MathOperationTag。
+- **L384** `  MathOperation.multiply_add: 'cutlass::arch::OpMultiplyAdd',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `  MathOperation.multiply_add_saturate: 'cutlass::arch::OpMultiplyAddSaturate',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `  MathOperation.multiply_add_mixed_input_upcast: 'cutlass::arch::OpMultiplyAddMixedInputUpcast',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `  MathOperation.xor_popc: 'cutlass::arch::OpXorPopc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `  MathOperation.and_popc: 'cutlass::arch::OpAndPopc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `  MathOperation.multiply_add_fast_bf16: 'cutlass::arch::OpMultiplyAddFastBF16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `  MathOperation.multiply_add_fast_f16: 'cutlass::arch::OpMultiplyAddFastF16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** `  MathOperation.multiply_add_fast_f32: 'cutlass::arch::OpMultiplyAddFastF32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** `  MathOperation.multiply_add_complex_fast_f32: 'cutlass::arch::OpMultiplyAddComplexFastF32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L393** `  MathOperation.multiply_add_complex: 'cutlass::arch::OpMultiplyAddComplex',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L394** `  MathOperation.multiply_add_complex_gaussian: 'cutlass::arch::OpMultiplyAddGaussianComplex',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L395** `  MathOperation.multiply_add_fast_accum: 'cutlass::arch::OpMultiplyAddFastAccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L401** `class LayoutType(enum.Enum):` — **EN:** Defines class `LayoutType` with bases enum.Enum. **CN:** 定义类 `LayoutType`，其基类为 enum.Enum。
+- **L402** `  ColumnMajor = enum_auto()` — **EN:** Assigns a value to ColumnMajor. **CN:** 将一个值赋给 ColumnMajor。
+- **L403** `  RowMajor = enum_auto()` — **EN:** Assigns a value to RowMajor. **CN:** 将一个值赋给 RowMajor。
+- **L404** `  ColumnMajorInterleaved2 = enum_auto()` — **EN:** Assigns a value to ColumnMajorInterleaved2. **CN:** 将一个值赋给 ColumnMajorInterleaved2。
+- **L405** `  RowMajorInterleaved2 = enum_auto()` — **EN:** Assigns a value to RowMajorInterleaved2. **CN:** 将一个值赋给 RowMajorInterleaved2。
+- **L406** `  ColumnMajorInterleaved32 = enum_auto()` — **EN:** Assigns a value to ColumnMajorInterleaved32. **CN:** 将一个值赋给 ColumnMajorInterleaved32。
+- **L407** `  RowMajorInterleaved32 = enum_auto()` — **EN:** Assigns a value to RowMajorInterleaved32. **CN:** 将一个值赋给 RowMajorInterleaved32。
+- **L408** `  ColumnMajorInterleaved64 = enum_auto()` — **EN:** Assigns a value to ColumnMajorInterleaved64. **CN:** 将一个值赋给 ColumnMajorInterleaved64。
+- **L409** `  RowMajorInterleaved64 = enum_auto()` — **EN:** Assigns a value to RowMajorInterleaved64. **CN:** 将一个值赋给 RowMajorInterleaved64。
+- **L410** `  TensorNWC = enum_auto()` — **EN:** Assigns a value to TensorNWC. **CN:** 将一个值赋给 TensorNWC。
+- **L411** `  TensorNHWC = enum_auto()` — **EN:** Assigns a value to TensorNHWC. **CN:** 将一个值赋给 TensorNHWC。
+- **L412** `  TensorNDHWC = enum_auto()` — **EN:** Assigns a value to TensorNDHWC. **CN:** 将一个值赋给 TensorNDHWC。
+- **L413** `  TensorNCHW = enum_auto()` — **EN:** Assigns a value to TensorNCHW. **CN:** 将一个值赋给 TensorNCHW。
+- **L414** `  TensorNGHWC = enum_auto()` — **EN:** Assigns a value to TensorNGHWC. **CN:** 将一个值赋给 TensorNGHWC。
+- **L415** `  TensorNC32HW32 = enum_auto()` — **EN:** Assigns a value to TensorNC32HW32. **CN:** 将一个值赋给 TensorNC32HW32。
+- **L416** `  TensorNC64HW64 = enum_auto()` — **EN:** Assigns a value to TensorNC64HW64. **CN:** 将一个值赋给 TensorNC64HW64。
+- **L417** `  TensorC32RSK32 = enum_auto()` — **EN:** Assigns a value to TensorC32RSK32. **CN:** 将一个值赋给 TensorC32RSK32。
+- **L418** `  TensorC64RSK64 = enum_auto()` — **EN:** Assigns a value to TensorC64RSK64. **CN:** 将一个值赋给 TensorC64RSK64。
+- **L419** `  TensorKCS = enum_auto()` — **EN:** Assigns a value to TensorKCS. **CN:** 将一个值赋给 TensorKCS。
+- **L420** `  TensorKCSR = enum_auto()` — **EN:** Assigns a value to TensorKCSR. **CN:** 将一个值赋给 TensorKCSR。
+- **L421** `  TensorKCSRT = enum_auto()` — **EN:** Assigns a value to TensorKCSRT. **CN:** 将一个值赋给 TensorKCSRT。
+- **L422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L423** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L424** `LayoutTag = {` — **EN:** Assigns a value to LayoutTag. **CN:** 将一个值赋给 LayoutTag。
+- **L425** `  LayoutType.ColumnMajor: 'cutlass::layout::ColumnMajor',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `  LayoutType.RowMajor: 'cutlass::layout::RowMajor',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `  LayoutType.ColumnMajorInterleaved2: 'cutlass::layout::ColumnMajorInterleaved<2>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `  LayoutType.RowMajorInterleaved2: 'cutlass::layout::RowMajorInterleaved<2>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `  LayoutType.ColumnMajorInterleaved32: 'cutlass::layout::ColumnMajorInterleaved<32>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `  LayoutType.RowMajorInterleaved32: 'cutlass::layout::RowMajorInterleaved<32>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `  LayoutType.ColumnMajorInterleaved64: 'cutlass::layout::ColumnMajorInterleaved<64>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `  LayoutType.RowMajorInterleaved64: 'cutlass::layout::RowMajorInterleaved<64>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `  LayoutType.TensorNWC: 'cutlass::layout::TensorNWC',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `  LayoutType.TensorNHWC: 'cutlass::layout::TensorNHWC',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `  LayoutType.TensorNDHWC: 'cutlass::layout::TensorNDHWC',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `  LayoutType.TensorNCHW: 'cutlass::layout::TensorNCHW',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `  LayoutType.TensorNGHWC: 'cutlass::layout::TensorNGHWC',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `  LayoutType.TensorNC32HW32: 'cutlass::layout::TensorNCxHWx<32>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `  LayoutType.TensorC32RSK32: 'cutlass::layout::TensorCxRSKx<32>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L440** `  LayoutType.TensorNC64HW64: 'cutlass::layout::TensorNCxHWx<64>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `  LayoutType.TensorC64RSK64: 'cutlass::layout::TensorCxRSKx<64>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `  LayoutType.TensorKCS: 'cutlass::layout::TensorKCS',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `  LayoutType.TensorKCSR: 'cutlass::layout::TensorKCSR',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `  LayoutType.TensorKCSRT: 'cutlass::layout::TensorKCSRT'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L448** `TransposedLayout = {` — **EN:** Assigns a value to TransposedLayout. **CN:** 将一个值赋给 TransposedLayout。
+- **L449** `  LayoutType.ColumnMajor: LayoutType.RowMajor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `  LayoutType.RowMajor: LayoutType.ColumnMajor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `  LayoutType.ColumnMajorInterleaved2: LayoutType.RowMajorInterleaved2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `  LayoutType.RowMajorInterleaved2: LayoutType.ColumnMajorInterleaved2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `  LayoutType.ColumnMajorInterleaved32: LayoutType.RowMajorInterleaved32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** `  LayoutType.RowMajorInterleaved32: LayoutType.ColumnMajorInterleaved32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** `  LayoutType.ColumnMajorInterleaved64: LayoutType.RowMajorInterleaved64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L456** `  LayoutType.RowMajorInterleaved64: LayoutType.ColumnMajorInterleaved64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L457** `  LayoutType.TensorNHWC: LayoutType.TensorNHWC` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L458** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L459** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L460** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L461** `ShortLayoutTypeNames = {` — **EN:** Assigns a value to ShortLayoutTypeNames. **CN:** 将一个值赋给 ShortLayoutTypeNames。
+- **L462** `  LayoutType.ColumnMajor: 'n',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `  LayoutType.ColumnMajorInterleaved2: 'n2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `  LayoutType.ColumnMajorInterleaved32: 'n32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `  LayoutType.ColumnMajorInterleaved64: 'n64',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `  LayoutType.RowMajor: 't',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `  LayoutType.RowMajorInterleaved2: 't2',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `  LayoutType.RowMajorInterleaved32: 't32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `  LayoutType.RowMajorInterleaved64: 't64',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L470** `  LayoutType.TensorNWC: 'nwc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `  LayoutType.TensorNHWC: 'nhwc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `  LayoutType.TensorNDHWC: 'ndhwc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** `  LayoutType.TensorNCHW: 'nchw',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L474** `  LayoutType.TensorNGHWC: 'nghwc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** `  LayoutType.TensorNC32HW32: 'nc32hw32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `  LayoutType.TensorNC64HW64: 'nc64hw64',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `  LayoutType.TensorC32RSK32: 'c32rsk32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `  LayoutType.TensorC64RSK64: 'c64rsk64',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `  LayoutType.TensorKCS: 'kcs',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `  LayoutType.TensorKCSR: 'kcsr',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `  LayoutType.TensorKCSRT: 'kcsrt'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L484** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L485** `ShortComplexLayoutNames = {` — **EN:** Assigns a value to ShortComplexLayoutNames. **CN:** 将一个值赋给 ShortComplexLayoutNames。
+- **L486** `  (LayoutType.ColumnMajor, ComplexTransform.none): 'n',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `  (LayoutType.ColumnMajor, ComplexTransform.conj): 'c',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `  (LayoutType.RowMajor, ComplexTransform.none): 't',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** `  (LayoutType.RowMajor, ComplexTransform.conj): 'h'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L490** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L491** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L492** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L493** `class KernelScheduleType(enum.Enum):` — **EN:** Defines class `KernelScheduleType` with bases enum.Enum. **CN:** 定义类 `KernelScheduleType`，其基类为 enum.Enum。
+- **L494** `  ScheduleAuto = enum_auto()` — **EN:** Assigns a value to ScheduleAuto. **CN:** 将一个值赋给 ScheduleAuto。
+- **L495** `  Multistage = enum_auto()` — **EN:** Assigns a value to Multistage. **CN:** 将一个值赋给 Multistage。
+- **L496** `  CpAsyncWarpSpecialized = enum_auto()` — **EN:** Assigns a value to CpAsyncWarpSpecialized. **CN:** 将一个值赋给 CpAsyncWarpSpecialized。
+- **L497** `  CpAsyncWarpSpecializedPingpong = enum_auto()` — **EN:** Assigns a value to CpAsyncWarpSpecializedPingpong. **CN:** 将一个值赋给 CpAsyncWarpSpecializedPingpong。
+- **L498** `  CpAsyncWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to CpAsyncWarpSpecializedCooperative. **CN:** 将一个值赋给 CpAsyncWarpSpecializedCooperative。
+- **L499** `  Tma = enum_auto()` — **EN:** Assigns a value to Tma. **CN:** 将一个值赋给 Tma。
+- **L500** `  TmaWarpSpecialized = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized. **CN:** 将一个值赋给 TmaWarpSpecialized。
+- **L501** `  TmaWarpSpecializedPingpong = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecializedPingpong. **CN:** 将一个值赋给 TmaWarpSpecializedPingpong。
+- **L502** `  TmaWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecializedCooperative. **CN:** 将一个值赋给 TmaWarpSpecializedCooperative。
+- **L503** `  TmaWarpSpecializedFP8FastAccum = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecializedFP8FastAccum. **CN:** 将一个值赋给 TmaWarpSpecializedFP8FastAccum。
+- **L504** `  TmaWarpSpecializedCooperativeFP8FastAccum = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecializedCooperativeFP8FastAccum. **CN:** 将一个值赋给 TmaWarpSpecializedCooperativeFP8FastAccum。
+- **L505** `  TmaWarpSpecializedPingpongFP8FastAccum = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecializedPingpongFP8FastAccum. **CN:** 将一个值赋给 TmaWarpSpecializedPingpongFP8FastAccum。
+- **L506** `  ImplicitTmaWarpSpecializedSm90 = enum_auto()` — **EN:** Assigns a value to ImplicitTmaWarpSpecializedSm90. **CN:** 将一个值赋给 ImplicitTmaWarpSpecializedSm90。
+- **L507** `  PtrArrayTmaWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedCooperative. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedCooperative。
+- **L508** `  PtrArrayTmaWarpSpecializedCooperativeFP8FastAccum = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedCooperativeFP8FastAccum. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedCooperativeFP8FastAccum。
+- **L509** `  PtrArrayTmaWarpSpecializedPingpong = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedPingpong. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedPingpong。
+- **L510** `  PtrArrayTmaWarpSpecializedPingpongFP8FastAccum = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedPingpongFP8FastAccum. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedPingpongFP8FastAccum。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** `  BlockwiseTmaWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to BlockwiseTmaWarpSpecializedCooperative. **CN:** 将一个值赋给 BlockwiseTmaWarpSpecializedCooperative。
+- **L513** `  PtrArrayBlockwiseTmaWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to PtrArrayBlockwiseTmaWarpSpecializedCooperative. **CN:** 将一个值赋给 PtrArrayBlockwiseTmaWarpSpecializedCooperative。
+- **L514** `  BlockwiseTmaWarpSpecializedPingpong = enum_auto()` — **EN:** Assigns a value to BlockwiseTmaWarpSpecializedPingpong. **CN:** 将一个值赋给 BlockwiseTmaWarpSpecializedPingpong。
+- **L515** `  PtrArrayBlockwiseTmaWarpSpecializedPingpong = enum_auto()` — **EN:** Assigns a value to PtrArrayBlockwiseTmaWarpSpecializedPingpong. **CN:** 将一个值赋给 PtrArrayBlockwiseTmaWarpSpecializedPingpong。
+- **L516** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L517** `  TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 TmaWarpSpecialized1SmSm100。
+- **L518** `  TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 TmaWarpSpecialized2SmSm100。
+- **L519** `  WarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to WarpSpecialized1SmSm100. **CN:** 将一个值赋给 WarpSpecialized1SmSm100。
+- **L520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L521** `  ImplicitTmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to ImplicitTmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 ImplicitTmaWarpSpecialized1SmSm100。
+- **L522** `  ImplicitTmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to ImplicitTmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 ImplicitTmaWarpSpecialized2SmSm100。
+- **L523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L524** `  PtrArrayTmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecialized1SmSm100。
+- **L525** `  PtrArrayTmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecialized2SmSm100。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `  PtrArrayTmaWarpSpecialized1SmBlockScaledSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecialized1SmBlockScaledSm100. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecialized1SmBlockScaledSm100。
+- **L528** `  PtrArrayTmaWarpSpecialized2SmBlockScaledSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecialized2SmBlockScaledSm100. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecialized2SmBlockScaledSm100。
+- **L529** `  PtrArrayNvf4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayNvf4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 PtrArrayNvf4TmaWarpSpecialized1SmSm100。
+- **L530** `  PtrArrayNvf4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayNvf4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 PtrArrayNvf4TmaWarpSpecialized2SmSm100。
+- **L531** `  PtrArrayMxf4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxf4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 PtrArrayMxf4TmaWarpSpecialized1SmSm100。
+- **L532** `  PtrArrayMxf4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxf4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 PtrArrayMxf4TmaWarpSpecialized2SmSm100。
+- **L533** `  PtrArrayMxf8f6f4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxf8f6f4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 PtrArrayMxf8f6f4TmaWarpSpecialized1SmSm100。
+- **L534** `  PtrArrayMxf8f6f4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxf8f6f4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 PtrArrayMxf8f6f4TmaWarpSpecialized2SmSm100。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** `  MixedTmaCpAsyncWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to MixedTmaCpAsyncWarpSpecialized1SmSm100. **CN:** 将一个值赋给 MixedTmaCpAsyncWarpSpecialized1SmSm100。
+- **L537** `  MixedTmaCpAsyncWarpSpecialized1SmBlockScaledSm100 = enum_auto()` — **EN:** Assigns a value to MixedTmaCpAsyncWarpSpecialized1SmBlockScaledSm100. **CN:** 将一个值赋给 MixedTmaCpAsyncWarpSpecialized1SmBlockScaledSm100。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** `  SparseTmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseTmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 SparseTmaWarpSpecialized1SmSm100。
+- **L540** `  SparseTmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseTmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 SparseTmaWarpSpecialized2SmSm100。
+- **L541** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L542** `  BlockScaledTmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to BlockScaledTmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 BlockScaledTmaWarpSpecialized1SmSm100。
+- **L543** `  BlockScaledTmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to BlockScaledTmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 BlockScaledTmaWarpSpecialized2SmSm100。
+- **L544** `  Mxf8f6f4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to Mxf8f6f4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 Mxf8f6f4TmaWarpSpecialized1SmSm100。
+- **L545** `  Mxf8f6f4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to Mxf8f6f4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 Mxf8f6f4TmaWarpSpecialized2SmSm100。
+- **L546** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L547** `  BlockwiseTmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to BlockwiseTmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 BlockwiseTmaWarpSpecialized1SmSm100。
+- **L548** `  BlockwiseTmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to BlockwiseTmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 BlockwiseTmaWarpSpecialized2SmSm100。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** `  PtrArrayBlockwiseTmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayBlockwiseTmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 PtrArrayBlockwiseTmaWarpSpecialized1SmSm100。
+- **L551** `  PtrArrayBlockwiseTmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to PtrArrayBlockwiseTmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 PtrArrayBlockwiseTmaWarpSpecialized2SmSm100。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L554** `  Mxf4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to Mxf4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 Mxf4TmaWarpSpecialized1SmSm100。
+- **L555** `  Mxf4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to Mxf4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 Mxf4TmaWarpSpecialized2SmSm100。
+- **L556** `  Nvf4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to Nvf4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 Nvf4TmaWarpSpecialized1SmSm100。
+- **L557** `  Nvf4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to Nvf4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 Nvf4TmaWarpSpecialized2SmSm100。
+- **L558** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L559** `  SparseMxf4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseMxf4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 SparseMxf4TmaWarpSpecialized1SmSm100。
+- **L560** `  SparseMxf4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseMxf4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 SparseMxf4TmaWarpSpecialized2SmSm100。
+- **L561** `  SparseNvf4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseNvf4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 SparseNvf4TmaWarpSpecialized1SmSm100。
+- **L562** `  SparseNvf4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseNvf4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 SparseNvf4TmaWarpSpecialized2SmSm100。
+- **L563** `  SparseMxf8f6f4TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseMxf8f6f4TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 SparseMxf8f6f4TmaWarpSpecialized1SmSm100。
+- **L564** `  SparseMxf8f6f4TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to SparseMxf8f6f4TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 SparseMxf8f6f4TmaWarpSpecialized2SmSm100。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `  InterleavedComplexTF32TmaWarpSpecialized1SmSm100 = enum_auto()` — **EN:** Assigns a value to InterleavedComplexTF32TmaWarpSpecialized1SmSm100. **CN:** 将一个值赋给 InterleavedComplexTF32TmaWarpSpecialized1SmSm100。
+- **L567** `  InterleavedComplexTF32TmaWarpSpecialized2SmSm100 = enum_auto()` — **EN:** Assigns a value to InterleavedComplexTF32TmaWarpSpecialized2SmSm100. **CN:** 将一个值赋给 InterleavedComplexTF32TmaWarpSpecialized2SmSm100。
+- **L568** `  TmaWarpSpecialized1SmFastFP32Sm100 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized1SmFastFP32Sm100. **CN:** 将一个值赋给 TmaWarpSpecialized1SmFastFP32Sm100。
+- **L569** `  TmaWarpSpecialized2SmFastFP32Sm100 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized2SmFastFP32Sm100. **CN:** 将一个值赋给 TmaWarpSpecialized2SmFastFP32Sm100。
+- **L570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L571** `  # FP4 Ultra` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L572** `  MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103 = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103。
+- **L573** `  MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103 = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103。
+- **L574** `  MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103 = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103。
+- **L575** `  MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103 = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** `  MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch。
+- **L578** `  MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch。
+- **L579** `  MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch。
+- **L580** `  MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch。
+- **L581** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L582** `  MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch。
+- **L583** `  MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch。
+- **L584** `  MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch。
+- **L585** `  MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch. **CN:** 将一个值赋给 MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch。
+- **L586** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L587** `  PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103。
+- **L588** `  PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103。
+- **L589** `  PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103。
+- **L590** `  PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103 = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103。
+- **L591** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L592** `  PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisableP.... **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisableP...。
+- **L593** `  PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisableP.... **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisableP...。
+- **L594** `  PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisableP.... **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisableP...。
+- **L595** `  PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisableP.... **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisableP...。
+- **L596** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L597** `  PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch。
+- **L598** `  PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch。
+- **L599** `  PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch。
+- **L600** `  PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch = enum_auto()` — **EN:** Assigns a value to PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch. **CN:** 将一个值赋给 PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** `  Mxf8f6f4TmaWarpSpecializedCooperativeSm120 = enum_auto()` — **EN:** Assigns a value to Mxf8f6f4TmaWarpSpecializedCooperativeSm120. **CN:** 将一个值赋给 Mxf8f6f4TmaWarpSpecializedCooperativeSm120。
+- **L603** `  Mxf8f6f4TmaWarpSpecializedPingpongSm120 = enum_auto()` — **EN:** Assigns a value to Mxf8f6f4TmaWarpSpecializedPingpongSm120. **CN:** 将一个值赋给 Mxf8f6f4TmaWarpSpecializedPingpongSm120。
+- **L604** `  Nvf4TmaWarpSpecializedCooperativeSm120 = enum_auto()` — **EN:** Assigns a value to Nvf4TmaWarpSpecializedCooperativeSm120. **CN:** 将一个值赋给 Nvf4TmaWarpSpecializedCooperativeSm120。
+- **L605** `  Nvf4TmaWarpSpecializedPingpongSm120 = enum_auto()` — **EN:** Assigns a value to Nvf4TmaWarpSpecializedPingpongSm120. **CN:** 将一个值赋给 Nvf4TmaWarpSpecializedPingpongSm120。
+- **L606** `  Mxf4TmaWarpSpecializedCooperativeSm120 = enum_auto()` — **EN:** Assigns a value to Mxf4TmaWarpSpecializedCooperativeSm120. **CN:** 将一个值赋给 Mxf4TmaWarpSpecializedCooperativeSm120。
+- **L607** `  Mxf4TmaWarpSpecializedPingpongSm120 = enum_auto()` — **EN:** Assigns a value to Mxf4TmaWarpSpecializedPingpongSm120. **CN:** 将一个值赋给 Mxf4TmaWarpSpecializedPingpongSm120。
+- **L608** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L609** `  SparseMxf8f6f4TmaWarpSpecializedSm120 = enum_auto()` — **EN:** Assigns a value to SparseMxf8f6f4TmaWarpSpecializedSm120. **CN:** 将一个值赋给 SparseMxf8f6f4TmaWarpSpecializedSm120。
+- **L610** `  SparseMxf8f6f4TmaWarpSpecializedAcc2x4Sm120 = enum_auto()  ` — **EN:** Assigns a value to SparseMxf8f6f4TmaWarpSpecializedAcc2x4Sm120. **CN:** 将一个值赋给 SparseMxf8f6f4TmaWarpSpecializedAcc2x4Sm120。
+- **L611** `  SparseNvf4TmaWarpSpecializedSm120 = enum_auto()` — **EN:** Assigns a value to SparseNvf4TmaWarpSpecializedSm120. **CN:** 将一个值赋给 SparseNvf4TmaWarpSpecializedSm120。
+- **L612** `  SparseMxf4TmaWarpSpecializedSm120 = enum_auto()` — **EN:** Assigns a value to SparseMxf4TmaWarpSpecializedSm120. **CN:** 将一个值赋给 SparseMxf4TmaWarpSpecializedSm120。
+- **L613** `  F8f6f4SparseTmaWarpSpecializedCooperativeSm120 = enum_auto()` — **EN:** Assigns a value to F8f6f4SparseTmaWarpSpecializedCooperativeSm120. **CN:** 将一个值赋给 F8f6f4SparseTmaWarpSpecializedCooperativeSm120。
+- **L614** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L615** `  BlockwiseTmaWarpSpecializedCooperativeSm120 = enum_auto()` — **EN:** Assigns a value to BlockwiseTmaWarpSpecializedCooperativeSm120. **CN:** 将一个值赋给 BlockwiseTmaWarpSpecializedCooperativeSm120。
+- **L616** `  BlockwiseTmaWarpSpecializedPingpongSm120 = enum_auto()` — **EN:** Assigns a value to BlockwiseTmaWarpSpecializedPingpongSm120. **CN:** 将一个值赋给 BlockwiseTmaWarpSpecializedPingpongSm120。
+- **L617** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L618** `  PtrArrayTmaWarpSpecializedCooperativeBlockScaledSm120 = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedCooperativeBlockScaledSm120. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedCooperativeBlockScaledSm120。
+- **L619** `  PtrArrayTmaWarpSpecializedPingpongBlockScaledSm120 = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedPingpongBlockScaledSm120. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedPingpongBlockScaledSm120。
+- **L620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L621** `KernelScheduleTag = {` — **EN:** Assigns a value to KernelScheduleTag. **CN:** 将一个值赋给 KernelScheduleTag。
+- **L622** `  KernelScheduleType.ScheduleAuto: 'cutlass::gemm::collective::KernelScheduleAuto',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L623** `  KernelScheduleType.Multistage: 'cutlass::gemm::KernelMultistage',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L624** `  KernelScheduleType.CpAsyncWarpSpecialized: 'cutlass::gemm::KernelCpAsyncWarpSpecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L625** `  KernelScheduleType.CpAsyncWarpSpecializedPingpong: 'cutlass::gemm::KernelCpAsyncWarpSpecializedPingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `  KernelScheduleType.CpAsyncWarpSpecializedCooperative: 'cutlass::gemm::KernelCpAsyncWarpSpecializedCooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `  KernelScheduleType.Tma: 'cutlass::gemm::KernelTma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `  KernelScheduleType.TmaWarpSpecialized: 'cutlass::gemm::KernelTmaWarpSpecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `  KernelScheduleType.TmaWarpSpecializedPingpong: 'cutlass::gemm::KernelTmaWarpSpecializedPingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `  KernelScheduleType.TmaWarpSpecializedCooperative: 'cutlass::gemm::KernelTmaWarpSpecializedCooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** `  KernelScheduleType.TmaWarpSpecializedFP8FastAccum: 'cutlass::gemm::KernelTmaWarpSpecializedFP8FastAccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L632** `  KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum: 'cutlass::gemm::KernelTmaWarpSpecializedCooperativeFP8FastAccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L633** `  KernelScheduleType.TmaWarpSpecializedPingpongFP8FastAccum: 'cutlass::gemm::KernelTmaWarpSpecializedPingpongFP8FastAccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `  KernelScheduleType.ImplicitTmaWarpSpecializedSm90: 'cutlass::conv::KernelImplicitTmaWarpSpecializedSm90',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L636** `  KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative: 'cutlass::gemm::KernelTmaWarpSpecializedCooperativeFP8Blockwise',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `  KernelScheduleType.BlockwiseTmaWarpSpecializedPingpong: 'cutlass::gemm::KernelTmaWarpSpecializedPingpongFP8Blockwise',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L639** `  KernelScheduleType.TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L640** `  KernelScheduleType.TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L641** `  KernelScheduleType.WarpSpecialized1SmSm100: 'cutlass::gemm::KernelWarpSpecialized1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L642** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L643** `  KernelScheduleType.ImplicitTmaWarpSpecialized1SmSm100: 'cutlass::conv::KernelImplicitTmaWarpSpecialized1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L644** `  KernelScheduleType.ImplicitTmaWarpSpecialized2SmSm100: 'cutlass::conv::KernelImplicitTmaWarpSpecialized2SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L646** `  KernelScheduleType.PtrArrayTmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L647** `  KernelScheduleType.PtrArrayTmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L648** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L649** `  KernelScheduleType.SparseTmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** `  KernelScheduleType.SparseTmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized2SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L652** `  KernelScheduleType.BlockScaledTmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L653** `  KernelScheduleType.BlockScaledTmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L654** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmMxf8f6f4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L655** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmMxf8f6f4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L657** `  KernelScheduleType.BlockwiseTmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecializedBlockwise1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L658** `  KernelScheduleType.BlockwiseTmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecializedBlockwise2SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L660** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedBlockwise1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L661** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedBlockwise2SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `  KernelScheduleType.MixedTmaCpAsyncWarpSpecialized1SmSm100: 'cutlass::gemm::KernelMixedTmaCpAsyncWarpSpecialized1SmSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L663** `  KernelScheduleType.MixedTmaCpAsyncWarpSpecialized1SmBlockScaledSm100: 'cutlass::gemm::KernelMixedTmaCpAsyncWarpSpecialized1SmBlockScaledSm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L664** `  KernelScheduleType.Mxf4TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmMxf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** `  KernelScheduleType.Mxf4TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmMxf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L666** `  KernelScheduleType.Nvf4TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmNvf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L667** `  KernelScheduleType.Nvf4TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmNvf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L668** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L669** `  KernelScheduleType.SparseMxf4TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized1SmMxf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L670** `  KernelScheduleType.SparseMxf4TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized2SmMxf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** `  KernelScheduleType.SparseNvf4TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized1SmNvf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `  KernelScheduleType.SparseNvf4TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized2SmNvf4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized1SmMxf8f6f4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelSparseTmaWarpSpecialized2SmMxf8f6f4Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L675** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L676** `  # FP4 Ultra` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L677** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs16Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs16Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L679** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs32Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L680** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs32Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L682** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs16Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs16Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L684** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs32Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs32Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs16Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs16Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L689** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs32Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch: 'cutlass::gemm::KernelTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs32Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `  KernelScheduleType.InterleavedComplexTF32TmaWarpSpecialized1SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmInterleavedComplexTF32Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `  KernelScheduleType.InterleavedComplexTF32TmaWarpSpecialized2SmSm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmInterleavedComplexTF32Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** `  KernelScheduleType.TmaWarpSpecialized1SmFastFP32Sm100: 'cutlass::gemm::KernelTmaWarpSpecialized1SmFastFP32Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L694** `  KernelScheduleType.TmaWarpSpecialized2SmFastFP32Sm100: 'cutlass::gemm::KernelTmaWarpSpecialized2SmFastFP32Sm100',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L695** `  KernelScheduleType.PtrArrayTmaWarpSpecializedCooperative: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedCooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L696** `  KernelScheduleType.PtrArrayTmaWarpSpecializedCooperativeFP8FastAccum: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedCooperativeFP8FastAccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** `  KernelScheduleType.PtrArrayTmaWarpSpecializedPingpong: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedPingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L698** `  KernelScheduleType.PtrArrayTmaWarpSpecializedPingpongFP8FastAccum: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedPingpongFP8FastAccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L699** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L700** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecializedCooperative: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedCooperativeFP8Blockwise',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L701** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecializedPingpong: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedPingpongFP8Blockwise',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L702** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L703** `  KernelScheduleType.PtrArrayTmaWarpSpecialized1SmBlockScaledSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledSm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** `  KernelScheduleType.PtrArrayTmaWarpSpecialized2SmBlockScaledSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledSm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L705** `  KernelScheduleType.PtrArrayNvf4TmaWarpSpecialized1SmSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmNvf4Sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L706** `  KernelScheduleType.PtrArrayNvf4TmaWarpSpecialized2SmSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmNvf4Sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L707** `  KernelScheduleType.PtrArrayMxf4TmaWarpSpecialized1SmSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmMxf4Sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `  KernelScheduleType.PtrArrayMxf4TmaWarpSpecialized2SmSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmMxf4Sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** `  KernelScheduleType.PtrArrayMxf8f6f4TmaWarpSpecialized1SmSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmMxf8f6f4Sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L710** `  KernelScheduleType.PtrArrayMxf8f6f4TmaWarpSpecialized2SmSm100: "cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmMxf8f6f4Sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs16Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L713** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs16Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs32Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L715** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs32Sm103',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L716** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs16Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L717** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs16Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L718** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs32Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L719** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs32Sm103TmaPrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L720** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs16Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L721** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs16Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L722** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized1SmBlockScaledMxNvf4UltraVs32Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L723** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecialized2SmBlockScaledMxNvf4UltraVs32Sm103DisablePrefetch',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L724** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L725** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecializedCooperativeSm120: 'cutlass::gemm::KernelTmaWarpSpecializedMxf8f6f4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L726** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecializedPingpongSm120: 'cutlass::gemm::KernelTmaWarpSpecializedPingpongMxf8f6f4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `  KernelScheduleType.Nvf4TmaWarpSpecializedCooperativeSm120: 'cutlass::gemm::KernelTmaWarpSpecializedNvf4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** `  KernelScheduleType.Nvf4TmaWarpSpecializedPingpongSm120: 'cutlass::gemm::KernelTmaWarpSpecializedPingpongNvf4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `  KernelScheduleType.Mxf4TmaWarpSpecializedCooperativeSm120: 'cutlass::gemm::KernelTmaWarpSpecializedMxf4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** `  KernelScheduleType.Mxf4TmaWarpSpecializedPingpongSm120: 'cutlass::gemm::KernelTmaWarpSpecializedPingpongMxf4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L731** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L732** `  KernelScheduleType.F8f6f4SparseTmaWarpSpecializedCooperativeSm120: 'cutlass::gemm::KernelScheduleSparseF8f6f4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L733** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L734** `  KernelScheduleType.BlockwiseTmaWarpSpecializedCooperativeSm120: 'cutlass::gemm::KernelTmaWarpSpecializedBlockwiseCooperativeSm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L735** `  KernelScheduleType.BlockwiseTmaWarpSpecializedPingpongSm120: 'cutlass::gemm::KernelTmaWarpSpecializedBlockwisePingpongSm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L736** `  KernelScheduleType.PtrArrayTmaWarpSpecializedCooperativeBlockScaledSm120: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedCooperativeBlockScaledSm120<3>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L737** `  KernelScheduleType.PtrArrayTmaWarpSpecializedPingpongBlockScaledSm120: 'cutlass::gemm::KernelPtrArrayTmaWarpSpecializedPingpongBlockScaledSm120<3>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L738** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecializedSm120: 'cutlass::gemm::KernelSparseTmaWarpSpecializedMxf8f6f4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L739** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecializedAcc2x4Sm120: 'cutlass::gemm::KernelSparseTmaWarpSpecializedMxf8f6f4Acc2x4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L740** `  KernelScheduleType.SparseNvf4TmaWarpSpecializedSm120: 'cutlass::gemm::KernelSparseTmaWarpSpecializedNvf4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L741** `  KernelScheduleType.SparseMxf4TmaWarpSpecializedSm120: 'cutlass::gemm::KernelSparseTmaWarpSpecializedMxf4Sm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L742** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L743** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L744** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L745** `KernelScheduleSuffixes = {` — **EN:** Assigns a value to KernelScheduleSuffixes. **CN:** 将一个值赋给 KernelScheduleSuffixes。
+- **L746** `  KernelScheduleType.ScheduleAuto: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L747** `  KernelScheduleType.Multistage: '_cpasync',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** `  KernelScheduleType.CpAsyncWarpSpecialized: '_cpasync_warpspecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L749** `  KernelScheduleType.CpAsyncWarpSpecializedPingpong: '_cpasync_warpspecialized_pingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L750** `  KernelScheduleType.CpAsyncWarpSpecializedCooperative: '_cpasync_warpspecialized_cooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** `  KernelScheduleType.Tma: '_unspecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L752** `  KernelScheduleType.TmaWarpSpecialized: '_warpspecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L753** `  KernelScheduleType.TmaWarpSpecializedPingpong: '_warpspecialized_pingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `  KernelScheduleType.TmaWarpSpecializedCooperative: '_warpspecialized_cooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `  KernelScheduleType.TmaWarpSpecializedFP8FastAccum: '_warpspecialized_fp8_fastaccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** `  KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum: '_warpspecialized_cooperative_fp8_fastaccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L757** `  KernelScheduleType.TmaWarpSpecializedPingpongFP8FastAccum: '_warpspecialized_pingpong_fp8_fastaccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** `  KernelScheduleType.ImplicitTmaWarpSpecializedSm90: '_warpspecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L760** `  KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative: '_warpspecialized_cooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L761** `  KernelScheduleType.BlockwiseTmaWarpSpecializedPingpong: '_warpspecialized_pingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L762** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L763** `  KernelScheduleType.TmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L764** `  KernelScheduleType.TmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L765** `  KernelScheduleType.WarpSpecialized1SmSm100: '_cpasync_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L766** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L767** `  KernelScheduleType.ImplicitTmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L768** `  KernelScheduleType.ImplicitTmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L769** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L770** `  KernelScheduleType.PtrArrayTmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `  KernelScheduleType.PtrArrayTmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L772** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L773** `  KernelScheduleType.SparseTmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `  KernelScheduleType.SparseTmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L775** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L776** `  KernelScheduleType.BlockScaledTmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L777** `  KernelScheduleType.BlockScaledTmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecialized1SmSm100: '_q_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L779** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecialized2SmSm100: '_q_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L780** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L781** `  KernelScheduleType.BlockwiseTmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L782** `  KernelScheduleType.BlockwiseTmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L783** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L784** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L785** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L786** `  KernelScheduleType.MixedTmaCpAsyncWarpSpecialized1SmSm100: '_mixed_cpasync_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L787** `  KernelScheduleType.MixedTmaCpAsyncWarpSpecialized1SmBlockScaledSm100: '_mixed_cpasync_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L788** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L789** `  KernelScheduleType.Mxf4TmaWarpSpecialized1SmSm100: '_o_vs32_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `  KernelScheduleType.Mxf4TmaWarpSpecialized2SmSm100: '_o_vs32_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `  KernelScheduleType.Nvf4TmaWarpSpecialized1SmSm100: '_o_vs16_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `  KernelScheduleType.Nvf4TmaWarpSpecialized2SmSm100: '_o_vs16_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L793** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L794** `  KernelScheduleType.SparseMxf4TmaWarpSpecialized1SmSm100: '_o_vs32_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L795** `  KernelScheduleType.SparseMxf4TmaWarpSpecialized2SmSm100: '_o_vs32_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L796** `  KernelScheduleType.SparseNvf4TmaWarpSpecialized1SmSm100: '_o_vs16_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L797** `  KernelScheduleType.SparseNvf4TmaWarpSpecialized2SmSm100: '_o_vs16_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L798** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L799** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecialized1SmSm100: '_q_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L800** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecialized2SmSm100: '_q_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L801** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L802** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103: '_o_vs16_ultra_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L803** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103: '_o_vs16_ultra_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L804** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103: '_o_vs32_ultra_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L805** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103: '_o_vs32_ultra_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L806** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L807** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch: '_o_vs16_ultra_1sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L808** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch: '_o_vs16_ultra_2sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch: '_o_vs32_ultra_1sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch: '_o_vs32_ultra_2sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L811** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L812** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch: '_o_vs16_ultra_1sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L813** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch: '_o_vs16_ultra_2sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L814** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch: '_o_vs32_ultra_1sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L815** `  KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch: '_o_vs32_ultra_2sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** `  KernelScheduleType.InterleavedComplexTF32TmaWarpSpecialized1SmSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `  KernelScheduleType.InterleavedComplexTF32TmaWarpSpecialized2SmSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L818** `  KernelScheduleType.TmaWarpSpecialized1SmFastFP32Sm100: '_FastF32_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L819** `  KernelScheduleType.TmaWarpSpecialized2SmFastFP32Sm100: '_FastF32_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L820** `  KernelScheduleType.PtrArrayTmaWarpSpecializedCooperative: '_warpspecialized_cooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L821** `  KernelScheduleType.PtrArrayTmaWarpSpecializedCooperativeFP8FastAccum: '_warpspecialized_cooperative_fp8_fastaccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L822** `  KernelScheduleType.PtrArrayTmaWarpSpecializedPingpong: '_warpspecialized_pingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L823** `  KernelScheduleType.PtrArrayTmaWarpSpecializedPingpongFP8FastAccum: '_warpspecialized_pingpong_fp8_fastaccum',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L824** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L825** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecializedCooperative: '_warpspecialized_cooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L826** `  KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecializedPingpong: '_warpspecialized_pingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `  KernelScheduleType.PtrArrayTmaWarpSpecialized1SmBlockScaledSm100: '_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L829** `  KernelScheduleType.PtrArrayTmaWarpSpecialized2SmBlockScaledSm100: '_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L830** `  KernelScheduleType.PtrArrayNvf4TmaWarpSpecialized1SmSm100: '_o_vs16_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L831** `  KernelScheduleType.PtrArrayNvf4TmaWarpSpecialized2SmSm100: '_o_vs16_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L832** `  KernelScheduleType.PtrArrayMxf4TmaWarpSpecialized1SmSm100: '_o_vs32_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L833** `  KernelScheduleType.PtrArrayMxf4TmaWarpSpecialized2SmSm100: '_o_vs32_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L834** `  KernelScheduleType.PtrArrayMxf8f6f4TmaWarpSpecialized1SmSm100: '_o_vs32_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L835** `  KernelScheduleType.PtrArrayMxf8f6f4TmaWarpSpecialized2SmSm100: '_o_vs32_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L836** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L837** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103: '_o_vs16_ultra_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L838** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103: '_o_vs16_ultra_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L839** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103: '_o_vs32_ultra_1sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L840** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103: '_o_vs32_ultra_2sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L841** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L842** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch: '_o_vs16_ultra_1sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch: '_o_vs16_ultra_2sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L844** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch: '_o_vs32_ultra_1sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L845** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch: '_o_vs32_ultra_2sm_nopf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L846** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L847** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch: '_o_vs16_ultra_1sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L848** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch: '_o_vs16_ultra_2sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L849** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch: '_o_vs32_ultra_1sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L850** `  KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch: '_o_vs32_ultra_2sm_tmapf',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L851** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L852** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecializedCooperativeSm120: '_cooperative_q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L853** `  KernelScheduleType.Mxf8f6f4TmaWarpSpecializedPingpongSm120: '_pingpong_q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L854** `  KernelScheduleType.Nvf4TmaWarpSpecializedCooperativeSm120: '_cooperative_o_vs16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L855** `  KernelScheduleType.Nvf4TmaWarpSpecializedPingpongSm120: '_pingpong_o_vs16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L856** `  KernelScheduleType.Mxf4TmaWarpSpecializedCooperativeSm120: '_cooperative_o_vs32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L857** `  KernelScheduleType.Mxf4TmaWarpSpecializedPingpongSm120: '_pingpong_o_vs32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L858** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L859** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecializedSm120: '_q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L860** `  KernelScheduleType.SparseMxf8f6f4TmaWarpSpecializedAcc2x4Sm120: '_acc2x4_q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L861** `  KernelScheduleType.SparseNvf4TmaWarpSpecializedSm120: '_o_vs16',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L862** `  KernelScheduleType.SparseMxf4TmaWarpSpecializedSm120: '_o_vs32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L863** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L864** `  KernelScheduleType.F8f6f4SparseTmaWarpSpecializedCooperativeSm120: '_q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L865** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L866** `  KernelScheduleType.BlockwiseTmaWarpSpecializedCooperativeSm120: '_cooperative_q',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L867** `  KernelScheduleType.BlockwiseTmaWarpSpecializedPingpongSm120: '_pingpong_q'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L868** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L869** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L870** `class EpilogueScheduleType(enum.Enum):` — **EN:** Defines class `EpilogueScheduleType` with bases enum.Enum. **CN:** 定义类 `EpilogueScheduleType`，其基类为 enum.Enum。
+- **L871** `  ScheduleAuto = enum_auto()` — **EN:** Assigns a value to ScheduleAuto. **CN:** 将一个值赋给 ScheduleAuto。
+- **L872** `  EpilogueTransposed = enum_auto()` — **EN:** Assigns a value to EpilogueTransposed. **CN:** 将一个值赋给 EpilogueTransposed。
+- **L873** `  NoSmemWarpSpecialized = enum_auto()` — **EN:** Assigns a value to NoSmemWarpSpecialized. **CN:** 将一个值赋给 NoSmemWarpSpecialized。
+- **L874** `  PtrArrayNoSmemWarpSpecialized = enum_auto()` — **EN:** Assigns a value to PtrArrayNoSmemWarpSpecialized. **CN:** 将一个值赋给 PtrArrayNoSmemWarpSpecialized。
+- **L875** `  NoSmemWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to NoSmemWarpSpecialized1Sm. **CN:** 将一个值赋给 NoSmemWarpSpecialized1Sm。
+- **L876** `  NoSmemWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to NoSmemWarpSpecialized2Sm. **CN:** 将一个值赋给 NoSmemWarpSpecialized2Sm。
+- **L877** `  FastF32NoSmemWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to FastF32NoSmemWarpSpecialized1Sm. **CN:** 将一个值赋给 FastF32NoSmemWarpSpecialized1Sm。
+- **L878** `  FastF32NoSmemWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to FastF32NoSmemWarpSpecialized2Sm. **CN:** 将一个值赋给 FastF32NoSmemWarpSpecialized2Sm。
+- **L879** `  BlockwiseNoSmemWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to BlockwiseNoSmemWarpSpecialized1Sm. **CN:** 将一个值赋给 BlockwiseNoSmemWarpSpecialized1Sm。
+- **L880** `  BlockwiseNoSmemWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to BlockwiseNoSmemWarpSpecialized2Sm. **CN:** 将一个值赋给 BlockwiseNoSmemWarpSpecialized2Sm。
+- **L881** `  PtrArrayNoSmemWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayNoSmemWarpSpecialized1Sm. **CN:** 将一个值赋给 PtrArrayNoSmemWarpSpecialized1Sm。
+- **L882** `  PtrArrayNoSmemWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayNoSmemWarpSpecialized2Sm. **CN:** 将一个值赋给 PtrArrayNoSmemWarpSpecialized2Sm。
+- **L883** `  PtrArrayFastF32NoSmemWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayFastF32NoSmemWarpSpecialized1Sm. **CN:** 将一个值赋给 PtrArrayFastF32NoSmemWarpSpecialized1Sm。
+- **L884** `  PtrArrayFastF32NoSmemWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayFastF32NoSmemWarpSpecialized2Sm. **CN:** 将一个值赋给 PtrArrayFastF32NoSmemWarpSpecialized2Sm。
+- **L885** `  PtrArrayBlockwiseNoSmemWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayBlockwiseNoSmemWarpSpecialized1Sm. **CN:** 将一个值赋给 PtrArrayBlockwiseNoSmemWarpSpecialized1Sm。
+- **L886** `  PtrArrayBlockwiseNoSmemWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayBlockwiseNoSmemWarpSpecialized2Sm. **CN:** 将一个值赋给 PtrArrayBlockwiseNoSmemWarpSpecialized2Sm。
+- **L887** `  TmaWarpSpecialized = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized. **CN:** 将一个值赋给 TmaWarpSpecialized。
+- **L888** `  TmaWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecializedCooperative. **CN:** 将一个值赋给 TmaWarpSpecializedCooperative。
+- **L889** `  TmaWarpSpecialized1Sm = enum_auto() ` — **EN:** Assigns a value to TmaWarpSpecialized1Sm. **CN:** 将一个值赋给 TmaWarpSpecialized1Sm。
+- **L890** `  TmaWarpSpecialized2Sm = enum_auto() ` — **EN:** Assigns a value to TmaWarpSpecialized2Sm. **CN:** 将一个值赋给 TmaWarpSpecialized2Sm。
+- **L891** `  PtrArrayTmaWarpSpecialized1Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecialized1Sm. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecialized1Sm。
+- **L892** `  PtrArrayTmaWarpSpecialized2Sm = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecialized2Sm. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecialized2Sm。
+- **L893** `  PtrArrayTmaWarpSpecializedPingpong = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedPingpong. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedPingpong。
+- **L894** `  PtrArrayTmaWarpSpecializedCooperative = enum_auto()` — **EN:** Assigns a value to PtrArrayTmaWarpSpecializedCooperative. **CN:** 将一个值赋给 PtrArrayTmaWarpSpecializedCooperative。
+- **L895** `  TmaWarpSpecialized1SmNvf4 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized1SmNvf4. **CN:** 将一个值赋给 TmaWarpSpecialized1SmNvf4。
+- **L896** `  TmaWarpSpecialized2SmNvf4 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized2SmNvf4. **CN:** 将一个值赋给 TmaWarpSpecialized2SmNvf4。
+- **L897** `  TmaWarpSpecialized1SmMxf4 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized1SmMxf4. **CN:** 将一个值赋给 TmaWarpSpecialized1SmMxf4。
+- **L898** `  TmaWarpSpecialized2SmMxf4 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized2SmMxf4. **CN:** 将一个值赋给 TmaWarpSpecialized2SmMxf4。
+- **L899** `  TmaWarpSpecialized1SmMxf8f6f4 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized1SmMxf8f6f4. **CN:** 将一个值赋给 TmaWarpSpecialized1SmMxf8f6f4。
+- **L900** `  TmaWarpSpecialized2SmMxf8f6f4 = enum_auto()` — **EN:** Assigns a value to TmaWarpSpecialized2SmMxf8f6f4. **CN:** 将一个值赋给 TmaWarpSpecialized2SmMxf8f6f4。
+- **L901** `  SparseTmaWarpSpecializedCooperativeSm120 = enum_auto()` — **EN:** Assigns a value to SparseTmaWarpSpecializedCooperativeSm120. **CN:** 将一个值赋给 SparseTmaWarpSpecializedCooperativeSm120。
+- **L902** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L903** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L904** `EpilogueScheduleTag = {` — **EN:** Assigns a value to EpilogueScheduleTag. **CN:** 将一个值赋给 EpilogueScheduleTag。
+- **L905** `  EpilogueScheduleType.ScheduleAuto: 'cutlass::epilogue::collective::EpilogueScheduleAuto',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L906** `  EpilogueScheduleType.EpilogueTransposed: 'cutlass::gemm::EpilogueTransposed',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L907** `  EpilogueScheduleType.NoSmemWarpSpecialized: 'cutlass::epilogue::NoSmemWarpSpecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L908** `  EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized: 'cutlass::epilogue::PtrArrayNoSmemWarpSpecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L909** `  EpilogueScheduleType.NoSmemWarpSpecialized1Sm: 'cutlass::epilogue::NoSmemWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L910** `  EpilogueScheduleType.NoSmemWarpSpecialized2Sm: 'cutlass::epilogue::NoSmemWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L911** `  EpilogueScheduleType.FastF32NoSmemWarpSpecialized1Sm: 'cutlass::epilogue::FastF32NoSmemWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L912** `  EpilogueScheduleType.FastF32NoSmemWarpSpecialized2Sm: 'cutlass::epilogue::FastF32NoSmemWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L913** `  EpilogueScheduleType.BlockwiseNoSmemWarpSpecialized1Sm: 'cutlass::epilogue::BlockwiseNoSmemWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L914** `  EpilogueScheduleType.BlockwiseNoSmemWarpSpecialized2Sm: 'cutlass::epilogue::BlockwiseNoSmemWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L915** `  EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized1Sm: 'cutlass::epilogue::PtrArrayNoSmemWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L916** `  EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized2Sm: 'cutlass::epilogue::PtrArrayNoSmemWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L917** `  EpilogueScheduleType.PtrArrayFastF32NoSmemWarpSpecialized1Sm: 'cutlass::epilogue::PtrArrayFastF32NoSmemWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L918** `  EpilogueScheduleType.PtrArrayFastF32NoSmemWarpSpecialized2Sm: 'cutlass::epilogue::PtrArrayFastF32NoSmemWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L919** `  EpilogueScheduleType.PtrArrayBlockwiseNoSmemWarpSpecialized1Sm: 'cutlass::epilogue::PtrArrayBlockwiseNoSmemWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L920** `  EpilogueScheduleType.PtrArrayBlockwiseNoSmemWarpSpecialized2Sm: 'cutlass::epilogue::PtrArrayBlockwiseNoSmemWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L921** `  EpilogueScheduleType.TmaWarpSpecialized: 'cutlass::epilogue::TmaWarpSpecialized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L922** `  EpilogueScheduleType.TmaWarpSpecializedCooperative: 'cutlass::epilogue::TmaWarpSpecializedCooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L923** `  EpilogueScheduleType.TmaWarpSpecialized1Sm: 'cutlass::epilogue::TmaWarpSpecialized1Sm', ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L924** `  EpilogueScheduleType.TmaWarpSpecialized2Sm: 'cutlass::epilogue::TmaWarpSpecialized2Sm', ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L925** `  EpilogueScheduleType.PtrArrayTmaWarpSpecialized1Sm: 'cutlass::epilogue::PtrArrayTmaWarpSpecialized1Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L926** `  EpilogueScheduleType.PtrArrayTmaWarpSpecialized2Sm: 'cutlass::epilogue::PtrArrayTmaWarpSpecialized2Sm',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L927** `  EpilogueScheduleType.PtrArrayTmaWarpSpecializedCooperative: 'cutlass::epilogue::PtrArrayTmaWarpSpecializedCooperative',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L928** `  EpilogueScheduleType.PtrArrayTmaWarpSpecializedPingpong: 'cutlass::epilogue::PtrArrayTmaWarpSpecializedPingpong',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L929** `  EpilogueScheduleType.TmaWarpSpecialized1SmNvf4: 'cutlass::epilogue::TmaWarpSpecialized1SmNvf4',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L930** `  EpilogueScheduleType.TmaWarpSpecialized2SmNvf4: 'cutlass::epilogue::TmaWarpSpecialized2SmNvf4',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L931** `  EpilogueScheduleType.TmaWarpSpecialized1SmMxf4: 'cutlass::epilogue::TmaWarpSpecialized1SmMxf4',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L932** `  EpilogueScheduleType.TmaWarpSpecialized2SmMxf4: 'cutlass::epilogue::TmaWarpSpecialized2SmMxf4',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L933** `  EpilogueScheduleType.TmaWarpSpecialized1SmMxf8f6f4: 'cutlass::epilogue::TmaWarpSpecialized1SmMxf8f6f4',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L934** `  EpilogueScheduleType.TmaWarpSpecialized2SmMxf8f6f4: 'cutlass::epilogue::TmaWarpSpecialized2SmMxf8f6f4',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L935** `  EpilogueScheduleType.SparseTmaWarpSpecializedCooperativeSm120: 'cutlass::epilogue::SparseTmaWarpSpecializedCooperativeSm120',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L936** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L937** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L938** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L939** `EpilogueScheduleSuffixes = {` — **EN:** Assigns a value to EpilogueScheduleSuffixes. **CN:** 将一个值赋给 EpilogueScheduleSuffixes。
+- **L940** `  EpilogueScheduleType.ScheduleAuto: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L941** `  EpilogueScheduleType.EpilogueTransposed: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L942** `  EpilogueScheduleType.NoSmemWarpSpecialized: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L943** `  EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L944** `  EpilogueScheduleType.NoSmemWarpSpecialized1Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L945** `  EpilogueScheduleType.NoSmemWarpSpecialized2Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L946** `  EpilogueScheduleType.FastF32NoSmemWarpSpecialized1Sm: '_epi_nosmem_fastf32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L947** `  EpilogueScheduleType.FastF32NoSmemWarpSpecialized2Sm: '_epi_nosmem_fastf32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L948** `  EpilogueScheduleType.BlockwiseNoSmemWarpSpecialized1Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L949** `  EpilogueScheduleType.BlockwiseNoSmemWarpSpecialized2Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L950** `  EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized1Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L951** `  EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized2Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L952** `  EpilogueScheduleType.PtrArrayFastF32NoSmemWarpSpecialized1Sm: '_epi_nosmem_fastf32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L953** `  EpilogueScheduleType.PtrArrayFastF32NoSmemWarpSpecialized2Sm: '_epi_nosmem_fastf32',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L954** `  EpilogueScheduleType.PtrArrayBlockwiseNoSmemWarpSpecialized1Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L955** `  EpilogueScheduleType.PtrArrayBlockwiseNoSmemWarpSpecialized2Sm: '_epi_nosmem',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L956** `  EpilogueScheduleType.TmaWarpSpecialized: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L957** `  EpilogueScheduleType.TmaWarpSpecializedCooperative: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L958** `  EpilogueScheduleType.TmaWarpSpecialized1Sm: '', ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L959** `  EpilogueScheduleType.TmaWarpSpecialized2Sm: '_epi_tma', ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L960** `  EpilogueScheduleType.PtrArrayTmaWarpSpecialized1Sm: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L961** `  EpilogueScheduleType.PtrArrayTmaWarpSpecialized2Sm: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L962** `  EpilogueScheduleType.PtrArrayTmaWarpSpecializedCooperative: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L963** `  EpilogueScheduleType.PtrArrayTmaWarpSpecializedPingpong: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L964** `  EpilogueScheduleType.TmaWarpSpecialized1SmNvf4: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L965** `  EpilogueScheduleType.TmaWarpSpecialized2SmNvf4: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L966** `  EpilogueScheduleType.TmaWarpSpecialized1SmMxf4: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L967** `  EpilogueScheduleType.TmaWarpSpecialized2SmMxf4: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L968** `  EpilogueScheduleType.TmaWarpSpecialized1SmMxf8f6f4: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L969** `  EpilogueScheduleType.TmaWarpSpecialized2SmMxf8f6f4: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L970** `  EpilogueScheduleType.SparseTmaWarpSpecializedCooperativeSm120: '_epi_tma',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L971** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L972** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L973** `class EpilogueFunctor3x(enum.Enum):` — **EN:** Defines class `EpilogueFunctor3x` with bases enum.Enum. **CN:** 定义类 `EpilogueFunctor3x`，其基类为 enum.Enum。
+- **L974** `  LinearCombination = enum_auto()` — **EN:** Assigns a value to LinearCombination. **CN:** 将一个值赋给 LinearCombination。
+- **L975** `  LinearCombinationBlockScaleFactor = enum_auto() ` — **EN:** Assigns a value to LinearCombinationBlockScaleFactor. **CN:** 将一个值赋给 LinearCombinationBlockScaleFactor。
+- **L976** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L977** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L978** `EpilogueFunctor3xTag = {` — **EN:** Assigns a value to EpilogueFunctor3xTag. **CN:** 将一个值赋给 EpilogueFunctor3xTag。
+- **L979** `  EpilogueFunctor3x.LinearCombination: 'cutlass::epilogue::fusion::LinearCombination',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L980** `  EpilogueFunctor3x.LinearCombinationBlockScaleFactor: 'cutlass::epilogue::fusion::LinCombBlockScaleFactor',  ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L981** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L982** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L983** `# TMA epilogues have certain alignment requirements as calculated in get_tma_alignment(data_type)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L984** `def is_tma_epilogue(epilogue_schedule_type):` — **EN:** Defines function `is_tma_epilogue`. **CN:** 定义函数 `is_tma_epilogue`。
+- **L985** `  return epilogue_schedule_type in [` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L986** `    EpilogueScheduleType.ScheduleAuto,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L987** `    EpilogueScheduleType.TmaWarpSpecialized,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L988** `    EpilogueScheduleType.TmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L989** `    EpilogueScheduleType.TmaWarpSpecialized1Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L990** `    EpilogueScheduleType.TmaWarpSpecialized2Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L991** `    EpilogueScheduleType.PtrArrayTmaWarpSpecialized1Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L992** `    EpilogueScheduleType.PtrArrayTmaWarpSpecialized2Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L993** `    EpilogueScheduleType.PtrArrayTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L994** `    EpilogueScheduleType.PtrArrayTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L995** `    EpilogueScheduleType.TmaWarpSpecialized1SmNvf4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L996** `    EpilogueScheduleType.TmaWarpSpecialized2SmNvf4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L997** `    EpilogueScheduleType.TmaWarpSpecialized1SmMxf4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L998** `    EpilogueScheduleType.TmaWarpSpecialized2SmMxf4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L999** `    EpilogueScheduleType.TmaWarpSpecialized1SmMxf8f6f4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1000** `    EpilogueScheduleType.TmaWarpSpecialized2SmMxf8f6f4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1001** `  ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1002** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1003** `def to_grouped_schedule(schedule, grouped):` — **EN:** Defines function `to_grouped_schedule`. **CN:** 定义函数 `to_grouped_schedule`。
+- **L1004** `  if not grouped:` — **EN:** Starts a conditional branch guarded by `not grouped`. **CN:** 开始一个由 `not grouped` 控制的条件分支。
+- **L1005** `    return schedule` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1006** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1007** `  group_schedule_map = {` — **EN:** Assigns a value to group_schedule_map. **CN:** 将一个值赋给 group_schedule_map。
+- **L1008** `    # SM90` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1009** `    KernelScheduleType.TmaWarpSpecializedCooperative : KernelScheduleType.PtrArrayTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1010** `    KernelScheduleType.BlockwiseTmaWarpSpecializedCooperative : KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1011** `    KernelScheduleType.BlockwiseTmaWarpSpecializedPingpong : KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1012** `    KernelScheduleType.TmaWarpSpecializedPingpong    : KernelScheduleType.PtrArrayTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1013** `    KernelScheduleType.TmaWarpSpecializedCooperativeFP8FastAccum : KernelScheduleType.PtrArrayTmaWarpSpecializedCooperativeFP8FastAccum,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1014** `    KernelScheduleType.TmaWarpSpecializedPingpongFP8FastAccum    : KernelScheduleType.PtrArrayTmaWarpSpecializedPingpongFP8FastAccum,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1015** `    EpilogueScheduleType.TmaWarpSpecialized            : EpilogueScheduleType.PtrArrayTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1016** `    EpilogueScheduleType.TmaWarpSpecializedCooperative : EpilogueScheduleType.PtrArrayTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1017** `    EpilogueScheduleType.NoSmemWarpSpecialized         : EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1018** `    # SM100` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1019** `    KernelScheduleType.TmaWarpSpecialized1SmSm100: KernelScheduleType.PtrArrayTmaWarpSpecialized1SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1020** `    KernelScheduleType.TmaWarpSpecialized2SmSm100: KernelScheduleType.PtrArrayTmaWarpSpecialized2SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1021** `    KernelScheduleType.Nvf4TmaWarpSpecialized1SmSm100 : KernelScheduleType.PtrArrayNvf4TmaWarpSpecialized1SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1022** `    KernelScheduleType.Nvf4TmaWarpSpecialized2SmSm100 : KernelScheduleType.PtrArrayNvf4TmaWarpSpecialized2SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1023** `    KernelScheduleType.Mxf4TmaWarpSpecialized1SmSm100 : KernelScheduleType.PtrArrayMxf4TmaWarpSpecialized1SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1024** `    KernelScheduleType.Mxf4TmaWarpSpecialized2SmSm100 : KernelScheduleType.PtrArrayMxf4TmaWarpSpecialized2SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1025** `    KernelScheduleType.Mxf8f6f4TmaWarpSpecialized1SmSm100 : KernelScheduleType.PtrArrayMxf8f6f4TmaWarpSpecialized1SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1026** `    KernelScheduleType.Mxf8f6f4TmaWarpSpecialized2SmSm100 : KernelScheduleType.PtrArrayMxf8f6f4TmaWarpSpecialized2SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1027** `    KernelScheduleType.BlockwiseTmaWarpSpecialized1SmSm100 : KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecialized1SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1028** `    KernelScheduleType.BlockwiseTmaWarpSpecialized2SmSm100 : KernelScheduleType.PtrArrayBlockwiseTmaWarpSpecialized2SmSm100,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1029** `    EpilogueScheduleType.TmaWarpSpecialized1Sm: EpilogueScheduleType.PtrArrayTmaWarpSpecialized1Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1030** `    EpilogueScheduleType.TmaWarpSpecialized2Sm: EpilogueScheduleType.PtrArrayTmaWarpSpecialized2Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1031** `    EpilogueScheduleType.NoSmemWarpSpecialized1Sm: EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized1Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1032** `    EpilogueScheduleType.NoSmemWarpSpecialized2Sm: EpilogueScheduleType.PtrArrayNoSmemWarpSpecialized2Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1033** `    EpilogueScheduleType.BlockwiseNoSmemWarpSpecialized1Sm: EpilogueScheduleType.PtrArrayBlockwiseNoSmemWarpSpecialized1Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1034** `    EpilogueScheduleType.BlockwiseNoSmemWarpSpecialized2Sm: EpilogueScheduleType.PtrArrayBlockwiseNoSmemWarpSpecialized2Sm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1035** `    # SM103` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1036** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1037** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1038** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1039** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1040** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103DisablePrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1041** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103DisablePrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1042** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103DisablePrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1043** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103DisablePrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1044** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs16Sm103TmaPrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1045** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs16Sm103TmaPrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1046** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized1SmVs32Sm103TmaPrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1047** `    KernelScheduleType.MxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch: KernelScheduleType.PtrArrayMxNvf4UltraTmaWarpSpecialized2SmVs32Sm103TmaPrefetch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1048** `    # SM120` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1049** `    KernelScheduleType.Mxf8f6f4TmaWarpSpecializedCooperativeSm120: KernelScheduleType.PtrArrayTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1050** `    KernelScheduleType.Mxf8f6f4TmaWarpSpecializedPingpongSm120: KernelScheduleType.PtrArrayTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1051** `    KernelScheduleType.Nvf4TmaWarpSpecializedCooperativeSm120: KernelScheduleType.PtrArrayTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1052** `    KernelScheduleType.Nvf4TmaWarpSpecializedPingpongSm120: KernelScheduleType.PtrArrayTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1053** `    KernelScheduleType.Mxf4TmaWarpSpecializedCooperativeSm120: KernelScheduleType.PtrArrayTmaWarpSpecializedCooperative,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1054** `    KernelScheduleType.Mxf4TmaWarpSpecializedPingpongSm120: KernelScheduleType.PtrArrayTmaWarpSpecializedPingpong,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1055** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1056** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1057** `  return group_schedule_map[schedule]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1058** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1059** `class TileSchedulerType(enum.Enum):` — **EN:** Defines class `TileSchedulerType` with bases enum.Enum. **CN:** 定义类 `TileSchedulerType`，其基类为 enum.Enum。
+- **L1060** `  Default = enum_auto()` — **EN:** Assigns a value to Default. **CN:** 将一个值赋给 Default。
+- **L1061** `  Persistent = enum_auto()` — **EN:** Assigns a value to Persistent. **CN:** 将一个值赋给 Persistent。
+- **L1062** `  StreamK = enum_auto()` — **EN:** Assigns a value to StreamK. **CN:** 将一个值赋给 StreamK。
+- **L1063** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1064** `TileSchedulerTag = {` — **EN:** Assigns a value to TileSchedulerTag. **CN:** 将一个值赋给 TileSchedulerTag。
+- **L1065** `  TileSchedulerType.Default: 'void',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1066** `  TileSchedulerType.Persistent: 'cutlass::gemm::PersistentScheduler',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1067** `  TileSchedulerType.StreamK: 'cutlass::gemm::StreamKScheduler',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1068** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1069** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1070** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1071** `TileSchedulerSuffixes = {` — **EN:** Assigns a value to TileSchedulerSuffixes. **CN:** 将一个值赋给 TileSchedulerSuffixes。
+- **L1072** `  TileSchedulerType.Default: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1073** `  TileSchedulerType.Persistent: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1074** `  TileSchedulerType.StreamK: '_stream_k',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1075** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1076** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1077** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1078** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1079** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1080** `class SideMode(enum.Enum):` — **EN:** Defines class `SideMode` with bases enum.Enum. **CN:** 定义类 `SideMode`，其基类为 enum.Enum。
+- **L1081** `  Left = enum_auto()` — **EN:** Assigns a value to Left. **CN:** 将一个值赋给 Left。
+- **L1082** `  Right = enum_auto()` — **EN:** Assigns a value to Right. **CN:** 将一个值赋给 Right。
+- **L1083** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1084** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1085** `SideModeTag = {` — **EN:** Assigns a value to SideModeTag. **CN:** 将一个值赋给 SideModeTag。
+- **L1086** `  SideMode.Left: 'cutlass::SideMode::kLeft',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1087** `  SideMode.Right: 'cutlass::SideMode::kRight'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1088** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1089** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1090** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1091** `ShortSideModeNames = {` — **EN:** Assigns a value to ShortSideModeNames. **CN:** 将一个值赋给 ShortSideModeNames。
+- **L1092** `  SideMode.Left: 'ls',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1093** `  SideMode.Right: 'rs'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1094** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1095** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1096** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1097** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1098** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1099** `class FillMode(enum.Enum):` — **EN:** Defines class `FillMode` with bases enum.Enum. **CN:** 定义类 `FillMode`，其基类为 enum.Enum。
+- **L1100** `  Lower = enum_auto()` — **EN:** Assigns a value to Lower. **CN:** 将一个值赋给 Lower。
+- **L1101** `  Upper = enum_auto()` — **EN:** Assigns a value to Upper. **CN:** 将一个值赋给 Upper。
+- **L1102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1103** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1104** `FillModeTag = {` — **EN:** Assigns a value to FillModeTag. **CN:** 将一个值赋给 FillModeTag。
+- **L1105** `  FillMode.Lower: 'cutlass::FillMode::kLower',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1106** `  FillMode.Upper: 'cutlass::FillMode::kUpper'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1107** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1109** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1110** `ShortFillModeNames = {` — **EN:** Assigns a value to ShortFillModeNames. **CN:** 将一个值赋给 ShortFillModeNames。
+- **L1111** `  FillMode.Lower: 'l',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1112** `  FillMode.Upper: 'u'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1113** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1115** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1117** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1118** `class DiagType(enum.Enum):` — **EN:** Defines class `DiagType` with bases enum.Enum. **CN:** 定义类 `DiagType`，其基类为 enum.Enum。
+- **L1119** `  NonUnit = enum_auto()` — **EN:** Assigns a value to NonUnit. **CN:** 将一个值赋给 NonUnit。
+- **L1120** `  Unit = enum_auto()` — **EN:** Assigns a value to Unit. **CN:** 将一个值赋给 Unit。
+- **L1121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1122** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1123** `DiagTypeTag = {` — **EN:** Assigns a value to DiagTypeTag. **CN:** 将一个值赋给 DiagTypeTag。
+- **L1124** `  DiagType.NonUnit: 'cutlass::DiagType::kNonUnit',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1125** `  DiagType.Unit: 'cutlass::DiagType::kUnit'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1126** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1128** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1129** `ShortDiagTypeNames = {` — **EN:** Assigns a value to ShortDiagTypeNames. **CN:** 将一个值赋给 ShortDiagTypeNames。
+- **L1130** `  DiagType.NonUnit: 'nu',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1131** `  DiagType.Unit: 'un'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1132** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1134** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1136** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1137** `class OpcodeClass(enum.Enum):` — **EN:** Defines class `OpcodeClass` with bases enum.Enum. **CN:** 定义类 `OpcodeClass`，其基类为 enum.Enum。
+- **L1138** `  Simt = enum_auto()` — **EN:** Assigns a value to Simt. **CN:** 将一个值赋给 Simt。
+- **L1139** `  TensorOp = enum_auto()` — **EN:** Assigns a value to TensorOp. **CN:** 将一个值赋给 TensorOp。
+- **L1140** `  WmmaTensorOp = enum_auto()` — **EN:** Assigns a value to WmmaTensorOp. **CN:** 将一个值赋给 WmmaTensorOp。
+- **L1141** `  SparseTensorOp = enum_auto()` — **EN:** Assigns a value to SparseTensorOp. **CN:** 将一个值赋给 SparseTensorOp。
+- **L1142** `  BlockScaledTensorOp = enum_auto()` — **EN:** Assigns a value to BlockScaledTensorOp. **CN:** 将一个值赋给 BlockScaledTensorOp。
+- **L1143** `  BlockScaledSparseTensorOp = enum_auto()                               ` — **EN:** Assigns a value to BlockScaledSparseTensorOp. **CN:** 将一个值赋给 BlockScaledSparseTensorOp。
+- **L1144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1146** `OpcodeClassNames = {` — **EN:** Assigns a value to OpcodeClassNames. **CN:** 将一个值赋给 OpcodeClassNames。
+- **L1147** `  OpcodeClass.Simt: 'simt',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1148** `  OpcodeClass.TensorOp: 'tensorop',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1149** `  OpcodeClass.WmmaTensorOp: 'wmma_tensorop',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1150** `  OpcodeClass.SparseTensorOp: 'sptensorop',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1151** `  OpcodeClass.BlockScaledTensorOp: 'bstensorop',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1152** `  OpcodeClass.BlockScaledSparseTensorOp: 'bssptensorop'                   ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1153** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1155** `OpcodeClassTag = {` — **EN:** Assigns a value to OpcodeClassTag. **CN:** 将一个值赋给 OpcodeClassTag。
+- **L1156** `  OpcodeClass.Simt: 'cutlass::arch::OpClassSimt',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1157** `  OpcodeClass.TensorOp: 'cutlass::arch::OpClassTensorOp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1158** `  OpcodeClass.WmmaTensorOp: 'cutlass::arch::OpClassWmmaTensorOp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1159** `  OpcodeClass.SparseTensorOp: 'cutlass::arch::OpClassSparseTensorOp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1160** `  OpcodeClass.BlockScaledTensorOp: 'cutlass::arch::OpClassBlockScaledTensorOp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1161** `  OpcodeClass.BlockScaledSparseTensorOp: 'cutlass::arch::OpClassBlockScaledSparseTensorOp'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1162** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1164** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1166** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1167** `class OperationKind(enum.Enum):` — **EN:** Defines class `OperationKind` with bases enum.Enum. **CN:** 定义类 `OperationKind`，其基类为 enum.Enum。
+- **L1168** `  Gemm = enum_auto()` — **EN:** Assigns a value to Gemm. **CN:** 将一个值赋给 Gemm。
+- **L1169** `  RankK = enum_auto()` — **EN:** Assigns a value to RankK. **CN:** 将一个值赋给 RankK。
+- **L1170** `  Rank2K = enum_auto()` — **EN:** Assigns a value to Rank2K. **CN:** 将一个值赋给 Rank2K。
+- **L1171** `  Trmm = enum_auto()` — **EN:** Assigns a value to Trmm. **CN:** 将一个值赋给 Trmm。
+- **L1172** `  Symm = enum_auto()` — **EN:** Assigns a value to Symm. **CN:** 将一个值赋给 Symm。
+- **L1173** `  Conv2d = enum_auto()` — **EN:** Assigns a value to Conv2d. **CN:** 将一个值赋给 Conv2d。
+- **L1174** `  Conv3d = enum_auto()` — **EN:** Assigns a value to Conv3d. **CN:** 将一个值赋给 Conv3d。
+- **L1175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1176** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1177** `OperationKindNames = {` — **EN:** Assigns a value to OperationKindNames. **CN:** 将一个值赋给 OperationKindNames。
+- **L1178** `  OperationKind.Gemm: 'gemm'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1179** `  , OperationKind.RankK: 'rank_k'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1180** `  , OperationKind.Rank2K: 'rank_2k'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1181** `  , OperationKind.Trmm: 'trmm'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1182** `  , OperationKind.Symm: 'symm'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1183** `  , OperationKind.Conv2d: 'conv2d'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1184** `  , OperationKind.Conv3d: 'conv3d'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1185** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1187** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1188** `class Target(enum.Enum):` — **EN:** Defines class `Target` with bases enum.Enum. **CN:** 定义类 `Target`，其基类为 enum.Enum。
+- **L1189** `  library = enum_auto()` — **EN:** Assigns a value to library. **CN:** 将一个值赋给 library。
+- **L1190** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1191** `ArchitectureNames = {` — **EN:** Assigns a value to ArchitectureNames. **CN:** 将一个值赋给 ArchitectureNames。
+- **L1192** `  50: 'maxwell',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1193** `  60: 'pascal',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1194** `  61: 'pascal',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1195** `  70: 'volta',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1196** `  75: 'turing',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1197** `  80: 'ampere',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1198** `  89: 'ada',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1199** `  90: 'hopper'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1200** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1202** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1203** `SharedMemPerCC = {` — **EN:** Assigns a value to SharedMemPerCC. **CN:** 将一个值赋给 SharedMemPerCC。
+- **L1204** `  70:   96, #  96KB of SMEM` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1205** `  72:   96, #  96KB of SMEM` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1206** `  75:   64, #  64KB of SMEM` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1207** `  80:  163, # 163KB of SMEM - 1KB reserved for the driver` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1208** `  86:   99, #  99KB of SMEM - 1KB reserved for the driver` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1209** `  87:  163, # 163KB of SMEM - 1KB reserved for the driver` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1210** `  89:   99, #  99KB of SMEM - 1KB reserved for the driver` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1211** `  90:  227, # 227KB of SMEM - 1KB reserved for the driver` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1212** `  100: 227, # 227KB of SMEM - 1KB reserved for the driver` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1213** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1215** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1217** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1218** `def SubstituteTemplate(template, values):` — **EN:** Defines function `SubstituteTemplate`. **CN:** 定义函数 `SubstituteTemplate`。
+- **L1219** `  text = template` — **EN:** Assigns a value to text. **CN:** 将一个值赋给 text。
+- **L1220** `  changed = True` — **EN:** Assigns a value to changed. **CN:** 将一个值赋给 changed。
+- **L1221** `  while changed:` — **EN:** Starts a while-loop guarded by `changed`. **CN:** 开始一个由 `changed` 控制的 while 循环。
+- **L1222** `    changed = False` — **EN:** Assigns a value to changed. **CN:** 将一个值赋给 changed。
+- **L1223** `    for key, value in values.items():` — **EN:** Starts a loop assigning items from `values.items()` to `(key, value)`. **CN:** 开始一个循环，将 `values.items()` 的元素赋给 `(key, value)`。
+- **L1224** `      regex = "\\$\\{%s\\}" % key` — **EN:** Assigns a value to regex. **CN:** 将一个值赋给 regex。
+- **L1225** `      newtext = re.sub(regex, value, text)` — **EN:** Assigns a value to newtext. **CN:** 将一个值赋给 newtext。
+- **L1226** `      if newtext != text:` — **EN:** Starts a conditional branch guarded by `newtext != text`. **CN:** 开始一个由 `newtext != text` 控制的条件分支。
+- **L1227** `        changed = True` — **EN:** Assigns a value to changed. **CN:** 将一个值赋给 changed。
+- **L1228** `      text = newtext` — **EN:** Assigns a value to text. **CN:** 将一个值赋给 text。
+- **L1229** `  return text` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1231** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1233** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1234** `class GemmKind(enum.Enum):` — **EN:** Defines class `GemmKind` with bases enum.Enum. **CN:** 定义类 `GemmKind`，其基类为 enum.Enum。
+- **L1235** `  Gemm = enum_auto()` — **EN:** Assigns a value to Gemm. **CN:** 将一个值赋给 Gemm。
+- **L1236** `  Sparse = enum_auto()` — **EN:** Assigns a value to Sparse. **CN:** 将一个值赋给 Sparse。
+- **L1237** `  Universal = enum_auto()` — **EN:** Assigns a value to Universal. **CN:** 将一个值赋给 Universal。
+- **L1238** `  Universal3x = enum_auto()` — **EN:** Assigns a value to Universal3x. **CN:** 将一个值赋给 Universal3x。
+- **L1239** `  SparseUniversal3x = enum_auto()` — **EN:** Assigns a value to SparseUniversal3x. **CN:** 将一个值赋给 SparseUniversal3x。
+- **L1240** `  PlanarComplex = enum_auto()` — **EN:** Assigns a value to PlanarComplex. **CN:** 将一个值赋给 PlanarComplex。
+- **L1241** `  PlanarComplexArray = enum_auto()` — **EN:** Assigns a value to PlanarComplexArray. **CN:** 将一个值赋给 PlanarComplexArray。
+- **L1242** `  Grouped = enum_auto()` — **EN:** Assigns a value to Grouped. **CN:** 将一个值赋给 Grouped。
+- **L1243** `  BlockScaledUniversal3x = enum_auto()                                   ` — **EN:** Assigns a value to BlockScaledUniversal3x. **CN:** 将一个值赋给 BlockScaledUniversal3x。
+- **L1244** `  GroupedUniversal3x = enum_auto()` — **EN:** Assigns a value to GroupedUniversal3x. **CN:** 将一个值赋给 GroupedUniversal3x。
+- **L1245** `  GroupedBlockScaledUniversal3x = enum_auto()` — **EN:** Assigns a value to GroupedBlockScaledUniversal3x. **CN:** 将一个值赋给 GroupedBlockScaledUniversal3x。
+- **L1246** `  BlockwiseUniversal3x = enum_auto()` — **EN:** Assigns a value to BlockwiseUniversal3x. **CN:** 将一个值赋给 BlockwiseUniversal3x。
+- **L1247** `  GroupedBlockwiseUniversal3x = enum_auto()` — **EN:** Assigns a value to GroupedBlockwiseUniversal3x. **CN:** 将一个值赋给 GroupedBlockwiseUniversal3x。
+- **L1248** `  BlockScaledSparseUniversal3x = enum_auto()` — **EN:** Assigns a value to BlockScaledSparseUniversal3x. **CN:** 将一个值赋给 BlockScaledSparseUniversal3x。
+- **L1249** `  MoeGroupedUniversal3x = enum_auto()` — **EN:** Assigns a value to MoeGroupedUniversal3x. **CN:** 将一个值赋给 MoeGroupedUniversal3x。
+- **L1250** `  BlockScaledMoeGroupedUniversal3x = enum_auto()` — **EN:** Assigns a value to BlockScaledMoeGroupedUniversal3x. **CN:** 将一个值赋给 BlockScaledMoeGroupedUniversal3x。
+- **L1251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1253** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1254** `GemmKindNames = {` — **EN:** Assigns a value to GemmKindNames. **CN:** 将一个值赋给 GemmKindNames。
+- **L1255** `  GemmKind.Gemm: "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1256** `  GemmKind.Sparse: "spgemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1257** `  GemmKind.Universal: "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1258** `  GemmKind.Universal3x: "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1259** `  GemmKind.SparseUniversal3x: "spgemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1260** `  GemmKind.PlanarComplex: "gemm_planar_complex",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1261** `  GemmKind.PlanarComplexArray: "gemm_planar_complex_array",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1262** `  GemmKind.Grouped: "gemm_grouped",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1263** `  GemmKind.BlockScaledUniversal3x: "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1264** `  GemmKind.GroupedUniversal3x: "gemm_grouped",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1265** `  GemmKind.GroupedBlockScaledUniversal3x: "gemm_grouped",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1266** `  GemmKind.BlockwiseUniversal3x: "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1267** `  GemmKind.GroupedBlockwiseUniversal3x: "gemm_grouped",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1268** `  GemmKind.BlockScaledSparseUniversal3x: "spgemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1269** `  GemmKind.MoeGroupedUniversal3x: "moe_gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1270** `  GemmKind.BlockScaledMoeGroupedUniversal3x: "moe_gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1271** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1273** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1274** `class RankKKind(enum.Enum):` — **EN:** Defines class `RankKKind` with bases enum.Enum. **CN:** 定义类 `RankKKind`，其基类为 enum.Enum。
+- **L1275** `  Universal = enum_auto()` — **EN:** Assigns a value to Universal. **CN:** 将一个值赋给 Universal。
+- **L1276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1277** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1278** `RankKKindNames = {` — **EN:** Assigns a value to RankKKindNames. **CN:** 将一个值赋给 RankKKindNames。
+- **L1279** `  RankKKind.Universal: "rank_k"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1280** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1282** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1283** `class TrmmKind(enum.Enum):` — **EN:** Defines class `TrmmKind` with bases enum.Enum. **CN:** 定义类 `TrmmKind`，其基类为 enum.Enum。
+- **L1284** `  Universal = enum_auto()` — **EN:** Assigns a value to Universal. **CN:** 将一个值赋给 Universal。
+- **L1285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1286** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1287** `TrmmKindNames = {` — **EN:** Assigns a value to TrmmKindNames. **CN:** 将一个值赋给 TrmmKindNames。
+- **L1288** `  TrmmKind.Universal: "trmm"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1289** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1291** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1292** `class SymmKind(enum.Enum):` — **EN:** Defines class `SymmKind` with bases enum.Enum. **CN:** 定义类 `SymmKind`，其基类为 enum.Enum。
+- **L1293** `  Universal = enum_auto()` — **EN:** Assigns a value to Universal. **CN:** 将一个值赋给 Universal。
+- **L1294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1295** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1296** `SymmKindNames = {` — **EN:** Assigns a value to SymmKindNames. **CN:** 将一个值赋给 SymmKindNames。
+- **L1297** `  SymmKind.Universal: "symm"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1298** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1300** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1301** `class EpilogueFunctor(enum.Enum):` — **EN:** Defines class `EpilogueFunctor` with bases enum.Enum. **CN:** 定义类 `EpilogueFunctor`，其基类为 enum.Enum。
+- **L1302** `  LinearCombination = enum_auto()` — **EN:** Assigns a value to LinearCombination. **CN:** 将一个值赋给 LinearCombination。
+- **L1303** `  LinearCombinationClamp = enum_auto()` — **EN:** Assigns a value to LinearCombinationClamp. **CN:** 将一个值赋给 LinearCombinationClamp。
+- **L1304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1305** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1306** `EpilogueFunctorTag = {` — **EN:** Assigns a value to EpilogueFunctorTag. **CN:** 将一个值赋给 EpilogueFunctorTag。
+- **L1307** `  EpilogueFunctor.LinearCombination: 'cutlass::epilogue::thread::LinearCombination',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1308** `  EpilogueFunctor.LinearCombinationClamp: 'cutlass::epilogue::thread::LinearCombinationClamp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1309** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1311** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1312** `class MixedInputMode(enum.Enum):` — **EN:** Defines class `MixedInputMode` with bases enum.Enum. **CN:** 定义类 `MixedInputMode`，其基类为 enum.Enum。
+- **L1313** `  ConvertOnly = enum_auto()` — **EN:** Assigns a value to ConvertOnly. **CN:** 将一个值赋给 ConvertOnly。
+- **L1314** `  ScaleOnly = enum_auto()` — **EN:** Assigns a value to ScaleOnly. **CN:** 将一个值赋给 ScaleOnly。
+- **L1315** `  ScaleWithZeroPoint = enum_auto()` — **EN:** Assigns a value to ScaleWithZeroPoint. **CN:** 将一个值赋给 ScaleWithZeroPoint。
+- **L1316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1317** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1318** `class SwizzlingFunctor(enum.Enum):` — **EN:** Defines class `SwizzlingFunctor` with bases enum.Enum. **CN:** 定义类 `SwizzlingFunctor`，其基类为 enum.Enum。
+- **L1319** `  Identity1 = enum_auto()` — **EN:** Assigns a value to Identity1. **CN:** 将一个值赋给 Identity1。
+- **L1320** `  Identity2 = enum_auto()` — **EN:** Assigns a value to Identity2. **CN:** 将一个值赋给 Identity2。
+- **L1321** `  Identity4 = enum_auto()` — **EN:** Assigns a value to Identity4. **CN:** 将一个值赋给 Identity4。
+- **L1322** `  Identity8 = enum_auto()` — **EN:** Assigns a value to Identity8. **CN:** 将一个值赋给 Identity8。
+- **L1323** `  Horizontal = enum_auto()` — **EN:** Assigns a value to Horizontal. **CN:** 将一个值赋给 Horizontal。
+- **L1324** `  StridedDgradIdentity1 = enum_auto()` — **EN:** Assigns a value to StridedDgradIdentity1. **CN:** 将一个值赋给 StridedDgradIdentity1。
+- **L1325** `  StridedDgradIdentity4 = enum_auto()` — **EN:** Assigns a value to StridedDgradIdentity4. **CN:** 将一个值赋给 StridedDgradIdentity4。
+- **L1326** `  StridedDgradHorizontal = enum_auto()` — **EN:** Assigns a value to StridedDgradHorizontal. **CN:** 将一个值赋给 StridedDgradHorizontal。
+- **L1327** `  StreamK = enum_auto()` — **EN:** Assigns a value to StreamK. **CN:** 将一个值赋给 StreamK。
+- **L1328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1329** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1330** `SwizzlingFunctorTag = {` — **EN:** Assigns a value to SwizzlingFunctorTag. **CN:** 将一个值赋给 SwizzlingFunctorTag。
+- **L1331** `  SwizzlingFunctor.Identity1: 'cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<1>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1332** `  SwizzlingFunctor.Identity2: 'cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<2>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1333** `  SwizzlingFunctor.Identity4: 'cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<4>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1334** `  SwizzlingFunctor.Identity8: 'cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<8>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1335** `  SwizzlingFunctor.Horizontal: 'cutlass::gemm::threadblock::GemmHorizontalThreadblockSwizzle',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1336** `  SwizzlingFunctor.StridedDgradIdentity1: 'cutlass::conv::threadblock::StridedDgradIdentityThreadblockSwizzle<1>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1337** `  SwizzlingFunctor.StridedDgradIdentity4: 'cutlass::conv::threadblock::StridedDgradIdentityThreadblockSwizzle<4>',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1338** `  SwizzlingFunctor.StridedDgradHorizontal: 'cutlass::conv::threadblock::StridedDgradHorizontalThreadblockSwizzle',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1339** `  SwizzlingFunctor.StreamK: 'cutlass::gemm::threadblock::ThreadblockSwizzleStreamK',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1340** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1342** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1343** `class GroupScheduleMode(enum.Enum):` — **EN:** Defines class `GroupScheduleMode` with bases enum.Enum. **CN:** 定义类 `GroupScheduleMode`，其基类为 enum.Enum。
+- **L1344** `  Device = enum_auto(),` — **EN:** Assigns a value to Device. **CN:** 将一个值赋给 Device。
+- **L1345** `  Host = enum_auto()` — **EN:** Assigns a value to Host. **CN:** 将一个值赋给 Host。
+- **L1346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1347** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1348** `GroupScheduleModeTag = {` — **EN:** Assigns a value to GroupScheduleModeTag. **CN:** 将一个值赋给 GroupScheduleModeTag。
+- **L1349** `  GroupScheduleMode.Device: 'cutlass::gemm::kernel::GroupScheduleMode::kDeviceOnly',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1350** `  GroupScheduleMode.Host: 'cutlass::gemm::kernel::GroupScheduleMode::kHostPrecompute'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1351** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1353** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1354** `ShortGroupScheduleModeNames = {` — **EN:** Assigns a value to ShortGroupScheduleModeNames. **CN:** 将一个值赋给 ShortGroupScheduleModeNames。
+- **L1355** `  GroupScheduleMode.Device: 'Device',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1356** `  GroupScheduleMode.Host: 'Host'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1357** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1359** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1361** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1362** `class ConvKind(enum.IntEnum):` — **EN:** Defines class `ConvKind` with bases enum.IntEnum. **CN:** 定义类 `ConvKind`，其基类为 enum.IntEnum。
+- **L1363** `  Fprop = 0` — **EN:** Assigns a value to Fprop. **CN:** 将一个值赋给 Fprop。
+- **L1364** `  Dgrad = 1` — **EN:** Assigns a value to Dgrad. **CN:** 将一个值赋给 Dgrad。
+- **L1365** `  Wgrad = 2` — **EN:** Assigns a value to Wgrad. **CN:** 将一个值赋给 Wgrad。
+- **L1366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1367** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1368** `ConvKindTag = {` — **EN:** Assigns a value to ConvKindTag. **CN:** 将一个值赋给 ConvKindTag。
+- **L1369** `  ConvKind.Fprop: 'cutlass::conv::Operator::kFprop',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1370** `  ConvKind.Dgrad: 'cutlass::conv::Operator::kDgrad',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1371** `  ConvKind.Wgrad: 'cutlass::conv::Operator::kWgrad'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1372** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1373** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1374** `ConvKindNames = {` — **EN:** Assigns a value to ConvKindNames. **CN:** 将一个值赋给 ConvKindNames。
+- **L1375** `  ConvKind.Fprop: 'fprop',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1376** `  ConvKind.Dgrad: 'dgrad',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1377** `  ConvKind.Wgrad: 'wgrad',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1378** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1379** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1380** `class ConvMode(enum.IntEnum):` — **EN:** Defines class `ConvMode` with bases enum.IntEnum. **CN:** 定义类 `ConvMode`，其基类为 enum.IntEnum。
+- **L1381** `  CrossCorrelation = 0` — **EN:** Assigns a value to CrossCorrelation. **CN:** 将一个值赋给 CrossCorrelation。
+- **L1382** `  Convolution = 1` — **EN:** Assigns a value to Convolution. **CN:** 将一个值赋给 Convolution。
+- **L1383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1384** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1385** `class IteratorAlgorithm(enum.Enum):` — **EN:** Defines class `IteratorAlgorithm` with bases enum.Enum. **CN:** 定义类 `IteratorAlgorithm`，其基类为 enum.Enum。
+- **L1386** `  Analytic = 0` — **EN:** Assigns a value to Analytic. **CN:** 将一个值赋给 Analytic。
+- **L1387** `  Optimized = 1` — **EN:** Assigns a value to Optimized. **CN:** 将一个值赋给 Optimized。
+- **L1388** `  FixedChannels = 2` — **EN:** Assigns a value to FixedChannels. **CN:** 将一个值赋给 FixedChannels。
+- **L1389** `  FewChannels = 3` — **EN:** Assigns a value to FewChannels. **CN:** 将一个值赋给 FewChannels。
+- **L1390** `  FixedStrideDilation = 4` — **EN:** Assigns a value to FixedStrideDilation. **CN:** 将一个值赋给 FixedStrideDilation。
+- **L1391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1392** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1393** `IteratorAlgorithmTag = {` — **EN:** Assigns a value to IteratorAlgorithmTag. **CN:** 将一个值赋给 IteratorAlgorithmTag。
+- **L1394** `  IteratorAlgorithm.Analytic: 'cutlass::conv::IteratorAlgorithm::kAnalytic',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1395** `  IteratorAlgorithm.Optimized: 'cutlass::conv::IteratorAlgorithm::kOptimized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1396** `  IteratorAlgorithm.FixedChannels: 'cutlass::conv::IteratorAlgorithm::kFixedChannels',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1397** `  IteratorAlgorithm.FewChannels: 'cutlass::conv::IteratorAlgorithm::kFewChannels',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1398** `  IteratorAlgorithm.FixedStrideDilation: 'cutlass::conv::IteratorAlgorithm::kFixedStrideDilation'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1399** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1401** `IteratorAlgorithmNames = {` — **EN:** Assigns a value to IteratorAlgorithmNames. **CN:** 将一个值赋给 IteratorAlgorithmNames。
+- **L1402** `  IteratorAlgorithm.Analytic: 'analytic',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1403** `  IteratorAlgorithm.Optimized: 'optimized',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1404** `  IteratorAlgorithm.FixedChannels: 'fixed_channels',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1405** `  IteratorAlgorithm.FewChannels: 'few_channels',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1406** `  IteratorAlgorithm.FixedStrideDilation: 'fixed_stride_dilation'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1407** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1409** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1410** `class StrideSupport(enum.Enum):` — **EN:** Defines class `StrideSupport` with bases enum.Enum. **CN:** 定义类 `StrideSupport`，其基类为 enum.Enum。
+- **L1411** `  Strided = 0` — **EN:** Assigns a value to Strided. **CN:** 将一个值赋给 Strided。
+- **L1412** `  Unity = 1` — **EN:** Assigns a value to Unity. **CN:** 将一个值赋给 Unity。
+- **L1413** `  Fixed = 2` — **EN:** Assigns a value to Fixed. **CN:** 将一个值赋给 Fixed。
+- **L1414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1415** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1416** `StrideSupportTag = {` — **EN:** Assigns a value to StrideSupportTag. **CN:** 将一个值赋给 StrideSupportTag。
+- **L1417** `  StrideSupport.Strided: 'cutlass::conv::StrideSupport::kStrided',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1418** `  StrideSupport.Unity: 'cutlass::conv::StrideSupport::kUnity',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1419** `  StrideSupport.Fixed: 'cutlass::conv::StrideSupport::kFixed'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1420** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1422** `StrideSupportNames = {` — **EN:** Assigns a value to StrideSupportNames. **CN:** 将一个值赋给 StrideSupportNames。
+- **L1423** `  StrideSupport.Strided: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1424** `  StrideSupport.Unity: 'unity_stride',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1425** `  StrideSupport.Fixed: 'fixed_stride'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1426** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1428** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1429** `class GroupMode(enum.Enum):` — **EN:** Defines class `GroupMode` with bases enum.Enum. **CN:** 定义类 `GroupMode`，其基类为 enum.Enum。
+- **L1430** `  NoneGroup = enum_auto()         # dense conv (G=1)` — **EN:** Assigns a value to NoneGroup. **CN:** 将一个值赋给 NoneGroup。
+- **L1431** `  SingleGroup = enum_auto()       # grouped convolution (single group per CTA)` — **EN:** Assigns a value to SingleGroup. **CN:** 将一个值赋给 SingleGroup。
+- **L1432** `  MultipleGroup = enum_auto()     # grouped convolution ( multiple groups per CTA)` — **EN:** Assigns a value to MultipleGroup. **CN:** 将一个值赋给 MultipleGroup。
+- **L1433** `  Depthwise = enum_auto()         # Depthwise convolution ( C=K=G )` — **EN:** Assigns a value to Depthwise. **CN:** 将一个值赋给 Depthwise。
+- **L1434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1435** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1436** `GroupModeTag = {` — **EN:** Assigns a value to GroupModeTag. **CN:** 将一个值赋给 GroupModeTag。
+- **L1437** `  GroupMode.NoneGroup: 'cutlass::conv::GroupMode::kNone',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1438** `  GroupMode.SingleGroup: 'cutlass::conv::GroupMode::kSingleGroup',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1439** `  GroupMode.MultipleGroup: 'cutlass::conv::GroupMode::kMultipleGroup',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1440** `  GroupMode.Depthwise: 'cutlass::conv::GroupMode::kDepthwise',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1441** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1443** `GroupModeNames = {` — **EN:** Assigns a value to GroupModeNames. **CN:** 将一个值赋给 GroupModeNames。
+- **L1444** `  GroupMode.NoneGroup: '',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1445** `  GroupMode.SingleGroup: 'single_group',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1446** `  GroupMode.MultipleGroup: 'multiple_group',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1447** `  GroupMode.Depthwise: 'depthwise',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1448** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1449** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1450** `DynamicClusterShape = [0, 0, 1] ` — **EN:** Assigns a value to DynamicClusterShape. **CN:** 将一个值赋给 DynamicClusterShape。
+- **L1451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1452** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1454** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1455** `class MathInstruction:` — **EN:** Defines class `MathInstruction`. **CN:** 定义类 `MathInstruction`。
+- **L1456** `  def __init__(self,` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1457** `      instruction_shape,                                            \` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1458** `      element_a, element_b, element_accumulator,                    \` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1459** `      opcode_class, math_operation = MathOperation.multiply_add     \` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1460** `      , element_scale_factor = None ` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1461** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1463** `    self.instruction_shape = instruction_shape` — **EN:** Assigns a value to self.instruction_shape. **CN:** 将一个值赋给 self.instruction_shape。
+- **L1464** `    self.element_a = element_a` — **EN:** Assigns a value to self.element_a. **CN:** 将一个值赋给 self.element_a。
+- **L1465** `    self.element_b = element_b` — **EN:** Assigns a value to self.element_b. **CN:** 将一个值赋给 self.element_b。
+- **L1466** `    self.element_accumulator = element_accumulator` — **EN:** Assigns a value to self.element_accumulator. **CN:** 将一个值赋给 self.element_accumulator。
+- **L1467** `    self.opcode_class = opcode_class` — **EN:** Assigns a value to self.opcode_class. **CN:** 将一个值赋给 self.opcode_class。
+- **L1468** `    self.math_operation = math_operation` — **EN:** Assigns a value to self.math_operation. **CN:** 将一个值赋给 self.math_operation。
+- **L1469** `    self.element_scale_factor = element_scale_factor ` — **EN:** Assigns a value to self.element_scale_factor. **CN:** 将一个值赋给 self.element_scale_factor。
+- **L1470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1471** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1472** `class TileDescription:` — **EN:** Defines class `TileDescription`. **CN:** 定义类 `TileDescription`。
+- **L1473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1474** `  def __init__(self, threadblock_shape, stages, warp_count, math_instruction, min_compute, max_compute, cluster_shape = [1,1,1], explicit_vector_sizes = None):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1475** `    self.threadblock_shape = threadblock_shape` — **EN:** Assigns a value to self.threadblock_shape. **CN:** 将一个值赋给 self.threadblock_shape。
+- **L1476** `    self.tile_shape = threadblock_shape` — **EN:** Assigns a value to self.tile_shape. **CN:** 将一个值赋给 self.tile_shape。
+- **L1477** `    self.stages = stages` — **EN:** Assigns a value to self.stages. **CN:** 将一个值赋给 self.stages。
+- **L1478** `    self.warp_count = warp_count` — **EN:** Assigns a value to self.warp_count. **CN:** 将一个值赋给 self.warp_count。
+- **L1479** `    self.math_instruction = math_instruction` — **EN:** Assigns a value to self.math_instruction. **CN:** 将一个值赋给 self.math_instruction。
+- **L1480** `    self.minimum_compute_capability = min_compute` — **EN:** Assigns a value to self.minimum_compute_capability. **CN:** 将一个值赋给 self.minimum_compute_capability。
+- **L1481** `    self.maximum_compute_capability = max_compute` — **EN:** Assigns a value to self.maximum_compute_capability. **CN:** 将一个值赋给 self.maximum_compute_capability。
+- **L1482** `    self.cluster_shape = cluster_shape` — **EN:** Assigns a value to self.cluster_shape. **CN:** 将一个值赋给 self.cluster_shape。
+- **L1483** `    self.explicit_vector_sizes = explicit_vector_sizes` — **EN:** Assigns a value to self.explicit_vector_sizes. **CN:** 将一个值赋给 self.explicit_vector_sizes。
+- **L1484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1485** `  def procedural_name(self):` — **EN:** Defines function `procedural_name`. **CN:** 定义函数 `procedural_name`。
+- **L1486** `    if self.minimum_compute_capability >= 90:` — **EN:** Starts a conditional branch guarded by `self.minimum_compute_capability >= 90`. **CN:** 开始一个由 `self.minimum_compute_capability >= 90` 控制的条件分支。
+- **L1487** `      return "{tbm}x{tbn}x{tbk}_{cm}x{cn}x{ck}_{s}".format(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1488** `        tbm = self.threadblock_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1489** `        tbn = self.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1490** `        tbk = self.threadblock_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1491** `        cm = self.cluster_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1492** `        cn = self.cluster_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1493** `        ck = self.cluster_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1494** `        s = self.stages)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1495** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1496** `      return "%dx%d_%dx%d" % (self.threadblock_shape[0], self.threadblock_shape[1], self.threadblock_shape[2], self.stages)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1498** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1499** `class Direct2dConvFixedStrideDilationTileDescription:` — **EN:** Defines class `Direct2dConvFixedStrideDilationTileDescription`. **CN:** 定义类 `Direct2dConvFixedStrideDilationTileDescription`。
+- **L1500** `  def __init__(self, threadblock_output_shape, filter_shape, stages, stride, dilation, warp_count, math_instruction, min_compute, max_compute):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1501** `    self.threadblock_shape = [threadblock_output_shape[0]*threadblock_output_shape[1]*threadblock_output_shape[2], threadblock_output_shape[3], filter_shape[0]*filter_shape[1]]` — **EN:** Assigns a value to self.threadblock_shape. **CN:** 将一个值赋给 self.threadblock_shape。
+- **L1502** `    self.threadblock_output_shape = threadblock_output_shape` — **EN:** Assigns a value to self.threadblock_output_shape. **CN:** 将一个值赋给 self.threadblock_output_shape。
+- **L1503** `    self.filter_shape = filter_shape` — **EN:** Assigns a value to self.filter_shape. **CN:** 将一个值赋给 self.filter_shape。
+- **L1504** `    self.stages = stages` — **EN:** Assigns a value to self.stages. **CN:** 将一个值赋给 self.stages。
+- **L1505** `    self.warp_count = warp_count` — **EN:** Assigns a value to self.warp_count. **CN:** 将一个值赋给 self.warp_count。
+- **L1506** `    self.stride = stride` — **EN:** Assigns a value to self.stride. **CN:** 将一个值赋给 self.stride。
+- **L1507** `    self.dilation =  dilation` — **EN:** Assigns a value to self.dilation. **CN:** 将一个值赋给 self.dilation。
+- **L1508** `    self.math_instruction = math_instruction` — **EN:** Assigns a value to self.math_instruction. **CN:** 将一个值赋给 self.math_instruction。
+- **L1509** `    self.minimum_compute_capability = min_compute` — **EN:** Assigns a value to self.minimum_compute_capability. **CN:** 将一个值赋给 self.minimum_compute_capability。
+- **L1510** `    self.maximum_compute_capability = max_compute` — **EN:** Assigns a value to self.maximum_compute_capability. **CN:** 将一个值赋给 self.maximum_compute_capability。
+- **L1511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1512** `  def procedural_name(self):` — **EN:** Defines function `procedural_name`. **CN:** 定义函数 `procedural_name`。
+- **L1513** `    str_name = "%dx%dx%d_%dx%dx%dx%d_%d_filter%dx%d" % (self.threadblock_shape[0],` — **EN:** Assigns a value to str_name. **CN:** 将一个值赋给 str_name。
+- **L1514** `                                      self.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1515** `                                      self.threadblock_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1516** `                                      self.threadblock_output_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1517** `                                      self.threadblock_output_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1518** `                                      self.threadblock_output_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1519** `                                      self.threadblock_output_shape[3],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1520** `                                      self.stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1521** `                                      self.filter_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1522** `                                      self.filter_shape[1])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1523** `    # Fixed Strided and dilation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1524** `    if self.stride != [-1, -1] and self.dilation != [-1, -1]:` — **EN:** Starts a conditional branch guarded by `self.stride != [-1, -1] and self.dilation != [-1, -1]`. **CN:** 开始一个由 `self.stride != [-1, -1] and self.dilation != [-1, -1]` 控制的条件分支。
+- **L1525** `      str_name += "_stride%dx%d_dilation%dx%d" % (self.stride[0],` — **EN:** Updates str_name in place. **CN:** 原地更新 str_name。
+- **L1526** `                                                  self.stride[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1527** `                                                  self.dilation[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1528** `                                                  self.dilation[1])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1529** `    return str_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1531** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1532** `class Direct2dConvFixedStrideDilationTileDescription:` — **EN:** Defines class `Direct2dConvFixedStrideDilationTileDescription`. **CN:** 定义类 `Direct2dConvFixedStrideDilationTileDescription`。
+- **L1533** `  def __init__(self, threadblock_output_shape, filter_shape, stages, stride, dilation, warp_count, math_instruction, min_compute, max_compute):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1534** `    self.threadblock_shape = [threadblock_output_shape[0]*threadblock_output_shape[1]*threadblock_output_shape[2], threadblock_output_shape[3], filter_shape[0]*filter_shape[1]]` — **EN:** Assigns a value to self.threadblock_shape. **CN:** 将一个值赋给 self.threadblock_shape。
+- **L1535** `    self.threadblock_output_shape = threadblock_output_shape` — **EN:** Assigns a value to self.threadblock_output_shape. **CN:** 将一个值赋给 self.threadblock_output_shape。
+- **L1536** `    self.filter_shape = filter_shape` — **EN:** Assigns a value to self.filter_shape. **CN:** 将一个值赋给 self.filter_shape。
+- **L1537** `    self.stages = stages` — **EN:** Assigns a value to self.stages. **CN:** 将一个值赋给 self.stages。
+- **L1538** `    self.warp_count = warp_count` — **EN:** Assigns a value to self.warp_count. **CN:** 将一个值赋给 self.warp_count。
+- **L1539** `    self.stride = stride` — **EN:** Assigns a value to self.stride. **CN:** 将一个值赋给 self.stride。
+- **L1540** `    self.dilation =  dilation` — **EN:** Assigns a value to self.dilation. **CN:** 将一个值赋给 self.dilation。
+- **L1541** `    self.math_instruction = math_instruction` — **EN:** Assigns a value to self.math_instruction. **CN:** 将一个值赋给 self.math_instruction。
+- **L1542** `    self.minimum_compute_capability = min_compute` — **EN:** Assigns a value to self.minimum_compute_capability. **CN:** 将一个值赋给 self.minimum_compute_capability。
+- **L1543** `    self.maximum_compute_capability = max_compute` — **EN:** Assigns a value to self.maximum_compute_capability. **CN:** 将一个值赋给 self.maximum_compute_capability。
+- **L1544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1545** `  def procedural_name(self):` — **EN:** Defines function `procedural_name`. **CN:** 定义函数 `procedural_name`。
+- **L1546** `    str_name = "%dx%dx%d_%dx%dx%dx%d_%d_filter%dx%d" % (self.threadblock_shape[0],` — **EN:** Assigns a value to str_name. **CN:** 将一个值赋给 str_name。
+- **L1547** `                                      self.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1548** `                                      self.threadblock_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1549** `                                      self.threadblock_output_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1550** `                                      self.threadblock_output_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1551** `                                      self.threadblock_output_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1552** `                                      self.threadblock_output_shape[3],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1553** `                                      self.stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1554** `                                      self.filter_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1555** `                                      self.filter_shape[1])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1556** `    # Fixed Strided and dilation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1557** `    if self.stride != [-1, -1] and self.dilation != [-1, -1]:` — **EN:** Starts a conditional branch guarded by `self.stride != [-1, -1] and self.dilation != [-1, -1]`. **CN:** 开始一个由 `self.stride != [-1, -1] and self.dilation != [-1, -1]` 控制的条件分支。
+- **L1558** `      str_name += "_stride%dx%d_dilation%dx%d" % (self.stride[0],` — **EN:** Updates str_name in place. **CN:** 原地更新 str_name。
+- **L1559** `                                                  self.stride[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1560** `                                                  self.dilation[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1561** `                                                  self.dilation[1])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1562** `    return str_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1563** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1564** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1565** `class TensorDescription:` — **EN:** Defines class `TensorDescription`. **CN:** 定义类 `TensorDescription`。
+- **L1566** `  def __init__(self, element, layout, alignment = 1, complex_transform = ComplexTransform.none):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1567** `    self.element = element` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L1568** `    self.layout = layout` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L1569** `    self.alignment = alignment` — **EN:** Assigns a value to self.alignment. **CN:** 将一个值赋给 self.alignment。
+- **L1570** `    self.complex_transform = complex_transform` — **EN:** Assigns a value to self.complex_transform. **CN:** 将一个值赋给 self.complex_transform。
+- **L1571** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1572** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1573** `class SymmetricTensorDescription:` — **EN:** Defines class `SymmetricTensorDescription`. **CN:** 定义类 `SymmetricTensorDescription`。
+- **L1574** `  def __init__(self, element, layout, fill_mode, alignment = 1, complex_transform = ComplexTransform.none, side_mode = SideMode.Left):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1575** `    self.element = element` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L1576** `    self.layout = layout` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L1577** `    self.fill_mode = fill_mode` — **EN:** Assigns a value to self.fill_mode. **CN:** 将一个值赋给 self.fill_mode。
+- **L1578** `    self.alignment = alignment` — **EN:** Assigns a value to self.alignment. **CN:** 将一个值赋给 self.alignment。
+- **L1579** `    self.complex_transform = complex_transform` — **EN:** Assigns a value to self.complex_transform. **CN:** 将一个值赋给 self.complex_transform。
+- **L1580** `    self.side_mode = side_mode` — **EN:** Assigns a value to self.side_mode. **CN:** 将一个值赋给 self.side_mode。
+- **L1581** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1582** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1583** `class TriangularTensorDescription:` — **EN:** Defines class `TriangularTensorDescription`. **CN:** 定义类 `TriangularTensorDescription`。
+- **L1584** `  def __init__(self, element, layout, side_mode, fill_mode, diag_type, alignment = 1, complex_transform = ComplexTransform.none):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1585** `    self.element = element` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L1586** `    self.layout = layout` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L1587** `    self.side_mode = side_mode` — **EN:** Assigns a value to self.side_mode. **CN:** 将一个值赋给 self.side_mode。
+- **L1588** `    self.fill_mode = fill_mode` — **EN:** Assigns a value to self.fill_mode. **CN:** 将一个值赋给 self.fill_mode。
+- **L1589** `    self.diag_type = diag_type` — **EN:** Assigns a value to self.diag_type. **CN:** 将一个值赋给 self.diag_type。
+- **L1590** `    self.alignment = alignment` — **EN:** Assigns a value to self.alignment. **CN:** 将一个值赋给 self.alignment。
+- **L1591** `    self.complex_transform = complex_transform` — **EN:** Assigns a value to self.complex_transform. **CN:** 将一个值赋给 self.complex_transform。
+- **L1592** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1593** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1594** `def CalculateSmemUsage(operation):` — **EN:** Defines function `CalculateSmemUsage`. **CN:** 定义函数 `CalculateSmemUsage`。
+- **L1595** `  cta_shape = operation.tile_description.threadblock_shape` — **EN:** Assigns a value to cta_shape. **CN:** 将一个值赋给 cta_shape。
+- **L1596** `  stages = operation.tile_description.stages` — **EN:** Assigns a value to stages. **CN:** 将一个值赋给 stages。
+- **L1597** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1598** `  if operation.operation_kind == OperationKind.Gemm and operation.gemm_kind == GemmKind.Sparse:` — **EN:** Starts a conditional branch guarded by `operation.operation_kind == OperationKind.Gemm and operat...`. **CN:** 开始一个由 `operation.operation_kind == OperationKind.Gemm and operat...` 控制的条件分支。
+- **L1599** `    # Elements represented by 8 bits of metadata (based on 4:8, 2:4 or 1:2 sparsity)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1600** `    if DataTypeSize[operation.A.element] == 32:` — **EN:** Starts a conditional branch guarded by `DataTypeSize[operation.A.element] == 32`. **CN:** 开始一个由 `DataTypeSize[operation.A.element] == 32` 控制的条件分支。
+- **L1601** `      elements_per_8b_md = 2` — **EN:** Assigns a value to elements_per_8b_md. **CN:** 将一个值赋给 elements_per_8b_md。
+- **L1602** `    elif DataTypeSize[operation.A.element] == 4:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L1603** `      elements_per_8b_md = 8` — **EN:** Assigns a value to elements_per_8b_md. **CN:** 将一个值赋给 elements_per_8b_md。
+- **L1604** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1605** `      elements_per_8b_md = 4` — **EN:** Assigns a value to elements_per_8b_md. **CN:** 将一个值赋给 elements_per_8b_md。
+- **L1606** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1607** `    smem_per_stage = DataTypeSize[operation.A.element] * cta_shape[0] * (cta_shape[2] // 2) // 8 + \` — **EN:** Assigns a value to smem_per_stage. **CN:** 将一个值赋给 smem_per_stage。
+- **L1608** `                     DataTypeSize[operation.B.element] * cta_shape[1] * cta_shape[2] // 8 + \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1609** `                     cta_shape[0] * (cta_shape[2] // 2) // elements_per_8b_md` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1610** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L1611** `    # Few BLAS3 operations only have A tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1612** `    data_type_size_a = DataTypeSize[operation.A.element]` — **EN:** Assigns a value to data_type_size_a. **CN:** 将一个值赋给 data_type_size_a。
+- **L1613** `    data_type_size_b = DataTypeSize[operation.A.element]` — **EN:** Assigns a value to data_type_size_b. **CN:** 将一个值赋给 data_type_size_b。
+- **L1614** `    if operation.is_mixed_input():` — **EN:** Starts a conditional branch guarded by `operation.is_mixed_input()`. **CN:** 开始一个由 `operation.is_mixed_input()` 控制的条件分支。
+- **L1615** `      data_type_size_b = DataTypeSize[operation.B.element]` — **EN:** Assigns a value to data_type_size_b. **CN:** 将一个值赋给 data_type_size_b。
+- **L1616** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1617** `    smem_per_stage = data_type_size_a * cta_shape[0] * cta_shape[2] // 8 + \` — **EN:** Assigns a value to smem_per_stage. **CN:** 将一个值赋给 smem_per_stage。
+- **L1618** `                     data_type_size_b * cta_shape[1] * cta_shape[2] // 8` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1620** `  smem_usage = smem_per_stage * stages` — **EN:** Assigns a value to smem_usage. **CN:** 将一个值赋给 smem_usage。
+- **L1621** `  return (smem_usage >> 10)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1622** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1623** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1624** `class GemmUniversalMode(enum.IntEnum):` — **EN:** Defines class `GemmUniversalMode` with bases enum.IntEnum. **CN:** 定义类 `GemmUniversalMode`，其基类为 enum.IntEnum。
+- **L1625** `  """` — **EN:** Starts the docstring for the class `GemmUniversalMode`. **CN:** 开始说明 class `GemmUniversalMode` 的文档字符串。
+- **L1626** `  Types corresponding to GemmUniversalMode` — **EN:** Continues the docstring for the class `GemmUniversalMode`. **CN:** 继续说明 class `GemmUniversalMode` 的文档字符串。
+- **L1627** `  """` — **EN:** Ends the docstring for the class `GemmUniversalMode`. **CN:** 结束说明 class `GemmUniversalMode` 的文档字符串。
+- **L1628** `  Gemm = 0` — **EN:** Assigns a value to Gemm. **CN:** 将一个值赋给 Gemm。
+- **L1629** `  GemmSplitKParallel = 1` — **EN:** Assigns a value to GemmSplitKParallel. **CN:** 将一个值赋给 GemmSplitKParallel。
+- **L1630** `  Batched = 2` — **EN:** Assigns a value to Batched. **CN:** 将一个值赋给 Batched。
+- **L1631** `  Array = 3` — **EN:** Assigns a value to Array. **CN:** 将一个值赋给 Array。
+- **L1632** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1633** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1634** `class SplitKMode(enum.IntEnum):` — **EN:** Defines class `SplitKMode` with bases enum.IntEnum. **CN:** 定义类 `SplitKMode`，其基类为 enum.IntEnum。
+- **L1635** `  """` — **EN:** Starts the docstring for the class `SplitKMode`. **CN:** 开始说明 class `SplitKMode` 的文档字符串。
+- **L1636** `  Types corresponding to SplitKMode` — **EN:** Continues the docstring for the class `SplitKMode`. **CN:** 继续说明 class `SplitKMode` 的文档字符串。
+- **L1637** `  """` — **EN:** Ends the docstring for the class `SplitKMode`. **CN:** 结束说明 class `SplitKMode` 的文档字符串。
+- **L1638** `  NoneSplitK = 0` — **EN:** Assigns a value to NoneSplitK. **CN:** 将一个值赋给 NoneSplitK。
+- **L1639** `  Serial = 1` — **EN:** Assigns a value to Serial. **CN:** 将一个值赋给 Serial。
+- **L1640** `  Parallel = 2` — **EN:** Assigns a value to Parallel. **CN:** 将一个值赋给 Parallel。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.library`. CN: 模块名为 `cutlass_library.library`。
+- EN: Module docstring summary: Data types and tags used for emitting CUTLASS C++ kernels CN: 模块文档摘要为：Data types and tags used for emitting CUTLASS C++ kernels
+- EN: Top-level classes: GeneratorTarget, DataType, BlasMode, ComplexTransform, ComplexMultiplyOp, MathOperation, LayoutType, KernelScheduleType, EpilogueScheduleType, EpilogueFunctor3x, TileSchedulerType, SideMode, ... (+27 more) CN: 顶层类包括：GeneratorTarget, DataType, BlasMode, ComplexTransform, ComplexMultiplyOp, MathOperation, LayoutType, KernelScheduleType, EpilogueScheduleType, EpilogueFunctor3x, TileSchedulerType, SideMode, ... (+27 more)
+- EN: Top-level functions: is_complex, is_block_scaled, is_blockwise, is_grouped, is_moe, get_complex_from_real, get_real_from_complex, get_tma_alignment, is_tma_epilogue, to_grouped_schedule, SubstituteTemplate, CalculateSmemUsage CN: 顶层函数包括：is_complex, is_block_scaled, is_blockwise, is_grouped, is_moe, get_complex_from_real, get_real_from_complex, get_tma_alignment, is_tma_epilogue, to_grouped_schedule, SubstituteTemplate, CalculateSmemUsage
+
+## Dependencies / 依赖
+- EN: External or standard-library dependencies: enum, re, enum:auto CN: 外部或标准库依赖：enum, re, enum:auto

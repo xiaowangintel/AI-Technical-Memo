@@ -1,0 +1,664 @@
+# tma_store_testbed.hpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/hopper/tma_store_testbed.hpp`
+
+## Purpose / 用途
+- EN: This header defines reusable Hopper / SM90-era CuTe testbed helpers for tma store testbed, so nearby tests can launch kernels and validate results consistently.
+- CN: 该头文件为 Hopper / SM90 时代 的 tma store testbed 定义可复用的 CuTe 测试平台辅助代码，便于相邻测试一致地启动内核并验证结果。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#pragma once`
+  - EN: Ensures this header is included only once per translation unit.
+  - CN: 确保该头文件在一个编译单元中只会被包含一次。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include <iostream>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 37**: `#include <cstdint>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 38**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 39**: `#include <thrust/host_vector.h>`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- **Line 40**: `#include <thrust/device_vector.h>`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- **Line 41**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 42**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 43**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: `namespace cutlass::test {`
+  - EN: Opens namespace `cutlass::test` to organize related helpers or tests.
+  - CN: 打开命名空间 `cutlass::test`，用于组织相关辅助代码或测试。
+- **Line 45**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: `template <class ElementType, class SmemLayout>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 47**: `struct SharedStorage`
+  - EN: Declares `struct SharedStorage`, which packages related state or helper behavior.
+  - CN: 声明 `struct SharedStorage`，用于封装相关状态或辅助行为。
+- **Line 48**: `{`
+  - EN: Opens the scope for `struct SharedStorage`.
+  - CN: 为 `struct SharedStorage` 打开作用域。
+- **Line 49**: `  cute::ArrayEngine<ElementType, cute::cosize_v<SmemLayout>> smem;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 50**: `};`
+  - EN: Closes the scope for `struct SharedStorage`.
+  - CN: 结束 `struct SharedStorage` 的作用域。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `#if CUDA_12_0_SM90_FEATURES_SUPPORTED`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 53**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 54**: `template <class T, class TiledCopy, class CTA_Tiler, class GmemLayout, class SmemLayout>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 55**: `__global__ void`
+  - EN: Marks the next declaration as a CUDA kernel that will execute on the GPU.
+  - CN: 把后续声明标记为将在 GPU 上执行的 CUDA 内核。
+- **Line 56**: `tma_test_device_cute(T const* g_in, T* g_out,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 57**: `                     CUTE_GRID_CONSTANT TiledCopy const tma, CTA_Tiler cta_tiler,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 58**: `                     GmemLayout gmem_layout, SmemLayout smem_layout)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 59**: `{`
+  - EN: Opens the scope for `CUDA kernel`.
+  - CN: 为 `CUDA kernel` 打开作用域。
+- **Line 60**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 61**: `  CUTE_STATIC_ASSERT_V(product_each(shape(cta_tiler)) == product_each(shape(smem_layout)));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 62**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 63**: `  // Use Shared Storage structure to allocate and distribute aligned SMEM addresses`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 64**: `  extern __shared__ char shared_memory[];`
+  - EN: Declares dynamically sized shared memory used as a per-block scratch buffer.
+  - CN: 声明动态大小的共享内存，作为线程块级暂存缓冲区。
+- **Line 65**: `  using SharedStorage = SharedStorage<T, SmemLayout>;`
+  - EN: Creates alias `SharedStorage` to simplify a verbose type or expression.
+  - CN: 创建别名 `SharedStorage`，以简化较长的类型或表达式。
+- **Line 66**: `  SharedStorage& shared_storage = *reinterpret_cast<SharedStorage*>(shared_memory);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 67**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 68**: `  // Construct SMEM tensor`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 69**: `  Tensor sB = make_tensor(make_smem_ptr(shared_storage.smem.begin()), smem_layout);  // (CTA_TILE_M,CTA_TILE_N,...)`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 70**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 71**: `  // TMA requires special handling of strides to deal with coord codomain mapping`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 72**: `  // Represent the full tensors -- get these from TMA`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 73**: `  Tensor mA = make_tensor(make_gmem_ptr<T>(g_in), gmem_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 74**: `  Tensor mB = tma.get_tma_tensor(shape(gmem_layout));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 75**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 76**: `  constexpr int R = rank_v<CTA_Tiler>;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 77**: `  Tensor gA = flat_divide(mA, cta_tiler);                 // (CTA_TILE_M,CTA_TILE_N,...REST_M,REST_N,...)`
+  - EN: Flattens then divides a layout/tensor into coarse and residual pieces.
+  - CN: 先展平再划分布局/张量，得到粗粒度与残余部分。
+- **Line 78**: `  Tensor gB = flat_divide(mB, cta_tiler);                 // (CTA_TILE_M,CTA_TILE_N,...REST_M,REST_N,...)`
+  - EN: Flattens then divides a layout/tensor into coarse and residual pieces.
+  - CN: 先展平再划分布局/张量，得到粗粒度与残余部分。
+- **Line 79**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 80**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 81**: `  // Prepare the TMA_STORE`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 82**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 83**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 84**: `  auto cta_tma = tma.get_slice(Int<0>{});                            // CTA slice`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 85**: `  Tensor tBsB_x = cta_tma.partition_S(sB);                           // (TMA,TMA_M,TMA_N)`
+  - EN: Partitions the source-side tensor view according to a tiled copy object.
+  - CN: 根据分块复制对象对源侧张量视图进行分区。
+- **Line 86**: `  Tensor tBgB_x = cta_tma.partition_D(gB);                           // (TMA,TMA_M,TMA_N,REST_M,REST_N)`
+  - EN: Partitions the destination-side tensor view according to a tiled copy object.
+  - CN: 根据分块复制对象对目标侧张量视图进行分区。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `#if 0`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 89**: `  if (thread0()) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 90**: `    print(tma);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 91**: `    print("TILE  :  "); print(cta_tiler); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 92**: `    print("  mB  :  "); print(  mB.data());   print(" o "); print(  mB.layout());   print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 93**: `    print("  gB  :  "); print(  gB.data());   print(" o "); print(  gB.layout());   print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 94**: `    print("tBgB_x:  "); print(tBgB_x.data()); print(" o "); print(tBgB_x.layout()); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 95**: `    print("  sB  :  "); print(  sB.data());   print(" o "); print(  sB.layout());   print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 96**: `    print("tBsB_x:  "); print(tBsB_x.data()); print(" o "); print(tBsB_x.layout()); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 97**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 98**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+- **Line 99**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 100**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 101**: `  // Perform the TMA_STORE`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 102**: `  //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 103**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 104**: `  // INPUT: Group the CTA_TILE_X modes and REST_X modes for input`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 105**: `  Tensor tAgA = group_modes<0,R>(group_modes<R,rank(gA)>(gA));       // (CTA_TILE, REST)`
+  - EN: Regroups multiple modes into a higher-level tiled view.
+  - CN: 把多个模式重新分组为更高层次的分块视图。
+- **Line 106**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 107**: `  // OUTPUT: Group the REST_X modes and the TMA_X modes to easily iterate through the tiles`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 108**: `  Tensor tBgB = group_modes<1,rank(tBgB_x)>(tBgB_x);                 // (TMA,REST)`
+  - EN: Regroups multiple modes into a higher-level tiled view.
+  - CN: 把多个模式重新分组为更高层次的分块视图。
+- **Line 109**: `  Tensor tBsB = group_modes<1,rank(tBsB_x)>(tBsB_x);                 // (TMA,REST)`
+  - EN: Regroups multiple modes into a higher-level tiled view.
+  - CN: 把多个模式重新分组为更高层次的分块视图。
+- **Line 110**: `  static_assert(size<1>(tBsB) == 1);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 111**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 112**: `#if 0`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 113**: `  if (thread0()) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 114**: `    print("tAgA  :  "); print(tAgA.data()); print(" o "); print(tAgA.layout()); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 115**: `    print("tBsB  :  "); print(tBsB.data()); print(" o "); print(tBsB.layout()); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 116**: `    print("tBgB  :  "); print(tBgB.data()); print(" o "); print(tBgB.layout()); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 117**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 118**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+- **Line 119**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 120**: `  // Test L2 prefetch`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 121**: `  cooperative_prefetch<128>(threadIdx.x, gA);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 122**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: `  // Loop over the TMA stages, using smem as our buffer`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 124**: `  for (int stage = 0; stage < size<1>(tBgB); ++stage)`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 125**: `  {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 126**: `    //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 127**: `    // Read in trivially gmem -> smem`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 128**: `    //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 129**: `    // Subbyte elements could cause race conditions, so be even more conservative`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 130**: `    if (thread0()) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 131**: `      copy(tAgA(_,stage), sB);`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 132**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 133**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 134**: `    __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 135**: `    cute::cp_async_wait<0>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 136**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 137**: `    //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 138**: `    // Perform the TMA_STORE`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 139**: `    //`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 140**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 141**: `    if (threadIdx.x == 0) {`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 142**: `      copy(tma, tBsB(_,0), tBgB(_,stage));`
+  - EN: Invokes a CuTe or CUDA data-movement operation.
+  - CN: 调用一个 CuTe 或 CUDA 数据搬运操作。
+- **Line 143**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 144**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 145**: `    tma_store_wait<0>();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 146**: `    __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 147**: `  }`
+  - EN: Closes the scope for `CUDA kernel`.
+  - CN: 结束 `CUDA kernel` 的作用域。
+- **Line 148**: `}`
+  - EN: Closes the scope for `namespace cutlass::test`.
+  - CN: 结束 `namespace cutlass::test` 的作用域。
+- **Line 149**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 150**: `template <class T, class TmaType = T, class CopyOp, class GMEM_Layout, class SMEM_Layout, class CTA_Tile>`
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 151**: `void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 152**: `test_tma_store(CopyOp      const& copy_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 153**: `               GMEM_Layout const& gmem_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 154**: `               SMEM_Layout const& smem_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 155**: `               CTA_Tile    const& cta_tile)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 156**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 157**: `  using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 158**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 159**: `  // Allocate and initialize host test data`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 160**: `  size_t N = ceil_div(cosize(gmem_layout) * sizeof_bits<T>::value, 8);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 161**: `  thrust::host_vector<uint8_t> h_in(N);`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 162**: `  for (size_t i = 0; i < h_in.size(); ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 163**: `    h_in[i] = uint8_t(i % 13);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 164**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 165**: `  Tensor hA_in  = make_tensor(recast_ptr<T>(h_in.data()), gmem_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 166**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 167**: `  // Allocate and initialize device test data`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 168**: `  thrust::device_vector<uint8_t> d_in = h_in;`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 169**: `  thrust::device_vector<uint8_t> d_out(h_in.size(), uint8_t(-1)); // overflow uint`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `  // Create TMA for this device Tensor`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 172**: `  Tensor gA = make_tensor(make_gmem_ptr<T>(raw_pointer_cast(d_out.data())), gmem_layout);`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 173**: `  auto tma = make_tma_copy<TmaType>(copy_op, gA, smem_layout, cta_tile, Int<1>{});`
+  - EN: Builds a TMA copy object that describes Hopper-style tensor movement.
+  - CN: 构造一个 TMA copy 对象，用于描述 Hopper 风格的张量搬运。
+- **Line 174**: `  //print(tma);`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 175**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 176**: `  // Launch`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 177**: `  int smem_size = int(sizeof(SharedStorage<T, decltype(smem_layout)>));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 178**: `  tma_test_device_cute<<<1, 128, smem_size>>>(`
+  - EN: Launches a CUDA kernel with the specified grid, block, and shared-memory configuration.
+  - CN: 使用给定的网格、线程块和共享内存配置启动 CUDA 内核。
+- **Line 179**: `    reinterpret_cast<T const*>(raw_pointer_cast(d_in.data())),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 180**: `    reinterpret_cast<T*>      (raw_pointer_cast(d_out.data())),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 181**: `    tma, cta_tile,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 182**: `    gmem_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 183**: `    smem_layout);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 184**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 185**: `  // Copy results back to host`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 186**: `  thrust::host_vector<uint8_t> h_out = d_out;`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 187**: `  Tensor hA_out = make_tensor(recast_ptr<T>(h_out.data()), gmem_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 188**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 189**: `  // Validate the results. Print only the first 3 errors.`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 190**: `  int count = 3;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 191**: `  for (int i = 0; i < int(size(hA_out)) && count > 0; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 192**: `    EXPECT_EQ(hA_in(i), hA_out(i));`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 193**: `    if (hA_in(i) != hA_out(i)) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 194**: `      --count;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 195**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 196**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 197**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 198**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 199**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+- **Line 200**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 201**: `} // end namespace cutlass::test`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+
+## Key Concepts / 关键概念
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `ASSERT_`
+  - EN: Uses a stronger assertion that aborts the current test when a prerequisite fails.
+  - CN: 使用更强的断言；当前置条件失败时会立即中止当前测试。
+- `CUTE_STATIC_ASSERT_V`
+  - EN: Checks a CuTe expression at compile time, which is important for layout algebra and type-level reasoning.
+  - CN: 在编译期检查 CuTe 表达式，这对布局代数和类型级推导非常重要。
+- `static_assert`
+  - EN: Checks a property at compile time before the binary can be produced.
+  - CN: 在生成二进制文件之前，于编译期检查某个性质。
+- `Tensor`
+  - EN: Uses the CuTe tensor abstraction to bind memory pointers with layouts.
+  - CN: 使用 CuTe Tensor 抽象把内存指针与布局绑定起来。
+- `make_tensor`
+  - EN: Builds a CuTe tensor object from a pointer and a layout.
+  - CN: 从指针和布局构造一个 CuTe 张量对象。
+- `thrust::host_vector`
+  - EN: Uses a host container to prepare reference data on the CPU.
+  - CN: 使用主机端容器在 CPU 上准备参考数据。
+- `thrust::device_vector`
+  - EN: Uses a device container to allocate and copy GPU buffers.
+  - CN: 使用设备端容器来分配并复制 GPU 缓冲区。
+- `__global__`
+  - EN: Defines a CUDA kernel launched from the host for device-side validation.
+  - CN: 定义一个从主机启动的 CUDA 内核，用于设备端验证。
+- `cp_async`
+  - EN: Exercises asynchronous copy primitives on architectures that support them.
+  - CN: 测试支持该能力的架构上的异步拷贝原语。
+
+## Dependencies / 依赖关系
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `iostream`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `cstdint`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `thrust/host_vector.h`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- `thrust/device_vector.h`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。

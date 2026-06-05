@@ -1,0 +1,730 @@
+# Float8_e4m3fn.h — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `torch/headeronly/util/Float8_e4m3fn.h`
+- **Repository / 仓库**: `pytorch` (`/root/xw/pytorch`)
+- **Purpose (EN)**: Declares lightweight utility types, numeric helpers, or version metadata for header-only consumers.
+- **Purpose (CN)**: 声明供 header-only 使用者消费的轻量工具类型、数值辅助逻辑或版本元数据。
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-18 / 第 1-18 行
+````cpp
+#pragma once
+
+/// Defines the Float8_e4m3fn type (8-bit floating-point) including conversions
+/// to standard C types and basic arithmetic operations. Note that arithmetic
+/// operations are implemented by converting to floating point and
+/// performing the operation in float32.
+/// Binary configuration:
+/// s eeee mmm
+/// 1 sign bit
+/// 4 exponent bits
+/// 3 mantissa bits
+/// bias = 7
+///
+/// Implementation based on the paper https://arxiv.org/pdf/2209.05433.pdf
+/// and inspired by Half implementation from pytorch/c10/util/Half.h
+
+#include <torch/headeronly/macros/Macros.h>
+#include <torch/headeronly/util/floating_point_utils.h>
+````
+- **EN**: This block assembles C++ compilation dependencies, pulling in local torch headers such as torch/headeronly/macros/Macros.h, torch/headeronly/util/floating_point_utils.h. The preprocessor guard keeps the header safe to include transitively.
+- **CN**: 这一段组织 C++ 编译依赖，引入了本地 torch 头文件，如 torch/headeronly/macros/Macros.h、torch/headeronly/util/floating_point_utils.h。 预处理器保护使该头文件在传递包含时依然安全。
+
+### Lines 20-38 / 第 20-38 行
+````cpp
+#if defined(__cplusplus)
+#include <cmath>
+#include <cstdint>
+#elif !defined(__OPENCL_VERSION__)
+#include <math.h>
+#include <stdint.h>
+#endif
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
+#include <climits>
+#include <iostream>
+
+namespace c10 {
+
+struct alignas(1) Float8_e4m3fn {
+  uint8_t x;
+````
+- **EN**: This block assembles C++ compilation dependencies, pulling in other supporting headers such as cmath, cstdint, math.h, .... The namespace declarations place the code inside c10, matching the surrounding header-only subsystem. It introduces or extends `alignas`, which define the main types in this slice of the header. Conditional logic preserves invariants across scalar types, platform features, or macro arguments.
+- **CN**: 这一段组织 C++ 编译依赖，引入了其他支撑头文件，如 cmath、cstdint、math.h、...。 命名空间声明把代码放入 c10 中，与周边 header-only 子系统保持一致。 它引入或扩展了 `alignas`，这些类型定义了该头文件片段中的主要抽象。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。
+
+### Lines 40-60 / 第 40-60 行
+````cpp
+  struct from_bits_t {};
+  C10_HOST_DEVICE static constexpr from_bits_t from_bits() {
+    return from_bits_t();
+  }
+
+  Float8_e4m3fn() = default;
+
+  constexpr C10_HOST_DEVICE Float8_e4m3fn(uint8_t bits, from_bits_t /*unused*/)
+      : x(bits) {}
+  inline C10_HOST_DEVICE Float8_e4m3fn(float value);
+  inline C10_HOST_DEVICE operator float() const;
+  inline C10_HOST_DEVICE bool isnan() const;
+  inline C10_HOST_DEVICE bool isinf() const;
+};
+
+inline std::ostream& operator<<(std::ostream& out, const Float8_e4m3fn& value) {
+  out << (float)value;
+  return out;
+}
+
+namespace detail {
+````
+- **EN**: The namespace declarations place the code inside detail, matching the surrounding header-only subsystem. It introduces or extends `from_bits_t`, which define the main types in this slice of the header. This chunk declares or defines `isinf`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 命名空间声明把代码放入 detail 中，与周边 header-only 子系统保持一致。 它引入或扩展了 `from_bits_t`，这些类型定义了该头文件片段中的主要抽象。 这一段声明或定义了 `isinf`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 62-83 / 第 62-83 行
+````cpp
+/*
+ * Convert a 8-bit floating-point number in fp8 E4M3FN format, in bit
+ * representation, to a 32-bit floating-point number in IEEE single-precision
+ * format, in bit representation.
+ *
+ * @note The implementation doesn't use any floating-point operations.
+ */
+inline C10_HOST_DEVICE float fp8e4m3fn_to_fp32_value(uint8_t input) {
+  /*
+   * Extend the fp8 E4M3FN number to 32 bits and shift to the
+   * upper part of the 32-bit word:
+   *      +---+----+---+-----------------------------+
+   *      | S |EEEE|MMM|0000 0000 0000 0000 0000 0000|
+   *      +---+----+---+-----------------------------+
+   * Bits  31 27-30 24-26          0-23
+   *
+   * S - sign bit, E - bits of the biased exponent, M - bits of the mantissa, 0
+   * - zero bits.
+   */
+  const uint32_t w = (uint32_t)input << 24;
+  /*
+   * Extract the sign of the input number into the high bit of the 32-bit word:
+````
+- **EN**: This chunk declares or defines `fp8e4m3fn_to_fp32_value`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units.
+- **CN**: 这一段声明或定义了 `fp8e4m3fn_to_fp32_value`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。
+
+### Lines 84-105 / 第 84-105 行
+````cpp
+   *
+   *      +---+----------------------------------+
+   *      | S |0000000 00000000 00000000 00000000|
+   *      +---+----------------------------------+
+   * Bits  31                 0-31
+   */
+  const uint32_t sign = w & UINT32_C(0x80000000);
+  /*
+   * Extract mantissa and biased exponent of the input number into the bits 0-30
+   * of the 32-bit word:
+   *
+   *      +---+----+---+-----------------------------+
+   *      | S |EEEE|MMM|0000 0000 0000 0000 0000 0000|
+   *      +---+----+---+-----------------------------+
+   * Bits  31  27-30 24-26      0-23
+   */
+  const uint32_t nonsign = w & UINT32_C(0x7FFFFFFF);
+  /*
+   * Renorm shift is the number of bits to shift mantissa left to make the
+   * half-precision number normalized. If the initial number is normalized, some
+   * of its high 5 bits (sign == 0 and 4-bit exponent) equals one. In this case
+   * renorm_shift == 0. If the number is denormalize, renorm_shift > 0. Note
+````
+- **EN**: This chunk declares or defines `UINT32_C`, which defines a reusable C++ abstraction that downstream code expands inline.
+- **CN**: 这一段声明或定义了 `UINT32_C`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。
+
+### Lines 106-127 / 第 106-127 行
+````cpp
+   * that if we shift denormalized nonsign by renorm_shift, the unit bit of
+   * mantissa will shift into exponent, turning the biased exponent into 1, and
+   * making mantissa normalized (i.e. without leading 1).
+   */
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+  uint32_t renorm_shift = __clz(nonsign);
+#elif defined(__SYCL_DEVICE_ONLY__)
+  // Note: zero is not a supported input into `__builtin_clz`
+  uint32_t renorm_shift =
+      nonsign != 0 ? __builtin_clz(nonsign) : sizeof(uint32_t) * CHAR_BIT;
+#elif defined(_MSC_VER) && !defined(__clang__)
+  unsigned long nonsign_bsr;
+  _BitScanReverse(&nonsign_bsr, (unsigned long)nonsign);
+  uint32_t renorm_shift = (uint32_t)nonsign_bsr ^ 31;
+#else
+  // Note: zero is not a supported input into `__builtin_clz`
+  uint32_t renorm_shift =
+      nonsign != 0 ? __builtin_clz(nonsign) : sizeof(uint32_t) * CHAR_BIT;
+#endif
+  renorm_shift = renorm_shift > 4 ? renorm_shift - 4 : 0;
+  /*
+   * Iff fp8e4m3fn number has all exponent and mantissa bits set to 1,
+````
+- **EN**: This chunk declares or defines `__builtin_clz`, which defines a reusable C++ abstraction that downstream code expands inline. Conditional logic preserves invariants across scalar types, platform features, or macro arguments.
+- **CN**: 这一段声明或定义了 `__builtin_clz`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。
+
+### Lines 128-149 / 第 128-149 行
+````cpp
+   * the addition overflows it into bit 31, and the subsequent shift turns the
+   * high 9 bits into 1. Thus inf_nan_mask == 0x7F800000 if the fp8e4m3fn number
+   * is Nan, 0x00000000 otherwise
+   */
+  const int32_t inf_nan_mask =
+      ((int32_t)(nonsign + 0x01000000) >> 8) & INT32_C(0x7F800000);
+  /*
+   * Iff nonsign is 0, it overflows into 0xFFFFFFFF, turning bit 31
+   * into 1. Otherwise, bit 31 remains 0. The signed shift right by 31
+   * broadcasts bit 31 into all bits of the zero_mask. Thus zero_mask ==
+   * 0xFFFFFFFF if the half-precision number was zero (+0.0h or -0.0h)
+   * 0x00000000 otherwise
+   */
+  const int32_t zero_mask = (int32_t)(nonsign - 1) >> 31;
+  /*
+   * 1. Shift nonsign left by renorm_shift to normalize it (if the input
+   * was denormal)
+   * 2. Shift nonsign right by 4 so the exponent (4 bits originally)
+   * becomes an 8-bit field and 3-bit mantissa shifts into the 3 high
+   * bits of the 23-bit mantissa of IEEE single-precision number.
+   * 3. Add 0x78 to the exponent (starting at bit 23) to compensate the
+   * different in exponent bias (0x7F for single-precision number less 0x07
+````
+- **EN**: This chunk declares or defines `INT32_C`, which defines a reusable C++ abstraction that downstream code expands inline. Conditional logic preserves invariants across scalar types, platform features, or macro arguments.
+- **CN**: 这一段声明或定义了 `INT32_C`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。
+
+### Lines 150-165 / 第 150-165 行
+````cpp
+   * for fp8e4m3fn number).
+   * 4. Subtract renorm_shift from the exponent (starting at bit 23) to
+   * account for renormalization. As renorm_shift is less than 0x78, this
+   * can be combined with step 3.
+   * 5. Binary OR with inf_nan_mask to turn the exponent into 0xFF if the
+   * input was NaN or infinity.
+   * 6. Binary ANDNOT with zero_mask to turn the mantissa and exponent
+   * into zero if the input was zero.
+   * 7. Combine with the sign of the input number.
+   */
+  uint32_t result = sign |
+      ((((nonsign << renorm_shift >> 4) + ((0x78 - renorm_shift) << 23)) |
+        inf_nan_mask) &
+       ~zero_mask);
+  return fp32_from_bits(result);
+}
+````
+- **EN**: This chunk declares or defines `fp32_from_bits`, which defines a reusable C++ abstraction that downstream code expands inline. Conditional logic preserves invariants across scalar types, platform features, or macro arguments. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `fp32_from_bits`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 167-187 / 第 167-187 行
+````cpp
+/*
+ * Convert a 32-bit floating-point number in IEEE single-precision format to a
+ * 8-bit floating-point number in fp8 E4M3FN format, in bit representation.
+ */
+inline C10_HOST_DEVICE uint8_t fp8e4m3fn_from_fp32_value(float f) {
+  /*
+   * Binary representation of 480.0f, which is the first value
+   * not representable in fp8e4m3fn range:
+   * 0 1111 111 - fp8e4m3fn
+   * 0 10000111 11100000000000000000000 - fp32
+   */
+  constexpr uint32_t fp8_max = UINT32_C(1087) << 20;
+
+  /*
+   * A mask for converting fp32 numbers lower than fp8e4m3fn normal range
+   * into denorm representation
+   * magic number: ((127 - 7) + (23 - 3) + 1)
+   */
+  constexpr uint32_t denorm_mask = UINT32_C(141) << 23;
+
+  uint32_t f_bits = fp32_to_bits(f);
+````
+- **EN**: This chunk declares or defines `fp32_to_bits`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units.
+- **CN**: 这一段声明或定义了 `fp32_to_bits`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。
+
+### Lines 189-204 / 第 189-204 行
+````cpp
+  uint8_t result = 0u;
+
+  /*
+   * Extract the sign of the input number into the high bit of the 32-bit word:
+   *
+   *      +---+----------------------------------+
+   *      | S |0000000 00000000 00000000 00000000|
+   *      +---+----------------------------------+
+   * Bits  31                 0-31
+   */
+  const uint32_t sign = f_bits & UINT32_C(0x80000000);
+
+  /*
+   * Set sign bit to 0
+   */
+  f_bits ^= sign;
+````
+- **EN**: This chunk declares or defines `UINT32_C`, which defines a reusable C++ abstraction that downstream code expands inline.
+- **CN**: 这一段声明或定义了 `UINT32_C`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。
+
+### Lines 206-226 / 第 206-226 行
+````cpp
+  if (f_bits >= fp8_max) {
+    if (f_bits > UINT32_C(0x7F800000)) {
+      // NaN input → NaN output
+      result = 0x7f;
+    } else {
+      // Finite overflow or inf → saturate to max finite value
+      result = 0x7e;
+    }
+  } else {
+    if (f_bits < (UINT32_C(121) << 23)) {
+      // Input number is smaller than 2^(-6), which is the smallest
+      // fp8e4m3fn normal number
+      f_bits =
+          fp32_to_bits(fp32_from_bits(f_bits) + fp32_from_bits(denorm_mask));
+      result = static_cast<uint8_t>(f_bits - denorm_mask);
+    } else {
+      // resulting mantissa is odd
+      uint8_t mant_odd = (f_bits >> 20) & 1;
+
+      // update exponent, rounding bias part 1
+      f_bits += ((uint32_t)(7 - 127) << 23) + 0x7FFFF;
+````
+- **EN**: This chunk declares or defines `static_cast<uint8_t>`, which defines a reusable C++ abstraction that downstream code expands inline. Conditional logic preserves invariants across scalar types, platform features, or macro arguments.
+- **CN**: 这一段声明或定义了 `static_cast<uint8_t>`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。
+
+### Lines 228-245 / 第 228-245 行
+````cpp
+      // rounding bias part 2
+      f_bits += mant_odd;
+
+      // take the bits!
+      result = static_cast<uint8_t>(f_bits >> 20);
+
+      // Rounding may carry into the NaN bit pattern (0x7f); saturate to max
+      if (result == 0x7f) {
+        result = 0x7e;
+      }
+    }
+  }
+
+  result |= static_cast<uint8_t>(sign >> 24);
+  return result;
+}
+
+} // namespace detail
+````
+- **EN**: This chunk declares or defines `pattern`, which defines a reusable C++ abstraction that downstream code expands inline. Conditional logic preserves invariants across scalar types, platform features, or macro arguments. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `pattern`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 247-264 / 第 247-264 行
+````cpp
+// -------- below is copied from c10/util/Float8_e4m3fn-inl.h --------//
+C10_CLANG_DIAGNOSTIC_PUSH()
+#if C10_CLANG_HAS_WARNING("-Wimplicit-int-float-conversion")
+C10_CLANG_DIAGNOSTIC_IGNORE("-Wimplicit-int-float-conversion")
+#endif
+
+/// Constructors
+
+inline C10_HOST_DEVICE Float8_e4m3fn::Float8_e4m3fn(float value)
+    : x(detail::fp8e4m3fn_from_fp32_value(value)) {}
+
+/// Implicit conversions
+
+inline C10_HOST_DEVICE Float8_e4m3fn::operator float() const {
+  return detail::fp8e4m3fn_to_fp32_value(x);
+}
+
+/// Special values helper
+````
+- **EN**: This chunk declares or defines `fp8e4m3fn_to_fp32_value`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. Conditional logic preserves invariants across scalar types, platform features, or macro arguments. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `fp8e4m3fn_to_fp32_value`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 条件逻辑用于在不同标量类型、平台特性或宏参数之间保持不变量。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 266-285 / 第 266-285 行
+````cpp
+inline C10_HOST_DEVICE bool Float8_e4m3fn::isnan() const {
+  return (x & 0b01111111) == 0b01111111;
+}
+
+inline C10_HOST_DEVICE bool Float8_e4m3fn::isinf() const {
+  // Note: fp8e4m3fn does not have infinity, so this always returns false.
+  return false;
+}
+
+/// Arithmetic
+
+inline C10_HOST_DEVICE Float8_e4m3fn
+operator+(const Float8_e4m3fn& a, const Float8_e4m3fn& b) {
+  return static_cast<float>(a) + static_cast<float>(b);
+}
+
+inline C10_HOST_DEVICE Float8_e4m3fn
+operator-(const Float8_e4m3fn& a, const Float8_e4m3fn& b) {
+  return static_cast<float>(a) - static_cast<float>(b);
+}
+````
+- **EN**: This chunk declares or defines `static_cast<float>`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `static_cast<float>`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 287-307 / 第 287-307 行
+````cpp
+inline C10_HOST_DEVICE Float8_e4m3fn
+operator*(const Float8_e4m3fn& a, const Float8_e4m3fn& b) {
+  return static_cast<float>(a) * static_cast<float>(b);
+}
+
+inline C10_HOST_DEVICE Float8_e4m3fn operator/(
+    const Float8_e4m3fn& a,
+    const Float8_e4m3fn& b) __ubsan_ignore_float_divide_by_zero__ {
+  return static_cast<float>(a) / static_cast<float>(b);
+}
+
+inline C10_HOST_DEVICE Float8_e4m3fn operator-(const Float8_e4m3fn& a) {
+  return -static_cast<float>(a);
+}
+
+inline C10_HOST_DEVICE Float8_e4m3fn& operator+=(
+    Float8_e4m3fn& a,
+    const Float8_e4m3fn& b) {
+  a = a + b;
+  return a;
+}
+````
+- **EN**: This chunk declares or defines `static_cast<float>`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `static_cast<float>`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 309-328 / 第 309-328 行
+````cpp
+inline C10_HOST_DEVICE Float8_e4m3fn& operator-=(
+    Float8_e4m3fn& a,
+    const Float8_e4m3fn& b) {
+  a = a - b;
+  return a;
+}
+
+inline C10_HOST_DEVICE Float8_e4m3fn& operator*=(
+    Float8_e4m3fn& a,
+    const Float8_e4m3fn& b) {
+  a = a * b;
+  return a;
+}
+
+inline C10_HOST_DEVICE Float8_e4m3fn& operator/=(
+    Float8_e4m3fn& a,
+    const Float8_e4m3fn& b) {
+  a = a / b;
+  return a;
+}
+````
+- **EN**: This chunk continues `static_cast<float>` and expands the supporting macro logic or inline behavior around it. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段延续了 `static_cast<float>`，进一步展开其周边的宏逻辑或内联行为。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 330-344 / 第 330-344 行
+````cpp
+/// Arithmetic with floats
+
+inline C10_HOST_DEVICE float operator+(Float8_e4m3fn a, float b) {
+  return static_cast<float>(a) + b;
+}
+inline C10_HOST_DEVICE float operator-(Float8_e4m3fn a, float b) {
+  return static_cast<float>(a) - b;
+}
+inline C10_HOST_DEVICE float operator*(Float8_e4m3fn a, float b) {
+  return static_cast<float>(a) * b;
+}
+inline C10_HOST_DEVICE float operator/(Float8_e4m3fn a, float b)
+    __ubsan_ignore_float_divide_by_zero__ {
+  return static_cast<float>(a) / b;
+}
+````
+- **EN**: This chunk continues `static_cast<float>` and expands the supporting macro logic or inline behavior around it. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段延续了 `static_cast<float>`，进一步展开其周边的宏逻辑或内联行为。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 346-367 / 第 346-367 行
+````cpp
+inline C10_HOST_DEVICE float operator+(float a, Float8_e4m3fn b) {
+  return a + static_cast<float>(b);
+}
+inline C10_HOST_DEVICE float operator-(float a, Float8_e4m3fn b) {
+  return a - static_cast<float>(b);
+}
+inline C10_HOST_DEVICE float operator*(float a, Float8_e4m3fn b) {
+  return a * static_cast<float>(b);
+}
+inline C10_HOST_DEVICE float operator/(float a, Float8_e4m3fn b)
+    __ubsan_ignore_float_divide_by_zero__ {
+  return a / static_cast<float>(b);
+}
+
+inline C10_HOST_DEVICE float& operator+=(float& a, const Float8_e4m3fn& b) {
+  return a += static_cast<float>(b);
+}
+inline C10_HOST_DEVICE float& operator-=(float& a, const Float8_e4m3fn& b) {
+  return a -= static_cast<float>(b);
+}
+inline C10_HOST_DEVICE float& operator*=(float& a, const Float8_e4m3fn& b) {
+  return a *= static_cast<float>(b);
+````
+- **EN**: This chunk declares or defines `static_cast<float>`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `static_cast<float>`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 368-387 / 第 368-387 行
+````cpp
+}
+inline C10_HOST_DEVICE float& operator/=(float& a, const Float8_e4m3fn& b) {
+  return a /= static_cast<float>(b);
+}
+
+/// Arithmetic with doubles
+
+inline C10_HOST_DEVICE double operator+(Float8_e4m3fn a, double b) {
+  return static_cast<double>(a) + b;
+}
+inline C10_HOST_DEVICE double operator-(Float8_e4m3fn a, double b) {
+  return static_cast<double>(a) - b;
+}
+inline C10_HOST_DEVICE double operator*(Float8_e4m3fn a, double b) {
+  return static_cast<double>(a) * b;
+}
+inline C10_HOST_DEVICE double operator/(Float8_e4m3fn a, double b)
+    __ubsan_ignore_float_divide_by_zero__ {
+  return static_cast<double>(a) / b;
+}
+````
+- **EN**: This chunk declares or defines `static_cast<float>`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `static_cast<float>`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 389-403 / 第 389-403 行
+````cpp
+inline C10_HOST_DEVICE double operator+(double a, Float8_e4m3fn b) {
+  return a + static_cast<double>(b);
+}
+inline C10_HOST_DEVICE double operator-(double a, Float8_e4m3fn b) {
+  return a - static_cast<double>(b);
+}
+inline C10_HOST_DEVICE double operator*(double a, Float8_e4m3fn b) {
+  return a * static_cast<double>(b);
+}
+inline C10_HOST_DEVICE double operator/(double a, Float8_e4m3fn b)
+    __ubsan_ignore_float_divide_by_zero__ {
+  return a / static_cast<double>(b);
+}
+
+/// Arithmetic with ints
+````
+- **EN**: This chunk declares or defines `static_cast<double>`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `static_cast<double>`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 405-420 / 第 405-420 行
+````cpp
+inline C10_HOST_DEVICE Float8_e4m3fn operator+(Float8_e4m3fn a, int b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a + static_cast<Float8_e4m3fn>(b);
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator-(Float8_e4m3fn a, int b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a - static_cast<Float8_e4m3fn>(b);
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator*(Float8_e4m3fn a, int b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a * static_cast<Float8_e4m3fn>(b);
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator/(Float8_e4m3fn a, int b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a / static_cast<Float8_e4m3fn>(b);
+}
+````
+- **EN**: This chunk declares or defines `NOLINTNEXTLINE`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `NOLINTNEXTLINE`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 422-439 / 第 422-439 行
+````cpp
+inline C10_HOST_DEVICE Float8_e4m3fn operator+(int a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) + b;
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator-(int a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) - b;
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator*(int a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) * b;
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator/(int a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) / b;
+}
+
+//// Arithmetic with int64_t
+````
+- **EN**: This chunk continues `NOLINTNEXTLINE` and expands the supporting macro logic or inline behavior around it. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段延续了 `NOLINTNEXTLINE`，进一步展开其周边的宏逻辑或内联行为。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 441-456 / 第 441-456 行
+````cpp
+inline C10_HOST_DEVICE Float8_e4m3fn operator+(Float8_e4m3fn a, int64_t b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a + static_cast<Float8_e4m3fn>(b);
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator-(Float8_e4m3fn a, int64_t b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a - static_cast<Float8_e4m3fn>(b);
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator*(Float8_e4m3fn a, int64_t b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a * static_cast<Float8_e4m3fn>(b);
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator/(Float8_e4m3fn a, int64_t b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return a / static_cast<Float8_e4m3fn>(b);
+}
+````
+- **EN**: This chunk declares or defines `NOLINTNEXTLINE`, which defines a reusable C++ abstraction that downstream code expands inline. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `NOLINTNEXTLINE`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 458-478 / 第 458-478 行
+````cpp
+inline C10_HOST_DEVICE Float8_e4m3fn operator+(int64_t a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) + b;
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator-(int64_t a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) - b;
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator*(int64_t a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) * b;
+}
+inline C10_HOST_DEVICE Float8_e4m3fn operator/(int64_t a, Float8_e4m3fn b) {
+  // NOLINTNEXTLINE(bugprone-narrowing-conversions,cppcoreguidelines-narrowing-conversions)
+  return static_cast<Float8_e4m3fn>(a) / b;
+}
+
+/// NOTE: we do not define comparisons directly and instead rely on the implicit
+/// conversion from c10::Float8_e4m3fn to float.
+
+C10_CLANG_DIAGNOSTIC_POP()
+````
+- **EN**: This chunk continues `NOLINTNEXTLINE` and expands the supporting macro logic or inline behavior around it. Inline definitions keep the helper cheap to reuse from downstream translation units. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段延续了 `NOLINTNEXTLINE`，进一步展开其周边的宏逻辑或内联行为。 内联定义使该辅助逻辑能被下游翻译单元低成本复用。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 480-495 / 第 480-495 行
+````cpp
+} // namespace c10
+
+HIDDEN_NAMESPACE_BEGIN(torch, headeronly)
+using c10::Float8_e4m3fn;
+using c10::operator<<;
+using c10::operator+;
+using c10::operator-;
+using c10::operator*;
+using c10::operator/;
+using c10::operator+=;
+using c10::operator-=;
+using c10::operator*=;
+using c10::operator/=;
+HIDDEN_NAMESPACE_END(torch, headeronly)
+
+namespace std {
+````
+- **EN**: The namespace declarations place the code inside std, matching the surrounding header-only subsystem. This chunk continues `NOLINTNEXTLINE` and expands the supporting macro logic or inline behavior around it.
+- **CN**: 命名空间声明把代码放入 std 中，与周边 header-only 子系统保持一致。 这一段延续了 `NOLINTNEXTLINE`，进一步展开其周边的宏逻辑或内联行为。
+
+### Lines 497-518 / 第 497-518 行
+````cpp
+template <>
+class numeric_limits<c10::Float8_e4m3fn> {
+ public:
+  static constexpr bool is_specialized = true;
+  static constexpr bool is_signed = true;
+  static constexpr bool is_integer = false;
+  static constexpr bool is_exact = false;
+  static constexpr bool has_infinity = false;
+  static constexpr bool has_quiet_NaN = true;
+  static constexpr bool has_signaling_NaN = false;
+  static constexpr auto has_denorm = true;
+  static constexpr auto has_denorm_loss = true;
+  static constexpr auto round_style = numeric_limits<float>::round_style;
+  static constexpr bool is_iec559 = false;
+  static constexpr bool is_bounded = true;
+  static constexpr bool is_modulo = false;
+  static constexpr int digits = 4;
+  static constexpr int digits10 = 0;
+  static constexpr int max_digits10 = 3;
+  static constexpr int radix = 2;
+  static constexpr int min_exponent = -5;
+  static constexpr int min_exponent10 = -1;
+````
+- **EN**: It introduces or extends `numeric_limits`, which define the main types in this slice of the header. This chunk continues `numeric_limits` and expands the supporting macro logic or inline behavior around it. Template machinery keeps the abstraction generic across scalar or layout choices.
+- **CN**: 它引入或扩展了 `numeric_limits`，这些类型定义了该头文件片段中的主要抽象。 这一段延续了 `numeric_limits`，进一步展开其周边的宏逻辑或内联行为。 模板机制让该抽象可以跨不同标量类型或布局选择复用。
+
+### Lines 519-540 / 第 519-540 行
+````cpp
+  static constexpr int max_exponent = 8;
+  static constexpr int max_exponent10 = 2;
+  static constexpr auto traps = numeric_limits<float>::traps;
+  static constexpr auto tinyness_before = false;
+
+  static constexpr c10::Float8_e4m3fn min() {
+    return c10::Float8_e4m3fn(0x08, c10::Float8_e4m3fn::from_bits());
+  }
+  static constexpr c10::Float8_e4m3fn lowest() {
+    return c10::Float8_e4m3fn(0xFE, c10::Float8_e4m3fn::from_bits());
+  }
+  static constexpr c10::Float8_e4m3fn max() {
+    return c10::Float8_e4m3fn(0x7E, c10::Float8_e4m3fn::from_bits());
+  }
+  static constexpr c10::Float8_e4m3fn epsilon() {
+    return c10::Float8_e4m3fn(0x20, c10::Float8_e4m3fn::from_bits());
+  }
+  static constexpr c10::Float8_e4m3fn round_error() {
+    return c10::Float8_e4m3fn(0x30, c10::Float8_e4m3fn::from_bits());
+  }
+  static constexpr c10::Float8_e4m3fn quiet_NaN() {
+    return c10::Float8_e4m3fn(0x7F, c10::Float8_e4m3fn::from_bits());
+````
+- **EN**: This chunk declares or defines `quiet_NaN`, which defines a reusable C++ abstraction that downstream code expands inline. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `quiet_NaN`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+### Lines 541-547 / 第 541-547 行
+````cpp
+  }
+  static constexpr c10::Float8_e4m3fn denorm_min() {
+    return c10::Float8_e4m3fn(0x01, c10::Float8_e4m3fn::from_bits());
+  }
+};
+
+} // namespace std
+````
+- **EN**: This chunk declares or defines `Float8_e4m3fn`, which defines a reusable C++ abstraction that downstream code expands inline. The tail returns the selected helper result back to the caller or macro expansion site.
+- **CN**: 这一段声明或定义了 `Float8_e4m3fn`，其作用是定义可被下游代码以内联方式复用的 C++ 抽象。 末尾会把选定的辅助结果返回给调用方或宏展开位置。
+
+## Key Concepts / 关键概念
+
+- **Header-only foundations**
+  - EN: Encodes small C++ building blocks as headers so downstream code can inline them cheaply.
+  - CN: 把小型 C++ 基础构件编码为头文件，便于下游代码低成本内联。
+- **alignas**
+  - EN: `alignas` is one of the main symbols declared or implemented in this file.
+  - CN: `alignas` 是本文件声明或实现的主要符号之一。
+- **from_bits_t**
+  - EN: `from_bits_t` is one of the main symbols declared or implemented in this file.
+  - CN: `from_bits_t` 是本文件声明或实现的主要符号之一。
+- **Stream coordination**
+  - EN: The code exposes stream-aware state so asynchronous execution can be controlled from Python.
+  - CN: 代码暴露与流相关的状态，使异步执行可从 Python 侧进行控制。
+- **Type surface**
+  - EN: The code uses typing metadata or scalar/layout enums to make APIs safer and clearer.
+  - CN: 代码使用类型元数据或标量/布局枚举，让 API 更安全、更清晰。
+- **Macro-based abstraction**
+  - EN: The header relies on macros so similar dispatch patterns can be expanded consistently.
+  - CN: 该头文件依赖宏来一致地展开相似的 dispatch 模式。
+## Dependencies / 依赖关系
+
+- **Internal torch headers / torch 内部头文件**: `torch/headeronly/macros/Macros.h`, `torch/headeronly/util/floating_point_utils.h`
+- **Other headers / 其他头文件**: `cmath`, `cstdint`, `math.h`, `stdint.h`, `intrin.h`, `climits`, `iostream`
+- **Primary symbols in this file / 本文件核心符号**: `alignas`, `from_bits_t`, `from_bits`, `Float8_e4m3fn`, `float`, `isnan`, `isinf`, `fp8e4m3fn_to_fp32_value`, `UINT32_C`, `bits`

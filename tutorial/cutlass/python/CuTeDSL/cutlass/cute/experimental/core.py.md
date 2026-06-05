@@ -1,0 +1,633 @@
+# core.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/experimental/core.py`
+
+## Purpose / 作用
+- EN: Defines 3 classes (_SupportsIrValue, PipelineState, CircularBufferPipelineState) and 23 functions (elect_sync, get_mbarrier, _normalize_create_pipeline_arrival_mask, _build_pipeline, ... (+19 more)) in `CuTeDSL.cutlass.cute.experimental.core`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.experimental.core` 定义了 3 个类（_SupportsIrValue, PipelineState, CircularBufferPipelineState） 和 23 个函数（elect_sync, get_mbarrier, _normalize_create_pipeline_arrival_mask, _build_pipeline, ... (+19 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional, Protocol, TypeAlias` — **EN:** Imports Optional, Protocol, TypeAlias from `typing`. **CN:** 从 `typing` 导入 Optional, Protocol, TypeAlias。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L15** `from cutlass._mlir.dialects import lir as cutlass_lir_ir, nvvm as _nvvm` — **EN:** Imports lir as cutlass_lir_ir, nvvm as _nvvm from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 lir as cutlass_lir_ir, nvvm as _nvvm。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `from cutlass.cutlass_dsl import lru_cache_ir` — **EN:** Imports lru_cache_ir from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 lru_cache_ir。
+- **L18** `from cutlass._mlir.dialects.core import OperationTypeEnum` — **EN:** Imports OperationTypeEnum from `cutlass._mlir.dialects.core`. **CN:** 从 `cutlass._mlir.dialects.core` 导入 OperationTypeEnum。
+- **L19** `from cutlass import cute` — **EN:** Imports cute from `cutlass`. **CN:** 从 `cutlass` 导入 cute。
+- **L20** `from cutlass.cute.typing import Boolean` — **EN:** Imports Boolean from `cutlass.cute.typing`. **CN:** 从 `cutlass.cute.typing` 导入 Boolean。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `class _SupportsIrValue(Protocol):` — **EN:** Defines class `_SupportsIrValue` with bases Protocol. **CN:** 定义类 `_SupportsIrValue`，其基类为 Protocol。
+- **L24** `    def ir_value(` — **EN:** Defines function `ir_value`. **CN:** 定义函数 `ir_value`。
+- **L25** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `    ) -> ir.Value: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `SkipWaitToken: TypeAlias = bool | ir.Value | _SupportsIrValue` — **EN:** Assigns a typed value to SkipWaitToken. **CN:** 为 SkipWaitToken 赋予带类型标注的值。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L36** `def elect_sync(` — **EN:** Defines function `elect_sync`. **CN:** 定义函数 `elect_sync`。
+- **L37** `    loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L38** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L39** `    return _nvvm.elect_sync(loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L43** `def get_mbarrier(` — **EN:** Defines function `get_mbarrier`. **CN:** 定义函数 `get_mbarrier`。
+- **L44** `    stage_token: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L48** `    """` — **EN:** Starts the docstring for the function `get_mbarrier`. **CN:** 开始说明 function `get_mbarrier` 的文档字符串。
+- **L49** `    Returns the mbarrier pointer for a given stage token.` — **EN:** Continues the docstring for the function `get_mbarrier`. **CN:** 继续说明 function `get_mbarrier` 的文档字符串。
+- **L50** `    """` — **EN:** Ends the docstring for the function `get_mbarrier`. **CN:** 结束说明 function `get_mbarrier` 的文档字符串。
+- **L51** `    return cutlass_lir_ir.GetMbarrierOp(stage_token, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `@ir.register_value_caster(cutlass_lir_ir.PipelineStateType.get_static_typeid())` — **EN:** Applies decorator `ir.register_value_caster(cutlass_lir_ir.PipelineStateType...` to the following definition. **CN:** 将装饰器 `ir.register_value_caster(cutlass_lir_ir.PipelineStateType...` 应用于后面的定义。
+- **L55** `class PipelineState(ir.Value):` — **EN:** Defines class `PipelineState` with bases ir.Value. **CN:** 定义类 `PipelineState`，其基类为 ir.Value。
+- **L56** `    def __init__(self, value: ir.Value) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L57** `        if isinstance(value, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(value, ir.Value)`. **CN:** 开始一个由 `isinstance(value, ir.Value)` 控制的条件分支。
+- **L58** `            self.value = value` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L59** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L60** `            raise TypeError(f"Expected ir.Value, got {type(value)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L61** `        super().__init__(value)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L64** `    @lru_cache_ir()` — **EN:** Applies decorator `lru_cache_ir()` to the following definition. **CN:** 将装饰器 `lru_cache_ir()` 应用于后面的定义。
+- **L65** `    def type(self) -> ir.Type:` — **EN:** Defines function `type`. **CN:** 定义函数 `type`。
+- **L66** `        return self.value.type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L69** `    def __new_from_mlir_values__(cls, values: list[ir.Value]) -> "PipelineState":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L70** `        assert len(values) == 1, f"Expected 1 value, but got {len(values)}"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L71** `        return PipelineState(values[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `def _normalize_create_pipeline_arrival_mask(` — **EN:** Defines function `_normalize_create_pipeline_arrival_mask`. **CN:** 定义函数 `_normalize_create_pipeline_arrival_mask`。
+- **L75** `    arrival_mask: Optional[cute.Int16],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `    compat_kwargs: dict[str, object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `) -> Optional[cute.Int16]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L78** `    # Legacy source compatibility: older callers used \`multicast\` as the sixth` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `    # argument. Keep \`False\` working, but force \`True\` callers onto the explicit` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L80** `    # mask APIs because the legacy path produced incorrect IR.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L81** `    # Remove this shim once the team is comfortable breaking low-level` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L82** `    # create_pipeline() callers and dropping the legacy multicast spelling.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L83** `    multicast = compat_kwargs.pop("multicast", None)` — **EN:** Assigns a value to multicast. **CN:** 将一个值赋给 multicast。
+- **L84** `    if compat_kwargs:` — **EN:** Starts a conditional branch guarded by `compat_kwargs`. **CN:** 开始一个由 `compat_kwargs` 控制的条件分支。
+- **L85** `        unexpected_arg = next(iter(compat_kwargs))` — **EN:** Assigns a value to unexpected_arg. **CN:** 将一个值赋给 unexpected_arg。
+- **L86** `        raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L87** `            f"create_pipeline() got an unexpected keyword argument '{unexpected_arg}'"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    if multicast is not None:` — **EN:** Starts a conditional branch guarded by `multicast is not None`. **CN:** 开始一个由 `multicast is not None` 控制的条件分支。
+- **L91** `        if not isinstance(multicast, bool):` — **EN:** Starts a conditional branch guarded by `not isinstance(multicast, bool)`. **CN:** 开始一个由 `not isinstance(multicast, bool)` 控制的条件分支。
+- **L92** `            raise TypeError(f"Expected \`multicast\` to be a bool, got {type(multicast)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L93** `        if arrival_mask is not None:` — **EN:** Starts a conditional branch guarded by `arrival_mask is not None`. **CN:** 开始一个由 `arrival_mask is not None` 控制的条件分支。
+- **L94** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L95** `                "create_pipeline() does not accept both \`arrival_mask\` and legacy \`multicast\`."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `        if multicast:` — **EN:** Starts a conditional branch guarded by `multicast`. **CN:** 开始一个由 `multicast` 控制的条件分支。
+- **L98** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L99** `                "create_pipeline(multicast=True) is no longer supported; "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `                "use create_pipeline(..., arrival_mask=...) or "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `                "create_pipeline_with_mask(...)."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    if isinstance(arrival_mask, bool):` — **EN:** Starts a conditional branch guarded by `isinstance(arrival_mask, bool)`. **CN:** 开始一个由 `isinstance(arrival_mask, bool)` 控制的条件分支。
+- **L106** `        if arrival_mask:` — **EN:** Starts a conditional branch guarded by `arrival_mask`. **CN:** 开始一个由 `arrival_mask` 控制的条件分支。
+- **L107** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L108** `                "create_pipeline(True) no longer supports the legacy multicast "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `                "form; use create_pipeline(..., arrival_mask=...) or "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `                "create_pipeline_with_mask(...)."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    return arrival_mask` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `def _build_pipeline(` — **EN:** Defines function `_build_pipeline`. **CN:** 定义函数 `_build_pipeline`。
+- **L118** `    stage: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `    producer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `    consumer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `    producer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `    consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `    arrival_mask: Optional[cute.Int16],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `    loc: Optional[ir.Location],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `    ip: Optional[ir.InsertionPoint],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `) -> tuple[PipelineState, PipelineState, PipelineState]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L127** `    if isinstance(producer_arv_count, int):` — **EN:** Starts a conditional branch guarded by `isinstance(producer_arv_count, int)`. **CN:** 开始一个由 `isinstance(producer_arv_count, int)` 控制的条件分支。
+- **L128** `        producer_arv_count = cute.Int32(producer_arv_count)` — **EN:** Assigns a value to producer_arv_count. **CN:** 将一个值赋给 producer_arv_count。
+- **L129** `    if isinstance(consumer_arv_count, int):` — **EN:** Starts a conditional branch guarded by `isinstance(consumer_arv_count, int)`. **CN:** 开始一个由 `isinstance(consumer_arv_count, int)` 控制的条件分支。
+- **L130** `        consumer_arv_count = cute.Int32(consumer_arv_count)` — **EN:** Assigns a value to consumer_arv_count. **CN:** 将一个值赋给 consumer_arv_count。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    if arrival_mask is not None:` — **EN:** Starts a conditional branch guarded by `arrival_mask is not None`. **CN:** 开始一个由 `arrival_mask is not None` 控制的条件分支。
+- **L133** `        if isinstance(arrival_mask, int):` — **EN:** Starts a conditional branch guarded by `isinstance(arrival_mask, int)`. **CN:** 开始一个由 `isinstance(arrival_mask, int)` 控制的条件分支。
+- **L134** `            arrival_mask = cute.Int16(arrival_mask)` — **EN:** Assigns a value to arrival_mask. **CN:** 将一个值赋给 arrival_mask。
+- **L135** `        result = ir.Type.parse(f"!lir.pipeline<{stage}, {producer} -> {consumer}>")` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L136** `        op = cutlass_lir_ir.CreatePipelineWithMaskOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L137** `            result,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `            producer_arv_count.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `            consumer_arv_count.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `            arrival_mask.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L145** `        result = ir.Type.parse(f"!lir.pipeline<{stage}, {producer} -> {consumer}>")` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L146** `        op = cutlass_lir_ir.CreatePipelineOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L147** `            result,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `            producer_arv_count.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            consumer_arv_count.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `    pipeline = op.result` — **EN:** Assigns a value to pipeline. **CN:** 将一个值赋给 pipeline。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `    result = ir.Type.parse(f"!lir.pipeline_state<{stage}>")` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L156** `    op = cutlass_lir_ir.CreatePipelineStateOp(result, pipeline, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L157** `    producer_state = op.result` — **EN:** Assigns a value to producer_state. **CN:** 将一个值赋给 producer_state。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    result = ir.Type.parse(f"!lir.pipeline_state<{stage}>")` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L160** `    op = cutlass_lir_ir.CreatePipelineStateOp(result, pipeline, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L161** `    consumer_state = op.result` — **EN:** Assigns a value to consumer_state. **CN:** 将一个值赋给 consumer_state。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    return pipeline, producer_state, consumer_state` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L167** `def create_pipeline(` — **EN:** Defines function `create_pipeline`. **CN:** 定义函数 `create_pipeline`。
+- **L168** `    stage: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L169** `    producer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L170** `    consumer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L171** `    producer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L172** `    consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L173** `    arrival_mask: Optional[cute.Int16] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L174** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L175** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L176** `    **compat_kwargs: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L177** `) -> tuple[PipelineState, PipelineState, PipelineState]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L178** `    """` — **EN:** Starts the docstring for the function `create_pipeline`. **CN:** 开始说明 function `create_pipeline` 的文档字符串。
+- **L179** `    Creates an abstraction for a circular buffer of synchronization primitives` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L180** `    indexed by stage count.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    Args:` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L183** `        stage: Number of pipeline stages.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L184** `        producer: Producer operation type.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L185** `        consumer: Consumer operation type.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L186** `        producer_arv_count: Number of producer arrivals.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L187** `        consumer_arv_count: Number of consumer arrivals.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L188** `        arrival_mask: Optional arrival mask for multi-CTA synchronization` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L189** `            (2SM or multicast). When provided, creates the pipeline with` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L190** `            explicit mask-based barrier configuration.` — **EN:** Continues the docstring for the function `create_pipeline`. **CN:** 继续说明 function `create_pipeline` 的文档字符串。
+- **L191** `    """` — **EN:** Ends the docstring for the function `create_pipeline`. **CN:** 结束说明 function `create_pipeline` 的文档字符串。
+- **L192** `    arrival_mask = _normalize_create_pipeline_arrival_mask(arrival_mask, compat_kwargs)` — **EN:** Assigns a value to arrival_mask. **CN:** 将一个值赋给 arrival_mask。
+- **L193** `    return _build_pipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** `        stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `        producer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `        consumer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `        producer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `        arrival_mask,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `        loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L206** `def create_pipeline_with_mask(` — **EN:** Defines function `create_pipeline_with_mask`. **CN:** 定义函数 `create_pipeline_with_mask`。
+- **L207** `    stage: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L208** `    producer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L209** `    consumer: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L210** `    producer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L211** `    consumer_arv_count: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L212** `    arrival_mask: cute.Int16,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L213** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L214** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L215** `) -> tuple[PipelineState, PipelineState, PipelineState]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L216** `    """Backward-compatible wrapper. Prefer create_pipeline(..., arrival_mask=...)."""` — **EN:** Docstring line documenting the function `create_pipeline_with_mask`. **CN:** 文档字符串行，用于说明 function `create_pipeline_with_mask`。
+- **L217** `    return _build_pipeline(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** `        stage,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `        producer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `        consumer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `        producer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `        consumer_arv_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `        arrival_mask,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `        loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `        ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L230** `def pipeline_advance_iterator(` — **EN:** Defines function `pipeline_advance_iterator`. **CN:** 定义函数 `pipeline_advance_iterator`。
+- **L231** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L232** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L233** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L234** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L235** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L236** `    """` — **EN:** Starts the docstring for the function `pipeline_advance_iterator`. **CN:** 开始说明 function `pipeline_advance_iterator` 的文档字符串。
+- **L237** `    Advances a pipeline iterator to the next stage.` — **EN:** Continues the docstring for the function `pipeline_advance_iterator`. **CN:** 继续说明 function `pipeline_advance_iterator` 的文档字符串。
+- **L238** `    """` — **EN:** Ends the docstring for the function `pipeline_advance_iterator`. **CN:** 结束说明 function `pipeline_advance_iterator` 的文档字符串。
+- **L239** `    op = cutlass_lir_ir.PipelineAdvanceIteratorOp(pipe, state, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L240** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L244** `def producer_acquire(` — **EN:** Defines function `producer_acquire`. **CN:** 定义函数 `producer_acquire`。
+- **L245** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L246** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L247** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L248** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L249** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L250** `    """` — **EN:** Starts the docstring for the function `producer_acquire`. **CN:** 开始说明 function `producer_acquire` 的文档字符串。
+- **L251** `    Acquires exclusive access to a pipeline.` — **EN:** Continues the docstring for the function `producer_acquire`. **CN:** 继续说明 function `producer_acquire` 的文档字符串。
+- **L252** `    """` — **EN:** Ends the docstring for the function `producer_acquire`. **CN:** 结束说明 function `producer_acquire` 的文档字符串。
+- **L253** `    op = cutlass_lir_ir.ProducerAcquireOp(pipe, state, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L254** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L258** `def producer_commit(` — **EN:** Defines function `producer_commit`. **CN:** 定义函数 `producer_commit`。
+- **L259** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L260** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L261** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L262** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L263** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L264** `    """` — **EN:** Starts the docstring for the function `producer_commit`. **CN:** 开始说明 function `producer_commit` 的文档字符串。
+- **L265** `    Commits results to a pipeline.` — **EN:** Continues the docstring for the function `producer_commit`. **CN:** 继续说明 function `producer_commit` 的文档字符串。
+- **L266** `    """` — **EN:** Ends the docstring for the function `producer_commit`. **CN:** 结束说明 function `producer_commit` 的文档字符串。
+- **L267** `    op = cutlass_lir_ir.ProducerCommitOp(pipe, state, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L268** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L272** `def consumer_wait(` — **EN:** Defines function `consumer_wait`. **CN:** 定义函数 `consumer_wait`。
+- **L273** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L274** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L275** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L278** `    """` — **EN:** Starts the docstring for the function `consumer_wait`. **CN:** 开始说明 function `consumer_wait` 的文档字符串。
+- **L279** `    Waits for a pipeline to transition to \`full\`.` — **EN:** Continues the docstring for the function `consumer_wait`. **CN:** 继续说明 function `consumer_wait` 的文档字符串。
+- **L280** `    """` — **EN:** Ends the docstring for the function `consumer_wait`. **CN:** 结束说明 function `consumer_wait` 的文档字符串。
+- **L281** `    op = cutlass_lir_ir.ConsumerWaitOp(pipe, state, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L282** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L286** `def consumer_release(` — **EN:** Defines function `consumer_release`. **CN:** 定义函数 `consumer_release`。
+- **L287** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L288** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L289** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L290** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L291** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L292** `    """` — **EN:** Starts the docstring for the function `consumer_release`. **CN:** 开始说明 function `consumer_release` 的文档字符串。
+- **L293** `    Releases a pipeline that has been consumed.` — **EN:** Continues the docstring for the function `consumer_release`. **CN:** 继续说明 function `consumer_release` 的文档字符串。
+- **L294** `    """` — **EN:** Ends the docstring for the function `consumer_release`. **CN:** 结束说明 function `consumer_release` 的文档字符串。
+- **L295** `    op = cutlass_lir_ir.ConsumerReleaseOp(pipe, state, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L296** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L300** `def consumer_release_elect_one_sync(` — **EN:** Defines function `consumer_release_elect_one_sync`. **CN:** 定义函数 `consumer_release_elect_one_sync`。
+- **L301** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L302** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L303** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L304** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L306** `    """` — **EN:** Starts the docstring for the function `consumer_release_elect_one_sync`. **CN:** 开始说明 function `consumer_release_elect_one_sync` 的文档字符串。
+- **L307** `    Releases a pipeline that has been consumed.` — **EN:** Continues the docstring for the function `consumer_release_elect_one_sync`. **CN:** 继续说明 function `consumer_release_elect_one_sync` 的文档字符串。
+- **L308** `    """` — **EN:** Ends the docstring for the function `consumer_release_elect_one_sync`. **CN:** 结束说明 function `consumer_release_elect_one_sync` 的文档字符串。
+- **L309** `    op = cutlass_lir_ir.ConsumerReleaseOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L310** `        pipe, state, elect_one_sync=True, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L312** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L316** `def consumer_tail(` — **EN:** Defines function `consumer_tail`. **CN:** 定义函数 `consumer_tail`。
+- **L317** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L318** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L319** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L320** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L321** `) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L322** `    """` — **EN:** Starts the docstring for the function `consumer_tail`. **CN:** 开始说明 function `consumer_tail` 的文档字符串。
+- **L323** `    Called by the consumer to block until asynchronous tasks have completed.` — **EN:** Continues the docstring for the function `consumer_tail`. **CN:** 继续说明 function `consumer_tail` 的文档字符串。
+- **L324** `    """` — **EN:** Ends the docstring for the function `consumer_tail`. **CN:** 结束说明 function `consumer_tail` 的文档字符串。
+- **L325** `    op = cutlass_lir_ir.ConsumerTailOp(pipe, state, loc=loc, ip=ip)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L326** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L330** `def get_pipeline_produce_stage(` — **EN:** Defines function `get_pipeline_produce_stage`. **CN:** 定义函数 `get_pipeline_produce_stage`。
+- **L331** `    pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L332** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L333** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L334** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L335** `) -> tuple[ir.Value, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L336** `    """` — **EN:** Starts the docstring for the function `get_pipeline_produce_stage`. **CN:** 开始说明 function `get_pipeline_produce_stage` 的文档字符串。
+- **L337** `    Gets a pipeline produce stage.` — **EN:** Continues the docstring for the function `get_pipeline_produce_stage`. **CN:** 继续说明 function `get_pipeline_produce_stage` 的文档字符串。
+- **L338** `    """` — **EN:** Ends the docstring for the function `get_pipeline_produce_stage`. **CN:** 结束说明 function `get_pipeline_produce_stage` 的文档字符串。
+- **L339** `    stage_token_type = ir.Type.parse(f"!lir.stage_token<{pipeline.type}>")` — **EN:** Assigns a value to stage_token_type. **CN:** 将一个值赋给 stage_token_type。
+- **L340** `    stage_idx = ir.IntegerType.get_signless(32)` — **EN:** Assigns a value to stage_idx. **CN:** 将一个值赋给 stage_idx。
+- **L341** `    op = cutlass_lir_ir.GetPipelineProduceStageOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L342** `        stage_token=stage_token_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L343** `        stage_index=stage_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `        pipeline=pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `        pipelineState=state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `    return op.stage_token, op.stage_index` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L353** `def get_pipeline_consume_stage(` — **EN:** Defines function `get_pipeline_consume_stage`. **CN:** 定义函数 `get_pipeline_consume_stage`。
+- **L354** `    pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L355** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L356** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L357** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `) -> tuple[ir.Value, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L359** `    """` — **EN:** Starts the docstring for the function `get_pipeline_consume_stage`. **CN:** 开始说明 function `get_pipeline_consume_stage` 的文档字符串。
+- **L360** `    Creates a pipeline consume stage.` — **EN:** Continues the docstring for the function `get_pipeline_consume_stage`. **CN:** 继续说明 function `get_pipeline_consume_stage` 的文档字符串。
+- **L361** `    """` — **EN:** Ends the docstring for the function `get_pipeline_consume_stage`. **CN:** 结束说明 function `get_pipeline_consume_stage` 的文档字符串。
+- **L362** `    stage_token_type = ir.Type.parse(f"!lir.stage_token<{pipeline.type}>")` — **EN:** Assigns a value to stage_token_type. **CN:** 将一个值赋给 stage_token_type。
+- **L363** `    stage_idx = ir.IntegerType.get_signless(32)` — **EN:** Assigns a value to stage_idx. **CN:** 将一个值赋给 stage_idx。
+- **L364** `    op = cutlass_lir_ir.GetPipelineConsumeStageOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L365** `        stage_token=stage_token_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `        stage_index=stage_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `        pipeline=pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `        pipelineState=state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `    return op.stage_token, op.stage_index` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L373** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L374** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L375** `@ir.register_value_caster(` — **EN:** Applies decorator `ir.register_value_caster(cutlass_lir_ir.CircularBufferPip...` to the following definition. **CN:** 将装饰器 `ir.register_value_caster(cutlass_lir_ir.CircularBufferPip...` 应用于后面的定义。
+- **L376** `    cutlass_lir_ir.CircularBufferPipelineStateType.get_static_typeid()` — **EN:** Applies decorator `ir.register_value_caster(cutlass_lir_ir.CircularBufferPip...` to the following definition. **CN:** 将装饰器 `ir.register_value_caster(cutlass_lir_ir.CircularBufferPip...` 应用于后面的定义。
+- **L377** `)` — **EN:** Applies decorator `ir.register_value_caster(cutlass_lir_ir.CircularBufferPip...` to the following definition. **CN:** 将装饰器 `ir.register_value_caster(cutlass_lir_ir.CircularBufferPip...` 应用于后面的定义。
+- **L378** `class CircularBufferPipelineState(ir.Value):` — **EN:** Defines class `CircularBufferPipelineState` with bases ir.Value. **CN:** 定义类 `CircularBufferPipelineState`，其基类为 ir.Value。
+- **L379** `    def __init__(self, value: ir.Value) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L380** `        if isinstance(value, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(value, ir.Value)`. **CN:** 开始一个由 `isinstance(value, ir.Value)` 控制的条件分支。
+- **L381** `            self.value = value` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L382** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L383** `            raise TypeError(f"Expected ir.Value, got {type(value)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L384** `        super().__init__(value)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L387** `    @lru_cache_ir()` — **EN:** Applies decorator `lru_cache_ir()` to the following definition. **CN:** 将装饰器 `lru_cache_ir()` 应用于后面的定义。
+- **L388** `    def type(self) -> ir.Type:` — **EN:** Defines function `type`. **CN:** 定义函数 `type`。
+- **L389** `        return self.value.type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L392** `    def __new_from_mlir_values__(` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L393** `        cls, values: list[ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L394** `    ) -> "CircularBufferPipelineState":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L395** `        assert len(values) == 1, f"Expected 1 value, but got {len(values)}"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L396** `        return CircularBufferPipelineState(values[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L400** `def create_circular_buffer_pipeline(` — **EN:** Defines function `create_circular_buffer_pipeline`. **CN:** 定义函数 `create_circular_buffer_pipeline`。
+- **L401** `    pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `    pipeline_state: PipelineState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `    stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `    count_per_stage: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L405** `    count_per_iteration: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L406** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L407** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L408** `) -> CircularBufferPipelineState:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L409** `    """` — **EN:** Starts the docstring for the function `create_circular_buffer_pipeline`. **CN:** 开始说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L410** `    Creates a circular buffer abstraction layered on top of a lir.pipeline.` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** `    Each pipeline stage is subdivided into \`count_per_stage\` units.` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L413** `    Operations can advance the circular buffer position by \`count_per_iteration\` units` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L414** `    at a time in a FIFO manner. The abstraction provides synchronized access to` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L415** `    pipeline stages given the circular buffer position.` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L417** `    Args:` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L418** `        pipeline: The underlying pipeline object` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L419** `        pipeline_state: Initial pipeline state` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L420** `        stages: Number of pipeline stages` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L421** `        count_per_stage: Number of units per pipeline stage` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L422** `        count_per_iteration: Number of units per iteration (chunk size)` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L423** `        loc: Source location` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L424** `        ip: Insertion point` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L426** `    Returns:` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L427** `        CircularBufferPipelineState: The circular buffer pipeline state` — **EN:** Continues the docstring for the function `create_circular_buffer_pipeline`. **CN:** 继续说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L428** `    """` — **EN:** Ends the docstring for the function `create_circular_buffer_pipeline`. **CN:** 结束说明 function `create_circular_buffer_pipeline` 的文档字符串。
+- **L429** `    result_type = ir.Type.parse(` — **EN:** Assigns a value to result_type. **CN:** 将一个值赋给 result_type。
+- **L430** `        f"!lir.circular_buffer_pipeline_state<{stages}, {count_per_stage}, {count_per_iteration}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `    op = cutlass_lir_ir.CreateCircularBufferPipelineOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L433** `        result_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `        pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L435** `        pipeline_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L443** `def circular_buffer_pipeline_consume(` — **EN:** Defines function `circular_buffer_pipeline_consume`. **CN:** 定义函数 `circular_buffer_pipeline_consume`。
+- **L444** `    pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L445** `    circular_buffer_pipeline_state: CircularBufferPipelineState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L446** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L447** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L448** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L449** `    """` — **EN:** Starts the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 开始说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L450** `    Synchronize pipeline stages needed for circular buffer consumption.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `    This operation performs synchronization for the circular buffer consumer.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L453** `    Based on the current circular buffer position and \`count_per_iteration\`, it` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L454** `    determines which pipeline stages need to be synchronized and waits for them` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L455** `    to transition to full before consumption can proceed.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `    Args:` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L458** `        pipeline: The underlying pipeline object` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L459** `        circular_buffer_pipeline_state: Current circular buffer pipeline state` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L460** `        loc: Source location` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L461** `        ip: Insertion point` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 继续说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L462** `    """` — **EN:** Ends the docstring for the function `circular_buffer_pipeline_consume`. **CN:** 结束说明 function `circular_buffer_pipeline_consume` 的文档字符串。
+- **L463** `    cutlass_lir_ir.CircularBufferPipelineConsumeOp(` — **EN:** Invokes `cutlass_lir_ir.CircularBufferPipelineConsumeOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir_ir.CircularBufferPipelineConsumeOp`。
+- **L464** `        pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `        circular_buffer_pipeline_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L471** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L472** `def circular_buffer_pipeline_consumer_release(` — **EN:** Defines function `circular_buffer_pipeline_consumer_release`. **CN:** 定义函数 `circular_buffer_pipeline_consumer_release`。
+- **L473** `    pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `    circular_buffer_pipeline_state: CircularBufferPipelineState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L475** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L476** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L477** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L478** `    """` — **EN:** Starts the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 开始说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L479** `    Release pipeline stages after circular buffer consumption.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L480** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L481** `    This operation releases pipeline stages after circular buffer consumption.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L482** `    Based on the current circular buffer position and \`count_per_iteration\`, it` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L483** `    determines which pipeline stages have been fully consumed and transitions them` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L484** `    to empty.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L486** `    Args:` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L487** `        pipeline: The underlying pipeline object` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L488** `        circular_buffer_pipeline_state: Current circular buffer pipeline state` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L489** `        loc: Source location` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L490** `        ip: Insertion point` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 继续说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L491** `    """` — **EN:** Ends the docstring for the function `circular_buffer_pipeline_consumer_release`. **CN:** 结束说明 function `circular_buffer_pipeline_consumer_release` 的文档字符串。
+- **L492** `    cutlass_lir_ir.CircularBufferPipelineConsumerReleaseOp(` — **EN:** Invokes `cutlass_lir_ir.CircularBufferPipelineConsumerReleaseOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir_ir.CircularBufferPipelineConsumerReleaseOp`。
+- **L493** `        pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L494** `        circular_buffer_pipeline_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L497** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L498** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L499** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L500** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L501** `def circular_buffer_pipeline_advance_iterator(` — **EN:** Defines function `circular_buffer_pipeline_advance_iterator`. **CN:** 定义函数 `circular_buffer_pipeline_advance_iterator`。
+- **L502** `    pipeline: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L503** `    circular_buffer_pipeline_state: CircularBufferPipelineState,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L504** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L505** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L506** `) -> CircularBufferPipelineState:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L507** `    """` — **EN:** Starts the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 开始说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L508** `    Advance the circular buffer position.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L509** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L510** `    This operation advances the circular buffer position by \`count_per_iteration\`` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L511** `    units.` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L513** `    Args:` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L514** `        pipeline: The underlying pipeline` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L515** `        circular_buffer_pipeline_state: Current circular buffer pipeline state` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L516** `        loc: Source location` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L517** `        ip: Insertion point` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `    Returns:` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L520** `        CircularBufferPipelineState: Updated circular buffer pipeline state with advanced offset` — **EN:** Continues the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 继续说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L521** `    """` — **EN:** Ends the docstring for the function `circular_buffer_pipeline_advance_iterator`. **CN:** 结束说明 function `circular_buffer_pipeline_advance_iterator` 的文档字符串。
+- **L522** `    op = cutlass_lir_ir.CircularBufferPipelineAdvanceIteratorOp(` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L523** `        pipeline,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `        circular_buffer_pipeline_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L525** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L528** `    return op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L529** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L531** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L532** `def mbarrier_expect_tx(` — **EN:** Defines function `mbarrier_expect_tx`. **CN:** 定义函数 `mbarrier_expect_tx`。
+- **L533** `    mbarPtr: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L534** `    txBytes: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L535** `    ctaId: Optional[ir.Value] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L536** `    elect_one_sync: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L537** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L538** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L539** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L540** `    """` — **EN:** Starts the docstring for the function `mbarrier_expect_tx`. **CN:** 开始说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L541** `    Called by the consumer to block until asynchronous tasks have completed. Supports optional broadcast.` — **EN:** Continues the docstring for the function `mbarrier_expect_tx`. **CN:** 继续说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L542** `    """` — **EN:** Ends the docstring for the function `mbarrier_expect_tx`. **CN:** 结束说明 function `mbarrier_expect_tx` 的文档字符串。
+- **L543** `    if isinstance(txBytes, int):` — **EN:** Starts a conditional branch guarded by `isinstance(txBytes, int)`. **CN:** 开始一个由 `isinstance(txBytes, int)` 控制的条件分支。
+- **L544** `        txBytes = cute.Int32(txBytes)` — **EN:** Assigns a value to txBytes. **CN:** 将一个值赋给 txBytes。
+- **L545** `    if ctaId != None:` — **EN:** Starts a conditional branch guarded by `ctaId != None`. **CN:** 开始一个由 `ctaId != None` 控制的条件分支。
+- **L546** `        ctaId = ctaId.value` — **EN:** Assigns a value to ctaId. **CN:** 将一个值赋给 ctaId。
+- **L547** `    _op = cutlass_lir_ir.MBarrierExpectTxOp(` — **EN:** Assigns a value to _op. **CN:** 将一个值赋给 _op。
+- **L548** `        mbarPtr.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `        txBytes.ir_value(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `        ctaId=ctaId,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L551** `        elect_one_sync=elect_one_sync,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L552** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L555** `    return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L556** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L557** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L558** `def normalize_skip_wait_token(` — **EN:** Defines function `normalize_skip_wait_token`. **CN:** 定义函数 `normalize_skip_wait_token`。
+- **L559** `    token: Optional[SkipWaitToken],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L560** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L561** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L562** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L563** `) -> Optional[ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L564** `    """` — **EN:** Starts the docstring for the function `normalize_skip_wait_token`. **CN:** 开始说明 function `normalize_skip_wait_token` 的文档字符串。
+- **L565** `    Normalizes a skip wait token to an ir.Value.` — **EN:** Continues the docstring for the function `normalize_skip_wait_token`. **CN:** 继续说明 function `normalize_skip_wait_token` 的文档字符串。
+- **L566** `    """` — **EN:** Ends the docstring for the function `normalize_skip_wait_token`. **CN:** 结束说明 function `normalize_skip_wait_token` 的文档字符串。
+- **L567** `    if token is None:` — **EN:** Starts a conditional branch guarded by `token is None`. **CN:** 开始一个由 `token is None` 控制的条件分支。
+- **L568** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L569** `    if isinstance(token, bool):` — **EN:** Starts a conditional branch guarded by `isinstance(token, bool)`. **CN:** 开始一个由 `isinstance(token, bool)` 控制的条件分支。
+- **L570** `        return Boolean(token).ir_value(loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L571** `    if isinstance(token, ir.Value):` — **EN:** Starts a conditional branch guarded by `isinstance(token, ir.Value)`. **CN:** 开始一个由 `isinstance(token, ir.Value)` 控制的条件分支。
+- **L572** `        return token` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L573** `    if hasattr(token, "ir_value"):` — **EN:** Starts a conditional branch guarded by `hasattr(token, 'ir_value')`. **CN:** 开始一个由 `hasattr(token, 'ir_value')` 控制的条件分支。
+- **L574** `        return token.ir_value(loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L575** `    raise TypeError(f"skipWait token must lower to ir.Value, got {type(token)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L576** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L579** `def producer_try_acquire(` — **EN:** Defines function `producer_try_acquire`. **CN:** 定义函数 `producer_try_acquire`。
+- **L580** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L581** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L582** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L583** `    token: Optional[SkipWaitToken] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L584** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L585** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L586** `) -> Boolean:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L587** `    """` — **EN:** Starts the docstring for the function `producer_try_acquire`. **CN:** 开始说明 function `producer_try_acquire` 的文档字符串。
+- **L588** `    Tries to acquire a producer stage, non-blocking.` — **EN:** Continues the docstring for the function `producer_try_acquire`. **CN:** 继续说明 function `producer_try_acquire` 的文档字符串。
+- **L589** `    """` — **EN:** Ends the docstring for the function `producer_try_acquire`. **CN:** 结束说明 function `producer_try_acquire` 的文档字符串。
+- **L590** `    skip_wait = normalize_skip_wait_token(token, loc=loc, ip=ip)` — **EN:** Assigns a value to skip_wait. **CN:** 将一个值赋给 skip_wait。
+- **L591** `    token_value = cutlass_lir_ir.ProducerTryAcquireOp(` — **EN:** Assigns a value to token_value. **CN:** 将一个值赋给 token_value。
+- **L592** `        pipe, state, skipWait=skip_wait, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `    ).token` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `    return Boolean(token_value, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L595** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L596** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L597** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L598** `def consumer_try_wait(` — **EN:** Defines function `consumer_try_wait`. **CN:** 定义函数 `consumer_try_wait`。
+- **L599** `    pipe: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L600** `    state: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L601** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L602** `    token: Optional[SkipWaitToken] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L603** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L604** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L605** `) -> Boolean:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L606** `    """` — **EN:** Starts the docstring for the function `consumer_try_wait`. **CN:** 开始说明 function `consumer_try_wait` 的文档字符串。
+- **L607** `    Tries to wait for a consumer stage, non-blocking.` — **EN:** Continues the docstring for the function `consumer_try_wait`. **CN:** 继续说明 function `consumer_try_wait` 的文档字符串。
+- **L608** `    """` — **EN:** Ends the docstring for the function `consumer_try_wait`. **CN:** 结束说明 function `consumer_try_wait` 的文档字符串。
+- **L609** `    skip_wait = normalize_skip_wait_token(token, loc=loc, ip=ip)` — **EN:** Assigns a value to skip_wait. **CN:** 将一个值赋给 skip_wait。
+- **L610** `    token_value = cutlass_lir_ir.ConsumerTryWaitOp(` — **EN:** Assigns a value to token_value. **CN:** 将一个值赋给 token_value。
+- **L611** `        pipe, state, skipWait=skip_wait, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `    ).token` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `    return Boolean(token_value, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.experimental.core`. CN: 模块名为 `CuTeDSL.cutlass.cute.experimental.core`。
+- EN: Top-level classes: _SupportsIrValue, PipelineState, CircularBufferPipelineState CN: 顶层类包括：_SupportsIrValue, PipelineState, CircularBufferPipelineState
+- EN: Top-level functions: elect_sync, get_mbarrier, _normalize_create_pipeline_arrival_mask, _build_pipeline, create_pipeline, create_pipeline_with_mask, pipeline_advance_iterator, producer_acquire, producer_commit, consumer_wait, consumer_release, consumer_release_elect_one_sync, ... (+11 more) CN: 顶层函数包括：elect_sync, get_mbarrier, _normalize_create_pipeline_arrival_mask, _build_pipeline, create_pipeline, create_pipeline_with_mask, pipeline_advance_iterator, producer_acquire, producer_commit, consumer_wait, consumer_release, consumer_release_elect_one_sync, ... (+11 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir.dialects:lir,nvvm, cutlass._mlir:ir, cutlass.cutlass_dsl:lru_cache_ir, cutlass._mlir.dialects.core:OperationTypeEnum, cutlass:cute, cutlass.cute.typing:Boolean CN: 内部依赖：cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir.dialects:lir,nvvm, cutlass._mlir:ir, cutlass.cutlass_dsl:lru_cache_ir, cutlass._mlir.dialects.core:OperationTypeEnum, cutlass:cute, cutlass.cute.typing:Boolean
+- EN: External or standard-library dependencies: typing:Optional,Protocol,TypeAlias CN: 外部或标准库依赖：typing:Optional,Protocol,TypeAlias

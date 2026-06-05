@@ -1,0 +1,4842 @@
+# mma_tensor_op_tile_iterator.h — Code Analysis / 代码分析
+
+## Source / 源文件
+
+`include/cutlass/gemm/warp/mma_tensor_op_tile_iterator.h`
+
+## Purpose / 用途
+
+**EN:** Defines iterators used by warp-level matrix multiply operations targeting Tensor Cores. /.
+
+**CN:** 通用 Tensor Core tile 迭代器。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code> — **EN:** Starts the file header comment block that carries the license notice. **CN:** 开始文件头注释块，这里承载许可证说明。
+- **L2** <code>* Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L3** <code>* SPDX-License-Identifier: BSD-3-Clause</code> — **EN:** States the SPDX license identifier for automated tooling. **CN:** 给出 SPDX 许可证标识，便于自动化工具识别。
+- **L4** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L5** <code>* Redistribution and use in source and binary forms, with or without</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L6** <code>* modification, are permitted provided that the following conditions are met:</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L7** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L8** <code>* 1. Redistributions of source code must retain the above copyright notice, this</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L9** <code>* list of conditions and the following disclaimer.</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L10** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L11** <code>* 2. Redistributions in binary form must reproduce the above copyright notice,</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L12** <code>* this list of conditions and the following disclaimer in the documentation</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L13** <code>* and/or other materials provided with the distribution.</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L14** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L15** <code>* 3. Neither the name of the copyright holder nor the names of its</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L16** <code>* contributors may be used to endorse or promote products derived from</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L17** <code>* this software without specific prior written permission.</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L18** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L19** <code>* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L20** <code>* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L21** <code>* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L22** <code>* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code> — **EN:** Records the copyright ownership for this header. **CN:** 记录该头文件的版权归属。
+- **L23** <code>* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L24** <code>* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L25** <code>* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L26** <code>* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L27** <code>* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L28** <code>* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code> — **EN:** Continues the BSD-3-Clause license terms and disclaimer. **CN:** 继续说明 BSD-3-Clause 许可证条款与免责声明。
+- **L29** <code>*</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L30** <code>**************************************************************************************************/</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L31** <code>/*! \file</code> — **EN:** Marks this comment as the file-level documentation block. **CN:** 将该注释标记为文件级文档块。
+- **L32** <code>\brief Defines iterators used by warp-level matrix multiply operations targeting Tensor Cores.</code> — **EN:** Provides a short summary of the header’s responsibility. **CN:** 给出该头文件职责的简短摘要。
+- **L33** <code>*/</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L34** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L35** <code>#pragma once</code> — **EN:** Uses a pragma guard so the header is included only once per translation unit. **CN:** 使用 pragma 保护，确保同一翻译单元中只包含一次该头文件。
+- **L36** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L37** <code>#include &quot;cutlass/cutlass.h&quot;</code> — **EN:** Includes `cutlass/cutlass.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/cutlass.h`，以获得 CUTLASS 基础工具与类型。
+- **L38** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L39** <code>#include &quot;cutlass/array.h&quot;</code> — **EN:** Includes `cutlass/array.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/array.h`，以获得 CUTLASS 基础工具与类型。
+- **L40** <code>#include &quot;cutlass/numeric_types.h&quot;</code> — **EN:** Includes `cutlass/numeric_types.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/numeric_types.h`，以获得 CUTLASS 基础工具与类型。
+- **L41** <code>#include &quot;cutlass/tensor_ref.h&quot;</code> — **EN:** Includes `cutlass/tensor_ref.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/tensor_ref.h`，以获得 CUTLASS 基础工具与类型。
+- **L42** <code>#include &quot;cutlass/matrix_shape.h&quot;</code> — **EN:** Includes `cutlass/matrix_shape.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/matrix_shape.h`，以获得 CUTLASS 基础工具与类型。
+- **L43** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L44** <code>#include &quot;cutlass/arch/memory_sm75.h&quot;</code> — **EN:** Includes `cutlass/arch/memory_sm75.h` to access architecture-specific instruction, memory, or pipeline primitives. **CN:** 引入 `cutlass/arch/memory_sm75.h`，以获得 架构相关的指令、内存或流水线原语。
+- **L45** <code>#include &quot;cutlass/gemm/gemm.h&quot;</code> — **EN:** Includes `cutlass/gemm/gemm.h` to access other GEMM core types, iterators, or policies. **CN:** 引入 `cutlass/gemm/gemm.h`，以获得 其他 GEMM 核心类型、迭代器或策略。
+- **L46** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L47** <code>#include &quot;cutlass/layout/matrix.h&quot;</code> — **EN:** Includes `cutlass/layout/matrix.h` to access matrix layout descriptors. **CN:** 引入 `cutlass/layout/matrix.h`，以获得 矩阵布局描述类型。
+- **L48** <code>#include &quot;cutlass/layout/tensor.h&quot;</code> — **EN:** Includes `cutlass/layout/tensor.h` to access matrix layout descriptors. **CN:** 引入 `cutlass/layout/tensor.h`，以获得 矩阵布局描述类型。
+- **L49** <code>#include &quot;cutlass/layout/pitch_linear.h&quot;</code> — **EN:** Includes `cutlass/layout/pitch_linear.h` to access matrix layout descriptors. **CN:** 引入 `cutlass/layout/pitch_linear.h`，以获得 矩阵布局描述类型。
+- **L50** <code>#include &quot;cutlass/layout/tensor_op_multiplicand_sm75.h&quot;</code> — **EN:** Includes `cutlass/layout/tensor_op_multiplicand_sm75.h` to access matrix layout descriptors. **CN:** 引入 `cutlass/layout/tensor_op_multiplicand_sm75.h`，以获得 矩阵布局描述类型。
+- **L51** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L52** <code>#include &quot;cutlass/platform/platform.h&quot;</code> — **EN:** Includes `cutlass/platform/platform.h` to access platform-portability traits and wrappers. **CN:** 引入 `cutlass/platform/platform.h`，以获得 平台可移植 traits 与封装。
+- **L53** <code>#include &quot;cutlass/fast_math.h&quot;</code> — **EN:** Includes `cutlass/fast_math.h` to access foundational CUTLASS utilities and types. **CN:** 引入 `cutlass/fast_math.h`，以获得 CUTLASS 基础工具与类型。
+- **L54** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L55** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L56** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L57** <code>namespace cutlass {</code> — **EN:** Opens namespace `cutlass` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `cutlass`，把后续声明放入正确的 CUTLASS 作用域。
+- **L58** <code>namespace gemm {</code> — **EN:** Opens namespace `gemm` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `gemm`，把后续声明放入正确的 CUTLASS 作用域。
+- **L59** <code>namespace warp {</code> — **EN:** Opens namespace `warp` to place the following declarations in the proper CUTLASS scope. **CN:** 打开命名空间 `warp`，把后续声明放入正确的 CUTLASS 作用域。
+- **L60** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L61** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L62** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L63** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L64** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L65** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L66** <code>/// Operand identity</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L67** <code>Operand Operand,</code> — **EN:** Continues the current implementation using `Operand`, `Operand`. **CN:** 使用 `Operand`, `Operand` 继续当前实现。
+- **L68** <code>/// Data type of A elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L69** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L70** <code>/// Layout of operand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L71** <code>typename Layout_,</code> — **EN:** Continues the current implementation using `Layout_`. **CN:** 使用 `Layout_` 继续当前实现。
+- **L72** <code>/// Shape of one matrix production operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L73** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L74** <code>/// Delta between *MMA operations (in units of *MMA operations, concept:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L75** <code>/// MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L76** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L77** <code>/// Number of threads participating in one matrix operation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L78** <code>int Threads,</code> — **EN:** Continues the current implementation using `Threads`. **CN:** 使用 `Threads` 继续当前实现。
+- **L79** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L80** <code>int PartitionsK_ = 1&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L81** <code>class MmaTensorOpMultiplicandTileIterator;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator`，作为本头文件中的可复用抽象。
+- **L82** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L83** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L84** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L85** <code>/// This tile iterator is specialized for 32-thread TensorOps. It uses LDSM to load from shared</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L86** <code>/// memory and therefore must be initialized with a TensorRef to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L87** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L88** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L89** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L90** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L91** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L92** <code>/// Size of the matrix to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L93** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L94** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L95** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L96** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L97** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L98** <code>/// Shape of one matrix product operation (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L99** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L100** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L101** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L102** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L103** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L104** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L105** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L106** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L107** <code>cutlass::layout::TensorOpMultiplicandCongruous&lt;sizeof_bits&lt;Element_&gt;::value,</code> — **EN:** Continues the current implementation using `cutlass::layout::TensorOpMultiplicandCongruous`, `sizeof_bits`, `Element_`, `value`. **CN:** 使用 `cutlass::layout::TensorOpMultiplicandCongruous`, `sizeof_bits`, `Element_`, `value` 继续当前实现。
+- **L108** <code>64&gt;,</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L109** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L110** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L111** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L112** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L113** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L114** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L115** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L116** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L117** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L118** <code>static_assert(kOperand == Operand::kA || kOperand== Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L119** <code>&quot;MmaTensorOpMultiplicandIterator may only be instantiated for A or B operands to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `MmaTensorOpMultiplicandIterator`, `may`, `only`. **CN:** 完成一条与 `MmaTensorOpMultiplicandIterator`, `may`, `only` 相关的声明。
+- **L120** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L121** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L122** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L123** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L124** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L125** <code>using Layout = cutlass::layout::TensorOpMultiplicandCongruous&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::TensorOpMultiplicandCongruous<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::TensorOpMultiplicandCongruous<`，便于在当前作用域中复用。
+- **L126** <code>sizeof_bits&lt;Element_&gt;::value, 64&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L127** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L128** <code>/// Shape of one matrix product operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L129** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L130** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L131** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L132** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L133** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L134** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L135** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L136** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L137** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L138** <code>static int const kPartitionsK = PartitionsK_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L139** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L140** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L141** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L142** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L143** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L144** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L145** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L146** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L147** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L148** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L149** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L150** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L151** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L152** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L153** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L154** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L155** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L156** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L157** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L158** <code>!(Shape::kContiguous % InstructionShape::kContiguous),</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `InstructionShape::kContiguous`. **CN:** 使用 `Shape::kContiguous`, `InstructionShape::kContiguous` 继续当前实现。
+- **L159** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L160** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L161** <code>// Determine number of elements along outer dimension per individual LDSM op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L162** <code>static int const kLdsmOpOuter = Layout::kElementsPerAccess;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L163** <code>static int const kLdsmOpInner = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L164** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L165** <code>static_assert(!(Shape::kContiguous % kLdsmOpOuter),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L166** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L167** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L168** <code>static_assert(!(Shape::kStrided % kLdsmOpInner),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L169** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L170** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L171** <code>/// Shape of one individual LDSM instruction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L172** <code>static int const LdsmShapeStrided =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L173** <code>InstructionShape::kStrided / kLdsmOpInner;</code> — **EN:** Completes a declaration involving `InstructionShape::kStrided`, `kLdsmOpInner`. **CN:** 完成一条与 `InstructionShape::kStrided`, `kLdsmOpInner` 相关的声明。
+- **L174** <code>static int const LdsmShapeContiguous = 4 / LdsmShapeStrided;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L175** <code>using LdsmShape =</code> — **EN:** Introduces alias or imported name `LdsmShape =` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmShape =`，便于在当前作用域中复用。
+- **L176** <code>layout::PitchLinearShape&lt;LdsmShapeContiguous, LdsmShapeStrided&gt;;</code> — **EN:** Completes a declaration involving `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided`. **CN:** 完成一条与 `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided` 相关的声明。
+- **L177** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L178** <code>/// Number and arrangement of LDSM instructions</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L179** <code>using LdsmIterations = layout::PitchLinearShape&lt;</code> — **EN:** Introduces alias or imported name `LdsmIterations = layout::PitchLinearShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmIterations = layout::PitchLinearShape<`，便于在当前作用域中复用。
+- **L180** <code>Shape::kContiguous / Layout::kElementsPerAccess / LdsmShapeContiguous,</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `Layout::kElementsPerAccess`, `LdsmShapeContiguous`. **CN:** 使用 `Shape::kContiguous`, `Layout::kElementsPerAccess`, `LdsmShapeContiguous` 继续当前实现。
+- **L181** <code>1&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L182** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L183** <code>/// Number of groups for each tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L184** <code>static int const kGroupsPerTile =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L185** <code>Shape::kStrided / InstructionShape::kStrided;</code> — **EN:** Completes a declaration involving `Shape::kStrided`, `InstructionShape::kStrided`. **CN:** 完成一条与 `Shape::kStrided`, `InstructionShape::kStrided` 相关的声明。
+- **L186** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L187** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L188** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L189** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L190** <code>/// Not working on this feature at the moment.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L191** <code>static_assert(kOpDelta == 1,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L192** <code>&quot;Alternative arrangements not supported at present.&quot;);</code> — **EN:** Completes a declaration involving `Alternative`, `arrangements`, `not`. **CN:** 完成一条与 `Alternative`, `arrangements`, `not` 相关的声明。
+- **L193** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L194** <code>/// Number of internal pointers needed to reference shared memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L195** <code>static int const kPointerCount =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L196** <code>Layout::TileShape::kContiguous / Policy::LdsmShape::kContiguous;</code> — **EN:** Completes a declaration involving `Layout::TileShape::kContiguous`, `Policy::LdsmShape::kContiguous`. **CN:** 完成一条与 `Layout::TileShape::kContiguous`, `Policy::LdsmShape::kContiguous` 相关的声明。
+- **L197** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L198** <code>/// Pointer type used for accesses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L199** <code>using AccessType = Array&lt;Element, Layout::kElementsPerAccess&gt;;</code> — **EN:** Introduces alias or imported name `AccessType = Array<Element, Layout::kElementsPerAccess>` for easier reuse in this scope. **CN:** 引入别名或导入名 `AccessType = Array<Element, Layout::kElementsPerAccess>`，便于在当前作用域中复用。
+- **L200** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L201** <code>/// Internal counter used to jump to next K partition</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L202** <code>int k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L203** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L204** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L205** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L206** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L207** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L208** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L209** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L210** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L211** <code>using Fragment =</code> — **EN:** Introduces alias or imported name `Fragment =` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment =`，便于在当前作用域中复用。
+- **L212** <code>Array&lt;Element, Shape::kContiguous * InstructionShape::kStrided / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `Shape::kContiguous`. **CN:** 完成一条与 `Array`, `Element`, `Shape::kContiguous` 相关的声明。
+- **L213** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L214** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L215** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L216** <code>/// Layout object storing stride values</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L217** <code>StrideIndex stride_;</code> — **EN:** Completes a declaration involving `StrideIndex`, `stride_`. **CN:** 完成一条与 `StrideIndex`, `stride_` 相关的声明。
+- **L218** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L219** <code>/// Shared memory base pointers - not advanced</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L220** <code>AccessType const *pointer_[kPointerCount];</code> — **EN:** Completes a declaration involving `AccessType`, `pointer_`, `kPointerCount`. **CN:** 完成一条与 `AccessType`, `pointer_`, `kPointerCount` 相关的声明。
+- **L221** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L222** <code>/// Byte offset incremented as iterator advances</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L223** <code>Index byte_offset_;</code> — **EN:** Completes a declaration involving `Index`, `byte_offset_`. **CN:** 完成一条与 `Index`, `byte_offset_` 相关的声明。
+- **L224** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L225** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L226** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L227** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L228** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L229** <code>MmaTensorOpMultiplicandTileIterator(): stride_(0), byte_offset_(0) { }</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_` 继续当前实现。
+- **L230** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L231** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L232** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L233** <code>MmaTensorOpMultiplicandTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L234** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L235** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L236** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L237** <code>stride_(ref.stride(0) / Layout::kElementsPerAccess),</code> — **EN:** Continues the current implementation using `stride_`, `ref`, `stride`, `Layout::kElementsPerAccess`. **CN:** 使用 `stride_`, `ref`, `stride`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L238** <code>byte_offset_(0),</code> — **EN:** Continues the current implementation using `byte_offset_`. **CN:** 使用 `byte_offset_` 继续当前实现。
+- **L239** <code>k_group_idx_(0) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L240** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L241** <code>int quad_pair = (lane_id &gt;&gt; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L242** <code>int quad_quad = (lane_id &gt;&gt; 4);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L243** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L244** <code>int lane_in_quad_pair = (lane_id &amp; 7);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L245** <code>int lane_in_quad_quad = (lane_id &amp; 15);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L246** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L247** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L248** <code>for (int i = 0; i &lt; kPointerCount; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L249** <code>int partition_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L250** <code>int access_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L251** <code>int access_strided_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L252** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L253** <code>if (Policy::LdsmShape::kContiguous == 4) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L254** <code>// Matrix multiply 1688 A/B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L255** <code>// Q0 Q1 Q2 Q3 (Q stands for 1 8x128bit block).</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L256** <code>// Four blocks are next to each other in the contiguous dimension.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L257** <code>partition_contiguous_idx = ((lane_in_quad_pair &gt;&gt; 2) ^ i);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L258** <code>access_contiguous_idx = (quad_pair ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L259** <code>access_strided_idx = lane_in_quad_pair;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L260** <code>} else if (Policy::LdsmShape::kContiguous == 2 &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L261** <code>kOperand == Operand::kA) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kA`. **CN:** 使用 `kOperand`, `Operand::kA` 继续当前实现。
+- **L262** <code>// Matrix multiply 16816 A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L263** <code>// Q0 Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L264** <code>// Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L265** <code>partition_contiguous_idx = ((lane_in_quad_pair &gt;&gt; 2) ^ (i &gt;&gt; 1));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L266** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L267** <code>(((quad_pair &amp; 1) + ((i &amp; 1) &lt;&lt; 1)) ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L268** <code>access_strided_idx = lane_in_quad_pair + (lane_id &gt;&gt; 4 &lt;&lt; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L269** <code>} else if (Policy::LdsmShape::kContiguous == 2 &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L270** <code>kOperand == Operand::kB) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kB`. **CN:** 使用 `kOperand`, `Operand::kB` 继续当前实现。
+- **L271** <code>// Matrix multiply 16816 B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L272** <code>// Q0 Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L273** <code>// Q1 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L274** <code>partition_contiguous_idx = ((lane_in_quad_pair &gt;&gt; 2) ^ (i &gt;&gt; 1));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L275** <code>access_contiguous_idx = ((quad_quad + ((i &amp; 1) &lt;&lt; 1)) ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L276** <code>access_strided_idx = lane_in_quad_quad;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L277** <code>} else if (Policy::LdsmShape::kContiguous == 1) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L278** <code>// Matrix multiply 16832.SP B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L279** <code>// Q0</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L280** <code>// Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L281** <code>// Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L282** <code>// Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L283** <code>partition_contiguous_idx = ((lane_in_quad_pair &gt;&gt; 2) ^ (i &gt;&gt; 2));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L284** <code>access_contiguous_idx = ((i &amp; 3) ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L285** <code>access_strided_idx = lane_id;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L286** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L287** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L288** <code>int access_contiguous =</code> — **EN:** Continues the current implementation using `access_contiguous`. **CN:** 使用 `access_contiguous` 继续当前实现。
+- **L289** <code>partition_contiguous_idx * Layout::PartitionShape::kContiguous +</code> — **EN:** Continues the current implementation using `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous`. **CN:** 使用 `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous` 继续当前实现。
+- **L290** <code>access_contiguous_idx;</code> — **EN:** Completes a declaration involving `access_contiguous_idx`. **CN:** 完成一条与 `access_contiguous_idx` 相关的声明。
+- **L291** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L292** <code>int access_strided = access_strided_idx;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L293** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L294** <code>pointer_[i] = reinterpret_cast&lt;AccessType const *&gt;(ref.data()) +</code> — **EN:** Continues the current implementation using `pointer_`, `i`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `pointer_`, `i`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L295** <code>access_contiguous + access_strided * stride_;</code> — **EN:** Completes a declaration involving `access_contiguous`, `access_strided`, `stride_`. **CN:** 完成一条与 `access_contiguous`, `access_strided`, `stride_` 相关的声明。
+- **L296** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L297** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L298** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L299** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L300** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L301** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L302** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L303** <code>byte_offset_ += offset * sizeof(Element);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L304** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L305** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L306** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L307** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L308** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L309** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L310** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L311** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L312** <code>int contiguous_offset = tile_offset.contiguous();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L313** <code>if (Shape::kContiguous ==</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L314** <code>Layout::PartitionShape::kContiguous * Layout::kElementsPerAccess) {</code> — **EN:** Continues the current implementation using `Layout::PartitionShape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::PartitionShape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L315** <code>if (tile_offset.contiguous() % 2) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L316** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L317** <code>for (int i = 0; i &lt; kPointerCount / 2; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L318** <code>AccessType const *tmp_pointer = pointer_[i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L319** <code>pointer_[i] = pointer_[i + kPointerCount / 2];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L320** <code>pointer_[i + kPointerCount / 2] = tmp_pointer;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L321** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L322** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L323** <code>contiguous_offset = (tile_offset.contiguous() &gt;&gt; 1) &lt;&lt; 1;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L324** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L325** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L326** <code>int offset = (tile_offset.strided() * InstructionShape::kStrided) *</code> — **EN:** Continues the current implementation using `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided`. **CN:** 使用 `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided` 继续当前实现。
+- **L327** <code>stride_ * Layout::kElementsPerAccess +</code> — **EN:** Continues the current implementation using `stride_`, `Layout::kElementsPerAccess`. **CN:** 使用 `stride_`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L328** <code>contiguous_offset * Shape::kContiguous;</code> — **EN:** Completes a declaration involving `contiguous_offset`, `Shape::kContiguous`. **CN:** 完成一条与 `contiguous_offset`, `Shape::kContiguous` 相关的声明。
+- **L329** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L330** <code>add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L331** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L332** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L333** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L334** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L335** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L336** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L337** <code>MmaTensorOpMultiplicandTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L338** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L339** <code>add_tile_offset({0, 1});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L340** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L341** <code>if (kPartitionsK &gt; 1) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L342** <code>++k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L343** <code>// Jump to next stage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L344** <code>if (k_group_idx_ == Policy::kGroupsPerTile) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L345** <code>k_group_idx_ = 0;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L346** <code>add_tile_offset(</code> — **EN:** Continues the current implementation using `add_tile_offset`. **CN:** 使用 `add_tile_offset` 继续当前实现。
+- **L347** <code>{0, ((kPartitionsK - 1) * Policy::kGroupsPerTile)});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L348** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L349** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L350** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L351** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L352** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L353** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L354** <code>/// Advances the iterator along the opposite of the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L355** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L356** <code>MmaTensorOpMultiplicandTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L357** <code>byte_offset_ -= stride_ * InstructionShape::kStrided * sizeof(Element) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof`. **CN:** 使用 `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof` 继续当前实现。
+- **L358** <code>Layout::kElementsPerAccess;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L359** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L360** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L361** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L362** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L363** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L364** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L365** <code>MmaTensorOpMultiplicandTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L366** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L367** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L368** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L369** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L370** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L371** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L372** <code>MmaTensorOpMultiplicandTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L373** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L374** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L375** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L376** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L377** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L378** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L379** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L380** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L381** <code>load_with_byte_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L382** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L383** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L384** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L385** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L386** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L387** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L388** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L389** <code>/// loads a tile with a linear offset in units of bytes</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L390** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L391** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L392** <code>Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *fetch_ptr =</code> — **EN:** Continues the current implementation using `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr`. **CN:** 使用 `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr` 继续当前实现。
+- **L393** <code>reinterpret_cast&lt;Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L394** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L395** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L396** <code>for (int s = 0; s &lt; Policy::LdsmIterations::kStrided; ++s) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L397** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L398** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L399** <code>for (int c = 0; c &lt; Policy::LdsmIterations::kContiguous; ++c) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L400** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L401** <code>int access_idx = c + s * Policy::LdsmIterations::kContiguous;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L402** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L403** <code>AccessType const *source_ptr =</code> — **EN:** Continues the current implementation using `AccessType`, `source_ptr`. **CN:** 使用 `AccessType`, `source_ptr` 继续当前实现。
+- **L404** <code>pointer_[c % kPointerCount] +</code> — **EN:** Continues the current implementation using `pointer_`, `c`, `kPointerCount`. **CN:** 使用 `pointer_`, `c`, `kPointerCount` 继续当前实现。
+- **L405** <code>Layout::TileShape::kContiguous * (c / kPointerCount) +</code> — **EN:** Continues the current implementation using `Layout::TileShape::kContiguous`, `c`, `kPointerCount`. **CN:** 使用 `Layout::TileShape::kContiguous`, `c`, `kPointerCount` 继续当前实现。
+- **L406** <code>Policy::kLdsmOpInner * Policy::LdsmShape::kStrided * s * stride_;</code> — **EN:** Completes a declaration involving `Policy::kLdsmOpInner`, `Policy::LdsmShape::kStrided`, `s`. **CN:** 完成一条与 `Policy::kLdsmOpInner`, `Policy::LdsmShape::kStrided`, `s` 相关的声明。
+- **L407** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L408** <code>char const *source_byte_ptr = reinterpret_cast&lt;char const *&gt;(source_ptr) + byte_offset + byte_offset_;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L409** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L410** <code>cutlass::arch::ldsm&lt;layout::ColumnMajor, Policy::LdsmShape::kCount&gt;(</code> — **EN:** Continues the current implementation using `cutlass::arch::ldsm`, `layout::ColumnMajor`, `Policy::LdsmShape::kCount`. **CN:** 使用 `cutlass::arch::ldsm`, `layout::ColumnMajor`, `Policy::LdsmShape::kCount` 继续当前实现。
+- **L411** <code>fetch_ptr[access_idx],</code> — **EN:** Continues the current implementation using `fetch_ptr`, `access_idx`. **CN:** 使用 `fetch_ptr`, `access_idx` 继续当前实现。
+- **L412** <code>source_byte_ptr</code> — **EN:** Continues the current implementation using `source_byte_ptr`. **CN:** 使用 `source_byte_ptr` 继续当前实现。
+- **L413** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L414** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L415** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L416** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L417** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L418** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L419** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L420** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L421** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L422** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L423** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L424** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L425** <code>load_with_byte_offset(frag, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L426** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L427** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L428** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L429** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L430** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L431** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L432** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L433** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L434** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L435** <code>load_with_byte_offset(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L436** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L437** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L438** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L439** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L440** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L441** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L442** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L443** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L444** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L445** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L446** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L447** <code>load_with_byte_offset(frag, tile_offset, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L448** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L449** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L450** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L451** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L452** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L453** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L454** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L455** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L456** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L457** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L458** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L459** <code>Index pointer_offset =</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L460** <code>tile_offset.contiguous() * Shape::kContiguous / Layout::kElementsPerAccess +</code> — **EN:** Continues the current implementation using `tile_offset`, `contiguous`, `Shape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `tile_offset`, `contiguous`, `Shape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L461** <code>tile_offset.strided() * InstructionShape::kStrided * stride_;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L462** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L463** <code>byte_offset += sizeof(AccessType) * pointer_offset;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L464** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L465** <code>load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L466** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L467** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L468** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L469** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L470** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L471** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L472** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L473** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L474** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L475** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L476** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L477** <code>// no op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L478** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L479** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L480** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L481** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L482** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L483** <code>/// This tile iterator is specialized for 32-thread MMA.TF32 NT TensorOps. It</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L484** <code>/// uses LDS.32 to load from shared memory and therefore must be initialized</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L485** <code>/// with a TensorRef to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L486** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L487** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L488** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L489** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L490** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L491** <code>/// Size of the matrix to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L492** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L493** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L494** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L495** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L496** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L497** <code>/// Shape of one matrix product operation (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L498** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L499** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L500** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L501** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L502** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L503** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L504** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L505** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L506** <code>cutlass::layout::TensorOpMultiplicandCongruous&lt;32, 32&gt;, InstructionShape_,</code> — **EN:** Continues the current implementation using `cutlass::layout::TensorOpMultiplicandCongruous`, `InstructionShape_`. **CN:** 使用 `cutlass::layout::TensorOpMultiplicandCongruous`, `InstructionShape_` 继续当前实现。
+- **L507** <code>OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `OpDelta_`, `PartitionsK_`. **CN:** 使用 `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L508** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L509** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L510** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L511** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L512** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L513** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L514** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L515** <code>static_assert(kOperand == Operand::kA || kOperand == Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L516** <code>&quot;MmaTensorOpMultiplicandIterator may only be instantiated for &quot;</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandIterator`, `may`, `only`, `be`. **CN:** 使用 `MmaTensorOpMultiplicandIterator`, `may`, `only`, `be` 继续当前实现。
+- **L517** <code>&quot;A or B operands to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `A`, `or`, `B`. **CN:** 完成一条与 `A`, `or`, `B` 相关的声明。
+- **L518** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L519** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L520** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L521** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L522** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L523** <code>using Layout = cutlass::layout::TensorOpMultiplicandCongruous&lt;32, 32&gt;;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::TensorOpMultiplicandCongruous<32, 32>` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::TensorOpMultiplicandCongruous<32, 32>`，便于在当前作用域中复用。
+- **L524** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L525** <code>/// Shape of one matrix product operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L526** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L527** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L528** <code>/// Delta between *MMA operations (in units of *MMA operations, concept:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L529** <code>/// MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L530** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L531** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L532** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L533** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L534** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L535** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L536** <code>static int const kPartitionsK = PartitionsK_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L537** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L538** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L539** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L540** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L541** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L542** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L543** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L544** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L545** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L546** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L547** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L548** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L549** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L550** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L551** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L552** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L553** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L554** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L555** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L556** <code>!(Shape::kContiguous % InstructionShape::kContiguous),</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `InstructionShape::kContiguous`. **CN:** 使用 `Shape::kContiguous`, `InstructionShape::kContiguous` 继续当前实现。
+- **L557** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L558** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L559** <code>// Determine number of elements along outer dimension per individual 32bit</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L560** <code>// shared memory load op.  Every one warp of 32bit shared memory load loads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L561** <code>// 8x4 elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L562** <code>static int const kLdsOpInner = Layout::TileShape::kStrided;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L563** <code>static int const kLdsOpOuter = kThreads / kLdsOpInner;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L564** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L565** <code>static_assert(!(Shape::kContiguous % kLdsOpOuter),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L566** <code>&quot;Shape of warp-level mma must be divisible by 32bit &quot;</code> — **EN:** Continues the current implementation using `Shape`, `of`, `warp`, `level`. **CN:** 使用 `Shape`, `of`, `warp`, `level` 继续当前实现。
+- **L567** <code>&quot;fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `fundamental`, `tile`, `size`. **CN:** 完成一条与 `fundamental`, `tile`, `size` 相关的声明。
+- **L568** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L569** <code>static_assert(!(Shape::kStrided % kLdsOpInner),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L570** <code>&quot;Shape of warp-level mma must be divisible by 32bit &quot;</code> — **EN:** Continues the current implementation using `Shape`, `of`, `warp`, `level`. **CN:** 使用 `Shape`, `of`, `warp`, `level` 继续当前实现。
+- **L571** <code>&quot;fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `fundamental`, `tile`, `size`. **CN:** 完成一条与 `fundamental`, `tile`, `size` 相关的声明。
+- **L572** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L573** <code>/// Number of 32 bit shared memory load instructions needed by one MMA instruction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L574** <code>/// 1688  A 2x2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L575** <code>/// 1688  B 1x2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L576** <code>/// 16816 B 1x4</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L577** <code>static int const LdsShapeContiguous =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L578** <code>InstructionShape::kContiguous / kLdsOpOuter;</code> — **EN:** Completes a declaration involving `InstructionShape::kContiguous`, `kLdsOpOuter`. **CN:** 完成一条与 `InstructionShape::kContiguous`, `kLdsOpOuter` 相关的声明。
+- **L579** <code>static int const LdsShapeStrided = InstructionShape::kStrided / kLdsOpInner;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L580** <code>using LdsShape =</code> — **EN:** Introduces alias or imported name `LdsShape =` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsShape =`，便于在当前作用域中复用。
+- **L581** <code>layout::PitchLinearShape&lt;LdsShapeContiguous, LdsShapeStrided&gt;;</code> — **EN:** Completes a declaration involving `layout::PitchLinearShape`, `LdsShapeContiguous`, `LdsShapeStrided`. **CN:** 完成一条与 `layout::PitchLinearShape`, `LdsShapeContiguous`, `LdsShapeStrided` 相关的声明。
+- **L582** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L583** <code>/// Number and arrangement of LDS instructions</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L584** <code>using LdsIterations = layout::PitchLinearShape&lt;</code> — **EN:** Introduces alias or imported name `LdsIterations = layout::PitchLinearShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsIterations = layout::PitchLinearShape<`，便于在当前作用域中复用。
+- **L585** <code>Shape::kContiguous / LdsShapeContiguous / kLdsOpOuter, 1&gt;;</code> — **EN:** Completes a declaration involving `Shape::kContiguous`, `LdsShapeContiguous`, `kLdsOpOuter`. **CN:** 完成一条与 `Shape::kContiguous`, `LdsShapeContiguous`, `kLdsOpOuter` 相关的声明。
+- **L586** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L587** <code>/// Number of groups for each tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L588** <code>static int const kGroupsPerTile =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L589** <code>Shape::kStrided / InstructionShape::kStrided;</code> — **EN:** Completes a declaration involving `Shape::kStrided`, `InstructionShape::kStrided`. **CN:** 完成一条与 `Shape::kStrided`, `InstructionShape::kStrided` 相关的声明。
+- **L590** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L591** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L592** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L593** <code>/// Not working on this feature at the moment.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L594** <code>static_assert(kOpDelta == 1,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L595** <code>&quot;Alternative arrangements not supported at present.&quot;);</code> — **EN:** Completes a declaration involving `Alternative`, `arrangements`, `not`. **CN:** 完成一条与 `Alternative`, `arrangements`, `not` 相关的声明。
+- **L596** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L597** <code>/// Number of internal pointers needed to reference shared memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L598** <code>static int const kPointerCount = Layout::TileShape::kContiguous *</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L599** <code>Layout::kElementsPerAccess /</code> — **EN:** Continues the current implementation using `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::kElementsPerAccess` 继续当前实现。
+- **L600** <code>Policy::kLdsOpOuter;</code> — **EN:** Completes a declaration involving `Policy::kLdsOpOuter`. **CN:** 完成一条与 `Policy::kLdsOpOuter` 相关的声明。
+- **L601** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L602** <code>/// Vectorized access is not used</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L603** <code>static int const kElementsPerAccess = 1;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L604** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L605** <code>/// Pointer type used for accesses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L606** <code>using AccessType = Element;</code> — **EN:** Introduces alias or imported name `AccessType = Element` for easier reuse in this scope. **CN:** 引入别名或导入名 `AccessType = Element`，便于在当前作用域中复用。
+- **L607** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L608** <code>/// Internal counter used to jump to next K partition</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L609** <code>int k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L610** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L611** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L612** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L613** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L614** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L615** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L616** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L617** <code>using Fragment =</code> — **EN:** Introduces alias or imported name `Fragment =` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment =`，便于在当前作用域中复用。
+- **L618** <code>Array&lt;Element, Shape::kContiguous * InstructionShape::kStrided / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `Shape::kContiguous`. **CN:** 完成一条与 `Array`, `Element`, `Shape::kContiguous` 相关的声明。
+- **L619** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L620** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L621** <code>/// Layout object storing stride values</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L622** <code>StrideIndex stride_;</code> — **EN:** Completes a declaration involving `StrideIndex`, `stride_`. **CN:** 完成一条与 `StrideIndex`, `stride_` 相关的声明。
+- **L623** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L624** <code>/// Shared memory base pointers - not advanced</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L625** <code>AccessType const *pointer_[kPointerCount];</code> — **EN:** Completes a declaration involving `AccessType`, `pointer_`, `kPointerCount`. **CN:** 完成一条与 `AccessType`, `pointer_`, `kPointerCount` 相关的声明。
+- **L626** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L627** <code>/// Byte offset incremented as iterator advances</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L628** <code>Index byte_offset_;</code> — **EN:** Completes a declaration involving `Index`, `byte_offset_`. **CN:** 完成一条与 `Index`, `byte_offset_` 相关的声明。
+- **L629** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L630** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L631** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L632** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L633** <code>MmaTensorOpMultiplicandTileIterator() : stride_(0), byte_offset_(0) {}</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_` 继续当前实现。
+- **L634** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L635** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L636** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L637** <code>MmaTensorOpMultiplicandTileIterator(TensorRef const &amp;ref, int lane_id)</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id` 继续当前实现。
+- **L638** <code>: stride_(ref.stride(0)), byte_offset_(0), k_group_idx_(0) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L639** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L640** <code>for (int i = 0; i &lt; kPointerCount; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L641** <code>int access_strided = lane_id % Policy::kLdsOpInner;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L642** <code>int access_contiguous = (lane_id / Policy::kLdsOpInner) +</code> — **EN:** Continues the current implementation using `access_contiguous`, `lane_id`, `Policy::kLdsOpInner`. **CN:** 使用 `access_contiguous`, `lane_id`, `Policy::kLdsOpInner` 继续当前实现。
+- **L643** <code>(access_strided ^ i) * Policy::kLdsOpOuter;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L644** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L645** <code>pointer_[i] = reinterpret_cast&lt;AccessType const *&gt;(ref.data()) +</code> — **EN:** Continues the current implementation using `pointer_`, `i`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `pointer_`, `i`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L646** <code>access_contiguous + access_strided * stride_;</code> — **EN:** Completes a declaration involving `access_contiguous`, `access_strided`, `stride_`. **CN:** 完成一条与 `access_contiguous`, `access_strided`, `stride_` 相关的声明。
+- **L647** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L648** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L649** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L650** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L651** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L652** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L653** <code>byte_offset_ += offset * sizeof(Element);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L654** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L655** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L656** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L657** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L658** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L659** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L660** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L661** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset` 继续当前实现。
+- **L662** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L663** <code>int contiguous_offset = tile_offset.contiguous();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L664** <code>if (Shape::kContiguous ==</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L665** <code>Layout::TileShape::kContiguous * Layout::kElementsPerAccess / 2) {</code> — **EN:** Continues the current implementation using `Layout::TileShape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::TileShape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L666** <code>if (tile_offset.contiguous() % 2) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L667** <code>// Matrix multiply 1688 pointer_[0] &lt;=&gt; pointer_[4] pointer_[1] &lt;=&gt; pointer_[5]</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L668** <code>//           pointer_[2] &lt;=&gt; pointer_[6] pointer_[3] &lt;=&gt; pointer_[7]</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L669** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L670** <code>for (int i = 0; i &lt; kPointerCount / 2; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L671** <code>AccessType const *tmp_pointer = pointer_[i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L672** <code>pointer_[i] = pointer_[i + kPointerCount / 2];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L673** <code>pointer_[i + kPointerCount / 2] = tmp_pointer;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L674** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L675** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L676** <code>contiguous_offset = (tile_offset.contiguous() &gt;&gt; 1) &lt;&lt; 1;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L677** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L678** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L679** <code>int offset = (tile_offset.strided() * InstructionShape::kStrided) * stride_ +</code> — **EN:** Continues the current implementation using `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided`. **CN:** 使用 `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided` 继续当前实现。
+- **L680** <code>contiguous_offset * Shape::kContiguous;</code> — **EN:** Completes a declaration involving `contiguous_offset`, `Shape::kContiguous`. **CN:** 完成一条与 `contiguous_offset`, `Shape::kContiguous` 相关的声明。
+- **L681** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L682** <code>add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L683** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L684** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L685** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L686** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L687** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L688** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L689** <code>MmaTensorOpMultiplicandTileIterator &amp;operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L690** <code>add_tile_offset({0, 1});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L691** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L692** <code>if (kPartitionsK &gt; 1) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L693** <code>++k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L694** <code>// Jump to next stage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L695** <code>if (k_group_idx_ == Policy::kGroupsPerTile) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L696** <code>k_group_idx_ = 0;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L697** <code>add_tile_offset(</code> — **EN:** Continues the current implementation using `add_tile_offset`. **CN:** 使用 `add_tile_offset` 继续当前实现。
+- **L698** <code>{0, ((kPartitionsK - 1) * Policy::kGroupsPerTile)});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L699** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L700** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L701** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L702** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L703** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L704** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L705** <code>/// Advances the iterator along the opposite of the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L706** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L707** <code>MmaTensorOpMultiplicandTileIterator &amp;operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L708** <code>byte_offset_ -= stride_ * InstructionShape::kStrided * sizeof(Element) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof`. **CN:** 使用 `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof` 继续当前实现。
+- **L709** <code>kElementsPerAccess;</code> — **EN:** Completes a declaration involving `kElementsPerAccess`. **CN:** 完成一条与 `kElementsPerAccess` 相关的声明。
+- **L710** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L711** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L712** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L713** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L714** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L715** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L716** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L717** <code>MmaTensorOpMultiplicandTileIterator &amp;operator+=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L718** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L719** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L720** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L721** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L722** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L723** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L724** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L725** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L726** <code>MmaTensorOpMultiplicandTileIterator &amp;operator-=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L727** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L728** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L729** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L730** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L731** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L732** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L733** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L734** <code>void load(Fragment &amp;frag) const { load_with_byte_offset(frag, 0); }</code> — **EN:** Continues the current implementation using `load`, `Fragment`, `frag`, `load_with_byte_offset`. **CN:** 使用 `load`, `Fragment`, `frag`, `load_with_byte_offset` 继续当前实现。
+- **L735** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L736** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L737** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L738** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L739** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L740** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L741** <code>/// loads a tile with a linear offset in units of bytes</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L742** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L743** <code>Element *fetch_ptr = reinterpret_cast&lt;Element *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L744** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L745** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L746** <code>for (int s = 0; s &lt; Policy::LdsIterations::kStrided; ++s) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L747** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L748** <code>for (int c = 0; c &lt; Policy::LdsIterations::kContiguous; ++c) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L749** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L750** <code>for (int ss = 0; ss &lt; Policy::LdsShape::kStrided; ++ss) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L751** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L752** <code>for (int cc = 0; cc &lt; Policy::LdsShape::kContiguous; ++cc) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L753** <code>int access_idx =</code> — **EN:** Continues the current implementation using `access_idx`. **CN:** 使用 `access_idx` 继续当前实现。
+- **L754** <code>cc + (ss + (c + s * Policy::LdsIterations::kContiguous) *</code> — **EN:** Continues the current implementation using `cc`, `ss`, `c`, `s`. **CN:** 使用 `cc`, `ss`, `c`, `s` 继续当前实现。
+- **L755** <code>Policy::LdsShape::kStrided) *</code> — **EN:** Continues the current implementation using `Policy::LdsShape::kStrided`. **CN:** 使用 `Policy::LdsShape::kStrided` 继续当前实现。
+- **L756** <code>Policy::LdsShape::kContiguous;</code> — **EN:** Completes a declaration involving `Policy::LdsShape::kContiguous`. **CN:** 完成一条与 `Policy::LdsShape::kContiguous` 相关的声明。
+- **L757** <code>int access_idx_contiguous = cc + c * Policy::LdsShape::kContiguous;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L758** <code>int access_idx_strided =</code> — **EN:** Continues the current implementation using `access_idx_strided`. **CN:** 使用 `access_idx_strided` 继续当前实现。
+- **L759** <code>(ss + s * Policy::LdsShape::kStrided) * Policy::kLdsOpInner;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L760** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L761** <code>AccessType const *source_ptr =</code> — **EN:** Continues the current implementation using `AccessType`, `source_ptr`. **CN:** 使用 `AccessType`, `source_ptr` 继续当前实现。
+- **L762** <code>pointer_[access_idx_contiguous % kPointerCount] +</code> — **EN:** Continues the current implementation using `pointer_`, `access_idx_contiguous`, `kPointerCount`. **CN:** 使用 `pointer_`, `access_idx_contiguous`, `kPointerCount` 继续当前实现。
+- **L763** <code>Layout::TileShape::kContiguous * Layout::kElementsPerAccess *</code> — **EN:** Continues the current implementation using `Layout::TileShape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::TileShape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L764** <code>(access_idx_contiguous / kPointerCount) +</code> — **EN:** Continues the current implementation using `access_idx_contiguous`, `kPointerCount`. **CN:** 使用 `access_idx_contiguous`, `kPointerCount` 继续当前实现。
+- **L765** <code>access_idx_strided * stride_;</code> — **EN:** Completes a declaration involving `access_idx_strided`, `stride_`. **CN:** 完成一条与 `access_idx_strided`, `stride_` 相关的声明。
+- **L766** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L767** <code>char const *source_byte_ptr =</code> — **EN:** Continues the current implementation using `char`, `source_byte_ptr`. **CN:** 使用 `char`, `source_byte_ptr` 继续当前实现。
+- **L768** <code>reinterpret_cast&lt;char const *&gt;(source_ptr) + byte_offset +</code> — **EN:** Continues the current implementation using `reinterpret_cast`, `char`, `source_ptr`, `byte_offset`. **CN:** 使用 `reinterpret_cast`, `char`, `source_ptr`, `byte_offset` 继续当前实现。
+- **L769** <code>byte_offset_;</code> — **EN:** Completes a declaration involving `byte_offset_`. **CN:** 完成一条与 `byte_offset_` 相关的声明。
+- **L770** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L771** <code>fetch_ptr[access_idx] =</code> — **EN:** Continues the current implementation using `fetch_ptr`, `access_idx`. **CN:** 使用 `fetch_ptr`, `access_idx` 继续当前实现。
+- **L772** <code>*reinterpret_cast&lt;Element const *&gt;(source_byte_ptr);</code> — **EN:** Continues a block comment used for documentation or explanation. **CN:** 继续块注释，用于文档说明或解释。
+- **L773** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L774** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L775** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L776** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L777** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L778** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L779** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L780** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L781** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L782** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L783** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L784** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L785** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L786** <code>load_with_byte_offset(frag, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L787** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L788** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L789** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L790** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L791** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L792** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L793** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L794** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L795** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L796** <code>load_with_byte_offset(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L797** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L798** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L799** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L800** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L801** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L802** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L803** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L804** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L805** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L806** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L807** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L808** <code>load_with_byte_offset(frag, tile_offset, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L809** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L810** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L811** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L812** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L813** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L814** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L815** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L816** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L817** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L818** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L819** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L820** <code>Index pointer_offset =</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L821** <code>tile_offset.contiguous() * Shape::kContiguous /</code> — **EN:** Continues the current implementation using `tile_offset`, `contiguous`, `Shape::kContiguous`. **CN:** 使用 `tile_offset`, `contiguous`, `Shape::kContiguous` 继续当前实现。
+- **L822** <code>Layout::kElementsPerAccess +</code> — **EN:** Continues the current implementation using `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::kElementsPerAccess` 继续当前实现。
+- **L823** <code>tile_offset.strided() * InstructionShape::kStrided * stride_;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L824** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L825** <code>byte_offset += sizeof(AccessType) * pointer_offset;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L826** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L827** <code>load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L828** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L829** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L830** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L831** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L832** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L833** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L834** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L835** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L836** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L837** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L838** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L839** <code>// no op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L840** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L841** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L842** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L843** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L844** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L845** <code>/// This tile iterator is specialized for 32-thread TensorOps with 64B warp tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L846** <code>/// the contiguous dimension. This assumes Threadblock contiguous dimension has</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L847** <code>/// the same size as the warp tile.  It uses LDSM to load from shared</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L848** <code>/// memory and therefore must be initialized with a TensorRef to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L849** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L850** <code>/// This specialization can be merged into the general one.  Most code is the same.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L851** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L852** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L853** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L854** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L855** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L856** <code>/// Size of the matrix to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L857** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L858** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L859** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L860** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L861** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L862** <code>/// Shape of one matrix product operation (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L863** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L864** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L865** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L866** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L867** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L868** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L869** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L870** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L871** <code>cutlass::layout::TensorOpMultiplicandCongruous&lt;16, 32&gt;,</code> — **EN:** Continues the current implementation using `cutlass::layout::TensorOpMultiplicandCongruous`. **CN:** 使用 `cutlass::layout::TensorOpMultiplicandCongruous` 继续当前实现。
+- **L872** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L873** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L874** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L875** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L876** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L877** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L878** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L879** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L880** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L881** <code>static_assert(kOperand == Operand::kA || kOperand== Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L882** <code>&quot;MmaTensorOpMultiplicandIterator may only be instantiated for A or B operands to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `MmaTensorOpMultiplicandIterator`, `may`, `only`. **CN:** 完成一条与 `MmaTensorOpMultiplicandIterator`, `may`, `only` 相关的声明。
+- **L883** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L884** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L885** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L886** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L887** <code>/// Element number when the layout crosses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L888** <code>static int const kCrosswise = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L889** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L890** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L891** <code>using Layout = cutlass::layout::TensorOpMultiplicandCongruous&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::TensorOpMultiplicandCongruous<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::TensorOpMultiplicandCongruous<`，便于在当前作用域中复用。
+- **L892** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L893** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L894** <code>/// Shape of one matrix product operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L895** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L896** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L897** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L898** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L899** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L900** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L901** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L902** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L903** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L904** <code>static int const kPartitionsK = PartitionsK_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L905** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L906** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L907** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L908** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L909** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L910** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L911** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L912** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L913** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L914** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L915** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L916** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L917** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L918** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L919** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L920** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L921** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L922** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L923** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L924** <code>!(Shape::kContiguous % InstructionShape::kContiguous),</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `InstructionShape::kContiguous`. **CN:** 使用 `Shape::kContiguous`, `InstructionShape::kContiguous` 继续当前实现。
+- **L925** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L926** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L927** <code>// Determine number of elements along outer dimension per individual LDSM op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L928** <code>static int const kLdsmOpOuter = Layout::kElementsPerAccess;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L929** <code>static int const kLdsmOpInner = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L930** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L931** <code>static_assert(!(Shape::kContiguous % kLdsmOpOuter),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L932** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L933** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L934** <code>static_assert(!(Shape::kStrided % kLdsmOpInner),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L935** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L936** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L937** <code>/// Shape of one individual LDSM instruction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L938** <code>static int const LdsmShapeStrided =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L939** <code>InstructionShape::kStrided / kLdsmOpInner;</code> — **EN:** Completes a declaration involving `InstructionShape::kStrided`, `kLdsmOpInner`. **CN:** 完成一条与 `InstructionShape::kStrided`, `kLdsmOpInner` 相关的声明。
+- **L940** <code>static int const LdsmShapeContiguous = 4 / LdsmShapeStrided;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L941** <code>using LdsmShape =</code> — **EN:** Introduces alias or imported name `LdsmShape =` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmShape =`，便于在当前作用域中复用。
+- **L942** <code>layout::PitchLinearShape&lt;LdsmShapeContiguous, LdsmShapeStrided&gt;;</code> — **EN:** Completes a declaration involving `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided`. **CN:** 完成一条与 `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided` 相关的声明。
+- **L943** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L944** <code>/// Number and arrangement of LDSM instructions</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L945** <code>using LdsmIterations = layout::PitchLinearShape&lt;</code> — **EN:** Introduces alias or imported name `LdsmIterations = layout::PitchLinearShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmIterations = layout::PitchLinearShape<`，便于在当前作用域中复用。
+- **L946** <code>Shape::kContiguous / Layout::kElementsPerAccess / LdsmShapeContiguous,</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `Layout::kElementsPerAccess`, `LdsmShapeContiguous`. **CN:** 使用 `Shape::kContiguous`, `Layout::kElementsPerAccess`, `LdsmShapeContiguous` 继续当前实现。
+- **L947** <code>1&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L948** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L949** <code>/// Number of groups for each tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L950** <code>static int const kGroupsPerTile =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L951** <code>Shape::kStrided / InstructionShape::kStrided;</code> — **EN:** Completes a declaration involving `Shape::kStrided`, `InstructionShape::kStrided`. **CN:** 完成一条与 `Shape::kStrided`, `InstructionShape::kStrided` 相关的声明。
+- **L952** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L953** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L954** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L955** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L956** <code>/// Not working on this feature at the moment.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L957** <code>static_assert(kOpDelta == 1,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L958** <code>&quot;Alternative arrangements not supported at present.&quot;);</code> — **EN:** Completes a declaration involving `Alternative`, `arrangements`, `not`. **CN:** 完成一条与 `Alternative`, `arrangements`, `not` 相关的声明。
+- **L959** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L960** <code>/// Number of internal pointers needed to reference shared memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L961** <code>static int const kPointerCount =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L962** <code>Layout::TileShape::kContiguous / Policy::LdsmShape::kContiguous / Layout::kFactor;</code> — **EN:** Completes a declaration involving `Layout::TileShape::kContiguous`, `Policy::LdsmShape::kContiguous`, `Layout::kFactor`. **CN:** 完成一条与 `Layout::TileShape::kContiguous`, `Policy::LdsmShape::kContiguous`, `Layout::kFactor` 相关的声明。
+- **L963** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L964** <code>/// Pointer type used for accesses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L965** <code>using AccessType = Array&lt;Element, Layout::kElementsPerAccess&gt;;</code> — **EN:** Introduces alias or imported name `AccessType = Array<Element, Layout::kElementsPerAccess>` for easier reuse in this scope. **CN:** 引入别名或导入名 `AccessType = Array<Element, Layout::kElementsPerAccess>`，便于在当前作用域中复用。
+- **L966** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L967** <code>/// Internal counter used to jump to next K partition</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L968** <code>int k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L969** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L970** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L971** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L972** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L973** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L974** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L975** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L976** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L977** <code>using Fragment =</code> — **EN:** Introduces alias or imported name `Fragment =` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment =`，便于在当前作用域中复用。
+- **L978** <code>Array&lt;Element, Shape::kContiguous * InstructionShape::kStrided / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `Shape::kContiguous`. **CN:** 完成一条与 `Array`, `Element`, `Shape::kContiguous` 相关的声明。
+- **L979** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L980** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L981** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L982** <code>/// Layout object storing stride values</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L983** <code>StrideIndex stride_;</code> — **EN:** Completes a declaration involving `StrideIndex`, `stride_`. **CN:** 完成一条与 `StrideIndex`, `stride_` 相关的声明。
+- **L984** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L985** <code>/// Shared memory base pointers - not advanced</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L986** <code>AccessType const *pointer_[kPointerCount];</code> — **EN:** Completes a declaration involving `AccessType`, `pointer_`, `kPointerCount`. **CN:** 完成一条与 `AccessType`, `pointer_`, `kPointerCount` 相关的声明。
+- **L987** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L988** <code>/// Byte offset incremented as iterator advances</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L989** <code>Index byte_offset_;</code> — **EN:** Completes a declaration involving `Index`, `byte_offset_`. **CN:** 完成一条与 `Index`, `byte_offset_` 相关的声明。
+- **L990** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L991** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L992** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L993** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L994** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L995** <code>MmaTensorOpMultiplicandTileIterator(): stride_(0), byte_offset_(0) { }</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_` 继续当前实现。
+- **L996** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L997** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L998** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L999** <code>MmaTensorOpMultiplicandTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L1000** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L1001** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L1002** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L1003** <code>stride_(ref.stride(0) * Layout::kFactor / Layout::kElementsPerAccess),</code> — **EN:** Continues the current implementation using `stride_`, `ref`, `stride`, `Layout::kFactor`. **CN:** 使用 `stride_`, `ref`, `stride`, `Layout::kFactor` 继续当前实现。
+- **L1004** <code>byte_offset_(0),</code> — **EN:** Continues the current implementation using `byte_offset_`. **CN:** 使用 `byte_offset_` 继续当前实现。
+- **L1005** <code>k_group_idx_(0) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1006** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1007** <code>int quad_pair = (lane_id &gt;&gt; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1008** <code>int quad_quad = (lane_id &gt;&gt; 4);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1009** <code>//int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1010** <code>int lane_in_quad_pair = (lane_id &amp; 7);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1011** <code>int lane_in_quad_quad = (lane_id &amp; 15);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1012** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1013** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1014** <code>for (int i = 0; i &lt; kPointerCount; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1015** <code>int partition_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1016** <code>int access_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1017** <code>int access_strided_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1018** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1019** <code>if (Policy::LdsmShape::kContiguous == 4) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1020** <code>// Matrix multiply 1688 A/B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1021** <code>// Q0 Q1 Q2 Q3 (Q stands for 1 8x128bit block).</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1022** <code>// Four blocks are next to each other in the contiguous dimension.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1023** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1024** <code>access_contiguous_idx = quad_pair ^ (lane_in_quad_pair / Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1025** <code>access_strided_idx = lane_in_quad_pair / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1026** <code>} else if (Policy::LdsmShape::kContiguous == 2 &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L1027** <code>kOperand == Operand::kA) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kA`. **CN:** 使用 `kOperand`, `Operand::kA` 继续当前实现。
+- **L1028** <code>// Matrix multiply 16816 A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1029** <code>// Q0 Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1030** <code>// Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1031** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1032** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L1033** <code>(((quad_pair &amp; 1) + i * 2) ^ (lane_in_quad_pair / Layout::kFactor));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1034** <code>access_strided_idx = (lane_in_quad_pair + (lane_id &gt;&gt; 4 &lt;&lt; 3)) / 2;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1035** <code>} else if (Policy::LdsmShape::kContiguous == 2 &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L1036** <code>kOperand == Operand::kB) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kB`. **CN:** 使用 `kOperand`, `Operand::kB` 继续当前实现。
+- **L1037** <code>// Matrix multiply 16816 B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1038** <code>// Q0 Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1039** <code>// Q1 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1040** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1041** <code>access_contiguous_idx = (quad_quad + i * 2) ^ (lane_in_quad_pair / Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1042** <code>access_strided_idx = (lane_in_quad_quad / Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1043** <code>} else if (Policy::LdsmShape::kContiguous == 1) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1044** <code>// Matrix multiply 16832.SP B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1045** <code>// Q0</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1046** <code>// Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1047** <code>// Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1048** <code>// Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1049** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1050** <code>access_contiguous_idx = (lane_in_quad_pair / Layout::kFactor) ^ i;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1051** <code>access_strided_idx = lane_id / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1052** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1053** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1054** <code>int access_contiguous =</code> — **EN:** Continues the current implementation using `access_contiguous`. **CN:** 使用 `access_contiguous` 继续当前实现。
+- **L1055** <code>partition_contiguous_idx * Layout::PartitionShape::kContiguous +</code> — **EN:** Continues the current implementation using `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous`. **CN:** 使用 `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous` 继续当前实现。
+- **L1056** <code>access_contiguous_idx;</code> — **EN:** Completes a declaration involving `access_contiguous_idx`. **CN:** 完成一条与 `access_contiguous_idx` 相关的声明。
+- **L1057** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1058** <code>int access_strided = access_strided_idx;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1059** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1060** <code>pointer_[i] = reinterpret_cast&lt;AccessType const *&gt;(ref.data()) +</code> — **EN:** Continues the current implementation using `pointer_`, `i`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `pointer_`, `i`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L1061** <code>access_contiguous + access_strided * stride_;</code> — **EN:** Completes a declaration involving `access_contiguous`, `access_strided`, `stride_`. **CN:** 完成一条与 `access_contiguous`, `access_strided`, `stride_` 相关的声明。
+- **L1062** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1063** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1064** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1065** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1066** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1067** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1068** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1069** <code>byte_offset_ += offset * sizeof(Element);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1070** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1071** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1072** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1073** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1074** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1075** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1076** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1077** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1078** <code>int contiguous_offset = tile_offset.contiguous();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1079** <code>if (Shape::kContiguous ==</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1080** <code>Layout::PartitionShape::kContiguous * Layout::kElementsPerAccess) {</code> — **EN:** Continues the current implementation using `Layout::PartitionShape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::PartitionShape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L1081** <code>if (tile_offset.contiguous() % 2) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1082** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1083** <code>for (int i = 0; i &lt; kPointerCount / 2; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1084** <code>AccessType const *tmp_pointer = pointer_[i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1085** <code>pointer_[i] = pointer_[i + kPointerCount / 2];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1086** <code>pointer_[i + kPointerCount / 2] = tmp_pointer;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1087** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1088** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1089** <code>contiguous_offset = (tile_offset.contiguous() &gt;&gt; 1) &lt;&lt; 1;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1090** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1091** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1092** <code>int offset = (tile_offset.strided() * InstructionShape::kStrided) *</code> — **EN:** Continues the current implementation using `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided`. **CN:** 使用 `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided` 继续当前实现。
+- **L1093** <code>stride_ * Layout::kElementsPerAccess / Layout::kFactor +</code> — **EN:** Continues the current implementation using `stride_`, `Layout::kElementsPerAccess`, `Layout::kFactor`. **CN:** 使用 `stride_`, `Layout::kElementsPerAccess`, `Layout::kFactor` 继续当前实现。
+- **L1094** <code>contiguous_offset * Shape::kContiguous;</code> — **EN:** Completes a declaration involving `contiguous_offset`, `Shape::kContiguous`. **CN:** 完成一条与 `contiguous_offset`, `Shape::kContiguous` 相关的声明。
+- **L1095** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1096** <code>add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1097** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1098** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1099** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1100** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1101** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1102** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1103** <code>MmaTensorOpMultiplicandTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1104** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1105** <code>add_tile_offset({0, 1});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1106** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1107** <code>if (kPartitionsK &gt; 1) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1108** <code>++k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L1109** <code>// Jump to next stage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1110** <code>if (k_group_idx_ == Policy::kGroupsPerTile) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1111** <code>k_group_idx_ = 0;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1112** <code>add_tile_offset(</code> — **EN:** Continues the current implementation using `add_tile_offset`. **CN:** 使用 `add_tile_offset` 继续当前实现。
+- **L1113** <code>{0, ((kPartitionsK - 1) * Policy::kGroupsPerTile)});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1114** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1115** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1116** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1117** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1118** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1119** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1120** <code>/// Advances the iterator along the opposite of the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1121** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1122** <code>MmaTensorOpMultiplicandTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1123** <code>byte_offset_ -= stride_ * InstructionShape::kStrided * sizeof(Element) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof`. **CN:** 使用 `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof` 继续当前实现。
+- **L1124** <code>Layout::kElementsPerAccess;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L1125** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1126** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1127** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1128** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1129** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1130** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1131** <code>MmaTensorOpMultiplicandTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1132** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1133** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1134** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1135** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1136** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1137** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1138** <code>MmaTensorOpMultiplicandTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1139** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1140** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1141** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1142** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1143** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1144** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1145** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1146** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1147** <code>load_with_byte_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1148** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1149** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1150** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1151** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1152** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L1153** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1154** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1155** <code>/// loads a tile with a linear offset in units of bytes</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1156** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L1157** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1158** <code>Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *fetch_ptr =</code> — **EN:** Continues the current implementation using `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr`. **CN:** 使用 `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr` 继续当前实现。
+- **L1159** <code>reinterpret_cast&lt;Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1160** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1161** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1162** <code>for (int s = 0; s &lt; Policy::LdsmIterations::kStrided; ++s) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1163** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1164** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1165** <code>for (int c = 0; c &lt; Policy::LdsmIterations::kContiguous; ++c) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1166** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1167** <code>int access_idx = c + s * Policy::LdsmIterations::kContiguous;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1168** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1169** <code>AccessType const *source_ptr =</code> — **EN:** Continues the current implementation using `AccessType`, `source_ptr`. **CN:** 使用 `AccessType`, `source_ptr` 继续当前实现。
+- **L1170** <code>pointer_[c % kPointerCount] +</code> — **EN:** Continues the current implementation using `pointer_`, `c`, `kPointerCount`. **CN:** 使用 `pointer_`, `c`, `kPointerCount` 继续当前实现。
+- **L1171** <code>Layout::TileShape::kContiguous * (c / kPointerCount) +</code> — **EN:** Continues the current implementation using `Layout::TileShape::kContiguous`, `c`, `kPointerCount`. **CN:** 使用 `Layout::TileShape::kContiguous`, `c`, `kPointerCount` 继续当前实现。
+- **L1172** <code>Policy::kLdsmOpInner * Policy::LdsmShape::kStrided * s * stride_ / Layout::kFactor;</code> — **EN:** Completes a declaration involving `Policy::kLdsmOpInner`, `Policy::LdsmShape::kStrided`, `s`. **CN:** 完成一条与 `Policy::kLdsmOpInner`, `Policy::LdsmShape::kStrided`, `s` 相关的声明。
+- **L1173** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1174** <code>char const *source_byte_ptr = reinterpret_cast&lt;char const *&gt;(source_ptr) + byte_offset + byte_offset_;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1175** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1176** <code>cutlass::arch::ldsm&lt;layout::ColumnMajor, Policy::LdsmShape::kCount&gt;(</code> — **EN:** Continues the current implementation using `cutlass::arch::ldsm`, `layout::ColumnMajor`, `Policy::LdsmShape::kCount`. **CN:** 使用 `cutlass::arch::ldsm`, `layout::ColumnMajor`, `Policy::LdsmShape::kCount` 继续当前实现。
+- **L1177** <code>fetch_ptr[access_idx],</code> — **EN:** Continues the current implementation using `fetch_ptr`, `access_idx`. **CN:** 使用 `fetch_ptr`, `access_idx` 继续当前实现。
+- **L1178** <code>source_byte_ptr</code> — **EN:** Continues the current implementation using `source_byte_ptr`. **CN:** 使用 `source_byte_ptr` 继续当前实现。
+- **L1179** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L1180** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1181** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1182** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1183** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1184** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1185** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1186** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L1187** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1188** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1189** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1190** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1191** <code>load_with_byte_offset(frag, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1192** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1193** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1194** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1195** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1196** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L1197** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1198** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1199** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1200** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1201** <code>load_with_byte_offset(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1202** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1203** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1204** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1205** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1206** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L1207** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1208** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1209** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1210** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1211** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1212** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1213** <code>load_with_byte_offset(frag, tile_offset, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1214** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1215** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1216** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1217** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1218** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L1219** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1220** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1221** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1222** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1223** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1224** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L1225** <code>Index pointer_offset =</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1226** <code>tile_offset.contiguous() * Shape::kContiguous / Layout::kElementsPerAccess +</code> — **EN:** Continues the current implementation using `tile_offset`, `contiguous`, `Shape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `tile_offset`, `contiguous`, `Shape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L1227** <code>tile_offset.strided() * InstructionShape::kStrided * stride_ / Layout::kFactor;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1228** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1229** <code>byte_offset += sizeof(AccessType) * pointer_offset;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1230** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1231** <code>load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1232** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1233** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1234** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1235** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1236** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1237** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1238** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1239** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1240** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1241** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1242** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1243** <code>// no op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1244** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1245** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1246** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1247** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1248** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1249** <code>/// This tile iterator is specialized for 32-thread TensorOps with 32B warp tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1250** <code>/// the contiguous dimension. This assumes Threadblock contiguous dimension has</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1251** <code>/// the same size as the warp tile.  It uses LDSM to load from shared</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1252** <code>/// memory and therefore must be initialized with a TensorRef to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1253** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1254** <code>/// This specialization can be merged into the general one.  Most code is the same.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1255** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1256** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1257** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1258** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1259** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L1260** <code>/// Size of the matrix to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1261** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L1262** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1263** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L1264** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1265** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L1266** <code>/// Shape of one matrix product operation (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1267** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L1268** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1269** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1270** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L1271** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1272** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L1273** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L1274** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L1275** <code>cutlass::layout::TensorOpMultiplicandCongruous&lt;16, 16&gt;,</code> — **EN:** Continues the current implementation using `cutlass::layout::TensorOpMultiplicandCongruous`. **CN:** 使用 `cutlass::layout::TensorOpMultiplicandCongruous` 继续当前实现。
+- **L1276** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L1277** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1278** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1279** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1280** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L1281** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1282** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1283** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1284** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1285** <code>static_assert(kOperand == Operand::kA || kOperand== Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1286** <code>&quot;MmaTensorOpMultiplicandIterator may only be instantiated for A or B operands to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `MmaTensorOpMultiplicandIterator`, `may`, `only`. **CN:** 完成一条与 `MmaTensorOpMultiplicandIterator`, `may`, `only` 相关的声明。
+- **L1287** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1288** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1289** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L1290** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1291** <code>/// Element number when the layout crosses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1292** <code>static int const kCrosswise = 16;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1293** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1294** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1295** <code>using Layout = cutlass::layout::TensorOpMultiplicandCongruous&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::TensorOpMultiplicandCongruous<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::TensorOpMultiplicandCongruous<`，便于在当前作用域中复用。
+- **L1296** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L1297** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1298** <code>/// Shape of one matrix product operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1299** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L1300** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1301** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1302** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1303** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1304** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1305** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1306** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1307** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1308** <code>static int const kPartitionsK = PartitionsK_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1309** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1310** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1311** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L1312** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1313** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1314** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L1315** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1316** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1317** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L1318** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1319** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1320** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L1321** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1322** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1323** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L1324** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1325** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1326** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L1327** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1328** <code>!(Shape::kContiguous % InstructionShape::kContiguous),</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `InstructionShape::kContiguous`. **CN:** 使用 `Shape::kContiguous`, `InstructionShape::kContiguous` 继续当前实现。
+- **L1329** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L1330** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1331** <code>// Determine number of elements along outer dimension per individual LDSM op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1332** <code>static int const kLdsmOpOuter = Layout::kElementsPerAccess;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1333** <code>static int const kLdsmOpInner = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1334** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1335** <code>static_assert(!(Shape::kContiguous % kLdsmOpOuter),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1336** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L1337** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1338** <code>static_assert(!(Shape::kStrided % kLdsmOpInner),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1339** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L1340** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1341** <code>/// Shape of one individual LDSM instruction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1342** <code>static int const LdsmShapeStrided =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1343** <code>InstructionShape::kStrided / kLdsmOpInner;</code> — **EN:** Completes a declaration involving `InstructionShape::kStrided`, `kLdsmOpInner`. **CN:** 完成一条与 `InstructionShape::kStrided`, `kLdsmOpInner` 相关的声明。
+- **L1344** <code>static int const LdsmShapeContiguous = 4 / LdsmShapeStrided;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1345** <code>using LdsmShape =</code> — **EN:** Introduces alias or imported name `LdsmShape =` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmShape =`，便于在当前作用域中复用。
+- **L1346** <code>layout::PitchLinearShape&lt;LdsmShapeContiguous, LdsmShapeStrided&gt;;</code> — **EN:** Completes a declaration involving `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided`. **CN:** 完成一条与 `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided` 相关的声明。
+- **L1347** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1348** <code>/// Number and arrangement of LDSM instructions</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1349** <code>using LdsmIterations = layout::PitchLinearShape&lt;</code> — **EN:** Introduces alias or imported name `LdsmIterations = layout::PitchLinearShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmIterations = layout::PitchLinearShape<`，便于在当前作用域中复用。
+- **L1350** <code>Shape::kContiguous / Layout::kElementsPerAccess / LdsmShapeContiguous,</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `Layout::kElementsPerAccess`, `LdsmShapeContiguous`. **CN:** 使用 `Shape::kContiguous`, `Layout::kElementsPerAccess`, `LdsmShapeContiguous` 继续当前实现。
+- **L1351** <code>1&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L1352** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1353** <code>/// Number of groups for each tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1354** <code>static int const kGroupsPerTile =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1355** <code>Shape::kStrided / InstructionShape::kStrided;</code> — **EN:** Completes a declaration involving `Shape::kStrided`, `InstructionShape::kStrided`. **CN:** 完成一条与 `Shape::kStrided`, `InstructionShape::kStrided` 相关的声明。
+- **L1356** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1357** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1358** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1359** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1360** <code>/// Not working on this feature at the moment.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1361** <code>static_assert(kOpDelta == 1,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1362** <code>&quot;Alternative arrangements not supported at present.&quot;);</code> — **EN:** Completes a declaration involving `Alternative`, `arrangements`, `not`. **CN:** 完成一条与 `Alternative`, `arrangements`, `not` 相关的声明。
+- **L1363** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1364** <code>/// Number of internal pointers needed to reference shared memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1365** <code>static int const kPointerCount =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1366** <code>Layout::TileShape::kContiguous / Policy::LdsmShape::kContiguous / Layout::kFactor;</code> — **EN:** Completes a declaration involving `Layout::TileShape::kContiguous`, `Policy::LdsmShape::kContiguous`, `Layout::kFactor`. **CN:** 完成一条与 `Layout::TileShape::kContiguous`, `Policy::LdsmShape::kContiguous`, `Layout::kFactor` 相关的声明。
+- **L1367** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1368** <code>/// Pointer type used for accesses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1369** <code>using AccessType = Array&lt;Element, Layout::kElementsPerAccess&gt;;</code> — **EN:** Introduces alias or imported name `AccessType = Array<Element, Layout::kElementsPerAccess>` for easier reuse in this scope. **CN:** 引入别名或导入名 `AccessType = Array<Element, Layout::kElementsPerAccess>`，便于在当前作用域中复用。
+- **L1370** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1371** <code>/// Internal counter used to jump to next K partition</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1372** <code>int k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L1373** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1374** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1375** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1376** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1377** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1378** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1379** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1380** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1381** <code>using Fragment =</code> — **EN:** Introduces alias or imported name `Fragment =` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment =`，便于在当前作用域中复用。
+- **L1382** <code>Array&lt;Element, Shape::kContiguous * InstructionShape::kStrided / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `Shape::kContiguous`. **CN:** 完成一条与 `Array`, `Element`, `Shape::kContiguous` 相关的声明。
+- **L1383** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1384** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1385** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1386** <code>/// Layout object storing stride values</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1387** <code>StrideIndex stride_;</code> — **EN:** Completes a declaration involving `StrideIndex`, `stride_`. **CN:** 完成一条与 `StrideIndex`, `stride_` 相关的声明。
+- **L1388** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1389** <code>/// Shared memory base pointers - not advanced</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1390** <code>AccessType const *pointer_[kPointerCount];</code> — **EN:** Completes a declaration involving `AccessType`, `pointer_`, `kPointerCount`. **CN:** 完成一条与 `AccessType`, `pointer_`, `kPointerCount` 相关的声明。
+- **L1391** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1392** <code>/// Byte offset incremented as iterator advances</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1393** <code>Index byte_offset_;</code> — **EN:** Completes a declaration involving `Index`, `byte_offset_`. **CN:** 完成一条与 `Index`, `byte_offset_` 相关的声明。
+- **L1394** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1395** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1396** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1397** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1398** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1399** <code>MmaTensorOpMultiplicandTileIterator(): stride_(0), byte_offset_(0) { }</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `stride_`, `byte_offset_` 继续当前实现。
+- **L1400** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1401** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1402** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1403** <code>MmaTensorOpMultiplicandTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L1404** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L1405** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L1406** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L1407** <code>stride_(ref.stride(0) * Layout::kFactor / Layout::kElementsPerAccess),</code> — **EN:** Continues the current implementation using `stride_`, `ref`, `stride`, `Layout::kFactor`. **CN:** 使用 `stride_`, `ref`, `stride`, `Layout::kFactor` 继续当前实现。
+- **L1408** <code>byte_offset_(0),</code> — **EN:** Continues the current implementation using `byte_offset_`. **CN:** 使用 `byte_offset_` 继续当前实现。
+- **L1409** <code>k_group_idx_(0) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1410** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1411** <code>//int quad_pair = (lane_id &gt;&gt; 3);</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1412** <code>int quad_quad = (lane_id &gt;&gt; 4);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1413** <code>int lane_in_pair = (lane_id &amp; 1);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1414** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1415** <code>int lane_in_quad_pair = (lane_id &amp; 7);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1416** <code>int lane_in_quad_quad = (lane_id &amp; 15);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1417** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1418** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1419** <code>for (int i = 0; i &lt; kPointerCount; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1420** <code>int partition_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1421** <code>int access_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1422** <code>int access_strided_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1423** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1424** <code>if (Policy::LdsmShape::kContiguous == 2 &amp;&amp;</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1425** <code>kOperand == Operand::kA) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kA`. **CN:** 使用 `kOperand`, `Operand::kA` 继续当前实现。
+- **L1426** <code>// Matrix multiply 16816 A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1427** <code>// Q0 Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1428** <code>// Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1429** <code>partition_contiguous_idx = lane_in_quad / 2;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1430** <code>access_strided_idx = lane_in_quad_pair / Layout::kFactor + quad_quad * 2;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1431** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L1432** <code>((lane_in_pair * 2 + ((lane_id &amp; 8) &gt;&gt; 3)) ^</code> — **EN:** Continues the current implementation using `lane_in_pair`, `lane_id`. **CN:** 使用 `lane_in_pair`, `lane_id` 继续当前实现。
+- **L1433** <code>access_strided_idx);</code> — **EN:** Completes a declaration involving `access_strided_idx`. **CN:** 完成一条与 `access_strided_idx` 相关的声明。
+- **L1434** <code>} else if (Policy::LdsmShape::kContiguous == 2 &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L1435** <code>kOperand == Operand::kB) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kB`. **CN:** 使用 `kOperand`, `Operand::kB` 继续当前实现。
+- **L1436** <code>// Matrix multiply 16816 B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1437** <code>// Q0 Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1438** <code>// Q1 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1439** <code>partition_contiguous_idx = lane_in_quad / 2;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1440** <code>access_strided_idx = lane_in_quad_quad / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1441** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L1442** <code>((lane_in_pair * 2 + quad_quad) ^</code> — **EN:** Continues the current implementation using `lane_in_pair`, `quad_quad`. **CN:** 使用 `lane_in_pair`, `quad_quad` 继续当前实现。
+- **L1443** <code>access_strided_idx);</code> — **EN:** Completes a declaration involving `access_strided_idx`. **CN:** 完成一条与 `access_strided_idx` 相关的声明。
+- **L1444** <code>} else if (Policy::LdsmShape::kContiguous == 1) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1445** <code>// Matrix multiply 16832.SP B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1446** <code>// Q0</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1447** <code>// Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1448** <code>// Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1449** <code>// Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1450** <code>int factor_in_partition =</code> — **EN:** Continues the current implementation using `factor_in_partition`. **CN:** 使用 `factor_in_partition` 继续当前实现。
+- **L1451** <code>(Layout::PartitionShape::kContiguous * Layout::kFactor /</code> — **EN:** Continues the current implementation using `Layout::PartitionShape::kContiguous`, `Layout::kFactor`. **CN:** 使用 `Layout::PartitionShape::kContiguous`, `Layout::kFactor` 继续当前实现。
+- **L1452** <code>Layout::TileShape::kContiguous);</code> — **EN:** Completes a declaration involving `Layout::TileShape::kContiguous`. **CN:** 完成一条与 `Layout::TileShape::kContiguous` 相关的声明。
+- **L1453** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1454** <code>partition_contiguous_idx = lane_in_quad / factor_in_partition;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1455** <code>access_contiguous_idx = ((lane_in_pair * factor_in_partition) ^</code> — **EN:** Continues the current implementation using `access_contiguous_idx`, `lane_in_pair`, `factor_in_partition`. **CN:** 使用 `access_contiguous_idx`, `lane_in_pair`, `factor_in_partition` 继续当前实现。
+- **L1456** <code>(lane_in_quad_quad / Layout::kFactor) ^ i);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1457** <code>access_strided_idx = lane_id / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1458** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1459** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1460** <code>int access_contiguous =</code> — **EN:** Continues the current implementation using `access_contiguous`. **CN:** 使用 `access_contiguous` 继续当前实现。
+- **L1461** <code>partition_contiguous_idx * Layout::PartitionShape::kContiguous +</code> — **EN:** Continues the current implementation using `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous`. **CN:** 使用 `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous` 继续当前实现。
+- **L1462** <code>access_contiguous_idx;</code> — **EN:** Completes a declaration involving `access_contiguous_idx`. **CN:** 完成一条与 `access_contiguous_idx` 相关的声明。
+- **L1463** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1464** <code>int access_strided = access_strided_idx;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1465** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1466** <code>pointer_[i] = reinterpret_cast&lt;AccessType const *&gt;(ref.data()) +</code> — **EN:** Continues the current implementation using `pointer_`, `i`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `pointer_`, `i`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L1467** <code>access_contiguous + access_strided * stride_;</code> — **EN:** Completes a declaration involving `access_contiguous`, `access_strided`, `stride_`. **CN:** 完成一条与 `access_contiguous`, `access_strided`, `stride_` 相关的声明。
+- **L1468** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1469** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1470** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1471** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1472** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1473** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1474** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1475** <code>byte_offset_ += offset * sizeof(Element);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1476** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1477** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1478** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1479** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1480** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1481** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1482** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1483** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1484** <code>int contiguous_offset = tile_offset.contiguous();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1485** <code>if (Shape::kContiguous ==</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1486** <code>Layout::PartitionShape::kContiguous * Layout::kElementsPerAccess) {</code> — **EN:** Continues the current implementation using `Layout::PartitionShape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::PartitionShape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L1487** <code>if (tile_offset.contiguous() % 2) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1488** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1489** <code>for (int i = 0; i &lt; kPointerCount / 2; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1490** <code>AccessType const *tmp_pointer = pointer_[i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1491** <code>pointer_[i] = pointer_[i + kPointerCount / 2];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1492** <code>pointer_[i + kPointerCount / 2] = tmp_pointer;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1493** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1494** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1495** <code>contiguous_offset = (tile_offset.contiguous() &gt;&gt; 1) &lt;&lt; 1;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1496** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1497** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1498** <code>int offset = (tile_offset.strided() * InstructionShape::kStrided) *</code> — **EN:** Continues the current implementation using `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided`. **CN:** 使用 `offset`, `tile_offset`, `strided`, `InstructionShape::kStrided` 继续当前实现。
+- **L1499** <code>stride_ * Layout::kElementsPerAccess / Layout::kFactor +</code> — **EN:** Continues the current implementation using `stride_`, `Layout::kElementsPerAccess`, `Layout::kFactor`. **CN:** 使用 `stride_`, `Layout::kElementsPerAccess`, `Layout::kFactor` 继续当前实现。
+- **L1500** <code>contiguous_offset * Shape::kContiguous;</code> — **EN:** Completes a declaration involving `contiguous_offset`, `Shape::kContiguous`. **CN:** 完成一条与 `contiguous_offset`, `Shape::kContiguous` 相关的声明。
+- **L1501** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1502** <code>add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1503** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1504** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1505** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1506** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1507** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1508** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1509** <code>MmaTensorOpMultiplicandTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1510** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1511** <code>add_tile_offset({0, 1});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1512** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1513** <code>if (kPartitionsK &gt; 1) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1514** <code>++k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L1515** <code>// Jump to next stage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1516** <code>if (k_group_idx_ == Policy::kGroupsPerTile) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L1517** <code>k_group_idx_ = 0;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1518** <code>add_tile_offset(</code> — **EN:** Continues the current implementation using `add_tile_offset`. **CN:** 使用 `add_tile_offset` 继续当前实现。
+- **L1519** <code>{0, ((kPartitionsK - 1) * Policy::kGroupsPerTile)});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1520** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1521** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1522** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1523** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1524** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1525** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1526** <code>/// Advances the iterator along the opposite of the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1527** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1528** <code>MmaTensorOpMultiplicandTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1529** <code>byte_offset_ -= stride_ * InstructionShape::kStrided * sizeof(Element) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof`. **CN:** 使用 `byte_offset_`, `stride_`, `InstructionShape::kStrided`, `sizeof` 继续当前实现。
+- **L1530** <code>Layout::kElementsPerAccess;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L1531** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1532** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1533** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1534** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1535** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1536** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1537** <code>MmaTensorOpMultiplicandTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1538** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1539** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1540** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1541** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1542** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1543** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1544** <code>MmaTensorOpMultiplicandTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1545** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1546** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1547** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1548** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1549** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1550** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1551** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1552** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1553** <code>load_with_byte_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1554** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1555** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1556** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1557** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1558** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L1559** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1560** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1561** <code>/// loads a tile with a linear offset in units of bytes</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1562** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L1563** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1564** <code>Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *fetch_ptr =</code> — **EN:** Continues the current implementation using `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr`. **CN:** 使用 `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr` 继续当前实现。
+- **L1565** <code>reinterpret_cast&lt;Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1566** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1567** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1568** <code>for (int s = 0; s &lt; Policy::LdsmIterations::kStrided; ++s) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1569** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1570** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1571** <code>for (int c = 0; c &lt; Policy::LdsmIterations::kContiguous; ++c) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L1572** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1573** <code>int access_idx = c + s * Policy::LdsmIterations::kContiguous;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1574** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1575** <code>AccessType const *source_ptr =</code> — **EN:** Continues the current implementation using `AccessType`, `source_ptr`. **CN:** 使用 `AccessType`, `source_ptr` 继续当前实现。
+- **L1576** <code>pointer_[c % kPointerCount] +</code> — **EN:** Continues the current implementation using `pointer_`, `c`, `kPointerCount`. **CN:** 使用 `pointer_`, `c`, `kPointerCount` 继续当前实现。
+- **L1577** <code>Layout::TileShape::kContiguous * (c / kPointerCount) +</code> — **EN:** Continues the current implementation using `Layout::TileShape::kContiguous`, `c`, `kPointerCount`. **CN:** 使用 `Layout::TileShape::kContiguous`, `c`, `kPointerCount` 继续当前实现。
+- **L1578** <code>Policy::kLdsmOpInner * Policy::LdsmShape::kStrided * s * stride_ / Layout::kFactor;</code> — **EN:** Completes a declaration involving `Policy::kLdsmOpInner`, `Policy::LdsmShape::kStrided`, `s`. **CN:** 完成一条与 `Policy::kLdsmOpInner`, `Policy::LdsmShape::kStrided`, `s` 相关的声明。
+- **L1579** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1580** <code>char const *source_byte_ptr = reinterpret_cast&lt;char const *&gt;(source_ptr) + byte_offset + byte_offset_;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1581** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1582** <code>cutlass::arch::ldsm&lt;layout::ColumnMajor, Policy::LdsmShape::kCount&gt;(</code> — **EN:** Continues the current implementation using `cutlass::arch::ldsm`, `layout::ColumnMajor`, `Policy::LdsmShape::kCount`. **CN:** 使用 `cutlass::arch::ldsm`, `layout::ColumnMajor`, `Policy::LdsmShape::kCount` 继续当前实现。
+- **L1583** <code>fetch_ptr[access_idx],</code> — **EN:** Continues the current implementation using `fetch_ptr`, `access_idx`. **CN:** 使用 `fetch_ptr`, `access_idx` 继续当前实现。
+- **L1584** <code>source_byte_ptr</code> — **EN:** Continues the current implementation using `source_byte_ptr`. **CN:** 使用 `source_byte_ptr` 继续当前实现。
+- **L1585** <code>);</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L1586** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1587** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1588** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1589** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1590** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1591** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1592** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L1593** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1594** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1595** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1596** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1597** <code>load_with_byte_offset(frag, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1598** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1599** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1600** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1601** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1602** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L1603** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1604** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1605** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1606** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1607** <code>load_with_byte_offset(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1608** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1609** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1610** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1611** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1612** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L1613** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1614** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1615** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1616** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1617** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1618** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1619** <code>load_with_byte_offset(frag, tile_offset, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1620** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1621** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1622** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1623** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1624** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L1625** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1626** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1627** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1628** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1629** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1630** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L1631** <code>Index pointer_offset =</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1632** <code>tile_offset.contiguous() * Shape::kContiguous / Layout::kElementsPerAccess +</code> — **EN:** Continues the current implementation using `tile_offset`, `contiguous`, `Shape::kContiguous`, `Layout::kElementsPerAccess`. **CN:** 使用 `tile_offset`, `contiguous`, `Shape::kContiguous`, `Layout::kElementsPerAccess` 继续当前实现。
+- **L1633** <code>tile_offset.strided() * InstructionShape::kStrided * stride_ / Layout::kFactor;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1634** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1635** <code>byte_offset += sizeof(AccessType) * pointer_offset;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1636** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1637** <code>load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1638** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1639** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1640** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1641** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1642** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1643** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1644** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1645** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1646** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1647** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1648** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1649** <code>// no op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1650** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1651** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1652** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1653** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1654** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1655** <code>/// This tile iterator is specialized for 32-thread TensorOps. It uses LDSM to load from shared</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1656** <code>/// memory and therefore must be initialized with a TensorRef to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1657** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1658** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1659** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1660** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1661** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L1662** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1663** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L1664** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1665** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L1666** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1667** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L1668** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1669** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L1670** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1671** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1672** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L1673** <code>/// Element number when the layout crosses (in units of elements)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1674** <code>int Crosswise,</code> — **EN:** Continues the current implementation using `Crosswise`. **CN:** 使用 `Crosswise` 继续当前实现。
+- **L1675** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1676** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L1677** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L1678** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L1679** <code>cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous&lt;</code> — **EN:** Continues the current implementation using `cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous`. **CN:** 使用 `cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous` 继续当前实现。
+- **L1680** <code>sizeof_bits&lt;Element_&gt;::value, Crosswise&gt;,</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element_`, `value`, `Crosswise`. **CN:** 使用 `sizeof_bits`, `Element_`, `value`, `Crosswise` 继续当前实现。
+- **L1681** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L1682** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1683** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1684** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1685** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L1686** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1687** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1688** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1689** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1690** <code>static_assert(kOperand == Operand::kA,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1691** <code>&quot;MmaTensorOpMultiplicandIterator for ColumnMajor Congruous may &quot;</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandIterator`, `ColumnMajor`, `Congruous`, `may`. **CN:** 使用 `MmaTensorOpMultiplicandIterator`, `ColumnMajor`, `Congruous`, `may` 继续当前实现。
+- **L1692** <code>&quot;only be instantiated for A operand to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `only`, `be`, `instantiated`. **CN:** 完成一条与 `only`, `be`, `instantiated` 相关的声明。
+- **L1693** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1694** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1695** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L1696** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1697** <code>/// MBlock or NBlock size</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1698** <code>static int const kCrosswise = Crosswise;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1699** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1700** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1701** <code>using Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous<`，便于在当前作用域中复用。
+- **L1702** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L1703** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1704** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1705** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L1706** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1707** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1708** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1709** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1710** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1711** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1712** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1713** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1714** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L1715** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1716** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1717** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L1718** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1719** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1720** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L1721** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1722** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1723** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L1724** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1725** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1726** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L1727** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1728** <code>/// Underlying tile iterator implementation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1729** <code>using Base = MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Introduces alias or imported name `Base = MmaTensorOpMultiplicandTileIterator<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Base = MmaTensorOpMultiplicandTileIterator<`，便于在当前作用域中复用。
+- **L1730** <code>layout::PitchLinearShape&lt;Shape::kRow, Shape::kColumn&gt;, kOperand, Element,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `Shape::kRow`, `Shape::kColumn`, `kOperand`. **CN:** 使用 `layout::PitchLinearShape`, `Shape::kRow`, `Shape::kColumn`, `kOperand` 继续当前实现。
+- **L1731** <code>layout::TensorOpMultiplicandCongruous&lt;sizeof_bits&lt;Element_&gt;::value,</code> — **EN:** Continues the current implementation using `layout::TensorOpMultiplicandCongruous`, `sizeof_bits`, `Element_`, `value`. **CN:** 使用 `layout::TensorOpMultiplicandCongruous`, `sizeof_bits`, `Element_`, `value` 继续当前实现。
+- **L1732** <code>kCrosswise&gt;,</code> — **EN:** Continues the current implementation using `kCrosswise`. **CN:** 使用 `kCrosswise` 继续当前实现。
+- **L1733** <code>layout::PitchLinearShape&lt;InstructionShape::kRow,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `InstructionShape::kRow`. **CN:** 使用 `layout::PitchLinearShape`, `InstructionShape::kRow` 继续当前实现。
+- **L1734** <code>InstructionShape::kColumn&gt;,</code> — **EN:** Continues the current implementation using `InstructionShape::kColumn`. **CN:** 使用 `InstructionShape::kColumn` 继续当前实现。
+- **L1735** <code>kOpDelta, kThreads, PartitionsK_&gt;;</code> — **EN:** Completes a declaration involving `kOpDelta`, `kThreads`, `PartitionsK_`. **CN:** 完成一条与 `kOpDelta`, `kThreads`, `PartitionsK_` 相关的声明。
+- **L1736** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1737** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1738** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1739** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1740** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1741** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1742** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1743** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1744** <code>using Fragment = typename Base::Fragment;</code> — **EN:** Introduces alias or imported name `Fragment = typename Base::Fragment` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = typename Base::Fragment`，便于在当前作用域中复用。
+- **L1745** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1746** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1747** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1748** <code>/// Underlying tile iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1749** <code>Base iterator_;</code> — **EN:** Completes a declaration involving `Base`, `iterator_`. **CN:** 完成一条与 `Base`, `iterator_` 相关的声明。
+- **L1750** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1751** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1752** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1753** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1754** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1755** <code>MmaTensorOpMultiplicandTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L1756** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1757** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1758** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1759** <code>MmaTensorOpMultiplicandTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L1760** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L1761** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L1762** <code>): iterator_({ref.data(), ref.stride()}, lane_id) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1763** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1764** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1765** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1766** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1767** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1768** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1769** <code>iterator_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1770** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1771** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1772** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1773** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1774** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1775** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1776** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1777** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1778** <code>iterator_.add_tile_offset({tile_offset.row(), tile_offset.column()});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1779** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1780** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1781** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1782** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1783** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1784** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1785** <code>MmaTensorOpMultiplicandTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1786** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1787** <code>++iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L1788** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1789** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1790** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1791** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1792** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1793** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1794** <code>MmaTensorOpMultiplicandTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1795** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1796** <code>--iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L1797** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1798** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1799** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1800** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1801** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1802** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1803** <code>MmaTensorOpMultiplicandTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1804** <code>add_tile_offset(PitchLinearCoord(tile_offset.row(), tile_offset.column()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1805** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1806** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1807** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1808** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1809** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1810** <code>MmaTensorOpMultiplicandTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1811** <code>add_tile_offset(-PitchLinearCoord(tile_offset.row(), tile_offset.column()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1812** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L1813** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1814** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1815** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1816** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1817** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1818** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1819** <code>iterator_.load(frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1820** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1821** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1822** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1823** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1824** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L1825** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1826** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1827** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1828** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1829** <code>iterator_.load_with_pointer_offset(frag, pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1830** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1831** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1832** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1833** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1834** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L1835** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1836** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1837** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1838** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L1839** <code>iterator_.load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1840** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1841** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1842** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1843** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1844** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L1845** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1846** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1847** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1848** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1849** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1850** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1851** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1852** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1853** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L1854** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1855** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1856** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1857** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1858** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1859** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L1860** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1861** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1862** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1863** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1864** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L1865** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1866** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L1867** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1868** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L1869** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1870** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L1871** <code>iterator_.load_with_byte_offset(</code> — **EN:** Continues the current implementation using `iterator_`, `load_with_byte_offset`. **CN:** 使用 `iterator_`, `load_with_byte_offset` 继续当前实现。
+- **L1872** <code>frag,</code> — **EN:** Continues the current implementation using `frag`. **CN:** 使用 `frag` 继续当前实现。
+- **L1873** <code>{tile_offset.contiguous(), tile_offset.strided()},</code> — **EN:** Continues the current implementation using `tile_offset`, `contiguous`, `tile_offset`, `strided`. **CN:** 使用 `tile_offset`, `contiguous`, `tile_offset`, `strided` 继续当前实现。
+- **L1874** <code>byte_offset);</code> — **EN:** Completes a declaration involving `byte_offset`. **CN:** 完成一条与 `byte_offset` 相关的声明。
+- **L1875** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1876** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1877** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1878** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1879** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1880** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1881** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1882** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1883** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1884** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1885** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1886** <code>iterator_.set_kgroup_index(k_group);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1887** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1888** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L1889** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1890** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1891** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1892** <code>/// This tile iterator is specialized for 32-thread TensorOps. It uses LDSM to load from shared</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1893** <code>/// memory and therefore must be initialized with a TensorRef to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1894** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1895** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1896** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1897** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1898** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L1899** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1900** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L1901** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1902** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L1903** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1904** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L1905** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1906** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L1907** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1908** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1909** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L1910** <code>/// Element number when the layout crosses (in units of elements)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1911** <code>int Crosswise,</code> — **EN:** Continues the current implementation using `Crosswise`. **CN:** 使用 `Crosswise` 继续当前实现。
+- **L1912** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1913** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L1914** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L1915** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L1916** <code>cutlass::layout::RowMajorTensorOpMultiplicandCongruous&lt;</code> — **EN:** Continues the current implementation using `cutlass::layout::RowMajorTensorOpMultiplicandCongruous`. **CN:** 使用 `cutlass::layout::RowMajorTensorOpMultiplicandCongruous` 继续当前实现。
+- **L1917** <code>sizeof_bits&lt;Element_&gt;::value, Crosswise&gt;,</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element_`, `value`, `Crosswise`. **CN:** 使用 `sizeof_bits`, `Element_`, `value`, `Crosswise` 继续当前实现。
+- **L1918** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L1919** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1920** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1921** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1922** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L1923** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1924** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1925** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L1926** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1927** <code>static_assert(kOperand == Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L1928** <code>&quot;MmaTensorOpMultiplicandIterator for RowMajor Congruous may &quot;</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandIterator`, `RowMajor`, `Congruous`, `may`. **CN:** 使用 `MmaTensorOpMultiplicandIterator`, `RowMajor`, `Congruous`, `may` 继续当前实现。
+- **L1929** <code>&quot;only be instantiated for B operand to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `only`, `be`, `instantiated`. **CN:** 完成一条与 `only`, `be`, `instantiated` 相关的声明。
+- **L1930** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1931** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1932** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L1933** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1934** <code>/// Element number when the layout crosses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1935** <code>static int const kCrosswise = Crosswise;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1936** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1937** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1938** <code>using Layout = cutlass::layout::RowMajorTensorOpMultiplicandCongruous&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::RowMajorTensorOpMultiplicandCongruous<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::RowMajorTensorOpMultiplicandCongruous<`，便于在当前作用域中复用。
+- **L1939** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L1940** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1941** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1942** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L1943** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1944** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1945** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1946** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1947** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1948** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L1949** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1950** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1951** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L1952** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1953** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1954** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L1955** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1956** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1957** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L1958** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1959** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1960** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L1961** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1962** <code>/// Underlying tile iterator implementation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1963** <code>using Base = MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Introduces alias or imported name `Base = MmaTensorOpMultiplicandTileIterator<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Base = MmaTensorOpMultiplicandTileIterator<`，便于在当前作用域中复用。
+- **L1964** <code>layout::PitchLinearShape&lt;Shape::kColumn, Shape::kRow&gt;, kOperand, Element,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `Shape::kColumn`, `Shape::kRow`, `kOperand`. **CN:** 使用 `layout::PitchLinearShape`, `Shape::kColumn`, `Shape::kRow`, `kOperand` 继续当前实现。
+- **L1965** <code>layout::TensorOpMultiplicandCongruous&lt;sizeof_bits&lt;Element_&gt;::value,</code> — **EN:** Continues the current implementation using `layout::TensorOpMultiplicandCongruous`, `sizeof_bits`, `Element_`, `value`. **CN:** 使用 `layout::TensorOpMultiplicandCongruous`, `sizeof_bits`, `Element_`, `value` 继续当前实现。
+- **L1966** <code>kCrosswise&gt;,</code> — **EN:** Continues the current implementation using `kCrosswise`. **CN:** 使用 `kCrosswise` 继续当前实现。
+- **L1967** <code>layout::PitchLinearShape&lt;InstructionShape::kColumn,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `InstructionShape::kColumn`. **CN:** 使用 `layout::PitchLinearShape`, `InstructionShape::kColumn` 继续当前实现。
+- **L1968** <code>InstructionShape::kRow&gt;,</code> — **EN:** Continues the current implementation using `InstructionShape::kRow`. **CN:** 使用 `InstructionShape::kRow` 继续当前实现。
+- **L1969** <code>kOpDelta, kThreads, PartitionsK_&gt;;</code> — **EN:** Completes a declaration involving `kOpDelta`, `kThreads`, `PartitionsK_`. **CN:** 完成一条与 `kOpDelta`, `kThreads`, `PartitionsK_` 相关的声明。
+- **L1970** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1971** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1972** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1973** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1974** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1975** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L1976** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1977** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1978** <code>using Fragment = typename Base::Fragment;</code> — **EN:** Introduces alias or imported name `Fragment = typename Base::Fragment` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = typename Base::Fragment`，便于在当前作用域中复用。
+- **L1979** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1980** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1981** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1982** <code>/// Underlying tile iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1983** <code>Base iterator_;</code> — **EN:** Completes a declaration involving `Base`, `iterator_`. **CN:** 完成一条与 `Base`, `iterator_` 相关的声明。
+- **L1984** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1985** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L1986** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1987** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1988** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1989** <code>MmaTensorOpMultiplicandTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L1990** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1991** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L1992** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L1993** <code>MmaTensorOpMultiplicandTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L1994** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L1995** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L1996** <code>): iterator_({ref.data(), ref.stride()}, lane_id) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L1997** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L1998** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L1999** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2000** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2001** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2002** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2003** <code>iterator_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2004** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2005** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2006** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2007** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2008** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2009** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2010** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2011** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2012** <code>iterator_.add_tile_offset({tile_offset.column(), tile_offset.row()});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2013** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2014** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2015** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2016** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2017** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2018** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2019** <code>MmaTensorOpMultiplicandTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2020** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2021** <code>++iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L2022** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2023** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2024** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2025** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2026** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2027** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2028** <code>MmaTensorOpMultiplicandTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2029** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2030** <code>--iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L2031** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2032** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2033** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2034** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2035** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2036** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2037** <code>MmaTensorOpMultiplicandTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2038** <code>add_tile_offset(PitchLinearCoord(tile_offset.column(), tile_offset.row()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2039** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2040** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2041** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2042** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2043** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2044** <code>MmaTensorOpMultiplicandTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2045** <code>add_tile_offset(-PitchLinearCoord(tile_offset.column(), tile_offset.row()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2046** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2047** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2048** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2049** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2050** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2051** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2052** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2053** <code>iterator_.load(frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2054** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2055** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2056** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2057** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2058** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L2059** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2060** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2061** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2062** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L2063** <code>iterator_.load_with_pointer_offset(frag, pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2064** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2065** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2066** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2067** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2068** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L2069** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2070** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2071** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2072** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L2073** <code>iterator_.load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2074** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2075** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2076** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2077** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2078** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L2079** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2080** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2081** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2082** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2083** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2084** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2085** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2086** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2087** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L2088** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2089** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2090** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2091** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2092** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2093** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L2094** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2095** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2096** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2097** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2098** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L2099** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2100** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2101** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2102** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2103** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2104** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L2105** <code>iterator_.load_with_byte_offset(</code> — **EN:** Continues the current implementation using `iterator_`, `load_with_byte_offset`. **CN:** 使用 `iterator_`, `load_with_byte_offset` 继续当前实现。
+- **L2106** <code>frag,</code> — **EN:** Continues the current implementation using `frag`. **CN:** 使用 `frag` 继续当前实现。
+- **L2107** <code>{tile_offset.strided(), tile_offset.contiguous()},</code> — **EN:** Continues the current implementation using `tile_offset`, `strided`, `tile_offset`, `contiguous`. **CN:** 使用 `tile_offset`, `strided`, `tile_offset`, `contiguous` 继续当前实现。
+- **L2108** <code>byte_offset);</code> — **EN:** Completes a declaration involving `byte_offset`. **CN:** 完成一条与 `byte_offset` 相关的声明。
+- **L2109** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2110** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2111** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2112** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2113** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2114** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2115** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2116** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2117** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2118** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2119** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2120** <code>iterator_.set_kgroup_index(k_group);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2121** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2122** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L2123** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2124** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2125** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2126** <code>/// This tile iterator is specialized for 32-thread TensorOps. It uses LDSM to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2127** <code>/// load from shared memory and therefore must be initialized with a TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2128** <code>/// to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2129** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2130** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2131** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2132** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2133** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L2134** <code>/// Size of the matrix to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2135** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L2136** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2137** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L2138** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2139** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L2140** <code>/// Shape of one matrix product operation (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2141** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L2142** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2143** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2144** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L2145** <code>/// Element number when the layout crosses (in units of elements)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2146** <code>int Crosswise,</code> — **EN:** Continues the current implementation using `Crosswise`. **CN:** 使用 `Crosswise` 继续当前实现。
+- **L2147** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2148** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L2149** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L2150** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L2151** <code>cutlass::layout::TensorOpMultiplicandCrosswise&lt;sizeof_bits&lt;Element_&gt;::value,</code> — **EN:** Continues the current implementation using `cutlass::layout::TensorOpMultiplicandCrosswise`, `sizeof_bits`, `Element_`, `value`. **CN:** 使用 `cutlass::layout::TensorOpMultiplicandCrosswise`, `sizeof_bits`, `Element_`, `value` 继续当前实现。
+- **L2152** <code>Crosswise&gt;,</code> — **EN:** Continues the current implementation using `Crosswise`. **CN:** 使用 `Crosswise` 继续当前实现。
+- **L2153** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L2154** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2155** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2156** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L2157** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2158** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2159** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2160** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2161** <code>static_assert(kOperand == Operand::kA || kOperand == Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2162** <code>&quot;MmaTensorOpMultiplicandIterator may only be instantiated for &quot;</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandIterator`, `may`, `only`, `be`. **CN:** 使用 `MmaTensorOpMultiplicandIterator`, `may`, `only`, `be` 继续当前实现。
+- **L2163** <code>&quot;A or B operands to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `A`, `or`, `B`. **CN:** 完成一条与 `A`, `or`, `B` 相关的声明。
+- **L2164** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2165** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2166** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L2167** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2168** <code>/// Element number when the layout crosses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2169** <code>static int const kCrosswise = Crosswise;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2170** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2171** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2172** <code>using Layout = cutlass::layout::TensorOpMultiplicandCrosswise&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::TensorOpMultiplicandCrosswise<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::TensorOpMultiplicandCrosswise<`，便于在当前作用域中复用。
+- **L2173** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L2174** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2175** <code>/// Shape of one matrix product operation (concept: GemmShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2176** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L2177** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2178** <code>/// Delta between *MMA operations (in units of *MMA operations, concept:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2179** <code>/// MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2180** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2181** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2182** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2183** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2184** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2185** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2186** <code>static int const kPartitionsK = PartitionsK_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2187** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2188** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2189** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L2190** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2191** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2192** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L2193** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2194** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2195** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L2196** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2197** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2198** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L2199** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2200** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2201** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L2202** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2203** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2204** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L2205** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2206** <code>!(Shape::kContiguous % InstructionShape::kContiguous),</code> — **EN:** Continues the current implementation using `Shape::kContiguous`, `InstructionShape::kContiguous`. **CN:** 使用 `Shape::kContiguous`, `InstructionShape::kContiguous` 继续当前实现。
+- **L2207** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L2208** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2209** <code>// Determine number of elements along outer dimension per individual LDSM op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2210** <code>static int const kLdsmOpOuter = Layout::kElementsPerAccess;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2211** <code>static int const kLdsmOpInner = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2212** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2213** <code>static_assert(!(Shape::kContiguous % kLdsmOpOuter),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2214** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s &quot;</code> — **EN:** Continues the current implementation using `Shape`, `of`, `warp`, `level`. **CN:** 使用 `Shape`, `of`, `warp`, `level` 继续当前实现。
+- **L2215** <code>&quot;fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `fundamental`, `tile`, `size`. **CN:** 完成一条与 `fundamental`, `tile`, `size` 相关的声明。
+- **L2216** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2217** <code>static_assert(!(Shape::kStrided % kLdsmOpInner),</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2218** <code>&quot;Shape of warp-level mma must be divisible by LDSM&#x27;s &quot;</code> — **EN:** Continues the current implementation using `Shape`, `of`, `warp`, `level`. **CN:** 使用 `Shape`, `of`, `warp`, `level` 继续当前实现。
+- **L2219** <code>&quot;fundamental tile size.&quot;);</code> — **EN:** Completes a declaration involving `fundamental`, `tile`, `size`. **CN:** 完成一条与 `fundamental`, `tile`, `size` 相关的声明。
+- **L2220** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2221** <code>/// Shape of one individual LDSM instruction</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2222** <code>static int const LdsmShapeContiguous =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2223** <code>InstructionShape::kContiguous / kLdsmOpOuter;</code> — **EN:** Completes a declaration involving `InstructionShape::kContiguous`, `kLdsmOpOuter`. **CN:** 完成一条与 `InstructionShape::kContiguous`, `kLdsmOpOuter` 相关的声明。
+- **L2224** <code>static int const LdsmShapeStrided =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2225** <code>((4 / LdsmShapeContiguous * kLdsmOpInner) &gt; Shape::kStrided)</code> — **EN:** Continues the current implementation using `LdsmShapeContiguous`, `kLdsmOpInner`, `Shape::kStrided`. **CN:** 使用 `LdsmShapeContiguous`, `kLdsmOpInner`, `Shape::kStrided` 继续当前实现。
+- **L2226** <code>? (Shape::kStrided / kLdsmOpInner)</code> — **EN:** Continues the current implementation using `Shape::kStrided`, `kLdsmOpInner`. **CN:** 使用 `Shape::kStrided`, `kLdsmOpInner` 继续当前实现。
+- **L2227** <code>: (4 / LdsmShapeContiguous);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2228** <code>using LdsmShape =</code> — **EN:** Introduces alias or imported name `LdsmShape =` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmShape =`，便于在当前作用域中复用。
+- **L2229** <code>layout::PitchLinearShape&lt;LdsmShapeContiguous, LdsmShapeStrided&gt;;</code> — **EN:** Completes a declaration involving `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided`. **CN:** 完成一条与 `layout::PitchLinearShape`, `LdsmShapeContiguous`, `LdsmShapeStrided` 相关的声明。
+- **L2230** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2231** <code>/// Number and arrangement of LDSM instructions</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2232** <code>using LdsmIterations =</code> — **EN:** Introduces alias or imported name `LdsmIterations =` for easier reuse in this scope. **CN:** 引入别名或导入名 `LdsmIterations =`，便于在当前作用域中复用。
+- **L2233** <code>layout::PitchLinearShape&lt;1, Shape::kStrided / kLdsmOpInner /</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `Shape::kStrided`, `kLdsmOpInner`. **CN:** 使用 `layout::PitchLinearShape`, `Shape::kStrided`, `kLdsmOpInner` 继续当前实现。
+- **L2234** <code>LdsmShape::kStrided&gt;;</code> — **EN:** Completes a declaration involving `LdsmShape::kStrided`. **CN:** 完成一条与 `LdsmShape::kStrided` 相关的声明。
+- **L2235** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2236** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2237** <code>static int const kGroupsPerTile = Layout::TileShape::kContiguous /</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2238** <code>Layout::kFactor / LdsmShape::kContiguous;</code> — **EN:** Completes a declaration involving `Layout::kFactor`, `LdsmShape::kContiguous`. **CN:** 完成一条与 `Layout::kFactor`, `LdsmShape::kContiguous` 相关的声明。
+- **L2239** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L2240** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2241** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2242** <code>/// Not working on this feature at the moment.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2243** <code>static_assert(kOpDelta == 1,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2244** <code>&quot;Alternative arrangements not supported at present.&quot;);</code> — **EN:** Completes a declaration involving `Alternative`, `arrangements`, `not`. **CN:** 完成一条与 `Alternative`, `arrangements`, `not` 相关的声明。
+- **L2245** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2246** <code>/// Pointer type used for accesses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2247** <code>using AccessType = Array&lt;Element, Layout::kElementsPerAccess&gt;;</code> — **EN:** Introduces alias or imported name `AccessType = Array<Element, Layout::kElementsPerAccess>` for easier reuse in this scope. **CN:** 引入别名或导入名 `AccessType = Array<Element, Layout::kElementsPerAccess>`，便于在当前作用域中复用。
+- **L2248** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2249** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2250** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2251** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2252** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2253** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2254** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2255** <code>using Fragment = Array&lt;Element, Shape::kStrided *</code> — **EN:** Introduces alias or imported name `Fragment = Array<Element, Shape::kStrided *` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = Array<Element, Shape::kStrided *`，便于在当前作用域中复用。
+- **L2256** <code>InstructionShape::kContiguous / kThreads&gt;;</code> — **EN:** Completes a declaration involving `InstructionShape::kContiguous`, `kThreads`. **CN:** 完成一条与 `InstructionShape::kContiguous`, `kThreads` 相关的声明。
+- **L2257** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2258** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2259** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2260** <code>/// Total number of sections.  The memory is divided into stages.  One stage</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2261** <code>/// can store one tile.  Stage is divided into sections.  Interleaved layout</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2262** <code>/// can have multiple sections in a stage.  The rest layout only has one section</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2263** <code>/// in a stage.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2264** <code>int sections_;</code> — **EN:** Completes a declaration involving `sections_`. **CN:** 完成一条与 `sections_` 相关的声明。
+- **L2265** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2266** <code>/// Layout object storing stride values</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2267** <code>StrideIndex stride_;</code> — **EN:** Completes a declaration involving `StrideIndex`, `stride_`. **CN:** 完成一条与 `StrideIndex`, `stride_` 相关的声明。
+- **L2268** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2269** <code>/// Shared memory base pointers - not advanced</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2270** <code>AccessType const *pointer_;</code> — **EN:** Completes a declaration involving `AccessType`, `pointer_`. **CN:** 完成一条与 `AccessType`, `pointer_` 相关的声明。
+- **L2271** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2272** <code>/// Byte offset incremented as iterator advances</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2273** <code>Index byte_offset_;</code> — **EN:** Completes a declaration involving `Index`, `byte_offset_`. **CN:** 完成一条与 `Index`, `byte_offset_` 相关的声明。
+- **L2274** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2275** <code>/// Internal counter used to determine when to increment byte offset and when</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2276** <code>/// to XOR it</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2277** <code>int k_group_idx_;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L2278** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2279** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2280** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2281** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2282** <code>MmaTensorOpMultiplicandTileIterator()</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L2283** <code>: pointer_(nullptr),</code> — **EN:** Continues the current implementation using `pointer_`, `nullptr`. **CN:** 使用 `pointer_`, `nullptr` 继续当前实现。
+- **L2284** <code>sections_(0),</code> — **EN:** Continues the current implementation using `sections_`. **CN:** 使用 `sections_` 继续当前实现。
+- **L2285** <code>stride_(0),</code> — **EN:** Continues the current implementation using `stride_`. **CN:** 使用 `stride_` 继续当前实现。
+- **L2286** <code>byte_offset_(0),</code> — **EN:** Continues the current implementation using `byte_offset_`. **CN:** 使用 `byte_offset_` 继续当前实现。
+- **L2287** <code>k_group_idx_(0) {}</code> — **EN:** Continues the current implementation using `k_group_idx_`. **CN:** 使用 `k_group_idx_` 继续当前实现。
+- **L2288** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2289** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2290** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2291** <code>MmaTensorOpMultiplicandTileIterator(TensorRef const &amp;ref, int lane_id)</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id` 继续当前实现。
+- **L2292** <code>: pointer_(reinterpret_cast&lt;AccessType const *&gt;(ref.data())),</code> — **EN:** Continues the current implementation using `pointer_`, `reinterpret_cast`, `AccessType`, `ref`. **CN:** 使用 `pointer_`, `reinterpret_cast`, `AccessType`, `ref` 继续当前实现。
+- **L2293** <code>sections_(ref.stride(0) / kCrosswise),</code> — **EN:** Continues the current implementation using `sections_`, `ref`, `stride`, `kCrosswise`. **CN:** 使用 `sections_`, `ref`, `stride`, `kCrosswise` 继续当前实现。
+- **L2294** <code>// stride_ = kCrosswise x sections_ x kFactor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2295** <code>stride_(ref.stride(0) * Layout::kFactor / Layout::kElementsPerAccess),</code> — **EN:** Continues the current implementation using `stride_`, `ref`, `stride`, `Layout::kFactor`. **CN:** 使用 `stride_`, `ref`, `stride`, `Layout::kFactor` 继续当前实现。
+- **L2296** <code>byte_offset_(0),</code> — **EN:** Continues the current implementation using `byte_offset_`. **CN:** 使用 `byte_offset_` 继续当前实现。
+- **L2297** <code>k_group_idx_(0) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2298** <code>// Warp level iterator at most use double buffer to hide latency.  If there</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2299** <code>// are more than 2 sections, every stage should have more than 1 section.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2300** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2301** <code>// Turing silicon requires all 32 threads in a warp provide valid addresses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2302** <code>// even for LDSM.1 and LDSM.2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2303** <code>#if (defined(__CUDA_ARCH__) &amp;&amp; (__CUDA_ARCH__ == 750))</code> — **EN:** Starts a conditional-compilation branch that selects code for a specific compile-time condition. **CN:** 开始条件编译分支，用于针对特定编译期条件选择代码。
+- **L2304** <code>lane_id = lane_id % (Policy::LdsmShape::kCount * Policy::kLdsmOpInner);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2305** <code>#endif</code> — **EN:** Ends the active conditional-compilation block. **CN:** 结束当前条件编译块。
+- **L2306** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2307** <code>int quad_quad = (lane_id &gt;&gt; 4);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2308** <code>int quad_pair = (lane_id &gt;&gt; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2309** <code>int lane_in_pair = (lane_id &amp; 1);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2310** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2311** <code>int lane_in_quad_pair = (lane_id &amp; 7);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2312** <code>int lane_in_quad_quad = (lane_id &amp; 15);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2313** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2314** <code>int partition_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2315** <code>int access_contiguous_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2316** <code>int access_strided_idx = -1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2317** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2318** <code>if (Layout::kFactor == 8) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2319** <code>int factor_in_partition =</code> — **EN:** Continues the current implementation using `factor_in_partition`. **CN:** 使用 `factor_in_partition` 继续当前实现。
+- **L2320** <code>(Layout::PartitionShape::kContiguous * Layout::kFactor /</code> — **EN:** Continues the current implementation using `Layout::PartitionShape::kContiguous`, `Layout::kFactor`. **CN:** 使用 `Layout::PartitionShape::kContiguous`, `Layout::kFactor` 继续当前实现。
+- **L2321** <code>Layout::TileShape::kContiguous);</code> — **EN:** Completes a declaration involving `Layout::TileShape::kContiguous`. **CN:** 完成一条与 `Layout::TileShape::kContiguous` 相关的声明。
+- **L2322** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2323** <code>if (Policy::LdsmShape::kStrided == Policy::LdsmShape::kCount) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2324** <code>partition_contiguous_idx = lane_in_quad_pair / factor_in_partition;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2325** <code>access_contiguous_idx = ((lane_in_quad) ^ (lane_id / Layout::kFactor));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2326** <code>access_strided_idx = lane_id / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2327** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2328** <code>} else if (Layout::kFactor == 4) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2329** <code>// Super Integer matrix multiply Interleaved-32</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2330** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2331** <code>int factor_in_partition =</code> — **EN:** Continues the current implementation using `factor_in_partition`. **CN:** 使用 `factor_in_partition` 继续当前实现。
+- **L2332** <code>(Layout::PartitionShape::kContiguous * Layout::kFactor /</code> — **EN:** Continues the current implementation using `Layout::PartitionShape::kContiguous`, `Layout::kFactor`. **CN:** 使用 `Layout::PartitionShape::kContiguous`, `Layout::kFactor` 继续当前实现。
+- **L2333** <code>Layout::TileShape::kContiguous);</code> — **EN:** Completes a declaration involving `Layout::TileShape::kContiguous`. **CN:** 完成一条与 `Layout::TileShape::kContiguous` 相关的声明。
+- **L2334** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2335** <code>if (Policy::LdsmShape::kStrided == Policy::LdsmShape::kCount) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2336** <code>// Integer matrix multiply 8816  A/B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2337** <code>partition_contiguous_idx = lane_in_quad / factor_in_partition;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2338** <code>access_contiguous_idx = ((lane_in_pair * factor_in_partition) ^</code> — **EN:** Continues the current implementation using `access_contiguous_idx`, `lane_in_pair`, `factor_in_partition`. **CN:** 使用 `access_contiguous_idx`, `lane_in_pair`, `factor_in_partition` 继续当前实现。
+- **L2339** <code>(lane_in_quad_quad / Layout::kFactor));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2340** <code>access_strided_idx = lane_id / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2341** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2342** <code>else if (Policy::LdsmShape::kStrided ==</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2343** <code>(Policy::LdsmShape::kCount / 2) &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kCount`. **CN:** 使用 `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2344** <code>kOperand == Operand::kA) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kA`. **CN:** 使用 `kOperand`, `Operand::kA` 继续当前实现。
+- **L2345** <code>// Integer matrix multiply 16832 A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2346** <code>partition_contiguous_idx = lane_in_quad / factor_in_partition;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2347** <code>access_strided_idx = lane_in_quad_quad / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2348** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L2349** <code>((lane_in_pair * factor_in_partition + quad_quad) ^</code> — **EN:** Continues the current implementation using `lane_in_pair`, `factor_in_partition`, `quad_quad`. **CN:** 使用 `lane_in_pair`, `factor_in_partition`, `quad_quad` 继续当前实现。
+- **L2350** <code>access_strided_idx);</code> — **EN:** Completes a declaration involving `access_strided_idx`. **CN:** 完成一条与 `access_strided_idx` 相关的声明。
+- **L2351** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2352** <code>else if (Policy::LdsmShape::kStrided ==</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2353** <code>(Policy::LdsmShape::kCount / 2) &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kCount`. **CN:** 使用 `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2354** <code>kOperand == Operand::kB) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kB`. **CN:** 使用 `kOperand`, `Operand::kB` 继续当前实现。
+- **L2355** <code>// Integer matrix multiply 16832 B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2356** <code>partition_contiguous_idx = lane_in_quad / factor_in_partition;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2357** <code>access_strided_idx = lane_in_quad_pair / Layout::kFactor + quad_quad * 2;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2358** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L2359** <code>((lane_in_pair * factor_in_partition + ((lane_id &amp; 8) &gt;&gt; 3)) ^</code> — **EN:** Continues the current implementation using `lane_in_pair`, `factor_in_partition`, `lane_id`. **CN:** 使用 `lane_in_pair`, `factor_in_partition`, `lane_id` 继续当前实现。
+- **L2360** <code>access_strided_idx);</code> — **EN:** Completes a declaration involving `access_strided_idx`. **CN:** 完成一条与 `access_strided_idx` 相关的声明。
+- **L2361** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2362** <code>} else if (Layout::kFactor == 2) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2363** <code>// Super Matrix multiply kBlock = 32</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2364** <code>if (Policy::LdsmShape::kStrided == Policy::LdsmShape::kCount) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2365** <code>// Matrix multiply 1688 A/B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2366** <code>// (Q stands for 1 8x128bit block).</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2367** <code>// Q0</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2368** <code>// Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2369** <code>// Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2370** <code>// Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2371** <code>// Four blocks are next to each other in the strided dimension.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2372** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2373** <code>access_contiguous_idx = (lane_in_quad_pair / Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2374** <code>access_strided_idx = lane_id / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2375** <code>} else if (Policy::LdsmShape::kStrided ==</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kStrided`. **CN:** 使用 `Policy::LdsmShape::kStrided` 继续当前实现。
+- **L2376** <code>(Policy::LdsmShape::kCount / 2) &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kCount`. **CN:** 使用 `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2377** <code>kOperand == Operand::kA) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kA`. **CN:** 使用 `kOperand`, `Operand::kA` 继续当前实现。
+- **L2378** <code>// Matrix multiply 16816|1688.TF32 A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2379** <code>// Q0 Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2380** <code>// Q1 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2381** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2382** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L2383** <code>(quad_quad ^ (lane_in_quad_pair / Layout::kFactor));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2384** <code>access_strided_idx = (lane_in_quad_quad / Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2385** <code>} else if (Policy::LdsmShape::kStrided ==</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kStrided`. **CN:** 使用 `Policy::LdsmShape::kStrided` 继续当前实现。
+- **L2386** <code>(Policy::LdsmShape::kCount / 2) &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kCount`. **CN:** 使用 `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2387** <code>kOperand == Operand::kB) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kB`. **CN:** 使用 `kOperand`, `Operand::kB` 继续当前实现。
+- **L2388** <code>// Matrix multiply 16816|1688.TF32 B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2389** <code>// Q0 Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2390** <code>// Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2391** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2392** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L2393** <code>((quad_pair &amp; 1) ^ (lane_in_quad_pair / Layout::kFactor));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2394** <code>access_strided_idx =</code> — **EN:** Continues the current implementation using `access_strided_idx`. **CN:** 使用 `access_strided_idx` 继续当前实现。
+- **L2395** <code>(lane_in_quad_pair + (lane_id &gt;&gt; 4 &lt;&lt; 3)) / Layout::kFactor;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2396** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2397** <code>else if (Policy::LdsmShape::kContiguous == Policy::LdsmShape::kCount) {</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2398** <code>// Matrix multiply 16832.SP B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2399** <code>// Q0 Q1 Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2400** <code>partition_contiguous_idx = (lane_id % Layout::kFactor);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2401** <code>access_contiguous_idx =</code> — **EN:** Continues the current implementation using `access_contiguous_idx`. **CN:** 使用 `access_contiguous_idx` 继续当前实现。
+- **L2402** <code>(quad_pair ^ (lane_in_quad_pair / Layout::kFactor));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2403** <code>access_strided_idx = lane_in_quad_pair / Layout::kFactor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2404** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2405** <code>} else if (Layout::kFactor == 1) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2406** <code>// Super Matrix multiply kBlock = 64</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2407** <code>if (Policy::LdsmShape::kStrided == Policy::LdsmShape::kCount) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2408** <code>// Q0</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2409** <code>// Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2410** <code>// Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2411** <code>// Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2412** <code>partition_contiguous_idx = (lane_in_quad_pair &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2413** <code>access_contiguous_idx = lane_in_quad;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2414** <code>access_strided_idx = lane_id;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2415** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2416** <code>else if (Policy::LdsmShape::kStrided ==</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2417** <code>(Policy::LdsmShape::kCount / 2) &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kCount`. **CN:** 使用 `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2418** <code>kOperand == Operand::kA) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kA`. **CN:** 使用 `kOperand`, `Operand::kA` 继续当前实现。
+- **L2419** <code>// Matrix multiply 16816|1688.TF32 A</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2420** <code>// Q0 Q2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2421** <code>// Q1 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2422** <code>partition_contiguous_idx = (lane_in_quad_pair &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2423** <code>access_contiguous_idx = (quad_quad ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2424** <code>access_strided_idx = lane_in_quad_quad;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2425** <code>} else if (Policy::LdsmShape::kStrided ==</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kStrided`. **CN:** 使用 `Policy::LdsmShape::kStrided` 继续当前实现。
+- **L2426** <code>(Policy::LdsmShape::kCount / 2) &amp;&amp;</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kCount`. **CN:** 使用 `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2427** <code>kOperand == Operand::kB) {</code> — **EN:** Continues the current implementation using `kOperand`, `Operand::kB`. **CN:** 使用 `kOperand`, `Operand::kB` 继续当前实现。
+- **L2428** <code>// Matrix multiply 16816|1688.TF32 B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2429** <code>// Q0 Q1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2430** <code>// Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2431** <code>partition_contiguous_idx = (lane_in_quad_pair &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2432** <code>access_contiguous_idx = ((quad_pair &amp; 1) ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2433** <code>access_strided_idx = lane_in_quad_pair + (lane_id &gt;&gt; 4 &lt;&lt; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2434** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2435** <code>else if (Policy::LdsmShape::kContiguous == Policy::LdsmShape::kCount) {</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2436** <code>// Matrix multiply 16832.SP B</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2437** <code>// Q0 Q1 Q2 Q3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2438** <code>partition_contiguous_idx = (lane_in_quad_pair &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2439** <code>access_contiguous_idx = (quad_pair ^ lane_in_quad);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2440** <code>access_strided_idx = lane_in_quad_pair;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2441** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2442** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2443** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2444** <code>int access_contiguous =</code> — **EN:** Continues the current implementation using `access_contiguous`. **CN:** 使用 `access_contiguous` 继续当前实现。
+- **L2445** <code>partition_contiguous_idx * Layout::PartitionShape::kContiguous +</code> — **EN:** Continues the current implementation using `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous`. **CN:** 使用 `partition_contiguous_idx`, `Layout::PartitionShape::kContiguous` 继续当前实现。
+- **L2446** <code>access_contiguous_idx;</code> — **EN:** Completes a declaration involving `access_contiguous_idx`. **CN:** 完成一条与 `access_contiguous_idx` 相关的声明。
+- **L2447** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2448** <code>int access_strided = access_strided_idx;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2449** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2450** <code>byte_offset_ = (access_contiguous + access_strided * stride_) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `access_contiguous`, `access_strided`, `stride_`. **CN:** 使用 `byte_offset_`, `access_contiguous`, `access_strided`, `stride_` 继续当前实现。
+- **L2451** <code>sizeof_bits&lt;Element&gt;::value * Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element`, `value` 相关的声明。
+- **L2452** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2453** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2454** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2455** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2456** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2457** <code>byte_offset_ += offset * sizeof_bits&lt;Element&gt;::value / 8;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2458** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2459** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2460** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2461** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2462** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2463** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2464** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2465** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset` 继续当前实现。
+- **L2466** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2467** <code>int whole_tiles = tile_offset.contiguous() / Policy::kGroupsPerTile;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2468** <code>int k_groups_delta = tile_offset.contiguous() % Policy::kGroupsPerTile;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2469** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2470** <code>byte_offset_ ^= k_groups_delta * sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `byte_offset_`, `k_groups_delta`, `sizeof_bits`, `Element`. **CN:** 使用 `byte_offset_`, `k_groups_delta`, `sizeof_bits`, `Element` 继续当前实现。
+- **L2471** <code>Layout::kElementsPerAccess *</code> — **EN:** Continues the current implementation using `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::kElementsPerAccess` 继续当前实现。
+- **L2472** <code>Policy::LdsmShape::kContiguous / 8;</code> — **EN:** Completes a declaration involving `Policy::LdsmShape::kContiguous`. **CN:** 完成一条与 `Policy::LdsmShape::kContiguous` 相关的声明。
+- **L2473** <code>pointer_ +=</code> — **EN:** Continues the current implementation using `pointer_`. **CN:** 使用 `pointer_` 继续当前实现。
+- **L2474** <code>tile_offset.strided() * stride_ * Shape::kStrided / Layout::kFactor +</code> — **EN:** Continues the current implementation using `tile_offset`, `strided`, `stride_`, `Shape::kStrided`. **CN:** 使用 `tile_offset`, `strided`, `stride_`, `Shape::kStrided` 继续当前实现。
+- **L2475** <code>whole_tiles * stride_ / sections_;</code> — **EN:** Completes a declaration involving `whole_tiles`, `stride_`, `sections_`. **CN:** 完成一条与 `whole_tiles`, `stride_`, `sections_` 相关的声明。
+- **L2476** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2477** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2478** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2479** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2480** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2481** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2482** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset_negative(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset_negative`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset_negative` 继续当前实现。
+- **L2483** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2484** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2485** <code>int whole_tiles = tile_offset.contiguous() / Policy::kGroupsPerTile;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2486** <code>int k_groups_delta = tile_offset.contiguous() % Policy::kGroupsPerTile;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2487** <code>if (k_groups_delta &lt; 0) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2488** <code>whole_tiles -= 1;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2489** <code>k_groups_delta += Policy::kGroupsPerTile;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2490** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2491** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2492** <code>if ((Policy::kGroupsPerTile / kPartitionsK) &gt;= 2) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2493** <code>byte_offset_ ^= (k_groups_delta &amp; 1) * Policy::LdsmShape::kContiguous *</code> — **EN:** Continues the current implementation using `byte_offset_`, `k_groups_delta`, `Policy::LdsmShape::kContiguous`. **CN:** 使用 `byte_offset_`, `k_groups_delta`, `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L2494** <code>sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element`, `value`. **CN:** 使用 `sizeof_bits`, `Element`, `value` 继续当前实现。
+- **L2495** <code>Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L2496** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2497** <code>if ((Policy::kGroupsPerTile / kPartitionsK) &gt;= 4) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2498** <code>byte_offset_ ^= ((k_groups_delta + (k_group_idx_ &amp; 1)) &amp; 2) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `k_groups_delta`, `k_group_idx_`. **CN:** 使用 `byte_offset_`, `k_groups_delta`, `k_group_idx_` 继续当前实现。
+- **L2499** <code>Policy::LdsmShape::kContiguous *</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L2500** <code>sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element`, `value`. **CN:** 使用 `sizeof_bits`, `Element`, `value` 继续当前实现。
+- **L2501** <code>Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L2502** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2503** <code>if ((Policy::kGroupsPerTile / kPartitionsK) == 8) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2504** <code>byte_offset_ ^= ((k_groups_delta + (k_group_idx_ &amp; 3)) &amp; 4) *</code> — **EN:** Continues the current implementation using `byte_offset_`, `k_groups_delta`, `k_group_idx_`. **CN:** 使用 `byte_offset_`, `k_groups_delta`, `k_group_idx_` 继续当前实现。
+- **L2505** <code>Policy::LdsmShape::kContiguous *</code> — **EN:** Continues the current implementation using `Policy::LdsmShape::kContiguous`. **CN:** 使用 `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L2506** <code>sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element`, `value`. **CN:** 使用 `sizeof_bits`, `Element`, `value` 继续当前实现。
+- **L2507** <code>Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L2508** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2509** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2510** <code>k_group_idx_ += k_groups_delta;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2511** <code>whole_tiles += k_group_idx_ / (Policy::kGroupsPerTile / kPartitionsK);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2512** <code>k_group_idx_ = k_group_idx_ % (Policy::kGroupsPerTile / kPartitionsK);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2513** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2514** <code>pointer_ +=</code> — **EN:** Continues the current implementation using `pointer_`. **CN:** 使用 `pointer_` 继续当前实现。
+- **L2515** <code>tile_offset.strided() * stride_ * Shape::kStrided / Layout::kFactor +</code> — **EN:** Continues the current implementation using `tile_offset`, `strided`, `stride_`, `Shape::kStrided`. **CN:** 使用 `tile_offset`, `strided`, `stride_`, `Shape::kStrided` 继续当前实现。
+- **L2516** <code>whole_tiles * stride_ / sections_;</code> — **EN:** Completes a declaration involving `whole_tiles`, `stride_`, `sections_`. **CN:** 完成一条与 `whole_tiles`, `stride_`, `sections_` 相关的声明。
+- **L2517** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2518** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2519** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2520** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2521** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2522** <code>MmaTensorOpMultiplicandTileIterator &amp;operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2523** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2524** <code>// Integer matrix multiply 16832 Interleaved-32</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2525** <code>//   NONE</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2526** <code>// Integer matrix multiply 16816 Interleaved-32 || Integer matrix multiply 16816 kblock=32</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2527** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2528** <code>// Integer matrix multiply 8816  Interleaved-32</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2529** <code>//   ^1 ^1</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2530** <code>// Matrix multiply 1684.TF32 kblock=16 || Integer matrix multiply 16816 kblock=64</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2531** <code>// Matrix multiply 1688 kblock=32 || Integer matrix multiply 8816 kblock=64</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2532** <code>//   ^1 ^3 ^1 ^3</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2533** <code>// Matrix multiply 1688 kblock=64</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2534** <code>//   ^1 ^3 ^1 ^7 ^1 ^3 ^1 ^7</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2535** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2536** <code>// Matrix multiply 16816 kblock=32 | 1688.TF32 kblock=16 || Integer matrix multiply 16832 kblock=64</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2537** <code>//   ^2 ^2</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2538** <code>// Matrix multiply 16816 kblock=64 | 1688.TF32 kblock=32 || Integer matrix multiply 16832 kblock=128</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2539** <code>//   ^2 ^6 ^2 ^6</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2540** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2541** <code>if ((Policy::kGroupsPerTile / kPartitionsK) &gt; 1) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2542** <code>int mask = ((Policy::kGroupsPerTile / kPartitionsK) == 8)</code> — **EN:** Continues the current implementation using `mask`, `Policy::kGroupsPerTile`, `kPartitionsK`. **CN:** 使用 `mask`, `Policy::kGroupsPerTile`, `kPartitionsK` 继续当前实现。
+- **L2543** <code>? 3</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L2544** <code>: (((Policy::kGroupsPerTile / kPartitionsK) == 4) ? 1 : 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2545** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2546** <code>if (((k_group_idx_ &amp; mask) % 2) == 0)</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2547** <code>byte_offset_ ^= 1 * Policy::LdsmShape::kContiguous *</code> — **EN:** Continues the current implementation using `byte_offset_`, `Policy::LdsmShape::kContiguous`. **CN:** 使用 `byte_offset_`, `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L2548** <code>sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element`, `value`. **CN:** 使用 `sizeof_bits`, `Element`, `value` 继续当前实现。
+- **L2549** <code>Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L2550** <code>else if ((k_group_idx_ &amp; mask) == 1)</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2551** <code>byte_offset_ ^= 3 * Policy::LdsmShape::kContiguous *</code> — **EN:** Continues the current implementation using `byte_offset_`, `Policy::LdsmShape::kContiguous`. **CN:** 使用 `byte_offset_`, `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L2552** <code>sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element`, `value`. **CN:** 使用 `sizeof_bits`, `Element`, `value` 继续当前实现。
+- **L2553** <code>Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L2554** <code>else if ((k_group_idx_ &amp; mask) == 3)</code> — **EN:** Provides the alternate branch for the preceding condition. **CN:** 为前面的条件提供备选分支。
+- **L2555** <code>byte_offset_ ^= 7 * Policy::LdsmShape::kContiguous *</code> — **EN:** Continues the current implementation using `byte_offset_`, `Policy::LdsmShape::kContiguous`. **CN:** 使用 `byte_offset_`, `Policy::LdsmShape::kContiguous` 继续当前实现。
+- **L2556** <code>sizeof_bits&lt;Element&gt;::value *</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element`, `value`. **CN:** 使用 `sizeof_bits`, `Element`, `value` 继续当前实现。
+- **L2557** <code>Layout::kElementsPerAccess / 8;</code> — **EN:** Completes a declaration involving `Layout::kElementsPerAccess`. **CN:** 完成一条与 `Layout::kElementsPerAccess` 相关的声明。
+- **L2558** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2559** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2560** <code>k_group_idx_++;</code> — **EN:** Completes a declaration involving `k_group_idx_`. **CN:** 完成一条与 `k_group_idx_` 相关的声明。
+- **L2561** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2562** <code>if (k_group_idx_ == (Policy::kGroupsPerTile / kPartitionsK)) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L2563** <code>k_group_idx_ = 0;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2564** <code>add_tile_offset({Policy::kGroupsPerTile, 0});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2565** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2566** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2567** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2568** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2569** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2570** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2571** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2572** <code>MmaTensorOpMultiplicandTileIterator &amp;operator--() { assert(0); }</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`, `assert`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator`, `assert` 继续当前实现。
+- **L2573** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2574** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2575** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2576** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2577** <code>MmaTensorOpMultiplicandTileIterator &amp;operator+=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L2578** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2579** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2580** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2581** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2582** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2583** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2584** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2585** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2586** <code>MmaTensorOpMultiplicandTileIterator &amp;operator-=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L2587** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2588** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2589** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2590** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2591** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2592** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2593** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2594** <code>void load(Fragment &amp;frag) const { load_with_byte_offset(frag, 0); }</code> — **EN:** Continues the current implementation using `load`, `Fragment`, `frag`, `load_with_byte_offset`. **CN:** 使用 `load`, `Fragment`, `frag`, `load_with_byte_offset` 继续当前实现。
+- **L2595** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2596** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2597** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2598** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L2599** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2600** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2601** <code>/// loads a tile with a linear offset in units of bytes</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2602** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L2603** <code>Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *fetch_ptr =</code> — **EN:** Continues the current implementation using `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr`. **CN:** 使用 `Array`, `unsigned`, `Policy::LdsmShape::kCount`, `fetch_ptr` 继续当前实现。
+- **L2604** <code>reinterpret_cast&lt;Array&lt;unsigned, Policy::LdsmShape::kCount&gt; *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2605** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2606** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2607** <code>for (int s = 0; s &lt; Policy::LdsmIterations::kStrided; ++s) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L2608** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2609** <code>for (int c = 0; c &lt; Policy::LdsmIterations::kContiguous; ++c) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L2610** <code>int access_idx = c + s * Policy::LdsmIterations::kContiguous;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2611** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2612** <code>AccessType const *source_ptr =</code> — **EN:** Continues the current implementation using `AccessType`, `source_ptr`. **CN:** 使用 `AccessType`, `source_ptr` 继续当前实现。
+- **L2613** <code>pointer_ + Policy::LdsmShape::kContiguous * c +</code> — **EN:** Continues the current implementation using `pointer_`, `Policy::LdsmShape::kContiguous`, `c`. **CN:** 使用 `pointer_`, `Policy::LdsmShape::kContiguous`, `c` 继续当前实现。
+- **L2614** <code>Policy::kLdsmOpInner / Layout::kFactor *</code> — **EN:** Continues the current implementation using `Policy::kLdsmOpInner`, `Layout::kFactor`. **CN:** 使用 `Policy::kLdsmOpInner`, `Layout::kFactor` 继续当前实现。
+- **L2615** <code>Policy::LdsmShape::kStrided * s * stride_;</code> — **EN:** Completes a declaration involving `Policy::LdsmShape::kStrided`, `s`, `stride_`. **CN:** 完成一条与 `Policy::LdsmShape::kStrided`, `s`, `stride_` 相关的声明。
+- **L2616** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2617** <code>char const *source_byte_ptr =</code> — **EN:** Continues the current implementation using `char`, `source_byte_ptr`. **CN:** 使用 `char`, `source_byte_ptr` 继续当前实现。
+- **L2618** <code>reinterpret_cast&lt;char const *&gt;(source_ptr) + byte_offset +</code> — **EN:** Continues the current implementation using `reinterpret_cast`, `char`, `source_ptr`, `byte_offset`. **CN:** 使用 `reinterpret_cast`, `char`, `source_ptr`, `byte_offset` 继续当前实现。
+- **L2619** <code>byte_offset_;</code> — **EN:** Completes a declaration involving `byte_offset_`. **CN:** 完成一条与 `byte_offset_` 相关的声明。
+- **L2620** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2621** <code>cutlass::arch::ldsm&lt;layout::RowMajor, Policy::LdsmShape::kCount&gt;(</code> — **EN:** Continues the current implementation using `cutlass::arch::ldsm`, `layout::RowMajor`, `Policy::LdsmShape::kCount`. **CN:** 使用 `cutlass::arch::ldsm`, `layout::RowMajor`, `Policy::LdsmShape::kCount` 继续当前实现。
+- **L2622** <code>fetch_ptr[access_idx], source_byte_ptr);</code> — **EN:** Completes a declaration involving `fetch_ptr`, `access_idx`, `source_byte_ptr`. **CN:** 完成一条与 `fetch_ptr`, `access_idx`, `source_byte_ptr` 相关的声明。
+- **L2623** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2624** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2625** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2626** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2627** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2628** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2629** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L2630** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2631** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2632** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2633** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L2634** <code>load_with_byte_offset(frag, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2635** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2636** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2637** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2638** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2639** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L2640** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2641** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2642** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2643** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2644** <code>load_with_byte_offset(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2645** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2646** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2647** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2648** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2649** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L2650** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2651** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2652** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2653** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2654** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2655** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L2656** <code>load_with_byte_offset(frag, tile_offset, pointer_offset * sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2657** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2658** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2659** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2660** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2661** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L2662** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2663** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2664** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2665** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2666** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2667** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L2668** <code>Index pointer_offset = tile_offset.contiguous() *</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `tile_offset`, `contiguous`. **CN:** 使用 `Index`, `pointer_offset`, `tile_offset`, `contiguous` 继续当前实现。
+- **L2669** <code>InstructionShape::kContiguous /</code> — **EN:** Continues the current implementation using `InstructionShape::kContiguous`. **CN:** 使用 `InstructionShape::kContiguous` 继续当前实现。
+- **L2670** <code>Layout::kElementsPerAccess +</code> — **EN:** Continues the current implementation using `Layout::kElementsPerAccess`. **CN:** 使用 `Layout::kElementsPerAccess` 继续当前实现。
+- **L2671** <code>tile_offset.strided() * Shape::kStrided * stride_;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2672** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2673** <code>byte_offset += sizeof_bits&lt;AccessType&gt;::value * pointer_offset / 8;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2674** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2675** <code>load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2676** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2677** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2678** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2679** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2680** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2681** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2682** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2683** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2684** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2685** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2686** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2687** <code>k_group_idx_ = k_group % (Policy::kGroupsPerTile / kPartitionsK);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2688** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2689** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L2690** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2691** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2692** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2693** <code>/// This tile iterator is specialized for 32-thread TensorOps. It uses LDSM to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2694** <code>/// load from shared memory and therefore must be initialized with a TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2695** <code>/// to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2696** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2697** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2698** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2699** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2700** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L2701** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2702** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L2703** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2704** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L2705** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2706** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L2707** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2708** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L2709** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2710** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2711** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L2712** <code>/// Element number when the layout crosses (in units of elements)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2713** <code>int Crosswise,</code> — **EN:** Continues the current implementation using `Crosswise`. **CN:** 使用 `Crosswise` 继续当前实现。
+- **L2714** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2715** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L2716** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L2717** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L2718** <code>cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code> — **EN:** Continues the current implementation using `cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise`. **CN:** 使用 `cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise` 继续当前实现。
+- **L2719** <code>sizeof_bits&lt;Element_&gt;::value, Crosswise&gt;,</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element_`, `value`, `Crosswise`. **CN:** 使用 `sizeof_bits`, `Element_`, `value`, `Crosswise` 继续当前实现。
+- **L2720** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L2721** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2722** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2723** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L2724** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2725** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2726** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2727** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2728** <code>static_assert(kOperand == Operand::kB,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2729** <code>&quot;MmaTensorOpMultiplicandIterator for ColumnMajor Crosswise may &quot;</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandIterator`, `ColumnMajor`, `Crosswise`, `may`. **CN:** 使用 `MmaTensorOpMultiplicandIterator`, `ColumnMajor`, `Crosswise`, `may` 继续当前实现。
+- **L2730** <code>&quot;only be instantiated for B operand to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `only`, `be`, `instantiated`. **CN:** 完成一条与 `only`, `be`, `instantiated` 相关的声明。
+- **L2731** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2732** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2733** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L2734** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2735** <code>/// KBlock size</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2736** <code>static int const kCrosswise = Crosswise;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2737** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2738** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2739** <code>using Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise<`，便于在当前作用域中复用。
+- **L2740** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L2741** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2742** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2743** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L2744** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2745** <code>/// Delta between *MMA operations (in units of *MMA operations, concept:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2746** <code>/// MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2747** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2748** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2749** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2750** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2751** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2752** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2753** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L2754** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2755** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2756** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L2757** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2758** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2759** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L2760** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2761** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2762** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L2763** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2764** <code>/// Underlying tile iterator implementation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2765** <code>using Base = MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Introduces alias or imported name `Base = MmaTensorOpMultiplicandTileIterator<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Base = MmaTensorOpMultiplicandTileIterator<`，便于在当前作用域中复用。
+- **L2766** <code>layout::PitchLinearShape&lt;Shape::kRow, Shape::kColumn&gt;, kOperand, Element,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `Shape::kRow`, `Shape::kColumn`, `kOperand`. **CN:** 使用 `layout::PitchLinearShape`, `Shape::kRow`, `Shape::kColumn`, `kOperand` 继续当前实现。
+- **L2767** <code>layout::TensorOpMultiplicandCrosswise&lt;sizeof_bits&lt;Element_&gt;::value,</code> — **EN:** Continues the current implementation using `layout::TensorOpMultiplicandCrosswise`, `sizeof_bits`, `Element_`, `value`. **CN:** 使用 `layout::TensorOpMultiplicandCrosswise`, `sizeof_bits`, `Element_`, `value` 继续当前实现。
+- **L2768** <code>kCrosswise&gt;,</code> — **EN:** Continues the current implementation using `kCrosswise`. **CN:** 使用 `kCrosswise` 继续当前实现。
+- **L2769** <code>layout::PitchLinearShape&lt;InstructionShape::kRow,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `InstructionShape::kRow`. **CN:** 使用 `layout::PitchLinearShape`, `InstructionShape::kRow` 继续当前实现。
+- **L2770** <code>InstructionShape::kColumn&gt;,</code> — **EN:** Continues the current implementation using `InstructionShape::kColumn`. **CN:** 使用 `InstructionShape::kColumn` 继续当前实现。
+- **L2771** <code>kOpDelta, kThreads, PartitionsK_&gt;;</code> — **EN:** Completes a declaration involving `kOpDelta`, `kThreads`, `PartitionsK_`. **CN:** 完成一条与 `kOpDelta`, `kThreads`, `PartitionsK_` 相关的声明。
+- **L2772** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2773** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2774** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2775** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2776** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2777** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2778** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2779** <code>using Fragment = typename Base::Fragment;</code> — **EN:** Introduces alias or imported name `Fragment = typename Base::Fragment` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = typename Base::Fragment`，便于在当前作用域中复用。
+- **L2780** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2781** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2782** <code>/// Underlying tile iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2783** <code>Base iterator_;</code> — **EN:** Completes a declaration involving `Base`, `iterator_`. **CN:** 完成一条与 `Base`, `iterator_` 相关的声明。
+- **L2784** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2785** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2786** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2787** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2788** <code>MmaTensorOpMultiplicandTileIterator() {}</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L2789** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2790** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2791** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2792** <code>MmaTensorOpMultiplicandTileIterator(TensorRef const &amp;ref, int lane_id)</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id` 继续当前实现。
+- **L2793** <code>: iterator_({ref.data(), ref.stride()}, lane_id) {}</code> — **EN:** Continues the current implementation using `iterator_`, `ref`, `data`, `ref`. **CN:** 使用 `iterator_`, `ref`, `data`, `ref` 继续当前实现。
+- **L2794** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2795** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2796** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2797** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2798** <code>iterator_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2799** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2800** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2801** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2802** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2803** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2804** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2805** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2806** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset` 继续当前实现。
+- **L2807** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2808** <code>iterator_.add_tile_offset({tile_offset.row(), tile_offset.column()});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2809** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2810** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2811** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2812** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2813** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2814** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2815** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2816** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset_negative(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset_negative`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset_negative` 继续当前实现。
+- **L2817** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2818** <code>iterator_.add_tile_offset_negative({tile_offset.row(), tile_offset.column()});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2819** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2820** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2821** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2822** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2823** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2824** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2825** <code>MmaTensorOpMultiplicandTileIterator &amp;operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2826** <code>++iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L2827** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2828** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2829** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2830** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2831** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2832** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2833** <code>MmaTensorOpMultiplicandTileIterator &amp;operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2834** <code>--iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L2835** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2836** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2837** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2838** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2839** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2840** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2841** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2842** <code>MmaTensorOpMultiplicandTileIterator &amp;operator+=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L2843** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2844** <code>add_tile_offset(PitchLinearCoord(tile_offset.row(), tile_offset.column()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2845** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2846** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2847** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2848** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2849** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2850** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2851** <code>MmaTensorOpMultiplicandTileIterator &amp;operator-=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L2852** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2853** <code>add_tile_offset(-PitchLinearCoord(tile_offset.row(), tile_offset.column()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2854** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L2855** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2856** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2857** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2858** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2859** <code>void load(Fragment &amp;frag) const { iterator_.load(frag); }</code> — **EN:** Continues the current implementation using `load`, `Fragment`, `frag`, `iterator_`. **CN:** 使用 `load`, `Fragment`, `frag`, `iterator_` 继续当前实现。
+- **L2860** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2861** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2862** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2863** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L2864** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2865** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2866** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2867** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L2868** <code>iterator_.load_with_pointer_offset(frag, pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2869** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2870** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2871** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2872** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2873** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L2874** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2875** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2876** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2877** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L2878** <code>iterator_.load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2879** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2880** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2881** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2882** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2883** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L2884** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2885** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2886** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2887** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2888** <code>assert(0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2889** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2890** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2891** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2892** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2893** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L2894** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2895** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2896** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2897** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2898** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2899** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L2900** <code>assert(0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2901** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2902** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2903** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2904** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2905** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L2906** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2907** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L2908** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2909** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L2910** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2911** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L2912** <code>iterator_.load_with_byte_offset(</code> — **EN:** Continues the current implementation using `iterator_`, `load_with_byte_offset`. **CN:** 使用 `iterator_`, `load_with_byte_offset` 继续当前实现。
+- **L2913** <code>frag, {tile_offset.contiguous(), tile_offset.strided()}, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2914** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2915** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2916** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2917** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2918** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2919** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2920** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2921** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2922** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2923** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L2924** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2925** <code>iterator_.set_kgroup_index(k_group);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L2926** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L2927** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L2928** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2929** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2930** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2931** <code>/// This tile iterator is specialized for 32-thread TensorOps. It uses LDSM to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2932** <code>/// load from shared memory and therefore must be initialized with a TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2933** <code>/// to shared memory.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2934** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2935** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2936** <code>///   ReadableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2937** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L2938** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L2939** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2940** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L2941** <code>/// Identifies A or B multiplicand</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2942** <code>Operand Operand_,</code> — **EN:** Continues the current implementation using `Operand`, `Operand_`. **CN:** 使用 `Operand`, `Operand_` 继续当前实现。
+- **L2943** <code>/// Data type of elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2944** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L2945** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2946** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L2947** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2948** <code>/// instructions)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2949** <code>int OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L2950** <code>/// Element number when the layout crosses (in units of elements)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2951** <code>int Crosswise,</code> — **EN:** Continues the current implementation using `Crosswise`. **CN:** 使用 `Crosswise` 继续当前实现。
+- **L2952** <code>/// Number of partitions along K dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2953** <code>int PartitionsK_&gt;</code> — **EN:** Continues the current implementation using `PartitionsK_`. **CN:** 使用 `PartitionsK_` 继续当前实现。
+- **L2954** <code>class MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpMultiplicandTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpMultiplicandTileIterator<`，作为本头文件中的可复用抽象。
+- **L2955** <code>Shape_, Operand_, Element_,</code> — **EN:** Continues the current implementation using `Shape_`, `Operand_`, `Element_`. **CN:** 使用 `Shape_`, `Operand_`, `Element_` 继续当前实现。
+- **L2956** <code>cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code> — **EN:** Continues the current implementation using `cutlass::layout::RowMajorTensorOpMultiplicandCrosswise`. **CN:** 使用 `cutlass::layout::RowMajorTensorOpMultiplicandCrosswise` 继续当前实现。
+- **L2957** <code>sizeof_bits&lt;Element_&gt;::value, Crosswise&gt;,</code> — **EN:** Continues the current implementation using `sizeof_bits`, `Element_`, `value`, `Crosswise`. **CN:** 使用 `sizeof_bits`, `Element_`, `value`, `Crosswise` 继续当前实现。
+- **L2958** <code>InstructionShape_, OpDelta_, 32, PartitionsK_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`, `PartitionsK_`. **CN:** 使用 `InstructionShape_`, `OpDelta_`, `PartitionsK_` 继续当前实现。
+- **L2959** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L2960** <code>/// Shape of tile to load (concept: PitchLinearShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2961** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L2962** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2963** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2964** <code>static Operand const kOperand = Operand_;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L2965** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2966** <code>static_assert(kOperand == Operand::kA,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L2967** <code>&quot;MmaTensorOpMultiplicandIterator for RowMajor Crosswise may &quot;</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandIterator`, `RowMajor`, `Crosswise`, `may`. **CN:** 使用 `MmaTensorOpMultiplicandIterator`, `RowMajor`, `Crosswise`, `may` 继续当前实现。
+- **L2968** <code>&quot;only be instantiated for A operand to warp-level Mma.&quot;);</code> — **EN:** Completes a declaration involving `only`, `be`, `instantiated`. **CN:** 完成一条与 `only`, `be`, `instantiated` 相关的声明。
+- **L2969** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2970** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2971** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L2972** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2973** <code>/// Element number when the layout crosses</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2974** <code>static int const kCrosswise = Crosswise;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2975** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2976** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2977** <code>using Layout = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise<`，便于在当前作用域中复用。
+- **L2978** <code>sizeof_bits&lt;Element_&gt;::value, kCrosswise&gt;;</code> — **EN:** Completes a declaration involving `sizeof_bits`, `Element_`, `value`. **CN:** 完成一条与 `sizeof_bits`, `Element_`, `value` 相关的声明。
+- **L2979** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2980** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2981** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L2982** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2983** <code>/// Delta between *MMA operations (in units of *MMA operations, concept:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2984** <code>/// MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2985** <code>static int const kOpDelta = OpDelta_;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2986** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2987** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2988** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L2989** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2990** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2991** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L2992** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2993** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2994** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L2995** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2996** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L2997** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L2998** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L2999** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3000** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L3001** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3002** <code>/// Underlying tile iterator implementation</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3003** <code>using Base = MmaTensorOpMultiplicandTileIterator&lt;</code> — **EN:** Introduces alias or imported name `Base = MmaTensorOpMultiplicandTileIterator<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Base = MmaTensorOpMultiplicandTileIterator<`，便于在当前作用域中复用。
+- **L3004** <code>layout::PitchLinearShape&lt;Shape::kColumn, Shape::kRow&gt;, kOperand, Element,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `Shape::kColumn`, `Shape::kRow`, `kOperand`. **CN:** 使用 `layout::PitchLinearShape`, `Shape::kColumn`, `Shape::kRow`, `kOperand` 继续当前实现。
+- **L3005** <code>layout::TensorOpMultiplicandCrosswise&lt;sizeof_bits&lt;Element_&gt;::value,</code> — **EN:** Continues the current implementation using `layout::TensorOpMultiplicandCrosswise`, `sizeof_bits`, `Element_`, `value`. **CN:** 使用 `layout::TensorOpMultiplicandCrosswise`, `sizeof_bits`, `Element_`, `value` 继续当前实现。
+- **L3006** <code>kCrosswise&gt;,</code> — **EN:** Continues the current implementation using `kCrosswise`. **CN:** 使用 `kCrosswise` 继续当前实现。
+- **L3007** <code>layout::PitchLinearShape&lt;InstructionShape::kColumn,</code> — **EN:** Continues the current implementation using `layout::PitchLinearShape`, `InstructionShape::kColumn`. **CN:** 使用 `layout::PitchLinearShape`, `InstructionShape::kColumn` 继续当前实现。
+- **L3008** <code>InstructionShape::kRow&gt;,</code> — **EN:** Continues the current implementation using `InstructionShape::kRow`. **CN:** 使用 `InstructionShape::kRow` 继续当前实现。
+- **L3009** <code>kOpDelta, kThreads, PartitionsK_&gt;;</code> — **EN:** Completes a declaration involving `kOpDelta`, `kThreads`, `PartitionsK_`. **CN:** 完成一条与 `kOpDelta`, `kThreads`, `PartitionsK_` 相关的声明。
+- **L3010** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3011** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3012** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3013** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3014** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3015** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3016** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3017** <code>using Fragment = typename Base::Fragment;</code> — **EN:** Introduces alias or imported name `Fragment = typename Base::Fragment` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = typename Base::Fragment`，便于在当前作用域中复用。
+- **L3018** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3019** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3020** <code>/// Underlying tile iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3021** <code>Base iterator_;</code> — **EN:** Completes a declaration involving `Base`, `iterator_`. **CN:** 完成一条与 `Base`, `iterator_` 相关的声明。
+- **L3022** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3023** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3024** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3025** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3026** <code>MmaTensorOpMultiplicandTileIterator() {}</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator` 继续当前实现。
+- **L3027** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3028** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3029** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3030** <code>MmaTensorOpMultiplicandTileIterator(TensorRef const &amp;ref, int lane_id)</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `TensorRef`, `ref`, `lane_id` 继续当前实现。
+- **L3031** <code>: iterator_({ref.data(), ref.stride()}, lane_id) {}</code> — **EN:** Continues the current implementation using `iterator_`, `ref`, `data`, `ref`. **CN:** 使用 `iterator_`, `ref`, `data`, `ref` 继续当前实现。
+- **L3032** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3033** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3034** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3035** <code>MmaTensorOpMultiplicandTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3036** <code>iterator_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3037** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3038** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3039** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3040** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3041** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3042** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3043** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3044** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset` 继续当前实现。
+- **L3045** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3046** <code>iterator_.add_tile_offset({tile_offset.column(), tile_offset.row()});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3047** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3048** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3049** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3050** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3051** <code>/// Advances an iterator along logical dimensions of matrix in units of whole</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3052** <code>/// tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3053** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3054** <code>MmaTensorOpMultiplicandTileIterator &amp;add_tile_offset_negative(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset_negative`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `add_tile_offset_negative` 继续当前实现。
+- **L3055** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3056** <code>iterator_.add_tile_offset_negative({tile_offset.column(), tile_offset.row()});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3057** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3058** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3059** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3060** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3061** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3062** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3063** <code>MmaTensorOpMultiplicandTileIterator &amp;operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3064** <code>++iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L3065** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3066** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3067** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3068** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3069** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3070** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3071** <code>MmaTensorOpMultiplicandTileIterator &amp;operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3072** <code>--iterator_;</code> — **EN:** Completes a declaration involving `iterator_`. **CN:** 完成一条与 `iterator_` 相关的声明。
+- **L3073** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3074** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3075** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3076** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3077** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3078** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3079** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3080** <code>MmaTensorOpMultiplicandTileIterator &amp;operator+=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L3081** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3082** <code>add_tile_offset(PitchLinearCoord(tile_offset.column(), tile_offset.row()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3083** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3084** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3085** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3086** <code>///&lt; advances in units of whole tiles along the logical coordinate space of</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3087** <code>///&lt; the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3088** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3089** <code>MmaTensorOpMultiplicandTileIterator &amp;operator-=(</code> — **EN:** Continues the current implementation using `MmaTensorOpMultiplicandTileIterator`, `operator`. **CN:** 使用 `MmaTensorOpMultiplicandTileIterator`, `operator` 继续当前实现。
+- **L3090** <code>TensorCoord const &amp;tile_offset) {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3091** <code>add_tile_offset(-PitchLinearCoord(tile_offset.column(), tile_offset.row()));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3092** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3093** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3094** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3095** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3096** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3097** <code>void load(Fragment &amp;frag) const { iterator_.load(frag); }</code> — **EN:** Continues the current implementation using `load`, `Fragment`, `frag`, `iterator_`. **CN:** 使用 `load`, `Fragment`, `frag`, `iterator_` 继续当前实现。
+- **L3098** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3099** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3100** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3101** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L3102** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3103** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3104** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3105** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L3106** <code>iterator_.load_with_pointer_offset(frag, pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3107** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3108** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3109** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3110** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3111** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L3112** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3113** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3114** <code>/// loads a tile with a linear offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3115** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L3116** <code>iterator_.load_with_byte_offset(frag, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3117** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3118** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3119** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3120** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3121** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3122** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3123** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3124** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3125** <code>TensorCoord const &amp;tile_offset) const {</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3126** <code>assert(0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3127** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3128** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3129** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3130** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3131** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3132** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3133** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3134** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3135** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3136** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3137** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L3138** <code>assert(0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3139** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3140** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3141** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3142** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3143** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L3144** <code>/// fragment to load from the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3145** <code>Fragment &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3146** <code>/// loads a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3147** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3148** <code>/// loads a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3149** <code>Index byte_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`. **CN:** 使用 `Index`, `byte_offset` 继续当前实现。
+- **L3150** <code>iterator_.load_with_byte_offset(</code> — **EN:** Continues the current implementation using `iterator_`, `load_with_byte_offset`. **CN:** 使用 `iterator_`, `load_with_byte_offset` 继续当前实现。
+- **L3151** <code>frag, {tile_offset.strided(), tile_offset.contiguous()}, byte_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3152** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3153** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3154** <code>/// Notify the iterator which k-group it is currently pointing to.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3155** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3156** <code>/// This does not advance the iterator. Rather, it overrides its internal</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3157** <code>/// tracking with constant-valued k-group index to enable the compiler to</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3158** <code>/// fold constants and achieve more efficient code.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3159** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3160** <code>/// This is used by some nontrivial permuted layouts.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3161** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3162** <code>void set_kgroup_index(int k_group) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3163** <code>iterator_.set_kgroup_index(k_group);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3164** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3165** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L3166** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3167** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3168** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3169** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L3170** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3171** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L3172** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3173** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L3174** <code>/// Layout of operand in memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3175** <code>typename Layout_,</code> — **EN:** Continues the current implementation using `Layout_`. **CN:** 使用 `Layout_` 继续当前实现。
+- **L3176** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3177** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L3178** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3179** <code>/// instructions, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3180** <code>typename OpDelta_&gt;</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L3181** <code>class MmaTensorOpAccumulatorTileIterator;</code> — **EN:** Declares class `MmaTensorOpAccumulatorTileIterator` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpAccumulatorTileIterator`，作为本头文件中的可复用抽象。
+- **L3182** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3183** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3184** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3185** <code>/// This tile iterator is specialized for 32-thread TensorOps. It is used to load or store</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3186** <code>/// accumulators from memory and is agnostic to layout. It could be faster if it assumed row-major</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3187** <code>/// accumulator layout.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3188** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3189** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3190** <code>///   ReadableRandomAccessContiguousTileIteratorConcept |</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3191** <code>///   WriteableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3192** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3193** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L3194** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3195** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L3196** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3197** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L3198** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3199** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L3200** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3201** <code>/// instructions, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3202** <code>typename OpDelta_&gt;</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L3203** <code>class MmaTensorOpAccumulatorTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpAccumulatorTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpAccumulatorTileIterator<`，作为本头文件中的可复用抽象。
+- **L3204** <code>Shape_, Element_, cutlass::layout::RowMajor, InstructionShape_, OpDelta_&gt; {</code> — **EN:** Continues the current implementation using `Shape_`, `Element_`, `cutlass::layout::RowMajor`, `InstructionShape_`. **CN:** 使用 `Shape_`, `Element_`, `cutlass::layout::RowMajor`, `InstructionShape_` 继续当前实现。
+- **L3205** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3206** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3207** <code>/// Shape of tile to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3208** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L3209** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3210** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3211** <code>static Operand const kOperand = Operand::kC;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3212** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3213** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3214** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L3215** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3216** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3217** <code>using Layout = cutlass::layout::RowMajor;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::RowMajor` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::RowMajor`，便于在当前作用域中复用。
+- **L3218** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3219** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3220** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L3221** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3222** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3223** <code>using OpDelta = OpDelta_;</code> — **EN:** Introduces alias or imported name `OpDelta = OpDelta_` for easier reuse in this scope. **CN:** 引入别名或导入名 `OpDelta = OpDelta_`，便于在当前作用域中复用。
+- **L3224** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3225** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3226** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3227** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3228** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3229** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L3230** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3231** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3232** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L3233** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3234** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3235** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L3236** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3237** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3238** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L3239** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3240** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3241** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L3242** <code>static bool const kDivisible =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3243** <code>!(Shape::kRow % InstructionShape::kM) &amp;&amp;</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM` 继续当前实现。
+- **L3244** <code>!(Shape::kColumn % InstructionShape::kN);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3245** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3246** <code>static_assert(platform::is_same&lt;TensorCoord, MatrixCoord&gt;::value,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L3247** <code>&quot;Layouts must be defined for logical MatrixCoord coordinate space.&quot;);</code> — **EN:** Completes a declaration involving `Layouts`, `must`, `be`. **CN:** 完成一条与 `Layouts`, `must`, `be` 相关的声明。
+- **L3248** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3249** <code>/// Number of mma operations performed</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3250** <code>using MmaIterations = MatrixShape&lt;</code> — **EN:** Introduces alias or imported name `MmaIterations = MatrixShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaIterations = MatrixShape<`，便于在当前作用域中复用。
+- **L3251** <code>(Shape::kRow + InstructionShape::kM - 1) / InstructionShape::kM,</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM`, `InstructionShape::kM` 继续当前实现。
+- **L3252** <code>(Shape::kColumn + InstructionShape::kN - 1) / InstructionShape::kN</code> — **EN:** Continues the current implementation using `Shape::kColumn`, `InstructionShape::kN`, `InstructionShape::kN`. **CN:** 使用 `Shape::kColumn`, `InstructionShape::kN`, `InstructionShape::kN` 继续当前实现。
+- **L3253** <code>&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L3254** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L3255** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3256** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3257** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3258** <code>// Assume accumulator tile is an arrangement of 8-by-8 tiles replicated over the entire</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3259** <code>// shape, with each quad mapped to one row and each thread mapped to 1/4 of the elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3260** <code>// of that row. The accumulators within one row are assumed to be consecutive.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3261** <code>static int const kElementsPerAccess = InstructionShape::kN / 4;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3262** <code>static int const kRowsPerTile = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3263** <code>static int const kAccumulatorRows = InstructionShape::kM / kRowsPerTile;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3264** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3265** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3266** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3267** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3268** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3269** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3270** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3271** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3272** <code>using Fragment = Array&lt;</code> — **EN:** Introduces alias or imported name `Fragment = Array<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = Array<`，便于在当前作用域中复用。
+- **L3273** <code>Element,</code> — **EN:** Continues the current implementation using `Element`. **CN:** 使用 `Element` 继续当前实现。
+- **L3274** <code>Policy::MmaIterations::kCount * InstructionShape::kMN / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Policy::MmaIterations::kCount`, `InstructionShape::kMN`, `kThreads`. **CN:** 完成一条与 `Policy::MmaIterations::kCount`, `InstructionShape::kMN`, `kThreads` 相关的声明。
+- **L3275** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3276** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3277** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3278** <code>/// Reference to output tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3279** <code>TensorRef ref_;</code> — **EN:** Completes a declaration involving `TensorRef`, `ref_`. **CN:** 完成一条与 `TensorRef`, `ref_` 相关的声明。
+- **L3280** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3281** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3282** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3283** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3284** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3285** <code>MmaTensorOpAccumulatorTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L3286** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3287** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3288** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3289** <code>MmaTensorOpAccumulatorTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L3290** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L3291** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L3292** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L3293** <code>ref_(ref) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3294** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3295** <code>int quad = (lane_id &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3296** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3297** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3298** <code>MatrixCoord lane_offset(quad, lane_in_quad * kElementsPerAccess);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3299** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3300** <code>ref_.add_coord_offset(lane_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3301** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3302** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3303** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3304** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3305** <code>MmaTensorOpAccumulatorTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3306** <code>ref_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3307** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3308** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3309** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3310** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3311** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3312** <code>MmaTensorOpAccumulatorTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3313** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3314** <code>ref_.add_coord_offset(tile_offset * make_Coord(Shape::kRow, Shape::kColumn));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3315** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3316** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3317** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3318** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3319** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3320** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3321** <code>MmaTensorOpAccumulatorTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3322** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3323** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3324** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3325** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3326** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3327** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3328** <code>MmaTensorOpAccumulatorTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3329** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3330** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3331** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3332** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3333** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3334** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3335** <code>MmaTensorOpAccumulatorTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3336** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3337** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3338** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3339** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3340** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3341** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3342** <code>MmaTensorOpAccumulatorTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3343** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3344** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3345** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3346** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3347** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3348** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3349** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3350** <code>load_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3351** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3352** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3353** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3354** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3355** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L3356** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3357** <code>Index pointer_offset) const {               ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L3358** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3359** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3360** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3361** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3362** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3363** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3364** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3365** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3366** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3367** <code>int mma_accum_start = kAccumulatorRows * kElementsPerAccess *</code> — **EN:** Continues the current implementation using `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess`. **CN:** 使用 `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess` 继续当前实现。
+- **L3368** <code>(mma_n * Policy::MmaIterations::kRow + mma_m);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3369** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3370** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3371** <code>for (int row = 0; row &lt; kAccumulatorRows; ++row) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3372** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3373** <code>for (int col = 0; col &lt; kElementsPerAccess; ++col) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3374** <code>int accum_m = mma_m * InstructionShape::kM * OpDelta::kRow +</code> — **EN:** Continues the current implementation using `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow`. **CN:** 使用 `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow` 继续当前实现。
+- **L3375** <code>row * kRowsPerTile;</code> — **EN:** Completes a declaration involving `row`, `kRowsPerTile`. **CN:** 完成一条与 `row`, `kRowsPerTile` 相关的声明。
+- **L3376** <code>int accum_n = mma_n * InstructionShape::kN * OpDelta::kColumn + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3377** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3378** <code>frag[mma_accum_start + row * kElementsPerAccess + col] = offset_ref.at({accum_m, accum_n});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3379** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3380** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3381** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3382** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3383** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3384** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3385** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3386** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3387** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L3388** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3389** <code>Index byte_offset) const {                  ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `loads`, `a`. **CN:** 使用 `Index`, `byte_offset`, `loads`, `a` 继续当前实现。
+- **L3390** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3391** <code>load_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3392** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3393** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3394** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3395** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3396** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3397** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3398** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L3399** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3400** <code>load(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3401** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3402** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3403** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3404** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3405** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3406** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3407** <code>TensorCoord const &amp;tile_offset,             ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L3408** <code>Index pointer_offset) const {               ///&lt; loads a tile with a logical offset AND a pointer offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L3409** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3410** <code>load_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3411** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3412** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3413** <code>/// Stores a fragment to memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3414** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3415** <code>void store(Fragment const &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3416** <code>store_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3417** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3418** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3419** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3420** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3421** <code>void store_with_pointer_offset(</code> — **EN:** Continues the current implementation using `store_with_pointer_offset`. **CN:** 使用 `store_with_pointer_offset` 继续当前实现。
+- **L3422** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3423** <code>Index pointer_offset) const {               ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `store`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `store`, `a` 继续当前实现。
+- **L3424** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3425** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3426** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3427** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3428** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3429** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3430** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3431** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3432** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3433** <code>int mma_accum_start = kAccumulatorRows * kElementsPerAccess *</code> — **EN:** Continues the current implementation using `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess`. **CN:** 使用 `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess` 继续当前实现。
+- **L3434** <code>(mma_n * Policy::MmaIterations::kRow + mma_m);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3435** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3436** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3437** <code>for (int row = 0; row &lt; kAccumulatorRows; ++row) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3438** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3439** <code>for (int col = 0; col &lt; kElementsPerAccess; ++col) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3440** <code>int accum_m = mma_m * InstructionShape::kM * OpDelta::kRow +</code> — **EN:** Continues the current implementation using `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow`. **CN:** 使用 `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow` 继续当前实现。
+- **L3441** <code>row * kRowsPerTile;</code> — **EN:** Completes a declaration involving `row`, `kRowsPerTile`. **CN:** 完成一条与 `row`, `kRowsPerTile` 相关的声明。
+- **L3442** <code>int accum_n = mma_n * InstructionShape::kN * OpDelta::kColumn + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3443** <code>int idx = mma_accum_start + row * kElementsPerAccess + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3444** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3445** <code>offset_ref.at({accum_m, accum_n}) = frag[idx];</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3446** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3447** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3448** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3449** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3450** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3451** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3452** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3453** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3454** <code>void store_with_byte_offset(</code> — **EN:** Continues the current implementation using `store_with_byte_offset`. **CN:** 使用 `store_with_byte_offset` 继续当前实现。
+- **L3455** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3456** <code>Index byte_offset) const {                  ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `store`, `a`. **CN:** 使用 `Index`, `byte_offset`, `store`, `a` 继续当前实现。
+- **L3457** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3458** <code>store_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3459** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3460** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3461** <code>/// Stores a fragment to memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3462** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3463** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L3464** <code>Fragment &amp;frag,                             ///&lt; fragment to store to the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3465** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; stores a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `stores`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `stores`, `a` 继续当前实现。
+- **L3466** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3467** <code>store(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3468** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3469** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3470** <code>/// Stores a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3471** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3472** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L3473** <code>/// fragment to store to the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3474** <code>Fragment const &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3475** <code>/// stores a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3476** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3477** <code>/// stores a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3478** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L3479** <code>store_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3480** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3481** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L3482** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3483** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3484** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3485** <code>/// This tile iterator is specialized for 32-thread TensorOps. It is used to load or store</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3486** <code>/// accumulators from memory and is agnostic to layout.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3487** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3488** <code>/// This iterator is not tested.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3489** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3490** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3491** <code>///   ReadableRandomAccessContiguousTileIteratorConcept |</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3492** <code>///   WriteableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3493** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3494** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L3495** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3496** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L3497** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3498** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L3499** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3500** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L3501** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3502** <code>/// instructions, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3503** <code>typename OpDelta_&gt;</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L3504** <code>class MmaTensorOpAccumulatorTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpAccumulatorTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpAccumulatorTileIterator<`，作为本头文件中的可复用抽象。
+- **L3505** <code>Shape_, Element_, cutlass::layout::AffineRankN&lt;2&gt;, InstructionShape_, OpDelta_&gt; {</code> — **EN:** Continues the current implementation using `Shape_`, `Element_`, `cutlass::layout::AffineRankN`, `InstructionShape_`. **CN:** 使用 `Shape_`, `Element_`, `cutlass::layout::AffineRankN`, `InstructionShape_` 继续当前实现。
+- **L3506** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3507** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3508** <code>/// Shape of tile to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3509** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L3510** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3511** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3512** <code>static Operand const kOperand = Operand::kC;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3513** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3514** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3515** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L3516** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3517** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3518** <code>using Layout = cutlass::layout::RowMajor;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::RowMajor` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::RowMajor`，便于在当前作用域中复用。
+- **L3519** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3520** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3521** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L3522** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3523** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3524** <code>using OpDelta = OpDelta_;</code> — **EN:** Introduces alias or imported name `OpDelta = OpDelta_` for easier reuse in this scope. **CN:** 引入别名或导入名 `OpDelta = OpDelta_`，便于在当前作用域中复用。
+- **L3525** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3526** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3527** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3528** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3529** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3530** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L3531** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3532** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3533** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L3534** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3535** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3536** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L3537** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3538** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3539** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L3540** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3541** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3542** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L3543** <code>static bool const kDivisible =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3544** <code>!(Shape::kRow % InstructionShape::kM) &amp;&amp;</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM` 继续当前实现。
+- **L3545** <code>!(Shape::kColumn % InstructionShape::kN);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3546** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3547** <code>static_assert(platform::is_same&lt;TensorCoord, MatrixCoord&gt;::value,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L3548** <code>&quot;Layouts must be defined for logical MatrixCoord coordinate space.&quot;);</code> — **EN:** Completes a declaration involving `Layouts`, `must`, `be`. **CN:** 完成一条与 `Layouts`, `must`, `be` 相关的声明。
+- **L3549** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3550** <code>/// Number of mma operations performed</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3551** <code>using MmaIterations = MatrixShape&lt;</code> — **EN:** Introduces alias or imported name `MmaIterations = MatrixShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaIterations = MatrixShape<`，便于在当前作用域中复用。
+- **L3552** <code>(Shape::kRow + InstructionShape::kM - 1) / InstructionShape::kM,</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM`, `InstructionShape::kM` 继续当前实现。
+- **L3553** <code>(Shape::kColumn + InstructionShape::kN - 1) / InstructionShape::kN</code> — **EN:** Continues the current implementation using `Shape::kColumn`, `InstructionShape::kN`, `InstructionShape::kN`. **CN:** 使用 `Shape::kColumn`, `InstructionShape::kN`, `InstructionShape::kN` 继续当前实现。
+- **L3554** <code>&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L3555** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L3556** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3557** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3558** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3559** <code>// Assume accumulator tile is an arrangement of 8-by-8 tiles replicated over the entire</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3560** <code>// shape, with each quad mapped to one row and each thread mapped to 1/4 of the elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3561** <code>// of that row. The accumulators within one row are assumed to be consecutive.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3562** <code>static int const kElementsPerAccess = InstructionShape::kN / 4;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3563** <code>static int const kRowsPerTile = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3564** <code>static int const kAccumulatorRows = InstructionShape::kM / kRowsPerTile;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3565** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3566** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3567** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3568** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3569** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3570** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3571** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3572** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3573** <code>using Fragment = Array&lt;</code> — **EN:** Introduces alias or imported name `Fragment = Array<` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = Array<`，便于在当前作用域中复用。
+- **L3574** <code>Element,</code> — **EN:** Continues the current implementation using `Element`. **CN:** 使用 `Element` 继续当前实现。
+- **L3575** <code>Policy::MmaIterations::kCount * InstructionShape::kMN / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Policy::MmaIterations::kCount`, `InstructionShape::kMN`, `kThreads`. **CN:** 完成一条与 `Policy::MmaIterations::kCount`, `InstructionShape::kMN`, `kThreads` 相关的声明。
+- **L3576** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3577** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3578** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3579** <code>/// Reference to output tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3580** <code>TensorRef ref_;</code> — **EN:** Completes a declaration involving `TensorRef`, `ref_`. **CN:** 完成一条与 `TensorRef`, `ref_` 相关的声明。
+- **L3581** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3582** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3583** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3584** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3585** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3586** <code>MmaTensorOpAccumulatorTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L3587** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3588** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3589** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3590** <code>MmaTensorOpAccumulatorTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L3591** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L3592** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L3593** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L3594** <code>ref_(ref) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3595** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3596** <code>int quad = (lane_id &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3597** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3598** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3599** <code>MatrixCoord lane_offset(quad, lane_in_quad * kElementsPerAccess);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3600** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3601** <code>ref_.add_coord_offset(lane_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3602** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3603** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3604** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3605** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3606** <code>MmaTensorOpAccumulatorTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3607** <code>ref_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3608** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3609** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3610** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3611** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3612** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3613** <code>MmaTensorOpAccumulatorTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3614** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3615** <code>ref_.add_coord_offset(tile_offset * make_Coord(Shape::kRow, Shape::kColumn));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3616** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3617** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3618** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3619** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3620** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3621** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3622** <code>MmaTensorOpAccumulatorTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3623** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3624** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3625** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3626** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3627** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3628** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3629** <code>MmaTensorOpAccumulatorTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3630** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3631** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3632** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3633** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3634** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3635** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3636** <code>MmaTensorOpAccumulatorTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3637** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3638** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3639** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3640** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3641** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3642** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3643** <code>MmaTensorOpAccumulatorTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3644** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3645** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3646** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3647** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3648** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3649** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3650** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3651** <code>load_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3652** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3653** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3654** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3655** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3656** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L3657** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3658** <code>Index pointer_offset) const {               ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L3659** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3660** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3661** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3662** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3663** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3664** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3665** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3666** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3667** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3668** <code>int mma_accum_start = kAccumulatorRows * kElementsPerAccess *</code> — **EN:** Continues the current implementation using `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess`. **CN:** 使用 `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess` 继续当前实现。
+- **L3669** <code>(mma_n * Policy::MmaIterations::kRow + mma_m);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3670** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3671** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3672** <code>for (int row = 0; row &lt; kAccumulatorRows; ++row) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3673** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3674** <code>for (int col = 0; col &lt; kElementsPerAccess; ++col) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3675** <code>int accum_m = mma_m * InstructionShape::kM * OpDelta::kRow +</code> — **EN:** Continues the current implementation using `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow`. **CN:** 使用 `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow` 继续当前实现。
+- **L3676** <code>row * kRowsPerTile;</code> — **EN:** Completes a declaration involving `row`, `kRowsPerTile`. **CN:** 完成一条与 `row`, `kRowsPerTile` 相关的声明。
+- **L3677** <code>int accum_n = mma_n * InstructionShape::kN * OpDelta::kColumn + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3678** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3679** <code>frag[mma_accum_start + row * kElementsPerAccess + col] = offset_ref.at({accum_m, accum_n});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3680** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3681** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3682** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3683** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3684** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3685** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3686** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3687** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3688** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L3689** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3690** <code>Index byte_offset) const {                  ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `loads`, `a`. **CN:** 使用 `Index`, `byte_offset`, `loads`, `a` 继续当前实现。
+- **L3691** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3692** <code>load_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3693** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3694** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3695** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3696** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3697** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3698** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3699** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L3700** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3701** <code>load(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3702** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3703** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3704** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3705** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3706** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3707** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3708** <code>TensorCoord const &amp;tile_offset,             ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L3709** <code>Index pointer_offset) const {               ///&lt; loads a tile with a logical offset AND a pointer offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L3710** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3711** <code>load_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3712** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3713** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3714** <code>/// Stores a fragment to memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3715** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3716** <code>void store(Fragment const &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3717** <code>store_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3718** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3719** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3720** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3721** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3722** <code>void store_with_pointer_offset(</code> — **EN:** Continues the current implementation using `store_with_pointer_offset`. **CN:** 使用 `store_with_pointer_offset` 继续当前实现。
+- **L3723** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3724** <code>Index pointer_offset) const {               ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `store`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `store`, `a` 继续当前实现。
+- **L3725** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3726** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3727** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3728** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3729** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3730** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3731** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3732** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3733** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3734** <code>int mma_accum_start = kAccumulatorRows * kElementsPerAccess *</code> — **EN:** Continues the current implementation using `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess`. **CN:** 使用 `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess` 继续当前实现。
+- **L3735** <code>(mma_n * Policy::MmaIterations::kRow + mma_m);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3736** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3737** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3738** <code>for (int row = 0; row &lt; kAccumulatorRows; ++row) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3739** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3740** <code>for (int col = 0; col &lt; kElementsPerAccess; ++col) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3741** <code>int accum_m = mma_m * InstructionShape::kM * OpDelta::kRow +</code> — **EN:** Continues the current implementation using `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow`. **CN:** 使用 `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow` 继续当前实现。
+- **L3742** <code>row * kRowsPerTile;</code> — **EN:** Completes a declaration involving `row`, `kRowsPerTile`. **CN:** 完成一条与 `row`, `kRowsPerTile` 相关的声明。
+- **L3743** <code>int accum_n = mma_n * InstructionShape::kN * OpDelta::kColumn + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3744** <code>int idx = mma_accum_start + row * kElementsPerAccess + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3745** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3746** <code>offset_ref.at({accum_m, accum_n}) = frag[idx];</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3747** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3748** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3749** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3750** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3751** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3752** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3753** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3754** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3755** <code>void store_with_byte_offset(</code> — **EN:** Continues the current implementation using `store_with_byte_offset`. **CN:** 使用 `store_with_byte_offset` 继续当前实现。
+- **L3756** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3757** <code>Index byte_offset) const {                  ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `store`, `a`. **CN:** 使用 `Index`, `byte_offset`, `store`, `a` 继续当前实现。
+- **L3758** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3759** <code>store_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3760** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3761** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3762** <code>/// Stores a fragment to memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3763** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3764** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L3765** <code>Fragment &amp;frag,                             ///&lt; fragment to store to the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3766** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; stores a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `stores`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `stores`, `a` 继续当前实现。
+- **L3767** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3768** <code>store(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3769** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3770** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3771** <code>/// Stores a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3772** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3773** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L3774** <code>/// fragment to store to the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3775** <code>Fragment const &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L3776** <code>/// stores a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3777** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L3778** <code>/// stores a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3779** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L3780** <code>store_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3781** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3782** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L3783** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3784** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3785** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3786** <code>/// This tile iterator is specialized for 32-thread TensorOps. It is used to load or store</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3787** <code>/// accumulators from memory and is agnostic to layout. It could be faster if it assumed row-major</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3788** <code>/// accumulator layout.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3789** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3790** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3791** <code>///   ReadableRandomAccessContiguousTileIteratorConcept |</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3792** <code>///   WriteableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3793** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3794** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L3795** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3796** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L3797** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3798** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L3799** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3800** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L3801** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3802** <code>/// instructions, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3803** <code>typename OpDelta_&gt;</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L3804** <code>class MmaTensorOpAccumulatorTileIterator&lt;Shape_, Element_,</code> — **EN:** Declares class `MmaTensorOpAccumulatorTileIterator<Shape_, Element_,` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpAccumulatorTileIterator<Shape_, Element_,`，作为本头文件中的可复用抽象。
+- **L3805** <code>cutlass::layout::ColumnMajor,</code> — **EN:** Continues the current implementation using `cutlass::layout::ColumnMajor`. **CN:** 使用 `cutlass::layout::ColumnMajor` 继续当前实现。
+- **L3806** <code>InstructionShape_, OpDelta_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`. **CN:** 使用 `InstructionShape_`, `OpDelta_` 继续当前实现。
+- **L3807** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3808** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3809** <code>/// Shape of tile to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3810** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L3811** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3812** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3813** <code>static Operand const kOperand = Operand::kC;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3814** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3815** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3816** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L3817** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3818** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3819** <code>using Layout = cutlass::layout::ColumnMajor;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::ColumnMajor` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::ColumnMajor`，便于在当前作用域中复用。
+- **L3820** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3821** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3822** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L3823** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3824** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3825** <code>using OpDelta = OpDelta_;</code> — **EN:** Introduces alias or imported name `OpDelta = OpDelta_` for easier reuse in this scope. **CN:** 引入别名或导入名 `OpDelta = OpDelta_`，便于在当前作用域中复用。
+- **L3826** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3827** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3828** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3829** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3830** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3831** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L3832** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3833** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3834** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L3835** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3836** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3837** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L3838** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3839** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3840** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L3841** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3842** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3843** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L3844** <code>static bool const kDivisible =</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3845** <code>!(Shape::kRow % InstructionShape::kM) &amp;&amp;</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM` 继续当前实现。
+- **L3846** <code>!(Shape::kColumn % InstructionShape::kN);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3847** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3848** <code>static_assert(platform::is_same&lt;TensorCoord, MatrixCoord&gt;::value,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L3849** <code>&quot;Layouts must be defined for logical MatrixCoord coordinate space.&quot;);</code> — **EN:** Completes a declaration involving `Layouts`, `must`, `be`. **CN:** 完成一条与 `Layouts`, `must`, `be` 相关的声明。
+- **L3850** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3851** <code>/// Number of mma operations performed</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3852** <code>using MmaIterations = MatrixShape&lt;</code> — **EN:** Introduces alias or imported name `MmaIterations = MatrixShape<` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaIterations = MatrixShape<`，便于在当前作用域中复用。
+- **L3853** <code>(Shape::kRow + InstructionShape::kM - 1) / InstructionShape::kM,</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM`, `InstructionShape::kM` 继续当前实现。
+- **L3854** <code>(Shape::kColumn + InstructionShape::kN - 1) / InstructionShape::kN</code> — **EN:** Continues the current implementation using `Shape::kColumn`, `InstructionShape::kN`, `InstructionShape::kN`. **CN:** 使用 `Shape::kColumn`, `InstructionShape::kN`, `InstructionShape::kN` 继续当前实现。
+- **L3855** <code>&gt;;</code> — **EN:** Completes the current declaration statement. **CN:** 完成当前声明语句。
+- **L3856** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L3857** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3858** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3859** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3860** <code>// Assume accumulator tile is an arrangement of 8-by-8 tiles replicated over the entire</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3861** <code>// shape, with each quad mapped to one row and each thread mapped to 1/4 of the elements</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3862** <code>// of that row. The accumulators within one row are assumed to be consecutive.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3863** <code>static int const kElementsPerAccess = InstructionShape::kN / 4;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3864** <code>static int const kRowsPerTile = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3865** <code>static int const kAccumulatorRows = InstructionShape::kM / kRowsPerTile;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L3866** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3867** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3868** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3869** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3870** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3871** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L3872** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3873** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3874** <code>using Fragment = Array&lt;Element,</code> — **EN:** Introduces alias or imported name `Fragment = Array<Element,` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = Array<Element,`，便于在当前作用域中复用。
+- **L3875** <code>Policy::MmaIterations::kCount * InstructionShape::kMN / kThreads&gt;;</code> — **EN:** Completes a declaration involving `Policy::MmaIterations::kCount`, `InstructionShape::kMN`, `kThreads`. **CN:** 完成一条与 `Policy::MmaIterations::kCount`, `InstructionShape::kMN`, `kThreads` 相关的声明。
+- **L3876** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3877** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3878** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3879** <code>/// Reference to output tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3880** <code>TensorRef ref_;</code> — **EN:** Completes a declaration involving `TensorRef`, `ref_`. **CN:** 完成一条与 `TensorRef`, `ref_` 相关的声明。
+- **L3881** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3882** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L3883** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3884** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3885** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3886** <code>MmaTensorOpAccumulatorTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L3887** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3888** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3889** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3890** <code>MmaTensorOpAccumulatorTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L3891** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L3892** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L3893** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L3894** <code>ref_(ref) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3895** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3896** <code>int quad = (lane_id &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3897** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3898** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3899** <code>MatrixCoord lane_offset(quad, lane_in_quad * kElementsPerAccess);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3900** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3901** <code>ref_.add_coord_offset(lane_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3902** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3903** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3904** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3905** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3906** <code>MmaTensorOpAccumulatorTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3907** <code>ref_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3908** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3909** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3910** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3911** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3912** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3913** <code>MmaTensorOpAccumulatorTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3914** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3915** <code>ref_.add_coord_offset(tile_offset * make_Coord(Shape::kRow, Shape::kColumn));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3916** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3917** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3918** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3919** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3920** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3921** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3922** <code>MmaTensorOpAccumulatorTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3923** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3924** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3925** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3926** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3927** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3928** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3929** <code>MmaTensorOpAccumulatorTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3930** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3931** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3932** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3933** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3934** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3935** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3936** <code>MmaTensorOpAccumulatorTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3937** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3938** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3939** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3940** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3941** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3942** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3943** <code>MmaTensorOpAccumulatorTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3944** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3945** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L3946** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3947** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3948** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3949** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3950** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3951** <code>load_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3952** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3953** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3954** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3955** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3956** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L3957** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3958** <code>Index pointer_offset) const {               ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L3959** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3960** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3961** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3962** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3963** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3964** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3965** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3966** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3967** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3968** <code>int mma_accum_start = kAccumulatorRows * kElementsPerAccess *</code> — **EN:** Continues the current implementation using `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess`. **CN:** 使用 `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess` 继续当前实现。
+- **L3969** <code>(mma_n * Policy::MmaIterations::kRow + mma_m);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3970** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3971** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3972** <code>for (int row = 0; row &lt; kAccumulatorRows; ++row) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3973** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3974** <code>for (int col = 0; col &lt; kElementsPerAccess; ++col) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L3975** <code>int accum_m = mma_m * InstructionShape::kM * OpDelta::kRow +</code> — **EN:** Continues the current implementation using `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow`. **CN:** 使用 `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow` 继续当前实现。
+- **L3976** <code>row * kRowsPerTile;</code> — **EN:** Completes a declaration involving `row`, `kRowsPerTile`. **CN:** 完成一条与 `row`, `kRowsPerTile` 相关的声明。
+- **L3977** <code>int accum_n = mma_n * InstructionShape::kN * OpDelta::kColumn + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3978** <code>int idx = mma_accum_start + row * kElementsPerAccess + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L3979** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3980** <code>frag[idx] = offset_ref.at({accum_m, accum_n});</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3981** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3982** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3983** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3984** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3985** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3986** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3987** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3988** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3989** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L3990** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L3991** <code>Index byte_offset) const {                  ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `loads`, `a`. **CN:** 使用 `Index`, `byte_offset`, `loads`, `a` 继续当前实现。
+- **L3992** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3993** <code>load_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L3994** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L3995** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L3996** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L3997** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L3998** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L3999** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4000** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L4001** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4002** <code>load(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4003** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4004** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4005** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4006** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4007** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L4008** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4009** <code>TensorCoord const &amp;tile_offset,             ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L4010** <code>Index pointer_offset) const {               ///&lt; loads a tile with a logical offset AND a pointer offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L4011** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4012** <code>load_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4013** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4014** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4015** <code>/// Stores a fragment to memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4016** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4017** <code>void store(Fragment const &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4018** <code>store_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4019** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4020** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4021** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4022** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4023** <code>void store_with_pointer_offset(</code> — **EN:** Continues the current implementation using `store_with_pointer_offset`. **CN:** 使用 `store_with_pointer_offset` 继续当前实现。
+- **L4024** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4025** <code>Index pointer_offset) const {               ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `store`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `store`, `a` 继续当前实现。
+- **L4026** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4027** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4028** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4029** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4030** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4031** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4032** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4033** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4034** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4035** <code>int mma_accum_start = kAccumulatorRows * kElementsPerAccess *</code> — **EN:** Continues the current implementation using `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess`. **CN:** 使用 `mma_accum_start`, `kAccumulatorRows`, `kElementsPerAccess` 继续当前实现。
+- **L4036** <code>(mma_n * Policy::MmaIterations::kRow + mma_m);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4037** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4038** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4039** <code>for (int row = 0; row &lt; kAccumulatorRows; ++row) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4040** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4041** <code>for (int col = 0; col &lt; kElementsPerAccess; ++col) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4042** <code>int accum_m = mma_m * InstructionShape::kM * OpDelta::kRow +</code> — **EN:** Continues the current implementation using `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow`. **CN:** 使用 `accum_m`, `mma_m`, `InstructionShape::kM`, `OpDelta::kRow` 继续当前实现。
+- **L4043** <code>row * kRowsPerTile;</code> — **EN:** Completes a declaration involving `row`, `kRowsPerTile`. **CN:** 完成一条与 `row`, `kRowsPerTile` 相关的声明。
+- **L4044** <code>int accum_n = mma_n * InstructionShape::kN * OpDelta::kColumn + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4045** <code>int idx = mma_accum_start + row * kElementsPerAccess + col;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4046** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4047** <code>offset_ref.at({accum_m, accum_n}) = frag[idx];</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4048** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4049** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4050** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4051** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4052** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4053** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4054** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4055** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4056** <code>void store_with_byte_offset(</code> — **EN:** Continues the current implementation using `store_with_byte_offset`. **CN:** 使用 `store_with_byte_offset` 继续当前实现。
+- **L4057** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4058** <code>Index byte_offset) const {                  ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `store`, `a`. **CN:** 使用 `Index`, `byte_offset`, `store`, `a` 继续当前实现。
+- **L4059** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4060** <code>store_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4061** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4062** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4063** <code>/// Stores a fragment to memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4064** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4065** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L4066** <code>Fragment &amp;frag,                             ///&lt; fragment to store to the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4067** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; stores a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `stores`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `stores`, `a` 继续当前实现。
+- **L4068** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4069** <code>store(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4070** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4071** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4072** <code>/// Stores a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4073** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4074** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L4075** <code>/// fragment to store to the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4076** <code>Fragment const &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L4077** <code>/// stores a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4078** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L4079** <code>/// stores a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4080** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L4081** <code>store_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4082** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4083** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L4084** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4085** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4086** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4087** <code>/// This tile iterator is specialized for 32-thread TensorOps. It is used to load or store</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4088** <code>/// accumulators from memory and is agnostic to layout. It could be faster if it assumed row-major</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4089** <code>/// accumulator layout.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4090** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4091** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4092** <code>///   ReadableRandomAccessContiguousTileIteratorConcept |</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4093** <code>///   WriteableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4094** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4095** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4096** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L4097** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4098** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L4099** <code>/// Element typ</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4100** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L4101** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4102** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L4103** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4104** <code>/// instructions, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4105** <code>typename OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L4106** <code>/// Interleaved N</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4107** <code>int InterleavedN&gt;</code> — **EN:** Continues the current implementation using `InterleavedN`. **CN:** 使用 `InterleavedN` 继续当前实现。
+- **L4108** <code>class MmaTensorOpAccumulatorTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpAccumulatorTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpAccumulatorTileIterator<`，作为本头文件中的可复用抽象。
+- **L4109** <code>Shape_, Element_, cutlass::layout::ColumnMajorInterleaved&lt;InterleavedN&gt;,</code> — **EN:** Continues the current implementation using `Shape_`, `Element_`, `cutlass::layout::ColumnMajorInterleaved`, `InterleavedN`. **CN:** 使用 `Shape_`, `Element_`, `cutlass::layout::ColumnMajorInterleaved`, `InterleavedN` 继续当前实现。
+- **L4110** <code>InstructionShape_, OpDelta_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`. **CN:** 使用 `InstructionShape_`, `OpDelta_` 继续当前实现。
+- **L4111** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4112** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4113** <code>/// Shape of tile to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4114** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L4115** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4116** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4117** <code>static Operand const kOperand = Operand::kC;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4118** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4119** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4120** <code>using Element = Element_;</code> — **EN:** Introduces alias or imported name `Element = Element_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = Element_`，便于在当前作用域中复用。
+- **L4121** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4122** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4123** <code>using Layout = cutlass::layout::ColumnMajorInterleaved&lt;InterleavedN&gt;;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::ColumnMajorInterleaved<InterleavedN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::ColumnMajorInterleaved<InterleavedN>`，便于在当前作用域中复用。
+- **L4124** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4125** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4126** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L4127** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4128** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4129** <code>using OpDelta = OpDelta_;</code> — **EN:** Introduces alias or imported name `OpDelta = OpDelta_` for easier reuse in this scope. **CN:** 引入别名或导入名 `OpDelta = OpDelta_`，便于在当前作用域中复用。
+- **L4130** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4131** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4132** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L4133** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4134** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4135** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L4136** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4137** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4138** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L4139** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4140** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4141** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L4142** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4143** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4144** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L4145** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4146** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4147** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L4148** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L4149** <code>!(Shape::kRow % InstructionShape::kM) &amp;&amp;</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM` 继续当前实现。
+- **L4150** <code>!(Shape::kColumn % InstructionShape::kN),</code> — **EN:** Continues the current implementation using `Shape::kColumn`, `InstructionShape::kN`. **CN:** 使用 `Shape::kColumn`, `InstructionShape::kN` 继续当前实现。
+- **L4151** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L4152** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4153** <code>static_assert(platform::is_same&lt;TensorCoord, MatrixCoord&gt;::value,</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L4154** <code>&quot;Layouts must be defined for logical MatrixCoord coordinate space.&quot;);</code> — **EN:** Completes a declaration involving `Layouts`, `must`, `be`. **CN:** 完成一条与 `Layouts`, `must`, `be` 相关的声明。
+- **L4155** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4156** <code>/// Number of mma operations performed</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4157** <code>using MmaIterations = MatrixShape&lt;Shape::kRow / InstructionShape::kM,</code> — **EN:** Introduces alias or imported name `MmaIterations = MatrixShape<Shape::kRow / InstructionShape::kM,` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaIterations = MatrixShape<Shape::kRow / InstructionShape::kM,`，便于在当前作用域中复用。
+- **L4158** <code>Shape::kColumn / InstructionShape::kN&gt;;</code> — **EN:** Completes a declaration involving `Shape::kColumn`, `InstructionShape::kN`. **CN:** 完成一条与 `Shape::kColumn`, `InstructionShape::kN` 相关的声明。
+- **L4159** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L4160** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4161** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4162** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4163** <code>static int const kElementsPerAccess = 2;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L4164** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4165** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4166** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4167** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4168** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4169** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4170** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4171** <code>using AccessType = Array&lt;Element, kElementsPerAccess&gt;;</code> — **EN:** Introduces alias or imported name `AccessType = Array<Element, kElementsPerAccess>` for easier reuse in this scope. **CN:** 引入别名或导入名 `AccessType = Array<Element, kElementsPerAccess>`，便于在当前作用域中复用。
+- **L4172** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4173** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4174** <code>using Fragment = Array&lt;Element, Shape::kCount / kThreads&gt;;</code> — **EN:** Introduces alias or imported name `Fragment = Array<Element, Shape::kCount / kThreads>` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = Array<Element, Shape::kCount / kThreads>`，便于在当前作用域中复用。
+- **L4175** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4176** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4177** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4178** <code>/// Reference to output tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4179** <code>TensorRef ref_;</code> — **EN:** Completes a declaration involving `TensorRef`, `ref_`. **CN:** 完成一条与 `TensorRef`, `ref_` 相关的声明。
+- **L4180** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4181** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4182** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4183** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4184** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4185** <code>MmaTensorOpAccumulatorTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L4186** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4187** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4188** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4189** <code>MmaTensorOpAccumulatorTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L4190** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L4191** <code>int lane_id</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L4192** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L4193** <code>ref_(ref) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4194** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4195** <code>int quad = (lane_id &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4196** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4197** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4198** <code>MatrixCoord lane_offset(quad, lane_in_quad * kElementsPerAccess);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4199** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4200** <code>ref_.add_coord_offset(lane_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4201** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4202** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4203** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4204** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4205** <code>MmaTensorOpAccumulatorTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4206** <code>ref_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4207** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4208** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4209** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4210** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4211** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4212** <code>MmaTensorOpAccumulatorTileIterator &amp;add_tile_offset(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4213** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4214** <code>ref_.add_coord_offset(tile_offset * make_Coord(Shape::kRow, Shape::kColumn));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4215** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4216** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4217** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4218** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4219** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4220** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4221** <code>MmaTensorOpAccumulatorTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4222** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4223** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4224** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4225** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4226** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4227** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4228** <code>MmaTensorOpAccumulatorTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4229** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4230** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4231** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4232** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4233** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4234** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4235** <code>MmaTensorOpAccumulatorTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4236** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4237** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4238** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4239** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4240** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4241** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4242** <code>MmaTensorOpAccumulatorTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4243** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4244** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4245** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4246** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4247** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4248** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4249** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4250** <code>load_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4251** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4252** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4253** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4254** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4255** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L4256** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4257** <code>Index pointer_offset) const {               ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L4258** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4259** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4260** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4261** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4262** <code>AccessType* frag_ptr = reinterpret_cast&lt;AccessType *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4263** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4264** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4265** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4266** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4267** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4268** <code>int accum_m = mma_m * InstructionShape::kM;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4269** <code>int accum_n = mma_n * InstructionShape::kN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4270** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4271** <code>int idx = mma_m + mma_n * Policy::MmaIterations::kRow;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4272** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4273** <code>AccessType* access_ptr = reinterpret_cast&lt;AccessType *&gt;(offset_ref.data() +</code> — **EN:** Continues the current implementation using `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L4274** <code>offset_ref.offset(TensorCoord(accum_m, accum_n)));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4275** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4276** <code>frag_ptr[idx] = access_ptr[0];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4277** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4278** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4279** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4280** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4281** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4282** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4283** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L4284** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4285** <code>Index byte_offset) const {                  ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `loads`, `a`. **CN:** 使用 `Index`, `byte_offset`, `loads`, `a` 继续当前实现。
+- **L4286** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4287** <code>load_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4288** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4289** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4290** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4291** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4292** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L4293** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4294** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L4295** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4296** <code>load(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4297** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4298** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4299** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4300** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4301** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L4302** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4303** <code>TensorCoord const &amp;tile_offset,             ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L4304** <code>Index pointer_offset) const {               ///&lt; loads a tile with a logical offset AND a pointer offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L4305** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4306** <code>load_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4307** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4308** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4309** <code>/// Stores a fragment to memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4310** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4311** <code>void store(Fragment const &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4312** <code>store_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4313** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4314** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4315** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4316** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4317** <code>void store_with_pointer_offset(</code> — **EN:** Continues the current implementation using `store_with_pointer_offset`. **CN:** 使用 `store_with_pointer_offset` 继续当前实现。
+- **L4318** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4319** <code>Index pointer_offset) const {               ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `store`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `store`, `a` 继续当前实现。
+- **L4320** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4321** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4322** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4323** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4324** <code>AccessType const *frag_ptr = reinterpret_cast&lt;AccessType const*&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4325** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4326** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4327** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4328** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4329** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4330** <code>int accum_m = mma_m * InstructionShape::kM;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4331** <code>int accum_n = mma_n * InstructionShape::kN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4332** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4333** <code>int idx = mma_m + mma_n * Policy::MmaIterations::kRow;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4334** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4335** <code>AccessType* access_ptr = reinterpret_cast&lt;AccessType *&gt;(offset_ref.data() +</code> — **EN:** Continues the current implementation using `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L4336** <code>offset_ref.offset(TensorCoord(accum_m, accum_n)));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4337** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4338** <code>access_ptr[0] = frag_ptr[idx];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4339** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4340** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4341** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4342** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4343** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4344** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4345** <code>void store_with_byte_offset(</code> — **EN:** Continues the current implementation using `store_with_byte_offset`. **CN:** 使用 `store_with_byte_offset` 继续当前实现。
+- **L4346** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4347** <code>Index byte_offset) const {                  ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `store`, `a`. **CN:** 使用 `Index`, `byte_offset`, `store`, `a` 继续当前实现。
+- **L4348** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4349** <code>store_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4350** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4351** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4352** <code>/// Stores a fragment to memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4353** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4354** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L4355** <code>Fragment &amp;frag,                             ///&lt; fragment to store to the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4356** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; stores a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `stores`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `stores`, `a` 继续当前实现。
+- **L4357** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4358** <code>store(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4359** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4360** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4361** <code>/// Stores a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4362** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4363** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L4364** <code>/// fragment to store to the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4365** <code>Fragment const &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L4366** <code>/// stores a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4367** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L4368** <code>/// stores a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4369** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L4370** <code>store_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4371** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4372** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L4373** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4374** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4375** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4376** <code>/// This tile iterator is specialized for 32-thread TensorOps. It is used to load or store</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4377** <code>/// accumulators from memory and is agnostic to layout. It could be faster if it assumed row-major</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4378** <code>/// accumulator layout.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4379** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4380** <code>/// Satisfies:</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4381** <code>///   ReadableRandomAccessContiguousTileIteratorConcept |</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4382** <code>///   WriteableRandomAccessContiguousTileIteratorConcept</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4383** <code>///</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4384** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4385** <code>template &lt;</code> — **EN:** Begins a template parameter list that makes the following declaration configurable at compile time. **CN:** 开始模板参数列表，使后续声明能够在编译期配置。
+- **L4386** <code>/// Size of the matrix to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4387** <code>typename Shape_,</code> — **EN:** Continues the current implementation using `Shape_`. **CN:** 使用 `Shape_` 继续当前实现。
+- **L4388** <code>/// Element typ</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4389** <code>typename Element_,</code> — **EN:** Continues the current implementation using `Element_`. **CN:** 使用 `Element_` 继续当前实现。
+- **L4390** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4391** <code>typename InstructionShape_,</code> — **EN:** Continues the current implementation using `InstructionShape_`. **CN:** 使用 `InstructionShape_` 继续当前实现。
+- **L4392** <code>/// Interval between adjacent *MMA instructions (in units of MMA</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4393** <code>/// instructions, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4394** <code>typename OpDelta_,</code> — **EN:** Continues the current implementation using `OpDelta_`. **CN:** 使用 `OpDelta_` 继续当前实现。
+- **L4395** <code>/// Interleaved N</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4396** <code>int InterleavedN&gt;</code> — **EN:** Continues the current implementation using `InterleavedN`. **CN:** 使用 `InterleavedN` 继续当前实现。
+- **L4397** <code>class MmaTensorOpAccumulatorTileIterator&lt;</code> — **EN:** Declares class `MmaTensorOpAccumulatorTileIterator<` as a reusable abstraction in this header. **CN:** 声明类 `MmaTensorOpAccumulatorTileIterator<`，作为本头文件中的可复用抽象。
+- **L4398** <code>Shape_, Element_, cutlass::layout::TensorNCxHWx&lt;InterleavedN&gt;,</code> — **EN:** Continues the current implementation using `Shape_`, `Element_`, `cutlass::layout::TensorNCxHWx`, `InterleavedN`. **CN:** 使用 `Shape_`, `Element_`, `cutlass::layout::TensorNCxHWx`, `InterleavedN` 继续当前实现。
+- **L4399** <code>InstructionShape_, OpDelta_&gt; {</code> — **EN:** Continues the current implementation using `InstructionShape_`, `OpDelta_`. **CN:** 使用 `InstructionShape_`, `OpDelta_` 继续当前实现。
+- **L4400** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4401** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4402** <code>/// Shape of tile to load (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4403** <code>using Shape = Shape_;</code> — **EN:** Introduces alias or imported name `Shape = Shape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `Shape = Shape_`，便于在当前作用域中复用。
+- **L4404** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4405** <code>/// Operand tag</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4406** <code>static Operand const kOperand = Operand::kC;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4407** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4408** <code>/// Element type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4409** <code>using Element = int8_t;</code> — **EN:** Introduces alias or imported name `Element = int8_t` for easier reuse in this scope. **CN:** 引入别名或导入名 `Element = int8_t`，便于在当前作用域中复用。
+- **L4410** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4411** <code>/// Layout of source tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4412** <code>using Layout = cutlass::layout::TensorNCxHWx&lt;InterleavedN&gt;;</code> — **EN:** Introduces alias or imported name `Layout = cutlass::layout::TensorNCxHWx<InterleavedN>` for easier reuse in this scope. **CN:** 引入别名或导入名 `Layout = cutlass::layout::TensorNCxHWx<InterleavedN>`，便于在当前作用域中复用。
+- **L4413** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4414** <code>/// Shape of one matrix product operation (concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4415** <code>using InstructionShape = InstructionShape_;</code> — **EN:** Introduces alias or imported name `InstructionShape = InstructionShape_` for easier reuse in this scope. **CN:** 引入别名或导入名 `InstructionShape = InstructionShape_`，便于在当前作用域中复用。
+- **L4416** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4417** <code>/// Delta between *MMA operations (in units of *MMA operations, concept: MatrixShape)</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4418** <code>using OpDelta = OpDelta_;</code> — **EN:** Introduces alias or imported name `OpDelta = OpDelta_` for easier reuse in this scope. **CN:** 引入别名或导入名 `OpDelta = OpDelta_`，便于在当前作用域中复用。
+- **L4419** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4420** <code>/// Number of participating threads</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4421** <code>static int const kThreads = 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L4422** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4423** <code>/// TensorRef type for loading element from a tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4424** <code>using TensorRef = TensorRef&lt;Element, Layout&gt;;</code> — **EN:** Introduces alias or imported name `TensorRef = TensorRef<Element, Layout>` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorRef = TensorRef<Element, Layout>`，便于在当前作用域中复用。
+- **L4425** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4426** <code>/// Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4427** <code>using Index = typename TensorRef::Index;</code> — **EN:** Introduces alias or imported name `Index = typename TensorRef::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `Index = typename TensorRef::Index`，便于在当前作用域中复用。
+- **L4428** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4429** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4430** <code>using LongIndex = typename TensorRef::LongIndex;</code> — **EN:** Introduces alias or imported name `LongIndex = typename TensorRef::LongIndex` for easier reuse in this scope. **CN:** 引入别名或导入名 `LongIndex = typename TensorRef::LongIndex`，便于在当前作用域中复用。
+- **L4431** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4432** <code>/// Long Index type</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4433** <code>using StrideIndex = typename TensorRef::Layout::Stride::Index;</code> — **EN:** Introduces alias or imported name `StrideIndex = typename TensorRef::Layout::Stride::Index` for easier reuse in this scope. **CN:** 引入别名或导入名 `StrideIndex = typename TensorRef::Layout::Stride::Index`，便于在当前作用域中复用。
+- **L4434** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4435** <code>/// Coordinate for an element in the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4436** <code>using TensorCoord = typename TensorRef::TensorCoord;</code> — **EN:** Introduces alias or imported name `TensorCoord = typename TensorRef::TensorCoord` for easier reuse in this scope. **CN:** 引入别名或导入名 `TensorCoord = typename TensorRef::TensorCoord`，便于在当前作用域中复用。
+- **L4437** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4438** <code>/// Internal structure of iterator - made public to enable introspection</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4439** <code>struct Policy {</code> — **EN:** Declares struct `Policy`, which packages related data or policy behavior. **CN:** 声明结构体 `Policy`，用于组织相关数据或策略行为。
+- **L4440** <code>static_assert(</code> — **EN:** Checks an invariant at compile time and emits an error if it is violated. **CN:** 在编译期检查一个不变量，若违反则报错。
+- **L4441** <code>!(Shape::kRow % InstructionShape::kM) &amp;&amp;</code> — **EN:** Continues the current implementation using `Shape::kRow`, `InstructionShape::kM`. **CN:** 使用 `Shape::kRow`, `InstructionShape::kM` 继续当前实现。
+- **L4442** <code>!(Shape::kColumn % InstructionShape::kN),</code> — **EN:** Continues the current implementation using `Shape::kColumn`, `InstructionShape::kN`. **CN:** 使用 `Shape::kColumn`, `InstructionShape::kN` 继续当前实现。
+- **L4443** <code>&quot;Shape of warp-level Mma must be divisible by operator shape.&quot;);</code> — **EN:** Completes a declaration involving `Shape`, `of`, `warp`. **CN:** 完成一条与 `Shape`, `of`, `warp` 相关的声明。
+- **L4444** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4445** <code>/// Number of elements in strided dimension that each STG writes</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4446** <code>static int const kStridedPerSTG = 8;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L4447** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4448** <code>/// Factor to calculate reorder index to pack accumulator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4449** <code>static int const kPackedFactor = Shape::kColumn / 32;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L4450** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4451** <code>/// Number of mma operations performed</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4452** <code>using MmaIterations = MatrixShape&lt;Shape::kRow / kStridedPerSTG,</code> — **EN:** Introduces alias or imported name `MmaIterations = MatrixShape<Shape::kRow / kStridedPerSTG,` for easier reuse in this scope. **CN:** 引入别名或导入名 `MmaIterations = MatrixShape<Shape::kRow / kStridedPerSTG,`，便于在当前作用域中复用。
+- **L4453** <code>Shape::kColumn / InterleavedN&gt;;</code> — **EN:** Completes a declaration involving `Shape::kColumn`, `InterleavedN`. **CN:** 完成一条与 `Shape::kColumn`, `InterleavedN` 相关的声明。
+- **L4454** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L4455** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4456** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4457** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4458** <code>static int const kElementsPerAccess = InterleavedN / 4;</code> — **EN:** Defines a class-level compile-time constant. **CN:** 定义类级别的编译期常量。
+- **L4459** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4460** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4461** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4462** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4463** <code>// Derived quantities</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4464** <code>//</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4465** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4466** <code>struct alignas((kElementsPerAccess * sizeof_bits&lt;Element&gt;::value / 8)) AccessType {</code> — **EN:** Declares struct `alignas((kElementsPerAccess * sizeof_bits<Element>`, which packages related data or policy behavior. **CN:** 声明结构体 `alignas((kElementsPerAccess * sizeof_bits<Element>`，用于组织相关数据或策略行为。
+- **L4467** <code>Array&lt;Element, kElementsPerAccess&gt; storage;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `kElementsPerAccess`. **CN:** 完成一条与 `Array`, `Element`, `kElementsPerAccess` 相关的声明。
+- **L4468** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L4469** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4470** <code>/// Fragment object holding a thread&#x27;s part of a tile</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4471** <code>using Fragment = Array&lt;int32_t, Shape::kCount / kThreads&gt;;</code> — **EN:** Introduces alias or imported name `Fragment = Array<int32_t, Shape::kCount / kThreads>` for easier reuse in this scope. **CN:** 引入别名或导入名 `Fragment = Array<int32_t, Shape::kCount / kThreads>`，便于在当前作用域中复用。
+- **L4472** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4473** <code>private:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4474** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4475** <code>/// Reference to output tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4476** <code>TensorRef ref_;</code> — **EN:** Completes a declaration involving `TensorRef`, `ref_`. **CN:** 完成一条与 `TensorRef`, `ref_` 相关的声明。
+- **L4477** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4478** <code>/// Row offset index globally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4479** <code>LongIndex global_offset_row_;</code> — **EN:** Completes a declaration involving `LongIndex`, `global_offset_row_`. **CN:** 完成一条与 `LongIndex`, `global_offset_row_` 相关的声明。
+- **L4480** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4481** <code>/// Column offset index globally</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4482** <code>LongIndex global_offset_col_;</code> — **EN:** Completes a declaration involving `LongIndex`, `global_offset_col_`. **CN:** 完成一条与 `LongIndex`, `global_offset_col_` 相关的声明。
+- **L4483** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4484** <code>/// Output tensor size</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4485** <code>TensorCoord extent_;</code> — **EN:** Completes a declaration involving `TensorCoord`, `extent_`. **CN:** 完成一条与 `TensorCoord`, `extent_` 相关的声明。
+- **L4486** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4487** <code>/// Alpha</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4488** <code>float alpha_;</code> — **EN:** Completes a declaration involving `float`, `alpha_`. **CN:** 完成一条与 `float`, `alpha_` 相关的声明。
+- **L4489** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4490** <code>/// Beta</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4491** <code>float beta_;</code> — **EN:** Completes a declaration involving `float`, `beta_`. **CN:** 完成一条与 `float`, `beta_` 相关的声明。
+- **L4492** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4493** <code>public:</code> — **EN:** Changes the access level for the class members that follow. **CN:** 切换后续类成员的访问级别。
+- **L4494** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4495** <code>/// Default ctor constructs null iterator</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4496** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4497** <code>MmaTensorOpAccumulatorTileIterator() { }</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L4498** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4499** <code>/// Constructor from TensorRef</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4500** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4501** <code>MmaTensorOpAccumulatorTileIterator(</code> — **EN:** Continues the current implementation using `MmaTensorOpAccumulatorTileIterator`. **CN:** 使用 `MmaTensorOpAccumulatorTileIterator` 继续当前实现。
+- **L4502** <code>TensorRef const &amp;ref,</code> — **EN:** Continues the current implementation using `TensorRef`, `ref`. **CN:** 使用 `TensorRef`, `ref` 继续当前实现。
+- **L4503** <code>int const lane_id,</code> — **EN:** Continues the current implementation using `lane_id`. **CN:** 使用 `lane_id` 继续当前实现。
+- **L4504** <code>TensorCoord extent,</code> — **EN:** Continues the current implementation using `TensorCoord`, `extent`. **CN:** 使用 `TensorCoord`, `extent` 继续当前实现。
+- **L4505** <code>float alpha = 1.0f,</code> — **EN:** Continues the current implementation using `float`, `alpha`, `f`. **CN:** 使用 `float`, `alpha`, `f` 继续当前实现。
+- **L4506** <code>float beta = 0.0f</code> — **EN:** Continues the current implementation using `float`, `beta`, `f`. **CN:** 使用 `float`, `beta`, `f` 继续当前实现。
+- **L4507** <code>):</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L4508** <code>ref_(ref),</code> — **EN:** Continues the current implementation using `ref_`, `ref`. **CN:** 使用 `ref_`, `ref` 继续当前实现。
+- **L4509** <code>extent_(extent),</code> — **EN:** Continues the current implementation using `extent_`, `extent`. **CN:** 使用 `extent_`, `extent` 继续当前实现。
+- **L4510** <code>alpha_(alpha),</code> — **EN:** Continues the current implementation using `alpha_`, `alpha`. **CN:** 使用 `alpha_`, `alpha` 继续当前实现。
+- **L4511** <code>beta_(beta) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4512** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4513** <code>int quad = (lane_id &gt;&gt; 2);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4514** <code>int lane_in_quad = (lane_id &amp; 3);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4515** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4516** <code>global_offset_row_ = quad;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4517** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4518** <code>global_offset_col_ = lane_in_quad * kElementsPerAccess;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4519** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4520** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4521** <code>/// Adds a pointer offset to internal pointer(s) to advance through memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4522** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4523** <code>MmaTensorOpAccumulatorTileIterator &amp;add_pointer_offset(LongIndex offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4524** <code>ref_.add_pointer_offset(offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4525** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4526** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4527** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4528** <code>/// Advances an iterator along logical dimensions of matrix in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4529** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4530** <code>MmaTensorOpAccumulatorTileIterator &amp;add_tile_offset(MatrixCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4531** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4532** <code>global_offset_row_ += tile_offset.row() * Shape::kRow;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4533** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4534** <code>global_offset_col_ += tile_offset.column() * Shape::kColumn;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4535** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4536** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4537** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4538** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4539** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4540** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4541** <code>MmaTensorOpAccumulatorTileIterator &amp; operator++() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4542** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4543** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4544** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4545** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4546** <code>/// Advances the iterator along the advance dimension</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4547** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4548** <code>MmaTensorOpAccumulatorTileIterator &amp; operator--() {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4549** <code>// deliberate no-op</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4550** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4551** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4552** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4553** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4554** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4555** <code>MmaTensorOpAccumulatorTileIterator &amp; operator+=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4556** <code>add_tile_offset(tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4557** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4558** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4559** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4560** <code>///&lt; advances in units of whole tiles along the logical coordinate space of the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4561** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4562** <code>MmaTensorOpAccumulatorTileIterator &amp; operator-=(TensorCoord const &amp;tile_offset) {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4563** <code>add_tile_offset(-tile_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4564** <code>return *this;</code> — **EN:** Returns the computed value or object to the caller. **CN:** 将计算得到的值或对象返回给调用者。
+- **L4565** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4566** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4567** <code>/// Loads a fragment from memory at the location pointed to by the iterator.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4568** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4569** <code>void load(Fragment &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4570** <code>load_with_pointer_offset(frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4571** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4572** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4573** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4574** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4575** <code>void load_with_pointer_offset(</code> — **EN:** Continues the current implementation using `load_with_pointer_offset`. **CN:** 使用 `load_with_pointer_offset` 继续当前实现。
+- **L4576** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4577** <code>Index pointer_offset) const {               ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L4578** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4579** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4580** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4581** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4582** <code>AccessType* frag_ptr = reinterpret_cast&lt;AccessType *&gt;(&amp;frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4583** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4584** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4585** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kN; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4586** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4587** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kM; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4588** <code>int accum_m = mma_m * InstructionShape::kM;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4589** <code>int accum_n = mma_n * InstructionShape::kN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4590** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4591** <code>int idx = mma_m + mma_n * Policy::MmaIterations::kM;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4592** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4593** <code>AccessType* access_ptr = reinterpret_cast&lt;AccessType *&gt;(offset_ref.data() +</code> — **EN:** Continues the current implementation using `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L4594** <code>accum_m * offset_ref.stride(0) + accum_n);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4595** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4596** <code>frag_ptr[idx] = access_ptr[0];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4597** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4598** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4599** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4600** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4601** <code>/// Loads a fragment from memory with additional logical offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4602** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4603** <code>void load_with_byte_offset(</code> — **EN:** Continues the current implementation using `load_with_byte_offset`. **CN:** 使用 `load_with_byte_offset` 继续当前实现。
+- **L4604** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4605** <code>Index byte_offset) const {                  ///&lt; loads a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `loads`, `a`. **CN:** 使用 `Index`, `byte_offset`, `loads`, `a` 继续当前实现。
+- **L4606** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4607** <code>load_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4608** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4609** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4610** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4611** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4612** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L4613** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4614** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L4615** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4616** <code>load(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4617** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4618** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4619** <code>/// Loads a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4620** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4621** <code>void load(</code> — **EN:** Continues the current implementation using `load`. **CN:** 使用 `load` 继续当前实现。
+- **L4622** <code>Fragment &amp;frag,                             ///&lt; fragment to load from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4623** <code>TensorCoord const &amp;tile_offset,             ///&lt; loads a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `loads`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `loads`, `a` 继续当前实现。
+- **L4624** <code>Index pointer_offset) const {               ///&lt; loads a tile with a logical offset AND a pointer offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `loads`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `loads`, `a` 继续当前实现。
+- **L4625** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4626** <code>load_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4627** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4628** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4629** <code>/// Stores a fragment to memory</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4630** <code>CUTLASS_HOST_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4631** <code>void store(Fragment const &amp;frag) const {</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4632** <code>store_with_pointer_offset(frag, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4633** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4634** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4635** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4636** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4637** <code>void store_with_pointer_offset(</code> — **EN:** Continues the current implementation using `store_with_pointer_offset`. **CN:** 使用 `store_with_pointer_offset` 继续当前实现。
+- **L4638** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4639** <code>Index pointer_offset) const {               ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`, `store`, `a`. **CN:** 使用 `Index`, `pointer_offset`, `store`, `a` 继续当前实现。
+- **L4640** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4641** <code>TensorRef offset_ref(ref_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4642** <code>offset_ref.add_pointer_offset(pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4643** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4644** <code>Array&lt;float, Shape::kCount / kThreads&gt; output_frag_f;</code> — **EN:** Completes a declaration involving `Array`, `float`, `Shape::kCount`. **CN:** 完成一条与 `Array`, `float`, `Shape::kCount` 相关的声明。
+- **L4645** <code>Array&lt;Element, Shape::kCount / kThreads&gt; output_frag;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `Shape::kCount`. **CN:** 完成一条与 `Array`, `Element`, `Shape::kCount` 相关的声明。
+- **L4646** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4647** <code>LongIndex pq = extent_.h() * extent_.w();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4648** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4649** <code>LongIndex extent_row = extent_.n() * pq;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4650** <code>LongIndex extent_col = extent_.c();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4651** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4652** <code>LongIndex k_major = (global_offset_col_ / InterleavedN) * pq;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4653** <code>Index k_minor = global_offset_col_ % InterleavedN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4654** <code>LongIndex k_offset = k_major * InterleavedN + k_minor;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4655** <code>LongIndex k_offset_delta = pq * InterleavedN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4656** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4657** <code>LongIndex stride_n = pq * extent_.c();</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4658** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4659** <code>Index n;</code> — **EN:** Completes a declaration involving `Index`, `n`. **CN:** 完成一条与 `Index`, `n` 相关的声明。
+- **L4660** <code>LongIndex pq_rem;</code> — **EN:** Completes a declaration involving `LongIndex`, `pq_rem`. **CN:** 完成一条与 `LongIndex`, `pq_rem` 相关的声明。
+- **L4661** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4662** <code>unsigned int pq_mul, pq_shr;</code> — **EN:** Completes a declaration involving `unsigned`, `pq_mul`, `pq_shr`. **CN:** 完成一条与 `unsigned`, `pq_mul`, `pq_shr` 相关的声明。
+- **L4663** <code>find_divisor(pq_mul, pq_shr, pq);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4664** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4665** <code>if(beta_ == 0.0f) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L4666** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4667** <code>for(int i = 0; i &lt; int(frag.size()); ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4668** <code>output_frag_f[i] = frag[i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4669** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4670** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4671** <code>if(InstructionShape::kM == Policy::kStridedPerSTG) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L4672** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4673** <code>for(int i = 0; i &lt; int(frag.size()); ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4674** <code>output_frag[i] = (Element)(output_frag_f[i] * alpha_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4675** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4676** <code>} else {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L4677** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4678** <code>for(int i = 0; i &lt; int(frag.size()); ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4679** <code>int map_i = (i / (16 * Policy::kPackedFactor)) * (16 * Policy::kPackedFactor)</code> — **EN:** Continues the current implementation using `map_i`, `i`, `Policy::kPackedFactor`, `Policy::kPackedFactor`. **CN:** 使用 `map_i`, `i`, `Policy::kPackedFactor`, `Policy::kPackedFactor` 继续当前实现。
+- **L4680** <code>+ (i % (8 * Policy::kPackedFactor)) / 2 * 4</code> — **EN:** Continues the current implementation using `i`, `Policy::kPackedFactor`. **CN:** 使用 `i`, `Policy::kPackedFactor` 继续当前实现。
+- **L4681** <code>+ (i % (8 * Policy::kPackedFactor)) % 2</code> — **EN:** Continues the current implementation using `i`, `Policy::kPackedFactor`. **CN:** 使用 `i`, `Policy::kPackedFactor` 继续当前实现。
+- **L4682** <code>+ (i / (8 * Policy::kPackedFactor)) % 2 * 2;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4683** <code>output_frag[i] = (Element)(output_frag_f[map_i] * alpha_);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4684** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4685** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4686** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4687** <code>AccessType const *frag_ptr = reinterpret_cast&lt;AccessType const*&gt;(&amp;output_frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4688** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4689** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4690** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4691** <code>int accum_m = mma_m * Policy::kStridedPerSTG;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4692** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4693** <code>fast_divmod(n, pq_rem, global_offset_row_ + accum_m, pq, pq_mul, pq_shr);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4694** <code>LongIndex offset_m = n * stride_n + k_offset + pq_rem * InterleavedN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4695** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4696** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4697** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4698** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4699** <code>int accum_n = mma_n * InterleavedN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4700** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4701** <code>int idx = mma_n + mma_m * Policy::MmaIterations::kColumn;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4702** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4703** <code>if((global_offset_row_ + accum_m &lt; extent_row) &amp;&amp; (global_offset_col_ + accum_n &lt; extent_col)) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L4704** <code>AccessType* access_ptr = reinterpret_cast&lt;AccessType *&gt;(offset_ref.data() +</code> — **EN:** Continues the current implementation using `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L4705** <code>offset_m + mma_n * k_offset_delta);</code> — **EN:** Completes a declaration involving `offset_m`, `mma_n`, `k_offset_delta`. **CN:** 完成一条与 `offset_m`, `mma_n`, `k_offset_delta` 相关的声明。
+- **L4706** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4707** <code>access_ptr[0] = frag_ptr[idx];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4708** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4709** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4710** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4711** <code>} else {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L4712** <code>if(InstructionShape::kM == Policy::kStridedPerSTG) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L4713** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4714** <code>for(int i = 0; i &lt; int(frag.size()); ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4715** <code>output_frag_f[i] = frag[i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4716** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4717** <code>} else {</code> — **EN:** Continues the current declaration or implementation detail. **CN:** 继续当前声明或实现细节。
+- **L4718** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4719** <code>for(int i = 0; i &lt; int(frag.size()); ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4720** <code>int map_i = (i / (16 * Policy::kPackedFactor)) * (16 * Policy::kPackedFactor)</code> — **EN:** Continues the current implementation using `map_i`, `i`, `Policy::kPackedFactor`, `Policy::kPackedFactor`. **CN:** 使用 `map_i`, `i`, `Policy::kPackedFactor`, `Policy::kPackedFactor` 继续当前实现。
+- **L4721** <code>+ (i % (8 * Policy::kPackedFactor)) / 2 * 4</code> — **EN:** Continues the current implementation using `i`, `Policy::kPackedFactor`. **CN:** 使用 `i`, `Policy::kPackedFactor` 继续当前实现。
+- **L4722** <code>+ (i % (8 * Policy::kPackedFactor)) % 2</code> — **EN:** Continues the current implementation using `i`, `Policy::kPackedFactor`. **CN:** 使用 `i`, `Policy::kPackedFactor` 继续当前实现。
+- **L4723** <code>+ (i / (8 * Policy::kPackedFactor)) % 2 * 2;</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4724** <code>output_frag_f[i] = frag[map_i];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4725** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4726** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4727** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4728** <code>AccessType const *frag_ptr = reinterpret_cast&lt;AccessType const*&gt;(&amp;output_frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4729** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4730** <code>Array&lt;Element, kElementsPerAccess&gt; ref_frag;</code> — **EN:** Completes a declaration involving `Array`, `Element`, `kElementsPerAccess`. **CN:** 完成一条与 `Array`, `Element`, `kElementsPerAccess` 相关的声明。
+- **L4731** <code>AccessType *ref_frag_ptr = reinterpret_cast&lt;AccessType *&gt;(&amp;ref_frag);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4732** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4733** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4734** <code>for (int mma_m = 0; mma_m &lt; Policy::MmaIterations::kRow; ++mma_m) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4735** <code>int accum_m = mma_m * Policy::kStridedPerSTG;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4736** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4737** <code>fast_divmod(n, pq_rem, global_offset_row_ + accum_m, pq, pq_mul, pq_shr);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4738** <code>LongIndex offset_m = n * stride_n + k_offset + pq_rem * InterleavedN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4739** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4740** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4741** <code>for (int mma_n = 0; mma_n &lt; Policy::MmaIterations::kColumn; ++mma_n) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4742** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4743** <code>int accum_n = mma_n * InterleavedN;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4744** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4745** <code>int idx = mma_n + mma_m * Policy::MmaIterations::kColumn;</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4746** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4747** <code>if((global_offset_row_ + accum_m &lt; extent_row) &amp;&amp; (global_offset_col_ + accum_n &lt; extent_col)) {</code> — **EN:** Introduces a runtime condition that selects one execution path. **CN:** 引入运行时条件，用于选择一条执行路径。
+- **L4748** <code>AccessType* access_ptr = reinterpret_cast&lt;AccessType *&gt;(offset_ref.data() +</code> — **EN:** Continues the current implementation using `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType`. **CN:** 使用 `AccessType`, `access_ptr`, `reinterpret_cast`, `AccessType` 继续当前实现。
+- **L4749** <code>offset_m + mma_n * k_offset_delta);</code> — **EN:** Completes a declaration involving `offset_m`, `mma_n`, `k_offset_delta`. **CN:** 完成一条与 `offset_m`, `mma_n`, `k_offset_delta` 相关的声明。
+- **L4750** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4751** <code>ref_frag_ptr[0] = access_ptr[0];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4752** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4753** <code>CUTLASS_PRAGMA_UNROLL</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4754** <code>for(int i = 0; i &lt; kElementsPerAccess; ++i) {</code> — **EN:** Starts a loop that iterates over a compile-time or runtime range. **CN:** 开始一个循环，用于遍历编译期或运行期范围。
+- **L4755** <code>output_frag[idx * kElementsPerAccess + i] = Element(alpha_ * output_frag_f[idx * kElementsPerAccess + i]</code> — **EN:** Continues the current implementation using `output_frag`, `idx`, `kElementsPerAccess`, `i`. **CN:** 使用 `output_frag`, `idx`, `kElementsPerAccess`, `i` 继续当前实现。
+- **L4756** <code>+ beta_ * ref_frag[i]);</code> — **EN:** Completes a declaration involving `beta_`, `ref_frag`, `i`. **CN:** 完成一条与 `beta_`, `ref_frag`, `i` 相关的声明。
+- **L4757** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4758** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4759** <code>access_ptr[0] = frag_ptr[idx];</code> — **EN:** Assigns or initializes a value used by the surrounding type or function. **CN:** 对外围类型或函数使用的值进行赋值或初始化。
+- **L4760** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4761** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4762** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4763** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4764** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4765** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4766** <code>/// Stores a fragment to memory with additional pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4767** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4768** <code>void store_with_byte_offset(</code> — **EN:** Continues the current implementation using `store_with_byte_offset`. **CN:** 使用 `store_with_byte_offset` 继续当前实现。
+- **L4769** <code>Fragment const &amp;frag,                       ///&lt; fragment to store from the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4770** <code>Index byte_offset) const {                  ///&lt; store a tile with a linear offset</code> — **EN:** Continues the current implementation using `Index`, `byte_offset`, `store`, `a`. **CN:** 使用 `Index`, `byte_offset`, `store`, `a` 继续当前实现。
+- **L4771** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4772** <code>store_with_pointer_offset(byte_offset / sizeof(Element));</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4773** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4774** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4775** <code>/// Stores a fragment to memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4776** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4777** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L4778** <code>Fragment &amp;frag,                             ///&lt; fragment to store to the tensor</code> — **EN:** Continues the current implementation using `Fragment`, `frag`, `fragment`, `to`. **CN:** 使用 `Fragment`, `frag`, `fragment`, `to` 继续当前实现。
+- **L4779** <code>TensorCoord const &amp;tile_offset) const {     ///&lt; stores a tile with a logical offset in units of whole tiles</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`, `stores`, `a`. **CN:** 使用 `TensorCoord`, `tile_offset`, `stores`, `a` 继续当前实现。
+- **L4780** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4781** <code>store(frag, tile_offset, 0);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4782** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4783** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4784** <code>/// Stores a fragment from memory with logical offset in units of whole tiles.</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4785** <code>CUTLASS_DEVICE</code> — **EN:** Applies a CUTLASS macro that controls host/device annotation or compilation behavior. **CN:** 应用 CUTLASS 宏以控制主机/设备标注或编译行为。
+- **L4786** <code>void store(</code> — **EN:** Continues the current implementation using `store`. **CN:** 使用 `store` 继续当前实现。
+- **L4787** <code>/// fragment to store to the tensor</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4788** <code>Fragment const &amp;frag,</code> — **EN:** Continues the current implementation using `Fragment`, `frag`. **CN:** 使用 `Fragment`, `frag` 继续当前实现。
+- **L4789** <code>/// stores a tile with a logical offset in units of whole tiles</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4790** <code>TensorCoord const &amp;tile_offset,</code> — **EN:** Continues the current implementation using `TensorCoord`, `tile_offset`. **CN:** 使用 `TensorCoord`, `tile_offset` 继续当前实现。
+- **L4791** <code>/// stores a tile with a logical offset AND a pointer offset</code> — **EN:** Single-line comment documenting the code immediately below or beside it. **CN:** 单行注释，用于说明其下方或旁边的代码。
+- **L4792** <code>Index pointer_offset) const {</code> — **EN:** Continues the current implementation using `Index`, `pointer_offset`. **CN:** 使用 `Index`, `pointer_offset` 继续当前实现。
+- **L4793** <code>store_with_pointer_offset(frag, ref_.offset(tile_offset) + pointer_offset);</code> — **EN:** Declares or defines a function/member that contributes behavior to this abstraction. **CN:** 声明或定义一个函数/成员，为该抽象提供行为。
+- **L4794** <code>}</code> — **EN:** Closes the current scope or control block. **CN:** 关闭当前作用域或控制块。
+- **L4795** <code>};</code> — **EN:** Closes the current type definition and terminates it with a semicolon. **CN:** 结束当前类型定义，并用分号终止。
+- **L4796** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4797** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+- **L4798** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4799** <code>} // namespace warp</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L4800** <code>} // namespace gemm</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L4801** <code>} // namespace cutlass</code> — **EN:** Closes a named scope and documents which scope is ending. **CN:** 关闭一个具名作用域，并注明当前结束的是哪个作用域。
+- **L4802** *(blank)* — **EN:** Blank line separating nearby declarations or code blocks. **CN:** 空行，用于分隔相邻的声明或代码块。
+- **L4803** <code>////////////////////////////////////////////////////////////////////////////////</code> — **EN:** Visual separator comment dividing major sections of the header. **CN:** 视觉分隔注释，用于划分头文件中的主要区段。
+
+## Key Concepts / 关键概念
+
+- **EN:** Theme: this header focuses on generic Tensor Core tile iterators.
+  **CN:** 主题：该头文件重点处理通用 Tensor Core tile 迭代器。
+- **EN:** Primary declarations include `MmaTensorOpMultiplicandTileIterator`, `Shape`, `Element`, `Layout`, `InstructionShape`, `TensorRef`.
+  **CN:** 主要声明包括 `MmaTensorOpMultiplicandTileIterator`、`Shape`、`Element`、`Layout`、`InstructionShape`、`TensorRef`。
+- **EN:** Main namespaces: `cutlass`, `gemm`, `warp`.
+  **CN:** 主要命名空间：`cutlass`、`gemm`、`warp`。
+
+## Dependencies / 依赖关系
+
+- `cutlass/cutlass.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/array.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/numeric_types.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/tensor_ref.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/matrix_shape.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。
+- `cutlass/arch/memory_sm75.h` — **EN:** Provides architecture-specific instruction, memory, or pipeline primitives. **CN:** 提供 架构相关的指令、内存或流水线原语。
+- `cutlass/gemm/gemm.h` — **EN:** Provides other GEMM core types, iterators, or policies. **CN:** 提供 其他 GEMM 核心类型、迭代器或策略。
+- `cutlass/layout/matrix.h` — **EN:** Provides matrix layout descriptors. **CN:** 提供 矩阵布局描述类型。
+- `cutlass/layout/tensor.h` — **EN:** Provides matrix layout descriptors. **CN:** 提供 矩阵布局描述类型。
+- `cutlass/layout/pitch_linear.h` — **EN:** Provides matrix layout descriptors. **CN:** 提供 矩阵布局描述类型。
+- `cutlass/layout/tensor_op_multiplicand_sm75.h` — **EN:** Provides matrix layout descriptors. **CN:** 提供 矩阵布局描述类型。
+- `cutlass/platform/platform.h` — **EN:** Provides platform-portability traits and wrappers. **CN:** 提供 平台可移植 traits 与封装。
+- `cutlass/fast_math.h` — **EN:** Provides foundational CUTLASS utilities and types. **CN:** 提供 CUTLASS 基础工具与类型。

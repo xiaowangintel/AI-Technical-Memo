@@ -1,0 +1,589 @@
+# library_defaults.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/library_defaults.py`
+
+## Purpose / 作用
+- EN: Classes containing valid operations for a given compute capability and data types.
+- CN: 该模块的文档字符串将其描述为：Classes containing valid operations for a given compute capability and data types.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Classes containing valid operations for a given compute capability and data types.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from itertools import combinations_with_replacement` — **EN:** Imports combinations_with_replacement from `itertools`. **CN:** 从 `itertools` 导入 combinations_with_replacement。
+- **L38** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `import cutlass_library` — **EN:** Imports cutlass_library for later use. **CN:** 导入 cutlass_library 供后续使用。
+- **L41** `from cutlass_library.library import ConvKind, IteratorAlgorithm, StrideSupport, GroupMode` — **EN:** Imports ConvKind, IteratorAlgorithm, StrideSupport, GroupMode from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 ConvKind, IteratorAlgorithm, StrideSupport, GroupMode。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L44** `from cutlass_cppgen.utils.check import valid_stage_count` — **EN:** Imports valid_stage_count from `cutlass_cppgen.utils.check`. **CN:** 从 `cutlass_cppgen.utils.check` 导入 valid_stage_count。
+- **L45** `from cutlass_cppgen.utils.datatypes import td_from_profiler_td, td_from_profiler_op` — **EN:** Imports td_from_profiler_td, td_from_profiler_op from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 td_from_profiler_td, td_from_profiler_op。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `_generator_ccs = [50, 60, 61, 70, 75, 80, 90, 100]` — **EN:** Assigns a value to _generator_ccs. **CN:** 将一个值赋给 _generator_ccs。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `class KernelsForDataType:` — **EN:** Defines class `KernelsForDataType`. **CN:** 定义类 `KernelsForDataType`。
+- **L52** `    """` — **EN:** Starts the docstring for the class `KernelsForDataType`. **CN:** 开始说明 class `KernelsForDataType` 的文档字符串。
+- **L53** `    Container class for keeping track of kernels that correspond to a particular combination` — **EN:** Continues the docstring for the class `KernelsForDataType`. **CN:** 继续说明 class `KernelsForDataType` 的文档字符串。
+- **L54** `    of data types for operands A, B, and accumulator` — **EN:** Continues the docstring for the class `KernelsForDataType`. **CN:** 继续说明 class `KernelsForDataType` 的文档字符串。
+- **L55** `    """` — **EN:** Ends the docstring for the class `KernelsForDataType`. **CN:** 结束说明 class `KernelsForDataType` 的文档字符串。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    def __init__(self, datatype_comb: tuple, layout_comb: tuple):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L58** `        self.datatype_comb = datatype_comb` — **EN:** Assigns a value to self.datatype_comb. **CN:** 将一个值赋给 self.datatype_comb。
+- **L59** `        self.layout_comb = layout_comb` — **EN:** Assigns a value to self.layout_comb. **CN:** 将一个值赋给 self.layout_comb。
+- **L60** `        self.math_operations = set()` — **EN:** Assigns a value to self.math_operations. **CN:** 将一个值赋给 self.math_operations。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `        # Dictionary mapping from alignment (int) to a list of kernels that fit the alignment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L63** `        # constraint for the data type combination` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `        self.kernels_by_alignment = {}` — **EN:** Assigns a value to self.kernels_by_alignment. **CN:** 将一个值赋给 self.kernels_by_alignment。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    def add(self, operation):` — **EN:** Defines function `add`. **CN:** 定义函数 `add`。
+- **L67** `        """` — **EN:** Starts the docstring for the function `add`. **CN:** 开始说明 function `add` 的文档字符串。
+- **L68** `        Add an operation to the list of supported kernels` — **EN:** Continues the docstring for the function `add`. **CN:** 继续说明 function `add` 的文档字符串。
+- **L69** `        """` — **EN:** Ends the docstring for the function `add`. **CN:** 结束说明 function `add` 的文档字符串。
+- **L70** `        alignment_key = f"{operation.A.alignment} {operation.B.alignment} {operation.C.alignment}"` — **EN:** Assigns a value to alignment_key. **CN:** 将一个值赋给 alignment_key。
+- **L71** `        if alignment_key not in self.kernels_by_alignment:` — **EN:** Starts a conditional branch guarded by `alignment_key not in self.kernels_by_alignment`. **CN:** 开始一个由 `alignment_key not in self.kernels_by_alignment` 控制的条件分支。
+- **L72** `            self.kernels_by_alignment[alignment_key] = []` — **EN:** Assigns a value to self.kernels_by_alignment[alignment_key]. **CN:** 将一个值赋给 self.kernels_by_alignment[alignment_key]。
+- **L73** `        self.kernels_by_alignment[alignment_key].append(operation)` — **EN:** Invokes `self.kernels_by_alignment[alignment_key].append` as a standalone call. **CN:** 以独立语句方式调用 `self.kernels_by_alignment[alignment_key].append`。
+- **L74** `        self.math_operations.add(operation.tile_description.math_instruction.math_operation)` — **EN:** Invokes `self.math_operations.add` as a standalone call. **CN:** 以独立语句方式调用 `self.math_operations.add`。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    def alignments(self, operand: str):` — **EN:** Defines function `alignments`. **CN:** 定义函数 `alignments`。
+- **L77** `        """` — **EN:** Starts the docstring for the function `alignments`. **CN:** 开始说明 function `alignments` 的文档字符串。
+- **L78** `        Returns an unsorted list of alignments supported by this data type combination` — **EN:** Continues the docstring for the function `alignments`. **CN:** 继续说明 function `alignments` 的文档字符串。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `        :param operand: identifier of operand in question (e.g., A, B, C)` — **EN:** Continues the docstring for the function `alignments`. **CN:** 继续说明 function `alignments` 的文档字符串。
+- **L81** `        :type operand: str` — **EN:** Continues the docstring for the function `alignments`. **CN:** 继续说明 function `alignments` 的文档字符串。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `        :return: unsorted list of alignments supported by this data type combination` — **EN:** Continues the docstring for the function `alignments`. **CN:** 继续说明 function `alignments` 的文档字符串。
+- **L84** `        :rtype: list` — **EN:** Continues the docstring for the function `alignments`. **CN:** 继续说明 function `alignments` 的文档字符串。
+- **L85** `        """` — **EN:** Ends the docstring for the function `alignments`. **CN:** 结束说明 function `alignments` 的文档字符串。
+- **L86** `        operand_idx = self._operand_idx(operand)` — **EN:** Assigns a value to operand_idx. **CN:** 将一个值赋给 operand_idx。
+- **L87** `        return [int(key.split(" ")[operand_idx]) for key in self.kernels_by_alignment.keys()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L90** `    def all_operations(self):` — **EN:** Defines function `all_operations`. **CN:** 定义函数 `all_operations`。
+- **L91** `        """` — **EN:** Starts the docstring for the function `all_operations`. **CN:** 开始说明 function `all_operations` 的文档字符串。
+- **L92** `        Returns a list of all operations supported by this data type combination` — **EN:** Continues the docstring for the function `all_operations`. **CN:** 继续说明 function `all_operations` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `        :return: list of all operations supported by this data type combination` — **EN:** Continues the docstring for the function `all_operations`. **CN:** 继续说明 function `all_operations` 的文档字符串。
+- **L95** `        :rtype: list` — **EN:** Continues the docstring for the function `all_operations`. **CN:** 继续说明 function `all_operations` 的文档字符串。
+- **L96** `        """` — **EN:** Ends the docstring for the function `all_operations`. **CN:** 结束说明 function `all_operations` 的文档字符串。
+- **L97** `        ops = []` — **EN:** Assigns a value to ops. **CN:** 将一个值赋给 ops。
+- **L98** `        for _, alignment_ops in self.kernels_by_alignment.items():` — **EN:** Starts a loop assigning items from `self.kernels_by_alignment.items()` to `(_, alignment_ops)`. **CN:** 开始一个循环，将 `self.kernels_by_alignment.items()` 的元素赋给 `(_, alignment_ops)`。
+- **L99** `            ops.extend(alignment_ops)` — **EN:** Invokes `ops.extend` as a standalone call. **CN:** 以独立语句方式调用 `ops.extend`。
+- **L100** `        return ops` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def default_operation(self, math_operation: cutlass_cppgen.MathOperation):` — **EN:** Defines function `default_operation`. **CN:** 定义函数 `default_operation`。
+- **L103** `        key = sorted(list(self.kernels_by_alignment.keys()))[0]` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L104** `        kernels = self.kernels_by_alignment[key]` — **EN:** Assigns a value to kernels. **CN:** 将一个值赋给 kernels。
+- **L105** `        if math_operation is not None:` — **EN:** Starts a conditional branch guarded by `math_operation is not None`. **CN:** 开始一个由 `math_operation is not None` 控制的条件分支。
+- **L106** `            kernels = [x for x in kernels if x.tile_description.math_instruction.math_operation == math_operation]` — **EN:** Assigns a value to kernels. **CN:** 将一个值赋给 kernels。
+- **L107** `        return kernels[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    def operations(self, alignment_A: int, alignment_B: int, alignment_C: int, math_operation: cutlass_cppgen.MathOperation):` — **EN:** Defines function `operations`. **CN:** 定义函数 `operations`。
+- **L110** `        """` — **EN:** Starts the docstring for the function `operations`. **CN:** 开始说明 function `operations` 的文档字符串。
+- **L111** `        Returns operations satisfying the alignment constraints` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `        :param alignment_A: alignment constraint of operations to return` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L114** `        :type alignment_A: int` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L115** `        :param alignment_B: alignment constraint of operations to return` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L116** `        :type alignment_B: int` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L117** `        :param alignment_C: alignment constraint of operations to return` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L118** `        :type alignment_C: int` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L119** `        :param math_operation: math operation to consider` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L120** `        :type math_operation: cutlass_cppgen.MathOperation` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `        :return: list of operations` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L123** `        :rtype: list` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L124** `        """` — **EN:** Ends the docstring for the function `operations`. **CN:** 结束说明 function `operations` 的文档字符串。
+- **L125** `        key = f"{alignment_A} {alignment_B} {alignment_C}"` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `        if key not in self.kernels_by_alignment:` — **EN:** Starts a conditional branch guarded by `key not in self.kernels_by_alignment`. **CN:** 开始一个由 `key not in self.kernels_by_alignment` 控制的条件分支。
+- **L128** `            og_key = key` — **EN:** Assigns a value to og_key. **CN:** 将一个值赋给 og_key。
+- **L129** `            # Reconcile A, B, and C alignments by trying to align to the minimum` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L130** `            min_alignment = min(alignment_A, alignment_B, alignment_C)` — **EN:** Assigns a value to min_alignment. **CN:** 将一个值赋给 min_alignment。
+- **L131** `            key = f"{min_alignment} {min_alignment} {min_alignment}"` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L132** `            if key not in self.kernels_by_alignment:` — **EN:** Starts a conditional branch guarded by `key not in self.kernels_by_alignment`. **CN:** 开始一个由 `key not in self.kernels_by_alignment` 控制的条件分支。
+- **L133** `                # Finally, go through all available alignment combinations and find` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L134** `                # one for which all values are less than those passed in.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L135** `                key = None` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L136** `                alignments = sorted([tuple(int(x) for x in k.split(" ")) for k in self.kernels_by_alignment.keys()], reverse=True)` — **EN:** Assigns a value to alignments. **CN:** 将一个值赋给 alignments。
+- **L137** `                for align_A, align_B, align_C in alignments:` — **EN:** Starts a loop assigning items from `alignments` to `(align_A, align_B, align_C)`. **CN:** 开始一个循环，将 `alignments` 的元素赋给 `(align_A, align_B, align_C)`。
+- **L138** `                    if alignment_A % align_A == 0 and alignment_B % align_B == 0 and alignment_C % align_C == 0:` — **EN:** Starts a conditional branch guarded by `alignment_A % align_A == 0 and alignment_B % align_B == 0...`. **CN:** 开始一个由 `alignment_A % align_A == 0 and alignment_B % align_B == 0...` 控制的条件分支。
+- **L139** `                        key = f"{align_A} {align_B} {align_C}"` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L140** `                        break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `                if key is None:` — **EN:** Starts a conditional branch guarded by `key is None`. **CN:** 开始一个由 `key is None` 控制的条件分支。
+- **L143** `                    raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L144** `                        f"No operations of alignment {og_key} found for data type and layout "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `                        f"combination {self.datatype_comb} {self.layout_comb}. Compatible alignments "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `                        f"are {self.kernels_by_alignment.keys()}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `        ops = self.kernels_by_alignment[key]` — **EN:** Assigns a value to ops. **CN:** 将一个值赋给 ops。
+- **L150** `        if math_operation is not None:` — **EN:** Starts a conditional branch guarded by `math_operation is not None`. **CN:** 开始一个由 `math_operation is not None` 控制的条件分支。
+- **L151** `            ops = [op for op in ops if op.tile_description.math_instruction.math_operation == math_operation]` — **EN:** Assigns a value to ops. **CN:** 将一个值赋给 ops。
+- **L152** `        return ops` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `    def _operand_idx(self, key: str) -> int:` — **EN:** Defines function `_operand_idx`. **CN:** 定义函数 `_operand_idx`。
+- **L155** `        operand_list = ["A", "B", "C"]` — **EN:** Assigns a value to operand_list. **CN:** 将一个值赋给 operand_list。
+- **L156** `        if key not in operand_list:` — **EN:** Starts a conditional branch guarded by `key not in operand_list`. **CN:** 开始一个由 `key not in operand_list` 控制的条件分支。
+- **L157** `            raise Exception(f"Unexpected operand {operand}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `        return operand_list.index(key)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    def find_alignment(self, shape: tuple, layout: cutlass_cppgen.LayoutType, operand=str) -> int:` — **EN:** Defines function `find_alignment`. **CN:** 定义函数 `find_alignment`。
+- **L162** `        """` — **EN:** Starts the docstring for the function `find_alignment`. **CN:** 开始说明 function `find_alignment` 的文档字符串。
+- **L163** `        Returns the most preferable alignment for a given shape and layout` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `        :param shape: extent of each dimension of the tensor` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L166** `        :type shape: tuple` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L167** `        :param layout: layout of the tensor` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L168** `        :type layout: cutlass_cppgen.LayoutType` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L169** `        :param operand: descriptor of the operand in question` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L170** `        :type operand: str` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `        :return: maximum alignment supported by the data type combination and tensor size` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L173** `        :rtype: int` — **EN:** Continues the docstring for the function `find_alignment`. **CN:** 继续说明 function `find_alignment` 的文档字符串。
+- **L174** `        """` — **EN:** Ends the docstring for the function `find_alignment`. **CN:** 结束说明 function `find_alignment` 的文档字符串。
+- **L175** `        operand_idx = self._operand_idx(operand)` — **EN:** Assigns a value to operand_idx. **CN:** 将一个值赋给 operand_idx。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `        # Determine the leading dimension of the shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L178** `        if layout == cutlass_cppgen.LayoutType.ColumnMajor:` — **EN:** Starts a conditional branch guarded by `layout == cutlass_cppgen.LayoutType.ColumnMajor`. **CN:** 开始一个由 `layout == cutlass_cppgen.LayoutType.ColumnMajor` 控制的条件分支。
+- **L179** `            ld = shape[-2]` — **EN:** Assigns a value to ld. **CN:** 将一个值赋给 ld。
+- **L180** `        elif layout == cutlass_cppgen.LayoutType.RowMajor:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L181** `            ld = shape[-1]` — **EN:** Assigns a value to ld. **CN:** 将一个值赋给 ld。
+- **L182** `        elif layout == cutlass_cppgen.LayoutType.TensorNHWC:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L183** `            ld = shape[-1]` — **EN:** Assigns a value to ld. **CN:** 将一个值赋给 ld。
+- **L184** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L185** `            raise Exception(f"Unexpected or unsupported layout {layout}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        for alignments in sorted(list(self.kernels_by_alignment.keys()), reverse=True):` — **EN:** Starts a loop assigning items from `sorted(list(self.kernels_by_alignment.keys()), ...` to `alignments`. **CN:** 开始一个循环，将 `sorted(list(self.kernels_by_alignment.keys()), ...` 的元素赋给 `alignments`。
+- **L188** `            alignment = int(alignments.split(" ")[operand_idx])` — **EN:** Assigns a value to alignment. **CN:** 将一个值赋给 alignment。
+- **L189** `            if ld % alignment == 0:` — **EN:** Starts a conditional branch guarded by `ld % alignment == 0`. **CN:** 开始一个由 `ld % alignment == 0` 控制的条件分支。
+- **L190** `                return alignment` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `        # Default to alignment of 1 if no others match` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L193** `        return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** `    def sort(self):` — **EN:** Defines function `sort`. **CN:** 定义函数 `sort`。
+- **L196** `        """` — **EN:** Starts the docstring for the function `sort`. **CN:** 开始说明 function `sort` 的文档字符串。
+- **L197** `        Sorts each list of kernels in \`kernels_by_alignment\` in descending order of threadblock shape` — **EN:** Continues the docstring for the function `sort`. **CN:** 继续说明 function `sort` 的文档字符串。
+- **L198** `        """` — **EN:** Ends the docstring for the function `sort`. **CN:** 结束说明 function `sort` 的文档字符串。
+- **L199** `        key = lambda op: (` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L200** `            op.tile_description.threadblock_shape[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `            * op.tile_description.threadblock_shape[1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `            * op.tile_description.threadblock_shape[2]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `        for alignment in self.kernels_by_alignment.keys():` — **EN:** Starts a loop assigning items from `self.kernels_by_alignment.keys()` to `alignment`. **CN:** 开始一个循环，将 `self.kernels_by_alignment.keys()` 的元素赋给 `alignment`。
+- **L205** `            self.kernels_by_alignment[alignment].sort(key=key, reverse=True)` — **EN:** Invokes `self.kernels_by_alignment[alignment].sort` as a standalone call. **CN:** 以独立语句方式调用 `self.kernels_by_alignment[alignment].sort`。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** `    def supports_math_operation(self, math_operation: cutlass_cppgen.MathOperation) -> bool:` — **EN:** Defines function `supports_math_operation`. **CN:** 定义函数 `supports_math_operation`。
+- **L208** `        """` — **EN:** Starts the docstring for the function `supports_math_operation`. **CN:** 开始说明 function `supports_math_operation` 的文档字符串。
+- **L209** `        Returns whether \`math_operation\` is supported by at least one operation.` — **EN:** Continues the docstring for the function `supports_math_operation`. **CN:** 继续说明 function `supports_math_operation` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `        :param math_operation: math operation to consider` — **EN:** Continues the docstring for the function `supports_math_operation`. **CN:** 继续说明 function `supports_math_operation` 的文档字符串。
+- **L212** `        :type math_operation: cutlass_cppgen.MathOperation` — **EN:** Continues the docstring for the function `supports_math_operation`. **CN:** 继续说明 function `supports_math_operation` 的文档字符串。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `        :return: whether math_operation is supported by at least one operation` — **EN:** Continues the docstring for the function `supports_math_operation`. **CN:** 继续说明 function `supports_math_operation` 的文档字符串。
+- **L215** `        :rtype: bool` — **EN:** Continues the docstring for the function `supports_math_operation`. **CN:** 继续说明 function `supports_math_operation` 的文档字符串。
+- **L216** `        """` — **EN:** Ends the docstring for the function `supports_math_operation`. **CN:** 结束说明 function `supports_math_operation` 的文档字符串。
+- **L217** `        return math_operation is None or math_operation in self.math_operations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** `class ArchOptions:` — **EN:** Defines class `ArchOptions`. **CN:** 定义类 `ArchOptions`。
+- **L221** `    """` — **EN:** Starts the docstring for the class `ArchOptions`. **CN:** 开始说明 class `ArchOptions` 的文档字符串。
+- **L222** `    Structure for keeping track of kernels available on a given compute capability` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `    :param target_cc: compute capability of the device on which kernels will be run` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L225** `    :type target_cc: int` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L226** `    :param kernel_cc: compute capability of the kernels to generate` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L227** `    :type kernel_cc: int` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L228** `    :param operation_kind: type of operation to register` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L229** `    :type operation_kind: cutlass_library.OperationKind` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L230** `    :param gemm_kinds: types of GEMM operations that can be included` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L231** `    :type gemm_kinds: list` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L232** `    :param allowed_math_operations: types of primitive math operations allowed` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L233** `    :type allowed_math_operations: list` — **EN:** Continues the docstring for the class `ArchOptions`. **CN:** 继续说明 class `ArchOptions` 的文档字符串。
+- **L234** `    """` — **EN:** Ends the docstring for the class `ArchOptions`. **CN:** 结束说明 class `ArchOptions` 的文档字符串。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L237** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L238** `        target_cc: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L239** `        kernel_cc: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `        operation_kind: cutlass_library.OperationKind,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `        gemm_kinds: list,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L242** `        allowed_math_operations: list = [` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L243** `            cutlass_library.MathOperation.multiply_add,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L244** `            cutlass_library.MathOperation.multiply_add_saturate,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L245** `            cutlass_library.MathOperation.multiply_add_mixed_input_upcast,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L246** `            cutlass_library.MathOperation.multiply_add_fast_f32` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L247** `        ]` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L248** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L249** `        self.cc = kernel_cc` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `        # Dictionary with following structure:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L252** `        #  Key: OpcodeClass` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L253** `        #  Value: Dictionary with the following structure:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L254** `        #     Key: tuple of ((DataType, DataType, DataType), (LayoutType, LayoutType, LayoutType),` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L255** `        #          representing ((element_a, element_b, element_accumulator), (layout_a, layout_b))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L256** `        #     Value: KernelsForDataType` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L257** `        self.operations_by_opclass = {}` — **EN:** Assigns a value to self.operations_by_opclass. **CN:** 将一个值赋给 self.operations_by_opclass。
+- **L258** `        self.op_class = None` — **EN:** Assigns a value to self.op_class. **CN:** 将一个值赋给 self.op_class。
+- **L259** `        self.allowed_math_operations = allowed_math_operations` — **EN:** Assigns a value to self.allowed_math_operations. **CN:** 将一个值赋给 self.allowed_math_operations。
+- **L260** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L261** `        if target_cc == 100 and kernel_cc == 90 or target_cc == 90 and kernel_cc == 100:` — **EN:** Starts a conditional branch guarded by `target_cc == 100 and kernel_cc == 90 or (target_cc == 90 ...`. **CN:** 开始一个由 `target_cc == 100 and kernel_cc == 90 or (target_cc == 90 ...` 控制的条件分支。
+- **L262** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `        # Identify the method within CUTLASS generator script that generates kernel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L265** `        # descriptions for the target CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L266** `        generate_function_name = "GenerateSM" + str(kernel_cc)` — **EN:** Assigns a value to generate_function_name. **CN:** 将一个值赋给 generate_function_name。
+- **L267** `        if not hasattr(cutlass_library.generator, generate_function_name):` — **EN:** Starts a conditional branch guarded by `not hasattr(cutlass_library.generator, generate_function_...`. **CN:** 开始一个由 `not hasattr(cutlass_library.generator, generate_function_...` 控制的条件分支。
+- **L268** `            cutlass_cppgen.logger.warning(f"No generator found for architecture {kernel_cc}")` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L269** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L270** `        generate_function = getattr(cutlass_library.generator, generate_function_name)` — **EN:** Assigns a value to generate_function. **CN:** 将一个值赋给 generate_function。
+- **L271** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L272** `        # Initialize a default manifest and populate it with valid kernel descriptions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L273** `        # for the target CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L274** `        args = [` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L275** `            "--kernels=all",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `            f"--log-level={logging.getLevelName(cutlass_cppgen.logger.level)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `        manifest_args = cutlass_library.generator.define_parser().parse_args(args)` — **EN:** Assigns a value to manifest_args. **CN:** 将一个值赋给 manifest_args。
+- **L279** `        manifest = cutlass_library.manifest.Manifest(manifest_args)` — **EN:** Assigns a value to manifest. **CN:** 将一个值赋给 manifest。
+- **L280** `        generate_function(manifest, cutlass_cppgen._nvcc_version)` — **EN:** Invokes `generate_function` as a standalone call. **CN:** 以独立语句方式调用 `generate_function`。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `        if operation_kind not in manifest.operations:` — **EN:** Starts a conditional branch guarded by `operation_kind not in manifest.operations`. **CN:** 开始一个由 `operation_kind not in manifest.operations` 控制的条件分支。
+- **L283** `            # No kernels generated for this architecture, this could be because the CUDA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L284** `            # toolkit is insufficient to support operations in this CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L285** `            cutlass_cppgen.logger.warning(f"No operations of type {operation_kind} found for CC {kernel_cc}")` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L286** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `        # Only one CC should be returned, given the setup above of calling only the generation scripts` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L289** `        # for a given CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L290** `        if len(manifest.operations[operation_kind].keys()) != 1 or kernel_cc not in manifest.operations[operation_kind]:` — **EN:** Starts a conditional branch guarded by `len(manifest.operations[operation_kind].keys()) != 1 or k...`. **CN:** 开始一个由 `len(manifest.operations[operation_kind].keys()) != 1 or k...` 控制的条件分支。
+- **L291** `            raise Exception(f"Error finding kernels for SM{kernel_cc}. Check that your CUDA toolkit version "` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L292** `                             "is sufficient for the architecture in question.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** `        # Iterate through the available operations for this operation kind and` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L295** `        # find available opclasses and data types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L296** `        for name, op_list in manifest.operations[operation_kind][kernel_cc].items():` — **EN:** Starts a loop assigning items from `manifest.operations[operation_kind][kernel_cc]....` to `(name, op_list)`. **CN:** 开始一个循环，将 `manifest.operations[operation_kind][kernel_cc]....` 的元素赋给 `(name, op_list)`。
+- **L297** `            for op in op_list:` — **EN:** Starts a loop assigning items from `op_list` to `op`. **CN:** 开始一个循环，将 `op_list` 的元素赋给 `op`。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `                if operation_kind == cutlass_library.OperationKind.Gemm:` — **EN:** Starts a conditional branch guarded by `operation_kind == cutlass_library.OperationKind.Gemm`. **CN:** 开始一个由 `operation_kind == cutlass_library.OperationKind.Gemm` 控制的条件分支。
+- **L300** `                    if op.gemm_kind not in gemm_kinds:` — **EN:** Starts a conditional branch guarded by `op.gemm_kind not in gemm_kinds`. **CN:** 开始一个由 `op.gemm_kind not in gemm_kinds` 控制的条件分支。
+- **L301** `                        continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `                mi = op.tile_description.math_instruction` — **EN:** Assigns a value to mi. **CN:** 将一个值赋给 mi。
+- **L304** `                if mi.math_operation not in self.allowed_math_operations:` — **EN:** Starts a conditional branch guarded by `mi.math_operation not in self.allowed_math_operations`. **CN:** 开始一个由 `mi.math_operation not in self.allowed_math_operations` 控制的条件分支。
+- **L305** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `                # Prune operations that don't fit in shared memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L308** `                td = td_from_profiler_op(op)` — **EN:** Assigns a value to td. **CN:** 将一个值赋给 td。
+- **L309** `                if not valid_stage_count(target_cc, kernel_cc, td, verbose=False)[0]:` — **EN:** Starts a conditional branch guarded by `not valid_stage_count(target_cc, kernel_cc, td, verbose=F...`. **CN:** 开始一个由 `not valid_stage_count(target_cc, kernel_cc, td, verbose=F...` 控制的条件分支。
+- **L310** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `                if mi.opcode_class not in self.operations_by_opclass:` — **EN:** Starts a conditional branch guarded by `mi.opcode_class not in self.operations_by_opclass`. **CN:** 开始一个由 `mi.opcode_class not in self.operations_by_opclass` 控制的条件分支。
+- **L313** `                    self.operations_by_opclass[mi.opcode_class] = {}` — **EN:** Assigns a value to self.operations_by_opclass[mi.opcode_class]. **CN:** 将一个值赋给 self.operations_by_opclass[mi.opcode_class]。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `                datatype_comb = (mi.element_a, mi.element_b, mi.element_accumulator)` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L316** `                layout_comb = (op.A.layout, op.B.layout)` — **EN:** Assigns a value to layout_comb. **CN:** 将一个值赋给 layout_comb。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `                # Register TF32 kernels as F32 to enable F32 -> TF32 conversion + TF32 Tensor Core operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L319** `                if datatype_comb == (cutlass_library.DataType.tf32, cutlass_library.DataType.tf32, cutlass_library.DataType.f32):` — **EN:** Starts a conditional branch guarded by `datatype_comb == (cutlass_library.DataType.tf32, cutlass_...`. **CN:** 开始一个由 `datatype_comb == (cutlass_library.DataType.tf32, cutlass_...` 控制的条件分支。
+- **L320** `                    # TF32 kernels only supported on SM80 and beyond` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L321** `                    if self.cc < 80:` — **EN:** Starts a conditional branch guarded by `self.cc < 80`. **CN:** 开始一个由 `self.cc < 80` 控制的条件分支。
+- **L322** `                        continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L323** `                    elif self.cc == 90 or self.cc == 100:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L324** `                        if (op.A.element != cutlass_library.DataType.f32` — **EN:** Starts a conditional branch guarded by `op.A.element != cutlass_library.DataType.f32 or op.B.elem...`. **CN:** 开始一个由 `op.A.element != cutlass_library.DataType.f32 or op.B.elem...` 控制的条件分支。
+- **L325** `                            or op.B.element != cutlass_library.DataType.f32` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L326** `                            or op.C.element != cutlass_library.DataType.f32):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L327** `                            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `                    datatype_comb = (cutlass_library.DataType.f32, cutlass_library.DataType.f32, cutlass_library.DataType.f32)` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `                opclass_dict = self.operations_by_opclass[mi.opcode_class]` — **EN:** Assigns a value to opclass_dict. **CN:** 将一个值赋给 opclass_dict。
+- **L332** `                key = (datatype_comb, layout_comb)` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L333** `                if key not in opclass_dict:` — **EN:** Starts a conditional branch guarded by `key not in opclass_dict`. **CN:** 开始一个由 `key not in opclass_dict` 控制的条件分支。
+- **L334** `                    opclass_dict[key] = KernelsForDataType(datatype_comb, layout_comb)` — **EN:** Assigns a value to opclass_dict[key]. **CN:** 将一个值赋给 opclass_dict[key]。
+- **L335** `                opclass_dict[key].add(op)` — **EN:** Invokes `opclass_dict[key].add` as a standalone call. **CN:** 以独立语句方式调用 `opclass_dict[key].add`。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `        # Set the default opclass to TensorOp, if available. Otherwise default to SIMT` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L338** `        if cutlass_library.OpcodeClass.TensorOp in self.operations_by_opclass:` — **EN:** Starts a conditional branch guarded by `cutlass_library.OpcodeClass.TensorOp in self.operations_b...`. **CN:** 开始一个由 `cutlass_library.OpcodeClass.TensorOp in self.operations_b...` 控制的条件分支。
+- **L339** `            self.op_class = cutlass_library.OpcodeClass.TensorOp` — **EN:** Assigns a value to self.op_class. **CN:** 将一个值赋给 self.op_class。
+- **L340** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L341** `            self.op_class = cutlass_library.OpcodeClass.Simt` — **EN:** Assigns a value to self.op_class. **CN:** 将一个值赋给 self.op_class。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `        # The profiler's generator may generate only a limited set of combinations of operands for SIMT kernels.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L344** `        # Here, we generate additional versions via a generic TileDescription.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L345** `        if cutlass_library.OpcodeClass.Simt not in self.operations_by_opclass:` — **EN:** Starts a conditional branch guarded by `cutlass_library.OpcodeClass.Simt not in self.operations_b...`. **CN:** 开始一个由 `cutlass_library.OpcodeClass.Simt not in self.operations_b...` 控制的条件分支。
+- **L346** `            self.operations_by_opclass[cutlass_library.OpcodeClass.Simt] = {}` — **EN:** Assigns a value to self.operations_by_opclass[cutlass_library.OpcodeClass.Simt]. **CN:** 将一个值赋给 self.operations_by_opclass[cutlass_library.OpcodeClass.Simt]。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `        if operation_kind == cutlass_library.OperationKind.Gemm:` — **EN:** Starts a conditional branch guarded by `operation_kind == cutlass_library.OperationKind.Gemm`. **CN:** 开始一个由 `operation_kind == cutlass_library.OperationKind.Gemm` 控制的条件分支。
+- **L349** `            types = [` — **EN:** Assigns a value to types. **CN:** 将一个值赋给 types。
+- **L350** `                (cutlass_library.DataType.s8, cutlass_library.DataType.s8, cutlass_library.DataType.s8),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `                (cutlass_library.DataType.s8, cutlass_library.DataType.s8, cutlass_library.DataType.s32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `                (cutlass_library.DataType.f16, cutlass_library.DataType.f16, cutlass_library.DataType.f16),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `                (cutlass_library.DataType.f16, cutlass_library.DataType.f16, cutlass_library.DataType.f32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `                (cutlass_library.DataType.f32, cutlass_library.DataType.f32, cutlass_library.DataType.f32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `                (cutlass_library.DataType.f64, cutlass_library.DataType.f64, cutlass_library.DataType.f64),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `            # Add FP8 A/B/C` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L359** `            fp8_types = [cutlass_library.DataType.e4m3, cutlass_library.DataType.e5m2]` — **EN:** Assigns a value to fp8_types. **CN:** 将一个值赋给 fp8_types。
+- **L360** `            for type_comb in combinations_with_replacement(fp8_types, 3):` — **EN:** Starts a loop assigning items from `combinations_with_replacement(fp8_types, 3)` to `type_comb`. **CN:** 开始一个循环，将 `combinations_with_replacement(fp8_types, 3)` 的元素赋给 `type_comb`。
+- **L361** `                types.append(type_comb)` — **EN:** Invokes `types.append` as a standalone call. **CN:** 以独立语句方式调用 `types.append`。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** `            # Add FP8 A/B with FP32 C` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L364** `            for type_comb in combinations_with_replacement(fp8_types, 2):` — **EN:** Starts a loop assigning items from `combinations_with_replacement(fp8_types, 2)` to `type_comb`. **CN:** 开始一个循环，将 `combinations_with_replacement(fp8_types, 2)` 的元素赋给 `type_comb`。
+- **L365** `                types.append(type_comb + (cutlass_cppgen.DataType.f32,))` — **EN:** Invokes `types.append` as a standalone call. **CN:** 以独立语句方式调用 `types.append`。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** `            layouts = [` — **EN:** Assigns a value to layouts. **CN:** 将一个值赋给 layouts。
+- **L368** `                (cutlass_library.LayoutType.RowMajor, cutlass_library.LayoutType.RowMajor),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `                (cutlass_library.LayoutType.RowMajor, cutlass_library.LayoutType.ColumnMajor),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `                (cutlass_library.LayoutType.ColumnMajor, cutlass_library.LayoutType.RowMajor),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `                (cutlass_library.LayoutType.ColumnMajor, cutlass_library.LayoutType.ColumnMajor),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `        elif operation_kind == cutlass_library.OperationKind.Conv2d:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L374** `            types = [` — **EN:** Assigns a value to types. **CN:** 将一个值赋给 types。
+- **L375** `                (cutlass_library.DataType.f16, cutlass_library.DataType.f16, cutlass_library.DataType.f16),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `                (cutlass_library.DataType.f16, cutlass_library.DataType.f16, cutlass_library.DataType.f32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `                (cutlass_library.DataType.f32, cutlass_library.DataType.f32, cutlass_library.DataType.f32),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `                (cutlass_library.DataType.f64, cutlass_library.DataType.f64, cutlass_library.DataType.f64),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L380** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L381** `            layouts = [` — **EN:** Assigns a value to layouts. **CN:** 将一个值赋给 layouts。
+- **L382** `                (cutlass_library.LayoutType.TensorNHWC, cutlass_library.LayoutType.TensorNHWC),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L385** `            raise NotImplementedError(f"Operation kind {operation_kind} is currently unsupported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `        alignment = 1` — **EN:** Assigns a value to alignment. **CN:** 将一个值赋给 alignment。
+- **L388** `        epilogue_functor = cutlass_library.EpilogueFunctor.LinearCombination` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L389** `        swizzling_functor = cutlass_library.SwizzlingFunctor.Identity8` — **EN:** Assigns a value to swizzling_functor. **CN:** 将一个值赋给 swizzling_functor。
+- **L390** `        for type_comb in types:` — **EN:** Starts a loop assigning items from `types` to `type_comb`. **CN:** 开始一个循环，将 `types` 的元素赋给 `type_comb`。
+- **L391** `            for layout_comb in layouts:` — **EN:** Starts a loop assigning items from `layouts` to `layout_comb`. **CN:** 开始一个循环，将 `layouts` 的元素赋给 `layout_comb`。
+- **L392** `                comb = (type_comb, layout_comb)` — **EN:** Assigns a value to comb. **CN:** 将一个值赋给 comb。
+- **L393** `                if comb in self.operations_by_opclass[cutlass_library.OpcodeClass.Simt]:` — **EN:** Starts a conditional branch guarded by `comb in self.operations_by_opclass[cutlass_library.Opcode...`. **CN:** 开始一个由 `comb in self.operations_by_opclass[cutlass_library.Opcode...` 控制的条件分支。
+- **L394** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L395** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L396** `                A = cutlass_library.TensorDescription(type_comb[0], layout_comb[0], alignment)` — **EN:** Assigns a value to A. **CN:** 将一个值赋给 A。
+- **L397** `                B = cutlass_library.TensorDescription(type_comb[1], layout_comb[1], alignment)` — **EN:** Assigns a value to B. **CN:** 将一个值赋给 B。
+- **L398** `                C = cutlass_library.TensorDescription(type_comb[2], cutlass_library.LayoutType.ColumnMajor, alignment)` — **EN:** Assigns a value to C. **CN:** 将一个值赋给 C。
+- **L399** `                math_inst = cutlass_library.MathInstruction(` — **EN:** Assigns a value to math_inst. **CN:** 将一个值赋给 math_inst。
+- **L400** `                    [1, 1, 1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `                    type_comb[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `                    type_comb[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `                    type_comb[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** `                    cutlass_library.OpcodeClass.Simt,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** `                    cutlass_library.MathOperation.multiply_add` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L406** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** `                td = cutlass_library.TileDescription(` — **EN:** Assigns a value to td. **CN:** 将一个值赋给 td。
+- **L409** `                    [128, 128, 8], 2, [4, 2, 1], math_inst, 50, 1024)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `                # Prune operations that don't fit in shared memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L412** `                if not valid_stage_count(target_cc, kernel_cc, td_from_profiler_td(td), verbose=False)[0]:` — **EN:** Starts a conditional branch guarded by `not valid_stage_count(target_cc, kernel_cc, td_from_profi...`. **CN:** 开始一个由 `not valid_stage_count(target_cc, kernel_cc, td_from_profi...` 控制的条件分支。
+- **L413** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `                new_kernels = KernelsForDataType(type_comb, layout_comb)` — **EN:** Assigns a value to new_kernels. **CN:** 将一个值赋给 new_kernels。
+- **L416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L417** `                if operation_kind == cutlass_library.OperationKind.Gemm:` — **EN:** Starts a conditional branch guarded by `operation_kind == cutlass_library.OperationKind.Gemm`. **CN:** 开始一个由 `operation_kind == cutlass_library.OperationKind.Gemm` 控制的条件分支。
+- **L418** `                    new_operation = cutlass_library.manifest.GemmOperation(` — **EN:** Assigns a value to new_operation. **CN:** 将一个值赋给 new_operation。
+- **L419** `                        cutlass_library.GemmKind.Universal, td.minimum_compute_capability,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** `                        td, A, B, C, type_comb[2], epilogue_functor, swizzling_functor)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L421** `                    new_kernels.add(new_operation)` — **EN:** Invokes `new_kernels.add` as a standalone call. **CN:** 以独立语句方式调用 `new_kernels.add`。
+- **L422** `                elif operation_kind == cutlass_library.OperationKind.Conv2d:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L423** `                    for conv_kind in [ConvKind.Fprop, ConvKind.Dgrad, ConvKind.Wgrad]:` — **EN:** Starts a loop assigning items from `[ConvKind.Fprop, ConvKind.Dgrad, ConvKind.Wgrad]` to `conv_kind`. **CN:** 开始一个循环，将 `[ConvKind.Fprop, ConvKind.Dgrad, ConvKind.Wgrad]` 的元素赋给 `conv_kind`。
+- **L424** `                        new_operation = cutlass_library.manifest.Conv2dOperation(` — **EN:** Assigns a value to new_operation. **CN:** 将一个值赋给 new_operation。
+- **L425** `                            conv_kind, IteratorAlgorithm.Analytic, td.minimum_compute_capability, td,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `                            A, B, C, type_comb[2], StrideSupport.Strided, epilogue_functor, swizzling_functor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L427** `                            group_mode=GroupMode.SingleGroup` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L428** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `                        new_kernels.add(new_operation)` — **EN:** Invokes `new_kernels.add` as a standalone call. **CN:** 以独立语句方式调用 `new_kernels.add`。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `                self.operations_by_opclass[cutlass_library.OpcodeClass.Simt][comb] = new_kernels` — **EN:** Assigns a value to self.operations_by_opclass[cutlass_library.OpcodeClass.Si.... **CN:** 将一个值赋给 self.operations_by_opclass[cutlass_library.OpcodeClass.Si...。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `        # Sort all operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L434** `        for oc in self.operations_by_opclass.keys():` — **EN:** Starts a loop assigning items from `self.operations_by_opclass.keys()` to `oc`. **CN:** 开始一个循环，将 `self.operations_by_opclass.keys()` 的元素赋给 `oc`。
+- **L435** `            for comb in self.operations_by_opclass[oc].keys():` — **EN:** Starts a loop assigning items from `self.operations_by_opclass[oc].keys()` to `comb`. **CN:** 开始一个循环，将 `self.operations_by_opclass[oc].keys()` 的元素赋给 `comb`。
+- **L436** `                self.operations_by_opclass[oc][comb].sort()` — **EN:** Invokes `self.operations_by_opclass[oc][comb].sort` as a standalone call. **CN:** 以独立语句方式调用 `self.operations_by_opclass[oc][comb].sort`。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `    def opclass_supports_combination(` — **EN:** Defines function `opclass_supports_combination`. **CN:** 定义函数 `opclass_supports_combination`。
+- **L439** `        self, op_class: cutlass_library.OpcodeClass, datatype_comb: tuple, layout_comb: tuple, math_operation: cutlass_library.MathOperation` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L440** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L441** `        """` — **EN:** Starts the docstring for the function `opclass_supports_combination`. **CN:** 开始说明 function `opclass_supports_combination` 的文档字符串。
+- **L442** `        Returns whether the provided operation class supports the provided data type and layout combination` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `        :param op_class: operation class to consider` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L445** `        :type op_class: cutlass_library.OpcodeClass` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L446** `        :param datatype_comb: tuple of data types for (element_A, element_B, element_accumulator)` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L447** `        :type datatype_comb: tuple[cutlass_library.DataType]` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L448** `        :param layout_comb: tuple of data types for (layout_A, layout_B)` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L449** `        :type layout_comb: tuple[cutlass_library.LayoutType]` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L450** `        :param math_operation: math operation to consider or None if any can be considered` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L451** `        :type math_operation: cutlass_cppgen.MathOperation` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L452** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L453** `        :return: set of operation classes that support the provided data type and layout combination` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L454** `        :rtype: set` — **EN:** Continues the docstring for the function `opclass_supports_combination`. **CN:** 继续说明 function `opclass_supports_combination` 的文档字符串。
+- **L455** `        """` — **EN:** Ends the docstring for the function `opclass_supports_combination`. **CN:** 结束说明 function `opclass_supports_combination` 的文档字符串。
+- **L456** `        if op_class not in self.operations_by_opclass:` — **EN:** Starts a conditional branch guarded by `op_class not in self.operations_by_opclass`. **CN:** 开始一个由 `op_class not in self.operations_by_opclass` 控制的条件分支。
+- **L457** `            raise Exception(f"Unexpected or unsupported operation class {op_class}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `        if operations := self.operations_by_opclass[op_class].get((datatype_comb, layout_comb)):` — **EN:** Starts a conditional branch guarded by `(operations := self.operations_by_opclass[op_class].get((...`. **CN:** 开始一个由 `(operations := self.operations_by_opclass[op_class].get((...` 控制的条件分支。
+- **L460** `            if math_operation is not None:` — **EN:** Starts a conditional branch guarded by `math_operation is not None`. **CN:** 开始一个由 `math_operation is not None` 控制的条件分支。
+- **L461** `                return operations.supports_math_operation(math_operation)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L462** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L463** `                return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `    def supporting_opclasses(` — **EN:** Defines function `supporting_opclasses`. **CN:** 定义函数 `supporting_opclasses`。
+- **L469** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L470** `        element_a: cutlass_library.DataType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L471** `        element_b: cutlass_library.DataType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L472** `        element_accumulator: cutlass_library.DataType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L473** `        layout_a: cutlass_library.LayoutType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `        layout_b: cutlass_library.LayoutType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L475** `        math_operation: cutlass_library.MathOperation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L476** `    ) -> set:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L477** `        """` — **EN:** Starts the docstring for the function `supporting_opclasses`. **CN:** 开始说明 function `supporting_opclasses` 的文档字符串。
+- **L478** `        Returns a set of operation classes that support the provided data type combination` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `        :param element_a: data type of operand A` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L481** `        :type element_a: cutlass_library.DataType` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L482** `        :param element_b: data type of operand B` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L483** `        :type element_b: cutlass_library.DataType` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L484** `        :param element_accumulator: data type of accumulator` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L485** `        :type element_accumulator: cutlass_library.DataType` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L486** `        :param layout_a: layout of operand A` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L487** `        :type layout_a: cutlass_library.LayoutType` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L488** `        :param layout_b: layout of operand B` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L489** `        :type layout_b: cutlass_library.LayoutType` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L490** `        :param math_operation: math operation to consider` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L491** `        :type math_operation: cutlass_cppgen.MathOperation` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `        :return: set of operation classes that support the provided data type combination` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L494** `        :rtype: set` — **EN:** Continues the docstring for the function `supporting_opclasses`. **CN:** 继续说明 function `supporting_opclasses` 的文档字符串。
+- **L495** `        """` — **EN:** Ends the docstring for the function `supporting_opclasses`. **CN:** 结束说明 function `supporting_opclasses` 的文档字符串。
+- **L496** `        supporting_op_classes = set()` — **EN:** Assigns a value to supporting_op_classes. **CN:** 将一个值赋给 supporting_op_classes。
+- **L497** `        datatype_comb = (element_a, element_b, element_accumulator)` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L498** `        layout_comb = (layout_a, layout_b)` — **EN:** Assigns a value to layout_comb. **CN:** 将一个值赋给 layout_comb。
+- **L499** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L500** `        for op_class in self.operations_by_opclass.keys():` — **EN:** Starts a loop assigning items from `self.operations_by_opclass.keys()` to `op_class`. **CN:** 开始一个循环，将 `self.operations_by_opclass.keys()` 的元素赋给 `op_class`。
+- **L501** `            if self.opclass_supports_combination(op_class, datatype_comb, layout_comb, math_operation):` — **EN:** Starts a conditional branch guarded by `self.opclass_supports_combination(op_class, datatype_comb...`. **CN:** 开始一个由 `self.opclass_supports_combination(op_class, datatype_comb...` 控制的条件分支。
+- **L502** `                supporting_op_classes.add(op_class)` — **EN:** Invokes `supporting_op_classes.add` as a standalone call. **CN:** 以独立语句方式调用 `supporting_op_classes.add`。
+- **L503** `        return supporting_op_classes` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L504** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L505** `    def operations(` — **EN:** Defines function `operations`. **CN:** 定义函数 `operations`。
+- **L506** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L507** `        op_class: cutlass_library.OpcodeClass,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L508** `        element_a: cutlass_library.DataType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L509** `        element_b: cutlass_library.DataType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L510** `        element_accumulator: cutlass_library.DataType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L511** `        layout_a: cutlass_library.LayoutType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L512** `        layout_b: cutlass_library.LayoutType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L513** `        math_operation: cutlass_library.MathOperation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L514** `    ) -> KernelsForDataType:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L515** `        """` — **EN:** Starts the docstring for the function `operations`. **CN:** 开始说明 function `operations` 的文档字符串。
+- **L516** `        Returns whether the provided operation class supports the provided data type combination` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `        :param op_class: operation class to consider` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L519** `        :type op_class: cutlass_library.OpcodeClass` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L520** `        :param element_a: data type of operand A` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L521** `        :type element_a: cutlass_library.DataType` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L522** `        :param element_b: data type of operand B` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L523** `        :type element_b: cutlass_library.DataType` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L524** `        :param element_accumulator: data type of accumulator` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L525** `        :type element_accumulator: cutlass_library.DataType` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L526** `        :param layout_a: layout of operand A` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L527** `        :type layout_a: cutlass_library.LayoutType` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L528** `        :param layout_b: layout of operand B` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L529** `        :type layout_b: cutlass_library.LayoutType` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L530** `        :param math_operation: math operation to consider` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L531** `        :type math_operation: cutlass_cppgen.MathOperation` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L532** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L533** `        :return: container of kernels by alignment supported by the provided combination of parameters` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L534** `        :rtype: KernelsForDataType` — **EN:** Continues the docstring for the function `operations`. **CN:** 继续说明 function `operations` 的文档字符串。
+- **L535** `        """` — **EN:** Ends the docstring for the function `operations`. **CN:** 结束说明 function `operations` 的文档字符串。
+- **L536** `        datatype_comb = (element_a, element_b, element_accumulator)` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L537** `        layout_comb = (layout_a, layout_b)` — **EN:** Assigns a value to layout_comb. **CN:** 将一个值赋给 layout_comb。
+- **L538** `        if not self.opclass_supports_combination(op_class, datatype_comb, layout_comb, math_operation):` — **EN:** Starts a conditional branch guarded by `not self.opclass_supports_combination(op_class, datatype_...`. **CN:** 开始一个由 `not self.opclass_supports_combination(op_class, datatype_...` 控制的条件分支。
+- **L539** `            raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L540** `                f"Data type layout combination {datatype_comb}, {layout_comb} "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** `                f"is not supported by opcode class {op_class} on CC {self.cc}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L542** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `        return self.operations_by_opclass[op_class][(datatype_comb, layout_comb)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `class OptionRegistry:` — **EN:** Defines class `OptionRegistry`. **CN:** 定义类 `OptionRegistry`。
+- **L547** `    """` — **EN:** Starts the docstring for the class `OptionRegistry`. **CN:** 开始说明 class `OptionRegistry` 的文档字符串。
+- **L548** `    Container of all architecture-specific options` — **EN:** Continues the docstring for the class `OptionRegistry`. **CN:** 继续说明 class `OptionRegistry` 的文档字符串。
+- **L549** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L550** `    :param target_cc: compute capability of the device on which operations will be run` — **EN:** Continues the docstring for the class `OptionRegistry`. **CN:** 继续说明 class `OptionRegistry` 的文档字符串。
+- **L551** `    :type target_cc: int` — **EN:** Continues the docstring for the class `OptionRegistry`. **CN:** 继续说明 class `OptionRegistry` 的文档字符串。
+- **L552** `    """` — **EN:** Ends the docstring for the class `OptionRegistry`. **CN:** 结束说明 class `OptionRegistry` 的文档字符串。
+- **L553** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L554** `    def __init__(self, target_cc: int):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L555** `        self.registry = {}` — **EN:** Assigns a value to self.registry. **CN:** 将一个值赋给 self.registry。
+- **L556** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L557** `        if target_cc > 100 and (target_cc not in [101, 103, 120, 121]):` — **EN:** Starts a conditional branch guarded by `target_cc > 100 and target_cc not in [101, 103, 120, 121]`. **CN:** 开始一个由 `target_cc > 100 and target_cc not in [101, 103, 120, 121]` 控制的条件分支。
+- **L558** `            raise Exception(f"Unsupported compute capability {target_cc}. The CUTLASS Python interface only supports compute capabilities up to the Blackwell architecture.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L559** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L560** `        gemm_kinds = [cutlass_library.GemmKind.Universal, cutlass_library.GemmKind.Universal3x]` — **EN:** Assigns a value to gemm_kinds. **CN:** 将一个值赋给 gemm_kinds。
+- **L561** `        operation_kinds = [cutlass_library.OperationKind.Gemm, cutlass_library.OperationKind.Conv2d]` — **EN:** Assigns a value to operation_kinds. **CN:** 将一个值赋给 operation_kinds。
+- **L562** `        # Construct options for each CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L563** `        for kernel_cc in _generator_ccs:` — **EN:** Starts a loop assigning items from `_generator_ccs` to `kernel_cc`. **CN:** 开始一个循环，将 `_generator_ccs` 的元素赋给 `kernel_cc`。
+- **L564** `            self.registry[kernel_cc] = {}` — **EN:** Assigns a value to self.registry[kernel_cc]. **CN:** 将一个值赋给 self.registry[kernel_cc]。
+- **L565** `            for opkind in operation_kinds:` — **EN:** Starts a loop assigning items from `operation_kinds` to `opkind`. **CN:** 开始一个循环，将 `operation_kinds` 的元素赋给 `opkind`。
+- **L566** `                self.registry[kernel_cc][opkind] = ArchOptions(target_cc, kernel_cc, opkind, gemm_kinds)` — **EN:** Assigns a value to self.registry[kernel_cc][opkind]. **CN:** 将一个值赋给 self.registry[kernel_cc][opkind]。
+- **L567** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L568** `    def options_for_cc(self, cc: int, op_kind=cutlass_library.OperationKind.Gemm) -> ArchOptions:` — **EN:** Defines function `options_for_cc`. **CN:** 定义函数 `options_for_cc`。
+- **L569** `        return self.registry.get(cc, None)[op_kind]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.library_defaults`. CN: 模块名为 `cutlass_cppgen.library_defaults`。
+- EN: Module docstring summary: Classes containing valid operations for a given compute capability and data types. CN: 模块文档摘要为：Classes containing valid operations for a given compute capability and data types.
+- EN: Top-level classes: KernelsForDataType, ArchOptions, OptionRegistry CN: 顶层类包括：KernelsForDataType, ArchOptions, OptionRegistry
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library, cutlass_library.library:ConvKind,IteratorAlgorithm,StrideSupport,GroupMode, cutlass_cppgen, cutlass_cppgen.utils.check:valid_stage_count, cutlass_cppgen.utils.datatypes:td_from_profiler_td,td_from_profiler_op CN: 内部依赖：cutlass_library, cutlass_library.library:ConvKind,IteratorAlgorithm,StrideSupport,GroupMode, cutlass_cppgen, cutlass_cppgen.utils.check:valid_stage_count, cutlass_cppgen.utils.datatypes:td_from_profiler_td,td_from_profiler_op
+- EN: External or standard-library dependencies: itertools:combinations_with_replacement, logging CN: 外部或标准库依赖：itertools:combinations_with_replacement, logging

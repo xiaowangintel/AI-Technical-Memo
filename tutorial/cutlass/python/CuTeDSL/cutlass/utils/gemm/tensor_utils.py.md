@@ -1,0 +1,395 @@
+# tensor_utils.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/gemm/tensor_utils.py`
+
+## Purpose / 作用
+- EN: GEMM Tensor Utilities for CuTe DSL This module provides end-to-end helpers for creating and wrapping GEMM operands when using CuTe DSL with PyTorch integration.
+- CN: 该模块的文档字符串将其描述为：GEMM Tensor Utilities for CuTe DSL This module provides end-to-end helpers for creating and wrapping GEMM operands when using CuTe DSL with PyTorch integration.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `GEMM Tensor Utilities for CuTe DSL` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `This module provides end-to-end helpers for creating and wrapping GEMM operands` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L16** `when using CuTe DSL with PyTorch integration. It consolidates tensor creation,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L17** `layout management, and DLPack-based wrapping for GPU kernels.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `Key functions:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L20** `- create_gemm_tensor_torch: Allocate PyTorch CUDA tensors with MN-major or K-major layouts` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L21** `- get_gemm_tensor: Wrap PyTorch tensors as CuTe tensors via DLPack` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L22** `- get_gemm_tensors: Convenience wrapper for complete GEMM problem (A, B, D)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L23** `- create_scale_factor_tensor: Generate block-scaled GEMM scale factors` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L24** `- decode_float4e2m1fn: Decode packed FP4 tensors to float32` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `Supports FP8/FP4 types with workarounds for DLPack limitations.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L27** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `import math` — **EN:** Imports math for later use. **CN:** 导入 math 供后续使用。
+- **L30** `from typing import Tuple, Type` — **EN:** Imports Tuple, Type from `typing`. **CN:** 从 `typing` 导入 Tuple, Type。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `import torch` — **EN:** Imports torch for later use. **CN:** 导入 torch 供后续使用。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L35** `from cutlass.cute.runtime import from_dlpack` — **EN:** Imports from_dlpack from `cutlass.cute.runtime`. **CN:** 从 `cutlass.cute.runtime` 导入 from_dlpack。
+- **L36** `from cutlass.cutlass_dsl import Numeric` — **EN:** Imports Numeric from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 Numeric。
+- **L37** `import cutlass.torch as cutlass_torch` — **EN:** Imports cutlass.torch as cutlass_torch for later use. **CN:** 导入 cutlass.torch as cutlass_torch 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L40** `    "create_gemm_tensor_torch",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    "get_gemm_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    "get_gemm_tensors",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    "create_scale_factor_tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    "decode_float4e2m1fn",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `def create_gemm_tensor_torch(` — **EN:** Defines function `create_gemm_tensor_torch`. **CN:** 定义函数 `create_gemm_tensor_torch`。
+- **L49** `    M_or_N: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `    K_or_N: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L51** `    L: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `    major_mode: cute.nvgpu.OperandMajorMode,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L53** `    dtype: torch.dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L54** `) -> torch.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L55** `    """` — **EN:** Starts the docstring for the function `create_gemm_tensor_torch`. **CN:** 开始说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L56** `    Allocate a random GEMM operand as a PyTorch CUDA tensor.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `    Returns a tensor of shape \`\`(M_or_N, K_or_N, L)\`\` with a physical layout` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L59** `    determined by \`\`major_mode\`\`:` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    * \`\`MN\`\`-major: stride \`\`(1, M_or_N, M_or_N * K_or_N)\`\`` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L62** `    * \`\`K\`\`-major:  stride \`\`(K_or_N, 1, M_or_N * K_or_N)\`\`` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `    Elements are initialised randomly from \`\`{-1, 0, 1}\`\`.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    :param M_or_N: Size of the M (for A/D) or N (for B) dimension.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L67** `    :type M_or_N: int` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L68** `    :param K_or_N: Size of the K (for A/B) or N (for D) dimension.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L69** `    :type K_or_N: int` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L70** `    :param L: Batch dimension (number of independent GEMM problems).` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L71** `    :type L: int` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L72** `    :param major_mode: \`\`MN\`\` for MN-major layout, \`\`K\`\` for K-major layout.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L73** `    :type major_mode: cute.nvgpu.OperandMajorMode` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L74** `    :param dtype: Element type of the returned tensor.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L75** `    :type dtype: torch.dtype` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L76** `    :return: A CUDA tensor of shape \`\`(M_or_N, K_or_N, L)\`\` with the` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L77** `        requested layout and dtype.` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L78** `    :rtype: torch.Tensor` — **EN:** Continues the docstring for the function `create_gemm_tensor_torch`. **CN:** 继续说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L79** `    """` — **EN:** Ends the docstring for the function `create_gemm_tensor_torch`. **CN:** 结束说明 function `create_gemm_tensor_torch` 的文档字符串。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `    if major_mode == cute.nvgpu.OperandMajorMode.MN:` — **EN:** Starts a conditional branch guarded by `major_mode == cute.nvgpu.OperandMajorMode.MN`. **CN:** 开始一个由 `major_mode == cute.nvgpu.OperandMajorMode.MN` 控制的条件分支。
+- **L82** `        result = torch.empty(L, K_or_N, M_or_N).permute(2, 1, 0)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L83** `    elif major_mode == cute.nvgpu.OperandMajorMode.K:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L84** `        result = torch.empty(L, M_or_N, K_or_N).permute(1, 2, 0)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    if dtype == torch.float4_e2m1fn_x2:` — **EN:** Starts a conditional branch guarded by `dtype == torch.float4_e2m1fn_x2`. **CN:** 开始一个由 `dtype == torch.float4_e2m1fn_x2` 控制的条件分支。
+- **L87** `        values = torch.tensor(` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L88** `            [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `                0x00,  # { 0,  0}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `                0x02,  # { 0,  1}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                0x0A,  # { 0, -1}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `                0x20,  # { 1,  0}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `                0x22,  # { 1,  1}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `                0x2A,  # { 1, -1}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `                0xA0,  # {-1,  0}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `                0xA2,  # {-1,  1}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `                0xAA,  # {-1, -1}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `            dtype=torch.uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `        # Note [dkb 16 Jan '26] we are consciously over-allocating by 2x` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `        # because it makes the code much simpler and terser.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L104** `        result = result.to(torch.uint8)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L105** `        result[:] = values[torch.randint(0, len(values), result.size())]` — **EN:** Assigns a value to result[:]. **CN:** 将一个值赋给 result[:]。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L108** `        result = result.random_(-1, 2).to(dtype)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    return result.cuda()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `def get_gemm_tensor(` — **EN:** Defines function `get_gemm_tensor`. **CN:** 定义函数 `get_gemm_tensor`。
+- **L114** `    torch_tensor: torch.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L115** `    major_mode: cute.nvgpu.OperandMajorMode,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L116** `    dtype: torch.dtype,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L117** `) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L118** `    """` — **EN:** Starts the docstring for the function `get_gemm_tensor`. **CN:** 开始说明 function `get_gemm_tensor` 的文档字符串。
+- **L119** `    Wrap a PyTorch tensor as a CuTe tensor for passing to a GPU kernel.` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    Converts \`\`torch_tensor\`\` to a CuTe \`\`Tensor\`\` via DLPack and marks the` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L122** `    leading dimension as dynamic so the compiler treats the corresponding` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L123** `    stride as a runtime value:` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    * \`\`K\`\`-major  -> leading dim is 1 (K dimension has unit stride)` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L126** `    * \`\`MN\`\`-major -> leading dim is 0 (MN dimension has unit stride)` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    :param torch_tensor: Source PyTorch CUDA tensor, typically created by` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L129** `        :func:\`create_gemm_tensor_torch\`.` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L130** `    :type torch_tensor: torch.Tensor` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L131** `    :param major_mode: \`\`MN\`\` or \`\`K\`\`, indicating which dimension has unit` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L132** `        stride.` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L133** `    :type major_mode: cute.nvgpu.OperandMajorMode` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L134** `    :param dtype: Logical element type of the tensor.` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L135** `    :type dtype: torch.dtype` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L136** `    :return: A CuTe tensor backed by the same GPU memory, with its leading` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L137** `        dimension marked dynamic and element type set to the CuTe equivalent` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L138** `        of \`\`dtype\`\`.` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L139** `    :rtype: cutlass.cute.Tensor` — **EN:** Continues the docstring for the function `get_gemm_tensor`. **CN:** 继续说明 function `get_gemm_tensor` 的文档字符串。
+- **L140** `    """` — **EN:** Ends the docstring for the function `get_gemm_tensor`. **CN:** 结束说明 function `get_gemm_tensor` 的文档字符串。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    _TYPES_NOT_SUPPORTED_BY_DLPACK = {` — **EN:** Assigns a value to _TYPES_NOT_SUPPORTED_BY_DLPACK. **CN:** 将一个值赋给 _TYPES_NOT_SUPPORTED_BY_DLPACK。
+- **L143** `        torch.float8_e4m3fn: cute.Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `        torch.float8_e5m2: cute.Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `        torch.float8_e4m3fnuz: cute.Float8E4M3B11FNUZ,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `        torch.float4_e2m1fn_x2: cute.Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    dlpack_tensor = torch_tensor` — **EN:** Assigns a value to dlpack_tensor. **CN:** 将一个值赋给 dlpack_tensor。
+- **L150** `    if dtype in _TYPES_NOT_SUPPORTED_BY_DLPACK:` — **EN:** Starts a conditional branch guarded by `dtype in _TYPES_NOT_SUPPORTED_BY_DLPACK`. **CN:** 开始一个由 `dtype in _TYPES_NOT_SUPPORTED_BY_DLPACK` 控制的条件分支。
+- **L151** `        dlpack_tensor = torch_tensor.view(dtype=torch.uint8)` — **EN:** Assigns a value to dlpack_tensor. **CN:** 将一个值赋给 dlpack_tensor。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `    result = from_dlpack(dlpack_tensor, assumed_align=16).mark_layout_dynamic(` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L154** `        leading_dim=1 if major_mode == cute.nvgpu.OperandMajorMode.K else 0` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    if dtype in _TYPES_NOT_SUPPORTED_BY_DLPACK:` — **EN:** Starts a conditional branch guarded by `dtype in _TYPES_NOT_SUPPORTED_BY_DLPACK`. **CN:** 开始一个由 `dtype in _TYPES_NOT_SUPPORTED_BY_DLPACK` 控制的条件分支。
+- **L158** `        result.element_type = _TYPES_NOT_SUPPORTED_BY_DLPACK[dtype]` — **EN:** Assigns a value to result.element_type. **CN:** 将一个值赋给 result.element_type。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `def get_gemm_tensors(` — **EN:** Defines function `get_gemm_tensors`. **CN:** 定义函数 `get_gemm_tensors`。
+- **L164** `    M: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L165** `    N: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L166** `    K: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L167** `    L: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L168** `    majors: tuple[` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L169** `        cute.nvgpu.OperandMajorMode,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L170** `        cute.nvgpu.OperandMajorMode,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L171** `        cute.nvgpu.OperandMajorMode,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L172** `    ],` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L173** `    dtypes: tuple[torch.dtype, torch.dtype, torch.dtype],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L174** `) -> Tuple[` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L175** `    torch.Tensor, torch.Tensor, torch.Tensor, cute.Tensor, cute.Tensor, cute.Tensor` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L176** `]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L177** `    """` — **EN:** Starts the docstring for the function `get_gemm_tensors`. **CN:** 开始说明 function `get_gemm_tensors` 的文档字符串。
+- **L178** `    Allocate all three GEMM operands (A, B, D) as paired PyTorch / CuTe tensors.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    Convenience wrapper around :func:\`create_gemm_tensor_torch\` and` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L181** `    :func:\`get_gemm_tensor\` for a complete GEMM problem \`\`D = A @ B\`\`.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    :param M: Number of rows of A and D.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L184** `    :type M: int` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L185** `    :param N: Number of columns of B and D.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L186** `    :type N: int` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L187** `    :param K: Shared (contraction) dimension of A and B.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L188** `    :type K: int` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L189** `    :param L: Batch dimension (number of independent GEMM problems).` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L190** `    :type L: int` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L191** `    :param majors: \`\`(major_A, major_B, major_D)\`\` specifying the physical` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L192** `        layout of each operand.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L193** `    :type majors: tuple[OperandMajorMode, OperandMajorMode, OperandMajorMode]` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L194** `    :param dtypes: \`\`(dtype_A, dtype_B, dtype_D)\`\` specifying the element type` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L195** `        of each operand.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L196** `    :type dtypes: tuple[torch.dtype, torch.dtype, torch.dtype]` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L197** `    :return: \`\`(A, B, D, A_cute, B_cute, D_cute)\`\` where \`\`A\`\`, \`\`B\`\`, \`\`D\`\`` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L198** `        are PyTorch CUDA tensors and \`\`A_cute\`\`, \`\`B_cute\`\`, \`\`D_cute\`\` are` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L199** `        CuTe tensors wrapping the same memory.` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L200** `    :rtype: tuple[torch.Tensor, torch.Tensor, torch.Tensor,` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L201** `        cutlass.cute.Tensor, cutlass.cute.Tensor, cutlass.cute.Tensor]` — **EN:** Continues the docstring for the function `get_gemm_tensors`. **CN:** 继续说明 function `get_gemm_tensors` 的文档字符串。
+- **L202** `    """` — **EN:** Ends the docstring for the function `get_gemm_tensors`. **CN:** 结束说明 function `get_gemm_tensors` 的文档字符串。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `    A = create_gemm_tensor_torch(M, K, L, majors[0], dtypes[0])` — **EN:** Assigns a value to A. **CN:** 将一个值赋给 A。
+- **L205** `    B = create_gemm_tensor_torch(N, K, L, majors[1], dtypes[1])` — **EN:** Assigns a value to B. **CN:** 将一个值赋给 B。
+- **L206** `    D = create_gemm_tensor_torch(M, N, L, majors[2], dtypes[2])` — **EN:** Assigns a value to D. **CN:** 将一个值赋给 D。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `    A_cute = get_gemm_tensor(A, majors[0], dtypes[0])` — **EN:** Assigns a value to A_cute. **CN:** 将一个值赋给 A_cute。
+- **L209** `    B_cute = get_gemm_tensor(B, majors[1], dtypes[1])` — **EN:** Assigns a value to B_cute. **CN:** 将一个值赋给 B_cute。
+- **L210** `    D_cute = get_gemm_tensor(D, majors[2], dtypes[2])` — **EN:** Assigns a value to D_cute. **CN:** 将一个值赋给 D_cute。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `    return A, B, D, A_cute, B_cute, D_cute` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `def create_scale_factor_tensor(` — **EN:** Defines function `create_scale_factor_tensor`. **CN:** 定义函数 `create_scale_factor_tensor`。
+- **L216** `    MN: int, K: int, L: int, sf_vec_size: int, sf_dtype: Type[Numeric]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L217** `) -> Tuple[torch.Tensor, cute.Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L218** `    """` — **EN:** Starts the docstring for the function `create_scale_factor_tensor`. **CN:** 开始说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L219** `    Create a random scale-factor tensor in BlockScaledBasicChunk layout.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    Allocates a scale-factor tensor for block-scaled GEMM, where each scale` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L222** `    factor covers \`\`sf_vec_size\`\` contiguous elements along K.  The MN and K` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L223** `    dimensions are padded up to the required atom boundaries.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    Scale factor values are drawn uniformly from \`\`{1.0, 2.0, 4.0}\`\`.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `    Two tensors are returned: a logical FP32 tensor for host-side reference` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L228** `    computation, and a CuTe tensor in the on-device packed layout for passing` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L229** `    to the GPU kernel.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `    :param MN: Size of the MN dimension of the operand to be scaled.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L232** `    :type MN: int` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L233** `    :param K: Size of the K dimension of the operand to be scaled.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L234** `    :type K: int` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L235** `    :param L: Batch dimension (number of independent GEMM problems).` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L236** `    :type L: int` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L237** `    :param sf_vec_size: Number of contiguous K-elements sharing a single` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L238** `        scale factor (block-scaling granularity along K).` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L239** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L240** `    :param sf_dtype: CuTe element type for the on-device scale factors` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L241** `        (e.g. \`\`cute.Float8E4M3FN\`\`, \`\`cute.Float8E8M0FNU\`\`).` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L242** `    :return: \`\`(sf_torch, sf_cute)\`\` where \`\`sf_torch\`\` is an FP32 CPU tensor` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L243** `        of shape \`\`(MN, K, L)\`\` with scale factors unpacked into a dense` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L244** `        layout suitable for element-wise multiplication with A or B, and` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L245** `        \`\`sf_cute\`\` is a CuTe CUDA tensor in BlockScaledBasicChunk layout` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L246** `        with \`\`element_type\`\` set to \`\`sf_dtype\`\`.` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L247** `    :rtype: tuple[torch.Tensor, cutlass.cute.Tensor]` — **EN:** Continues the docstring for the function `create_scale_factor_tensor`. **CN:** 继续说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L248** `    """` — **EN:** Ends the docstring for the function `create_scale_factor_tensor`. **CN:** 结束说明 function `create_scale_factor_tensor` 的文档字符串。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `    def unpack_scale_factors(` — **EN:** Defines function `unpack_scale_factors`. **CN:** 定义函数 `unpack_scale_factors`。
+- **L251** `        sf: torch.Tensor, sf_vec_size: int, MN: int, K: int, L: int` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L252** `    ) -> torch.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L253** `        """` — **EN:** Starts the docstring for the function `unpack_scale_factors`. **CN:** 开始说明 function `unpack_scale_factors` 的文档字符串。
+- **L254** `        Unpack a scale-factor tensor from BlockScaledBasicChunk layout to a` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L255** `        dense \`\`(MN, K, L)\`\` tensor.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `        The on-device SF layout packs scale factors into 512-byte atoms with` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L258** `        a specific index mapping: 128-row MN tiles, 4-element K groups, and` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L259** `        an interleaved \`\`(mn0, mn1, k1)\`\` addressing within each atom.  This` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L260** `        function inverts that mapping so that the output element at position` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L261** `        \`\`(m, k, l)\`\` holds the scale factor that applies to element` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L262** `        \`\`(m, k, l)\`\` in A/B, ready for direct element-wise multiplication.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `        :param sf: Scale-factor tensor in packed layout, shape` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L265** `            \`\`(L, m_padded, k_padded)\`\`.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L266** `        :type sf: torch.Tensor` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L267** `        :param sf_vec_size: Number of K-elements per scale-factor block.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L268** `        :type sf_vec_size: int` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L269** `        :param MN: Logical (unpadded) MN dimension.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L270** `        :type MN: int` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L271** `        :param K: Logical (unpadded) K dimension.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L272** `        :type K: int` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L273** `        :param L: Batch dimension.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L274** `        :type L: int` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L275** `        :return: Dense FP32 tensor of shape \`\`(MN, K, L)\`\` with unpacked` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L276** `            scale factors.` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L277** `        :rtype: torch.Tensor` — **EN:** Continues the docstring for the function `unpack_scale_factors`. **CN:** 继续说明 function `unpack_scale_factors` 的文档字符串。
+- **L278** `        """` — **EN:** Ends the docstring for the function `unpack_scale_factors`. **CN:** 结束说明 function `unpack_scale_factors` 的文档字符串。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `        def index_map() -> torch.Tensor:` — **EN:** Defines function `index_map`. **CN:** 定义函数 `index_map`。
+- **L281** `            ATOM = 512` — **EN:** Assigns a value to ATOM. **CN:** 将一个值赋给 ATOM。
+- **L282** `            ATOM_MN = 128` — **EN:** Assigns a value to ATOM_MN. **CN:** 将一个值赋给 ATOM_MN。
+- **L283** `            ATOM_K = 4` — **EN:** Assigns a value to ATOM_K. **CN:** 将一个值赋给 ATOM_K。
+- **L284** `            DATA_PATHS = 32` — **EN:** Assigns a value to DATA_PATHS. **CN:** 将一个值赋给 DATA_PATHS。
+- **L285** `            DATA_PATH_STRIDE = ATOM // DATA_PATHS  # 16` — **EN:** Assigns a value to DATA_PATH_STRIDE. **CN:** 将一个值赋给 DATA_PATH_STRIDE。
+- **L286** `            K_TILE = ATOM_K * sf_vec_size` — **EN:** Assigns a value to K_TILE. **CN:** 将一个值赋给 K_TILE。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `            k_tiles = (K + K_TILE - 1) // K_TILE` — **EN:** Assigns a value to k_tiles. **CN:** 将一个值赋给 k_tiles。
+- **L289** `            mn_tiles = (MN + ATOM_MN - 1) // ATOM_MN` — **EN:** Assigns a value to mn_tiles. **CN:** 将一个值赋给 mn_tiles。
+- **L290** `            sf_per_l = ATOM * mn_tiles * k_tiles` — **EN:** Assigns a value to sf_per_l. **CN:** 将一个值赋给 sf_per_l。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `            m, k = torch.meshgrid(` — **EN:** Assigns a value to (m, k). **CN:** 将一个值赋给 (m, k)。
+- **L293** `                torch.arange(MN, device=sf.device),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `                torch.arange(K, device=sf.device),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `                indexing="ij",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `            base = (` — **EN:** Assigns a value to base. **CN:** 将一个值赋给 base。
+- **L299** `                (m // ATOM_MN) * (ATOM * k_tiles)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `                + (k // K_TILE) * ATOM` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `                + DATA_PATH_STRIDE * (m % DATA_PATHS)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `                + ATOM_K * ((m % ATOM_MN) // DATA_PATHS)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `                + ((k // sf_vec_size) % ATOM_K)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `            l_offsets = torch.arange(L, device=sf.device)[:, None, None] * sf_per_l` — **EN:** Assigns a value to l_offsets. **CN:** 将一个值赋给 l_offsets。
+- **L307** `            return base.unsqueeze(0) + l_offsets` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `        return sf.flatten()[index_map()].permute(1, 2, 0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L311** `    ATOM_MN = 128` — **EN:** Assigns a value to ATOM_MN. **CN:** 将一个值赋给 ATOM_MN。
+- **L312** `    ATOM_K = 4` — **EN:** Assigns a value to ATOM_K. **CN:** 将一个值赋给 ATOM_K。
+- **L313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L314** `    m_padded = math.ceil(MN / ATOM_MN) * ATOM_MN` — **EN:** Assigns a value to m_padded. **CN:** 将一个值赋给 m_padded。
+- **L315** `    k_padded = math.ceil(math.ceil(K / sf_vec_size) / ATOM_K) * ATOM_K` — **EN:** Assigns a value to k_padded. **CN:** 将一个值赋给 k_padded。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `    lut = torch.tensor([1.0, 2.0, 4.0])  # subset of numbers supported by all SF dtypes` — **EN:** Assigns a value to lut. **CN:** 将一个值赋给 lut。
+- **L318** `    sf_torch = lut[torch.randint(0, lut.numel(), (L, m_padded, k_padded))].to(` — **EN:** Assigns a value to sf_torch. **CN:** 将一个值赋给 sf_torch。
+- **L319** `        cutlass_torch.dtype(sf_dtype)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    sf_cute = from_dlpack(sf_torch.cuda().view(dtype=torch.uint8), assumed_align=16)` — **EN:** Assigns a value to sf_cute. **CN:** 将一个值赋给 sf_cute。
+- **L323** `    sf_cute.element_type = sf_dtype` — **EN:** Assigns a value to sf_cute.element_type. **CN:** 将一个值赋给 sf_cute.element_type。
+- **L324** `    sf_torch = unpack_scale_factors(sf_torch.to(torch.float32), sf_vec_size, MN, K, L)` — **EN:** Assigns a value to sf_torch. **CN:** 将一个值赋给 sf_torch。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** `    return sf_torch, sf_cute` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** `def decode_float4e2m1fn(u8: torch.Tensor) -> torch.Tensor:` — **EN:** Defines function `decode_float4e2m1fn`. **CN:** 定义函数 `decode_float4e2m1fn`。
+- **L330** `    """` — **EN:** Starts the docstring for the function `decode_float4e2m1fn`. **CN:** 开始说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L331** `    Decode a packed FP4 (E2M1) tensor into float32.` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `    Each byte in the input encodes two FP4 values: the low nibble holds the` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L334** `    even-indexed element and the high nibble holds the odd-indexed element.` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L335** `    Because \`\`create_gemm_tensor_torch\`\` intentionally over-allocates FP4` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L336** `    tensors by 2x (one byte per logical element instead of one nibble), only` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L337** `    the first half of the input bytes contain data.  This function unpacks` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L338** `    those bytes via a 16-entry LUT covering all representable E2M1 values.` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** `    :param u8: Packed FP4 tensor of shape \`\`(MN, K, L)\`\` with dtype` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L341** `        \`\`torch.uint8\`\`, as produced by :func:\`create_gemm_tensor_torch\`` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L342** `        with \`\`dtype=torch.float4_e2m1fn_x2\`\`.` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L343** `    :type u8: torch.Tensor` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L344** `    :return: Decoded float32 tensor of shape \`\`(MN, K, L)\`\`.` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L345** `    :rtype: torch.Tensor` — **EN:** Continues the docstring for the function `decode_float4e2m1fn`. **CN:** 继续说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L346** `    """` — **EN:** Ends the docstring for the function `decode_float4e2m1fn`. **CN:** 结束说明 function `decode_float4e2m1fn` 的文档字符串。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    lut = torch.tensor(` — **EN:** Assigns a value to lut. **CN:** 将一个值赋给 lut。
+- **L349** `        [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `            0.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `            0.5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            1.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `            1.5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `            2.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `            3.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `            4.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `            6.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `            -0.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `            -0.5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `            -1.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `            -1.5,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `            -2.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `            -3.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `            -4.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `            -6.0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `        ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `        dtype=torch.float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L370** `    MN, K, L = u8.shape` — **EN:** Assigns a value to (MN, K, L). **CN:** 将一个值赋给 (MN, K, L)。
+- **L371** `    flat = u8.permute(2, 0, 1).flatten()` — **EN:** Assigns a value to flat. **CN:** 将一个值赋给 flat。
+- **L372** `    idx = torch.arange(u8.numel())` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L373** `    byte_idx = idx // 2` — **EN:** Assigns a value to byte_idx. **CN:** 将一个值赋给 byte_idx。
+- **L374** `    shift = (idx % 2) * 4` — **EN:** Assigns a value to shift. **CN:** 将一个值赋给 shift。
+- **L375** `    return lut[(flat[byte_idx] >> shift) & 0xF].view(L, MN, K).permute(1, 2, 0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.gemm.tensor_utils`. CN: 模块名为 `CuTeDSL.cutlass.utils.gemm.tensor_utils`。
+- EN: Module docstring summary: GEMM Tensor Utilities for CuTe DSL This module provides end-to-end helpers for creating and wrapping GEMM operands when using CuTe DSL with PyTorch integration. CN: 模块文档摘要为：GEMM Tensor Utilities for CuTe DSL This module provides end-to-end helpers for creating and wrapping GEMM operands when using CuTe DSL with PyTorch integration.
+- EN: Top-level functions: create_gemm_tensor_torch, get_gemm_tensor, get_gemm_tensors, create_scale_factor_tensor, decode_float4e2m1fn CN: 顶层函数包括：create_gemm_tensor_torch, get_gemm_tensor, get_gemm_tensors, create_scale_factor_tensor, decode_float4e2m1fn
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute, cutlass.cute.runtime:from_dlpack, cutlass.cutlass_dsl:Numeric, cutlass.torch CN: 内部依赖：cutlass.cute, cutlass.cute.runtime:from_dlpack, cutlass.cutlass_dsl:Numeric, cutlass.torch
+- EN: External or standard-library dependencies: math, typing:Tuple,Type, torch CN: 外部或标准库依赖：math, typing:Tuple,Type, torch

@@ -1,0 +1,3743 @@
+# constants.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/constants.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Boost-style constant definitions for floating-point types." and defines related CUTLASS facilities in `include/cutlass/constants.h`.
+- CN: 该头文件以注释摘要“Boost-style constant definitions for floating-point types.”引入，并在 `include/cutlass/constants.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *                                                                                                  </code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L32**: <code>/* \file </code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L33**: <code>  \brief Boost-style constant definitions for floating-point types.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L34**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L35**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L36**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L37**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L38**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>#include &quot;cutlass/complex.h&quot;</code>
+  - EN: Includes "cutlass/complex.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/complex.h"，以便本文件使用该依赖中的声明。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>///////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L44**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L45**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L46**: <code>namespace constants {</code>
+  - EN: Opens namespace `constants` to scope the following declarations.
+  - CN: 打开命名空间 `constants`，为后续声明提供作用域。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>///////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L51**: <code>// Primary templates</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L52**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L53**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L54**: <code>/// Returns 1, the multiplicative identity element</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L55**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T one();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>/// Returns 0, the additive identity element</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L58**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T zero();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L59**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L60**: <code>/// Returns 2</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L61**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T two();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L62**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L63**: <code>/// Returns pi, approximately 3.141</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L64**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L65**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L66**: <code>/// Returns 2 * pi</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L67**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T two_pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L68**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L69**: <code>/// Returns pi / 2</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L70**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T half_pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L71**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L72**: <code>/// Returns sqrt(pi)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L73**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T root_pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>/// Returns sqrt(pi / 2)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L76**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T root_half_pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L77**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L78**: <code>/// Returns sqrt(2 * pi)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L79**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T root_two_pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L80**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L81**: <code>/// Returns sqrt(ln(4))</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L82**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T root_ln_four();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L83**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L84**: <code>/// Returns e, approximately 2.718...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L85**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T e();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L86**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L87**: <code>/// Returns (1/2)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L88**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T half();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L89**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L90**: <code>/// Returns sqrt(2), approximately 1.414...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L91**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T root_two();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L92**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L93**: <code>/// Returns sqrt(2)/2, approximately 0.707...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L94**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T half_root_two();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L95**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L96**: <code>/// Returns ln(2), approximately 0.693...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L97**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T ln_two();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L98**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L99**: <code>/// Returns ln(ln(2)), approximately -0.3665...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L100**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T ln_ln_two();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L101**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L102**: <code>/// Returns 1/3, approximately 0.333...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L103**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T third();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L104**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L105**: <code>/// Returns 2/3, approximately 0.666...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L106**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T twothirds();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L107**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L108**: <code>/// Returns pi - 3, approximately 0.1416...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L109**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T pi_minus_three();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L110**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L111**: <code>/// Returns 4 - pi, approximately 0.858...</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L112**: <code>template &lt;typename T&gt; CUTLASS_HOST_DEVICE T four_minus_pi();</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L114**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L115**: <code>/////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L116**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L117**: <code>// Specialization for double</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L118**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L119**: <code>/// Returns 1, the multiplicative identity element  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L120**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double one&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L121**: <code>  uint64_t bits = 0x3ff0000000000000ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L122**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L123**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L124**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L125**: <code>/// Returns 1, the multiplicative identity element  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L126**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; one&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L127**: <code>  return complex&lt;double&gt;(one&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L128**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L129**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L130**: <code>/// Returns 0, the additive identity element  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L131**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double zero&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L132**: <code>  uint64_t bits = 0x0ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L133**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L134**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L135**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L136**: <code>/// Returns 0, the additive identity element  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L137**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; zero&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L138**: <code>  return complex&lt;double&gt;(zero&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L139**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L140**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L141**: <code>/// Returns 2  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L142**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double two&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L143**: <code>  uint64_t bits = 0x4000000000000000ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L144**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L145**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L146**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L147**: <code>/// Returns 2  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L148**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; two&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L149**: <code>  return complex&lt;double&gt;(two&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L150**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L151**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L152**: <code>/// Returns pi, approximately 3.141  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L153**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L154**: <code>  uint64_t bits = 0x400921fb54442d18ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L155**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L156**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L157**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L158**: <code>/// Returns pi, approximately 3.141  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L159**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L160**: <code>  return complex&lt;double&gt;(pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L161**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L162**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L163**: <code>/// Returns 2 * pi  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L164**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double two_pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L165**: <code>  uint64_t bits = 0x401921fb54442d18ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L166**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L167**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L168**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L169**: <code>/// Returns 2 * pi  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L170**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; two_pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L171**: <code>  return complex&lt;double&gt;(two_pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L172**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L173**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L174**: <code>/// Returns pi / 2  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L175**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double half_pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L176**: <code>  uint64_t bits = 0x3ff921fb54442d18ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L177**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L178**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L179**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L180**: <code>/// Returns pi / 2  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L181**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; half_pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L182**: <code>  return complex&lt;double&gt;(half_pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L183**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L184**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L185**: <code>/// Returns sqrt(pi)  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L186**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double root_pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L187**: <code>  uint64_t bits = 0x3ffc5bf891b4ef6aull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L188**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L189**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L190**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L191**: <code>/// Returns sqrt(pi)  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L192**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; root_pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L193**: <code>  return complex&lt;double&gt;(root_pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L194**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L195**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L196**: <code>/// Returns sqrt(pi / 2)  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L197**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double root_half_pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L198**: <code>  uint64_t bits = 0x3ff40d931ff62705ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L199**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L200**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L201**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L202**: <code>/// Returns sqrt(pi / 2)  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L203**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; root_half_pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L204**: <code>  return complex&lt;double&gt;(root_half_pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L205**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L206**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L207**: <code>/// Returns sqrt(2 * pi)  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L208**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double root_two_pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L209**: <code>  uint64_t bits = 0x40040d931ff62705ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L210**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L211**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L212**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L213**: <code>/// Returns sqrt(2 * pi)  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L214**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; root_two_pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L215**: <code>  return complex&lt;double&gt;(root_two_pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L216**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L217**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L218**: <code>/// Returns sqrt(ln(4))  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L219**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double root_ln_four&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L220**: <code>  uint64_t bits = 0x3ff2d6abe44afc43ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L221**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L222**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L223**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L224**: <code>/// Returns sqrt(ln(4))  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L225**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; root_ln_four&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L226**: <code>  return complex&lt;double&gt;(root_ln_four&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L227**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L228**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L229**: <code>/// Returns e, approximately 2.718...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L230**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double e&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L231**: <code>  uint64_t bits = 0x4005bf0a8b145769ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L232**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L233**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L234**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L235**: <code>/// Returns e, approximately 2.718...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L236**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; e&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L237**: <code>  return complex&lt;double&gt;(e&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L238**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>/// Returns (1/2)  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L241**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double half&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L242**: <code>  uint64_t bits = 0x3fe0000000000000ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L243**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L244**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L245**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L246**: <code>/// Returns (1/2)  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L247**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; half&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L248**: <code>  return complex&lt;double&gt;(half&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L249**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L250**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L251**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L252**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double root_two&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L253**: <code>  uint64_t bits = 0x3ff6a09e667f3bcdull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L254**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L255**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L256**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L257**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L258**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; root_two&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L259**: <code>  return complex&lt;double&gt;(root_two&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L260**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L261**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L262**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L263**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double half_root_two&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L264**: <code>  uint64_t bits = 0x3fe6a09e667f3bcdull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L265**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L266**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L267**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L268**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L269**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; half_root_two&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L270**: <code>  return complex&lt;double&gt;(half_root_two&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L271**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L272**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L273**: <code>/// Returns ln(2), approximately 0.693...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L274**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double ln_two&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L275**: <code>  uint64_t bits = 0x3fe62e42fefa39efull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L276**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L277**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L278**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L279**: <code>/// Returns ln(2), approximately 0.693...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L280**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; ln_two&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L281**: <code>  return complex&lt;double&gt;(ln_two&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L282**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L283**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L284**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L285**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double ln_ln_two&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L286**: <code>  uint64_t bits = 0xbfd774f29bdd6b9full;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L287**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L288**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L289**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L290**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L291**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; ln_ln_two&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L292**: <code>  return complex&lt;double&gt;(ln_ln_two&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L293**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L294**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L295**: <code>/// Returns 1/3, approximately 0.333...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L296**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double third&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L297**: <code>  uint64_t bits = 0x3fd5555555555555ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L298**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L299**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L300**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L301**: <code>/// Returns 1/3, approximately 0.333...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L302**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; third&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L303**: <code>  return complex&lt;double&gt;(third&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L304**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L305**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L306**: <code>/// Returns 2/3, approximately 0.666...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L307**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double twothirds&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L308**: <code>  uint64_t bits = 0x3fe5555555555555ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L309**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L310**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L311**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L312**: <code>/// Returns 2/3, approximately 0.666...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L313**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; twothirds&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L314**: <code>  return complex&lt;double&gt;(twothirds&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L315**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L316**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L317**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L318**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double pi_minus_three&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L319**: <code>  uint64_t bits = 0x3fc21fb54442d180ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L320**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L321**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L322**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L323**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L324**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; pi_minus_three&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L325**: <code>  return complex&lt;double&gt;(pi_minus_three&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L326**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L327**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L328**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for double)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L329**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE double four_minus_pi&lt;double&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L330**: <code>  uint64_t bits = 0x3feb7812aeef4ba0ull;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L331**: <code>  return reinterpret_cast&lt;double const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L332**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L333**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L334**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for complex&lt;double&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L335**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;double&gt; four_minus_pi&lt; complex&lt;double&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L336**: <code>  return complex&lt;double&gt;(four_minus_pi&lt;double&gt;(), double());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L337**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L338**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L339**: <code>/////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L340**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L341**: <code>// Specialization for float</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L342**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L343**: <code>/// Returns 1, the multiplicative identity element  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L344**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float one&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L345**: <code>  uint32_t bits = 0x3f800000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L346**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L347**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L348**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L349**: <code>/// Returns 1, the multiplicative identity element  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L350**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; one&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L351**: <code>  return complex&lt;float&gt;(one&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L352**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L353**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L354**: <code>/// Returns 0, the additive identity element  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L355**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float zero&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L356**: <code>  uint32_t bits = 0x0u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L357**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L358**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L359**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L360**: <code>/// Returns 0, the additive identity element  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L361**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; zero&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L362**: <code>  return complex&lt;float&gt;(zero&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L363**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L364**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L365**: <code>/// Returns 2  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L366**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float two&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L367**: <code>  uint32_t bits = 0x40000000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L368**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L369**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L370**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L371**: <code>/// Returns 2  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L372**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; two&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L373**: <code>  return complex&lt;float&gt;(two&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L374**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L375**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L376**: <code>/// Returns pi, approximately 3.141  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L377**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L378**: <code>  uint32_t bits = 0x40490fdbu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L379**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L380**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L381**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L382**: <code>/// Returns pi, approximately 3.141  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L383**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L384**: <code>  return complex&lt;float&gt;(pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L385**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L386**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L387**: <code>/// Returns 2 * pi  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L388**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float two_pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L389**: <code>  uint32_t bits = 0x40c90fdbu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L390**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L391**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L392**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L393**: <code>/// Returns 2 * pi  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L394**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; two_pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L395**: <code>  return complex&lt;float&gt;(two_pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L396**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L397**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L398**: <code>/// Returns pi / 2  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L399**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float half_pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L400**: <code>  uint32_t bits = 0x3fc90fdbu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L401**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L402**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L403**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L404**: <code>/// Returns pi / 2  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L405**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; half_pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L406**: <code>  return complex&lt;float&gt;(half_pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L407**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L408**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L409**: <code>/// Returns sqrt(pi)  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L410**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float root_pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L411**: <code>  uint32_t bits = 0x3fe2dfc5u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L412**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L413**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L414**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L415**: <code>/// Returns sqrt(pi)  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L416**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; root_pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L417**: <code>  return complex&lt;float&gt;(root_pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L418**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L419**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L420**: <code>/// Returns sqrt(pi / 2)  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L421**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float root_half_pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L422**: <code>  uint32_t bits = 0x3fa06c99u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L423**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L424**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L425**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L426**: <code>/// Returns sqrt(pi / 2)  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L427**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; root_half_pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L428**: <code>  return complex&lt;float&gt;(root_half_pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L429**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L430**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L431**: <code>/// Returns sqrt(2 * pi)  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L432**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float root_two_pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L433**: <code>  uint32_t bits = 0x40206c99u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L434**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L435**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L436**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L437**: <code>/// Returns sqrt(2 * pi)  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L438**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; root_two_pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L439**: <code>  return complex&lt;float&gt;(root_two_pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L440**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L441**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L442**: <code>/// Returns sqrt(ln(4))  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L443**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float root_ln_four&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L444**: <code>  uint32_t bits = 0x3f96b55fu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L445**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L446**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L447**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L448**: <code>/// Returns sqrt(ln(4))  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L449**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; root_ln_four&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L450**: <code>  return complex&lt;float&gt;(root_ln_four&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L451**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L452**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L453**: <code>/// Returns e, approximately 2.718...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L454**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float e&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L455**: <code>  uint32_t bits = 0x402df854u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L456**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L457**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L458**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L459**: <code>/// Returns e, approximately 2.718...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L460**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; e&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L461**: <code>  return complex&lt;float&gt;(e&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L462**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L463**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L464**: <code>/// Returns (1/2)  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L465**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float half&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L466**: <code>  uint32_t bits = 0x3f000000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L467**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L468**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L469**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L470**: <code>/// Returns (1/2)  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L471**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; half&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L472**: <code>  return complex&lt;float&gt;(half&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L473**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L474**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L475**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L476**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float root_two&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L477**: <code>  uint32_t bits = 0x3fb504f3u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L478**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L479**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L480**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L481**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L482**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; root_two&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L483**: <code>  return complex&lt;float&gt;(root_two&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L484**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L485**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L486**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L487**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float half_root_two&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L488**: <code>  uint32_t bits = 0x3f3504f3u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L489**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L490**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L491**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L492**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L493**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; half_root_two&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L494**: <code>  return complex&lt;float&gt;(half_root_two&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L495**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L496**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L497**: <code>/// Returns ln(2), approximately 0.693...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L498**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float ln_two&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L499**: <code>  uint32_t bits = 0x3f317218u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L500**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L501**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L502**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L503**: <code>/// Returns ln(2), approximately 0.693...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L504**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; ln_two&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L505**: <code>  return complex&lt;float&gt;(ln_two&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L506**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L507**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L508**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L509**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float ln_ln_two&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L510**: <code>  uint32_t bits = 0xbebba795u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L511**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L512**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L513**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L514**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L515**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; ln_ln_two&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L516**: <code>  return complex&lt;float&gt;(ln_ln_two&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L517**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L518**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L519**: <code>/// Returns 1/3, approximately 0.333...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L520**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float third&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L521**: <code>  uint32_t bits = 0x3eaaaaabu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L522**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L523**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L524**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L525**: <code>/// Returns 1/3, approximately 0.333...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L526**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; third&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L527**: <code>  return complex&lt;float&gt;(third&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L528**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L529**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L530**: <code>/// Returns 2/3, approximately 0.666...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L531**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float twothirds&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L532**: <code>  uint32_t bits = 0x3f2aaaabu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L533**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L534**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L535**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L536**: <code>/// Returns 2/3, approximately 0.666...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L537**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; twothirds&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L538**: <code>  return complex&lt;float&gt;(twothirds&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L539**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L540**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L541**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L542**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float pi_minus_three&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L543**: <code>  uint32_t bits = 0x3e10fdaau;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L544**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L545**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L546**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L547**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L548**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; pi_minus_three&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L549**: <code>  return complex&lt;float&gt;(pi_minus_three&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L550**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L551**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L552**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for float)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L553**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE float four_minus_pi&lt;float&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L554**: <code>  uint32_t bits = 0x3f5bc095u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L555**: <code>  return reinterpret_cast&lt;float const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L556**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L557**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L558**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for complex&lt;float&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L559**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;float&gt; four_minus_pi&lt; complex&lt;float&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L560**: <code>  return complex&lt;float&gt;(four_minus_pi&lt;float&gt;(), float());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L561**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L562**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L563**: <code>/////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L564**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L565**: <code>// Specialization for tfloat32_t</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L566**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L567**: <code>/// Returns 1, the multiplicative identity element  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L568**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t one&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L569**: <code>  uint32_t bits = 0x3f801000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L570**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L571**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L572**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L573**: <code>/// Returns 1, the multiplicative identity element  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L574**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; one&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L575**: <code>  return complex&lt;tfloat32_t&gt;(one&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L576**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L577**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L578**: <code>/// Returns 0, the additive identity element  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L579**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t zero&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L580**: <code>  uint32_t bits = 0x1000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L581**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L582**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L583**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L584**: <code>/// Returns 0, the additive identity element  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L585**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; zero&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L586**: <code>  return complex&lt;tfloat32_t&gt;(zero&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L587**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L588**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L589**: <code>/// Returns 2  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L590**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t two&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L591**: <code>  uint32_t bits = 0x40001000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L592**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L593**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L594**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L595**: <code>/// Returns 2  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L596**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; two&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L597**: <code>  return complex&lt;tfloat32_t&gt;(two&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L598**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L599**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L600**: <code>/// Returns pi, approximately 3.141  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L601**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L602**: <code>  uint32_t bits = 0x40491fdbu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L603**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L604**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L605**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L606**: <code>/// Returns pi, approximately 3.141  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L607**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L608**: <code>  return complex&lt;tfloat32_t&gt;(pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L609**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L610**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L611**: <code>/// Returns 2 * pi  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L612**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t two_pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L613**: <code>  uint32_t bits = 0x40c91fdbu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L614**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L615**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L616**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L617**: <code>/// Returns 2 * pi  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L618**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; two_pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L619**: <code>  return complex&lt;tfloat32_t&gt;(two_pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L620**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L621**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L622**: <code>/// Returns pi / 2  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L623**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t half_pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L624**: <code>  uint32_t bits = 0x3fc91fdbu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L625**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L626**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L627**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L628**: <code>/// Returns pi / 2  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L629**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; half_pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L630**: <code>  return complex&lt;tfloat32_t&gt;(half_pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L631**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L632**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L633**: <code>/// Returns sqrt(pi)  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L634**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t root_pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L635**: <code>  uint32_t bits = 0x3fe2efc5u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L636**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L637**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L638**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L639**: <code>/// Returns sqrt(pi)  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L640**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; root_pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L641**: <code>  return complex&lt;tfloat32_t&gt;(root_pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L642**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L643**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L644**: <code>/// Returns sqrt(pi / 2)  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L645**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t root_half_pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L646**: <code>  uint32_t bits = 0x3fa07c99u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L647**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L648**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L649**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L650**: <code>/// Returns sqrt(pi / 2)  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L651**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; root_half_pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L652**: <code>  return complex&lt;tfloat32_t&gt;(root_half_pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L653**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L654**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L655**: <code>/// Returns sqrt(2 * pi)  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L656**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t root_two_pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L657**: <code>  uint32_t bits = 0x40207c99u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L658**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L659**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L660**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L661**: <code>/// Returns sqrt(2 * pi)  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L662**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; root_two_pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L663**: <code>  return complex&lt;tfloat32_t&gt;(root_two_pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L664**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L665**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L666**: <code>/// Returns sqrt(ln(4))  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L667**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t root_ln_four&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L668**: <code>  uint32_t bits = 0x3f96c55fu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L669**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L670**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L671**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L672**: <code>/// Returns sqrt(ln(4))  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L673**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; root_ln_four&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L674**: <code>  return complex&lt;tfloat32_t&gt;(root_ln_four&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L675**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L676**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L677**: <code>/// Returns e, approximately 2.718...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L678**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t e&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L679**: <code>  uint32_t bits = 0x402e0854u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L680**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L681**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L682**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L683**: <code>/// Returns e, approximately 2.718...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L684**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; e&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L685**: <code>  return complex&lt;tfloat32_t&gt;(e&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L686**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L687**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L688**: <code>/// Returns (1/2)  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L689**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t half&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L690**: <code>  uint32_t bits = 0x3f001000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L691**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L692**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L693**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L694**: <code>/// Returns (1/2)  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L695**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; half&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L696**: <code>  return complex&lt;tfloat32_t&gt;(half&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L697**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L698**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L699**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L700**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t root_two&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L701**: <code>  uint32_t bits = 0x3fb514f3u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L702**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L703**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L704**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L705**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L706**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; root_two&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L707**: <code>  return complex&lt;tfloat32_t&gt;(root_two&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L708**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L709**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L710**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L711**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t half_root_two&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L712**: <code>  uint32_t bits = 0x3f3514f3u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L713**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L714**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L715**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L716**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L717**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; half_root_two&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L718**: <code>  return complex&lt;tfloat32_t&gt;(half_root_two&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L719**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L720**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L721**: <code>/// Returns ln(2), approximately 0.693...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L722**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t ln_two&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L723**: <code>  uint32_t bits = 0x3f318218u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L724**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L725**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L726**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L727**: <code>/// Returns ln(2), approximately 0.693...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L728**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; ln_two&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L729**: <code>  return complex&lt;tfloat32_t&gt;(ln_two&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L730**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L731**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L732**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L733**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t ln_ln_two&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L734**: <code>  uint32_t bits = 0xbebbb795u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L735**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L736**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L737**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L738**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L739**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; ln_ln_two&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L740**: <code>  return complex&lt;tfloat32_t&gt;(ln_ln_two&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L741**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L742**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L743**: <code>/// Returns 1/3, approximately 0.333...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L744**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t third&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L745**: <code>  uint32_t bits = 0x3eaabaabu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L746**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L747**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L748**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L749**: <code>/// Returns 1/3, approximately 0.333...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L750**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; third&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L751**: <code>  return complex&lt;tfloat32_t&gt;(third&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L752**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L753**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L754**: <code>/// Returns 2/3, approximately 0.666...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L755**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t twothirds&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L756**: <code>  uint32_t bits = 0x3f2abaabu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L757**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L758**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L759**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L760**: <code>/// Returns 2/3, approximately 0.666...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L761**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; twothirds&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L762**: <code>  return complex&lt;tfloat32_t&gt;(twothirds&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L763**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L764**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L765**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L766**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t pi_minus_three&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L767**: <code>  uint32_t bits = 0x3e110daau;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L768**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L769**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L770**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L771**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L772**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; pi_minus_three&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L773**: <code>  return complex&lt;tfloat32_t&gt;(pi_minus_three&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L774**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L775**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L776**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for tfloat32_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L777**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE tfloat32_t four_minus_pi&lt;tfloat32_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L778**: <code>  uint32_t bits = 0x3f5bd095u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L779**: <code>  return reinterpret_cast&lt;tfloat32_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L780**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L781**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L782**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for complex&lt;tfloat32_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L783**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;tfloat32_t&gt; four_minus_pi&lt; complex&lt;tfloat32_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L784**: <code>  return complex&lt;tfloat32_t&gt;(four_minus_pi&lt;tfloat32_t&gt;(), tfloat32_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L785**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L786**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L787**: <code>/////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L788**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L789**: <code>// Specialization for half_t</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L790**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L791**: <code>/// Returns 1, the multiplicative identity element  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L792**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t one&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L793**: <code>  uint16_t bits = 0x3c00u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L794**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L795**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L796**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L797**: <code>/// Returns 1, the multiplicative identity element  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L798**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; one&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L799**: <code>  return complex&lt;half_t&gt;(one&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L800**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L801**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L802**: <code>/// Returns 0, the additive identity element  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L803**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t zero&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L804**: <code>  uint16_t bits = 0x0u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L805**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L806**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L807**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L808**: <code>/// Returns 0, the additive identity element  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L809**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; zero&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L810**: <code>  return complex&lt;half_t&gt;(zero&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L811**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L812**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L813**: <code>/// Returns 2  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L814**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t two&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L815**: <code>  uint16_t bits = 0x4000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L816**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L817**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L818**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L819**: <code>/// Returns 2  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L820**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; two&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L821**: <code>  return complex&lt;half_t&gt;(two&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L822**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L823**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L824**: <code>/// Returns pi, approximately 3.141  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L825**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L826**: <code>  uint16_t bits = 0x4248u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L827**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L828**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L829**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L830**: <code>/// Returns pi, approximately 3.141  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L831**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L832**: <code>  return complex&lt;half_t&gt;(pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L833**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L834**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L835**: <code>/// Returns 2 * pi  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L836**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t two_pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L837**: <code>  uint16_t bits = 0x4648u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L838**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L839**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L840**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L841**: <code>/// Returns 2 * pi  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L842**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; two_pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L843**: <code>  return complex&lt;half_t&gt;(two_pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L844**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L845**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L846**: <code>/// Returns pi / 2  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L847**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t half_pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L848**: <code>  uint16_t bits = 0x3e48u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L849**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L850**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L851**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L852**: <code>/// Returns pi / 2  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L853**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; half_pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L854**: <code>  return complex&lt;half_t&gt;(half_pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L855**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L856**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L857**: <code>/// Returns sqrt(pi)  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L858**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t root_pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L859**: <code>  uint16_t bits = 0x3f17u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L860**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L861**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L862**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L863**: <code>/// Returns sqrt(pi)  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L864**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; root_pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L865**: <code>  return complex&lt;half_t&gt;(root_pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L866**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L867**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L868**: <code>/// Returns sqrt(pi / 2)  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L869**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t root_half_pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L870**: <code>  uint16_t bits = 0x3d03u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L871**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L872**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L873**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L874**: <code>/// Returns sqrt(pi / 2)  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L875**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; root_half_pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L876**: <code>  return complex&lt;half_t&gt;(root_half_pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L877**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L878**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L879**: <code>/// Returns sqrt(2 * pi)  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L880**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t root_two_pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L881**: <code>  uint16_t bits = 0x4103u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L882**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L883**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L884**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L885**: <code>/// Returns sqrt(2 * pi)  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L886**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; root_two_pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L887**: <code>  return complex&lt;half_t&gt;(root_two_pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L888**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L889**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L890**: <code>/// Returns sqrt(ln(4))  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L891**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t root_ln_four&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L892**: <code>  uint16_t bits = 0x3cb6u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L893**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L894**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L895**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L896**: <code>/// Returns sqrt(ln(4))  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L897**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; root_ln_four&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L898**: <code>  return complex&lt;half_t&gt;(root_ln_four&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L899**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L900**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L901**: <code>/// Returns e, approximately 2.718...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L902**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t e&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L903**: <code>  uint16_t bits = 0x4170u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L904**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L905**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L906**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L907**: <code>/// Returns e, approximately 2.718...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L908**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; e&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L909**: <code>  return complex&lt;half_t&gt;(e&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L910**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L911**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L912**: <code>/// Returns (1/2)  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L913**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t half&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L914**: <code>  uint16_t bits = 0x3800u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L915**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L916**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L917**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L918**: <code>/// Returns (1/2)  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L919**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; half&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L920**: <code>  return complex&lt;half_t&gt;(half&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L921**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L922**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L923**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L924**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t root_two&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L925**: <code>  uint16_t bits = 0x3da8u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L926**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L927**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L928**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L929**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L930**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; root_two&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L931**: <code>  return complex&lt;half_t&gt;(root_two&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L932**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L933**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L934**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L935**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t half_root_two&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L936**: <code>  uint16_t bits = 0x39a8u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L937**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L938**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L939**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L940**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L941**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; half_root_two&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L942**: <code>  return complex&lt;half_t&gt;(half_root_two&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L943**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L944**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L945**: <code>/// Returns ln(2), approximately 0.693...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L946**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t ln_two&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L947**: <code>  uint16_t bits = 0x398cu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L948**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L949**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L950**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L951**: <code>/// Returns ln(2), approximately 0.693...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L952**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; ln_two&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L953**: <code>  return complex&lt;half_t&gt;(ln_two&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L954**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L955**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L956**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L957**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t ln_ln_two&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L958**: <code>  uint16_t bits = 0xb5ddu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L959**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L960**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L961**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L962**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L963**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; ln_ln_two&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L964**: <code>  return complex&lt;half_t&gt;(ln_ln_two&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L965**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L966**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L967**: <code>/// Returns 1/3, approximately 0.333...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L968**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t third&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L969**: <code>  uint16_t bits = 0x3555u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L970**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L971**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L972**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L973**: <code>/// Returns 1/3, approximately 0.333...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L974**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; third&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L975**: <code>  return complex&lt;half_t&gt;(third&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L976**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L977**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L978**: <code>/// Returns 2/3, approximately 0.666...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L979**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t twothirds&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L980**: <code>  uint16_t bits = 0x3955u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L981**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L982**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L983**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L984**: <code>/// Returns 2/3, approximately 0.666...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L985**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; twothirds&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L986**: <code>  return complex&lt;half_t&gt;(twothirds&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L987**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L988**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L989**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L990**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t pi_minus_three&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L991**: <code>  uint16_t bits = 0x3088u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L992**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L993**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L994**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L995**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L996**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; pi_minus_three&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L997**: <code>  return complex&lt;half_t&gt;(pi_minus_three&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L998**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L999**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1000**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for half_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1001**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE half_t four_minus_pi&lt;half_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1002**: <code>  uint16_t bits = 0x3adeu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1003**: <code>  return reinterpret_cast&lt;half_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1004**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1005**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1006**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for complex&lt;half_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1007**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;half_t&gt; four_minus_pi&lt; complex&lt;half_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1008**: <code>  return complex&lt;half_t&gt;(four_minus_pi&lt;half_t&gt;(), half_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1009**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1010**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1011**: <code>/////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1012**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1013**: <code>// Specialization for bfloat16_t</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L1014**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1015**: <code>/// Returns 1, the multiplicative identity element  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1016**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t one&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1017**: <code>  uint16_t bits = 0x3f80u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1018**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1019**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1020**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1021**: <code>/// Returns 1, the multiplicative identity element  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1022**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; one&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1023**: <code>  return complex&lt;bfloat16_t&gt;(one&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1024**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1025**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1026**: <code>/// Returns 0, the additive identity element  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1027**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t zero&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1028**: <code>  uint16_t bits = 0x0u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1029**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1030**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1031**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1032**: <code>/// Returns 0, the additive identity element  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1033**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; zero&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1034**: <code>  return complex&lt;bfloat16_t&gt;(zero&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1035**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1036**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1037**: <code>/// Returns 2  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1038**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t two&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1039**: <code>  uint16_t bits = 0x4000u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1040**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1041**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1042**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1043**: <code>/// Returns 2  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1044**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; two&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1045**: <code>  return complex&lt;bfloat16_t&gt;(two&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1046**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1047**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1048**: <code>/// Returns pi, approximately 3.141  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1049**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1050**: <code>  uint16_t bits = 0x4049u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1051**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1052**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1053**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1054**: <code>/// Returns pi, approximately 3.141  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1055**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1056**: <code>  return complex&lt;bfloat16_t&gt;(pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1057**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1058**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1059**: <code>/// Returns 2 * pi  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1060**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t two_pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1061**: <code>  uint16_t bits = 0x40c9u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1062**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1063**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1064**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1065**: <code>/// Returns 2 * pi  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1066**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; two_pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1067**: <code>  return complex&lt;bfloat16_t&gt;(two_pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1068**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1069**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1070**: <code>/// Returns pi / 2  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1071**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t half_pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1072**: <code>  uint16_t bits = 0x3fc9u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1073**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1074**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1075**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1076**: <code>/// Returns pi / 2  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1077**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; half_pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1078**: <code>  return complex&lt;bfloat16_t&gt;(half_pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1079**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1080**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1081**: <code>/// Returns sqrt(pi)  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1082**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t root_pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1083**: <code>  uint16_t bits = 0x3fe3u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1084**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1085**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1086**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1087**: <code>/// Returns sqrt(pi)  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1088**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; root_pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1089**: <code>  return complex&lt;bfloat16_t&gt;(root_pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1090**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1091**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1092**: <code>/// Returns sqrt(pi / 2)  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1093**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t root_half_pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1094**: <code>  uint16_t bits = 0x3fa0u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1095**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1096**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1097**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1098**: <code>/// Returns sqrt(pi / 2)  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1099**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; root_half_pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1100**: <code>  return complex&lt;bfloat16_t&gt;(root_half_pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1101**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1103**: <code>/// Returns sqrt(2 * pi)  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1104**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t root_two_pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1105**: <code>  uint16_t bits = 0x4020u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1106**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1107**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1109**: <code>/// Returns sqrt(2 * pi)  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1110**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; root_two_pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1111**: <code>  return complex&lt;bfloat16_t&gt;(root_two_pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1112**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1114**: <code>/// Returns sqrt(ln(4))  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1115**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t root_ln_four&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1116**: <code>  uint16_t bits = 0x3f97u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1117**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1118**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1119**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1120**: <code>/// Returns sqrt(ln(4))  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1121**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; root_ln_four&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1122**: <code>  return complex&lt;bfloat16_t&gt;(root_ln_four&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1123**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1124**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1125**: <code>/// Returns e, approximately 2.718...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1126**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t e&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1127**: <code>  uint16_t bits = 0x402eu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1128**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1129**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1130**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1131**: <code>/// Returns e, approximately 2.718...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1132**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; e&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1133**: <code>  return complex&lt;bfloat16_t&gt;(e&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1134**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1135**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1136**: <code>/// Returns (1/2)  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1137**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t half&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1138**: <code>  uint16_t bits = 0x3f00u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1139**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1140**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1141**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1142**: <code>/// Returns (1/2)  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1143**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; half&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1144**: <code>  return complex&lt;bfloat16_t&gt;(half&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1145**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1146**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1147**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1148**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t root_two&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1149**: <code>  uint16_t bits = 0x3fb5u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1150**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1151**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1153**: <code>/// Returns sqrt(2), approximately 1.414...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1154**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; root_two&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1155**: <code>  return complex&lt;bfloat16_t&gt;(root_two&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1156**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1157**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1158**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1159**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t half_root_two&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1160**: <code>  uint16_t bits = 0x3f35u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1161**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1162**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1163**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1164**: <code>/// Returns sqrt(2)/2, approximately 0.707...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1165**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; half_root_two&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1166**: <code>  return complex&lt;bfloat16_t&gt;(half_root_two&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1167**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1168**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1169**: <code>/// Returns ln(2), approximately 0.693...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1170**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t ln_two&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1171**: <code>  uint16_t bits = 0x3f31u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1172**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1173**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1174**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1175**: <code>/// Returns ln(2), approximately 0.693...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1176**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; ln_two&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1177**: <code>  return complex&lt;bfloat16_t&gt;(ln_two&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1178**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1179**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1180**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1181**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t ln_ln_two&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1182**: <code>  uint16_t bits = 0xbebcu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1183**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1184**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1185**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1186**: <code>/// Returns ln(ln(2)), approximately -0.3665...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1187**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; ln_ln_two&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1188**: <code>  return complex&lt;bfloat16_t&gt;(ln_ln_two&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1189**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1190**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1191**: <code>/// Returns 1/3, approximately 0.333...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1192**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t third&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1193**: <code>  uint16_t bits = 0x3eabu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1194**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1195**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1196**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1197**: <code>/// Returns 1/3, approximately 0.333...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1198**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; third&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1199**: <code>  return complex&lt;bfloat16_t&gt;(third&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1200**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1201**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1202**: <code>/// Returns 2/3, approximately 0.666...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1203**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t twothirds&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1204**: <code>  uint16_t bits = 0x3f2bu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1205**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1206**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1207**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1208**: <code>/// Returns 2/3, approximately 0.666...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1209**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; twothirds&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1210**: <code>  return complex&lt;bfloat16_t&gt;(twothirds&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1211**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1212**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1213**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1214**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t pi_minus_three&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1215**: <code>  uint16_t bits = 0x3e11u;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1216**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1217**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1218**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1219**: <code>/// Returns pi - 3, approximately 0.1416...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1220**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; pi_minus_three&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1221**: <code>  return complex&lt;bfloat16_t&gt;(pi_minus_three&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1222**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1223**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1224**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for bfloat16_t)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1225**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE bfloat16_t four_minus_pi&lt;bfloat16_t&gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1226**: <code>  uint16_t bits = 0x3f5cu;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L1227**: <code>  return reinterpret_cast&lt;bfloat16_t const &amp;&gt;(bits);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1228**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1229**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1230**: <code>/// Returns 4 - pi, approximately 0.858...  (specialization for complex&lt;bfloat16_t&gt;)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L1231**: <code>template &lt;&gt; CUTLASS_HOST_DEVICE complex&lt;bfloat16_t&gt; four_minus_pi&lt; complex&lt;bfloat16_t&gt; &gt;() {</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L1232**: <code>  return complex&lt;bfloat16_t&gt;(four_minus_pi&lt;bfloat16_t&gt;(), bfloat16_t());</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L1233**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1234**: <code>///////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L1235**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1236**: <code>} // namespace constants</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1237**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L1238**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L1239**: <code>///////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Host-device annotations / 主机设备限定符
+- Symbol focus: `one` / 重点符号：`one`
+- Symbol focus: `zero` / 重点符号：`zero`
+- Symbol focus: `two` / 重点符号：`two`
+- Symbol focus: `pi` / 重点符号：`pi`
+- Symbol focus: `two_pi` / 重点符号：`two_pi`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/numeric_types.h"`
+  - `"cutlass/complex.h"`

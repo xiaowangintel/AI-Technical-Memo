@@ -1,0 +1,4673 @@
+# convolution.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/device/convolution.h`
+**Purpose / 用途**: Provides a device-side reference implementation or helper for 卷积. / 为 卷积 提供设备端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L33** <code>    \brief Reference implementation for convolution in device-side code.</code>
+  - EN: Comment that documents intent or context: "\brief Reference implementation for convolution in device-side code.".
+  - CN: 用于说明意图或上下文的注释："\brief Reference implementation for convolution in device-side code."。
+- **L34** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes `cutlass/coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes `cutlass/functional.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/functional.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/layout/tensor.h&quot;</code>
+  - EN: Includes `cutlass/layout/tensor.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/tensor.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L41** <code>#include &quot;cutlass/matrix_shape.h&quot;</code>
+  - EN: Includes `cutlass/matrix_shape.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/matrix_shape.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L42** <code>#include &quot;cutlass/numeric_conversion.h&quot;</code>
+  - EN: Includes `cutlass/numeric_conversion.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_conversion.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>#include &quot;cutlass/tensor_ref.h&quot;</code>
+  - EN: Includes `cutlass/tensor_ref.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_ref.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L45** <code>#include &quot;cutlass/conv/convolution.h&quot;</code>
+  - EN: Includes `cutlass/conv/convolution.h` so this file can use CUTLASS convolution support.
+  - CN: 引入 `cutlass/conv/convolution.h`，使当前文件可以使用CUTLASS 卷积支持。
+- **L46** <code>#include &quot;cutlass/conv/conv2d_problem_size.h&quot;</code>
+  - EN: Includes `cutlass/conv/conv2d_problem_size.h` so this file can use CUTLASS convolution support.
+  - CN: 引入 `cutlass/conv/conv2d_problem_size.h`，使当前文件可以使用CUTLASS 卷积支持。
+- **L47** <code>#include &quot;cutlass/conv/conv3d_problem_size.h&quot;</code>
+  - EN: Includes `cutlass/conv/conv3d_problem_size.h` so this file can use CUTLASS convolution support.
+  - CN: 引入 `cutlass/conv/conv3d_problem_size.h`，使当前文件可以使用CUTLASS 卷积支持。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L50** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L51** <code>namespace device {</code>
+  - EN: Opens namespace `device` to group related symbols.
+  - CN: 打开命名空间 `device`，用于归组相关符号。
+- **L52** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L53** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>namespace kernel {</code>
+  - EN: Opens namespace `kernel` to group related symbols.
+  - CN: 打开命名空间 `kernel`，用于归组相关符号。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L58** <code>///                                   Conv2d device reference kernel</code>
+  - EN: Comment that documents intent or context: "Conv2d device reference kernel".
+  - CN: 用于说明意图或上下文的注释："Conv2d device reference kernel"。
+- **L59** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L60** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L61** <code>// Conv2d Fprop kernel - y = fprop(x, w)</code>
+  - EN: Comment that documents intent or context: "Conv2d Fprop kernel - y = fprop(x, w)".
+  - CN: 用于说明意图或上下文的注释："Conv2d Fprop kernel - y = fprop(x, w)"。
+- **L62** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L63** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L64** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L65** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L66** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L67** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L68** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L69** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L70** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L71** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L72** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L73** <code>  int kThreadM = 2,       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L74** <code>  int kThreadN = 4,       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L75** <code>  int kCtaShapeM = 16,    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L76** <code>  int kCtaShapeN = 8      // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L77** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L78** <code>__global__ void Conv2dFprop(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2dFprop`.
+  - CN: 开始或继续与 `Conv2dFprop` 相关的签名/调用语法。
+- **L79** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L80** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L81** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L82** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L83** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L84** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L85** <code>  ElementCompute beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L86** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L87** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L88** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L89** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L90** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L91** <code>  ElementAccumulator element_A[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L92** <code>  ElementAccumulator element_B[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L93** <code>  ElementAccumulator accum[kThreadM][kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>  int64_t npq_start = int64_t(blockIdx.x) * kCtaShapeM * kThreadM + threadIdx.x * kThreadM;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L96** <code>  int k_start = blockIdx.y * kCtaShapeN * kThreadN + threadIdx.y * kThreadN;</code>
+  - EN: Assigns or initializes `k_start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `k_start` 进行赋值或初始化。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>  int thread_n[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L99** <code>  int thread_p[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L100** <code>  int thread_q[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L101** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L102** <code>  // Compute N, P, Q coordinates for each row of a thread&#x27;s tile</code>
+  - EN: Comment that documents intent or context: "Compute N, P, Q coordinates for each row of a thread's tile".
+  - CN: 用于说明意图或上下文的注释："Compute N, P, Q coordinates for each row of a thread's tile"。
+- **L103** <code>  int64_t PQ = int64_t(problem_size.P) * problem_size.Q;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L104** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L105** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L106** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L107** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L108** <code>    int64_t npq = npq_start + m;</code>
+  - EN: Assigns or initializes `npq` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `npq` 进行赋值或初始化。
+- **L109** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L110** <code>    thread_n[m] = int(npq / PQ);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L111** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L112** <code>    int64_t residual = npq % PQ;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L113** <code>    thread_p[m] = int(residual / problem_size.Q);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L114** <code>    thread_q[m] = int(residual % problem_size.Q);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L115** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L116** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L117** <code>  // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L118** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L119** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L120** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>    for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L122** <code>      accum[m][n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L123** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L124** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L125** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L126** <code>  int c_per_group = problem_size.C / problem_size.groups;</code>
+  - EN: Assigns or initializes `c_per_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_per_group` 进行赋值或初始化。
+- **L127** <code>  int k_per_group = problem_size.K / problem_size.groups;</code>
+  - EN: Assigns or initializes `k_per_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `k_per_group` 进行赋值或初始化。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>  // Compute convolution</code>
+  - EN: Comment that documents intent or context: "Compute convolution".
+  - CN: 用于说明意图或上下文的注释："Compute convolution"。
+- **L130** <code>  for (int R = 0; R &lt; problem_size.R; ++R) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L131** <code>    for (int S = 0; S &lt; problem_size.S; ++S) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L132** <code>      for (int C = 0; C &lt; problem_size.C; ++C) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L133** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L134** <code>        // Get group id of currnet channel</code>
+  - EN: Comment that documents intent or context: "Get group id of currnet channel".
+  - CN: 用于说明意图或上下文的注释："Get group id of currnet channel"。
+- **L135** <code>        int c_group_idx = C / c_per_group;</code>
+  - EN: Assigns or initializes `c_group_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_group_idx` 进行赋值或初始化。
+- **L136** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L137** <code>        // Load from activations tensor</code>
+  - EN: Comment that documents intent or context: "Load from activations tensor".
+  - CN: 用于说明意图或上下文的注释："Load from activations tensor"。
+- **L138** <code>        int filter_r = R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L139** <code>        int filter_s = S;   </code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>        if (problem_size.mode == cutlass::conv::Mode::kConvolution) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L142** <code>          filter_r = problem_size.R - 1 - R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L143** <code>          filter_s = problem_size.S - 1 - S;</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L144** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L147** <code>        for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L148** <code>          int h = thread_p[m] * problem_size.stride_h - problem_size.pad_h + filter_r * problem_size.dilation_h;</code>
+  - EN: Assigns or initializes `h` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h` 进行赋值或初始化。
+- **L149** <code>          int w = thread_q[m] * problem_size.stride_w - problem_size.pad_w + filter_s * problem_size.dilation_w;</code>
+  - EN: Assigns or initializes `w` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w` 进行赋值或初始化。
+- **L150** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L151** <code>          if (thread_n[m] &lt; problem_size.N &amp;&amp; h &gt;= 0 &amp;&amp; h &lt; problem_size.H &amp;&amp; w &gt;= 0 &amp;&amp; w &lt; problem_size.W) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L152** <code>            element_A[m] = ElementAccumulator(tensor_x.at({thread_n[m], h, w, C}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L153** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L154** <code>          else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L155** <code>            element_A[m] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L156** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L157** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L158** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L159** <code>        // Load from filters tensor</code>
+  - EN: Comment that documents intent or context: "Load from filters tensor".
+  - CN: 用于说明意图或上下文的注释："Load from filters tensor"。
+- **L160** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L161** <code>        for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L162** <code>          int thread_k = k_start + n;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L163** <code>          int k_group_idx = thread_k / k_per_group;</code>
+  - EN: Assigns or initializes `k_group_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `k_group_idx` 进行赋值或初始化。
+- **L164** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L165** <code>          if (thread_k &lt; problem_size.K &amp;&amp; k_group_idx == c_group_idx) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L166** <code>            element_B[n] = ElementAccumulator(tensor_w.at({thread_k, R, S, C % c_per_group}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L167** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L168** <code>          else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L169** <code>            element_B[n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L170** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L171** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L172** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L173** <code>        // Accumulate matrix product</code>
+  - EN: Comment that documents intent or context: "Accumulate matrix product".
+  - CN: 用于说明意图或上下文的注释："Accumulate matrix product"。
+- **L174** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L175** <code>        for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L176** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L177** <code>          for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L178** <code>            accum[m][n] = inner_product_op(element_A[m], element_B[n], accum[m][n]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L179** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L181** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L182** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L183** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>  // Write out the results</code>
+  - EN: Comment that documents intent or context: "Write out the results".
+  - CN: 用于说明意图或上下文的注释："Write out the results"。
+- **L186** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L187** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L188** <code>    if (thread_n[m] &lt; problem_size.N &amp;&amp; thread_p[m] &lt; problem_size.P &amp;&amp; thread_q[m] &lt; problem_size.Q) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L189** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L190** <code>      for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L191** <code>        int thread_k = k_start + n;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L192** <code>        if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L194** <code>          ElementCompute c_ref = ElementCompute();</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L195** <code>          if (beta != ElementCompute()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L196** <code>            c_ref = ElementCompute(tensor_y_in.at({thread_n[m], thread_p[m], thread_q[m], thread_k}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L197** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L198** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L199** <code>          tensor_y_out.at({thread_n[m], thread_p[m], thread_q[m], thread_k}) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L200** <code>            alpha * ElementCompute(accum[m][n]) + beta * c_ref);</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L201** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L202** <code>      } </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L203** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L204** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L205** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L206** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L207** <code>// Conv3d Fprop kernel - y = fprop(x, w)</code>
+  - EN: Comment that documents intent or context: "Conv3d Fprop kernel - y = fprop(x, w)".
+  - CN: 用于说明意图或上下文的注释："Conv3d Fprop kernel - y = fprop(x, w)"。
+- **L208** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L209** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L210** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L211** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L212** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L213** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L214** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L215** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L216** <code>  typename ElementAccumulator =  ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L217** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L218** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L219** <code>  int kThreadM = 2,       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L220** <code>  int kThreadN = 4,       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L221** <code>  int kCtaShapeM = 16,    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L222** <code>  int kCtaShapeN = 8      // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L223** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>__global__ void Conv3dFprop(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3dFprop`.
+  - CN: 开始或继续与 `Conv3dFprop` 相关的签名/调用语法。
+- **L225** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L226** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L227** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L228** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L229** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L230** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L231** <code>  ElementCompute beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L232** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L234** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L235** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L236** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L237** <code>  ElementAccumulator element_A[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L238** <code>  ElementAccumulator element_B[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L239** <code>  ElementAccumulator accum[kThreadM][kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L240** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L241** <code>  int64_t nzpq_start = int64_t(blockIdx.x) * kCtaShapeM * kThreadM + threadIdx.x * kThreadM;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L242** <code>  int k_start = blockIdx.y * kCtaShapeN * kThreadN + threadIdx.y * kThreadN;</code>
+  - EN: Assigns or initializes `k_start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `k_start` 进行赋值或初始化。
+- **L243** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L244** <code>  int thread_n[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L245** <code>  int thread_z[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L246** <code>  int thread_p[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L247** <code>  int thread_q[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>  // Compute N, Z, P, Q coordinates for each row of a thread&#x27;s tile</code>
+  - EN: Comment that documents intent or context: "Compute N, Z, P, Q coordinates for each row of a thread's tile".
+  - CN: 用于说明意图或上下文的注释："Compute N, Z, P, Q coordinates for each row of a thread's tile"。
+- **L250** <code>  int64_t PQ = int64_t(problem_size.P) * problem_size.Q;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L251** <code>  int64_t ZPQ = PQ * problem_size.Z;</code>
+  - EN: Assigns or initializes `ZPQ` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ZPQ` 进行赋值或初始化。
+- **L252** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L253** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L254** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>    int64_t nzpq = nzpq_start + m;</code>
+  - EN: Assigns or initializes `nzpq` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `nzpq` 进行赋值或初始化。
+- **L257** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L258** <code>    thread_n[m] = int(nzpq / ZPQ);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L259** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L260** <code>    int64_t residual = nzpq % ZPQ;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L261** <code>    thread_z[m] = int(residual / PQ);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L262** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L263** <code>    residual = residual % PQ;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L264** <code>    thread_p[m] = int(residual / problem_size.Q);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L265** <code>    thread_q[m] = int(residual % problem_size.Q);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L266** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L267** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L268** <code>  // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L269** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L270** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L271** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L272** <code>    for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L273** <code>      accum[m][n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L274** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L275** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L276** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L277** <code>  // Compute convolution</code>
+  - EN: Comment that documents intent or context: "Compute convolution".
+  - CN: 用于说明意图或上下文的注释："Compute convolution"。
+- **L278** <code>  for (int T = 0; T &lt; problem_size.T; ++T) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L279** <code>    for (int R = 0; R &lt; problem_size.R; ++R) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L280** <code>      for (int S = 0; S &lt; problem_size.S; ++S) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L281** <code>        for (int C = 0; C &lt; problem_size.C; ++C) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L282** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L283** <code>          // Load from activations tensor</code>
+  - EN: Comment that documents intent or context: "Load from activations tensor".
+  - CN: 用于说明意图或上下文的注释："Load from activations tensor"。
+- **L284** <code>          int filter_t = T;</code>
+  - EN: Assigns or initializes `filter_t` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_t` 进行赋值或初始化。
+- **L285** <code>          int filter_r = R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L286** <code>          int filter_s = S;   </code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L287** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L288** <code>          if (problem_size.mode == cutlass::conv::Mode::kConvolution) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L289** <code>            filter_t = problem_size.T - 1 - T;</code>
+  - EN: Assigns or initializes `filter_t` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_t` 进行赋值或初始化。
+- **L290** <code>            filter_r = problem_size.R - 1 - R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L291** <code>            filter_s = problem_size.S - 1 - S;</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L292** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L293** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L294** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L295** <code>          for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L296** <code>            int d = thread_z[m] * problem_size.stride_d - problem_size.pad_d + filter_t * problem_size.dilation_d;</code>
+  - EN: Assigns or initializes `d` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `d` 进行赋值或初始化。
+- **L297** <code>            int h = thread_p[m] * problem_size.stride_h - problem_size.pad_h + filter_r * problem_size.dilation_h;</code>
+  - EN: Assigns or initializes `h` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h` 进行赋值或初始化。
+- **L298** <code>            int w = thread_q[m] * problem_size.stride_w - problem_size.pad_w + filter_s * problem_size.dilation_w;</code>
+  - EN: Assigns or initializes `w` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w` 进行赋值或初始化。
+- **L299** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L300** <code>            if (thread_n[m] &lt; problem_size.N &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L301** <code>              d &gt;= 0 &amp;&amp; d &lt; problem_size.D &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L302** <code>              h &gt;= 0 &amp;&amp; h &lt; problem_size.H &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L303** <code>              w &gt;= 0 &amp;&amp; w &lt; problem_size.W) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>              element_A[m] = ElementAccumulator(tensor_x.at({thread_n[m], d, h, w, C}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L306** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L307** <code>            else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L308** <code>              element_A[m] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L309** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L310** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L311** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L312** <code>          // Load from filters tensor</code>
+  - EN: Comment that documents intent or context: "Load from filters tensor".
+  - CN: 用于说明意图或上下文的注释："Load from filters tensor"。
+- **L313** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L314** <code>          for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L315** <code>            int thread_k = k_start + n;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L316** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L317** <code>            if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L318** <code>              element_B[n] = ElementAccumulator(tensor_w.at({thread_k, T, R, S, C}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L319** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L320** <code>            else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L321** <code>              element_B[n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L322** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L323** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L324** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L325** <code>          // Accumulate matrix product</code>
+  - EN: Comment that documents intent or context: "Accumulate matrix product".
+  - CN: 用于说明意图或上下文的注释："Accumulate matrix product"。
+- **L326** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L327** <code>          for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L328** <code>            CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L329** <code>            for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L330** <code>              accum[m][n] = inner_product_op(element_A[m], element_B[n], accum[m][n]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L331** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L332** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L333** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L334** <code>        } // for (C)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L335** <code>      } // for (S)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L336** <code>    }  // for (R) </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L337** <code>  } // for (T)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>  // Write out the results</code>
+  - EN: Comment that documents intent or context: "Write out the results".
+  - CN: 用于说明意图或上下文的注释："Write out the results"。
+- **L340** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L341** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L342** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L343** <code>    if (thread_n[m] &lt; problem_size.N &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L344** <code>      thread_z[m] &lt; problem_size.Z &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L345** <code>      thread_p[m] &lt; problem_size.P &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L346** <code>      thread_q[m] &lt; problem_size.Q) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L347** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L348** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L349** <code>      for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L350** <code>        int thread_k = k_start + n;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L351** <code>        if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L353** <code>          ElementCompute c_ref = ElementCompute();</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L354** <code>          if (beta != ElementCompute()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L355** <code>            c_ref = ElementCompute(tensor_y_in.at({thread_n[m], thread_z[m], thread_p[m], thread_q[m], thread_k}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L356** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L357** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L358** <code>          tensor_y_out.at({thread_n[m], thread_z[m], thread_p[m], thread_q[m], thread_k}) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L359** <code>            alpha * ElementCompute(accum[m][n]) + beta * c_ref);</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L360** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L361** <code>      } // for (n)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L362** <code> </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L363** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L364** <code>  } // for (m)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L365** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L366** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L367** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L368** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L369** <code>// Conv2d dgrad kernel - dx = dgrad(dy, w)</code>
+  - EN: Comment that documents intent or context: "Conv2d dgrad kernel - dx = dgrad(dy, w)".
+  - CN: 用于说明意图或上下文的注释："Conv2d dgrad kernel - dx = dgrad(dy, w)"。
+- **L370** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L371** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L372** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L373** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L374** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L375** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L376** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L377** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L378** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L379** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L380** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L381** <code>  int kThreadM = 2,       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L382** <code>  int kThreadN = 4,       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L383** <code>  int kCtaShapeM = 16,    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L384** <code>  int kCtaShapeN = 8      // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L385** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L386** <code>__global__ void Conv2dDgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2dDgrad`.
+  - CN: 开始或继续与 `Conv2dDgrad` 相关的签名/调用语法。
+- **L387** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L388** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L389** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L390** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L391** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L392** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L393** <code>  ElementCompute beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L394** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L395** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L396** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L397** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L398** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L399** <code>  ElementAccumulator element_A[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L400** <code>  ElementAccumulator element_B[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L401** <code>  ElementAccumulator accum[kThreadM][kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L402** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L403** <code>  int64_t nhw_start = int64_t(blockIdx.x) * kCtaShapeM * kThreadM + threadIdx.x * kThreadM;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L404** <code>  int c_start = blockIdx.y * kCtaShapeN * kThreadN + threadIdx.y * kThreadN;</code>
+  - EN: Assigns or initializes `c_start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_start` 进行赋值或初始化。
+- **L405** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L406** <code>  int thread_n[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L407** <code>  int thread_h[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L408** <code>  int thread_w[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L409** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L410** <code>  // Compute N, H, W coordinates for each row of a thread&#x27;s tile</code>
+  - EN: Comment that documents intent or context: "Compute N, H, W coordinates for each row of a thread's tile".
+  - CN: 用于说明意图或上下文的注释："Compute N, H, W coordinates for each row of a thread's tile"。
+- **L411** <code>  int64_t HW = int64_t(problem_size.H) * problem_size.W;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L412** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L413** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L414** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L415** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L416** <code>    int64_t nhw = nhw_start + m;</code>
+  - EN: Assigns or initializes `nhw` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `nhw` 进行赋值或初始化。
+- **L417** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L418** <code>    thread_n[m] = int(nhw / HW);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L419** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L420** <code>    int64_t residual = nhw % HW;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L421** <code>    thread_h[m] = int(residual / problem_size.W);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L422** <code>    thread_w[m] = int(residual % problem_size.W);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L423** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L424** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L425** <code>  // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L426** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L427** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L428** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L429** <code>    for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L430** <code>      accum[m][n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L431** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L432** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L433** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L434** <code>  // Compute convolution</code>
+  - EN: Comment that documents intent or context: "Compute convolution".
+  - CN: 用于说明意图或上下文的注释："Compute convolution"。
+- **L435** <code>  for (int R = 0; R &lt; problem_size.R; ++R) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L436** <code>    for (int S = 0; S &lt; problem_size.S; ++S) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L437** <code>      for (int K = 0; K &lt; problem_size.K; ++K) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L438** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L439** <code>        // Load from activations tensor</code>
+  - EN: Comment that documents intent or context: "Load from activations tensor".
+  - CN: 用于说明意图或上下文的注释："Load from activations tensor"。
+- **L440** <code>        int filter_r = R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L441** <code>        int filter_s = S;   </code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L442** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L443** <code>        if (problem_size.mode == cutlass::conv::Mode::kConvolution) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L444** <code>          filter_r = problem_size.R - 1 - R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L445** <code>          filter_s = problem_size.S - 1 - S;</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L446** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L447** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L448** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L449** <code>        for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L450** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L451** <code>          int p = thread_h[m] + problem_size.pad_h - filter_r * problem_size.dilation_h;</code>
+  - EN: Assigns or initializes `p` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `p` 进行赋值或初始化。
+- **L452** <code>          int q = thread_w[m] + problem_size.pad_w - filter_s * problem_size.dilation_w;</code>
+  - EN: Assigns or initializes `q` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `q` 进行赋值或初始化。
+- **L453** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L454** <code>          element_A[m] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L455** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L456** <code>          if (p &gt;= 0 &amp;&amp; !(p % problem_size.stride_h) &amp;&amp; q &gt;= 0 &amp;&amp; !(q % problem_size.stride_w)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L457** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L458** <code>            p = p / problem_size.stride_h;</code>
+  - EN: Assigns or initializes `p` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `p` 进行赋值或初始化。
+- **L459** <code>            q = q / problem_size.stride_w;</code>
+  - EN: Assigns or initializes `q` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `q` 进行赋值或初始化。
+- **L460** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L461** <code>            if (thread_n[m] &lt; problem_size.N &amp;&amp; p &lt; problem_size.P &amp;&amp; q &lt; problem_size.Q) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L462** <code>              element_A[m] = ElementAccumulator(tensor_dy.at({thread_n[m], p, q, K}));  </code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L463** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L464** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L465** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L466** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L467** <code>        // Load from filters tensor</code>
+  - EN: Comment that documents intent or context: "Load from filters tensor".
+  - CN: 用于说明意图或上下文的注释："Load from filters tensor"。
+- **L468** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L469** <code>        for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L470** <code>          int thread_c = c_start + n;</code>
+  - EN: Assigns or initializes `thread_c` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_c` 进行赋值或初始化。
+- **L471** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L472** <code>          if (thread_c &lt; problem_size.C) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L473** <code>            element_B[n] = ElementAccumulator(tensor_w.at({K, R, S, thread_c}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L474** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L475** <code>          else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L476** <code>            element_B[n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L477** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L478** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L479** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L480** <code>        // Accumulate matrix product</code>
+  - EN: Comment that documents intent or context: "Accumulate matrix product".
+  - CN: 用于说明意图或上下文的注释："Accumulate matrix product"。
+- **L481** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L482** <code>        for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L483** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L484** <code>          for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L485** <code>            accum[m][n] = inner_product_op(element_A[m], element_B[n], accum[m][n]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L486** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L487** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L488** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L489** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L490** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L491** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L492** <code>  // Write out the results</code>
+  - EN: Comment that documents intent or context: "Write out the results".
+  - CN: 用于说明意图或上下文的注释："Write out the results"。
+- **L493** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L494** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L495** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L496** <code>    if (thread_n[m] &lt; problem_size.N &amp;&amp; thread_h[m] &lt; problem_size.H &amp;&amp; thread_w[m] &lt; problem_size.W) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L497** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L498** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L499** <code>      for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L500** <code>        int thread_c = c_start + n;</code>
+  - EN: Assigns or initializes `thread_c` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_c` 进行赋值或初始化。
+- **L501** <code>        if (thread_c &lt; problem_size.C) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L502** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L503** <code>          ElementCompute c_ref = ElementCompute();</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L504** <code>          if (beta != ElementCompute()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L505** <code>            c_ref = ElementCompute(tensor_dx_in.at({thread_n[m], thread_h[m], thread_w[m], thread_c}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L506** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L507** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L508** <code>          tensor_dx_out.at({thread_n[m], thread_h[m], thread_w[m], thread_c}) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L509** <code>            alpha * ElementCompute(accum[m][n]) + beta * c_ref);</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L510** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L511** <code>      } </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L512** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L513** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L514** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L515** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L516** <code>// Conv3d dgrad kernel - dx = dgrad(dy, w)</code>
+  - EN: Comment that documents intent or context: "Conv3d dgrad kernel - dx = dgrad(dy, w)".
+  - CN: 用于说明意图或上下文的注释："Conv3d dgrad kernel - dx = dgrad(dy, w)"。
+- **L517** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L518** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L519** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L520** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L521** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L522** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L523** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L524** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L525** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L526** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L527** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L528** <code>  int kThreadM = 2,       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L529** <code>  int kThreadN = 4,       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L530** <code>  int kCtaShapeM = 16,    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L531** <code>  int kCtaShapeN = 8      // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L532** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L533** <code>__global__ void Conv3dDgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3dDgrad`.
+  - CN: 开始或继续与 `Conv3dDgrad` 相关的签名/调用语法。
+- **L534** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L535** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L536** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L537** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L538** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L539** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L540** <code>  ElementCompute beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L541** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L542** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L543** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L544** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L545** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L546** <code>  ElementAccumulator element_A[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L547** <code>  ElementAccumulator element_B[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L548** <code>  ElementAccumulator accum[kThreadM][kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L549** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L550** <code>  int64_t ndhw_start = int64_t(blockIdx.x) * kCtaShapeM * kThreadM + threadIdx.x * kThreadM;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L551** <code>  int c_start = blockIdx.y * kCtaShapeN * kThreadN + threadIdx.y * kThreadN;</code>
+  - EN: Assigns or initializes `c_start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `c_start` 进行赋值或初始化。
+- **L552** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L553** <code>  int thread_n[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L554** <code>  int thread_d[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L555** <code>  int thread_h[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L556** <code>  int thread_w[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L557** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L558** <code>  // Compute N, H, W coordinates for each row of a thread&#x27;s tile</code>
+  - EN: Comment that documents intent or context: "Compute N, H, W coordinates for each row of a thread's tile".
+  - CN: 用于说明意图或上下文的注释："Compute N, H, W coordinates for each row of a thread's tile"。
+- **L559** <code>  int64_t HW = int64_t(problem_size.H) * problem_size.W;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L560** <code>  int64_t DHW = HW * problem_size.D;</code>
+  - EN: Assigns or initializes `DHW` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `DHW` 进行赋值或初始化。
+- **L561** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L562** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L563** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L564** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L565** <code>    int64_t ndhw = ndhw_start + m;</code>
+  - EN: Assigns or initializes `ndhw` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ndhw` 进行赋值或初始化。
+- **L566** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L567** <code>    thread_n[m] = int(ndhw / DHW);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L568** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L569** <code>    int64_t residual = ndhw % DHW;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L570** <code>    thread_d[m] = int(residual / HW);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L571** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L572** <code>    residual = residual % HW;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L573** <code>    thread_h[m] = int(residual / problem_size.W);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L574** <code>    thread_w[m] = int(residual % problem_size.W);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L575** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L576** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L577** <code>  // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L578** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L579** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L580** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L581** <code>    for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L582** <code>      accum[m][n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L583** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L584** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L585** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L586** <code>  // Compute convolution</code>
+  - EN: Comment that documents intent or context: "Compute convolution".
+  - CN: 用于说明意图或上下文的注释："Compute convolution"。
+- **L587** <code>  for (int T = 0; T &lt; problem_size.T; ++T) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L588** <code>    for (int R = 0; R &lt; problem_size.R; ++R) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L589** <code>      for (int S = 0; S &lt; problem_size.S; ++S) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L590** <code>        for (int K = 0; K &lt; problem_size.K; ++K) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L591** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L592** <code>          // Load from activations tensor</code>
+  - EN: Comment that documents intent or context: "Load from activations tensor".
+  - CN: 用于说明意图或上下文的注释："Load from activations tensor"。
+- **L593** <code>          int filter_t = T;</code>
+  - EN: Assigns or initializes `filter_t` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_t` 进行赋值或初始化。
+- **L594** <code>          int filter_r = R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L595** <code>          int filter_s = S;   </code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L596** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L597** <code>          if (problem_size.mode == cutlass::conv::Mode::kConvolution) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L598** <code>            filter_t = problem_size.T - 1 - T;</code>
+  - EN: Assigns or initializes `filter_t` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_t` 进行赋值或初始化。
+- **L599** <code>            filter_r = problem_size.R - 1 - R;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L600** <code>            filter_s = problem_size.S - 1 - S;</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L601** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L602** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L603** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L604** <code>          for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L605** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L606** <code>            int z = thread_d[m] + problem_size.pad_d - filter_t * problem_size.dilation_d;</code>
+  - EN: Assigns or initializes `z` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `z` 进行赋值或初始化。
+- **L607** <code>            int p = thread_h[m] + problem_size.pad_h - filter_r * problem_size.dilation_h;</code>
+  - EN: Assigns or initializes `p` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `p` 进行赋值或初始化。
+- **L608** <code>            int q = thread_w[m] + problem_size.pad_w - filter_s * problem_size.dilation_w;</code>
+  - EN: Assigns or initializes `q` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `q` 进行赋值或初始化。
+- **L609** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L610** <code>            element_A[m] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L611** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L612** <code>            if (z &gt;= 0 &amp;&amp; !(z % problem_size.stride_d) &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L613** <code>              p &gt;= 0 &amp;&amp; !(p % problem_size.stride_h) &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L614** <code>              q &gt;= 0 &amp;&amp; !(q % problem_size.stride_w)) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L615** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L616** <code>              z = z / problem_size.stride_d;</code>
+  - EN: Assigns or initializes `z` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `z` 进行赋值或初始化。
+- **L617** <code>              p = p / problem_size.stride_h;</code>
+  - EN: Assigns or initializes `p` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `p` 进行赋值或初始化。
+- **L618** <code>              q = q / problem_size.stride_w;</code>
+  - EN: Assigns or initializes `q` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `q` 进行赋值或初始化。
+- **L619** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L620** <code>              if (thread_n[m] &lt; problem_size.N &amp;&amp; z &lt; problem_size.Z &amp;&amp; p &lt; problem_size.P &amp;&amp; q &lt; problem_size.Q) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L621** <code>                element_A[m] = ElementAccumulator(tensor_dy.at({thread_n[m], z, p, q, K}));  </code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L622** <code>              }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L623** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L624** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L625** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L626** <code>          // Load from filters tensor</code>
+  - EN: Comment that documents intent or context: "Load from filters tensor".
+  - CN: 用于说明意图或上下文的注释："Load from filters tensor"。
+- **L627** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L628** <code>          for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L629** <code>            int thread_c = c_start + n;</code>
+  - EN: Assigns or initializes `thread_c` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_c` 进行赋值或初始化。
+- **L630** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L631** <code>            if (thread_c &lt; problem_size.C) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L632** <code>              element_B[n] = ElementAccumulator(tensor_w.at({K, T, R, S, thread_c}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L633** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L634** <code>            else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L635** <code>              element_B[n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L636** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L637** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L638** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L639** <code>          // Accumulate matrix product</code>
+  - EN: Comment that documents intent or context: "Accumulate matrix product".
+  - CN: 用于说明意图或上下文的注释："Accumulate matrix product"。
+- **L640** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L641** <code>          for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L642** <code>            CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L643** <code>            for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L644** <code>              accum[m][n] = inner_product_op(element_A[m], element_B[n], accum[m][n]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L645** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L646** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L647** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L648** <code>        } // for (C)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L649** <code>      } // for (S)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L650** <code>    } // for (R)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L651** <code>  } // for (T)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L652** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L653** <code>  // Write out the results</code>
+  - EN: Comment that documents intent or context: "Write out the results".
+  - CN: 用于说明意图或上下文的注释："Write out the results"。
+- **L654** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L655** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L656** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L657** <code>    if (thread_n[m] &lt; problem_size.N &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L658** <code>      thread_d[m] &lt; problem_size.D &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L659** <code>      thread_h[m] &lt; problem_size.H &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L660** <code>      thread_w[m] &lt; problem_size.W) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L661** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L662** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L663** <code>      for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L664** <code>        int thread_c = c_start + n;</code>
+  - EN: Assigns or initializes `thread_c` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_c` 进行赋值或初始化。
+- **L665** <code>        if (thread_c &lt; problem_size.C) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L666** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L667** <code>          ElementCompute c_ref = ElementCompute();</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L668** <code>          if (beta != ElementCompute()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L669** <code>            c_ref = ElementCompute(tensor_dx_in.at({thread_n[m], thread_d[m], thread_h[m], thread_w[m], thread_c}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L670** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L671** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L672** <code>          tensor_dx_out.at({thread_n[m], thread_d[m], thread_h[m], thread_w[m], thread_c}) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L673** <code>            alpha * ElementCompute(accum[m][n]) + beta * c_ref);</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L674** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L675** <code>      } </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L676** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L677** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L678** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L679** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L680** <code>///////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L681** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L682** <code>// Conv2d wgrad kernel - dw = wgrad(dy, x)</code>
+  - EN: Comment that documents intent or context: "Conv2d wgrad kernel - dw = wgrad(dy, x)".
+  - CN: 用于说明意图或上下文的注释："Conv2d wgrad kernel - dw = wgrad(dy, x)"。
+- **L683** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L684** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L685** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L686** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L687** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L688** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L689** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L690** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L691** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L692** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L693** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L694** <code>  int kThreadM = 2,       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L695** <code>  int kThreadN = 4,       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L696** <code>  int kCtaShapeM = 8,     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L697** <code>  int kCtaShapeN = 16     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L698** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L699** <code>__global__ void Conv2dWgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2dWgrad`.
+  - CN: 开始或继续与 `Conv2dWgrad` 相关的签名/调用语法。
+- **L700** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L701** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L702** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L703** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L704** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L705** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L706** <code>  ElementCompute beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L707** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L708** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L709** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L710** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L711** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L712** <code>  ElementAccumulator element_A[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L713** <code>  ElementAccumulator element_B[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L714** <code>  ElementAccumulator accum[kThreadM][kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L715** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L716** <code>  int k_start = blockIdx.x * kCtaShapeM * kThreadM + threadIdx.x * kThreadM;</code>
+  - EN: Assigns or initializes `k_start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `k_start` 进行赋值或初始化。
+- **L717** <code>  int64_t rsc_start = int64_t(blockIdx.y) * kCtaShapeN * kThreadN + threadIdx.y * kThreadN;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L718** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L719** <code>  int thread_r[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L720** <code>  int thread_s[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L721** <code>  int thread_c[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L722** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L723** <code>  // Compute R, S, C coordinates for each row of a thread&#x27;s tile</code>
+  - EN: Comment that documents intent or context: "Compute R, S, C coordinates for each row of a thread's tile".
+  - CN: 用于说明意图或上下文的注释："Compute R, S, C coordinates for each row of a thread's tile"。
+- **L724** <code>  int64_t SC = int64_t(problem_size.S) * problem_size.C;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L725** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L726** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L727** <code>  for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L728** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L729** <code>    int64_t rsc = rsc_start + n;</code>
+  - EN: Assigns or initializes `rsc` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rsc` 进行赋值或初始化。
+- **L730** <code>    int64_t residual = rsc % SC;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L731** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L732** <code>    thread_r[n] = int(rsc / SC);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L733** <code>    thread_s[n] = int(residual / problem_size.C);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L734** <code>    thread_c[n] = int(residual % problem_size.C);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L735** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L736** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L737** <code>  // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L738** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L739** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L740** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L741** <code>    for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L742** <code>      accum[m][n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L743** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L744** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L745** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L746** <code>  // Compute convolution</code>
+  - EN: Comment that documents intent or context: "Compute convolution".
+  - CN: 用于说明意图或上下文的注释："Compute convolution"。
+- **L747** <code>  for (int N = 0; N &lt; problem_size.N; ++N) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L748** <code>    for (int P = 0; P &lt; problem_size.P; ++P) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L749** <code>      for (int Q = 0; Q &lt; problem_size.Q; ++Q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L750** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L751** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L752** <code>        for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L753** <code>          int thread_k = k_start + m;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L754** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L755** <code>          element_A[m] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L756** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L757** <code>          if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L758** <code>            element_A[m] = ElementAccumulator(tensor_dy.at({N, P, Q, thread_k}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L759** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L760** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L761** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L762** <code>        // Load from filters tensor</code>
+  - EN: Comment that documents intent or context: "Load from filters tensor".
+  - CN: 用于说明意图或上下文的注释："Load from filters tensor"。
+- **L763** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L764** <code>        for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L765** <code>          </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L766** <code>          // Load from activations tensor</code>
+  - EN: Comment that documents intent or context: "Load from activations tensor".
+  - CN: 用于说明意图或上下文的注释："Load from activations tensor"。
+- **L767** <code>          int filter_r = thread_r[n];</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L768** <code>          int filter_s = thread_s[n];</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L769** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L770** <code>          if (problem_size.mode == cutlass::conv::Mode::kConvolution) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L771** <code>            filter_r = problem_size.R - 1 - filter_r;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L772** <code>            filter_s = problem_size.S - 1 - filter_s;</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L773** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L774** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L775** <code>          int h = P * problem_size.stride_h - problem_size.pad_h + filter_r * problem_size.dilation_h;</code>
+  - EN: Assigns or initializes `h` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h` 进行赋值或初始化。
+- **L776** <code>          int w = Q * problem_size.stride_w - problem_size.pad_w + filter_s * problem_size.dilation_w;</code>
+  - EN: Assigns or initializes `w` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w` 进行赋值或初始化。
+- **L777** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L778** <code>          element_B[n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L779** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L780** <code>          if (h &gt;= 0 &amp;&amp; h &lt; problem_size.H &amp;&amp; w &gt;= 0 &amp;&amp; w &lt; problem_size.W &amp;&amp; thread_c[n] &lt; problem_size.C) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L781** <code>            element_B[n] = ElementAccumulator(tensor_x.at({N, h, w, thread_c[n]}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L782** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L783** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L784** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L785** <code>        // Accumulate matrix product</code>
+  - EN: Comment that documents intent or context: "Accumulate matrix product".
+  - CN: 用于说明意图或上下文的注释："Accumulate matrix product"。
+- **L786** <code>        CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L787** <code>        for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L788** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L789** <code>          for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L790** <code>            accum[m][n] = inner_product_op(element_A[m], element_B[n], accum[m][n]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L791** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L792** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L793** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L794** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L795** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L796** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L797** <code>  // Write out the results</code>
+  - EN: Comment that documents intent or context: "Write out the results".
+  - CN: 用于说明意图或上下文的注释："Write out the results"。
+- **L798** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L799** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L800** <code>    int thread_k = k_start + m;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L801** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L802** <code>    if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L803** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L804** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L805** <code>      for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L806** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L807** <code>        if (thread_r[n] &lt; problem_size.R &amp;&amp; thread_s[n] &lt; problem_size.S &amp;&amp; thread_c[n] &lt; problem_size.C) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L808** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L809** <code>          ElementCompute c_ref = ElementCompute();</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L810** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L811** <code>          if (beta != ElementCompute()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L812** <code>            c_ref = ElementCompute(tensor_dw_in.at({thread_k, thread_r[n], thread_s[n], thread_c[n]}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L813** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L814** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L815** <code>          tensor_dw_out.at({thread_k, thread_r[n], thread_s[n], thread_c[n]}) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L816** <code>            alpha * ElementCompute(accum[m][n]) + beta * c_ref);</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L817** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L818** <code>      } </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L819** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L820** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L821** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L822** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L823** <code>// Conv3d wgrad kernel - dw = wgrad(dy, x)</code>
+  - EN: Comment that documents intent or context: "Conv3d wgrad kernel - dw = wgrad(dy, x)".
+  - CN: 用于说明意图或上下文的注释："Conv3d wgrad kernel - dw = wgrad(dy, x)"。
+- **L824** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L825** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L826** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L827** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L828** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L829** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L830** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L831** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L832** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L833** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L834** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L835** <code>  int kThreadM = 2,       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L836** <code>  int kThreadN = 4,       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L837** <code>  int kCtaShapeM = 8,     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L838** <code>  int kCtaShapeN = 16     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L839** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L840** <code>__global__ void Conv3dWgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3dWgrad`.
+  - CN: 开始或继续与 `Conv3dWgrad` 相关的签名/调用语法。
+- **L841** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L842** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L843** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L844** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L845** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L846** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L847** <code>  ElementCompute beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L848** <code>  ) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L849** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L850** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L851** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L852** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L853** <code>  ElementAccumulator element_A[kThreadM];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L854** <code>  ElementAccumulator element_B[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L855** <code>  ElementAccumulator accum[kThreadM][kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L856** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L857** <code>  int k_start = blockIdx.x * kCtaShapeM * kThreadM + threadIdx.x * kThreadM;</code>
+  - EN: Assigns or initializes `k_start` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `k_start` 进行赋值或初始化。
+- **L858** <code>  int64_t trsc_start = int64_t(blockIdx.y) * kCtaShapeN * kThreadN + threadIdx.y * kThreadN;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L859** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L860** <code>  int thread_t[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L861** <code>  int thread_r[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L862** <code>  int thread_s[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L863** <code>  int thread_c[kThreadN];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L864** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L865** <code>  // Compute R, S, C coordinates for each row of a thread&#x27;s tile</code>
+  - EN: Comment that documents intent or context: "Compute R, S, C coordinates for each row of a thread's tile".
+  - CN: 用于说明意图或上下文的注释："Compute R, S, C coordinates for each row of a thread's tile"。
+- **L866** <code>  int64_t SC = int64_t(problem_size.S) * problem_size.C;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L867** <code>  int64_t RSC = SC * problem_size.R;</code>
+  - EN: Assigns or initializes `RSC` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `RSC` 进行赋值或初始化。
+- **L868** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L869** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L870** <code>  for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L871** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L872** <code>    int64_t trsc = trsc_start + n;</code>
+  - EN: Assigns or initializes `trsc` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `trsc` 进行赋值或初始化。
+- **L873** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L874** <code>    thread_t[n] = int(trsc / RSC);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L875** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L876** <code>    int64_t residual = trsc % RSC;</code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L877** <code>    thread_r[n] = int(residual / SC);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L878** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L879** <code>    residual = residual % SC; </code>
+  - EN: Assigns or initializes `residual` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `residual` 进行赋值或初始化。
+- **L880** <code>    thread_s[n] = int(residual / problem_size.C);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L881** <code>    thread_c[n] = int(residual % problem_size.C);</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L882** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L883** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L884** <code>  // Clear accumulators</code>
+  - EN: Comment that documents intent or context: "Clear accumulators".
+  - CN: 用于说明意图或上下文的注释："Clear accumulators"。
+- **L885** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L886** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L887** <code>    CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L888** <code>    for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L889** <code>      accum[m][n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L890** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L891** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L892** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L893** <code>  // Compute convolution</code>
+  - EN: Comment that documents intent or context: "Compute convolution".
+  - CN: 用于说明意图或上下文的注释："Compute convolution"。
+- **L894** <code>  for (int N = 0; N &lt; problem_size.N; ++N) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L895** <code>    for (int Z = 0; Z &lt; problem_size.Z; ++Z) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L896** <code>      for (int P = 0; P &lt; problem_size.P; ++P) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L897** <code>        for (int Q = 0; Q &lt; problem_size.Q; ++Q) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L898** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L899** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L900** <code>          for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L901** <code>            int thread_k = k_start + m;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L902** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L903** <code>            element_A[m] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L904** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L905** <code>            if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L906** <code>              element_A[m] = ElementAccumulator(tensor_dy.at({N, Z, P, Q, thread_k}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L907** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L908** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L909** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L910** <code>          // Load from filters tensor</code>
+  - EN: Comment that documents intent or context: "Load from filters tensor".
+  - CN: 用于说明意图或上下文的注释："Load from filters tensor"。
+- **L911** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L912** <code>          for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L913** <code>            </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L914** <code>            // Load from activations tensor</code>
+  - EN: Comment that documents intent or context: "Load from activations tensor".
+  - CN: 用于说明意图或上下文的注释："Load from activations tensor"。
+- **L915** <code>            int filter_t = thread_t[n];</code>
+  - EN: Assigns or initializes `filter_t` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_t` 进行赋值或初始化。
+- **L916** <code>            int filter_r = thread_r[n];</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L917** <code>            int filter_s = thread_s[n];</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L918** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L919** <code>            if (problem_size.mode == cutlass::conv::Mode::kConvolution) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L920** <code>              filter_t = problem_size.T - 1 - filter_t;</code>
+  - EN: Assigns or initializes `filter_t` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_t` 进行赋值或初始化。
+- **L921** <code>              filter_r = problem_size.R - 1 - filter_r;</code>
+  - EN: Assigns or initializes `filter_r` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_r` 进行赋值或初始化。
+- **L922** <code>              filter_s = problem_size.S - 1 - filter_s;</code>
+  - EN: Assigns or initializes `filter_s` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `filter_s` 进行赋值或初始化。
+- **L923** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L924** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L925** <code>            int d = Z * problem_size.stride_d - problem_size.pad_d + filter_t * problem_size.dilation_d;</code>
+  - EN: Assigns or initializes `d` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `d` 进行赋值或初始化。
+- **L926** <code>            int h = P * problem_size.stride_h - problem_size.pad_h + filter_r * problem_size.dilation_h;</code>
+  - EN: Assigns or initializes `h` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `h` 进行赋值或初始化。
+- **L927** <code>            int w = Q * problem_size.stride_w - problem_size.pad_w + filter_s * problem_size.dilation_w;</code>
+  - EN: Assigns or initializes `w` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `w` 进行赋值或初始化。
+- **L928** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L929** <code>            element_B[n] = ElementAccumulator();</code>
+  - EN: Declares function or method `ElementAccumulator` without defining it here.
+  - CN: 声明函数或方法 `ElementAccumulator`，但不在此处给出定义。
+- **L930** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L931** <code>            if (d &gt;= 0 &amp;&amp; d &lt; problem_size.D &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L932** <code>              h &gt;= 0 &amp;&amp; h &lt; problem_size.H &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L933** <code>              w &gt;= 0 &amp;&amp; w &lt; problem_size.W &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L934** <code>              thread_c[n] &lt; problem_size.C) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L935** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L936** <code>              element_B[n] = ElementAccumulator(tensor_x.at({N, d, h, w, thread_c[n]}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L937** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L938** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L939** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L940** <code>          // Accumulate matrix product</code>
+  - EN: Comment that documents intent or context: "Accumulate matrix product".
+  - CN: 用于说明意图或上下文的注释："Accumulate matrix product"。
+- **L941** <code>          CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L942** <code>          for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L943** <code>            CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L944** <code>            for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L945** <code>              accum[m][n] = inner_product_op(element_A[m], element_B[n], accum[m][n]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L946** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L947** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L948** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L949** <code>        } // for (Q)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L950** <code>      } // for (P)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L951** <code>    } // for (Z)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L952** <code>  } // for (N)</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L953** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L954** <code>  // Write out the results</code>
+  - EN: Comment that documents intent or context: "Write out the results".
+  - CN: 用于说明意图或上下文的注释："Write out the results"。
+- **L955** <code>  CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L956** <code>  for (int m = 0; m &lt; kThreadM; ++m) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L957** <code>    int thread_k = k_start + m;</code>
+  - EN: Assigns or initializes `thread_k` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `thread_k` 进行赋值或初始化。
+- **L958** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L959** <code>    if (thread_k &lt; problem_size.K) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L960** <code>      </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L961** <code>      CUTLASS_PRAGMA_UNROLL</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L962** <code>      for (int n = 0; n &lt; kThreadN; ++n) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L963** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L964** <code>        if (thread_t[n] &lt; problem_size.T &amp;&amp; </code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L965** <code>          thread_r[n] &lt; problem_size.R &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L966** <code>          thread_s[n] &lt; problem_size.S &amp;&amp; </code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L967** <code>          thread_c[n] &lt; problem_size.C) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L968** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L969** <code>          ElementCompute c_ref = ElementCompute();</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L970** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L971** <code>          if (beta != ElementCompute()) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L972** <code>            c_ref = ElementCompute(tensor_dw_in.at({thread_k, thread_t[n], thread_r[n], thread_s[n], thread_c[n]}));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L973** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L974** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L975** <code>          tensor_dw_out.at({thread_k, thread_t[n], thread_r[n], thread_s[n], thread_c[n]}) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L976** <code>            alpha * ElementCompute(accum[m][n]) + beta * c_ref);</code>
+  - EN: Declares function or method `ElementCompute` without defining it here.
+  - CN: 声明函数或方法 `ElementCompute`，但不在此处给出定义。
+- **L977** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L978** <code>      } </code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L979** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L980** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L981** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L982** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L983** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L984** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L985** <code>} // namespace kernel</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L986** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L987** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L988** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L989** <code>/// Conv2d Fprop dispatcher - y = fprop(x, w)</code>
+  - EN: Comment that documents intent or context: "Conv2d Fprop dispatcher - y = fprop(x, w)".
+  - CN: 用于说明意图或上下文的注释："Conv2d Fprop dispatcher - y = fprop(x, w)"。
+- **L990** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L991** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L992** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L993** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L994** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L995** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L996** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L997** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L998** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L999** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1000** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1001** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1002** <code>Status Conv2dFprop(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2dFprop`.
+  - CN: 开始或继续与 `Conv2dFprop` 相关的签名/调用语法。
+- **L1003** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1004** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1005** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1006** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1007** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1008** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1009** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1010** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1011** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1012** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1013** <code>  // Blocking factors improve performance of reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking factors improve performance of reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking factors improve performance of reference implementation"。
+- **L1014** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1015** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1016** <code>  int const kThreadM = 4;       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L1017** <code>  int const kThreadN = 4;       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L1018** <code>  int const kCtaShapeM = 16;    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L1019** <code>  int const kCtaShapeN = 8;     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L1020** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1021** <code>  int64_t npq = int64_t(problem_size.N) * problem_size.P * problem_size.Q;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L1022** <code>  int64_t blocks_m = (npq + (kCtaShapeM * kThreadM) - 1) / (kCtaShapeM * kThreadM);</code>
+  - EN: Assigns or initializes `blocks_m` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_m` 进行赋值或初始化。
+- **L1023** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1024** <code>  dim3 block(kCtaShapeM, kCtaShapeN);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L1025** <code>  dim3 grid(uint32_t(blocks_m), (problem_size.K + (kCtaShapeN * kThreadN) - 1) / (kCtaShapeN * kThreadN));</code>
+  - EN: Declares function or method `uint32_t` without defining it here.
+  - CN: 声明函数或方法 `uint32_t`，但不在此处给出定义。
+- **L1026** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1027** <code>  kernel::Conv2dFprop&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1028** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1029** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1030** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1031** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1032** <code>    ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1033** <code>    LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1034** <code>    ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1035** <code>    ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1036** <code>    ConvertOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1037** <code>    InnerProductOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1038** <code>    kThreadM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1039** <code>    kThreadN,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1040** <code>    kCtaShapeM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1041** <code>    kCtaShapeN</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1042** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1043** <code>    problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1044** <code>    tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1045** <code>    tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1046** <code>    tensor_y_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1047** <code>    tensor_y_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1048** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1049** <code>    beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1050** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1051** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1052** <code>  cudaError_t result = cudaPeekAtLastError();</code>
+  - EN: Declares function or method `cudaPeekAtLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaPeekAtLastError`，但不在此处给出定义。
+- **L1053** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1054** <code>    return Status::kErrorInternal;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1055** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1056** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1057** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1058** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1059** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1060** <code>/// Conv3d Fprop dispatcher - y = fprop(x, w)</code>
+  - EN: Comment that documents intent or context: "Conv3d Fprop dispatcher - y = fprop(x, w)".
+  - CN: 用于说明意图或上下文的注释："Conv3d Fprop dispatcher - y = fprop(x, w)"。
+- **L1061** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1062** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1063** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1064** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1065** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1066** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1067** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1068** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1069** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1070** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1071** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1072** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1073** <code>Status Conv3dFprop(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3dFprop`.
+  - CN: 开始或继续与 `Conv3dFprop` 相关的签名/调用语法。
+- **L1074** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1075** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1076** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1077** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1078** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_y_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1079** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1080** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1081** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1082** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1083** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1084** <code>  // Blocking factors improve performance of reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking factors improve performance of reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking factors improve performance of reference implementation"。
+- **L1085** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1086** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1087** <code>  int const kThreadM = 4;       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L1088** <code>  int const kThreadN = 4;       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L1089** <code>  int const kCtaShapeM = 16;    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L1090** <code>  int const kCtaShapeN = 8;     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L1091** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1092** <code>  int64_t nzpq = int64_t(problem_size.N) * problem_size.Z * problem_size.P * problem_size.Q;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L1093** <code>  int64_t blocks_m = (nzpq + (kCtaShapeM * kThreadM) - 1) / (kCtaShapeM * kThreadM);</code>
+  - EN: Assigns or initializes `blocks_m` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_m` 进行赋值或初始化。
+- **L1094** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1095** <code>  dim3 block(kCtaShapeM, kCtaShapeN);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L1096** <code>  dim3 grid(uint32_t(blocks_m), (problem_size.K + (kCtaShapeN * kThreadN) - 1) / (kCtaShapeN * kThreadN));</code>
+  - EN: Declares function or method `uint32_t` without defining it here.
+  - CN: 声明函数或方法 `uint32_t`，但不在此处给出定义。
+- **L1097** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1098** <code>  kernel::Conv3dFprop&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1099** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1100** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1101** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1102** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1103** <code>    ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1104** <code>    LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1105** <code>    ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1106** <code>    ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1107** <code>    ConvertOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1108** <code>    InnerProductOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1109** <code>    kThreadM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1110** <code>    kThreadN,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1111** <code>    kCtaShapeM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1112** <code>    kCtaShapeN</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1113** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1114** <code>    problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1115** <code>    tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1116** <code>    tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1117** <code>    tensor_y_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1118** <code>    tensor_y_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1119** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1120** <code>    beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1121** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1122** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1123** <code>  cudaError_t result = cudaPeekAtLastError();</code>
+  - EN: Declares function or method `cudaPeekAtLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaPeekAtLastError`，但不在此处给出定义。
+- **L1124** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1125** <code>    return Status::kErrorInternal;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1126** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1128** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1129** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1130** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1131** <code>/// Conv2d Dgrad dispatcher - dx = dgrad(dy, w)</code>
+  - EN: Comment that documents intent or context: "Conv2d Dgrad dispatcher - dx = dgrad(dy, w)".
+  - CN: 用于说明意图或上下文的注释："Conv2d Dgrad dispatcher - dx = dgrad(dy, w)"。
+- **L1132** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1133** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1134** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1135** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1136** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1137** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1138** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1139** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1140** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1141** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1142** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1143** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1144** <code>Status Conv2dDgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2dDgrad`.
+  - CN: 开始或继续与 `Conv2dDgrad` 相关的签名/调用语法。
+- **L1145** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1146** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1147** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1148** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1149** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1150** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1151** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1152** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1154** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1155** <code>  // Blocking factors improve performance of reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking factors improve performance of reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking factors improve performance of reference implementation"。
+- **L1156** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1157** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1158** <code>  int const kThreadM = 2;       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L1159** <code>  int const kThreadN = 4;       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L1160** <code>  int const kCtaShapeM = 16;    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L1161** <code>  int const kCtaShapeN = 8;     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L1162** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1163** <code>  int64_t nhw = int64_t(problem_size.N) * problem_size.H * problem_size.W;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L1164** <code>  int64_t blocks_m = (nhw + (kCtaShapeM * kThreadM) - 1) / (kCtaShapeM * kThreadM);</code>
+  - EN: Assigns or initializes `blocks_m` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_m` 进行赋值或初始化。
+- **L1165** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1166** <code>  dim3 block(kCtaShapeM, kCtaShapeN);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L1167** <code>  dim3 grid(uint32_t(blocks_m), (problem_size.C + (kCtaShapeN * kThreadN) - 1) / (kCtaShapeN * kThreadN));</code>
+  - EN: Declares function or method `uint32_t` without defining it here.
+  - CN: 声明函数或方法 `uint32_t`，但不在此处给出定义。
+- **L1168** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1169** <code>  kernel::Conv2dDgrad&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1170** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1171** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1172** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1173** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1174** <code>    ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1175** <code>    LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1176** <code>    ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1177** <code>    ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1178** <code>    ConvertOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1179** <code>    InnerProductOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1180** <code>    kThreadM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1181** <code>    kThreadN,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1182** <code>    kCtaShapeM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1183** <code>    kCtaShapeN</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1184** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1185** <code>    problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1186** <code>    tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1187** <code>    tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1188** <code>    tensor_dx_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1189** <code>    tensor_dx_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1190** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1191** <code>    beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1192** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1193** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1194** <code>  cudaError_t result = cudaPeekAtLastError();</code>
+  - EN: Declares function or method `cudaPeekAtLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaPeekAtLastError`，但不在此处给出定义。
+- **L1195** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1196** <code>    return Status::kErrorInternal;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1197** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1198** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1199** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1200** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1202** <code>/// Conv3d Dgrad dispatcher - dx = dgrad(dy, w)</code>
+  - EN: Comment that documents intent or context: "Conv3d Dgrad dispatcher - dx = dgrad(dy, w)".
+  - CN: 用于说明意图或上下文的注释："Conv3d Dgrad dispatcher - dx = dgrad(dy, w)"。
+- **L1203** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1204** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1205** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1206** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1207** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1208** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1209** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1210** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1211** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1212** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1213** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1214** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1215** <code>Status Conv3dDgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3dDgrad`.
+  - CN: 开始或继续与 `Conv3dDgrad` 相关的签名/调用语法。
+- **L1216** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1217** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1218** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1219** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1220** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dx_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1221** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1222** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1223** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1224** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1225** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1226** <code>  // Blocking factors improve performance of reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking factors improve performance of reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking factors improve performance of reference implementation"。
+- **L1227** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1228** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1229** <code>  int const kThreadM = 2;       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L1230** <code>  int const kThreadN = 4;       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L1231** <code>  int const kCtaShapeM = 16;    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L1232** <code>  int const kCtaShapeN = 8;     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L1233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1234** <code>  int64_t ndhw = int64_t(problem_size.N) * problem_size.D * problem_size.H * problem_size.W;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L1235** <code>  int64_t blocks_m = (ndhw + (kCtaShapeM * kThreadM) - 1) / (kCtaShapeM * kThreadM);</code>
+  - EN: Assigns or initializes `blocks_m` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_m` 进行赋值或初始化。
+- **L1236** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1237** <code>  dim3 block(kCtaShapeM, kCtaShapeN);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L1238** <code>  dim3 grid(uint32_t(blocks_m), (problem_size.C + (kCtaShapeN * kThreadN) - 1) / (kCtaShapeN * kThreadN));</code>
+  - EN: Declares function or method `uint32_t` without defining it here.
+  - CN: 声明函数或方法 `uint32_t`，但不在此处给出定义。
+- **L1239** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1240** <code>  kernel::Conv3dDgrad&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1241** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1242** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1243** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1244** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1245** <code>    ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1246** <code>    LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1247** <code>    ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1248** <code>    ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1249** <code>    ConvertOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1250** <code>    InnerProductOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1251** <code>    kThreadM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1252** <code>    kThreadN,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1253** <code>    kCtaShapeM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1254** <code>    kCtaShapeN</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1255** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1256** <code>    problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1257** <code>    tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1258** <code>    tensor_w,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1259** <code>    tensor_dx_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1260** <code>    tensor_dx_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1261** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1262** <code>    beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1263** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1264** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1265** <code>  cudaError_t result = cudaPeekAtLastError();</code>
+  - EN: Declares function or method `cudaPeekAtLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaPeekAtLastError`，但不在此处给出定义。
+- **L1266** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1267** <code>    return Status::kErrorInternal;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1268** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1269** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1270** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1271** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1272** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1273** <code>/// Conv2d Wgrad dispatcher - dw = wgrad(dy, x)</code>
+  - EN: Comment that documents intent or context: "Conv2d Wgrad dispatcher - dw = wgrad(dy, x)".
+  - CN: 用于说明意图或上下文的注释："Conv2d Wgrad dispatcher - dw = wgrad(dy, x)"。
+- **L1274** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1275** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1276** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1277** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1278** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1279** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1280** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1281** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1282** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1283** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1284** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1285** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1286** <code>Status Conv2dWgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2dWgrad`.
+  - CN: 开始或继续与 `Conv2dWgrad` 相关的签名/调用语法。
+- **L1287** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1288** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1289** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1290** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1291** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1292** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1293** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1294** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1295** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1296** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1297** <code>  // Blocking factors improve performance of reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking factors improve performance of reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking factors improve performance of reference implementation"。
+- **L1298** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1299** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1300** <code>  int const kThreadM = 2;       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L1301** <code>  int const kThreadN = 4;       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L1302** <code>  int const kCtaShapeM = 8;     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L1303** <code>  int const kCtaShapeN = 16;    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L1304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1305** <code>  int64_t rsc = int64_t(problem_size.R) * problem_size.S * problem_size.C;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L1306** <code>  int64_t blocks_n = (rsc + (kCtaShapeN * kThreadN) - 1) / (kCtaShapeN * kThreadN);</code>
+  - EN: Assigns or initializes `blocks_n` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_n` 进行赋值或初始化。
+- **L1307** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1308** <code>  dim3 block(kCtaShapeM, kCtaShapeN);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L1309** <code>  dim3 grid((problem_size.K + (kCtaShapeM * kThreadM) - 1) / (kCtaShapeM * kThreadM), uint32_t(blocks_n));</code>
+  - EN: Declares function or method `uint32_t` without defining it here.
+  - CN: 声明函数或方法 `uint32_t`，但不在此处给出定义。
+- **L1310** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1311** <code>  kernel::Conv2dWgrad&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1312** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1313** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1314** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1315** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1316** <code>    ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1317** <code>    LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1318** <code>    ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1319** <code>    ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1320** <code>    ConvertOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1321** <code>    InnerProductOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1322** <code>    kThreadM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1323** <code>    kThreadN,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1324** <code>    kCtaShapeM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1325** <code>    kCtaShapeN</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1326** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1327** <code>    problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1328** <code>    tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1329** <code>    tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1330** <code>    tensor_dw_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1331** <code>    tensor_dw_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1332** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1333** <code>    beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1334** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1335** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1336** <code>  cudaError_t result = cudaPeekAtLastError();</code>
+  - EN: Declares function or method `cudaPeekAtLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaPeekAtLastError`，但不在此处给出定义。
+- **L1337** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1338** <code>    return Status::kErrorInternal;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1339** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1340** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1341** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1342** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1343** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1344** <code>/// Conv3d Wgrad dispatcher - dw = wgrad(dy, x)</code>
+  - EN: Comment that documents intent or context: "Conv3d Wgrad dispatcher - dw = wgrad(dy, x)".
+  - CN: 用于说明意图或上下文的注释："Conv3d Wgrad dispatcher - dw = wgrad(dy, x)"。
+- **L1345** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1346** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1347** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1348** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1349** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1350** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1351** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1352** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1353** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1354** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1355** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1356** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1357** <code>Status Conv3dWgrad(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3dWgrad`.
+  - CN: 开始或继续与 `Conv3dWgrad` 相关的签名/调用语法。
+- **L1358** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1359** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1360** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1361** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1362** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_dw_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1363** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1364** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1365** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1366** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1367** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1368** <code>  // Blocking factors improve performance of reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking factors improve performance of reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking factors improve performance of reference implementation"。
+- **L1369** <code>  //</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1370** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1371** <code>  int const kThreadM = 2;       // shape of a thread&#x27;s tile in the GEMM M dimension</code>
+  - EN: Assigns or initializes `kThreadM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadM` 进行赋值或初始化。
+- **L1372** <code>  int const kThreadN = 4;       // shape of a thread&#x27;s tile in the GEMM N dimension</code>
+  - EN: Assigns or initializes `kThreadN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kThreadN` 进行赋值或初始化。
+- **L1373** <code>  int const kCtaShapeM = 8;     // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeM` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeM` 进行赋值或初始化。
+- **L1374** <code>  int const kCtaShapeN = 16;    // shape of a threadblock in units of threads</code>
+  - EN: Assigns or initializes `kCtaShapeN` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kCtaShapeN` 进行赋值或初始化。
+- **L1375** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1376** <code>  int64_t trsc = int64_t(problem_size.T) * problem_size.R * problem_size.S * problem_size.C;</code>
+  - EN: Declares function or method `int64_t` without defining it here.
+  - CN: 声明函数或方法 `int64_t`，但不在此处给出定义。
+- **L1377** <code>  int64_t blocks_n = (trsc + (kCtaShapeN * kThreadN) - 1) / (kCtaShapeN * kThreadN);</code>
+  - EN: Assigns or initializes `blocks_n` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `blocks_n` 进行赋值或初始化。
+- **L1378** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1379** <code>  dim3 block(kCtaShapeM, kCtaShapeN);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L1380** <code>  dim3 grid((problem_size.K + (kCtaShapeM * kThreadM) - 1) / (kCtaShapeM * kThreadM), uint32_t(blocks_n));</code>
+  - EN: Declares function or method `uint32_t` without defining it here.
+  - CN: 声明函数或方法 `uint32_t`，但不在此处给出定义。
+- **L1381** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1382** <code>  kernel::Conv3dWgrad&lt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1383** <code>    ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1384** <code>    LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1385** <code>    ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1386** <code>    LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1387** <code>    ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1388** <code>    LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1389** <code>    ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1390** <code>    ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1391** <code>    ConvertOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1392** <code>    InnerProductOp,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1393** <code>    kThreadM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1394** <code>    kThreadN,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1395** <code>    kCtaShapeM,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1396** <code>    kCtaShapeN</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1397** <code>  &gt;&lt;&lt;&lt; grid, block, 0, stream &gt;&gt;&gt;(</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1398** <code>    problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1399** <code>    tensor_dy,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1400** <code>    tensor_x,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1401** <code>    tensor_dw_in,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1402** <code>    tensor_dw_out,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1403** <code>    alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1404** <code>    beta</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1405** <code>  );</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1406** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1407** <code>  cudaError_t result = cudaPeekAtLastError();</code>
+  - EN: Declares function or method `cudaPeekAtLastError` without defining it here.
+  - CN: 声明函数或方法 `cudaPeekAtLastError`，但不在此处给出定义。
+- **L1408** <code>  if (result != cudaSuccess) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L1409** <code>    return Status::kErrorInternal;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1410** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1411** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1412** <code>  return Status::kSuccess;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1413** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1414** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1415** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1416** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1417** <code>/// Generic 2D convolution targeting Conv2dFprop, Conv2dDgrad, and Conv2dWgrad.</code>
+  - EN: Comment that documents intent or context: "Generic 2D convolution targeting Conv2dFprop, Conv2dDgrad, and Conv2dWgrad.".
+  - CN: 用于说明意图或上下文的注释："Generic 2D convolution targeting Conv2dFprop, Conv2dDgrad, and Conv2dWgrad."。
+- **L1418** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1419** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1420** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1421** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1422** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1423** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1424** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1425** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1426** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1427** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1428** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1429** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1430** <code>Status Conv2d(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv2d`.
+  - CN: 开始或继续与 `Conv2d` 相关的签名/调用语法。
+- **L1431** <code>  conv::Operator convolutional_operator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1432** <code>  conv::Conv2dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1433** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1434** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1435** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1436** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1437** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1438** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1439** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1440** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1441** <code>  switch (convolutional_operator) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L1442** <code>  case conv::Operator::kFprop:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1443** <code>    return Conv2dFprop&lt;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1444** <code>      ElementA, LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1445** <code>      ElementB, LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1446** <code>      ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1447** <code>      ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1448** <code>      ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1449** <code>      ConvertOp, InnerProductOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1450** <code>    &gt;(problem_size, tensor_A, tensor_B, tensor_C, tensor_D, alpha, beta, stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1451** <code>    break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1452** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1453** <code>  case conv::Operator::kDgrad:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1454** <code>    return Conv2dDgrad&lt;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1455** <code>      ElementA, LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1456** <code>      ElementB, LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1457** <code>      ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1458** <code>      ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1459** <code>      ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1460** <code>      ConvertOp, InnerProductOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1461** <code>    &gt;(problem_size, tensor_A, tensor_B, tensor_C, tensor_D, alpha, beta, stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1462** <code>    break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1463** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1464** <code>  case conv::Operator::kWgrad:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1465** <code>    return Conv2dWgrad&lt;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1466** <code>      ElementA, LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1467** <code>      ElementB, LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1468** <code>      ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1469** <code>      ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1470** <code>      ElementAccumulator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1471** <code>      ConvertOp, InnerProductOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1472** <code>    &gt;(problem_size, tensor_A, tensor_B, tensor_C, tensor_D, alpha, beta, stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1473** <code>    break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L1474** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1475** <code>  default: break;</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L1476** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1477** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1478** <code>  return Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1479** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1480** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1481** <code>/// Generic 3D convolution targeting Conv3dFprop, Conv3dDgrad, and Conv3dWgrad.</code>
+  - EN: Comment that documents intent or context: "Generic 3D convolution targeting Conv3dFprop, Conv3dDgrad, and Conv3dWgrad.".
+  - CN: 用于说明意图或上下文的注释："Generic 3D convolution targeting Conv3dFprop, Conv3dDgrad, and Conv3dWgrad."。
+- **L1482** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L1483** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1484** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1485** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1486** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1487** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1488** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1489** <code>  typename ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1490** <code>  typename ElementAccumulator = ElementCompute,</code>
+  - EN: Assigns or initializes `ElementAccumulator` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ElementAccumulator` 进行赋值或初始化。
+- **L1491** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ElementCompute&gt;,</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L1492** <code>  typename InnerProductOp = multiply_add&lt;ElementAccumulator&gt;</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L1493** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1494** <code>Status Conv3d(</code>
+  - EN: Begins or continues the signature/call syntax involving `Conv3d`.
+  - CN: 开始或继续与 `Conv3d` 相关的签名/调用语法。
+- **L1495** <code>  conv::Operator convolutional_operator,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1496** <code>  conv::Conv3dProblemSize problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1497** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1498** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1499** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1500** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_D,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1501** <code>  ElementCompute alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1502** <code>  ElementCompute beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1503** <code>  cudaStream_t stream = nullptr) {</code>
+  - EN: Assigns or initializes `stream` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `stream` 进行赋值或初始化。
+- **L1504** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1505** <code>  switch (convolutional_operator) {</code>
+  - EN: Begins a `switch` statement for multi-way control flow.
+  - CN: 开始一个 `switch` 语句，用于多分支控制流。
+- **L1506** <code>  case conv::Operator::kFprop:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1507** <code>    return Conv3dFprop&lt;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1508** <code>      ElementA, LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1509** <code>      ElementB, LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1510** <code>      ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1511** <code>      ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1512** <code>      ElementAccumulator, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1513** <code>      ConvertOp, InnerProductOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1514** <code>    &gt;(problem_size, tensor_A, tensor_B, tensor_C, tensor_D, alpha, beta, stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1515** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1516** <code>  case conv::Operator::kDgrad:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1517** <code>    return Conv3dDgrad&lt;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1518** <code>      ElementA, LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1519** <code>      ElementB, LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1520** <code>      ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1521** <code>      ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1522** <code>      ElementAccumulator, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1523** <code>      ConvertOp, InnerProductOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1524** <code>    &gt;(problem_size, tensor_A, tensor_B, tensor_C, tensor_D, alpha, beta, stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1525** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1526** <code>  case conv::Operator::kWgrad:</code>
+  - EN: Defines one branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句中的一个分支。
+- **L1527** <code>    return Conv3dWgrad&lt;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1528** <code>      ElementA, LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1529** <code>      ElementB, LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1530** <code>      ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1531** <code>      ElementCompute,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1532** <code>      ElementAccumulator, </code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L1533** <code>      ConvertOp, InnerProductOp</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1534** <code>    &gt;(problem_size, tensor_A, tensor_B, tensor_C, tensor_D, alpha, beta, stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L1535** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1536** <code>  default: break;</code>
+  - EN: Defines the default branch of the surrounding `switch` statement.
+  - CN: 定义当前 `switch` 语句的默认分支。
+- **L1537** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1538** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1539** <code>  return Status::kErrorNotSupported;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L1540** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1541** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1542** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1543** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1544** <code>}  // namespace device</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1545** <code>}  // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1546** <code>}  // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L1547** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L1548** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L1549** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/functional.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/tensor.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/matrix_shape.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_conversion.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_ref.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/conv/convolution.h</code> — CUTLASS convolution support / CUTLASS 卷积支持
+- <code>cutlass/conv/conv2d_problem_size.h</code> — CUTLASS convolution support / CUTLASS 卷积支持
+- <code>cutlass/conv/conv3d_problem_size.h</code> — CUTLASS convolution support / CUTLASS 卷积支持

@@ -1,0 +1,156 @@
+# tensor.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/ir/tensor.py`
+
+## Purpose / 作用
+- EN: High-level class for tensor
+- CN: 该模块的文档字符串将其描述为：High-level class for tensor
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `High-level class for tensor` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_library import LayoutType` — **EN:** Imports LayoutType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 LayoutType。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_cppgen.backend.evt.ir.layout_algorithm import (` — **EN:** Imports Layout, broadcast, canonicalization, permutation, reshape, _reverse_tuple from `cutlass_cppgen.backend.evt.ir.layout_algorithm`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.layout_algorithm` 导入 Layout, broadcast, canonicalization, permutation, reshape, _reverse_tuple。
+- **L40** `    Layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    broadcast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    canonicalization,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    permutation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    reshape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    _reverse_tuple` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `from cutlass_cppgen.utils.datatypes import get_datatype_and_layout, get_tensor_shape, library_type` — **EN:** Imports get_datatype_and_layout, get_tensor_shape, library_type from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 get_datatype_and_layout, get_tensor_shape, library_type。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `class Tensor:` — **EN:** Defines class `Tensor`. **CN:** 定义类 `Tensor`。
+- **L51** `    """` — **EN:** Starts the docstring for the class `Tensor`. **CN:** 开始说明 class `Tensor` 的文档字符串。
+- **L52** `    The tensor abstracts the data type` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L53** `    """` — **EN:** Ends the docstring for the class `Tensor`. **CN:** 结束说明 class `Tensor` 的文档字符串。
+- **L54** `    def __init__(self, tensor=None, element=None, shape=None, stride=None,layout_tag=None, is_constant=False) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L55** `        if element is not None and tensor is not None:` — **EN:** Starts a conditional branch guarded by `element is not None and tensor is not None`. **CN:** 开始一个由 `element is not None and tensor is not None` 控制的条件分支。
+- **L56** `            raise Exception(f"Must not specify both element and tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L57** `        elif shape is not None and tensor is not None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L58** `            raise Exception(f"Must not specify both shape and tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L59** `        elif layout_tag is not None and tensor is not None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L60** `            raise Exception(f"Must not specify both layout_tag and tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L61** `        elif (element is None or (layout_tag is None and stride is None) or shape is None) and (tensor is None) :` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L62** `            raise Exception(f"Must specify one of (element, shape, layout/stride) or (tensor)")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L63** `        elif stride is not None and tensor is not None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L64** `            raise Exception(f"Must not specify both stride and tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L65** `        elif stride is not None and layout_tag is not None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L66** `            raise Exception(f"Must not specify layout_tag when stride is provided")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `        if isinstance(tensor, Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(tensor, Tensor)`. **CN:** 开始一个由 `isinstance(tensor, Tensor)` 控制的条件分支。
+- **L69** `            # Directly copy all the attributes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `            self.__dict__.update(vars(tensor))` — **EN:** Invokes `self.__dict__.update` as a standalone call. **CN:** 以独立语句方式调用 `self.__dict__.update`。
+- **L71** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L72** `            if tensor is None:` — **EN:** Starts a conditional branch guarded by `tensor is None`. **CN:** 开始一个由 `tensor is None` 控制的条件分支。
+- **L73** `                self.element = library_type(element)` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L74** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L75** `                self.element, layout_tag = get_datatype_and_layout(tensor)` — **EN:** Assigns a value to (self.element, layout_tag). **CN:** 将一个值赋给 (self.element, layout_tag)。
+- **L76** `                shape = get_tensor_shape(tensor)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L77** `            if stride is not None:` — **EN:** Starts a conditional branch guarded by `stride is not None`. **CN:** 开始一个由 `stride is not None` 控制的条件分支。
+- **L78** `                self.layout = Layout(shape[::-1], stride[::-1])` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L79** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L80** `                if layout_tag == LayoutType.RowMajor:` — **EN:** Starts a conditional branch guarded by `layout_tag == LayoutType.RowMajor`. **CN:** 开始一个由 `layout_tag == LayoutType.RowMajor` 控制的条件分支。
+- **L81** `                    self.layout = Layout(shape[::-1])` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L82** `                elif layout_tag == LayoutType.ColumnMajor:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L83** `                    self.layout = permutation(Layout(shape), [idx for idx in reversed(range(len(shape)))])` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L84** `            self.layout = canonicalization(self.layout)` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `            self.is_constant = is_constant` — **EN:** Assigns a value to self.is_constant. **CN:** 将一个值赋给 self.is_constant。
+- **L87** `            # Save the tensor value if it is constant` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `            if is_constant and tensor is not None:` — **EN:** Starts a conditional branch guarded by `is_constant and tensor is not None`. **CN:** 开始一个由 `is_constant and tensor is not None` 控制的条件分支。
+- **L89** `                self.value = tensor` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L92** `    def shape(self):` — **EN:** Defines function `shape`. **CN:** 定义函数 `shape`。
+- **L93** `        """` — **EN:** Starts the docstring for the function `shape`. **CN:** 开始说明 function `shape` 的文档字符串。
+- **L94** `        Returns the RowMajor layout shape` — **EN:** Continues the docstring for the function `shape`. **CN:** 继续说明 function `shape` 的文档字符串。
+- **L95** `        """` — **EN:** Ends the docstring for the function `shape`. **CN:** 结束说明 function `shape` 的文档字符串。
+- **L96** `        return _reverse_tuple(self.layout.shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L99** `    def stride(self):` — **EN:** Defines function `stride`. **CN:** 定义函数 `stride`。
+- **L100** `        """` — **EN:** Starts the docstring for the function `stride`. **CN:** 开始说明 function `stride` 的文档字符串。
+- **L101** `        Returns the RowMajor layout stride` — **EN:** Continues the docstring for the function `stride`. **CN:** 继续说明 function `stride` 的文档字符串。
+- **L102** `        """` — **EN:** Ends the docstring for the function `stride`. **CN:** 结束说明 function `stride` 的文档字符串。
+- **L103** `        return _reverse_tuple(self.layout.stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L106** `    def rank(self):` — **EN:** Defines function `rank`. **CN:** 定义函数 `rank`。
+- **L107** `        """` — **EN:** Starts the docstring for the function `rank`. **CN:** 开始说明 function `rank` 的文档字符串。
+- **L108** `        Returns the rank of the tensor` — **EN:** Continues the docstring for the function `rank`. **CN:** 继续说明 function `rank` 的文档字符串。
+- **L109** `        """` — **EN:** Ends the docstring for the function `rank`. **CN:** 结束说明 function `rank` 的文档字符串。
+- **L110** `        return len(self.shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L113** `    # Layout Algorithms` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L114** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    def broadcast(self, shape):` — **EN:** Defines function `broadcast`. **CN:** 定义函数 `broadcast`。
+- **L117** `        """` — **EN:** Starts the docstring for the function `broadcast`. **CN:** 开始说明 function `broadcast` 的文档字符串。
+- **L118** `        Broadcast self.layout to shape` — **EN:** Continues the docstring for the function `broadcast`. **CN:** 继续说明 function `broadcast` 的文档字符串。
+- **L119** `        """` — **EN:** Ends the docstring for the function `broadcast`. **CN:** 结束说明 function `broadcast` 的文档字符串。
+- **L120** `        assert isinstance(shape, tuple)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L121** `        self.layout = broadcast(self.layout, _reverse_tuple(shape))` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    def reshape(self, shape):` — **EN:** Defines function `reshape`. **CN:** 定义函数 `reshape`。
+- **L124** `        """` — **EN:** Starts the docstring for the function `reshape`. **CN:** 开始说明 function `reshape` 的文档字符串。
+- **L125** `        Reshape self.layout to shape` — **EN:** Continues the docstring for the function `reshape`. **CN:** 继续说明 function `reshape` 的文档字符串。
+- **L126** `        """` — **EN:** Ends the docstring for the function `reshape`. **CN:** 结束说明 function `reshape` 的文档字符串。
+- **L127** `        assert isinstance(shape, tuple)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L128** `        reverse_shape = _reverse_tuple(shape)` — **EN:** Assigns a value to reverse_shape. **CN:** 将一个值赋给 reverse_shape。
+- **L129** `        self.layout = reshape(self.layout, reverse_shape)` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    def permute(self, indices):` — **EN:** Defines function `permute`. **CN:** 定义函数 `permute`。
+- **L132** `        """` — **EN:** Starts the docstring for the function `permute`. **CN:** 开始说明 function `permute` 的文档字符串。
+- **L133** `        Permute self.layout according to indices` — **EN:** Continues the docstring for the function `permute`. **CN:** 继续说明 function `permute` 的文档字符串。
+- **L134** `        """` — **EN:** Ends the docstring for the function `permute`. **CN:** 结束说明 function `permute` 的文档字符串。
+- **L135** `        length = len(indices)` — **EN:** Assigns a value to length. **CN:** 将一个值赋给 length。
+- **L136** `        indices = [length - idx - 1 for idx in indices]` — **EN:** Assigns a value to indices. **CN:** 将一个值赋给 indices。
+- **L137** `        self.layout = permutation(self.layout, indices[::-1])` — **EN:** Assigns a value to self.layout. **CN:** 将一个值赋给 self.layout。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.ir.tensor`. CN: 模块名为 `cutlass_cppgen.backend.evt.ir.tensor`。
+- EN: Module docstring summary: High-level class for tensor CN: 模块文档摘要为：High-level class for tensor
+- EN: Top-level classes: Tensor CN: 顶层类包括：Tensor
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:LayoutType, cutlass_cppgen.backend.evt.ir.layout_algorithm:Layout,broadcast,canonicalization,permutation,reshape,_reverse_tuple, cutlass_cppgen.utils.datatypes:get_datatype_and_layout,get_tensor_shape,library_type CN: 内部依赖：cutlass_library:LayoutType, cutlass_cppgen.backend.evt.ir.layout_algorithm:Layout,broadcast,canonicalization,permutation,reshape,_reverse_tuple, cutlass_cppgen.utils.datatypes:get_datatype_and_layout,get_tensor_shape,library_type

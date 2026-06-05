@@ -1,0 +1,274 @@
+# dag_ir.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/ir/dag_ir.py`
+
+## Purpose / 作用
+- EN: DAG IR used by Python EVT
+- CN: 该模块的文档字符串将其描述为：DAG IR used by Python EVT
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `DAG IR used by Python EVT` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import networkx as nx` — **EN:** Imports networkx as nx for later use. **CN:** 导入 networkx as nx 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_library import DataType` — **EN:** Imports DataType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `from cutlass_cppgen.backend.evt.ir.compute_nodes import ComputeNode` — **EN:** Imports ComputeNode from `cutlass_cppgen.backend.evt.ir.compute_nodes`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.compute_nodes` 导入 ComputeNode。
+- **L42** `from cutlass_cppgen.backend.evt.ir.node import NodeBase` — **EN:** Imports NodeBase from `cutlass_cppgen.backend.evt.ir.node`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.node` 导入 NodeBase。
+- **L43** `from cutlass_cppgen.backend.library import ActivationOp` — **EN:** Imports ActivationOp from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 ActivationOp。
+- **L44** `from cutlass_cppgen.backend.utils import device_cc` — **EN:** Imports device_cc from `cutlass_cppgen.backend.utils`. **CN:** 从 `cutlass_cppgen.backend.utils` 导入 device_cc。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `class DAGIR:` — **EN:** Defines class `DAGIR`. **CN:** 定义类 `DAGIR`。
+- **L48** `    """` — **EN:** Starts the docstring for the class `DAGIR`. **CN:** 开始说明 class `DAGIR` 的文档字符串。
+- **L49** `    \`\`DAGIR\`\` is the main data structure used in the EVT Intermediate Representation.` — **EN:** Continues the docstring for the class `DAGIR`. **CN:** 继续说明 class `DAGIR` 的文档字符串。
+- **L50** `    It consists of a series of \`\`Node\`\` s, each representing epilogue visitor nodes.` — **EN:** Continues the docstring for the class `DAGIR`. **CN:** 继续说明 class `DAGIR` 的文档字符串。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `    In the DAGIR, \`\`node\`\` is an string of its name. \`\`node_meta\`\` is the underlying class of the node` — **EN:** Continues the docstring for the class `DAGIR`. **CN:** 继续说明 class `DAGIR` 的文档字符串。
+- **L53** `    """` — **EN:** Ends the docstring for the class `DAGIR`. **CN:** 结束说明 class `DAGIR` 的文档字符串。
+- **L54** `    def __init__(self, cc, element_compute=DataType.f32) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L55** `        # The EVT DAGIR is managed through the nextworkX Digraph class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L56** `        self._graph = nx.DiGraph()` — **EN:** Assigns a value to self._graph. **CN:** 将一个值赋给 self._graph。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `        self.element_compute = element_compute` — **EN:** Assigns a value to self.element_compute. **CN:** 将一个值赋给 self.element_compute。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `        self.reduction_names = []` — **EN:** Assigns a value to self.reduction_names. **CN:** 将一个值赋给 self.reduction_names。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `        self.cc = cc` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `        self.identity_counter = 0` — **EN:** Assigns a value to self.identity_counter. **CN:** 将一个值赋给 self.identity_counter。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L67** `    # IR manipulator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    def add_node(self, meta: NodeBase):` — **EN:** Defines function `add_node`. **CN:** 定义函数 `add_node`。
+- **L71** `        """` — **EN:** Starts the docstring for the function `add_node`. **CN:** 开始说明 function `add_node` 的文档字符串。
+- **L72** `        Add a node to dag ir` — **EN:** Continues the docstring for the function `add_node`. **CN:** 继续说明 function `add_node` 的文档字符串。
+- **L73** `        """` — **EN:** Ends the docstring for the function `add_node`. **CN:** 结束说明 function `add_node` 的文档字符串。
+- **L74** `        if self.has_node(meta.name):` — **EN:** Starts a conditional branch guarded by `self.has_node(meta.name)`. **CN:** 开始一个由 `self.has_node(meta.name)` 控制的条件分支。
+- **L75** `            raise SyntaxError(f"Variable '{meta.name}' cannot be defined twice.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L76** `        self._graph.add_node(meta.name, meta=meta)` — **EN:** Invokes `self._graph.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self._graph.add_node`。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    def add_edge(self, src: str, dst: str, weight: int=0):` — **EN:** Defines function `add_edge`. **CN:** 定义函数 `add_edge`。
+- **L79** `        """` — **EN:** Starts the docstring for the function `add_edge`. **CN:** 开始说明 function `add_edge` 的文档字符串。
+- **L80** `        Add an edge src -> dst to dag ir with weight` — **EN:** Continues the docstring for the function `add_edge`. **CN:** 继续说明 function `add_edge` 的文档字符串。
+- **L81** `        """` — **EN:** Ends the docstring for the function `add_edge`. **CN:** 结束说明 function `add_edge` 的文档字符串。
+- **L82** `        if not self.has_node(src):` — **EN:** Starts a conditional branch guarded by `not self.has_node(src)`. **CN:** 开始一个由 `not self.has_node(src)` 控制的条件分支。
+- **L83** `            raise SyntaxError(f"Variable '{src}' is undefined.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L84** `        if not self.has_node(dst):` — **EN:** Starts a conditional branch guarded by `not self.has_node(dst)`. **CN:** 开始一个由 `not self.has_node(dst)` 控制的条件分支。
+- **L85** `            raise SyntaxError(f"Variable '{dst}' is undefined.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `        if self._graph.has_edge(src, dst):` — **EN:** Starts a conditional branch guarded by `self._graph.has_edge(src, dst)`. **CN:** 开始一个由 `self._graph.has_edge(src, dst)` 控制的条件分支。
+- **L88** `            # The DiGraph doesn't support multiple edges between two nodes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L89** `            # We insert an identity node in such case as a workaround` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L90** `            identity_name = f"autogen_identity_{self.identity_counter}"` — **EN:** Assigns a value to identity_name. **CN:** 将一个值赋给 identity_name。
+- **L91** `            self.identity_counter += 1` — **EN:** Updates self.identity_counter in place. **CN:** 原地更新 self.identity_counter。
+- **L92** `            compute_node = ComputeNode(` — **EN:** Assigns a value to compute_node. **CN:** 将一个值赋给 compute_node。
+- **L93** `                name=identity_name, fn=ActivationOp.Identity,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `                element_output=self.element_compute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `                element_compute=self.element_compute)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `            self.add_node(compute_node)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L97** `            self.add_edge(src, identity_name, 0)` — **EN:** Invokes `self.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.add_edge`。
+- **L98** `            self.add_edge(identity_name, dst, weight)` — **EN:** Invokes `self.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.add_edge`。
+- **L99** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L100** `            self._graph.add_edge(src, dst, weight=weight)` — **EN:** Invokes `self._graph.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self._graph.add_edge`。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def remove_node(self, node: str):` — **EN:** Defines function `remove_node`. **CN:** 定义函数 `remove_node`。
+- **L103** `        """` — **EN:** Starts the docstring for the function `remove_node`. **CN:** 开始说明 function `remove_node` 的文档字符串。
+- **L104** `        Remove node from dag ir` — **EN:** Continues the docstring for the function `remove_node`. **CN:** 继续说明 function `remove_node` 的文档字符串。
+- **L105** `        """` — **EN:** Ends the docstring for the function `remove_node`. **CN:** 结束说明 function `remove_node` 的文档字符串。
+- **L106** `        self._graph.remove_node(node)` — **EN:** Invokes `self._graph.remove_node` as a standalone call. **CN:** 以独立语句方式调用 `self._graph.remove_node`。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `    def remove_edge(self, src: str, dst: str):` — **EN:** Defines function `remove_edge`. **CN:** 定义函数 `remove_edge`。
+- **L109** `        """` — **EN:** Starts the docstring for the function `remove_edge`. **CN:** 开始说明 function `remove_edge` 的文档字符串。
+- **L110** `        Remove edge src -> dst` — **EN:** Continues the docstring for the function `remove_edge`. **CN:** 继续说明 function `remove_edge` 的文档字符串。
+- **L111** `        """` — **EN:** Ends the docstring for the function `remove_edge`. **CN:** 结束说明 function `remove_edge` 的文档字符串。
+- **L112** `        self._graph.remove_edge(src, dst)` — **EN:** Invokes `self._graph.remove_edge` as a standalone call. **CN:** 以独立语句方式调用 `self._graph.remove_edge`。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L115** `    # Helper functions for getting attrs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    def has_node(self, node: str) -> bool:` — **EN:** Defines function `has_node`. **CN:** 定义函数 `has_node`。
+- **L119** `        """` — **EN:** Starts the docstring for the function `has_node`. **CN:** 开始说明 function `has_node` 的文档字符串。
+- **L120** `        Check if the node is in the graph` — **EN:** Continues the docstring for the function `has_node`. **CN:** 继续说明 function `has_node` 的文档字符串。
+- **L121** `        """` — **EN:** Ends the docstring for the function `has_node`. **CN:** 结束说明 function `has_node` 的文档字符串。
+- **L122** `        return self._graph.has_node(node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `    def in_degree(self, node: str):` — **EN:** Defines function `in_degree`. **CN:** 定义函数 `in_degree`。
+- **L125** `        """` — **EN:** Starts the docstring for the function `in_degree`. **CN:** 开始说明 function `in_degree` 的文档字符串。
+- **L126** `        Get the input degree of node` — **EN:** Continues the docstring for the function `in_degree`. **CN:** 继续说明 function `in_degree` 的文档字符串。
+- **L127** `        """` — **EN:** Ends the docstring for the function `in_degree`. **CN:** 结束说明 function `in_degree` 的文档字符串。
+- **L128** `        return self._graph.in_degree(node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def in_edges(self, node: str):` — **EN:** Defines function `in_edges`. **CN:** 定义函数 `in_edges`。
+- **L131** `        """` — **EN:** Starts the docstring for the function `in_edges`. **CN:** 开始说明 function `in_edges` 的文档字符串。
+- **L132** `        Get the input edges of node` — **EN:** Continues the docstring for the function `in_edges`. **CN:** 继续说明 function `in_edges` 的文档字符串。
+- **L133** `        """` — **EN:** Ends the docstring for the function `in_edges`. **CN:** 结束说明 function `in_edges` 的文档字符串。
+- **L134** `        return [edge for edge in self._graph.in_edges(node)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    def out_degree(self, node: str):` — **EN:** Defines function `out_degree`. **CN:** 定义函数 `out_degree`。
+- **L137** `        """` — **EN:** Starts the docstring for the function `out_degree`. **CN:** 开始说明 function `out_degree` 的文档字符串。
+- **L138** `        Get the output degree of node` — **EN:** Continues the docstring for the function `out_degree`. **CN:** 继续说明 function `out_degree` 的文档字符串。
+- **L139** `        """` — **EN:** Ends the docstring for the function `out_degree`. **CN:** 结束说明 function `out_degree` 的文档字符串。
+- **L140** `        return self._graph.out_degree(node)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    def out_edges(self, node: str):` — **EN:** Defines function `out_edges`. **CN:** 定义函数 `out_edges`。
+- **L143** `        """` — **EN:** Starts the docstring for the function `out_edges`. **CN:** 开始说明 function `out_edges` 的文档字符串。
+- **L144** `        Get the output edges of node` — **EN:** Continues the docstring for the function `out_edges`. **CN:** 继续说明 function `out_edges` 的文档字符串。
+- **L145** `        """` — **EN:** Ends the docstring for the function `out_edges`. **CN:** 结束说明 function `out_edges` 的文档字符串。
+- **L146** `        return [edge for edge in self._graph.out_edges(node)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `    def get_node_meta(self, node: str):` — **EN:** Defines function `get_node_meta`. **CN:** 定义函数 `get_node_meta`。
+- **L149** `        """` — **EN:** Starts the docstring for the function `get_node_meta`. **CN:** 开始说明 function `get_node_meta` 的文档字符串。
+- **L150** `        Get the meta data of the node` — **EN:** Continues the docstring for the function `get_node_meta`. **CN:** 继续说明 function `get_node_meta` 的文档字符串。
+- **L151** `        """` — **EN:** Ends the docstring for the function `get_node_meta`. **CN:** 结束说明 function `get_node_meta` 的文档字符串。
+- **L152** `        return self._graph.nodes[node]["meta"]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `    def get_edge_weight(self, src, dst):` — **EN:** Defines function `get_edge_weight`. **CN:** 定义函数 `get_edge_weight`。
+- **L155** `        """` — **EN:** Starts the docstring for the function `get_edge_weight`. **CN:** 开始说明 function `get_edge_weight` 的文档字符串。
+- **L156** `        Get the edge weight of edge src->dst` — **EN:** Continues the docstring for the function `get_edge_weight`. **CN:** 继续说明 function `get_edge_weight` 的文档字符串。
+- **L157** `        """` — **EN:** Ends the docstring for the function `get_edge_weight`. **CN:** 结束说明 function `get_edge_weight` 的文档字符串。
+- **L158** `        return self._graph.get_edge_data(src, dst)["weight"]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L161** `    # High-level helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L162** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    def all_reachable_nodes(self, node: str):` — **EN:** Defines function `all_reachable_nodes`. **CN:** 定义函数 `all_reachable_nodes`。
+- **L165** `        """` — **EN:** Starts the docstring for the function `all_reachable_nodes`. **CN:** 开始说明 function `all_reachable_nodes` 的文档字符串。
+- **L166** `        Get all the nodes reachable from the current node (exclude)` — **EN:** Continues the docstring for the function `all_reachable_nodes`. **CN:** 继续说明 function `all_reachable_nodes` 的文档字符串。
+- **L167** `        """` — **EN:** Ends the docstring for the function `all_reachable_nodes`. **CN:** 结束说明 function `all_reachable_nodes` 的文档字符串。
+- **L168** `        return list(nx.dfs_preorder_nodes(self._graph, source=node))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    def get_users(self, node: str):` — **EN:** Defines function `get_users`. **CN:** 定义函数 `get_users`。
+- **L171** `        """` — **EN:** Starts the docstring for the function `get_users`. **CN:** 开始说明 function `get_users` 的文档字符串。
+- **L172** `        Get all users of the current node` — **EN:** Continues the docstring for the function `get_users`. **CN:** 继续说明 function `get_users` 的文档字符串。
+- **L173** `        """` — **EN:** Ends the docstring for the function `get_users`. **CN:** 结束说明 function `get_users` 的文档字符串。
+- **L174** `        return [edge[1] for edge in self.out_edges(node)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `    def get_all_inputs(self, node: str):` — **EN:** Defines function `get_all_inputs`. **CN:** 定义函数 `get_all_inputs`。
+- **L177** `        """` — **EN:** Starts the docstring for the function `get_all_inputs`. **CN:** 开始说明 function `get_all_inputs` 的文档字符串。
+- **L178** `        Get all the input nodes sorted by edge weight` — **EN:** Continues the docstring for the function `get_all_inputs`. **CN:** 继续说明 function `get_all_inputs` 的文档字符串。
+- **L179** `        """` — **EN:** Ends the docstring for the function `get_all_inputs`. **CN:** 结束说明 function `get_all_inputs` 的文档字符串。
+- **L180** `        in_edges = self.in_edges(node)` — **EN:** Assigns a value to in_edges. **CN:** 将一个值赋给 in_edges。
+- **L181** `        edge_weights = [self.get_edge_weight(*edge) for edge in in_edges]` — **EN:** Assigns a value to edge_weights. **CN:** 将一个值赋给 edge_weights。
+- **L182** `        return [edge[0] for _, edge in sorted(zip(edge_weights, in_edges))]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `    def get_all_inputs_meta(self, node: str):` — **EN:** Defines function `get_all_inputs_meta`. **CN:** 定义函数 `get_all_inputs_meta`。
+- **L185** `        """` — **EN:** Starts the docstring for the function `get_all_inputs_meta`. **CN:** 开始说明 function `get_all_inputs_meta` 的文档字符串。
+- **L186** `        Get all the input node metas sorted by edge weight` — **EN:** Continues the docstring for the function `get_all_inputs_meta`. **CN:** 继续说明 function `get_all_inputs_meta` 的文档字符串。
+- **L187** `        """` — **EN:** Ends the docstring for the function `get_all_inputs_meta`. **CN:** 结束说明 function `get_all_inputs_meta` 的文档字符串。
+- **L188** `        return [self.get_node_meta(input_node) for input_node in self.get_all_inputs(node)]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    def replace_all_uses_with(self, node1, node2):` — **EN:** Defines function `replace_all_uses_with`. **CN:** 定义函数 `replace_all_uses_with`。
+- **L191** `        """` — **EN:** Starts the docstring for the function `replace_all_uses_with`. **CN:** 开始说明 function `replace_all_uses_with` 的文档字符串。
+- **L192** `        Replace all uses of node1 with node2` — **EN:** Continues the docstring for the function `replace_all_uses_with`. **CN:** 继续说明 function `replace_all_uses_with` 的文档字符串。
+- **L193** `        """` — **EN:** Ends the docstring for the function `replace_all_uses_with`. **CN:** 结束说明 function `replace_all_uses_with` 的文档字符串。
+- **L194** `        for edge in self.out_edges(node1):` — **EN:** Starts a loop assigning items from `self.out_edges(node1)` to `edge`. **CN:** 开始一个循环，将 `self.out_edges(node1)` 的元素赋给 `edge`。
+- **L195** `            weight = self.get_edge_weight(*edge)` — **EN:** Assigns a value to weight. **CN:** 将一个值赋给 weight。
+- **L196** `            user = edge[1]` — **EN:** Assigns a value to user. **CN:** 将一个值赋给 user。
+- **L197** `            self.add_edge(node2, user, weight)` — **EN:** Invokes `self.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.add_edge`。
+- **L198** `            self.remove_edge(node1, user)` — **EN:** Invokes `self.remove_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.remove_edge`。
+- **L199** `        self.remove_node(node1)` — **EN:** Invokes `self.remove_node` as a standalone call. **CN:** 以独立语句方式调用 `self.remove_node`。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L202** `    # Node accessor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L203** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L204** `    def nodes_topological_order(self):` — **EN:** Defines function `nodes_topological_order`. **CN:** 定义函数 `nodes_topological_order`。
+- **L205** `        """` — **EN:** Starts the docstring for the function `nodes_topological_order`. **CN:** 开始说明 function `nodes_topological_order` 的文档字符串。
+- **L206** `        Get the nodes in the unique lexicographical topological order` — **EN:** Continues the docstring for the function `nodes_topological_order`. **CN:** 继续说明 function `nodes_topological_order` 的文档字符串。
+- **L207** `        It generates a unique ordering of nodes by first sorting topologically` — **EN:** Continues the docstring for the function `nodes_topological_order`. **CN:** 继续说明 function `nodes_topological_order` 的文档字符串。
+- **L208** `        and then additionally by sorting lexicographically.` — **EN:** Continues the docstring for the function `nodes_topological_order`. **CN:** 继续说明 function `nodes_topological_order` 的文档字符串。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `        Although topological_sort alone also works, this generates a unique key` — **EN:** Continues the docstring for the function `nodes_topological_order`. **CN:** 继续说明 function `nodes_topological_order` 的文档字符串。
+- **L211** `        for each epilogue visitor pattern and ensures the compilation cache can be reused.` — **EN:** Continues the docstring for the function `nodes_topological_order`. **CN:** 继续说明 function `nodes_topological_order` 的文档字符串。
+- **L212** `        :return: list[str]` — **EN:** Continues the docstring for the function `nodes_topological_order`. **CN:** 继续说明 function `nodes_topological_order` 的文档字符串。
+- **L213** `        """` — **EN:** Ends the docstring for the function `nodes_topological_order`. **CN:** 结束说明 function `nodes_topological_order` 的文档字符串。
+- **L214** `        return list(nx.lexicographical_topological_sort(self._graph))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `    def node_metas_topological_order(self):` — **EN:** Defines function `node_metas_topological_order`. **CN:** 定义函数 `node_metas_topological_order`。
+- **L217** `        """` — **EN:** Starts the docstring for the function `node_metas_topological_order`. **CN:** 开始说明 function `node_metas_topological_order` 的文档字符串。
+- **L218** `        Get the node metas in topological order` — **EN:** Continues the docstring for the function `node_metas_topological_order`. **CN:** 继续说明 function `node_metas_topological_order` 的文档字符串。
+- **L219** `        :return: list[NodeBase]` — **EN:** Continues the docstring for the function `node_metas_topological_order`. **CN:** 继续说明 function `node_metas_topological_order` 的文档字符串。
+- **L220** `        """` — **EN:** Ends the docstring for the function `node_metas_topological_order`. **CN:** 结束说明 function `node_metas_topological_order` 的文档字符串。
+- **L221** `        return [self.get_node_meta(node) for node in self.nodes_topological_order()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L224** `    def nodes(self):` — **EN:** Defines function `nodes`. **CN:** 定义函数 `nodes`。
+- **L225** `        """` — **EN:** Starts the docstring for the function `nodes`. **CN:** 开始说明 function `nodes` 的文档字符串。
+- **L226** `        Get all nodes` — **EN:** Continues the docstring for the function `nodes`. **CN:** 继续说明 function `nodes` 的文档字符串。
+- **L227** `        :return: list[str]` — **EN:** Continues the docstring for the function `nodes`. **CN:** 继续说明 function `nodes` 的文档字符串。
+- **L228** `        """` — **EN:** Ends the docstring for the function `nodes`. **CN:** 结束说明 function `nodes` 的文档字符串。
+- **L229** `        return list(self._graph.nodes)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L232** `    def nodes_meta(self):` — **EN:** Defines function `nodes_meta`. **CN:** 定义函数 `nodes_meta`。
+- **L233** `        """` — **EN:** Starts the docstring for the function `nodes_meta`. **CN:** 开始说明 function `nodes_meta` 的文档字符串。
+- **L234** `        Get all node metas` — **EN:** Continues the docstring for the function `nodes_meta`. **CN:** 继续说明 function `nodes_meta` 的文档字符串。
+- **L235** `        :return: list[NodeBase]` — **EN:** Continues the docstring for the function `nodes_meta`. **CN:** 继续说明 function `nodes_meta` 的文档字符串。
+- **L236** `        """` — **EN:** Ends the docstring for the function `nodes_meta`. **CN:** 结束说明 function `nodes_meta` 的文档字符串。
+- **L237** `        return [data[1]['meta'] for data in self._graph.nodes.data()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L240** `    def edges(self):` — **EN:** Defines function `edges`. **CN:** 定义函数 `edges`。
+- **L241** `        """` — **EN:** Starts the docstring for the function `edges`. **CN:** 开始说明 function `edges` 的文档字符串。
+- **L242** `        Get all edges` — **EN:** Continues the docstring for the function `edges`. **CN:** 继续说明 function `edges` 的文档字符串。
+- **L243** `        :return: list[(str, str)]` — **EN:** Continues the docstring for the function `edges`. **CN:** 继续说明 function `edges` 的文档字符串。
+- **L244** `        """` — **EN:** Ends the docstring for the function `edges`. **CN:** 结束说明 function `edges` 的文档字符串。
+- **L245** `        return list(self._graph.edges)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L248** `    # Path` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L249** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L250** `    def has_path(self, src: str, target: str) -> bool:` — **EN:** Defines function `has_path`. **CN:** 定义函数 `has_path`。
+- **L251** `        """` — **EN:** Starts the docstring for the function `has_path`. **CN:** 开始说明 function `has_path` 的文档字符串。
+- **L252** `        Return True is a path exists from src to target` — **EN:** Continues the docstring for the function `has_path`. **CN:** 继续说明 function `has_path` 的文档字符串。
+- **L253** `        """` — **EN:** Ends the docstring for the function `has_path`. **CN:** 结束说明 function `has_path` 的文档字符串。
+- **L254** `        return nx.has_path(self._graph, src, target)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.ir.dag_ir`. CN: 模块名为 `cutlass_cppgen.backend.evt.ir.dag_ir`。
+- EN: Module docstring summary: DAG IR used by Python EVT CN: 模块文档摘要为：DAG IR used by Python EVT
+- EN: Top-level classes: DAGIR CN: 顶层类包括：DAGIR
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataType, cutlass_cppgen.backend.evt.ir.compute_nodes:ComputeNode, cutlass_cppgen.backend.evt.ir.node:NodeBase, cutlass_cppgen.backend.library:ActivationOp, cutlass_cppgen.backend.utils:device_cc CN: 内部依赖：cutlass_library:DataType, cutlass_cppgen.backend.evt.ir.compute_nodes:ComputeNode, cutlass_cppgen.backend.evt.ir.node:NodeBase, cutlass_cppgen.backend.library:ActivationOp, cutlass_cppgen.backend.utils:device_cc
+- EN: External or standard-library dependencies: networkx CN: 外部或标准库依赖：networkx

@@ -1,0 +1,191 @@
+# aot_config.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/export/aot_config.py`
+
+## Purpose / 作用
+- EN: CLI tool to help with AOT compilation configuration.
+- CN: 该模块的文档字符串将其描述为：CLI tool to help with AOT compilation configuration.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `CLI tool to help with AOT compilation configuration.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `Similar to tvm-ffi-config or llvm-config, this tool provides compiler flags` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L16** `for linking against CuTe DSL runtime libraries.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `Usage:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L19** `    python -m cutlass.cute.export.aot_config --libdir    # Returns the library directory path` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L20** `    python -m cutlass.cute.export.aot_config --ldflags   # Returns -L flags for linking` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L21** `    python -m cutlass.cute.export.aot_config --libs      # Returns -l flags for linking` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `Examples:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L24** `    # Compile and link a shared library using shell substitution` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L25** `    g++ -shared -o kernel.so kernel.o \\` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L26** `        $(python -m cutlass.cute.export.aot_config --ldflags) \\` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L27** `        $(python -m cutlass.cute.export.aot_config --libs)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `    # Or using backticks` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L30** `    g++ -shared -o kernel.so kernel.o \`python -m cutlass.cute.export.aot_config --ldflags\` \`python -m cutlass.cute.export.aot_config --libs\`` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L31** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `import argparse` — **EN:** Imports argparse for later use. **CN:** 导入 argparse 供后续使用。
+- **L34** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L35** `from pathlib import Path` — **EN:** Imports Path from `pathlib`. **CN:** 从 `pathlib` 导入 Path。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `def get_libdir() -> str:` — **EN:** Defines function `get_libdir`. **CN:** 定义函数 `get_libdir`。
+- **L39** `    """` — **EN:** Starts the docstring for the function `get_libdir`. **CN:** 开始说明 function `get_libdir` 的文档字符串。
+- **L40** `    Get the library directory path containing libcuda_dialect_runtime.so.` — **EN:** Continues the docstring for the function `get_libdir`. **CN:** 继续说明 function `get_libdir` 的文档字符串。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `    :return: Path to the library directory` — **EN:** Continues the docstring for the function `get_libdir`. **CN:** 继续说明 function `get_libdir` 的文档字符串。
+- **L43** `    :rtype: str` — **EN:** Continues the docstring for the function `get_libdir`. **CN:** 继续说明 function `get_libdir` 的文档字符串。
+- **L44** `    """` — **EN:** Ends the docstring for the function `get_libdir`. **CN:** 结束说明 function `get_libdir` 的文档字符串。
+- **L45** `    from ..runtime import find_runtime_libraries` — **EN:** Imports find_runtime_libraries from `..runtime`. **CN:** 从 `..runtime` 导入 find_runtime_libraries。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    libs = find_runtime_libraries(enable_tvm_ffi=False)` — **EN:** Assigns a value to libs. **CN:** 将一个值赋给 libs。
+- **L48** `    if libs:` — **EN:** Starts a conditional branch guarded by `libs`. **CN:** 开始一个由 `libs` 控制的条件分支。
+- **L49** `        # Return the directory containing the first library found` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L50** `        return str(Path(libs[0]).parent)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `    return ""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `def get_libs(enable_tvm_ffi: bool = False) -> str:` — **EN:** Defines function `get_libs`. **CN:** 定义函数 `get_libs`。
+- **L56** `    """` — **EN:** Starts the docstring for the function `get_libs`. **CN:** 开始说明 function `get_libs` 的文档字符串。
+- **L57** `    Get the -l flags needed for AOT compilation linking.` — **EN:** Continues the docstring for the function `get_libs`. **CN:** 继续说明 function `get_libs` 的文档字符串。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    Similar to \`tvm-ffi-config --libs\` which returns \`-ltvm_ffi\`,` — **EN:** Continues the docstring for the function `get_libs`. **CN:** 继续说明 function `get_libs` 的文档字符串。
+- **L60** `    this returns \`-lcuda_dialect_runtime\` (and \`-ltvm_ffi\` if TVM-FFI is enabled).` — **EN:** Continues the docstring for the function `get_libs`. **CN:** 继续说明 function `get_libs` 的文档字符串。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `    :param enable_tvm_ffi: Whether to include TVM-FFI library` — **EN:** Continues the docstring for the function `get_libs`. **CN:** 继续说明 function `get_libs` 的文档字符串。
+- **L63** `    :return: Space-separated -l flags (e.g., "-lcuda_dialect_runtime -ltvm_ffi")` — **EN:** Continues the docstring for the function `get_libs`. **CN:** 继续说明 function `get_libs` 的文档字符串。
+- **L64** `    :rtype: str` — **EN:** Continues the docstring for the function `get_libs`. **CN:** 继续说明 function `get_libs` 的文档字符串。
+- **L65** `    """` — **EN:** Ends the docstring for the function `get_libs`. **CN:** 结束说明 function `get_libs` 的文档字符串。
+- **L66** `    from ..runtime import find_runtime_libraries` — **EN:** Imports find_runtime_libraries from `..runtime`. **CN:** 从 `..runtime` 导入 find_runtime_libraries。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    libs = find_runtime_libraries(enable_tvm_ffi=enable_tvm_ffi)` — **EN:** Assigns a value to libs. **CN:** 将一个值赋给 libs。
+- **L69** `    # Convert full paths to -l flags` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `    # e.g., /path/to/libcuda_dialect_runtime.so -> -lcuda_dialect_runtime` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `    flags = []` — **EN:** Assigns a value to flags. **CN:** 将一个值赋给 flags。
+- **L72** `    for lib in libs:` — **EN:** Starts a loop assigning items from `libs` to `lib`. **CN:** 开始一个循环，将 `libs` 的元素赋给 `lib`。
+- **L73** `        lib_path = Path(lib)` — **EN:** Assigns a value to lib_path. **CN:** 将一个值赋给 lib_path。
+- **L74** `        lib_name = lib_path.stem  # e.g., "libcuda_dialect_runtime"` — **EN:** Assigns a value to lib_name. **CN:** 将一个值赋给 lib_name。
+- **L75** `        if lib_name.startswith("lib"):` — **EN:** Starts a conditional branch guarded by `lib_name.startswith('lib')`. **CN:** 开始一个由 `lib_name.startswith('lib')` 控制的条件分支。
+- **L76** `            lib_name = lib_name[3:]` — **EN:** Assigns a value to lib_name. **CN:** 将一个值赋给 lib_name。
+- **L77** `        flags.append(f"-l{lib_name}")` — **EN:** Invokes `flags.append` as a standalone call. **CN:** 以独立语句方式调用 `flags.append`。
+- **L78** `    return " ".join(flags)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `def get_lib_paths(enable_tvm_ffi: bool = False) -> list[str]:` — **EN:** Defines function `get_lib_paths`. **CN:** 定义函数 `get_lib_paths`。
+- **L82** `    """` — **EN:** Starts the docstring for the function `get_lib_paths`. **CN:** 开始说明 function `get_lib_paths` 的文档字符串。
+- **L83** `    Get the full paths to runtime libraries.` — **EN:** Continues the docstring for the function `get_lib_paths`. **CN:** 继续说明 function `get_lib_paths` 的文档字符串。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `    :param enable_tvm_ffi: Whether to include TVM-FFI library` — **EN:** Continues the docstring for the function `get_lib_paths`. **CN:** 继续说明 function `get_lib_paths` 的文档字符串。
+- **L86** `    :return: List of full library paths` — **EN:** Continues the docstring for the function `get_lib_paths`. **CN:** 继续说明 function `get_lib_paths` 的文档字符串。
+- **L87** `    :rtype: list[str]` — **EN:** Continues the docstring for the function `get_lib_paths`. **CN:** 继续说明 function `get_lib_paths` 的文档字符串。
+- **L88** `    """` — **EN:** Ends the docstring for the function `get_lib_paths`. **CN:** 结束说明 function `get_lib_paths` 的文档字符串。
+- **L89** `    from ..runtime import find_runtime_libraries` — **EN:** Imports find_runtime_libraries from `..runtime`. **CN:** 从 `..runtime` 导入 find_runtime_libraries。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    return find_runtime_libraries(enable_tvm_ffi=enable_tvm_ffi)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `def get_ldflags() -> str:` — **EN:** Defines function `get_ldflags`. **CN:** 定义函数 `get_ldflags`。
+- **L95** `    """` — **EN:** Starts the docstring for the function `get_ldflags`. **CN:** 开始说明 function `get_ldflags` 的文档字符串。
+- **L96** `    Get the -L flags for the linker.` — **EN:** Continues the docstring for the function `get_ldflags`. **CN:** 继续说明 function `get_ldflags` 的文档字符串。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    Similar to \`tvm-ffi-config --ldflags\` which returns \`-L<libdir>\`.` — **EN:** Continues the docstring for the function `get_ldflags`. **CN:** 继续说明 function `get_ldflags` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    :return: -L flag with library directory path` — **EN:** Continues the docstring for the function `get_ldflags`. **CN:** 继续说明 function `get_ldflags` 的文档字符串。
+- **L101** `    :rtype: str` — **EN:** Continues the docstring for the function `get_ldflags`. **CN:** 继续说明 function `get_ldflags` 的文档字符串。
+- **L102** `    """` — **EN:** Ends the docstring for the function `get_ldflags`. **CN:** 结束说明 function `get_ldflags` 的文档字符串。
+- **L103** `    libdir = get_libdir()` — **EN:** Assigns a value to libdir. **CN:** 将一个值赋给 libdir。
+- **L104** `    if libdir:` — **EN:** Starts a conditional branch guarded by `libdir`. **CN:** 开始一个由 `libdir` 控制的条件分支。
+- **L105** `        return f"-L{libdir}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L106** `    return ""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `def main() -> None:` — **EN:** Defines function `main`. **CN:** 定义函数 `main`。
+- **L110** `    parser = argparse.ArgumentParser(` — **EN:** Assigns a value to parser. **CN:** 将一个值赋给 parser。
+- **L111** `        description="AOT configuration helper for CuTe DSL (similar to tvm-ffi-config)",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        formatter_class=argparse.RawDescriptionHelpFormatter,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        epilog="""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `Examples:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `  # Get library directory path` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `  python -m cutlass.cute.export.aot_config --libdir` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `  # Get -L flags for linking` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L119** `  python -m cutlass.cute.export.aot_config --ldflags` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `  # Get -l flags for linking` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L122** `  python -m cutlass.cute.export.aot_config --libs` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `  # Compile a shared library` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `  g++ -shared -o kernel.so kernel.o \\` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `      $(python -m cutlass.cute.export.aot_config --ldflags) \\` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `      $(python -m cutlass.cute.export.aot_config --libs)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `        """,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    parser.add_argument(` — **EN:** Invokes `parser.add_argument` as a standalone call. **CN:** 以独立语句方式调用 `parser.add_argument`。
+- **L132** `        "--libdir",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `        action="store_true",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        help="Print the library directory path containing runtime libraries",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `    parser.add_argument(` — **EN:** Invokes `parser.add_argument` as a standalone call. **CN:** 以独立语句方式调用 `parser.add_argument`。
+- **L137** `        "--ldflags",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `        action="store_true",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `        help="Print -L flags for linking (e.g., -L/path/to/lib)",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `    parser.add_argument(` — **EN:** Invokes `parser.add_argument` as a standalone call. **CN:** 以独立语句方式调用 `parser.add_argument`。
+- **L142** `        "--libs",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `        action="store_true",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `        help="Print -l flags for linking (e.g., -lcuda_dialect_runtime)",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    parser.add_argument(` — **EN:** Invokes `parser.add_argument` as a standalone call. **CN:** 以独立语句方式调用 `parser.add_argument`。
+- **L147** `        "--with-tvm-ffi",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `        action="store_true",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `        help="Include TVM-FFI library in --libs output (disabled by default)",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    args = parser.parse_args()` — **EN:** Assigns a value to args. **CN:** 将一个值赋给 args。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `    if not args.libdir and not args.ldflags and not args.libs:` — **EN:** Starts a conditional branch guarded by `not args.libdir and (not args.ldflags) and (not args.libs)`. **CN:** 开始一个由 `not args.libdir and (not args.ldflags) and (not args.libs)` 控制的条件分支。
+- **L155** `        parser.print_help()` — **EN:** Invokes `parser.print_help` as a standalone call. **CN:** 以独立语句方式调用 `parser.print_help`。
+- **L156** `        sys.exit(1)` — **EN:** Invokes `sys.exit` as a standalone call. **CN:** 以独立语句方式调用 `sys.exit`。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    enable_tvm_ffi = args.with_tvm_ffi` — **EN:** Assigns a value to enable_tvm_ffi. **CN:** 将一个值赋给 enable_tvm_ffi。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    if args.libdir:` — **EN:** Starts a conditional branch guarded by `args.libdir`. **CN:** 开始一个由 `args.libdir` 控制的条件分支。
+- **L161** `        print(get_libdir())` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    if args.ldflags:` — **EN:** Starts a conditional branch guarded by `args.ldflags`. **CN:** 开始一个由 `args.ldflags` 控制的条件分支。
+- **L164** `        print(get_ldflags())` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    if args.libs:` — **EN:** Starts a conditional branch guarded by `args.libs`. **CN:** 开始一个由 `args.libs` 控制的条件分支。
+- **L167** `        print(get_libs(enable_tvm_ffi=enable_tvm_ffi))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `if __name__ == "__main__":` — **EN:** Starts a conditional branch guarded by `__name__ == '__main__'`. **CN:** 开始一个由 `__name__ == '__main__'` 控制的条件分支。
+- **L171** `    main()` — **EN:** Invokes `main` as a standalone call. **CN:** 以独立语句方式调用 `main`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.export.aot_config`. CN: 模块名为 `CuTeDSL.cutlass.cute.export.aot_config`。
+- EN: Module docstring summary: CLI tool to help with AOT compilation configuration. CN: 模块文档摘要为：CLI tool to help with AOT compilation configuration.
+- EN: Top-level functions: get_libdir, get_libs, get_lib_paths, get_ldflags, main CN: 顶层函数包括：get_libdir, get_libs, get_lib_paths, get_ldflags, main
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..runtime:find_runtime_libraries CN: 内部依赖：..runtime:find_runtime_libraries
+- EN: External or standard-library dependencies: argparse, sys, pathlib:Path CN: 外部或标准库依赖：argparse, sys, pathlib:Path

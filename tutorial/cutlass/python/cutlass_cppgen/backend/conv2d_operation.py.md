@@ -1,0 +1,719 @@
+# conv2d_operation.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/conv2d_operation.py`
+
+## Purpose / 作用
+- EN: Defines 4 classes (Conv2dArguments, Conv2dRT, Conv2dOperation, EmitConv2dInstance) in `cutlass_cppgen.backend.conv2d_operation`.
+- CN: 该模块 `cutlass_cppgen.backend.conv2d_operation` 定义了 4 个类（Conv2dArguments, Conv2dRT, Conv2dOperation, EmitConv2dInstance）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L35** `from typing import Union` — **EN:** Imports Union from `typing`. **CN:** 从 `typing` 导入 Union。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L38** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L39** `from cutlass_library import SubstituteTemplate` — **EN:** Imports SubstituteTemplate from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 SubstituteTemplate。
+- **L40** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `from cutlass_library import (` — **EN:** Imports ConvKindNames, ConvKindTag, DataTypeNames, DataTypeSize, DataTypeTag, IteratorAlgorithmNames, ... (+17 more) from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 ConvKindNames, ConvKindTag, DataTypeNames, DataTypeSize, DataTypeTag, IteratorAlgorithmNames, ... (+17 more)。
+- **L43** `    ConvKindNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    ConvKindTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    DataTypeNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    DataTypeTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    IteratorAlgorithmNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    IteratorAlgorithmTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    LayoutTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    LayoutType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    MathOperation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    MathOperationTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    OpcodeClass,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    OpcodeClassNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    OpcodeClassTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    OperationKind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    ShortDataTypeNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `    ShortLayoutTypeNames,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `    SplitKMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `    StrideSupport,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `    StrideSupportTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `    SwizzlingFunctor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    SwizzlingFunctorTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    get_complex_from_real,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `from cutlass_cppgen.backend.arguments import ArgumentBase` — **EN:** Imports ArgumentBase from `cutlass_cppgen.backend.arguments`. **CN:** 从 `cutlass_cppgen.backend.arguments` 导入 ArgumentBase。
+- **L69** `from cutlass_cppgen.backend.c_types import dim3_, get_conv2d_arguments` — **EN:** Imports dim3_, get_conv2d_arguments from `cutlass_cppgen.backend.c_types`. **CN:** 从 `cutlass_cppgen.backend.c_types` 导入 dim3_, get_conv2d_arguments。
+- **L70** `from cutlass_cppgen.backend.library import (` — **EN:** Imports EmissionType, TensorDescription, TileDescription from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 EmissionType, TensorDescription, TileDescription。
+- **L71** `    EmissionType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `    TensorDescription,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `    TileDescription,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `from cutlass_cppgen.backend.memory_manager import device_mem_alloc` — **EN:** Imports device_mem_alloc from `cutlass_cppgen.backend.memory_manager`. **CN:** 从 `cutlass_cppgen.backend.memory_manager` 导入 device_mem_alloc。
+- **L76** `from cutlass_cppgen.backend.operation import ExecutableOperation, LaunchConfiguration` — **EN:** Imports ExecutableOperation, LaunchConfiguration from `cutlass_cppgen.backend.operation`. **CN:** 从 `cutlass_cppgen.backend.operation` 导入 ExecutableOperation, LaunchConfiguration。
+- **L77** `from cutlass_cppgen.backend.utils.device import to_device_ptr` — **EN:** Imports to_device_ptr from `cutlass_cppgen.backend.utils.device`. **CN:** 从 `cutlass_cppgen.backend.utils.device` 导入 to_device_ptr。
+- **L78** `from cutlass_cppgen.shape import GemmCoord` — **EN:** Imports GemmCoord from `cutlass_cppgen.shape`. **CN:** 从 `cutlass_cppgen.shape` 导入 GemmCoord。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `class Conv2dArguments(ArgumentBase):` — **EN:** Defines class `Conv2dArguments` with bases ArgumentBase. **CN:** 定义类 `Conv2dArguments`，其基类为 ArgumentBase。
+- **L82** `    """` — **EN:** Starts the docstring for the class `Conv2dArguments`. **CN:** 开始说明 class `Conv2dArguments` 的文档字符串。
+- **L83** `    Argument wrapper for Conv2d. It encodes problem information and` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L84** `    user-provide tensors into the kernel's argument.` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    :param operation: the Conv2d operation to take the argument` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L87** `    :type operation: :class:\`cutlass_cppgen.backend.Conv2dOperation\`` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L88** `    :param problem_size: the Conv2d problem size` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L89** `    :type problem_size: :class:\`cutlass_cppgen.shape.Conv2dProblemSize\`` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L90** `    :param A: tensor A` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L91** `    :type A: cuda.CUdeviceptr | numpy.ndarray | torch.Tensor | cupy.ndarray` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L92** `    :param B: tensor B` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L93** `    :type B: cuda.CUdeviceptr | numpy.ndarray | torch.Tensor | cupy.ndarray` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L94** `    :param C: tensor C` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L95** `    :type C: cuda.CUdeviceptr | numpy.ndarray | torch.Tensor | cupy.ndarray` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L96** `    :param D: tensor D` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L97** `    :type D: cuda.CUdeviceptr | numpy.ndarray | torch.Tensor | cupy.ndarray` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L98** `    :param split_k_mode: conv2d split K mode, defaults to cutlass_library.library.SplitKMode.Serial` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L99** `    :type split_k_mode: cutlass_library.library.SplitKMode, optional` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L100** `    :param output_op: output operator, optional` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L101** `    :type output_op: :class:\`cutlass_cppgen.backend.LinearCombinationFunctorArguments\`` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L102** `    :param stream: cuda stream, defaults to cuda.cuda.CUstream(0)` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L103** `    :type stream: :class:\`cuda.cuda.CUstream\`` — **EN:** Continues the docstring for the class `Conv2dArguments`. **CN:** 继续说明 class `Conv2dArguments` 的文档字符串。
+- **L104** `    """` — **EN:** Ends the docstring for the class `Conv2dArguments`. **CN:** 结束说明 class `Conv2dArguments` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    def __init__(self, operation, problem_size, A, B, C, D,` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L107** `        split_k_mode=SplitKMode.Serial, **kwargs, ) -> None:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `        self.operation = operation` — **EN:** Assigns a value to self.operation. **CN:** 将一个值赋给 self.operation。
+- **L109** `        self.conv_kind = operation.conv_kind` — **EN:** Assigns a value to self.conv_kind. **CN:** 将一个值赋给 self.conv_kind。
+- **L110** `        self.layout_A = operation.A.layout` — **EN:** Assigns a value to self.layout_A. **CN:** 将一个值赋给 self.layout_A。
+- **L111** `        self.layout_B = operation.B.layout` — **EN:** Assigns a value to self.layout_B. **CN:** 将一个值赋给 self.layout_B。
+- **L112** `        self.layout_C = operation.C.layout` — **EN:** Assigns a value to self.layout_C. **CN:** 将一个值赋给 self.layout_C。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `        self.element_A = operation.A.element` — **EN:** Assigns a value to self.element_A. **CN:** 将一个值赋给 self.element_A。
+- **L115** `        self.element_B = operation.B.element` — **EN:** Assigns a value to self.element_B. **CN:** 将一个值赋给 self.element_B。
+- **L116** `        self.element_C = operation.C.element` — **EN:** Assigns a value to self.element_C. **CN:** 将一个值赋给 self.element_C。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `        if self.layout_C == LayoutType.TensorNC32HW32:` — **EN:** Starts a conditional branch guarded by `self.layout_C == LayoutType.TensorNC32HW32`. **CN:** 开始一个由 `self.layout_C == LayoutType.TensorNC32HW32` 控制的条件分支。
+- **L119** `            raise Exception("Layout type TensorNC32HW32 is not currently supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `        super().__init__(A, B, C, D, **kwargs)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `        if "split_k_slices" in kwargs.keys() and kwargs["split_k_slices"] > 1:` — **EN:** Starts a conditional branch guarded by `'split_k_slices' in kwargs.keys() and kwargs['split_k_sli...`. **CN:** 开始一个由 `'split_k_slices' in kwargs.keys() and kwargs['split_k_sli...` 控制的条件分支。
+- **L124** `            self.split_k_mode = split_k_mode` — **EN:** Assigns a value to self.split_k_mode. **CN:** 将一个值赋给 self.split_k_mode。
+- **L125** `            self.split_k_slices = kwargs["split_k_slices"]` — **EN:** Assigns a value to self.split_k_slices. **CN:** 将一个值赋给 self.split_k_slices。
+- **L126** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L127** `            self.split_k_mode = SplitKMode.Serial` — **EN:** Assigns a value to self.split_k_mode. **CN:** 将一个值赋给 self.split_k_mode。
+- **L128** `            self.split_k_slices = 1` — **EN:** Assigns a value to self.split_k_slices. **CN:** 将一个值赋给 self.split_k_slices。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `        if "output_op" in kwargs.keys() and self.split_k_mode != SplitKMode.Parallel:` — **EN:** Starts a conditional branch guarded by `'output_op' in kwargs.keys() and self.split_k_mode != Spl...`. **CN:** 开始一个由 `'output_op' in kwargs.keys() and self.split_k_mode != Spl...` 控制的条件分支。
+- **L131** `            self.output_op = kwargs["output_op"]` — **EN:** Assigns a value to self.output_op. **CN:** 将一个值赋给 self.output_op。
+- **L132** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L133** `            self.output_op = self.operation.epilogue_type(1.0, 0.0)` — **EN:** Assigns a value to self.output_op. **CN:** 将一个值赋给 self.output_op。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `        self.problem_size = problem_size` — **EN:** Assigns a value to self.problem_size. **CN:** 将一个值赋给 self.problem_size。
+- **L136** `        self.problem_size.split_k_slices = self.split_k_slices` — **EN:** Assigns a value to self.problem_size.split_k_slices. **CN:** 将一个值赋给 self.problem_size.split_k_slices。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `        self.initialize()` — **EN:** Invokes `self.initialize` as a standalone call. **CN:** 以独立语句方式调用 `self.initialize`。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `    def get_arguments(self):` — **EN:** Defines function `get_arguments`. **CN:** 定义函数 `get_arguments`。
+- **L141** `        tc_numel = -1` — **EN:** Assigns a value to tc_numel. **CN:** 将一个值赋给 tc_numel。
+- **L142** `        if hasattr(self, "tensor_c_numel"):` — **EN:** Starts a conditional branch guarded by `hasattr(self, 'tensor_c_numel')`. **CN:** 开始一个由 `hasattr(self, 'tensor_c_numel')` 控制的条件分支。
+- **L143** `            tc_numel = self.tensor_c_numel` — **EN:** Assigns a value to tc_numel. **CN:** 将一个值赋给 tc_numel。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `        self.c_arguments = self.operation.argument_type(` — **EN:** Assigns a value to self.c_arguments. **CN:** 将一个值赋给 self.c_arguments。
+- **L146** `            int(self.conv_kind),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `            self.problem_size.ctype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `            int(to_device_ptr(self.ptr_A)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            int(to_device_ptr(self.ptr_B)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `            int(to_device_ptr(self.ptr_C)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `            int(to_device_ptr(self.ptr_D)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `            tc_numel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `            self.output_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `            int(self.split_k_mode)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    def initialize(self):` — **EN:** Defines function `initialize`. **CN:** 定义函数 `initialize`。
+- **L158** `        self.launch_config = self.operation.rt_module.plan(self)` — **EN:** Assigns a value to self.launch_config. **CN:** 将一个值赋给 self.launch_config。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        self.get_arguments()` — **EN:** Invokes `self.get_arguments` as a standalone call. **CN:** 以独立语句方式调用 `self.get_arguments`。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `        # Allocate and initialize device workspace` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L163** `        device_workspace_size = self.operation.rt_module.get_workspace_size(self.c_arguments)` — **EN:** Assigns a value to device_workspace_size. **CN:** 将一个值赋给 device_workspace_size。
+- **L164** `        if device_workspace_size > 0:` — **EN:** Starts a conditional branch guarded by `device_workspace_size > 0`. **CN:** 开始一个由 `device_workspace_size > 0` 控制的条件分支。
+- **L165** `            self.workspace_buffer = device_mem_alloc(device_workspace_size)` — **EN:** Assigns a value to self.workspace_buffer. **CN:** 将一个值赋给 self.workspace_buffer。
+- **L166** `            workspace_ptr = self.workspace_buffer.ptr` — **EN:** Assigns a value to workspace_ptr. **CN:** 将一个值赋给 workspace_ptr。
+- **L167** `            err, = cuda.cuMemsetD32(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L168** `                workspace_ptr, 0, device_workspace_size // 4)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L170** `            workspace_ptr = None` — **EN:** Assigns a value to workspace_ptr. **CN:** 将一个值赋给 workspace_ptr。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `        self.semaphore = 0` — **EN:** Assigns a value to self.semaphore. **CN:** 将一个值赋给 self.semaphore。
+- **L173** `        if workspace_ptr is not None and self.split_k_mode == SplitKMode.Parallel:` — **EN:** Starts a conditional branch guarded by `workspace_ptr is not None and self.split_k_mode == SplitK...`. **CN:** 开始一个由 `workspace_ptr is not None and self.split_k_mode == SplitK...` 控制的条件分支。
+- **L174** `            self.ptr_D = workspace_ptr` — **EN:** Assigns a value to self.ptr_D. **CN:** 将一个值赋给 self.ptr_D。
+- **L175** `            # Reset arguments now that ptr_D has been updated` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L176** `            self.get_arguments()` — **EN:** Invokes `self.get_arguments` as a standalone call. **CN:** 以独立语句方式调用 `self.get_arguments`。
+- **L177** `        elif workspace_ptr is not None and self.split_k_mode == SplitKMode.Serial:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L178** `            self.semaphore = workspace_ptr` — **EN:** Assigns a value to self.semaphore. **CN:** 将一个值赋给 self.semaphore。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `        params_ = self.operation.rt_module.get_args(` — **EN:** Assigns a value to params_. **CN:** 将一个值赋给 params_。
+- **L181** `            self.c_arguments, ctypes.c_void_p(int(self.semaphore)))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `        self.host_workspace = bytearray(params_.contents)` — **EN:** Assigns a value to self.host_workspace. **CN:** 将一个值赋给 self.host_workspace。
+- **L183** `        self.device_workspace = None` — **EN:** Assigns a value to self.device_workspace. **CN:** 将一个值赋给 self.device_workspace。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `    def sync(self):` — **EN:** Defines function `sync`. **CN:** 定义函数 `sync`。
+- **L186** `        """` — **EN:** Starts the docstring for the function `sync`. **CN:** 开始说明 function `sync` 的文档字符串。
+- **L187** `        Synchronize the arguments. If the input tensor is in host,` — **EN:** Continues the docstring for the function `sync`. **CN:** 继续说明 function `sync` 的文档字符串。
+- **L188** `        copy it from device to host.` — **EN:** Continues the docstring for the function `sync`. **CN:** 继续说明 function `sync` 的文档字符串。
+- **L189** `        """` — **EN:** Ends the docstring for the function `sync`. **CN:** 结束说明 function `sync` 的文档字符串。
+- **L190** `        return super().sync()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `class Conv2dRT(ExecutableOperation):` — **EN:** Defines class `Conv2dRT` with bases ExecutableOperation. **CN:** 定义类 `Conv2dRT`，其基类为 ExecutableOperation。
+- **L194** `    """` — **EN:** Starts the docstring for the class `Conv2dRT`. **CN:** 开始说明 class `Conv2dRT` 的文档字符串。
+- **L195** `    Conv2dRT manages the CUTLASS runtime components` — **EN:** Continues the docstring for the class `Conv2dRT`. **CN:** 继续说明 class `Conv2dRT` 的文档字符串。
+- **L196** `    """` — **EN:** Ends the docstring for the class `Conv2dRT`. **CN:** 结束说明 class `Conv2dRT` 的文档字符串。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `    KernelTemplate = r"""` — **EN:** Assigns a value to KernelTemplate. **CN:** 将一个值赋给 KernelTemplate。
+- **L199** `extern "C"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `__global__ void` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `${operation_name}(${operation_name}${operation_suffix}::Params params) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `  // Dynamic shared memory base pointer` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `  extern __shared__ int SharedStorageBase[];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `  // Declare pointer to dynamic shared memory.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `  ${operation_name}${operation_suffix}::SharedStorage *shared_storage =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `      reinterpret_cast<${operation_name}${operation_suffix}::SharedStorage *>(SharedStorageBase);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `  ${operation_name}${operation_suffix} op;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `  op(params, *shared_storage);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `    HostTemplate = r"""` — **EN:** Assigns a value to HostTemplate. **CN:** 将一个值赋给 HostTemplate。
+- **L217** `extern "C" {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `  // Get the size of params in bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `  int ${operation_name}_get_param_size(){` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `    return sizeof(${operation_name}${operation_suffix}::Params);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `  // Get the size of dynamic shared memory in bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `  int ${operation_name}_shared_memory_size() {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `    return int(sizeof(${operation_name}${operation_suffix}::SharedStorage));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `  using ElementA = typename ${operation_name}_base::ElementA;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `  using ElementB = typename ${operation_name}_base::ElementB;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `  using ElementC = typename ${operation_name}_base::ElementC;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `  using LayoutA = typename ${operation_name}_base::LayoutA;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `  using LayoutB = typename ${operation_name}_base::LayoutB;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `  using LayoutC = typename ${operation_name}_base::LayoutC;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `  using EpilogueOutputOp = typename ${operation_name}_base::EpilogueOutputOp;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `  struct ${operation_name}_TemporaryArgs {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `    int conv_kind;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `    cutlass::conv::Conv2dProblemSize problem_size;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `    ElementA* ptr_A;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `    ElementB* ptr_B;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `    ElementC* ptr_C;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `    ElementC* ptr_D;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `    int tensor_c_numel;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `    typename EpilogueOutputOp::Params epilogue_params;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `    int split_k_mode;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `  };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `  typename ${operation_name}${operation_suffix}::Arguments` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `  construct_arguments(${operation_name}_TemporaryArgs args) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `    cutlass::conv::Operator conv_operator = static_cast<cutlass::conv::Operator>(args.conv_kind);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** `    auto tc_A = cutlass::conv::implicit_gemm_tensor_a_extent(conv_operator, args.problem_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `    auto tc_B = cutlass::conv::implicit_gemm_tensor_b_extent(conv_operator, args.problem_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `    auto tc_C = cutlass::conv::implicit_gemm_tensor_c_extent(conv_operator, args.problem_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `    auto tc_D = cutlass::conv::implicit_gemm_tensor_c_extent(conv_operator, args.problem_size);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `    auto size_C = tc_C.at(0) * tc_C.at(1) * tc_C.at(2) * tc_C.at(3);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `    if (args.tensor_c_numel >= 0 && args.tensor_c_numel == tc_C.at(3) && args.tensor_c_numel < size_C) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `      // C is interpreted as bias` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `      tc_C = {0, 0, 0, 0};` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `    cutlass::TensorRef<ElementA, LayoutA> tref_A(args.ptr_A, LayoutA::packed(tc_A));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `    cutlass::TensorRef<ElementB, LayoutA> tref_B(args.ptr_B, LayoutB::packed(tc_B));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `    cutlass::TensorRef<ElementC, LayoutA> tref_C(args.ptr_C, LayoutC::packed(tc_C));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `    cutlass::TensorRef<ElementC, LayoutA> tref_D(args.ptr_D, LayoutC::packed(tc_D));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `    return {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `      args.problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `      tref_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `      tref_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `      tref_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `      tref_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `      args.epilogue_params,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `      static_cast<cutlass::conv::SplitKMode>(args.split_k_mode)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `    };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L278** `  // Get the params as byte array` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `  char* ${operation_name}_get_params(${operation_name}_TemporaryArgs args, int *semaphore=nullptr) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `    auto arguments = construct_arguments(args);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `    typename ${operation_name}${operation_suffix}::Params* params;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `    params = new ${operation_name}${operation_suffix}::Params(arguments, semaphore);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `    char *bytes = ((char*)(params));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `    char *output = new char[sizeof(${operation_name}${operation_suffix}::Params)];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `    for (unsigned int i = 0; i < sizeof(${operation_name}${operation_suffix}::Params); i ++)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `      output[i] = bytes[i];` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `    return output;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `  dim3 ${operation_name}_get_grid_shape(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `    int conv_kind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `    cutlass::conv::Conv2dProblemSize problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `    cutlass::gemm::GemmCoord tile_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `    int split_k_slices` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** `  ) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `    using Swizzle = typename ${operation_name}_base::ThreadblockSwizzle;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `    auto tiled_shape = Swizzle::get_tiled_shape(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `      static_cast<cutlass::conv::Operator>(conv_kind),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `      problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `      tile_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `      split_k_slices);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `    return Swizzle::get_grid_shape(tiled_shape);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `  size_t ${operation_name}_get_workspace_size(${operation_name}_TemporaryArgs args) {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `    auto arguments = construct_arguments(args);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `    // Temporarily define device::-level Conv2d so that we can call get_workspace_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `    using DeviceConv = cutlass::conv::device::ImplicitGemmConvolution<${operation_name}_base>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `    return DeviceConv::get_workspace_size(arguments);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `  }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    def __init__(self, operation: "Conv2dOperation"):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L321** `        super().__init__(operation)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L322** `        self.extra_funcs = {` — **EN:** Assigns a value to self.extra_funcs. **CN:** 将一个值赋给 self.extra_funcs。
+- **L323** `            "get_grid_shape": dim3_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `            "get_workspace_size": ctypes.c_uint64` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `        self.argument_type, self.epilogue_type = get_conv2d_arguments(operation.epilogue_functor)` — **EN:** Assigns a value to (self.argument_type, self.epilogue_type). **CN:** 将一个值赋给 (self.argument_type, self.epilogue_type)。
+- **L327** `        self.argtype = [ctypes.POINTER(self.argument_type), ctypes.c_void_p]` — **EN:** Assigns a value to self.argtype. **CN:** 将一个值赋给 self.argtype。
+- **L328** `        self.conv_kind = operation.conv_kind` — **EN:** Assigns a value to self.conv_kind. **CN:** 将一个值赋给 self.conv_kind。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `        self.operation: Conv2dOperation = operation` — **EN:** Assigns a typed value to self.operation. **CN:** 为 self.operation 赋予带类型标注的值。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `        self.emitter = EmitConv2dInstance("_type")` — **EN:** Assigns a value to self.emitter. **CN:** 将一个值赋给 self.emitter。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** `        self.threads = operation.tile_description.num_threads` — **EN:** Assigns a value to self.threads. **CN:** 将一个值赋给 self.threads。
+- **L335** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L336** `        self.swizzle_functor = operation.swizzling_functor` — **EN:** Assigns a value to self.swizzle_functor. **CN:** 将一个值赋给 self.swizzle_functor。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L339** `        return self.emitter.emit(self.operation)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `    def plan(self, arguments: Conv2dArguments):` — **EN:** Defines function `plan`. **CN:** 定义函数 `plan`。
+- **L342** `        tile_size = GemmCoord(` — **EN:** Assigns a value to tile_size. **CN:** 将一个值赋给 tile_size。
+- **L343** `            self.operation.tile_description.threadblock_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** `            self.operation.tile_description.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L345** `            self.operation.tile_description.threadblock_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `        grid = self.get_grid_shape(` — **EN:** Assigns a value to grid. **CN:** 将一个值赋给 grid。
+- **L349** `            int(self.conv_kind),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** `            arguments.problem_size.ctype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `            tile_size.ctype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            arguments.split_k_slices` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L355** `        return LaunchConfiguration(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** `            [grid.x, grid.y, grid.z], [self.threads, 1, 1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `            self.shared_memory_capacity)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `    def initialize(self):` — **EN:** Defines function `initialize`. **CN:** 定义函数 `initialize`。
+- **L360** `        err, = cuda.cuFuncSetAttribute(` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L361** `            self.kernel,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `            attrib=cuda.CUfunction_attribute.CU_FUNC_ATTRIBUTE_MAX_DYNAMIC_SHARED_SIZE_BYTES,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `            value=self.shared_memory_capacity)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L365** `            raise RuntimeError(f"CUDA Error: {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L366** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L367** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L368** `class Conv2dOperation:` — **EN:** Defines class `Conv2dOperation`. **CN:** 定义类 `Conv2dOperation`。
+- **L369** `    """` — **EN:** Starts the docstring for the class `Conv2dOperation`. **CN:** 开始说明 class `Conv2dOperation` 的文档字符串。
+- **L370** `    CUTLASS Conv2d operation description.` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    :param conv_kind: convolution operator` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L373** `    :type conv_kind: :class:\`cutlass_library.library.ConvKind\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L374** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L375** `    :param iterator_algorithm: Selects among several implementation` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L376** `    variants trading off performance with simplicity` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L377** `    :type iterator_algorithm: :class:\`cutlass_library.library.IteratorAlgorithm\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L378** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L379** `    :param arch: GPU compute capability (sm_xx)` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L380** `    :type arch: int` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `    :param tile_description: tile description` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L383** `    :type tile_description: :class:\`cutlass_cppgen.backend.TileDescription\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L384** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L385** `    :param A: tensor A description` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L386** `    :type A: :class:\`cutlass_cppgen.backend.TensorDescription\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L387** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L388** `    :param B: tensor B description` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L389** `    :type B: :class:\`cutlass_cppgen.backend.TensorDescription\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `    :param C: tensor C description` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L392** `    :type C: :class:\`cutlass_cppgen.backend.TensorDescription\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L393** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L394** `    :param D: tensor D description` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L395** `    :type D: :class:\`cutlass_cppgen.backend.TensorDescription\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `    :param element_epilogue: element type for computation in epilogue \` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L398** `    :type element_epilogue: cutlass_library.library.DataType` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L400** `    :param stride_support: distinguish among partial specializations that \` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L401** `    accelerate certain problems where convolution stride is unit \` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L402** `    :type stride_support: :class:\`cutlass_library.library.StrideSupport\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** `    :param epilogue_functor: convolution epilogue functor` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L405** `    :type epilogue_functor: :class:\`EpilogueFunctor\`` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L406** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L407** `    :param swizzling_functor: threadblock swizzling functor` — **EN:** Continues the docstring for the class `Conv2dOperation`. **CN:** 继续说明 class `Conv2dOperation` 的文档字符串。
+- **L408** `    """` — **EN:** Ends the docstring for the class `Conv2dOperation`. **CN:** 结束说明 class `Conv2dOperation` 的文档字符串。
+- **L409** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L410** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L411** `        conv_kind,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L412** `        iterator_algorithm,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L413** `        arch: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L414** `        tile_description: TileDescription,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L415** `        A: TensorDescription,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L416** `        B: TensorDescription,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L417** `        C: TensorDescription,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L418** `        stride_support,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L419** `        epilogue_functor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L420** `        swizzling_functor=SwizzlingFunctor.Identity1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L421** `        emission_type=EmissionType.Kernel,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L422** `        **kwargs` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L423** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L424** `        self.operation_kind: OperationKind = OperationKind.Conv2d` — **EN:** Assigns a typed value to self.operation_kind. **CN:** 为 self.operation_kind 赋予带类型标注的值。
+- **L425** `        self.arch: int = arch` — **EN:** Assigns a typed value to self.arch. **CN:** 为 self.arch 赋予带类型标注的值。
+- **L426** `        self.tile_description: TileDescription = tile_description` — **EN:** Assigns a typed value to self.tile_description. **CN:** 为 self.tile_description 赋予带类型标注的值。
+- **L427** `        self.conv_kind = conv_kind` — **EN:** Assigns a value to self.conv_kind. **CN:** 将一个值赋给 self.conv_kind。
+- **L428** `        self.A: TensorDescription = A` — **EN:** Assigns a typed value to self.A. **CN:** 为 self.A 赋予带类型标注的值。
+- **L429** `        self.B: TensorDescription = B` — **EN:** Assigns a typed value to self.B. **CN:** 为 self.B 赋予带类型标注的值。
+- **L430** `        self.C: TensorDescription = C` — **EN:** Assigns a typed value to self.C. **CN:** 为 self.C 赋予带类型标注的值。
+- **L431** `        self.epilogue_functor = epilogue_functor` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L432** `        self.iterator_algorithm = iterator_algorithm` — **EN:** Assigns a value to self.iterator_algorithm. **CN:** 将一个值赋给 self.iterator_algorithm。
+- **L433** `        self.stride_support = stride_support` — **EN:** Assigns a value to self.stride_support. **CN:** 将一个值赋给 self.stride_support。
+- **L434** `        self.swizzling_functor = swizzling_functor` — **EN:** Assigns a value to self.swizzling_functor. **CN:** 将一个值赋给 self.swizzling_functor。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `        self.emission_type = emission_type` — **EN:** Assigns a value to self.emission_type. **CN:** 将一个值赋给 self.emission_type。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `        self.rt_module: Conv2dRT = Conv2dRT(self)` — **EN:** Assigns a typed value to self.rt_module. **CN:** 为 self.rt_module 赋予带类型标注的值。
+- **L439** `        self.argument_type = self.rt_module.argument_type` — **EN:** Assigns a value to self.argument_type. **CN:** 将一个值赋给 self.argument_type。
+- **L440** `        self.epilogue_type = self.rt_module.epilogue_type` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** `    def run(self, arguments: Conv2dArguments) -> cuda.CUresult:` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L443** `        """` — **EN:** Starts the docstring for the function `run`. **CN:** 开始说明 function `run` 的文档字符串。
+- **L444** `        Launch the cuda kernel with input arguments` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** `        :param arguments: conv2d arguments` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L447** `        :type arguments: :class:\`cutlass_cppgen.backend.Conv2dArguments\`` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L448** `        """` — **EN:** Ends the docstring for the function `run`. **CN:** 结束说明 function `run` 的文档字符串。
+- **L449** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L450** `        # launch the kernel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L451** `        err = self.rt_module.run(` — **EN:** Assigns a value to err. **CN:** 将一个值赋给 err。
+- **L452** `            arguments.host_workspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** `            arguments.device_workspace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L454** `            arguments.launch_config,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L455** `            arguments.stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L456** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L457** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L458** `        if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L459** `            raise RuntimeError(f"CUDA Error {err}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `        return err` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L464** `    # Get function name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L465** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L467** `    def procedural_name(self):` — **EN:** Defines function `procedural_name`. **CN:** 定义函数 `procedural_name`。
+- **L468** `        """The full procedural name indicates architecture, extended name, tile size, and layout."""` — **EN:** Docstring line documenting the function `procedural_name`. **CN:** 文档字符串行，用于说明 function `procedural_name`。
+- **L469** `        return self.configuration_name()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L471** `    def configuration_name(self):` — **EN:** Defines function `configuration_name`. **CN:** 定义函数 `configuration_name`。
+- **L472** `        """The full procedural name indicates architecture, extended name, tile size, and layout."""` — **EN:** Docstring line documenting the function `configuration_name`. **CN:** 文档字符串行，用于说明 function `configuration_name`。
+- **L473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L474** `        opcode_class_name = OpcodeClassNames[` — **EN:** Assigns a value to opcode_class_name. **CN:** 将一个值赋给 opcode_class_name。
+- **L475** `            self.tile_description.math_instruction.opcode_class` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** `        threadblock = "%dx%d_%dx%d" % (` — **EN:** Assigns a value to threadblock. **CN:** 将一个值赋给 threadblock。
+- **L479** `            self.tile_description.threadblock_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `            self.tile_description.threadblock_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `            self.tile_description.threadblock_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `            self.tile_description.stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L485** `        if self.stride_support == StrideSupport.Unity:` — **EN:** Starts a conditional branch guarded by `self.stride_support == StrideSupport.Unity`. **CN:** 开始一个由 `self.stride_support == StrideSupport.Unity` 控制的条件分支。
+- **L486** `            configuration_name = "cutlass_sm${arch}_${opcode_class}_${extended_name}_${threadblock}_${layout}_unity_stride_align${alignment}"` — **EN:** Assigns a value to configuration_name. **CN:** 将一个值赋给 configuration_name。
+- **L487** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L488** `            configuration_name = "cutlass_sm${arch}_${opcode_class}_${extended_name}_${threadblock}_${layout}_align${alignment}"` — **EN:** Assigns a value to configuration_name. **CN:** 将一个值赋给 configuration_name。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `        return SubstituteTemplate(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L491** `            configuration_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L492** `            {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L493** `                "arch": str(self.arch),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L494** `                "opcode_class": opcode_class_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `                "extended_name": self.extended_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** `                "threadblock": threadblock,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L497** `                "layout": self.layout_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L498** `                "alignment": "%d" % self.A.alignment` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L499** `            },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** `    def extended_name(self):` — **EN:** Defines function `extended_name`. **CN:** 定义函数 `extended_name`。
+- **L503** `        """Append data types if they differ from compute type."""` — **EN:** Docstring line documenting the function `extended_name`. **CN:** 文档字符串行，用于说明 function `extended_name`。
+- **L504** `        if self.C.element != self.tile_description.math_instruction.element_accumulator and \` — **EN:** Starts a conditional branch guarded by `self.C.element != self.tile_description.math_instruction....`. **CN:** 开始一个由 `self.C.element != self.tile_description.math_instruction....` 控制的条件分支。
+- **L505** `                self.A.element != self.tile_description.math_instruction.element_accumulator:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L506** `            extended_name = "${element_c}_${core_name}_${element_a}"` — **EN:** Assigns a value to extended_name. **CN:** 将一个值赋给 extended_name。
+- **L507** `        elif self.C.element == self.tile_description.math_instruction.element_accumulator and  \` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L508** `                self.A.element != self.tile_description.math_instruction.element_accumulator:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L509** `            extended_name = "${core_name}_${element_a}"` — **EN:** Assigns a value to extended_name. **CN:** 将一个值赋给 extended_name。
+- **L510** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L511** `            extended_name = "${core_name}"` — **EN:** Assigns a value to extended_name. **CN:** 将一个值赋给 extended_name。
+- **L512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L513** `        extended_name = SubstituteTemplate(extended_name, {` — **EN:** Assigns a value to extended_name. **CN:** 将一个值赋给 extended_name。
+- **L514** `            "element_a": DataTypeNames[self.A.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L515** `            "element_c": DataTypeNames[self.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `            "core_name": self.core_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L517** `        })` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `        return extended_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L521** `    def layout_name(self):` — **EN:** Defines function `layout_name`. **CN:** 定义函数 `layout_name`。
+- **L522** `        return "%s" % (ShortLayoutTypeNames[self.A.layout])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L524** `    def core_name(self):` — **EN:** Defines function `core_name`. **CN:** 定义函数 `core_name`。
+- **L525** `        """The basic operation kind is prefixed with a letter indicating the accumulation type."""` — **EN:** Docstring line documenting the function `core_name`. **CN:** 文档字符串行，用于说明 function `core_name`。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `        intermediate_type = ""` — **EN:** Assigns a value to intermediate_type. **CN:** 将一个值赋给 intermediate_type。
+- **L528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L529** `        if self.tile_description.math_instruction.opcode_class == OpcodeClass.TensorOp:` — **EN:** Starts a conditional branch guarded by `self.tile_description.math_instruction.opcode_class == Op...`. **CN:** 开始一个由 `self.tile_description.math_instruction.opcode_class == Op...` 控制的条件分支。
+- **L530** `            inst_shape = "%dx%dx%d" % tuple(` — **EN:** Assigns a value to inst_shape. **CN:** 将一个值赋给 inst_shape。
+- **L531** `                self.tile_description.math_instruction.instruction_shape)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `            if self.tile_description.math_instruction.element_a != self.A.element and \` — **EN:** Starts a conditional branch guarded by `self.tile_description.math_instruction.element_a != self....`. **CN:** 开始一个由 `self.tile_description.math_instruction.element_a != self....` 控制的条件分支。
+- **L533** `                    self.tile_description.math_instruction.element_a != self.accumulator_type():` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L534** `                intermediate_type = DataTypeNames[self.tile_description.math_instruction.element_a]` — **EN:** Assigns a value to intermediate_type. **CN:** 将一个值赋给 intermediate_type。
+- **L535** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L536** `            inst_shape = ""` — **EN:** Assigns a value to inst_shape. **CN:** 将一个值赋给 inst_shape。
+- **L537** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L538** `        return "%s%s%s%s_%s" % (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L539** `            ShortDataTypeNames[self.accumulator_type()],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L540** `            inst_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** `            intermediate_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L542** `            ConvKindNames[self.conv_kind],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L543** `            IteratorAlgorithmNames[self.iterator_algorithm]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L544** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `    def is_complex(self):` — **EN:** Defines function `is_complex`. **CN:** 定义函数 `is_complex`。
+- **L547** `        complex_operators = [` — **EN:** Assigns a value to complex_operators. **CN:** 将一个值赋给 complex_operators。
+- **L548** `            MathOperation.multiply_add_complex,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `            MathOperation.multiply_add_complex_gaussian,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L551** `        return self.tile_description.math_instruction.math_operation in complex_operators` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `    def accumulator_type(self):` — **EN:** Defines function `accumulator_type`. **CN:** 定义函数 `accumulator_type`。
+- **L554** `        accum = self.tile_description.math_instruction.element_accumulator` — **EN:** Assigns a value to accum. **CN:** 将一个值赋给 accum。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `        if self.is_complex():` — **EN:** Starts a conditional branch guarded by `self.is_complex()`. **CN:** 开始一个由 `self.is_complex()` 控制的条件分支。
+- **L557** `            return get_complex_from_real(accum)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L558** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L559** `        return accum` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L560** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L561** `    def device_op(self):` — **EN:** Defines function `device_op`. **CN:** 定义函数 `device_op`。
+- **L562** `        """` — **EN:** Starts the docstring for the function `device_op`. **CN:** 开始说明 function `device_op` 的文档字符串。
+- **L563** `        Returns a new Conv2dOperation object that is constructed with emission type` — **EN:** Continues the docstring for the function `device_op`. **CN:** 继续说明 function `device_op` 的文档字符串。
+- **L564** `        \`\`EmissionType.Device\`\`.` — **EN:** Continues the docstring for the function `device_op`. **CN:** 继续说明 function `device_op` 的文档字符串。
+- **L565** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L566** `        :return: operation ready for device-level code emission` — **EN:** Continues the docstring for the function `device_op`. **CN:** 继续说明 function `device_op` 的文档字符串。
+- **L567** `        :rtype: Conv2dOperation` — **EN:** Continues the docstring for the function `device_op`. **CN:** 继续说明 function `device_op` 的文档字符串。
+- **L568** `        """` — **EN:** Ends the docstring for the function `device_op`. **CN:** 结束说明 function `device_op` 的文档字符串。
+- **L569** `        return Conv2dOperation(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L570** `            self.conv_kind, self.iterator_algorithm, self.arch, self.tile_description,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L571** `            self.A, self.B, self.C, self.stride_support, self.epilogue_functor, self.swizzling_functor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L572** `            emission_type=EmissionType.Device)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L575** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L576** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L577** `# Emits single instances of a CUTLASS device-wide operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L578** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L579** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L581** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L582** `class EmitConv2dInstance:` — **EN:** Defines class `EmitConv2dInstance`. **CN:** 定义类 `EmitConv2dInstance`。
+- **L583** `    def __init__(self, operation_suffix=""):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L584** `        self.operation_suffix = operation_suffix` — **EN:** Assigns a value to self.operation_suffix. **CN:** 将一个值赋给 self.operation_suffix。
+- **L585** `        self.includes = [` — **EN:** Assigns a value to self.includes. **CN:** 将一个值赋给 self.includes。
+- **L586** `            "cutlass/cutlass.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `            "cutlass/conv/kernel/default_conv2d_fprop.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `            "cutlass/conv/kernel/default_conv2d_dgrad.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `            "cutlass/conv/kernel/default_conv2d_wgrad.h",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `            "cutlass/conv/device/implicit_gemm_convolution.h"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `        self.template = """` — **EN:** Assigns a value to self.template. **CN:** 将一个值赋给 self.template。
+- **L593** `// Conv2d${conv_kind_name} ${iterator_algorithm_name} kernel instance "${operation_name}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `using ${operation_name}_base =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L595** `typename cutlass::conv::kernel::DefaultConv2d${conv_kind_name}<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L596** `  ${element_a},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** `  ${layout_a},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L598** `  ${element_b},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L599** `  ${layout_b},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L600** `  ${element_c},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** `  ${layout_c},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L602** `  ${element_accumulator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L603** `  ${opcode_class},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `  ${arch},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `  cutlass::gemm::GemmShape<${threadblock_shape_m}, ${threadblock_shape_n}, ${threadblock_shape_k}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L606** `  cutlass::gemm::GemmShape<${warp_shape_m}, ${warp_shape_n}, ${warp_shape_k} >,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L607** `  cutlass::gemm::GemmShape<${instruction_shape_m}, ${instruction_shape_n}, ${instruction_shape_k}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L608** `  ${epilogue_functor},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `  ${swizzling_functor},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `  ${stages},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** `  ${math_operator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `  ${iterator_algorithm},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `  ${stride_support},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** `  ${align_a},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L615** `  ${align_b}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `>::Kernel;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L618** `struct ${operation_name}${operation_suffix}:` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L619** `  public ${operation_name}_base { };` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L621** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L622** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L623** `        self.template_device = """` — **EN:** Assigns a value to self.template_device. **CN:** 将一个值赋给 self.template_device。
+- **L624** `// Conv2d operation ${operation_name}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L625** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L626** `using Conv2d${conv_kind_name}Kernel = typename cutlass::conv::kernel::DefaultConv2d${conv_kind_name}<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `  ${element_a},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `  ${layout_a},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `  ${element_b},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `  ${layout_b},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** `  ${element_c},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L632** `  ${layout_c},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L633** `  ${element_accumulator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `  ${opcode_class},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** `  ${arch},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L636** `  cutlass::gemm::GemmShape<${threadblock_shape_m}, ${threadblock_shape_n}, ${threadblock_shape_k}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `  cutlass::gemm::GemmShape<${warp_shape_m}, ${warp_shape_n}, ${warp_shape_k} >,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** `  cutlass::gemm::GemmShape<${instruction_shape_m}, ${instruction_shape_n}, ${instruction_shape_k}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L639** `  ${epilogue_functor},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L640** `  ${swizzling_functor},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L641** `  ${stages},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L642** `  ${math_operator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L643** `  ${iterator_algorithm},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L644** `  ${stride_support},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** `  ${align_a},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L646** `  ${align_b}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L647** `>::Kernel;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L648** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L649** `using DeviceKernel =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** `    typename cutlass::conv::device::ImplicitGemmConvolution<Conv2d${conv_kind_name}Kernel>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L651** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L652** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L653** `    def emit(self, operation):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L654** `        warp_shape = [int(operation.tile_description.threadblock_shape[idx] /` — **EN:** Assigns a value to warp_shape. **CN:** 将一个值赋给 warp_shape。
+- **L655** `                          operation.tile_description.warp_count[idx]) for idx in range(3)]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L657** `        epilogue_vector_length = int(min(` — **EN:** Assigns a value to epilogue_vector_length. **CN:** 将一个值赋给 epilogue_vector_length。
+- **L658** `            operation.C.alignment * DataTypeSize[operation.C.element], 128) / DataTypeSize[operation.C.element])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L660** `        values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L661** `            "operation_name": operation.procedural_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `            "operation_suffix": self.operation_suffix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L663** `            "conv_kind": ConvKindTag[operation.conv_kind],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L664** `            "conv_kind_name": ConvKindNames[operation.conv_kind].capitalize(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** `            "element_a": DataTypeTag[operation.A.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L666** `            "layout_a": LayoutTag[operation.A.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L667** `            "element_b": DataTypeTag[operation.B.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L668** `            "layout_b": LayoutTag[operation.B.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L669** `            "element_c": DataTypeTag[operation.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L670** `            "layout_c": LayoutTag[operation.C.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** `            "element_accumulator": DataTypeTag[operation.accumulator_type()],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `            "opcode_class": OpcodeClassTag[operation.tile_description.math_instruction.opcode_class],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `            "arch": "cutlass::arch::Sm%d" % operation.arch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `            "threadblock_shape_m": str(operation.tile_description.threadblock_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L675** `            "threadblock_shape_n": str(operation.tile_description.threadblock_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `            "threadblock_shape_k": str(operation.tile_description.threadblock_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `            "warp_shape_m": str(warp_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** `            "warp_shape_n": str(warp_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L679** `            "warp_shape_k": str(warp_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L680** `            "instruction_shape_m": str(operation.tile_description.math_instruction.instruction_shape[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** `            "instruction_shape_n": str(operation.tile_description.math_instruction.instruction_shape[1]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** `            "instruction_shape_k": str(operation.tile_description.math_instruction.instruction_shape[2]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `            "epilogue_vector_length": str(epilogue_vector_length),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L684** `            "epilogue_functor": operation.epilogue_functor.emit(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** `            "swizzling_functor": SwizzlingFunctorTag[operation.swizzling_functor],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L686** `            "stages": str(operation.tile_description.stages),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L687** `            "iterator_algorithm": IteratorAlgorithmTag[operation.iterator_algorithm],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `            "iterator_algorithm_name": IteratorAlgorithmNames[operation.iterator_algorithm].capitalize(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L689** `            "stride_support": StrideSupportTag[operation.stride_support],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `            "math_operator": "cutlass::arch::OpMultiplyAddComplex" if operation.is_complex() else MathOperationTag[operation.tile_description.math_instruction.math_operation],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `            "align_a": str(operation.A.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `            "align_b": str(operation.B.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L694** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L695** `        if operation.emission_type == EmissionType.Kernel:` — **EN:** Starts a conditional branch guarded by `operation.emission_type == EmissionType.Kernel`. **CN:** 开始一个由 `operation.emission_type == EmissionType.Kernel` 控制的条件分支。
+- **L696** `            conv2d_template = self.template` — **EN:** Assigns a value to conv2d_template. **CN:** 将一个值赋给 conv2d_template。
+- **L697** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L698** `            conv2d_template = self.template_device` — **EN:** Assigns a value to conv2d_template. **CN:** 将一个值赋给 conv2d_template。
+- **L699** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L700** `        return SubstituteTemplate(conv2d_template, values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.conv2d_operation`. CN: 模块名为 `cutlass_cppgen.backend.conv2d_operation`。
+- EN: Top-level classes: Conv2dArguments, Conv2dRT, Conv2dOperation, EmitConv2dInstance CN: 顶层类包括：Conv2dArguments, Conv2dRT, Conv2dOperation, EmitConv2dInstance
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:SubstituteTemplate, cutlass_library:ConvKindNames,ConvKindTag,DataTypeNames,DataTypeSize,DataTypeTag,IteratorAlgorithmNames,IteratorAlgorithmTag,LayoutTag,LayoutType,MathOperation,MathOperationTag,OpcodeClass,OpcodeClassNames,OpcodeClassTag,OperationKind,ShortDataTypeNames,ShortLayoutTypeNames,SplitKMode,StrideSupport,StrideSupportTag,SwizzlingFunctor,SwizzlingFunctorTag,get_complex_from_real, cutlass_cppgen.backend.arguments:ArgumentBase, cutlass_cppgen.backend.c_types:dim3_,get_conv2d_arguments, cutlass_cppgen.backend.library:EmissionType,TensorDescription,TileDescription, cutlass_cppgen.backend.memory_manager:device_mem_alloc, cutlass_cppgen.backend.operation:ExecutableOperation,LaunchConfiguration, cutlass_cppgen.backend.utils.device:to_device_ptr, cutlass_cppgen.shape:GemmCoord CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:SubstituteTemplate, cutlass_library:ConvKindNames,ConvKindTag,DataTypeNames,DataTypeSize,DataTypeTag,IteratorAlgorithmNames,IteratorAlgorithmTag,LayoutTag,LayoutType,MathOperation,MathOperationTag,OpcodeClass,OpcodeClassNames,OpcodeClassTag,OperationKind,ShortDataTypeNames,ShortLayoutTypeNames,SplitKMode,StrideSupport,StrideSupportTag,SwizzlingFunctor,SwizzlingFunctorTag,get_complex_from_real, cutlass_cppgen.backend.arguments:ArgumentBase, cutlass_cppgen.backend.c_types:dim3_,get_conv2d_arguments, cutlass_cppgen.backend.library:EmissionType,TensorDescription,TileDescription, cutlass_cppgen.backend.memory_manager:device_mem_alloc, cutlass_cppgen.backend.operation:ExecutableOperation,LaunchConfiguration, cutlass_cppgen.backend.utils.device:to_device_ptr, cutlass_cppgen.shape:GemmCoord
+- EN: External or standard-library dependencies: __future__:annotations, ctypes, typing:Union, numpy CN: 外部或标准库依赖：__future__:annotations, ctypes, typing:Union, numpy

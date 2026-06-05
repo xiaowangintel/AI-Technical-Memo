@@ -1,0 +1,1017 @@
+# conv.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/op/conv.py`
+
+## Purpose / 作用
+- EN: Ease-of-use interface for constructing, compiling, and running CONVs The ``Conv2d`` interface is meant to allow one to easily instantiate, compile, and run CONV2D operations in ...
+- CN: 该模块的文档字符串将其描述为：Ease-of-use interface for constructing, compiling, and running CONVs The ``Conv2d`` interface is meant to allow one to easily instantiate, compile, and run CONV2D operations in ...
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `    Ease-of-use interface for constructing, compiling, and running CONVs` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    The \`\`Conv2d\`\` interface is meant to allow one to easily instantiate, compile, and run` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L37** `    CONV2D operations in CUTLASS via Python, without specifying many configuration parameters.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L38** `    Under the hood, the interface will select sensible default parameters for the many template` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L39** `    parameters for CUTLASS CONVs.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `    Note: optimal performance is not to be expected from this interface. To achieve optimal` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L42** `    performance, one should specify and tune each configuration parameter.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    The simplest example of using this interface is the following:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L47** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `        # A, B, C, and D are torch/numpy/cupy tensor objects` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L50** `        plan = cutlass_cppgen.op.Conv(A, B, C, D)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L51** `        plan.run(stride=(1, 1), padding=(0, 0), dilation=(1, 1))` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `    One can also use the interface by specifying data types of operands at construction` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L54** `    and using different tensor objects with these data types at runtime:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L57** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `        # The following is shorthand for:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L60** `        #        cutlass_cppgen.op.Conv2d(kind="fprop",` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L61** `        #                          element_A=torch.float32, element_B=torch.float32,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L62** `        #                          element_C=torch.float32, element_D=torch.float32,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L63** `        #                          element_accumulator=torch.float32)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L64** `        plan = cutlass_cppgen.op.Conv2d(kind="fprop", element=torch.float32)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `        A0 = torch.rand((128, 256), dtype=torch.float32, device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L67** `        B0 = torch.rand((256, 64), dtype=torch.float32, device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L68** `        C0 = torch.zeros((128, 64), dtype=torch.float32, device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L69** `        D0 = torch.zeros((128, 64), dtype=torch.float32, device.'cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L70** `        plan.run(A0, B0, C0, D0, stride=(1, 1), padding=(0, 0), dilation=(1, 1))` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `        A = torch.rand((32, 128), dtype=torch.float32, device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L73** `        B = torch.rand((128, 256), dtype=torch.float32, device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L74** `        C = torch.zeros((32, 256), dtype=torch.float32, device='cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L75** `        D = torch.zeros((32, 256), dtype=torch.float32, device.'cuda')` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L76** `        plan.run(A1, B1, C1, D1, stride=(1, 1), padding=(0, 0), dilation=(1, 1))` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    The interface additionally enables one to decouple the compilation of the underlying CUTLASS` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L79** `    kernel from its execution:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L82** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `        plan = cutlass_cppgen.op.Conv2d(kind="fprop", element=np.float32)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `        # Do other work...` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `        plan.run(A0, B0, C0, D0, stride=(1, 1), padding=(0, 0), dilation=(1, 1))` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `        # Do other work...` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `        plan.run(A1, B1, C1, D1, stride=(1, 1), padding=(0, 0), dilation=(1, 1))` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    Elementwise activation functions are easily fused to the GEMM via the interface:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L97** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `        plan = cutlass_cppgen.op.Conv2d(kind="fprop", element=np.float32)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L100** `        plan.activation = cutlass_cppgen.epilogue.relu` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    Operations can also be run asynchronously:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `    .. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L105** `    .. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `        plan = cutlass_cppgen.op.Conv2d(kind="fprop", element=np.float32)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L108** `        args = plan.run()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `        # Do other work...` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `        args.sync()` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L113** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L116** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L117** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L118** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L119** `cudart =  lazy_import("cuda.cudart")` — **EN:** Assigns a value to cudart. **CN:** 将一个值赋给 cudart。
+- **L120** `from cutlass_library import (` — **EN:** Imports ConvKind, ConvMode, DataTypeSize, IteratorAlgorithm, OperationKind, SplitKMode, ... (+1 more) from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 ConvKind, ConvMode, DataTypeSize, IteratorAlgorithm, OperationKind, SplitKMode, ... (+1 more)。
+- **L121** `    ConvKind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `    ConvMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    IteratorAlgorithm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `    OperationKind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    SplitKMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    StrideSupport,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L131** `from cutlass_cppgen import epilogue` — **EN:** Imports epilogue from `cutlass_cppgen`. **CN:** 从 `cutlass_cppgen` 导入 epilogue。
+- **L132** `from cutlass_cppgen.backend import compiler` — **EN:** Imports compiler from `cutlass_cppgen.backend`. **CN:** 从 `cutlass_cppgen.backend` 导入 compiler。
+- **L133** `from cutlass_cppgen.backend.conv2d_operation import Conv2dArguments, Conv2dOperation` — **EN:** Imports Conv2dArguments, Conv2dOperation from `cutlass_cppgen.backend.conv2d_operation`. **CN:** 从 `cutlass_cppgen.backend.conv2d_operation` 导入 Conv2dArguments, Conv2dOperation。
+- **L134** `from cutlass_cppgen.backend.reduction_operation import ReductionOperation, ReductionArguments` — **EN:** Imports ReductionOperation, ReductionArguments from `cutlass_cppgen.backend.reduction_operation`. **CN:** 从 `cutlass_cppgen.backend.reduction_operation` 导入 ReductionOperation, ReductionArguments。
+- **L135** `from cutlass_cppgen.backend.library import TensorDescription, TileDescription` — **EN:** Imports TensorDescription, TileDescription from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 TensorDescription, TileDescription。
+- **L136** `from cutlass_cppgen.op.op import OperationBase` — **EN:** Imports OperationBase from `cutlass_cppgen.op.op`. **CN:** 从 `cutlass_cppgen.op.op` 导入 OperationBase。
+- **L137** `from cutlass_cppgen.shape import Conv2DProblemSize, MatrixCoord` — **EN:** Imports Conv2DProblemSize, MatrixCoord from `cutlass_cppgen.shape`. **CN:** 从 `cutlass_cppgen.shape` 导入 Conv2DProblemSize, MatrixCoord。
+- **L138** `from cutlass_cppgen.utils import check, datatypes` — **EN:** Imports check, datatypes from `cutlass_cppgen.utils`. **CN:** 从 `cutlass_cppgen.utils` 导入 check, datatypes。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `class Conv2d(OperationBase):` — **EN:** Defines class `Conv2d` with bases OperationBase. **CN:** 定义类 `Conv2d`，其基类为 OperationBase。
+- **L142** `    """` — **EN:** Starts the docstring for the class `Conv2d`. **CN:** 开始说明 class `Conv2d` 的文档字符串。
+- **L143** `    Constructs a \`\`Conv2d\`\` object.` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    The convolution kind (fprop, wgrad, degrad), the data types of operands A, B, and C,` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L146** `    along with the data type of output D and that used for accumulation, are bound to the \`\`Conv\`\`` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L147** `    object throughout its lifetime -- these are not to be changed after a \`\`Conv2d\`\` has been constructed.` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    The constructor has optional parameters for flexibly setting these parameters. The following` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L150** `    constructors are equivalent:` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    .. highlight:: python` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L153** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        # Use F32 for A, B, C, D, and accumulation in fprop` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `        # Use the generic \`\`element\`\` parameter to concisely set all data types for operands to the same values.` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L158** `        Conv2d(kind="fprop", element=cutlass_cppgen.DataType.f32)` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        # Explicitly specify the data types to use for A, B, C, and D.` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L161** `        Conv2d(kind="fprop", element_A=cutlass_cppgen.DataType.f32, element_B=cutlass_cppgen.DataType.f32,` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L162** `            element_C=cutlass_cppgen.DataType.f32, element_D=cutlass_cppgen.DataType.f32)` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `        # Set the data types and elements from existing tensors. Note that one can use different tensors when` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L165** `        # executing GEMM via the \`\`run()\`\` method than passed in here (though those passed in to \`\`run()\`\` must` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L166** `        # have the same data type as those passed in here).` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L167** `        # A, B, C, and D are torch.Tensor objects of type torch.float32 under the channel-last layout` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L168** `        Conv2d(kind="fprop", A=A, B=B, C=C, D=D)` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `        # Explicitly specify the data type for only some of A, B, C, and D. Unspecified data types will inherit` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L171** `        # those passed in via the generic \`\`element\`\`` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L172** `        Conv2d(kind="fprop", element_A=cutlass_cppgen.DataType.f32, element_accumulator=cutlass_cppgen.DataType.f32,` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L173** `            element=cutlass_cppgen.DataType.f32)` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `    The order of precedence for the setting of the data type for a given operand/output is as follows:` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L176** `        1) If the tensor type is specified (e.g., \`\`A\`\`), use the data type inferred from this tensor` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L177** `        2) Otherwise, if the data type (e.g., \`\`element_A\`\`) is specified, use those` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L178** `        3) Otherwise, use the generic values (e.g., \`\`element\`\`)` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    :param kind: the convolution kind (i.e. fprop, wgrad, and dgrad)` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L181** `    :type kind: str` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L182** `    :param A: tensor representing data type of operand A` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L183** `    :param B: tensor representing data type of operand B` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L184** `    :param C: tensor representing data type of operand C` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L185** `    :param D: tensor representing data type of operand D` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L186** `    :param alpha: scalar paramter alpha from GEMM computation that scales the product of operands A and B` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L187** `    :param beta: scalar parameter beta from GEMM operation that scales operand C` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L188** `    :param element: generic data type to be used for operands A, B, C, D, as well as the accumulation data type` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L189** `    :type element: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L190** `    :param element_A: data type to be used for operand A` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L191** `    :type element_A: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L192** `    :param element_B: data type to be used for operand B` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L193** `    :type element_B: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L194** `    :param element_C: data type to be used for operand C` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L195** `    :type element_C: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L196** `    :param element_D: data type to be used for operand D` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L197** `    :type element_D: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L198** `    :param element_accumulator: data type to be used in accumulation of the product of operands A and B` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L199** `    :type element_accumulator: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L200** `    :param cc: compute capability of device for which kernels should be compiled. For example, if running on H100, this should be set to 90` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L201** `    :type cc: int` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L202** `    :param kernel_cc: compute capability of kernels to generate. For example, if running on SM90, but desiring to use a CUTLASS 2.x-style Ampere kernel, this should be set to 80` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L203** `    :type kernel_cc: int` — **EN:** Continues the docstring for the class `Conv2d`. **CN:** 继续说明 class `Conv2d` 的文档字符串。
+- **L204** `    """` — **EN:** Ends the docstring for the class `Conv2d`. **CN:** 结束说明 class `Conv2d` 的文档字符串。
+- **L205** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L206** `        self, kind="fprop",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L207** `        A=None, B=None, C=None, D=None, alpha=1.0, beta=0.0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L208** `        element=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L209** `        element_A=None, element_B=None, element_C=None, element_D=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L210** `        element_accumulator=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L211** `        cc: int = None, kernel_cc: int = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L212** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L213** `        super().__init__(cc=cc, kernel_cc=kernel_cc, operation_kind=OperationKind.Conv2d)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L214** `        # Verify the kernel cc` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L215** `        if self.current_cc in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `self.current_cc in [90, 100, 101, 103]`. **CN:** 开始一个由 `self.current_cc in [90, 100, 101, 103]` 控制的条件分支。
+- **L216** `            # The Conv2d kernel on Hopper (SM90) is currently unsupported` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L217** `            # Revert to use SM80-tagged kernels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L218** `            cutlass_cppgen.logger.warning("Reverting to using SM80-tagged kernel. Opclass may change.")` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L219** `            self.specified_kernel_cc = 80` — **EN:** Assigns a value to self.specified_kernel_cc. **CN:** 将一个值赋给 self.specified_kernel_cc。
+- **L220** `            self._reset_options(80)` — **EN:** Invokes `self._reset_options` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_options`。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `        # The arch is used in testing` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L223** `        self.arch = self.current_cc` — **EN:** Assigns a value to self.arch. **CN:** 将一个值赋给 self.arch。
+- **L224** `        self.name = "conv2d" + kind` — **EN:** Assigns a value to self.name. **CN:** 将一个值赋给 self.name。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `        # The convolution kind. (concept: cutlass_library.library.ConvKind)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L227** `        self.conv_kind = datatypes.getattr_enum(ConvKind, kind)` — **EN:** Assigns a value to self.conv_kind. **CN:** 将一个值赋给 self.conv_kind。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `        # The element types (concept: cutlass library types) of A, B, C, and D` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L230** `        elements = []` — **EN:** Assigns a value to elements. **CN:** 将一个值赋给 elements。
+- **L231** `        layouts = []` — **EN:** Assigns a value to layouts. **CN:** 将一个值赋给 layouts。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `        # Complete the data types based on user-provided arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L234** `        for elt, tens, name in zip([element_A, element_B, element_C, element_D],` — **EN:** Starts a loop assigning items from `zip([element_A, element_B, element_C, element_D...` to `(elt, tens, name)`. **CN:** 开始一个循环，将 `zip([element_A, element_B, element_C, element_D...` 的元素赋给 `(elt, tens, name)`。
+- **L235** `                                   [A, B, C, D],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L236** `                                   ["A", "B", "C", "D"]):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L237** `            if elt is not None and tens is not None:` — **EN:** Starts a conditional branch guarded by `elt is not None and tens is not None`. **CN:** 开始一个由 `elt is not None and tens is not None` 控制的条件分支。
+- **L238** `                raise Exception(f'Must not specify both element_{name} and tensor {name}')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L239** `            if elt is None and tens is None and element is None:` — **EN:** Starts a conditional branch guarded by `elt is None and tens is None and (element is None)`. **CN:** 开始一个由 `elt is None and tens is None and (element is None)` 控制的条件分支。
+- **L240** `                raise Exception(f'Must specify one of element_{name}, tensor {name}, or generic element.')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `            elt_to_set = None` — **EN:** Assigns a value to elt_to_set. **CN:** 将一个值赋给 elt_to_set。
+- **L243** `            lay_to_set = None` — **EN:** Assigns a value to lay_to_set. **CN:** 将一个值赋给 lay_to_set。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `            if tens is not None:` — **EN:** Starts a conditional branch guarded by `tens is not None`. **CN:** 开始一个由 `tens is not None` 控制的条件分支。
+- **L246** `                elt_to_set, _ = datatypes.get_datatype_and_layout(tens)` — **EN:** Assigns a value to (elt_to_set, _). **CN:** 将一个值赋给 (elt_to_set, _)。
+- **L247** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L248** `                elt_to_set = elt if elt is not None else element` — **EN:** Assigns a value to elt_to_set. **CN:** 将一个值赋给 elt_to_set。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `            assert elt_to_set is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** `            # Currently we only support layout TensorNHWC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L253** `            lay_to_set = cutlass_cppgen.LayoutType.TensorNHWC` — **EN:** Assigns a value to lay_to_set. **CN:** 将一个值赋给 lay_to_set。
+- **L254** `            elements.append(datatypes.library_type(elt_to_set))` — **EN:** Invokes `elements.append` as a standalone call. **CN:** 以独立语句方式调用 `elements.append`。
+- **L255** `            layouts.append(lay_to_set)` — **EN:** Invokes `layouts.append` as a standalone call. **CN:** 以独立语句方式调用 `layouts.append`。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `        self._element_a, self._element_b, self._element_c, self._element_d = elements` — **EN:** Assigns a value to (self._element_a, self._element_b, self._element_c, self..... **CN:** 将一个值赋给 (self._element_a, self._element_b, self._element_c, self....。
+- **L258** `        self._layout_a, self._layout_b, self._layout_c, self._layout_d = layouts` — **EN:** Assigns a value to (self._layout_a, self._layout_b, self._layout_c, self._la.... **CN:** 将一个值赋给 (self._layout_a, self._layout_b, self._layout_c, self._la...。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `        self.A, self.B, self.C, self.D, self.alpha, self.beta = A, B, C, D, alpha, beta` — **EN:** Assigns a value to (self.A, self.B, self.C, self.D, self.alpha, self.beta). **CN:** 将一个值赋给 (self.A, self.B, self.C, self.D, self.alpha, self.beta)。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `        if element_accumulator is None:` — **EN:** Starts a conditional branch guarded by `element_accumulator is None`. **CN:** 开始一个由 `element_accumulator is None` 控制的条件分支。
+- **L263** `            self._element_accumulator = self._element_c` — **EN:** Assigns a value to self._element_accumulator. **CN:** 将一个值赋给 self._element_accumulator。
+- **L264** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L265** `            self._element_accumulator = datatypes.library_type(element_accumulator)` — **EN:** Assigns a value to self._element_accumulator. **CN:** 将一个值赋给 self._element_accumulator。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `        # Default inputs if none is supplied in run()` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L268** `        self.A = A` — **EN:** Assigns a value to self.A. **CN:** 将一个值赋给 self.A。
+- **L269** `        self.B = B` — **EN:** Assigns a value to self.B. **CN:** 将一个值赋给 self.B。
+- **L270** `        self.C = C` — **EN:** Assigns a value to self.C. **CN:** 将一个值赋给 self.C。
+- **L271** `        self.D = D` — **EN:** Assigns a value to self.D. **CN:** 将一个值赋给 self.D。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `        self.alpha = alpha` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L274** `        self.beta = beta` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `        # We only specify the stride of the swizzling functor here` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L277** `        # The actual swizzling functor is determined in run based on conv_kind and stride` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L278** `        self._swizzling_stride = 1` — **EN:** Assigns a value to self._swizzling_stride. **CN:** 将一个值赋给 self._swizzling_stride。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `        # Arguments that will be set to default value in _reset_operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L281** `        # The default tile_description and op_class are fetched from manifest of cutlass library` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L282** `        self._tile_description = None` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L283** `        self.op_class = None` — **EN:** Assigns a value to self.op_class. **CN:** 将一个值赋给 self.op_class。
+- **L284** `        # The default identity epilogue will be created` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L285** `        self.epilogue_functor = None` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `        self._reset_operations()` — **EN:** Invokes `self._reset_operations` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_operations`。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `        # Arguments that will be determined online based on arguments of "run"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L290** `        # based on stride, input/output channels, alignment, and conv_kind` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L291** `        self._iterator_algorithm = None` — **EN:** Assigns a value to self._iterator_algorithm. **CN:** 将一个值赋给 self._iterator_algorithm。
+- **L292** `        self._stride_support = None` — **EN:** Assigns a value to self._stride_support. **CN:** 将一个值赋给 self._stride_support。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** `    def _reset_operations(self, reset_epilogue: bool = True):` — **EN:** Defines function `_reset_operations`. **CN:** 定义函数 `_reset_operations`。
+- **L295** `        # Set the default op class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L296** `        datatype_comb = (self._element_a, self._element_b, self._element_accumulator)` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L297** `        layout_comb = (self._layout_a, self._layout_b)` — **EN:** Assigns a value to layout_comb. **CN:** 将一个值赋给 layout_comb。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `        self.possible_op_classes = self.options.supporting_opclasses(` — **EN:** Assigns a value to self.possible_op_classes. **CN:** 将一个值赋给 self.possible_op_classes。
+- **L300** `            self._element_a, self._element_b, self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `            self._layout_a, self._layout_b, self._math_operation` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `        if cutlass_cppgen.OpcodeClass.TensorOp in self.possible_op_classes:` — **EN:** Starts a conditional branch guarded by `cutlass_cppgen.OpcodeClass.TensorOp in self.possible_op_c...`. **CN:** 开始一个由 `cutlass_cppgen.OpcodeClass.TensorOp in self.possible_op_c...` 控制的条件分支。
+- **L305** `            self.opclass = cutlass_cppgen.OpcodeClass.TensorOp` — **EN:** Assigns a value to self.opclass. **CN:** 将一个值赋给 self.opclass。
+- **L306** `        elif cutlass_cppgen.OpcodeClass.Simt in self.possible_op_classes:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L307** `            self.opclass = cutlass_cppgen.OpcodeClass.Simt` — **EN:** Assigns a value to self.opclass. **CN:** 将一个值赋给 self.opclass。
+- **L308** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L309** `            if self._math_operation is not None:` — **EN:** Starts a conditional branch guarded by `self._math_operation is not None`. **CN:** 开始一个由 `self._math_operation is not None` 控制的条件分支。
+- **L310** `                math_op_str = f' and math operation {self._math_operation}'` — **EN:** Assigns a value to math_op_str. **CN:** 将一个值赋给 math_op_str。
+- **L311** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L312** `                math_op_str = ''` — **EN:** Assigns a value to math_op_str. **CN:** 将一个值赋给 math_op_str。
+- **L313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L314** `            raise Exception(f'No kernel configuration found for supported data type and layout '` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L315** `                            f'combination {datatype_comb}x{layout_comb}{math_op_str}')` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `        if reset_epilogue:` — **EN:** Starts a conditional branch guarded by `reset_epilogue`. **CN:** 开始一个由 `reset_epilogue` 控制的条件分支。
+- **L318** `            self._reset_epilogue_functor_activation(epilogue.identity)` — **EN:** Invokes `self._reset_epilogue_functor_activation` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_epilogue_functor_activation`。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `        self.alignment_pref_A = min(` — **EN:** Assigns a value to self.alignment_pref_A. **CN:** 将一个值赋给 self.alignment_pref_A。
+- **L321** `            128 // DataTypeSize[self._element_a], max(self.possible_operations.alignments("A")))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `        self.alignment_pref_B = min(` — **EN:** Assigns a value to self.alignment_pref_B. **CN:** 将一个值赋给 self.alignment_pref_B。
+- **L323** `            128 // DataTypeSize[self._element_b], max(self.possible_operations.alignments("B")))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `        self.alignment_pref_C = min(` — **EN:** Assigns a value to self.alignment_pref_C. **CN:** 将一个值赋给 self.alignment_pref_C。
+- **L325** `            128 // DataTypeSize[self._element_c], max(self.possible_operations.alignments("C")))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L328** `    # Tile description Related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L329** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L332** `    def tile_description(self) -> TileDescription:` — **EN:** Defines function `tile_description`. **CN:** 定义函数 `tile_description`。
+- **L333** `        """` — **EN:** Starts the docstring for the function `tile_description`. **CN:** 开始说明 function `tile_description` 的文档字符串。
+- **L334** `        Returns the tile description` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L335** `        """` — **EN:** Ends the docstring for the function `tile_description`. **CN:** 结束说明 function `tile_description` 的文档字符串。
+- **L336** `        return self._tile_description` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `    @tile_description.setter` — **EN:** Applies decorator `tile_description.setter` to the following definition. **CN:** 将装饰器 `tile_description.setter` 应用于后面的定义。
+- **L339** `    def tile_description(` — **EN:** Defines function `tile_description`. **CN:** 定义函数 `tile_description`。
+- **L340** `        self, td=None):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `        """` — **EN:** Starts the docstring for the function `tile_description`. **CN:** 开始说明 function `tile_description` 的文档字符串。
+- **L342** `        Set the tile description` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `        :param td: tile description` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L345** `        :type td: cutlass_cppgen.backend.TileDescription, or a dict with keys` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L346** `                  {` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L347** `                      "threadblock_shape": [int, int, int],` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L348** `                      "warp_count": [int, int, int],` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L349** `                      "stages": int,` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L350** `                      "instruction_shape": [int, int, int] (optional),` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L351** `                      "cluster_shape": [int, int, int] (optional)` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L352** `                  }` — **EN:** Continues the docstring for the function `tile_description`. **CN:** 继续说明 function `tile_description` 的文档字符串。
+- **L353** `        """` — **EN:** Ends the docstring for the function `tile_description`. **CN:** 结束说明 function `tile_description` 的文档字符串。
+- **L354** `        if td is None:` — **EN:** Starts a conditional branch guarded by `td is None`. **CN:** 开始一个由 `td is None` 控制的条件分支。
+- **L355** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** `        if isinstance(td, dict):` — **EN:** Starts a conditional branch guarded by `isinstance(td, dict)`. **CN:** 开始一个由 `isinstance(td, dict)` 控制的条件分支。
+- **L357** `            if self._tile_description is None:` — **EN:** Starts a conditional branch guarded by `self._tile_description is None`. **CN:** 开始一个由 `self._tile_description is None` 控制的条件分支。
+- **L358** `                op = self.possible_operations.default_operation(self._math_operation)` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L359** `                self._tile_description = datatypes.td_from_profiler_op(op)` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L360** `            if "cluster_shape" in td.keys():` — **EN:** Starts a conditional branch guarded by `'cluster_shape' in td.keys()`. **CN:** 开始一个由 `'cluster_shape' in td.keys()` 控制的条件分支。
+- **L361** `                if td["cluster_shape"] != [1, 1, 1]:` — **EN:** Starts a conditional branch guarded by `td['cluster_shape'] != [1, 1, 1]`. **CN:** 开始一个由 `td['cluster_shape'] != [1, 1, 1]` 控制的条件分支。
+- **L362** `                    cutlass_cppgen.logger.warning("Conv2d currently only support 'cluster_shape'=[1, 1, 1]'.")` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L363** `                    td["cluster_shape"] = [1, 1, 1]` — **EN:** Assigns a value to td['cluster_shape']. **CN:** 将一个值赋给 td['cluster_shape']。
+- **L364** `            td = self._tile_description.clone_and_update(td)` — **EN:** Assigns a value to td. **CN:** 将一个值赋给 td。
+- **L365** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L366** `        valid, msg = self._valid_tile_description(td)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L367** `        if valid:` — **EN:** Starts a conditional branch guarded by `valid`. **CN:** 开始一个由 `valid` 控制的条件分支。
+- **L368** `            self._tile_description = td` — **EN:** Assigns a value to self._tile_description. **CN:** 将一个值赋给 self._tile_description。
+- **L369** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L370** `            raise Exception(msg)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    def _valid_tile_description(self, td: TileDescription) -> tuple:` — **EN:** Defines function `_valid_tile_description`. **CN:** 定义函数 `_valid_tile_description`。
+- **L373** `        """` — **EN:** Starts the docstring for the function `_valid_tile_description`. **CN:** 开始说明 function `_valid_tile_description` 的文档字符串。
+- **L374** `        Checks whether the provided tile description is valid for the given compute capability. At present,` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L375** `        this checks the following:` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** `        - Does the tile description use a number of stages supported by the compute capability in question?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L378** `        - Does the tile size requested fit within shared memory?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L379** `        - Are cluster dimensions outside the valid range requested for a given architecture (e.g.,` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L380** `          more non-unit cluster dimensions for pre-SM90 architectures)?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L381** `        - Is the kernel schedule being used supported on the architecture in question?` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `        :param td: tile description to validate` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L384** `        :type td: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L385** `        :return: tuple in which the first element is a bool indicating that the tile description is valid` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L386** `                 and the second element is a string providing an optional error message.` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L387** `        :rtype: tuple` — **EN:** Continues the docstring for the function `_valid_tile_description`. **CN:** 继续说明 function `_valid_tile_description` 的文档字符串。
+- **L388** `        """` — **EN:** Ends the docstring for the function `_valid_tile_description`. **CN:** 结束说明 function `_valid_tile_description` 的文档字符串。
+- **L389** `        valid, msg = check.valid_stage_count(self.cc, self.current_cc, td)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L390** `        if not valid:` — **EN:** Starts a conditional branch guarded by `not valid`. **CN:** 开始一个由 `not valid` 控制的条件分支。
+- **L391** `            return (valid, msg)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `        valid, msg = check.valid_cluster_shape(self.current_cc, td.cluster_shape)` — **EN:** Assigns a value to (valid, msg). **CN:** 将一个值赋给 (valid, msg)。
+- **L394** `        if not valid:` — **EN:** Starts a conditional branch guarded by `not valid`. **CN:** 开始一个由 `not valid` 控制的条件分支。
+- **L395** `            return (valid, msg)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `        return valid, msg` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `    def tile_descriptions(self) -> list:` — **EN:** Defines function `tile_descriptions`. **CN:** 定义函数 `tile_descriptions`。
+- **L400** `        """` — **EN:** Starts the docstring for the function `tile_descriptions`. **CN:** 开始说明 function `tile_descriptions` 的文档字符串。
+- **L401** `        Returns a list of valid tile descriptions for the operations` — **EN:** Continues the docstring for the function `tile_descriptions`. **CN:** 继续说明 function `tile_descriptions` 的文档字符串。
+- **L402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L403** `        :returns: list of valid tile descriptions for the operations` — **EN:** Continues the docstring for the function `tile_descriptions`. **CN:** 继续说明 function `tile_descriptions` 的文档字符串。
+- **L404** `        :rtype: list` — **EN:** Continues the docstring for the function `tile_descriptions`. **CN:** 继续说明 function `tile_descriptions` 的文档字符串。
+- **L405** `        """` — **EN:** Ends the docstring for the function `tile_descriptions`. **CN:** 结束说明 function `tile_descriptions` 的文档字符串。
+- **L406** `        descriptions = []` — **EN:** Assigns a value to descriptions. **CN:** 将一个值赋给 descriptions。
+- **L407** `        description_str = []` — **EN:** Assigns a value to description_str. **CN:** 将一个值赋给 description_str。
+- **L408** `        for op in self.possible_operations.all_operations:` — **EN:** Starts a loop assigning items from `self.possible_operations.all_operations` to `op`. **CN:** 开始一个循环，将 `self.possible_operations.all_operations` 的元素赋给 `op`。
+- **L409** `            td = datatypes.td_from_profiler_op(op)` — **EN:** Assigns a value to td. **CN:** 将一个值赋给 td。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** `            if self._math_operation is not None:` — **EN:** Starts a conditional branch guarded by `self._math_operation is not None`. **CN:** 开始一个由 `self._math_operation is not None` 控制的条件分支。
+- **L412** `                if td.math_instruction.math_operation != self._math_operation:` — **EN:** Starts a conditional branch guarded by `td.math_instruction.math_operation != self._math_operation`. **CN:** 开始一个由 `td.math_instruction.math_operation != self._math_operation` 控制的条件分支。
+- **L413** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `            if str(td) not in description_str:` — **EN:** Starts a conditional branch guarded by `str(td) not in description_str`. **CN:** 开始一个由 `str(td) not in description_str` 控制的条件分支。
+- **L416** `                description_str.append(str(td))` — **EN:** Invokes `description_str.append` as a standalone call. **CN:** 以独立语句方式调用 `description_str.append`。
+- **L417** `                descriptions.append(td)` — **EN:** Invokes `descriptions.append` as a standalone call. **CN:** 以独立语句方式调用 `descriptions.append`。
+- **L418** `        return descriptions` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L420** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L421** `    # Swizzling functor Related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L422** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L425** `    def swizzling_stride(self):` — **EN:** Defines function `swizzling_stride`. **CN:** 定义函数 `swizzling_stride`。
+- **L426** `        """` — **EN:** Starts the docstring for the function `swizzling_stride`. **CN:** 开始说明 function `swizzling_stride` 的文档字符串。
+- **L427** `        Returns the stride of swizzling currently being used by the Conv2d` — **EN:** Continues the docstring for the function `swizzling_stride`. **CN:** 继续说明 function `swizzling_stride` 的文档字符串。
+- **L428** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L429** `        :return: swizzing stride` — **EN:** Continues the docstring for the function `swizzling_stride`. **CN:** 继续说明 function `swizzling_stride` 的文档字符串。
+- **L430** `        """` — **EN:** Ends the docstring for the function `swizzling_stride`. **CN:** 结束说明 function `swizzling_stride` 的文档字符串。
+- **L431** `        return self._swizzling_stride` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `    @swizzling_stride.setter` — **EN:** Applies decorator `swizzling_stride.setter` to the following definition. **CN:** 将装饰器 `swizzling_stride.setter` 应用于后面的定义。
+- **L434** `    def swizzling_stride(self, stride: int):` — **EN:** Defines function `swizzling_stride`. **CN:** 定义函数 `swizzling_stride`。
+- **L435** `        """` — **EN:** Starts the docstring for the function `swizzling_stride`. **CN:** 开始说明 function `swizzling_stride` 的文档字符串。
+- **L436** `        Sets the swizzling functor to the type specified by \`swizzling_functor\`` — **EN:** Continues the docstring for the function `swizzling_stride`. **CN:** 继续说明 function `swizzling_stride` 的文档字符串。
+- **L437** `        """` — **EN:** Ends the docstring for the function `swizzling_stride`. **CN:** 结束说明 function `swizzling_stride` 的文档字符串。
+- **L438** `        if not isinstance(stride, int):` — **EN:** Starts a conditional branch guarded by `not isinstance(stride, int)`. **CN:** 开始一个由 `not isinstance(stride, int)` 控制的条件分支。
+- **L439** `            raise Exception(f"Expect integer (1, 2, 4, 8), got {stride}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L440** `        self._swizzling_stride = stride` — **EN:** Assigns a value to self._swizzling_stride. **CN:** 将一个值赋给 self._swizzling_stride。
+- **L441** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L442** `    def _propose_swizzling_functor(self, stride):` — **EN:** Defines function `_propose_swizzling_functor`. **CN:** 定义函数 `_propose_swizzling_functor`。
+- **L443** `        """` — **EN:** Starts the docstring for the function `_propose_swizzling_functor`. **CN:** 开始说明 function `_propose_swizzling_functor` 的文档字符串。
+- **L444** `        Automatically propose the swizzling functor based on the stride` — **EN:** Continues the docstring for the function `_propose_swizzling_functor`. **CN:** 继续说明 function `_propose_swizzling_functor` 的文档字符串。
+- **L445** `        """` — **EN:** Ends the docstring for the function `_propose_swizzling_functor`. **CN:** 结束说明 function `_propose_swizzling_functor` 的文档字符串。
+- **L446** `        if self.conv_kind == ConvKind.Dgrad:` — **EN:** Starts a conditional branch guarded by `self.conv_kind == ConvKind.Dgrad`. **CN:** 开始一个由 `self.conv_kind == ConvKind.Dgrad` 控制的条件分支。
+- **L447** `            if stride[0] != 1 or stride[1] != 1:` — **EN:** Starts a conditional branch guarded by `stride[0] != 1 or stride[1] != 1`. **CN:** 开始一个由 `stride[0] != 1 or stride[1] != 1` 控制的条件分支。
+- **L448** `                return getattr(cutlass_cppgen.swizzle, f"StridedDgradIdentitySwizzle{self._swizzling_stride}")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L449** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L450** `        return getattr(cutlass_cppgen.swizzle, f"IdentitySwizzle{self._swizzling_stride}")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L453** `    # Iterator Algorithm Related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L454** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L457** `    def iterator_algorithm(self) -> IteratorAlgorithm:` — **EN:** Defines function `iterator_algorithm`. **CN:** 定义函数 `iterator_algorithm`。
+- **L458** `        """` — **EN:** Starts the docstring for the function `iterator_algorithm`. **CN:** 开始说明 function `iterator_algorithm` 的文档字符串。
+- **L459** `        Returns the iterator algorithm` — **EN:** Continues the docstring for the function `iterator_algorithm`. **CN:** 继续说明 function `iterator_algorithm` 的文档字符串。
+- **L460** `        """` — **EN:** Ends the docstring for the function `iterator_algorithm`. **CN:** 结束说明 function `iterator_algorithm` 的文档字符串。
+- **L461** `        return self._iterator_algorithm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `    @iterator_algorithm.setter` — **EN:** Applies decorator `iterator_algorithm.setter` to the following definition. **CN:** 将装饰器 `iterator_algorithm.setter` 应用于后面的定义。
+- **L464** `    def iterator_algorithm(self, alg: str):` — **EN:** Defines function `iterator_algorithm`. **CN:** 定义函数 `iterator_algorithm`。
+- **L465** `        """` — **EN:** Starts the docstring for the function `iterator_algorithm`. **CN:** 开始说明 function `iterator_algorithm` 的文档字符串。
+- **L466** `        Sets the iterator algorithm` — **EN:** Continues the docstring for the function `iterator_algorithm`. **CN:** 继续说明 function `iterator_algorithm` 的文档字符串。
+- **L467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L468** `        :param alg: The iterator algorithm` — **EN:** Continues the docstring for the function `iterator_algorithm`. **CN:** 继续说明 function `iterator_algorithm` 的文档字符串。
+- **L469** `        :type td: string, options: "analytic", "optimized", "few_channels", and "fixed_channels"` — **EN:** Continues the docstring for the function `iterator_algorithm`. **CN:** 继续说明 function `iterator_algorithm` 的文档字符串。
+- **L470** `        """` — **EN:** Ends the docstring for the function `iterator_algorithm`. **CN:** 结束说明 function `iterator_algorithm` 的文档字符串。
+- **L471** `        iterator_alg = datatypes.getattr_enum(IteratorAlgorithm, alg)` — **EN:** Assigns a value to iterator_alg. **CN:** 将一个值赋给 iterator_alg。
+- **L472** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L473** `        # Check if the iterator algorithm is valid` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L474** `        if iterator_alg in [IteratorAlgorithm.FewChannels, IteratorAlgorithm.FixedChannels] and self.conv_kind != ConvKind.Fprop:` — **EN:** Starts a conditional branch guarded by `iterator_alg in [IteratorAlgorithm.FewChannels, IteratorA...`. **CN:** 开始一个由 `iterator_alg in [IteratorAlgorithm.FewChannels, IteratorA...` 控制的条件分支。
+- **L475** `            raise Exception(f"{self.conv_kind} does not support iterator algorithm {alg}.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L476** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L477** `        self._iterator_algorithm = iterator_alg` — **EN:** Assigns a value to self._iterator_algorithm. **CN:** 将一个值赋给 self._iterator_algorithm。
+- **L478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L479** `    def _propose_iterator_algorithm(self, problem_size, alignment_a, alignment_b) -> IteratorAlgorithm:` — **EN:** Defines function `_propose_iterator_algorithm`. **CN:** 定义函数 `_propose_iterator_algorithm`。
+- **L480** `        """` — **EN:** Starts the docstring for the function `_propose_iterator_algorithm`. **CN:** 开始说明 function `_propose_iterator_algorithm` 的文档字符串。
+- **L481** `        Propose a valid iterator algorithm based on problem size and alignment` — **EN:** Continues the docstring for the function `_propose_iterator_algorithm`. **CN:** 继续说明 function `_propose_iterator_algorithm` 的文档字符串。
+- **L482** `        """` — **EN:** Ends the docstring for the function `_propose_iterator_algorithm`. **CN:** 结束说明 function `_propose_iterator_algorithm` 的文档字符串。
+- **L483** `        if self.conv_kind == ConvKind.Fprop:` — **EN:** Starts a conditional branch guarded by `self.conv_kind == ConvKind.Fprop`. **CN:** 开始一个由 `self.conv_kind == ConvKind.Fprop` 控制的条件分支。
+- **L484** `            # Check whether the fixed channel is applicable` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L485** `            if problem_size.C == alignment_a:` — **EN:** Starts a conditional branch guarded by `problem_size.C == alignment_a`. **CN:** 开始一个由 `problem_size.C == alignment_a` 控制的条件分支。
+- **L486** `                return IteratorAlgorithm.FixedChannels` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L487** `            elif (problem_size.C % alignment_a == 0 and` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L488** `                  problem_size.R <= 32 and problem_size.S <= 32):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L489** `                return IteratorAlgorithm.Optimized` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L490** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L491** `                return IteratorAlgorithm.Analytic` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L492** `        elif self.conv_kind == ConvKind.Dgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L493** `            if (problem_size.K % alignment_a == 0 and` — **EN:** Starts a conditional branch guarded by `problem_size.K % alignment_a == 0 and problem_size.R <= 3...`. **CN:** 开始一个由 `problem_size.K % alignment_a == 0 and problem_size.R <= 3...` 控制的条件分支。
+- **L494** `                problem_size.R <= 32 and problem_size.S <= 32 and` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L495** `                problem_size.C % alignment_b == 0):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L496** `                return IteratorAlgorithm.Optimized` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L497** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L498** `                return IteratorAlgorithm.Analytic` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L499** `        elif self.conv_kind == ConvKind.Wgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L500** `            if (problem_size.K % alignment_a == 0 and` — **EN:** Starts a conditional branch guarded by `problem_size.K % alignment_a == 0 and problem_size.C % al...`. **CN:** 开始一个由 `problem_size.K % alignment_a == 0 and problem_size.C % al...` 控制的条件分支。
+- **L501** `                problem_size.C % alignment_b == 0):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L502** `                return IteratorAlgorithm.Optimized` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L503** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L504** `                return IteratorAlgorithm.Analytic` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L505** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L506** `    def _validate_iterator_algorithm(self, iterator_algorithm, problem_size, alignment_a, alignment_b) -> bool:` — **EN:** Defines function `_validate_iterator_algorithm`. **CN:** 定义函数 `_validate_iterator_algorithm`。
+- **L507** `        """` — **EN:** Starts the docstring for the function `_validate_iterator_algorithm`. **CN:** 开始说明 function `_validate_iterator_algorithm` 的文档字符串。
+- **L508** `        Validate whether the user provide iterator algorithm works for the given problem size` — **EN:** Continues the docstring for the function `_validate_iterator_algorithm`. **CN:** 继续说明 function `_validate_iterator_algorithm` 的文档字符串。
+- **L509** `        """` — **EN:** Ends the docstring for the function `_validate_iterator_algorithm`. **CN:** 结束说明 function `_validate_iterator_algorithm` 的文档字符串。
+- **L510** `        if self.conv_kind == ConvKind.Fprop:` — **EN:** Starts a conditional branch guarded by `self.conv_kind == ConvKind.Fprop`. **CN:** 开始一个由 `self.conv_kind == ConvKind.Fprop` 控制的条件分支。
+- **L511** `            if iterator_algorithm == IteratorAlgorithm.FixedChannels:` — **EN:** Starts a conditional branch guarded by `iterator_algorithm == IteratorAlgorithm.FixedChannels`. **CN:** 开始一个由 `iterator_algorithm == IteratorAlgorithm.FixedChannels` 控制的条件分支。
+- **L512** `                return problem_size.C == alignment_a` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L513** `            elif iterator_algorithm == IteratorAlgorithm.Optimized:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L514** `                return (problem_size.C % alignment_a == 0 and` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L515** `                  problem_size.R <= 32 and problem_size.S <= 32)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `            elif iterator_algorithm == IteratorAlgorithm.FewChannels:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L517** `                return problem_size.C % alignment_a == 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L518** `        elif self.conv_kind == ConvKind.Dgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L519** `            if iterator_algorithm == IteratorAlgorithm.Optimized:` — **EN:** Starts a conditional branch guarded by `iterator_algorithm == IteratorAlgorithm.Optimized`. **CN:** 开始一个由 `iterator_algorithm == IteratorAlgorithm.Optimized` 控制的条件分支。
+- **L520** `                return (problem_size.K % alignment_a == 0 and` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L521** `                        problem_size.R <= 32 and problem_size.S <= 32 and` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `                        problem_size.C % alignment_b == 0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `        elif self.conv_kind == ConvKind.Wgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L524** `            if iterator_algorithm == IteratorAlgorithm.Optimized:` — **EN:** Starts a conditional branch guarded by `iterator_algorithm == IteratorAlgorithm.Optimized`. **CN:** 开始一个由 `iterator_algorithm == IteratorAlgorithm.Optimized` 控制的条件分支。
+- **L525** `                return (problem_size.K % alignment_a == 0 and` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L526** `                problem_size.C % alignment_b == 0)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L528** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L529** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L530** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L531** `    # Stride Support Related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L532** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L533** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L534** `    def _propose_stride_support(self, stride):` — **EN:** Defines function `_propose_stride_support`. **CN:** 定义函数 `_propose_stride_support`。
+- **L535** `        if self.conv_kind == ConvKind.Dgrad:` — **EN:** Starts a conditional branch guarded by `self.conv_kind == ConvKind.Dgrad`. **CN:** 开始一个由 `self.conv_kind == ConvKind.Dgrad` 控制的条件分支。
+- **L536** `            if stride[0] == 1 and stride[1] == 1:` — **EN:** Starts a conditional branch guarded by `stride[0] == 1 and stride[1] == 1`. **CN:** 开始一个由 `stride[0] == 1 and stride[1] == 1` 控制的条件分支。
+- **L537** `                return StrideSupport.Unity` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** `        return StrideSupport.Strided` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L540** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L541** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L542** `    # Construct and Compilation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L543** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L545** `    def construct(` — **EN:** Defines function `construct`. **CN:** 定义函数 `construct`。
+- **L546** `        self, tile_description: TileDescription = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L547** `        alignment_A: int = None, alignment_B: int = None, alignment_C: int = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L548** `        iterator_algorithm: IteratorAlgorithm = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L549** `        stride_support = None, swizzling_functor: cutlass_cppgen.swizzle = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L550** `        epilogue_functor=None) -> cutlass_cppgen.backend.Conv2dOperation:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L551** `        """` — **EN:** Starts the docstring for the function `construct`. **CN:** 开始说明 function `construct` 的文档字符串。
+- **L552** `        Constructs a \`\`cutlass_cppgen.backend.Conv2dOperation\`\` based on the input parameters and current` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L553** `        kernel specification of the \`\`Conv2d\`\` object.` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** `        :param tile_description: tile description specifying shapes and operand types to use in the kernel` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L556** `        :type tile_description: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L557** `        :param alignment_A: alignment of operand A` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L558** `        :type alignment_A: int` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L559** `        :param alignment_B: alignment of operand B` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L560** `        :type alignment_B: int` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L561** `        :param alignment_C: alignment of operand C` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L562** `        :type alignment_C: int` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L563** `        :param iterator_algorithm: the iterator algorithm used` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L564** `        :type iterator_algorithm: cutlass_library.library.IteratorAlgorithm` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L565** `        :param stride_support: the stride support of dgrad` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L566** `        :type stride_support: cutlass_library.library.StrideSupport` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L567** `        :param swizzling_functor: the swizzling functor` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L568** `        :type swizzling_functor: cutlass_cppgen.swizzle` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L569** `        :param epilogue_functor: the epilogue functor` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L571** `        :return: operation that was constructed` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L572** `        :rtype: cutlass_cppgen.backend.Conv2dOperation` — **EN:** Continues the docstring for the function `construct`. **CN:** 继续说明 function `construct` 的文档字符串。
+- **L573** `        """` — **EN:** Ends the docstring for the function `construct`. **CN:** 结束说明 function `construct` 的文档字符串。
+- **L574** `        # Get alignment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L575** `        alignment_A = check.alignment_or_default(alignment_A, self.alignment_pref_A)` — **EN:** Assigns a value to alignment_A. **CN:** 将一个值赋给 alignment_A。
+- **L576** `        alignment_B = check.alignment_or_default(alignment_B, self.alignment_pref_B)` — **EN:** Assigns a value to alignment_B. **CN:** 将一个值赋给 alignment_B。
+- **L577** `        alignment_C = check.alignment_or_default(alignment_C, self.alignment_pref_C)` — **EN:** Assigns a value to alignment_C. **CN:** 将一个值赋给 alignment_C。
+- **L578** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L579** `        tensor_A = TensorDescription(self._element_a, self._layout_b, alignment_A)` — **EN:** Assigns a value to tensor_A. **CN:** 将一个值赋给 tensor_A。
+- **L580** `        tensor_B = TensorDescription(self._element_b, self._layout_b, alignment_B)` — **EN:** Assigns a value to tensor_B. **CN:** 将一个值赋给 tensor_B。
+- **L581** `        tensor_C = TensorDescription(self._element_c, self._layout_c, alignment_C)` — **EN:** Assigns a value to tensor_C. **CN:** 将一个值赋给 tensor_C。
+- **L582** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L583** `        if tile_description is None:` — **EN:** Starts a conditional branch guarded by `tile_description is None`. **CN:** 开始一个由 `tile_description is None` 控制的条件分支。
+- **L584** `            if self.tile_description is not None:` — **EN:** Starts a conditional branch guarded by `self.tile_description is not None`. **CN:** 开始一个由 `self.tile_description is not None` 控制的条件分支。
+- **L585** `                tile_description = self.tile_description` — **EN:** Assigns a value to tile_description. **CN:** 将一个值赋给 tile_description。
+- **L586** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L587** `                op = self.possible_operations.operations(alignment_A, alignment_B, alignment_C, self._math_operation)[0]` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L588** `                tile_description = datatypes.td_from_profiler_op(op)` — **EN:** Assigns a value to tile_description. **CN:** 将一个值赋给 tile_description。
+- **L589** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L590** `            valid, err_str = self._valid_tile_description(tile_description)` — **EN:** Assigns a value to (valid, err_str). **CN:** 将一个值赋给 (valid, err_str)。
+- **L591** `            if not valid:` — **EN:** Starts a conditional branch guarded by `not valid`. **CN:** 开始一个由 `not valid` 控制的条件分支。
+- **L592** `                raise Exception(f"Invalid tile description. {err_str}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L593** `            self.tile_description = tile_description` — **EN:** Assigns a value to self.tile_description. **CN:** 将一个值赋给 self.tile_description。
+- **L594** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L595** `        if iterator_algorithm is None:` — **EN:** Starts a conditional branch guarded by `iterator_algorithm is None`. **CN:** 开始一个由 `iterator_algorithm is None` 控制的条件分支。
+- **L596** `            # If the iterator algorithm is already set` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L597** `            if self.iterator_algorithm is not None:` — **EN:** Starts a conditional branch guarded by `self.iterator_algorithm is not None`. **CN:** 开始一个由 `self.iterator_algorithm is not None` 控制的条件分支。
+- **L598** `                iterator_algorithm = self.iterator_algorithm` — **EN:** Assigns a value to iterator_algorithm. **CN:** 将一个值赋给 iterator_algorithm。
+- **L599** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L600** `                # Otherwise, we conservatively use the analytic iterator for correctness` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L601** `                iterator_algorithm = IteratorAlgorithm.Analytic` — **EN:** Assigns a value to iterator_algorithm. **CN:** 将一个值赋给 iterator_algorithm。
+- **L602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L603** `        if stride_support is None:` — **EN:** Starts a conditional branch guarded by `stride_support is None`. **CN:** 开始一个由 `stride_support is None` 控制的条件分支。
+- **L604** `            # If the stride support is already set` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L605** `            if self._stride_support is not None:` — **EN:** Starts a conditional branch guarded by `self._stride_support is not None`. **CN:** 开始一个由 `self._stride_support is not None` 控制的条件分支。
+- **L606** `                stride_support = self._stride_support` — **EN:** Assigns a value to stride_support. **CN:** 将一个值赋给 stride_support。
+- **L607** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L608** `                # Otherwise, we assume strided` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L609** `                stride_support = StrideSupport.Strided` — **EN:** Assigns a value to stride_support. **CN:** 将一个值赋给 stride_support。
+- **L610** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L611** `        if swizzling_functor is None:` — **EN:** Starts a conditional branch guarded by `swizzling_functor is None`. **CN:** 开始一个由 `swizzling_functor is None` 控制的条件分支。
+- **L612** `            # If the swizzling functor is already set` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L613** `            swizzling_functor = self._propose_swizzling_functor(stride=(2, 2))` — **EN:** Assigns a value to swizzling_functor. **CN:** 将一个值赋给 swizzling_functor。
+- **L614** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L615** `        if epilogue_functor is None:` — **EN:** Starts a conditional branch guarded by `epilogue_functor is None`. **CN:** 开始一个由 `epilogue_functor is None` 控制的条件分支。
+- **L616** `            if self.epilogue_functor is not None:` — **EN:** Starts a conditional branch guarded by `self.epilogue_functor is not None`. **CN:** 开始一个由 `self.epilogue_functor is not None` 控制的条件分支。
+- **L617** `                epilogue_functor = self.epilogue_functor` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L618** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L619** `                epilogue_functor = self._create_epilogue_functor_activation(self._activation)` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L621** `        # Reset the alignment of the epilogue functor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L622** `        epilogue_functor = self._reset_epilogue_functor_alignment(alignment_C, epilogue_functor)` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L623** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L624** `        operation = Conv2dOperation(` — **EN:** Assigns a value to operation. **CN:** 将一个值赋给 operation。
+- **L625** `            conv_kind=self.conv_kind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `            iterator_algorithm=iterator_algorithm,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `            arch=self.current_cc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `            tile_description=tile_description,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `            A=tensor_A, B=tensor_B, C=tensor_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `            stride_support=stride_support,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** `            epilogue_functor=epilogue_functor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L632** `            swizzling_functor=swizzling_functor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L633** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L635** `        return operation` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L636** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L637** `    def compile(self, tile_description: TileDescription = None,` — **EN:** Defines function `compile`. **CN:** 定义函数 `compile`。
+- **L638** `                alignment_A: int = None, alignment_B: int = None, alignment_C: int = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L639** `                iterator_algorithm: IteratorAlgorithm = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L640** `                stride_support = None, swizzling_functor: cutlass_cppgen.swizzle = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L641** `                epilogue_functor = None, print_module: bool = False) -> cutlass_cppgen.backend.Conv2dOperation:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L642** `        """` — **EN:** Starts the docstring for the function `compile`. **CN:** 开始说明 function `compile` 的文档字符串。
+- **L643** `        Emits and compiles the kernel currently specified. If \`\`tile_description\`\` and any` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L644** `        of the \`\`alignment\`\` parameters are set, the kernel will be chosen using this` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L645** `        tile description and alignments. Otherwise, a default tile description and alignment` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L646** `        will be used.` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L648** `        ::param tile_description: tile description specifying shapes and operand types to use in the kernel` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L649** `        :type tile_description: cutlass_cppgen.backend.TileDescription` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L650** `        :param alignment_A: alignment of operand A` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L651** `        :type alignment_A: int` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L652** `        :param alignment_B: alignment of operand B` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L653** `        :type alignment_B: int` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L654** `        :param alignment_C: alignment of operand C` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L655** `        :type alignment_C: int` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L656** `        :param iterator_algorithm: the iterator algorithm used` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L657** `        :type iterator_algorithm: cutlass_library.library.IteratorAlgorithm` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L658** `        :param stride_support: the stride support of dgrad` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L659** `        :type stride_support: cutlass_library.library.StrideSupport` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L660** `        :param swizzling_functor: the swizzling functor` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L661** `        :type swizzling_functor: cutlass_cppgen.swizzle` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L662** `        :param epilogue_functor: the epilogue functor` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L663** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L664** `        :return: operation that was compiled` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L665** `        :rtype: cutlass_cppgen.backend.Conv2dOperation` — **EN:** Continues the docstring for the function `compile`. **CN:** 继续说明 function `compile` 的文档字符串。
+- **L666** `        """` — **EN:** Ends the docstring for the function `compile`. **CN:** 结束说明 function `compile` 的文档字符串。
+- **L667** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L668** `        self.operation = self.construct(` — **EN:** Assigns a value to self.operation. **CN:** 将一个值赋给 self.operation。
+- **L669** `            tile_description, alignment_A, alignment_B, alignment_C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L670** `            iterator_algorithm, stride_support, swizzling_functor, epilogue_functor)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L671** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L672** `        if print_module:` — **EN:** Starts a conditional branch guarded by `print_module`. **CN:** 开始一个由 `print_module` 控制的条件分支。
+- **L673** `            print(self.operation.rt_module.emit())` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L674** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L675** `        compiler.add_module([self.operation,])` — **EN:** Invokes `compiler.add_module` as a standalone call. **CN:** 以独立语句方式调用 `compiler.add_module`。
+- **L676** `        return self.operation` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L677** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L678** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L679** `    # Run Related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L680** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L681** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L682** `    def _verify_type_and_layout(self, tensor, ref_type, ref_layout, name):` — **EN:** Defines function `_verify_type_and_layout`. **CN:** 定义函数 `_verify_type_and_layout`。
+- **L683** `        """` — **EN:** Starts the docstring for the function `_verify_type_and_layout`. **CN:** 开始说明 function `_verify_type_and_layout` 的文档字符串。
+- **L684** `        Verifies that \`\`tensor\`\` has data type \`\`ref_type\`\` and layout \`\`ref_layout\`\`. An exception` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L685** `        is raised if it does not.` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `        :param tensor: object representing a tensor passed in to verify, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L688** `        :type tensor: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L689** `        :param ref_dtype: data type for the tensor that this object was initialized to` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L690** `        :param name: identifier of the tensor to verify. Used in raising exceptions` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L691** `        :type name: str` — **EN:** Continues the docstring for the function `_verify_type_and_layout`. **CN:** 继续说明 function `_verify_type_and_layout` 的文档字符串。
+- **L692** `        """` — **EN:** Ends the docstring for the function `_verify_type_and_layout`. **CN:** 结束说明 function `_verify_type_and_layout` 的文档字符串。
+- **L693** `        dtype, _ = datatypes.get_datatype_and_layout(tensor)` — **EN:** Assigns a value to (dtype, _). **CN:** 将一个值赋给 (dtype, _)。
+- **L694** `        if dtype != ref_type:` — **EN:** Starts a conditional branch guarded by `dtype != ref_type`. **CN:** 开始一个由 `dtype != ref_type` 控制的条件分支。
+- **L695** `            raise Exception(f'Tensor {name} with type and layout {dtype} '` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L696** `                            f'does not match the expected type of {ref_type}.')` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L698** `    def _get_and_verify_conv_problem_size(self, A, B, C, stride, padding, dilation):` — **EN:** Defines function `_get_and_verify_conv_problem_size`. **CN:** 定义函数 `_get_and_verify_conv_problem_size`。
+- **L699** `        if self.conv_kind == ConvKind.Fprop:` — **EN:** Starts a conditional branch guarded by `self.conv_kind == ConvKind.Fprop`. **CN:** 开始一个由 `self.conv_kind == ConvKind.Fprop` 控制的条件分支。
+- **L700** `            input = A` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L701** `            weight = B` — **EN:** Assigns a value to weight. **CN:** 将一个值赋给 weight。
+- **L702** `            output = C` — **EN:** Assigns a value to output. **CN:** 将一个值赋给 output。
+- **L703** `            output_tensor = "C"` — **EN:** Assigns a value to output_tensor. **CN:** 将一个值赋给 output_tensor。
+- **L704** `        elif self.conv_kind == ConvKind.Dgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L705** `            output = A` — **EN:** Assigns a value to output. **CN:** 将一个值赋给 output。
+- **L706** `            weight = B` — **EN:** Assigns a value to weight. **CN:** 将一个值赋给 weight。
+- **L707** `            input = C` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L708** `            output_tensor = "A"` — **EN:** Assigns a value to output_tensor. **CN:** 将一个值赋给 output_tensor。
+- **L709** `        elif self.conv_kind == ConvKind.Wgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L710** `            output = A` — **EN:** Assigns a value to output. **CN:** 将一个值赋给 output。
+- **L711** `            input = B` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L712** `            weight = C` — **EN:** Assigns a value to weight. **CN:** 将一个值赋给 weight。
+- **L713** `            output_tensor = "A"` — **EN:** Assigns a value to output_tensor. **CN:** 将一个值赋给 output_tensor。
+- **L714** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L715** `            raise Exception(f"Convolution kind {self.conv_kind} is not supported")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L716** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L717** `        N_, H_, W_, C_ = datatypes.get_tensor_shape(input, op="CONV")` — **EN:** Assigns a value to (N_, H_, W_, C_). **CN:** 将一个值赋给 (N_, H_, W_, C_)。
+- **L718** `        K_, R_, S_, _ = datatypes.get_tensor_shape(weight, op="CONV")` — **EN:** Assigns a value to (K_, R_, S_, _). **CN:** 将一个值赋给 (K_, R_, S_, _)。
+- **L719** `        _, P_, Q_, _ = datatypes.get_tensor_shape(output, op="CONV")` — **EN:** Assigns a value to (_, P_, Q_, _). **CN:** 将一个值赋给 (_, P_, Q_, _)。
+- **L720** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L721** `        problem_size = Conv2DProblemSize(` — **EN:** Assigns a value to problem_size. **CN:** 将一个值赋给 problem_size。
+- **L722** `            N_, H_, W_, C_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L723** `            K_, R_, S_, C_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L724** `            padding[0], padding[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L725** `            stride[0], stride[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L726** `            dilation[0], dilation[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `            ConvMode.CrossCorrelation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** `            1, 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L731** `        if P_ != problem_size.P or Q_ != problem_size.Q:` — **EN:** Starts a conditional branch guarded by `P_ != problem_size.P or Q_ != problem_size.Q`. **CN:** 开始一个由 `P_ != problem_size.P or Q_ != problem_size.Q` 控制的条件分支。
+- **L732** `            raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L733** `                f"Tensor {output_tensor} size should be ({N_}, {problem_size.P}, {problem_size.Q}, {K_}), got ({N_}, {P_}, {Q_}, {K_})")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L734** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L735** `        return problem_size` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L736** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L737** `    def run(self, A=None, B=None, C=None, D=None,` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L738** `            stride=(1, 1), padding=(0, 0), dilation=(1, 1),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L739** `            alpha=None, beta=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L740** `            split_k=("serial", 1), sync: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L741** `            print_module: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L742** `            stream: Optional[cuda.CUstream] = None) -> Conv2dArguments:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L743** `        """` — **EN:** Starts the docstring for the function `run`. **CN:** 开始说明 function `run` 的文档字符串。
+- **L744** `        Runs the kernel currently specified. If it has not already been, the kernel is emitted and` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L745** `        compiled. Tensors holding operands and outputs of the kernel are sourced either from the` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L746** `        \`\`A\`\`, \`\`B\`\`, \`\`C\`\`, \`\`D\`\`, \`\`alpha\`\`, and \`\`beta\`\`` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L747** `        parameters provided in the call, or from those` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L748** `        passed in on the construction of this object -- one of the two must be specified.` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L749** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L750** `        By default, this call returns only once the kernel has completed. To launch the kernel` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L751** `        and immediately return, set \`\`sync=False\`\`. In this case, it is the responsibility of the` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L752** `        caller to syncrhonize the results of the kernel before attempting to access outputs` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L753** `        by calling \`\`sync()\`\` on the arguments returned from this call.` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L754** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L755** `        :param A: tensor representing data type and layout of operand A` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L756** `        :param B: tensor representing data type and layout of operand B` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L757** `        :param C: tensor representing data type and layout of operand C` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L758** `        :param D: tensor representing data type and layout of operand D` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L759** `        :param stride: (stride_h, stride_w) describing the convolution stride. Default: (1, 1)` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L760** `        :param padding: (pad_h, pad_w) describing the convolution padding. Default: (0, 0)` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L761** `        :param dilation: (dilation_h, dilation_w) describing the dilation of convolution. Default: (1, 1)` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L762** `        :param alpha: scalar paramter alpha from GEMM computation that scales the product of operands A and B` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L763** `        :param beta: scalar parameter beta from GEMM operation that scales operand C` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L764** `        :param split_k: a tuple (split_k_mode, split_k_slices)` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L765** `        :param sync: whether the call should wait for the kernel to complete before returning` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L766** `        :type sync: bool` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L767** `        :param print_module: whether to print the emitted C++ code` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L768** `        :type print_module: bool` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L769** `        :param stream: cuda stream, defaults to cuda.cuda.CUstream(0)` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L770** `        :type stream: :class:\`cuda.cuda.CUstream\`` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L771** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L772** `        :return: arguments passed in to the kernel` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L773** `        :rtype: cutlass_cppgen.backend.Conv2dArguments` — **EN:** Continues the docstring for the function `run`. **CN:** 继续说明 function `run` 的文档字符串。
+- **L774** `        """` — **EN:** Ends the docstring for the function `run`. **CN:** 结束说明 function `run` 的文档字符串。
+- **L775** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L776** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L777** `        super().run_setup()` — **EN:** Invokes `super().run_setup` as a standalone call. **CN:** 以独立语句方式调用 `super().run_setup`。
+- **L778** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L779** `        A = self._verify_tensor(A, self.A, self._element_a, self._layout_a, "A")` — **EN:** Assigns a value to A. **CN:** 将一个值赋给 A。
+- **L780** `        B = self._verify_tensor(B, self.B, self._element_b, self._layout_b, "B")` — **EN:** Assigns a value to B. **CN:** 将一个值赋给 B。
+- **L781** `        C = self._verify_tensor(C, self.C, self._element_c, self._layout_c, "C")` — **EN:** Assigns a value to C. **CN:** 将一个值赋给 C。
+- **L782** `        D = self._verify_tensor(D, self.D, self._element_d, self._layout_d, "D")` — **EN:** Assigns a value to D. **CN:** 将一个值赋给 D。
+- **L783** `        alpha = self._verify_scalar(alpha, self.alpha, self._element_c, "alpha")` — **EN:** Assigns a value to alpha. **CN:** 将一个值赋给 alpha。
+- **L784** `        beta = self._verify_scalar(beta, self.beta, self._element_c, "beta")` — **EN:** Assigns a value to beta. **CN:** 将一个值赋给 beta。
+- **L785** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L786** `        # handle the case when there is no C` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L787** `        if C is None:` — **EN:** Starts a conditional branch guarded by `C is None`. **CN:** 开始一个由 `C is None` 控制的条件分支。
+- **L788** `            if beta != 0:` — **EN:** Starts a conditional branch guarded by `beta != 0`. **CN:** 开始一个由 `beta != 0` 控制的条件分支。
+- **L789** `                raise Exception(f"With beta {beta} != 0, C has to be provided.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L790** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L791** `                C = D` — **EN:** Assigns a value to C. **CN:** 将一个值赋给 C。
+- **L792** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L793** `        # Construct problem size based on input` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L794** `        # It also verifies whether the A, B, C, D, stride, padding, and dilation are matching` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L795** `        problem_size = self._get_and_verify_conv_problem_size(A, B, C, stride, padding, dilation)` — **EN:** Assigns a value to problem_size. **CN:** 将一个值赋给 problem_size。
+- **L796** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L797** `        # Propose stride support based on input` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L798** `        stride_support = self._propose_stride_support(stride)` — **EN:** Assigns a value to stride_support. **CN:** 将一个值赋给 stride_support。
+- **L799** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L800** `        # Propose swizzling functor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L801** `        swizzling_functor = self._propose_swizzling_functor(stride)` — **EN:** Assigns a value to swizzling_functor. **CN:** 将一个值赋给 swizzling_functor。
+- **L802** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L803** `        shape_a = datatypes.get_tensor_shape(A, op="CONV")` — **EN:** Assigns a value to shape_a. **CN:** 将一个值赋给 shape_a。
+- **L804** `        shape_b = datatypes.get_tensor_shape(B, op="CONV")` — **EN:** Assigns a value to shape_b. **CN:** 将一个值赋给 shape_b。
+- **L805** `        shape_c = datatypes.get_tensor_shape(C, op="CONV")` — **EN:** Assigns a value to shape_c. **CN:** 将一个值赋给 shape_c。
+- **L806** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L807** `        # Get the alignment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L808** `        alignment_a = self.possible_operations.find_alignment(shape_a, self._layout_a, operand="A")` — **EN:** Assigns a value to alignment_a. **CN:** 将一个值赋给 alignment_a。
+- **L809** `        alignment_b = self.possible_operations.find_alignment(shape_b, self._layout_b, operand="B")` — **EN:** Assigns a value to alignment_b. **CN:** 将一个值赋给 alignment_b。
+- **L810** `        alignment_c = self.possible_operations.find_alignment(shape_c, self._layout_c, operand="C")` — **EN:** Assigns a value to alignment_c. **CN:** 将一个值赋给 alignment_c。
+- **L811** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L812** `        alignment_a = check.update_alignment(alignment_a, self.alignment_pref_A)` — **EN:** Assigns a value to alignment_a. **CN:** 将一个值赋给 alignment_a。
+- **L813** `        alignment_b = check.update_alignment(alignment_b, self.alignment_pref_B)` — **EN:** Assigns a value to alignment_b. **CN:** 将一个值赋给 alignment_b。
+- **L814** `        alignment_c = check.update_alignment(alignment_c, self.alignment_pref_C)` — **EN:** Assigns a value to alignment_c. **CN:** 将一个值赋给 alignment_c。
+- **L815** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L816** `        # Propose iterator algorithm based on input` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L817** `        if self._iterator_algorithm is None:` — **EN:** Starts a conditional branch guarded by `self._iterator_algorithm is None`. **CN:** 开始一个由 `self._iterator_algorithm is None` 控制的条件分支。
+- **L818** `            # Propose a default iterator algorithm based on the problem size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L819** `            iterator_algorithm = self._propose_iterator_algorithm(problem_size, alignment_a, alignment_b)` — **EN:** Assigns a value to iterator_algorithm. **CN:** 将一个值赋给 iterator_algorithm。
+- **L820** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L821** `            if (self._validate_iterator_algorithm(self._iterator_algorithm, problem_size, alignment_a, alignment_b)):` — **EN:** Starts a conditional branch guarded by `self._validate_iterator_algorithm(self._iterator_algorith...`. **CN:** 开始一个由 `self._validate_iterator_algorithm(self._iterator_algorith...` 控制的条件分支。
+- **L822** `                iterator_algorithm = self._iterator_algorithm` — **EN:** Assigns a value to iterator_algorithm. **CN:** 将一个值赋给 iterator_algorithm。
+- **L823** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L824** `                raise Exception(f"Iterator algorithm {self._iterator_algorithm} is invalid for current problem.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L825** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L826** `        epilogue_args = [alpha, beta]` — **EN:** Assigns a value to epilogue_args. **CN:** 将一个值赋给 epilogue_args。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `        if hasattr(self, "_activation_args"):` — **EN:** Starts a conditional branch guarded by `hasattr(self, '_activation_args')`. **CN:** 开始一个由 `hasattr(self, '_activation_args')` 控制的条件分支。
+- **L829** `            if isinstance(self._activation_args, list):` — **EN:** Starts a conditional branch guarded by `isinstance(self._activation_args, list)`. **CN:** 开始一个由 `isinstance(self._activation_args, list)` 控制的条件分支。
+- **L830** `                epilogue_args += self._activation_args` — **EN:** Updates epilogue_args in place. **CN:** 原地更新 epilogue_args。
+- **L831** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L832** `                epilogue_args.append(self._activation_args)` — **EN:** Invokes `epilogue_args.append` as a standalone call. **CN:** 以独立语句方式调用 `epilogue_args.append`。
+- **L833** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L834** `        if split_k[0] == "parallel" and split_k[1] > 1:` — **EN:** Starts a conditional branch guarded by `split_k[0] == 'parallel' and split_k[1] > 1`. **CN:** 开始一个由 `split_k[0] == 'parallel' and split_k[1] > 1` 控制的条件分支。
+- **L835** `            epilogue_functor = self._create_epilogue_functor_activation(epilogue.identity)` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L836** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L837** `            epilogue_functor = self.epilogue_functor` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L838** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L839** `        # The alignment is determined by the iterator function (I believe)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L840** `        self.compile(tile_description=self.tile_description, alignment_A=alignment_a, alignment_B=alignment_b,` — **EN:** Invokes `self.compile` as a standalone call. **CN:** 以独立语句方式调用 `self.compile`。
+- **L841** `                     alignment_C=alignment_c, iterator_algorithm=iterator_algorithm, stride_support=stride_support,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L842** `                     swizzling_functor=swizzling_functor, epilogue_functor=epilogue_functor, print_module=print_module)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L843** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L844** `        # Create reduction operation for parallel split-k` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L845** `        if split_k[0] == "parallel" and split_k[1] > 1:` — **EN:** Starts a conditional branch guarded by `split_k[0] == 'parallel' and split_k[1] > 1`. **CN:** 开始一个由 `split_k[0] == 'parallel' and split_k[1] > 1` 控制的条件分支。
+- **L846** `            epilogue_functor_reduction = self._reset_epilogue_functor_alignment(alignment_c, self.epilogue_functor)` — **EN:** Assigns a value to epilogue_functor_reduction. **CN:** 将一个值赋给 epilogue_functor_reduction。
+- **L847** `            self.reduction_operation = ReductionOperation(` — **EN:** Assigns a value to self.reduction_operation. **CN:** 将一个值赋给 self.reduction_operation。
+- **L848** `                shape=MatrixCoord(4, 32 * alignment_c), C=self.operation.C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L849** `                element_accumulator=self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L850** `                element_compute=self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L851** `                epilogue_functor=epilogue_functor_reduction,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L852** `                count=alignment_c` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L853** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L854** `            if print_module:` — **EN:** Starts a conditional branch guarded by `print_module`. **CN:** 开始一个由 `print_module` 控制的条件分支。
+- **L855** `                print(self.reduction_operation.rt_module.emit())` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L856** `            compiler.add_module([self.reduction_operation,])` — **EN:** Invokes `compiler.add_module` as a standalone call. **CN:** 以独立语句方式调用 `compiler.add_module`。
+- **L857** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L858** `        arguments = Conv2dArguments(` — **EN:** Assigns a value to arguments. **CN:** 将一个值赋给 arguments。
+- **L859** `            operation=self.operation, problem_size=problem_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L860** `            A=A, B=B, C=C, D=D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L861** `            output_op=self.operation.epilogue_type(*epilogue_args),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L862** `            split_k_mode=datatypes.getattr_enum(SplitKMode, split_k[0]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L863** `            split_k_slices=split_k[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L864** `            stream=stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L865** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L866** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L867** `        self.operation.run(arguments)` — **EN:** Invokes `self.operation.run` as a standalone call. **CN:** 以独立语句方式调用 `self.operation.run`。
+- **L868** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L869** `        if split_k[0] == "parallel" and split_k[1] > 1:` — **EN:** Starts a conditional branch guarded by `split_k[0] == 'parallel' and split_k[1] > 1`. **CN:** 开始一个由 `split_k[0] == 'parallel' and split_k[1] > 1` 控制的条件分支。
+- **L870** `            implicit_gemm_size = arguments.problem_size.implicit_gemm_size(self.conv_kind)` — **EN:** Assigns a value to implicit_gemm_size. **CN:** 将一个值赋给 implicit_gemm_size。
+- **L871** `            reduction_arguments = ReductionArguments(` — **EN:** Assigns a value to reduction_arguments. **CN:** 将一个值赋给 reduction_arguments。
+- **L872** `                self.reduction_operation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L873** `                problem_size=[implicit_gemm_size.m, implicit_gemm_size.n],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L874** `                partitions=split_k[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L875** `                workspace=arguments.ptr_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L876** `                destination=D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L877** `                source=C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L878** `                output_op=self.reduction_operation.epilogue_type(*epilogue_args),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L879** `                stream=stream` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L880** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L881** `            self.reduction_operation.run(reduction_arguments)` — **EN:** Invokes `self.reduction_operation.run` as a standalone call. **CN:** 以独立语句方式调用 `self.reduction_operation.run`。
+- **L882** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L883** `        if sync:` — **EN:** Starts a conditional branch guarded by `sync`. **CN:** 开始一个由 `sync` 控制的条件分支。
+- **L884** `            if split_k[0] == "parallel" and split_k[1] > 1:` — **EN:** Starts a conditional branch guarded by `split_k[0] == 'parallel' and split_k[1] > 1`. **CN:** 开始一个由 `split_k[0] == 'parallel' and split_k[1] > 1` 控制的条件分支。
+- **L885** `                reduction_arguments.sync()` — **EN:** Invokes `reduction_arguments.sync` as a standalone call. **CN:** 以独立语句方式调用 `reduction_arguments.sync`。
+- **L886** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L887** `                # Free memory allocated by args because we are not` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L888** `                # calling \`arguments.sync()\` in this case (which will free memory)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L889** `                arguments.free()` — **EN:** Invokes `arguments.free` as a standalone call. **CN:** 以独立语句方式调用 `arguments.free`。
+- **L890** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L891** `                arguments.sync()` — **EN:** Invokes `arguments.sync` as a standalone call. **CN:** 以独立语句方式调用 `arguments.sync`。
+- **L892** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L893** `        return arguments` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L894** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L895** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L896** `    # Helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L897** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L898** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L899** `    def output_size(input_size, weight_size, padding, stride, dilation):` — **EN:** Defines function `output_size`. **CN:** 定义函数 `output_size`。
+- **L900** `        problem_size = Conv2DProblemSize(` — **EN:** Assigns a value to problem_size. **CN:** 将一个值赋给 problem_size。
+- **L901** `            *input_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L902** `            *weight_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L903** `            padding[0], padding[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L904** `            stride[0], stride[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L905** `            dilation[0], dilation[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L906** `            ConvMode.CrossCorrelation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L907** `            1, 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L908** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L909** `        return (problem_size.N, problem_size.P, problem_size.Q, problem_size.K)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L910** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L911** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L912** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L913** `# Easy to use interfaces for fprop, wgrad, and dgrad` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L914** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L915** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L916** `class Conv2dFprop(Conv2d):` — **EN:** Defines class `Conv2dFprop` with bases Conv2d. **CN:** 定义类 `Conv2dFprop`，其基类为 Conv2d。
+- **L917** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L918** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L919** `        input=None, weight=None, C=None, output=None, alpha=1, beta=0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L920** `        element=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L921** `        element_input=None, element_weight=None, element_C=None, element_output=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L922** `        element_accumulator=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L923** `        cc: int = None, kernel_cc: int = None):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L924** `        A, B, D = input, weight, output` — **EN:** Assigns a value to (A, B, D). **CN:** 将一个值赋给 (A, B, D)。
+- **L925** `        element_A, element_B, element_D = element_input, element_weight, element_output` — **EN:** Assigns a value to (element_A, element_B, element_D). **CN:** 将一个值赋给 (element_A, element_B, element_D)。
+- **L926** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L927** `            "fprop", A, B, C, D, alpha, beta, element,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L928** `            element_A, element_B, element_C, element_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L929** `            element_accumulator, cc, kernel_cc)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L930** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L931** `    def run(` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L932** `        self, input=None, weight=None, C=None, output=None, alpha=None, beta=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L933** `        stride=(1, 1), padding=(0, 0), dilation=(1, 1), split_k=("serial", 1),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L934** `        sync: bool = True, print_module: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L935** `        stream: Optional[cuda.CUstream] = None) -> Conv2dArguments:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L936** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L937** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L938** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L939** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L940** `        A, B, D = input, weight, output` — **EN:** Assigns a value to (A, B, D). **CN:** 将一个值赋给 (A, B, D)。
+- **L941** `        return super().run(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L942** `            A, B, C, D, alpha, beta, stride, padding, dilation, split_k, sync, print_module, stream)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L943** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L944** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L945** `class Conv2dDgrad(Conv2d):` — **EN:** Defines class `Conv2dDgrad` with bases Conv2d. **CN:** 定义类 `Conv2dDgrad`，其基类为 Conv2d。
+- **L946** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L947** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L948** `        grad_output=None, weight=None, C=None, grad_input=None, alpha=1, beta=0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L949** `        element=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L950** `        element_grad_output=None, element_weight=None, element_C=None, element_grad_input=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L951** `        element_accumulator=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L952** `        cc: int = None, kernel_cc: int = None):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L953** `        A, B, D = grad_output, weight, grad_input` — **EN:** Assigns a value to (A, B, D). **CN:** 将一个值赋给 (A, B, D)。
+- **L954** `        element_A, element_B, element_D = element_grad_output, element_weight, element_grad_input` — **EN:** Assigns a value to (element_A, element_B, element_D). **CN:** 将一个值赋给 (element_A, element_B, element_D)。
+- **L955** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L956** `            "dgrad", A, B, C, D, alpha, beta, element,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L957** `            element_A, element_B, element_C, element_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L958** `            element_accumulator, cc, kernel_cc)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L959** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L960** `    def run(self, grad_output=None, weight=None, C=None, grad_input=None, alpha=None, beta=None,` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L961** `        stride=(1, 1), padding=(0, 0), dilation=(1, 1), split_k=("serial", 1),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L962** `        sync: bool = True, print_module: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L963** `        stream: Optional[cuda.CUstream] = None) -> Conv2dArguments:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L964** `        #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L965** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L966** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L967** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L968** `        A, B, D = grad_output, weight, grad_input` — **EN:** Assigns a value to (A, B, D). **CN:** 将一个值赋给 (A, B, D)。
+- **L969** `        return super().run(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L970** `            A, B, C, D, alpha, beta, stride, padding, dilation, split_k, sync, print_module, stream)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L971** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L972** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L973** `class Conv2dWgrad(Conv2d):` — **EN:** Defines class `Conv2dWgrad` with bases Conv2d. **CN:** 定义类 `Conv2dWgrad`，其基类为 Conv2d。
+- **L974** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L975** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L976** `        grad_output=None, input=None, C=None, grad_weight=None, alpha=1, beta=0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L977** `        element=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L978** `        element_grad_output=None, element_input=None, element_C=None, element_grad_weight=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L979** `        element_accumulator=None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L980** `        cc: int = None, kernel_cc: int = None):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L981** `        A, B, D = grad_output, input, grad_weight` — **EN:** Assigns a value to (A, B, D). **CN:** 将一个值赋给 (A, B, D)。
+- **L982** `        element_A, element_B, element_D = element_grad_output, element_input, element_grad_weight` — **EN:** Assigns a value to (element_A, element_B, element_D). **CN:** 将一个值赋给 (element_A, element_B, element_D)。
+- **L983** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L984** `            "wgrad", A, B, C, D, alpha, beta, element,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L985** `            element_A, element_B, element_C, element_D,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L986** `            element_accumulator, cc, kernel_cc)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L987** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L988** `    def run(self, grad_output=None, input=None, C=None, grad_weight=None, alpha=None, beta=None,` — **EN:** Defines function `run`. **CN:** 定义函数 `run`。
+- **L989** `        stride=(1, 1), padding=(0, 0), dilation=(1, 1), split_k=("serial", 1),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L990** `        sync: bool = True, print_module: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L991** `        stream: Optional[cuda.CUstream] = None) -> Conv2dArguments:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L992** `        if not stream:` — **EN:** Starts a conditional branch guarded by `not stream`. **CN:** 开始一个由 `not stream` 控制的条件分支。
+- **L993** `            stream = cuda.CUstream(0)` — **EN:** Assigns a value to stream. **CN:** 将一个值赋给 stream。
+- **L994** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L995** `        A, B, D = grad_output, input, grad_weight` — **EN:** Assigns a value to (A, B, D). **CN:** 将一个值赋给 (A, B, D)。
+- **L996** `        return super().run(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L997** `            A, B, C, D, alpha, beta, stride, padding, dilation, split_k, sync, print_module, stream)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.op.conv`. CN: 模块名为 `cutlass_cppgen.op.conv`。
+- EN: Module docstring summary: Ease-of-use interface for constructing, compiling, and running CONVs The ``Conv2d`` interface is meant to allow one to easily instantiate, compile, and run CONV2D operations in ... CN: 模块文档摘要为：Ease-of-use interface for constructing, compiling, and running CONVs The ``Conv2d`` interface is meant to allow one to easily instantiate, compile, and run CONV2D operations in ...
+- EN: Top-level classes: Conv2d, Conv2dFprop, Conv2dDgrad, Conv2dWgrad CN: 顶层类包括：Conv2d, Conv2dFprop, Conv2dDgrad, Conv2dWgrad
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:ConvKind,ConvMode,DataTypeSize,IteratorAlgorithm,OperationKind,SplitKMode,StrideSupport, cutlass_cppgen, cutlass_cppgen:epilogue, cutlass_cppgen.backend:compiler, cutlass_cppgen.backend.conv2d_operation:Conv2dArguments,Conv2dOperation, cutlass_cppgen.backend.reduction_operation:ReductionOperation,ReductionArguments, cutlass_cppgen.backend.library:TensorDescription,TileDescription, cutlass_cppgen.op.op:OperationBase, cutlass_cppgen.shape:Conv2DProblemSize,MatrixCoord, cutlass_cppgen.utils:check,datatypes CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:ConvKind,ConvMode,DataTypeSize,IteratorAlgorithm,OperationKind,SplitKMode,StrideSupport, cutlass_cppgen, cutlass_cppgen:epilogue, cutlass_cppgen.backend:compiler, cutlass_cppgen.backend.conv2d_operation:Conv2dArguments,Conv2dOperation, cutlass_cppgen.backend.reduction_operation:ReductionOperation,ReductionArguments, cutlass_cppgen.backend.library:TensorDescription,TileDescription, cutlass_cppgen.op.op:OperationBase, cutlass_cppgen.shape:Conv2DProblemSize,MatrixCoord, cutlass_cppgen.utils:check,datatypes
+- EN: External or standard-library dependencies: __future__:annotations, typing:Optional CN: 外部或标准库依赖：__future__:annotations, typing:Optional

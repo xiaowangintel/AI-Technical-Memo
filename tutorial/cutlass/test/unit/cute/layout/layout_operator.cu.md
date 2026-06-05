@@ -1,0 +1,484 @@
+# layout_operator.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/layout/layout_operator.cu`
+
+## Purpose / 用途
+- EN: This file contains unit tests Generic CuTe Layouts, documenting how the corresponding CuTe behavior is validated in tests.
+- CN: 该文件围绕通用 CuTe 布局的单元测试展开，说明相关 CuTe 行为如何在测试中被验证。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `/*! \file`
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 33**: `    \brief Unit tests Generic CuTe Layouts`
+  - EN: Provides a short Doxygen summary of what this test file covers.
+  - CN: 给出该测试文件覆盖内容的 Doxygen 简短摘要。
+- **Line 34**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 35**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 36**: `#include "../../common/cutlass_unit_test.h"`
+  - EN: Provides the shared CUTLASS unit-test harness used by this source file.
+  - CN: 提供该源文件使用的共享 CUTLASS 单元测试框架。
+- **Line 37**: `#include "cutlass/cutlass.h"`
+  - EN: Provides core CUTLASS types, architecture tags, and utility traits.
+  - CN: 提供 CUTLASS 的核心类型、架构标签与工具 traits。
+- **Line 38**: `#include "cutlass/layout/layout.h"`
+  - EN: Provides CUTLASS layout classes used for interoperability comparisons.
+  - CN: 提供用于互操作对比的 CUTLASS 布局类。
+- **Line 39**: `#include "cutlass/matrix_coord.h"`
+  - EN: Provides matrix-coordinate helpers used by layout-oriented tests.
+  - CN: 提供布局类测试使用的矩阵坐标辅助工具。
+- **Line 40**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 41**: `// Cute includes`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 42**: `#include <cute/layout.hpp>`
+  - EN: Provides CuTe layout algebra types and helpers.
+  - CN: 提供 CuTe 布局代数类型与辅助函数。
+- **Line 43**: `#include <cute/int_tuple.hpp>`
+  - EN: Provides CuTe integer-tuple utilities used for static and dynamic shapes.
+  - CN: 提供用于静态和动态形状的 CuTe 整数元组工具。
+- **Line 44**: `#include <cute/swizzle.hpp>`
+  - EN: Provides CuTe swizzle mappings used to model shared-memory permutations.
+  - CN: 提供用于建模共享内存置换的 CuTe swizzle 映射。
+- **Line 45**: `#include <cute/layout_composed.hpp>`
+  - EN: Provides layout-composition helpers for building compound index mappings.
+  - CN: 提供用于构建复合索引映射的布局组合辅助函数。
+- **Line 46**: `#include <cute/swizzle_layout.hpp>`
+  - EN: Provides layout wrappers that combine base layouts with swizzle transforms.
+  - CN: 提供把基础布局与 swizzle 变换组合起来的布局包装器。
+- **Line 47**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 48**: `using namespace cutlass;`
+  - EN: Brings namespace `cutlass` into the local scope to shorten later code.
+  - CN: 把命名空间 `cutlass` 引入当前作用域，以简化后续代码。
+- **Line 49**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 50**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 51**: `namespace test {`
+  - EN: Opens namespace `test` to organize related helpers or tests.
+  - CN: 打开命名空间 `test`，用于组织相关辅助代码或测试。
+- **Line 52**: `namespace layout {`
+  - EN: Opens namespace `layout` to organize related helpers or tests.
+  - CN: 打开命名空间 `layout`，用于组织相关辅助代码或测试。
+- **Line 53**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 54**: `template <typename GenericLayout, typename Layout> `
+  - EN: Begins a template declaration so the following helper can be specialized by types or layouts.
+  - CN: 开始一个模板声明，使后续辅助代码可按类型或布局参数特化。
+- **Line 55**: `  struct Testbed {`
+  - EN: Declares `struct Testbed`, which packages related state or helper behavior.
+  - CN: 声明 `struct Testbed`，用于封装相关状态或辅助行为。
+- **Line 56**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 57**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 58**: `    Testbed() {}`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 59**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 60**: `    bool run() {`
+  - EN: Declares a helper function or method used by the surrounding test flow.
+  - CN: 声明一个供周边测试流程使用的辅助函数或方法。
+- **Line 61**: `      GenericLayout generic_layout;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 62**: `      Layout layout = Layout::packed({size<0>(generic_layout), size<1>(generic_layout)});`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 63**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 64**: `      for (int m = 0; m < size<0>(generic_layout); m++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 65**: `        for (int n = 0; n < size<1>(generic_layout); n++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 66**: `          if (generic_layout(m, n) != layout({m, n})) return false;`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 67**: `        }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 68**: `      }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 69**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: `      return true;`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 71**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 72**: `  };`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 73**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 74**: `}`
+  - EN: Closes the scope for `struct Testbed`.
+  - CN: 结束 `struct Testbed` 的作用域。
+- **Line 75**: `}`
+  - EN: Closes the scope for `namespace layout`.
+  - CN: 结束 `namespace layout` 的作用域。
+- **Line 76**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 77**: `//////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 78**: `//                      Test Generic CuTe Layouts`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 79**: `//////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 80**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 81**: `/// Canonical Layouts`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 82**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 83**: `TEST(GenericLayout, ColumnMajor) {`
+  - EN: Declares GoogleTest case `GenericLayout::ColumnMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `GenericLayout::ColumnMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 84**: `  using GenericLayout = cute::Layout<Shape<_8, _4>, Stride<_1, _8>>;`
+  - EN: Creates type alias `GenericLayout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `GenericLayout`。
+- **Line 85**: `  using Layout = cutlass::layout::ColumnMajor;`
+  - EN: Creates alias `Layout` to simplify a verbose type or expression.
+  - CN: 创建别名 `Layout`，以简化较长的类型或表达式。
+- **Line 86**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 87**: `  test::layout::Testbed<GenericLayout, Layout> testbed;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 88**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 89**: `  EXPECT_TRUE(testbed.run());`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 90**: `}`
+  - EN: Closes the scope for `test GenericLayout::ColumnMajor`.
+  - CN: 结束 `test GenericLayout::ColumnMajor` 的作用域。
+- **Line 91**: `//////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 92**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 93**: `TEST(GenericLayout, RowMajor) {`
+  - EN: Declares GoogleTest case `GenericLayout::RowMajor` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `GenericLayout::RowMajor`，用于验证一个具体的 CuTe 场景。
+- **Line 94**: `  using GenericLayout = cute::Layout<Shape<_8, _4>, Stride<_4, _1>>;`
+  - EN: Creates type alias `GenericLayout` for a CuTe layout-related type used repeatedly below.
+  - CN: 为下方会重复使用的 CuTe 布局相关类型创建别名 `GenericLayout`。
+- **Line 95**: `  using Layout = cutlass::layout::RowMajor;`
+  - EN: Creates alias `Layout` to simplify a verbose type or expression.
+  - CN: 创建别名 `Layout`，以简化较长的类型或表达式。
+- **Line 96**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 97**: `  test::layout::Testbed<GenericLayout, Layout> testbed;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 98**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 99**: `  EXPECT_TRUE(testbed.run());`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 100**: `}`
+  - EN: Closes the scope for `test GenericLayout::RowMajor`.
+  - CN: 结束 `test GenericLayout::RowMajor` 的作用域。
+- **Line 101**: `//////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 102**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 103**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 104**: `/// Swizzle Shared Memory layouts`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 105**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 106**: `TEST(GenericLayout, RowMajorTensorOpMultiplicandCrosswise) {`
+  - EN: Declares GoogleTest case `GenericLayout::RowMajorTensorOpMultiplicandCrosswise` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `GenericLayout::RowMajorTensorOpMultiplicandCrosswise`，用于验证一个具体的 CuTe 场景。
+- **Line 107**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 108**: `  using GenericLayout = decltype(`
+  - EN: Creates alias `GenericLayout` to simplify a verbose type or expression.
+  - CN: 创建别名 `GenericLayout`，以简化较长的类型或表达式。
+- **Line 109**: `        composition(`
+  - EN: Composes two mappings so the output of one becomes the input of another.
+  - CN: 把两个映射组合起来，使一个的输出成为另一个的输入。
+- **Line 110**: `          Swizzle<3,3,3>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 111**: `          Layout<Shape<_128, _64>, Stride<_64, _1>>{})`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 112**: `  );`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 113**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 114**: `  using Layout = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise<`
+  - EN: Creates alias `Layout` to simplify a verbose type or expression.
+  - CN: 创建别名 `Layout`，以简化较长的类型或表达式。
+- **Line 115**: `      cutlass::sizeof_bits<cutlass::half_t>::value, 64>;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 116**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 117**: `  test::layout::Testbed<GenericLayout, Layout> testbed;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 118**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 119**: `  EXPECT_TRUE(testbed.run());`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 120**: `}`
+  - EN: Closes the scope for `test GenericLayout::RowMajorTensorOpMultiplicandCrosswise`.
+  - CN: 结束 `test GenericLayout::RowMajorTensorOpMultiplicandCrosswise` 的作用域。
+- **Line 121**: `//////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+- **Line 122**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: `TEST(GenericLayout, ColumnMajorTensorOpMultiplicandCongruous) {`
+  - EN: Declares GoogleTest case `GenericLayout::ColumnMajorTensorOpMultiplicandCongruous` to validate one concrete CuTe scenario.
+  - CN: 声明 GoogleTest 用例 `GenericLayout::ColumnMajorTensorOpMultiplicandCongruous`，用于验证一个具体的 CuTe 场景。
+- **Line 124**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 125**: `  using GenericLayout = decltype(`
+  - EN: Creates alias `GenericLayout` to simplify a verbose type or expression.
+  - CN: 创建别名 `GenericLayout`，以简化较长的类型或表达式。
+- **Line 126**: `        composition(`
+  - EN: Composes two mappings so the output of one becomes the input of another.
+  - CN: 把两个映射组合起来，使一个的输出成为另一个的输入。
+- **Line 127**: `          Swizzle<3,3,4>{},`
+  - EN: Instantiates a swizzle transform to permute addresses or indices.
+  - CN: 实例化一个 swizzle 变换，用于置换地址或索引。
+- **Line 128**: `          Layout<Shape<_128, _64>>{})`
+  - EN: Refers to a CuTe layout type that maps coordinates to storage locations.
+  - CN: 引用一个将坐标映射到存储位置的 CuTe 布局类型。
+- **Line 129**: `  );`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 130**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 131**: `  using Layout = cutlass::layout::ColumnMajorTensorOpMultiplicandCongruous<`
+  - EN: Creates alias `Layout` to simplify a verbose type or expression.
+  - CN: 创建别名 `Layout`，以简化较长的类型或表达式。
+- **Line 132**: `    cutlass::sizeof_bits<cutlass::half_t>::value, 64>;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 133**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 134**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 135**: `  test::layout::Testbed<GenericLayout, Layout> testbed;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 136**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 137**: `  EXPECT_TRUE(testbed.run());`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 138**: `}`
+  - EN: Closes the scope for `test GenericLayout::ColumnMajorTensorOpMultiplicandCongruous`.
+  - CN: 结束 `test GenericLayout::ColumnMajorTensorOpMultiplicandCongruous` 的作用域。
+- **Line 139**: `//////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test sections.
+  - CN: 在主要测试片段之间加入可视分隔线。
+
+## Key Concepts / 关键概念
+- `TEST(`
+  - EN: Defines a GoogleTest case that exercises one concrete CuTe scenario.
+  - CN: 定义一个 GoogleTest 用例，用于覆盖一个具体的 CuTe 场景。
+- `EXPECT_`
+  - EN: Uses a runtime expectation to compare observed and expected results.
+  - CN: 使用运行期期望断言来比较实际结果与预期结果。
+- `Layout<`
+  - EN: Represents a CuTe layout that maps logical coordinates to linear storage.
+  - CN: 表示一个 CuTe 布局，用于把逻辑坐标映射到线性存储。
+- `Shape<`
+  - EN: Represents compile-time tensor extents or tile shapes.
+  - CN: 表示编译期张量尺寸或 tile 形状。
+- `Stride<`
+  - EN: Represents the stride pattern paired with a shape in a CuTe layout.
+  - CN: 表示与形状配对使用的步长模式。
+- `Tensor`
+  - EN: Uses the CuTe tensor abstraction to bind memory pointers with layouts.
+  - CN: 使用 CuTe Tensor 抽象把内存指针与布局绑定起来。
+- `composition(`
+  - EN: Composes multiple layout transforms into one mapping.
+  - CN: 把多个布局变换组合成一个映射。
+- `Swizzle<`
+  - EN: Models swizzled address mappings that match hardware-friendly shared-memory layouts.
+  - CN: 建模 swizzle 地址映射，以匹配硬件友好的共享内存布局。
+- `layout-algebra`
+  - EN: The file focuses on layout construction, transformation, and coordinate mapping.
+  - CN: 该文件关注布局构造、变换与坐标映射。
+
+## Dependencies / 依赖关系
+- `../../common/cutlass_unit_test.h`
+  - EN: Provides the shared CUTLASS unit-test harness used by this source file.
+  - CN: 提供该源文件使用的共享 CUTLASS 单元测试框架。
+- `cutlass/cutlass.h`
+  - EN: Provides core CUTLASS types, architecture tags, and utility traits.
+  - CN: 提供 CUTLASS 的核心类型、架构标签与工具 traits。
+- `cutlass/layout/layout.h`
+  - EN: Provides CUTLASS layout classes used for interoperability comparisons.
+  - CN: 提供用于互操作对比的 CUTLASS 布局类。
+- `cutlass/matrix_coord.h`
+  - EN: Provides matrix-coordinate helpers used by layout-oriented tests.
+  - CN: 提供布局类测试使用的矩阵坐标辅助工具。
+- `cute/layout.hpp`
+  - EN: Provides CuTe layout algebra types and helpers.
+  - CN: 提供 CuTe 布局代数类型与辅助函数。
+- `cute/int_tuple.hpp`
+  - EN: Provides CuTe integer-tuple utilities used for static and dynamic shapes.
+  - CN: 提供用于静态和动态形状的 CuTe 整数元组工具。
+- `cute/swizzle.hpp`
+  - EN: Provides CuTe swizzle mappings used to model shared-memory permutations.
+  - CN: 提供用于建模共享内存置换的 CuTe swizzle 映射。
+- `cute/layout_composed.hpp`
+  - EN: Provides layout-composition helpers for building compound index mappings.
+  - CN: 提供用于构建复合索引映射的布局组合辅助函数。
+- `cute/swizzle_layout.hpp`
+  - EN: Provides layout wrappers that combine base layouts with swizzle transforms.
+  - CN: 提供把基础布局与 swizzle 变换组合起来的布局包装器。

@@ -1,0 +1,1617 @@
+# gemm.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/reference/host/gemm.h`
+**Purpose / 用途**: Provides a host-side reference implementation or helper for GEMM. / 为 GEMM 提供主机端参考实现或辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L32** <code>    \brief Reference implementation for GEMM in host-side code.</code>
+  - EN: Comment that documents intent or context: "\brief Reference implementation for GEMM in host-side code.".
+  - CN: 用于说明意图或上下文的注释："\brief Reference implementation for GEMM in host-side code."。
+- **L33** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L34** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes `cutlass/coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L38** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L39** <code>#include &quot;cutlass/functional.h&quot;</code>
+  - EN: Includes `cutlass/functional.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/functional.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/numeric_conversion.h&quot;</code>
+  - EN: Includes `cutlass/numeric_conversion.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_conversion.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/gemm/gemm.h&quot;</code>
+  - EN: Includes `cutlass/gemm/gemm.h` so this file can use CUTLASS GEMM abstractions and kernels.
+  - CN: 引入 `cutlass/gemm/gemm.h`，使当前文件可以使用CUTLASS GEMM 抽象与内核。
+- **L44** <code>#include &quot;cutlass/arch/mma.h&quot;</code>
+  - EN: Includes `cutlass/arch/mma.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/arch/mma.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L45** <code>#include &quot;cutlass/util/host_tensor.h&quot;</code>
+  - EN: Includes `cutlass/util/host_tensor.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/host_tensor.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L48** <code>namespace reference {</code>
+  - EN: Opens namespace `reference` to group related symbols.
+  - CN: 打开命名空间 `reference`，用于归组相关符号。
+- **L49** <code>namespace host {</code>
+  - EN: Opens namespace `host` to group related symbols.
+  - CN: 打开命名空间 `host`，用于归组相关符号。
+- **L50** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L51** <code>template&lt;typename Out, typename In&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L52** <code>struct CastIfScalar {</code>
+  - EN: Begins the declaration of struct `CastIfScalar`.
+  - CN: 开始声明 struct `CastIfScalar`。
+- **L53** <code>  static Out cast(In in) {</code>
+  - EN: Begins the definition of function or method `cast`.
+  - CN: 开始定义函数或方法 `cast`。
+- **L54** <code>    return Out(in);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L55** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L56** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>template&lt;typename OutScalar, typename In&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L59** <code>struct CastIfScalar&lt;cutlass::complex&lt;OutScalar&gt;, In&gt; {</code>
+  - EN: Begins the declaration of struct `CastIfScalar`.
+  - CN: 开始声明 struct `CastIfScalar`。
+- **L60** <code>  typedef cutlass::complex&lt;OutScalar&gt; Out;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L61** <code>  static Out cast(In in) {</code>
+  - EN: Begins the definition of function or method `cast`.
+  - CN: 开始定义函数或方法 `cast`。
+- **L62** <code>    return Out(static_cast&lt;OutScalar&gt;(in));</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L63** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L64** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L65** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L66** <code>template&lt;typename OutScalar, typename InScalar&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L67** <code>struct CastIfScalar&lt;cutlass::complex&lt;OutScalar&gt;, cutlass::complex&lt;InScalar&gt;&gt; {</code>
+  - EN: Begins the declaration of struct `CastIfScalar`.
+  - CN: 开始声明 struct `CastIfScalar`。
+- **L68** <code>  typedef cutlass::complex&lt;OutScalar&gt; Out;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L69** <code>  typedef cutlass::complex&lt;InScalar&gt; In;</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L70** <code>  static Out cast(In in) {</code>
+  - EN: Begins the definition of function or method `cast`.
+  - CN: 开始定义函数或方法 `cast`。
+- **L71** <code>    return Out(in);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L72** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L73** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>template&lt;typename Out, typename In&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L76** <code>Out cast_if_scalar(In in) {</code>
+  - EN: Begins the definition of function or method `cast_if_scalar`.
+  - CN: 开始定义函数或方法 `cast_if_scalar`。
+- **L77** <code>  return CastIfScalar&lt;Out, In&gt;::cast(in);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L78** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L79** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L80** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>/// Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef</code>
+  - EN: Comment that documents intent or context: "Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef".
+  - CN: 用于说明意图或上下文的注释："Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef"。
+- **L83** <code>/// objects.</code>
+  - EN: Comment that documents intent or context: "objects.".
+  - CN: 用于说明意图或上下文的注释："objects."。
+- **L84** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L85** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L86** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L87** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L88** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L89** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L90** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L91** <code>  typename ScalarType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L92** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L93** <code>  typename InnerProductOp = multiply_add&lt;ComputeType&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L94** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ScalarType&gt;</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L95** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L96** <code>void compute_gemm(</code>
+  - EN: Begins or continues the signature/call syntax involving `compute_gemm`.
+  - CN: 开始或继续与 `compute_gemm` 相关的签名/调用语法。
+- **L97** <code>  gemm::GemmCoord problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L98** <code>  ScalarType alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L99** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L100** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_b,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L101** <code>  ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L102** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L103** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L104** <code>  ComputeType initial_accum) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L105** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L106** <code>  static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L107** <code>    LayoutA::kRank == 2 &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L108** <code>    LayoutB::kRank == 2 &amp;&amp;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L109** <code>    LayoutC::kRank == 2, &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L112** <code>  // Note: batch is ignored.</code>
+  - EN: Comment that documents intent or context: "Note: batch is ignored.".
+  - CN: 用于说明意图或上下文的注释："Note: batch is ignored."。
+- **L113** <code>  int const M = problem_size.m();</code>
+  - EN: Declares function or method `m` without defining it here.
+  - CN: 声明函数或方法 `m`，但不在此处给出定义。
+- **L114** <code>  int const N = problem_size.n();</code>
+  - EN: Declares function or method `n` without defining it here.
+  - CN: 声明函数或方法 `n`，但不在此处给出定义。
+- **L115** <code>  int const K = problem_size.k();</code>
+  - EN: Declares function or method `k` without defining it here.
+  - CN: 声明函数或方法 `k`，但不在此处给出定义。
+- **L116** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L117** <code>  // Blocking necessary to speedup reference implementation</code>
+  - EN: Comment that documents intent or context: "Blocking necessary to speedup reference implementation".
+  - CN: 用于说明意图或上下文的注释："Blocking necessary to speedup reference implementation"。
+- **L118** <code>  int const Mblock = 16;</code>
+  - EN: Assigns or initializes `Mblock` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `Mblock` 进行赋值或初始化。
+- **L119** <code>  int const Nblock = 16;</code>
+  - EN: Assigns or initializes `Nblock` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `Nblock` 进行赋值或初始化。
+- **L120** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L121** <code>  ConvertOp convert_op;</code>
+  - EN: Declares the symbol `convert_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `convert_op`。
+- **L122** <code>  InnerProductOp inner_product_op;</code>
+  - EN: Declares the symbol `inner_product_op` in the current scope.
+  - CN: 在当前作用域中声明符号 `inner_product_op`。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>  for (int row_block = 0; row_block &lt; M; row_block += Mblock) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L125** <code>    for (int col_block = 0; col_block &lt; N; col_block += Nblock) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L126** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L127** <code>      ComputeType accum[Mblock][Nblock];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>      for (int j = 0; j &lt; Nblock; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L130** <code>        for (int i = 0; i &lt; Mblock; i++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L131** <code>          accum[i][j] = initial_accum;</code>
+  - EN: Declares the symbol `initial_accum` in the current scope.
+  - CN: 在当前作用域中声明符号 `initial_accum`。
+- **L132** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L133** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>      for (int k_block = 0; k_block &lt; K; ++k_block) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L136** <code>        for (int j = 0; j &lt; Nblock; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L137** <code>          for (int i = 0; i &lt; Mblock; i++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L138** <code>            int row = row_block + i;</code>
+  - EN: Assigns or initializes `row` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `row` 进行赋值或初始化。
+- **L139** <code>            int col = col_block + j;</code>
+  - EN: Assigns or initializes `col` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `col` 进行赋值或初始化。
+- **L140** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L141** <code>            if (row &lt; M &amp;&amp; col &lt; N) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L142** <code>              ElementA a = tensor_a.at(MatrixCoord(row, k_block));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L143** <code>              ElementB b = tensor_b.at(MatrixCoord(k_block, col));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L144** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L145** <code>              ComputeType compute_a(cast_if_scalar&lt;ComputeType&gt;(a));</code>
+  - EN: Declares function or method `cast_if_scalar<ComputeType>` without defining it here.
+  - CN: 声明函数或方法 `cast_if_scalar<ComputeType>`，但不在此处给出定义。
+- **L146** <code>              ComputeType compute_b(cast_if_scalar&lt;ComputeType&gt;(b));</code>
+  - EN: Declares function or method `cast_if_scalar<ComputeType>` without defining it here.
+  - CN: 声明函数或方法 `cast_if_scalar<ComputeType>`，但不在此处给出定义。
+- **L147** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L148** <code>              accum[i][j] = inner_product_op(compute_a, compute_b, accum[i][j]);</code>
+  - EN: Declares function or method `inner_product_op` without defining it here.
+  - CN: 声明函数或方法 `inner_product_op`，但不在此处给出定义。
+- **L149** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L150** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L152** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L153** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L154** <code>      for (int j = 0; j &lt; Nblock; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L155** <code>        for (int i = 0; i &lt; Mblock; i++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L156** <code>          int row = row_block + i;</code>
+  - EN: Assigns or initializes `row` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `row` 进行赋值或初始化。
+- **L157** <code>          int col = col_block + j;</code>
+  - EN: Assigns or initializes `col` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `col` 进行赋值或初始化。
+- **L158** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L159** <code>          MatrixCoord coord = MatrixCoord(row, col);</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L160** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L161** <code>          if (row &lt; M &amp;&amp; col &lt; N) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L162** <code>            tensor_d.at(coord) = convert_op(</code>
+  - EN: Begins or continues the signature/call syntax involving `convert_op`.
+  - CN: 开始或继续与 `convert_op` 相关的签名/调用语法。
+- **L163** <code>              alpha * ScalarType(accum[i][j]) +</code>
+  - EN: Begins or continues the signature/call syntax involving `ScalarType`.
+  - CN: 开始或继续与 `ScalarType` 相关的签名/调用语法。
+- **L164** <code>              beta * ScalarType(tensor_c.at(coord)));</code>
+  - EN: Declares function or method `at` without defining it here.
+  - CN: 声明函数或方法 `at`，但不在此处给出定义。
+- **L165** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L166** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L167** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L168** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L169** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L170** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L172** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L173** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L174** <code>/// Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef</code>
+  - EN: Comment that documents intent or context: "Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef".
+  - CN: 用于说明意图或上下文的注释："Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef"。
+- **L175** <code>/// objects.</code>
+  - EN: Comment that documents intent or context: "objects.".
+  - CN: 用于说明意图或上下文的注释："objects."。
+- **L176** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L177** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L178** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L179** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L180** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L181** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L182** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L183** <code>  typename ScalarType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L184** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L185** <code>  typename InnerProductOp = multiply_add&lt;ComputeType&gt;,</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L186** <code>  typename ConvertOp = NumericConverter&lt;ElementC, ScalarType&gt;</code>
+  - EN: Assigns or initializes `ConvertOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ConvertOp` 进行赋值或初始化。
+- **L187** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L188** <code>void compute_gemm(</code>
+  - EN: Begins or continues the signature/call syntax involving `compute_gemm`.
+  - CN: 开始或继续与 `compute_gemm` 相关的签名/调用语法。
+- **L189** <code>  gemm::GemmCoord problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L190** <code>  ScalarType alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L191** <code>  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L192** <code>  TensorRef&lt;ElementB, LayoutB&gt; tensor_b,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L193** <code>  ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L194** <code>  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L195** <code>  ComputeType initial_accum) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L196** <code>  compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L197** <code>               ScalarType, ComputeType, InnerProductOp, ConvertOp&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `ConvertOp>`.
+  - CN: 开始或继续与 `ConvertOp>` 相关的签名/调用语法。
+- **L198** <code>      problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L199** <code>      initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L200** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L203** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L204** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L205** <code>  typename ElementA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L206** <code>  typename LayoutA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L207** <code>  typename ElementB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L208** <code>  typename LayoutB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L209** <code>  typename ElementC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L210** <code>  typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L211** <code>  typename ScalarType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L212** <code>  typename ComputeType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L213** <code>  typename InnerProductOp = cutlass::arch::OpMultiplyAdd</code>
+  - EN: Assigns or initializes `InnerProductOp` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `InnerProductOp` 进行赋值或初始化。
+- **L214** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L215** <code>struct Gemm;</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L216** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L217** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L218** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L219** <code>/// Partial specialization for multiply-add</code>
+  - EN: Comment that documents intent or context: "Partial specialization for multiply-add".
+  - CN: 用于说明意图或上下文的注释："Partial specialization for multiply-add"。
+- **L220** <code>template &lt;typename ElementA, typename LayoutA, typename ElementB,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L221** <code>          typename LayoutB, typename ElementC, typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L222** <code>          typename ScalarType, typename ComputeType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L223** <code>struct Gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, ScalarType,</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L224** <code>            ComputeType, arch::OpMultiplyAdd&gt; {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L225** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L226** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L227** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L228** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L229** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L230** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L231** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L232** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L233** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L234** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L235** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L236** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add<ComputeType>>`.
+  - CN: 开始或继续与 `multiply_add<ComputeType>>` 相关的签名/调用语法。
+- **L237** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L238** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L239** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L240** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L241** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L242** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L243** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L244** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L245** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L246** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L247** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L248** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L249** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L250** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L251** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add<ComputeType>>`.
+  - CN: 开始或继续与 `multiply_add<ComputeType>>` 相关的签名/调用语法。
+- **L252** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_d, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L253** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L254** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L255** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L256** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L257** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L258** <code>/// Partial specialization for multiply-add</code>
+  - EN: Comment that documents intent or context: "Partial specialization for multiply-add".
+  - CN: 用于说明意图或上下文的注释："Partial specialization for multiply-add"。
+- **L259** <code>template &lt;typename ElementA, typename LayoutA, typename ElementB,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L260** <code>          typename LayoutB, typename ElementC, typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L261** <code>          typename ScalarType, typename ComputeType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L262** <code>struct Gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, ScalarType,</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L263** <code>            ComputeType, arch::OpMultiplyAddFastBF16&gt; {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L264** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L265** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L266** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L267** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L268** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L269** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L270** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L271** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L272** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L273** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L274** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L275** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add<ComputeType>>`.
+  - CN: 开始或继续与 `multiply_add<ComputeType>>` 相关的签名/调用语法。
+- **L276** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L277** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L278** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L279** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L280** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L281** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L282** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L283** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L284** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L285** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L286** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L287** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L288** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L289** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L290** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add<ComputeType>>`.
+  - CN: 开始或继续与 `multiply_add<ComputeType>>` 相关的签名/调用语法。
+- **L291** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_d, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L292** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L293** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L294** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L295** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L296** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L297** <code>/// Partial specialization for multiply-add-saturate</code>
+  - EN: Comment that documents intent or context: "Partial specialization for multiply-add-saturate".
+  - CN: 用于说明意图或上下文的注释："Partial specialization for multiply-add-saturate"。
+- **L298** <code>template &lt;typename ElementA, typename LayoutA, typename ElementB,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L299** <code>          typename LayoutB, typename ElementC, typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L300** <code>          typename ScalarType, typename ComputeType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L301** <code>struct Gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, ScalarType,</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L302** <code>            ComputeType, arch::OpMultiplyAddSaturate&gt; {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L303** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L304** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L305** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L306** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L307** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L308** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L309** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L310** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L311** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L312** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L313** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L314** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L315** <code>                 NumericConverterClamp&lt;ElementC, ScalarType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `ScalarType>>`.
+  - CN: 开始或继续与 `ScalarType>>` 相关的签名/调用语法。
+- **L316** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L317** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L318** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L319** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L320** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L321** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L322** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L323** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L324** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L325** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L326** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L327** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L328** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L329** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L330** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L331** <code>                 NumericConverterClamp&lt;ElementC, ScalarType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `ScalarType>>`.
+  - CN: 开始或继续与 `ScalarType>>` 相关的签名/调用语法。
+- **L332** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_d, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L333** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L334** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L335** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L336** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L337** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L338** <code>/// Partial specialization for XOR-popc</code>
+  - EN: Comment that documents intent or context: "Partial specialization for XOR-popc".
+  - CN: 用于说明意图或上下文的注释："Partial specialization for XOR-popc"。
+- **L339** <code>template &lt;typename ElementA, typename LayoutA, typename ElementB,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L340** <code>          typename LayoutB, typename ElementC, typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L341** <code>          typename ScalarType, typename ComputeType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L342** <code>struct Gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, ScalarType,</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L343** <code>            ComputeType, arch::OpXorPopc&gt; {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L344** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L345** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L346** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L347** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L348** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L349** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L350** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L351** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L352** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L353** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L354** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L355** <code>                 ScalarType, ComputeType, xor_popc_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `xor_popc_add<ComputeType>>`.
+  - CN: 开始或继续与 `xor_popc_add<ComputeType>>` 相关的签名/调用语法。
+- **L356** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L357** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L358** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L359** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L360** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L361** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L362** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L363** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L364** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L365** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L366** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L367** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L368** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L369** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L370** <code>                 ScalarType, ComputeType, xor_popc_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `xor_popc_add<ComputeType>>`.
+  - CN: 开始或继续与 `xor_popc_add<ComputeType>>` 相关的签名/调用语法。
+- **L371** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_d, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L372** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L373** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L374** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L375** <code>/// Partial specialization for AND-popc</code>
+  - EN: Comment that documents intent or context: "Partial specialization for AND-popc".
+  - CN: 用于说明意图或上下文的注释："Partial specialization for AND-popc"。
+- **L376** <code>template &lt;typename ElementA, typename LayoutA, typename ElementB,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L377** <code>          typename LayoutB, typename ElementC, typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L378** <code>          typename ScalarType, typename ComputeType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L379** <code>struct Gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, ScalarType,</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L380** <code>            ComputeType, arch::OpAndPopc&gt; {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L381** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L382** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L383** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L384** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L385** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L386** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L387** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L388** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L389** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L390** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L391** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L392** <code>                 ScalarType, ComputeType, and_popc_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `and_popc_add<ComputeType>>`.
+  - CN: 开始或继续与 `and_popc_add<ComputeType>>` 相关的签名/调用语法。
+- **L393** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L394** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L395** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L396** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L397** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L398** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L399** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L400** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L401** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L402** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L403** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L404** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L405** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L406** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L407** <code>                 ScalarType, ComputeType, and_popc_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `and_popc_add<ComputeType>>`.
+  - CN: 开始或继续与 `and_popc_add<ComputeType>>` 相关的签名/调用语法。
+- **L408** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_d, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L409** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L410** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L411** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L412** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L413** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L414** <code>/// Partial specialization for multiply-add</code>
+  - EN: Comment that documents intent or context: "Partial specialization for multiply-add".
+  - CN: 用于说明意图或上下文的注释："Partial specialization for multiply-add"。
+- **L415** <code>template &lt;typename ElementA, typename LayoutA, typename ElementB,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L416** <code>          typename LayoutB, typename ElementC, typename LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L417** <code>          typename ScalarType, typename ComputeType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L418** <code>struct Gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC, ScalarType,</code>
+  - EN: Begins the declaration of struct `Gemm`.
+  - CN: 开始声明 struct `Gemm`。
+- **L419** <code>            ComputeType, arch::OpMultiplyAddFastF32&gt; {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L420** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L421** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L422** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L423** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L424** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L425** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L426** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L427** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L428** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L429** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L430** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L431** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add<ComputeType>>`.
+  - CN: 开始或继续与 `multiply_add<ComputeType>>` 相关的签名/调用语法。
+- **L432** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L433** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L434** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L435** <code>  void operator()(gemm::GemmCoord problem_size, ScalarType alpha,</code>
+  - EN: Begins or continues the signature/call syntax involving `operator`.
+  - CN: 开始或继续与 `operator` 相关的签名/调用语法。
+- **L436** <code>                  TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L437** <code>                  TensorRef&lt;ElementB, LayoutB&gt; tensor_b, ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L438** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L439** <code>                  TensorRef&lt;ElementC, LayoutC&gt; tensor_d,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L440** <code>                  ComputeType initial_accum = ComputeType(0)) {</code>
+  - EN: Begins the definition of function or method `ComputeType`.
+  - CN: 开始定义函数或方法 `ComputeType`。
+- **L441** <code>    static_assert(</code>
+  - EN: Begins or continues the signature/call syntax involving `static_assert`.
+  - CN: 开始或继续与 `static_assert` 相关的签名/调用语法。
+- **L442** <code>        LayoutA::kRank == 2 &amp;&amp; LayoutB::kRank == 2 &amp;&amp; LayoutC::kRank == 2,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L443** <code>        &quot;Tensors must be of rank 2&quot;);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L444** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L445** <code>    compute_gemm&lt;ElementA, LayoutA, ElementB, LayoutB, ElementC, LayoutC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L446** <code>                 ScalarType, ComputeType, multiply_add&lt;ComputeType&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `multiply_add<ComputeType>>`.
+  - CN: 开始或继续与 `multiply_add<ComputeType>>` 相关的签名/调用语法。
+- **L447** <code>        problem_size, alpha, tensor_a, tensor_b, beta, tensor_c, tensor_d, initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L448** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L449** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L450** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L451** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L452** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L453** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L454** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L455** <code>// Batched GEMM</code>
+  - EN: Comment that documents intent or context: "Batched GEMM".
+  - CN: 用于说明意图或上下文的注释："Batched GEMM"。
+- **L456** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L457** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L458** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L459** <code>/// Computes a batch of GEMMs over a set of matrices of common dimension.</code>
+  - EN: Comment that documents intent or context: "Computes a batch of GEMMs over a set of matrices of common dimension.".
+  - CN: 用于说明意图或上下文的注释："Computes a batch of GEMMs over a set of matrices of common dimension."。
+- **L460** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L461** <code>// TensorRefCollection* is a type satisfying the TensorRefCollection concept.</code>
+  - EN: Comment that documents intent or context: "TensorRefCollection* is a type satisfying the TensorRefCollection concept.".
+  - CN: 用于说明意图或上下文的注释："TensorRefCollection* is a type satisfying the TensorRefCollection concept."。
+- **L462** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L463** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L464** <code>  typename TensorRefCollectionA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L465** <code>  typename TensorRefCollectionB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L466** <code>  typename TensorRefCollectionC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L467** <code>  typename ScalarType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L468** <code>  typename AccumulatorType</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L469** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L470** <code>void BatchedGemm(</code>
+  - EN: Begins or continues the signature/call syntax involving `BatchedGemm`.
+  - CN: 开始或继续与 `BatchedGemm` 相关的签名/调用语法。
+- **L471** <code>  gemm::GemmCoord problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L472** <code>  int batch_count,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L473** <code>  ScalarType alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L474** <code>  TensorRefCollectionA const&amp; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L475** <code>  TensorRefCollectionB const&amp; tensor_b,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L476** <code>  ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L477** <code>  TensorRefCollectionC &amp;tensor_c,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L478** <code>  AccumulatorType initial_accum) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L479** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L480** <code>  typename TensorRefCollectionA::ConstIterator tensor_a_it = tensor_a.begin();</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L481** <code>  typename TensorRefCollectionB::ConstIterator tensor_b_it = tensor_b.begin();</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L482** <code>  typename TensorRefCollectionC::ConstIterator tensor_c_it = tensor_c.begin();</code>
+  - EN: Declares function or method `begin` without defining it here.
+  - CN: 声明函数或方法 `begin`，但不在此处给出定义。
+- **L483** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L484** <code>  for (int batch = 0;</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L485** <code>    batch &lt; batch_count;</code>
+  - EN: Declares the symbol `batch_count` in the current scope.
+  - CN: 在当前作用域中声明符号 `batch_count`。
+- **L486** <code>    ++batch, ++tensor_a_it, ++tensor_b_it, ++tensor_c_it) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L487** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L488** <code>    Gemm&lt;typename TensorRefCollectionA::Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L489** <code>         typename TensorRefCollectionA::Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L490** <code>         typename TensorRefCollectionB::Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L491** <code>         typename TensorRefCollectionB::Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L492** <code>         typename TensorRefCollectionC::Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L493** <code>         typename TensorRefCollectionC::Layout,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L494** <code>         typename TensorRefCollectionC::Element,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L495** <code>         typename TensorRefCollectionC::Element&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L496** <code>        gemm;</code>
+  - EN: Declares the symbol `gemm` in the current scope.
+  - CN: 在当前作用域中声明符号 `gemm`。
+- **L497** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L498** <code>    gemm(problem_size, alpha, *tensor_a_it, *tensor_b_it, beta, *tensor_c_it,</code>
+  - EN: Begins or continues the signature/call syntax involving `gemm`.
+  - CN: 开始或继续与 `gemm` 相关的签名/调用语法。
+- **L499** <code>         initial_accum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L500** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L501** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L502** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L503** <code>/// Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef</code>
+  - EN: Comment that documents intent or context: "Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef".
+  - CN: 用于说明意图或上下文的注释："Computes a general matrix product among matrices (tensors of rank=2) pointed to by TensorRef"。
+- **L504** <code>/// objects.</code>
+  - EN: Comment that documents intent or context: "objects.".
+  - CN: 用于说明意图或上下文的注释："objects."。
+- **L505** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L506** <code>// TensorRefCollection* is a type satisfying the TensorRefCollection concept.</code>
+  - EN: Comment that documents intent or context: "TensorRefCollection* is a type satisfying the TensorRefCollection concept.".
+  - CN: 用于说明意图或上下文的注释："TensorRefCollection* is a type satisfying the TensorRefCollection concept."。
+- **L507** <code>//</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L508** <code>template &lt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L509** <code>  typename TensorRefCollectionA,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L510** <code>  typename TensorRefCollectionB,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L511** <code>  typename TensorRefCollectionC,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L512** <code>  typename ScalarType,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L513** <code>  typename AccumulatorType</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L514** <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L515** <code>void BatchedGemm(</code>
+  - EN: Begins or continues the signature/call syntax involving `BatchedGemm`.
+  - CN: 开始或继续与 `BatchedGemm` 相关的签名/调用语法。
+- **L516** <code>  gemm::GemmCoord problem_size,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L517** <code>  int batch_count,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L518** <code>  ScalarType alpha,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L519** <code>  TensorRefCollectionA const&amp; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L520** <code>  TensorRefCollectionB const&amp; tensor_b,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L521** <code>  ScalarType beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L522** <code>  TensorRefCollectionC &amp;tensor_c) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L523** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L524** <code>  BatchedGemm(problem_size, batch_count, alpha, tensor_a, tensor_b, beta, tensor_c, ScalarType(0));</code>
+  - EN: Declares function or method `ScalarType` without defining it here.
+  - CN: 声明函数或方法 `ScalarType`，但不在此处给出定义。
+- **L525** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L526** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L527** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L528** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L529** <code>} // namespace host</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L530** <code>} // namespace reference</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L531** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Reference implementations for validation / 用于正确性校验的参考实现
+- Linear algebra kernels and metadata / 线性代数内核与元数据
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/functional.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_conversion.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_view.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/gemm/gemm.h</code> — CUTLASS GEMM abstractions and kernels / CUTLASS GEMM 抽象与内核
+- <code>cutlass/arch/mma.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/host_tensor.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块

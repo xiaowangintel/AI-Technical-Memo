@@ -1,0 +1,239 @@
+# tmem.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/arch/tmem.py`
+
+## Purpose / 作用
+- EN: Defines 6 functions (get_max_tmem_alloc_cols, get_min_tmem_alloc_cols, retrieve_tmem_ptr, alloc_tmem, ... (+2 more)) in `CuTeDSL.cutlass.cute.arch.tmem`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.arch.tmem` 定义了 6 个函数（get_max_tmem_alloc_cols, get_min_tmem_alloc_cols, retrieve_tmem_ptr, alloc_tmem, ... (+2 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional, Type` — **EN:** Imports Optional, Type from `typing`. **CN:** 从 `typing` 导入 Optional, Type。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L15** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L18** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L19** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `from ..typing import Pointer, Int, Int32, Numeric, NumericMeta` — **EN:** Imports Pointer, Int, Int32, Numeric, NumericMeta from `..typing`. **CN:** 从 `..typing` 导入 Pointer, Int, Int32, Numeric, NumericMeta。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `SM100_TMEM_CAPACITY_COLUMNS = (` — **EN:** Assigns a value to SM100_TMEM_CAPACITY_COLUMNS. **CN:** 将一个值赋给 SM100_TMEM_CAPACITY_COLUMNS。
+- **L24** `    512  # deprecated; use get_max_tmem_alloc_cols(arch="sm_100") instead` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `SM100_TMEM_MIN_ALLOC_COLUMNS = (` — **EN:** Assigns a value to SM100_TMEM_MIN_ALLOC_COLUMNS. **CN:** 将一个值赋给 SM100_TMEM_MIN_ALLOC_COLUMNS。
+- **L27** `    32  # deprecated; use get_min_tmem_alloc_cols(arch="sm_100") instead` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `TMEM_MAX_ALLOC_COLUMNS_MAP = {` — **EN:** Assigns a value to TMEM_MAX_ALLOC_COLUMNS_MAP. **CN:** 将一个值赋给 TMEM_MAX_ALLOC_COLUMNS_MAP。
+- **L31** `    "sm_120": 512,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    "sm_103": 512,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    "sm_100": 512,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `TMEM_MIN_ALLOC_COLUMNS_MAP = {` — **EN:** Assigns a value to TMEM_MIN_ALLOC_COLUMNS_MAP. **CN:** 将一个值赋给 TMEM_MIN_ALLOC_COLUMNS_MAP。
+- **L37** `    "sm_120": 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    "sm_103": 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    "sm_100": 32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `def get_max_tmem_alloc_cols(compute_capability: str) -> int:` — **EN:** Defines function `get_max_tmem_alloc_cols`. **CN:** 定义函数 `get_max_tmem_alloc_cols`。
+- **L44** `    """Get the tensor memory capacity in columns for a given compute capability.` — **EN:** Starts the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 开始说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `    Returns the maximum TMEM capacity in columns available for the specified` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L47** `    GPU compute capability.` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `    :param compute_capability: The compute capability string (e.g. "sm_100", "sm_103")` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L50** `    :type compute_capability: str` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L51** `    :return: The TMEM capacity in columns` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L52** `    :rtype: int` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L53** `    :raises ValueError: If the compute capability is not supported` — **EN:** Continues the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 继续说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L54** `    """` — **EN:** Ends the docstring for the function `get_max_tmem_alloc_cols`. **CN:** 结束说明 function `get_max_tmem_alloc_cols` 的文档字符串。
+- **L55** `    if compute_capability not in TMEM_MAX_ALLOC_COLUMNS_MAP:` — **EN:** Starts a conditional branch guarded by `compute_capability not in TMEM_MAX_ALLOC_COLUMNS_MAP`. **CN:** 开始一个由 `compute_capability not in TMEM_MAX_ALLOC_COLUMNS_MAP` 控制的条件分支。
+- **L56** `        raise ValueError(f"Unsupported compute capability: {compute_capability}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L57** `    return TMEM_MAX_ALLOC_COLUMNS_MAP[compute_capability]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `def get_min_tmem_alloc_cols(compute_capability: str) -> int:` — **EN:** Defines function `get_min_tmem_alloc_cols`. **CN:** 定义函数 `get_min_tmem_alloc_cols`。
+- **L61** `    """Get the minimum TMEM allocation columns for a given compute capability.` — **EN:** Starts the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 开始说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    Returns the minimum TMEM allocation columns available for the specified` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L64** `    GPU compute capability.` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    :param compute_capability: The compute capability string (e.g. "sm_100", "sm_103")` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L67** `    :type compute_capability: str` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L68** `    :return: The minimum TMEM allocation columns` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L69** `    :rtype: int` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L70** `    :raises ValueError: If the compute capability is not supported` — **EN:** Continues the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 继续说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L71** `    """` — **EN:** Ends the docstring for the function `get_min_tmem_alloc_cols`. **CN:** 结束说明 function `get_min_tmem_alloc_cols` 的文档字符串。
+- **L72** `    if compute_capability not in TMEM_MIN_ALLOC_COLUMNS_MAP:` — **EN:** Starts a conditional branch guarded by `compute_capability not in TMEM_MIN_ALLOC_COLUMNS_MAP`. **CN:** 开始一个由 `compute_capability not in TMEM_MIN_ALLOC_COLUMNS_MAP` 控制的条件分支。
+- **L73** `        raise ValueError(f"Unsupported compute capability: {compute_capability}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** `    return TMEM_MIN_ALLOC_COLUMNS_MAP[compute_capability]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L79** `def retrieve_tmem_ptr(` — **EN:** Defines function `retrieve_tmem_ptr`. **CN:** 定义函数 `retrieve_tmem_ptr`。
+- **L80** `    element_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L81** `    alignment: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L82** `    ptr_to_buffer_holding_addr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L83** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L84** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `) -> Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L87** `    """` — **EN:** Starts the docstring for the function `retrieve_tmem_ptr`. **CN:** 开始说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L88** `    Retrieves a pointer to TMEM with the provided element type and alignment.` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    :param element_type:               The pointee type of the pointer.` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L91** `    :type element_type:                Type[Numeric]` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L92** `    :param alignment:                  The alignment of the result pointer` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L93** `    :type alignment:                   int` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L94** `    :param ptr_to_buffer_holding_addr: A pointer to a SMEM buffer holding the TMEM address of the` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L95** `                                       start of the allocation allocation` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L96** `    :type ptr_to_buffer_holding_addr:  Pointer` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L97** `    :return:                           A pointer to TMEM` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L98** `    :rtype:                            Pointer` — **EN:** Continues the docstring for the function `retrieve_tmem_ptr`. **CN:** 继续说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L99** `    """` — **EN:** Ends the docstring for the function `retrieve_tmem_ptr`. **CN:** 结束说明 function `retrieve_tmem_ptr` 的文档字符串。
+- **L100** `    if not isinstance(element_type, NumericMeta):` — **EN:** Starts a conditional branch guarded by `not isinstance(element_type, NumericMeta)`. **CN:** 开始一个由 `not isinstance(element_type, NumericMeta)` 控制的条件分支。
+- **L101** `        raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L102** `            f"element_type must be a type of Numeric, but got {element_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    res_ty = _cute_ir.PtrType.get(` — **EN:** Assigns a value to res_ty. **CN:** 将一个值赋给 res_ty。
+- **L106** `        element_type.mlir_type, _cute_ir.AddressSpace.tmem, alignment` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `    return _cute_nvgpu_ir.arch_sm100_retrieve_tmem_ptr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** `        res_ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `        ptr_to_buffer_holding_addr.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L117** `def alloc_tmem(` — **EN:** Defines function `alloc_tmem`. **CN:** 定义函数 `alloc_tmem`。
+- **L118** `    num_columns: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `    smem_ptr_to_write_address: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `    is_two_cta: Optional[bool] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `    arch: str = "sm_100",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L126** `    """` — **EN:** Starts the docstring for the function `alloc_tmem`. **CN:** 开始说明 function `alloc_tmem` 的文档字符串。
+- **L127** `    Allocates TMEM.` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `    :param num_columns: The number of TMEM columns to allocate` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L130** `    :type num_columns:  Int` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L131** `    :param smem_ptr_to_write_address: A pointer to a SMEM buffer where the TMEM address is written` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L132** `                                      to` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L133** `    :type smem_ptr_to_write_address:  Pointer` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L134** `    :param is_two_cta:                Optional boolean parameter for 2-CTA MMAs` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L135** `    :param arch:                      The architecture of the GPU.` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L136** `    :type arch:                       str` — **EN:** Continues the docstring for the function `alloc_tmem`. **CN:** 继续说明 function `alloc_tmem` 的文档字符串。
+- **L137** `    """` — **EN:** Ends the docstring for the function `alloc_tmem`. **CN:** 结束说明 function `alloc_tmem` 的文档字符串。
+- **L138** `    tmem_max_alloc_cols = get_max_tmem_alloc_cols(arch)` — **EN:** Assigns a value to tmem_max_alloc_cols. **CN:** 将一个值赋给 tmem_max_alloc_cols。
+- **L139** `    tmem_min_alloc_cols = get_min_tmem_alloc_cols(arch)` — **EN:** Assigns a value to tmem_min_alloc_cols. **CN:** 将一个值赋给 tmem_min_alloc_cols。
+- **L140** `    if isinstance(num_columns, int):` — **EN:** Starts a conditional branch guarded by `isinstance(num_columns, int)`. **CN:** 开始一个由 `isinstance(num_columns, int)` 控制的条件分支。
+- **L141** `        if (` — **EN:** Starts a conditional branch guarded by `num_columns < tmem_min_alloc_cols or num_columns > tmem_m...`. **CN:** 开始一个由 `num_columns < tmem_min_alloc_cols or num_columns > tmem_m...` 控制的条件分支。
+- **L142** `            num_columns < tmem_min_alloc_cols` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L143** `            or num_columns > tmem_max_alloc_cols` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L144** `            or not (` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L145** `                (num_columns & (num_columns - 1) == 0)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `            )` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L147** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L148** `            err_msg = f"num_columns must be between {tmem_min_alloc_cols} and {tmem_max_alloc_cols}, "` — **EN:** Assigns a value to err_msg. **CN:** 将一个值赋给 err_msg。
+- **L149** `            err_msg += "and must be pow of 2"` — **EN:** Updates err_msg in place. **CN:** 原地更新 err_msg。
+- **L150** `            err_msg += f", but got {num_columns}."` — **EN:** Updates err_msg in place. **CN:** 原地更新 err_msg。
+- **L151** `            raise ValueError(err_msg)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `    _cute_nvgpu_ir.arch_sm100_alloc_tmem(` — **EN:** Invokes `_cute_nvgpu_ir.arch_sm100_alloc_tmem` as a standalone call. **CN:** 以独立语句方式调用 `_cute_nvgpu_ir.arch_sm100_alloc_tmem`。
+- **L154** `        Int32(num_columns).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `        smem_ptr_to_write_address.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        is_two_cta=is_two_cta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L163** `def relinquish_tmem_alloc_permit(` — **EN:** Defines function `relinquish_tmem_alloc_permit`. **CN:** 定义函数 `relinquish_tmem_alloc_permit`。
+- **L164** `    is_two_cta: Optional[bool] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L165** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L166** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L167** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L168** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L169** `    """` — **EN:** Starts the docstring for the function `relinquish_tmem_alloc_permit`. **CN:** 开始说明 function `relinquish_tmem_alloc_permit` 的文档字符串。
+- **L170** `    Relinquishes the right to allocate TMEM so that other CTAs potentially in a different grid can` — **EN:** Continues the docstring for the function `relinquish_tmem_alloc_permit`. **CN:** 继续说明 function `relinquish_tmem_alloc_permit` 的文档字符串。
+- **L171** `    allocate.` — **EN:** Continues the docstring for the function `relinquish_tmem_alloc_permit`. **CN:** 继续说明 function `relinquish_tmem_alloc_permit` 的文档字符串。
+- **L172** `    """` — **EN:** Ends the docstring for the function `relinquish_tmem_alloc_permit`. **CN:** 结束说明 function `relinquish_tmem_alloc_permit` 的文档字符串。
+- **L173** `    _cute_nvgpu_ir.arch_sm100_relinquish_tmem_alloc_permit(` — **EN:** Invokes `_cute_nvgpu_ir.arch_sm100_relinquish_tmem_alloc_permit` as a standalone call. **CN:** 以独立语句方式调用 `_cute_nvgpu_ir.arch_sm100_relinquish_tmem_alloc_permit`。
+- **L174** `        is_two_cta=is_two_cta, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L179** `def dealloc_tmem(` — **EN:** Defines function `dealloc_tmem`. **CN:** 定义函数 `dealloc_tmem`。
+- **L180** `    tmem_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L181** `    num_columns: Int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L182** `    is_two_cta: Optional[bool] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L183** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L184** `    arch: str = "sm_100",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L186** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L187** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L188** `    """` — **EN:** Starts the docstring for the function `dealloc_tmem`. **CN:** 开始说明 function `dealloc_tmem` 的文档字符串。
+- **L189** `    Deallocates TMEM using the provided pointer and number of columns.` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `    :param tmem_ptr:    A pointer to the TMEM allocation to de-allocate` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L192** `    :type tmem_ptr:     Pointer` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L193** `    :param num_columns: The number of columns in the TMEM allocation` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L194** `    :type num_columns:  Int` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L195** `    :param is_two_cta:  Optional boolean parameter for 2-CTA MMAs` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L196** `    :param arch:        The architecture of the GPU.` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L197** `    :type arch:         str` — **EN:** Continues the docstring for the function `dealloc_tmem`. **CN:** 继续说明 function `dealloc_tmem` 的文档字符串。
+- **L198** `    """` — **EN:** Ends the docstring for the function `dealloc_tmem`. **CN:** 结束说明 function `dealloc_tmem` 的文档字符串。
+- **L199** `    tmem_min_alloc_cols = get_min_tmem_alloc_cols(arch)` — **EN:** Assigns a value to tmem_min_alloc_cols. **CN:** 将一个值赋给 tmem_min_alloc_cols。
+- **L200** `    tmem_max_alloc_cols = get_max_tmem_alloc_cols(arch)` — **EN:** Assigns a value to tmem_max_alloc_cols. **CN:** 将一个值赋给 tmem_max_alloc_cols。
+- **L201** `    if isinstance(num_columns, int):` — **EN:** Starts a conditional branch guarded by `isinstance(num_columns, int)`. **CN:** 开始一个由 `isinstance(num_columns, int)` 控制的条件分支。
+- **L202** `        if (` — **EN:** Starts a conditional branch guarded by `num_columns < tmem_min_alloc_cols or num_columns > tmem_m...`. **CN:** 开始一个由 `num_columns < tmem_min_alloc_cols or num_columns > tmem_m...` 控制的条件分支。
+- **L203** `            num_columns < tmem_min_alloc_cols` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L204** `            or num_columns > tmem_max_alloc_cols` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L205** `            or not (` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L206** `                (num_columns & (num_columns - 1) == 0)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L207** `            )` — **EN:** Closes the preceding multi-line construct. **CN:** 结束前面的多行结构。
+- **L208** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L209** `            err_msg = f"num_columns must be between {tmem_min_alloc_cols} and {tmem_max_alloc_cols}, "` — **EN:** Assigns a value to err_msg. **CN:** 将一个值赋给 err_msg。
+- **L210** `            err_msg += "and must be pow of 2"` — **EN:** Updates err_msg in place. **CN:** 原地更新 err_msg。
+- **L211** `            err_msg += f", but got {num_columns}."` — **EN:** Updates err_msg in place. **CN:** 原地更新 err_msg。
+- **L212** `            raise ValueError(err_msg)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `    _cute_nvgpu_ir.arch_sm100_dealloc_tmem(` — **EN:** Invokes `_cute_nvgpu_ir.arch_sm100_dealloc_tmem` as a standalone call. **CN:** 以独立语句方式调用 `_cute_nvgpu_ir.arch_sm100_dealloc_tmem`。
+- **L215** `        tmem_ptr.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `        Int32(num_columns).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `        is_two_cta=is_two_cta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.arch.tmem`. CN: 模块名为 `CuTeDSL.cutlass.cute.arch.tmem`。
+- EN: Top-level functions: get_max_tmem_alloc_cols, get_min_tmem_alloc_cols, retrieve_tmem_ptr, alloc_tmem, relinquish_tmem_alloc_permit, dealloc_tmem CN: 顶层函数包括：get_max_tmem_alloc_cols, get_min_tmem_alloc_cols, retrieve_tmem_ptr, alloc_tmem, relinquish_tmem_alloc_permit, dealloc_tmem
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:dsl_user_op, cutlass.base_dsl.arch:Arch, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, ..typing:Pointer,Int,Int32,Numeric,NumericMeta CN: 内部依赖：cutlass.cutlass_dsl:dsl_user_op, cutlass.base_dsl.arch:Arch, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, ..typing:Pointer,Int,Int32,Numeric,NumericMeta
+- EN: External or standard-library dependencies: typing:Optional,Type CN: 外部或标准库依赖：typing:Optional,Type

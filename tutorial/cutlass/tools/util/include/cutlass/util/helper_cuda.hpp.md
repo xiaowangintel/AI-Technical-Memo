@@ -1,0 +1,365 @@
+# helper_cuda.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/helper_cuda.hpp`
+**Purpose / 用途**: Provides reusable CUDA error-checking and helper routines. / 提供可复用的 CUDA 错误检查与辅助例程。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>#include &lt;cuda.h&gt;</code>
+  - EN: Includes `cuda.h` so this file can use project-specific declarations from `cuda.h`.
+  - CN: 引入 `cuda.h`，使当前文件可以使用来自 `cuda.h` 的项目专用声明。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#include &lt;cute/util/debug.hpp&gt;</code>
+  - EN: Includes `cute/util/debug.hpp` so this file can use project-specific declarations from `debug.hpp`.
+  - CN: 引入 `cute/util/debug.hpp`，使当前文件可以使用来自 `debug.hpp` 的项目专用声明。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>namespace cute</code>
+  - EN: Opens namespace `cute` to group related symbols.
+  - CN: 打开命名空间 `cute`，用于归组相关符号。
+- **L39** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L40** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L41** <code>void</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L42** <code>device_init(int device_id, bool quiet = false)</code>
+  - EN: Begins or continues the signature/call syntax involving `device_init`.
+  - CN: 开始或继续与 `device_init` 相关的签名/调用语法。
+- **L43** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L44** <code>  cudaDeviceProp device_prop;</code>
+  - EN: Declares the symbol `device_prop` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_prop`。
+- **L45** <code>  std::size_t    device_free_physmem;</code>
+  - EN: Declares the symbol `device_free_physmem` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_free_physmem`。
+- **L46** <code>  std::size_t    device_total_physmem;</code>
+  - EN: Declares the symbol `device_total_physmem` in the current scope.
+  - CN: 在当前作用域中声明符号 `device_total_physmem`。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>  CUTE_CHECK_ERROR(cudaSetDevice(device_id));</code>
+  - EN: Declares function or method `cudaSetDevice` without defining it here.
+  - CN: 声明函数或方法 `cudaSetDevice`，但不在此处给出定义。
+- **L49** <code>  CUTE_CHECK_ERROR(cudaMemGetInfo(&amp;device_free_physmem, &amp;device_total_physmem));</code>
+  - EN: Declares function or method `cudaMemGetInfo` without defining it here.
+  - CN: 声明函数或方法 `cudaMemGetInfo`，但不在此处给出定义。
+- **L50** <code>  CUTE_CHECK_ERROR(cudaGetDeviceProperties(&amp;device_prop, device_id));</code>
+  - EN: Declares function or method `cudaGetDeviceProperties` without defining it here.
+  - CN: 声明函数或方法 `cudaGetDeviceProperties`，但不在此处给出定义。
+- **L51** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L52** <code>  if (device_prop.major &lt; 1) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L53** <code>    fprintf(stderr, &quot;Device does not support CUDA.\n&quot;);</code>
+  - EN: Declares function or method `fprintf` without defining it here.
+  - CN: 声明函数或方法 `fprintf`，但不在此处给出定义。
+- **L54** <code>    exit(1);</code>
+  - EN: Declares function or method `exit` without defining it here.
+  - CN: 声明函数或方法 `exit`，但不在此处给出定义。
+- **L55** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>  //float device_giga_bandwidth = float(device_prop.memoryBusWidth) * device_prop.memoryClockRate * 2 / 8 / 1000 / 1000;</code>
+  - EN: Comment that documents intent or context: "float device_giga_bandwidth = float(device_prop.memoryBusWidth) * device_prop.memoryClockRate * 2 / 8 / 1000 / 1000;".
+  - CN: 用于说明意图或上下文的注释："float device_giga_bandwidth = float(device_prop.memoryBusWidth) * device_prop.memoryClockRate * 2 / 8 / 1000 / 1000;"。
+- **L58** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L59** <code>  if (!quiet) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L60** <code>    printf(&quot;Using device %d: %s  (SM%d, %d SMs)\n&quot;,</code>
+  - EN: Begins or continues the signature/call syntax involving `s`.
+  - CN: 开始或继续与 `s` 相关的签名/调用语法。
+- **L61** <code>           device_id, device_prop.name,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L62** <code>           device_prop.major * 10 + device_prop.minor,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L63** <code>           device_prop.multiProcessorCount);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L64** <code>    fflush(stdout);</code>
+  - EN: Declares function or method `fflush` without defining it here.
+  - CN: 声明函数或方法 `fflush`，但不在此处给出定义。
+- **L65** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L66** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L69** <code> * Convert the SM version (e.g. v7.0, v7.5) to the physical number of cores.</code>
+  - EN: Comment that documents intent or context: "Convert the SM version (e.g. v7.0, v7.5) to the physical number of cores.".
+  - CN: 用于说明意图或上下文的注释："Convert the SM version (e.g. v7.0, v7.5) to the physical number of cores."。
+- **L70** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L71** <code>inline int</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L72** <code>_ConvertSMVer2Cores(int major, int minor)</code>
+  - EN: Begins or continues the signature/call syntax involving `_ConvertSMVer2Cores`.
+  - CN: 开始或继续与 `_ConvertSMVer2Cores` 相关的签名/调用语法。
+- **L73** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L74** <code>  // Defines for GPU Architecture types (using the SM version to determine</code>
+  - EN: Comment that documents intent or context: "Defines for GPU Architecture types (using the SM version to determine".
+  - CN: 用于说明意图或上下文的注释："Defines for GPU Architecture types (using the SM version to determine"。
+- **L75** <code>  // the # of cores per SM</code>
+  - EN: Comment that documents intent or context: "the # of cores per SM".
+  - CN: 用于说明意图或上下文的注释："the # of cores per SM"。
+- **L76** <code>  typedef struct {</code>
+  - EN: Creates a legacy-style type alias for later use.
+  - CN: 创建一个传统写法的类型别名供后续使用。
+- **L77** <code>    int SM;  // 0xMm (hexadecimal notation), M = SM Major version,</code>
+  - EN: Begins or continues the signature/call syntax involving `xMm`.
+  - CN: 开始或继续与 `xMm` 相关的签名/调用语法。
+- **L78** <code>    // and m = SM minor version</code>
+  - EN: Comment that documents intent or context: "and m = SM minor version".
+  - CN: 用于说明意图或上下文的注释："and m = SM minor version"。
+- **L79** <code>    int Cores;</code>
+  - EN: Declares the symbol `Cores` in the current scope.
+  - CN: 在当前作用域中声明符号 `Cores`。
+- **L80** <code>  } sSMtoCores;</code>
+  - EN: Declares the symbol `sSMtoCores` in the current scope.
+  - CN: 在当前作用域中声明符号 `sSMtoCores`。
+- **L81** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L82** <code>  sSMtoCores nGpuArchCoresPerSM[] = {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L83** <code>      {0x30, 192},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L84** <code>      {0x32, 192},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L85** <code>      {0x35, 192},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L86** <code>      {0x37, 192},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L87** <code>      {0x50, 128},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L88** <code>      {0x52, 128},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L89** <code>      {0x53, 128},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L90** <code>      {0x60,  64},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L91** <code>      {0x61, 128},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L92** <code>      {0x62, 128},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L93** <code>      {0x70,  64},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L94** <code>      {0x72,  64},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L95** <code>      {0x75,  64},</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L96** <code>      {-1, -1}};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>  int index = 0;</code>
+  - EN: Assigns or initializes `index` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `index` 进行赋值或初始化。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>  while (nGpuArchCoresPerSM[index].SM != -1) {</code>
+  - EN: Starts a `while` loop that repeats while its condition remains true.
+  - CN: 开始一个 `while` 循环，只要条件成立就重复执行。
+- **L101** <code>    if (nGpuArchCoresPerSM[index].SM == ((major &lt;&lt; 4) + minor)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L102** <code>      return nGpuArchCoresPerSM[index].Cores;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L103** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L104** <code>    index++;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L105** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code>  // If we don&#x27;t find the values, we default use the previous one</code>
+  - EN: Comment that documents intent or context: "If we don't find the values, we default use the previous one".
+  - CN: 用于说明意图或上下文的注释："If we don't find the values, we default use the previous one"。
+- **L108** <code>  // to run properly</code>
+  - EN: Comment that documents intent or context: "to run properly".
+  - CN: 用于说明意图或上下文的注释："to run properly"。
+- **L109** <code>  printf(&quot;MapSMtoCores for SM %d.%d is undefined.&quot;</code>
+  - EN: Begins or continues the signature/call syntax involving `printf`.
+  - CN: 开始或继续与 `printf` 相关的签名/调用语法。
+- **L110** <code>         &quot;  Default to use %d Cores/SM\n&quot;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L111** <code>         major, minor, nGpuArchCoresPerSM[index - 1].Cores);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L112** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L113** <code>  return nGpuArchCoresPerSM[index - 1].Cores;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L114** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L115** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L116** <code>} // end namespace cute</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>cuda.h</code> — project-specific declarations from `cuda.h` / 来自 `cuda.h` 的项目专用声明
+- <code>cute/util/debug.hpp</code> — project-specific declarations from `debug.hpp` / 来自 `debug.hpp` 的项目专用声明

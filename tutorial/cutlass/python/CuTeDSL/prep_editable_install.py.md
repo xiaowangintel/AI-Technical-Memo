@@ -1,0 +1,352 @@
+# prep_editable_install.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/prep_editable_install.py`
+
+## Purpose / 作用
+- EN: CuTeDSL Development Package Setup This setup script automatically downloads the nvidia-cutlass-dsl wheel, extracts required libraries and Python packages, and sets up the develo...
+- CN: 该模块的文档字符串将其描述为：CuTeDSL Development Package Setup This setup script automatically downloads the nvidia-cutlass-dsl wheel, extracts required libraries and Python packages, and sets up the develo...
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# NVIDIA CORPORATION, its affiliates and licensors retain all intellectual` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# property and proprietary rights in and to this material, related` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# documentation and any modifications thereto. Any use, reproduction,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `# disclosure or distribution of this material and related documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `# without an express license agreement from NVIDIA CORPORATION or` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# its affiliates is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L11** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L12** `CuTeDSL Development Package Setup` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `This setup script automatically downloads the nvidia-cutlass-dsl wheel,` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L15** `extracts required libraries and Python packages, and sets up the development` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L16** `environment for CuTeDSL.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L17** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `import subprocess` — **EN:** Imports subprocess for later use. **CN:** 导入 subprocess 供后续使用。
+- **L20** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L21** `import shutil` — **EN:** Imports shutil for later use. **CN:** 导入 shutil 供后续使用。
+- **L22** `import tempfile` — **EN:** Imports tempfile for later use. **CN:** 导入 tempfile 供后续使用。
+- **L23** `import zipfile` — **EN:** Imports zipfile for later use. **CN:** 导入 zipfile 供后续使用。
+- **L24** `import re` — **EN:** Imports re for later use. **CN:** 导入 re 供后续使用。
+- **L25** `from pathlib import Path` — **EN:** Imports Path from `pathlib`. **CN:** 从 `pathlib` 导入 Path。
+- **L26** `from typing import Optional, Tuple, List` — **EN:** Imports Optional, Tuple, List from `typing`. **CN:** 从 `typing` 导入 Optional, Tuple, List。
+- **L27** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `# Configure logging` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")` — **EN:** Invokes `logging.basicConfig` as a standalone call. **CN:** 以独立语句方式调用 `logging.basicConfig`。
+- **L31** `logger = logging.getLogger(__name__)` — **EN:** Assigns a value to logger. **CN:** 将一个值赋给 logger。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `# Constants` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L34** `PACKAGE_NAME = "nvidia-cutlass-dsl"` — **EN:** Assigns a value to PACKAGE_NAME. **CN:** 将一个值赋给 PACKAGE_NAME。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `class CutlassDSLSetupError(Exception):` — **EN:** Defines class `CutlassDSLSetupError` with bases Exception. **CN:** 定义类 `CutlassDSLSetupError`，其基类为 Exception。
+- **L38** `    """Custom exception for setup errors."""` — **EN:** Docstring line documenting the class `CutlassDSLSetupError`. **CN:** 文档字符串行，用于说明 class `CutlassDSLSetupError`。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `def get_package_spec(requirements_path: Optional[Path] = None) -> str:` — **EN:** Defines function `get_package_spec`. **CN:** 定义函数 `get_package_spec`。
+- **L44** `    """` — **EN:** Starts the docstring for the function `get_package_spec`. **CN:** 开始说明 function `get_package_spec` 的文档字符串。
+- **L45** `    Return the pip requirement spec for nvidia-cutlass-dsl from requirements.txt.` — **EN:** Continues the docstring for the function `get_package_spec`. **CN:** 继续说明 function `get_package_spec` 的文档字符串。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    If anything goes wrong (file not found, parse failure, line missing),` — **EN:** Continues the docstring for the function `get_package_spec`. **CN:** 继续说明 function `get_package_spec` 的文档字符串。
+- **L48** `    return PACKAGE_NAME as a safe default.` — **EN:** Continues the docstring for the function `get_package_spec`. **CN:** 继续说明 function `get_package_spec` 的文档字符串。
+- **L49** `    """` — **EN:** Ends the docstring for the function `get_package_spec`. **CN:** 结束说明 function `get_package_spec` 的文档字符串。
+- **L50** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L51** `        req_path = requirements_path or Path(__file__).with_name("requirements.txt")` — **EN:** Assigns a value to req_path. **CN:** 将一个值赋给 req_path。
+- **L52** `        with open(req_path, "r", encoding="utf-8") as f:` — **EN:** Starts a context-managed block using open(req_path, 'r', encoding='utf-8'). **CN:** 开始一个使用 open(req_path, 'r', encoding='utf-8') 的上下文管理代码块。
+- **L53** `            for raw_line in f:` — **EN:** Starts a loop assigning items from `f` to `raw_line`. **CN:** 开始一个循环，将 `f` 的元素赋给 `raw_line`。
+- **L54** `                line = raw_line.strip()` — **EN:** Assigns a value to line. **CN:** 将一个值赋给 line。
+- **L55** `                if not line or line.startswith("#"):` — **EN:** Starts a conditional branch guarded by `not line or line.startswith('#')`. **CN:** 开始一个由 `not line or line.startswith('#')` 控制的条件分支。
+- **L56** `                    continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L57** `                if line.lower().startswith(PACKAGE_NAME):` — **EN:** Starts a conditional branch guarded by `line.lower().startswith(PACKAGE_NAME)`. **CN:** 开始一个由 `line.lower().startswith(PACKAGE_NAME)` 控制的条件分支。
+- **L58** `                    return line.split("#", 1)[0].strip()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** `    except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L60** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L61** `    return PACKAGE_NAME` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `def download_wheel(temp_dir: Path) -> Path:` — **EN:** Defines function `download_wheel`. **CN:** 定义函数 `download_wheel`。
+- **L65** `    """` — **EN:** Starts the docstring for the function `download_wheel`. **CN:** 开始说明 function `download_wheel` 的文档字符串。
+- **L66** `    Download the nvidia-cutlass-dsl wheel to a temporary directory.` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    Args:` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L69** `        temp_dir: Temporary directory path for downloading` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    Returns:` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L72** `        Path to the downloaded wheel file` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    Raises:` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L75** `        CutlassDSLSetupError: If download fails or wheel not found` — **EN:** Continues the docstring for the function `download_wheel`. **CN:** 继续说明 function `download_wheel` 的文档字符串。
+- **L76** `    """` — **EN:** Ends the docstring for the function `download_wheel`. **CN:** 结束说明 function `download_wheel` 的文档字符串。
+- **L77** `    # Resolve package spec from requirements, or fall back to PACKAGE_NAME` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L78** `    package_spec = get_package_spec()` — **EN:** Assigns a value to package_spec. **CN:** 将一个值赋给 package_spec。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `    logger.info(f"Downloading {package_spec} wheel to {temp_dir}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L83** `        subprocess.check_call(` — **EN:** Invokes `subprocess.check_call` as a standalone call. **CN:** 以独立语句方式调用 `subprocess.check_call`。
+- **L84** `            [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `                sys.executable,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `                "-m",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `                "pip",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `                "download",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `                "--no-deps",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `                package_spec,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                "--dest",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `                str(temp_dir),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `            stdout=subprocess.PIPE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `            stderr=subprocess.PIPE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    except subprocess.CalledProcessError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L98** `        error_msg = f"Failed to download {PACKAGE_NAME}: {e}"` — **EN:** Assigns a value to error_msg. **CN:** 将一个值赋给 error_msg。
+- **L99** `        if e.stdout:` — **EN:** Starts a conditional branch guarded by `e.stdout`. **CN:** 开始一个由 `e.stdout` 控制的条件分支。
+- **L100** `            error_msg += f"\nstdout: {e.stdout.decode()}"` — **EN:** Updates error_msg in place. **CN:** 原地更新 error_msg。
+- **L101** `        if e.stderr:` — **EN:** Starts a conditional branch guarded by `e.stderr`. **CN:** 开始一个由 `e.stderr` 控制的条件分支。
+- **L102** `            error_msg += f"\nstderr: {e.stderr.decode()}"` — **EN:** Updates error_msg in place. **CN:** 原地更新 error_msg。
+- **L103** `        raise CutlassDSLSetupError(error_msg)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    # Find the downloaded wheel file` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L106** `    wheel_pattern = f"*.whl"` — **EN:** Assigns a value to wheel_pattern. **CN:** 将一个值赋给 wheel_pattern。
+- **L107** `    wheel_files = list(temp_dir.glob(wheel_pattern))` — **EN:** Assigns a value to wheel_files. **CN:** 将一个值赋给 wheel_files。
+- **L108** `    if not wheel_files:` — **EN:** Starts a conditional branch guarded by `not wheel_files`. **CN:** 开始一个由 `not wheel_files` 控制的条件分支。
+- **L109** `        raise CutlassDSLSetupError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L110** `            f"No wheel file matching {wheel_pattern} found after download"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    wheel_path = wheel_files[0]` — **EN:** Assigns a value to wheel_path. **CN:** 将一个值赋给 wheel_path。
+- **L114** `    logger.info(f"Successfully downloaded: {wheel_path.name}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L115** `    return wheel_path` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `def extract_version_from_wheel(wheel_path: Path) -> str:` — **EN:** Defines function `extract_version_from_wheel`. **CN:** 定义函数 `extract_version_from_wheel`。
+- **L119** `    """` — **EN:** Starts the docstring for the function `extract_version_from_wheel`. **CN:** 开始说明 function `extract_version_from_wheel` 的文档字符串。
+- **L120** `    Extract version from wheel filename and convert to dev version.` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `    Args:` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L123** `        wheel_path: Path to the wheel file` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    Returns:` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L126** `        Version string in format '{version}.dev0' or '{base_version}.dev{n+1}' if already has dev{n}` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    Raises:` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L129** `        CutlassDSLSetupError: If version cannot be extracted from filename` — **EN:** Continues the docstring for the function `extract_version_from_wheel`. **CN:** 继续说明 function `extract_version_from_wheel` 的文档字符串。
+- **L130** `    """` — **EN:** Ends the docstring for the function `extract_version_from_wheel`. **CN:** 结束说明 function `extract_version_from_wheel` 的文档字符串。
+- **L131** `    wheel_filename = wheel_path.name` — **EN:** Assigns a value to wheel_filename. **CN:** 将一个值赋给 wheel_filename。
+- **L132** `    # Construct version regex from package name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `    # Wheel filename format: {package_name_with_underscores}-{version}-{python}-{abi}-{platform}.whl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L134** `    package_pattern = PACKAGE_NAME.replace("-", "_")` — **EN:** Assigns a value to package_pattern. **CN:** 将一个值赋给 package_pattern。
+- **L135** `    version_regex = rf"{re.escape(package_pattern)}-([^-]+)"` — **EN:** Assigns a value to version_regex. **CN:** 将一个值赋给 version_regex。
+- **L136** `    version_match = re.match(version_regex, wheel_filename)` — **EN:** Assigns a value to version_match. **CN:** 将一个值赋给 version_match。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    if version_match:` — **EN:** Starts a conditional branch guarded by `version_match`. **CN:** 开始一个由 `version_match` 控制的条件分支。
+- **L139** `        version = version_match.group(1)` — **EN:** Assigns a value to version. **CN:** 将一个值赋给 version。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `        # Check if version already has .dev<n> pattern` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L142** `        dev_pattern = r"^(.+)\.dev(\d+)"` — **EN:** Assigns a value to dev_pattern. **CN:** 将一个值赋给 dev_pattern。
+- **L143** `        dev_match = re.match(dev_pattern, version)` — **EN:** Assigns a value to dev_match. **CN:** 将一个值赋给 dev_match。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `        if dev_match:` — **EN:** Starts a conditional branch guarded by `dev_match`. **CN:** 开始一个由 `dev_match` 控制的条件分支。
+- **L146** `            base_version = dev_match.group(1)` — **EN:** Assigns a value to base_version. **CN:** 将一个值赋给 base_version。
+- **L147** `            dev_number = int(dev_match.group(2))` — **EN:** Assigns a value to dev_number. **CN:** 将一个值赋给 dev_number。
+- **L148** `            new_dev_number = dev_number + 1` — **EN:** Assigns a value to new_dev_number. **CN:** 将一个值赋给 new_dev_number。
+- **L149** `            dev_version = f"{base_version}.dev{new_dev_number}"` — **EN:** Assigns a value to dev_version. **CN:** 将一个值赋给 dev_version。
+- **L150** `            logger.info(` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L151** `                f"Detected version with dev{dev_number}: {version} -> using {dev_version}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L154** `            dev_version = f"{version}.dev0"` — **EN:** Assigns a value to dev_version. **CN:** 将一个值赋给 dev_version。
+- **L155** `            logger.info(f"Detected version: {version} -> using {dev_version}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `        return dev_version` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L158** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L159** `        return "9.9.9.dev0"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `def extract_wheel_contents(wheel_path: Path, extract_dir: Path) -> None:` — **EN:** Defines function `extract_wheel_contents`. **CN:** 定义函数 `extract_wheel_contents`。
+- **L163** `    """` — **EN:** Starts the docstring for the function `extract_wheel_contents`. **CN:** 开始说明 function `extract_wheel_contents` 的文档字符串。
+- **L164** `    Extract wheel contents to specified directory.` — **EN:** Continues the docstring for the function `extract_wheel_contents`. **CN:** 继续说明 function `extract_wheel_contents` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    Args:` — **EN:** Continues the docstring for the function `extract_wheel_contents`. **CN:** 继续说明 function `extract_wheel_contents` 的文档字符串。
+- **L167** `        wheel_path: Path to the wheel file` — **EN:** Continues the docstring for the function `extract_wheel_contents`. **CN:** 继续说明 function `extract_wheel_contents` 的文档字符串。
+- **L168** `        extract_dir: Directory to extract contents to` — **EN:** Continues the docstring for the function `extract_wheel_contents`. **CN:** 继续说明 function `extract_wheel_contents` 的文档字符串。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    Raises:` — **EN:** Continues the docstring for the function `extract_wheel_contents`. **CN:** 继续说明 function `extract_wheel_contents` 的文档字符串。
+- **L171** `        CutlassDSLSetupError: If extraction fails` — **EN:** Continues the docstring for the function `extract_wheel_contents`. **CN:** 继续说明 function `extract_wheel_contents` 的文档字符串。
+- **L172** `    """` — **EN:** Ends the docstring for the function `extract_wheel_contents`. **CN:** 结束说明 function `extract_wheel_contents` 的文档字符串。
+- **L173** `    logger.info(f"Extracting wheel contents to {extract_dir}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L176** `        with zipfile.ZipFile(wheel_path, "r") as wheel_zip:` — **EN:** Starts a context-managed block using zipfile.ZipFile(wheel_path, 'r'). **CN:** 开始一个使用 zipfile.ZipFile(wheel_path, 'r') 的上下文管理代码块。
+- **L177** `            wheel_zip.extractall(extract_dir)` — **EN:** Invokes `wheel_zip.extractall` as a standalone call. **CN:** 以独立语句方式调用 `wheel_zip.extractall`。
+- **L178** `        logger.info("Wheel extraction completed successfully")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L179** `    except zipfile.BadZipFile as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L180** `        raise CutlassDSLSetupError(f"Invalid wheel file {wheel_path}: {e}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L181** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L182** `        raise CutlassDSLSetupError(f"Failed to extract wheel: {e}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `def copy_library_files(extract_dir: Path, package_root: Path) -> int:` — **EN:** Defines function `copy_library_files`. **CN:** 定义函数 `copy_library_files`。
+- **L186** `    """` — **EN:** Starts the docstring for the function `copy_library_files`. **CN:** 开始说明 function `copy_library_files` 的文档字符串。
+- **L187** `    Copy .so library files from extracted wheel to package lib directory.` — **EN:** Continues the docstring for the function `copy_library_files`. **CN:** 继续说明 function `copy_library_files` 的文档字符串。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `    Args:` — **EN:** Continues the docstring for the function `copy_library_files`. **CN:** 继续说明 function `copy_library_files` 的文档字符串。
+- **L190** `        extract_dir: Directory containing extracted wheel contents` — **EN:** Continues the docstring for the function `copy_library_files`. **CN:** 继续说明 function `copy_library_files` 的文档字符串。
+- **L191** `        package_root: Root directory of the package` — **EN:** Continues the docstring for the function `copy_library_files`. **CN:** 继续说明 function `copy_library_files` 的文档字符串。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `    Returns:` — **EN:** Continues the docstring for the function `copy_library_files`. **CN:** 继续说明 function `copy_library_files` 的文档字符串。
+- **L194** `        Number of files copied` — **EN:** Continues the docstring for the function `copy_library_files`. **CN:** 继续说明 function `copy_library_files` 的文档字符串。
+- **L195** `    """` — **EN:** Ends the docstring for the function `copy_library_files`. **CN:** 结束说明 function `copy_library_files` 的文档字符串。
+- **L196** `    lib_pattern = extract_dir / "**" / "lib" / "*.so"` — **EN:** Assigns a value to lib_pattern. **CN:** 将一个值赋给 lib_pattern。
+- **L197** `    so_files = [f for f in extract_dir.rglob("lib/*.so")]` — **EN:** Assigns a value to so_files. **CN:** 将一个值赋给 so_files。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `    if not so_files:` — **EN:** Starts a conditional branch guarded by `not so_files`. **CN:** 开始一个由 `not so_files` 控制的条件分支。
+- **L200** `        logger.warning("No .so files found in the wheel")` — **EN:** Invokes `logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `logger.warning`。
+- **L201** `        return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `    logger.info(f"Found {len(so_files)} .so files")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `    # Create lib directory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L206** `    lib_dir = package_root / "lib"` — **EN:** Assigns a value to lib_dir. **CN:** 将一个值赋给 lib_dir。
+- **L207** `    lib_dir.mkdir(exist_ok=True)` — **EN:** Invokes `lib_dir.mkdir` as a standalone call. **CN:** 以独立语句方式调用 `lib_dir.mkdir`。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `    # Copy .so files` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L210** `    copied_count = 0` — **EN:** Assigns a value to copied_count. **CN:** 将一个值赋给 copied_count。
+- **L211** `    for so_file in so_files:` — **EN:** Starts a loop assigning items from `so_files` to `so_file`. **CN:** 开始一个循环，将 `so_files` 的元素赋给 `so_file`。
+- **L212** `        dest_path = lib_dir / so_file.name` — **EN:** Assigns a value to dest_path. **CN:** 将一个值赋给 dest_path。
+- **L213** `        logger.info(f"Copying {so_file.name} to {dest_path}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L214** `        shutil.copy2(so_file, dest_path)` — **EN:** Invokes `shutil.copy2` as a standalone call. **CN:** 以独立语句方式调用 `shutil.copy2`。
+- **L215** `        copied_count += 1` — **EN:** Updates copied_count in place. **CN:** 原地更新 copied_count。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** `    logger.info(f"Successfully copied {copied_count} .so files to lib/")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L218** `    return copied_count` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `def copy_python_packages(extract_dir: Path, package_root: Path) -> Tuple[int, int]:` — **EN:** Defines function `copy_python_packages`. **CN:** 定义函数 `copy_python_packages`。
+- **L222** `    """` — **EN:** Starts the docstring for the function `copy_python_packages`. **CN:** 开始说明 function `copy_python_packages` 的文档字符串。
+- **L223** `    Copy python_packages/cutlass/ directory to local cutlass/ directory.` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L224** `    Ignores conflicts with existing files.` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `    Args:` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L227** `        extract_dir: Directory containing extracted wheel contents` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L228** `        package_root: Root directory of the package` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `    Returns:` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L231** `        Tuple of (files_copied, files_skipped)` — **EN:** Continues the docstring for the function `copy_python_packages`. **CN:** 继续说明 function `copy_python_packages` 的文档字符串。
+- **L232** `    """` — **EN:** Ends the docstring for the function `copy_python_packages`. **CN:** 结束说明 function `copy_python_packages` 的文档字符串。
+- **L233** `    # Find source cutlass directory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L234** `    cutlass_source_dirs = list(extract_dir.rglob("python_packages/cutlass"))` — **EN:** Assigns a value to cutlass_source_dirs. **CN:** 将一个值赋给 cutlass_source_dirs。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `    if not cutlass_source_dirs:` — **EN:** Starts a conditional branch guarded by `not cutlass_source_dirs`. **CN:** 开始一个由 `not cutlass_source_dirs` 控制的条件分支。
+- **L237** `        logger.warning("No python_packages/cutlass/ directory found in the wheel")` — **EN:** Invokes `logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `logger.warning`。
+- **L238** `        return 0, 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `    cutlass_source_dir = cutlass_source_dirs[0]` — **EN:** Assigns a value to cutlass_source_dir. **CN:** 将一个值赋给 cutlass_source_dir。
+- **L241** `    cutlass_dest_dir = package_root / "cutlass"` — **EN:** Assigns a value to cutlass_dest_dir. **CN:** 将一个值赋给 cutlass_dest_dir。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `    logger.info(f"Found python_packages/cutlass/ directory")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L244** `    logger.info(f"Copying from {cutlass_source_dir} to {cutlass_dest_dir}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `    copied_count = 0` — **EN:** Assigns a value to copied_count. **CN:** 将一个值赋给 copied_count。
+- **L247** `    skipped_count = 0` — **EN:** Assigns a value to skipped_count. **CN:** 将一个值赋给 skipped_count。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    # Walk through source directory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L250** `    for src_file in cutlass_source_dir.rglob("*"):` — **EN:** Starts a loop assigning items from `cutlass_source_dir.rglob('*')` to `src_file`. **CN:** 开始一个循环，将 `cutlass_source_dir.rglob('*')` 的元素赋给 `src_file`。
+- **L251** `        if src_file.is_file():` — **EN:** Starts a conditional branch guarded by `src_file.is_file()`. **CN:** 开始一个由 `src_file.is_file()` 控制的条件分支。
+- **L252** `            # Calculate relative path and destination` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L253** `            rel_path = src_file.relative_to(cutlass_source_dir)` — **EN:** Assigns a value to rel_path. **CN:** 将一个值赋给 rel_path。
+- **L254** `            dest_file = cutlass_dest_dir / rel_path` — **EN:** Assigns a value to dest_file. **CN:** 将一个值赋给 dest_file。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `            # Create parent directories` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L257** `            dest_file.parent.mkdir(parents=True, exist_ok=True)` — **EN:** Invokes `dest_file.parent.mkdir` as a standalone call. **CN:** 以独立语句方式调用 `dest_file.parent.mkdir`。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `            # Copy file if it doesn't exist` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L260** `            if dest_file.exists():` — **EN:** Starts a conditional branch guarded by `dest_file.exists()`. **CN:** 开始一个由 `dest_file.exists()` 控制的条件分支。
+- **L261** `                skipped_count += 1` — **EN:** Updates skipped_count in place. **CN:** 原地更新 skipped_count。
+- **L262** `                logger.debug(f"  Skipping {rel_path} (already exists)")` — **EN:** Invokes `logger.debug` as a standalone call. **CN:** 以独立语句方式调用 `logger.debug`。
+- **L263** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L264** `                shutil.copy2(src_file, dest_file)` — **EN:** Invokes `shutil.copy2` as a standalone call. **CN:** 以独立语句方式调用 `shutil.copy2`。
+- **L265** `                copied_count += 1` — **EN:** Updates copied_count in place. **CN:** 原地更新 copied_count。
+- **L266** `                logger.info(f"  Copied {rel_path}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `    logger.info(` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L269** `        f"Cutlass directory update: {copied_count} files copied, {skipped_count} files skipped"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `    return copied_count, skipped_count` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `def write_version_file(version: str, package_root: Path) -> None:` — **EN:** Defines function `write_version_file`. **CN:** 定义函数 `write_version_file`。
+- **L275** `    """` — **EN:** Starts the docstring for the function `write_version_file`. **CN:** 开始说明 function `write_version_file` 的文档字符串。
+- **L276** `    Write version string to VERSION file in the package root directory.` — **EN:** Continues the docstring for the function `write_version_file`. **CN:** 继续说明 function `write_version_file` 的文档字符串。
+- **L277** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L278** `    Args:` — **EN:** Continues the docstring for the function `write_version_file`. **CN:** 继续说明 function `write_version_file` 的文档字符串。
+- **L279** `        version: Version string to write` — **EN:** Continues the docstring for the function `write_version_file`. **CN:** 继续说明 function `write_version_file` 的文档字符串。
+- **L280** `        package_root: Root directory of the package` — **EN:** Continues the docstring for the function `write_version_file`. **CN:** 继续说明 function `write_version_file` 的文档字符串。
+- **L281** `    """` — **EN:** Ends the docstring for the function `write_version_file`. **CN:** 结束说明 function `write_version_file` 的文档字符串。
+- **L282** `    version_file = package_root / "VERSION.EDITABLE"` — **EN:** Assigns a value to version_file. **CN:** 将一个值赋给 version_file。
+- **L283** `    logger.info(f"Writing version {version} to {version_file}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L286** `        with open(version_file, "w", encoding="utf-8") as f:` — **EN:** Starts a context-managed block using open(version_file, 'w', encoding='utf-8'). **CN:** 开始一个使用 open(version_file, 'w', encoding='utf-8') 的上下文管理代码块。
+- **L287** `            f.write(version + "\n")` — **EN:** Invokes `f.write` as a standalone call. **CN:** 以独立语句方式调用 `f.write`。
+- **L288** `        logger.info(f"Successfully created VERSION file with version: {version}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L289** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L290** `        raise CutlassDSLSetupError(f"Failed to write VERSION file: {e}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `def prep_editable_install() -> None:` — **EN:** Defines function `prep_editable_install`. **CN:** 定义函数 `prep_editable_install`。
+- **L294** `    """` — **EN:** Starts the docstring for the function `prep_editable_install`. **CN:** 开始说明 function `prep_editable_install` 的文档字符串。
+- **L295** `    Set up the CuTeDSL development environment.` — **EN:** Continues the docstring for the function `prep_editable_install`. **CN:** 继续说明 function `prep_editable_install` 的文档字符串。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `    Downloads nvidia-cutlass-dsl wheel, extracts version, and copies required files.` — **EN:** Continues the docstring for the function `prep_editable_install`. **CN:** 继续说明 function `prep_editable_install` 的文档字符串。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `    Raises:` — **EN:** Continues the docstring for the function `prep_editable_install`. **CN:** 继续说明 function `prep_editable_install` 的文档字符串。
+- **L300** `        CutlassDSLSetupError: If setup fails` — **EN:** Continues the docstring for the function `prep_editable_install`. **CN:** 继续说明 function `prep_editable_install` 的文档字符串。
+- **L301** `    """` — **EN:** Ends the docstring for the function `prep_editable_install`. **CN:** 结束说明 function `prep_editable_install` 的文档字符串。
+- **L302** `    package_root = Path(__file__).parent` — **EN:** Assigns a value to package_root. **CN:** 将一个值赋给 package_root。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `    with tempfile.TemporaryDirectory() as temp_dir_str:` — **EN:** Starts a context-managed block using tempfile.TemporaryDirectory(). **CN:** 开始一个使用 tempfile.TemporaryDirectory() 的上下文管理代码块。
+- **L305** `        temp_dir = Path(temp_dir_str)` — **EN:** Assigns a value to temp_dir. **CN:** 将一个值赋给 temp_dir。
+- **L306** `        extract_dir = temp_dir / "extracted"` — **EN:** Assigns a value to extract_dir. **CN:** 将一个值赋给 extract_dir。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** `        # Download and extract wheel` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L309** `        wheel_path = download_wheel(temp_dir)` — **EN:** Assigns a value to wheel_path. **CN:** 将一个值赋给 wheel_path。
+- **L310** `        version = extract_version_from_wheel(wheel_path)` — **EN:** Assigns a value to version. **CN:** 将一个值赋给 version。
+- **L311** `        extract_wheel_contents(wheel_path, extract_dir)` — **EN:** Invokes `extract_wheel_contents` as a standalone call. **CN:** 以独立语句方式调用 `extract_wheel_contents`。
+- **L312** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L313** `        # Copy files` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L314** `        lib_files_copied = copy_library_files(extract_dir, package_root)` — **EN:** Assigns a value to lib_files_copied. **CN:** 将一个值赋给 lib_files_copied。
+- **L315** `        py_files_copied, py_files_skipped = copy_python_packages(` — **EN:** Assigns a value to (py_files_copied, py_files_skipped). **CN:** 将一个值赋给 (py_files_copied, py_files_skipped)。
+- **L316** `            extract_dir, package_root` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `        # Write version file` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L320** `        write_version_file(version, package_root)` — **EN:** Invokes `write_version_file` as a standalone call. **CN:** 以独立语句方式调用 `write_version_file`。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `        logger.info("Setup completed successfully!")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L323** `        logger.info(` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L324** `            f"Summary: {lib_files_copied} lib files, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `            f"{py_files_copied} Python files copied, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            f"{py_files_skipped} Python files skipped"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** `        logger.info(f"Detected upstream version: {version}")` — **EN:** Invokes `logger.info` as a standalone call. **CN:** 以独立语句方式调用 `logger.info`。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L331** `if __name__ == "__main__":` — **EN:** Starts a conditional branch guarded by `__name__ == '__main__'`. **CN:** 开始一个由 `__name__ == '__main__'` 控制的条件分支。
+- **L332** `    prep_editable_install()` — **EN:** Invokes `prep_editable_install` as a standalone call. **CN:** 以独立语句方式调用 `prep_editable_install`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.prep_editable_install`. CN: 模块名为 `CuTeDSL.prep_editable_install`。
+- EN: Module docstring summary: CuTeDSL Development Package Setup This setup script automatically downloads the nvidia-cutlass-dsl wheel, extracts required libraries and Python packages, and sets up the develo... CN: 模块文档摘要为：CuTeDSL Development Package Setup This setup script automatically downloads the nvidia-cutlass-dsl wheel, extracts required libraries and Python packages, and sets up the develo...
+- EN: Top-level classes: CutlassDSLSetupError CN: 顶层类包括：CutlassDSLSetupError
+- EN: Top-level functions: get_package_spec, download_wheel, extract_version_from_wheel, extract_wheel_contents, copy_library_files, copy_python_packages, write_version_file, prep_editable_install CN: 顶层函数包括：get_package_spec, download_wheel, extract_version_from_wheel, extract_wheel_contents, copy_library_files, copy_python_packages, write_version_file, prep_editable_install
+
+## Dependencies / 依赖
+- EN: External or standard-library dependencies: subprocess, sys, shutil, tempfile, zipfile, re, pathlib:Path, typing:Optional,Tuple,List, logging CN: 外部或标准库依赖：subprocess, sys, shutil, tempfile, zipfile, re, pathlib:Path, typing:Optional,Tuple,List, logging

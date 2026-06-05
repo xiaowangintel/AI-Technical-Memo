@@ -1,0 +1,282 @@
+# check.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/utils/check.py`
+
+## Purpose / 作用
+- EN: Utility functions for checking constraints on kernels and calculating kernel attributes
+- CN: 该模块的文档字符串将其描述为：Utility functions for checking constraints on kernels and calculating kernel attributes
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utility functions for checking constraints on kernels and calculating kernel attributes` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_library import DataTypeSize, KernelScheduleSuffixes, OperationKind, SharedMemPerCC` — **EN:** Imports DataTypeSize, KernelScheduleSuffixes, OperationKind, SharedMemPerCC from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeSize, KernelScheduleSuffixes, OperationKind, SharedMemPerCC。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L42** `from cutlass_cppgen.backend.library import TileDescription` — **EN:** Imports TileDescription from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 TileDescription。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `def calculate_smem_usage_per_stage(td: TileDescription, operation_kind: OperationKind) -> int:` — **EN:** Defines function `calculate_smem_usage_per_stage`. **CN:** 定义函数 `calculate_smem_usage_per_stage`。
+- **L46** `    """` — **EN:** Starts the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 开始说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L47** `    Returns the amount of shared memory in bytes consumed in a single stage of a kernel.` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `    :param td: tile description to compute shared memory of` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L50** `    :type td: TileDescription` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L51** `    :param operation_kind: identifier for the type of operation being performed` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L52** `    :type operation_kind: cutlass_library.OperationKind` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    :return: number of bytes of shared memory consumed by a single stage` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L55** `    :rtype: int` — **EN:** Continues the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 继续说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L56** `    """` — **EN:** Ends the docstring for the function `calculate_smem_usage_per_stage`. **CN:** 结束说明 function `calculate_smem_usage_per_stage` 的文档字符串。
+- **L57** `    m, n, k = td.blackwell_threadblock_shape` — **EN:** Assigns a value to (m, n, k). **CN:** 将一个值赋给 (m, n, k)。
+- **L58** `    if td.is_2sm:` — **EN:** Starts a conditional branch guarded by `td.is_2sm`. **CN:** 开始一个由 `td.is_2sm` 控制的条件分支。
+- **L59** `        m //= 2` — **EN:** Updates m in place. **CN:** 原地更新 m。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    if operation_kind == OperationKind.Gemm:` — **EN:** Starts a conditional branch guarded by `operation_kind == OperationKind.Gemm`. **CN:** 开始一个由 `operation_kind == OperationKind.Gemm` 控制的条件分支。
+- **L62** `        stage_barrier_bytes = 32` — **EN:** Assigns a value to stage_barrier_bytes. **CN:** 将一个值赋给 stage_barrier_bytes。
+- **L63** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L64** `            (DataTypeSize[td.math_instruction.element_a] * m * k // 8)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `            + (DataTypeSize[td.math_instruction.element_b] * k * n // 8)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `            + stage_barrier_bytes` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L69** `        raise Exception(f"No available shared memory calculation for operation kind {operation.operation_kind}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `def calculate_smem_usage(operation) -> int:` — **EN:** Defines function `calculate_smem_usage`. **CN:** 定义函数 `calculate_smem_usage`。
+- **L73** `    """` — **EN:** Starts the docstring for the function `calculate_smem_usage`. **CN:** 开始说明 function `calculate_smem_usage` 的文档字符串。
+- **L74** `    Returns the amount of shared memory in bytes consumed by a kernel.` — **EN:** Continues the docstring for the function `calculate_smem_usage`. **CN:** 继续说明 function `calculate_smem_usage` 的文档字符串。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    :return: number of bytes of shared memory consumed by the operation` — **EN:** Continues the docstring for the function `calculate_smem_usage`. **CN:** 继续说明 function `calculate_smem_usage` 的文档字符串。
+- **L77** `    :return: int` — **EN:** Continues the docstring for the function `calculate_smem_usage`. **CN:** 继续说明 function `calculate_smem_usage` 的文档字符串。
+- **L78** `    """` — **EN:** Ends the docstring for the function `calculate_smem_usage`. **CN:** 结束说明 function `calculate_smem_usage` 的文档字符串。
+- **L79** `    _per_stage = calculate_smem_usage_per_stage(operation.tile_description, operation.operation_kind)` — **EN:** Assigns a value to _per_stage. **CN:** 将一个值赋给 _per_stage。
+- **L80** `    return _per_stage * operation.tile_description.stages` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `def valid_stage_count(` — **EN:** Defines function `valid_stage_count`. **CN:** 定义函数 `valid_stage_count`。
+- **L84** `    cc: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `    kernel_cc: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `    td: TileDescription,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L87** `    element_C: cutlass_cppgen.DataType = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L88** `    element_D: cutlass_cppgen.DataType = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L89** `    verbose: bool = True) -> tuple:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L90** `    """` — **EN:** Starts the docstring for the function `valid_stage_count`. **CN:** 开始说明 function `valid_stage_count` 的文档字符串。
+- **L91** `    Checks whether a device with \`cc\` supports the number of stages within \`tile_description\`, both` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L92** `    based on raw limits on the number of stages and based on shared memory capacity` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    :param cc: compute capability of device in question` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L95** `    :type cc: int` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L96** `    :param kernel_cc: compute capability that the kernel targets (corresponding to the arch::SMxy tag in CUTLASS)` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L97** `    :type kernel_cc: int` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L98** `    :param td: tile description to check` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L99** `    :type td: TileDescription` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L100** `    :param element_C: data type of operand C` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L101** `    :type element_C: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L102** `    :param element_D: data type of operand D` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L103** `    :type element_D: cutlass_cppgen.DataType` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L104** `    :param verbose: whether to log warnings` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L105** `    :type verbose: bool` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `    :return: tuple with the first element indicating whether the provided tile description is` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L108** `             valid for the provided device and the second element being an error message` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L109** `    :rtype: tuple` — **EN:** Continues the docstring for the function `valid_stage_count`. **CN:** 继续说明 function `valid_stage_count` 的文档字符串。
+- **L110** `    """` — **EN:** Ends the docstring for the function `valid_stage_count`. **CN:** 结束说明 function `valid_stage_count` 的文档字符串。
+- **L111** `    if kernel_cc in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `kernel_cc in [90, 100, 101, 103]`. **CN:** 开始一个由 `kernel_cc in [90, 100, 101, 103]` 控制的条件分支。
+- **L112** `        if (td.stages is None or td.stages == 0):` — **EN:** Starts a conditional branch guarded by `td.stages is None or td.stages == 0`. **CN:** 开始一个由 `td.stages is None or td.stages == 0` 控制的条件分支。
+- **L113** `            # Stage count of None or 0 for SM90 indicates that the CollectiveBuilder automatically` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L114** `            # determines the stage count to use. Thus, all settings are valid in these scenarios.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L115** `            return (True, "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** `        elif verbose:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L117** `            cutlass_cppgen.logger.warning(` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L118** `                "Setting an explicit stage count for SM90 kernels currently may "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `                "result in compilation errors if the combination of tile shape, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `                "stage count, and shared memory requirement of the epilogue exceeds "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `                "the available shared memory per SM.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    if td.stages <= 0:` — **EN:** Starts a conditional branch guarded by `td.stages <= 0`. **CN:** 开始一个由 `td.stages <= 0` 控制的条件分支。
+- **L124** `        return (False, f"Stage counts must be positive integers. Tile description has stage count of {td.stages}.")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `    if cc < 80 and td.stages != 2:` — **EN:** Starts a conditional branch guarded by `cc < 80 and td.stages != 2`. **CN:** 开始一个由 `cc < 80 and td.stages != 2` 控制的条件分支。
+- **L127** `        return (False, f"Tile description has stage count of {td.stages}, "` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** `                       f"but only 2 stages are supported on SM{cc}.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    # The calculation below does not consider shared memory used by the epilogue and, thus,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L131** `    # only catches cases in which the mainloop exceeds the device's shared memory capacity.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L132** `    # This is not a concern for CUTLASS 2.x kernels, for which the shared memory of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `    # mainloop and epilogue is shared.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L134** `    smem_per_stage = calculate_smem_usage_per_stage(td, OperationKind.Gemm)` — **EN:** Assigns a value to smem_per_stage. **CN:** 将一个值赋给 smem_per_stage。
+- **L135** `    smem_usage_mainloop = (smem_per_stage * td.stages)` — **EN:** Assigns a value to smem_usage_mainloop. **CN:** 将一个值赋给 smem_usage_mainloop。
+- **L136** `    smem_arch = SharedMemPerCC[cc] << 10` — **EN:** Assigns a value to smem_arch. **CN:** 将一个值赋给 smem_arch。
+- **L137** `    if smem_usage_mainloop > smem_arch:` — **EN:** Starts a conditional branch guarded by `smem_usage_mainloop > smem_arch`. **CN:** 开始一个由 `smem_usage_mainloop > smem_arch` 控制的条件分支。
+- **L138** `        return ( False,` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L139** `            "Configuration uses too much shared memory. Consider reducing stage count or tile shape.\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `            f"Details:\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `            f"Mainloop uses {smem_per_stage} bytes of shared memory per stage, and "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `            f"{td.stages} stages for a total of {smem_usage_mainloop} bytes.\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `            f"The maxmium amount of shared memory that can be used per block on CC {cc} is {smem_arch}.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    return (True, "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `def valid_cluster_shape(cc: int, cluster_shape: list) -> tuple:` — **EN:** Defines function `valid_cluster_shape`. **CN:** 定义函数 `valid_cluster_shape`。
+- **L149** `    """` — **EN:** Starts the docstring for the function `valid_cluster_shape`. **CN:** 开始说明 function `valid_cluster_shape` 的文档字符串。
+- **L150** `    Checks whether a device with \`cc\` supports a thread block cluster of shape \`cluster_shape\`.` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    :param cc: compute capability of device in question` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L153** `    :type cc: int` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L154** `    :param cluster_shape: dimensions of thread block cluster shape to check` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L155** `    :type cluster_shape: list` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    :return: tuple with the first element indicating whether the provided cluster shape is` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L158** `             valid for the provided device and the second element being an error message` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L159** `    :rtype: tuple` — **EN:** Continues the docstring for the function `valid_cluster_shape`. **CN:** 继续说明 function `valid_cluster_shape` 的文档字符串。
+- **L160** `    """` — **EN:** Ends the docstring for the function `valid_cluster_shape`. **CN:** 结束说明 function `valid_cluster_shape` 的文档字符串。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `    if cc < 90 or cc in [120, 121]:` — **EN:** Starts a conditional branch guarded by `cc < 90 or cc in [120, 121]`. **CN:** 开始一个由 `cc < 90 or cc in [120, 121]` 控制的条件分支。
+- **L163** `        if cluster_shape != [1, 1, 1]:` — **EN:** Starts a conditional branch guarded by `cluster_shape != [1, 1, 1]`. **CN:** 开始一个由 `cluster_shape != [1, 1, 1]` 控制的条件分支。
+- **L164** `            return (False,` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L165** `                    f"Cluster shape for pre-SM90 architectures and SM 120 and 121 must be [1, 1, 1]. Received cluster shape of "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `                    f"{cluster_shape} for SM{cc}.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L168** `            return (True, "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    if len(cluster_shape) != 3:` — **EN:** Starts a conditional branch guarded by `len(cluster_shape) != 3`. **CN:** 开始一个由 `len(cluster_shape) != 3` 控制的条件分支。
+- **L171** `        return (False,` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L172** `                f"Cluster shapes must be rank-3. Received {cluster_shape} (rank {len(cluster_shape)}")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `    if cluster_shape[2] != 1:` — **EN:** Starts a conditional branch guarded by `cluster_shape[2] != 1`. **CN:** 开始一个由 `cluster_shape[2] != 1` 控制的条件分支。
+- **L175** `        return (False,` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L176** `                "CUTLASS kernels currently require the third dimension of cluster shape to be 1. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `                f"Received cluster shape of {cluster_shape}.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `    return (True, "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `def valid_schedule(` — **EN:** Defines function `valid_schedule`. **CN:** 定义函数 `valid_schedule`。
+- **L183** `    cc: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L184** `    kernel_schedule: cutlass_cppgen.KernelScheduleType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L185** `    epilogue_schedule: cutlass_cppgen.EpilogueScheduleType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L186** `    tile_scheduler: cutlass_cppgen.TileSchedulerType) -> tuple:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L187** `    """` — **EN:** Starts the docstring for the function `valid_schedule`. **CN:** 开始说明 function `valid_schedule` 的文档字符串。
+- **L188** `    Checks that the kernel and epilogue schedules passed in are a valid combination for` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L189** `    a device of compute capability \`\`cc\`\`.` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `    :param cc: compute capability of device in question` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L192** `    :type cc: int` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L193** `    :param kernel_schedule: kernel schedule type` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L194** `    :type kernel_schedule: cutlass_cppgen.KernelScheduleType` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L195** `    :param epilogue_schedule: epilogue schedule type` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L196** `    :type epilogue_schedule: cutlass_cppgen.EpilogueScheduleType` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L197** `    :param tile_scheduler: tile scheduler type` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L198** `    :type tile_scheduler: cutlass_cppgen.TileSchedulerType` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `    :return: tuple with the first element indicating whether the provided schedules are` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L201** `             valid for the provided device and the second element being an error message` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L202** `    :rtype: tuple` — **EN:** Continues the docstring for the function `valid_schedule`. **CN:** 继续说明 function `valid_schedule` 的文档字符串。
+- **L203** `    """` — **EN:** Ends the docstring for the function `valid_schedule`. **CN:** 结束说明 function `valid_schedule` 的文档字符串。
+- **L204** `    kernel_auto = (kernel_schedule == cutlass_cppgen.KernelScheduleType.ScheduleAuto)` — **EN:** Assigns a value to kernel_auto. **CN:** 将一个值赋给 kernel_auto。
+- **L205** `    epilogue_auto = (epilogue_schedule == cutlass_cppgen.EpilogueScheduleType.ScheduleAuto)` — **EN:** Assigns a value to epilogue_auto. **CN:** 将一个值赋给 epilogue_auto。
+- **L206** `    tile_scheduler_default = (tile_scheduler == cutlass_cppgen.TileSchedulerType.Default)` — **EN:** Assigns a value to tile_scheduler_default. **CN:** 将一个值赋给 tile_scheduler_default。
+- **L207** `    if (cc < 90 or cc in [120, 121]) and not (kernel_auto and epilogue_auto and tile_scheduler_default):` — **EN:** Starts a conditional branch guarded by `(cc < 90 or cc in [120, 121]) and (not (kernel_auto and e...`. **CN:** 开始一个由 `(cc < 90 or cc in [120, 121]) and (not (kernel_auto and e...` 控制的条件分支。
+- **L208** `        return (False, "Non-default schedules are only supported on SM90 and beyond (excluding SM120 and SM121)")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `    if cc == 90 and ((kernel_auto and not epilogue_auto) or (not kernel_auto and epilogue_auto)):` — **EN:** Starts a conditional branch guarded by `cc == 90 and (kernel_auto and (not epilogue_auto) or (not...`. **CN:** 开始一个由 `cc == 90 and (kernel_auto and (not epilogue_auto) or (not...` 控制的条件分支。
+- **L211** `        return (False, "Kernel and epilogue schedules must either both be auto or neither be auto")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `    if not tile_scheduler_default:` — **EN:** Starts a conditional branch guarded by `not tile_scheduler_default`. **CN:** 开始一个由 `not tile_scheduler_default` 控制的条件分支。
+- **L214** `        cooperative_kernels = [cutlass_cppgen.KernelScheduleType.TmaWarpSpecializedCooperative, ` — **EN:** Assigns a value to cooperative_kernels. **CN:** 将一个值赋给 cooperative_kernels。
+- **L215** `                               cutlass_cppgen.KernelScheduleType.CpAsyncWarpSpecializedCooperative]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `        if cc == 90 and (tile_scheduler == cutlass_cppgen.TileSchedulerType.StreamK) and (kernel_schedule not in cooperative_kernels):` — **EN:** Starts a conditional branch guarded by `cc == 90 and tile_scheduler == cutlass_cppgen.TileSchedul...`. **CN:** 开始一个由 `cc == 90 and tile_scheduler == cutlass_cppgen.TileSchedul...` 控制的条件分支。
+- **L217** `            return (False, "Stream-K tile scheduler is currently only supported with the cooperative kernel schedule")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** `    return (True, "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `def alignment_or_default(alignment_provided: int, default_alignment: int) -> int:` — **EN:** Defines function `alignment_or_default`. **CN:** 定义函数 `alignment_or_default`。
+- **L222** `    """` — **EN:** Starts the docstring for the function `alignment_or_default`. **CN:** 开始说明 function `alignment_or_default` 的文档字符串。
+- **L223** `    Returns \`alignment_provided\` if it is set, otherwise \`default_alignment\` and checks` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L224** `    that \`alignment_provided\` does not exceed \`default_alignment\`.` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `    :param alignment_provided: alignment preference specified. Can be None.` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L227** `    :type alignment_provided: int` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L228** `    :param default_alignment: alignment to use if \`alignment_provided\` is None` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L229** `    :type default_alignment: int` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `    :return: alignment to use` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L232** `    :rtype: int` — **EN:** Continues the docstring for the function `alignment_or_default`. **CN:** 继续说明 function `alignment_or_default` 的文档字符串。
+- **L233** `    """` — **EN:** Ends the docstring for the function `alignment_or_default`. **CN:** 结束说明 function `alignment_or_default` 的文档字符串。
+- **L234** `    if alignment_provided is not None:` — **EN:** Starts a conditional branch guarded by `alignment_provided is not None`. **CN:** 开始一个由 `alignment_provided is not None` 控制的条件分支。
+- **L235** `        if alignment_provided > default_alignment:` — **EN:** Starts a conditional branch guarded by `alignment_provided > default_alignment`. **CN:** 开始一个由 `alignment_provided > default_alignment` 控制的条件分支。
+- **L236** `            raise Exception(f"Alignment {alignment_provided} exceeds the maximum supported of {default_alignment}.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L237** `        return alignment_provided` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `    return default_alignment` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `def update_alignment(alignment_provided:int, default_alignment: int) -> int:` — **EN:** Defines function `update_alignment`. **CN:** 定义函数 `update_alignment`。
+- **L243** `    """` — **EN:** Starts the docstring for the function `update_alignment`. **CN:** 开始说明 function `update_alignment` 的文档字符串。
+- **L244** `    Returns \`alignment_provided\` if it is set, otherwise \`default_alignment\` and checks` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L245** `    that \`alignment_provided\` does not exceed \`default_alignment\`.` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `    :param alignment_provided: alignment preference specified. Can be None.` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L248** `    :type alignment_provided: int` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L249** `    :param default_alignment: alignment to use if \`alignment_provided\` is None` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L250** `    :type default_alignment: int` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** `    :return: alignment to use` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L253** `    :rtype: int` — **EN:** Continues the docstring for the function `update_alignment`. **CN:** 继续说明 function `update_alignment` 的文档字符串。
+- **L254** `    """` — **EN:** Ends the docstring for the function `update_alignment`. **CN:** 结束说明 function `update_alignment` 的文档字符串。
+- **L255** `    if alignment_provided is not None:` — **EN:** Starts a conditional branch guarded by `alignment_provided is not None`. **CN:** 开始一个由 `alignment_provided is not None` 控制的条件分支。
+- **L256** `        if alignment_provided > default_alignment:` — **EN:** Starts a conditional branch guarded by `alignment_provided > default_alignment`. **CN:** 开始一个由 `alignment_provided > default_alignment` 控制的条件分支。
+- **L257** `            if alignment_provided % default_alignment == 0:` — **EN:** Starts a conditional branch guarded by `alignment_provided % default_alignment == 0`. **CN:** 开始一个由 `alignment_provided % default_alignment == 0` 控制的条件分支。
+- **L258** `                return default_alignment` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L259** `            raise Exception(f"Alignment {alignment_provided} exceeds the maximum supported of {default_alignment}.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L260** `        return alignment_provided` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `    return default_alignment` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.utils.check`. CN: 模块名为 `cutlass_cppgen.utils.check`。
+- EN: Module docstring summary: Utility functions for checking constraints on kernels and calculating kernel attributes CN: 模块文档摘要为：Utility functions for checking constraints on kernels and calculating kernel attributes
+- EN: Top-level functions: calculate_smem_usage_per_stage, calculate_smem_usage, valid_stage_count, valid_cluster_shape, valid_schedule, alignment_or_default, update_alignment CN: 顶层函数包括：calculate_smem_usage_per_stage, calculate_smem_usage, valid_stage_count, valid_cluster_shape, valid_schedule, alignment_or_default, update_alignment
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataTypeSize,KernelScheduleSuffixes,OperationKind,SharedMemPerCC, cutlass_cppgen, cutlass_cppgen.backend.library:TileDescription CN: 内部依赖：cutlass_library:DataTypeSize,KernelScheduleSuffixes,OperationKind,SharedMemPerCC, cutlass_cppgen, cutlass_cppgen.backend.library:TileDescription
+- EN: External or standard-library dependencies: ctypes CN: 外部或标准库依赖：ctypes

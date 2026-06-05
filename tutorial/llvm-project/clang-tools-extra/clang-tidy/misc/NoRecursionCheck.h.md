@@ -1,0 +1,120 @@
+# NoRecursionCheck.h — Code Analysis / 代码分析
+
+## Source / 来源
+- **File / 文件**: `clang-tools-extra/clang-tidy/misc/NoRecursionCheck.h`
+- **Repository / 仓库**: `llvm-project` (`/root/xw/llvm-project`)
+- **Purpose (EN)**: Declares the `NoRecursionCheck` clang-tidy check in the `misc` module, part of the miscellaneous portability and correctness checks.
+- **Purpose (CN)**: 声明 `misc` 模块中的 `NoRecursionCheck` clang-tidy 检查，它属于杂项可移植性与正确性检查。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-12 / 第 1-12 行
+
+```cpp
+   1: //===----------------------------------------------------------------------===//
+   2: //
+   3: // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+   4: // See https://llvm.org/LICENSE.txt for license information.
+   5: // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+   6: //
+   7: //===----------------------------------------------------------------------===//
+   8: 
+   9: #ifndef LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_NORECURSIONCHECK_H
+  10: #define LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_NORECURSIONCHECK_H
+  11: 
+  12: #include "../ClangTidyCheck.h"
+```
+- **Line 1 / 第 1 行**: EN: Banner comment marking a file or section boundary. CN: 横幅注释，用于标记文件或章节边界。
+- **Line 2 / 第 2 行**: EN: Separator comment used for visual grouping. CN: 用于视觉分组的分隔注释。
+- **Line 3 / 第 3 行**: EN: Comment describing intent, behavior, or metadata: `Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`. CN: 用于说明意图、行为或元数据的注释：`Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`。
+- **Line 4 / 第 4 行**: EN: Comment describing intent, behavior, or metadata: `See https://llvm.org/LICENSE.txt for license information.`. CN: 用于说明意图、行为或元数据的注释：`See https://llvm.org/LICENSE.txt for license information.`。
+- **Line 5 / 第 5 行**: EN: Comment describing intent, behavior, or metadata: `SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`. CN: 用于说明意图、行为或元数据的注释：`SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`。
+- **Line 6 / 第 6 行**: EN: Separator comment used for visual grouping. CN: 用于视觉分组的分隔注释。
+- **Line 7 / 第 7 行**: EN: Banner comment marking a file or section boundary. CN: 横幅注释，用于标记文件或章节边界。
+- **Line 8 / 第 8 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 9 / 第 9 行**: EN: Starts a conditional-compilation guard or branch. CN: 开始一个条件编译保护块或分支。
+- **Line 10 / 第 10 行**: EN: Defines a macro or header-guard symbol. CN: 定义宏或头文件保护符。
+- **Line 11 / 第 11 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 12 / 第 12 行**: EN: Includes "../ClangTidyCheck.h" so this file can use local declarations that pair with this file. CN: 包含 "../ClangTidyCheck.h"，以便当前文件使用与该文件配套的本地声明。
+
+### Lines 13-24 / 第 13-24 行
+
+```cpp
+  13: 
+  14: namespace clang {
+  15: 
+  16: class CallGraphNode;
+  17: 
+  18: namespace tidy::misc {
+  19: 
+  20: /// Finds strongly connected functions (by analyzing call graph for SCC's
+  21: /// that are loops), diagnoses each function in the cycle,
+  22: /// and displays one example of possible call graph loop (recursion).
+  23: ///
+  24: /// For the user-facing documentation see:
+```
+- **Line 13 / 第 13 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 14 / 第 14 行**: EN: Opens namespace `clang` to scope related declarations. CN: 打开命名空间 `clang`，为相关声明建立作用域。
+- **Line 15 / 第 15 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 16 / 第 16 行**: EN: Begins the declaration of class `CallGraphNode`. CN: 开始声明 class `CallGraphNode`。
+- **Line 17 / 第 17 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 18 / 第 18 行**: EN: Opens namespace `tidy::misc` to scope related declarations. CN: 打开命名空间 `tidy::misc`，为相关声明建立作用域。
+- **Line 19 / 第 19 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 20 / 第 20 行**: EN: Comment describing intent, behavior, or metadata: `Finds strongly connected functions (by analyzing call graph for SCC's`. CN: 用于说明意图、行为或元数据的注释：`Finds strongly connected functions (by analyzing call graph for SCC's`。
+- **Line 21 / 第 21 行**: EN: Comment describing intent, behavior, or metadata: `that are loops), diagnoses each function in the cycle,`. CN: 用于说明意图、行为或元数据的注释：`that are loops), diagnoses each function in the cycle,`。
+- **Line 22 / 第 22 行**: EN: Comment describing intent, behavior, or metadata: `and displays one example of possible call graph loop (recursion).`. CN: 用于说明意图、行为或元数据的注释：`and displays one example of possible call graph loop (recursion).`。
+- **Line 23 / 第 23 行**: EN: Separator comment used for visual grouping. CN: 用于视觉分组的分隔注释。
+- **Line 24 / 第 24 行**: EN: Comment describing intent, behavior, or metadata: `For the user-facing documentation see:`. CN: 用于说明意图、行为或元数据的注释：`For the user-facing documentation see:`。
+
+### Lines 25-36 / 第 25-36 行
+
+```cpp
+  25: /// https://clang.llvm.org/extra/clang-tidy/checks/misc/no-recursion.html
+  26: class NoRecursionCheck : public ClangTidyCheck {
+  27: public:
+  28:   NoRecursionCheck(StringRef Name, ClangTidyContext *Context)
+  29:       : ClangTidyCheck(Name, Context) {}
+  30:   void registerMatchers(ast_matchers::MatchFinder *Finder) override;
+  31:   void check(const ast_matchers::MatchFinder::MatchResult &Result) override;
+  32: 
+  33: private:
+  34:   void handleSCC(ArrayRef<CallGraphNode *> SCC);
+  35: };
+  36: 
+```
+- **Line 25 / 第 25 行**: EN: Comment describing intent, behavior, or metadata: `https://clang.llvm.org/extra/clang-tidy/checks/misc/no-recursion.html`. CN: 用于说明意图、行为或元数据的注释：`https://clang.llvm.org/extra/clang-tidy/checks/misc/no-recursion.html`。
+- **Line 26 / 第 26 行**: EN: Begins the declaration of class `NoRecursionCheck`. CN: 开始声明 class `NoRecursionCheck`。
+- **Line 27 / 第 27 行**: EN: Sets access control for the following members. CN: 设置后续成员的访问控制级别。
+- **Line 28 / 第 28 行**: EN: Continues logic associated with callable symbol `NoRecursionCheck`. CN: 继续与可调用符号 `NoRecursionCheck` 相关的逻辑。
+- **Line 29 / 第 29 行**: EN: Continues logic associated with callable symbol `ClangTidyCheck`. CN: 继续与可调用符号 `ClangTidyCheck` 相关的逻辑。
+- **Line 30 / 第 30 行**: EN: Starts or references matcher-registration logic for this check. CN: 开始或引用该检查的 Matcher 注册逻辑。
+- **Line 31 / 第 31 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 32 / 第 32 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 33 / 第 33 行**: EN: Sets access control for the following members. CN: 设置后续成员的访问控制级别。
+- **Line 34 / 第 34 行**: EN: Calls a helper routine or method to advance the implementation. CN: 调用辅助例程或方法以推进实现逻辑。
+- **Line 35 / 第 35 行**: EN: Terminates a type declaration or scoped block. CN: 结束一个类型声明或作用域块。
+- **Line 36 / 第 36 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+
+### Lines 37-40 / 第 37-40 行
+
+```cpp
+  37: } // namespace tidy::misc
+  38: } // namespace clang
+  39: 
+  40: #endif // LLVM_CLANG_TOOLS_EXTRA_CLANG_TIDY_MISC_NORECURSIONCHECK_H
+```
+- **Line 37 / 第 37 行**: EN: Closes a namespace scope and documents which namespace ended. CN: 结束一个命名空间作用域，并说明被关闭的命名空间。
+- **Line 38 / 第 38 行**: EN: Closes a namespace scope and documents which namespace ended. CN: 结束一个命名空间作用域，并说明被关闭的命名空间。
+- **Line 39 / 第 39 行**: EN: Blank line separating logical blocks. CN: 空行，用于分隔逻辑块。
+- **Line 40 / 第 40 行**: EN: Closes the current preprocessor conditional block. CN: 结束当前预处理条件块。
+
+## Key Concepts / 关键概念
+- **Clang-Tidy framework / Clang-Tidy 框架**: Participates in the clang-tidy architecture that wires checks, options, and diagnostics together. / 参与 clang-tidy 架构，把检查、选项和诊断连接在一起。
+- **misc module focus / misc 模块关注点**: This file belongs to the `misc` module, which concentrates on miscellaneous portability and correctness checks. / 该文件属于 `misc` 模块，重点关注杂项可移植性与正确性检查。
+- **Clang-Tidy check lifecycle / Clang-Tidy 检查生命周期**: Defines or uses the standard hook points of a clang-tidy check. / 定义或使用 clang-tidy 检查的标准钩子。
+- **Shared analysis context / 共享分析上下文**: Carries options, diagnostics, language mode, and per-run shared state. / 承载选项、诊断、语言模式以及每次运行的共享状态。
+- **AST matcher registration / AST Matcher 注册**: Connects declarative AST matchers to callback-based diagnostics. / 把声明式 AST Matcher 连接到基于回调的诊断逻辑。
+
+## Dependencies / 依赖关系
+- **Clang/LLVM and local headers / Clang/LLVM 与本地头文件**: `../ClangTidyCheck.h`
+- **Standard library headers / 标准库头文件**: None / 无

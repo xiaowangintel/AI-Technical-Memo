@@ -1,0 +1,1347 @@
+# layout.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/detail/layout.hpp`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/detail/layout.hpp`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/detail/layout.hpp` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L32**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L33**: <code>#include &quot;cute/layout.hpp&quot;</code>
+  - EN: Includes "cute/layout.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/layout.hpp"，以便本文件使用该依赖中的声明。
+- **L34**: <code>#include &quot;cute/pointer_sparse.hpp&quot;       // cute::is_sparse</code>
+  - EN: Includes "cute/pointer_sparse.hpp"       // cute::is_sparse so this file can use declarations from that dependency.
+  - CN: 包含 "cute/pointer_sparse.hpp"       // cute::is_sparse，以便本文件使用该依赖中的声明。
+- **L35**: <code>#include &quot;cute/swizzle.hpp&quot;              // cute::Swizzle</code>
+  - EN: Includes "cute/swizzle.hpp"              // cute::Swizzle so this file can use declarations from that dependency.
+  - CN: 包含 "cute/swizzle.hpp"              // cute::Swizzle，以便本文件使用该依赖中的声明。
+- **L36**: <code>#include &quot;cute/swizzle_layout.hpp&quot;       // cute::get_swizzle_portion</code>
+  - EN: Includes "cute/swizzle_layout.hpp"       // cute::get_swizzle_portion so this file can use declarations from that dependency.
+  - CN: 包含 "cute/swizzle_layout.hpp"       // cute::get_swizzle_portion，以便本文件使用该依赖中的声明。
+- **L37**: <code>#include &quot;cute/util/type_traits.hpp&quot;</code>
+  - EN: Includes "cute/util/type_traits.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/util/type_traits.hpp"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;cute/arch/copy_sm90_tma.hpp&quot;</code>
+  - EN: Includes "cute/arch/copy_sm90_tma.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/arch/copy_sm90_tma.hpp"，以便本文件使用该依赖中的声明。
+- **L39**: <code>#include &quot;cute/arch/copy_sm100_tma.hpp&quot;</code>
+  - EN: Includes "cute/arch/copy_sm100_tma.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cute/arch/copy_sm100_tma.hpp"，以便本文件使用该依赖中的声明。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>#include &quot;cutlass/layout/matrix.h&quot;</code>
+  - EN: Includes "cutlass/layout/matrix.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/layout/matrix.h"，以便本文件使用该依赖中的声明。
+- **L42**: <code>#include &quot;cutlass/layout/tensor.h&quot;</code>
+  - EN: Includes "cutlass/layout/tensor.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/layout/tensor.h"，以便本文件使用该依赖中的声明。
+- **L43**: <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes "cutlass/numeric_types.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/numeric_types.h"，以便本文件使用该依赖中的声明。
+- **L44**: <code>#include &quot;cutlass/detail/collective.hpp&quot;</code>
+  - EN: Includes "cutlass/detail/collective.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/detail/collective.hpp"，以便本文件使用该依赖中的声明。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>namespace cutlass::detail {</code>
+  - EN: Opens namespace `cutlass::detail` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass::detail`，为后续声明提供作用域。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L51**: <code>// For each cutlass::layout, provides its corresponding cute stride types, 64b by default</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L52**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L53**: <code>template &lt;class L&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L54**: <code>struct TagToStrideA {</code>
+  - EN: Declares or defines the struct `TagToStrideA`.
+  - CN: 声明或定义 struct `TagToStrideA`。
+- **L55**: <code>  using type = L;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L56**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L57**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L58**: <code>// Maps to modes [M, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L59**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L60**: <code>struct TagToStrideA&lt;layout::RowMajor&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideA`.
+  - CN: 声明或定义 struct `TagToStrideA`。
+- **L61**: <code>  using type = cute::Stride&lt;int64_t, cute::Int&lt;1&gt;, int64_t&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L62**: <code>  using tag = layout::RowMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L63**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L64**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L65**: <code>// Maps to modes [M, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L66**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L67**: <code>struct TagToStrideA&lt;layout::ColumnMajor&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideA`.
+  - CN: 声明或定义 struct `TagToStrideA`。
+- **L68**: <code>  using type = cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, int64_t&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L69**: <code>  using tag = layout::ColumnMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L70**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L71**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L72**: <code>template &lt;class L&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L73**: <code>struct TagToStrideB {</code>
+  - EN: Declares or defines the struct `TagToStrideB`.
+  - CN: 声明或定义 struct `TagToStrideB`。
+- **L74**: <code>  using type = L;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L75**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L76**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L77**: <code>// Maps to modes [N, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L78**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L79**: <code>struct TagToStrideB&lt;layout::RowMajor&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideB`.
+  - CN: 声明或定义 struct `TagToStrideB`。
+- **L80**: <code>  using type = cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, int64_t&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L81**: <code>  using tag = layout::RowMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L82**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L83**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L84**: <code>// Maps to modes [N, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L85**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L86**: <code>struct TagToStrideB&lt;layout::ColumnMajor&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideB`.
+  - CN: 声明或定义 struct `TagToStrideB`。
+- **L87**: <code>  using type = cute::Stride&lt;int64_t, cute::Int&lt;1&gt;, int64_t&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L88**: <code>  using tag = layout::ColumnMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L89**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L90**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L91**: <code>// For each cutlass::layout *, provides its corresponding cute stride types, 64b by default</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L92**: <code>// Used by pointer array and grouped gemm</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L93**: <code>// Maps to modes [M, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L94**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L95**: <code>struct TagToStrideA&lt;layout::RowMajor *&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideA`.
+  - CN: 声明或定义 struct `TagToStrideA`。
+- **L96**: <code>  using UnderlyingType = cute::Stride&lt;int64_t, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `UnderlyingType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `UnderlyingType`。
+- **L97**: <code>  using type = UnderlyingType*;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L98**: <code>  using tag = layout::RowMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L99**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L100**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L101**: <code>// Maps to modes [M, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L102**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L103**: <code>struct TagToStrideA&lt;layout::ColumnMajor *&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideA`.
+  - CN: 声明或定义 struct `TagToStrideA`。
+- **L104**: <code>  using UnderlyingType = cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `UnderlyingType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `UnderlyingType`。
+- **L105**: <code>  using type = UnderlyingType*;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L106**: <code>  using tag = layout::ColumnMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L107**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L108**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L109**: <code>// Maps to modes [N, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L110**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L111**: <code>struct TagToStrideB&lt;layout::RowMajor *&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideB`.
+  - CN: 声明或定义 struct `TagToStrideB`。
+- **L112**: <code>  using UnderlyingType = cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `UnderlyingType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `UnderlyingType`。
+- **L113**: <code>  using type = UnderlyingType*;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L114**: <code>  using tag = layout::RowMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L115**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L116**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L117**: <code>// Maps to modes [N, K, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L118**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L119**: <code>struct TagToStrideB&lt;layout::ColumnMajor *&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideB`.
+  - CN: 声明或定义 struct `TagToStrideB`。
+- **L120**: <code>  using UnderlyingType = cute::Stride&lt;int64_t, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `UnderlyingType` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `UnderlyingType`。
+- **L121**: <code>  using type = UnderlyingType*;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L122**: <code>  using tag = layout::ColumnMajor;</code>
+  - EN: Defines the alias `tag` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `tag`。
+- **L123**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L124**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L125**: <code>// Maps to modes [M, N, L]</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L126**: <code>template &lt;class LayoutTag&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L127**: <code>struct TagToStrideC : TagToStrideA&lt;LayoutTag&gt; { };</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L128**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L129**: <code>// Conv: Maps to modes ((P,N), C, _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L130**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L131**: <code>struct TagToStrideC&lt;cutlass::layout::TensorNWC&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L132**: <code>  using type = cute::Stride&lt;cute::Stride&lt;int64_t, int64_t&gt;, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L133**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>// Conv: Maps to modes ((P,Q,N), C, _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L136**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L137**: <code>struct TagToStrideC&lt;cutlass::layout::TensorNHWC&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L138**: <code>  using type = cute::Stride&lt;cute::Stride&lt;int64_t, int64_t, int64_t&gt;, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L139**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L140**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L141**: <code>// Conv: Maps to modes ((P,Q,Z,N), C, _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L142**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L143**: <code>struct TagToStrideC&lt;cutlass::layout::TensorNDHWC&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L144**: <code>  using type = cute::Stride&lt;cute::Stride&lt;int64_t, int64_t, int64_t, int64_t&gt;, cute::Int&lt;1&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L145**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L146**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L147**: <code>// Conv: Maps to modes (K, (C,S), _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L148**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L149**: <code>struct TagToStrideC&lt;cutlass::layout::TensorKCS&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L150**: <code>  using type = cute::Stride&lt;int64_t, cute::Stride&lt;cute::Int&lt;1&gt;, int64_t&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L151**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L152**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L153**: <code>// Conv: Maps to modes (K, (C,S,R), _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L154**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L155**: <code>struct TagToStrideC&lt;cutlass::layout::TensorKCSR&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L156**: <code>  using type = cute::Stride&lt;int64_t, cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, int64_t&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L157**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L158**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L159**: <code>// Conv: Maps to modes (K, (C,S,R,T), _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L160**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L161**: <code>struct TagToStrideC&lt;cutlass::layout::TensorKCSRT&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L162**: <code>  using type = cute::Stride&lt;int64_t, cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, int64_t, int64_t&gt;, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L163**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L164**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L165**: <code>// Conv: Maps to modes ((C,S), K, _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L166**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L167**: <code>struct TagToStrideC&lt;cutlass::layout::TensorCSK&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L168**: <code>  using type = cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, int64_t&gt;, int64_t, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L169**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L170**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L171**: <code>// Conv: Maps to modes ((C,S,R), K, _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L172**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L173**: <code>struct TagToStrideC&lt;cutlass::layout::TensorCSRK&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L174**: <code>  using type = cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, int64_t&gt;, int64_t, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L175**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L176**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L177**: <code>// Conv: Maps to modes ((C,S,R,T), K, _0) for compatiblity with GEMM epilogues expecting a batch mode stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L178**: <code>template &lt;&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L179**: <code>struct TagToStrideC&lt;cutlass::layout::TensorCSRTK&gt; {</code>
+  - EN: Declares or defines the struct `TagToStrideC`.
+  - CN: 声明或定义 struct `TagToStrideC`。
+- **L180**: <code>  using type = cute::Stride&lt;cute::Stride&lt;cute::Int&lt;1&gt;, int64_t, int64_t, int64_t&gt;, int64_t, cute::Int&lt;0&gt;&gt;;</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L181**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L182**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L183**: <code>// Convenience aliases</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L184**: <code>template&lt;class LayoutTag&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L185**: <code>using TagToStrideA_t = typename TagToStrideA&lt;LayoutTag&gt;::type;</code>
+  - EN: Defines the alias `TagToStrideA_t` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TagToStrideA_t`。
+- **L186**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L187**: <code>template&lt;class LayoutTag&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L188**: <code>using TagToStrideB_t = typename TagToStrideB&lt;LayoutTag&gt;::type;</code>
+  - EN: Defines the alias `TagToStrideB_t` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TagToStrideB_t`。
+- **L189**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L190**: <code>template&lt;class LayoutTag&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L191**: <code>using TagToStrideC_t = typename TagToStrideC&lt;LayoutTag&gt;::type;</code>
+  - EN: Defines the alias `TagToStrideC_t` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `TagToStrideC_t`。
+- **L192**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L193**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L194**: <code>// For 2.x compatibility APIs, provide stride-&gt;layout tag mappers</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L195**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L196**: <code>template&lt;int ModeIndex, class Stride&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L197**: <code>constexpr bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L198**: <code>is_major(Stride = {}) {</code>
+  - EN: Starts the definition body for `is_major`.
+  - CN: 开始 `is_major` 的定义体。
+- **L199**: <code>  // Account for stride types with and without batch mode and batch modes with static zero stride</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L200**: <code>  return cute::is_constant&lt;1, decltype(cute::front(cute::get&lt;ModeIndex&gt;(cute::remove_pointer_t&lt;Stride&gt;{})))&gt;::value;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L201**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L202**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L203**: <code>template&lt;int ModeIndex, class Shape, class Stride&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L204**: <code>constexpr bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L205**: <code>is_major(cute::Layout&lt;Shape,Stride&gt; = {}) {</code>
+  - EN: Starts the definition body for `is_major`.
+  - CN: 开始 `is_major` 的定义体。
+- **L206**: <code>  return is_major&lt;ModeIndex&gt;(Stride{});</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L207**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L208**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L209**: <code>// Note : This method can be used for deducing the Layout Tag of A, C, D Matrices</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L210**: <code>template&lt;class StrideA&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L211**: <code>constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L212**: <code>auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L213**: <code>stride_to_layout_tag_A() {</code>
+  - EN: Starts the definition body for `stride_to_layout_tag_A`.
+  - CN: 开始 `stride_to_layout_tag_A` 的定义体。
+- **L214**: <code>  using InternalStrideA = cute::remove_pointer_t&lt;StrideA&gt;;</code>
+  - EN: Defines the alias `InternalStrideA` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `InternalStrideA`。
+- **L215**: <code>  if constexpr (cute::is_layout&lt;InternalStrideA&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L216**: <code>    return stride_to_layout_tag_A&lt;decltype(cute::stride(InternalStrideA{}))&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L217**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L218**: <code>  else if constexpr (is_major&lt;0, StrideA&gt;()) { // M major</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L219**: <code>    return layout::ColumnMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L220**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L221**: <code>  // Specialize for sparse layout</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L222**: <code>  else if constexpr (cute::get&lt;0&gt;(InternalStrideA{}) == cute::_2{} &amp;&amp;</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L223**: <code>                     cute::rank(cute::get&lt;1&gt;(InternalStrideA{})) == 2 &amp;&amp;</code>
+  - EN: Starts the definition body for `rank`.
+  - CN: 开始 `rank` 的定义体。
+- **L224**: <code>                     cute::is_same_v&lt;cute::_1, cute::remove_cvref_t&lt;decltype(cute::get&lt;1,0&gt;(InternalStrideA{}))&gt;&gt;) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L225**: <code>    return layout::ColumnMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L226**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L227**: <code>  else { // K major</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L228**: <code>    return layout::RowMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L229**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L230**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L231**: <code>  CUTE_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L232**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L233**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L234**: <code>template&lt;class StrideB&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L235**: <code>constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L236**: <code>auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L237**: <code>stride_to_layout_tag_B() {</code>
+  - EN: Starts the definition body for `stride_to_layout_tag_B`.
+  - CN: 开始 `stride_to_layout_tag_B` 的定义体。
+- **L238**: <code>  using InternalStrideB = cute::remove_pointer_t&lt;StrideB&gt;;</code>
+  - EN: Defines the alias `InternalStrideB` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `InternalStrideB`。
+- **L239**: <code>  if constexpr (cute::is_layout&lt;InternalStrideB&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L240**: <code>    return stride_to_layout_tag_B&lt;decltype(cute::stride(InternalStrideB{}))&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L241**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L242**: <code>  else if constexpr (is_major&lt;0, StrideB&gt;()) { // N major</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L243**: <code>    return layout::RowMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L244**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L245**: <code>  else { // K major</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L246**: <code>    return layout::ColumnMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L247**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L248**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L249**: <code>  CUTE_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L250**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <code>template&lt;class StrideC&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L253**: <code>constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L254**: <code>auto</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L255**: <code>stride_to_layout_tag_C() {</code>
+  - EN: Starts the definition body for `stride_to_layout_tag_C`.
+  - CN: 开始 `stride_to_layout_tag_C` 的定义体。
+- **L256**: <code>  using InternalStrideC = cute::remove_pointer_t&lt;StrideC&gt;;</code>
+  - EN: Defines the alias `InternalStrideC` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `InternalStrideC`。
+- **L257**: <code>  if constexpr (cute::is_layout&lt;InternalStrideC&gt;::value) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L258**: <code>    return stride_to_layout_tag_C&lt;decltype(cute::stride(InternalStrideC{}))&gt;();</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L259**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L260**: <code>  else if constexpr (is_major&lt;0, StrideC&gt;()) { // M major</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L261**: <code>    return layout::ColumnMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L262**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L263**: <code>  else { // N major</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L264**: <code>    return layout::RowMajor{};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L265**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L266**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L267**: <code>  CUTE_GCC_UNREACHABLE;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L268**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L269**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L270**: <code>// Utilities to map Stride back on to their corresponding layout tags</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L271**: <code>template &lt;class S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L272**: <code>struct StrideToLayoutTagA {</code>
+  - EN: Declares or defines the struct `StrideToLayoutTagA`.
+  - CN: 声明或定义 struct `StrideToLayoutTagA`。
+- **L273**: <code>  using type = decltype(detail::stride_to_layout_tag_A&lt;S&gt;());</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L274**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L275**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L276**: <code>template &lt;class S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L277**: <code>struct StrideToLayoutTagB {</code>
+  - EN: Declares or defines the struct `StrideToLayoutTagB`.
+  - CN: 声明或定义 struct `StrideToLayoutTagB`。
+- **L278**: <code>  using type = decltype(detail::stride_to_layout_tag_B&lt;S&gt;());</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L279**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L280**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L281**: <code>template &lt;class S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L282**: <code>struct StrideToLayoutTagC {</code>
+  - EN: Declares or defines the struct `StrideToLayoutTagC`.
+  - CN: 声明或定义 struct `StrideToLayoutTagC`。
+- **L283**: <code>  using type = decltype(detail::stride_to_layout_tag_C&lt;S&gt;());</code>
+  - EN: Defines the alias `type` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `type`。
+- **L284**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L285**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L286**: <code>// Convenience aliases</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L287**: <code>template&lt;class S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L288**: <code>using StrideToLayoutTagA_t = typename StrideToLayoutTagA&lt;S&gt;::type;</code>
+  - EN: Defines the alias `StrideToLayoutTagA_t` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `StrideToLayoutTagA_t`。
+- **L289**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L290**: <code>template&lt;class S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L291**: <code>using StrideToLayoutTagB_t = typename StrideToLayoutTagB&lt;S&gt;::type;</code>
+  - EN: Defines the alias `StrideToLayoutTagB_t` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `StrideToLayoutTagB_t`。
+- **L292**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L293**: <code>template&lt;class S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L294**: <code>using StrideToLayoutTagC_t = typename StrideToLayoutTagC&lt;S&gt;::type;</code>
+  - EN: Defines the alias `StrideToLayoutTagC_t` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `StrideToLayoutTagC_t`。
+- **L295**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L296**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L297**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L298**: <code>// Inspects a tiled copy and whether its copy engine is TMA or not</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L299**: <code>template&lt;class GmemTiledCopy&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L300**: <code>constexpr bool is_tma_copy_engine() {</code>
+  - EN: Starts the definition body for `is_tma_copy_engine`.
+  - CN: 开始 `is_tma_copy_engine` 的定义体。
+- **L301**: <code>  if constexpr (cute::is_void_v&lt;GmemTiledCopy&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L302**: <code>    return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L303**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L304**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L305**: <code>   if constexpr (   cute::is_base_of_v&lt;cute::SM90_TMA_LOAD,                         GmemTiledCopy&gt;</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L306**: <code>                  || cute::is_base_of_v&lt;cute::SM90_TMA_LOAD_MULTICAST,              GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L307**: <code>                  || cute::is_base_of_v&lt;cute::SM90_TMA_LOAD_IM2COL,                 GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L308**: <code>                  || cute::is_base_of_v&lt;cute::SM90_TMA_LOAD_IM2COL_MULTICAST,       GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L309**: <code>                  || cute::is_base_of_v&lt;cute::SM90_TMA_STORE,                       GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L310**: <code>                  || cute::is_base_of_v&lt;cute::SM90_TMA_STORE_IM2COL,                GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L311**: <code>                  || cute::is_base_of_v&lt;cute::SM100_TMA_2SM_LOAD,                   GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L312**: <code>                  || cute::is_base_of_v&lt;cute::SM100_TMA_2SM_LOAD_MULTICAST,         GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L313**: <code>                  || cute::is_base_of_v&lt;cute::SM100_TMA_LOAD_2D_GATHER4,            GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L314**: <code>                  || cute::is_base_of_v&lt;cute::SM100_TMA_LOAD_MULTICAST_2D_GATHER4,  GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L315**: <code>                  || cute::is_base_of_v&lt;cute::SM100_TMA_STORE_2D_SCATTER4,          GmemTiledCopy&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L316**: <code>                  ) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L317**: <code>      return true;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L318**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L319**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L320**: <code>  return false;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L321**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L322**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L323**: <code>template &lt;class X, class = void&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L324**: <code>struct RawDtype { using type = X; };</code>
+  - EN: Declares or defines the struct `RawDtype`.
+  - CN: 声明或定义 struct `RawDtype`。
+- **L325**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L326**: <code>template &lt;class X&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L327**: <code>struct RawDtype&lt;X,cute::void_t&lt;typename X::raw_type&gt;&gt; { using type = typename X::raw_type; };</code>
+  - EN: Declares or defines the struct `RawDtype`.
+  - CN: 声明或定义 struct `RawDtype`。
+- **L328**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L329**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L330**: <code>// Inspects a TiledCopy and returns its alignment in terms of element count</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L331**: <code>template &lt;class GmemTiledCopy, class Element, class ElementMma = Element&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L332**: <code>constexpr int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L333**: <code>get_alignment_count_from_gmem_tiled_copy() {</code>
+  - EN: Starts the definition body for `get_alignment_count_from_gmem_tiled_copy`.
+  - CN: 开始 `get_alignment_count_from_gmem_tiled_copy` 的定义体。
+- **L334**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L335**: <code>  if constexpr (cute::is_void_v&lt;GmemTiledCopy&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L336**: <code>    return 1;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L337**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L338**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L339**: <code>  // Account for ElementC = void kernels</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L340**: <code>  else if constexpr (cute::is_void_v&lt;Element&gt;) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L341**: <code>    return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L342**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L343**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L344**: <code>  else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L345**: <code>    // For TMA tiled copies, we know the alignment has to be 128 bits</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L346**: <code>    if constexpr (is_tma_copy_engine&lt;GmemTiledCopy&gt;()) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L347**: <code>      if constexpr ( cute::is_same_v&lt;typename RawDtype&lt;ElementMma&gt;::type, cutlass::detail::float_e2m1_unpacksmem_t&gt; ||</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L348**: <code>                     cute::is_same_v&lt;typename RawDtype&lt;ElementMma&gt;::type, cutlass::detail::float_e3m2_unpacksmem_t&gt; ||</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L349**: <code>                     cute::is_same_v&lt;typename RawDtype&lt;ElementMma&gt;::type, cutlass::detail::float_e2m3_unpacksmem_t&gt; ||</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L350**: <code>                     cute::is_same_v&lt;typename RawDtype&lt;ElementMma&gt;::type, cutlass::detail::type_erased_dynamic_float4_unpacksmem_t&gt; ||</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L351**: <code>                     cute::is_same_v&lt;typename RawDtype&lt;ElementMma&gt;::type, cutlass::detail::type_erased_dynamic_float6_unpacksmem_t&gt; ||</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L352**: <code>                     cutlass::gemm::collective::detail::is_sm10x_f8f6f4_element&lt;Element&gt;() &amp;&amp; cute::is_same_v&lt;typename RawDtype&lt;ElementMma&gt;::type, uint8_t&gt;) {</code>
+  - EN: Starts the definition body for `Element`.
+  - CN: 开始 `Element` 的定义体。
+- **L353**: <code>        return 128;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L354**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L355**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L356**: <code>      // For sparse MMA, alignment in logical elements is increased by sparsity factor</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L357**: <code>      if constexpr (cute::is_sparse_v&lt;ElementMma&gt;) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L358**: <code>        return 128 / sizeof_bits&lt;Element&gt;::value * ElementMma::sparsity;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L359**: <code>      }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L360**: <code>      return 128 / sizeof_bits&lt;Element&gt;::value;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L361**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L362**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L363**: <code>      // For non-TMA tiled copies, TiledCopy holds the alignment count directly in its TiledShape_MN</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L364**: <code>      return GmemTiledCopy::NumValSrc;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L365**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L366**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L367**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L368**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L369**: <code>// Return alignment bit requirements for the GEMM inputs.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L370**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L371**: <code>  class ElementType</code>
+  - EN: Declares or defines the class `ElementType`.
+  - CN: 声明或定义 class `ElementType`。
+- **L372**: <code>  , bool IsF8F6F4SubBytes=false</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L373**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L374**: <code>constexpr int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L375**: <code>get_input_alignment_bits() {</code>
+  - EN: Starts the definition body for `get_input_alignment_bits`.
+  - CN: 开始 `get_input_alignment_bits` 的定义体。
+- **L376**: <code>  if constexpr (IsF8F6F4SubBytes &amp;&amp; sizeof_bits&lt;ElementType&gt;::value == 4) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L377**: <code>    // 16U4 format: The inner tensor size dimension should be multiple of 64B.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L378**: <code>    return 64 * 8;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L379**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L380**: <code>  else if constexpr (IsF8F6F4SubBytes &amp;&amp; sizeof_bits&lt;ElementType&gt;::value == 6) {</code>
+  - EN: Adds another tested branch to the current conditional chain.
+  - CN: 为当前条件链增加一个继续判断的分支。
+- **L381**: <code>    // 16U6 format : The inner tensor size dimension must be a multiple of 96B.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L382**: <code>    return 96 * 8;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L383**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L384**: <code>  // TMA 16B alignment requirement</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L385**: <code>  return 128;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L386**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L387**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L388**: <code>// Return alignment bit requirements for the GEMM outputs.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L389**: <code>template &lt;class ElementType&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L390**: <code>constexpr int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L391**: <code>get_output_alignment_bits() {</code>
+  - EN: Starts the definition body for `get_output_alignment_bits`.
+  - CN: 开始 `get_output_alignment_bits` 的定义体。
+- **L392**: <code>  if constexpr (sizeof_bits&lt;ElementType&gt;::value == 6) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L393**: <code>    // 16U6 format : The inner tensor size dimension must be a multiple of 96B.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L394**: <code>    return 96 * 8;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L395**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L396**: <code>  // TMA 16B alignment requirement</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L397**: <code>  return 128;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L398**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L399**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L400**: <code>// Check if tensor layout satisfies a given major alignment</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L401**: <code>template&lt;int Alignment, class Shape, class Stride&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L402**: <code>CUTLASS_HOST_DEVICE constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L403**: <code>bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L404**: <code>check_alignment(cute::Layout&lt;Shape,Stride&gt; const&amp; layout) {</code>
+  - EN: Starts the definition body for `check_alignment`.
+  - CN: 开始 `check_alignment` 的定义体。
+- **L405**: <code>  // Condition: shape must divide by Alignment without rounding</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L406**: <code>  bool shape_check = cute::size(layout.shape()) == Alignment * cute::size(cute::upcast&lt;Alignment&gt;(layout));</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L407**: <code>  // Condition: every dynamic stride must be a multiple of Alignment</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L408**: <code>  bool stride_check = cute::all_of(cute::flatten(layout.stride()), [](auto s){ return cute::is_static&lt;decltype(s)&gt;::value || (s % Alignment == 0); });</code>
+  - EN: Declares the callable or operator `all_of`.
+  - CN: 声明可调用对象或运算符 `all_of`。
+- **L409**: <code>  return shape_check &amp;&amp; stride_check;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L410**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L411**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L412**: <code>// Check if tensor layout satisfies a given major alignment</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L413**: <code>template&lt;int Alignment, class Shape, class Stride&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L414**: <code>CUTLASS_HOST_DEVICE constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L415**: <code>bool</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L416**: <code>check_alignment(Shape const&amp; shape, Stride const&amp; stride) {</code>
+  - EN: Starts the definition body for `check_alignment`.
+  - CN: 开始 `check_alignment` 的定义体。
+- **L417**: <code>  return check_alignment&lt;Alignment&gt;(cute::make_layout(shape, stride));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L418**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L419**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L420**: <code>template&lt;int B, int M, int S&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L421**: <code>CUTLASS_HOST_DEVICE constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L422**: <code>size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L423**: <code>alignment_for_swizzle(cute::Swizzle&lt;B, M, S&gt;) {</code>
+  - EN: Starts the definition body for `alignment_for_swizzle`.
+  - CN: 开始 `alignment_for_swizzle` 的定义体。
+- **L424**: <code>  static_assert(B &gt;= 0 and M &gt;= 0);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L425**: <code>  return size_t(1) &lt;&lt; size_t(B + M + cute::abs(S));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L426**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L427**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L428**: <code>template&lt;class Layout&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L429**: <code>CUTLASS_HOST_DEVICE constexpr</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L430**: <code>size_t</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L431**: <code>alignment_for_swizzle(Layout layout) {</code>
+  - EN: Starts the definition body for `alignment_for_swizzle`.
+  - CN: 开始 `alignment_for_swizzle` 的定义体。
+- **L432**: <code>  return alignment_for_swizzle(cute::get_swizzle_portion(layout));</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L433**: <code>}</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L434**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L435**: <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L436**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L437**: <code>} // namespace cutlass::detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Host-device annotations / 主机设备限定符
+- Symbol focus: `L` / 重点符号：`L`
+- Symbol focus: `TagToStrideA` / 重点符号：`TagToStrideA`
+- Symbol focus: `type` / 重点符号：`type`
+- Symbol focus: `tag` / 重点符号：`tag`
+- Symbol focus: `TagToStrideB` / 重点符号：`TagToStrideB`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cute/layout.hpp"`
+  - `"cute/pointer_sparse.hpp"       // cute::is_sparse`
+  - `"cute/swizzle.hpp"              // cute::Swizzle`
+  - `"cute/swizzle_layout.hpp"       // cute::get_swizzle_portion`
+  - `"cute/util/type_traits.hpp"`
+  - `"cute/arch/copy_sm90_tma.hpp"`
+  - `"cute/arch/copy_sm100_tma.hpp"`
+  - `"cutlass/layout/matrix.h"`
+  - `"cutlass/layout/tensor.h"`
+  - `"cutlass/numeric_types.h"`
+  - `"cutlass/detail/collective.hpp"`

@@ -1,0 +1,12088 @@
+# gemm_testbed_3x.hpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/device/gemm_testbed_3x.hpp`
+
+## Purpose / 目的
+- EN: This header defines reusable CUTLASS 3.x GEMM testbed infrastructure for constructing inputs, launching kernels, and checking results on SM90 configurations.
+- CN: 该头文件定义了可复用的 CUTLASS 3.x GEMM 测试平台基础设施，用于在 SM90 配置下构造输入、启动内核并检查结果。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `/*! \file`
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: `    \brief Tests for device-wide GEMM interface`
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: `*/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: `#pragma once`
+  - EN: Ensures this header is included only once per translation unit.
+  - CN: 确保该头文件在一个编译单元中只被包含一次。
+- **Line 36**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: `#include <iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- **Line 38**: `#include <fstream>`
+  - EN: Provides file-stream support for writing debug dumps.
+  - CN: 提供用于写入调试转储的文件流支持。
+- **Line 39**: `#include <sstream>`
+  - EN: Provides string-stream utilities for building messages or filenames.
+  - CN: 提供用于构造消息或文件名的字符串流工具。
+- **Line 40**: `#include <algorithm>`
+  - EN: Provides a standard-library facility used by this source file.
+  - CN: 提供该源文件使用的标准库能力。
+- **Line 41**: `#include <random>`
+  - EN: Provides a standard-library facility used by this source file.
+  - CN: 提供该源文件使用的标准库能力。
+- **Line 42**: `#include <numeric> // std::lcm`
+  - EN: Provides a standard-library facility used by this source file.
+  - CN: 提供该源文件使用的标准库能力。
+- **Line 43**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 44**: `#include "../../common/cutlass_unit_test.h"`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 45**: `#include "cutlass/util/host_tensor.h"`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 46**: `#include "cutlass/util/tensor_view_io.h"`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 47**: `#include "cutlass/util/distribution.h"`
+  - EN: Defines the supported random and structured tensor initialization distributions.
+  - CN: 定义支持的随机和结构化张量初始化分布。
+- **Line 48**: `#include "cutlass/util/packed_stride.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 49**: `#include "cutlass/util/reference/host/tensor_fill.h"`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- **Line 50**: `#include "cutlass/util/reference/host/tensor_copy.h"`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- **Line 51**: `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 52**: `#include "cutlass/util/reference/host/tensor_norm.h"`
+  - EN: Provides tensor norm utilities for sanity checks.
+  - CN: 提供用于健全性检查的张量范数工具。
+- **Line 53**: `#include "cutlass/util/reference/host/gett.hpp"`
+  - EN: Provides host-side reference math or tensor utilities used for validation.
+  - CN: 提供用于验证的主机侧参考数学或张量工具。
+- **Line 54**: `#include "cutlass/epilogue/collective/default_epilogue.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 55**: `#include "cutlass/epilogue/fusion/operations.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 56**: `#include "cutlass/complex.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 57**: `#include "cutlass/transform/device/transform_universal_adapter.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 58**: `#include "cutlass/transform/kernel/sparse_gemm_compressor.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 59**: `#include "cutlass/detail/collective.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 60**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 61**: `#include "testbed_utils.h"`
+  - EN: Local utility helpers shared by GEMM testbed headers.
+  - CN: GEMM 测试平台头文件共享的本地工具辅助函数。
+- **Line 62**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 63**: `#include "cutlass/kernel_hardware_info.hpp"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 64**: `#include "cutlass/layout/matrix.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 65**: `#include "cutlass/matrix_coord.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 66**: `#include "cutlass/gemm/gemm.h"`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- **Line 67**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 68**: `#include "cute/int_tuple.hpp"`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 69**: `#include "cute/layout.hpp"`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 70**: `#include "cute/numeric/int.hpp"`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 71**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 72**: `namespace test {`
+  - EN: Opens namespace `test` to organize related test utilities.
+  - CN: 打开命名空间 `test`，用于组织相关测试工具。
+- **Line 73**: `namespace gemm {`
+  - EN: Opens namespace `gemm` to organize related test utilities.
+  - CN: 打开命名空间 `gemm`，用于组织相关测试工具。
+- **Line 74**: `namespace device {`
+  - EN: Opens namespace `device` to organize related test utilities.
+  - CN: 打开命名空间 `device`，用于组织相关测试工具。
+- **Line 75**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 76**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 77**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 78**: `enum class ScalarLoc {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 79**: `  ON_HOST = 0,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 80**: `  ON_DEVICE = 1`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 81**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 82**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 83**: `enum class VectorScale {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 84**: `  DISABLED = 0,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 85**: `  ENABLED = 1`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 86**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 87**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 88**: `enum class CheckEquality {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 89**: `  EXACT = 0,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 90**: `  RELATIVE = 1`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 91**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 92**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 93**: `namespace detail {`
+  - EN: Opens namespace `detail` to organize related test utilities.
+  - CN: 打开命名空间 `detail`，用于组织相关测试工具。
+- **Line 94**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 95**: `inline constexpr auto decomp_mode_to_string =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 96**: `  [] (cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode mode) -> std::string {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 97**: `    using Mode = cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates type alias `Mode` to simplify later code.
+  - CN: 创建类型别名 `Mode` 以简化后续代码。
+- **Line 98**: `    if (mode == Mode::Heuristic) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 99**: `      return "Heuristic";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 100**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 101**: `    else if (mode == Mode::DataParallel) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 102**: `      return "DataParallel";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 103**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 104**: `    else if (mode == Mode::SplitK) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 105**: `      return "SplitK";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 106**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 107**: `    else if (mode == Mode::StreamK) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 108**: `      return "StreamK";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 109**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 110**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 111**: `      return "Unknown";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 112**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 113**: `  };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 114**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 115**: `inline constexpr auto raster_order_to_string =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 116**: `  [] (cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90Params::RasterOrderOptions mode) -> std::string {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 117**: `    using Mode = cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90Params::RasterOrderOptions;`
+  - EN: Creates type alias `Mode` to simplify later code.
+  - CN: 创建类型别名 `Mode` 以简化后续代码。
+- **Line 118**: `    if (mode == Mode::Heuristic) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 119**: `      return "Heuristic";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 120**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 121**: `    else if (mode == Mode::AlongM) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 122**: `      return "AlongM";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 123**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 124**: `    else if (mode == Mode::AlongN) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 125**: `      return "AlongN";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 126**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 127**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 128**: `      return "Unknown";`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 129**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 130**: `  };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 131**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 132**: `// Helper classes that take default data type when`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 133**: `// the Gemm::EpilogueOutputOp does not have ElementCompute`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 134**: `// and ElementScalar.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 135**: `// (e.g. when Sm90TreeVisitor is used as FusionCallbacks)`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 136**: `template <typename Gemm, typename Default, typename = void>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 137**: `struct ElementComputeType {`
+  - EN: Declares `struct ElementComputeType`, which groups related data or behavior.
+  - CN: 声明 `struct ElementComputeType`，用于组织相关数据或行为。
+- **Line 138**: `  using Type = Default;`
+  - EN: Creates type alias `Type` to simplify later code.
+  - CN: 创建类型别名 `Type` 以简化后续代码。
+- **Line 139**: `};`
+  - EN: Closes the scope for `struct ElementComputeType`.
+  - CN: 结束 `struct ElementComputeType` 的作用域。
+- **Line 140**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 141**: `template <typename Gemm, typename Default>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 142**: `struct ElementComputeType<Gemm, Default, std::enable_if_t<not std::is_void_v<typename Gemm::EpilogueOutputOp::ElementCompute>>> {`
+  - EN: Declares `struct ElementComputeType`, which groups related data or behavior.
+  - CN: 声明 `struct ElementComputeType`，用于组织相关数据或行为。
+- **Line 143**: `  using Type = typename Gemm::EpilogueOutputOp::ElementCompute;`
+  - EN: Creates alias `Type` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Type`。
+- **Line 144**: `};`
+  - EN: Closes the scope for `struct ElementComputeType`.
+  - CN: 结束 `struct ElementComputeType` 的作用域。
+- **Line 145**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 146**: `template <typename Gemm, typename Default, typename = void>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 147**: `struct ElementScalarType {`
+  - EN: Declares `struct ElementScalarType`, which groups related data or behavior.
+  - CN: 声明 `struct ElementScalarType`，用于组织相关数据或行为。
+- **Line 148**: `  using Type = Default;`
+  - EN: Creates type alias `Type` to simplify later code.
+  - CN: 创建类型别名 `Type` 以简化后续代码。
+- **Line 149**: `};`
+  - EN: Closes the scope for `struct ElementScalarType`.
+  - CN: 结束 `struct ElementScalarType` 的作用域。
+- **Line 150**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 151**: `template <typename Gemm, typename Default>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 152**: `struct ElementScalarType<Gemm, Default, std::enable_if_t<not std::is_void_v<typename Gemm::EpilogueOutputOp::ElementScalar>>> {`
+  - EN: Declares `struct ElementScalarType`, which groups related data or behavior.
+  - CN: 声明 `struct ElementScalarType`，用于组织相关数据或行为。
+- **Line 153**: `  using Type = typename Gemm::EpilogueOutputOp::ElementScalar;`
+  - EN: Creates alias `Type` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Type`。
+- **Line 154**: `};`
+  - EN: Closes the scope for `struct ElementScalarType`.
+  - CN: 结束 `struct ElementScalarType` 的作用域。
+- **Line 155**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 156**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 157**: `template <typename Gemm, typename = void>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 158**: `struct IsF8F6F4Kernel {`
+  - EN: Declares `struct IsF8F6F4Kernel`, which groups related data or behavior.
+  - CN: 声明 `struct IsF8F6F4Kernel`，用于组织相关数据或行为。
+- **Line 159**: `  static constexpr bool value = false;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 160**: `};`
+  - EN: Closes the scope for `struct IsF8F6F4Kernel`.
+  - CN: 结束 `struct IsF8F6F4Kernel` 的作用域。
+- **Line 161**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 162**: `template <typename Gemm>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 163**: `struct IsF8F6F4Kernel<Gemm, std::void_t<decltype(Gemm::GemmKernel::CollectiveMainloop::IsF8F6F4)>> {`
+  - EN: Declares `struct IsF8F6F4Kernel`, which groups related data or behavior.
+  - CN: 声明 `struct IsF8F6F4Kernel`，用于组织相关数据或行为。
+- **Line 164**: `  static constexpr bool value = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 165**: `};`
+  - EN: Closes the scope for `struct IsF8F6F4Kernel`.
+  - CN: 结束 `struct IsF8F6F4Kernel` 的作用域。
+- **Line 166**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 167**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 168**: `template<class CollectiveEpilogue, class = void>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 169**: `struct IsSfdEpi : cute::false_type {};`
+  - EN: Declares `struct IsSfdEpi`, which groups related data or behavior.
+  - CN: 声明 `struct IsSfdEpi`，用于组织相关数据或行为。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `template<class CollectiveEpilogue>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 172**: `struct IsSfdEpi<CollectiveEpilogue, cute::void_t<typename CollectiveEpilogue::FusionCallbacks::Operation::GmemLayoutTagScalefactor>> : cute::true_type {};`
+  - EN: Declares `struct IsSfdEpi`, which groups related data or behavior.
+  - CN: 声明 `struct IsSfdEpi`，用于组织相关数据或行为。
+- **Line 173**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 174**: `// The maximum swizzle size to use`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 175**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 176**: `// This class, like Splits above makes it harder to confuse`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 177**: `// the order of arguments of the various run(...) functions in this file.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 178**: `class MaxSwizzleSize {`
+  - EN: Declares `class MaxSwizzleSize`, which groups related data or behavior.
+  - CN: 声明 `class MaxSwizzleSize`，用于组织相关数据或行为。
+- **Line 179**: `public:`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 180**: `  MaxSwizzleSize() = default;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 181**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 182**: `  template<class IntegralNotBool,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 183**: `    __CUTE_REQUIRES((std::is_integral_v<IntegralNotBool> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 184**: `      !cute::is_same_v<IntegralNotBool, bool>)) >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 185**: `  explicit MaxSwizzleSize(IntegralNotBool max_swizzle_size) : max_swizzle_size_(max_swizzle_size) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 186**: `  explicit operator int() const { return max_swizzle_size_; }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 187**: `private:`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 188**: `  int max_swizzle_size_ = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 189**: `};`
+  - EN: Closes the scope for `class MaxSwizzleSize`.
+  - CN: 结束 `class MaxSwizzleSize` 的作用域。
+- **Line 190**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 191**: `template <typename T>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 192**: `auto make_iterator(T* ptr) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 193**: `  return cute::recast_ptr<T>(ptr);`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 194**: `}`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 195**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 196**: `template<class T>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 197**: `struct IsDefaultEpilogue {`
+  - EN: Declares `struct IsDefaultEpilogue`, which groups related data or behavior.
+  - CN: 声明 `struct IsDefaultEpilogue`，用于组织相关数据或行为。
+- **Line 198**: `  static constexpr bool value = false;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 199**: `};`
+  - EN: Closes the scope for `struct IsDefaultEpilogue`.
+  - CN: 结束 `struct IsDefaultEpilogue` 的作用域。
+- **Line 200**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 201**: `template<class ...args>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 202**: `struct IsDefaultEpilogue<cutlass::epilogue::collective::DefaultEpilogue<args...>> {`
+  - EN: Declares `struct IsDefaultEpilogue`, which groups related data or behavior.
+  - CN: 声明 `struct IsDefaultEpilogue`，用于组织相关数据或行为。
+- **Line 203**: `  static constexpr bool value = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 204**: `};`
+  - EN: Closes the scope for `struct IsDefaultEpilogue`.
+  - CN: 结束 `struct IsDefaultEpilogue` 的作用域。
+- **Line 205**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 206**: `template<class ...args>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 207**: `struct IsDefaultEpilogue<cutlass::epilogue::collective::detail::Sm90TmaWarpSpecializedAdapter<args...>> {`
+  - EN: Declares `struct IsDefaultEpilogue`, which groups related data or behavior.
+  - CN: 声明 `struct IsDefaultEpilogue`，用于组织相关数据或行为。
+- **Line 208**: `  static constexpr bool value = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 209**: `};`
+  - EN: Closes the scope for `struct IsDefaultEpilogue`.
+  - CN: 结束 `struct IsDefaultEpilogue` 的作用域。
+- **Line 210**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 211**: `template <typename Epilogue, typename = void>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 212**: `struct IsLegacyEpiloguePolicy {`
+  - EN: Declares `struct IsLegacyEpiloguePolicy`, which groups related data or behavior.
+  - CN: 声明 `struct IsLegacyEpiloguePolicy`，用于组织相关数据或行为。
+- **Line 213**: `  static constexpr bool value = false;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 214**: `};`
+  - EN: Closes the scope for `struct IsLegacyEpiloguePolicy`.
+  - CN: 结束 `struct IsLegacyEpiloguePolicy` 的作用域。
+- **Line 215**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 216**: `template <typename Epilogue>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 217**: `struct IsLegacyEpiloguePolicy<Epilogue, cute::void_t<decltype(Epilogue::DispatchPolicy::FragmentSize)>> {`
+  - EN: Declares `struct IsLegacyEpiloguePolicy`, which groups related data or behavior.
+  - CN: 声明 `struct IsLegacyEpiloguePolicy`，用于组织相关数据或行为。
+- **Line 218**: `  using EpiloguePolicy = typename Epilogue::DispatchPolicy;`
+  - EN: Creates alias `EpiloguePolicy` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `EpiloguePolicy`。
+- **Line 219**: `  static constexpr bool value = cute::is_same_v<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 220**: `                                      EpiloguePolicy,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 221**: `                                      cutlass::epilogue::Sm90TmaWarpSpecializedBiasElementwise<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 222**: `                                        EpiloguePolicy::StagesC, EpiloguePolicy::StagesD, EpiloguePolicy::FragmentSize>>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 223**: `};`
+  - EN: Closes the scope for `struct IsLegacyEpiloguePolicy`.
+  - CN: 结束 `struct IsLegacyEpiloguePolicy` 的作用域。
+- **Line 224**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 225**: `// The number of splits to test.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 226**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 227**: `// This class makes it harder to confuse the order of arguments`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 228**: `// of the various run(...) functions in this file.  The constructor`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 229**: `// is explicit, so one can't just type 42 (or false, which the`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 230**: `// compiler unhelpfully turns into 0); one has to type Splits(42).`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 231**: `// Splits() picks the default number of splits, 1.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 232**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 233**: `// The conversion-to-int operator (operator int()) MUST be explicit!`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 234**: `// Conversion to int MUST require static_cast<int>.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 235**: `// Otherwise, that defeats a key purpose of this class,`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 236**: `// which is to catch common errors of confusing the order`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 237**: `// of function arguments.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 238**: `class Splits {`
+  - EN: Declares `class Splits`, which groups related data or behavior.
+  - CN: 声明 `class Splits`，用于组织相关数据或行为。
+- **Line 239**: `public:`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 240**: `  Splits() = default;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 241**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 242**: `  template<class IntegralNotBool,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 243**: `    __CUTE_REQUIRES((std::is_integral_v<IntegralNotBool> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 244**: `      !cute::is_same_v<IntegralNotBool, bool>)) >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 245**: `  explicit Splits(IntegralNotBool splits) : splits_(splits) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 246**: `  explicit operator int() const { return splits_; }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 247**: `private:`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 248**: `  int splits_ = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 249**: `};`
+  - EN: Closes the scope for `class Splits`.
+  - CN: 结束 `class Splits` 的作用域。
+- **Line 250**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 251**: `// The number of iterations to test.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 252**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 253**: `// This class, like Splits above makes it harder to confuse`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 254**: `// the order of arguments of the various run(...) functions in this file.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 255**: `// Iterations() picks the default number of iterations, 20.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 256**: `class Iterations {`
+  - EN: Declares `class Iterations`, which groups related data or behavior.
+  - CN: 声明 `class Iterations`，用于组织相关数据或行为。
+- **Line 257**: `public:`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 258**: `  Iterations() = default;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 259**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 260**: `  template<class IntegralNotBool,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 261**: `    __CUTE_REQUIRES((std::is_integral_v<IntegralNotBool> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 262**: `      !cute::is_same_v<IntegralNotBool, bool>)) >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 263**: `  explicit Iterations(IntegralNotBool iterations) : iterations_(iterations) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 264**: `  explicit operator int() const { return iterations_; }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 265**: `private:`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 266**: `  int iterations_ = 20;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 267**: `};`
+  - EN: Closes the scope for `class Iterations`.
+  - CN: 结束 `class Iterations` 的作用域。
+- **Line 268**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 269**: `template <typename Element, typename Layout>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 270**: `bool initialize_tensor(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 271**: `  cutlass::TensorView<Element, Layout> view,`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 272**: `  cutlass::Distribution::Kind dist_kind,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 273**: `  uint64_t seed) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 274**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 275**: `  if (dist_kind == cutlass::Distribution::Uniform) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 276**: `    double scope_max, scope_min;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 277**: `    int bits_input = cutlass::sizeof_bits<Element>::value;`
+  - EN: Computes a vector length or policy value from the bit-width of the selected element type.
+  - CN: 根据所选元素类型的位宽计算向量长度或策略值。
+- **Line 278**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 279**: `    if (bits_input == 1) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 280**: `      scope_max = 2;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 281**: `      scope_min = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 282**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 283**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 284**: `    else if (bits_input <= 6) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 285**: `      scope_max = 2;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 286**: `      scope_min = -2;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 287**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 288**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 289**: `    else if (bits_input <= 8) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 290**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 291**: `      if constexpr (`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 292**: `                    cute::is_same_v<Element, cutlass::float_ue8m0_t>){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 293**: `        scope_max = 4;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 294**: `        scope_min = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 295**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 296**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 297**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 298**: `        scope_max = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 299**: `        scope_min = -1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 300**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 301**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 302**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 303**: `    }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 304**: `    else{`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 305**: `      scope_max = 4;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 306**: `      scope_min = -4;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 307**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 308**: `    cutlass::reference::host::TensorFillRandomUniform(`
+  - EN: Initializes a tensor with uniformly distributed random values.
+  - CN: 使用均匀分布随机值初始化张量。
+- **Line 309**: `      view, seed, scope_max, scope_min, 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 310**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 311**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 312**: `  else if (dist_kind == cutlass::Distribution::Identity) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 313**: `    cutlass::reference::host::TensorFillIdentity(view);`
+  - EN: Initializes the tensor with an identity-pattern structure.
+  - CN: 将张量初始化为单位矩阵样式结构。
+- **Line 314**: `  }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 315**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 316**: `  else if (dist_kind == cutlass::Distribution::Gaussian) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 317**: `    cutlass::reference::host::TensorFillRandomGaussian(view, seed, 0, 0.5);`
+  - EN: Initializes a tensor with Gaussian-distributed random values.
+  - CN: 使用高斯分布随机值初始化张量。
+- **Line 318**: `  }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 319**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 320**: `  else if (dist_kind == cutlass::Distribution::Sequential) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 321**: `    cutlass::reference::host::BlockFillSequential(`
+  - EN: Initializes tensor storage with a deterministic sequential pattern.
+  - CN: 以确定性的顺序模式初始化张量存储。
+- **Line 322**: `      view.data(), view.capacity());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 323**: `  }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 324**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 325**: `  else if (dist_kind == cutlass::Distribution::AllOnes) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 326**: `    cutlass::reference::host::TensorFill(view, Element(1));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 327**: `  }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 328**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 329**: `  else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 330**: `    EXPECT_TRUE(false) << "Not implemented";`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 331**: `    return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 332**: `  }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 333**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 334**: `  return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 335**: `}`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 336**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 337**: `// Looks at Cute Stride to check Row / Column Major`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 338**: `template<typename Stride>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 339**: `static constexpr bool is_row_or_col_major(){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 340**: `  int stride_0 = int(cute::size<0>(Stride{}));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 341**: `  int stride_1 = int(cute::size<1>(Stride{}));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 342**: `  int depth = cute::depth(Stride{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 343**: `  return ((stride_0 == 1) || (stride_1 == 1)) && (depth == 1);`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 344**: `}`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 345**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 346**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 347**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 348**: `// Default MMA input Operands : A , B`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 349**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 350**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 351**: `  class ScheduleType_,`
+  - EN: Declares `class ScheduleType_`, which groups related data or behavior.
+  - CN: 声明 `class ScheduleType_`，用于组织相关数据或行为。
+- **Line 352**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 353**: `  class ElementA_ = typename Gemm::GemmKernel::ElementA,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 354**: `  class ElementB_ = typename Gemm::GemmKernel::ElementB,`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 355**: `  class Enable = void>`
+  - EN: Declares `class Enable`, which groups related data or behavior.
+  - CN: 声明 `class Enable`，用于组织相关数据或行为。
+- **Line 356**: `struct HostCollectiveMainloop {`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 357**: `  // Kernel data types`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 358**: `  using ElementA = ElementA_;`
+  - EN: Creates type alias `ElementA` to simplify later code.
+  - CN: 创建类型别名 `ElementA` 以简化后续代码。
+- **Line 359**: `  using StrideA  = typename Gemm::GemmKernel::StrideA;`
+  - EN: Creates alias `StrideA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideA`。
+- **Line 360**: `  using ElementB = ElementB_;`
+  - EN: Creates type alias `ElementB` to simplify later code.
+  - CN: 创建类型别名 `ElementB` 以简化后续代码。
+- **Line 361**: `  using StrideB  = typename Gemm::GemmKernel::StrideB;`
+  - EN: Creates alias `StrideB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideB`。
+- **Line 362**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 363**: `  using LayoutTagA = cutlass::detail::StrideToLayoutTagA_t<StrideA>;`
+  - EN: Creates type alias `LayoutTagA` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagA` 以简化后续代码。
+- **Line 364**: `  using LayoutTagB = cutlass::detail::StrideToLayoutTagB_t<StrideB>;`
+  - EN: Creates type alias `LayoutTagB` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagB` 以简化后续代码。
+- **Line 365**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 366**: `  using ElementAccumulator = typename Gemm::GemmKernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 367**: `  using ElementScalingFactor = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalingFactor` to simplify later code.
+  - CN: 创建类型别名 `ElementScalingFactor` 以简化后续代码。
+- **Line 368**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 369**: `  using EpilogueOutputOp = typename Gemm::EpilogueOutputOp;`
+  - EN: Creates alias `EpilogueOutputOp` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `EpilogueOutputOp`。
+- **Line 370**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 371**: `  using Arguments = typename Gemm::GemmKernel::MainloopArguments;`
+  - EN: Creates alias `Arguments` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Arguments`。
+- **Line 372**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 373**: `  cutlass::ComplexTransform TransformA = Gemm::kTransformA;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 374**: `  cutlass::ComplexTransform TransformB = Gemm::kTransformB;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 375**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 376**: `  StrideA stride_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 377**: `  StrideB stride_b;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 378**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 379**: `  typename LayoutTagA::Stride stride_factor_A;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 380**: `  typename LayoutTagB::Stride stride_factor_B;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 381**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 382**: `  cutlass::Distribution::Kind init_A;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 383**: `  cutlass::Distribution::Kind init_B;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 384**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 385**: `  cutlass::HostTensor<ElementA, LayoutTagA> tensor_A;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 386**: `  cutlass::HostTensor<ElementB, LayoutTagB> tensor_B;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 387**: `  // Whether to use relative equality checks`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 388**: `  CheckEquality check_relative_equality = CheckEquality::EXACT;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 389**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 390**: `  uint64_t seed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 391**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 392**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 393**: `  // Note: this limitation comes from testbed / not the library`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 394**: `  static_assert(is_row_or_col_major<StrideA>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 395**: `    "ERROR : A Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 396**: `  static_assert(is_row_or_col_major<StrideB>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 397**: `    "ERROR : B Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 398**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 399**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 400**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 401**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 402**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 403**: `    uint64_t seed_ = kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 404**: `    typename LayoutTagA::Stride stride_factor_A_ = typename LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 405**: `    typename LayoutTagB::Stride stride_factor_B_ = typename LayoutTagB::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 406**: `  ):`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 407**: `    stride_factor_A(stride_factor_A_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 408**: `    stride_factor_B(stride_factor_B_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 409**: `    init_A(init_A_), init_B(init_B_), seed(seed_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 410**: `    check_relative_equality(check_relative_equality_) { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 411**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 412**: `  template<class ProblemShapeType>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 413**: `  bool initialize(ProblemShapeType problem_size) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 414**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 415**: `    CUTLASS_TRACE_HOST("HostCollectiveMainloop (generic)::initialize(problem_shape)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 416**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 417**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 418**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 419**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 420**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 421**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 422**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 423**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 424**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 425**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 426**: `    stride_a = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 427**: `    stride_b = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 428**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 429**: `    // 2.x host tensor does not natively contain a batch stride or coord, so we spoof if by folding it into the outer mode`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 430**: `    auto a_coord = cutlass::make_Coord(M * L, K);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 431**: `    // Cutlass has Row/Col major refers to MxK times KxN matrix product,`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 432**: `    // so the HostTensorB should be treated as KxN in "coord"'s view`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 433**: `    auto b_coord = cutlass::make_Coord(K, N * L);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 434**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 435**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 436**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 437**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor_A.resize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 438**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 439**: `      tensor_A.resize(a_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(a_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 440**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 441**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor_B.resize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 442**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 443**: `      tensor_B.resize(b_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagB>::layout_factory(b_coord, stride_factor_B));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 444**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 445**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 446**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor A or B resize threw an exception: " << e.what());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 447**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 448**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 449**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 450**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor A or B resize threw an unknown exception");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 451**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 452**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 453**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 454**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 455**: `      EXPECT_TRUE(initialize_tensor(tensor_A.host_view(), init_A, seed + 2022));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 456**: `      EXPECT_TRUE(initialize_tensor(tensor_B.host_view(), init_B, seed + 2021));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 457**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 458**: `    catch (cutlass::cuda_exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 459**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: checked initialize_tensor threw cutlass::cuda_exception: " << e);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 460**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 461**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 462**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 463**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: checked initialize_tensor threw an exception: " << e.what());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 464**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 465**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 466**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 467**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: checked_initialize_tensor threw an unknown exception");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 468**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 469**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 470**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 471**: `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 472**: `    // in the upper left corner of each operand.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 473**: `    tensor_A.host_view().at({0, 0}) = ElementA(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 474**: `    tensor_B.host_view().at({0, 0}) = ElementB(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 475**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 476**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 477**: `    {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 478**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: Check last error before sync_device()");`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 479**: `      cudaError_t error = cudaGetLastError();`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 480**: `      const auto error_str = cudaGetErrorString(error);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 481**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: cudaGetLastError() is " << error_str);`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 482**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor_A.host_data()=" << tensor_A.host_data() << ", tensor_A.device_data()=" << tensor_A.device_data());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 483**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor_B.host_data()=" << tensor_B.host_data() << ", tensor_B.device_data()=" << tensor_B.device_data());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 484**: `    }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 485**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 486**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 487**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 488**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor_A.sync_device");`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 489**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 490**: `      tensor_A.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 491**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 492**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: tensor_B.sync_device");`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 493**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 494**: `      tensor_B.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 495**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 496**: `    catch (cutlass::cuda_exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 497**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: sync_device() threw cutlass::cuda_exception: " << e);`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 498**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 499**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 500**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 501**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: sync_device() threw an exception: " << e.what());`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 502**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 503**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 504**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 505**: `      CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: sync_device() threw an unknown exception");`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 506**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 507**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 508**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 509**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 510**: `    CUTLASS_TRACE_HOST("HostCollectiveMainloop::initialize: Reached end");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 511**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 512**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 513**: `  }`
+  - EN: Closes the scope for `struct HostCollectiveMainloop`.
+  - CN: 结束 `struct HostCollectiveMainloop` 的作用域。
+- **Line 514**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 515**: `  Arguments to_args() {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 516**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 517**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 518**: `    // Runtime datatype selection`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 519**: `    if constexpr (not cute::is_same_v<ElementA, typename Gemm::GemmKernel::ElementA>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 520**: `      using ArrayElementA = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementA;`
+  - EN: Creates alias `ArrayElementA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementA`。
+- **Line 521**: `      using ArrayElementB = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementB;`
+  - EN: Creates alias `ArrayElementB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementB`。
+- **Line 522**: `      return {`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 523**: `        reinterpret_cast<ArrayElementA *>(tensor_A.device_data()), stride_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 524**: `        reinterpret_cast<ArrayElementB *>(tensor_B.device_data()), stride_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 525**: `      };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 526**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 527**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 528**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 529**: `    Arguments arguments =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 530**: `    {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 531**: `      tensor_A.device_data(), stride_a, tensor_B.device_data(), stride_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 532**: `    };`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 533**: `    return arguments;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 534**: `    }`
+  - EN: Closes the scope for `struct IsSfdEpi`.
+  - CN: 结束 `struct IsSfdEpi` 的作用域。
+- **Line 535**: `  }`
+  - EN: Closes the scope for `struct IsSfdEpi`.
+  - CN: 结束 `struct IsSfdEpi` 的作用域。
+- **Line 536**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 537**: `  auto to_host_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 538**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 539**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 540**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 541**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 542**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 543**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 544**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 545**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 546**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 547**: `    auto A = make_tensor(make_iterator(tensor_A.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 548**: `          make_layout(make_shape(M, K, L), stride_a));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 549**: `    auto B = make_tensor(make_iterator(tensor_B.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 550**: `        make_layout(make_shape(N, K, L), stride_b));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 551**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 552**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 553**: `    auto dummy_SFA = cute::make_tensor(static_cast<ElementA*>(nullptr),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 554**: `        cute::make_layout(cute::make_shape(M, K, L), stride_a));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 555**: `    auto dummy_SFB = cute::make_tensor(static_cast<ElementB*>(nullptr),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 556**: `        cute::make_layout(cute::make_shape(N, K, L), stride_b));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 557**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 558**: `    cutlass::reference::host::GettMainloopParams<ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 559**: `                                                 decltype(A),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 560**: `                                                 decltype(B)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 561**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 562**: `                                                 , decltype(dummy_SFA),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 563**: `                                                 decltype(dummy_SFB)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 564**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 565**: `                                                 > mainloop_params{};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 566**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 567**: `    mainloop_params.A = A;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 568**: `    mainloop_params.B = B;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 569**: `    mainloop_params.transform_A = TransformA;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 570**: `    mainloop_params.transform_B = TransformB;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 571**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 572**: `    return mainloop_params;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 573**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 574**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 575**: `  void print_tensors(std::ofstream& file) {`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 576**: `    file << "A =\n" << tensor_A.host_view()`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 577**: `         << "\nB =\n" << tensor_B.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 578**: `  }`
+  - EN: Closes the scope for `namespace detail`.
+  - CN: 结束 `namespace detail` 的作用域。
+- **Line 579**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 580**: `  template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 581**: `    class Element,`
+  - EN: Declares `class Element`, which groups related data or behavior.
+  - CN: 声明 `class Element`，用于组织相关数据或行为。
+- **Line 582**: `    class Layout`
+  - EN: Declares `class Layout`, which groups related data or behavior.
+  - CN: 声明 `class Layout`，用于组织相关数据或行为。
+- **Line 583**: `  >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 584**: `  bool equality_check(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 585**: `    cutlass::TensorView<Element, Layout> const& lhs,`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 586**: `    cutlass::TensorView<Element, Layout> const& rhs) const {`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 587**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 588**: `    // Factors used for calculating relative equality. CUTLASS's relative-equality`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 589**: `    // checks in include/cutlass/relatively_equal.h  are inspired by`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 590**: `    // https://floating-point-gui.de/errors/comparison/. This reference suggests using`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 591**: `    // the minimum normal value of a given type as the nonzero_floor.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 592**: `    Element epsilon(static_cast<Element>(0.1f));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 593**: `    Element nonzero_floor(std::numeric_limits<Element>::min());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 594**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 595**: `    if constexpr (!cutlass::is_complex<Element>::value) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 596**: `      if (check_relative_equality == CheckEquality::RELATIVE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 597**: `        return cutlass::reference::host::TensorRelativelyEquals(`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 598**: `          lhs, rhs, epsilon, nonzero_floor);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 599**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 600**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 601**: `        return cutlass::reference::host::TensorEquals(lhs, rhs);`
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 602**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 603**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 604**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 605**: `      return cutlass::reference::host::TensorEquals(lhs, rhs);`
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 606**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 607**: `  }`
+  - EN: Closes the scope for `namespace device`.
+  - CN: 结束 `namespace device` 的作用域。
+- **Line 608**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 609**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 610**: `      cute::Shape<int,int,int,int> problem_shape_MNKL) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 611**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_A.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 612**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_B.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 613**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 614**: `    bool passed = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 615**: `    return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 616**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 617**: `};`
+  - EN: Closes the scope for `namespace gemm`.
+  - CN: 结束 `namespace gemm` 的作用域。
+- **Line 618**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 619**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 620**: `// Sparse MMA host implementation`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 621**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 622**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 623**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 624**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 625**: `  class ElementB_>`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 626**: `struct HostCollectiveMainloopSparse`
+  - EN: Declares `struct HostCollectiveMainloopSparse`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloopSparse`，用于组织相关数据或行为。
+- **Line 627**: `{`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 628**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 629**: `  // Kernel data types`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 630**: `  using ElementA = ElementA_;`
+  - EN: Creates type alias `ElementA` to simplify later code.
+  - CN: 创建类型别名 `ElementA` 以简化后续代码。
+- **Line 631**: `  // CuTe layout A for the kernel's sparse tensorA.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 632**: `  using LayoutA  = typename Gemm::GemmKernel::CollectiveMainloop::LayoutA;`
+  - EN: Creates alias `LayoutA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutA`。
+- **Line 633**: `  using ElementB = ElementB_;`
+  - EN: Creates type alias `ElementB` to simplify later code.
+  - CN: 创建类型别名 `ElementB` 以简化后续代码。
+- **Line 634**: `  using StrideB  = typename Gemm::GemmKernel::StrideB;`
+  - EN: Creates alias `StrideB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideB`。
+- **Line 635**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 636**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 637**: `  using ElementE = typename Gemm::GemmKernel::CollectiveMainloop::ElementE;`
+  - EN: Creates alias `ElementE` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementE`。
+- **Line 638**: `  // CuTe layout E for the kernel's metadata tensor.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 639**: `  using LayoutE  = typename Gemm::GemmKernel::CollectiveMainloop::LayoutE;`
+  - EN: Creates alias `LayoutE` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutE`。
+- **Line 640**: `  using ElementAccumulator = typename Gemm::GemmKernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 641**: `  using ElementScalingFactor = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalingFactor` to simplify later code.
+  - CN: 创建类型别名 `ElementScalingFactor` 以简化后续代码。
+- **Line 642**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 643**: `  using EpilogueOutputOp = typename Gemm::EpilogueOutputOp;`
+  - EN: Creates alias `EpilogueOutputOp` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `EpilogueOutputOp`。
+- **Line 644**: `  using SparseConfig = typename Gemm::GemmKernel::CollectiveMainloop::SparseConfig;`
+  - EN: Creates alias `SparseConfig` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `SparseConfig`。
+- **Line 645**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 646**: `  // The following typenames are for the reference host tensors. They are non-sparse tensors.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 647**: `  using LayoutTagA = decltype(SparseConfig::deduce_layoutA_tag(LayoutA{}));`
+  - EN: Creates type alias `LayoutTagA` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagA` 以简化后续代码。
+- **Line 648**: `  using StrideA = cutlass::gemm::TagToStrideA_t<LayoutTagA>;`
+  - EN: Creates type alias `StrideA` to simplify later code.
+  - CN: 创建类型别名 `StrideA` 以简化后续代码。
+- **Line 649**: `  // We don't care about the actual strideE for the host tensor, but just need one to allocate memory.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 650**: `  using StrideE = StrideA;`
+  - EN: Creates type alias `StrideE` to simplify later code.
+  - CN: 创建类型别名 `StrideE` 以简化后续代码。
+- **Line 651**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 652**: `  // Deduce Cutlass Layouts (RowMajor & ColumnMajor)`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 653**: `  using LayoutTagB = cutlass::detail::StrideToLayoutTagB_t<StrideB>;`
+  - EN: Creates type alias `LayoutTagB` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagB` 以简化后续代码。
+- **Line 654**: `  using LayoutTagE = cutlass::detail::StrideToLayoutTagA_t<StrideE>;`
+  - EN: Creates type alias `LayoutTagE` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagE` 以简化后续代码。
+- **Line 655**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 656**: `  using ArchTag = typename Gemm::ArchTag;`
+  - EN: Creates alias `ArchTag` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArchTag`。
+- **Line 657**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 658**: `  using CompressorUtility = cutlass::transform::kernel::StructuredSparseCompressorUtility<`
+  - EN: Creates type alias `CompressorUtility` to simplify later code.
+  - CN: 创建类型别名 `CompressorUtility` 以简化后续代码。
+- **Line 659**: `                              cute::Shape<int, int, int, int>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 660**: `                              ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 661**: `                              LayoutTagA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 662**: `                              SparseConfig>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 663**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 664**: `  using CompressorKernel = cutlass::transform::kernel::StructuredSparseCompressor<`
+  - EN: Creates type alias `CompressorKernel` to simplify later code.
+  - CN: 创建类型别名 `CompressorKernel` 以简化后续代码。
+- **Line 665**: `                              cute::Shape<int, int, int, int>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 666**: `                              ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 667**: `                              LayoutTagA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 668**: `                              SparseConfig,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 669**: `                              ArchTag>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 670**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 671**: `  using Compressor = cutlass::transform::device::TransformUniversalAdapter<CompressorKernel>;`
+  - EN: Creates type alias `Compressor` to simplify later code.
+  - CN: 创建类型别名 `Compressor` 以简化后续代码。
+- **Line 672**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 673**: `  using Arguments = typename Gemm::GemmKernel::MainloopArguments;`
+  - EN: Creates alias `Arguments` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Arguments`。
+- **Line 674**: `  // Whether to use relative equality checks`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 675**: `  CheckEquality check_relative_equality = CheckEquality::EXACT;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 676**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 677**: `  // Note: this limitation comes from testbed / not the library`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 678**: `  static_assert(is_row_or_col_major<StrideA>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 679**: `    "ERROR : A Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 680**: `  static_assert(is_row_or_col_major<StrideB>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 681**: `    "ERROR : B Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 682**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 683**: `  StrideA stride_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 684**: `  StrideA stride_a_compressed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 685**: `  StrideB stride_b;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 686**: `  StrideE stride_e;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 687**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 688**: `  LayoutA layout_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 689**: `  LayoutE layout_e;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 690**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 691**: `  typename LayoutTagA::Stride stride_factor_A;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 692**: `  typename LayoutTagB::Stride stride_factor_B;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 693**: `  typename LayoutTagE::Stride stride_factor_E;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 694**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 695**: `  cutlass::Distribution::Kind init_A;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 696**: `  cutlass::Distribution::Kind init_B;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 697**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 698**: `  cutlass::HostTensor<ElementA, LayoutTagA> tensor_A;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 699**: `  cutlass::HostTensor<ElementA, LayoutTagA> tensor_A_Comp;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 700**: `  cutlass::HostTensor<ElementB, LayoutTagB> tensor_B;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 701**: `  cutlass::HostTensor<ElementE, LayoutTagE> tensor_E;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 702**: `  uint64_t seed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 703**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 704**: `  static constexpr int MaxSmCount = 16;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 705**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 706**: `  HostCollectiveMainloopSparse(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 707**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 708**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 709**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 710**: `    uint64_t seed_ = kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 711**: `    typename LayoutTagA::Stride stride_factor_A_ = typename LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 712**: `    typename LayoutTagB::Stride stride_factor_B_ = typename LayoutTagB::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 713**: `    typename LayoutTagE::Stride stride_factor_E_ = typename LayoutTagE::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 714**: `  ):`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 715**: `    check_relative_equality(check_relative_equality_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 716**: `    stride_factor_A(stride_factor_A_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 717**: `    stride_factor_B(stride_factor_B_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 718**: `    stride_factor_E(stride_factor_E_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 719**: `    init_A(init_A_), init_B(init_B_), seed(seed_) { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 720**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 721**: `  template<class ProblemShapeType>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 722**: `  bool initialize(ProblemShapeType problem_size) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 723**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 724**: `    CUTLASS_TRACE_HOST("HostCollectiveMainloopSparse::initialize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 725**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 726**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 727**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 728**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 729**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 730**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 731**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 732**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 733**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 734**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 735**: `    stride_a = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 736**: `    stride_b = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 737**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 738**: `    CompressorUtility compressor_utility(problem_shape_MNKL, stride_a);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 739**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 740**: `    // TensorE`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 741**: `    // In unit of ElementE (uint8_t), after alignment requirement`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 742**: `    // M-dim: TensorEAtom_M alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 743**: `    // K-dim: TensorEAtom_K alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 744**: `    int KAlignedE = compressor_utility.get_metadata_k_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 745**: `    int MAlignedE = compressor_utility.get_metadata_m_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 746**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 747**: `    // TensorA Compressed`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 748**: `    // In unit of ElementARaw, after alignment requirement`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 749**: `    // M-dim: TMA alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 750**: `    // K-dim: TMA alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 751**: `    int KAlignedAC = compressor_utility.get_tensorA_k_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 752**: `    int MAlignedAC = compressor_utility.get_tensorA_m_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 753**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 754**: `    stride_a_compressed = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, KAlignedAC, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 755**: `    stride_e = cutlass::make_cute_packed_stride(StrideE{}, cute::make_shape(MAlignedE, KAlignedE, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 756**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 757**: `    auto a_coord = cutlass::make_Coord(M * L, K);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 758**: `    auto b_coord = cutlass::make_Coord(K, N * L);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 759**: `    auto e_coord = cutlass::make_Coord(MAlignedE * L, KAlignedE);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 760**: `    auto a_comp_coord = cutlass::make_Coord(MAlignedAC * L, KAlignedAC);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 761**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 762**: `    tensor_A.resize(a_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(a_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 763**: `    tensor_A_Comp.resize(a_comp_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(a_comp_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 764**: `    tensor_B.resize(b_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagB>::layout_factory(b_coord, stride_factor_B));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 765**: `    tensor_E.resize(e_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagE>::layout_factory(e_coord, stride_factor_E));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 766**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 767**: `    EXPECT_TRUE(initialize_tensor(tensor_A.host_view(), init_A, seed + 2022));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 768**: `    EXPECT_TRUE(initialize_tensor(tensor_B.host_view(), init_B, seed + 2021));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 769**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 770**: `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 771**: `    // in the upper left corner of each operand.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 772**: `    tensor_A.host_view().at({0, 0}) = ElementA(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 773**: `    tensor_B.host_view().at({0, 0}) = ElementB(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 774**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 775**: `    compressor_utility.structure_sparse_zero_mask_fill(tensor_A.host_data(), static_cast<int>(seed + 2023));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 776**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 777**: `    tensor_A.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 778**: `    tensor_B.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 779**: `    tensor_E.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 780**: `    tensor_A_Comp.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 781**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 782**: `    cutlass::Status status {cutlass::Status::kSuccess };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 783**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 784**: `    cutlass::KernelHardwareInfo hw_info;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 785**: `    hw_info.device_id = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 786**: `    hw_info.sm_count = cutlass::KernelHardwareInfo::query_device_multiprocessor_count(hw_info.device_id);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 787**: `    typename Compressor::Arguments arguments{`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 788**: `      {M, N, K, L},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 789**: `      {tensor_A.device_data(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 790**: `       stride_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 791**: `       tensor_A_Comp.device_data(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 792**: `       tensor_E.device_data()},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 793**: `      {hw_info}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 794**: `    };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 795**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 796**: `    Compressor compressor_op;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 797**: `    size_t workspace_size = Compressor::get_workspace_size(arguments);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 798**: `    cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 799**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 800**: `    status = compressor_op.can_implement(arguments);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 801**: `    if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 802**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 803**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 804**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 805**: `    status = compressor_op.initialize(arguments, workspace.get());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 806**: `    if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 807**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 808**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 809**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 810**: `    status = compressor_op.run();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 811**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 812**: `    auto result = cudaDeviceSynchronize();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 813**: `    if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 814**: `      EXPECT_EQ(result, cudaSuccess) << "Error at Kernel Sync.";`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 815**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 816**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 817**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 818**: `    layout_a = SparseConfig::fill_layoutA(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 819**: `    layout_e = SparseConfig::fill_layoutE(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 820**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 821**: `    tensor_E.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 822**: `    tensor_A_Comp.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 823**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 824**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 825**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 826**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 827**: `  Arguments to_args() {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 828**: `    using ArrayElementA = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementA;`
+  - EN: Creates alias `ArrayElementA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementA`。
+- **Line 829**: `    using ArrayElementB = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementB;`
+  - EN: Creates alias `ArrayElementB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementB`。
+- **Line 830**: `    return {`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 831**: `      reinterpret_cast<ArrayElementA *>(tensor_A_Comp.device_data()), layout_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 832**: `      reinterpret_cast<ArrayElementB *>(tensor_B.device_data()), stride_b,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 833**: `      tensor_E.device_data(), layout_e`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 834**: `    };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 835**: `  }`
+  - EN: Closes the scope for `namespace test`.
+  - CN: 结束 `namespace test` 的作用域。
+- **Line 836**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 837**: `  auto to_host_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 838**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 839**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 840**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 841**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 842**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 843**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 844**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 845**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 846**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 847**: `    auto A = make_tensor(make_iterator(tensor_A.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 848**: `          make_layout(make_shape(M, K, L), stride_a));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 849**: `    auto B = make_tensor(make_iterator(tensor_B.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 850**: `        make_layout(make_shape(N, K, L), stride_b));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 851**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 852**: `    cutlass::reference::host::GettMainloopParams<ElementAccumulator, decltype(A), decltype(B)> mainloop_params{A, B};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 853**: `    return mainloop_params;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 854**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 855**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 856**: `  void print_tensors(std::ofstream& file) {`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 857**: `    file << "A =\n" << tensor_A.host_view()`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 858**: `         << "\nB =\n" << tensor_B.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 859**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 860**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 861**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 862**: `      cute::Shape<int,int,int,int> problem_shape_MNKL) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 863**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 864**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 865**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_A.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 866**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_B.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 867**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 868**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 869**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 870**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 871**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 872**: `  class ScheduleType_,`
+  - EN: Declares `class ScheduleType_`, which groups related data or behavior.
+  - CN: 声明 `class ScheduleType_`，用于组织相关数据或行为。
+- **Line 873**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 874**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 875**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 876**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 877**: `struct HostCollectiveMainloop<ScheduleType_, Gemm, ElementA_, ElementB_,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 878**: `    cute::enable_if_t<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 879**: `      cute::is_base_of_v<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 880**: `        cutlass::gemm::MainloopSm90TmaGmmaWarpSpecializedSparse<Gemm::CollectiveMainloop::DispatchPolicy::Stages,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 881**: `                                                                typename Gemm::CollectiveMainloop::DispatchPolicy::ClusterShape,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 882**: `                                                                ScheduleType_>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 883**: `        typename Gemm::CollectiveMainloop::DispatchPolicy>>>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 884**: `  : HostCollectiveMainloopSparse<Gemm, ElementA_, ElementB_>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 885**: `{`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 886**: `  using HostCollectiveMainloopSparse<Gemm, ElementA_, ElementB_>::HostCollectiveMainloopSparse;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 887**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 888**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 889**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 890**: `// Sparse MMA input Operands : A_compressed, B, metadata`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 891**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 892**: `// Structured Sparse Gemm Input Operands`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 893**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 894**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 895**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 896**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 897**: `  int AccumulatorPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 898**: `  typename ElementA_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 899**: `  typename ElementB_`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 900**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 901**: `struct HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedSm100<SchedulerPipelineStageCount_,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 902**: `                                                                                 AccumulatorPipelineStageCount_>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 903**: `                              Gemm, ElementA_, ElementB_>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 904**: `  : HostCollectiveMainloopSparse<Gemm, ElementA_, ElementB_>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 905**: `{`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 906**: `  using HostCollectiveMainloopSparse<Gemm, ElementA_, ElementB_>::HostCollectiveMainloopSparse;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 907**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 908**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 909**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 910**: `// Sparse Gemm Input Operands : A , B, E`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 911**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 912**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 913**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 914**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 915**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 916**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 917**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 918**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedCooperativeSparseSm120<SchedulerPipelineStageCount_, false /*isAsymmetric*/>,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 919**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 920**: `       HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedSm100<0/*SchedulerPipelineStageCount_*/,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 921**: `                                                                                 0/*AccumulatorPipelineStageCount_*/>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 922**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 923**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedSm100<0,0>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 924**: `                                      Gemm, ElementA_, ElementB_ >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 925**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 926**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 927**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 928**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 929**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 930**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 931**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 932**: `    typename Base::LayoutTagE::Stride stride_factor_E_ = typename Base::LayoutTagE::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 933**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 934**: `                                                                                      stride_factor_B_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 935**: `                                                                                      stride_factor_E_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 936**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 937**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 938**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 939**: `// Sparse Gemm Input Operands : A , B, E`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 940**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 941**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 942**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 943**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 944**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 945**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 946**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 947**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedCooperativeSparseSm120<SchedulerPipelineStageCount_, true /*isAsymmetric*/>,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 948**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 949**: `       HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedSm100<0/*SchedulerPipelineStageCount_*/,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 950**: `                                                                                 0/*AccumulatorPipelineStageCount_*/>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 951**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 952**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedSm100<0,0>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 953**: `                                      Gemm, ElementA_, ElementB_ >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 954**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 955**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 956**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 957**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 958**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 959**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 960**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 961**: `    typename Base::LayoutTagE::Stride stride_factor_E_ = typename Base::LayoutTagE::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 962**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 963**: `                                                                                      stride_factor_B_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 964**: `                                                                                      stride_factor_E_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 965**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 966**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 967**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 968**: `// Block Scaled Gemm Input Operands : A , B, scalefactorA, scalefactorB`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 969**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 970**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 971**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 972**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 973**: `  int AccumulatorPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 974**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 975**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 976**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 977**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<SchedulerPipelineStageCount_,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 978**: `                                                                                      AccumulatorPipelineStageCount_>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 979**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 980**: `  // Kernel data types`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 981**: `  using ElementA = ElementA_;`
+  - EN: Creates type alias `ElementA` to simplify later code.
+  - CN: 创建类型别名 `ElementA` 以简化后续代码。
+- **Line 982**: `  using StrideA  = typename Gemm::GemmKernel::StrideA;`
+  - EN: Creates alias `StrideA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideA`。
+- **Line 983**: `  using ElementB = ElementB_;`
+  - EN: Creates type alias `ElementB` to simplify later code.
+  - CN: 创建类型别名 `ElementB` 以简化后续代码。
+- **Line 984**: `  using StrideB  = typename Gemm::GemmKernel::StrideB;`
+  - EN: Creates alias `StrideB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideB`。
+- **Line 985**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 986**: `  using LayoutTagA = cutlass::detail::StrideToLayoutTagA_t<StrideA>;`
+  - EN: Creates type alias `LayoutTagA` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagA` 以简化后续代码。
+- **Line 987**: `  using LayoutTagB = cutlass::detail::StrideToLayoutTagB_t<StrideB>;`
+  - EN: Creates type alias `LayoutTagB` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagB` 以简化后续代码。
+- **Line 988**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 989**: `  using ElementAccumulator = typename Gemm::GemmKernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 990**: `  using ElementScalingFactor = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalingFactor` to simplify later code.
+  - CN: 创建类型别名 `ElementScalingFactor` 以简化后续代码。
+- **Line 991**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 992**: `  using EpilogueOutputOp = typename Gemm::EpilogueOutputOp;`
+  - EN: Creates alias `EpilogueOutputOp` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `EpilogueOutputOp`。
+- **Line 993**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 994**: `  static constexpr int SFVecSize = Gemm::GemmKernel::CollectiveMainloop::SFVecSize;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 995**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 996**: `  using ElementSF = typename Gemm::GemmKernel::CollectiveMainloop::ElementSF;`
+  - EN: Creates alias `ElementSF` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementSF`。
+- **Line 997**: `  using Sm1xxBlkScaledConfig =  typename Gemm::GemmKernel::CollectiveMainloop::Sm1xxBlkScaledConfig;`
+  - EN: Creates alias `Sm1xxBlkScaledConfig` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Sm1xxBlkScaledConfig`。
+- **Line 998**: `  using Blk_MN   = typename Sm1xxBlkScaledConfig::Blk_MN;`
+  - EN: Creates alias `Blk_MN` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Blk_MN`。
+- **Line 999**: `  using Blk_SF   = typename Sm1xxBlkScaledConfig::Blk_SF;`
+  - EN: Creates alias `Blk_SF` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Blk_SF`。
+- **Line 1000**: `  using SfAtom   = typename Sm1xxBlkScaledConfig::SfAtom;`
+  - EN: Creates alias `SfAtom` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `SfAtom`。
+- **Line 1001**: `  using LayoutSFA = typename Gemm::GemmKernel::CollectiveMainloop::LayoutSFA;`
+  - EN: Creates alias `LayoutSFA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutSFA`。
+- **Line 1002**: `  using LayoutSFB = typename Gemm::GemmKernel::CollectiveMainloop::LayoutSFB;`
+  - EN: Creates alias `LayoutSFB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutSFB`。
+- **Line 1003**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1004**: `  using Arguments = typename Gemm::GemmKernel::MainloopArguments;`
+  - EN: Creates alias `Arguments` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Arguments`。
+- **Line 1005**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1006**: `  // Whether to use relative equality checks`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1007**: `  CheckEquality check_relative_equality = CheckEquality::EXACT;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1008**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1009**: `  StrideA stride_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1010**: `  StrideB stride_b;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1011**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1012**: `  LayoutSFA layout_sfa;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1013**: `  LayoutSFB layout_sfb;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1014**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1015**: `  typename LayoutTagA::Stride stride_factor_A;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1016**: `  typename LayoutTagB::Stride stride_factor_B;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1017**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1018**: `  cutlass::Distribution::Kind init_A;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1019**: `  cutlass::Distribution::Kind init_B;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1020**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1021**: `  cutlass::HostTensor<ElementA, LayoutTagA> tensor_A;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1022**: `  cutlass::HostTensor<ElementB, LayoutTagB> tensor_B;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1023**: `  cutlass::HostTensor<ElementSF, LayoutTagA> tensor_SFA;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1024**: `  cutlass::HostTensor<ElementSF, LayoutTagB> tensor_SFB;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1025**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1026**: `  uint64_t seed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1027**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1028**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1029**: `  // Note: this limitation comes from testbed / not the library`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1030**: `  static_assert(is_row_or_col_major<StrideA>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1031**: `    "ERROR : A Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1032**: `  static_assert(is_row_or_col_major<StrideB>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1033**: `    "ERROR : B Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1034**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1035**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1036**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1037**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1038**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1039**: `    uint64_t seed_ = kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1040**: `    typename LayoutTagA::Stride stride_factor_A_ = typename LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1041**: `    typename LayoutTagB::Stride stride_factor_B_ = typename LayoutTagB::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1042**: `  ):`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1043**: `    check_relative_equality(check_relative_equality_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1044**: `    stride_factor_A(stride_factor_A_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1045**: `    stride_factor_B(stride_factor_B_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1046**: `    init_A(init_A_), init_B(init_B_), seed(seed_) { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1047**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1048**: `  template<class ProblemShapeType>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1049**: `  bool initialize(ProblemShapeType problem_size) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 1050**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 1051**: `    CUTLASS_TRACE_HOST("HostCollectiveMainloop (KernelTmaWarpSpecializedBlockScaledSm100)::initialize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1052**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 1053**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1054**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1055**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1056**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1057**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1058**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1059**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1060**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1061**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1062**: `    stride_a = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1063**: `    stride_b = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1064**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1065**: `    // 2.x host tensor does not natively contain a batch stride or coord, so we spoof if by folding it into the outer mode`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1066**: `    auto a_coord = cutlass::make_Coord(M * L, K);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1067**: `    // Cutlass has Row/Col major refers to MxK times KxN matrix product,`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1068**: `    // so the HostTensorB should be treated as KxN in "coord"'s view`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1069**: `    auto b_coord = cutlass::make_Coord(K, N * L);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1070**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1071**: `    tensor_A.resize(a_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(a_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1072**: `    tensor_B.resize(b_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagB>::layout_factory(b_coord, stride_factor_B));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1073**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1074**: `    EXPECT_TRUE(initialize_tensor(tensor_A.host_view(), init_A, seed + 2022));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1075**: `    EXPECT_TRUE(initialize_tensor(tensor_B.host_view(), init_B, seed + 2021));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1076**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1077**: `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1078**: `    // in the upper left corner of each operand.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1079**: `    tensor_A.host_view().at({0, 0}) = ElementA(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1080**: `    tensor_B.host_view().at({0, 0}) = ElementB(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1081**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1082**: `    tensor_A.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1083**: `    tensor_B.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1084**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1085**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1086**: `    auto k_blks = cutlass::ceil_div(K, size<1>(shape(SfAtom{})));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1087**: `    auto m_blks = cutlass::ceil_div(M, Blk_MN{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1088**: `    auto n_blks = cutlass::ceil_div(N, Blk_MN{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1089**: `    layout_sfa = Sm1xxBlkScaledConfig::tile_atom_to_shape_SFA(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1090**: `    layout_sfb = Sm1xxBlkScaledConfig::tile_atom_to_shape_SFB(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1091**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1092**: `    // 2.x host tensor does not natively contain a batch stride or coord, so we spoof if by folding it into the outer mode`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1093**: `    auto sfa_coord   = cutlass::make_Coord(m_blks * Blk_MN{} * L, k_blks * Blk_SF{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1094**: `    auto sfb_coord   = cutlass::make_Coord(n_blks * Blk_MN{} * L, k_blks * Blk_SF{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1095**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1096**: `    tensor_SFA.resize(sfa_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(sfa_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1097**: `    tensor_SFB.resize(sfb_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagB>::layout_factory(sfb_coord, stride_factor_B));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1098**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1099**: `    EXPECT_TRUE(initialize_tensor(tensor_SFA.host_view(), init_A, seed + 2024));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1100**: `    EXPECT_TRUE(initialize_tensor(tensor_SFB.host_view(), init_B, seed + 2025));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1101**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1102**: `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1103**: `    // in the upper left corner of each operand.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1104**: `    tensor_SFA.host_view().at({0, 0}) = ElementSF(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1105**: `    tensor_SFB.host_view().at({0, 0}) = ElementSF(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1106**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1107**: `    tensor_SFA.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1108**: `    tensor_SFB.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1109**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1110**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1111**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 1112**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1113**: `  Arguments to_args() {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1114**: `    using ArrayElementA = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementA;`
+  - EN: Creates alias `ArrayElementA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementA`。
+- **Line 1115**: `    using ArrayElementB = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementB;`
+  - EN: Creates alias `ArrayElementB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementB`。
+- **Line 1116**: `    return {`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1117**: `      reinterpret_cast<ArrayElementA *>(tensor_A.device_data()), stride_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1118**: `      reinterpret_cast<ArrayElementB *>(tensor_B.device_data()), stride_b,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1119**: `      tensor_SFA.device_data(), layout_sfa,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1120**: `      tensor_SFB.device_data(), layout_sfb`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1121**: `    };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1122**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1123**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1124**: `  auto to_host_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1125**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1126**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1127**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1128**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1129**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1130**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1131**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1132**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1133**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1134**: `    auto A = make_tensor(make_iterator(tensor_A.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1135**: `          make_layout(make_shape(M, K, L), stride_a));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1136**: `    auto SfA = make_tensor(tensor_SFA.host_data(), layout_sfa);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1137**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1138**: `    auto B = make_tensor(make_iterator(tensor_B.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1139**: `        make_layout(make_shape(N, K, L), stride_b));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1140**: `    auto SfB = make_tensor(tensor_SFB.host_data(), layout_sfb);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1141**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1142**: `    cutlass::reference::host::GettMainloopParams<ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1143**: `        decltype(A),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1144**: `        decltype(B),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1145**: `        decltype(SfA),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1146**: `        decltype(SfB)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1147**: `      >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1148**: `      mainloop_params{A, SfA, B, SfB};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1149**: `    return mainloop_params;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1150**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1151**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1152**: `  void print_tensors(std::ofstream& file) {`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 1153**: `    file << "A =\n" << tensor_A.host_view()`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 1154**: `         << "\nB =\n" << tensor_B.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1155**: `         << "\nSFA =\n" << tensor_SFA.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1156**: `         << "\nSFB =\n" << tensor_SFB.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1157**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1158**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1159**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1160**: `      cute::Shape<int,int,int,int> problem_shape_MNKL) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1161**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1162**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1163**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_A.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1164**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_B.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1165**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_SFA.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1166**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_SFB.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1167**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1168**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1169**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1171**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1172**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1173**: `// Block Scaled Gemm Input Operands : A , B, scalefactorA, scalefactorB`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1174**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1175**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1176**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 1177**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1178**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 1179**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 1180**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1181**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedPingpongBlockScaledSm120<SchedulerPipelineStageCount_>,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 1182**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1183**: `       HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1184**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1185**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 1186**: `                                      Gemm, ElementA_, ElementB_>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1187**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1188**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1189**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1190**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1191**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1192**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1193**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1194**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_, stride_factor_B_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1195**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1196**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1197**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1198**: `// Block Scaled Gemm Input Operands : A , B, scalefactorA, scalefactorB`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1199**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1200**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1201**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 1202**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1203**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 1204**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 1205**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1206**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedCooperativeBlockScaledSm120<SchedulerPipelineStageCount_>,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 1207**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1208**: `       HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1209**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1210**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 1211**: `                                      Gemm, ElementA_, ElementB_>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1212**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1213**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1214**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1215**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1216**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1217**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1218**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1219**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_, stride_factor_B_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1220**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1221**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1222**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1223**: `// Block Scaled Gemm Input Operands : A , B, scalefactorA, scalefactorB`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1224**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1225**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1226**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 1227**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1228**: `  int AccumulatorPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1229**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 1230**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 1231**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1232**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm103<SchedulerPipelineStageCount_,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 1233**: `                                                                                      AccumulatorPipelineStageCount_>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1234**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1235**: `       HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<SchedulerPipelineStageCount_,AccumulatorPipelineStageCount_>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1236**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1237**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedBlockScaledSm100<SchedulerPipelineStageCount_,AccumulatorPipelineStageCount_>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 1238**: `                                      Gemm, ElementA_, ElementB_>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1239**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1240**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1241**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1242**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1243**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1244**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1245**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1246**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_, stride_factor_B_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1247**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1248**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1249**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1250**: `// Block Scaled Structured Sparse Gemm Input Operands : A_compressed, B, metadata, scalefactorA, scalefactorB`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1251**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1252**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1253**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 1254**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1255**: `  int AccumulatorPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1256**: `  typename ElementA_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1257**: `  typename ElementB_`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1258**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1259**: `struct HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedBlockScaledSm100<SchedulerPipelineStageCount_,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 1260**: `                                                                                            AccumulatorPipelineStageCount_>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1261**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1262**: `  // Kernel data types`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1263**: `  using ElementA = ElementA_;`
+  - EN: Creates type alias `ElementA` to simplify later code.
+  - CN: 创建类型别名 `ElementA` 以简化后续代码。
+- **Line 1264**: `  // CuTe layout A for the kernel's sparse tensorA.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1265**: `  using LayoutA  = typename Gemm::GemmKernel::CollectiveMainloop::LayoutA;`
+  - EN: Creates alias `LayoutA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutA`。
+- **Line 1266**: `  using ElementB = ElementB_;`
+  - EN: Creates type alias `ElementB` to simplify later code.
+  - CN: 创建类型别名 `ElementB` 以简化后续代码。
+- **Line 1267**: `  using StrideB  = typename Gemm::GemmKernel::StrideB;`
+  - EN: Creates alias `StrideB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideB`。
+- **Line 1268**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 1269**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1270**: `  using ElementE = typename Gemm::GemmKernel::CollectiveMainloop::ElementE;`
+  - EN: Creates alias `ElementE` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementE`。
+- **Line 1271**: `  // CuTe layout E for the kernel's metadata tensor.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1272**: `  using LayoutE  = typename Gemm::GemmKernel::CollectiveMainloop::LayoutE;`
+  - EN: Creates alias `LayoutE` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutE`。
+- **Line 1273**: `  using ElementAccumulator = typename Gemm::GemmKernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 1274**: `  using ElementScalingFactor = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalingFactor` to simplify later code.
+  - CN: 创建类型别名 `ElementScalingFactor` 以简化后续代码。
+- **Line 1275**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 1276**: `  using EpilogueOutputOp = typename Gemm::EpilogueOutputOp;`
+  - EN: Creates alias `EpilogueOutputOp` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `EpilogueOutputOp`。
+- **Line 1277**: `  using SparseConfig = typename Gemm::GemmKernel::CollectiveMainloop::SparseConfig;`
+  - EN: Creates alias `SparseConfig` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `SparseConfig`。
+- **Line 1278**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1279**: `  // The following typenames are for the reference host tensors. They are non-sparse tensors.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1280**: `  using LayoutTagA = decltype(SparseConfig::deduce_layoutA_tag(LayoutA{}));`
+  - EN: Creates type alias `LayoutTagA` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagA` 以简化后续代码。
+- **Line 1281**: `  using StrideA = cutlass::gemm::TagToStrideA_t<LayoutTagA>;`
+  - EN: Creates type alias `StrideA` to simplify later code.
+  - CN: 创建类型别名 `StrideA` 以简化后续代码。
+- **Line 1282**: `  // We don't care about the actual strideE for the host tensor, but just need one to allocate memory.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1283**: `  using StrideE = StrideA;`
+  - EN: Creates type alias `StrideE` to simplify later code.
+  - CN: 创建类型别名 `StrideE` 以简化后续代码。
+- **Line 1284**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1285**: `  static constexpr int SFVecSize = Gemm::GemmKernel::CollectiveMainloop::SFVecSize;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1286**: `  // Deduce Cutlass Layouts (RowMajor & ColumnMajor)`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1287**: `  using LayoutTagB = cutlass::detail::StrideToLayoutTagB_t<StrideB>;`
+  - EN: Creates type alias `LayoutTagB` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagB` 以简化后续代码。
+- **Line 1288**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1289**: `  using LayoutTagE = cutlass::detail::StrideToLayoutTagA_t<StrideE>;`
+  - EN: Creates type alias `LayoutTagE` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagE` 以简化后续代码。
+- **Line 1290**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1291**: `  using ElementSF = typename Gemm::GemmKernel::CollectiveMainloop::ElementSF;`
+  - EN: Creates alias `ElementSF` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementSF`。
+- **Line 1292**: `  using Sm1xxBlkScaledConfig =  typename Gemm::GemmKernel::CollectiveMainloop::Sm1xxBlkScaledConfig;`
+  - EN: Creates alias `Sm1xxBlkScaledConfig` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Sm1xxBlkScaledConfig`。
+- **Line 1293**: `  using Blk_MN   = typename Sm1xxBlkScaledConfig::Blk_MN;`
+  - EN: Creates alias `Blk_MN` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Blk_MN`。
+- **Line 1294**: `  using Blk_SF   = typename Sm1xxBlkScaledConfig::Blk_SF;`
+  - EN: Creates alias `Blk_SF` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Blk_SF`。
+- **Line 1295**: `  using SfAtom   = typename Sm1xxBlkScaledConfig::SfAtom;`
+  - EN: Creates alias `SfAtom` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `SfAtom`。
+- **Line 1296**: `  using LayoutSFA = typename Gemm::GemmKernel::CollectiveMainloop::LayoutSFA;`
+  - EN: Creates alias `LayoutSFA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutSFA`。
+- **Line 1297**: `  using LayoutSFB = typename Gemm::GemmKernel::CollectiveMainloop::LayoutSFB;`
+  - EN: Creates alias `LayoutSFB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutSFB`。
+- **Line 1298**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1299**: `  using CompressorUtility = cutlass::transform::kernel::StructuredSparseCompressorUtility<`
+  - EN: Creates type alias `CompressorUtility` to simplify later code.
+  - CN: 创建类型别名 `CompressorUtility` 以简化后续代码。
+- **Line 1300**: `                              cute::Shape<int, int, int, int>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1301**: `                              ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1302**: `                              LayoutTagA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1303**: `                              SparseConfig>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1304**: `  using CompressorKernel = cutlass::transform::kernel::StructuredSparseCompressor<`
+  - EN: Creates type alias `CompressorKernel` to simplify later code.
+  - CN: 创建类型别名 `CompressorKernel` 以简化后续代码。
+- **Line 1305**: `                        cute::Shape<int, int, int, int>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1306**: `                        ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1307**: `                        LayoutTagA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1308**: `                        SparseConfig,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1309**: `                        cutlass::arch::Sm100>;`
+  - EN: Targets the `Sm100` GPU architecture in the kernel configuration.
+  - CN: 在内核配置中指定目标 GPU 架构 `Sm100`。
+- **Line 1310**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1311**: `  using Compressor = cutlass::transform::device::TransformUniversalAdapter<CompressorKernel>;`
+  - EN: Creates type alias `Compressor` to simplify later code.
+  - CN: 创建类型别名 `Compressor` 以简化后续代码。
+- **Line 1312**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1313**: `  using Arguments = typename Gemm::GemmKernel::MainloopArguments;`
+  - EN: Creates alias `Arguments` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Arguments`。
+- **Line 1314**: `  // Whether to use relative equality checks`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1315**: `  CheckEquality check_relative_equality = CheckEquality::EXACT;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1316**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1317**: `  StrideA stride_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1318**: `  StrideA stride_a_compressed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1319**: `  StrideB stride_b;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1320**: `  StrideE stride_e;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1321**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1322**: `  LayoutA layout_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1323**: `  LayoutE layout_e;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1324**: `  LayoutSFA layout_sfa;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1325**: `  LayoutSFB layout_sfb;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1326**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1327**: `  typename LayoutTagA::Stride stride_factor_A;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1328**: `  typename LayoutTagB::Stride stride_factor_B;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1329**: `  typename LayoutTagE::Stride stride_factor_E;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1330**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1331**: `  cutlass::Distribution::Kind init_A;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1332**: `  cutlass::Distribution::Kind init_B;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1333**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1334**: `  cutlass::HostTensor<ElementA, LayoutTagA> tensor_A;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1335**: `  cutlass::HostTensor<ElementA, LayoutTagA> tensor_A_Comp;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1336**: `  cutlass::HostTensor<ElementB, LayoutTagB> tensor_B;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1337**: `  cutlass::HostTensor<ElementE, LayoutTagE> tensor_E;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1338**: `  cutlass::HostTensor<ElementSF, LayoutTagA> tensor_SFA;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1339**: `  cutlass::HostTensor<ElementSF, LayoutTagB> tensor_SFB;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1340**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1341**: `  uint64_t seed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1342**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1343**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1344**: `  // Note: this limitation comes from testbed / not the library`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1345**: `  static_assert(is_row_or_col_major<StrideA>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1346**: `    "ERROR : A Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1347**: `  static_assert(is_row_or_col_major<StrideB>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1348**: `    "ERROR : B Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1349**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1350**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1351**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1352**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1353**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1354**: `    uint64_t seed_ = kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1355**: `    typename LayoutTagA::Stride stride_factor_A_ = typename LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1356**: `    typename LayoutTagB::Stride stride_factor_B_ = typename LayoutTagB::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1357**: `    typename LayoutTagE::Stride stride_factor_E_ = typename LayoutTagE::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1358**: `  ):`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1359**: `    check_relative_equality(check_relative_equality_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1360**: `    stride_factor_A(stride_factor_A_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1361**: `    stride_factor_B(stride_factor_B_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1362**: `    stride_factor_E(stride_factor_E_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1363**: `    init_A(init_A_), init_B(init_B_), seed(seed_) { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1364**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1365**: `  template<class ProblemShapeType>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1366**: `  bool initialize(ProblemShapeType problem_size) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 1367**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 1368**: `    CUTLASS_TRACE_HOST("HostCollectiveMainloop (KernelSparseTmaWarpSpecializedBlockScaledSm100)::initialize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1369**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 1370**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1371**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1372**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1373**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1374**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1375**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1376**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1377**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1378**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1379**: `    stride_a = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1380**: `    stride_b = cutlass::make_cute_packed_stride(StrideB{}, cute::make_shape(N, K, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1381**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1382**: `    CompressorUtility compressor_utility(problem_shape_MNKL, stride_a);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1383**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1384**: `    // TensorE`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1385**: `    // In unit of ElementE (uint8_t), after alignment requirement`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1386**: `    // M-dim: TensorEAtom_M alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1387**: `    // K-dim: TensorEAtom_K alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1388**: `    int KAlignedE = compressor_utility.get_metadata_k_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1389**: `    int MAlignedE = compressor_utility.get_metadata_m_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1390**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1391**: `    // TensorA Compressed`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1392**: `    // In unit of ElementARaw, after alignment requirement`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1393**: `    // M-dim: TMA alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1394**: `    // K-dim: TMA alignment`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1395**: `    int KAlignedAC = compressor_utility.get_tensorA_k_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1396**: `    int MAlignedAC = compressor_utility.get_tensorA_m_physical();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1397**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1398**: `    stride_a_compressed = cutlass::make_cute_packed_stride(StrideA{}, cute::make_shape(M, KAlignedAC, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1399**: `    stride_e = cutlass::make_cute_packed_stride(StrideE{}, cute::make_shape(MAlignedE, KAlignedE, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1400**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1401**: `    auto a_coord = cutlass::make_Coord(M * L, K);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1402**: `    auto b_coord = cutlass::make_Coord(K, N * L);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1403**: `    auto e_coord = cutlass::make_Coord(MAlignedE * L, KAlignedE);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1404**: `    auto a_comp_coord = cutlass::make_Coord(MAlignedAC * L, KAlignedAC);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1405**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1406**: `    tensor_A.resize(a_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(a_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1407**: `    tensor_A_Comp.resize(a_comp_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(a_comp_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1408**: `    tensor_B.resize(b_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagB>::layout_factory(b_coord, stride_factor_B));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1409**: `    tensor_E.resize(e_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagE>::layout_factory(e_coord, stride_factor_E));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1410**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1411**: `    EXPECT_TRUE(initialize_tensor(tensor_A.host_view(), init_A, seed + 2022));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1412**: `    EXPECT_TRUE(initialize_tensor(tensor_B.host_view(), init_B, seed + 2021));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1413**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1414**: `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1415**: `    // in the upper left corner of each operand.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1416**: `    tensor_A.host_view().at({0, 0}) = ElementA(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1417**: `    tensor_B.host_view().at({0, 0}) = ElementB(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1418**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1419**: `    compressor_utility.structure_sparse_zero_mask_fill(tensor_A.host_data(), static_cast<int>(seed + 2023));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1420**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1421**: `    tensor_A.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1422**: `    tensor_B.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1423**: `    tensor_E.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1424**: `    tensor_A_Comp.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1425**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1426**: `    cutlass::Status status {cutlass::Status::kSuccess };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1427**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1428**: `    cutlass::KernelHardwareInfo hw_info;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1429**: `    hw_info.device_id = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1430**: `    hw_info.sm_count = cutlass::KernelHardwareInfo::query_device_multiprocessor_count(hw_info.device_id);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1431**: `    typename Compressor::Arguments arguments{`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1432**: `      {M, N, K, L},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1433**: `      {tensor_A.device_data(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1434**: `       stride_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1435**: `       tensor_A_Comp.device_data(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1436**: `       tensor_E.device_data()},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1437**: `      {hw_info}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1438**: `    };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1439**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1440**: `    Compressor compressor_op;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1441**: `    size_t workspace_size = Compressor::get_workspace_size(arguments);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1442**: `    cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1443**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1444**: `    status = compressor_op.can_implement(arguments);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1445**: `    if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1446**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1447**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1448**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1449**: `    status = compressor_op.initialize(arguments, workspace.get());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1450**: `    if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1451**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1452**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1453**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1454**: `    status = compressor_op.run();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1455**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1456**: `    auto result = cudaDeviceSynchronize();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1457**: `    if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1458**: `      EXPECT_EQ(result, cudaSuccess) << "Error at Kernel Sync.";`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1459**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1460**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1461**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1462**: `    layout_a = SparseConfig::fill_layoutA(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1463**: `    layout_e = SparseConfig::fill_layoutE(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1464**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1465**: `    tensor_E.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 1466**: `    tensor_A_Comp.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 1467**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1468**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1469**: `    auto k_blks = cutlass::ceil_div(K, size<1>(shape(SfAtom{})));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1470**: `    auto m_blks = cutlass::ceil_div(M, Blk_MN{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1471**: `    auto n_blks = cutlass::ceil_div(N, Blk_MN{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1472**: `    layout_sfa = Sm1xxBlkScaledConfig::tile_atom_to_shape_SFA(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1473**: `    layout_sfb = Sm1xxBlkScaledConfig::tile_atom_to_shape_SFB(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1474**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1475**: `    // 2.x host tensor does not natively contain a batch stride or coord, so we spoof if by folding it into the outer mode`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1476**: `    auto sfa_coord   = cutlass::make_Coord(m_blks * Blk_MN{} * L, k_blks * Blk_SF{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1477**: `    auto sfb_coord   = cutlass::make_Coord(n_blks * Blk_MN{} * L, k_blks * Blk_SF{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1478**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1479**: `    tensor_SFA.resize(sfa_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagA>::layout_factory(sfa_coord, stride_factor_A));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1480**: `    tensor_SFB.resize(sfb_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagB>::layout_factory(sfb_coord, stride_factor_B));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1481**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1482**: `    EXPECT_TRUE(initialize_tensor(tensor_SFA.host_view(), init_A, seed + 2024));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1483**: `    EXPECT_TRUE(initialize_tensor(tensor_SFB.host_view(), init_B, seed + 2025));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1484**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1485**: `    // It is possible to randomly initialize to all zeros, so override this with non-zeros`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1486**: `    // in the upper left corner of each operand.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1487**: `    tensor_SFA.host_view().at({0, 0}) = ElementSF(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1488**: `    tensor_SFB.host_view().at({0, 0}) = ElementSF(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1489**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1490**: `    tensor_SFA.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1491**: `    tensor_SFB.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1492**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1493**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1494**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 1495**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1496**: `  Arguments to_args() {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1497**: `    using ArrayElementA = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementA;`
+  - EN: Creates alias `ArrayElementA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementA`。
+- **Line 1498**: `    using ArrayElementB = typename Gemm::GemmKernel::CollectiveMainloop::ArrayElementB;`
+  - EN: Creates alias `ArrayElementB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ArrayElementB`。
+- **Line 1499**: `    return {`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1500**: `      reinterpret_cast<ArrayElementA *>(tensor_A_Comp.device_data()), layout_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1501**: `      reinterpret_cast<ArrayElementB *>(tensor_B.device_data()), stride_b,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1502**: `      tensor_E.device_data(), layout_e,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1503**: `      tensor_SFA.device_data(), layout_sfa,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1504**: `      tensor_SFB.device_data(), layout_sfb`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1505**: `    };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1506**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1507**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1508**: `  auto to_host_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1509**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1510**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1511**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1512**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1513**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1514**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1515**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1516**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1517**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1518**: `    auto A = make_tensor(make_iterator(tensor_A.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1519**: `          make_layout(make_shape(M, K, L), stride_a));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1520**: `    auto SfA = make_tensor(tensor_SFA.host_data(), layout_sfa);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1521**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1522**: `    auto B = make_tensor(make_iterator(tensor_B.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1523**: `        make_layout(make_shape(N, K, L), stride_b));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1524**: `    auto SfB = make_tensor(tensor_SFB.host_data(), layout_sfb);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1525**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1526**: `    // return {A, SfA, B, SfB};`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1527**: `    cutlass::reference::host::GettMainloopParams<ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1528**: `        decltype(A),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1529**: `        decltype(B),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1530**: `        decltype(SfA),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1531**: `        decltype(SfB)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1532**: `      >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1533**: `          mainloop_params{A, SfA, B, SfB};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1534**: `    return mainloop_params;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1535**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1536**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1537**: `  void print_tensors(std::ofstream& file) {`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 1538**: `    file << "A =\n" << tensor_A.host_view()`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 1539**: `         << "\nB =\n" << tensor_B.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1540**: `         << "\nSFA =\n" << tensor_SFA.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1541**: `         << "\nSFB =\n" << tensor_SFB.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1542**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1543**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1544**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1545**: `      cute::Shape<int,int,int,int> problem_shape_MNKL) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1546**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1547**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1548**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_A.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1549**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_B.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1550**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_SFA.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1551**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_SFB.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1552**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1553**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1554**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1555**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1556**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1557**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 1558**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1559**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 1560**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 1561**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1562**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedCooperativeSparseBlockScaledSm120<SchedulerPipelineStageCount_, true>,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 1563**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1564**: `       HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1565**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1566**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 1567**: `                                      Gemm, ElementA_, ElementB_>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1568**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1569**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1570**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1571**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1572**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1573**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1574**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1575**: `    typename Base::LayoutTagE::Stride stride_factor_E_ = typename Base::LayoutTagE::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1576**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1577**: `                                                                                      stride_factor_B_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1578**: `                                                                                      stride_factor_E_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1579**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1580**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1581**: `template<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1582**: `  class Gemm,`
+  - EN: Declares `class Gemm`, which groups related data or behavior.
+  - CN: 声明 `class Gemm`，用于组织相关数据或行为。
+- **Line 1583**: `  int SchedulerPipelineStageCount_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1584**: `  class ElementA_,`
+  - EN: Declares `class ElementA_`, which groups related data or behavior.
+  - CN: 声明 `class ElementA_`，用于组织相关数据或行为。
+- **Line 1585**: `  class ElementB_`
+  - EN: Declares `class ElementB_`, which groups related data or behavior.
+  - CN: 声明 `class ElementB_`，用于组织相关数据或行为。
+- **Line 1586**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1587**: `struct HostCollectiveMainloop<cutlass::gemm::KernelTmaWarpSpecializedCooperativeSparseBlockScaledSm120<SchedulerPipelineStageCount_, false>,`
+  - EN: Declares `struct HostCollectiveMainloop`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveMainloop`，用于组织相关数据或行为。
+- **Line 1588**: `                              Gemm, ElementA_, ElementB_> : public`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1589**: `       HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1590**: `                              Gemm, ElementA_, ElementB_> {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1591**: `  using Base = HostCollectiveMainloop<cutlass::gemm::KernelSparseTmaWarpSpecializedBlockScaledSm100<0,0>,`
+  - EN: Creates type alias `Base` to simplify later code.
+  - CN: 创建类型别名 `Base` 以简化后续代码。
+- **Line 1592**: `                                      Gemm, ElementA_, ElementB_>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1593**: `  HostCollectiveMainloop(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1594**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1595**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1596**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1597**: `    uint64_t seed_ = Base::kDefaultSeed,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1598**: `    typename Base::LayoutTagA::Stride stride_factor_A_ = typename Base::LayoutTagA::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1599**: `    typename Base::LayoutTagB::Stride stride_factor_B_ = typename Base::LayoutTagB::Stride(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1600**: `    typename Base::LayoutTagE::Stride stride_factor_E_ = typename Base::LayoutTagE::Stride()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1601**: `  ) : Base::HostCollectiveMainloop(check_relative_equality_, init_A_, init_B_, seed_, stride_factor_A_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1602**: `                                                                                      stride_factor_B_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1603**: `                                                                                      stride_factor_E_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1604**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1605**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1606**: `template<class Gemm>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1607**: `struct HostCollectiveDefaultEpilogue {`
+  - EN: Declares `struct HostCollectiveDefaultEpilogue`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveDefaultEpilogue`，用于组织相关数据或行为。
+- **Line 1608**: `  // fusion types are potentially void if the fusion is not supported`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1609**: `  // helper so we don't try to construct HostTensor with void type`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1610**: `  template <typename T, typename U = uint8_t>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 1611**: `  using non_void_t = cute::conditional_t<cute::is_void_v<T>, U, T>;`
+  - EN: Creates type alias `non_void_t` to simplify later code.
+  - CN: 创建类型别名 `non_void_t` 以简化后续代码。
+- **Line 1612**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1613**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 1614**: `  using kernel   = typename Gemm::GemmKernel;`
+  - EN: Creates alias `kernel` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `kernel`。
+- **Line 1615**: `  using Epilogue = typename kernel::CollectiveEpilogue;`
+  - EN: Creates alias `Epilogue` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Epilogue`。
+- **Line 1616**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1617**: `  using ElementD = typename kernel::ElementD;`
+  - EN: Creates alias `ElementD` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementD`。
+- **Line 1618**: `  using StrideD  = typename kernel::StrideD;`
+  - EN: Creates alias `StrideD` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideD`。
+- **Line 1619**: `  using ElementC = non_void_t<typename kernel::ElementC, ElementD>;`
+  - EN: Creates alias `ElementC` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementC`。
+- **Line 1620**: `  using StrideC  = typename kernel::StrideC;`
+  - EN: Creates alias `StrideC` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideC`。
+- **Line 1621**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1622**: `  using FusionOp = typename Gemm::EpilogueOutputOp;`
+  - EN: Creates alias `FusionOp` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `FusionOp`。
+- **Line 1623**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1624**: `  static_assert(rank(StrideC{}) == 3, "StrideCD must be rank-3: [M, N, L]");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1625**: `  static_assert(rank(StrideD{}) == 3, "StrideCD must be rank-3: [M, N, L]");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1626**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1627**: `  static_assert(is_row_or_col_major<StrideC>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1628**: `    "ERROR : C Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1629**: `  static_assert(is_row_or_col_major<StrideD>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1630**: `    "ERROR : D Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1631**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1632**: `  // Deduce Cutlass Layouts (RowMajor & ColumnMajor)`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1633**: `  using LayoutTagC = cutlass::detail::StrideToLayoutTagC_t<StrideC>;`
+  - EN: Creates type alias `LayoutTagC` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagC` 以简化后续代码。
+- **Line 1634**: `  using LayoutTagD = cutlass::detail::StrideToLayoutTagC_t<StrideD>;`
+  - EN: Creates type alias `LayoutTagD` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagD` 以简化后续代码。
+- **Line 1635**: `  using LayoutTagScalar = cutlass::layout::PackedVectorLayout; // scalars are size-1 vectors`
+  - EN: Creates type alias `LayoutTagScalar` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagScalar` 以简化后续代码。
+- **Line 1636**: `  using LayoutTagVector = cutlass::layout::PackedVectorLayout;`
+  - EN: Creates type alias `LayoutTagVector` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagVector` 以简化后续代码。
+- **Line 1637**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1638**: `  using ElementAccumulator = typename kernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 1639**: `  using ElementScalingFactor = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalingFactor` to simplify later code.
+  - CN: 创建类型别名 `ElementScalingFactor` 以简化后续代码。
+- **Line 1640**: `  using ProblemShapeType = typename kernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 1641**: `  using ElementCompute = typename ElementComputeType<Gemm, ElementAccumulator>::Type;`
+  - EN: Creates alias `ElementCompute` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementCompute`。
+- **Line 1642**: `  using ElementScalar = typename ElementScalarType<Gemm, ElementCompute>::Type;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 1643**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1644**: `  using Arguments = typename Gemm::GemmKernel::EpilogueArguments;`
+  - EN: Creates alias `Arguments` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Arguments`。
+- **Line 1645**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1646**: `  /// Initialization`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1647**: `  StrideC stride_c;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1648**: `  StrideD stride_d;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1649**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1650**: `  typename LayoutTagC::Stride stride_factor_C;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1651**: `  typename LayoutTagD::Stride stride_factor_D;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1652**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1653**: `  cutlass::HostTensor<ElementC, LayoutTagC> tensor_C;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1654**: `  // Inputs`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1655**: `  ElementScalar alpha;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1656**: `  ElementScalar beta;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1657**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1658**: `  cutlass::HostTensor<ElementD, LayoutTagD> tensor_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1659**: `  cutlass::HostTensor<ElementD, LayoutTagD> reference_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1660**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1661**: `  // Whether to use relative equality checks`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1662**: `  CheckEquality check_relative_equality = CheckEquality::EXACT;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1663**: `  // Are scalars copied to device memory before kernel launch`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1664**: `  ScalarLoc use_device_scalars = ScalarLoc::ON_HOST;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1665**: `  // If per-row scale is enabled and this is disabled, alpha/beta are passed as a host or device scalar instead of device vector`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1666**: `  VectorScale vector_scale_mode = VectorScale::DISABLED;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1667**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1668**: `  cutlass::Distribution::Kind init_C;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1669**: `  uint64_t seed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1670**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1671**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1672**: `  HostCollectiveDefaultEpilogue(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1673**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1674**: `    ScalarLoc use_device_scalars_ = ScalarLoc::ON_HOST,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1675**: `    VectorScale vector_scale_mode_ = VectorScale::DISABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1676**: `    cutlass::Distribution::Kind init_C_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1677**: `    cutlass::Distribution::Kind init_scale_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1678**: `    cutlass::Distribution::Kind init_bias_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1679**: `    uint64_t seed_ = kDefaultSeed`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1680**: `  ): init_C(init_C_), seed(seed_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1681**: `     stride_factor_C(typename LayoutTagC::Stride()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1682**: `     stride_factor_D(typename LayoutTagD::Stride()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1683**: `     check_relative_equality(check_relative_equality_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1684**: `     use_device_scalars(use_device_scalars_){ }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1685**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1686**: `  bool initialize(ProblemShapeType problem_size, ElementScalar alpha_=1.f, ElementScalar beta_=0.f) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 1687**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 1688**: `    CUTLASS_TRACE_HOST("HostCollectiveDefaultEpilogue::initialize(problem_size, alpha, beta)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1689**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 1690**: `    // Initialize Epilogue tensors`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1691**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1692**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1693**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1694**: `    stride_c = cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1695**: `    stride_d = cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1696**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1697**: `    // 2.x host tensor does not natively contain a batch stride or coord, so we spoof if by folding it into the outer mode`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1698**: `    auto c_coord = cutlass::make_Coord(M * L, N);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1699**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1700**: `      tensor_C.resize(c_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagC>::layout_factory(c_coord, stride_factor_C));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1701**: `      tensor_D.resize(c_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(c_coord, stride_factor_D));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1702**: `      reference_D.resize(c_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(c_coord, stride_factor_D), false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1703**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1704**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1705**: `      CUTLASS_TRACE_HOST("HostCollectiveDefaultEpilogue::initialize: resizing tensors threw an exception: " << e.what());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1706**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1707**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1708**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1709**: `      CUTLASS_TRACE_HOST("HostCollectiveDefaultEpilogue::initialize: resizing tensors threw an unknown exception");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1710**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1711**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1712**: `    {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 1713**: `      const bool init_succeeded = initialize_tensor(tensor_C.host_view(), init_C, seed + 2020);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1714**: `      if (not init_succeeded) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1715**: `        CUTLASS_TRACE_HOST("HostCollectiveDefaultEpilogue::initialize: initialize_tensor returned false");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1716**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1717**: `      EXPECT_TRUE(init_succeeded);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1718**: `    }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 1719**: `    tensor_C.host_view().at({0, 0}) = ElementC(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1720**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1721**: `    cutlass::reference::host::TensorCopy(reference_D.host_view(), tensor_C.host_view());`
+  - EN: Copies tensor data so the reference path starts from the same initial values.
+  - CN: 复制张量数据，使参考路径从相同初始值开始。
+- **Line 1722**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1723**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1724**: `      tensor_C.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1725**: `      tensor_D.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1726**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1727**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1728**: `      CUTLASS_TRACE_HOST("HostCollectiveDefaultEpilogue::initialize: sync_device() threw an exception: " << e.what());`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1729**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1730**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1731**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1732**: `      CUTLASS_TRACE_HOST("HostCollectiveDefaultEpilogue::initialize: sync_device() threw an unknown exception");`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 1733**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1734**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1735**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1736**: `    alpha = alpha_;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1737**: `    beta = beta_;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1738**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1739**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1740**: `  }`
+  - EN: Closes the scope for `struct HostCollectiveDefaultEpilogue`.
+  - CN: 结束 `struct HostCollectiveDefaultEpilogue` 的作用域。
+- **Line 1741**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1742**: `  template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 1743**: `    class Element,`
+  - EN: Declares `class Element`, which groups related data or behavior.
+  - CN: 声明 `class Element`，用于组织相关数据或行为。
+- **Line 1744**: `    class Layout`
+  - EN: Declares `class Layout`, which groups related data or behavior.
+  - CN: 声明 `class Layout`，用于组织相关数据或行为。
+- **Line 1745**: `  >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1746**: `  bool equality_check(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1747**: `    cutlass::TensorView<Element, Layout> const& lhs,`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 1748**: `    cutlass::TensorView<Element, Layout> const& rhs) const {`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 1749**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1750**: `    // Factors used for calculating relative equality. CUTLASS's relative-equality`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1751**: `    // checks in include/cutlass/relatively_equal.h  are inspired by`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1752**: `    // https://floating-point-gui.de/errors/comparison/. This reference suggests using`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1753**: `    // the minimum normal value of a given type as the nonzero_floor.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1754**: `    Element epsilon(static_cast<Element>(0.1f));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1755**: `    Element nonzero_floor(std::numeric_limits<Element>::min());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1756**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1757**: `    if constexpr (!cutlass::is_complex<Element>::value) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1758**: `      if (check_relative_equality == CheckEquality::RELATIVE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1759**: `        return cutlass::reference::host::TensorRelativelyEquals(`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1760**: `          lhs, rhs, epsilon, nonzero_floor);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1761**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1762**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 1763**: `        return cutlass::reference::host::TensorEquals(lhs, rhs);`
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 1764**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 1765**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1766**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 1767**: `      return cutlass::reference::host::TensorEquals(lhs, rhs);`
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 1768**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 1769**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1770**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1771**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1772**: `      cute::Shape<int,int,int,int> problem_shape_MNKL,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1773**: `      ElementScalar alpha,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1774**: `      ElementScalar beta) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1775**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1776**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1777**: `    tensor_D.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 1778**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_C.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1779**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1780**: `    if (tensor_D.size() > 1) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1781**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_D.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1782**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1783**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1784**: `    if (reference_D.size() > 1) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1785**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(reference_D.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 1786**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1787**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1788**: `    bool passed = equality_check(reference_D.host_view(), tensor_D.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1789**: `    if(!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 1790**: `      std::cout<<"D is incorrect"<<std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1791**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 1792**: `    return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1793**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1794**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1795**: `  void print_tensors(std::ofstream& file) {`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 1796**: `    file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1797**: `    << "\nC =\n" << tensor_C.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1798**: `    << "\n\nReference =\n" << reference_D.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1799**: `    << "\n\nComputed =\n" << tensor_D.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1800**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1801**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1802**: `  Arguments to_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1803**: `    Arguments arguments =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1804**: `      {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 1805**: `        {alpha, beta},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1806**: `        tensor_C.device_data(), stride_c, tensor_D.device_data(), stride_d`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1807**: `      };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1808**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1809**: `    return arguments;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1810**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1811**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1812**: `  auto to_host_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 1813**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1814**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1815**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1816**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1817**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1818**: `    auto M = cute::get<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1819**: `    auto N = cute::get<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1820**: `    auto K = cute::get<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1821**: `    auto L = cute::get<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1822**: `    auto coord_0 = cutlass::make_Coord(0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1823**: `    auto C = cute::make_tensor(detail::make_iterator(tensor_C.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1824**: `        cute::make_layout(cute::make_shape(M, N, L), stride_c));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1825**: `    auto D = cute::make_tensor(detail::make_iterator(reference_D.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1826**: `        cute::make_layout(cute::make_shape(M, N, L), stride_d));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1827**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1828**: `    cutlass::reference::host::GettEpilogueParams<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1829**: `      ElementScalar,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1830**: `      ElementScalar,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1831**: `      ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1832**: `      ElementCompute,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1833**: `      decltype(C),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1834**: `      decltype(D)>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1835**: `        epilogue_params{};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1836**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1837**: `    epilogue_params.C = C;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1838**: `    epilogue_params.D = D;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1839**: `    epilogue_params.alpha = alpha;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1840**: `    epilogue_params.beta = beta;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1841**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1842**: `    return epilogue_params;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 1843**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 1844**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 1845**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1846**: `template<class Gemm>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1847**: `struct HostCollectiveEpilogue {`
+  - EN: Declares `struct HostCollectiveEpilogue`, which groups related data or behavior.
+  - CN: 声明 `struct HostCollectiveEpilogue`，用于组织相关数据或行为。
+- **Line 1848**: `  // fusion types are potentially void if the fusion is not supported`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1849**: `  // helper so we don't try to construct HostTensor with void type`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1850**: `  template <typename T, typename U = uint8_t>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 1851**: `  using non_void_t = cute::conditional_t<cute::is_void_v<T>, U, T>;`
+  - EN: Creates type alias `non_void_t` to simplify later code.
+  - CN: 创建类型别名 `non_void_t` 以简化后续代码。
+- **Line 1852**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1853**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 1854**: `  using kernel   = typename Gemm::GemmKernel;`
+  - EN: Creates alias `kernel` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `kernel`。
+- **Line 1855**: `  using Epilogue = typename kernel::CollectiveEpilogue;`
+  - EN: Creates alias `Epilogue` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Epilogue`。
+- **Line 1856**: `  static_assert(IsDefaultEpilogue<Epilogue>::value == false, "Default Epilogue is not supported");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1857**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1858**: `  using ElementD = typename kernel::ElementD;`
+  - EN: Creates alias `ElementD` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementD`。
+- **Line 1859**: `  using StrideD  = typename kernel::StrideD;`
+  - EN: Creates alias `StrideD` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideD`。
+- **Line 1860**: `  using ElementC = non_void_t<typename kernel::ElementC, ElementD>;`
+  - EN: Creates alias `ElementC` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementC`。
+- **Line 1861**: `  using StrideC  = typename kernel::StrideC;`
+  - EN: Creates alias `StrideC` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `StrideC`。
+- **Line 1862**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1863**: `  static_assert(rank(StrideC{}) == 3, "StrideCD must be rank-3: [M, N, L]");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1864**: `  static_assert(rank(StrideD{}) == 3, "StrideCD must be rank-3: [M, N, L]");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1865**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1866**: `  static_assert(is_row_or_col_major<StrideC>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1867**: `    "ERROR : C Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1868**: `  static_assert(is_row_or_col_major<StrideD>(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1869**: `    "ERROR : D Layout is neither Row / Column Major)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1870**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1871**: `  // Deduce Cutlass Layouts (RowMajor & ColumnMajor)`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1872**: `  using LayoutTagC = cutlass::detail::StrideToLayoutTagC_t<StrideC>;`
+  - EN: Creates type alias `LayoutTagC` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagC` 以简化后续代码。
+- **Line 1873**: `  using LayoutTagD = cutlass::detail::StrideToLayoutTagC_t<StrideD>;`
+  - EN: Creates type alias `LayoutTagD` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagD` 以简化后续代码。
+- **Line 1874**: `  using LayoutTagScalar = cutlass::layout::PackedVectorLayout; // scalars are size-1 vectors`
+  - EN: Creates type alias `LayoutTagScalar` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagScalar` 以简化后续代码。
+- **Line 1875**: `  using LayoutTagVector = cutlass::layout::PackedVectorLayout;`
+  - EN: Creates type alias `LayoutTagVector` to simplify later code.
+  - CN: 创建类型别名 `LayoutTagVector` 以简化后续代码。
+- **Line 1876**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1877**: `  using ElementAccumulator = typename kernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 1878**: `  using ElementScalingFactor = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalingFactor` to simplify later code.
+  - CN: 创建类型别名 `ElementScalingFactor` 以简化后续代码。
+- **Line 1879**: `  using ProblemShapeType = typename kernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 1880**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1881**: `  //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1882**: `  // FusionOperation derived types/queries`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1883**: `  //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1884**: `  static constexpr bool IsLegacy = detail::IsLegacyEpiloguePolicy<Epilogue>::value;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1885**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1886**: `  // FFMA2 SGEMM uses ThreadEpilogueOp for bias and relu support instead of FusionOp, so we compose LinCombPerRowBiasEltAct FusionOp by hand to test the functionality.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1887**: `  static constexpr bool IsFfma2Kernel = cute::is_same_v<ScheduleType, cutlass::gemm::KernelMultistage>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1888**: `  using FusionOp = cute::conditional_t<IsFfma2Kernel,`
+  - EN: Creates type alias `FusionOp` to simplify later code.
+  - CN: 创建类型别名 `FusionOp` 以简化后续代码。
+- **Line 1889**: `                                       cutlass::epilogue::fusion::LinCombPerRowBiasEltAct<cutlass::epilogue::thread::Clamp, float, float>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1890**: `                                       typename Gemm::EpilogueOutputOp>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1891**: `  static_assert(cute::is_base_of_v<cutlass::epilogue::fusion::FusionOperation, FusionOp>);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1892**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1893**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1894**: `  // Scale factor Generation related`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1895**: `  using SfStrategy = cutlass::reference::host::SfStrategy;`
+  - EN: Creates type alias `SfStrategy` to simplify later code.
+  - CN: 创建类型别名 `SfStrategy` 以简化后续代码。
+- **Line 1896**: `  static constexpr bool IsBlockScaleSupported            = FusionOp::IsBlockScaleSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1897**: `  static constexpr SfStrategy SfGenStrategy              = (!IsBlockScaleSupported) ? SfStrategy::None : SfStrategy::SfDGen;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1898**: `  static constexpr int32_t SFD_VectorSize = IsBlockScaleSupported ? FusionOp::SFVecSize : 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1899**: `  static constexpr bool IsKMajorSFD = cute::is_same_v<typename FusionOp::GmemLayoutTagScalefactor, cutlass::layout::RowMajor>;`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 1900**: `  using ElementSFD = non_void_t<typename FusionOp::ElementBlockScaleFactor, ElementD>;`
+  - EN: Creates alias `ElementSFD` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementSFD`。
+- **Line 1901**: `  using Sm1xxBlockScaledOutputConfig= cutlass::detail::Sm1xxBlockScaledOutputConfig<SFD_VectorSize,`
+  - EN: Creates type alias `Sm1xxBlockScaledOutputConfig` to simplify later code.
+  - CN: 创建类型别名 `Sm1xxBlockScaledOutputConfig` 以简化后续代码。
+- **Line 1902**: `                                        IsKMajorSFD ? cute::UMMA::Major::K : cute::UMMA::Major::MN>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1903**: `  using Blk_MN = typename Sm1xxBlockScaledOutputConfig::Blk_MN;`
+  - EN: Creates alias `Blk_MN` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Blk_MN`。
+- **Line 1904**: `  using Blk_SF = typename Sm1xxBlockScaledOutputConfig::Blk_SF;`
+  - EN: Creates alias `Blk_SF` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Blk_SF`。
+- **Line 1905**: `  using OutputSFAtom = typename Sm1xxBlockScaledOutputConfig::SfAtom;`
+  - EN: Creates alias `OutputSFAtom` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `OutputSFAtom`。
+- **Line 1906**: `  cutlass::HostTensor<ElementSFD, LayoutTagD> tensor_SFD;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1907**: `  cutlass::HostTensor<ElementSFD, LayoutTagD> reference_SFD;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1908**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1909**: `  using ElementCompute    = typename FusionOp::ElementCompute;`
+  - EN: Creates alias `ElementCompute` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementCompute`。
+- **Line 1910**: `  using ElementScalar     = typename FusionOp::ElementScalar;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 1911**: `  using ElementBias       = non_void_t<typename FusionOp::ElementBias>;`
+  - EN: Creates alias `ElementBias` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementBias`。
+- **Line 1912**: `  using ElementAux        = non_void_t<typename FusionOp::ElementAux>;`
+  - EN: Creates alias `ElementAux` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAux`。
+- **Line 1913**: `  using ElementAmax       = non_void_t<typename FusionOp::ElementAmax>;`
+  - EN: Creates alias `ElementAmax` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAmax`。
+- **Line 1914**: `  using LayoutTagAux      = non_void_t<typename FusionOp::GmemLayoutTagAux, LayoutTagD>;`
+  - EN: Creates alias `LayoutTagAux` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutTagAux`。
+- **Line 1915**: `  using ActivationFunctor = non_void_t<typename FusionOp::ActivationFn,`
+  - EN: Creates alias `ActivationFunctor` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ActivationFunctor`。
+- **Line 1916**: `                              cutlass::epilogue::thread::Identity<ElementCompute>>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1917**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1918**: `  static constexpr bool IsRowBiasEnabled        = FusionOp::IsPerRowBiasSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1919**: `  static constexpr bool IsColBiasEnabled        = FusionOp::IsPerColBiasSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1920**: `  static_assert(not (IsColBiasEnabled && IsRowBiasEnabled));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1921**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1922**: `  static constexpr bool IsDeBiasEnabled      = FusionOp::IsDePerRowBiasSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1923**: `  static constexpr bool IsPerRowScaleEnabled = FusionOp::IsPerRowScaleSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1924**: `  static constexpr bool IsPerColScaleEnabled = FusionOp::IsPerColScaleSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1925**: `  static constexpr bool IsScaleFactorEnabled = FusionOp::IsScaleFactorSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1926**: `  static constexpr bool IsAuxInEnabled       = FusionOp::IsAuxInSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1927**: `  static constexpr bool IsAuxOutEnabled      = FusionOp::IsAuxOutSupported;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1928**: `  static constexpr bool IsAbsMaxEnabledD     = FusionOp::IsAbsMaxSupported &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1929**: `                                                (cute::is_same_v<ElementD, cutlass::float_e4m3_t> ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1930**: `                                                 cute::is_same_v<ElementD, cutlass::float_e5m2_t>);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1931**: `  static constexpr bool IsAbsMaxEnabledAux   = IsAuxOutEnabled && FusionOp::IsAbsMaxSupported &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1932**: `                                                (cute::is_same_v<ElementAux, cutlass::float_e4m3_t> ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1933**: `                                                 cute::is_same_v<ElementAux, cutlass::float_e5m2_t>);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1934**: `  using Arguments = typename Gemm::GemmKernel::EpilogueArguments;`
+  - EN: Creates alias `Arguments` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Arguments`。
+- **Line 1935**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1936**: `  /// Initialization`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 1937**: `  StrideC stride_c;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1938**: `  StrideD stride_d;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1939**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1940**: `  typename LayoutTagC::Stride stride_factor_C;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1941**: `  typename LayoutTagD::Stride stride_factor_D;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1942**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1943**: `  // Inputs`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1944**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> alpha;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1945**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> beta;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1946**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> scale_A;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1947**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> scale_B;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1948**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> scale_C;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1949**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> scale_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1950**: `  cutlass::HostTensor<ElementScalar, LayoutTagScalar> scale_Aux;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1951**: `  cutlass::HostTensor<ElementBias  , LayoutTagVector> bias;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1952**: `  cutlass::HostTensor<ElementC, LayoutTagC> tensor_C;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1953**: `  cutlass::HostTensor<ElementCompute, LayoutTagScalar> norm_constant;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1954**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1955**: `  // Outputs`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1956**: `  cutlass::HostTensor<ElementAmax, LayoutTagScalar> abs_max_Aux;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1957**: `  cutlass::HostTensor<ElementAmax, LayoutTagScalar> abs_max_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1958**: `  cutlass::HostTensor<ElementAux , LayoutTagAux   > tensor_Aux;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1959**: `  cutlass::gemm::TagToStrideC_t<   LayoutTagAux   > stride_Aux;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1960**: `  cutlass::HostTensor<ElementD, LayoutTagD> tensor_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1961**: `  cutlass::HostTensor<ElementD, LayoutTagD> reference_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1962**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1963**: `  // References`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1964**: `  cutlass::HostTensor<ElementBias, LayoutTagVector> reference_dbias;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1965**: `  cutlass::HostTensor<ElementAux , LayoutTagAux   > reference_Aux;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1966**: `  cutlass::HostTensor<ElementAmax, LayoutTagScalar> reference_abs_max_Aux;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1967**: `  cutlass::HostTensor<ElementAmax, LayoutTagScalar> reference_abs_max_D;`
+  - EN: Declares a host/device tensor wrapper used to manage allocations and transfers.
+  - CN: 声明用于管理分配与传输的主机/设备张量封装。
+- **Line 1968**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1969**: `  // Whether to use relative equality checks`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1970**: `  CheckEquality check_relative_equality = CheckEquality::EXACT;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1971**: `  // Are scalars copied to device memory before kernel launch`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1972**: `  ScalarLoc use_device_scalars = ScalarLoc::ON_HOST;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1973**: `  // If vector scale is supported and this is disabled, alpha/beta are passed as a host or device scalar instead of device vector`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1974**: `  VectorScale vector_scale_mode = VectorScale::DISABLED;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1975**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1976**: `  // Random distribution with which to initialize the A/B/C/D/Aux scaling factors`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1977**: `  cutlass::Distribution::Kind init_scale = cutlass::Distribution::Uniform;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1978**: `  // Random distribution with which to initialize the bias vector`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 1979**: `  cutlass::Distribution::Kind init_bias = cutlass::Distribution::Uniform;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1980**: `  cutlass::Distribution::Kind init_C;`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1981**: `  uint64_t seed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1982**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1983**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1984**: `  HostCollectiveEpilogue(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1985**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1986**: `    ScalarLoc use_device_scalars_ = ScalarLoc::ON_HOST,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1987**: `    VectorScale vector_scale_mode_ = VectorScale::DISABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1988**: `    cutlass::Distribution::Kind init_C_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1989**: `    cutlass::Distribution::Kind init_scale_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1990**: `    cutlass::Distribution::Kind init_bias_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 1991**: `    uint64_t seed_ = kDefaultSeed`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1992**: `  ): init_scale(init_scale_), init_bias(init_bias_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1993**: `     init_C(init_C_), seed(seed_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1994**: `     stride_factor_C(typename LayoutTagC::Stride()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1995**: `     stride_factor_D(typename LayoutTagD::Stride()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1996**: `     check_relative_equality(check_relative_equality_),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1997**: `     use_device_scalars(use_device_scalars_){ }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 1998**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 1999**: `  bool initialize(ProblemShapeType problem_size, ElementScalar alpha_=1.f, ElementScalar beta_=0.f) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 2000**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2001**: `    CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize(problem_size, alpha, beta)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2002**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2003**: `    // Initialize Epilogue tensors`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2004**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2005**: `    auto M = cute::size<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2006**: `    auto N = cute::size<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2007**: `    auto K = cute::size<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2008**: `    auto L = cute::size<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2009**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2010**: `    stride_c = cutlass::make_cute_packed_stride(StrideC{}, cute::make_shape(M, N, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2011**: `    stride_d = cutlass::make_cute_packed_stride(StrideD{}, cute::make_shape(M, N, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2012**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2013**: `    // 2.x host tensor does not natively contain a batch stride or coord, so we spoof if by folding it into the outer mode`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2014**: `    auto c_coord = cutlass::make_Coord(M * L, N);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2015**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2016**: `      tensor_C.resize(c_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagC>::layout_factory(c_coord, stride_factor_C));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2017**: `      tensor_D.resize(c_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(c_coord, stride_factor_D));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2018**: `      reference_D.resize(c_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(c_coord, stride_factor_D), false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2019**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2020**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2021**: `      CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: resizing tensors threw an exception: " << e.what());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2022**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2023**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2024**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2025**: `      CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: resizing tensors threw an unknown exception");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2026**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2027**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2028**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2029**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2030**: `      const bool initialize_tensor_C_succeeded =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2031**: `        initialize_tensor(tensor_C.host_view(), init_C, seed + 2020);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2032**: `      if (not initialize_tensor_C_succeeded) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2033**: `        CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: initialize_tensor returned false");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2034**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2035**: `      EXPECT_TRUE(initialize_tensor_C_succeeded);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2036**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2037**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2038**: `      CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: initialize_tensor threw an exception: " << e.what());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2039**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2040**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2041**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2042**: `      CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: initialize_tensor threw an unknown exception");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2043**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2044**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2045**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2046**: `    tensor_C.host_view().at({0, 0}) = ElementC(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2047**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2048**: `    cutlass::reference::host::TensorCopy(reference_D.host_view(), tensor_C.host_view());`
+  - EN: Copies tensor data so the reference path starts from the same initial values.
+  - CN: 复制张量数据，使参考路径从相同初始值开始。
+- **Line 2049**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2050**: `      tensor_C.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2051**: `      tensor_D.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2052**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2053**: `    catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2054**: `      CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: sync_device() threw an exception: " << e.what());`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2055**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2056**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2057**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2058**: `      CUTLASS_TRACE_HOST("HostCollectiveEpilogue::initialize: sync_device() threw an unknown exception");`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2059**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2060**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2061**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2062**: `    auto scalar_coord = cutlass::make_Coord(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2063**: `    auto col_vector_coord = cutlass::make_Coord(M);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2064**: `    auto row_vector_coord = cutlass::make_Coord(N);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2065**: `    auto batch_vector_coord = cutlass::make_Coord(L);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2066**: `    if constexpr (IsPerRowScaleEnabled or IsPerColScaleEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2067**: `      // scalars`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2068**: `      if (vector_scale_mode == VectorScale::DISABLED) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2069**: `        // batched scalars`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2070**: `        if (use_device_scalars == ScalarLoc::ON_DEVICE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2071**: `          alpha.resize(batch_vector_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2072**: `          beta.resize(batch_vector_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2073**: `          EXPECT_TRUE(initialize_tensor(alpha.host_view(), init_scale, seed + 2023));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2074**: `          if (beta_ != ElementScalar(0)) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2075**: `            EXPECT_TRUE(initialize_tensor(beta.host_view(), init_scale, seed + 2024));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2076**: `          }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2077**: `          else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2078**: `            cutlass::reference::host::TensorFill(beta.host_view(), beta_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2079**: `          }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2080**: `        }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2081**: `        // non-batched scalars`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2082**: `        else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2083**: `          alpha.resize(scalar_coord, false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2084**: `          beta.resize(scalar_coord, false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2085**: `          cutlass::reference::host::TensorFill(alpha.host_view(), alpha_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2086**: `          cutlass::reference::host::TensorFill(beta.host_view(), beta_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2087**: `        }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2088**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2089**: `      // batched vectors`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2090**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2091**: `        auto batched_vector_coord = cutlass::make_Coord((IsPerRowScaleEnabled ? M : N) * L);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2092**: `        alpha.resize(batched_vector_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2093**: `        beta.resize(batched_vector_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2094**: `        EXPECT_TRUE(initialize_tensor(alpha.host_view(), init_scale, seed + 2023));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2095**: `        if (beta_ != ElementScalar(0)) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2096**: `          EXPECT_TRUE(initialize_tensor(beta.host_view(), init_scale, seed + 2024));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2097**: `        }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2098**: `        else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2099**: `          cutlass::reference::host::TensorFill(beta.host_view(), beta_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2100**: `        }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2101**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2102**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2103**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2104**: `      if (use_device_scalars == ScalarLoc::ON_DEVICE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2105**: `        // Set alpha  beta for different batches.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2106**: `        alpha.resize(batch_vector_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2107**: `        beta.resize(batch_vector_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2108**: `        cutlass::reference::host::TensorFill(alpha.host_view(), alpha_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2109**: `        for (int l = 0; l < L; ++l) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 2110**: `          beta.host_view().at(cutlass::make_Coord(l)) = beta_ + ElementScalar(l);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2111**: `        }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 2112**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2113**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2114**: `        alpha.resize(scalar_coord, false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2115**: `        beta.resize(scalar_coord, false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2116**: `        cutlass::reference::host::TensorFill(alpha.host_view(), alpha_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2117**: `        cutlass::reference::host::TensorFill(beta.host_view(), beta_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2118**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2119**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2120**: `    alpha.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2121**: `    beta.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2122**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2123**: `    if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2124**: `      scale_A.resize(scalar_coord, (use_device_scalars == ScalarLoc::ON_DEVICE));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2125**: `      scale_B.resize(scalar_coord, (use_device_scalars == ScalarLoc::ON_DEVICE));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2126**: `      scale_C.resize(scalar_coord, (use_device_scalars == ScalarLoc::ON_DEVICE));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2127**: `      scale_D.resize(scalar_coord, (use_device_scalars == ScalarLoc::ON_DEVICE));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2128**: `      EXPECT_TRUE(initialize_tensor(scale_A.host_view(), init_scale, seed + 2023));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2129**: `      EXPECT_TRUE(initialize_tensor(scale_B.host_view(), init_scale, seed + 2024));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2130**: `      EXPECT_TRUE(initialize_tensor(scale_C.host_view(), init_scale, seed + 2025));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2131**: `      EXPECT_TRUE(initialize_tensor(scale_D.host_view(), init_scale, seed + 2026));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2132**: `      scale_A.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2133**: `      scale_B.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2134**: `      scale_C.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2135**: `      scale_D.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2136**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2137**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2138**: `    if constexpr (IsRowBiasEnabled or IsColBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2139**: `      bias.resize(IsRowBiasEnabled ? col_vector_coord : row_vector_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2140**: `      EXPECT_TRUE(initialize_tensor(bias.host_view(), init_bias, seed + 2023));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2141**: `      bias.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2142**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2143**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2144**: `    if constexpr (IsDeBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2145**: `      bias.resize(col_vector_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2146**: `      reference_dbias.resize(col_vector_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2147**: `      cutlass::reference::host::TensorFill(bias.host_view(), ElementBias(0));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2148**: `      cutlass::reference::host::TensorFill(reference_dbias.host_view(), ElementBias(0));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2149**: `      bias.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2150**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2151**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2152**: `    if constexpr (IsAbsMaxEnabledD) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2153**: `      abs_max_D.resize(scalar_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2154**: `      // ensure in-place device reductions perform their own initialization`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2155**: `      cutlass::reference::host::TensorFill(abs_max_D.host_view(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2156**: `                                           CUTLASS_STL_NAMESPACE::numeric_limits<ElementAmax>::max());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2157**: `      abs_max_D.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2158**: `      reference_abs_max_D.resize(scalar_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2159**: `      cutlass::reference::host::TensorFill(reference_abs_max_D.host_view(), ElementAmax(0));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2160**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2161**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2162**: `    if constexpr (IsAuxInEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2163**: `      auto aux_coord = cutlass::make_Coord(M * L, N);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2164**: `      auto aux_layout = cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(aux_coord, typename LayoutTagAux::Stride{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2165**: `      tensor_Aux.resize(aux_coord, aux_layout);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2166**: `      EXPECT_TRUE(initialize_tensor(tensor_Aux.host_view(), init_C, seed + 2023));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2167**: `      tensor_Aux.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2168**: `      stride_Aux = cutlass::make_cute_packed_stride(cutlass::gemm::TagToStrideC_t<LayoutTagAux>{}, cute::make_shape(M, N, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2169**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2171**: `    if constexpr (IsAuxOutEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2172**: `      auto aux_coord = cutlass::make_Coord(M * L, N);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2173**: `      auto aux_layout = cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(aux_coord, typename LayoutTagAux::Stride{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2174**: `      tensor_Aux.resize(aux_coord, aux_layout);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2175**: `      reference_Aux.resize(aux_coord, aux_layout, false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2176**: `      tensor_Aux.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2177**: `      stride_Aux = cutlass::make_cute_packed_stride(cutlass::gemm::TagToStrideC_t<LayoutTagAux>{}, cute::make_shape(M, N, L));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2178**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2179**: `      if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2180**: `        scale_Aux.resize(scalar_coord, (use_device_scalars == ScalarLoc::ON_DEVICE));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2181**: `        EXPECT_TRUE(initialize_tensor(scale_Aux.host_view(), init_scale, seed + 2027));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2182**: `        scale_Aux.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2183**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2184**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2185**: `      if constexpr (IsAbsMaxEnabledAux) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2186**: `        abs_max_Aux.resize(scalar_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2187**: `        // ensure in-place device reductions perform their own initialization`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2188**: `        cutlass::reference::host::TensorFill(abs_max_Aux.host_view(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2189**: `                                             CUTLASS_STL_NAMESPACE::numeric_limits<ElementAmax>::max());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2190**: `        abs_max_Aux.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2191**: `        reference_abs_max_Aux.resize(scalar_coord);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2192**: `        cutlass::reference::host::TensorFill(reference_abs_max_Aux.host_view(), ElementAmax(0));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2193**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2194**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2195**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2196**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2197**: `    if constexpr (IsBlockScaleSupported) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2198**: `      auto m_blks = cutlass::ceil_div(M, cute::size<0>(cute::shape(OutputSFAtom{})));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2199**: `      auto n_blks = cutlass::ceil_div(N, cute::size<1>(cute::shape(OutputSFAtom{})));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2200**: `      auto sfd_coord = [&] () {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2201**: `        if constexpr (IsKMajorSFD) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2202**: `          return cutlass::make_Coord(m_blks * Blk_MN{} * L, n_blks * Blk_SF{});`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2203**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2204**: `        else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2205**: `          return cutlass::make_Coord(m_blks * Blk_SF{} * L, n_blks * Blk_MN{});`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2206**: `        }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2207**: `      }();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2208**: `      tensor_SFD.resize(sfd_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(sfd_coord, stride_factor_D));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2209**: `      reference_SFD.resize(sfd_coord, cutlass::layout::Affine2Layout_Factory<LayoutTagD>::layout_factory(sfd_coord, stride_factor_D), false);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2210**: `      tensor_SFD.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2211**: `      norm_constant.resize(scalar_coord, true);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2212**: `      EXPECT_TRUE(initialize_tensor(norm_constant.host_view(), init_scale, seed + 2023));`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2213**: `      norm_constant.sync_device();`
+  - EN: Transfers the current tensor contents from host memory to device memory.
+  - CN: 将当前张量内容从主机内存传输到设备内存。
+- **Line 2214**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2215**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2216**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2217**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2218**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2219**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2220**: `  template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 2221**: `    class Element,`
+  - EN: Declares `class Element`, which groups related data or behavior.
+  - CN: 声明 `class Element`，用于组织相关数据或行为。
+- **Line 2222**: `    class Layout`
+  - EN: Declares `class Layout`, which groups related data or behavior.
+  - CN: 声明 `class Layout`，用于组织相关数据或行为。
+- **Line 2223**: `  >`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2224**: `  bool equality_check(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2225**: `    cutlass::TensorView<Element, Layout> const& lhs,`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 2226**: `    cutlass::TensorView<Element, Layout> const& rhs) const {`
+  - EN: Uses a tensor-view abstraction so helper code can operate on shaped tensor data.
+  - CN: 使用张量视图抽象，使辅助代码可以处理带形状的张量数据。
+- **Line 2227**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2228**: `    // Factors used for calculating relative equality. CUTLASS's relative-equality`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2229**: `    // checks in include/cutlass/relatively_equal.h  are inspired by`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2230**: `    // https://floating-point-gui.de/errors/comparison/. This reference suggests using`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2231**: `    // the minimum normal value of a given type as the nonzero_floor.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2232**: `    Element epsilon(static_cast<Element>(0.1f));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2233**: `    Element nonzero_floor(std::numeric_limits<Element>::min());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2234**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2235**: `    if constexpr (!cutlass::is_complex<Element>::value) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2236**: `      if (check_relative_equality == CheckEquality::RELATIVE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2237**: `        return cutlass::reference::host::TensorRelativelyEquals(`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2238**: `          lhs, rhs, epsilon, nonzero_floor);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2239**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2240**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2241**: `        return cutlass::reference::host::TensorEquals(lhs, rhs);`
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 2242**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2243**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2244**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2245**: `      return cutlass::reference::host::TensorEquals(lhs, rhs);`
+  - EN: Compares the computed tensor against the reference tensor.
+  - CN: 将计算得到的张量与参考张量进行比较。
+- **Line 2246**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2247**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 2248**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2249**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2250**: `      cute::Shape<int,int,int,int> problem_shape_MNKL,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2251**: `      ElementScalar alpha,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2252**: `      ElementScalar beta) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2253**: `    tensor_D.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 2254**: `    EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_C.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2255**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2256**: `    if (tensor_D.size() > 1) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2257**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_D.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2258**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2259**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2260**: `    if (reference_D.size() > 1) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2261**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(reference_D.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2262**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2263**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2264**: `    bool passed = equality_check(reference_D.host_view(), tensor_D.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2265**: `    if(!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2266**: `      #if 0`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2267**: `      auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2268**: `      auto ref = cute::make_tensor(detail::make_iterator(reference_D.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2269**: `        cute::make_layout(cute::make_shape(M, N, L), stride_d));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2270**: `      auto comp = cute::make_tensor(detail::make_iterator(tensor_D.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2271**: `        cute::make_layout(cute::make_shape(M, N, L), stride_d));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2272**: `      for(int i=0; i<M; i++) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 2273**: `        for(int j=0; j<N; j++) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 2274**: `          for(int l=0; l<L; l++) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 2275**: `            if(static_cast<float>(ElementD(ref(i, j, l))) != static_cast<float>((ElementD(comp(i, j, l))))) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2276**: `              printf("<m %d, n %d, l %d> ref: %f comp: %f\n", i, j, l, static_cast<float>(ElementD(ref(i, j, l))), static_cast<float>((ElementD(comp(i, j, l)))));`
+  - EN: Emits diagnostic output to help explain why a test was waived or failed.
+  - CN: 输出诊断信息，以帮助解释测试为何被跳过或失败。
+- **Line 2277**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2278**: `          }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 2279**: `        }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 2280**: `      }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 2281**: `      #endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2282**: `      std::cout<<"D is incorrect"<<std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2283**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2284**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2285**: `    if constexpr (IsAbsMaxEnabledD) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2286**: `      abs_max_D.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 2287**: `      passed &= equality_check(reference_abs_max_D.host_view(), abs_max_D.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2288**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2289**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2290**: `    if constexpr (IsDeBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2291**: `      bias.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 2292**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(bias.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2293**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(reference_dbias.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2294**: `      passed &= equality_check(reference_dbias.host_view(), bias.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2295**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2296**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2297**: `    if constexpr (IsAuxOutEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2298**: `      tensor_Aux.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 2299**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(tensor_Aux.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2300**: `      EXPECT_GT(cutlass::reference::host::TensorNorm(reference_Aux.host_view()), 0);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2301**: `      passed &= equality_check(reference_Aux.host_view(), tensor_Aux.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2302**: `      if(!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2303**: `        std::cout<<"Aux is incorrect"<<std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2304**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2305**: `      if constexpr (IsAbsMaxEnabledAux) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2306**: `        abs_max_Aux.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 2307**: `        bool tmp =  equality_check(reference_abs_max_Aux.host_view(), abs_max_Aux.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2308**: `        if(!tmp) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2309**: `          std::cout<<"AbsMax of Aux is incorrect"<<std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2310**: `        }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2311**: `        passed &= tmp;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2312**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2313**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2314**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2315**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2316**: `    if constexpr (IsBlockScaleSupported) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2317**: `      tensor_SFD.sync_host();`
+  - EN: Transfers the latest tensor contents from device memory back to host memory.
+  - CN: 将最新张量内容从设备内存传回主机内存。
+- **Line 2318**: `      bool passed_sf = equality_check(reference_SFD.host_view(), tensor_SFD.host_view());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2319**: `      if(!passed_sf) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2320**: `        std::cout<<"SF is incorrect"<<std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2321**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2322**: `      passed &= passed_sf;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2323**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2324**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2325**: `    return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2326**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2327**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2328**: `  void print_tensors(std::ofstream& file) {`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 2329**: `    auto coord_0 = cutlass::make_Coord(0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2330**: `    if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2331**: `      file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2332**: `        << ", scale_a: " << scale_A.at(coord_0)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2333**: `        << ", scale_b: " << scale_B.at(coord_0)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2334**: `        << ", scale_c: " << scale_C.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2335**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2336**: `    if constexpr (IsPerRowScaleEnabled or IsPerColScaleEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2337**: `      file << "\n\nvalpha = \n" << alpha.host_view();`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2338**: `      file << "\n\nvbeta = \n" << beta.host_view();`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2339**: `    } else {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2340**: `      file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2341**: `        << "\n\nalpha= \n" << alpha.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2342**: `        << "\n\nbeta= \n " << beta.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2343**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2344**: `    file << "\n\n";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2345**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2346**: `    if constexpr (IsAbsMaxEnabledD) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2347**: `      file << "scale_d: " << float(scale_D.at(coord_0));`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2348**: `      file << "\nReference abs_max_D :";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2349**: `      file << " " << float(reference_abs_max_D.at(coord_0));`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2350**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2351**: `      file << "\nComputed abs_max_D :";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2352**: `      file << " " << float(abs_max_D.at(coord_0));`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2353**: `      file << "\n\n";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2354**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2355**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2356**: `    if constexpr (IsAbsMaxEnabledAux) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2357**: `      file << "scale_aux: " << float(scale_Aux.at(coord_0));`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2358**: `      file << "\nReference abs_max_Aux :";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2359**: `      file << " " << float(reference_abs_max_Aux.at(coord_0));`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2360**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2361**: `      file << "\nComputed abs_max_Aux :";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2362**: `      file << " " << float(abs_max_Aux.at(coord_0));`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2363**: `      file << "\n\n";`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2364**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2365**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2366**: `    if constexpr (IsRowBiasEnabled or IsColBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2367**: `      file << "\n\nBias = \n" << bias.host_view();`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2368**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2369**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2370**: `    if constexpr (IsAuxInEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2371**: `      file << "\n\nAux Input = \n" << tensor_Aux.host_view();`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2372**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2373**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2374**: `    if constexpr (IsDeBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2375**: `      file << "\n\nReference dBias = \n" << reference_dbias.host_view();`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2376**: `      file << "\n\nComputed dBias = \n" << bias.host_view();`
+  - EN: Writes diagnostic information into the debug output file.
+  - CN: 将诊断信息写入调试输出文件。
+- **Line 2377**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2378**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2379**: `    if constexpr (IsAuxOutEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2380**: `      file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2381**: `        << "\n\nReference Aux =\n" << reference_Aux.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2382**: `        << "\n\nComputed Aux =\n" << tensor_Aux.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2383**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2384**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2385**: `    if constexpr (IsBlockScaleSupported) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2386**: `      file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2387**: `        << "\n\nSFD Reference =\n" << reference_SFD.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2388**: `        << "\n\nSFD Computed =\n" << tensor_SFD.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2389**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2390**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2391**: `    file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2392**: `    << "\nC =\n" << tensor_C.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2393**: `    << "\n\nReference =\n" << reference_D.host_view()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2394**: `    << "\n\nComputed =\n" << tensor_D.host_view();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2395**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2396**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2397**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2398**: `  Arguments to_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2399**: `    auto coord_0 = cutlass::make_Coord(0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2400**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2401**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2402**: `    Arguments arguments =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2403**: `      {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 2404**: `        {},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2405**: `        tensor_C.device_data(), stride_c, tensor_D.device_data(), stride_d`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2406**: `      };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2407**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2408**: `    auto &fusion_args = arguments.thread;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2409**: `    if constexpr (IsLegacy) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2410**: `      arguments.thread = {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2411**: `        alpha.at(coord_0),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2412**: `        beta.at(coord_0),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2413**: `        alpha.device_data(),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2414**: `        beta.device_data()`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2415**: `      };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2416**: `      arguments.ptr_Bias = bias.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2417**: `      arguments.ptr_T = tensor_Aux.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2418**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2419**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2420**: `      fusion_args.alpha = alpha.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2421**: `      fusion_args.alpha_ptr = alpha.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2422**: `      // Only initializing beta/beta_ptr for non-void source`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2423**: `      if constexpr (not cute::is_void_v<typename kernel::ElementC>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2424**: `        fusion_args.beta = beta.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2425**: `        fusion_args.beta_ptr = beta.device_data(); // if vector_scale_mode is true this is nullptr`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2426**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2427**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2428**: `      if constexpr (IsPerRowScaleEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2429**: `        int32_t m_stride = vector_scale_mode == VectorScale::ENABLED ? 1 : 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2430**: `        int64_t l_stride = vector_scale_mode == VectorScale::ENABLED ? M : (use_device_scalars == ScalarLoc::ON_DEVICE ? 1 : 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2431**: `        fusion_args.dAlpha = cute::make_stride(bool(m_stride),cute::_0{}, l_stride);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2432**: `        fusion_args.dBeta = cute::make_stride(bool(m_stride),cute::_0{}, l_stride);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2433**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2434**: `      else if constexpr (IsPerColScaleEnabled) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 2435**: `        int32_t n_stride = vector_scale_mode == VectorScale::ENABLED ? 1 : 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2436**: `        int64_t l_stride = vector_scale_mode == VectorScale::ENABLED ? N : (use_device_scalars == ScalarLoc::ON_DEVICE ? 1 : 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2437**: `        fusion_args.dAlpha = cute::make_stride(cute::_0{}, bool(n_stride), l_stride);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2438**: `        fusion_args.dBeta = cute::make_stride(cute::_0{}, bool(n_stride), l_stride);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2439**: `      }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 2440**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2441**: `        if constexpr (not IsFfma2Kernel) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2442**: `          if (use_device_scalars == ScalarLoc::ON_DEVICE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2443**: `            if (L > 1) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2444**: `              fusion_args.dAlpha = cute::make_stride(cute::_0{},cute::_0{}, int64_t(1));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2445**: `              fusion_args.dBeta  = cute::make_stride(cute::_0{},cute::_0{}, int64_t(1));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2446**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2447**: `          }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2448**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2449**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2450**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2451**: `      if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2452**: `        fusion_args.scale_a = scale_A.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2453**: `        fusion_args.scale_b = scale_B.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2454**: `        fusion_args.scale_c = scale_C.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2455**: `        fusion_args.scale_d = scale_D.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2456**: `        fusion_args.scale_a_ptr = scale_A.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2457**: `        fusion_args.scale_b_ptr = scale_B.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2458**: `        fusion_args.scale_c_ptr = scale_C.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2459**: `        fusion_args.scale_d_ptr = scale_D.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2460**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2461**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2462**: `      if constexpr (IsRowBiasEnabled or IsColBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2463**: `        fusion_args.bias_ptr = bias.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2464**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2465**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2466**: `      if constexpr (IsDeBiasEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2467**: `        fusion_args.dbias_ptr = bias.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2468**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2469**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2470**: `      // example of how to set kernel activation arguments`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2471**: `      // see ActivationFunctor::Arguments in activation.h for definition`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2472**: `      // if Arguments doesn't exist then fusion_args.activation is empty`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2473**: `      auto init_activation_args = [] (auto activation, auto& args) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2474**: `        using Activation = cute::remove_cvref_t<decltype(activation)>;`
+  - EN: Creates type alias `Activation` to simplify later code.
+  - CN: 创建类型别名 `Activation` 以简化后续代码。
+- **Line 2475**: `        if constexpr (cute::is_same_v<Activation, cutlass::epilogue::thread::Clamp<ElementCompute>>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2476**: `          args.lower_bound = 0; // Treat Clamp as ReLU`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2477**: `          args.upper_bound = cutlass::platform::identity_for_minimum<ElementCompute>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2478**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2479**: `        if constexpr (cute::is_same_v<Activation, cutlass::epilogue::thread::ScaledGELU_taylor<ElementCompute>>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2480**: `          args.scale = ElementCompute(1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2481**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2482**: `      };`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2483**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2484**: `      if constexpr (not cute::is_same_v<ActivationFunctor, cutlass::epilogue::thread::Identity<ElementCompute>>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2485**: `        init_activation_args(ActivationFunctor{}, fusion_args.activation);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2486**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2487**: `      if constexpr (IsAbsMaxEnabledD) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2488**: `        fusion_args.amax_D_ptr = abs_max_D.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2489**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2490**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2491**: `      if constexpr (IsAuxInEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2492**: `        fusion_args.aux_ptr = tensor_Aux.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2493**: `        fusion_args.dAux = stride_Aux;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2494**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2495**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2496**: `      if constexpr (IsAuxOutEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2497**: `        fusion_args.aux_ptr = tensor_Aux.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2498**: `        fusion_args.dAux = stride_Aux;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2499**: `        if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2500**: `          fusion_args.scale_aux = scale_Aux.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2501**: `          fusion_args.scale_aux_ptr = scale_Aux.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2502**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2503**: `        if constexpr (IsAbsMaxEnabledAux) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2504**: `          fusion_args.amax_aux_ptr = abs_max_Aux.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2505**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2506**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2507**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2508**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2509**: `      if constexpr (IsBlockScaleSupported) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2510**: `        arguments.thread.block_scale_factor_ptr = tensor_SFD.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2511**: `        arguments.thread.norm_constant_ptr = norm_constant.device_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2512**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2513**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2514**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2515**: `    return arguments;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2516**: `  }`
+  - EN: Closes the scope for `struct HostCollectiveEpilogue`.
+  - CN: 结束 `struct HostCollectiveEpilogue` 的作用域。
+- **Line 2517**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2518**: `  auto to_host_args(ProblemShapeType problem_size) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2519**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2520**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2521**: `    // Allocate the GEMM workspace`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2522**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2523**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2524**: `    auto M = cute::get<0>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2525**: `    auto N = cute::get<1>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2526**: `    auto K = cute::get<2>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2527**: `    auto L = cute::get<3>(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2528**: `    auto coord_0 = cutlass::make_Coord(0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2529**: `    auto C = cute::make_tensor(detail::make_iterator(tensor_C.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2530**: `        cute::make_layout(cute::make_shape(M, N, L), stride_c));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2531**: `    auto D = cute::make_tensor(detail::make_iterator(reference_D.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2532**: `        cute::make_layout(cute::make_shape(M, N, L), stride_d));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2533**: `    auto Bias = cute::make_tensor(detail::make_iterator(IsDeBiasEnabled ? reference_dbias.host_data() : bias.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2534**: `        cute::make_layout(cute::make_shape(IsRowBiasEnabled ? M : N)));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2535**: `    auto Aux = cute::make_tensor(detail::make_iterator(IsAuxInEnabled ? tensor_Aux.host_data() : reference_Aux.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2536**: `        cute::make_layout(cute::make_shape(M, N, L), stride_Aux));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2537**: `    auto Valpha = [&](){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2538**: `      if constexpr (IsPerRowScaleEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2539**: `        int m_stride = vector_scale_mode == VectorScale::ENABLED ? 1 : 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2540**: `        int l_stride = vector_scale_mode == VectorScale::ENABLED ? M : (use_device_scalars == ScalarLoc::ON_DEVICE ? 1 : 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2541**: `        return cute::make_tensor(detail::make_iterator(alpha.host_data()),`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2542**: `            cute::make_layout(cute::make_shape(M, N, L), make_stride(m_stride, cute::_0{}, l_stride)));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2543**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2544**: `      else if constexpr (IsPerColScaleEnabled) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 2545**: `        int n_stride = vector_scale_mode == VectorScale::ENABLED ? 1 : 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2546**: `        int l_stride = vector_scale_mode == VectorScale::ENABLED ? N : (use_device_scalars == ScalarLoc::ON_DEVICE ? 1 : 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2547**: `        return cute::make_tensor(detail::make_iterator(alpha.host_data()),`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2548**: `            cute::make_layout(cute::make_shape(M, N, L), make_stride(cute::_0{}, n_stride, l_stride)));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2549**: `      }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 2550**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2551**: `        return cute::make_tensor(detail::make_iterator(alpha.host_data()),`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2552**: `            cute::make_layout(cute::make_shape(M, N, L), make_stride(cute::_0{}, cute::_0{}, cute::_1{})));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2553**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2554**: `    }();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2555**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2556**: `    auto Vbeta = [&]() {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2557**: `      if constexpr (IsPerRowScaleEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2558**: `        int m_stride = vector_scale_mode == VectorScale::ENABLED ? 1 : 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2559**: `        int l_stride = vector_scale_mode == VectorScale::ENABLED ? M : (use_device_scalars == ScalarLoc::ON_DEVICE ? 1 : 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2560**: `        return cute::make_tensor(detail::make_iterator(beta.host_data()),`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2561**: `            cute::make_layout(cute::make_shape(M, N, L), make_stride(m_stride, cute::_0{}, l_stride)));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2562**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2563**: `      else if constexpr (IsPerColScaleEnabled) {`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 2564**: `        int n_stride = vector_scale_mode == VectorScale::ENABLED ? 1 : 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2565**: `        int l_stride = vector_scale_mode == VectorScale::ENABLED ? N : (use_device_scalars == ScalarLoc::ON_DEVICE ? 1 : 0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2566**: `        return cute::make_tensor(detail::make_iterator(beta.host_data()),`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2567**: `            cute::make_layout(cute::make_shape(M, N, L), make_stride(cute::_0{}, n_stride, l_stride)));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2568**: `      }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 2569**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2570**: `        return  cute::make_tensor(detail::make_iterator(beta.host_data()),`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2571**: `            cute::make_layout(cute::make_shape(M, N, L), make_stride(cute::_0{}, cute::_0{}, cute::_1{})));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2572**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2573**: `    }();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2574**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2575**: `    auto SfD = [&](){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2576**: `      if constexpr (IsBlockScaleSupported) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2577**: `        auto tensor = make_tensor(detail::make_iterator(reference_SFD.host_data()),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2578**: `          Sm1xxBlockScaledOutputConfig::tile_atom_to_shape_SFD(problem_shape_MNKL));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2579**: `        return tensor;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2580**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2581**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2582**: `        // Reference kernel has a logic to ignore scalefactor computation if we pass the tensor type same as output D tensor.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2583**: `        return D;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2584**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2585**: `    }();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2586**: `    cutlass::reference::host::GettEpilogueParams<`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2587**: `      ElementScalar,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2588**: `      ElementScalar,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2589**: `      ElementAccumulator,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2590**: `      ElementCompute,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2591**: `      decltype(C),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2592**: `      decltype(D),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2593**: `      decltype(Bias),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2594**: `      decltype(Aux),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2595**: `      decltype(Valpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2596**: `      decltype(Vbeta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2597**: `      ActivationFunctor,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2598**: `      decltype(SfD),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2599**: `      Int<SFD_VectorSize>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2600**: `      cutlass::plus<ElementCompute>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2601**: `      IsColBiasEnabled`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2602**: `      , SfGenStrategy`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2603**: `    > epilogue_params{};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2604**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2605**: `    epilogue_params.C = C;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2606**: `    epilogue_params.D = D;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2607**: `    epilogue_params.alpha = alpha.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2608**: `    epilogue_params.beta = beta.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2609**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2610**: `    if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2611**: `      epilogue_params.scale_a = scale_A.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2612**: `      epilogue_params.scale_b = scale_B.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2613**: `      epilogue_params.scale_c = scale_C.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2614**: `      epilogue_params.scale_d = scale_D.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2615**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2616**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2617**: `    if constexpr (IsRowBiasEnabled or IsColBiasEnabled or IsDeBiasEnabled)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2618**: `    {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 2619**: `      epilogue_params.Bias = Bias;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2620**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2621**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2622**: `    if constexpr (IsAbsMaxEnabledD) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2623**: `      epilogue_params.abs_max_D = reference_abs_max_D.host_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2624**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2625**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2626**: `    if constexpr (IsAuxInEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2627**: `      epilogue_params.Aux = Aux;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2628**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2629**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2630**: `    if constexpr (IsAuxOutEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2631**: `      epilogue_params.Aux = Aux;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2632**: `      if constexpr (IsScaleFactorEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2633**: `        epilogue_params.scale_aux = scale_Aux.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2634**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2635**: `      if constexpr (IsAbsMaxEnabledAux) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2636**: `        epilogue_params.abs_max_Aux = reference_abs_max_Aux.host_data();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2637**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2638**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2639**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2640**: `    if constexpr (IsPerRowScaleEnabled or IsPerColScaleEnabled) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2641**: `      epilogue_params.Valpha = Valpha;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2642**: `      if (vector_scale_mode == VectorScale::ENABLED) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2643**: `        epilogue_params.Vbeta = Vbeta;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2644**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2645**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2646**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2647**: `      if (use_device_scalars == ScalarLoc::ON_DEVICE) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2648**: `        epilogue_params.Valpha = Valpha;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2649**: `        epilogue_params.Vbeta = Vbeta;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2650**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2651**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2652**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2653**: `    if constexpr (IsBlockScaleSupported) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2654**: `      epilogue_params.SfD = SfD;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2655**: `      epilogue_params.st = norm_constant.at(coord_0);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2656**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2657**: `    return epilogue_params;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2658**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2659**: `};`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2660**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2661**: `template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 2662**: `  typename Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2663**: `  template <class T> class ActivationFunctor_ = cutlass::epilogue::thread::Identity,`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 2664**: `  bool force_legacy_epilogue = false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2665**: `  typename ElementA = typename Gemm::GemmKernel::ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2666**: `  typename ElementB = typename Gemm::GemmKernel::ElementB`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2667**: `  , typename RuntimeDatatypeA = void*`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2668**: `  , typename RuntimeDatatypeB = void*`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2669**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2670**: `struct TestbedImpl {`
+  - EN: Declares `struct TestbedImpl`, which groups related data or behavior.
+  - CN: 声明 `struct TestbedImpl`，用于组织相关数据或行为。
+- **Line 2671**: `  // Kernel data types`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2672**: `  using ScheduleType = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy::Schedule;`
+  - EN: Creates alias `ScheduleType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ScheduleType`。
+- **Line 2673**: `  // All Collective MMA operands are defined by HostCollectiveMainloopType based on the schedule type`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2674**: `  using HostCollectiveMainloopType = HostCollectiveMainloop<ScheduleType, Gemm, ElementA, ElementB>;`
+  - EN: Creates type alias `HostCollectiveMainloopType` to simplify later code.
+  - CN: 创建类型别名 `HostCollectiveMainloopType` 以简化后续代码。
+- **Line 2675**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2676**: `  using CollectiveEpilogue = cute::conditional_t<IsDefaultEpilogue<typename Gemm::GemmKernel::CollectiveEpilogue>::value || force_legacy_epilogue,`
+  - EN: Creates alias `CollectiveEpilogue` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `CollectiveEpilogue`。
+- **Line 2677**: `                                                HostCollectiveDefaultEpilogue<Gemm>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2678**: `                                                HostCollectiveEpilogue<Gemm>>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2679**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2680**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 2681**: `  using ElementAccumulator = typename Gemm::GemmKernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 2682**: `  using ElementCompute = typename ElementComputeType<Gemm, ElementAccumulator>::Type;`
+  - EN: Creates alias `ElementCompute` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementCompute`。
+- **Line 2683**: `  using ElementScalar = typename ElementScalarType<Gemm, ElementCompute>::Type;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 2684**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2685**: `  using LayoutTagA = typename HostCollectiveMainloopType::LayoutTagA;`
+  - EN: Creates alias `LayoutTagA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutTagA`。
+- **Line 2686**: `  using LayoutTagB = typename HostCollectiveMainloopType::LayoutTagB;`
+  - EN: Creates alias `LayoutTagB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutTagB`。
+- **Line 2687**: `  using LayoutTagC = typename CollectiveEpilogue::LayoutTagC;`
+  - EN: Creates alias `LayoutTagC` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutTagC`。
+- **Line 2688**: `  using LayoutTagD = typename CollectiveEpilogue::LayoutTagD;`
+  - EN: Creates alias `LayoutTagD` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `LayoutTagD`。
+- **Line 2689**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2690**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2691**: `  using InternalElementA = typename Gemm::GemmKernel::ElementA;`
+  - EN: Creates alias `InternalElementA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `InternalElementA`。
+- **Line 2692**: `  using InternalElementB = typename Gemm::GemmKernel::ElementB;`
+  - EN: Creates alias `InternalElementB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `InternalElementB`。
+- **Line 2693**: `  static constexpr bool IsRuntimeDataTypeA = cutlass::gemm::collective::detail::is_sm10x_runtime_f8f6f4<InternalElementA>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2694**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2695**: `  static constexpr bool IsRuntimeDataTypeB = cutlass::gemm::collective::detail::is_sm10x_runtime_f8f6f4<InternalElementB>();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2696**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2697**: `  static_assert((IsRuntimeDataTypeA && IsRuntimeDataTypeB) ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2698**: `                (!IsRuntimeDataTypeA && !IsRuntimeDataTypeB),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2699**: `                "ElementA and ElementB in a GEMM kernel should be both runtime or both static.");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2700**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2701**: `  static constexpr bool IsRuntimeDataType = IsRuntimeDataTypeA && IsRuntimeDataTypeB;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2702**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2703**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2704**: `  uint32_t sm_count;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2705**: `  // Used to force multi-wave tests for persistent kernel schedules`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2706**: `  constexpr static int MaxSmCount = 16;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2707**: `  static constexpr uint64_t kDefaultSeed = 4096;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2708**: `  static constexpr uint32_t mma_promotion_interval = 4;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2709**: `  using RasterOrderOptions = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90::RasterOrderOptions;`
+  - EN: Creates alias `RasterOrderOptions` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `RasterOrderOptions`。
+- **Line 2710**: `  using DecompositionMode = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates alias `DecompositionMode` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DecompositionMode`。
+- **Line 2711**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2712**: `  HostCollectiveMainloopType collective_mma_inputs;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2713**: `  CollectiveEpilogue collective_epilogue;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2714**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2715**: `  //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2716**: `  // Methods`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2717**: `  //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2718**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2719**: `  TestbedImpl(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2720**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2721**: `    ScalarLoc use_device_scalars_ = ScalarLoc::ON_HOST,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2722**: `    VectorScale vector_scale_mode_ = VectorScale::DISABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2723**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2724**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2725**: `    cutlass::Distribution::Kind init_C_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2726**: `    cutlass::Distribution::Kind init_scale_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2727**: `    cutlass::Distribution::Kind init_bias_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2728**: `    uint64_t seed_ = kDefaultSeed`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2729**: `  ): collective_mma_inputs(HostCollectiveMainloopType(check_relative_equality_, init_A_, init_B_, seed_)),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2730**: `     collective_epilogue(CollectiveEpilogue(check_relative_equality_, use_device_scalars_, vector_scale_mode_, init_C_, init_scale_, init_bias_, seed_)) { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2731**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2732**: `  TestbedImpl(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2733**: `    typename LayoutTagA::Stride stride_factor_A_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2734**: `    typename LayoutTagB::Stride stride_factor_B_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2735**: `    typename LayoutTagC::Stride stride_factor_C_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2736**: `    typename LayoutTagD::Stride stride_factor_D_,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2737**: `    CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2738**: `    ScalarLoc use_device_scalars_ = ScalarLoc::ON_HOST,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2739**: `    VectorScale vector_scale_mode_ = VectorScale::DISABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2740**: `    cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2741**: `    cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2742**: `    cutlass::Distribution::Kind init_C_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2743**: `    cutlass::Distribution::Kind init_scale_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2744**: `    cutlass::Distribution::Kind init_bias_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 2745**: `    uint64_t seed_ = kDefaultSeed`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2746**: `  ): collective_mma_inputs(HostCollectiveMainloopType(check_relative_equality_, stride_factor_A_, stride_factor_B_, init_A_, init_B_, seed_)),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2747**: `     collective_epilogue(CollectiveEpilogue(check_relative_equality_, use_device_scalars_, vector_scale_mode_, init_C_, init_scale_, init_bias_, seed_)) { }`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2748**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2749**: `  /// Initializes data structures`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 2750**: `  bool initialize(ProblemShapeType problem_size, ElementScalar alpha_=1.f, ElementScalar beta_=0.f) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 2751**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2752**: `    CUTLASS_TRACE_HOST("TestbedImpl::initialize(problem_size, alpha, beta)");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2753**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2754**: `    collective_mma_inputs.initialize(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2755**: `    collective_epilogue.initialize(problem_size, alpha_, beta_);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2756**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2757**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2758**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 2759**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2760**: `  /// Compares computed reference with device reference and outputs to a file if incorrect`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 2761**: `  bool compare_reference(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2762**: `      cute::Shape<int,int,int,int> problem_shape_MNKL,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2763**: `      ElementScalar alpha,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2764**: `      ElementScalar beta)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2765**: `  {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 2766**: `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2767**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2768**: `    bool passed = collective_mma_inputs.compare_reference(problem_shape_MNKL);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2769**: `    passed &= collective_epilogue.compare_reference(problem_shape_MNKL, alpha, beta);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2770**: `    EXPECT_TRUE(passed);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2771**: `    if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2772**: `      std::stringstream fname;`
+  - EN: Builds a formatted string, typically for a diagnostic filename.
+  - CN: 构造格式化字符串，通常用于生成诊断文件名。
+- **Line 2773**: `      fname << "error_Gemm_device_"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2774**: `        << M << "x" << N << "x" << K << "x" << L << "_"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2775**: `        << cute::get<0>(typename Gemm::GemmKernel::TileShape{}) << "_"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2776**: `        << cute::get<1>(typename Gemm::GemmKernel::TileShape{}) << "_"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2777**: `        << cute::get<2>(typename Gemm::GemmKernel::TileShape{}) << ".txt";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2778**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2779**: `      std::ofstream file(fname.str());`
+  - EN: Opens a file stream used to dump debugging information for failing cases.
+  - CN: 打开文件流，用于为失败用例转储调试信息。
+- **Line 2780**: `      file`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2781**: `        << "problem: " << ' ' << M << "x" << N << "x" << K << ", Batch count = " << L`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2782**: `        << ", alpha: " << alpha << ", beta: " << beta << "\n\n";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2783**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2784**: `      collective_mma_inputs.print_tensors(file);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2785**: `      collective_epilogue.print_tensors(file);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2786**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2787**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2788**: `    return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2789**: `  }`
+  - EN: Closes the scope for `struct TestbedImpl`.
+  - CN: 结束 `struct TestbedImpl` 的作用域。
+- **Line 2790**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2791**: `  /// Verifies the result is a GEMM`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 2792**: `  bool verify(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2793**: `      ProblemShapeType problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2794**: `      ElementScalar alpha,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2795**: `      ElementScalar beta)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2796**: `  {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 2797**: `    using namespace cute;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2798**: `    auto problem_shape_MNKL = cute::append<4>(problem_size, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2799**: `    auto mainloop_params = collective_mma_inputs.to_host_args(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2800**: `    auto epilogue_params = collective_epilogue.to_host_args(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2801**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2802**: `    cutlass::reference::host::Gemm3x(mainloop_params, epilogue_params);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2803**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2804**: `    bool passed = compare_reference(problem_shape_MNKL, alpha, beta);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2805**: `    return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2806**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2807**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2808**: `	/// Determine if the CUDA device is sufficient to run the kernel`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 2809**: `  bool sufficient() {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 2810**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2811**: `    // Determine SMEM requirements and waive if not satisfied`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2812**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2813**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2814**: `    size_t smem_size = static_cast<size_t>(Gemm::GemmKernel::SharedStorageSize);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2815**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2816**: `    int device_idx;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2817**: `    cudaError_t result = cudaGetDevice(&device_idx);`
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 2818**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2819**: `    if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2820**: `      throw std::runtime_error("cudaGetDevice() API call failed.");`
+  - EN: Queries the active CUDA device index before inspecting hardware capabilities.
+  - CN: 在检查硬件能力前查询当前 CUDA 设备编号。
+- **Line 2821**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2822**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2823**: `    cudaDeviceProp properties;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2824**: `    result = cudaGetDeviceProperties(&properties, device_idx);`
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 2825**: `    this->sm_count = properties.multiProcessorCount;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2826**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2827**: `    if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2828**: `      throw std::runtime_error("cudaGetDeviceProperties() failed");`
+  - EN: Retrieves CUDA device properties used to decide whether the test can run.
+  - CN: 获取 CUDA 设备属性，用于判断测试是否可运行。
+- **Line 2829**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2830**: `      if (properties.sharedMemPerBlockOptin < smem_size) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2831**: `        printf("failed due to smem_size\n");`
+  - EN: Emits diagnostic output to help explain why a test was waived or failed.
+  - CN: 输出诊断信息，以帮助解释测试为何被跳过或失败。
+- **Line 2832**: `        printf("hardware smem_size: %d, required smem_size: %d\n\n", int(properties.sharedMemPerBlockOptin), int(smem_size));`
+  - EN: Emits diagnostic output to help explain why a test was waived or failed.
+  - CN: 输出诊断信息，以帮助解释测试为何被跳过或失败。
+- **Line 2833**: `        return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2834**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2835**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2836**: `  }`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 2837**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2838**: `  bool profile(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2839**: `    ProblemShapeType problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2840**: `    int iterations,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2841**: `    Gemm& gemm_op,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2842**: `    typename Gemm::Arguments& arguments,`
+  - EN: Begins construction of the runtime argument object passed to the GEMM operator.
+  - CN: 开始构造传递给 GEMM 算子的运行时参数对象。
+- **Line 2843**: `    cutlass::device_memory::allocation<uint8_t>& workspace) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2844**: `    int M = cute::size<0>(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2845**: `    int N = cute::size<1>(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2846**: `    int K = cute::size<2>(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2847**: `    int L = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2848**: `    if constexpr(cute::rank(ProblemShapeType{}) == 4) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2849**: `      L = cute::size<3>(problem_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2850**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2851**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2852**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2853**: `    cutlass::Status status;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2854**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2855**: `    // Run the GEMM`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2856**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2857**: `    cudaError_t result;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2858**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2859**: `    for (int iter = 0; iter < iterations; ++iter) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 2860**: `      status = gemm_op(arguments, workspace.get());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2861**: `      if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2862**: `        EXPECT_TRUE(status == cutlass::Status::kSuccess) << to_string(status);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2863**: `        return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2864**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2865**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 2866**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2867**: `    result = cudaDeviceSynchronize();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2868**: `    if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2869**: `      EXPECT_EQ(result, cudaSuccess) << "Error at Kernel Sync.";`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 2870**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2871**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2872**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2873**: `    return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2874**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2875**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2876**: `  /// Executes one test`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 2877**: `  bool run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2878**: `    ProblemShapeType problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2879**: `    ElementScalar alpha = ElementScalar(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2880**: `    ElementScalar beta = ElementScalar(0),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2881**: `    bool profiling = false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2882**: `    detail::Iterations iterations = detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2883**: `    RasterOrderOptions raster_order = RasterOrderOptions::Heuristic,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2884**: `    detail::MaxSwizzleSize max_swizzle = detail::MaxSwizzleSize{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2885**: `    detail::Splits splits = detail::Splits{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2886**: `    DecompositionMode decomposition_mode = DecompositionMode::Heuristic`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2887**: `    , RuntimeDatatypeA runtime_input_datatype_a = {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2888**: `    , RuntimeDatatypeB runtime_input_datatype_b = {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2889**: `    )`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2890**: `  {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 2891**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2892**: `    CUTLASS_TRACE_HOST("TestbedImpl::run");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2893**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2894**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2895**: `    // Fail test if insufficient CUDA device`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2896**: `    if (!sufficient()) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2897**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Test failed due to insufficient CUDA device");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2898**: `      std::cout << "Test failed due to insufficient CUDA device." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2899**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2900**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2901**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2902**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2903**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: sufficient() returned true");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2904**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2905**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2906**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2907**: `    try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2908**: `      const bool initialized = this->initialize(problem_size, alpha, beta);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2909**: `      if (not initialized) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2910**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: this->initialize returned false");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2911**: `        std::cerr << "Initialization failed \n";`
+  - EN: Emits diagnostic output to help explain why a test was waived or failed.
+  - CN: 输出诊断信息，以帮助解释测试为何被跳过或失败。
+- **Line 2912**: `        return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2913**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2914**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2915**: `    catch ([[maybe_unused]] std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2916**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: this->initialize threw an exception: " << e.what());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2917**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2918**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2919**: `    catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2920**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: this->initialize threw an unknown exception");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2921**: `      throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2922**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2923**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2924**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2925**: `    CUTLASS_TRACE_HOST("TestbedImpl::run: this->initialize() returned true");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2926**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2927**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2928**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2929**: `    // Initialize the GEMM operator`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2930**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 2931**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2932**: `    typename Gemm::Arguments arguments;`
+  - EN: Begins construction of the runtime argument object passed to the GEMM operator.
+  - CN: 开始构造传递给 GEMM 算子的运行时参数对象。
+- **Line 2933**: `    cutlass::KernelHardwareInfo hw_info;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2934**: `    hw_info.device_id = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2935**: `    if (not profiling) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2936**: `      this->sm_count = std::min(MaxSmCount, cutlass::KernelHardwareInfo::query_device_multiprocessor_count(hw_info.device_id));`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2937**: `      hw_info.sm_count = this->sm_count;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2938**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2939**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2940**: `      this->sm_count = cutlass::KernelHardwareInfo::query_device_multiprocessor_count(hw_info.device_id);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2941**: `      hw_info.sm_count = this->sm_count;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2942**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2943**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2944**: `    typename Gemm::GemmKernel::TileScheduler::Arguments scheduler_args;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2945**: `    if constexpr (cute::is_same_v<typename Gemm::GemmKernel::TileSchedulerTag, cutlass::gemm::StreamKScheduler>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2946**: `      scheduler_args = { static_cast<int>(splits), static_cast<int>(max_swizzle), raster_order, decomposition_mode };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2947**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2948**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 2949**: `      scheduler_args = { static_cast<int>(max_swizzle), raster_order };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2950**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 2951**: `    typename HostCollectiveMainloopType::Arguments mainloop_args;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2952**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2953**: `    mainloop_args = collective_mma_inputs.to_args();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2954**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2955**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2956**: `    if constexpr (IsRuntimeDataType) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 2957**: `      mainloop_args.runtime_data_type_a = runtime_input_datatype_a;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2958**: `      mainloop_args.runtime_data_type_b = runtime_input_datatype_b;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2959**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 2960**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2961**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2962**: `    arguments =`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2963**: `    {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 2964**: `      cutlass::gemm::GemmUniversalMode::kGemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2965**: `      problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2966**: `      mainloop_args,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2967**: `      collective_epilogue.to_args(problem_size),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2968**: `      hw_info,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2969**: `      scheduler_args`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2970**: `    };`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 2971**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2972**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2973**: `    CUTLASS_TRACE_HOST("TestbedImpl::run: Creating gemm_op");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2974**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2975**: `    Gemm gemm_op;`
+  - EN: Instantiates the configured GEMM operator object.
+  - CN: 实例化已配置好的 GEMM 算子对象。
+- **Line 2976**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2977**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2978**: `    CUTLASS_TRACE_HOST("TestbedImpl::run: Calling Gemm::get_workspace_size");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2979**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2980**: `    size_t workspace_size = Gemm::get_workspace_size(arguments);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2981**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2982**: `    CUTLASS_TRACE_HOST("TestbedImpl::run: Allocating workspace of size " << workspace_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2983**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2984**: `    cutlass::device_memory::allocation<uint8_t> workspace(workspace_size);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2985**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2986**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 2987**: `    CUTLASS_TRACE_HOST("TestbedImpl::run: Calling gemm_op.can_implement");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2988**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 2989**: `    cutlass::Status status = gemm_op.can_implement(arguments);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2990**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2991**: `    if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 2992**: `      cudaError_t error = cudaGetLastError();`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 2993**: `      const auto error_str = cudaGetErrorString(error);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 2994**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: cudaGetLastError() is " << error_str);`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 2995**: `      std::cerr << "This test is not supported: " << error_str << "\n";`
+  - EN: Emits diagnostic output to help explain why a test was waived or failed.
+  - CN: 输出诊断信息，以帮助解释测试为何被跳过或失败。
+- **Line 2996**: `      return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 2997**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 2998**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 2999**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3000**: `    // Run the GEMM`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3001**: `    //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3002**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3003**: `    if (profiling) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3004**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3005**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Calling profile");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3006**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3007**: `      return profile(problem_size, static_cast<int>(iterations), gemm_op, arguments, workspace);`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3008**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3009**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3010**: `      cudaError_t result;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3011**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3012**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Calling gemm_op.initialize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3013**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3014**: `      status = gemm_op.initialize(arguments, workspace.get());`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3015**: `      if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3016**: `        cudaError_t error = cudaGetLastError();`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 3017**: `        const auto error_str = cudaGetErrorString(error);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3018**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: cudaGetLastError() is " << error_str);`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 3019**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3020**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3021**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Calling gemm_op.run");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3022**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3023**: `      status = gemm_op.run();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3024**: `      if (status != cutlass::Status::kSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3025**: `        cudaError_t error = cudaGetLastError();`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 3026**: `        const auto error_str = cudaGetErrorString(error);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3027**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: cudaGetLastError() is " << error_str);`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 3028**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3029**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3030**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Calling cudaDeviceSynchronize");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3031**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3032**: `      result = cudaDeviceSynchronize();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3033**: `      if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3034**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: cudaDeviceSynchronize reports non-success");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3035**: `        EXPECT_EQ(result, cudaSuccess) << "Error at Kernel Sync.";`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3036**: `        return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3037**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3038**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3039**: `      EXPECT_TRUE(status == cutlass::Status::kSuccess) << to_string(status);`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3040**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3041**: `      //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3042**: `      // Verify`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3043**: `      //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3044**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3045**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Calling this->verify");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3046**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3047**: `      bool passed = this->verify(problem_size, alpha, beta);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3048**: `      if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3049**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: this->verify FAILED");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3050**: `        cudaError_t error = cudaGetLastError();`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 3051**: `        const auto error_str = cudaGetErrorString(error);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3052**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: cudaGetLastError() is " << error_str);`
+  - EN: Reads the most recent CUDA error to report why initialization failed.
+  - CN: 读取最近一次 CUDA 错误，以报告初始化失败原因。
+- **Line 3053**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3054**: `        std::cout << "Error : Failed : with alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3055**: `                  << "\n";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3056**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3057**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3058**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3059**: `        CUTLASS_TRACE_HOST("TestbedImpl::run: this->verify passed");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3060**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3061**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3062**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3063**: `#if (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - EN: Starts a preprocessor condition that selects code for a specific build configuration.
+  - CN: 开始一个预处理条件，用于为特定构建配置选择代码。
+- **Line 3064**: `      CUTLASS_TRACE_HOST("TestbedImpl::run: Reached end");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3065**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+- **Line 3066**: `      return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3067**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3068**: `  }`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 3069**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 3070**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3071**: `} // namespace detail`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3072**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3073**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 3074**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3075**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3076**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 3077**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3078**: `template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3079**: `  typename Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3080**: `  template <class T> class ActivationFunctor = cutlass::epilogue::thread::Identity,`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3081**: `  bool force_legacy_epilogue = false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3082**: `  typename ElementA = typename Gemm::GemmKernel::ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3083**: `  typename ElementB = typename Gemm::GemmKernel::ElementB`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3084**: `  , typename RuntimeDatatypeA = void*`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3085**: `  , typename RuntimeDatatypeB = void*`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3086**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3087**: `struct Testbed3x {`
+  - EN: Declares `struct Testbed3x`, which groups related data or behavior.
+  - CN: 声明 `struct Testbed3x`，用于组织相关数据或行为。
+- **Line 3088**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3089**: `  using TestBedImpl = typename detail::TestbedImpl<`
+  - EN: Creates alias `TestBedImpl` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `TestBedImpl`。
+- **Line 3090**: `                        Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3091**: `                        ActivationFunctor,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3092**: `                        force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3093**: `                        ElementA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3094**: `                        ElementB`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3095**: `                        , RuntimeDatatypeA`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3096**: `                        , RuntimeDatatypeB`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3097**: `                        >;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3098**: `  using Kernel      = typename Gemm::GemmKernel;`
+  - EN: Creates alias `Kernel` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Kernel`。
+- **Line 3099**: `  using Epilogue    = typename Gemm::GemmKernel::CollectiveEpilogue;`
+  - EN: Creates alias `Epilogue` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `Epilogue`。
+- **Line 3100**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3101**: `  using ElementAccumulator   = typename TestBedImpl::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 3102**: `  using ElementCompute       = typename TestBedImpl::ElementCompute;`
+  - EN: Creates alias `ElementCompute` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementCompute`。
+- **Line 3103**: `  using ElementScalar        = typename TestBedImpl::ElementScalar;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 3104**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3105**: `  using RasterOrderOptions = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90::RasterOrderOptions;`
+  - EN: Creates alias `RasterOrderOptions` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `RasterOrderOptions`。
+- **Line 3106**: `  using DecompositionMode = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates alias `DecompositionMode` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DecompositionMode`。
+- **Line 3107**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3108**: `  // Detail Implementation`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3109**: `  TestBedImpl impl_;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3110**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3111**: `  //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3112**: `  // Methods`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3113**: `  //`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3114**: `  Testbed3x(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3115**: `      CheckEquality check_relative_equality_ = CheckEquality::EXACT,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3116**: `      ScalarLoc use_device_scalars_ = ScalarLoc::ON_DEVICE,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3117**: `      VectorScale vector_scale_mode_ = VectorScale::DISABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3118**: `      cutlass::Distribution::Kind init_A_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 3119**: `      cutlass::Distribution::Kind init_B_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 3120**: `      cutlass::Distribution::Kind init_C_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 3121**: `      cutlass::Distribution::Kind init_scale_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 3122**: `      cutlass::Distribution::Kind init_bias_ = cutlass::Distribution::Uniform,`
+  - EN: Stores the tensor initialization distribution chosen for a test operand.
+  - CN: 保存某个测试操作数所选的张量初始化分布。
+- **Line 3123**: `      uint64_t seed_ = TestBedImpl::kDefaultSeed)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3124**: `      : impl_(check_relative_equality_, use_device_scalars_, vector_scale_mode_, init_A_, init_B_, init_C_, init_scale_, init_bias_, seed_) {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3125**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3126**: `  /// Executes one test`
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 3127**: `  bool run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3128**: `   typename TestBedImpl::ProblemShapeType problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3129**: `    ElementScalar alpha = ElementScalar(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3130**: `    ElementScalar beta = ElementScalar(0),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3131**: `    RasterOrderOptions raster_order = RasterOrderOptions::Heuristic,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3132**: `    detail::MaxSwizzleSize max_swizzle = detail::MaxSwizzleSize{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3133**: `    detail::Splits splits = detail::Splits{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3134**: `    DecompositionMode decomposition_mode = DecompositionMode::Heuristic,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3135**: `    bool profiling = false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3136**: `    detail::Iterations iterations = detail::Iterations{}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3137**: `    , RuntimeDatatypeA runtime_input_datatype_a = {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3138**: `    , RuntimeDatatypeB runtime_input_datatype_b = {}`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3139**: `    )`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3140**: `  {`
+  - EN: Opens a new scope for the current declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 3141**: `    return impl_.run(`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3142**: `        problem_size, alpha, beta, profiling, iterations, raster_order, max_swizzle, splits, decomposition_mode`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3143**: `        , runtime_input_datatype_a, runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3144**: `        );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3145**: `  }`
+  - EN: Closes the scope for `struct Testbed3x`.
+  - CN: 结束 `struct Testbed3x` 的作用域。
+- **Line 3146**: `};`
+  - EN: Closes the current C++ scope or macro body.
+  - CN: 结束当前的 C++ 作用域或宏体。
+- **Line 3147**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3148**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 3149**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3150**: `template <typename Gemm>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3151**: `bool TestGemmPerf3x(int iterations = 20) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 3152**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 3153**: `  using ElementAccumulator = typename Gemm::GemmKernel::ElementAccumulator;`
+  - EN: Creates alias `ElementAccumulator` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementAccumulator`。
+- **Line 3154**: `  using ElementScalar = ElementAccumulator;`
+  - EN: Creates type alias `ElementScalar` to simplify later code.
+  - CN: 创建类型别名 `ElementScalar` 以简化后续代码。
+- **Line 3155**: `  bool passed = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3156**: `  using DecompositionMode = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates alias `DecompositionMode` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DecompositionMode`。
+- **Line 3157**: `  using RasterOrderOptions = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90::RasterOrderOptions;`
+  - EN: Creates alias `RasterOrderOptions` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `RasterOrderOptions`。
+- **Line 3158**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3159**: `  std::vector<int> problem_size_m = { 4608 };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3160**: `  std::vector<int> problem_size_n = { 4608 };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3161**: `  std::vector<int> problem_size_k = { 8192 };`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3162**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3163**: `  Testbed3x<Gemm> testbed;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3164**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3165**: `  for (int m : problem_size_m) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3166**: `    for (int n : problem_size_n) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3167**: `      for (int k : problem_size_k) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3168**: `        ProblemShapeType problem_size;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3169**: `        if constexpr (cute::rank(ProblemShapeType{}) == 4) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3170**: `          problem_size = ProblemShapeType{m, n, k, /* l */ 1};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3171**: `        }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3172**: `        else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3173**: `          problem_size = ProblemShapeType{m, n, k};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3174**: `        }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3175**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3176**: `        passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3177**: `          problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3178**: `          cutlass::from_real<ElementScalar>(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3179**: `          cutlass::from_real<ElementScalar>(0),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3180**: `          RasterOrderOptions{}, detail::MaxSwizzleSize(1), detail::Splits{1}, DecompositionMode{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3181**: `          true, // profiling`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3182**: `          detail::Iterations{iterations});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3183**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3184**: `        if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3185**: `          return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3186**: `        }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3187**: `      }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 3188**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 3189**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 3190**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3191**: `  return true;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3192**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 3193**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3194**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3195**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 3196**: `//`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3197**: `template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3198**: `  typename Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3199**: `  typename RuntimeDataTypeA,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3200**: `  typename RuntimeDataTypeB,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3201**: `  bool force_legacy_epilogue = false>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3202**: `bool TestRuntimeDataTypeSmall(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3203**: `  RuntimeDataTypeA runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3204**: `  RuntimeDataTypeB runtime_input_datatype_b,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3205**: `  double alpha = 1.0, double beta = cute::is_same_v<typename Gemm::GemmKernel::ElementC, void> ? 0.0 : 1.0,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3206**: `  CheckEquality check_relative_equality = CheckEquality::RELATIVE, ScalarLoc use_device_scalars = ScalarLoc::ON_DEVICE, VectorScale vector_scale_mode = VectorScale::ENABLED, std::vector<int> override_problem_size_k = {}) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3207**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 3208**: `  using ElementScalar = typename Gemm::EpilogueOutputOp::ElementScalar;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 3209**: `  using CtaShape_MNK = typename Gemm::GemmKernel::CollectiveMainloop::CtaShape_MNK;`
+  - EN: Creates alias `CtaShape_MNK` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `CtaShape_MNK`。
+- **Line 3210**: `  using DispatchPolicy = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy;`
+  - EN: Creates alias `DispatchPolicy` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DispatchPolicy`。
+- **Line 3211**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3212**: `  using InternalElementA = typename Gemm::GemmKernel::ElementA;`
+  - EN: Creates alias `InternalElementA` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `InternalElementA`。
+- **Line 3213**: `  using InternalElementB = typename Gemm::GemmKernel::ElementB;`
+  - EN: Creates alias `InternalElementB` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `InternalElementB`。
+- **Line 3214**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3215**: `  CtaShape_MNK cta_shape;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3216**: `  static constexpr int SmCount  = 16;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3217**: `  static constexpr int MultiplierOffsetM = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3218**: `  static constexpr int MultiplierOffsetN = 2;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3219**: `  static constexpr int MultiplierOffsetK = 3;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3220**: `  int max_alignment = std::max(Gemm::kAlignmentA, Gemm::kAlignmentB);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3221**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3222**: `  float waves[] = {0.5, 1.25, 2.5};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3223**: `  int cluster_m = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3224**: `  int cluster_n = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3225**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3226**: `  std::vector<int> problem_size_k;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3227**: `  if (override_problem_size_k.empty()) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3228**: `    problem_size_k = {256 + max_alignment * MultiplierOffsetK, 512 + max_alignment * MultiplierOffsetK};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3229**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3230**: `  else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3231**: `    problem_size_k = override_problem_size_k;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3232**: `  }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3233**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3234**: `  if constexpr(DispatchPolicy::ArchTag::kMinComputeCapability >= 90) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3235**: `    typename DispatchPolicy::ClusterShape cluster_shape;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3236**: `    cluster_m = cute::size<0>(cluster_shape);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3237**: `    cluster_n = cute::size<1>(cluster_shape);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3238**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3239**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3240**: `  [[maybe_unused]] constexpr int TileShapeK = cute::size<2>(typename Gemm::GemmKernel::TileShape{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3241**: `  using DecompositionMode = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates alias `DecompositionMode` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DecompositionMode`。
+- **Line 3242**: `  using RasterOrderOptions = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90::RasterOrderOptions;`
+  - EN: Creates alias `RasterOrderOptions` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `RasterOrderOptions`。
+- **Line 3243**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3244**: `  std::vector<DecompositionMode> decomposition_modes = {DecompositionMode::Heuristic};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3245**: `  static constexpr bool UsesStreamKScheduler = cute::is_same_v<typename Gemm::GemmKernel::TileSchedulerTag, cutlass::gemm::StreamKScheduler>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3246**: `  if constexpr (UsesStreamKScheduler) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3247**: `    decomposition_modes.push_back(DecompositionMode::DataParallel);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3248**: `    decomposition_modes.push_back(DecompositionMode::SplitK);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3249**: `    decomposition_modes.push_back(DecompositionMode::StreamK);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3250**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3251**: `  bool passed = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3252**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3253**: `  for (float wave : waves) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3254**: `    for (int k : problem_size_k) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3255**: `      int grid_m, grid_n = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3256**: `      int num_grid = int(wave * SmCount);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3257**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3258**: `      if (cluster_m >= cluster_n) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3259**: `        grid_m = cluster_m;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3260**: `        grid_n = num_grid / grid_m;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3261**: `        // Align grid_n to cluster_n`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3262**: `        grid_n = std::max((grid_n + cluster_n - 1 ) / cluster_n * cluster_n, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3263**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3264**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3265**: `        grid_n = cluster_n;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3266**: `        grid_m = num_grid / grid_n;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3267**: `        // Align grid_m to cluster_m`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3268**: `        grid_m = std::max((grid_m + cluster_m - 1 ) / cluster_m * cluster_m, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3269**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3270**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3271**: `      int m = grid_m * cute::size<0>(cta_shape) + MultiplierOffsetM * max_alignment;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3272**: `      int n = grid_n * cute::size<1>(cta_shape) + MultiplierOffsetN * max_alignment;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3273**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3274**: `      ProblemShapeType problem_size;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3275**: `      if constexpr (cute::rank(ProblemShapeType{}) == 4) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3276**: `        problem_size = ProblemShapeType{m, n, k, /* l */ 1};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3277**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3278**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3279**: `        problem_size = ProblemShapeType{m, n, k};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3280**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3281**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3282**: `      for (DecompositionMode decomp_mode : decomposition_modes) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3283**: `        std::vector problem_splits = {detail::Splits{1}};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3284**: `        if (decomp_mode == DecompositionMode::Heuristic || decomp_mode == DecompositionMode::SplitK) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3285**: `          problem_splits.push_back(detail::Splits{2});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3286**: `        }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3287**: `        for (auto splits : problem_splits) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3288**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3289**: `          if constexpr (cute::is_same_v<RuntimeDataTypeA, cute::UMMA::MXF4Format> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3290**: `                        cute::is_same_v<RuntimeDataTypeB, cute::UMMA::MXF4Format>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3291**: `            // e2m1_e2m1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3292**: `            if (runtime_input_datatype_a == cute::UMMA::MXF4Format::E2M1 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3293**: `                runtime_input_datatype_b == cute::UMMA::MXF4Format::E2M1) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3294**: `              Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3295**: `                        cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3296**: `                        force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3297**: `                        cutlass::float_e2m1_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3298**: `                        cutlass::float_e2m1_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3299**: `                        cute::UMMA::MXF4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3300**: `                        cute::UMMA::MXF4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3301**: `                                                        use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3302**: `                                                        vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3303**: `              passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3304**: `                problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3305**: `                cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3306**: `                cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3307**: `                RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3308**: `                detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3309**: `                splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3310**: `                decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3311**: `                false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3312**: `                detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3313**: `                runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3314**: `                runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3315**: `              );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3316**: `            }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3317**: `            else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3318**: `              std::cout << "Unsupported configuration for runtime datatype MXFP4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3319**: `              return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3320**: `            }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3321**: `          }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3322**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3323**: `          else`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3324**: `          if constexpr (cute::is_same_v<RuntimeDataTypeA, cute::UMMA::MXF8F6F4Format> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3325**: `                             cute::is_same_v<RuntimeDataTypeB, cute::UMMA::MXF8F6F4Format>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3326**: `            static_assert((cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float8_t> ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3327**: `                           cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float6_t> ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3328**: `                           cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float4_t>) &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3329**: `                          (cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float8_t> ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3330**: `                           cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float6_t> ||`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3331**: `                           cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float4_t>),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3332**: `                          "Runtime datatype must be selected with an appropriate static umbrella data type.");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3333**: `            if constexpr (cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float8_t> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3334**: `                          cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float4_t>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3335**: `              // e4m3_e2m1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3336**: `              if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E4M3 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3337**: `                  runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E2M1) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3338**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3339**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3340**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3341**: `                          cutlass::float_e4m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3342**: `                          cutlass::float_e2m1_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3343**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3344**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3345**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3346**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3347**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3348**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3349**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3350**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3351**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3352**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3353**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3354**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3355**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3356**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3357**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3358**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3359**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3360**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3361**: `              // Unsupport`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3362**: `              else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3363**: `                std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3364**: `                return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3365**: `              }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3366**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3367**: `            // f6xf4`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3368**: `            else if constexpr (cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float6_t> &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3369**: `                               cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float4_t>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3370**: `              // e3m2_e2m1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3371**: `              if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E3M2 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3372**: `                  runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E2M1) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3373**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3374**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3375**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3376**: `                          cutlass::float_e3m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3377**: `                          cutlass::float_e2m1_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3378**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3379**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3380**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3381**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3382**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3383**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3384**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3385**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3386**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3387**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3388**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3389**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3390**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3391**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3392**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3393**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3394**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3395**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3396**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3397**: `              // Unsupport`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3398**: `              else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3399**: `                std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3400**: `                return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3401**: `              }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3402**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3403**: `            else if constexpr (cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float4_t> &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3404**: `                               cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float4_t>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3405**: `              // e2m1_e2m1`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3406**: `              if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E2M1 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3407**: `                  runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E2M1) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3408**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3409**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3410**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3411**: `                          cutlass::float_e2m1_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3412**: `                          cutlass::float_e2m1_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3413**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3414**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3415**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3416**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3417**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3418**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3419**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3420**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3421**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3422**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3423**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3424**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3425**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3426**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3427**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3428**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3429**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3430**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3431**: `              // Unsupport`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3432**: `              else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3433**: `                std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3434**: `                return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3435**: `              }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3436**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3437**: `            else if constexpr (cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float8_t> &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3438**: `                               cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float6_t>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3439**: `              // e4m3_e3m2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3440**: `              if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E4M3 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3441**: `                  runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E3M2) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3442**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3443**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3444**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3445**: `                          cutlass::float_e4m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3446**: `                          cutlass::float_e3m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3447**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3448**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3449**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3450**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3451**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3452**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3453**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3454**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3455**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3456**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3457**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3458**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3459**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3460**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3461**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3462**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3463**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3464**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3465**: `              // Unsupport`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3466**: `              else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3467**: `                std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3468**: `                return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3469**: `              }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3470**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3471**: `            else if constexpr (cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float6_t> &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3472**: `                               cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float6_t>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3473**: `              // e3m2_e2m3`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3474**: `              if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E3M2 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3475**: `                  runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E2M3) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3476**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3477**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3478**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3479**: `                          cutlass::float_e3m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3480**: `                          cutlass::float_e2m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3481**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3482**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3483**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3484**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3485**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3486**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3487**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3488**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3489**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3490**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3491**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3492**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3493**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3494**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3495**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3496**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3497**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3498**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3499**: `              // Unsupported`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3500**: `              else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3501**: `                std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3502**: `                return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3503**: `              }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3504**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3505**: `            else`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3506**: `            if constexpr (cute::is_same_v<InternalElementA, cutlass::type_erased_dynamic_float8_t> &&`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3507**: `                               cute::is_same_v<InternalElementB, cutlass::type_erased_dynamic_float8_t>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3508**: `              // e5m2_e5m2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3509**: `              if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E5M2 &&`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3510**: `                  runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E5M2) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3511**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3512**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3513**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3514**: `                          cutlass::float_e5m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3515**: `                          cutlass::float_e5m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3516**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3517**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3518**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3519**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3520**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3521**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3522**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3523**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3524**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3525**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3526**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3527**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3528**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3529**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3530**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3531**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3532**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3533**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3534**: `              // e4m3_e5m2`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3535**: `              else if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E4M3 &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3536**: `                       runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E5M2){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3537**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3538**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3539**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3540**: `                          cutlass::float_e4m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3541**: `                          cutlass::float_e5m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3542**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3543**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3544**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3545**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3546**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3547**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3548**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3549**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3550**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3551**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3552**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3553**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3554**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3555**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3556**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3557**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3558**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3559**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3560**: `              // e5m2_e4m3`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3561**: `              else if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E5M2 &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3562**: `                       runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E4M3){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3563**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3564**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3565**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3566**: `                          cutlass::float_e5m2_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3567**: `                          cutlass::float_e4m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3568**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3569**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3570**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3571**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3572**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3573**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3574**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3575**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3576**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3577**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3578**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3579**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3580**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3581**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3582**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3583**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3584**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3585**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3586**: `              // e4m3_e4m3`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3587**: `              else if (runtime_input_datatype_a == cute::UMMA::MXF8F6F4Format::E4M3 &&`
+  - EN: Checks an alternate conditional branch when earlier conditions did not match.
+  - CN: 在前面的条件不满足时检查另一条条件分支。
+- **Line 3588**: `                       runtime_input_datatype_b == cute::UMMA::MXF8F6F4Format::E4M3){`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3589**: `                Testbed3x<Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3590**: `                          cutlass::epilogue::thread::Identity,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3591**: `                          force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3592**: `                          cutlass::float_e4m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3593**: `                          cutlass::float_e4m3_t,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3594**: `                          cute::UMMA::MXF8F6F4Format,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3595**: `                          cute::UMMA::MXF8F6F4Format> testbed(check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3596**: `                                                          use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3597**: `                                                          vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3598**: `                passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3599**: `                  problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3600**: `                  cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3601**: `                  cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3602**: `                  RasterOrderOptions::Heuristic, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3603**: `                  detail::MaxSwizzleSize(1),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3604**: `                  splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3605**: `                  decomp_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3606**: `                  false,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3607**: `                  detail::Iterations{},`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3608**: `                  runtime_input_datatype_a,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3609**: `                  runtime_input_datatype_b`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3610**: `                );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3611**: `              }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3612**: `              // Unsupported`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3613**: `              else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3614**: `                std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3615**: `                return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3616**: `              }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3617**: `            }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 3618**: `            // Unsupported`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3619**: `            else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3620**: `              std::cout << "Unsupported configuration for runtime datatype Mxf8f6f4." << std::endl;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3621**: `              return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3622**: `            }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3623**: `          }`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 3624**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3625**: `          else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3626**: `            static_assert(cutlass::detail::dependent_false<RuntimeDataTypeA>,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3627**: `                "Unsupported configuration for runtime datatype.");`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3628**: `          }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3629**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3630**: `          if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3631**: `            std::cout << __FILE__ << ':' << __LINE__ << " : GEMM MNK " << m << " " << n << " " << k << " FAILED.\n";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3632**: `            return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3633**: `          }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3634**: `        } // splits`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3635**: `      } // decomposition_mode`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3636**: `    } // k`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3637**: `  } // waves`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3638**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3639**: `  return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3640**: `}`
+  - EN: Closes the scope for `else-if block`.
+  - CN: 结束 `else-if block` 的作用域。
+- **Line 3641**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3642**: `template <typename Gemm, bool force_legacy_epilogue = false, bool apply_alignment_offset = true, bool test_batched_alpha_beta = false>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3643**: `bool TestSmall(double alpha = 1.0, double beta = cute::is_same_v<typename Gemm::GemmKernel::ElementC, void> ? 0.0 : 1.0,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3644**: `  CheckEquality check_relative_equality = CheckEquality::RELATIVE,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3645**: `  ScalarLoc use_device_scalars = ScalarLoc::ON_DEVICE,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3646**: `  VectorScale vector_scale_mode = VectorScale::ENABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3647**: `  std::vector<int> override_problem_size_k = {}) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3648**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3649**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 3650**: `  using ElementScalar = typename Gemm::EpilogueOutputOp::ElementScalar;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 3651**: `  using CtaShape_MNK = typename Gemm::GemmKernel::CollectiveMainloop::CtaShape_MNK;`
+  - EN: Creates alias `CtaShape_MNK` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `CtaShape_MNK`。
+- **Line 3652**: `  using DispatchPolicy = typename Gemm::GemmKernel::CollectiveMainloop::DispatchPolicy;`
+  - EN: Creates alias `DispatchPolicy` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DispatchPolicy`。
+- **Line 3653**: `  CtaShape_MNK cta_shape;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3654**: `  Testbed3x<Gemm, cutlass::epilogue::thread::Identity, force_legacy_epilogue> testbed(check_relative_equality, use_device_scalars, vector_scale_mode);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3655**: `  static constexpr int SmCount  = 16;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3656**: `  static constexpr int MultiplierOffsetM = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3657**: `  static constexpr int MultiplierOffsetN = 2;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3658**: `  static constexpr int MultiplierOffsetK = 3;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3659**: `  int max_alignment_k = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3660**: `  int max_alignment_m = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3661**: `  int max_alignment_n = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3662**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3663**: `  if constexpr (apply_alignment_offset) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3664**: `    max_alignment_k = std::max(Gemm::kAlignmentA, Gemm::kAlignmentB);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3665**: `    max_alignment_n = std::max(Gemm::kAlignmentA, Gemm::kAlignmentB);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3666**: `    max_alignment_m = std::max(Gemm::kAlignmentA, Gemm::kAlignmentB);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3667**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3668**: `  // Alignment for SFD`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3669**: `  if constexpr (detail::IsSfdEpi<typename Gemm::GemmKernel::CollectiveEpilogue>::value) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3670**: `    using GmemLayoutTagScalefactor = typename Gemm::GemmKernel::CollectiveEpilogue::FusionCallbacks::Operation::GmemLayoutTagScalefactor;`
+  - EN: Creates alias `GmemLayoutTagScalefactor` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `GmemLayoutTagScalefactor`。
+- **Line 3671**: `    constexpr int SFDVecSize = Gemm::GemmKernel::CollectiveEpilogue::FusionCallbacks::Operation::SFVecSize;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3672**: `    if constexpr (cute::is_same_v<GmemLayoutTagScalefactor, cutlass::layout::RowMajor>) {`
+  - EN: Selects the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 3673**: `      max_alignment_n = std::lcm(max_alignment_n, SFDVecSize);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3674**: `    }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3675**: `    else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3676**: `      max_alignment_m = std::lcm(max_alignment_m, SFDVecSize);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3677**: `    }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3678**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3679**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3680**: `  float waves[] = {0.5, 1.25, 2.5};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3681**: `  int cluster_m = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3682**: `  int cluster_n = 1;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3683**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3684**: `  std::vector<int> problem_size_k;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3685**: `  if (override_problem_size_k.empty()) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3686**: `    problem_size_k = {256 + max_alignment_k * MultiplierOffsetK, 512 + max_alignment_k * MultiplierOffsetK};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3687**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3688**: `  else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3689**: `    problem_size_k = override_problem_size_k;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3690**: `  }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3691**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3692**: `  if constexpr(DispatchPolicy::ArchTag::kMinComputeCapability >= 90) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3693**: `    typename DispatchPolicy::ClusterShape cluster_shape;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3694**: `    cluster_m = cute::size<0>(cluster_shape);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3695**: `    cluster_n = cute::size<1>(cluster_shape);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3696**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3697**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3698**: `  using DecompositionMode = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates alias `DecompositionMode` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DecompositionMode`。
+- **Line 3699**: `  using RasterOrderOptions = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90::RasterOrderOptions;`
+  - EN: Creates alias `RasterOrderOptions` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `RasterOrderOptions`。
+- **Line 3700**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3701**: `  std::vector<DecompositionMode> decomposition_modes = {DecompositionMode::Heuristic};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3702**: `  static constexpr bool UsesStreamKScheduler = cute::is_same_v<typename Gemm::GemmKernel::TileSchedulerTag, cutlass::gemm::StreamKScheduler>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3703**: `  if constexpr (UsesStreamKScheduler) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3704**: `    decomposition_modes.push_back(DecompositionMode::DataParallel);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3705**: `    decomposition_modes.push_back(DecompositionMode::SplitK);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3706**: `    decomposition_modes.push_back(DecompositionMode::StreamK);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3707**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3708**: `  bool passed = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3709**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3710**: `  std::vector<RasterOrderOptions> raster_order_options = {RasterOrderOptions::Heuristic};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3711**: `  for (float wave : waves) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3712**: `    for (int k : problem_size_k) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3713**: `      int grid_m, grid_n = 0;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3714**: `      int num_grid = int(wave * SmCount);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3715**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3716**: `      if (cluster_m >= cluster_n) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3717**: `        grid_m = cluster_m;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3718**: `        grid_n = num_grid / grid_m;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3719**: `        // Align grid_n to cluster_n`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3720**: `        grid_n = std::max((grid_n + cluster_n - 1 ) / cluster_n * cluster_n, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3721**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3722**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3723**: `        grid_n = cluster_n;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3724**: `        grid_m = num_grid / grid_n;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3725**: `        // Align grid_m to cluster_m`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3726**: `        grid_m = std::max((grid_m + cluster_m - 1 ) / cluster_m * cluster_m, 1);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3727**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3728**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3729**: `      int m = grid_m * cute::size<0>(cta_shape) + MultiplierOffsetM * max_alignment_m;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3730**: `      int n = grid_n * cute::size<1>(cta_shape) + MultiplierOffsetN * max_alignment_n;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3731**: `      int l = test_batched_alpha_beta && wave == waves[0] && k == problem_size_k[0] ? 2 : 1; // only test the smallest problem size`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3732**: `      ProblemShapeType problem_size;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3733**: `      if constexpr (cute::rank(ProblemShapeType{}) == 4) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3734**: `        problem_size = ProblemShapeType{m, n, k, l};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3735**: `      }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3736**: `      else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3737**: `        problem_size = ProblemShapeType{m, n, k};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3738**: `      }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3739**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3740**: `      for (DecompositionMode decomp_mode : decomposition_modes) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3741**: `        for (RasterOrderOptions raster_order : raster_order_options) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3742**: `          std::vector problem_splits = {detail::Splits{1}};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3743**: `          if constexpr (UsesStreamKScheduler) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3744**: `            if (decomp_mode == DecompositionMode::SplitK) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3745**: `              problem_splits.push_back(detail::Splits{2});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3746**: `              problem_splits.push_back(detail::Splits{4});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3747**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3748**: `          }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3749**: `          for (auto splits : problem_splits) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3750**: `            try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3751**: `              passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3752**: `                problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3753**: `                cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3754**: `                cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3755**: `                raster_order, // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3756**: `                detail::MaxSwizzleSize(0),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3757**: `                splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3758**: `                decomp_mode`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3759**: `              );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3760**: `            }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3761**: `            catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3762**: `              EXPECT_TRUE(false) << "TestSmall: testbed.run {"`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3763**: `                << "m: " << m << ", n: " << n << ", k: " << k << ", l: " << l`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3764**: `                << ", alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3765**: `                << ", raster_order: " << detail::raster_order_to_string(raster_order)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3766**: `                << ", max_swizzle_size: 1"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3767**: `                << ", splits: " << static_cast<int>(splits)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3768**: `                << ", decomp_mode: " << detail::decomp_mode_to_string(decomp_mode)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3769**: `                << "} threw an exception: " << e.what();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3770**: `              throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3771**: `            }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3772**: `            catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3773**: `              EXPECT_TRUE(false) << "TestSmall: testbed.run {"`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3774**: `                << "m: " << m << ", n: " << n << ", k: " << k << ", l: " << l`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3775**: `                << ", alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3776**: `                << ", raster_order: " << detail::raster_order_to_string(raster_order)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3777**: `                << ", max_swizzle_size: 1"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3778**: `                << ", splits: " << static_cast<int>(splits)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3779**: `                << ", decomp_mode: " << detail::decomp_mode_to_string(decomp_mode)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3780**: `                << "} threw an exception (unknown)";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3781**: `              throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3782**: `            }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3783**: `            EXPECT_TRUE(passed) << "TestSmall: testbed.run {"`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3784**: `              << "m: " << m << ", n: " << n << ", k: " << k << ", l: " << l`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3785**: `              << ", alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3786**: `              << ", raster_order: " << detail::raster_order_to_string(raster_order)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3787**: `              << ", max_swizzle_size: 1"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3788**: `              << ", splits: " << static_cast<int>(splits)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3789**: `              << ", decomp_mode: " << detail::decomp_mode_to_string(decomp_mode)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3790**: `              << "} failed";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3791**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3792**: `            if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3793**: `              std::cout << __FILE__ << ':' << __LINE__ << " : GEMM MNKL " << m << " " << n << " " << k << " " << l << " FAILED.\n";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3794**: `              return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3795**: `            }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3796**: `          } // splits`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3797**: `        } // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3798**: `      } // decomposition_mode`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3799**: `    } // k`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3800**: `  } // waves`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3801**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3802**: `  return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3803**: `}`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 3804**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3805**: `template <typename Gemm, bool force_legacy_epilogue = false, bool apply_alignment_offset = true, bool test_batched_alpha_beta = false>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3806**: `bool TestSmallFusion(double alpha = 1.0, double beta = cute::is_same_v<typename Gemm::GemmKernel::ElementC, void> ? 0.0 : 1.0,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3807**: `                     CheckEquality check_relative_equality = CheckEquality::RELATIVE,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3808**: `                     ScalarLoc use_device_scalars = ScalarLoc::ON_DEVICE,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3809**: `                     VectorScale vector_scale_mode = VectorScale::ENABLED,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3810**: `                     std::vector<int> override_problem_size_k = {}) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3811**: `  return TestSmall<Gemm,`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3812**: `                   force_legacy_epilogue,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3813**: `                   apply_alignment_offset,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3814**: `                   test_batched_alpha_beta>(alpha,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3815**: `                                            beta,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3816**: `                                            check_relative_equality,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3817**: `                                            use_device_scalars,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3818**: `                                            vector_scale_mode,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3819**: `                                            override_problem_size_k);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3820**: `}`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3821**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3822**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3823**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3824**: `template <`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3825**: `  typename Gemm,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3826**: `  template <class T> class ActivationFunctor = cutlass::epilogue::thread::Identity`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3827**: `>`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3828**: `bool TestAll(double alpha = 1.0, double beta = cute::is_same_v<typename Gemm::GemmKernel::ElementC, void> ? 0.0 : 1.0, CheckEquality check_relative_equality = CheckEquality::RELATIVE) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 3829**: `  using ElementScalar = typename Gemm::EpilogueOutputOp::ElementScalar;`
+  - EN: Creates alias `ElementScalar` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ElementScalar`。
+- **Line 3830**: `  using ProblemShapeType = typename Gemm::GemmKernel::ProblemShape;`
+  - EN: Creates alias `ProblemShapeType` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `ProblemShapeType`。
+- **Line 3831**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3832**: `  Testbed3x<Gemm, ActivationFunctor> testbed(check_relative_equality, ScalarLoc::ON_HOST, VectorScale::DISABLED);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3833**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3834**: `  int max_alignment_m = std::max({Gemm::kAlignmentA, Gemm::kAlignmentC, Gemm::kAlignmentD});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3835**: `  int max_alignment_n = std::max({Gemm::kAlignmentB, Gemm::kAlignmentC, Gemm::kAlignmentD});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3836**: `  if constexpr (std::is_base_of_v<cutlass::epilogue::fusion::FusionOperation, typename Gemm::EpilogueOutputOp>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3837**: `    max_alignment_m = std::max(max_alignment_m, Gemm::EpilogueOutputOp::AlignmentAux);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3838**: `    max_alignment_n = std::max(max_alignment_n, Gemm::EpilogueOutputOp::AlignmentAux);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3839**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3840**: `  std::vector<int> problem_size_m = {max_alignment_m, 512 - 3 * max_alignment_m};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3841**: `  std::vector<int> problem_size_n = {max_alignment_n, 512 - 2 * max_alignment_n};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3842**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3843**: `  if constexpr (cute::is_same_v<typename Gemm::GemmKernel::DispatchPolicy::Schedule,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3844**: `                cutlass::gemm::KernelTmaWarpSpecializedPingpong>) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3845**: `    problem_size_m.push_back(768);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3846**: `    problem_size_n.push_back(768);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3847**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3848**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3849**: `  constexpr int Stages = Gemm::GemmKernel::DispatchPolicy::Stages;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3850**: `  constexpr int TileShapeK = cute::size<2>(typename Gemm::GemmKernel::TileShape{});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3851**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3852**: `  int max_alignment_k = std::max(Gemm::kAlignmentA, Gemm::kAlignmentB);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3853**: `  std::vector<int> problem_size_k = {max_alignment_k, TileShapeK * (Stages + 1) - max_alignment_k};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3854**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3855**: `  using DecompositionMode = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::DecompositionMode;`
+  - EN: Creates alias `DecompositionMode` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `DecompositionMode`。
+- **Line 3856**: `  std::vector<DecompositionMode> decomposition_modes = {DecompositionMode::Heuristic};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3857**: `  std::vector problem_splits = {detail::Splits{1}};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3858**: `  static constexpr bool UsesStreamKScheduler = cute::is_same_v<typename Gemm::GemmKernel::TileSchedulerTag, cutlass::gemm::StreamKScheduler>;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3859**: `  if constexpr (UsesStreamKScheduler) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3860**: `    problem_splits.push_back(detail::Splits{2});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3861**: `    problem_splits.push_back(detail::Splits{3});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3862**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3863**: `    decomposition_modes.push_back(DecompositionMode::DataParallel);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3864**: `    decomposition_modes.push_back(DecompositionMode::SplitK);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3865**: `    decomposition_modes.push_back(DecompositionMode::StreamK);`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3866**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3867**: `    // Use larger K sizes for stream-K tests`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3868**: `    static constexpr int min_tiles_per_sk_unit = cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90StreamKParams::min_iters_per_sk_unit_;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3869**: `    problem_size_k = {TileShapeK * min_tiles_per_sk_unit, TileShapeK * 3 * min_tiles_per_sk_unit - max_alignment_k};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3870**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3871**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3872**: `  using RasterOrderOptions = typename cutlass::gemm::kernel::detail::PersistentTileSchedulerSm90::RasterOrderOptions;`
+  - EN: Creates alias `RasterOrderOptions` by extracting a dependent type from the GEMM configuration.
+  - CN: 通过从 GEMM 配置中提取依赖类型来创建别名 `RasterOrderOptions`。
+- **Line 3873**: `  std::vector<RasterOrderOptions> raster_orders = {RasterOrderOptions::AlongM, RasterOrderOptions::AlongN};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3874**: `  std::vector max_swizzle_sizes{detail::MaxSwizzleSize{1}, detail::MaxSwizzleSize{4}};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3875**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3876**: `  bool passed = true;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3877**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3878**: `  for (int m : problem_size_m) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3879**: `    for (int n : problem_size_n) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3880**: `      for (int k : problem_size_k) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3881**: `        for (auto raster_order : raster_orders) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3882**: `          for (auto max_swizzle_size : max_swizzle_sizes) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3883**: `            for (DecompositionMode decomp_mode : decomposition_modes) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3884**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3885**: `              std::vector problem_splits = {detail::Splits{1}};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3886**: `              if (decomp_mode == DecompositionMode::Heuristic || decomp_mode == DecompositionMode::SplitK) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3887**: `                auto max_splits = (k + TileShapeK - 1) / TileShapeK;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3888**: `                if (max_splits > 2) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3889**: `                  problem_splits.push_back(detail::Splits{2});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3890**: `                }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3891**: `                if (max_splits > 3) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3892**: `                  problem_splits.push_back(detail::Splits{3});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3893**: `                }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3894**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3895**: `                problem_splits.push_back(detail::Splits{max_splits});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3896**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3897**: `                // Test the case in which we ask for more splits than there are K tiles in the GEMM. In this`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3898**: `                // case, split-K will fall back to a splitting factor of \`max_splits\`.`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3899**: `                problem_splits.push_back(detail::Splits{max_splits + 1});`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3900**: `              }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3901**: `              for (auto splits : problem_splits) {`
+  - EN: Starts a loop that iterates over a collection or index range.
+  - CN: 开始一个循环，用于遍历集合或索引范围。
+- **Line 3902**: `                ProblemShapeType problem_size;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3903**: `                if constexpr (cute::rank(ProblemShapeType{}) == 4) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3904**: `                  problem_size = ProblemShapeType{m, n, k, /* l */ 1};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3905**: `                }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3906**: `                else {`
+  - EN: Begins the fallback branch for the current conditional.
+  - CN: 开始当前条件语句的兜底分支。
+- **Line 3907**: `                  problem_size = ProblemShapeType{m, n, k};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3908**: `                }`
+  - EN: Closes the scope for `else block`.
+  - CN: 结束 `else block` 的作用域。
+- **Line 3909**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3910**: `                try {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3911**: `                  passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3912**: `                    problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3913**: `                    cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3914**: `                    cutlass::from_real<ElementScalar>(beta),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3915**: `                    raster_order,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3916**: `                    max_swizzle_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3917**: `                    splits,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3918**: `                    decomp_mode`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3919**: `                  );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3920**: `                }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3921**: `                catch (std::exception const& e) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3922**: `                  EXPECT_TRUE(false) << "TestAll: testbed.run {"`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3923**: `                    << "m: " << m << ", n: " << n << ", k: " << k`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3924**: `                    << ", alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3925**: `                    << ", raster_order: ???"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3926**: `                    << ", max_swizzle_size: " << static_cast<int>(max_swizzle_size)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3927**: `                    << ", splits: " << static_cast<int>(splits)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3928**: `                    << ", decomp_mode: " << detail::decomp_mode_to_string(decomp_mode)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3929**: `                    << "} threw an exception: " << e.what();`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3930**: `                  throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3931**: `                }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3932**: `                catch (...) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3933**: `                  EXPECT_TRUE(false) << "TestAll: testbed.run {"`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3934**: `                    << "m: " << m << ", n: " << n << ", k: " << k`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3935**: `                    << ", alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3936**: `                    << ", raster_order: ???"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3937**: `                    << ", max_swizzle_size: " << static_cast<int>(max_swizzle_size)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3938**: `                    << ", splits: " << static_cast<int>(splits)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3939**: `                    << ", decomp_mode: " << detail::decomp_mode_to_string(decomp_mode)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3940**: `                    << "} threw an exception (unknown)";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3941**: `                  throw;`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3942**: `                }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3943**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3944**: `                EXPECT_TRUE(passed) << "TestAll: testbed.run {"`
+  - EN: Performs a test assertion to enforce the expected outcome.
+  - CN: 执行测试断言以强制检查期望结果。
+- **Line 3945**: `                  << "m: " << m << ", n: " << n << ", k: " << k`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3946**: `                  << ", alpha: " << alpha << ", beta: " << beta`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3947**: `                  << ", raster_order: ???"`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3948**: `                  << ", max_swizzle_size: " << static_cast<int>(max_swizzle_size)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3949**: `                  << ", splits: " << static_cast<int>(splits)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3950**: `                  << ", decomp_mode: " << detail::decomp_mode_to_string(decomp_mode)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3951**: `                  << "} failed";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3952**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3953**: `                if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3954**: `                  std::cout << __FILE__ << ':' << __LINE__ << " : GEMM MNK " << m << " " << n << " " << k << " FAILED.\n";`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3955**: `                  return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3956**: `                }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3957**: `              } // splits`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3958**: `            } // decomposition_mode`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3959**: `          } // max_swizzle_size`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3960**: `        } // raster_order`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3961**: `      } // k`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3962**: `    } // n`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3963**: `  } // m`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3964**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3965**: `  // if we do support batched GEMM, just run one test on it to save on test time`
+  - EN: Adds an inline comment that explains the next code region.
+  - CN: 添加行内注释，用于说明后续代码区域。
+- **Line 3966**: `  if constexpr (cute::rank(ProblemShapeType{}) == 4) {`
+  - EN: Opens a new scope for the declaration or statement started on this line.
+  - CN: 为当前行开始的声明或语句打开新的作用域。
+- **Line 3967**: `    auto problem_size = ProblemShapeType{256 + max_alignment_m, 256 + max_alignment_n, 160 + max_alignment_k, /* l */ 3};`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3968**: `    passed = testbed.run(`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3969**: `      problem_size,`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3970**: `      cutlass::from_real<ElementScalar>(alpha),`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3971**: `      cutlass::from_real<ElementScalar>(beta)`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3972**: `    );`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3973**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3974**: `    if (!passed) {`
+  - EN: Starts a conditional branch that handles one runtime case.
+  - CN: 开始一个条件分支，用于处理某种运行时情况。
+- **Line 3975**: `      return false;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3976**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 3977**: `  }`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 3978**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3979**: `  return passed;`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3980**: `}`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 3981**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3982**: `template <typename Gemm>`
+  - EN: Begins a template declaration so the following type or function can be specialized by parameters.
+  - CN: 开始模板声明，使后续类型或函数可由参数特化。
+- **Line 3983**: `bool TestAllBiasElementwise(double alpha = 1.0, double beta = cute::is_same_v<typename Gemm::GemmKernel::ElementC, void> ? 0.0 : 1.0, CheckEquality check_relative_equality = CheckEquality::EXACT) {`
+  - EN: Declares a function or method that implements part of the test workflow.
+  - CN: 声明一个函数或方法，用于实现测试流程的一部分。
+- **Line 3984**: `  return TestAll<Gemm>(alpha, beta, check_relative_equality);`
+  - EN: Returns a status value from the current function.
+  - CN: 从当前函数返回一个状态值。
+- **Line 3985**: `}`
+  - EN: Closes the scope for `function`.
+  - CN: 结束 `function` 的作用域。
+- **Line 3986**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3987**: `} // namespace device`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3988**: `} // namespace gemm`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3989**: `} // namespace test`
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 3990**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 3991**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+
+## Key Concepts / 关键概念
+- `HostTensor`
+  - EN: Relies on HostTensor wrappers to manage host allocations, device allocations, and transfers.
+  - CN: 依赖 HostTensor 封装来管理主机分配、设备分配和数据传输。
+- `TensorEquals`
+  - EN: Compares device results against a host-computed reference tensor.
+  - CN: 将设备结果与主机计算出的参考张量进行比较。
+- `cudaGetDeviceProperties`
+  - EN: Queries CUDA device capabilities before running kernels that require enough shared memory.
+  - CN: 在运行需要足够共享内存的内核前查询 CUDA 设备能力。
+- `Sm90`
+  - EN: Targets NVIDIA SM90-era kernels and policies.
+  - CN: 面向 NVIDIA SM90 时代的内核与策略。
+
+## Dependencies / 依赖关系
+- `<iostream>`
+  - EN: Provides standard stream output used for diagnostics.
+  - CN: 提供用于诊断输出的标准流。
+- `<fstream>`
+  - EN: Provides file-stream support for writing debug dumps.
+  - CN: 提供用于写入调试转储的文件流支持。
+- `<sstream>`
+  - EN: Provides string-stream utilities for building messages or filenames.
+  - CN: 提供用于构造消息或文件名的字符串流工具。
+- `<algorithm>`
+  - EN: Provides a standard-library facility used by this source file.
+  - CN: 提供该源文件使用的标准库能力。
+- `<random>`
+  - EN: Provides a standard-library facility used by this source file.
+  - CN: 提供该源文件使用的标准库能力。
+- `<numeric>`
+  - EN: Provides a standard-library facility used by this source file.
+  - CN: 提供该源文件使用的标准库能力。
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbed.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/distribution.h`
+  - EN: Defines the supported random and structured tensor initialization distributions.
+  - CN: 定义支持的随机和结构化张量初始化分布。
+- `cutlass/util/packed_stride.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic tensor initialization helpers.
+  - CN: 提供确定性的张量初始化辅助函数。
+- `cutlass/util/reference/host/tensor_copy.h`
+  - EN: Provides host-side tensor copy helpers.
+  - CN: 提供主机侧张量复制辅助函数。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/tensor_norm.h`
+  - EN: Provides tensor norm utilities for sanity checks.
+  - CN: 提供用于健全性检查的张量范数工具。
+- `cutlass/util/reference/host/gett.hpp`
+  - EN: Provides host-side reference math or tensor utilities used for validation.
+  - CN: 提供用于验证的主机侧参考数学或张量工具。
+- `cutlass/epilogue/collective/default_epilogue.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/epilogue/fusion/operations.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/complex.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/transform/device/transform_universal_adapter.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/transform/kernel/sparse_gemm_compressor.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/detail/collective.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `testbed_utils.h`
+  - EN: Local utility helpers shared by GEMM testbed headers.
+  - CN: GEMM 测试平台头文件共享的本地工具辅助函数。
+- `cutlass/kernel_hardware_info.hpp`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/layout/matrix.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/matrix_coord.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cutlass/gemm/gemm.h`
+  - EN: Provides a CUTLASS component needed by the test or helper implementation.
+  - CN: 提供测试或辅助实现所需的 CUTLASS 组件。
+- `cute/int_tuple.hpp`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `cute/layout.hpp`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `cute/numeric/int.hpp`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。

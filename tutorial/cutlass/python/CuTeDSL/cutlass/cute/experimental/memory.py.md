@@ -1,0 +1,258 @@
+# memory.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/experimental/memory.py`
+
+## Purpose / 作用
+- EN: Defines 6 functions (_get_tma_load_kind, allocate, tma_load, tma_load_multicast, ... (+2 more)) in `CuTeDSL.cutlass.cute.experimental.memory`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.experimental.memory` 定义了 6 个函数（_get_tma_load_kind, allocate, tma_load, tma_load_multicast, ... (+2 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Type, Optional` — **EN:** Imports Type, Optional from `typing`. **CN:** 从 `typing` 导入 Type, Optional。
+- **L13** `from cutlass._mlir.dialects import cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cute_nvgpu as _cute_nvgpu_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 cute_nvgpu as _cute_nvgpu_ir。
+- **L14** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L15** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L16** `from cutlass._mlir.dialects import (` — **EN:** Imports lir as cutlass_lir, cute as _cute_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 lir as cutlass_lir, cute as _cute_ir。
+- **L17** `    lir as cutlass_lir,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    cute as _cute_ir,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `from cutlass._mlir.dialects.core import OperationTypeEnum` — **EN:** Imports OperationTypeEnum from `cutlass._mlir.dialects.core`. **CN:** 从 `cutlass._mlir.dialects.core` 导入 OperationTypeEnum。
+- **L21** `from cutlass import cute` — **EN:** Imports cute from `cutlass`. **CN:** 从 `cutlass` 导入 cute。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `def _get_tma_load_kind(` — **EN:** Defines function `_get_tma_load_kind`. **CN:** 定义函数 `_get_tma_load_kind`。
+- **L25** `    tma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `) -> _cute_ir.TiledTmaLoadEnum:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L27** `    """Convert OperationTypeEnum to TiledTmaLoadEnum."""` — **EN:** Docstring line documenting the function `_get_tma_load_kind`. **CN:** 文档字符串行，用于说明 function `_get_tma_load_kind`。
+- **L28** `    if tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM_MULTICAST:` — **EN:** Starts a conditional branch guarded by `tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2S...`. **CN:** 开始一个由 `tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2S...` 控制的条件分支。
+- **L29** `        return _cute_ir.TiledTmaLoadEnum.sm_100_2sm_multicast` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L30** `    if tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD_MULTICAST:` — **EN:** Starts a conditional branch guarded by `tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD_MUL...`. **CN:** 开始一个由 `tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD_MUL...` 控制的条件分支。
+- **L31** `        return _cute_ir.TiledTmaLoadEnum.sm_90_multicast` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L32** `    if tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM:` — **EN:** Starts a conditional branch guarded by `tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM`. **CN:** 开始一个由 `tma_operation_type == OperationTypeEnum.SM100_TMA_LOAD_2SM` 控制的条件分支。
+- **L33** `        return _cute_ir.TiledTmaLoadEnum.sm_100_2sm` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L34** `    if tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD:` — **EN:** Starts a conditional branch guarded by `tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD`. **CN:** 开始一个由 `tma_operation_type == OperationTypeEnum.SM90_TMA_LOAD` 控制的条件分支。
+- **L35** `        return _cute_ir.TiledTmaLoadEnum.sm_90` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L36** `    raise ValueError(f"Unsupported TMA operation type: {tma_operation_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L40** `def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L41** `    type: Type[cute.Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L42** `    address_space: cute.AddressSpace,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L43** `    layout: cute.Layout | cute.ComposedLayout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L44** `    alignment: cute.Int32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    is2cta: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L47** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L48** `) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L49** `    """` — **EN:** Starts the docstring for the function `allocate`. **CN:** 开始说明 function `allocate` 的文档字符串。
+- **L50** `    Allocate a buffer of the given type and layout.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `    :param type: The type of the buffer` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L53** `    :type type: cute.Tensor` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L54** `    :param layout: The layout of the buffer` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L55** `    :type layout: cute.Layout` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L56** `    :param address_space: The address space of the buffer` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L57** `    :type address_space: str` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L58** `    :param alignment: The alignment of the buffer` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L59** `    :type alignment: cute.Int32` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L60** `    :param is2cta: Whether TMEM allocation should span a CTA pair (2CTA TMEM)` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L61** `    :type is2cta: bool` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L62** `    """` — **EN:** Ends the docstring for the function `allocate`. **CN:** 结束说明 function `allocate` 的文档字符串。
+- **L63** `    swizzle = None` — **EN:** Assigns a value to swizzle. **CN:** 将一个值赋给 swizzle。
+- **L64** `    if isinstance(layout, cute.ComposedLayout):` — **EN:** Starts a conditional branch guarded by `isinstance(layout, cute.ComposedLayout)`. **CN:** 开始一个由 `isinstance(layout, cute.ComposedLayout)` 控制的条件分支。
+- **L65** `        swizzle = layout.inner` — **EN:** Assigns a value to swizzle. **CN:** 将一个值赋给 swizzle。
+- **L66** `        layout = layout.outer` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    bit_layout = None` — **EN:** Assigns a value to bit_layout. **CN:** 将一个值赋给 bit_layout。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    _is_passthrough_type = False` — **EN:** Assigns a value to _is_passthrough_type. **CN:** 将一个值赋给 _is_passthrough_type。
+- **L71** `    if not _is_passthrough_type:` — **EN:** Starts a conditional branch guarded by `not _is_passthrough_type`. **CN:** 开始一个由 `not _is_passthrough_type` 控制的条件分支。
+- **L72** `        type = type.mlir_type` — **EN:** Assigns a value to type. **CN:** 将一个值赋给 type。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    ptr_ty = _cute_ir.PtrType.get(` — **EN:** Assigns a value to ptr_ty. **CN:** 将一个值赋给 ptr_ty。
+- **L75** `        type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `        address_space,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `        alignment,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `        swizzle.type.attribute if swizzle else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `        bit_layout.type.attribute if bit_layout else None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    buffer_type = _cute_ir.MemRefType.get(ptr_ty, layout.type)` — **EN:** Assigns a value to buffer_type. **CN:** 将一个值赋给 buffer_type。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `    # \`is2cta\` is a UnitAttr flag in the IR:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `    # present => true, absent => false.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L86** `    is2cta_attr = ir.UnitAttr.get() if is2cta else None` — **EN:** Assigns a value to is2cta_attr. **CN:** 将一个值赋给 is2cta_attr。
+- **L87** `    buffer_op = cutlass_lir.AllocateBufferOp(` — **EN:** Assigns a value to buffer_op. **CN:** 将一个值赋给 buffer_op。
+- **L88** `        buffer_type, is2cta=is2cta_attr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    return buffer_op.result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L94** `def tma_load(` — **EN:** Defines function `tma_load`. **CN:** 定义函数 `tma_load`。
+- **L95** `    src: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L96** `    dst: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L97** `    mbar: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L98** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L99** `    cta_v_map: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L100** `    tma_operation_type: Optional[OperationTypeEnum] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L101** `    internal_type: Optional[Type[cute.Numeric]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L102** `    update_expect_tx: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L103** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L104** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L105** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L106** `    """` — **EN:** Starts the docstring for the function `tma_load`. **CN:** 开始说明 function `tma_load` 的文档字符串。
+- **L107** `    Copies a tensor pointed by a !cute.memref into a Buffer using TMA.` — **EN:** Continues the docstring for the function `tma_load`. **CN:** 继续说明 function `tma_load` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    update_expect_tx (bool): controls whether this operation increments the mbarrier's transaction bytes with the TMA copy size.` — **EN:** Continues the docstring for the function `tma_load`. **CN:** 继续说明 function `tma_load` 的文档字符串。
+- **L110** `    When used with Cute DSL pipelines, it must be set to False as the pipeline already initializes the mbarrier's transaction bytes.` — **EN:** Continues the docstring for the function `tma_load`. **CN:** 继续说明 function `tma_load` 的文档字符串。
+- **L111** `    tma_operation_type (optional): specifies the TMA operation type (SM90_TMA_LOAD, SM100_TMA_LOAD_2SM, etc.)` — **EN:** Continues the docstring for the function `tma_load`. **CN:** 继续说明 function `tma_load` 的文档字符串。
+- **L112** `    internal_type (optional): selects the TMA transfer's internal element encoding used by hardware.` — **EN:** Continues the docstring for the function `tma_load`. **CN:** 继续说明 function `tma_load` 的文档字符串。
+- **L113** `    """` — **EN:** Ends the docstring for the function `tma_load`. **CN:** 结束说明 function `tma_load` 的文档字符串。
+- **L114** `    if tma_operation_type is not None:` — **EN:** Starts a conditional branch guarded by `tma_operation_type is not None`. **CN:** 开始一个由 `tma_operation_type is not None` 控制的条件分支。
+- **L115** `        kind = _get_tma_load_kind(tma_operation_type)` — **EN:** Assigns a value to kind. **CN:** 将一个值赋给 kind。
+- **L116** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L117** `        kind = _cute_ir.TiledTmaLoadEnum.sm_90` — **EN:** Assigns a value to kind. **CN:** 将一个值赋给 kind。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `    kwargs = {` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L120** `        "kind": kind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `        "loc": loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `        "ip": ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    if cta_v_map is not None:` — **EN:** Starts a conditional branch guarded by `cta_v_map is not None`. **CN:** 开始一个由 `cta_v_map is not None` 控制的条件分支。
+- **L125** `        kwargs["cta_v_map"] = cta_v_map.type.attribute` — **EN:** Assigns a value to kwargs['cta_v_map']. **CN:** 将一个值赋给 kwargs['cta_v_map']。
+- **L126** `    # Map internal_type to tma_format per updated API` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L127** `    if internal_type is not None:` — **EN:** Starts a conditional branch guarded by `internal_type is not None`. **CN:** 开始一个由 `internal_type is not None` 控制的条件分支。
+- **L128** `        internal_mlir_ty = (` — **EN:** Assigns a value to internal_mlir_ty. **CN:** 将一个值赋给 internal_mlir_ty。
+- **L129** `            internal_type.mlir_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `            if hasattr(internal_type, "mlir_type")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `            else internal_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `        kwargs["tma_format"] = _cute_nvgpu_ir.TmaDataFormat(` — **EN:** Assigns a value to kwargs['tma_format']. **CN:** 将一个值赋给 kwargs['tma_format']。
+- **L134** `            _cute_nvgpu_ir.get_default_tma_format(internal_mlir_ty, False)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `    if update_expect_tx:` — **EN:** Starts a conditional branch guarded by `update_expect_tx`. **CN:** 开始一个由 `update_expect_tx` 控制的条件分支。
+- **L138** `        kwargs["update_expect_tx"] = True` — **EN:** Assigns a value to kwargs['update_expect_tx']. **CN:** 将一个值赋给 kwargs['update_expect_tx']。
+- **L139** `    cutlass_lir.TmaLoadOp(src.value, dst.value, mbar, **kwargs)` — **EN:** Invokes `cutlass_lir.TmaLoadOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir.TmaLoadOp`。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L143** `def tma_load_multicast(` — **EN:** Defines function `tma_load_multicast`. **CN:** 定义函数 `tma_load_multicast`。
+- **L144** `    src: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    dst: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `    mbar: ir.Value,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L147** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L148** `    vmnk_layout: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L149** `    cta_v_map: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L150** `    tma_operation_type: OperationTypeEnum,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `    multicast_mode: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L152** `    update_expect_tx: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L153** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L155** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L156** `    """` — **EN:** Starts the docstring for the function `tma_load_multicast`. **CN:** 开始说明 function `tma_load_multicast` 的文档字符串。
+- **L157** `    Copies a tensor pointed by a !cute.memref into a Buffer using TMA with multicast.` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    :param src: Source tensor in global memory` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L160** `    :param dst: Destination tensor in shared memory` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L161** `    :param mbar: Memory barrier for synchronization` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L162** `    :param vmnk_layout: Layout describing the cluster configuration` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L163** `    :param cta_v_map: CTA V-map for the tensor` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L164** `    :param tma_operation_type: TMA operation type (e.g., SM90_TMA_LOAD_MULTICAST, SM100_TMA_LOAD_2SM_MULTICAST)` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L165** `    :param multicast_mode: Multicast projection mode (1=column, 2=row)` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L166** `    :param update_expect_tx: Whether to update expected transaction bytes` — **EN:** Continues the docstring for the function `tma_load_multicast`. **CN:** 继续说明 function `tma_load_multicast` 的文档字符串。
+- **L167** `    """` — **EN:** Ends the docstring for the function `tma_load_multicast`. **CN:** 结束说明 function `tma_load_multicast` 的文档字符串。
+- **L168** `    kind = _get_tma_load_kind(tma_operation_type)` — **EN:** Assigns a value to kind. **CN:** 将一个值赋给 kind。
+- **L169** `    kwargs = {` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L170** `        "kind": kind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `        "vmnk_layout": vmnk_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `        "multicast_mode": multicast_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `        "loc": loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `        "ip": ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `    if cta_v_map is not None:` — **EN:** Starts a conditional branch guarded by `cta_v_map is not None`. **CN:** 开始一个由 `cta_v_map is not None` 控制的条件分支。
+- **L177** `        kwargs["cta_v_map"] = cta_v_map.type.attribute` — **EN:** Assigns a value to kwargs['cta_v_map']. **CN:** 将一个值赋给 kwargs['cta_v_map']。
+- **L178** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L179** `    if update_expect_tx:` — **EN:** Starts a conditional branch guarded by `update_expect_tx`. **CN:** 开始一个由 `update_expect_tx` 控制的条件分支。
+- **L180** `        kwargs["update_expect_tx"] = True` — **EN:** Assigns a value to kwargs['update_expect_tx']. **CN:** 将一个值赋给 kwargs['update_expect_tx']。
+- **L181** `    cutlass_lir.TmaLoadMulticastOp(` — **EN:** Invokes `cutlass_lir.TmaLoadMulticastOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir.TmaLoadMulticastOp`。
+- **L182** `        src.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `        dst.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `        mbar,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `        **kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L190** `def tma_store(` — **EN:** Defines function `tma_store`. **CN:** 定义函数 `tma_store`。
+- **L191** `    src: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L192** `    dst: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L193** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `    cta_v_map: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `    internal_type: Optional[Type[cute.Numeric]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L199** `    """` — **EN:** Starts the docstring for the function `tma_store`. **CN:** 开始说明 function `tma_store` 的文档字符串。
+- **L200** `    Copies a tensor from a Buffer to a tensor pointed to by a !cute.memref.` — **EN:** Continues the docstring for the function `tma_store`. **CN:** 继续说明 function `tma_store` 的文档字符串。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `    internal_type (optional): selects the TMA transfer's internal element encoding used by hardware.` — **EN:** Continues the docstring for the function `tma_store`. **CN:** 继续说明 function `tma_store` 的文档字符串。
+- **L203** `    """` — **EN:** Ends the docstring for the function `tma_store`. **CN:** 结束说明 function `tma_store` 的文档字符串。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `    kwargs = {` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L206** `        "loc": loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `        "ip": ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `    if cta_v_map is not None:` — **EN:** Starts a conditional branch guarded by `cta_v_map is not None`. **CN:** 开始一个由 `cta_v_map is not None` 控制的条件分支。
+- **L210** `        kwargs["cta_v_map"] = cta_v_map.type.attribute` — **EN:** Assigns a value to kwargs['cta_v_map']. **CN:** 将一个值赋给 kwargs['cta_v_map']。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `    # Map internal_type to tma_format per updated API` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L213** `    if internal_type is not None:` — **EN:** Starts a conditional branch guarded by `internal_type is not None`. **CN:** 开始一个由 `internal_type is not None` 控制的条件分支。
+- **L214** `        internal_mlir_ty = (` — **EN:** Assigns a value to internal_mlir_ty. **CN:** 将一个值赋给 internal_mlir_ty。
+- **L215** `            internal_type.mlir_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `            if hasattr(internal_type, "mlir_type")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `            else internal_type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `        kwargs["tma_format"] = _cute_nvgpu_ir.TmaDataFormat(` — **EN:** Assigns a value to kwargs['tma_format']. **CN:** 将一个值赋给 kwargs['tma_format']。
+- **L220** `            _cute_nvgpu_ir.get_default_tma_format(internal_mlir_ty, False)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `    cutlass_lir.TmaStoreOp(src.value, dst.value, **kwargs)` — **EN:** Invokes `cutlass_lir.TmaStoreOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir.TmaStoreOp`。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L227** `def copy(` — **EN:** Defines function `copy`. **CN:** 定义函数 `copy`。
+- **L228** `    src: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `    dst: cute.Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `    copy_atom: cute.CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L232** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L233** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L234** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L235** `    """` — **EN:** Starts the docstring for the function `copy`. **CN:** 开始说明 function `copy` 的文档字符串。
+- **L236** `    Copy a tensor from src to dst using a given copy atom.` — **EN:** Continues the docstring for the function `copy`. **CN:** 继续说明 function `copy` 的文档字符串。
+- **L237** `    """` — **EN:** Ends the docstring for the function `copy`. **CN:** 结束说明 function `copy` 的文档字符串。
+- **L238** `    copy_atom = ir.Attribute.parse(f"{copy_atom.type}")` — **EN:** Assigns a value to copy_atom. **CN:** 将一个值赋给 copy_atom。
+- **L239** `    cutlass_lir.CopyOp(src.value, dst.value, copy_atom=copy_atom, loc=loc, ip=ip)` — **EN:** Invokes `cutlass_lir.CopyOp` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_lir.CopyOp`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.experimental.memory`. CN: 模块名为 `CuTeDSL.cutlass.cute.experimental.memory`。
+- EN: Top-level functions: _get_tma_load_kind, allocate, tma_load, tma_load_multicast, tma_store, copy CN: 顶层函数包括：_get_tma_load_kind, allocate, tma_load, tma_load_multicast, tma_store, copy
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir.dialects:cute_nvgpu, cutlass._mlir:ir, cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir.dialects:lir,cute, cutlass._mlir.dialects.core:OperationTypeEnum, cutlass:cute CN: 内部依赖：cutlass._mlir.dialects:cute_nvgpu, cutlass._mlir:ir, cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir.dialects:lir,cute, cutlass._mlir.dialects.core:OperationTypeEnum, cutlass:cute
+- EN: External or standard-library dependencies: typing:Type,Optional CN: 外部或标准库依赖：typing:Type,Optional

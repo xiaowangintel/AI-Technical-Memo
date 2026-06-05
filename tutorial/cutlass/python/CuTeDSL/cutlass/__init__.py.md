@@ -1,0 +1,122 @@
+# __init__.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/__init__.py`
+
+## Purpose / 作用
+- EN: Package marker for `CuTeDSL.cutlass` that exposes or initializes _cutlass_ir, _get_cuda_version, _common, CUDA_VERSION, Constexpr, dsl_user_op, ... (+32 more).
+- CN: 这是 `CuTeDSL.cutlass` 的包标记文件，用于导出或初始化 _cutlass_ir, _get_cuda_version, _common, CUDA_VERSION, Constexpr, dsl_user_op, ... (+32 more)。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from ._mlir._mlir_libs import _cutlass_ir` — **EN:** Imports _cutlass_ir from `._mlir._mlir_libs`. **CN:** 从 `._mlir._mlir_libs` 导入 _cutlass_ir。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `_cutlass_ir.populate(_cutlass_ir)` — **EN:** Invokes `_cutlass_ir.populate` as a standalone call. **CN:** 以独立语句方式调用 `_cutlass_ir.populate`。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `def _ensure_mlir_type_compat() -> None:` — **EN:** Defines function `_ensure_mlir_type_compat`. **CN:** 定义函数 `_ensure_mlir_type_compat`。
+- **L18** `    """Patch \`.isinstance()\` onto MLIR type classes that no longer expose it."""` — **EN:** Docstring line documenting the function `_ensure_mlir_type_compat`. **CN:** 文档字符串行，用于说明 function `_ensure_mlir_type_compat`。
+- **L19** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L20** `        from ._mlir import ir as _mlir_ir` — **EN:** Imports ir as _mlir_ir from `._mlir`. **CN:** 从 `._mlir` 导入 ir as _mlir_ir。
+- **L21** `    except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L22** `        return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L23** `    for name in dir(_mlir_ir):` — **EN:** Starts a loop assigning items from `dir(_mlir_ir)` to `name`. **CN:** 开始一个循环，将 `dir(_mlir_ir)` 的元素赋给 `name`。
+- **L24** `        if not name.endswith("Type"):` — **EN:** Starts a conditional branch guarded by `not name.endswith('Type')`. **CN:** 开始一个由 `not name.endswith('Type')` 控制的条件分支。
+- **L25** `            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L26** `        cls = getattr(_mlir_ir, name)` — **EN:** Assigns a value to cls. **CN:** 将一个值赋给 cls。
+- **L27** `        if not isinstance(cls, type) or hasattr(cls, "isinstance"):` — **EN:** Starts a conditional branch guarded by `not isinstance(cls, type) or hasattr(cls, 'isinstance')`. **CN:** 开始一个由 `not isinstance(cls, type) or hasattr(cls, 'isinstance')` 控制的条件分支。
+- **L28** `            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L29** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L30** `            cls.isinstance = staticmethod(lambda ty, _cls=cls: isinstance(ty, _cls))  # type: ignore[attr-defined]` — **EN:** Assigns a value to cls.isinstance. **CN:** 将一个值赋给 cls.isinstance。
+- **L31** `        except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L32** `            continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `_ensure_mlir_type_compat()` — **EN:** Invokes `_ensure_mlir_type_compat` as a standalone call. **CN:** 以独立语句方式调用 `_ensure_mlir_type_compat`。
+- **L36** `del _ensure_mlir_type_compat` — **EN:** Deletes one or more names or entries. **CN:** 删除一个或多个名称或条目。
+- **L37** `__version__ = "@CUTLASS_IR_WHEEL_RELEASE_VERSION@"` — **EN:** Assigns a value to __version__. **CN:** 将一个值赋给 __version__。
+- **L38** `# Monkey patch CUDA version query function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L39** `from ._mlir._mlir_libs._cutlass_ir._base_dsl import (` — **EN:** Imports get_cuda_version as _get_cuda_version from `._mlir._mlir_libs._cutlass_ir._base_dsl`. **CN:** 从 `._mlir._mlir_libs._cutlass_ir._base_dsl` 导入 get_cuda_version as _get_cuda_version。
+- **L40** `    get_cuda_version as _get_cuda_version,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `from .base_dsl import common as _common` — **EN:** Imports common as _common from `.base_dsl`. **CN:** 从 `.base_dsl` 导入 common as _common。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `_common._get_cuda_version = _get_cuda_version` — **EN:** Assigns a value to _common._get_cuda_version. **CN:** 将一个值赋给 _common._get_cuda_version。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `# Import CUDA version from base_dsl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L47** `from .base_dsl.version_info import CUDA_VERSION` — **EN:** Imports CUDA_VERSION from `.base_dsl.version_info`. **CN:** 从 `.base_dsl.version_info` 导入 CUDA_VERSION。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `from .cutlass_dsl import (` — **EN:** Imports Constexpr, dsl_user_op, as_numeric, min, max, and_, ... (+23 more) from `.cutlass_dsl`. **CN:** 从 `.cutlass_dsl` 导入 Constexpr, dsl_user_op, as_numeric, min, max, and_, ... (+23 more)。
+- **L50** `    Constexpr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    dsl_user_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    as_numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    min,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    max,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    and_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    or_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    not_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    all_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `    any_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `    select_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `    # Control-flow without AST pre-processor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L62** `    if_generate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `    for_generate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    LoopUnroll,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    while_generate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `    yield_out,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    # Control-flow with AST pre-processor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `    range,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `    range_constexpr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    range_dynamic,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    const_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `    dynamic_expr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `    # Data types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L74** `    dtype,  # Provides conversions to types inheriting from NumericType` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `    DSLRuntimeError,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `    DSLAstPreprocessorError,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    JitArgAdapterRegistry,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    # Construction utilities for user-defined classes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `    extract_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    new_from_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    DSLCudaVersion,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    target_version,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `from .cute.typing import *` — **EN:** Imports * from `.cute.typing`. **CN:** 从 `.cute.typing` 导入 *。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `# Utilities not belonging to CuTe` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `from . import utils as utils` — **EN:** Imports utils as utils from the current package. **CN:** 从当前包导入 utils as utils。
+- **L89** `from . import pipeline as pipeline` — **EN:** Imports pipeline as pipeline from the current package. **CN:** 从当前包导入 pipeline as pipeline。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `# Used as internal symbol` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L92** `from . import cutlass_dsl as _dsl` — **EN:** Imports cutlass_dsl as _dsl from the current package. **CN:** 从当前包导入 cutlass_dsl as _dsl。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `# Aliases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L95** `LaunchConfig = _dsl.BaseDSL.LaunchConfig` — **EN:** Assigns a value to LaunchConfig. **CN:** 将一个值赋给 LaunchConfig。
+- **L96** `register_jit_arg_adapter = _dsl.JitArgAdapterRegistry.register_jit_arg_adapter` — **EN:** Assigns a value to register_jit_arg_adapter. **CN:** 将一个值赋给 register_jit_arg_adapter。
+- **L97** `gpu = _dsl.cutlass_gpu` — **EN:** Assigns a value to gpu. **CN:** 将一个值赋给 gpu。
+- **L98** `cuda = _dsl.cuda_helpers` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `# Jax Framework support` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L101** `from . import jax as jax` — **EN:** Imports jax as jax from the current package. **CN:** 从当前包导入 jax as jax。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `CACHE_FILE = "compiled_cache.db"` — **EN:** Assigns a value to CACHE_FILE. **CN:** 将一个值赋给 CACHE_FILE。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.__init__`. CN: 模块名为 `CuTeDSL.cutlass.__init__`。
+- EN: This `__init__.py` file acts as a package marker and central import surface. CN: 这个 `__init__.py` 文件既是包标记，也是集中导出入口。
+- EN: Top-level functions: _ensure_mlir_type_compat CN: 顶层函数包括：_ensure_mlir_type_compat
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ._mlir._mlir_libs:_cutlass_ir, ._mlir._mlir_libs._cutlass_ir._base_dsl:get_cuda_version, .base_dsl:common, .base_dsl.version_info:CUDA_VERSION, .cutlass_dsl:Constexpr,dsl_user_op,as_numeric,min,max,and_,or_,not_,all_,any_,select_,if_generate,for_generate,LoopUnroll,while_generate,yield_out,range,range_constexpr,range_dynamic,const_expr,dynamic_expr,dtype,DSLRuntimeError,DSLAstPreprocessorError,JitArgAdapterRegistry,extract_mlir_values,new_from_mlir_values,DSLCudaVersion,target_version, .cute.typing:*, .:utils, .:pipeline, .:cutlass_dsl, .:jax, ._mlir:ir CN: 内部依赖：._mlir._mlir_libs:_cutlass_ir, ._mlir._mlir_libs._cutlass_ir._base_dsl:get_cuda_version, .base_dsl:common, .base_dsl.version_info:CUDA_VERSION, .cutlass_dsl:Constexpr,dsl_user_op,as_numeric,min,max,and_,or_,not_,all_,any_,select_,if_generate,for_generate,LoopUnroll,while_generate,yield_out,range,range_constexpr,range_dynamic,const_expr,dynamic_expr,dtype,DSLRuntimeError,DSLAstPreprocessorError,JitArgAdapterRegistry,extract_mlir_values,new_from_mlir_values,DSLCudaVersion,target_version, .cute.typing:*, .:utils, .:pipeline, .:cutlass_dsl, .:jax, ._mlir:ir

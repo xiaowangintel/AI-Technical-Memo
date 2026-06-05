@@ -1,0 +1,418 @@
+# conv2d_fprop_with_broadcast_sm70.cu — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device/conv2d_fprop_with_broadcast_sm70.cu`
+**Purpose / 用途**: Tests for device-wide Implicit GEMM interface. The file instantiates and runs tests for 2D, forward-propagation, SM70, with concrete type aliases and builders declared in the source. / 该文件为对应卷积内核提供测试覆盖。 这里针对 2 维、前向传播、SM70 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief Tests for device-wide Implicit GEMM interface`
+  - **EN**: Records the file-level brief description: Tests for device-wide Implicit GEMM interface.
+  - **CN**: 记录文件级简述：Tests for device-wide Implicit GEMM interface。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L35** `#include "../../common/cutlass_unit_test.h"`
+  - **EN**: Shared CUTLASS unit-test harness used by older convolution tests.
+  - **CN**: 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- **L36** `#include "cutlass/cutlass.h"`
+  - **EN**: Core CUTLASS definitions, architecture tags, and status types.
+  - **CN**: CUTLASS 核心定义、架构标签和状态类型。
+- **L37** `#include "cutlass/array.h"`
+  - **EN**: Provides `cutlass/array.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `cutlass/array.h`，使本文件能够使用相关 API 或辅助工具。
+- **L38** `#include "cutlass/epilogue/thread/linear_combination_bias_elementwise.h"`
+  - **EN**: Epilogue components that convert accumulators to outputs and optionally fuse extra work.
+  - **CN**: epilogue 组件，用于把累加器转换为输出并可选地融合额外计算。
+- **L39** `#include "cutlass/epilogue/thread/linear_combination_residual_block.h"`
+  - **EN**: Epilogue components that convert accumulators to outputs and optionally fuse extra work.
+  - **CN**: epilogue 组件，用于把累加器转换为输出并可选地融合额外计算。
+- **L40** `#include "cutlass/epilogue/thread/activation.h"`
+  - **EN**: Epilogue components that convert accumulators to outputs and optionally fuse extra work.
+  - **CN**: epilogue 组件，用于把累加器转换为输出并可选地融合额外计算。
+- **L41** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L42** `#include "cutlass/conv/kernel/default_conv2d_fprop_with_broadcast.h"`
+  - **EN**: Kernel-level convolution building blocks.
+  - **CN**: 内核级卷积构建模块。
+- **L43** `#include "cutlass/conv/device/implicit_gemm_convolution.h"`
+  - **EN**: Device-level wrapper that launches convolution kernels expressed as implicit GEMM.
+  - **CN**: 将隐式 GEMM 卷积内核封装为设备级调用接口的包装器。
+- **L44** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L45** `#include "conv2d_with_broadcast_testbed.h"`
+  - **EN**: Provides `conv2d_with_broadcast_testbed.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `conv2d_with_broadcast_testbed.h`，使本文件能够使用相关 API 或辅助工具。
+- **L46** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L47** `#if defined(CUTLASS_ARCH_MMA_SM70_SUPPORTED)`
+  - **EN**: Starts a compile-time conditional block guarded by `defined(CUTLASS_ARCH_MMA_SM70_SUPPORTED)`.
+  - **CN**: 开始由 `defined(CUTLASS_ARCH_MMA_SM70_SUPPORTED)` 保护的编译期条件块。
+- **L48** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L49** `// Test residual block fusion: UnaryOp(BinaryOp(ActivationOp(Conv2d(X) + bias), residual))`
+  - **EN**: Comment explaining: Test residual block fusion: UnaryOp(BinaryOp(ActivationOp(Conv2d(X) + bias), residual)).
+  - **CN**: 说明性注释：Test residual block fusion: UnaryOp(BinaryOp(ActivationOp(Conv2d(X) + bias), residual))。
+- **L50** `// LinearCombinationResidualBlock does not support the split-k mode unless ActivationOp is Identity.`
+  - **EN**: Comment explaining: LinearCombinationResidualBlock does not support the split-k mode unless ActivationOp is Identity..
+  - **CN**: 说明性注释：LinearCombinationResidualBlock does not support the split-k mode unless ActivationOp is Identity.。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `// This is because the activation needs to be applied to the fully accumulated output of the Conv2d op,`
+  - **EN**: Comment explaining: This is because the activation needs to be applied to the fully accumulated output of the Conv2d op,.
+  - **CN**: 说明性注释：This is because the activation needs to be applied to the fully accumulated output of the Conv2d op,。
+- **L52** `// which only the last thread block would have an access to, before applying BinaryOp.`
+  - **EN**: Comment explaining: which only the last thread block would have an access to, before applying BinaryOp..
+  - **CN**: 说明性注释：which only the last thread block would have an access to, before applying BinaryOp.。
+- **L53** `// The epilogue functor in the last thread block would have to be given three inputs, namely`
+  - **EN**: Comment explaining: The epilogue functor in the last thread block would have to be given three inputs, namely.
+  - **CN**: 说明性注释：The epilogue functor in the last thread block would have to be given three inputs, namely。
+- **L54** `// partial outputs, bias, and residual, but this is not supported in the current interface.`
+  - **EN**: Comment explaining: partial outputs, bias, and residual, but this is not supported in the current interface..
+  - **CN**: 说明性注释：partial outputs, bias, and residual, but this is not supported in the current interface.。
+- **L55** `// Set TestSplitK = false to skip split-k tests with non-trivial ActivationOp.`
+  - **EN**: Comment explaining: Set TestSplitK = false to skip split-k tests with non-trivial ActivationOp..
+  - **CN**: 说明性注释：Set TestSplitK = false to skip split-k tests with non-trivial ActivationOp.。
+- **L56** `template <`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L57** ` typename ElementAccumulator,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L58** ` template<typename T> class ActivationOp,`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L59** ` template<typename T> class BinaryOp,`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L60** ` template<typename T> class UnaryOp,`
+  - **EN**: Declares template parameters for the following type or function.
+  - **CN**: 为后续类型或函数声明模板参数。
+- **L61** ` bool TestSplitK = false `
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L62** `>`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L63** `void Conv2dFpropSM70TestResidualBlock() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L64** `  using ElementA = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L65** `  using ElementB = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L66** `  using ElementC = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L67** `  using ElementD = ElementC;`
+  - **EN**: Creates the `ElementD` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementD` 类型别名，供后续内核与 epilogue 定义使用。
+- **L68** `  using ElementCompute = ElementAccumulator;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L69** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L70** `  using EpilogueOutputOp = cutlass::epilogue::thread::LinearCombinationResidualBlock<`
+  - **EN**: Creates the helper type alias `EpilogueOutputOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `EpilogueOutputOp`，供后续声明使用。
+- **L71** `    ElementD,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L72** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L73** `    ElementCompute,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L74** `    ElementC,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L75** `    8,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `    ActivationOp,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L77** `    BinaryOp,`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L78** `    UnaryOp`
+  - **EN**: Continues supplying template arguments for `EpilogueOutputOp`.
+  - **CN**: 继续为 `EpilogueOutputOp` 提供模板参数。
+- **L79** `  >;`
+  - **EN**: Closes the multi-line alias definition for `EpilogueOutputOp`.
+  - **CN**: 结束 `EpilogueOutputOp` 的多行别名定义。
+- **L80** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L81** `  using Conv2dFpropKernel = typename cutlass::conv::kernel::DefaultConv2dFpropWithBroadcast<`
+  - **EN**: Defines the kernel type alias `Conv2dFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dFpropKernel`，形成具体卷积内核。
+- **L82** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L83** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L84** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L85** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L86** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择张量核心指令类别。
+- **L87** `    cutlass::arch::Sm70,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 指定目标 GPU 架构。
+- **L88** `    cutlass::gemm::GemmShape<128, 128, 32>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L89** `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L90** `    cutlass::gemm::GemmShape<8, 8, 4>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L91** `    EpilogueOutputOp,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L92** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L93** `    2,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L94** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L95** `    cutlass::conv::IteratorAlgorithm::kOptimized`
+  - **EN**: Selects the iterator algorithm used by `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择使用的迭代器算法。
+- **L96** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dFpropKernel` 最终确定为选定的内核类型。
+- **L97** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L98** `  using Conv2dFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dFprop`。
+- **L99** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L100** `  struct ReferenceOp {`
+  - **EN**: Starts the declaration of struct `ReferenceOp`.
+  - **CN**: 开始声明结构体 `ReferenceOp`。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `    using OutputOp = typename Conv2dFprop::EpilogueOutputOp;`
+  - **EN**: Creates the helper type alias `OutputOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `OutputOp`，供后续声明使用。
+- **L102** `    using ElementZ = typename OutputOp::ElementZ;`
+  - **EN**: Creates the `ElementZ` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementZ` 类型别名，供后续内核与 epilogue 定义使用。
+- **L103** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L104** `    ActivationOp<ElementCompute> activation;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L105** `    BinaryOp<ElementCompute> binary_op;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L106** `    UnaryOp<ElementCompute> unary_op;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L107** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L108** `    void operator()(ElementZ &Z, ElementZ&, ElementCompute conv2d, ElementCompute residual) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L109** `      Z = ElementZ(unary_op(binary_op(activation(conv2d), residual)));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L110** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L111** `  };`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L112** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L113** `  bool passed = test::conv::device::TestAllConv2dWithBroadcast<Conv2dFprop, ReferenceOp, true, TestSplitK>();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L114** `  EXPECT_TRUE(passed);`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L115** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L116** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L117** `TEST(SM70_Device_Conv2d_Fprop_With_Residual_Block_Plus_Optimized_ImplicitGemm_f16nhwc_f16nhwc_f32nhwc_tensor_op_f32,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L118** `     128x128_32x2_64x64x32) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L119** `  // Resnet`
+  - **EN**: Comment explaining: Resnet.
+  - **CN**: 说明性注释：Resnet。
+- **L120** `  Conv2dFpropSM70TestResidualBlock<float, cutlass::epilogue::thread::ReLu, cutlass::plus, cutlass::epilogue::thread::Identity>();`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L121** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L122** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L123** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L124** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L125** `#endif  // CUTLASS_ARCH_MMA_SM70_SUPPORTED`
+  - **EN**: Ends the current compile-time conditional block.
+  - **CN**: 结束当前编译期条件块。
+
+### Lines 126-127 / 第126-127行
+
+- **L126** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L127** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+## Key Concepts / 关键概念
+- GoogleTest test cases encode each kernel variant as a compile-time instantiation that is exercised by a shared testbed. / GoogleTest 用例将每个内核变体编码为编译期实例化，并交由共享测试平台执行。
+- Legacy convolution tests rely on default kernel builders and the `ImplicitGemmConvolution` device wrapper. / 旧版卷积测试依赖默认内核构建器以及 `ImplicitGemmConvolution` 设备包装器。
+## Dependencies / 依赖项
+- `../../common/cutlass_unit_test.h` — Shared CUTLASS unit-test harness used by older convolution tests. / 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- `cutlass/cutlass.h` — Core CUTLASS definitions, architecture tags, and status types. / CUTLASS 核心定义、架构标签和状态类型。
+- `cutlass/array.h` — Provides `cutlass/array.h` so this file can use the related API or helper utilities. / 提供 `cutlass/array.h`，使本文件能够使用相关 API 或辅助工具。
+- `cutlass/epilogue/thread/linear_combination_bias_elementwise.h` — Epilogue components that convert accumulators to outputs and optionally fuse extra work. / epilogue 组件，用于把累加器转换为输出并可选地融合额外计算。
+- `cutlass/epilogue/thread/linear_combination_residual_block.h` — Epilogue components that convert accumulators to outputs and optionally fuse extra work. / epilogue 组件，用于把累加器转换为输出并可选地融合额外计算。
+- `cutlass/epilogue/thread/activation.h` — Epilogue components that convert accumulators to outputs and optionally fuse extra work. / epilogue 组件，用于把累加器转换为输出并可选地融合额外计算。
+- `cutlass/conv/kernel/default_conv2d_fprop_with_broadcast.h` — Kernel-level convolution building blocks. / 内核级卷积构建模块。
+- `cutlass/conv/device/implicit_gemm_convolution.h` — Device-level wrapper that launches convolution kernels expressed as implicit GEMM. / 将隐式 GEMM 卷积内核封装为设备级调用接口的包装器。
+- `conv2d_with_broadcast_testbed.h` — Provides `conv2d_with_broadcast_testbed.h` so this file can use the related API or helper utilities. / 提供 `conv2d_with_broadcast_testbed.h`，使本文件能够使用相关 API 或辅助工具。

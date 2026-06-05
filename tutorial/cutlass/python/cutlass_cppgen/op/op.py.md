@@ -1,0 +1,451 @@
+# op.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/op/op.py`
+
+## Purpose / 作用
+- EN: Base operation used for defining high-level CUTLASS operations (e.g., GEMM, Conv2d)
+- CN: 该模块的文档字符串将其描述为：Base operation used for defining high-level CUTLASS operations (e.g., GEMM, Conv2d)
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Base operation used for defining high-level CUTLASS operations (e.g., GEMM, Conv2d)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from bisect import bisect_left` — **EN:** Imports bisect_left from `bisect`. **CN:** 从 `bisect` 导入 bisect_left。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_library import (` — **EN:** Imports DataType, DataTypeSize, MathOperation, OperationKind, SharedMemPerCC from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType, DataTypeSize, MathOperation, OperationKind, SharedMemPerCC。
+- **L40** `    DataType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    DataTypeSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    MathOperation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    OperationKind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    SharedMemPerCC` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L48** `from cutlass_cppgen import get_option_registry` — **EN:** Imports get_option_registry from `cutlass_cppgen`. **CN:** 从 `cutlass_cppgen` 导入 get_option_registry。
+- **L49** `from cutlass_cppgen.backend.evt import EpilogueFunctorVisitor` — **EN:** Imports EpilogueFunctorVisitor from `cutlass_cppgen.backend.evt`. **CN:** 从 `cutlass_cppgen.backend.evt` 导入 EpilogueFunctorVisitor。
+- **L50** `from cutlass_cppgen.backend.evt.passes.util import cc_map` — **EN:** Imports cc_map from `cutlass_cppgen.backend.evt.passes.util`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.util` 导入 cc_map。
+- **L51** `from cutlass_cppgen.backend.utils.device import device_cc` — **EN:** Imports device_cc from `cutlass_cppgen.backend.utils.device`. **CN:** 从 `cutlass_cppgen.backend.utils.device` 导入 device_cc。
+- **L52** `from cutlass_cppgen.epilogue import get_activations, get_activation_epilogue, identity` — **EN:** Imports get_activations, get_activation_epilogue, identity from `cutlass_cppgen.epilogue`. **CN:** 从 `cutlass_cppgen.epilogue` 导入 get_activations, get_activation_epilogue, identity。
+- **L53** `from cutlass_cppgen.library_defaults import KernelsForDataType, _generator_ccs` — **EN:** Imports KernelsForDataType, _generator_ccs from `cutlass_cppgen.library_defaults`. **CN:** 从 `cutlass_cppgen.library_defaults` 导入 KernelsForDataType, _generator_ccs。
+- **L54** `from cutlass_cppgen.swizzle import get_swizzling_functors` — **EN:** Imports get_swizzling_functors from `cutlass_cppgen.swizzle`. **CN:** 从 `cutlass_cppgen.swizzle` 导入 get_swizzling_functors。
+- **L55** `from cutlass_cppgen.utils import datatypes, check` — **EN:** Imports datatypes, check from `cutlass_cppgen.utils`. **CN:** 从 `cutlass_cppgen.utils` 导入 datatypes, check。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `class OperationBase:` — **EN:** Defines class `OperationBase`. **CN:** 定义类 `OperationBase`。
+- **L59** `    """` — **EN:** Starts the docstring for the class `OperationBase`. **CN:** 开始说明 class `OperationBase` 的文档字符串。
+- **L60** `    Base operation used for defining high-level CUTLASS operations (e.g., GEMM, Conv2d)` — **EN:** Continues the docstring for the class `OperationBase`. **CN:** 继续说明 class `OperationBase` 的文档字符串。
+- **L61** `    """` — **EN:** Ends the docstring for the class `OperationBase`. **CN:** 结束说明 class `OperationBase` 的文档字符串。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    def __init__(self, cc: int = None, kernel_cc: int = None, operation_kind = OperationKind.Gemm):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L64** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L65** `        :param cc: compute capability of device for which kernels should be compiled. For example, if running on H100, this should be set to 90` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L66** `        :type cc: int` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L67** `        :param kernel_cc: compute capability of kernels to generate. For example, if running on SM90, but desiring to use a CUTLASS 2.x-style Ampere kernel, this should be set to 80` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L68** `        :type kernel_cc: int` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L69** `        :param operation_kind: class of operation that will be performed (e.g., GEMM, Conv)` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L70** `        :type operation_kind: cutlass_library.OperationKind` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L71** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L72** `        self.operation_kind = operation_kind` — **EN:** Assigns a value to self.operation_kind. **CN:** 将一个值赋给 self.operation_kind。
+- **L73** `        self.cc = cc if cc is not None else device_cc()` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L74** `        self.specified_kernel_cc = kernel_cc is not None` — **EN:** Assigns a value to self.specified_kernel_cc. **CN:** 将一个值赋给 self.specified_kernel_cc。
+- **L75** `        self.current_cc = kernel_cc if kernel_cc is not None else self._find_closest_cc(self.cc)` — **EN:** Assigns a value to self.current_cc. **CN:** 将一个值赋给 self.current_cc。
+- **L76** `        self.tile_description = None` — **EN:** Assigns a value to self.tile_description. **CN:** 将一个值赋给 self.tile_description。
+- **L77** `        self._math_operation = None` — **EN:** Assigns a value to self._math_operation. **CN:** 将一个值赋给 self._math_operation。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `        self.options = get_option_registry().options_for_cc(self.current_cc, operation_kind)` — **EN:** Assigns a value to self.options. **CN:** 将一个值赋给 self.options。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `        if self.options is None:` — **EN:** Starts a conditional branch guarded by `self.options is None`. **CN:** 开始一个由 `self.options is None` 控制的条件分支。
+- **L82** `            raise Exception(f"Invalid or unsupported compute capability: {self.current_cc}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `        # Default activation function: identity` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `        self._activation = identity` — **EN:** Assigns a value to self._activation. **CN:** 将一个值赋给 self._activation。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    def _find_closest_cc(self, cc: int) -> int:` — **EN:** Defines function `_find_closest_cc`. **CN:** 定义函数 `_find_closest_cc`。
+- **L88** `        """` — **EN:** Starts the docstring for the function `_find_closest_cc`. **CN:** 开始说明 function `_find_closest_cc` 的文档字符串。
+- **L89** `        Returns the closest CC in _generator_ccs less than or equal to \`cc\`` — **EN:** Continues the docstring for the function `_find_closest_cc`. **CN:** 继续说明 function `_find_closest_cc` 的文档字符串。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `        :param cc: compute capability to query` — **EN:** Continues the docstring for the function `_find_closest_cc`. **CN:** 继续说明 function `_find_closest_cc` 的文档字符串。
+- **L92** `        :type cc: int` — **EN:** Continues the docstring for the function `_find_closest_cc`. **CN:** 继续说明 function `_find_closest_cc` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `        :returns: closest CC in _generator_ccs less than or equal to \`cc\`` — **EN:** Continues the docstring for the function `_find_closest_cc`. **CN:** 继续说明 function `_find_closest_cc` 的文档字符串。
+- **L95** `        :rtype: int` — **EN:** Continues the docstring for the function `_find_closest_cc`. **CN:** 继续说明 function `_find_closest_cc` 的文档字符串。
+- **L96** `        """` — **EN:** Ends the docstring for the function `_find_closest_cc`. **CN:** 结束说明 function `_find_closest_cc` 的文档字符串。
+- **L97** `        if cc in _generator_ccs:` — **EN:** Starts a conditional branch guarded by `cc in _generator_ccs`. **CN:** 开始一个由 `cc in _generator_ccs` 控制的条件分支。
+- **L98** `            return cc` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `        # Find closest CC lower than this CC` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L101** `        idx = bisect_left(_generator_ccs, cc)` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L102** `        if idx == 0:` — **EN:** Starts a conditional branch guarded by `idx == 0`. **CN:** 开始一个由 `idx == 0` 控制的条件分支。
+- **L103** `            raise Exception(f'No valid CC to fall back to for {cc}')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L104** `        return _generator_ccs[idx-1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    def activations(self) -> list:` — **EN:** Defines function `activations`. **CN:** 定义函数 `activations`。
+- **L107** `        """` — **EN:** Starts the docstring for the function `activations`. **CN:** 开始说明 function `activations` 的文档字符串。
+- **L108** `        Returns possible activation functions that can be used` — **EN:** Continues the docstring for the function `activations`. **CN:** 继续说明 function `activations` 的文档字符串。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `        :return: list of activation functions that can be used` — **EN:** Continues the docstring for the function `activations`. **CN:** 继续说明 function `activations` 的文档字符串。
+- **L111** `        :rtype: list` — **EN:** Continues the docstring for the function `activations`. **CN:** 继续说明 function `activations` 的文档字符串。
+- **L112** `        """` — **EN:** Ends the docstring for the function `activations`. **CN:** 结束说明 function `activations` 的文档字符串。
+- **L113** `        return get_activations()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    def swizzling_functors(self) -> list:` — **EN:** Defines function `swizzling_functors`. **CN:** 定义函数 `swizzling_functors`。
+- **L116** `        """` — **EN:** Starts the docstring for the function `swizzling_functors`. **CN:** 开始说明 function `swizzling_functors` 的文档字符串。
+- **L117** `        Returns possible swizzling functions that can be used` — **EN:** Continues the docstring for the function `swizzling_functors`. **CN:** 继续说明 function `swizzling_functors` 的文档字符串。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `        :return: list of swizzling functions that can be used` — **EN:** Continues the docstring for the function `swizzling_functors`. **CN:** 继续说明 function `swizzling_functors` 的文档字符串。
+- **L120** `        :rtype: list` — **EN:** Continues the docstring for the function `swizzling_functors`. **CN:** 继续说明 function `swizzling_functors` 的文档字符串。
+- **L121** `        """` — **EN:** Ends the docstring for the function `swizzling_functors`. **CN:** 结束说明 function `swizzling_functors` 的文档字符串。
+- **L122** `        return get_swizzling_functors()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `    def _reset_options(self, cc: int):` — **EN:** Defines function `_reset_options`. **CN:** 定义函数 `_reset_options`。
+- **L125** `        """` — **EN:** Starts the docstring for the function `_reset_options`. **CN:** 开始说明 function `_reset_options` 的文档字符串。
+- **L126** `        Resets the kernel options based on cc` — **EN:** Continues the docstring for the function `_reset_options`. **CN:** 继续说明 function `_reset_options` 的文档字符串。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `        :param cc: compute capability to reset to` — **EN:** Continues the docstring for the function `_reset_options`. **CN:** 继续说明 function `_reset_options` 的文档字符串。
+- **L129** `        :type cc: int` — **EN:** Continues the docstring for the function `_reset_options`. **CN:** 继续说明 function `_reset_options` 的文档字符串。
+- **L130** `        """` — **EN:** Ends the docstring for the function `_reset_options`. **CN:** 结束说明 function `_reset_options` 的文档字符串。
+- **L131** `        if cc != self.current_cc:` — **EN:** Starts a conditional branch guarded by `cc != self.current_cc`. **CN:** 开始一个由 `cc != self.current_cc` 控制的条件分支。
+- **L132** `            if cc not in _generator_ccs:` — **EN:** Starts a conditional branch guarded by `cc not in _generator_ccs`. **CN:** 开始一个由 `cc not in _generator_ccs` 控制的条件分支。
+- **L133** `                raise Exception(f'Invalid CC for CUTLASS kernels: {cc}.')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L134** `            self.current_cc = cc` — **EN:** Assigns a value to self.current_cc. **CN:** 将一个值赋给 self.current_cc。
+- **L135** `            self.options = get_option_registry().options_for_cc(self.current_cc, self.operation_kind)` — **EN:** Assigns a value to self.options. **CN:** 将一个值赋给 self.options。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `    def _verify_scalar(self, scalar, ref_scalar, ref_dtype, name):` — **EN:** Defines function `_verify_scalar`. **CN:** 定义函数 `_verify_scalar`。
+- **L138** `        """` — **EN:** Starts the docstring for the function `_verify_scalar`. **CN:** 开始说明 function `_verify_scalar` 的文档字符串。
+- **L139** `        Verifies the following properties:` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L140** `            1) Either \`\`scalar\`\` or \`\`ref_scakar\`\` must be set (i.e., not \`\`None\`\`)` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L141** `            2) If \`\`scalar\`\` is not \`\`None\`\`, its datatype must match matches the current version` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L142** `               set by the plan (i.e., those in \`\`ref_dtype\`\`)` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `        If either of these properties does not hold, an exception is raised. If these properties hold and` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L145** `        \`\`scalar\`\` is not \`\`None\`\`, \`\`scalar\`\` is returned. Otherwise, \`\`ref_scalar\`\` is returned.` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `        :param scalar: object representing a tensor passed in to verify, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L148** `        :type scalar: numpy/cupy/torch scalar` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L149** `        :param ref_scalar: object representing a tensor passed in on construction of this object, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L150** `        :type ref_scalar: numpy/cupy/torch scalar` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L151** `        :param ref_dtype: data type for the scalar that this object was initialized to` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L152** `        :param name: identifier of the scalar to verify. Used in raising exceptions` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L153** `        :type name: str` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        :return: valid scalar to use` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L156** `        :rtype: numpy/cupy/torch scalar` — **EN:** Continues the docstring for the function `_verify_scalar`. **CN:** 继续说明 function `_verify_scalar` 的文档字符串。
+- **L157** `        """` — **EN:** Ends the docstring for the function `_verify_scalar`. **CN:** 结束说明 function `_verify_scalar` 的文档字符串。
+- **L158** `        if scalar is None:` — **EN:** Starts a conditional branch guarded by `scalar is None`. **CN:** 开始一个由 `scalar is None` 控制的条件分支。
+- **L159** `            if ref_scalar is None:` — **EN:** Starts a conditional branch guarded by `ref_scalar is None`. **CN:** 开始一个由 `ref_scalar is None` 控制的条件分支。
+- **L160** `                raise Exception(f"Scalar {name} must be set.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L161** `            return ref_scalar` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L162** `        if hasattr(scalar, "dtype"):` — **EN:** Starts a conditional branch guarded by `hasattr(scalar, 'dtype')`. **CN:** 开始一个由 `hasattr(scalar, 'dtype')` 控制的条件分支。
+- **L163** `            dtype = datatypes.library_type(scalar.dtype)` — **EN:** Assigns a value to dtype. **CN:** 将一个值赋给 dtype。
+- **L164** `            if dtype != ref_dtype:` — **EN:** Starts a conditional branch guarded by `dtype != ref_dtype`. **CN:** 开始一个由 `dtype != ref_dtype` 控制的条件分支。
+- **L165** `                raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L166** `                    f"Tensor {name} with type {dtype} does not match expected type {ref_dtype}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `        return scalar` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `    def _verify_tensor(self, tensor, ref_tensor, ref_dtype, ref_layout, name):` — **EN:** Defines function `_verify_tensor`. **CN:** 定义函数 `_verify_tensor`。
+- **L171** `        """` — **EN:** Starts the docstring for the function `_verify_tensor`. **CN:** 开始说明 function `_verify_tensor` 的文档字符串。
+- **L172** `        Verifies the following properties:` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L173** `            If ref_dtype is not void:` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L174** `                1) Either \`\`tensor\`\` or \`\`ref_tensor\`\` must be set (i.e., not \`\`None\`\`)` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L175** `                2) If \`\`tensor\`\` is not \`\`None\`\`, its datatype and layout must match matches the current versions` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L176** `                set by the plan (i.e., those in \`\`ref_dtype\`\` and \`\`ref_layout\`\`)` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L177** `            If ref_dtype is void:` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L178** `                Neither \`\`tensor\`\` nor \`\`ref_tensor\`\` are set` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `        If either of these properties does not hold, an exception is raised. If these properties hold and` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L181** `        \`\`tensor\`\` is not \`\`None\`\`, \`\`tensor\`\` is returned. Otherwise, \`\`ref_tensor\`\` is returned.` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `        :param tensor: object representing a tensor passed in to verify, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L184** `        :type tensor: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L185** `        :param ref_tensor: object representing a tensor passed in on construction of this object, or \`\`None\`\` if no tensor was passed in` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L186** `        :type ref_tensor: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L187** `        :param ref_dtype: data type for the tensor that this object was initialized to` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L188** `        :param ref_layout: layout for the tensor that this object was initialized to` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L189** `        :param name: identifier of the tensor to verify. Used in raising exceptions` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L190** `        :type name: str` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `        :return: valid tensor object to use` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L193** `        :rtype: numpy/cupy/torch array/tensor object` — **EN:** Continues the docstring for the function `_verify_tensor`. **CN:** 继续说明 function `_verify_tensor` 的文档字符串。
+- **L194** `        """` — **EN:** Ends the docstring for the function `_verify_tensor`. **CN:** 结束说明 function `_verify_tensor` 的文档字符串。
+- **L195** `        if ref_dtype == DataType.void:` — **EN:** Starts a conditional branch guarded by `ref_dtype == DataType.void`. **CN:** 开始一个由 `ref_dtype == DataType.void` 控制的条件分支。
+- **L196** `            if tensor is not None or ref_tensor is not None:` — **EN:** Starts a conditional branch guarded by `tensor is not None or ref_tensor is not None`. **CN:** 开始一个由 `tensor is not None or ref_tensor is not None` 控制的条件分支。
+- **L197** `                raise Exception("Operands with element DataType.void must not be provided a tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L198** `            return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `        if tensor is None:` — **EN:** Starts a conditional branch guarded by `tensor is None`. **CN:** 开始一个由 `tensor is None` 控制的条件分支。
+- **L201** `            if ref_tensor is None:` — **EN:** Starts a conditional branch guarded by `ref_tensor is None`. **CN:** 开始一个由 `ref_tensor is None` 控制的条件分支。
+- **L202** `                raise Exception(f"Tensor {name} must be set.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L203** `            return ref_tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `        self._verify_type_and_layout(tensor, ref_dtype, ref_layout, name)` — **EN:** Invokes `self._verify_type_and_layout` as a standalone call. **CN:** 以独立语句方式调用 `self._verify_type_and_layout`。
+- **L206** `        return tensor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L209** `    def opclass(self) -> cutlass_cppgen.OpcodeClass:` — **EN:** Defines function `opclass`. **CN:** 定义函数 `opclass`。
+- **L210** `        """` — **EN:** Starts the docstring for the function `opclass`. **CN:** 开始说明 function `opclass` 的文档字符串。
+- **L211** `        Returns the opcode class currently in use` — **EN:** Continues the docstring for the function `opclass`. **CN:** 继续说明 function `opclass` 的文档字符串。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `        :return: opcode class currently in use` — **EN:** Continues the docstring for the function `opclass`. **CN:** 继续说明 function `opclass` 的文档字符串。
+- **L214** `        :rtype: cutlass_cppgen.OpcodeClass` — **EN:** Continues the docstring for the function `opclass`. **CN:** 继续说明 function `opclass` 的文档字符串。
+- **L215** `        """` — **EN:** Ends the docstring for the function `opclass`. **CN:** 结束说明 function `opclass` 的文档字符串。
+- **L216** `        return self.op_class` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `    @opclass.setter` — **EN:** Applies decorator `opclass.setter` to the following definition. **CN:** 将装饰器 `opclass.setter` 应用于后面的定义。
+- **L219** `    def opclass(self, oc: cutlass_cppgen.OpcodeClass):` — **EN:** Defines function `opclass`. **CN:** 定义函数 `opclass`。
+- **L220** `        if isinstance(oc, str):` — **EN:** Starts a conditional branch guarded by `isinstance(oc, str)`. **CN:** 开始一个由 `isinstance(oc, str)` 控制的条件分支。
+- **L221** `            oc = datatypes.getattr_enum(cutlass_cppgen.OpcodeClass, oc)` — **EN:** Assigns a value to oc. **CN:** 将一个值赋给 oc。
+- **L222** `        if oc in self.possible_op_classes:` — **EN:** Starts a conditional branch guarded by `oc in self.possible_op_classes`. **CN:** 开始一个由 `oc in self.possible_op_classes` 控制的条件分支。
+- **L223** `            self.op_class = oc` — **EN:** Assigns a value to self.op_class. **CN:** 将一个值赋给 self.op_class。
+- **L224** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L225** `            raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L226** `                f'Unsupported operation class {oc} for CC {self.cc} and data type combination '` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `                f'({self._element_a}, {self._element_b}, {self._element_accumulator}) and '` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `                f'layout combination ({self._layout_a}, {self._layout_b}).')` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `        # Changing the op class also changes the possible operations available. Reset these.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L231** `        self.possible_operations = self.options.operations(` — **EN:** Assigns a value to self.possible_operations. **CN:** 将一个值赋给 self.possible_operations。
+- **L232** `            self.op_class, self._element_a, self._element_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `            self._element_accumulator, self._layout_a, self._layout_b, self._math_operation)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `        # Changing the op class changes the elements per access in the epilogue. Reset this.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L236** `        if self.epilogue_functor is not None:` — **EN:** Starts a conditional branch guarded by `self.epilogue_functor is not None`. **CN:** 开始一个由 `self.epilogue_functor is not None` 控制的条件分支。
+- **L237** `            self.epilogue_functor = self._reset_epilogue_functor_alignment(self._elements_per_access(), self.epilogue_functor)` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L240** `    def math_operation(self) -> cutlass_cppgen.MathOperation:` — **EN:** Defines function `math_operation`. **CN:** 定义函数 `math_operation`。
+- **L241** `        """` — **EN:** Starts the docstring for the function `math_operation`. **CN:** 开始说明 function `math_operation` 的文档字符串。
+- **L242** `        Returns the math operation currently in use` — **EN:** Continues the docstring for the function `math_operation`. **CN:** 继续说明 function `math_operation` 的文档字符串。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `        :return: math operation currently in use` — **EN:** Continues the docstring for the function `math_operation`. **CN:** 继续说明 function `math_operation` 的文档字符串。
+- **L245** `        :rtype: cutlass_cppgen.MathOperation` — **EN:** Continues the docstring for the function `math_operation`. **CN:** 继续说明 function `math_operation` 的文档字符串。
+- **L246** `        """` — **EN:** Ends the docstring for the function `math_operation`. **CN:** 结束说明 function `math_operation` 的文档字符串。
+- **L247** `        return self._math_operation` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    @math_operation.setter` — **EN:** Applies decorator `math_operation.setter` to the following definition. **CN:** 将装饰器 `math_operation.setter` 应用于后面的定义。
+- **L250** `    def math_operation(self, mo: cutlass_cppgen.MathOperation):` — **EN:** Defines function `math_operation`. **CN:** 定义函数 `math_operation`。
+- **L251** `        if isinstance(mo, str):` — **EN:** Starts a conditional branch guarded by `isinstance(mo, str)`. **CN:** 开始一个由 `isinstance(mo, str)` 控制的条件分支。
+- **L252** `            mo = datatypes.getattr_enum(cutlass_cppgen.MathOperation, mo)` — **EN:** Assigns a value to mo. **CN:** 将一个值赋给 mo。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `        if not self.specified_kernel_cc:` — **EN:** Starts a conditional branch guarded by `not self.specified_kernel_cc`. **CN:** 开始一个由 `not self.specified_kernel_cc` 控制的条件分支。
+- **L255** `            if self.current_cc in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `self.current_cc in [90, 100, 101, 103]`. **CN:** 开始一个由 `self.current_cc in [90, 100, 101, 103]` 控制的条件分支。
+- **L256** `                # CUTLASS 3.0 kernels do not use different math operations. If one is specified, we` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L257** `                # revert to using a CUTLASS 2.x kernel by using SM80-tagged kernels.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L258** `                cutlass_cppgen.logger.warning("Reverting to using SM80-tagged kernel. Opclass may change.")` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L259** `                self._reset_options(80)` — **EN:** Invokes `self._reset_options` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_options`。
+- **L260** `                self._reset_operations(reset_epilogue=False)` — **EN:** Invokes `self._reset_operations` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_operations`。
+- **L261** `        elif self.current_cc in [90, 100, 101, 103]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L262** `            raise Exception("CUTLASS 3.0 kernels do not use different math operations. "` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L263** `                "To use 2.x kernels with a specific math operation, do not set the \`kernel_cc\`"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `                "parameter when constructing the plan.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `        self._math_operation = mo` — **EN:** Assigns a value to self._math_operation. **CN:** 将一个值赋给 self._math_operation。
+- **L267** `        self._reset_operations()` — **EN:** Invokes `self._reset_operations` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_operations`。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** `    def _elements_per_access(self):` — **EN:** Defines function `_elements_per_access`. **CN:** 定义函数 `_elements_per_access`。
+- **L270** `        if self.op_class == cutlass_cppgen.OpcodeClass.Simt:` — **EN:** Starts a conditional branch guarded by `self.op_class == cutlass_cppgen.OpcodeClass.Simt`. **CN:** 开始一个由 `self.op_class == cutlass_cppgen.OpcodeClass.Simt` 控制的条件分支。
+- **L271** `            return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L272** `        elif self._element_c != DataType.void:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L273** `            return 128 // DataTypeSize[self._element_c]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L274** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L275** `            return 128 // max(self.possible_operations.alignments("C"))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L277** `    def _create_epilogue_functor_activation(self, activation):` — **EN:** Defines function `_create_epilogue_functor_activation`. **CN:** 定义函数 `_create_epilogue_functor_activation`。
+- **L278** `        """` — **EN:** Starts the docstring for the function `_create_epilogue_functor_activation`. **CN:** 开始说明 function `_create_epilogue_functor_activation` 的文档字符串。
+- **L279** `        Returns the epilogue functor with given activation function` — **EN:** Continues the docstring for the function `_create_epilogue_functor_activation`. **CN:** 继续说明 function `_create_epilogue_functor_activation` 的文档字符串。
+- **L280** `        """` — **EN:** Ends the docstring for the function `_create_epilogue_functor_activation`. **CN:** 结束说明 function `_create_epilogue_functor_activation` 的文档字符串。
+- **L281** `        if self.epilogue_functor is None:` — **EN:** Starts a conditional branch guarded by `self.epilogue_functor is None`. **CN:** 开始一个由 `self.epilogue_functor is None` 控制的条件分支。
+- **L282** `            elements_per_access = self._elements_per_access()` — **EN:** Assigns a value to elements_per_access. **CN:** 将一个值赋给 elements_per_access。
+- **L283** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L284** `            elements_per_access = self.epilogue_functor.epilogue_vector_length` — **EN:** Assigns a value to elements_per_access. **CN:** 将一个值赋给 elements_per_access。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `        if not self.specified_kernel_cc:` — **EN:** Starts a conditional branch guarded by `not self.specified_kernel_cc`. **CN:** 开始一个由 `not self.specified_kernel_cc` 控制的条件分支。
+- **L287** `            if self.current_cc in [90, 100, 101, 103] and activation != identity:` — **EN:** Starts a conditional branch guarded by `self.current_cc in [90, 100, 101, 103] and activation != ...`. **CN:** 开始一个由 `self.current_cc in [90, 100, 101, 103] and activation != ...` 控制的条件分支。
+- **L288** `                # CUTLASS 3.0 kernels in Python currently only support identity activation. If one requests a non-identity activation,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L289** `                # revert to using a CUTLASS 2.x kernel by using SM80-tagged kernels.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L290** `                cutlass_cppgen.logger.warning("Reverting to using SM80-tagged kernel. Opclass may change.")` — **EN:** Invokes `cutlass_cppgen.logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.logger.warning`。
+- **L291** `                if self._element_c != self._element_d:` — **EN:** Starts a conditional branch guarded by `self._element_c != self._element_d`. **CN:** 开始一个由 `self._element_c != self._element_d` 控制的条件分支。
+- **L292** `                    raise Exception("CUTLASS 2.x kernels require element C to be the same as element D")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L293** `                self._reset_options(80)` — **EN:** Invokes `self._reset_options` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_options`。
+- **L294** `                self._reset_operations(reset_epilogue=False)` — **EN:** Invokes `self._reset_operations` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_operations`。
+- **L295** `            elif (self.cc in [90, 100, 101, 103] and self.current_cc not in [90, 100, 101, 103] and activation == identity and self._math_operation is None):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L296** `                # SM80 fallback kernels are currently used. Since an identity activation is requested,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L297** `                # we can switch back to using SM90 kernels.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L298** `                self._reset_options(self.cc)` — **EN:** Invokes `self._reset_options` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_options`。
+- **L299** `                self._reset_operations(reset_epilogue=False)` — **EN:** Invokes `self._reset_operations` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_operations`。
+- **L300** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L301** `            if self.current_cc in [90, 100, 101, 103] and activation != identity:` — **EN:** Starts a conditional branch guarded by `self.current_cc in [90, 100, 101, 103] and activation != ...`. **CN:** 开始一个由 `self.current_cc in [90, 100, 101, 103] and activation != ...` 控制的条件分支。
+- **L302** `                raise Exception("Epilogues with elementwise fusion are not currently supported "` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L303** `                                "in the Python interface for 3.x kernels. To use 2.x kernels "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `                                "with fused elementwise epilogues, do not set the \`kernel_cc\` "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `                                "parameter when constructing the plan.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `        return get_activation_epilogue(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L308** `            activation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `            self._element_d,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `            elements_per_access,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** `            self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L312** `            self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `    def _reset_epilogue_functor_activation(self, activation):` — **EN:** Defines function `_reset_epilogue_functor_activation`. **CN:** 定义函数 `_reset_epilogue_functor_activation`。
+- **L316** `        """` — **EN:** Starts the docstring for the function `_reset_epilogue_functor_activation`. **CN:** 开始说明 function `_reset_epilogue_functor_activation` 的文档字符串。
+- **L317** `        Set the epilogue functor based on the provided activation function` — **EN:** Continues the docstring for the function `_reset_epilogue_functor_activation`. **CN:** 继续说明 function `_reset_epilogue_functor_activation` 的文档字符串。
+- **L318** `        """` — **EN:** Ends the docstring for the function `_reset_epilogue_functor_activation`. **CN:** 结束说明 function `_reset_epilogue_functor_activation` 的文档字符串。
+- **L319** `        self.epilogue_functor = self._create_epilogue_functor_activation(activation)` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L320** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L321** `    def _reset_epilogue_functor_alignment(self, alignment, epilogue_functor):` — **EN:** Defines function `_reset_epilogue_functor_alignment`. **CN:** 定义函数 `_reset_epilogue_functor_alignment`。
+- **L322** `        """` — **EN:** Starts the docstring for the function `_reset_epilogue_functor_alignment`. **CN:** 开始说明 function `_reset_epilogue_functor_alignment` 的文档字符串。
+- **L323** `        Reset the alignment of the current epilogue functor based on alignment C` — **EN:** Continues the docstring for the function `_reset_epilogue_functor_alignment`. **CN:** 继续说明 function `_reset_epilogue_functor_alignment` 的文档字符串。
+- **L324** `        """` — **EN:** Ends the docstring for the function `_reset_epilogue_functor_alignment`. **CN:** 结束说明 function `_reset_epilogue_functor_alignment` 的文档字符串。
+- **L325** `        if isinstance(epilogue_functor, EpilogueFunctorVisitor):` — **EN:** Starts a conditional branch guarded by `isinstance(epilogue_functor, EpilogueFunctorVisitor)`. **CN:** 开始一个由 `isinstance(epilogue_functor, EpilogueFunctorVisitor)` 控制的条件分支。
+- **L326** `            return epilogue_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L327** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L328** `        if epilogue_functor is None or not hasattr(epilogue_functor, 'activation_functor'):` — **EN:** Starts a conditional branch guarded by `epilogue_functor is None or not hasattr(epilogue_functor,...`. **CN:** 开始一个由 `epilogue_functor is None or not hasattr(epilogue_functor,...` 控制的条件分支。
+- **L329** `            # Identity epilogue does not have 'activation_functor'` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L330** `            activation = identity` — **EN:** Assigns a value to activation. **CN:** 将一个值赋给 activation。
+- **L331** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L332** `            activation = epilogue_functor.activation_functor` — **EN:** Assigns a value to activation. **CN:** 将一个值赋给 activation。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** `        epilogue_functor = get_activation_epilogue(` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L335** `            activation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `            self._element_d,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** `            alignment,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `            self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `            self._element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `        return epilogue_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L344** `    def activation(self):` — **EN:** Defines function `activation`. **CN:** 定义函数 `activation`。
+- **L345** `        """` — **EN:** Starts the docstring for the function `activation`. **CN:** 开始说明 function `activation` 的文档字符串。
+- **L346** `        Returns the type of the current activation function used` — **EN:** Continues the docstring for the function `activation`. **CN:** 继续说明 function `activation` 的文档字符串。
+- **L347** `        """` — **EN:** Ends the docstring for the function `activation`. **CN:** 结束说明 function `activation` 的文档字符串。
+- **L348** `        if hasattr(self.epilogue_functor, "activation_functor"):` — **EN:** Starts a conditional branch guarded by `hasattr(self.epilogue_functor, 'activation_functor')`. **CN:** 开始一个由 `hasattr(self.epilogue_functor, 'activation_functor')` 控制的条件分支。
+- **L349** `            return self.epilogue_functor.activation_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L350** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L351** `            return identity` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** `    @activation.setter` — **EN:** Applies decorator `activation.setter` to the following definition. **CN:** 将装饰器 `activation.setter` 应用于后面的定义。
+- **L354** `    def activation(self, act):` — **EN:** Defines function `activation`. **CN:** 定义函数 `activation`。
+- **L355** `        """` — **EN:** Starts the docstring for the function `activation`. **CN:** 开始说明 function `activation` 的文档字符串。
+- **L356** `        Sets the type of the activation function to use` — **EN:** Continues the docstring for the function `activation`. **CN:** 继续说明 function `activation` 的文档字符串。
+- **L357** `        Activation can come with a set of arguments` — **EN:** Continues the docstring for the function `activation`. **CN:** 继续说明 function `activation` 的文档字符串。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `        :param act: type of activation function to use` — **EN:** Continues the docstring for the function `activation`. **CN:** 继续说明 function `activation` 的文档字符串。
+- **L360** `        :type act: str or tuple. e.g. "relu", ("leaky_relu", 0.01)` — **EN:** Continues the docstring for the function `activation`. **CN:** 继续说明 function `activation` 的文档字符串。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** `        """` — **EN:** Ends the docstring for the function `activation`. **CN:** 结束说明 function `activation` 的文档字符串。
+- **L363** `        if isinstance(act, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(act, tuple)`. **CN:** 开始一个由 `isinstance(act, tuple)` 控制的条件分支。
+- **L364** `            if isinstance(act[0], str):` — **EN:** Starts a conditional branch guarded by `isinstance(act[0], str)`. **CN:** 开始一个由 `isinstance(act[0], str)` 控制的条件分支。
+- **L365** `                act_fn = getattr(cutlass_cppgen.backend.epilogue, act[0])` — **EN:** Assigns a value to act_fn. **CN:** 将一个值赋给 act_fn。
+- **L366** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L367** `                act_fn = act[0]` — **EN:** Assigns a value to act_fn. **CN:** 将一个值赋给 act_fn。
+- **L368** `            self._reset_epilogue_functor_activation(act_fn)` — **EN:** Invokes `self._reset_epilogue_functor_activation` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_epilogue_functor_activation`。
+- **L369** `            self._activation_args = act[1]` — **EN:** Assigns a value to self._activation_args. **CN:** 将一个值赋给 self._activation_args。
+- **L370** `            self._activation = act[0]` — **EN:** Assigns a value to self._activation. **CN:** 将一个值赋给 self._activation。
+- **L371** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L372** `            if isinstance(act, str):` — **EN:** Starts a conditional branch guarded by `isinstance(act, str)`. **CN:** 开始一个由 `isinstance(act, str)` 控制的条件分支。
+- **L373** `                act = getattr(cutlass_cppgen.backend.epilogue, act)` — **EN:** Assigns a value to act. **CN:** 将一个值赋给 act。
+- **L374** `            self._reset_epilogue_functor_activation(act)` — **EN:** Invokes `self._reset_epilogue_functor_activation` as a standalone call. **CN:** 以独立语句方式调用 `self._reset_epilogue_functor_activation`。
+- **L375** `            self._activation = act` — **EN:** Assigns a value to self._activation. **CN:** 将一个值赋给 self._activation。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L378** `    def epilogue_visitor(self):` — **EN:** Defines function `epilogue_visitor`. **CN:** 定义函数 `epilogue_visitor`。
+- **L379** `        """` — **EN:** Starts the docstring for the function `epilogue_visitor`. **CN:** 开始说明 function `epilogue_visitor` 的文档字符串。
+- **L380** `        Return the epilogue functor` — **EN:** Continues the docstring for the function `epilogue_visitor`. **CN:** 继续说明 function `epilogue_visitor` 的文档字符串。
+- **L381** `        """` — **EN:** Ends the docstring for the function `epilogue_visitor`. **CN:** 结束说明 function `epilogue_visitor` 的文档字符串。
+- **L382** `        return self.epilogue_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** `    @epilogue_visitor.setter` — **EN:** Applies decorator `epilogue_visitor.setter` to the following definition. **CN:** 将装饰器 `epilogue_visitor.setter` 应用于后面的定义。
+- **L385** `    def epilogue_visitor(self, visitor):` — **EN:** Defines function `epilogue_visitor`. **CN:** 定义函数 `epilogue_visitor`。
+- **L386** `        """` — **EN:** Starts the docstring for the function `epilogue_visitor`. **CN:** 开始说明 function `epilogue_visitor` 的文档字符串。
+- **L387** `        Create the epilogue visitor` — **EN:** Continues the docstring for the function `epilogue_visitor`. **CN:** 继续说明 function `epilogue_visitor` 的文档字符串。
+- **L388** `        """` — **EN:** Ends the docstring for the function `epilogue_visitor`. **CN:** 结束说明 function `epilogue_visitor` 的文档字符串。
+- **L389** `        self.epilogue_functor = EpilogueFunctorVisitor(cc_map[self.cc], visitor)` — **EN:** Assigns a value to self.epilogue_functor. **CN:** 将一个值赋给 self.epilogue_functor。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `        # The epilogue_functor may consume too much shared memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L392** `        # Reset the possible operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L393** `        if self.cc not in [90, 100, 101, 103]:` — **EN:** Starts a conditional branch guarded by `self.cc not in [90, 100, 101, 103]`. **CN:** 开始一个由 `self.cc not in [90, 100, 101, 103]` 控制的条件分支。
+- **L394** `            # The shared memory is only a concern for sm90+ epilogue` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L395** `            # In sm80, the epilogue and mainloop share the shared memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L396** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `        datatype_comb = self.possible_operations.datatype_comb` — **EN:** Assigns a value to datatype_comb. **CN:** 将一个值赋给 datatype_comb。
+- **L399** `        layout_comb = self.possible_operations.layout_comb` — **EN:** Assigns a value to layout_comb. **CN:** 将一个值赋给 layout_comb。
+- **L400** `        new_possible_operations = KernelsForDataType(datatype_comb, layout_comb)` — **EN:** Assigns a value to new_possible_operations. **CN:** 将一个值赋给 new_possible_operations。
+- **L401** `        for operation in self.possible_operations.all_operations:` — **EN:** Starts a loop assigning items from `self.possible_operations.all_operations` to `operation`. **CN:** 开始一个循环，将 `self.possible_operations.all_operations` 的元素赋给 `operation`。
+- **L402** `            td = datatypes.td_from_profiler_op(operation)` — **EN:** Assigns a value to td. **CN:** 将一个值赋给 td。
+- **L403** `            # Filter invalid epilogue schedules` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L404** `            if cc_map[self.cc] == 90 and td.epilogue_schedule not in [` — **EN:** Starts a conditional branch guarded by `cc_map[self.cc] == 90 and td.epilogue_schedule not in [cu...`. **CN:** 开始一个由 `cc_map[self.cc] == 90 and td.epilogue_schedule not in [cu...` 控制的条件分支。
+- **L405** `                cutlass_cppgen.EpilogueScheduleType.TmaWarpSpecialized,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L406** `                cutlass_cppgen.EpilogueScheduleType.TmaWarpSpecializedCooperative]:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L407** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L408** `            epilogue_smem_bytes = self.epilogue_functor.get_smem_size(td)` — **EN:** Assigns a value to epilogue_smem_bytes. **CN:** 将一个值赋给 epilogue_smem_bytes。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** `            # Verify the maximum number of mainloop stages` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L411** `            mainloop_smem_per_stage = check.calculate_smem_usage_per_stage(td, OperationKind.Gemm)` — **EN:** Assigns a value to mainloop_smem_per_stage. **CN:** 将一个值赋给 mainloop_smem_per_stage。
+- **L412** `            smem_capacity_bytes = SharedMemPerCC[self.cc] << 10` — **EN:** Assigns a value to smem_capacity_bytes. **CN:** 将一个值赋给 smem_capacity_bytes。
+- **L413** `            mainloop_stages = (smem_capacity_bytes - epilogue_smem_bytes) // mainloop_smem_per_stage` — **EN:** Assigns a value to mainloop_stages. **CN:** 将一个值赋给 mainloop_stages。
+- **L414** `            if mainloop_stages < 2:` — **EN:** Starts a conditional branch guarded by `mainloop_stages < 2`. **CN:** 开始一个由 `mainloop_stages < 2` 控制的条件分支。
+- **L415** `                # Mainloop stages must >= 2` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L416** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L417** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L418** `            new_possible_operations.add(operation)` — **EN:** Invokes `new_possible_operations.add` as a standalone call. **CN:** 以独立语句方式调用 `new_possible_operations.add`。
+- **L419** `        if len(new_possible_operations.all_operations) == 0:` — **EN:** Starts a conditional branch guarded by `len(new_possible_operations.all_operations) == 0`. **CN:** 开始一个由 `len(new_possible_operations.all_operations) == 0` 控制的条件分支。
+- **L420** `            raise RuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L421** `                "The epilogue consumes too much shared memory. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L422** `                "No valid tile description is found in the generator.")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L423** `        self.possible_operations = new_possible_operations` — **EN:** Assigns a value to self.possible_operations. **CN:** 将一个值赋给 self.possible_operations。
+- **L424** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L426** `    def run_setup(self):` — **EN:** Defines function `run_setup`. **CN:** 定义函数 `run_setup`。
+- **L427** `        """` — **EN:** Starts the docstring for the function `run_setup`. **CN:** 开始说明 function `run_setup` 的文档字符串。
+- **L428** `        Steps that must be taken before caling \`plan.run()\`` — **EN:** Continues the docstring for the function `run_setup`. **CN:** 继续说明 function `run_setup` 的文档字符串。
+- **L429** `        """` — **EN:** Ends the docstring for the function `run_setup`. **CN:** 结束说明 function `run_setup` 的文档字符串。
+- **L430** `        # Initialize the memory pool if, if not already done` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L431** `        cutlass_cppgen.get_memory_pool()` — **EN:** Invokes `cutlass_cppgen.get_memory_pool` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.get_memory_pool`。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.op.op`. CN: 模块名为 `cutlass_cppgen.op.op`。
+- EN: Module docstring summary: Base operation used for defining high-level CUTLASS operations (e.g., GEMM, Conv2d) CN: 模块文档摘要为：Base operation used for defining high-level CUTLASS operations (e.g., GEMM, Conv2d)
+- EN: Top-level classes: OperationBase CN: 顶层类包括：OperationBase
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataType,DataTypeSize,MathOperation,OperationKind,SharedMemPerCC, cutlass_cppgen, cutlass_cppgen:get_option_registry, cutlass_cppgen.backend.evt:EpilogueFunctorVisitor, cutlass_cppgen.backend.evt.passes.util:cc_map, cutlass_cppgen.backend.utils.device:device_cc, cutlass_cppgen.epilogue:get_activations,get_activation_epilogue,identity, cutlass_cppgen.library_defaults:KernelsForDataType,_generator_ccs, cutlass_cppgen.swizzle:get_swizzling_functors, cutlass_cppgen.utils:datatypes,check CN: 内部依赖：cutlass_library:DataType,DataTypeSize,MathOperation,OperationKind,SharedMemPerCC, cutlass_cppgen, cutlass_cppgen:get_option_registry, cutlass_cppgen.backend.evt:EpilogueFunctorVisitor, cutlass_cppgen.backend.evt.passes.util:cc_map, cutlass_cppgen.backend.utils.device:device_cc, cutlass_cppgen.epilogue:get_activations,get_activation_epilogue,identity, cutlass_cppgen.library_defaults:KernelsForDataType,_generator_ccs, cutlass_cppgen.swizzle:get_swizzling_functors, cutlass_cppgen.utils:datatypes,check
+- EN: External or standard-library dependencies: bisect:bisect_left CN: 外部或标准库依赖：bisect:bisect_left

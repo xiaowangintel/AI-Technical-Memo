@@ -1,0 +1,1644 @@
+# depthwise_conv2d_fprop_direct_conv_fixed_stride_dilation_f16nhwc_f16nhwc_f16nhwc_simt_f16_sm60.cu — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device/depthwise_conv2d_fprop_direct_conv_fixed_stride_dilation_f16nhwc_f16nhwc_f16nhwc_simt_f16_sm60.cu`
+**Purpose / 用途**: Tests for device-wide Depthwise Direct Conv interface. The file instantiates and runs tests for 2D, forward-propagation, SM60, depthwise coverage, with concrete type aliases and builders declared in the source. / 该文件为对应卷积内核提供测试覆盖。 这里针对 2 维、前向传播、SM60、深度可分离场景覆盖 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief Tests for device-wide Depthwise Direct Conv interface`
+  - **EN**: Records the file-level brief description: Tests for device-wide Depthwise Direct Conv interface.
+  - **CN**: 记录文件级简述：Tests for device-wide Depthwise Direct Conv interface。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L35** `#include "../../common/cutlass_unit_test.h"`
+  - **EN**: Shared CUTLASS unit-test harness used by older convolution tests.
+  - **CN**: 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- **L36** `#include "cutlass/cutlass.h"`
+  - **EN**: Core CUTLASS definitions, architecture tags, and status types.
+  - **CN**: CUTLASS 核心定义、架构标签和状态类型。
+- **L37** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L38** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L39** `#include "cutlass/conv/kernel/default_depthwise_fprop.h"`
+  - **EN**: Kernel-level convolution building blocks.
+  - **CN**: 内核级卷积构建模块。
+- **L40** `#include "cutlass/conv/device/direct_convolution.h"`
+  - **EN**: Device-level convolution wrapper built on implicit GEMM.
+  - **CN**: 基于隐式 GEMM 的设备级卷积封装。
+- **L41** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L42** `#include "conv2d_testbed.h"`
+  - **EN**: Conv2d testbed helpers that generate problem sizes and verify results.
+  - **CN**: 用于生成问题规模并校验结果的 Conv2d 测试平台辅助工具。
+- **L43** `#include "depthwise_conv2d_direct_conv_testbed.h"`
+  - **EN**: Provides `depthwise_conv2d_direct_conv_testbed.h` so this file can use the related API or helper utilities.
+  - **CN**: 提供 `depthwise_conv2d_direct_conv_testbed.h`，使本文件能够使用相关 API 或辅助工具。
+- **L44** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L45** `std::vector<cutlass::conv::Conv2dProblemSize> DepthwiseFpropProblemSizes_filter3x3_stride1x1_dilation1x1() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L46** `  std::vector<cutlass::conv::Conv2dProblemSize> problems;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L47** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L48** `  for (int channels = 16; channels <= 512; channels += 16) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L49** `    problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L50** `        {1, 8, 8, channels},                     // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `        {channels, 3, 3, 1},                     // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L52** `        {1, 1, 1, 1},                            // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L53** `        {1, 1},                                  // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L54** `        {1, 1},                                  // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L55** `        cutlass::conv::Mode::kCrossCorrelation,  // Convolution mode`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L56** `        16,                                      // split_k_slices`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L57** `        channels                                 // groups`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L58** `        ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L59** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L60** `    return problems;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L61** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L62** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L63** `std::vector<cutlass::conv::Conv2dProblemSize> DepthwiseFpropProblemSizes_filter3x3_stride2x2_dilation2x2() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L64** `    std::vector<cutlass::conv::Conv2dProblemSize> problems;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L65** `    for (int channels = 16; channels <= 512; channels += 16) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L66** `        problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L67** `            {1, 16, 16, channels},                   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L68** `            {channels, 3, 3, 1},                     // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L69** `            {1, 1, 1, 1},                            // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L70** `            {2, 2},                                  // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L71** `            {2, 2},                                  // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L72** `            cutlass::conv::Mode::kCrossCorrelation,  // Convolution mode`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L73** `            16,                                      // split_k_slices`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L74** `            channels                                 // groups`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L75** `            ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L77** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L78** `  return problems;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L79** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L80** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L81** `std::vector<cutlass::conv::Conv2dProblemSize> DepthwiseFpropProblemSizes_filter5x5_stride1x1_dilation1x1() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L82** `  std::vector<cutlass::conv::Conv2dProblemSize> problems;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L83** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L84** `  for (int channels = 16; channels < 256; channels += 16) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L85** `    problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L86** `        {1, 16, 16, channels},                   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L87** `        {channels, 5, 5, 1},                     // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L88** `        {1, 1, 1, 1},                            // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L89** `        {1, 1},                                  // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L90** `        {1, 1},                                  // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L91** `        cutlass::conv::Mode::kCrossCorrelation,  // Convolution mode`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L92** `        16,                                      // split_k_slices`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L93** `        channels                                 // groups`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L94** `        ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L95** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L96** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L97** `    return problems;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L98** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L99** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L100** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `std::vector<cutlass::conv::Conv2dProblemSize> DepthwiseFpropProblemSizes_filter5x5_stride2x2_dilation2x2() {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L102** `    std::vector<cutlass::conv::Conv2dProblemSize> problems;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L103** `    for (int channels = 16; channels < 256; channels += 16) {`
+  - **EN**: Begins a loop over a collection or index range.
+  - **CN**: 开始遍历集合或索引范围的循环。
+- **L104** `        problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L105** `            {1, 112, 112, channels},                 // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L106** `            {channels, 5, 5, 1},                     // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L107** `            {1, 1, 1, 1},                            // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L108** `            {2, 2},                                  // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L109** `            {2, 2},                                  // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L110** `            cutlass::conv::Mode::kCrossCorrelation,  // Convolution mode`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L111** `            16,                                      // split_k_slices`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L112** `            channels                                 // groups`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L113** `            ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L114** `    }`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L115** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L116** `  return problems;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L117** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L118** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L119** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L120** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L121** `TEST(`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L122** `    SM60_Device_Depthwise_conv2d_Fprop_Direct_Conv_FixedStrideDilation_f16nhwc_f16nhwc_f16nhwc_simt_f16,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L123** `    64x32_4_8x32_Filter3x3_Stride1x1_Dilation1x1) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L124** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L125** `  using ElementInputA = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputA` 类型别名，供后续内核与 epilogue 定义使用。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `  using ElementInputB = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L127** `  using ElementOutput = cutlass::half_t;`
+  - **EN**: Creates the `ElementOutput` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOutput` 类型别名，供后续内核与 epilogue 定义使用。
+- **L128** `  using ElementAccumulator = cutlass::half_t;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L129** `  using ElementComputeEpilogue = cutlass::half_t;`
+  - **EN**: Creates the `ElementComputeEpilogue` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementComputeEpilogue` 类型别名，供后续内核与 epilogue 定义使用。
+- **L130** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L131** `  using LayoutInputA = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputA` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputA`，供后续声明使用。
+- **L132** `  using LayoutInputB = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputB` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputB`，供后续声明使用。
+- **L133** `  using LayoutOutput = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutOutput` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutOutput`，供后续声明使用。
+- **L134** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L135** `  // This code section describes whether you want to use tensor cores or regular SIMT cores on GPU`
+  - **EN**: Comment explaining: This code section describes whether you want to use tensor cores or regular SIMT cores on GPU.
+  - **CN**: 说明性注释：This code section describes whether you want to use tensor cores or regular SIMT cores on GPU。
+- **L136** `  // SM`
+  - **EN**: Comment explaining: SM.
+  - **CN**: 说明性注释：SM。
+- **L137** `  using MMAOp = cutlass::arch::OpClassSimt;`
+  - **EN**: Creates the helper type alias `MMAOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `MMAOp`，供后续声明使用。
+- **L138** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L139** `  // This code section describes CUDA SM architecture number`
+  - **EN**: Comment explaining: This code section describes CUDA SM architecture number.
+  - **CN**: 说明性注释：This code section describes CUDA SM architecture number。
+- **L140** `  using SmArch = cutlass::arch::Sm60;`
+  - **EN**: Creates the helper type alias `SmArch` for later declarations.
+  - **CN**: 创建辅助类型别名 `SmArch`，供后续声明使用。
+- **L141** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L142** `  // This code section describes the groups a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the groups a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the groups a thread block will compute。
+- **L143** `  constexpr int groups_per_cta = 32;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L144** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L145** `  // This code section describes the output tile <N, P, Q, C> a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the output tile <N, P, Q, C> a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the output tile <N, P, Q, C> a thread block will compute。
+- **L146** `  using ThreadBlockOutputShape = cutlass::conv::TensorNHWCShape<1, 8, 8, groups_per_cta>;`
+  - **EN**: Creates the helper type alias `ThreadBlockOutputShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `ThreadBlockOutputShape`，供后续声明使用。
+- **L147** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L148** `  // This code section describes the filter shape <R, S>`
+  - **EN**: Comment explaining: This code section describes the filter shape <R, S>.
+  - **CN**: 说明性注释：This code section describes the filter shape <R, S>。
+- **L149** `  using FilterShape = cutlass::MatrixShape<3, 3>;`
+  - **EN**: Creates the helper type alias `FilterShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `FilterShape`，供后续声明使用。
+- **L150** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `  // Threadblock tile shape`
+  - **EN**: Comment explaining: Threadblock tile shape.
+  - **CN**: 说明性注释：Threadblock tile shape。
+- **L152** `  using ThreadblockShape =`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L153** `      cutlass::gemm::GemmShape<ThreadBlockOutputShape::kNHW, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Provides a GEMM tile shape argument for `ThreadblockShape`.
+  - **CN**: 为 `ThreadblockShape` 提供 GEMM 分块形状参数。
+- **L154** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L155** `  // This code section describes tile size a warp will computes`
+  - **EN**: Comment explaining: This code section describes tile size a warp will computes.
+  - **CN**: 说明性注释：This code section describes tile size a warp will computes。
+- **L156** `  using WarpShape = cutlass::gemm::GemmShape<8, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L157** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L158** `  // This code section describes the size of MMA op`
+  - **EN**: Comment explaining: This code section describes the size of MMA op.
+  - **CN**: 说明性注释：This code section describes the size of MMA op。
+- **L159** `  using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L160** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L161** `  // This code section describes how threadblocks are scheduled on GPU`
+  - **EN**: Comment explaining: This code section describes how threadblocks are scheduled on GPU.
+  - **CN**: 说明性注释：This code section describes how threadblocks are scheduled on GPU。
+- **L162** `  using SwizzleThreadBlock =`
+  - **EN**: Creates the helper type alias `SwizzleThreadBlock` for later declarations.
+  - **CN**: 创建辅助类型别名 `SwizzleThreadBlock`，供后续声明使用。
+- **L163** `      cutlass::conv::threadblock::DepthwiseDirect2dConvIdentityThreadblockSwizzle<`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L164** `          1,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L165** `          ThreadBlockOutputShape::kN,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L166** `          ThreadBlockOutputShape::kH,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L167** `          ThreadBlockOutputShape::kW>;`
+  - **EN**: Closes the multi-line alias definition for `SwizzleThreadBlock`.
+  - **CN**: 结束 `SwizzleThreadBlock` 的多行别名定义。
+- **L168** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L169** `  // Number of pipelines you want to use`
+  - **EN**: Comment explaining: Number of pipelines you want to use.
+  - **CN**: 说明性注释：Number of pipelines you want to use。
+- **L170** `  constexpr int NumStages = 4;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L171** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L172** `  // This code section describe iterator algorithm selected is Analytic or Optimized`
+  - **EN**: Comment explaining: This code section describe iterator algorithm selected is Analytic or Optimized.
+  - **CN**: 说明性注释：This code section describe iterator algorithm selected is Analytic or Optimized。
+- **L173** `  static cutlass::conv::IteratorAlgorithm const IteratorAlgorithm =`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L174** `      cutlass::conv::IteratorAlgorithm::kFixedStrideDilation;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L175** `  using StrideShape = cutlass::MatrixShape<1, 1>;`
+  - **EN**: Creates the helper type alias `StrideShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `StrideShape`，供后续声明使用。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `  using DilationShape = cutlass::MatrixShape<1, 1>;`
+  - **EN**: Creates the helper type alias `DilationShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `DilationShape`，供后续声明使用。
+- **L177** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L178** `  constexpr int kEpilogueElementsPerAccess = 128 / cutlass::sizeof_bits<ElementOutput>::value;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L179** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L180** `  // This code section describes the epilogue part of the kernel, we use default value`
+  - **EN**: Comment explaining: This code section describes the epilogue part of the kernel, we use default value.
+  - **CN**: 说明性注释：This code section describes the epilogue part of the kernel, we use default value。
+- **L181** `  using EpilogueOp = cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Creates the helper type alias `EpilogueOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `EpilogueOp`，供后续声明使用。
+- **L182** `      ElementOutput,               // Data type of output matrix.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L183** `      kEpilogueElementsPerAccess,  // The number of elements per vectorized.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L184** `                                   // memory access. This becomes the vector width of`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L185** `                                   // math instructions in the epilogue too.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L186** `      ElementAccumulator,          // Data type of accumulator`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L187** `      ElementComputeEpilogue,      // Data type for alpha/beta in linear combination`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L188** `      cutlass::epilogue::thread::ScaleType::Default>;     `
+  - **EN**: Closes the multi-line alias definition for `EpilogueOp`.
+  - **CN**: 结束 `EpilogueOp` 的多行别名定义。
+- **L189** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L190** `  using DepthwiseDirect2dConv = typename cutlass::conv::kernel::DefaultDepthwiseDirect2dConvFprop<`
+  - **EN**: Creates the helper type alias `DepthwiseDirect2dConv` for later declarations.
+  - **CN**: 创建辅助类型别名 `DepthwiseDirect2dConv`，供后续声明使用。
+- **L191** `      ElementInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L192** `      LayoutInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L193** `      ElementInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L194** `      LayoutInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L195** `      ElementOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L196** `      LayoutOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L197** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L198** `      MMAOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L199** `      SmArch,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L200** `      ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `      ThreadBlockOutputShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L202** `      FilterShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L203** `      WarpShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L204** `      InstructionShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L205** `      EpilogueOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L206** `      SwizzleThreadBlock,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L207** `      NumStages,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L208** `      cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L209** `      IteratorAlgorithm,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L210** `      cutlass::conv::StrideSupport::kFixed,`
+  - **EN**: Specifies the stride constraints expected by `DepthwiseDirect2dConv`.
+  - **CN**: 指定 `DepthwiseDirect2dConv` 期望支持的步幅约束。
+- **L211** `      StrideShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L212** `      DilationShape>::Kernel;`
+  - **EN**: Finalizes `DepthwiseDirect2dConv` as the selected kernel type.
+  - **CN**: 将 `DepthwiseDirect2dConv` 最终确定为选定的内核类型。
+- **L213** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L214** `  using Direct2dConv = cutlass::conv::device::DirectConvolution<DepthwiseDirect2dConv>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Direct2dConv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Direct2dConv`。
+- **L215** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L216** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L217** `  EXPECT_TRUE(test::conv::device::TestSpecificDepthwiseDirectConv2d<Direct2dConv>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L218** `    DepthwiseFpropProblemSizes_filter3x3_stride1x1_dilation1x1()));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L219** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L220** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L221** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L222** `TEST(`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L223** `    SM60_Device_Depthwise_conv2d_Fprop_Direct_Conv_FixedStrideDilation_f16nhwc_f16nhwc_f16nhwc_simt_f16,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L224** `    64x32_4_8x32_Filter3x3_Stride2x2_Dilation2x2) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L225** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `  using ElementInputA = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L227** `  using ElementInputB = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L228** `  using ElementOutput = cutlass::half_t;`
+  - **EN**: Creates the `ElementOutput` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOutput` 类型别名，供后续内核与 epilogue 定义使用。
+- **L229** `  using ElementAccumulator = cutlass::half_t;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L230** `  using ElementComputeEpilogue = cutlass::half_t;`
+  - **EN**: Creates the `ElementComputeEpilogue` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementComputeEpilogue` 类型别名，供后续内核与 epilogue 定义使用。
+- **L231** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L232** `  using LayoutInputA = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputA` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputA`，供后续声明使用。
+- **L233** `  using LayoutInputB = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputB` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputB`，供后续声明使用。
+- **L234** `  using LayoutOutput = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutOutput` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutOutput`，供后续声明使用。
+- **L235** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L236** `  // This code section describes whether you want to use tensor cores or regular SIMT cores on GPU`
+  - **EN**: Comment explaining: This code section describes whether you want to use tensor cores or regular SIMT cores on GPU.
+  - **CN**: 说明性注释：This code section describes whether you want to use tensor cores or regular SIMT cores on GPU。
+- **L237** `  // SM`
+  - **EN**: Comment explaining: SM.
+  - **CN**: 说明性注释：SM。
+- **L238** `  using MMAOp = cutlass::arch::OpClassSimt;`
+  - **EN**: Creates the helper type alias `MMAOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `MMAOp`，供后续声明使用。
+- **L239** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L240** `  // This code section describes CUDA SM architecture number`
+  - **EN**: Comment explaining: This code section describes CUDA SM architecture number.
+  - **CN**: 说明性注释：This code section describes CUDA SM architecture number。
+- **L241** `  using SmArch = cutlass::arch::Sm60;`
+  - **EN**: Creates the helper type alias `SmArch` for later declarations.
+  - **CN**: 创建辅助类型别名 `SmArch`，供后续声明使用。
+- **L242** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L243** `  // This code section describes the groups a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the groups a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the groups a thread block will compute。
+- **L244** `  constexpr int groups_per_cta = 32;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L245** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L246** `  // This code section describes the output tile <N, P, Q, C> a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the output tile <N, P, Q, C> a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the output tile <N, P, Q, C> a thread block will compute。
+- **L247** `  using ThreadBlockOutputShape = cutlass::conv::TensorNHWCShape<1, 8, 8, groups_per_cta>;`
+  - **EN**: Creates the helper type alias `ThreadBlockOutputShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `ThreadBlockOutputShape`，供后续声明使用。
+- **L248** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L249** `  // This code section describes the filter shape <R, S>`
+  - **EN**: Comment explaining: This code section describes the filter shape <R, S>.
+  - **CN**: 说明性注释：This code section describes the filter shape <R, S>。
+- **L250** `  using FilterShape =  cutlass::MatrixShape<3, 3>;`
+  - **EN**: Creates the helper type alias `FilterShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `FilterShape`，供后续声明使用。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L252** `  // Threadblock tile shape`
+  - **EN**: Comment explaining: Threadblock tile shape.
+  - **CN**: 说明性注释：Threadblock tile shape。
+- **L253** `  using ThreadblockShape =`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L254** `      cutlass::gemm::GemmShape<ThreadBlockOutputShape::kNHW, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Provides a GEMM tile shape argument for `ThreadblockShape`.
+  - **CN**: 为 `ThreadblockShape` 提供 GEMM 分块形状参数。
+- **L255** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L256** `  // This code section describes tile size a warp will computes`
+  - **EN**: Comment explaining: This code section describes tile size a warp will computes.
+  - **CN**: 说明性注释：This code section describes tile size a warp will computes。
+- **L257** `  using WarpShape = cutlass::gemm::GemmShape<8, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L258** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L259** `  // This code section describes the size of MMA op`
+  - **EN**: Comment explaining: This code section describes the size of MMA op.
+  - **CN**: 说明性注释：This code section describes the size of MMA op。
+- **L260** `  using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L261** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L262** `  // This code section describes how threadblocks are scheduled on GPU`
+  - **EN**: Comment explaining: This code section describes how threadblocks are scheduled on GPU.
+  - **CN**: 说明性注释：This code section describes how threadblocks are scheduled on GPU。
+- **L263** `  using SwizzleThreadBlock =`
+  - **EN**: Creates the helper type alias `SwizzleThreadBlock` for later declarations.
+  - **CN**: 创建辅助类型别名 `SwizzleThreadBlock`，供后续声明使用。
+- **L264** `      cutlass::conv::threadblock::DepthwiseDirect2dConvIdentityThreadblockSwizzle<`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L265** `          1,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L266** `          ThreadBlockOutputShape::kN,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L267** `          ThreadBlockOutputShape::kH,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L268** `          ThreadBlockOutputShape::kW>;`
+  - **EN**: Closes the multi-line alias definition for `SwizzleThreadBlock`.
+  - **CN**: 结束 `SwizzleThreadBlock` 的多行别名定义。
+- **L269** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L270** `  // Number of pipelines you want to use`
+  - **EN**: Comment explaining: Number of pipelines you want to use.
+  - **CN**: 说明性注释：Number of pipelines you want to use。
+- **L271** `  constexpr int NumStages = 4;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L272** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L273** `  // This code section describe iterator algorithm selected is Analytic or Optimized`
+  - **EN**: Comment explaining: This code section describe iterator algorithm selected is Analytic or Optimized.
+  - **CN**: 说明性注释：This code section describe iterator algorithm selected is Analytic or Optimized。
+- **L274** `  static cutlass::conv::IteratorAlgorithm const IteratorAlgorithm =`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L275** `      cutlass::conv::IteratorAlgorithm::kFixedStrideDilation;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 276-300 / 第276-300行
+
+- **L276** `  using StrideShape = cutlass::MatrixShape<2, 2>;`
+  - **EN**: Creates the helper type alias `StrideShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `StrideShape`，供后续声明使用。
+- **L277** `  using DilationShape = cutlass::MatrixShape<2, 2>;`
+  - **EN**: Creates the helper type alias `DilationShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `DilationShape`，供后续声明使用。
+- **L278** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L279** `  constexpr int kEpilogueElementsPerAccess = 128 / cutlass::sizeof_bits<ElementOutput>::value;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L280** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L281** `  // This code section describes the epilogue part of the kernel, we use default value`
+  - **EN**: Comment explaining: This code section describes the epilogue part of the kernel, we use default value.
+  - **CN**: 说明性注释：This code section describes the epilogue part of the kernel, we use default value。
+- **L282** `  using EpilogueOp = cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Creates the helper type alias `EpilogueOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `EpilogueOp`，供后续声明使用。
+- **L283** `      ElementOutput,               // Data type of output matrix.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L284** `      kEpilogueElementsPerAccess,  // The number of elements per vectorized.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L285** `                                   // memory access. This becomes the vector width of`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L286** `                                   // math instructions in the epilogue too.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L287** `      ElementAccumulator,          // Data type of accumulator`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L288** `      ElementComputeEpilogue,      // Data type for alpha/beta in linear combination`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L289** `      cutlass::epilogue::thread::ScaleType::Default>;     `
+  - **EN**: Closes the multi-line alias definition for `EpilogueOp`.
+  - **CN**: 结束 `EpilogueOp` 的多行别名定义。
+- **L290** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L291** `  using DepthwiseDirect2dConv = typename cutlass::conv::kernel::DefaultDepthwiseDirect2dConvFprop<`
+  - **EN**: Creates the helper type alias `DepthwiseDirect2dConv` for later declarations.
+  - **CN**: 创建辅助类型别名 `DepthwiseDirect2dConv`，供后续声明使用。
+- **L292** `      ElementInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L293** `      LayoutInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L294** `      ElementInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L295** `      LayoutInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L296** `      ElementOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L297** `      LayoutOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L298** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L299** `      MMAOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L300** `      SmArch,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+
+### Lines 301-325 / 第301-325行
+
+- **L301** `      ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L302** `      ThreadBlockOutputShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L303** `      FilterShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L304** `      WarpShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L305** `      InstructionShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L306** `      EpilogueOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L307** `      SwizzleThreadBlock,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L308** `      NumStages,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L309** `      cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L310** `      IteratorAlgorithm,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L311** `      cutlass::conv::StrideSupport::kFixed,`
+  - **EN**: Specifies the stride constraints expected by `DepthwiseDirect2dConv`.
+  - **CN**: 指定 `DepthwiseDirect2dConv` 期望支持的步幅约束。
+- **L312** `      StrideShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L313** `      DilationShape>::Kernel;`
+  - **EN**: Finalizes `DepthwiseDirect2dConv` as the selected kernel type.
+  - **CN**: 将 `DepthwiseDirect2dConv` 最终确定为选定的内核类型。
+- **L314** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L315** `  using Direct2dConv = cutlass::conv::device::DirectConvolution<DepthwiseDirect2dConv>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Direct2dConv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Direct2dConv`。
+- **L316** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L317** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L318** `  EXPECT_TRUE(test::conv::device::TestSpecificDepthwiseDirectConv2d<Direct2dConv>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L319** `    DepthwiseFpropProblemSizes_filter3x3_stride2x2_dilation2x2()));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L320** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L321** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L322** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L323** `TEST(`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L324** `    SM60_Device_Depthwise_conv2d_Fprop_Direct_Conv_FixedStrideDilation_f16nhwc_f16nhwc_f16nhwc_simt_f16,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L325** `    64x64_3_16x64_Filter5x5_Stride1x1_Dilation1x1) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+
+### Lines 326-350 / 第326-350行
+
+- **L326** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L327** `  using ElementInputA = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L328** `  using ElementInputB = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L329** `  using ElementOutput = cutlass::half_t;`
+  - **EN**: Creates the `ElementOutput` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOutput` 类型别名，供后续内核与 epilogue 定义使用。
+- **L330** `  using ElementAccumulator = cutlass::half_t;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L331** `  using ElementComputeEpilogue = cutlass::half_t;`
+  - **EN**: Creates the `ElementComputeEpilogue` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementComputeEpilogue` 类型别名，供后续内核与 epilogue 定义使用。
+- **L332** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L333** `  using LayoutInputA = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputA` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputA`，供后续声明使用。
+- **L334** `  using LayoutInputB = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputB` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputB`，供后续声明使用。
+- **L335** `  using LayoutOutput = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutOutput` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutOutput`，供后续声明使用。
+- **L336** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L337** `  // This code section describes whether you want to use tensor cores or regular SIMT cores on GPU`
+  - **EN**: Comment explaining: This code section describes whether you want to use tensor cores or regular SIMT cores on GPU.
+  - **CN**: 说明性注释：This code section describes whether you want to use tensor cores or regular SIMT cores on GPU。
+- **L338** `  // SM`
+  - **EN**: Comment explaining: SM.
+  - **CN**: 说明性注释：SM。
+- **L339** `  using MMAOp = cutlass::arch::OpClassSimt;`
+  - **EN**: Creates the helper type alias `MMAOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `MMAOp`，供后续声明使用。
+- **L340** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L341** `  // This code section describes CUDA SM architecture number`
+  - **EN**: Comment explaining: This code section describes CUDA SM architecture number.
+  - **CN**: 说明性注释：This code section describes CUDA SM architecture number。
+- **L342** `  using SmArch = cutlass::arch::Sm60;`
+  - **EN**: Creates the helper type alias `SmArch` for later declarations.
+  - **CN**: 创建辅助类型别名 `SmArch`，供后续声明使用。
+- **L343** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L344** `  // This code section describes the groups a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the groups a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the groups a thread block will compute。
+- **L345** `  constexpr int groups_per_cta = 64;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L346** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L347** `  // This code section describes the output tile <N, P, Q, C> a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the output tile <N, P, Q, C> a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the output tile <N, P, Q, C> a thread block will compute。
+- **L348** `  using ThreadBlockOutputShape = cutlass::conv::TensorNHWCShape<1, 8, 8, groups_per_cta>;`
+  - **EN**: Creates the helper type alias `ThreadBlockOutputShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `ThreadBlockOutputShape`，供后续声明使用。
+- **L349** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L350** `  // This code section describes the filter shape <R, S>`
+  - **EN**: Comment explaining: This code section describes the filter shape <R, S>.
+  - **CN**: 说明性注释：This code section describes the filter shape <R, S>。
+
+### Lines 351-375 / 第351-375行
+
+- **L351** `  using FilterShape = cutlass::MatrixShape<5, 5>;`
+  - **EN**: Creates the helper type alias `FilterShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `FilterShape`，供后续声明使用。
+- **L352** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L353** `  // Threadblock tile shape`
+  - **EN**: Comment explaining: Threadblock tile shape.
+  - **CN**: 说明性注释：Threadblock tile shape。
+- **L354** `  using ThreadblockShape =`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L355** `      cutlass::gemm::GemmShape<ThreadBlockOutputShape::kNHW, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Provides a GEMM tile shape argument for `ThreadblockShape`.
+  - **CN**: 为 `ThreadblockShape` 提供 GEMM 分块形状参数。
+- **L356** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L357** `  // This code section describes tile size a warp will computes`
+  - **EN**: Comment explaining: This code section describes tile size a warp will computes.
+  - **CN**: 说明性注释：This code section describes tile size a warp will computes。
+- **L358** `  using WarpShape = cutlass::gemm::GemmShape<16, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L359** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L360** `  // This code section describes the size of MMA op`
+  - **EN**: Comment explaining: This code section describes the size of MMA op.
+  - **CN**: 说明性注释：This code section describes the size of MMA op。
+- **L361** `  using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L362** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L363** `  // This code section describes how threadblocks are scheduled on GPU`
+  - **EN**: Comment explaining: This code section describes how threadblocks are scheduled on GPU.
+  - **CN**: 说明性注释：This code section describes how threadblocks are scheduled on GPU。
+- **L364** `  using SwizzleThreadBlock =`
+  - **EN**: Creates the helper type alias `SwizzleThreadBlock` for later declarations.
+  - **CN**: 创建辅助类型别名 `SwizzleThreadBlock`，供后续声明使用。
+- **L365** `      cutlass::conv::threadblock::DepthwiseDirect2dConvIdentityThreadblockSwizzle<`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L366** `          1,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L367** `          ThreadBlockOutputShape::kN,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L368** `          ThreadBlockOutputShape::kH,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L369** `          ThreadBlockOutputShape::kW>;`
+  - **EN**: Closes the multi-line alias definition for `SwizzleThreadBlock`.
+  - **CN**: 结束 `SwizzleThreadBlock` 的多行别名定义。
+- **L370** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L371** `  // Number of pipelines you want to use`
+  - **EN**: Comment explaining: Number of pipelines you want to use.
+  - **CN**: 说明性注释：Number of pipelines you want to use。
+- **L372** `  constexpr int NumStages = 3;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L373** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L374** `  // This code section describe iterator algorithm selected is Analytic or Optimized`
+  - **EN**: Comment explaining: This code section describe iterator algorithm selected is Analytic or Optimized.
+  - **CN**: 说明性注释：This code section describe iterator algorithm selected is Analytic or Optimized。
+- **L375** `  static cutlass::conv::IteratorAlgorithm const IteratorAlgorithm =`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 376-400 / 第376-400行
+
+- **L376** `      cutlass::conv::IteratorAlgorithm::kFixedStrideDilation;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L377** `  using StrideShape = cutlass::MatrixShape<1, 1>;`
+  - **EN**: Creates the helper type alias `StrideShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `StrideShape`，供后续声明使用。
+- **L378** `  using DilationShape = cutlass::MatrixShape<1, 1>;`
+  - **EN**: Creates the helper type alias `DilationShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `DilationShape`，供后续声明使用。
+- **L379** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L380** `  constexpr int kEpilogueElementsPerAccess = 128 / cutlass::sizeof_bits<ElementOutput>::value;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L381** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L382** `  // This code section describes the epilogue part of the kernel, we use default value`
+  - **EN**: Comment explaining: This code section describes the epilogue part of the kernel, we use default value.
+  - **CN**: 说明性注释：This code section describes the epilogue part of the kernel, we use default value。
+- **L383** `  using EpilogueOp = cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Creates the helper type alias `EpilogueOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `EpilogueOp`，供后续声明使用。
+- **L384** `      ElementOutput,               // Data type of output matrix.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L385** `      kEpilogueElementsPerAccess,  // The number of elements per vectorized.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L386** `                                   // memory access. This becomes the vector width of`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L387** `                                   // math instructions in the epilogue too.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L388** `      ElementAccumulator,          // Data type of accumulator`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L389** `      ElementComputeEpilogue,      // Data type for alpha/beta in linear combination`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L390** `      cutlass::epilogue::thread::ScaleType::Default>;  `
+  - **EN**: Closes the multi-line alias definition for `EpilogueOp`.
+  - **CN**: 结束 `EpilogueOp` 的多行别名定义。
+- **L391** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L392** `  using DepthwiseDirect2dConv = typename cutlass::conv::kernel::DefaultDepthwiseDirect2dConvFprop<`
+  - **EN**: Creates the helper type alias `DepthwiseDirect2dConv` for later declarations.
+  - **CN**: 创建辅助类型别名 `DepthwiseDirect2dConv`，供后续声明使用。
+- **L393** `      ElementInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L394** `      LayoutInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L395** `      ElementInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L396** `      LayoutInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L397** `      ElementOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L398** `      LayoutOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L399** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L400** `      MMAOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+
+### Lines 401-425 / 第401-425行
+
+- **L401** `      SmArch,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L402** `      ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L403** `      ThreadBlockOutputShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L404** `      FilterShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L405** `      WarpShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L406** `      InstructionShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L407** `      EpilogueOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L408** `      SwizzleThreadBlock,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L409** `      NumStages,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L410** `      cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L411** `      IteratorAlgorithm,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L412** `      cutlass::conv::StrideSupport::kFixed,`
+  - **EN**: Specifies the stride constraints expected by `DepthwiseDirect2dConv`.
+  - **CN**: 指定 `DepthwiseDirect2dConv` 期望支持的步幅约束。
+- **L413** `      StrideShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L414** `      DilationShape>::Kernel;`
+  - **EN**: Finalizes `DepthwiseDirect2dConv` as the selected kernel type.
+  - **CN**: 将 `DepthwiseDirect2dConv` 最终确定为选定的内核类型。
+- **L415** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L416** `  using Direct2dConv = cutlass::conv::device::DirectConvolution<DepthwiseDirect2dConv>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Direct2dConv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Direct2dConv`。
+- **L417** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L418** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L419** `  EXPECT_TRUE(test::conv::device::TestSpecificDepthwiseDirectConv2d<Direct2dConv>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L420** `    DepthwiseFpropProblemSizes_filter5x5_stride1x1_dilation1x1()));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L421** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L422** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L423** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L424** `TEST(`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L425** `    SM60_Device_Depthwise_conv2d_Fprop_Direct_Conv_FixedStrideDilation_f16nhwc_f16nhwc_f16nhwc_simt_f16,`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 426-450 / 第426-450行
+
+- **L426** `    64x64_3_16x64_Filter5x5_Stride2x2_Dilation2x2) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L427** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L428** `  using ElementInputA = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L429** `  using ElementInputB = cutlass::half_t;`
+  - **EN**: Creates the `ElementInputB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementInputB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L430** `  using ElementOutput = cutlass::half_t;`
+  - **EN**: Creates the `ElementOutput` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementOutput` 类型别名，供后续内核与 epilogue 定义使用。
+- **L431** `  using ElementAccumulator = cutlass::half_t;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L432** `  using ElementComputeEpilogue = cutlass::half_t;`
+  - **EN**: Creates the `ElementComputeEpilogue` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementComputeEpilogue` 类型别名，供后续内核与 epilogue 定义使用。
+- **L433** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L434** `  using LayoutInputA = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputA` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputA`，供后续声明使用。
+- **L435** `  using LayoutInputB = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutInputB` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutInputB`，供后续声明使用。
+- **L436** `  using LayoutOutput = cutlass::layout::TensorNHWC;`
+  - **EN**: Creates the helper type alias `LayoutOutput` for later declarations.
+  - **CN**: 创建辅助类型别名 `LayoutOutput`，供后续声明使用。
+- **L437** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L438** `  // This code section describes whether you want to use tensor cores or regular SIMT cores on GPU`
+  - **EN**: Comment explaining: This code section describes whether you want to use tensor cores or regular SIMT cores on GPU.
+  - **CN**: 说明性注释：This code section describes whether you want to use tensor cores or regular SIMT cores on GPU。
+- **L439** `  // SM`
+  - **EN**: Comment explaining: SM.
+  - **CN**: 说明性注释：SM。
+- **L440** `  using MMAOp = cutlass::arch::OpClassSimt;`
+  - **EN**: Creates the helper type alias `MMAOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `MMAOp`，供后续声明使用。
+- **L441** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L442** `  // This code section describes CUDA SM architecture number`
+  - **EN**: Comment explaining: This code section describes CUDA SM architecture number.
+  - **CN**: 说明性注释：This code section describes CUDA SM architecture number。
+- **L443** `  using SmArch = cutlass::arch::Sm60;`
+  - **EN**: Creates the helper type alias `SmArch` for later declarations.
+  - **CN**: 创建辅助类型别名 `SmArch`，供后续声明使用。
+- **L444** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L445** `  // This code section describes the groups a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the groups a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the groups a thread block will compute。
+- **L446** `  constexpr int groups_per_cta = 32;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L447** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L448** `  // This code section describes the output tile <N, P, Q, C> a thread block will compute`
+  - **EN**: Comment explaining: This code section describes the output tile <N, P, Q, C> a thread block will compute.
+  - **CN**: 说明性注释：This code section describes the output tile <N, P, Q, C> a thread block will compute。
+- **L449** `  using ThreadBlockOutputShape = cutlass::conv::TensorNHWCShape<1, 8, 8, groups_per_cta>;`
+  - **EN**: Creates the helper type alias `ThreadBlockOutputShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `ThreadBlockOutputShape`，供后续声明使用。
+- **L450** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 451-475 / 第451-475行
+
+- **L451** `  // This code section describes the filter shape <R, S>`
+  - **EN**: Comment explaining: This code section describes the filter shape <R, S>.
+  - **CN**: 说明性注释：This code section describes the filter shape <R, S>。
+- **L452** `  using FilterShape = cutlass::MatrixShape<5, 5>;`
+  - **EN**: Creates the helper type alias `FilterShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `FilterShape`，供后续声明使用。
+- **L453** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L454** `  // Threadblock tile shape`
+  - **EN**: Comment explaining: Threadblock tile shape.
+  - **CN**: 说明性注释：Threadblock tile shape。
+- **L455** `  using ThreadblockShape =`
+  - **EN**: Defines the tile shape alias `ThreadblockShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `ThreadblockShape`，控制工作在内核层级中的划分方式。
+- **L456** `      cutlass::gemm::GemmShape<ThreadBlockOutputShape::kNHW, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Provides a GEMM tile shape argument for `ThreadblockShape`.
+  - **CN**: 为 `ThreadblockShape` 提供 GEMM 分块形状参数。
+- **L457** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L458** `  // This code section describes tile size a warp will computes`
+  - **EN**: Comment explaining: This code section describes tile size a warp will computes.
+  - **CN**: 说明性注释：This code section describes tile size a warp will computes。
+- **L459** `  using WarpShape = cutlass::gemm::GemmShape<16, groups_per_cta, FilterShape::kCount>;`
+  - **EN**: Defines the tile shape alias `WarpShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `WarpShape`，控制工作在内核层级中的划分方式。
+- **L460** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L461** `  // This code section describes the size of MMA op`
+  - **EN**: Comment explaining: This code section describes the size of MMA op.
+  - **CN**: 说明性注释：This code section describes the size of MMA op。
+- **L462** `  using InstructionShape = cutlass::gemm::GemmShape<1, 1, 1>;`
+  - **EN**: Defines the tile shape alias `InstructionShape` that controls how work is partitioned across the kernel hierarchy.
+  - **CN**: 定义分块形状别名 `InstructionShape`，控制工作在内核层级中的划分方式。
+- **L463** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L464** `  // This code section describes how threadblocks are scheduled on GPU`
+  - **EN**: Comment explaining: This code section describes how threadblocks are scheduled on GPU.
+  - **CN**: 说明性注释：This code section describes how threadblocks are scheduled on GPU。
+- **L465** `  using SwizzleThreadBlock =`
+  - **EN**: Creates the helper type alias `SwizzleThreadBlock` for later declarations.
+  - **CN**: 创建辅助类型别名 `SwizzleThreadBlock`，供后续声明使用。
+- **L466** `      cutlass::conv::threadblock::DepthwiseDirect2dConvIdentityThreadblockSwizzle<`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L467** `          1,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L468** `          ThreadBlockOutputShape::kN,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L469** `          ThreadBlockOutputShape::kH,`
+  - **EN**: Continues supplying template arguments for `SwizzleThreadBlock`.
+  - **CN**: 继续为 `SwizzleThreadBlock` 提供模板参数。
+- **L470** `          ThreadBlockOutputShape::kW>;`
+  - **EN**: Closes the multi-line alias definition for `SwizzleThreadBlock`.
+  - **CN**: 结束 `SwizzleThreadBlock` 的多行别名定义。
+- **L471** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L472** `  // Number of pipelines you want to use`
+  - **EN**: Comment explaining: Number of pipelines you want to use.
+  - **CN**: 说明性注释：Number of pipelines you want to use。
+- **L473** `  constexpr int NumStages = 3;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L474** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L475** `  // This code section describe iterator algorithm selected is Analytic or Optimized`
+  - **EN**: Comment explaining: This code section describe iterator algorithm selected is Analytic or Optimized.
+  - **CN**: 说明性注释：This code section describe iterator algorithm selected is Analytic or Optimized。
+
+### Lines 476-500 / 第476-500行
+
+- **L476** `  static cutlass::conv::IteratorAlgorithm const IteratorAlgorithm =`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L477** `      cutlass::conv::IteratorAlgorithm::kFixedStrideDilation;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L478** `  using StrideShape = cutlass::MatrixShape<2, 2>;`
+  - **EN**: Creates the helper type alias `StrideShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `StrideShape`，供后续声明使用。
+- **L479** `  using DilationShape = cutlass::MatrixShape<2, 2>;`
+  - **EN**: Creates the helper type alias `DilationShape` for later declarations.
+  - **CN**: 创建辅助类型别名 `DilationShape`，供后续声明使用。
+- **L480** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L481** `  constexpr int kEpilogueElementsPerAccess = 128 / cutlass::sizeof_bits<ElementOutput>::value;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L482** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L483** `  // This code section describes the epilogue part of the kernel, we use default value`
+  - **EN**: Comment explaining: This code section describes the epilogue part of the kernel, we use default value.
+  - **CN**: 说明性注释：This code section describes the epilogue part of the kernel, we use default value。
+- **L484** `  using EpilogueOp = cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Creates the helper type alias `EpilogueOp` for later declarations.
+  - **CN**: 创建辅助类型别名 `EpilogueOp`，供后续声明使用。
+- **L485** `      ElementOutput,               // Data type of output matrix.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L486** `      kEpilogueElementsPerAccess,  // The number of elements per vectorized.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L487** `                                   // memory access. This becomes the vector width of`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L488** `                                   // math instructions in the epilogue too.`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L489** `      ElementAccumulator,          // Data type of accumulator`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L490** `      ElementComputeEpilogue,      // Data type for alpha/beta in linear combination`
+  - **EN**: Continues supplying template arguments for `EpilogueOp`.
+  - **CN**: 继续为 `EpilogueOp` 提供模板参数。
+- **L491** `      cutlass::epilogue::thread::ScaleType::Default>;  `
+  - **EN**: Closes the multi-line alias definition for `EpilogueOp`.
+  - **CN**: 结束 `EpilogueOp` 的多行别名定义。
+- **L492** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L493** `  using DepthwiseDirect2dConv = typename cutlass::conv::kernel::DefaultDepthwiseDirect2dConvFprop<`
+  - **EN**: Creates the helper type alias `DepthwiseDirect2dConv` for later declarations.
+  - **CN**: 创建辅助类型别名 `DepthwiseDirect2dConv`，供后续声明使用。
+- **L494** `      ElementInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L495** `      LayoutInputA,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L496** `      ElementInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L497** `      LayoutInputB,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L498** `      ElementOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L499** `      LayoutOutput,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L500** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+
+### Lines 501-522 / 第501-522行
+
+- **L501** `      MMAOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L502** `      SmArch,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L503** `      ThreadblockShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L504** `      ThreadBlockOutputShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L505** `      FilterShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L506** `      WarpShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L507** `      InstructionShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L508** `      EpilogueOp,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L509** `      SwizzleThreadBlock,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L510** `      NumStages,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L511** `      cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L512** `      IteratorAlgorithm,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L513** `      cutlass::conv::StrideSupport::kFixed,`
+  - **EN**: Specifies the stride constraints expected by `DepthwiseDirect2dConv`.
+  - **CN**: 指定 `DepthwiseDirect2dConv` 期望支持的步幅约束。
+- **L514** `      StrideShape,`
+  - **EN**: Continues supplying template arguments for `DepthwiseDirect2dConv`.
+  - **CN**: 继续为 `DepthwiseDirect2dConv` 提供模板参数。
+- **L515** `      DilationShape>::Kernel;`
+  - **EN**: Finalizes `DepthwiseDirect2dConv` as the selected kernel type.
+  - **CN**: 将 `DepthwiseDirect2dConv` 最终确定为选定的内核类型。
+- **L516** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L517** `  using Direct2dConv = cutlass::conv::device::DirectConvolution<DepthwiseDirect2dConv>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Direct2dConv`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Direct2dConv`。
+- **L518** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L519** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L520** `  EXPECT_TRUE(test::conv::device::TestSpecificDepthwiseDirectConv2d<Direct2dConv>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L521** `    DepthwiseFpropProblemSizes_filter5x5_stride2x2_dilation2x2()));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L522** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+
+## Key Concepts / 关键概念
+- GoogleTest test cases encode each kernel variant as a compile-time instantiation that is exercised by a shared testbed. / GoogleTest 用例将每个内核变体编码为编译期实例化，并交由共享测试平台执行。
+## Dependencies / 依赖项
+- `../../common/cutlass_unit_test.h` — Shared CUTLASS unit-test harness used by older convolution tests. / 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- `cutlass/cutlass.h` — Core CUTLASS definitions, architecture tags, and status types. / CUTLASS 核心定义、架构标签和状态类型。
+- `cutlass/conv/kernel/default_depthwise_fprop.h` — Kernel-level convolution building blocks. / 内核级卷积构建模块。
+- `cutlass/conv/device/direct_convolution.h` — Device-level convolution wrapper built on implicit GEMM. / 基于隐式 GEMM 的设备级卷积封装。
+- `conv2d_testbed.h` — Conv2d testbed helpers that generate problem sizes and verify results. / 用于生成问题规模并校验结果的 Conv2d 测试平台辅助工具。
+- `depthwise_conv2d_direct_conv_testbed.h` — Provides `depthwise_conv2d_direct_conv_testbed.h` so this file can use the related API or helper utilities. / 提供 `depthwise_conv2d_direct_conv_testbed.h`，使本文件能够使用相关 API 或辅助工具。

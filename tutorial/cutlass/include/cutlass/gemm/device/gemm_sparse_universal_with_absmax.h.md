@@ -1,0 +1,641 @@
+# gemm_sparse_universal_with_absmax.h — Code Analysis / 代码分析
+
+**Source / 源文件**: `include/cutlass/gemm/device/gemm_sparse_universal_with_absmax.h`  
+**Purpose / 用途**: Implements sparse universal GEMM and additionally tracks absolute-maximum output statistics. / 实现 sparse universal GEMM，并额外跟踪输出张量的绝对值最大值统计。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**: `/***************************************************************************************************`
+  - **EN**: Begins the file header comment block.
+  - **CN**: 开始文件头部注释块。
+- **Line 2 / 第2行**: ` * Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 3 / 第3行**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 4 / 第4行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 5 / 第5行**: ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 6 / 第6行**: ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 7 / 第7行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 8 / 第8行**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 9 / 第9行**: ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 10 / 第10行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 11 / 第11行**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 12 / 第12行**: ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 13 / 第13行**: ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 14 / 第14行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 15 / 第15行**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 16 / 第16行**: ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 17 / 第17行**: ` * this software without specific prior written permission.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 18 / 第18行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 19 / 第19行**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 20 / 第20行**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 21 / 第21行**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 22 / 第22行**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 23 / 第23行**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 24 / 第24行**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 25 / 第25行**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 26 / 第26行**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 27 / 第27行**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 28 / 第28行**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 29 / 第29行**: ` *`
+  - **EN**: Part of the file header comment and license text.
+  - **CN**: 属于文件头部注释与许可证说明。
+- **Line 30 / 第30行**: ` **************************************************************************************************/`
+  - **EN**: Closes the header comment block.
+  - **CN**: 关闭头部注释块。
+- **Line 31 / 第31行**: `/*! \file`
+  - **EN**: Begins a Doxygen file comment block.
+  - **CN**: 开始一个 Doxygen 文件注释块。
+- **Line 32 / 第32行**: `    \brief`
+  - **EN**: Summarizes the file purpose for generated documentation.
+  - **CN**: 用一句话概括文件用途，供生成文档使用。
+- **Line 33 / 第33行**: `*/`
+  - **EN**: Closes the Doxygen comment block that introduced the file.
+  - **CN**: 关闭用于介绍该文件的 Doxygen 注释块。
+- **Line 34 / 第34行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 35 / 第35行**: `#pragma once`
+  - **EN**: Ensures the header is included only once per translation unit.
+  - **CN**: 确保该头文件在同一个编译单元中只会被包含一次。
+- **Line 36 / 第36行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 37 / 第37行**: `#include "cutlass/arch/mma.h"`
+  - **EN**: Includes `cutlass/arch/mma.h` so the wrapper can reuse required declarations. Provides architecture-specific helpers referenced by this header.
+  - **CN**: 包含 `cutlass/arch/mma.h`，以便该封装复用所需声明。提供本头文件引用的架构相关辅助类型。
+- **Line 38 / 第38行**: `#include "cutlass/cutlass.h"`
+  - **EN**: Includes `cutlass/cutlass.h` so the wrapper can reuse required declarations. Provides core CUTLASS types, macros, and status codes.
+  - **CN**: 包含 `cutlass/cutlass.h`，以便该封装复用所需声明。提供 CUTLASS 核心类型、宏与状态码。
+- **Line 39 / 第39行**: `#include "cutlass/numeric_types.h"`
+  - **EN**: Includes `cutlass/numeric_types.h` so the wrapper can reuse required declarations. Defines CUTLASS numeric scalar and packed data types.
+  - **CN**: 包含 `cutlass/numeric_types.h`，以便该封装复用所需声明。定义 CUTLASS 的数值标量与打包数据类型。
+- **Line 40 / 第40行**: `#include "cutlass/arch/arch.h"`
+  - **EN**: Includes `cutlass/arch/arch.h` so the wrapper can reuse required declarations. Provides architecture tags and architecture-specific traits.
+  - **CN**: 包含 `cutlass/arch/arch.h`，以便该封装复用所需声明。提供架构标签与架构相关 traits。
+- **Line 41 / 第41行**: `#include "cutlass/device_kernel.h"`
+  - **EN**: Includes `cutlass/device_kernel.h` so the wrapper can reuse required declarations. Supplies helpers for launching CUTLASS device kernels.
+  - **CN**: 包含 `cutlass/device_kernel.h`，以便该封装复用所需声明。提供启动 CUTLASS 设备内核所需的辅助工具。
+- **Line 42 / 第42行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 43 / 第43行**: `#include "cutlass/gemm/gemm.h"`
+  - **EN**: Includes `cutlass/gemm/gemm.h` so the wrapper can reuse required declarations. Defines common GEMM enums, problem shapes, and coordinate helpers.
+  - **CN**: 包含 `cutlass/gemm/gemm.h`，以便该封装复用所需声明。定义通用 GEMM 枚举、问题形状与坐标辅助类型。
+- **Line 44 / 第44行**: `#include "cutlass/gemm/threadblock/threadblock_swizzle.h"`
+  - **EN**: Includes `cutlass/gemm/threadblock/threadblock_swizzle.h` so the wrapper can reuse required declarations. Defines threadblock swizzle policies for mapping tiles to CTAs.
+  - **CN**: 包含 `cutlass/gemm/threadblock/threadblock_swizzle.h`，以便该封装复用所需声明。定义把 tile 映射到 CTA 的 threadblock swizzle 策略。
+- **Line 45 / 第45行**: `#include "cutlass/gemm/kernel/gemm_sparse_universal.h"`
+  - **EN**: Includes `cutlass/gemm/kernel/gemm_sparse_universal.h` so the wrapper can reuse required declarations. Provides the underlying GEMM kernel or kernel-side parameter definitions.
+  - **CN**: 包含 `cutlass/gemm/kernel/gemm_sparse_universal.h`，以便该封装复用所需声明。提供底层 GEMM 内核或内核侧参数定义。
+- **Line 46 / 第46行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 47 / 第47行**: `#include "cutlass/gemm/kernel/default_gemm_sparse_universal_with_absmax.h"`
+  - **EN**: Includes `cutlass/gemm/kernel/default_gemm_sparse_universal_with_absmax.h` so the wrapper can reuse required declarations. Builds a default GEMM-kernel composition used by this device wrapper.
+  - **CN**: 包含 `cutlass/gemm/kernel/default_gemm_sparse_universal_with_absmax.h`，以便该封装复用所需声明。构建该设备封装所使用的默认 GEMM 内核组合。
+- **Line 48 / 第48行**: `#include "cutlass/gemm/device/default_gemm_configuration.h"`
+  - **EN**: Includes `cutlass/gemm/device/default_gemm_configuration.h` so the wrapper can reuse required declarations. Supplies default tile, alignment, and epilogue configuration choices.
+  - **CN**: 包含 `cutlass/gemm/device/default_gemm_configuration.h`，以便该封装复用所需声明。提供默认的 tile、对齐方式与 epilogue 配置选择。
+- **Line 49 / 第49行**: `#include "cutlass/gemm/device/gemm_universal_base.h"`
+  - **EN**: Includes `cutlass/gemm/device/gemm_universal_base.h` so the wrapper can reuse required declarations. Provides supporting CUTLASS declarations required by this wrapper.
+  - **CN**: 包含 `cutlass/gemm/device/gemm_universal_base.h`，以便该封装复用所需声明。提供该封装所需的 CUTLASS 支持性声明。
+- **Line 50 / 第50行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 51 / 第51行**: `#include "cutlass/layout/permute.h"`
+  - **EN**: Includes `cutlass/layout/permute.h` so the wrapper can reuse required declarations. Defines tensor layout helpers used to interpret matrix or vector memory.
+  - **CN**: 包含 `cutlass/layout/permute.h`，以便该封装复用所需声明。定义解释矩阵或向量内存布局所需的 layout 辅助类型。
+- **Line 52 / 第52行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 53 / 第53行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 54 / 第54行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 55 / 第55行**: `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` to scope the following declarations.
+  - **CN**: 打开命名空间 `cutlass`，为后续声明限定作用域。
+- **Line 56 / 第56行**: `namespace gemm {`
+  - **EN**: Opens namespace `gemm` to scope the following declarations.
+  - **CN**: 打开命名空间 `gemm`，为后续声明限定作用域。
+- **Line 57 / 第57行**: `namespace device {`
+  - **EN**: Opens namespace `device` to scope the following declarations.
+  - **CN**: 打开命名空间 `device`，为后续声明限定作用域。
+- **Line 58 / 第58行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 59 / 第59行**: `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 60 / 第60行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 61 / 第61行**: `template <`
+  - **EN**: Begins a template declaration that parameterizes the wrapper on types, layouts, policies, or architecture tags.
+  - **CN**: 开始模板声明，通过类型、布局、策略或架构标签对封装进行参数化。
+- **Line 62 / 第62行**: `    /// Element type for A matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Element type for A matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Element type for A matrix operand
+- **Line 63 / 第63行**: `    typename ElementA_,`
+  - **EN**: Declares template parameter `ElementA_`. The nearby documentation says: Element type for A matrix operand
+  - **CN**: 声明模板参数 `ElementA_`。附近文档对它的说明是：Element type for A matrix operand
+- **Line 64 / 第64行**: `    /// Layout type for A matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Layout type for A matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Layout type for A matrix operand
+- **Line 65 / 第65行**: `    typename LayoutA_,`
+  - **EN**: Declares template parameter `LayoutA_`. The nearby documentation says: Layout type for A matrix operand
+  - **CN**: 声明模板参数 `LayoutA_`。附近文档对它的说明是：Layout type for A matrix operand
+- **Line 66 / 第66行**: `    /// Element type for B matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Element type for B matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Element type for B matrix operand
+- **Line 67 / 第67行**: `    typename ElementB_,`
+  - **EN**: Declares template parameter `ElementB_`. The nearby documentation says: Element type for B matrix operand
+  - **CN**: 声明模板参数 `ElementB_`。附近文档对它的说明是：Element type for B matrix operand
+- **Line 68 / 第68行**: `    /// Layout type for B matrix operand`
+  - **EN**: Documentation comment describing the next declaration: Layout type for B matrix operand
+  - **CN**: 文档注释，用于说明后续声明：Layout type for B matrix operand
+- **Line 69 / 第69行**: `    typename LayoutB_,`
+  - **EN**: Declares template parameter `LayoutB_`. The nearby documentation says: Layout type for B matrix operand
+  - **CN**: 声明模板参数 `LayoutB_`。附近文档对它的说明是：Layout type for B matrix operand
+- **Line 70 / 第70行**: `    /// Element type for C and D matrix operands`
+  - **EN**: Documentation comment describing the next declaration: Element type for C and D matrix operands
+  - **CN**: 文档注释，用于说明后续声明：Element type for C and D matrix operands
+- **Line 71 / 第71行**: `    typename ElementC_,`
+  - **EN**: Declares template parameter `ElementC_`. The nearby documentation says: Element type for C and D matrix operands
+  - **CN**: 声明模板参数 `ElementC_`。附近文档对它的说明是：Element type for C and D matrix operands
+- **Line 72 / 第72行**: `    /// Layout type for C and D matrix operands`
+  - **EN**: Documentation comment describing the next declaration: Layout type for C and D matrix operands
+  - **CN**: 文档注释，用于说明后续声明：Layout type for C and D matrix operands
+- **Line 73 / 第73行**: `    typename LayoutC_,`
+  - **EN**: Declares template parameter `LayoutC_`. The nearby documentation says: Layout type for C and D matrix operands
+  - **CN**: 声明模板参数 `LayoutC_`。附近文档对它的说明是：Layout type for C and D matrix operands
+- **Line 74 / 第74行**: `    /// Element type for internal accumulation`
+  - **EN**: Documentation comment describing the next declaration: Element type for internal accumulation
+  - **CN**: 文档注释，用于说明后续声明：Element type for internal accumulation
+- **Line 75 / 第75行**: `    typename ElementAccumulator_ = ElementC_,`
+  - **EN**: Declares template parameter `ElementAccumulator_`. The nearby documentation says: Element type for internal accumulation
+  - **CN**: 声明模板参数 `ElementAccumulator_`。附近文档对它的说明是：Element type for internal accumulation
+- **Line 76 / 第76行**: `    /// Operator class tag`
+  - **EN**: Documentation comment describing the next declaration: Operator class tag
+  - **CN**: 文档注释，用于说明后续声明：Operator class tag
+- **Line 77 / 第77行**: `    typename OperatorClass_ = arch::OpClassTensorOp,`
+  - **EN**: Declares template parameter `OperatorClass_`. The nearby documentation says: Operator class tag
+  - **CN**: 声明模板参数 `OperatorClass_`。附近文档对它的说明是：Operator class tag
+- **Line 78 / 第78行**: `    /// Tag indicating architecture to tune for.  This is the minimum SM that`
+  - **EN**: Documentation comment describing the next declaration: Tag indicating architecture to tune for.  This is the minimum SM that
+  - **CN**: 文档注释，用于说明后续声明：Tag indicating architecture to tune for.  This is the minimum SM that
+- **Line 79 / 第79行**: `    /// supports the intended feature. The device kernel can be built`
+  - **EN**: Documentation comment describing the next declaration: supports the intended feature. The device kernel can be built
+  - **CN**: 文档注释，用于说明后续声明：supports the intended feature. The device kernel can be built
+- **Line 80 / 第80行**: `    /// targeting any SM larger than this number.`
+  - **EN**: Documentation comment describing the next declaration: targeting any SM larger than this number.
+  - **CN**: 文档注释，用于说明后续声明：targeting any SM larger than this number.
+- **Line 81 / 第81行**: `    typename ArchTag_ = arch::Sm80,`
+  - **EN**: Declares template parameter `ArchTag_`. The nearby documentation says: targeting any SM larger than this number.
+  - **CN**: 声明模板参数 `ArchTag_`。附近文档对它的说明是：targeting any SM larger than this number.
+- **Line 82 / 第82行**: `    /// Threadblock-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Threadblock-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Threadblock-level tile size (concept: GemmShape)
+- **Line 83 / 第83行**: `    typename ThreadblockShape_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `ThreadblockShape_`. The nearby documentation says: Threadblock-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `ThreadblockShape_`。附近文档对它的说明是：Threadblock-level tile size (concept: GemmShape)
+- **Line 84 / 第84行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 85 / 第85行**: `        ElementAccumulator_>::ThreadblockShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 86 / 第86行**: `    /// Warp-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Warp-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Warp-level tile size (concept: GemmShape)
+- **Line 87 / 第87行**: `    typename WarpShape_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `WarpShape_`. The nearby documentation says: Warp-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `WarpShape_`。附近文档对它的说明是：Warp-level tile size (concept: GemmShape)
+- **Line 88 / 第88行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 89 / 第89行**: `        ElementAccumulator_>::WarpShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 90 / 第90行**: `    /// Instruction-level tile size (concept: GemmShape)`
+  - **EN**: Documentation comment describing the next declaration: Instruction-level tile size (concept: GemmShape)
+  - **CN**: 文档注释，用于说明后续声明：Instruction-level tile size (concept: GemmShape)
+- **Line 91 / 第91行**: `    typename InstructionShape_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `InstructionShape_`. The nearby documentation says: Instruction-level tile size (concept: GemmShape)
+  - **CN**: 声明模板参数 `InstructionShape_`。附近文档对它的说明是：Instruction-level tile size (concept: GemmShape)
+- **Line 92 / 第92行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 93 / 第93行**: `        ElementAccumulator_>::InstructionShape,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 94 / 第94行**: `    /// Epilogue output operator`
+  - **EN**: Documentation comment describing the next declaration: Epilogue output operator
+  - **CN**: 文档注释，用于说明后续声明：Epilogue output operator
+- **Line 95 / 第95行**: `    typename EpilogueOutputOp_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `EpilogueOutputOp_`. The nearby documentation says: Epilogue output operator
+  - **CN**: 声明模板参数 `EpilogueOutputOp_`。附近文档对它的说明是：Epilogue output operator
+- **Line 96 / 第96行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 97 / 第97行**: `        ElementAccumulator_>::EpilogueOutputOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 98 / 第98行**: `    /// Threadblock-level swizzling operator`
+  - **EN**: Documentation comment describing the next declaration: Threadblock-level swizzling operator
+  - **CN**: 文档注释，用于说明后续声明：Threadblock-level swizzling operator
+- **Line 99 / 第99行**: `    typename ThreadblockSwizzle_ = threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Declares template parameter `ThreadblockSwizzle_`. The nearby documentation says: Threadblock-level swizzling operator
+  - **CN**: 声明模板参数 `ThreadblockSwizzle_`。附近文档对它的说明是：Threadblock-level swizzling operator
+- **Line 100 / 第100行**: `    /// Number of stages used in the pipelined mainloop`
+  - **EN**: Documentation comment describing the next declaration: Number of stages used in the pipelined mainloop
+  - **CN**: 文档注释，用于说明后续声明：Number of stages used in the pipelined mainloop
+- **Line 101 / 第101行**: `    int Stages =`
+  - **EN**: Declares template parameter `Stages`. The nearby documentation says: Number of stages used in the pipelined mainloop
+  - **CN**: 声明模板参数 `Stages`。附近文档对它的说明是：Number of stages used in the pipelined mainloop
+- **Line 102 / 第102行**: `        DefaultGemmConfiguration<OperatorClass_, ArchTag_, ElementA_, ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 103 / 第103行**: `                                 ElementC_, ElementAccumulator_>::kStages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 104 / 第104行**: `    /// Access granularity of A matrix in units of elements`
+  - **EN**: Documentation comment describing the next declaration: Access granularity of A matrix in units of elements
+  - **CN**: 文档注释，用于说明后续声明：Access granularity of A matrix in units of elements
+- **Line 105 / 第105行**: `    int AlignmentA =`
+  - **EN**: Declares template parameter `AlignmentA`. The nearby documentation says: Access granularity of A matrix in units of elements
+  - **CN**: 声明模板参数 `AlignmentA`。附近文档对它的说明是：Access granularity of A matrix in units of elements
+- **Line 106 / 第106行**: `        DefaultGemmConfiguration<OperatorClass_, ArchTag_, ElementA_, ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 107 / 第107行**: `                                 ElementC_, ElementAccumulator_>::kAlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 108 / 第108行**: `    /// Access granularity of B matrix in units of elements`
+  - **EN**: Documentation comment describing the next declaration: Access granularity of B matrix in units of elements
+  - **CN**: 文档注释，用于说明后续声明：Access granularity of B matrix in units of elements
+- **Line 109 / 第109行**: `    int AlignmentB =`
+  - **EN**: Declares template parameter `AlignmentB`. The nearby documentation says: Access granularity of B matrix in units of elements
+  - **CN**: 声明模板参数 `AlignmentB`。附近文档对它的说明是：Access granularity of B matrix in units of elements
+- **Line 110 / 第110行**: `        DefaultGemmConfiguration<OperatorClass_, ArchTag_, ElementA_, ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 111 / 第111行**: `                                 ElementC_, ElementAccumulator_>::kAlignmentB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 112 / 第112行**: `    /// Operation performed by GEMM`
+  - **EN**: Documentation comment describing the next declaration: Operation performed by GEMM
+  - **CN**: 文档注释，用于说明后续声明：Operation performed by GEMM
+- **Line 113 / 第113行**: `    typename Operator_ = typename DefaultGemmConfiguration<`
+  - **EN**: Declares template parameter `Operator_`. The nearby documentation says: Operation performed by GEMM
+  - **CN**: 声明模板参数 `Operator_`。附近文档对它的说明是：Operation performed by GEMM
+- **Line 114 / 第114行**: `        OperatorClass_, ArchTag_, ElementA_, ElementB_, ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 115 / 第115行**: `        ElementAccumulator_>::Operator>`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 116 / 第116行**: `class GemmSparseUniversalWithAbsmax :`
+  - **EN**: Declares template parameter `GemmSparseUniversalWithAbsmax` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `GemmSparseUniversalWithAbsmax`，用于定制生成出的封装。
+- **Line 117 / 第117行**: `  public GemmUniversalBase<`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 118 / 第118行**: `    typename kernel::DefaultGemmSparseUniversalWithAbsmax<`
+  - **EN**: Declares template parameter `kernel` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `kernel`，用于定制生成出的封装。
+- **Line 119 / 第119行**: `      ElementA_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 120 / 第120行**: `      LayoutA_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 121 / 第121行**: `      AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 122 / 第122行**: `      ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 123 / 第123行**: `      LayoutB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 124 / 第124行**: `      AlignmentB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 125 / 第125行**: `      ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 126 / 第126行**: `      LayoutC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 127 / 第127行**: `      ElementAccumulator_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 128 / 第128行**: `      OperatorClass_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 129 / 第129行**: `      ArchTag_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 130 / 第130行**: `      ThreadblockShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 131 / 第131行**: `      WarpShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 132 / 第132行**: `      InstructionShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 133 / 第133行**: `      EpilogueOutputOp_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 134 / 第134行**: `      ThreadblockSwizzle_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 135 / 第135行**: `      Stages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 136 / 第136行**: `      Operator_`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 137 / 第137行**: `    >::GemmKernel`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 138 / 第138行**: `  > {`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 139 / 第139行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 140 / 第140行**: ` public:`
+  - **EN**: Switches to the `public` access section of the class.
+  - **CN**: 切换到类的 `public` 访问区域。
+- **Line 141 / 第141行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 142 / 第142行**: `  static_assert((platform::is_same<LayoutC_, layout::RowMajor>::value),`
+  - **EN**: This line contributes to the signature or invocation of `static_assert`.
+  - **CN**: 这一行参与 `static_assert` 的签名或调用。
+- **Line 143 / 第143行**: `             "Epilogue of Ada sparse GEMM must be row major for now.");`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 144 / 第144行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 145 / 第145行**: `  using ElementAccumulator = ElementAccumulator_;`
+  - **EN**: Defines the alias `ElementAccumulator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementAccumulator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 146 / 第146行**: `  using OperatorClass = OperatorClass_;`
+  - **EN**: Defines the alias `OperatorClass` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `OperatorClass`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 147 / 第147行**: `  using ArchTag = ArchTag_;`
+  - **EN**: Defines the alias `ArchTag` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ArchTag`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 148 / 第148行**: `  using ThreadblockShape = ThreadblockShape_;`
+  - **EN**: Defines the alias `ThreadblockShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 149 / 第149行**: `  using WarpShape = WarpShape_;`
+  - **EN**: Defines the alias `WarpShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `WarpShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 150 / 第150行**: `  using InstructionShape = InstructionShape_;`
+  - **EN**: Defines the alias `InstructionShape` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `InstructionShape`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 151 / 第151行**: `  using EpilogueOutputOp = EpilogueOutputOp_;`
+  - **EN**: Defines the alias `EpilogueOutputOp` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `EpilogueOutputOp`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 152 / 第152行**: `  using ThreadblockSwizzle = ThreadblockSwizzle_;`
+  - **EN**: Defines the alias `ThreadblockSwizzle` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ThreadblockSwizzle`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 153 / 第153行**: `  using Operator = Operator_;`
+  - **EN**: Defines the alias `Operator` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Operator`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 154 / 第154行**: `  static int const kStages = Stages;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 155 / 第155行**: `  static int const kAlignmentA = AlignmentA;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 156 / 第156行**: `  static int const kAlignmentB = AlignmentB;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 157 / 第157行**: `  static int const kAlignmentC = EpilogueOutputOp::kCount;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 158 / 第158行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 159 / 第159行**: `  using Base = GemmUniversalBase<`
+  - **EN**: Defines the alias `Base` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Base`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 160 / 第160行**: `    typename kernel::DefaultGemmSparseUniversalWithAbsmax<`
+  - **EN**: Declares template parameter `kernel` used to customize the generated wrapper.
+  - **CN**: 声明模板参数 `kernel`，用于定制生成出的封装。
+- **Line 161 / 第161行**: `      ElementA_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 162 / 第162行**: `      LayoutA_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 163 / 第163行**: `      AlignmentA,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 164 / 第164行**: `      ElementB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 165 / 第165行**: `      LayoutB_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 166 / 第166行**: `      AlignmentB,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 167 / 第167行**: `      ElementC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 168 / 第168行**: `      LayoutC_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 169 / 第169行**: `      ElementAccumulator_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 170 / 第170行**: `      OperatorClass_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 171 / 第171行**: `      ArchTag_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 172 / 第172行**: `      ThreadblockShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 173 / 第173行**: `      WarpShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 174 / 第174行**: `      InstructionShape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 175 / 第175行**: `      EpilogueOutputOp_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 176 / 第176行**: `      ThreadblockSwizzle_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 177 / 第177行**: `      Stages,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or initializers.
+  - **CN**: 继续书写逗号分隔的参数、实参或初始化项列表。
+- **Line 178 / 第178行**: `      Operator_`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 179 / 第179行**: `    >::GemmKernel`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 180 / 第180行**: `  >;`
+  - **EN**: This line contributes to type wiring, control flow, or launch setup inside the device wrapper.
+  - **CN**: 这一行参与设备封装中的类型连接、控制流程或启动配置。
+- **Line 181 / 第181行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 182 / 第182行**: `  using Arguments = typename Base::Arguments;`
+  - **EN**: Defines the alias `Arguments` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `Arguments`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 183 / 第183行**: `  using GemmKernel = typename Base::GemmKernel;`
+  - **EN**: Defines the alias `GemmKernel` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `GemmKernel`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 184 / 第184行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 185 / 第185行**: `  using ElementE = typename GemmKernel::ElementE;`
+  - **EN**: Defines the alias `ElementE` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `ElementE`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 186 / 第186行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 187 / 第187行**: `  using LayoutE = typename GemmKernel::LayoutE;`
+  - **EN**: Defines the alias `LayoutE` to simplify later references to nested or derived types.
+  - **CN**: 定义别名 `LayoutE`，以简化后续对嵌套类型或派生类型的引用。
+- **Line 188 / 第188行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 189 / 第189行**: `  static int const kAlignmentE = 128 / sizeof_bits<ElementE>::value;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 190 / 第190行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 191 / 第191行**: `  static int const kSparse = GemmKernel::kSparse;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 192 / 第192行**: `  static int const kMetaSizeInBits = GemmKernel::kMetaSizeInBits;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 193 / 第193行**: `  static int const kElementsPerElementE = GemmKernel::kElementsPerElementE;`
+  - **EN**: Publishes compile-time static information that callers or helper code can query.
+  - **CN**: 公布可供调用方或辅助代码查询的编译期静态信息。
+- **Line 194 / 第194行**: `};`
+  - **EN**: Ends the current class or struct definition.
+  - **CN**: 结束当前类或结构体定义。
+- **Line 195 / 第195行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 196 / 第196行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+- **Line 197 / 第197行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 198 / 第198行**: `} // namespace device`
+  - **EN**: Closes namespace `device`.
+  - **CN**: 关闭命名空间 `device`。
+- **Line 199 / 第199行**: `} // namespace gemm`
+  - **EN**: Closes namespace `gemm`.
+  - **CN**: 关闭命名空间 `gemm`。
+- **Line 200 / 第200行**: `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 201 / 第201行**: ``
+  - **EN**: Blank line separating nearby declarations or execution phases.
+  - **CN**: 空行，用于分隔相邻的声明或执行阶段。
+- **Line 202 / 第202行**: `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Visual separator line between major sections of the header.
+  - **CN**: 可视化分隔线，用于区分头文件中的主要章节。
+
+## Key Concepts / 关键概念
+
+- **EN**: The header lives at CUTLASS's device API layer, where heavy template composition is turned into a callable host-side wrapper.  
+- **CN**: 该头文件位于 CUTLASS 的设备 API 层，把复杂的模板组合封装成可由主机调用的包装器。
+- **EN**: Universal GEMM wrappers support several problem modes behind one API, such as regular, strided-batched, or array-based execution.  
+- **CN**: Universal GEMM 封装通过一个 API 支持多种问题模式，例如普通、步长批处理或数组式执行。
+- **EN**: Sparse wrappers thread sparsity metadata through the same host-side lifecycle as dense GEMM while selecting sparse kernels underneath.  
+- **CN**: Sparse 封装会在与稠密 GEMM 类似的主机侧生命周期中传递稀疏元数据，并在底层选择稀疏内核。
+- **EN**: Absmax variants produce auxiliary statistics alongside the main GEMM output, which is useful for quantization-oriented workflows.  
+- **CN**: Absmax 变体会在主 GEMM 输出之外生成附加统计量，这对面向量化的流程很有用。
+
+## Dependencies / 依赖关系
+
+- `cutlass/arch/mma.h`: Provides architecture-specific helpers referenced by this header. / 提供本头文件引用的架构相关辅助类型。
+- `cutlass/cutlass.h`: Provides core CUTLASS types, macros, and status codes. / 提供 CUTLASS 核心类型、宏与状态码。
+- `cutlass/numeric_types.h`: Defines CUTLASS numeric scalar and packed data types. / 定义 CUTLASS 的数值标量与打包数据类型。
+- `cutlass/arch/arch.h`: Provides architecture tags and architecture-specific traits. / 提供架构标签与架构相关 traits。
+- `cutlass/device_kernel.h`: Supplies helpers for launching CUTLASS device kernels. / 提供启动 CUTLASS 设备内核所需的辅助工具。
+- `cutlass/gemm/gemm.h`: Defines common GEMM enums, problem shapes, and coordinate helpers. / 定义通用 GEMM 枚举、问题形状与坐标辅助类型。
+- `cutlass/gemm/threadblock/threadblock_swizzle.h`: Defines threadblock swizzle policies for mapping tiles to CTAs. / 定义把 tile 映射到 CTA 的 threadblock swizzle 策略。
+- `cutlass/gemm/kernel/gemm_sparse_universal.h`: Provides the underlying GEMM kernel or kernel-side parameter definitions. / 提供底层 GEMM 内核或内核侧参数定义。
+- `cutlass/gemm/kernel/default_gemm_sparse_universal_with_absmax.h`: Builds a default GEMM-kernel composition used by this device wrapper. / 构建该设备封装所使用的默认 GEMM 内核组合。
+- `cutlass/gemm/device/default_gemm_configuration.h`: Supplies default tile, alignment, and epilogue configuration choices. / 提供默认的 tile、对齐方式与 epilogue 配置选择。
+- `cutlass/gemm/device/gemm_universal_base.h`: Provides supporting CUTLASS declarations required by this wrapper. / 提供该封装所需的 CUTLASS 支持性声明。
+- `cutlass/layout/permute.h`: Defines tensor layout helpers used to interpret matrix or vector memory. / 定义解释矩阵或向量内存布局所需的 layout 辅助类型。

@@ -1,0 +1,1137 @@
+# predicated_scale_bias_vector_iterator.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/threadblock/predicated_scale_bias_vector_iterator.h`
+**Purpose / 用途**: Templates calculating the address and predicates to the load of scale and bias vectors. / 提供threadblock 构件、迭代器工具。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 32 / 第 32 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 33 / 第 33 行** — `    \brief Templates calculating the address and predicates to the load of scale and bias vectors.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `    This iterator uses masks to guard out-of-bounds accesses.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `    A precomputed "Params" object minimizes the amount of state that must be`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 38 / 第 38 行** — `   stored in registers, and integer addition is used to advance the pointer`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 39 / 第 39 行** — `   through memory.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 40 / 第 40 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 43 / 第 43 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 44 / 第 44 行** — `#include "cutlass/array.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/array.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/array.h`。
+- **Line 45 / 第 45 行** — `#include "cutlass/coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/coord.h`。
+- **Line 46 / 第 46 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 47 / 第 47 行** — `#include "cutlass/layout/matrix.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/matrix.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/matrix.h`。
+- **Line 48 / 第 48 行** — `#include "cutlass/layout/pitch_linear.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/pitch_linear.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/pitch_linear.h`。
+- **Line 49 / 第 49 行** — `#include "cutlass/matrix_shape.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/matrix_shape.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/matrix_shape.h`。
+- **Line 50 / 第 50 行** — `#include "cutlass/predicate_vector.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/predicate_vector.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/predicate_vector.h`。
+- **Line 51 / 第 51 行** — `#include "cutlass/tensor_ref.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_ref.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_ref.h`。
+- **Line 52 / 第 52 行** — `#include "cutlass/tensor_view.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_view.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_view.h`。
+- **Line 53 / 第 53 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 54 / 第 54 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 55 / 第 55 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 56 / 第 56 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 57 / 第 57 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 58 / 第 58 行** — `namespace threadblock {`
+  - **EN**: Opens namespace `threadblock` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `threadblock`。
+- **Line 59 / 第 59 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 60 / 第 60 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 61 / 第 61 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 62 / 第 62 行** — `/// PredicatedScaleBiasVectorIterator`
+  - **EN**: Inline comment explaining intent: `PredicatedScaleBiasVectorIterator`.
+  - **CN**: 行内注释说明意图：`PredicatedScaleBiasVectorIterator`。
+- **Line 63 / 第 63 行** — `///`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 64 / 第 64 行** — `template <typename WarpShape,`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 65 / 第 65 行** — `          typename Element,`
+  - **EN**: Adds template parameter specifier `typename Element`.
+  - **CN**: 补充模板参数说明符 `typename Element`。
+- **Line 66 / 第 66 行** — `          typename Layout>`
+  - **EN**: Adds template parameter specifier `typename Layout>`.
+  - **CN**: 补充模板参数说明符 `typename Layout>`。
+- **Line 67 / 第 67 行** — `class PredicatedScaleBiasVectorIterator;`
+  - **EN**: Adds template parameter specifier `class PredicatedScaleBiasVectorIterator;`.
+  - **CN**: 补充模板参数说明符 `class PredicatedScaleBiasVectorIterator;`。
+- **Line 68 / 第 68 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 69 / 第 69 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `////////////////////////////////////////////////////////////////////////////////`。
+- **Line 70 / 第 70 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 71 / 第 71 行** — `/// Specialization of PredicatedTileIterator for wgrad pitch-linear data.`
+  - **EN**: Adds template parameter specifier `/// Specialization of PredicatedTileIterator for wgrad pitch-linear data.`.
+  - **CN**: 补充模板参数说明符 `/// Specialization of PredicatedTileIterator for wgrad pitch-linear data.`。
+- **Line 72 / 第 72 行** — `///`
+  - **EN**: Adds template parameter specifier `///`.
+  - **CN**: 补充模板参数说明符 `///`。
+- **Line 73 / 第 73 行** — `template <typename WarpShape_, typename Element_>`
+  - **EN**: Starts a template declaration with specifier `typename WarpShape_, typename Element_`.
+  - **CN**: 开始一个模板声明，说明符为 `typename WarpShape_, typename Element_`。
+- **Line 74 / 第 74 行** — `class PredicatedScaleBiasVectorIterator<WarpShape_,`
+  - **EN**: Adds template parameter specifier `class PredicatedScaleBiasVectorIterator<WarpShape_`.
+  - **CN**: 补充模板参数说明符 `class PredicatedScaleBiasVectorIterator<WarpShape_`。
+- **Line 75 / 第 75 行** — `                                        Element_,`
+  - **EN**: Adds template parameter specifier `Element_`.
+  - **CN**: 补充模板参数说明符 `Element_`。
+- **Line 76 / 第 76 行** — `                                        layout::PitchLinear> {`
+  - **EN**: Adds template parameter specifier `layout::PitchLinear> {`.
+  - **CN**: 补充模板参数说明符 `layout::PitchLinear> {`。
+- **Line 77 / 第 77 行** — ` public:`
+  - **EN**: Adds template parameter specifier `public:`.
+  - **CN**: 补充模板参数说明符 `public:`。
+- **Line 78 / 第 78 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 79 / 第 79 行** — `  using WarpShape = WarpShape_;`
+  - **EN**: Adds template parameter specifier `using WarpShape = WarpShape_;`.
+  - **CN**: 补充模板参数说明符 `using WarpShape = WarpShape_;`。
+- **Line 80 / 第 80 行** — `  using Element = Element_;`
+  - **EN**: Adds template parameter specifier `using Element = Element_;`.
+  - **CN**: 补充模板参数说明符 `using Element = Element_;`。
+- **Line 81 / 第 81 行** — `  using Layout = layout::PitchLinear;`
+  - **EN**: Adds template parameter specifier `using Layout = layout::PitchLinear;`.
+  - **CN**: 补充模板参数说明符 `using Layout = layout::PitchLinear;`。
+- **Line 82 / 第 82 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 83 / 第 83 行** — `  using Index = typename Layout::Index;`
+  - **EN**: Adds template parameter specifier `using Index = typename Layout::Index;`.
+  - **CN**: 补充模板参数说明符 `using Index = typename Layout::Index;`。
+- **Line 84 / 第 84 行** — `  using LongIndex = typename Layout::LongIndex;`
+  - **EN**: Adds template parameter specifier `using LongIndex = typename Layout::LongIndex;`.
+  - **CN**: 补充模板参数说明符 `using LongIndex = typename Layout::LongIndex;`。
+- **Line 85 / 第 85 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 86 / 第 86 行** — `  using TensorRef = TensorRef<Element, Layout>;`
+  - **EN**: Adds template parameter specifier `using TensorRef = TensorRef<Element, Layout>;`.
+  - **CN**: 补充模板参数说明符 `using TensorRef = TensorRef<Element, Layout>;`。
+- **Line 87 / 第 87 行** — `  using TensorView = TensorView<Element, Layout>;`
+  - **EN**: Adds template parameter specifier `using TensorView = TensorView<Element, Layout>;`.
+  - **CN**: 补充模板参数说明符 `using TensorView = TensorView<Element, Layout>;`。
+- **Line 88 / 第 88 行** — `  using TensorCoord = typename Layout::TensorCoord;`
+  - **EN**: Adds template parameter specifier `using TensorCoord = typename Layout::TensorCoord;`.
+  - **CN**: 补充模板参数说明符 `using TensorCoord = typename Layout::TensorCoord;`。
+- **Line 89 / 第 89 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 90 / 第 90 行** — `  using ConstPointer = const Element *;`
+  - **EN**: Adds template parameter specifier `using ConstPointer = const Element *;`.
+  - **CN**: 补充模板参数说明符 `using ConstPointer = const Element *;`。
+- **Line 91 / 第 91 行** — `  using NonConstPointer = typename platform::remove_const<Element>::type *;`
+  - **EN**: Adds template parameter specifier `using NonConstPointer = typename platform::remove_const<Element>::type *;`.
+  - **CN**: 补充模板参数说明符 `using NonConstPointer = typename platform::remove_const<Element>::type *;`。
+- **Line 92 / 第 92 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 93 / 第 93 行** — `  static int const kElementsPerAccess = 1;`
+  - **EN**: Adds template parameter specifier `static int const kElementsPerAccess = 1;`.
+  - **CN**: 补充模板参数说明符 `static int const kElementsPerAccess = 1;`。
+- **Line 94 / 第 94 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 95 / 第 95 行** — `  using AccessType = AlignedArray<Element, kElementsPerAccess>;`
+  - **EN**: Adds template parameter specifier `using AccessType = AlignedArray<Element, kElementsPerAccess>;`.
+  - **CN**: 补充模板参数说明符 `using AccessType = AlignedArray<Element, kElementsPerAccess>;`。
+- **Line 96 / 第 96 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 97 / 第 97 行** — `  static int const kIterations = WarpShape::kContiguous / 8;`
+  - **EN**: Adds template parameter specifier `static int const kIterations = WarpShape::kContiguous / 8;`.
+  - **CN**: 补充模板参数说明符 `static int const kIterations = WarpShape::kContiguous / 8;`。
+- **Line 98 / 第 98 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 99 / 第 99 行** — `  /// Fragment object to be loaded or stored`
+  - **EN**: Adds template parameter specifier `/// Fragment object to be loaded or stored`.
+  - **CN**: 补充模板参数说明符 `/// Fragment object to be loaded or stored`。
+- **Line 100 / 第 100 行** — `  using Fragment = cutlass::Array<__half2, 2 * kIterations * kElementsPerAccess>;`
+  - **EN**: Adds template parameter specifier `using Fragment = cutlass::Array<__half2, 2 * kIterations * kElementsPerAccess>;`.
+  - **CN**: 补充模板参数说明符 `using Fragment = cutlass::Array<__half2, 2 * kIterations * kElementsPerAccess>;`。
+- **Line 101 / 第 101 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 102 / 第 102 行** — `  /// Parameters object is precomputed state and is host-constructible`
+  - **EN**: Adds template parameter specifier `/// Parameters object is precomputed state and is host-constructible`.
+  - **CN**: 补充模板参数说明符 `/// Parameters object is precomputed state and is host-constructible`。
+- **Line 103 / 第 103 行** — `  using Params = Conv2dWgradActivationIteratorOptimizedParams;`
+  - **EN**: Adds template parameter specifier `using Params = Conv2dWgradActivationIteratorOptimizedParams;`.
+  - **CN**: 补充模板参数说明符 `using Params = Conv2dWgradActivationIteratorOptimizedParams;`。
+- **Line 104 / 第 104 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 105 / 第 105 行** — ` private:`
+  - **EN**: Adds template parameter specifier `private:`.
+  - **CN**: 补充模板参数说明符 `private:`。
+- **Line 106 / 第 106 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 107 / 第 107 行** — `  // Data members`
+  - **EN**: Adds template parameter specifier `// Data members`.
+  - **CN**: 补充模板参数说明符 `// Data members`。
+- **Line 108 / 第 108 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 109 / 第 109 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 110 / 第 110 行** — `  /// Parameters object with precomputed internal state`
+  - **EN**: Adds template parameter specifier `/// Parameters object with precomputed internal state`.
+  - **CN**: 补充模板参数说明符 `/// Parameters object with precomputed internal state`。
+- **Line 111 / 第 111 行** — `  Params const &params_;`
+  - **EN**: Adds template parameter specifier `Params const &params_;`.
+  - **CN**: 补充模板参数说明符 `Params const &params_;`。
+- **Line 112 / 第 112 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 113 / 第 113 行** — `  /// Internal pointer to first access of tile`
+  - **EN**: Adds template parameter specifier `/// Internal pointer to first access of tile`.
+  - **CN**: 补充模板参数说明符 `/// Internal pointer to first access of tile`。
+- **Line 114 / 第 114 行** — `  ConstPointer scale_pointer_;`
+  - **EN**: Adds template parameter specifier `ConstPointer scale_pointer_;`.
+  - **CN**: 补充模板参数说明符 `ConstPointer scale_pointer_;`。
+- **Line 115 / 第 115 行** — `  ConstPointer bias_pointer_;`
+  - **EN**: Adds template parameter specifier `ConstPointer bias_pointer_;`.
+  - **CN**: 补充模板参数说明符 `ConstPointer bias_pointer_;`。
+- **Line 116 / 第 116 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 117 / 第 117 行** — `  /// Size of tensor`
+  - **EN**: Adds template parameter specifier `/// Size of tensor`.
+  - **CN**: 补充模板参数说明符 `/// Size of tensor`。
+- **Line 118 / 第 118 行** — `  Conv2dProblemSize problem_size_;`
+  - **EN**: Adds template parameter specifier `Conv2dProblemSize problem_size_;`.
+  - **CN**: 补充模板参数说明符 `Conv2dProblemSize problem_size_;`。
+- **Line 119 / 第 119 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 120 / 第 120 行** — `  int32_t thread_offset_;`
+  - **EN**: Adds template parameter specifier `int32_t thread_offset_;`.
+  - **CN**: 补充模板参数说明符 `int32_t thread_offset_;`。
+- **Line 121 / 第 121 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 122 / 第 122 行** — `  // Channel dimension in contiguous dimension stays constant for each gemm_iteration_k`
+  - **EN**: Adds template parameter specifier `// Channel dimension in contiguous dimension stays constant for each gemm_iteration_k`.
+  - **CN**: 补充模板参数说明符 `// Channel dimension in contiguous dimension stays constant for each gemm_iteration_k`。
+- **Line 123 / 第 123 行** — `  int32_t filter_c_[kIterations];`
+  - **EN**: Adds template parameter specifier `int32_t filter_c_[kIterations];`.
+  - **CN**: 补充模板参数说明符 `int32_t filter_c_[kIterations];`。
+- **Line 124 / 第 124 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 125 / 第 125 行** — ` public:`
+  - **EN**: Adds template parameter specifier `public:`.
+  - **CN**: 补充模板参数说明符 `public:`。
+- **Line 126 / 第 126 行** — `  /// Constructs a TileIterator from its precomputed state, threadblock offset,`
+  - **EN**: Adds template parameter specifier `/// Constructs a TileIterator from its precomputed state, threadblock offset`.
+  - **CN**: 补充模板参数说明符 `/// Constructs a TileIterator from its precomputed state, threadblock offset`。
+- **Line 127 / 第 127 行** — `  /// and thread ID`
+  - **EN**: Adds template parameter specifier `/// and thread ID`.
+  - **CN**: 补充模板参数说明符 `/// and thread ID`。
+- **Line 128 / 第 128 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 129 / 第 129 行** — `  PredicatedScaleBiasVectorIterator(`
+  - **EN**: Adds template parameter specifier `PredicatedScaleBiasVectorIterator(`.
+  - **CN**: 补充模板参数说明符 `PredicatedScaleBiasVectorIterator(`。
+- **Line 130 / 第 130 行** — `      /// Precomputed parameters object`
+  - **EN**: Adds template parameter specifier `/// Precomputed parameters object`.
+  - **CN**: 补充模板参数说明符 `/// Precomputed parameters object`。
+- **Line 131 / 第 131 行** — `      Params const &params,`
+  - **EN**: Adds template parameter specifier `Params const &params`.
+  - **CN**: 补充模板参数说明符 `Params const &params`。
+- **Line 132 / 第 132 行** — `      /// Extent of tensor`
+  - **EN**: Adds template parameter specifier `/// Extent of tensor`.
+  - **CN**: 补充模板参数说明符 `/// Extent of tensor`。
+- **Line 133 / 第 133 行** — `      Conv2dProblemSize const &problem_size,`
+  - **EN**: Adds template parameter specifier `Conv2dProblemSize const &problem_size`.
+  - **CN**: 补充模板参数说明符 `Conv2dProblemSize const &problem_size`。
+- **Line 134 / 第 134 行** — `      /// Pointer to the start of the scale vector`
+  - **EN**: Adds template parameter specifier `/// Pointer to the start of the scale vector`.
+  - **CN**: 补充模板参数说明符 `/// Pointer to the start of the scale vector`。
+- **Line 135 / 第 135 行** — `      ConstPointer scale_pointer,`
+  - **EN**: Adds template parameter specifier `ConstPointer scale_pointer`.
+  - **CN**: 补充模板参数说明符 `ConstPointer scale_pointer`。
+- **Line 136 / 第 136 行** — `      /// Pointer to the start of the bias vector`
+  - **EN**: Adds template parameter specifier `/// Pointer to the start of the bias vector`.
+  - **CN**: 补充模板参数说明符 `/// Pointer to the start of the bias vector`。
+- **Line 137 / 第 137 行** — `      ConstPointer bias_pointer,`
+  - **EN**: Adds template parameter specifier `ConstPointer bias_pointer`.
+  - **CN**: 补充模板参数说明符 `ConstPointer bias_pointer`。
+- **Line 138 / 第 138 行** — `      /// ID of each participating thread`
+  - **EN**: Adds template parameter specifier `/// ID of each participating thread`.
+  - **CN**: 补充模板参数说明符 `/// ID of each participating thread`。
+- **Line 139 / 第 139 行** — `      int thread_id,`
+  - **EN**: Adds template parameter specifier `int thread_id`.
+  - **CN**: 补充模板参数说明符 `int thread_id`。
+- **Line 140 / 第 140 行** — `      /// Initial offset of threadblock`
+  - **EN**: Adds template parameter specifier `/// Initial offset of threadblock`.
+  - **CN**: 补充模板参数说明符 `/// Initial offset of threadblock`。
+- **Line 141 / 第 141 行** — `      TensorCoord const &threadblock_offset)`
+  - **EN**: Adds template parameter specifier `TensorCoord const &threadblock_offset)`.
+  - **CN**: 补充模板参数说明符 `TensorCoord const &threadblock_offset)`。
+- **Line 142 / 第 142 行** — `      : params_(params),`
+  - **EN**: Adds template parameter specifier `: params_(params)`.
+  - **CN**: 补充模板参数说明符 `: params_(params)`。
+- **Line 143 / 第 143 行** — `        problem_size_(problem_size),`
+  - **EN**: Adds template parameter specifier `problem_size_(problem_size)`.
+  - **CN**: 补充模板参数说明符 `problem_size_(problem_size)`。
+- **Line 144 / 第 144 行** — `        scale_pointer_(scale_pointer),`
+  - **EN**: Adds template parameter specifier `scale_pointer_(scale_pointer)`.
+  - **CN**: 补充模板参数说明符 `scale_pointer_(scale_pointer)`。
+- **Line 145 / 第 145 行** — `        bias_pointer_(bias_pointer) {`
+  - **EN**: Adds template parameter specifier `bias_pointer_(bias_pointer) {`.
+  - **CN**: 补充模板参数说明符 `bias_pointer_(bias_pointer) {`。
+- **Line 146 / 第 146 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 147 / 第 147 行** — `    thread_offset_ = threadblock_offset.contiguous() + (thread_id % 32) / 4;`
+  - **EN**: Adds template parameter specifier `thread_offset_ = threadblock_offset.contiguous() + (thread_id % 32) / 4;`.
+  - **CN**: 补充模板参数说明符 `thread_offset_ = threadblock_offset.contiguous() + (thread_id % 32) / 4;`。
+- **Line 148 / 第 148 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 149 / 第 149 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 150 / 第 150 行** — `  /// Construct a PredicatedTileIterator with zero threadblock offset`
+  - **EN**: Adds template parameter specifier `/// Construct a PredicatedTileIterator with zero threadblock offset`.
+  - **CN**: 补充模板参数说明符 `/// Construct a PredicatedTileIterator with zero threadblock offset`。
+- **Line 151 / 第 151 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 152 / 第 152 行** — `  PredicatedScaleBiasVectorIterator(`
+  - **EN**: Adds template parameter specifier `PredicatedScaleBiasVectorIterator(`.
+  - **CN**: 补充模板参数说明符 `PredicatedScaleBiasVectorIterator(`。
+- **Line 153 / 第 153 行** — `      /// Precomputed parameters object`
+  - **EN**: Adds template parameter specifier `/// Precomputed parameters object`.
+  - **CN**: 补充模板参数说明符 `/// Precomputed parameters object`。
+- **Line 154 / 第 154 行** — `      Params const &params,`
+  - **EN**: Adds template parameter specifier `Params const &params`.
+  - **CN**: 补充模板参数说明符 `Params const &params`。
+- **Line 155 / 第 155 行** — `      /// Extent of tensor`
+  - **EN**: Adds template parameter specifier `/// Extent of tensor`.
+  - **CN**: 补充模板参数说明符 `/// Extent of tensor`。
+- **Line 156 / 第 156 行** — `      Conv2dProblemSize const &problem_size,`
+  - **EN**: Adds template parameter specifier `Conv2dProblemSize const &problem_size`.
+  - **CN**: 补充模板参数说明符 `Conv2dProblemSize const &problem_size`。
+- **Line 157 / 第 157 行** — `      /// Pointer to start of scale vector`
+  - **EN**: Adds template parameter specifier `/// Pointer to start of scale vector`.
+  - **CN**: 补充模板参数说明符 `/// Pointer to start of scale vector`。
+- **Line 158 / 第 158 行** — `      ConstPointer scale_pointer,`
+  - **EN**: Adds template parameter specifier `ConstPointer scale_pointer`.
+  - **CN**: 补充模板参数说明符 `ConstPointer scale_pointer`。
+- **Line 159 / 第 159 行** — `      /// Pointer to start of scale vector`
+  - **EN**: Adds template parameter specifier `/// Pointer to start of scale vector`.
+  - **CN**: 补充模板参数说明符 `/// Pointer to start of scale vector`。
+- **Line 160 / 第 160 行** — `      ConstPointer bias_pointer,`
+  - **EN**: Adds template parameter specifier `ConstPointer bias_pointer`.
+  - **CN**: 补充模板参数说明符 `ConstPointer bias_pointer`。
+- **Line 161 / 第 161 行** — `      ///< ID of each participating thread`
+  - **EN**: Adds template parameter specifier `///< ID of each participating thread`.
+  - **CN**: 补充模板参数说明符 `///< ID of each participating thread`。
+- **Line 162 / 第 162 行** — `      int thread_id)`
+  - **EN**: Adds template parameter specifier `int thread_id)`.
+  - **CN**: 补充模板参数说明符 `int thread_id)`。
+- **Line 163 / 第 163 行** — `      : PredicatedScaleBiasVectorIterator(params, problem_size,`
+  - **EN**: Adds template parameter specifier `: PredicatedScaleBiasVectorIterator(params, problem_size`.
+  - **CN**: 补充模板参数说明符 `: PredicatedScaleBiasVectorIterator(params, problem_size`。
+- **Line 164 / 第 164 行** — `                                          scale_pointer, bias_pointer,`
+  - **EN**: Adds template parameter specifier `scale_pointer, bias_pointer`.
+  - **CN**: 补充模板参数说明符 `scale_pointer, bias_pointer`。
+- **Line 165 / 第 165 行** — `                                          thread_id, make_Coord(0, 0)) {}`
+  - **EN**: Adds template parameter specifier `thread_id, make_Coord(0, 0)) {}`.
+  - **CN**: 补充模板参数说明符 `thread_id, make_Coord(0, 0)) {}`。
+- **Line 166 / 第 166 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 167 / 第 167 行** — `  /// Advances an iterator along logical dimensions of matrix in units of whole warp tiles`
+  - **EN**: Adds template parameter specifier `/// Advances an iterator along logical dimensions of matrix in units of whole warp tiles`.
+  - **CN**: 补充模板参数说明符 `/// Advances an iterator along logical dimensions of matrix in units of whole warp tiles`。
+- **Line 168 / 第 168 行** — `  CUTLASS_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_DEVICE`。
+- **Line 169 / 第 169 行** — `  void add_tile_offset(`
+  - **EN**: Adds template parameter specifier `void add_tile_offset(`.
+  - **CN**: 补充模板参数说明符 `void add_tile_offset(`。
+- **Line 170 / 第 170 行** — `      TensorCoord const &tile_offset) {`
+  - **EN**: Adds template parameter specifier `TensorCoord const &tile_offset) {`.
+  - **CN**: 补充模板参数说明符 `TensorCoord const &tile_offset) {`。
+- **Line 171 / 第 171 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 172 / 第 172 行** — `    thread_offset_ += (WarpShape::kContiguous * tile_offset.contiguous());`
+  - **EN**: Adds template parameter specifier `thread_offset_ += (WarpShape::kContiguous * tile_offset.contiguous());`.
+  - **CN**: 补充模板参数说明符 `thread_offset_ += (WarpShape::kContiguous * tile_offset.contiguous());`。
+- **Line 173 / 第 173 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 174 / 第 174 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Adds template parameter specifier `CUTLASS_PRAGMA_UNROLL`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_PRAGMA_UNROLL`。
+- **Line 175 / 第 175 行** — `    for(int c = 0; c < kIterations; ++c) {`
+  - **EN**: Adds template parameter specifier `for(int c = 0; c < kIterations; ++c) {`.
+  - **CN**: 补充模板参数说明符 `for(int c = 0; c < kIterations; ++c) {`。
+- **Line 176 / 第 176 行** — `      int rsc_offset = thread_offset_ + c * 8;`
+  - **EN**: Adds template parameter specifier `int rsc_offset = thread_offset_ + c * 8;`.
+  - **CN**: 补充模板参数说明符 `int rsc_offset = thread_offset_ + c * 8;`。
+- **Line 177 / 第 177 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 178 / 第 178 行** — `      int residual, tmp;`
+  - **EN**: Adds template parameter specifier `int residual, tmp;`.
+  - **CN**: 补充模板参数说明符 `int residual, tmp;`。
+- **Line 179 / 第 179 行** — `      params_.sc_divmod(tmp, residual, rsc_offset);`
+  - **EN**: Adds template parameter specifier `params_.sc_divmod(tmp, residual, rsc_offset);`.
+  - **CN**: 补充模板参数说明符 `params_.sc_divmod(tmp, residual, rsc_offset);`。
+- **Line 180 / 第 180 行** — `      params_.c_divmod(tmp, filter_c_[c], residual);`
+  - **EN**: Adds template parameter specifier `params_.c_divmod(tmp, filter_c_[c], residual);`.
+  - **CN**: 补充模板参数说明符 `params_.c_divmod(tmp, filter_c_[c], residual);`。
+- **Line 181 / 第 181 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 182 / 第 182 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 183 / 第 183 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 184 / 第 184 行** — `  /// Loads a fragment from memory`
+  - **EN**: Adds template parameter specifier `/// Loads a fragment from memory`.
+  - **CN**: 补充模板参数说明符 `/// Loads a fragment from memory`。
+- **Line 185 / 第 185 行** — `  CUTLASS_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_DEVICE`。
+- **Line 186 / 第 186 行** — `  void load_with_pointer_offset(Fragment &frag, Index pointer_offset) {`
+  - **EN**: Adds template parameter specifier `void load_with_pointer_offset(Fragment &frag, Index pointer_offset) {`.
+  - **CN**: 补充模板参数说明符 `void load_with_pointer_offset(Fragment &frag, Index pointer_offset) {`。
+- **Line 187 / 第 187 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 188 / 第 188 行** — `    frag.fill(__float2half2_rn(0.0f));`
+  - **EN**: Adds template parameter specifier `frag.fill(__float2half2_rn(0.0f));`.
+  - **CN**: 补充模板参数说明符 `frag.fill(__float2half2_rn(0.0f));`。
+- **Line 189 / 第 189 行** — `    __half2 *frag_ptr = reinterpret_cast<__half2 *>(&frag);`
+  - **EN**: Adds template parameter specifier `__half2 *frag_ptr = reinterpret_cast<__half2 *>(&frag);`.
+  - **CN**: 补充模板参数说明符 `__half2 *frag_ptr = reinterpret_cast<__half2 *>(&frag);`。
+- **Line 190 / 第 190 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 191 / 第 191 行** — `    // load scale`
+  - **EN**: Adds template parameter specifier `// load scale`.
+  - **CN**: 补充模板参数说明符 `// load scale`。
+- **Line 192 / 第 192 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Adds template parameter specifier `CUTLASS_PRAGMA_UNROLL`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_PRAGMA_UNROLL`。
+- **Line 193 / 第 193 行** — `    for (int c = 0; c < kIterations; ++c) {`
+  - **EN**: Adds template parameter specifier `for (int c = 0; c < kIterations; ++c) {`.
+  - **CN**: 补充模板参数说明符 `for (int c = 0; c < kIterations; ++c) {`。
+- **Line 194 / 第 194 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 195 / 第 195 行** — `      cutlass::arch::global_load<`
+  - **EN**: Adds template parameter specifier `cutlass::arch::global_load<`.
+  - **CN**: 补充模板参数说明符 `cutlass::arch::global_load<`。
+- **Line 196 / 第 196 行** — `        __half,`
+  - **EN**: Adds template parameter specifier `__half`.
+  - **CN**: 补充模板参数说明符 `__half`。
+- **Line 197 / 第 197 行** — `        sizeof(AccessType)`
+  - **EN**: Adds template parameter specifier `sizeof(AccessType)`.
+  - **CN**: 补充模板参数说明符 `sizeof(AccessType)`。
+- **Line 198 / 第 198 行** — `      >(`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 199 / 第 199 行** — `        frag_ptr[c * 2].x,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 200 / 第 200 行** — `        scale_pointer_ + filter_c_[c],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 201 / 第 201 行** — `        true`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 202 / 第 202 行** — `      );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 203 / 第 203 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 204 / 第 204 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 205 / 第 205 行** — `    // load bias`
+  - **EN**: Inline comment explaining intent: `load bias`.
+  - **CN**: 行内注释说明意图：`load bias`。
+- **Line 206 / 第 206 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 207 / 第 207 行** — `    for (int c = 0; c < kIterations; ++c) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 208 / 第 208 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 209 / 第 209 行** — `      cutlass::arch::global_load<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 210 / 第 210 行** — `        __half,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 211 / 第 211 行** — `        sizeof(AccessType)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 212 / 第 212 行** — `      >(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 213 / 第 213 行** — `        frag_ptr[c * 2 + 1].x,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 214 / 第 214 行** — `        bias_pointer_ + filter_c_[c],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 215 / 第 215 行** — `        true `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 216 / 第 216 行** — `      );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 217 / 第 217 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 218 / 第 218 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 219 / 第 219 行** — `    // duplicate scale`
+  - **EN**: Inline comment explaining intent: `duplicate scale`.
+  - **CN**: 行内注释说明意图：`duplicate scale`。
+- **Line 220 / 第 220 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 221 / 第 221 行** — `    for (int c = 0; c < kIterations; ++c) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 222 / 第 222 行** — `      frag_ptr[c * 2].y = frag_ptr[c * 2].x;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 223 / 第 223 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 224 / 第 224 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 225 / 第 225 行** — `    // duplicate bias`
+  - **EN**: Inline comment explaining intent: `duplicate bias`.
+  - **CN**: 行内注释说明意图：`duplicate bias`。
+- **Line 226 / 第 226 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 227 / 第 227 行** — `    for (int c = 0; c < kIterations; ++c) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 228 / 第 228 行** — `      frag_ptr[c * 2 + 1].y = frag_ptr[c * 2 + 1].x;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 229 / 第 229 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 230 / 第 230 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 231 / 第 231 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 232 / 第 232 行** — `  /// Loads a fragment from memory`
+  - **EN**: Inline comment explaining intent: `Loads a fragment from memory`.
+  - **CN**: 行内注释说明意图：`Loads a fragment from memory`。
+- **Line 233 / 第 233 行** — `  CUTLASS_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 234 / 第 234 行** — `  void load(Fragment &frag) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 235 / 第 235 行** — `    load_with_pointer_offset(frag, 0);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 236 / 第 236 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 237 / 第 237 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 238 / 第 238 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 239 / 第 239 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 240 / 第 240 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 241 / 第 241 行** — `/// Specialization of PredicatedTileIterator for row-major data.`
+  - **EN**: Inline comment explaining intent: `Specialization of PredicatedTileIterator for row-major data.`.
+  - **CN**: 行内注释说明意图：`Specialization of PredicatedTileIterator for row-major data.`。
+- **Line 242 / 第 242 行** — `///`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 243 / 第 243 行** — `/// Satisfies: ForwardTileIteratorConcept |`
+  - **EN**: Inline comment explaining intent: `Satisfies: ForwardTileIteratorConcept |`.
+  - **CN**: 行内注释说明意图：`Satisfies: ForwardTileIteratorConcept |`。
+- **Line 244 / 第 244 行** — `///            ReadableContiguousTileIteratorConcept |`
+  - **EN**: Inline comment explaining intent: `ReadableContiguousTileIteratorConcept |`.
+  - **CN**: 行内注释说明意图：`ReadableContiguousTileIteratorConcept |`。
+- **Line 245 / 第 245 行** — `///            WriteableContiguousTileIteratorConcept |`
+  - **EN**: Inline comment explaining intent: `WriteableContiguousTileIteratorConcept |`.
+  - **CN**: 行内注释说明意图：`WriteableContiguousTileIteratorConcept |`。
+- **Line 246 / 第 246 行** — `///            MaskedTileIteratorConcept`
+  - **EN**: Inline comment explaining intent: `MaskedTileIteratorConcept`.
+  - **CN**: 行内注释说明意图：`MaskedTileIteratorConcept`。
+- **Line 247 / 第 247 行** — `///`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 248 / 第 248 行** — `template <typename WarpShape_,`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 249 / 第 249 行** — `          typename Element_>`
+  - **EN**: Adds template parameter specifier `typename Element_>`.
+  - **CN**: 补充模板参数说明符 `typename Element_>`。
+- **Line 250 / 第 250 行** — `class PredicatedScaleBiasVectorIterator<WarpShape_,`
+  - **EN**: Adds template parameter specifier `class PredicatedScaleBiasVectorIterator<WarpShape_`.
+  - **CN**: 补充模板参数说明符 `class PredicatedScaleBiasVectorIterator<WarpShape_`。
+- **Line 251 / 第 251 行** — `                                        Element_,`
+  - **EN**: Adds template parameter specifier `Element_`.
+  - **CN**: 补充模板参数说明符 `Element_`。
+- **Line 252 / 第 252 行** — `                                        layout::RowMajor> {`
+  - **EN**: Adds template parameter specifier `layout::RowMajor> {`.
+  - **CN**: 补充模板参数说明符 `layout::RowMajor> {`。
+- **Line 253 / 第 253 行** — ` public:`
+  - **EN**: Adds template parameter specifier `public:`.
+  - **CN**: 补充模板参数说明符 `public:`。
+- **Line 254 / 第 254 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 255 / 第 255 行** — `  using WarpShape = WarpShape_;`
+  - **EN**: Adds template parameter specifier `using WarpShape = WarpShape_;`.
+  - **CN**: 补充模板参数说明符 `using WarpShape = WarpShape_;`。
+- **Line 256 / 第 256 行** — `  using Element = Element_;`
+  - **EN**: Adds template parameter specifier `using Element = Element_;`.
+  - **CN**: 补充模板参数说明符 `using Element = Element_;`。
+- **Line 257 / 第 257 行** — `  using Layout = layout::RowMajor;`
+  - **EN**: Adds template parameter specifier `using Layout = layout::RowMajor;`.
+  - **CN**: 补充模板参数说明符 `using Layout = layout::RowMajor;`。
+- **Line 258 / 第 258 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 259 / 第 259 行** — `  using Index = typename Layout::Index;`
+  - **EN**: Adds template parameter specifier `using Index = typename Layout::Index;`.
+  - **CN**: 补充模板参数说明符 `using Index = typename Layout::Index;`。
+- **Line 260 / 第 260 行** — `  using LongIndex = typename Layout::LongIndex;`
+  - **EN**: Adds template parameter specifier `using LongIndex = typename Layout::LongIndex;`.
+  - **CN**: 补充模板参数说明符 `using LongIndex = typename Layout::LongIndex;`。
+- **Line 261 / 第 261 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 262 / 第 262 行** — `  using TensorRef = TensorRef<Element, Layout>;`
+  - **EN**: Adds template parameter specifier `using TensorRef = TensorRef<Element, Layout>;`.
+  - **CN**: 补充模板参数说明符 `using TensorRef = TensorRef<Element, Layout>;`。
+- **Line 263 / 第 263 行** — `  using TensorView = TensorView<Element, Layout>;`
+  - **EN**: Adds template parameter specifier `using TensorView = TensorView<Element, Layout>;`.
+  - **CN**: 补充模板参数说明符 `using TensorView = TensorView<Element, Layout>;`。
+- **Line 264 / 第 264 行** — `  using TensorCoord = typename Layout::TensorCoord;`
+  - **EN**: Adds template parameter specifier `using TensorCoord = typename Layout::TensorCoord;`.
+  - **CN**: 补充模板参数说明符 `using TensorCoord = typename Layout::TensorCoord;`。
+- **Line 265 / 第 265 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 266 / 第 266 行** — `  using ConstPointer = const Element *;`
+  - **EN**: Adds template parameter specifier `using ConstPointer = const Element *;`.
+  - **CN**: 补充模板参数说明符 `using ConstPointer = const Element *;`。
+- **Line 267 / 第 267 行** — `  using NonConstPointer = typename platform::remove_const<Element>::type *;`
+  - **EN**: Adds template parameter specifier `using NonConstPointer = typename platform::remove_const<Element>::type *;`.
+  - **CN**: 补充模板参数说明符 `using NonConstPointer = typename platform::remove_const<Element>::type *;`。
+- **Line 268 / 第 268 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 269 / 第 269 行** — `  using UnderlyingIterator = PredicatedScaleBiasVectorIterator<`
+  - **EN**: Adds template parameter specifier `using UnderlyingIterator = PredicatedScaleBiasVectorIterator<`.
+  - **CN**: 补充模板参数说明符 `using UnderlyingIterator = PredicatedScaleBiasVectorIterator<`。
+- **Line 270 / 第 270 行** — `      layout::PitchLinearShape<WarpShape::kColumn, WarpShape::kRow>,`
+  - **EN**: Adds template parameter specifier `layout::PitchLinearShape<WarpShape::kColumn, WarpShape::kRow>`.
+  - **CN**: 补充模板参数说明符 `layout::PitchLinearShape<WarpShape::kColumn, WarpShape::kRow>`。
+- **Line 271 / 第 271 行** — `      Element,`
+  - **EN**: Adds template parameter specifier `Element`.
+  - **CN**: 补充模板参数说明符 `Element`。
+- **Line 272 / 第 272 行** — `      layout::PitchLinear>;`
+  - **EN**: Adds template parameter specifier `layout::PitchLinear>;`.
+  - **CN**: 补充模板参数说明符 `layout::PitchLinear>;`。
+- **Line 273 / 第 273 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 274 / 第 274 行** — `  using AccessType = typename UnderlyingIterator::AccessType;`
+  - **EN**: Adds template parameter specifier `using AccessType = typename UnderlyingIterator::AccessType;`.
+  - **CN**: 补充模板参数说明符 `using AccessType = typename UnderlyingIterator::AccessType;`。
+- **Line 275 / 第 275 行** — `  static int const kElementsPerAccess = UnderlyingIterator::kElementsPerAccess;`
+  - **EN**: Adds template parameter specifier `static int const kElementsPerAccess = UnderlyingIterator::kElementsPerAccess;`.
+  - **CN**: 补充模板参数说明符 `static int const kElementsPerAccess = UnderlyingIterator::kElementsPerAccess;`。
+- **Line 276 / 第 276 行** — `  using Fragment = typename UnderlyingIterator::Fragment;`
+  - **EN**: Adds template parameter specifier `using Fragment = typename UnderlyingIterator::Fragment;`.
+  - **CN**: 补充模板参数说明符 `using Fragment = typename UnderlyingIterator::Fragment;`。
+- **Line 277 / 第 277 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 278 / 第 278 行** — `  /// Parameters object is precomputed state and is host-constructible`
+  - **EN**: Adds template parameter specifier `/// Parameters object is precomputed state and is host-constructible`.
+  - **CN**: 补充模板参数说明符 `/// Parameters object is precomputed state and is host-constructible`。
+- **Line 279 / 第 279 行** — `  class Params {`
+  - **EN**: Adds template parameter specifier `class Params {`.
+  - **CN**: 补充模板参数说明符 `class Params {`。
+- **Line 280 / 第 280 行** — `   private:`
+  - **EN**: Adds template parameter specifier `private:`.
+  - **CN**: 补充模板参数说明符 `private:`。
+- **Line 281 / 第 281 行** — `    friend PredicatedScaleBiasVectorIterator;`
+  - **EN**: Adds template parameter specifier `friend PredicatedScaleBiasVectorIterator;`.
+  - **CN**: 补充模板参数说明符 `friend PredicatedScaleBiasVectorIterator;`。
+- **Line 282 / 第 282 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 283 / 第 283 行** — `    /// Parameters object`
+  - **EN**: Adds template parameter specifier `/// Parameters object`.
+  - **CN**: 补充模板参数说明符 `/// Parameters object`。
+- **Line 284 / 第 284 行** — `    typename UnderlyingIterator::Params params_;`
+  - **EN**: Adds template parameter specifier `typename UnderlyingIterator::Params params_;`.
+  - **CN**: 补充模板参数说明符 `typename UnderlyingIterator::Params params_;`。
+- **Line 285 / 第 285 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 286 / 第 286 行** — `   public:`
+  - **EN**: Adds template parameter specifier `public:`.
+  - **CN**: 补充模板参数说明符 `public:`。
+- **Line 287 / 第 287 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 288 / 第 288 行** — `    /// Default ctor`
+  - **EN**: Adds template parameter specifier `/// Default ctor`.
+  - **CN**: 补充模板参数说明符 `/// Default ctor`。
+- **Line 289 / 第 289 行** — `    CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 290 / 第 290 行** — `    Params() { }`
+  - **EN**: Adds template parameter specifier `Params() { }`.
+  - **CN**: 补充模板参数说明符 `Params() { }`。
+- **Line 291 / 第 291 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 292 / 第 292 行** — `    /// Construct the Params object given a pitch-linear tensor's layout`
+  - **EN**: Adds template parameter specifier `/// Construct the Params object given a pitch-linear tensor's layout`.
+  - **CN**: 补充模板参数说明符 `/// Construct the Params object given a pitch-linear tensor's layout`。
+- **Line 293 / 第 293 行** — `    CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 294 / 第 294 行** — `    Params(Conv2dProblemSize const &problem_size, Layout const &layout)`
+  - **EN**: Adds template parameter specifier `Params(Conv2dProblemSize const &problem_size, Layout const &layout)`.
+  - **CN**: 补充模板参数说明符 `Params(Conv2dProblemSize const &problem_size, Layout const &layout)`。
+- **Line 295 / 第 295 行** — `        : params_(problem_size, layout::TensorNHWC(0, 0, 0)){};`
+  - **EN**: Adds template parameter specifier `: params_(problem_size, layout::TensorNHWC(0, 0, 0)){};`.
+  - **CN**: 补充模板参数说明符 `: params_(problem_size, layout::TensorNHWC(0, 0, 0)){};`。
+- **Line 296 / 第 296 行** — `  };`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 297 / 第 297 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 298 / 第 298 行** — ` private:`
+  - **EN**: Adds template parameter specifier `private:`.
+  - **CN**: 补充模板参数说明符 `private:`。
+- **Line 299 / 第 299 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 300 / 第 300 行** — `  // Data members`
+  - **EN**: Adds template parameter specifier `// Data members`.
+  - **CN**: 补充模板参数说明符 `// Data members`。
+- **Line 301 / 第 301 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 302 / 第 302 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 303 / 第 303 行** — `  /// Underlying pitch-linear tile iterator`
+  - **EN**: Adds template parameter specifier `/// Underlying pitch-linear tile iterator`.
+  - **CN**: 补充模板参数说明符 `/// Underlying pitch-linear tile iterator`。
+- **Line 304 / 第 304 行** — `  UnderlyingIterator iterator_;`
+  - **EN**: Adds template parameter specifier `UnderlyingIterator iterator_;`.
+  - **CN**: 补充模板参数说明符 `UnderlyingIterator iterator_;`。
+- **Line 305 / 第 305 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 306 / 第 306 行** — ` public:`
+  - **EN**: Adds template parameter specifier `public:`.
+  - **CN**: 补充模板参数说明符 `public:`。
+- **Line 307 / 第 307 行** — `  /// Constructs a TileIterator from its precomputed state, threadblock offset,`
+  - **EN**: Adds template parameter specifier `/// Constructs a TileIterator from its precomputed state, threadblock offset`.
+  - **CN**: 补充模板参数说明符 `/// Constructs a TileIterator from its precomputed state, threadblock offset`。
+- **Line 308 / 第 308 行** — `  /// and thread ID`
+  - **EN**: Adds template parameter specifier `/// and thread ID`.
+  - **CN**: 补充模板参数说明符 `/// and thread ID`。
+- **Line 309 / 第 309 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 310 / 第 310 行** — `  PredicatedScaleBiasVectorIterator(`
+  - **EN**: Adds template parameter specifier `PredicatedScaleBiasVectorIterator(`.
+  - **CN**: 补充模板参数说明符 `PredicatedScaleBiasVectorIterator(`。
+- **Line 311 / 第 311 行** — `      ///< Precomputed parameters object`
+  - **EN**: Adds template parameter specifier `///< Precomputed parameters object`.
+  - **CN**: 补充模板参数说明符 `///< Precomputed parameters object`。
+- **Line 312 / 第 312 行** — `      Params const &params,`
+  - **EN**: Adds template parameter specifier `Params const &params`.
+  - **CN**: 补充模板参数说明符 `Params const &params`。
+- **Line 313 / 第 313 行** — `      ///< Extent of tensor`
+  - **EN**: Adds template parameter specifier `///< Extent of tensor`.
+  - **CN**: 补充模板参数说明符 `///< Extent of tensor`。
+- **Line 314 / 第 314 行** — `      Conv2dProblemSize const &problem_size,`
+  - **EN**: Adds template parameter specifier `Conv2dProblemSize const &problem_size`.
+  - **CN**: 补充模板参数说明符 `Conv2dProblemSize const &problem_size`。
+- **Line 315 / 第 315 行** — `      ///< Pointer to the start of the scale vector`
+  - **EN**: Adds template parameter specifier `///< Pointer to the start of the scale vector`.
+  - **CN**: 补充模板参数说明符 `///< Pointer to the start of the scale vector`。
+- **Line 316 / 第 316 行** — `      ConstPointer scale_pointer,`
+  - **EN**: Adds template parameter specifier `ConstPointer scale_pointer`.
+  - **CN**: 补充模板参数说明符 `ConstPointer scale_pointer`。
+- **Line 317 / 第 317 行** — `      ///< Pointer to the start of the bias vector`
+  - **EN**: Adds template parameter specifier `///< Pointer to the start of the bias vector`.
+  - **CN**: 补充模板参数说明符 `///< Pointer to the start of the bias vector`。
+- **Line 318 / 第 318 行** — `      ConstPointer bias_pointer,`
+  - **EN**: Adds template parameter specifier `ConstPointer bias_pointer`.
+  - **CN**: 补充模板参数说明符 `ConstPointer bias_pointer`。
+- **Line 319 / 第 319 行** — `      ///< ID of each participating thread`
+  - **EN**: Adds template parameter specifier `///< ID of each participating thread`.
+  - **CN**: 补充模板参数说明符 `///< ID of each participating thread`。
+- **Line 320 / 第 320 行** — `      int thread_id,`
+  - **EN**: Adds template parameter specifier `int thread_id`.
+  - **CN**: 补充模板参数说明符 `int thread_id`。
+- **Line 321 / 第 321 行** — `      ///< Initial offset of threadblock`
+  - **EN**: Adds template parameter specifier `///< Initial offset of threadblock`.
+  - **CN**: 补充模板参数说明符 `///< Initial offset of threadblock`。
+- **Line 322 / 第 322 行** — `      TensorCoord const &threadblock_offset)`
+  - **EN**: Adds template parameter specifier `TensorCoord const &threadblock_offset)`.
+  - **CN**: 补充模板参数说明符 `TensorCoord const &threadblock_offset)`。
+- **Line 323 / 第 323 行** — `      : iterator_(params.params_, problem_size, scale_pointer, bias_pointer,`
+  - **EN**: Adds template parameter specifier `: iterator_(params.params_, problem_size, scale_pointer, bias_pointer`.
+  - **CN**: 补充模板参数说明符 `: iterator_(params.params_, problem_size, scale_pointer, bias_pointer`。
+- **Line 324 / 第 324 行** — `                  thread_id,`
+  - **EN**: Adds template parameter specifier `thread_id`.
+  - **CN**: 补充模板参数说明符 `thread_id`。
+- **Line 325 / 第 325 行** — `                  layout::PitchLinearCoord(threadblock_offset.column(),`
+  - **EN**: Adds template parameter specifier `layout::PitchLinearCoord(threadblock_offset.column()`.
+  - **CN**: 补充模板参数说明符 `layout::PitchLinearCoord(threadblock_offset.column()`。
+- **Line 326 / 第 326 行** — `                                           threadblock_offset.row())) {}`
+  - **EN**: Adds template parameter specifier `threadblock_offset.row())) {}`.
+  - **CN**: 补充模板参数说明符 `threadblock_offset.row())) {}`。
+- **Line 327 / 第 327 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 328 / 第 328 行** — `  /// Construct a PredicatedTileIterator with zero threadblock offset`
+  - **EN**: Adds template parameter specifier `/// Construct a PredicatedTileIterator with zero threadblock offset`.
+  - **CN**: 补充模板参数说明符 `/// Construct a PredicatedTileIterator with zero threadblock offset`。
+- **Line 329 / 第 329 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 330 / 第 330 行** — `  PredicatedScaleBiasVectorIterator(`
+  - **EN**: Adds template parameter specifier `PredicatedScaleBiasVectorIterator(`.
+  - **CN**: 补充模板参数说明符 `PredicatedScaleBiasVectorIterator(`。
+- **Line 331 / 第 331 行** — `      Params const &params,                   ///< Precomputed parameters object`
+  - **EN**: Adds template parameter specifier `Params const &params,                   ///< Precomputed parameters object`.
+  - **CN**: 补充模板参数说明符 `Params const &params,                   ///< Precomputed parameters object`。
+- **Line 332 / 第 332 行** — `      Conv2dProblemSize const &problem_size,  ///< Extent of tensor`
+  - **EN**: Adds template parameter specifier `Conv2dProblemSize const &problem_size,  ///< Extent of tensor`.
+  - **CN**: 补充模板参数说明符 `Conv2dProblemSize const &problem_size,  ///< Extent of tensor`。
+- **Line 333 / 第 333 行** — `      ConstPointer scale_pointer,  ///< Pointer to the start of the scale vector`
+  - **EN**: Adds template parameter specifier `ConstPointer scale_pointer,  ///< Pointer to the start of the scale vector`.
+  - **CN**: 补充模板参数说明符 `ConstPointer scale_pointer,  ///< Pointer to the start of the scale vector`。
+- **Line 334 / 第 334 行** — `      ConstPointer bias_pointer,   ///< Pointer to the start of the bias vector`
+  - **EN**: Adds template parameter specifier `ConstPointer bias_pointer,   ///< Pointer to the start of the bias vector`.
+  - **CN**: 补充模板参数说明符 `ConstPointer bias_pointer,   ///< Pointer to the start of the bias vector`。
+- **Line 335 / 第 335 行** — `      int thread_id                ///< ID of each participating thread`
+  - **EN**: Adds template parameter specifier `int thread_id                ///< ID of each participating thread`.
+  - **CN**: 补充模板参数说明符 `int thread_id                ///< ID of each participating thread`。
+- **Line 336 / 第 336 行** — `      )`
+  - **EN**: Adds template parameter specifier `)`.
+  - **CN**: 补充模板参数说明符 `)`。
+- **Line 337 / 第 337 行** — `      : PredicatedScaleBiasVectorIterator(params, problem_size,`
+  - **EN**: Adds template parameter specifier `: PredicatedScaleBiasVectorIterator(params, problem_size`.
+  - **CN**: 补充模板参数说明符 `: PredicatedScaleBiasVectorIterator(params, problem_size`。
+- **Line 338 / 第 338 行** — `                                          scale_pointer, bias_pointer,`
+  - **EN**: Adds template parameter specifier `scale_pointer, bias_pointer`.
+  - **CN**: 补充模板参数说明符 `scale_pointer, bias_pointer`。
+- **Line 339 / 第 339 行** — `                                          thread_id, make_Coord(0, 0)) {}`
+  - **EN**: Adds template parameter specifier `thread_id, make_Coord(0, 0)) {}`.
+  - **CN**: 补充模板参数说明符 `thread_id, make_Coord(0, 0)) {}`。
+- **Line 340 / 第 340 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 341 / 第 341 行** — `  /// Overrides the internal iteration index`
+  - **EN**: Adds template parameter specifier `/// Overrides the internal iteration index`.
+  - **CN**: 补充模板参数说明符 `/// Overrides the internal iteration index`。
+- **Line 342 / 第 342 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 343 / 第 343 行** — `  void set_iteration_index(int index) { iterator_.set_iteration_index(index); }`
+  - **EN**: Adds template parameter specifier `void set_iteration_index(int index) { iterator_.set_iteration_index(index); }`.
+  - **CN**: 补充模板参数说明符 `void set_iteration_index(int index) { iterator_.set_iteration_index(index); }`。
+- **Line 344 / 第 344 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 345 / 第 345 行** — `  /// Advances an iterator along logical dimensions of matrix in units of whole`
+  - **EN**: Adds template parameter specifier `/// Advances an iterator along logical dimensions of matrix in units of whole`.
+  - **CN**: 补充模板参数说明符 `/// Advances an iterator along logical dimensions of matrix in units of whole`。
+- **Line 346 / 第 346 行** — `  /// threadblock tiles`
+  - **EN**: Adds template parameter specifier `/// threadblock tiles`.
+  - **CN**: 补充模板参数说明符 `/// threadblock tiles`。
+- **Line 347 / 第 347 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 348 / 第 348 行** — `  void add_tile_offset(TensorCoord const &tile_offset) {`
+  - **EN**: Adds template parameter specifier `void add_tile_offset(TensorCoord const &tile_offset) {`.
+  - **CN**: 补充模板参数说明符 `void add_tile_offset(TensorCoord const &tile_offset) {`。
+- **Line 349 / 第 349 行** — `    iterator_.add_tile_offset({tile_offset.column(), tile_offset.row()});`
+  - **EN**: Adds template parameter specifier `iterator_.add_tile_offset({tile_offset.column(), tile_offset.row()});`.
+  - **CN**: 补充模板参数说明符 `iterator_.add_tile_offset({tile_offset.column(), tile_offset.row()});`。
+- **Line 350 / 第 350 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 351 / 第 351 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 352 / 第 352 行** — `  /// Loads a fragment from memory`
+  - **EN**: Adds template parameter specifier `/// Loads a fragment from memory`.
+  - **CN**: 补充模板参数说明符 `/// Loads a fragment from memory`。
+- **Line 353 / 第 353 行** — `  CUTLASS_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_DEVICE`。
+- **Line 354 / 第 354 行** — `  void load_with_pointer_offset(Fragment &frag, Index pointer_offset) {`
+  - **EN**: Adds template parameter specifier `void load_with_pointer_offset(Fragment &frag, Index pointer_offset) {`.
+  - **CN**: 补充模板参数说明符 `void load_with_pointer_offset(Fragment &frag, Index pointer_offset) {`。
+- **Line 355 / 第 355 行** — `    iterator_.load_with_pointer_offset(frag, pointer_offset);`
+  - **EN**: Adds template parameter specifier `iterator_.load_with_pointer_offset(frag, pointer_offset);`.
+  - **CN**: 补充模板参数说明符 `iterator_.load_with_pointer_offset(frag, pointer_offset);`。
+- **Line 356 / 第 356 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 357 / 第 357 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 358 / 第 358 行** — `  /// Loads a fragment from memory`
+  - **EN**: Adds template parameter specifier `/// Loads a fragment from memory`.
+  - **CN**: 补充模板参数说明符 `/// Loads a fragment from memory`。
+- **Line 359 / 第 359 行** — `  CUTLASS_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_DEVICE`。
+- **Line 360 / 第 360 行** — `  void load(Fragment &frag) {`
+  - **EN**: Adds template parameter specifier `void load(Fragment &frag) {`.
+  - **CN**: 补充模板参数说明符 `void load(Fragment &frag) {`。
+- **Line 361 / 第 361 行** — `    iterator_.load(frag);`
+  - **EN**: Adds template parameter specifier `iterator_.load(frag);`.
+  - **CN**: 补充模板参数说明符 `iterator_.load(frag);`。
+- **Line 362 / 第 362 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 363 / 第 363 行** — `};`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 364 / 第 364 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 365 / 第 365 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `////////////////////////////////////////////////////////////////////////////////`。
+- **Line 366 / 第 366 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 367 / 第 367 行** — `}  // namespace threadblock`
+  - **EN**: Adds template parameter specifier `}  // namespace threadblock`.
+  - **CN**: 补充模板参数说明符 `}  // namespace threadblock`。
+- **Line 368 / 第 368 行** — `}  // namespace conv `
+  - **EN**: Adds template parameter specifier `}  // namespace conv`.
+  - **CN**: 补充模板参数说明符 `}  // namespace conv`。
+- **Line 369 / 第 369 行** — `}  // namespace cutlass`
+  - **EN**: Adds template parameter specifier `}  // namespace cutlass`.
+  - **CN**: 补充模板参数说明符 `}  // namespace cutlass`。
+- **Line 370 / 第 370 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 371 / 第 371 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `////////////////////////////////////////////////////////////////////////////////`。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Problem shapes / 问题形状
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+- Threadblock structure / Threadblock 结构
+
+## Dependencies / 依赖
+- `cutlass/array.h` — CUTLASS dependency `cutlass/array.h` / CUTLASS 依赖 `cutlass/array.h`
+- `cutlass/coord.h` — CUTLASS dependency `cutlass/coord.h` / CUTLASS 依赖 `cutlass/coord.h`
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/layout/matrix.h` — Layout definition `cutlass/layout/matrix.h` / 布局定义 `cutlass/layout/matrix.h`
+- `cutlass/layout/pitch_linear.h` — Layout definition `cutlass/layout/pitch_linear.h` / 布局定义 `cutlass/layout/pitch_linear.h`
+- `cutlass/matrix_shape.h` — CUTLASS dependency `cutlass/matrix_shape.h` / CUTLASS 依赖 `cutlass/matrix_shape.h`
+- `cutlass/predicate_vector.h` — CUTLASS dependency `cutlass/predicate_vector.h` / CUTLASS 依赖 `cutlass/predicate_vector.h`
+- `cutlass/tensor_ref.h` — CUTLASS dependency `cutlass/tensor_ref.h` / CUTLASS 依赖 `cutlass/tensor_ref.h`
+- `cutlass/tensor_view.h` — CUTLASS dependency `cutlass/tensor_view.h` / CUTLASS 依赖 `cutlass/tensor_view.h`

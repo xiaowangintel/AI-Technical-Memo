@@ -1,0 +1,826 @@
+# implicit_gemm_convolution_fusion.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/device/implicit_gemm_convolution_fusion.h`
+**Purpose / 用途**: Template for device-level fused activation's scale+bias+relu and Implicit GEMM Convolution. / 提供device 级封装、隐式 GEMM 支持。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/* \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `   \brief Template for device-level fused activation's scale+bias+relu and Implicit GEMM Convolution`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `#include <limits>`
+  - **EN**: Includes standard library header `limits`.
+  - **CN**: 引入标准库头文件 `limits`。
+- **Line 38 / 第 38 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 39 / 第 39 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 40 / 第 40 行** — `#include "cutlass/device_kernel.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/device_kernel.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/device_kernel.h`。
+- **Line 41 / 第 41 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 42 / 第 42 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 43 / 第 43 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 44 / 第 44 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 45 / 第 45 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 46 / 第 46 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 47 / 第 47 行** — `namespace device {`
+  - **EN**: Opens namespace `device` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `device`。
+- **Line 48 / 第 48 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 49 / 第 49 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `template<typename ImplicitGemmFusionKernel_>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 52 / 第 52 行** — `class ImplicitGemmConvolutionFusion {`
+  - **EN**: Starts the definition of class `ImplicitGemmConvolutionFusion`.
+  - **CN**: 开始定义 class `ImplicitGemmConvolutionFusion`。
+- **Line 53 / 第 53 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 54 / 第 54 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 55 / 第 55 行** — `  using ImplicitGemmFusionKernel = ImplicitGemmFusionKernel_;`
+  - **EN**: Introduces type or value alias `ImplicitGemmFusionKernel`.
+  - **CN**: 引入类型或值别名 `ImplicitGemmFusionKernel`。
+- **Line 56 / 第 56 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 57 / 第 57 行** — `  using ElementA = typename ImplicitGemmFusionKernel::ElementA;`
+  - **EN**: Introduces type or value alias `ElementA`.
+  - **CN**: 引入类型或值别名 `ElementA`。
+- **Line 58 / 第 58 行** — `  using LayoutA = typename ImplicitGemmFusionKernel::LayoutA;`
+  - **EN**: Introduces type or value alias `LayoutA`.
+  - **CN**: 引入类型或值别名 `LayoutA`。
+- **Line 59 / 第 59 行** — `  using ElementB = typename ImplicitGemmFusionKernel::ElementB;`
+  - **EN**: Introduces type or value alias `ElementB`.
+  - **CN**: 引入类型或值别名 `ElementB`。
+- **Line 60 / 第 60 行** — `  using LayoutB = typename ImplicitGemmFusionKernel::LayoutB;`
+  - **EN**: Introduces type or value alias `LayoutB`.
+  - **CN**: 引入类型或值别名 `LayoutB`。
+- **Line 61 / 第 61 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 62 / 第 62 行** — `//  using ElementScaleBias = typename ImplicitGemmFusionKernel::ElementScaleBias;`
+  - **EN**: Inline comment explaining intent: `using ElementScaleBias = typename ImplicitGemmFusionKernel::ElementScaleBias;`.
+  - **CN**: 行内注释说明意图：`using ElementScaleBias = typename ImplicitGemmFusionKernel::ElementScaleBias;`。
+- **Line 63 / 第 63 行** — `//  using LayoutScaleBias = typename ImplicitGemmFusionKernel::LayoutScaleBias;`
+  - **EN**: Inline comment explaining intent: `using LayoutScaleBias = typename ImplicitGemmFusionKernel::LayoutScaleBias;`.
+  - **CN**: 行内注释说明意图：`using LayoutScaleBias = typename ImplicitGemmFusionKernel::LayoutScaleBias;`。
+- **Line 64 / 第 64 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 65 / 第 65 行** — `  using ElementC = typename ImplicitGemmFusionKernel::ElementC;`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 66 / 第 66 行** — `  using LayoutC = typename ImplicitGemmFusionKernel::LayoutC;`
+  - **EN**: Introduces type or value alias `LayoutC`.
+  - **CN**: 引入类型或值别名 `LayoutC`。
+- **Line 67 / 第 67 行** — `  using ElementAccumulator = typename ImplicitGemmFusionKernel::ElementAccumulator;`
+  - **EN**: Introduces type or value alias `ElementAccumulator`.
+  - **CN**: 引入类型或值别名 `ElementAccumulator`。
+- **Line 68 / 第 68 行** — `  using ElementCompute = typename ImplicitGemmFusionKernel::ElementCompute;`
+  - **EN**: Introduces type or value alias `ElementCompute`.
+  - **CN**: 引入类型或值别名 `ElementCompute`。
+- **Line 69 / 第 69 行** — `  using OperatorClass = typename ImplicitGemmFusionKernel::OperatorClass;`
+  - **EN**: Introduces type or value alias `OperatorClass`.
+  - **CN**: 引入类型或值别名 `OperatorClass`。
+- **Line 70 / 第 70 行** — `  using ArchTag = typename ImplicitGemmFusionKernel::ArchTag;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 71 / 第 71 行** — `  using ThreadblockShape = typename ImplicitGemmFusionKernel::ThreadblockShape;`
+  - **EN**: Introduces type or value alias `ThreadblockShape`.
+  - **CN**: 引入类型或值别名 `ThreadblockShape`。
+- **Line 72 / 第 72 行** — `  using WarpShape = typename ImplicitGemmFusionKernel::WarpShape;`
+  - **EN**: Introduces type or value alias `WarpShape`.
+  - **CN**: 引入类型或值别名 `WarpShape`。
+- **Line 73 / 第 73 行** — `  using InstructionShape = typename ImplicitGemmFusionKernel::InstructionShape;`
+  - **EN**: Introduces type or value alias `InstructionShape`.
+  - **CN**: 引入类型或值别名 `InstructionShape`。
+- **Line 74 / 第 74 行** — `  using ThreadblockSwizzle = typename ImplicitGemmFusionKernel::ThreadblockSwizzle;`
+  - **EN**: Introduces type or value alias `ThreadblockSwizzle`.
+  - **CN**: 引入类型或值别名 `ThreadblockSwizzle`。
+- **Line 75 / 第 75 行** — `  using EpilogueOutputOp = typename ImplicitGemmFusionKernel::EpilogueOutputOp;`
+  - **EN**: Introduces type or value alias `EpilogueOutputOp`.
+  - **CN**: 引入类型或值别名 `EpilogueOutputOp`。
+- **Line 76 / 第 76 行** — `  static int const kStages = ImplicitGemmFusionKernel::kStages;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 77 / 第 77 行** — `  static int const kConvDim = ImplicitGemmFusionKernel::kConvDim;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 78 / 第 78 行** — `  using WarpMmaOperator = typename ImplicitGemmFusionKernel::WarpMmaOperator;`
+  - **EN**: Introduces type or value alias `WarpMmaOperator`.
+  - **CN**: 引入类型或值别名 `WarpMmaOperator`。
+- **Line 79 / 第 79 行** — `  using ArchMmaOperator = typename ImplicitGemmFusionKernel::ArchMmaOperator;`
+  - **EN**: Introduces type or value alias `ArchMmaOperator`.
+  - **CN**: 引入类型或值别名 `ArchMmaOperator`。
+- **Line 80 / 第 80 行** — `  using MathOperator = typename ImplicitGemmFusionKernel::MathOperator; `
+  - **EN**: Introduces type or value alias `MathOperator`.
+  - **CN**: 引入类型或值别名 `MathOperator`。
+- **Line 81 / 第 81 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 82 / 第 82 行** — `  static cutlass::conv::Operator const kConvolutionalOperator = ImplicitGemmFusionKernel::kConvolutionalOperator;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 83 / 第 83 行** — `  static cutlass::conv::IteratorAlgorithm const kIteratorAlgorithm = ImplicitGemmFusionKernel::kIteratorAlgorithm;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 84 / 第 84 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 85 / 第 85 行** — `  static int const kWarpCount = `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 86 / 第 86 行** — `    (ThreadblockShape::kM / WarpShape::kM) * `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 87 / 第 87 行** — `    (ThreadblockShape::kN / WarpShape::kN) *`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 88 / 第 88 行** — `    (ThreadblockShape::kK / WarpShape::kK);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 89 / 第 89 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 90 / 第 90 行** — `  /// Argument structure`
+  - **EN**: Inline comment explaining intent: `Argument structure`.
+  - **CN**: 行内注释说明意图：`Argument structure`。
+- **Line 91 / 第 91 行** — `  using Arguments = typename ImplicitGemmFusionKernel::Arguments;`
+  - **EN**: Introduces type or value alias `Arguments`.
+  - **CN**: 引入类型或值别名 `Arguments`。
+- **Line 92 / 第 92 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 93 / 第 93 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 94 / 第 94 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 95 / 第 95 行** — `  /// Kernel parameters object`
+  - **EN**: Inline comment explaining intent: `Kernel parameters object`.
+  - **CN**: 行内注释说明意图：`Kernel parameters object`。
+- **Line 96 / 第 96 行** — `  typename ImplicitGemmFusionKernel::Params params_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 97 / 第 97 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 98 / 第 98 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 99 / 第 99 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 100 / 第 100 行** — `  /// Constructs Implicit GEMM`
+  - **EN**: Inline comment explaining intent: `Constructs Implicit GEMM`.
+  - **CN**: 行内注释说明意图：`Constructs Implicit GEMM`。
+- **Line 101 / 第 101 行** — `  ImplicitGemmConvolutionFusion() { }`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 102 / 第 102 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 103 / 第 103 行** — `  /// Determines whether the Implicit GEMM can execute the given problem.`
+  - **EN**: Inline comment explaining intent: `Determines whether the Implicit GEMM can execute the given problem.`.
+  - **CN**: 行内注释说明意图：`Determines whether the Implicit GEMM can execute the given problem.`。
+- **Line 104 / 第 104 行** — `  static Status can_implement(Arguments const &args) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 105 / 第 105 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 106 / 第 106 行** — `    // dispatch to iterators`
+  - **EN**: Inline comment explaining intent: `dispatch to iterators`.
+  - **CN**: 行内注释说明意图：`dispatch to iterators`。
+- **Line 107 / 第 107 行** — `    Status status = ImplicitGemmFusionKernel::Mma::IteratorA::can_implement(args.problem_size);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 108 / 第 108 行** — `    if (Status::kSuccess != status) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 109 / 第 109 行** — `      return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 110 / 第 110 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 111 / 第 111 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 112 / 第 112 行** — `    status = ImplicitGemmFusionKernel::Mma::IteratorB::can_implement(args.problem_size);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 113 / 第 113 行** — `    if (Status::kSuccess != status) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 114 / 第 114 行** — `      return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 115 / 第 115 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 116 / 第 116 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 117 / 第 117 行** — `    // Determine grid shape`
+  - **EN**: Inline comment explaining intent: `Determine grid shape`.
+  - **CN**: 行内注释说明意图：`Determine grid shape`。
+- **Line 118 / 第 118 行** — `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 119 / 第 119 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 120 / 第 120 行** — `    dim3 grid = threadblock_swizzle.get_grid_shape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 121 / 第 121 行** — `      threadblock_swizzle.get_tiled_shape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 122 / 第 122 行** — `        cutlass::conv::implicit_gemm_problem_size(kConvolutionalOperator, args.problem_size),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 123 / 第 123 行** — `        {ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 124 / 第 124 行** — `        args.problem_size.split_k_slices));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 125 / 第 125 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 126 / 第 126 行** — `    if (!(grid.y <= std::numeric_limits<uint16_t>::max() &&`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 127 / 第 127 行** — `          grid.z <= std::numeric_limits<uint16_t>::max())) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 128 / 第 128 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 129 / 第 129 行** — `      return Status::kErrorInvalidProblem;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 130 / 第 130 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 131 / 第 131 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 132 / 第 132 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 133 / 第 133 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 134 / 第 134 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 135 / 第 135 行** — `  /// Gets the workspace size`
+  - **EN**: Inline comment explaining intent: `Gets the workspace size`.
+  - **CN**: 行内注释说明意图：`Gets the workspace size`。
+- **Line 136 / 第 136 行** — `  static size_t get_workspace_size(Arguments const &args) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 137 / 第 137 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 138 / 第 138 行** — `    size_t workspace_bytes = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 139 / 第 139 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 140 / 第 140 行** — `    // Determine grid shape`
+  - **EN**: Inline comment explaining intent: `Determine grid shape`.
+  - **CN**: 行内注释说明意图：`Determine grid shape`。
+- **Line 141 / 第 141 行** — `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 142 / 第 142 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 143 / 第 143 行** — `    cutlass::gemm::GemmCoord grid_tiled_shape = threadblock_swizzle.get_tiled_shape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 144 / 第 144 行** — `        cutlass::conv::implicit_gemm_problem_size(kConvolutionalOperator, args.problem_size),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 145 / 第 145 行** — `        {ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 146 / 第 146 行** — `        args.problem_size.split_k_slices);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 147 / 第 147 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 148 / 第 148 行** — `    if(args.split_k_mode == SplitKMode::kParallel) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 149 / 第 149 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 150 / 第 150 行** — `      // Split-K parallel: CTAs in k-dimension write the partial results in a temporary workspace.`
+  - **EN**: Inline comment explaining intent: `Split-K parallel: CTAs in k-dimension write the partial results in a temporary workspace.`.
+  - **CN**: 行内注释说明意图：`Split-K parallel: CTAs in k-dimension write the partial results in a temporary workspace.`。
+- **Line 151 / 第 151 行** — `      // The user needs to call a reduction operator to optain the final output tensor`
+  - **EN**: Inline comment explaining intent: `The user needs to call a reduction operator to optain the final output tensor`.
+  - **CN**: 行内注释说明意图：`The user needs to call a reduction operator to optain the final output tensor`。
+- **Line 152 / 第 152 行** — `      workspace_bytes = `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 153 / 第 153 行** — `        sizeof(ElementAccumulator) *`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 154 / 第 154 行** — `        size_t(cutlass::conv::implicit_gemm_tensor_c_size(kConvolutionalOperator, args.problem_size)) *`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 155 / 第 155 行** — `        size_t(grid_tiled_shape.k());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 156 / 第 156 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 157 / 第 157 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 158 / 第 158 行** — `    else if(args.split_k_mode == SplitKMode::kSerial && args.problem_size.split_k_slices > 1) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 159 / 第 159 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 160 / 第 160 行** — `      // Split-K serial: The user workspace is used to store semaphore and serialize writing the `
+  - **EN**: Inline comment explaining intent: `Split-K serial: The user workspace is used to store semaphore and serialize writing the`.
+  - **CN**: 行内注释说明意图：`Split-K serial: The user workspace is used to store semaphore and serialize writing the`。
+- **Line 161 / 第 161 行** — `      // final reduced output to user's output tensor`
+  - **EN**: Inline comment explaining intent: `final reduced output to user's output tensor`.
+  - **CN**: 行内注释说明意图：`final reduced output to user's output tensor`。
+- **Line 162 / 第 162 行** — `      workspace_bytes = sizeof(int) * size_t(grid_tiled_shape.m()) * size_t(grid_tiled_shape.n());`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 163 / 第 163 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 164 / 第 164 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 165 / 第 165 行** — `    return workspace_bytes;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 166 / 第 166 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 167 / 第 167 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 168 / 第 168 行** — `  /// Initializes GEMM state from arguments.`
+  - **EN**: Inline comment explaining intent: `Initializes GEMM state from arguments.`.
+  - **CN**: 行内注释说明意图：`Initializes GEMM state from arguments.`。
+- **Line 169 / 第 169 行** — `  Status initialize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 170 / 第 170 行** — `    Arguments const &args, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 171 / 第 171 行** — `    void *workspace = nullptr, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 172 / 第 172 行** — `    cudaStream_t stream = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 173 / 第 173 行** — `   `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 174 / 第 174 行** — `    if (args.problem_size.split_k_slices > 1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 175 / 第 175 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 176 / 第 176 行** — `      if (!workspace) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 177 / 第 177 行** — `        return Status::kErrorWorkspaceNull;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 178 / 第 178 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 179 / 第 179 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 180 / 第 180 行** — `      cudaError_t status = cudaMemsetAsync(workspace, 0, get_workspace_size(args), stream);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 181 / 第 181 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 182 / 第 182 行** — `      if (status != cudaSuccess) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 183 / 第 183 行** — `        return Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 184 / 第 184 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 185 / 第 185 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 186 / 第 186 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 187 / 第 187 行** — `    // initialize the params structure from the arguments`
+  - **EN**: Inline comment explaining intent: `initialize the params structure from the arguments`.
+  - **CN**: 行内注释说明意图：`initialize the params structure from the arguments`。
+- **Line 188 / 第 188 行** — `    params_ = typename ImplicitGemmFusionKernel::Params(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 189 / 第 189 行** — `    	args,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 190 / 第 190 行** — `    	static_cast<int *>(workspace)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 191 / 第 191 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 192 / 第 192 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 193 / 第 193 行** — `    int smem_size = int(sizeof(typename ImplicitGemmFusionKernel::SharedStorage));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 194 / 第 194 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 195 / 第 195 行** — `    if (smem_size >= (48 << 10)) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 196 / 第 196 行** — `      cudaError_t result = cudaFuncSetAttribute(cutlass::Kernel<ImplicitGemmFusionKernel>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 197 / 第 197 行** — `                                    cudaFuncAttributeMaxDynamicSharedMemorySize,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 198 / 第 198 行** — `                                    smem_size);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 199 / 第 199 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 200 / 第 200 行** — `      if (result != cudaSuccess) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 201 / 第 201 行** — `        return Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 202 / 第 202 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 203 / 第 203 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 204 / 第 204 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 205 / 第 205 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 206 / 第 206 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 207 / 第 207 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 208 / 第 208 行** — `  /// Initializes Impicit GEMM state from arguments.`
+  - **EN**: Inline comment explaining intent: `Initializes Impicit GEMM state from arguments.`.
+  - **CN**: 行内注释说明意图：`Initializes Impicit GEMM state from arguments.`。
+- **Line 209 / 第 209 行** — `  Status update(Arguments const &args, void *workspace = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 210 / 第 210 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 211 / 第 211 行** — `    // update the params structure from the arguments`
+  - **EN**: Inline comment explaining intent: `update the params structure from the arguments`.
+  - **CN**: 行内注释说明意图：`update the params structure from the arguments`。
+- **Line 212 / 第 212 行** — `    params_.ptr_A = args.ref_A.data();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 213 / 第 213 行** — `    params_.ptr_B = args.ref_B.data();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 214 / 第 214 行** — `    params_.ptr_scale = args.ref_A_scale.data();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 215 / 第 215 行** — `    params_.ptr_bias = args.ref_A_bias.data();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 216 / 第 216 行** — `    params_.ptr_C = args.ref_C.data();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 217 / 第 217 行** — `    params_.ptr_D = args.ref_D.data();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 218 / 第 218 行** — `    params_.output_op = args.output_op;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 219 / 第 219 行** — `    params_.semaphore = static_cast<int *>(workspace);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 220 / 第 220 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 221 / 第 221 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 222 / 第 222 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 223 / 第 223 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 224 / 第 224 行** — `  /// Runs the kernel using initialized state.`
+  - **EN**: Inline comment explaining intent: `Runs the kernel using initialized state.`.
+  - **CN**: 行内注释说明意图：`Runs the kernel using initialized state.`。
+- **Line 225 / 第 225 行** — `  Status run(cudaStream_t stream = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 226 / 第 226 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 227 / 第 227 行** — `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 228 / 第 228 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 229 / 第 229 行** — `    dim3 grid = threadblock_swizzle.get_grid_shape(params_.grid_tiled_shape);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 230 / 第 230 行** — `    dim3 block(32 * kWarpCount, 1, 1);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 231 / 第 231 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 232 / 第 232 行** — `    int smem_size = int(sizeof(typename ImplicitGemmFusionKernel::SharedStorage));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 233 / 第 233 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 234 / 第 234 行** — `    cutlass::arch::synclog_setup();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 235 / 第 235 行** — `    cutlass::Kernel<ImplicitGemmFusionKernel><<<grid, block, smem_size, stream>>>(params_);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 236 / 第 236 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 237 / 第 237 行** — `    cudaError_t result = cudaGetLastError();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 238 / 第 238 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 239 / 第 239 行** — `    return result == cudaSuccess ? Status::kSuccess : Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 240 / 第 240 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 241 / 第 241 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 242 / 第 242 行** — `  /// Runs the kernel using initialized state.`
+  - **EN**: Inline comment explaining intent: `Runs the kernel using initialized state.`.
+  - **CN**: 行内注释说明意图：`Runs the kernel using initialized state.`。
+- **Line 243 / 第 243 行** — `  Status operator()(cudaStream_t stream = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 244 / 第 244 行** — `    return run(stream);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 245 / 第 245 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 246 / 第 246 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 247 / 第 247 行** — `  /// Runs the kernel using initialized state.`
+  - **EN**: Inline comment explaining intent: `Runs the kernel using initialized state.`.
+  - **CN**: 行内注释说明意图：`Runs the kernel using initialized state.`。
+- **Line 248 / 第 248 行** — `  Status operator()(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 249 / 第 249 行** — `    Arguments const &args, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 250 / 第 250 行** — `    void *workspace = nullptr, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 251 / 第 251 行** — `    cudaStream_t stream = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 252 / 第 252 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 253 / 第 253 行** — `    Status status = initialize(args, workspace, stream);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 254 / 第 254 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 255 / 第 255 行** — `    if (status == Status::kSuccess) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 256 / 第 256 行** — `      status = run(stream);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 257 / 第 257 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 258 / 第 258 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 259 / 第 259 行** — `    return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 260 / 第 260 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 261 / 第 261 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 262 / 第 262 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 263 / 第 263 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 264 / 第 264 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 265 / 第 265 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 266 / 第 266 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 267 / 第 267 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 268 / 第 268 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 269 / 第 269 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Convolution operators / 卷积算子
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+- Threadblock structure / Threadblock 结构
+
+## Dependencies / 依赖
+- `limits` — Dependency `limits` / 依赖 `limits`
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/device_kernel.h` — CUTLASS dependency `cutlass/device_kernel.h` / CUTLASS 依赖 `cutlass/device_kernel.h`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`

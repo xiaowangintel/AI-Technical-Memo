@@ -1,0 +1,445 @@
+# debug.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/debug.h`
+**Purpose / 用途**: Provides shared CUTLASS utility support for `debug`. / 为 `debug` 提供共享的 CUTLASS 工具支持。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L33** <code>    \brief Contains code for debugging cutlass code</code>
+  - EN: Comment that documents intent or context: "\brief Contains code for debugging cutlass code".
+  - CN: 用于说明意图或上下文的注释："\brief Contains code for debugging cutlass code"。
+- **L34** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L37** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>#include &quot;device_dump.h&quot;</code>
+  - EN: Includes `device_dump.h` so this file can use project-specific declarations from `device_dump.h`.
+  - CN: 引入 `device_dump.h`，使当前文件可以使用来自 `device_dump.h` 的项目专用声明。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L41** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L43** <code> * Debug and logging macros</code>
+  - EN: Comment that documents intent or context: "Debug and logging macros".
+  - CN: 用于说明意图或上下文的注释："Debug and logging macros"。
+- **L44** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L47** <code> * Formats and prints the given message to stdout</code>
+  - EN: Comment that documents intent or context: "Formats and prints the given message to stdout".
+  - CN: 用于说明意图或上下文的注释："Formats and prints the given message to stdout"。
+- **L48** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L49** <code>#if !defined(CUDA_LOG)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L50** <code>#if !defined(__CUDA_ARCH__)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L51** <code>#define CUDA_LOG(format, ...) printf(format, __VA_ARGS__)</code>
+  - EN: Defines the preprocessor macro `CUDA_LOG(format,`.
+  - CN: 定义预处理宏 `CUDA_LOG(format,`。
+- **L52** <code>#else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L53** <code>#define CUDA_LOG(format, ...)                              \</code>
+  - EN: Defines the preprocessor macro `CUDA_LOG(format,`.
+  - CN: 定义预处理宏 `CUDA_LOG(format,`。
+- **L54** <code>  printf(&quot;[block (%d,%d,%d), thread (%d,%d,%d)]: &quot; format, \</code>
+  - EN: Begins or continues the signature/call syntax involving `thread`.
+  - CN: 开始或继续与 `thread` 相关的签名/调用语法。
+- **L55** <code>         blockIdx.x,                                       \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L56** <code>         blockIdx.y,                                       \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L57** <code>         blockIdx.z,                                       \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L58** <code>         threadIdx.x,                                      \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L59** <code>         threadIdx.y,                                      \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L60** <code>         threadIdx.z,                                      \</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>         __VA_ARGS__);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L62** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L63** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L64** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L65** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L66** <code> * Formats and prints the given message to stdout only if DEBUG is defined</code>
+  - EN: Comment that documents intent or context: "Formats and prints the given message to stdout only if DEBUG is defined".
+  - CN: 用于说明意图或上下文的注释："Formats and prints the given message to stdout only if DEBUG is defined"。
+- **L67** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L68** <code>#if !defined(CUDA_LOG_DEBUG)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L69** <code>#ifdef DEBUG</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L70** <code>#define CUDA_LOG_DEBUG(format, ...) CUDA_LOG(format, __VA_ARGS__)</code>
+  - EN: Defines the preprocessor macro `CUDA_LOG_DEBUG(format,`.
+  - CN: 定义预处理宏 `CUDA_LOG_DEBUG(format,`。
+- **L71** <code>#else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L72** <code>#define CUDA_LOG_DEBUG(format, ...)</code>
+  - EN: Defines the preprocessor macro `CUDA_LOG_DEBUG(format,`.
+  - CN: 定义预处理宏 `CUDA_LOG_DEBUG(format,`。
+- **L73** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L74** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L77** <code> * \brief The corresponding error message is printed to \p stderr (or \p stdout in device code)</code>
+  - EN: Comment that documents intent or context: "\brief The corresponding error message is printed to \p stderr (or \p stdout in device code)".
+  - CN: 用于说明意图或上下文的注释："\brief The corresponding error message is printed to \p stderr (or \p stdout in device code)"。
+- **L78** <code> * along with the supplied source context.</code>
+  - EN: Comment that documents intent or context: "along with the supplied source context.".
+  - CN: 用于说明意图或上下文的注释："along with the supplied source context."。
+- **L79** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L80** <code> * \return The CUDA error.</code>
+  - EN: Comment that documents intent or context: "\return The CUDA error.".
+  - CN: 用于说明意图或上下文的注释："\return The CUDA error."。
+- **L81** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L82** <code>__host__ CUTLASS_DEVICE cudaError_t cuda_perror_impl(cudaError_t error,</code>
+  - EN: Begins or continues the signature/call syntax involving `cuda_perror_impl`.
+  - CN: 开始或继续与 `cuda_perror_impl` 相关的签名/调用语法。
+- **L83** <code>                                                     const char* expression,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L84** <code>                                                     const char* filename,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L85** <code>                                                     int line) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L86** <code>  (void)filename;</code>
+  - EN: Declares the symbol `filename` in the current scope.
+  - CN: 在当前作用域中声明符号 `filename`。
+- **L87** <code>  (void)line;</code>
+  - EN: Declares the symbol `line` in the current scope.
+  - CN: 在当前作用域中声明符号 `line`。
+- **L88** <code>  if (error) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L89** <code>#if !defined(__CUDA_ARCH__)</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L90** <code>    fprintf(</code>
+  - EN: Begins or continues the signature/call syntax involving `fprintf`.
+  - CN: 开始或继续与 `fprintf` 相关的签名/调用语法。
+- **L91** <code>        stderr, &quot;CUDA error %d [%s, %d] in expression &#x27;%s&#x27;: %s\n&quot;, error, filename, line, expression, cudaGetErrorString(error));</code>
+  - EN: Declares function or method `cudaGetErrorString` without defining it here.
+  - CN: 声明函数或方法 `cudaGetErrorString`，但不在此处给出定义。
+- **L92** <code>    fflush(stderr);</code>
+  - EN: Declares function or method `fflush` without defining it here.
+  - CN: 声明函数或方法 `fflush`，但不在此处给出定义。
+- **L93** <code>#else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L94** <code>    printf(&quot;CUDA error %d [%s, %d] in expression &#x27;%s&#x27;\n&quot;, error, filename, line, expression);</code>
+  - EN: Declares function or method `printf` without defining it here.
+  - CN: 声明函数或方法 `printf`，但不在此处给出定义。
+- **L95** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L96** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L97** <code>  return error;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L98** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L99** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L100** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L101** <code> * \brief Perror macro</code>
+  - EN: Comment that documents intent or context: "\brief Perror macro".
+  - CN: 用于说明意图或上下文的注释："\brief Perror macro"。
+- **L102** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L103** <code>#ifndef CUDA_PERROR</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L104** <code>#define CUDA_PERROR(e) cuda_perror_impl((cudaError_t)(e), #e, __FILE__, __LINE__)</code>
+  - EN: Defines the preprocessor macro `CUDA_PERROR(e)`.
+  - CN: 定义预处理宏 `CUDA_PERROR(e)`。
+- **L105** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L108** <code> * \brief Perror macro with exit</code>
+  - EN: Comment that documents intent or context: "\brief Perror macro with exit".
+  - CN: 用于说明意图或上下文的注释："\brief Perror macro with exit"。
+- **L109** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L110** <code>#ifndef CUDA_PERROR_EXIT</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L111** <code>#define CUDA_PERROR_EXIT(e)                                     \</code>
+  - EN: Defines the preprocessor macro `CUDA_PERROR_EXIT(e)`.
+  - CN: 定义预处理宏 `CUDA_PERROR_EXIT(e)`。
+- **L112** <code>  do { if (cuda_perror_impl((cudaError_t)(e), #e, __FILE__, __LINE__)) { \</code>
+  - EN: Begins or continues the signature/call syntax involving `cuda_perror_impl`.
+  - CN: 开始或继续与 `cuda_perror_impl` 相关的签名/调用语法。
+- **L113** <code>    exit(1);                                                    \</code>
+  - EN: Begins or continues the signature/call syntax involving `exit`.
+  - CN: 开始或继续与 `exit` 相关的签名/调用语法。
+- **L114** <code>  } } while (0)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L115** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L116** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L117** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L118** <code> * \brief Perror macro only if DEBUG is defined</code>
+  - EN: Comment that documents intent or context: "\brief Perror macro only if DEBUG is defined".
+  - CN: 用于说明意图或上下文的注释："\brief Perror macro only if DEBUG is defined"。
+- **L119** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L120** <code>#ifndef CUDA_PERROR_DEBUG</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L121** <code>#ifdef DEBUG</code>
+  - EN: Begins or refines a conditional-compilation branch controlled by preprocessor symbols.
+  - CN: 开始或细化一个由预处理宏控制的条件编译分支。
+- **L122** <code>#define CUDA_PERROR_DEBUG(e) CUDA_PERROR(e)</code>
+  - EN: Defines the preprocessor macro `CUDA_PERROR_DEBUG(e)`.
+  - CN: 定义预处理宏 `CUDA_PERROR_DEBUG(e)`。
+- **L123** <code>#else</code>
+  - EN: Switches to the alternate branch of the current conditional-compilation block.
+  - CN: 切换到当前条件编译块的另一分支。
+- **L124** <code>#define CUDA_PERROR_DEBUG(e) (e)</code>
+  - EN: Defines the preprocessor macro `CUDA_PERROR_DEBUG(e)`.
+  - CN: 定义预处理宏 `CUDA_PERROR_DEBUG(e)`。
+- **L125** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L126** <code>#endif</code>
+  - EN: Closes the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>////////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L129** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L130** <code>// A small helper class to dump a type at compile time</code>
+  - EN: Comment that documents intent or context: "A small helper class to dump a type at compile time".
+  - CN: 用于说明意图或上下文的注释："A small helper class to dump a type at compile time"。
+- **L131** <code>// Usage:: DumpType&lt;Class&gt;::Class</code>
+  - EN: Comment that documents intent or context: "Usage:: DumpType<Class>::Class".
+  - CN: 用于说明意图或上下文的注释："Usage:: DumpType<Class>::Class"。
+- **L132** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L133** <code>struct DebugType {};</code>
+  - EN: Begins the declaration of struct `DebugType`.
+  - CN: 开始声明 struct `DebugType`。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L136** <code>void DebugTypeFunc(T const&amp; t) {</code>
+  - EN: Begins the definition of function or method `DebugTypeFunc`.
+  - CN: 开始定义函数或方法 `DebugTypeFunc`。
+- **L137** <code>  T::t;</code>
+  - EN: Declares the symbol `t` in the current scope.
+  - CN: 在当前作用域中声明符号 `t`。
+- **L138** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L140** <code>// A small helper class to dump a compile time constant at compile time</code>
+  - EN: Comment that documents intent or context: "A small helper class to dump a compile time constant at compile time".
+  - CN: 用于说明意图或上下文的注释："A small helper class to dump a compile time constant at compile time"。
+- **L141** <code>// Usage: DumpValue&lt;Class::kConstant&gt;::kConstant</code>
+  - EN: Comment that documents intent or context: "Usage: DumpValue<Class::kConstant>::kConstant".
+  - CN: 用于说明意图或上下文的注释："Usage: DumpValue<Class::kConstant>::kConstant"。
+- **L142** <code>template &lt;int Value&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L143** <code>struct DebugValue {};</code>
+  - EN: Begins the declaration of struct `DebugValue`.
+  - CN: 开始声明 struct `DebugValue`。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>device_dump.h</code> — project-specific declarations from `device_dump.h` / 来自 `device_dump.h` 的项目专用声明

@@ -1,0 +1,1888 @@
+# mma.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/nvgpu/tcgen05/mma.py`
+
+## Purpose / 作用
+- EN: Defines 30 classes (Tcgen05MmaOp, OperandMajorMode, OperandSource, CtaGroup, ... (+26 more)) in `CuTeDSL.cutlass.cute.nvgpu.tcgen05.mma`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.nvgpu.tcgen05.mma` 定义了 30 个类（Tcgen05MmaOp, OperandMajorMode, OperandSource, CtaGroup, ... (+26 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L13** `import warnings` — **EN:** Imports warnings for later use. **CN:** 导入 warnings 供后续使用。
+- **L14** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L15** `from typing import Type, Any, Union, Optional, cast, Tuple` — **EN:** Imports Type, Any, Union, Optional, cast, Tuple from `typing`. **CN:** 从 `typing` 导入 Type, Any, Union, Optional, cast, Tuple。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L18** `from cutlass.cutlass_dsl import BaseDSL, T, DSLRuntimeError` — **EN:** Imports BaseDSL, T, DSLRuntimeError from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 BaseDSL, T, DSLRuntimeError。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L21** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L22** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L23** `from typing_extensions import deprecated` — **EN:** Imports deprecated from `typing_extensions`. **CN:** 从 `typing_extensions` 导入 deprecated。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `from ..common import OpError, normalize_field_to_ir_name` — **EN:** Imports OpError, normalize_field_to_ir_name from `..common`. **CN:** 从 `..common` 导入 OpError, normalize_field_to_ir_name。
+- **L26** `from ..common import OperandMajorMode as _OperandMajorMode` — **EN:** Imports OperandMajorMode as _OperandMajorMode from `..common`. **CN:** 从 `..common` 导入 OperandMajorMode as _OperandMajorMode。
+- **L27** `from ... import core, atom` — **EN:** Imports core, atom from `...`. **CN:** 从 `...` 导入 core, atom。
+- **L28** `from ...core import _pack_shape, rank, depth` — **EN:** Imports _pack_shape, rank, depth from `...core`. **CN:** 从 `...core` 导入 _pack_shape, rank, depth。
+- **L29** `from ...typing import (` — **EN:** Imports Shape, Tensor, Float4E2M1FN, Float8E8M0FNU, Float8E5M2, Float8E4M3FN, ... (+13 more) from `...typing`. **CN:** 从 `...typing` 导入 Shape, Tensor, Float4E2M1FN, Float8E8M0FNU, Float8E5M2, Float8E4M3FN, ... (+13 more)。
+- **L30** `    Shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    Tensor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    Float6E3M2FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    Float6E2M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    Float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    BFloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    TFloat32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    AddressSpace,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    Pointer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `from ...atom import Trait, make_atom` — **EN:** Imports Trait, make_atom from `...atom`. **CN:** 从 `...atom` 导入 Trait, make_atom。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `_F8F6F4_TYPES = [` — **EN:** Assigns a value to _F8F6F4_TYPES. **CN:** 将一个值赋给 _F8F6F4_TYPES。
+- **L54** `    Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    Float6E3M2FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    Float6E2M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L62** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L63** `# MMA Ops and Traits` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L65** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `class Tcgen05MmaOp(atom.MmaOp):` — **EN:** Defines class `Tcgen05MmaOp` with bases atom.MmaOp. **CN:** 定义类 `Tcgen05MmaOp`，其基类为 atom.MmaOp。
+- **L69** `    """` — **EN:** Starts the docstring for the class `Tcgen05MmaOp`. **CN:** 开始说明 class `Tcgen05MmaOp` 的文档字符串。
+- **L70** `    Base class for all tcgen05 MMA operations.` — **EN:** Continues the docstring for the class `Tcgen05MmaOp`. **CN:** 继续说明 class `Tcgen05MmaOp` 的文档字符串。
+- **L71** `    """` — **EN:** Ends the docstring for the class `Tcgen05MmaOp`. **CN:** 结束说明 class `Tcgen05MmaOp` 的文档字符串。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `@deprecated(` — **EN:** Applies decorator `deprecated('tcgen05.OperandMajorMode is deprecated, use c...` to the following definition. **CN:** 将装饰器 `deprecated('tcgen05.OperandMajorMode is deprecated, use c...` 应用于后面的定义。
+- **L77** `    "tcgen05.OperandMajorMode is deprecated, use cute.nvgpu.OperandMajorMode instead"` — **EN:** Applies decorator `deprecated('tcgen05.OperandMajorMode is deprecated, use c...` to the following definition. **CN:** 将装饰器 `deprecated('tcgen05.OperandMajorMode is deprecated, use c...` 应用于后面的定义。
+- **L78** `)` — **EN:** Applies decorator `deprecated('tcgen05.OperandMajorMode is deprecated, use c...` to the following definition. **CN:** 将装饰器 `deprecated('tcgen05.OperandMajorMode is deprecated, use c...` 应用于后面的定义。
+- **L79** `class OperandMajorMode(enum.Enum):` — **EN:** Defines class `OperandMajorMode` with bases enum.Enum. **CN:** 定义类 `OperandMajorMode`，其基类为 enum.Enum。
+- **L80** `    """` — **EN:** Starts the docstring for the class `OperandMajorMode`. **CN:** 开始说明 class `OperandMajorMode` 的文档字符串。
+- **L81** `    An enumeration for the majorness of the input operands of the MMA.` — **EN:** Continues the docstring for the class `OperandMajorMode`. **CN:** 继续说明 class `OperandMajorMode` 的文档字符串。
+- **L82** `    """` — **EN:** Ends the docstring for the class `OperandMajorMode`. **CN:** 结束说明 class `OperandMajorMode` 的文档字符串。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `    MN = _cute_ir.MajorMode.mn` — **EN:** Assigns a value to MN. **CN:** 将一个值赋给 MN。
+- **L85** `    K = _cute_ir.MajorMode.k` — **EN:** Assigns a value to K. **CN:** 将一个值赋给 K。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L88** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L91** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    def __eq__(self, other: object) -> bool:` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L94** `        if hasattr(other, "_to_ir") and type(other._to_ir()) is type(self._to_ir()):` — **EN:** Starts a conditional branch guarded by `hasattr(other, '_to_ir') and type(other._to_ir()) is type...`. **CN:** 开始一个由 `hasattr(other, '_to_ir') and type(other._to_ir()) is type...` 控制的条件分支。
+- **L95** `            return self._to_ir() == other._to_ir()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L96** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L97** `            f"{self.__module__}.{self.__class__.__qualname__} cannot be compared with {other.__module__}.{other.__class__.__qualname__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    def __ne__(self, other: object) -> bool:` — **EN:** Defines function `__ne__`. **CN:** 定义函数 `__ne__`。
+- **L101** `        return not self.__eq__(other)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `    def __hash__(self) -> int:` — **EN:** Defines function `__hash__`. **CN:** 定义函数 `__hash__`。
+- **L104** `        return hash(self.value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L107** `    def _missing_(cls, value: Any) -> Optional["OperandMajorMode"]:` — **EN:** Defines function `_missing_`. **CN:** 定义函数 `_missing_`。
+- **L108** `        if isinstance(value, str):` — **EN:** Starts a conditional branch guarded by `isinstance(value, str)`. **CN:** 开始一个由 `isinstance(value, str)` 控制的条件分支。
+- **L109** `            value = value.upper()` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L110** `            if value == "MN":` — **EN:** Starts a conditional branch guarded by `value == 'MN'`. **CN:** 开始一个由 `value == 'MN'` 控制的条件分支。
+- **L111** `                return OperandMajorMode.MN` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L112** `            elif value == "K":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L113** `                return OperandMajorMode.K` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L114** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    def _to_ir(self) -> _cute_ir.MajorMode:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L117** `        return self.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `class OperandSource(enum.Enum):` — **EN:** Defines class `OperandSource` with bases enum.Enum. **CN:** 定义类 `OperandSource`，其基类为 enum.Enum。
+- **L121** `    """` — **EN:** Starts the docstring for the class `OperandSource`. **CN:** 开始说明 class `OperandSource` 的文档字符串。
+- **L122** `    An enumeration for the source memory location of the A input operand of the MMA.` — **EN:** Continues the docstring for the class `OperandSource`. **CN:** 继续说明 class `OperandSource` 的文档字符串。
+- **L123** `    """` — **EN:** Ends the docstring for the class `OperandSource`. **CN:** 结束说明 class `OperandSource` 的文档字符串。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    TMEM = _cute_ir.MmaFragKind.tmem` — **EN:** Assigns a value to TMEM. **CN:** 将一个值赋给 TMEM。
+- **L126** `    SMEM = _cute_ir.MmaFragKind.smem_desc` — **EN:** Assigns a value to SMEM. **CN:** 将一个值赋给 SMEM。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L129** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L132** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `    def _to_ir(self) -> _cute_ir.MmaFragKind:` — **EN:** Defines function `_to_ir`. **CN:** 定义函数 `_to_ir`。
+- **L135** `        return self.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `class CtaGroup(enum.Enum):` — **EN:** Defines class `CtaGroup` with bases enum.Enum. **CN:** 定义类 `CtaGroup`，其基类为 enum.Enum。
+- **L139** `    """` — **EN:** Starts the docstring for the class `CtaGroup`. **CN:** 开始说明 class `CtaGroup` 的文档字符串。
+- **L140** `    An enumeration for the \`\`cta_group\`\`  qualifier of the MMA.` — **EN:** Continues the docstring for the class `CtaGroup`. **CN:** 继续说明 class `CtaGroup` 的文档字符串。
+- **L141** `    """` — **EN:** Ends the docstring for the class `CtaGroup`. **CN:** 结束说明 class `CtaGroup` 的文档字符串。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    ONE = 1` — **EN:** Assigns a value to ONE. **CN:** 将一个值赋给 ONE。
+- **L144** `    TWO = 2` — **EN:** Assigns a value to TWO. **CN:** 将一个值赋给 TWO。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L147** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L150** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `class Field(enum.Enum):` — **EN:** Defines class `Field` with bases enum.Enum. **CN:** 定义类 `Field`，其基类为 enum.Enum。
+- **L154** `    """` — **EN:** Starts the docstring for the class `Field`. **CN:** 开始说明 class `Field` 的文档字符串。
+- **L155** `    An enumeration for the fields of the MMA Atom that can be modified at runtime.` — **EN:** Continues the docstring for the class `Field`. **CN:** 继续说明 class `Field` 的文档字符串。
+- **L156** `    """` — **EN:** Ends the docstring for the class `Field`. **CN:** 结束说明 class `Field` 的文档字符串。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    NEGATE_A = "neg_a"` — **EN:** Assigns a value to NEGATE_A. **CN:** 将一个值赋给 NEGATE_A。
+- **L159** `    NEGATE_B = "neg_b"` — **EN:** Assigns a value to NEGATE_B. **CN:** 将一个值赋给 NEGATE_B。
+- **L160** `    ACCUMULATE = "accum_c"` — **EN:** Assigns a value to ACCUMULATE. **CN:** 将一个值赋给 ACCUMULATE。
+- **L161** `    SFA = "sf_a"` — **EN:** Assigns a value to SFA. **CN:** 将一个值赋给 SFA。
+- **L162** `    SFB = "sf_b"` — **EN:** Assigns a value to SFB. **CN:** 将一个值赋给 SFB。
+- **L163** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L164** `        return f"{self.__class__.__name__}.{self.name}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L167** `        return f"<{self.__class__.__name__}.{self.name}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `    def _to_ir_field_name(self) -> str:` — **EN:** Defines function `_to_ir_field_name`. **CN:** 定义函数 `_to_ir_field_name`。
+- **L170** `        return self.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `# Base class for all tcgen05 MMA Ops with syntax \`tcgen05.mma.cta_group.kind\` used to factor out some internal code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L175** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L176** `class MmaOp(Tcgen05MmaOp):` — **EN:** Defines class `MmaOp` with bases Tcgen05MmaOp. **CN:** 定义类 `MmaOp`，其基类为 Tcgen05MmaOp。
+- **L177** `    a_dtype: Type[Numeric]` — **EN:** Assigns a typed value to a_dtype. **CN:** 为 a_dtype 赋予带类型标注的值。
+- **L178** `    b_dtype: Type[Numeric]` — **EN:** Assigns a typed value to b_dtype. **CN:** 为 b_dtype 赋予带类型标注的值。
+- **L179** `    acc_dtype: Type[Numeric]` — **EN:** Assigns a typed value to acc_dtype. **CN:** 为 acc_dtype 赋予带类型标注的值。
+- **L180** `    shape_mnk: Shape` — **EN:** Assigns a typed value to shape_mnk. **CN:** 为 shape_mnk 赋予带类型标注的值。
+- **L181** `    cta_group: CtaGroup` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L182** `    a_src: OperandSource` — **EN:** Assigns a typed value to a_src. **CN:** 为 a_src 赋予带类型标注的值。
+- **L183** `    a_major_mode: Union[_OperandMajorMode, OperandMajorMode]` — **EN:** Assigns a typed value to a_major_mode. **CN:** 为 a_major_mode 赋予带类型标注的值。
+- **L184** `    b_major_mode: Union[_OperandMajorMode, OperandMajorMode]` — **EN:** Assigns a typed value to b_major_mode. **CN:** 为 b_major_mode 赋予带类型标注的值。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    admissible_archs = Arch.filter(` — **EN:** Assigns a value to admissible_archs. **CN:** 将一个值赋给 admissible_archs。
+- **L187** `        lambda arch: arch.is_family_of(Arch.sm_100f) or arch.is_family_of(Arch.sm_110f)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L191** `        # Verify arch` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L192** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L193** `        if arch not in self.admissible_archs:` — **EN:** Starts a conditional branch guarded by `arch not in self.admissible_archs`. **CN:** 开始一个由 `arch not in self.admissible_archs` 控制的条件分支。
+- **L194** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L195** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `                f"expects arch to be one of {self.admissible_archs}, but got {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `        # Verify that the user provided enum values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L200** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L201** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L202** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `                "expects the 'cta_group' Op parameter to be a tcgen05.CtaGroup instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `        if not isinstance(self.a_src, OperandSource):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.a_src, OperandSource)`. **CN:** 开始一个由 `not isinstance(self.a_src, OperandSource)` 控制的条件分支。
+- **L206** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L207** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `                "expects the 'a_src' Op parameter to be a tcgen05.OperandSource instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `        if not isinstance(self.a_major_mode, _OperandMajorMode) and not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(self.a_major_mode, _OperandMajorMode) and ...`. **CN:** 开始一个由 `not isinstance(self.a_major_mode, _OperandMajorMode) and ...` 控制的条件分支。
+- **L211** `            self.a_major_mode, OperandMajorMode` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L212** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L213** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L214** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `                "expects the 'a_major_mode' Op parameter to be a cute.nvgpu.OperandMajorMode or tcgen05.OperandMajorMode (deprecated) instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `        if not isinstance(self.b_major_mode, _OperandMajorMode) and not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(self.b_major_mode, _OperandMajorMode) and ...`. **CN:** 开始一个由 `not isinstance(self.b_major_mode, _OperandMajorMode) and ...` 控制的条件分支。
+- **L218** `            self.b_major_mode, OperandMajorMode` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L220** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L221** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `                "expects the 'b_major_mode' Op parameter to be a cute.nvgpu.OperandMajorMode or tcgen05.OperandMajorMode (deprecated) instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `        if isinstance(self.a_major_mode, OperandMajorMode) or isinstance(` — **EN:** Starts a conditional branch guarded by `isinstance(self.a_major_mode, OperandMajorMode) or isinst...`. **CN:** 开始一个由 `isinstance(self.a_major_mode, OperandMajorMode) or isinst...` 控制的条件分支。
+- **L225** `            self.b_major_mode, OperandMajorMode` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L227** `            warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L228** `                "tcgen05.OperandMajorMode is deprecated, use cute.nvgpu.OperandMajorMode instead",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `                DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `                stacklevel=2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `            # Normalize the major modes to the new enum type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L233** `            # Since this is a frozen dataclass, we need to use the object.__setattr__ method to set the attributes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L234** `            object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L235** `                self, "a_major_mode", _OperandMajorMode(self.a_major_mode.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `            object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L238** `                self, "b_major_mode", _OperandMajorMode(self.b_major_mode.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        # Verify the instruction shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L241** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L242** `        if (rank(shape_mnk_tuple) not in [2, 3]) or (depth(shape_mnk_tuple) != 1):` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) not in [2, 3] or depth(shape_mnk_tu...`. **CN:** 开始一个由 `rank(shape_mnk_tuple) not in [2, 3] or depth(shape_mnk_tu...` 控制的条件分支。
+- **L243** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L244** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `                f"expected a flat rank 2 or 3 tuple for the 'shape_mnk' Op parameter, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `                f"but got {self.shape_mnk}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `        m, n = shape_mnk_tuple[0], shape_mnk_tuple[1]` — **EN:** Assigns a value to (m, n). **CN:** 将一个值赋给 (m, n)。
+- **L249** `        if self.cta_group == CtaGroup.ONE:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.ONE`. **CN:** 开始一个由 `self.cta_group == CtaGroup.ONE` 控制的条件分支。
+- **L250** `            if m not in [64, 128]:` — **EN:** Starts a conditional branch guarded by `m not in [64, 128]`. **CN:** 开始一个由 `m not in [64, 128]` 控制的条件分支。
+- **L251** `                raise OpError(self, f"expects the M-mode to be 64 or 128, but got {m}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L252** `            if self.b_dtype.width == 8 and (self.b_major_mode == _OperandMajorMode.MN):` — **EN:** Starts a conditional branch guarded by `self.b_dtype.width == 8 and self.b_major_mode == _Operand...`. **CN:** 开始一个由 `self.b_dtype.width == 8 and self.b_major_mode == _Operand...` 控制的条件分支。
+- **L253** `                if (n < 16) or (n > 256) or (n % 16 != 0):` — **EN:** Starts a conditional branch guarded by `n < 16 or n > 256 or n % 16 != 0`. **CN:** 开始一个由 `n < 16 or n > 256 or n % 16 != 0` 控制的条件分支。
+- **L254** `                    raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L255** `                        self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `                        f"expects the N-mode to satisfy 16 <= N <= 256 and N % 16 == 0, but got {n}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L259** `                if (n < 8) or (n > 256) or (n % 8 != 0):` — **EN:** Starts a conditional branch guarded by `n < 8 or n > 256 or n % 8 != 0`. **CN:** 开始一个由 `n < 8 or n > 256 or n % 8 != 0` 控制的条件分支。
+- **L260** `                    raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L261** `                        self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `                        f"expects the N-mode to satisfy 8 <= N <= 256 and N % 8 == 0, but got {n}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L265** `            if m not in [128, 256]:` — **EN:** Starts a conditional branch guarded by `m not in [128, 256]`. **CN:** 开始一个由 `m not in [128, 256]` 控制的条件分支。
+- **L266** `                raise OpError(self, f"expects the M-mode to be 128 or 256, but got {m}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L267** `            if self.b_dtype.width == 8 and (self.b_major_mode == _OperandMajorMode.MN):` — **EN:** Starts a conditional branch guarded by `self.b_dtype.width == 8 and self.b_major_mode == _Operand...`. **CN:** 开始一个由 `self.b_dtype.width == 8 and self.b_major_mode == _Operand...` 控制的条件分支。
+- **L268** `                if (n < 32) or (n > 256) or (n % 32 != 0):` — **EN:** Starts a conditional branch guarded by `n < 32 or n > 256 or n % 32 != 0`. **CN:** 开始一个由 `n < 32 or n > 256 or n % 32 != 0` 控制的条件分支。
+- **L269** `                    raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L270** `                        self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `                        f"expects the N-mode to satisfy 32 <= N <= 256 and N % 32 == 0, but got {n}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L274** `                if (n < 16) or (n > 256) or (n % 16 != 0):` — **EN:** Starts a conditional branch guarded by `n < 16 or n > 256 or n % 16 != 0`. **CN:** 开始一个由 `n < 16 or n > 256 or n % 16 != 0` 控制的条件分支。
+- **L275** `                    raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L276** `                        self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `                        f"expects the N-mode to satisfy 16 <= N <= 256 and N % 16 == 0, but got {n}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L281** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L282** `            self.__class__.descriptive_name  # type: ignore` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `            + f"\n  A data type           = {self.a_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `            + f"\n  B data type           = {self.b_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `            + f"\n  Accumulator data type = {self.acc_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `            + f"\n  CTA group             = {self.cta_group}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `            + f"\n  A source location     = {self.a_src}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `            + f"\n  A major mode          = {self.a_major_mode}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `            + f"\n  B major mode          = {self.b_major_mode}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `            + f"\n  Instruction shape MNK = {self.shape_mnk}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `    def _verify_fragment_A(` — **EN:** Defines function `_verify_fragment_A`. **CN:** 定义函数 `_verify_fragment_A`。
+- **L294** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L295** `        input: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L296** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L297** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L298** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L299** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L300** `        if input.memspace == AddressSpace.smem and isinstance(` — **EN:** Starts a conditional branch guarded by `input.memspace == AddressSpace.smem and isinstance(input....`. **CN:** 开始一个由 `input.memspace == AddressSpace.smem and isinstance(input....` 控制的条件分支。
+- **L301** `            input.layout.type, _cute_ir.ComposedLayoutType` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L302** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L303** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L304** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `                f"Expected affine layout for {self._make_trait()}'s operand A, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `                f"but got composed layout instead: {input.layout}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `                f"\nPlease use recast_ptr(ptr, {input.layout.inner}, element_type) operation to move swizzle to the ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L311** `    def _verify_fragment_B(` — **EN:** Defines function `_verify_fragment_B`. **CN:** 定义函数 `_verify_fragment_B`。
+- **L312** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        input: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L317** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L318** `        if input.memspace == AddressSpace.smem and isinstance(` — **EN:** Starts a conditional branch guarded by `input.memspace == AddressSpace.smem and isinstance(input....`. **CN:** 开始一个由 `input.memspace == AddressSpace.smem and isinstance(input....` 控制的条件分支。
+- **L319** `            input.layout.type, _cute_ir.ComposedLayoutType` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L320** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L321** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L322** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `                f"Expected affine layout for {self._make_trait()}'s operand B, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `                f"but got composed layout instead: {input.layout}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `                f"\nPlease use recast_ptr(ptr, {input.layout.inner}, element_type) operation to move swizzle to the ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `class MmaTraits(Trait):` — **EN:** Defines class `MmaTraits` with bases Trait. **CN:** 定义类 `MmaTraits`，其基类为 Trait。
+- **L331** `    admissible_fields = [Field.ACCUMULATE, Field.NEGATE_A, Field.NEGATE_B]` — **EN:** Assigns a value to admissible_fields. **CN:** 将一个值赋给 admissible_fields。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `    def set(` — **EN:** Defines function `set`. **CN:** 定义函数 `set`。
+- **L334** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L335** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L336** `        value: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L337** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L338** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L339** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L340** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L341** `        field_ir = normalize_field_to_ir_name(field, self.admissible_fields)` — **EN:** Assigns a value to field_ir. **CN:** 将一个值赋给 field_ir。
+- **L342** `        bool_val = Boolean(value).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to bool_val. **CN:** 将一个值赋给 bool_val。
+- **L343** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L344** `            self.value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L345** `                self.value, field_ir, bool_val, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L346** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `        except (TypeError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L348** `            # Legacy fallback` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L349** `            attr = ir.Attribute.parse(f"#cute_nvgpu.atom_mma_field_sm100<{field_ir}>")` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L350** `            self.value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L351** `                self.value, attr, bool_val, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `    def get(` — **EN:** Defines function `get`. **CN:** 定义函数 `get`。
+- **L355** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L356** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L357** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L359** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L360** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L361** `        field_ir = normalize_field_to_ir_name(field, self.admissible_fields)` — **EN:** Assigns a value to field_ir. **CN:** 将一个值赋给 field_ir。
+- **L362** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L363** `            return _cute_nvgpu_ir.atom_get_value(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L364** `                Boolean.mlir_type, self.value, field_ir, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `        except (TypeError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L367** `            attr = ir.Attribute.parse(f"#cute_nvgpu.atom_mma_field_sm100<{field_ir}>")` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L368** `            return _cute_nvgpu_ir.atom_get_value(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L369** `                Boolean.mlir_type, self.value, attr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `# Base class for all tcgen05 BlockScaled MMA Ops with syntax \`tcgen05.mma.cta_group.kind.block_scale\` used to factor out some internal code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L374** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L375** `class BlockScaledMmaOp(Tcgen05MmaOp):` — **EN:** Defines class `BlockScaledMmaOp` with bases Tcgen05MmaOp. **CN:** 定义类 `BlockScaledMmaOp`，其基类为 Tcgen05MmaOp。
+- **L376** `    a_dtype: Type[Numeric]` — **EN:** Assigns a typed value to a_dtype. **CN:** 为 a_dtype 赋予带类型标注的值。
+- **L377** `    b_dtype: Type[Numeric]` — **EN:** Assigns a typed value to b_dtype. **CN:** 为 b_dtype 赋予带类型标注的值。
+- **L378** `    acc_dtype: Type[Numeric]` — **EN:** Assigns a typed value to acc_dtype. **CN:** 为 acc_dtype 赋予带类型标注的值。
+- **L379** `    sf_dtype: Type[Numeric]` — **EN:** Assigns a typed value to sf_dtype. **CN:** 为 sf_dtype 赋予带类型标注的值。
+- **L380** `    sf_vec_size: int` — **EN:** Assigns a typed value to sf_vec_size. **CN:** 为 sf_vec_size 赋予带类型标注的值。
+- **L381** `    shape_mnk: Shape` — **EN:** Assigns a typed value to shape_mnk. **CN:** 为 shape_mnk 赋予带类型标注的值。
+- **L382** `    cta_group: CtaGroup` — **EN:** Assigns a typed value to cta_group. **CN:** 为 cta_group 赋予带类型标注的值。
+- **L383** `    a_src: OperandSource` — **EN:** Assigns a typed value to a_src. **CN:** 为 a_src 赋予带类型标注的值。
+- **L384** `    a_major_mode: Union[_OperandMajorMode, OperandMajorMode]` — **EN:** Assigns a typed value to a_major_mode. **CN:** 为 a_major_mode 赋予带类型标注的值。
+- **L385** `    b_major_mode: Union[_OperandMajorMode, OperandMajorMode]` — **EN:** Assigns a typed value to b_major_mode. **CN:** 为 b_major_mode 赋予带类型标注的值。
+- **L386** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L387** `    admissible_archs = [` — **EN:** Assigns a value to admissible_archs. **CN:** 将一个值赋给 admissible_archs。
+- **L388** `        Arch.sm_100a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `        Arch.sm_103a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L393** `        # Verify arch` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L394** `        arch = BaseDSL._get_dsl().get_arch_enum()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L395** `        if arch not in self.admissible_archs:` — **EN:** Starts a conditional branch guarded by `arch not in self.admissible_archs`. **CN:** 开始一个由 `arch not in self.admissible_archs` 控制的条件分支。
+- **L396** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L397** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L398** `                f"expects arch to be one of {self.admissible_archs}, but got {arch}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L399** `                suggestion="Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L400** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `        # Verify that the user provided enum values` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L402** `        if not isinstance(self.cta_group, CtaGroup):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.cta_group, CtaGroup)`. **CN:** 开始一个由 `not isinstance(self.cta_group, CtaGroup)` 控制的条件分支。
+- **L403** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L404** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** `                "expects the 'cta_group' Op parameter to be a tcgen05.CtaGroup instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L406** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L407** `        if not isinstance(self.a_src, OperandSource):` — **EN:** Starts a conditional branch guarded by `not isinstance(self.a_src, OperandSource)`. **CN:** 开始一个由 `not isinstance(self.a_src, OperandSource)` 控制的条件分支。
+- **L408** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L409** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L410** `                "expects the 'a_src' Op parameter to be a tcgen05.OperandSource instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L411** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `        if not isinstance(self.a_major_mode, _OperandMajorMode) and not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(self.a_major_mode, _OperandMajorMode) and ...`. **CN:** 开始一个由 `not isinstance(self.a_major_mode, _OperandMajorMode) and ...` 控制的条件分支。
+- **L413** `            self.a_major_mode, OperandMajorMode` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L414** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L415** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L416** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `                "expects the 'a_major_mode' Op parameter to be a cute.nvgpu.OperandMajorMode or tcgen05.OperandMajorMode (deprecated) instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `        if not isinstance(self.b_major_mode, _OperandMajorMode) and not isinstance(` — **EN:** Starts a conditional branch guarded by `not isinstance(self.b_major_mode, _OperandMajorMode) and ...`. **CN:** 开始一个由 `not isinstance(self.b_major_mode, _OperandMajorMode) and ...` 控制的条件分支。
+- **L420** `            self.b_major_mode, OperandMajorMode` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L421** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L422** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L423** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L424** `                "expects the 'b_major_mode' Op parameter to be a cute.nvgpu.OperandMajorMode or tcgen05.OperandMajorMode (deprecated) instance",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L425** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L426** `        if isinstance(self.a_major_mode, OperandMajorMode) or isinstance(` — **EN:** Starts a conditional branch guarded by `isinstance(self.a_major_mode, OperandMajorMode) or isinst...`. **CN:** 开始一个由 `isinstance(self.a_major_mode, OperandMajorMode) or isinst...` 控制的条件分支。
+- **L427** `            self.b_major_mode, OperandMajorMode` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L428** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L429** `            warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L430** `                "tcgen05.OperandMajorMode is deprecated, use cute.nvgpu.OperandMajorMode instead",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `                DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `                stacklevel=2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `            # Normalize the major modes to the new enum type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L435** `            # Since this is a frozen dataclass, we need to use the object.__setattr__ method to set the attributes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L436** `            object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L437** `                self, "a_major_mode", _OperandMajorMode(self.a_major_mode.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L438** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L439** `            object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L440** `                self, "b_major_mode", _OperandMajorMode(self.b_major_mode.value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L441** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `        # Verify the instruction shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L443** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L444** `        if (rank(shape_mnk_tuple) not in [2, 3]) or (depth(shape_mnk_tuple) != 1):` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) not in [2, 3] or depth(shape_mnk_tu...`. **CN:** 开始一个由 `rank(shape_mnk_tuple) not in [2, 3] or depth(shape_mnk_tu...` 控制的条件分支。
+- **L445** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L446** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `                f"expected a flat rank 2 or 3 tuple for the 'shape_mnk' Op parameter, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `                f"but got {self.shape_mnk}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `        m, n = shape_mnk_tuple[0], shape_mnk_tuple[1]` — **EN:** Assigns a value to (m, n). **CN:** 将一个值赋给 (m, n)。
+- **L451** `        if self.cta_group == CtaGroup.ONE:` — **EN:** Starts a conditional branch guarded by `self.cta_group == CtaGroup.ONE`. **CN:** 开始一个由 `self.cta_group == CtaGroup.ONE` 控制的条件分支。
+- **L452** `            if m != 128:` — **EN:** Starts a conditional branch guarded by `m != 128`. **CN:** 开始一个由 `m != 128` 控制的条件分支。
+- **L453** `                raise OpError(self, f"expects the M-mode to be 128, but got {m}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `            if (n < 8) or (n > 256) or (n % 8 != 0):` — **EN:** Starts a conditional branch guarded by `n < 8 or n > 256 or n % 8 != 0`. **CN:** 开始一个由 `n < 8 or n > 256 or n % 8 != 0` 控制的条件分支。
+- **L456** `                raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L457** `                    self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L458** `                    f"expects the N-mode to satisfy 8 <= N <= 256 and N % 8 == 0, but got {n}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L459** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L460** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L461** `            if m not in [128, 256]:` — **EN:** Starts a conditional branch guarded by `m not in [128, 256]`. **CN:** 开始一个由 `m not in [128, 256]` 控制的条件分支。
+- **L462** `                raise OpError(self, f"expects the M-mode to be 128 or 256, but got {m}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L463** `            if (n < 16) or (n > 256) or (n % 16 != 0):` — **EN:** Starts a conditional branch guarded by `n < 16 or n > 256 or n % 16 != 0`. **CN:** 开始一个由 `n < 16 or n > 256 or n % 16 != 0` 控制的条件分支。
+- **L464** `                raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L465** `                    self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `                    f"expects the N-mode to satisfy 16 <= N <= 256 and N % 16 == 0, but got {n}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `        if self.sf_vec_size not in [16, 32]:` — **EN:** Starts a conditional branch guarded by `self.sf_vec_size not in [16, 32]`. **CN:** 开始一个由 `self.sf_vec_size not in [16, 32]` 控制的条件分支。
+- **L469** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L470** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `                f"expects the scale factor vector size to be 16 or 32, but got {self.sf_vec_size}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L474** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L475** `        return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L476** `            self.__class__.descriptive_name  # type: ignore` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `            + f"\n  A data type               = {self.a_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `            + f"\n  B data type               = {self.b_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `            + f"\n  Accumulator data type     = {self.acc_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `            + f"\n  Scale factor data type    = {self.sf_dtype}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `            + f"\n  Scale factor vector size  = {self.sf_vec_size}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `            + f"\n  CTA group                 = {self.cta_group}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `            + f"\n  A source location         = {self.a_src}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** `            + f"\n  A major mode              = {self.a_major_mode}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `            + f"\n  B major mode              = {self.b_major_mode}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `            + f"\n  Instruction shape MNK     = {self.shape_mnk}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L489** `    def _verify_fragment_A(` — **EN:** Defines function `_verify_fragment_A`. **CN:** 定义函数 `_verify_fragment_A`。
+- **L490** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L491** `        input: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L492** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L493** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L494** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L495** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L496** `        if input.memspace == AddressSpace.smem and isinstance(` — **EN:** Starts a conditional branch guarded by `input.memspace == AddressSpace.smem and isinstance(input....`. **CN:** 开始一个由 `input.memspace == AddressSpace.smem and isinstance(input....` 控制的条件分支。
+- **L497** `            input.layout.type, _cute_ir.ComposedLayoutType` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L498** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L499** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L500** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L501** `                f"Expected affine layout for {self._make_trait()}'s operand A, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L502** `                f"but got composed layout instead: {input.layout}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L503** `                f"\nPlease use recast_ptr(ptr, {input.layout.inner}, element_type) operation to move swizzle to the ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L504** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L505** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    def _verify_fragment_B(` — **EN:** Defines function `_verify_fragment_B`. **CN:** 定义函数 `_verify_fragment_B`。
+- **L508** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L509** `        input: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L510** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L511** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L512** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L513** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L514** `        if input.memspace == AddressSpace.smem and isinstance(` — **EN:** Starts a conditional branch guarded by `input.memspace == AddressSpace.smem and isinstance(input....`. **CN:** 开始一个由 `input.memspace == AddressSpace.smem and isinstance(input....` 控制的条件分支。
+- **L515** `            input.layout.type, _cute_ir.ComposedLayoutType` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L516** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L517** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L518** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L519** `                f"Expected affine layout for {self._make_trait()}'s operand B, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L520** `                f"but got composed layout instead: {input.layout}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L521** `                f"\nPlease use recast_ptr(ptr, {input.layout.inner}, element_type) operation to move swizzle to the ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L522** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** `class BlockScaledMmaTraits(Trait):` — **EN:** Defines class `BlockScaledMmaTraits` with bases Trait. **CN:** 定义类 `BlockScaledMmaTraits`，其基类为 Trait。
+- **L527** `    admissible_fields = [` — **EN:** Assigns a value to admissible_fields. **CN:** 将一个值赋给 admissible_fields。
+- **L528** `        Field.ACCUMULATE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L529** `        Field.NEGATE_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `        Field.NEGATE_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `        Field.SFA,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `        Field.SFB,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L533** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L535** `    def set(` — **EN:** Defines function `set`. **CN:** 定义函数 `set`。
+- **L536** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L537** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L538** `        value: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L539** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L540** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L541** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L542** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L543** `        field_ir = normalize_field_to_ir_name(field, self.admissible_fields)` — **EN:** Assigns a value to field_ir. **CN:** 将一个值赋给 field_ir。
+- **L544** `        # Derive boolean/pointer IR names from enum values, no hard-coded strings.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L545** `        bool_field_ir = {` — **EN:** Assigns a value to bool_field_ir. **CN:** 将一个值赋给 bool_field_ir。
+- **L546** `            f._to_ir_field_name()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L547** `            for f in self.admissible_fields` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L548** `            if f in (Field.ACCUMULATE, Field.NEGATE_A, Field.NEGATE_B)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `        ptr_field_ir = {` — **EN:** Assigns a value to ptr_field_ir. **CN:** 将一个值赋给 ptr_field_ir。
+- **L551** `            f._to_ir_field_name()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L552** `            for f in self.admissible_fields` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** `            if f in (Field.SFA, Field.SFB)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L554** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L555** `        # Coerce value based on field kind` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L556** `        if field_ir in bool_field_ir:` — **EN:** Starts a conditional branch guarded by `field_ir in bool_field_ir`. **CN:** 开始一个由 `field_ir in bool_field_ir` 控制的条件分支。
+- **L557** `            val = Boolean(value).ir_value(loc=loc, ip=ip)` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L558** `        elif field_ir in ptr_field_ir:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L559** `            if not isinstance(value, Pointer):` — **EN:** Starts a conditional branch guarded by `not isinstance(value, Pointer)`. **CN:** 开始一个由 `not isinstance(value, Pointer)` 控制的条件分支。
+- **L560** `                raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L561** `                    f"expects value to be a pointer for {field_ir}, but got {type(value).__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L562** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L563** `            val = value.value` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L564** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L565** `            raise ValueError(f"unsupported field: {field_ir}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L566** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L567** `            self.value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L568** `                self.value, field_ir, val, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L569** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `        except (TypeError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L571** `            attr = ir.Attribute.parse(` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L572** `                f"#cute_nvgpu.atom_mma_field_sm100_block_scaled<{field_ir}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L573** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L574** `            self.value = _cute_nvgpu_ir.atom_set_value(` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L575** `                self.value, attr, val, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L576** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `    def get(` — **EN:** Defines function `get`. **CN:** 定义函数 `get`。
+- **L579** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L580** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L581** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L582** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L583** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L584** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L585** `        # Only boolean-returning fields supported for get. Derive from admissible_fields.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L586** `        gettable_fields = [` — **EN:** Assigns a value to gettable_fields. **CN:** 将一个值赋给 gettable_fields。
+- **L587** `            f for f in self.admissible_fields if f not in (Field.SFA, Field.SFB)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `        field_ir = normalize_field_to_ir_name(field, gettable_fields)` — **EN:** Assigns a value to field_ir. **CN:** 将一个值赋给 field_ir。
+- **L590** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L591** `            return _cute_nvgpu_ir.atom_get_value(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L592** `                Boolean.mlir_type, self.value, field_ir, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `        except (TypeError, AttributeError):` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L595** `            attr = ir.Attribute.parse(` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L596** `                f"#cute_nvgpu.atom_mma_field_sm100_block_scaled<{field_ir}>"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L598** `            return _cute_nvgpu_ir.atom_get_value(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L599** `                Boolean.mlir_type, self.value, attr, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L600** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L603** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L604** `# TF32 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L605** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L606** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L607** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L608** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L609** `class MmaTF32Op(MmaOp):` — **EN:** Defines class `MmaTF32Op` with bases MmaOp. **CN:** 定义类 `MmaTF32Op`，其基类为 MmaOp。
+- **L610** `    """` — **EN:** Starts the docstring for the class `MmaTF32Op`. **CN:** 开始说明 class `MmaTF32Op` 的文档字符串。
+- **L611** `    TF32 tcgen05 MMA Operation.` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L612** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L613** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L614** `    This Operation corresponds to the \`\`.kind::tf32\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L615** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L616** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L617** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L618** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L619** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L621** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L622** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L623** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L624** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L625** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L626** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaTF32Op`. **CN:** 继续说明 class `MmaTF32Op` 的文档字符串。
+- **L627** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L628** `    """` — **EN:** Ends the docstring for the class `MmaTF32Op`. **CN:** 结束说明 class `MmaTF32Op` 的文档字符串。
+- **L629** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L630** `    descriptive_name = "tcgen05 TF32 MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L633** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L634** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L635** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L636** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L637** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L638** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L639** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L640** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L641** `            TFloat32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L642** `            TFloat32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L643** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L644** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L646** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L647** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L648** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L649** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L650** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L652** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L653** `        # Verify the instruction shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L654** `        instruction_k = 8` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L655** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L656** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L657** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L658** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L659** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L660** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L661** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L662** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L663** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L664** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L665** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L666** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L667** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L668** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L669** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L670** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L671** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L672** `    ) -> "MmaTF32Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L673** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L674** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMAType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L675** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L679** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L680** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L684** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** `        return MmaTF32Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L686** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L687** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L689** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L694** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L695** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L696** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L698** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L699** `class MmaTF32Trait(MmaTraits):` — **EN:** Defines class `MmaTF32Trait` with bases MmaTraits. **CN:** 定义类 `MmaTF32Trait`，其基类为 MmaTraits。
+- **L700** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L701** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L702** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L703** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L704** `# F16/BF16 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L705** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L706** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L707** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L708** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L709** `class MmaF16BF16Op(MmaOp):` — **EN:** Defines class `MmaF16BF16Op` with bases MmaOp. **CN:** 定义类 `MmaF16BF16Op`，其基类为 MmaOp。
+- **L710** `    """` — **EN:** Starts the docstring for the class `MmaF16BF16Op`. **CN:** 开始说明 class `MmaF16BF16Op` 的文档字符串。
+- **L711** `    F16/BF16 tcgen05 MMA Operation.` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L712** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L713** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L714** `    This Operation corresponds to the \`\`.kind::f16\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L715** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L716** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L717** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L718** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L719** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L720** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L721** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L722** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L723** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L724** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L725** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L726** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaF16BF16Op`. **CN:** 继续说明 class `MmaF16BF16Op` 的文档字符串。
+- **L727** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L728** `    """` — **EN:** Ends the docstring for the class `MmaF16BF16Op`. **CN:** 结束说明 class `MmaF16BF16Op` 的文档字符串。
+- **L729** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L730** `    descriptive_name = "tcgen05 F16/BF16 MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L731** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L732** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L733** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L734** `        ab_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L735** `        acc_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L736** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L737** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L738** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L739** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L740** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L741** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L742** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L743** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L744** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `            acc_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L747** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L749** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L750** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L752** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L753** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L754** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L755** `        # Input data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L756** `        if self.a_dtype not in [Float16, BFloat16]:` — **EN:** Starts a conditional branch guarded by `self.a_dtype not in [Float16, BFloat16]`. **CN:** 开始一个由 `self.a_dtype not in [Float16, BFloat16]` 控制的条件分支。
+- **L757** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L758** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `                "expects the 'ab_dtype' Op parameter to be one of Float16 or BFloat16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L760** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L761** `        assert self.b_dtype == self.a_dtype, "a_dtype and b_dtype must be the same"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L762** `        # Accumulator data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L763** `        if self.acc_dtype not in [Float16, Float32]:` — **EN:** Starts a conditional branch guarded by `self.acc_dtype not in [Float16, Float32]`. **CN:** 开始一个由 `self.acc_dtype not in [Float16, Float32]` 控制的条件分支。
+- **L764** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L765** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L766** `                "expects the 'acc_dtype' Op parameter to be one of Float16 or Float32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L767** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L768** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L769** `        instruction_k = 16` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L770** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L771** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L772** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L773** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L774** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L775** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L776** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L777** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L778** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L779** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L780** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L781** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L782** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L783** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L784** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L785** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L786** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L787** `    ) -> "MmaF16BF16Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L788** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L789** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMAType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L790** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L793** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L794** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L795** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L796** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L797** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L798** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L799** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L800** `        return MmaF16BF16Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L801** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L802** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L803** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L804** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L805** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L806** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L808** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L811** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L812** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L813** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L814** `class MmaF16BF16Trait(MmaTraits):` — **EN:** Defines class `MmaF16BF16Trait` with bases MmaTraits. **CN:** 定义类 `MmaF16BF16Trait`，其基类为 MmaTraits。
+- **L815** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L816** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L817** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L818** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L819** `# I8 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L820** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L821** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L822** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L823** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L824** `class MmaI8Op(MmaOp):` — **EN:** Defines class `MmaI8Op` with bases MmaOp. **CN:** 定义类 `MmaI8Op`，其基类为 MmaOp。
+- **L825** `    """` — **EN:** Starts the docstring for the class `MmaI8Op`. **CN:** 开始说明 class `MmaI8Op` 的文档字符串。
+- **L826** `    I8 tcgen05 MMA Operation.` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L827** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L828** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L829** `    This Operation corresponds to the \`\`.kind::i8\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L830** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L831** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L832** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L833** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L834** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L835** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L836** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L837** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L838** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L839** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L840** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L841** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaI8Op`. **CN:** 继续说明 class `MmaI8Op` 的文档字符串。
+- **L842** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L843** `    """` — **EN:** Ends the docstring for the class `MmaI8Op`. **CN:** 结束说明 class `MmaI8Op` 的文档字符串。
+- **L844** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L845** `    descriptive_name = "tcgen05 I8 MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L846** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L847** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L848** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L849** `        ab_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L850** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L851** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L852** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L853** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L854** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L855** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L856** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L857** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L858** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L859** `            Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L860** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L861** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L862** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L863** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L864** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L865** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L866** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L867** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L868** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L869** `        # Input data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L870** `        if self.a_dtype not in [Int8, Uint8]:` — **EN:** Starts a conditional branch guarded by `self.a_dtype not in [Int8, Uint8]`. **CN:** 开始一个由 `self.a_dtype not in [Int8, Uint8]` 控制的条件分支。
+- **L871** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L872** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L873** `                "expects the 'ab_dtype' Op parameter to be one of Int8 or Uint8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L874** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L875** `        assert self.b_dtype == self.a_dtype, "a_dtype and b_dtype must be the same"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L876** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L877** `        instruction_k = 32` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L878** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L879** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L880** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L881** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L882** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L883** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L884** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L885** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L886** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L887** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L888** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L889** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L890** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L891** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L892** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L893** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L894** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L895** `    ) -> "MmaI8Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L896** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L897** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMAType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L898** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L899** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L900** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L901** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L902** `            (T.si8() if self.a_dtype.signed else T.ui8()),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L903** `            (T.si8() if self.b_dtype.signed else T.ui8()),  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L904** `            T.si32(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L905** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L906** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L907** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L908** `        return MmaI8Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L909** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L910** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L911** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L912** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L913** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L914** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L915** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L916** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L917** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L918** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L919** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L920** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L921** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L922** `class MmaI8Trait(MmaTraits):` — **EN:** Defines class `MmaI8Trait` with bases MmaTraits. **CN:** 定义类 `MmaI8Trait`，其基类为 MmaTraits。
+- **L923** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L924** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L925** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L926** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L927** `# F8F6F4 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L928** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L929** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L930** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L931** `@deprecated("MmaFP8Op is deprecated, use MmaF8F6F4Op instead")` — **EN:** Applies decorator `deprecated('MmaFP8Op is deprecated, use MmaF8F6F4Op inste...` to the following definition. **CN:** 将装饰器 `deprecated('MmaFP8Op is deprecated, use MmaF8F6F4Op inste...` 应用于后面的定义。
+- **L932** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L933** `class MmaFP8Op(MmaOp):` — **EN:** Defines class `MmaFP8Op` with bases MmaOp. **CN:** 定义类 `MmaFP8Op`，其基类为 MmaOp。
+- **L934** `    """` — **EN:** Starts the docstring for the class `MmaFP8Op`. **CN:** 开始说明 class `MmaFP8Op` 的文档字符串。
+- **L935** `    F8 tcgen05 MMA Operation.` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L936** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L937** `    .. deprecated::` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L938** `        Use :class:\`MmaF8F6F4Op\` instead.` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L939** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L940** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L941** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L942** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L943** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L944** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L945** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L946** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L947** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L948** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L949** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L950** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L951** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L952** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaFP8Op`. **CN:** 继续说明 class `MmaFP8Op` 的文档字符串。
+- **L953** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L954** `    """` — **EN:** Ends the docstring for the class `MmaFP8Op`. **CN:** 结束说明 class `MmaFP8Op` 的文档字符串。
+- **L955** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L956** `    descriptive_name = "tcgen05 F8 MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L957** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L958** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L959** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L960** `        ab_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L961** `        acc_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L962** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L963** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L964** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L965** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L966** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L967** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L968** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L969** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L970** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L971** `            acc_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L972** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L973** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L974** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L975** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L976** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L977** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L978** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L979** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L980** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L981** `        # Input data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L982** `        if self.a_dtype not in [` — **EN:** Starts a conditional branch guarded by `self.a_dtype not in [Float8E5M2, Float8E4M3FN]`. **CN:** 开始一个由 `self.a_dtype not in [Float8E5M2, Float8E4M3FN]` 控制的条件分支。
+- **L983** `            Float8E5M2,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L984** `            Float8E4M3FN,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L985** `        ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L986** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L987** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L988** `                "expects the 'ab_dtype' Op parameter to be one of Float8E5M2, Float8E4M3FN"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L989** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L990** `        assert self.b_dtype == self.a_dtype, "a_dtype and b_dtype must be the same"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L991** `        # Accumulator data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L992** `        if self.acc_dtype not in [Float16, Float32]:` — **EN:** Starts a conditional branch guarded by `self.acc_dtype not in [Float16, Float32]`. **CN:** 开始一个由 `self.acc_dtype not in [Float16, Float32]` 控制的条件分支。
+- **L993** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L994** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L995** `                "expects the 'acc_dtype' Op parameter to be one of Float16 or Float32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L996** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L997** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L998** `        instruction_k = 32` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L999** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L1000** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L1001** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1002** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1003** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1004** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1005** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1006** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1007** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1008** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1009** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1010** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1011** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1012** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1013** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1014** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1015** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1016** `    ) -> "MmaFP8Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1017** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1018** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMAType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1019** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1020** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1021** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1022** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1023** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1024** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1025** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1026** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1027** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1028** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1029** `        return MmaFP8Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1030** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1031** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1032** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1033** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1034** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1035** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1036** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1037** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1038** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1039** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1040** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1041** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1042** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1043** `class MmaFP8Trait(MmaTraits):` — **EN:** Defines class `MmaFP8Trait` with bases MmaTraits. **CN:** 定义类 `MmaFP8Trait`，其基类为 MmaTraits。
+- **L1044** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1045** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1046** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1047** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1048** `class MmaF8F6F4Op(MmaOp):` — **EN:** Defines class `MmaF8F6F4Op` with bases MmaOp. **CN:** 定义类 `MmaF8F6F4Op`，其基类为 MmaOp。
+- **L1049** `    """` — **EN:** Starts the docstring for the class `MmaF8F6F4Op`. **CN:** 开始说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1050** `    F8F6F4 tcgen05 MMA Operation.` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1051** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1052** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1053** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1054** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1055** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1056** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1057** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1058** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1059** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1060** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1061** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1062** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1063** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1064** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaF8F6F4Op`. **CN:** 继续说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1065** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1066** `    """` — **EN:** Ends the docstring for the class `MmaF8F6F4Op`. **CN:** 结束说明 class `MmaF8F6F4Op` 的文档字符串。
+- **L1067** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1068** `    descriptive_name = "tcgen05 F8F6F4 MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1069** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1070** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1071** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1072** `        a_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1073** `        b_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1074** `        acc_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1075** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1076** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1077** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1078** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1079** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1080** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1081** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1082** `            a_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1083** `            b_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1084** `            acc_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1085** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1086** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1087** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1088** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1089** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1090** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1091** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1092** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1093** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1094** `        # Input data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1095** `        if self.a_dtype not in _F8F6F4_TYPES:` — **EN:** Starts a conditional branch guarded by `self.a_dtype not in _F8F6F4_TYPES`. **CN:** 开始一个由 `self.a_dtype not in _F8F6F4_TYPES` 控制的条件分支。
+- **L1096** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1097** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1098** `                "expects the 'a_dtype' Op parameter to be one of "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1099** `                "Float8E5M2, Float8E4M3FN, Float6E3M2FN, Float6E2M3FN, or Float4E2M1FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1100** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1101** `        if self.b_dtype not in _F8F6F4_TYPES:` — **EN:** Starts a conditional branch guarded by `self.b_dtype not in _F8F6F4_TYPES`. **CN:** 开始一个由 `self.b_dtype not in _F8F6F4_TYPES` 控制的条件分支。
+- **L1102** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1103** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1104** `                "expects the 'b_dtype' Op parameter to be one of "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1105** `                "Float8E5M2, Float8E4M3FN, Float6E3M2FN, Float6E2M3FN, or Float4E2M1FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1106** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1107** `        # Accumulator data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1108** `        if self.acc_dtype not in [Float16, Float32]:` — **EN:** Starts a conditional branch guarded by `self.acc_dtype not in [Float16, Float32]`. **CN:** 开始一个由 `self.acc_dtype not in [Float16, Float32]` 控制的条件分支。
+- **L1109** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1110** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1111** `                "expects the 'acc_dtype' Op parameter to be one of Float16 or Float32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1112** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1113** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1114** `        instruction_k = 32` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1115** `        shape_mnk_tuple = cast(Tuple[Any, ...], self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1116** `        if rank(self.shape_mnk) == 2:` — **EN:** Starts a conditional branch guarded by `rank(self.shape_mnk) == 2`. **CN:** 开始一个由 `rank(self.shape_mnk) == 2` 控制的条件分支。
+- **L1117** `            shape_mnk_tuple = (*shape_mnk_tuple, instruction_k)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1118** `            object.__setattr__(self, "shape_mnk", shape_mnk_tuple)` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1119** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1120** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1121** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1122** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1123** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1124** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1126** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1127** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1128** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1129** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1130** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1131** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1132** `    ) -> "MmaF8F6F4Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1133** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1134** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMAType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1135** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1136** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1137** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1138** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1139** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1140** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1141** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1142** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1143** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1144** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1145** `        return MmaF8F6F4Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1146** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1147** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1148** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1149** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1150** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1151** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1152** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1153** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1154** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1155** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1156** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1159** `class MmaF8F6F4Trait(MmaTraits):` — **EN:** Defines class `MmaF8F6F4Trait` with bases MmaTraits. **CN:** 定义类 `MmaF8F6F4Trait`，其基类为 MmaTraits。
+- **L1160** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1164** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1165** `# MXF8F6F4 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1166** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1169** `@deprecated("MmaMXF8Op is deprecated, use MmaMXF8F6F4Op instead")` — **EN:** Applies decorator `deprecated('MmaMXF8Op is deprecated, use MmaMXF8F6F4Op in...` to the following definition. **CN:** 将装饰器 `deprecated('MmaMXF8Op is deprecated, use MmaMXF8F6F4Op in...` 应用于后面的定义。
+- **L1170** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1171** `class MmaMXF8Op(BlockScaledMmaOp):` — **EN:** Defines class `MmaMXF8Op` with bases BlockScaledMmaOp. **CN:** 定义类 `MmaMXF8Op`，其基类为 BlockScaledMmaOp。
+- **L1172** `    """` — **EN:** Starts the docstring for the class `MmaMXF8Op`. **CN:** 开始说明 class `MmaMXF8Op` 的文档字符串。
+- **L1173** `    MXF8 tcgen05 BlockScaled MMA Operation.` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1175** `    .. deprecated::` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1176** `        Use :class:\`MmaMXF8F6F4Op\` instead.` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1178** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1179** `    This Operation corresponds to the \`\`.kind::mxf8f6f4\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1181** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1182** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1184** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1186** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1187** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1189** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1190** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1191** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF8Op`. **CN:** 继续说明 class `MmaMXF8Op` 的文档字符串。
+- **L1192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1193** `    """` — **EN:** Ends the docstring for the class `MmaMXF8Op`. **CN:** 结束说明 class `MmaMXF8Op` 的文档字符串。
+- **L1194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1195** `    descriptive_name = "tcgen05 MXF8 BlockScaled MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1197** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1198** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1199** `        ab_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1200** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1201** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1202** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1203** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1204** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1205** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1206** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1207** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1208** `            ab_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1209** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1210** `            Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1211** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1212** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1213** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1214** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1215** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1216** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1217** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1218** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1220** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1221** `        # Input data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1222** `        if self.a_dtype not in [Float8E5M2, Float8E4M3FN]:` — **EN:** Starts a conditional branch guarded by `self.a_dtype not in [Float8E5M2, Float8E4M3FN]`. **CN:** 开始一个由 `self.a_dtype not in [Float8E5M2, Float8E4M3FN]` 控制的条件分支。
+- **L1223** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1224** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1225** `                "expects the 'ab_dtype' Op parameter to be one of Float8E5M2 or Float8E4M3FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1226** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1227** `        assert self.b_dtype == self.a_dtype, "a_dtype and b_dtype must be the same"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1228** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1229** `        instruction_k = 32` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1230** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L1231** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L1232** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1233** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1234** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1235** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1236** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1237** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1238** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1239** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1241** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1242** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1243** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1244** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1245** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1246** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1247** `    ) -> "MmaMXF8Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1248** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1249** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMABlockScaledType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1250** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1251** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1252** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1253** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1254** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1255** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1256** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1257** `            self.sf_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1258** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1259** `            self.sf_vec_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1260** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1261** `        return MmaMXF8Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1262** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1263** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1264** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1265** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1266** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1267** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1268** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1269** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1270** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1271** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1272** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1273** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1274** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1275** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1276** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1277** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1278** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1281** `class MmaMXF8Trait(BlockScaledMmaTraits):` — **EN:** Defines class `MmaMXF8Trait` with bases BlockScaledMmaTraits. **CN:** 定义类 `MmaMXF8Trait`，其基类为 BlockScaledMmaTraits。
+- **L1282** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1285** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1286** `class MmaMXF8F6F4Op(BlockScaledMmaOp):` — **EN:** Defines class `MmaMXF8F6F4Op` with bases BlockScaledMmaOp. **CN:** 定义类 `MmaMXF8F6F4Op`，其基类为 BlockScaledMmaOp。
+- **L1287** `    """` — **EN:** Starts the docstring for the class `MmaMXF8F6F4Op`. **CN:** 开始说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1288** `    MXF8F6F4 tcgen05 BlockScaled MMA Operation.` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1290** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1291** `    This Operation corresponds to the \`\`.kind::mxf8f6f4\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1293** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1294** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1295** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1296** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1298** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1299** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1301** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1302** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1303** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF8F6F4Op`. **CN:** 继续说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1305** `    """` — **EN:** Ends the docstring for the class `MmaMXF8F6F4Op`. **CN:** 结束说明 class `MmaMXF8F6F4Op` 的文档字符串。
+- **L1306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1307** `    descriptive_name = "tcgen05 MXF8F6F4 BlockScaled MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1309** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1310** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1311** `        a_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1312** `        b_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1313** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1314** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1315** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1316** `        a_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1317** `        b_major_mode: Union[_OperandMajorMode, OperandMajorMode],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1318** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1319** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1320** `            a_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1321** `            b_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1322** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1323** `            Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1324** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1325** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1326** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1327** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1328** `            a_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1329** `            b_major_mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1330** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1331** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1333** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1334** `        # Input data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1335** `        if self.a_dtype not in _F8F6F4_TYPES:` — **EN:** Starts a conditional branch guarded by `self.a_dtype not in _F8F6F4_TYPES`. **CN:** 开始一个由 `self.a_dtype not in _F8F6F4_TYPES` 控制的条件分支。
+- **L1336** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1337** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1338** `                "expects the 'a_dtype' Op parameter to be one of "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1339** `                "Float8E5M2, Float8E4M3FN, Float6E3M2FN, Float6E2M3FN, or Float4E2M1FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1340** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1341** `        if self.b_dtype not in _F8F6F4_TYPES:` — **EN:** Starts a conditional branch guarded by `self.b_dtype not in _F8F6F4_TYPES`. **CN:** 开始一个由 `self.b_dtype not in _F8F6F4_TYPES` 控制的条件分支。
+- **L1342** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1343** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1344** `                "expects the 'b_dtype' Op parameter to be one of "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1345** `                "Float8E5M2, Float8E4M3FN, Float6E3M2FN, Float6E2M3FN, or Float4E2M1FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1346** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1348** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1349** `        instruction_k = 32` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1350** `        shape_mnk_tuple = cast(Tuple[Any, ...], self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1351** `        if rank(self.shape_mnk) == 2:` — **EN:** Starts a conditional branch guarded by `rank(self.shape_mnk) == 2`. **CN:** 开始一个由 `rank(self.shape_mnk) == 2` 控制的条件分支。
+- **L1352** `            shape_mnk_tuple = (*shape_mnk_tuple, instruction_k)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1353** `            object.__setattr__(self, "shape_mnk", shape_mnk_tuple)` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1354** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1355** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1356** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1357** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1358** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1359** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1361** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1362** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1363** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1364** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1365** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1366** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1367** `    ) -> "MmaMXF8F6F4Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1368** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1369** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMABlockScaledType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1370** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1371** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1372** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1373** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1374** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1375** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1376** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1377** `            self.sf_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1378** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1379** `            self.sf_vec_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1380** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1381** `        return MmaMXF8F6F4Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1382** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1383** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1384** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1385** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1386** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1387** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1388** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1389** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1390** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1391** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1392** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1393** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1394** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1395** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1396** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1397** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1398** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1401** `class MmaMXF8F6F4Trait(BlockScaledMmaTraits):` — **EN:** Defines class `MmaMXF8F6F4Trait` with bases BlockScaledMmaTraits. **CN:** 定义类 `MmaMXF8F6F4Trait`，其基类为 BlockScaledMmaTraits。
+- **L1402** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1405** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1406** `# MXF4 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1407** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1410** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1411** `class MmaMXF4Op(BlockScaledMmaOp):` — **EN:** Defines class `MmaMXF4Op` with bases BlockScaledMmaOp. **CN:** 定义类 `MmaMXF4Op`，其基类为 BlockScaledMmaOp。
+- **L1412** `    """` — **EN:** Starts the docstring for the class `MmaMXF4Op`. **CN:** 开始说明 class `MmaMXF4Op` 的文档字符串。
+- **L1413** `    MXF4 tcgen05 BlockScaled MMA Operation.` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1415** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1416** `    This Operation corresponds to the \`\`.kind::mxf4\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1417** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1418** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1419** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1421** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1423** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1424** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1426** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1427** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1428** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF4Op`. **CN:** 继续说明 class `MmaMXF4Op` 的文档字符串。
+- **L1429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1430** `    """` — **EN:** Ends the docstring for the class `MmaMXF4Op`. **CN:** 结束说明 class `MmaMXF4Op` 的文档字符串。
+- **L1431** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1432** `    descriptive_name = "tcgen05 MXF4 BlockScaled MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1434** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1435** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1436** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1437** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1438** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1439** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1440** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1441** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1442** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1443** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1444** `            Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1445** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1446** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1447** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1448** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1449** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1450** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1451** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1452** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1454** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1455** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1456** `        instruction_k = 64` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1457** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L1458** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L1459** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1460** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1461** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1462** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1463** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1464** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1465** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1466** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1467** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1468** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1469** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1470** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1471** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1472** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1473** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1474** `    ) -> "MmaMXF4Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1475** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1476** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMABlockScaledType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1477** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1478** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1479** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1480** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1481** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1482** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1483** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1484** `            self.sf_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1485** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1486** `            self.sf_vec_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1487** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1488** `        return MmaMXF4Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1489** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1490** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1491** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1492** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1493** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1494** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1495** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1496** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1497** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1498** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1499** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1500** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1501** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1502** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1503** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1504** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1505** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1508** `class MmaMXF4Trait(BlockScaledMmaTraits):` — **EN:** Defines class `MmaMXF4Trait` with bases BlockScaledMmaTraits. **CN:** 定义类 `MmaMXF4Trait`，其基类为 BlockScaledMmaTraits。
+- **L1509** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1510** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1512** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1513** `# MXF4NVF4 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1514** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1515** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1516** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1517** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1518** `class MmaMXF4NVF4Op(BlockScaledMmaOp):` — **EN:** Defines class `MmaMXF4NVF4Op` with bases BlockScaledMmaOp. **CN:** 定义类 `MmaMXF4NVF4Op`，其基类为 BlockScaledMmaOp。
+- **L1519** `    """` — **EN:** Starts the docstring for the class `MmaMXF4NVF4Op`. **CN:** 开始说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1520** `    MXF4NVF4 tcgen05 BlockScaled MMA Operation.` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1521** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1522** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1523** `    This Operation corresponds to the \`\`.kind::mxf4nvf4\`\` qualifier.` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1524** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1525** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1526** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1527** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1528** `    .. code-block:: python` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1529** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1530** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1531** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1532** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1533** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1534** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1535** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `MmaMXF4NVF4Op`. **CN:** 继续说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1536** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1537** `    """` — **EN:** Ends the docstring for the class `MmaMXF4NVF4Op`. **CN:** 结束说明 class `MmaMXF4NVF4Op` 的文档字符串。
+- **L1538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1539** `    descriptive_name = "tcgen05 MXF4NVF4 BlockScaled MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1540** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1541** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1542** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1543** `        sf_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1544** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1545** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1546** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1547** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1548** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1549** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1550** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1551** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1552** `            sf_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1553** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1554** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1555** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1556** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1557** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1558** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1559** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1560** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1562** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1563** `        # Scale Factor data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1564** `        if self.sf_dtype not in [Float8E8M0FNU, Float8E4M3FN]:` — **EN:** Starts a conditional branch guarded by `self.sf_dtype not in [Float8E8M0FNU, Float8E4M3FN]`. **CN:** 开始一个由 `self.sf_dtype not in [Float8E8M0FNU, Float8E4M3FN]` 控制的条件分支。
+- **L1565** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1566** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1567** `                "expects the 'sf_dtype' Op parameter to be one of Float8E8M0FNU",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1568** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1569** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1570** `        instruction_k = 64` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1571** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L1572** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L1573** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1574** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1575** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1576** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1577** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1578** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1579** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1580** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1581** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1582** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1583** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1584** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1585** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1586** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1587** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1588** `    ) -> "MmaMXF4NVF4Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1589** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1590** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMABlockScaledType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1591** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1592** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1593** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1594** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1595** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1596** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1597** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1598** `            self.sf_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1599** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1600** `            self.sf_vec_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1601** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1602** `        return MmaMXF4NVF4Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1603** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1604** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1605** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1606** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1607** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1608** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1609** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1610** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1611** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1612** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1613** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1614** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1615** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1616** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1617** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1618** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1619** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1620** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1621** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1622** `class MmaMXF4NVF4Trait(BlockScaledMmaTraits):` — **EN:** Defines class `MmaMXF4NVF4Trait` with bases BlockScaledMmaTraits. **CN:** 定义类 `MmaMXF4NVF4Trait`，其基类为 BlockScaledMmaTraits。
+- **L1623** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L1624** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1625** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1626** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1627** `# SM103 MXF4 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1628** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1629** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1630** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1631** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1632** `class SM103MmaMXF4Op(BlockScaledMmaOp):` — **EN:** Defines class `SM103MmaMXF4Op` with bases BlockScaledMmaOp. **CN:** 定义类 `SM103MmaMXF4Op`，其基类为 BlockScaledMmaOp。
+- **L1633** `    """` — **EN:** Starts the docstring for the class `SM103MmaMXF4Op`. **CN:** 开始说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1634** `    SM103 MXF4 tcgen05 BlockScaled MMA Operation.` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1635** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1636** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1637** `    This Operation corresponds to the \`\`.kind::mxf4\`\` qualifier.` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1638** `    This Operation is for SM103.` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1640** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1641** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1642** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1643** `    .. code-block:: python` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1645** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1646** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1648** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1649** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1650** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `SM103MmaMXF4Op`. **CN:** 继续说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1652** `    """` — **EN:** Ends the docstring for the class `SM103MmaMXF4Op`. **CN:** 结束说明 class `SM103MmaMXF4Op` 的文档字符串。
+- **L1653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1654** `    descriptive_name = "tcgen05 SM103 MXF4 BlockScaled MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1655** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1656** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1657** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1658** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1659** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1660** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1661** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1662** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1663** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1664** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1665** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1666** `            Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1667** `            32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1668** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1669** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1670** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1671** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1672** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1673** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1674** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1675** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1676** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1677** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1678** `        instruction_k = 96` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1679** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L1680** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L1681** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1682** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1683** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1684** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1685** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1686** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1687** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1688** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1689** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1690** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1691** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1692** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1693** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1694** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1695** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1696** `    ) -> "MmaMXF4Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1697** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1698** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMABlockScaledType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1699** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1700** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1701** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1702** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1703** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1704** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1705** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1706** `            self.sf_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1707** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1708** `            self.sf_vec_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1709** `            1030,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1710** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1711** `        return MmaMXF4Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1712** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1713** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1714** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1715** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1716** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1717** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1718** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1719** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1720** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1721** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1722** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1723** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1724** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1725** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1726** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1727** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1728** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1729** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1730** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1731** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1732** `# SM103 MXF4NVF4 MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1733** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1734** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1735** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1736** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L1737** `class SM103MmaMXF4NVF4Op(BlockScaledMmaOp):` — **EN:** Defines class `SM103MmaMXF4NVF4Op` with bases BlockScaledMmaOp. **CN:** 定义类 `SM103MmaMXF4NVF4Op`，其基类为 BlockScaledMmaOp。
+- **L1738** `    """` — **EN:** Starts the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 开始说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1739** `    SM103 MXF4NVF4 tcgen05 BlockScaled MMA Operation.` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1740** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1741** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-instructions-mma>\`__.` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1742** `    This Operation corresponds to the \`\`.kind::mxf4nvf4\`\` qualifier.` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1743** `    This Operation is for SM103.` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1744** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1745** `    MMA operations should be issued by a single thread. The DSL automatically handles this by` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1746** `    implicitly adding \`\`elect_one()\`\` around the copy operation.` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1747** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1748** `    .. code-block:: python` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1749** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1750** `        # CORRECT: MMA without elect_one` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1751** `        cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1752** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1753** `        # WRONG: Do NOT wrap in elect_one (can cause deadlock)` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1754** `        with cute.arch.elect_one():  # INCORRECT` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1755** `            cute.gemm(mma_atom, d, a, b, c)` — **EN:** Continues the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 继续说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1756** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1757** `    """` — **EN:** Ends the docstring for the class `SM103MmaMXF4NVF4Op`. **CN:** 结束说明 class `SM103MmaMXF4NVF4Op` 的文档字符串。
+- **L1758** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1759** `    descriptive_name = "tcgen05 SM103 MXF4NVF4 BlockScaled MMA Operation"` — **EN:** Assigns a value to descriptive_name. **CN:** 将一个值赋给 descriptive_name。
+- **L1760** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1761** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L1762** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1763** `        sf_dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1764** `        instruction_shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1765** `        cta_group: CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1766** `        a_src: OperandSource,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1767** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1768** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L1769** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1770** `            Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1771** `            Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1772** `            sf_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1773** `            16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1774** `            instruction_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1775** `            cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1776** `            a_src,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1777** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1778** `            _OperandMajorMode.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1779** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1780** `        self._verify()` — **EN:** Invokes `self._verify` as a standalone call. **CN:** 以独立语句方式调用 `self._verify`。
+- **L1781** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1782** `    def _verify(self) -> None:` — **EN:** Defines function `_verify`. **CN:** 定义函数 `_verify`。
+- **L1783** `        # Scale Factor data type verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1784** `        if self.sf_dtype not in [Float8E8M0FNU, Float8E4M3FN]:` — **EN:** Starts a conditional branch guarded by `self.sf_dtype not in [Float8E8M0FNU, Float8E4M3FN]`. **CN:** 开始一个由 `self.sf_dtype not in [Float8E8M0FNU, Float8E4M3FN]` 控制的条件分支。
+- **L1785** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1786** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1787** `                "expects the 'sf_dtype' Op parameter to be one of Float8E8M0FNU",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1788** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1789** `        # Instruction shape verification` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1790** `        instruction_k = 96` — **EN:** Assigns a value to instruction_k. **CN:** 将一个值赋给 instruction_k。
+- **L1791** `        shape_mnk_tuple: Any = cast(Any, self.shape_mnk)` — **EN:** Assigns a typed value to shape_mnk_tuple. **CN:** 为 shape_mnk_tuple 赋予带类型标注的值。
+- **L1792** `        if rank(shape_mnk_tuple) == 2:` — **EN:** Starts a conditional branch guarded by `rank(shape_mnk_tuple) == 2`. **CN:** 开始一个由 `rank(shape_mnk_tuple) == 2` 控制的条件分支。
+- **L1793** `            object.__setattr__(self, "shape_mnk", (*shape_mnk_tuple, instruction_k))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L1794** `            shape_mnk_tuple = cast(Any, self.shape_mnk)` — **EN:** Assigns a value to shape_mnk_tuple. **CN:** 将一个值赋给 shape_mnk_tuple。
+- **L1795** `        if shape_mnk_tuple[2] != instruction_k:` — **EN:** Starts a conditional branch guarded by `shape_mnk_tuple[2] != instruction_k`. **CN:** 开始一个由 `shape_mnk_tuple[2] != instruction_k` 控制的条件分支。
+- **L1796** `            raise OpError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1797** `                self,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1798** `                f"expects the instruction extent in the K-mode to be {instruction_k}, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1799** `                f"but got {shape_mnk_tuple[2]}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1800** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1801** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1802** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L1803** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1804** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1805** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1806** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1807** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1808** `    ) -> "MmaMXF4NVF4Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1809** `        shape_mnk = _pack_shape(self.shape_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to shape_mnk. **CN:** 将一个值赋给 shape_mnk。
+- **L1810** `        ty = _cute_nvgpu_ir.MmaAtomSM100UMMABlockScaledType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L1811** `            shape_mnk.type.attribute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1812** `            self.cta_group.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1813** `            self.a_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1814** `            self.b_major_mode._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1815** `            self.a_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1816** `            self.b_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1817** `            self.acc_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1818** `            self.sf_dtype.mlir_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1819** `            self.a_src._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1820** `            self.sf_vec_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1821** `            1030,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1822** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1823** `        return MmaMXF4NVF4Trait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1824** `            make_atom(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1825** `                ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1826** `                [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1827** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1828** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1829** `                    Boolean(False).ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1830** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1831** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1832** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1833** `                    core.make_ptr(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1834** `                        self.sf_dtype, 0, _cute_ir.AddressSpace.tmem, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1835** `                    ).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1836** `                ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1837** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1838** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1839** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1840** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1841** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1842** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1843** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1844** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1845** `# SMEM layout atoms` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1846** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1847** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L1848** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1849** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1850** `class SmemLayoutAtomKind(enum.Enum):` — **EN:** Defines class `SmemLayoutAtomKind` with bases enum.Enum. **CN:** 定义类 `SmemLayoutAtomKind`，其基类为 enum.Enum。
+- **L1851** `    """` — **EN:** Starts the docstring for the class `SmemLayoutAtomKind`. **CN:** 开始说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1852** `    Enum class for the kinds of SMEM layout atoms for SM100.` — **EN:** Continues the docstring for the class `SmemLayoutAtomKind`. **CN:** 继续说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1853** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1854** `    Given a swizzle kind, an SMEM layout atom is the compact layout of smallest size that can be` — **EN:** Continues the docstring for the class `SmemLayoutAtomKind`. **CN:** 继续说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1855** `    used to construct an SMEM layout using blocked product for operand A or B such that the` — **EN:** Continues the docstring for the class `SmemLayoutAtomKind`. **CN:** 继续说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1856** `    resulting layout is legal for both TMA and UMMA.` — **EN:** Continues the docstring for the class `SmemLayoutAtomKind`. **CN:** 继续说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1857** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1858** `    Note that there are other ways of creating legal layouts for operand A and B.` — **EN:** Continues the docstring for the class `SmemLayoutAtomKind`. **CN:** 继续说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1859** `    """` — **EN:** Ends the docstring for the class `SmemLayoutAtomKind`. **CN:** 结束说明 class `SmemLayoutAtomKind` 的文档字符串。
+- **L1860** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1861** `    MN_INTER = enum.auto()` — **EN:** Assigns a value to MN_INTER. **CN:** 将一个值赋给 MN_INTER。
+- **L1862** `    MN_SW32 = enum.auto()` — **EN:** Assigns a value to MN_SW32. **CN:** 将一个值赋给 MN_SW32。
+- **L1863** `    MN_SW64 = enum.auto()` — **EN:** Assigns a value to MN_SW64. **CN:** 将一个值赋给 MN_SW64。
+- **L1864** `    MN_SW128 = enum.auto()` — **EN:** Assigns a value to MN_SW128. **CN:** 将一个值赋给 MN_SW128。
+- **L1865** `    MN_SW128_32B = enum.auto()` — **EN:** Assigns a value to MN_SW128_32B. **CN:** 将一个值赋给 MN_SW128_32B。
+- **L1866** `    K_INTER = enum.auto()` — **EN:** Assigns a value to K_INTER. **CN:** 将一个值赋给 K_INTER。
+- **L1867** `    K_SW32 = enum.auto()` — **EN:** Assigns a value to K_SW32. **CN:** 将一个值赋给 K_SW32。
+- **L1868** `    K_SW64 = enum.auto()` — **EN:** Assigns a value to K_SW64. **CN:** 将一个值赋给 K_SW64。
+- **L1869** `    K_SW128 = enum.auto()` — **EN:** Assigns a value to K_SW128. **CN:** 将一个值赋给 K_SW128。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.nvgpu.tcgen05.mma`. CN: 模块名为 `CuTeDSL.cutlass.cute.nvgpu.tcgen05.mma`。
+- EN: Top-level classes: Tcgen05MmaOp, OperandMajorMode, OperandSource, CtaGroup, Field, MmaOp, MmaTraits, BlockScaledMmaOp, BlockScaledMmaTraits, MmaTF32Op, MmaTF32Trait, MmaF16BF16Op, ... (+18 more) CN: 顶层类包括：Tcgen05MmaOp, OperandMajorMode, OperandSource, CtaGroup, Field, MmaOp, MmaTraits, BlockScaledMmaOp, BlockScaledMmaTraits, MmaTF32Op, MmaTF32Trait, MmaF16BF16Op, ... (+18 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL,T,DSLRuntimeError, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, ..common:OpError,normalize_field_to_ir_name, ..common:OperandMajorMode, ...:core,atom, ...core:_pack_shape,rank,depth, ...typing:Shape,Tensor,Float4E2M1FN,Float8E8M0FNU,Float8E5M2,Float8E4M3FN,Float6E3M2FN,Float6E2M3FN,Float16,BFloat16,Float32,TFloat32,Boolean,Int8,Uint8,Int32,Numeric,AddressSpace,Pointer, ...atom:Trait,make_atom CN: 内部依赖：cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:BaseDSL,T,DSLRuntimeError, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu, ..common:OpError,normalize_field_to_ir_name, ..common:OperandMajorMode, ...:core,atom, ...core:_pack_shape,rank,depth, ...typing:Shape,Tensor,Float4E2M1FN,Float8E8M0FNU,Float8E5M2,Float8E4M3FN,Float6E3M2FN,Float6E2M3FN,Float16,BFloat16,Float32,TFloat32,Boolean,Int8,Uint8,Int32,Numeric,AddressSpace,Pointer, ...atom:Trait,make_atom
+- EN: External or standard-library dependencies: enum, warnings, dataclasses:dataclass, typing:Type,Any,Union,Optional,cast,Tuple, typing_extensions:deprecated CN: 外部或标准库依赖：enum, warnings, dataclasses:dataclass, typing:Type,Any,Union,Optional,cast,Tuple, typing_extensions:deprecated

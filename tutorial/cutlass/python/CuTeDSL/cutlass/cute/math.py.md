@@ -1,0 +1,720 @@
+# math.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/math.py`
+
+## Purpose / 作用
+- EN: Defines 20 functions (_math_op, acos, asin, atan, ... (+16 more)) in `CuTeDSL.cutlass.cute.math`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.math` 定义了 20 个函数（_math_op, acos, asin, atan, ... (+16 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Callable, Optional, Union` — **EN:** Imports Callable, Optional, Union from `typing`. **CN:** 从 `typing` 导入 Callable, Optional, Union。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from .typing import Numeric` — **EN:** Imports Numeric from `.typing`. **CN:** 从 `.typing` 导入 Numeric。
+- **L15** `from .tensor import TensorSSA` — **EN:** Imports TensorSSA from `.tensor`. **CN:** 从 `.tensor` 导入 TensorSSA。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L18** `from cutlass._mlir.dialects import math, arith` — **EN:** Imports math, arith from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 math, arith。
+- **L19** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `def _math_op(` — **EN:** Defines function `_math_op`. **CN:** 定义函数 `_math_op`。
+- **L23** `    func: Callable[..., ir.Value],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L24** `    fastmath: bool,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L25** `    *args: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `    **kwargs: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `) -> Union[TensorSSA, ir.Value]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L28** `    """Dispatch the function to either a TensorSSA or a Numeric(Float).` — **EN:** Starts the docstring for the function `_math_op`. **CN:** 开始说明 function `_math_op` 的文档字符串。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `    :param func: The function to dispatch` — **EN:** Continues the docstring for the function `_math_op`. **CN:** 继续说明 function `_math_op` 的文档字符串。
+- **L31** `    :param args: The input tensor or scalar` — **EN:** Continues the docstring for the function `_math_op`. **CN:** 继续说明 function `_math_op` 的文档字符串。
+- **L32** `    :param kwargs: Extra keyword arguments (loc, ip) forwarded to the MLIR op` — **EN:** Continues the docstring for the function `_math_op`. **CN:** 继续说明 function `_math_op` 的文档字符串。
+- **L33** `    """` — **EN:** Ends the docstring for the function `_math_op`. **CN:** 结束说明 function `_math_op` 的文档字符串。
+- **L34** `    arg_type = type(args[0])` — **EN:** Assigns a value to arg_type. **CN:** 将一个值赋给 arg_type。
+- **L35** `    for arg in args:` — **EN:** Starts a loop assigning items from `args` to `arg`. **CN:** 开始一个循环，将 `args` 的元素赋给 `arg`。
+- **L36** `        if not isinstance(arg, TensorSSA) and (` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, TensorSSA) and (not isinstance(arg, N...`. **CN:** 开始一个由 `not isinstance(arg, TensorSSA) and (not isinstance(arg, N...` 控制的条件分支。
+- **L37** `            not isinstance(arg, Numeric) or not type(arg).is_float` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L38** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L39** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L40** `                f"Expected a TensorSSA or Numeric(Float), but got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `        if not isinstance(arg, arg_type):` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, arg_type)`. **CN:** 开始一个由 `not isinstance(arg, arg_type)` 控制的条件分支。
+- **L43** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L44** `                f"Expected all inputs to be of type {arg_type}, but got {type(arg)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    fastmath_flag = arith.FastMathFlags.fast if fastmath else arith.FastMathFlags.none` — **EN:** Assigns a value to fastmath_flag. **CN:** 将一个值赋给 fastmath_flag。
+- **L48** `    if isinstance(args[0], TensorSSA):` — **EN:** Starts a conditional branch guarded by `isinstance(args[0], TensorSSA)`. **CN:** 开始一个由 `isinstance(args[0], TensorSSA)` 控制的条件分支。
+- **L49** `        return TensorSSA(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L50** `            func(*args, fastmath=fastmath_flag, **kwargs), args[0].shape, args[0].dtype` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L53** `        ir_args = [a.ir_value() for a in args]` — **EN:** Assigns a value to ir_args. **CN:** 将一个值赋给 ir_args。
+- **L54** `        return func(*ir_args, fastmath=fastmath_flag, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L58** `def acos(` — **EN:** Defines function `acos`. **CN:** 定义函数 `acos`。
+- **L59** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L61** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L62** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L64** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L65** `    """Compute element-wise arc cosine of the input tensor.` — **EN:** Starts the docstring for the function `acos`. **CN:** 开始说明 function `acos` 的文档字符串。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L68** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L69** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L70** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L71** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L72** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L73** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L74** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L75** `    :return: Tensor containing the arc cosine of each element in input tensor` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L76** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    Example:` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `    .. code-block::` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L83** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L84** `        z = acos(y)  # Compute arc cosine` — **EN:** Continues the docstring for the function `acos`. **CN:** 继续说明 function `acos` 的文档字符串。
+- **L85** `    """` — **EN:** Ends the docstring for the function `acos`. **CN:** 结束说明 function `acos` 的文档字符串。
+- **L86** `    return _math_op(math.acos, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L90** `def asin(` — **EN:** Defines function `asin`. **CN:** 定义函数 `asin`。
+- **L91** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L92** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L93** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L95** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L96** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L97** `    """Compute element-wise arc sine of the input tensor.` — **EN:** Starts the docstring for the function `asin`. **CN:** 开始说明 function `asin` 的文档字符串。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L100** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L101** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L102** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L103** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L104** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L105** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L106** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L107** `    :return: Tensor containing the arc sine of each element in input tensor` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L108** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    Example:` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `    .. code-block::` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L115** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L116** `        z = asin(y)  # Compute arc sine` — **EN:** Continues the docstring for the function `asin`. **CN:** 继续说明 function `asin` 的文档字符串。
+- **L117** `    """` — **EN:** Ends the docstring for the function `asin`. **CN:** 结束说明 function `asin` 的文档字符串。
+- **L118** `    return _math_op(math.asin, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L122** `def atan(` — **EN:** Defines function `atan`. **CN:** 定义函数 `atan`。
+- **L123** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L128** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L129** `    """Compute element-wise arc tangent of the input tensor.` — **EN:** Starts the docstring for the function `atan`. **CN:** 开始说明 function `atan` 的文档字符串。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L132** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L133** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L134** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L135** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L136** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L137** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L138** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L139** `    :return: Tensor containing the arc tangent of each element in input tensor` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L140** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    Example:` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `    .. code-block::` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L147** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L148** `        z = atan(y)  # Compute arc tangent` — **EN:** Continues the docstring for the function `atan`. **CN:** 继续说明 function `atan` 的文档字符串。
+- **L149** `    """` — **EN:** Ends the docstring for the function `atan`. **CN:** 结束说明 function `atan` 的文档字符串。
+- **L150** `    return _math_op(math.atan, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L153** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L154** `def atan2(` — **EN:** Defines function `atan2`. **CN:** 定义函数 `atan2`。
+- **L155** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L156** `    b: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L157** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L158** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L159** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L160** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L161** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L162** `    """Compute element-wise arc tangent of two tensors.` — **EN:** Starts the docstring for the function `atan2`. **CN:** 开始说明 function `atan2` 的文档字符串。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `    Computes atan2(a, b) element-wise. The function atan2(a, b) is the angle in radians` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L165** `    between the positive x-axis and the point given by the coordinates (b, a).` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    :param a: First input tensor (y-coordinates)` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L168** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L169** `    :param b: Second input tensor (x-coordinates)` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L170** `    :type b: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L171** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L172** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L173** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L174** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L175** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L176** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L177** `    :return: Tensor containing the arc tangent of a/b element-wise` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L178** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    Example:` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    .. code-block::` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `        y = cute.make_rmem_tensor(ptr1, layout).load()  # y coordinates` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L185** `        x = cute.make_rmem_tensor(ptr2, layout).load()  # x coordinates` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L186** `        theta = atan2(y, x)  # Compute angles` — **EN:** Continues the docstring for the function `atan2`. **CN:** 继续说明 function `atan2` 的文档字符串。
+- **L187** `    """` — **EN:** Ends the docstring for the function `atan2`. **CN:** 结束说明 function `atan2` 的文档字符串。
+- **L188** `    return _math_op(math.atan2, fastmath, a, b, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L192** `def absf(` — **EN:** Defines function `absf`. **CN:** 定义函数 `absf`。
+- **L193** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L199** `    """Compute element-wise absolute value of the input tensor.` — **EN:** Starts the docstring for the function `absf`. **CN:** 开始说明 function `absf` 的文档字符串。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L202** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L203** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L204** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L205** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L206** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L207** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L208** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L209** `    :return: Tensor containing the absolute value of each element in input tensor` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L210** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `    Example:` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `    .. code-block::` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L217** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L218** `        z = absf(y)  # Compute absolute value` — **EN:** Continues the docstring for the function `absf`. **CN:** 继续说明 function `absf` 的文档字符串。
+- **L219** `    """` — **EN:** Ends the docstring for the function `absf`. **CN:** 结束说明 function `absf` 的文档字符串。
+- **L220** `    return _math_op(math.absf, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L224** `def copysign(` — **EN:** Defines function `copysign`. **CN:** 定义函数 `copysign`。
+- **L225** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `    b: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L227** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L232** `    """Compute element-wise copysign of two tensors.` — **EN:** Starts the docstring for the function `copysign`. **CN:** 开始说明 function `copysign` 的文档字符串。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `    Returns a value with the magnitude of \`\`a\`\` and the sign of \`\`b\`\`.` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `    :param a: Input tensor providing magnitude` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L237** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L238** `    :param b: Input tensor providing sign` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L239** `    :type b: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L240** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L241** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L242** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L243** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L244** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L245** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L246** `    :return: Tensor where each element has the magnitude of \`\`a\`\` and the sign of \`\`b\`\`` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L247** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    Example:` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    .. code-block::` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `        mag = cute.make_rmem_tensor(ptr1, layout).load()  # magnitudes` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L254** `        sgn = cute.make_rmem_tensor(ptr2, layout).load()  # signs` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L255** `        result = copysign(mag, sgn)  # Combine magnitude and sign` — **EN:** Continues the docstring for the function `copysign`. **CN:** 继续说明 function `copysign` 的文档字符串。
+- **L256** `    """` — **EN:** Ends the docstring for the function `copysign`. **CN:** 结束说明 function `copysign` 的文档字符串。
+- **L257** `    return _math_op(math.copysign, fastmath, a, b, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L261** `def cos(` — **EN:** Defines function `cos`. **CN:** 定义函数 `cos`。
+- **L262** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L263** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L264** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L265** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L266** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L267** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L268** `    """Compute element-wise cosine of the input tensor.` — **EN:** Starts the docstring for the function `cos`. **CN:** 开始说明 function `cos` 的文档字符串。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `    :param a: Input tensor (in radians)` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L271** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L272** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L273** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L274** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L275** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L276** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L277** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L278** `    :return: Tensor containing the cosine of each element` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L279** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `    Example:` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L283** `    .. code-block::` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L286** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L287** `        z = cos(y)  # Compute cosine` — **EN:** Continues the docstring for the function `cos`. **CN:** 继续说明 function `cos` 的文档字符串。
+- **L288** `    """` — **EN:** Ends the docstring for the function `cos`. **CN:** 结束说明 function `cos` 的文档字符串。
+- **L289** `    return _math_op(math.cos, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L293** `def erf(` — **EN:** Defines function `erf`. **CN:** 定义函数 `erf`。
+- **L294** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L295** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L296** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L297** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L298** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L299** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L300** `    """Compute element-wise error function of the input tensor.` — **EN:** Starts the docstring for the function `erf`. **CN:** 开始说明 function `erf` 的文档字符串。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** `    The error function is defined as:` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L303** `    erf(x) = 2/√π ∫[0 to x] exp(-t²) dt` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L306** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L307** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L308** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L309** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L310** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L311** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L312** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L313** `    :return: Tensor containing the error function value for each element` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L314** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** `    Example:` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `    .. code-block::` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L321** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L322** `        z = erf(y)  # Compute error function` — **EN:** Continues the docstring for the function `erf`. **CN:** 继续说明 function `erf` 的文档字符串。
+- **L323** `    """` — **EN:** Ends the docstring for the function `erf`. **CN:** 结束说明 function `erf` 的文档字符串。
+- **L324** `    return _math_op(math.erf, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L328** `def exp(` — **EN:** Defines function `exp`. **CN:** 定义函数 `exp`。
+- **L329** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L330** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L331** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L332** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L333** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L334** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L335** `    """Compute element-wise exponential of the input tensor.` — **EN:** Starts the docstring for the function `exp`. **CN:** 开始说明 function `exp` 的文档字符串。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L338** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L339** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L340** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L341** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L342** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L343** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L344** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L345** `    :return: Tensor containing the exponential of each element` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L346** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    Example:` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L349** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L350** `    .. code-block::` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L353** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L354** `        z = exp(y)  # Compute exponential` — **EN:** Continues the docstring for the function `exp`. **CN:** 继续说明 function `exp` 的文档字符串。
+- **L355** `    """` — **EN:** Ends the docstring for the function `exp`. **CN:** 结束说明 function `exp` 的文档字符串。
+- **L356** `    return _math_op(math.exp, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L360** `def exp2(` — **EN:** Defines function `exp2`. **CN:** 定义函数 `exp2`。
+- **L361** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L362** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L363** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L364** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L365** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L366** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L367** `    """Compute element-wise base-2 exponential of the input tensor.` — **EN:** Starts the docstring for the function `exp2`. **CN:** 开始说明 function `exp2` 的文档字符串。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L370** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L371** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L372** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L373** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L374** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L375** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L376** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L377** `    :return: Tensor containing 2 raised to the power of each element` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L378** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L379** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L380** `    Example:` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `    .. code-block::` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L385** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L386** `        z = exp2(y)  # Compute 2^x` — **EN:** Continues the docstring for the function `exp2`. **CN:** 继续说明 function `exp2` 的文档字符串。
+- **L387** `    """` — **EN:** Ends the docstring for the function `exp2`. **CN:** 结束说明 function `exp2` 的文档字符串。
+- **L388** `    return _math_op(math.exp2, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L389** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L392** `def floor(` — **EN:** Defines function `floor`. **CN:** 定义函数 `floor`。
+- **L393** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L394** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L395** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L396** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L397** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L398** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L399** `    """Compute element-wise floor of the input tensor.` — **EN:** Starts the docstring for the function `floor`. **CN:** 开始说明 function `floor` 的文档字符串。
+- **L400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L401** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L402** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L403** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L404** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L405** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L406** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L407** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L408** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L409** `    :return: Tensor containing the largest integer less than or equal to each element in input tensor` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L410** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** `    Example:` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L414** `    .. code-block::` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L417** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L418** `        z = floor(y)  # Compute floor` — **EN:** Continues the docstring for the function `floor`. **CN:** 继续说明 function `floor` 的文档字符串。
+- **L419** `    """` — **EN:** Ends the docstring for the function `floor`. **CN:** 结束说明 function `floor` 的文档字符串。
+- **L420** `    return _math_op(math.floor, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L423** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L424** `def log(` — **EN:** Defines function `log`. **CN:** 定义函数 `log`。
+- **L425** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L426** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L427** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L428** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L429** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L430** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L431** `    """Compute element-wise natural logarithm of the input tensor.` — **EN:** Starts the docstring for the function `log`. **CN:** 开始说明 function `log` 的文档字符串。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L434** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L435** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L436** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L437** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L438** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L439** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L440** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L441** `    :return: Tensor containing the natural logarithm of each element` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L442** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `    Example:` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** `    .. code-block::` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L449** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L450** `        z = log(y)  # Compute natural logarithm` — **EN:** Continues the docstring for the function `log`. **CN:** 继续说明 function `log` 的文档字符串。
+- **L451** `    """` — **EN:** Ends the docstring for the function `log`. **CN:** 结束说明 function `log` 的文档字符串。
+- **L452** `    return _math_op(math.log, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L456** `def log2(` — **EN:** Defines function `log2`. **CN:** 定义函数 `log2`。
+- **L457** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L458** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L459** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L460** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L461** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L462** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L463** `    """Compute element-wise base-2 logarithm of the input tensor.` — **EN:** Starts the docstring for the function `log2`. **CN:** 开始说明 function `log2` 的文档字符串。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L466** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L467** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L468** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L469** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L470** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L471** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L472** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L473** `    :return: Tensor containing the base-2 logarithm of each element` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L474** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L475** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L476** `    Example:` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** `    .. code-block::` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L479** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L480** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L481** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L482** `        z = log2(y)  # Compute log base 2` — **EN:** Continues the docstring for the function `log2`. **CN:** 继续说明 function `log2` 的文档字符串。
+- **L483** `    """` — **EN:** Ends the docstring for the function `log2`. **CN:** 结束说明 function `log2` 的文档字符串。
+- **L484** `    return _math_op(math.log2, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L488** `def log10(` — **EN:** Defines function `log10`. **CN:** 定义函数 `log10`。
+- **L489** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L490** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L491** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L492** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L493** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L494** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L495** `    """Compute element-wise base-10 logarithm of the input tensor.` — **EN:** Starts the docstring for the function `log10`. **CN:** 开始说明 function `log10` 的文档字符串。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L498** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L499** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L500** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L501** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L502** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L503** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L504** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L505** `    :return: Tensor containing the base-10 logarithm of each element` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L506** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L508** `    Example:` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L509** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L510** `    .. code-block::` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L513** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L514** `        z = log10(y)  # Compute log base 10` — **EN:** Continues the docstring for the function `log10`. **CN:** 继续说明 function `log10` 的文档字符串。
+- **L515** `    """` — **EN:** Ends the docstring for the function `log10`. **CN:** 结束说明 function `log10` 的文档字符串。
+- **L516** `    return _math_op(math.log10, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L520** `def rsqrt(` — **EN:** Defines function `rsqrt`. **CN:** 定义函数 `rsqrt`。
+- **L521** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L522** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L523** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L524** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L525** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L526** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L527** `    """Compute element-wise reciprocal square root of the input tensor.` — **EN:** Starts the docstring for the function `rsqrt`. **CN:** 开始说明 function `rsqrt` 的文档字符串。
+- **L528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L529** `    Computes 1/√x element-wise.` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L531** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L532** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L533** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L534** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L535** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L536** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L537** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L538** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L539** `    :return: Tensor containing the reciprocal square root of each element` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L540** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L541** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L542** `    Example:` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L543** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L544** `    .. code-block::` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L547** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L548** `        z = rsqrt(y)  # Compute 1/√x` — **EN:** Continues the docstring for the function `rsqrt`. **CN:** 继续说明 function `rsqrt` 的文档字符串。
+- **L549** `    """` — **EN:** Ends the docstring for the function `rsqrt`. **CN:** 结束说明 function `rsqrt` 的文档字符串。
+- **L550** `    return _math_op(math.rsqrt, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L551** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L554** `def sin(` — **EN:** Defines function `sin`. **CN:** 定义函数 `sin`。
+- **L555** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L556** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L557** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L558** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L559** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L560** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L561** `    """Compute element-wise sine of the input tensor.` — **EN:** Starts the docstring for the function `sin`. **CN:** 开始说明 function `sin` 的文档字符串。
+- **L562** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L563** `    :param a: Input tensor (in radians)` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L564** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L565** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L566** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L567** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L568** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L569** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L570** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L571** `    :return: Tensor containing the sine of each element` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L572** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `    Example:` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L575** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L576** `    .. code-block::` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L577** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L578** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L579** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L580** `        z = sin(y)  # Compute sine` — **EN:** Continues the docstring for the function `sin`. **CN:** 继续说明 function `sin` 的文档字符串。
+- **L581** `    """` — **EN:** Ends the docstring for the function `sin`. **CN:** 结束说明 function `sin` 的文档字符串。
+- **L582** `    return _math_op(math.sin, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L583** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L586** `def sqrt(` — **EN:** Defines function `sqrt`. **CN:** 定义函数 `sqrt`。
+- **L587** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L588** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L589** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L590** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L591** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L592** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L593** `    """Compute element-wise square root of the input tensor.` — **EN:** Starts the docstring for the function `sqrt`. **CN:** 开始说明 function `sqrt` 的文档字符串。
+- **L594** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L595** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L596** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L597** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L598** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L599** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L600** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L601** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L602** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L603** `    :return: Tensor containing the square root of each element` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L604** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L605** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L606** `    Example:` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L607** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L608** `    .. code-block::` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L609** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L610** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L611** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L612** `        z = sqrt(y)  # Compute square root` — **EN:** Continues the docstring for the function `sqrt`. **CN:** 继续说明 function `sqrt` 的文档字符串。
+- **L613** `    """` — **EN:** Ends the docstring for the function `sqrt`. **CN:** 结束说明 function `sqrt` 的文档字符串。
+- **L614** `    return _math_op(math.sqrt, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L615** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L616** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L617** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L618** `def tan(` — **EN:** Defines function `tan`. **CN:** 定义函数 `tan`。
+- **L619** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L620** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L621** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L622** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L623** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L624** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L625** `    """Compute element-wise tangent of the input tensor.` — **EN:** Starts the docstring for the function `tan`. **CN:** 开始说明 function `tan` 的文档字符串。
+- **L626** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L627** `    :param a: Input tensor (in radians)` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L628** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L629** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L630** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L631** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L632** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L633** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L634** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L635** `    :return: Tensor containing the tangent of each element` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L636** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L637** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L638** `    Example:` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L640** `    .. code-block::` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L641** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L642** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L643** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L644** `        z = tan(y)  # Compute tangent` — **EN:** Continues the docstring for the function `tan`. **CN:** 继续说明 function `tan` 的文档字符串。
+- **L645** `    """` — **EN:** Ends the docstring for the function `tan`. **CN:** 结束说明 function `tan` 的文档字符串。
+- **L646** `    return _math_op(math.tan, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L648** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L649** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L650** `def tanh(` — **EN:** Defines function `tanh`. **CN:** 定义函数 `tanh`。
+- **L651** `    a: Union[TensorSSA, Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L652** `    fastmath: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L653** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L654** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L655** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L656** `) -> Union[TensorSSA, Numeric]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L657** `    """Compute element-wise hyperbolic tangent of the input tensor.` — **EN:** Starts the docstring for the function `tanh`. **CN:** 开始说明 function `tanh` 的文档字符串。
+- **L658** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L659** `    :param a: Input tensor` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L660** `    :type a: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L661** `    :param fastmath: Enable fast math optimizations, defaults to False` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L662** `    :type fastmath: bool, optional` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L663** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L664** `    :type loc: Optional[Location]` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L665** `    :param ip: Insertion point for IR generation, defaults to None` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L666** `    :type ip: Optional[InsertionPoint]` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L667** `    :return: Tensor containing the hyperbolic tangent of each element` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L668** `    :rtype: Union[TensorSSA, Numeric]` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L669** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L670** `    Example:` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L671** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L672** `    .. code-block::` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L673** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L674** `        x = cute.make_rmem_tensor(layout)  # Create tensor` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L675** `        y = x.load()  # Load values` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L676** `        z = tanh(y)  # Compute hyperbolic tangent` — **EN:** Continues the docstring for the function `tanh`. **CN:** 继续说明 function `tanh` 的文档字符串。
+- **L677** `    """` — **EN:** Ends the docstring for the function `tanh`. **CN:** 结束说明 function `tanh` 的文档字符串。
+- **L678** `    return _math_op(math.tanh, fastmath, a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L679** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L680** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L681** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L682** `    "absf",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L683** `    "acos",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L684** `    "asin",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L685** `    "atan",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L686** `    "atan2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L687** `    "cos",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L688** `    "copysign",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L689** `    "erf",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `    "exp",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `    "exp2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `    "floor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** `    "log",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L694** `    "log10",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L695** `    "log2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L696** `    "rsqrt",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L697** `    "sin",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L698** `    "sqrt",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L699** `    "tan",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L700** `    "tanh",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L701** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.math`. CN: 模块名为 `CuTeDSL.cutlass.cute.math`。
+- EN: Top-level functions: _math_op, acos, asin, atan, atan2, absf, copysign, cos, erf, exp, exp2, floor, ... (+8 more) CN: 顶层函数包括：_math_op, acos, asin, atan, atan2, absf, copysign, cos, erf, exp, exp2, floor, ... (+8 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .typing:Numeric, .tensor:TensorSSA, cutlass._mlir:ir, cutlass._mlir.dialects:math,arith, cutlass.cutlass_dsl:dsl_user_op CN: 内部依赖：.typing:Numeric, .tensor:TensorSSA, cutlass._mlir:ir, cutlass._mlir.dialects:math,arith, cutlass.cutlass_dsl:dsl_user_op
+- EN: External or standard-library dependencies: typing:Callable,Optional,Union CN: 外部或标准库依赖：typing:Callable,Optional,Union

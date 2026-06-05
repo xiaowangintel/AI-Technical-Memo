@@ -1,0 +1,1048 @@
+# print_error.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/print_error.hpp`
+**Purpose / 用途**: Provides shared CUTLASS utility support for `print error`. / 为 `print error` 提供共享的 CUTLASS 工具支持。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>#include &lt;array&gt;</code>
+  - EN: Includes `array` so this file can use fixed-size array containers.
+  - CN: 引入 `array`，使当前文件可以使用定长数组容器。
+- **L35** <code>#include &lt;cassert&gt;</code>
+  - EN: Includes `cassert` so this file can use assert macros.
+  - CN: 引入 `cassert`，使当前文件可以使用断言宏。
+- **L36** <code>#include &lt;cmath&gt;</code>
+  - EN: Includes `cmath` so this file can use math routines.
+  - CN: 引入 `cmath`，使当前文件可以使用数学函数。
+- **L37** <code>#include &lt;iostream&gt;</code>
+  - EN: Includes `iostream` so this file can use standard stream input/output support.
+  - CN: 引入 `iostream`，使当前文件可以使用标准流输入输出支持。
+- **L38** <code>#include &lt;type_traits&gt;</code>
+  - EN: Includes `type_traits` so this file can use compile-time type traits.
+  - CN: 引入 `type_traits`，使当前文件可以使用编译期类型特征。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>#include &lt;cute/util/type_traits.hpp&gt;</code>
+  - EN: Includes `cute/util/type_traits.hpp` so this file can use compile-time type traits.
+  - CN: 引入 `cute/util/type_traits.hpp`，使当前文件可以使用编译期类型特征。
+- **L41** <code>#include &lt;cute/tensor.hpp&gt;</code>
+  - EN: Includes `cute/tensor.hpp` so this file can use project-specific declarations from `tensor.hpp`.
+  - CN: 引入 `cute/tensor.hpp`，使当前文件可以使用来自 `tensor.hpp` 的项目专用声明。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>#include &lt;cute/numeric/numeric_types.hpp&gt;</code>
+  - EN: Includes `cute/numeric/numeric_types.hpp` so this file can use project-specific declarations from `numeric_types.hpp`.
+  - CN: 引入 `cute/numeric/numeric_types.hpp`，使当前文件可以使用来自 `numeric_types.hpp` 的项目专用声明。
+- **L44** <code>#include &lt;cute/numeric/complex.hpp&gt;</code>
+  - EN: Includes `cute/numeric/complex.hpp` so this file can use project-specific declarations from `complex.hpp`.
+  - CN: 引入 `cute/numeric/complex.hpp`，使当前文件可以使用来自 `complex.hpp` 的项目专用声明。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>#include &lt;cutlass/layout/layout.h&gt;</code>
+  - EN: Includes `cutlass/layout/layout.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/layout.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>// The computed infinity norm does not include</code>
+  - EN: Comment that documents intent or context: "The computed infinity norm does not include".
+  - CN: 用于说明意图或上下文的注释："The computed infinity norm does not include"。
+- **L49** <code>// any NaN column absolute-value sums.</code>
+  - EN: Comment that documents intent or context: "any NaN column absolute-value sums.".
+  - CN: 用于说明意图或上下文的注释："any NaN column absolute-value sums."。
+- **L50** <code>struct matrix_inf_norm_result {</code>
+  - EN: Begins the declaration of struct `matrix_inf_norm_result`.
+  - CN: 开始声明 struct `matrix_inf_norm_result`。
+- **L51** <code>  // Accumulate errors in double, as this is generally</code>
+  - EN: Comment that documents intent or context: "Accumulate errors in double, as this is generally".
+  - CN: 用于说明意图或上下文的注释："Accumulate errors in double, as this is generally"。
+- **L52** <code>  // the highest precision that the examples use.</code>
+  - EN: Comment that documents intent or context: "the highest precision that the examples use.".
+  - CN: 用于说明意图或上下文的注释："the highest precision that the examples use."。
+- **L53** <code>  double inf_norm = 0.0;</code>
+  - EN: Assigns or initializes `inf_norm` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `inf_norm` 进行赋值或初始化。
+- **L54** <code>  bool found_nan = false;</code>
+  - EN: Assigns or initializes `found_nan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `found_nan` 进行赋值或初始化。
+- **L55** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L56** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L57** <code>// In theory, cute::Tensor&lt;ViewEngine&lt;T*&gt;, T&gt; could be treated as a view type,</code>
+  - EN: Comment that documents intent or context: "In theory, cute::Tensor<ViewEngine<T*>, T> could be treated as a view type,".
+  - CN: 用于说明意图或上下文的注释："In theory, cute::Tensor<ViewEngine<T*>, T> could be treated as a view type,"。
+- **L58** <code>// and thus passed by value (as std::span or std::string_view would be).</code>
+  - EN: Comment that documents intent or context: "and thus passed by value (as std::span or std::string_view would be).".
+  - CN: 用于说明意图或上下文的注释："and thus passed by value (as std::span or std::string_view would be)."。
+- **L59** <code>// However, generic cute::Tensor are more like containers</code>
+  - EN: Comment that documents intent or context: "However, generic cute::Tensor are more like containers".
+  - CN: 用于说明意图或上下文的注释："However, generic cute::Tensor are more like containers"。
+- **L60** <code>// and thus are best passed by reference or const reference.</code>
+  - EN: Comment that documents intent or context: "and thus are best passed by reference or const reference.".
+  - CN: 用于说明意图或上下文的注释："and thus are best passed by reference or const reference."。
+- **L61** <code>template &lt;typename EngineType, typename LayoutType&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L62** <code>matrix_inf_norm_result</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L63** <code>matrix_inf_norm(cute::Tensor&lt;EngineType, LayoutType&gt; const&amp; host_matrix)</code>
+  - EN: Begins or continues the signature/call syntax involving `matrix_inf_norm`.
+  - CN: 开始或继续与 `matrix_inf_norm` 相关的签名/调用语法。
+- **L64** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L65** <code>  using error_type = decltype(std::declval&lt;matrix_inf_norm_result&gt;().inf_norm);</code>
+  - EN: Introduces the type or namespace alias `error_type`.
+  - CN: 引入类型或命名空间别名 `error_type`。
+- **L66** <code>  using element_type = typename EngineType::value_type;</code>
+  - EN: Introduces the type or namespace alias `element_type`.
+  - CN: 引入类型或命名空间别名 `element_type`。
+- **L67** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L68** <code>  error_type inf_norm = 0.0;</code>
+  - EN: Assigns or initializes `inf_norm` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `inf_norm` 进行赋值或初始化。
+- **L69** <code>  bool found_nan = false;</code>
+  - EN: Assigns or initializes `found_nan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `found_nan` 进行赋值或初始化。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>  // Computing the infinity norm requires that we be able</code>
+  - EN: Comment that documents intent or context: "Computing the infinity norm requires that we be able".
+  - CN: 用于说明意图或上下文的注释："Computing the infinity norm requires that we be able"。
+- **L72** <code>  // to treat the input as a matrix, with rows and columns.</code>
+  - EN: Comment that documents intent or context: "to treat the input as a matrix, with rows and columns.".
+  - CN: 用于说明意图或上下文的注释："to treat the input as a matrix, with rows and columns."。
+- **L73** <code>  const int64_t num_rows = cute::size&lt;0&gt;(host_matrix);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L74** <code>  const int64_t num_cols = cute::size&lt;1&gt;(host_matrix);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L75** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L76** <code>  auto abs_fn = [] (element_type A_ij) {</code>
+  - EN: Assigns or initializes `abs_fn` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `abs_fn` 进行赋值或初始化。
+- **L77** <code>    if constexpr (not std::is_unsigned_v&lt;element_type&gt;) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L78** <code>      using std::abs;</code>
+  - EN: Introduces the type or namespace alias `std`.
+  - CN: 引入类型或命名空间别名 `std`。
+- **L79** <code>      return abs(A_ij);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L80** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L81** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L82** <code>      return A_ij;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L83** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L84** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>  for (int64_t i = 0; i &lt; num_rows; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L87** <code>    error_type row_abs_sum = 0.0;</code>
+  - EN: Assigns or initializes `row_abs_sum` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `row_abs_sum` 进行赋值或初始化。
+- **L88** <code>    for(int64_t j = 0; j &lt; num_cols; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L89** <code>      row_abs_sum += abs_fn(host_matrix(i, j));</code>
+  - EN: Declares function or method `host_matrix` without defining it here.
+  - CN: 声明函数或方法 `host_matrix`，但不在此处给出定义。
+- **L90** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L91** <code>    if (std::isnan(row_abs_sum)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L92** <code>      found_nan = true;</code>
+  - EN: Assigns or initializes `found_nan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `found_nan` 进行赋值或初始化。
+- **L93** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L94** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L95** <code>      inf_norm = row_abs_sum &gt; inf_norm ? row_abs_sum : inf_norm;</code>
+  - EN: Assigns or initializes `inf_norm` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `inf_norm` 进行赋值或初始化。
+- **L96** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L97** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>  return {inf_norm, found_nan};</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L100** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L101** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L102** <code>// Infinity norm of (X - Y).</code>
+  - EN: Comment that documents intent or context: "Infinity norm of (X - Y).".
+  - CN: 用于说明意图或上下文的注释："Infinity norm of (X - Y)."。
+- **L103** <code>template &lt;typename EngineType, typename LayoutType&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L104** <code>matrix_inf_norm_result</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L105** <code>matrix_diff_inf_norm(cute::Tensor&lt;EngineType, LayoutType&gt; const&amp; X,</code>
+  - EN: Begins or continues the signature/call syntax involving `matrix_diff_inf_norm`.
+  - CN: 开始或继续与 `matrix_diff_inf_norm` 相关的签名/调用语法。
+- **L106** <code>                     cute::Tensor&lt;EngineType, LayoutType&gt; const&amp; Y)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L107** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L108** <code>  using error_type = decltype(std::declval&lt;matrix_inf_norm_result&gt;().inf_norm);</code>
+  - EN: Introduces the type or namespace alias `error_type`.
+  - CN: 引入类型或命名空间别名 `error_type`。
+- **L109** <code>  using element_type = typename EngineType::value_type;</code>
+  - EN: Introduces the type or namespace alias `element_type`.
+  - CN: 引入类型或命名空间别名 `element_type`。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>  auto abs_fn = [] (element_type A_ij) {</code>
+  - EN: Assigns or initializes `abs_fn` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `abs_fn` 进行赋值或初始化。
+- **L112** <code>    if constexpr (not std::is_unsigned_v&lt;element_type&gt;) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L113** <code>      using std::abs;</code>
+  - EN: Introduces the type or namespace alias `std`.
+  - CN: 引入类型或命名空间别名 `std`。
+- **L114** <code>      return abs(A_ij);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L115** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L116** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L117** <code>      return A_ij;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L118** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L119** <code>  };</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L120** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L121** <code>  assert(cute::size&lt;0&gt;(X) == cute::size&lt;0&gt;(Y));</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L122** <code>  assert(cute::size&lt;1&gt;(X) == cute::size&lt;1&gt;(Y));</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>  // Computing the infinity norm requires that we be able</code>
+  - EN: Comment that documents intent or context: "Computing the infinity norm requires that we be able".
+  - CN: 用于说明意图或上下文的注释："Computing the infinity norm requires that we be able"。
+- **L125** <code>  // to treat the input as a matrix, with rows and columns.</code>
+  - EN: Comment that documents intent or context: "to treat the input as a matrix, with rows and columns.".
+  - CN: 用于说明意图或上下文的注释："to treat the input as a matrix, with rows and columns."。
+- **L126** <code>  const int64_t num_rows = cute::size&lt;0&gt;(X);</code>
+  - EN: Declares function or method `size<0>` without defining it here.
+  - CN: 声明函数或方法 `size<0>`，但不在此处给出定义。
+- **L127** <code>  const int64_t num_cols = cute::size&lt;1&gt;(X);</code>
+  - EN: Declares function or method `size<1>` without defining it here.
+  - CN: 声明函数或方法 `size<1>`，但不在此处给出定义。
+- **L128** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L129** <code>  error_type inf_norm = 0.0;</code>
+  - EN: Assigns or initializes `inf_norm` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `inf_norm` 进行赋值或初始化。
+- **L130** <code>  bool found_nan = false;</code>
+  - EN: Assigns or initializes `found_nan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `found_nan` 进行赋值或初始化。
+- **L131** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L132** <code>  for (int64_t i = 0; i &lt; num_rows; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L133** <code>    error_type row_abs_sum = 0.0;</code>
+  - EN: Assigns or initializes `row_abs_sum` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `row_abs_sum` 进行赋值或初始化。
+- **L134** <code>    for (int64_t j = 0; j &lt; num_cols; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L135** <code>      row_abs_sum += error_type(abs_fn(element_type(X(i,j)) -</code>
+  - EN: Begins or continues the signature/call syntax involving `X`.
+  - CN: 开始或继续与 `X` 相关的签名/调用语法。
+- **L136** <code>                                       element_type(Y(i,j))));</code>
+  - EN: Declares function or method `Y` without defining it here.
+  - CN: 声明函数或方法 `Y`，但不在此处给出定义。
+- **L137** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L138** <code>    if (std::isnan(row_abs_sum)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L139** <code>      found_nan = true;</code>
+  - EN: Assigns or initializes `found_nan` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `found_nan` 进行赋值或初始化。
+- **L140** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L141** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L142** <code>      inf_norm = row_abs_sum &gt; inf_norm ? row_abs_sum : inf_norm;</code>
+  - EN: Assigns or initializes `inf_norm` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `inf_norm` 进行赋值或初始化。
+- **L143** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L144** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L146** <code>  return {inf_norm, found_nan};</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L147** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L148** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L149** <code>template &lt;typename EngineType_A, typename LayoutType_A,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L150** <code>          typename EngineType_B, typename LayoutType_B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L151** <code>          typename EngineType_C, typename LayoutType_C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L152** <code>          typename EngineType_C_ref, typename LayoutType_C_ref&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L153** <code>auto</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L154** <code>print_matrix_multiply_mollified_relative_error(</code>
+  - EN: Begins or continues the signature/call syntax involving `print_matrix_multiply_mollified_relative_error`.
+  - CN: 开始或继续与 `print_matrix_multiply_mollified_relative_error` 相关的签名/调用语法。
+- **L155** <code>  char const A_value_type_name[],</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L156** <code>  cute::Tensor&lt;EngineType_A, LayoutType_A&gt; const&amp; A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L157** <code>  char const B_value_type_name[],</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L158** <code>  cute::Tensor&lt;EngineType_B, LayoutType_B&gt; const&amp; B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L159** <code>  char const C_value_type_name[],</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L160** <code>  cute::Tensor&lt;EngineType_C, LayoutType_C&gt; const&amp; C,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L161** <code>  cute::Tensor&lt;EngineType_C_ref, LayoutType_C_ref&gt; const&amp; C_ref)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L163** <code>  const auto [A_norm, A_has_nan] = matrix_inf_norm(A);</code>
+  - EN: Declares function or method `matrix_inf_norm` without defining it here.
+  - CN: 声明函数或方法 `matrix_inf_norm`，但不在此处给出定义。
+- **L164** <code>  const auto [B_norm, B_has_nan] = matrix_inf_norm(B);</code>
+  - EN: Declares function or method `matrix_inf_norm` without defining it here.
+  - CN: 声明函数或方法 `matrix_inf_norm`，但不在此处给出定义。
+- **L165** <code>  const auto [C_norm, C_has_nan] = matrix_inf_norm(C_ref);</code>
+  - EN: Declares function or method `matrix_inf_norm` without defining it here.
+  - CN: 声明函数或方法 `matrix_inf_norm`，但不在此处给出定义。
+- **L166** <code>  const auto [diff_norm, diff_has_nan] = matrix_diff_inf_norm(C, C_ref);</code>
+  - EN: Declares function or method `matrix_diff_inf_norm` without defining it here.
+  - CN: 声明函数或方法 `matrix_diff_inf_norm`，但不在此处给出定义。
+- **L167** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L168** <code>  const auto A_norm_times_B_norm = A_norm * B_norm;</code>
+  - EN: Assigns or initializes `A_norm_times_B_norm` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `A_norm_times_B_norm` 进行赋值或初始化。
+- **L169** <code>  const auto relative_error = A_norm_times_B_norm == 0.0 ?</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L170** <code>    diff_norm : (diff_norm / A_norm_times_B_norm);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L172** <code>  // For expected error bounds, please refer to the LAPACK Users&#x27; Guide,</code>
+  - EN: Comment that documents intent or context: "For expected error bounds, please refer to the LAPACK Users' Guide,".
+  - CN: 用于说明意图或上下文的注释："For expected error bounds, please refer to the LAPACK Users' Guide,"。
+- **L173** <code>  // in particular https://netlib.org/lapack/lug/node108.html .</code>
+  - EN: Comment that documents intent or context: "in particular https://netlib.org/lapack/lug/node108.html .".
+  - CN: 用于说明意图或上下文的注释："in particular https://netlib.org/lapack/lug/node108.html ."。
+- **L174** <code>  // Printing the infinity norm of C is a way to check</code>
+  - EN: Comment that documents intent or context: "Printing the infinity norm of C is a way to check".
+  - CN: 用于说明意图或上下文的注释："Printing the infinity norm of C is a way to check"。
+- **L175** <code>  // that both the function being tested (C)</code>
+  - EN: Comment that documents intent or context: "that both the function being tested (C)".
+  - CN: 用于说明意图或上下文的注释："that both the function being tested (C)"。
+- **L176** <code>  // and the reference implementation (C_ref)</code>
+  - EN: Comment that documents intent or context: "and the reference implementation (C_ref)".
+  - CN: 用于说明意图或上下文的注释："and the reference implementation (C_ref)"。
+- **L177** <code>  // don&#x27;t just do nothing (or fill with zeros).</code>
+  - EN: Comment that documents intent or context: "don't just do nothing (or fill with zeros).".
+  - CN: 用于说明意图或上下文的注释："don't just do nothing (or fill with zeros)."。
+- **L178** <code>  using std::cout;</code>
+  - EN: Introduces the type or namespace alias `std`.
+  - CN: 引入类型或命名空间别名 `std`。
+- **L179** <code>  using cute::shape;</code>
+  - EN: Introduces the type or namespace alias `cute`.
+  - CN: 引入类型或命名空间别名 `cute`。
+- **L180** <code>  cout &lt;&lt; &quot;Matrix A: &quot; &lt;&lt; shape&lt;0&gt;(A) &lt;&lt; &quot;x&quot; &lt;&lt; shape&lt;1&gt;(A) &lt;&lt; &quot; of &quot; &lt;&lt; A_value_type_name &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Begins or continues the signature/call syntax involving `shape<1>`.
+  - CN: 开始或继续与 `shape<1>` 相关的签名/调用语法。
+- **L181** <code>      &lt;&lt; &quot;Matrix B: &quot; &lt;&lt; shape&lt;0&gt;(B) &lt;&lt; &quot;x&quot; &lt;&lt; shape&lt;1&gt;(B) &lt;&lt; &quot; of &quot; &lt;&lt; B_value_type_name &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Begins or continues the signature/call syntax involving `shape<1>`.
+  - CN: 开始或继续与 `shape<1>` 相关的签名/调用语法。
+- **L182** <code>      &lt;&lt; &quot;Matrix C: &quot; &lt;&lt; shape&lt;0&gt;(C) &lt;&lt; &quot;x&quot; &lt;&lt; shape&lt;1&gt;(C) &lt;&lt; &quot; of &quot; &lt;&lt; C_value_type_name &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Begins or continues the signature/call syntax involving `shape<1>`.
+  - CN: 开始或继续与 `shape<1>` 相关的签名/调用语法。
+- **L183** <code>      &lt;&lt; std::scientific</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L184** <code>      &lt;&lt; &quot;Infinity norm of A: &quot; &lt;&lt; A_norm &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L185** <code>      &lt;&lt; &quot;Infinity norm of B: &quot; &lt;&lt; B_norm &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L186** <code>      &lt;&lt; &quot;Infinity norm of C: &quot; &lt;&lt; C_norm &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L187** <code>      &lt;&lt; &quot;Infinity norm of (C - C_ref): &quot; &lt;&lt; diff_norm &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Declares function or method `of` without defining it here.
+  - CN: 声明函数或方法 `of`，但不在此处给出定义。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>  if(A_norm_times_B_norm == 0.0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L190** <code>    cout &lt;&lt; &quot;Mollified relative error: &quot; &lt;&lt; relative_error &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L191** <code>  } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L192** <code>    cout &lt;&lt; &quot;Relative error: &quot; &lt;&lt; relative_error &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L193** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L194** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L195** <code>  if (A_has_nan || B_has_nan || C_has_nan || diff_has_nan) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L196** <code>    cout &lt;&lt; &quot;Did we encounter NaN in A? &quot; &lt;&lt; (A_has_nan ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L197** <code>        &lt;&lt; &quot;Did we encounter NaN in B? &quot; &lt;&lt; (B_has_nan ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L198** <code>        &lt;&lt; &quot;Did we encounter NaN in C? &quot; &lt;&lt; (C_has_nan ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &#x27;\n&#x27;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L199** <code>        &lt;&lt; &quot;Did we encounter NaN in (C - C_ref)? &quot; &lt;&lt; (diff_has_nan ? &quot;yes&quot; : &quot;no&quot;) &lt;&lt; &#x27;\n&#x27;;</code>
+  - EN: Declares function or method `in` without defining it here.
+  - CN: 声明函数或方法 `in`，但不在此处给出定义。
+- **L200** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L201** <code>  return relative_error;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L202** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L203** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L204** <code>template &lt;typename EngineType, typename LayoutType&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L205** <code>auto</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L206** <code>print_matrix_multiply_mollified_relative_error(</code>
+  - EN: Begins or continues the signature/call syntax involving `print_matrix_multiply_mollified_relative_error`.
+  - CN: 开始或继续与 `print_matrix_multiply_mollified_relative_error` 相关的签名/调用语法。
+- **L207** <code>  const char value_type_name[],</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L208** <code>  const cute::Tensor&lt;EngineType, LayoutType&gt;&amp; A,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L209** <code>  const cute::Tensor&lt;EngineType, LayoutType&gt;&amp; B,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L210** <code>  const cute::Tensor&lt;EngineType, LayoutType&gt;&amp; C_computed,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L211** <code>  const cute::Tensor&lt;EngineType, LayoutType&gt;&amp; C_expected)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L212** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L213** <code>  return print_matrix_multiply_mollified_relative_error(value_type_name, A, value_type_name, B,</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L214** <code>                                                 value_type_name, C_computed, C_expected);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L215** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L216** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L217** <code>// Take a CUTLASS HostTensor (or the like) as input,</code>
+  - EN: Comment that documents intent or context: "Take a CUTLASS HostTensor (or the like) as input,".
+  - CN: 用于说明意图或上下文的注释："Take a CUTLASS HostTensor (or the like) as input,"。
+- **L218** <code>// and return a const CuTe Tensor.</code>
+  - EN: Comment that documents intent or context: "and return a const CuTe Tensor.".
+  - CN: 用于说明意图或上下文的注释："and return a const CuTe Tensor."。
+- **L219** <code>// This is useful for use with the above error printing functions.</code>
+  - EN: Comment that documents intent or context: "This is useful for use with the above error printing functions.".
+  - CN: 用于说明意图或上下文的注释："This is useful for use with the above error printing functions."。
+- **L220** <code>// This implicitly &quot;transposes&quot; if the layout is RowMajor.</code>
+  - EN: Comment that documents intent or context: "This implicitly "transposes" if the layout is RowMajor.".
+  - CN: 用于说明意图或上下文的注释："This implicitly "transposes" if the layout is RowMajor."。
+- **L221** <code>// Note that the HostTensor must be captured by nonconst reference</code>
+  - EN: Comment that documents intent or context: "Note that the HostTensor must be captured by nonconst reference".
+  - CN: 用于说明意图或上下文的注释："Note that the HostTensor must be captured by nonconst reference"。
+- **L222** <code>// in order for X.host_ref().data() to compile.</code>
+  - EN: Comment that documents intent or context: "in order for X.host_ref().data() to compile.".
+  - CN: 用于说明意图或上下文的注释："in order for X.host_ref().data() to compile."。
+- **L223** <code>// (CUTLASS is a bit more container-y than CuTe.)</code>
+  - EN: Comment that documents intent or context: "(CUTLASS is a bit more container-y than CuTe.)".
+  - CN: 用于说明意图或上下文的注释："(CUTLASS is a bit more container-y than CuTe.)"。
+- **L224** <code>template&lt;class CutlassHostTensorType&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L225** <code>auto host_matrix_to_const_cute_tensor(CutlassHostTensorType&amp; X)</code>
+  - EN: Begins or continues the signature/call syntax involving `host_matrix_to_const_cute_tensor`.
+  - CN: 开始或继续与 `host_matrix_to_const_cute_tensor` 相关的签名/调用语法。
+- **L226** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L227** <code>  // The tensors were created with post-transposed extents.</code>
+  - EN: Comment that documents intent or context: "The tensors were created with post-transposed extents.".
+  - CN: 用于说明意图或上下文的注释："The tensors were created with post-transposed extents."。
+- **L228** <code>  const auto extents = X.extent();</code>
+  - EN: Declares function or method `extent` without defining it here.
+  - CN: 声明函数或方法 `extent`，但不在此处给出定义。
+- **L229** <code>  const auto shape = cute::Shape&lt;int, int&gt;{extents[0], extents[1]};</code>
+  - EN: Assigns or initializes `shape` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `shape` 进行赋值或初始化。
+- **L230** <code>  // Both RowMajor and ColumnMajor only store one stride.</code>
+  - EN: Comment that documents intent or context: "Both RowMajor and ColumnMajor only store one stride.".
+  - CN: 用于说明意图或上下文的注释："Both RowMajor and ColumnMajor only store one stride."。
+- **L231** <code>  const int LDX = X.stride(0);</code>
+  - EN: Declares function or method `stride` without defining it here.
+  - CN: 声明函数或方法 `stride`，但不在此处给出定义。
+- **L232** <code>  const auto strides = [&amp;]() {</code>
+  - EN: Assigns or initializes `strides` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `strides` 进行赋值或初始化。
+- **L233** <code>      using input_layout_type = typename std::decay_t&lt;decltype(X)&gt;::Layout;</code>
+  - EN: Introduces the type or namespace alias `input_layout_type`.
+  - CN: 引入类型或命名空间别名 `input_layout_type`。
+- **L234** <code>      if constexpr (std::is_same_v&lt;input_layout_type, cutlass::layout::ColumnMajor&gt;) {</code>
+  - EN: Begins the definition of function or method `constexpr`.
+  - CN: 开始定义函数或方法 `constexpr`。
+- **L235** <code>        return cute::Stride&lt;int, int&gt;{1, LDX};</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L236** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L237** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L238** <code>        static_assert(std::is_same_v&lt;input_layout_type, cutlass::layout::RowMajor&gt;);</code>
+  - EN: Declares function or method `static_assert` without defining it here.
+  - CN: 声明函数或方法 `static_assert`，但不在此处给出定义。
+- **L239** <code>        return cute::Stride&lt;int, int&gt;{LDX, 1};</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L240** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L241** <code>    }();</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L242** <code>  const auto layout = cute::make_layout(shape, strides);</code>
+  - EN: Declares function or method `make_layout` without defining it here.
+  - CN: 声明函数或方法 `make_layout`，但不在此处给出定义。
+- **L243** <code>  auto X_data = X.host_ref().data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L244** <code>  auto X_data_const = const_cast&lt;std::add_const_t&lt; decltype(X_data)&gt; &gt;(X_data);</code>
+  - EN: Assigns or initializes `X_data_const` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `X_data_const` 进行赋值或初始化。
+- **L245** <code>  return cute::make_tensor(X_data_const, layout);</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L246** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L247** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>// Returns EXIT_SUCCESS if the 2-norm relative error is exactly zero, else returns EXIT_FAILURE.</code>
+  - EN: Comment that documents intent or context: "Returns EXIT_SUCCESS if the 2-norm relative error is exactly zero, else returns EXIT_FAILURE.".
+  - CN: 用于说明意图或上下文的注释："Returns EXIT_SUCCESS if the 2-norm relative error is exactly zero, else returns EXIT_FAILURE."。
+- **L250** <code>// This makes the return value suitable as the return value of main().</code>
+  - EN: Comment that documents intent or context: "This makes the return value suitable as the return value of main().".
+  - CN: 用于说明意图或上下文的注释："This makes the return value suitable as the return value of main()."。
+- **L251** <code>template &lt;typename T1, typename T2&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L252** <code>int</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L253** <code>print_relative_error(</code>
+  - EN: Begins or continues the signature/call syntax involving `print_relative_error`.
+  - CN: 开始或继续与 `print_relative_error` 相关的签名/调用语法。
+- **L254** <code>    std::size_t n,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L255** <code>    T1 const&amp; data,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L256** <code>    T2 const&amp; reference,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L257** <code>    bool print_verbose = false,</code>
+  - EN: Assigns or initializes `print_verbose` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `print_verbose` 进行赋值或初始化。
+- **L258** <code>    bool print_error = true,</code>
+  - EN: Assigns or initializes `print_error` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `print_error` 进行赋值或初始化。
+- **L259** <code>    double error_margin = 0.00001) {</code>
+  - EN: Assigns or initializes `error_margin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `error_margin` 进行赋值或初始化。
+- **L260** <code>  using std::abs; using std::sqrt;</code>
+  - EN: Introduces the type or namespace alias `std`.
+  - CN: 引入类型或命名空间别名 `std`。
+- **L261** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L262** <code>  // Use either double or complex&lt;double&gt; for error computation</code>
+  - EN: Comment that documents intent or context: "Use either double or complex<double> for error computation".
+  - CN: 用于说明意图或上下文的注释："Use either double or complex<double> for error computation"。
+- **L263** <code>  using value_type = cute::remove_cvref_t&lt;decltype(reference[0])&gt;;</code>
+  - EN: Introduces the type or namespace alias `value_type`.
+  - CN: 引入类型或命名空间别名 `value_type`。
+- **L264** <code>  using error_type = std::conditional_t&lt;cute::is_complex&lt;value_type&gt;::value,</code>
+  - EN: Introduces the type or namespace alias `error_type`.
+  - CN: 引入类型或命名空间别名 `error_type`。
+- **L265** <code>                                        cute::complex&lt;double&gt;,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L266** <code>                                        double&gt;;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L267** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L268** <code>  if (print_verbose) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L269** <code>    std::cout &lt;&lt; &quot;Idx:\t&quot;&lt;&lt; &quot;Val\t&quot; &lt;&lt; &quot;RefVal\t&quot; &lt;&lt; &quot;RelError&quot; &lt;&lt; std::endl;</code>
+  - EN: Declares the symbol `endl` in the current scope.
+  - CN: 在当前作用域中声明符号 `endl`。
+- **L270** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L271** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L272** <code>  double eps = 1e-200;</code>
+  - EN: Assigns or initializes `eps` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `eps` 进行赋值或初始化。
+- **L273** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L274** <code>  double tot_error_sq = 0;</code>
+  - EN: Assigns or initializes `tot_error_sq` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tot_error_sq` 进行赋值或初始化。
+- **L275** <code>  double tot_norm_sq = 0;</code>
+  - EN: Assigns or initializes `tot_norm_sq` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tot_norm_sq` 进行赋值或初始化。
+- **L276** <code>  double tot_ind_rel_err = 0;</code>
+  - EN: Assigns or initializes `tot_ind_rel_err` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tot_ind_rel_err` 进行赋值或初始化。
+- **L277** <code>  double max_ind_rel_err = 0;</code>
+  - EN: Assigns or initializes `max_ind_rel_err` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max_ind_rel_err` 进行赋值或初始化。
+- **L278** <code>  double max_diff = 0;</code>
+  - EN: Assigns or initializes `max_diff` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `max_diff` 进行赋值或初始化。
+- **L279** <code>  for (std::size_t i = 0; i &lt; n; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L280** <code>    error_type val = data[i];</code>
+  - EN: Assigns or initializes `val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `val` 进行赋值或初始化。
+- **L281** <code>    error_type ref = reference[i];</code>
+  - EN: Assigns or initializes `ref` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `ref` 进行赋值或初始化。
+- **L282** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L283** <code>    double aref = abs(ref);</code>
+  - EN: Declares function or method `abs` without defining it here.
+  - CN: 声明函数或方法 `abs`，但不在此处给出定义。
+- **L284** <code>    double diff = abs(ref - val);</code>
+  - EN: Declares function or method `abs` without defining it here.
+  - CN: 声明函数或方法 `abs`，但不在此处给出定义。
+- **L285** <code>    double rel_error = diff / (aref + eps);</code>
+  - EN: Assigns or initializes `rel_error` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `rel_error` 进行赋值或初始化。
+- **L286** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L287** <code>    // Individual relative error</code>
+  - EN: Comment that documents intent or context: "Individual relative error".
+  - CN: 用于说明意图或上下文的注释："Individual relative error"。
+- **L288** <code>    tot_ind_rel_err += rel_error;</code>
+  - EN: Declares the symbol `rel_error` in the current scope.
+  - CN: 在当前作用域中声明符号 `rel_error`。
+- **L289** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L290** <code>    // Maximum relative error</code>
+  - EN: Comment that documents intent or context: "Maximum relative error".
+  - CN: 用于说明意图或上下文的注释："Maximum relative error"。
+- **L291** <code>    max_ind_rel_err  = std::max(max_ind_rel_err, rel_error);</code>
+  - EN: Declares function or method `max` without defining it here.
+  - CN: 声明函数或方法 `max`，但不在此处给出定义。
+- **L292** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L293** <code>    // Maximum delta in value error</code>
+  - EN: Comment that documents intent or context: "Maximum delta in value error".
+  - CN: 用于说明意图或上下文的注释："Maximum delta in value error"。
+- **L294** <code>    max_diff = std::max(max_diff, diff);</code>
+  - EN: Declares function or method `max` without defining it here.
+  - CN: 声明函数或方法 `max`，但不在此处给出定义。
+- **L295** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L296** <code>    // Total relative error</code>
+  - EN: Comment that documents intent or context: "Total relative error".
+  - CN: 用于说明意图或上下文的注释："Total relative error"。
+- **L297** <code>    tot_error_sq += diff * diff;</code>
+  - EN: Declares the symbol `diff` in the current scope.
+  - CN: 在当前作用域中声明符号 `diff`。
+- **L298** <code>    tot_norm_sq  += aref * aref;</code>
+  - EN: Declares the symbol `aref` in the current scope.
+  - CN: 在当前作用域中声明符号 `aref`。
+- **L299** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L300** <code>    if (print_verbose) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L301** <code>      std::cout &lt;&lt; i &lt;&lt; &quot;:\t&quot; &lt;&lt; val &lt;&lt; &quot;\t&quot; &lt;&lt; ref &lt;&lt; &quot;\t&quot; &lt;&lt; rel_error &lt;&lt; std::endl;</code>
+  - EN: Declares the symbol `endl` in the current scope.
+  - CN: 在当前作用域中声明符号 `endl`。
+- **L302** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L303** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L304** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L305** <code>  double ave_rel_err = tot_ind_rel_err / double(n);</code>
+  - EN: Declares function or method `double` without defining it here.
+  - CN: 声明函数或方法 `double`，但不在此处给出定义。
+- **L306** <code>  if (print_error) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L307** <code>    printf(&quot;Average relative error: %.3e\n&quot;, ave_rel_err);</code>
+  - EN: Declares function or method `printf` without defining it here.
+  - CN: 声明函数或方法 `printf`，但不在此处给出定义。
+- **L308** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L309** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L310** <code>  if (print_error) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L311** <code>    printf(&quot;Maximum relative error: %.3e\n&quot;, max_ind_rel_err);</code>
+  - EN: Declares function or method `printf` without defining it here.
+  - CN: 声明函数或方法 `printf`，但不在此处给出定义。
+- **L312** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L313** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L314** <code>  if (print_error) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L315** <code>    printf(&quot;Maximum difference    : %.3e\n&quot;, max_diff);</code>
+  - EN: Declares function or method `printf` without defining it here.
+  - CN: 声明函数或方法 `printf`，但不在此处给出定义。
+- **L316** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L317** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L318** <code>  double tot_rel_err = sqrt(tot_error_sq/(tot_norm_sq+eps));</code>
+  - EN: Declares function or method `sqrt` without defining it here.
+  - CN: 声明函数或方法 `sqrt`，但不在此处给出定义。
+- **L319** <code>  if (print_error) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L320** <code>    printf(&quot;Vector relative error:  %.3e\n&quot;, tot_rel_err);</code>
+  - EN: Declares function or method `printf` without defining it here.
+  - CN: 声明函数或方法 `printf`，但不在此处给出定义。
+- **L321** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>  printf(&quot;Vector reference  norm: %.3e\n&quot;, sqrt(tot_norm_sq));</code>
+  - EN: Declares function or method `sqrt` without defining it here.
+  - CN: 声明函数或方法 `sqrt`，但不在此处给出定义。
+- **L324** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L325** <code>  return (tot_rel_err &lt;= error_margin) ? EXIT_SUCCESS : EXIT_FAILURE;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L326** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L327** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L328** <code>// Overload for cute::Tensor&lt;&gt;</code>
+  - EN: Comment that documents intent or context: "Overload for cute::Tensor<>".
+  - CN: 用于说明意图或上下文的注释："Overload for cute::Tensor<>"。
+- **L329** <code>template &lt;class Engine, class Layout&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L330** <code>int</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L331** <code>print_relative_error(</code>
+  - EN: Begins or continues the signature/call syntax involving `print_relative_error`.
+  - CN: 开始或继续与 `print_relative_error` 相关的签名/调用语法。
+- **L332** <code>    cute::Tensor&lt;Engine, Layout&gt; data,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L333** <code>    cute::Tensor&lt;Engine, Layout&gt; reference,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L334** <code>    bool print_verbose = false,</code>
+  - EN: Assigns or initializes `print_verbose` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `print_verbose` 进行赋值或初始化。
+- **L335** <code>    bool print_error = true,</code>
+  - EN: Assigns or initializes `print_error` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `print_error` 进行赋值或初始化。
+- **L336** <code>    double error_margin = 0.00001) {</code>
+  - EN: Assigns or initializes `error_margin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `error_margin` 进行赋值或初始化。
+- **L337** <code>  assert(size(data) == size(reference));</code>
+  - EN: Declares function or method `size` without defining it here.
+  - CN: 声明函数或方法 `size`，但不在此处给出定义。
+- **L338** <code>  return print_relative_error(static_cast&lt;std::size_t&gt;(size(data)),</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L339** <code>                              data, reference,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L340** <code>                              print_verbose, print_error, error_margin);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L341** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>array</code> — fixed-size array containers / 定长数组容器
+- <code>cassert</code> — assert macros / 断言宏
+- <code>cmath</code> — math routines / 数学函数
+- <code>iostream</code> — standard stream input/output support / 标准流输入输出支持
+- <code>type_traits</code> — compile-time type traits / 编译期类型特征
+- <code>cute/util/type_traits.hpp</code> — compile-time type traits / 编译期类型特征
+- <code>cute/tensor.hpp</code> — project-specific declarations from `tensor.hpp` / 来自 `tensor.hpp` 的项目专用声明
+- <code>cute/numeric/numeric_types.hpp</code> — project-specific declarations from `numeric_types.hpp` / 来自 `numeric_types.hpp` 的项目专用声明
+- <code>cute/numeric/complex.hpp</code> — project-specific declarations from `complex.hpp` / 来自 `complex.hpp` 的项目专用声明
+- <code>cutlass/layout/layout.h</code> — general CUTLASS declarations / CUTLASS 通用声明

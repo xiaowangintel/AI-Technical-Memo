@@ -1,0 +1,485 @@
+# kernel_hardware_info.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/kernel_hardware_info.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "and/or other materials provided with the distribution." and defines related CUTLASS facilities in `include/cutlass/kernel_hardware_info.h`.
+- CN: 该头文件以注释摘要“and/or other materials provided with the distribution.”引入，并在 `include/cutlass/kernel_hardware_info.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L32**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L33**: <code>#include &quot;cutlass/device_kernel.h&quot;</code>
+  - EN: Includes "cutlass/device_kernel.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/device_kernel.h"，以便本文件使用该依赖中的声明。
+- **L34**: <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L35**: <code>#include &quot;cuda_runtime.h&quot;</code>
+  - EN: Includes "cuda_runtime.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cuda_runtime.h"，以便本文件使用该依赖中的声明。
+- **L36**: <code>#include &quot;cutlass/cluster_launch.hpp&quot;</code>
+  - EN: Includes "cutlass/cluster_launch.hpp" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cluster_launch.hpp"，以便本文件使用该依赖中的声明。
+- **L37**: <code>#include &quot;cutlass/trace.h&quot;</code>
+  - EN: Includes "cutlass/trace.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/trace.h"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L39**: <code>#include &lt;cute/int_tuple.hpp&gt;</code>
+  - EN: Includes <cute/int_tuple.hpp> so this file can use declarations from that dependency.
+  - CN: 包含 <cute/int_tuple.hpp>，以便本文件使用该依赖中的声明。
+- **L40**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L41**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L42**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L43**: <code>struct KernelHardwareInfo {</code>
+  - EN: Declares or defines the struct `KernelHardwareInfo`.
+  - CN: 声明或定义 struct `KernelHardwareInfo`。
+- **L44**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L45**: <code>  // Data members</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L46**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L47**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L48**: <code>  // Hardware properties</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L49**: <code>  int device_id = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L50**: <code>  int sm_count  = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L51**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L52**: <code>  // Kernel properties</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L53**: <code>  int max_active_clusters = 0;              // Maximum number of clusters that could co-exist on the target device.</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L54**: <code>  dim3 cluster_shape = {0,0,0};             </code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L55**: <code>  dim3 cluster_shape_fallback = {0,0,0};    </code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L58**: <code>  // Methods</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L59**: <code>  //</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L60**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L61**: <code>#if !defined(__CUDACC_RTC__)</code>
+  - EN: Starts a conditional-compilation block controlled by `!defined(__CUDACC_RTC__)`.
+  - CN: 开始一个由 `!defined(__CUDACC_RTC__)` 控制的条件编译块。
+- **L62**: <code>  static inline int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L63**: <code>  query_device_multiprocessor_count(int device_id = 0) {</code>
+  - EN: Starts the definition body for `query_device_multiprocessor_count`.
+  - CN: 开始 `query_device_multiprocessor_count` 的定义体。
+- **L64**: <code>    cudaError_t result = cudaGetDevice(&amp;device_id);</code>
+  - EN: Declares the callable or operator `cudaGetDevice`.
+  - CN: 声明可调用对象或运算符 `cudaGetDevice`。
+- **L65**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L66**: <code>      CUTLASS_TRACE_HOST(</code>
+  - EN: Begins or continues the signature/parameter list for `CUTLASS_TRACE_HOST`.
+  - CN: 开始或继续 `CUTLASS_TRACE_HOST` 的签名/参数列表。
+- **L67**: <code>        &quot;  cudaGetDevice() returned error &quot;</code>
+  - EN: Provides part of the signature or implementation for `cudaGetDevice`.
+  - CN: 提供 `cudaGetDevice` 的签名或实现的一部分。
+- **L68**: <code>        &lt;&lt; cudaGetErrorString(result));</code>
+  - EN: Declares the callable or operator `cudaGetErrorString`.
+  - CN: 声明可调用对象或运算符 `cudaGetErrorString`。
+- **L69**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L70**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L71**: <code>    int multiprocessor_count;</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L72**: <code>    result = cudaDeviceGetAttribute(&amp;multiprocessor_count,</code>
+  - EN: Begins or continues the signature/parameter list for `cudaDeviceGetAttribute`.
+  - CN: 开始或继续 `cudaDeviceGetAttribute` 的签名/参数列表。
+- **L73**: <code>      cudaDevAttrMultiProcessorCount, device_id);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L74**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L75**: <code>      CUTLASS_TRACE_HOST(</code>
+  - EN: Begins or continues the signature/parameter list for `CUTLASS_TRACE_HOST`.
+  - CN: 开始或继续 `CUTLASS_TRACE_HOST` 的签名/参数列表。
+- **L76**: <code>        &quot;  cudaDeviceGetAttribute() returned error &quot;</code>
+  - EN: Provides part of the signature or implementation for `cudaDeviceGetAttribute`.
+  - CN: 提供 `cudaDeviceGetAttribute` 的签名或实现的一部分。
+- **L77**: <code>        &lt;&lt; cudaGetErrorString(result));</code>
+  - EN: Declares the callable or operator `cudaGetErrorString`.
+  - CN: 声明可调用对象或运算符 `cudaGetErrorString`。
+- **L78**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L79**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L80**: <code>    return multiprocessor_count;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L81**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L82**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L83**: <code>  // Query maximum number of active clusters that could co-exist on the target device</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L84**: <code>  // based on kernel properties such as cluster dims and threadblock dims.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L85**: <code>  // When a green context stream is provided, the occupancy query is scoped to the</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L86**: <code>  // green context&#x27;s SM partition, returning the max active clusters for that partition.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L87**: <code>  static inline int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L88**: <code>  query_device_max_active_clusters(</code>
+  - EN: Begins or continues the signature/parameter list for `query_device_max_active_clusters`.
+  - CN: 开始或继续 `query_device_max_active_clusters` 的签名/参数列表。
+- **L89**: <code>      dim3 cluster_dims,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L90**: <code>      uint32_t threads_per_block,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L91**: <code>      void const* kernel_ptr,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L92**: <code>      cudaStream_t stream = nullptr) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L93**: <code>    int max_active_clusters = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L94**: <code>#if !(defined(__QNX__) &amp;&amp; __QNX__ &gt;= 800 &amp;&amp; defined(NV_IS_SAFETY))</code>
+  - EN: Starts a conditional-compilation block controlled by `!(defined(__QNX__) && __QNX__ >= 800 && defined(NV_IS_SAFETY))`.
+  - CN: 开始一个由 `!(defined(__QNX__) && __QNX__ >= 800 && defined(NV_IS_SAFETY))` 控制的条件编译块。
+- **L95**: <code>#if defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)</code>
+  - EN: Starts a conditional-compilation block controlled by `defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)`.
+  - CN: 开始一个由 `defined(CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED)` 控制的条件编译块。
+- **L96**: <code>    ClusterLauncher::LaunchConfig cluster_launch_config = ClusterLauncher::make_cluster_launch_config(</code>
+  - EN: Begins or continues the signature/parameter list for `make_cluster_launch_config`.
+  - CN: 开始或继续 `make_cluster_launch_config` 的签名/参数列表。
+- **L97**: <code>                                                            cluster_dims /* minimum grid dim */, cluster_dims, {threads_per_block, 1, 1},</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L98**: <code>                                                            0 /* smem_size */, stream /* green ctx stream or nullptr */);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L99**: <code>    // Given the kernel function and launch configuration, return the maximum number of clusters that could co-exist on the target device.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L100**: <code>    // When stream is a green context stream, this returns the max active clusters for that partition.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L101**: <code>    cudaError_t result = cudaOccupancyMaxActiveClusters(&amp;max_active_clusters, kernel_ptr, &amp;cluster_launch_config.launch_config);</code>
+  - EN: Declares the callable or operator `cudaOccupancyMaxActiveClusters`.
+  - CN: 声明可调用对象或运算符 `cudaOccupancyMaxActiveClusters`。
+- **L102**: <code>    if (result != cudaSuccess) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L103**: <code>      CUTLASS_TRACE_HOST(</code>
+  - EN: Begins or continues the signature/parameter list for `CUTLASS_TRACE_HOST`.
+  - CN: 开始或继续 `CUTLASS_TRACE_HOST` 的签名/参数列表。
+- **L104**: <code>        &quot;  cudaOccupancyMaxActiveClusters() returned error &quot;</code>
+  - EN: Provides part of the signature or implementation for `cudaOccupancyMaxActiveClusters`.
+  - CN: 提供 `cudaOccupancyMaxActiveClusters` 的签名或实现的一部分。
+- **L105**: <code>        &lt;&lt; cudaGetErrorString(result));</code>
+  - EN: Declares the callable or operator `cudaGetErrorString`.
+  - CN: 声明可调用对象或运算符 `cudaGetErrorString`。
+- **L106**: <code>      return 0;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L107**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L108**: <code>    CUTLASS_TRACE_HOST(&quot;cudaOccupancyMaxActiveClusters: maximum number of clusters that could co-exist on the target device = &quot;</code>
+  - EN: Begins or continues the signature/parameter list for `CUTLASS_TRACE_HOST`.
+  - CN: 开始或继续 `CUTLASS_TRACE_HOST` 的签名/参数列表。
+- **L109**: <code>        &lt;&lt; max_active_clusters &lt;&lt; &quot;\n&quot;);</code>
+  - EN: Terminates a declaration or statement.
+  - CN: 结束一个声明或语句。
+- **L110**: <code>    return max_active_clusters;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L111**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L112**: <code>    CUTLASS_TRACE_HOST(&quot;ClusterLauncher: CUTLASS_SM90_CLUSTER_LAUNCH_ENABLED not defined! Aborting cluster occupancy query.&quot;);</code>
+  - EN: Declares the callable or operator `CUTLASS_TRACE_HOST`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_TRACE_HOST`。
+- **L113**: <code>    return max_active_clusters;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L114**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L115**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L116**: <code>    CUTLASS_TRACE_HOST(&quot;ClusterLauncher: cluster launch disabled for QNX 8+ safety builds&quot;);</code>
+  - EN: Declares the callable or operator `CUTLASS_TRACE_HOST`.
+  - CN: 声明可调用对象或运算符 `CUTLASS_TRACE_HOST`。
+- **L117**: <code>    return max_active_clusters;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L118**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L119**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L120**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L121**: <code>  // Simpler version of the above query function that fetches relevant information from the Kernel.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L122**: <code>  // When a green context stream is provided, the occupancy query is scoped to that partition.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L123**: <code>  template &lt;typename Kernel&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L124**: <code>  static inline int</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L125**: <code>  query_device_max_active_clusters(cudaStream_t stream = nullptr) {</code>
+  - EN: Starts the definition body for `query_device_max_active_clusters`.
+  - CN: 开始 `query_device_max_active_clusters` 的定义体。
+- **L126**: <code>    dim3 cluster_dims(cute::size&lt;0&gt;(typename Kernel::ClusterShape{}),</code>
+  - EN: Starts the definition body for `cluster_dims`.
+  - CN: 开始 `cluster_dims` 的定义体。
+- **L127**: <code>                      cute::size&lt;1&gt;(typename Kernel::ClusterShape{}),</code>
+  - EN: Starts the definition body for `size`.
+  - CN: 开始 `size` 的定义体。
+- **L128**: <code>                      cute::size&lt;2&gt;(typename Kernel::ClusterShape{}));</code>
+  - EN: Declares the callable or operator `size`.
+  - CN: 声明可调用对象或运算符 `size`。
+- **L129**: <code>    uint32_t threads_per_block = Kernel::MaxThreadsPerBlock;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L130**: <code>    void const* kernel_ptr = (void*)(device_kernel&lt;Kernel&gt;);</code>
+  - EN: Declares the callable or operator `kernel_ptr`.
+  - CN: 声明可调用对象或运算符 `kernel_ptr`。
+- **L131**: <code>    return query_device_max_active_clusters(cluster_dims, threads_per_block, kernel_ptr, stream);</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L132**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L133**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L134**: <code>  // Create a KernelHardwareInfo by querying device properties.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L135**: <code>  // When a green context stream is provided, max_active_clusters is queried</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L136**: <code>  // against that stream&#x27;s green context partition instead of the full device.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L137**: <code>  template &lt;typename Kernel&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L138**: <code>  static inline KernelHardwareInfo</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L139**: <code>  make_kernel_hardware_info(int const device_id = 0, int sm_count = 0, int max_active_clusters = 0,</code>
+  - EN: Begins or continues the signature/parameter list for `make_kernel_hardware_info`.
+  - CN: 开始或继续 `make_kernel_hardware_info` 的签名/参数列表。
+- **L140**: <code>                            cudaStream_t stream = nullptr) {</code>
+  - EN: Opens a definition or nested scope associated with the preceding line.
+  - CN: 打开与前一行相关的定义体或嵌套作用域。
+- **L141**: <code>    if (sm_count == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L142**: <code>      sm_count = query_device_multiprocessor_count(device_id);</code>
+  - EN: Declares the callable or operator `query_device_multiprocessor_count`.
+  - CN: 声明可调用对象或运算符 `query_device_multiprocessor_count`。
+- **L143**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L144**: <code>    if (max_active_clusters == 0) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L145**: <code>      max_active_clusters = query_device_max_active_clusters&lt;Kernel&gt;(stream);</code>
+  - EN: Declares the callable or operator `Kernel`.
+  - CN: 声明可调用对象或运算符 `Kernel`。
+- **L146**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L147**: <code>    return {device_id, sm_count, max_active_clusters};</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L148**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L149**: <code>#endif</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L150**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L151**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L152**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Conditional compilation / 条件编译
+- Symbol focus: `KernelHardwareInfo` / 重点符号：`KernelHardwareInfo`
+- Symbol focus: `query_device_multiprocessor_count` / 重点符号：`query_device_multiprocessor_count`
+- Symbol focus: `cudaGetDevice` / 重点符号：`cudaGetDevice`
+- Symbol focus: `CUTLASS_TRACE_HOST` / 重点符号：`CUTLASS_TRACE_HOST`
+- Symbol focus: `cudaGetErrorString` / 重点符号：`cudaGetErrorString`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/device_kernel.h"`
+  - `"cuda_runtime.h"`
+  - `"cutlass/cluster_launch.hpp"`
+  - `"cutlass/trace.h"`
+- System/CUDA headers / 系统/CUDA 头文件:
+  - `<cute/int_tuple.hpp>`

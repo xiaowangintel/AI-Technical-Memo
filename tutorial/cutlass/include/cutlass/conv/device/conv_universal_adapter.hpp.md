@@ -1,0 +1,1371 @@
+# conv_universal_adapter.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/device/conv_universal_adapter.hpp`
+**Purpose / 用途**: Provides device-level wrappers. / 提供device 级封装。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 32 / 第 32 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 33 / 第 33 行** — `// common`
+  - **EN**: Inline comment explaining intent: `common`.
+  - **CN**: 行内注释说明意图：`common`。
+- **Line 34 / 第 34 行** — `#include "cutlass/arch/mma.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/arch/mma.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/arch/mma.h`。
+- **Line 35 / 第 35 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 36 / 第 36 行** — `#include "cutlass/arch/mma.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/arch/mma.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/arch/mma.h`。
+- **Line 37 / 第 37 行** — `#include "cutlass/trace.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/trace.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/trace.h`。
+- **Line 38 / 第 38 行** — `#include "cutlass/cluster_launch.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cluster_launch.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cluster_launch.hpp`。
+- **Line 39 / 第 39 行** — `#include "cutlass/device_kernel.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/device_kernel.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/device_kernel.h`。
+- **Line 40 / 第 40 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 41 / 第 41 行** — `#include "cutlass/conv/kernel/conv_universal.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/kernel/conv_universal.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/kernel/conv_universal.hpp`。
+- **Line 42 / 第 42 行** — `#include "cutlass/gemm/gemm.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/gemm.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/gemm.h`。
+- **Line 43 / 第 43 行** — `#include "cutlass/detail/layout.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/detail/layout.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/detail/layout.hpp`。
+- **Line 44 / 第 44 行** — `#include "cutlass/cuda_host_adapter.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cuda_host_adapter.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cuda_host_adapter.hpp`。
+- **Line 45 / 第 45 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 46 / 第 46 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 47 / 第 47 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 48 / 第 48 行** — `namespace cutlass::conv::device {`
+  - **EN**: Opens namespace `cutlass::conv::device` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv::device`。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 51 / 第 51 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 52 / 第 52 行** — `/*!`
+  - **EN**: Documentation/comment text: `!`.
+  - **CN**: 文档/注释内容：`!`。
+- **Line 53 / 第 53 行** — `  ConvUniversalAdapter is a stateful, reusable handle built around a kernel`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 54 / 第 54 行** — `  of type cutlass::conv::kernel::ConvUniversal.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 55 / 第 55 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 56 / 第 56 行** — ``  It manages the lifetime of the underlying `kernel::Params` struct, and exposes APIs``
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 57 / 第 57 行** — `  to create it from the host facing arguments. For power users, static methods`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 58 / 第 58 行** — `  are exposed that bypass the stateful methods or args->params lowering.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 59 / 第 59 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 60 / 第 60 行** — `template <class ConvKernel_>`
+  - **EN**: Starts a template declaration with specifier `class ConvKernel_`.
+  - **CN**: 开始一个模板声明，说明符为 `class ConvKernel_`。
+- **Line 61 / 第 61 行** — `class ConvUniversalAdapter`
+  - **EN**: Declares class `ConvUniversalAdapter`.
+  - **CN**: 声明 class `ConvUniversalAdapter`。
+- **Line 62 / 第 62 行** — `{`
+  - **EN**: Opens the body for the preceding declaration or control block.
+  - **CN**: 为前面的声明或控制块打开主体。
+- **Line 63 / 第 63 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 64 / 第 64 行** — `  using ConvKernel = GetUnderlyingKernel_t<ConvKernel_>;`
+  - **EN**: Introduces type or value alias `ConvKernel`.
+  - **CN**: 引入类型或值别名 `ConvKernel`。
+- **Line 65 / 第 65 行** — `  using TileShape = typename ConvKernel::TileShape;`
+  - **EN**: Introduces type or value alias `TileShape`.
+  - **CN**: 引入类型或值别名 `TileShape`。
+- **Line 66 / 第 66 行** — `  using ElementA = typename ConvKernel::ElementA;`
+  - **EN**: Introduces type or value alias `ElementA`.
+  - **CN**: 引入类型或值别名 `ElementA`。
+- **Line 67 / 第 67 行** — `  using ElementB = typename ConvKernel::ElementB;`
+  - **EN**: Introduces type or value alias `ElementB`.
+  - **CN**: 引入类型或值别名 `ElementB`。
+- **Line 68 / 第 68 行** — `  using ElementC = typename ConvKernel::ElementC;`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 69 / 第 69 行** — `  using ElementD = typename ConvKernel::ElementD;`
+  - **EN**: Introduces type or value alias `ElementD`.
+  - **CN**: 引入类型或值别名 `ElementD`。
+- **Line 70 / 第 70 行** — `  using ElementAccumulator = typename ConvKernel::TiledMma::ValTypeC;`
+  - **EN**: Introduces type or value alias `ElementAccumulator`.
+  - **CN**: 引入类型或值别名 `ElementAccumulator`。
+- **Line 71 / 第 71 行** — `  using DispatchPolicy = typename ConvKernel::DispatchPolicy;`
+  - **EN**: Introduces type or value alias `DispatchPolicy`.
+  - **CN**: 引入类型或值别名 `DispatchPolicy`。
+- **Line 72 / 第 72 行** — `  using CollectiveMainloop = typename ConvKernel::CollectiveMainloop;`
+  - **EN**: Introduces type or value alias `CollectiveMainloop`.
+  - **CN**: 引入类型或值别名 `CollectiveMainloop`。
+- **Line 73 / 第 73 行** — `  using CollectiveEpilogue = typename ConvKernel::CollectiveEpilogue;`
+  - **EN**: Introduces type or value alias `CollectiveEpilogue`.
+  - **CN**: 引入类型或值别名 `CollectiveEpilogue`。
+- **Line 74 / 第 74 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 75 / 第 75 行** — `  static bool const kEnableCudaHostAdapter = CUTLASS_ENABLE_CUDA_HOST_ADAPTER;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 76 / 第 76 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 77 / 第 77 行** — `  // Tease out meta-information about the conv algorithm`
+  - **EN**: Inline comment explaining intent: `Tease out meta-information about the conv algorithm`.
+  - **CN**: 行内注释说明意图：`Tease out meta-information about the conv algorithm`。
+- **Line 78 / 第 78 行** — `  static constexpr conv::Operator kConvolutionalOperator = DispatchPolicy::ConvOp;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 79 / 第 79 行** — `  static constexpr int NumSpatialDimensions = CollectiveMainloop::NumSpatialDimensions;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 80 / 第 80 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 81 / 第 81 行** — `  // If our TiledMMA's instruction thread layout size is larger than 1, we know its a tensorop!`
+  - **EN**: Inline comment explaining intent: `If our TiledMMA's instruction thread layout size is larger than 1, we know its a tensorop!`.
+  - **CN**: 行内注释说明意图：`If our TiledMMA's instruction thread layout size is larger than 1, we know its a tensorop!`。
+- **Line 82 / 第 82 行** — `  using OperatorClass = cute::conditional_t<`
+  - **EN**: Introduces type or value alias `OperatorClass`.
+  - **CN**: 引入类型或值别名 `OperatorClass`。
+- **Line 83 / 第 83 行** — `      (cute::size(typename ConvKernel::TiledMma::AtomThrID{}) > 1),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 84 / 第 84 行** — `      cutlass::arch::OpClassTensorOp, cutlass::arch::OpClassSimt>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 85 / 第 85 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 86 / 第 86 行** — `  using ArchTag = typename ConvKernel::ArchTag;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 87 / 第 87 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 88 / 第 88 行** — `  // Assume TiledMma's ShapeMNK is the same as 2.x's ThreadblockShape`
+  - **EN**: Inline comment explaining intent: `Assume TiledMma's ShapeMNK is the same as 2.x's ThreadblockShape`.
+  - **CN**: 行内注释说明意图：`Assume TiledMma's ShapeMNK is the same as 2.x's ThreadblockShape`。
+- **Line 89 / 第 89 行** — `  using ThreadblockShape = cutlass::gemm::GemmShape<`
+  - **EN**: Introduces type or value alias `ThreadblockShape`.
+  - **CN**: 引入类型或值别名 `ThreadblockShape`。
+- **Line 90 / 第 90 行** — `      cute::size<0>(TileShape{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 91 / 第 91 行** — `      cute::size<1>(TileShape{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 92 / 第 92 行** — `      cute::size<2>(TileShape{})>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 93 / 第 93 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 94 / 第 94 行** — `  using ClusterShape = cutlass::gemm::GemmShape<`
+  - **EN**: Introduces type or value alias `ClusterShape`.
+  - **CN**: 引入类型或值别名 `ClusterShape`。
+- **Line 95 / 第 95 行** — `      cute::size<0>(typename ConvKernel::DispatchPolicy::ClusterShape{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 96 / 第 96 行** — `      cute::size<1>(typename ConvKernel::DispatchPolicy::ClusterShape{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 97 / 第 97 行** — `      cute::size<2>(typename ConvKernel::DispatchPolicy::ClusterShape{})>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 98 / 第 98 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 99 / 第 99 行** — `  // Instruction shape is easy too, since we get that directly from our TiledMma's atom shape`
+  - **EN**: Inline comment explaining intent: `Instruction shape is easy too, since we get that directly from our TiledMma's atom shape`.
+  - **CN**: 行内注释说明意图：`Instruction shape is easy too, since we get that directly from our TiledMma's atom shape`。
+- **Line 100 / 第 100 行** — `  using InstructionShape = cutlass::gemm::GemmShape<`
+  - **EN**: Introduces type or value alias `InstructionShape`.
+  - **CN**: 引入类型或值别名 `InstructionShape`。
+- **Line 101 / 第 101 行** — `      cute::size<0>(typename CollectiveMainloop::TiledMma::AtomShape_MNK{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 102 / 第 102 行** — `      cute::size<1>(typename CollectiveMainloop::TiledMma::AtomShape_MNK{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 103 / 第 103 行** — `      cute::size<2>(typename CollectiveMainloop::TiledMma::AtomShape_MNK{})>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 104 / 第 104 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 105 / 第 105 行** — `  // Legacy: provide a correct warp count, but no reliable warp shape`
+  - **EN**: Inline comment explaining intent: `Legacy: provide a correct warp count, but no reliable warp shape`.
+  - **CN**: 行内注释说明意图：`Legacy: provide a correct warp count, but no reliable warp shape`。
+- **Line 106 / 第 106 行** — `  static int const kThreadCount = ConvKernel::MaxThreadsPerBlock;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 107 / 第 107 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 108 / 第 108 行** — `  // Warp shape is not a primary API type in 3.x`
+  - **EN**: Inline comment explaining intent: `Warp shape is not a primary API type in 3.x`.
+  - **CN**: 行内注释说明意图：`Warp shape is not a primary API type in 3.x`。
+- **Line 109 / 第 109 行** — `  // But we can best approximate it by inspecting the TiledMma`
+  - **EN**: Inline comment explaining intent: `But we can best approximate it by inspecting the TiledMma`.
+  - **CN**: 行内注释说明意图：`But we can best approximate it by inspecting the TiledMma`。
+- **Line 110 / 第 110 行** — `  // For this, we make the assumption that we always have 4 warps along M, and rest along N, none along K`
+  - **EN**: Inline comment explaining intent: `For this, we make the assumption that we always have 4 warps along M, and rest along N, none alo...`.
+  - **CN**: 行内注释说明意图：`For this, we make the assumption that we always have 4 warps along M, and rest along N, none alo...`。
+- **Line 111 / 第 111 行** — `  // We also always round up the warp count to 4 if the tiled mma is smaller than 128 threads`
+  - **EN**: Inline comment explaining intent: `We also always round up the warp count to 4 if the tiled mma is smaller than 128 threads`.
+  - **CN**: 行内注释说明意图：`We also always round up the warp count to 4 if the tiled mma is smaller than 128 threads`。
+- **Line 112 / 第 112 行** — `  static constexpr int WarpsInMma = cute::max(4, CUTE_STATIC_V(cute::size(typename ConvKernel::TiledMma{})) / 32);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 113 / 第 113 行** — `  static constexpr int WarpsInMmaM = 4;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 114 / 第 114 行** — `  static constexpr int WarpsInMmaN = cute::ceil_div(WarpsInMma, WarpsInMmaM);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 115 / 第 115 行** — `  using WarpCount = cutlass::gemm::GemmShape<WarpsInMmaM, WarpsInMmaN, 1>;`
+  - **EN**: Introduces type or value alias `WarpCount`.
+  - **CN**: 引入类型或值别名 `WarpCount`。
+- **Line 116 / 第 116 行** — `  using WarpShape = cutlass::gemm::GemmShape<`
+  - **EN**: Introduces type or value alias `WarpShape`.
+  - **CN**: 引入类型或值别名 `WarpShape`。
+- **Line 117 / 第 117 行** — `      CUTE_STATIC_V(cute::tile_size<0>(typename CollectiveMainloop::TiledMma{})) / WarpsInMmaM,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 118 / 第 118 行** — `      CUTE_STATIC_V(cute::tile_size<1>(typename CollectiveMainloop::TiledMma{})) / WarpsInMmaN,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 119 / 第 119 行** — `      CUTE_STATIC_V(cute::tile_size<2>(typename CollectiveMainloop::TiledMma{}))>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 120 / 第 120 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 121 / 第 121 行** — `  static int constexpr kStages = CollectiveMainloop::DispatchPolicy::Stages;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 122 / 第 122 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 123 / 第 123 行** — `  // Inspect TiledCopy for A and B to compute the alignment size`
+  - **EN**: Inline comment explaining intent: `Inspect TiledCopy for A and B to compute the alignment size`.
+  - **CN**: 行内注释说明意图：`Inspect TiledCopy for A and B to compute the alignment size`。
+- **Line 124 / 第 124 行** — `  static int constexpr kAlignmentA = cutlass::detail::get_alignment_count_from_gmem_tiled_copy<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 125 / 第 125 行** — `      typename CollectiveMainloop::GmemTiledCopyA, ElementA>();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 126 / 第 126 行** — `  static int constexpr kAlignmentB = cutlass::detail::get_alignment_count_from_gmem_tiled_copy<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 127 / 第 127 行** — `      typename CollectiveMainloop::GmemTiledCopyB, ElementB>();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 128 / 第 128 行** — `  static int constexpr kAlignmentC = cutlass::detail::get_alignment_count_from_gmem_tiled_copy<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 129 / 第 129 行** — `      typename CollectiveEpilogue::GmemTiledCopyC, ElementC>();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 130 / 第 130 行** — `  static int constexpr kAlignmentD = cutlass::detail::get_alignment_count_from_gmem_tiled_copy<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 131 / 第 131 行** — `      typename CollectiveEpilogue::GmemTiledCopyD, ElementD>();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 132 / 第 132 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 133 / 第 133 行** — `  using EpilogueOutputOp = typename CollectiveEpilogue::ThreadEpilogueOp;`
+  - **EN**: Introduces type or value alias `EpilogueOutputOp`.
+  - **CN**: 引入类型或值别名 `EpilogueOutputOp`。
+- **Line 134 / 第 134 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 135 / 第 135 行** — `  /// Argument structure: User API`
+  - **EN**: Inline comment explaining intent: `Argument structure: User API`.
+  - **CN**: 行内注释说明意图：`Argument structure: User API`。
+- **Line 136 / 第 136 行** — `  using Arguments = typename ConvKernel::Arguments;`
+  - **EN**: Introduces type or value alias `Arguments`.
+  - **CN**: 引入类型或值别名 `Arguments`。
+- **Line 137 / 第 137 行** — `  /// Argument structure: Kernel API`
+  - **EN**: Inline comment explaining intent: `Argument structure: Kernel API`.
+  - **CN**: 行内注释说明意图：`Argument structure: Kernel API`。
+- **Line 138 / 第 138 行** — `  using Params = typename ConvKernel::Params;`
+  - **EN**: Introduces type or value alias `Params`.
+  - **CN**: 引入类型或值别名 `Params`。
+- **Line 139 / 第 139 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 140 / 第 140 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 141 / 第 141 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 142 / 第 142 行** — `  /// Kernel API parameters object`
+  - **EN**: Inline comment explaining intent: `Kernel API parameters object`.
+  - **CN**: 行内注释说明意图：`Kernel API parameters object`。
+- **Line 143 / 第 143 行** — `  Params params_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 144 / 第 144 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 145 / 第 145 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 146 / 第 146 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 147 / 第 147 行** — `  /// Access the Params structure`
+  - **EN**: Inline comment explaining intent: `Access the Params structure`.
+  - **CN**: 行内注释说明意图：`Access the Params structure`。
+- **Line 148 / 第 148 行** — `  Params const& params() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 149 / 第 149 行** — `    return params_;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 150 / 第 150 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 151 / 第 151 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 152 / 第 152 行** — `  /// Determines whether the conv can execute the given problem.`
+  - **EN**: Inline comment explaining intent: `Determines whether the conv can execute the given problem.`.
+  - **CN**: 行内注释说明意图：`Determines whether the conv can execute the given problem.`。
+- **Line 153 / 第 153 行** — `  static Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 154 / 第 154 行** — `  can_implement(Arguments const& args) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 155 / 第 155 行** — `    if (ConvKernel::can_implement(args)) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 156 / 第 156 行** — `      return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 157 / 第 157 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 158 / 第 158 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 159 / 第 159 行** — `      return Status::kInvalid;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 160 / 第 160 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 161 / 第 161 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 162 / 第 162 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 163 / 第 163 行** — `  /// Gets the workspace size`
+  - **EN**: Inline comment explaining intent: `Gets the workspace size`.
+  - **CN**: 行内注释说明意图：`Gets the workspace size`。
+- **Line 164 / 第 164 行** — `  static size_t`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 165 / 第 165 行** — `  get_workspace_size(Arguments const& args) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 166 / 第 166 行** — `    size_t workspace_bytes = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 167 / 第 167 行** — `    CUTLASS_TRACE_HOST("  workspace_bytes: " << workspace_bytes);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 168 / 第 168 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 169 / 第 169 行** — `    workspace_bytes += ConvKernel::get_workspace_size(args);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 170 / 第 170 行** — `    return workspace_bytes;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 171 / 第 171 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 172 / 第 172 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 173 / 第 173 行** — `  /// Computes the grid shape`
+  - **EN**: Inline comment explaining intent: `Computes the grid shape`.
+  - **CN**: 行内注释说明意图：`Computes the grid shape`。
+- **Line 174 / 第 174 行** — `  static dim3`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 175 / 第 175 行** — `  get_grid_shape(Arguments const& args, void* workspace = nullptr) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 176 / 第 176 行** — `    auto tmp_params = ConvKernel::to_underlying_arguments(args, workspace);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 177 / 第 177 行** — `    return ConvKernel::get_grid_shape(tmp_params);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 178 / 第 178 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 179 / 第 179 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 180 / 第 180 行** — `  /// Computes the grid shape`
+  - **EN**: Inline comment explaining intent: `Computes the grid shape`.
+  - **CN**: 行内注释说明意图：`Computes the grid shape`。
+- **Line 181 / 第 181 行** — `  static dim3`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 182 / 第 182 行** — `  get_grid_shape(Params const& params) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 183 / 第 183 行** — `    return ConvKernel::get_grid_shape(params);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 184 / 第 184 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 185 / 第 185 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 186 / 第 186 行** — `  /// Computes the maximum number of active blocks per multiprocessor`
+  - **EN**: Inline comment explaining intent: `Computes the maximum number of active blocks per multiprocessor`.
+  - **CN**: 行内注释说明意图：`Computes the maximum number of active blocks per multiprocessor`。
+- **Line 187 / 第 187 行** — `  static int maximum_active_blocks(int /* smem_capacity */ = -1) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 188 / 第 188 行** — `    CUTLASS_TRACE_HOST("ConvUniversal::maximum_active_blocks()");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 189 / 第 189 行** — `    int max_active_blocks = -1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 190 / 第 190 行** — `    int smem_size = ConvKernel::SharedStorageSize;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 191 / 第 191 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 192 / 第 192 行** — `    // first, account for dynamic smem capacity if needed`
+  - **EN**: Inline comment explaining intent: `first, account for dynamic smem capacity if needed`.
+  - **CN**: 行内注释说明意图：`first, account for dynamic smem capacity if needed`。
+- **Line 193 / 第 193 行** — `    cudaError_t result;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 194 / 第 194 行** — `    if (smem_size >= (48 << 10)) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 195 / 第 195 行** — `      CUTLASS_TRACE_HOST("  Setting smem size to " << smem_size);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 196 / 第 196 行** — `      result = cudaFuncSetAttribute(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 197 / 第 197 行** — `          device_kernel<ConvKernel>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 198 / 第 198 行** — `          cudaFuncAttributeMaxDynamicSharedMemorySize,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 199 / 第 199 行** — `          smem_size);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 200 / 第 200 行** — `      if (cudaSuccess != result) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 201 / 第 201 行** — `        result = cudaGetLastError(); // to clear the error bit`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 202 / 第 202 行** — `        CUTLASS_TRACE_HOST(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 203 / 第 203 行** — `          "  cudaFuncSetAttribute() returned error: "`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 204 / 第 204 行** — `          << cudaGetErrorString(result));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 205 / 第 205 行** — `        return -1;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 206 / 第 206 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 207 / 第 207 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 208 / 第 208 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 209 / 第 209 行** — `    // query occupancy after setting smem size`
+  - **EN**: Inline comment explaining intent: `query occupancy after setting smem size`.
+  - **CN**: 行内注释说明意图：`query occupancy after setting smem size`。
+- **Line 210 / 第 210 行** — `    result = cudaOccupancyMaxActiveBlocksPerMultiprocessor(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 211 / 第 211 行** — `        &max_active_blocks,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 212 / 第 212 行** — `        device_kernel<ConvKernel>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 213 / 第 213 行** — `        ConvKernel::MaxThreadsPerBlock,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 214 / 第 214 行** — `        smem_size);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 215 / 第 215 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 216 / 第 216 行** — `    if (cudaSuccess != result) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 217 / 第 217 行** — `      result = cudaGetLastError(); // to clear the error bit`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 218 / 第 218 行** — `      CUTLASS_TRACE_HOST(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 219 / 第 219 行** — `        "  cudaOccupancyMaxActiveBlocksPerMultiprocessor() returned error: "`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 220 / 第 220 行** — `        << cudaGetErrorString(result));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 221 / 第 221 行** — `      return -1;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 222 / 第 222 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 223 / 第 223 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 224 / 第 224 行** — `    CUTLASS_TRACE_HOST("  max_active_blocks: " << max_active_blocks);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 225 / 第 225 行** — `    return max_active_blocks;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 226 / 第 226 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 227 / 第 227 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 228 / 第 228 行** — `  /// Initializes conv state from arguments.`
+  - **EN**: Inline comment explaining intent: `Initializes conv state from arguments.`.
+  - **CN**: 行内注释说明意图：`Initializes conv state from arguments.`。
+- **Line 229 / 第 229 行** — `  Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 230 / 第 230 行** — `  initialize(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 231 / 第 231 行** — `    Arguments const& args,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 232 / 第 232 行** — `    void* workspace = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 233 / 第 233 行** — `    cudaStream_t stream = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 234 / 第 234 行** — `    CudaHostAdapter *cuda_adapter = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 235 / 第 235 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 236 / 第 236 行** — `    CUTLASS_TRACE_HOST("ConvUniversal::initialize() - workspace "`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 237 / 第 237 行** — `      << workspace << ", stream: " << (stream ? "non-null" : "null"));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 238 / 第 238 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 239 / 第 239 行** — `    // Initialize the workspace`
+  - **EN**: Inline comment explaining intent: `Initialize the workspace`.
+  - **CN**: 行内注释说明意图：`Initialize the workspace`。
+- **Line 240 / 第 240 行** — `    Status status = ConvKernel::initialize_workspace(args, workspace, stream, cuda_adapter);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 241 / 第 241 行** — `    if (status != Status::kSuccess) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 242 / 第 242 行** — `      return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 243 / 第 243 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 244 / 第 244 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 245 / 第 245 行** — `    // Initialize the Params structure`
+  - **EN**: Inline comment explaining intent: `Initialize the Params structure`.
+  - **CN**: 行内注释说明意图：`Initialize the Params structure`。
+- **Line 246 / 第 246 行** — `    params_ = ConvKernel::to_underlying_arguments(args, workspace);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 247 / 第 247 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 248 / 第 248 行** — `    // Don't set the function attributes - require the CudaHostAdapter to set it.`
+  - **EN**: Inline comment explaining intent: `Don't set the function attributes - require the CudaHostAdapter to set it.`.
+  - **CN**: 行内注释说明意图：`Don't set the function attributes - require the CudaHostAdapter to set it.`。
+- **Line 249 / 第 249 行** — `    if constexpr (kEnableCudaHostAdapter) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 250 / 第 250 行** — `      CUTLASS_ASSERT(cuda_adapter);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 251 / 第 251 行** — `      return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 252 / 第 252 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 253 / 第 253 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 254 / 第 254 行** — `      // account for dynamic smem capacity if needed`
+  - **EN**: Inline comment explaining intent: `account for dynamic smem capacity if needed`.
+  - **CN**: 行内注释说明意图：`account for dynamic smem capacity if needed`。
+- **Line 255 / 第 255 行** — `      int smem_size = ConvKernel::SharedStorageSize;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 256 / 第 256 行** — `      if (smem_size >= (48 << 10)) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 257 / 第 257 行** — `        CUTLASS_TRACE_HOST("  Setting smem size to " << smem_size);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 258 / 第 258 行** — `        cudaError_t result = cudaFuncSetAttribute(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 259 / 第 259 行** — `            device_kernel<ConvKernel>,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 260 / 第 260 行** — `            cudaFuncAttributeMaxDynamicSharedMemorySize,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 261 / 第 261 行** — `            smem_size);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 262 / 第 262 行** — `        if (cudaSuccess != result) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 263 / 第 263 行** — `          result = cudaGetLastError(); // to clear the error bit`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 264 / 第 264 行** — `          CUTLASS_TRACE_HOST("  cudaFuncSetAttribute() returned error: " << cudaGetErrorString(result));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 265 / 第 265 行** — `          return Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 266 / 第 266 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 267 / 第 267 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 268 / 第 268 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 269 / 第 269 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 270 / 第 270 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 271 / 第 271 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 272 / 第 272 行** — `  /// Update API is preserved in 3.0, but does not guarantee a lightweight update of params.`
+  - **EN**: Inline comment explaining intent: `Update API is preserved in 3.0, but does not guarantee a lightweight update of params.`.
+  - **CN**: 行内注释说明意图：`Update API is preserved in 3.0, but does not guarantee a lightweight update of params.`。
+- **Line 273 / 第 273 行** — `  Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 274 / 第 274 行** — `  update(Arguments const& args, void* workspace = nullptr) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 275 / 第 275 行** — `    CUTLASS_TRACE_HOST("ConvUniversal()::update() - workspace: " << workspace);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 276 / 第 276 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 277 / 第 277 行** — `    size_t workspace_bytes = get_workspace_size(args);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 278 / 第 278 行** — `    if (workspace_bytes > 0 && nullptr == workspace) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 279 / 第 279 行** — `      return Status::kErrorWorkspaceNull;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 280 / 第 280 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 281 / 第 281 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 282 / 第 282 行** — `    params_ = ConvKernel::to_underlying_arguments(args, workspace);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 283 / 第 283 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 284 / 第 284 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 285 / 第 285 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 286 / 第 286 行** — `  /// Primary run() entry point API that is static allowing users to create and manage their own params.`
+  - **EN**: Inline comment explaining intent: `Primary run() entry point API that is static allowing users to create and manage their own param...`.
+  - **CN**: 行内注释说明意图：`Primary run() entry point API that is static allowing users to create and manage their own param...`。
+- **Line 287 / 第 287 行** — `  /// Supplied params struct must be construct by calling ConvKernel::to_underling_arguments()`
+  - **EN**: Inline comment explaining intent: `Supplied params struct must be construct by calling ConvKernel::to_underling_arguments()`.
+  - **CN**: 行内注释说明意图：`Supplied params struct must be construct by calling ConvKernel::to_underling_arguments()`。
+- **Line 288 / 第 288 行** — `  static Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 289 / 第 289 行** — `  run(Params& params, cudaStream_t stream = nullptr, CudaHostAdapter *cuda_adapter = nullptr, int32_t kernel_index = 0) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 290 / 第 290 行** — `    CUTLASS_TRACE_HOST("ConvUniversal::run()");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 291 / 第 291 行** — `    dim3 const block = ConvKernel::get_block_shape();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 292 / 第 292 行** — `    dim3 const grid = get_grid_shape(params);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 293 / 第 293 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 294 / 第 294 行** — `    // configure smem size and carveout`
+  - **EN**: Inline comment explaining intent: `configure smem size and carveout`.
+  - **CN**: 行内注释说明意图：`configure smem size and carveout`。
+- **Line 295 / 第 295 行** — `    int smem_size = ConvKernel::SharedStorageSize;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 296 / 第 296 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 297 / 第 297 行** — `    Status launch_result;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 298 / 第 298 行** — `    // Use extended launch API only for mainloops that use it`
+  - **EN**: Inline comment explaining intent: `Use extended launch API only for mainloops that use it`.
+  - **CN**: 行内注释说明意图：`Use extended launch API only for mainloops that use it`。
+- **Line 299 / 第 299 行** — `    if constexpr (ConvKernel::ArchTag::kMinComputeCapability >= 90) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 300 / 第 300 行** — `      [[maybe_unused]] constexpr bool is_static_1x1x1 =`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 301 / 第 301 行** — `        cute::is_static_v<typename ConvKernel::DispatchPolicy::ClusterShape> and`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 302 / 第 302 行** — `        cute::size(typename ConvKernel::DispatchPolicy::ClusterShape{}) == 1;`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 303 / 第 303 行** — `      dim3 cluster(cute::size<0>(typename ConvKernel::DispatchPolicy::ClusterShape{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 304 / 第 304 行** — `                   cute::size<1>(typename ConvKernel::DispatchPolicy::ClusterShape{}),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 305 / 第 305 行** — `                   cute::size<2>(typename ConvKernel::DispatchPolicy::ClusterShape{}));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 306 / 第 306 行** — `      // Dynamic cluster support`
+  - **EN**: Inline comment explaining intent: `Dynamic cluster support`.
+  - **CN**: 行内注释说明意图：`Dynamic cluster support`。
+- **Line 307 / 第 307 行** — `      [[maybe_unused]] dim3 fallback_cluster = dim3{0,0,0};`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 308 / 第 308 行** — `      if constexpr (ConvKernel::ArchTag::kMinComputeCapability == 100 ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 309 / 第 309 行** — `                    ConvKernel::ArchTag::kMinComputeCapability == 101) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 310 / 第 310 行** — `        if constexpr (!cute::is_static_v<typename ConvKernel::DispatchPolicy::ClusterShape>) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 311 / 第 311 行** — `          fallback_cluster = params.hw_info.cluster_shape_fallback;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 312 / 第 312 行** — `          cluster = params.hw_info.cluster_shape;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 313 / 第 313 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 314 / 第 314 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 315 / 第 315 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 316 / 第 316 行** — `      void* kernel_params[] = {&params};`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 317 / 第 317 行** — `      if constexpr (kEnableCudaHostAdapter) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 318 / 第 318 行** — `        //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 319 / 第 319 行** — `        // Use the cuda host adapter`
+  - **EN**: Inline comment explaining intent: `Use the cuda host adapter`.
+  - **CN**: 行内注释说明意图：`Use the cuda host adapter`。
+- **Line 320 / 第 320 行** — `        //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 321 / 第 321 行** — `        CUTLASS_ASSERT(cuda_adapter);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 322 / 第 322 行** — `        if (cuda_adapter) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 323 / 第 323 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 324 / 第 324 行** — `          launch_result = cuda_adapter->launch(grid,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 325 / 第 325 行** — `                                               cluster, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 326 / 第 326 行** — `                                               fallback_cluster,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 327 / 第 327 行** — `                                               block, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 328 / 第 328 行** — `                                               smem_size, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 329 / 第 329 行** — `                                               stream, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 330 / 第 330 行** — `                                               kernel_params,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 331 / 第 331 行** — `                                               kernel_index);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 332 / 第 332 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 333 / 第 333 行** — `        else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 334 / 第 334 行** — `          return Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 335 / 第 335 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 336 / 第 336 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 337 / 第 337 行** — `      else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 338 / 第 338 行** — `        CUTLASS_ASSERT(cuda_adapter == nullptr);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 339 / 第 339 行** — `        void const* kernel = (void const*) device_kernel<ConvKernel>;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 340 / 第 340 行** — `        if constexpr (ConvKernel::ArchTag::kMinComputeCapability == 90`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 341 / 第 341 行** — `                        || ConvKernel::ArchTag::kMinComputeCapability == 100 `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 342 / 第 342 行** — `                     ) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 343 / 第 343 行** — `          if constexpr (is_static_1x1x1) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 344 / 第 344 行** — `            device_kernel<ConvKernel><<<grid, block, smem_size, stream>>>(params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 345 / 第 345 行** — `            launch_result = Status::kSuccess;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 346 / 第 346 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 347 / 第 347 行** — `          else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 348 / 第 348 行** — `            launch_result = ClusterLauncher::launch(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 349 / 第 349 行** — `                grid, cluster, block, smem_size, stream, kernel, kernel_params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 350 / 第 350 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 351 / 第 351 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 352 / 第 352 行** — `        else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 353 / 第 353 行** — `          if constexpr (ConvKernel::ArchTag::kMinComputeCapability == 100 ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 354 / 第 354 行** — `                        ConvKernel::ArchTag::kMinComputeCapability == 101`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 355 / 第 355 行** — `                        ) { `
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 356 / 第 356 行** — `            launch_result = ClusterLauncher::launch_with_fallback_cluster(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 357 / 第 357 行** — `              grid,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 358 / 第 358 行** — `              cluster,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 359 / 第 359 行** — `              fallback_cluster,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 360 / 第 360 行** — `              block,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 361 / 第 361 行** — `              smem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 362 / 第 362 行** — `              stream,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 363 / 第 363 行** — `              kernel,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 364 / 第 364 行** — `              kernel_params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 365 / 第 365 行** — `          }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 366 / 第 366 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 367 / 第 367 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 368 / 第 368 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 369 / 第 369 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 370 / 第 370 行** — `      launch_result = Status::kSuccess;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 371 / 第 371 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 372 / 第 372 行** — `      if constexpr (kEnableCudaHostAdapter) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 373 / 第 373 行** — `        CUTLASS_ASSERT(cuda_adapter);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 374 / 第 374 行** — `        if (cuda_adapter) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 375 / 第 375 行** — `          void* kernel_params[] = {&params};`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 376 / 第 376 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 377 / 第 377 行** — `          launch_result = cuda_adapter->launch(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 378 / 第 378 行** — `              grid, block, smem_size, stream, kernel_params, 0`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 379 / 第 379 行** — `              );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 380 / 第 380 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 381 / 第 381 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 382 / 第 382 行** — `        else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 383 / 第 383 行** — `          return Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 384 / 第 384 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 385 / 第 385 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 386 / 第 386 行** — `      else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 387 / 第 387 行** — `        CUTLASS_ASSERT(cuda_adapter == nullptr);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 388 / 第 388 行** — `        device_kernel<ConvKernel><<<grid, block, smem_size, stream>>>(params);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 389 / 第 389 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 390 / 第 390 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 391 / 第 391 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 392 / 第 392 行** — `    cudaError_t result = cudaGetLastError();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 393 / 第 393 行** — `    if (cudaSuccess == result && Status::kSuccess == launch_result) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 394 / 第 394 行** — `      return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 395 / 第 395 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 396 / 第 396 行** — `    else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 397 / 第 397 行** — `      CUTLASS_TRACE_HOST("  Kernel launch failed. Reason: " << result);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 398 / 第 398 行** — `      return Status::kErrorInternal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 399 / 第 399 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 400 / 第 400 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 401 / 第 401 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 402 / 第 402 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 403 / 第 403 行** — `  // Non-static launch overloads that first create and set the internal params struct of this kernel handle.`
+  - **EN**: Inline comment explaining intent: `Non-static launch overloads that first create and set the internal params struct of this kernel ...`.
+  - **CN**: 行内注释说明意图：`Non-static launch overloads that first create and set the internal params struct of this kernel ...`。
+- **Line 404 / 第 404 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 405 / 第 405 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 406 / 第 406 行** — `  /// Launches the kernel after first constructing Params internal state from supplied arguments.`
+  - **EN**: Inline comment explaining intent: `Launches the kernel after first constructing Params internal state from supplied arguments.`.
+  - **CN**: 行内注释说明意图：`Launches the kernel after first constructing Params internal state from supplied arguments.`。
+- **Line 407 / 第 407 行** — `  Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 408 / 第 408 行** — `  run(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 409 / 第 409 行** — `    Arguments const& args,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 410 / 第 410 行** — `    void* workspace = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 411 / 第 411 行** — `    cudaStream_t stream = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 412 / 第 412 行** — `    CudaHostAdapter *cuda_adapter = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 413 / 第 413 行** — `    int32_t kernel_index = 0`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 414 / 第 414 行** — `  ) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 415 / 第 415 行** — `    Status status = initialize(args, workspace, stream, cuda_adapter);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 416 / 第 416 行** — `    if (Status::kSuccess == status) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 417 / 第 417 行** — `      status = run(params_, stream, cuda_adapter, kernel_index);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 418 / 第 418 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 419 / 第 419 行** — `    return status;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 420 / 第 420 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 421 / 第 421 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 422 / 第 422 行** — `  /// Launches the kernel after first constructing Params internal state from supplied arguments.`
+  - **EN**: Inline comment explaining intent: `Launches the kernel after first constructing Params internal state from supplied arguments.`.
+  - **CN**: 行内注释说明意图：`Launches the kernel after first constructing Params internal state from supplied arguments.`。
+- **Line 423 / 第 423 行** — `  Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 424 / 第 424 行** — `  operator()(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 425 / 第 425 行** — `    Arguments const& args,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 426 / 第 426 行** — `    void* workspace = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 427 / 第 427 行** — `    cudaStream_t stream = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 428 / 第 428 行** — `    CudaHostAdapter *cuda_adapter = nullptr) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 429 / 第 429 行** — `    return run(args, workspace, stream, cuda_adapter);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 430 / 第 430 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 431 / 第 431 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 432 / 第 432 行** — `  /// Overload that allows a user to re-launch the same kernel without updating internal params struct.`
+  - **EN**: Inline comment explaining intent: `Overload that allows a user to re-launch the same kernel without updating internal params struct...`.
+  - **CN**: 行内注释说明意图：`Overload that allows a user to re-launch the same kernel without updating internal params struct...`。
+- **Line 433 / 第 433 行** — `  Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 434 / 第 434 行** — `  run(cudaStream_t stream = nullptr) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 435 / 第 435 行** — `    return run(params_, stream);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 436 / 第 436 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 437 / 第 437 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 438 / 第 438 行** — `  /// Overload that allows a user to re-launch the same kernel without updating internal params struct.`
+  - **EN**: Inline comment explaining intent: `Overload that allows a user to re-launch the same kernel without updating internal params struct...`.
+  - **CN**: 行内注释说明意图：`Overload that allows a user to re-launch the same kernel without updating internal params struct...`。
+- **Line 439 / 第 439 行** — `  Status`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 440 / 第 440 行** — `  operator()(cudaStream_t stream = nullptr) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 441 / 第 441 行** — `    return run(params_, stream);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 442 / 第 442 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 443 / 第 443 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 444 / 第 444 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 445 / 第 445 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 446 / 第 446 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 447 / 第 447 行** — `} // namespace cutlass::conv::device`
+  - **EN**: Closes namespace `cutlass::conv::device`.
+  - **CN**: 关闭命名空间 `cutlass::conv::device`。
+- **Line 448 / 第 448 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 449 / 第 449 行** — `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Architecture specialization / 架构特化
+- Threadblock structure / Threadblock 结构
+- Epilogues / 尾处理
+
+## Dependencies / 依赖
+- `cutlass/arch/mma.h` — Architecture-specific support `cutlass/arch/mma.h` / 架构特化支持 `cutlass/arch/mma.h`
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/trace.h` — CUTLASS dependency `cutlass/trace.h` / CUTLASS 依赖 `cutlass/trace.h`
+- `cutlass/cluster_launch.hpp` — CUTLASS dependency `cutlass/cluster_launch.hpp` / CUTLASS 依赖 `cutlass/cluster_launch.hpp`
+- `cutlass/device_kernel.h` — CUTLASS dependency `cutlass/device_kernel.h` / CUTLASS 依赖 `cutlass/device_kernel.h`
+- `cutlass/conv/kernel/conv_universal.hpp` — CUTLASS convolution component `cutlass/conv/kernel/conv_universal.hpp` / CUTLASS 卷积组件 `cutlass/conv/kernel/conv_universal.hpp`
+- `cutlass/gemm/gemm.h` — CUTLASS GEMM primitive `cutlass/gemm/gemm.h` / CUTLASS GEMM 原语 `cutlass/gemm/gemm.h`
+- `cutlass/detail/layout.hpp` — Internal helper `cutlass/detail/layout.hpp` / 内部辅助头 `cutlass/detail/layout.hpp`
+- `cutlass/cuda_host_adapter.hpp` — CUTLASS dependency `cutlass/cuda_host_adapter.hpp` / CUTLASS 依赖 `cutlass/cuda_host_adapter.hpp`

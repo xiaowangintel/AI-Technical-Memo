@@ -1,0 +1,310 @@
+# jit_arg_adapters.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/runtime/jit_arg_adapters.py`
+
+## Purpose / 作用
+- EN: This module provides runtime utilities for JIT argument conversion in DSL.
+- CN: 该模块的文档字符串将其描述为：This module provides runtime utilities for JIT argument conversion in DSL.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides runtime utilities for JIT argument conversion in DSL.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from functools import wraps` — **EN:** Imports wraps from `functools`. **CN:** 从 `functools` 导入 wraps。
+- **L17** `from typing import Callable, Any, Optional, get_origin` — **EN:** Imports Callable, Any, Optional, get_origin from `typing`. **CN:** 从 `typing` 导入 Callable, Any, Optional, get_origin。
+- **L18** `from inspect import Parameter` — **EN:** Imports Parameter from `inspect`. **CN:** 从 `inspect` 导入 Parameter。
+- **L19** `from dataclasses import is_dataclass, fields` — **EN:** Imports is_dataclass, fields from `dataclasses`. **CN:** 从 `dataclasses` 导入 is_dataclass, fields。
+- **L20** `from itertools import chain` — **EN:** Imports chain from `itertools`. **CN:** 从 `itertools` 导入 chain。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `# Local modules imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L24** `from ..common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `..common`. **CN:** 从 `..common` 导入 DSLRuntimeError。
+- **L25** `from ..typing import (` — **EN:** Imports Constexpr, Int32, Float32, Boolean, NumericMeta, cast, ... (+4 more) from `..typing`. **CN:** 从 `..typing` 导入 Constexpr, Int32, Float32, Boolean, NumericMeta, cast, ... (+4 more)。
+- **L26** `    Constexpr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    NumericMeta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    cast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    get_c_pointers,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    get_mlir_types,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    implements_jit_argument,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    implements_dynamic_expression,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `from ..utils.tree_utils import is_constexpr_field` — **EN:** Imports is_constexpr_field from `..utils.tree_utils`. **CN:** 从 `..utils.tree_utils` 导入 is_constexpr_field。
+- **L38** `from ..._mlir import ir` — **EN:** Imports ir from `..._mlir`. **CN:** 从 `..._mlir` 导入 ir。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `def is_arg_annotation_constexpr(` — **EN:** Defines function `is_arg_annotation_constexpr`. **CN:** 定义函数 `is_arg_annotation_constexpr`。
+- **L42** `    arg_annotation: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L43** `    arg_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L44** `    arg_index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    owning_func: Optional[Callable[..., Any]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L47** `    """` — **EN:** Starts the docstring for the function `is_arg_annotation_constexpr`. **CN:** 开始说明 function `is_arg_annotation_constexpr` 的文档字符串。
+- **L48** `    Check if the argument annotation is a constexpr.` — **EN:** Continues the docstring for the function `is_arg_annotation_constexpr`. **CN:** 继续说明 function `is_arg_annotation_constexpr` 的文档字符串。
+- **L49** `    """` — **EN:** Ends the docstring for the function `is_arg_annotation_constexpr`. **CN:** 结束说明 function `is_arg_annotation_constexpr` 的文档字符串。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `    def _is_reserved_python_func_arg(` — **EN:** Defines function `_is_reserved_python_func_arg`. **CN:** 定义函数 `_is_reserved_python_func_arg`。
+- **L52** `        arg_index: int, arg_name: str, func: Optional[Callable[..., Any]]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L53** `    ) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L54** `        """` — **EN:** Starts the docstring for the function `_is_reserved_python_func_arg`. **CN:** 开始说明 function `_is_reserved_python_func_arg` 的文档字符串。
+- **L55** `        Check if the argument is a reserved python function argument.` — **EN:** Continues the docstring for the function `_is_reserved_python_func_arg`. **CN:** 继续说明 function `_is_reserved_python_func_arg` 的文档字符串。
+- **L56** `        """` — **EN:** Ends the docstring for the function `_is_reserved_python_func_arg`. **CN:** 结束说明 function `_is_reserved_python_func_arg` 的文档字符串。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `        if arg_index != 0:` — **EN:** Starts a conditional branch guarded by `arg_index != 0`. **CN:** 开始一个由 `arg_index != 0` 控制的条件分支。
+- **L59** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `        if arg_name == "self":` — **EN:** Starts a conditional branch guarded by `arg_name == 'self'`. **CN:** 开始一个由 `arg_name == 'self'` 控制的条件分支。
+- **L62** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `        if func:` — **EN:** Starts a conditional branch guarded by `func`. **CN:** 开始一个由 `func` 控制的条件分支。
+- **L65** `            is_classmethod = isinstance(func, classmethod) or (` — **EN:** Assigns a value to is_classmethod. **CN:** 将一个值赋给 is_classmethod。
+- **L66** `                hasattr(func, "__func__") and isinstance(func.__func__, classmethod)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `            return arg_name == "cls" and is_classmethod` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** `        _is_reserved_python_func_arg(arg_index, arg_name, owning_func)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `        or (isinstance(arg_annotation, type) and issubclass(arg_annotation, Constexpr))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `        or (get_origin(arg_annotation) is Constexpr)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `def is_argument_constexpr(` — **EN:** Defines function `is_argument_constexpr`. **CN:** 定义函数 `is_argument_constexpr`。
+- **L79** `    arg: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L80** `    arg_annotation: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L81** `    arg_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L82** `    arg_index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L83** `    owning_func: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L84** `) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L85** `    """` — **EN:** Starts the docstring for the function `is_argument_constexpr`. **CN:** 开始说明 function `is_argument_constexpr` 的文档字符串。
+- **L86** `    Check if the argument is a constexpr.` — **EN:** Continues the docstring for the function `is_argument_constexpr`. **CN:** 继续说明 function `is_argument_constexpr` 的文档字符串。
+- **L87** `    """` — **EN:** Ends the docstring for the function `is_argument_constexpr`. **CN:** 结束说明 function `is_argument_constexpr` 的文档字符串。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    def _is_type_argument(arg: Any, arg_annotation: Any) -> bool:` — **EN:** Defines function `_is_type_argument`. **CN:** 定义函数 `_is_type_argument`。
+- **L90** `        """` — **EN:** Starts the docstring for the function `_is_type_argument`. **CN:** 开始说明 function `_is_type_argument` 的文档字符串。
+- **L91** `        Check if the argument is a type argument like Type[X]` — **EN:** Continues the docstring for the function `_is_type_argument`. **CN:** 继续说明 function `_is_type_argument` 的文档字符串。
+- **L92** `        """` — **EN:** Ends the docstring for the function `_is_type_argument`. **CN:** 结束说明 function `_is_type_argument` 的文档字符串。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `        return isinstance(arg, type) and (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L95** `            arg_annotation is Parameter.empty or get_origin(arg_annotation) is type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** `        is_arg_annotation_constexpr(arg_annotation, arg_name, arg_index, owning_func)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `        or _is_type_argument(arg, arg_annotation)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `        or arg is None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `class JitArgAdapterRegistry:` — **EN:** Defines class `JitArgAdapterRegistry`. **CN:** 定义类 `JitArgAdapterRegistry`。
+- **L106** `    """` — **EN:** Starts the docstring for the class `JitArgAdapterRegistry`. **CN:** 开始说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L107** `    A registry to keep track of the JIT argument adapters.` — **EN:** Continues the docstring for the class `JitArgAdapterRegistry`. **CN:** 继续说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    An adapter is a callable that converts a Python type to a type with following protocols supported:` — **EN:** Continues the docstring for the class `JitArgAdapterRegistry`. **CN:** 继续说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L110** `    - JitArgument` — **EN:** Continues the docstring for the class `JitArgAdapterRegistry`. **CN:** 继续说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L111** `    - DynamicExpression` — **EN:** Continues the docstring for the class `JitArgAdapterRegistry`. **CN:** 继续说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L112** `    The converted type can then be further processed by DSL to generate arguments for JIT functions.` — **EN:** Continues the docstring for the class `JitArgAdapterRegistry`. **CN:** 继续说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L113** `    """` — **EN:** Ends the docstring for the class `JitArgAdapterRegistry`. **CN:** 结束说明 class `JitArgAdapterRegistry` 的文档字符串。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `    # A dictionary with key=type and value=callable` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `    jit_arg_adapter_registry: dict[type, Any] = {}` — **EN:** Assigns a typed value to jit_arg_adapter_registry. **CN:** 为 jit_arg_adapter_registry 赋予带类型标注的值。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    # Default adapters for arguments we don't know type names beforehand` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L119** `    # Default dataclass adapter` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L120** `    default_dataclass_adapter: Callable[[object], Any] | None = None` — **EN:** Assigns a typed value to default_dataclass_adapter. **CN:** 为 default_dataclass_adapter 赋予带类型标注的值。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L123** `    def register_jit_arg_adapter(cls, *dargs: Any, **dkwargs: Any) -> Any:` — **EN:** Defines function `register_jit_arg_adapter`. **CN:** 定义函数 `register_jit_arg_adapter`。
+- **L124** `        """` — **EN:** Starts the docstring for the function `register_jit_arg_adapter`. **CN:** 开始说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L125** `        Register a JIT argument adapter callable` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `        This can be used as a decorator on any callable like:` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `        @register_jit_arg_adapter(my_py_type)` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L130** `        def my_adapter_for_my_py_type(arg):` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L131** `            ...` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `        @register_jit_arg_adapter(my_py_type)` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L134** `        class MyAdapterForMyPythonType:` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L135** `            ...` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `        The adapters are registered per type. If a type is already registerd, an error will be raised.` — **EN:** Continues the docstring for the function `register_jit_arg_adapter`. **CN:** 继续说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L138** `        """` — **EN:** Ends the docstring for the function `register_jit_arg_adapter`. **CN:** 结束说明 function `register_jit_arg_adapter` 的文档字符串。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `        def decorator(*dargs: Any, **dkwargs: Any) -> Any:` — **EN:** Defines function `decorator`. **CN:** 定义函数 `decorator`。
+- **L141** `            darg_python_ty = dargs[0]` — **EN:** Assigns a value to darg_python_ty. **CN:** 将一个值赋给 darg_python_ty。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `            @wraps(darg_python_ty)` — **EN:** Applies decorator `wraps(darg_python_ty)` to the following definition. **CN:** 将装饰器 `wraps(darg_python_ty)` 应用于后面的定义。
+- **L144** `            def wrapper(*args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `wrapper`. **CN:** 定义函数 `wrapper`。
+- **L145** `                if len(args) != 1 or not callable(args[0]):` — **EN:** Starts a conditional branch guarded by `len(args) != 1 or not callable(args[0])`. **CN:** 开始一个由 `len(args) != 1 or not callable(args[0])` 控制的条件分支。
+- **L146** `                    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L147** `                        "a callable must be provided for registering JIT argument adapter"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `                adapter = args[0]` — **EN:** Assigns a value to adapter. **CN:** 将一个值赋给 adapter。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `                if darg_python_ty in cls.jit_arg_adapter_registry:` — **EN:** Starts a conditional branch guarded by `darg_python_ty in cls.jit_arg_adapter_registry`. **CN:** 开始一个由 `darg_python_ty in cls.jit_arg_adapter_registry` 控制的条件分支。
+- **L152** `                    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L153** `                        f"JIT argument adapter for {darg_python_ty} is already registered!",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `                        context={` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `                            "Registered adapter": cls.jit_arg_adapter_registry[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `                                darg_python_ty` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `                            ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `                            "Adapter to be registered": adapter,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `                        },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `                cls.jit_arg_adapter_registry[darg_python_ty] = adapter` — **EN:** Assigns a value to cls.jit_arg_adapter_registry[darg_python_ty]. **CN:** 将一个值赋给 cls.jit_arg_adapter_registry[darg_python_ty]。
+- **L162** `                return adapter` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `            return wrapper` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `        if len(dargs) > 0:` — **EN:** Starts a conditional branch guarded by `len(dargs) > 0`. **CN:** 开始一个由 `len(dargs) > 0` 控制的条件分支。
+- **L167** `            return decorator(*dargs, **dkwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L169** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L170** `                "a Python type must be provided for registering JIT argument adapter"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L174** `    def get_registered_adapter(cls, arg: object) -> Any:` — **EN:** Defines function `get_registered_adapter`. **CN:** 定义函数 `get_registered_adapter`。
+- **L175** `        """` — **EN:** Starts the docstring for the function `get_registered_adapter`. **CN:** 开始说明 function `get_registered_adapter` 的文档字符串。
+- **L176** `        Get the registered JIT argument adapter for the given argument.` — **EN:** Continues the docstring for the function `get_registered_adapter`. **CN:** 继续说明 function `get_registered_adapter` 的文档字符串。
+- **L177** `        """` — **EN:** Ends the docstring for the function `get_registered_adapter`. **CN:** 结束说明 function `get_registered_adapter` 的文档字符串。
+- **L178** `        adapter = cls.jit_arg_adapter_registry.get(type(arg), None)` — **EN:** Assigns a value to adapter. **CN:** 将一个值赋给 adapter。
+- **L179** `        if adapter is None:` — **EN:** Starts a conditional branch guarded by `adapter is None`. **CN:** 开始一个由 `adapter is None` 控制的条件分支。
+- **L180** `            if (cls.default_dataclass_adapter` — **EN:** Starts a conditional branch guarded by `cls.default_dataclass_adapter and (not implements_jit_arg...`. **CN:** 开始一个由 `cls.default_dataclass_adapter and (not implements_jit_arg...` 控制的条件分支。
+- **L181** `                and not implements_jit_argument(arg, partial=True)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L182** `                and not implements_dynamic_expression(arg, partial=True)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L183** `                and is_dataclass(arg)` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L184** `                and len(vars(arg)) == len(fields(arg))):  # no extra/missing instance attrs` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L185** `                adapter = cls.default_dataclass_adapter` — **EN:** Assigns a value to adapter. **CN:** 将一个值赋给 adapter。
+- **L186** `        return adapter` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L189** `    def set_default_dataclass_adapter(cls, adapter: Callable[[object], Any]) -> None:` — **EN:** Defines function `set_default_dataclass_adapter`. **CN:** 定义函数 `set_default_dataclass_adapter`。
+- **L190** `        """` — **EN:** Starts the docstring for the function `set_default_dataclass_adapter`. **CN:** 开始说明 function `set_default_dataclass_adapter` 的文档字符串。
+- **L191** `        Set up a default dataclass adapter. If any user defined dataclass implements the JitArgument/DynamicExpression protocol,` — **EN:** Continues the docstring for the function `set_default_dataclass_adapter`. **CN:** 继续说明 function `set_default_dataclass_adapter` 的文档字符串。
+- **L192** `        those impls will be honored instead of this default adapter.` — **EN:** Continues the docstring for the function `set_default_dataclass_adapter`. **CN:** 继续说明 function `set_default_dataclass_adapter` 的文档字符串。
+- **L193** `        """` — **EN:** Ends the docstring for the function `set_default_dataclass_adapter`. **CN:** 结束说明 function `set_default_dataclass_adapter` 的文档字符串。
+- **L194** `        cls.default_dataclass_adapter = adapter` — **EN:** Assigns a value to cls.default_dataclass_adapter. **CN:** 将一个值赋给 cls.default_dataclass_adapter。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `class DefaultDataclassAdapter:` — **EN:** Defines class `DefaultDataclassAdapter`. **CN:** 定义类 `DefaultDataclassAdapter`。
+- **L198** `    """` — **EN:** Starts the docstring for the class `DefaultDataclassAdapter`. **CN:** 开始说明 class `DefaultDataclassAdapter` 的文档字符串。
+- **L199** `    Adapter for dataclass typed JIT arguments.` — **EN:** Continues the docstring for the class `DefaultDataclassAdapter`. **CN:** 继续说明 class `DefaultDataclassAdapter` 的文档字符串。
+- **L200** `    """` — **EN:** Ends the docstring for the class `DefaultDataclassAdapter`. **CN:** 结束说明 class `DefaultDataclassAdapter` 的文档字符串。
+- **L201** `    def __init__(self, arg: object) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L202** `        self._ir_fields: dict[str, object] = {}` — **EN:** Assigns a typed value to self._ir_fields. **CN:** 为 self._ir_fields 赋予带类型标注的值。
+- **L203** `        self._ir_fields_len: dict[str, int] = {}` — **EN:** Assigns a typed value to self._ir_fields_len. **CN:** 为 self._ir_fields_len 赋予带类型标注的值。
+- **L204** `        self._arg = arg` — **EN:** Assigns a value to self._arg. **CN:** 将一个值赋给 self._arg。
+- **L205** `        for f in fields(arg): # type: ignore[arg-type]` — **EN:** Starts a loop assigning items from `fields(arg)` to `f`. **CN:** 开始一个循环，将 `fields(arg)` 的元素赋给 `f`。
+- **L206** `            arg_field = getattr(arg, f.name)` — **EN:** Assigns a value to arg_field. **CN:** 将一个值赋给 arg_field。
+- **L207** `            if not is_constexpr_field(f):` — **EN:** Starts a conditional branch guarded by `not is_constexpr_field(f)`. **CN:** 开始一个由 `not is_constexpr_field(f)` 控制的条件分支。
+- **L208** `                if isinstance(f.type, NumericMeta) and not isinstance(arg_field, f.type):` — **EN:** Starts a conditional branch guarded by `isinstance(f.type, NumericMeta) and (not isinstance(arg_f...`. **CN:** 开始一个由 `isinstance(f.type, NumericMeta) and (not isinstance(arg_f...` 控制的条件分支。
+- **L209** `                    self._ir_fields[f.name] = cast(arg_field, f.type) # type: ignore[arg-type]` — **EN:** Assigns a value to self._ir_fields[f.name]. **CN:** 将一个值赋给 self._ir_fields[f.name]。
+- **L210** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L211** `                    # Allow the nested fields to be adapted` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L212** `                    arg_adapter = JitArgAdapterRegistry.get_registered_adapter(arg_field)` — **EN:** Assigns a value to arg_adapter. **CN:** 将一个值赋给 arg_adapter。
+- **L213** `                    if arg_adapter is not None:` — **EN:** Starts a conditional branch guarded by `arg_adapter is not None`. **CN:** 开始一个由 `arg_adapter is not None` 控制的条件分支。
+- **L214** `                        self._ir_fields[f.name] = arg_adapter(arg_field)` — **EN:** Assigns a value to self._ir_fields[f.name]. **CN:** 将一个值赋给 self._ir_fields[f.name]。
+- **L215** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L216** `                        self._ir_fields[f.name] = arg_field` — **EN:** Assigns a value to self._ir_fields[f.name]. **CN:** 将一个值赋给 self._ir_fields[f.name]。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `    def __c_pointers__(self) -> list[Any]:` — **EN:** Defines function `__c_pointers__`. **CN:** 定义函数 `__c_pointers__`。
+- **L219** `        return list(chain.from_iterable(get_c_pointers(v) for v in self._ir_fields.values()))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    def __get_mlir_types__(self) -> list[Any]:` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L222** `        ir_types = []` — **EN:** Assigns a value to ir_types. **CN:** 将一个值赋给 ir_types。
+- **L223** `        for f, v in self._ir_fields.items():` — **EN:** Starts a loop assigning items from `self._ir_fields.items()` to `(f, v)`. **CN:** 开始一个循环，将 `self._ir_fields.items()` 的元素赋给 `(f, v)`。
+- **L224** `            types = get_mlir_types(v)` — **EN:** Assigns a value to types. **CN:** 将一个值赋给 types。
+- **L225** `            self._ir_fields_len[f] = len(types)` — **EN:** Assigns a value to self._ir_fields_len[f]. **CN:** 将一个值赋给 self._ir_fields_len[f]。
+- **L226** `            ir_types.extend(types)` — **EN:** Invokes `ir_types.extend` as a standalone call. **CN:** 以独立语句方式调用 `ir_types.extend`。
+- **L227** `        return ir_types` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `    def __new_from_mlir_values__(self, values: list[Any]) -> Any:` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L230** `        from ..dsl import new_from_mlir_values  # deferred to avoid circular import` — **EN:** Imports new_from_mlir_values from `..dsl`. **CN:** 从 `..dsl` 导入 new_from_mlir_values。
+- **L231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L232** `        kwargs = {}` — **EN:** Assigns a value to kwargs. **CN:** 将一个值赋给 kwargs。
+- **L233** `        idx = 0` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L234** `        for f in fields(self._arg): # type: ignore[arg-type]` — **EN:** Starts a loop assigning items from `fields(self._arg)` to `f`. **CN:** 开始一个循环，将 `fields(self._arg)` 的元素赋给 `f`。
+- **L235** `            if is_constexpr_field(f):` — **EN:** Starts a conditional branch guarded by `is_constexpr_field(f)`. **CN:** 开始一个由 `is_constexpr_field(f)` 控制的条件分支。
+- **L236** `                kwargs[f.name] = getattr(self._arg, f.name)` — **EN:** Assigns a value to kwargs[f.name]. **CN:** 将一个值赋给 kwargs[f.name]。
+- **L237** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L238** `                kwargs[f.name] = new_from_mlir_values(self._ir_fields[f.name], values[idx : idx + self._ir_fields_len[f.name]])` — **EN:** Assigns a value to kwargs[f.name]. **CN:** 将一个值赋给 kwargs[f.name]。
+- **L239** `                idx += self._ir_fields_len[f.name]` — **EN:** Updates idx in place. **CN:** 原地更新 idx。
+- **L240** `        return type(self._arg)(**kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L243** `        from ..dsl import extract_mlir_values  # deferred to avoid circular import` — **EN:** Imports extract_mlir_values from `..dsl`. **CN:** 从 `..dsl` 导入 extract_mlir_values。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `        return list(chain.from_iterable(extract_mlir_values(v) for v in self._ir_fields.values()))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `JitArgAdapterRegistry.set_default_dataclass_adapter(DefaultDataclassAdapter)` — **EN:** Invokes `JitArgAdapterRegistry.set_default_dataclass_adapter` as a standalone call. **CN:** 以独立语句方式调用 `JitArgAdapterRegistry.set_default_dataclass_adapter`。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L252** `# JIT Argument Adapters` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L253** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `@JitArgAdapterRegistry.register_jit_arg_adapter(int)` — **EN:** Applies decorator `JitArgAdapterRegistry.register_jit_arg_adapter(int)` to the following definition. **CN:** 将装饰器 `JitArgAdapterRegistry.register_jit_arg_adapter(int)` 应用于后面的定义。
+- **L257** `@JitArgAdapterRegistry.register_jit_arg_adapter(float)` — **EN:** Applies decorator `JitArgAdapterRegistry.register_jit_arg_adapter(float)` to the following definition. **CN:** 将装饰器 `JitArgAdapterRegistry.register_jit_arg_adapter(float)` 应用于后面的定义。
+- **L258** `@JitArgAdapterRegistry.register_jit_arg_adapter(bool)` — **EN:** Applies decorator `JitArgAdapterRegistry.register_jit_arg_adapter(bool)` to the following definition. **CN:** 将装饰器 `JitArgAdapterRegistry.register_jit_arg_adapter(bool)` 应用于后面的定义。
+- **L259** `def _convert_python_scalar(arg: Any) -> Any:` — **EN:** Defines function `_convert_python_scalar`. **CN:** 定义函数 `_convert_python_scalar`。
+- **L260** `    """` — **EN:** Starts the docstring for the function `_convert_python_scalar`. **CN:** 开始说明 function `_convert_python_scalar` 的文档字符串。
+- **L261** `    Convert a Python scalar to a DSL type.` — **EN:** Continues the docstring for the function `_convert_python_scalar`. **CN:** 继续说明 function `_convert_python_scalar` 的文档字符串。
+- **L262** `    """` — **EN:** Ends the docstring for the function `_convert_python_scalar`. **CN:** 结束说明 function `_convert_python_scalar` 的文档字符串。
+- **L263** `    conversion_map = {` — **EN:** Assigns a value to conversion_map. **CN:** 将一个值赋给 conversion_map。
+- **L264** `        int: Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `        float: Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `        bool: Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `    return conversion_map.get(type(arg))(arg)  # type: ignore[misc]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `@JitArgAdapterRegistry.register_jit_arg_adapter(tuple)` — **EN:** Applies decorator `JitArgAdapterRegistry.register_jit_arg_adapter(tuple)` to the following definition. **CN:** 将装饰器 `JitArgAdapterRegistry.register_jit_arg_adapter(tuple)` 应用于后面的定义。
+- **L272** `@JitArgAdapterRegistry.register_jit_arg_adapter(list)` — **EN:** Applies decorator `JitArgAdapterRegistry.register_jit_arg_adapter(list)` to the following definition. **CN:** 将装饰器 `JitArgAdapterRegistry.register_jit_arg_adapter(list)` 应用于后面的定义。
+- **L273** `def _convert_python_sequence(arg: Any) -> Any:` — **EN:** Defines function `_convert_python_sequence`. **CN:** 定义函数 `_convert_python_sequence`。
+- **L274** `    """` — **EN:** Starts the docstring for the function `_convert_python_sequence`. **CN:** 开始说明 function `_convert_python_sequence` 的文档字符串。
+- **L275** `    Go through each element in the sequence and convert it to a type that can be` — **EN:** Continues the docstring for the function `_convert_python_sequence`. **CN:** 继续说明 function `_convert_python_sequence` 的文档字符串。
+- **L276** `    further processed by DSL to generate the corresponding JIT argument(s).` — **EN:** Continues the docstring for the function `_convert_python_sequence`. **CN:** 继续说明 function `_convert_python_sequence` 的文档字符串。
+- **L277** `    """` — **EN:** Ends the docstring for the function `_convert_python_sequence`. **CN:** 结束说明 function `_convert_python_sequence` 的文档字符串。
+- **L278** `    adapted_arg = []` — **EN:** Assigns a value to adapted_arg. **CN:** 将一个值赋给 adapted_arg。
+- **L279** `    for elem in arg:` — **EN:** Starts a loop assigning items from `arg` to `elem`. **CN:** 开始一个循环，将 `arg` 的元素赋给 `elem`。
+- **L280** `        adapter = JitArgAdapterRegistry.get_registered_adapter(elem)` — **EN:** Assigns a value to adapter. **CN:** 将一个值赋给 adapter。
+- **L281** `        if adapter is not None:` — **EN:** Starts a conditional branch guarded by `adapter is not None`. **CN:** 开始一个由 `adapter is not None` 控制的条件分支。
+- **L282** `            converted_elem = adapter(elem)` — **EN:** Assigns a value to converted_elem. **CN:** 将一个值赋给 converted_elem。
+- **L283** `            adapted_arg.append(converted_elem)` — **EN:** Invokes `adapted_arg.append` as a standalone call. **CN:** 以独立语句方式调用 `adapted_arg.append`。
+- **L284** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L285** `            # If no registered adapter is found, just return the original element` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L286** `            adapted_arg.append(elem)` — **EN:** Invokes `adapted_arg.append` as a standalone call. **CN:** 以独立语句方式调用 `adapted_arg.append`。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `    assert len(adapted_arg) == len(arg)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L289** `    return type(arg)(adapted_arg)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.runtime.jit_arg_adapters`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.runtime.jit_arg_adapters`。
+- EN: Module docstring summary: This module provides runtime utilities for JIT argument conversion in DSL. CN: 模块文档摘要为：This module provides runtime utilities for JIT argument conversion in DSL.
+- EN: Top-level classes: JitArgAdapterRegistry, DefaultDataclassAdapter CN: 顶层类包括：JitArgAdapterRegistry, DefaultDataclassAdapter
+- EN: Top-level functions: is_arg_annotation_constexpr, is_argument_constexpr, _convert_python_scalar, _convert_python_sequence CN: 顶层函数包括：is_arg_annotation_constexpr, is_argument_constexpr, _convert_python_scalar, _convert_python_sequence
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..common:DSLRuntimeError, ..typing:Constexpr,Int32,Float32,Boolean,NumericMeta,cast,get_c_pointers,get_mlir_types,implements_jit_argument,implements_dynamic_expression, ..utils.tree_utils:is_constexpr_field, ..._mlir:ir, ..dsl:new_from_mlir_values, ..dsl:extract_mlir_values CN: 内部依赖：..common:DSLRuntimeError, ..typing:Constexpr,Int32,Float32,Boolean,NumericMeta,cast,get_c_pointers,get_mlir_types,implements_jit_argument,implements_dynamic_expression, ..utils.tree_utils:is_constexpr_field, ..._mlir:ir, ..dsl:new_from_mlir_values, ..dsl:extract_mlir_values
+- EN: External or standard-library dependencies: functools:wraps, typing:Callable,Any,Optional,get_origin, inspect:Parameter, dataclasses:is_dataclass,fields, itertools:chain CN: 外部或标准库依赖：functools:wraps, typing:Callable,Any,Optional,get_origin, inspect:Parameter, dataclasses:is_dataclass,fields, itertools:chain

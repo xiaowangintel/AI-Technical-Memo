@@ -1,0 +1,178 @@
+# external_binary_module.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/export/external_binary_module.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (LoadProvider, ExternalBinaryModule) and 1 functions (_get_ctypes_return_type) in `CuTeDSL.cutlass.base_dsl.export.external_binary_module`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.export.external_binary_module` 定义了 2 个类（LoadProvider, ExternalBinaryModule） 和 1 个函数（_get_ctypes_return_type）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import io` — **EN:** Imports io for later use. **CN:** 导入 io 供后续使用。
+- **L13** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L16** `from collections.abc import Callable` — **EN:** Imports Callable from `collections.abc`. **CN:** 从 `collections.abc` 导入 Callable。
+- **L17** `from inspect import Signature, Parameter` — **EN:** Imports Signature, Parameter from `inspect`. **CN:** 从 `inspect` 导入 Signature, Parameter。
+- **L18** `from typing import Any, cast` — **EN:** Imports Any, cast from `typing`. **CN:** 从 `typing` 导入 Any, cast。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `from ..common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `..common`. **CN:** 从 `..common` 导入 DSLRuntimeError。
+- **L21** `from ...base_dsl.dsl import BaseDSL` — **EN:** Imports BaseDSL from `...base_dsl.dsl`. **CN:** 从 `...base_dsl.dsl` 导入 BaseDSL。
+- **L22** `from ...base_dsl.typing import Int32, Int64, Float32, Float64` — **EN:** Imports Int32, Int64, Float32, Float64 from `...base_dsl.typing`. **CN:** 从 `...base_dsl.typing` 导入 Int32, Int64, Float32, Float64。
+- **L23** `from .export import SignatureProcessor, decode_metadata_from_execution_engine` — **EN:** Imports SignatureProcessor, decode_metadata_from_execution_engine from `.export`. **CN:** 从 `.export` 导入 SignatureProcessor, decode_metadata_from_execution_engine。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `def _get_ctypes_return_type(signature: Signature) -> Any:` — **EN:** Defines function `_get_ctypes_return_type`. **CN:** 定义函数 `_get_ctypes_return_type`。
+- **L27** `    """Get the ctypes return type from the signature."""` — **EN:** Docstring line documenting the function `_get_ctypes_return_type`. **CN:** 文档字符串行，用于说明 function `_get_ctypes_return_type`。
+- **L28** `    return_type = signature.return_annotation` — **EN:** Assigns a value to return_type. **CN:** 将一个值赋给 return_type。
+- **L29** `    if return_type is Parameter.empty:` — **EN:** Starts a conditional branch guarded by `return_type is Parameter.empty`. **CN:** 开始一个由 `return_type is Parameter.empty` 控制的条件分支。
+- **L30** `        raise DSLRuntimeError("Return type is not specified for AOT compiled function.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L31** `    type_to_ctype = {` — **EN:** Assigns a value to type_to_ctype. **CN:** 将一个值赋给 type_to_ctype。
+- **L32** `        Int32: ctypes.c_int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `        Int64: ctypes.c_int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `        Float32: ctypes.c_float,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `        Float64: ctypes.c_double,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `        # Add other types if needed` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L37** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `    ctype = type_to_ctype.get(return_type)` — **EN:** Assigns a value to ctype. **CN:** 将一个值赋给 ctype。
+- **L40** `    if ctype is None:` — **EN:** Starts a conditional branch guarded by `ctype is None`. **CN:** 开始一个由 `ctype is None` 控制的条件分支。
+- **L41** `        raise DSLRuntimeError(f"Unsupported return type for AOT loading: {return_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `    return ctype` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `class LoadProvider:` — **EN:** Defines class `LoadProvider`. **CN:** 定义类 `LoadProvider`。
+- **L47** `    """The load provider is a class that stores the necessary information to construct a ExternalBinaryModule,` — **EN:** Starts the docstring for the class `LoadProvider`. **CN:** 开始说明 class `LoadProvider` 的文档字符串。
+- **L48** `    it could be set later by specific DSL."""` — **EN:** Ends the docstring for the class `LoadProvider`. **CN:** 结束说明 class `LoadProvider` 的文档字符串。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L51** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `        dsl: type[BaseDSL],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L53** `        signature_processor: SignatureProcessor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L54** `        version_checker: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `        execution_engine_constructor: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `        jit_function_constructor: Callable[..., Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L58** `        self.dsl = dsl` — **EN:** Assigns a value to self.dsl. **CN:** 将一个值赋给 self.dsl。
+- **L59** `        self.signature_processor = signature_processor` — **EN:** Assigns a value to self.signature_processor. **CN:** 将一个值赋给 self.signature_processor。
+- **L60** `        self.version_checker = version_checker` — **EN:** Assigns a value to self.version_checker. **CN:** 将一个值赋给 self.version_checker。
+- **L61** `        self.execution_engine_constructor = execution_engine_constructor` — **EN:** Assigns a value to self.execution_engine_constructor. **CN:** 将一个值赋给 self.execution_engine_constructor。
+- **L62** `        self.jit_function_constructor = jit_function_constructor` — **EN:** Assigns a value to self.jit_function_constructor. **CN:** 将一个值赋给 self.jit_function_constructor。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `class ExternalBinaryModule:` — **EN:** Defines class `ExternalBinaryModule`. **CN:** 定义类 `ExternalBinaryModule`。
+- **L66** `    """The exported binary module is a wrapper of the previous exported object files. It is used to load a object file` — **EN:** Starts the docstring for the class `ExternalBinaryModule`. **CN:** 开始说明 class `ExternalBinaryModule` 的文档字符串。
+- **L67** `    or a library in memory, allow function lookup and return the corresponding \`JitCompiledFunction\`."""` — **EN:** Ends the docstring for the class `ExternalBinaryModule`. **CN:** 结束说明 class `ExternalBinaryModule` 的文档字符串。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    load_provider: LoadProvider | None = None` — **EN:** Assigns a typed value to load_provider. **CN:** 为 load_provider 赋予带类型标注的值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    def __init__(self, file_path: str, enable_tvm_ffi: bool = False) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L72** `        self.enable_tvm_ffi = enable_tvm_ffi` — **EN:** Assigns a value to self.enable_tvm_ffi. **CN:** 将一个值赋给 self.enable_tvm_ffi。
+- **L73** `        assert self.load_provider is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L74** `            "Load provider is not set for ExternalBinaryModule."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `        shared_libs = self.load_provider.dsl._get_dsl().get_shared_libs()` — **EN:** Assigns a value to shared_libs. **CN:** 将一个值赋给 shared_libs。
+- **L77** `        object_file_content = bytes()` — **EN:** Assigns a value to object_file_content. **CN:** 将一个值赋给 object_file_content。
+- **L78** `        if file_path.endswith(".so"):` — **EN:** Starts a conditional branch guarded by `file_path.endswith('.so')`. **CN:** 开始一个由 `file_path.endswith('.so')` 控制的条件分支。
+- **L79** `            shared_libs.append(file_path)` — **EN:** Invokes `shared_libs.append` as a standalone call. **CN:** 以独立语句方式调用 `shared_libs.append`。
+- **L80** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L81** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L82** `                with open(file_path, "rb") as f:` — **EN:** Starts a context-managed block using open(file_path, 'rb'). **CN:** 开始一个使用 open(file_path, 'rb') 的上下文管理代码块。
+- **L83** `                    object_file_content = f.read()` — **EN:** Assigns a value to object_file_content. **CN:** 将一个值赋给 object_file_content。
+- **L84** `            except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L85** `                raise DSLRuntimeError(f"Failed to read object file {file_path}: {e}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L86** `        # Lifetime of the engine is same as the ExternalBinaryModule.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L87** `        # Always use JITLink. MCJIT mishandles .o files with duplicate` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `        # .text ELF sections (different permission flags), causing` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L89** `        # non-deterministic SIGSEGV in multi-process torchrun workloads.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L90** `        # JITLink handles sections independently and correctly.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `        useJitLink = True` — **EN:** Assigns a value to useJitLink. **CN:** 将一个值赋给 useJitLink。
+- **L92** `        self.engine = self.load_provider.execution_engine_constructor(` — **EN:** Assigns a value to self.engine. **CN:** 将一个值赋给 self.engine。
+- **L93** `            object_file_content, shared_libs, useJitLink` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    def __getattr__(self, function_prefix: str) -> Any:` — **EN:** Defines function `__getattr__`. **CN:** 定义函数 `__getattr__`。
+- **L97** `        """Get the jit_function from the \`function_prefix\`. The \`function_prefix\` is specified when users dump the object file. When there is no function_prefix found in the module, the function will raise an error."""` — **EN:** Docstring line documenting the function `__getattr__`. **CN:** 文档字符串行，用于说明 function `__getattr__`。
+- **L98** `        if self.enable_tvm_ffi:` — **EN:** Starts a conditional branch guarded by `self.enable_tvm_ffi`. **CN:** 开始一个由 `self.enable_tvm_ffi` 控制的条件分支。
+- **L99** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L100** `                import tvm_ffi` — **EN:** Imports tvm_ffi for later use. **CN:** 导入 tvm_ffi 供后续使用。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `                function_ptr = self.engine.lookup("__tvm_ffi_" + function_prefix)` — **EN:** Assigns a value to function_ptr. **CN:** 将一个值赋给 function_ptr。
+- **L103** `                return tvm_ffi.Function.__from_extern_c__(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** `                    function_ptr, keep_alive_object=self.engine` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `            except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L107** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L108** `                    f"Failed to load TVM FFI function {function_prefix}: {e}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `        load_provider = cast(LoadProvider, self.load_provider)` — **EN:** Assigns a value to load_provider. **CN:** 将一个值赋给 load_provider。
+- **L112** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L113** `            signature, function_name, kernel_info, version_str = (` — **EN:** Assigns a value to (signature, function_name, kernel_info, version_str). **CN:** 将一个值赋给 (signature, function_name, kernel_info, version_str)。
+- **L114** `                decode_metadata_from_execution_engine(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `                    function_prefix, self.engine, load_provider.signature_processor` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L119** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L120** `                f"Function prefix {function_prefix} not found in the module.", cause=e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `        load_provider.version_checker(version_str)` — **EN:** Invokes `load_provider.version_checker` as a standalone call. **CN:** 以独立语句方式调用 `load_provider.version_checker`。
+- **L123** `        capi_func_p = self.engine.lookup(function_name)` — **EN:** Assigns a value to capi_func_p. **CN:** 将一个值赋给 capi_func_p。
+- **L124** `        if not capi_func_p:` — **EN:** Starts a conditional branch guarded by `not capi_func_p`. **CN:** 开始一个由 `not capi_func_p` 控制的条件分支。
+- **L125** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L126** `                "Unknown function: "  # type: ignore[operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `                + "_mlir_"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `                + function_prefix` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `                + "__mlir_ciface_"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `                + function_name` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        return_type = _get_ctypes_return_type(signature)` — **EN:** Assigns a value to return_type. **CN:** 将一个值赋给 return_type。
+- **L133** `        capi_func = ctypes.CFUNCTYPE(return_type, ctypes.c_void_p)(capi_func_p)` — **EN:** Assigns a value to capi_func. **CN:** 将一个值赋给 capi_func。
+- **L134** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L135** `            has_gpu_module = (` — **EN:** Assigns a value to has_gpu_module. **CN:** 将一个值赋给 has_gpu_module。
+- **L136** `                self.engine.lookup("_mlir_" + function_prefix + "_cuda_init")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `                is not None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L140** `            has_gpu_module = False` — **EN:** Assigns a value to has_gpu_module. **CN:** 将一个值赋给 has_gpu_module。
+- **L141** `        jit_function = load_provider.jit_function_constructor(` — **EN:** Assigns a value to jit_function. **CN:** 将一个值赋给 jit_function。
+- **L142** `            ir_module=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `            engine=self.engine,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `            capi_func=capi_func,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `            signature=signature,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `            function_name=function_name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `            kernel_info=kernel_info,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `            jit_time_profiling=load_provider.dsl._get_dsl().envar.jit_time_profiling,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            jit_function_artifacts=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `            prefix=function_prefix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `            load_from_binary=True,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `            has_gpu_module=has_gpu_module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `        return jit_function` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `    def __getitem__(self, function_prefix: str) -> Any:` — **EN:** Defines function `__getitem__`. **CN:** 定义函数 `__getitem__`。
+- **L157** `        """Get the jit_function from the \`function_prefix\`. The \`function_prefix\` is specified when users dump the object file. When there is no function_prefix found in the module, the function will raise an error."""` — **EN:** Docstring line documenting the function `__getitem__`. **CN:** 文档字符串行，用于说明 function `__getitem__`。
+- **L158** `        return self.__getattr__(function_prefix)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.export.external_binary_module`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.export.external_binary_module`。
+- EN: Top-level classes: LoadProvider, ExternalBinaryModule CN: 顶层类包括：LoadProvider, ExternalBinaryModule
+- EN: Top-level functions: _get_ctypes_return_type CN: 顶层函数包括：_get_ctypes_return_type
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..common:DSLRuntimeError, ...base_dsl.dsl:BaseDSL, ...base_dsl.typing:Int32,Int64,Float32,Float64, .export:SignatureProcessor,decode_metadata_from_execution_engine CN: 内部依赖：..common:DSLRuntimeError, ...base_dsl.dsl:BaseDSL, ...base_dsl.typing:Int32,Int64,Float32,Float64, .export:SignatureProcessor,decode_metadata_from_execution_engine
+- EN: External or standard-library dependencies: io, os, ctypes, collections.abc:Callable, inspect:Signature,Parameter, typing:Any,cast, tvm_ffi CN: 外部或标准库依赖：io, os, ctypes, collections.abc:Callable, inspect:Signature,Parameter, typing:Any,cast, tvm_ffi

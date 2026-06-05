@@ -1,0 +1,152 @@
+# sm100_nodes.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/backend/sm100_nodes.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (Sm100AuxLoadImpl, Sm100AuxStoreImpl) in `cutlass_cppgen.backend.evt.backend.sm100_nodes`.
+- CN: 该模块 `cutlass_cppgen.backend.evt.backend.sm100_nodes` 定义了 2 个类（Sm100AuxLoadImpl, Sm100AuxStoreImpl）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `from pycute import product` — **EN:** Imports product from `pycute`. **CN:** 从 `pycute` 导入 product。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `from cutlass_library import DataTypeSize, DataTypeTag` — **EN:** Imports DataTypeSize, DataTypeTag from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeSize, DataTypeTag。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_cppgen.backend.evt.ir import AuxLoadImpl, AuxStoreImpl` — **EN:** Imports AuxLoadImpl, AuxStoreImpl from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 AuxLoadImpl, AuxStoreImpl。
+- **L38** `import cutlass_cppgen.backend.evt.backend.sm90_nodes as sm90_nodes` — **EN:** Imports cutlass_cppgen.backend.evt.backend.sm90_nodes as sm90_nodes for later use. **CN:** 导入 cutlass_cppgen.backend.evt.backend.sm90_nodes as sm90_nodes 供后续使用。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `from cutlass_cppgen.backend.library import FloatRoundStyleTag` — **EN:** Imports FloatRoundStyleTag from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 FloatRoundStyleTag。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `Sm100AccumulatorImpl = sm90_nodes.Sm90AccumulatorImpl` — **EN:** Assigns a value to Sm100AccumulatorImpl. **CN:** 将一个值赋给 Sm100AccumulatorImpl。
+- **L44** `Sm100LoadSrcImpl = sm90_nodes.Sm90LoadSrcImpl` — **EN:** Assigns a value to Sm100LoadSrcImpl. **CN:** 将一个值赋给 Sm100LoadSrcImpl。
+- **L45** `Sm100ScalarBroadcastImpl = sm90_nodes.Sm90ScalarBroadcastImpl` — **EN:** Assigns a value to Sm100ScalarBroadcastImpl. **CN:** 将一个值赋给 Sm100ScalarBroadcastImpl。
+- **L46** `Sm100RowBroadcastImpl = sm90_nodes.Sm90RowBroadcastImpl` — **EN:** Assigns a value to Sm100RowBroadcastImpl. **CN:** 将一个值赋给 Sm100RowBroadcastImpl。
+- **L47** `Sm100ColumnBroadcastImpl = sm90_nodes.Sm90ColumnBroadcastImpl` — **EN:** Assigns a value to Sm100ColumnBroadcastImpl. **CN:** 将一个值赋给 Sm100ColumnBroadcastImpl。
+- **L48** `Sm100ComputeImpl = sm90_nodes.Sm90ComputeImpl` — **EN:** Assigns a value to Sm100ComputeImpl. **CN:** 将一个值赋给 Sm100ComputeImpl。
+- **L49** `Sm100StoreDImpl = sm90_nodes.Sm90StoreDImpl` — **EN:** Assigns a value to Sm100StoreDImpl. **CN:** 将一个值赋给 Sm100StoreDImpl。
+- **L50** `Sm100ColumnReductionImpl = sm90_nodes.Sm90ColumnReductionImpl` — **EN:** Assigns a value to Sm100ColumnReductionImpl. **CN:** 将一个值赋给 Sm100ColumnReductionImpl。
+- **L51** `Sm100RowReductionImpl = sm90_nodes.Sm90RowReductionImpl` — **EN:** Assigns a value to Sm100RowReductionImpl. **CN:** 将一个值赋给 Sm100RowReductionImpl。
+- **L52** `Sm100ScalarReductionImpl = sm90_nodes.Sm90ScalarReductionImpl` — **EN:** Assigns a value to Sm100ScalarReductionImpl. **CN:** 将一个值赋给 Sm100ScalarReductionImpl。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `class Sm100AuxLoadImpl(AuxLoadImpl):` — **EN:** Defines class `Sm100AuxLoadImpl` with bases AuxLoadImpl. **CN:** 定义类 `Sm100AuxLoadImpl`，其基类为 AuxLoadImpl。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L58** `    def descriptor(self) -> str:` — **EN:** Defines function `descriptor`. **CN:** 定义函数 `descriptor`。
+- **L59** `        """` — **EN:** Starts the docstring for the function `descriptor`. **CN:** 开始说明 function `descriptor` 的文档字符串。
+- **L60** `        Descriptor for Aux Load` — **EN:** Continues the docstring for the function `descriptor`. **CN:** 继续说明 function `descriptor` 的文档字符串。
+- **L61** `        """` — **EN:** Ends the docstring for the function `descriptor`. **CN:** 结束说明 function `descriptor` 的文档字符串。
+- **L62** `        return f"{self.name_camel}Descriptor"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `    def decl_descriptor(self) -> str:` — **EN:** Defines function `decl_descriptor`. **CN:** 定义函数 `decl_descriptor`。
+- **L65** `        """` — **EN:** Starts the docstring for the function `decl_descriptor`. **CN:** 开始说明 function `decl_descriptor` 的文档字符串。
+- **L66** `        Declare the descriptor type` — **EN:** Continues the docstring for the function `decl_descriptor`. **CN:** 继续说明 function `decl_descriptor` 的文档字符串。
+- **L67** `        """` — **EN:** Ends the docstring for the function `decl_descriptor`. **CN:** 结束说明 function `decl_descriptor` 的文档字符串。
+- **L68** `        return f"\nusing {self.descriptor} = cutlass::epilogue::collective::detail::Sm100AuxLoadDescriptor<EpilogueDescriptor, {self.stride_mnl}, {DataTypeTag[self.element]}>;\n"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L71** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L72** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L73** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L74** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L75** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L76** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `        self._type_decl = self.decl_descriptor()` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L79** `        self._type_decl += f"""` — **EN:** Updates self._type_decl in place. **CN:** 原地更新 self._type_decl。
+- **L80** `using {self.name_camel} = cutlass::epilogue::fusion::Sm90AuxLoad<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    {self.descriptor}::Stages, typename {self.descriptor}::EpilogueTile, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    {self.stride_mnl}, typename {self.descriptor}::SmemLayoutAtom, typename {self.descriptor}::CopyOpS2R` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    def get_smem_size(self, cta_tile_mnk, epilogue_tile_mn, stages_c, stages_d, epi_tiles):` — **EN:** Defines function `get_smem_size`. **CN:** 定义函数 `get_smem_size`。
+- **L88** `        """` — **EN:** Starts the docstring for the function `get_smem_size`. **CN:** 开始说明 function `get_smem_size` 的文档字符串。
+- **L89** `        Get the shared memory size based on epilogue_tile_mn, stages_c, and stages_d` — **EN:** Continues the docstring for the function `get_smem_size`. **CN:** 继续说明 function `get_smem_size` 的文档字符串。
+- **L90** `        """` — **EN:** Ends the docstring for the function `get_smem_size`. **CN:** 结束说明 function `get_smem_size` 的文档字符串。
+- **L91** `        return (DataTypeSize[self.element] * stages_c * product(epilogue_tile_mn) // 8, 128)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `class Sm100AuxStoreImpl(AuxStoreImpl):` — **EN:** Defines class `Sm100AuxStoreImpl` with bases AuxStoreImpl. **CN:** 定义类 `Sm100AuxStoreImpl`，其基类为 AuxStoreImpl。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L97** `    def descriptor(self) -> str:` — **EN:** Defines function `descriptor`. **CN:** 定义函数 `descriptor`。
+- **L98** `        """` — **EN:** Starts the docstring for the function `descriptor`. **CN:** 开始说明 function `descriptor` 的文档字符串。
+- **L99** `        Descriptor for Aux Load` — **EN:** Continues the docstring for the function `descriptor`. **CN:** 继续说明 function `descriptor` 的文档字符串。
+- **L100** `        """` — **EN:** Ends the docstring for the function `descriptor`. **CN:** 结束说明 function `descriptor` 的文档字符串。
+- **L101** `        return f"{self.name_camel}Descriptor"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `    def decl_descriptor(self) -> str:` — **EN:** Defines function `decl_descriptor`. **CN:** 定义函数 `decl_descriptor`。
+- **L104** `        """` — **EN:** Starts the docstring for the function `decl_descriptor`. **CN:** 开始说明 function `decl_descriptor` 的文档字符串。
+- **L105** `        Declare the descriptor type` — **EN:** Continues the docstring for the function `decl_descriptor`. **CN:** 继续说明 function `decl_descriptor` 的文档字符串。
+- **L106** `        """` — **EN:** Ends the docstring for the function `decl_descriptor`. **CN:** 结束说明 function `decl_descriptor` 的文档字符串。
+- **L107** `        return f"""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** `using {self.descriptor} = cutlass::epilogue::collective::detail::Sm100AuxStoreDescriptor<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `    EpilogueDescriptor, {self.stride_mnl}, {DataTypeTag[self.element]}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L113** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L114** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L115** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L116** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L117** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L118** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `        self._type_decl = self.decl_descriptor()` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L121** `        self._type_decl += f"""` — **EN:** Updates self._type_decl in place. **CN:** 原地更新 self._type_decl。
+- **L122** `using {self.name_camel} = cutlass::epilogue::fusion::Sm90AuxStore<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `    {self.descriptor}::Stages, typename {self.descriptor}::EpilogueTile, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `    {FloatRoundStyleTag[self.round_style]}, {self.stride_mnl}, typename {self.descriptor}::SmemLayoutAtom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `    typename {self.descriptor}::CopyOpR2S` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def get_smem_size(self, cta_tile_mnk, epilogue_tile_mn, stages_c, stages_d, epi_tiles):` — **EN:** Defines function `get_smem_size`. **CN:** 定义函数 `get_smem_size`。
+- **L131** `        """` — **EN:** Starts the docstring for the function `get_smem_size`. **CN:** 开始说明 function `get_smem_size` 的文档字符串。
+- **L132** `        Get the shared memory size based on epilogue_tile_mn, stages_c, and stages_d` — **EN:** Continues the docstring for the function `get_smem_size`. **CN:** 继续说明 function `get_smem_size` 的文档字符串。
+- **L133** `        """` — **EN:** Ends the docstring for the function `get_smem_size`. **CN:** 结束说明 function `get_smem_size` 的文档字符串。
+- **L134** `        return (DataTypeSize[self.element] * stages_d * product(epilogue_tile_mn) // 8, 128)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.backend.sm100_nodes`. CN: 模块名为 `cutlass_cppgen.backend.evt.backend.sm100_nodes`。
+- EN: Top-level classes: Sm100AuxLoadImpl, Sm100AuxStoreImpl CN: 顶层类包括：Sm100AuxLoadImpl, Sm100AuxStoreImpl
+
+## Dependencies / 依赖
+- EN: Internal dependencies: pycute:product, cutlass_library:DataTypeSize,DataTypeTag, cutlass_cppgen.backend.evt.ir:AuxLoadImpl,AuxStoreImpl, cutlass_cppgen.backend.evt.backend.sm90_nodes, cutlass_cppgen.backend.library:FloatRoundStyleTag CN: 内部依赖：pycute:product, cutlass_library:DataTypeSize,DataTypeTag, cutlass_cppgen.backend.evt.ir:AuxLoadImpl,AuxStoreImpl, cutlass_cppgen.backend.evt.backend.sm90_nodes, cutlass_cppgen.backend.library:FloatRoundStyleTag

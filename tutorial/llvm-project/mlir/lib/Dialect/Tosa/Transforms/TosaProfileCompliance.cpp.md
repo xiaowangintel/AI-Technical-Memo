@@ -1,0 +1,2301 @@
+# TosaProfileCompliance.cpp — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `mlir/lib/Dialect/Tosa/Transforms/TosaProfileCompliance.cpp`
+- **Repository / 仓库**: `llvm-project`
+- **Purpose (EN)**: Implements TOSA-specific optimization and lowering passes.
+- **Purpose (CN)**: 实现 TOSA 专用的优化与 lowering pass。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-20
+
+````cpp
+//===--- TosaProfileCompliance.cpp - Tosa Profile Compliance Validation ---===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+
+#include "mlir/Dialect/Tosa/IR/TosaProfileCompliance.h"
+#include "llvm/ADT/StringExtras.h"
+
+using namespace mlir;
+using namespace mlir::tosa;
+
+TosaProfileCompliance::TosaProfileCompliance() {
+  const TypeInfo boolT = {mlir::IntegerType::getTypeID(), 1};
+  const TypeInfo i4T = {mlir::IntegerType::getTypeID(), 4};
+  const TypeInfo i8T = {mlir::IntegerType::getTypeID(), 8};
+  const TypeInfo i16T = {mlir::IntegerType::getTypeID(), 16};
+  const TypeInfo i32T = {mlir::IntegerType::getTypeID(), 32};
+````
+- **L1 EN**: Banner comment marking a file or section boundary.
+  **L1 CN**: 横幅注释，用于标记文件或章节边界。
+- **L2 EN**: Separator comment used for visual grouping.
+  **L2 CN**: 用于视觉分组的分隔注释。
+- **L3 EN**: Comment explains nearby logic, invariants, or intent: `Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`.
+  **L3 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.`。
+- **L4 EN**: Comment explains nearby logic, invariants, or intent: `See https://llvm.org/LICENSE.txt for license information.`.
+  **L4 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`See https://llvm.org/LICENSE.txt for license information.`。
+- **L5 EN**: Comment explains nearby logic, invariants, or intent: `SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`.
+  **L5 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception`。
+- **L6 EN**: Separator comment used for visual grouping.
+  **L6 CN**: 用于视觉分组的分隔注释。
+- **L7 EN**: Banner comment marking a file or section boundary.
+  **L7 CN**: 横幅注释，用于标记文件或章节边界。
+- **L8 EN**: Blank line separating nearby declarations or logic blocks.
+  **L8 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L9 EN**: Includes "mlir/Dialect/Tosa/IR/TosaProfileCompliance.h" to access dialect-specific IR, transforms, or shared utilities.
+  **L9 CN**: 引入 "mlir/Dialect/Tosa/IR/TosaProfileCompliance.h" 以使用方言专用 IR、变换或共享工具。
+- **L10 EN**: Includes "llvm/ADT/StringExtras.h" to access LLVM ADT containers and low-level utility types.
+  **L10 CN**: 引入 "llvm/ADT/StringExtras.h" 以使用LLVM ADT 容器与底层工具类型。
+- **L11 EN**: Blank line separating nearby declarations or logic blocks.
+  **L11 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L12 EN**: Brings namespace `mlir` into local scope.
+  **L12 CN**: 将命名空间 `mlir` 引入当前作用域。
+- **L13 EN**: Brings namespace `mlir::tosa` into local scope.
+  **L13 CN**: 将命名空间 `mlir::tosa` 引入当前作用域。
+- **L14 EN**: Blank line separating nearby declarations or logic blocks.
+  **L14 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L15 EN**: Starts a function, method, lambda, or structured scope: `TosaProfileCompliance::TosaProfileCompliance() {`.
+  **L15 CN**: 开始一个函数、方法、lambda 或结构化作用域：`TosaProfileCompliance::TosaProfileCompliance() {`。
+- **L16 EN**: Initializes variable `boolT` from the right-hand expression.
+  **L16 CN**: 使用右侧表达式初始化变量 `boolT`。
+- **L17 EN**: Initializes variable `i4T` from the right-hand expression.
+  **L17 CN**: 使用右侧表达式初始化变量 `i4T`。
+- **L18 EN**: Initializes variable `i8T` from the right-hand expression.
+  **L18 CN**: 使用右侧表达式初始化变量 `i8T`。
+- **L19 EN**: Initializes variable `i16T` from the right-hand expression.
+  **L19 CN**: 使用右侧表达式初始化变量 `i16T`。
+- **L20 EN**: Initializes variable `i32T` from the right-hand expression.
+  **L20 CN**: 使用右侧表达式初始化变量 `i32T`。
+
+### Lines 21-40
+
+````cpp
+  const TypeInfo i48T = {mlir::IntegerType::getTypeID(), 48};
+  const TypeInfo i64T = {mlir::IntegerType::getTypeID(), 64};
+  const TypeInfo bf16T = {mlir::BFloat16Type::getTypeID(), 16};
+  const TypeInfo fp16T = {mlir::Float16Type::getTypeID(), 16};
+  const TypeInfo fp32T = {mlir::Float32Type::getTypeID(), 32};
+  const TypeInfo fp8e4m3T = {mlir::Float8E4M3FNType::getTypeID(), 8};
+  const TypeInfo fp8e5m2T = {mlir::Float8E5M2Type::getTypeID(), 8};
+
+  // micro-scaling formats
+  const TypeInfo fp6e2m3T = {mlir::Float6E2M3FNType::getTypeID(), 6};
+  const TypeInfo fp6e3m2T = {mlir::Float6E3M2FNType::getTypeID(), 6};
+  const TypeInfo fp4e2m1T = {mlir::Float4E2M1FNType::getTypeID(), 4};
+  const TypeInfo fp8ue8m0T = {mlir::Float8E8M0FNUType::getTypeID(), 8};
+  const TypeInfo mxint8T = {mlir::tosa::mxint8Type::getTypeID(), 8};
+
+// The profile-based compliance content below is auto-generated by a script
+// in https://github.com/arm/tosa-specification
+#include "mlir/Dialect/Tosa/IR/TosaComplianceData.h.inc"
+  // End of auto-generated metadata
+}
+````
+- **L21 EN**: Initializes variable `i48T` from the right-hand expression.
+  **L21 CN**: 使用右侧表达式初始化变量 `i48T`。
+- **L22 EN**: Initializes variable `i64T` from the right-hand expression.
+  **L22 CN**: 使用右侧表达式初始化变量 `i64T`。
+- **L23 EN**: Initializes variable `bf16T` from the right-hand expression.
+  **L23 CN**: 使用右侧表达式初始化变量 `bf16T`。
+- **L24 EN**: Initializes variable `fp16T` from the right-hand expression.
+  **L24 CN**: 使用右侧表达式初始化变量 `fp16T`。
+- **L25 EN**: Initializes variable `fp32T` from the right-hand expression.
+  **L25 CN**: 使用右侧表达式初始化变量 `fp32T`。
+- **L26 EN**: Initializes variable `fp8e4m3T` from the right-hand expression.
+  **L26 CN**: 使用右侧表达式初始化变量 `fp8e4m3T`。
+- **L27 EN**: Initializes variable `fp8e5m2T` from the right-hand expression.
+  **L27 CN**: 使用右侧表达式初始化变量 `fp8e5m2T`。
+- **L28 EN**: Blank line separating nearby declarations or logic blocks.
+  **L28 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L29 EN**: Comment explains nearby logic, invariants, or intent: `micro-scaling formats`.
+  **L29 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`micro-scaling formats`。
+- **L30 EN**: Initializes variable `fp6e2m3T` from the right-hand expression.
+  **L30 CN**: 使用右侧表达式初始化变量 `fp6e2m3T`。
+- **L31 EN**: Initializes variable `fp6e3m2T` from the right-hand expression.
+  **L31 CN**: 使用右侧表达式初始化变量 `fp6e3m2T`。
+- **L32 EN**: Initializes variable `fp4e2m1T` from the right-hand expression.
+  **L32 CN**: 使用右侧表达式初始化变量 `fp4e2m1T`。
+- **L33 EN**: Initializes variable `fp8ue8m0T` from the right-hand expression.
+  **L33 CN**: 使用右侧表达式初始化变量 `fp8ue8m0T`。
+- **L34 EN**: Initializes variable `mxint8T` from the right-hand expression.
+  **L34 CN**: 使用右侧表达式初始化变量 `mxint8T`。
+- **L35 EN**: Blank line separating nearby declarations or logic blocks.
+  **L35 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L36 EN**: Comment explains nearby logic, invariants, or intent: `The profile-based compliance content below is auto-generated by a script`.
+  **L36 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`The profile-based compliance content below is auto-generated by a script`。
+- **L37 EN**: Comment explains nearby logic, invariants, or intent: `in https://github.com/arm/tosa-specification`.
+  **L37 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`in https://github.com/arm/tosa-specification`。
+- **L38 EN**: Includes "mlir/Dialect/Tosa/IR/TosaComplianceData.h.inc" to access dialect-specific IR, transforms, or shared utilities.
+  **L38 CN**: 引入 "mlir/Dialect/Tosa/IR/TosaComplianceData.h.inc" 以使用方言专用 IR、变换或共享工具。
+- **L39 EN**: Comment explains nearby logic, invariants, or intent: `End of auto-generated metadata`.
+  **L39 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`End of auto-generated metadata`。
+- **L40 EN**: Closes the current lexical scope or compound statement.
+  **L40 CN**: 结束当前词法作用域或复合语句块。
+
+### Lines 41-60
+
+````cpp
+
+template <>
+OperationProfileComplianceMap TosaProfileCompliance::getProfileComplianceMap() {
+  return profileComplianceMap;
+}
+
+template <>
+OperationExtensionComplianceMap
+TosaProfileCompliance::getProfileComplianceMap() {
+  return extensionComplianceMap;
+}
+
+// Base populating function
+LogicalResult ProfileInfoDepot::populateProfileInfo(ValueRange operands,
+                                                    ValueRange results) {
+  for (const auto &operand : operands)
+    addValue(operand);
+  for (const auto &result : results)
+    addValue(result);
+  return success();
+````
+- **L41 EN**: Blank line separating nearby declarations or logic blocks.
+  **L41 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L42 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L42 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L43 EN**: Starts a function, method, lambda, or structured scope: `OperationProfileComplianceMap TosaProfileCompliance::getProfileComplianceMap() {`.
+  **L43 CN**: 开始一个函数、方法、lambda 或结构化作用域：`OperationProfileComplianceMap TosaProfileCompliance::getProfileComplianceMap() {`。
+- **L44 EN**: Returns from the current function with `profileComplianceMap`.
+  **L44 CN**: 以 `profileComplianceMap` 从当前函数返回。
+- **L45 EN**: Closes the current lexical scope or compound statement.
+  **L45 CN**: 结束当前词法作用域或复合语句块。
+- **L46 EN**: Blank line separating nearby declarations or logic blocks.
+  **L46 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L47 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L47 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L48 EN**: Continues the surrounding expression or declaration: `OperationExtensionComplianceMap`.
+  **L48 CN**: 继续构造周围的表达式或声明：`OperationExtensionComplianceMap`。
+- **L49 EN**: Starts a function, method, lambda, or structured scope: `TosaProfileCompliance::getProfileComplianceMap() {`.
+  **L49 CN**: 开始一个函数、方法、lambda 或结构化作用域：`TosaProfileCompliance::getProfileComplianceMap() {`。
+- **L50 EN**: Returns from the current function with `extensionComplianceMap`.
+  **L50 CN**: 以 `extensionComplianceMap` 从当前函数返回。
+- **L51 EN**: Closes the current lexical scope or compound statement.
+  **L51 CN**: 结束当前词法作用域或复合语句块。
+- **L52 EN**: Blank line separating nearby declarations or logic blocks.
+  **L52 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L53 EN**: Comment explains nearby logic, invariants, or intent: `Base populating function`.
+  **L53 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Base populating function`。
+- **L54 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `LogicalResult ProfileInfoDepot::populateProfileInfo(ValueRange operands,`.
+  **L54 CN**: 继续一个多行参数列表、初始化器或聚合项：`LogicalResult ProfileInfoDepot::populateProfileInfo(ValueRange operands,`。
+- **L55 EN**: Continues the surrounding expression or declaration: `ValueRange results) {`.
+  **L55 CN**: 继续构造周围的表达式或声明：`ValueRange results) {`。
+- **L56 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L56 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L57 EN**: Executes a call or declaration centered on `addValue`.
+  **L57 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L58 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L58 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L59 EN**: Executes a call or declaration centered on `addValue`.
+  **L59 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L60 EN**: Returns from the current function with `success()`.
+  **L60 CN**: 以 `success()` 从当前函数返回。
+
+### Lines 61-80
+
+````cpp
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ConcatOp op) {
+  addValue(op.getInput1().front());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::AvgPool2dOp op) {
+  addValue(op.getInput());
+  addValue(op.getInputZp());
+  addValue(op.getOutputZp());
+  addType(op.getAccType());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+````
+- **L61 EN**: Closes the current lexical scope or compound statement.
+  **L61 CN**: 结束当前词法作用域或复合语句块。
+- **L62 EN**: Blank line separating nearby declarations or logic blocks.
+  **L62 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L63 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L63 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L64 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ConcatOp op) {`.
+  **L64 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ConcatOp op) {`。
+- **L65 EN**: Executes a call or declaration centered on `addValue`.
+  **L65 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L66 EN**: Executes a call or declaration centered on `addValue`.
+  **L66 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L67 EN**: Returns from the current function with `success()`.
+  **L67 CN**: 以 `success()` 从当前函数返回。
+- **L68 EN**: Closes the current lexical scope or compound statement.
+  **L68 CN**: 结束当前词法作用域或复合语句块。
+- **L69 EN**: Blank line separating nearby declarations or logic blocks.
+  **L69 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L70 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L70 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L71 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::AvgPool2dOp op) {`.
+  **L71 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::AvgPool2dOp op) {`。
+- **L72 EN**: Executes a call or declaration centered on `addValue`.
+  **L72 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L73 EN**: Executes a call or declaration centered on `addValue`.
+  **L73 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L74 EN**: Executes a call or declaration centered on `addValue`.
+  **L74 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L75 EN**: Executes a call or declaration centered on `addType`.
+  **L75 CN**: 执行以 `addType` 为核心的调用或声明。
+- **L76 EN**: Executes a call or declaration centered on `addValue`.
+  **L76 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L77 EN**: Returns from the current function with `success()`.
+  **L77 CN**: 以 `success()` 从当前函数返回。
+- **L78 EN**: Closes the current lexical scope or compound statement.
+  **L78 CN**: 结束当前词法作用域或复合语句块。
+- **L79 EN**: Blank line separating nearby declarations or logic blocks.
+  **L79 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L80 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L80 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+
+### Lines 81-100
+
+````cpp
+LogicalResult
+ProfileInfoDepot::populateProfileInfo(tosa::AvgPool2dAdaptiveOp op) {
+  addValue(op.getInput());
+  addValue(op.getInputZp());
+  addValue(op.getOutputZp());
+  addType(op.getAccType());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult
+ProfileInfoDepot::populateProfileInfo(tosa::MaxPool2dAdaptiveOp op) {
+  addValue(op.getInput());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <typename T>
+LogicalResult ProfileInfoDepot::populateProfileInfoConv(T op) {
+````
+- **L81 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L81 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L82 EN**: Starts a function, method, lambda, or structured scope: `ProfileInfoDepot::populateProfileInfo(tosa::AvgPool2dAdaptiveOp op) {`.
+  **L82 CN**: 开始一个函数、方法、lambda 或结构化作用域：`ProfileInfoDepot::populateProfileInfo(tosa::AvgPool2dAdaptiveOp op) {`。
+- **L83 EN**: Executes a call or declaration centered on `addValue`.
+  **L83 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L84 EN**: Executes a call or declaration centered on `addValue`.
+  **L84 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L85 EN**: Executes a call or declaration centered on `addValue`.
+  **L85 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L86 EN**: Executes a call or declaration centered on `addType`.
+  **L86 CN**: 执行以 `addType` 为核心的调用或声明。
+- **L87 EN**: Executes a call or declaration centered on `addValue`.
+  **L87 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L88 EN**: Returns from the current function with `success()`.
+  **L88 CN**: 以 `success()` 从当前函数返回。
+- **L89 EN**: Closes the current lexical scope or compound statement.
+  **L89 CN**: 结束当前词法作用域或复合语句块。
+- **L90 EN**: Blank line separating nearby declarations or logic blocks.
+  **L90 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L91 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L91 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L92 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L92 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L93 EN**: Starts a function, method, lambda, or structured scope: `ProfileInfoDepot::populateProfileInfo(tosa::MaxPool2dAdaptiveOp op) {`.
+  **L93 CN**: 开始一个函数、方法、lambda 或结构化作用域：`ProfileInfoDepot::populateProfileInfo(tosa::MaxPool2dAdaptiveOp op) {`。
+- **L94 EN**: Executes a call or declaration centered on `addValue`.
+  **L94 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L95 EN**: Executes a call or declaration centered on `addValue`.
+  **L95 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L96 EN**: Returns from the current function with `success()`.
+  **L96 CN**: 以 `success()` 从当前函数返回。
+- **L97 EN**: Closes the current lexical scope or compound statement.
+  **L97 CN**: 结束当前词法作用域或复合语句块。
+- **L98 EN**: Blank line separating nearby declarations or logic blocks.
+  **L98 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L99 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L99 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+- **L100 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfoConv(T op) {`.
+  **L100 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfoConv(T op) {`。
+
+### Lines 101-120
+
+````cpp
+  addValue(op.getInput());
+  addValue(op.getWeight());
+  addValue(op.getBias());
+  addValue(op.getInputZp());
+  addValue(op.getWeightZp());
+  addType(op.getAccType());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::Conv2DOp op) {
+  return populateProfileInfoConv(op);
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::Conv3DOp op) {
+  return populateProfileInfoConv(op);
+}
+
+````
+- **L101 EN**: Executes a call or declaration centered on `addValue`.
+  **L101 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L102 EN**: Executes a call or declaration centered on `addValue`.
+  **L102 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L103 EN**: Executes a call or declaration centered on `addValue`.
+  **L103 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L104 EN**: Executes a call or declaration centered on `addValue`.
+  **L104 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L105 EN**: Executes a call or declaration centered on `addValue`.
+  **L105 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L106 EN**: Executes a call or declaration centered on `addType`.
+  **L106 CN**: 执行以 `addType` 为核心的调用或声明。
+- **L107 EN**: Executes a call or declaration centered on `addValue`.
+  **L107 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L108 EN**: Returns from the current function with `success()`.
+  **L108 CN**: 以 `success()` 从当前函数返回。
+- **L109 EN**: Closes the current lexical scope or compound statement.
+  **L109 CN**: 结束当前词法作用域或复合语句块。
+- **L110 EN**: Blank line separating nearby declarations or logic blocks.
+  **L110 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L111 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L111 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L112 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::Conv2DOp op) {`.
+  **L112 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::Conv2DOp op) {`。
+- **L113 EN**: Returns from the current function with `populateProfileInfoConv(op)`.
+  **L113 CN**: 以 `populateProfileInfoConv(op)` 从当前函数返回。
+- **L114 EN**: Closes the current lexical scope or compound statement.
+  **L114 CN**: 结束当前词法作用域或复合语句块。
+- **L115 EN**: Blank line separating nearby declarations or logic blocks.
+  **L115 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L116 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L116 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L117 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::Conv3DOp op) {`.
+  **L117 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::Conv3DOp op) {`。
+- **L118 EN**: Returns from the current function with `populateProfileInfoConv(op)`.
+  **L118 CN**: 以 `populateProfileInfoConv(op)` 从当前函数返回。
+- **L119 EN**: Closes the current lexical scope or compound statement.
+  **L119 CN**: 结束当前词法作用域或复合语句块。
+- **L120 EN**: Blank line separating nearby declarations or logic blocks.
+  **L120 CN**: 空行，用于分隔相邻的声明或逻辑块。
+
+### Lines 121-140
+
+````cpp
+template <>
+LogicalResult
+ProfileInfoDepot::populateProfileInfo(tosa::TransposeConv2DOp op) {
+  return populateProfileInfoConv(op);
+}
+
+template <>
+LogicalResult
+ProfileInfoDepot::populateProfileInfo(tosa::DepthwiseConv2DOp op) {
+  return populateProfileInfoConv(op);
+}
+
+template <>
+LogicalResult
+ProfileInfoDepot::populateProfileInfo(tosa::Conv2DBlockScaledOp op) {
+  addValue(op.getInputData());
+  addValue(op.getInputScale());
+  addValue(op.getWeightData());
+  addValue(op.getWeightScale());
+  addValue(op.getBias());
+````
+- **L121 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L121 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L122 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L122 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L123 EN**: Starts a function, method, lambda, or structured scope: `ProfileInfoDepot::populateProfileInfo(tosa::TransposeConv2DOp op) {`.
+  **L123 CN**: 开始一个函数、方法、lambda 或结构化作用域：`ProfileInfoDepot::populateProfileInfo(tosa::TransposeConv2DOp op) {`。
+- **L124 EN**: Returns from the current function with `populateProfileInfoConv(op)`.
+  **L124 CN**: 以 `populateProfileInfoConv(op)` 从当前函数返回。
+- **L125 EN**: Closes the current lexical scope or compound statement.
+  **L125 CN**: 结束当前词法作用域或复合语句块。
+- **L126 EN**: Blank line separating nearby declarations or logic blocks.
+  **L126 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L127 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L127 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L128 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L128 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L129 EN**: Starts a function, method, lambda, or structured scope: `ProfileInfoDepot::populateProfileInfo(tosa::DepthwiseConv2DOp op) {`.
+  **L129 CN**: 开始一个函数、方法、lambda 或结构化作用域：`ProfileInfoDepot::populateProfileInfo(tosa::DepthwiseConv2DOp op) {`。
+- **L130 EN**: Returns from the current function with `populateProfileInfoConv(op)`.
+  **L130 CN**: 以 `populateProfileInfoConv(op)` 从当前函数返回。
+- **L131 EN**: Closes the current lexical scope or compound statement.
+  **L131 CN**: 结束当前词法作用域或复合语句块。
+- **L132 EN**: Blank line separating nearby declarations or logic blocks.
+  **L132 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L133 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L133 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L134 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L134 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L135 EN**: Starts a function, method, lambda, or structured scope: `ProfileInfoDepot::populateProfileInfo(tosa::Conv2DBlockScaledOp op) {`.
+  **L135 CN**: 开始一个函数、方法、lambda 或结构化作用域：`ProfileInfoDepot::populateProfileInfo(tosa::Conv2DBlockScaledOp op) {`。
+- **L136 EN**: Executes a call or declaration centered on `addValue`.
+  **L136 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L137 EN**: Executes a call or declaration centered on `addValue`.
+  **L137 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L138 EN**: Executes a call or declaration centered on `addValue`.
+  **L138 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L139 EN**: Executes a call or declaration centered on `addValue`.
+  **L139 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L140 EN**: Executes a call or declaration centered on `addValue`.
+  **L140 CN**: 执行以 `addValue` 为核心的调用或声明。
+
+### Lines 141-160
+
+````cpp
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::PadOp op) {
+  addValue(op.getInput1());
+  addValue(op.getPadConst());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <typename T>
+LogicalResult ProfileInfoDepot::populateProfileInfoDataLayout(T op) {
+  addValue(op.getInput1());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+````
+- **L141 EN**: Executes a call or declaration centered on `addValue`.
+  **L141 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L142 EN**: Returns from the current function with `success()`.
+  **L142 CN**: 以 `success()` 从当前函数返回。
+- **L143 EN**: Closes the current lexical scope or compound statement.
+  **L143 CN**: 结束当前词法作用域或复合语句块。
+- **L144 EN**: Blank line separating nearby declarations or logic blocks.
+  **L144 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L145 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L145 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L146 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::PadOp op) {`.
+  **L146 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::PadOp op) {`。
+- **L147 EN**: Executes a call or declaration centered on `addValue`.
+  **L147 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L148 EN**: Executes a call or declaration centered on `addValue`.
+  **L148 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L149 EN**: Executes a call or declaration centered on `addValue`.
+  **L149 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L150 EN**: Returns from the current function with `success()`.
+  **L150 CN**: 以 `success()` 从当前函数返回。
+- **L151 EN**: Closes the current lexical scope or compound statement.
+  **L151 CN**: 结束当前词法作用域或复合语句块。
+- **L152 EN**: Blank line separating nearby declarations or logic blocks.
+  **L152 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L153 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L153 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+- **L154 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfoDataLayout(T op) {`.
+  **L154 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfoDataLayout(T op) {`。
+- **L155 EN**: Executes a call or declaration centered on `addValue`.
+  **L155 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L156 EN**: Executes a call or declaration centered on `addValue`.
+  **L156 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L157 EN**: Returns from the current function with `success()`.
+  **L157 CN**: 以 `success()` 从当前函数返回。
+- **L158 EN**: Closes the current lexical scope or compound statement.
+  **L158 CN**: 结束当前词法作用域或复合语句块。
+- **L159 EN**: Blank line separating nearby declarations or logic blocks.
+  **L159 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L160 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L160 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+
+### Lines 161-180
+
+````cpp
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ReshapeOp op) {
+  return populateProfileInfoDataLayout(op);
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::SliceOp op) {
+  return populateProfileInfoDataLayout(op);
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::TileOp op) {
+  return populateProfileInfoDataLayout(op);
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::TransposeOp op) {
+  return populateProfileInfoDataLayout(op);
+}
+
+template <>
+````
+- **L161 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ReshapeOp op) {`.
+  **L161 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ReshapeOp op) {`。
+- **L162 EN**: Returns from the current function with `populateProfileInfoDataLayout(op)`.
+  **L162 CN**: 以 `populateProfileInfoDataLayout(op)` 从当前函数返回。
+- **L163 EN**: Closes the current lexical scope or compound statement.
+  **L163 CN**: 结束当前词法作用域或复合语句块。
+- **L164 EN**: Blank line separating nearby declarations or logic blocks.
+  **L164 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L165 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L165 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L166 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::SliceOp op) {`.
+  **L166 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::SliceOp op) {`。
+- **L167 EN**: Returns from the current function with `populateProfileInfoDataLayout(op)`.
+  **L167 CN**: 以 `populateProfileInfoDataLayout(op)` 从当前函数返回。
+- **L168 EN**: Closes the current lexical scope or compound statement.
+  **L168 CN**: 结束当前词法作用域或复合语句块。
+- **L169 EN**: Blank line separating nearby declarations or logic blocks.
+  **L169 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L170 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L170 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L171 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::TileOp op) {`.
+  **L171 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::TileOp op) {`。
+- **L172 EN**: Returns from the current function with `populateProfileInfoDataLayout(op)`.
+  **L172 CN**: 以 `populateProfileInfoDataLayout(op)` 从当前函数返回。
+- **L173 EN**: Closes the current lexical scope or compound statement.
+  **L173 CN**: 结束当前词法作用域或复合语句块。
+- **L174 EN**: Blank line separating nearby declarations or logic blocks.
+  **L174 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L175 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L175 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L176 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::TransposeOp op) {`.
+  **L176 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::TransposeOp op) {`。
+- **L177 EN**: Returns from the current function with `populateProfileInfoDataLayout(op)`.
+  **L177 CN**: 以 `populateProfileInfoDataLayout(op)` 从当前函数返回。
+- **L178 EN**: Closes the current lexical scope or compound statement.
+  **L178 CN**: 结束当前词法作用域或复合语句块。
+- **L179 EN**: Blank line separating nearby declarations or logic blocks.
+  **L179 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L180 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L180 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+
+### Lines 181-200
+
+````cpp
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::GatherOp op) {
+  addValue(op.getValues());
+  addValue(op.getIndices());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult
+ProfileInfoDepot::populateProfileInfo(tosa::RowGatherBlockScaledOp op) {
+  for (Value value : op.getValues())
+    addValue(value);
+  addValue(op.getIndices());
+  addValue(op.getRowCount());
+  for (Value result : op.getOutput())
+    addValue(result);
+  return success();
+}
+
+template <>
+````
+- **L181 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::GatherOp op) {`.
+  **L181 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::GatherOp op) {`。
+- **L182 EN**: Executes a call or declaration centered on `addValue`.
+  **L182 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L183 EN**: Executes a call or declaration centered on `addValue`.
+  **L183 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L184 EN**: Executes a call or declaration centered on `addValue`.
+  **L184 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L185 EN**: Returns from the current function with `success()`.
+  **L185 CN**: 以 `success()` 从当前函数返回。
+- **L186 EN**: Closes the current lexical scope or compound statement.
+  **L186 CN**: 结束当前词法作用域或复合语句块。
+- **L187 EN**: Blank line separating nearby declarations or logic blocks.
+  **L187 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L188 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L188 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L189 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L189 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L190 EN**: Starts a function, method, lambda, or structured scope: `ProfileInfoDepot::populateProfileInfo(tosa::RowGatherBlockScaledOp op) {`.
+  **L190 CN**: 开始一个函数、方法、lambda 或结构化作用域：`ProfileInfoDepot::populateProfileInfo(tosa::RowGatherBlockScaledOp op) {`。
+- **L191 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L191 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L192 EN**: Executes a call or declaration centered on `addValue`.
+  **L192 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L193 EN**: Executes a call or declaration centered on `addValue`.
+  **L193 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L194 EN**: Executes a call or declaration centered on `addValue`.
+  **L194 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L195 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L195 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L196 EN**: Executes a call or declaration centered on `addValue`.
+  **L196 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L197 EN**: Returns from the current function with `success()`.
+  **L197 CN**: 以 `success()` 从当前函数返回。
+- **L198 EN**: Closes the current lexical scope or compound statement.
+  **L198 CN**: 结束当前词法作用域或复合语句块。
+- **L199 EN**: Blank line separating nearby declarations or logic blocks.
+  **L199 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L200 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L200 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+
+### Lines 201-220
+
+````cpp
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ScatterOp op) {
+  addValue(op.getValuesIn());
+  addValue(op.getIndices());
+  addValue(op.getInput());
+  addValue(op.getValuesOut());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::MulOp op) {
+  addValue(op.getInput1());
+  addValue(op.getInput2());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ResizeOp op) {
+  addValue(op.getInput());
+  addValue(op.getOutput());
+````
+- **L201 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ScatterOp op) {`.
+  **L201 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ScatterOp op) {`。
+- **L202 EN**: Executes a call or declaration centered on `addValue`.
+  **L202 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L203 EN**: Executes a call or declaration centered on `addValue`.
+  **L203 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L204 EN**: Executes a call or declaration centered on `addValue`.
+  **L204 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L205 EN**: Executes a call or declaration centered on `addValue`.
+  **L205 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L206 EN**: Returns from the current function with `success()`.
+  **L206 CN**: 以 `success()` 从当前函数返回。
+- **L207 EN**: Closes the current lexical scope or compound statement.
+  **L207 CN**: 结束当前词法作用域或复合语句块。
+- **L208 EN**: Blank line separating nearby declarations or logic blocks.
+  **L208 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L209 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L209 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L210 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::MulOp op) {`.
+  **L210 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::MulOp op) {`。
+- **L211 EN**: Executes a call or declaration centered on `addValue`.
+  **L211 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L212 EN**: Executes a call or declaration centered on `addValue`.
+  **L212 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L213 EN**: Executes a call or declaration centered on `addValue`.
+  **L213 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L214 EN**: Returns from the current function with `success()`.
+  **L214 CN**: 以 `success()` 从当前函数返回。
+- **L215 EN**: Closes the current lexical scope or compound statement.
+  **L215 CN**: 结束当前词法作用域或复合语句块。
+- **L216 EN**: Blank line separating nearby declarations or logic blocks.
+  **L216 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L217 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L217 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L218 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ResizeOp op) {`.
+  **L218 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::ResizeOp op) {`。
+- **L219 EN**: Executes a call or declaration centered on `addValue`.
+  **L219 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L220 EN**: Executes a call or declaration centered on `addValue`.
+  **L220 CN**: 执行以 `addValue` 为核心的调用或声明。
+
+### Lines 221-240
+
+````cpp
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::SelectOp op) {
+  addValue(op.getOnTrue());
+  addValue(op.getOnFalse());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::RescaleOp op) {
+  addValue(op.getInput());
+  addValue(op.getInputZp());
+  addValue(op.getOutputZp());
+  addValue(op.getOutput());
+  return success();
+}
+
+````
+- **L221 EN**: Returns from the current function with `success()`.
+  **L221 CN**: 以 `success()` 从当前函数返回。
+- **L222 EN**: Closes the current lexical scope or compound statement.
+  **L222 CN**: 结束当前词法作用域或复合语句块。
+- **L223 EN**: Blank line separating nearby declarations or logic blocks.
+  **L223 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L224 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L224 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L225 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::SelectOp op) {`.
+  **L225 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::SelectOp op) {`。
+- **L226 EN**: Executes a call or declaration centered on `addValue`.
+  **L226 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L227 EN**: Executes a call or declaration centered on `addValue`.
+  **L227 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L228 EN**: Executes a call or declaration centered on `addValue`.
+  **L228 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L229 EN**: Returns from the current function with `success()`.
+  **L229 CN**: 以 `success()` 从当前函数返回。
+- **L230 EN**: Closes the current lexical scope or compound statement.
+  **L230 CN**: 结束当前词法作用域或复合语句块。
+- **L231 EN**: Blank line separating nearby declarations or logic blocks.
+  **L231 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L232 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L232 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L233 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::RescaleOp op) {`.
+  **L233 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::RescaleOp op) {`。
+- **L234 EN**: Executes a call or declaration centered on `addValue`.
+  **L234 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L235 EN**: Executes a call or declaration centered on `addValue`.
+  **L235 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L236 EN**: Executes a call or declaration centered on `addValue`.
+  **L236 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L237 EN**: Executes a call or declaration centered on `addValue`.
+  **L237 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L238 EN**: Returns from the current function with `success()`.
+  **L238 CN**: 以 `success()` 从当前函数返回。
+- **L239 EN**: Closes the current lexical scope or compound statement.
+  **L239 CN**: 结束当前词法作用域或复合语句块。
+- **L240 EN**: Blank line separating nearby declarations or logic blocks.
+  **L240 CN**: 空行，用于分隔相邻的声明或逻辑块。
+
+### Lines 241-260
+
+````cpp
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::MatMulOp op) {
+  addValue(op.getA());
+  addValue(op.getB());
+  addValue(op.getAZp());
+  addValue(op.getBZp());
+  addValue(op.getOutput());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::VariableOp op) {
+  addType(op.getType());
+  return success();
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::VariableWriteOp op) {
+  addValue(op.getInput1());
+  return success();
+````
+- **L241 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L241 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L242 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::MatMulOp op) {`.
+  **L242 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::MatMulOp op) {`。
+- **L243 EN**: Executes a call or declaration centered on `addValue`.
+  **L243 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L244 EN**: Executes a call or declaration centered on `addValue`.
+  **L244 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L245 EN**: Executes a call or declaration centered on `addValue`.
+  **L245 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L246 EN**: Executes a call or declaration centered on `addValue`.
+  **L246 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L247 EN**: Executes a call or declaration centered on `addValue`.
+  **L247 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L248 EN**: Returns from the current function with `success()`.
+  **L248 CN**: 以 `success()` 从当前函数返回。
+- **L249 EN**: Closes the current lexical scope or compound statement.
+  **L249 CN**: 结束当前词法作用域或复合语句块。
+- **L250 EN**: Blank line separating nearby declarations or logic blocks.
+  **L250 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L251 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L251 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L252 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::VariableOp op) {`.
+  **L252 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::VariableOp op) {`。
+- **L253 EN**: Executes a call or declaration centered on `addType`.
+  **L253 CN**: 执行以 `addType` 为核心的调用或声明。
+- **L254 EN**: Returns from the current function with `success()`.
+  **L254 CN**: 以 `success()` 从当前函数返回。
+- **L255 EN**: Closes the current lexical scope or compound statement.
+  **L255 CN**: 结束当前词法作用域或复合语句块。
+- **L256 EN**: Blank line separating nearby declarations or logic blocks.
+  **L256 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L257 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L257 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L258 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::VariableWriteOp op) {`.
+  **L258 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::VariableWriteOp op) {`。
+- **L259 EN**: Executes a call or declaration centered on `addValue`.
+  **L259 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L260 EN**: Returns from the current function with `success()`.
+  **L260 CN**: 以 `success()` 从当前函数返回。
+
+### Lines 261-280
+
+````cpp
+}
+
+template <>
+LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::DimOp op) {
+  addValue(op.getInput1());
+  return success();
+}
+
+LogicalResult ProfileInfoDepot::populatationDispatch(Operation *op) {
+// This helper function only populates the info for the customised operands.
+#define POPULATE_PROFILE_INFO_CUSTOM(tosaOp)                                   \
+  if (isa<tosa::tosaOp##Op>(op)) {                                             \
+    return populateProfileInfo(cast<tosa::tosaOp##Op>(op));                    \
+  }
+
+#define POPULATE_PROFILE_INFO_SKIP(tosaOp)                                     \
+  if (isa<tosa::tosaOp##Op>(op))                                               \
+    return success();
+
+// This helper function populates the info for all operands.
+````
+- **L261 EN**: Closes the current lexical scope or compound statement.
+  **L261 CN**: 结束当前词法作用域或复合语句块。
+- **L262 EN**: Blank line separating nearby declarations or logic blocks.
+  **L262 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L263 EN**: Introduces template parameters or specialization context: `template <>`.
+  **L263 CN**: 为后续声明引入模板参数或特化上下文：`template <>`。
+- **L264 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::DimOp op) {`.
+  **L264 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populateProfileInfo(tosa::DimOp op) {`。
+- **L265 EN**: Executes a call or declaration centered on `addValue`.
+  **L265 CN**: 执行以 `addValue` 为核心的调用或声明。
+- **L266 EN**: Returns from the current function with `success()`.
+  **L266 CN**: 以 `success()` 从当前函数返回。
+- **L267 EN**: Closes the current lexical scope or compound statement.
+  **L267 CN**: 结束当前词法作用域或复合语句块。
+- **L268 EN**: Blank line separating nearby declarations or logic blocks.
+  **L268 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L269 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult ProfileInfoDepot::populatationDispatch(Operation *op) {`.
+  **L269 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult ProfileInfoDepot::populatationDispatch(Operation *op) {`。
+- **L270 EN**: Comment explains nearby logic, invariants, or intent: `This helper function only populates the info for the customised operands.`.
+  **L270 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`This helper function only populates the info for the customised operands.`。
+- **L271 EN**: Defines macro `POPULATE_PROFILE_INFO_CUSTOM(tosaOp)` for generated declarations, local shorthand, or conditional logic.
+  **L271 CN**: 定义宏 `POPULATE_PROFILE_INFO_CUSTOM(tosaOp)`，供生成式声明、本地简写或条件逻辑使用。
+- **L272 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L272 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L273 EN**: Returns from the current function with `populateProfileInfo(cast<tosa::tosaOp##Op>(op));                    \`.
+  **L273 CN**: 以 `populateProfileInfo(cast<tosa::tosaOp##Op>(op));                    \` 从当前函数返回。
+- **L274 EN**: Closes the current lexical scope or compound statement.
+  **L274 CN**: 结束当前词法作用域或复合语句块。
+- **L275 EN**: Blank line separating nearby declarations or logic blocks.
+  **L275 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L276 EN**: Defines macro `POPULATE_PROFILE_INFO_SKIP(tosaOp)` for generated declarations, local shorthand, or conditional logic.
+  **L276 CN**: 定义宏 `POPULATE_PROFILE_INFO_SKIP(tosaOp)`，供生成式声明、本地简写或条件逻辑使用。
+- **L277 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L277 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L278 EN**: Returns from the current function with `success()`.
+  **L278 CN**: 以 `success()` 从当前函数返回。
+- **L279 EN**: Blank line separating nearby declarations or logic blocks.
+  **L279 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L280 EN**: Comment explains nearby logic, invariants, or intent: `This helper function populates the info for all operands.`.
+  **L280 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`This helper function populates the info for all operands.`。
+
+### Lines 281-300
+
+````cpp
+#define POPULATE_PROFILE_INFO_COMMON(tosaOp)                                   \
+  if (isa<tosa::tosaOp##Op>(op)) {                                             \
+    return populateProfileInfo(op->getOperands(), op->getResults());           \
+  }
+
+  // Skip irrelevant operands when they are independent and not tied to any
+  // specific profile/extension.
+  POPULATE_PROFILE_INFO_CUSTOM(AvgPool2d)
+  POPULATE_PROFILE_INFO_CUSTOM(AvgPool2dAdaptive)
+  POPULATE_PROFILE_INFO_CUSTOM(TransposeConv2D)
+  POPULATE_PROFILE_INFO_CUSTOM(Conv2D)
+  POPULATE_PROFILE_INFO_CUSTOM(Conv2DBlockScaled)
+  POPULATE_PROFILE_INFO_CUSTOM(Conv3D)
+  POPULATE_PROFILE_INFO_CUSTOM(DepthwiseConv2D)
+  POPULATE_PROFILE_INFO_CUSTOM(Mul)
+  POPULATE_PROFILE_INFO_CUSTOM(Concat)
+  POPULATE_PROFILE_INFO_CUSTOM(Pad)
+  POPULATE_PROFILE_INFO_CUSTOM(Reshape)
+  POPULATE_PROFILE_INFO_CUSTOM(Slice)
+  POPULATE_PROFILE_INFO_CUSTOM(Tile)
+````
+- **L281 EN**: Defines macro `POPULATE_PROFILE_INFO_COMMON(tosaOp)` for generated declarations, local shorthand, or conditional logic.
+  **L281 CN**: 定义宏 `POPULATE_PROFILE_INFO_COMMON(tosaOp)`，供生成式声明、本地简写或条件逻辑使用。
+- **L282 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L282 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L283 EN**: Returns from the current function with `populateProfileInfo(op->getOperands(), op->getResults());           \`.
+  **L283 CN**: 以 `populateProfileInfo(op->getOperands(), op->getResults());           \` 从当前函数返回。
+- **L284 EN**: Closes the current lexical scope or compound statement.
+  **L284 CN**: 结束当前词法作用域或复合语句块。
+- **L285 EN**: Blank line separating nearby declarations or logic blocks.
+  **L285 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L286 EN**: Comment explains nearby logic, invariants, or intent: `Skip irrelevant operands when they are independent and not tied to any`.
+  **L286 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Skip irrelevant operands when they are independent and not tied to any`。
+- **L287 EN**: Comment explains nearby logic, invariants, or intent: `specific profile/extension.`.
+  **L287 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`specific profile/extension.`。
+- **L288 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L288 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L289 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L289 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L290 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L290 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L291 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L291 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L292 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L292 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L293 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L293 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L294 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L294 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L295 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L295 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L296 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L296 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L297 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L297 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L298 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L298 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L299 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L299 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L300 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L300 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+
+### Lines 301-320
+
+````cpp
+  POPULATE_PROFILE_INFO_CUSTOM(Transpose)
+  POPULATE_PROFILE_INFO_CUSTOM(Gather)
+  POPULATE_PROFILE_INFO_CUSTOM(RowGatherBlockScaled)
+  POPULATE_PROFILE_INFO_CUSTOM(Scatter)
+  POPULATE_PROFILE_INFO_CUSTOM(Resize)
+  POPULATE_PROFILE_INFO_CUSTOM(Select)
+  POPULATE_PROFILE_INFO_CUSTOM(Rescale)
+  POPULATE_PROFILE_INFO_CUSTOM(MatMul)
+  POPULATE_PROFILE_INFO_CUSTOM(Variable)
+  POPULATE_PROFILE_INFO_CUSTOM(VariableWrite)
+  POPULATE_PROFILE_INFO_CUSTOM(Dim)
+  POPULATE_PROFILE_INFO_CUSTOM(MaxPool2dAdaptive)
+
+  // For the most of tosa operators, all operands are profile/extension related
+  // and hence are all considered in this profile-based compilance check.
+  POPULATE_PROFILE_INFO_COMMON(MatmulTBlockScaled)
+  POPULATE_PROFILE_INFO_COMMON(FFT2d)
+  POPULATE_PROFILE_INFO_COMMON(RFFT2d)
+  POPULATE_PROFILE_INFO_COMMON(Cast)
+  POPULATE_PROFILE_INFO_COMMON(CastFromBlockScaled)
+````
+- **L301 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L301 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L302 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L302 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L303 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L303 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L304 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L304 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L305 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L305 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L306 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L306 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L307 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L307 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L308 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L308 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L309 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L309 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L310 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L310 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L311 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L311 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L312 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_CUSTOM`.
+  **L312 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_CUSTOM` 相关的逻辑。
+- **L313 EN**: Blank line separating nearby declarations or logic blocks.
+  **L313 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L314 EN**: Comment explains nearby logic, invariants, or intent: `For the most of tosa operators, all operands are profile/extension related`.
+  **L314 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`For the most of tosa operators, all operands are profile/extension related`。
+- **L315 EN**: Comment explains nearby logic, invariants, or intent: `and hence are all considered in this profile-based compilance check.`.
+  **L315 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`and hence are all considered in this profile-based compilance check.`。
+- **L316 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L316 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L317 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L317 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L318 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L318 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L319 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L319 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L320 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L320 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+
+### Lines 321-340
+
+````cpp
+  POPULATE_PROFILE_INFO_COMMON(CastToBlockScaled)
+  POPULATE_PROFILE_INFO_COMMON(Const)
+  POPULATE_PROFILE_INFO_COMMON(ArgMax)
+  POPULATE_PROFILE_INFO_COMMON(Sub)
+  POPULATE_PROFILE_INFO_COMMON(Maximum)
+  POPULATE_PROFILE_INFO_COMMON(Minimum)
+  POPULATE_PROFILE_INFO_COMMON(MaxPool2d)
+  POPULATE_PROFILE_INFO_COMMON(Clamp)
+  POPULATE_PROFILE_INFO_COMMON(Erf)
+  POPULATE_PROFILE_INFO_COMMON(Sigmoid)
+  POPULATE_PROFILE_INFO_COMMON(Tanh)
+  POPULATE_PROFILE_INFO_COMMON(Add)
+  POPULATE_PROFILE_INFO_COMMON(ArithmeticRightShift)
+  POPULATE_PROFILE_INFO_COMMON(BitwiseAnd)
+  POPULATE_PROFILE_INFO_COMMON(BitwiseNot)
+  POPULATE_PROFILE_INFO_COMMON(BitwiseOr)
+  POPULATE_PROFILE_INFO_COMMON(BitwiseXor)
+  POPULATE_PROFILE_INFO_COMMON(LogicalLeftShift)
+  POPULATE_PROFILE_INFO_COMMON(LogicalRightShift)
+  POPULATE_PROFILE_INFO_COMMON(LogicalAnd)
+````
+- **L321 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L321 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L322 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L322 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L323 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L323 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L324 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L324 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L325 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L325 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L326 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L326 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L327 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L327 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L328 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L328 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L329 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L329 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L330 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L330 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L331 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L331 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L332 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L332 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L333 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L333 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L334 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L334 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L335 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L335 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L336 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L336 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L337 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L337 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L338 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L338 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L339 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L339 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L340 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L340 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+
+### Lines 341-360
+
+````cpp
+  POPULATE_PROFILE_INFO_COMMON(LogicalNot)
+  POPULATE_PROFILE_INFO_COMMON(LogicalOr)
+  POPULATE_PROFILE_INFO_COMMON(LogicalXor)
+  POPULATE_PROFILE_INFO_COMMON(IntDiv)
+  POPULATE_PROFILE_INFO_COMMON(Pow)
+  POPULATE_PROFILE_INFO_COMMON(Table)
+  POPULATE_PROFILE_INFO_COMMON(Abs)
+  POPULATE_PROFILE_INFO_COMMON(Ceil)
+  POPULATE_PROFILE_INFO_COMMON(Clz)
+  POPULATE_PROFILE_INFO_COMMON(Sin)
+  POPULATE_PROFILE_INFO_COMMON(Cos)
+  POPULATE_PROFILE_INFO_COMMON(Exp)
+  POPULATE_PROFILE_INFO_COMMON(Floor)
+  POPULATE_PROFILE_INFO_COMMON(Log)
+  POPULATE_PROFILE_INFO_COMMON(Negate)
+  POPULATE_PROFILE_INFO_COMMON(Reciprocal)
+  POPULATE_PROFILE_INFO_COMMON(Rsqrt)
+  POPULATE_PROFILE_INFO_COMMON(ReduceAll)
+  POPULATE_PROFILE_INFO_COMMON(ReduceAny)
+  POPULATE_PROFILE_INFO_COMMON(ReduceMax)
+````
+- **L341 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L341 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L342 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L342 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L343 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L343 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L344 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L344 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L345 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L345 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L346 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L346 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L347 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L347 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L348 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L348 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L349 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L349 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L350 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L350 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L351 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L351 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L352 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L352 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L353 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L353 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L354 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L354 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L355 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L355 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L356 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L356 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L357 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L357 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L358 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L358 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L359 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L359 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L360 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L360 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+
+### Lines 361-380
+
+````cpp
+  POPULATE_PROFILE_INFO_COMMON(ReduceMin)
+  POPULATE_PROFILE_INFO_COMMON(ReduceProduct)
+  POPULATE_PROFILE_INFO_COMMON(ReduceSum)
+  POPULATE_PROFILE_INFO_COMMON(Equal)
+  POPULATE_PROFILE_INFO_COMMON(GreaterEqual)
+  POPULATE_PROFILE_INFO_COMMON(Greater)
+  POPULATE_PROFILE_INFO_COMMON(Reverse)
+  POPULATE_PROFILE_INFO_COMMON(Identity)
+  POPULATE_PROFILE_INFO_COMMON(VariableRead)
+
+  // Type Invariant Extension, a capability extension that is independent
+  // of the data type, meaning any compatible type can be used. No type
+  // constraint for those operations.
+  POPULATE_PROFILE_INFO_SKIP(AddShape)
+  POPULATE_PROFILE_INFO_SKIP(AssertEqualShape)
+  POPULATE_PROFILE_INFO_SKIP(ConcatShape)
+  POPULATE_PROFILE_INFO_SKIP(ConstShape)
+  POPULATE_PROFILE_INFO_SKIP(DivCeilShape)
+  POPULATE_PROFILE_INFO_SKIP(DivFloorShape)
+  POPULATE_PROFILE_INFO_SKIP(Exp2Shape)
+````
+- **L361 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L361 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L362 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L362 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L363 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L363 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L364 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L364 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L365 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L365 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L366 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L366 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L367 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L367 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L368 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L368 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L369 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_COMMON`.
+  **L369 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_COMMON` 相关的逻辑。
+- **L370 EN**: Blank line separating nearby declarations or logic blocks.
+  **L370 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L371 EN**: Comment explains nearby logic, invariants, or intent: `Type Invariant Extension, a capability extension that is independent`.
+  **L371 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Type Invariant Extension, a capability extension that is independent`。
+- **L372 EN**: Comment explains nearby logic, invariants, or intent: `of the data type, meaning any compatible type can be used. No type`.
+  **L372 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`of the data type, meaning any compatible type can be used. No type`。
+- **L373 EN**: Comment explains nearby logic, invariants, or intent: `constraint for those operations.`.
+  **L373 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`constraint for those operations.`。
+- **L374 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L374 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L375 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L375 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L376 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L376 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L377 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L377 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L378 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L378 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L379 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L379 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L380 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L380 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+
+### Lines 381-400
+
+````cpp
+  POPULATE_PROFILE_INFO_SKIP(Log2CeilShape)
+  POPULATE_PROFILE_INFO_SKIP(Log2FloorShape)
+  POPULATE_PROFILE_INFO_SKIP(MaxShape)
+  POPULATE_PROFILE_INFO_SKIP(MinShape)
+  POPULATE_PROFILE_INFO_SKIP(ModShape)
+  POPULATE_PROFILE_INFO_SKIP(MulShape)
+  POPULATE_PROFILE_INFO_SKIP(SliceShape)
+  POPULATE_PROFILE_INFO_SKIP(SubShape)
+  POPULATE_PROFILE_INFO_SKIP(Yield)
+  POPULATE_PROFILE_INFO_SKIP(If)
+  POPULATE_PROFILE_INFO_SKIP(While)
+
+  return failure();
+}
+
+//===----------------------------------------------------------------------===//
+// Tosa Profile And Extension Compliance Checker
+//===----------------------------------------------------------------------===//
+
+template <typename T>
+````
+- **L381 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L381 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L382 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L382 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L383 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L383 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L384 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L384 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L385 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L385 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L386 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L386 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L387 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L387 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L388 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L388 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L389 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L389 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L390 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L390 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L391 EN**: Continues logic associated with callable symbol `POPULATE_PROFILE_INFO_SKIP`.
+  **L391 CN**: 继续与可调用符号 `POPULATE_PROFILE_INFO_SKIP` 相关的逻辑。
+- **L392 EN**: Blank line separating nearby declarations or logic blocks.
+  **L392 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L393 EN**: Returns from the current function with `failure()`.
+  **L393 CN**: 以 `failure()` 从当前函数返回。
+- **L394 EN**: Closes the current lexical scope or compound statement.
+  **L394 CN**: 结束当前词法作用域或复合语句块。
+- **L395 EN**: Blank line separating nearby declarations or logic blocks.
+  **L395 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L396 EN**: Banner comment marking a file or section boundary.
+  **L396 CN**: 横幅注释，用于标记文件或章节边界。
+- **L397 EN**: Comment explains nearby logic, invariants, or intent: `Tosa Profile And Extension Compliance Checker`.
+  **L397 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Tosa Profile And Extension Compliance Checker`。
+- **L398 EN**: Banner comment marking a file or section boundary.
+  **L398 CN**: 横幅注释，用于标记文件或章节边界。
+- **L399 EN**: Blank line separating nearby declarations or logic blocks.
+  **L399 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L400 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L400 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+
+### Lines 401-420
+
+````cpp
+FailureOr<SmallVector<OpComplianceInfo<T>>>
+TosaProfileCompliance::getOperatorMatchedEntries(Operation *op) {
+  const std::string opName = op->getName().getStringRef().str();
+  const auto complianceMap = getProfileComplianceMap<T>();
+  const auto it = complianceMap.find(opName);
+  if (it == complianceMap.end())
+    return {};
+
+  return findMatchedEntries<T>(op, it->second);
+}
+
+template <typename T>
+LogicalResult TosaProfileCompliance::checkProfileOrExtension(
+    Operation *op, const tosa::TargetEnv &targetEnv,
+    const SmallVector<ArrayRef<T>> &specRequiredModeSet) {
+
+  // None of profile requirement is set in the specification.
+  if (specRequiredModeSet.size() == 0)
+    return success();
+
+````
+- **L401 EN**: Continues the surrounding expression or declaration: `FailureOr<SmallVector<OpComplianceInfo<T>>>`.
+  **L401 CN**: 继续构造周围的表达式或声明：`FailureOr<SmallVector<OpComplianceInfo<T>>>`。
+- **L402 EN**: Starts a function, method, lambda, or structured scope: `TosaProfileCompliance::getOperatorMatchedEntries(Operation *op) {`.
+  **L402 CN**: 开始一个函数、方法、lambda 或结构化作用域：`TosaProfileCompliance::getOperatorMatchedEntries(Operation *op) {`。
+- **L403 EN**: Initializes variable `opName` from the right-hand expression.
+  **L403 CN**: 使用右侧表达式初始化变量 `opName`。
+- **L404 EN**: Initializes variable `complianceMap` from the right-hand expression.
+  **L404 CN**: 使用右侧表达式初始化变量 `complianceMap`。
+- **L405 EN**: Initializes variable `it` from the right-hand expression.
+  **L405 CN**: 使用右侧表达式初始化变量 `it`。
+- **L406 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L406 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L407 EN**: Returns from the current function with `{}`.
+  **L407 CN**: 以 `{}` 从当前函数返回。
+- **L408 EN**: Blank line separating nearby declarations or logic blocks.
+  **L408 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L409 EN**: Returns from the current function with `findMatchedEntries<T>(op, it->second)`.
+  **L409 CN**: 以 `findMatchedEntries<T>(op, it->second)` 从当前函数返回。
+- **L410 EN**: Closes the current lexical scope or compound statement.
+  **L410 CN**: 结束当前词法作用域或复合语句块。
+- **L411 EN**: Blank line separating nearby declarations or logic blocks.
+  **L411 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L412 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L412 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+- **L413 EN**: Continues logic associated with callable symbol `checkProfileOrExtension`.
+  **L413 CN**: 继续与可调用符号 `checkProfileOrExtension` 相关的逻辑。
+- **L414 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `Operation *op, const tosa::TargetEnv &targetEnv,`.
+  **L414 CN**: 继续一个多行参数列表、初始化器或聚合项：`Operation *op, const tosa::TargetEnv &targetEnv,`。
+- **L415 EN**: Continues the surrounding expression or declaration: `const SmallVector<ArrayRef<T>> &specRequiredModeSet) {`.
+  **L415 CN**: 继续构造周围的表达式或声明：`const SmallVector<ArrayRef<T>> &specRequiredModeSet) {`。
+- **L416 EN**: Blank line separating nearby declarations or logic blocks.
+  **L416 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L417 EN**: Comment explains nearby logic, invariants, or intent: `None of profile requirement is set in the specification.`.
+  **L417 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`None of profile requirement is set in the specification.`。
+- **L418 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L418 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L419 EN**: Returns from the current function with `success()`.
+  **L419 CN**: 以 `success()` 从当前函数返回。
+- **L420 EN**: Blank line separating nearby declarations or logic blocks.
+  **L420 CN**: 空行，用于分隔相邻的声明或逻辑块。
+
+### Lines 421-440
+
+````cpp
+  const auto maybeOpEntries = getOperatorMatchedEntries<T>(op);
+  if (failed(maybeOpEntries)) {
+    // Operators such as control-flow and shape ops do not have an operand type
+    // restriction. When the profile compliance information of operation is not
+    // found, confirm if the target have enabled the profile required from the
+    // specification.
+    int modeCount = 0;
+    for (const auto &cands : specRequiredModeSet) {
+      if (targetEnv.allowsAnyOf(cands))
+        return success();
+      modeCount += cands.size();
+    }
+
+    op->emitOpError() << "illegal: requires"
+                      << (modeCount > 1 ? " any of " : " ") << "["
+                      << llvm::join(stringifyProfile<T>(specRequiredModeSet),
+                                    ", ")
+                      << "] but not enabled in target\n";
+
+    return failure();
+````
+- **L421 EN**: Initializes variable `maybeOpEntries` from the right-hand expression.
+  **L421 CN**: 使用右侧表达式初始化变量 `maybeOpEntries`。
+- **L422 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L422 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L423 EN**: Comment explains nearby logic, invariants, or intent: `Operators such as control-flow and shape ops do not have an operand type`.
+  **L423 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Operators such as control-flow and shape ops do not have an operand type`。
+- **L424 EN**: Comment explains nearby logic, invariants, or intent: `restriction. When the profile compliance information of operation is not`.
+  **L424 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`restriction. When the profile compliance information of operation is not`。
+- **L425 EN**: Comment explains nearby logic, invariants, or intent: `found, confirm if the target have enabled the profile required from the`.
+  **L425 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`found, confirm if the target have enabled the profile required from the`。
+- **L426 EN**: Comment explains nearby logic, invariants, or intent: `specification.`.
+  **L426 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`specification.`。
+- **L427 EN**: Initializes variable `modeCount` from the right-hand expression.
+  **L427 CN**: 使用右侧表达式初始化变量 `modeCount`。
+- **L428 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L428 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L429 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L429 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L430 EN**: Returns from the current function with `success()`.
+  **L430 CN**: 以 `success()` 从当前函数返回。
+- **L431 EN**: Executes a call or declaration centered on `cands.size`.
+  **L431 CN**: 执行以 `cands.size` 为核心的调用或声明。
+- **L432 EN**: Closes the current lexical scope or compound statement.
+  **L432 CN**: 结束当前词法作用域或复合语句块。
+- **L433 EN**: Blank line separating nearby declarations or logic blocks.
+  **L433 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L434 EN**: Continues logic associated with callable symbol `emitOpError`.
+  **L434 CN**: 继续与可调用符号 `emitOpError` 相关的逻辑。
+- **L435 EN**: Continues the surrounding expression or declaration: `<< (modeCount > 1 ? " any of " : " ") << "["`.
+  **L435 CN**: 继续构造周围的表达式或声明：`<< (modeCount > 1 ? " any of " : " ") << "["`。
+- **L436 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `<< llvm::join(stringifyProfile<T>(specRequiredModeSet),`.
+  **L436 CN**: 继续一个多行参数列表、初始化器或聚合项：`<< llvm::join(stringifyProfile<T>(specRequiredModeSet),`。
+- **L437 EN**: Continues the surrounding expression or declaration: `", ")`.
+  **L437 CN**: 继续构造周围的表达式或声明：`", ")`。
+- **L438 EN**: Executes a standalone statement or declaration: `<< "] but not enabled in target\n";`.
+  **L438 CN**: 执行一条独立语句或声明：`<< "] but not enabled in target\n";`。
+- **L439 EN**: Blank line separating nearby declarations or logic blocks.
+  **L439 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L440 EN**: Returns from the current function with `failure()`.
+  **L440 CN**: 以 `failure()` 从当前函数返回。
+
+### Lines 441-460
+
+````cpp
+  }
+
+  const auto opEntries = maybeOpEntries.value();
+  if (opEntries.size() == 0) {
+    // No matched restriction found.
+    return success();
+  }
+
+  // Check the profile/extension requirement according to the current target
+  // profiles/extensions.
+  const auto isModeAllowed = [&](const OpComplianceInfo<T> &info) -> bool {
+    if (info.condition == CheckCondition::allOf)
+      return targetEnv.allowsAllOf(info.mode);
+    return targetEnv.allowsAnyOf(info.mode);
+  };
+
+  // Check the matched op compliance version does not exceed the target
+  // specification version.
+  const TosaSpecificationVersion targetVersion{targetEnv.getSpecVersion()};
+  const auto isVersionCompatible =
+````
+- **L441 EN**: Closes the current lexical scope or compound statement.
+  **L441 CN**: 结束当前词法作用域或复合语句块。
+- **L442 EN**: Blank line separating nearby declarations or logic blocks.
+  **L442 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L443 EN**: Initializes variable `opEntries` from the right-hand expression.
+  **L443 CN**: 使用右侧表达式初始化变量 `opEntries`。
+- **L444 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L444 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L445 EN**: Comment explains nearby logic, invariants, or intent: `No matched restriction found.`.
+  **L445 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`No matched restriction found.`。
+- **L446 EN**: Returns from the current function with `success()`.
+  **L446 CN**: 以 `success()` 从当前函数返回。
+- **L447 EN**: Closes the current lexical scope or compound statement.
+  **L447 CN**: 结束当前词法作用域或复合语句块。
+- **L448 EN**: Blank line separating nearby declarations or logic blocks.
+  **L448 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L449 EN**: Comment explains nearby logic, invariants, or intent: `Check the profile/extension requirement according to the current target`.
+  **L449 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Check the profile/extension requirement according to the current target`。
+- **L450 EN**: Comment explains nearby logic, invariants, or intent: `profiles/extensions.`.
+  **L450 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`profiles/extensions.`。
+- **L451 EN**: Starts a function, method, lambda, or structured scope: `const auto isModeAllowed = [&](const OpComplianceInfo<T> &info) -> bool {`.
+  **L451 CN**: 开始一个函数、方法、lambda 或结构化作用域：`const auto isModeAllowed = [&](const OpComplianceInfo<T> &info) -> bool {`。
+- **L452 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L452 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L453 EN**: Returns from the current function with `targetEnv.allowsAllOf(info.mode)`.
+  **L453 CN**: 以 `targetEnv.allowsAllOf(info.mode)` 从当前函数返回。
+- **L454 EN**: Returns from the current function with `targetEnv.allowsAnyOf(info.mode)`.
+  **L454 CN**: 以 `targetEnv.allowsAnyOf(info.mode)` 从当前函数返回。
+- **L455 EN**: Closes the current declaration scope such as a class, struct, or enum.
+  **L455 CN**: 结束当前声明作用域，例如类、结构体或枚举。
+- **L456 EN**: Blank line separating nearby declarations or logic blocks.
+  **L456 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L457 EN**: Comment explains nearby logic, invariants, or intent: `Check the matched op compliance version does not exceed the target`.
+  **L457 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Check the matched op compliance version does not exceed the target`。
+- **L458 EN**: Comment explains nearby logic, invariants, or intent: `specification version.`.
+  **L458 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`specification version.`。
+- **L459 EN**: Executes a call or declaration centered on `targetVersion{targetEnv.getSpecVersion`.
+  **L459 CN**: 执行以 `targetVersion{targetEnv.getSpecVersion` 为核心的调用或声明。
+- **L460 EN**: Continues the surrounding expression or declaration: `const auto isVersionCompatible =`.
+  **L460 CN**: 继续构造周围的表达式或声明：`const auto isVersionCompatible =`。
+
+### Lines 461-480
+
+````cpp
+      [&targetVersion](const OpComplianceInfo<T> &info) -> bool {
+    const TosaSpecificationVersion complianceVersion{
+        info.operandTypeInfoSet.front().second};
+    return targetVersion.isBackwardsCompatibleWith(complianceVersion);
+  };
+
+  for (const auto &info : opEntries) {
+    // Ensure the profile compliance is compatible with the profile knowledge of
+    // the op definition.
+    assert(llvm::all_of(info.mode,
+                        [&specRequiredModeSet](const T &mode) {
+                          return llvm::is_contained(specRequiredModeSet.front(),
+                                                    mode);
+                        }) &&
+           "the profile/extension requirement of the operator should be "
+           "included in the profile compliance information");
+
+    if (isModeAllowed(info) && isVersionCompatible(info))
+      return success();
+  }
+````
+- **L461 EN**: Starts a function, method, lambda, or structured scope: `[&targetVersion](const OpComplianceInfo<T> &info) -> bool {`.
+  **L461 CN**: 开始一个函数、方法、lambda 或结构化作用域：`[&targetVersion](const OpComplianceInfo<T> &info) -> bool {`。
+- **L462 EN**: Continues the surrounding expression or declaration: `const TosaSpecificationVersion complianceVersion{`.
+  **L462 CN**: 继续构造周围的表达式或声明：`const TosaSpecificationVersion complianceVersion{`。
+- **L463 EN**: Executes a call or declaration centered on `info.operandTypeInfoSet.front`.
+  **L463 CN**: 执行以 `info.operandTypeInfoSet.front` 为核心的调用或声明。
+- **L464 EN**: Returns from the current function with `targetVersion.isBackwardsCompatibleWith(complianceVersion)`.
+  **L464 CN**: 以 `targetVersion.isBackwardsCompatibleWith(complianceVersion)` 从当前函数返回。
+- **L465 EN**: Closes the current declaration scope such as a class, struct, or enum.
+  **L465 CN**: 结束当前声明作用域，例如类、结构体或枚举。
+- **L466 EN**: Blank line separating nearby declarations or logic blocks.
+  **L466 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L467 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L467 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L468 EN**: Comment explains nearby logic, invariants, or intent: `Ensure the profile compliance is compatible with the profile knowledge of`.
+  **L468 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Ensure the profile compliance is compatible with the profile knowledge of`。
+- **L469 EN**: Comment explains nearby logic, invariants, or intent: `the op definition.`.
+  **L469 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`the op definition.`。
+- **L470 EN**: Checks an internal invariant in debug builds.
+  **L470 CN**: 在调试构建中检查内部不变式。
+- **L471 EN**: Starts a function, method, lambda, or structured scope: `[&specRequiredModeSet](const T &mode) {`.
+  **L471 CN**: 开始一个函数、方法、lambda 或结构化作用域：`[&specRequiredModeSet](const T &mode) {`。
+- **L472 EN**: Returns from the current function with `llvm::is_contained(specRequiredModeSet.front(),`.
+  **L472 CN**: 以 `llvm::is_contained(specRequiredModeSet.front(),` 从当前函数返回。
+- **L473 EN**: Executes a standalone statement or declaration: `mode);`.
+  **L473 CN**: 执行一条独立语句或声明：`mode);`。
+- **L474 EN**: Continues the surrounding expression or declaration: `}) &&`.
+  **L474 CN**: 继续构造周围的表达式或声明：`}) &&`。
+- **L475 EN**: Continues the surrounding expression or declaration: `"the profile/extension requirement of the operator should be "`.
+  **L475 CN**: 继续构造周围的表达式或声明：`"the profile/extension requirement of the operator should be "`。
+- **L476 EN**: Executes a standalone statement or declaration: `"included in the profile compliance information");`.
+  **L476 CN**: 执行一条独立语句或声明：`"included in the profile compliance information");`。
+- **L477 EN**: Blank line separating nearby declarations or logic blocks.
+  **L477 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L478 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L478 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L479 EN**: Returns from the current function with `success()`.
+  **L479 CN**: 以 `success()` 从当前函数返回。
+- **L480 EN**: Closes the current lexical scope or compound statement.
+  **L480 CN**: 结束当前词法作用域或复合语句块。
+
+### Lines 481-500
+
+````cpp
+
+  // No valid entry was found, now emit appropriate error message and return
+  // failure
+  std::string message;
+  llvm::raw_string_ostream os(message);
+
+  os << "illegal: ";
+  const size_t numOpEntries = opEntries.size();
+  for (const auto &[index, info] : llvm::enumerate(opEntries)) {
+    bool mismatchedVersion = false;
+    if (!isVersionCompatible(info)) {
+      mismatchedVersion = true;
+      os << "requires specification version compatible with "
+         << stringifyVersion(info.operandTypeInfoSet.front().second) << " (got "
+         << stringifyVersion(targetVersion) << ") ";
+    }
+
+    if (!isModeAllowed(info)) {
+      if (mismatchedVersion)
+        os << "and ";
+````
+- **L481 EN**: Blank line separating nearby declarations or logic blocks.
+  **L481 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L482 EN**: Comment explains nearby logic, invariants, or intent: `No valid entry was found, now emit appropriate error message and return`.
+  **L482 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`No valid entry was found, now emit appropriate error message and return`。
+- **L483 EN**: Comment explains nearby logic, invariants, or intent: `failure`.
+  **L483 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`failure`。
+- **L484 EN**: Executes a standalone statement or declaration: `std::string message;`.
+  **L484 CN**: 执行一条独立语句或声明：`std::string message;`。
+- **L485 EN**: Executes a call or declaration centered on `os`.
+  **L485 CN**: 执行以 `os` 为核心的调用或声明。
+- **L486 EN**: Blank line separating nearby declarations or logic blocks.
+  **L486 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L487 EN**: Executes a standalone statement or declaration: `os << "illegal: ";`.
+  **L487 CN**: 执行一条独立语句或声明：`os << "illegal: ";`。
+- **L488 EN**: Initializes variable `numOpEntries` from the right-hand expression.
+  **L488 CN**: 使用右侧表达式初始化变量 `numOpEntries`。
+- **L489 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L489 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L490 EN**: Initializes variable `mismatchedVersion` from the right-hand expression.
+  **L490 CN**: 使用右侧表达式初始化变量 `mismatchedVersion`。
+- **L491 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L491 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L492 EN**: Executes a standalone statement or declaration: `mismatchedVersion = true;`.
+  **L492 CN**: 执行一条独立语句或声明：`mismatchedVersion = true;`。
+- **L493 EN**: Continues the surrounding expression or declaration: `os << "requires specification version compatible with "`.
+  **L493 CN**: 继续构造周围的表达式或声明：`os << "requires specification version compatible with "`。
+- **L494 EN**: Continues logic associated with callable symbol `stringifyVersion`.
+  **L494 CN**: 继续与可调用符号 `stringifyVersion` 相关的逻辑。
+- **L495 EN**: Executes a call or declaration centered on `stringifyVersion`.
+  **L495 CN**: 执行以 `stringifyVersion` 为核心的调用或声明。
+- **L496 EN**: Closes the current lexical scope or compound statement.
+  **L496 CN**: 结束当前词法作用域或复合语句块。
+- **L497 EN**: Blank line separating nearby declarations or logic blocks.
+  **L497 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L498 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L498 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L499 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L499 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L500 EN**: Executes a standalone statement or declaration: `os << "and ";`.
+  **L500 CN**: 执行一条独立语句或声明：`os << "and ";`。
+
+### Lines 501-520
+
+````cpp
+      os << "requires "
+         << (info.condition == CheckCondition::allOf ? "all of " : "any of ")
+         << "[" << llvm::join(stringifyProfile<T>(info.mode), ", ")
+         << "] profiles/extensions ";
+    }
+
+    if (index != numOpEntries - 1)
+      os << "OR ";
+  }
+  os << "to be specified in the target environment";
+
+  return op->emitOpError(message);
+}
+
+LogicalResult
+TosaProfileCompliance::checkProfile(Operation *op,
+                                    const tosa::TargetEnv &targetEnv) {
+  if (auto interface = dyn_cast<tosa::QueryProfileInterface>(op))
+    return checkProfileOrExtension<Profile>(op, targetEnv,
+                                            interface.getProfiles());
+````
+- **L501 EN**: Continues the surrounding expression or declaration: `os << "requires "`.
+  **L501 CN**: 继续构造周围的表达式或声明：`os << "requires "`。
+- **L502 EN**: Continues the surrounding expression or declaration: `<< (info.condition == CheckCondition::allOf ? "all of " : "any of ")`.
+  **L502 CN**: 继续构造周围的表达式或声明：`<< (info.condition == CheckCondition::allOf ? "all of " : "any of ")`。
+- **L503 EN**: Continues logic associated with callable symbol `join`.
+  **L503 CN**: 继续与可调用符号 `join` 相关的逻辑。
+- **L504 EN**: Executes a standalone statement or declaration: `<< "] profiles/extensions ";`.
+  **L504 CN**: 执行一条独立语句或声明：`<< "] profiles/extensions ";`。
+- **L505 EN**: Closes the current lexical scope or compound statement.
+  **L505 CN**: 结束当前词法作用域或复合语句块。
+- **L506 EN**: Blank line separating nearby declarations or logic blocks.
+  **L506 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L507 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L507 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L508 EN**: Executes a standalone statement or declaration: `os << "OR ";`.
+  **L508 CN**: 执行一条独立语句或声明：`os << "OR ";`。
+- **L509 EN**: Closes the current lexical scope or compound statement.
+  **L509 CN**: 结束当前词法作用域或复合语句块。
+- **L510 EN**: Executes a standalone statement or declaration: `os << "to be specified in the target environment";`.
+  **L510 CN**: 执行一条独立语句或声明：`os << "to be specified in the target environment";`。
+- **L511 EN**: Blank line separating nearby declarations or logic blocks.
+  **L511 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L512 EN**: Returns from the current function with `op->emitOpError(message)`.
+  **L512 CN**: 以 `op->emitOpError(message)` 从当前函数返回。
+- **L513 EN**: Closes the current lexical scope or compound statement.
+  **L513 CN**: 结束当前词法作用域或复合语句块。
+- **L514 EN**: Blank line separating nearby declarations or logic blocks.
+  **L514 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L515 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L515 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L516 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `TosaProfileCompliance::checkProfile(Operation *op,`.
+  **L516 CN**: 继续一个多行参数列表、初始化器或聚合项：`TosaProfileCompliance::checkProfile(Operation *op,`。
+- **L517 EN**: Continues the surrounding expression or declaration: `const tosa::TargetEnv &targetEnv) {`.
+  **L517 CN**: 继续构造周围的表达式或声明：`const tosa::TargetEnv &targetEnv) {`。
+- **L518 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L518 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L519 EN**: Returns from the current function with `checkProfileOrExtension<Profile>(op, targetEnv,`.
+  **L519 CN**: 以 `checkProfileOrExtension<Profile>(op, targetEnv,` 从当前函数返回。
+- **L520 EN**: Executes a call or declaration centered on `interface.getProfiles`.
+  **L520 CN**: 执行以 `interface.getProfiles` 为核心的调用或声明。
+
+### Lines 521-540
+
+````cpp
+
+  return success();
+}
+
+LogicalResult
+TosaProfileCompliance::checkExtension(Operation *op,
+                                      const tosa::TargetEnv &targetEnv) {
+  if (auto interface = dyn_cast<tosa::QueryExtensionInterface>(op))
+    return checkProfileOrExtension<Extension>(op, targetEnv,
+                                              interface.getExtensions());
+
+  return success();
+}
+
+LogicalResult TosaProfileCompliance::checkInvalid(Operation *op) {
+  const auto maybeProfEntries = getOperatorMatchedEntries<Profile>(op);
+  const auto maybeExtEntries = getOperatorMatchedEntries<Extension>(op);
+  if (failed(maybeProfEntries) && failed(maybeExtEntries))
+    return success();
+
+````
+- **L521 EN**: Blank line separating nearby declarations or logic blocks.
+  **L521 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L522 EN**: Returns from the current function with `success()`.
+  **L522 CN**: 以 `success()` 从当前函数返回。
+- **L523 EN**: Closes the current lexical scope or compound statement.
+  **L523 CN**: 结束当前词法作用域或复合语句块。
+- **L524 EN**: Blank line separating nearby declarations or logic blocks.
+  **L524 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L525 EN**: Continues the surrounding expression or declaration: `LogicalResult`.
+  **L525 CN**: 继续构造周围的表达式或声明：`LogicalResult`。
+- **L526 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `TosaProfileCompliance::checkExtension(Operation *op,`.
+  **L526 CN**: 继续一个多行参数列表、初始化器或聚合项：`TosaProfileCompliance::checkExtension(Operation *op,`。
+- **L527 EN**: Continues the surrounding expression or declaration: `const tosa::TargetEnv &targetEnv) {`.
+  **L527 CN**: 继续构造周围的表达式或声明：`const tosa::TargetEnv &targetEnv) {`。
+- **L528 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L528 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L529 EN**: Returns from the current function with `checkProfileOrExtension<Extension>(op, targetEnv,`.
+  **L529 CN**: 以 `checkProfileOrExtension<Extension>(op, targetEnv,` 从当前函数返回。
+- **L530 EN**: Executes a call or declaration centered on `interface.getExtensions`.
+  **L530 CN**: 执行以 `interface.getExtensions` 为核心的调用或声明。
+- **L531 EN**: Blank line separating nearby declarations or logic blocks.
+  **L531 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L532 EN**: Returns from the current function with `success()`.
+  **L532 CN**: 以 `success()` 从当前函数返回。
+- **L533 EN**: Closes the current lexical scope or compound statement.
+  **L533 CN**: 结束当前词法作用域或复合语句块。
+- **L534 EN**: Blank line separating nearby declarations or logic blocks.
+  **L534 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L535 EN**: Starts a function, method, lambda, or structured scope: `LogicalResult TosaProfileCompliance::checkInvalid(Operation *op) {`.
+  **L535 CN**: 开始一个函数、方法、lambda 或结构化作用域：`LogicalResult TosaProfileCompliance::checkInvalid(Operation *op) {`。
+- **L536 EN**: Initializes variable `maybeProfEntries` from the right-hand expression.
+  **L536 CN**: 使用右侧表达式初始化变量 `maybeProfEntries`。
+- **L537 EN**: Initializes variable `maybeExtEntries` from the right-hand expression.
+  **L537 CN**: 使用右侧表达式初始化变量 `maybeExtEntries`。
+- **L538 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L538 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L539 EN**: Returns from the current function with `success()`.
+  **L539 CN**: 以 `success()` 从当前函数返回。
+- **L540 EN**: Blank line separating nearby declarations or logic blocks.
+  **L540 CN**: 空行，用于分隔相邻的声明或逻辑块。
+
+### Lines 541-560
+
+````cpp
+  const bool hasEntry =
+      (succeeded(maybeProfEntries) && !maybeProfEntries.value().empty()) ||
+      (succeeded(maybeExtEntries) && !maybeExtEntries.value().empty());
+
+  if (!hasEntry) {
+    std::string message;
+    llvm::raw_string_ostream os(message);
+    os << "illegal: operation operand/result data types did not align with any "
+          "profile or extension, got (";
+
+    ProfileInfoDepot depot(op);
+    SmallVector<TypeInfo> current = depot.getInfo();
+    for (const auto &typeInfo : llvm::drop_end(current))
+      os << stringifyTypeInfo(typeInfo) << ",";
+    os << stringifyTypeInfo(current.back()) << ")";
+
+    // avoid polluting the error message output by outputting only
+    // the best match
+    const std::string opName = op->getName().getStringRef().str();
+    int maxMatches = -1;
+````
+- **L541 EN**: Continues the surrounding expression or declaration: `const bool hasEntry =`.
+  **L541 CN**: 继续构造周围的表达式或声明：`const bool hasEntry =`。
+- **L542 EN**: Continues logic associated with callable symbol `succeeded`.
+  **L542 CN**: 继续与可调用符号 `succeeded` 相关的逻辑。
+- **L543 EN**: Executes a call or declaration centered on `statement`.
+  **L543 CN**: 执行以 `statement` 为核心的调用或声明。
+- **L544 EN**: Blank line separating nearby declarations or logic blocks.
+  **L544 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L545 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L545 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L546 EN**: Executes a standalone statement or declaration: `std::string message;`.
+  **L546 CN**: 执行一条独立语句或声明：`std::string message;`。
+- **L547 EN**: Executes a call or declaration centered on `os`.
+  **L547 CN**: 执行以 `os` 为核心的调用或声明。
+- **L548 EN**: Continues the surrounding expression or declaration: `os << "illegal: operation operand/result data types did not align with any "`.
+  **L548 CN**: 继续构造周围的表达式或声明：`os << "illegal: operation operand/result data types did not align with any "`。
+- **L549 EN**: Executes a call or declaration centered on `got`.
+  **L549 CN**: 执行以 `got` 为核心的调用或声明。
+- **L550 EN**: Blank line separating nearby declarations or logic blocks.
+  **L550 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L551 EN**: Executes a call or declaration centered on `depot`.
+  **L551 CN**: 执行以 `depot` 为核心的调用或声明。
+- **L552 EN**: Initializes variable `current` from the right-hand expression.
+  **L552 CN**: 使用右侧表达式初始化变量 `current`。
+- **L553 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L553 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L554 EN**: Executes a call or declaration centered on `stringifyTypeInfo`.
+  **L554 CN**: 执行以 `stringifyTypeInfo` 为核心的调用或声明。
+- **L555 EN**: Executes a call or declaration centered on `stringifyTypeInfo`.
+  **L555 CN**: 执行以 `stringifyTypeInfo` 为核心的调用或声明。
+- **L556 EN**: Blank line separating nearby declarations or logic blocks.
+  **L556 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L557 EN**: Comment explains nearby logic, invariants, or intent: `avoid polluting the error message output by outputting only`.
+  **L557 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`avoid polluting the error message output by outputting only`。
+- **L558 EN**: Comment explains nearby logic, invariants, or intent: `the best match`.
+  **L558 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`the best match`。
+- **L559 EN**: Initializes variable `opName` from the right-hand expression.
+  **L559 CN**: 使用右侧表达式初始化变量 `opName`。
+- **L560 EN**: Initializes variable `maxMatches` from the right-hand expression.
+  **L560 CN**: 使用右侧表达式初始化变量 `maxMatches`。
+
+### Lines 561-580
+
+````cpp
+    SmallVector<TypeInfo> bestTypeInfo;
+    const auto searchBestMatch = [&](auto map) {
+      for (const auto &complianceInfos : map[opName]) {
+        for (const auto &versionedTypeInfos :
+             complianceInfos.operandTypeInfoSet) {
+          const SmallVector<TypeInfo> typeInfos = versionedTypeInfos.first;
+          if (current.size() != typeInfos.size())
+            continue;
+          const int matches = llvm::count_if(
+              llvm::zip_equal(current, typeInfos), [&](const auto zipType) {
+                return isSameTypeInfo(std::get<0>(zipType),
+                                      std::get<1>(zipType));
+              });
+          if (matches > maxMatches) {
+            maxMatches = matches;
+            bestTypeInfo = typeInfos;
+          }
+        }
+      }
+    };
+````
+- **L561 EN**: Executes a standalone statement or declaration: `SmallVector<TypeInfo> bestTypeInfo;`.
+  **L561 CN**: 执行一条独立语句或声明：`SmallVector<TypeInfo> bestTypeInfo;`。
+- **L562 EN**: Starts a function, method, lambda, or structured scope: `const auto searchBestMatch = [&](auto map) {`.
+  **L562 CN**: 开始一个函数、方法、lambda 或结构化作用域：`const auto searchBestMatch = [&](auto map) {`。
+- **L563 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L563 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L564 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L564 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L565 EN**: Continues the surrounding expression or declaration: `complianceInfos.operandTypeInfoSet) {`.
+  **L565 CN**: 继续构造周围的表达式或声明：`complianceInfos.operandTypeInfoSet) {`。
+- **L566 EN**: Initializes variable `typeInfos` from the right-hand expression.
+  **L566 CN**: 使用右侧表达式初始化变量 `typeInfos`。
+- **L567 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L567 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L568 EN**: Skips to the next loop iteration.
+  **L568 CN**: 跳到下一次循环迭代。
+- **L569 EN**: Continues logic associated with callable symbol `count_if`.
+  **L569 CN**: 继续与可调用符号 `count_if` 相关的逻辑。
+- **L570 EN**: Starts a function, method, lambda, or structured scope: `llvm::zip_equal(current, typeInfos), [&](const auto zipType) {`.
+  **L570 CN**: 开始一个函数、方法、lambda 或结构化作用域：`llvm::zip_equal(current, typeInfos), [&](const auto zipType) {`。
+- **L571 EN**: Returns from the current function with `isSameTypeInfo(std::get<0>(zipType),`.
+  **L571 CN**: 以 `isSameTypeInfo(std::get<0>(zipType),` 从当前函数返回。
+- **L572 EN**: Executes a call or declaration centered on `std::get<1>`.
+  **L572 CN**: 执行以 `std::get<1>` 为核心的调用或声明。
+- **L573 EN**: Executes a standalone statement or declaration: `});`.
+  **L573 CN**: 执行一条独立语句或声明：`});`。
+- **L574 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L574 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L575 EN**: Executes a standalone statement or declaration: `maxMatches = matches;`.
+  **L575 CN**: 执行一条独立语句或声明：`maxMatches = matches;`。
+- **L576 EN**: Executes a standalone statement or declaration: `bestTypeInfo = typeInfos;`.
+  **L576 CN**: 执行一条独立语句或声明：`bestTypeInfo = typeInfos;`。
+- **L577 EN**: Closes the current lexical scope or compound statement.
+  **L577 CN**: 结束当前词法作用域或复合语句块。
+- **L578 EN**: Closes the current lexical scope or compound statement.
+  **L578 CN**: 结束当前词法作用域或复合语句块。
+- **L579 EN**: Closes the current lexical scope or compound statement.
+  **L579 CN**: 结束当前词法作用域或复合语句块。
+- **L580 EN**: Closes the current declaration scope such as a class, struct, or enum.
+  **L580 CN**: 结束当前声明作用域，例如类、结构体或枚举。
+
+### Lines 581-600
+
+````cpp
+    searchBestMatch(getProfileComplianceMap<Profile>());
+    searchBestMatch(getProfileComplianceMap<Extension>());
+
+    os << ", did you mean (";
+    for (const auto &typeInfo : llvm::drop_end(bestTypeInfo))
+      os << stringifyTypeInfo(typeInfo) << ",";
+    os << stringifyTypeInfo(bestTypeInfo.back()) << ")? ";
+    os << "Otherwise, please refer to the 'supported data types' for '"
+       << opName << "' in the specification.";
+    op->emitOpError(message);
+    return failure();
+  }
+
+  return success();
+}
+
+// Find the profiles or extensions requirement according to the signature of
+// type of the operand list.
+template <typename T>
+SmallVector<OpComplianceInfo<T>> TosaProfileCompliance::findMatchedEntries(
+````
+- **L581 EN**: Executes a call or declaration centered on `searchBestMatch`.
+  **L581 CN**: 执行以 `searchBestMatch` 为核心的调用或声明。
+- **L582 EN**: Executes a call or declaration centered on `searchBestMatch`.
+  **L582 CN**: 执行以 `searchBestMatch` 为核心的调用或声明。
+- **L583 EN**: Blank line separating nearby declarations or logic blocks.
+  **L583 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L584 EN**: Executes a call or declaration centered on `mean`.
+  **L584 CN**: 执行以 `mean` 为核心的调用或声明。
+- **L585 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L585 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L586 EN**: Executes a call or declaration centered on `stringifyTypeInfo`.
+  **L586 CN**: 执行以 `stringifyTypeInfo` 为核心的调用或声明。
+- **L587 EN**: Executes a call or declaration centered on `stringifyTypeInfo`.
+  **L587 CN**: 执行以 `stringifyTypeInfo` 为核心的调用或声明。
+- **L588 EN**: Continues the surrounding expression or declaration: `os << "Otherwise, please refer to the 'supported data types' for '"`.
+  **L588 CN**: 继续构造周围的表达式或声明：`os << "Otherwise, please refer to the 'supported data types' for '"`。
+- **L589 EN**: Executes a standalone statement or declaration: `<< opName << "' in the specification.";`.
+  **L589 CN**: 执行一条独立语句或声明：`<< opName << "' in the specification.";`。
+- **L590 EN**: Executes a call or declaration centered on `op->emitOpError`.
+  **L590 CN**: 执行以 `op->emitOpError` 为核心的调用或声明。
+- **L591 EN**: Returns from the current function with `failure()`.
+  **L591 CN**: 以 `failure()` 从当前函数返回。
+- **L592 EN**: Closes the current lexical scope or compound statement.
+  **L592 CN**: 结束当前词法作用域或复合语句块。
+- **L593 EN**: Blank line separating nearby declarations or logic blocks.
+  **L593 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L594 EN**: Returns from the current function with `success()`.
+  **L594 CN**: 以 `success()` 从当前函数返回。
+- **L595 EN**: Closes the current lexical scope or compound statement.
+  **L595 CN**: 结束当前词法作用域或复合语句块。
+- **L596 EN**: Blank line separating nearby declarations or logic blocks.
+  **L596 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L597 EN**: Comment explains nearby logic, invariants, or intent: `Find the profiles or extensions requirement according to the signature of`.
+  **L597 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Find the profiles or extensions requirement according to the signature of`。
+- **L598 EN**: Comment explains nearby logic, invariants, or intent: `type of the operand list.`.
+  **L598 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`type of the operand list.`。
+- **L599 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L599 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+- **L600 EN**: Continues logic associated with callable symbol `findMatchedEntries`.
+  **L600 CN**: 继续与可调用符号 `findMatchedEntries` 相关的逻辑。
+
+### Lines 601-620
+
+````cpp
+    Operation *op, SmallVector<OpComplianceInfo<T>> compInfo) {
+  assert(compInfo.size() != 0 &&
+         "profile-based compliance information is empty");
+
+  // Populate the type of profile/extension relevant operands.
+  ProfileInfoDepot depot(op);
+  SmallVector<TypeInfo> present = depot.getInfo();
+  if (present.size() == 0)
+    return {};
+
+  SmallVector<OpComplianceInfo<T>> matchedInfos;
+  for (size_t i = 0; i < compInfo.size(); i++) {
+    SmallVector<VersionedTypeInfo> sets = compInfo[i].operandTypeInfoSet;
+    for (const auto &set : sets) {
+      SmallVector<TypeInfo> expected = set.first;
+      // Tensor-list operators can legitimately have multiple valid signatures
+      // with different operand/result counts, e.g. data-only and data+scale
+      // forms. Treat those as non-matches instead of asserting.
+      if (present.size() != expected.size())
+        continue;
+````
+- **L601 EN**: Continues the surrounding expression or declaration: `Operation *op, SmallVector<OpComplianceInfo<T>> compInfo) {`.
+  **L601 CN**: 继续构造周围的表达式或声明：`Operation *op, SmallVector<OpComplianceInfo<T>> compInfo) {`。
+- **L602 EN**: Checks an internal invariant in debug builds.
+  **L602 CN**: 在调试构建中检查内部不变式。
+- **L603 EN**: Executes a standalone statement or declaration: `"profile-based compliance information is empty");`.
+  **L603 CN**: 执行一条独立语句或声明：`"profile-based compliance information is empty");`。
+- **L604 EN**: Blank line separating nearby declarations or logic blocks.
+  **L604 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L605 EN**: Comment explains nearby logic, invariants, or intent: `Populate the type of profile/extension relevant operands.`.
+  **L605 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Populate the type of profile/extension relevant operands.`。
+- **L606 EN**: Executes a call or declaration centered on `depot`.
+  **L606 CN**: 执行以 `depot` 为核心的调用或声明。
+- **L607 EN**: Initializes variable `present` from the right-hand expression.
+  **L607 CN**: 使用右侧表达式初始化变量 `present`。
+- **L608 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L608 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L609 EN**: Returns from the current function with `{}`.
+  **L609 CN**: 以 `{}` 从当前函数返回。
+- **L610 EN**: Blank line separating nearby declarations or logic blocks.
+  **L610 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L611 EN**: Executes a standalone statement or declaration: `SmallVector<OpComplianceInfo<T>> matchedInfos;`.
+  **L611 CN**: 执行一条独立语句或声明：`SmallVector<OpComplianceInfo<T>> matchedInfos;`。
+- **L612 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L612 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L613 EN**: Initializes variable `sets` from the right-hand expression.
+  **L613 CN**: 使用右侧表达式初始化变量 `sets`。
+- **L614 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L614 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L615 EN**: Initializes variable `expected` from the right-hand expression.
+  **L615 CN**: 使用右侧表达式初始化变量 `expected`。
+- **L616 EN**: Comment explains nearby logic, invariants, or intent: `Tensor-list operators can legitimately have multiple valid signatures`.
+  **L616 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Tensor-list operators can legitimately have multiple valid signatures`。
+- **L617 EN**: Comment explains nearby logic, invariants, or intent: `with different operand/result counts, e.g. data-only and data+scale`.
+  **L617 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`with different operand/result counts, e.g. data-only and data+scale`。
+- **L618 EN**: Comment explains nearby logic, invariants, or intent: `forms. Treat those as non-matches instead of asserting.`.
+  **L618 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`forms. Treat those as non-matches instead of asserting.`。
+- **L619 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L619 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L620 EN**: Skips to the next loop iteration.
+  **L620 CN**: 跳到下一次循环迭代。
+
+### Lines 621-640
+
+````cpp
+
+      bool isFound = true;
+      // Compare the type signature between the given operation and the
+      // compliance metadata.
+      for (size_t j = 0; j < expected.size(); j++) {
+        if (!isSameTypeInfo(present[j], expected[j])) {
+          // Verify the next mode set from the list.
+          isFound = false;
+          break;
+        }
+      }
+
+      if (isFound == true) {
+        SmallVector<VersionedTypeInfo> typeInfoSet{set};
+        OpComplianceInfo<T> info{compInfo[i].mode, typeInfoSet,
+                                 compInfo[i].condition};
+        matchedInfos.push_back(info);
+      }
+    }
+  }
+````
+- **L621 EN**: Blank line separating nearby declarations or logic blocks.
+  **L621 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L622 EN**: Initializes variable `isFound` from the right-hand expression.
+  **L622 CN**: 使用右侧表达式初始化变量 `isFound`。
+- **L623 EN**: Comment explains nearby logic, invariants, or intent: `Compare the type signature between the given operation and the`.
+  **L623 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Compare the type signature between the given operation and the`。
+- **L624 EN**: Comment explains nearby logic, invariants, or intent: `compliance metadata.`.
+  **L624 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`compliance metadata.`。
+- **L625 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L625 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L626 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L626 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L627 EN**: Comment explains nearby logic, invariants, or intent: `Verify the next mode set from the list.`.
+  **L627 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Verify the next mode set from the list.`。
+- **L628 EN**: Executes a standalone statement or declaration: `isFound = false;`.
+  **L628 CN**: 执行一条独立语句或声明：`isFound = false;`。
+- **L629 EN**: Exits the nearest loop or switch statement.
+  **L629 CN**: 退出最近的循环或 switch 语句。
+- **L630 EN**: Closes the current lexical scope or compound statement.
+  **L630 CN**: 结束当前词法作用域或复合语句块。
+- **L631 EN**: Closes the current lexical scope or compound statement.
+  **L631 CN**: 结束当前词法作用域或复合语句块。
+- **L632 EN**: Blank line separating nearby declarations or logic blocks.
+  **L632 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L633 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L633 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L634 EN**: Executes a standalone statement or declaration: `SmallVector<VersionedTypeInfo> typeInfoSet{set};`.
+  **L634 CN**: 执行一条独立语句或声明：`SmallVector<VersionedTypeInfo> typeInfoSet{set};`。
+- **L635 EN**: Continues a multi-line argument list, initializer, or aggregate entry: `OpComplianceInfo<T> info{compInfo[i].mode, typeInfoSet,`.
+  **L635 CN**: 继续一个多行参数列表、初始化器或聚合项：`OpComplianceInfo<T> info{compInfo[i].mode, typeInfoSet,`。
+- **L636 EN**: Executes a standalone statement or declaration: `compInfo[i].condition};`.
+  **L636 CN**: 执行一条独立语句或声明：`compInfo[i].condition};`。
+- **L637 EN**: Executes a call or declaration centered on `matchedInfos.push_back`.
+  **L637 CN**: 执行以 `matchedInfos.push_back` 为核心的调用或声明。
+- **L638 EN**: Closes the current lexical scope or compound statement.
+  **L638 CN**: 结束当前词法作用域或复合语句块。
+- **L639 EN**: Closes the current lexical scope or compound statement.
+  **L639 CN**: 结束当前词法作用域或复合语句块。
+- **L640 EN**: Closes the current lexical scope or compound statement.
+  **L640 CN**: 结束当前词法作用域或复合语句块。
+
+### Lines 641-660
+
+````cpp
+
+  return matchedInfos;
+}
+
+// Debug utilites.
+template <typename T>
+SmallVector<StringRef>
+TosaProfileCompliance::stringifyProfile(ArrayRef<T> profiles) {
+  SmallVector<StringRef> debugStrings;
+  for (const auto &profile : profiles) {
+    if constexpr (std::is_same_v<T, Profile>)
+      debugStrings.push_back(tosa::stringifyProfile(profile));
+    else
+      debugStrings.push_back(tosa::stringifyExtension(profile));
+  }
+  return debugStrings;
+}
+
+template <typename T>
+SmallVector<StringRef> TosaProfileCompliance::stringifyProfile(
+````
+- **L641 EN**: Blank line separating nearby declarations or logic blocks.
+  **L641 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L642 EN**: Returns from the current function with `matchedInfos`.
+  **L642 CN**: 以 `matchedInfos` 从当前函数返回。
+- **L643 EN**: Closes the current lexical scope or compound statement.
+  **L643 CN**: 结束当前词法作用域或复合语句块。
+- **L644 EN**: Blank line separating nearby declarations or logic blocks.
+  **L644 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L645 EN**: Comment explains nearby logic, invariants, or intent: `Debug utilites.`.
+  **L645 CN**: 注释说明了附近代码的逻辑、不变式或设计意图：`Debug utilites.`。
+- **L646 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L646 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+- **L647 EN**: Continues the surrounding expression or declaration: `SmallVector<StringRef>`.
+  **L647 CN**: 继续构造周围的表达式或声明：`SmallVector<StringRef>`。
+- **L648 EN**: Starts a function, method, lambda, or structured scope: `TosaProfileCompliance::stringifyProfile(ArrayRef<T> profiles) {`.
+  **L648 CN**: 开始一个函数、方法、lambda 或结构化作用域：`TosaProfileCompliance::stringifyProfile(ArrayRef<T> profiles) {`。
+- **L649 EN**: Executes a standalone statement or declaration: `SmallVector<StringRef> debugStrings;`.
+  **L649 CN**: 执行一条独立语句或声明：`SmallVector<StringRef> debugStrings;`。
+- **L650 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L650 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L651 EN**: Continues logic associated with callable symbol `constexpr`.
+  **L651 CN**: 继续与可调用符号 `constexpr` 相关的逻辑。
+- **L652 EN**: Executes a call or declaration centered on `debugStrings.push_back`.
+  **L652 CN**: 执行以 `debugStrings.push_back` 为核心的调用或声明。
+- **L653 EN**: Starts the alternative branch of the preceding conditional.
+  **L653 CN**: 开始前一个条件语句的备选分支。
+- **L654 EN**: Executes a call or declaration centered on `debugStrings.push_back`.
+  **L654 CN**: 执行以 `debugStrings.push_back` 为核心的调用或声明。
+- **L655 EN**: Closes the current lexical scope or compound statement.
+  **L655 CN**: 结束当前词法作用域或复合语句块。
+- **L656 EN**: Returns from the current function with `debugStrings`.
+  **L656 CN**: 以 `debugStrings` 从当前函数返回。
+- **L657 EN**: Closes the current lexical scope or compound statement.
+  **L657 CN**: 结束当前词法作用域或复合语句块。
+- **L658 EN**: Blank line separating nearby declarations or logic blocks.
+  **L658 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L659 EN**: Introduces template parameters or specialization context: `template <typename T>`.
+  **L659 CN**: 为后续声明引入模板参数或特化上下文：`template <typename T>`。
+- **L660 EN**: Continues logic associated with callable symbol `stringifyProfile`.
+  **L660 CN**: 继续与可调用符号 `stringifyProfile` 相关的逻辑。
+
+### Lines 661-680
+
+````cpp
+    const SmallVector<ArrayRef<T>> &profileSet) {
+  SmallVector<StringRef> debugStrings;
+
+  for (const auto &profiles : profileSet) {
+    auto tempStrings = stringifyProfile<T>(profiles);
+    llvm::append_range(debugStrings, tempStrings);
+  }
+
+  return debugStrings;
+}
+
+llvm::SmallString<7>
+TosaProfileCompliance::stringifyTypeInfo(const TypeInfo &typeInfo) {
+  if (typeInfo.typeID == mlir::IntegerType::getTypeID()) {
+    return {"i" + llvm::utostr(typeInfo.bitWidth)};
+  }
+  if (typeInfo.typeID == mlir::Float16Type::getTypeID()) {
+    return {"f16"};
+  } else if (typeInfo.typeID == mlir::Float32Type::getTypeID()) {
+    return {"f32"};
+````
+- **L661 EN**: Continues the surrounding expression or declaration: `const SmallVector<ArrayRef<T>> &profileSet) {`.
+  **L661 CN**: 继续构造周围的表达式或声明：`const SmallVector<ArrayRef<T>> &profileSet) {`。
+- **L662 EN**: Executes a standalone statement or declaration: `SmallVector<StringRef> debugStrings;`.
+  **L662 CN**: 执行一条独立语句或声明：`SmallVector<StringRef> debugStrings;`。
+- **L663 EN**: Blank line separating nearby declarations or logic blocks.
+  **L663 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L664 EN**: Begins a `for` control-flow statement and evaluates its condition.
+  **L664 CN**: 开始 `for` 控制流语句并计算其条件。
+- **L665 EN**: Initializes variable `tempStrings` from the right-hand expression.
+  **L665 CN**: 使用右侧表达式初始化变量 `tempStrings`。
+- **L666 EN**: Executes a call or declaration centered on `llvm::append_range`.
+  **L666 CN**: 执行以 `llvm::append_range` 为核心的调用或声明。
+- **L667 EN**: Closes the current lexical scope or compound statement.
+  **L667 CN**: 结束当前词法作用域或复合语句块。
+- **L668 EN**: Blank line separating nearby declarations or logic blocks.
+  **L668 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L669 EN**: Returns from the current function with `debugStrings`.
+  **L669 CN**: 以 `debugStrings` 从当前函数返回。
+- **L670 EN**: Closes the current lexical scope or compound statement.
+  **L670 CN**: 结束当前词法作用域或复合语句块。
+- **L671 EN**: Blank line separating nearby declarations or logic blocks.
+  **L671 CN**: 空行，用于分隔相邻的声明或逻辑块。
+- **L672 EN**: Continues the surrounding expression or declaration: `llvm::SmallString<7>`.
+  **L672 CN**: 继续构造周围的表达式或声明：`llvm::SmallString<7>`。
+- **L673 EN**: Starts a function, method, lambda, or structured scope: `TosaProfileCompliance::stringifyTypeInfo(const TypeInfo &typeInfo) {`.
+  **L673 CN**: 开始一个函数、方法、lambda 或结构化作用域：`TosaProfileCompliance::stringifyTypeInfo(const TypeInfo &typeInfo) {`。
+- **L674 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L674 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L675 EN**: Returns from the current function with `{"i" + llvm::utostr(typeInfo.bitWidth)}`.
+  **L675 CN**: 以 `{"i" + llvm::utostr(typeInfo.bitWidth)}` 从当前函数返回。
+- **L676 EN**: Closes the current lexical scope or compound statement.
+  **L676 CN**: 结束当前词法作用域或复合语句块。
+- **L677 EN**: Begins a `if` control-flow statement and evaluates its condition.
+  **L677 CN**: 开始 `if` 控制流语句并计算其条件。
+- **L678 EN**: Returns from the current function with `{"f16"}`.
+  **L678 CN**: 以 `{"f16"}` 从当前函数返回。
+- **L679 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float32Type::getTypeID()) {`.
+  **L679 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float32Type::getTypeID()) {`。
+- **L680 EN**: Returns from the current function with `{"f32"}`.
+  **L680 CN**: 以 `{"f32"}` 从当前函数返回。
+
+### Lines 681-699
+
+````cpp
+  } else if (typeInfo.typeID == mlir::BFloat16Type::getTypeID()) {
+    return {"bf16"};
+  } else if (typeInfo.typeID == mlir::Float8E4M3FNType::getTypeID()) {
+    return {"fp8e4m3"};
+  } else if (typeInfo.typeID == mlir::Float8E5M2Type::getTypeID()) {
+    return {"fp8e5m2"};
+  } else if (typeInfo.typeID == mlir::Float6E2M3FNType::getTypeID()) {
+    return {"fp6e2m3"};
+  } else if (typeInfo.typeID == mlir::Float6E3M2FNType::getTypeID()) {
+    return {"fp6e3m2"};
+  } else if (typeInfo.typeID == mlir::Float4E2M1FNType::getTypeID()) {
+    return {"fp4e2m1"};
+  } else if (typeInfo.typeID == mlir::Float8E8M0FNUType::getTypeID()) {
+    return {"fp8e8m0"};
+  } else if (typeInfo.typeID == tosa::mxint8Type::getTypeID()) {
+    return {"mxint8"};
+  }
+  llvm_unreachable("unknown type");
+}
+````
+- **L681 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::BFloat16Type::getTypeID()) {`.
+  **L681 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::BFloat16Type::getTypeID()) {`。
+- **L682 EN**: Returns from the current function with `{"bf16"}`.
+  **L682 CN**: 以 `{"bf16"}` 从当前函数返回。
+- **L683 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float8E4M3FNType::getTypeID()) {`.
+  **L683 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float8E4M3FNType::getTypeID()) {`。
+- **L684 EN**: Returns from the current function with `{"fp8e4m3"}`.
+  **L684 CN**: 以 `{"fp8e4m3"}` 从当前函数返回。
+- **L685 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float8E5M2Type::getTypeID()) {`.
+  **L685 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float8E5M2Type::getTypeID()) {`。
+- **L686 EN**: Returns from the current function with `{"fp8e5m2"}`.
+  **L686 CN**: 以 `{"fp8e5m2"}` 从当前函数返回。
+- **L687 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float6E2M3FNType::getTypeID()) {`.
+  **L687 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float6E2M3FNType::getTypeID()) {`。
+- **L688 EN**: Returns from the current function with `{"fp6e2m3"}`.
+  **L688 CN**: 以 `{"fp6e2m3"}` 从当前函数返回。
+- **L689 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float6E3M2FNType::getTypeID()) {`.
+  **L689 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float6E3M2FNType::getTypeID()) {`。
+- **L690 EN**: Returns from the current function with `{"fp6e3m2"}`.
+  **L690 CN**: 以 `{"fp6e3m2"}` 从当前函数返回。
+- **L691 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float4E2M1FNType::getTypeID()) {`.
+  **L691 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float4E2M1FNType::getTypeID()) {`。
+- **L692 EN**: Returns from the current function with `{"fp4e2m1"}`.
+  **L692 CN**: 以 `{"fp4e2m1"}` 从当前函数返回。
+- **L693 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == mlir::Float8E8M0FNUType::getTypeID()) {`.
+  **L693 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == mlir::Float8E8M0FNUType::getTypeID()) {`。
+- **L694 EN**: Returns from the current function with `{"fp8e8m0"}`.
+  **L694 CN**: 以 `{"fp8e8m0"}` 从当前函数返回。
+- **L695 EN**: Starts a function, method, lambda, or structured scope: `} else if (typeInfo.typeID == tosa::mxint8Type::getTypeID()) {`.
+  **L695 CN**: 开始一个函数、方法、lambda 或结构化作用域：`} else if (typeInfo.typeID == tosa::mxint8Type::getTypeID()) {`。
+- **L696 EN**: Returns from the current function with `{"mxint8"}`.
+  **L696 CN**: 以 `{"mxint8"}` 从当前函数返回。
+- **L697 EN**: Closes the current lexical scope or compound statement.
+  **L697 CN**: 结束当前词法作用域或复合语句块。
+- **L698 EN**: Marks this control path as unreachable.
+  **L698 CN**: 将该控制路径标记为不可达。
+- **L699 EN**: Closes the current lexical scope or compound statement.
+  **L699 CN**: 结束当前词法作用域或复合语句块。
+
+## Key Concepts / 关键概念
+
+- **TOSA dialect semantics / TOSA 方言语义**
+- **Rewrite-driven lowering / 基于重写的 lowering**
+- **Dialect definition and registration / 方言定义与注册**
+- **Operation semantics and verification / 操作语义与验证**
+- **Failure-aware result propagation / 带失败语义的结果传播**
+- **Optional success payloads / 带成功载荷的可失败结果**
+- **Type-system modeling / 类型系统建模**
+- **Basic block ownership and traversal / 基本块拥有关系与遍历**
+- **SSA value representation / SSA 值表示**
+- **Tensor-level abstraction / 张量层抽象**
+
+## Dependencies / 依赖关系
+
+- `mlir/Dialect/Tosa/IR/TosaProfileCompliance.h`: Provides dialect-specific IR, transforms, or shared utilities. / 提供方言专用 IR、变换或共享工具。
+- `llvm/ADT/StringExtras.h`: Provides LLVM ADT containers and low-level utility types. / 提供LLVM ADT 容器与底层工具类型。
+- `mlir/Dialect/Tosa/IR/TosaComplianceData.h.inc`: Provides dialect-specific IR, transforms, or shared utilities. / 提供方言专用 IR、变换或共享工具。

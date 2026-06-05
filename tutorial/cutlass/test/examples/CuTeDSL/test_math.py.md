@@ -1,0 +1,474 @@
+# test_math.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/examples/CuTeDSL/test_math.py`
+**Purpose / 用途**: This file defines automated tests for test math. / 该文件定义了针对 test math 的自动化测试。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 4 / 第4行**
+  - Code / 代码: `# Redistribution and use in source and binary forms, with or without`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 5 / 第5行**
+  - Code / 代码: `# modification, are permitted provided that the following conditions are met:`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 6 / 第6行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 7 / 第7行**
+  - Code / 代码: `# 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 8 / 第8行**
+  - Code / 代码: `# list of conditions and the following disclaimer.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 9 / 第9行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 10 / 第10行**
+  - Code / 代码: `# 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 11 / 第11行**
+  - Code / 代码: `# this list of conditions and the following disclaimer in the documentation`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 12 / 第12行**
+  - Code / 代码: `# and/or other materials provided with the distribution.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 13 / 第13行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 14 / 第14行**
+  - Code / 代码: `# 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 15 / 第15行**
+  - Code / 代码: `# contributors may be used to endorse or promote products derived from`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 16 / 第16行**
+  - Code / 代码: `# this software without specific prior written permission.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 17 / 第17行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 18 / 第18行**
+  - Code / 代码: `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 19 / 第19行**
+  - Code / 代码: `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 20 / 第20行**
+  - Code / 代码: `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 21 / 第21行**
+  - Code / 代码: `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 22 / 第22行**
+  - Code / 代码: `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 23 / 第23行**
+  - Code / 代码: `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 24 / 第24行**
+  - Code / 代码: `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 25 / 第25行**
+  - Code / 代码: `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 27 / 第27行**
+  - Code / 代码: `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Adds a Python comment that explains the nearby logic.
+  - CN: 添加 Python 注释来说明邻近逻辑。
+- **Line 28 / 第28行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 29 / 第29行**
+  - Code / 代码: `import pytest`
+  - EN: Imports `pytest` so its symbols are available to the test module.
+  - CN: 导入 `pytest`，使其符号可供该测试模块使用。
+- **Line 30 / 第30行**
+  - Code / 代码: `import torch`
+  - EN: Imports `torch` so its symbols are available to the test module.
+  - CN: 导入 `torch`，使其符号可供该测试模块使用。
+- **Line 31 / 第31行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 32 / 第32行**
+  - Code / 代码: `import cutlass`
+  - EN: Imports `cutlass` so its symbols are available to the test module.
+  - CN: 导入 `cutlass`，使其符号可供该测试模块使用。
+- **Line 33 / 第33行**
+  - Code / 代码: `import cutlass.cute as cute`
+  - EN: Imports `cutlass.cute` so its symbols are available to the test module.
+  - CN: 导入 `cutlass.cute`，使其符号可供该测试模块使用。
+- **Line 34 / 第34行**
+  - Code / 代码: `from cutlass.cute.runtime import from_dlpack`
+  - EN: Imports selected symbols from `cutlass.cute.runtime` for later use.
+  - CN: 从 `cutlass.cute.runtime` 导入选定符号以供后续使用。
+- **Line 35 / 第35行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 36 / 第36行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 37 / 第37行**
+  - Code / 代码: `@cute.kernel`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 38 / 第38行**
+  - Code / 代码: `def _unary_ops_kernel(`
+  - EN: Defines function `_unary_ops_kernel`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_unary_ops_kernel`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 39 / 第39行**
+  - Code / 代码: `    absf_inp: cute.Tensor, absf_out: cute.Tensor,`
+  - EN: Continues the multi-line function signature for `_unary_ops_kernel`.
+  - CN: 继续 `_unary_ops_kernel` 的多行函数签名。
+- **Line 40 / 第40行**
+  - Code / 代码: `    floor_inp: cute.Tensor, floor_out: cute.Tensor,`
+  - EN: Continues the multi-line function signature for `_unary_ops_kernel`.
+  - CN: 继续 `_unary_ops_kernel` 的多行函数签名。
+- **Line 41 / 第41行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_unary_ops_kernel`.
+  - CN: 完成 `_unary_ops_kernel` 的多行函数签名。
+- **Line 42 / 第42行**
+  - Code / 代码: `    tidx, _, _ = cute.arch.thread_idx()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 43 / 第43行**
+  - Code / 代码: `    absf_out[tidx] = cute.math.absf(absf_inp[tidx])`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 44 / 第44行**
+  - Code / 代码: `    floor_out[tidx] = cute.math.floor(floor_inp[tidx])`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 45 / 第45行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 46 / 第46行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 47 / 第47行**
+  - Code / 代码: `@cute.jit`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 48 / 第48行**
+  - Code / 代码: `def _unary_ops_host(`
+  - EN: Defines function `_unary_ops_host`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_unary_ops_host`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 49 / 第49行**
+  - Code / 代码: `    absf_inp: cute.Tensor, absf_out: cute.Tensor,`
+  - EN: Continues the multi-line function signature for `_unary_ops_host`.
+  - CN: 继续 `_unary_ops_host` 的多行函数签名。
+- **Line 50 / 第50行**
+  - Code / 代码: `    floor_inp: cute.Tensor, floor_out: cute.Tensor,`
+  - EN: Continues the multi-line function signature for `_unary_ops_host`.
+  - CN: 继续 `_unary_ops_host` 的多行函数签名。
+- **Line 51 / 第51行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_unary_ops_host`.
+  - CN: 完成 `_unary_ops_host` 的多行函数签名。
+- **Line 52 / 第52行**
+  - Code / 代码: `    _unary_ops_kernel(absf_inp, absf_out, floor_inp, floor_out).launch(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 53 / 第53行**
+  - Code / 代码: `        grid=[1, 1, 1], block=[absf_inp.shape[0], 1, 1]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 54 / 第54行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 55 / 第55行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 56 / 第56行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 57 / 第57行**
+  - Code / 代码: `def test_unary_ops():`
+  - EN: Defines function `test_unary_ops`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_unary_ops`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 58 / 第58行**
+  - Code / 代码: `    absf_inp = torch.tensor([-3.5, 2.0, 0.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 59 / 第59行**
+  - Code / 代码: `    absf_expected = torch.tensor([3.5, 2.0, 0.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 60 / 第60行**
+  - Code / 代码: `    absf_out = torch.zeros(3, device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 61 / 第61行**
+  - Code / 代码: `    floor_inp = torch.tensor([3.7, -2.3, 5.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 62 / 第62行**
+  - Code / 代码: `    floor_expected = torch.tensor([3.0, -3.0, 5.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 63 / 第63行**
+  - Code / 代码: `    floor_out = torch.zeros(3, device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 64 / 第64行**
+  - Code / 代码: `    absf_inp_cute = from_dlpack(absf_inp)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 65 / 第65行**
+  - Code / 代码: `    absf_out_cute = from_dlpack(absf_out)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 66 / 第66行**
+  - Code / 代码: `    floor_inp_cute = from_dlpack(floor_inp)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 67 / 第67行**
+  - Code / 代码: `    floor_out_cute = from_dlpack(floor_out)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 68 / 第68行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 69 / 第69行**
+  - Code / 代码: `    args = (absf_inp_cute, absf_out_cute, floor_inp_cute, floor_out_cute)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 70 / 第70行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 71 / 第71行**
+  - Code / 代码: `    cute.compile(_unary_ops_host, *args)(*args)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 72 / 第72行**
+  - Code / 代码: `    torch.cuda.synchronize()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 73 / 第73行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 74 / 第74行**
+  - Code / 代码: `    assert torch.equal(absf_out, absf_expected)`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 75 / 第75行**
+  - Code / 代码: `    assert torch.equal(floor_out, floor_expected)`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+- **Line 76 / 第76行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 77 / 第77行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 78 / 第78行**
+  - Code / 代码: `@cute.kernel`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 79 / 第79行**
+  - Code / 代码: `def _binary_ops_kernel(`
+  - EN: Defines function `_binary_ops_kernel`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_binary_ops_kernel`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 80 / 第80行**
+  - Code / 代码: `    mag_inp: cute.Tensor, sign_inp: cute.Tensor, out: cute.Tensor,`
+  - EN: Continues the multi-line function signature for `_binary_ops_kernel`.
+  - CN: 继续 `_binary_ops_kernel` 的多行函数签名。
+- **Line 81 / 第81行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_binary_ops_kernel`.
+  - CN: 完成 `_binary_ops_kernel` 的多行函数签名。
+- **Line 82 / 第82行**
+  - Code / 代码: `    tidx, _, _ = cute.arch.thread_idx()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 83 / 第83行**
+  - Code / 代码: `    out[tidx] = cute.math.copysign(mag_inp[tidx], sign_inp[tidx])`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 84 / 第84行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 85 / 第85行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 86 / 第86行**
+  - Code / 代码: `@cute.jit`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 87 / 第87行**
+  - Code / 代码: `def _binary_ops_host(`
+  - EN: Defines function `_binary_ops_host`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_binary_ops_host`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 88 / 第88行**
+  - Code / 代码: `    mag_inp: cute.Tensor, sign_inp: cute.Tensor, out: cute.Tensor,`
+  - EN: Continues the multi-line function signature for `_binary_ops_host`.
+  - CN: 继续 `_binary_ops_host` 的多行函数签名。
+- **Line 89 / 第89行**
+  - Code / 代码: `):`
+  - EN: Completes the multi-line function signature for `_binary_ops_host`.
+  - CN: 完成 `_binary_ops_host` 的多行函数签名。
+- **Line 90 / 第90行**
+  - Code / 代码: `    _binary_ops_kernel(mag_inp, sign_inp, out).launch(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 91 / 第91行**
+  - Code / 代码: `        grid=[1, 1, 1], block=[mag_inp.shape[0], 1, 1]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 92 / 第92行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 93 / 第93行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 94 / 第94行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 95 / 第95行**
+  - Code / 代码: `def test_binary_ops():`
+  - EN: Defines function `test_binary_ops`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_binary_ops`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 96 / 第96行**
+  - Code / 代码: `    mag_inp = torch.tensor([3.5, -2.0, 0.0, 1.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 97 / 第97行**
+  - Code / 代码: `    sign_inp = torch.tensor([-1.0, 1.0, -1.0, 1.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 98 / 第98行**
+  - Code / 代码: `    expected = torch.tensor([-3.5, 2.0, -0.0, 1.0], device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 99 / 第99行**
+  - Code / 代码: `    out = torch.zeros(4, device="cuda", dtype=torch.float32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 100 / 第100行**
+  - Code / 代码: `    mag_inp_cute = from_dlpack(mag_inp)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 101 / 第101行**
+  - Code / 代码: `    sign_inp_cute = from_dlpack(sign_inp)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 102 / 第102行**
+  - Code / 代码: `    out_cute = from_dlpack(out)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 103 / 第103行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 104 / 第104行**
+  - Code / 代码: `    args = (mag_inp_cute, sign_inp_cute, out_cute)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 105 / 第105行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 106 / 第106行**
+  - Code / 代码: `    cute.compile(_binary_ops_host, *args)(*args)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 107 / 第107行**
+  - Code / 代码: `    torch.cuda.synchronize()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 108 / 第108行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 109 / 第109行**
+  - Code / 代码: `    assert torch.equal(out, expected)`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+
+## Key Concepts / 关键概念
+
+- **EN**: Uses pytest markers, parametrization, or hooks to organize automated test coverage.
+  **CN**: 使用 pytest 的标记、参数化或钩子来组织自动化测试覆盖。
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Relates to CuTeDSL-based examples or testing utilities.
+  **CN**: 与基于 CuTeDSL 的示例或测试工具有关。
+
+## Dependencies / 依赖项
+
+- `pytest`
+  - EN: Provides the Python test runner, markers, and parametrization helpers.
+  - CN: 提供 Python 测试运行器、标记与参数化辅助功能。
+- `torch`
+  - EN: Provides tensor creation, GPU execution, and reference math helpers.
+  - CN: 提供张量创建、GPU 执行与参考数学辅助功能。
+- `cutlass`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `cutlass.cute`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `cutlass.cute.runtime`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。

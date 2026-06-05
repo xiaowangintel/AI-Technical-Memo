@@ -1,0 +1,1228 @@
+# device_groupnorm.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/device_groupnorm.h`
+**Purpose / 用途**: Provides CUDA device utilities for groupnorm. / 提供与 groupnorm 相关的 CUDA 设备端工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/******************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> ******************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>/**</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code> * \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L36** <code> * \brief cuda kernels to do group norm on a device memory tensor with NHWC layout. The tensor will be divided into [N, H, W, G, C&#x27;] and then we do normalization on [H, W, C&#x27;].</code>
+  - EN: Comment that documents intent or context: "\brief cuda kernels to do group norm on a device memory tensor with NHWC layout. The tensor will be divided into [N, H, W, G, C'] and then we do normalization on [H, W, C'].".
+  - CN: 用于说明意图或上下文的注释："\brief cuda kernels to do group norm on a device memory tensor with NHWC layout. The tensor will be divided into [N, H, W, G, C'] and then we do normalization on [H, W, C']."。
+- **L37** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L38** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L39** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/layout/tensor.h&quot;</code>
+  - EN: Includes `cutlass/layout/tensor.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/tensor.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L41** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L42** <code>#include &quot;cutlass/tensor_coord.h&quot;</code>
+  - EN: Includes `cutlass/tensor_coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L43** <code>#include &quot;cutlass/tensor_ref.h&quot;</code>
+  - EN: Includes `cutlass/tensor_ref.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_ref.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L44** <code>#include &quot;device_utils.h&quot;</code>
+  - EN: Includes `device_utils.h` so this file can use project-specific declarations from `device_utils.h`.
+  - CN: 引入 `device_utils.h`，使当前文件可以使用来自 `device_utils.h` 的项目专用声明。
+- **L45** <code>#include &lt;cfloat&gt;</code>
+  - EN: Includes `cfloat` so this file can use APIs or definitions from `cfloat`.
+  - CN: 引入 `cfloat`，使当前文件可以使用来自 `cfloat` 的 API 或定义。
+- **L46** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L47** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L48** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L49** <code>/** \brief interface to do group norm on a device memory tensor with NHWC layout.</code>
+  - EN: Comment that documents intent or context: "\brief interface to do group norm on a device memory tensor with NHWC layout.".
+  - CN: 用于说明意图或上下文的注释："\brief interface to do group norm on a device memory tensor with NHWC layout."。
+- **L50** <code> * \tparam T: data type</code>
+  - EN: Comment that documents intent or context: "\tparam T: data type".
+  - CN: 用于说明意图或上下文的注释："\tparam T: data type"。
+- **L51** <code> */</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L52** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L53** <code>void groupnorm(cutlass::Tensor4DCoord input_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `groupnorm`.
+  - CN: 开始或继续与 `groupnorm` 相关的签名/调用语法。
+- **L54** <code>               const int num_groups,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L55** <code>               const float eps,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L56** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L57** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L58** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_gamma,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L59** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L60** <code>               cudaStream_t stream);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L61** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L62** <code>extern __shared__ char groupnorm_shm[];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L63** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L64** <code>// For small prod_dim1_to_last_dim/num_groups, to avoid multiple loads from global memory,</code>
+  - EN: Comment that documents intent or context: "For small prod_dim1_to_last_dim/num_groups, to avoid multiple loads from global memory,".
+  - CN: 用于说明意图或上下文的注释："For small prod_dim1_to_last_dim/num_groups, to avoid multiple loads from global memory,"。
+- **L65** <code>// we store the input in the shared memory.</code>
+  - EN: Comment that documents intent or context: "we store the input in the shared memory.".
+  - CN: 用于说明意图或上下文的注释："we store the input in the shared memory."。
+- **L66** <code>// grid(num_groups, dim0)</code>
+  - EN: Comment that documents intent or context: "grid(num_groups, dim0)".
+  - CN: 用于说明意图或上下文的注释："grid(num_groups, dim0)"。
+- **L67** <code>// block(BLOCKSIZE)</code>
+  - EN: Comment that documents intent or context: "block(BLOCKSIZE)".
+  - CN: 用于说明意图或上下文的注释："block(BLOCKSIZE)"。
+- **L68** <code>// BLOCKSIZE * TVecs_PER_THREAD &lt;= prod_dim1_to_last_dim/num_group</code>
+  - EN: Comment that documents intent or context: "BLOCKSIZE * TVecs_PER_THREAD <= prod_dim1_to_last_dim/num_group".
+  - CN: 用于说明意图或上下文的注释："BLOCKSIZE * TVecs_PER_THREAD <= prod_dim1_to_last_dim/num_group"。
+- **L69** <code>template&lt;typename TVec, typename T, int T_PER_TVec&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L70** <code>__global__ void groupnorm_twopass_store_locally(T*          output,</code>
+  - EN: Begins or continues the signature/call syntax involving `groupnorm_twopass_store_locally`.
+  - CN: 开始或继续与 `groupnorm_twopass_store_locally` 相关的签名/调用语法。
+- **L71** <code>                                                const T*    input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L72** <code>                                                const T*    gamma,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L73** <code>                                                const T*    beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L74** <code>                                                int         num_groups,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L75** <code>                                                int         prod_dim1_to_last_dim,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L76** <code>                                                int         last_dim,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L77** <code>                                                const float eps,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L78** <code>                                                const int   TVecs_PER_THREAD)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L79** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L80** <code>    const int   bid               = blockIdx.y;   // index of batch</code>
+  - EN: Assigns or initializes `bid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bid` 进行赋值或初始化。
+- **L81** <code>    const int   gid               = blockIdx.x;   // index of group</code>
+  - EN: Assigns or initializes `gid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gid` 进行赋值或初始化。
+- **L82** <code>    const int   tid               = threadIdx.x;  // index of thread</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L83** <code>    const int   bdimx             = blockDim.x;</code>
+  - EN: Assigns or initializes `bdimx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bdimx` 进行赋值或初始化。
+- **L84** <code>    const int   s_reduce_elements = prod_dim1_to_last_dim / num_groups;</code>
+  - EN: Assigns or initializes `s_reduce_elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_reduce_elements` 进行赋值或初始化。
+- **L85** <code>    const int   v_reduce_elements = s_reduce_elements / T_PER_TVec;</code>
+  - EN: Assigns or initializes `v_reduce_elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `v_reduce_elements` 进行赋值或初始化。
+- **L86** <code>    const int   s_group_stride    = last_dim / num_groups;</code>
+  - EN: Assigns or initializes `s_group_stride` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_group_stride` 进行赋值或初始化。
+- **L87** <code>    const int   v_group_stride    = s_group_stride / T_PER_TVec;</code>
+  - EN: Assigns or initializes `v_group_stride` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `v_group_stride` 进行赋值或初始化。
+- **L88** <code>    const int   offset_of_group   = (bid * prod_dim1_to_last_dim + gid * s_group_stride) / T_PER_TVec;</code>
+  - EN: Assigns or initializes `offset_of_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `offset_of_group` 进行赋值或初始化。
+- **L89** <code>    const TVec* input_TVec_ptr    = (const TVec*)(input) + offset_of_group;</code>
+  - EN: Assigns or initializes `input_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `input_TVec_ptr` 进行赋值或初始化。
+- **L90** <code>    TVec*       output_TVec_ptr   = (TVec*)(output) + offset_of_group;</code>
+  - EN: Assigns or initializes `output_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_TVec_ptr` 进行赋值或初始化。
+- **L91** <code>    T*       local_val         = ((T*)groupnorm_shm) + TVecs_PER_THREAD * T_PER_TVec * tid;</code>
+  - EN: Assigns or initializes `local_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val` 进行赋值或初始化。
+- **L92** <code>    float       local_sum[1]      = {0.0f};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L93** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L94** <code>// load from global memory into shared memory</code>
+  - EN: Comment that documents intent or context: "load from global memory into shared memory".
+  - CN: 用于说明意图或上下文的注释："load from global memory into shared memory"。
+- **L95** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L96** <code>    for (int i = 0; i &lt; TVecs_PER_THREAD; i += 1) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L97** <code>        const int current_load_start_idx = (i * bdimx + tid) * T_PER_TVec;</code>
+  - EN: Assigns or initializes `current_load_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current_load_start_idx` 进行赋值或初始化。
+- **L98** <code>        const int offset_in_group =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L99** <code>            ((current_load_start_idx / s_group_stride) * last_dim + (current_load_start_idx % s_group_stride))</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L100** <code>            / T_PER_TVec;</code>
+  - EN: Declares the symbol `T_PER_TVec` in the current scope.
+  - CN: 在当前作用域中声明符号 `T_PER_TVec`。
+- **L101** <code>        if (current_load_start_idx &lt; s_reduce_elements) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L102** <code>            TVec      tmp_vec          = input_TVec_ptr[offset_in_group];</code>
+  - EN: Assigns or initializes `tmp_vec` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec` 进行赋值或初始化。
+- **L103** <code>            T*        tmp_vec_ptr      = (T*)(&amp;tmp_vec);</code>
+  - EN: Assigns or initializes `tmp_vec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec_ptr` 进行赋值或初始化。
+- **L104** <code>            const int local_val_offset = i * T_PER_TVec;</code>
+  - EN: Assigns or initializes `local_val_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val_offset` 进行赋值或初始化。
+- **L105** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L106** <code>            for (int j = 0; j &lt; T_PER_TVec; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L107** <code>                float tmp = static_cast&lt;float&gt;(tmp_vec_ptr[j]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L108** <code>                local_sum[0] += tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L109** <code>                local_val[local_val_offset + j] = tmp_vec_ptr[j];</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L110** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L111** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L112** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L113** <code>    __shared__ float s_mean, s_variance;</code>
+  - EN: Declares the symbol `s_variance` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_variance`。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>    // reduction for mean</code>
+  - EN: Comment that documents intent or context: "reduction for mean".
+  - CN: 用于说明意图或上下文的注释："reduction for mean"。
+- **L116** <code>    if (bdimx &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L117** <code>        warpReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L118** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L119** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L120** <code>        blockReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L121** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L122** <code>    if (tid == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L123** <code>        s_mean = local_sum[0] / s_reduce_elements;</code>
+  - EN: Assigns or initializes `s_mean` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_mean` 进行赋值或初始化。
+- **L124** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L125** <code>    __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L126** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L127** <code>    // reduction for std</code>
+  - EN: Comment that documents intent or context: "reduction for std".
+  - CN: 用于说明意图或上下文的注释："reduction for std"。
+- **L128** <code>    local_sum[0] = 0.0f;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L129** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L130** <code>    for (int i = 0; i &lt; TVecs_PER_THREAD; i += 1) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L131** <code>        const int current_load_start_idx = (i * bdimx + tid) * T_PER_TVec;</code>
+  - EN: Assigns or initializes `current_load_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current_load_start_idx` 进行赋值或初始化。
+- **L132** <code>        if (current_load_start_idx &lt; s_reduce_elements) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L133** <code>            const int local_val_offset = i * T_PER_TVec;</code>
+  - EN: Assigns or initializes `local_val_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val_offset` 进行赋值或初始化。
+- **L134** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L135** <code>            for (int j = 0; j &lt; T_PER_TVec; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L136** <code>                float tmp = static_cast&lt;float&gt;(local_val[local_val_offset + j]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L137** <code>                tmp -= s_mean;</code>
+  - EN: Declares the symbol `s_mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_mean`。
+- **L138** <code>                local_sum[0] += tmp * tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L139** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L140** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L141** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L142** <code>    if (bdimx &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L143** <code>        warpReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L144** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L145** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L146** <code>        blockReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L147** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L148** <code>    if (tid == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L149** <code>        s_variance = rsqrtf(local_sum[0] / s_reduce_elements + eps);</code>
+  - EN: Declares function or method `rsqrtf` without defining it here.
+  - CN: 声明函数或方法 `rsqrtf`，但不在此处给出定义。
+- **L150** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>    __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L152** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L153** <code>    // normalize</code>
+  - EN: Comment that documents intent or context: "normalize".
+  - CN: 用于说明意图或上下文的注释："normalize"。
+- **L154** <code>    const int   gamma_offset_of_group = gid * v_group_stride;</code>
+  - EN: Assigns or initializes `gamma_offset_of_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_offset_of_group` 进行赋值或初始化。
+- **L155** <code>    const TVec* gamma_TVec_ptr        = (const TVec*)gamma + gamma_offset_of_group;</code>
+  - EN: Assigns or initializes `gamma_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_TVec_ptr` 进行赋值或初始化。
+- **L156** <code>    const TVec* beta_TVec_ptr         = (const TVec*)beta + gamma_offset_of_group;</code>
+  - EN: Assigns or initializes `beta_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta_TVec_ptr` 进行赋值或初始化。
+- **L157** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L158** <code>    for (int i = 0; i &lt; TVecs_PER_THREAD; i += 1) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L159** <code>        const int current_load_start_idx = (i * bdimx + tid) * T_PER_TVec;</code>
+  - EN: Assigns or initializes `current_load_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current_load_start_idx` 进行赋值或初始化。
+- **L160** <code>        const int offset_in_group =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L161** <code>            ((current_load_start_idx / s_group_stride) * last_dim + (current_load_start_idx % s_group_stride))</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L162** <code>            / T_PER_TVec;</code>
+  - EN: Declares the symbol `T_PER_TVec` in the current scope.
+  - CN: 在当前作用域中声明符号 `T_PER_TVec`。
+- **L163** <code>        const int gamma_offset_in_group = (current_load_start_idx % s_group_stride) / T_PER_TVec;</code>
+  - EN: Assigns or initializes `gamma_offset_in_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_offset_in_group` 进行赋值或初始化。
+- **L164** <code>        const int local_val_offset      = i * T_PER_TVec;</code>
+  - EN: Assigns or initializes `local_val_offset` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `local_val_offset` 进行赋值或初始化。
+- **L165** <code>        if (current_load_start_idx &lt; s_reduce_elements) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L166** <code>            TVec gamma_val     = gamma_TVec_ptr[gamma_offset_in_group];</code>
+  - EN: Assigns or initializes `gamma_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_val` 进行赋值或初始化。
+- **L167** <code>            TVec beta_val      = beta_TVec_ptr[gamma_offset_in_group];</code>
+  - EN: Assigns or initializes `beta_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta_val` 进行赋值或初始化。
+- **L168** <code>            T*   gamma_val_ptr = (T*)(&amp;gamma_val);</code>
+  - EN: Assigns or initializes `gamma_val_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_val_ptr` 进行赋值或初始化。
+- **L169** <code>            T*   beta_val_ptr  = (T*)(&amp;beta_val);</code>
+  - EN: Assigns or initializes `beta_val_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta_val_ptr` 进行赋值或初始化。
+- **L170** <code>            TVec tmp_vec;</code>
+  - EN: Declares the symbol `tmp_vec` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp_vec`。
+- **L171** <code>            T*   tmp_vec_ptr = (T*)(&amp;tmp_vec);</code>
+  - EN: Assigns or initializes `tmp_vec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec_ptr` 进行赋值或初始化。
+- **L172** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L173** <code>            for (int j = 0; j &lt; T_PER_TVec; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L174** <code>                float tmp = (static_cast&lt;float&gt;(local_val[local_val_offset + j]) - s_mean) * s_variance</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L175** <code>                                * static_cast&lt;float&gt;(gamma_val_ptr[j])</code>
+  - EN: Comment that documents intent or context: "static_cast<float>(gamma_val_ptr[j])".
+  - CN: 用于说明意图或上下文的注释："static_cast<float>(gamma_val_ptr[j])"。
+- **L176** <code>                            + static_cast&lt;float&gt;(beta_val_ptr[j]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L177** <code>                if (sizeof(T) == sizeof(half)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L178** <code>                    tmp_vec_ptr[j] = T(__float2half_rn(tmp));</code>
+  - EN: Declares function or method `__float2half_rn` without defining it here.
+  - CN: 声明函数或方法 `__float2half_rn`，但不在此处给出定义。
+- **L179** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L180** <code>                else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L181** <code>                    tmp_vec_ptr[j] = T(tmp);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L182** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L183** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L184** <code>            output_TVec_ptr[offset_in_group] = tmp_vec;</code>
+  - EN: Declares the symbol `tmp_vec` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp_vec`。
+- **L185** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L186** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L187** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L188** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L189** <code>// For large prod_dim1_to_last_dim/num_groups,</code>
+  - EN: Comment that documents intent or context: "For large prod_dim1_to_last_dim/num_groups,".
+  - CN: 用于说明意图或上下文的注释："For large prod_dim1_to_last_dim/num_groups,"。
+- **L190** <code>// in which the data cannot be stored locally,</code>
+  - EN: Comment that documents intent or context: "in which the data cannot be stored locally,".
+  - CN: 用于说明意图或上下文的注释："in which the data cannot be stored locally,"。
+- **L191** <code>// we will load from global memory multiple times,</code>
+  - EN: Comment that documents intent or context: "we will load from global memory multiple times,".
+  - CN: 用于说明意图或上下文的注释："we will load from global memory multiple times,"。
+- **L192** <code>// grid(num_groups, dim0)</code>
+  - EN: Comment that documents intent or context: "grid(num_groups, dim0)".
+  - CN: 用于说明意图或上下文的注释："grid(num_groups, dim0)"。
+- **L193** <code>// block(BLOCKSIZE)</code>
+  - EN: Comment that documents intent or context: "block(BLOCKSIZE)".
+  - CN: 用于说明意图或上下文的注释："block(BLOCKSIZE)"。
+- **L194** <code>// BLOCKSIZE * TVecs_PER_THREAD &lt;= prod_dim1_to_last_dim/num_group</code>
+  - EN: Comment that documents intent or context: "BLOCKSIZE * TVecs_PER_THREAD <= prod_dim1_to_last_dim/num_group".
+  - CN: 用于说明意图或上下文的注释："BLOCKSIZE * TVecs_PER_THREAD <= prod_dim1_to_last_dim/num_group"。
+- **L195** <code>template&lt;typename TVec, typename T, int T_PER_TVec&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L196** <code>__global__ void groupnorm_twopass_multiple_load(T*          output,</code>
+  - EN: Begins or continues the signature/call syntax involving `groupnorm_twopass_multiple_load`.
+  - CN: 开始或继续与 `groupnorm_twopass_multiple_load` 相关的签名/调用语法。
+- **L197** <code>                                                const T*    input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L198** <code>                                                const T*    gamma,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L199** <code>                                                const T*    beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L200** <code>                                                int         num_groups,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L201** <code>                                                int         prod_dim1_to_last_dim,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L202** <code>                                                int         last_dim,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L203** <code>                                                const float eps,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L204** <code>                                                const int   TVecs_PER_THREAD)</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L205** <code>{</code>
+  - EN: Opens or continues a nested syntactic scope.
+  - CN: 打开或延续一个嵌套的语法作用域。
+- **L206** <code>    const int   bid               = blockIdx.y;   // index of batch</code>
+  - EN: Assigns or initializes `bid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bid` 进行赋值或初始化。
+- **L207** <code>    const int   gid               = blockIdx.x;   // index of group</code>
+  - EN: Assigns or initializes `gid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gid` 进行赋值或初始化。
+- **L208** <code>    const int   tid               = threadIdx.x;  // index of thread</code>
+  - EN: Assigns or initializes `tid` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tid` 进行赋值或初始化。
+- **L209** <code>    const int   bdimx             = blockDim.x;</code>
+  - EN: Assigns or initializes `bdimx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `bdimx` 进行赋值或初始化。
+- **L210** <code>    const int   s_reduce_elements = prod_dim1_to_last_dim / num_groups;</code>
+  - EN: Assigns or initializes `s_reduce_elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_reduce_elements` 进行赋值或初始化。
+- **L211** <code>    const int   v_reduce_elements = s_reduce_elements / T_PER_TVec;</code>
+  - EN: Assigns or initializes `v_reduce_elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `v_reduce_elements` 进行赋值或初始化。
+- **L212** <code>    const int   s_group_stride    = last_dim / num_groups;</code>
+  - EN: Assigns or initializes `s_group_stride` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_group_stride` 进行赋值或初始化。
+- **L213** <code>    const int   v_group_stride    = s_group_stride / T_PER_TVec;</code>
+  - EN: Assigns or initializes `v_group_stride` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `v_group_stride` 进行赋值或初始化。
+- **L214** <code>    const int   offset_of_group   = (bid * prod_dim1_to_last_dim + gid * s_group_stride) / T_PER_TVec;</code>
+  - EN: Assigns or initializes `offset_of_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `offset_of_group` 进行赋值或初始化。
+- **L215** <code>    const TVec* input_TVec_ptr    = (const TVec*)(input) + offset_of_group;</code>
+  - EN: Assigns or initializes `input_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `input_TVec_ptr` 进行赋值或初始化。
+- **L216** <code>    TVec*       output_TVec_ptr   = (TVec*)(output) + offset_of_group;</code>
+  - EN: Assigns or initializes `output_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_TVec_ptr` 进行赋值或初始化。
+- **L217** <code>    float       local_sum[1]      = {0.0f};</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L218** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L219** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L220** <code>    for (int i = 0; i &lt; TVecs_PER_THREAD; i += 1) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L221** <code>        const int current_load_start_idx = (i * bdimx + tid) * T_PER_TVec;</code>
+  - EN: Assigns or initializes `current_load_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current_load_start_idx` 进行赋值或初始化。
+- **L222** <code>        if (current_load_start_idx &lt; s_reduce_elements) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L223** <code>            const int offset_in_group =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L224** <code>                ((current_load_start_idx / s_group_stride) * last_dim + (current_load_start_idx % s_group_stride))</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L225** <code>                / T_PER_TVec;</code>
+  - EN: Declares the symbol `T_PER_TVec` in the current scope.
+  - CN: 在当前作用域中声明符号 `T_PER_TVec`。
+- **L226** <code>            TVec tmp_vec     = input_TVec_ptr[offset_in_group];</code>
+  - EN: Assigns or initializes `tmp_vec` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec` 进行赋值或初始化。
+- **L227** <code>            T*   tmp_vec_ptr = (T*)(&amp;tmp_vec);</code>
+  - EN: Assigns or initializes `tmp_vec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec_ptr` 进行赋值或初始化。
+- **L228** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L229** <code>            for (int j = 0; j &lt; T_PER_TVec; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L230** <code>                float tmp = static_cast&lt;float&gt;(tmp_vec_ptr[j]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L231** <code>                local_sum[0] += tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L232** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L233** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L234** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L235** <code>    __shared__ float s_mean, s_variance;</code>
+  - EN: Declares the symbol `s_variance` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_variance`。
+- **L236** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L237** <code>    // reduction for mean</code>
+  - EN: Comment that documents intent or context: "reduction for mean".
+  - CN: 用于说明意图或上下文的注释："reduction for mean"。
+- **L238** <code>    if (bdimx &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L239** <code>        warpReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L240** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L241** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L242** <code>        blockReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L243** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L244** <code>    if (tid == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L245** <code>        s_mean = local_sum[0] / s_reduce_elements;</code>
+  - EN: Assigns or initializes `s_mean` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_mean` 进行赋值或初始化。
+- **L246** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L247** <code>    __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>    // reduction for std</code>
+  - EN: Comment that documents intent or context: "reduction for std".
+  - CN: 用于说明意图或上下文的注释："reduction for std"。
+- **L250** <code>    local_sum[0] = 0.0f;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L251** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L252** <code>    for (int i = 0; i &lt; TVecs_PER_THREAD; i += 1) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L253** <code>        const int current_load_start_idx = (i * bdimx + tid) * T_PER_TVec;</code>
+  - EN: Assigns or initializes `current_load_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current_load_start_idx` 进行赋值或初始化。
+- **L254** <code>        if (current_load_start_idx &lt; s_reduce_elements) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L255** <code>            const int offset_in_group =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L256** <code>                ((current_load_start_idx / s_group_stride) * last_dim + (current_load_start_idx % s_group_stride))</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L257** <code>                / T_PER_TVec;</code>
+  - EN: Declares the symbol `T_PER_TVec` in the current scope.
+  - CN: 在当前作用域中声明符号 `T_PER_TVec`。
+- **L258** <code>            TVec tmp_vec     = input_TVec_ptr[offset_in_group];</code>
+  - EN: Assigns or initializes `tmp_vec` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec` 进行赋值或初始化。
+- **L259** <code>            T*   tmp_vec_ptr = (T*)(&amp;tmp_vec);</code>
+  - EN: Assigns or initializes `tmp_vec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec_ptr` 进行赋值或初始化。
+- **L260** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L261** <code>            for (int j = 0; j &lt; T_PER_TVec; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L262** <code>                float tmp = static_cast&lt;float&gt;(tmp_vec_ptr[j]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L263** <code>                tmp -= s_mean;</code>
+  - EN: Declares the symbol `s_mean` in the current scope.
+  - CN: 在当前作用域中声明符号 `s_mean`。
+- **L264** <code>                local_sum[0] += tmp * tmp;</code>
+  - EN: Declares the symbol `tmp` in the current scope.
+  - CN: 在当前作用域中声明符号 `tmp`。
+- **L265** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L266** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L267** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L268** <code>    if (bdimx &lt;= 32) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L269** <code>        warpReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L270** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L271** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L272** <code>        blockReduceSum&lt;float, 1&gt;(local_sum);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L273** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L274** <code>    if (tid == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L275** <code>        s_variance = rsqrtf(local_sum[0] / s_reduce_elements + eps);</code>
+  - EN: Declares function or method `rsqrtf` without defining it here.
+  - CN: 声明函数或方法 `rsqrtf`，但不在此处给出定义。
+- **L276** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L277** <code>    __syncthreads();</code>
+  - EN: Declares function or method `__syncthreads` without defining it here.
+  - CN: 声明函数或方法 `__syncthreads`，但不在此处给出定义。
+- **L278** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L279** <code>    // normalize</code>
+  - EN: Comment that documents intent or context: "normalize".
+  - CN: 用于说明意图或上下文的注释："normalize"。
+- **L280** <code>    const int   gamma_offset_of_group = gid * v_group_stride;</code>
+  - EN: Assigns or initializes `gamma_offset_of_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_offset_of_group` 进行赋值或初始化。
+- **L281** <code>    const TVec* gamma_TVec_ptr        = (const TVec*)gamma + gamma_offset_of_group;</code>
+  - EN: Assigns or initializes `gamma_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_TVec_ptr` 进行赋值或初始化。
+- **L282** <code>    const TVec* beta_TVec_ptr         = (const TVec*)beta + gamma_offset_of_group;</code>
+  - EN: Assigns or initializes `beta_TVec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta_TVec_ptr` 进行赋值或初始化。
+- **L283** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L284** <code>    for (int i = 0; i &lt; TVecs_PER_THREAD; i += 1) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L285** <code>        const int current_load_start_idx = (i * bdimx + tid) * T_PER_TVec;</code>
+  - EN: Assigns or initializes `current_load_start_idx` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `current_load_start_idx` 进行赋值或初始化。
+- **L286** <code>        if (current_load_start_idx &lt; s_reduce_elements) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L287** <code>            const int offset_in_group =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L288** <code>                ((current_load_start_idx / s_group_stride) * last_dim + (current_load_start_idx % s_group_stride))</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L289** <code>                / T_PER_TVec;</code>
+  - EN: Declares the symbol `T_PER_TVec` in the current scope.
+  - CN: 在当前作用域中声明符号 `T_PER_TVec`。
+- **L290** <code>            const int gamma_offset_in_group = (current_load_start_idx % s_group_stride) / T_PER_TVec;</code>
+  - EN: Assigns or initializes `gamma_offset_in_group` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_offset_in_group` 进行赋值或初始化。
+- **L291** <code>            TVec      gamma_val             = gamma_TVec_ptr[gamma_offset_in_group];</code>
+  - EN: Assigns or initializes `gamma_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_val` 进行赋值或初始化。
+- **L292** <code>            TVec      beta_val              = beta_TVec_ptr[gamma_offset_in_group];</code>
+  - EN: Assigns or initializes `beta_val` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta_val` 进行赋值或初始化。
+- **L293** <code>            T*        gamma_val_ptr         = (T*)(&amp;gamma_val);</code>
+  - EN: Assigns or initializes `gamma_val_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `gamma_val_ptr` 进行赋值或初始化。
+- **L294** <code>            T*        beta_val_ptr          = (T*)(&amp;beta_val);</code>
+  - EN: Assigns or initializes `beta_val_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `beta_val_ptr` 进行赋值或初始化。
+- **L295** <code>            TVec      tmp_vec               = input_TVec_ptr[offset_in_group];</code>
+  - EN: Assigns or initializes `tmp_vec` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec` 进行赋值或初始化。
+- **L296** <code>            T*        tmp_vec_ptr           = (T*)(&amp;tmp_vec);</code>
+  - EN: Assigns or initializes `tmp_vec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `tmp_vec_ptr` 进行赋值或初始化。
+- **L297** <code>            TVec      output_tmp_vec;</code>
+  - EN: Declares the symbol `output_tmp_vec` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_tmp_vec`。
+- **L298** <code>            T*        output_tmp_vec_ptr = (T*)(&amp;output_tmp_vec);</code>
+  - EN: Assigns or initializes `output_tmp_vec_ptr` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `output_tmp_vec_ptr` 进行赋值或初始化。
+- **L299** <code>#pragma unroll</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L300** <code>            for (int j = 0; j &lt; T_PER_TVec; j++) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L301** <code>                float tmp =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L302** <code>                    (static_cast&lt;float&gt;(tmp_vec_ptr[j]) - s_mean) * s_variance * static_cast&lt;float&gt;(gamma_val_ptr[j])</code>
+  - EN: Begins or continues the signature/call syntax involving `static_cast<float>`.
+  - CN: 开始或继续与 `static_cast<float>` 相关的签名/调用语法。
+- **L303** <code>                    + static_cast&lt;float&gt;(beta_val_ptr[j]);</code>
+  - EN: Declares function or method `static_cast<float>` without defining it here.
+  - CN: 声明函数或方法 `static_cast<float>`，但不在此处给出定义。
+- **L304** <code>                if (sizeof(T) == sizeof(half)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L305** <code>                    output_tmp_vec_ptr[j] = T(__float2half_rn(tmp));</code>
+  - EN: Declares function or method `__float2half_rn` without defining it here.
+  - CN: 声明函数或方法 `__float2half_rn`，但不在此处给出定义。
+- **L306** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L307** <code>                else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L308** <code>                    output_tmp_vec_ptr[j] = T(tmp);</code>
+  - EN: Declares function or method `T` without defining it here.
+  - CN: 声明函数或方法 `T`，但不在此处给出定义。
+- **L309** <code>                }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L310** <code>            }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L311** <code>            output_TVec_ptr[offset_in_group] = output_tmp_vec;</code>
+  - EN: Declares the symbol `output_tmp_vec` in the current scope.
+  - CN: 在当前作用域中声明符号 `output_tmp_vec`。
+- **L312** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L313** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L314** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L315** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L316** <code>//ref_input &amp; ref_output should be [N, H, W, C]</code>
+  - EN: Comment that documents intent or context: "ref_input & ref_output should be [N, H, W, C]".
+  - CN: 用于说明意图或上下文的注释："ref_input & ref_output should be [N, H, W, C]"。
+- **L317** <code>//ref_gamma &amp; ref_beta should be [1, 1, 1, C]</code>
+  - EN: Comment that documents intent or context: "ref_gamma & ref_beta should be [1, 1, 1, C]".
+  - CN: 用于说明意图或上下文的注释："ref_gamma & ref_beta should be [1, 1, 1, C]"。
+- **L318** <code>template &lt;typename T&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L319** <code>void groupnorm(cutlass::Tensor4DCoord input_size,</code>
+  - EN: Begins or continues the signature/call syntax involving `groupnorm`.
+  - CN: 开始或继续与 `groupnorm` 相关的签名/调用语法。
+- **L320** <code>               const int num_groups,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L321** <code>               const float eps,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L322** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_output,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L323** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_input,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L324** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_gamma,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L325** <code>               TensorRef&lt;T, layout::TensorNHWC&gt; ref_beta,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L326** <code>               cudaStream_t stream){</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L327** <code>  const int N = input_size.n();</code>
+  - EN: Declares function or method `n` without defining it here.
+  - CN: 声明函数或方法 `n`，但不在此处给出定义。
+- **L328** <code>  const int H = input_size.h();</code>
+  - EN: Declares function or method `h` without defining it here.
+  - CN: 声明函数或方法 `h`，但不在此处给出定义。
+- **L329** <code>  const int W = input_size.w();</code>
+  - EN: Declares function or method `w` without defining it here.
+  - CN: 声明函数或方法 `w`，但不在此处给出定义。
+- **L330** <code>  const int C = input_size.c();</code>
+  - EN: Declares function or method `c` without defining it here.
+  - CN: 声明函数或方法 `c`，但不在此处给出定义。
+- **L331** <code>  if (C % num_groups != 0){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L332** <code>    printf(&quot;[ERROR] C should be a multiple of num_groups.\n&quot;);</code>
+  - EN: Declares function or method `printf` without defining it here.
+  - CN: 声明函数或方法 `printf`，但不在此处给出定义。
+- **L333** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L334** <code>  T* output = ref_output.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L335** <code>  const T* input = ref_input.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L336** <code>  const T* gamma = ref_gamma.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L337** <code>  const T* beta = ref_beta.data();</code>
+  - EN: Declares function or method `data` without defining it here.
+  - CN: 声明函数或方法 `data`，但不在此处给出定义。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>  const int dim0 = N;</code>
+  - EN: Assigns or initializes `dim0` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `dim0` 进行赋值或初始化。
+- **L340** <code>  const int last_dim = C;</code>
+  - EN: Assigns or initializes `last_dim` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `last_dim` 进行赋值或初始化。
+- **L341** <code>  const int prod_dim1_to_last_dim = H*W*C;</code>
+  - EN: Assigns or initializes `prod_dim1_to_last_dim` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `prod_dim1_to_last_dim` 进行赋值或初始化。
+- **L342** <code>  const int s_reduce_elements = prod_dim1_to_last_dim / num_groups;</code>
+  - EN: Assigns or initializes `s_reduce_elements` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_reduce_elements` 进行赋值或初始化。
+- **L343** <code>  const int s_group_stride = last_dim / num_groups;</code>
+  - EN: Assigns or initializes `s_group_stride` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `s_group_stride` 进行赋值或初始化。
+- **L344** <code>  dim3      grid(num_groups, dim0);</code>
+  - EN: Declares function or method `grid` without defining it here.
+  - CN: 声明函数或方法 `grid`，但不在此处给出定义。
+- **L345** <code>  int       threadblock_size = 32;</code>
+  - EN: Assigns or initializes `threadblock_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `threadblock_size` 进行赋值或初始化。
+- **L346** <code>  if (s_group_stride % 2 == 0) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L347** <code>    const int T_PER_TVec = 2;</code>
+  - EN: Assigns or initializes `T_PER_TVec` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `T_PER_TVec` 进行赋值或初始化。
+- **L348** <code>    while (threadblock_size &lt; 1024) {</code>
+  - EN: Starts a `while` loop that repeats while its condition remains true.
+  - CN: 开始一个 `while` 循环，只要条件成立就重复执行。
+- **L349** <code>      if (s_reduce_elements / T_PER_TVec / threadblock_size &lt;= 8)</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L350** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L351** <code>        threadblock_size *= 2;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L352** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L353** <code>    dim3      block(threadblock_size);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L354** <code>    const int TVec_PER_THREAD = (s_reduce_elements / T_PER_TVec + threadblock_size - 1) / threadblock_size;</code>
+  - EN: Assigns or initializes `TVec_PER_THREAD` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `TVec_PER_THREAD` 进行赋值或初始化。
+- **L355** <code>    const int shm_size = T_PER_TVec * TVec_PER_THREAD * threadblock_size * sizeof(T);</code>
+  - EN: Assigns or initializes `shm_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `shm_size` 进行赋值或初始化。
+- **L356** <code>    // for small s_reduce_elements, specific case for H=W=22, C=1280, num_groups=32;</code>
+  - EN: Comment that documents intent or context: "for small s_reduce_elements, specific case for H=W=22, C=1280, num_groups=32;".
+  - CN: 用于说明意图或上下文的注释："for small s_reduce_elements, specific case for H=W=22, C=1280, num_groups=32;"。
+- **L357** <code>    // the size of grid &amp; block may have better choice for different cases.</code>
+  - EN: Comment that documents intent or context: "the size of grid & block may have better choice for different cases.".
+  - CN: 用于说明意图或上下文的注释："the size of grid & block may have better choice for different cases."。
+- **L358** <code>    // ensure shared memory is smaller than 48KB</code>
+  - EN: Comment that documents intent or context: "ensure shared memory is smaller than 48KB".
+  - CN: 用于说明意图或上下文的注释："ensure shared memory is smaller than 48KB"。
+- **L359** <code>    if (std::is_same&lt;T, float&gt;::value){</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L360** <code>      if (shm_size &lt; 48 * 1024) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L361** <code>        groupnorm_twopass_store_locally&lt;float2, T, T_PER_TVec&gt;&lt;&lt;&lt;grid, block, shm_size, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L362** <code>          output, input, gamma, beta, num_groups, prod_dim1_to_last_dim, last_dim, eps, TVec_PER_THREAD);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L363** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L364** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L365** <code>        groupnorm_twopass_multiple_load&lt;float2, T, T_PER_TVec&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L366** <code>          output, input, gamma, beta, num_groups, prod_dim1_to_last_dim, last_dim, eps, TVec_PER_THREAD);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L367** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L368** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L369** <code>    else{</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L370** <code>      if (shm_size &lt; 48 * 1024) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L371** <code>        groupnorm_twopass_store_locally&lt;half2, T, T_PER_TVec&gt;&lt;&lt;&lt;grid, block, shm_size, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L372** <code>          output, input, gamma, beta, num_groups, prod_dim1_to_last_dim, last_dim, eps, TVec_PER_THREAD);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L373** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L374** <code>      else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L375** <code>        groupnorm_twopass_multiple_load&lt;half2, T, T_PER_TVec&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L376** <code>          output, input, gamma, beta, num_groups, prod_dim1_to_last_dim, last_dim, eps, TVec_PER_THREAD);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L377** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L378** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L379** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L380** <code>  else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L381** <code>    const int T_PER_TVec = 1;</code>
+  - EN: Assigns or initializes `T_PER_TVec` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `T_PER_TVec` 进行赋值或初始化。
+- **L382** <code>    while (threadblock_size &lt; 1024) {</code>
+  - EN: Starts a `while` loop that repeats while its condition remains true.
+  - CN: 开始一个 `while` 循环，只要条件成立就重复执行。
+- **L383** <code>      if (s_reduce_elements / T_PER_TVec / threadblock_size &lt;= 8)</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L384** <code>        break;</code>
+  - EN: Breaks out of the nearest loop or switch statement.
+  - CN: 跳出最近的一层循环或 switch 语句。
+- **L385** <code>        threadblock_size *= 2;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L386** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L387** <code>    dim3      block(threadblock_size);</code>
+  - EN: Declares function or method `block` without defining it here.
+  - CN: 声明函数或方法 `block`，但不在此处给出定义。
+- **L388** <code>    const int TVec_PER_THREAD = (s_reduce_elements / T_PER_TVec + threadblock_size - 1) / threadblock_size;</code>
+  - EN: Assigns or initializes `TVec_PER_THREAD` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `TVec_PER_THREAD` 进行赋值或初始化。
+- **L389** <code>    const int shm_size = T_PER_TVec * TVec_PER_THREAD * threadblock_size * sizeof(T);</code>
+  - EN: Assigns or initializes `shm_size` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `shm_size` 进行赋值或初始化。
+- **L390** <code>    if (shm_size &lt; 48 * 1024) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L391** <code>      groupnorm_twopass_store_locally&lt;T, T, T_PER_TVec&gt;&lt;&lt;&lt;grid, block, shm_size, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L392** <code>        output, input, gamma, beta, num_groups, prod_dim1_to_last_dim, last_dim, eps, TVec_PER_THREAD);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L393** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L394** <code>    else {</code>
+  - EN: Begins the fallback branch when prior conditions are false.
+  - CN: 当前面条件为假时进入兜底分支。
+- **L395** <code>      groupnorm_twopass_multiple_load&lt;T, T, T_PER_TVec&gt;&lt;&lt;&lt;grid, block, 0, stream&gt;&gt;&gt;(</code>
+  - EN: Begins or continues the signature/call syntax involving `stream>>>`.
+  - CN: 开始或继续与 `stream>>>` 相关的签名/调用语法。
+- **L396** <code>        output, input, gamma, beta, num_groups, prod_dim1_to_last_dim, last_dim, eps, TVec_PER_THREAD);</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L397** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L398** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L399** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L400** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L401** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L402** <code>} //namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- CUDA host/device execution details / CUDA 主机/设备执行细节
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/tensor.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/tensor_ref.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>device_utils.h</code> — project-specific declarations from `device_utils.h` / 来自 `device_utils.h` 的项目专用声明
+- <code>cfloat</code> — APIs or definitions from `cfloat` / 来自 `cfloat` 的 API 或定义

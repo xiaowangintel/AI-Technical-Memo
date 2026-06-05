@@ -1,0 +1,184 @@
+# pass_manager.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/passes/pass_manager.py`
+
+## Purpose / 作用
+- EN: Pass manager for DAG IR.
+- CN: 该模块的文档字符串将其描述为：Pass manager for DAG IR.
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Pass manager for DAG IR.` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `import networkx as nx` — **EN:** Imports networkx as nx for later use. **CN:** 导入 networkx as nx 供后续使用。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `from cutlass_cppgen.backend.evt.ir import DAGIR` — **EN:** Imports DAGIR from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 DAGIR。
+- **L42** `from cutlass_cppgen.backend.evt.passes.util import cc_map` — **EN:** Imports cc_map from `cutlass_cppgen.backend.evt.passes.util`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.util` 导入 cc_map。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `class EVTPassBase:` — **EN:** Defines class `EVTPassBase`. **CN:** 定义类 `EVTPassBase`。
+- **L46** `    """` — **EN:** Starts the docstring for the class `EVTPassBase`. **CN:** 开始说明 class `EVTPassBase` 的文档字符串。
+- **L47** `    Base class for EVT Passes` — **EN:** Continues the docstring for the class `EVTPassBase`. **CN:** 继续说明 class `EVTPassBase` 的文档字符串。
+- **L48** `    """` — **EN:** Ends the docstring for the class `EVTPassBase`. **CN:** 结束说明 class `EVTPassBase` 的文档字符串。
+- **L49** `    dependencies = []` — **EN:** Assigns a value to dependencies. **CN:** 将一个值赋给 dependencies。
+- **L50** `    def __init__(self, dag_ir: DAGIR) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L51** `        self.dag_ir = dag_ir` — **EN:** Assigns a value to self.dag_ir. **CN:** 将一个值赋给 self.dag_ir。
+- **L52** `        self.cc = self.dag_ir.cc` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    def requires(self) -> None:` — **EN:** Defines function `requires`. **CN:** 定义函数 `requires`。
+- **L55** `        """` — **EN:** Starts the docstring for the function `requires`. **CN:** 开始说明 function `requires` 的文档字符串。
+- **L56** `        This function will be called before the pass is run.` — **EN:** Continues the docstring for the function `requires`. **CN:** 继续说明 function `requires` 的文档字符串。
+- **L57** `        """` — **EN:** Ends the docstring for the function `requires`. **CN:** 结束说明 function `requires` 的文档字符串。
+- **L58** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    def call(self) -> None:` — **EN:** Defines function `call`. **CN:** 定义函数 `call`。
+- **L61** `        """` — **EN:** Starts the docstring for the function `call`. **CN:** 开始说明 function `call` 的文档字符串。
+- **L62** `        The pass that is run through the self.dag_ir` — **EN:** Continues the docstring for the function `call`. **CN:** 继续说明 function `call` 的文档字符串。
+- **L63** `        """` — **EN:** Ends the docstring for the function `call`. **CN:** 结束说明 function `call` 的文档字符串。
+- **L64** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L65** `            f"__call__ is not overwritten in Pass {self.__class__.__name__}")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `    def ensures(self) -> None:` — **EN:** Defines function `ensures`. **CN:** 定义函数 `ensures`。
+- **L68** `        """` — **EN:** Starts the docstring for the function `ensures`. **CN:** 开始说明 function `ensures` 的文档字符串。
+- **L69** `        This function will be called after the pass is run.` — **EN:** Continues the docstring for the function `ensures`. **CN:** 继续说明 function `ensures` 的文档字符串。
+- **L70** `        """` — **EN:** Ends the docstring for the function `ensures`. **CN:** 结束说明 function `ensures` 的文档字符串。
+- **L71** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `    def __call__(self) -> Any:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L74** `        self.requires()` — **EN:** Invokes `self.requires` as a standalone call. **CN:** 以独立语句方式调用 `self.requires`。
+- **L75** `        self.call()` — **EN:** Invokes `self.call` as a standalone call. **CN:** 以独立语句方式调用 `self.call`。
+- **L76** `        self.ensures()` — **EN:** Invokes `self.ensures` as a standalone call. **CN:** 以独立语句方式调用 `self.ensures`。
+- **L77** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L78** `    def cc_specific_method(self, func):` — **EN:** Defines function `cc_specific_method`. **CN:** 定义函数 `cc_specific_method`。
+- **L79** `        """` — **EN:** Starts the docstring for the function `cc_specific_method`. **CN:** 开始说明 function `cc_specific_method` 的文档字符串。
+- **L80** `        This enables defining function that behaves differently under different cc` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L81** `        The simplest example of using this function is the following` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `        .. highlight:: python` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L84** `        .. code-block:: python` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `        class ExamplePass(EVTPassBase):` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `            def call(sekf):` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L89** `                # This automatically select the smXX_func based on current cc` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L90** `                self.cc_specific_method(self.func)()` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `            # Interface func, can be empty` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L93** `            def func(self):` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L94** `                pass` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `            # Sm90 specific func` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L97** `            def sm90_func(self):` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L98** `                // sm90 specific method` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L99** `                return` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `            # Sm80 specific func` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L102** `            def sm80_func(self):` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L103** `                // sm80 specific method` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L104** `                return` — **EN:** Continues the docstring for the function `cc_specific_method`. **CN:** 继续说明 function `cc_specific_method` 的文档字符串。
+- **L105** `        """` — **EN:** Ends the docstring for the function `cc_specific_method`. **CN:** 结束说明 function `cc_specific_method` 的文档字符串。
+- **L106** `        func_name = f"sm{cc_map[self.cc]}_{func.__name__}"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L107** `        if hasattr(self, func_name):` — **EN:** Starts a conditional branch guarded by `hasattr(self, func_name)`. **CN:** 开始一个由 `hasattr(self, func_name)` 控制的条件分支。
+- **L108** `            return getattr(self, func_name)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L110** `            raise NotImplementedError(f"func {func.__name__} is not overwritten for Sm{self.cc}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `class EVTPassManager(nx.DiGraph):` — **EN:** Defines class `EVTPassManager` with bases nx.DiGraph. **CN:** 定义类 `EVTPassManager`，其基类为 nx.DiGraph。
+- **L114** `    """` — **EN:** Starts the docstring for the class `EVTPassManager`. **CN:** 开始说明 class `EVTPassManager` 的文档字符串。
+- **L115** `    Topological-based Pass Manager.` — **EN:** Continues the docstring for the class `EVTPassManager`. **CN:** 继续说明 class `EVTPassManager` 的文档字符串。
+- **L116** `    Each registered pass has a list of dependencies. The pass manager organizes` — **EN:** Continues the docstring for the class `EVTPassManager`. **CN:** 继续说明 class `EVTPassManager` 的文档字符串。
+- **L117** `    the passes as a DAG and launch the compiler passes under topological order.` — **EN:** Continues the docstring for the class `EVTPassManager`. **CN:** 继续说明 class `EVTPassManager` 的文档字符串。
+- **L118** `    """` — **EN:** Ends the docstring for the class `EVTPassManager`. **CN:** 结束说明 class `EVTPassManager` 的文档字符串。
+- **L119** `    def __init__(self, dag_ir: DAGIR, pass_list):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L120** `        super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L121** `        self.dag_ir = dag_ir` — **EN:** Assigns a value to self.dag_ir. **CN:** 将一个值赋给 self.dag_ir。
+- **L122** `        for pass_cls in pass_list:` — **EN:** Starts a loop assigning items from `pass_list` to `pass_cls`. **CN:** 开始一个循环，将 `pass_list` 的元素赋给 `pass_cls`。
+- **L123** `            self.add_pass(pass_cls)` — **EN:** Invokes `self.add_pass` as a standalone call. **CN:** 以独立语句方式调用 `self.add_pass`。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `        self.sorted_passes = self.schedule()` — **EN:** Assigns a value to self.sorted_passes. **CN:** 将一个值赋给 self.sorted_passes。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    def get_callable(self, pass_name):` — **EN:** Defines function `get_callable`. **CN:** 定义函数 `get_callable`。
+- **L128** `        """` — **EN:** Starts the docstring for the function `get_callable`. **CN:** 开始说明 function `get_callable` 的文档字符串。
+- **L129** `        Return the callable of the pass` — **EN:** Continues the docstring for the function `get_callable`. **CN:** 继续说明 function `get_callable` 的文档字符串。
+- **L130** `        """` — **EN:** Ends the docstring for the function `get_callable`. **CN:** 结束说明 function `get_callable` 的文档字符串。
+- **L131** `        return self.nodes[pass_name]["callable"]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `    def add_pass(self, pass_cls):` — **EN:** Defines function `add_pass`. **CN:** 定义函数 `add_pass`。
+- **L134** `        """` — **EN:** Starts the docstring for the function `add_pass`. **CN:** 开始说明 function `add_pass` 的文档字符串。
+- **L135** `        Add a pass to the pass manager` — **EN:** Continues the docstring for the function `add_pass`. **CN:** 继续说明 function `add_pass` 的文档字符串。
+- **L136** `        :param pass_cls: the class of pass` — **EN:** Continues the docstring for the function `add_pass`. **CN:** 继续说明 function `add_pass` 的文档字符串。
+- **L137** `        :type pass_cls: derived class of EVTPassBase` — **EN:** Continues the docstring for the function `add_pass`. **CN:** 继续说明 function `add_pass` 的文档字符串。
+- **L138** `        """` — **EN:** Ends the docstring for the function `add_pass`. **CN:** 结束说明 function `add_pass` 的文档字符串。
+- **L139** `        name = pass_cls.__name__` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L140** `        pass_callable = pass_cls(self.dag_ir)` — **EN:** Assigns a value to pass_callable. **CN:** 将一个值赋给 pass_callable。
+- **L141** `        self.add_node(name, callable=pass_callable)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    def schedule(self):` — **EN:** Defines function `schedule`. **CN:** 定义函数 `schedule`。
+- **L144** `        """` — **EN:** Starts the docstring for the function `schedule`. **CN:** 开始说明 function `schedule` 的文档字符串。
+- **L145** `        Schedule the added passes under topological order` — **EN:** Continues the docstring for the function `schedule`. **CN:** 继续说明 function `schedule` 的文档字符串。
+- **L146** `        """` — **EN:** Ends the docstring for the function `schedule`. **CN:** 结束说明 function `schedule` 的文档字符串。
+- **L147** `        # Add edges` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L148** `        for pass_name in self.nodes:` — **EN:** Starts a loop assigning items from `self.nodes` to `pass_name`. **CN:** 开始一个循环，将 `self.nodes` 的元素赋给 `pass_name`。
+- **L149** `            callable = self.get_callable(pass_name)` — **EN:** Assigns a value to callable. **CN:** 将一个值赋给 callable。
+- **L150** `            for dependency_cls in callable.dependencies:` — **EN:** Starts a loop assigning items from `callable.dependencies` to `dependency_cls`. **CN:** 开始一个循环，将 `callable.dependencies` 的元素赋给 `dependency_cls`。
+- **L151** `                self.add_edge(` — **EN:** Invokes `self.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.add_edge`。
+- **L152** `                    dependency_cls.__name__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `                    type(callable).__name__)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        # Topological sort` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L156** `        return list(nx.topological_sort(self))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    def __call__(self) -> Any:` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L159** `        """` — **EN:** Starts the docstring for the function `__call__`. **CN:** 开始说明 function `__call__` 的文档字符串。
+- **L160** `        Launch the registered passes` — **EN:** Continues the docstring for the function `__call__`. **CN:** 继续说明 function `__call__` 的文档字符串。
+- **L161** `        """` — **EN:** Ends the docstring for the function `__call__`. **CN:** 结束说明 function `__call__` 的文档字符串。
+- **L162** `        for pass_name in self.sorted_passes:` — **EN:** Starts a loop assigning items from `self.sorted_passes` to `pass_name`. **CN:** 开始一个循环，将 `self.sorted_passes` 的元素赋给 `pass_name`。
+- **L163** `            callable = self.get_callable(pass_name)` — **EN:** Assigns a value to callable. **CN:** 将一个值赋给 callable。
+- **L164** `            callable()` — **EN:** Invokes `callable` as a standalone call. **CN:** 以独立语句方式调用 `callable`。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.passes.pass_manager`. CN: 模块名为 `cutlass_cppgen.backend.evt.passes.pass_manager`。
+- EN: Module docstring summary: Pass manager for DAG IR. CN: 模块文档摘要为：Pass manager for DAG IR.
+- EN: Top-level classes: EVTPassBase, EVTPassManager CN: 顶层类包括：EVTPassBase, EVTPassManager
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.backend.evt.ir:DAGIR, cutlass_cppgen.backend.evt.passes.util:cc_map CN: 内部依赖：cutlass_cppgen.backend.evt.ir:DAGIR, cutlass_cppgen.backend.evt.passes.util:cc_map
+- EN: External or standard-library dependencies: typing:Any, networkx CN: 外部或标准库依赖：typing:Any, networkx

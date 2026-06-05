@@ -1,0 +1,146 @@
+# clc.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/arch/clc.py`
+
+## Purpose / 作用
+- EN: Defines 2 functions (issue_clc_query, clc_response) in `CuTeDSL.cutlass.cute.arch.clc`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.arch.clc` 定义了 2 个函数（issue_clc_query, clc_response）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Optional, Tuple` — **EN:** Imports Optional, Tuple from `typing`. **CN:** 从 `typing` 导入 Optional, Tuple。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `from cutlass._mlir.dialects import nvvm as _nvvm, vector` — **EN:** Imports nvvm as _nvvm, vector from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 nvvm as _nvvm, vector。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from ..typing import Int32, Pointer, Int128` — **EN:** Imports Int32, Pointer, Int128 from `..typing`. **CN:** 从 `..typing` 导入 Int32, Pointer, Int128。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L23** `def issue_clc_query(` — **EN:** Defines function `issue_clc_query`. **CN:** 定义函数 `issue_clc_query`。
+- **L24** `    mbar_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L25** `    clc_response_ptr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L26** `    multicast: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L30** `    """` — **EN:** Starts the docstring for the function `issue_clc_query`. **CN:** 开始说明 function `issue_clc_query` 的文档字符串。
+- **L31** `    The clusterlaunchcontrol.try_cancel instruction requests atomically cancelling the launch` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L32** `    of a cluster that has not started running yet. It asynchronously writes an opaque response` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L33** `    to shared memory indicating whether the operation succeeded or failed. On success, the` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L34** `    opaque response contains the ctaid of the first CTA of the canceled cluster.` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    :param mbar_ptr: A pointer to the mbarrier address in SMEM` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L37** `    :type mbar_ptr:  Pointer` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L38** `    :param clc_response_ptr: A pointer to the cluster launch control response address in SMEM` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L39** `    :type clc_response_ptr:  Pointer` — **EN:** Continues the docstring for the function `issue_clc_query`. **CN:** 继续说明 function `issue_clc_query` 的文档字符串。
+- **L40** `    """` — **EN:** Ends the docstring for the function `issue_clc_query`. **CN:** 结束说明 function `issue_clc_query` 的文档字符串。
+- **L41** `    mbar_llvm_ptr = mbar_ptr.llvm_ptr` — **EN:** Assigns a value to mbar_llvm_ptr. **CN:** 将一个值赋给 mbar_llvm_ptr。
+- **L42** `    clc_response_llvm_ptr = clc_response_ptr.llvm_ptr` — **EN:** Assigns a value to clc_response_llvm_ptr. **CN:** 将一个值赋给 clc_response_llvm_ptr。
+- **L43** `    if multicast:` — **EN:** Starts a conditional branch guarded by `multicast`. **CN:** 开始一个由 `multicast` 控制的条件分支。
+- **L44** `        _nvvm.clusterlaunchcontrol_try_cancel_multicast(` — **EN:** Invokes `_nvvm.clusterlaunchcontrol_try_cancel_multicast` as a standalone call. **CN:** 以独立语句方式调用 `_nvvm.clusterlaunchcontrol_try_cancel_multicast`。
+- **L45** `            clc_response_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `            mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L51** `        _nvvm.clusterlaunchcontrol_try_cancel(` — **EN:** Invokes `_nvvm.clusterlaunchcontrol_try_cancel` as a standalone call. **CN:** 以独立语句方式调用 `_nvvm.clusterlaunchcontrol_try_cancel`。
+- **L52** `            clc_response_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `            mbar_llvm_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L60** `def clc_response(` — **EN:** Defines function `clc_response`. **CN:** 定义函数 `clc_response`。
+- **L61** `    result_addr: Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L62** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L64** `) -> Tuple[Int32, Int32, Int32, Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L65** `    """` — **EN:** Starts the docstring for the function `clc_response`. **CN:** 开始说明 function `clc_response` 的文档字符串。
+- **L66** `    After loading response from clusterlaunchcontrol.try_cancel instruction into 16-byte` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L67** `    register, it can be further queried using clusterlaunchcontrol.query_cancel instruction.` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L68** `    If the cluster is canceled successfully, predicate p is set to true; otherwise, it is` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L69** `    set to false. If the request succeeded, clusterlaunchcontrol.query_cancel.get_first_ctaid` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L70** `    extracts the CTA id of the first CTA in the canceled cluster. By default, the instruction` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L71** `    returns a .v4 vector whose first three elements are the x, y and z coordinate of first CTA` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L72** `    in canceled cluster.` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    :param result_addr: A pointer to the cluster launch control response address in SMEM` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L75** `    :type result_addr:  Pointer` — **EN:** Continues the docstring for the function `clc_response`. **CN:** 继续说明 function `clc_response` 的文档字符串。
+- **L76** `    """` — **EN:** Ends the docstring for the function `clc_response`. **CN:** 结束说明 function `clc_response` 的文档字符串。
+- **L77** `    from cutlass.cute import recast_ptr, make_tensor, make_layout` — **EN:** Imports recast_ptr, make_tensor, make_layout from `cutlass.cute`. **CN:** 从 `cutlass.cute` 导入 recast_ptr, make_tensor, make_layout。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    clc_ptr_i128 = recast_ptr(result_addr, dtype=Int128, loc=loc, ip=ip)` — **EN:** Assigns a value to clc_ptr_i128. **CN:** 将一个值赋给 clc_ptr_i128。
+- **L80** `    clc_tensor = make_tensor(` — **EN:** Assigns a value to clc_tensor. **CN:** 将一个值赋给 clc_tensor。
+- **L81** `        clc_ptr_i128, make_layout(1, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `    # Load the 128-bit value from shared memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `    clc_result_vec = clc_tensor.load(loc=loc, ip=ip)` — **EN:** Assigns a value to clc_result_vec. **CN:** 将一个值赋给 clc_result_vec。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    # Extract the i128 scalar from the vector<1xi128>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `    clc_result_i128 = vector.extract(` — **EN:** Assigns a value to clc_result_i128. **CN:** 将一个值赋给 clc_result_i128。
+- **L89** `        clc_result_vec.ir_value(loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `        [],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `        [0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    # Query if the cluster was canceled` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L94** `    # res parameter expects an MLIR Type, and returns the actual OpResult value` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L95** `    pred = _nvvm.clusterlaunchcontrol_query_cancel_is_canceled(` — **EN:** Assigns a value to pred. **CN:** 将一个值赋给 pred。
+- **L96** `        clc_result_i128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    is_valid = Int32(pred)` — **EN:** Assigns a value to is_valid. **CN:** 将一个值赋给 is_valid。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    # Get first CTA ID x component` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `    m_idx_i32 = _nvvm.clusterlaunchcontrol_query_cancel_get_first_ctaid_x(` — **EN:** Assigns a value to m_idx_i32. **CN:** 将一个值赋给 m_idx_i32。
+- **L104** `        clc_result_i128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    # Get first CTA ID y component` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `    n_idx_i32 = _nvvm.clusterlaunchcontrol_query_cancel_get_first_ctaid_y(` — **EN:** Assigns a value to n_idx_i32. **CN:** 将一个值赋给 n_idx_i32。
+- **L111** `        clc_result_i128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    # Get first CTA ID z component` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L117** `    l_idx_i32 = _nvvm.clusterlaunchcontrol_query_cancel_get_first_ctaid_z(` — **EN:** Assigns a value to l_idx_i32. **CN:** 将一个值赋给 l_idx_i32。
+- **L118** `        clc_result_i128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    m_idx = Int32(m_idx_i32)` — **EN:** Assigns a value to m_idx. **CN:** 将一个值赋给 m_idx。
+- **L124** `    n_idx = Int32(n_idx_i32)` — **EN:** Assigns a value to n_idx. **CN:** 将一个值赋给 n_idx。
+- **L125** `    l_idx = Int32(l_idx_i32)` — **EN:** Assigns a value to l_idx. **CN:** 将一个值赋给 l_idx。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    return m_idx, n_idx, l_idx, is_valid` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.arch.clc`. CN: 模块名为 `CuTeDSL.cutlass.cute.arch.clc`。
+- EN: Top-level functions: issue_clc_query, clc_response CN: 顶层函数包括：issue_clc_query, clc_response
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:nvvm,vector, ..typing:Int32,Pointer,Int128, cutlass.cute:recast_ptr,make_tensor,make_layout CN: 内部依赖：cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:nvvm,vector, ..typing:Int32,Pointer,Int128, cutlass.cute:recast_ptr,make_tensor,make_layout
+- EN: External or standard-library dependencies: typing:Optional,Tuple CN: 外部或标准库依赖：typing:Optional,Tuple

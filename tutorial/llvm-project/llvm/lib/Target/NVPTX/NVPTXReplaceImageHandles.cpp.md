@@ -1,0 +1,2001 @@
+# NVPTXReplaceImageHandles.cpp — Code Analysis / 代码分析
+
+## Source / 来源
+
+- File: `llvm/lib/Target/NVPTX/NVPTXReplaceImageHandles.cpp`
+- Repository: `llvm-project`
+- Purpose (EN): On Fermi, image handles are not supported.
+- 目的（中文）: 该文件用于支撑 LLVM 目标后端的相关功能。
+- Language: C++ source
+
+## Line-by-Line Analysis / 逐行分析
+
+> Note / 说明: To keep the document readable, the source is analyzed in contiguous line ranges while preserving the original order. Each code block prefixes original line numbers.
+
+### Lines 1-90
+```cpp
+ 1: //===-- NVPTXReplaceImageHandles.cpp - Replace image handles for Fermi ----===//
+ 2: //
+ 3: // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+ 4: // See https://llvm.org/LICENSE.txt for license information.
+ 5: // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+ 6: //
+ 7: //===----------------------------------------------------------------------===//
+ 8: //
+ 9: // On Fermi, image handles are not supported. To work around this, we traverse
+10: // the machine code and replace image handles with concrete symbols. For this
+11: // to work reliably, inlining of all function call must be performed.
+12: //
+13: //===----------------------------------------------------------------------===//
+14: #include "MCTargetDesc/NVPTXBaseInfo.h"
+15: #include "NVPTX.h"
+16: #include "NVPTXMachineFunctionInfo.h"
+17: #include "NVPTXSubtarget.h"
+18: #include "NVPTXTargetMachine.h"
+19: #include "llvm/ADT/DenseSet.h"
+20: #include "llvm/CodeGen/MachineFunction.h"
+21: #include "llvm/CodeGen/MachineFunctionPass.h"
+22: #include "llvm/CodeGen/MachineRegisterInfo.h"
+23:
+24: using namespace llvm;
+25:
+26: namespace {
+27: class NVPTXReplaceImageHandles : public MachineFunctionPass {
+28: private:
+29:   static char ID;
+30:   DenseSet<MachineInstr *> InstrsToRemove;
+31:
+32: public:
+33:   NVPTXReplaceImageHandles();
+34:
+35:   bool runOnMachineFunction(MachineFunction &MF) override;
+36:
+37:   StringRef getPassName() const override {
+38:     return "NVPTX Replace Image Handles";
+39:   }
+40: private:
+41:   bool processInstr(MachineInstr &MI);
+42:   bool replaceImageHandle(MachineOperand &Op, MachineFunction &MF);
+43: };
+44: } // namespace
+45:
+46: char NVPTXReplaceImageHandles::ID = 0;
+47:
+48: NVPTXReplaceImageHandles::NVPTXReplaceImageHandles()
+49:   : MachineFunctionPass(ID) {}
+50:
+51: bool NVPTXReplaceImageHandles::runOnMachineFunction(MachineFunction &MF) {
+52:   bool Changed = false;
+53:   InstrsToRemove.clear();
+54:
+55:   for (MachineBasicBlock &MBB : MF)
+56:     for (MachineInstr &MI : MBB)
+57:       Changed |= processInstr(MI);
+58:
+59:   // Now clean up any handle-access instructions
+60:   // This is needed in debug mode when code cleanup passes are not executed,
+61:   // but we need the handle access to be eliminated because they are not
+62:   // valid instructions when image handles are disabled.
+63:   for (MachineInstr *MI : InstrsToRemove) {
+64:     unsigned DefReg = MI->getOperand(0).getReg();
+65:     // Only these that are not used can be removed.
+66:     if (MF.getRegInfo().use_nodbg_empty(DefReg))
+67:       MI->eraseFromParent();
+68:   }
+69:   return Changed;
+70: }
+71:
+72: static unsigned suldRegisterToIndexOpcode(unsigned RegOC) {
+73:   switch (RegOC) {
+74:   case NVPTX::SULD_1D_I8_CLAMP_R:
+75:     return NVPTX::SULD_1D_I8_CLAMP_I;
+76:   case NVPTX::SULD_1D_I16_CLAMP_R:
+77:     return NVPTX::SULD_1D_I16_CLAMP_I;
+78:   case NVPTX::SULD_1D_I32_CLAMP_R:
+79:     return NVPTX::SULD_1D_I32_CLAMP_I;
+80:   case NVPTX::SULD_1D_I64_CLAMP_R:
+81:     return NVPTX::SULD_1D_I64_CLAMP_I;
+82:   case NVPTX::SULD_1D_ARRAY_I8_CLAMP_R:
+83:     return NVPTX::SULD_1D_ARRAY_I8_CLAMP_I;
+84:   case NVPTX::SULD_1D_ARRAY_I16_CLAMP_R:
+85:     return NVPTX::SULD_1D_ARRAY_I16_CLAMP_I;
+86:   case NVPTX::SULD_1D_ARRAY_I32_CLAMP_R:
+87:     return NVPTX::SULD_1D_ARRAY_I32_CLAMP_I;
+88:   case NVPTX::SULD_1D_ARRAY_I64_CLAMP_R:
+89:     return NVPTX::SULD_1D_ARRAY_I64_CLAMP_I;
+90:   case NVPTX::SULD_2D_I8_CLAMP_R:
+```
+- EN: This range defines or declares important types such as NVPTXReplaceImageHandles, runOnMachineFunction, getPassName, processInstr, shaping the data model used by NVPTXReplaceImageHandles.cpp.
+- CN: 这一段定义或声明了 NVPTXReplaceImageHandles、runOnMachineFunction、getPassName、processInstr 等关键类型，构成 NVPTXReplaceImageHandles.cpp 使用的数据模型。
+
+### Lines 91-180
+```cpp
+ 91:     return NVPTX::SULD_2D_I8_CLAMP_I;
+ 92:   case NVPTX::SULD_2D_I16_CLAMP_R:
+ 93:     return NVPTX::SULD_2D_I16_CLAMP_I;
+ 94:   case NVPTX::SULD_2D_I32_CLAMP_R:
+ 95:     return NVPTX::SULD_2D_I32_CLAMP_I;
+ 96:   case NVPTX::SULD_2D_I64_CLAMP_R:
+ 97:     return NVPTX::SULD_2D_I64_CLAMP_I;
+ 98:   case NVPTX::SULD_2D_ARRAY_I8_CLAMP_R:
+ 99:     return NVPTX::SULD_2D_ARRAY_I8_CLAMP_I;
+100:   case NVPTX::SULD_2D_ARRAY_I16_CLAMP_R:
+101:     return NVPTX::SULD_2D_ARRAY_I16_CLAMP_I;
+102:   case NVPTX::SULD_2D_ARRAY_I32_CLAMP_R:
+103:     return NVPTX::SULD_2D_ARRAY_I32_CLAMP_I;
+104:   case NVPTX::SULD_2D_ARRAY_I64_CLAMP_R:
+105:     return NVPTX::SULD_2D_ARRAY_I64_CLAMP_I;
+106:   case NVPTX::SULD_3D_I8_CLAMP_R:
+107:     return NVPTX::SULD_3D_I8_CLAMP_I;
+108:   case NVPTX::SULD_3D_I16_CLAMP_R:
+109:     return NVPTX::SULD_3D_I16_CLAMP_I;
+110:   case NVPTX::SULD_3D_I32_CLAMP_R:
+111:     return NVPTX::SULD_3D_I32_CLAMP_I;
+112:   case NVPTX::SULD_3D_I64_CLAMP_R:
+113:     return NVPTX::SULD_3D_I64_CLAMP_I;
+114:   case NVPTX::SULD_1D_V2I8_CLAMP_R:
+115:     return NVPTX::SULD_1D_V2I8_CLAMP_I;
+116:   case NVPTX::SULD_1D_V2I16_CLAMP_R:
+117:     return NVPTX::SULD_1D_V2I16_CLAMP_I;
+118:   case NVPTX::SULD_1D_V2I32_CLAMP_R:
+119:     return NVPTX::SULD_1D_V2I32_CLAMP_I;
+120:   case NVPTX::SULD_1D_V2I64_CLAMP_R:
+121:     return NVPTX::SULD_1D_V2I64_CLAMP_I;
+122:   case NVPTX::SULD_1D_ARRAY_V2I8_CLAMP_R:
+123:     return NVPTX::SULD_1D_ARRAY_V2I8_CLAMP_I;
+124:   case NVPTX::SULD_1D_ARRAY_V2I16_CLAMP_R:
+125:     return NVPTX::SULD_1D_ARRAY_V2I16_CLAMP_I;
+126:   case NVPTX::SULD_1D_ARRAY_V2I32_CLAMP_R:
+127:     return NVPTX::SULD_1D_ARRAY_V2I32_CLAMP_I;
+128:   case NVPTX::SULD_1D_ARRAY_V2I64_CLAMP_R:
+129:     return NVPTX::SULD_1D_ARRAY_V2I64_CLAMP_I;
+130:   case NVPTX::SULD_2D_V2I8_CLAMP_R:
+131:     return NVPTX::SULD_2D_V2I8_CLAMP_I;
+132:   case NVPTX::SULD_2D_V2I16_CLAMP_R:
+133:     return NVPTX::SULD_2D_V2I16_CLAMP_I;
+134:   case NVPTX::SULD_2D_V2I32_CLAMP_R:
+135:     return NVPTX::SULD_2D_V2I32_CLAMP_I;
+136:   case NVPTX::SULD_2D_V2I64_CLAMP_R:
+137:     return NVPTX::SULD_2D_V2I64_CLAMP_I;
+138:   case NVPTX::SULD_2D_ARRAY_V2I8_CLAMP_R:
+139:     return NVPTX::SULD_2D_ARRAY_V2I8_CLAMP_I;
+140:   case NVPTX::SULD_2D_ARRAY_V2I16_CLAMP_R:
+141:     return NVPTX::SULD_2D_ARRAY_V2I16_CLAMP_I;
+142:   case NVPTX::SULD_2D_ARRAY_V2I32_CLAMP_R:
+143:     return NVPTX::SULD_2D_ARRAY_V2I32_CLAMP_I;
+144:   case NVPTX::SULD_2D_ARRAY_V2I64_CLAMP_R:
+145:     return NVPTX::SULD_2D_ARRAY_V2I64_CLAMP_I;
+146:   case NVPTX::SULD_3D_V2I8_CLAMP_R:
+147:     return NVPTX::SULD_3D_V2I8_CLAMP_I;
+148:   case NVPTX::SULD_3D_V2I16_CLAMP_R:
+149:     return NVPTX::SULD_3D_V2I16_CLAMP_I;
+150:   case NVPTX::SULD_3D_V2I32_CLAMP_R:
+151:     return NVPTX::SULD_3D_V2I32_CLAMP_I;
+152:   case NVPTX::SULD_3D_V2I64_CLAMP_R:
+153:     return NVPTX::SULD_3D_V2I64_CLAMP_I;
+154:   case NVPTX::SULD_1D_V4I8_CLAMP_R:
+155:     return NVPTX::SULD_1D_V4I8_CLAMP_I;
+156:   case NVPTX::SULD_1D_V4I16_CLAMP_R:
+157:     return NVPTX::SULD_1D_V4I16_CLAMP_I;
+158:   case NVPTX::SULD_1D_V4I32_CLAMP_R:
+159:     return NVPTX::SULD_1D_V4I32_CLAMP_I;
+160:   case NVPTX::SULD_1D_ARRAY_V4I8_CLAMP_R:
+161:     return NVPTX::SULD_1D_ARRAY_V4I8_CLAMP_I;
+162:   case NVPTX::SULD_1D_ARRAY_V4I16_CLAMP_R:
+163:     return NVPTX::SULD_1D_ARRAY_V4I16_CLAMP_I;
+164:   case NVPTX::SULD_1D_ARRAY_V4I32_CLAMP_R:
+165:     return NVPTX::SULD_1D_ARRAY_V4I32_CLAMP_I;
+166:   case NVPTX::SULD_2D_V4I8_CLAMP_R:
+167:     return NVPTX::SULD_2D_V4I8_CLAMP_I;
+168:   case NVPTX::SULD_2D_V4I16_CLAMP_R:
+169:     return NVPTX::SULD_2D_V4I16_CLAMP_I;
+170:   case NVPTX::SULD_2D_V4I32_CLAMP_R:
+171:     return NVPTX::SULD_2D_V4I32_CLAMP_I;
+172:   case NVPTX::SULD_2D_ARRAY_V4I8_CLAMP_R:
+173:     return NVPTX::SULD_2D_ARRAY_V4I8_CLAMP_I;
+174:   case NVPTX::SULD_2D_ARRAY_V4I16_CLAMP_R:
+175:     return NVPTX::SULD_2D_ARRAY_V4I16_CLAMP_I;
+176:   case NVPTX::SULD_2D_ARRAY_V4I32_CLAMP_R:
+177:     return NVPTX::SULD_2D_ARRAY_V4I32_CLAMP_I;
+178:   case NVPTX::SULD_3D_V4I8_CLAMP_R:
+179:     return NVPTX::SULD_3D_V4I8_CLAMP_I;
+180:   case NVPTX::SULD_3D_V4I16_CLAMP_R:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 181-270
+```cpp
+181:     return NVPTX::SULD_3D_V4I16_CLAMP_I;
+182:   case NVPTX::SULD_3D_V4I32_CLAMP_R:
+183:     return NVPTX::SULD_3D_V4I32_CLAMP_I;
+184:   case NVPTX::SULD_1D_I8_TRAP_R:
+185:     return NVPTX::SULD_1D_I8_TRAP_I;
+186:   case NVPTX::SULD_1D_I16_TRAP_R:
+187:     return NVPTX::SULD_1D_I16_TRAP_I;
+188:   case NVPTX::SULD_1D_I32_TRAP_R:
+189:     return NVPTX::SULD_1D_I32_TRAP_I;
+190:   case NVPTX::SULD_1D_I64_TRAP_R:
+191:     return NVPTX::SULD_1D_I64_TRAP_I;
+192:   case NVPTX::SULD_1D_ARRAY_I8_TRAP_R:
+193:     return NVPTX::SULD_1D_ARRAY_I8_TRAP_I;
+194:   case NVPTX::SULD_1D_ARRAY_I16_TRAP_R:
+195:     return NVPTX::SULD_1D_ARRAY_I16_TRAP_I;
+196:   case NVPTX::SULD_1D_ARRAY_I32_TRAP_R:
+197:     return NVPTX::SULD_1D_ARRAY_I32_TRAP_I;
+198:   case NVPTX::SULD_1D_ARRAY_I64_TRAP_R:
+199:     return NVPTX::SULD_1D_ARRAY_I64_TRAP_I;
+200:   case NVPTX::SULD_2D_I8_TRAP_R:
+201:     return NVPTX::SULD_2D_I8_TRAP_I;
+202:   case NVPTX::SULD_2D_I16_TRAP_R:
+203:     return NVPTX::SULD_2D_I16_TRAP_I;
+204:   case NVPTX::SULD_2D_I32_TRAP_R:
+205:     return NVPTX::SULD_2D_I32_TRAP_I;
+206:   case NVPTX::SULD_2D_I64_TRAP_R:
+207:     return NVPTX::SULD_2D_I64_TRAP_I;
+208:   case NVPTX::SULD_2D_ARRAY_I8_TRAP_R:
+209:     return NVPTX::SULD_2D_ARRAY_I8_TRAP_I;
+210:   case NVPTX::SULD_2D_ARRAY_I16_TRAP_R:
+211:     return NVPTX::SULD_2D_ARRAY_I16_TRAP_I;
+212:   case NVPTX::SULD_2D_ARRAY_I32_TRAP_R:
+213:     return NVPTX::SULD_2D_ARRAY_I32_TRAP_I;
+214:   case NVPTX::SULD_2D_ARRAY_I64_TRAP_R:
+215:     return NVPTX::SULD_2D_ARRAY_I64_TRAP_I;
+216:   case NVPTX::SULD_3D_I8_TRAP_R:
+217:     return NVPTX::SULD_3D_I8_TRAP_I;
+218:   case NVPTX::SULD_3D_I16_TRAP_R:
+219:     return NVPTX::SULD_3D_I16_TRAP_I;
+220:   case NVPTX::SULD_3D_I32_TRAP_R:
+221:     return NVPTX::SULD_3D_I32_TRAP_I;
+222:   case NVPTX::SULD_3D_I64_TRAP_R:
+223:     return NVPTX::SULD_3D_I64_TRAP_I;
+224:   case NVPTX::SULD_1D_V2I8_TRAP_R:
+225:     return NVPTX::SULD_1D_V2I8_TRAP_I;
+226:   case NVPTX::SULD_1D_V2I16_TRAP_R:
+227:     return NVPTX::SULD_1D_V2I16_TRAP_I;
+228:   case NVPTX::SULD_1D_V2I32_TRAP_R:
+229:     return NVPTX::SULD_1D_V2I32_TRAP_I;
+230:   case NVPTX::SULD_1D_V2I64_TRAP_R:
+231:     return NVPTX::SULD_1D_V2I64_TRAP_I;
+232:   case NVPTX::SULD_1D_ARRAY_V2I8_TRAP_R:
+233:     return NVPTX::SULD_1D_ARRAY_V2I8_TRAP_I;
+234:   case NVPTX::SULD_1D_ARRAY_V2I16_TRAP_R:
+235:     return NVPTX::SULD_1D_ARRAY_V2I16_TRAP_I;
+236:   case NVPTX::SULD_1D_ARRAY_V2I32_TRAP_R:
+237:     return NVPTX::SULD_1D_ARRAY_V2I32_TRAP_I;
+238:   case NVPTX::SULD_1D_ARRAY_V2I64_TRAP_R:
+239:     return NVPTX::SULD_1D_ARRAY_V2I64_TRAP_I;
+240:   case NVPTX::SULD_2D_V2I8_TRAP_R:
+241:     return NVPTX::SULD_2D_V2I8_TRAP_I;
+242:   case NVPTX::SULD_2D_V2I16_TRAP_R:
+243:     return NVPTX::SULD_2D_V2I16_TRAP_I;
+244:   case NVPTX::SULD_2D_V2I32_TRAP_R:
+245:     return NVPTX::SULD_2D_V2I32_TRAP_I;
+246:   case NVPTX::SULD_2D_V2I64_TRAP_R:
+247:     return NVPTX::SULD_2D_V2I64_TRAP_I;
+248:   case NVPTX::SULD_2D_ARRAY_V2I8_TRAP_R:
+249:     return NVPTX::SULD_2D_ARRAY_V2I8_TRAP_I;
+250:   case NVPTX::SULD_2D_ARRAY_V2I16_TRAP_R:
+251:     return NVPTX::SULD_2D_ARRAY_V2I16_TRAP_I;
+252:   case NVPTX::SULD_2D_ARRAY_V2I32_TRAP_R:
+253:     return NVPTX::SULD_2D_ARRAY_V2I32_TRAP_I;
+254:   case NVPTX::SULD_2D_ARRAY_V2I64_TRAP_R:
+255:     return NVPTX::SULD_2D_ARRAY_V2I64_TRAP_I;
+256:   case NVPTX::SULD_3D_V2I8_TRAP_R:
+257:     return NVPTX::SULD_3D_V2I8_TRAP_I;
+258:   case NVPTX::SULD_3D_V2I16_TRAP_R:
+259:     return NVPTX::SULD_3D_V2I16_TRAP_I;
+260:   case NVPTX::SULD_3D_V2I32_TRAP_R:
+261:     return NVPTX::SULD_3D_V2I32_TRAP_I;
+262:   case NVPTX::SULD_3D_V2I64_TRAP_R:
+263:     return NVPTX::SULD_3D_V2I64_TRAP_I;
+264:   case NVPTX::SULD_1D_V4I8_TRAP_R:
+265:     return NVPTX::SULD_1D_V4I8_TRAP_I;
+266:   case NVPTX::SULD_1D_V4I16_TRAP_R:
+267:     return NVPTX::SULD_1D_V4I16_TRAP_I;
+268:   case NVPTX::SULD_1D_V4I32_TRAP_R:
+269:     return NVPTX::SULD_1D_V4I32_TRAP_I;
+270:   case NVPTX::SULD_1D_ARRAY_V4I8_TRAP_R:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 271-360
+```cpp
+271:     return NVPTX::SULD_1D_ARRAY_V4I8_TRAP_I;
+272:   case NVPTX::SULD_1D_ARRAY_V4I16_TRAP_R:
+273:     return NVPTX::SULD_1D_ARRAY_V4I16_TRAP_I;
+274:   case NVPTX::SULD_1D_ARRAY_V4I32_TRAP_R:
+275:     return NVPTX::SULD_1D_ARRAY_V4I32_TRAP_I;
+276:   case NVPTX::SULD_2D_V4I8_TRAP_R:
+277:     return NVPTX::SULD_2D_V4I8_TRAP_I;
+278:   case NVPTX::SULD_2D_V4I16_TRAP_R:
+279:     return NVPTX::SULD_2D_V4I16_TRAP_I;
+280:   case NVPTX::SULD_2D_V4I32_TRAP_R:
+281:     return NVPTX::SULD_2D_V4I32_TRAP_I;
+282:   case NVPTX::SULD_2D_ARRAY_V4I8_TRAP_R:
+283:     return NVPTX::SULD_2D_ARRAY_V4I8_TRAP_I;
+284:   case NVPTX::SULD_2D_ARRAY_V4I16_TRAP_R:
+285:     return NVPTX::SULD_2D_ARRAY_V4I16_TRAP_I;
+286:   case NVPTX::SULD_2D_ARRAY_V4I32_TRAP_R:
+287:     return NVPTX::SULD_2D_ARRAY_V4I32_TRAP_I;
+288:   case NVPTX::SULD_3D_V4I8_TRAP_R:
+289:     return NVPTX::SULD_3D_V4I8_TRAP_I;
+290:   case NVPTX::SULD_3D_V4I16_TRAP_R:
+291:     return NVPTX::SULD_3D_V4I16_TRAP_I;
+292:   case NVPTX::SULD_3D_V4I32_TRAP_R:
+293:     return NVPTX::SULD_3D_V4I32_TRAP_I;
+294:   case NVPTX::SULD_1D_I8_ZERO_R:
+295:     return NVPTX::SULD_1D_I8_ZERO_I;
+296:   case NVPTX::SULD_1D_I16_ZERO_R:
+297:     return NVPTX::SULD_1D_I16_ZERO_I;
+298:   case NVPTX::SULD_1D_I32_ZERO_R:
+299:     return NVPTX::SULD_1D_I32_ZERO_I;
+300:   case NVPTX::SULD_1D_I64_ZERO_R:
+301:     return NVPTX::SULD_1D_I64_ZERO_I;
+302:   case NVPTX::SULD_1D_ARRAY_I8_ZERO_R:
+303:     return NVPTX::SULD_1D_ARRAY_I8_ZERO_I;
+304:   case NVPTX::SULD_1D_ARRAY_I16_ZERO_R:
+305:     return NVPTX::SULD_1D_ARRAY_I16_ZERO_I;
+306:   case NVPTX::SULD_1D_ARRAY_I32_ZERO_R:
+307:     return NVPTX::SULD_1D_ARRAY_I32_ZERO_I;
+308:   case NVPTX::SULD_1D_ARRAY_I64_ZERO_R:
+309:     return NVPTX::SULD_1D_ARRAY_I64_ZERO_I;
+310:   case NVPTX::SULD_2D_I8_ZERO_R:
+311:     return NVPTX::SULD_2D_I8_ZERO_I;
+312:   case NVPTX::SULD_2D_I16_ZERO_R:
+313:     return NVPTX::SULD_2D_I16_ZERO_I;
+314:   case NVPTX::SULD_2D_I32_ZERO_R:
+315:     return NVPTX::SULD_2D_I32_ZERO_I;
+316:   case NVPTX::SULD_2D_I64_ZERO_R:
+317:     return NVPTX::SULD_2D_I64_ZERO_I;
+318:   case NVPTX::SULD_2D_ARRAY_I8_ZERO_R:
+319:     return NVPTX::SULD_2D_ARRAY_I8_ZERO_I;
+320:   case NVPTX::SULD_2D_ARRAY_I16_ZERO_R:
+321:     return NVPTX::SULD_2D_ARRAY_I16_ZERO_I;
+322:   case NVPTX::SULD_2D_ARRAY_I32_ZERO_R:
+323:     return NVPTX::SULD_2D_ARRAY_I32_ZERO_I;
+324:   case NVPTX::SULD_2D_ARRAY_I64_ZERO_R:
+325:     return NVPTX::SULD_2D_ARRAY_I64_ZERO_I;
+326:   case NVPTX::SULD_3D_I8_ZERO_R:
+327:     return NVPTX::SULD_3D_I8_ZERO_I;
+328:   case NVPTX::SULD_3D_I16_ZERO_R:
+329:     return NVPTX::SULD_3D_I16_ZERO_I;
+330:   case NVPTX::SULD_3D_I32_ZERO_R:
+331:     return NVPTX::SULD_3D_I32_ZERO_I;
+332:   case NVPTX::SULD_3D_I64_ZERO_R:
+333:     return NVPTX::SULD_3D_I64_ZERO_I;
+334:   case NVPTX::SULD_1D_V2I8_ZERO_R:
+335:     return NVPTX::SULD_1D_V2I8_ZERO_I;
+336:   case NVPTX::SULD_1D_V2I16_ZERO_R:
+337:     return NVPTX::SULD_1D_V2I16_ZERO_I;
+338:   case NVPTX::SULD_1D_V2I32_ZERO_R:
+339:     return NVPTX::SULD_1D_V2I32_ZERO_I;
+340:   case NVPTX::SULD_1D_V2I64_ZERO_R:
+341:     return NVPTX::SULD_1D_V2I64_ZERO_I;
+342:   case NVPTX::SULD_1D_ARRAY_V2I8_ZERO_R:
+343:     return NVPTX::SULD_1D_ARRAY_V2I8_ZERO_I;
+344:   case NVPTX::SULD_1D_ARRAY_V2I16_ZERO_R:
+345:     return NVPTX::SULD_1D_ARRAY_V2I16_ZERO_I;
+346:   case NVPTX::SULD_1D_ARRAY_V2I32_ZERO_R:
+347:     return NVPTX::SULD_1D_ARRAY_V2I32_ZERO_I;
+348:   case NVPTX::SULD_1D_ARRAY_V2I64_ZERO_R:
+349:     return NVPTX::SULD_1D_ARRAY_V2I64_ZERO_I;
+350:   case NVPTX::SULD_2D_V2I8_ZERO_R:
+351:     return NVPTX::SULD_2D_V2I8_ZERO_I;
+352:   case NVPTX::SULD_2D_V2I16_ZERO_R:
+353:     return NVPTX::SULD_2D_V2I16_ZERO_I;
+354:   case NVPTX::SULD_2D_V2I32_ZERO_R:
+355:     return NVPTX::SULD_2D_V2I32_ZERO_I;
+356:   case NVPTX::SULD_2D_V2I64_ZERO_R:
+357:     return NVPTX::SULD_2D_V2I64_ZERO_I;
+358:   case NVPTX::SULD_2D_ARRAY_V2I8_ZERO_R:
+359:     return NVPTX::SULD_2D_ARRAY_V2I8_ZERO_I;
+360:   case NVPTX::SULD_2D_ARRAY_V2I16_ZERO_R:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 361-450
+```cpp
+361:     return NVPTX::SULD_2D_ARRAY_V2I16_ZERO_I;
+362:   case NVPTX::SULD_2D_ARRAY_V2I32_ZERO_R:
+363:     return NVPTX::SULD_2D_ARRAY_V2I32_ZERO_I;
+364:   case NVPTX::SULD_2D_ARRAY_V2I64_ZERO_R:
+365:     return NVPTX::SULD_2D_ARRAY_V2I64_ZERO_I;
+366:   case NVPTX::SULD_3D_V2I8_ZERO_R:
+367:     return NVPTX::SULD_3D_V2I8_ZERO_I;
+368:   case NVPTX::SULD_3D_V2I16_ZERO_R:
+369:     return NVPTX::SULD_3D_V2I16_ZERO_I;
+370:   case NVPTX::SULD_3D_V2I32_ZERO_R:
+371:     return NVPTX::SULD_3D_V2I32_ZERO_I;
+372:   case NVPTX::SULD_3D_V2I64_ZERO_R:
+373:     return NVPTX::SULD_3D_V2I64_ZERO_I;
+374:   case NVPTX::SULD_1D_V4I8_ZERO_R:
+375:     return NVPTX::SULD_1D_V4I8_ZERO_I;
+376:   case NVPTX::SULD_1D_V4I16_ZERO_R:
+377:     return NVPTX::SULD_1D_V4I16_ZERO_I;
+378:   case NVPTX::SULD_1D_V4I32_ZERO_R:
+379:     return NVPTX::SULD_1D_V4I32_ZERO_I;
+380:   case NVPTX::SULD_1D_ARRAY_V4I8_ZERO_R:
+381:     return NVPTX::SULD_1D_ARRAY_V4I8_ZERO_I;
+382:   case NVPTX::SULD_1D_ARRAY_V4I16_ZERO_R:
+383:     return NVPTX::SULD_1D_ARRAY_V4I16_ZERO_I;
+384:   case NVPTX::SULD_1D_ARRAY_V4I32_ZERO_R:
+385:     return NVPTX::SULD_1D_ARRAY_V4I32_ZERO_I;
+386:   case NVPTX::SULD_2D_V4I8_ZERO_R:
+387:     return NVPTX::SULD_2D_V4I8_ZERO_I;
+388:   case NVPTX::SULD_2D_V4I16_ZERO_R:
+389:     return NVPTX::SULD_2D_V4I16_ZERO_I;
+390:   case NVPTX::SULD_2D_V4I32_ZERO_R:
+391:     return NVPTX::SULD_2D_V4I32_ZERO_I;
+392:   case NVPTX::SULD_2D_ARRAY_V4I8_ZERO_R:
+393:     return NVPTX::SULD_2D_ARRAY_V4I8_ZERO_I;
+394:   case NVPTX::SULD_2D_ARRAY_V4I16_ZERO_R:
+395:     return NVPTX::SULD_2D_ARRAY_V4I16_ZERO_I;
+396:   case NVPTX::SULD_2D_ARRAY_V4I32_ZERO_R:
+397:     return NVPTX::SULD_2D_ARRAY_V4I32_ZERO_I;
+398:   case NVPTX::SULD_3D_V4I8_ZERO_R:
+399:     return NVPTX::SULD_3D_V4I8_ZERO_I;
+400:   case NVPTX::SULD_3D_V4I16_ZERO_R:
+401:     return NVPTX::SULD_3D_V4I16_ZERO_I;
+402:   case NVPTX::SULD_3D_V4I32_ZERO_R:
+403:     return NVPTX::SULD_3D_V4I32_ZERO_I;
+404:   default:
+405:     llvm_unreachable("Unhandled SULD opcode");
+406:   }
+407: }
+408:
+409: static unsigned sustRegisterToIndexOpcode(unsigned RegOC) {
+410:   switch (RegOC) {
+411:   case NVPTX::SUST_B_1D_I8_CLAMP_R:
+412:     return NVPTX::SUST_B_1D_I8_CLAMP_I;
+413:   case NVPTX::SUST_B_1D_I16_CLAMP_R:
+414:     return NVPTX::SUST_B_1D_I16_CLAMP_I;
+415:   case NVPTX::SUST_B_1D_I32_CLAMP_R:
+416:     return NVPTX::SUST_B_1D_I32_CLAMP_I;
+417:   case NVPTX::SUST_B_1D_I64_CLAMP_R:
+418:     return NVPTX::SUST_B_1D_I64_CLAMP_I;
+419:   case NVPTX::SUST_B_1D_V2I8_CLAMP_R:
+420:     return NVPTX::SUST_B_1D_V2I8_CLAMP_I;
+421:   case NVPTX::SUST_B_1D_V2I16_CLAMP_R:
+422:     return NVPTX::SUST_B_1D_V2I16_CLAMP_I;
+423:   case NVPTX::SUST_B_1D_V2I32_CLAMP_R:
+424:     return NVPTX::SUST_B_1D_V2I32_CLAMP_I;
+425:   case NVPTX::SUST_B_1D_V2I64_CLAMP_R:
+426:     return NVPTX::SUST_B_1D_V2I64_CLAMP_I;
+427:   case NVPTX::SUST_B_1D_V4I8_CLAMP_R:
+428:     return NVPTX::SUST_B_1D_V4I8_CLAMP_I;
+429:   case NVPTX::SUST_B_1D_V4I16_CLAMP_R:
+430:     return NVPTX::SUST_B_1D_V4I16_CLAMP_I;
+431:   case NVPTX::SUST_B_1D_V4I32_CLAMP_R:
+432:     return NVPTX::SUST_B_1D_V4I32_CLAMP_I;
+433:   case NVPTX::SUST_B_1D_ARRAY_I8_CLAMP_R:
+434:     return NVPTX::SUST_B_1D_ARRAY_I8_CLAMP_I;
+435:   case NVPTX::SUST_B_1D_ARRAY_I16_CLAMP_R:
+436:     return NVPTX::SUST_B_1D_ARRAY_I16_CLAMP_I;
+437:   case NVPTX::SUST_B_1D_ARRAY_I32_CLAMP_R:
+438:     return NVPTX::SUST_B_1D_ARRAY_I32_CLAMP_I;
+439:   case NVPTX::SUST_B_1D_ARRAY_I64_CLAMP_R:
+440:     return NVPTX::SUST_B_1D_ARRAY_I64_CLAMP_I;
+441:   case NVPTX::SUST_B_1D_ARRAY_V2I8_CLAMP_R:
+442:     return NVPTX::SUST_B_1D_ARRAY_V2I8_CLAMP_I;
+443:   case NVPTX::SUST_B_1D_ARRAY_V2I16_CLAMP_R:
+444:     return NVPTX::SUST_B_1D_ARRAY_V2I16_CLAMP_I;
+445:   case NVPTX::SUST_B_1D_ARRAY_V2I32_CLAMP_R:
+446:     return NVPTX::SUST_B_1D_ARRAY_V2I32_CLAMP_I;
+447:   case NVPTX::SUST_B_1D_ARRAY_V2I64_CLAMP_R:
+448:     return NVPTX::SUST_B_1D_ARRAY_V2I64_CLAMP_I;
+449:   case NVPTX::SUST_B_1D_ARRAY_V4I8_CLAMP_R:
+450:     return NVPTX::SUST_B_1D_ARRAY_V4I8_CLAMP_I;
+```
+- EN: This range implements operational logic in helpers such as llvm_unreachable, sustRegisterToIndexOpcode, translating backend policy into executable code.
+- CN: 这一段实现了 llvm_unreachable、sustRegisterToIndexOpcode 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 451-540
+```cpp
+451:   case NVPTX::SUST_B_1D_ARRAY_V4I16_CLAMP_R:
+452:     return NVPTX::SUST_B_1D_ARRAY_V4I16_CLAMP_I;
+453:   case NVPTX::SUST_B_1D_ARRAY_V4I32_CLAMP_R:
+454:     return NVPTX::SUST_B_1D_ARRAY_V4I32_CLAMP_I;
+455:   case NVPTX::SUST_B_2D_I8_CLAMP_R:
+456:     return NVPTX::SUST_B_2D_I8_CLAMP_I;
+457:   case NVPTX::SUST_B_2D_I16_CLAMP_R:
+458:     return NVPTX::SUST_B_2D_I16_CLAMP_I;
+459:   case NVPTX::SUST_B_2D_I32_CLAMP_R:
+460:     return NVPTX::SUST_B_2D_I32_CLAMP_I;
+461:   case NVPTX::SUST_B_2D_I64_CLAMP_R:
+462:     return NVPTX::SUST_B_2D_I64_CLAMP_I;
+463:   case NVPTX::SUST_B_2D_V2I8_CLAMP_R:
+464:     return NVPTX::SUST_B_2D_V2I8_CLAMP_I;
+465:   case NVPTX::SUST_B_2D_V2I16_CLAMP_R:
+466:     return NVPTX::SUST_B_2D_V2I16_CLAMP_I;
+467:   case NVPTX::SUST_B_2D_V2I32_CLAMP_R:
+468:     return NVPTX::SUST_B_2D_V2I32_CLAMP_I;
+469:   case NVPTX::SUST_B_2D_V2I64_CLAMP_R:
+470:     return NVPTX::SUST_B_2D_V2I64_CLAMP_I;
+471:   case NVPTX::SUST_B_2D_V4I8_CLAMP_R:
+472:     return NVPTX::SUST_B_2D_V4I8_CLAMP_I;
+473:   case NVPTX::SUST_B_2D_V4I16_CLAMP_R:
+474:     return NVPTX::SUST_B_2D_V4I16_CLAMP_I;
+475:   case NVPTX::SUST_B_2D_V4I32_CLAMP_R:
+476:     return NVPTX::SUST_B_2D_V4I32_CLAMP_I;
+477:   case NVPTX::SUST_B_2D_ARRAY_I8_CLAMP_R:
+478:     return NVPTX::SUST_B_2D_ARRAY_I8_CLAMP_I;
+479:   case NVPTX::SUST_B_2D_ARRAY_I16_CLAMP_R:
+480:     return NVPTX::SUST_B_2D_ARRAY_I16_CLAMP_I;
+481:   case NVPTX::SUST_B_2D_ARRAY_I32_CLAMP_R:
+482:     return NVPTX::SUST_B_2D_ARRAY_I32_CLAMP_I;
+483:   case NVPTX::SUST_B_2D_ARRAY_I64_CLAMP_R:
+484:     return NVPTX::SUST_B_2D_ARRAY_I64_CLAMP_I;
+485:   case NVPTX::SUST_B_2D_ARRAY_V2I8_CLAMP_R:
+486:     return NVPTX::SUST_B_2D_ARRAY_V2I8_CLAMP_I;
+487:   case NVPTX::SUST_B_2D_ARRAY_V2I16_CLAMP_R:
+488:     return NVPTX::SUST_B_2D_ARRAY_V2I16_CLAMP_I;
+489:   case NVPTX::SUST_B_2D_ARRAY_V2I32_CLAMP_R:
+490:     return NVPTX::SUST_B_2D_ARRAY_V2I32_CLAMP_I;
+491:   case NVPTX::SUST_B_2D_ARRAY_V2I64_CLAMP_R:
+492:     return NVPTX::SUST_B_2D_ARRAY_V2I64_CLAMP_I;
+493:   case NVPTX::SUST_B_2D_ARRAY_V4I8_CLAMP_R:
+494:     return NVPTX::SUST_B_2D_ARRAY_V4I8_CLAMP_I;
+495:   case NVPTX::SUST_B_2D_ARRAY_V4I16_CLAMP_R:
+496:     return NVPTX::SUST_B_2D_ARRAY_V4I16_CLAMP_I;
+497:   case NVPTX::SUST_B_2D_ARRAY_V4I32_CLAMP_R:
+498:     return NVPTX::SUST_B_2D_ARRAY_V4I32_CLAMP_I;
+499:   case NVPTX::SUST_B_3D_I8_CLAMP_R:
+500:     return NVPTX::SUST_B_3D_I8_CLAMP_I;
+501:   case NVPTX::SUST_B_3D_I16_CLAMP_R:
+502:     return NVPTX::SUST_B_3D_I16_CLAMP_I;
+503:   case NVPTX::SUST_B_3D_I32_CLAMP_R:
+504:     return NVPTX::SUST_B_3D_I32_CLAMP_I;
+505:   case NVPTX::SUST_B_3D_I64_CLAMP_R:
+506:     return NVPTX::SUST_B_3D_I64_CLAMP_I;
+507:   case NVPTX::SUST_B_3D_V2I8_CLAMP_R:
+508:     return NVPTX::SUST_B_3D_V2I8_CLAMP_I;
+509:   case NVPTX::SUST_B_3D_V2I16_CLAMP_R:
+510:     return NVPTX::SUST_B_3D_V2I16_CLAMP_I;
+511:   case NVPTX::SUST_B_3D_V2I32_CLAMP_R:
+512:     return NVPTX::SUST_B_3D_V2I32_CLAMP_I;
+513:   case NVPTX::SUST_B_3D_V2I64_CLAMP_R:
+514:     return NVPTX::SUST_B_3D_V2I64_CLAMP_I;
+515:   case NVPTX::SUST_B_3D_V4I8_CLAMP_R:
+516:     return NVPTX::SUST_B_3D_V4I8_CLAMP_I;
+517:   case NVPTX::SUST_B_3D_V4I16_CLAMP_R:
+518:     return NVPTX::SUST_B_3D_V4I16_CLAMP_I;
+519:   case NVPTX::SUST_B_3D_V4I32_CLAMP_R:
+520:     return NVPTX::SUST_B_3D_V4I32_CLAMP_I;
+521:   case NVPTX::SUST_B_1D_I8_TRAP_R:
+522:     return NVPTX::SUST_B_1D_I8_TRAP_I;
+523:   case NVPTX::SUST_B_1D_I16_TRAP_R:
+524:     return NVPTX::SUST_B_1D_I16_TRAP_I;
+525:   case NVPTX::SUST_B_1D_I32_TRAP_R:
+526:     return NVPTX::SUST_B_1D_I32_TRAP_I;
+527:   case NVPTX::SUST_B_1D_I64_TRAP_R:
+528:     return NVPTX::SUST_B_1D_I64_TRAP_I;
+529:   case NVPTX::SUST_B_1D_V2I8_TRAP_R:
+530:     return NVPTX::SUST_B_1D_V2I8_TRAP_I;
+531:   case NVPTX::SUST_B_1D_V2I16_TRAP_R:
+532:     return NVPTX::SUST_B_1D_V2I16_TRAP_I;
+533:   case NVPTX::SUST_B_1D_V2I32_TRAP_R:
+534:     return NVPTX::SUST_B_1D_V2I32_TRAP_I;
+535:   case NVPTX::SUST_B_1D_V2I64_TRAP_R:
+536:     return NVPTX::SUST_B_1D_V2I64_TRAP_I;
+537:   case NVPTX::SUST_B_1D_V4I8_TRAP_R:
+538:     return NVPTX::SUST_B_1D_V4I8_TRAP_I;
+539:   case NVPTX::SUST_B_1D_V4I16_TRAP_R:
+540:     return NVPTX::SUST_B_1D_V4I16_TRAP_I;
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 541-630
+```cpp
+541:   case NVPTX::SUST_B_1D_V4I32_TRAP_R:
+542:     return NVPTX::SUST_B_1D_V4I32_TRAP_I;
+543:   case NVPTX::SUST_B_1D_ARRAY_I8_TRAP_R:
+544:     return NVPTX::SUST_B_1D_ARRAY_I8_TRAP_I;
+545:   case NVPTX::SUST_B_1D_ARRAY_I16_TRAP_R:
+546:     return NVPTX::SUST_B_1D_ARRAY_I16_TRAP_I;
+547:   case NVPTX::SUST_B_1D_ARRAY_I32_TRAP_R:
+548:     return NVPTX::SUST_B_1D_ARRAY_I32_TRAP_I;
+549:   case NVPTX::SUST_B_1D_ARRAY_I64_TRAP_R:
+550:     return NVPTX::SUST_B_1D_ARRAY_I64_TRAP_I;
+551:   case NVPTX::SUST_B_1D_ARRAY_V2I8_TRAP_R:
+552:     return NVPTX::SUST_B_1D_ARRAY_V2I8_TRAP_I;
+553:   case NVPTX::SUST_B_1D_ARRAY_V2I16_TRAP_R:
+554:     return NVPTX::SUST_B_1D_ARRAY_V2I16_TRAP_I;
+555:   case NVPTX::SUST_B_1D_ARRAY_V2I32_TRAP_R:
+556:     return NVPTX::SUST_B_1D_ARRAY_V2I32_TRAP_I;
+557:   case NVPTX::SUST_B_1D_ARRAY_V2I64_TRAP_R:
+558:     return NVPTX::SUST_B_1D_ARRAY_V2I64_TRAP_I;
+559:   case NVPTX::SUST_B_1D_ARRAY_V4I8_TRAP_R:
+560:     return NVPTX::SUST_B_1D_ARRAY_V4I8_TRAP_I;
+561:   case NVPTX::SUST_B_1D_ARRAY_V4I16_TRAP_R:
+562:     return NVPTX::SUST_B_1D_ARRAY_V4I16_TRAP_I;
+563:   case NVPTX::SUST_B_1D_ARRAY_V4I32_TRAP_R:
+564:     return NVPTX::SUST_B_1D_ARRAY_V4I32_TRAP_I;
+565:   case NVPTX::SUST_B_2D_I8_TRAP_R:
+566:     return NVPTX::SUST_B_2D_I8_TRAP_I;
+567:   case NVPTX::SUST_B_2D_I16_TRAP_R:
+568:     return NVPTX::SUST_B_2D_I16_TRAP_I;
+569:   case NVPTX::SUST_B_2D_I32_TRAP_R:
+570:     return NVPTX::SUST_B_2D_I32_TRAP_I;
+571:   case NVPTX::SUST_B_2D_I64_TRAP_R:
+572:     return NVPTX::SUST_B_2D_I64_TRAP_I;
+573:   case NVPTX::SUST_B_2D_V2I8_TRAP_R:
+574:     return NVPTX::SUST_B_2D_V2I8_TRAP_I;
+575:   case NVPTX::SUST_B_2D_V2I16_TRAP_R:
+576:     return NVPTX::SUST_B_2D_V2I16_TRAP_I;
+577:   case NVPTX::SUST_B_2D_V2I32_TRAP_R:
+578:     return NVPTX::SUST_B_2D_V2I32_TRAP_I;
+579:   case NVPTX::SUST_B_2D_V2I64_TRAP_R:
+580:     return NVPTX::SUST_B_2D_V2I64_TRAP_I;
+581:   case NVPTX::SUST_B_2D_V4I8_TRAP_R:
+582:     return NVPTX::SUST_B_2D_V4I8_TRAP_I;
+583:   case NVPTX::SUST_B_2D_V4I16_TRAP_R:
+584:     return NVPTX::SUST_B_2D_V4I16_TRAP_I;
+585:   case NVPTX::SUST_B_2D_V4I32_TRAP_R:
+586:     return NVPTX::SUST_B_2D_V4I32_TRAP_I;
+587:   case NVPTX::SUST_B_2D_ARRAY_I8_TRAP_R:
+588:     return NVPTX::SUST_B_2D_ARRAY_I8_TRAP_I;
+589:   case NVPTX::SUST_B_2D_ARRAY_I16_TRAP_R:
+590:     return NVPTX::SUST_B_2D_ARRAY_I16_TRAP_I;
+591:   case NVPTX::SUST_B_2D_ARRAY_I32_TRAP_R:
+592:     return NVPTX::SUST_B_2D_ARRAY_I32_TRAP_I;
+593:   case NVPTX::SUST_B_2D_ARRAY_I64_TRAP_R:
+594:     return NVPTX::SUST_B_2D_ARRAY_I64_TRAP_I;
+595:   case NVPTX::SUST_B_2D_ARRAY_V2I8_TRAP_R:
+596:     return NVPTX::SUST_B_2D_ARRAY_V2I8_TRAP_I;
+597:   case NVPTX::SUST_B_2D_ARRAY_V2I16_TRAP_R:
+598:     return NVPTX::SUST_B_2D_ARRAY_V2I16_TRAP_I;
+599:   case NVPTX::SUST_B_2D_ARRAY_V2I32_TRAP_R:
+600:     return NVPTX::SUST_B_2D_ARRAY_V2I32_TRAP_I;
+601:   case NVPTX::SUST_B_2D_ARRAY_V2I64_TRAP_R:
+602:     return NVPTX::SUST_B_2D_ARRAY_V2I64_TRAP_I;
+603:   case NVPTX::SUST_B_2D_ARRAY_V4I8_TRAP_R:
+604:     return NVPTX::SUST_B_2D_ARRAY_V4I8_TRAP_I;
+605:   case NVPTX::SUST_B_2D_ARRAY_V4I16_TRAP_R:
+606:     return NVPTX::SUST_B_2D_ARRAY_V4I16_TRAP_I;
+607:   case NVPTX::SUST_B_2D_ARRAY_V4I32_TRAP_R:
+608:     return NVPTX::SUST_B_2D_ARRAY_V4I32_TRAP_I;
+609:   case NVPTX::SUST_B_3D_I8_TRAP_R:
+610:     return NVPTX::SUST_B_3D_I8_TRAP_I;
+611:   case NVPTX::SUST_B_3D_I16_TRAP_R:
+612:     return NVPTX::SUST_B_3D_I16_TRAP_I;
+613:   case NVPTX::SUST_B_3D_I32_TRAP_R:
+614:     return NVPTX::SUST_B_3D_I32_TRAP_I;
+615:   case NVPTX::SUST_B_3D_I64_TRAP_R:
+616:     return NVPTX::SUST_B_3D_I64_TRAP_I;
+617:   case NVPTX::SUST_B_3D_V2I8_TRAP_R:
+618:     return NVPTX::SUST_B_3D_V2I8_TRAP_I;
+619:   case NVPTX::SUST_B_3D_V2I16_TRAP_R:
+620:     return NVPTX::SUST_B_3D_V2I16_TRAP_I;
+621:   case NVPTX::SUST_B_3D_V2I32_TRAP_R:
+622:     return NVPTX::SUST_B_3D_V2I32_TRAP_I;
+623:   case NVPTX::SUST_B_3D_V2I64_TRAP_R:
+624:     return NVPTX::SUST_B_3D_V2I64_TRAP_I;
+625:   case NVPTX::SUST_B_3D_V4I8_TRAP_R:
+626:     return NVPTX::SUST_B_3D_V4I8_TRAP_I;
+627:   case NVPTX::SUST_B_3D_V4I16_TRAP_R:
+628:     return NVPTX::SUST_B_3D_V4I16_TRAP_I;
+629:   case NVPTX::SUST_B_3D_V4I32_TRAP_R:
+630:     return NVPTX::SUST_B_3D_V4I32_TRAP_I;
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 631-720
+```cpp
+631:   case NVPTX::SUST_B_1D_I8_ZERO_R:
+632:     return NVPTX::SUST_B_1D_I8_ZERO_I;
+633:   case NVPTX::SUST_B_1D_I16_ZERO_R:
+634:     return NVPTX::SUST_B_1D_I16_ZERO_I;
+635:   case NVPTX::SUST_B_1D_I32_ZERO_R:
+636:     return NVPTX::SUST_B_1D_I32_ZERO_I;
+637:   case NVPTX::SUST_B_1D_I64_ZERO_R:
+638:     return NVPTX::SUST_B_1D_I64_ZERO_I;
+639:   case NVPTX::SUST_B_1D_V2I8_ZERO_R:
+640:     return NVPTX::SUST_B_1D_V2I8_ZERO_I;
+641:   case NVPTX::SUST_B_1D_V2I16_ZERO_R:
+642:     return NVPTX::SUST_B_1D_V2I16_ZERO_I;
+643:   case NVPTX::SUST_B_1D_V2I32_ZERO_R:
+644:     return NVPTX::SUST_B_1D_V2I32_ZERO_I;
+645:   case NVPTX::SUST_B_1D_V2I64_ZERO_R:
+646:     return NVPTX::SUST_B_1D_V2I64_ZERO_I;
+647:   case NVPTX::SUST_B_1D_V4I8_ZERO_R:
+648:     return NVPTX::SUST_B_1D_V4I8_ZERO_I;
+649:   case NVPTX::SUST_B_1D_V4I16_ZERO_R:
+650:     return NVPTX::SUST_B_1D_V4I16_ZERO_I;
+651:   case NVPTX::SUST_B_1D_V4I32_ZERO_R:
+652:     return NVPTX::SUST_B_1D_V4I32_ZERO_I;
+653:   case NVPTX::SUST_B_1D_ARRAY_I8_ZERO_R:
+654:     return NVPTX::SUST_B_1D_ARRAY_I8_ZERO_I;
+655:   case NVPTX::SUST_B_1D_ARRAY_I16_ZERO_R:
+656:     return NVPTX::SUST_B_1D_ARRAY_I16_ZERO_I;
+657:   case NVPTX::SUST_B_1D_ARRAY_I32_ZERO_R:
+658:     return NVPTX::SUST_B_1D_ARRAY_I32_ZERO_I;
+659:   case NVPTX::SUST_B_1D_ARRAY_I64_ZERO_R:
+660:     return NVPTX::SUST_B_1D_ARRAY_I64_ZERO_I;
+661:   case NVPTX::SUST_B_1D_ARRAY_V2I8_ZERO_R:
+662:     return NVPTX::SUST_B_1D_ARRAY_V2I8_ZERO_I;
+663:   case NVPTX::SUST_B_1D_ARRAY_V2I16_ZERO_R:
+664:     return NVPTX::SUST_B_1D_ARRAY_V2I16_ZERO_I;
+665:   case NVPTX::SUST_B_1D_ARRAY_V2I32_ZERO_R:
+666:     return NVPTX::SUST_B_1D_ARRAY_V2I32_ZERO_I;
+667:   case NVPTX::SUST_B_1D_ARRAY_V2I64_ZERO_R:
+668:     return NVPTX::SUST_B_1D_ARRAY_V2I64_ZERO_I;
+669:   case NVPTX::SUST_B_1D_ARRAY_V4I8_ZERO_R:
+670:     return NVPTX::SUST_B_1D_ARRAY_V4I8_ZERO_I;
+671:   case NVPTX::SUST_B_1D_ARRAY_V4I16_ZERO_R:
+672:     return NVPTX::SUST_B_1D_ARRAY_V4I16_ZERO_I;
+673:   case NVPTX::SUST_B_1D_ARRAY_V4I32_ZERO_R:
+674:     return NVPTX::SUST_B_1D_ARRAY_V4I32_ZERO_I;
+675:   case NVPTX::SUST_B_2D_I8_ZERO_R:
+676:     return NVPTX::SUST_B_2D_I8_ZERO_I;
+677:   case NVPTX::SUST_B_2D_I16_ZERO_R:
+678:     return NVPTX::SUST_B_2D_I16_ZERO_I;
+679:   case NVPTX::SUST_B_2D_I32_ZERO_R:
+680:     return NVPTX::SUST_B_2D_I32_ZERO_I;
+681:   case NVPTX::SUST_B_2D_I64_ZERO_R:
+682:     return NVPTX::SUST_B_2D_I64_ZERO_I;
+683:   case NVPTX::SUST_B_2D_V2I8_ZERO_R:
+684:     return NVPTX::SUST_B_2D_V2I8_ZERO_I;
+685:   case NVPTX::SUST_B_2D_V2I16_ZERO_R:
+686:     return NVPTX::SUST_B_2D_V2I16_ZERO_I;
+687:   case NVPTX::SUST_B_2D_V2I32_ZERO_R:
+688:     return NVPTX::SUST_B_2D_V2I32_ZERO_I;
+689:   case NVPTX::SUST_B_2D_V2I64_ZERO_R:
+690:     return NVPTX::SUST_B_2D_V2I64_ZERO_I;
+691:   case NVPTX::SUST_B_2D_V4I8_ZERO_R:
+692:     return NVPTX::SUST_B_2D_V4I8_ZERO_I;
+693:   case NVPTX::SUST_B_2D_V4I16_ZERO_R:
+694:     return NVPTX::SUST_B_2D_V4I16_ZERO_I;
+695:   case NVPTX::SUST_B_2D_V4I32_ZERO_R:
+696:     return NVPTX::SUST_B_2D_V4I32_ZERO_I;
+697:   case NVPTX::SUST_B_2D_ARRAY_I8_ZERO_R:
+698:     return NVPTX::SUST_B_2D_ARRAY_I8_ZERO_I;
+699:   case NVPTX::SUST_B_2D_ARRAY_I16_ZERO_R:
+700:     return NVPTX::SUST_B_2D_ARRAY_I16_ZERO_I;
+701:   case NVPTX::SUST_B_2D_ARRAY_I32_ZERO_R:
+702:     return NVPTX::SUST_B_2D_ARRAY_I32_ZERO_I;
+703:   case NVPTX::SUST_B_2D_ARRAY_I64_ZERO_R:
+704:     return NVPTX::SUST_B_2D_ARRAY_I64_ZERO_I;
+705:   case NVPTX::SUST_B_2D_ARRAY_V2I8_ZERO_R:
+706:     return NVPTX::SUST_B_2D_ARRAY_V2I8_ZERO_I;
+707:   case NVPTX::SUST_B_2D_ARRAY_V2I16_ZERO_R:
+708:     return NVPTX::SUST_B_2D_ARRAY_V2I16_ZERO_I;
+709:   case NVPTX::SUST_B_2D_ARRAY_V2I32_ZERO_R:
+710:     return NVPTX::SUST_B_2D_ARRAY_V2I32_ZERO_I;
+711:   case NVPTX::SUST_B_2D_ARRAY_V2I64_ZERO_R:
+712:     return NVPTX::SUST_B_2D_ARRAY_V2I64_ZERO_I;
+713:   case NVPTX::SUST_B_2D_ARRAY_V4I8_ZERO_R:
+714:     return NVPTX::SUST_B_2D_ARRAY_V4I8_ZERO_I;
+715:   case NVPTX::SUST_B_2D_ARRAY_V4I16_ZERO_R:
+716:     return NVPTX::SUST_B_2D_ARRAY_V4I16_ZERO_I;
+717:   case NVPTX::SUST_B_2D_ARRAY_V4I32_ZERO_R:
+718:     return NVPTX::SUST_B_2D_ARRAY_V4I32_ZERO_I;
+719:   case NVPTX::SUST_B_3D_I8_ZERO_R:
+720:     return NVPTX::SUST_B_3D_I8_ZERO_I;
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 721-810
+```cpp
+721:   case NVPTX::SUST_B_3D_I16_ZERO_R:
+722:     return NVPTX::SUST_B_3D_I16_ZERO_I;
+723:   case NVPTX::SUST_B_3D_I32_ZERO_R:
+724:     return NVPTX::SUST_B_3D_I32_ZERO_I;
+725:   case NVPTX::SUST_B_3D_I64_ZERO_R:
+726:     return NVPTX::SUST_B_3D_I64_ZERO_I;
+727:   case NVPTX::SUST_B_3D_V2I8_ZERO_R:
+728:     return NVPTX::SUST_B_3D_V2I8_ZERO_I;
+729:   case NVPTX::SUST_B_3D_V2I16_ZERO_R:
+730:     return NVPTX::SUST_B_3D_V2I16_ZERO_I;
+731:   case NVPTX::SUST_B_3D_V2I32_ZERO_R:
+732:     return NVPTX::SUST_B_3D_V2I32_ZERO_I;
+733:   case NVPTX::SUST_B_3D_V2I64_ZERO_R:
+734:     return NVPTX::SUST_B_3D_V2I64_ZERO_I;
+735:   case NVPTX::SUST_B_3D_V4I8_ZERO_R:
+736:     return NVPTX::SUST_B_3D_V4I8_ZERO_I;
+737:   case NVPTX::SUST_B_3D_V4I16_ZERO_R:
+738:     return NVPTX::SUST_B_3D_V4I16_ZERO_I;
+739:   case NVPTX::SUST_B_3D_V4I32_ZERO_R:
+740:     return NVPTX::SUST_B_3D_V4I32_ZERO_I;
+741:   case NVPTX::SUST_P_1D_I8_TRAP_R:
+742:     return NVPTX::SUST_P_1D_I8_TRAP_I;
+743:   case NVPTX::SUST_P_1D_I16_TRAP_R:
+744:     return NVPTX::SUST_P_1D_I16_TRAP_I;
+745:   case NVPTX::SUST_P_1D_I32_TRAP_R:
+746:     return NVPTX::SUST_P_1D_I32_TRAP_I;
+747:   case NVPTX::SUST_P_1D_V2I8_TRAP_R:
+748:     return NVPTX::SUST_P_1D_V2I8_TRAP_I;
+749:   case NVPTX::SUST_P_1D_V2I16_TRAP_R:
+750:     return NVPTX::SUST_P_1D_V2I16_TRAP_I;
+751:   case NVPTX::SUST_P_1D_V2I32_TRAP_R:
+752:     return NVPTX::SUST_P_1D_V2I32_TRAP_I;
+753:   case NVPTX::SUST_P_1D_V4I8_TRAP_R:
+754:     return NVPTX::SUST_P_1D_V4I8_TRAP_I;
+755:   case NVPTX::SUST_P_1D_V4I16_TRAP_R:
+756:     return NVPTX::SUST_P_1D_V4I16_TRAP_I;
+757:   case NVPTX::SUST_P_1D_V4I32_TRAP_R:
+758:     return NVPTX::SUST_P_1D_V4I32_TRAP_I;
+759:   case NVPTX::SUST_P_1D_ARRAY_I8_TRAP_R:
+760:     return NVPTX::SUST_P_1D_ARRAY_I8_TRAP_I;
+761:   case NVPTX::SUST_P_1D_ARRAY_I16_TRAP_R:
+762:     return NVPTX::SUST_P_1D_ARRAY_I16_TRAP_I;
+763:   case NVPTX::SUST_P_1D_ARRAY_I32_TRAP_R:
+764:     return NVPTX::SUST_P_1D_ARRAY_I32_TRAP_I;
+765:   case NVPTX::SUST_P_1D_ARRAY_V2I8_TRAP_R:
+766:     return NVPTX::SUST_P_1D_ARRAY_V2I8_TRAP_I;
+767:   case NVPTX::SUST_P_1D_ARRAY_V2I16_TRAP_R:
+768:     return NVPTX::SUST_P_1D_ARRAY_V2I16_TRAP_I;
+769:   case NVPTX::SUST_P_1D_ARRAY_V2I32_TRAP_R:
+770:     return NVPTX::SUST_P_1D_ARRAY_V2I32_TRAP_I;
+771:   case NVPTX::SUST_P_1D_ARRAY_V4I8_TRAP_R:
+772:     return NVPTX::SUST_P_1D_ARRAY_V4I8_TRAP_I;
+773:   case NVPTX::SUST_P_1D_ARRAY_V4I16_TRAP_R:
+774:     return NVPTX::SUST_P_1D_ARRAY_V4I16_TRAP_I;
+775:   case NVPTX::SUST_P_1D_ARRAY_V4I32_TRAP_R:
+776:     return NVPTX::SUST_P_1D_ARRAY_V4I32_TRAP_I;
+777:   case NVPTX::SUST_P_2D_I8_TRAP_R:
+778:     return NVPTX::SUST_P_2D_I8_TRAP_I;
+779:   case NVPTX::SUST_P_2D_I16_TRAP_R:
+780:     return NVPTX::SUST_P_2D_I16_TRAP_I;
+781:   case NVPTX::SUST_P_2D_I32_TRAP_R:
+782:     return NVPTX::SUST_P_2D_I32_TRAP_I;
+783:   case NVPTX::SUST_P_2D_V2I8_TRAP_R:
+784:     return NVPTX::SUST_P_2D_V2I8_TRAP_I;
+785:   case NVPTX::SUST_P_2D_V2I16_TRAP_R:
+786:     return NVPTX::SUST_P_2D_V2I16_TRAP_I;
+787:   case NVPTX::SUST_P_2D_V2I32_TRAP_R:
+788:     return NVPTX::SUST_P_2D_V2I32_TRAP_I;
+789:   case NVPTX::SUST_P_2D_V4I8_TRAP_R:
+790:     return NVPTX::SUST_P_2D_V4I8_TRAP_I;
+791:   case NVPTX::SUST_P_2D_V4I16_TRAP_R:
+792:     return NVPTX::SUST_P_2D_V4I16_TRAP_I;
+793:   case NVPTX::SUST_P_2D_V4I32_TRAP_R:
+794:     return NVPTX::SUST_P_2D_V4I32_TRAP_I;
+795:   case NVPTX::SUST_P_2D_ARRAY_I8_TRAP_R:
+796:     return NVPTX::SUST_P_2D_ARRAY_I8_TRAP_I;
+797:   case NVPTX::SUST_P_2D_ARRAY_I16_TRAP_R:
+798:     return NVPTX::SUST_P_2D_ARRAY_I16_TRAP_I;
+799:   case NVPTX::SUST_P_2D_ARRAY_I32_TRAP_R:
+800:     return NVPTX::SUST_P_2D_ARRAY_I32_TRAP_I;
+801:   case NVPTX::SUST_P_2D_ARRAY_V2I8_TRAP_R:
+802:     return NVPTX::SUST_P_2D_ARRAY_V2I8_TRAP_I;
+803:   case NVPTX::SUST_P_2D_ARRAY_V2I16_TRAP_R:
+804:     return NVPTX::SUST_P_2D_ARRAY_V2I16_TRAP_I;
+805:   case NVPTX::SUST_P_2D_ARRAY_V2I32_TRAP_R:
+806:     return NVPTX::SUST_P_2D_ARRAY_V2I32_TRAP_I;
+807:   case NVPTX::SUST_P_2D_ARRAY_V4I8_TRAP_R:
+808:     return NVPTX::SUST_P_2D_ARRAY_V4I8_TRAP_I;
+809:   case NVPTX::SUST_P_2D_ARRAY_V4I16_TRAP_R:
+810:     return NVPTX::SUST_P_2D_ARRAY_V4I16_TRAP_I;
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 811-900
+```cpp
+811:   case NVPTX::SUST_P_2D_ARRAY_V4I32_TRAP_R:
+812:     return NVPTX::SUST_P_2D_ARRAY_V4I32_TRAP_I;
+813:   case NVPTX::SUST_P_3D_I8_TRAP_R:
+814:     return NVPTX::SUST_P_3D_I8_TRAP_I;
+815:   case NVPTX::SUST_P_3D_I16_TRAP_R:
+816:     return NVPTX::SUST_P_3D_I16_TRAP_I;
+817:   case NVPTX::SUST_P_3D_I32_TRAP_R:
+818:     return NVPTX::SUST_P_3D_I32_TRAP_I;
+819:   case NVPTX::SUST_P_3D_V2I8_TRAP_R:
+820:     return NVPTX::SUST_P_3D_V2I8_TRAP_I;
+821:   case NVPTX::SUST_P_3D_V2I16_TRAP_R:
+822:     return NVPTX::SUST_P_3D_V2I16_TRAP_I;
+823:   case NVPTX::SUST_P_3D_V2I32_TRAP_R:
+824:     return NVPTX::SUST_P_3D_V2I32_TRAP_I;
+825:   case NVPTX::SUST_P_3D_V4I8_TRAP_R:
+826:     return NVPTX::SUST_P_3D_V4I8_TRAP_I;
+827:   case NVPTX::SUST_P_3D_V4I16_TRAP_R:
+828:     return NVPTX::SUST_P_3D_V4I16_TRAP_I;
+829:   case NVPTX::SUST_P_3D_V4I32_TRAP_R:
+830:     return NVPTX::SUST_P_3D_V4I32_TRAP_I;
+831:   default:
+832:     llvm_unreachable("Unhandled SUST opcode");
+833:   }
+834: }
+835:
+836: static unsigned texRegisterToIndexOpcode(unsigned RegOC) {
+837:   switch (RegOC) {
+838:   case NVPTX::TEX_1D_F32_S32_RR:
+839:     return NVPTX::TEX_1D_F32_S32_IR;
+840:   case NVPTX::TEX_1D_F32_S32_RI:
+841:     return NVPTX::TEX_1D_F32_S32_II;
+842:   case NVPTX::TEX_1D_F32_F32_RR:
+843:     return NVPTX::TEX_1D_F32_F32_IR;
+844:   case NVPTX::TEX_1D_F32_F32_RI:
+845:     return NVPTX::TEX_1D_F32_F32_II;
+846:   case NVPTX::TEX_1D_F32_F32_LEVEL_RR:
+847:     return NVPTX::TEX_1D_F32_F32_LEVEL_IR;
+848:   case NVPTX::TEX_1D_F32_F32_LEVEL_RI:
+849:     return NVPTX::TEX_1D_F32_F32_LEVEL_II;
+850:   case NVPTX::TEX_1D_F32_F32_GRAD_RR:
+851:     return NVPTX::TEX_1D_F32_F32_GRAD_IR;
+852:   case NVPTX::TEX_1D_F32_F32_GRAD_RI:
+853:     return NVPTX::TEX_1D_F32_F32_GRAD_II;
+854:   case NVPTX::TEX_1D_S32_S32_RR:
+855:     return NVPTX::TEX_1D_S32_S32_IR;
+856:   case NVPTX::TEX_1D_S32_S32_RI:
+857:     return NVPTX::TEX_1D_S32_S32_II;
+858:   case NVPTX::TEX_1D_S32_F32_RR:
+859:     return NVPTX::TEX_1D_S32_F32_IR;
+860:   case NVPTX::TEX_1D_S32_F32_RI:
+861:     return NVPTX::TEX_1D_S32_F32_II;
+862:   case NVPTX::TEX_1D_S32_F32_LEVEL_RR:
+863:     return NVPTX::TEX_1D_S32_F32_LEVEL_IR;
+864:   case NVPTX::TEX_1D_S32_F32_LEVEL_RI:
+865:     return NVPTX::TEX_1D_S32_F32_LEVEL_II;
+866:   case NVPTX::TEX_1D_S32_F32_GRAD_RR:
+867:     return NVPTX::TEX_1D_S32_F32_GRAD_IR;
+868:   case NVPTX::TEX_1D_S32_F32_GRAD_RI:
+869:     return NVPTX::TEX_1D_S32_F32_GRAD_II;
+870:   case NVPTX::TEX_1D_U32_S32_RR:
+871:     return NVPTX::TEX_1D_U32_S32_IR;
+872:   case NVPTX::TEX_1D_U32_S32_RI:
+873:     return NVPTX::TEX_1D_U32_S32_II;
+874:   case NVPTX::TEX_1D_U32_F32_RR:
+875:     return NVPTX::TEX_1D_U32_F32_IR;
+876:   case NVPTX::TEX_1D_U32_F32_RI:
+877:     return NVPTX::TEX_1D_U32_F32_II;
+878:   case NVPTX::TEX_1D_U32_F32_LEVEL_RR:
+879:     return NVPTX::TEX_1D_U32_F32_LEVEL_IR;
+880:   case NVPTX::TEX_1D_U32_F32_LEVEL_RI:
+881:     return NVPTX::TEX_1D_U32_F32_LEVEL_II;
+882:   case NVPTX::TEX_1D_U32_F32_GRAD_RR:
+883:     return NVPTX::TEX_1D_U32_F32_GRAD_IR;
+884:   case NVPTX::TEX_1D_U32_F32_GRAD_RI:
+885:     return NVPTX::TEX_1D_U32_F32_GRAD_II;
+886:   case NVPTX::TEX_1D_ARRAY_F32_S32_RR:
+887:     return NVPTX::TEX_1D_ARRAY_F32_S32_IR;
+888:   case NVPTX::TEX_1D_ARRAY_F32_S32_RI:
+889:     return NVPTX::TEX_1D_ARRAY_F32_S32_II;
+890:   case NVPTX::TEX_1D_ARRAY_F32_F32_RR:
+891:     return NVPTX::TEX_1D_ARRAY_F32_F32_IR;
+892:   case NVPTX::TEX_1D_ARRAY_F32_F32_RI:
+893:     return NVPTX::TEX_1D_ARRAY_F32_F32_II;
+894:   case NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_RR:
+895:     return NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_IR;
+896:   case NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_RI:
+897:     return NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_II;
+898:   case NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_RR:
+899:     return NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_IR;
+900:   case NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_RI:
+```
+- EN: This range implements operational logic in helpers such as llvm_unreachable, texRegisterToIndexOpcode, translating backend policy into executable code.
+- CN: 这一段实现了 llvm_unreachable、texRegisterToIndexOpcode 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 901-990
+```cpp
+901:     return NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_II;
+902:   case NVPTX::TEX_1D_ARRAY_S32_S32_RR:
+903:     return NVPTX::TEX_1D_ARRAY_S32_S32_IR;
+904:   case NVPTX::TEX_1D_ARRAY_S32_S32_RI:
+905:     return NVPTX::TEX_1D_ARRAY_S32_S32_II;
+906:   case NVPTX::TEX_1D_ARRAY_S32_F32_RR:
+907:     return NVPTX::TEX_1D_ARRAY_S32_F32_IR;
+908:   case NVPTX::TEX_1D_ARRAY_S32_F32_RI:
+909:     return NVPTX::TEX_1D_ARRAY_S32_F32_II;
+910:   case NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_RR:
+911:     return NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_IR;
+912:   case NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_RI:
+913:     return NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_II;
+914:   case NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_RR:
+915:     return NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_IR;
+916:   case NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_RI:
+917:     return NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_II;
+918:   case NVPTX::TEX_1D_ARRAY_U32_S32_RR:
+919:     return NVPTX::TEX_1D_ARRAY_U32_S32_IR;
+920:   case NVPTX::TEX_1D_ARRAY_U32_S32_RI:
+921:     return NVPTX::TEX_1D_ARRAY_U32_S32_II;
+922:   case NVPTX::TEX_1D_ARRAY_U32_F32_RR:
+923:     return NVPTX::TEX_1D_ARRAY_U32_F32_IR;
+924:   case NVPTX::TEX_1D_ARRAY_U32_F32_RI:
+925:     return NVPTX::TEX_1D_ARRAY_U32_F32_II;
+926:   case NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_RR:
+927:     return NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_IR;
+928:   case NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_RI:
+929:     return NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_II;
+930:   case NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_RR:
+931:     return NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_IR;
+932:   case NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_RI:
+933:     return NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_II;
+934:   case NVPTX::TEX_2D_F32_S32_RR:
+935:     return NVPTX::TEX_2D_F32_S32_IR;
+936:   case NVPTX::TEX_2D_F32_S32_RI:
+937:     return NVPTX::TEX_2D_F32_S32_II;
+938:   case NVPTX::TEX_2D_F32_F32_RR:
+939:     return NVPTX::TEX_2D_F32_F32_IR;
+940:   case NVPTX::TEX_2D_F32_F32_RI:
+941:     return NVPTX::TEX_2D_F32_F32_II;
+942:   case NVPTX::TEX_2D_F32_F32_LEVEL_RR:
+943:     return NVPTX::TEX_2D_F32_F32_LEVEL_IR;
+944:   case NVPTX::TEX_2D_F32_F32_LEVEL_RI:
+945:     return NVPTX::TEX_2D_F32_F32_LEVEL_II;
+946:   case NVPTX::TEX_2D_F32_F32_GRAD_RR:
+947:     return NVPTX::TEX_2D_F32_F32_GRAD_IR;
+948:   case NVPTX::TEX_2D_F32_F32_GRAD_RI:
+949:     return NVPTX::TEX_2D_F32_F32_GRAD_II;
+950:   case NVPTX::TEX_2D_S32_S32_RR:
+951:     return NVPTX::TEX_2D_S32_S32_IR;
+952:   case NVPTX::TEX_2D_S32_S32_RI:
+953:     return NVPTX::TEX_2D_S32_S32_II;
+954:   case NVPTX::TEX_2D_S32_F32_RR:
+955:     return NVPTX::TEX_2D_S32_F32_IR;
+956:   case NVPTX::TEX_2D_S32_F32_RI:
+957:     return NVPTX::TEX_2D_S32_F32_II;
+958:   case NVPTX::TEX_2D_S32_F32_LEVEL_RR:
+959:     return NVPTX::TEX_2D_S32_F32_LEVEL_IR;
+960:   case NVPTX::TEX_2D_S32_F32_LEVEL_RI:
+961:     return NVPTX::TEX_2D_S32_F32_LEVEL_II;
+962:   case NVPTX::TEX_2D_S32_F32_GRAD_RR:
+963:     return NVPTX::TEX_2D_S32_F32_GRAD_IR;
+964:   case NVPTX::TEX_2D_S32_F32_GRAD_RI:
+965:     return NVPTX::TEX_2D_S32_F32_GRAD_II;
+966:   case NVPTX::TEX_2D_U32_S32_RR:
+967:     return NVPTX::TEX_2D_U32_S32_IR;
+968:   case NVPTX::TEX_2D_U32_S32_RI:
+969:     return NVPTX::TEX_2D_U32_S32_II;
+970:   case NVPTX::TEX_2D_U32_F32_RR:
+971:     return NVPTX::TEX_2D_U32_F32_IR;
+972:   case NVPTX::TEX_2D_U32_F32_RI:
+973:     return NVPTX::TEX_2D_U32_F32_II;
+974:   case NVPTX::TEX_2D_U32_F32_LEVEL_RR:
+975:     return NVPTX::TEX_2D_U32_F32_LEVEL_IR;
+976:   case NVPTX::TEX_2D_U32_F32_LEVEL_RI:
+977:     return NVPTX::TEX_2D_U32_F32_LEVEL_II;
+978:   case NVPTX::TEX_2D_U32_F32_GRAD_RR:
+979:     return NVPTX::TEX_2D_U32_F32_GRAD_IR;
+980:   case NVPTX::TEX_2D_U32_F32_GRAD_RI:
+981:     return NVPTX::TEX_2D_U32_F32_GRAD_II;
+982:   case NVPTX::TEX_2D_ARRAY_F32_S32_RR:
+983:     return NVPTX::TEX_2D_ARRAY_F32_S32_IR;
+984:   case NVPTX::TEX_2D_ARRAY_F32_S32_RI:
+985:     return NVPTX::TEX_2D_ARRAY_F32_S32_II;
+986:   case NVPTX::TEX_2D_ARRAY_F32_F32_RR:
+987:     return NVPTX::TEX_2D_ARRAY_F32_F32_IR;
+988:   case NVPTX::TEX_2D_ARRAY_F32_F32_RI:
+989:     return NVPTX::TEX_2D_ARRAY_F32_F32_II;
+990:   case NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_RR:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 991-1080
+```cpp
+ 991:     return NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_IR;
+ 992:   case NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_RI:
+ 993:     return NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_II;
+ 994:   case NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_RR:
+ 995:     return NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_IR;
+ 996:   case NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_RI:
+ 997:     return NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_II;
+ 998:   case NVPTX::TEX_2D_ARRAY_S32_S32_RR:
+ 999:     return NVPTX::TEX_2D_ARRAY_S32_S32_IR;
+1000:   case NVPTX::TEX_2D_ARRAY_S32_S32_RI:
+1001:     return NVPTX::TEX_2D_ARRAY_S32_S32_II;
+1002:   case NVPTX::TEX_2D_ARRAY_S32_F32_RR:
+1003:     return NVPTX::TEX_2D_ARRAY_S32_F32_IR;
+1004:   case NVPTX::TEX_2D_ARRAY_S32_F32_RI:
+1005:     return NVPTX::TEX_2D_ARRAY_S32_F32_II;
+1006:   case NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_RR:
+1007:     return NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_IR;
+1008:   case NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_RI:
+1009:     return NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_II;
+1010:   case NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_RR:
+1011:     return NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_IR;
+1012:   case NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_RI:
+1013:     return NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_II;
+1014:   case NVPTX::TEX_2D_ARRAY_U32_S32_RR:
+1015:     return NVPTX::TEX_2D_ARRAY_U32_S32_IR;
+1016:   case NVPTX::TEX_2D_ARRAY_U32_S32_RI:
+1017:     return NVPTX::TEX_2D_ARRAY_U32_S32_II;
+1018:   case NVPTX::TEX_2D_ARRAY_U32_F32_RR:
+1019:     return NVPTX::TEX_2D_ARRAY_U32_F32_IR;
+1020:   case NVPTX::TEX_2D_ARRAY_U32_F32_RI:
+1021:     return NVPTX::TEX_2D_ARRAY_U32_F32_II;
+1022:   case NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_RR:
+1023:     return NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_IR;
+1024:   case NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_RI:
+1025:     return NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_II;
+1026:   case NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_RR:
+1027:     return NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_IR;
+1028:   case NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_RI:
+1029:     return NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_II;
+1030:   case NVPTX::TEX_3D_F32_S32_RR:
+1031:     return NVPTX::TEX_3D_F32_S32_IR;
+1032:   case NVPTX::TEX_3D_F32_S32_RI:
+1033:     return NVPTX::TEX_3D_F32_S32_II;
+1034:   case NVPTX::TEX_3D_F32_F32_RR:
+1035:     return NVPTX::TEX_3D_F32_F32_IR;
+1036:   case NVPTX::TEX_3D_F32_F32_RI:
+1037:     return NVPTX::TEX_3D_F32_F32_II;
+1038:   case NVPTX::TEX_3D_F32_F32_LEVEL_RR:
+1039:     return NVPTX::TEX_3D_F32_F32_LEVEL_IR;
+1040:   case NVPTX::TEX_3D_F32_F32_LEVEL_RI:
+1041:     return NVPTX::TEX_3D_F32_F32_LEVEL_II;
+1042:   case NVPTX::TEX_3D_F32_F32_GRAD_RR:
+1043:     return NVPTX::TEX_3D_F32_F32_GRAD_IR;
+1044:   case NVPTX::TEX_3D_F32_F32_GRAD_RI:
+1045:     return NVPTX::TEX_3D_F32_F32_GRAD_II;
+1046:   case NVPTX::TEX_3D_S32_S32_RR:
+1047:     return NVPTX::TEX_3D_S32_S32_IR;
+1048:   case NVPTX::TEX_3D_S32_S32_RI:
+1049:     return NVPTX::TEX_3D_S32_S32_II;
+1050:   case NVPTX::TEX_3D_S32_F32_RR:
+1051:     return NVPTX::TEX_3D_S32_F32_IR;
+1052:   case NVPTX::TEX_3D_S32_F32_RI:
+1053:     return NVPTX::TEX_3D_S32_F32_II;
+1054:   case NVPTX::TEX_3D_S32_F32_LEVEL_RR:
+1055:     return NVPTX::TEX_3D_S32_F32_LEVEL_IR;
+1056:   case NVPTX::TEX_3D_S32_F32_LEVEL_RI:
+1057:     return NVPTX::TEX_3D_S32_F32_LEVEL_II;
+1058:   case NVPTX::TEX_3D_S32_F32_GRAD_RR:
+1059:     return NVPTX::TEX_3D_S32_F32_GRAD_IR;
+1060:   case NVPTX::TEX_3D_S32_F32_GRAD_RI:
+1061:     return NVPTX::TEX_3D_S32_F32_GRAD_II;
+1062:   case NVPTX::TEX_3D_U32_S32_RR:
+1063:     return NVPTX::TEX_3D_U32_S32_IR;
+1064:   case NVPTX::TEX_3D_U32_S32_RI:
+1065:     return NVPTX::TEX_3D_U32_S32_II;
+1066:   case NVPTX::TEX_3D_U32_F32_RR:
+1067:     return NVPTX::TEX_3D_U32_F32_IR;
+1068:   case NVPTX::TEX_3D_U32_F32_RI:
+1069:     return NVPTX::TEX_3D_U32_F32_II;
+1070:   case NVPTX::TEX_3D_U32_F32_LEVEL_RR:
+1071:     return NVPTX::TEX_3D_U32_F32_LEVEL_IR;
+1072:   case NVPTX::TEX_3D_U32_F32_LEVEL_RI:
+1073:     return NVPTX::TEX_3D_U32_F32_LEVEL_II;
+1074:   case NVPTX::TEX_3D_U32_F32_GRAD_RR:
+1075:     return NVPTX::TEX_3D_U32_F32_GRAD_IR;
+1076:   case NVPTX::TEX_3D_U32_F32_GRAD_RI:
+1077:     return NVPTX::TEX_3D_U32_F32_GRAD_II;
+1078:   case NVPTX::TEX_CUBE_F32_F32_RR:
+1079:     return NVPTX::TEX_CUBE_F32_F32_IR;
+1080:   case NVPTX::TEX_CUBE_F32_F32_RI:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1081-1170
+```cpp
+1081:     return NVPTX::TEX_CUBE_F32_F32_II;
+1082:   case NVPTX::TEX_CUBE_F32_F32_LEVEL_RR:
+1083:     return NVPTX::TEX_CUBE_F32_F32_LEVEL_IR;
+1084:   case NVPTX::TEX_CUBE_F32_F32_LEVEL_RI:
+1085:     return NVPTX::TEX_CUBE_F32_F32_LEVEL_II;
+1086:   case NVPTX::TEX_CUBE_S32_F32_RR:
+1087:     return NVPTX::TEX_CUBE_S32_F32_IR;
+1088:   case NVPTX::TEX_CUBE_S32_F32_RI:
+1089:     return NVPTX::TEX_CUBE_S32_F32_II;
+1090:   case NVPTX::TEX_CUBE_S32_F32_LEVEL_RR:
+1091:     return NVPTX::TEX_CUBE_S32_F32_LEVEL_IR;
+1092:   case NVPTX::TEX_CUBE_S32_F32_LEVEL_RI:
+1093:     return NVPTX::TEX_CUBE_S32_F32_LEVEL_II;
+1094:   case NVPTX::TEX_CUBE_U32_F32_RR:
+1095:     return NVPTX::TEX_CUBE_U32_F32_IR;
+1096:   case NVPTX::TEX_CUBE_U32_F32_RI:
+1097:     return NVPTX::TEX_CUBE_U32_F32_II;
+1098:   case NVPTX::TEX_CUBE_U32_F32_LEVEL_RR:
+1099:     return NVPTX::TEX_CUBE_U32_F32_LEVEL_IR;
+1100:   case NVPTX::TEX_CUBE_U32_F32_LEVEL_RI:
+1101:     return NVPTX::TEX_CUBE_U32_F32_LEVEL_II;
+1102:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_RR:
+1103:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_IR;
+1104:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_RI:
+1105:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_II;
+1106:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_RR:
+1107:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_IR;
+1108:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_RI:
+1109:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_II;
+1110:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_RR:
+1111:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_IR;
+1112:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_RI:
+1113:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_II;
+1114:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_RR:
+1115:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_IR;
+1116:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_RI:
+1117:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_II;
+1118:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_RR:
+1119:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_IR;
+1120:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_RI:
+1121:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_II;
+1122:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_RR:
+1123:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_IR;
+1124:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_RI:
+1125:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_II;
+1126:   case NVPTX::TLD4_R_2D_F32_F32_RR:
+1127:     return NVPTX::TLD4_R_2D_F32_F32_IR;
+1128:   case NVPTX::TLD4_R_2D_F32_F32_RI:
+1129:     return NVPTX::TLD4_R_2D_F32_F32_II;
+1130:   case NVPTX::TLD4_G_2D_F32_F32_RR:
+1131:     return NVPTX::TLD4_G_2D_F32_F32_IR;
+1132:   case NVPTX::TLD4_G_2D_F32_F32_RI:
+1133:     return NVPTX::TLD4_G_2D_F32_F32_II;
+1134:   case NVPTX::TLD4_B_2D_F32_F32_RR:
+1135:     return NVPTX::TLD4_B_2D_F32_F32_IR;
+1136:   case NVPTX::TLD4_B_2D_F32_F32_RI:
+1137:     return NVPTX::TLD4_B_2D_F32_F32_II;
+1138:   case NVPTX::TLD4_A_2D_F32_F32_RR:
+1139:     return NVPTX::TLD4_A_2D_F32_F32_IR;
+1140:   case NVPTX::TLD4_A_2D_F32_F32_RI:
+1141:     return NVPTX::TLD4_A_2D_F32_F32_II;
+1142:   case NVPTX::TLD4_R_2D_S32_F32_RR:
+1143:     return NVPTX::TLD4_R_2D_S32_F32_IR;
+1144:   case NVPTX::TLD4_R_2D_S32_F32_RI:
+1145:     return NVPTX::TLD4_R_2D_S32_F32_II;
+1146:   case NVPTX::TLD4_G_2D_S32_F32_RR:
+1147:     return NVPTX::TLD4_G_2D_S32_F32_IR;
+1148:   case NVPTX::TLD4_G_2D_S32_F32_RI:
+1149:     return NVPTX::TLD4_G_2D_S32_F32_II;
+1150:   case NVPTX::TLD4_B_2D_S32_F32_RR:
+1151:     return NVPTX::TLD4_B_2D_S32_F32_IR;
+1152:   case NVPTX::TLD4_B_2D_S32_F32_RI:
+1153:     return NVPTX::TLD4_B_2D_S32_F32_II;
+1154:   case NVPTX::TLD4_A_2D_S32_F32_RR:
+1155:     return NVPTX::TLD4_A_2D_S32_F32_IR;
+1156:   case NVPTX::TLD4_A_2D_S32_F32_RI:
+1157:     return NVPTX::TLD4_A_2D_S32_F32_II;
+1158:   case NVPTX::TLD4_R_2D_U32_F32_RR:
+1159:     return NVPTX::TLD4_R_2D_U32_F32_IR;
+1160:   case NVPTX::TLD4_R_2D_U32_F32_RI:
+1161:     return NVPTX::TLD4_R_2D_U32_F32_II;
+1162:   case NVPTX::TLD4_G_2D_U32_F32_RR:
+1163:     return NVPTX::TLD4_G_2D_U32_F32_IR;
+1164:   case NVPTX::TLD4_G_2D_U32_F32_RI:
+1165:     return NVPTX::TLD4_G_2D_U32_F32_II;
+1166:   case NVPTX::TLD4_B_2D_U32_F32_RR:
+1167:     return NVPTX::TLD4_B_2D_U32_F32_IR;
+1168:   case NVPTX::TLD4_B_2D_U32_F32_RI:
+1169:     return NVPTX::TLD4_B_2D_U32_F32_II;
+1170:   case NVPTX::TLD4_A_2D_U32_F32_RR:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1171-1260
+```cpp
+1171:     return NVPTX::TLD4_A_2D_U32_F32_IR;
+1172:   case NVPTX::TLD4_A_2D_U32_F32_RI:
+1173:     return NVPTX::TLD4_A_2D_U32_F32_II;
+1174:   case NVPTX::TEX_UNIFIED_1D_F32_S32_R:
+1175:     return NVPTX::TEX_UNIFIED_1D_F32_S32_I;
+1176:   case NVPTX::TEX_UNIFIED_1D_F32_F32_R:
+1177:     return NVPTX::TEX_UNIFIED_1D_F32_F32_I;
+1178:   case NVPTX::TEX_UNIFIED_1D_F32_F32_LEVEL_R:
+1179:     return NVPTX::TEX_UNIFIED_1D_F32_F32_LEVEL_I;
+1180:   case NVPTX::TEX_UNIFIED_1D_F32_F32_GRAD_R:
+1181:     return NVPTX::TEX_UNIFIED_1D_F32_F32_GRAD_I;
+1182:   case NVPTX::TEX_UNIFIED_1D_S32_S32_R:
+1183:     return NVPTX::TEX_UNIFIED_1D_S32_S32_I;
+1184:   case NVPTX::TEX_UNIFIED_1D_S32_F32_R:
+1185:     return NVPTX::TEX_UNIFIED_1D_S32_F32_I;
+1186:   case NVPTX::TEX_UNIFIED_1D_S32_F32_LEVEL_R:
+1187:     return NVPTX::TEX_UNIFIED_1D_S32_F32_LEVEL_I;
+1188:   case NVPTX::TEX_UNIFIED_1D_S32_F32_GRAD_R:
+1189:     return NVPTX::TEX_UNIFIED_1D_S32_F32_GRAD_I;
+1190:   case NVPTX::TEX_UNIFIED_1D_U32_S32_R:
+1191:     return NVPTX::TEX_UNIFIED_1D_U32_S32_I;
+1192:   case NVPTX::TEX_UNIFIED_1D_U32_F32_R:
+1193:     return NVPTX::TEX_UNIFIED_1D_U32_F32_I;
+1194:   case NVPTX::TEX_UNIFIED_1D_U32_F32_LEVEL_R:
+1195:     return NVPTX::TEX_UNIFIED_1D_U32_F32_LEVEL_I;
+1196:   case NVPTX::TEX_UNIFIED_1D_U32_F32_GRAD_R:
+1197:     return NVPTX::TEX_UNIFIED_1D_U32_F32_GRAD_I;
+1198:   case NVPTX::TEX_UNIFIED_1D_ARRAY_F32_S32_R:
+1199:     return NVPTX::TEX_UNIFIED_1D_ARRAY_F32_S32_I;
+1200:   case NVPTX::TEX_UNIFIED_1D_ARRAY_F32_F32_R:
+1201:     return NVPTX::TEX_UNIFIED_1D_ARRAY_F32_F32_I;
+1202:   case NVPTX::TEX_UNIFIED_1D_ARRAY_F32_F32_LEVEL_R:
+1203:     return NVPTX::TEX_UNIFIED_1D_ARRAY_F32_F32_LEVEL_I;
+1204:   case NVPTX::TEX_UNIFIED_1D_ARRAY_F32_F32_GRAD_R:
+1205:     return NVPTX::TEX_UNIFIED_1D_ARRAY_F32_F32_GRAD_I;
+1206:   case NVPTX::TEX_UNIFIED_1D_ARRAY_S32_S32_R:
+1207:     return NVPTX::TEX_UNIFIED_1D_ARRAY_S32_S32_I;
+1208:   case NVPTX::TEX_UNIFIED_1D_ARRAY_S32_F32_R:
+1209:     return NVPTX::TEX_UNIFIED_1D_ARRAY_S32_F32_I;
+1210:   case NVPTX::TEX_UNIFIED_1D_ARRAY_S32_F32_LEVEL_R:
+1211:     return NVPTX::TEX_UNIFIED_1D_ARRAY_S32_F32_LEVEL_I;
+1212:   case NVPTX::TEX_UNIFIED_1D_ARRAY_S32_F32_GRAD_R:
+1213:     return NVPTX::TEX_UNIFIED_1D_ARRAY_S32_F32_GRAD_I;
+1214:   case NVPTX::TEX_UNIFIED_1D_ARRAY_U32_S32_R:
+1215:     return NVPTX::TEX_UNIFIED_1D_ARRAY_U32_S32_I;
+1216:   case NVPTX::TEX_UNIFIED_1D_ARRAY_U32_F32_R:
+1217:     return NVPTX::TEX_UNIFIED_1D_ARRAY_U32_F32_I;
+1218:   case NVPTX::TEX_UNIFIED_1D_ARRAY_U32_F32_LEVEL_R:
+1219:     return NVPTX::TEX_UNIFIED_1D_ARRAY_U32_F32_LEVEL_I;
+1220:   case NVPTX::TEX_UNIFIED_1D_ARRAY_U32_F32_GRAD_R:
+1221:     return NVPTX::TEX_UNIFIED_1D_ARRAY_U32_F32_GRAD_I;
+1222:   case NVPTX::TEX_UNIFIED_2D_F32_S32_R:
+1223:     return NVPTX::TEX_UNIFIED_2D_F32_S32_I;
+1224:   case NVPTX::TEX_UNIFIED_2D_F32_F32_R:
+1225:     return NVPTX::TEX_UNIFIED_2D_F32_F32_I;
+1226:   case NVPTX::TEX_UNIFIED_2D_F32_F32_LEVEL_R:
+1227:     return NVPTX::TEX_UNIFIED_2D_F32_F32_LEVEL_I;
+1228:   case NVPTX::TEX_UNIFIED_2D_F32_F32_GRAD_R:
+1229:     return NVPTX::TEX_UNIFIED_2D_F32_F32_GRAD_I;
+1230:   case NVPTX::TEX_UNIFIED_2D_S32_S32_R:
+1231:     return NVPTX::TEX_UNIFIED_2D_S32_S32_I;
+1232:   case NVPTX::TEX_UNIFIED_2D_S32_F32_R:
+1233:     return NVPTX::TEX_UNIFIED_2D_S32_F32_I;
+1234:   case NVPTX::TEX_UNIFIED_2D_S32_F32_LEVEL_R:
+1235:     return NVPTX::TEX_UNIFIED_2D_S32_F32_LEVEL_I;
+1236:   case NVPTX::TEX_UNIFIED_2D_S32_F32_GRAD_R:
+1237:     return NVPTX::TEX_UNIFIED_2D_S32_F32_GRAD_I;
+1238:   case NVPTX::TEX_UNIFIED_2D_U32_S32_R:
+1239:     return NVPTX::TEX_UNIFIED_2D_U32_S32_I;
+1240:   case NVPTX::TEX_UNIFIED_2D_U32_F32_R:
+1241:     return NVPTX::TEX_UNIFIED_2D_U32_F32_I;
+1242:   case NVPTX::TEX_UNIFIED_2D_U32_F32_LEVEL_R:
+1243:     return NVPTX::TEX_UNIFIED_2D_U32_F32_LEVEL_I;
+1244:   case NVPTX::TEX_UNIFIED_2D_U32_F32_GRAD_R:
+1245:     return NVPTX::TEX_UNIFIED_2D_U32_F32_GRAD_I;
+1246:   case NVPTX::TEX_UNIFIED_2D_ARRAY_F32_S32_R:
+1247:     return NVPTX::TEX_UNIFIED_2D_ARRAY_F32_S32_I;
+1248:   case NVPTX::TEX_UNIFIED_2D_ARRAY_F32_F32_R:
+1249:     return NVPTX::TEX_UNIFIED_2D_ARRAY_F32_F32_I;
+1250:   case NVPTX::TEX_UNIFIED_2D_ARRAY_F32_F32_LEVEL_R:
+1251:     return NVPTX::TEX_UNIFIED_2D_ARRAY_F32_F32_LEVEL_I;
+1252:   case NVPTX::TEX_UNIFIED_2D_ARRAY_F32_F32_GRAD_R:
+1253:     return NVPTX::TEX_UNIFIED_2D_ARRAY_F32_F32_GRAD_I;
+1254:   case NVPTX::TEX_UNIFIED_2D_ARRAY_S32_S32_R:
+1255:     return NVPTX::TEX_UNIFIED_2D_ARRAY_S32_S32_I;
+1256:   case NVPTX::TEX_UNIFIED_2D_ARRAY_S32_F32_R:
+1257:     return NVPTX::TEX_UNIFIED_2D_ARRAY_S32_F32_I;
+1258:   case NVPTX::TEX_UNIFIED_2D_ARRAY_S32_F32_LEVEL_R:
+1259:     return NVPTX::TEX_UNIFIED_2D_ARRAY_S32_F32_LEVEL_I;
+1260:   case NVPTX::TEX_UNIFIED_2D_ARRAY_S32_F32_GRAD_R:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1261-1350
+```cpp
+1261:     return NVPTX::TEX_UNIFIED_2D_ARRAY_S32_F32_GRAD_I;
+1262:   case NVPTX::TEX_UNIFIED_2D_ARRAY_U32_S32_R:
+1263:     return NVPTX::TEX_UNIFIED_2D_ARRAY_U32_S32_I;
+1264:   case NVPTX::TEX_UNIFIED_2D_ARRAY_U32_F32_R:
+1265:     return NVPTX::TEX_UNIFIED_2D_ARRAY_U32_F32_I;
+1266:   case NVPTX::TEX_UNIFIED_2D_ARRAY_U32_F32_LEVEL_R:
+1267:     return NVPTX::TEX_UNIFIED_2D_ARRAY_U32_F32_LEVEL_I;
+1268:   case NVPTX::TEX_UNIFIED_2D_ARRAY_U32_F32_GRAD_R:
+1269:     return NVPTX::TEX_UNIFIED_2D_ARRAY_U32_F32_GRAD_I;
+1270:   case NVPTX::TEX_UNIFIED_3D_F32_S32_R:
+1271:     return NVPTX::TEX_UNIFIED_3D_F32_S32_I;
+1272:   case NVPTX::TEX_UNIFIED_3D_F32_F32_R:
+1273:     return NVPTX::TEX_UNIFIED_3D_F32_F32_I;
+1274:   case NVPTX::TEX_UNIFIED_3D_F32_F32_LEVEL_R:
+1275:     return NVPTX::TEX_UNIFIED_3D_F32_F32_LEVEL_I;
+1276:   case NVPTX::TEX_UNIFIED_3D_F32_F32_GRAD_R:
+1277:     return NVPTX::TEX_UNIFIED_3D_F32_F32_GRAD_I;
+1278:   case NVPTX::TEX_UNIFIED_3D_S32_S32_R:
+1279:     return NVPTX::TEX_UNIFIED_3D_S32_S32_I;
+1280:   case NVPTX::TEX_UNIFIED_3D_S32_F32_R:
+1281:     return NVPTX::TEX_UNIFIED_3D_S32_F32_I;
+1282:   case NVPTX::TEX_UNIFIED_3D_S32_F32_LEVEL_R:
+1283:     return NVPTX::TEX_UNIFIED_3D_S32_F32_LEVEL_I;
+1284:   case NVPTX::TEX_UNIFIED_3D_S32_F32_GRAD_R:
+1285:     return NVPTX::TEX_UNIFIED_3D_S32_F32_GRAD_I;
+1286:   case NVPTX::TEX_UNIFIED_3D_U32_S32_R:
+1287:     return NVPTX::TEX_UNIFIED_3D_U32_S32_I;
+1288:   case NVPTX::TEX_UNIFIED_3D_U32_F32_R:
+1289:     return NVPTX::TEX_UNIFIED_3D_U32_F32_I;
+1290:   case NVPTX::TEX_UNIFIED_3D_U32_F32_LEVEL_R:
+1291:     return NVPTX::TEX_UNIFIED_3D_U32_F32_LEVEL_I;
+1292:   case NVPTX::TEX_UNIFIED_3D_U32_F32_GRAD_R:
+1293:     return NVPTX::TEX_UNIFIED_3D_U32_F32_GRAD_I;
+1294:   case NVPTX::TEX_UNIFIED_CUBE_F32_F32_R:
+1295:     return NVPTX::TEX_UNIFIED_CUBE_F32_F32_I;
+1296:   case NVPTX::TEX_UNIFIED_CUBE_F32_F32_LEVEL_R:
+1297:     return NVPTX::TEX_UNIFIED_CUBE_F32_F32_LEVEL_I;
+1298:   case NVPTX::TEX_UNIFIED_CUBE_S32_F32_R:
+1299:     return NVPTX::TEX_UNIFIED_CUBE_S32_F32_I;
+1300:   case NVPTX::TEX_UNIFIED_CUBE_S32_F32_LEVEL_R:
+1301:     return NVPTX::TEX_UNIFIED_CUBE_S32_F32_LEVEL_I;
+1302:   case NVPTX::TEX_UNIFIED_CUBE_U32_F32_R:
+1303:     return NVPTX::TEX_UNIFIED_CUBE_U32_F32_I;
+1304:   case NVPTX::TEX_UNIFIED_CUBE_U32_F32_LEVEL_R:
+1305:     return NVPTX::TEX_UNIFIED_CUBE_U32_F32_LEVEL_I;
+1306:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_F32_F32_R:
+1307:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_F32_F32_I;
+1308:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_F32_F32_LEVEL_R:
+1309:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_F32_F32_LEVEL_I;
+1310:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_S32_F32_R:
+1311:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_S32_F32_I;
+1312:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_S32_F32_LEVEL_R:
+1313:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_S32_F32_LEVEL_I;
+1314:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_U32_F32_R:
+1315:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_U32_F32_I;
+1316:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_U32_F32_LEVEL_R:
+1317:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_U32_F32_LEVEL_I;
+1318:   case NVPTX::TEX_UNIFIED_CUBE_F32_F32_GRAD_R:
+1319:     return NVPTX::TEX_UNIFIED_CUBE_F32_F32_GRAD_I;
+1320:   case NVPTX::TEX_UNIFIED_CUBE_S32_F32_GRAD_R:
+1321:     return NVPTX::TEX_UNIFIED_CUBE_S32_F32_GRAD_I;
+1322:   case NVPTX::TEX_UNIFIED_CUBE_U32_F32_GRAD_R:
+1323:     return NVPTX::TEX_UNIFIED_CUBE_U32_F32_GRAD_I;
+1324:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_F32_F32_GRAD_R:
+1325:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_F32_F32_GRAD_I;
+1326:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_S32_F32_GRAD_R:
+1327:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_S32_F32_GRAD_I;
+1328:   case NVPTX::TEX_UNIFIED_CUBE_ARRAY_U32_F32_GRAD_R:
+1329:     return NVPTX::TEX_UNIFIED_CUBE_ARRAY_U32_F32_GRAD_I;
+1330:   case NVPTX::TLD4_UNIFIED_R_2D_F32_F32_R:
+1331:     return NVPTX::TLD4_UNIFIED_R_2D_F32_F32_I;
+1332:   case NVPTX::TLD4_UNIFIED_G_2D_F32_F32_R:
+1333:     return NVPTX::TLD4_UNIFIED_G_2D_F32_F32_I;
+1334:   case NVPTX::TLD4_UNIFIED_B_2D_F32_F32_R:
+1335:     return NVPTX::TLD4_UNIFIED_B_2D_F32_F32_I;
+1336:   case NVPTX::TLD4_UNIFIED_A_2D_F32_F32_R:
+1337:     return NVPTX::TLD4_UNIFIED_A_2D_F32_F32_I;
+1338:   case NVPTX::TLD4_UNIFIED_R_2D_S32_F32_R:
+1339:     return NVPTX::TLD4_UNIFIED_R_2D_S32_F32_I;
+1340:   case NVPTX::TLD4_UNIFIED_G_2D_S32_F32_R:
+1341:     return NVPTX::TLD4_UNIFIED_G_2D_S32_F32_I;
+1342:   case NVPTX::TLD4_UNIFIED_B_2D_S32_F32_R:
+1343:     return NVPTX::TLD4_UNIFIED_B_2D_S32_F32_I;
+1344:   case NVPTX::TLD4_UNIFIED_A_2D_S32_F32_R:
+1345:     return NVPTX::TLD4_UNIFIED_A_2D_S32_F32_I;
+1346:   case NVPTX::TLD4_UNIFIED_R_2D_U32_F32_R:
+1347:     return NVPTX::TLD4_UNIFIED_R_2D_U32_F32_I;
+1348:   case NVPTX::TLD4_UNIFIED_G_2D_U32_F32_R:
+1349:     return NVPTX::TLD4_UNIFIED_G_2D_U32_F32_I;
+1350:   case NVPTX::TLD4_UNIFIED_B_2D_U32_F32_R:
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1351-1440
+```cpp
+1351:     return NVPTX::TLD4_UNIFIED_B_2D_U32_F32_I;
+1352:   case NVPTX::TLD4_UNIFIED_A_2D_U32_F32_R:
+1353:     return NVPTX::TLD4_UNIFIED_A_2D_U32_F32_I;
+1354:   default:
+1355:     llvm_unreachable("Unhandled TEX opcode");
+1356:   };
+1357: }
+1358:
+1359: static unsigned samplerRegisterToIndexOpcode(unsigned RegOC) {
+1360:   switch (RegOC) {
+1361:   case NVPTX::TEX_1D_F32_S32_RR:
+1362:     return NVPTX::TEX_1D_F32_S32_RI;
+1363:   case NVPTX::TEX_1D_F32_S32_IR:
+1364:     return NVPTX::TEX_1D_F32_S32_II;
+1365:   case NVPTX::TEX_1D_F32_F32_RR:
+1366:     return NVPTX::TEX_1D_F32_F32_RI;
+1367:   case NVPTX::TEX_1D_F32_F32_IR:
+1368:     return NVPTX::TEX_1D_F32_F32_II;
+1369:   case NVPTX::TEX_1D_F32_F32_LEVEL_RR:
+1370:     return NVPTX::TEX_1D_F32_F32_LEVEL_RI;
+1371:   case NVPTX::TEX_1D_F32_F32_LEVEL_IR:
+1372:     return NVPTX::TEX_1D_F32_F32_LEVEL_II;
+1373:   case NVPTX::TEX_1D_F32_F32_GRAD_RR:
+1374:     return NVPTX::TEX_1D_F32_F32_GRAD_RI;
+1375:   case NVPTX::TEX_1D_F32_F32_GRAD_IR:
+1376:     return NVPTX::TEX_1D_F32_F32_GRAD_II;
+1377:   case NVPTX::TEX_1D_S32_S32_RR:
+1378:     return NVPTX::TEX_1D_S32_S32_RI;
+1379:   case NVPTX::TEX_1D_S32_S32_IR:
+1380:     return NVPTX::TEX_1D_S32_S32_II;
+1381:   case NVPTX::TEX_1D_S32_F32_RR:
+1382:     return NVPTX::TEX_1D_S32_F32_RI;
+1383:   case NVPTX::TEX_1D_S32_F32_IR:
+1384:     return NVPTX::TEX_1D_S32_F32_II;
+1385:   case NVPTX::TEX_1D_S32_F32_LEVEL_RR:
+1386:     return NVPTX::TEX_1D_S32_F32_LEVEL_RI;
+1387:   case NVPTX::TEX_1D_S32_F32_LEVEL_IR:
+1388:     return NVPTX::TEX_1D_S32_F32_LEVEL_II;
+1389:   case NVPTX::TEX_1D_S32_F32_GRAD_RR:
+1390:     return NVPTX::TEX_1D_S32_F32_GRAD_RI;
+1391:   case NVPTX::TEX_1D_S32_F32_GRAD_IR:
+1392:     return NVPTX::TEX_1D_S32_F32_GRAD_II;
+1393:   case NVPTX::TEX_1D_U32_S32_RR:
+1394:     return NVPTX::TEX_1D_U32_S32_RI;
+1395:   case NVPTX::TEX_1D_U32_S32_IR:
+1396:     return NVPTX::TEX_1D_U32_S32_II;
+1397:   case NVPTX::TEX_1D_U32_F32_RR:
+1398:     return NVPTX::TEX_1D_U32_F32_RI;
+1399:   case NVPTX::TEX_1D_U32_F32_IR:
+1400:     return NVPTX::TEX_1D_U32_F32_II;
+1401:   case NVPTX::TEX_1D_U32_F32_LEVEL_RR:
+1402:     return NVPTX::TEX_1D_U32_F32_LEVEL_RI;
+1403:   case NVPTX::TEX_1D_U32_F32_LEVEL_IR:
+1404:     return NVPTX::TEX_1D_U32_F32_LEVEL_II;
+1405:   case NVPTX::TEX_1D_U32_F32_GRAD_RR:
+1406:     return NVPTX::TEX_1D_U32_F32_GRAD_RI;
+1407:   case NVPTX::TEX_1D_U32_F32_GRAD_IR:
+1408:     return NVPTX::TEX_1D_U32_F32_GRAD_II;
+1409:   case NVPTX::TEX_1D_ARRAY_F32_S32_RR:
+1410:     return NVPTX::TEX_1D_ARRAY_F32_S32_RI;
+1411:   case NVPTX::TEX_1D_ARRAY_F32_S32_IR:
+1412:     return NVPTX::TEX_1D_ARRAY_F32_S32_II;
+1413:   case NVPTX::TEX_1D_ARRAY_F32_F32_RR:
+1414:     return NVPTX::TEX_1D_ARRAY_F32_F32_RI;
+1415:   case NVPTX::TEX_1D_ARRAY_F32_F32_IR:
+1416:     return NVPTX::TEX_1D_ARRAY_F32_F32_II;
+1417:   case NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_RR:
+1418:     return NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_RI;
+1419:   case NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_IR:
+1420:     return NVPTX::TEX_1D_ARRAY_F32_F32_LEVEL_II;
+1421:   case NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_RR:
+1422:     return NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_RI;
+1423:   case NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_IR:
+1424:     return NVPTX::TEX_1D_ARRAY_F32_F32_GRAD_II;
+1425:   case NVPTX::TEX_1D_ARRAY_S32_S32_RR:
+1426:     return NVPTX::TEX_1D_ARRAY_S32_S32_RI;
+1427:   case NVPTX::TEX_1D_ARRAY_S32_S32_IR:
+1428:     return NVPTX::TEX_1D_ARRAY_S32_S32_II;
+1429:   case NVPTX::TEX_1D_ARRAY_S32_F32_RR:
+1430:     return NVPTX::TEX_1D_ARRAY_S32_F32_RI;
+1431:   case NVPTX::TEX_1D_ARRAY_S32_F32_IR:
+1432:     return NVPTX::TEX_1D_ARRAY_S32_F32_II;
+1433:   case NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_RR:
+1434:     return NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_RI;
+1435:   case NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_IR:
+1436:     return NVPTX::TEX_1D_ARRAY_S32_F32_LEVEL_II;
+1437:   case NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_RR:
+1438:     return NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_RI;
+1439:   case NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_IR:
+1440:     return NVPTX::TEX_1D_ARRAY_S32_F32_GRAD_II;
+```
+- EN: This range implements operational logic in helpers such as llvm_unreachable, samplerRegisterToIndexOpcode, translating backend policy into executable code.
+- CN: 这一段实现了 llvm_unreachable、samplerRegisterToIndexOpcode 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1441-1530
+```cpp
+1441:   case NVPTX::TEX_1D_ARRAY_U32_S32_RR:
+1442:     return NVPTX::TEX_1D_ARRAY_U32_S32_RI;
+1443:   case NVPTX::TEX_1D_ARRAY_U32_S32_IR:
+1444:     return NVPTX::TEX_1D_ARRAY_U32_S32_II;
+1445:   case NVPTX::TEX_1D_ARRAY_U32_F32_RR:
+1446:     return NVPTX::TEX_1D_ARRAY_U32_F32_RI;
+1447:   case NVPTX::TEX_1D_ARRAY_U32_F32_IR:
+1448:     return NVPTX::TEX_1D_ARRAY_U32_F32_II;
+1449:   case NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_RR:
+1450:     return NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_RI;
+1451:   case NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_IR:
+1452:     return NVPTX::TEX_1D_ARRAY_U32_F32_LEVEL_II;
+1453:   case NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_RR:
+1454:     return NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_RI;
+1455:   case NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_IR:
+1456:     return NVPTX::TEX_1D_ARRAY_U32_F32_GRAD_II;
+1457:   case NVPTX::TEX_2D_F32_S32_RR:
+1458:     return NVPTX::TEX_2D_F32_S32_RI;
+1459:   case NVPTX::TEX_2D_F32_S32_IR:
+1460:     return NVPTX::TEX_2D_F32_S32_II;
+1461:   case NVPTX::TEX_2D_F32_F32_RR:
+1462:     return NVPTX::TEX_2D_F32_F32_RI;
+1463:   case NVPTX::TEX_2D_F32_F32_IR:
+1464:     return NVPTX::TEX_2D_F32_F32_II;
+1465:   case NVPTX::TEX_2D_F32_F32_LEVEL_RR:
+1466:     return NVPTX::TEX_2D_F32_F32_LEVEL_RI;
+1467:   case NVPTX::TEX_2D_F32_F32_LEVEL_IR:
+1468:     return NVPTX::TEX_2D_F32_F32_LEVEL_II;
+1469:   case NVPTX::TEX_2D_F32_F32_GRAD_RR:
+1470:     return NVPTX::TEX_2D_F32_F32_GRAD_RI;
+1471:   case NVPTX::TEX_2D_F32_F32_GRAD_IR:
+1472:     return NVPTX::TEX_2D_F32_F32_GRAD_II;
+1473:   case NVPTX::TEX_2D_S32_S32_RR:
+1474:     return NVPTX::TEX_2D_S32_S32_RI;
+1475:   case NVPTX::TEX_2D_S32_S32_IR:
+1476:     return NVPTX::TEX_2D_S32_S32_II;
+1477:   case NVPTX::TEX_2D_S32_F32_RR:
+1478:     return NVPTX::TEX_2D_S32_F32_RI;
+1479:   case NVPTX::TEX_2D_S32_F32_IR:
+1480:     return NVPTX::TEX_2D_S32_F32_II;
+1481:   case NVPTX::TEX_2D_S32_F32_LEVEL_RR:
+1482:     return NVPTX::TEX_2D_S32_F32_LEVEL_RI;
+1483:   case NVPTX::TEX_2D_S32_F32_LEVEL_IR:
+1484:     return NVPTX::TEX_2D_S32_F32_LEVEL_II;
+1485:   case NVPTX::TEX_2D_S32_F32_GRAD_RR:
+1486:     return NVPTX::TEX_2D_S32_F32_GRAD_RI;
+1487:   case NVPTX::TEX_2D_S32_F32_GRAD_IR:
+1488:     return NVPTX::TEX_2D_S32_F32_GRAD_II;
+1489:   case NVPTX::TEX_2D_U32_S32_RR:
+1490:     return NVPTX::TEX_2D_U32_S32_RI;
+1491:   case NVPTX::TEX_2D_U32_S32_IR:
+1492:     return NVPTX::TEX_2D_U32_S32_II;
+1493:   case NVPTX::TEX_2D_U32_F32_RR:
+1494:     return NVPTX::TEX_2D_U32_F32_RI;
+1495:   case NVPTX::TEX_2D_U32_F32_IR:
+1496:     return NVPTX::TEX_2D_U32_F32_II;
+1497:   case NVPTX::TEX_2D_U32_F32_LEVEL_RR:
+1498:     return NVPTX::TEX_2D_U32_F32_LEVEL_RI;
+1499:   case NVPTX::TEX_2D_U32_F32_LEVEL_IR:
+1500:     return NVPTX::TEX_2D_U32_F32_LEVEL_II;
+1501:   case NVPTX::TEX_2D_U32_F32_GRAD_RR:
+1502:     return NVPTX::TEX_2D_U32_F32_GRAD_RI;
+1503:   case NVPTX::TEX_2D_U32_F32_GRAD_IR:
+1504:     return NVPTX::TEX_2D_U32_F32_GRAD_II;
+1505:   case NVPTX::TEX_2D_ARRAY_F32_S32_RR:
+1506:     return NVPTX::TEX_2D_ARRAY_F32_S32_RI;
+1507:   case NVPTX::TEX_2D_ARRAY_F32_S32_IR:
+1508:     return NVPTX::TEX_2D_ARRAY_F32_S32_II;
+1509:   case NVPTX::TEX_2D_ARRAY_F32_F32_RR:
+1510:     return NVPTX::TEX_2D_ARRAY_F32_F32_RI;
+1511:   case NVPTX::TEX_2D_ARRAY_F32_F32_IR:
+1512:     return NVPTX::TEX_2D_ARRAY_F32_F32_II;
+1513:   case NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_RR:
+1514:     return NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_RI;
+1515:   case NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_IR:
+1516:     return NVPTX::TEX_2D_ARRAY_F32_F32_LEVEL_II;
+1517:   case NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_RR:
+1518:     return NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_RI;
+1519:   case NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_IR:
+1520:     return NVPTX::TEX_2D_ARRAY_F32_F32_GRAD_II;
+1521:   case NVPTX::TEX_2D_ARRAY_S32_S32_RR:
+1522:     return NVPTX::TEX_2D_ARRAY_S32_S32_RI;
+1523:   case NVPTX::TEX_2D_ARRAY_S32_S32_IR:
+1524:     return NVPTX::TEX_2D_ARRAY_S32_S32_II;
+1525:   case NVPTX::TEX_2D_ARRAY_S32_F32_RR:
+1526:     return NVPTX::TEX_2D_ARRAY_S32_F32_RI;
+1527:   case NVPTX::TEX_2D_ARRAY_S32_F32_IR:
+1528:     return NVPTX::TEX_2D_ARRAY_S32_F32_II;
+1529:   case NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_RR:
+1530:     return NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_RI;
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1531-1620
+```cpp
+1531:   case NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_IR:
+1532:     return NVPTX::TEX_2D_ARRAY_S32_F32_LEVEL_II;
+1533:   case NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_RR:
+1534:     return NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_RI;
+1535:   case NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_IR:
+1536:     return NVPTX::TEX_2D_ARRAY_S32_F32_GRAD_II;
+1537:   case NVPTX::TEX_2D_ARRAY_U32_S32_RR:
+1538:     return NVPTX::TEX_2D_ARRAY_U32_S32_RI;
+1539:   case NVPTX::TEX_2D_ARRAY_U32_S32_IR:
+1540:     return NVPTX::TEX_2D_ARRAY_U32_S32_II;
+1541:   case NVPTX::TEX_2D_ARRAY_U32_F32_RR:
+1542:     return NVPTX::TEX_2D_ARRAY_U32_F32_RI;
+1543:   case NVPTX::TEX_2D_ARRAY_U32_F32_IR:
+1544:     return NVPTX::TEX_2D_ARRAY_U32_F32_II;
+1545:   case NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_RR:
+1546:     return NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_RI;
+1547:   case NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_IR:
+1548:     return NVPTX::TEX_2D_ARRAY_U32_F32_LEVEL_II;
+1549:   case NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_RR:
+1550:     return NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_RI;
+1551:   case NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_IR:
+1552:     return NVPTX::TEX_2D_ARRAY_U32_F32_GRAD_II;
+1553:   case NVPTX::TEX_3D_F32_S32_RR:
+1554:     return NVPTX::TEX_3D_F32_S32_RI;
+1555:   case NVPTX::TEX_3D_F32_S32_IR:
+1556:     return NVPTX::TEX_3D_F32_S32_II;
+1557:   case NVPTX::TEX_3D_F32_F32_RR:
+1558:     return NVPTX::TEX_3D_F32_F32_RI;
+1559:   case NVPTX::TEX_3D_F32_F32_IR:
+1560:     return NVPTX::TEX_3D_F32_F32_II;
+1561:   case NVPTX::TEX_3D_F32_F32_LEVEL_RR:
+1562:     return NVPTX::TEX_3D_F32_F32_LEVEL_RI;
+1563:   case NVPTX::TEX_3D_F32_F32_LEVEL_IR:
+1564:     return NVPTX::TEX_3D_F32_F32_LEVEL_II;
+1565:   case NVPTX::TEX_3D_F32_F32_GRAD_RR:
+1566:     return NVPTX::TEX_3D_F32_F32_GRAD_RI;
+1567:   case NVPTX::TEX_3D_F32_F32_GRAD_IR:
+1568:     return NVPTX::TEX_3D_F32_F32_GRAD_II;
+1569:   case NVPTX::TEX_3D_S32_S32_RR:
+1570:     return NVPTX::TEX_3D_S32_S32_RI;
+1571:   case NVPTX::TEX_3D_S32_S32_IR:
+1572:     return NVPTX::TEX_3D_S32_S32_II;
+1573:   case NVPTX::TEX_3D_S32_F32_RR:
+1574:     return NVPTX::TEX_3D_S32_F32_RI;
+1575:   case NVPTX::TEX_3D_S32_F32_IR:
+1576:     return NVPTX::TEX_3D_S32_F32_II;
+1577:   case NVPTX::TEX_3D_S32_F32_LEVEL_RR:
+1578:     return NVPTX::TEX_3D_S32_F32_LEVEL_RI;
+1579:   case NVPTX::TEX_3D_S32_F32_LEVEL_IR:
+1580:     return NVPTX::TEX_3D_S32_F32_LEVEL_II;
+1581:   case NVPTX::TEX_3D_S32_F32_GRAD_RR:
+1582:     return NVPTX::TEX_3D_S32_F32_GRAD_RI;
+1583:   case NVPTX::TEX_3D_S32_F32_GRAD_IR:
+1584:     return NVPTX::TEX_3D_S32_F32_GRAD_II;
+1585:   case NVPTX::TEX_3D_U32_S32_RR:
+1586:     return NVPTX::TEX_3D_U32_S32_RI;
+1587:   case NVPTX::TEX_3D_U32_S32_IR:
+1588:     return NVPTX::TEX_3D_U32_S32_II;
+1589:   case NVPTX::TEX_3D_U32_F32_RR:
+1590:     return NVPTX::TEX_3D_U32_F32_RI;
+1591:   case NVPTX::TEX_3D_U32_F32_IR:
+1592:     return NVPTX::TEX_3D_U32_F32_II;
+1593:   case NVPTX::TEX_3D_U32_F32_LEVEL_RR:
+1594:     return NVPTX::TEX_3D_U32_F32_LEVEL_RI;
+1595:   case NVPTX::TEX_3D_U32_F32_LEVEL_IR:
+1596:     return NVPTX::TEX_3D_U32_F32_LEVEL_II;
+1597:   case NVPTX::TEX_3D_U32_F32_GRAD_RR:
+1598:     return NVPTX::TEX_3D_U32_F32_GRAD_RI;
+1599:   case NVPTX::TEX_3D_U32_F32_GRAD_IR:
+1600:     return NVPTX::TEX_3D_U32_F32_GRAD_II;
+1601:   case NVPTX::TEX_CUBE_F32_F32_RR:
+1602:     return NVPTX::TEX_CUBE_F32_F32_RI;
+1603:   case NVPTX::TEX_CUBE_F32_F32_IR:
+1604:     return NVPTX::TEX_CUBE_F32_F32_II;
+1605:   case NVPTX::TEX_CUBE_F32_F32_LEVEL_RR:
+1606:     return NVPTX::TEX_CUBE_F32_F32_LEVEL_RI;
+1607:   case NVPTX::TEX_CUBE_F32_F32_LEVEL_IR:
+1608:     return NVPTX::TEX_CUBE_F32_F32_LEVEL_II;
+1609:   case NVPTX::TEX_CUBE_S32_F32_RR:
+1610:     return NVPTX::TEX_CUBE_S32_F32_RI;
+1611:   case NVPTX::TEX_CUBE_S32_F32_IR:
+1612:     return NVPTX::TEX_CUBE_S32_F32_II;
+1613:   case NVPTX::TEX_CUBE_S32_F32_LEVEL_RR:
+1614:     return NVPTX::TEX_CUBE_S32_F32_LEVEL_RI;
+1615:   case NVPTX::TEX_CUBE_S32_F32_LEVEL_IR:
+1616:     return NVPTX::TEX_CUBE_S32_F32_LEVEL_II;
+1617:   case NVPTX::TEX_CUBE_U32_F32_RR:
+1618:     return NVPTX::TEX_CUBE_U32_F32_RI;
+1619:   case NVPTX::TEX_CUBE_U32_F32_IR:
+1620:     return NVPTX::TEX_CUBE_U32_F32_II;
+```
+- EN: This range implements operational logic in helpers such as backend logic, translating backend policy into executable code.
+- CN: 这一段实现了 后端逻辑 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1621-1710
+```cpp
+1621:   case NVPTX::TEX_CUBE_U32_F32_LEVEL_RR:
+1622:     return NVPTX::TEX_CUBE_U32_F32_LEVEL_RI;
+1623:   case NVPTX::TEX_CUBE_U32_F32_LEVEL_IR:
+1624:     return NVPTX::TEX_CUBE_U32_F32_LEVEL_II;
+1625:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_RR:
+1626:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_RI;
+1627:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_IR:
+1628:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_II;
+1629:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_RR:
+1630:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_RI;
+1631:   case NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_IR:
+1632:     return NVPTX::TEX_CUBE_ARRAY_F32_F32_LEVEL_II;
+1633:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_RR:
+1634:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_RI;
+1635:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_IR:
+1636:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_II;
+1637:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_RR:
+1638:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_RI;
+1639:   case NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_IR:
+1640:     return NVPTX::TEX_CUBE_ARRAY_S32_F32_LEVEL_II;
+1641:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_RR:
+1642:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_RI;
+1643:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_IR:
+1644:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_II;
+1645:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_RR:
+1646:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_RI;
+1647:   case NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_IR:
+1648:     return NVPTX::TEX_CUBE_ARRAY_U32_F32_LEVEL_II;
+1649:   case NVPTX::TLD4_R_2D_F32_F32_RR:
+1650:     return NVPTX::TLD4_R_2D_F32_F32_RI;
+1651:   case NVPTX::TLD4_R_2D_F32_F32_IR:
+1652:     return NVPTX::TLD4_R_2D_F32_F32_II;
+1653:   case NVPTX::TLD4_G_2D_F32_F32_RR:
+1654:     return NVPTX::TLD4_G_2D_F32_F32_RI;
+1655:   case NVPTX::TLD4_G_2D_F32_F32_IR:
+1656:     return NVPTX::TLD4_G_2D_F32_F32_II;
+1657:   case NVPTX::TLD4_B_2D_F32_F32_RR:
+1658:     return NVPTX::TLD4_B_2D_F32_F32_RI;
+1659:   case NVPTX::TLD4_B_2D_F32_F32_IR:
+1660:     return NVPTX::TLD4_B_2D_F32_F32_II;
+1661:   case NVPTX::TLD4_A_2D_F32_F32_RR:
+1662:     return NVPTX::TLD4_A_2D_F32_F32_RI;
+1663:   case NVPTX::TLD4_A_2D_F32_F32_IR:
+1664:     return NVPTX::TLD4_A_2D_F32_F32_II;
+1665:   case NVPTX::TLD4_R_2D_S32_F32_RR:
+1666:     return NVPTX::TLD4_R_2D_S32_F32_RI;
+1667:   case NVPTX::TLD4_R_2D_S32_F32_IR:
+1668:     return NVPTX::TLD4_R_2D_S32_F32_II;
+1669:   case NVPTX::TLD4_G_2D_S32_F32_RR:
+1670:     return NVPTX::TLD4_G_2D_S32_F32_RI;
+1671:   case NVPTX::TLD4_G_2D_S32_F32_IR:
+1672:     return NVPTX::TLD4_G_2D_S32_F32_II;
+1673:   case NVPTX::TLD4_B_2D_S32_F32_RR:
+1674:     return NVPTX::TLD4_B_2D_S32_F32_RI;
+1675:   case NVPTX::TLD4_B_2D_S32_F32_IR:
+1676:     return NVPTX::TLD4_B_2D_S32_F32_II;
+1677:   case NVPTX::TLD4_A_2D_S32_F32_RR:
+1678:     return NVPTX::TLD4_A_2D_S32_F32_RI;
+1679:   case NVPTX::TLD4_A_2D_S32_F32_IR:
+1680:     return NVPTX::TLD4_A_2D_S32_F32_II;
+1681:   case NVPTX::TLD4_R_2D_U32_F32_RR:
+1682:     return NVPTX::TLD4_R_2D_U32_F32_RI;
+1683:   case NVPTX::TLD4_R_2D_U32_F32_IR:
+1684:     return NVPTX::TLD4_R_2D_U32_F32_II;
+1685:   case NVPTX::TLD4_G_2D_U32_F32_RR:
+1686:     return NVPTX::TLD4_G_2D_U32_F32_RI;
+1687:   case NVPTX::TLD4_G_2D_U32_F32_IR:
+1688:     return NVPTX::TLD4_G_2D_U32_F32_II;
+1689:   case NVPTX::TLD4_B_2D_U32_F32_RR:
+1690:     return NVPTX::TLD4_B_2D_U32_F32_RI;
+1691:   case NVPTX::TLD4_B_2D_U32_F32_IR:
+1692:     return NVPTX::TLD4_B_2D_U32_F32_II;
+1693:   case NVPTX::TLD4_A_2D_U32_F32_RR:
+1694:     return NVPTX::TLD4_A_2D_U32_F32_RI;
+1695:   case NVPTX::TLD4_A_2D_U32_F32_IR:
+1696:     return NVPTX::TLD4_A_2D_U32_F32_II;
+1697:   default:
+1698:     llvm_unreachable("Unhandled TEX opcode");
+1699:   };
+1700: }
+1701:
+1702: static unsigned queryRegisterToIndexOpcode(unsigned RegOC) {
+1703:   switch (RegOC) {
+1704:   case NVPTX::TXQ_CHANNEL_ORDER_R:
+1705:     return NVPTX::TXQ_CHANNEL_ORDER_I;
+1706:   case NVPTX::TXQ_CHANNEL_DATA_TYPE_R:
+1707:     return NVPTX::TXQ_CHANNEL_DATA_TYPE_I;
+1708:   case NVPTX::TXQ_WIDTH_R:
+1709:     return NVPTX::TXQ_WIDTH_I;
+1710:   case NVPTX::TXQ_HEIGHT_R:
+```
+- EN: This range implements operational logic in helpers such as llvm_unreachable, queryRegisterToIndexOpcode, translating backend policy into executable code.
+- CN: 这一段实现了 llvm_unreachable、queryRegisterToIndexOpcode 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1711-1800
+```cpp
+1711:     return NVPTX::TXQ_HEIGHT_I;
+1712:   case NVPTX::TXQ_DEPTH_R:
+1713:     return NVPTX::TXQ_DEPTH_I;
+1714:   case NVPTX::TXQ_ARRAY_SIZE_R:
+1715:     return NVPTX::TXQ_ARRAY_SIZE_I;
+1716:   case NVPTX::TXQ_NUM_SAMPLES_R:
+1717:     return NVPTX::TXQ_NUM_SAMPLES_I;
+1718:   case NVPTX::TXQ_NUM_MIPMAP_LEVELS_R:
+1719:     return NVPTX::TXQ_NUM_MIPMAP_LEVELS_I;
+1720:   case NVPTX::SUQ_CHANNEL_ORDER_R:
+1721:     return NVPTX::SUQ_CHANNEL_ORDER_I;
+1722:   case NVPTX::SUQ_CHANNEL_DATA_TYPE_R:
+1723:     return NVPTX::SUQ_CHANNEL_DATA_TYPE_I;
+1724:   case NVPTX::SUQ_WIDTH_R:
+1725:     return NVPTX::SUQ_WIDTH_I;
+1726:   case NVPTX::SUQ_HEIGHT_R:
+1727:     return NVPTX::SUQ_HEIGHT_I;
+1728:   case NVPTX::SUQ_DEPTH_R:
+1729:     return NVPTX::SUQ_DEPTH_I;
+1730:   case NVPTX::SUQ_ARRAY_SIZE_R:
+1731:     return NVPTX::SUQ_ARRAY_SIZE_I;
+1732:   default:
+1733:     llvm_unreachable("Unhandled TXQ/SUQ opcode");
+1734:   };
+1735: }
+1736:
+1737: bool NVPTXReplaceImageHandles::processInstr(MachineInstr &MI) {
+1738:   MachineFunction &MF = *MI.getParent()->getParent();
+1739:   const MCInstrDesc &MCID = MI.getDesc();
+1740:   const NVPTXInstrInfo *TII = MF.getSubtarget<NVPTXSubtarget>().getInstrInfo();
+1741:
+1742:   if (MCID.TSFlags & NVPTXII::IsTexFlag) {
+1743:     // This is a texture fetch, so operand 4 is a texref and operand 5 is
+1744:     // a samplerref
+1745:     MachineOperand &TexHandle = MI.getOperand(4);
+1746:     if (replaceImageHandle(TexHandle, MF))
+1747:       MI.setDesc(TII->get(texRegisterToIndexOpcode(MI.getOpcode())));
+1748:
+1749:     if (!(MCID.TSFlags & NVPTXII::IsTexModeUnifiedFlag)) {
+1750:       MachineOperand &SampHandle = MI.getOperand(5);
+1751:       if (replaceImageHandle(SampHandle, MF))
+1752:         MI.setDesc(TII->get(samplerRegisterToIndexOpcode(MI.getOpcode())));
+1753:     }
+1754:
+1755:     return true;
+1756:   }
+1757:   if (MCID.TSFlags & NVPTXII::IsSuldMask) {
+1758:     unsigned VecSize =
+1759:         1 << (((MCID.TSFlags & NVPTXII::IsSuldMask) >> NVPTXII::IsSuldShift) -
+1760:               1);
+1761:
+1762:     // For a surface load of vector size N, the Nth operand will be the surfref
+1763:     MachineOperand &SurfHandle = MI.getOperand(VecSize);
+1764:
+1765:     if (replaceImageHandle(SurfHandle, MF))
+1766:       MI.setDesc(TII->get(suldRegisterToIndexOpcode(MI.getOpcode())));
+1767:
+1768:     return true;
+1769:   }
+1770:   if (MCID.TSFlags & NVPTXII::IsSustFlag) {
+1771:     // This is a surface store, so operand 0 is a surfref
+1772:     MachineOperand &SurfHandle = MI.getOperand(0);
+1773:
+1774:     if (replaceImageHandle(SurfHandle, MF))
+1775:       MI.setDesc(TII->get(sustRegisterToIndexOpcode(MI.getOpcode())));
+1776:
+1777:     return true;
+1778:   }
+1779:   if (MCID.TSFlags & NVPTXII::IsSurfTexQueryFlag) {
+1780:     // This is a query, so operand 1 is a surfref/texref
+1781:     MachineOperand &Handle = MI.getOperand(1);
+1782:
+1783:     if (replaceImageHandle(Handle, MF))
+1784:       MI.setDesc(TII->get(queryRegisterToIndexOpcode(MI.getOpcode())));
+1785:
+1786:     return true;
+1787:   }
+1788:
+1789:   return false;
+1790: }
+1791:
+1792: bool NVPTXReplaceImageHandles::replaceImageHandle(MachineOperand &Op,
+1793:                                                   MachineFunction &MF) {
+1794:   const MachineRegisterInfo &MRI = MF.getRegInfo();
+1795:   NVPTXMachineFunctionInfo *MFI = MF.getInfo<NVPTXMachineFunctionInfo>();
+1796:
+1797:   assert(Op.isReg() && "Handle is not in a reg?");
+1798:
+1799:   // Which instruction defines the handle?
+1800:   MachineInstr &TexHandleDef = *MRI.getVRegDef(Op.getReg());
+```
+- EN: This range implements operational logic in helpers such as llvm_unreachable, NVPTXReplaceImageHandles::processInstr, getParent, getDesc, translating backend policy into executable code.
+- CN: 这一段实现了 llvm_unreachable、NVPTXReplaceImageHandles::processInstr、getParent、getDesc 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+### Lines 1801-1841
+```cpp
+1801:
+1802:   switch (TexHandleDef.getOpcode()) {
+1803:   case NVPTX::LD_i64: {
+1804:     // The handle is a parameter value being loaded, replace with the
+1805:     // parameter symbol
+1806:     const auto &TM = static_cast<const NVPTXTargetMachine &>(MF.getTarget());
+1807:     if (TM.getDrvInterface() == NVPTX::CUDA)
+1808:       // For CUDA, we preserve the param loads coming from function arguments
+1809:       return false;
+1810:
+1811:     assert(TexHandleDef.getOperand(7).isSymbol() && "Load is not a symbol!");
+1812:     StringRef Sym = TexHandleDef.getOperand(7).getSymbolName();
+1813:     InstrsToRemove.insert(&TexHandleDef);
+1814:     Op.ChangeToES(Sym.data());
+1815:     MFI->getImageHandleSymbolIndex(Sym);
+1816:     return true;
+1817:   }
+1818:   case NVPTX::texsurf_handles: {
+1819:     // The handle is a global variable, replace with the global variable name
+1820:     assert(TexHandleDef.getOperand(1).isGlobal() && "Load is not a global!");
+1821:     const GlobalValue *GV = TexHandleDef.getOperand(1).getGlobal();
+1822:     assert(GV->hasName() && "Global sampler must be named!");
+1823:     InstrsToRemove.insert(&TexHandleDef);
+1824:     Op.ChangeToGA(GV, 0);
+1825:     return true;
+1826:   }
+1827:   case NVPTX::nvvm_move_i64:
+1828:   case TargetOpcode::COPY: {
+1829:     bool Res = replaceImageHandle(TexHandleDef.getOperand(1), MF);
+1830:     if (Res)
+1831:       InstrsToRemove.insert(&TexHandleDef);
+1832:     return Res;
+1833:   }
+1834:   default:
+1835:     llvm_unreachable("Unknown instruction operating on handle");
+1836:   }
+1837: }
+1838:
+1839: MachineFunctionPass *llvm::createNVPTXReplaceImageHandlesPass() {
+1840:   return new NVPTXReplaceImageHandles();
+1841: }
+```
+- EN: This range implements operational logic in helpers such as getTarget, assert, getOperand, insert, translating backend policy into executable code.
+- CN: 这一段实现了 getTarget、assert、getOperand、insert 等操作逻辑，把后端策略落实为可执行的代码路径。
+
+## Key Concepts / 关键概念
+
+- EN: NVPTX backend code reflects GPU execution concerns such as address spaces, intrinsics, and PTX-specific lowering.
+  - CN: NVPTX 后端代码体现了 GPU 执行特性，例如地址空间、内建函数以及 PTX 特定降级。
+- EN: Key symbols in this file include NVPTXReplaceImageHandles, runOnMachineFunction, getPassName, processInstr, replaceImageHandle, which anchor the file's main abstractions.
+  - CN: 该文件中的关键符号包括 NVPTXReplaceImageHandles, runOnMachineFunction, getPassName, processInstr, replaceImageHandle，它们构成了本文件的核心抽象。
+
+## Dependencies / 依赖关系
+
+- Local backend headers / 本地后端头文件:
+  - `MCTargetDesc/NVPTXBaseInfo.h`
+  - `NVPTX.h`
+  - `NVPTXMachineFunctionInfo.h`
+  - `NVPTXSubtarget.h`
+  - `NVPTXTargetMachine.h`
+- LLVM infrastructure / LLVM 基础设施:
+  - `llvm/ADT/DenseSet.h`
+  - `llvm/CodeGen/MachineFunction.h`
+  - `llvm/CodeGen/MachineFunctionPass.h`
+  - `llvm/CodeGen/MachineRegisterInfo.h`

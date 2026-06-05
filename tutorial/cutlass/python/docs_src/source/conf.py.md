@@ -1,0 +1,150 @@
+# conf.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/docs_src/source/conf.py`
+
+## Purpose / 作用
+- EN: Provides support code for `docs_src.source.conf`.
+- CN: 为 `docs_src.source.conf` 提供支撑代码。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `# Configuration file for the Sphinx documentation builder.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L34** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L35** `# For the full list of built-in configuration values, see the documentation:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L36** `# https://www.sphinx-doc.org/en/master/usage/configuration.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `# -- Path setup --------------------------------------------------------------` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `# If extensions (or modules to document with autodoc) are in another directory,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L41** `# add these directories to sys.path here. If the directory is relative to the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L42** `# documentation root, use os.path.abspath to make it absolute, like shown here.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L43** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L44** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L45** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `sys.path.insert(0, os.path.abspath('..'))` — **EN:** Invokes `sys.path.insert` as a standalone call. **CN:** 以独立语句方式调用 `sys.path.insert`。
+- **L48** `sys.path.insert(0, os.path.abspath('../..'))` — **EN:** Invokes `sys.path.insert` as a standalone call. **CN:** 以独立语句方式调用 `sys.path.insert`。
+- **L49** `sys.path.insert(0, os.path.abspath('../../media/docs'))` — **EN:** Invokes `sys.path.insert` as a standalone call. **CN:** 以独立语句方式调用 `sys.path.insert`。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `# -- Project information -----------------------------------------------------` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L52** `# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `project = 'CUTLASS Python interface'` — **EN:** Assigns a value to project. **CN:** 将一个值赋给 project。
+- **L55** `copyright = '2023, NVIDIA'` — **EN:** Assigns a value to copyright. **CN:** 将一个值赋给 copyright。
+- **L56** `author = 'NVIDIA'` — **EN:** Assigns a value to author. **CN:** 将一个值赋给 author。
+- **L57** `release = '3.1.0'` — **EN:** Assigns a value to release. **CN:** 将一个值赋给 release。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `# -- General configuration ---------------------------------------------------` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `# Add any Sphinx extension module names here, as strings. They can be` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L65** `# ones.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L66** `extensions = [` — **EN:** Assigns a value to extensions. **CN:** 将一个值赋给 extensions。
+- **L67** `        'myst_parser',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `        'nbsphinx',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `        'nbsphinx_link', ` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `        'sphinx_copybutton',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `        'sphinx.ext.autodoc',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `        'sphinx.ext.autosectionlabel',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `        'sphinx.ext.autosummary',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `        'sphinx.ext.coverage',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `        'sphinx.ext.extlinks',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `        'sphinx.ext.ifconfig',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `        'sphinx.ext.intersphinx',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `        'sphinx.ext.mathjax',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        'sphinx.ext.napoleon',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `        'sphinx.ext.viewcode',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `        'sphinx_inline_tabs',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `source_suffix = {` — **EN:** Assigns a value to source_suffix. **CN:** 将一个值赋给 source_suffix。
+- **L85** `    '.rst': 'restructuredtext',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `    '.md': 'markdown',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `autodoc_typehints = 'description'` — **EN:** Assigns a value to autodoc_typehints. **CN:** 将一个值赋给 autodoc_typehints。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `pygments_style = "sphinx"` — **EN:** Assigns a value to pygments_style. **CN:** 将一个值赋给 pygments_style。
+- **L92** `pygments_dark_style = "monokai"` — **EN:** Assigns a value to pygments_dark_style. **CN:** 将一个值赋给 pygments_dark_style。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `templates_path = ['_templates']` — **EN:** Assigns a value to templates_path. **CN:** 将一个值赋给 templates_path。
+- **L95** `exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']` — **EN:** Assigns a value to exclude_patterns. **CN:** 将一个值赋给 exclude_patterns。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `# Ignore errors when converting notebooks` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L98** `nbsphinx_allow_errors = True` — **EN:** Assigns a value to nbsphinx_allow_errors. **CN:** 将一个值赋给 nbsphinx_allow_errors。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `language = 'en'` — **EN:** Assigns a value to language. **CN:** 将一个值赋给 language。
+- **L101** `# -- Options for HTML output -------------------------------------------------` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L102** `# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `html_static_path = ['_static']` — **EN:** Assigns a value to html_static_path. **CN:** 将一个值赋给 html_static_path。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `html_title = "CUTLASS Python"` — **EN:** Assigns a value to html_title. **CN:** 将一个值赋给 html_title。
+- **L107** `html_baseurl = 'docs'` — **EN:** Assigns a value to html_baseurl. **CN:** 将一个值赋给 html_baseurl。
+- **L108** `html_theme = 'furo'` — **EN:** Assigns a value to html_theme. **CN:** 将一个值赋给 html_theme。
+- **L109** `html_theme_options = {` — **EN:** Assigns a value to html_theme_options. **CN:** 将一个值赋给 html_theme_options。
+- **L110** `    "light_logo": "cutlass-logo-small.png",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `    "dark_logo": "cutlass-logo-small.png",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `    "light_css_variables": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        "color-brand-primary": "#76B900",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        "color-brand-content": "#76B900",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    "dark_css_variables": {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `        "color-brand-primary": "#76B900",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        "color-brand-content": "#76B900",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `    },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `    "footer_icons": [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `        {` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            "name": "GitHub",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `            "url": "https://github.com/NVIDIA/cutlass",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `            "html": """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `                <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `                    <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `                </svg>` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `            """,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `            "class": "",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `        },` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `    ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `docs_src.source.conf`. CN: 模块名为 `docs_src.source.conf`。
+- EN: The file is mostly composed of imports, constants, and execution-time helpers. CN: 该文件主要由导入、常量和运行时辅助逻辑组成。
+
+## Dependencies / 依赖
+- EN: External or standard-library dependencies: os, sys CN: 外部或标准库依赖：os, sys

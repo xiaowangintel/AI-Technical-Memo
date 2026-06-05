@@ -1,0 +1,203 @@
+# shape.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/shape.py`
+
+## Purpose / 作用
+- EN: Utilities for expressing shapes
+- CN: 该模块的文档字符串将其描述为：Utilities for expressing shapes
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utilities for expressing shapes` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_library import (` — **EN:** Imports ConvMode, ConvKind, LayoutType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 ConvMode, ConvKind, LayoutType。
+- **L38** `    ConvMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    ConvKind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    LayoutType` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `from cutlass_cppgen.backend.c_types import (` — **EN:** Imports Conv2DProblemSize_, GemmCoord_, GemmCoordBatched_ from `cutlass_cppgen.backend.c_types`. **CN:** 从 `cutlass_cppgen.backend.c_types` 导入 Conv2DProblemSize_, GemmCoord_, GemmCoordBatched_。
+- **L43** `    Conv2DProblemSize_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    GemmCoord_,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    GemmCoordBatched_` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `class MatrixCoord:` — **EN:** Defines class `MatrixCoord`. **CN:** 定义类 `MatrixCoord`。
+- **L50** `    def __init__(self, row, col):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L51** `        self._row = row` — **EN:** Assigns a value to self._row. **CN:** 将一个值赋给 self._row。
+- **L52** `        self._col = col` — **EN:** Assigns a value to self._col. **CN:** 将一个值赋给 self._col。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L55** `    def row(self):` — **EN:** Defines function `row`. **CN:** 定义函数 `row`。
+- **L56** `        return self._row` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L59** `    def column(self):` — **EN:** Defines function `column`. **CN:** 定义函数 `column`。
+- **L60** `        return self._col` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `    def leading_dimension(self, layout: LayoutType) -> int:` — **EN:** Defines function `leading_dimension`. **CN:** 定义函数 `leading_dimension`。
+- **L63** `        """` — **EN:** Starts the docstring for the function `leading_dimension`. **CN:** 开始说明 function `leading_dimension` 的文档字符串。
+- **L64** `        Returns the leading dimension for a matrix with layout \`\`layout\`\` and shape provided by the MatrixCoord.` — **EN:** Continues the docstring for the function `leading_dimension`. **CN:** 继续说明 function `leading_dimension` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `        :param layout: layout of matrix` — **EN:** Continues the docstring for the function `leading_dimension`. **CN:** 继续说明 function `leading_dimension` 的文档字符串。
+- **L67** `        :type layout: cutlass_library.LayoutType` — **EN:** Continues the docstring for the function `leading_dimension`. **CN:** 继续说明 function `leading_dimension` 的文档字符串。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `        :returns: leading dimension` — **EN:** Continues the docstring for the function `leading_dimension`. **CN:** 继续说明 function `leading_dimension` 的文档字符串。
+- **L70** `        :rtype: int` — **EN:** Continues the docstring for the function `leading_dimension`. **CN:** 继续说明 function `leading_dimension` 的文档字符串。
+- **L71** `        """` — **EN:** Ends the docstring for the function `leading_dimension`. **CN:** 结束说明 function `leading_dimension` 的文档字符串。
+- **L72** `        if layout == LayoutType.RowMajor:` — **EN:** Starts a conditional branch guarded by `layout == LayoutType.RowMajor`. **CN:** 开始一个由 `layout == LayoutType.RowMajor` 控制的条件分支。
+- **L73** `            return self._col` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L74** `        elif layout == LayoutType.ColumnMajor:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L75** `            return self._row` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L76** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L77** `            raise Exception(f'Unsupported layout for leading dimension calculation: {layout}')` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `class GemmCoord:` — **EN:** Defines class `GemmCoord`. **CN:** 定义类 `GemmCoord`。
+- **L81** `    def __init__(self, m: int, n: int, k: int):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L82** `        self._m = m` — **EN:** Assigns a value to self._m. **CN:** 将一个值赋给 self._m。
+- **L83** `        self._n = n` — **EN:** Assigns a value to self._n. **CN:** 将一个值赋给 self._n。
+- **L84** `        self._k = k` — **EN:** Assigns a value to self._k. **CN:** 将一个值赋给 self._k。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L87** `    def m(self) -> int:` — **EN:** Defines function `m`. **CN:** 定义函数 `m`。
+- **L88** `        return self._m` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L91** `    def n(self) -> int:` — **EN:** Defines function `n`. **CN:** 定义函数 `n`。
+- **L92** `        return self._n` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L95** `    def k(self) -> int:` — **EN:** Defines function `k`. **CN:** 定义函数 `k`。
+- **L96** `        return self._k` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L99** `    def mk(self) -> MatrixCoord:` — **EN:** Defines function `mk`. **CN:** 定义函数 `mk`。
+- **L100** `        return MatrixCoord(self._m, self._k)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L103** `    def mn(self) -> MatrixCoord:` — **EN:** Defines function `mn`. **CN:** 定义函数 `mn`。
+- **L104** `        return MatrixCoord(self._m, self._n)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L107** `    def kn(self) -> MatrixCoord:` — **EN:** Defines function `kn`. **CN:** 定义函数 `kn`。
+- **L108** `        return MatrixCoord(self._k, self._n)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L111** `    def ctype(self) -> GemmCoord_:` — **EN:** Defines function `ctype`. **CN:** 定义函数 `ctype`。
+- **L112** `        return GemmCoord_(self._m, self._n, self._k)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    def batched_ctype(self, batch_count: int) -> GemmCoordBatched_:` — **EN:** Defines function `batched_ctype`. **CN:** 定义函数 `batched_ctype`。
+- **L115** `        return GemmCoordBatched_(self._m, self._n, self._k, batch_count)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `class Conv2DProblemSize:` — **EN:** Defines class `Conv2DProblemSize`. **CN:** 定义类 `Conv2DProblemSize`。
+- **L119** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L120** `        self, n: int, h: int, w: int, c: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `        k: int, r: int, s: int, c_: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L122** `        pad_h: int, pad_w: int, stride_h: int, stride_w: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L123** `        dilation_h: int, dilation_w: int, mode: ConvMode=ConvMode.CrossCorrelation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L124** `        split_k_slices: int=1, groups: int=1):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `        self.N = n` — **EN:** Assigns a value to self.N. **CN:** 将一个值赋给 self.N。
+- **L127** `        self.H = h` — **EN:** Assigns a value to self.H. **CN:** 将一个值赋给 self.H。
+- **L128** `        self.W = w` — **EN:** Assigns a value to self.W. **CN:** 将一个值赋给 self.W。
+- **L129** `        self.C = c` — **EN:** Assigns a value to self.C. **CN:** 将一个值赋给 self.C。
+- **L130** `        self.K = k` — **EN:** Assigns a value to self.K. **CN:** 将一个值赋给 self.K。
+- **L131** `        self.R = r` — **EN:** Assigns a value to self.R. **CN:** 将一个值赋给 self.R。
+- **L132** `        self.S = s` — **EN:** Assigns a value to self.S. **CN:** 将一个值赋给 self.S。
+- **L133** `        self.pad_h = pad_h` — **EN:** Assigns a value to self.pad_h. **CN:** 将一个值赋给 self.pad_h。
+- **L134** `        self.pad_w = pad_w` — **EN:** Assigns a value to self.pad_w. **CN:** 将一个值赋给 self.pad_w。
+- **L135** `        self.stride_h = stride_h` — **EN:** Assigns a value to self.stride_h. **CN:** 将一个值赋给 self.stride_h。
+- **L136** `        self.stride_w = stride_w` — **EN:** Assigns a value to self.stride_w. **CN:** 将一个值赋给 self.stride_w。
+- **L137** `        self.dilation_h = dilation_h` — **EN:** Assigns a value to self.dilation_h. **CN:** 将一个值赋给 self.dilation_h。
+- **L138** `        self.dilation_w = dilation_w` — **EN:** Assigns a value to self.dilation_w. **CN:** 将一个值赋给 self.dilation_w。
+- **L139** `        self.mode = int(mode)` — **EN:** Assigns a value to self.mode. **CN:** 将一个值赋给 self.mode。
+- **L140** `        self.split_k_slices = split_k_slices` — **EN:** Assigns a value to self.split_k_slices. **CN:** 将一个值赋给 self.split_k_slices。
+- **L141** `        self.groups = groups` — **EN:** Assigns a value to self.groups. **CN:** 将一个值赋给 self.groups。
+- **L142** `        self.P = ((h + pad_h * 2 - r * dilation_h) // stride_h) + 1` — **EN:** Assigns a value to self.P. **CN:** 将一个值赋给 self.P。
+- **L143** `        self.Q = ((w + pad_w * 2 - s * dilation_w) // stride_w) + 1` — **EN:** Assigns a value to self.Q. **CN:** 将一个值赋给 self.Q。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L146** `    def ctype(self) -> Conv2DProblemSize_:` — **EN:** Defines function `ctype`. **CN:** 定义函数 `ctype`。
+- **L147** `        return Conv2DProblemSize_(self)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `    def implicit_gemm_size(self, kind: ConvKind):` — **EN:** Defines function `implicit_gemm_size`. **CN:** 定义函数 `implicit_gemm_size`。
+- **L150** `        if kind == ConvKind.Fprop:` — **EN:** Starts a conditional branch guarded by `kind == ConvKind.Fprop`. **CN:** 开始一个由 `kind == ConvKind.Fprop` 控制的条件分支。
+- **L151** `            return GemmCoord(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L152** `                self.N * self.P * self.Q,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `                self.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `                self.R * self.S * self.C // self.groups` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `        elif kind == ConvKind.Dgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L157** `            return GemmCoord(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L158** `                self.N * self.H * self.W,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `                self.C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `                self.R * self.S * self.K` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `        elif kind == ConvKind.Wgrad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L163** `            return GemmCoord(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L164** `                self.K,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `                self.R * self.S * self.C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `                self.N * self.P * self.Q` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L170** `    def from_sizes(input_size, weight_size):` — **EN:** Defines function `from_sizes`. **CN:** 定义函数 `from_sizes`。
+- **L171** `        K, R, S, _ = weight_size` — **EN:** Assigns a value to (K, R, S, _). **CN:** 将一个值赋给 (K, R, S, _)。
+- **L172** `        pad_h = R // 2` — **EN:** Assigns a value to pad_h. **CN:** 将一个值赋给 pad_h。
+- **L173** `        pad_w = S // 2` — **EN:** Assigns a value to pad_w. **CN:** 将一个值赋给 pad_w。
+- **L174** `        stride_h = 1` — **EN:** Assigns a value to stride_h. **CN:** 将一个值赋给 stride_h。
+- **L175** `        stride_w = 1` — **EN:** Assigns a value to stride_w. **CN:** 将一个值赋给 stride_w。
+- **L176** `        dilation_h = 1` — **EN:** Assigns a value to dilation_h. **CN:** 将一个值赋给 dilation_h。
+- **L177** `        dilation_w = 1` — **EN:** Assigns a value to dilation_w. **CN:** 将一个值赋给 dilation_w。
+- **L178** `        return Conv2DProblemSize(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L179** `            *input_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `            *weight_size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `            pad_h, pad_w,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `            stride_h, stride_w,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `            dilation_h, dilation_w` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.shape`. CN: 模块名为 `cutlass_cppgen.shape`。
+- EN: Module docstring summary: Utilities for expressing shapes CN: 模块文档摘要为：Utilities for expressing shapes
+- EN: Top-level classes: MatrixCoord, GemmCoord, Conv2DProblemSize CN: 顶层类包括：MatrixCoord, GemmCoord, Conv2DProblemSize
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:ConvMode,ConvKind,LayoutType, cutlass_cppgen.backend.c_types:Conv2DProblemSize_,GemmCoord_,GemmCoordBatched_ CN: 内部依赖：cutlass_library:ConvMode,ConvKind,LayoutType, cutlass_cppgen.backend.c_types:Conv2DProblemSize_,GemmCoord_,GemmCoordBatched_

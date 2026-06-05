@@ -1,0 +1,209 @@
+# test_for_control_flow.py — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/examples/CuTeDSL/test_for_control_flow.py`
+**Purpose / 用途**: This file defines automated tests for test for control flow. / 该文件定义了针对 test for control flow 的自动化测试。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1 / 第1行**
+  - Code / 代码: `# Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: Records copyright ownership for the file.
+  - CN: 记录该文件的版权归属。
+- **Line 2 / 第2行**
+  - Code / 代码: `# SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier.
+  - CN: 记录 SPDX 许可证标识符。
+- **Line 3 / 第3行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 4 / 第4行**
+  - Code / 代码: `import torch`
+  - EN: Imports `torch` so its symbols are available to the test module.
+  - CN: 导入 `torch`，使其符号可供该测试模块使用。
+- **Line 5 / 第5行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 6 / 第6行**
+  - Code / 代码: `import cutlass`
+  - EN: Imports `cutlass` so its symbols are available to the test module.
+  - CN: 导入 `cutlass`，使其符号可供该测试模块使用。
+- **Line 7 / 第7行**
+  - Code / 代码: `import cutlass.cute as cute`
+  - EN: Imports `cutlass.cute` so its symbols are available to the test module.
+  - CN: 导入 `cutlass.cute`，使其符号可供该测试模块使用。
+- **Line 8 / 第8行**
+  - Code / 代码: `from cutlass.cute.runtime import from_dlpack`
+  - EN: Imports selected symbols from `cutlass.cute.runtime` for later use.
+  - CN: 从 `cutlass.cute.runtime` 导入选定符号以供后续使用。
+- **Line 9 / 第9行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 10 / 第10行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 11 / 第11行**
+  - Code / 代码: `@cute.kernel`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 12 / 第12行**
+  - Code / 代码: `def _for_loop_carried_reused_target_kernel(out: cute.Tensor, n: cutlass.Int32):`
+  - EN: Defines function `_for_loop_carried_reused_target_kernel`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_for_loop_carried_reused_target_kernel`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 13 / 第13行**
+  - Code / 代码: `    acc = cutlass.Int32(0)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 14 / 第14行**
+  - Code / 代码: `    i = cutlass.Int32(-1)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 15 / 第15行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 16 / 第16行**
+  - Code / 代码: `    for i in cutlass.range(0, n):`
+  - EN: Starts a loop that iterates over cases, values, or objects.
+  - CN: 开始一个循环，用于遍历用例、数值或对象。
+- **Line 17 / 第17行**
+  - Code / 代码: `        acc = cutlass.Int32(1)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 18 / 第18行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 19 / 第19行**
+  - Code / 代码: `    out[0] = acc`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 20 / 第20行**
+  - Code / 代码: `    out[1] = i`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 21 / 第21行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 22 / 第22行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 23 / 第23行**
+  - Code / 代码: `@cute.jit`
+  - EN: Applies a decorator that marks, parametrizes, or otherwise configures the next Python object.
+  - CN: 应用装饰器，用于标记、参数化或以其他方式配置下一个 Python 对象。
+- **Line 24 / 第24行**
+  - Code / 代码: `def _for_loop_carried_reused_target_host(out: cute.Tensor, n: cutlass.Int32):`
+  - EN: Defines function `_for_loop_carried_reused_target_host`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `_for_loop_carried_reused_target_host`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 25 / 第25行**
+  - Code / 代码: `    _for_loop_carried_reused_target_kernel(out, n).launch(`
+  - EN: Continues the Python implementation for this test module.
+  - CN: 继续实现该测试模块中的 Python 逻辑。
+- **Line 26 / 第26行**
+  - Code / 代码: `        grid=[1, 1, 1],`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 27 / 第27行**
+  - Code / 代码: `        block=[1, 1, 1],`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 28 / 第28行**
+  - Code / 代码: `    )`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 29 / 第29行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 30 / 第30行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 31 / 第31行**
+  - Code / 代码: `def test_for_loop_carried_var_with_reused_loop_target():`
+  - EN: Defines function `test_for_loop_carried_var_with_reused_loop_target`, which encapsulates one reusable test step or test case.
+  - CN: 定义函数 `test_for_loop_carried_var_with_reused_loop_target`，用于封装一个可复用的测试步骤或测试用例。
+- **Line 32 / 第32行**
+  - Code / 代码: `    n = 5`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 33 / 第33行**
+  - Code / 代码: `    out = torch.zeros(2, device="cuda", dtype=torch.int32)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 34 / 第34行**
+  - Code / 代码: `    out_cute = from_dlpack(out).mark_layout_dynamic()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 35 / 第35行**
+  - Code / 代码: `    n_cute = cutlass.Int32(n)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 36 / 第36行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 37 / 第37行**
+  - Code / 代码: `    compiled = cute.compile(_for_loop_carried_reused_target_host, out_cute, n_cute)`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 38 / 第38行**
+  - Code / 代码: `    compiled(out_cute, n_cute)`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 39 / 第39行**
+  - Code / 代码: `    torch.cuda.synchronize()`
+  - EN: Invokes a helper, library API, or test utility.
+  - CN: 调用一个辅助函数、库 API 或测试工具。
+- **Line 40 / 第40行**
+  - Code / 代码: `<blank>`
+  - EN: Leaves a blank line to separate logical sections.
+  - CN: 保留空行以分隔逻辑片段。
+- **Line 41 / 第41行**
+  - Code / 代码: `    actual = out.cpu().tolist()`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 42 / 第42行**
+  - Code / 代码: `    expected = [1, n - 1]`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 43 / 第43行**
+  - Code / 代码: `    print(f"for loop carried reused target actual={actual}, expected={expected}")`
+  - EN: Assigns a variable or attribute needed by later test logic.
+  - CN: 为后续测试逻辑赋值变量或属性。
+- **Line 44 / 第44行**
+  - Code / 代码: `    assert actual == expected`
+  - EN: Performs a correctness check or test assertion.
+  - CN: 执行正确性检查或测试断言。
+
+## Key Concepts / 关键概念
+
+- **EN**: Exercises CUTLASS APIs, types, or generated kernels.
+  **CN**: 测试 CUTLASS 的 API、类型或生成的内核。
+- **EN**: Uses PyTorch tensors or reference math for validation.
+  **CN**: 使用 PyTorch 张量或参考计算来做验证。
+- **EN**: Relates to CuTeDSL-based examples or testing utilities.
+  **CN**: 与基于 CuTeDSL 的示例或测试工具有关。
+
+## Dependencies / 依赖项
+
+- `torch`
+  - EN: Provides tensor creation, GPU execution, and reference math helpers.
+  - CN: 提供张量创建、GPU 执行与参考数学辅助功能。
+- `cutlass`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `cutlass.cute`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。
+- `cutlass.cute.runtime`
+  - EN: Provides CUTLASS Python bindings or DSL-facing APIs exercised by the file.
+  - CN: 提供该文件所测试的 CUTLASS Python 绑定或 DSL 接口。

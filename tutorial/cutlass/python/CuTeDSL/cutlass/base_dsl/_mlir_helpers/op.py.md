@@ -1,0 +1,178 @@
+# op.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/_mlir_helpers/op.py`
+
+## Purpose / 作用
+- EN: This module provides MLIR's OP helper functions
+- CN: 该模块的文档字符串将其描述为：This module provides MLIR's OP helper functions
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides MLIR's OP helper functions` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L17** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L18** `import types` — **EN:** Imports types for later use. **CN:** 导入 types 供后续使用。
+- **L19** `from functools import wraps` — **EN:** Imports wraps from `functools`. **CN:** 从 `functools` 导入 wraps。
+- **L20** `from typing import Any, Callable` — **EN:** Imports Any, Callable from `typing`. **CN:** 从 `typing` 导入 Any, Callable。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `from ..._mlir import ir` — **EN:** Imports ir from `..._mlir`. **CN:** 从 `..._mlir` 导入 ir。
+- **L23** `from ..common import DSLRuntimeError, DSLOperationBuildError` — **EN:** Imports DSLRuntimeError, DSLOperationBuildError from `..common`. **CN:** 从 `..common` 导入 DSLRuntimeError, DSLOperationBuildError。
+- **L24** `from ..utils.stacktrace import walk_to_top_module` — **EN:** Imports walk_to_top_module from `..utils.stacktrace`. **CN:** 从 `..utils.stacktrace` 导入 walk_to_top_module。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `# The DSL package root is empty by default.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `_DSL_PACKAGE_ROOT: str | None = ""` — **EN:** Assigns a typed value to _DSL_PACKAGE_ROOT. **CN:** 为 _DSL_PACKAGE_ROOT 赋予带类型标注的值。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `# Whether location tracking is enabled.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `_ENABLE_FRAME_FILTERING: bool = False` — **EN:** Assigns a typed value to _ENABLE_FRAME_FILTERING. **CN:** 为 _ENABLE_FRAME_FILTERING 赋予带类型标注的值。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `def _set_enable_frame_filtering(enable: bool) -> None:` — **EN:** Defines function `_set_enable_frame_filtering`. **CN:** 定义函数 `_set_enable_frame_filtering`。
+- **L34** `    """Set whether location tracking is enabled."""` — **EN:** Docstring line documenting the function `_set_enable_frame_filtering`. **CN:** 文档字符串行，用于说明 function `_set_enable_frame_filtering`。
+- **L35** `    global _ENABLE_FRAME_FILTERING` — **EN:** Declares _ENABLE_FRAME_FILTERING as module-level globals. **CN:** 将 _ENABLE_FRAME_FILTERING 声明为模块级全局变量。
+- **L36** `    _ENABLE_FRAME_FILTERING = enable` — **EN:** Assigns a value to _ENABLE_FRAME_FILTERING. **CN:** 将一个值赋给 _ENABLE_FRAME_FILTERING。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `def _is_framework_frame(filename: str) -> bool:` — **EN:** Defines function `_is_framework_frame`. **CN:** 定义函数 `_is_framework_frame`。
+- **L40** `    """Check if a frame's filename belongs to DSL library code."""` — **EN:** Docstring line documenting the function `_is_framework_frame`. **CN:** 文档字符串行，用于说明 function `_is_framework_frame`。
+- **L41** `    global _DSL_PACKAGE_ROOT` — **EN:** Declares _DSL_PACKAGE_ROOT as module-level globals. **CN:** 将 _DSL_PACKAGE_ROOT 声明为模块级全局变量。
+- **L42** `    if _DSL_PACKAGE_ROOT == "":` — **EN:** Starts a conditional branch guarded by `_DSL_PACKAGE_ROOT == ''`. **CN:** 开始一个由 `_DSL_PACKAGE_ROOT == ''` 控制的条件分支。
+- **L43** `        # Compute the DSL package root once` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L44** `        # Any frame whose file starts with this prefix is considered DSL library code.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L45** `        _DSL_PACKAGE_ROOT = walk_to_top_module(` — **EN:** Assigns a value to _DSL_PACKAGE_ROOT. **CN:** 将一个值赋给 _DSL_PACKAGE_ROOT。
+- **L46** `            os.path.dirname(os.path.abspath(__file__))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `    if _DSL_PACKAGE_ROOT is None:` — **EN:** Starts a conditional branch guarded by `_DSL_PACKAGE_ROOT is None`. **CN:** 开始一个由 `_DSL_PACKAGE_ROOT is None` 控制的条件分支。
+- **L50** `        return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `    return os.path.abspath(filename).startswith(_DSL_PACKAGE_ROOT)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `def _find_user_frame(start_frame: types.FrameType | None) -> types.FrameType | None:` — **EN:** Defines function `_find_user_frame`. **CN:** 定义函数 `_find_user_frame`。
+- **L56** `    """Walk up the call stack from start_frame to find the first user (non-library) frame.` — **EN:** Starts the docstring for the function `_find_user_frame`. **CN:** 开始说明 function `_find_user_frame` 的文档字符串。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `    Returns the first frame whose file is not under the DSL package root.` — **EN:** Continues the docstring for the function `_find_user_frame`. **CN:** 继续说明 function `_find_user_frame` 的文档字符串。
+- **L59** `    Falls back to start_frame if no user frame is found (e.g. all frames are library code).` — **EN:** Continues the docstring for the function `_find_user_frame`. **CN:** 继续说明 function `_find_user_frame` 的文档字符串。
+- **L60** `    """` — **EN:** Ends the docstring for the function `_find_user_frame`. **CN:** 结束说明 function `_find_user_frame` 的文档字符串。
+- **L61** `    frame = start_frame` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L62** `    while frame is not None:` — **EN:** Starts a while-loop guarded by `frame is not None`. **CN:** 开始一个由 `frame is not None` 控制的 while 循环。
+- **L63** `        if not _is_framework_frame(frame.f_code.co_filename):` — **EN:** Starts a conditional branch guarded by `not _is_framework_frame(frame.f_code.co_filename)`. **CN:** 开始一个由 `not _is_framework_frame(frame.f_code.co_filename)` 控制的条件分支。
+- **L64** `            return frame` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L65** `        frame = frame.f_back` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L66** `    # Fallback: if everything is framework code, use the original caller` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `    return start_frame` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `def dsl_user_op(opFunc: Callable[..., Any]) -> Callable[..., Any]:` — **EN:** Defines function `dsl_user_op`. **CN:** 定义函数 `dsl_user_op`。
+- **L71** `    """` — **EN:** Starts the docstring for the function `dsl_user_op`. **CN:** 开始说明 function `dsl_user_op` 的文档字符串。
+- **L72** `    This is a decorator that needs to be used in each user-facing API to` — **EN:** Continues the docstring for the function `dsl_user_op`. **CN:** 继续说明 function `dsl_user_op` 的文档字符串。
+- **L73** `    manage source location for toolchain.` — **EN:** Continues the docstring for the function `dsl_user_op`. **CN:** 继续说明 function `dsl_user_op` 的文档字符串。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    :param opFunc: The user-facing API function.` — **EN:** Continues the docstring for the function `dsl_user_op`. **CN:** 继续说明 function `dsl_user_op` 的文档字符串。
+- **L76** `    :type opFunc: Callable` — **EN:** Continues the docstring for the function `dsl_user_op`. **CN:** 继续说明 function `dsl_user_op` 的文档字符串。
+- **L77** `    :return: The wrapped user-facing API function.` — **EN:** Continues the docstring for the function `dsl_user_op`. **CN:** 继续说明 function `dsl_user_op` 的文档字符串。
+- **L78** `    :rtype: Callable` — **EN:** Continues the docstring for the function `dsl_user_op`. **CN:** 继续说明 function `dsl_user_op` 的文档字符串。
+- **L79** `    """` — **EN:** Ends the docstring for the function `dsl_user_op`. **CN:** 结束说明 function `dsl_user_op` 的文档字符串。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `    @wraps(opFunc)` — **EN:** Applies decorator `wraps(opFunc)` to the following definition. **CN:** 将装饰器 `wraps(opFunc)` 应用于后面的定义。
+- **L82** `    def wrapper(*args: Any, **kwargs: Any) -> Any:` — **EN:** Defines function `wrapper`. **CN:** 定义函数 `wrapper`。
+- **L83** `        # Pop loc= from kwargs so callers that still pass it don't break.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L84** `        # We no longer forward it — LOC_TRACEBACKS captures full stacks automatically.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L85** `        loc: Any = kwargs.pop("loc", None)` — **EN:** Assigns a typed value to loc. **CN:** 为 loc 赋予带类型标注的值。
+- **L86** `        frameInfo = None` — **EN:** Assigns a value to frameInfo. **CN:** 将一个值赋给 frameInfo。
+- **L87** `        verifier_error = False` — **EN:** Assigns a value to verifier_error. **CN:** 将一个值赋给 verifier_error。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `        if loc is None and ir.Context.current is not None:` — **EN:** Starts a conditional branch guarded by `loc is None and ir.Context.current is not None`. **CN:** 开始一个由 `loc is None and ir.Context.current is not None` 控制的条件分支。
+- **L90** `            frame = _find_user_frame(inspect.currentframe().f_back)  # type: ignore[union-attr]` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L91** `            frameInfo = inspect.getframeinfo(frame)  # type: ignore[arg-type]` — **EN:** Assigns a value to frameInfo. **CN:** 将一个值赋给 frameInfo。
+- **L92** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L93** `                # In Python < 3.11, getframeinfo returns a NamedTuple without positions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L94** `                if not hasattr(frameInfo, "positions"):` — **EN:** Starts a conditional branch guarded by `not hasattr(frameInfo, 'positions')`. **CN:** 开始一个由 `not hasattr(frameInfo, 'positions')` 控制的条件分支。
+- **L95** `                    file_loc = ir.Location.file(` — **EN:** Assigns a value to file_loc. **CN:** 将一个值赋给 file_loc。
+- **L96** `                        frameInfo.filename,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `                        frameInfo.lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `                        0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L101** `                    file_loc = ir.Location.file(` — **EN:** Assigns a value to file_loc. **CN:** 将一个值赋给 file_loc。
+- **L102** `                        frameInfo.filename,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `                        frameInfo.positions.lineno,  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `                        frameInfo.positions.col_offset or 0,  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `                loc = ir.Location.name(` — **EN:** Assigns a value to loc. **CN:** 将一个值赋给 loc。
+- **L107** `                    (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `                        "".join([c.strip() for c in frameInfo.code_context])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `                        if frameInfo.code_context` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `                        else frameInfo.function` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `                    childLoc=file_loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `            except RuntimeError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L115** `                # No MLIR context available (e.g. validation-only call` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `                # outside a kernel).  Proceed with loc=None so that the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L117** `                # wrapped function's own validation can still fire.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L118** `                pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L121** `            res_or_list = opFunc(*args, **kwargs, loc=loc)` — **EN:** Assigns a value to res_or_list. **CN:** 将一个值赋给 res_or_list。
+- **L122** `            verifier_error = True` — **EN:** Assigns a value to verifier_error. **CN:** 将一个值赋给 verifier_error。
+- **L123** `            # Verify the operation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L124** `            if hasattr(res_or_list, "verify"):` — **EN:** Starts a conditional branch guarded by `hasattr(res_or_list, 'verify')`. **CN:** 开始一个由 `hasattr(res_or_list, 'verify')` 控制的条件分支。
+- **L125** `                res_or_list.verify()` — **EN:** Invokes `res_or_list.verify` as a standalone call. **CN:** 以独立语句方式调用 `res_or_list.verify`。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `        except DSLOperationBuildError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L128** `            # Nested DSLOperationError` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L129** `            raise DSLOperationBuildError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L130** `                message=e.message, cause=e, frameInfo=frameInfo` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L133** `            # Check if it's a decorator config error first` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L134** `            func_name = getattr(opFunc, "__name__", str(opFunc))` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L135** `            if "unexpected keyword argument 'loc'" in str(e):` — **EN:** Starts a conditional branch guarded by `"unexpected keyword argument 'loc'" in str(e)`. **CN:** 开始一个由 `"unexpected keyword argument 'loc'" in str(e)` 控制的条件分支。
+- **L136** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L137** `                    f"Function '{func_name}' decorated with @dsl_user_op does not accept the required 'loc' parameter.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `                    suggestion=[` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `                        f"1. Add 'loc=None' as a keyword-only parameter to {func_name}:",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `                        f"  def {func_name}(..., *, loc=None):",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `                        "",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `                        "2. Remove the @dsl_user_op decorator if location tracking is not needed",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `                    ],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `                    cause=e,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `                ) from e` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `            if verifier_error:` — **EN:** Starts a conditional branch guarded by `verifier_error`. **CN:** 开始一个由 `verifier_error` 控制的条件分支。
+- **L147** `                raise DSLOperationBuildError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L148** `                    message="Operation verification failed",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `                    cause=e,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `                    frameInfo=frameInfo,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `                    auto_translate=False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L154** `            raise e` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `        return res_or_list` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    return wrapper` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl._mlir_helpers.op`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl._mlir_helpers.op`。
+- EN: Module docstring summary: This module provides MLIR's OP helper functions CN: 模块文档摘要为：This module provides MLIR's OP helper functions
+- EN: Top-level functions: _set_enable_frame_filtering, _is_framework_frame, _find_user_frame, dsl_user_op CN: 顶层函数包括：_set_enable_frame_filtering, _is_framework_frame, _find_user_frame, dsl_user_op
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..._mlir:ir, ..common:DSLRuntimeError,DSLOperationBuildError, ..utils.stacktrace:walk_to_top_module CN: 内部依赖：..._mlir:ir, ..common:DSLRuntimeError,DSLOperationBuildError, ..utils.stacktrace:walk_to_top_module
+- EN: External or standard-library dependencies: inspect, os, types, functools:wraps, typing:Any,Callable CN: 外部或标准库依赖：inspect, os, types, functools:wraps, typing:Any,Callable

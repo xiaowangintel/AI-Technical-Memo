@@ -1,0 +1,245 @@
+# int_tuple.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/pycute/int_tuple.py`
+
+## Purpose / 作用
+- EN: Functions for manipulating IntTuples
+- CN: 该模块的文档字符串将其描述为：Functions for manipulating IntTuples
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Functions for manipulating IntTuples` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from functools import reduce` — **EN:** Imports reduce from `functools`. **CN:** 从 `functools` 导入 reduce。
+- **L38** `from itertools import chain` — **EN:** Imports chain from `itertools`. **CN:** 从 `itertools` 导入 chain。
+- **L39** `from typing import Union` — **EN:** Imports Union from `typing`. **CN:** 从 `typing` 导入 Union。
+- **L40** `from .typing import Integer` — **EN:** Imports Integer from `.typing`. **CN:** 从 `.typing` 导入 Integer。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `def is_int(x):` — **EN:** Defines function `is_int`. **CN:** 定义函数 `is_int`。
+- **L44** `  return isinstance(x, Integer)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `def is_tuple(x):` — **EN:** Defines function `is_tuple`. **CN:** 定义函数 `is_tuple`。
+- **L48** `  return isinstance(x, tuple)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `def flatten(t):` — **EN:** Defines function `flatten`. **CN:** 定义函数 `flatten`。
+- **L52** `  if is_tuple(t):` — **EN:** Starts a conditional branch guarded by `is_tuple(t)`. **CN:** 开始一个由 `is_tuple(t)` 控制的条件分支。
+- **L53** `    if len(t) == 0:` — **EN:** Starts a conditional branch guarded by `len(t) == 0`. **CN:** 开始一个由 `len(t) == 0` 控制的条件分支。
+- **L54** `      return ()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L56** `      return tuple(i for a in t for i in flatten(a))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L58** `    return (t,)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `def signum(a):` — **EN:** Defines function `signum`. **CN:** 定义函数 `signum`。
+- **L62** `  return bool(a > 0) - bool(a < 0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `def product(a):` — **EN:** Defines function `product`. **CN:** 定义函数 `product`。
+- **L66** `  if is_tuple(a):` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L67** `    return reduce(lambda val,elem : val*product(elem), a, 1)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L68** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L69** `    return a` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `def inner_product(a, b):` — **EN:** Defines function `inner_product`. **CN:** 定义函数 `inner_product`。
+- **L73** `  if is_tuple(a):                      # tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L74** `    assert len(a) == len(b)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L75** `    return sum(inner_product(x,y) for x,y in zip(a,b))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L76** `  else:                                # "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `    assert not is_tuple(b)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L78** `    return a * b` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `def tuple_max(a):` — **EN:** Defines function `tuple_max`. **CN:** 定义函数 `tuple_max`。
+- **L82** `  if is_tuple(a):` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L83** `    return max(tuple_max(x) for x in a)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L84** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L85** `    return a` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `def elem_scale(a, b):` — **EN:** Defines function `elem_scale`. **CN:** 定义函数 `elem_scale`。
+- **L89** `  if is_tuple(a):` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L90** `    if is_tuple(b):                     # tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(b)`. **CN:** 开始一个由 `is_tuple(b)` 控制的条件分支。
+- **L91** `      assert len(a) == len(b)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L92** `      return tuple(elem_scale(x,y) for x,y in zip(a,b))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** `    else:                               # tuple "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `      assert False           # Error` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L95** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L96** `    if is_tuple(b):                     # "int" tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(b)`. **CN:** 开始一个由 `is_tuple(b)` 控制的条件分支。
+- **L97** `      return elem_scale(a, product(b))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L98** `    else:                               # "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L99** `      return a * b` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `# Inclusive prefix ceil div with output congruent to input a` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `def shape_div(a, b):` — **EN:** Defines function `shape_div`. **CN:** 定义函数 `shape_div`。
+- **L104** `  if is_tuple(a):` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L105** `    if is_tuple(b):                    # tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(b)`. **CN:** 开始一个由 `is_tuple(b)` 控制的条件分支。
+- **L106** `      assert len(a) == len(b)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L107** `      return tuple(shape_div(x,y) for x,y in zip(a,b))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L108** `    else:                              # tuple "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L109** `      #r = [shape_div(a[0],b)] + [shape_div(a[i],b := shape_div(b, product(a[i-1]))) for i in range(1,len(a))]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `      r = []` — **EN:** Assigns a value to r. **CN:** 将一个值赋给 r。
+- **L111** `      for v in a:` — **EN:** Starts a loop assigning items from `a` to `v`. **CN:** 开始一个循环，将 `a` 的元素赋给 `v`。
+- **L112** `        r.append(shape_div(v,b))` — **EN:** Invokes `r.append` as a standalone call. **CN:** 以独立语句方式调用 `r.append`。
+- **L113** `        b = shape_div(b,product(v))` — **EN:** Assigns a value to b. **CN:** 将一个值赋给 b。
+- **L114** `      return tuple(r)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L116** `    if is_tuple(b):                    # "int" tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(b)`. **CN:** 开始一个由 `is_tuple(b)` 控制的条件分支。
+- **L117** `      return shape_div(a, product(b))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L118** `    else:                              # "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `      assert a % b == 0 or b % a == 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L120** `      return (a + b - 1) // b` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `# Exclusive prefix product with output congruent to input a` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L123** `def prefix_product(a, init=1):` — **EN:** Defines function `prefix_product`. **CN:** 定义函数 `prefix_product`。
+- **L124** `  if is_tuple(a):` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L125** `    if is_tuple(init):                 # tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(init)`. **CN:** 开始一个由 `is_tuple(init)` 控制的条件分支。
+- **L126** `      assert len(a) == len(init)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L127** `      return tuple(prefix_product(x,i) for x,i in zip(a,init))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** `    else:                              # tuple "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L129** `      #r = [prefix_product(a[0],init)] + [prefix_product(a[i],init := init * product(a[i-1])) for i in range(1,len(a))]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L130** `      r = []` — **EN:** Assigns a value to r. **CN:** 将一个值赋给 r。
+- **L131** `      for v in a:` — **EN:** Starts a loop assigning items from `a` to `v`. **CN:** 开始一个循环，将 `a` 的元素赋给 `v`。
+- **L132** `        r.append(prefix_product(v,init))` — **EN:** Invokes `r.append` as a standalone call. **CN:** 以独立语句方式调用 `r.append`。
+- **L133** `        init = init * product(v)` — **EN:** Assigns a value to init. **CN:** 将一个值赋给 init。
+- **L134** `      return tuple(r)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L135** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L136** `    if is_tuple(init):                 # "int" tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(init)`. **CN:** 开始一个由 `is_tuple(init)` 控制的条件分支。
+- **L137** `      assert False           # Error` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L138** `    else:                              # "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L139** `      return init` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `def idx2crd(idx, shape, stride=None):` — **EN:** Defines function `idx2crd`. **CN:** 定义函数 `idx2crd`。
+- **L143** `  if stride is None:` — **EN:** Starts a conditional branch guarded by `stride is None`. **CN:** 开始一个由 `stride is None` 控制的条件分支。
+- **L144** `    stride = prefix_product(shape)` — **EN:** Assigns a value to stride. **CN:** 将一个值赋给 stride。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `  if is_tuple(idx):` — **EN:** Starts a conditional branch guarded by `is_tuple(idx)`. **CN:** 开始一个由 `is_tuple(idx)` 控制的条件分支。
+- **L147** `    if is_tuple(shape):                # tuple tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(shape)`. **CN:** 开始一个由 `is_tuple(shape)` 控制的条件分支。
+- **L148** `      assert len(idx) == len(shape) and len(idx) == len(stride)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L149** `      return tuple(idx2crd(i, s, d) for i, s, d in zip(idx,shape,stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L150** `    else:                              # tuple "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `      assert False           # Error` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L152** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L153** `    if is_tuple(shape):                # "int" tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(shape)`. **CN:** 开始一个由 `is_tuple(shape)` 控制的条件分支。
+- **L154** `      assert len(shape) == len(stride)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L155** `      return tuple(idx2crd(idx, s, d) for s,d in zip(shape,stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L156** `    else:                              # "int" "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L157** `      return (idx // stride) % shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `def crd2idx(crd, shape, stride=None):` — **EN:** Defines function `crd2idx`. **CN:** 定义函数 `crd2idx`。
+- **L161** `  if stride is None:` — **EN:** Starts a conditional branch guarded by `stride is None`. **CN:** 开始一个由 `stride is None` 控制的条件分支。
+- **L162** `    stride = prefix_product(shape)` — **EN:** Assigns a value to stride. **CN:** 将一个值赋给 stride。
+- **L163** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L164** `  if is_tuple(crd):` — **EN:** Starts a conditional branch guarded by `is_tuple(crd)`. **CN:** 开始一个由 `is_tuple(crd)` 控制的条件分支。
+- **L165** `    if is_tuple(shape):                # tuple tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(shape)`. **CN:** 开始一个由 `is_tuple(shape)` 控制的条件分支。
+- **L166** `      assert len(crd) == len(shape) and len(crd) == len(stride)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L167** `      return sum(crd2idx(c, s, d) for c, s, d in zip(crd, shape, stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** `    else:                              # tuple "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L169** `      assert False, f"crd={crd}, shape={shape}"           # Error` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L170** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L171** `    if crd is None:` — **EN:** Starts a conditional branch guarded by `crd is None`. **CN:** 开始一个由 `crd is None` 控制的条件分支。
+- **L172** `      crd = 0` — **EN:** Assigns a value to crd. **CN:** 将一个值赋给 crd。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `    if is_tuple(shape):                # "int" tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(shape)`. **CN:** 开始一个由 `is_tuple(shape)` 控制的条件分支。
+- **L175** `      assert len(shape) == len(stride)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L176** `      result = 0` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L177** `      for i in range(len(shape)-1):` — **EN:** Starts a loop assigning items from `range(len(shape) - 1)` to `i`. **CN:** 开始一个循环，将 `range(len(shape) - 1)` 的元素赋给 `i`。
+- **L178** `        result += crd2idx(crd % product(shape[i]), shape[i], stride[i])` — **EN:** Updates result in place. **CN:** 原地更新 result。
+- **L179** `        crd = crd // product(shape[i])` — **EN:** Assigns a value to crd. **CN:** 将一个值赋给 crd。
+- **L180** `      return result + crd2idx(crd, shape[-1], stride[-1])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L181** `    else:                              # "int" "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L182** `      return crd * stride` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `# Transform crd into the dst_shape's iteration space` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L186** `def crd2crd(crd, dst_shape, src_shape=None):` — **EN:** Defines function `crd2crd`. **CN:** 定义函数 `crd2crd`。
+- **L187** `  if is_tuple(crd):` — **EN:** Starts a conditional branch guarded by `is_tuple(crd)`. **CN:** 开始一个由 `is_tuple(crd)` 控制的条件分支。
+- **L188** `    if is_tuple(dst_shape):            # tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(dst_shape)`. **CN:** 开始一个由 `is_tuple(dst_shape)` 控制的条件分支。
+- **L189** `      assert len(crd) == len(dst_shape)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L190** `      return tuple(crd2crd(x, y) for x, y in zip(crd,dst_shape))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L191** `    else:                              # tuple "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L192** `      # Ambiguous unless we have src_shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L193** `      assert src_shape is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L194** `      return crd2idx(crd, src_shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L195** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L196** `    if is_tuple(dst_shape):            # "int" tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(dst_shape)`. **CN:** 开始一个由 `is_tuple(dst_shape)` 控制的条件分支。
+- **L197** `      return idx2crd(crd, dst_shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L198** `    else:                              # "int" "int"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L199** `      assert crd < dst_shape` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L200** `      return crd` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `# Filter trg according to crd: keep only elements of trg that are paired with None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L204** `def slice_(crd: Union[None, tuple, int],` — **EN:** Defines function `slice_`. **CN:** 定义函数 `slice_`。
+- **L205** `           trg: Union[tuple, int]):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L206** `  if is_tuple(crd):` — **EN:** Starts a conditional branch guarded by `is_tuple(crd)`. **CN:** 开始一个由 `is_tuple(crd)` 控制的条件分支。
+- **L207** `    if is_tuple(trg):                  # tuple tuple` — **EN:** Starts a conditional branch guarded by `is_tuple(trg)`. **CN:** 开始一个由 `is_tuple(trg)` 控制的条件分支。
+- **L208** `      assert len(crd) == len(trg)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L209** `      # match C++ behavior of \`filter_tuple\` using \`tuple_cat(...)\`` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L210** `      return tuple(chain(*filter(lambda x: x != (), [slice_(c, s) for c, s in zip(crd, trg)])))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L211** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L212** `      assert False                     # tuple "int" : Error` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L213** `  elif crd is None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L214** `    # match C++ behavior \`return cute::tuple<B>{b};\`` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L215** `    return (trg,)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L216** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L217** `    return ()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** `# Determine if None appears at any of an int_tuples' terminals` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L221** `def has_none(a: Union[None, tuple, int]):` — **EN:** Defines function `has_none`. **CN:** 定义函数 `has_none`。
+- **L222** `  if is_tuple(a):` — **EN:** Starts a conditional branch guarded by `is_tuple(a)`. **CN:** 开始一个由 `is_tuple(a)` 控制的条件分支。
+- **L223** `    return any(has_none(v) for v in a)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L224** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L225** `    return a is None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `pycute.int_tuple`. CN: 模块名为 `pycute.int_tuple`。
+- EN: Module docstring summary: Functions for manipulating IntTuples CN: 模块文档摘要为：Functions for manipulating IntTuples
+- EN: Top-level functions: is_int, is_tuple, flatten, signum, product, inner_product, tuple_max, elem_scale, shape_div, prefix_product, idx2crd, crd2idx, ... (+3 more) CN: 顶层函数包括：is_int, is_tuple, flatten, signum, product, inner_product, tuple_max, elem_scale, shape_div, prefix_product, idx2crd, crd2idx, ... (+3 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .typing:Integer CN: 内部依赖：.typing:Integer
+- EN: External or standard-library dependencies: functools:reduce, itertools:chain, typing:Union CN: 外部或标准库依赖：functools:reduce, itertools:chain, typing:Union

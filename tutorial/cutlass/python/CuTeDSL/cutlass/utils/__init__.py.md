@@ -1,0 +1,204 @@
+# __init__.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/__init__.py`
+
+## Purpose / 作用
+- EN: Package marker for `CuTeDSL.cutlass.utils` that exposes or initializes WorkTileInfo, PersistentTileSchedulerParams, StaticPersistentTileScheduler, StaticPersistentRuntimeTileScheduler, ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler, ... (+75 more).
+- CN: 这是 `CuTeDSL.cutlass.utils` 的包标记文件，用于导出或初始化 WorkTileInfo, PersistentTileSchedulerParams, StaticPersistentTileScheduler, StaticPersistentRuntimeTileScheduler, ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler, ... (+75 more)。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from .static_persistent_tile_scheduler import (` — **EN:** Imports WorkTileInfo, PersistentTileSchedulerParams, StaticPersistentTileScheduler, StaticPersistentRuntimeTileScheduler from `.static_persistent_tile_scheduler`. **CN:** 从 `.static_persistent_tile_scheduler` 导入 WorkTileInfo, PersistentTileSchedulerParams, StaticPersistentTileScheduler, StaticPersistentRuntimeTileScheduler。
+- **L13** `    WorkTileInfo,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L14** `    PersistentTileSchedulerParams,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L15** `    StaticPersistentTileScheduler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L16** `    StaticPersistentRuntimeTileScheduler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L17** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from .dynamic_persistent_tile_scheduler import (` — **EN:** Imports ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler from `.dynamic_persistent_tile_scheduler`. **CN:** 从 `.dynamic_persistent_tile_scheduler` 导入 ClcDynamicPersistentTileSchedulerParams, ClcDynamicPersistentTileScheduler。
+- **L20** `    ClcDynamicPersistentTileSchedulerParams,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    ClcDynamicPersistentTileScheduler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `from .hardware_info import HardwareInfo` — **EN:** Imports HardwareInfo from `.hardware_info`. **CN:** 从 `.hardware_info` 导入 HardwareInfo。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `from .blackwell_helpers import (` — **EN:** Imports cluster_shape_to_tma_atom_A, cluster_shape_to_tma_atom_B, cluster_shape_to_tma_atom_SFB, compute_epilogue_tile_shape, get_permutation_mnk, get_smem_layout_atom_ab, ... (+9 more) from `.blackwell_helpers`. **CN:** 从 `.blackwell_helpers` 导入 cluster_shape_to_tma_atom_A, cluster_shape_to_tma_atom_B, cluster_shape_to_tma_atom_SFB, compute_epilogue_tile_shape, get_permutation_mnk, get_smem_layout_atom_ab, ... (+9 more)。
+- **L27** `    cluster_shape_to_tma_atom_A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    cluster_shape_to_tma_atom_B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    cluster_shape_to_tma_atom_SFB,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    compute_epilogue_tile_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    get_permutation_mnk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    get_smem_layout_atom_ab,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    get_smem_layout_atom_epi,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    get_smem_store_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    get_tmem_load_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    make_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    make_smem_layout_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    make_smem_layout_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    make_smem_layout_epi,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    make_trivial_tiled_mma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    make_blockscaled_trivial_tiled_mma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `from .hopper_helpers import (` — **EN:** Imports sm90_get_smem_store_op, get_smem_layout_atom as sm90_get_smem_layout_atom, make_smem_layout_a as sm90_make_smem_layout_a, make_smem_layout_b as sm90_make_smem_layout_b, make_smem_layout_epi as sm90_make_smem_layout_epi, make_trivial_tiled_mma as sm90_make_trivial_tiled_mma, ... (+1 more) from `.hopper_helpers`. **CN:** 从 `.hopper_helpers` 导入 sm90_get_smem_store_op, get_smem_layout_atom as sm90_get_smem_layout_atom, make_smem_layout_a as sm90_make_smem_layout_a, make_smem_layout_b as sm90_make_smem_layout_b, make_smem_layout_epi as sm90_make_smem_layout_epi, make_trivial_tiled_mma as sm90_make_trivial_tiled_mma, ... (+1 more)。
+- **L45** `    sm90_get_smem_store_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    get_smem_layout_atom as sm90_get_smem_layout_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    make_smem_layout_a as sm90_make_smem_layout_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    make_smem_layout_b as sm90_make_smem_layout_b,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    make_smem_layout_epi as sm90_make_smem_layout_epi,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    make_trivial_tiled_mma as sm90_make_trivial_tiled_mma,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    compute_tile_shape_or_override,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `from .blockscaled_layout import (` — **EN:** Imports BlockScaledBasicChunk, tile_atom_to_shape_SF, make_smem_layout_sfa, make_smem_layout_sfb, make_tmem_layout_sfa, make_tmem_layout_sfb from `.blockscaled_layout`. **CN:** 从 `.blockscaled_layout` 导入 BlockScaledBasicChunk, tile_atom_to_shape_SF, make_smem_layout_sfa, make_smem_layout_sfb, make_tmem_layout_sfa, make_tmem_layout_sfb。
+- **L55** `    BlockScaledBasicChunk,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    tile_atom_to_shape_SF,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    make_smem_layout_sfa,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    make_smem_layout_sfb,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `    make_tmem_layout_sfa,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `    make_tmem_layout_sfb,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `from .grouped_gemm_persistent_tile_scheduler import (` — **EN:** Imports GroupSearchResult, GroupedGemmGroupSearchState, create_initial_search_state, GroupedWorkTileInfo, StaticPersistentGroupTileScheduler, GroupedGemmTileSchedulerHelper from `.grouped_gemm_persistent_tile_scheduler`. **CN:** 从 `.grouped_gemm_persistent_tile_scheduler` 导入 GroupSearchResult, GroupedGemmGroupSearchState, create_initial_search_state, GroupedWorkTileInfo, StaticPersistentGroupTileScheduler, GroupedGemmTileSchedulerHelper。
+- **L64** `    GroupSearchResult,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** `    GroupedGemmGroupSearchState,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L66** `    create_initial_search_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L67** `    GroupedWorkTileInfo,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `    StaticPersistentGroupTileScheduler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `    GroupedGemmTileSchedulerHelper,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `from .tensormap_manager import (` — **EN:** Imports TensorMapUpdateMode, TensorMapManager from `.tensormap_manager`. **CN:** 从 `.tensormap_manager` 导入 TensorMapUpdateMode, TensorMapManager。
+- **L73** `    TensorMapUpdateMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `    TensorMapManager,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `from .smem_allocator import SmemAllocator, get_smem_capacity_in_bytes` — **EN:** Imports SmemAllocator, get_smem_capacity_in_bytes from `.smem_allocator`. **CN:** 从 `.smem_allocator` 导入 SmemAllocator, get_smem_capacity_in_bytes。
+- **L78** `from .tmem_allocator import (` — **EN:** Imports TmemAllocator, TmemBufferPool, get_num_tmem_alloc_cols, compute_tmem_cols_from_layout from `.tmem_allocator`. **CN:** 从 `.tmem_allocator` 导入 TmemAllocator, TmemBufferPool, get_num_tmem_alloc_cols, compute_tmem_cols_from_layout。
+- **L79** `    TmemAllocator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    TmemBufferPool,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `    get_num_tmem_alloc_cols,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `    compute_tmem_cols_from_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `from .layout import LayoutEnum` — **EN:** Imports LayoutEnum from `.layout`. **CN:** 从 `.layout` 导入 LayoutEnum。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `from .mixed_input_helpers import (` — **EN:** Imports TransformMode, scale_tma_partition, transform_partition, scale_partition, epilog_gmem_copy_and_partition, epilog_smem_copy_and_partition, ... (+17 more) from `.mixed_input_helpers`. **CN:** 从 `.mixed_input_helpers` 导入 TransformMode, scale_tma_partition, transform_partition, scale_partition, epilog_gmem_copy_and_partition, epilog_smem_copy_and_partition, ... (+17 more)。
+- **L88** `    TransformMode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `    scale_tma_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    transform_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    scale_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    epilog_gmem_copy_and_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    epilog_smem_copy_and_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    epilog_tmem_copy_and_partition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `    get_gmem_layout_scale,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `    get_smem_layout_scale,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `    compute_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `    get_transform_a_source,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `    get_tma_atom_kind,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    get_copy_atom_a_transform,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    is_valid_scale_granularity,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    is_shuffle_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `    is_valid_tensor_alignment,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `    is_valid_mma_tiler_and_cluster_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `    get_divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `    create_initial_contiguous_group_search_state,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    contiguous_group_search,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `    make_contiguous_group_work_tile_info,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `    cvt_tensor_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `    store_transformed_a,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `from . import gemm` — **EN:** Imports gemm from the current package. **CN:** 从当前包导入 gemm。
+- **L114** `from . import distributed` — **EN:** Imports distributed from the current package. **CN:** 从当前包导入 distributed。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `from . import hopper_helpers as sm90` — **EN:** Imports hopper_helpers as sm90 from the current package. **CN:** 从当前包导入 hopper_helpers as sm90。
+- **L117** `from . import blackwell_helpers as sm100` — **EN:** Imports blackwell_helpers as sm100 from the current package. **CN:** 从当前包导入 blackwell_helpers as sm100。
+- **L118** `from .print_latex import print_latex, print_latex_tv` — **EN:** Imports print_latex, print_latex_tv from `.print_latex`. **CN:** 从 `.print_latex` 导入 print_latex, print_latex_tv。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `from .tensor_helpers import (` — **EN:** Imports is_fp8_dtype, create_cute_tensor_for_fp8 from `.tensor_helpers`. **CN:** 从 `.tensor_helpers` 导入 is_fp8_dtype, create_cute_tensor_for_fp8。
+- **L121** `    is_fp8_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `    create_cute_tensor_for_fp8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L126** `    "get_smem_capacity_in_bytes",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    "SmemAllocator",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `    "TmemAllocator",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L129** `    "TmemBufferPool",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `    "get_num_tmem_alloc_cols",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `    "compute_tmem_cols_from_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `    "LayoutEnum",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `    "WorkTileInfo",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `    "PersistentTileSchedulerParams",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `    "StaticPersistentTileScheduler",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `    "StaticPersistentRuntimeTileScheduler",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    "TensorMapUpdateMode",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    "TensorMapManager",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `    "GroupSearchResult",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `    "GroupedGemmGroupSearchState",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `    "create_initial_search_state",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** `    "GroupedGemmTileSchedulerHelper",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L143** `    "HardwareInfo",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L144** `    "TransformMode",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `    "scale_tma_partition",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    "transform_partition",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `    "scale_partition",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `    "get_gmem_layout_scale",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `    "get_smem_layout_scale",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `    "compute_smem_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `    "get_transform_a_source",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `    "get_tma_atom_kind",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `    "get_copy_atom_a_transform",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `    "is_valid_scale_granularity",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `    "get_divisibility",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** `    "epilogue_tma_store",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `    "epilogue",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `    "create_tensor_a",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    "cluster_shape_to_tma_atom_A",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    "cluster_shape_to_tma_atom_B",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `    "cluster_shape_to_tma_atom_SFB",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L162** `    "compute_epilogue_tile_shape",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `    "get_permutation_mnk",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `    "get_smem_layout_atom_ab",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `    "get_smem_layout_atom_epi",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `    "get_smem_store_op",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `    "get_tmem_load_op",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `    "make_smem_layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `    "make_smem_layout_a",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `    "make_smem_layout_b",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `    "make_smem_layout_epi",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `    "make_trivial_tiled_mma",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `    "make_blockscaled_trivial_tiled_mma",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `    "sm90_get_smem_layout_atom",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `    "sm90_make_trivial_tiled_mma",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `    "sm90",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `    "sm100",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L178** `    "gemm",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `    "ClcDynamicPersistentTileSchedulerParams",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `    "ClcDynamicPersistentTileScheduler",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `    "print_latex",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `    "print_latex_tv",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `    "is_fp8_dtype",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `    "create_cute_tensor_for_fp8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `    "distributed",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.__init__`. CN: 模块名为 `CuTeDSL.cutlass.utils.__init__`。
+- EN: This `__init__.py` file acts as a package marker and central import surface. CN: 这个 `__init__.py` 文件既是包标记，也是集中导出入口。
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .static_persistent_tile_scheduler:WorkTileInfo,PersistentTileSchedulerParams,StaticPersistentTileScheduler,StaticPersistentRuntimeTileScheduler, .dynamic_persistent_tile_scheduler:ClcDynamicPersistentTileSchedulerParams,ClcDynamicPersistentTileScheduler, .hardware_info:HardwareInfo, .blackwell_helpers:cluster_shape_to_tma_atom_A,cluster_shape_to_tma_atom_B,cluster_shape_to_tma_atom_SFB,compute_epilogue_tile_shape,get_permutation_mnk,get_smem_layout_atom_ab,get_smem_layout_atom_epi,get_smem_store_op,get_tmem_load_op,make_smem_layout,make_smem_layout_a,make_smem_layout_b,make_smem_layout_epi,make_trivial_tiled_mma,make_blockscaled_trivial_tiled_mma, .hopper_helpers:sm90_get_smem_store_op,get_smem_layout_atom,make_smem_layout_a,make_smem_layout_b,make_smem_layout_epi,make_trivial_tiled_mma,compute_tile_shape_or_override, .blockscaled_layout:BlockScaledBasicChunk,tile_atom_to_shape_SF,make_smem_layout_sfa,make_smem_layout_sfb,make_tmem_layout_sfa,make_tmem_layout_sfb, .grouped_gemm_persistent_tile_scheduler:GroupSearchResult,GroupedGemmGroupSearchState,create_initial_search_state,GroupedWorkTileInfo,StaticPersistentGroupTileScheduler,GroupedGemmTileSchedulerHelper, .tensormap_manager:TensorMapUpdateMode,TensorMapManager, .smem_allocator:SmemAllocator,get_smem_capacity_in_bytes, .tmem_allocator:TmemAllocator,TmemBufferPool,get_num_tmem_alloc_cols,compute_tmem_cols_from_layout, .layout:LayoutEnum, .mixed_input_helpers:TransformMode,scale_tma_partition,transform_partition,scale_partition,epilog_gmem_copy_and_partition,epilog_smem_copy_and_partition,epilog_tmem_copy_and_partition,get_gmem_layout_scale,get_smem_layout_scale,compute_smem_layout,get_transform_a_source,get_tma_atom_kind,get_copy_atom_a_transform,is_valid_scale_granularity,is_shuffle_a,is_valid_tensor_alignment,is_valid_mma_tiler_and_cluster_shape,get_divisibility,create_initial_contiguous_group_search_state,contiguous_group_search,make_contiguous_group_work_tile_info,cvt_tensor_a,store_transformed_a, .:gemm, .:distributed, .:hopper_helpers, .:blackwell_helpers, .print_latex:print_latex,print_latex_tv, .tensor_helpers:is_fp8_dtype,create_cute_tensor_for_fp8 CN: 内部依赖：.static_persistent_tile_scheduler:WorkTileInfo,PersistentTileSchedulerParams,StaticPersistentTileScheduler,StaticPersistentRuntimeTileScheduler, .dynamic_persistent_tile_scheduler:ClcDynamicPersistentTileSchedulerParams,ClcDynamicPersistentTileScheduler, .hardware_info:HardwareInfo, .blackwell_helpers:cluster_shape_to_tma_atom_A,cluster_shape_to_tma_atom_B,cluster_shape_to_tma_atom_SFB,compute_epilogue_tile_shape,get_permutation_mnk,get_smem_layout_atom_ab,get_smem_layout_atom_epi,get_smem_store_op,get_tmem_load_op,make_smem_layout,make_smem_layout_a,make_smem_layout_b,make_smem_layout_epi,make_trivial_tiled_mma,make_blockscaled_trivial_tiled_mma, .hopper_helpers:sm90_get_smem_store_op,get_smem_layout_atom,make_smem_layout_a,make_smem_layout_b,make_smem_layout_epi,make_trivial_tiled_mma,compute_tile_shape_or_override, .blockscaled_layout:BlockScaledBasicChunk,tile_atom_to_shape_SF,make_smem_layout_sfa,make_smem_layout_sfb,make_tmem_layout_sfa,make_tmem_layout_sfb, .grouped_gemm_persistent_tile_scheduler:GroupSearchResult,GroupedGemmGroupSearchState,create_initial_search_state,GroupedWorkTileInfo,StaticPersistentGroupTileScheduler,GroupedGemmTileSchedulerHelper, .tensormap_manager:TensorMapUpdateMode,TensorMapManager, .smem_allocator:SmemAllocator,get_smem_capacity_in_bytes, .tmem_allocator:TmemAllocator,TmemBufferPool,get_num_tmem_alloc_cols,compute_tmem_cols_from_layout, .layout:LayoutEnum, .mixed_input_helpers:TransformMode,scale_tma_partition,transform_partition,scale_partition,epilog_gmem_copy_and_partition,epilog_smem_copy_and_partition,epilog_tmem_copy_and_partition,get_gmem_layout_scale,get_smem_layout_scale,compute_smem_layout,get_transform_a_source,get_tma_atom_kind,get_copy_atom_a_transform,is_valid_scale_granularity,is_shuffle_a,is_valid_tensor_alignment,is_valid_mma_tiler_and_cluster_shape,get_divisibility,create_initial_contiguous_group_search_state,contiguous_group_search,make_contiguous_group_work_tile_info,cvt_tensor_a,store_transformed_a, .:gemm, .:distributed, .:hopper_helpers, .:blackwell_helpers, .print_latex:print_latex,print_latex_tv, .tensor_helpers:is_fp8_dtype,create_cute_tensor_for_fp8

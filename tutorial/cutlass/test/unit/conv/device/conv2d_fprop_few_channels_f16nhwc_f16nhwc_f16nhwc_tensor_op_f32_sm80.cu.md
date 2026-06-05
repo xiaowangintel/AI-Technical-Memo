@@ -1,0 +1,963 @@
+# conv2d_fprop_few_channels_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_sm80.cu — Code Analysis / 代码分析
+**Source / 源文件**: `test/unit/conv/device/conv2d_fprop_few_channels_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_sm80.cu`
+**Purpose / 用途**: Tests for device-wide Implicit GEMM interface. The file instantiates and runs tests for 2D, forward-propagation, SM80, few-channel coverage, with concrete type aliases and builders declared in the source. / 该文件为对应卷积内核提供测试覆盖。 这里针对 2 维、前向传播、SM80、少通道场景覆盖 进行实例化并运行测试，具体类型别名和构建器都在源文件中声明。
+---
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-25 / 第1-25行
+
+- **L1** `/***************************************************************************************************`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L2** ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L4** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L7** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L10** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L14** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L17** ` * this software without specific prior written permission.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L18** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+
+### Lines 26-50 / 第26-50行
+
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L29** ` *`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L30** ` **************************************************************************************************/`
+  - **EN**: Part of the BSD-3-Clause license header.
+  - **CN**: BSD-3-Clause 许可证头的一部分。
+- **L31** `/*! \file`
+  - **EN**: Marks the start of the Doxygen file documentation block.
+  - **CN**: 标记 Doxygen 文件说明块的开始。
+- **L32** `    \brief Tests for device-wide Implicit GEMM interface`
+  - **EN**: Records the file-level brief description: Tests for device-wide Implicit GEMM interface.
+  - **CN**: 记录文件级简述：Tests for device-wide Implicit GEMM interface。
+- **L33** `*/`
+  - **EN**: Continues the file-level Doxygen documentation.
+  - **CN**: 继续补充文件级 Doxygen 说明。
+- **L34** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L35** `#include "../../common/cutlass_unit_test.h"`
+  - **EN**: Shared CUTLASS unit-test harness used by older convolution tests.
+  - **CN**: 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- **L36** `#include "cutlass/cutlass.h"`
+  - **EN**: Core CUTLASS definitions, architecture tags, and status types.
+  - **CN**: CUTLASS 核心定义、架构标签和状态类型。
+- **L37** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L38** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L39** `#include "cutlass/conv/kernel/default_conv2d_fprop.h"`
+  - **EN**: Default kernel builder for legacy CUTLASS Conv2d forward-propagation kernels.
+  - **CN**: 旧版 CUTLASS Conv2d 前向传播内核的默认构建器。
+- **L40** `#include "cutlass/conv/device/implicit_gemm_convolution.h"`
+  - **EN**: Device-level wrapper that launches convolution kernels expressed as implicit GEMM.
+  - **CN**: 将隐式 GEMM 卷积内核封装为设备级调用接口的包装器。
+- **L41** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L42** `#include "conv2d_testbed.h"`
+  - **EN**: Conv2d testbed helpers that generate problem sizes and verify results.
+  - **CN**: 用于生成问题规模并校验结果的 Conv2d 测试平台辅助工具。
+- **L43** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L44** `#if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`
+  - **EN**: Starts a compile-time conditional block guarded by `defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)`.
+  - **CN**: 开始由 `defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)` 保护的编译期条件块。
+- **L45** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L46** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L47** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L48** `std::vector<cutlass::conv::Conv2dProblemSize> Conv2dFewChannelProblemSizes(int channels) {`
+  - **EN**: Starts a constructor or function definition.
+  - **CN**: 开始定义一个构造函数或函数。
+- **L49** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L50** `  std::vector<cutlass::conv::Conv2dProblemSize> problems;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 51-75 / 第51-75行
+
+- **L51** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L52** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L53** `    {1, 8, 8, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L54** `    {16, 3, 3, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L55** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L56** `    {2, 2},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L57** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L58** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L59** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L60** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L61** `    {1, 16, 16, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L62** `    {16, 3, 3, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L63** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L64** `    {2, 2},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L65** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L66** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L67** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L68** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L69** `    {1, 16, 16, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L70** `    {16, 7, 7, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L71** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L72** `    {1, 1},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L73** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L74** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L75** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 76-100 / 第76-100行
+
+- **L76** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L77** `    {1, 224, 224, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L78** `    {32, 7, 7, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L79** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L80** `    {1, 1},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L81** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L82** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L83** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L84** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L85** `    {1, 224, 224, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L86** `    {64, 7, 7, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L87** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L88** `    {2, 2},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L89** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L90** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L91** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L92** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L93** `    {1, 224, 224, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L94** `    {64, 5, 5, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L95** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L96** `    {1, 1},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L97** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L98** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L99** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L100** `  problems.push_back(cutlass::conv::Conv2dProblemSize(`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+
+### Lines 101-125 / 第101-125行
+
+- **L101** `    {1, 224, 224, channels},   // input size  (NHWC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L102** `    {64, 5, 5, channels},   // filter size (KRSC)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L103** `    {1, 1, 1, 1},                      // padding (pad_h, _, pad_w, _)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L104** `    {2, 2},                            // stride (stride_h, stride_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L105** `    {1, 1}                             // dilation (dilation_h, dilation_w)`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L106** `  ));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L107** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L108** `  return problems;`
+  - **EN**: Returns the computed value from the current function.
+  - **CN**: 从当前函数返回计算结果。
+- **L109** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L110** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L111** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L112** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L113** `TEST(SM80_Device_Conv2d_Fprop_Few_Channels_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_channels_8,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L114** `  128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L115** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L116** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L117** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L118** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L119** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L120** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L121** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L122** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L123** `  int const kChannelCount = 8;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L124** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L125** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+
+### Lines 126-150 / 第126-150行
+
+- **L126** `  using Conv2dFpropKernel = typename cutlass::conv::kernel::DefaultConv2dFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dFpropKernel`，形成具体卷积内核。
+- **L127** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L128** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L129** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L130** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L131** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择张量核心指令类别。
+- **L132** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 指定目标 GPU 架构。
+- **L133** `    cutlass::gemm::GemmShape<128, 128, 64>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L134** `    cutlass::gemm::GemmShape<64, 64, 64>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L135** `    cutlass::gemm::GemmShape<16, 8, 16>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L136** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dFpropKernel`.
+  - **CN**: 在 `Conv2dFpropKernel` 中开始定义 epilogue 输出算子。
+- **L137** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L138** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L139** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L140** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L141** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L142** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L143** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L144** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L145** `    cutlass::conv::IteratorAlgorithm::kFewChannels,`
+  - **EN**: Selects the iterator algorithm used by `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择使用的迭代器算法。
+- **L146** `    cutlass::conv::StrideSupport::kStrided,`
+  - **EN**: Specifies the stride constraints expected by `Conv2dFpropKernel`.
+  - **CN**: 指定 `Conv2dFpropKernel` 期望支持的步幅约束。
+- **L147** `    kChannelCount,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L148** `    kChannelCount`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L149** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dFpropKernel` 最终确定为选定的内核类型。
+- **L150** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 151-175 / 第151-175行
+
+- **L151** `  using Conv2dFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dFprop`。
+- **L152** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L153** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L154** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dFprop>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L155** `    Conv2dFewChannelProblemSizes(kChannelCount)));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L156** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L157** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L158** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L159** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L160** `TEST(SM80_Device_Conv2d_Fprop_Few_Channels_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_channels_4,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L161** `  128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L162** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L163** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L164** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L165** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L166** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L167** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L168** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L169** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L170** `  int const kChannelCount = 4;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L171** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L172** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L173** `  using Conv2dFpropKernel = typename cutlass::conv::kernel::DefaultConv2dFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dFpropKernel`，形成具体卷积内核。
+- **L174** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L175** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+
+### Lines 176-200 / 第176-200行
+
+- **L176** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L177** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L178** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择张量核心指令类别。
+- **L179** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 指定目标 GPU 架构。
+- **L180** `    cutlass::gemm::GemmShape<128, 128, 64>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L181** `    cutlass::gemm::GemmShape<64, 64, 64>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L182** `    cutlass::gemm::GemmShape<16, 8, 16>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L183** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dFpropKernel`.
+  - **CN**: 在 `Conv2dFpropKernel` 中开始定义 epilogue 输出算子。
+- **L184** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L185** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L186** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L187** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L188** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L189** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L190** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L191** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L192** `    cutlass::conv::IteratorAlgorithm::kFewChannels,`
+  - **EN**: Selects the iterator algorithm used by `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择使用的迭代器算法。
+- **L193** `    cutlass::conv::StrideSupport::kStrided,`
+  - **EN**: Specifies the stride constraints expected by `Conv2dFpropKernel`.
+  - **CN**: 指定 `Conv2dFpropKernel` 期望支持的步幅约束。
+- **L194** `    kChannelCount,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L195** `    kChannelCount`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L196** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dFpropKernel` 最终确定为选定的内核类型。
+- **L197** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L198** `  using Conv2dFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dFprop`。
+- **L199** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L200** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+
+### Lines 201-225 / 第201-225行
+
+- **L201** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dFprop>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L202** `    Conv2dFewChannelProblemSizes(kChannelCount)));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L203** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L204** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L205** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L206** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L207** `TEST(SM80_Device_Conv2d_Fprop_Few_Channels_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_channels_2,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L208** `  128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L209** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L210** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L211** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L212** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L213** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L214** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L215** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L216** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L217** `  int const kChannelCount = 2;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L218** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L219** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L220** `  using Conv2dFpropKernel = typename cutlass::conv::kernel::DefaultConv2dFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dFpropKernel`，形成具体卷积内核。
+- **L221** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L222** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L223** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L224** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L225** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择张量核心指令类别。
+
+### Lines 226-250 / 第226-250行
+
+- **L226** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 指定目标 GPU 架构。
+- **L227** `    cutlass::gemm::GemmShape<128, 128, 64>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L228** `    cutlass::gemm::GemmShape<64, 64, 64>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L229** `    cutlass::gemm::GemmShape<16, 8, 16>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L230** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dFpropKernel`.
+  - **CN**: 在 `Conv2dFpropKernel` 中开始定义 epilogue 输出算子。
+- **L231** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L232** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L233** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L234** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L235** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L236** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L237** `    3,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L238** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L239** `    cutlass::conv::IteratorAlgorithm::kFewChannels,`
+  - **EN**: Selects the iterator algorithm used by `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择使用的迭代器算法。
+- **L240** `    cutlass::conv::StrideSupport::kStrided,`
+  - **EN**: Specifies the stride constraints expected by `Conv2dFpropKernel`.
+  - **CN**: 指定 `Conv2dFpropKernel` 期望支持的步幅约束。
+- **L241** `    kChannelCount,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L242** `    kChannelCount`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L243** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dFpropKernel` 最终确定为选定的内核类型。
+- **L244** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L245** `  using Conv2dFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dFprop`。
+- **L246** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L247** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L248** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dFprop>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L249** `    Conv2dFewChannelProblemSizes(2 * kChannelCount)));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L250** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+
+### Lines 251-275 / 第251-275行
+
+- **L251** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L252** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L253** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L254** `TEST(SM80_Device_Conv2d_Fprop_Few_Channels_ImplicitGemm_f16nhwc_f16nhwc_f16nhwc_tensor_op_f32_channels_1,`
+  - **EN**: Starts a GoogleTest case definition whose signature continues on the next line.
+  - **CN**: 开始定义一个 GoogleTest 用例，其签名会在下一行继续。
+- **L255** `  128x128_64x3_64x64x64) {`
+  - **EN**: Opens a new scope for the surrounding declaration or statement.
+  - **CN**: 为周围的声明或语句打开新的作用域。
+- **L256** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L257** `  /// Conv operation element types for the Gemm equivalent (ImplicitGemm)`
+  - **EN**: Comment explaining: Conv operation element types for the Gemm equivalent (ImplicitGemm).
+  - **CN**: 说明性注释：Conv operation element types for the Gemm equivalent (ImplicitGemm)。
+- **L258** `  using ElementA           = cutlass::half_t;`
+  - **EN**: Creates the `ElementA` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementA` 类型别名，供后续内核与 epilogue 定义使用。
+- **L259** `  using ElementB           = cutlass::half_t;`
+  - **EN**: Creates the `ElementB` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementB` 类型别名，供后续内核与 epilogue 定义使用。
+- **L260** `  using ElementC           = cutlass::half_t;`
+  - **EN**: Creates the `ElementC` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementC` 类型别名，供后续内核与 epilogue 定义使用。
+- **L261** `  using ElementAccumulator = float;`
+  - **EN**: Creates the `ElementAccumulator` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementAccumulator` 类型别名，供后续内核与 epilogue 定义使用。
+- **L262** `  using ElementCompute     = float;`
+  - **EN**: Creates the `ElementCompute` type alias used by later kernel and epilogue definitions.
+  - **CN**: 创建 `ElementCompute` 类型别名，供后续内核与 epilogue 定义使用。
+- **L263** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L264** `  int const kChannelCount = 1;`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L265** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L266** `  /// Device-level Conv2d instance`
+  - **EN**: Comment explaining: Device-level Conv2d instance.
+  - **CN**: 说明性注释：Device-level Conv2d instance。
+- **L267** `  using Conv2dFpropKernel = typename cutlass::conv::kernel::DefaultConv2dFprop<`
+  - **EN**: Defines the kernel type alias `Conv2dFpropKernel` by composing template parameters into a concrete convolution kernel.
+  - **CN**: 通过组合模板参数定义内核类型别名 `Conv2dFpropKernel`，形成具体卷积内核。
+- **L268** `    ElementA, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L269** `    ElementB, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L270** `    ElementC, cutlass::layout::TensorNHWC,`
+  - **EN**: Sets one of the tensor layouts used by `Conv2dFpropKernel`.
+  - **CN**: 设置 `Conv2dFpropKernel` 使用的一个张量布局。
+- **L271** `    ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L272** `    cutlass::arch::OpClassTensorOp,`
+  - **EN**: Selects tensor-core instructions for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择张量核心指令类别。
+- **L273** `    cutlass::arch::Sm80,`
+  - **EN**: Specifies the target GPU architecture for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 指定目标 GPU 架构。
+- **L274** `    cutlass::gemm::GemmShape<128, 128, 32>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L275** `    cutlass::gemm::GemmShape<64, 64, 32>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+
+### Lines 276-300 / 第276-300行
+
+- **L276** `    cutlass::gemm::GemmShape<16, 8, 8>,`
+  - **EN**: Provides a GEMM tile shape argument for `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 提供 GEMM 分块形状参数。
+- **L277** `    cutlass::epilogue::thread::LinearCombination<`
+  - **EN**: Starts the epilogue output-operator description inside `Conv2dFpropKernel`.
+  - **CN**: 在 `Conv2dFpropKernel` 中开始定义 epilogue 输出算子。
+- **L278** `      ElementC,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L279** `      128 / cutlass::sizeof_bits<ElementC>::value,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L280** `      ElementAccumulator,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L281** `      ElementCompute`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L282** `    >,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L283** `    cutlass::gemm::threadblock::GemmIdentityThreadblockSwizzle<>,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L284** `    2,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L285** `    cutlass::arch::OpMultiplyAdd,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L286** `    cutlass::conv::IteratorAlgorithm::kFewChannels,`
+  - **EN**: Selects the iterator algorithm used by `Conv2dFpropKernel`.
+  - **CN**: 为 `Conv2dFpropKernel` 选择使用的迭代器算法。
+- **L287** `    cutlass::conv::StrideSupport::kStrided,`
+  - **EN**: Specifies the stride constraints expected by `Conv2dFpropKernel`.
+  - **CN**: 指定 `Conv2dFpropKernel` 期望支持的步幅约束。
+- **L288** `    kChannelCount,`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L289** `    kChannelCount`
+  - **EN**: Continues supplying template arguments for `Conv2dFpropKernel`.
+  - **CN**: 继续为 `Conv2dFpropKernel` 提供模板参数。
+- **L290** `  >::Kernel;`
+  - **EN**: Finalizes `Conv2dFpropKernel` as the selected kernel type.
+  - **CN**: 将 `Conv2dFpropKernel` 最终确定为选定的内核类型。
+- **L291** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L292** `  using Conv2dFprop = cutlass::conv::device::ImplicitGemmConvolution<Conv2dFpropKernel>;`
+  - **EN**: Wraps the concrete kernel in the device-facing operator alias `Conv2dFprop`.
+  - **CN**: 将具体内核封装为面向设备调用的算子别名 `Conv2dFprop`。
+- **L293** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L294** `  /// Run all unit test sizes with device-level Conv2d instance`
+  - **EN**: Comment explaining: Run all unit test sizes with device-level Conv2d instance.
+  - **CN**: 说明性注释：Run all unit test sizes with device-level Conv2d instance。
+- **L295** `  EXPECT_TRUE(test::conv::device::TestSpecificConv2d<Conv2dFprop>(`
+  - **EN**: Asserts that the invoked testbed run returns success.
+  - **CN**: 断言被调用的测试平台运行结果为成功。
+- **L296** `    Conv2dFewChannelProblemSizes(3 * kChannelCount)));`
+  - **EN**: Contributes one step to the surrounding declaration, initializer, or control flow.
+  - **CN**: 为周围的声明、初始化或控制流程补充一个步骤。
+- **L297** `}`
+  - **EN**: Closes the current scope or aggregate initializer.
+  - **CN**: 结束当前作用域或聚合初始化。
+- **L298** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L299** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+- **L300** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+
+### Lines 301-303 / 第301-303行
+
+- **L301** `#endif  // CUTLASS_ARCH_MMA_SM80_SUPPORTED`
+  - **EN**: Ends the current compile-time conditional block.
+  - **CN**: 结束当前编译期条件块。
+- **L302** `_blank line_`
+  - **EN**: Blank line that separates nearby logical blocks.
+  - **CN**: 用于分隔相邻逻辑块的空行。
+- **L303** `////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Comment-only line used to separate or label nearby code.
+  - **CN**: 仅包含注释，用于分隔或标记附近代码。
+
+## Key Concepts / 关键概念
+- GoogleTest test cases encode each kernel variant as a compile-time instantiation that is exercised by a shared testbed. / GoogleTest 用例将每个内核变体编码为编译期实例化，并交由共享测试平台执行。
+- Legacy convolution tests rely on default kernel builders and the `ImplicitGemmConvolution` device wrapper. / 旧版卷积测试依赖默认内核构建器以及 `ImplicitGemmConvolution` 设备包装器。
+## Dependencies / 依赖项
+- `../../common/cutlass_unit_test.h` — Shared CUTLASS unit-test harness used by older convolution tests. / 旧版卷积测试使用的共享 CUTLASS 单元测试框架。
+- `cutlass/cutlass.h` — Core CUTLASS definitions, architecture tags, and status types. / CUTLASS 核心定义、架构标签和状态类型。
+- `cutlass/conv/kernel/default_conv2d_fprop.h` — Default kernel builder for legacy CUTLASS Conv2d forward-propagation kernels. / 旧版 CUTLASS Conv2d 前向传播内核的默认构建器。
+- `cutlass/conv/device/implicit_gemm_convolution.h` — Device-level wrapper that launches convolution kernels expressed as implicit GEMM. / 将隐式 GEMM 卷积内核封装为设备级调用接口的包装器。
+- `conv2d_testbed.h` — Conv2d testbed helpers that generate problem sizes and verify results. / 用于生成问题规模并校验结果的 Conv2d 测试平台辅助工具。

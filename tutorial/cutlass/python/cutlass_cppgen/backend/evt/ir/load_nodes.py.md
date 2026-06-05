@@ -1,0 +1,314 @@
+# load_nodes.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/ir/load_nodes.py`
+
+## Purpose / 作用
+- EN: Load nodes and implementations
+- CN: 该模块的文档字符串将其描述为：Load nodes and implementations
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Load nodes and implementations` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_cppgen.backend.c_types import tuple_factory` — **EN:** Imports tuple_factory from `cutlass_cppgen.backend.c_types`. **CN:** 从 `cutlass_cppgen.backend.c_types` 导入 tuple_factory。
+- **L40** `from cutlass_cppgen.backend.epilogue import dtype2ctype, to_ctype_value` — **EN:** Imports dtype2ctype, to_ctype_value from `cutlass_cppgen.backend.epilogue`. **CN:** 从 `cutlass_cppgen.backend.epilogue` 导入 dtype2ctype, to_ctype_value。
+- **L41** `from cutlass_cppgen.backend.evt.ir.node import NodeBase, ImplBase` — **EN:** Imports NodeBase, ImplBase from `cutlass_cppgen.backend.evt.ir.node`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.node` 导入 NodeBase, ImplBase。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `class LoadImplBase(ImplBase):` — **EN:** Defines class `LoadImplBase` with bases ImplBase. **CN:** 定义类 `LoadImplBase`，其基类为 ImplBase。
+- **L45** `    """` — **EN:** Starts the docstring for the class `LoadImplBase`. **CN:** 开始说明 class `LoadImplBase` 的文档字符串。
+- **L46** `    Base class for load node implementations` — **EN:** Continues the docstring for the class `LoadImplBase`. **CN:** 继续说明 class `LoadImplBase` 的文档字符串。
+- **L47** `    """` — **EN:** Ends the docstring for the class `LoadImplBase`. **CN:** 结束说明 class `LoadImplBase` 的文档字符串。
+- **L48** `    reserved_names = ["accum", "C"]` — **EN:** Assigns a value to reserved_names. **CN:** 将一个值赋给 reserved_names。
+- **L49** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L50** `        super().__init__(node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L51** `        self.element = node.element` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L52** `        self.element_output = node.element_output` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+- **L53** `        self.stride = node.tensor.stride` — **EN:** Assigns a value to self.stride. **CN:** 将一个值赋给 self.stride。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `class AccumulatorImpl(LoadImplBase):` — **EN:** Defines class `AccumulatorImpl` with bases LoadImplBase. **CN:** 定义类 `AccumulatorImpl`，其基类为 LoadImplBase。
+- **L57** `    """` — **EN:** Starts the docstring for the class `AccumulatorImpl`. **CN:** 开始说明 class `AccumulatorImpl` 的文档字符串。
+- **L58** `    Accumulator node implementation` — **EN:** Continues the docstring for the class `AccumulatorImpl`. **CN:** 继续说明 class `AccumulatorImpl` 的文档字符串。
+- **L59** `    """` — **EN:** Ends the docstring for the class `AccumulatorImpl`. **CN:** 结束说明 class `AccumulatorImpl` 的文档字符串。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L62** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L63** `        return node.name == "accum" and node.tensor.shape == problem_size` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `class LoadSrcImpl(LoadImplBase):` — **EN:** Defines class `LoadSrcImpl` with bases LoadImplBase. **CN:** 定义类 `LoadSrcImpl`，其基类为 LoadImplBase。
+- **L67** `    """` — **EN:** Starts the docstring for the class `LoadSrcImpl`. **CN:** 开始说明 class `LoadSrcImpl` 的文档字符串。
+- **L68** `    Load C implementation` — **EN:** Continues the docstring for the class `LoadSrcImpl`. **CN:** 继续说明 class `LoadSrcImpl` 的文档字符串。
+- **L69** `    """` — **EN:** Ends the docstring for the class `LoadSrcImpl`. **CN:** 结束说明 class `LoadSrcImpl` 的文档字符串。
+- **L70** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L71** `    def name_camel(self) -> str:` — **EN:** Defines function `name_camel`. **CN:** 定义函数 `name_camel`。
+- **L72** `        return "TensorC"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L75** `    def argument_type_c(self):` — **EN:** Defines function `argument_type_c`. **CN:** 定义函数 `argument_type_c`。
+- **L76** `        stride_mnl = self.get_stride_mnl()` — **EN:** Assigns a value to stride_mnl. **CN:** 将一个值赋给 stride_mnl。
+- **L77** `        tuple_type = tuple_factory(stride_mnl, self.stride_dtype)` — **EN:** Assigns a value to tuple_type. **CN:** 将一个值赋给 tuple_type。
+- **L78** `        class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L79** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L80** `                ("ptr_C", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `                ("stride_C", tuple_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `            def __init__(self, ptr) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L84** `                self.ptr_C = ptr` — **EN:** Assigns a value to self.ptr_C. **CN:** 将一个值赋给 self.ptr_C。
+- **L85** `                self.stride_C = tuple_type(stride_mnl)` — **EN:** Assigns a value to self.stride_C. **CN:** 将一个值赋给 self.stride_C。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `        return _Argument` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L90** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L91** `        return node.name == "C" and node.tensor.shape == problem_size` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `class AuxLoadImpl(LoadImplBase):` — **EN:** Defines class `AuxLoadImpl` with bases LoadImplBase. **CN:** 定义类 `AuxLoadImpl`，其基类为 LoadImplBase。
+- **L95** `    """` — **EN:** Starts the docstring for the class `AuxLoadImpl`. **CN:** 开始说明 class `AuxLoadImpl` 的文档字符串。
+- **L96** `    Load arbitrary tensor` — **EN:** Continues the docstring for the class `AuxLoadImpl`. **CN:** 继续说明 class `AuxLoadImpl` 的文档字符串。
+- **L97** `    """` — **EN:** Ends the docstring for the class `AuxLoadImpl`. **CN:** 结束说明 class `AuxLoadImpl` 的文档字符串。
+- **L98** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L99** `    def argument_type(self):` — **EN:** Defines function `argument_type`. **CN:** 定义函数 `argument_type`。
+- **L100** `        stride_mnl = self.get_stride_mnl()` — **EN:** Assigns a value to stride_mnl. **CN:** 将一个值赋给 stride_mnl。
+- **L101** `        name = self.name` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L102** `        tuple_type = tuple_factory(stride_mnl, self.stride_dtype)` — **EN:** Assigns a value to tuple_type. **CN:** 将一个值赋给 tuple_type。
+- **L103** `        element_type = self.element` — **EN:** Assigns a value to element_type. **CN:** 将一个值赋给 element_type。
+- **L104** `        class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L105** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L106** `                ("ptr_aux", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `                ("null_default", dtype2ctype[element_type]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `                ("dAux", tuple_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `            def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L111** `                ptr = kwargs[name]` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L112** `                self.ptr_aux = ptr` — **EN:** Assigns a value to self.ptr_aux. **CN:** 将一个值赋给 self.ptr_aux。
+- **L113** `                self.null_default = to_ctype_value(0, element_type)` — **EN:** Assigns a value to self.null_default. **CN:** 将一个值赋给 self.null_default。
+- **L114** `                self.dAux = tuple_type(stride_mnl)` — **EN:** Assigns a value to self.dAux. **CN:** 将一个值赋给 self.dAux。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `        return _Argument` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L119** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L120** `        if node.name in LoadImplBase.reserved_names:` — **EN:** Starts a conditional branch guarded by `node.name in LoadImplBase.reserved_names`. **CN:** 开始一个由 `node.name in LoadImplBase.reserved_names` 控制的条件分支。
+- **L121** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** `        strideMN = node.tensor.stride[-2:]` — **EN:** Assigns a value to strideMN. **CN:** 将一个值赋给 strideMN。
+- **L123** `        if (strideMN[0] == 1 and strideMN[1] != 0 or` — **EN:** Starts a conditional branch guarded by `strideMN[0] == 1 and strideMN[1] != 0 or (strideMN[0] != ...`. **CN:** 开始一个由 `strideMN[0] == 1 and strideMN[1] != 0 or (strideMN[0] != ...` 控制的条件分支。
+- **L124** `            strideMN[0] != 0 and strideMN[1] == 1 ):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L127** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `class RowBroadcastImpl(LoadImplBase):` — **EN:** Defines class `RowBroadcastImpl` with bases LoadImplBase. **CN:** 定义类 `RowBroadcastImpl`，其基类为 LoadImplBase。
+- **L131** `    """` — **EN:** Starts the docstring for the class `RowBroadcastImpl`. **CN:** 开始说明 class `RowBroadcastImpl` 的文档字符串。
+- **L132** `    Broadcast a row vector` — **EN:** Continues the docstring for the class `RowBroadcastImpl`. **CN:** 继续说明 class `RowBroadcastImpl` 的文档字符串。
+- **L133** `    """` — **EN:** Ends the docstring for the class `RowBroadcastImpl`. **CN:** 结束说明 class `RowBroadcastImpl` 的文档字符串。
+- **L134** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L135** `        super().__init__(node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L136** `        self.stride_dtype = "int"` — **EN:** Assigns a value to self.stride_dtype. **CN:** 将一个值赋给 self.stride_dtype。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L139** `    def argument_type(self):` — **EN:** Defines function `argument_type`. **CN:** 定义函数 `argument_type`。
+- **L140** `        stride_mnl = self.get_stride_mnl()` — **EN:** Assigns a value to stride_mnl. **CN:** 将一个值赋给 stride_mnl。
+- **L141** `        name = self.name` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L142** `        tuple_type = tuple_factory(stride_mnl, self.stride_dtype)` — **EN:** Assigns a value to tuple_type. **CN:** 将一个值赋给 tuple_type。
+- **L143** `        element_type = self.element` — **EN:** Assigns a value to element_type. **CN:** 将一个值赋给 element_type。
+- **L144** `        class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L145** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L146** `                ("ptr_row", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `                ("null_default", dtype2ctype[element_type]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `                ("dRow", tuple_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `            def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L151** `                ptr = kwargs[name]` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L152** `                self.ptr_row = ptr` — **EN:** Assigns a value to self.ptr_row. **CN:** 将一个值赋给 self.ptr_row。
+- **L153** `                self.null_default = to_ctype_value(0, element_type)` — **EN:** Assigns a value to self.null_default. **CN:** 将一个值赋给 self.null_default。
+- **L154** `                self.dRow = tuple_type(stride_mnl)` — **EN:** Assigns a value to self.dRow. **CN:** 将一个值赋给 self.dRow。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `        return _Argument` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L159** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L160** `        if node.name in LoadImplBase.reserved_names:` — **EN:** Starts a conditional branch guarded by `node.name in LoadImplBase.reserved_names`. **CN:** 开始一个由 `node.name in LoadImplBase.reserved_names` 控制的条件分支。
+- **L161** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `        strideMN = node.tensor.stride[-2:]` — **EN:** Assigns a value to strideMN. **CN:** 将一个值赋给 strideMN。
+- **L164** `        if strideMN == (0, 1):` — **EN:** Starts a conditional branch guarded by `strideMN == (0, 1)`. **CN:** 开始一个由 `strideMN == (0, 1)` 控制的条件分支。
+- **L165** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L167** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `class ColumnBroadcastImpl(LoadImplBase):` — **EN:** Defines class `ColumnBroadcastImpl` with bases LoadImplBase. **CN:** 定义类 `ColumnBroadcastImpl`，其基类为 LoadImplBase。
+- **L171** `    """` — **EN:** Starts the docstring for the class `ColumnBroadcastImpl`. **CN:** 开始说明 class `ColumnBroadcastImpl` 的文档字符串。
+- **L172** `    Broadcast a column vector` — **EN:** Continues the docstring for the class `ColumnBroadcastImpl`. **CN:** 继续说明 class `ColumnBroadcastImpl` 的文档字符串。
+- **L173** `    """` — **EN:** Ends the docstring for the class `ColumnBroadcastImpl`. **CN:** 结束说明 class `ColumnBroadcastImpl` 的文档字符串。
+- **L174** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L175** `        super().__init__(node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L176** `        self.stride_dtype = "int"` — **EN:** Assigns a value to self.stride_dtype. **CN:** 将一个值赋给 self.stride_dtype。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L179** `    def argument_type(self):` — **EN:** Defines function `argument_type`. **CN:** 定义函数 `argument_type`。
+- **L180** `        stride_mnl = self.get_stride_mnl()` — **EN:** Assigns a value to stride_mnl. **CN:** 将一个值赋给 stride_mnl。
+- **L181** `        name = self.name` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L182** `        tuple_type = tuple_factory(stride_mnl, self.stride_dtype)` — **EN:** Assigns a value to tuple_type. **CN:** 将一个值赋给 tuple_type。
+- **L183** `        element_type = self.element` — **EN:** Assigns a value to element_type. **CN:** 将一个值赋给 element_type。
+- **L184** `        class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L185** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L186** `                ("ptr_col", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `                ("null_default", dtype2ctype[element_type]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `                ("dCol", tuple_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `            def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L191** `                ptr = kwargs[name]` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L192** `                self.ptr_col = int(ptr)` — **EN:** Assigns a value to self.ptr_col. **CN:** 将一个值赋给 self.ptr_col。
+- **L193** `                self.null_default = to_ctype_value(0, element_type)` — **EN:** Assigns a value to self.null_default. **CN:** 将一个值赋给 self.null_default。
+- **L194** `                self.dCol = tuple_type(stride_mnl)` — **EN:** Assigns a value to self.dCol. **CN:** 将一个值赋给 self.dCol。
+- **L195** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L196** `        return _Argument` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L199** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L200** `        if node.name in LoadImplBase.reserved_names:` — **EN:** Starts a conditional branch guarded by `node.name in LoadImplBase.reserved_names`. **CN:** 开始一个由 `node.name in LoadImplBase.reserved_names` 控制的条件分支。
+- **L201** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `        strideMN = node.tensor.stride[-2:]` — **EN:** Assigns a value to strideMN. **CN:** 将一个值赋给 strideMN。
+- **L204** `        if strideMN == (1, 0):` — **EN:** Starts a conditional branch guarded by `strideMN == (1, 0)`. **CN:** 开始一个由 `strideMN == (1, 0)` 控制的条件分支。
+- **L205** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L206** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L207** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `class ScalarBroadcastImpl(LoadImplBase):` — **EN:** Defines class `ScalarBroadcastImpl` with bases LoadImplBase. **CN:** 定义类 `ScalarBroadcastImpl`，其基类为 LoadImplBase。
+- **L211** `    """` — **EN:** Starts the docstring for the class `ScalarBroadcastImpl`. **CN:** 开始说明 class `ScalarBroadcastImpl` 的文档字符串。
+- **L212** `    Broadcast a scalar` — **EN:** Continues the docstring for the class `ScalarBroadcastImpl`. **CN:** 继续说明 class `ScalarBroadcastImpl` 的文档字符串。
+- **L213** `    """` — **EN:** Ends the docstring for the class `ScalarBroadcastImpl`. **CN:** 结束说明 class `ScalarBroadcastImpl` 的文档字符串。
+- **L214** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L215** `        super().__init__(node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L216** `        self.stride_dtype = "int"` — **EN:** Assigns a value to self.stride_dtype. **CN:** 将一个值赋给 self.stride_dtype。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L219** `    def argument_type(self):` — **EN:** Defines function `argument_type`. **CN:** 定义函数 `argument_type`。
+- **L220** `        stride_mnl = self.get_stride_mnl()` — **EN:** Assigns a value to stride_mnl. **CN:** 将一个值赋给 stride_mnl。
+- **L221** `        name = self.name` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L222** `        tuple_type = tuple_factory(stride_mnl, self.stride_dtype)` — **EN:** Assigns a value to tuple_type. **CN:** 将一个值赋给 tuple_type。
+- **L223** `        element_type = self.element` — **EN:** Assigns a value to element_type. **CN:** 将一个值赋给 element_type。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `        if self.tensor.is_constant:` — **EN:** Starts a conditional branch guarded by `self.tensor.is_constant`. **CN:** 开始一个由 `self.tensor.is_constant` 控制的条件分支。
+- **L226** `            value = self.tensor.value` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L227** `            class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L228** `                _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L229** `                    ("scalars", dtype2ctype[element_type]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `                    ("scalar_ptrs", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `                    ("dScalar", tuple_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `                ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `                def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L234** `                    self.scalars = to_ctype_value(value, element_type)` — **EN:** Assigns a value to self.scalars. **CN:** 将一个值赋给 self.scalars。
+- **L235** `                    self.scalar_ptrs = 0` — **EN:** Assigns a value to self.scalar_ptrs. **CN:** 将一个值赋给 self.scalar_ptrs。
+- **L236** `                    self.dScalar = tuple_type(stride_mnl)` — **EN:** Assigns a value to self.dScalar. **CN:** 将一个值赋给 self.dScalar。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L239** `            class _Argument(ctypes.Structure):` — **EN:** Defines class `_Argument` with bases ctypes.Structure. **CN:** 定义类 `_Argument`，其基类为 ctypes.Structure。
+- **L240** `                _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L241** `                    ("scalars", dtype2ctype[element_type]),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `                    ("scalar_ptrs", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                    ("dScalar", tuple_type)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `                ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `                def __init__(self, kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L246** `                    scalar_or_ptr = kwargs[name]` — **EN:** Assigns a value to scalar_or_ptr. **CN:** 将一个值赋给 scalar_or_ptr。
+- **L247** `                    if isinstance(scalar_or_ptr, float):` — **EN:** Starts a conditional branch guarded by `isinstance(scalar_or_ptr, float)`. **CN:** 开始一个由 `isinstance(scalar_or_ptr, float)` 控制的条件分支。
+- **L248** `                        self.scalars = to_ctype_value(scalar_or_ptr, element_type)` — **EN:** Assigns a value to self.scalars. **CN:** 将一个值赋给 self.scalars。
+- **L249** `                        self.scalar_ptrs = 0` — **EN:** Assigns a value to self.scalar_ptrs. **CN:** 将一个值赋给 self.scalar_ptrs。
+- **L250** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L251** `                        self.scalar_ptrs = int(scalar_or_ptr)` — **EN:** Assigns a value to self.scalar_ptrs. **CN:** 将一个值赋给 self.scalar_ptrs。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `                    self.dScalar = tuple_type(stride_mnl)` — **EN:** Assigns a value to self.dScalar. **CN:** 将一个值赋给 self.dScalar。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `        return _Argument` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L258** `    def match(node, problem_size: tuple):` — **EN:** Defines function `match`. **CN:** 定义函数 `match`。
+- **L259** `        if node.name in LoadImplBase.reserved_names:` — **EN:** Starts a conditional branch guarded by `node.name in LoadImplBase.reserved_names`. **CN:** 开始一个由 `node.name in LoadImplBase.reserved_names` 控制的条件分支。
+- **L260** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `        strideMN = node.tensor.stride[-2:]` — **EN:** Assigns a value to strideMN. **CN:** 将一个值赋给 strideMN。
+- **L263** `        if strideMN == (0, 0):` — **EN:** Starts a conditional branch guarded by `strideMN == (0, 0)`. **CN:** 开始一个由 `strideMN == (0, 0)` 控制的条件分支。
+- **L264** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L265** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L266** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L269** `class LoadNode(NodeBase):` — **EN:** Defines class `LoadNode` with bases NodeBase. **CN:** 定义类 `LoadNode`，其基类为 NodeBase。
+- **L270** `    """` — **EN:** Starts the docstring for the class `LoadNode`. **CN:** 开始说明 class `LoadNode` 的文档字符串。
+- **L271** `    Load Node` — **EN:** Continues the docstring for the class `LoadNode`. **CN:** 继续说明 class `LoadNode` 的文档字符串。
+- **L272** `    """` — **EN:** Ends the docstring for the class `LoadNode`. **CN:** 结束说明 class `LoadNode` 的文档字符串。
+- **L273** `    cnt = 0` — **EN:** Assigns a value to cnt. **CN:** 将一个值赋给 cnt。
+- **L274** `    possible_impls = [` — **EN:** Assigns a value to possible_impls. **CN:** 将一个值赋给 possible_impls。
+- **L275** `        AccumulatorImpl, LoadSrcImpl, AuxLoadImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `        RowBroadcastImpl, ColumnBroadcastImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `        ScalarBroadcastImpl` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `    def __init__(self, name: str) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L280** `        if name is None:` — **EN:** Starts a conditional branch guarded by `name is None`. **CN:** 开始一个由 `name is None` 控制的条件分支。
+- **L281** `            name = f"load{LoadNode.cnt}"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L282** `            LoadNode.cnt += 1` — **EN:** Updates LoadNode.cnt in place. **CN:** 原地更新 LoadNode.cnt。
+- **L283** `        super().__init__(name)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L284** `        self.op = "load"` — **EN:** Assigns a value to self.op. **CN:** 将一个值赋给 self.op。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `    def type_propagation(self, *args, **kwargs):` — **EN:** Defines function `type_propagation`. **CN:** 定义函数 `type_propagation`。
+- **L287** `        """` — **EN:** Starts the docstring for the function `type_propagation`. **CN:** 开始说明 function `type_propagation` 的文档字符串。
+- **L288** `        Load node loads tensor under type \`tensor.element\` and returns an array of type \`tensor.element\`.` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L289** `        """` — **EN:** Ends the docstring for the function `type_propagation`. **CN:** 结束说明 function `type_propagation` 的文档字符串。
+- **L290** `        if self.tensor is None:` — **EN:** Starts a conditional branch guarded by `self.tensor is None`. **CN:** 开始一个由 `self.tensor is None` 控制的条件分支。
+- **L291** `            raise RuntimeError(f"The tensor of node {self.name} is unknown.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L292** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L293** `        self.element = self.tensor.element` — **EN:** Assigns a value to self.element. **CN:** 将一个值赋给 self.element。
+- **L294** `        self.element_output = self.tensor.element` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.ir.load_nodes`. CN: 模块名为 `cutlass_cppgen.backend.evt.ir.load_nodes`。
+- EN: Module docstring summary: Load nodes and implementations CN: 模块文档摘要为：Load nodes and implementations
+- EN: Top-level classes: LoadImplBase, AccumulatorImpl, LoadSrcImpl, AuxLoadImpl, RowBroadcastImpl, ColumnBroadcastImpl, ScalarBroadcastImpl, LoadNode CN: 顶层类包括：LoadImplBase, AccumulatorImpl, LoadSrcImpl, AuxLoadImpl, RowBroadcastImpl, ColumnBroadcastImpl, ScalarBroadcastImpl, LoadNode
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.backend.c_types:tuple_factory, cutlass_cppgen.backend.epilogue:dtype2ctype,to_ctype_value, cutlass_cppgen.backend.evt.ir.node:NodeBase,ImplBase CN: 内部依赖：cutlass_cppgen.backend.c_types:tuple_factory, cutlass_cppgen.backend.epilogue:dtype2ctype,to_ctype_value, cutlass_cppgen.backend.evt.ir.node:NodeBase,ImplBase
+- EN: External or standard-library dependencies: ctypes CN: 外部或标准库依赖：ctypes

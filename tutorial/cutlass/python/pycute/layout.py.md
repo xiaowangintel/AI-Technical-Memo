@@ -1,0 +1,388 @@
+# layout.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/pycute/layout.py`
+
+## Purpose / 作用
+- EN: Definition of CuTe Layouts and functions to manipulate them
+- CN: 该模块的文档字符串将其描述为：Definition of CuTe Layouts and functions to manipulate them
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Definition of CuTe Layouts and functions to manipulate them` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from itertools import chain` — **EN:** Imports chain from `itertools`. **CN:** 从 `itertools` 导入 chain。
+- **L38** `from typing import Union` — **EN:** Imports Union from `typing`. **CN:** 从 `typing` 导入 Union。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `from .int_tuple import *` — **EN:** Imports * from `.int_tuple`. **CN:** 从 `.int_tuple` 导入 *。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `class LayoutBase:` — **EN:** Defines class `LayoutBase`. **CN:** 定义类 `LayoutBase`。
+- **L44** `  pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `def is_layout(x):` — **EN:** Defines function `is_layout`. **CN:** 定义函数 `is_layout`。
+- **L48** `  return isinstance(x, LayoutBase)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `class Layout(LayoutBase):` — **EN:** Defines class `Layout` with bases LayoutBase. **CN:** 定义类 `Layout`，其基类为 LayoutBase。
+- **L52** `  def __init__(self, _shape, _stride=None):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L53** `    self.shape  = _shape` — **EN:** Assigns a value to self.shape. **CN:** 将一个值赋给 self.shape。
+- **L54** `    if _stride is None:` — **EN:** Starts a conditional branch guarded by `_stride is None`. **CN:** 开始一个由 `_stride is None` 控制的条件分支。
+- **L55** `      self.stride = prefix_product(self.shape)` — **EN:** Assigns a value to self.stride. **CN:** 将一个值赋给 self.stride。
+- **L56** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L57** `      self.stride = _stride` — **EN:** Assigns a value to self.stride. **CN:** 将一个值赋给 self.stride。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `  # operator ==` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `  def __eq__(self, other):` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L61** `    return self.shape == other.shape and self.stride == other.stride` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `  # operator len(L)  (len [rank] like tuples)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `  def __len__(self):` — **EN:** Defines function `__len__`. **CN:** 定义函数 `__len__`。
+- **L65** `    if is_tuple(self.shape):` — **EN:** Starts a conditional branch guarded by `is_tuple(self.shape)`. **CN:** 开始一个由 `is_tuple(self.shape)` 控制的条件分支。
+- **L66** `      return len(self.shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L67** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L68** `      return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `  # operator ()    (map coord to idx)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `  def __call__(self, *args):` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L72** `    """` — **EN:** Starts the docstring for the function `__call__`. **CN:** 开始说明 function `__call__` 的文档字符串。
+- **L73** `    Map a logical coordinate to a linear index (Coord has no Underscore slice operators)` — **EN:** Continues the docstring for the function `__call__`. **CN:** 继续说明 function `__call__` 的文档字符串。
+- **L74** `    OR` — **EN:** Continues the docstring for the function `__call__`. **CN:** 继续说明 function `__call__` 的文档字符串。
+- **L75** `    Slice the layout and return the sublayout (Coord has an Underscore slice op)` — **EN:** Continues the docstring for the function `__call__`. **CN:** 继续说明 function `__call__` 的文档字符串。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    Follow the same behavior of \`Layout::operator(Coord const&)\` in cute C++` — **EN:** Continues the docstring for the function `__call__`. **CN:** 继续说明 function `__call__` 的文档字符串。
+- **L78** `    """` — **EN:** Ends the docstring for the function `__call__`. **CN:** 结束说明 function `__call__` 的文档字符串。
+- **L79** `    if has_none(args):` — **EN:** Starts a conditional branch guarded by `has_none(args)`. **CN:** 开始一个由 `has_none(args)` 控制的条件分支。
+- **L80** `      if len(args) == 1:` — **EN:** Starts a conditional branch guarded by `len(args) == 1`. **CN:** 开始一个由 `len(args) == 1` 控制的条件分支。
+- **L81** `        return Layout(slice_(args[0], self.shape), slice_(args[0], self.stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L82** `      else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L83** `        return Layout(slice_(args, self.shape), slice_(args, self.stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L84** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L85** `      if len(args) == 1:` — **EN:** Starts a conditional branch guarded by `len(args) == 1`. **CN:** 开始一个由 `len(args) == 1` 控制的条件分支。
+- **L86** `        return crd2idx(args[0], self.shape, self.stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L87** `      else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L88** `        return crd2idx(args, self.shape, self.stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `  # operator []    (get-i like tuples)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `  def __getitem__(self, i):` — **EN:** Defines function `__getitem__`. **CN:** 定义函数 `__getitem__`。
+- **L92** `    if is_tuple(self.shape):` — **EN:** Starts a conditional branch guarded by `is_tuple(self.shape)`. **CN:** 开始一个由 `is_tuple(self.shape)` 控制的条件分支。
+- **L93** `      return Layout(self.shape[i], self.stride[i])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L94** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L95** `      assert i == 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L96** `      return Layout(self.shape, self.stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `  # size(layout)   Size of the domain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L99** `  def size(self):` — **EN:** Defines function `size`. **CN:** 定义函数 `size`。
+- **L100** `    return product(self.shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `  # cosize(layout)   Size of the codomain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L103** `  def cosize(self):` — **EN:** Defines function `cosize`. **CN:** 定义函数 `cosize`。
+- **L104** `    return self(self.size() - 1) + 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `  # print and str` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** `  def __str__(self):` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L108** `    return f"{self.shape}:{self.stride}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `  # error msgs and representation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L111** `  def __repr__(self):` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L112** `    return f"Layout({self.shape},{self.stride})"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `# Make Layout from a list of layouts (each layout it's own mode in the result)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `def make_layout(*layouts):` — **EN:** Defines function `make_layout`. **CN:** 定义函数 `make_layout`。
+- **L117** `  if len(layouts) == 1 and not is_layout(layouts[0]):` — **EN:** Starts a conditional branch guarded by `len(layouts) == 1 and (not is_layout(layouts[0]))`. **CN:** 开始一个由 `len(layouts) == 1 and (not is_layout(layouts[0]))` 控制的条件分支。
+- **L118** `    layouts = layouts[0]` — **EN:** Assigns a value to layouts. **CN:** 将一个值赋给 layouts。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `  shape, stride = zip(*((a.shape,a.stride) for a in layouts))` — **EN:** Assigns a value to (shape, stride). **CN:** 将一个值赋给 (shape, stride)。
+- **L121** `  return Layout(shape, stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `# Size of the domain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L125** `def size(layout):` — **EN:** Defines function `size`. **CN:** 定义函数 `size`。
+- **L126** `  if is_layout(layout):` — **EN:** Starts a conditional branch guarded by `is_layout(layout)`. **CN:** 开始一个由 `is_layout(layout)` 控制的条件分支。
+- **L127** `    return layout.size()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** `  return product(layout)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `# Size of the codomain` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L132** `def cosize(layout):` — **EN:** Defines function `cosize`. **CN:** 定义函数 `cosize`。
+- **L133** `  return layout.cosize()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `# Layout coalesce -- flatten and combine as many modes as possible while preserving the int-to-int function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L137** `def coalesce(layout, profile=None):` — **EN:** Defines function `coalesce`. **CN:** 定义函数 `coalesce`。
+- **L138** `  if is_tuple(profile):` — **EN:** Starts a conditional branch guarded by `is_tuple(profile)`. **CN:** 开始一个由 `is_tuple(profile)` 控制的条件分支。
+- **L139** `    assert len(layout) >= len(profile)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L140** `    return make_layout(chain((coalesce(layout[i], profile[i]) for i in range(           0,len(profile))),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L141** `                             (layout[i]                       for i in range(len(profile),len(layout)))))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `  result_shape  = [1]` — **EN:** Assigns a value to result_shape. **CN:** 将一个值赋给 result_shape。
+- **L144** `  result_stride = [0]` — **EN:** Assigns a value to result_stride. **CN:** 将一个值赋给 result_stride。
+- **L145** `  for (shape,stride) in zip(flatten(layout.shape),flatten(layout.stride)):` — **EN:** Starts a loop assigning items from `zip(flatten(layout.shape), flatten(layout.stride))` to `(shape, stride)`. **CN:** 开始一个循环，将 `zip(flatten(layout.shape), flatten(layout.stride))` 的元素赋给 `(shape, stride)`。
+- **L146** `    # skip their shape-1s` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L147** `    if shape == 1:` — **EN:** Starts a conditional branch guarded by `shape == 1`. **CN:** 开始一个由 `shape == 1` 控制的条件分支。
+- **L148** `      continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L149** `    # replace our shape-1 with anything` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L150** `    elif result_shape[-1] == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L151** `      result_shape[-1]  = shape` — **EN:** Assigns a value to result_shape[-1]. **CN:** 将一个值赋给 result_shape[-1]。
+- **L152** `      result_stride[-1] = stride` — **EN:** Assigns a value to result_stride[-1]. **CN:** 将一个值赋给 result_stride[-1]。
+- **L153** `    # merge modes if the shape*stride match` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L154** `    elif result_shape[-1] * result_stride[-1] == stride:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L155** `      result_shape[-1] = result_shape[-1] * shape` — **EN:** Assigns a value to result_shape[-1]. **CN:** 将一个值赋给 result_shape[-1]。
+- **L156** `    # append a new mode` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L157** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L158** `      result_shape.append(shape)` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L159** `      result_stride.append(stride)` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `  if len(result_shape) == 1:` — **EN:** Starts a conditional branch guarded by `len(result_shape) == 1`. **CN:** 开始一个由 `len(result_shape) == 1` 控制的条件分支。
+- **L162** `    return Layout(result_shape[0], result_stride[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L163** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L164** `    return Layout(tuple(result_shape), tuple(result_stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `# Layout filter -- replace all stride-0 modes with size-1 and then coalesce to remove them` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L168** `def filter(layout, profile=None):` — **EN:** Defines function `filter`. **CN:** 定义函数 `filter`。
+- **L169** `  if is_tuple(profile):` — **EN:** Starts a conditional branch guarded by `is_tuple(profile)`. **CN:** 开始一个由 `is_tuple(profile)` 控制的条件分支。
+- **L170** `    assert len(layout) >= len(profile)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L171** `    return make_layout(chain((filter(layout[i], profile[i]) for i in range(           0,len(profile))),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L172** `                             (layout[i]                     for i in range(len(profile),len(layout)))))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `  result_shape  = []` — **EN:** Assigns a value to result_shape. **CN:** 将一个值赋给 result_shape。
+- **L175** `  result_stride = []` — **EN:** Assigns a value to result_stride. **CN:** 将一个值赋给 result_stride。
+- **L176** `  for (shape,stride) in zip(flatten(layout.shape),flatten(layout.stride)):` — **EN:** Starts a loop assigning items from `zip(flatten(layout.shape), flatten(layout.stride))` to `(shape, stride)`. **CN:** 开始一个循环，将 `zip(flatten(layout.shape), flatten(layout.stride))` 的元素赋给 `(shape, stride)`。
+- **L177** `    # skip their shape-1s and stride-0s` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L178** `    if not (shape == 1 or stride == 0):` — **EN:** Starts a conditional branch guarded by `not (shape == 1 or stride == 0)`. **CN:** 开始一个由 `not (shape == 1 or stride == 0)` 控制的条件分支。
+- **L179** `      result_shape.append(shape)` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L180** `      result_stride.append(stride)` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `  if len(result_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(result_shape) == 0`. **CN:** 开始一个由 `len(result_shape) == 0` 控制的条件分支。
+- **L183** `    return Layout(1,0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L184** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L185** `    return coalesce(Layout(tuple(result_shape), tuple(result_stride)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `# Layout composition` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L189** `# Use tuples-of-layouts to perform this operation by-mode and None as no-op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L190** `def composition(layoutA, layoutB):` — **EN:** Defines function `composition`. **CN:** 定义函数 `composition`。
+- **L191** `  if layoutB is None:` — **EN:** Starts a conditional branch guarded by `layoutB is None`. **CN:** 开始一个由 `layoutB is None` 控制的条件分支。
+- **L192** `    return layoutA` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L193** `  elif is_int(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L194** `    return composition(layoutA, Layout(layoutB))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L195** `  elif is_tuple(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L196** `    assert len(layoutA) >= len(layoutB)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L197** `    return make_layout(chain((composition(layoutA[i], layoutB[i]) for i in range(           0,len(layoutB))),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L198** `                             (layoutA[i]                          for i in range(len(layoutB),len(layoutA)))))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `  elif is_tuple(layoutB.shape):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L200** `    return make_layout(composition(layoutA, layoutB_i) for layoutB_i in layoutB)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `  if layoutB.stride == 0:` — **EN:** Starts a conditional branch guarded by `layoutB.stride == 0`. **CN:** 开始一个由 `layoutB.stride == 0` 控制的条件分支。
+- **L203** `    return Layout(layoutB.shape, 0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L204** `  else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L205** `    result_shape  = []` — **EN:** Assigns a value to result_shape. **CN:** 将一个值赋给 result_shape。
+- **L206** `    result_stride = []` — **EN:** Assigns a value to result_stride. **CN:** 将一个值赋给 result_stride。
+- **L207** `    rest_shape    = layoutB.shape` — **EN:** Assigns a value to rest_shape. **CN:** 将一个值赋给 rest_shape。
+- **L208** `    rest_stride   = layoutB.stride` — **EN:** Assigns a value to rest_stride. **CN:** 将一个值赋给 rest_stride。
+- **L209** `    flat_A = coalesce(layoutA)` — **EN:** Assigns a value to flat_A. **CN:** 将一个值赋给 flat_A。
+- **L210** `    for (curr_shape, curr_stride) in zip(flatten(flat_A.shape)[:-1], flatten(flat_A.stride)[:-1]):` — **EN:** Starts a loop assigning items from `zip(flatten(flat_A.shape)[:-1], flatten(flat_A....` to `(curr_shape, curr_stride)`. **CN:** 开始一个循环，将 `zip(flatten(flat_A.shape)[:-1], flatten(flat_A....` 的元素赋给 `(curr_shape, curr_stride)`。
+- **L211** `      assert curr_shape % rest_stride == 0 or rest_stride % curr_shape == 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L212** `      new_shape = min(max(1, curr_shape // rest_stride), rest_shape)` — **EN:** Assigns a value to new_shape. **CN:** 将一个值赋给 new_shape。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `      if new_shape != 1:` — **EN:** Starts a conditional branch guarded by `new_shape != 1`. **CN:** 开始一个由 `new_shape != 1` 控制的条件分支。
+- **L215** `        result_shape.append(new_shape)` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L216** `        result_stride.append(rest_stride * curr_stride)` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `      rest_shape  = rest_shape // new_shape` — **EN:** Assigns a value to rest_shape. **CN:** 将一个值赋给 rest_shape。
+- **L219** `      rest_stride = -(-rest_stride // curr_shape)  # Python exclusive impl: "//" is always floor div so == ceil_div(abs(rest_stride), curr_shape) * signum(rest_stride)` — **EN:** Assigns a value to rest_stride. **CN:** 将一个值赋给 rest_stride。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    if rest_shape != 1 or len(result_shape) == 0:` — **EN:** Starts a conditional branch guarded by `rest_shape != 1 or len(result_shape) == 0`. **CN:** 开始一个由 `rest_shape != 1 or len(result_shape) == 0` 控制的条件分支。
+- **L222** `      result_shape.append(rest_shape)` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L223** `      result_stride.append(rest_stride * flatten(flat_A.stride)[-1])` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    if len(result_shape) == 1:` — **EN:** Starts a conditional branch guarded by `len(result_shape) == 1`. **CN:** 开始一个由 `len(result_shape) == 1` 控制的条件分支。
+- **L226** `      return Layout(result_shape[0], result_stride[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L227** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L228** `      return Layout(tuple(result_shape), tuple(result_stride))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L231** `# Layout complement` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L232** `def complement(layout, max_idx=1):` — **EN:** Defines function `complement`. **CN:** 定义函数 `complement`。
+- **L233** `  if is_int(layout):` — **EN:** Starts a conditional branch guarded by `is_int(layout)`. **CN:** 开始一个由 `is_int(layout)` 控制的条件分支。
+- **L234** `    return complement(Layout(layout))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `  result_shape  = []` — **EN:** Assigns a value to result_shape. **CN:** 将一个值赋给 result_shape。
+- **L237** `  result_stride = []` — **EN:** Assigns a value to result_stride. **CN:** 将一个值赋给 result_stride。
+- **L238** `  current_idx = 1` — **EN:** Assigns a value to current_idx. **CN:** 将一个值赋给 current_idx。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `  sorted_DS = sorted(zip(flatten(layout.stride), flatten(layout.shape)))` — **EN:** Assigns a value to sorted_DS. **CN:** 将一个值赋给 sorted_DS。
+- **L241** `  for (stride, shape) in sorted_DS:` — **EN:** Starts a loop assigning items from `sorted_DS` to `(stride, shape)`. **CN:** 开始一个循环，将 `sorted_DS` 的元素赋给 `(stride, shape)`。
+- **L242** `    if stride == 0 or shape == 1:` — **EN:** Starts a conditional branch guarded by `stride == 0 or shape == 1`. **CN:** 开始一个由 `stride == 0 or shape == 1` 控制的条件分支。
+- **L243** `      continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `    in_bound = current_idx <= shape * stride` — **EN:** Assigns a value to in_bound. **CN:** 将一个值赋给 in_bound。
+- **L246** `    # To support symbolic value which can't be evaluated now` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L247** `    assert (type(in_bound) is not bool) or in_bound` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    result_shape.append(stride // current_idx)` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L250** `    result_stride.append(current_idx)` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L251** `    current_idx = shape * stride` — **EN:** Assigns a value to current_idx. **CN:** 将一个值赋给 current_idx。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `  result_shape.append((max_idx + current_idx - 1) // current_idx)  # ceil_div` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L254** `  result_stride.append(current_idx)` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `  return coalesce(Layout(tuple(result_shape), tuple(result_stride)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `# Layout right inverse` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L260** `def right_inverse(layout):` — **EN:** Defines function `right_inverse`. **CN:** 定义函数 `right_inverse`。
+- **L261** `  if layout is None:` — **EN:** Starts a conditional branch guarded by `layout is None`. **CN:** 开始一个由 `layout is None` 控制的条件分支。
+- **L262** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L263** `  elif is_int(layout):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L264** `    return Layout(layout)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `  result_shape  = []` — **EN:** Assigns a value to result_shape. **CN:** 将一个值赋给 result_shape。
+- **L267** `  result_stride = []` — **EN:** Assigns a value to result_stride. **CN:** 将一个值赋给 result_stride。
+- **L268** `  current_idx = 1` — **EN:** Assigns a value to current_idx. **CN:** 将一个值赋给 current_idx。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `  flat_shape  = flatten(layout.shape)` — **EN:** Assigns a value to flat_shape. **CN:** 将一个值赋给 flat_shape。
+- **L271** `  flat_stride = flatten(layout.stride)` — **EN:** Assigns a value to flat_stride. **CN:** 将一个值赋给 flat_stride。
+- **L272** `  sorted_DSA = sorted(zip(flat_stride, flat_shape, prefix_product(flat_shape)))` — **EN:** Assigns a value to sorted_DSA. **CN:** 将一个值赋给 sorted_DSA。
+- **L273** `  for (stride,shape,rstride) in sorted_DSA:` — **EN:** Starts a loop assigning items from `sorted_DSA` to `(stride, shape, rstride)`. **CN:** 开始一个循环，将 `sorted_DSA` 的元素赋给 `(stride, shape, rstride)`。
+- **L274** `    if shape == 1:` — **EN:** Starts a conditional branch guarded by `shape == 1`. **CN:** 开始一个由 `shape == 1` 控制的条件分支。
+- **L275** `      continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L276** `    if current_idx != stride:` — **EN:** Starts a conditional branch guarded by `current_idx != stride`. **CN:** 开始一个由 `current_idx != stride` 控制的条件分支。
+- **L277** `      break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L279** `    result_shape.append(shape)` — **EN:** Invokes `result_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `result_shape.append`。
+- **L280** `    result_stride.append(rstride)` — **EN:** Invokes `result_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `result_stride.append`。
+- **L281** `    current_idx = shape * stride` — **EN:** Assigns a value to current_idx. **CN:** 将一个值赋给 current_idx。
+- **L282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L283** `  return coalesce(Layout(tuple(result_shape), tuple(result_stride)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `# Layout left inverse` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L287** `def left_inverse(layout):` — **EN:** Defines function `left_inverse`. **CN:** 定义函数 `left_inverse`。
+- **L288** `  if layout is None:` — **EN:** Starts a conditional branch guarded by `layout is None`. **CN:** 开始一个由 `layout is None` 控制的条件分支。
+- **L289** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L290** `  elif is_int(layout):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L291** `    return Layout(layout)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L292** `  return right_inverse(make_layout(layout, complement(layout)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `# Split a layout by the composition of B and the "rest"` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L296** `# Use tuples-of-layouts to perform this operation by-mode and None as no-op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L297** `def logical_divide(layoutA, layoutB):` — **EN:** Defines function `logical_divide`. **CN:** 定义函数 `logical_divide`。
+- **L298** `  if layoutB is None:` — **EN:** Starts a conditional branch guarded by `layoutB is None`. **CN:** 开始一个由 `layoutB is None` 控制的条件分支。
+- **L299** `    return layoutA` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L300** `  elif is_int(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L301** `    return logical_divide(layoutA, Layout(layoutB))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L302** `  elif is_tuple(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L303** `    assert len(layoutA) >= len(layoutB)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L304** `    return make_layout(chain((logical_divide(layoutA[i], layoutB[i]) for i in range(           0,len(layoutB))),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L305** `                             (layoutA[i]                             for i in range(len(layoutB),len(layoutA)))))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `  return composition(layoutA, make_layout(layoutB, complement(layoutB, size(layoutA))))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `# Reproduce a layoutA over a layoutB` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L311** `# Use tuples-of-layouts to perform this operation by-mode and None as no-op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L312** `def logical_product(layoutA, layoutB):` — **EN:** Defines function `logical_product`. **CN:** 定义函数 `logical_product`。
+- **L313** `  if layoutB is None:` — **EN:** Starts a conditional branch guarded by `layoutB is None`. **CN:** 开始一个由 `layoutB is None` 控制的条件分支。
+- **L314** `    return layoutA` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L315** `  elif is_int(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L316** `    return logical_divide(layoutA, Layout(layoutB))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L317** `  elif is_tuple(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L318** `    assert len(layoutA) >= len(layoutB)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L319** `    return make_layout(chain((logical_product(layoutA[i], layoutB[i]) for i in range(           0,len(layoutB))),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L320** `                             (layoutA[i]                              for i in range(len(layoutB),len(layoutA)))))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `  return make_layout(layoutA, composition(complement(layoutA, size(layoutA)*cosize(layoutB)), layoutB));` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L323** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `# Gather the modes from a hierarchical logical_divide or logical_product` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L326** `def hier_unzip(splitter, layoutA, layoutB):` — **EN:** Defines function `hier_unzip`. **CN:** 定义函数 `hier_unzip`。
+- **L327** `  if layoutB is None:` — **EN:** Starts a conditional branch guarded by `layoutB is None`. **CN:** 开始一个由 `layoutB is None` 控制的条件分支。
+- **L328** `    return make_layout(Layout(1,0), layoutA)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L329** `  elif is_tuple(layoutB):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L330** `    assert len(layoutA) >= len(layoutB)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L331** `    # A layout with shape ((A,a),(B,b),(C,c))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L332** `    split = make_layout(hier_unzip(splitter, layoutA[i], layoutB[i]) for i in range(0,len(layoutB)))` — **EN:** Assigns a value to split. **CN:** 将一个值赋给 split。
+- **L333** `    # Gather to shape ((A,B,C,...),(a,b,c,...,y,z))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L334** `    return make_layout(make_layout(       split[i][0] for i in range(           0,len(layoutB))),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L335** `                       make_layout(chain((split[i][1] for i in range(           0,len(layoutB))),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `                                         (layoutA[i]  for i in range(len(layoutB),len(layoutA))))))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `  # splitter must return a rank-2 layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** `  return splitter(layoutA, layoutB)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** `# Apply logical divide hierarchically and gather the split modes into two modes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L343** `def zipped_divide(layoutA, layoutB):` — **EN:** Defines function `zipped_divide`. **CN:** 定义函数 `zipped_divide`。
+- **L344** `  return hier_unzip(logical_divide, layoutA, layoutB)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** `# Perform logical divide hierarchically and gather tiles (B-layouts) into a new mode` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L348** `def tiled_divide(layoutA, layoutB):` — **EN:** Defines function `tiled_divide`. **CN:** 定义函数 `tiled_divide`。
+- **L349** `  result = zipped_divide(layoutA, layoutB)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L350** `  return make_layout([result[0]] + [result[1][i] for i in range(len(result[1]))])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** `# Apply logical product hierarchically and gather the split modes into two modes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L354** `def zipped_product(layoutA, layoutB):` — **EN:** Defines function `zipped_product`. **CN:** 定义函数 `zipped_product`。
+- **L355** `  return hier_unzip(logical_product, layoutA, layoutB)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `# Perform logical product hierarchically and gather tiles (B-layouts) into a new mode` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L359** `def tiled_product(layoutA, layoutB):` — **EN:** Defines function `tiled_product`. **CN:** 定义函数 `tiled_product`。
+- **L360** `  result = zipped_product(layoutA, layoutB)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L361** `  return make_layout([result[0]] + [result[1][i] for i in range(len(result[1]))])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `def slice_and_offset(crd: tuple,` — **EN:** Defines function `slice_and_offset`. **CN:** 定义函数 `slice_and_offset`。
+- **L365** `                     layout: Layout):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L366** `  return (Layout(slice_(crd, layout.shape), slice_(crd, layout.stride)),` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L367** `          crd2idx(crd, layout.shape, layout.stride))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `pycute.layout`. CN: 模块名为 `pycute.layout`。
+- EN: Module docstring summary: Definition of CuTe Layouts and functions to manipulate them CN: 模块文档摘要为：Definition of CuTe Layouts and functions to manipulate them
+- EN: Top-level classes: LayoutBase, Layout CN: 顶层类包括：LayoutBase, Layout
+- EN: Top-level functions: is_layout, make_layout, size, cosize, coalesce, filter, composition, complement, right_inverse, left_inverse, logical_divide, logical_product, ... (+6 more) CN: 顶层函数包括：is_layout, make_layout, size, cosize, coalesce, filter, composition, complement, right_inverse, left_inverse, logical_divide, logical_product, ... (+6 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .int_tuple:* CN: 内部依赖：.int_tuple:*
+- EN: External or standard-library dependencies: itertools:chain, typing:Union CN: 外部或标准库依赖：itertools:chain, typing:Union

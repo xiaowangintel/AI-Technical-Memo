@@ -1,0 +1,2389 @@
+# cooperative_gemm_common.hpp — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/cute/cooperative_gemm_common.hpp`
+
+## Purpose / 用途
+- EN: This header defines reusable CuTe test helpers for cooperative gemm common, shared by multiple neighboring tests.
+- CN: 该头文件为 cooperative gemm common 定义可复用的 CuTe 测试辅助代码，供多个相邻测试共享。
+
+## Line-by-Line Analysis / 逐行分析
+- **Line 1**: `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **Line 3**: ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: ` *`
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: ` **************************************************************************************************/`
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 32**: `#pragma once`
+  - EN: Ensures this header is included only once per translation unit.
+  - CN: 确保该头文件在一个编译单元中只会被包含一次。
+- **Line 33**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 34**: `#include "cutlass/relatively_equal.h"`
+  - EN: Provides CUTLASS `relatively_equal` functionality used by this file.
+  - CN: 提供该文件使用的 CUTLASS `relatively_equal` 功能。
+- **Line 35**: `#include "cutlass_unit_test.h"`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- **Line 36**: `#include "cutlass/util/reference/host/tensor_compare.h"`
+  - EN: Provides CUTLASS `util / reference / host / tensor_compare` functionality used by this file.
+  - CN: 提供该文件使用的 CUTLASS `util / reference / host / tensor_compare` 功能。
+- **Line 37**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 38**: `#include <iostream>`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- **Line 39**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 40**: `#include <thrust/host_vector.h>`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- **Line 41**: `#include <thrust/device_vector.h>`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- **Line 42**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 43**: `#include <cute/tensor.hpp>`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。
+- **Line 44**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 45**: `using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 46**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 47**: `template<typename T>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 48**: `struct fp64_tester {`
+  - EN: Declares `struct fp64_tester`, which packages related state or helper behavior.
+  - CN: 声明 `struct fp64_tester`，用于封装相关状态或辅助行为。
+- **Line 49**: `  using value_type = double;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 50**: `};`
+  - EN: Closes the scope for `struct fp64_tester`.
+  - CN: 结束 `struct fp64_tester` 的作用域。
+- **Line 51**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: `template<typename T>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 53**: `struct fp64_tester<complex<T>> {`
+  - EN: Declares `struct fp64_tester`, which packages related state or helper behavior.
+  - CN: 声明 `struct fp64_tester`，用于封装相关状态或辅助行为。
+- **Line 54**: `  using value_type = complex<double>;`
+  - EN: Creates alias `value_type` to simplify a verbose type or expression.
+  - CN: 创建别名 `value_type`，以简化较长的类型或表达式。
+- **Line 55**: `};`
+  - EN: Closes the scope for `struct fp64_tester`.
+  - CN: 结束 `struct fp64_tester` 的作用域。
+- **Line 56**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 57**: `template<class TA,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 58**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 59**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 60**: `         class ALayout, // logical shape (M, K)`
+  - EN: Declares `class ALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class ALayout`，用于封装相关状态或辅助行为。
+- **Line 61**: `         class BLayout, // logical shape (N, K)`
+  - EN: Declares `class BLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class BLayout`，用于封装相关状态或辅助行为。
+- **Line 62**: `         class CLayout> // logical shape (M, N)`
+  - EN: Declares `class CLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class CLayout`，用于封装相关状态或辅助行为。
+- **Line 63**: `auto host_generate_gemm_inputs(`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 64**: `  ALayout a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 65**: `  BLayout b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 66**: `  CLayout c_layout`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 67**: `) {`
+  - EN: Opens a new nested scope for the statement started on this line.
+  - CN: 为本行开始的语句打开新的嵌套作用域。
+- **Line 68**: `  thrust::host_vector<TA> h_a(cosize(a_layout));`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 69**: `  thrust::host_vector<TB> h_b(cosize(b_layout));`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 70**: `  thrust::host_vector<TC> h_c(cosize(c_layout));`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 71**: `  thrust::host_vector<TC> h_c_out(cosize(c_layout));`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 72**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 73**: `  auto h_a_tensor = make_tensor(h_a.data(), a_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 74**: `  auto h_b_tensor = make_tensor(h_b.data(), b_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 75**: `  auto h_c_tensor = make_tensor(h_c.data(), c_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 76**: `  size_t max_size   = std::max<size_t>({static_cast<size_t>(size(a_layout)),`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 77**: `                                        static_cast<size_t>(size(b_layout)),`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 78**: `                                        static_cast<size_t>(size(c_layout))});`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 79**: `  for (size_t i = 0; i < max_size; ++i) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 80**: `    double di = static_cast<double>(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 81**: `    if(i < size(a_layout)) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 82**: `      h_a_tensor(i) = static_cast<TA>(di / size(a_layout));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 83**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 84**: `    if(i < size(b_layout)) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 85**: `      h_b_tensor(i) = static_cast<TB>(di / size(a_layout));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 86**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 87**: `    if(i < size(c_layout)) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 88**: `      h_c_tensor(i) = static_cast<TC>((di*di) / size(a_layout));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 89**: `    }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 90**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 91**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 92**: `  return std::make_tuple(h_a, h_b, h_c, h_c_out);`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 93**: `}`
+  - EN: Closes the scope for `scope`.
+  - CN: 结束 `scope` 的作用域。
+- **Line 94**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 95**: `template<class Alpha, class EngineA, class ALayout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 96**: `         class EngineB, class BLayout,`
+  - EN: Declares `class EngineB`, which packages related state or helper behavior.
+  - CN: 声明 `class EngineB`，用于封装相关状态或辅助行为。
+- **Line 97**: `         class Beta, class EngineC, class CLayout,`
+  - EN: Declares `class Beta`, which packages related state or helper behavior.
+  - CN: 声明 `class Beta`，用于封装相关状态或辅助行为。
+- **Line 98**: `         class ALoadTransform  = cute::identity,`
+  - EN: Declares `class ALoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class ALoadTransform`，用于封装相关状态或辅助行为。
+- **Line 99**: `         class BLoadTransform  = cute::identity,`
+  - EN: Declares `class BLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class BLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 100**: `         class CLoadTransform  = cute::identity,`
+  - EN: Declares `class CLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 101**: `         class CStoreTransform = cute::identity>`
+  - EN: Declares `class CStoreTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CStoreTransform`，用于封装相关状态或辅助行为。
+- **Line 102**: `thrust::host_vector<typename EngineC::value_type>`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 103**: `host_reference_gemm(Alpha                           alpha,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 104**: `                    Tensor<EngineA, ALayout> const& h_a_tensor,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 105**: `                    Tensor<EngineB, BLayout> const& h_b_tensor,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 106**: `                    Beta                            beta,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 107**: `                    Tensor<EngineC, CLayout> const& h_c_tensor,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 108**: `                    ALoadTransform           const& a_load_transform = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 109**: `                    BLoadTransform           const& b_load_transform = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 110**: `                    CLoadTransform           const& c_load_transform = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 111**: `                    CStoreTransform          const& c_store_transform = {})`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 112**: `  {`
+  - EN: Opens the scope for `class CStoreTransform`.
+  - CN: 为 `class CStoreTransform` 打开作用域。
+- **Line 113**: `  // Cannot use ::value_type because it propagates to complex::value_type,`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 114**: `  // so ViewEngine<complex<double>>::value_type == double`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 115**: `  using TA = remove_cv_t<typename EngineA::element_type>;`
+  - EN: Creates alias `TA` to simplify a verbose type or expression.
+  - CN: 创建别名 `TA`，以简化较长的类型或表达式。
+- **Line 116**: `  using TB = remove_cv_t<typename EngineB::element_type>;`
+  - EN: Creates alias `TB` to simplify a verbose type or expression.
+  - CN: 创建别名 `TB`，以简化较长的类型或表达式。
+- **Line 117**: `  using TC = remove_cv_t<typename EngineC::element_type>;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 118**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 119**: `  using tester = fp64_tester<TC>;`
+  - EN: Creates alias `tester` to simplify a verbose type or expression.
+  - CN: 创建别名 `tester`，以简化较长的类型或表达式。
+- **Line 120**: `  using ABC_64 = typename tester::value_type;`
+  - EN: Creates alias `ABC_64` to simplify a verbose type or expression.
+  - CN: 创建别名 `ABC_64`，以简化较长的类型或表达式。
+- **Line 121**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 122**: `  static_assert(std::is_same_v<typename fp64_tester<TA>::value_type, typename fp64_tester<TB>::value_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 123**: `  static_assert(std::is_same_v<typename fp64_tester<TB>::value_type, typename fp64_tester<TC>::value_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 124**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 125**: `  thrust::host_vector<TC> h_c_ref(cosize(h_c_tensor.layout()), static_cast<TC>(0.0));`
+  - EN: Declares or uses a host vector to prepare reference or staging data.
+  - CN: 声明或使用主机端向量来准备参考数据或暂存数据。
+- **Line 126**: `  auto h_c_ref_tensor = make_tensor(h_c_ref.data(), h_c_tensor.layout());`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 127**: `  // A * B`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 128**: `  for (int k = 0; k < size<1>(h_a_tensor); k++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 129**: `    for (int m = 0; m < size<0>(h_a_tensor); m++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 130**: `      for (int n = 0; n < size<0>(h_b_tensor); n++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 131**: `          const auto a_value      = a_load_transform(h_a_tensor(m, k));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 132**: `          const auto b_value      = b_load_transform(h_b_tensor(n, k));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 133**: `          const auto a_value_fp64 = static_cast<ABC_64>(a_value);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 134**: `          const auto b_value_fp64 = static_cast<ABC_64>(b_value);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 135**: `          h_c_ref_tensor(m, n) += static_cast<TC>(a_value_fp64 * b_value_fp64);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 136**: `      }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 137**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 138**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 139**: `  // C = A*B + C`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 140**: `  for (int i = 0; i < size(h_c_ref_tensor); i++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 141**: `    const auto ab_value_fp64 = static_cast<ABC_64>(h_c_ref_tensor(i));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 142**: `    const auto c_value_fp64  = static_cast<ABC_64>(c_load_transform(h_c_tensor(i)));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 143**: `    h_c_ref_tensor(i)        = c_store_transform(static_cast<TC>(alpha * ab_value_fp64 + beta * c_value_fp64));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 144**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 145**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 146**: `  return h_c_ref;`
+  - EN: Returns the current result, status code, or computed object to the caller.
+  - CN: 向调用方返回当前结果、状态码或计算对象。
+- **Line 147**: `}`
+  - EN: Closes the scope for `class CStoreTransform`.
+  - CN: 结束 `class CStoreTransform` 的作用域。
+- **Line 148**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 149**: `template<class EngineC, class CLayout>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 150**: `void verify_gemm_correctness(cute::Tensor<EngineC, CLayout> const& h_c_out_tensor,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 151**: `                             cute::Tensor<EngineC, CLayout> const& h_c_ref_tensor)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 152**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 153**: `  // Cannot use ::value_type because it propagates to complex::value_type,`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 154**: `  // so ViewEngine<complex<double>>::value_type == double`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 155**: `  using TC = remove_cv_t<typename EngineC::element_type>;`
+  - EN: Creates alias `TC` to simplify a verbose type or expression.
+  - CN: 创建别名 `TC`，以简化较长的类型或表达式。
+- **Line 156**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 157**: `  using tester = fp64_tester<TC>;`
+  - EN: Creates alias `tester` to simplify a verbose type or expression.
+  - CN: 创建别名 `tester`，以简化较长的类型或表达式。
+- **Line 158**: `  using ABC_64 = typename tester::value_type;`
+  - EN: Creates alias `ABC_64` to simplify a verbose type or expression.
+  - CN: 创建别名 `ABC_64`，以简化较长的类型或表达式。
+- **Line 159**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 160**: `  for (int i = 0; i < size(h_c_ref_tensor); i++) {`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 161**: `    ABC_64 h_c_ref_i = h_c_ref_tensor(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 162**: `    ABC_64 h_c_out_i = h_c_out_tensor(i);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 163**: `    double epsilon(0.1f);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 164**: `    double nonzero_floor(std::numeric_limits<double>::min());`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 165**: `    bool passed = cutlass::relatively_equal(h_c_out_i, h_c_ref_i, epsilon, nonzero_floor);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 166**: `    ASSERT_TRUE(passed) << i << " - result:" << h_c_out_i << " expected:" << h_c_ref_i;`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 167**: `  }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 168**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 169**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 170**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 171**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 172**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 173**: `         class GMemALayout,`
+  - EN: Declares `class GMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemALayout`，用于封装相关状态或辅助行为。
+- **Line 174**: `         class GMemBLayout,`
+  - EN: Declares `class GMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 175**: `         class GMemCLayout,`
+  - EN: Declares `class GMemCLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemCLayout`，用于封装相关状态或辅助行为。
+- **Line 176**: `         class SMemALayout,`
+  - EN: Declares `class SMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemALayout`，用于封装相关状态或辅助行为。
+- **Line 177**: `         class SMemBLayout,`
+  - EN: Declares `class SMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 178**: `         class SMemCLayout,`
+  - EN: Declares `class SMemCLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCLayout`，用于封装相关状态或辅助行为。
+- **Line 179**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 180**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 181**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 182**: `         class Alpha,`
+  - EN: Declares `class Alpha`, which packages related state or helper behavior.
+  - CN: 声明 `class Alpha`，用于封装相关状态或辅助行为。
+- **Line 183**: `         class Beta,`
+  - EN: Declares `class Beta`, which packages related state or helper behavior.
+  - CN: 声明 `class Beta`，用于封装相关状态或辅助行为。
+- **Line 184**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 185**: `         class ALoadTransform,`
+  - EN: Declares `class ALoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class ALoadTransform`，用于封装相关状态或辅助行为。
+- **Line 186**: `         class BLoadTransform,`
+  - EN: Declares `class BLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class BLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 187**: `         class CLoadTransform,`
+  - EN: Declares `class CLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 188**: `         class CStoreTransform,`
+  - EN: Declares `class CStoreTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CStoreTransform`，用于封装相关状态或辅助行为。
+- **Line 189**: `         class SMemCopyOpA,`
+  - EN: Declares `class SMemCopyOpA`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCopyOpA`，用于封装相关状态或辅助行为。
+- **Line 190**: `         class SMemCopyOpB,`
+  - EN: Declares `class SMemCopyOpB`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCopyOpB`，用于封装相关状态或辅助行为。
+- **Line 191**: `         class SMemCopyLdOpC,`
+  - EN: Declares `class SMemCopyLdOpC`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCopyLdOpC`，用于封装相关状态或辅助行为。
+- **Line 192**: `         class SMemCopyStOpC>`
+  - EN: Declares `class SMemCopyStOpC`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCopyStOpC`，用于封装相关状态或辅助行为。
+- **Line 193**: `__launch_bounds__(ThreadBlockSize) __global__ void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 194**: `cooperative_gemm_kernel(GMemALayout gmem_a_layout,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 195**: `                        GMemBLayout gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 196**: `                        GMemCLayout gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 197**: `                        SMemALayout smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 198**: `                        SMemBLayout smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 199**: `                        SMemCLayout smem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 200**: `                        TA       const* a,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 201**: `                        TB       const* b,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 202**: `                        TC       const* c,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 203**: `                        TC            * c_out,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 204**: `                        Alpha    const  alpha,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 205**: `                        Beta     const  beta,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 206**: `                        TiledMma        tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 207**: `                        ALoadTransform  a_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 208**: `                        BLoadTransform  b_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 209**: `                        CLoadTransform  c_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 210**: `                        CStoreTransform c_store_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 211**: `                        SMemCopyOpA     a_copy_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 212**: `                        SMemCopyOpB     b_copy_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 213**: `                        SMemCopyLdOpC   c_copy_ld_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 214**: `                        SMemCopyStOpC   c_copy_st_op)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 215**: `{`
+  - EN: Opens the scope for `class SMemCopyStOpC`.
+  - CN: 为 `class SMemCopyStOpC` 打开作用域。
+- **Line 216**: `    using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 217**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 218**: `    Tensor g_a_tensor     = make_tensor(make_gmem_ptr(a), gmem_a_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 219**: `    Tensor g_b_tensor     = make_tensor(make_gmem_ptr(b), gmem_b_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 220**: `    Tensor g_c_tensor     = make_tensor(make_gmem_ptr(c), gmem_c_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 221**: `    Tensor g_c_out_tensor = make_tensor(make_gmem_ptr(c_out), gmem_c_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 222**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 223**: `    constexpr uint32_t copy_max_vec_bytes = CopyMaxVecBits / 8;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 224**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 225**: `    extern __shared__ float4 smem_buf[];`
+  - EN: Declares dynamically sized shared memory used as a per-block scratch buffer.
+  - CN: 声明动态大小的共享内存，作为线程块级暂存缓冲区。
+- **Line 226**: `    auto* smem_ptr = reinterpret_cast<unsigned char*>(smem_buf);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 227**: `    auto* smem_ptr_a = smem_ptr;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 228**: `    auto* smem_ptr_b = smem_ptr_a + round_up((sizeof(TA) * cosize(smem_a_layout)), copy_max_vec_bytes);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 229**: `    auto* smem_ptr_c = smem_ptr_b + round_up((sizeof(TB) * cosize(smem_b_layout)), copy_max_vec_bytes);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 230**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 231**: `    Tensor s_a_tensor = make_tensor(make_smem_ptr<TA>(smem_ptr_a), smem_a_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 232**: `    Tensor s_b_tensor = make_tensor(make_smem_ptr<TB>(smem_ptr_b), smem_b_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 233**: `    Tensor s_c_tensor = make_tensor(make_smem_ptr<TC>(smem_ptr_c), smem_c_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 234**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 235**: `    cooperative_copy<ThreadBlockSize, CopyMaxVecBits>(threadIdx.x, g_a_tensor, s_a_tensor);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 236**: `    cooperative_copy<ThreadBlockSize, CopyMaxVecBits>(threadIdx.x, g_b_tensor, s_b_tensor);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 237**: `    cooperative_copy<ThreadBlockSize, CopyMaxVecBits>(threadIdx.x, g_c_tensor, s_c_tensor);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 238**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 239**: `    cp_async_fence();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 240**: `    cp_async_wait<0>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 241**: `    __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 242**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 243**: `    cooperative_gemm(`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 244**: `      threadIdx.x, tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 245**: `      alpha, s_a_tensor, s_b_tensor, beta, s_c_tensor,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 246**: `      a_load_transform, b_load_transform, c_load_transform, c_store_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 247**: `      a_copy_op, b_copy_op, c_copy_ld_op, c_copy_st_op`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 248**: `    );`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 249**: `    __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 250**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 251**: `    cooperative_copy<ThreadBlockSize, CopyMaxVecBits>(threadIdx.x, s_c_tensor, g_c_out_tensor);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 252**: `}`
+  - EN: Closes the scope for `class SMemCopyStOpC`.
+  - CN: 结束 `class SMemCopyStOpC` 的作用域。
+- **Line 253**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 254**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 255**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 256**: `         class GMemALayout,`
+  - EN: Declares `class GMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemALayout`，用于封装相关状态或辅助行为。
+- **Line 257**: `         class GMemBLayout,`
+  - EN: Declares `class GMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 258**: `         class GMemCLayout,`
+  - EN: Declares `class GMemCLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemCLayout`，用于封装相关状态或辅助行为。
+- **Line 259**: `         class SMemALayout,`
+  - EN: Declares `class SMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemALayout`，用于封装相关状态或辅助行为。
+- **Line 260**: `         class SMemBLayout,`
+  - EN: Declares `class SMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 261**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 262**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 263**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 264**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 265**: `         class ALoadTransform,`
+  - EN: Declares `class ALoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class ALoadTransform`，用于封装相关状态或辅助行为。
+- **Line 266**: `         class BLoadTransform,`
+  - EN: Declares `class BLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class BLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 267**: `         class CLoadTransform,`
+  - EN: Declares `class CLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 268**: `         class CStoreTransform,`
+  - EN: Declares `class CStoreTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CStoreTransform`，用于封装相关状态或辅助行为。
+- **Line 269**: `         class SMemCopyOpA,`
+  - EN: Declares `class SMemCopyOpA`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCopyOpA`，用于封装相关状态或辅助行为。
+- **Line 270**: `         class SMemCopyOpB>`
+  - EN: Declares `class SMemCopyOpB`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCopyOpB`，用于封装相关状态或辅助行为。
+- **Line 271**: `__launch_bounds__(ThreadBlockSize) __global__ void`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 272**: `cooperative_gemm_kernel_rmem_c(GMemALayout gmem_a_layout,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 273**: `                               GMemBLayout gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 274**: `                               GMemCLayout gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 275**: `                               SMemALayout smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 276**: `                               SMemBLayout smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 277**: `                               TA        const* a,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 278**: `                               TB        const* b,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 279**: `                               TC        const* c,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 280**: `                               TC             * c_out,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 281**: `                               TiledMma         tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 282**: `                               ALoadTransform   a_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 283**: `                               BLoadTransform   b_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 284**: `                               CLoadTransform   c_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 285**: `                               CStoreTransform  c_store_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 286**: `                               SMemCopyOpA      a_copy_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 287**: `                               SMemCopyOpB      b_copy_op)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 288**: `  {`
+  - EN: Opens the scope for `class SMemCopyOpB`.
+  - CN: 为 `class SMemCopyOpB` 打开作用域。
+- **Line 289**: `    using namespace cute;`
+  - EN: Brings namespace `cute` into the local scope to shorten later code.
+  - CN: 把命名空间 `cute` 引入当前作用域，以简化后续代码。
+- **Line 290**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 291**: `    Tensor g_a_tensor     = make_tensor(make_gmem_ptr(a), gmem_a_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 292**: `    Tensor g_b_tensor     = make_tensor(make_gmem_ptr(b), gmem_b_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 293**: `    Tensor g_c_tensor     = make_tensor(make_gmem_ptr(c), gmem_c_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 294**: `    Tensor g_c_out_tensor = make_tensor(make_gmem_ptr(c_out), gmem_c_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 295**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 296**: `    constexpr uint32_t copy_max_vec_bytes = CopyMaxVecBits / 8;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 297**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 298**: `    extern __shared__ float4 smem_buf[];`
+  - EN: Declares dynamically sized shared memory used as a per-block scratch buffer.
+  - CN: 声明动态大小的共享内存，作为线程块级暂存缓冲区。
+- **Line 299**: `    auto* smem_ptr = reinterpret_cast<unsigned char*>(smem_buf);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 300**: `    auto* smem_ptr_a = smem_ptr;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 301**: `    auto* smem_ptr_b = smem_ptr_a + round_up((sizeof(TA) * cosize(smem_a_layout)), copy_max_vec_bytes);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 302**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 303**: `    Tensor s_a_tensor = make_tensor(make_smem_ptr<TA>(smem_ptr_a), smem_a_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 304**: `    Tensor s_b_tensor = make_tensor(make_smem_ptr<TB>(smem_ptr_b), smem_b_layout);`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 305**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 306**: `    cooperative_copy<ThreadBlockSize, CopyMaxVecBits>(threadIdx.x, g_a_tensor, s_a_tensor);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 307**: `    cooperative_copy<ThreadBlockSize, CopyMaxVecBits>(threadIdx.x, g_b_tensor, s_b_tensor);`
+  - EN: Uses CUDA execution indices to map the current thread or block onto data.
+  - CN: 使用 CUDA 执行索引把当前线程或线程块映射到数据。
+- **Line 308**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 309**: `    cp_async_fence();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 310**: `    cp_async_wait<0>();`
+  - EN: Refers to architecture-supported asynchronous copy operations.
+  - CN: 引用架构支持的异步复制操作。
+- **Line 311**: `    __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 312**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 313**: `    // Create C fragment for storing intermediate results`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 314**: `    auto thr_mma = TiledMma().get_thread_slice(threadIdx.x);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 315**: `    Tensor g_c_partition = thr_mma.partition_C(g_c_tensor);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 316**: `    Tensor g_c_out_partition = thr_mma.partition_C(g_c_out_tensor);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 317**: `    Tensor r_c_partition = thr_mma.make_fragment_C(g_c_partition);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 318**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 319**: `    // Create indexing help for predicated GEMMs`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 320**: `    Tensor cC   = make_identity_tensor(shape(gmem_c_layout));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 321**: `    Tensor tCcC = thr_mma.partition_C(cC);`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 322**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 323**: `    // Load C from global`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 324**: `    // (always loading in predicated way)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 325**: `    CUTE_UNROLL`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 326**: `    for (int i = 0; i < size(r_c_partition); ++i)`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 327**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 328**: `      if (elem_less(tCcC(i), shape(g_c_tensor)))`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 329**: `      {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 330**: `        r_c_partition(i) = c_load_transform(g_c_partition(i));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 331**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 332**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 333**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 334**: `    cooperative_gemm(`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 335**: `      threadIdx.x, tiled_mma, s_a_tensor, s_b_tensor, r_c_partition,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 336**: `      a_load_transform, b_load_transform, a_copy_op, b_copy_op`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 337**: `    );`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 338**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 339**: `    __syncthreads();`
+  - EN: Synchronizes all threads in the block before proceeding to the next phase.
+  - CN: 在进入下一阶段前同步线程块中的所有线程。
+- **Line 340**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 341**: `    // Store C to global`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 342**: `    // (always storing in predicated way)`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 343**: `    CUTE_UNROLL`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 344**: `    for (int i = 0; i < size(r_c_partition); ++i)`
+  - EN: Starts a loop that iterates over indices, tiles, or tensor elements.
+  - CN: 开始一个循环，用于遍历索引、tile 或张量元素。
+- **Line 345**: `    {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 346**: `      if (elem_less(tCcC(i), shape(g_c_tensor)))`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 347**: `      {`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 348**: `        g_c_out_partition(i) = c_store_transform(r_c_partition(i));`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 349**: `      }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 350**: `    }`
+  - EN: Closes the scope for `for loop`.
+  - CN: 结束 `for loop` 的作用域。
+- **Line 351**: `}`
+  - EN: Closes the scope for `class SMemCopyOpB`.
+  - CN: 结束 `class SMemCopyOpB` 的作用域。
+- **Line 352**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 353**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 354**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 355**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 356**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 357**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 358**: `         class GMemALayout, // logical shape (M, K)`
+  - EN: Declares `class GMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemALayout`，用于封装相关状态或辅助行为。
+- **Line 359**: `         class GMemBLayout, // logical shape (N, K)`
+  - EN: Declares `class GMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 360**: `         class GMemCLayout, // logical shape (M, N)`
+  - EN: Declares `class GMemCLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemCLayout`，用于封装相关状态或辅助行为。
+- **Line 361**: `         class SMemALayout, // logical shape (M, K)`
+  - EN: Declares `class SMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemALayout`，用于封装相关状态或辅助行为。
+- **Line 362**: `         class SMemBLayout, // logical shape (N, K)`
+  - EN: Declares `class SMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 363**: `         class SMemCLayout, // logical shape (M, N)`
+  - EN: Declares `class SMemCLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemCLayout`，用于封装相关状态或辅助行为。
+- **Line 364**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 365**: `         class ALoadTransform = cute::identity,`
+  - EN: Declares `class ALoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class ALoadTransform`，用于封装相关状态或辅助行为。
+- **Line 366**: `         class BLoadTransform = cute::identity,`
+  - EN: Declares `class BLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class BLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 367**: `         class CLoadTransform = cute::identity,`
+  - EN: Declares `class CLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 368**: `         class CStoreTransform = cute::identity,`
+  - EN: Declares `class CStoreTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CStoreTransform`，用于封装相关状态或辅助行为。
+- **Line 369**: `         class ASMemCopyOp = AutoVectorizingCopyWithAssumedAlignment<CopyMaxVecBits>,`
+  - EN: Declares `class ASMemCopyOp`, which packages related state or helper behavior.
+  - CN: 声明 `class ASMemCopyOp`，用于封装相关状态或辅助行为。
+- **Line 370**: `         class BSMemCopyOp = AutoVectorizingCopyWithAssumedAlignment<CopyMaxVecBits>,`
+  - EN: Declares `class BSMemCopyOp`, which packages related state or helper behavior.
+  - CN: 声明 `class BSMemCopyOp`，用于封装相关状态或辅助行为。
+- **Line 371**: `         class CSMemCopyLdOp = AutoVectorizingCopyWithAssumedAlignment<CopyMaxVecBits>,`
+  - EN: Declares `class CSMemCopyLdOp`, which packages related state or helper behavior.
+  - CN: 声明 `class CSMemCopyLdOp`，用于封装相关状态或辅助行为。
+- **Line 372**: `         class CSMemCopyStOp = AutoVectorizingCopyWithAssumedAlignment<CopyMaxVecBits>>`
+  - EN: Declares `class CSMemCopyStOp`, which packages related state or helper behavior.
+  - CN: 声明 `class CSMemCopyStOp`，用于封装相关状态或辅助行为。
+- **Line 373**: `void test_cooperative_gemm(GMemALayout     gmem_a_layout,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 374**: `                           GMemBLayout     gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 375**: `                           GMemCLayout     gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 376**: `                           SMemALayout     smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 377**: `                           SMemBLayout     smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 378**: `                           SMemCLayout     smem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 379**: `                           TiledMma        tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 380**: `                           ALoadTransform  a_load_transform  = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 381**: `                           BLoadTransform  b_load_transform  = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 382**: `                           CLoadTransform  c_load_transform  = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 383**: `                           CStoreTransform c_store_transform = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 384**: `                           ASMemCopyOp     a_smem_copy_op = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 385**: `                           BSMemCopyOp     b_smem_copy_op = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 386**: `                           CSMemCopyLdOp   c_smem_copy_ld_op = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 387**: `                           CSMemCopyStOp   c_smem_copy_st_op = {})`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 388**: `{`
+  - EN: Opens the scope for `class CSMemCopyStOp`.
+  - CN: 为 `class CSMemCopyStOp` 打开作用域。
+- **Line 389**: `  static_assert(std::is_same_v<typename fp64_tester<TA>::value_type, typename fp64_tester<TB>::value_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 390**: `  static_assert(std::is_same_v<typename fp64_tester<TB>::value_type, typename fp64_tester<TC>::value_type>);`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 391**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 392**: `  static_assert(size<0>(gmem_a_layout) == size<0>(gmem_c_layout));  // AM == CM`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 393**: `  static_assert(size<0>(gmem_b_layout) == size<1>(gmem_c_layout));  // BN == CN`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 394**: `  static_assert(size<1>(gmem_a_layout) == size<1>(gmem_b_layout));  // AK == BK`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 395**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 396**: `  static_assert(size<0>(smem_a_layout) == size<0>(smem_c_layout));  // AM == CM`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 397**: `  static_assert(size<0>(smem_b_layout) == size<1>(smem_c_layout));  // BN == CN`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 398**: `  static_assert(size<1>(smem_a_layout) == size<1>(smem_b_layout));  // AK == BK`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 399**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 400**: `  static_assert(cute::size(gmem_a_layout) == cute::size(smem_a_layout));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 401**: `  static_assert(cute::size(gmem_b_layout) == cute::size(smem_b_layout));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 402**: `  static_assert(cute::size(gmem_c_layout) == cute::size(smem_c_layout));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 403**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 404**: `#if 0`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 405**: `  print("   "); print("gmem:    "); print(gmem_layout); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 406**: `  print("   "); print("smem:    "); print(smem_layout); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 407**: `  print("   "); print("threads: "); print(ThreadBlockSize); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 408**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+- **Line 409**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 410**: `  const auto alpha = static_cast<TC>(1.1);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 411**: `  const auto beta  = static_cast<TC>(1.2);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 412**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 413**: `  // Generate inputs`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 414**: `  auto [h_a, h_b, h_c, h_c_out] = host_generate_gemm_inputs<TA, TB, TC>(gmem_a_layout, gmem_b_layout, gmem_c_layout);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 415**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 416**: `  thrust::device_vector<TA> d_a(h_a);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 417**: `  thrust::device_vector<TB> d_b(h_b);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 418**: `  thrust::device_vector<TC> d_c(h_c);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 419**: `  thrust::device_vector<TC> d_c_out(h_c_out.size(), TC(float(-1)));`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 420**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 421**: `  constexpr uint32_t copy_max_vec_bytes = CopyMaxVecBits / 8;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 422**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 423**: `  const size_t shared_memory_size = round_up(sizeof(TA) * h_a.size(), copy_max_vec_bytes) +`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 424**: `                                    round_up(sizeof(TB) * h_b.size(), copy_max_vec_bytes) +`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 425**: `                                    sizeof(TC) * h_c.size();`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 426**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 427**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 428**: `  auto kernel = cooperative_gemm_kernel<`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 429**: `    ThreadBlockSize, CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 430**: `    GMemALayout, GMemBLayout, GMemCLayout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 431**: `    SMemALayout, SMemBLayout, SMemCLayout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 432**: `    TA, TB, TC, decltype(alpha), decltype(beta),`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 433**: `    TiledMma,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 434**: `    ALoadTransform, BLoadTransform, CLoadTransform, CStoreTransform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 435**: `    ASMemCopyOp, BSMemCopyOp, CSMemCopyLdOp, CSMemCopyStOp`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 436**: `  >;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 437**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 438**: `  ASSERT_EQ(cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, static_cast<int>(shared_memory_size)), 0);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 439**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 440**: `  kernel<<<1, ThreadBlockSize, shared_memory_size>>>(`
+  - EN: Launches a CUDA kernel with the specified grid, block, and shared-memory configuration.
+  - CN: 使用给定的网格、线程块和共享内存配置启动 CUDA 内核。
+- **Line 441**: `    gmem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 442**: `    gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 443**: `    gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 444**: `    smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 445**: `    smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 446**: `    smem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 447**: `    thrust::raw_pointer_cast(d_a.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 448**: `    thrust::raw_pointer_cast(d_b.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 449**: `    thrust::raw_pointer_cast(d_c.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 450**: `    thrust::raw_pointer_cast(d_c_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 451**: `    alpha,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 452**: `    beta,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 453**: `    tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 454**: `    a_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 455**: `    b_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 456**: `    c_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 457**: `    c_store_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 458**: `    a_smem_copy_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 459**: `    b_smem_copy_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 460**: `    c_smem_copy_ld_op,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 461**: `    c_smem_copy_st_op`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 462**: `  );`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 463**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 464**: `  cudaError_t result = cudaDeviceSynchronize();`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 465**: `  if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 466**: `    cudaError_t error = cudaGetLastError();`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 467**: `    FAIL() << "Error at kernel sync: " << cudaGetErrorString(error) << "\n";`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 468**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 469**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 470**: `  // Reference gemm`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 471**: `  auto h_c_ref = host_reference_gemm(alpha,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 472**: `                                     make_tensor(h_a.data(), gmem_a_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 473**: `                                     make_tensor(h_b.data(), gmem_b_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 474**: `                                     beta,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 475**: `                                     make_tensor(h_c.data(), gmem_c_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 476**: `                                     a_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 477**: `                                     b_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 478**: `                                     c_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 479**: `                                     c_store_transform);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 480**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 481**: `  // Copy result data`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 482**: `  h_c_out = d_c_out;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 483**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 484**: `  // Verify correctness`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 485**: `  verify_gemm_correctness(make_tensor(h_c_out.data(), gmem_c_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 486**: `                          make_tensor(h_c_ref.data(), gmem_c_layout));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 487**: `}`
+  - EN: Closes the scope for `class CSMemCopyStOp`.
+  - CN: 结束 `class CSMemCopyStOp` 的作用域。
+- **Line 488**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 489**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 490**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 491**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 492**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 493**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 494**: `         class GMemALayout, // logical shape (M, K)`
+  - EN: Declares `class GMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemALayout`，用于封装相关状态或辅助行为。
+- **Line 495**: `         class GMemBLayout, // logical shape (N, K)`
+  - EN: Declares `class GMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 496**: `         class GMemCLayout, // logical shape (M, N)`
+  - EN: Declares `class GMemCLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class GMemCLayout`，用于封装相关状态或辅助行为。
+- **Line 497**: `         class SMemALayout, // logical shape (M, K)`
+  - EN: Declares `class SMemALayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemALayout`，用于封装相关状态或辅助行为。
+- **Line 498**: `         class SMemBLayout, // logical shape (N, K)`
+  - EN: Declares `class SMemBLayout`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemBLayout`，用于封装相关状态或辅助行为。
+- **Line 499**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 500**: `         class ALoadTransform = cute::identity,`
+  - EN: Declares `class ALoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class ALoadTransform`，用于封装相关状态或辅助行为。
+- **Line 501**: `         class BLoadTransform = cute::identity,`
+  - EN: Declares `class BLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class BLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 502**: `         class CLoadTransform = cute::identity,`
+  - EN: Declares `class CLoadTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CLoadTransform`，用于封装相关状态或辅助行为。
+- **Line 503**: `         class CStoreTransform = cute::identity,`
+  - EN: Declares `class CStoreTransform`, which packages related state or helper behavior.
+  - CN: 声明 `class CStoreTransform`，用于封装相关状态或辅助行为。
+- **Line 504**: `         class ASMemCopyOp = AutoVectorizingCopyWithAssumedAlignment<CopyMaxVecBits>,`
+  - EN: Declares `class ASMemCopyOp`, which packages related state or helper behavior.
+  - CN: 声明 `class ASMemCopyOp`，用于封装相关状态或辅助行为。
+- **Line 505**: `         class BSMemCopyOp = AutoVectorizingCopyWithAssumedAlignment<CopyMaxVecBits>>`
+  - EN: Declares `class BSMemCopyOp`, which packages related state or helper behavior.
+  - CN: 声明 `class BSMemCopyOp`，用于封装相关状态或辅助行为。
+- **Line 506**: `void test_cooperative_gemm_rmem_c(GMemALayout     gmem_a_layout,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 507**: `                                  GMemBLayout     gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 508**: `                                  GMemCLayout     gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 509**: `                                  SMemALayout     smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 510**: `                                  SMemBLayout     smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 511**: `                                  TiledMma        tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 512**: `                                  ALoadTransform  a_load_transform  = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 513**: `                                  BLoadTransform  b_load_transform  = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 514**: `                                  CLoadTransform  c_load_transform  = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 515**: `                                  CStoreTransform c_store_transform = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 516**: `                                  ASMemCopyOp     a_smem_copy_op    = {},`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 517**: `                                  BSMemCopyOp     b_smem_copy_op    = {})`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 518**: `{`
+  - EN: Opens the scope for `class BSMemCopyOp`.
+  - CN: 为 `class BSMemCopyOp` 打开作用域。
+- **Line 519**: `  static_assert(size<0>(gmem_a_layout) == size<0>(gmem_c_layout));  // AM == CM`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 520**: `  static_assert(size<0>(gmem_b_layout) == size<1>(gmem_c_layout));  // BN == CN`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 521**: `  static_assert(size<1>(gmem_a_layout) == size<1>(gmem_b_layout));  // AK == BK`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 522**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 523**: `  static_assert(size<1>(smem_a_layout) == size<1>(smem_b_layout));  // AK == BK`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 524**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 525**: `  static_assert(cute::size(gmem_a_layout) == cute::size(smem_a_layout));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 526**: `  static_assert(cute::size(gmem_b_layout) == cute::size(smem_b_layout));`
+  - EN: Performs a compile-time assertion so an invalid CuTe property fails during compilation.
+  - CN: 执行编译期断言，使无效的 CuTe 性质在编译阶段就失败。
+- **Line 527**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 528**: `#if 0`
+  - EN: Starts a preprocessor condition that enables code only for matching build or architecture settings.
+  - CN: 开始一个预处理条件，仅在匹配的构建或架构设置下启用代码。
+- **Line 529**: `  print("   "); print("gmem:    "); print(gmem_layout); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 530**: `  print("   "); print("smem:    "); print(smem_layout); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 531**: `  print("   "); print("threads: "); print(ThreadBlockSize); print("\n");`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 532**: `#endif`
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前预处理条件块。
+- **Line 533**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 534**: `  const auto alpha = static_cast<TC>(1.0);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 535**: `  const auto beta  = static_cast<TC>(1.0);`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 536**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 537**: `  // Generate inputs`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 538**: `  auto [h_a, h_b, h_c, h_c_out] =`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 539**: `    host_generate_gemm_inputs<TA, TB, TC>(gmem_a_layout, gmem_b_layout, gmem_c_layout);`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 540**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 541**: `  thrust::device_vector<TA> d_a(h_a);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 542**: `  thrust::device_vector<TB> d_b(h_b);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 543**: `  thrust::device_vector<TC> d_c(h_c);`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 544**: `  thrust::device_vector<TC> d_c_out(h_c_out.size(), static_cast<TC>(-1));`
+  - EN: Declares or uses a device vector to allocate GPU-resident buffers.
+  - CN: 声明或使用设备端向量来分配位于 GPU 上的缓冲区。
+- **Line 545**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 546**: `  constexpr uint32_t copy_max_vec_bytes = CopyMaxVecBits / 8;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 547**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 548**: `  const size_t shared_memory_size = round_up(sizeof(TA) * h_a.size(), copy_max_vec_bytes) +`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 549**: `                                    round_up(sizeof(TB) * h_b.size(), copy_max_vec_bytes);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 550**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 551**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 552**: `  auto kernel = cooperative_gemm_kernel_rmem_c<`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 553**: `    ThreadBlockSize, CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 554**: `    GMemALayout, GMemBLayout, GMemCLayout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 555**: `    SMemALayout, SMemBLayout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 556**: `    TA, TB, TC,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 557**: `    TiledMma,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 558**: `    ALoadTransform, BLoadTransform, CLoadTransform, CStoreTransform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 559**: `    ASMemCopyOp, BSMemCopyOp`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 560**: `  >;`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 561**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 562**: `  ASSERT_EQ(cudaFuncSetAttribute(kernel, cudaFuncAttributeMaxDynamicSharedMemorySize, static_cast<int>(shared_memory_size)), 0);`
+  - EN: Performs a test assertion that checks the observed value against the expected condition.
+  - CN: 执行测试断言，检查实际值是否满足预期条件。
+- **Line 563**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 564**: `  kernel<<<1, ThreadBlockSize, shared_memory_size>>>(`
+  - EN: Launches a CUDA kernel with the specified grid, block, and shared-memory configuration.
+  - CN: 使用给定的网格、线程块和共享内存配置启动 CUDA 内核。
+- **Line 565**: `    gmem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 566**: `    gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 567**: `    gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 568**: `    smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 569**: `    smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 570**: `    thrust::raw_pointer_cast(d_a.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 571**: `    thrust::raw_pointer_cast(d_b.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 572**: `    thrust::raw_pointer_cast(d_c.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 573**: `    thrust::raw_pointer_cast(d_c_out.data()),`
+  - EN: Extracts a raw pointer from a Thrust container so CUDA or CuTe APIs can consume it.
+  - CN: 从 Thrust 容器中提取原始指针，以便 CUDA 或 CuTe API 使用。
+- **Line 574**: `    tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 575**: `    a_load_transform, b_load_transform, c_load_transform, c_store_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 576**: `    a_smem_copy_op, b_smem_copy_op`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 577**: `  );`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 578**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 579**: `  cudaError_t result = cudaDeviceSynchronize();`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 580**: `  if (result != cudaSuccess) {`
+  - EN: Starts a conditional branch that handles one runtime or compile-time case.
+  - CN: 开始一个条件分支，用于处理某个运行期或编译期情况。
+- **Line 581**: `    cudaError_t error = cudaGetLastError();`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 582**: `    FAIL() << "Error at kernel sync: " << cudaGetErrorString(error) << "\n";`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 583**: `  }`
+  - EN: Closes the scope for `if block`.
+  - CN: 结束 `if block` 的作用域。
+- **Line 584**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 585**: `  // Copy result data`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 586**: `  h_c_out = d_c_out;`
+  - EN: Completes a declaration or assignment that prepares data, types, or configuration for the test.
+  - CN: 完成一个声明或赋值，用于为测试准备数据、类型或配置信息。
+- **Line 587**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 588**: `  // Reference gemm`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 589**: `  auto h_c_ref = host_reference_gemm(alpha,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 590**: `                                     make_tensor(h_a.data(), gmem_a_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 591**: `                                     make_tensor(h_b.data(), gmem_b_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 592**: `                                     beta,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 593**: `                                     make_tensor(h_c.data(), gmem_c_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 594**: `                                     a_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 595**: `                                     b_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 596**: `                                     c_load_transform,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 597**: `                                     c_store_transform);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 598**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 599**: `  // Verify correctness`
+  - EN: Adds a comment that explains the next test section or code fragment.
+  - CN: 添加注释，用于说明接下来的测试片段或代码区域。
+- **Line 600**: `  verify_gemm_correctness(make_tensor(h_c_out.data(), gmem_c_layout),`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 601**: `                          make_tensor(h_c_ref.data(), gmem_c_layout));`
+  - EN: Constructs a CuTe tensor by pairing memory with a layout description.
+  - CN: 通过把内存与布局描述配对来构造 CuTe 张量。
+- **Line 602**: `}`
+  - EN: Closes the scope for `class BSMemCopyOp`.
+  - CN: 结束 `class BSMemCopyOp` 的作用域。
+- **Line 603**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 604**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 605**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 606**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 607**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 608**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 609**: `         class ShapeMNK,`
+  - EN: Declares `class ShapeMNK`, which packages related state or helper behavior.
+  - CN: 声明 `class ShapeMNK`，用于封装相关状态或辅助行为。
+- **Line 610**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 611**: `         class ... Ops>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 612**: `void test_cooperative_gemm_col_major_layout(ShapeMNK shape_mnk,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 613**: `                                            TiledMma tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 614**: `                                            Ops ... ops)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 615**: `{`
+  - EN: Opens the scope for `class TiledMma`.
+  - CN: 为 `class TiledMma` 打开作用域。
+- **Line 616**: `  auto a_layout = make_layout(select<0, 2>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 617**: `  auto b_layout = make_layout(select<1, 2>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 618**: `  auto c_layout = make_layout(select<0, 1>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 619**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 620**: `  test_cooperative_gemm<ThreadBlockSize,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 621**: `                        CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 622**: `                        TA, TB, TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 623**: `    (a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 624**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 625**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 626**: `     a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 627**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 628**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 629**: `     tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 630**: `     ops...);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 631**: `}`
+  - EN: Closes the scope for `class TiledMma`.
+  - CN: 结束 `class TiledMma` 的作用域。
+- **Line 632**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 633**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 634**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 635**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 636**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 637**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 638**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 639**: `         class SMemAtomLayoutA,`
+  - EN: Declares `class SMemAtomLayoutA`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemAtomLayoutA`，用于封装相关状态或辅助行为。
+- **Line 640**: `         class SMemAtomLayoutB,`
+  - EN: Declares `class SMemAtomLayoutB`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemAtomLayoutB`，用于封装相关状态或辅助行为。
+- **Line 641**: `         class SMemAtomLayoutC,`
+  - EN: Declares `class SMemAtomLayoutC`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemAtomLayoutC`，用于封装相关状态或辅助行为。
+- **Line 642**: `         class ShapeMNK,`
+  - EN: Declares `class ShapeMNK`, which packages related state or helper behavior.
+  - CN: 声明 `class ShapeMNK`，用于封装相关状态或辅助行为。
+- **Line 643**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 644**: `         class ... Ops>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 645**: `std::enable_if_t<std::conjunction_v<cute::is_layout<SMemAtomLayoutA>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 646**: `                                    cute::is_layout<SMemAtomLayoutB>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 647**: `                                    cute::is_layout<SMemAtomLayoutC>>>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 648**: `test_cooperative_gemm_col_major_layout(SMemAtomLayoutA smem_atom_layout_a,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 649**: `                                       SMemAtomLayoutB smem_atom_layout_b,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 650**: `                                       SMemAtomLayoutC smem_atom_layout_c,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 651**: `                                       ShapeMNK        shape_mnk,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 652**: `                                       TiledMma        tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 653**: `                                       Ops&&    ...    ops)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 654**: `{`
+  - EN: Opens the scope for `class TiledMma`.
+  - CN: 为 `class TiledMma` 打开作用域。
+- **Line 655**: `  auto gmem_a_layout = make_layout(select<0, 2>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 656**: `  auto gmem_b_layout = make_layout(select<1, 2>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 657**: `  auto gmem_c_layout = make_layout(select<0, 1>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 658**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 659**: `  auto smem_a_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 660**: `      smem_atom_layout_a,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 661**: `      make_shape(shape<0>(gmem_a_layout), shape<1>(gmem_a_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 662**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 663**: `  auto smem_b_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 664**: `      smem_atom_layout_b,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 665**: `      make_shape(shape<0>(gmem_b_layout), shape<1>(gmem_b_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 666**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 667**: `  auto smem_c_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 668**: `      smem_atom_layout_c,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 669**: `      make_shape(shape<0>(gmem_c_layout), shape<1>(gmem_c_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 670**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 671**: `  test_cooperative_gemm<ThreadBlockSize,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 672**: `                        CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 673**: `                        TA, TB, TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 674**: `    (gmem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 675**: `     gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 676**: `     gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 677**: `     smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 678**: `     smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 679**: `     smem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 680**: `     tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 681**: `     ops...);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 682**: `}`
+  - EN: Closes the scope for `class TiledMma`.
+  - CN: 结束 `class TiledMma` 的作用域。
+- **Line 683**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 684**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 685**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 686**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 687**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 688**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 689**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 690**: `         class ShapeMNK,`
+  - EN: Declares `class ShapeMNK`, which packages related state or helper behavior.
+  - CN: 声明 `class ShapeMNK`，用于封装相关状态或辅助行为。
+- **Line 691**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 692**: `         class ... Ops>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 693**: `void test_cooperative_gemm_col_major_layout_rmem_c(ShapeMNK    shape_mnk,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 694**: `                                                   TiledMma    tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 695**: `                                                   Ops ... ops)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 696**: `{`
+  - EN: Opens the scope for `class TiledMma`.
+  - CN: 为 `class TiledMma` 打开作用域。
+- **Line 697**: `  auto a_layout = make_layout(select<0, 2>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 698**: `  auto b_layout = make_layout(select<1, 2>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 699**: `  auto c_layout = make_layout(select<0, 1>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 700**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 701**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 702**: `  test_cooperative_gemm_rmem_c<ThreadBlockSize,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 703**: `                               CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 704**: `                               TA, TB,TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 705**: `    (a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 706**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 707**: `     c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 708**: `     a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 709**: `     b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 710**: `     tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 711**: `     ops...);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 712**: `}`
+  - EN: Closes the scope for `class TiledMma`.
+  - CN: 结束 `class TiledMma` 的作用域。
+- **Line 713**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 714**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 715**: `         uint32_t CopyMaxVecBits,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 716**: `         class TA,`
+  - EN: Declares `class TA`, which packages related state or helper behavior.
+  - CN: 声明 `class TA`，用于封装相关状态或辅助行为。
+- **Line 717**: `         class TB,`
+  - EN: Declares `class TB`, which packages related state or helper behavior.
+  - CN: 声明 `class TB`，用于封装相关状态或辅助行为。
+- **Line 718**: `         class TC,`
+  - EN: Declares `class TC`, which packages related state or helper behavior.
+  - CN: 声明 `class TC`，用于封装相关状态或辅助行为。
+- **Line 719**: `         class SMemAtomLayoutA,`
+  - EN: Declares `class SMemAtomLayoutA`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemAtomLayoutA`，用于封装相关状态或辅助行为。
+- **Line 720**: `         class SMemAtomLayoutB,`
+  - EN: Declares `class SMemAtomLayoutB`, which packages related state or helper behavior.
+  - CN: 声明 `class SMemAtomLayoutB`，用于封装相关状态或辅助行为。
+- **Line 721**: `         class ShapeMNK,`
+  - EN: Declares `class ShapeMNK`, which packages related state or helper behavior.
+  - CN: 声明 `class ShapeMNK`，用于封装相关状态或辅助行为。
+- **Line 722**: `         class TiledMma,`
+  - EN: Declares `class TiledMma`, which packages related state or helper behavior.
+  - CN: 声明 `class TiledMma`，用于封装相关状态或辅助行为。
+- **Line 723**: `         class ... Ops>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 724**: `std::enable_if_t<std::conjunction_v<cute::is_layout<SMemAtomLayoutA>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 725**: `                                    cute::is_layout<SMemAtomLayoutB>>>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 726**: `test_cooperative_gemm_col_major_layout_rmem_c(SMemAtomLayoutA smem_atom_layout_a,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 727**: `                                              SMemAtomLayoutB smem_atom_layout_b,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 728**: `                                              ShapeMNK        shape_mnk,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 729**: `                                              TiledMma        tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 730**: `                                              Ops      ...    ops)`
+  - EN: Continues or completes the current call, signature, or parenthesized expression.
+  - CN: 继续或完成当前调用、签名或带括号的表达式。
+- **Line 731**: `{`
+  - EN: Opens the scope for `class TiledMma`.
+  - CN: 为 `class TiledMma` 打开作用域。
+- **Line 732**: `  auto gmem_a_layout = make_layout(select<0, 2>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 733**: `  auto gmem_b_layout = make_layout(select<1, 2>(shape_mnk), GenRowMajor{});`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 734**: `  auto gmem_c_layout = make_layout(select<0, 1>(shape_mnk));`
+  - EN: Constructs a CuTe layout object from shapes, strides, or composition rules.
+  - CN: 根据形状、步长或组合规则构造 CuTe 布局对象。
+- **Line 735**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 736**: `  auto smem_a_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 737**: `      smem_atom_layout_a,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 738**: `      make_shape(shape<0>(gmem_a_layout), shape<1>(gmem_a_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 739**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 740**: `  auto smem_b_layout = tile_to_shape(`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 741**: `      smem_atom_layout_b,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 742**: `      make_shape(shape<0>(gmem_b_layout), shape<1>(gmem_b_layout)));`
+  - EN: Constructs a CuTe shape object that describes logical extents.
+  - CN: 构造一个描述逻辑尺寸的 CuTe 形状对象。
+- **Line 743**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 744**: `  test_cooperative_gemm_rmem_c<ThreadBlockSize, CopyMaxVecBits,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 745**: `                               TA, TB, TC>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 746**: `    (gmem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 747**: `     gmem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 748**: `     gmem_c_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 749**: `     smem_a_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 750**: `     smem_b_layout,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 751**: `     tiled_mma,`
+  - EN: Refers to matrix-multiply-accumulate instructions or abstractions.
+  - CN: 引用矩阵乘加指令或抽象。
+- **Line 752**: `     ops...);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 753**: `}`
+  - EN: Closes the scope for `class TiledMma`.
+  - CN: 结束 `class TiledMma` 的作用域。
+- **Line 754**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 755**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 756**: `         typename T,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 757**: `         class ... Args>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 758**: `void test_cooperative_gemm_col_major_layout_rmem_c(Args&& ... args)`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 759**: `{`
+  - EN: Opens a new scope for the declaration or control-flow block.
+  - CN: 为当前声明或控制流代码块打开新的作用域。
+- **Line 760**: `  test_cooperative_gemm_col_major_layout_rmem_c<ThreadBlockSize,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 761**: `                                                cute::sizeof_bits_v<T>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 762**: `                                                T, T, T>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 763**: `    (static_cast<Args&&>(args)...);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 764**: `}`
+  - EN: Closes the current C++ scope.
+  - CN: 结束当前的 C++ 作用域。
+- **Line 765**: `<blank>`
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 766**: `template<uint32_t ThreadBlockSize,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 767**: `         class T,`
+  - EN: Declares `class T`, which packages related state or helper behavior.
+  - CN: 声明 `class T`，用于封装相关状态或辅助行为。
+- **Line 768**: `         class ... Args>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 769**: `void test_cooperative_gemm_col_major_layout(Args&& ... args)`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 770**: `{`
+  - EN: Opens the scope for `class T`.
+  - CN: 为 `class T` 打开作用域。
+- **Line 771**: `  test_cooperative_gemm_col_major_layout<ThreadBlockSize,`
+  - EN: Refers to matrix-multiply orchestration built from CuTe tiling primitives.
+  - CN: 引用由 CuTe 分块原语构成的矩阵乘法调度。
+- **Line 772**: `                                         cute::sizeof_bits_v<T>,`
+  - EN: Continues a comma-separated argument, initializer, or template-parameter list.
+  - CN: 继续一个逗号分隔的参数、初始化项或模板参数列表。
+- **Line 773**: `                                         T, T, T>`
+  - EN: Continues the current declaration, expression, or helper implementation.
+  - CN: 继续当前的声明、表达式或辅助实现。
+- **Line 774**: `    (static_cast<Args&&>(args)...);`
+  - EN: Terminates the current declaration or statement.
+  - CN: 结束当前声明或语句。
+- **Line 775**: `}`
+  - EN: Closes the scope for `class T`.
+  - CN: 结束 `class T` 的作用域。
+
+## Key Concepts / 关键概念
+- `ASSERT_`
+  - EN: Uses a stronger assertion that aborts the current test when a prerequisite fails.
+  - CN: 使用更强的断言；当前置条件失败时会立即中止当前测试。
+- `static_assert`
+  - EN: Checks a property at compile time before the binary can be produced.
+  - CN: 在生成二进制文件之前，于编译期检查某个性质。
+- `Tensor`
+  - EN: Uses the CuTe tensor abstraction to bind memory pointers with layouts.
+  - CN: 使用 CuTe Tensor 抽象把内存指针与布局绑定起来。
+- `make_tensor`
+  - EN: Builds a CuTe tensor object from a pointer and a layout.
+  - CN: 从指针和布局构造一个 CuTe 张量对象。
+- `thrust::host_vector`
+  - EN: Uses a host container to prepare reference data on the CPU.
+  - CN: 使用主机端容器在 CPU 上准备参考数据。
+- `thrust::device_vector`
+  - EN: Uses a device container to allocate and copy GPU buffers.
+  - CN: 使用设备端容器来分配并复制 GPU 缓冲区。
+- `__global__`
+  - EN: Defines a CUDA kernel launched from the host for device-side validation.
+  - CN: 定义一个从主机启动的 CUDA 内核，用于设备端验证。
+- `cp_async`
+  - EN: Exercises asynchronous copy primitives on architectures that support them.
+  - CN: 测试支持该能力的架构上的异步拷贝原语。
+- `gemm`
+  - EN: Connects the test to tiled matrix-multiply orchestration concepts.
+  - CN: 把该测试与分块矩阵乘法调度概念联系起来。
+- `tiled-gemm`
+  - EN: The file relates layout/tensor primitives to tiled GEMM execution.
+  - CN: 该文件把布局/张量原语与分块 GEMM 执行联系起来。
+
+## Dependencies / 依赖关系
+- `cutlass/relatively_equal.h`
+  - EN: Provides CUTLASS `relatively_equal` functionality used by this file.
+  - CN: 提供该文件使用的 CUTLASS `relatively_equal` 功能。
+- `cutlass_unit_test.h`
+  - EN: Provides the CUTLASS unit-test harness, CUDA helpers, and assertion glue used throughout these tests.
+  - CN: 提供 CUTLASS 单元测试框架、CUDA 辅助函数以及这些测试通用的断言封装。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides CUTLASS `util / reference / host / tensor_compare` functionality used by this file.
+  - CN: 提供该文件使用的 CUTLASS `util / reference / host / tensor_compare` 功能。
+- `iostream`
+  - EN: Provides a dependency required by this source file.
+  - CN: 提供该源文件所需的依赖。
+- `thrust/host_vector.h`
+  - EN: Provides host-side vectors used to stage test input and output data.
+  - CN: 提供用于暂存测试输入输出数据的主机端向量。
+- `thrust/device_vector.h`
+  - EN: Provides device-side vectors used to allocate and move CUDA test buffers.
+  - CN: 提供用于分配和搬运 CUDA 测试缓冲区的设备端向量。
+- `cute/tensor.hpp`
+  - EN: Provides CuTe tensor, layout, shape, stride, and copy primitives.
+  - CN: 提供 CuTe 的张量、布局、形状、步长与复制原语。

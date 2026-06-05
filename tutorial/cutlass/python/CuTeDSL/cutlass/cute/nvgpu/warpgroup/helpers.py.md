@@ -1,0 +1,142 @@
+# helpers.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/nvgpu/warpgroup/helpers.py`
+
+## Purpose / 作用
+- EN: Defines 4 functions (make_smem_layout_atom, fence, commit_group, wait_group) in `CuTeDSL.cutlass.cute.nvgpu.warpgroup.helpers`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.nvgpu.warpgroup.helpers` 定义了 4 个函数（make_smem_layout_atom, fence, commit_group, wait_group）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Any, Optional, Type` — **EN:** Imports Any, Optional, Type from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Type。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `from cutlass._mlir.dialects import nvvm` — **EN:** Imports nvvm from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 nvvm。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from ...typing import Numeric, NumericMeta, ComposedLayout` — **EN:** Imports Numeric, NumericMeta, ComposedLayout from `...typing`. **CN:** 从 `...typing` 导入 Numeric, NumericMeta, ComposedLayout。
+- **L20** `from ... import core` — **EN:** Imports core from `...`. **CN:** 从 `...` 导入 core。
+- **L21** `from .mma import SmemLayoutAtomKind` — **EN:** Imports SmemLayoutAtomKind from `.mma`. **CN:** 从 `.mma` 导入 SmemLayoutAtomKind。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L25** `def make_smem_layout_atom(` — **EN:** Defines function `make_smem_layout_atom`. **CN:** 定义函数 `make_smem_layout_atom`。
+- **L26** `    kind: SmemLayoutAtomKind,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `    element_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L30** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L31** `) -> ComposedLayout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L32** `    """` — **EN:** Starts the docstring for the function `make_smem_layout_atom`. **CN:** 开始说明 function `make_smem_layout_atom` 的文档字符串。
+- **L33** `    Makes a SMEM layout Atom.` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `    This function creates a composed layout in unit of elements consistent with the requested layout` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L36** `    Atom kind and element data type.` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `    :param kind:         The kind of layout Atom` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L39** `    :type kind:          SmemLayoutAtomKind` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L40** `    :param element_type: The element data type to construct the layout for` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L41** `    :type element_type:  Type[Numeric]` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L42** `    :return:             The SMEM layout atom` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L43** `    :rtype:              ComposedLayout` — **EN:** Continues the docstring for the function `make_smem_layout_atom`. **CN:** 继续说明 function `make_smem_layout_atom` 的文档字符串。
+- **L44** `    """` — **EN:** Ends the docstring for the function `make_smem_layout_atom`. **CN:** 结束说明 function `make_smem_layout_atom` 的文档字符串。
+- **L45** `    if not isinstance(element_type, NumericMeta):` — **EN:** Starts a conditional branch guarded by `not isinstance(element_type, NumericMeta)`. **CN:** 开始一个由 `not isinstance(element_type, NumericMeta)` 控制的条件分支。
+- **L46** `        raise TypeError(f"element_type must be a Numeric, but got {element_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** `    if kind in (SmemLayoutAtomKind.MN_INTER, SmemLayoutAtomKind.K_INTER):` — **EN:** Starts a conditional branch guarded by `kind in (SmemLayoutAtomKind.MN_INTER, SmemLayoutAtomKind....`. **CN:** 开始一个由 `kind in (SmemLayoutAtomKind.MN_INTER, SmemLayoutAtomKind....` 控制的条件分支。
+- **L49** `        num_contiguous_bits = 128` — **EN:** Assigns a value to num_contiguous_bits. **CN:** 将一个值赋给 num_contiguous_bits。
+- **L50** `        sw = core.make_swizzle(0, 4, 3)` — **EN:** Assigns a value to sw. **CN:** 将一个值赋给 sw。
+- **L51** `    elif kind in (SmemLayoutAtomKind.MN_SW32, SmemLayoutAtomKind.K_SW32):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L52** `        num_contiguous_bits = 256` — **EN:** Assigns a value to num_contiguous_bits. **CN:** 将一个值赋给 num_contiguous_bits。
+- **L53** `        sw = core.make_swizzle(1, 4, 3)` — **EN:** Assigns a value to sw. **CN:** 将一个值赋给 sw。
+- **L54** `    elif kind in (SmemLayoutAtomKind.MN_SW64, SmemLayoutAtomKind.K_SW64):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L55** `        num_contiguous_bits = 512` — **EN:** Assigns a value to num_contiguous_bits. **CN:** 将一个值赋给 num_contiguous_bits。
+- **L56** `        sw = core.make_swizzle(2, 4, 3)` — **EN:** Assigns a value to sw. **CN:** 将一个值赋给 sw。
+- **L57** `    elif kind in (SmemLayoutAtomKind.MN_SW128, SmemLayoutAtomKind.K_SW128):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L58** `        num_contiguous_bits = 1024` — **EN:** Assigns a value to num_contiguous_bits. **CN:** 将一个值赋给 num_contiguous_bits。
+- **L59** `        sw = core.make_swizzle(3, 4, 3)` — **EN:** Assigns a value to sw. **CN:** 将一个值赋给 sw。
+- **L60** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L61** `        raise ValueError("unrecognized SMEM layout atom kind")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L62** `    num_contiguous_elems = num_contiguous_bits // element_type.width` — **EN:** Assigns a value to num_contiguous_elems. **CN:** 将一个值赋给 num_contiguous_elems。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `    if kind in (` — **EN:** Starts a conditional branch guarded by `kind in (SmemLayoutAtomKind.MN_INTER, SmemLayoutAtomKind....`. **CN:** 开始一个由 `kind in (SmemLayoutAtomKind.MN_INTER, SmemLayoutAtomKind....` 控制的条件分支。
+- **L65** `        SmemLayoutAtomKind.MN_INTER,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L66** `        SmemLayoutAtomKind.MN_SW32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L67** `        SmemLayoutAtomKind.MN_SW64,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L68** `        SmemLayoutAtomKind.MN_SW128,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L70** `        # M/N-major layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `        return core.make_composed_layout(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** `            sw,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `            core.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `                (num_contiguous_elems, 8), stride=(1, num_contiguous_elems)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L81** `        # K-major layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L82** `        return core.make_composed_layout(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** `            sw,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `            0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `            core.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `                (8, num_contiguous_elems), stride=(num_contiguous_elems, 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L94** `def fence(` — **EN:** Defines function `fence`. **CN:** 定义函数 `fence`。
+- **L95** `    *, loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L96** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L97** `    """` — **EN:** Starts the docstring for the function `fence`. **CN:** 开始说明 function `fence` 的文档字符串。
+- **L98** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-multiply-and-accumulate-instruction-wgmma-fence>\`__.` — **EN:** Continues the docstring for the function `fence`. **CN:** 继续说明 function `fence` 的文档字符串。
+- **L99** `    """` — **EN:** Ends the docstring for the function `fence`. **CN:** 结束说明 function `fence` 的文档字符串。
+- **L100** `    nvvm.wgmma_fence_aligned(loc=None, ip=None)` — **EN:** Invokes `nvvm.wgmma_fence_aligned` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.wgmma_fence_aligned`。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L104** `def commit_group(` — **EN:** Defines function `commit_group`. **CN:** 定义函数 `commit_group`。
+- **L105** `    *, loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L106** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L107** `    """` — **EN:** Starts the docstring for the function `commit_group`. **CN:** 开始说明 function `commit_group` 的文档字符串。
+- **L108** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-warpgroup-level-matrix-instructions-wgmma-commit-group>\`__.` — **EN:** Continues the docstring for the function `commit_group`. **CN:** 继续说明 function `commit_group` 的文档字符串。
+- **L109** `    """` — **EN:** Ends the docstring for the function `commit_group`. **CN:** 结束说明 function `commit_group` 的文档字符串。
+- **L110** `    nvvm.wgmma_commit_group_sync_aligned(loc=loc, ip=ip)` — **EN:** Invokes `nvvm.wgmma_commit_group_sync_aligned` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.wgmma_commit_group_sync_aligned`。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L114** `def wait_group(` — **EN:** Defines function `wait_group`. **CN:** 定义函数 `wait_group`。
+- **L115** `    group: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L116** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L117** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L118** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L120** `    """` — **EN:** Starts the docstring for the function `wait_group`. **CN:** 开始说明 function `wait_group` 的文档字符串。
+- **L121** `    See the \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#asynchronous-multiply-and-accumulate-instruction-wgmma-wait-group>\`__.` — **EN:** Continues the docstring for the function `wait_group`. **CN:** 继续说明 function `wait_group` 的文档字符串。
+- **L122** `    """` — **EN:** Ends the docstring for the function `wait_group`. **CN:** 结束说明 function `wait_group` 的文档字符串。
+- **L123** `    nvvm.wgmma_wait_group_sync_aligned(group, loc=loc, ip=ip)` — **EN:** Invokes `nvvm.wgmma_wait_group_sync_aligned` as a standalone call. **CN:** 以独立语句方式调用 `nvvm.wgmma_wait_group_sync_aligned`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.nvgpu.warpgroup.helpers`. CN: 模块名为 `CuTeDSL.cutlass.cute.nvgpu.warpgroup.helpers`。
+- EN: Top-level functions: make_smem_layout_atom, fence, commit_group, wait_group CN: 顶层函数包括：make_smem_layout_atom, fence, commit_group, wait_group
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:nvvm, ...typing:Numeric,NumericMeta,ComposedLayout, ...:core, .mma:SmemLayoutAtomKind CN: 内部依赖：cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:nvvm, ...typing:Numeric,NumericMeta,ComposedLayout, ...:core, .mma:SmemLayoutAtomKind
+- EN: External or standard-library dependencies: typing:Any,Optional,Type CN: 外部或标准库依赖：typing:Any,Optional,Type

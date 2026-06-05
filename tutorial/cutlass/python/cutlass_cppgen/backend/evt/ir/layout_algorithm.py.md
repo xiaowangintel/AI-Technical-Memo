@@ -1,0 +1,343 @@
+# layout_algorithm.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/ir/layout_algorithm.py`
+
+## Purpose / 作用
+- EN: Layout algebras
+- CN: 该模块的文档字符串将其描述为：Layout algebras
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Layout algebras` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from pycute import Layout, composition, make_layout, flatten, product` — **EN:** Imports Layout, composition, make_layout, flatten, product from `pycute`. **CN:** 从 `pycute` 导入 Layout, composition, make_layout, flatten, product。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `def _infer_split(old_shape, new_shape):` — **EN:** Defines function `_infer_split`. **CN:** 定义函数 `_infer_split`。
+- **L41** `    old_shape = _tuple_to_list(old_shape)` — **EN:** Assigns a value to old_shape. **CN:** 将一个值赋给 old_shape。
+- **L42** `    new_shape = _tuple_to_list(new_shape)` — **EN:** Assigns a value to new_shape. **CN:** 将一个值赋给 new_shape。
+- **L43** `    if len(old_shape) == 0 and len(new_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(old_shape) == 0 and len(new_shape) == 0`. **CN:** 开始一个由 `len(old_shape) == 0 and len(new_shape) == 0` 控制的条件分支。
+- **L44** `        return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L45** `    if len(old_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(old_shape) == 0`. **CN:** 开始一个由 `len(old_shape) == 0` 控制的条件分支。
+- **L46** `        if product(tuple(new_shape)) != 1:` — **EN:** Starts a conditional branch guarded by `product(tuple(new_shape)) != 1`. **CN:** 开始一个由 `product(tuple(new_shape)) != 1` 控制的条件分支。
+- **L47** `            raise ValueError("Invalid reshape size")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L48** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L49** `            return new_shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L50** `    if len(new_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(new_shape) == 0`. **CN:** 开始一个由 `len(new_shape) == 0` 控制的条件分支。
+- **L51** `        if product(tuple(old_shape)) != 1:` — **EN:** Starts a conditional branch guarded by `product(tuple(old_shape)) != 1`. **CN:** 开始一个由 `product(tuple(old_shape)) != 1` 控制的条件分支。
+- **L52** `            raise ValueError("Invalid reshape size")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L53** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L54** `            return old_shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** `    # This is done recursively by only process the last dimension at each time` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L56** `    old_dim = old_shape[-1]` — **EN:** Assigns a value to old_dim. **CN:** 将一个值赋给 old_dim。
+- **L57** `    new_dim = new_shape[-1]` — **EN:** Assigns a value to new_dim. **CN:** 将一个值赋给 new_dim。
+- **L58** `    # Exact match` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L59** `    if old_dim == new_dim:` — **EN:** Starts a conditional branch guarded by `old_dim == new_dim`. **CN:** 开始一个由 `old_dim == new_dim` 控制的条件分支。
+- **L60** `        return _infer_split(old_shape[:-1], new_shape[:-1]) + [new_dim,]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L61** `    # Needs split` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L62** `    if old_dim > new_dim and old_dim % new_dim == 0:` — **EN:** Starts a conditional branch guarded by `old_dim > new_dim and old_dim % new_dim == 0`. **CN:** 开始一个由 `old_dim > new_dim and old_dim % new_dim == 0` 控制的条件分支。
+- **L63** `        residual = old_dim // new_dim` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L64** `        return _infer_split(old_shape[:-1] + [residual,], new_shape[:-1]) + [new_dim,]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L65** `    # Needs merge` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L66** `    if old_dim < new_dim and new_dim % old_dim == 0:` — **EN:** Starts a conditional branch guarded by `old_dim < new_dim and new_dim % old_dim == 0`. **CN:** 开始一个由 `old_dim < new_dim and new_dim % old_dim == 0` 控制的条件分支。
+- **L67** `        residual = new_dim // old_dim` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L68** `        return _infer_split(old_shape[:-1], new_shape[:-1] + [residual,]) + [old_dim,]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    raise NotImplementedError(f"Unsupported split: {old_shape} -> {new_shape}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `def _infer_merge(flatten_shape, shape):` — **EN:** Defines function `_infer_merge`. **CN:** 定义函数 `_infer_merge`。
+- **L73** `    flatten_shape = _tuple_to_list(flatten_shape)` — **EN:** Assigns a value to flatten_shape. **CN:** 将一个值赋给 flatten_shape。
+- **L74** `    shape = _tuple_to_list(shape)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L75** `    idx_flat = 0` — **EN:** Assigns a value to idx_flat. **CN:** 将一个值赋给 idx_flat。
+- **L76** `    merged_shape = []` — **EN:** Assigns a value to merged_shape. **CN:** 将一个值赋给 merged_shape。
+- **L77** `    for dim in shape:` — **EN:** Starts a loop assigning items from `shape` to `dim`. **CN:** 开始一个循环，将 `shape` 的元素赋给 `dim`。
+- **L78** `        # Exact match` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `        if dim == flatten_shape[idx_flat]:` — **EN:** Starts a conditional branch guarded by `dim == flatten_shape[idx_flat]`. **CN:** 开始一个由 `dim == flatten_shape[idx_flat]` 控制的条件分支。
+- **L80** `            merged_shape.append(dim)` — **EN:** Invokes `merged_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `merged_shape.append`。
+- **L81** `            idx_flat += 1` — **EN:** Updates idx_flat in place. **CN:** 原地更新 idx_flat。
+- **L82** `        # Need group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L83** `        elif dim > flatten_shape[idx_flat] and dim % flatten_shape[idx_flat] == 0:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L84** `            residual = dim` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L85** `            group = []` — **EN:** Assigns a value to group. **CN:** 将一个值赋给 group。
+- **L86** `            while(residual > 1):` — **EN:** Starts a while-loop guarded by `residual > 1`. **CN:** 开始一个由 `residual > 1` 控制的 while 循环。
+- **L87** `                group.append(flatten_shape[idx_flat])` — **EN:** Invokes `group.append` as a standalone call. **CN:** 以独立语句方式调用 `group.append`。
+- **L88** `                residual = residual // flatten_shape[idx_flat]` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L89** `                idx_flat += 1` — **EN:** Updates idx_flat in place. **CN:** 原地更新 idx_flat。
+- **L90** `            merged_shape.append(group)` — **EN:** Invokes `merged_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `merged_shape.append`。
+- **L91** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L92** `            raise NotImplementedError(f"Unsupported merge: {flatten_shape} -> {shape}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    return merged_shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `def _list_to_tuple(nested_list):` — **EN:** Defines function `_list_to_tuple`. **CN:** 定义函数 `_list_to_tuple`。
+- **L97** `    if isinstance(nested_list, list) or isinstance(nested_list, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(nested_list, list) or isinstance(nested_list, ...`. **CN:** 开始一个由 `isinstance(nested_list, list) or isinstance(nested_list, ...` 控制的条件分支。
+- **L98** `        return tuple(_list_to_tuple(item) for item in nested_list)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** `    return nested_list` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `def _tuple_to_list(nested_tuple):` — **EN:** Defines function `_tuple_to_list`. **CN:** 定义函数 `_tuple_to_list`。
+- **L102** `    if isinstance(nested_tuple, list) or isinstance(nested_tuple, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(nested_tuple, list) or isinstance(nested_tuple...`. **CN:** 开始一个由 `isinstance(nested_tuple, list) or isinstance(nested_tuple...` 控制的条件分支。
+- **L103** `        return list(_tuple_to_list(item) for item in nested_tuple)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** `    return nested_tuple` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `def _reverse_tuple(nested_tuple: tuple):` — **EN:** Defines function `_reverse_tuple`. **CN:** 定义函数 `_reverse_tuple`。
+- **L107** `    if isinstance(nested_tuple, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(nested_tuple, tuple)`. **CN:** 开始一个由 `isinstance(nested_tuple, tuple)` 控制的条件分支。
+- **L108** `        return tuple([_reverse_tuple(item) for item in nested_tuple][::-1])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** `    return nested_tuple` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `def _get_first_lhs_nonzero_stride(stride_list, idx):` — **EN:** Defines function `_get_first_lhs_nonzero_stride`. **CN:** 定义函数 `_get_first_lhs_nonzero_stride`。
+- **L112** `    for i in reversed(range(idx)):` — **EN:** Starts a loop assigning items from `reversed(range(idx))` to `i`. **CN:** 开始一个循环，将 `reversed(range(idx))` 的元素赋给 `i`。
+- **L113** `        if stride_list[i] != 0:` — **EN:** Starts a conditional branch guarded by `stride_list[i] != 0`. **CN:** 开始一个由 `stride_list[i] != 0` 控制的条件分支。
+- **L114** `            return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L116** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `def _get_first_rhs_nonzero_stride(stride_list, idx):` — **EN:** Defines function `_get_first_rhs_nonzero_stride`. **CN:** 定义函数 `_get_first_rhs_nonzero_stride`。
+- **L119** `    for i in range(idx+1, len(stride_list)):` — **EN:** Starts a loop assigning items from `range(idx + 1, len(stride_list))` to `i`. **CN:** 开始一个循环，将 `range(idx + 1, len(stride_list))` 的元素赋给 `i`。
+- **L120** `        if stride_list[i] != 0:` — **EN:** Starts a conditional branch guarded by `stride_list[i] != 0`. **CN:** 开始一个由 `stride_list[i] != 0` 控制的条件分支。
+- **L121** `            return i` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L122** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L123** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `def reshape(layout, new_shape):` — **EN:** Defines function `reshape`. **CN:** 定义函数 `reshape`。
+- **L126** `    """` — **EN:** Starts the docstring for the function `reshape`. **CN:** 开始说明 function `reshape` 的文档字符串。
+- **L127** `    General reshape of input layout.` — **EN:** Continues the docstring for the function `reshape`. **CN:** 继续说明 function `reshape` 的文档字符串。
+- **L128** `    It takes two steps:` — **EN:** Continues the docstring for the function `reshape`. **CN:** 继续说明 function `reshape` 的文档字符串。
+- **L129** `    1. split the dimensions of the old layout` — **EN:** Continues the docstring for the function `reshape`. **CN:** 继续说明 function `reshape` 的文档字符串。
+- **L130** `    2. merge the splitted dimensions according to the new shape` — **EN:** Continues the docstring for the function `reshape`. **CN:** 继续说明 function `reshape` 的文档字符串。
+- **L131** `    """` — **EN:** Ends the docstring for the function `reshape`. **CN:** 结束说明 function `reshape` 的文档字符串。
+- **L132** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L133** `    # Step 1: Split the dimensions of the old layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L134** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L135** `    # 1.1 Flat old and new shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L136** `    old_flatten_shape = list(flatten(layout.shape))` — **EN:** Assigns a value to old_flatten_shape. **CN:** 将一个值赋给 old_flatten_shape。
+- **L137** `    new_flatten_shape = list(flatten(new_shape))` — **EN:** Assigns a value to new_flatten_shape. **CN:** 将一个值赋给 new_flatten_shape。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `    # 1.2 Infer the flatten splitted shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L140** `    splitted_flatten_shape = _infer_split(old_flatten_shape, new_flatten_shape)` — **EN:** Assigns a value to splitted_flatten_shape. **CN:** 将一个值赋给 splitted_flatten_shape。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    # 1.3 Unflat the splitted shape based on the old shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L143** `    splited_shape = _infer_merge(splitted_flatten_shape, old_flatten_shape)` — **EN:** Assigns a value to splited_shape. **CN:** 将一个值赋给 splited_shape。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    # 1.4 Infer the type of each split` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `    # If the split type is in row-major (R), the dimension list is reversed because` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L147** `    # the cute::composition only support column-major split` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L148** `    split_type = []  # the type of each split (ColumnMajor or RowMajor)` — **EN:** Assigns a value to split_type. **CN:** 将一个值赋给 split_type。
+- **L149** `    permuted_splitted_shape = []` — **EN:** Assigns a value to permuted_splitted_shape. **CN:** 将一个值赋给 permuted_splitted_shape。
+- **L150** `    old_flatten_stride = list(flatten(layout.stride))` — **EN:** Assigns a value to old_flatten_stride. **CN:** 将一个值赋给 old_flatten_stride。
+- **L151** `    for idx, dim in enumerate(splited_shape):` — **EN:** Starts a loop assigning items from `enumerate(splited_shape)` to `(idx, dim)`. **CN:** 开始一个循环，将 `enumerate(splited_shape)` 的元素赋给 `(idx, dim)`。
+- **L152** `        if not isinstance(dim, list):` — **EN:** Starts a conditional branch guarded by `not isinstance(dim, list)`. **CN:** 开始一个由 `not isinstance(dim, list)` 控制的条件分支。
+- **L153** `            permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L154** `            split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L155** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L156** `            lhs_stride = _get_first_lhs_nonzero_stride(old_flatten_stride, idx)` — **EN:** Assigns a value to lhs_stride. **CN:** 将一个值赋给 lhs_stride。
+- **L157** `            rhs_stride = _get_first_rhs_nonzero_stride(old_flatten_stride, idx)` — **EN:** Assigns a value to rhs_stride. **CN:** 将一个值赋给 rhs_stride。
+- **L158** `            # Special case for single tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L159** `            # Use column-major by default` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L160** `            if lhs_stride is None and rhs_stride is None:` — **EN:** Starts a conditional branch guarded by `lhs_stride is None and rhs_stride is None`. **CN:** 开始一个由 `lhs_stride is None and rhs_stride is None` 控制的条件分支。
+- **L161** `                permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L162** `                split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L163** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L164** `                if lhs_stride is not None and rhs_stride is not None:` — **EN:** Starts a conditional branch guarded by `lhs_stride is not None and rhs_stride is not None`. **CN:** 开始一个由 `lhs_stride is not None and rhs_stride is not None` 控制的条件分支。
+- **L165** `                    # We consider shape[idx]:stride[idx]` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L166** `                    # Case 1: stride[idx - 1] <= stride[idx] <= stride[idx + 1]: column major` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L167** `                    if lhs_stride <= old_flatten_stride[idx] and old_flatten_stride[idx] <= rhs_stride:` — **EN:** Starts a conditional branch guarded by `lhs_stride <= old_flatten_stride[idx] and old_flatten_str...`. **CN:** 开始一个由 `lhs_stride <= old_flatten_stride[idx] and old_flatten_str...` 控制的条件分支。
+- **L168** `                        permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L169** `                        split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L170** `                    # Case 2: stride[idx - 1] > stride[idx] > stride[idx + 1]: row major` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L171** `                    elif lhs_stride > old_flatten_stride[idx] and old_flatten_stride[idx] > rhs_stride:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L172** `                        permuted_splitted_shape.append([d for d in reversed(dim)])` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L173** `                        split_type.append("R")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L174** `                    # Case 3: stride[idx - 1] <= stride[idx] > stride[idx + 1]: concave` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L175** `                    elif lhs_stride <= old_flatten_stride[idx] and old_flatten_stride[idx] > rhs_stride:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L176** `                        if lhs_stride >= rhs_stride:` — **EN:** Starts a conditional branch guarded by `lhs_stride >= rhs_stride`. **CN:** 开始一个由 `lhs_stride >= rhs_stride` 控制的条件分支。
+- **L177** `                            permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L178** `                            split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L179** `                        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L180** `                            permuted_splitted_shape.append([d for d in reversed(dim)])` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L181** `                            split_type.append("R")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L182** `                    # Case 4: stride[idx - 1] > stride[idx] <= stride[idx + 1]: concave` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L183** `                    elif lhs_stride > old_flatten_stride[idx] and old_flatten_stride[idx] <= rhs_stride:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L184** `                        if lhs_stride >= rhs_stride:` — **EN:** Starts a conditional branch guarded by `lhs_stride >= rhs_stride`. **CN:** 开始一个由 `lhs_stride >= rhs_stride` 控制的条件分支。
+- **L185** `                            permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L186** `                            split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L187** `                        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L188** `                            permuted_splitted_shape.append([d for d in reversed(dim)])` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L189** `                            split_type.append("R")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L190** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L191** `                        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L192** `                elif lhs_stride is None:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L193** `                    # Case 1: dim's stride < dim+1's stride, expand in column major` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L194** `                    if old_flatten_stride[idx] > rhs_stride:` — **EN:** Starts a conditional branch guarded by `old_flatten_stride[idx] > rhs_stride`. **CN:** 开始一个由 `old_flatten_stride[idx] > rhs_stride` 控制的条件分支。
+- **L195** `                        permuted_splitted_shape.append([d for d in reversed(dim)])` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L196** `                        split_type.append("R")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L197** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L198** `                        permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L199** `                        split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L200** `                else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L201** `                    # Case 1: dim's stride > dim-1's stride` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L202** `                    if old_flatten_stride[idx] < lhs_stride:` — **EN:** Starts a conditional branch guarded by `old_flatten_stride[idx] < lhs_stride`. **CN:** 开始一个由 `old_flatten_stride[idx] < lhs_stride` 控制的条件分支。
+- **L203** `                        permuted_splitted_shape.append([d for d in reversed(dim)])` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L204** `                        split_type.append("R")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L205** `                    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L206** `                        permuted_splitted_shape.append(dim)` — **EN:** Invokes `permuted_splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `permuted_splitted_shape.append`。
+- **L207** `                        split_type.append("C")` — **EN:** Invokes `split_type.append` as a standalone call. **CN:** 以独立语句方式调用 `split_type.append`。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `    # 1.4 Generate the splitted layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L210** `    permuted_splitted_layout = composition(layout, Layout(_list_to_tuple(permuted_splitted_shape)))` — **EN:** Assigns a value to permuted_splitted_layout. **CN:** 将一个值赋给 permuted_splitted_layout。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `    # 1.5 Reverse the permutation in 1.4 before merge` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L213** `    splitted_shape = []` — **EN:** Assigns a value to splitted_shape. **CN:** 将一个值赋给 splitted_shape。
+- **L214** `    splitted_stride = []` — **EN:** Assigns a value to splitted_stride. **CN:** 将一个值赋给 splitted_stride。
+- **L215** `    for shape_dim, stride_dim, type in zip(` — **EN:** Starts a loop assigning items from `zip(permuted_splitted_layout.shape, permuted_sp...` to `(shape_dim, stride_dim, type)`. **CN:** 开始一个循环，将 `zip(permuted_splitted_layout.shape, permuted_sp...` 的元素赋给 `(shape_dim, stride_dim, type)`。
+- **L216** `            permuted_splitted_layout.shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L217** `            permuted_splitted_layout.stride,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L218** `            split_type):` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `        if type == "C":` — **EN:** Starts a conditional branch guarded by `type == 'C'`. **CN:** 开始一个由 `type == 'C'` 控制的条件分支。
+- **L220** `            splitted_shape.append(shape_dim)` — **EN:** Invokes `splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `splitted_shape.append`。
+- **L221** `            splitted_stride.append(stride_dim)` — **EN:** Invokes `splitted_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `splitted_stride.append`。
+- **L222** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L223** `            splitted_shape.append(tuple([d for d in reversed(shape_dim)]))` — **EN:** Invokes `splitted_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `splitted_shape.append`。
+- **L224** `            splitted_stride.append(tuple([d for d in reversed(stride_dim)]))` — **EN:** Invokes `splitted_stride.append` as a standalone call. **CN:** 以独立语句方式调用 `splitted_stride.append`。
+- **L225** `    splitted_layout = Layout(tuple(splitted_shape), tuple(splitted_stride))` — **EN:** Assigns a value to splitted_layout. **CN:** 将一个值赋给 splitted_layout。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L228** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L229** `    # Step 2: Merge the splitted dimensions according to the new shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L230** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L231** `    # 2.1 Merge layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L232** `    merged_layout = composition(splitted_layout, Layout(new_shape))` — **EN:** Assigns a value to merged_layout. **CN:** 将一个值赋给 merged_layout。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `    # 2.2 Cleaning up` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `    output_layout = composition(merged_layout, Layout(new_shape))` — **EN:** Assigns a value to output_layout. **CN:** 将一个值赋给 output_layout。
+- **L236** `    return output_layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `def permutation(layout, permutation):` — **EN:** Defines function `permutation`. **CN:** 定义函数 `permutation`。
+- **L240** `    """` — **EN:** Starts the docstring for the function `permutation`. **CN:** 开始说明 function `permutation` 的文档字符串。
+- **L241** `    Permute the layout` — **EN:** Continues the docstring for the function `permutation`. **CN:** 继续说明 function `permutation` 的文档字符串。
+- **L242** `    """` — **EN:** Ends the docstring for the function `permutation`. **CN:** 结束说明 function `permutation` 的文档字符串。
+- **L243** `    new_shape = tuple([layout.shape[idx] for idx in permutation])` — **EN:** Assigns a value to new_shape. **CN:** 将一个值赋给 new_shape。
+- **L244** `    new_stride = tuple([layout.stride[idx] for idx in permutation])` — **EN:** Assigns a value to new_stride. **CN:** 将一个值赋给 new_stride。
+- **L245** `    return Layout(new_shape, new_stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `def _broadcast(layout, new_shape):` — **EN:** Defines function `_broadcast`. **CN:** 定义函数 `_broadcast`。
+- **L249** `    if len(layout) == 1 and isinstance(new_shape, int):` — **EN:** Starts a conditional branch guarded by `len(layout) == 1 and isinstance(new_shape, int)`. **CN:** 开始一个由 `len(layout) == 1 and isinstance(new_shape, int)` 控制的条件分支。
+- **L250** `        old_dim = layout.shape` — **EN:** Assigns a value to old_dim. **CN:** 将一个值赋给 old_dim。
+- **L251** `        old_stride = layout.stride` — **EN:** Assigns a value to old_stride. **CN:** 将一个值赋给 old_stride。
+- **L252** `        new_dim = new_shape` — **EN:** Assigns a value to new_dim. **CN:** 将一个值赋给 new_dim。
+- **L253** `        if old_dim == new_dim:` — **EN:** Starts a conditional branch guarded by `old_dim == new_dim`. **CN:** 开始一个由 `old_dim == new_dim` 控制的条件分支。
+- **L254** `            return Layout(old_dim, old_stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L255** `        elif old_dim == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L256** `            return Layout(new_dim, 0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L257** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L258** `            raise NotImplementedError(f"Invalid Broadcast: {old_dim} -> {new_dim}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    # Align the dimensions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L261** `    old_shape = layout.shape` — **EN:** Assigns a value to old_shape. **CN:** 将一个值赋给 old_shape。
+- **L262** `    if isinstance(old_shape, int):` — **EN:** Starts a conditional branch guarded by `isinstance(old_shape, int)`. **CN:** 开始一个由 `isinstance(old_shape, int)` 控制的条件分支。
+- **L263** `        old_shape = (old_shape,)` — **EN:** Assigns a value to old_shape. **CN:** 将一个值赋给 old_shape。
+- **L264** `        sub_layouts = [layout,]` — **EN:** Assigns a value to sub_layouts. **CN:** 将一个值赋给 sub_layouts。
+- **L265** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L266** `        sub_layouts = [sub_layout for sub_layout in layout]` — **EN:** Assigns a value to sub_layouts. **CN:** 将一个值赋给 sub_layouts。
+- **L267** `    rhs_broadcast_layouts = [Layout(1, 0)] * (len(new_shape) - len(old_shape))` — **EN:** Assigns a value to rhs_broadcast_layouts. **CN:** 将一个值赋给 rhs_broadcast_layouts。
+- **L268** `    # Get the broadcasted layout` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L269** `    broadcast_layouts = []` — **EN:** Assigns a value to broadcast_layouts. **CN:** 将一个值赋给 broadcast_layouts。
+- **L270** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L271** `        layout = make_layout(*sub_layouts, *rhs_broadcast_layouts)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L272** `        broadcast_layouts = []` — **EN:** Assigns a value to broadcast_layouts. **CN:** 将一个值赋给 broadcast_layouts。
+- **L273** `        for idx, sub_layout in enumerate(layout):` — **EN:** Starts a loop assigning items from `enumerate(layout)` to `(idx, sub_layout)`. **CN:** 开始一个循环，将 `enumerate(layout)` 的元素赋给 `(idx, sub_layout)`。
+- **L274** `            broadcast_layouts.append(_broadcast(sub_layout, new_shape[idx]))` — **EN:** Invokes `broadcast_layouts.append` as a standalone call. **CN:** 以独立语句方式调用 `broadcast_layouts.append`。
+- **L275** `    except NotImplementedError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L276** `        layout = make_layout(*rhs_broadcast_layouts, *sub_layouts)` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L277** `        for idx, sub_layout in enumerate(layout):` — **EN:** Starts a loop assigning items from `enumerate(layout)` to `(idx, sub_layout)`. **CN:** 开始一个循环，将 `enumerate(layout)` 的元素赋给 `(idx, sub_layout)`。
+- **L278** `            broadcast_layouts.append(_broadcast(sub_layout, new_shape[idx]))` — **EN:** Invokes `broadcast_layouts.append` as a standalone call. **CN:** 以独立语句方式调用 `broadcast_layouts.append`。
+- **L279** `    return make_layout(*broadcast_layouts)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `def broadcast(layout, new_shape):` — **EN:** Defines function `broadcast`. **CN:** 定义函数 `broadcast`。
+- **L283** `    """` — **EN:** Starts the docstring for the function `broadcast`. **CN:** 开始说明 function `broadcast` 的文档字符串。
+- **L284** `    Broadcast the new layout based on the input shape` — **EN:** Continues the docstring for the function `broadcast`. **CN:** 继续说明 function `broadcast` 的文档字符串。
+- **L285** `    The broadcasted shape equals to the new shape` — **EN:** Continues the docstring for the function `broadcast`. **CN:** 继续说明 function `broadcast` 的文档字符串。
+- **L286** `    The stride of broadcasted dimensions are 0` — **EN:** Continues the docstring for the function `broadcast`. **CN:** 继续说明 function `broadcast` 的文档字符串。
+- **L287** `    """` — **EN:** Ends the docstring for the function `broadcast`. **CN:** 结束说明 function `broadcast` 的文档字符串。
+- **L288** `    return _broadcast(layout, new_shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `def debroadcast(layout, dims):` — **EN:** Defines function `debroadcast`. **CN:** 定义函数 `debroadcast`。
+- **L292** `    """` — **EN:** Starts the docstring for the function `debroadcast`. **CN:** 开始说明 function `debroadcast` 的文档字符串。
+- **L293** `    Squeeze the 0-stride` — **EN:** Continues the docstring for the function `debroadcast`. **CN:** 继续说明 function `debroadcast` 的文档字符串。
+- **L294** `    """` — **EN:** Ends the docstring for the function `debroadcast`. **CN:** 结束说明 function `debroadcast` 的文档字符串。
+- **L295** `    for dim in dims:` — **EN:** Starts a loop assigning items from `dims` to `dim`. **CN:** 开始一个循环，将 `dims` 的元素赋给 `dim`。
+- **L296** `        if layout.stride[dim] != 0:` — **EN:** Starts a conditional branch guarded by `layout.stride[dim] != 0`. **CN:** 开始一个由 `layout.stride[dim] != 0` 控制的条件分支。
+- **L297** `            raise ValueError(f"Dim{dim} cannot be debroadcasted as it has stride {layout.stride[dim]}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L298** `    new_shape = tuple([s for idx, s in enumerate(layout.shape) if idx not in dims])` — **EN:** Assigns a value to new_shape. **CN:** 将一个值赋给 new_shape。
+- **L299** `    new_stride = tuple([s for idx, s in enumerate(layout.stride) if idx not in dims])` — **EN:** Assigns a value to new_stride. **CN:** 将一个值赋给 new_stride。
+- **L300** `    return Layout(new_shape, new_stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `def canonicalization_(shapes, strides):` — **EN:** Defines function `canonicalization_`. **CN:** 定义函数 `canonicalization_`。
+- **L304** `    if isinstance(shapes, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(shapes, tuple)`. **CN:** 开始一个由 `isinstance(shapes, tuple)` 控制的条件分支。
+- **L305** `        c_shapes = []` — **EN:** Assigns a value to c_shapes. **CN:** 将一个值赋给 c_shapes。
+- **L306** `        c_strides = []` — **EN:** Assigns a value to c_strides. **CN:** 将一个值赋给 c_strides。
+- **L307** `        for shape, stride in zip(shapes, strides):` — **EN:** Starts a loop assigning items from `zip(shapes, strides)` to `(shape, stride)`. **CN:** 开始一个循环，将 `zip(shapes, strides)` 的元素赋给 `(shape, stride)`。
+- **L308** `            c_shape, c_stride = canonicalization_(shape, stride)` — **EN:** Assigns a value to (c_shape, c_stride). **CN:** 将一个值赋给 (c_shape, c_stride)。
+- **L309** `            c_shapes.append(c_shape)` — **EN:** Invokes `c_shapes.append` as a standalone call. **CN:** 以独立语句方式调用 `c_shapes.append`。
+- **L310** `            c_strides.append(c_stride)` — **EN:** Invokes `c_strides.append` as a standalone call. **CN:** 以独立语句方式调用 `c_strides.append`。
+- **L311** `        return tuple(c_shapes), tuple(c_strides)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L312** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L313** `        if shapes == 1:` — **EN:** Starts a conditional branch guarded by `shapes == 1`. **CN:** 开始一个由 `shapes == 1` 控制的条件分支。
+- **L314** `            return 1, 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L315** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L316** `            return shapes, strides` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L317** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L318** `def canonicalization(layout):` — **EN:** Defines function `canonicalization`. **CN:** 定义函数 `canonicalization`。
+- **L319** `    """` — **EN:** Starts the docstring for the function `canonicalization`. **CN:** 开始说明 function `canonicalization` 的文档字符串。
+- **L320** `    Canonicalize the input layout` — **EN:** Continues the docstring for the function `canonicalization`. **CN:** 继续说明 function `canonicalization` 的文档字符串。
+- **L321** `    1. set the stride of shape "1" to 0` — **EN:** Continues the docstring for the function `canonicalization`. **CN:** 继续说明 function `canonicalization` 的文档字符串。
+- **L322** `    """` — **EN:** Ends the docstring for the function `canonicalization`. **CN:** 结束说明 function `canonicalization` 的文档字符串。
+- **L323** `    new_shape, new_stride = canonicalization_(layout.shape, layout.stride)` — **EN:** Assigns a value to (new_shape, new_stride). **CN:** 将一个值赋给 (new_shape, new_stride)。
+- **L324** `    return Layout(new_shape, new_stride)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.ir.layout_algorithm`. CN: 模块名为 `cutlass_cppgen.backend.evt.ir.layout_algorithm`。
+- EN: Module docstring summary: Layout algebras CN: 模块文档摘要为：Layout algebras
+- EN: Top-level functions: _infer_split, _infer_merge, _list_to_tuple, _tuple_to_list, _reverse_tuple, _get_first_lhs_nonzero_stride, _get_first_rhs_nonzero_stride, reshape, permutation, _broadcast, broadcast, debroadcast, ... (+2 more) CN: 顶层函数包括：_infer_split, _infer_merge, _list_to_tuple, _tuple_to_list, _reverse_tuple, _get_first_lhs_nonzero_stride, _get_first_rhs_nonzero_stride, reshape, permutation, _broadcast, broadcast, debroadcast, ... (+2 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: pycute:Layout,composition,make_layout,flatten,product CN: 内部依赖：pycute:Layout,composition,make_layout,flatten,product

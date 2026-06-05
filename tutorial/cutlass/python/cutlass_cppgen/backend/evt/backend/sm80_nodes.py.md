@@ -1,0 +1,276 @@
+# sm80_nodes.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/backend/sm80_nodes.py`
+
+## Purpose / 作用
+- EN: Defines 12 classes (Sm80AccumulatorImpl, Sm80AuxLoadImpl, Sm80LoadSrcImpl, Sm80ScalarBroadcastImpl, ... (+8 more)) in `cutlass_cppgen.backend.evt.backend.sm80_nodes`.
+- CN: 该模块 `cutlass_cppgen.backend.evt.backend.sm80_nodes` 定义了 12 个类（Sm80AccumulatorImpl, Sm80AuxLoadImpl, Sm80LoadSrcImpl, Sm80ScalarBroadcastImpl, ... (+8 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `from cutlass_library import DataTypeSize, DataTypeTag` — **EN:** Imports DataTypeSize, DataTypeTag from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeSize, DataTypeTag。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `from cutlass_cppgen.backend.evt.ir import (` — **EN:** Imports AccumulatorImpl, AuxLoadImpl, ColumnBroadcastImpl, LoadNode, LoadSrcImpl, RowBroadcastImpl, ... (+6 more) from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 AccumulatorImpl, AuxLoadImpl, ColumnBroadcastImpl, LoadNode, LoadSrcImpl, RowBroadcastImpl, ... (+6 more)。
+- **L36** `    # Load Node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L37** `    AccumulatorImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    AuxLoadImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    ColumnBroadcastImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    LoadNode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    LoadSrcImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    RowBroadcastImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    ScalarBroadcastImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    # Compute Node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L45** `    ComputeImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    # Store Node` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L47** `    AuxStoreImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    ColumnReductionImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    RowReductionImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    ScalarReductionImpl` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `from cutlass_cppgen.backend.library import (` — **EN:** Imports FloatRoundStyleTag, FunctionalOp, op_tag from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 FloatRoundStyleTag, FunctionalOp, op_tag。
+- **L54** `    FloatRoundStyleTag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    FunctionalOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    op_tag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `class Sm80AccumulatorImpl(AccumulatorImpl):` — **EN:** Defines class `Sm80AccumulatorImpl` with bases AccumulatorImpl. **CN:** 定义类 `Sm80AccumulatorImpl`，其基类为 AccumulatorImpl。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L63** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L64** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L65** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L66** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L67** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L68** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `        self._type_decl = f"""\nusing {self.name_camel} = cutlass::epilogue::threadblock::VisitorAccFetch;\n"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L71** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `class Sm80AuxLoadImpl(AuxLoadImpl):` — **EN:** Defines class `Sm80AuxLoadImpl` with bases AuxLoadImpl. **CN:** 定义类 `Sm80AuxLoadImpl`，其基类为 AuxLoadImpl。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L77** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L78** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L79** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L80** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L81** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L82** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L85** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorAuxLoad<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `    OutputTileThreadMap, {DataTypeTag[self.element]}, {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `class Sm80LoadSrcImpl(Sm80AuxLoadImpl):` — **EN:** Defines class `Sm80LoadSrcImpl` with bases Sm80AuxLoadImpl. **CN:** 定义类 `Sm80LoadSrcImpl`，其基类为 Sm80AuxLoadImpl。
+- **L93** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `class Sm80ScalarBroadcastImpl(ScalarBroadcastImpl):` — **EN:** Defines class `Sm80ScalarBroadcastImpl` with bases ScalarBroadcastImpl. **CN:** 定义类 `Sm80ScalarBroadcastImpl`，其基类为 ScalarBroadcastImpl。
+- **L97** `    def __init__(self, node: LoadNode) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L98** `        super().__init__(node)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L99** `        self.broadcast_count = 1` — **EN:** Assigns a value to self.broadcast_count. **CN:** 将一个值赋给 self.broadcast_count。
+- **L100** `        self.reduction_fn = FunctionalOp.Multiplies` — **EN:** Assigns a value to self.reduction_fn. **CN:** 将一个值赋给 self.reduction_fn。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L103** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L104** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L105** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L106** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L107** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L108** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L111** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorScalarBroadcast<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `    {DataTypeTag[self.element]}, {self.stride_mnl}, {self.broadcast_count}, {op_tag(self.reduction_fn)}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `class Sm80RowBroadcastImpl(RowBroadcastImpl):` — **EN:** Defines class `Sm80RowBroadcastImpl` with bases RowBroadcastImpl. **CN:** 定义类 `Sm80RowBroadcastImpl`，其基类为 RowBroadcastImpl。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L121** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L122** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L123** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L124** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L125** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L126** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L129** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorRowBroadcast<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** `    OutputTileThreadMap, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `    {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `class Sm80ColumnBroadcastImpl(ColumnBroadcastImpl):` — **EN:** Defines class `Sm80ColumnBroadcastImpl` with bases ColumnBroadcastImpl. **CN:** 定义类 `Sm80ColumnBroadcastImpl`，其基类为 ColumnBroadcastImpl。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L140** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L141** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L142** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L143** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L144** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L145** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L148** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorColBroadcast<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `    OutputTileThreadMap, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `    {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `class Sm80ComputeImpl(ComputeImpl):` — **EN:** Defines class `Sm80ComputeImpl` with bases ComputeImpl. **CN:** 定义类 `Sm80ComputeImpl`，其基类为 ComputeImpl。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L159** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L160** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L161** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L162** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L163** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L164** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L167** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorCompute<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `    {op_tag(self.fn)}, {DataTypeTag[self.element_output]}, {DataTypeTag[self.element_compute]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `    {FloatRoundStyleTag[self.round_style]}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L175** `class Sm80AuxStoreImpl(AuxStoreImpl):` — **EN:** Defines class `Sm80AuxStoreImpl` with bases AuxStoreImpl. **CN:** 定义类 `Sm80AuxStoreImpl`，其基类为 AuxStoreImpl。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L178** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L179** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L180** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L181** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L182** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L183** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L186** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorAuxStore<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `    OutputTileThreadMap, {DataTypeTag[self.element]}, {FloatRoundStyleTag[self.round_style]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `    {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `class Sm80StoreDImpl(Sm80AuxStoreImpl):` — **EN:** Defines class `Sm80StoreDImpl` with bases Sm80AuxStoreImpl. **CN:** 定义类 `Sm80StoreDImpl`，其基类为 Sm80AuxStoreImpl。
+- **L195** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `class Sm80ColumnReductionImpl(ColumnReductionImpl):` — **EN:** Defines class `Sm80ColumnReductionImpl` with bases ColumnReductionImpl. **CN:** 定义类 `Sm80ColumnReductionImpl`，其基类为 ColumnReductionImpl。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L201** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L202** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L203** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L204** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L205** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L206** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L209** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorColReduction<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `    {op_tag(self.reg_reduce_fn)}, {op_tag(self.gmem_reduce_fn)},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `    OutputTileThreadMap, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `    {DataTypeTag[self.element_compute]}, {FloatRoundStyleTag[self.round_style]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `    {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `class Sm80RowReductionImpl(RowReductionImpl):` — **EN:** Defines class `Sm80RowReductionImpl` with bases RowReductionImpl. **CN:** 定义类 `Sm80RowReductionImpl`，其基类为 RowReductionImpl。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L222** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L223** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L224** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L225** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L226** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L227** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L228** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L229** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L230** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorRowReduction<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `    {op_tag(self.reg_reduce_fn)}, {op_tag(self.gmem_reduce_fn)},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `    OutputTileThreadMap, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `    {DataTypeTag[self.element_compute]}, {FloatRoundStyleTag[self.round_style]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `    {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `class Sm80ScalarReductionImpl(ScalarReductionImpl):` — **EN:** Defines class `Sm80ScalarReductionImpl` with bases ScalarReductionImpl. **CN:** 定义类 `Sm80ScalarReductionImpl`，其基类为 ScalarReductionImpl。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L243** `    def type_decl(self):` — **EN:** Defines function `type_decl`. **CN:** 定义函数 `type_decl`。
+- **L244** `        """` — **EN:** Starts the docstring for the function `type_decl`. **CN:** 开始说明 function `type_decl` 的文档字符串。
+- **L245** `        Return the string defining the type` — **EN:** Continues the docstring for the function `type_decl`. **CN:** 继续说明 function `type_decl` 的文档字符串。
+- **L246** `        """` — **EN:** Ends the docstring for the function `type_decl`. **CN:** 结束说明 function `type_decl` 的文档字符串。
+- **L247** `        if self._type_decl is not None:` — **EN:** Starts a conditional branch guarded by `self._type_decl is not None`. **CN:** 开始一个由 `self._type_decl is not None` 控制的条件分支。
+- **L248** `            return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `        self._type_decl = f"""` — **EN:** Assigns a value to self._type_decl. **CN:** 将一个值赋给 self._type_decl。
+- **L251** `using {self.name_camel} = cutlass::epilogue::threadblock::VisitorScalarReduction<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L252** `    {op_tag(self.reg_reduce_fn)}, {op_tag(self.gmem_reduce_fn)},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `    OutputTileThreadMap, {DataTypeTag[self.element]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `    {DataTypeTag[self.element_compute]}, {FloatRoundStyleTag[self.round_style]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `    {self.stride_mnl}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `        return self._type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.backend.sm80_nodes`. CN: 模块名为 `cutlass_cppgen.backend.evt.backend.sm80_nodes`。
+- EN: Top-level classes: Sm80AccumulatorImpl, Sm80AuxLoadImpl, Sm80LoadSrcImpl, Sm80ScalarBroadcastImpl, Sm80RowBroadcastImpl, Sm80ColumnBroadcastImpl, Sm80ComputeImpl, Sm80AuxStoreImpl, Sm80StoreDImpl, Sm80ColumnReductionImpl, Sm80RowReductionImpl, Sm80ScalarReductionImpl CN: 顶层类包括：Sm80AccumulatorImpl, Sm80AuxLoadImpl, Sm80LoadSrcImpl, Sm80ScalarBroadcastImpl, Sm80RowBroadcastImpl, Sm80ColumnBroadcastImpl, Sm80ComputeImpl, Sm80AuxStoreImpl, Sm80StoreDImpl, Sm80ColumnReductionImpl, Sm80RowReductionImpl, Sm80ScalarReductionImpl
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataTypeSize,DataTypeTag, cutlass_cppgen.backend.evt.ir:AccumulatorImpl,AuxLoadImpl,ColumnBroadcastImpl,LoadNode,LoadSrcImpl,RowBroadcastImpl,ScalarBroadcastImpl,ComputeImpl,AuxStoreImpl,ColumnReductionImpl,RowReductionImpl,ScalarReductionImpl, cutlass_cppgen.backend.library:FloatRoundStyleTag,FunctionalOp,op_tag CN: 内部依赖：cutlass_library:DataTypeSize,DataTypeTag, cutlass_cppgen.backend.evt.ir:AccumulatorImpl,AuxLoadImpl,ColumnBroadcastImpl,LoadNode,LoadSrcImpl,RowBroadcastImpl,ScalarBroadcastImpl,ComputeImpl,AuxStoreImpl,ColumnReductionImpl,RowReductionImpl,ScalarReductionImpl, cutlass_cppgen.backend.library:FloatRoundStyleTag,FunctionalOp,op_tag

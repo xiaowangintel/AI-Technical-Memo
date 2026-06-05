@@ -1,0 +1,455 @@
+# native_struct.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/native_struct.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (_StructTypeDescriptor) and 4 functions (_is_constexpr_annotation, _annotation_to_mlir_type, native_struct, make_native_struct) in `CuTeDSL.cutlass.base_dsl.native_struct`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.native_struct` 定义了 1 个类（_StructTypeDescriptor） 和 4 个函数（_is_constexpr_annotation, _annotation_to_mlir_type, native_struct, make_native_struct）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L13** `from collections.abc import Iterator` — **EN:** Imports Iterator from `collections.abc`. **CN:** 从 `collections.abc` 导入 Iterator。
+- **L14** `from typing import Any, get_origin, get_type_hints` — **EN:** Imports Any, get_origin, get_type_hints from `typing`. **CN:** 从 `typing` 导入 Any, get_origin, get_type_hints。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from .dsl import extract_mlir_values` — **EN:** Imports extract_mlir_values from `.dsl`. **CN:** 从 `.dsl` 导入 extract_mlir_values。
+- **L17** `from .typing import DslType` — **EN:** Imports DslType from `.typing`. **CN:** 从 `.typing` 导入 DslType。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from .._mlir import ir` — **EN:** Imports ir from `.._mlir`. **CN:** 从 `.._mlir` 导入 ir。
+- **L20** `from .._mlir.dialects import llvm` — **EN:** Imports llvm from `.._mlir.dialects`. **CN:** 从 `.._mlir.dialects` 导入 llvm。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `from ._mlir_helpers import dsl_user_op` — **EN:** Imports dsl_user_op from `._mlir_helpers`. **CN:** 从 `._mlir_helpers` 导入 dsl_user_op。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `def _is_constexpr_annotation(ann: type) -> bool:` — **EN:** Defines function `_is_constexpr_annotation`. **CN:** 定义函数 `_is_constexpr_annotation`。
+- **L26** `    """True if the annotation is Constexpr or Constexpr[T]."""` — **EN:** Docstring line documenting the function `_is_constexpr_annotation`. **CN:** 文档字符串行，用于说明 function `_is_constexpr_annotation`。
+- **L27** `    from .typing import Constexpr` — **EN:** Imports Constexpr from `.typing`. **CN:** 从 `.typing` 导入 Constexpr。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `    return ann is Constexpr or get_origin(ann) is Constexpr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** `def _annotation_to_mlir_type(ann: type) -> ir.Type:` — **EN:** Defines function `_annotation_to_mlir_type`. **CN:** 定义函数 `_annotation_to_mlir_type`。
+- **L33** `    """Resolve a type annotation to an MLIR type for struct fields.` — **EN:** Starts the docstring for the function `_annotation_to_mlir_type`. **CN:** 开始说明 function `_annotation_to_mlir_type` 的文档字符串。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `    Supports DSL types with a class-level mlir_type (e.g. Int32, Float32),` — **EN:** Continues the docstring for the function `_annotation_to_mlir_type`. **CN:** 继续说明 function `_annotation_to_mlir_type` 的文档字符串。
+- **L36** `    ir.Type instances, and other native_struct classes (for nested structs).` — **EN:** Continues the docstring for the function `_annotation_to_mlir_type`. **CN:** 继续说明 function `_annotation_to_mlir_type` 的文档字符串。
+- **L37** `    Called at init/use time when MLIR context is available.` — **EN:** Continues the docstring for the function `_annotation_to_mlir_type`. **CN:** 继续说明 function `_annotation_to_mlir_type` 的文档字符串。
+- **L38** `    """` — **EN:** Ends the docstring for the function `_annotation_to_mlir_type`. **CN:** 结束说明 function `_annotation_to_mlir_type` 的文档字符串。
+- **L39** `    if isinstance(ann, ir.Type):` — **EN:** Starts a conditional branch guarded by `isinstance(ann, ir.Type)`. **CN:** 开始一个由 `isinstance(ann, ir.Type)` 控制的条件分支。
+- **L40** `        return ann` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L41** `    if hasattr(ann, "mlir_type"):` — **EN:** Starts a conditional branch guarded by `hasattr(ann, 'mlir_type')`. **CN:** 开始一个由 `hasattr(ann, 'mlir_type')` 控制的条件分支。
+- **L42** `        mt = ann.mlir_type` — **EN:** Assigns a value to mt. **CN:** 将一个值赋给 mt。
+- **L43** `        return mt() if callable(mt) else mt` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L44** `    if hasattr(ann, "_struct_type"):` — **EN:** Starts a conditional branch guarded by `hasattr(ann, '_struct_type')`. **CN:** 开始一个由 `hasattr(ann, '_struct_type')` 控制的条件分支。
+- **L45** `        return ann._struct_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L46** `    raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L47** `        f"Struct field type must be an ir.Type, a DSL type with mlir_type, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `        f"or a native_struct class; got {ann!r}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `class _StructTypeDescriptor:` — **EN:** Defines class `_StructTypeDescriptor`. **CN:** 定义类 `_StructTypeDescriptor`。
+- **L53** `    """Descriptor that resolves struct type from annotations on each access.` — **EN:** Starts the docstring for the class `_StructTypeDescriptor`. **CN:** 开始说明 class `_StructTypeDescriptor` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    Also provides :meth:\`resolve\` for use outside the descriptor protocol` — **EN:** Continues the docstring for the class `_StructTypeDescriptor`. **CN:** 继续说明 class `_StructTypeDescriptor` 的文档字符串。
+- **L56** `    (e.g. in static methods like \`\`__get_mlir_types__\`\` and \`\`isinstance\`\`).` — **EN:** Continues the docstring for the class `_StructTypeDescriptor`. **CN:** 继续说明 class `_StructTypeDescriptor` 的文档字符串。
+- **L57** `    """` — **EN:** Ends the docstring for the class `_StructTypeDescriptor`. **CN:** 结束说明 class `_StructTypeDescriptor` 的文档字符串。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    _field_types_attr = "_field_types"` — **EN:** Assigns a value to _field_types_attr. **CN:** 将一个值赋给 _field_types_attr。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L62** `        self, field_names: list, field_annotations: dict, packed: bool = False` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L64** `        self._field_names = field_names` — **EN:** Assigns a value to self._field_names. **CN:** 将一个值赋给 self._field_names。
+- **L65** `        self._field_annotations = field_annotations` — **EN:** Assigns a value to self._field_annotations. **CN:** 将一个值赋给 self._field_annotations。
+- **L66** `        self._packed = packed` — **EN:** Assigns a value to self._packed. **CN:** 将一个值赋给 self._packed。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    def _resolve(self) -> tuple[ir.Type, list[ir.Type]]:` — **EN:** Defines function `_resolve`. **CN:** 定义函数 `_resolve`。
+- **L69** `        """Resolve field annotations to MLIR types and build the struct type.` — **EN:** Starts the docstring for the function `_resolve`. **CN:** 开始说明 function `_resolve` 的文档字符串。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `        Requires an active MLIR context. Not cached — MLIR types are tied to` — **EN:** Continues the docstring for the function `_resolve`. **CN:** 继续说明 function `_resolve` 的文档字符串。
+- **L72** `        the context they were created in, and each JIT compilation may use a` — **EN:** Continues the docstring for the function `_resolve`. **CN:** 继续说明 function `_resolve` 的文档字符串。
+- **L73** `        different context.` — **EN:** Continues the docstring for the function `_resolve`. **CN:** 继续说明 function `_resolve` 的文档字符串。
+- **L74** `        """` — **EN:** Ends the docstring for the function `_resolve`. **CN:** 结束说明 function `_resolve` 的文档字符串。
+- **L75** `        field_types = [` — **EN:** Assigns a value to field_types. **CN:** 将一个值赋给 field_types。
+- **L76** `            _annotation_to_mlir_type(self._field_annotations[n])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `            for n in self._field_names` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `        struct_type = llvm.StructType.get_literal(field_types, packed=self._packed)` — **EN:** Assigns a value to struct_type. **CN:** 将一个值赋给 struct_type。
+- **L80** `        return struct_type, field_types` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    def resolve(self) -> ir.Type:` — **EN:** Defines function `resolve`. **CN:** 定义函数 `resolve`。
+- **L83** `        """Return the LLVM struct type (resolving and caching if needed)."""` — **EN:** Docstring line documenting the function `resolve`. **CN:** 文档字符串行，用于说明 function `resolve`。
+- **L84** `        struct_type, _ = self._resolve()` — **EN:** Assigns a value to (struct_type, _). **CN:** 将一个值赋给 (struct_type, _)。
+- **L85** `        return struct_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    def __get__(self, obj: Any, owner: type | None) -> ir.Type:` — **EN:** Defines function `__get__`. **CN:** 定义函数 `__get__`。
+- **L88** `        if owner is None:` — **EN:** Starts a conditional branch guarded by `owner is None`. **CN:** 开始一个由 `owner is None` 控制的条件分支。
+- **L89** `            owner = type(obj)` — **EN:** Assigns a value to owner. **CN:** 将一个值赋给 owner。
+- **L90** `        struct_type, field_types = self._resolve()` — **EN:** Assigns a value to (struct_type, field_types). **CN:** 将一个值赋给 (struct_type, field_types)。
+- **L91** `        setattr(owner, self._field_types_attr, field_types)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L92** `        return struct_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `def native_struct(` — **EN:** Defines function `native_struct`. **CN:** 定义函数 `native_struct`。
+- **L96** `    cls: type | None = None, *, zero_init: bool = True, packed: bool = False` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L97** `) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L98** `    """Decorator that mimics dataclass behavior but generates a native MLIR struct type.` — **EN:** Starts the docstring for the function `native_struct`. **CN:** 开始说明 function `native_struct` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    Can be used as \`\`@native_struct\`\`, \`\`@native_struct(zero_init=False)\`\`, or` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L101** `    \`\`@native_struct(packed=True)\`\`.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `    \`\`zero_init\`\` (default True): if True, the struct is initialized with` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L104** `    \`\`llvm.mlir.zero\`\` before inserting field values; if False, with \`\`llvm.mlir.undef\`\`.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    \`\`packed\`\` (default False): if True, the LLVM struct type is created with the` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L107** `    packed attribute (no padding between fields).` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    The decorated class must use type annotations for all fields; each annotation` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L110** `    must resolve to an DSL type (e.g. Int32, Float32, Pointer, etc.) or Constexpr. The decorator:` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `    - Builds an LLVM literal struct type \`\`!llvm.struct<(t1, t2, ...)>\`\` from the non-Constexpr` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L113** `      field types.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L114** `    - Adds \`\`__init__(self, *, loc=None, ip=None, **kwargs)\`\` to construct from keyword` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L115** `      arguments (one per MLIR field). Use \`\`cls.__new_from_mlir_values__([value])\`\` to wrap` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L116** `      an existing \`\`ir.Value\`\`.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L117** `    - Implements \`\`__extract_mlir_values__\`\`, \`\`__new_from_mlir_values__\`\`, and` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L118** `      \`\`__get_mlir_types__\`\` so the class works as a DynamicExpression and JitArgument.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L119** `    - For each field \`\`name\`\`, adds a property \`\`name\`\` to the class.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L120** `      Accessing \`\`instance.name\`\` gets the value of the field, optionally wrapping it in the annotated` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L121** `      DSL type (for example, \`\`Int32\`\`).` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L122** `      Assigning to \`\`instance.name\`\` is supported and replaces the value of that field.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L123** `    - Fields annotated with \`\`Constexpr\`\` or \`\`Constexpr[T]\`\` are excluded from the` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L124** `      native struct and from getters/setters; they can be passed as keyword arguments` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L125** `      to \`\`__init__\`\` and are stored as normal Python attributes on the instance.` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L126** `    - \`\`__setattr__\`\` is overridden so that only \`\`_value\`\` and Constexpr field names` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L127** `      can be set; assigning any other attribute raises \`\`AttributeError\`\` (no new` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L128** `      fields after init).` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    Instance data is stored in \`\`_value\`\` (a single ir.Value of the struct type).` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    Example::` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `        @native_struct` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L135** `        class Vec2:` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L136** `            x: Int32` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L137** `            y: Int32` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `        @native_struct(zero_init=False)` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L140** `        class Vec2Undef:` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L141** `            x: Int32` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L142** `            y: Int32` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `        @native_struct(packed=True)` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L145** `        class PackedVec2:` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L146** `            x: Int32` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L147** `            y: Int32` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `        # From keyword arguments (loc= and ip= required)` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L150** `        v = Vec2(x=x_val, y=y_val, loc=loc, ip=ip)` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `        # Get field (returns Int32 when annotation is Int32)` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L153** `        x_val = v.x` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        # Replace field` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L156** `        v.x = new_x` — **EN:** Continues the docstring for the function `native_struct`. **CN:** 继续说明 function `native_struct` 的文档字符串。
+- **L157** `    """` — **EN:** Ends the docstring for the function `native_struct`. **CN:** 结束说明 function `native_struct` 的文档字符串。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    def decorate(cls: type) -> type:` — **EN:** Defines function `decorate`. **CN:** 定义函数 `decorate`。
+- **L160** `        hints = get_type_hints(cls)` — **EN:** Assigns a value to hints. **CN:** 将一个值赋给 hints。
+- **L161** `        if not hints:` — **EN:** Starts a conditional branch guarded by `not hints`. **CN:** 开始一个由 `not hints` 控制的条件分支。
+- **L162** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L163** `                f"{cls.__name__}: @native_struct requires at least one type-annotated field"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `        # Split into MLIR fields (included in struct) and Constexpr fields (skipped).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L166** `        # Do not resolve annotations to MLIR types here; MLIR context may not exist yet.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L167** `        field_names = []` — **EN:** Assigns a value to field_names. **CN:** 将一个值赋给 field_names。
+- **L168** `        field_annotations = {}` — **EN:** Assigns a value to field_annotations. **CN:** 将一个值赋给 field_annotations。
+- **L169** `        constexpr_field_names = []` — **EN:** Assigns a value to constexpr_field_names. **CN:** 将一个值赋给 constexpr_field_names。
+- **L170** `        for name, ann in hints.items():` — **EN:** Starts a loop assigning items from `hints.items()` to `(name, ann)`. **CN:** 开始一个循环，将 `hints.items()` 的元素赋给 `(name, ann)`。
+- **L171** `            if _is_constexpr_annotation(ann):` — **EN:** Starts a conditional branch guarded by `_is_constexpr_annotation(ann)`. **CN:** 开始一个由 `_is_constexpr_annotation(ann)` 控制的条件分支。
+- **L172** `                constexpr_field_names.append(name)` — **EN:** Invokes `constexpr_field_names.append` as a standalone call. **CN:** 以独立语句方式调用 `constexpr_field_names.append`。
+- **L173** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L174** `                field_names.append(name)` — **EN:** Invokes `field_names.append` as a standalone call. **CN:** 以独立语句方式调用 `field_names.append`。
+- **L175** `                field_annotations[name] = ann` — **EN:** Assigns a value to field_annotations[name]. **CN:** 将一个值赋给 field_annotations[name]。
+- **L176** `        if not field_names:` — **EN:** Starts a conditional branch guarded by `not field_names`. **CN:** 开始一个由 `not field_names` 控制的条件分支。
+- **L177** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L178** `                f"{cls.__name__}: @native_struct requires at least one non-Constexpr field"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L179** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L181** `        struct_type_descriptor = _StructTypeDescriptor(` — **EN:** Assigns a value to struct_type_descriptor. **CN:** 将一个值赋给 struct_type_descriptor。
+- **L182** `            field_names, field_annotations, packed=packed` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** `        def __extract_mlir_values__(self: Any) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L186** `            return [self._value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `        def __new_from_mlir_values__(self: Any, values: list[ir.Value]) -> Any:` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L189** `            self._value = values[0]` — **EN:** Assigns a value to self._value. **CN:** 将一个值赋给 self._value。
+- **L190** `            return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `        @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L193** `        def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L194** `            self: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `            *args: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `            loc: ir.Location | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `            ip: ir.InsertionPoint | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `            **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L199** `        ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L200** `            # Wrapping mode: single positional ir.Value` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L201** `            # Note: this is builtins.isinstance, not the struct's own` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L202** `            # isinstance() staticmethod (which hasn't been added to the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L203** `            # class yet at this point in decorate()).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L204** `            if len(args) == 1 and not kwargs and isinstance(args[0], ir.Value):` — **EN:** Starts a conditional branch guarded by `len(args) == 1 and (not kwargs) and isinstance(args[0], i...`. **CN:** 开始一个由 `len(args) == 1 and (not kwargs) and isinstance(args[0], i...` 控制的条件分支。
+- **L205** `                struct_type = type(self)._struct_type` — **EN:** Assigns a value to struct_type. **CN:** 将一个值赋给 struct_type。
+- **L206** `                if args[0].type != struct_type:` — **EN:** Starts a conditional branch guarded by `args[0].type != struct_type`. **CN:** 开始一个由 `args[0].type != struct_type` 控制的条件分支。
+- **L207** `                    raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L208** `                        f"{cls.__name__}(): expected ir.Value of type "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `                        f"{struct_type}, got {args[0].type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `                self._value = args[0]` — **EN:** Assigns a value to self._value. **CN:** 将一个值赋给 self._value。
+- **L212** `                return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L213** `            # Keyword-arg construction mode` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L214** `            if len(args) > 0:` — **EN:** Starts a conditional branch guarded by `len(args) > 0`. **CN:** 开始一个由 `len(args) > 0` 控制的条件分支。
+- **L215** `                raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L216** `                    f"{cls.__name__}() takes a single ir.Value or keyword "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `                    f"arguments, got {len(args)} positional argument(s)"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `            # Populate Constexpr fields` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L220** `            for name in constexpr_field_names:` — **EN:** Starts a loop assigning items from `constexpr_field_names` to `name`. **CN:** 开始一个循环，将 `constexpr_field_names` 的元素赋给 `name`。
+- **L221** `                if name in kwargs:` — **EN:** Starts a conditional branch guarded by `name in kwargs`. **CN:** 开始一个由 `name in kwargs` 控制的条件分支。
+- **L222** `                    setattr(self, name, kwargs.pop(name))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L223** `            extra = set(kwargs.keys()) - set(field_names) - set(constexpr_field_names)` — **EN:** Assigns a value to extra. **CN:** 将一个值赋给 extra。
+- **L224** `            if extra:` — **EN:** Starts a conditional branch guarded by `extra`. **CN:** 开始一个由 `extra` 控制的条件分支。
+- **L225** `                raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L226** `                    f"{cls.__name__}() got unexpected keyword argument(s): {sorted(extra)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `            struct_type = type(self)._struct_type` — **EN:** Assigns a value to struct_type. **CN:** 将一个值赋给 struct_type。
+- **L229** `            if type(self)._struct_zero_init:` — **EN:** Starts a conditional branch guarded by `type(self)._struct_zero_init`. **CN:** 开始一个由 `type(self)._struct_zero_init` 控制的条件分支。
+- **L230** `                val = llvm.mlir_zero(struct_type, loc=loc, ip=ip)` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L231** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L232** `                val = llvm.mlir_undef(struct_type, loc=loc, ip=ip)` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L233** `            for i, name in enumerate(field_names):` — **EN:** Starts a loop assigning items from `enumerate(field_names)` to `(i, name)`. **CN:** 开始一个循环，将 `enumerate(field_names)` 的元素赋给 `(i, name)`。
+- **L234** `                v = kwargs.pop(name, None)` — **EN:** Assigns a value to v. **CN:** 将一个值赋给 v。
+- **L235** `                if v is not None:` — **EN:** Starts a conditional branch guarded by `v is not None`. **CN:** 开始一个由 `v is not None` 控制的条件分支。
+- **L236** `                    # Coerce Python literals (int, float, bool) using` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L237** `                    # the field's type annotation (e.g. Int32(10)).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L238** `                    ann = field_annotations[name]` — **EN:** Assigns a value to ann. **CN:** 将一个值赋给 ann。
+- **L239** `                    if isinstance(ann, DslType) and not hasattr(` — **EN:** Starts a conditional branch guarded by `isinstance(ann, DslType) and (not hasattr(v, '__extract_m...`. **CN:** 开始一个由 `isinstance(ann, DslType) and (not hasattr(v, '__extract_m...` 控制的条件分支。
+- **L240** `                        v, "__extract_mlir_values__"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `                    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L242** `                        v = ann(v)` — **EN:** Assigns a value to v. **CN:** 将一个值赋给 v。
+- **L243** `                    elem = extract_mlir_values(v)` — **EN:** Assigns a value to elem. **CN:** 将一个值赋给 elem。
+- **L244** `                    if len(elem) != 1:` — **EN:** Starts a conditional branch guarded by `len(elem) != 1`. **CN:** 开始一个由 `len(elem) != 1` 控制的条件分支。
+- **L245** `                        raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L246** `                            f"Expected single value for field {name!r}, got {len(elem)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `                        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `                    val = llvm.insertvalue(val, elem[0], position=[i], loc=loc, ip=ip)` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L249** `            self._value = val` — **EN:** Assigns a value to self._value. **CN:** 将一个值赋给 self._value。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `        # Build getter/setter for each field; need to capture in closure per field` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L252** `        field_annotations_for_getter = hints` — **EN:** Assigns a value to field_annotations_for_getter. **CN:** 将一个值赋给 field_annotations_for_getter。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `        def _make_getter(idx: int, name: str) -> Any:` — **EN:** Defines function `_make_getter`. **CN:** 定义函数 `_make_getter`。
+- **L255** `            dsl_type = field_annotations_for_getter.get(name)` — **EN:** Assigns a value to dsl_type. **CN:** 将一个值赋给 dsl_type。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `            def getter(` — **EN:** Defines function `getter`. **CN:** 定义函数 `getter`。
+- **L258** `                self: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L259** `                *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L260** `                loc: ir.Location | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L261** `                ip: ir.InsertionPoint | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L262** `            ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L263** `                # Resolve struct type (and thus _field_types) on first use` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L264** `                type(self)._struct_type` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L265** `                elem_type = type(self)._field_types[idx]` — **EN:** Assigns a value to elem_type. **CN:** 将一个值赋给 elem_type。
+- **L266** `                extracted = llvm.extractvalue(` — **EN:** Assigns a value to extracted. **CN:** 将一个值赋给 extracted。
+- **L267** `                    res=elem_type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `                    container=self._value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `                    position=[idx],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `                # Wrap in DSL type if annotation is a callable type (e.g. Int32)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L274** `                if isinstance(dsl_type, DslType):` — **EN:** Starts a conditional branch guarded by `isinstance(dsl_type, DslType)`. **CN:** 开始一个由 `isinstance(dsl_type, DslType)` 控制的条件分支。
+- **L275** `                    return dsl_type(extracted)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L276** `                if hasattr(dsl_type, "__new_from_mlir_values__"):` — **EN:** Starts a conditional branch guarded by `hasattr(dsl_type, '__new_from_mlir_values__')`. **CN:** 开始一个由 `hasattr(dsl_type, '__new_from_mlir_values__')` 控制的条件分支。
+- **L277** `                    instance = dsl_type()  # type: ignore[misc]` — **EN:** Assigns a value to instance. **CN:** 将一个值赋给 instance。
+- **L278** `                    return instance.__new_from_mlir_values__([extracted])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L279** `                return extracted` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `            getter.__name__ = name` — **EN:** Assigns a value to getter.__name__. **CN:** 将一个值赋给 getter.__name__。
+- **L282** `            getter.__doc__ = f"Get the {name!r} field."` — **EN:** Assigns a value to getter.__doc__. **CN:** 将一个值赋给 getter.__doc__。
+- **L283** `            return dsl_user_op(getter)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L284** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L285** `        def _make_setter(idx: int, name: str) -> Any:` — **EN:** Defines function `_make_setter`. **CN:** 定义函数 `_make_setter`。
+- **L286** `            dsl_type = field_annotations_for_getter.get(name)` — **EN:** Assigns a value to dsl_type. **CN:** 将一个值赋给 dsl_type。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** `            def setter(` — **EN:** Defines function `setter`. **CN:** 定义函数 `setter`。
+- **L289** `                self: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L290** `                value: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L291** `                *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L292** `                loc: ir.Location | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L293** `                ip: ir.InsertionPoint | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L294** `            ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L295** `                # Coerce Python literals using the field's type annotation.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L296** `                if isinstance(dsl_type, DslType) and not hasattr(` — **EN:** Starts a conditional branch guarded by `isinstance(dsl_type, DslType) and (not hasattr(value, '__...`. **CN:** 开始一个由 `isinstance(dsl_type, DslType) and (not hasattr(value, '__...` 控制的条件分支。
+- **L297** `                    value, "__extract_mlir_values__"` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L298** `                ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L299** `                    value = dsl_type(value)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L300** `                elem = extract_mlir_values(value)` — **EN:** Assigns a value to elem. **CN:** 将一个值赋给 elem。
+- **L301** `                if len(elem) != 1:` — **EN:** Starts a conditional branch guarded by `len(elem) != 1`. **CN:** 开始一个由 `len(elem) != 1` 控制的条件分支。
+- **L302** `                    raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L303** `                        f"Expected single value for field {name!r}, got {len(elem)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `                elem = elem[0]` — **EN:** Assigns a value to elem. **CN:** 将一个值赋给 elem。
+- **L306** `                new_value = llvm.insertvalue(` — **EN:** Assigns a value to new_value. **CN:** 将一个值赋给 new_value。
+- **L307** `                    self._value, elem, position=[idx], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `                self._value = new_value` — **EN:** Assigns a value to self._value. **CN:** 将一个值赋给 self._value。
+- **L310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L311** `            setter.__name__ = f"set_{name}"` — **EN:** Assigns a value to setter.__name__. **CN:** 将一个值赋给 setter.__name__。
+- **L312** `            setter.__doc__ = f"Set the {name!r} field."` — **EN:** Assigns a value to setter.__doc__. **CN:** 将一个值赋给 setter.__doc__。
+- **L313** `            return dsl_user_op(setter)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `        _allowed_attr_names = frozenset(` — **EN:** Assigns a value to _allowed_attr_names. **CN:** 将一个值赋给 _allowed_attr_names。
+- **L316** `            field_names + constexpr_field_names + ["_value"]  # _value is internal` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `        def __setattr__(self: Any, name: str, value: Any) -> None:` — **EN:** Defines function `__setattr__`. **CN:** 定义函数 `__setattr__`。
+- **L320** `            if name not in _allowed_attr_names:` — **EN:** Starts a conditional branch guarded by `name not in _allowed_attr_names`. **CN:** 开始一个由 `name not in _allowed_attr_names` 控制的条件分支。
+- **L321** `                raise AttributeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L322** `                    f"{type(self).__name__!r} does not allow setting attribute {name!r}; "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `                    f"only fields {field_names + constexpr_field_names} are settable"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `            object.__setattr__(self, name, value)` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `        def __iter__(self: Any) -> Iterator[Any]:` — **EN:** Defines function `__iter__`. **CN:** 定义函数 `__iter__`。
+- **L328** `            """Yield each field as its DSL-typed value (e.g. Int32, Boolean).` — **EN:** Starts the docstring for the function `__iter__`. **CN:** 开始说明 function `__iter__` 的文档字符串。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `            Enables tuple unpacking: \`\`a, b = my_struct\`\`.` — **EN:** Continues the docstring for the function `__iter__`. **CN:** 继续说明 function `__iter__` 的文档字符串。
+- **L331** `            """` — **EN:** Ends the docstring for the function `__iter__`. **CN:** 结束说明 function `__iter__` 的文档字符串。
+- **L332** `            for name in field_names:` — **EN:** Starts a loop assigning items from `field_names` to `name`. **CN:** 开始一个循环，将 `field_names` 的元素赋给 `name`。
+- **L333** `                yield getattr(self, name)` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `        def __get_mlir_types__() -> list[ir.Type]:` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L336** `            """Return MLIR types list — compatible with FFI \`\`_to_mlir_types\`\`.` — **EN:** Starts the docstring for the function `__get_mlir_types__`. **CN:** 开始说明 function `__get_mlir_types__` 的文档字符串。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `            Works on both the class and instances, so \`\`get_mlir_types(MyStruct)\`\`` — **EN:** Continues the docstring for the function `__get_mlir_types__`. **CN:** 继续说明 function `__get_mlir_types__` 的文档字符串。
+- **L339** `            and \`\`get_mlir_types(my_instance)\`\` both return \`\`[struct_type]\`\`.` — **EN:** Continues the docstring for the function `__get_mlir_types__`. **CN:** 继续说明 function `__get_mlir_types__` 的文档字符串。
+- **L340** `            """` — **EN:** Ends the docstring for the function `__get_mlir_types__`. **CN:** 结束说明 function `__get_mlir_types__` 的文档字符串。
+- **L341** `            return [struct_type_descriptor.resolve()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `        def _isinstance(value: Any) -> bool:` — **EN:** Defines function `_isinstance`. **CN:** 定义函数 `_isinstance`。
+- **L344** `            """Check if an \`\`ir.Value\`\` matches this struct type."""` — **EN:** Docstring line documenting the function `_isinstance`. **CN:** 文档字符串行，用于说明 function `_isinstance`。
+- **L345** `            if not builtins.isinstance(value, ir.Value):` — **EN:** Starts a conditional branch guarded by `not builtins.isinstance(value, ir.Value)`. **CN:** 开始一个由 `not builtins.isinstance(value, ir.Value)` 控制的条件分支。
+- **L346** `                return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L347** `            return value.type == struct_type_descriptor.resolve()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** `        attrs = {` — **EN:** Assigns a value to attrs. **CN:** 将一个值赋给 attrs。
+- **L350** `            "_field_names": field_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `            "_field_annotations": field_annotations,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** `            "_constexpr_field_names": constexpr_field_names,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L353** `            "_struct_type": struct_type_descriptor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L354** `            "mlir_type": struct_type_descriptor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L355** `            "_struct_zero_init": zero_init,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L356** `            "_struct_packed": packed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L357** `            "__init__": __init__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L358** `            "__iter__": __iter__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L359** `            "__setattr__": __setattr__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L360** `            "__get_mlir_types__": staticmethod(__get_mlir_types__),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L361** `            "isinstance": staticmethod(_isinstance),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L362** `            "__extract_mlir_values__": __extract_mlir_values__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `            "__new_from_mlir_values__": __new_from_mlir_values__,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `        for idx, name in enumerate(field_names):` — **EN:** Starts a loop assigning items from `enumerate(field_names)` to `(idx, name)`. **CN:** 开始一个循环，将 `enumerate(field_names)` 的元素赋给 `(idx, name)`。
+- **L366** `            attrs[name] = property(_make_getter(idx, name), _make_setter(idx, name))` — **EN:** Assigns a value to attrs[name]. **CN:** 将一个值赋给 attrs[name]。
+- **L367** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L368** `        # Preserve existing methods and attributes that don't conflict` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L369** `        for key, value in cls.__dict__.items():` — **EN:** Starts a loop assigning items from `cls.__dict__.items()` to `(key, value)`. **CN:** 开始一个循环，将 `cls.__dict__.items()` 的元素赋给 `(key, value)`。
+- **L370** `            if key not in attrs and not key.startswith("__"):` — **EN:** Starts a conditional branch guarded by `key not in attrs and (not key.startswith('__'))`. **CN:** 开始一个由 `key not in attrs and (not key.startswith('__'))` 控制的条件分支。
+- **L371** `                attrs[key] = value` — **EN:** Assigns a value to attrs[key]. **CN:** 将一个值赋给 attrs[key]。
+- **L372** `        new_cls = type(cls.__name__, cls.__bases__, attrs)` — **EN:** Assigns a value to new_cls. **CN:** 将一个值赋给 new_cls。
+- **L373** `        new_cls.__module__ = cls.__module__` — **EN:** Assigns a value to new_cls.__module__. **CN:** 将一个值赋给 new_cls.__module__。
+- **L374** `        new_cls.__qualname__ = cls.__qualname__` — **EN:** Assigns a value to new_cls.__qualname__. **CN:** 将一个值赋给 new_cls.__qualname__。
+- **L375** `        new_cls.__annotations__ = cls.__annotations__` — **EN:** Assigns a value to new_cls.__annotations__. **CN:** 将一个值赋给 new_cls.__annotations__。
+- **L376** `        if cls.__doc__ is not None:` — **EN:** Starts a conditional branch guarded by `cls.__doc__ is not None`. **CN:** 开始一个由 `cls.__doc__ is not None` 控制的条件分支。
+- **L377** `            new_cls.__doc__ = cls.__doc__` — **EN:** Assigns a value to new_cls.__doc__. **CN:** 将一个值赋给 new_cls.__doc__。
+- **L378** `        return new_cls` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L379** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L380** `    if cls is None:` — **EN:** Starts a conditional branch guarded by `cls is None`. **CN:** 开始一个由 `cls is None` 控制的条件分支。
+- **L381** `        return decorate` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L382** `    return decorate(cls)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L385** `def make_native_struct(` — **EN:** Defines function `make_native_struct`. **CN:** 定义函数 `make_native_struct`。
+- **L386** `    name: str, *, zero_init: bool = True, packed: bool = False, **fields: Any` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L387** `) -> type:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L388** `    """Create a native struct class dynamically from field name/type pairs.` — **EN:** Starts the docstring for the function `make_native_struct`. **CN:** 开始说明 function `make_native_struct` 的文档字符串。
+- **L389** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L390** `    Unlike the \`\`@native_struct\`\` decorator which requires a class definition` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L391** `    with static type annotations, this factory builds a struct class at runtime.` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L392** `    This is useful when the struct layout is determined dynamically — for example,` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L393** `    NVVM ops whose result struct depends on matrix dimensions or element types.` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L394** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L395** `    The returned class behaves identically to a \`\`@native_struct\`\`-decorated` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L396** `    class: it supports \`\`ir.Value\`\` wrapping, keyword-arg construction, named` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L397** `    field access, tuple unpacking via iteration, and the full DSL protocol.` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `    Example::` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L400** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L401** `        ResultType = make_native_struct("WmmaLoadResult",` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L402** `                                        d0=Int32, d1=Int32, d2=Int32, d3=Int32)` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L403** `        ResultType.mlir_type   # → !llvm.struct<(i32, i32, i32, i32)>` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `        result = ResultType(raw_ir_value)` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L406** `        result.d0              # → Int32 (via extractvalue)` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L407** `        d0, d1, d2, d3 = result  # tuple unpacking` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `    Parameters` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L410** `    ----------` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L411** `    name : str` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L412** `        Name for the generated class.` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L413** `    zero_init : bool` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L414** `        If True (default), keyword-arg construction zero-initializes before` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L415** `        inserting fields; if False, uses \`\`llvm.mlir.undef\`\`.` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L416** `    packed : bool` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L417** `        If True, create a packed LLVM struct (no padding).` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L418** `    **fields` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L419** `        Field names mapped to DSL types (e.g. \`\`d0=Int32, d1=Int32\`\`).` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L420** `        Order is preserved (Python 3.7+).` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** `    Returns` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L423** `    -------` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L424** `    type` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L425** `        A \`\`@native_struct\`\` class with the given fields.` — **EN:** Continues the docstring for the function `make_native_struct`. **CN:** 继续说明 function `make_native_struct` 的文档字符串。
+- **L426** `    """` — **EN:** Ends the docstring for the function `make_native_struct`. **CN:** 结束说明 function `make_native_struct` 的文档字符串。
+- **L427** `    if not fields:` — **EN:** Starts a conditional branch guarded by `not fields`. **CN:** 开始一个由 `not fields` 控制的条件分支。
+- **L428** `        raise TypeError(f"make_native_struct({name!r}) requires at least one field")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L430** `    # Build a bare class with the right annotations, then delegate to native_struct` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L431** `    cls = type(name, (), {"__annotations__": dict(fields)})` — **EN:** Assigns a value to cls. **CN:** 将一个值赋给 cls。
+- **L432** `    return native_struct(cls, zero_init=zero_init, packed=packed)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `__all__ = ["native_struct", "make_native_struct"]` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.native_struct`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.native_struct`。
+- EN: Top-level classes: _StructTypeDescriptor CN: 顶层类包括：_StructTypeDescriptor
+- EN: Top-level functions: _is_constexpr_annotation, _annotation_to_mlir_type, native_struct, make_native_struct CN: 顶层函数包括：_is_constexpr_annotation, _annotation_to_mlir_type, native_struct, make_native_struct
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .dsl:extract_mlir_values, .typing:DslType, .._mlir:ir, .._mlir.dialects:llvm, ._mlir_helpers:dsl_user_op, .typing:Constexpr CN: 内部依赖：.dsl:extract_mlir_values, .typing:DslType, .._mlir:ir, .._mlir.dialects:llvm, ._mlir_helpers:dsl_user_op, .typing:Constexpr
+- EN: External or standard-library dependencies: builtins, collections.abc:Iterator, typing:Any,get_origin,get_type_hints CN: 外部或标准库依赖：builtins, collections.abc:Iterator, typing:Any,get_origin,get_type_hints

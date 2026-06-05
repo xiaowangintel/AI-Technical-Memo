@@ -1,0 +1,195 @@
+# epilogue.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/epilogue/epilogue.py`
+
+## Purpose / 作用
+- EN: Registry of elementwise epilogues Elementwise epilogues can be added to many CUTLASS kernels in the CUTLAS Python interface via code like the following for GEMM: ..
+- CN: 该模块的文档字符串将其描述为：Registry of elementwise epilogues Elementwise epilogues can be added to many CUTLASS kernels in the CUTLAS Python interface via code like the following for GEMM: ..
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Registry of elementwise epilogues` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `Elementwise epilogues can be added to many CUTLASS kernels in the CUTLAS Python interface via` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L37** `code like the following for GEMM:` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `.. highlight:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L40** `.. code-block:: python` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `    plan = cutlass_cppgen.op.Gemm(element=cutlass_cppgen.DataType.f32, layout=cutlass_cppgen.LayoutType.RowMajor)` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L43** `    plan.activation = cutlass_cppgen.epilogue.relu` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L44** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `from cutlass_cppgen.backend import epilogue, device_cc` — **EN:** Imports epilogue, device_cc from `cutlass_cppgen.backend`. **CN:** 从 `cutlass_cppgen.backend` 导入 epilogue, device_cc。
+- **L47** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** `gelu = epilogue.gelu` — **EN:** Assigns a value to gelu. **CN:** 将一个值赋给 gelu。
+- **L50** `hardswish = epilogue.hardswish` — **EN:** Assigns a value to hardswish. **CN:** 将一个值赋给 hardswish。
+- **L51** `identity = epilogue.identity` — **EN:** Assigns a value to identity. **CN:** 将一个值赋给 identity。
+- **L52** `leaky_relu = epilogue.leaky_relu` — **EN:** Assigns a value to leaky_relu. **CN:** 将一个值赋给 leaky_relu。
+- **L53** `relu = epilogue.relu` — **EN:** Assigns a value to relu. **CN:** 将一个值赋给 relu。
+- **L54** `sigmoid = epilogue.sigmoid` — **EN:** Assigns a value to sigmoid. **CN:** 将一个值赋给 sigmoid。
+- **L55** `silu = epilogue.silu` — **EN:** Assigns a value to silu. **CN:** 将一个值赋给 silu。
+- **L56** `tanh = epilogue.tanh` — **EN:** Assigns a value to tanh. **CN:** 将一个值赋给 tanh。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `_activations = [gelu, hardswish, identity, leaky_relu, relu, sigmoid, silu, tanh]` — **EN:** Assigns a value to _activations. **CN:** 将一个值赋给 _activations。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L62** `def get_activations() -> list:` — **EN:** Defines function `get_activations`. **CN:** 定义函数 `get_activations`。
+- **L63** `    """` — **EN:** Starts the docstring for the function `get_activations`. **CN:** 开始说明 function `get_activations` 的文档字符串。
+- **L64** `    Returns a list of available activation functions` — **EN:** Continues the docstring for the function `get_activations`. **CN:** 继续说明 function `get_activations` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    :return: list of available activation functions` — **EN:** Continues the docstring for the function `get_activations`. **CN:** 继续说明 function `get_activations` 的文档字符串。
+- **L67** `    :rtype: list` — **EN:** Continues the docstring for the function `get_activations`. **CN:** 继续说明 function `get_activations` 的文档字符串。
+- **L68** `    """` — **EN:** Ends the docstring for the function `get_activations`. **CN:** 结束说明 function `get_activations` 的文档字符串。
+- **L69** `    return _activations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `def get_activation_epilogue(` — **EN:** Defines function `get_activation_epilogue`. **CN:** 定义函数 `get_activation_epilogue`。
+- **L73** `    activation,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L74** `    element_output,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L75** `    elements_per_access,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `    element_accumulator,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `    element_compute,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L78** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L79** `    """` — **EN:** Starts the docstring for the function `get_activation_epilogue`. **CN:** 开始说明 function `get_activation_epilogue` 的文档字符串。
+- **L80** `    Return an epilogue corresponding to the activation function, data types, and alignment` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L81** `    used in the kernel` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `    :param activation: elementwise activation function to use` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L84** `    :param element_output: data type of the output` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L85** `    :param elements_per_access: alignment of operand C of the kernel` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L86** `    :type elements_per_access: int` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L87** `    :param element_accumulator: data type of the accumulated output C` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L88** `    :param element_compute: data type in which compute operations should be performed` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    :return: epilogue functor` — **EN:** Continues the docstring for the function `get_activation_epilogue`. **CN:** 继续说明 function `get_activation_epilogue` 的文档字符串。
+- **L91** `    """` — **EN:** Ends the docstring for the function `get_activation_epilogue`. **CN:** 结束说明 function `get_activation_epilogue` 的文档字符串。
+- **L92** `    if activation not in _activations:` — **EN:** Starts a conditional branch guarded by `activation not in _activations`. **CN:** 开始一个由 `activation not in _activations` 控制的条件分支。
+- **L93** `        raise Exception(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L94** `            f"Unsupported activation type {activation}. Available activations are: {_activations}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `    if activation == identity:` — **EN:** Starts a conditional branch guarded by `activation == identity`. **CN:** 开始一个由 `activation == identity` 控制的条件分支。
+- **L98** `        return epilogue.LinearCombination(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** `            element_output, elements_per_access, element_accumulator, element_compute` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L102** `        return epilogue.LinearCombinationGeneric(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L103** `            activation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `            element_output,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `            elements_per_access,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `            element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `            element_compute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `"""` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L112** `Frontend for EVT that generates epilogue functor through tracing the input function` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `from cutlass_cppgen.backend.evt.frontend import PythonASTFrontend` — **EN:** Imports PythonASTFrontend from `cutlass_cppgen.backend.evt.frontend`. **CN:** 从 `cutlass_cppgen.backend.evt.frontend` 导入 PythonASTFrontend。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `def trace(fn, example_tensors, **kwargs):` — **EN:** Defines function `trace`. **CN:** 定义函数 `trace`。
+- **L118** `    """` — **EN:** Starts the docstring for the function `trace`. **CN:** 开始说明 function `trace` 的文档字符串。
+- **L119** `    Trace \`fn(**example_tensors)\` and generates epilogue visitor` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `    :param fn or str: Python callable or string of the epilogue function` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L122** `    :param example_tensors: example inputs for fn` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L123** `    :type example_tensors: dict` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    .. hightlight:: python` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L126** `    .. code-block:: python` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L127** `        import cutlass_cppgen.backend.evt` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `        # Define epilogue function as Python callable` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L130** `        def example_fn(accum, C, alpha, beta, gamma):` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L131** `            D = ((accum + C) * alpha - gamma) / beta` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L132** `            return D` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `        # Define the example tensors` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L135** `        example_inputs = {` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L136** `            "accum": torch.empty(size=(6, 512, 512), dtype=torch.float16, device="cuda"),` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L137** `            "C": torch.empty(size=(6, 512, 512), dtype=torch.float16, device="cuda"),` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L138** `            "alpha": 1.5,` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L139** `            "beta": 0.5,` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L140** `            "gamma": 2.5,` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L141** `            "D": torch.empty(size=(6, 512, 512), dtype=torch.float16, device="cuda")` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L142** `        }` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `        # Generate the epilogue functor` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L145** `        epilogue_visitor = cutlass_cppgen.epilogue.trace(example_fn, example_inputs)` — **EN:** Continues the docstring for the function `trace`. **CN:** 继续说明 function `trace` 的文档字符串。
+- **L146** `    """` — **EN:** Ends the docstring for the function `trace`. **CN:** 结束说明 function `trace` 的文档字符串。
+- **L147** `    if callable(fn):` — **EN:** Starts a conditional branch guarded by `callable(fn)`. **CN:** 开始一个由 `callable(fn)` 控制的条件分支。
+- **L148** `        class EpilogueFunctor(PythonASTFrontend):` — **EN:** Defines class `EpilogueFunctor` with bases PythonASTFrontend. **CN:** 定义类 `EpilogueFunctor`，其基类为 PythonASTFrontend。
+- **L149** `            def __init__(self, cc=None, **kwargs):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L150** `                if not cc:` — **EN:** Starts a conditional branch guarded by `not cc`. **CN:** 开始一个由 `not cc` 控制的条件分支。
+- **L151** `                    cc = device_cc()` — **EN:** Assigns a value to cc. **CN:** 将一个值赋给 cc。
+- **L152** `                super().__init__(cc, **kwargs)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L153** `            pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L154** `        setattr(EpilogueFunctor, "__call__", staticmethod(fn))` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `        epilogue_functor = EpilogueFunctor(**kwargs)` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L157** `        epilogue_functor.trace(example_tensors)` — **EN:** Invokes `epilogue_functor.trace` as a standalone call. **CN:** 以独立语句方式调用 `epilogue_functor.trace`。
+- **L158** `        return epilogue_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L159** `    elif isinstance(fn, str):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L160** `        class EpilogueFunctor(PythonASTFrontend):` — **EN:** Defines class `EpilogueFunctor` with bases PythonASTFrontend. **CN:** 定义类 `EpilogueFunctor`，其基类为 PythonASTFrontend。
+- **L161** `            def __init__(self, cc=None, **kwargs):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L162** `                self.source = textwrap.dedent(fn)` — **EN:** Assigns a value to self.source. **CN:** 将一个值赋给 self.source。
+- **L163** `                if not cc:` — **EN:** Starts a conditional branch guarded by `not cc`. **CN:** 开始一个由 `not cc` 控制的条件分支。
+- **L164** `                    cc = device_cc()` — **EN:** Assigns a value to cc. **CN:** 将一个值赋给 cc。
+- **L165** `                super().__init__(cc, **kwargs)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `            def parse(self, example_inputs) -> None:` — **EN:** Defines function `parse`. **CN:** 定义函数 `parse`。
+- **L168** `                self.example_inputs = example_inputs` — **EN:** Assigns a value to self.example_inputs. **CN:** 将一个值赋给 self.example_inputs。
+- **L169** `                self.ast = ast.parse(self.source)` — **EN:** Assigns a value to self.ast. **CN:** 将一个值赋给 self.ast。
+- **L170** `                self.visit(self.ast)` — **EN:** Invokes `self.visit` as a standalone call. **CN:** 以独立语句方式调用 `self.visit`。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** `        epilogue_functor = EpilogueFunctor(**kwargs)` — **EN:** Assigns a value to epilogue_functor. **CN:** 将一个值赋给 epilogue_functor。
+- **L173** `        epilogue_functor.trace(example_tensors)` — **EN:** Invokes `epilogue_functor.trace` as a standalone call. **CN:** 以独立语句方式调用 `epilogue_functor.trace`。
+- **L174** `        return epilogue_functor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L175** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L176** `        raise NotImplementedError("Expect a callable Python function")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.epilogue.epilogue`. CN: 模块名为 `cutlass_cppgen.epilogue.epilogue`。
+- EN: Module docstring summary: Registry of elementwise epilogues Elementwise epilogues can be added to many CUTLASS kernels in the CUTLAS Python interface via code like the following for GEMM: .. CN: 模块文档摘要为：Registry of elementwise epilogues Elementwise epilogues can be added to many CUTLASS kernels in the CUTLAS Python interface via code like the following for GEMM: ..
+- EN: Top-level functions: get_activations, get_activation_epilogue, trace CN: 顶层函数包括：get_activations, get_activation_epilogue, trace
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.backend:epilogue,device_cc, cutlass_cppgen.backend.evt.frontend:PythonASTFrontend CN: 内部依赖：cutlass_cppgen.backend:epilogue,device_cc, cutlass_cppgen.backend.evt.frontend:PythonASTFrontend

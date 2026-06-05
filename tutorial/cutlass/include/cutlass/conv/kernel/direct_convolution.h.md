@@ -1,0 +1,1547 @@
+# direct_convolution.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/kernel/direct_convolution.h`
+**Purpose / 用途**: Template for a multi-staged Depthwise Convolution kernel. / 提供kernel 级配置。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief Template for a multi-staged Depthwise Convolution kernel.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 38 / 第 38 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 39 / 第 39 行** — `#include "cutlass/aligned_buffer.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/aligned_buffer.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/aligned_buffer.h`。
+- **Line 40 / 第 40 行** — `#include "cutlass/array.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/array.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/array.h`。
+- **Line 41 / 第 41 行** — `#include "cutlass/numeric_types.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/numeric_types.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/numeric_types.h`。
+- **Line 42 / 第 42 行** — `#include "cutlass/matrix_shape.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/matrix_shape.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/matrix_shape.h`。
+- **Line 43 / 第 43 行** — `#include "cutlass/platform/platform.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/platform/platform.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/platform/platform.h`。
+- **Line 44 / 第 44 行** — `#include "cutlass/semaphore.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/semaphore.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/semaphore.h`。
+- **Line 45 / 第 45 行** — `#include "cutlass/tensor_ref.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_ref.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_ref.h`。
+- **Line 46 / 第 46 行** — `#include "cutlass/layout/tensor.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/tensor.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/tensor.h`。
+- **Line 47 / 第 47 行** — `#include "cutlass/gemm/gemm.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/gemm.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/gemm.h`。
+- **Line 48 / 第 48 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 49 / 第 49 行** — `#include "cutlass/conv/conv2d_problem_size.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/conv2d_problem_size.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/conv2d_problem_size.h`。
+- **Line 50 / 第 50 行** — `#include "cutlass/conv/conv3d_problem_size.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/conv3d_problem_size.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/conv3d_problem_size.h`。
+- **Line 51 / 第 51 行** — `#include "cutlass/epilogue/threadblock/output_iterator_parameter.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/epilogue/threadblock/output_iterator_parameter.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/epilogue/threadblock/output_iterator_parameter.h`。
+- **Line 52 / 第 52 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 53 / 第 53 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 54 / 第 54 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 55 / 第 55 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 56 / 第 56 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 57 / 第 57 行** — `namespace kernel {`
+  - **EN**: Opens namespace `kernel` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `kernel`。
+- **Line 58 / 第 58 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 59 / 第 59 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 60 / 第 60 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 61 / 第 61 行** — `/// Parameters structure`
+  - **EN**: Inline comment explaining intent: `Parameters structure`.
+  - **CN**: 行内注释说明意图：`Parameters structure`。
+- **Line 62 / 第 62 行** — `template <typename Mma_,                 ///! Threadblock-scoped matrix multiply-accumulate`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 63 / 第 63 行** — `          typename Epilogue_,            ///! Epilogue`
+  - **EN**: Adds template parameter specifier `typename Epilogue_,            ///! Epilogue`.
+  - **CN**: 补充模板参数说明符 `typename Epilogue_,            ///! Epilogue`。
+- **Line 64 / 第 64 行** — `          typename ThreadblockSwizzle_,  ///! Threadblock swizzling function`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle_,  ///! Threadblock swizzling function`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle_,  ///! Threadblock swizzling function`。
+- **Line 65 / 第 65 行** — `          conv::Operator ConvOperator,   ///! Convolutional operator (Fprop, Dgrad, Wgrad)`
+  - **EN**: Adds template parameter specifier `conv::Operator ConvOperator,   ///! Convolutional operator (Fprop, Dgrad, Wgrad)`.
+  - **CN**: 补充模板参数说明符 `conv::Operator ConvOperator,   ///! Convolutional operator (Fprop, Dgrad, Wgrad)`。
+- **Line 66 / 第 66 行** — `          typename Arguments_,           ///! Kernel Arguments`
+  - **EN**: Adds template parameter specifier `typename Arguments_,           ///! Kernel Arguments`.
+  - **CN**: 补充模板参数说明符 `typename Arguments_,           ///! Kernel Arguments`。
+- **Line 67 / 第 67 行** — `          typename ConvOutputIteratorParameter_, ///! Output Iterator Params`
+  - **EN**: Adds template parameter specifier `typename ConvOutputIteratorParameter_, ///! Output Iterator Params`.
+  - **CN**: 补充模板参数说明符 `typename ConvOutputIteratorParameter_, ///! Output Iterator Params`。
+- **Line 68 / 第 68 行** — `          typename ConvProblemSize_ = Conv2dProblemSize,  ///! Convolutional operator on 2D or 3D problem`
+  - **EN**: Adds template parameter specifier `typename ConvProblemSize_ = Conv2dProblemSize,  ///! Convolutional operator on 2D or 3D problem`.
+  - **CN**: 补充模板参数说明符 `typename ConvProblemSize_ = Conv2dProblemSize,  ///! Convolutional operator on 2D or 3D problem`。
+- **Line 69 / 第 69 行** — `          conv::GroupMode GroupMode_ = conv::GroupMode::kNone,  ///! Group mode`
+  - **EN**: Adds template parameter specifier `conv::GroupMode GroupMode_ = conv::GroupMode::kNone,  ///! Group mode`.
+  - **CN**: 补充模板参数说明符 `conv::GroupMode GroupMode_ = conv::GroupMode::kNone,  ///! Group mode`。
+- **Line 70 / 第 70 行** — `          typename ThreadBlockOutputShape_ = cutlass::conv::TensorNHWCShape<1, 1, 1, 1> >  ///! OutputShape per ThreadBlock`
+  - **EN**: Adds template parameter specifier `typename ThreadBlockOutputShape_ = cutlass::conv::TensorNHWCShape<1, 1, 1, 1> >  ///! OutputShape per ThreadBlock`.
+  - **CN**: 补充模板参数说明符 `typename ThreadBlockOutputShape_ = cutlass::conv::TensorNHWCShape<1, 1, 1, 1> >  ///! OutputShape per ThreadBlock`。
+- **Line 71 / 第 71 行** — `struct DirectConvolutionParams {`
+  - **EN**: Adds template parameter specifier `struct DirectConvolutionParams {`.
+  - **CN**: 补充模板参数说明符 `struct DirectConvolutionParams {`。
+- **Line 72 / 第 72 行** — `  using Mma = Mma_;`
+  - **EN**: Adds template parameter specifier `using Mma = Mma_;`.
+  - **CN**: 补充模板参数说明符 `using Mma = Mma_;`。
+- **Line 73 / 第 73 行** — `  using Epilogue = Epilogue_;`
+  - **EN**: Adds template parameter specifier `using Epilogue = Epilogue_;`.
+  - **CN**: 补充模板参数说明符 `using Epilogue = Epilogue_;`。
+- **Line 74 / 第 74 行** — `  using EpilogueOutputOp = typename Epilogue::OutputOp;`
+  - **EN**: Adds template parameter specifier `using EpilogueOutputOp = typename Epilogue::OutputOp;`.
+  - **CN**: 补充模板参数说明符 `using EpilogueOutputOp = typename Epilogue::OutputOp;`。
+- **Line 75 / 第 75 行** — `  using ThreadblockSwizzle = ThreadblockSwizzle_;`
+  - **EN**: Adds template parameter specifier `using ThreadblockSwizzle = ThreadblockSwizzle_;`.
+  - **CN**: 补充模板参数说明符 `using ThreadblockSwizzle = ThreadblockSwizzle_;`。
+- **Line 76 / 第 76 行** — `  using ThreadBlockOutputShape = ThreadBlockOutputShape_;`
+  - **EN**: Adds template parameter specifier `using ThreadBlockOutputShape = ThreadBlockOutputShape_;`.
+  - **CN**: 补充模板参数说明符 `using ThreadBlockOutputShape = ThreadBlockOutputShape_;`。
+- **Line 77 / 第 77 行** — `  static Operator const kConvolutionalOperator = ConvOperator;`
+  - **EN**: Adds template parameter specifier `static Operator const kConvolutionalOperator = ConvOperator;`.
+  - **CN**: 补充模板参数说明符 `static Operator const kConvolutionalOperator = ConvOperator;`。
+- **Line 78 / 第 78 行** — `  using ConvProblemSize = ConvProblemSize_;`
+  - **EN**: Adds template parameter specifier `using ConvProblemSize = ConvProblemSize_;`.
+  - **CN**: 补充模板参数说明符 `using ConvProblemSize = ConvProblemSize_;`。
+- **Line 79 / 第 79 行** — `  using Arguments = Arguments_;`
+  - **EN**: Adds template parameter specifier `using Arguments = Arguments_;`.
+  - **CN**: 补充模板参数说明符 `using Arguments = Arguments_;`。
+- **Line 80 / 第 80 行** — `  using ConvOutputIteratorParameter = ConvOutputIteratorParameter_;`
+  - **EN**: Adds template parameter specifier `using ConvOutputIteratorParameter = ConvOutputIteratorParameter_;`.
+  - **CN**: 补充模板参数说明符 `using ConvOutputIteratorParameter = ConvOutputIteratorParameter_;`。
+- **Line 81 / 第 81 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 82 / 第 82 行** — `  using ThreadblockShape = typename Mma::Shape;`
+  - **EN**: Adds template parameter specifier `using ThreadblockShape = typename Mma::Shape;`.
+  - **CN**: 补充模板参数说明符 `using ThreadblockShape = typename Mma::Shape;`。
+- **Line 83 / 第 83 行** — `  static IteratorAlgorithm const kIteratorAlgorithm = Mma::IteratorA::kIteratorAlgorithm;`
+  - **EN**: Adds template parameter specifier `static IteratorAlgorithm const kIteratorAlgorithm = Mma::IteratorA::kIteratorAlgorithm;`.
+  - **CN**: 补充模板参数说明符 `static IteratorAlgorithm const kIteratorAlgorithm = Mma::IteratorA::kIteratorAlgorithm;`。
+- **Line 84 / 第 84 行** — `  static conv::GroupMode const kGroupMode = GroupMode_;`
+  - **EN**: Adds template parameter specifier `static conv::GroupMode const kGroupMode = GroupMode_;`.
+  - **CN**: 补充模板参数说明符 `static conv::GroupMode const kGroupMode = GroupMode_;`。
+- **Line 85 / 第 85 行** — `  static int const kStages = Mma::kStages;`
+  - **EN**: Adds template parameter specifier `static int const kStages = Mma::kStages;`.
+  - **CN**: 补充模板参数说明符 `static int const kStages = Mma::kStages;`。
+- **Line 86 / 第 86 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 87 / 第 87 行** — `  ConvProblemSize problem_size;`
+  - **EN**: Adds template parameter specifier `ConvProblemSize problem_size;`.
+  - **CN**: 补充模板参数说明符 `ConvProblemSize problem_size;`。
+- **Line 88 / 第 88 行** — `  cutlass::gemm::GemmCoord grid_tiled_shape;`
+  - **EN**: Adds template parameter specifier `cutlass::gemm::GemmCoord grid_tiled_shape;`.
+  - **CN**: 补充模板参数说明符 `cutlass::gemm::GemmCoord grid_tiled_shape;`。
+- **Line 89 / 第 89 行** — `  gemm::GemmCoord implicit_gemm_problem_size;`
+  - **EN**: Adds template parameter specifier `gemm::GemmCoord implicit_gemm_problem_size;`.
+  - **CN**: 补充模板参数说明符 `gemm::GemmCoord implicit_gemm_problem_size;`。
+- **Line 90 / 第 90 行** — `  int swizzle_log_tile;`
+  - **EN**: Adds template parameter specifier `int swizzle_log_tile;`.
+  - **CN**: 补充模板参数说明符 `int swizzle_log_tile;`。
+- **Line 91 / 第 91 行** — `  int smem_size_;`
+  - **EN**: Adds template parameter specifier `int smem_size_;`.
+  - **CN**: 补充模板参数说明符 `int smem_size_;`。
+- **Line 92 / 第 92 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 93 / 第 93 行** — `  int gemm_k_iterations;`
+  - **EN**: Adds template parameter specifier `int gemm_k_iterations;`.
+  - **CN**: 补充模板参数说明符 `int gemm_k_iterations;`。
+- **Line 94 / 第 94 行** — `  int gemm_k_iterations_per_channel;`
+  - **EN**: Adds template parameter specifier `int gemm_k_iterations_per_channel;`.
+  - **CN**: 补充模板参数说明符 `int gemm_k_iterations_per_channel;`。
+- **Line 95 / 第 95 行** — `  typename Mma::IteratorA::Params iterator_A;`
+  - **EN**: Adds template parameter specifier `typename Mma::IteratorA::Params iterator_A;`.
+  - **CN**: 补充模板参数说明符 `typename Mma::IteratorA::Params iterator_A;`。
+- **Line 96 / 第 96 行** — `  typename Mma::IteratorA::Element const *ptr_A;`
+  - **EN**: Adds template parameter specifier `typename Mma::IteratorA::Element const *ptr_A;`.
+  - **CN**: 补充模板参数说明符 `typename Mma::IteratorA::Element const *ptr_A;`。
+- **Line 97 / 第 97 行** — `  typename Mma::IteratorB::Params iterator_B;`
+  - **EN**: Adds template parameter specifier `typename Mma::IteratorB::Params iterator_B;`.
+  - **CN**: 补充模板参数说明符 `typename Mma::IteratorB::Params iterator_B;`。
+- **Line 98 / 第 98 行** — `  typename Mma::IteratorB::Element const *ptr_B;`
+  - **EN**: Adds template parameter specifier `typename Mma::IteratorB::Element const *ptr_B;`.
+  - **CN**: 补充模板参数说明符 `typename Mma::IteratorB::Element const *ptr_B;`。
+- **Line 99 / 第 99 行** — `  typename Mma::IteratorB::Element *ptr_reordered_B;`
+  - **EN**: Adds template parameter specifier `typename Mma::IteratorB::Element *ptr_reordered_B;`.
+  - **CN**: 补充模板参数说明符 `typename Mma::IteratorB::Element *ptr_reordered_B;`。
+- **Line 100 / 第 100 行** — `  typename Epilogue::OutputTileIterator::Params iterator_C;`
+  - **EN**: Adds template parameter specifier `typename Epilogue::OutputTileIterator::Params iterator_C;`.
+  - **CN**: 补充模板参数说明符 `typename Epilogue::OutputTileIterator::Params iterator_C;`。
+- **Line 101 / 第 101 行** — `  typename Epilogue::OutputTileIterator::Element *ptr_C;`
+  - **EN**: Adds template parameter specifier `typename Epilogue::OutputTileIterator::Element *ptr_C;`.
+  - **CN**: 补充模板参数说明符 `typename Epilogue::OutputTileIterator::Element *ptr_C;`。
+- **Line 102 / 第 102 行** — `  typename Epilogue::OutputTileIterator::Params iterator_D;`
+  - **EN**: Adds template parameter specifier `typename Epilogue::OutputTileIterator::Params iterator_D;`.
+  - **CN**: 补充模板参数说明符 `typename Epilogue::OutputTileIterator::Params iterator_D;`。
+- **Line 103 / 第 103 行** — `  typename Epilogue::OutputTileIterator::Element *ptr_D;`
+  - **EN**: Adds template parameter specifier `typename Epilogue::OutputTileIterator::Element *ptr_D;`.
+  - **CN**: 补充模板参数说明符 `typename Epilogue::OutputTileIterator::Element *ptr_D;`。
+- **Line 104 / 第 104 行** — `  typename EpilogueOutputOp::Params output_op;`
+  - **EN**: Adds template parameter specifier `typename EpilogueOutputOp::Params output_op;`.
+  - **CN**: 补充模板参数说明符 `typename EpilogueOutputOp::Params output_op;`。
+- **Line 105 / 第 105 行** — `  int *semaphore;`
+  - **EN**: Adds template parameter specifier `int *semaphore;`.
+  - **CN**: 补充模板参数说明符 `int *semaphore;`。
+- **Line 106 / 第 106 行** — `  SplitKMode split_k_mode;`
+  - **EN**: Adds template parameter specifier `SplitKMode split_k_mode;`.
+  - **CN**: 补充模板参数说明符 `SplitKMode split_k_mode;`。
+- **Line 107 / 第 107 行** — `  int split_k_slices;`
+  - **EN**: Adds template parameter specifier `int split_k_slices;`.
+  - **CN**: 补充模板参数说明符 `int split_k_slices;`。
+- **Line 108 / 第 108 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 109 / 第 109 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 110 / 第 110 行** — `  // Methods`
+  - **EN**: Adds template parameter specifier `// Methods`.
+  - **CN**: 补充模板参数说明符 `// Methods`。
+- **Line 111 / 第 111 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 112 / 第 112 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 113 / 第 113 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 114 / 第 114 行** — `  DirectConvolutionParams() : swizzle_log_tile(0), gemm_k_iterations(0) {}`
+  - **EN**: Adds template parameter specifier `DirectConvolutionParams() : swizzle_log_tile(0), gemm_k_iterations(0) {}`.
+  - **CN**: 补充模板参数说明符 `DirectConvolutionParams() : swizzle_log_tile(0), gemm_k_iterations(0) {}`。
+- **Line 115 / 第 115 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 116 / 第 116 行** — `  ///`
+  - **EN**: Adds template parameter specifier `///`.
+  - **CN**: 补充模板参数说明符 `///`。
+- **Line 117 / 第 117 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 118 / 第 118 行** — `  DirectConvolutionParams(Arguments const &args, int *semaphore = nullptr)`
+  - **EN**: Adds template parameter specifier `DirectConvolutionParams(Arguments const &args, int *semaphore = nullptr)`.
+  - **CN**: 补充模板参数说明符 `DirectConvolutionParams(Arguments const &args, int *semaphore = nullptr)`。
+- **Line 119 / 第 119 行** — `      : problem_size(args.problem_size),`
+  - **EN**: Adds template parameter specifier `: problem_size(args.problem_size)`.
+  - **CN**: 补充模板参数说明符 `: problem_size(args.problem_size)`。
+- **Line 120 / 第 120 行** — `        implicit_gemm_problem_size(`
+  - **EN**: Adds template parameter specifier `implicit_gemm_problem_size(`.
+  - **CN**: 补充模板参数说明符 `implicit_gemm_problem_size(`。
+- **Line 121 / 第 121 行** — `            cutlass::conv::implicit_gemm_problem_size(kConvolutionalOperator, args.problem_size)),`
+  - **EN**: Adds template parameter specifier `cutlass::conv::implicit_gemm_problem_size(kConvolutionalOperator, args.problem_size))`.
+  - **CN**: 补充模板参数说明符 `cutlass::conv::implicit_gemm_problem_size(kConvolutionalOperator, args.problem_size))`。
+- **Line 122 / 第 122 行** — `        iterator_A(Mma::IteratorA::getParams(args.problem_size, args.ref_A.layout())),`
+  - **EN**: Adds template parameter specifier `iterator_A(Mma::IteratorA::getParams(args.problem_size, args.ref_A.layout()))`.
+  - **CN**: 补充模板参数说明符 `iterator_A(Mma::IteratorA::getParams(args.problem_size, args.ref_A.layout()))`。
+- **Line 123 / 第 123 行** — `        ptr_A(args.ref_A.data()),`
+  - **EN**: Adds template parameter specifier `ptr_A(args.ref_A.data())`.
+  - **CN**: 补充模板参数说明符 `ptr_A(args.ref_A.data())`。
+- **Line 124 / 第 124 行** — `        iterator_B(Mma::IteratorB::getParams(args.problem_size, args.ref_B.layout())),`
+  - **EN**: Adds template parameter specifier `iterator_B(Mma::IteratorB::getParams(args.problem_size, args.ref_B.layout()))`.
+  - **CN**: 补充模板参数说明符 `iterator_B(Mma::IteratorB::getParams(args.problem_size, args.ref_B.layout()))`。
+- **Line 125 / 第 125 行** — `        ptr_B(args.ref_B.data()),`
+  - **EN**: Adds template parameter specifier `ptr_B(args.ref_B.data())`.
+  - **CN**: 补充模板参数说明符 `ptr_B(args.ref_B.data())`。
+- **Line 126 / 第 126 行** — `        ptr_reordered_B(args.ref_reordered_B.data()),`
+  - **EN**: Adds template parameter specifier `ptr_reordered_B(args.ref_reordered_B.data())`.
+  - **CN**: 补充模板参数说明符 `ptr_reordered_B(args.ref_reordered_B.data())`。
+- **Line 127 / 第 127 行** — `        iterator_C(ConvOutputIteratorParameter::layout(args.ref_C), args.problem_size),`
+  - **EN**: Adds template parameter specifier `iterator_C(ConvOutputIteratorParameter::layout(args.ref_C), args.problem_size)`.
+  - **CN**: 补充模板参数说明符 `iterator_C(ConvOutputIteratorParameter::layout(args.ref_C), args.problem_size)`。
+- **Line 128 / 第 128 行** — `        ptr_C(args.ref_C.data()),`
+  - **EN**: Adds template parameter specifier `ptr_C(args.ref_C.data())`.
+  - **CN**: 补充模板参数说明符 `ptr_C(args.ref_C.data())`。
+- **Line 129 / 第 129 行** — `        iterator_D(ConvOutputIteratorParameter::layout(args.ref_D), args.problem_size),`
+  - **EN**: Adds template parameter specifier `iterator_D(ConvOutputIteratorParameter::layout(args.ref_D), args.problem_size)`.
+  - **CN**: 补充模板参数说明符 `iterator_D(ConvOutputIteratorParameter::layout(args.ref_D), args.problem_size)`。
+- **Line 130 / 第 130 行** — `        ptr_D(args.ref_D.data()),`
+  - **EN**: Adds template parameter specifier `ptr_D(args.ref_D.data())`.
+  - **CN**: 补充模板参数说明符 `ptr_D(args.ref_D.data())`。
+- **Line 131 / 第 131 行** — `        output_op(args.output_op),`
+  - **EN**: Adds template parameter specifier `output_op(args.output_op)`.
+  - **CN**: 补充模板参数说明符 `output_op(args.output_op)`。
+- **Line 132 / 第 132 行** — `        semaphore(semaphore),`
+  - **EN**: Adds template parameter specifier `semaphore(semaphore)`.
+  - **CN**: 补充模板参数说明符 `semaphore(semaphore)`。
+- **Line 133 / 第 133 行** — `        split_k_mode(args.split_k_mode),`
+  - **EN**: Adds template parameter specifier `split_k_mode(args.split_k_mode)`.
+  - **CN**: 补充模板参数说明符 `split_k_mode(args.split_k_mode)`。
+- **Line 134 / 第 134 行** — `        split_k_slices(args.problem_size.split_k_slices) {`
+  - **EN**: Adds template parameter specifier `split_k_slices(args.problem_size.split_k_slices) {`.
+  - **CN**: 补充模板参数说明符 `split_k_slices(args.problem_size.split_k_slices) {`。
+- **Line 135 / 第 135 行** — `    gemm_k_iterations =`
+  - **EN**: Adds template parameter specifier `gemm_k_iterations =`.
+  - **CN**: 补充模板参数说明符 `gemm_k_iterations =`。
+- **Line 136 / 第 136 行** — `        depthwise_gemm_k_iterations<ThreadBlockOutputShape::kN,`
+  - **EN**: Adds template parameter specifier `depthwise_gemm_k_iterations<ThreadBlockOutputShape::kN`.
+  - **CN**: 补充模板参数说明符 `depthwise_gemm_k_iterations<ThreadBlockOutputShape::kN`。
+- **Line 137 / 第 137 行** — `                                    ThreadBlockOutputShape::kH,`
+  - **EN**: Adds template parameter specifier `ThreadBlockOutputShape::kH`.
+  - **CN**: 补充模板参数说明符 `ThreadBlockOutputShape::kH`。
+- **Line 138 / 第 138 行** — `                                    ThreadBlockOutputShape::kW>(kConvolutionalOperator,`
+  - **EN**: Adds template parameter specifier `ThreadBlockOutputShape::kW>(kConvolutionalOperator`.
+  - **CN**: 补充模板参数说明符 `ThreadBlockOutputShape::kW>(kConvolutionalOperator`。
+- **Line 139 / 第 139 行** — `                                                                ThreadblockShape::kK,`
+  - **EN**: Adds template parameter specifier `ThreadblockShape::kK`.
+  - **CN**: 补充模板参数说明符 `ThreadblockShape::kK`。
+- **Line 140 / 第 140 行** — `                                                                args.problem_size,`
+  - **EN**: Adds template parameter specifier `args.problem_size`.
+  - **CN**: 补充模板参数说明符 `args.problem_size`。
+- **Line 141 / 第 141 行** — `                                                                kIteratorAlgorithm,`
+  - **EN**: Adds template parameter specifier `kIteratorAlgorithm`.
+  - **CN**: 补充模板参数说明符 `kIteratorAlgorithm`。
+- **Line 142 / 第 142 行** — `                                                                kGroupMode,`
+  - **EN**: Adds template parameter specifier `kGroupMode`.
+  - **CN**: 补充模板参数说明符 `kGroupMode`。
+- **Line 143 / 第 143 行** — `                                                                ThreadblockShape::kN);`
+  - **EN**: Adds template parameter specifier `ThreadblockShape::kN);`.
+  - **CN**: 补充模板参数说明符 `ThreadblockShape::kN);`。
+- **Line 144 / 第 144 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 145 / 第 145 行** — `    gemm_k_iterations_per_channel = implicit_gemm_k_iterations_per_channel(`
+  - **EN**: Adds template parameter specifier `gemm_k_iterations_per_channel = implicit_gemm_k_iterations_per_channel(`.
+  - **CN**: 补充模板参数说明符 `gemm_k_iterations_per_channel = implicit_gemm_k_iterations_per_channel(`。
+- **Line 146 / 第 146 行** — `        kConvolutionalOperator, args.problem_size, kIteratorAlgorithm);`
+  - **EN**: Adds template parameter specifier `kConvolutionalOperator, args.problem_size, kIteratorAlgorithm);`.
+  - **CN**: 补充模板参数说明符 `kConvolutionalOperator, args.problem_size, kIteratorAlgorithm);`。
+- **Line 147 / 第 147 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 148 / 第 148 行** — `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Adds template parameter specifier `ThreadblockSwizzle threadblock_swizzle;`.
+  - **CN**: 补充模板参数说明符 `ThreadblockSwizzle threadblock_swizzle;`。
+- **Line 149 / 第 149 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 150 / 第 150 行** — `    grid_tiled_shape = threadblock_swizzle.get_tiled_shape(`
+  - **EN**: Adds template parameter specifier `grid_tiled_shape = threadblock_swizzle.get_tiled_shape(`.
+  - **CN**: 补充模板参数说明符 `grid_tiled_shape = threadblock_swizzle.get_tiled_shape(`。
+- **Line 151 / 第 151 行** — `        kConvolutionalOperator,`
+  - **EN**: Adds template parameter specifier `kConvolutionalOperator`.
+  - **CN**: 补充模板参数说明符 `kConvolutionalOperator`。
+- **Line 152 / 第 152 行** — `        problem_size,`
+  - **EN**: Adds template parameter specifier `problem_size`.
+  - **CN**: 补充模板参数说明符 `problem_size`。
+- **Line 153 / 第 153 行** — `        {ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK},`
+  - **EN**: Adds template parameter specifier `{ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK}`.
+  - **CN**: 补充模板参数说明符 `{ThreadblockShape::kM, ThreadblockShape::kN, ThreadblockShape::kK}`。
+- **Line 154 / 第 154 行** — `        args.problem_size.split_k_slices);`
+  - **EN**: Adds template parameter specifier `args.problem_size.split_k_slices);`.
+  - **CN**: 补充模板参数说明符 `args.problem_size.split_k_slices);`。
+- **Line 155 / 第 155 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 156 / 第 156 行** — `    swizzle_log_tile = threadblock_swizzle.get_log_tile(grid_tiled_shape);`
+  - **EN**: Adds template parameter specifier `swizzle_log_tile = threadblock_swizzle.get_log_tile(grid_tiled_shape);`.
+  - **CN**: 补充模板参数说明符 `swizzle_log_tile = threadblock_swizzle.get_log_tile(grid_tiled_shape);`。
+- **Line 157 / 第 157 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 158 / 第 158 行** — `    // Dynamic SMEM usage because stride and dilation are runtime params.`
+  - **EN**: Adds template parameter specifier `// Dynamic SMEM usage because stride and dilation are runtime params.`.
+  - **CN**: 补充模板参数说明符 `// Dynamic SMEM usage because stride and dilation are runtime params.`。
+- **Line 159 / 第 159 行** — `    smem_size_ = (cutlass::platform::max(iterator_A.activation_size, int(sizeof(typename Epilogue::SharedStorage))) * kStages + iterator_B.filter_size);`
+  - **EN**: Adds template parameter specifier `smem_size_ = (cutlass::platform::max(iterator_A.activation_size, int(sizeof(typename Epilogue::SharedStorage))) * kStages + iterator_B.filter_size);`.
+  - **CN**: 补充模板参数说明符 `smem_size_ = (cutlass::platform::max(iterator_A.activation_size, int(sizeof(typename Epilogue::SharedStorage))) * kStages + iterator_B.filter_size);`。
+- **Line 160 / 第 160 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 161 / 第 161 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 162 / 第 162 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 163 / 第 163 行** — `  int get_smem_size() {`
+  - **EN**: Adds template parameter specifier `int get_smem_size() {`.
+  - **CN**: 补充模板参数说明符 `int get_smem_size() {`。
+- **Line 164 / 第 164 行** — `    // Dynamic Smem Size`
+  - **EN**: Adds template parameter specifier `// Dynamic Smem Size`.
+  - **CN**: 补充模板参数说明符 `// Dynamic Smem Size`。
+- **Line 165 / 第 165 行** — `    return smem_size_;`
+  - **EN**: Adds template parameter specifier `return smem_size_;`.
+  - **CN**: 补充模板参数说明符 `return smem_size_;`。
+- **Line 166 / 第 166 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 167 / 第 167 行** — `};`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 168 / 第 168 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 169 / 第 169 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `/////////////////////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `/////////////////////////////////////////////////////////////////////////////////////////////////`。
+- **Line 170 / 第 170 行** — `template <typename Params_, typename ElementB_>`
+  - **EN**: Starts a template declaration with specifier `typename Params_, typename ElementB_`.
+  - **CN**: 开始一个模板声明，说明符为 `typename Params_, typename ElementB_`。
+- **Line 171 / 第 171 行** — `struct ReorderKernel {`
+  - **EN**: Adds template parameter specifier `struct ReorderKernel {`.
+  - **CN**: 补充模板参数说明符 `struct ReorderKernel {`。
+- **Line 172 / 第 172 行** — `  using Params = Params_;`
+  - **EN**: Adds template parameter specifier `using Params = Params_;`.
+  - **CN**: 补充模板参数说明符 `using Params = Params_;`。
+- **Line 173 / 第 173 行** — `  using ElementB = ElementB_;`
+  - **EN**: Adds template parameter specifier `using ElementB = ElementB_;`.
+  - **CN**: 补充模板参数说明符 `using ElementB = ElementB_;`。
+- **Line 174 / 第 174 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 175 / 第 175 行** — `  union SharedStorage {};`
+  - **EN**: Adds template parameter specifier `union SharedStorage {};`.
+  - **CN**: 补充模板参数说明符 `union SharedStorage {};`。
+- **Line 176 / 第 176 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 177 / 第 177 行** — `  static unsigned int const kReorderKernelThreadPerCTA = 128;`
+  - **EN**: Adds template parameter specifier `static unsigned int const kReorderKernelThreadPerCTA = 128;`.
+  - **CN**: 补充模板参数说明符 `static unsigned int const kReorderKernelThreadPerCTA = 128;`。
+- **Line 178 / 第 178 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 179 / 第 179 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 180 / 第 180 行** — `  ReorderKernel() {}`
+  - **EN**: Adds template parameter specifier `ReorderKernel() {}`.
+  - **CN**: 补充模板参数说明符 `ReorderKernel() {}`。
+- **Line 181 / 第 181 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 182 / 第 182 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 183 / 第 183 行** — `  static dim3 get_grid_shape(Params const &params) {`
+  - **EN**: Adds template parameter specifier `static dim3 get_grid_shape(Params const &params) {`.
+  - **CN**: 补充模板参数说明符 `static dim3 get_grid_shape(Params const &params) {`。
+- **Line 184 / 第 184 行** — `    return dim3{static_cast<unsigned int>(`
+  - **EN**: Adds template parameter specifier `return dim3{static_cast<unsigned int>(`.
+  - **CN**: 补充模板参数说明符 `return dim3{static_cast<unsigned int>(`。
+- **Line 185 / 第 185 行** — `                    (params.problem_size.filter_size() + kReorderKernelThreadPerCTA - 1) /`
+  - **EN**: Adds template parameter specifier `(params.problem_size.filter_size() + kReorderKernelThreadPerCTA - 1) /`.
+  - **CN**: 补充模板参数说明符 `(params.problem_size.filter_size() + kReorderKernelThreadPerCTA - 1) /`。
+- **Line 186 / 第 186 行** — `                    kReorderKernelThreadPerCTA),`
+  - **EN**: Adds template parameter specifier `kReorderKernelThreadPerCTA)`.
+  - **CN**: 补充模板参数说明符 `kReorderKernelThreadPerCTA)`。
+- **Line 187 / 第 187 行** — `                1,`
+  - **EN**: Adds template parameter specifier `1`.
+  - **CN**: 补充模板参数说明符 `1`。
+- **Line 188 / 第 188 行** — `                1};`
+  - **EN**: Adds template parameter specifier `1};`.
+  - **CN**: 补充模板参数说明符 `1};`。
+- **Line 189 / 第 189 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 190 / 第 190 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 191 / 第 191 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 192 / 第 192 行** — `  static dim3 get_block_shape() { return dim3{kReorderKernelThreadPerCTA, 1, 1}; }`
+  - **EN**: Adds template parameter specifier `static dim3 get_block_shape() { return dim3{kReorderKernelThreadPerCTA, 1, 1}; }`.
+  - **CN**: 补充模板参数说明符 `static dim3 get_block_shape() { return dim3{kReorderKernelThreadPerCTA, 1, 1}; }`。
+- **Line 193 / 第 193 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 194 / 第 194 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_HOST_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_HOST_DEVICE`。
+- **Line 195 / 第 195 行** — `  void operator()(Params const &params, SharedStorage &shared_storage) {`
+  - **EN**: Adds template parameter specifier `void operator()(Params const &params, SharedStorage &shared_storage) {`.
+  - **CN**: 补充模板参数说明符 `void operator()(Params const &params, SharedStorage &shared_storage) {`。
+- **Line 196 / 第 196 行** — `    int64_t m = static_cast<int64_t>(params.problem_size.groups);`
+  - **EN**: Adds template parameter specifier `int64_t m = static_cast<int64_t>(params.problem_size.groups);`.
+  - **CN**: 补充模板参数说明符 `int64_t m = static_cast<int64_t>(params.problem_size.groups);`。
+- **Line 197 / 第 197 行** — `    int64_t n = static_cast<int64_t>(params.problem_size.filter_size() / params.problem_size.K);`
+  - **EN**: Adds template parameter specifier `int64_t n = static_cast<int64_t>(params.problem_size.filter_size() / params.problem_size.K);`.
+  - **CN**: 补充模板参数说明符 `int64_t n = static_cast<int64_t>(params.problem_size.filter_size() / params.problem_size.K);`。
+- **Line 198 / 第 198 行** — `    const ElementB *src_with_type = static_cast<const ElementB *>(params.ptr_B);`
+  - **EN**: Adds template parameter specifier `const ElementB *src_with_type = static_cast<const ElementB *>(params.ptr_B);`.
+  - **CN**: 补充模板参数说明符 `const ElementB *src_with_type = static_cast<const ElementB *>(params.ptr_B);`。
+- **Line 199 / 第 199 行** — `    ElementB *dst_with_type = static_cast<ElementB *>(params.ptr_reordered_B);`
+  - **EN**: Adds template parameter specifier `ElementB *dst_with_type = static_cast<ElementB *>(params.ptr_reordered_B);`.
+  - **CN**: 补充模板参数说明符 `ElementB *dst_with_type = static_cast<ElementB *>(params.ptr_reordered_B);`。
+- **Line 200 / 第 200 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 201 / 第 201 行** — `    int64_t linear_index = blockIdx.x * kReorderKernelThreadPerCTA + threadIdx.x;`
+  - **EN**: Adds template parameter specifier `int64_t linear_index = blockIdx.x * kReorderKernelThreadPerCTA + threadIdx.x;`.
+  - **CN**: 补充模板参数说明符 `int64_t linear_index = blockIdx.x * kReorderKernelThreadPerCTA + threadIdx.x;`。
+- **Line 202 / 第 202 行** — `    int64_t index_m = linear_index / n;`
+  - **EN**: Adds template parameter specifier `int64_t index_m = linear_index / n;`.
+  - **CN**: 补充模板参数说明符 `int64_t index_m = linear_index / n;`。
+- **Line 203 / 第 203 行** — `    int64_t index_n = linear_index % n;`
+  - **EN**: Adds template parameter specifier `int64_t index_n = linear_index % n;`.
+  - **CN**: 补充模板参数说明符 `int64_t index_n = linear_index % n;`。
+- **Line 204 / 第 204 行** — `    int64_t new_linear_index = index_m + index_n * m;`
+  - **EN**: Adds template parameter specifier `int64_t new_linear_index = index_m + index_n * m;`.
+  - **CN**: 补充模板参数说明符 `int64_t new_linear_index = index_m + index_n * m;`。
+- **Line 205 / 第 205 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 206 / 第 206 行** — `    if (linear_index < m * n) {`
+  - **EN**: Adds template parameter specifier `if (linear_index < m * n) {`.
+  - **CN**: 补充模板参数说明符 `if (linear_index < m * n) {`。
+- **Line 207 / 第 207 行** — `      dst_with_type[new_linear_index] = src_with_type[linear_index];`
+  - **EN**: Adds template parameter specifier `dst_with_type[new_linear_index] = src_with_type[linear_index];`.
+  - **CN**: 补充模板参数说明符 `dst_with_type[new_linear_index] = src_with_type[linear_index];`。
+- **Line 208 / 第 208 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 209 / 第 209 行** — `    return;`
+  - **EN**: Adds template parameter specifier `return;`.
+  - **CN**: 补充模板参数说明符 `return;`。
+- **Line 210 / 第 210 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 211 / 第 211 行** — `};`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 212 / 第 212 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 213 / 第 213 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Adds template parameter specifier `/////////////////////////////////////////////////////////////////////////////////////////////////`.
+  - **CN**: 补充模板参数说明符 `/////////////////////////////////////////////////////////////////////////////////////////////////`。
+- **Line 214 / 第 214 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 215 / 第 215 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 216 / 第 216 行** — `  typename Mma_,                                  ///! Threadblock-scoped matrix multiply-accumulate `
+  - **EN**: Adds template parameter specifier `typename Mma_,                                  ///! Threadblock-scoped matrix multiply-accumulate`.
+  - **CN**: 补充模板参数说明符 `typename Mma_,                                  ///! Threadblock-scoped matrix multiply-accumulate`。
+- **Line 217 / 第 217 行** — `  typename Epilogue_,                             ///! Epilogue`
+  - **EN**: Adds template parameter specifier `typename Epilogue_,                             ///! Epilogue`.
+  - **CN**: 补充模板参数说明符 `typename Epilogue_,                             ///! Epilogue`。
+- **Line 218 / 第 218 行** — `  typename ThreadblockSwizzle_,                   ///! Threadblock swizzling function`
+  - **EN**: Adds template parameter specifier `typename ThreadblockSwizzle_,                   ///! Threadblock swizzling function`.
+  - **CN**: 补充模板参数说明符 `typename ThreadblockSwizzle_,                   ///! Threadblock swizzling function`。
+- **Line 219 / 第 219 行** — `  conv::Operator ConvOperator,                    ///! Convolutional operator (Fprop, Dgrad, Wgrad)`
+  - **EN**: Adds template parameter specifier `conv::Operator ConvOperator,                    ///! Convolutional operator (Fprop, Dgrad, Wgrad)`.
+  - **CN**: 补充模板参数说明符 `conv::Operator ConvOperator,                    ///! Convolutional operator (Fprop, Dgrad, Wgrad)`。
+- **Line 220 / 第 220 行** — `  typename ConvProblemSize_ = Conv2dProblemSize,  ///! Convolutional operator on 2D or 3D problem`
+  - **EN**: Adds template parameter specifier `typename ConvProblemSize_ = Conv2dProblemSize,  ///! Convolutional operator on 2D or 3D problem`.
+  - **CN**: 补充模板参数说明符 `typename ConvProblemSize_ = Conv2dProblemSize,  ///! Convolutional operator on 2D or 3D problem`。
+- **Line 221 / 第 221 行** — `  conv::GroupMode GroupMode_ = conv::GroupMode::kNone,    ///! Group mode`
+  - **EN**: Adds template parameter specifier `conv::GroupMode GroupMode_ = conv::GroupMode::kNone,    ///! Group mode`.
+  - **CN**: 补充模板参数说明符 `conv::GroupMode GroupMode_ = conv::GroupMode::kNone,    ///! Group mode`。
+- **Line 222 / 第 222 行** — `  typename ThreadBlockOutputShape_ = cutlass::conv::TensorNHWCShape<1, 1, 1, 1>`
+  - **EN**: Adds template parameter specifier `typename ThreadBlockOutputShape_ = cutlass::conv::TensorNHWCShape<1, 1, 1, 1>`.
+  - **CN**: 补充模板参数说明符 `typename ThreadBlockOutputShape_ = cutlass::conv::TensorNHWCShape<1, 1, 1, 1>`。
+- **Line 223 / 第 223 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 224 / 第 224 行** — `struct DirectConvolution {`
+  - **EN**: Starts the definition of struct `DirectConvolution`.
+  - **CN**: 开始定义 struct `DirectConvolution`。
+- **Line 225 / 第 225 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 226 / 第 226 行** — `  using Mma = Mma_;`
+  - **EN**: Introduces type or value alias `Mma`.
+  - **CN**: 引入类型或值别名 `Mma`。
+- **Line 227 / 第 227 行** — `  using Epilogue = Epilogue_;`
+  - **EN**: Introduces type or value alias `Epilogue`.
+  - **CN**: 引入类型或值别名 `Epilogue`。
+- **Line 228 / 第 228 行** — `  using EpilogueOutputOp = typename Epilogue::OutputOp;`
+  - **EN**: Introduces type or value alias `EpilogueOutputOp`.
+  - **CN**: 引入类型或值别名 `EpilogueOutputOp`。
+- **Line 229 / 第 229 行** — `  using ThreadblockSwizzle = ThreadblockSwizzle_;`
+  - **EN**: Introduces type or value alias `ThreadblockSwizzle`.
+  - **CN**: 引入类型或值别名 `ThreadblockSwizzle`。
+- **Line 230 / 第 230 行** — `  using ThreadBlockOutputShape = ThreadBlockOutputShape_;`
+  - **EN**: Introduces type or value alias `ThreadBlockOutputShape`.
+  - **CN**: 引入类型或值别名 `ThreadBlockOutputShape`。
+- **Line 231 / 第 231 行** — `  static Operator const kConvolutionalOperator = ConvOperator;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 232 / 第 232 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 233 / 第 233 行** — `  using ElementA = typename Mma::IteratorA::Element;`
+  - **EN**: Introduces type or value alias `ElementA`.
+  - **CN**: 引入类型或值别名 `ElementA`。
+- **Line 234 / 第 234 行** — `  using LayoutA = typename Mma::IteratorA::Layout;`
+  - **EN**: Introduces type or value alias `LayoutA`.
+  - **CN**: 引入类型或值别名 `LayoutA`。
+- **Line 235 / 第 235 行** — `  using ElementB = typename Mma::IteratorB::Element;`
+  - **EN**: Introduces type or value alias `ElementB`.
+  - **CN**: 引入类型或值别名 `ElementB`。
+- **Line 236 / 第 236 行** — `  using LayoutB = typename Mma::IteratorB::Layout;`
+  - **EN**: Introduces type or value alias `LayoutB`.
+  - **CN**: 引入类型或值别名 `LayoutB`。
+- **Line 237 / 第 237 行** — `  using ElementC = typename EpilogueOutputOp::ElementOutput;`
+  - **EN**: Introduces type or value alias `ElementC`.
+  - **CN**: 引入类型或值别名 `ElementC`。
+- **Line 238 / 第 238 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 239 / 第 239 行** — `  /// Set output tensor C layout`
+  - **EN**: Inline comment explaining intent: `Set output tensor C layout`.
+  - **CN**: 行内注释说明意图：`Set output tensor C layout`。
+- **Line 240 / 第 240 行** — `  using LayoutC = LayoutA;`
+  - **EN**: Introduces type or value alias `LayoutC`.
+  - **CN**: 引入类型或值别名 `LayoutC`。
+- **Line 241 / 第 241 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 242 / 第 242 行** — `  using ElementAccumulator = typename EpilogueOutputOp::ElementAccumulator;`
+  - **EN**: Introduces type or value alias `ElementAccumulator`.
+  - **CN**: 引入类型或值别名 `ElementAccumulator`。
+- **Line 243 / 第 243 行** — `  using ElementCompute = typename EpilogueOutputOp::ElementCompute;`
+  - **EN**: Introduces type or value alias `ElementCompute`.
+  - **CN**: 引入类型或值别名 `ElementCompute`。
+- **Line 244 / 第 244 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 245 / 第 245 行** — `  using WarpMmaOperator = typename Mma::Policy::Operator;`
+  - **EN**: Introduces type or value alias `WarpMmaOperator`.
+  - **CN**: 引入类型或值别名 `WarpMmaOperator`。
+- **Line 246 / 第 246 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 247 / 第 247 行** — `  using ArchMmaOperator = typename WarpMmaOperator::ArchMmaOperator;`
+  - **EN**: Introduces type or value alias `ArchMmaOperator`.
+  - **CN**: 引入类型或值别名 `ArchMmaOperator`。
+- **Line 248 / 第 248 行** — `  using MathOperator = typename ArchMmaOperator::Operator;`
+  - **EN**: Introduces type or value alias `MathOperator`.
+  - **CN**: 引入类型或值别名 `MathOperator`。
+- **Line 249 / 第 249 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 250 / 第 250 行** — `  using OperatorClass = typename WarpMmaOperator::OperatorClass;`
+  - **EN**: Introduces type or value alias `OperatorClass`.
+  - **CN**: 引入类型或值别名 `OperatorClass`。
+- **Line 251 / 第 251 行** — `  using ArchTag = typename WarpMmaOperator::ArchTag;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 252 / 第 252 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 253 / 第 253 行** — `  using ThreadblockShape = typename Mma::Shape;`
+  - **EN**: Introduces type or value alias `ThreadblockShape`.
+  - **CN**: 引入类型或值别名 `ThreadblockShape`。
+- **Line 254 / 第 254 行** — `  using WarpShape = typename WarpMmaOperator::Shape;`
+  - **EN**: Introduces type or value alias `WarpShape`.
+  - **CN**: 引入类型或值别名 `WarpShape`。
+- **Line 255 / 第 255 行** — `  using InstructionShape = typename cutlass::gemm::GemmShape<1, 1, 1>;`
+  - **EN**: Introduces type or value alias `InstructionShape`.
+  - **CN**: 引入类型或值别名 `InstructionShape`。
+- **Line 256 / 第 256 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 257 / 第 257 行** — `  static int const kStages = Mma::kStages;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 258 / 第 258 行** — `  static IteratorAlgorithm const kIteratorAlgorithm = Mma::IteratorA::kIteratorAlgorithm; `
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 259 / 第 259 行** — `  static StrideSupport const kStrideSupport = Mma::IteratorA::kStrideSupport;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 260 / 第 260 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 261 / 第 261 行** — `  /// Warp count (concept: GemmShape)`
+  - **EN**: Inline comment explaining intent: `Warp count (concept: GemmShape)`.
+  - **CN**: 行内注释说明意图：`Warp count (concept: GemmShape)`。
+- **Line 262 / 第 262 行** — `  using WarpCount = typename Mma::WarpCount;`
+  - **EN**: Introduces type or value alias `WarpCount`.
+  - **CN**: 引入类型或值别名 `WarpCount`。
+- **Line 263 / 第 263 行** — `  static int const kThreadCount = 32 * WarpCount::kCount;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 264 / 第 264 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 265 / 第 265 行** — `  using TensorRefA = typename Mma::IteratorA::TensorRef;`
+  - **EN**: Introduces type or value alias `TensorRefA`.
+  - **CN**: 引入类型或值别名 `TensorRefA`。
+- **Line 266 / 第 266 行** — `  using TensorRefB = typename Mma::IteratorB::TensorRef;`
+  - **EN**: Introduces type or value alias `TensorRefB`.
+  - **CN**: 引入类型或值别名 `TensorRefB`。
+- **Line 267 / 第 267 行** — `  using TensorRefC = cutlass::TensorRef<ElementC, LayoutC>;`
+  - **EN**: Introduces type or value alias `TensorRefC`.
+  - **CN**: 引入类型或值别名 `TensorRefC`。
+- **Line 268 / 第 268 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 269 / 第 269 行** — `  /// Check iterator A and B convolution dimension are the same and `
+  - **EN**: Inline comment explaining intent: `Check iterator A and B convolution dimension are the same and`.
+  - **CN**: 行内注释说明意图：`Check iterator A and B convolution dimension are the same and`。
+- **Line 270 / 第 270 行** — `  // set device::ImplicitGemmConvolution::kConvDim`
+  - **EN**: Inline comment explaining intent: `set device::ImplicitGemmConvolution::kConvDim`.
+  - **CN**: 行内注释说明意图：`set device::ImplicitGemmConvolution::kConvDim`。
+- **Line 271 / 第 271 行** — `  static_assert(Mma::IteratorA::kConvDim == Mma::IteratorB::kConvDim, `
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 272 / 第 272 行** — `    "Convolution on different different dimensions is not supported");`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 273 / 第 273 行** — `  static int const kConvDim = Mma::IteratorA::kConvDim;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 274 / 第 274 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 275 / 第 275 行** — `  /// Conv dimension and problem size structure (Conv2d or Conv3d)`
+  - **EN**: Inline comment explaining intent: `Conv dimension and problem size structure (Conv2d or Conv3d)`.
+  - **CN**: 行内注释说明意图：`Conv dimension and problem size structure (Conv2d or Conv3d)`。
+- **Line 276 / 第 276 行** — `  using ConvProblemSize = ConvProblemSize_;`
+  - **EN**: Introduces type or value alias `ConvProblemSize`.
+  - **CN**: 引入类型或值别名 `ConvProblemSize`。
+- **Line 277 / 第 277 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 278 / 第 278 行** — `  static conv::GroupMode const kGroupMode = GroupMode_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 279 / 第 279 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 280 / 第 280 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 281 / 第 281 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 282 / 第 282 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 283 / 第 283 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 284 / 第 284 行** — `  using ConvOutputIteratorParameter = epilogue::threadblock::ConvOutputIteratorParameter<`
+  - **EN**: Introduces type or value alias `ConvOutputIteratorParameter`.
+  - **CN**: 引入类型或值别名 `ConvOutputIteratorParameter`。
+- **Line 285 / 第 285 行** — `    LayoutC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 286 / 第 286 行** — `    typename Epilogue::OutputTileIterator::Layout, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 287 / 第 287 行** — `    TensorRefC,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 288 / 第 288 行** — `    ConvOperator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 289 / 第 289 行** — `    ConvProblemSize`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 290 / 第 290 行** — `    >;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 291 / 第 291 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 292 / 第 292 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 293 / 第 293 行** — `  /// Argument structure`
+  - **EN**: Inline comment explaining intent: `Argument structure`.
+  - **CN**: 行内注释说明意图：`Argument structure`。
+- **Line 294 / 第 294 行** — `  struct Arguments {`
+  - **EN**: Starts the definition of struct `Arguments`.
+  - **CN**: 开始定义 struct `Arguments`。
+- **Line 295 / 第 295 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 296 / 第 296 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 297 / 第 297 行** — `    // Data members`
+  - **EN**: Inline comment explaining intent: `Data members`.
+  - **CN**: 行内注释说明意图：`Data members`。
+- **Line 298 / 第 298 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 299 / 第 299 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 300 / 第 300 行** — `    ConvProblemSize problem_size;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 301 / 第 301 行** — `    TensorRefA ref_A;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 302 / 第 302 行** — `    TensorRefB ref_B;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 303 / 第 303 行** — `    TensorRefB ref_reordered_B;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 304 / 第 304 行** — `    TensorRefC ref_C;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 305 / 第 305 行** — `    TensorRefC ref_D;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 306 / 第 306 行** — `    typename EpilogueOutputOp::Params output_op;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 307 / 第 307 行** — `    SplitKMode split_k_mode;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 308 / 第 308 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 309 / 第 309 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 310 / 第 310 行** — `    // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 311 / 第 311 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 312 / 第 312 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 313 / 第 313 行** — `    /// Default ctor`
+  - **EN**: Inline comment explaining intent: `Default ctor`.
+  - **CN**: 行内注释说明意图：`Default ctor`。
+- **Line 314 / 第 314 行** — `    CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 315 / 第 315 行** — `    Arguments() { }`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 316 / 第 316 行** — `   `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 317 / 第 317 行** — `    CUTLASS_HOST_DEVICE `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 318 / 第 318 行** — `    Arguments(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 319 / 第 319 行** — `      ConvProblemSize const & problem_size`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 320 / 第 320 行** — `    ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 321 / 第 321 行** — `      problem_size(problem_size) { }`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 322 / 第 322 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 323 / 第 323 行** — `    CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 324 / 第 324 行** — `    Arguments(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 325 / 第 325 行** — `      ConvProblemSize const & problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 326 / 第 326 行** — `      TensorRefA const & ref_A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 327 / 第 327 行** — `      TensorRefB const & ref_B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 328 / 第 328 行** — `      TensorRefC const & ref_C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 329 / 第 329 行** — `      TensorRefC const & ref_D,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 330 / 第 330 行** — `      typename EpilogueOutputOp::Params const & output_op,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 331 / 第 331 行** — `      TensorRefB const & ref_reordered_B = nullptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 332 / 第 332 行** — `      SplitKMode const & split_k_mode = SplitKMode::kSerial`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 333 / 第 333 行** — `    ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 334 / 第 334 行** — `      problem_size(problem_size),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 335 / 第 335 行** — `      ref_A(ref_A),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 336 / 第 336 行** — `      ref_B(ref_B),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 337 / 第 337 行** — `      ref_C(ref_C),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 338 / 第 338 行** — `      ref_D(ref_D),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 339 / 第 339 行** — `      output_op(output_op),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 340 / 第 340 行** — `      ref_reordered_B(ref_reordered_B),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 341 / 第 341 行** — `      split_k_mode(split_k_mode)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 342 / 第 342 行** — `    {`
+  - **EN**: Opens the body for the preceding declaration or control block.
+  - **CN**: 为前面的声明或控制块打开主体。
+- **Line 343 / 第 343 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 344 / 第 344 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 345 / 第 345 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 346 / 第 346 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 347 / 第 347 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 348 / 第 348 行** — `  using Params =`
+  - **EN**: Introduces type or value alias `Params`.
+  - **CN**: 引入类型或值别名 `Params`。
+- **Line 349 / 第 349 行** — `      typename cutlass::conv::kernel::DirectConvolutionParams<Mma,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 350 / 第 350 行** — `                                                              Epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 351 / 第 351 行** — `                                                              ThreadblockSwizzle,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 352 / 第 352 行** — `                                                              kConvolutionalOperator,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 353 / 第 353 行** — `                                                              Arguments,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 354 / 第 354 行** — `                                                              ConvOutputIteratorParameter,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 355 / 第 355 行** — `                                                              ConvProblemSize,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 356 / 第 356 行** — `                                                              kGroupMode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 357 / 第 357 行** — `                                                              ThreadBlockOutputShape>;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 358 / 第 358 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 359 / 第 359 行** — `  using ReorderKernel = typename cutlass::conv::kernel::ReorderKernel<Params, ElementB>;`
+  - **EN**: Introduces type or value alias `ReorderKernel`.
+  - **CN**: 引入类型或值别名 `ReorderKernel`。
+- **Line 360 / 第 360 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 361 / 第 361 行** — `  /// Shared memory storage structure`
+  - **EN**: Inline comment explaining intent: `Shared memory storage structure`.
+  - **CN**: 行内注释说明意图：`Shared memory storage structure`。
+- **Line 362 / 第 362 行** — `  union SharedStorage {`
+  - **EN**: Declares or defines a union.
+  - **CN**: 声明或定义一个联合体。
+- **Line 363 / 第 363 行** — `    typename Mma::SharedStorage main_loop;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 364 / 第 364 行** — `    typename Epilogue::SharedStorage epilogue;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 365 / 第 365 行** — `  };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 366 / 第 366 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 367 / 第 367 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 368 / 第 368 行** — `  // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 369 / 第 369 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 370 / 第 370 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 371 / 第 371 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 372 / 第 372 行** — `  DirectConvolution() { } `
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 373 / 第 373 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 374 / 第 374 行** — `  /// Executes one ImplicitGEMM`
+  - **EN**: Inline comment explaining intent: `Executes one ImplicitGEMM`.
+  - **CN**: 行内注释说明意图：`Executes one ImplicitGEMM`。
+- **Line 375 / 第 375 行** — `  CUTLASS_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 376 / 第 376 行** — `  void operator()(Params const &params, SharedStorage &shared_storage) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 377 / 第 377 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 378 / 第 378 行** — `    // Compute threadblock location`
+  - **EN**: Inline comment explaining intent: `Compute threadblock location`.
+  - **CN**: 行内注释说明意图：`Compute threadblock location`。
+- **Line 379 / 第 379 行** — `    ThreadblockSwizzle threadblock_swizzle;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 380 / 第 380 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 381 / 第 381 行** — `    cutlass::gemm::GemmCoord threadblock_tile_idx =`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 382 / 第 382 行** — `        threadblock_swizzle.get_tile_offset(params.swizzle_log_tile);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 383 / 第 383 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 384 / 第 384 行** — `    // Early exit if threadblock is out of range`
+  - **EN**: Inline comment explaining intent: `Early exit if threadblock is out of range`.
+  - **CN**: 行内注释说明意图：`Early exit if threadblock is out of range`。
+- **Line 385 / 第 385 行** — `    if (params.grid_tiled_shape.m() <= threadblock_tile_idx.m() ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 386 / 第 386 行** — `      params.grid_tiled_shape.n() <= threadblock_tile_idx.n()) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 387 / 第 387 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 388 / 第 388 行** — `      return;`
+  - **EN**: Returns from the current function.
+  - **CN**: 从当前函数返回。
+- **Line 389 / 第 389 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 390 / 第 390 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 391 / 第 391 行** — `    // Compute position within threadblock`
+  - **EN**: Inline comment explaining intent: `Compute position within threadblock`.
+  - **CN**: 行内注释说明意图：`Compute position within threadblock`。
+- **Line 392 / 第 392 行** — `    int thread_idx = threadIdx.x;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 393 / 第 393 行** — `    int iterator_column_offset = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 394 / 第 394 行** — `    int filter_row_offset = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 395 / 第 395 行** — `    if (kGroupMode != GroupMode::kNone) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 396 / 第 396 行** — `      if (kGroupMode == GroupMode::kDepthwise) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 397 / 第 397 行** — `        iterator_column_offset += threadblock_tile_idx.n() * Mma::Shape::kN;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 398 / 第 398 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 399 / 第 399 行** — `    } `
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 400 / 第 400 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 401 / 第 401 行** — `    // Construct iterators to A and B operands`
+  - **EN**: Inline comment explaining intent: `Construct iterators to A and B operands`.
+  - **CN**: 行内注释说明意图：`Construct iterators to A and B operands`。
+- **Line 402 / 第 402 行** — `    typename Mma::IteratorA iterator_A(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 403 / 第 403 行** — `      params.iterator_A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 404 / 第 404 行** — `      params.problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 405 / 第 405 行** — `      params.ptr_A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 406 / 第 406 行** — `      thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 407 / 第 407 行** — `      MatrixCoord(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 408 / 第 408 行** — `        threadblock_tile_idx.m() + threadblock_tile_idx.k(),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 409 / 第 409 行** — `        iterator_column_offset`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 410 / 第 410 行** — `      )`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 411 / 第 411 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 412 / 第 412 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 413 / 第 413 行** — `    typename Mma::IteratorB iterator_B(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 414 / 第 414 行** — `      params.iterator_B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 415 / 第 415 行** — `      params.problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 416 / 第 416 行** — `      params.ptr_reordered_B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 417 / 第 417 行** — `      thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 418 / 第 418 行** — `      MatrixCoord(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 419 / 第 419 行** — `        filter_row_offset,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 420 / 第 420 行** — `        iterator_column_offset`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 421 / 第 421 行** — `      )`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 422 / 第 422 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 423 / 第 423 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 424 / 第 424 行** — `    // Broadcast the warp_id computed by lane 0 to ensure dependent code`
+  - **EN**: Inline comment explaining intent: `Broadcast the warp_id computed by lane 0 to ensure dependent code`.
+  - **CN**: 行内注释说明意图：`Broadcast the warp_id computed by lane 0 to ensure dependent code`。
+- **Line 425 / 第 425 行** — `    // is compiled as warp-uniform.`
+  - **EN**: Inline comment explaining intent: `is compiled as warp-uniform.`.
+  - **CN**: 行内注释说明意图：`is compiled as warp-uniform.`。
+- **Line 426 / 第 426 行** — `    int warp_idx = __shfl_sync(0xffffffff, threadIdx.x / 32, 0);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 427 / 第 427 行** — `    int lane_idx = threadIdx.x % 32;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 428 / 第 428 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 429 / 第 429 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 430 / 第 430 行** — `    // Main loop`
+  - **EN**: Inline comment explaining intent: `Main loop`.
+  - **CN**: 行内注释说明意图：`Main loop`。
+- **Line 431 / 第 431 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 432 / 第 432 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 433 / 第 433 行** — `    // Construct thread-scoped matrix multiply`
+  - **EN**: Inline comment explaining intent: `Construct thread-scoped matrix multiply`.
+  - **CN**: 行内注释说明意图：`Construct thread-scoped matrix multiply`。
+- **Line 434 / 第 434 行** — `    Mma mma(shared_storage.main_loop, thread_idx, warp_idx, lane_idx);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 435 / 第 435 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 436 / 第 436 行** — `    typename Mma::FragmentC accumulators;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 437 / 第 437 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 438 / 第 438 行** — `    accumulators.clear();`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 439 / 第 439 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 440 / 第 440 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 441 / 第 441 行** — `    // Epilogue`
+  - **EN**: Inline comment explaining intent: `Epilogue`.
+  - **CN**: 行内注释说明意图：`Epilogue`。
+- **Line 442 / 第 442 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 443 / 第 443 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 444 / 第 444 行** — `    EpilogueOutputOp output_op(params.output_op);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 445 / 第 445 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 446 / 第 446 行** — `    // Compute logical position within grid`
+  - **EN**: Inline comment explaining intent: `Compute logical position within grid`.
+  - **CN**: 行内注释说明意图：`Compute logical position within grid`。
+- **Line 447 / 第 447 行** — `    threadblock_tile_idx =`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 448 / 第 448 行** — `        threadblock_swizzle.get_tile_offset(params.swizzle_log_tile);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 449 / 第 449 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 450 / 第 450 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 451 / 第 451 行** — `    MatrixCoord threadblock_offset(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 452 / 第 452 行** — `      threadblock_tile_idx.m() + threadblock_tile_idx.k(),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 453 / 第 453 行** — `      threadblock_tile_idx.n() * Mma::Shape::kN`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 454 / 第 454 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 455 / 第 455 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 456 / 第 456 行** — `    // Tile iterator writing to destination tensor`
+  - **EN**: Inline comment explaining intent: `Tile iterator writing to destination tensor`.
+  - **CN**: 行内注释说明意图：`Tile iterator writing to destination tensor`。
+- **Line 457 / 第 457 行** — `    typename Epilogue::OutputTileIterator iterator_D(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 458 / 第 458 行** — `      params.iterator_D,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 459 / 第 459 行** — `      params.ptr_D,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 460 / 第 460 行** — `      ConvOutputIteratorParameter::extent(params.problem_size),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 461 / 第 461 行** — `      thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 462 / 第 462 行** — `      threadblock_offset`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 463 / 第 463 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 464 / 第 464 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 465 / 第 465 行** — `    // Tile iterator reading from source accumulator tensor`
+  - **EN**: Inline comment explaining intent: `Tile iterator reading from source accumulator tensor`.
+  - **CN**: 行内注释说明意图：`Tile iterator reading from source accumulator tensor`。
+- **Line 466 / 第 466 行** — `    typename Epilogue::OutputTileIterator iterator_C(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 467 / 第 467 行** — `      params.iterator_C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 468 / 第 468 行** — `      params.ptr_C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 469 / 第 469 行** — `      ConvOutputIteratorParameter::extent(params.problem_size),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 470 / 第 470 行** — `      thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 471 / 第 471 行** — `      threadblock_offset`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 472 / 第 472 行** — `    );`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 473 / 第 473 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 474 / 第 474 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 475 / 第 475 行** — `    // Construct the epilogue`
+  - **EN**: Inline comment explaining intent: `Construct the epilogue`.
+  - **CN**: 行内注释说明意图：`Construct the epilogue`。
+- **Line 476 / 第 476 行** — `    Epilogue epilogue(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 477 / 第 477 行** — `      shared_storage.epilogue, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 478 / 第 478 行** — `      thread_idx, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 479 / 第 479 行** — `      warp_idx, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 480 / 第 480 行** — `      lane_idx);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 481 / 第 481 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 482 / 第 482 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 483 / 第 483 行** — `    // Compute threadblock-scoped matrix multiply-add`
+  - **EN**: Inline comment explaining intent: `Compute threadblock-scoped matrix multiply-add`.
+  - **CN**: 行内注释说明意图：`Compute threadblock-scoped matrix multiply-add`。
+- **Line 484 / 第 484 行** — `    // Epilogue is fused in the mainloop`
+  - **EN**: Inline comment explaining intent: `Epilogue is fused in the mainloop`.
+  - **CN**: 行内注释说明意图：`Epilogue is fused in the mainloop`。
+- **Line 485 / 第 485 行** — `    mma(params.gemm_k_iterations,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 486 / 第 486 行** — `        accumulators,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 487 / 第 487 行** — `        iterator_A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 488 / 第 488 行** — `        params.iterator_A,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 489 / 第 489 行** — `        iterator_B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 490 / 第 490 行** — `        params.iterator_B,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 491 / 第 491 行** — `        accumulators,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 492 / 第 492 行** — `        epilogue,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 493 / 第 493 行** — `        output_op,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 494 / 第 494 行** — `        iterator_D,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 495 / 第 495 行** — `        iterator_C,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 496 / 第 496 行** — `        params.split_k_slices);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 497 / 第 497 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 498 / 第 498 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 499 / 第 499 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 500 / 第 500 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 501 / 第 501 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 502 / 第 502 行** — `} // namespace kernel`
+  - **EN**: Closes namespace `kernel`.
+  - **CN**: 关闭命名空间 `kernel`。
+- **Line 503 / 第 503 行** — `} // namespace conv`
+  - **EN**: Closes namespace `conv`.
+  - **CN**: 关闭命名空间 `conv`。
+- **Line 504 / 第 504 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 505 / 第 505 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 506 / 第 506 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Architecture specialization / 架构特化
+- Problem shapes / 问题形状
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/aligned_buffer.h` — CUTLASS dependency `cutlass/aligned_buffer.h` / CUTLASS 依赖 `cutlass/aligned_buffer.h`
+- `cutlass/array.h` — CUTLASS dependency `cutlass/array.h` / CUTLASS 依赖 `cutlass/array.h`
+- `cutlass/numeric_types.h` — CUTLASS dependency `cutlass/numeric_types.h` / CUTLASS 依赖 `cutlass/numeric_types.h`
+- `cutlass/matrix_shape.h` — CUTLASS dependency `cutlass/matrix_shape.h` / CUTLASS 依赖 `cutlass/matrix_shape.h`
+- `cutlass/platform/platform.h` — CUTLASS dependency `cutlass/platform/platform.h` / CUTLASS 依赖 `cutlass/platform/platform.h`
+- `cutlass/semaphore.h` — CUTLASS dependency `cutlass/semaphore.h` / CUTLASS 依赖 `cutlass/semaphore.h`
+- `cutlass/tensor_ref.h` — CUTLASS dependency `cutlass/tensor_ref.h` / CUTLASS 依赖 `cutlass/tensor_ref.h`
+- `cutlass/layout/tensor.h` — Layout definition `cutlass/layout/tensor.h` / 布局定义 `cutlass/layout/tensor.h`
+- `cutlass/gemm/gemm.h` — CUTLASS GEMM primitive `cutlass/gemm/gemm.h` / CUTLASS GEMM 原语 `cutlass/gemm/gemm.h`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/conv/conv2d_problem_size.h` — CUTLASS convolution component `cutlass/conv/conv2d_problem_size.h` / CUTLASS 卷积组件 `cutlass/conv/conv2d_problem_size.h`
+- `cutlass/conv/conv3d_problem_size.h` — CUTLASS convolution component `cutlass/conv/conv3d_problem_size.h` / CUTLASS 卷积组件 `cutlass/conv/conv3d_problem_size.h`
+- `cutlass/epilogue/threadblock/output_iterator_parameter.h` — Epilogue support `cutlass/epilogue/threadblock/output_iterator_parameter.h` / 尾处理支持 `cutlass/epilogue/threadblock/output_iterator_parameter.h`

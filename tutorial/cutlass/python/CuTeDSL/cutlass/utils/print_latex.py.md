@@ -1,0 +1,186 @@
+# print_latex.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/print_latex.py`
+
+## Purpose / 作用
+- EN: Defines 5 functions (tikz_color_bwx8, tikz_color_white, tikz_color_tv, print_latex, ... (+1 more)) in `CuTeDSL.cutlass.utils.print_latex`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.print_latex` 定义了 5 个函数（tikz_color_bwx8, tikz_color_white, tikz_color_tv, print_latex, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Callable, Union` — **EN:** Imports Callable, Union from `typing`. **CN:** 从 `typing` 导入 Callable, Union。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from ..cute import (` — **EN:** Imports Layout, ComposedLayout, append, is_static, make_layout, size, ... (+2 more) from `..cute`. **CN:** 从 `..cute` 导入 Layout, ComposedLayout, append, is_static, make_layout, size, ... (+2 more)。
+- **L15** `    Layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L16** `    ComposedLayout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L17** `    append,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    is_static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    make_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    product_each,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    rank,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `from ..cute.typing import IntTuple` — **EN:** Imports IntTuple from `..cute.typing`. **CN:** 从 `..cute.typing` 导入 IntTuple。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `__all__ = ["print_latex", "print_latex_tv"]` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `def tikz_color_bwx8(idx: int) -> str:` — **EN:** Defines function `tikz_color_bwx8`. **CN:** 定义函数 `tikz_color_bwx8`。
+- **L30** `    color_map = [` — **EN:** Assigns a value to color_map. **CN:** 将一个值赋给 color_map。
+- **L31** `        "black!00",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `        "black!40",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `        "black!20",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `        "black!60",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `        "black!10",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `        "black!50",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `        "black!30",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `        "black!70",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    return color_map[idx % 8]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `def tikz_color_white(idx: int) -> str:` — **EN:** Defines function `tikz_color_white`. **CN:** 定义函数 `tikz_color_white`。
+- **L44** `    return "white"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `def tikz_color_tv(tid: int, vid: int) -> str:` — **EN:** Defines function `tikz_color_tv`. **CN:** 定义函数 `tikz_color_tv`。
+- **L48** `    color_map = [` — **EN:** Assigns a value to color_map. **CN:** 将一个值赋给 color_map。
+- **L49** `        "{rgb,255:red,175;green,175;blue,255}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `        "{rgb,255:red,175;green,255;blue,175}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `        "{rgb,255:red,255;green,255;blue,175}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `        "{rgb,255:red,255;green,175;blue,175}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `        "{rgb,255:red,210;green,210;blue,255}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `        "{rgb,255:red,210;green,255;blue,210}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `        "{rgb,255:red,255;green,255;blue,210}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `        "{rgb,255:red,255;green,210;blue,210}",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    return color_map[tid % 8]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `def print_latex(` — **EN:** Defines function `print_latex`. **CN:** 定义函数 `print_latex`。
+- **L62** `    x: Union[Layout, ComposedLayout], *, color: Callable = tikz_color_bwx8` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L63** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L64** `    """` — **EN:** Starts the docstring for the function `print_latex`. **CN:** 开始说明 function `print_latex` 的文档字符串。
+- **L65** `    Prints a layout.` — **EN:** Continues the docstring for the function `print_latex`. **CN:** 继续说明 function `print_latex` 的文档字符串。
+- **L66** `    :param x: A layout` — **EN:** Continues the docstring for the function `print_latex`. **CN:** 继续说明 function `print_latex` 的文档字符串。
+- **L67** `    :type x: Union[Layout, ComposedLayout]` — **EN:** Continues the docstring for the function `print_latex`. **CN:** 继续说明 function `print_latex` 的文档字符串。
+- **L68** `    :param color: A function that returns TiKZ colors` — **EN:** Continues the docstring for the function `print_latex`. **CN:** 继续说明 function `print_latex` 的文档字符串。
+- **L69** `    :type color: Callable` — **EN:** Continues the docstring for the function `print_latex`. **CN:** 继续说明 function `print_latex` 的文档字符串。
+- **L70** `    """` — **EN:** Ends the docstring for the function `print_latex`. **CN:** 结束说明 function `print_latex` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    if not is_static(x):` — **EN:** Starts a conditional branch guarded by `not is_static(x)`. **CN:** 开始一个由 `not is_static(x)` 控制的条件分支。
+- **L73** `        raise ValueError("Requires static input")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** `    if rank(x) > 2:` — **EN:** Starts a conditional branch guarded by `rank(x) > 2`. **CN:** 开始一个由 `rank(x) > 2` 控制的条件分支。
+- **L75** `        raise ValueError("Requires rank <= 2 to print")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    if rank(x) == 1:` — **EN:** Starts a conditional branch guarded by `rank(x) == 1`. **CN:** 开始一个由 `rank(x) == 1` 控制的条件分支。
+- **L78** `        layout = append(x, make_layout(1, stride=0))` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L79** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L80** `        layout = x` — **EN:** Assigns a value to layout. **CN:** 将一个值赋给 layout。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    print("%% Layout: {}", layout)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L83** `    print("\\documentclass[convert]{standalone}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L84** `    print("\\usepackage{tikz}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L85** `    print("\\begin{document}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L86** `    print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L87** `        "\\begin{tikzpicture}[x={(0cm,-1cm)},y={(1cm,0cm)},every node/.style={minimum size=1cm, outer sep=0pt}]"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    M, N = product_each(x.shape)` — **EN:** Assigns a value to (M, N). **CN:** 将一个值赋给 (M, N)。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `    for m in range(M):` — **EN:** Starts a loop assigning items from `range(M)` to `m`. **CN:** 开始一个循环，将 `range(M)` 的元素赋给 `m`。
+- **L93** `        for n in range(N):` — **EN:** Starts a loop assigning items from `range(N)` to `n`. **CN:** 开始一个循环，将 `range(N)` 的元素赋给 `n`。
+- **L94** `            idx = layout((m, n))` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L95** `            print("\\node[fill=")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L96** `            print(color(idx))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L97** `            print("] at (%d,%d) {%d};\n" % (m, n, idx))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L98** `    print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L99** `        "\\draw[color=black,thick,shift={(-0.5,-0.5)}] (0,0) grid (%d,%d);\n\n" % (M, N)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    for m in range(M):` — **EN:** Starts a loop assigning items from `range(M)` to `m`. **CN:** 开始一个循环，将 `range(M)` 的元素赋给 `m`。
+- **L102** `        print("\\node at (%d,%d) {\\Large{\\texttt{%d}}};\n" % (m, -1, m))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L103** `    for n in range(N):` — **EN:** Starts a loop assigning items from `range(N)` to `n`. **CN:** 开始一个循环，将 `range(N)` 的元素赋给 `n`。
+- **L104** `        print("\\node at (%d,%d) {\\Large{\\texttt{%d}}};\n" % (-1, n, n))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `    ## Footer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L107** `    print("\\end{tikzpicture}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L108** `    print("\\end{document}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `def print_latex_tv(` — **EN:** Defines function `print_latex_tv`. **CN:** 定义函数 `print_latex_tv`。
+- **L112** `    layout_tv: Union[Layout, ComposedLayout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L113** `    tile_mn: Union[IntTuple, Layout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L114** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L115** `    color: Callable = tikz_color_tv,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L116** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L117** `    """` — **EN:** Starts the docstring for the function `print_latex_tv`. **CN:** 开始说明 function `print_latex_tv` 的文档字符串。
+- **L118** `    Prints a tv layout for a tile M N. Everything must be static.` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L119** `    :param layout_tv: A static thread value layout` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L120** `    :type layout_tv: Union[Layout, ComposedLayout]` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L121** `    :param tile_mn: A static M N tile` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L122** `    :type tile_mn: Union[IntTuple, Layout]` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L123** `    :param color: A function that returns TiKZ colors` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L124** `    :type color: Callable` — **EN:** Continues the docstring for the function `print_latex_tv`. **CN:** 继续说明 function `print_latex_tv` 的文档字符串。
+- **L125** `    """` — **EN:** Ends the docstring for the function `print_latex_tv`. **CN:** 结束说明 function `print_latex_tv` 的文档字符串。
+- **L126** `    if not is_static(layout_tv) or not is_static(tile_mn):` — **EN:** Starts a conditional branch guarded by `not is_static(layout_tv) or not is_static(tile_mn)`. **CN:** 开始一个由 `not is_static(layout_tv) or not is_static(tile_mn)` 控制的条件分支。
+- **L127** `        raise ValueError("Layout tv and tile_mn must be static")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L128** `    if rank(layout_tv) != 2:` — **EN:** Starts a conditional branch guarded by `rank(layout_tv) != 2`. **CN:** 开始一个由 `rank(layout_tv) != 2` 控制的条件分支。
+- **L129** `        raise ValueError("Require layout_tv to be rank 2")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    print("%% Layout TV: {}", layout_tv)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L132** `    print("\\documentclass[convert]{standalone}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L133** `    print("\\usepackage{tikz}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L134** `    print("\\begin{document}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L135** `    print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L136** `        "\\begin{tikzpicture}[x={(0cm,-1cm)},y={(1cm,0cm)},every node/.style={minimum size=1cm, outer sep=0pt}]\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** `    if not isinstance(tile_mn, Layout):` — **EN:** Starts a conditional branch guarded by `not isinstance(tile_mn, Layout)`. **CN:** 开始一个由 `not isinstance(tile_mn, Layout)` 控制的条件分支。
+- **L140** `        tile_mn = make_layout(tile_mn)` — **EN:** Assigns a value to tile_mn. **CN:** 将一个值赋给 tile_mn。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    M, N = product_each(tile_mn.shape)  # type: ignore[union-attr]` — **EN:** Assigns a value to (M, N). **CN:** 将一个值赋给 (M, N)。
+- **L143** `    filled = [[False for n in range(N)] for m in range(M)]` — **EN:** Assigns a value to filled. **CN:** 将一个值赋给 filled。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    for tid in range(size(layout_tv, mode=[0])):` — **EN:** Starts a loop assigning items from `range(size(layout_tv, mode=[0]))` to `tid`. **CN:** 开始一个循环，将 `range(size(layout_tv, mode=[0]))` 的元素赋给 `tid`。
+- **L146** `        for vid in range(size(layout_tv, mode=[1])):` — **EN:** Starts a loop assigning items from `range(size(layout_tv, mode=[1]))` to `vid`. **CN:** 开始一个循环，将 `range(size(layout_tv, mode=[1]))` 的元素赋给 `vid`。
+- **L147** `            idx = layout_tv((tid, vid))` — **EN:** Assigns a value to idx. **CN:** 将一个值赋给 idx。
+- **L148** `            m = (idx // tile_mn.stride[0]) % tile_mn.shape[0]  # type: ignore[operator, union-attr, index]` — **EN:** Assigns a value to m. **CN:** 将一个值赋给 m。
+- **L149** `            n = (idx // tile_mn.stride[1]) % tile_mn.shape[1]  # type: ignore[operator, union-attr, index]` — **EN:** Assigns a value to n. **CN:** 将一个值赋给 n。
+- **L150** `            if not filled[m][n]:` — **EN:** Starts a conditional branch guarded by `not filled[m][n]`. **CN:** 开始一个由 `not filled[m][n]` 控制的条件分支。
+- **L151** `                filled[m][n] = True` — **EN:** Assigns a value to filled[m][n]. **CN:** 将一个值赋给 filled[m][n]。
+- **L152** `                print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L153** `                    "\\node[fill=%s] at (%d,%d) {\\shortstack{T%d \\\\ V%d}};\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `                    % (color(tid, vid), m, n, tid, vid)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    print(` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L158** `        "\\draw[color=black,thick,shift={(-0.5,-0.5)}] (0,0) grid (%d,%d);\n\n" % (M, N)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    for m in range(M):` — **EN:** Starts a loop assigning items from `range(M)` to `m`. **CN:** 开始一个循环，将 `range(M)` 的元素赋给 `m`。
+- **L161** `        print("\\node at (%d,%d) {\\Large{\\texttt{%d}}};\n" % (m, -1, m))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L162** `    for n in range(N):` — **EN:** Starts a loop assigning items from `range(N)` to `n`. **CN:** 开始一个循环，将 `range(N)` 的元素赋给 `n`。
+- **L163** `        print("\\node at (%d,%d) {\\Large{\\texttt{%d}}};\n" % (-1, n, n))` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    ## Footer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L166** `    print("\\end{tikzpicture}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L167** `    print("\\end{document}")` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.print_latex`. CN: 模块名为 `CuTeDSL.cutlass.utils.print_latex`。
+- EN: Top-level functions: tikz_color_bwx8, tikz_color_white, tikz_color_tv, print_latex, print_latex_tv CN: 顶层函数包括：tikz_color_bwx8, tikz_color_white, tikz_color_tv, print_latex, print_latex_tv
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..cute:Layout,ComposedLayout,append,is_static,make_layout,size,product_each,rank, ..cute.typing:IntTuple CN: 内部依赖：..cute:Layout,ComposedLayout,append,is_static,make_layout,size,product_each,rank, ..cute.typing:IntTuple
+- EN: External or standard-library dependencies: typing:Callable,Union CN: 外部或标准库依赖：typing:Callable,Union

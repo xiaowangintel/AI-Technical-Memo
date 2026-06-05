@@ -1,0 +1,602 @@
+# convolution.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/convolution.h`
+**Purpose / 用途**: Provides CUTLASS convolution infrastructure. / 提供CUTLASS 卷积基础设施。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 34 / 第 34 行** — `This file contains definitions and utility functions for describing convolution problem sizes in terms of`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 35 / 第 35 行** — `activation (NHWC), filter (KRSC), output (NPQK), padding (pad_h, pad_w), stride (stride_h, stride_w), and`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 36 / 第 36 行** — `dilation (dilation_h, dilation_w).  Furthermore, it defines helper functions to map CUTLASS's implicit gemm`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 37 / 第 37 行** — `tensor extents, sizes, and data types to that of the convolution's extents, sizes, and data types.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 38 / 第 38 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 39 / 第 39 行** — `                        * Mapping convolutions to Gemm computation *`
+  - **EN**: Documentation/comment text: `Mapping convolutions to Gemm computation *`.
+  - **CN**: 文档/注释内容：`Mapping convolutions to Gemm computation *`。
+- **Line 40 / 第 40 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 41 / 第 41 行** — `Cutlass implements convolutions with the Implicit Gemm algorithm.  This algorithm performs a gemm`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 42 / 第 42 行** — `(general matrix-matrix multiply) on the convolution tensors Activation, Filter, and Output.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 43 / 第 43 行** — `The underlying gemm operation follows the standard gemm definition:`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 44 / 第 44 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 45 / 第 45 行** — `                                     C = A * B + C`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 46 / 第 46 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 47 / 第 47 行** — `                               A and B are input matrices`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 48 / 第 48 行** — `                            C is source and output matrix`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `For the three convolutional operators (Fprop, Dgrad, Wgrad), ImplicitGemm matrices A, B, and C are mapped`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 52 / 第 52 行** — `to convolution tensors Activation, Filter and Output as described in the table below.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 53 / 第 53 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 54 / 第 54 行** — `        ___________________________________________________________________________`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 55 / 第 55 行** — `         ConvolutionalOperator |        A        |      B         |       C`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 56 / 第 56 行** — `        ___________________________________________________________________________`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 57 / 第 57 行** — `        |                      |                 |                |               |`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 58 / 第 58 行** — `        |       Fprop          |    Activation   |    Filter      |     Output    |`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 59 / 第 59 行** — `        |       Dgrad          |     Output      |    Filter      |   Activation  |`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 60 / 第 60 行** — `        |       Wgrad          |     Output      |  Activation    |     Filter    |`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 61 / 第 61 行** — `        ___________________________________________________________________________`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 62 / 第 62 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 63 / 第 63 行** — `In convolution codebase, DO NOT mix using (A, B, C) with (Activation, Filter, Output).`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 64 / 第 64 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 65 / 第 65 行** — `For example, it's confusing and error prone to document a convolution class or function`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 66 / 第 66 行** — `as operating on "A, B, Output."  Instead, use the mapping functions below,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 67 / 第 67 行** — `and adhere to using either A, B, C or Activation, Filter, Output.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 68 / 第 68 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 69 / 第 69 行** — `Map elements' data types (ImplicitGemm -> Conv): GemmToConvElementMap`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 70 / 第 70 行** — `Map elements' data types (Conv -> ImplicitGemm): ConvToGemmElementMap`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 71 / 第 71 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 72 / 第 72 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 73 / 第 73 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 74 / 第 74 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 75 / 第 75 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 76 / 第 76 行** — `#include "cutlass/layout/tensor.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/tensor.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/tensor.h`。
+- **Line 77 / 第 77 行** — `#include "cutlass/tensor_coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_coord.h`。
+- **Line 78 / 第 78 行** — `#include "cutlass/fast_math.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/fast_math.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/fast_math.h`。
+- **Line 79 / 第 79 行** — `#include "cutlass/gemm/gemm_enumerated_types.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/gemm_enumerated_types.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/gemm_enumerated_types.h`。
+- **Line 80 / 第 80 行** — `#include "cutlass/matrix_coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/matrix_coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/matrix_coord.h`。
+- **Line 81 / 第 81 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 82 / 第 82 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 83 / 第 83 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 84 / 第 84 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 85 / 第 85 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 86 / 第 86 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 87 / 第 87 行** — `/// Convolutional operator`
+  - **EN**: Inline comment explaining intent: `Convolutional operator`.
+  - **CN**: 行内注释说明意图：`Convolutional operator`。
+- **Line 88 / 第 88 行** — `enum class Operator {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 89 / 第 89 行** — `  kFprop,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 90 / 第 90 行** — `  kDgrad,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 91 / 第 91 行** — `  kWgrad,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 92 / 第 92 行** — `  kDeconv`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 93 / 第 93 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 94 / 第 94 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 95 / 第 95 行** — `/// Distinguishes convolution from cross correlation`
+  - **EN**: Inline comment explaining intent: `Distinguishes convolution from cross correlation`.
+  - **CN**: 行内注释说明意图：`Distinguishes convolution from cross correlation`。
+- **Line 96 / 第 96 行** — `enum class Mode {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 97 / 第 97 行** — `  kCrossCorrelation,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 98 / 第 98 行** — `  kConvolution`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 99 / 第 99 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 100 / 第 100 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 101 / 第 101 行** — `/// Selects among several implementation variants trading off performance with simplicity`
+  - **EN**: Inline comment explaining intent: `Selects among several implementation variants trading off performance with simplicity`.
+  - **CN**: 行内注释说明意图：`Selects among several implementation variants trading off performance with simplicity`。
+- **Line 102 / 第 102 行** — `enum class IteratorAlgorithm {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 103 / 第 103 行** — `  kAnalytic,      ///< functionally correct in all cases but lower performance`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 104 / 第 104 行** — `  kOptimized,     ///< optimized for R <= 32, S <= 32 and unity-stride dgrad`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 105 / 第 105 行** — `  kFixedChannels, ///< Analytic algorithm optimized for fixed channel count (C == AccessSize)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 106 / 第 106 行** — `  kFewChannels,   ///< Analytic algorithm optimized for few channels (C divisible by AccessSize)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 107 / 第 107 行** — `  kFixedStrideDilation ///< Optimized for fixed stride and dilation`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 108 / 第 108 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 109 / 第 109 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 110 / 第 110 行** — `/// Distinguishes among partial specializations that accelerate certain problems where convolution`
+  - **EN**: Inline comment explaining intent: `Distinguishes among partial specializations that accelerate certain problems where convolution`.
+  - **CN**: 行内注释说明意图：`Distinguishes among partial specializations that accelerate certain problems where convolution`。
+- **Line 111 / 第 111 行** — `/// stride is unit.`
+  - **EN**: Inline comment explaining intent: `stride is unit.`.
+  - **CN**: 行内注释说明意图：`stride is unit.`。
+- **Line 112 / 第 112 行** — `enum class StrideSupport {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 113 / 第 113 行** — `  kStrided,       ///< arbitrary convolution stride`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 114 / 第 114 行** — `  kUnity,         ///< unit convolution stride`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 115 / 第 115 行** — `  kFixed          ///< fixed convolution stride`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 116 / 第 116 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 117 / 第 117 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 118 / 第 118 行** — `/// Identifies split-K mode`
+  - **EN**: Inline comment explaining intent: `Identifies split-K mode`.
+  - **CN**: 行内注释说明意图：`Identifies split-K mode`。
+- **Line 119 / 第 119 行** — `enum class SplitKMode {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 120 / 第 120 行** — `  kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 121 / 第 121 行** — `  kSerial,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 122 / 第 122 行** — `  kParallel`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 123 / 第 123 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 124 / 第 124 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 125 / 第 125 行** — `/// Identifies group mode`
+  - **EN**: Inline comment explaining intent: `Identifies group mode`.
+  - **CN**: 行内注释说明意图：`Identifies group mode`。
+- **Line 126 / 第 126 行** — `enum class GroupMode {`
+  - **EN**: Declares or defines an enumeration.
+  - **CN**: 声明或定义一个枚举。
+- **Line 127 / 第 127 行** — `  kNone,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 128 / 第 128 行** — `  kSingleGroup,   ///< One CTA calculates one group or less`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 129 / 第 129 行** — `  kMultipleGroup, ///< One CTA calculates multiple groups`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 130 / 第 130 行** — `  kDepthwise      ///< One CTA calculates cta_n groups (problem_size.C == problem_size.K == problem_size.groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 131 / 第 131 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 132 / 第 132 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 133 / 第 133 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 134 / 第 134 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 135 / 第 135 行** — `/// Shape of a tensor`
+  - **EN**: Inline comment explaining intent: `Shape of a tensor`.
+  - **CN**: 行内注释说明意图：`Shape of a tensor`。
+- **Line 136 / 第 136 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 137 / 第 137 行** — `  int N = 1,`
+  - **EN**: Adds template parameter specifier `int N = 1`.
+  - **CN**: 补充模板参数说明符 `int N = 1`。
+- **Line 138 / 第 138 行** — `  int H = 1,`
+  - **EN**: Adds template parameter specifier `int H = 1`.
+  - **CN**: 补充模板参数说明符 `int H = 1`。
+- **Line 139 / 第 139 行** — `  int W = 1,`
+  - **EN**: Adds template parameter specifier `int W = 1`.
+  - **CN**: 补充模板参数说明符 `int W = 1`。
+- **Line 140 / 第 140 行** — `  int C = 1`
+  - **EN**: Adds template parameter specifier `int C = 1`.
+  - **CN**: 补充模板参数说明符 `int C = 1`。
+- **Line 141 / 第 141 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 142 / 第 142 行** — `struct TensorNHWCShape {`
+  - **EN**: Starts the definition of struct `TensorNHWCShape`.
+  - **CN**: 开始定义 struct `TensorNHWCShape`。
+- **Line 143 / 第 143 行** — `  static int const kN = N;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 144 / 第 144 行** — `  static int const kH = H;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 145 / 第 145 行** — `  static int const kW = W;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 146 / 第 146 行** — `  static int const kC = C;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 147 / 第 147 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 148 / 第 148 行** — `  static int const kHW = H * W;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 149 / 第 149 行** — `  static int const kNHW = N * kHW;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 150 / 第 150 行** — `  static int const kNHWC = N * H * W * C;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 151 / 第 151 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 152 / 第 152 行** — `  static int const kCount = kNHWC;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 153 / 第 153 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 154 / 第 154 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 155 / 第 155 行** — `  // Static member functions`
+  - **EN**: Inline comment explaining intent: `Static member functions`.
+  - **CN**: 行内注释说明意图：`Static member functions`。
+- **Line 156 / 第 156 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 157 / 第 157 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 158 / 第 158 行** — `  /// Returns a Coord object`
+  - **EN**: Inline comment explaining intent: `Returns a Coord object`.
+  - **CN**: 行内注释说明意图：`Returns a Coord object`。
+- **Line 159 / 第 159 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 160 / 第 160 行** — `  static Coord<4> toCoord() {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 161 / 第 161 行** — `    return make_Coord(kN, kH, kW, kC);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 162 / 第 162 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 163 / 第 163 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 164 / 第 164 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 165 / 第 165 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 166 / 第 166 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 167 / 第 167 行** — `/// Shape of a conv2d stride, which controls how the filter convolves around the input volume`
+  - **EN**: Inline comment explaining intent: `Shape of a conv2d stride, which controls how the filter convolves around the input volume`.
+  - **CN**: 行内注释说明意图：`Shape of a conv2d stride, which controls how the filter convolves around the input volume`。
+- **Line 168 / 第 168 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 169 / 第 169 行** — `  /// Stride in horizontal direction`
+  - **EN**: Adds template parameter specifier `/// Stride in horizontal direction`.
+  - **CN**: 补充模板参数说明符 `/// Stride in horizontal direction`。
+- **Line 170 / 第 170 行** — `  int u = 1,`
+  - **EN**: Adds template parameter specifier `int u = 1`.
+  - **CN**: 补充模板参数说明符 `int u = 1`。
+- **Line 171 / 第 171 行** — `  /// Stride in vertical direction`
+  - **EN**: Adds template parameter specifier `/// Stride in vertical direction`.
+  - **CN**: 补充模板参数说明符 `/// Stride in vertical direction`。
+- **Line 172 / 第 172 行** — `  int v = 1`
+  - **EN**: Adds template parameter specifier `int v = 1`.
+  - **CN**: 补充模板参数说明符 `int v = 1`。
+- **Line 173 / 第 173 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 174 / 第 174 行** — `struct Stride2D {`
+  - **EN**: Starts the definition of struct `Stride2D`.
+  - **CN**: 开始定义 struct `Stride2D`。
+- **Line 175 / 第 175 行** — `  static int const kU = u;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 176 / 第 176 行** — `  static int const kV = v;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 177 / 第 177 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 178 / 第 178 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 179 / 第 179 行** — `  // Static member functions`
+  - **EN**: Inline comment explaining intent: `Static member functions`.
+  - **CN**: 行内注释说明意图：`Static member functions`。
+- **Line 180 / 第 180 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 181 / 第 181 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 182 / 第 182 行** — `  /// Returns a Coord object`
+  - **EN**: Inline comment explaining intent: `Returns a Coord object`.
+  - **CN**: 行内注释说明意图：`Returns a Coord object`。
+- **Line 183 / 第 183 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 184 / 第 184 行** — `  static Coord<2> toCoord() {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 185 / 第 185 行** — `    return make_Coord(kU, kV);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 186 / 第 186 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 187 / 第 187 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 188 / 第 188 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 189 / 第 189 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 190 / 第 190 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 191 / 第 191 行** — `} // namespace conv`
+  - **EN**: Closes namespace `conv`.
+  - **CN**: 关闭命名空间 `conv`。
+- **Line 192 / 第 192 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 193 / 第 193 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 194 / 第 194 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Implicit GEMM / 隐式 GEMM
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/layout/tensor.h` — Layout definition `cutlass/layout/tensor.h` / 布局定义 `cutlass/layout/tensor.h`
+- `cutlass/tensor_coord.h` — CUTLASS dependency `cutlass/tensor_coord.h` / CUTLASS 依赖 `cutlass/tensor_coord.h`
+- `cutlass/fast_math.h` — CUTLASS dependency `cutlass/fast_math.h` / CUTLASS 依赖 `cutlass/fast_math.h`
+- `cutlass/gemm/gemm_enumerated_types.h` — CUTLASS GEMM primitive `cutlass/gemm/gemm_enumerated_types.h` / CUTLASS GEMM 原语 `cutlass/gemm/gemm_enumerated_types.h`
+- `cutlass/matrix_coord.h` — CUTLASS dependency `cutlass/matrix_coord.h` / CUTLASS 依赖 `cutlass/matrix_coord.h`

@@ -1,0 +1,1655 @@
+# sm90_evt_operations.hpp — Code Analysis / 代码分析
+
+## Source / 源文件
+- EN: `test/unit/gemm/device/sm90_evt_operations.hpp`
+- 中文：`test/unit/gemm/device/sm90_evt_operations.hpp`
+
+## Purpose / 目的
+- EN: This file contains host reference and operations for sm90 evt unit test tailored to the configuration encoded in `sm90_evt_operations`. The file-level brief is: "Host reference and operations for Sm90 EVT unit test."
+- 中文：该文件包含针对 `sm90_evt_operations` 配置定制的 CUTLASS GEMM 测试。 文件级摘要为：“Host reference and operations for Sm90 EVT unit test”。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1** `/***************************************************************************************************`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L2** ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - EN: States the copyright ownership for this source file.
+  - 中文：说明该源文件的版权归属。
+- **L3** ` * SPDX-License-Identifier: BSD-3-Clause`
+  - EN: Records the SPDX license identifier for automated license tracking.
+  - 中文：记录 SPDX 许可证标识，便于自动化许可证追踪。
+- **L4** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L5** ` * Redistribution and use in source and binary forms, with or without`
+  - EN: Begins the license terms that govern redistribution and reuse.
+  - 中文：开始说明控制再分发与复用的许可证条款。
+- **L6** ` * modification, are permitted provided that the following conditions are met:`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L7** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L8** ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L9** ` * list of conditions and the following disclaimer.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L10** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L11** ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L12** ` * this list of conditions and the following disclaimer in the documentation`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L13** ` * and/or other materials provided with the distribution.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L14** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L15** ` * 3. Neither the name of the copyright holder nor the names of its`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L16** ` * contributors may be used to endorse or promote products derived from`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L17** ` * this software without specific prior written permission.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L18** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L19** ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L20** ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L21** ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L22** ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L23** ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L24** ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L25** ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L26** ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L27** ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L28** ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L29** ` *`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L30** ` **************************************************************************************************/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L31** `/*! \file`
+  - EN: Marks the start of file-level documentation.
+  - 中文：标记文件级文档说明的开始。
+- **L32** `    \brief Host reference and operations for Sm90 EVT unit test`
+  - EN: Provides a short summary of the file purpose.
+  - 中文：提供该文件用途的简短摘要。
+- **L33** `*/`
+  - EN: Continues the license or documentation comment block.
+  - 中文：继续许可证或文档注释块。
+- **L34** `#pragma once`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L35** `#include "gemm_testbed_3x_evt.hpp"`
+  - EN: Includes `gemm_testbed_3x_evt.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `gemm_testbed_3x_evt.hpp`，这是该测试编译单元所需的依赖。
+- **L36** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L37** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L38** `/// Host references used for testing`
+  - EN: Adds a human-readable comment for the next code region: / Host references used for testing.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Host references used for testing。
+- **L39** `namespace test::gemm::device {`
+  - EN: Opens namespace `test::gemm::device` to isolate one test configuration.
+  - 中文：打开命名空间 `test::gemm::device`，用于隔离一组测试配置。
+- **L40** `template<class NodeOp, class ...ChildOp>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L41** `using HEVT = HostTreeVisitor<NodeOp, ChildOp...>;`
+  - EN: Creates the alias `HEVT` for the helper type `HostTreeVisitor<NodeOp, ChildOp...>`.
+  - 中文：为 `HEVT` 创建别名，对应 辅助类型 `HostTreeVisitor<NodeOp, ChildOp...>`。
+- **L42** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L43** `template<class EdgeTuple, class ...Ops>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L44** `using HDAG = HostTopoVisitor<EdgeTuple, Ops...>;`
+  - EN: Creates the alias `HDAG` for the helper type `HostTopoVisitor<EdgeTuple, Ops...>`.
+  - 中文：为 `HDAG` 创建别名，对应 辅助类型 `HostTopoVisitor<EdgeTuple, Ops...>`。
+- **L45** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L46** `template<class InputTree, class OutputTree, class... AuxOutTrees>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L47** `using HST = HostSplitTreeVisitor<InputTree, OutputTree, AuxOutTrees...>;`
+  - EN: Creates the alias `HST` for the helper type `HostSplitTreeVisitor<InputTree, OutputTree, AuxOutTrees...>`.
+  - 中文：为 `HST` 创建别名，对应 辅助类型 `HostSplitTreeVisitor<InputTree, OutputTree, AuxOutTrees...>`。
+- **L48** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L49** `/// D = alpha * acc + beta * C + AuxLoad`
+  - EN: Adds a human-readable comment for the next code region: / D = alpha * acc + beta * C + AuxLoad.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = alpha * acc + beta * C + AuxLoad。
+- **L50** `template<class Gemm, class ElementAux, class LayoutAux>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L51** `class HostEVTAuxLoad {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L52** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L53** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L54** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L55** `  using ElementD = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementD` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementD` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L56** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L57** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L58** `  using ScalarAlpha = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarAlpha` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarAlpha` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L59** `  using AccFetchNode = HostAccumulator<>;`
+  - EN: Creates the alias `AccFetchNode` for the helper type `HostAccumulator<>`.
+  - 中文：为 `AccFetchNode` 创建别名，对应 辅助类型 `HostAccumulator<>`。
+- **L60** `  using AuxLoadNode = HostAuxLoad<ElementAux, LayoutAux, false>;`
+  - EN: Creates the alias `AuxLoadNode` for the helper type `HostAuxLoad<ElementAux, LayoutAux, false>`.
+  - 中文：为 `AuxLoadNode` 创建别名，对应 辅助类型 `HostAuxLoad<ElementAux, LayoutAux, false>`。
+- **L61** `  using TernaryCompute0 = HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarAlpha, AccFetchNode, AuxLoadNode>;`
+  - EN: Creates the alias `TernaryCompute0` for the helper type `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarAlpha, AccFetchNode, AuxLoadNode>`.
+  - 中文：为 `TernaryCompute0` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarAlpha, AccFetchNode, AuxLoadNode>`。
+- **L62** `  using ScalarBeta = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarBeta` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarBeta` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L63** `  using CLoadNode = HostAuxLoad<ElementC, LayoutC, true>;`
+  - EN: Creates the alias `CLoadNode` for the helper type `HostAuxLoad<ElementC, LayoutC, true>`.
+  - 中文：为 `CLoadNode` 创建别名，对应 辅助类型 `HostAuxLoad<ElementC, LayoutC, true>`。
+- **L64** `  using TernaryCompute1 = HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, TernaryCompute0>;`
+  - EN: Creates the alias `TernaryCompute1` for the helper type `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, TernaryCompute0>`.
+  - 中文：为 `TernaryCompute1` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, TernaryCompute0>`。
+- **L65** `  using EVTModule = HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>;`
+  - EN: Creates the alias `EVTModule` for the helper type `HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>`.
+  - 中文：为 `EVTModule` 创建别名，对应 辅助类型 `HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>`。
+- **L66** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L67** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L68** `/// D = alpha * acc + beta * C + per-column bias`
+  - EN: Adds a human-readable comment for the next code region: / D = alpha * acc + beta * C + per-column bias.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = alpha * acc + beta * C + per-column bias。
+- **L69** `template<class Gemm, class ElementBias>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L70** `class HostPerColBias {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L71** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L72** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L73** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L74** `  using ElementD = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementD` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementD` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L75** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L76** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L77** `  using ScalarAlpha = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarAlpha` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarAlpha` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L78** `  using AccFetchNode = HostAccumulator<>;`
+  - EN: Creates the alias `AccFetchNode` for the helper type `HostAccumulator<>`.
+  - 中文：为 `AccFetchNode` 创建别名，对应 辅助类型 `HostAccumulator<>`。
+- **L79** `  using RowBroadcastNode = HostRowBroadcast<ElementBias>;`
+  - EN: Creates the alias `RowBroadcastNode` for the helper type `HostRowBroadcast<ElementBias>`.
+  - 中文：为 `RowBroadcastNode` 创建别名，对应 辅助类型 `HostRowBroadcast<ElementBias>`。
+- **L80** `  using TernaryCompute0 = HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarAlpha, AccFetchNode, RowBroadcastNode>;`
+  - EN: Creates the alias `TernaryCompute0` for the helper type `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarAlpha, AccFetchNode, RowBroadcastNode>`.
+  - 中文：为 `TernaryCompute0` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarAlpha, AccFetchNode, RowBroadcastNode>`。
+- **L81** `  using ScalarBeta = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarBeta` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarBeta` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L82** `  using CLoadNode = HostAuxLoad<ElementC, LayoutC, true>;`
+  - EN: Creates the alias `CLoadNode` for the helper type `HostAuxLoad<ElementC, LayoutC, true>`.
+  - 中文：为 `CLoadNode` 创建别名，对应 辅助类型 `HostAuxLoad<ElementC, LayoutC, true>`。
+- **L83** `  using TernaryCompute1 = HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, TernaryCompute0>;`
+  - EN: Creates the alias `TernaryCompute1` for the helper type `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, TernaryCompute0>`.
+  - 中文：为 `TernaryCompute1` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, TernaryCompute0>`。
+- **L84** `  using EVTModule = HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>;`
+  - EN: Creates the alias `EVTModule` for the helper type `HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>`.
+  - 中文：为 `EVTModule` 创建别名，对应 辅助类型 `HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>`。
+- **L85** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L86** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L87** `/// D = beta * C + Graph(relu(alpha * acc + aux) + aux)`
+  - EN: Adds a human-readable comment for the next code region: / D = beta * C + Graph(relu(alpha * acc + aux) + aux).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = beta * C + Graph(relu(alpha * acc + aux) + aux)。
+- **L88** `/// Testing EVT - DAG structure`
+  - EN: Adds a human-readable comment for the next code region: / Testing EVT - DAG structure.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Testing EVT - DAG structure。
+- **L89** `template<class Gemm>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L90** `class HostEVTDAG {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L91** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L92** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L93** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L94** `  using ElementD = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementD` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementD` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L95** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L96** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L97** `  using ScalarAlpha = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarAlpha` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarAlpha` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L98** `  using AccFetchNode = HostAccumulator<>;`
+  - EN: Creates the alias `AccFetchNode` for the helper type `HostAccumulator<>`.
+  - 中文：为 `AccFetchNode` 创建别名，对应 辅助类型 `HostAccumulator<>`。
+- **L99** `  using AuxLoadNode = HostAuxLoad<cutlass::half_t, cutlass::layout::RowMajor, false>;`
+  - EN: Creates the alias `AuxLoadNode` for a row-major memory layout.
+  - 中文：为 `AuxLoadNode` 创建别名，对应 行主序内存布局。
+- **L100** `  using DAGNode = HDAG<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L101** `    float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L102** `    cute::tuple<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L103** `      cute::tuple<>, // 0. alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L104** `      cute::tuple<>, // 1. acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L105** `      cute::tuple<>, // 2. aux load`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L106** `      cute::tuple<cute::_0, cute::_1, cute::_2>, // 3. alpha * acc + aux load`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L107** `      cute::tuple<cute::_3>, // relu(alpha * acc + aux load)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L108** `      cute::tuple<cute::_2, cute::_4> // relu(alpha * acc + aux load) + aux load`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: relu(alpha * acc + aux load) + aux load.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：relu(alpha * acc + aux load) + aux load。
+- **L109** `    >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L110** `    ScalarAlpha,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L111** `    AccFetchNode,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L112** `    AuxLoadNode,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L113** `    HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L114** `    HostCompute<cutlass::epilogue::thread::ReLu>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L115** `    HostCompute<cutlass::plus>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L116** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L117** `  using ScalarBeta = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarBeta` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarBeta` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L118** `  using CLoadNode = HostAuxLoad<ElementC, LayoutC, true>;`
+  - EN: Creates the alias `CLoadNode` for the helper type `HostAuxLoad<ElementC, LayoutC, true>`.
+  - 中文：为 `CLoadNode` 创建别名，对应 辅助类型 `HostAuxLoad<ElementC, LayoutC, true>`。
+- **L119** `  using TernaryCompute1 = HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, DAGNode>;`
+  - EN: Creates the alias `TernaryCompute1` for the helper type `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, DAGNode>`.
+  - 中文：为 `TernaryCompute1` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, DAGNode>`。
+- **L120** `  using EVTModule = HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>;`
+  - EN: Creates the alias `EVTModule` for the helper type `HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>`.
+  - 中文：为 `EVTModule` 创建别名，对应 辅助类型 `HEVT<HostAuxStore<ElementD, LayoutD, true>, TernaryCompute1>`。
+- **L121** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L122** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L123** `/// EVT = alpha * acc + C`
+  - EN: Adds a human-readable comment for the next code region: / EVT = alpha * acc + C.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ EVT = alpha * acc + C。
+- **L124** `/// D = Graph(maximum(EVT + per-row bias, EVT))`
+  - EN: Adds a human-readable comment for the next code region: / D = Graph(maximum(EVT + per-row bias, EVT)).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = Graph(maximum(EVT + per-row bias, EVT))。
+- **L125** `/// Testing DAG - EVT`
+  - EN: Adds a human-readable comment for the next code region: / Testing DAG - EVT.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Testing DAG - EVT。
+- **L126** `template<class Gemm>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L127** `class HostDAGEVT {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L128** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L129** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L130** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L131** `  using ElementD = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementD` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementD` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L132** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L133** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L134** `  using EVTNode = HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L135** `    HostAuxStore<cutlass::half_t, cutlass::layout::RowMajor, false>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L136** `    HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L137** `      HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L138** `      HostScalarBroadcast<2>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L139** `      HostAccumulator<>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L140** `      HostAuxLoad<ElementC, LayoutC, true>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L141** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L142** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L143** `  using EVTModule = HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L144** `    HostAuxStore<ElementD, LayoutD, true>,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L145** `    HDAG<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L146** `      float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L147** `      cute::tuple<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L148** `      cute::tuple<>, // 0. EVT`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L149** `      cute::tuple<>, // 1. per-row bias`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L150** `      cute::tuple<cute::_0, cute::_1>, // 2. EVT + per-row bias`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L151** `      cute::tuple<cute::_0, cute::_2> // 3. maximum(EVT + per-row bias, EVT)`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: 3. maximum(EVT + per-row bias, EVT).
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：3. maximum(EVT + per-row bias, EVT)。
+- **L152** `      >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L153** `      EVTNode,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L154** `      HostColBroadcast<cutlass::half_t, cute::Stride<cute::_1,cute::_0,int>>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L155** `      HostCompute<cutlass::plus>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L156** `      HostCompute<cutlass::maximum_with_default_nan_propagation>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L157** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L158** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L159** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L160** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L161** `/// Xreduce(alpha * acc + beta * C)`
+  - EN: Adds a human-readable comment for the next code region: / Xreduce(alpha * acc + beta * C).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Xreduce(alpha * acc + beta * C)。
+- **L162** `template<class Gemm, class ReduceOp>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L163** `class HostReduce {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L164** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L165** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L166** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L167** `  using ElementD = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementD` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementD` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L168** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L169** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L170** `  using ScalarAlpha = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarAlpha` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarAlpha` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L171** `  using AccFetchNode = HostAccumulator<>;`
+  - EN: Creates the alias `AccFetchNode` for the helper type `HostAccumulator<>`.
+  - 中文：为 `AccFetchNode` 创建别名，对应 辅助类型 `HostAccumulator<>`。
+- **L172** `  using BinaryCompute0 = HEVT<HostCompute<cutlass::multiplies>, ScalarAlpha, AccFetchNode>;`
+  - EN: Creates the alias `BinaryCompute0` for the helper type `HEVT<HostCompute<cutlass::multiplies>, ScalarAlpha, AccFetchNode>`.
+  - 中文：为 `BinaryCompute0` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::multiplies>, ScalarAlpha, AccFetchNode>`。
+- **L173** `  using ScalarBeta = HostScalarBroadcast<1>;`
+  - EN: Creates the alias `ScalarBeta` for the helper type `HostScalarBroadcast<1>`.
+  - 中文：为 `ScalarBeta` 创建别名，对应 辅助类型 `HostScalarBroadcast<1>`。
+- **L174** `  using CLoadNode = HostAuxLoad<ElementC, LayoutC, true>;`
+  - EN: Creates the alias `CLoadNode` for the helper type `HostAuxLoad<ElementC, LayoutC, true>`.
+  - 中文：为 `CLoadNode` 创建别名，对应 辅助类型 `HostAuxLoad<ElementC, LayoutC, true>`。
+- **L175** `  using TernaryCompute1 = HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, BinaryCompute0>;`
+  - EN: Creates the alias `TernaryCompute1` for the helper type `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, BinaryCompute0>`.
+  - 中文：为 `TernaryCompute1` 创建别名，对应 辅助类型 `HEVT<HostCompute<cutlass::homogeneous_multiply_add>, ScalarBeta, CLoadNode, BinaryCompute0>`。
+- **L176** `  using ReduceNode = HEVT<ReduceOp, TernaryCompute1>;`
+  - EN: Creates the alias `ReduceNode` for the helper type `HEVT<ReduceOp, TernaryCompute1>`.
+  - 中文：为 `ReduceNode` 创建别名，对应 辅助类型 `HEVT<ReduceOp, TernaryCompute1>`。
+- **L177** `  using EVTModule = HEVT<HostAuxStore<ElementD, LayoutD, true>, ReduceNode>;`
+  - EN: Creates the alias `EVTModule` for the helper type `HEVT<HostAuxStore<ElementD, LayoutD, true>, ReduceNode>`.
+  - 中文：为 `EVTModule` 创建别名，对应 辅助类型 `HEVT<HostAuxStore<ElementD, LayoutD, true>, ReduceNode>`。
+- **L178** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L179** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L180** `// Z = scale_a * scale_b * alpha * acc + beta * scale_c * C + per-row bias`
+  - EN: Adds a human-readable comment for the next code region: Z = scale_a * scale_b * alpha * acc + beta * scale_c * C + per-row bias.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Z = scale_a * scale_b * alpha * acc + beta * scale_c * C + per-row bias。
+- **L181** `// if D is fp8`
+  - EN: Adds a human-readable comment for the next code region: if D is fp8.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：if D is fp8。
+- **L182** `//   D = scale_d * activation(Z)`
+  - EN: Adds a human-readable comment for the next code region: D = scale_d * activation(Z).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：D = scale_d * activation(Z)。
+- **L183** `// else`
+  - EN: Adds a human-readable comment for the next code region: else.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：else。
+- **L184** `//   D = activation(Z)`
+  - EN: Adds a human-readable comment for the next code region: D = activation(Z).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：D = activation(Z)。
+- **L185** `template <class Gemm, template <class> class ActivationFn, class ElementD>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L186** `class HostScaledLinCombPerRowBiasEltAct {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L187** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L188** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L189** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L190** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L191** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L192** `  using EVTModule = HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L193** `  HostAuxStore<ElementD, LayoutD, true>,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L194** `  HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L195** `    HostCompute<cutlass::epilogue::fusion::detail::ScaleOutOp<ElementD>::template Op>,  // activation(Z) * scaled_d`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L196** `    HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L197** `      HostCompute<ActivationFn>, // activation(Z)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L198** `      HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L199** `        HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L200** `        HostScalarBroadcast<1, 2, cute::Stride<cute::_0,cute::_0,int64_t>>, // scale_c * beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L201** `        HostAuxLoad<ElementC, LayoutC, true>, // C`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L202** `        HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L203** `          HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L204** `          HostScalarBroadcast<1, 3, cute::Stride<cute::_0,cute::_0,int64_t>>, // scale_a * scale_b * alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L205** `          HostAccumulator<>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L206** `          HostColBroadcast<ElementD, cute::Stride<cute::_1,cute::_0,int64_t>>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L207** `        >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L208** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L209** `    >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L210** `    HostScalarBroadcast<1> // scale_d`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: scale_d.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：scale_d。
+- **L211** `  >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L212** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L213** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L214** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L215** `// Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias`
+  - EN: Adds a human-readable comment for the next code region: Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias。
+- **L216** `// if D is fp8`
+  - EN: Adds a human-readable comment for the next code region: if D is fp8.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：if D is fp8。
+- **L217** `//   amax_d = max(abs(elements in activation(Z)))`
+  - EN: Adds a human-readable comment for the next code region: amax_d = max(abs(elements in activation(Z))).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：amax_d = max(abs(elements in activation(Z)))。
+- **L218** `//   D = scale_d * activation(Z)`
+  - EN: Adds a human-readable comment for the next code region: D = scale_d * activation(Z).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：D = scale_d * activation(Z)。
+- **L219** `// else`
+  - EN: Adds a human-readable comment for the next code region: else.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：else。
+- **L220** `//   D = activation(Z)`
+  - EN: Adds a human-readable comment for the next code region: D = activation(Z).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：D = activation(Z)。
+- **L221** `// if Aux is fp8`
+  - EN: Adds a human-readable comment for the next code region: if Aux is fp8.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：if Aux is fp8。
+- **L222** `//   amax_aux = max(abs(elements in Z))`
+  - EN: Adds a human-readable comment for the next code region: amax_aux = max(abs(elements in Z)).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：amax_aux = max(abs(elements in Z))。
+- **L223** `//   Aux = scale_aux * Z`
+  - EN: Adds a human-readable comment for the next code region: Aux = scale_aux * Z.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Aux = scale_aux * Z。
+- **L224** `// else`
+  - EN: Adds a human-readable comment for the next code region: else.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：else。
+- **L225** `//   Aux = Z`
+  - EN: Adds a human-readable comment for the next code region: Aux = Z.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Aux = Z。
+- **L226** `template <class Gemm, template <class> class ActivationFn, class ElementD, class ElementAux = ElementD>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L227** `class HostScaledLinCombPerRowBiasEltActAmaxAux {`
+  - EN: Opens a new scoped block for the definition that just began.
+  - 中文：为刚开始的定义打开一个新的作用域块。
+- **L228** `public:`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L229** `  using ElementC = typename Gemm::GemmKernel::ElementC;`
+  - EN: Creates the alias `ElementC` for the helper type `typename Gemm::GemmKernel::ElementC`.
+  - 中文：为 `ElementC` 创建别名，对应 辅助类型 `typename Gemm::GemmKernel::ElementC`。
+- **L230** `  using LayoutC = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>;`
+  - EN: Creates the alias `LayoutC` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`.
+  - 中文：为 `LayoutC` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideC>`。
+- **L231** `  using LayoutD = cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>;`
+  - EN: Creates the alias `LayoutD` for the helper type `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`.
+  - 中文：为 `LayoutD` 创建别名，对应 辅助类型 `cutlass::detail::StrideToLayoutTagC_t<typename Gemm::GemmKernel::StrideD>`。
+- **L232** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L233** `  template <typename T>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L234** `  using amax = cutlass::maximum_absolute_value_reduction<T, true>;`
+  - EN: Creates the alias `amax` for the helper type `cutlass::maximum_absolute_value_reduction<T, true>`.
+  - 中文：为 `amax` 创建别名，对应 辅助类型 `cutlass::maximum_absolute_value_reduction<T, true>`。
+- **L235** `  using EVTModuleAuxFp8 = HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L236** `    HostAuxStore<ElementD, LayoutD, true>,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L237** `    HST<float,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L238** `      // Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias`
+  - EN: Adds a human-readable comment for the next code region: Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias。
+- **L239** `      HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L240** `        HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L241** `        HostScalarBroadcast<1, 2, cute::Stride<cute::_0,cute::_0,int64_t>>, // scale_c * beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L242** `        HostAuxLoad<ElementC, LayoutC, true>, // C`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L243** `        HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L244** `          HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L245** `          HostScalarBroadcast<1, 3, cute::Stride<cute::_0,cute::_0,int64_t>>, // scale_a * scale_b * alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L246** `          HostAccumulator<>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L247** `          HostColBroadcast<ElementD, cute::Stride<cute::_1,cute::_0,int64_t>>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L248** `        >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L249** `      >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L250** `      // D = activation(Z) * scaled_d, amax_d = max(abs(elements in D))`
+  - EN: Adds a human-readable comment for the next code region: D = activation(Z) * scaled_d, amax_d = max(abs(elements in D)).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：D = activation(Z) * scaled_d, amax_d = max(abs(elements in D))。
+- **L251** `      HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L252** `        HostCompute<cutlass::epilogue::fusion::detail::ScaleOutOp<ElementD>::template Op>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L253** `        HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L254** `          HostScalarReduce<amax, float>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L255** `          HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L256** `            HostCompute<ActivationFn>, //activation(Z) * scaled_d`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L257** `            HostAccumulator<> // Z`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: Z.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：Z。
+- **L258** `          >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L259** `        >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L260** `        HostScalarBroadcast<1> // scale_d`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: scale_d.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：scale_d。
+- **L261** `      >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L262** `      // Aux = Z * scale_aux, amax_aux = max(abs(elements in Aux))`
+  - EN: Adds a human-readable comment for the next code region: Aux = Z * scale_aux, amax_aux = max(abs(elements in Aux)).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Aux = Z * scale_aux, amax_aux = max(abs(elements in Aux))。
+- **L263** `      HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L264** `        HostAuxStore<ElementAux, cutlass::layout::RowMajor, false>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L265** `        HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L266** `          HostCompute<cutlass::multiplies>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L267** `          HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L268** `            HostScalarReduce<amax, float>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L269** `            HostAccumulator<>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L270** `            >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L271** `          HostScalarBroadcast<1>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L272** `        >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L273** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L274** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L275** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L276** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L277** `  using EVTModuleAuxNotFp8 = HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L278** `    // D = activation(Z) * scaled_d, amax_d = max(abs(elements in D))`
+  - EN: Adds a human-readable comment for the next code region: D = activation(Z) * scaled_d, amax_d = max(abs(elements in D)).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：D = activation(Z) * scaled_d, amax_d = max(abs(elements in D))。
+- **L279** `    HostAuxStore<ElementD, LayoutD, true>,`
+  - EN: Passes output tensor D metadata into the builder.
+  - 中文：向 builder 传入输出张量 D 的元数据。
+- **L280** `      HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L281** `        HostCompute<cutlass::epilogue::fusion::detail::ScaleOutOp<ElementD>::template Op>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L282** `        HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L283** `          HostScalarReduce<amax, float>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L284** `          HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L285** `            HostCompute<ActivationFn>, //activation(Z) * scaled_d`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L286** `            HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L287** `              // Aux = Z`
+  - EN: Adds a human-readable comment for the next code region: Aux = Z.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Aux = Z。
+- **L288** `              HostAuxStore<ElementAux, cutlass::layout::RowMajor, false>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L289** `              // Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias`
+  - EN: Adds a human-readable comment for the next code region: Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：Z = scale_a * scale_b * alpha * acc + scale_c * beta * C + per-row bias。
+- **L290** `              HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L291** `                HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L292** `                HostScalarBroadcast<1, 2, cute::Stride<cute::_0,cute::_0,int64_t>>, // scale_c * beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L293** `                HostAuxLoad<ElementC, LayoutC, true>, // C`
+  - EN: Passes source/output tensor C metadata into the builder.
+  - 中文：向 builder 传入源/输出张量 C 的元数据。
+- **L294** `                HEVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L295** `                  HostCompute<cutlass::homogeneous_multiply_add>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L296** `                  HostScalarBroadcast<1, 3, cute::Stride<cute::_0,cute::_0,int64_t>>, // scale_a * scale_b * alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L297** `                  HostAccumulator<>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L298** `                  HostColBroadcast<ElementD, cute::Stride<cute::_1,cute::_0,int64_t>>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L299** `                >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L300** `              >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L301** `            >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L302** `          >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L303** `        >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L304** `        HostScalarBroadcast<1> // scale_d`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: scale_d.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：scale_d。
+- **L305** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L306** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L307** `      `
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L308** `  using EVTModule = cute::conditional_t<cutlass::epilogue::fusion::detail::is_fp8_v<ElementAux>, EVTModuleAuxFp8, EVTModuleAuxNotFp8>;`
+  - EN: Creates the alias `EVTModule` for the helper type `cute::conditional_t<cutlass::epilogue::fusion::detail::is_fp8_v<ElementAux>, EVTModuleAuxFp8, EVTModuleAuxNotFp8>`.
+  - 中文：为 `EVTModule` 创建别名，对应 辅助类型 `cute::conditional_t<cutlass::epilogue::fusion::detail::is_fp8_v<ElementAux>, EVTModuleAuxFp8, EVTModuleAuxNotFp8>`。
+- **L309** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L310** `};`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L311** `} // namespace test::gemm::device`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L312** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L313** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L314** `namespace cutlass::epilogue {`
+  - EN: Opens namespace `cutlass::epilogue` to isolate one test configuration.
+  - 中文：打开命名空间 `cutlass::epilogue`，用于隔离一组测试配置。
+- **L315** `namespace fusion {`
+  - EN: Opens namespace `fusion` to isolate one test configuration.
+  - 中文：打开命名空间 `fusion`，用于隔离一组测试配置。
+- **L316** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L317** `namespace detail {`
+  - EN: Opens namespace `detail` to isolate one test configuration.
+  - 中文：打开命名空间 `detail`，用于隔离一组测试配置。
+- **L318** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L319** `template <typename T>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L320** `struct maximum_with_default_nan_propagation : maximum<T> {};`
+  - EN: Completes the statement `struct maximum_with_default_nan_propagation : maximum<T> {};`.
+  - 中文：完成语句 `struct maximum_with_default_nan_propagation : maximum<T> {};`。
+- **L321** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L322** `} // namespace detail`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L323** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L324** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L325** `/// D = alpha * acc + beta * C + AuxLoad`
+  - EN: Adds a human-readable comment for the next code region: / D = alpha * acc + beta * C + AuxLoad.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = alpha * acc + beta * C + AuxLoad。
+- **L326** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L327** `  class EpilogueDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L328** `  class AuxLoadDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L329** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L330** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L331** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L332** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L333** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L334** `using Sm90LinCombAuxLoad =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L335** `  Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + (alpha * acc + bias)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L336** `    Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L337** `    Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L338** `    Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementCompute, ElementCompute, RoundStyle>, // alpha * acc + bias`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L339** `      Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L340** `      Sm90AccFetch, // acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L341** `      Sm90AuxLoad<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L342** `        AuxLoadDescriptor::Stages, typename EpilogueDescriptor::EpilogueTile,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L343** `        typename AuxLoadDescriptor::Element,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L344** `        typename AuxLoadDescriptor::Stride, typename AuxLoadDescriptor::SmemLayoutAtom,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L345** `        typename AuxLoadDescriptor::CopyOpS2R // aux load`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: aux load.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：aux load。
+- **L346** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L347** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L348** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L349** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L350** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L351** `/// D = alpha * acc + beta * C + AuxLoadNoSmem`
+  - EN: Adds a human-readable comment for the next code region: / D = alpha * acc + beta * C + AuxLoadNoSmem.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = alpha * acc + beta * C + AuxLoadNoSmem。
+- **L352** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L353** `  class EpilogueDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L354** `  class ElementAux,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L355** `  class StrideAux,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L356** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L357** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L358** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L359** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L360** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L361** `using Sm90LinCombAuxLoadNoSmem =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L362** `  Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + (alpha * acc + bias)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L363** `    Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L364** `    Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L365** `    Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementCompute, ElementCompute, RoundStyle>, // alpha * acc + bias`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L366** `      Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L367** `      Sm90AccFetch, // acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L368** `      Sm90AuxLoad<0, void, ElementAux, StrideAux, void, void> // aux load`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: aux load.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：aux load。
+- **L369** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L370** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L371** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L372** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L373** `/// Example DAG`
+  - EN: Adds a human-readable comment for the next code region: / Example DAG.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Example DAG。
+- **L374** `/// beta * C + Graph(alpha * acc + gamma + acc)`
+  - EN: Adds a human-readable comment for the next code region: / beta * C + Graph(alpha * acc + gamma + acc).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ beta * C + Graph(alpha * acc + gamma + acc)。
+- **L375** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L376** `  typename EpilogueDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L377** `  typename AuxLoadDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L378** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L379** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L380** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L381** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L382** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L383** `using Sm90LinCombEVTDAG =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L384** `  Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + (alpha * acc + aux)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L385** `    Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L386** `    Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L387** `    Sm90TopologicalVisitor<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L388** `      ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L389** `      cute::tuple<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L390** `        cute::seq<>, // 0. alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L391** `        cute::seq<>, // 1. acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L392** `        cute::seq<>, // 2. aux load`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L393** `        cute::seq<1, 0, 2>, // 3. alpha * acc + aux load`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L394** `        cute::seq<3>, // relu(alpha & acc + aux load)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L395** `        cute::seq<2, 4> // relu(alpha * acc + aux load) + aux load`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: relu(alpha * acc + aux load) + aux load.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：relu(alpha * acc + aux load) + aux load。
+- **L396** `      >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L397** `      Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L398** `      Sm90AccFetch, // acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L399** `      Sm90AuxLoad<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L400** `        AuxLoadDescriptor::Stages, typename EpilogueDescriptor::EpilogueTile,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L401** `        typename AuxLoadDescriptor::Element, typename AuxLoadDescriptor::Stride,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L402** `        typename AuxLoadDescriptor::SmemLayoutAtom, typename AuxLoadDescriptor::CopyOpS2R>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L403** `      Sm90Compute<homogeneous_multiply_add, ElementCompute, ElementCompute, RoundStyle>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L404** `      Sm90Compute<cutlass::epilogue::thread::ReLu, ElementCompute, ElementCompute, RoundStyle>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L405** `      Sm90Compute<plus, ElementCompute, ElementCompute, RoundStyle>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L406** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L407** `    >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L408** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L409** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L410** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L411** `/// Example DAG`
+  - EN: Adds a human-readable comment for the next code region: / Example DAG.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ Example DAG。
+- **L412** `/// EVT = alpha * acc + C`
+  - EN: Adds a human-readable comment for the next code region: / EVT = alpha * acc + C.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ EVT = alpha * acc + C。
+- **L413** `/// D = Graph(maximum(EVT + per-row bias, EVT))`
+  - EN: Adds a human-readable comment for the next code region: / D = Graph(maximum(EVT + per-row bias, EVT)).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = Graph(maximum(EVT + per-row bias, EVT))。
+- **L414** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L415** `  class EpilogueDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L416** `  class AuxStoreDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L417** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L418** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L419** `  class ElementBias = ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L420** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L421** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L422** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L423** `using Sm90LinCombDAGEVT =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L424** `  Sm90TopologicalVisitor<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L425** `    ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L426** `    cute::tuple<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L427** `      cute::seq<>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L428** `      cute::seq<>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L429** `      cute::seq<1, 0>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L430** `      cute::seq<0, 2>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L431** `    >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L432** `    Sm90EVT<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L433** `      Sm90AuxStore<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L434** `        AuxStoreDescriptor::Stages, typename EpilogueDescriptor::EpilogueTile,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L435** `        typename AuxStoreDescriptor::Element, RoundStyle, typename AuxStoreDescriptor::Stride,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L436** `        typename AuxStoreDescriptor::SmemLayoutAtom, typename AuxStoreDescriptor::CopyOpR2S>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L437** `      Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementCompute, ElementCompute, RoundStyle>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L438** `        Sm90ScalarBroadcast<ElementScalar>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L439** `        Sm90AccFetch,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L440** `        Sm90SrcFetch<ElementOutput>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L441** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L442** `    >,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L443** `    Sm90ColBroadcast<0, typename EpilogueDescriptor::TileShape, ElementBias, ElementCompute>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L444** `    Sm90Compute<plus, ElementCompute, ElementCompute, RoundStyle>,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L445** `    Sm90Compute<detail::maximum_with_default_nan_propagation, ElementOutput, ElementCompute, RoundStyle>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L446** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L447** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L448** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L449** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L450** `/// D = alpha * acc + beta * C + per-column bias`
+  - EN: Adds a human-readable comment for the next code region: / D = alpha * acc + beta * C + per-column bias.
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = alpha * acc + beta * C + per-column bias。
+- **L451** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L452** `  class EpilogueDescriptor,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L453** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L454** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L455** `  class ElementBias = ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L456** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L457** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L458** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L459** `using Sm90LinCombPerColumnBias =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L460** `  Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + (alpha * acc + bias)`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L461** `    Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L462** `    Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L463** `    Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementCompute, ElementCompute, RoundStyle>, // alpha * acc + bias`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L464** `      Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L465** `      Sm90AccFetch, // acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L466** `      Sm90RowBroadcast<0, typename EpilogueDescriptor::TileShape, ElementBias, ElementCompute>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L467** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L468** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L469** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L470** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L471** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L472** `/// D = per-column reduce(alpha * acc + beta * C)`
+  - EN: Adds a human-readable comment for the next code region: / D = per-column reduce(alpha * acc + beta * C).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = per-column reduce(alpha * acc + beta * C)。
+- **L473** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L474** `  template <class> class RegReduceFn,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L475** `  template <class> class GmemReduceFn,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L476** `  class ElementReduce,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L477** `  class CtaTileShapeMNK,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L478** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L479** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L480** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L481** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L482** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L483** `using Sm90LinCombPerColumnReduce =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L484** `  Sm90EVT<Sm90RowReduction<RegReduceFn, RegReduceFn, GmemReduceFn, 0, CtaTileShapeMNK, ElementReduce, ElementCompute, RoundStyle>, // per column reduce`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L485** `    Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + alpha * acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L486** `      Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L487** `      Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L488** `      Sm90EVT<Sm90Compute<multiplies, ElementCompute, ElementCompute, RoundStyle>, // alpha * acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L489** `        Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L490** `        Sm90AccFetch // acc`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: acc.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：acc。
+- **L491** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L492** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L493** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L494** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L495** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L496** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L497** `/// D = per-row reduce(alpha * acc + beta * C)`
+  - EN: Adds a human-readable comment for the next code region: / D = per-row reduce(alpha * acc + beta * C).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = per-row reduce(alpha * acc + beta * C)。
+- **L498** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L499** `  template <class> class RegReduceFn,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L500** `  template <class> class GmemReduceFn,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L501** `  class ElementReduce,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L502** `  class CtaTileShapeMNK,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L503** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L504** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L505** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L506** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L507** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L508** `using Sm90LinCombPerRowReduce =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L509** `  Sm90EVT<Sm90ColReduction<RegReduceFn, RegReduceFn, GmemReduceFn, 0, CtaTileShapeMNK, ElementReduce, ElementCompute, RoundStyle>, // per column reduce`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L510** `    Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + alpha * acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L511** `      Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L512** `      Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L513** `      Sm90EVT<Sm90Compute<multiplies, ElementCompute, ElementCompute, RoundStyle>, // alpha * acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L514** `        Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L515** `        Sm90AccFetch // acc`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: acc.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：acc。
+- **L516** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L517** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L518** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L519** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L520** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L521** `//////////////////////////////////////////////////////////////////////////////`
+  - EN: Acts as a visual separator between major regions of the file.
+  - 中文：作为视觉分隔线，用于区分文件中的主要区域。
+- **L522** `/// D = scalar reduce(alpha * acc + beta * C)`
+  - EN: Adds a human-readable comment for the next code region: / D = scalar reduce(alpha * acc + beta * C).
+  - 中文：为后续代码区域添加可读性注释：行尾注释补充说明：/ D = scalar reduce(alpha * acc + beta * C)。
+- **L523** `template<`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L524** `  template <class> class RegReduceFn,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L525** `  template <class> class GmemReduceFn,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L526** `  class ElementReduce,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L527** `  class ElementOutput,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L528** `  class ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L529** `  class ElementScalar = ElementCompute,`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L530** `  FloatRoundStyle RoundStyle = FloatRoundStyle::round_to_nearest`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L531** `>`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L532** `using Sm90LinCombScalarReduce =`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L533** `  Sm90EVT<Sm90ScalarReduction<RegReduceFn, GmemReduceFn, ElementReduce, ElementCompute, RoundStyle>, // per column reduce`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L534** `    Sm90EVT<Sm90Compute<homogeneous_multiply_add, ElementOutput, ElementCompute, RoundStyle>, // beta * C + alpha * acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L535** `      Sm90ScalarBroadcast<ElementScalar>, // beta`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L536** `      Sm90SrcFetch<ElementOutput>, // C`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L537** `      Sm90EVT<Sm90Compute<multiplies, ElementCompute, ElementCompute, RoundStyle>, // alpha * acc`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L538** `        Sm90ScalarBroadcast<ElementScalar>, // alpha`
+  - EN: Supplies another template parameter or argument to the surrounding definition.
+  - 中文：为外围定义提供另一个模板参数或实参。
+- **L539** `        Sm90AccFetch // acc`
+  - EN: Contributes to the surrounding definition or template setup. The inline comment documents: acc.
+  - 中文：该行是外围定义或模板配置的一部分。 行尾注释说明：行尾注释补充说明：acc。
+- **L540** `      >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L541** `    >`
+  - EN: Contributes to the surrounding definition or template setup.
+  - 中文：该行是外围定义或模板配置的一部分。
+- **L542** `  >;`
+  - EN: Closes the current template instantiation or scoped definition.
+  - 中文：结束当前模板实例化或带作用域的定义。
+- **L543** `} // namespace fusion`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+- **L544** *(blank)*
+  - EN: Separates logical sections to improve readability.
+  - 中文：空行，用于分隔逻辑段落并提升可读性。
+- **L545** `} // namespace cutlass::epilogue`
+  - EN: Closes the current scope or test body.
+  - 中文：结束当前作用域或测试主体。
+
+## Key Concepts / 关键概念
+- EN: Architecture-specific CUTLASS GEMM test composition and validation.
+  - 中文：面向特定架构的 CUTLASS GEMM 组合与验证。
+
+## Dependencies / 依赖关系
+- `gemm_testbed_3x_evt.hpp`
+  - EN: Includes `gemm_testbed_3x_evt.hpp`, a dependency needed by this test translation unit.
+  - 中文：引入 `gemm_testbed_3x_evt.hpp`，这是该测试编译单元所需的依赖。

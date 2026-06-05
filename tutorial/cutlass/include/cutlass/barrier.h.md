@@ -1,0 +1,1158 @@
+# barrier.h — Code Analysis / 代码分析
+
+## Source / 源文件
+- `include/cutlass/barrier.h`
+
+## Purpose / 作用
+- EN: This header is introduced by the summary "Implementation of a CTA-wide barrier for inter-CTA synchronization." and defines related CUTLASS facilities in `include/cutlass/barrier.h`.
+- CN: 该头文件以注释摘要“Implementation of a CTA-wide barrier for inter-CTA synchronization.”引入，并在 `include/cutlass/barrier.h` 中定义相关的 CUTLASS 接口。
+
+## Line-by-Line Analysis / 逐行分析
+- **L1**: <code>/***************************************************************************************************</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L2**: <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L4**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L7**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L10**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L14**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L18**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L29**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L30**: <code> **************************************************************************************************/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L31**: <code>/*! \file</code>
+  - EN: Starts a documented comment block for whole-file metadata.
+  - CN: 开始一个用于描述整个文件元数据的文档注释块。
+- **L32**: <code>    \brief Implementation of a CTA-wide barrier for inter-CTA synchronization.</code>
+  - EN: Doxygen brief line summarizing the purpose of the file or declaration.
+  - CN: Doxygen 简述行，用于概括文件或声明的目的。
+- **L33**: <code>*/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L34**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L35**: <code>#pragma once</code>
+  - EN: Ensures the header is included only once per translation unit.
+  - CN: 确保该头文件在每个编译单元中只被包含一次。
+- **L36**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L37**: <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes "cutlass/cutlass.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/cutlass.h"，以便本文件使用该依赖中的声明。
+- **L38**: <code>#include &quot;cutlass/arch/barrier.h&quot;</code>
+  - EN: Includes "cutlass/arch/barrier.h" so this file can use declarations from that dependency.
+  - CN: 包含 "cutlass/arch/barrier.h"，以便本文件使用该依赖中的声明。
+- **L39**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L40**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L41**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L42**: <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to scope the following declarations.
+  - CN: 打开命名空间 `cutlass`，为后续声明提供作用域。
+- **L43**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L44**: <code>namespace detail {</code>
+  - EN: Opens namespace `detail` to scope the following declarations.
+  - CN: 打开命名空间 `detail`，为后续声明提供作用域。
+- **L45**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L46**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L47**: <code>// Utilities for abstracting synchronization methods for barriers</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L48**: <code>//</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L49**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L50**: <code>struct SyncthreadsSync {</code>
+  - EN: Declares or defines the struct `SyncthreadsSync`.
+  - CN: 声明或定义 struct `SyncthreadsSync`。
+- **L51**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L52**: <code>  static void sync() {</code>
+  - EN: Starts the definition body for `sync`.
+  - CN: 开始 `sync` 的定义体。
+- **L53**: <code>    __syncthreads();</code>
+  - EN: Declares the callable or operator `__syncthreads`.
+  - CN: 声明可调用对象或运算符 `__syncthreads`。
+- **L54**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L55**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L56**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L57**: <code>struct SyncwarpSync {</code>
+  - EN: Declares or defines the struct `SyncwarpSync`.
+  - CN: 声明或定义 struct `SyncwarpSync`。
+- **L58**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L59**: <code>  static void sync() {</code>
+  - EN: Starts the definition body for `sync`.
+  - CN: 开始 `sync` 的定义体。
+- **L60**: <code>    __syncwarp();</code>
+  - EN: Declares the callable or operator `__syncwarp`.
+  - CN: 声明可调用对象或运算符 `__syncwarp`。
+- **L61**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L62**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L63**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L64**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L65**: <code>  int ThreadCount,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L66**: <code>  int BarrierId</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L67**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L68**: <code>struct NamedBarrierSync {</code>
+  - EN: Declares or defines the struct `NamedBarrierSync`.
+  - CN: 声明或定义 struct `NamedBarrierSync`。
+- **L69**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L70**: <code>  static void sync() {</code>
+  - EN: Starts the definition body for `sync`.
+  - CN: 开始 `sync` 的定义体。
+- **L71**: <code>    cutlass::arch::NamedBarrier::sync(ThreadCount, static_cast&lt;arch::ReservedNamedBarriers&gt;(BarrierId));</code>
+  - EN: Declares the callable or operator `sync`.
+  - CN: 声明可调用对象或运算符 `sync`。
+- **L72**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L73**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L74**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L75**: <code>} // namepspace detail</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L76**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L77**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L78**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L79**: <code>/// Group or CTA-wide semaphore for inter-CTA synchronization.</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L80**: <code>template &lt;class Sync&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L81**: <code>struct GenericBarrier {</code>
+  - EN: Declares or defines the struct `GenericBarrier`.
+  - CN: 声明或定义 struct `GenericBarrier`。
+- **L82**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L83**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L84**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L85**: <code>  /// Flag type</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L86**: <code>  using T = int;</code>
+  - EN: Defines the alias `T` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `T`。
+- **L87**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L88**: <code>  /// Initial flag value</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L89**: <code>  static const T INIT = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L90**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L91**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L92**: <code>protected:</code>
+  - EN: Sets the `protected` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `protected`。
+- **L93**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L94**: <code>  /// Load flag, as a strong acquire operation (int specialization)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L95**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L96**: <code>  static int ld_acquire(int *ptr)</code>
+  - EN: Provides part of the signature or implementation for `ld_acquire`.
+  - CN: 提供 `ld_acquire` 的签名或实现的一部分。
+- **L97**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L98**: <code>    int state = 0;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L99**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L100**: <code>#if (__CUDA_ARCH__ &gt;= 700)</code>
+  - EN: Starts a conditional-compilation block controlled by `(__CUDA_ARCH__ >= 700)`.
+  - CN: 开始一个由 `(__CUDA_ARCH__ >= 700)` 控制的条件编译块。
+- **L101**: <code>    /// SM70 and newer use memory consistency qualifiers</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L102**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L103**: <code>    // Acquire pattern using acquire modifier</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L104**: <code>    asm volatile (&quot;ld.global.acquire.gpu.b32 %0, [%1];\n&quot; : &quot;=r&quot;(state) : &quot;l&quot;(ptr));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L105**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L106**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L107**: <code>    asm volatile (&quot;ld.cg.global.b32 %0, [%1];\n&quot; : &quot;=r&quot;(state) : &quot;l&quot;(ptr));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L108**: <code>#endif // (__CUDA_ARCH__ &gt;= 700)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L109**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L110**: <code>    return state;</code>
+  - EN: Returns a value or exits the current function.
+  - CN: 返回一个值或退出当前函数。
+- **L111**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L112**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L113**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L114**: <code>  /// Reduce into flag, with release pattern (int specialization)</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L115**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L116**: <code>  static void red_release(int *ptr, int val)</code>
+  - EN: Provides part of the signature or implementation for `red_release`.
+  - CN: 提供 `red_release` 的签名或实现的一部分。
+- **L117**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L118**: <code>#if (__CUDA_ARCH__ &gt;= 700)</code>
+  - EN: Starts a conditional-compilation block controlled by `(__CUDA_ARCH__ >= 700)`.
+  - CN: 开始一个由 `(__CUDA_ARCH__ >= 700)` 控制的条件编译块。
+- **L119**: <code>    /// SM70 and newer use memory consistency qualifiers</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L120**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L121**: <code>    // Release pattern using acq_rel fence + relaxed modifier.  (The fence also releases data</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L122**: <code>    // that was weakly-written by other threads prior to the last syncthreads)</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L123**: <code>    asm volatile (&quot;fence.acq_rel.gpu;\n&quot;);</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L124**: <code>    asm volatile (&quot;red.relaxed.gpu.global.add.s32 [%0], %1;\n&quot; : : &quot;l&quot;(ptr), &quot;r&quot;(val));</code>
+  - EN: Declares the callable or operator `volatile`.
+  - CN: 声明可调用对象或运算符 `volatile`。
+- **L125**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L126**: <code>#else</code>
+  - EN: Selects an alternate branch of the current conditional-compilation block.
+  - CN: 选择当前条件编译块的另一条分支。
+- **L127**: <code>    __threadfence();</code>
+  - EN: Declares the callable or operator `__threadfence`.
+  - CN: 声明可调用对象或运算符 `__threadfence`。
+- **L128**: <code>    atomicAdd(ptr, val);</code>
+  - EN: Declares the callable or operator `atomicAdd`.
+  - CN: 声明可调用对象或运算符 `atomicAdd`。
+- **L129**: <code>#endif // (__CUDA_ARCH__ &gt;= 700)</code>
+  - EN: Ends the current conditional-compilation block.
+  - CN: 结束当前条件编译块。
+- **L130**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L131**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L132**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L133**: <code>public:</code>
+  - EN: Sets the `public` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `public`。
+- **L134**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L135**: <code>  /// Uses thread[0] to wait for at least the specified count of signals on the given flag counter</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L136**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L137**: <code>  static void wait_lt(void *lock_ptr, int thread_idx, int flag_idx, int count)</code>
+  - EN: Provides part of the signature or implementation for `wait_lt`.
+  - CN: 提供 `wait_lt` 的签名或实现的一部分。
+- **L138**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L139**: <code>    T *flag_ptr = reinterpret_cast&lt;T*&gt;(lock_ptr) + flag_idx;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L140**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L141**: <code>    if (thread_idx == 0)</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L142**: <code>    {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L143**: <code>        // Spin-loop</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L144**: <code>        #pragma unroll 1</code>
+  - EN: Uses the `#pragma` directive to control preprocessing for this header.
+  - CN: 使用 `#pragma` 指令控制该头文件的预处理过程。
+- **L145**: <code>        while(ld_acquire(flag_ptr) &lt; count) {}</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L146**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L147**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L148**: <code>    Sync::sync();</code>
+  - EN: Declares the callable or operator `sync`.
+  - CN: 声明可调用对象或运算符 `sync`。
+- **L149**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L150**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L151**: <code>  /// Uses thread[0] to wait for at least the specified count of signals on the given flag counter</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L152**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L153**: <code>  static void wait_eq(void *lock_ptr, int thread_idx, int flag_idx, T val = 1)</code>
+  - EN: Provides part of the signature or implementation for `wait_eq`.
+  - CN: 提供 `wait_eq` 的签名或实现的一部分。
+- **L154**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L155**: <code>    T *flag_ptr = reinterpret_cast&lt;T*&gt;(lock_ptr) + flag_idx;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L156**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L157**: <code>    if (thread_idx == 0)</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L158**: <code>    {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L159**: <code>        // Spin-loop</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L160**: <code>        #pragma unroll 1</code>
+  - EN: Uses the `#pragma` directive to control preprocessing for this header.
+  - CN: 使用 `#pragma` 指令控制该头文件的预处理过程。
+- **L161**: <code>        while(ld_acquire(flag_ptr) != val) {}</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L162**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L163**: <code>    Sync::sync();</code>
+  - EN: Declares the callable or operator `sync`.
+  - CN: 声明可调用对象或运算符 `sync`。
+- **L164**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L165**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L166**: <code>  /// Uses thread[0] to wait for the specified count of signals on the given flag counter</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L167**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L168**: <code>  static void wait_eq_reset(void *lock_ptr, int thread_idx, int flag_idx, T val = 1) {</code>
+  - EN: Starts the definition body for `wait_eq_reset`.
+  - CN: 开始 `wait_eq_reset` 的定义体。
+- **L169**: <code>    T *flag_ptr = reinterpret_cast&lt;T*&gt;(lock_ptr) + flag_idx;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L170**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L171**: <code>    if (thread_idx == 0)</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L172**: <code>    {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L173**: <code>        // Spin-loop</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L174**: <code>        #pragma unroll 1</code>
+  - EN: Uses the `#pragma` directive to control preprocessing for this header.
+  - CN: 使用 `#pragma` 指令控制该头文件的预处理过程。
+- **L175**: <code>        while(atomicCAS(flag_ptr, val, 0) != val) {}</code>
+  - EN: Starts a loop that repeats while its condition remains true.
+  - CN: 开始一个在条件为真时重复执行的循环。
+- **L176**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L177**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L178**: <code>    Sync::sync();</code>
+  - EN: Declares the callable or operator `sync`.
+  - CN: 声明可调用对象或运算符 `sync`。
+- **L179**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L180**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L181**: <code>  /// Increment the arrival count for a flag</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L182**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L183**: <code>  static void arrive_inc(void *lock_ptr, int thread_idx, int flag_idx, int val = 1)</code>
+  - EN: Provides part of the signature or implementation for `arrive_inc`.
+  - CN: 提供 `arrive_inc` 的签名或实现的一部分。
+- **L184**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L185**: <code>    T* flag_ptr = reinterpret_cast&lt;T*&gt;(lock_ptr) + flag_idx;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L186**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L187**: <code>    Sync::sync();</code>
+  - EN: Declares the callable or operator `sync`.
+  - CN: 声明可调用对象或运算符 `sync`。
+- **L188**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L189**: <code>    if (thread_idx == 0)</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L190**: <code>    {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L191**: <code>      red_release(flag_ptr, val);</code>
+  - EN: Declares the callable or operator `red_release`.
+  - CN: 声明可调用对象或运算符 `red_release`。
+- **L192**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L193**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L194**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L195**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L196**: <code>  /// Increment the arrival counts for a range of flags</code>
+  - EN: Doxygen-style single-line comment that documents the next declaration.
+  - CN: Doxygen 风格的单行注释，用于说明接下来的声明。
+- **L197**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L198**: <code>  static void arrive_range_inc(void *lock_ptr, int thread_idx, int first_flag_idx, int count = 1, int val = 1)</code>
+  - EN: Provides part of the signature or implementation for `arrive_range_inc`.
+  - CN: 提供 `arrive_range_inc` 的签名或实现的一部分。
+- **L199**: <code>  {</code>
+  - EN: Opens a new scope block for the surrounding declaration or control flow.
+  - CN: 为周围的声明或控制流打开新的作用域代码块。
+- **L200**: <code>    int flag_idx = first_flag_idx + thread_idx;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L201**: <code>    T* flag_ptr = reinterpret_cast&lt;T*&gt;(lock_ptr) + flag_idx;</code>
+  - EN: Declares the callable or operator `T`.
+  - CN: 声明可调用对象或运算符 `T`。
+- **L202**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L203**: <code>    // Barrier to make sure all other threads in group have written their data</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L204**: <code>    Sync::sync();</code>
+  - EN: Declares the callable or operator `sync`.
+  - CN: 声明可调用对象或运算符 `sync`。
+- **L205**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L206**: <code>    // Select threads increment their flags</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L207**: <code>    if (thread_idx &lt; count) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L208**: <code>      red_release(flag_ptr, val);</code>
+  - EN: Declares the callable or operator `red_release`.
+  - CN: 声明可调用对象或运算符 `red_release`。
+- **L209**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L210**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L211**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L212**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L213**: <code>using Barrier = GenericBarrier&lt;detail::SyncthreadsSync&gt;;</code>
+  - EN: Defines the alias `Barrier` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `Barrier`。
+- **L214**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L215**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L216**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L217**: <code>/** Structure for managing multiple NamedBarriers to be used by different warp groups, allowing</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L218**: <code> * runtime index values to be used to call into named barriers with compile-time-constant IDs.</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L219**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L220**: <code> * @param ThreadCount_ Number of threads that will wait on a NamedBarrier with a given ID</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L221**: <code> * @param Offset Value added to the ID passed in by the user to determine the NamedBarrier ID to call into</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L222**: <code> * @param MaxNumNamedBarriers The maximum number of unique barrier IDs that will be requested on this type</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L223**: <code>**/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L224**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L225**: <code>  uint32_t ThreadCount_,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L226**: <code>  uint32_t Offset = 0,</code>
+  - EN: Continues a comma-separated list such as template arguments, parameters, or initializers.
+  - CN: 继续一个以逗号分隔的列表，例如模板参数、函数参数或初始化项。
+- **L227**: <code>  uint32_t MaxNumNamedBarriers = 16</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L228**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L229**: <code>struct NamedBarrierManager {</code>
+  - EN: Declares or defines the struct `NamedBarrierManager`.
+  - CN: 声明或定义 struct `NamedBarrierManager`。
+- **L230**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L231**: <code>  static_assert(MaxNumNamedBarriers &lt;= arch::NamedBarrier::HardwareMaxNumNamedBarriers);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L232**: <code>  static_assert(MaxNumNamedBarriers + Offset &lt;= arch::NamedBarrier::HardwareMaxNumNamedBarriers, &quot;Barrier IDs cannot exceed 15&quot;);</code>
+  - EN: Performs a compile-time assertion to enforce an invariant.
+  - CN: 执行编译期断言以保证某个不变量。
+- **L233**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L234**: <code>  // Number of threads participating in the barrier</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L235**: <code>  static constexpr uint32_t ThreadCount = ThreadCount_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L236**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L237**: <code>  template &lt;uint32_t BarrierId&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L238**: <code>  using BarrierSync = cutlass::GenericBarrier&lt;cutlass::detail::NamedBarrierSync&lt;ThreadCount, BarrierId&gt;&gt;;</code>
+  - EN: Defines the alias `BarrierSync` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BarrierSync`。
+- **L239**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L240**: <code>  // Underlying type used by all barriers for synchronization. Does not depend on</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L241**: <code>  // template parameter BarrierId, so passing in 0 suffices.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L242**: <code>  using T = typename BarrierSync&lt;0&gt;::T;</code>
+  - EN: Defines the alias `T` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `T`。
+- **L243**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L244**: <code>  using IntegerSequence = cute::make_integer_sequence&lt;uint32_t, MaxNumNamedBarriers&gt;;</code>
+  - EN: Defines the alias `IntegerSequence` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `IntegerSequence`。
+- **L245**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L246**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L247**: <code>  static</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L248**: <code>  void wait_lt(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, int count) {</code>
+  - EN: Starts the definition body for `wait_lt`.
+  - CN: 开始 `wait_lt` 的定义体。
+- **L249**: <code>    wait_lt_helper(idx, lock_ptr, thread_idx, flag_idx, count, IntegerSequence{});</code>
+  - EN: Declares the callable or operator `wait_lt_helper`.
+  - CN: 声明可调用对象或运算符 `wait_lt_helper`。
+- **L250**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L251**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L252**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L253**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L254**: <code>  wait_eq(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, T val = 1) {</code>
+  - EN: Starts the definition body for `wait_eq`.
+  - CN: 开始 `wait_eq` 的定义体。
+- **L255**: <code>    wait_eq_helper&lt;false&gt;(idx, lock_ptr, thread_idx, flag_idx, val, IntegerSequence{});</code>
+  - EN: Declares the callable or operator `false`.
+  - CN: 声明可调用对象或运算符 `false`。
+- **L256**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L257**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L258**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L259**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L260**: <code>  wait_eq_reset(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, T val = 1) {</code>
+  - EN: Starts the definition body for `wait_eq_reset`.
+  - CN: 开始 `wait_eq_reset` 的定义体。
+- **L261**: <code>    wait_eq_helper&lt;true&gt;(idx, lock_ptr, thread_idx, flag_idx, val, IntegerSequence{});</code>
+  - EN: Declares the callable or operator `true`.
+  - CN: 声明可调用对象或运算符 `true`。
+- **L262**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L263**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L264**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L265**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L266**: <code>  arrive_inc(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, int val = 1) {</code>
+  - EN: Starts the definition body for `arrive_inc`.
+  - CN: 开始 `arrive_inc` 的定义体。
+- **L267**: <code>    arrive_inc_helper(idx, lock_ptr, thread_idx, flag_idx, val, IntegerSequence{});</code>
+  - EN: Declares the callable or operator `arrive_inc_helper`.
+  - CN: 声明可调用对象或运算符 `arrive_inc_helper`。
+- **L268**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L269**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L270**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L271**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L272**: <code>  arrive_range_inc(uint32_t idx, void *lock_ptr, int thread_idx, int first_flag_idx, int count = 1, int val = 1) {</code>
+  - EN: Starts the definition body for `arrive_range_inc`.
+  - CN: 开始 `arrive_range_inc` 的定义体。
+- **L273**: <code>    arrive_range_inc_helper(idx, lock_ptr, thread_idx, first_flag_idx, count, val, IntegerSequence{});</code>
+  - EN: Declares the callable or operator `arrive_range_inc_helper`.
+  - CN: 声明可调用对象或运算符 `arrive_range_inc_helper`。
+- **L274**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L275**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L276**: <code>private:</code>
+  - EN: Sets the `private` access level for subsequent class members.
+  - CN: 将后续类成员的访问级别设置为 `private`。
+- **L277**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L278**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L279**: <code>  check_barrier_in_range([[maybe_unused]] uint32_t idx) {</code>
+  - EN: Starts the definition body for `check_barrier_in_range`.
+  - CN: 开始 `check_barrier_in_range` 的定义体。
+- **L280**: <code>    assert((idx &lt; MaxNumNamedBarriers) &amp;&amp; &quot;Index exceeds barrier count&quot;);</code>
+  - EN: Declares the callable or operator `assert`.
+  - CN: 声明可调用对象或运算符 `assert`。
+- **L281**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L282**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L283**: <code>  template &lt;uint32_t... Idx&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L284**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L285**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L286**: <code>  wait_lt_helper(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, int count, cute::integer_sequence&lt;uint32_t, Idx...&gt;) {</code>
+  - EN: Starts the definition body for `wait_lt_helper`.
+  - CN: 开始 `wait_lt_helper` 的定义体。
+- **L287**: <code>    check_barrier_in_range(idx);</code>
+  - EN: Declares the callable or operator `check_barrier_in_range`.
+  - CN: 声明可调用对象或运算符 `check_barrier_in_range`。
+- **L288**: <code>    ((Idx == idx &amp;&amp; (BarrierSync&lt;Idx + Offset&gt;::wait_lt(lock_ptr, thread_idx, flag_idx, count), true)) || ...);</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L289**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L290**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L291**: <code>  template &lt;bool Reset, uint32_t... Idx&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L292**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L293**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L294**: <code>  wait_eq_helper(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, T val, cute::integer_sequence&lt;uint32_t, Idx...&gt;) {</code>
+  - EN: Starts the definition body for `wait_eq_helper`.
+  - CN: 开始 `wait_eq_helper` 的定义体。
+- **L295**: <code>    check_barrier_in_range(idx);</code>
+  - EN: Declares the callable or operator `check_barrier_in_range`.
+  - CN: 声明可调用对象或运算符 `check_barrier_in_range`。
+- **L296**: <code>    if constexpr (Reset) {</code>
+  - EN: Starts a conditional branch evaluated at runtime or compile time.
+  - CN: 开始一个在运行期或编译期求值的条件分支。
+- **L297**: <code>      ((Idx == idx &amp;&amp; (BarrierSync&lt;Idx + Offset&gt;::wait_eq_reset(lock_ptr, thread_idx, flag_idx, val), true)) || ...);</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L298**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L299**: <code>    else {</code>
+  - EN: Provides the fallback branch when previous conditions do not match.
+  - CN: 在之前条件都不满足时提供回退分支。
+- **L300**: <code>      ((Idx == idx &amp;&amp; (BarrierSync&lt;Idx + Offset&gt;::wait_eq(lock_ptr, thread_idx, flag_idx, val), true)) || ...);</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L301**: <code>    }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L302**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L303**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L304**: <code>  template &lt;uint32_t... Idx&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L305**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L306**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L307**: <code>  arrive_inc_helper(uint32_t idx, void *lock_ptr, int thread_idx, int flag_idx, int val, cute::integer_sequence&lt;uint32_t, Idx...&gt;) {</code>
+  - EN: Starts the definition body for `arrive_inc_helper`.
+  - CN: 开始 `arrive_inc_helper` 的定义体。
+- **L308**: <code>    check_barrier_in_range(idx);</code>
+  - EN: Declares the callable or operator `check_barrier_in_range`.
+  - CN: 声明可调用对象或运算符 `check_barrier_in_range`。
+- **L309**: <code>    ((Idx == idx &amp;&amp; (BarrierSync&lt;Idx + Offset&gt;::arrive_inc(lock_ptr, thread_idx, flag_idx, val), true)) || ...);</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L310**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L311**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L312**: <code>  template &lt;uint32_t... Idx&gt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L313**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L314**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L315**: <code>  arrive_range_inc_helper(uint32_t idx, void *lock_ptr, int thread_idx, int first_flag_idx, int count, int val, cute::integer_sequence&lt;uint32_t, Idx...&gt;) {</code>
+  - EN: Starts the definition body for `arrive_range_inc_helper`.
+  - CN: 开始 `arrive_range_inc_helper` 的定义体。
+- **L316**: <code>    check_barrier_in_range(idx);</code>
+  - EN: Declares the callable or operator `check_barrier_in_range`.
+  - CN: 声明可调用对象或运算符 `check_barrier_in_range`。
+- **L317**: <code>    ((Idx == idx &amp;&amp; (BarrierSync&lt;Idx + Offset&gt;::arrive_range_inc(lock_ptr, thread_idx, first_flag_idx, count, val), true)) || ...);</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L318**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L319**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L320**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L321**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L322**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L323**: <code>/** Structure for synchronizing via contiguous barriers (e.g., __syncwarp, __syncthreads)</code>
+  - EN: Starts a block comment for file-level documentation or the license banner.
+  - CN: 开始一个用于文件级说明或许可证横幅的块注释。
+- **L324**: <code> *  via an API that mirrors that of NamedBarrierManager</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L325**: <code> *</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L326**: <code> * @param Synchronizer Synchronization helper exposing a `sync()` method to perform synchronization</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L327**: <code>**/</code>
+  - EN: Continues a block comment that documents the surrounding code.
+  - CN: 延续一个用于说明周围代码的块注释。
+- **L328**: <code>template &lt;</code>
+  - EN: Introduces template parameters for the declaration or specialization that follows.
+  - CN: 为后续声明或特化引入模板参数。
+- **L329**: <code>  class Synchronizer,</code>
+  - EN: Declares or defines the class `Synchronizer`.
+  - CN: 声明或定义 class `Synchronizer`。
+- **L330**: <code>  uint32_t ThreadCount_</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L331**: <code>&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L332**: <code>struct SyncManager {</code>
+  - EN: Declares or defines the struct `SyncManager`.
+  - CN: 声明或定义 struct `SyncManager`。
+- **L333**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L334**: <code>  // Number of threads participating in the barrier</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L335**: <code>  static constexpr uint32_t ThreadCount = ThreadCount_;</code>
+  - EN: Initializes or assigns a value and then terminates the statement.
+  - CN: 完成一个赋值或初始化语句，并在此结束。
+- **L336**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L337**: <code>  using BarrierSync = cutlass::GenericBarrier&lt;Synchronizer&gt;;</code>
+  - EN: Defines the alias `BarrierSync` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `BarrierSync`。
+- **L338**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L339**: <code>  // Underlying type used by all barriers for synchronization.</code>
+  - EN: Single-line comment that explains intent, constraints, or usage.
+  - CN: 单行注释，用于说明意图、约束或用法。
+- **L340**: <code>  using T = typename BarrierSync::T;</code>
+  - EN: Defines the alias `T` with a `using` declaration.
+  - CN: 使用 `using` 声明定义别名 `T`。
+- **L341**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L342**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L343**: <code>  static</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L344**: <code>  void wait_lt(uint32_t, void *lock_ptr, int thread_idx, int flag_idx, int count) {</code>
+  - EN: Starts the definition body for `wait_lt`.
+  - CN: 开始 `wait_lt` 的定义体。
+- **L345**: <code>    BarrierSync::wait_lt(lock_ptr, thread_idx, flag_idx, count);</code>
+  - EN: Declares the callable or operator `wait_lt`.
+  - CN: 声明可调用对象或运算符 `wait_lt`。
+- **L346**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L347**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L348**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L349**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L350**: <code>  wait_eq(uint32_t, void *lock_ptr, int thread_idx, int flag_idx, T val = 1) {</code>
+  - EN: Starts the definition body for `wait_eq`.
+  - CN: 开始 `wait_eq` 的定义体。
+- **L351**: <code>    BarrierSync::wait_eq(lock_ptr, thread_idx, flag_idx, val);</code>
+  - EN: Declares the callable or operator `wait_eq`.
+  - CN: 声明可调用对象或运算符 `wait_eq`。
+- **L352**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L353**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L354**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L355**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L356**: <code>  wait_eq_reset(uint32_t, void *lock_ptr, int thread_idx, int flag_idx, T val = 1) {</code>
+  - EN: Starts the definition body for `wait_eq_reset`.
+  - CN: 开始 `wait_eq_reset` 的定义体。
+- **L357**: <code>    BarrierSync::wait_eq_reset(lock_ptr, thread_idx, flag_idx, val);</code>
+  - EN: Declares the callable or operator `wait_eq_reset`.
+  - CN: 声明可调用对象或运算符 `wait_eq_reset`。
+- **L358**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L359**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L360**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L361**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L362**: <code>  arrive_inc(uint32_t, void *lock_ptr, int thread_idx, int flag_idx, int val = 1) {</code>
+  - EN: Starts the definition body for `arrive_inc`.
+  - CN: 开始 `arrive_inc` 的定义体。
+- **L363**: <code>    BarrierSync::arrive_inc(lock_ptr, thread_idx, flag_idx, val);</code>
+  - EN: Declares the callable or operator `arrive_inc`.
+  - CN: 声明可调用对象或运算符 `arrive_inc`。
+- **L364**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L365**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L366**: <code>  CUTLASS_DEVICE</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L367**: <code>  static void</code>
+  - EN: Continues the surrounding declaration, expression, or implementation detail.
+  - CN: 继续周围的声明、表达式或实现细节。
+- **L368**: <code>  arrive_range_inc(uint32_t idx, void *lock_ptr, int thread_idx, int first_flag_idx, int count = 1, int val = 1) {</code>
+  - EN: Starts the definition body for `arrive_range_inc`.
+  - CN: 开始 `arrive_range_inc` 的定义体。
+- **L369**: <code>    BarrierSync::arrive_range_inc(lock_ptr, thread_idx, first_flag_idx, count, val);</code>
+  - EN: Declares the callable or operator `arrive_range_inc`.
+  - CN: 声明可调用对象或运算符 `arrive_range_inc`。
+- **L370**: <code>  }</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L371**: <code>};</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L372**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L373**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+- **L374**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L375**: <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, block, or declaration body.
+  - CN: 结束当前作用域、代码块或声明体。
+- **L376**: <blank>
+  - EN: Blank line that visually separates code blocks or declarations.
+  - CN: 空行，用于在视觉上分隔代码块或声明。
+- **L377**: <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Visual separator comment used to divide sections of the header.
+  - CN: 用于分隔头文件不同部分的视觉分隔注释。
+
+## Key Concepts / 关键概念
+- Templates / 模板
+- Namespaces / 命名空间
+- Constexpr evaluation / constexpr 求值
+- Compile-time checks / 编译期检查
+- Conditional compilation / 条件编译
+- Synchronization barriers / 同步屏障
+- Symbol focus: `SyncthreadsSync` / 重点符号：`SyncthreadsSync`
+- Symbol focus: `sync` / 重点符号：`sync`
+- Symbol focus: `__syncthreads` / 重点符号：`__syncthreads`
+- Symbol focus: `SyncwarpSync` / 重点符号：`SyncwarpSync`
+
+## Dependencies / 依赖关系
+- Project headers / 项目头文件:
+  - `"cutlass/cutlass.h"`
+  - `"cutlass/arch/barrier.h"`

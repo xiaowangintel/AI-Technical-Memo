@@ -1,0 +1,293 @@
+# c_header_generator.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/export/c_header_generator.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (CuteCHeaderGenerator) in `CuTeDSL.cutlass.cute.export.c_header_generator`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.export.c_header_generator` 定义了 1 个类（CuteCHeaderGenerator）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from cutlass.cute.typing import NumericMeta, Integer` — **EN:** Imports NumericMeta, Integer from `cutlass.cute.typing`. **CN:** 从 `cutlass.cute.typing` 导入 NumericMeta, Integer。
+- **L13** `from cutlass.base_dsl.export import CHeaderGenerator, CHeaderArguments` — **EN:** Imports CHeaderGenerator, CHeaderArguments from `cutlass.base_dsl.export`. **CN:** 从 `cutlass.base_dsl.export` 导入 CHeaderGenerator, CHeaderArguments。
+- **L14** `from cutlass.base_dsl.common import DSLRuntimeError` — **EN:** Imports DSLRuntimeError from `cutlass.base_dsl.common`. **CN:** 从 `cutlass.base_dsl.common` 导入 DSLRuntimeError。
+- **L15** `from cutlass.base_dsl.jit_executor import ExecutionArgs` — **EN:** Imports ExecutionArgs from `cutlass.base_dsl.jit_executor`. **CN:** 从 `cutlass.base_dsl.jit_executor` 导入 ExecutionArgs。
+- **L16** `from cutlass.cutlass_dsl.cutlass import is_cute_algebra_type` — **EN:** Imports is_cute_algebra_type from `cutlass.cutlass_dsl.cutlass`. **CN:** 从 `cutlass.cutlass_dsl.cutlass` 导入 is_cute_algebra_type。
+- **L17** `from ..runtime import Tensor, Pointer` — **EN:** Imports Tensor, Pointer from `..runtime`. **CN:** 从 `..runtime` 导入 Tensor, Pointer。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from typing import Any, Union, get_origin, get_args` — **EN:** Imports Any, Union, get_origin, get_args from `typing`. **CN:** 从 `typing` 导入 Any, Union, get_origin, get_args。
+- **L20** `from inspect import isclass, Parameter` — **EN:** Imports isclass, Parameter from `inspect`. **CN:** 从 `inspect` 导入 isclass, Parameter。
+- **L21** `import cuda.bindings.driver as cuda` — **EN:** Imports cuda.bindings.driver as cuda for later use. **CN:** 导入 cuda.bindings.driver as cuda 供后续使用。
+- **L22** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L23** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L24** `# Cute DSL C Header Generator for c/cpp AOT support` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `class CuteCHeaderGenerator(CHeaderGenerator):` — **EN:** Defines class `CuteCHeaderGenerator` with bases CHeaderGenerator. **CN:** 定义类 `CuteCHeaderGenerator`，其基类为 CHeaderGenerator。
+- **L29** `    """This class provides a Export C Header Generator for cute c/cpp AOT support."""` — **EN:** Docstring line documenting the class `CuteCHeaderGenerator`. **CN:** 文档字符串行，用于说明 class `CuteCHeaderGenerator`。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `    includes = """` — **EN:** Assigns a value to includes. **CN:** 将一个值赋给 includes。
+- **L32** `#pragma once` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `#include <cuda_runtime.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L35** `#include <cuda_fp16.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L36** `#include <stdio.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L37** `#include <stdint.h>` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    cuda_error_check = r"""_CUDA_ERROR_CHECK(err) { \` — **EN:** Assigns a value to cuda_error_check. **CN:** 将一个值赋给 cuda_error_check。
+- **L41** `    if ((err) != cudaSuccess) { \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `        printf("Got Cuda Error %s: %s\n", cudaGetErrorName(err), cudaGetErrorString(err)); \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    } \` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    def _get_cute_algebra_type(self, arg_type: Any, arg: Any) -> str:` — **EN:** Defines function `_get_cute_algebra_type`. **CN:** 定义函数 `_get_cute_algebra_type`。
+- **L48** `        """Judge if the dynamic elements of the cute algebra type are same(Int32 or Int64).` — **EN:** Starts the docstring for the function `_get_cute_algebra_type`. **CN:** 开始说明 function `_get_cute_algebra_type` 的文档字符串。
+- **L49** `        If so, generate the corresponding C type. Otherwise, refuse to generate the argument` — **EN:** Continues the docstring for the function `_get_cute_algebra_type`. **CN:** 继续说明 function `_get_cute_algebra_type` 的文档字符串。
+- **L50** `        in C header and raise an error.` — **EN:** Continues the docstring for the function `_get_cute_algebra_type`. **CN:** 继续说明 function `_get_cute_algebra_type` 的文档字符串。
+- **L51** `        """` — **EN:** Ends the docstring for the function `_get_cute_algebra_type`. **CN:** 结束说明 function `_get_cute_algebra_type` 的文档字符串。
+- **L52** `        if not isinstance(arg, (list, tuple, Integer)):` — **EN:** Starts a conditional branch guarded by `not isinstance(arg, (list, tuple, Integer))`. **CN:** 开始一个由 `not isinstance(arg, (list, tuple, Integer))` 控制的条件分支。
+- **L53** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L54** `                f"Unsupported argument for c function argument generation: {arg} with type {arg_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `        if isinstance(arg, Integer):` — **EN:** Starts a conditional branch guarded by `isinstance(arg, Integer)`. **CN:** 开始一个由 `isinstance(arg, Integer)` 控制的条件分支。
+- **L57** `            return self.numeric_to_c_type[arg.dtype]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L58** `        dyn_type = None` — **EN:** Assigns a value to dyn_type. **CN:** 将一个值赋给 dyn_type。
+- **L59** `        for elem in arg:` — **EN:** Starts a loop assigning items from `arg` to `elem`. **CN:** 开始一个循环，将 `arg` 的元素赋给 `elem`。
+- **L60** `            if not isinstance(elem, (Integer, int)):` — **EN:** Starts a conditional branch guarded by `not isinstance(elem, (Integer, int))`. **CN:** 开始一个由 `not isinstance(elem, (Integer, int))` 控制的条件分支。
+- **L61** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L62** `                    f"Unsupported argument for c function argument generation: {arg} with type {arg_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `            if isinstance(elem, int):` — **EN:** Starts a conditional branch guarded by `isinstance(elem, int)`. **CN:** 开始一个由 `isinstance(elem, int)` 控制的条件分支。
+- **L65** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L66** `            if dyn_type is not None:` — **EN:** Starts a conditional branch guarded by `dyn_type is not None`. **CN:** 开始一个由 `dyn_type is not None` 控制的条件分支。
+- **L67** `                if elem.dtype != dyn_type:` — **EN:** Starts a conditional branch guarded by `elem.dtype != dyn_type`. **CN:** 开始一个由 `elem.dtype != dyn_type` 控制的条件分支。
+- **L68** `                    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L69** `                        f"Expects all dynamic elements of the cute algebra type to be of the same type, but got {elem.dtype} and {dyn_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L72** `                dyn_type = elem.dtype` — **EN:** Assigns a value to dyn_type. **CN:** 将一个值赋给 dyn_type。
+- **L73** `        if dyn_type is None:` — **EN:** Starts a conditional branch guarded by `dyn_type is None`. **CN:** 开始一个由 `dyn_type is None` 控制的条件分支。
+- **L74** `            return "int32_t "` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** `        return self.numeric_to_c_type[dyn_type]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    def _generate_binary_declaration(self, symbol_prefix: str) -> str:` — **EN:** Defines function `_generate_binary_declaration`. **CN:** 定义函数 `_generate_binary_declaration`。
+- **L78** `        """` — **EN:** Starts the docstring for the function `_generate_binary_declaration`. **CN:** 开始说明 function `_generate_binary_declaration` 的文档字符串。
+- **L79** `        Generate the binary of the compiled function.` — **EN:** Continues the docstring for the function `_generate_binary_declaration`. **CN:** 继续说明 function `_generate_binary_declaration` 的文档字符串。
+- **L80** `        """` — **EN:** Ends the docstring for the function `_generate_binary_declaration`. **CN:** 结束说明 function `_generate_binary_declaration` 的文档字符串。
+- **L81** `        return ""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `    def _generate_kernel_module(` — **EN:** Defines function `_generate_kernel_module`. **CN:** 定义函数 `_generate_kernel_module`。
+- **L84** `        self, symbol_prefix: str, kernel_info: dict[str, list[Any]], dsl_name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `    ) -> str:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L86** `        """` — **EN:** Starts the docstring for the function `_generate_kernel_module`. **CN:** 开始说明 function `_generate_kernel_module` 的文档字符串。
+- **L87** `        Generate the kernel module for the compiled function.` — **EN:** Continues the docstring for the function `_generate_kernel_module`. **CN:** 继续说明 function `_generate_kernel_module` 的文档字符串。
+- **L88** `        """` — **EN:** Ends the docstring for the function `_generate_kernel_module`. **CN:** 结束说明 function `_generate_kernel_module` 的文档字符串。
+- **L89** `        kernel_module_struct = f"""` — **EN:** Assigns a value to kernel_module_struct. **CN:** 将一个值赋给 kernel_module_struct。
+- **L90** `typedef struct {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    cudaLibrary_t module;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `}} {symbol_prefix}_Kernel_Module_t;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `        kernel_module_load = f"""` — **EN:** Assigns a value to kernel_module_load. **CN:** 将一个值赋给 kernel_module_load。
+- **L95** `#ifdef __cplusplus` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `extern "C" {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `#endif` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L98** `void _mlir_{symbol_prefix}_cuda_init(void **);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `void _mlir_{symbol_prefix}_cuda_load_to_device(void **);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `static inline void {symbol_prefix}_Kernel_Module_Load({symbol_prefix}_Kernel_Module_t *module) {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `    cudaLibrary_t *libraryPtr = &(module->module);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    cudaError_t ret;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `    struct {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `        cudaLibrary_t **libraryPtr;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `        cudaError_t *ret;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `    }} initArgs = {{&libraryPtr, &ret}};` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `    _mlir_{symbol_prefix}_cuda_init((void **)(&initArgs));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `    {dsl_name}_CUDA_ERROR_CHECK(ret);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `    int32_t device_id = 0;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `    struct {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        cudaLibrary_t **library;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        int32_t *device_id;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        cudaError_t *ret;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `    }} loadArgs = {{&libraryPtr, &device_id, &ret}};` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `    int32_t device_count;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    {dsl_name}_CUDA_ERROR_CHECK(cudaGetDeviceCount(&device_count));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `    for (int32_t i = 0; i < device_count; i++) {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        device_id = i;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `        _mlir_{symbol_prefix}_cuda_load_to_device((void **)(&loadArgs));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `        {dsl_name}_CUDA_ERROR_CHECK(ret);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `    }}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `}}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `        kernel_module_unload = f"""` — **EN:** Assigns a value to kernel_module_unload. **CN:** 将一个值赋给 kernel_module_unload。
+- **L125** `static inline void {symbol_prefix}_Kernel_Module_Unload({symbol_prefix}_Kernel_Module_t *module) {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    {dsl_name}_CUDA_ERROR_CHECK(cudaLibraryUnload(module->module));` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `}}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `#ifdef __cplusplus` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L130** `}}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L131** `#endif` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L132** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `        return kernel_module_struct + kernel_module_load + kernel_module_unload` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    def _generate_arguments(` — **EN:** Defines function `_generate_arguments`. **CN:** 定义函数 `_generate_arguments`。
+- **L137** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `        symbol_prefix: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L139** `        execution_args: ExecutionArgs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L140** `        args: tuple[Any, ...],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L141** `        kwargs: dict[str, Any],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L142** `    ) -> tuple[list[str], list[str], list[str]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L143** `        """` — **EN:** Starts the docstring for the function `_generate_arguments`. **CN:** 开始说明 function `_generate_arguments` 的文档字符串。
+- **L144** `        Generate the arguments of the wrapper function.` — **EN:** Continues the docstring for the function `_generate_arguments`. **CN:** 继续说明 function `_generate_arguments` 的文档字符串。
+- **L145** `        """` — **EN:** Ends the docstring for the function `_generate_arguments`. **CN:** 结束说明 function `_generate_arguments` 的文档字符串。
+- **L146** `        arguments = []` — **EN:** Assigns a value to arguments. **CN:** 将一个值赋给 arguments。
+- **L147** `        packed_args = []` — **EN:** Assigns a value to packed_args. **CN:** 将一个值赋给 packed_args。
+- **L148** `        declarations = []` — **EN:** Assigns a value to declarations. **CN:** 将一个值赋给 declarations。
+- **L149** `        # traverse the runtime args_spec and generate the arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L150** `        rectified_args = execution_args.get_rectified_args(args, kwargs)` — **EN:** Assigns a value to rectified_args. **CN:** 将一个值赋给 rectified_args。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `        for param, arg in zip(` — **EN:** Starts a loop assigning items from `zip(execution_args.signature.parameters.values(...` to `(param, arg)`. **CN:** 开始一个循环，将 `zip(execution_args.signature.parameters.values(...` 的元素赋给 `(param, arg)`。
+- **L153** `            execution_args.signature.parameters.values(), rectified_args` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L155** `            arg_type = param.annotation` — **EN:** Assigns a value to arg_type. **CN:** 将一个值赋给 arg_type。
+- **L156** `            arg_name = param.name` — **EN:** Assigns a value to arg_name. **CN:** 将一个值赋给 arg_name。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `            # process optional argument` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L159** `            if arg is None:` — **EN:** Starts a conditional branch guarded by `arg is None`. **CN:** 开始一个由 `arg is None` 控制的条件分支。
+- **L160** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `            # Unwrap Optional[X] (i.e. Union[X, None]) to X when arg is not None` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L163** `            if get_origin(arg_type) is Union:` — **EN:** Starts a conditional branch guarded by `get_origin(arg_type) is Union`. **CN:** 开始一个由 `get_origin(arg_type) is Union` 控制的条件分支。
+- **L164** `                inner_types = [t for t in get_args(arg_type) if t is not type(None)]` — **EN:** Assigns a value to inner_types. **CN:** 将一个值赋给 inner_types。
+- **L165** `                if len(inner_types) == 1:` — **EN:** Starts a conditional branch guarded by `len(inner_types) == 1`. **CN:** 开始一个由 `len(inner_types) == 1` 控制的条件分支。
+- **L166** `                    arg_type = inner_types[0]` — **EN:** Assigns a value to arg_type. **CN:** 将一个值赋给 arg_type。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `            if isinstance(arg, Pointer):` — **EN:** Starts a conditional branch guarded by `isinstance(arg, Pointer)`. **CN:** 开始一个由 `isinstance(arg, Pointer)` 控制的条件分支。
+- **L169** `                arguments.append(f"void *{arg_name}")` — **EN:** Invokes `arguments.append` as a standalone call. **CN:** 以独立语句方式调用 `arguments.append`。
+- **L170** `                packed_args.append("&" + arg_name)` — **EN:** Invokes `packed_args.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_args.append`。
+- **L171** `            elif isinstance(arg, Tensor):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L172** `                dynamic_shapes = (` — **EN:** Assigns a value to dynamic_shapes. **CN:** 将一个值赋给 dynamic_shapes。
+- **L173** `                    f"\n    int32_t dynamic_shapes[{sum(arg.dynamic_shapes_mask)}];"  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `                    if sum(arg.dynamic_shapes_mask) > 0  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `                    else ""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** `                stride_type = "int32_t" if arg._use_32bit_stride else "int64_t"  # type: ignore[attr-defined]` — **EN:** Assigns a value to stride_type. **CN:** 将一个值赋给 stride_type。
+- **L178** `                dynamic_strides = (` — **EN:** Assigns a value to dynamic_strides. **CN:** 将一个值赋给 dynamic_strides。
+- **L179** `                    f"\n    {stride_type} dynamic_strides[{sum(arg.dynamic_strides_mask)}];"  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L180** `                    if sum(arg.dynamic_strides_mask) > 0  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `                    else ""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `                declarations.append(` — **EN:** Invokes `declarations.append` as a standalone call. **CN:** 以独立语句方式调用 `declarations.append`。
+- **L184** `                    f"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `typedef struct {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `    void *data;{dynamic_shapes}{dynamic_strides}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `}} {symbol_prefix}_Tensor_{arg_name}_t;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `                arguments.append(f"{symbol_prefix}_Tensor_{arg_name}_t *{arg_name}")` — **EN:** Invokes `arguments.append` as a standalone call. **CN:** 以独立语句方式调用 `arguments.append`。
+- **L191** `                packed_args.append(arg_name)` — **EN:** Invokes `packed_args.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_args.append`。
+- **L192** `            # Generate basic numeric types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L193** `            elif isinstance(arg_type, NumericMeta):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L194** `                arguments.append(self._generate_numeric_argument(arg_name, arg_type))  # type: ignore[arg-type]` — **EN:** Invokes `arguments.append` as a standalone call. **CN:** 以独立语句方式调用 `arguments.append`。
+- **L195** `                packed_args.append("&" + arg_name)` — **EN:** Invokes `packed_args.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_args.append`。
+- **L196** `            elif is_cute_algebra_type(arg_type) or isinstance(arg, (tuple, list)):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L197** `                c_type = self._get_cute_algebra_type(arg_type, arg)` — **EN:** Assigns a value to c_type. **CN:** 将一个值赋给 c_type。
+- **L198** `                arguments.append(f"{c_type}*{arg_name}")` — **EN:** Invokes `arguments.append` as a standalone call. **CN:** 以独立语句方式调用 `arguments.append`。
+- **L199** `                for i in range(self._count_dynamic_expression(arg)):` — **EN:** Starts a loop assigning items from `range(self._count_dynamic_expression(arg))` to `i`. **CN:** 开始一个循环，将 `range(self._count_dynamic_expression(arg))` 的元素赋给 `i`。
+- **L200** `                    packed_args.append("&" + arg_name + "[" + str(i) + "]")` — **EN:** Invokes `packed_args.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_args.append`。
+- **L201** `            elif isclass(arg_type) and issubclass(arg_type, cuda.CUstream):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L202** `                arguments.append("cudaStream_t " + arg_name)` — **EN:** Invokes `arguments.append` as a standalone call. **CN:** 以独立语句方式调用 `arguments.append`。
+- **L203** `                packed_args.append("&" + arg_name)` — **EN:** Invokes `packed_args.append` as a standalone call. **CN:** 以独立语句方式调用 `packed_args.append`。
+- **L204** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L205** `                raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L206** `                    f"Unsupported argument for c function argument generation: {arg_name} = {arg} with type annotation {arg_type}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `        return arguments, packed_args, declarations` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    def _generate_wrapper_function(` — **EN:** Defines function `_generate_wrapper_function`. **CN:** 定义函数 `_generate_wrapper_function`。
+- **L212** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L213** `        dsl_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L214** `        symbol_prefix: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L215** `        execution_args: ExecutionArgs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L216** `        function_name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L217** `        kernel_info: dict[str, list[Any]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L218** `        c_header_arguments: CHeaderArguments,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `    ) -> str:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L220** `        """` — **EN:** Starts the docstring for the function `_generate_wrapper_function`. **CN:** 开始说明 function `_generate_wrapper_function` 的文档字符串。
+- **L221** `        Generate the wrapper function for the compiled function which is provided to users as the entry point.` — **EN:** Continues the docstring for the function `_generate_wrapper_function`. **CN:** 继续说明 function `_generate_wrapper_function` 的文档字符串。
+- **L222** `        It uses the \`symbol_prefix\` as the function name for identification. The host/device symbols are hidden under the bytecode.` — **EN:** Continues the docstring for the function `_generate_wrapper_function`. **CN:** 继续说明 function `_generate_wrapper_function` 的文档字符串。
+- **L223** `        """` — **EN:** Ends the docstring for the function `_generate_wrapper_function`. **CN:** 结束说明 function `_generate_wrapper_function` 的文档字符串。
+- **L224** `        # 1. Get the name of the function wrapper` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L225** `        wrapper_function_name = f"{dsl_name.lower()}_{symbol_prefix}_wrapper"` — **EN:** Assigns a value to wrapper_function_name. **CN:** 将一个值赋给 wrapper_function_name。
+- **L226** `        capi_function_name = f"_mlir_{symbol_prefix}__mlir_ciface_{function_name}"` — **EN:** Assigns a value to capi_function_name. **CN:** 将一个值赋给 capi_function_name。
+- **L227** `        # 2. Generate the signature of the wrapper function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L228** `        if c_header_arguments.error_msg is not None:` — **EN:** Starts a conditional branch guarded by `c_header_arguments.error_msg is not None`. **CN:** 开始一个由 `c_header_arguments.error_msg is not None` 控制的条件分支。
+- **L229** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L230** `                f"Error generating c header arguments: {c_header_arguments.error_msg}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `        arguments = [` — **EN:** Assigns a value to arguments. **CN:** 将一个值赋给 arguments。
+- **L233** `            arg.replace(c_header_arguments.dummy_prefix_name, symbol_prefix)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `            for arg in c_header_arguments.arguments` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        packed_args = [` — **EN:** Assigns a value to packed_args. **CN:** 将一个值赋给 packed_args。
+- **L237** `            arg.replace(c_header_arguments.dummy_prefix_name, symbol_prefix)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `            for arg in c_header_arguments.packed_args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `        declarations = [` — **EN:** Assigns a value to declarations. **CN:** 将一个值赋给 declarations。
+- **L241** `            declaration.replace(c_header_arguments.dummy_prefix_name, symbol_prefix)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `            for declaration in c_header_arguments.declarations` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `        # 3. Get the return type of the wrapper function.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L246** `        # Note that this requires the return type to be properly annotated in python.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L247** `        return_type = execution_args.signature.return_annotation` — **EN:** Assigns a value to return_type. **CN:** 将一个值赋给 return_type。
+- **L248** `        if return_type is Parameter.empty:` — **EN:** Starts a conditional branch guarded by `return_type is Parameter.empty`. **CN:** 开始一个由 `return_type is Parameter.empty` 控制的条件分支。
+- **L249** `            return_type = "void"` — **EN:** Assigns a value to return_type. **CN:** 将一个值赋给 return_type。
+- **L250** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L251** `            return_type = self.numeric_to_c_type[return_type][:-1]` — **EN:** Assigns a value to return_type. **CN:** 将一个值赋给 return_type。
+- **L252** `        declarations_str = "\n".join(declarations)` — **EN:** Assigns a value to declarations_str. **CN:** 将一个值赋给 declarations_str。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `        # 4. Generate the wrapper function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L255** `        function = (` — **EN:** Assigns a value to function. **CN:** 将一个值赋给 function。
+- **L256** `            declarations_str` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            + f"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `#ifdef __cplusplus` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L259** `extern "C"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `#endif` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L261** `void {capi_function_name}(void **args, int32_t num_args);` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `static inline {return_type} {wrapper_function_name}({symbol_prefix}_Kernel_Module_t *module, {", ".join(arguments)}) {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `    {return_type} ret;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `    void *args[{len(packed_args) + 1}] = {{` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `        {", ".join(packed_args)},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `        &ret` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `    }};` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `    {capi_function_name}(args, {len(packed_args) + 1});` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `    return ret;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `}}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `        return function` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.export.c_header_generator`. CN: 模块名为 `CuTeDSL.cutlass.cute.export.c_header_generator`。
+- EN: Top-level classes: CuteCHeaderGenerator CN: 顶层类包括：CuteCHeaderGenerator
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute.typing:NumericMeta,Integer, cutlass.base_dsl.export:CHeaderGenerator,CHeaderArguments, cutlass.base_dsl.common:DSLRuntimeError, cutlass.base_dsl.jit_executor:ExecutionArgs, cutlass.cutlass_dsl.cutlass:is_cute_algebra_type, ..runtime:Tensor,Pointer CN: 内部依赖：cutlass.cute.typing:NumericMeta,Integer, cutlass.base_dsl.export:CHeaderGenerator,CHeaderArguments, cutlass.base_dsl.common:DSLRuntimeError, cutlass.base_dsl.jit_executor:ExecutionArgs, cutlass.cutlass_dsl.cutlass:is_cute_algebra_type, ..runtime:Tensor,Pointer
+- EN: External or standard-library dependencies: typing:Any,Union,get_origin,get_args, inspect:isclass,Parameter, cuda.bindings.driver CN: 外部或标准库依赖：typing:Any,Union,get_origin,get_args, inspect:isclass,Parameter, cuda.bindings.driver

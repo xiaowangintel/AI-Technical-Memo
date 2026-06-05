@@ -1,0 +1,136 @@
+# sage_attn.py — Code Analysis / 代码分析
+
+## Source / 来源
+- **File**: `python/sglang/multimodal_gen/runtime/layers/attention/backends/sage_attn.py`
+- **Repository**: sgl-project/sglang
+- **Purpose**: This file belongs to the runtime layer implementation. It centers on `SageAttentionBackend`, and `SageAttentionImpl`, organizing the main control flow, data structures, or helper routines for this module. / 该文件属于运行时算子层。它围绕 `SageAttentionBackend` 和 `SageAttentionImpl` 展开，组织了本模块的主控制流程、数据结构或辅助逻辑。
+
+## Line-by-Line Analysis / 逐行分析
+### Lines 6-15: module setup and imports / 模块初始化与导入
+```python
+import torch
+from sageattention import sageattn
+
+from sglang.multimodal_gen.runtime.layers.attention.backends.attention_backend import (  # FlashAttentionMetadata,
+    AttentionBackend,
+    AttentionImpl,
+    AttentionMetadata,
+)
+from sglang.multimodal_gen.runtime.platforms import AttentionBackendEnum
+from sglang.multimodal_gen.runtime.utils.logging_utils import init_logger
+```
+**EN:** This block establishes the module context and imports `torch`, `sageattention`, `sglang.multimodal_gen.runtime.layers.attention.backends.attention_backend`, `sglang.multimodal_gen.runtime.platforms`, and `sglang.multimodal_gen.runtime.utils.logging_utils`. These dependencies provide the symbols needed by the rest of the file.
+**CN:** 该代码块建立模块上下文，并导入 `torch`、`sageattention`、`sglang.multimodal_gen.runtime.layers.attention.backends.attention_backend`、`sglang.multimodal_gen.runtime.platforms` 和 `sglang.multimodal_gen.runtime.utils.logging_utils`。这些依赖为后续实现提供所需符号。
+
+### Lines 17-17: supporting statements / 辅助语句
+```python
+logger = init_logger(__name__)
+```
+**EN:** This block gathers supporting statements at module scope. It updates names such as `logger`. The code collaborates with `init_logger`.
+**CN:** 该代码块汇集了位于模块作用域的辅助语句。 它会更新 `logger` 等名称。 代码会与 `init_logger` 协同工作。
+
+### Lines 20-20: `SageAttentionBackend` class overview / `SageAttentionBackend` 类概览
+```python
+class SageAttentionBackend(AttentionBackend):
+```
+**EN:** This block defines class `SageAttentionBackend`. It encapsulates sage attention backend behavior. It inherits from `AttentionBackend`.
+**CN:** 该代码块定义了类 `SageAttentionBackend`。 它用于封装 sage attention backend 相关行为。 它继承自 `AttentionBackend`。
+
+### Lines 21-21: supporting statements / 辅助语句
+```python
+    accept_output_buffer: bool = True
+```
+**EN:** This block gathers supporting statements inside `SageAttentionBackend`. It updates names such as `accept_output_buffer`.
+**CN:** 该代码块汇集了位于 `SageAttentionBackend` 内部的辅助语句。 它会更新 `accept_output_buffer` 等名称。
+
+### Lines 23-25: `get_supported_head_sizes` implementation / `get_supported_head_sizes` 实现
+```python
+    @staticmethod
+    def get_supported_head_sizes() -> list[int]:
+        return [32, 64, 96, 128, 160, 192, 224, 256]
+```
+**EN:** This block defines method `get_supported_head_sizes` on `SageAttentionBackend`. It retrieves supported head sizes.
+**CN:** 该代码块定义了 `SageAttentionBackend` 的方法 `get_supported_head_sizes`。 它用于获取supported head sizes。
+
+### Lines 27-29: `get_enum` implementation / `get_enum` 实现
+```python
+    @staticmethod
+    def get_enum() -> AttentionBackendEnum:
+        return AttentionBackendEnum.SAGE_ATTN
+```
+**EN:** This block defines method `get_enum` on `SageAttentionBackend`. It retrieves enum.
+**CN:** 该代码块定义了 `SageAttentionBackend` 的方法 `get_enum`。 它用于获取enum。
+
+### Lines 31-33: `get_impl_cls` implementation / `get_impl_cls` 实现
+```python
+    @staticmethod
+    def get_impl_cls() -> type["SageAttentionImpl"]:
+        return SageAttentionImpl
+```
+**EN:** This block defines method `get_impl_cls` on `SageAttentionBackend`. It retrieves impl cls.
+**CN:** 该代码块定义了 `SageAttentionBackend` 的方法 `get_impl_cls`。 它用于获取impl cls。
+
+### Lines 36-37: `SageAttentionImpl` class overview / `SageAttentionImpl` 类概览
+```python
+class SageAttentionImpl(AttentionImpl):
+```
+**EN:** This block defines class `SageAttentionImpl`. It encapsulates sage attention impl behavior. It inherits from `AttentionImpl`.
+**CN:** 该代码块定义了类 `SageAttentionImpl`。 它用于封装 sage attention impl 相关行为。 它继承自 `AttentionImpl`。
+
+### Lines 38-50: `__init__` implementation / `__init__` 实现
+```python
+    def __init__(
+        self,
+        num_heads: int,
+        head_size: int,
+        causal: bool,
+        softmax_scale: float,
+        num_kv_heads: int | None = None,
+        prefix: str = "",
+        **extra_impl_args,
+    ) -> None:
+        self.causal = causal
+        self.softmax_scale = softmax_scale
+        self.dropout = extra_impl_args.get("dropout_p", 0.0)
+```
+**EN:** This block defines method `__init__` on `SageAttentionImpl`. It initializes the instance state. Key calls include `extra_impl_args.get`. Parameters such as `num_heads`, `head_size`, `causal`, `softmax_scale`, and `num_kv_heads` drive the behavior in this section.
+**CN:** 该代码块定义了 `SageAttentionImpl` 的方法 `__init__`。 它用于初始化实例状态。 关键调用包括 `extra_impl_args.get`。 本段逻辑主要由 `num_heads`、`head_size`、`causal`、`softmax_scale` 和 `num_kv_heads` 等参数驱动。
+
+### Lines 52-74: `forward` implementation / `forward` 实现
+```python
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch.Tensor,
+        attn_metadata: AttentionMetadata,
+        *,
+        return_softmax_lse: bool = False,
+    ) -> torch.Tensor:
+        output = sageattn(
+            query,
+            key,
+            value,
+            # since input is (batch_size, seq_len, head_num, head_dim)
+            tensor_layout="NHD",
+            is_causal=self.causal,
+            sm_scale=self.softmax_scale,
+            return_lse=return_softmax_lse,
+        )
+        if return_softmax_lse:
+            output, softmax_lse = output
+            return output, softmax_lse
+        return output
+```
+**EN:** This block defines method `forward` on `SageAttentionImpl`. It executes function. Key calls include `sageattn`. The implementation branches on conditions. Parameters such as `query`, `key`, `value`, and `attn_metadata` drive the behavior in this section.
+**CN:** 该代码块定义了 `SageAttentionImpl` 的方法 `forward`。 它用于执行前向计算函数。 关键调用包括 `sageattn`。 实现中包含条件分支。 本段逻辑主要由 `query`、`key`、`value` 和 `attn_metadata` 等参数驱动。
+
+## Key Concepts / 关键概念
+- `SageAttentionBackend`: Primary class that encapsulates sage attention backend behavior. / 核心类，用于封装 sage attention backend 相关行为。
+- `SageAttentionImpl`: Primary class that encapsulates sage attention impl behavior. / 核心类，用于封装 sage attention impl 相关行为。
+
+## Dependencies / 依赖关系
+- **Third-party / 第三方依赖**: `torch`, `sageattention`
+- **Internal modules / 内部模块**: `sglang.multimodal_gen.runtime.layers.attention.backends.attention_backend`, `sglang.multimodal_gen.runtime.platforms`, `sglang.multimodal_gen.runtime.utils.logging_utils`
+
+- **Total lines / 总行数**: 74

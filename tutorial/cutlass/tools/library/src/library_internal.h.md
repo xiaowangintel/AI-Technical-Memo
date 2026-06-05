@@ -1,0 +1,1304 @@
+# library_internal.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/library/src/library_internal.h`
+**Purpose / 用途**: Declares internal helpers shared inside the CUTLASS library runtime. / 声明 CUTLASS 运行时库内部共享的辅助逻辑。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>/*! </code>
+  - EN: Comment that documents intent or context: "!".
+  - CN: 用于说明意图或上下文的注释："!"。
+- **L32** <code>  \file</code>
+  - EN: Comment that documents intent or context: "\file".
+  - CN: 用于说明意图或上下文的注释："\file"。
+- **L33** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L34** <code>  \brief CUTLASS Library is an object-oriented approach to managing operations implemented by CUTLASS.</code>
+  - EN: Comment that documents intent or context: "\brief CUTLASS Library is an object-oriented approach to managing operations implemented by CUTLASS.".
+  - CN: 用于说明意图或上下文的注释："\brief CUTLASS Library is an object-oriented approach to managing operations implemented by CUTLASS."。
+- **L35** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L36** <code>  Generally,</code>
+  - EN: Comment that documents intent or context: "Generally,".
+  - CN: 用于说明意图或上下文的注释："Generally,"。
+- **L37** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L38** <code>    description   - compile-time constant parameters used to instantiate an operation</code>
+  - EN: Comment that documents intent or context: "description   - compile-time constant parameters used to instantiate an operation".
+  - CN: 用于说明意图或上下文的注释："description   - compile-time constant parameters used to instantiate an operation"。
+- **L39** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L40** <code>    configuration - runtime parameters with computationally expensive initialization </code>
+  - EN: Comment that documents intent or context: "configuration - runtime parameters with computationally expensive initialization".
+  - CN: 用于说明意图或上下文的注释："configuration - runtime parameters with computationally expensive initialization"。
+- **L41** <code>    </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L42** <code>    arguments     - runtime parameters that may be passed to an initialized operation with low</code>
+  - EN: Comment that documents intent or context: "arguments     - runtime parameters that may be passed to an initialized operation with low".
+  - CN: 用于说明意图或上下文的注释："arguments     - runtime parameters that may be passed to an initialized operation with low"。
+- **L43** <code>                    computational overhead</code>
+  - EN: Comment that documents intent or context: "computational overhead".
+  - CN: 用于说明意图或上下文的注释："computational overhead"。
+- **L44** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L45** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L46** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L47** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L48** <code>#include &quot;cutlass/cutlass.h&quot;</code>
+  - EN: Includes `cutlass/cutlass.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/cutlass.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L49** <code>#include &quot;cutlass/complex.h&quot;</code>
+  - EN: Includes `cutlass/complex.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/complex.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L50** <code>#include &quot;cutlass/numeric_types.h&quot;</code>
+  - EN: Includes `cutlass/numeric_types.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/numeric_types.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L51** <code>#include &quot;cutlass/arch/arch.h&quot;</code>
+  - EN: Includes `cutlass/arch/arch.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/arch/arch.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L52** <code>#include &quot;cutlass/arch/mma.h&quot;</code>
+  - EN: Includes `cutlass/arch/mma.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/arch/mma.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L53** <code>#include &quot;cutlass/layout/matrix.h&quot;</code>
+  - EN: Includes `cutlass/layout/matrix.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/layout/matrix.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>#include &quot;cutlass/library/library.h&quot;</code>
+  - EN: Includes `cutlass/library/library.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/library.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L56** <code>#include &quot;cutlass/library/arch_mappings.h&quot;</code>
+  - EN: Includes `cutlass/library/arch_mappings.h` so this file can use CUTLASS runtime library interfaces or metadata.
+  - CN: 引入 `cutlass/library/arch_mappings.h`，使当前文件可以使用CUTLASS 运行时库接口或元数据。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L59** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L60** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L61** <code>namespace library {</code>
+  - EN: Opens namespace `library` to group related symbols.
+  - CN: 打开命名空间 `library`，用于归组相关符号。
+- **L62** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L63** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L64** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L65** <code>template &lt;typename T&gt; struct NumericTypeMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L66** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L67** <code>template &lt;&gt; struct NumericTypeMap&lt;void&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L68** <code>  static NumericTypeID const kId = NumericTypeID::kVoid;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L69** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L70** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L71** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::uint1b_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L72** <code>  static NumericTypeID const kId = NumericTypeID::kB1;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L73** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L74** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L75** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::int2b_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L76** <code>  static NumericTypeID const kId = NumericTypeID::kS2;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L77** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::int4b_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L80** <code>  static NumericTypeID const kId = NumericTypeID::kS4;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L81** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L82** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L83** <code>template &lt;&gt; struct NumericTypeMap&lt;int8_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L84** <code>  static NumericTypeID const kId = NumericTypeID::kS8;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L85** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L86** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L87** <code>template &lt;&gt; struct NumericTypeMap&lt;int16_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L88** <code>  static NumericTypeID const kId = NumericTypeID::kS16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L89** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L90** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L91** <code>template &lt;&gt; struct NumericTypeMap&lt;int32_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L92** <code>  static NumericTypeID const kId = NumericTypeID::kS32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L93** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L94** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L95** <code>template &lt;&gt; struct NumericTypeMap&lt;int64_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L96** <code>  static NumericTypeID const kId = NumericTypeID::kS64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L97** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L98** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L99** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::uint2b_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L100** <code>  static NumericTypeID const kId = NumericTypeID::kU2;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L101** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L102** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L103** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::uint4b_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L104** <code>  static NumericTypeID const kId = NumericTypeID::kU4;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L105** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L106** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L107** <code>template &lt;&gt; struct NumericTypeMap&lt;uint8_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L108** <code>  static NumericTypeID const kId = NumericTypeID::kU8;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L109** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L110** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L111** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_e4m3_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L112** <code>  static NumericTypeID const kId = NumericTypeID::kFE4M3;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L113** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L114** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L115** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_e5m2_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L116** <code>  static NumericTypeID const kId = NumericTypeID::kFE5M2;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L117** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L118** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L119** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L120** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_e2m3_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L121** <code>  static NumericTypeID const kId = NumericTypeID::kFE2M3;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L122** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_e3m2_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L125** <code>  static NumericTypeID const kId = NumericTypeID::kFE3M2;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L126** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L127** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L128** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_e2m1_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L129** <code>  static NumericTypeID const kId = NumericTypeID::kFE2M1;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L130** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L131** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_ue8m0_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L132** <code>  static NumericTypeID const kId = NumericTypeID::kFUE8M0;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L133** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L134** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L135** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::float_ue4m3_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L136** <code>  static NumericTypeID const kId = NumericTypeID::kFUE4M3;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L137** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L140** <code>template &lt;&gt; struct NumericTypeMap&lt;uint16_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L141** <code>  static NumericTypeID const kId = NumericTypeID::kU16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L142** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L143** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L144** <code>template &lt;&gt; struct NumericTypeMap&lt;uint32_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L145** <code>  static NumericTypeID const kId = NumericTypeID::kU32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L146** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L147** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L148** <code>template &lt;&gt; struct NumericTypeMap&lt;uint64_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L149** <code>  static NumericTypeID const kId = NumericTypeID::kU64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L150** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L152** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::half_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L153** <code>  static NumericTypeID const kId = NumericTypeID::kF16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L154** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>template &lt;&gt; struct NumericTypeMap&lt;float&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L157** <code>  static NumericTypeID const kId = NumericTypeID::kF32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L158** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L159** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L160** <code>template &lt;&gt; struct NumericTypeMap&lt;double&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L161** <code>  static NumericTypeID const kId = NumericTypeID::kF64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L162** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L163** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L164** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::complex&lt;cutlass::half_t&gt; &gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L165** <code>  static NumericTypeID const kId = NumericTypeID::kCF16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L166** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L167** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L168** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::complex&lt;float&gt; &gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L169** <code>  static NumericTypeID const kId = NumericTypeID::kCF32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L170** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L171** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L172** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::complex&lt;double&gt; &gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L173** <code>  static NumericTypeID const kId = NumericTypeID::kCF64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L174** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L175** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L176** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::bfloat16_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L177** <code>  static NumericTypeID const kId = NumericTypeID::kBF16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L178** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L179** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L180** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::tfloat32_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L181** <code>  static NumericTypeID const kId = NumericTypeID::kTF32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L182** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L183** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L184** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L185** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L186** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L187** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::type_erased_dynamic_float8_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L188** <code>  static NumericTypeID const kId = NumericTypeID::kF8;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L189** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L190** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L191** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::type_erased_dynamic_float6_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L192** <code>  static NumericTypeID const kId = NumericTypeID::kF6;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L193** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L194** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L195** <code>template &lt;&gt; struct NumericTypeMap&lt;cutlass::type_erased_dynamic_float4_t&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L196** <code>  static NumericTypeID const kId = NumericTypeID::kF4;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L197** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L198** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L199** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L200** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L201** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L202** <code>template &lt;typename T&gt; struct MathOperationMap {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L203** <code>  static MathOperationID const kId = MathOperationID::kInvalid;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L204** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L205** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L206** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAdd&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L207** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAdd;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L208** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L209** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L210** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddFastBF16&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L211** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddFastBF16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L212** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L213** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L214** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddFastF16&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L215** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddFastF16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L216** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L217** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L218** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddSaturate&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L219** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddSaturate;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L220** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L221** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L222** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddMixedInputUpcast&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L223** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddMixedInputUpcast;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L224** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L225** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L226** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddComplex&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L227** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddComplex;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L228** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L229** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L230** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddGaussianComplex&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L231** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddGaussianComplex;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L232** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L233** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L234** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpXorPopc&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L235** <code>  static MathOperationID const kId = MathOperationID::kXorPopc;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L236** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L237** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L238** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L239** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddFastF32&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L240** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddFastF32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L241** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L242** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L243** <code>template &lt;&gt; struct MathOperationMap&lt;cutlass::arch::OpMultiplyAddComplexFastF32&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L244** <code>  static MathOperationID const kId = MathOperationID::kMultiplyAddComplexFastF32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L245** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L246** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L247** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L248** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L249** <code>template &lt;typename T&gt; struct LayoutMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L250** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L251** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::ColumnMajor&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L252** <code>  static LayoutTypeID const kId = LayoutTypeID::kColumnMajor;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L253** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L254** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L255** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::RowMajor&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L256** <code>  static LayoutTypeID const kId = LayoutTypeID::kRowMajor;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L257** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L258** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L259** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::ColumnMajorInterleaved&lt;2&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L260** <code>  static LayoutTypeID const kId = LayoutTypeID::kColumnMajorInterleavedK2;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L261** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L262** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L263** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::RowMajorInterleaved&lt;2&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L264** <code>  static LayoutTypeID const kId = LayoutTypeID::kRowMajorInterleavedK2;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L265** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L266** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L267** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::ColumnMajorInterleaved&lt;4&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L268** <code>  static LayoutTypeID const kId = LayoutTypeID::kColumnMajorInterleavedK4;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L269** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L270** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L271** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::RowMajorInterleaved&lt;4&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L272** <code>  static LayoutTypeID const kId = LayoutTypeID::kRowMajorInterleavedK4;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L273** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L274** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L275** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::ColumnMajorInterleaved&lt;16&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L276** <code>  static LayoutTypeID const kId = LayoutTypeID::kColumnMajorInterleavedK16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L277** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L278** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L279** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::RowMajorInterleaved&lt;16&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L280** <code>  static LayoutTypeID const kId = LayoutTypeID::kRowMajorInterleavedK16;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L281** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L282** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L283** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::ColumnMajorInterleaved&lt;32&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L284** <code>  static LayoutTypeID const kId = LayoutTypeID::kColumnMajorInterleavedK32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L285** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L286** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L287** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::RowMajorInterleaved&lt;32&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L288** <code>  static LayoutTypeID const kId = LayoutTypeID::kRowMajorInterleavedK32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L289** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L290** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L291** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::ColumnMajorInterleaved&lt;64&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L292** <code>  static LayoutTypeID const kId = LayoutTypeID::kColumnMajorInterleavedK64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L293** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L294** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L295** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::RowMajorInterleaved&lt;64&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L296** <code>  static LayoutTypeID const kId = LayoutTypeID::kRowMajorInterleavedK64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L297** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L298** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L299** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::TensorNHWC&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L300** <code>  static LayoutTypeID const kId = LayoutTypeID::kTensorNHWC;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L301** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L302** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L303** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::TensorNDHWC&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L304** <code>  static LayoutTypeID const kId = LayoutTypeID::kTensorNDHWC;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L305** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L306** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L307** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::TensorNCxHWx&lt;32&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L308** <code>  static LayoutTypeID const kId = LayoutTypeID::kTensorNC32HW32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L309** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L310** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L311** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::TensorNCxHWx&lt;64&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L312** <code>  static LayoutTypeID const kId = LayoutTypeID::kTensorNC64HW64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L313** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L314** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L315** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::TensorCxRSKx&lt;32&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L316** <code>  static LayoutTypeID const kId = LayoutTypeID::kTensorC32RSK32;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L317** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L318** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L319** <code>template &lt;&gt; struct LayoutMap&lt;cutlass::layout::TensorCxRSKx&lt;64&gt;&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L320** <code>  static LayoutTypeID const kId = LayoutTypeID::kTensorC64RSK64;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L321** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L322** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L323** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L324** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L325** <code>template &lt;typename T&gt; struct OpcodeClassMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L326** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L327** <code>template &lt;&gt; struct OpcodeClassMap&lt;arch::OpClassSimt&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L328** <code>  static OpcodeClassID const kId = OpcodeClassID::kSimt;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L329** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L330** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L331** <code>template &lt;&gt; struct OpcodeClassMap&lt;arch::OpClassTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L332** <code>  static OpcodeClassID const kId = OpcodeClassID::kTensorOp;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L333** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L334** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L335** <code>template &lt;&gt; struct OpcodeClassMap&lt;arch::OpClassSparseTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L336** <code>  static OpcodeClassID const kId = OpcodeClassID::kSparseTensorOp;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L337** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L338** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L339** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L340** <code>template &lt;&gt; struct OpcodeClassMap&lt;arch::OpClassBlockScaledTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L341** <code>  static OpcodeClassID const kId = OpcodeClassID::kBlockScaledOp;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L342** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L343** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L344** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L345** <code>template &lt;&gt; struct OpcodeClassMap&lt;arch::OpClassWmmaTensorOp&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L346** <code>  static OpcodeClassID const kId = OpcodeClassID::kWmmaTensorOp;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L347** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L348** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L349** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L350** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L351** <code>template &lt;cutlass::ComplexTransform Transform&gt; struct ComplexTransformMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L352** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L353** <code>template &lt;&gt; struct ComplexTransformMap&lt;cutlass::ComplexTransform::kNone&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L354** <code>  static cutlass::library::ComplexTransform const kId = cutlass::library::ComplexTransform::kNone;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L355** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L356** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L357** <code>template &lt;&gt; struct ComplexTransformMap&lt;cutlass::ComplexTransform::kConjugate&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L358** <code>  static cutlass::library::ComplexTransform const kId = cutlass::library::ComplexTransform::kConjugate;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L359** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L360** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L361** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L362** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L363** <code>template &lt;cutlass::conv::Mode  T&gt; struct ConvModeMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L364** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L365** <code>template &lt;&gt; struct ConvModeMap&lt;conv::Mode::kCrossCorrelation&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L366** <code>  static ConvModeID const kId = ConvModeID::kCrossCorrelation;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L367** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L368** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L369** <code>template &lt;&gt; struct ConvModeMap&lt;conv::Mode::kConvolution&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L370** <code>  static ConvModeID const kId = ConvModeID::kConvolution;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L371** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L372** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L373** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L374** <code>template &lt;cutlass::conv::Operator  T&gt; struct ConvKindMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L375** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L376** <code>template &lt;&gt; struct ConvKindMap&lt;conv::Operator::kFprop&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L377** <code>  static ConvKind const kId = ConvKind::kFprop;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L378** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L379** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L380** <code>template &lt;&gt; struct ConvKindMap&lt;conv::Operator::kDgrad&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L381** <code>  static ConvKind const kId = ConvKind::kDgrad;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L382** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L383** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L384** <code>template &lt;&gt; struct ConvKindMap&lt;conv::Operator::kWgrad&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L385** <code>  static ConvKind const kId = ConvKind::kWgrad;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L386** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L387** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L388** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L389** <code>template &lt;cutlass::conv::IteratorAlgorithm  T&gt; struct IteratorAlgorithmMap;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L390** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L391** <code>template &lt;&gt; struct IteratorAlgorithmMap&lt;conv::IteratorAlgorithm::kAnalytic&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L392** <code>  static IteratorAlgorithmID const kId = IteratorAlgorithmID::kAnalytic;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L393** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L394** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L395** <code>template &lt;&gt; struct IteratorAlgorithmMap&lt;conv::IteratorAlgorithm::kOptimized&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L396** <code>  static IteratorAlgorithmID const kId = IteratorAlgorithmID::kOptimized;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L397** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L398** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L399** <code>template &lt;&gt; struct IteratorAlgorithmMap&lt;conv::IteratorAlgorithm::kFixedChannels&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L400** <code>  static IteratorAlgorithmID const kId = IteratorAlgorithmID::kFixedChannels;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L401** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L402** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L403** <code>template &lt;&gt; struct IteratorAlgorithmMap&lt;conv::IteratorAlgorithm::kFewChannels&gt; {</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L404** <code>  static IteratorAlgorithmID const kId = IteratorAlgorithmID::kFewChannels;</code>
+  - EN: Assigns or initializes `kId` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `kId` 进行赋值或初始化。
+- **L405** <code>};</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L406** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L407** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L408** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L409** <code>template &lt;typename Element, typename Layout&gt;</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L410** <code>TensorDescription make_TensorDescription(int alignment = 1) {</code>
+  - EN: Begins the definition of function or method `make_TensorDescription`.
+  - CN: 开始定义函数或方法 `make_TensorDescription`。
+- **L411** <code>  TensorDescription desc;</code>
+  - EN: Declares the symbol `desc` in the current scope.
+  - CN: 在当前作用域中声明符号 `desc`。
+- **L412** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L413** <code>  desc.element = NumericTypeMap&lt;Element&gt;::kId;</code>
+  - EN: Assigns or initializes `element` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `element` 进行赋值或初始化。
+- **L414** <code>  desc.layout = LayoutMap&lt;Layout&gt;::kId;</code>
+  - EN: Assigns or initializes `layout` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `layout` 进行赋值或初始化。
+- **L415** <code>  desc.alignment = alignment;</code>
+  - EN: Assigns or initializes `alignment` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `alignment` 进行赋值或初始化。
+- **L416** <code>  desc.log_extent_range = int(sizeof(typename Layout::TensorCoord::Index) - 1) * 8;</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L417** <code>  desc.log_stride_range = int(sizeof(typename Layout::Stride::Index) - 1) * 8;</code>
+  - EN: Declares function or method `int` without defining it here.
+  - CN: 声明函数或方法 `int`，但不在此处给出定义。
+- **L418** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L419** <code>  return desc;</code>
+  - EN: Returns a value from the current function or lambda.
+  - CN: 从当前函数或 lambda 返回一个值。
+- **L420** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L421** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L422** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L423** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L424** <code>} // namespace library</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L425** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L426** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L427** <code>/////////////////////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+
+## Key Concepts / 核心概念
+
+- Runtime operation registration and lookup / 运行时算子注册与查找
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/cutlass.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/complex.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/numeric_types.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/arch/arch.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/arch/mma.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/layout/matrix.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/library/library.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据
+- <code>cutlass/library/arch_mappings.h</code> — CUTLASS runtime library interfaces or metadata / CUTLASS 运行时库接口或元数据

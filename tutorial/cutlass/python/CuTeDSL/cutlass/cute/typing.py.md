@@ -1,0 +1,782 @@
+# typing.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/typing.py`
+
+## Purpose / 作用
+- EN: Defines 6 classes (SymInt, Layout, ComposedLayout, Pointer, ... (+2 more)) and 5 functions (sym_int, sym_int32, sym_int64, is_integer, ... (+1 more)) in `CuTeDSL.cutlass.cute.typing`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.typing` 定义了 6 个类（SymInt, Layout, ComposedLayout, Pointer, ... (+2 more)） 和 5 个函数（sym_int, sym_int32, sym_int64, is_integer, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from abc import ABC, abstractmethod` — **EN:** Imports ABC, abstractmethod from `abc`. **CN:** 从 `abc` 导入 ABC, abstractmethod。
+- **L15** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L16** `from typing import (` — **EN:** Imports ForwardRef, Tuple, Union, Any, Type, List, ... (+3 more) from `typing`. **CN:** 从 `typing` 导入 ForwardRef, Tuple, Union, Any, Type, List, ... (+3 more)。
+- **L17** `    ForwardRef,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    Tuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    Union,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    Any,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    Type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    List,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    Optional,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    Literal,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    TYPE_CHECKING,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L28** `from cutlass.cutlass_dsl import T` — **EN:** Imports T from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 T。
+- **L29** `from cutlass.base_dsl.typing import (` — **EN:** Imports Numeric, NumericMeta, Integer, Boolean, Int4, Int8, ... (+23 more) from `cutlass.base_dsl.typing`. **CN:** 从 `cutlass.base_dsl.typing` 导入 Numeric, NumericMeta, Integer, Boolean, Int4, Int8, ... (+23 more)。
+- **L30** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    NumericMeta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    Integer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** `    Int4,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L35** `    Int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    Int16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    Int32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `    Int64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** `    Int128,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L40** `    Uint8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L41** `    Uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    Uint32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    Uint64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    Float,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    Float16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    BFloat16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    TFloat32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    Float64,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    Float8E5M2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    Float8E4M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    Float8E4M3B11FNUZ,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    Float8E4M3,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    Float8E8M0FNU,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    Float4E2M1FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    Float6E2M3FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    Float6E3M2FN,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `    as_numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L62** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L63** `from cutlass._mlir.dialects.cute import AddressSpace, ConstrainedIntType` — **EN:** Imports AddressSpace, ConstrainedIntType from `cutlass._mlir.dialects.cute`. **CN:** 从 `cutlass._mlir.dialects.cute` 导入 AddressSpace, ConstrainedIntType。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `Int = Union[int, Integer]` — **EN:** Assigns a value to Int. **CN:** 将一个值赋给 Int。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `class SymInt:` — **EN:** Defines class `SymInt`. **CN:** 定义类 `SymInt`。
+- **L69** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L70** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L71** `        width: Literal[32, 64] = 32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L72** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L73** `        divisibility: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L74** `        symbol: str | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L75** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L76** `        if width not in [32, 64]:` — **EN:** Starts a conditional branch guarded by `width not in [32, 64]`. **CN:** 开始一个由 `width not in [32, 64]` 控制的条件分支。
+- **L77** `            raise ValueError(f"Unsupported width: {width}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `        self._width = width` — **EN:** Assigns a value to self._width. **CN:** 将一个值赋给 self._width。
+- **L80** `        self._divisibility = divisibility` — **EN:** Assigns a value to self._divisibility. **CN:** 将一个值赋给 self._divisibility。
+- **L81** `        self._symbol = symbol` — **EN:** Assigns a value to self._symbol. **CN:** 将一个值赋给 self._symbol。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `    def __hash__(self) -> int:` — **EN:** Defines function `__hash__`. **CN:** 定义函数 `__hash__`。
+- **L84** `        return hash((self._width, self._divisibility, self._symbol))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L87** `    def width(self) -> int:` — **EN:** Defines function `width`. **CN:** 定义函数 `width`。
+- **L88** `        return self._width` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L91** `    def divisibility(self) -> int:` — **EN:** Defines function `divisibility`. **CN:** 定义函数 `divisibility`。
+- **L92** `        return self._divisibility` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L95** `    def symbol(self) -> str | None:` — **EN:** Defines function `symbol`. **CN:** 定义函数 `symbol`。
+- **L96** `        return self._symbol` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L99** `        prefix = "" if self._symbol is None else self._symbol + " "` — **EN:** Assigns a value to prefix. **CN:** 将一个值赋给 prefix。
+- **L100** `        if self._width == 32:` — **EN:** Starts a conditional branch guarded by `self._width == 32`. **CN:** 开始一个由 `self._width == 32` 控制的条件分支。
+- **L101** `            return f"{prefix}?{{div={self._divisibility}}}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L102** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L103** `            return f"{prefix}?{{i{self._width} div={self._divisibility}}}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    def __repr__(self) -> str:` — **EN:** Defines function `__repr__`. **CN:** 定义函数 `__repr__`。
+- **L106** `        return self.__str__()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `    def __eq__(self, other: object) -> bool:` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L109** `        if not isinstance(other, SymInt):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, SymInt)`. **CN:** 开始一个由 `not isinstance(other, SymInt)` 控制的条件分支。
+- **L110** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `        return all(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L113** `            [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `                self._width == other._width,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `                self._divisibility == other._divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `                self._symbol == other._symbol,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    def __mod__(self, other: int | SymInt) -> SymInt | int:` — **EN:** Defines function `__mod__`. **CN:** 定义函数 `__mod__`。
+- **L121** `        if isinstance(other, int):` — **EN:** Starts a conditional branch guarded by `isinstance(other, int)`. **CN:** 开始一个由 `isinstance(other, int)` 控制的条件分支。
+- **L122** `            other_div, result_width = other, self._width` — **EN:** Assigns a value to (other_div, result_width). **CN:** 将一个值赋给 (other_div, result_width)。
+- **L123** `        elif isinstance(other, SymInt):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L124** `            other_div, result_width = (` — **EN:** Assigns a value to (other_div, result_width). **CN:** 将一个值赋给 (other_div, result_width)。
+- **L125** `                other._divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `                max(self._width, other._width),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L129** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `        if self._divisibility % other_div == 0:` — **EN:** Starts a conditional branch guarded by `self._divisibility % other_div == 0`. **CN:** 开始一个由 `self._divisibility % other_div == 0` 控制的条件分支。
+- **L132** `            return 0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L133** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L134** `            from math import gcd` — **EN:** Imports gcd from `math`. **CN:** 从 `math` 导入 gcd。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `            return SymInt(result_width, divisibility=gcd(self._divisibility, other_div))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    def __rmod__(self, other: int) -> int:` — **EN:** Defines function `__rmod__`. **CN:** 定义函数 `__rmod__`。
+- **L139** `        """int % SymInt: check if the int conforms to this SymInt's divisibility"""` — **EN:** Docstring line documenting the function `__rmod__`. **CN:** 文档字符串行，用于说明 function `__rmod__`。
+- **L140** `        if isinstance(other, int):` — **EN:** Starts a conditional branch guarded by `isinstance(other, int)`. **CN:** 开始一个由 `isinstance(other, int)` 控制的条件分支。
+- **L141** `            return other % self._divisibility` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L142** `        return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `    def __mul__(self, other: int | SymInt) -> SymInt:` — **EN:** Defines function `__mul__`. **CN:** 定义函数 `__mul__`。
+- **L145** `        if isinstance(other, int):` — **EN:** Starts a conditional branch guarded by `isinstance(other, int)`. **CN:** 开始一个由 `isinstance(other, int)` 控制的条件分支。
+- **L146** `            return SymInt(self._width, divisibility=self._divisibility * other)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** `        elif isinstance(other, SymInt):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L148** `            return SymInt(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L149** `                width=max(self._width, other._width),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `                divisibility=self._divisibility * other._divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L153** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `    def __rmul__(self, other: int | SymInt) -> SymInt:` — **EN:** Defines function `__rmul__`. **CN:** 定义函数 `__rmul__`。
+- **L156** `        return self.__mul__(other)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L157** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L158** `    def __c_pointers__(self) -> List[int | None]:` — **EN:** Defines function `__c_pointers__`. **CN:** 定义函数 `__c_pointers__`。
+- **L159** `        return [ctypes.c_void_p(0).value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    def __get_mlir_types__(self) -> List[ir.Type]:` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L162** `        res_ty = ir.Type.parse(` — **EN:** Assigns a value to res_ty. **CN:** 将一个值赋给 res_ty。
+- **L163** `            f'!cute.int_tuple<"?{{i{self.width} div={self.divisibility}}}">'` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `        return [res_ty]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L167** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> SymInt:` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L168** `        from .core import IntValue` — **EN:** Imports IntValue from `.core`. **CN:** 从 `.core` 导入 IntValue。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `        if self.width == 32:` — **EN:** Starts a conditional branch guarded by `self.width == 32`. **CN:** 开始一个由 `self.width == 32` 控制的条件分支。
+- **L171** `            return Int32(IntValue(values[0]))  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L172** `        elif self.width == 64:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L173** `            return Int64(IntValue(values[0]))  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L174** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L175** `            assert False, f"Unsupported width: {self.width}"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L176** `            return self` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `def sym_int(` — **EN:** Defines function `sym_int`. **CN:** 定义函数 `sym_int`。
+- **L179** `    width: Literal[32, 64] = 32, *, divisibility: int = 1, symbol: str | None = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L180** `) -> SymInt:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L181** `    return SymInt(width, divisibility=divisibility, symbol=symbol)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `def sym_int32(divisibility: int = 1, symbol: str | None = None) -> SymInt:` — **EN:** Defines function `sym_int32`. **CN:** 定义函数 `sym_int32`。
+- **L185** `    return sym_int(32, divisibility=divisibility, symbol=symbol)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `def sym_int64(divisibility: int = 1, symbol: str | None = None) -> SymInt:` — **EN:** Defines function `sym_int64`. **CN:** 定义函数 `sym_int64`。
+- **L189** `    return sym_int(64, divisibility=divisibility, symbol=symbol)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `if TYPE_CHECKING:` — **EN:** Starts a conditional branch guarded by `TYPE_CHECKING`. **CN:** 开始一个由 `TYPE_CHECKING` 控制的条件分支。
+- **L193** `    from cutlass.cute.core import ScaledBasis, Swizzle` — **EN:** Imports ScaledBasis, Swizzle from `cutlass.cute.core`. **CN:** 从 `cutlass.cute.core` 导入 ScaledBasis, Swizzle。
+- **L194** `    from cutlass.cute.tensor import TensorSSA` — **EN:** Imports TensorSSA from `cutlass.cute.tensor`. **CN:** 从 `cutlass.cute.tensor` 导入 TensorSSA。
+- **L195** `else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L196** `    ScaledBasis = ForwardRef("ScaledBasis")` — **EN:** Assigns a value to ScaledBasis. **CN:** 将一个值赋给 ScaledBasis。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `IntTuple = Union[Int, Tuple["IntTuple", ...]]` — **EN:** Assigns a value to IntTuple. **CN:** 将一个值赋给 IntTuple。
+- **L199** `Shape = Union[Int, Tuple["Shape", ...]]` — **EN:** Assigns a value to Shape. **CN:** 将一个值赋给 Shape。
+- **L200** `Stride = Union[Int, ScaledBasis, Tuple["Stride", ...]]` — **EN:** Assigns a value to Stride. **CN:** 将一个值赋给 Stride。
+- **L201** `Coord = Union[Int, None, Tuple["Coord", ...]]` — **EN:** Assigns a value to Coord. **CN:** 将一个值赋给 Coord。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `class Layout(ir.Value):` — **EN:** Defines class `Layout` with bases ir.Value. **CN:** 定义类 `Layout`，其基类为 ir.Value。
+- **L205** `    def __init__(self, op_result: ir.Value) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L206** `        super().__init__(op_result)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L209** `        return super().__str__()  # pragma: no cover` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    def get_hier_coord(self, idx: Int) -> Coord:` — **EN:** Defines function `get_hier_coord`. **CN:** 定义函数 `get_hier_coord`。
+- **L212** `        """Return the (hierarchical) ND logical coordinate corresponding to the linear index"""` — **EN:** Docstring line documenting the function `get_hier_coord`. **CN:** 文档字符串行，用于说明 function `get_hier_coord`。
+- **L213** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L216** `    def shape(  # type: ignore[empty-body]` — **EN:** Defines function `shape`. **CN:** 定义函数 `shape`。
+- **L217** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L218** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L219** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L220** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L221** `    ) -> Shape:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L222** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `shape`. **CN:** 文档字符串行，用于说明 function `shape`。
+- **L223** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L226** `    def stride(  # type: ignore[empty-body]` — **EN:** Defines function `stride`. **CN:** 定义函数 `stride`。
+- **L227** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `    ) -> Stride:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L232** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `stride`. **CN:** 文档字符串行，用于说明 function `stride`。
+- **L233** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L236** `class ComposedLayout(ABC):` — **EN:** Defines class `ComposedLayout` with bases ABC. **CN:** 定义类 `ComposedLayout`，其基类为 ABC。
+- **L237** `    r"""ComposedLayout represents the functional composition of layouts in CuTe.` — **EN:** Starts the docstring for the class `ComposedLayout`. **CN:** 开始说明 class `ComposedLayout` 的文档字符串。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `    **Formally:**` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `    .. math::` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `        R(c) := (inner \circ offset \circ outer)(c) := inner(offset + outer(c))` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `    where:` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `        - inner: The inner layout or swizzle that is applied last` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L248** `        - offset: An integer tuple representing a coordinate offset` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L249** `        - outer: The outer layout that is applied first` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    This composition allows for complex transformations of coordinates and indices,` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L252** `    enabling operations like tiling, partitioning, and reshaping of data.` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `    :ivar inner: The inner layout or swizzle component` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L255** `    :ivar offset: The coordinate offset applied between inner and outer layouts` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L256** `    :ivar outer: The outer layout component` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L257** `    :ivar max_alignment: The maximum alignment of the composed layout` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `    **Examples:**` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L260** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L261** `    .. code-block:: python` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `        # Create a composed layout with inner layout, offset, and outer layout` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `        # inner layout: (4, 8):(1, 4)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L266** `        inner_layout = make_layout((4, 8))` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L267** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L268** `        offset = (0, 0)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `        # outer layout: (2, 2):(1@0, 1@1)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L271** `        outer_layout = make_layout((2, 2), stride=(1 * E(0), 1 * E(1)))` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `        # composed layout: (inner o offset o outer)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L274** `        composed = make_composed_layout(inner_layout, offset, outer_layout)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `        # Accessing components of the composed layout` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L277** `        inner = composed.inner` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L278** `        offset = composed.offset` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L279** `        outer = composed.outer` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** `        # map coordinate (0, 1) to linear index` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L282** `        #  - outer(0, 1) = (0, 1)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L283** `        #  - offset + outer(0, 1) = (0, 1)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L284** `        #  - inner(0, 1) = 0 * 1 + 1 * 4 = 4` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L285** `        idx = crd2idx((0, 1), composed)` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `        # Composition is used in many tiling operations` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L288** `        # For example, in logical_product, raked_product, and blocked_product` — **EN:** Continues the docstring for the class `ComposedLayout`. **CN:** 继续说明 class `ComposedLayout` 的文档字符串。
+- **L289** `    """` — **EN:** Ends the docstring for the class `ComposedLayout`. **CN:** 结束说明 class `ComposedLayout` 的文档字符串。
+- **L290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L291** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L292** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L293** `    def type(self) -> ir.Type: ...` — **EN:** Defines function `type`. **CN:** 定义函数 `type`。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L296** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L297** `    def is_normal(self) -> bool: ...` — **EN:** Defines function `is_normal`. **CN:** 定义函数 `is_normal`。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L300** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L301** `    def inner(` — **EN:** Defines function `inner`. **CN:** 定义函数 `inner`。
+- **L302** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L303** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L304** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `    ) -> Union[Layout, "Swizzle"]: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L309** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L310** `    def offset(` — **EN:** Defines function `offset`. **CN:** 定义函数 `offset`。
+- **L311** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `    ) -> IntTuple: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L318** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L319** `    def outer(` — **EN:** Defines function `outer`. **CN:** 定义函数 `outer`。
+- **L320** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L321** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L322** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L323** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L324** `    ) -> Layout: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L327** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L328** `    def shape(` — **EN:** Defines function `shape`. **CN:** 定义函数 `shape`。
+- **L329** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L330** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L331** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L332** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L333** `    ) -> Shape: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L336** `    def __call__(` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L337** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L338** `        coord: Coord,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L339** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L340** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `    ) -> IntTuple: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `Tile = Union[Int, None, Layout, Tuple["Tile", ...]]` — **EN:** Assigns a value to Tile. **CN:** 将一个值赋给 Tile。
+- **L345** `Tiler = Union[Shape, Layout, Tile]` — **EN:** Assigns a value to Tiler. **CN:** 将一个值赋给 Tiler。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `# XTuple is super set of above types` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L349** `XTuple = Union[Any, Tuple["XTuple", ...]]` — **EN:** Assigns a value to XTuple. **CN:** 将一个值赋给 XTuple。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `class Pointer(ABC):` — **EN:** Defines class `Pointer` with bases ABC. **CN:** 定义类 `Pointer`，其基类为 ABC。
+- **L353** `    """` — **EN:** Starts the docstring for the class `Pointer`. **CN:** 开始说明 class `Pointer` 的文档字符串。
+- **L354** `    Abstract base class for CuTe jit function and runtime _Pointer` — **EN:** Continues the docstring for the class `Pointer`. **CN:** 继续说明 class `Pointer` 的文档字符串。
+- **L355** `    """` — **EN:** Ends the docstring for the class `Pointer`. **CN:** 结束说明 class `Pointer` 的文档字符串。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `    value: ir.Value` — **EN:** Assigns a typed value to value. **CN:** 为 value 赋予带类型标注的值。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L360** `    def type(self) -> ir.Type:` — **EN:** Defines function `type`. **CN:** 定义函数 `type`。
+- **L361** `        """The MLIR type of this pointer. Implemented by subclasses."""` — **EN:** Docstring line documenting the function `type`. **CN:** 文档字符串行，用于说明 function `type`。
+- **L362** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L365** `    def value_type(self) -> Type[Numeric]:` — **EN:** Defines function `value_type`. **CN:** 定义函数 `value_type`。
+- **L366** `        return self.dtype` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L367** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L368** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L369** `    def dtype(self) -> Type[Numeric]:  # type: ignore[empty-body]` — **EN:** Defines function `dtype`. **CN:** 定义函数 `dtype`。
+- **L370** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `dtype`. **CN:** 文档字符串行，用于说明 function `dtype`。
+- **L371** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L374** `    def memspace(self) -> AddressSpace:` — **EN:** Defines function `memspace`. **CN:** 定义函数 `memspace`。
+- **L375** `        """The memory address space of this pointer. Implemented by subclasses."""` — **EN:** Docstring line documenting the function `memspace`. **CN:** 文档字符串行，用于说明 function `memspace`。
+- **L376** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L379** `    def max_alignment(self) -> int:  # type: ignore[empty-body]` — **EN:** Defines function `max_alignment`. **CN:** 定义函数 `max_alignment`。
+- **L380** `        """Maximum alignment of this pointer in bytes. Implemented by subclasses."""` — **EN:** Docstring line documenting the function `max_alignment`. **CN:** 文档字符串行，用于说明 function `max_alignment`。
+- **L381** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L384** `    def llvm_ptr(` — **EN:** Defines function `llvm_ptr`. **CN:** 定义函数 `llvm_ptr`。
+- **L385** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L386** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L387** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L388** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L389** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L390** `        """Get the LLVM pointer representation. Implemented by subclasses."""` — **EN:** Docstring line documenting the function `llvm_ptr`. **CN:** 文档字符串行，用于说明 function `llvm_ptr`。
+- **L391** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `    def toint(  # type: ignore[empty-body]` — **EN:** Defines function `toint`. **CN:** 定义函数 `toint`。
+- **L394** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L395** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L396** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L397** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L398** `    ) -> Numeric:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L399** `        """Convert pointer to integer. Implemented by subclasses."""` — **EN:** Docstring line documenting the function `toint`. **CN:** 文档字符串行，用于说明 function `toint`。
+- **L400** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L401** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L402** `    def align(self, min_align: int) -> "Pointer":  # type: ignore[empty-body]` — **EN:** Defines function `align`. **CN:** 定义函数 `align`。
+- **L403** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `align`. **CN:** 文档字符串行，用于说明 function `align`。
+- **L404** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `    def __add__(  # type: ignore[empty-body]` — **EN:** Defines function `__add__`. **CN:** 定义函数 `__add__`。
+- **L407** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L408** `        other: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L409** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L410** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L411** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L412** `    ) -> "Pointer":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L413** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `__add__`. **CN:** 文档字符串行，用于说明 function `__add__`。
+- **L414** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `    def __get_mlir_types__(self) -> List[ir.Type]:  # type: ignore[empty-body]` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L417** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `__get_mlir_types__`. **CN:** 文档字符串行，用于说明 function `__get_mlir_types__`。
+- **L418** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L420** `    def __extract_mlir_values__(self) -> List[ir.Value]:  # type: ignore[empty-body]` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L421** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `__extract_mlir_values__`. **CN:** 文档字符串行，用于说明 function `__extract_mlir_values__`。
+- **L422** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> "Pointer":  # type: ignore[empty-body]` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L425** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `__new_from_mlir_values__`. **CN:** 文档字符串行，用于说明 function `__new_from_mlir_values__`。
+- **L426** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L428** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L429** `class TypedTensor:` — **EN:** Defines class `TypedTensor`. **CN:** 定义类 `TypedTensor`。
+- **L430** `    r"""A compile-time type descriptor for a statically-typed CuTe tensor.` — **EN:** Starts the docstring for the class `TypedTensor`. **CN:** 开始说明 class `TypedTensor` 的文档字符串。
+- **L431** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L432** `    \`\`TypedTensor\`\` captures the element type, shape, stride, memory space, and` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L433** `    pointer alignment of a tensor at compile time.` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `    The preferred way to construct a \`\`TypedTensor\`\` is via the \`\`Tensor\`\`` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L436** `    subscript syntax:` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `    .. code-block:: python` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `        # equivalent to TypedTensor(cutlass.Float32, (16,), (1,))` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L441** `        ty = Tensor[cutlass.Float32, (16,), (1,)]` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L443** `        @cute.jit` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L444** `        def kernel(a: Tensor[cutlass.Float32, (16,), (1,)]):` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L445** `            ...` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** `    :param dtype: Element type of the tensor` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L448** `    :param shape: Static shape of the tensor` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L449** `    :param stride: Static stride of the tensor` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L450** `    :param memspace: Memory space of the underlying pointer.  Defaults to` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L451** `        \`\`AddressSpace.generic\`\`.` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L452** `    :param assumed_align: Assumed byte alignment of the pointer.` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `    **Runtime type checking**` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L455** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L456** `    Use :meth:\`isinstance\` to check whether a live \`\`Tensor\`\` value matches` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L457** `    this descriptor:` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `    .. code-block:: python` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `        tt = TypedTensor(cutlass.Float32, (16,), (1,), AddressSpace.gmem)` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `        @cute.jit` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L464** `        def kernel(a: cute.Tensor):` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L465** `            if tt.isinstance(a):` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L466** `                ...` — **EN:** Continues the docstring for the class `TypedTensor`. **CN:** 继续说明 class `TypedTensor` 的文档字符串。
+- **L467** `    """` — **EN:** Ends the docstring for the class `TypedTensor`. **CN:** 结束说明 class `TypedTensor` 的文档字符串。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L470** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L471** `        dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L472** `        shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L473** `        stride: Stride,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `        memspace: AddressSpace = AddressSpace.generic,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L475** `        assumed_align: int | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L476** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L477** `        self._dtype = dtype` — **EN:** Assigns a value to self._dtype. **CN:** 将一个值赋给 self._dtype。
+- **L478** `        self._shape = shape` — **EN:** Assigns a value to self._shape. **CN:** 将一个值赋给 self._shape。
+- **L479** `        self._stride = stride` — **EN:** Assigns a value to self._stride. **CN:** 将一个值赋给 self._stride。
+- **L480** `        self._memspace = memspace` — **EN:** Assigns a value to self._memspace. **CN:** 将一个值赋给 self._memspace。
+- **L481** `        self._assumed_align = assumed_align` — **EN:** Assigns a value to self._assumed_align. **CN:** 将一个值赋给 self._assumed_align。
+- **L482** `        if assumed_align is None:` — **EN:** Starts a conditional branch guarded by `assumed_align is None`. **CN:** 开始一个由 `assumed_align is None` 控制的条件分支。
+- **L483** `            # use the bytes width of the element dtype. The alignment is at least one byte align.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L484** `            self._assumed_align = (self._dtype.width + 7) // 8` — **EN:** Assigns a value to self._assumed_align. **CN:** 将一个值赋给 self._assumed_align。
+- **L485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L486** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L487** `    def element_type(self) -> Type[Numeric]:` — **EN:** Defines function `element_type`. **CN:** 定义函数 `element_type`。
+- **L488** `        return self._dtype` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L491** `    def shape(self) -> Shape:` — **EN:** Defines function `shape`. **CN:** 定义函数 `shape`。
+- **L492** `        return self._shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L494** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L495** `    def stride(self) -> Stride:` — **EN:** Defines function `stride`. **CN:** 定义函数 `stride`。
+- **L496** `        return self._stride` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L497** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L498** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L499** `    def memspace(self) -> AddressSpace:` — **EN:** Defines function `memspace`. **CN:** 定义函数 `memspace`。
+- **L500** `        return self._memspace` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L503** `    def assumed_align(self) -> int | None:` — **EN:** Defines function `assumed_align`. **CN:** 定义函数 `assumed_align`。
+- **L504** `        return self._assumed_align` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L505** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L506** `    def isinstance(self, other: object) -> bool:` — **EN:** Defines function `isinstance`. **CN:** 定义函数 `isinstance`。
+- **L507** `        if not isinstance(other, Tensor):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, Tensor)`. **CN:** 开始一个由 `not isinstance(other, Tensor)` 控制的条件分支。
+- **L508** `            return False  # pragma: no cover` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L509** `        mlir_type = other.__extract_mlir_values__()[0].type  # type: ignore[attr-defined]` — **EN:** Assigns a value to mlir_type. **CN:** 将一个值赋给 mlir_type。
+- **L510** `        return mlir_type == self.mlir_type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L513** `    def mlir_type(self) -> ir.Type:` — **EN:** Defines function `mlir_type`. **CN:** 定义函数 `mlir_type`。
+- **L514** `        shape_ty = _cute_ir.ShapeType.get_from_x_tuple(ir.Context.current, self._shape)` — **EN:** Assigns a value to shape_ty. **CN:** 将一个值赋给 shape_ty。
+- **L515** `        stride_ty = _cute_ir.StrideType.get_from_x_tuple(` — **EN:** Assigns a value to stride_ty. **CN:** 将一个值赋给 stride_ty。
+- **L516** `            ir.Context.current, self._stride` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L517** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L518** `        layout_ty = _cute_ir.LayoutType.get(shape_ty, stride_ty)` — **EN:** Assigns a value to layout_ty. **CN:** 将一个值赋给 layout_ty。
+- **L519** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L520** `        # Boolean types are stored as i8 in memory` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L521** `        elem_type = T.i8() if self._dtype.width == 1 else self._dtype.mlir_type` — **EN:** Assigns a value to elem_type. **CN:** 将一个值赋给 elem_type。
+- **L522** `        ptr_ty = _cute_ir.PtrType.get(elem_type, self._memspace, self._assumed_align)` — **EN:** Assigns a value to ptr_ty. **CN:** 将一个值赋给 ptr_ty。
+- **L523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L524** `        return _cute_ir.MemRefType.get(ptr_ty, layout_ty)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** `    def __get_mlir_types__(self) -> List[ir.Type]:` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L527** `        return [self.mlir_type]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L528** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L529** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L530** `        return f"Tensor<{self._dtype}, {self._shape}, {self._stride}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L533** `class Tensor(ABC):` — **EN:** Defines class `Tensor` with bases ABC. **CN:** 定义类 `Tensor`，其基类为 ABC。
+- **L534** `    r"""Abstract base class for Tensor representations in CuTe DSL.` — **EN:** Starts the docstring for the class `Tensor`. **CN:** 开始说明 class `Tensor` 的文档字符串。
+- **L535** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L536** `    A CuTe Tensor is iterator with layout. A tensor evaluates the layout by mapping a` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L537** `    coordinate to the codomain, offsets the iterator accordingly, and dereferences` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L538** `    the result to obtain the tensor's value.` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L539** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L540** `    **Formally:**` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L541** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L542** `    .. math::` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L543** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L544** `        T(c) = (E \circ L)(c) = *(E + L(c))` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `    where` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L547** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L548** `        - :math:\`E\` is the iterator/engine` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L549** `        - :math:\`L\` is the layout` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L551** `    **Notes:**` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L552** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L553** `        - The tensor supports both direct element access via coordinates and slicing operations` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L554** `        - Load/store operations are only supported for specific memory spaces (rmem, smem, gmem, generic)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L555** `        - For composed layouts, stride information is not directly accessible` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L556** `        - Dynamic layouts do not support vector load/store operations` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L557** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L558** `    **Examples:**` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L559** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L560** `    Create tensor from torch.tensor with Host Runtime:` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L562** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L563** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L564** `        import torch` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L565** `        from cutlass.cute.runtime import from_dlpack` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L566** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L567** `        mA = from_dlpack(torch.tensor([1, 3, 5], dtype=torch.int32))` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L568** `        print(mA.shape)   # (3,)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L569** `        print(mA.stride)  # (1,)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L570** `        print(mA.layout)  # (3,):(1,)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L571** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L572** `    Define JIT function:` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L574** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L575** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L576** `        @cute.jit` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L577** `        def add(a: Tensor, b: Tensor, res: Tensor):` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L578** `            res.store(a.load() + b.load())` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L579** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L580** `    Call JIT function from python:` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L581** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L582** `    .. code-block:: python` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L583** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L584** `        import torch` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L585** `        a = torch.tensor([1, 3, 5], dtype=torch.int32)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L586** `        b = torch.tensor([2, 4, 6], dtype=torch.int32)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L587** `        c = torch.zeros([3], dtype=torch.int32)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L588** `        mA = from_dlpack(a)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L589** `        mB = from_dlpack(b)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L590** `        mC = from_dlpack(c)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L591** `        add(mA, mB, mC)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L592** `        print(c)  # tensor([3, 7, 11], dtype=torch.int32)` — **EN:** Continues the docstring for the class `Tensor`. **CN:** 继续说明 class `Tensor` 的文档字符串。
+- **L593** `    """` — **EN:** Ends the docstring for the class `Tensor`. **CN:** 结束说明 class `Tensor` 的文档字符串。
+- **L594** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L595** `    value: ir.Value` — **EN:** Assigns a typed value to value. **CN:** 为 value 赋予带类型标注的值。
+- **L596** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L597** `    def __class_getitem__(cls, args: tuple) -> TypedTensor:` — **EN:** Defines function `__class_getitem__`. **CN:** 定义函数 `__class_getitem__`。
+- **L598** `        return TypedTensor(*args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L599** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L600** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L601** `    def __str__(self) -> str: ...` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L602** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L603** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L604** `    def __getitem__(` — **EN:** Defines function `__getitem__`. **CN:** 定义函数 `__getitem__`。
+- **L605** `        self, idx: Union[Int, slice, Coord, Tuple]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L606** `    ) -> Union["Tensor", ir.Value, IntTuple]: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L607** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L608** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L609** `    def __setitem__(` — **EN:** Defines function `__setitem__`. **CN:** 定义函数 `__setitem__`。
+- **L610** `        self, idx: Union[Int, slice, Coord, Tuple], value: Union[Numeric, ir.Value]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L611** `    ) -> None: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L612** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L613** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L614** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L615** `    def element_type(self) -> Union[Type[Numeric], Type[IntTuple]]: ...` — **EN:** Defines function `element_type`. **CN:** 定义函数 `element_type`。
+- **L616** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L617** `    @element_type.setter` — **EN:** Applies decorator `element_type.setter` to the following definition. **CN:** 将装饰器 `element_type.setter` 应用于后面的定义。
+- **L618** `    def element_type(self, new_type: Union[Type[Numeric], Type[IntTuple]]) -> None: ...` — **EN:** Defines function `element_type`. **CN:** 定义函数 `element_type`。
+- **L619** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L620** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L621** `    def dtype(self) -> Type[Numeric]:  # type: ignore[empty-body]` — **EN:** Defines function `dtype`. **CN:** 定义函数 `dtype`。
+- **L622** `        """The element data type. Implemented by subclasses."""` — **EN:** Docstring line documenting the function `dtype`. **CN:** 文档字符串行，用于说明 function `dtype`。
+- **L623** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L624** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L625** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L626** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L627** `    def memspace(self) -> AddressSpace: ...` — **EN:** Defines function `memspace`. **CN:** 定义函数 `memspace`。
+- **L628** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L629** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L630** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L631** `    def iterator(self) -> Union[Pointer, IntTuple]: ...` — **EN:** Defines function `iterator`. **CN:** 定义函数 `iterator`。
+- **L632** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L633** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L634** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L635** `    def leading_dim(self) -> Union[int, Tuple[int, ...], None]:` — **EN:** Defines function `leading_dim`. **CN:** 定义函数 `leading_dim`。
+- **L636** `        """Get the leading dimension of this Tensor` — **EN:** Starts the docstring for the function `leading_dim`. **CN:** 开始说明 function `leading_dim` 的文档字符串。
+- **L637** `        (first mode from left to right with stride==1, shape!=1)` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L638** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L639** `        :return: The leading dimension index or indices` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L640** `        :rtype: int or tuple or None` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L641** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L642** `        The return value depends on the tensor's stride pattern:` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L643** `        * If a single leading dimension is found, returns an integer index` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L644** `        * If nested leading dimensions are found, returns a tuple of indices` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L645** `        * If no leading dimension is found, returns None` — **EN:** Continues the docstring for the function `leading_dim`. **CN:** 继续说明 function `leading_dim` 的文档字符串。
+- **L646** `        """` — **EN:** Ends the docstring for the function `leading_dim`. **CN:** 结束说明 function `leading_dim` 的文档字符串。
+- **L647** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L648** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L649** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L650** `    def layout(self) -> Union[Layout, "ComposedLayout"]:  # type: ignore[empty-body]` — **EN:** Defines function `layout`. **CN:** 定义函数 `layout`。
+- **L651** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `layout`. **CN:** 文档字符串行，用于说明 function `layout`。
+- **L652** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L654** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L655** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L656** `    def shape(self) -> Shape: ...` — **EN:** Defines function `shape`. **CN:** 定义函数 `shape`。
+- **L657** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L658** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L659** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L660** `    def stride(self) -> Stride: ...` — **EN:** Defines function `stride`. **CN:** 定义函数 `stride`。
+- **L661** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L662** `    def load(  # type: ignore[empty-body]` — **EN:** Defines function `load`. **CN:** 定义函数 `load`。
+- **L663** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L664** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L665** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L666** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L667** `    ) -> "TensorSSA":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L668** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `load`. **CN:** 文档字符串行，用于说明 function `load`。
+- **L669** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L670** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L671** `    def store(` — **EN:** Defines function `store`. **CN:** 定义函数 `store`。
+- **L672** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L673** `        data: "TensorSSA",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L674** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L675** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L676** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L677** `    ) -> None: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** `    def mark_layout_dynamic(  # type: ignore[empty-body]` — **EN:** Defines function `mark_layout_dynamic`. **CN:** 定义函数 `mark_layout_dynamic`。
+- **L680** `        self, leading_dim: Optional[int] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L681** `    ) -> "Tensor":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L682** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `mark_layout_dynamic`. **CN:** 文档字符串行，用于说明 function `mark_layout_dynamic`。
+- **L683** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L684** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L685** `    def mark_compact_shape_dynamic(  # type: ignore[empty-body]` — **EN:** Defines function `mark_compact_shape_dynamic`. **CN:** 定义函数 `mark_compact_shape_dynamic`。
+- **L686** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L687** `        mode: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L688** `        stride_order: Optional[tuple[int, ...]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L689** `        divisibility: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L690** `    ) -> "Tensor":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L691** `        """Implemented by subclasses."""` — **EN:** Docstring line documenting the function `mark_compact_shape_dynamic`. **CN:** 文档字符串行，用于说明 function `mark_compact_shape_dynamic`。
+- **L692** `        ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L693** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L694** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L695** `    def fill(self, value: Numeric) -> None: ...` — **EN:** Defines function `fill`. **CN:** 定义函数 `fill`。
+- **L696** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L697** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L698** `def is_integer(a: object) -> bool:` — **EN:** Defines function `is_integer`. **CN:** 定义函数 `is_integer`。
+- **L699** `    """Check if an object is static integer or dynamic integer"""` — **EN:** Docstring line documenting the function `is_integer`. **CN:** 文档字符串行，用于说明 function `is_integer`。
+- **L700** `    return isinstance(a, (int, Integer)) or (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L701** `        isinstance(a, ir.Value)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L702** `        and isinstance(a.type, (ir.IntegerType, ConstrainedIntType))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L703** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L704** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L705** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L706** `def is_int_tuple(a: object) -> bool:` — **EN:** Defines function `is_int_tuple`. **CN:** 定义函数 `is_int_tuple`。
+- **L707** `    if isinstance(a, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(a, tuple)`. **CN:** 开始一个由 `isinstance(a, tuple)` 控制的条件分支。
+- **L708** `        return all([is_int_tuple(x) for x in a])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L709** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L710** `        return is_integer(a)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L713** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L714** `    "SymInt",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L715** `    "sym_int",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L716** `    "sym_int32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L717** `    "sym_int64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L718** `    "Numeric",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L719** `    "NumericMeta",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L720** `    "Integer",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L721** `    "Boolean",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L722** `    "Int4",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L723** `    "Int8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L724** `    "Int16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L725** `    "Int32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L726** `    "Int64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L727** `    "Int128",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L728** `    "Uint8",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L729** `    "Uint16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L730** `    "Uint32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L731** `    "Uint64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L732** `    "Float",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L733** `    "Float16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L734** `    "BFloat16",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L735** `    "TFloat32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L736** `    "Float32",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L737** `    "Float64",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L738** `    "Float8E5M2",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L739** `    "Float8E4M3FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L740** `    "Float8E4M3B11FNUZ",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L741** `    "Float8E4M3",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L742** `    "Float8E8M0FNU",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L743** `    "Float4E2M1FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L744** `    "Float6E2M3FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `    "Float6E3M2FN",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** `    "IntTuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L747** `    "ScaledBasis",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** `    "Coord",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L749** `    "Shape",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L750** `    "Stride",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L751** `    "Layout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L752** `    "ComposedLayout",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L753** `    "Pointer",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L754** `    "Tensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L755** `    "TypedTensor",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L756** `    "Tile",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L757** `    "Tiler",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L758** `    "XTuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L759** `    "as_numeric",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L760** `    "is_integer",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L761** `    "is_int_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L762** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.typing`. CN: 模块名为 `CuTeDSL.cutlass.cute.typing`。
+- EN: Top-level classes: SymInt, Layout, ComposedLayout, Pointer, TypedTensor, Tensor CN: 顶层类包括：SymInt, Layout, ComposedLayout, Pointer, TypedTensor, Tensor
+- EN: Top-level functions: sym_int, sym_int32, sym_int64, is_integer, is_int_tuple CN: 顶层函数包括：sym_int, sym_int32, sym_int64, is_integer, is_int_tuple
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:T, cutlass.base_dsl.typing:Numeric,NumericMeta,Integer,Boolean,Int4,Int8,Int16,Int32,Int64,Int128,Uint8,Uint16,Uint32,Uint64,Float,Float16,BFloat16,TFloat32,Float32,Float64,Float8E5M2,Float8E4M3FN,Float8E4M3B11FNUZ,Float8E4M3,Float8E8M0FNU,Float4E2M1FN,Float6E2M3FN,Float6E3M2FN,as_numeric, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute:AddressSpace,ConstrainedIntType, cutlass.cute.core:ScaledBasis,Swizzle, cutlass.cute.tensor:TensorSSA, .core:IntValue CN: 内部依赖：cutlass.cutlass_dsl:T, cutlass.base_dsl.typing:Numeric,NumericMeta,Integer,Boolean,Int4,Int8,Int16,Int32,Int64,Int128,Uint8,Uint16,Uint32,Uint64,Float,Float16,BFloat16,TFloat32,Float32,Float64,Float8E5M2,Float8E4M3FN,Float8E4M3B11FNUZ,Float8E4M3,Float8E8M0FNU,Float4E2M1FN,Float6E2M3FN,Float6E3M2FN,as_numeric, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute:AddressSpace,ConstrainedIntType, cutlass.cute.core:ScaledBasis,Swizzle, cutlass.cute.tensor:TensorSSA, .core:IntValue
+- EN: External or standard-library dependencies: __future__:annotations, abc:ABC,abstractmethod, ctypes, typing:ForwardRef,Tuple,Union,Any,Type,List,Optional,Literal,TYPE_CHECKING, math:gcd CN: 外部或标准库依赖：__future__:annotations, abc:ABC,abstractmethod, ctypes, typing:ForwardRef,Tuple,Union,Any,Type,List,Optional,Literal,TYPE_CHECKING, math:gcd

@@ -1,0 +1,558 @@
+# tuple.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/tuple.py`
+
+## Purpose / 作用
+- EN: Defines 14 functions (wrap, unwrap, flatten_to_tuple, unflatten, ... (+10 more)) in `CuTeDSL.cutlass.cute.tuple`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.tuple` 定义了 14 个函数（wrap, unwrap, flatten_to_tuple, unflatten, ... (+10 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from inspect import signature` — **EN:** Imports signature from `inspect`. **CN:** 从 `inspect` 导入 signature。
+- **L13** `from itertools import chain` — **EN:** Imports chain from `itertools`. **CN:** 从 `itertools` 导入 chain。
+- **L14** `from typing import Any, Callable, Optional, Union, Tuple, List, Iterable` — **EN:** Imports Any, Callable, Optional, Union, Tuple, List, ... (+1 more) from `typing`. **CN:** 从 `typing` 导入 Any, Callable, Optional, Union, Tuple, List, ... (+1 more)。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `from cutlass.cutlass_dsl import is_dynamic_expression, dsl_user_op` — **EN:** Imports is_dynamic_expression, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 is_dynamic_expression, dsl_user_op。
+- **L19** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `from .typing import (` — **EN:** Imports XTuple, IntTuple, Shape, Coord, Boolean, is_integer from `.typing`. **CN:** 从 `.typing` 导入 XTuple, IntTuple, Shape, Coord, Boolean, is_integer。
+- **L22** `    XTuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    IntTuple,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    Shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    Coord,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    is_integer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `def wrap(x: XTuple) -> Tuple[Any, ...]:` — **EN:** Defines function `wrap`. **CN:** 定义函数 `wrap`。
+- **L32** `    """` — **EN:** Starts the docstring for the function `wrap`. **CN:** 开始说明 function `wrap` 的文档字符串。
+- **L33** `    Wraps the input into a tuple if not a tuple.` — **EN:** Continues the docstring for the function `wrap`. **CN:** 继续说明 function `wrap` 的文档字符串。
+- **L34** `    """` — **EN:** Ends the docstring for the function `wrap`. **CN:** 结束说明 function `wrap` 的文档字符串。
+- **L35** `    if isinstance(x, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(x, tuple)`. **CN:** 开始一个由 `isinstance(x, tuple)` 控制的条件分支。
+- **L36** `        return x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L37** `    return (x,)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `def unwrap(x: XTuple) -> XTuple:` — **EN:** Defines function `unwrap`. **CN:** 定义函数 `unwrap`。
+- **L41** `    """` — **EN:** Starts the docstring for the function `unwrap`. **CN:** 开始说明 function `unwrap` 的文档字符串。
+- **L42** `    Unwraps the input tuple if it is a single-element tuple, otherwise returns the input.` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `    Example:` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L45** `    >>> unwrap((1,))` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L46** `    1` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L47** `    >>> unwrap(((1, 2, 3),))` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L48** `    (1, 2, 3)` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L49** `    >>> unwrap((1, 2, 3))` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L50** `    (1, 2, 3)` — **EN:** Continues the docstring for the function `unwrap`. **CN:** 继续说明 function `unwrap` 的文档字符串。
+- **L51** `    """` — **EN:** Ends the docstring for the function `unwrap`. **CN:** 结束说明 function `unwrap` 的文档字符串。
+- **L52** `    while isinstance(x, tuple) and len(x) == 1:` — **EN:** Starts a while-loop guarded by `isinstance(x, tuple) and len(x) == 1`. **CN:** 开始一个由 `isinstance(x, tuple) and len(x) == 1` 控制的 while 循环。
+- **L53** `        x = x[0]` — **EN:** Assigns a value to x. **CN:** 将一个值赋给 x。
+- **L54** `    return x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `def flatten_to_tuple(a: XTuple) -> Tuple[Any, ...]:` — **EN:** Defines function `flatten_to_tuple`. **CN:** 定义函数 `flatten_to_tuple`。
+- **L58** `    """Flattens a potentially nested tuple structure into a flat tuple.` — **EN:** Starts the docstring for the function `flatten_to_tuple`. **CN:** 开始说明 function `flatten_to_tuple` 的文档字符串。
+- **L59** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L60** `    This function recursively traverses the input structure and flattens it into` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L61** `    a single-level tuple, preserving the order of elements.` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    :param a: The structure to flatten` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L64** `    :type a: Union[IntTuple, Coord, Shape, Stride]` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L65** `    :return: A flattened tuple containing all elements from the input` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L66** `    :rtype: tuple` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L67** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L68** `    **Examples:**` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `    .. code-block:: python` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `        flatten_to_tuple((1, 2, 3))       # Returns (1, 2, 3)` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L73** `        flatten_to_tuple(((1, 2), 3))     # Returns (1, 2, 3)` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L74** `        flatten_to_tuple((1, (2, (3,))))  # Returns (1, 2, 3)` — **EN:** Continues the docstring for the function `flatten_to_tuple`. **CN:** 继续说明 function `flatten_to_tuple` 的文档字符串。
+- **L75** `    """` — **EN:** Ends the docstring for the function `flatten_to_tuple`. **CN:** 结束说明 function `flatten_to_tuple` 的文档字符串。
+- **L76** `    if not isinstance(a, tuple):` — **EN:** Starts a conditional branch guarded by `not isinstance(a, tuple)`. **CN:** 开始一个由 `not isinstance(a, tuple)` 控制的条件分支。
+- **L77** `        return wrap(a)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L78** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L79** `        return tuple(chain.from_iterable(tuple(flatten_to_tuple(x) for x in a)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `def unflatten(` — **EN:** Defines function `unflatten`. **CN:** 定义函数 `unflatten`。
+- **L83** `    sequence: Union[Tuple[Any, ...], List[Any], Iterable[Any]], profile: XTuple` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L84** `) -> XTuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L85** `    """Unflatten a flat tuple into a nested tuple structure according to a profile.` — **EN:** Starts the docstring for the function `unflatten`. **CN:** 开始说明 function `unflatten` 的文档字符串。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    This function transforms a flat sequence of elements into a nested tuple structure` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L88** `    that matches the structure defined by the profile parameter. It traverses the profile` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L89** `    structure and populates it with elements from the sequence.` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    sequence must be long enough to fill the profile. Raises RuntimeError if it is not.` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    :param sequence: A flat sequence of elements to be restructured` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L94** `    :type sequence: Union[Tuple[Any, ...], List[Any], Iterable[Any]]` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L95** `    :param profile: A nested tuple structure that defines the shape of the output` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L96** `    :type profile: XTuple` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L97** `    :return: A nested tuple with the same structure as profile but containing elements from sequence` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L98** `    :rtype: XTuple` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    **Examples:**` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    .. code-block:: python` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `        unflatten([1, 2, 3, 4], ((0, 0), (0, 0)))  # Returns ((1, 2), (3, 4))` — **EN:** Continues the docstring for the function `unflatten`. **CN:** 继续说明 function `unflatten` 的文档字符串。
+- **L105** `    """` — **EN:** Ends the docstring for the function `unflatten`. **CN:** 结束说明 function `unflatten` 的文档字符串。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `    def _make_generator() -> Any:` — **EN:** Defines function `_make_generator`. **CN:** 定义函数 `_make_generator`。
+- **L108** `        for element in sequence:` — **EN:** Starts a loop assigning items from `sequence` to `element`. **CN:** 开始一个循环，将 `sequence` 的元素赋给 `element`。
+- **L109** `            yield element` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `    xs = _make_generator()` — **EN:** Assigns a value to xs. **CN:** 将一个值赋给 xs。
+- **L112** `    return transform_leaf(lambda _: next(xs), profile)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L116** `def product(` — **EN:** Defines function `product`. **CN:** 定义函数 `product`。
+- **L117** `    a: Union[IntTuple, Shape],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L118** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L119** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L120** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L121** `) -> IntTuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L122** `    # Local import to avoid circular dependency` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L123** `    from .core import _pack_int_tuple, _unpack_x_tuple` — **EN:** Imports _pack_int_tuple, _unpack_x_tuple from `.core`. **CN:** 从 `.core` 导入 _pack_int_tuple, _unpack_x_tuple。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** `    """Return product of the given IntTuple or Shape.` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L126** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L127** `    Computes the product of all elements in the input tuple or shape.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `    Returns static value if type is static otherwise dynamic value.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    :param a: The input tuple or shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L132** `    :type a: IntTuple or Shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L133** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `    :type loc: optional` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L136** `    :type ip: optional` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L137** `    :return: Static product of IntTuple or Shape if static, otherwise a Value` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L138** `    :rtype: int or Value` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L139** `    :raises TypeError: If input is not an IntTuple or Shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L140** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L141** `    if is_integer(a):` — **EN:** Starts a conditional branch guarded by `is_integer(a)`. **CN:** 开始一个由 `is_integer(a)` 控制的条件分支。
+- **L142** `        return a` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L143** `    if isinstance(a, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(a, tuple)`. **CN:** 开始一个由 `isinstance(a, tuple)` 控制的条件分支。
+- **L144** `        a_val = _pack_int_tuple(a, loc=loc, ip=ip)` — **EN:** Assigns a value to a_val. **CN:** 将一个值赋给 a_val。
+- **L145** `        res = _cute_ir.tuple_product(a_val, loc=loc, ip=ip)` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L146** `        return _unpack_x_tuple(res, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L147** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L148** `        raise TypeError(f"expects IntTuple or Shape, but got {type(a)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L152** `def product_like(` — **EN:** Defines function `product_like`. **CN:** 定义函数 `product_like`。
+- **L153** `    a: IntTuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L154** `    target_profile: XTuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L155** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L156** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L157** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L158** `) -> IntTuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L159** `    """Return product of the given IntTuple or Shape at leaves of \`target_profile\`.` — **EN:** Starts the docstring for the function `product_like`. **CN:** 开始说明 function `product_like` 的文档字符串。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    This function computes products according to the structure defined by target_profile.` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    :param a: The input tuple or shape` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L164** `    :type a: IntTuple or Shape` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L165** `    :param target_profile: The profile that guides how products are computed` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L166** `    :type target_profile: XTuple` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L167** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L168** `    :type loc: optional` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L169** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L170** `    :type ip: optional` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L171** `    :return: The resulting tuple with products computed according to target_profile` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L172** `    :rtype: IntTuple or Shape` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L173** `    :raises TypeError: If inputs have incompatible types` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L174** `    :raises ValueError: If inputs have incompatible shapes` — **EN:** Continues the docstring for the function `product_like`. **CN:** 继续说明 function `product_like` 的文档字符串。
+- **L175** `    """` — **EN:** Ends the docstring for the function `product_like`. **CN:** 结束说明 function `product_like` 的文档字符串。
+- **L176** `    # Perform product at leaf of \`target_profile\`` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L177** `    if not isinstance(target_profile, tuple):` — **EN:** Starts a conditional branch guarded by `not isinstance(target_profile, tuple)`. **CN:** 开始一个由 `not isinstance(target_profile, tuple)` 控制的条件分支。
+- **L178** `        return product(a, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    if not isinstance(a, tuple):` — **EN:** Starts a conditional branch guarded by `not isinstance(a, tuple)`. **CN:** 开始一个由 `not isinstance(a, tuple)` 控制的条件分支。
+- **L181** `        raise TypeError(f"expects \`a\` tuple but got {a}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    if len(a) != len(target_profile):` — **EN:** Starts a conditional branch guarded by `len(a) != len(target_profile)`. **CN:** 开始一个由 `len(a) != len(target_profile)` 控制的条件分支。
+- **L184** `        raise ValueError("expects \`a\` and \`guide\` have the same rank")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    return tuple(product_like(x, g, loc=loc, ip=ip) for x, g in zip(a, target_profile))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L189** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L190** `def product_each(` — **EN:** Defines function `product_each`. **CN:** 定义函数 `product_each`。
+- **L191** `    a: IntTuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L192** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L193** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `) -> IntTuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L196** `    from .core import _pack_int_tuple, _unpack_x_tuple` — **EN:** Imports _pack_int_tuple, _unpack_x_tuple from `.core`. **CN:** 从 `.core` 导入 _pack_int_tuple, _unpack_x_tuple。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `    """Compute products for each component of the input.` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `    Returns a rank(a) tuple result such that \`\`get(result, mode=[i]) == product(get(a, mode=[i]))\`\`` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** `    :param a: The input IntTuple or Shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `    :type a: IntTuple or Shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** `    :type loc: optional` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L206** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L207** `    :type ip: optional` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `    :return: A tuple containing products for each component` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `    :rtype: tuple` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `    :raises TypeError: If input is not an IntTuple or Shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `    if is_integer(a):` — **EN:** Starts a conditional branch guarded by `is_integer(a)`. **CN:** 开始一个由 `is_integer(a)` 控制的条件分支。
+- **L213** `        return a` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `    if not isinstance(a, tuple):` — **EN:** Starts a conditional branch guarded by `not isinstance(a, tuple)`. **CN:** 开始一个由 `not isinstance(a, tuple)` 控制的条件分支。
+- **L216** `        raise TypeError(f"expects IntTuple or Shape, but got {type(a)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `    if a == ():` — **EN:** Starts a conditional branch guarded by `a == ()`. **CN:** 开始一个由 `a == ()` 控制的条件分支。
+- **L219** `        return 1` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `    a_val = _pack_int_tuple(a, loc=loc, ip=ip)` — **EN:** Assigns a value to a_val. **CN:** 将一个值赋给 a_val。
+- **L222** `    res = _cute_ir.tuple_product_each(a_val, loc=loc, ip=ip)` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L223** `    return _unpack_x_tuple(res, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `def find_if(` — **EN:** Defines function `find_if`. **CN:** 定义函数 `find_if`。
+- **L227** `    t: XTuple,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L228** `    pred_fn: Callable[[XTuple, int], bool],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `    hierarchical: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `) -> Union[int, Tuple[int, ...], None]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L231** `    from .core import rank, get` — **EN:** Imports rank, get from `.core`. **CN:** 从 `.core` 导入 rank, get。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `    """Find the first position in t where pred_fn(val, pos) returns True.` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `    :param t: The search space` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `    :type t: Union[tuple, ir.Value, int]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `    :param pred_fn: A callable object (lambda, function, etc.) that predicates the value and position in t.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `                    It takes the current leaf value and position, returns True if the value or position is satisfied.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `                    The type must be compatible with rank(t).` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `    :type pred_fn: Callable[[Union[tuple, ir.Value, int], int], bool]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `    :return: Index if found at top level, tuple of indices showing nested position, or None if not found` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `    :rtype: Union[int, Tuple[int, ...], None]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `    **Examples:**` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `    .. code-block:: python` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `        # Find the first position of x in t` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L249** `        t = (3, 4)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** `        find_if(t, pred_fn=lambda val, pos: val == x)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** `    .. code-block:: python` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `        # find the leading dimension` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L255** `        shape = (3, 4)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `        stride = (4, 1)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `        # Find value 1 in stride where the corresponding shape is not 1` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L258** `        def pred_fn(val, pos):` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `            mode = [pos] if isinstance(pos, int) else list(pos)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `            return val == 1 and get(shape, mode) != 1` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `        find_if(stride, pred_fn=pred_fn)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `    """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `    def _find_if_impl(curr: Any, pos: Any) -> Any:` — **EN:** Defines function `_find_if_impl`. **CN:** 定义函数 `_find_if_impl`。
+- **L265** `        if isinstance(curr, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(curr, tuple)`. **CN:** 开始一个由 `isinstance(curr, tuple)` 控制的条件分支。
+- **L266** `            # Recursively search nested tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L267** `            for i in range(rank(curr)):` — **EN:** Starts a loop assigning items from `range(rank(curr))` to `i`. **CN:** 开始一个循环，将 `range(rank(curr))` 的元素赋给 `i`。
+- **L268** `                sub_curr = get(curr, mode=[i])` — **EN:** Assigns a value to sub_curr. **CN:** 将一个值赋给 sub_curr。
+- **L269** `                sub_pos = (pos, i) if isinstance(pos, int) else pos + (i,)` — **EN:** Assigns a value to sub_pos. **CN:** 将一个值赋给 sub_pos。
+- **L270** `                res_pos = _find_if_impl(sub_curr, sub_pos)` — **EN:** Assigns a value to res_pos. **CN:** 将一个值赋给 res_pos。
+- **L271** `                if res_pos is not None:` — **EN:** Starts a conditional branch guarded by `res_pos is not None`. **CN:** 开始一个由 `res_pos is not None` 控制的条件分支。
+- **L272** `                    return res_pos` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L273** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L274** `            # For leaf values, check if it matches x` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L275** `            if pred_fn(curr, pos):` — **EN:** Starts a conditional branch guarded by `pred_fn(curr, pos)`. **CN:** 开始一个由 `pred_fn(curr, pos)` 控制的条件分支。
+- **L276** `                return pos` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L277** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L278** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L279** `    if not callable(pred_fn):` — **EN:** Starts a conditional branch guarded by `not callable(pred_fn)`. **CN:** 开始一个由 `not callable(pred_fn)` 控制的条件分支。
+- **L280** `        raise TypeError(f"pred_fn must be callable, but got {type(pred_fn)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `    sig = signature(pred_fn)` — **EN:** Assigns a value to sig. **CN:** 将一个值赋给 sig。
+- **L283** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L284** `    if len(sig.parameters) != 2:` — **EN:** Starts a conditional branch guarded by `len(sig.parameters) != 2`. **CN:** 开始一个由 `len(sig.parameters) != 2` 控制的条件分支。
+- **L285** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L286** `            f"pred_fn must have two parameters (value, pos), but got {len(sig.parameters)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `    for i in range(rank(t)):` — **EN:** Starts a loop assigning items from `range(rank(t))` to `i`. **CN:** 开始一个循环，将 `range(rank(t))` 的元素赋给 `i`。
+- **L290** `        curr = get(t, mode=[i])` — **EN:** Assigns a value to curr. **CN:** 将一个值赋给 curr。
+- **L291** `        res_pos = _find_if_impl(curr, i)` — **EN:** Assigns a value to res_pos. **CN:** 将一个值赋给 res_pos。
+- **L292** `        if res_pos is not None:` — **EN:** Starts a conditional branch guarded by `res_pos is not None`. **CN:** 开始一个由 `res_pos is not None` 控制的条件分支。
+- **L293** `            if hierarchical:` — **EN:** Starts a conditional branch guarded by `hierarchical`. **CN:** 开始一个由 `hierarchical` 控制的条件分支。
+- **L294** `                return res_pos` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L295** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L296** `                return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L297** `                    res_pos` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `                    if not isinstance(res_pos, tuple)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** `                    else flatten_to_tuple(res_pos)[0]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L300** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `    return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `def find(` — **EN:** Defines function `find`. **CN:** 定义函数 `find`。
+- **L305** `    t: XTuple, x: int, hierarchical: bool = True` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `) -> Union[int, Tuple[int, ...], None]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L307** `    """Find the first position of a value \`\`x\`\` in a hierarchical structure \`\`t\`\`.` — **EN:** Starts the docstring for the function `find`. **CN:** 开始说明 function `find` 的文档字符串。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `    Searches for the first occurrence of x in t, optionally excluding positions` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L310** `    where a comparison value matches. The search can traverse nested structures` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L311** `    and returns either a single index or a tuple of indices for nested positions.` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L312** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L313** `    :param t: The search space` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L314** `    :type t: XTuple` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L315** `    :param x: The static integer x to search for` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L316** `    :type x: int` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L317** `    :return: Index if found at top level, tuple of indices showing nested position, or None if not found` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L318** `    :rtype: Union[int, Tuple[int, ...], None]` — **EN:** Continues the docstring for the function `find`. **CN:** 继续说明 function `find` 的文档字符串。
+- **L319** `    """` — **EN:** Ends the docstring for the function `find`. **CN:** 结束说明 function `find` 的文档字符串。
+- **L320** `    if not isinstance(x, int):` — **EN:** Starts a conditional branch guarded by `not isinstance(x, int)`. **CN:** 开始一个由 `not isinstance(x, int)` 控制的条件分支。
+- **L321** `        raise TypeError(f"find() requires a static x to search for, but got {x}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L323** `    def pred_fn(val: Any, pos: Any) -> bool:` — **EN:** Defines function `pred_fn`. **CN:** 定义函数 `pred_fn`。
+- **L324** `        # Skip dynamic values which can't be compared` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L325** `        return not is_dynamic_expression(val) and val == x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `    return find_if(t, pred_fn=pred_fn, hierarchical=hierarchical)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L328** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `def transform_leaf(f: Callable[..., XTuple], *args: XTuple) -> XTuple:` — **EN:** Defines function `transform_leaf`. **CN:** 定义函数 `transform_leaf`。
+- **L331** `    """` — **EN:** Starts the docstring for the function `transform_leaf`. **CN:** 开始说明 function `transform_leaf` 的文档字符串。
+- **L332** `    Apply a function to the leaf nodes of nested tuple structures.` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** `    This function traverses nested tuple structures in parallel and applies the function f` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L335** `    to corresponding leaf nodes. All input tuples must have the same nested structure.` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `    :param f: Function to apply to leaf nodes` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L338** `    :type f: Callable` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L339** `    :param args: One or more nested tuple structures with matching profiles` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L340** `    :return: A new nested tuple with the same structure as the inputs, but with leaf values transformed by f` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L341** `    :raises TypeError: If the input tuples have different nested structures` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `    **Example:**` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `    .. code-block:: python` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** `        >>> transform_leaf(lambda x: x + 1, (1, 2))` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L348** `        (2, 3)` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L349** `        >>> transform_leaf(lambda x, y: x + y, (1, 2), (3, 4))` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L350** `        (4, 6)` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L351** `        >>> transform_leaf(lambda x: x * 2, ((1, 2), (3, 4)))` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L352** `        ((2, 4), (6, 8))` — **EN:** Continues the docstring for the function `transform_leaf`. **CN:** 继续说明 function `transform_leaf` 的文档字符串。
+- **L353** `    """` — **EN:** Ends the docstring for the function `transform_leaf`. **CN:** 结束说明 function `transform_leaf` 的文档字符串。
+- **L354** `    if all(isinstance(t, tuple) for t in args):` — **EN:** Starts a conditional branch guarded by `all((isinstance(t, tuple) for t in args))`. **CN:** 开始一个由 `all((isinstance(t, tuple) for t in args))` 控制的条件分支。
+- **L355** `        return tuple(transform_leaf(f, *_args) for _args in zip(*args))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** `    elif all(not isinstance(t, tuple) for t in args):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L357** `        return f(*args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L358** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L359** `        raise TypeError(f"profile of input tuples doesn't match: {args}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L363** `def elem_less(` — **EN:** Defines function `elem_less`. **CN:** 定义函数 `elem_less`。
+- **L364** `    lhs: Union[Shape, IntTuple, Coord],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L365** `    rhs: Union[Shape, IntTuple, Coord],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L366** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L367** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L368** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L369** `) -> Boolean:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L370** `    from .core import _pack_coord` — **EN:** Imports _pack_coord from `.core`. **CN:** 从 `.core` 导入 _pack_coord。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    # Coord is super set of IntTuple and Shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L373** `    lhs_val = _pack_coord(lhs, loc=loc, ip=ip)` — **EN:** Assigns a value to lhs_val. **CN:** 将一个值赋给 lhs_val。
+- **L374** `    rhs_val = _pack_coord(rhs, loc=loc, ip=ip)` — **EN:** Assigns a value to rhs_val. **CN:** 将一个值赋给 rhs_val。
+- **L375** `    return Boolean(_cute_ir.elem_less(lhs_val, rhs_val, loc=loc, ip=ip))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `def tuple_cat(*tuples: XTuple) -> Tuple[Any, ...]:` — **EN:** Defines function `tuple_cat`. **CN:** 定义函数 `tuple_cat`。
+- **L379** `    """Concatenate multiple tuples into a single tuple.` — **EN:** Starts the docstring for the function `tuple_cat`. **CN:** 开始说明 function `tuple_cat` 的文档字符串。
+- **L380** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L381** `    This function takes any number of tuples and concatenates them into a single tuple.` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L382** `    Non-tuple arguments are treated as single-element tuples.` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** `    :param tuples: Variable number of tuples to concatenate` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L385** `    :type tuples: tuple or any` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L386** `    :return: A single concatenated tuple` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L387** `    :rtype: tuple` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** `    **Examples:**` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `    .. code-block:: python` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `        >>> tuple_cat((1, 2), (3, 4))` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L394** `        (1, 2, 3, 4)` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L395** `        >>> tuple_cat((1,), (2, 3), (4,))` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L396** `        (1, 2, 3, 4)` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L397** `        >>> tuple_cat(1, (2, 3))` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L398** `        (1, 2, 3)` — **EN:** Continues the docstring for the function `tuple_cat`. **CN:** 继续说明 function `tuple_cat` 的文档字符串。
+- **L399** `    """` — **EN:** Ends the docstring for the function `tuple_cat`. **CN:** 结束说明 function `tuple_cat` 的文档字符串。
+- **L400** `    result: Tuple[Any, ...] = ()` — **EN:** Assigns a typed value to result. **CN:** 为 result 赋予带类型标注的值。
+- **L401** `    for t in tuples:` — **EN:** Starts a loop assigning items from `tuples` to `t`. **CN:** 开始一个循环，将 `tuples` 的元素赋给 `t`。
+- **L402** `        if isinstance(t, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(t, tuple)`. **CN:** 开始一个由 `isinstance(t, tuple)` 控制的条件分支。
+- **L403** `            result += t` — **EN:** Updates result in place. **CN:** 原地更新 result。
+- **L404** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L405** `            result += (t,)` — **EN:** Updates result in place. **CN:** 原地更新 result。
+- **L406** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `def transform_apply(` — **EN:** Defines function `transform_apply`. **CN:** 定义函数 `transform_apply`。
+- **L410** `    *args: XTuple, f: Callable[..., XTuple], g: Callable[..., XTuple]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L411** `) -> XTuple:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L412** `    """Transform elements of tuple(s) with f, then apply g to all results.` — **EN:** Starts the docstring for the function `transform_apply`. **CN:** 开始说明 function `transform_apply` 的文档字符串。
+- **L413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L414** `    This function applies f to corresponding elements across input tuple(s),` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L415** `    then applies g to all transformed results. It mimics the C++ CuTe implementation.` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L416** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L417** `    Supports multiple signatures:` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L418** `    - transform_apply(t, f, g): For single tuple, computes g(f(t[0]), f(t[1]), ...)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L419** `    - transform_apply(t0, t1, f, g): For two tuples, computes g(f(t0[0], t1[0]), f(t0[1], t1[1]), ...)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L420** `    - transform_apply(t0, t1, t2, ..., f, g): For multiple tuples of same length` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** `    For non-tuple inputs, f is applied to the input(s) and g is applied to that single result.` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    :param args: One or more tuples (or non-tuples) to transform` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L425** `    :param f: The function to apply to each element (or corresponding elements across tuples)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L426** `    :type f: Callable` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L427** `    :param g: The function to apply to all transformed elements` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L428** `    :type g: Callable` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L429** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L430** `    :type loc: optional` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L431** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L432** `    :type ip: optional` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L433** `    :return: The result of applying g to all transformed elements` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L434** `    :rtype: any` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `    **Examples:**` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `    .. code-block:: python` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `        >>> transform_apply((1, 2, 3), f=lambda x: x * 2, g=lambda *args: sum(args))` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L441** `        12  # (1*2 + 2*2 + 3*2) = 12` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L442** `        >>> transform_apply((1, 2), f=lambda x: (x, x+1), g=tuple_cat)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L443** `        (1, 2, 2, 3)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L444** `        >>> transform_apply((1, 2), (3, 4), f=lambda x, y: x + y, g=lambda *args: args)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L445** `        (4, 6)` — **EN:** Continues the docstring for the function `transform_apply`. **CN:** 继续说明 function `transform_apply` 的文档字符串。
+- **L446** `    """` — **EN:** Ends the docstring for the function `transform_apply`. **CN:** 结束说明 function `transform_apply` 的文档字符串。
+- **L447** `    if not callable(f):` — **EN:** Starts a conditional branch guarded by `not callable(f)`. **CN:** 开始一个由 `not callable(f)` 控制的条件分支。
+- **L448** `        raise TypeError(f"f must be callable, but got {type(f)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L449** `    if not callable(g):` — **EN:** Starts a conditional branch guarded by `not callable(g)`. **CN:** 开始一个由 `not callable(g)` 控制的条件分支。
+- **L450** `        raise TypeError(f"g must be callable, but got {type(g)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `    if not args:` — **EN:** Starts a conditional branch guarded by `not args`. **CN:** 开始一个由 `not args` 控制的条件分支。
+- **L453** `        raise ValueError("transform_apply requires at least one argument")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `    def _compatible_xtuples(args: XTuple) -> bool:` — **EN:** Defines function `_compatible_xtuples`. **CN:** 定义函数 `_compatible_xtuples`。
+- **L456** `        if isinstance(args[0], tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(args[0], tuple)`. **CN:** 开始一个由 `isinstance(args[0], tuple)` 控制的条件分支。
+- **L457** `            if not all(isinstance(arg, tuple) for arg in args):` — **EN:** Starts a conditional branch guarded by `not all((isinstance(arg, tuple) for arg in args))`. **CN:** 开始一个由 `not all((isinstance(arg, tuple) for arg in args))` 控制的条件分支。
+- **L458** `                return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L459** `            tuple_length = len(args[0])` — **EN:** Assigns a value to tuple_length. **CN:** 将一个值赋给 tuple_length。
+- **L460** `            for i, arg in enumerate(args, 1):` — **EN:** Starts a loop assigning items from `enumerate(args, 1)` to `(i, arg)`. **CN:** 开始一个循环，将 `enumerate(args, 1)` 的元素赋给 `(i, arg)`。
+- **L461** `                if len(arg) != tuple_length:` — **EN:** Starts a conditional branch guarded by `len(arg) != tuple_length`. **CN:** 开始一个由 `len(arg) != tuple_length` 控制的条件分支。
+- **L462** `                    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L463** `            for i in range(tuple_length):` — **EN:** Starts a loop assigning items from `range(tuple_length)` to `i`. **CN:** 开始一个循环，将 `range(tuple_length)` 的元素赋给 `i`。
+- **L464** `                if not _compatible_xtuples(tuple([arg[i] for arg in args])):` — **EN:** Starts a conditional branch guarded by `not _compatible_xtuples(tuple([arg[i] for arg in args]))`. **CN:** 开始一个由 `not _compatible_xtuples(tuple([arg[i] for arg in args]))` 控制的条件分支。
+- **L465** `                    return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L466** `            return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L467** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L468** `            return all(not isinstance(arg, tuple) for arg in args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L469** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L470** `    if not _compatible_xtuples(args):` — **EN:** Starts a conditional branch guarded by `not _compatible_xtuples(args)`. **CN:** 开始一个由 `not _compatible_xtuples(args)` 控制的条件分支。
+- **L471** `        raise ValueError("All arguments must be congruent")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L472** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L473** `    # Check if first argument is a tuple to determine behavior` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L474** `    if isinstance(args[0], tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(args[0], tuple)`. **CN:** 开始一个由 `isinstance(args[0], tuple)` 控制的条件分支。
+- **L475** `        flat_args = [flatten_to_tuple(arg) for arg in args]` — **EN:** Assigns a value to flat_args. **CN:** 将一个值赋给 flat_args。
+- **L476** `        tuple_length = len(flat_args[0])` — **EN:** Assigns a value to tuple_length. **CN:** 将一个值赋给 tuple_length。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** `        # Apply f to corresponding elements across all tuples: g(f(args[0][i], args[1][i], ...), ...)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L479** `        transformed_results = tuple(` — **EN:** Assigns a value to transformed_results. **CN:** 将一个值赋给 transformed_results。
+- **L480** `            f(*(arg[i] for arg in flat_args)) for i in range(tuple_length)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `        return g(*transformed_results)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L483** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L484** `        # Non-tuple case: apply f to all args, then g to that single result` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L485** `        result = f(*args)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L486** `        return g(result)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L487** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L489** `def filter_tuple(*args: XTuple, f: Callable[..., Tuple[Any, ...]]) -> Tuple[Any, ...]:` — **EN:** Defines function `filter_tuple`. **CN:** 定义函数 `filter_tuple`。
+- **L490** `    """Filter and flatten tuple elements by applying a function.` — **EN:** Starts the docstring for the function `filter_tuple`. **CN:** 开始说明 function `filter_tuple` 的文档字符串。
+- **L491** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L492** `    The function f should return tuples, which are then concatenated together` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L493** `    to produce the final result. This is useful for filtering and transforming` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L494** `    tuple structures in a single pass.` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L495** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L496** `    :param t: The tuple to filter` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L497** `    :type t: Union[tuple, ir.Value, int]` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L498** `    :param f: The function to apply to each element of t` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L499** `    :type f: Callable` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L500** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L501** `    :type loc: optional` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L502** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L503** `    :type ip: optional` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L504** `    :return: A concatenated tuple of all results` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L505** `    :rtype: tuple` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    **Examples:**` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** `    .. code-block:: python` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L510** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L511** `        >>> # Keep only even numbers, wrapped in tuples` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L512** `        >>> filter_tuple((1, 2, 3, 4), lambda x: (x,) if x % 2 == 0 else ())` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L513** `        (2, 4)` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L514** `        >>> # Duplicate each element` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L515** `        >>> filter_tuple((1, 2, 3), lambda x: (x, x))` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L516** `        (1, 1, 2, 2, 3, 3)` — **EN:** Continues the docstring for the function `filter_tuple`. **CN:** 继续说明 function `filter_tuple` 的文档字符串。
+- **L517** `    """` — **EN:** Ends the docstring for the function `filter_tuple`. **CN:** 结束说明 function `filter_tuple` 的文档字符串。
+- **L518** `    if not callable(f):` — **EN:** Starts a conditional branch guarded by `not callable(f)`. **CN:** 开始一个由 `not callable(f)` 控制的条件分支。
+- **L519** `        raise TypeError(f"f must be callable, but got {type(f)}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L520** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L521** `    return transform_apply(*args, f=f, g=lambda *args: tuple_cat(*args))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L523** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L524** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L525** `    "transform_leaf",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L526** `    "find_if",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L527** `    "find",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L528** `    "flatten_to_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L529** `    "unflatten",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `    "product",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `    "product_like",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `    "product_each",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L533** `    "elem_less",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L534** `    "tuple_cat",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `    "transform_apply",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `    "filter_tuple",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L537** `    "unwrap",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L538** `    "wrap",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L539** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.tuple`. CN: 模块名为 `CuTeDSL.cutlass.cute.tuple`。
+- EN: Top-level functions: wrap, unwrap, flatten_to_tuple, unflatten, product, product_like, product_each, find_if, find, transform_leaf, elem_less, tuple_cat, ... (+2 more) CN: 顶层函数包括：wrap, unwrap, flatten_to_tuple, unflatten, product, product_like, product_each, find_if, find, transform_leaf, elem_less, tuple_cat, ... (+2 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass._mlir:ir, cutlass.cutlass_dsl:is_dynamic_expression,dsl_user_op, cutlass._mlir.dialects.cute, .typing:XTuple,IntTuple,Shape,Coord,Boolean,is_integer, .core:_pack_int_tuple,_unpack_x_tuple, .core:rank,get, .core:_pack_coord CN: 内部依赖：cutlass._mlir:ir, cutlass.cutlass_dsl:is_dynamic_expression,dsl_user_op, cutlass._mlir.dialects.cute, .typing:XTuple,IntTuple,Shape,Coord,Boolean,is_integer, .core:_pack_int_tuple,_unpack_x_tuple, .core:rank,get, .core:_pack_coord
+- EN: External or standard-library dependencies: inspect:signature, itertools:chain, typing:Any,Callable,Optional,Union,Tuple,List,Iterable CN: 外部或标准库依赖：inspect:signature, itertools:chain, typing:Any,Callable,Optional,Union,Tuple,List,Iterable

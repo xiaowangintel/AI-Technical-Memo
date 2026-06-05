@@ -1,0 +1,711 @@
+# tmem_allocator.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/tmem_allocator.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (TmemBufferPool, TmemAllocator) and 2 functions (compute_tmem_cols_from_layout, get_num_tmem_alloc_cols) in `CuTeDSL.cutlass.utils.tmem_allocator`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.tmem_allocator` 定义了 2 个类（TmemBufferPool, TmemAllocator） 和 2 个函数（compute_tmem_cols_from_layout, get_num_tmem_alloc_cols）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from math import log2, ceil` — **EN:** Imports log2, ceil from `math`. **CN:** 从 `math` 导入 log2, ceil。
+- **L13** `from typing import Optional, Type, Union, List` — **EN:** Imports Optional, Type, Union, List from `typing`. **CN:** 从 `typing` 导入 Optional, Type, Union, List。
+- **L14** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass import const_expr` — **EN:** Imports const_expr from `cutlass`. **CN:** 从 `cutlass` 导入 const_expr。
+- **L17** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L18** `from cutlass.cutlass_dsl import (` — **EN:** Imports Numeric, Float32, Boolean, extract_mlir_values, new_from_mlir_values, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 Numeric, Float32, Boolean, extract_mlir_values, new_from_mlir_values, dsl_user_op。
+- **L19** `    Numeric,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    Float32,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    Boolean,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    extract_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    new_from_mlir_values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    dsl_user_op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `import cutlass.pipeline as pipeline` — **EN:** Imports cutlass.pipeline as pipeline for later use. **CN:** 导入 cutlass.pipeline as pipeline 供后续使用。
+- **L27** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L28** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L29** `from cutlass.cute.nvgpu.tcgen05 import find_tmem_tensor_col_offset` — **EN:** Imports find_tmem_tensor_col_offset from `cutlass.cute.nvgpu.tcgen05`. **CN:** 从 `cutlass.cute.nvgpu.tcgen05` 导入 find_tmem_tensor_col_offset。
+- **L30** `from cutlass.cute.arch import get_max_tmem_alloc_cols, get_min_tmem_alloc_cols` — **EN:** Imports get_max_tmem_alloc_cols, get_min_tmem_alloc_cols from `cutlass.cute.arch`. **CN:** 从 `cutlass.cute.arch` 导入 get_max_tmem_alloc_cols, get_min_tmem_alloc_cols。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `_TMEM_COL_MASK = 0x0000FFFF` — **EN:** Assigns a value to _TMEM_COL_MASK. **CN:** 将一个值赋给 _TMEM_COL_MASK。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L37** `def compute_tmem_cols_from_layout(` — **EN:** Defines function `compute_tmem_cols_from_layout`. **CN:** 定义函数 `compute_tmem_cols_from_layout`。
+- **L38** `    layout: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L39** `    dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L40** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L41** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L42** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L43** `) -> int:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L44** `    """Compute the number of TMEM columns required for a layout with a given dtype.` — **EN:** Starts the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 开始说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `    This function calculates the column offset by recasting the layout to Int32` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L47** `    and computing its cosize, similar to how find_tmem_tensor_col_offset works` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L48** `    but without requiring a tensor.` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `    :param layout: The TMEM layout to compute columns for.` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L51** `    :type layout: cute.Layout` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L52** `    :param dtype: The data type of the elements in the layout.` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L53** `    :type dtype: Type[Numeric]` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L54** `    :return: The number of TMEM columns (always a Python int).` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L55** `    :rtype: int` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    :raises ValueError: If the layout size cannot be determined at compile time.` — **EN:** Continues the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 继续说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L58** `    """` — **EN:** Ends the docstring for the function `compute_tmem_cols_from_layout`. **CN:** 结束说明 function `compute_tmem_cols_from_layout` 的文档字符串。
+- **L59** `    # Get source width from dtype` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L60** `    if dtype is Boolean:` — **EN:** Starts a conditional branch guarded by `dtype is Boolean`. **CN:** 开始一个由 `dtype is Boolean` 控制的条件分支。
+- **L61** `        src_width = 8` — **EN:** Assigns a value to src_width. **CN:** 将一个值赋给 src_width。
+- **L62** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L63** `        src_width = dtype.width` — **EN:** Assigns a value to src_width. **CN:** 将一个值赋给 src_width。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    # Recast layout to Int32 (32-bit width) as done in find_tmem_tensor_col_offset` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L66** `    dst_width = 32  # Int32.width` — **EN:** Assigns a value to dst_width. **CN:** 将一个值赋给 dst_width。
+- **L67** `    recasted_layout = cute.recast_layout(dst_width, src_width, layout, loc=loc, ip=ip)` — **EN:** Assigns a value to recasted_layout. **CN:** 将一个值赋给 recasted_layout。
+- **L68** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L69** `    # Compute cosize and mask` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `    offset = cute.cosize(recasted_layout, loc=loc, ip=ip) & _TMEM_COL_MASK` — **EN:** Assigns a value to offset. **CN:** 将一个值赋给 offset。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    # Ensure we return a Python int` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** `    if isinstance(offset, int):` — **EN:** Starts a conditional branch guarded by `isinstance(offset, int)`. **CN:** 开始一个由 `isinstance(offset, int)` 控制的条件分支。
+- **L74** `        return offset` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    # Try to fold the DSL value to a Python int` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L77** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L78** `        return const_expr(offset)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L79** `    except Exception:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L80** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L81** `            "Dynamic TMEM layout size not supported; "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `            "the layout size must be determinable at compile time."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** `class TmemBufferPool:` — **EN:** Defines class `TmemBufferPool`. **CN:** 定义类 `TmemBufferPool`。
+- **L87** `    """A pool for sub-allocating from a reserved chunk of tensor memory.` — **EN:** Starts the docstring for the class `TmemBufferPool`. **CN:** 开始说明 class `TmemBufferPool` 的文档字符串。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    This class enables sub-allocation from a pre-reserved TMEM region,` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L90** `    eliminating the need for manual offset calculations when allocating` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L91** `    multiple tensors in TMEM.` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** `    Example usage::` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `        tmem_pool = tmem_allocator.reserve(tmem_total_size)` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `        # Allocate and create tensors in one call` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L98** `        tCtAcc = tmem_pool.allocate_tensor(tCtAcc_layout, cutlass.Float32)` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L99** `        tCtSFA = tmem_pool.allocate_tensor(tCtSFA_layout, sf_dtype)` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `        # Or allocate pointer only, then create tensor manually` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L102** `        sfb_ptr = tmem_pool.allocate(tCtSFB_layout, sf_dtype)` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L103** `        tCtSFB = cute.make_tensor(sfb_ptr, tCtSFB_layout)` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    :ivar _base_ptr: The base pointer to the reserved TMEM region.` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L106** `    :type _base_ptr: cute.Pointer` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L107** `    :ivar _total_cols: The total number of columns in the pool.` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L108** `    :type _total_cols: int` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L109** `    :ivar _current_offset: The current offset within the pool (in columns).` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L110** `    :type _current_offset: int` — **EN:** Continues the docstring for the class `TmemBufferPool`. **CN:** 继续说明 class `TmemBufferPool` 的文档字符串。
+- **L111** `    """` — **EN:** Ends the docstring for the class `TmemBufferPool`. **CN:** 结束说明 class `TmemBufferPool` 的文档字符串。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L114** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L115** `        base_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L116** `        total_cols: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L117** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L118** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L119** `        Initialize a TmemBufferPool instance.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `        :param base_ptr: The base pointer to the reserved TMEM region.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L122** `        :type base_ptr: cute.Pointer` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L123** `        :param total_cols: The total number of columns in the pool.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L124** `        :type total_cols: int` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L125** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L126** `        self._base_ptr = base_ptr` — **EN:** Assigns a value to self._base_ptr. **CN:** 将一个值赋给 self._base_ptr。
+- **L127** `        self._total_cols = total_cols` — **EN:** Assigns a value to self._total_cols. **CN:** 将一个值赋给 self._total_cols。
+- **L128** `        self._current_offset = 0` — **EN:** Assigns a value to self._current_offset. **CN:** 将一个值赋给 self._current_offset。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L131** `        return extract_mlir_values(self._base_ptr)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `    def __new_from_mlir_values__(self, values: list[ir.Value]) -> "TmemBufferPool":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L134** `        assert len(values) == 1` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L135** `        new_base_ptr = new_from_mlir_values(self._base_ptr, [values[0]])` — **EN:** Assigns a value to new_base_ptr. **CN:** 将一个值赋给 new_base_ptr。
+- **L136** `        pool = TmemBufferPool(new_base_ptr, self._total_cols)` — **EN:** Assigns a value to pool. **CN:** 将一个值赋给 pool。
+- **L137** `        pool._current_offset = self._current_offset` — **EN:** Assigns a value to pool._current_offset. **CN:** 将一个值赋给 pool._current_offset。
+- **L138** `        return pool` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L141** `    def base_ptr(self) -> cute.Pointer:` — **EN:** Defines function `base_ptr`. **CN:** 定义函数 `base_ptr`。
+- **L142** `        """Return the base pointer of the pool."""` — **EN:** Docstring line documenting the function `base_ptr`. **CN:** 文档字符串行，用于说明 function `base_ptr`。
+- **L143** `        return self._base_ptr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L146** `    def total_cols(self) -> int:` — **EN:** Defines function `total_cols`. **CN:** 定义函数 `total_cols`。
+- **L147** `        """Return the total number of columns in the pool."""` — **EN:** Docstring line documenting the function `total_cols`. **CN:** 文档字符串行，用于说明 function `total_cols`。
+- **L148** `        return self._total_cols` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L151** `    def current_offset(self) -> int:` — **EN:** Defines function `current_offset`. **CN:** 定义函数 `current_offset`。
+- **L152** `        """Return the current offset within the pool."""` — **EN:** Docstring line documenting the function `current_offset`. **CN:** 文档字符串行，用于说明 function `current_offset`。
+- **L153** `        return self._current_offset` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L156** `    def remaining_cols(self) -> int:` — **EN:** Defines function `remaining_cols`. **CN:** 定义函数 `remaining_cols`。
+- **L157** `        """Return the number of remaining columns available for allocation."""` — **EN:** Docstring line documenting the function `remaining_cols`. **CN:** 文档字符串行，用于说明 function `remaining_cols`。
+- **L158** `        return self._total_cols - self._current_offset` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L161** `    def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L162** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L163** `        size: Union[int, cute.Layout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L164** `        dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L165** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L166** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L167** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L168** `    ) -> cute.Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L169** `        """Allocate a sub-region from the pool and return a pointer.` — **EN:** Starts the docstring for the function `allocate`. **CN:** 开始说明 function `allocate` 的文档字符串。
+- **L170** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L171** `        This method allocates a contiguous region of TMEM columns from the pool` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L172** `        and returns a pointer to the start of that region.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `        :param size: The allocation size, which can be:` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L175** `            - int: explicit number of columns to allocate` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L176** `            - cute.Layout: a TMEM layout that, combined with dtype, determines the size` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L177** `        :type size: Union[int, cute.Layout]` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L178** `        :param dtype: The data type for the returned pointer and for computing` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L179** `            layout size (when size is a Layout).` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L180** `        :type dtype: Type[Numeric]` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L181** `        :return: A pointer to the allocated region with the specified dtype.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L182** `        :rtype: cute.Pointer` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L183** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L184** `        :raises AssertionError: If there are not enough columns remaining in the pool.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `        Example usage::` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `            # Allocate with explicit column count` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L189** `            acc_ptr = pool.allocate(64, cutlass.Float32)` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `            # Allocate based on layout and dtype` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L192** `            sfa_ptr = pool.allocate(tCtSFA_layout, sf_dtype)` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L193** `        """` — **EN:** Ends the docstring for the function `allocate`. **CN:** 结束说明 function `allocate` 的文档字符串。
+- **L194** `        # Determine number of columns from size argument` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L195** `        if isinstance(size, cute.Layout):` — **EN:** Starts a conditional branch guarded by `isinstance(size, cute.Layout)`. **CN:** 开始一个由 `isinstance(size, cute.Layout)` 控制的条件分支。
+- **L196** `            num_cols = compute_tmem_cols_from_layout(size, dtype, loc=loc, ip=ip)` — **EN:** Assigns a value to num_cols. **CN:** 将一个值赋给 num_cols。
+- **L197** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L198** `            num_cols = size` — **EN:** Assigns a value to num_cols. **CN:** 将一个值赋给 num_cols。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `        assert self._current_offset + num_cols <= self._total_cols, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L201** `            f"Cannot allocate {num_cols} columns, only {self.remaining_cols} remaining"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `        if self._current_offset == 0:` — **EN:** Starts a conditional branch guarded by `self._current_offset == 0`. **CN:** 开始一个由 `self._current_offset == 0` 控制的条件分支。
+- **L205** `            # First allocation - return base pointer with recast` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L206** `            ptr = cute.recast_ptr(self._base_ptr, dtype=dtype, loc=loc, ip=ip)` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L207** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L208** `            # Subsequent allocations - offset from base` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L209** `            ptr = cute.recast_ptr(` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L210** `                self._base_ptr + self._current_offset,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `                dtype=dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `        self._current_offset += num_cols` — **EN:** Updates self._current_offset in place. **CN:** 原地更新 self._current_offset。
+- **L217** `        return ptr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L220** `    def allocate_tensor(` — **EN:** Defines function `allocate_tensor`. **CN:** 定义函数 `allocate_tensor`。
+- **L221** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L222** `        layout: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L223** `        dtype: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L224** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L225** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L227** `    ) -> cute.Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L228** `        """Allocate a sub-region from the pool and return a tensor.` — **EN:** Starts the docstring for the function `allocate_tensor`. **CN:** 开始说明 function `allocate_tensor` 的文档字符串。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `        This is a convenience method that combines allocate() and cute.make_tensor()` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L231** `        into a single call.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `        :param layout: The TMEM layout for the tensor.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L234** `        :type layout: cute.Layout` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L235** `        :param dtype: The data type for the tensor elements.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L236** `        :type dtype: Type[Numeric]` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L237** `        :return: A tensor backed by the allocated TMEM region.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L238** `        :rtype: cute.Tensor` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `        :raises AssertionError: If there are not enough columns remaining in the pool.` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `        Example usage::` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `            tCtAcc = pool.allocate_tensor(tCtAcc_layout, cutlass.Float32)` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L245** `            tCtSFA = pool.allocate_tensor(tCtSFA_layout, sf_dtype)` — **EN:** Continues the docstring for the function `allocate_tensor`. **CN:** 继续说明 function `allocate_tensor` 的文档字符串。
+- **L246** `        """` — **EN:** Ends the docstring for the function `allocate_tensor`. **CN:** 结束说明 function `allocate_tensor` 的文档字符串。
+- **L247** `        ptr = self.allocate(layout, dtype, loc=loc, ip=ip)` — **EN:** Assigns a value to ptr. **CN:** 将一个值赋给 ptr。
+- **L248** `        return cute.make_tensor(ptr, layout, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `class TmemAllocator:` — **EN:** Defines class `TmemAllocator`. **CN:** 定义类 `TmemAllocator`。
+- **L252** `    """A class for managing tensor memory allocation on GPUs.` — **EN:** Starts the docstring for the class `TmemAllocator`. **CN:** 开始说明 class `TmemAllocator` 的文档字符串。
+- **L253** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L254** `    This class manages allocation/deallocation of tensor memory, including the mbarrier` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L255** `    synchronization for two cta use case.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `    :ivar _alloc_result_dst_smem_ptr: The smem pointer that holds the base address of allocated tensor memory.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L258** `    :type _alloc_result_dst_smem_ptr: cute.Pointer` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L259** `    :ivar _barrier_for_retrieve: The barrier for retrieving tensor memory ptr.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L260** `    :type _barrier_for_retrieve: pipeline.NamedBarrier` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L261** `    :ivar _allocator_warp_id: The warp id of the allocator warp.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L262** `    :type _allocator_warp_id: int` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L263** `    :ivar _is_two_cta: Whether the allocator is for two cta.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L264** `    :type _is_two_cta: bool` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L265** `    :ivar _num_allocated_columns: The number of columns allocated in the tensor memory.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L266** `    :type _num_allocated_columns: int` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L267** `    :ivar _two_cta_tmem_dealloc_mbar_ptr: The mbarrier pointer required when deallocating tensor memory for two cta.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L268** `    :type _two_cta_tmem_dealloc_mbar_ptr: cute.Pointer` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L269** `    :ivar _arch: The architecture of the GPU.` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L270** `    :type _arch: str` — **EN:** Continues the docstring for the class `TmemAllocator`. **CN:** 继续说明 class `TmemAllocator` 的文档字符串。
+- **L271** `    """` — **EN:** Ends the docstring for the class `TmemAllocator`. **CN:** 结束说明 class `TmemAllocator` 的文档字符串。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L274** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L275** `    def _init_dealloc_mbarrier(` — **EN:** Defines function `_init_dealloc_mbarrier`. **CN:** 定义函数 `_init_dealloc_mbarrier`。
+- **L276** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L279** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L280** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L281** `        assert self._two_cta_tmem_dealloc_mbar_ptr is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L282** `            "two_cta_tmem_dealloc_mbar_ptr is required for two cta"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `        warp_idx = cute.arch.warp_idx(loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L285** `        warp_idx = cute.arch.make_warp_uniform(warp_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L286** `        _is_allocator_warp = warp_idx == self._allocator_warp_id` — **EN:** Assigns a value to _is_allocator_warp. **CN:** 将一个值赋给 _is_allocator_warp。
+- **L287** `        if _is_allocator_warp:` — **EN:** Starts a conditional branch guarded by `_is_allocator_warp`. **CN:** 开始一个由 `_is_allocator_warp` 控制的条件分支。
+- **L288** `            num_tmem_dealloc_threads = 32` — **EN:** Assigns a value to num_tmem_dealloc_threads. **CN:** 将一个值赋给 num_tmem_dealloc_threads。
+- **L289** `            with cute.arch.elect_one(loc=loc, ip=ip):` — **EN:** Starts a context-managed block using cute.arch.elect_one(loc=loc, ip=ip). **CN:** 开始一个使用 cute.arch.elect_one(loc=loc, ip=ip) 的上下文管理代码块。
+- **L290** `                cute.arch.mbarrier_init(` — **EN:** Invokes `cute.arch.mbarrier_init` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_init`。
+- **L291** `                    self._two_cta_tmem_dealloc_mbar_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `                    num_tmem_dealloc_threads,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `        cute.arch.mbarrier_init_fence()` — **EN:** Invokes `cute.arch.mbarrier_init_fence` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_init_fence`。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L299** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L300** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L301** `        alloc_result_dst_smem_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L302** `        barrier_for_retrieve: pipeline.NamedBarrier,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L303** `        allocator_warp_id: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L304** `        is_two_cta: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `        num_allocated_columns: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `        two_cta_tmem_dealloc_mbar_ptr: Optional[cute.Pointer] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L307** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L308** `        arch: str = "sm_100",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L309** `        initialize_mbarrier: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L313** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L314** `        Initialize a TmemAllocator instance for managing tensor memory on Blackwell GPUs.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** `        This initializer sets up the allocator's state, including the shared memory (smem) pointer` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L317** `        holding the base address of the allocated tensor memory, barrier synchronization for` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L318** `        retrieving the tensor memory pointer, allocator warp ID, whether the allocator is being used` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L319** `        for a 2-SM configuration, number of allocated columns in tensor` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L320** `        memory, and the optional mbarrier pointer for deallocation in the 2-SM case.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `        If \`is_two_cta\` is set to True, this will initialize the mbarrier pointer required for tensor` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L323** `        memory deallocation across two CTAs.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `        :param alloc_result_dst_smem_ptr: The shared memory pointer that holds the base address of allocated tensor memory.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L326** `        :type alloc_result_dst_smem_ptr: cute.Pointer` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L327** `        :param barrier_for_retrieve: The named barrier for retrieving the tensor memory pointer.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L328** `        :type barrier_for_retrieve: pipeline.NamedBarrier` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L329** `        :param allocator_warp_id: The warp ID of the allocator warp, defaults to 0.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L330** `        :type allocator_warp_id: int, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L331** `        :param is_two_cta: Whether the allocator should coordinate two CTAs, defaults to False.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L332** `        :type is_two_cta: bool, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L333** `        :param num_allocated_columns: The number of columns allocated in tensor memory, defaults to 0.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L334** `        :type num_allocated_columns: int, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L335** `        :param two_cta_tmem_dealloc_mbar_ptr: The mbarrier pointer required for two-CTA tensor memory deallocation, optional.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L336** `        :type two_cta_tmem_dealloc_mbar_ptr: cute.Pointer, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L337** `        :param initialize_mbarrier: Whether to initialize the mbarrier for two cta, defaults to True.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L338** `        :type initialize_mbarrier: bool, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L339** `        :param loc: Optional codegen location for debugging and error reporting.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L340** `        :type loc: Any, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L341** `        :param ip: Optional insertion point for codegen.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L342** `        :type ip: Any, optional` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `        :raises AssertionError: If two_cta_tmem_dealloc_mbar_ptr is None while is_two_cta is True.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L345** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L346** `        # TODO: automatically maintain a smem address` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L347** `        self._alloc_result_dst_smem_ptr = alloc_result_dst_smem_ptr` — **EN:** Assigns a value to self._alloc_result_dst_smem_ptr. **CN:** 将一个值赋给 self._alloc_result_dst_smem_ptr。
+- **L348** `        self._allocator_warp_id = allocator_warp_id` — **EN:** Assigns a value to self._allocator_warp_id. **CN:** 将一个值赋给 self._allocator_warp_id。
+- **L349** `        self._is_two_cta = is_two_cta` — **EN:** Assigns a value to self._is_two_cta. **CN:** 将一个值赋给 self._is_two_cta。
+- **L350** `        self._num_allocated_columns = num_allocated_columns` — **EN:** Assigns a value to self._num_allocated_columns. **CN:** 将一个值赋给 self._num_allocated_columns。
+- **L351** `        self._two_cta_tmem_dealloc_mbar_ptr = two_cta_tmem_dealloc_mbar_ptr` — **EN:** Assigns a value to self._two_cta_tmem_dealloc_mbar_ptr. **CN:** 将一个值赋给 self._two_cta_tmem_dealloc_mbar_ptr。
+- **L352** `        self._barrier_for_retrieve = barrier_for_retrieve` — **EN:** Assigns a value to self._barrier_for_retrieve. **CN:** 将一个值赋给 self._barrier_for_retrieve。
+- **L353** `        self._arch = arch` — **EN:** Assigns a value to self._arch. **CN:** 将一个值赋给 self._arch。
+- **L354** `        self._max_tmem_columns = get_max_tmem_alloc_cols(arch)` — **EN:** Assigns a value to self._max_tmem_columns. **CN:** 将一个值赋给 self._max_tmem_columns。
+- **L355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L356** `        # Init tmem dealloc mbarrier if two cta` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L357** `        if const_expr(self._is_two_cta and initialize_mbarrier):` — **EN:** Starts a conditional branch guarded by `const_expr(self._is_two_cta and initialize_mbarrier)`. **CN:** 开始一个由 `const_expr(self._is_two_cta and initialize_mbarrier)` 控制的条件分支。
+- **L358** `            self._init_dealloc_mbarrier(loc=loc, ip=ip)` — **EN:** Invokes `self._init_dealloc_mbarrier` as a standalone call. **CN:** 以独立语句方式调用 `self._init_dealloc_mbarrier`。
+- **L359** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L360** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L361** `        values = extract_mlir_values(self._alloc_result_dst_smem_ptr)` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L362** `        if self._is_two_cta:` — **EN:** Starts a conditional branch guarded by `self._is_two_cta`. **CN:** 开始一个由 `self._is_two_cta` 控制的条件分支。
+- **L363** `            assert self._two_cta_tmem_dealloc_mbar_ptr is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L364** `                "2CTA mode requires the dealloc mbarrier"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `            values.extend(extract_mlir_values(self._two_cta_tmem_dealloc_mbar_ptr))` — **EN:** Invokes `values.extend` as a standalone call. **CN:** 以独立语句方式调用 `values.extend`。
+- **L367** `        return values` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `    def __new_from_mlir_values__(self, values: list[ir.Value]) -> "TmemAllocator":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L370** `        assert len(values) == 2 if self._is_two_cta else 1` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L371** `        new_alloc_result_dst_smem_ptr = new_from_mlir_values(` — **EN:** Assigns a value to new_alloc_result_dst_smem_ptr. **CN:** 将一个值赋给 new_alloc_result_dst_smem_ptr。
+- **L372** `            self._alloc_result_dst_smem_ptr, [values[0]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L373** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `        new_two_cta_tmem_dealloc_mbar_ptr = (` — **EN:** Assigns a value to new_two_cta_tmem_dealloc_mbar_ptr. **CN:** 将一个值赋给 new_two_cta_tmem_dealloc_mbar_ptr。
+- **L375** `            new_from_mlir_values(self._two_cta_tmem_dealloc_mbar_ptr, [values[1]])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `            if self._is_two_cta` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `            else None` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** `        return TmemAllocator(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L380** `            new_alloc_result_dst_smem_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L381** `            pipeline.NamedBarrier(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L382** `                barrier_id=self._barrier_for_retrieve.barrier_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L383** `                num_threads=self._barrier_for_retrieve.num_threads,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L384** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L385** `            self._allocator_warp_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `            self._is_two_cta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** `            self._num_allocated_columns,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L388** `            new_two_cta_tmem_dealloc_mbar_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `            arch=self._arch,  # Preserve the architecture parameter` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `            initialize_mbarrier=False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L394** `    def check_valid_num_columns(self, num_columns: int) -> bool:` — **EN:** Defines function `check_valid_num_columns`. **CN:** 定义函数 `check_valid_num_columns`。
+- **L395** `        """Check if the number of columns is valid.` — **EN:** Starts the docstring for the function `check_valid_num_columns`. **CN:** 开始说明 function `check_valid_num_columns` 的文档字符串。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `        This method checks if the number of columns is valid.` — **EN:** Continues the docstring for the function `check_valid_num_columns`. **CN:** 继续说明 function `check_valid_num_columns` 的文档字符串。
+- **L398** `        It checks if the number of columns is larger than 0, smaller than max capacity, a multiple of 32, and a power of two.` — **EN:** Continues the docstring for the function `check_valid_num_columns`. **CN:** 继续说明 function `check_valid_num_columns` 的文档字符串。
+- **L399** `        """` — **EN:** Ends the docstring for the function `check_valid_num_columns`. **CN:** 结束说明 function `check_valid_num_columns` 的文档字符串。
+- **L400** `        # larger than 0` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L401** `        if const_expr(num_columns < 0):` — **EN:** Starts a conditional branch guarded by `const_expr(num_columns < 0)`. **CN:** 开始一个由 `const_expr(num_columns < 0)` 控制的条件分支。
+- **L402** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L403** `        # smaller than max capacity` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L404** `        if const_expr(num_columns > self._max_tmem_columns):` — **EN:** Starts a conditional branch guarded by `const_expr(num_columns > self._max_tmem_columns)`. **CN:** 开始一个由 `const_expr(num_columns > self._max_tmem_columns)` 控制的条件分支。
+- **L405** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L406** `        # multiple of 32` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L407** `        if const_expr(num_columns % 32 != 0):` — **EN:** Starts a conditional branch guarded by `const_expr(num_columns % 32 != 0)`. **CN:** 开始一个由 `const_expr(num_columns % 32 != 0)` 控制的条件分支。
+- **L408** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L409** `        # power of two` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L410** `        if const_expr(` — **EN:** Starts a conditional branch guarded by `const_expr(num_columns & num_columns - 1 != 0)`. **CN:** 开始一个由 `const_expr(num_columns & num_columns - 1 != 0)` 控制的条件分支。
+- **L411** `            (num_columns & (num_columns - 1) != 0)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L412** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L413** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L414** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L417** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L418** `    def allocate(` — **EN:** Defines function `allocate`. **CN:** 定义函数 `allocate`。
+- **L419** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L420** `        num_columns: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L421** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L422** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L423** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L424** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L425** `        """Allocate a block of tensor memory.` — **EN:** Starts the docstring for the function `allocate`. **CN:** 开始说明 function `allocate` 的文档字符串。
+- **L426** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L427** `        This method allocates a block of tensor memory from allocator warp and returns a handle to retrieve` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L428** `        the allocated tensor memory address.` — **EN:** Continues the docstring for the function `allocate`. **CN:** 继续说明 function `allocate` 的文档字符串。
+- **L429** `        """` — **EN:** Ends the docstring for the function `allocate`. **CN:** 结束说明 function `allocate` 的文档字符串。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `        assert self.check_valid_num_columns(num_columns), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L432** `            f"num_columns must be multiple of 32 and power of two, and between 0 and {self._max_tmem_columns}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `        assert self._num_allocated_columns + num_columns <= self._max_tmem_columns, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L435** `            f"total allocated columns must be less than or equal to {self._max_tmem_columns}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `        warp_idx = cute.arch.warp_idx(loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L439** `        warp_idx = cute.arch.make_warp_uniform(warp_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L440** `        _is_allocator_warp = warp_idx == self._allocator_warp_id` — **EN:** Assigns a value to _is_allocator_warp. **CN:** 将一个值赋给 _is_allocator_warp。
+- **L441** `        if _is_allocator_warp:` — **EN:** Starts a conditional branch guarded by `_is_allocator_warp`. **CN:** 开始一个由 `_is_allocator_warp` 控制的条件分支。
+- **L442** `            cute.arch.alloc_tmem(` — **EN:** Invokes `cute.arch.alloc_tmem` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.alloc_tmem`。
+- **L443** `                num_columns,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `                self._alloc_result_dst_smem_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** `                is_two_cta=self._is_two_cta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L446** `                arch=self._arch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L447** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `        self._num_allocated_columns += num_columns` — **EN:** Updates self._num_allocated_columns in place. **CN:** 原地更新 self._num_allocated_columns。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L453** `    def wait_for_alloc(` — **EN:** Defines function `wait_for_alloc`. **CN:** 定义函数 `wait_for_alloc`。
+- **L454** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L455** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L456** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L457** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L458** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L459** `        """Wait for the allocator warp to finish allocation.` — **EN:** Starts the docstring for the function `wait_for_alloc`. **CN:** 开始说明 function `wait_for_alloc` 的文档字符串。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `        This method is used to synchronize the allocator warp with the other warps before retrieving tmem ptr.` — **EN:** Continues the docstring for the function `wait_for_alloc`. **CN:** 继续说明 function `wait_for_alloc` 的文档字符串。
+- **L462** `        """` — **EN:** Ends the docstring for the function `wait_for_alloc`. **CN:** 结束说明 function `wait_for_alloc` 的文档字符串。
+- **L463** `        self._barrier_for_retrieve.arrive_and_wait(loc=loc, ip=ip)` — **EN:** Invokes `self._barrier_for_retrieve.arrive_and_wait` as a standalone call. **CN:** 以独立语句方式调用 `self._barrier_for_retrieve.arrive_and_wait`。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L466** `    def retrieve_ptr(` — **EN:** Defines function `retrieve_ptr`. **CN:** 定义函数 `retrieve_ptr`。
+- **L467** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L468** `        dtype: Type[Numeric] = Float32,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L469** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L470** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L471** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L472** `    ) -> cute.Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L473** `        """Retrieve the pointer to the allocated tensor memory.` — **EN:** Starts the docstring for the function `retrieve_ptr`. **CN:** 开始说明 function `retrieve_ptr` 的文档字符串。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `        This method can be called by all warps after allocation has been performed` — **EN:** Continues the docstring for the function `retrieve_ptr`. **CN:** 继续说明 function `retrieve_ptr` 的文档字符串。
+- **L476** `        by the allocator warp.` — **EN:** Continues the docstring for the function `retrieve_ptr`. **CN:** 继续说明 function `retrieve_ptr` 的文档字符串。
+- **L477** `        """` — **EN:** Ends the docstring for the function `retrieve_ptr`. **CN:** 结束说明 function `retrieve_ptr` 的文档字符串。
+- **L478** `        return cute.arch.retrieve_tmem_ptr(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L479** `            dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `            alignment=16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `            ptr_to_buffer_holding_addr=self._alloc_result_dst_smem_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L486** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L487** `    def reserve(` — **EN:** Defines function `reserve`. **CN:** 定义函数 `reserve`。
+- **L488** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L489** `        num_columns: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L490** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L491** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L492** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L493** `    ) -> TmemBufferPool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L494** `        """Reserve a block of tensor memory and return a pool for sub-allocation.` — **EN:** Starts the docstring for the function `reserve`. **CN:** 开始说明 function `reserve` 的文档字符串。
+- **L495** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L496** `        This method allocates a block of tensor memory, waits for the allocation` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L497** `        to complete, and returns a TmemBufferPool that can be used to sub-allocate` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L498** `        regions within that block without manual offset calculations.` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L499** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L500** `        Example usage::` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L501** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L502** `            tmem_pool = tmem_allocator.reserve(tmem_total_size)` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L503** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L504** `            # Allocate and create tensors in one call` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L505** `            tCtAcc = tmem_pool.allocate_tensor(tCtAcc_layout, cutlass.Float32)` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L506** `            tCtSFA = tmem_pool.allocate_tensor(tCtSFA_layout, sf_dtype)` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L508** `            # Or allocate pointer only, then create tensor manually` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L509** `            sfb_ptr = tmem_pool.allocate(tCtSFB_layout, sf_dtype)` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L510** `            tCtSFB = cute.make_tensor(sfb_ptr, tCtSFB_layout)` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** `        :param num_columns: The total number of columns to reserve.` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L513** `        :type num_columns: int` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L514** `        :return: A TmemBufferPool for sub-allocating within the reserved region.` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L515** `        :rtype: TmemBufferPool` — **EN:** Continues the docstring for the function `reserve`. **CN:** 继续说明 function `reserve` 的文档字符串。
+- **L516** `        """` — **EN:** Ends the docstring for the function `reserve`. **CN:** 结束说明 function `reserve` 的文档字符串。
+- **L517** `        self.allocate(num_columns, loc=loc, ip=ip)` — **EN:** Invokes `self.allocate` as a standalone call. **CN:** 以独立语句方式调用 `self.allocate`。
+- **L518** `        self.wait_for_alloc(loc=loc, ip=ip)` — **EN:** Invokes `self.wait_for_alloc` as a standalone call. **CN:** 以独立语句方式调用 `self.wait_for_alloc`。
+- **L519** `        base_ptr = self.retrieve_ptr(loc=loc, ip=ip)` — **EN:** Assigns a value to base_ptr. **CN:** 将一个值赋给 base_ptr。
+- **L520** `        return TmemBufferPool(base_ptr, num_columns)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L521** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L522** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L523** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L524** `    def relinquish_alloc_permit(` — **EN:** Defines function `relinquish_alloc_permit`. **CN:** 定义函数 `relinquish_alloc_permit`。
+- **L525** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L526** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L527** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L528** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L529** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L530** `        """Relinquish the tensor memory allocation permit.` — **EN:** Starts the docstring for the function `relinquish_alloc_permit`. **CN:** 开始说明 function `relinquish_alloc_permit` 的文档字符串。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `        This method relinquishes the tensor memory allocation permit for the allocator warp, promising` — **EN:** Continues the docstring for the function `relinquish_alloc_permit`. **CN:** 继续说明 function `relinquish_alloc_permit` 的文档字符串。
+- **L533** `        the allocator warp will not allocate any more tensor memory.` — **EN:** Continues the docstring for the function `relinquish_alloc_permit`. **CN:** 继续说明 function `relinquish_alloc_permit` 的文档字符串。
+- **L534** `        """` — **EN:** Ends the docstring for the function `relinquish_alloc_permit`. **CN:** 结束说明 function `relinquish_alloc_permit` 的文档字符串。
+- **L535** `        warp_idx = cute.arch.warp_idx(loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L536** `        warp_idx = cute.arch.make_warp_uniform(warp_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L537** `        _is_allocator_warp = warp_idx == self._allocator_warp_id` — **EN:** Assigns a value to _is_allocator_warp. **CN:** 将一个值赋给 _is_allocator_warp。
+- **L538** `        if _is_allocator_warp:` — **EN:** Starts a conditional branch guarded by `_is_allocator_warp`. **CN:** 开始一个由 `_is_allocator_warp` 控制的条件分支。
+- **L539** `            cute.arch.relinquish_tmem_alloc_permit(` — **EN:** Invokes `cute.arch.relinquish_tmem_alloc_permit` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.relinquish_tmem_alloc_permit`。
+- **L540** `                is_two_cta=self._is_two_cta, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L541** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L542** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L543** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L544** `    @cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L545** `    def free(` — **EN:** Defines function `free`. **CN:** 定义函数 `free`。
+- **L546** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L547** `        tmem_ptr: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L548** `        num_columns: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L549** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L550** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L551** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L552** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L553** `        """Deallocate the tensor memory.` — **EN:** Starts the docstring for the function `free`. **CN:** 开始说明 function `free` 的文档字符串。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** `        This method sync on mbarrier (for two cta use case) and deallocates the tensor memory from the allocator warp.` — **EN:** Continues the docstring for the function `free`. **CN:** 继续说明 function `free` 的文档字符串。
+- **L556** `        User can optionally specify the number of columns to deallocate. If not specified, all allocated columns will be deallocated.` — **EN:** Continues the docstring for the function `free`. **CN:** 继续说明 function `free` 的文档字符串。
+- **L557** `        """` — **EN:** Ends the docstring for the function `free`. **CN:** 结束说明 function `free` 的文档字符串。
+- **L558** `        warp_idx = cute.arch.warp_idx(loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L559** `        warp_idx = cute.arch.make_warp_uniform(warp_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L560** `        _is_allocator_warp = warp_idx == self._allocator_warp_id` — **EN:** Assigns a value to _is_allocator_warp. **CN:** 将一个值赋给 _is_allocator_warp。
+- **L561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L562** `        assert num_columns <= self._num_allocated_columns, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L563** `            "num_columns must be less than or equal to num_allocated_columns"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L564** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L565** `        if const_expr(num_columns != 0):` — **EN:** Starts a conditional branch guarded by `const_expr(num_columns != 0)`. **CN:** 开始一个由 `const_expr(num_columns != 0)` 控制的条件分支。
+- **L566** `            assert self.check_valid_num_columns(num_columns), "num_columns is invalid"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L567** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L568** `        num_deallocate_columns = (` — **EN:** Assigns a value to num_deallocate_columns. **CN:** 将一个值赋给 num_deallocate_columns。
+- **L569** `            self._num_allocated_columns if num_columns == 0 else num_columns` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L570** `        )  # if num_columns is 0, deallocate all allocated columns` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L571** `        self._num_allocated_columns -= num_deallocate_columns` — **EN:** Updates self._num_allocated_columns in place. **CN:** 原地更新 self._num_allocated_columns。
+- **L572** `        if _is_allocator_warp:` — **EN:** Starts a conditional branch guarded by `_is_allocator_warp`. **CN:** 开始一个由 `_is_allocator_warp` 控制的条件分支。
+- **L573** `            if const_expr(self._is_two_cta):` — **EN:** Starts a conditional branch guarded by `const_expr(self._is_two_cta)`. **CN:** 开始一个由 `const_expr(self._is_two_cta)` 控制的条件分支。
+- **L574** `                bid_in_cluster = cute.arch.block_idx_in_cluster(loc=loc, ip=ip)` — **EN:** Assigns a value to bid_in_cluster. **CN:** 将一个值赋给 bid_in_cluster。
+- **L575** `                _cta_rank_in_cluster = cute.arch.make_warp_uniform(` — **EN:** Assigns a value to _cta_rank_in_cluster. **CN:** 将一个值赋给 _cta_rank_in_cluster。
+- **L576** `                    bid_in_cluster, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L577** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L578** `                # Arrive and wait for dealloc signal from peer cta` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L579** `                cute.arch.mbarrier_arrive(` — **EN:** Invokes `cute.arch.mbarrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_arrive`。
+- **L580** `                    self._two_cta_tmem_dealloc_mbar_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `                    _cta_rank_in_cluster ^ 1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `                cute.arch.mbarrier_wait(` — **EN:** Invokes `cute.arch.mbarrier_wait` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_wait`。
+- **L586** `                    self._two_cta_tmem_dealloc_mbar_ptr, 0, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `            # Deallocate tmem` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L589** `            cute.arch.dealloc_tmem(` — **EN:** Invokes `cute.arch.dealloc_tmem` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.dealloc_tmem`。
+- **L590** `                tmem_ptr,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `                num_deallocate_columns,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `                is_two_cta=self._is_two_cta,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `                arch=self._arch,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L595** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L596** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L597** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L598** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L599** `# Set explicit signature for Sphinx documentation to avoid issues with @dsl_user_op decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L600** `TmemAllocator.__init__.__signature__ = inspect.Signature(  # type: ignore[attr-defined]` — **EN:** Assigns a value to TmemAllocator.__init__.__signature__. **CN:** 将一个值赋给 TmemAllocator.__init__.__signature__。
+- **L601** `    [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L602** `        inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L603** `        inspect.Parameter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `            "alloc_result_dst_smem_ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L605** `            inspect.Parameter.POSITIONAL_OR_KEYWORD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L606** `            annotation=cute.Pointer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L607** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L608** `        inspect.Parameter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `            "barrier_for_retrieve",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** `            inspect.Parameter.POSITIONAL_OR_KEYWORD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L611** `            annotation=pipeline.NamedBarrier,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L612** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `        inspect.Parameter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** `            "allocator_warp_id",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L615** `            inspect.Parameter.POSITIONAL_OR_KEYWORD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L616** `            default=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L617** `            annotation=int,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L618** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L619** `        inspect.Parameter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L620** `            "is_two_cta",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L621** `            inspect.Parameter.POSITIONAL_OR_KEYWORD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L622** `            default=False,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L623** `            annotation=bool,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L624** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L625** `        inspect.Parameter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `            "num_allocated_columns",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `            inspect.Parameter.POSITIONAL_OR_KEYWORD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `            default=0,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `            annotation=int,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L631** `        inspect.Parameter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L632** `            "two_cta_tmem_dealloc_mbar_ptr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L633** `            inspect.Parameter.POSITIONAL_OR_KEYWORD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `            default=None,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** `            annotation=Optional[cute.Pointer],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L636** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L639** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L640** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L641** `def get_num_tmem_alloc_cols(` — **EN:** Defines function `get_num_tmem_alloc_cols`. **CN:** 定义函数 `get_num_tmem_alloc_cols`。
+- **L642** `    tmem_tensors: Union[cute.Tensor, List[cute.Tensor]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L643** `    rounding: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L644** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L645** `    arch: str = "sm_100",` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L646** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L647** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L648** `) -> int:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L649** `    """Get the total number of TMEM allocation columns for the given TMEM tensors.` — **EN:** Starts the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 开始说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L650** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L651** `    :param tmem_tensors: The TMEM tensors to get the number of allocation columns for.` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L652** `    :type tmem_tensors: Union[cute.Tensor, List[cute.Tensor]]` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L653** `    :param rounding: Whether to round up the number of allocation columns to the nearest power of 2.` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L654** `    :type rounding: bool` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L655** `    :param arch: The architecture of the GPU.` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L656** `    :type arch: str` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L657** `    :return: The total number of TMEM allocation columns.` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L658** `    :rtype: int` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L659** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L660** `    :raises ValueError: If the number of TMEM allocation columns exceeds the maximum capacity or is less than 32.` — **EN:** Continues the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 继续说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L661** `    """` — **EN:** Ends the docstring for the function `get_num_tmem_alloc_cols`. **CN:** 结束说明 function `get_num_tmem_alloc_cols` 的文档字符串。
+- **L662** `    # Turn tmem_tensors into a list` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L663** `    if isinstance(tmem_tensors, cute.Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(tmem_tensors, cute.Tensor)`. **CN:** 开始一个由 `isinstance(tmem_tensors, cute.Tensor)` 控制的条件分支。
+- **L664** `        tmem_tensors = [tmem_tensors]` — **EN:** Assigns a value to tmem_tensors. **CN:** 将一个值赋给 tmem_tensors。
+- **L665** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L666** `    tmem_max_alloc_cols = get_max_tmem_alloc_cols(arch)` — **EN:** Assigns a value to tmem_max_alloc_cols. **CN:** 将一个值赋给 tmem_max_alloc_cols。
+- **L667** `    tmem_min_alloc_cols = get_min_tmem_alloc_cols(arch)` — **EN:** Assigns a value to tmem_min_alloc_cols. **CN:** 将一个值赋给 tmem_min_alloc_cols。
+- **L668** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L669** `    # For each tensor in tmem_tensors, find the tmem_tensor_col_offset` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L670** `    num_tmem_alloc_cols_per_tensor = [` — **EN:** Assigns a value to num_tmem_alloc_cols_per_tensor. **CN:** 将一个值赋给 num_tmem_alloc_cols_per_tensor。
+- **L671** `        find_tmem_tensor_col_offset(t) for t in tmem_tensors` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L674** `    # Sum up the num_tmem_alloc_cols_per_tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L675** `    num_tmem_alloc_cols = sum(num_tmem_alloc_cols_per_tensor)` — **EN:** Assigns a value to num_tmem_alloc_cols. **CN:** 将一个值赋给 num_tmem_alloc_cols。
+- **L676** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L677** `    # Round up num_tmem_cols_total to the nearest power of 2 and make sure it is at least 32` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L678** `    if rounding:` — **EN:** Starts a conditional branch guarded by `rounding`. **CN:** 开始一个由 `rounding` 控制的条件分支。
+- **L679** `        num_tmem_alloc_cols = max(` — **EN:** Assigns a value to num_tmem_alloc_cols. **CN:** 将一个值赋给 num_tmem_alloc_cols。
+- **L680** `            1 << ceil(log2(num_tmem_alloc_cols)), tmem_min_alloc_cols` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L681** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L682** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L683** `    # Validate the number of TMEM allocation columns` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L684** `    if (` — **EN:** Starts a conditional branch guarded by `num_tmem_alloc_cols > tmem_max_alloc_cols or num_tmem_all...`. **CN:** 开始一个由 `num_tmem_alloc_cols > tmem_max_alloc_cols or num_tmem_all...` 控制的条件分支。
+- **L685** `        num_tmem_alloc_cols > tmem_max_alloc_cols` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L686** `        or num_tmem_alloc_cols < tmem_min_alloc_cols` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L687** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L688** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L689** `            f"TMEM allocation columns {num_tmem_alloc_cols} exceeds the maximum capacity of {tmem_max_alloc_cols} or less than {tmem_min_alloc_cols}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `    return num_tmem_alloc_cols` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.tmem_allocator`. CN: 模块名为 `CuTeDSL.cutlass.utils.tmem_allocator`。
+- EN: Top-level classes: TmemBufferPool, TmemAllocator CN: 顶层类包括：TmemBufferPool, TmemAllocator
+- EN: Top-level functions: compute_tmem_cols_from_layout, get_num_tmem_alloc_cols CN: 顶层函数包括：compute_tmem_cols_from_layout, get_num_tmem_alloc_cols
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass:const_expr, cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:Numeric,Float32,Boolean,extract_mlir_values,new_from_mlir_values,dsl_user_op, cutlass.pipeline, cutlass.cute, cutlass._mlir:ir, cutlass.cute.nvgpu.tcgen05:find_tmem_tensor_col_offset, cutlass.cute.arch:get_max_tmem_alloc_cols,get_min_tmem_alloc_cols CN: 内部依赖：cutlass:const_expr, cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:Numeric,Float32,Boolean,extract_mlir_values,new_from_mlir_values,dsl_user_op, cutlass.pipeline, cutlass.cute, cutlass._mlir:ir, cutlass.cute.nvgpu.tcgen05:find_tmem_tensor_col_offset, cutlass.cute.arch:get_max_tmem_alloc_cols,get_min_tmem_alloc_cols
+- EN: External or standard-library dependencies: math:log2,ceil, typing:Optional,Type,Union,List, inspect CN: 外部或标准库依赖：math:log2,ceil, typing:Optional,Type,Union,List, inspect

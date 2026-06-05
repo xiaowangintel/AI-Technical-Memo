@@ -1,0 +1,25 @@
+# __init__.py — Code Analysis / 代码分析
+
+## Source / 来源
+- **File**: `python/sglang/multimodal_gen/runtime/models/upsampler/__init__.py`
+- **Repository**: sgl-project/sglang
+- **Purpose**: This module implements model-side building blocks for init within the multimodal runtime. / 该模块实现多模态运行时中与 init 相关的模型构件。
+
+## Line-by-Line Analysis / 逐行分析
+### Lines 1-5: Imports and module setup / 导入与模块初始化
+```python
+from sglang.multimodal_gen.runtime.models.upsampler.latent_upsampler import (
+    LatentUpsampler,
+)
+
+__all__ = ["LatentUpsampler"]
+```
+**EN:** This block establishes imports, constants, registration hooks, or helper state used by later definitions.
+**CN:** 该代码块建立后续定义所需的导入、常量、注册钩子或辅助状态。
+
+## Key Concepts / 关键概念
+- Module composition / 模块组合方式
+- Runtime support logic / 运行时支撑逻辑
+
+## Dependencies / 依赖关系
+- **Internal / 内部**: `sglang.multimodal_gen.runtime.models.upsampler.latent_upsampler`

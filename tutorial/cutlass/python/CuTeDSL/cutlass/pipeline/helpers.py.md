@@ -1,0 +1,1021 @@
+# helpers.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/pipeline/helpers.py`
+
+## Purpose / 作用
+- EN: Defines 9 classes (Agent, CooperativeGroup, PipelineOp, SyncObject, ... (+5 more)) and 12 functions (_get_pipeline_op, make_pipeline_state, pipeline_init_arrive, pipeline_init_wait, ... (+8 more)) in `CuTeDSL.cutlass.pipeline.helpers`.
+- CN: 该模块 `CuTeDSL.cutlass.pipeline.helpers` 定义了 9 个类（Agent, CooperativeGroup, PipelineOp, SyncObject, ... (+5 more)） 和 12 个函数（_get_pipeline_op, make_pipeline_state, pipeline_init_arrive, pipeline_init_wait, ... (+8 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L13** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L14** `from abc import ABC, abstractmethod` — **EN:** Imports ABC, abstractmethod from `abc`. **CN:** 从 `abc` 导入 ABC, abstractmethod。
+- **L15** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L16** `from typing import Any, Optional, Union` — **EN:** Imports Any, Optional, Union from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Union。
+- **L17** `import warnings` — **EN:** Imports warnings for later use. **CN:** 导入 warnings 供后续使用。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L20** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L21** `from cutlass.base_dsl.arch import Arch` — **EN:** Imports Arch from `cutlass.base_dsl.arch`. **CN:** 从 `cutlass.base_dsl.arch` 导入 Arch。
+- **L22** `from cutlass.cutlass_dsl import CuTeDSL, Boolean, Int32, if_generate, dsl_user_op` — **EN:** Imports CuTeDSL, Boolean, Int32, if_generate, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 CuTeDSL, Boolean, Int32, if_generate, dsl_user_op。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L26** `# Agent class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `class Agent(enum.Enum):` — **EN:** Defines class `Agent` with bases enum.Enum. **CN:** 定义类 `Agent`，其基类为 enum.Enum。
+- **L31** `    """` — **EN:** Starts the docstring for the class `Agent`. **CN:** 开始说明 class `Agent` 的文档字符串。
+- **L32** `    Agent indicates what is participating in the pipeline synchronization.` — **EN:** Continues the docstring for the class `Agent`. **CN:** 继续说明 class `Agent` 的文档字符串。
+- **L33** `    """` — **EN:** Ends the docstring for the class `Agent`. **CN:** 结束说明 class `Agent` 的文档字符串。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `    # Arbitrary grouping of N threads` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L36** `    Thread = enum.auto()` — **EN:** Assigns a value to Thread. **CN:** 将一个值赋给 Thread。
+- **L37** `    # A collection of 32 threads executing in lockstep` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L38** `    Warp = enum.auto()` — **EN:** Assigns a value to Warp. **CN:** 将一个值赋给 Warp。
+- **L39** `    # Same as AsyncThread, but includes all threads in the block` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L40** `    ThreadBlock = enum.auto()` — **EN:** Assigns a value to ThreadBlock. **CN:** 将一个值赋给 ThreadBlock。
+- **L41** `    # Same as AsyncThread, but includes all threads in the cluster` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L42** `    ThreadBlockCluster = enum.auto()` — **EN:** Assigns a value to ThreadBlockCluster. **CN:** 将一个值赋给 ThreadBlockCluster。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L46** `# CooperativeGroup class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L47** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `class CooperativeGroup:` — **EN:** Defines class `CooperativeGroup`. **CN:** 定义类 `CooperativeGroup`。
+- **L51** `    """` — **EN:** Starts the docstring for the class `CooperativeGroup`. **CN:** 开始说明 class `CooperativeGroup` 的文档字符串。
+- **L52** `    CooperativeGroup contains size and alignment restrictions for an Agent.` — **EN:** Continues the docstring for the class `CooperativeGroup`. **CN:** 继续说明 class `CooperativeGroup` 的文档字符串。
+- **L53** `    """` — **EN:** Ends the docstring for the class `CooperativeGroup`. **CN:** 结束说明 class `CooperativeGroup` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    def __init__(self, agent: Agent, size: int = 1, alignment: Optional[int] = None):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L56** `        if alignment is not None:` — **EN:** Starts a conditional branch guarded by `alignment is not None`. **CN:** 开始一个由 `alignment is not None` 控制的条件分支。
+- **L57** `            warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L58** `                "The 'alignment' parameter of CooperativeGroup's constructor is deprecated and "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `                "will be removed in a subsequent release, please remove it from your code.",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L60** `                DeprecationWarning,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L61** `                stacklevel=2,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L62** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `        if agent is Agent.Thread:` — **EN:** Starts a conditional branch guarded by `agent is Agent.Thread`. **CN:** 开始一个由 `agent is Agent.Thread` 控制的条件分支。
+- **L65** `            assert size > 0` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L66** `        elif agent is Agent.ThreadBlock:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L67** `            raise NotImplementedError("Error: Not yet supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L68** `        elif agent is Agent.ThreadBlockCluster:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L69** `            raise NotImplementedError("Error: Not yet supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L70** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L71** `            # Should never reach this state` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `            size = 0` — **EN:** Assigns a value to size. **CN:** 将一个值赋给 size。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `        if size <= 0:` — **EN:** Starts a conditional branch guarded by `size <= 0`. **CN:** 开始一个由 `size <= 0` 控制的条件分支。
+- **L75** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L76** `                "Error: The number of threads in a CooperativeGroup must be more than 0."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `        # Size indicates how many threads are participating in this CooperativeGroup` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L80** `        self.size = size` — **EN:** Assigns a value to self.size. **CN:** 将一个值赋给 self.size。
+- **L81** `        # Agent indicates the type of thread group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L82** `        self.agent = agent` — **EN:** Assigns a value to self.agent. **CN:** 将一个值赋给 self.agent。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L86** `# PipelineOp class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L87** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `class PipelineOp(enum.Enum):` — **EN:** Defines class `PipelineOp` with bases enum.Enum. **CN:** 定义类 `PipelineOp`，其基类为 enum.Enum。
+- **L91** `    """` — **EN:** Starts the docstring for the class `PipelineOp`. **CN:** 开始说明 class `PipelineOp` 的文档字符串。
+- **L92** `    PipelineOp assigns an operation to an agent corresponding to a specific hardware feature.` — **EN:** Continues the docstring for the class `PipelineOp`. **CN:** 继续说明 class `PipelineOp` 的文档字符串。
+- **L93** `    """` — **EN:** Ends the docstring for the class `PipelineOp`. **CN:** 结束说明 class `PipelineOp` 的文档字符串。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `    # async-threads` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `    AsyncThread = enum.auto()` — **EN:** Assigns a value to AsyncThread. **CN:** 将一个值赋给 AsyncThread。
+- **L97** `    # Blackwell (SM100a) MMA instruction` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L98** `    TCGen05Mma = enum.auto()` — **EN:** Assigns a value to TCGen05Mma. **CN:** 将一个值赋给 TCGen05Mma。
+- **L99** `    # Tensor Memory Accelerator load` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L100** `    TmaLoad = enum.auto()` — **EN:** Assigns a value to TmaLoad. **CN:** 将一个值赋给 TmaLoad。
+- **L101** `    # Cluster launch cancel response load` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L102** `    ClcLoad = enum.auto()` — **EN:** Assigns a value to ClcLoad. **CN:** 将一个值赋给 ClcLoad。
+- **L103** `    # TMA Store consuming smem produced by AsyncThread` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L104** `    TmaStore = enum.auto()` — **EN:** Assigns a value to TmaStore. **CN:** 将一个值赋给 TmaStore。
+- **L105** `    # Composite of multiple PipelineOps` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L106** `    Composite = enum.auto()` — **EN:** Assigns a value to Composite. **CN:** 将一个值赋给 Composite。
+- **L107** `    # Async load without TMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L108** `    AsyncLoad = enum.auto()` — **EN:** Assigns a value to AsyncLoad. **CN:** 将一个值赋给 AsyncLoad。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `def _get_pipeline_op(type_str: int | PipelineOp) -> PipelineOp:` — **EN:** Defines function `_get_pipeline_op`. **CN:** 定义函数 `_get_pipeline_op`。
+- **L111** `    return PipelineOp(type_str)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L112** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L115** `# SyncObject class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L116** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `class SyncObject(ABC):` — **EN:** Defines class `SyncObject` with bases ABC. **CN:** 定义类 `SyncObject`，其基类为 ABC。
+- **L120** `    """Abstract base class for hardware synchronization primitives.` — **EN:** Starts the docstring for the class `SyncObject`. **CN:** 开始说明 class `SyncObject` 的文档字符串。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `    This class defines the interface for different types of hardware synchronization` — **EN:** Continues the docstring for the class `SyncObject`. **CN:** 继续说明 class `SyncObject` 的文档字符串。
+- **L123** `    mechanisms including shared memory barriers, named barriers, and fences.` — **EN:** Continues the docstring for the class `SyncObject`. **CN:** 继续说明 class `SyncObject` 的文档字符串。
+- **L124** `    """` — **EN:** Ends the docstring for the class `SyncObject`. **CN:** 结束说明 class `SyncObject` 的文档字符串。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L127** `    def arrive(self) -> None:` — **EN:** Defines function `arrive`. **CN:** 定义函数 `arrive`。
+- **L128** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L131** `    def wait(self) -> None:` — **EN:** Defines function `wait`. **CN:** 定义函数 `wait`。
+- **L132** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L135** `    def arrive_and_wait(self) -> None:` — **EN:** Defines function `arrive_and_wait`. **CN:** 定义函数 `arrive_and_wait`。
+- **L136** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L139** `    def arrive_and_drop(self) -> None:` — **EN:** Defines function `arrive_and_drop`. **CN:** 定义函数 `arrive_and_drop`。
+- **L140** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L143** `    def get_barrier(self) -> Union[cute.Pointer, int, None]:` — **EN:** Defines function `get_barrier`. **CN:** 定义函数 `get_barrier`。
+- **L144** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L145** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L146** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L147** `    def max(self) -> Union[int, None]:` — **EN:** Defines function `max`. **CN:** 定义函数 `max`。
+- **L148** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L152** `# MbarrierArray class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L153** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** `class MbarrierArray(SyncObject):` — **EN:** Defines class `MbarrierArray` with bases SyncObject. **CN:** 定义类 `MbarrierArray`，其基类为 SyncObject。
+- **L157** `    """` — **EN:** Starts the docstring for the class `MbarrierArray`. **CN:** 开始说明 class `MbarrierArray` 的文档字符串。
+- **L158** `    MbarrierArray implements an abstraction for an array of smem barriers.` — **EN:** Continues the docstring for the class `MbarrierArray`. **CN:** 继续说明 class `MbarrierArray` 的文档字符串。
+- **L159** `    """` — **EN:** Ends the docstring for the class `MbarrierArray`. **CN:** 结束说明 class `MbarrierArray` 的文档字符串。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L162** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L163** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L164** `        barrier_storage: cute.Pointer,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L165** `        num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L166** `        agent: tuple[PipelineOp, CooperativeGroup],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L167** `        tx_count: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L168** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L169** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L170** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L171** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L172** `        self.barrier_storage = barrier_storage` — **EN:** Assigns a value to self.barrier_storage. **CN:** 将一个值赋给 self.barrier_storage。
+- **L173** `        self.tx_count = tx_count` — **EN:** Assigns a value to self.tx_count. **CN:** 将一个值赋给 self.tx_count。
+- **L174** `        self.num_stages = num_stages` — **EN:** Assigns a value to self.num_stages. **CN:** 将一个值赋给 self.num_stages。
+- **L175** `        self.op_type, self.cg = agent` — **EN:** Assigns a value to (self.op_type, self.cg). **CN:** 将一个值赋给 (self.op_type, self.cg)。
+- **L176** `        self.arrive_count = self.cg.size` — **EN:** Assigns a value to self.arrive_count. **CN:** 将一个值赋给 self.arrive_count。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `        if self.num_stages <= 0:` — **EN:** Starts a conditional branch guarded by `self.num_stages <= 0`. **CN:** 开始一个由 `self.num_stages <= 0` 控制的条件分支。
+- **L179** `            raise ValueError("Error: Mbarrier stage count must be greater than 0.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L180** `        if self.arrive_count <= 0:` — **EN:** Starts a conditional branch guarded by `self.arrive_count <= 0`. **CN:** 开始一个由 `self.arrive_count <= 0` 控制的条件分支。
+- **L181** `            raise ValueError("Error: Mbarrier arrive count must be greater than 0.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L182** `        if self.op_type is PipelineOp.TmaLoad and self.tx_count < 0:` — **EN:** Starts a conditional branch guarded by `self.op_type is PipelineOp.TmaLoad and self.tx_count < 0`. **CN:** 开始一个由 `self.op_type is PipelineOp.TmaLoad and self.tx_count < 0` 控制的条件分支。
+- **L183** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L184** `                "Error: Mbarrier tx count must not be less than 0 for TMA ops."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        # Store mbarrier base pointer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `        self.mbarrier_base = self.barrier_storage` — **EN:** Assigns a value to self.mbarrier_base. **CN:** 将一个值赋给 self.mbarrier_base。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `        # Mbarrier initialization in constructor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L191** `        self.mbarrier_init(loc=loc, ip=ip)` — **EN:** Invokes `self.mbarrier_init` as a standalone call. **CN:** 以独立语句方式调用 `self.mbarrier_init`。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `    def recast_to_new_op_type(self, new_op_type: PipelineOp) -> "MbarrierArray":` — **EN:** Defines function `recast_to_new_op_type`. **CN:** 定义函数 `recast_to_new_op_type`。
+- **L194** `        """` — **EN:** Starts the docstring for the function `recast_to_new_op_type`. **CN:** 开始说明 function `recast_to_new_op_type` 的文档字符串。
+- **L195** `        Creates a copy of MbarrierArray with a different op_type without re-initializing barriers` — **EN:** Continues the docstring for the function `recast_to_new_op_type`. **CN:** 继续说明 function `recast_to_new_op_type` 的文档字符串。
+- **L196** `        """` — **EN:** Ends the docstring for the function `recast_to_new_op_type`. **CN:** 结束说明 function `recast_to_new_op_type` 的文档字符串。
+- **L197** `        # Create new instance without initialization` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L198** `        new_mbarrier_array = object.__new__(MbarrierArray)` — **EN:** Assigns a value to new_mbarrier_array. **CN:** 将一个值赋给 new_mbarrier_array。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `        # Copy all attributes directly` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L201** `        new_mbarrier_array.barrier_storage = self.barrier_storage` — **EN:** Assigns a value to new_mbarrier_array.barrier_storage. **CN:** 将一个值赋给 new_mbarrier_array.barrier_storage。
+- **L202** `        new_mbarrier_array.op_type = new_op_type` — **EN:** Assigns a value to new_mbarrier_array.op_type. **CN:** 将一个值赋给 new_mbarrier_array.op_type。
+- **L203** `        new_mbarrier_array.cg = self.cg` — **EN:** Assigns a value to new_mbarrier_array.cg. **CN:** 将一个值赋给 new_mbarrier_array.cg。
+- **L204** `        new_mbarrier_array.num_stages = self.num_stages` — **EN:** Assigns a value to new_mbarrier_array.num_stages. **CN:** 将一个值赋给 new_mbarrier_array.num_stages。
+- **L205** `        new_mbarrier_array.tx_count = self.tx_count` — **EN:** Assigns a value to new_mbarrier_array.tx_count. **CN:** 将一个值赋给 new_mbarrier_array.tx_count。
+- **L206** `        new_mbarrier_array.arrive_count = self.arrive_count` — **EN:** Assigns a value to new_mbarrier_array.arrive_count. **CN:** 将一个值赋给 new_mbarrier_array.arrive_count。
+- **L207** `        new_mbarrier_array.mbarrier_base = self.mbarrier_base` — **EN:** Assigns a value to new_mbarrier_array.mbarrier_base. **CN:** 将一个值赋给 new_mbarrier_array.mbarrier_base。
+- **L208** `        return new_mbarrier_array` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `    # Mbarrier initialization` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L211** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L212** `    def mbarrier_init(` — **EN:** Defines function `mbarrier_init`. **CN:** 定义函数 `mbarrier_init`。
+- **L213** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L214** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L215** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L216** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L217** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L218** `        """` — **EN:** Starts the docstring for the function `mbarrier_init`. **CN:** 开始说明 function `mbarrier_init` 的文档字符串。
+- **L219** `        Initializes an array of mbarriers using warp 0.` — **EN:** Continues the docstring for the function `mbarrier_init`. **CN:** 继续说明 function `mbarrier_init` 的文档字符串。
+- **L220** `        """` — **EN:** Ends the docstring for the function `mbarrier_init`. **CN:** 结束说明 function `mbarrier_init` 的文档字符串。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `        def then_body() -> None:` — **EN:** Defines function `then_body`. **CN:** 定义函数 `then_body`。
+- **L223** `            use_uniform_mbarrier_init = True` — **EN:** Assigns a value to use_uniform_mbarrier_init. **CN:** 将一个值赋给 use_uniform_mbarrier_init。
+- **L224** `            if use_uniform_mbarrier_init:` — **EN:** Starts a conditional branch guarded by `use_uniform_mbarrier_init`. **CN:** 开始一个由 `use_uniform_mbarrier_init` 控制的条件分支。
+- **L225** `                for index in range(self.num_stages):` — **EN:** Starts a loop assigning items from `range(self.num_stages)` to `index`. **CN:** 开始一个循环，将 `range(self.num_stages)` 的元素赋给 `index`。
+- **L226** `                    cute.arch.mbarrier_init(` — **EN:** Invokes `cute.arch.mbarrier_init` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_init`。
+- **L227** `                        self.get_barrier(index, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `                        self.arrive_count,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `                        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `                        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `        warp_idx = cute.arch.warp_idx(loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L233** `        warp_idx = cute.arch.make_warp_uniform(warp_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to warp_idx. **CN:** 将一个值赋给 warp_idx。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `        if_generate(warp_idx == 0, then_body, loc=loc, ip=ip)` — **EN:** Invokes `if_generate` as a standalone call. **CN:** 以独立语句方式调用 `if_generate`。
+- **L236** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L237** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L238** `    def arrive(` — **EN:** Defines function `arrive`. **CN:** 定义函数 `arrive`。
+- **L239** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L240** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L241** `        dst: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L242** `        cta_group: Optional[cute.nvgpu.tcgen05.CtaGroup] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L243** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L244** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L245** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L246** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L247** `        """Select the arrive corresponding to this MbarrierArray's PipelineOp.` — **EN:** Starts the docstring for the function `arrive`. **CN:** 开始说明 function `arrive` 的文档字符串。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `        :param index: Index of the mbarrier in the array to arrive on` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L250** `        :type index: int` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L251** `        :param dst: Destination parameter for selective arrival, which can be either a mask or destination cta rank.` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L252** `            When None, both \`\`TCGen05Mma\`\` and \`\`AsyncThread\`\` will arrive on their local mbarrier.` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L253** `            - For \`\`TCGen05Mma\`\`, \`\`dst\`\` serves as a multicast mask (e.g., 0b1011 allows arrive signal to be multicast to CTAs` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L254** `            in the cluster with rank = 0, 1, and 3).` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L255** `            - For \`\`AsyncThread\`\`, \`\`dst\`\` serves as a destination cta rank (e.g., 3 means threads will arrive on` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L256** `            the mbarrier with rank = 3 in the cluster).` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L257** `        :type dst: int | None` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L258** `        :param cta_group: CTA group for \`\`TCGen05Mma\`\`, defaults to None for other op types` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L259** `        :type cta_group: \`\`cute.nvgpu.tcgen05.CtaGroup\`\`, optional` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L260** `        """` — **EN:** Ends the docstring for the function `arrive`. **CN:** 结束说明 function `arrive` 的文档字符串。
+- **L261** `        if self.op_type is PipelineOp.AsyncThread:` — **EN:** Starts a conditional branch guarded by `self.op_type is PipelineOp.AsyncThread`. **CN:** 开始一个由 `self.op_type is PipelineOp.AsyncThread` 控制的条件分支。
+- **L262** `            self.arrive_mbarrier(index, dst, loc=loc, ip=ip)` — **EN:** Invokes `self.arrive_mbarrier` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_mbarrier`。
+- **L263** `        elif self.op_type is PipelineOp.TCGen05Mma:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L264** `            assert cta_group is not None, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L265** `                "Error: CTA group must be provided for TCGen05Mma."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `            self.arrive_tcgen05mma(index, dst, cta_group, loc=loc, ip=ip)` — **EN:** Invokes `self.arrive_tcgen05mma` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_tcgen05mma`。
+- **L268** `        elif self.op_type in [PipelineOp.TmaLoad]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L269** `            # TMA operation signals local mbarrier only` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L270** `            self.arrive_and_expect_tx(index, self.tx_count, loc=loc, ip=ip)` — **EN:** Invokes `self.arrive_and_expect_tx` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_and_expect_tx`。
+- **L271** `        elif self.op_type in [PipelineOp.ClcLoad]:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L272** `            self.arrive_and_expect_tx_with_dst(` — **EN:** Invokes `self.arrive_and_expect_tx_with_dst` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_and_expect_tx_with_dst`。
+- **L273** `                index, self.tx_count, dst, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `        elif self.op_type is PipelineOp.AsyncLoad:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L276** `            self.arrive_cp_async_mbarrier(index, loc=loc, ip=ip)` — **EN:** Invokes `self.arrive_cp_async_mbarrier` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_cp_async_mbarrier`。
+- **L277** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L278** `            assert False, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L279** `                f"Error: MbarrierArray is not supported for PipelineOp: {_get_pipeline_op(self.op_type)}."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L283** `    def arrive_mbarrier(` — **EN:** Defines function `arrive_mbarrier`. **CN:** 定义函数 `arrive_mbarrier`。
+- **L284** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L285** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L286** `        dst_rank: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L287** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L288** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L289** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L290** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L291** `        if dst_rank is None:` — **EN:** Starts a conditional branch guarded by `dst_rank is None`. **CN:** 开始一个由 `dst_rank is None` 控制的条件分支。
+- **L292** `            cute.arch.mbarrier_arrive(` — **EN:** Invokes `cute.arch.mbarrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_arrive`。
+- **L293** `                self.get_barrier(index, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L295** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L296** `            cute.arch.mbarrier_arrive(` — **EN:** Invokes `cute.arch.mbarrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_arrive`。
+- **L297** `                self.get_barrier(index, loc=loc, ip=ip), dst_rank, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L298** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L299** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L300** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L301** `    def arrive_cp_async_mbarrier(` — **EN:** Defines function `arrive_cp_async_mbarrier`. **CN:** 定义函数 `arrive_cp_async_mbarrier`。
+- **L302** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L303** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L304** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L305** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L306** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L307** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L308** `        cute.arch.cp_async_mbarrier_arrive_noinc(` — **EN:** Invokes `cute.arch.cp_async_mbarrier_arrive_noinc` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_mbarrier_arrive_noinc`。
+- **L309** `            self.get_barrier(index, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L313** `    def arrive_tcgen05mma(` — **EN:** Defines function `arrive_tcgen05mma`. **CN:** 定义函数 `arrive_tcgen05mma`。
+- **L314** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L315** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L316** `        mask: Optional[int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L317** `        cta_group: cute.nvgpu.tcgen05.CtaGroup,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L318** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L319** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L320** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L321** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L322** `        if mask is None:` — **EN:** Starts a conditional branch guarded by `mask is None`. **CN:** 开始一个由 `mask is None` 控制的条件分支。
+- **L323** `            with cute.arch.elect_one(loc=loc, ip=ip):` — **EN:** Starts a context-managed block using cute.arch.elect_one(loc=loc, ip=ip). **CN:** 开始一个使用 cute.arch.elect_one(loc=loc, ip=ip) 的上下文管理代码块。
+- **L324** `                cute.nvgpu.tcgen05.commit(` — **EN:** Invokes `cute.nvgpu.tcgen05.commit` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.tcgen05.commit`。
+- **L325** `                    self.get_barrier(index, loc=loc, ip=ip), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L328** `            with cute.arch.elect_one(loc=loc, ip=ip):` — **EN:** Starts a context-managed block using cute.arch.elect_one(loc=loc, ip=ip). **CN:** 开始一个使用 cute.arch.elect_one(loc=loc, ip=ip) 的上下文管理代码块。
+- **L329** `                cute.nvgpu.tcgen05.commit(` — **EN:** Invokes `cute.nvgpu.tcgen05.commit` as a standalone call. **CN:** 以独立语句方式调用 `cute.nvgpu.tcgen05.commit`。
+- **L330** `                    self.get_barrier(index, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** `                    mask,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L332** `                    cta_group,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L338** `    def arrive_and_expect_tx(` — **EN:** Defines function `arrive_and_expect_tx`. **CN:** 定义函数 `arrive_and_expect_tx`。
+- **L339** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L340** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `        tx_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L343** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L344** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L345** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L346** `        with cute.arch.elect_one(loc=loc, ip=ip):` — **EN:** Starts a context-managed block using cute.arch.elect_one(loc=loc, ip=ip). **CN:** 开始一个使用 cute.arch.elect_one(loc=loc, ip=ip) 的上下文管理代码块。
+- **L347** `            cute.arch.mbarrier_arrive_and_expect_tx(` — **EN:** Invokes `cute.arch.mbarrier_arrive_and_expect_tx` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_arrive_and_expect_tx`。
+- **L348** `                self.get_barrier(index, loc=loc, ip=ip), tx_count, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L349** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L350** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L351** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L352** `    def arrive_and_expect_tx_with_dst(` — **EN:** Defines function `arrive_and_expect_tx_with_dst`. **CN:** 定义函数 `arrive_and_expect_tx_with_dst`。
+- **L353** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L354** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L355** `        tx_count: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L356** `        dst: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L357** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L358** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L359** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L360** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L361** `        cute.arch.mbarrier_arrive_and_expect_tx(` — **EN:** Invokes `cute.arch.mbarrier_arrive_and_expect_tx` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_arrive_and_expect_tx`。
+- **L362** `            self.get_barrier(index, loc=loc, ip=ip), tx_count, dst, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L363** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L365** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L366** `    def try_wait(` — **EN:** Defines function `try_wait`. **CN:** 定义函数 `try_wait`。
+- **L367** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L368** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L369** `        phase: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L370** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L371** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L372** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L373** `    ) -> Boolean:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L374** `        return cute.arch.mbarrier_try_wait(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L375** `            self.get_barrier(index, loc=loc, ip=ip), phase, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L376** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L378** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L379** `    def wait(` — **EN:** Defines function `wait`. **CN:** 定义函数 `wait`。
+- **L380** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L381** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L382** `        phase: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L383** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L384** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L385** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L386** `    ) -> Optional[tuple]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L387** `        cute.arch.mbarrier_wait(` — **EN:** Invokes `cute.arch.mbarrier_wait` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_wait`。
+- **L388** `            self.get_barrier(index, loc=loc, ip=ip), phase, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L389** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L393** `    def arrive_and_wait(` — **EN:** Defines function `arrive_and_wait`. **CN:** 定义函数 `arrive_and_wait`。
+- **L394** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L395** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L396** `        phase: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L397** `        dst: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L398** `        cta_group: Optional[cute.nvgpu.tcgen05.CtaGroup] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L399** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L400** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L401** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L403** `        arrive(index, dst, cta_group, loc=loc, ip=ip)` — **EN:** Invokes `arrive` as a standalone call. **CN:** 以独立语句方式调用 `arrive`。
+- **L404** `        wait(index, phase, loc=loc, ip=ip)` — **EN:** Invokes `wait` as a standalone call. **CN:** 以独立语句方式调用 `wait`。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L407** `    def arrive_and_drop(` — **EN:** Defines function `arrive_and_drop`. **CN:** 定义函数 `arrive_and_drop`。
+- **L408** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L409** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L410** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L411** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L412** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L413** `        raise NotImplementedError("Error: Not yet supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L416** `    def get_barrier(` — **EN:** Defines function `get_barrier`. **CN:** 定义函数 `get_barrier`。
+- **L417** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L418** `        index: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L419** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L420** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L421** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L422** `    ) -> cute.Pointer:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L423** `        return self.mbarrier_base + index` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L424** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L425** `    def max(self) -> int:` — **EN:** Defines function `max`. **CN:** 定义函数 `max`。
+- **L426** `        # Transaction barriers have a maximum arrive count of 511 (2^9 - 1).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L427** `        # Non-transaction barriers have a maximum arrive count of 1,048,575 (2^20 - 1).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L428** `        return 511` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L429** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L430** `    def __extract_mlir_values__(self) -> list[object]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L431** `        return [self.barrier_storage]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `    def __new_from_mlir_values__(self, values: list[object]) -> "MbarrierArray":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L434** `        return MbarrierArray(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L435** `            values[0], self.num_stages, (self.op_type, self.cg), self.tx_count` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L436** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L439** `# Set explicit signature for Sphinx documentation to avoid issues with @dsl_user_op decorator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L440** `MbarrierArray.__init__.__signature__ = inspect.Signature(  # type: ignore[attr-defined]` — **EN:** Assigns a value to MbarrierArray.__init__.__signature__. **CN:** 将一个值赋给 MbarrierArray.__init__.__signature__。
+- **L441** `    [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L442** `        inspect.Parameter("self", inspect.Parameter.POSITIONAL_OR_KEYWORD),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L443** `    ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L444** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L445** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L448** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L449** `# NamedBarrier class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L450** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L451** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L452** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L453** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L454** `class NamedBarrier(SyncObject):` — **EN:** Defines class `NamedBarrier` with bases SyncObject. **CN:** 定义类 `NamedBarrier`，其基类为 SyncObject。
+- **L455** `    """` — **EN:** Starts the docstring for the class `NamedBarrier`. **CN:** 开始说明 class `NamedBarrier` 的文档字符串。
+- **L456** `    NamedBarrier is an abstraction for named barriers managed by hardware.` — **EN:** Continues the docstring for the class `NamedBarrier`. **CN:** 继续说明 class `NamedBarrier` 的文档字符串。
+- **L457** `    There are 16 named barriers available, with barrier_ids 0-15.` — **EN:** Continues the docstring for the class `NamedBarrier`. **CN:** 继续说明 class `NamedBarrier` 的文档字符串。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `    See the \`PTX documentation <https://https://docs.nvidia.com/cuda/parallel-thread-execution/#parallel-synchronization-and-communication-instructions-bar>\`__.` — **EN:** Continues the docstring for the class `NamedBarrier`. **CN:** 继续说明 class `NamedBarrier` 的文档字符串。
+- **L460** `    """` — **EN:** Ends the docstring for the class `NamedBarrier`. **CN:** 结束说明 class `NamedBarrier` 的文档字符串。
+- **L461** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L462** `    barrier_id: Union[int, Int32]` — **EN:** Assigns a typed value to barrier_id. **CN:** 为 barrier_id 赋予带类型标注的值。
+- **L463** `    num_threads: Union[int, Int32]` — **EN:** Assigns a typed value to num_threads. **CN:** 为 num_threads 赋予带类型标注的值。
+- **L464** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L465** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L466** `        if isinstance(self.barrier_id, int):` — **EN:** Starts a conditional branch guarded by `isinstance(self.barrier_id, int)`. **CN:** 开始一个由 `isinstance(self.barrier_id, int)` 控制的条件分支。
+- **L467** `            if self.barrier_id < 0 or self.barrier_id >= 16:` — **EN:** Starts a conditional branch guarded by `self.barrier_id < 0 or self.barrier_id >= 16`. **CN:** 开始一个由 `self.barrier_id < 0 or self.barrier_id >= 16` 控制的条件分支。
+- **L468** `                raise ValueError("Error: NamedBarrier ID must be in [0,15].")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L469** `            if self.barrier_id == 0:` — **EN:** Starts a conditional branch guarded by `self.barrier_id == 0`. **CN:** 开始一个由 `self.barrier_id == 0` 控制的条件分支。
+- **L470** `                warnings.warn("NamedBarrier ID 0 is used by sync_threads, avoid using.")` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L471** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L472** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L473** `    def arrive(` — **EN:** Defines function `arrive`. **CN:** 定义函数 `arrive`。
+- **L474** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L475** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L476** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L477** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L478** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L479** `        """` — **EN:** Starts the docstring for the function `arrive`. **CN:** 开始说明 function `arrive` 的文档字符串。
+- **L480** `        The aligned flavor of arrive is used when all threads in the CTA will execute the` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L481** `        same instruction. See PTX documentation.` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L482** `        """` — **EN:** Ends the docstring for the function `arrive`. **CN:** 结束说明 function `arrive` 的文档字符串。
+- **L483** `        cute.arch.barrier_arrive(` — **EN:** Invokes `cute.arch.barrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier_arrive`。
+- **L484** `            barrier_id=self.barrier_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `            number_of_threads=self.num_threads,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L491** `    def arrive_unaligned(` — **EN:** Defines function `arrive_unaligned`. **CN:** 定义函数 `arrive_unaligned`。
+- **L492** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L493** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L494** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L495** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L496** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L497** `        """` — **EN:** Starts the docstring for the function `arrive_unaligned`. **CN:** 开始说明 function `arrive_unaligned` 的文档字符串。
+- **L498** `        The unaligned flavor of arrive can be used with an arbitrary number of threads in the CTA.` — **EN:** Continues the docstring for the function `arrive_unaligned`. **CN:** 继续说明 function `arrive_unaligned` 的文档字符串。
+- **L499** `        """` — **EN:** Ends the docstring for the function `arrive_unaligned`. **CN:** 结束说明 function `arrive_unaligned` 的文档字符串。
+- **L500** `        cute.arch.barrier_arrive(` — **EN:** Invokes `cute.arch.barrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier_arrive`。
+- **L501** `            barrier_id=self.barrier_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L502** `            number_of_threads=self.num_threads,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L503** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L504** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L505** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L508** `    def wait(` — **EN:** Defines function `wait`. **CN:** 定义函数 `wait`。
+- **L509** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L510** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L511** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L512** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L513** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L514** `        """` — **EN:** Starts the docstring for the function `wait`. **CN:** 开始说明 function `wait` 的文档字符串。
+- **L515** `        NamedBarriers do not have a standalone wait like mbarriers, only an arrive_and_wait.` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L516** `        If synchronizing two warps in a producer/consumer pairing, the arrive count would be` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L517** `        32 using mbarriers but 64 using NamedBarriers. Only threads from either the producer` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L518** `        or consumer are counted for mbarriers, while all threads participating in the sync` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L519** `        are counted for NamedBarriers.` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L520** `        """` — **EN:** Ends the docstring for the function `wait`. **CN:** 结束说明 function `wait` 的文档字符串。
+- **L521** `        warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L522** `            "NamedBarrier wait also arrives on the barrier. Routing call to NamedBarrier.arrive_and_wait()."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L523** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L524** `        self.arrive_and_wait(loc=loc, ip=ip)` — **EN:** Invokes `self.arrive_and_wait` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_and_wait`。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L527** `    def wait_unaligned(` — **EN:** Defines function `wait_unaligned`. **CN:** 定义函数 `wait_unaligned`。
+- **L528** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L529** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L530** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L531** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L532** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L533** `        cute.arch.barrier(` — **EN:** Invokes `cute.arch.barrier` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier`。
+- **L534** `            barrier_id=self.barrier_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L535** `            number_of_threads=self.num_threads,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L536** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L537** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L538** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L539** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L540** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L541** `    def arrive_and_wait(` — **EN:** Defines function `arrive_and_wait`. **CN:** 定义函数 `arrive_and_wait`。
+- **L542** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L543** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L544** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L545** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L546** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L547** `        cute.arch.barrier(` — **EN:** Invokes `cute.arch.barrier` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier`。
+- **L548** `            barrier_id=self.barrier_id,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L549** `            number_of_threads=self.num_threads,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L550** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L551** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L552** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L553** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L554** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L555** `    def arrive_and_drop(` — **EN:** Defines function `arrive_and_drop`. **CN:** 定义函数 `arrive_and_drop`。
+- **L556** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L557** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L558** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L559** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L560** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L561** `        raise NotImplementedError("Error: Not supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L562** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L563** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L564** `    def sync(` — **EN:** Defines function `sync`. **CN:** 定义函数 `sync`。
+- **L565** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L566** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L567** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L568** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L569** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L570** `        self.arrive_and_wait()` — **EN:** Invokes `self.arrive_and_wait` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive_and_wait`。
+- **L571** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L572** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L573** `    def get_barrier(` — **EN:** Defines function `get_barrier`. **CN:** 定义函数 `get_barrier`。
+- **L574** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L575** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L576** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L577** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L578** `    ) -> Union[int, Int32]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L579** `        return self.barrier_id` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L580** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L581** `    def max(self) -> int:` — **EN:** Defines function `max`. **CN:** 定义函数 `max`。
+- **L582** `        # Transaction barriers have a maximum arrive count of 4095 (2^12 - 1).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L583** `        return 4095` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L584** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L585** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L586** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L587** `# TmaStoreFence class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L588** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L589** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L590** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L591** `class TmaStoreFence(SyncObject):` — **EN:** Defines class `TmaStoreFence` with bases SyncObject. **CN:** 定义类 `TmaStoreFence`，其基类为 SyncObject。
+- **L592** `    """` — **EN:** Starts the docstring for the class `TmaStoreFence`. **CN:** 开始说明 class `TmaStoreFence` 的文档字符串。
+- **L593** `    TmaStoreFence is used for a multi-stage epilogue buffer.` — **EN:** Continues the docstring for the class `TmaStoreFence`. **CN:** 继续说明 class `TmaStoreFence` 的文档字符串。
+- **L594** `    """` — **EN:** Ends the docstring for the class `TmaStoreFence`. **CN:** 结束说明 class `TmaStoreFence` 的文档字符串。
+- **L595** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L596** `    def __init__(self, num_stages: int = 0) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L597** `        if num_stages <= 0:` — **EN:** Starts a conditional branch guarded by `num_stages <= 0`. **CN:** 开始一个由 `num_stages <= 0` 控制的条件分支。
+- **L598** `            raise ValueError("Mbarrier stage count must be greater than 0.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L599** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L600** `        self.num_stages = num_stages` — **EN:** Assigns a value to self.num_stages. **CN:** 将一个值赋给 self.num_stages。
+- **L601** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L602** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L603** `    def arrive(` — **EN:** Defines function `arrive`. **CN:** 定义函数 `arrive`。
+- **L604** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L605** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L606** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L607** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L608** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L609** `        cute.arch.cp_async_bulk_commit_group(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cp_async_bulk_commit_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_commit_group`。
+- **L610** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L611** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L612** `    def wait(` — **EN:** Defines function `wait`. **CN:** 定义函数 `wait`。
+- **L613** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L614** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L615** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L616** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L617** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L618** `        cute.arch.cp_async_bulk_wait_group(` — **EN:** Invokes `cute.arch.cp_async_bulk_wait_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_wait_group`。
+- **L619** `            self.num_stages - 1, read=True, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L620** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L621** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L622** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L623** `    def arrive_and_wait(` — **EN:** Defines function `arrive_and_wait`. **CN:** 定义函数 `arrive_and_wait`。
+- **L624** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L625** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L626** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L627** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L628** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L629** `        self.arrive(loc=loc, ip=ip)` — **EN:** Invokes `self.arrive` as a standalone call. **CN:** 以独立语句方式调用 `self.arrive`。
+- **L630** `        self.wait(loc=loc, ip=ip)` — **EN:** Invokes `self.wait` as a standalone call. **CN:** 以独立语句方式调用 `self.wait`。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L633** `    def arrive_and_drop(` — **EN:** Defines function `arrive_and_drop`. **CN:** 定义函数 `arrive_and_drop`。
+- **L634** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L635** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L636** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L637** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L638** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L639** `        raise NotImplementedError("Error: Not supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L640** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L641** `    # TmaStoreFence doesn't have mbarriers` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L642** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L643** `    def get_barrier(` — **EN:** Defines function `get_barrier`. **CN:** 定义函数 `get_barrier`。
+- **L644** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L645** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L646** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L647** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L648** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L649** `        assert False, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L650** `            "Error: TmaStoreFence doesn't use mbarriers and cannot return a barrier."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L651** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L652** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L653** `    def max(self) -> None:` — **EN:** Defines function `max`. **CN:** 定义函数 `max`。
+- **L654** `        raise NotImplementedError("Error: Not supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L655** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L656** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L657** `    def tail(` — **EN:** Defines function `tail`. **CN:** 定义函数 `tail`。
+- **L658** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L659** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L660** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L661** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L662** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L663** `        cute.arch.cp_async_bulk_wait_group(0, read=True, loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cp_async_bulk_wait_group` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cp_async_bulk_wait_group`。
+- **L664** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L665** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L666** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L667** `# PipelineUserType class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L668** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L669** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L670** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L671** `class PipelineUserType(enum.Enum):` — **EN:** Defines class `PipelineUserType` with bases enum.Enum. **CN:** 定义类 `PipelineUserType`，其基类为 enum.Enum。
+- **L672** `    Producer = enum.auto()` — **EN:** Assigns a value to Producer. **CN:** 将一个值赋给 Producer。
+- **L673** `    Consumer = enum.auto()` — **EN:** Assigns a value to Consumer. **CN:** 将一个值赋给 Consumer。
+- **L674** `    ProducerConsumer = enum.auto()` — **EN:** Assigns a value to ProducerConsumer. **CN:** 将一个值赋给 ProducerConsumer。
+- **L675** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L676** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L677** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L678** `# PipelineState class` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L679** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L680** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L681** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L682** `class PipelineState:` — **EN:** Defines class `PipelineState`. **CN:** 定义类 `PipelineState`。
+- **L683** `    """` — **EN:** Starts the docstring for the class `PipelineState`. **CN:** 开始说明 class `PipelineState` 的文档字符串。
+- **L684** `    Pipeline state contains an index and phase bit corresponding to the current position in the circular buffer.` — **EN:** Continues the docstring for the class `PipelineState`. **CN:** 继续说明 class `PipelineState` 的文档字符串。
+- **L685** `    """` — **EN:** Ends the docstring for the class `PipelineState`. **CN:** 结束说明 class `PipelineState` 的文档字符串。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `    def __init__(self, stages: int, count: Int32, index: Int32, phase: Int32):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L688** `        self._stages = stages` — **EN:** Assigns a value to self._stages. **CN:** 将一个值赋给 self._stages。
+- **L689** `        self._count = count` — **EN:** Assigns a value to self._count. **CN:** 将一个值赋给 self._count。
+- **L690** `        self._index = index` — **EN:** Assigns a value to self._index. **CN:** 将一个值赋给 self._index。
+- **L691** `        self._phase = phase` — **EN:** Assigns a value to self._phase. **CN:** 将一个值赋给 self._phase。
+- **L692** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L693** `    def clone(self) -> "PipelineState":` — **EN:** Defines function `clone`. **CN:** 定义函数 `clone`。
+- **L694** `        return PipelineState(self.stages, self._count, self.index, self.phase)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L695** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L696** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L697** `    def index(self) -> Int32:` — **EN:** Defines function `index`. **CN:** 定义函数 `index`。
+- **L698** `        return self._index` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L699** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L700** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L701** `    def count(self) -> Int32:` — **EN:** Defines function `count`. **CN:** 定义函数 `count`。
+- **L702** `        return self._count` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L703** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L704** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L705** `    def stages(self) -> int:` — **EN:** Defines function `stages`. **CN:** 定义函数 `stages`。
+- **L706** `        return self._stages` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L707** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L708** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L709** `    def phase(self) -> Int32:` — **EN:** Defines function `phase`. **CN:** 定义函数 `phase`。
+- **L710** `        return self._phase` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L711** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L712** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L713** `    def reset_count(` — **EN:** Defines function `reset_count`. **CN:** 定义函数 `reset_count`。
+- **L714** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L715** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L716** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L717** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L718** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L719** `        self._count = Int32(0, loc=loc, ip=ip)` — **EN:** Assigns a value to self._count. **CN:** 将一个值赋给 self._count。
+- **L720** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L721** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L722** `    def advance(` — **EN:** Defines function `advance`. **CN:** 定义函数 `advance`。
+- **L723** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L724** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L725** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L726** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L727** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L728** `        self._index += 1` — **EN:** Updates self._index in place. **CN:** 原地更新 self._index。
+- **L729** `        self._count += 1` — **EN:** Updates self._count in place. **CN:** 原地更新 self._count。
+- **L730** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L731** `        def then_body(index: Int32, phase: Int32) -> tuple[Int32, Int32]:` — **EN:** Defines function `then_body`. **CN:** 定义函数 `then_body`。
+- **L732** `            new_index = Int32(0, loc=loc, ip=ip)` — **EN:** Assigns a value to new_index. **CN:** 将一个值赋给 new_index。
+- **L733** `            new_phase = phase ^ 1` — **EN:** Assigns a value to new_phase. **CN:** 将一个值赋给 new_phase。
+- **L734** `            return new_index, new_phase  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L735** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L736** `        def else_body(index: Int32, phase: Int32) -> tuple[Int32, Int32]:` — **EN:** Defines function `else_body`. **CN:** 定义函数 `else_body`。
+- **L737** `            return index, phase` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L738** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L739** `        self._index, self._phase = if_generate(  # type: ignore[assignment, misc]` — **EN:** Assigns a value to (self._index, self._phase). **CN:** 将一个值赋给 (self._index, self._phase)。
+- **L740** `            self._index == self.stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L741** `            then_body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L742** `            else_body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L743** `            [self.index, self.phase],  # type: ignore[list-item]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L744** `            [Int32, Int32],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L745** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L746** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L747** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L748** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L749** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L750** `    def reverse(` — **EN:** Defines function `reverse`. **CN:** 定义函数 `reverse`。
+- **L751** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L752** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L753** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L754** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L755** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L756** `        self._index -= 1` — **EN:** Updates self._index in place. **CN:** 原地更新 self._index。
+- **L757** `        self._count -= 1` — **EN:** Updates self._count in place. **CN:** 原地更新 self._count。
+- **L758** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L759** `        def then_body(index: Int32, phase: Int32) -> tuple[Int32, Int32]:` — **EN:** Defines function `then_body`. **CN:** 定义函数 `then_body`。
+- **L760** `            new_index = Int32(self.stages - 1, loc=loc, ip=ip)` — **EN:** Assigns a value to new_index. **CN:** 将一个值赋给 new_index。
+- **L761** `            new_phase = phase ^ 1` — **EN:** Assigns a value to new_phase. **CN:** 将一个值赋给 new_phase。
+- **L762** `            return new_index, new_phase  # type: ignore[return-value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L763** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L764** `        def else_body(index: Int32, phase: Int32) -> tuple[Int32, Int32]:` — **EN:** Defines function `else_body`. **CN:** 定义函数 `else_body`。
+- **L765** `            return index, phase` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L766** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L767** `        self._index, self._phase = if_generate(  # type: ignore[assignment, misc]` — **EN:** Assigns a value to (self._index, self._phase). **CN:** 将一个值赋给 (self._index, self._phase)。
+- **L768** `            self._index == -1,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L769** `            then_body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L770** `            else_body,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `            [self.index, self.phase],  # type: ignore[list-item]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L772** `            [Int32, Int32],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L773** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L774** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L775** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L776** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L777** `    def __get_mlir_types__(self) -> list[ir.Type]:` — **EN:** Defines function `__get_mlir_types__`. **CN:** 定义函数 `__get_mlir_types__`。
+- **L778** `        return [self._count.type, self._index.type, self._phase.type]  # type: ignore[attr-defined]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L779** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L780** `    def __extract_mlir_values__(self) -> list[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L781** `        count = self._count` — **EN:** Assigns a value to count. **CN:** 将一个值赋给 count。
+- **L782** `        index = self._index` — **EN:** Assigns a value to index. **CN:** 将一个值赋给 index。
+- **L783** `        phase = self._phase` — **EN:** Assigns a value to phase. **CN:** 将一个值赋给 phase。
+- **L784** `        return [count.ir_value(), index.ir_value(), phase.ir_value()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L785** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L786** `    # This can be overridden by derived classes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L787** `    def __new_from_mlir_values__(self, values: list[ir.Value]) -> "PipelineState":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L788** `        return PipelineState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L789** `            self.stages, Int32(values[0]), Int32(values[1]), Int32(values[2])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L790** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L792** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L793** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L794** `def make_pipeline_state(` — **EN:** Defines function `make_pipeline_state`. **CN:** 定义函数 `make_pipeline_state`。
+- **L795** `    type: PipelineUserType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L796** `    stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L797** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L798** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L799** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L800** `) -> PipelineState:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L801** `    """` — **EN:** Starts the docstring for the function `make_pipeline_state`. **CN:** 开始说明 function `make_pipeline_state` 的文档字符串。
+- **L802** `    Creates a pipeline state. Producers are assumed to start with an empty buffer and have a flipped phase bit of 1.` — **EN:** Continues the docstring for the function `make_pipeline_state`. **CN:** 继续说明 function `make_pipeline_state` 的文档字符串。
+- **L803** `    """` — **EN:** Ends the docstring for the function `make_pipeline_state`. **CN:** 结束说明 function `make_pipeline_state` 的文档字符串。
+- **L804** `    if type in (PipelineUserType.Producer, PipelineUserType.ProducerConsumer):` — **EN:** Starts a conditional branch guarded by `type in (PipelineUserType.Producer, PipelineUserType.Prod...`. **CN:** 开始一个由 `type in (PipelineUserType.Producer, PipelineUserType.Prod...` 控制的条件分支。
+- **L805** `        return PipelineState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L806** `            stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** `            Int32(0, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L808** `            Int32(0, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L809** `            Int32(1, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L810** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L811** `    elif type in (PipelineUserType.Consumer, PipelineUserType.ProducerConsumer):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L812** `        return PipelineState(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L813** `            stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L814** `            Int32(0, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L815** `            Int32(0, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L816** `            Int32(0, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L817** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L818** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L819** `        assert False, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L820** `            "Error: invalid PipelineUserType specified for make_pipeline_state."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L821** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L822** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L823** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L824** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L825** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L826** `# Helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L827** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L828** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L829** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L830** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L831** `def pipeline_init_arrive(` — **EN:** Defines function `pipeline_init_arrive`. **CN:** 定义函数 `pipeline_init_arrive`。
+- **L832** `    cluster_shape_mn: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L833** `    is_relaxed: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L834** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L835** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L836** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L837** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L838** `    """` — **EN:** Starts the docstring for the function `pipeline_init_arrive`. **CN:** 开始说明 function `pipeline_init_arrive` 的文档字符串。
+- **L839** `    Fences the mbarrier_init and sends an arrive if using clusters.` — **EN:** Continues the docstring for the function `pipeline_init_arrive`. **CN:** 继续说明 function `pipeline_init_arrive` 的文档字符串。
+- **L840** `    """` — **EN:** Ends the docstring for the function `pipeline_init_arrive`. **CN:** 结束说明 function `pipeline_init_arrive` 的文档字符串。
+- **L841** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L842** `    # If using clusters, send nonblocking arrives. Otherwise, do nothing` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L843** `    # because sync_threads() doesn't have a nonblocking arrive.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L844** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L845** `    cute.arch.mbarrier_init_fence(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.mbarrier_init_fence` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.mbarrier_init_fence`。
+- **L846** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L847** `    if cluster_shape_mn is not None and cute.size(cluster_shape_mn, loc=loc, ip=ip) > 1:` — **EN:** Starts a conditional branch guarded by `cluster_shape_mn is not None and cute.size(cluster_shape_...`. **CN:** 开始一个由 `cluster_shape_mn is not None and cute.size(cluster_shape_...` 控制的条件分支。
+- **L848** `        if is_relaxed:` — **EN:** Starts a conditional branch guarded by `is_relaxed`. **CN:** 开始一个由 `is_relaxed` 控制的条件分支。
+- **L849** `            # Fences memory operations issued before the arrive` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L850** `            cute.arch.cluster_arrive_relaxed(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cluster_arrive_relaxed` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cluster_arrive_relaxed`。
+- **L851** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L852** `            # Skips the memory barrier` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L853** `            cute.arch.cluster_arrive(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cluster_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cluster_arrive`。
+- **L854** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L855** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L856** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L857** `def pipeline_init_wait(` — **EN:** Defines function `pipeline_init_wait`. **CN:** 定义函数 `pipeline_init_wait`。
+- **L858** `    cluster_shape_mn: Optional[cute.Layout] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L859** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L860** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L861** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L862** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L863** `    """` — **EN:** Starts the docstring for the function `pipeline_init_wait`. **CN:** 开始说明 function `pipeline_init_wait` 的文档字符串。
+- **L864** `    Syncs the threadblock or cluster` — **EN:** Continues the docstring for the function `pipeline_init_wait`. **CN:** 继续说明 function `pipeline_init_wait` 的文档字符串。
+- **L865** `    """` — **EN:** Ends the docstring for the function `pipeline_init_wait`. **CN:** 结束说明 function `pipeline_init_wait` 的文档字符串。
+- **L866** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L867** `    if cluster_shape_mn is None or cute.size(cluster_shape_mn, loc=loc, ip=ip) == 1:` — **EN:** Starts a conditional branch guarded by `cluster_shape_mn is None or cute.size(cluster_shape_mn, l...`. **CN:** 开始一个由 `cluster_shape_mn is None or cute.size(cluster_shape_mn, l...` 控制的条件分支。
+- **L868** `        # If not using clusters, sync the threadblock` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L869** `        agent_sync(Agent.ThreadBlock, loc=loc, ip=ip)` — **EN:** Invokes `agent_sync` as a standalone call. **CN:** 以独立语句方式调用 `agent_sync`。
+- **L870** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L871** `        # If using clusters, wait on the cluster` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L872** `        cute.arch.cluster_wait(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cluster_wait` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cluster_wait`。
+- **L873** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L874** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L875** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L876** `def _sync(` — **EN:** Defines function `_sync`. **CN:** 定义函数 `_sync`。
+- **L877** `    group: Agent,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L878** `    is_relaxed: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L879** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L880** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L881** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L882** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L883** `    warnings.warn("_sync is deprecated. Please use agent_sync instead.")` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L884** `    agent_sync(group, is_relaxed, loc=loc, ip=ip)` — **EN:** Invokes `agent_sync` as a standalone call. **CN:** 以独立语句方式调用 `agent_sync`。
+- **L885** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L886** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L887** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L888** `def agent_sync(` — **EN:** Defines function `agent_sync`. **CN:** 定义函数 `agent_sync`。
+- **L889** `    group: Agent,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L890** `    is_relaxed: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L891** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L892** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L893** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L894** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L895** `    """` — **EN:** Starts the docstring for the function `agent_sync`. **CN:** 开始说明 function `agent_sync` 的文档字符串。
+- **L896** `    Syncs all threads within an agent.` — **EN:** Continues the docstring for the function `agent_sync`. **CN:** 继续说明 function `agent_sync` 的文档字符串。
+- **L897** `    """` — **EN:** Ends the docstring for the function `agent_sync`. **CN:** 结束说明 function `agent_sync` 的文档字符串。
+- **L898** `    if group is Agent.Thread:` — **EN:** Starts a conditional branch guarded by `group is Agent.Thread`. **CN:** 开始一个由 `group is Agent.Thread` 控制的条件分支。
+- **L899** `        raise NotImplementedError("Error: Not supported.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L900** `    elif group is Agent.ThreadBlock:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L901** `        cute.arch.sync_threads(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.sync_threads` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.sync_threads`。
+- **L902** `    elif group is Agent.ThreadBlockCluster:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L903** `        if is_relaxed:` — **EN:** Starts a conditional branch guarded by `is_relaxed`. **CN:** 开始一个由 `is_relaxed` 控制的条件分支。
+- **L904** `            cute.arch.cluster_arrive_relaxed(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cluster_arrive_relaxed` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cluster_arrive_relaxed`。
+- **L905** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L906** `            cute.arch.cluster_arrive(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cluster_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cluster_arrive`。
+- **L907** `        cute.arch.cluster_wait(loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.cluster_wait` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.cluster_wait`。
+- **L908** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L909** `        assert False, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L910** `            "Error: No explicit sync instruction exists. Please use barriers (named / mbarrier) instead."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L911** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L912** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L913** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L914** `# NamedBarrier free functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L915** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L916** `def arrive(` — **EN:** Defines function `arrive`. **CN:** 定义函数 `arrive`。
+- **L917** `    barrier_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L918** `    num_threads: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L919** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L920** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L921** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L922** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L923** `    """` — **EN:** Starts the docstring for the function `arrive`. **CN:** 开始说明 function `arrive` 的文档字符串。
+- **L924** `    The aligned flavor of arrive is used when all threads in the CTA will execute the` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L925** `    same instruction. See PTX documentation.` — **EN:** Continues the docstring for the function `arrive`. **CN:** 继续说明 function `arrive` 的文档字符串。
+- **L926** `    """` — **EN:** Ends the docstring for the function `arrive`. **CN:** 结束说明 function `arrive` 的文档字符串。
+- **L927** `    cute.arch.barrier_arrive(` — **EN:** Invokes `cute.arch.barrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier_arrive`。
+- **L928** `        barrier_id=barrier_id, number_of_threads=num_threads, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L929** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L930** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L931** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L932** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L933** `def arrive_unaligned(` — **EN:** Defines function `arrive_unaligned`. **CN:** 定义函数 `arrive_unaligned`。
+- **L934** `    barrier_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L935** `    num_threads: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L936** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L937** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L938** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L939** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L940** `    """` — **EN:** Starts the docstring for the function `arrive_unaligned`. **CN:** 开始说明 function `arrive_unaligned` 的文档字符串。
+- **L941** `    The unaligned flavor of arrive can be used with an arbitrary number of threads in the CTA.` — **EN:** Continues the docstring for the function `arrive_unaligned`. **CN:** 继续说明 function `arrive_unaligned` 的文档字符串。
+- **L942** `    """` — **EN:** Ends the docstring for the function `arrive_unaligned`. **CN:** 结束说明 function `arrive_unaligned` 的文档字符串。
+- **L943** `    cute.arch.barrier_arrive(` — **EN:** Invokes `cute.arch.barrier_arrive` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier_arrive`。
+- **L944** `        barrier_id=barrier_id, number_of_threads=num_threads, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L945** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L946** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L947** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L948** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L949** `def wait(` — **EN:** Defines function `wait`. **CN:** 定义函数 `wait`。
+- **L950** `    *, loc: Optional[ir.Location] = None, ip: Optional[ir.InsertionPoint] = None` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L951** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L952** `    """` — **EN:** Starts the docstring for the function `wait`. **CN:** 开始说明 function `wait` 的文档字符串。
+- **L953** `    NamedBarriers do not have a standalone wait like mbarriers, only an arrive_and_wait.` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L954** `    If synchronizing two warps in a producer/consumer pairing, the arrive count would be` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L955** `    32 using mbarriers but 64 using NamedBarriers. Only threads from either the producer` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L956** `    or consumer are counted for mbarriers, while all threads participating in the sync` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L957** `    are counted for NamedBarriers.` — **EN:** Continues the docstring for the function `wait`. **CN:** 继续说明 function `wait` 的文档字符串。
+- **L958** `    """` — **EN:** Ends the docstring for the function `wait`. **CN:** 结束说明 function `wait` 的文档字符串。
+- **L959** `    warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L960** `        "NamedBarrier wait also arrives on the barrier. Routing call to NamedBarrier.arrive_and_wait()."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L961** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L962** `    arrive_and_wait(loc=loc, ip=ip)` — **EN:** Invokes `arrive_and_wait` as a standalone call. **CN:** 以独立语句方式调用 `arrive_and_wait`。
+- **L963** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L964** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L965** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L966** `def wait_unaligned(` — **EN:** Defines function `wait_unaligned`. **CN:** 定义函数 `wait_unaligned`。
+- **L967** `    barrier_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L968** `    num_threads: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L969** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L970** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L971** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L972** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L973** `    warnings.warn(` — **EN:** Invokes `warnings.warn` as a standalone call. **CN:** 以独立语句方式调用 `warnings.warn`。
+- **L974** `        "NamedBarrier wait also arrives on the barrier. Routing call to NamedBarrier.arrive_and_wait()."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L975** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L976** `    cute.arch.barrier(` — **EN:** Invokes `cute.arch.barrier` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier`。
+- **L977** `        barrier_id=barrier_id, number_of_threads=num_threads, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L978** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L979** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L980** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L981** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L982** `def arrive_and_wait(` — **EN:** Defines function `arrive_and_wait`. **CN:** 定义函数 `arrive_and_wait`。
+- **L983** `    barrier_id: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L984** `    num_threads: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L985** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L986** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L987** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L988** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L989** `    cute.arch.barrier(` — **EN:** Invokes `cute.arch.barrier` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier`。
+- **L990** `        barrier_id=barrier_id, number_of_threads=num_threads, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L991** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L992** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L993** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L994** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L995** `def sync(` — **EN:** Defines function `sync`. **CN:** 定义函数 `sync`。
+- **L996** `    barrier_id: int = 0,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L997** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L998** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L999** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1000** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1001** `    cute.arch.barrier(barrier_id=barrier_id, loc=loc, ip=ip)` — **EN:** Invokes `cute.arch.barrier` as a standalone call. **CN:** 以独立语句方式调用 `cute.arch.barrier`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.pipeline.helpers`. CN: 模块名为 `CuTeDSL.cutlass.pipeline.helpers`。
+- EN: Top-level classes: Agent, CooperativeGroup, PipelineOp, SyncObject, MbarrierArray, NamedBarrier, TmaStoreFence, PipelineUserType, PipelineState CN: 顶层类包括：Agent, CooperativeGroup, PipelineOp, SyncObject, MbarrierArray, NamedBarrier, TmaStoreFence, PipelineUserType, PipelineState
+- EN: Top-level functions: _get_pipeline_op, make_pipeline_state, pipeline_init_arrive, pipeline_init_wait, _sync, agent_sync, arrive, arrive_unaligned, wait, wait_unaligned, arrive_and_wait, sync CN: 顶层函数包括：_get_pipeline_op, make_pipeline_state, pipeline_init_arrive, pipeline_init_wait, _sync, agent_sync, arrive, arrive_unaligned, wait, wait_unaligned, arrive_and_wait, sync
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cute, cutlass._mlir:ir, cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:CuTeDSL,Boolean,Int32,if_generate,dsl_user_op CN: 内部依赖：cutlass.cute, cutlass._mlir:ir, cutlass.base_dsl.arch:Arch, cutlass.cutlass_dsl:CuTeDSL,Boolean,Int32,if_generate,dsl_user_op
+- EN: External or standard-library dependencies: enum, inspect, abc:ABC,abstractmethod, dataclasses:dataclass, typing:Any,Optional,Union, warnings CN: 外部或标准库依赖：enum, inspect, abc:ABC,abstractmethod, dataclasses:dataclass, typing:Any,Optional,Union, warnings

@@ -1,0 +1,482 @@
+# compiler.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/compiler.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (CompilationOptions, ArtifactManager) and 3 functions (compile_with_nvcc, convertToBinaryData, CDLLBin) in `cutlass_cppgen.backend.compiler`.
+- CN: 该模块 `cutlass_cppgen.backend.compiler` 定义了 2 个类（CompilationOptions, ArtifactManager） 和 3 个函数（compile_with_nvcc, convertToBinaryData, CDLLBin）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L34** `import json` — **EN:** Imports json for later use. **CN:** 导入 json 供后续使用。
+- **L35** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L36** `import sqlite3` — **EN:** Imports sqlite3 for later use. **CN:** 导入 sqlite3 供后续使用。
+- **L37** `import subprocess` — **EN:** Imports subprocess for later use. **CN:** 导入 subprocess 供后续使用。
+- **L38** `import tempfile` — **EN:** Imports tempfile for later use. **CN:** 导入 tempfile 供后续使用。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `from cutlass_cppgen.utils.lazy_import import lazy_import` — **EN:** Imports lazy_import from `cutlass_cppgen.utils.lazy_import`. **CN:** 从 `cutlass_cppgen.utils.lazy_import` 导入 lazy_import。
+- **L41** `cuda = lazy_import("cuda.cuda")` — **EN:** Assigns a value to cuda. **CN:** 将一个值赋给 cuda。
+- **L42** `cudart = lazy_import("cuda.cudart")` — **EN:** Assigns a value to cudart. **CN:** 将一个值赋给 cudart。
+- **L43** `nvrtc = lazy_import("cuda.nvrtc")` — **EN:** Assigns a value to nvrtc. **CN:** 将一个值赋给 nvrtc。
+- **L44** `from cutlass_library import SubstituteTemplate` — **EN:** Imports SubstituteTemplate from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 SubstituteTemplate。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L47** `from cutlass_cppgen import CACHE_FILE, CUTLASS_PATH, cuda_install_path, logger` — **EN:** Imports CACHE_FILE, CUTLASS_PATH, cuda_install_path, logger from `cutlass_cppgen`. **CN:** 从 `cutlass_cppgen` 导入 CACHE_FILE, CUTLASS_PATH, cuda_install_path, logger。
+- **L48** `from cutlass_cppgen.backend.gemm_operation import GemmOperationUniversal` — **EN:** Imports GemmOperationUniversal from `cutlass_cppgen.backend.gemm_operation`. **CN:** 从 `cutlass_cppgen.backend.gemm_operation` 导入 GemmOperationUniversal。
+- **L49** `from cutlass_cppgen.backend.library import ApiVersion` — **EN:** Imports ApiVersion from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 ApiVersion。
+- **L50** `from cutlass_cppgen.backend.utils.device import device_cc` — **EN:** Imports device_cc from `cutlass_cppgen.backend.utils.device`. **CN:** 从 `cutlass_cppgen.backend.utils.device` 导入 device_cc。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `IncludeTemplate = r"""#include "${include}"` — **EN:** Assigns a value to IncludeTemplate. **CN:** 将一个值赋给 IncludeTemplate。
+- **L53** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L56** `def compile_with_nvcc(cmd, source, error_file):` — **EN:** Defines function `compile_with_nvcc`. **CN:** 定义函数 `compile_with_nvcc`。
+- **L57** `    succeed = True` — **EN:** Assigns a value to succeed. **CN:** 将一个值赋给 succeed。
+- **L58** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L59** `        subprocess.check_output(cmd, stderr=subprocess.STDOUT)` — **EN:** Invokes `subprocess.check_output` as a standalone call. **CN:** 以独立语句方式调用 `subprocess.check_output`。
+- **L60** `    except subprocess.CalledProcessError as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L61** `        error_message = e.output.decode()` — **EN:** Assigns a value to error_message. **CN:** 将一个值赋给 error_message。
+- **L62** `        with open(error_file, "w") as error_out:` — **EN:** Starts a context-managed block using open(error_file, 'w'). **CN:** 开始一个使用 open(error_file, 'w') 的上下文管理代码块。
+- **L63** `            error_log = "Compilation error for the following kernel: \n"` — **EN:** Assigns a value to error_log. **CN:** 将一个值赋给 error_log。
+- **L64** `            error_log += source` — **EN:** Updates error_log in place. **CN:** 原地更新 error_log。
+- **L65** `            error_log += "\nError Message:\n"` — **EN:** Updates error_log in place. **CN:** 原地更新 error_log。
+- **L66** `            error_log += error_message` — **EN:** Updates error_log in place. **CN:** 原地更新 error_log。
+- **L67** `            error_out.write(error_log)` — **EN:** Invokes `error_out.write` as a standalone call. **CN:** 以独立语句方式调用 `error_out.write`。
+- **L68** `        succeed = False` — **EN:** Assigns a value to succeed. **CN:** 将一个值赋给 succeed。
+- **L69** `    if not succeed:` — **EN:** Starts a conditional branch guarded by `not succeed`. **CN:** 开始一个由 `not succeed` 控制的条件分支。
+- **L70** `        # Print the error log to stdout if log level is set to warning or higher` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `        # verbosity. Otherwise, simply point to the error log file.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `        logger.warning(error_log)` — **EN:** Invokes `logger.warning` as a standalone call. **CN:** 以独立语句方式调用 `logger.warning`。
+- **L73** `        raise Exception(f"Invalid Kernel. See '{error_file}' for details.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `class CompilationOptions:` — **EN:** Defines class `CompilationOptions`. **CN:** 定义类 `CompilationOptions`。
+- **L77** `    """` — **EN:** Starts the docstring for the class `CompilationOptions`. **CN:** 开始说明 class `CompilationOptions` 的文档字符串。
+- **L78** `    Compilation options.` — **EN:** Continues the docstring for the class `CompilationOptions`. **CN:** 继续说明 class `CompilationOptions` 的文档字符串。
+- **L79** `    """` — **EN:** Ends the docstring for the class `CompilationOptions`. **CN:** 结束说明 class `CompilationOptions` 的文档字符串。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `    def __init__(self, flags, arch, include_paths=[]):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L82** `        self.includes = []` — **EN:** Assigns a value to self.includes. **CN:** 将一个值赋给 self.includes。
+- **L83** `        self.include_paths = include_paths` — **EN:** Assigns a value to self.include_paths. **CN:** 将一个值赋给 self.include_paths。
+- **L84** `        self.flags = flags` — **EN:** Assigns a value to self.flags. **CN:** 将一个值赋给 self.flags。
+- **L85** `        self.arch = arch` — **EN:** Assigns a value to self.arch. **CN:** 将一个值赋给 self.arch。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    def get_str(self):` — **EN:** Defines function `get_str`. **CN:** 定义函数 `get_str`。
+- **L88** `        opts = []` — **EN:** Assigns a value to opts. **CN:** 将一个值赋给 opts。
+- **L89** `        for flag in self.flags:` — **EN:** Starts a loop assigning items from `self.flags` to `flag`. **CN:** 开始一个循环，将 `self.flags` 的元素赋给 `flag`。
+- **L90** `            opts.append(flag)` — **EN:** Invokes `opts.append` as a standalone call. **CN:** 以独立语句方式调用 `opts.append`。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `        for incl in self.include_paths:` — **EN:** Starts a loop assigning items from `self.include_paths` to `incl`. **CN:** 开始一个循环，将 `self.include_paths` 的元素赋给 `incl`。
+- **L93** `            opts.append(f"--include-path={incl}")` — **EN:** Invokes `opts.append` as a standalone call. **CN:** 以独立语句方式调用 `opts.append`。
+- **L94** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L95** `        arch_flag = f"-arch=sm_{self.arch}"` — **EN:** Assigns a value to arch_flag. **CN:** 将一个值赋给 arch_flag。
+- **L96** `        if self.arch in [90, 100, 101, 103, 120, 121] and int(cutlass_cppgen.nvcc_version().split('.')[0]) >= 12:` — **EN:** Starts a conditional branch guarded by `self.arch in [90, 100, 101, 103, 120, 121] and int(cutlas...`. **CN:** 开始一个由 `self.arch in [90, 100, 101, 103, 120, 121] and int(cutlas...` 控制的条件分支。
+- **L97** `            arch_flag += "a"` — **EN:** Updates arch_flag in place. **CN:** 原地更新 arch_flag。
+- **L98** `        opts.append(arch_flag)` — **EN:** Invokes `opts.append` as a standalone call. **CN:** 以独立语句方式调用 `opts.append`。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `        return " ".join(opts)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def get(self):` — **EN:** Defines function `get`. **CN:** 定义函数 `get`。
+- **L103** `        options = []` — **EN:** Assigns a value to options. **CN:** 将一个值赋给 options。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `        for flag in self.flags:` — **EN:** Starts a loop assigning items from `self.flags` to `flag`. **CN:** 开始一个循环，将 `self.flags` 的元素赋给 `flag`。
+- **L106** `            options.append(bytes(str.encode(flag)))` — **EN:** Invokes `options.append` as a standalone call. **CN:** 以独立语句方式调用 `options.append`。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `        for incl in self.include_paths:` — **EN:** Starts a loop assigning items from `self.include_paths` to `incl`. **CN:** 开始一个循环，将 `self.include_paths` 的元素赋给 `incl`。
+- **L109** `            options.append(bytes(str.encode(f" --include-path={incl}")))` — **EN:** Invokes `options.append` as a standalone call. **CN:** 以独立语句方式调用 `options.append`。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `        arch_flag = f" -arch=sm_{self.arch}"` — **EN:** Assigns a value to arch_flag. **CN:** 将一个值赋给 arch_flag。
+- **L112** `        if self.arch in [90, 100, 101, 103, 120, 121]:` — **EN:** Starts a conditional branch guarded by `self.arch in [90, 100, 101, 103, 120, 121]`. **CN:** 开始一个由 `self.arch in [90, 100, 101, 103, 120, 121]` 控制的条件分支。
+- **L113** `            arch_flag += "a"` — **EN:** Updates arch_flag in place. **CN:** 原地更新 arch_flag。
+- **L114** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L115** `        options.append(bytes(str.encode(arch_flag)))` — **EN:** Invokes `options.append` as a standalone call. **CN:** 以独立语句方式调用 `options.append`。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `        return options` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `def convertToBinaryData(filename):` — **EN:** Defines function `convertToBinaryData`. **CN:** 定义函数 `convertToBinaryData`。
+- **L121** `    with open(filename, "rb") as file:` — **EN:** Starts a context-managed block using open(filename, 'rb'). **CN:** 开始一个使用 open(filename, 'rb') 的上下文管理代码块。
+- **L122** `        blobData = file.read()` — **EN:** Assigns a value to blobData. **CN:** 将一个值赋给 blobData。
+- **L123** `    return blobData` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L124** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `def CDLLBin(host_binary):` — **EN:** Defines function `CDLLBin`. **CN:** 定义函数 `CDLLBin`。
+- **L127** `    tempfile.tempdir = "./"` — **EN:** Assigns a value to tempfile.tempdir. **CN:** 将一个值赋给 tempfile.tempdir。
+- **L128** `    temp_so = tempfile.NamedTemporaryFile(prefix="host_func", suffix=".so", delete=True)` — **EN:** Assigns a value to temp_so. **CN:** 将一个值赋给 temp_so。
+- **L129** `    with open(temp_so.name, "wb") as file:` — **EN:** Starts a context-managed block using open(temp_so.name, 'wb'). **CN:** 开始一个使用 open(temp_so.name, 'wb') 的上下文管理代码块。
+- **L130** `        file.write(host_binary)` — **EN:** Invokes `file.write` as a standalone call. **CN:** 以独立语句方式调用 `file.write`。
+- **L131** `    host_lib = ctypes.CDLL(temp_so.name)` — **EN:** Assigns a value to host_lib. **CN:** 将一个值赋给 host_lib。
+- **L132** `    return host_lib` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L133** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `class ArtifactManager:` — **EN:** Defines class `ArtifactManager`. **CN:** 定义类 `ArtifactManager`。
+- **L136** `    """` — **EN:** Starts the docstring for the class `ArtifactManager`. **CN:** 开始说明 class `ArtifactManager` 的文档字符串。
+- **L137** `    Artifact manager` — **EN:** Continues the docstring for the class `ArtifactManager`. **CN:** 继续说明 class `ArtifactManager` 的文档字符串。
+- **L138** `    """` — **EN:** Ends the docstring for the class `ArtifactManager`. **CN:** 结束说明 class `ArtifactManager` 的文档字符串。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L141** `        connection = sqlite3.connect(CACHE_FILE)` — **EN:** Assigns a value to connection. **CN:** 将一个值赋给 connection。
+- **L142** `        cursor = connection.cursor()` — **EN:** Assigns a value to cursor. **CN:** 将一个值赋给 cursor。
+- **L143** `        # Create the table if it does not already exist` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L144** `        sqlite_create_table_query = """` — **EN:** Assigns a value to sqlite_create_table_query. **CN:** 将一个值赋给 sqlite_create_table_query。
+- **L145** `        CREATE TABLE IF NOT EXISTS compiled_operations(op_key TEXT NOT NULL UNIQUE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `                                                        cubin BLOB NOT NULL,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `                                                        hostbin BLOB NOT NULL,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `                                                        op_name TEXT NOT NULL,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `                                                        op_attrs TEXT NOT NULL)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `        """` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `        cursor.execute(sqlite_create_table_query)` — **EN:** Invokes `cursor.execute` as a standalone call. **CN:** 以独立语句方式调用 `cursor.execute`。
+- **L152** `        connection.commit()` — **EN:** Invokes `connection.commit` as a standalone call. **CN:** 以独立语句方式调用 `connection.commit`。
+- **L153** `        cursor.close()` — **EN:** Invokes `cursor.close` as a standalone call. **CN:** 以独立语句方式调用 `cursor.close`。
+- **L154** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L155** `        self._nvrtc_compile_options = ["-std=c++17", "-default-device"]` — **EN:** Assigns a value to self._nvrtc_compile_options. **CN:** 将一个值赋给 self._nvrtc_compile_options。
+- **L156** `        self._nvcc_compile_options = [` — **EN:** Assigns a value to self._nvcc_compile_options. **CN:** 将一个值赋给 self._nvcc_compile_options。
+- **L157** `            "-std=c++17",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `            "--expt-relaxed-constexpr",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `            "-Xcudafe --diag_suppress=esa_on_defaulted_function_ignored",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `        self.nvcc()` — **EN:** Invokes `self.nvcc` as a standalone call. **CN:** 以独立语句方式调用 `self.nvcc`。
+- **L162** `        self.compiled_cache_device = {}` — **EN:** Assigns a value to self.compiled_cache_device. **CN:** 将一个值赋给 self.compiled_cache_device。
+- **L163** `        self.compiled_cache_host = {}` — **EN:** Assigns a value to self.compiled_cache_host. **CN:** 将一个值赋给 self.compiled_cache_host。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    def nvrtc(self):` — **EN:** Defines function `nvrtc`. **CN:** 定义函数 `nvrtc`。
+- **L166** `        self.backend = "nvrtc"` — **EN:** Assigns a value to self.backend. **CN:** 将一个值赋给 self.backend。
+- **L167** `        self.default_compile_options = self._nvrtc_compile_options` — **EN:** Assigns a value to self.default_compile_options. **CN:** 将一个值赋给 self.default_compile_options。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `    def nvcc(self):` — **EN:** Defines function `nvcc`. **CN:** 定义函数 `nvcc`。
+- **L170** `        self.backend = "nvcc"` — **EN:** Assigns a value to self.backend. **CN:** 将一个值赋给 self.backend。
+- **L171** `        self.default_compile_options = self._nvcc_compile_options` — **EN:** Assigns a value to self.default_compile_options. **CN:** 将一个值赋给 self.default_compile_options。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    def insert_operation(self, op_key, cubin, hostfile, op_name, op_attrs):` — **EN:** Defines function `insert_operation`. **CN:** 定义函数 `insert_operation`。
+- **L174** `        connection = sqlite3.connect(CACHE_FILE)` — **EN:** Assigns a value to connection. **CN:** 将一个值赋给 connection。
+- **L175** `        cursor = connection.cursor()` — **EN:** Assigns a value to cursor. **CN:** 将一个值赋给 cursor。
+- **L176** `        sqlite_insert_blob_query = """ INSERT OR IGNORE INTO compiled_operations (op_key, cubin, hostbin, op_name, op_attrs) VALUES (?, ?, ?, ?, ?)"""` — **EN:** Assigns a value to sqlite_insert_blob_query. **CN:** 将一个值赋给 sqlite_insert_blob_query。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `        hostbin = convertToBinaryData(hostfile)` — **EN:** Assigns a value to hostbin. **CN:** 将一个值赋给 hostbin。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `        data_tuple = (op_key, cubin, hostbin, op_name, json.dumps(op_attrs))` — **EN:** Assigns a value to data_tuple. **CN:** 将一个值赋给 data_tuple。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `        cursor.execute(sqlite_insert_blob_query, data_tuple)` — **EN:** Invokes `cursor.execute` as a standalone call. **CN:** 以独立语句方式调用 `cursor.execute`。
+- **L183** `        connection.commit()` — **EN:** Invokes `connection.commit` as a standalone call. **CN:** 以独立语句方式调用 `connection.commit`。
+- **L184** `        cursor.close()` — **EN:** Invokes `cursor.close` as a standalone call. **CN:** 以独立语句方式调用 `cursor.close`。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    def load_operation(self, op_key, extra_funcs):` — **EN:** Defines function `load_operation`. **CN:** 定义函数 `load_operation`。
+- **L187** `        connection = sqlite3.connect(CACHE_FILE)` — **EN:** Assigns a value to connection. **CN:** 将一个值赋给 connection。
+- **L188** `        cursor = connection.cursor()` — **EN:** Assigns a value to cursor. **CN:** 将一个值赋给 cursor。
+- **L189** `        sqlite_fetch_blob_query = """SELECT * from compiled_operations where op_key = ?"""` — **EN:** Assigns a value to sqlite_fetch_blob_query. **CN:** 将一个值赋给 sqlite_fetch_blob_query。
+- **L190** `        cursor.execute(sqlite_fetch_blob_query, (op_key,))` — **EN:** Invokes `cursor.execute` as a standalone call. **CN:** 以独立语句方式调用 `cursor.execute`。
+- **L191** `        record = cursor.fetchall()` — **EN:** Assigns a value to record. **CN:** 将一个值赋给 record。
+- **L192** `        if len(record) == 0:` — **EN:** Starts a conditional branch guarded by `len(record) == 0`. **CN:** 开始一个由 `len(record) == 0` 控制的条件分支。
+- **L193** `            return False` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** `        for row in record:` — **EN:** Starts a loop assigning items from `record` to `row`. **CN:** 开始一个循环，将 `record` 的元素赋给 `row`。
+- **L195** `            key, cubin_image, host_binary, operation_name, op_attr = row` — **EN:** Assigns a value to (key, cubin_image, host_binary, operation_name, op_attr). **CN:** 将一个值赋给 (key, cubin_image, host_binary, operation_name, op_attr)。
+- **L196** `            op_attr = json.loads(op_attr)` — **EN:** Assigns a value to op_attr. **CN:** 将一个值赋给 op_attr。
+- **L197** `            err, module = cuda.cuModuleLoadData(cubin_image)` — **EN:** Assigns a value to (err, module). **CN:** 将一个值赋给 (err, module)。
+- **L198** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L199** `                raise RuntimeError("Cuda Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `            err, kernel = cuda.cuModuleGetFunction(module, bytes(str.encode(operation_name)))` — **EN:** Assigns a value to (err, kernel). **CN:** 将一个值赋给 (err, kernel)。
+- **L202** `            self.compiled_cache_device[key] = kernel` — **EN:** Assigns a value to self.compiled_cache_device[key]. **CN:** 将一个值赋给 self.compiled_cache_device[key]。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `            compiled_host_fns = {}` — **EN:** Assigns a value to compiled_host_fns. **CN:** 将一个值赋给 compiled_host_fns。
+- **L205** `            host_lib = CDLLBin(host_binary)` — **EN:** Assigns a value to host_lib. **CN:** 将一个值赋给 host_lib。
+- **L206** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L207** `            func_name = operation_name + "_get_params"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L208** `            func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L209** `            func.restype = ctypes.POINTER(ctypes.c_char * op_attr[0])` — **EN:** Assigns a value to func.restype. **CN:** 将一个值赋给 func.restype。
+- **L210** `            compiled_host_fns["get_args"] = func` — **EN:** Assigns a value to compiled_host_fns['get_args']. **CN:** 将一个值赋给 compiled_host_fns['get_args']。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `            func_name = operation_name + "_shared_memory_size"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L213** `            func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L214** `            compiled_host_fns["shared_memory_capacity"] = func()` — **EN:** Assigns a value to compiled_host_fns['shared_memory_capacity']. **CN:** 将一个值赋给 compiled_host_fns['shared_memory_capacity']。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `            for attr in op_attr:` — **EN:** Starts a loop assigning items from `op_attr` to `attr`. **CN:** 开始一个循环，将 `op_attr` 的元素赋给 `attr`。
+- **L217** `                if isinstance(attr, str):` — **EN:** Starts a conditional branch guarded by `isinstance(attr, str)`. **CN:** 开始一个由 `isinstance(attr, str)` 控制的条件分支。
+- **L218** `                    func_name = operation_name + "_" + attr` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L219** `                    func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L220** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L221** `                    # Set the return type of the function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L222** `                    if attr in extra_funcs and extra_funcs[attr] != None:` — **EN:** Starts a conditional branch guarded by `attr in extra_funcs and extra_funcs[attr] != None`. **CN:** 开始一个由 `attr in extra_funcs and extra_funcs[attr] != None` 控制的条件分支。
+- **L223** `                        func.restype = extra_funcs[attr]` — **EN:** Assigns a value to func.restype. **CN:** 将一个值赋给 func.restype。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `                    compiled_host_fns[attr] = func` — **EN:** Assigns a value to compiled_host_fns[attr]. **CN:** 将一个值赋给 compiled_host_fns[attr]。
+- **L226** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L227** `            self.compiled_cache_host[key] = compiled_host_fns` — **EN:** Assigns a value to self.compiled_cache_host[key]. **CN:** 将一个值赋给 self.compiled_cache_host[key]。
+- **L228** `        return True` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L229** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L230** `    def emit_compile_(self, operation_list, compilation_options, host_compilation_options):` — **EN:** Defines function `emit_compile_`. **CN:** 定义函数 `emit_compile_`。
+- **L231** `        """` — **EN:** Starts the docstring for the function `emit_compile_`. **CN:** 开始说明 function `emit_compile_` 的文档字符串。
+- **L232** `        Compile a list of kernels and store them into database` — **EN:** Continues the docstring for the function `emit_compile_`. **CN:** 继续说明 function `emit_compile_` 的文档字符串。
+- **L233** `        """` — **EN:** Ends the docstring for the function `emit_compile_`. **CN:** 结束说明 function `emit_compile_` 的文档字符串。
+- **L234** `        source_buffer_device = ""` — **EN:** Assigns a value to source_buffer_device. **CN:** 将一个值赋给 source_buffer_device。
+- **L235** `        source_buffer_host = ""` — **EN:** Assigns a value to source_buffer_host. **CN:** 将一个值赋给 source_buffer_host。
+- **L236** `        # 1. include` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L237** `        includes = []` — **EN:** Assigns a value to includes. **CN:** 将一个值赋给 includes。
+- **L238** `        for operation in operation_list:` — **EN:** Starts a loop assigning items from `operation_list` to `operation`. **CN:** 开始一个循环，将 `operation_list` 的元素赋给 `operation`。
+- **L239** `            for incl in operation.emitter.includes:` — **EN:** Starts a loop assigning items from `operation.emitter.includes` to `incl`. **CN:** 开始一个循环，将 `operation.emitter.includes` 的元素赋给 `incl`。
+- **L240** `                if incl not in includes:` — **EN:** Starts a conditional branch guarded by `incl not in includes`. **CN:** 开始一个由 `incl not in includes` 控制的条件分支。
+- **L241** `                    includes.append(incl)` — **EN:** Invokes `includes.append` as a standalone call. **CN:** 以独立语句方式调用 `includes.append`。
+- **L242** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L243** `        includes_host = ["builtin_types.h", "device_launch_parameters.h", "cstddef"] + includes` — **EN:** Assigns a value to includes_host. **CN:** 将一个值赋给 includes_host。
+- **L244** `        for incl in includes:` — **EN:** Starts a loop assigning items from `includes` to `incl`. **CN:** 开始一个循环，将 `includes` 的元素赋给 `incl`。
+- **L245** `            source_buffer_device += SubstituteTemplate(` — **EN:** Updates source_buffer_device in place. **CN:** 原地更新 source_buffer_device。
+- **L246** `                IncludeTemplate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `                {"include": incl},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `        for incl in includes_host:` — **EN:** Starts a loop assigning items from `includes_host` to `incl`. **CN:** 开始一个循环，将 `includes_host` 的元素赋给 `incl`。
+- **L251** `            source_buffer_host += SubstituteTemplate(` — **EN:** Updates source_buffer_host in place. **CN:** 原地更新 source_buffer_host。
+- **L252** `                IncludeTemplate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `                {"include": incl},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `        # 2. Operations` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L257** `        for operation in operation_list:` — **EN:** Starts a loop assigning items from `operation_list` to `operation`. **CN:** 开始一个循环，将 `operation_list` 的元素赋给 `operation`。
+- **L258** `            source_buffer_device += operation.emit()` — **EN:** Updates source_buffer_device in place. **CN:** 原地更新 source_buffer_device。
+- **L259** `            source_buffer_host += operation.emit()` — **EN:** Updates source_buffer_host in place. **CN:** 原地更新 source_buffer_host。
+- **L260** `            values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L261** `                "operation_name": operation.name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `                "operation_suffix": operation.emitter.operation_suffix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `            source_buffer_device += SubstituteTemplate(` — **EN:** Updates source_buffer_device in place. **CN:** 原地更新 source_buffer_device。
+- **L265** `                operation.KernelTemplate,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `                values,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `            source_buffer_host += SubstituteTemplate(operation.HostTemplate, values)` — **EN:** Updates source_buffer_host in place. **CN:** 原地更新 source_buffer_host。
+- **L269** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L270** `        if self.backend == "nvrtc":` — **EN:** Starts a conditional branch guarded by `self.backend == 'nvrtc'`. **CN:** 开始一个由 `self.backend == 'nvrtc'` 控制的条件分支。
+- **L271** `            # 3. compile` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L272** `            err, program = nvrtc.nvrtcCreateProgram(` — **EN:** Assigns a value to (err, program). **CN:** 将一个值赋给 (err, program)。
+- **L273** `                str.encode(source_buffer_device),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `                bytes(str.encode("module.cu")),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `                0, [], [])` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L277** `            if err != nvrtc.nvrtcResult.NVRTC_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != nvrtc.nvrtcResult.NVRTC_SUCCESS`. **CN:** 开始一个由 `err != nvrtc.nvrtcResult.NVRTC_SUCCESS` 控制的条件分支。
+- **L278** `                raise RuntimeError("NVRTC Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `            # Compile program` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L281** `            options = compilation_options.get()` — **EN:** Assigns a value to options. **CN:** 将一个值赋给 options。
+- **L282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L283** `            err, = nvrtc.nvrtcCompileProgram(program, len(options), options)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L284** `            if err != nvrtc.nvrtcResult.NVRTC_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != nvrtc.nvrtcResult.NVRTC_SUCCESS`. **CN:** 开始一个由 `err != nvrtc.nvrtcResult.NVRTC_SUCCESS` 控制的条件分支。
+- **L285** `                error_string = "NVRTC Error: {}\n".format(err)` — **EN:** Assigns a value to error_string. **CN:** 将一个值赋给 error_string。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `                # Get log from compilation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L288** `                err, logSize = nvrtc.nvrtcGetProgramLogSize(program)` — **EN:** Assigns a value to (err, logSize). **CN:** 将一个值赋给 (err, logSize)。
+- **L289** `                if err != nvrtc.nvrtcResult.NVRTC_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != nvrtc.nvrtcResult.NVRTC_SUCCESS`. **CN:** 开始一个由 `err != nvrtc.nvrtcResult.NVRTC_SUCCESS` 控制的条件分支。
+- **L290** `                    raise RuntimeError("NVRTC Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `                log = b" " * logSize` — **EN:** Assigns a value to log. **CN:** 将一个值赋给 log。
+- **L293** `                err, = nvrtc.nvrtcGetProgramLog(program, log)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L294** `                if err != nvrtc.nvrtcResult.NVRTC_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != nvrtc.nvrtcResult.NVRTC_SUCCESS`. **CN:** 开始一个由 `err != nvrtc.nvrtcResult.NVRTC_SUCCESS` 控制的条件分支。
+- **L295** `                    raise RuntimeError("NVRTC Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L296** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L297** `                raise RuntimeError(error_string + log.decode() + source_buffer_device)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `            # Get data from compilation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L300** `            err, dataSize = nvrtc.nvrtcGetCUBINSize(program)` — **EN:** Assigns a value to (err, dataSize). **CN:** 将一个值赋给 (err, dataSize)。
+- **L301** `            if err != nvrtc.nvrtcResult.NVRTC_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != nvrtc.nvrtcResult.NVRTC_SUCCESS`. **CN:** 开始一个由 `err != nvrtc.nvrtcResult.NVRTC_SUCCESS` 控制的条件分支。
+- **L302** `                raise RuntimeError("NVRTC Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** `            cubin_image = b" " * dataSize` — **EN:** Assigns a value to cubin_image. **CN:** 将一个值赋给 cubin_image。
+- **L305** `            (err,) = nvrtc.nvrtcGetCUBIN(program, cubin_image)` — **EN:** Assigns a value to (err,). **CN:** 将一个值赋给 (err,)。
+- **L306** `            if err != nvrtc.nvrtcResult.NVRTC_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != nvrtc.nvrtcResult.NVRTC_SUCCESS`. **CN:** 开始一个由 `err != nvrtc.nvrtcResult.NVRTC_SUCCESS` 控制的条件分支。
+- **L307** `                raise RuntimeError("NVRTC Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `        else:  # with nvcc backend` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L310** `            # emit code` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L311** `            tempfile.tempdir = "./"` — **EN:** Assigns a value to tempfile.tempdir. **CN:** 将一个值赋给 tempfile.tempdir。
+- **L312** `            temp_cu = tempfile.NamedTemporaryFile(` — **EN:** Assigns a value to temp_cu. **CN:** 将一个值赋给 temp_cu。
+- **L313** `                prefix="kernel", suffix=".cu", delete=True)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `            temp_cubin = tempfile.NamedTemporaryFile(` — **EN:** Assigns a value to temp_cubin. **CN:** 将一个值赋给 temp_cubin。
+- **L315** `                prefix="kernel", suffix=".cubin", delete=True)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `            with open(temp_cu.name, "w") as file:` — **EN:** Starts a context-managed block using open(temp_cu.name, 'w'). **CN:** 开始一个使用 open(temp_cu.name, 'w') 的上下文管理代码块。
+- **L317** `                file.write(source_buffer_device)` — **EN:** Invokes `file.write` as a standalone call. **CN:** 以独立语句方式调用 `file.write`。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `            # compile with nvcc` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L320** `            cmd_template = "${cuda_install_path}/bin/nvcc ${options} -cubin ${srcfile} -o ${tarfile}"` — **EN:** Assigns a value to cmd_template. **CN:** 将一个值赋给 cmd_template。
+- **L321** `            values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L322** `                "cuda_install_path": cuda_install_path(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `                "options": compilation_options.get_str(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `                "srcfile": temp_cu.name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L325** `                "tarfile": temp_cubin.name,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `            }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `            cmd = SubstituteTemplate(cmd_template, values)` — **EN:** Assigns a value to cmd. **CN:** 将一个值赋给 cmd。
+- **L328** `            compile_with_nvcc(cmd.split(" "), source_buffer_device, "./cutlass_python_compilation_device_error.txt")` — **EN:** Invokes `compile_with_nvcc` as a standalone call. **CN:** 以独立语句方式调用 `compile_with_nvcc`。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `            # load the cubin image` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L331** `            with open(temp_cubin.name, "rb") as file:` — **EN:** Starts a context-managed block using open(temp_cubin.name, 'rb'). **CN:** 开始一个使用 open(temp_cubin.name, 'rb') 的上下文管理代码块。
+- **L332** `                cubin_image = file.read()` — **EN:** Assigns a value to cubin_image. **CN:** 将一个值赋给 cubin_image。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** `        tempfile.tempdir = "./"` — **EN:** Assigns a value to tempfile.tempdir. **CN:** 将一个值赋给 tempfile.tempdir。
+- **L335** `        temp_src = tempfile.NamedTemporaryFile(` — **EN:** Assigns a value to temp_src. **CN:** 将一个值赋给 temp_src。
+- **L336** `            prefix="host_src", suffix=".cu", delete=True)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `        # Write the host source` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L339** `        with open(temp_src.name, "w") as outfile:` — **EN:** Starts a context-managed block using open(temp_src.name, 'w'). **CN:** 开始一个使用 open(temp_src.name, 'w') 的上下文管理代码块。
+- **L340** `            outfile.write(source_buffer_host)` — **EN:** Invokes `outfile.write` as a standalone call. **CN:** 以独立语句方式调用 `outfile.write`。
+- **L341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L342** `        temp_dst = tempfile.NamedTemporaryFile(` — **EN:** Assigns a value to temp_dst. **CN:** 将一个值赋给 temp_dst。
+- **L343** `            prefix="host_func", suffix=".so", delete=True)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** `        # Set up host compilation arguments` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L346** `        cmd = []` — **EN:** Assigns a value to cmd. **CN:** 将一个值赋给 cmd。
+- **L347** `        cmd.append(f"{cuda_install_path()}/bin/nvcc")` — **EN:** Invokes `cmd.append` as a standalone call. **CN:** 以独立语句方式调用 `cmd.append`。
+- **L348** `        cmd.extend(["-x", "cu", "-Xcompiler=-fpermissive", "-Xcompiler=-w", "-Xcompiler=-fPIC"])` — **EN:** Invokes `cmd.extend` as a standalone call. **CN:** 以独立语句方式调用 `cmd.extend`。
+- **L349** `        cmd.extend(host_compilation_options.get_str().split(" "))` — **EN:** Invokes `cmd.extend` as a standalone call. **CN:** 以独立语句方式调用 `cmd.extend`。
+- **L350** `        cmd.extend(["-shared", "-o", temp_dst.name, temp_src.name, "-lcudart", "-lcuda"])` — **EN:** Invokes `cmd.extend` as a standalone call. **CN:** 以独立语句方式调用 `cmd.extend`。
+- **L351** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L352** `        # Comile and load the library` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L353** `        compile_with_nvcc( cmd, source_buffer_host, error_file="./cutlass_python_compilation_host_error.txt")` — **EN:** Invokes `compile_with_nvcc` as a standalone call. **CN:** 以独立语句方式调用 `compile_with_nvcc`。
+- **L354** `        host_lib = ctypes.CDLL(temp_dst.name)` — **EN:** Assigns a value to host_lib. **CN:** 将一个值赋给 host_lib。
+- **L355** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L356** `        return cubin_image, host_lib, temp_dst` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `    def add_module(self, operations, compile_options=None, bypass_cache=False):` — **EN:** Defines function `add_module`. **CN:** 定义函数 `add_module`。
+- **L359** `        """` — **EN:** Starts the docstring for the function `add_module`. **CN:** 开始说明 function `add_module` 的文档字符串。
+- **L360** `        Insert a new compiled device module` — **EN:** Continues the docstring for the function `add_module`. **CN:** 继续说明 function `add_module` 的文档字符串。
+- **L361** `        """` — **EN:** Ends the docstring for the function `add_module`. **CN:** 结束说明 function `add_module` 的文档字符串。
+- **L362** `        include_paths = [` — **EN:** Assigns a value to include_paths. **CN:** 将一个值赋给 include_paths。
+- **L363** `            cuda_install_path() + "/include",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L364** `            CUTLASS_PATH + "/include",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L365** `            CUTLASS_PATH + "/tools/util/include",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L366** `            CUTLASS_PATH + "/python/cutlass/cpp/include",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L367** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `        cutlass_cppgen.initialize_cuda_context()` — **EN:** Invokes `cutlass_cppgen.initialize_cuda_context` as a standalone call. **CN:** 以独立语句方式调用 `cutlass_cppgen.initialize_cuda_context`。
+- **L370** `        arch = device_cc()` — **EN:** Assigns a value to arch. **CN:** 将一个值赋给 arch。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `        host_compile_options = CompilationOptions(` — **EN:** Assigns a value to host_compile_options. **CN:** 将一个值赋给 host_compile_options。
+- **L373** `            self._nvcc_compile_options, arch, include_paths)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L374** `        if compile_options is None:` — **EN:** Starts a conditional branch guarded by `compile_options is None`. **CN:** 开始一个由 `compile_options is None` 控制的条件分支。
+- **L375** `            compile_options = CompilationOptions(` — **EN:** Assigns a value to compile_options. **CN:** 将一个值赋给 compile_options。
+- **L376** `                self.default_compile_options, arch, include_paths)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L377** `        # save the cubin` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L378** `        operation_key = []` — **EN:** Assigns a value to operation_key. **CN:** 将一个值赋给 operation_key。
+- **L379** `        operation_list = []` — **EN:** Assigns a value to operation_list. **CN:** 将一个值赋给 operation_list。
+- **L380** `        for operation in operations:` — **EN:** Starts a loop assigning items from `operations` to `operation`. **CN:** 开始一个循环，将 `operations` 的元素赋给 `operation`。
+- **L381** `            # step 1: get kernel string as key` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L382** `            key = operation.rt_module.emit() + operation.procedural_name() + self.backend` — **EN:** Assigns a value to key. **CN:** 将一个值赋给 key。
+- **L383** `            # step 1: check if the operation is in cache` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L384** `            compiled_kernel = self.compiled_cache_device.get(key)` — **EN:** Assigns a value to compiled_kernel. **CN:** 将一个值赋给 compiled_kernel。
+- **L385** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L386** `            if compiled_kernel is None and not bypass_cache:` — **EN:** Starts a conditional branch guarded by `compiled_kernel is None and (not bypass_cache)`. **CN:** 开始一个由 `compiled_kernel is None and (not bypass_cache)` 控制的条件分支。
+- **L387** `                hit = self.load_operation(key, getattr( operation.rt_module, "extra_funcs", {}))` — **EN:** Assigns a value to hit. **CN:** 将一个值赋给 hit。
+- **L388** `                if hit:` — **EN:** Starts a conditional branch guarded by `hit`. **CN:** 开始一个由 `hit` 控制的条件分支。
+- **L389** `                    compiled_kernel = self.compiled_cache_device.get(key)` — **EN:** Assigns a value to compiled_kernel. **CN:** 将一个值赋给 compiled_kernel。
+- **L390** `                    assert compiled_kernel is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L391** `            if compiled_kernel is not None:` — **EN:** Starts a conditional branch guarded by `compiled_kernel is not None`. **CN:** 开始一个由 `compiled_kernel is not None` 控制的条件分支。
+- **L392** `                operation.rt_module.kernel = compiled_kernel` — **EN:** Assigns a value to operation.rt_module.kernel. **CN:** 将一个值赋给 operation.rt_module.kernel。
+- **L393** `                compiled_host_fns = self.compiled_cache_host.get(key)` — **EN:** Assigns a value to compiled_host_fns. **CN:** 将一个值赋给 compiled_host_fns。
+- **L394** `                assert compiled_host_fns is not None` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L395** `                for key in compiled_host_fns.keys():` — **EN:** Starts a loop assigning items from `compiled_host_fns.keys()` to `key`. **CN:** 开始一个循环，将 `compiled_host_fns.keys()` 的元素赋给 `key`。
+- **L396** `                    setattr(operation.rt_module, key, compiled_host_fns[key])` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L397** `                operation.rt_module.initialize()` — **EN:** Invokes `operation.rt_module.initialize` as a standalone call. **CN:** 以独立语句方式调用 `operation.rt_module.initialize`。
+- **L398** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L399** `                operation_list.append(operation.rt_module)` — **EN:** Invokes `operation_list.append` as a standalone call. **CN:** 以独立语句方式调用 `operation_list.append`。
+- **L400** `                operation_key.append(key)` — **EN:** Invokes `operation_key.append` as a standalone call. **CN:** 以独立语句方式调用 `operation_key.append`。
+- **L401** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L402** `        if len(operation_list) > 0:` — **EN:** Starts a conditional branch guarded by `len(operation_list) > 0`. **CN:** 开始一个由 `len(operation_list) > 0` 控制的条件分支。
+- **L403** `            cubin_image, host_lib, host_file = self.emit_compile_(` — **EN:** Assigns a value to (cubin_image, host_lib, host_file). **CN:** 将一个值赋给 (cubin_image, host_lib, host_file)。
+- **L404** `                operation_list, compile_options, host_compile_options)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `            err, module = cuda.cuModuleLoadData(cubin_image)` — **EN:** Assigns a value to (err, module). **CN:** 将一个值赋给 (err, module)。
+- **L407** `            if err != cuda.CUresult.CUDA_SUCCESS:` — **EN:** Starts a conditional branch guarded by `err != cuda.CUresult.CUDA_SUCCESS`. **CN:** 开始一个由 `err != cuda.CUresult.CUDA_SUCCESS` 控制的条件分支。
+- **L408** `                raise RuntimeError("Cuda Error: {}".format(err))` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** `            operation_name = []` — **EN:** Assigns a value to operation_name. **CN:** 将一个值赋给 operation_name。
+- **L411** `            operation_attr = []` — **EN:** Assigns a value to operation_attr. **CN:** 将一个值赋给 operation_attr。
+- **L412** `            for operation, key in zip(operation_list, operation_key):` — **EN:** Starts a loop assigning items from `zip(operation_list, operation_key)` to `(operation, key)`. **CN:** 开始一个循环，将 `zip(operation_list, operation_key)` 的元素赋给 `(operation, key)`。
+- **L413** `                # get device kernels` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L414** `                err, operation.kernel = cuda.cuModuleGetFunction(` — **EN:** Assigns a value to (err, operation.kernel). **CN:** 将一个值赋给 (err, operation.kernel)。
+- **L415** `                    module,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L416** `                    bytes(str.encode(operation.name()))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `                operation_name.append(operation.name())` — **EN:** Invokes `operation_name.append` as a standalone call. **CN:** 以独立语句方式调用 `operation_name.append`。
+- **L419** `                self.compiled_cache_device[key] = operation.kernel` — **EN:** Assigns a value to self.compiled_cache_device[key]. **CN:** 将一个值赋给 self.compiled_cache_device[key]。
+- **L420** `                # get host functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L421** `                compiled_host_fns = {}` — **EN:** Assigns a value to compiled_host_fns. **CN:** 将一个值赋给 compiled_host_fns。
+- **L422** `                op_attr = []` — **EN:** Assigns a value to op_attr. **CN:** 将一个值赋给 op_attr。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `                # get param size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L425** `                func_name = operation.name() + "_get_param_size"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L426** `                func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L427** `                param_size = func()` — **EN:** Assigns a value to param_size. **CN:** 将一个值赋给 param_size。
+- **L428** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L429** `                func_name = operation.name() + "_get_params"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L430** `                func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L431** `                func.argtype = operation.argtype` — **EN:** Assigns a value to func.argtype. **CN:** 将一个值赋给 func.argtype。
+- **L432** `                func.restype = ctypes.POINTER(ctypes.c_char * param_size)` — **EN:** Assigns a value to func.restype. **CN:** 将一个值赋给 func.restype。
+- **L433** `                setattr(operation, "get_args", func)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L434** `                compiled_host_fns["get_args"] = func` — **EN:** Assigns a value to compiled_host_fns['get_args']. **CN:** 将一个值赋给 compiled_host_fns['get_args']。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** `                # set shared memory size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L437** `                func_name = operation.name() + "_shared_memory_size"` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L438** `                func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L439** `                setattr(operation, "shared_memory_capacity", func())` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L440** `                compiled_host_fns["shared_memory_capacity"] = func()` — **EN:** Assigns a value to compiled_host_fns['shared_memory_capacity']. **CN:** 将一个值赋给 compiled_host_fns['shared_memory_capacity']。
+- **L441** `                # set the maximum dynamic shared size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L442** `                operation.initialize()` — **EN:** Invokes `operation.initialize` as a standalone call. **CN:** 以独立语句方式调用 `operation.initialize`。
+- **L443** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L444** `                # get extra functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L445** `                op_attr.append(param_size)` — **EN:** Invokes `op_attr.append` as a standalone call. **CN:** 以独立语句方式调用 `op_attr.append`。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** `                if hasattr(operation, "extra_funcs"):` — **EN:** Starts a conditional branch guarded by `hasattr(operation, 'extra_funcs')`. **CN:** 开始一个由 `hasattr(operation, 'extra_funcs')` 控制的条件分支。
+- **L448** `                    for suffix, ret_type  in operation.extra_funcs.items():` — **EN:** Starts a loop assigning items from `operation.extra_funcs.items()` to `(suffix, ret_type)`. **CN:** 开始一个循环，将 `operation.extra_funcs.items()` 的元素赋给 `(suffix, ret_type)`。
+- **L449** `                        func_name = operation.name() + "_" + suffix` — **EN:** Assigns a value to func_name. **CN:** 将一个值赋给 func_name。
+- **L450** `                        func = getattr(host_lib, func_name)` — **EN:** Assigns a value to func. **CN:** 将一个值赋给 func。
+- **L451** `                        if ret_type is not None:` — **EN:** Starts a conditional branch guarded by `ret_type is not None`. **CN:** 开始一个由 `ret_type is not None` 控制的条件分支。
+- **L452** `                            func.restype = ret_type` — **EN:** Assigns a value to func.restype. **CN:** 将一个值赋给 func.restype。
+- **L453** `                        setattr(operation, suffix, func)` — **EN:** Invokes `setattr` as a standalone call. **CN:** 以独立语句方式调用 `setattr`。
+- **L454** `                        compiled_host_fns[suffix] = func` — **EN:** Assigns a value to compiled_host_fns[suffix]. **CN:** 将一个值赋给 compiled_host_fns[suffix]。
+- **L455** `                        op_attr.append(suffix)` — **EN:** Invokes `op_attr.append` as a standalone call. **CN:** 以独立语句方式调用 `op_attr.append`。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `                operation_attr.append(op_attr)` — **EN:** Invokes `operation_attr.append` as a standalone call. **CN:** 以独立语句方式调用 `operation_attr.append`。
+- **L458** `                self.compiled_cache_host[key] = compiled_host_fns` — **EN:** Assigns a value to self.compiled_cache_host[key]. **CN:** 将一个值赋给 self.compiled_cache_host[key]。
+- **L459** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L460** `            for (key, operation_name, operation_attr,) in zip(operation_key, operation_name, operation_attr):` — **EN:** Starts a loop assigning items from `zip(operation_key, operation_name, operation_attr)` to `(key, operation_name, operation_attr)`. **CN:** 开始一个循环，将 `zip(operation_key, operation_name, operation_attr)` 的元素赋给 `(key, operation_name, operation_attr)`。
+- **L461** `                self.insert_operation(` — **EN:** Invokes `self.insert_operation` as a standalone call. **CN:** 以独立语句方式调用 `self.insert_operation`。
+- **L462** `                    key, cubin_image, host_file.name, operation_name, operation_attr)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.compiler`. CN: 模块名为 `cutlass_cppgen.backend.compiler`。
+- EN: Top-level classes: CompilationOptions, ArtifactManager CN: 顶层类包括：CompilationOptions, ArtifactManager
+- EN: Top-level functions: compile_with_nvcc, convertToBinaryData, CDLLBin CN: 顶层函数包括：compile_with_nvcc, convertToBinaryData, CDLLBin
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:SubstituteTemplate, cutlass_cppgen, cutlass_cppgen:CACHE_FILE,CUTLASS_PATH,cuda_install_path,logger, cutlass_cppgen.backend.gemm_operation:GemmOperationUniversal, cutlass_cppgen.backend.library:ApiVersion, cutlass_cppgen.backend.utils.device:device_cc CN: 内部依赖：cutlass_cppgen.utils.lazy_import:lazy_import, cutlass_library:SubstituteTemplate, cutlass_cppgen, cutlass_cppgen:CACHE_FILE,CUTLASS_PATH,cuda_install_path,logger, cutlass_cppgen.backend.gemm_operation:GemmOperationUniversal, cutlass_cppgen.backend.library:ApiVersion, cutlass_cppgen.backend.utils.device:device_cc
+- EN: External or standard-library dependencies: ctypes, json, os, sqlite3, subprocess, tempfile CN: 外部或标准库依赖：ctypes, json, os, sqlite3, subprocess, tempfile

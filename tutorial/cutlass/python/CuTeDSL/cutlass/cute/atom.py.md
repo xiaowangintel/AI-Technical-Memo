@@ -1,0 +1,1618 @@
+# atom.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/atom.py`
+
+## Purpose / 作用
+- EN: Defines 11 classes (Op, MmaOp, CopyOp, Trait, ... (+7 more)) and 17 functions (make_atom, make_mma_atom, make_tiled_mma, make_copy_atom, ... (+13 more)) in `CuTeDSL.cutlass.cute.atom`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.atom` 定义了 11 个类（Op, MmaOp, CopyOp, Trait, ... (+7 more)） 和 17 个函数（make_atom, make_mma_atom, make_tiled_mma, make_copy_atom, ... (+13 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from abc import ABC, ABCMeta, abstractmethod` — **EN:** Imports ABC, ABCMeta, abstractmethod from `abc`. **CN:** 从 `abc` 导入 ABC, ABCMeta, abstractmethod。
+- **L13** `from typing import Type, Union, Optional, Any, overload, List, Tuple` — **EN:** Imports Type, Union, Optional, Any, overload, List, ... (+1 more) from `typing`. **CN:** 从 `typing` 导入 Type, Union, Optional, Any, overload, List, ... (+1 more)。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `from .typing import Shape, Layout, Tile, Tensor, Numeric, Int32` — **EN:** Imports Shape, Layout, Tile, Tensor, Numeric, Int32 from `.typing`. **CN:** 从 `.typing` 导入 Shape, Layout, Tile, Tensor, Numeric, Int32。
+- **L16** `from .core import (` — **EN:** Imports composition, coalesce, left_inverse, filter, pretty_str, is_static, ... (+5 more) from `.core`. **CN:** 从 `.core` 导入 composition, coalesce, left_inverse, filter, pretty_str, is_static, ... (+5 more)。
+- **L17** `    composition,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L18** `    coalesce,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L19** `    left_inverse,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L20** `    filter,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L21** `    pretty_str,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L22** `    is_static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    make_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    make_layout_tv,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    rank,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    size,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    static,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `from .tuple import product_each` — **EN:** Imports product_each from `.tuple`. **CN:** 从 `.tuple` 导入 product_each。
+- **L30** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L31** `# Internal utils` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L32** `from .core import _unpack_x_tuple, _pack_shape, _pack_coord, _pack_tile` — **EN:** Imports _unpack_x_tuple, _pack_shape, _pack_coord, _pack_tile from `.core`. **CN:** 从 `.core` 导入 _unpack_x_tuple, _pack_shape, _pack_coord, _pack_tile。
+- **L33** `from .tensor import _Tensor, make_tensor` — **EN:** Imports _Tensor, make_tensor from `.tensor`. **CN:** 从 `.tensor` 导入 _Tensor, make_tensor。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `from cutlass.cutlass_dsl import extract_mlir_values, new_from_mlir_values, dsl_user_op` — **EN:** Imports extract_mlir_values, new_from_mlir_values, dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 extract_mlir_values, new_from_mlir_values, dsl_user_op。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L38** `from cutlass._mlir.dialects import cute as _cute_ir` — **EN:** Imports cute as _cute_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 cute as _cute_ir。
+- **L39** `from cutlass._mlir.dialects import cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cute_nvgpu as _cute_nvgpu_ir from `cutlass._mlir.dialects`. **CN:** 从 `cutlass._mlir.dialects` 导入 cute_nvgpu as _cute_nvgpu_ir。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `class Op(ABC):` — **EN:** Defines class `Op` with bases ABC. **CN:** 定义类 `Op`，其基类为 ABC。
+- **L43** `    """` — **EN:** Starts the docstring for the class `Op`. **CN:** 开始说明 class `Op` 的文档字符串。
+- **L44** `    Operation abstract base class.` — **EN:** Continues the docstring for the class `Op`. **CN:** 继续说明 class `Op` 的文档字符串。
+- **L45** `    """` — **EN:** Ends the docstring for the class `Op`. **CN:** 结束说明 class `Op` 的文档字符串。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `class MmaOp(Op, metaclass=ABCMeta):` — **EN:** Defines class `MmaOp` with bases Op. **CN:** 定义类 `MmaOp`，其基类为 Op。
+- **L51** `    """` — **EN:** Starts the docstring for the class `MmaOp`. **CN:** 开始说明 class `MmaOp` 的文档字符串。
+- **L52** `    MMA Operation abstract base class.` — **EN:** Continues the docstring for the class `MmaOp`. **CN:** 继续说明 class `MmaOp` 的文档字符串。
+- **L53** `    """` — **EN:** Ends the docstring for the class `MmaOp`. **CN:** 结束说明 class `MmaOp` 的文档字符串。
+- **L54** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L55** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L56** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L57** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L60** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L61** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L62** `    ) -> "Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L63** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `class CopyOp(Op, metaclass=ABCMeta):` — **EN:** Defines class `CopyOp` with bases Op. **CN:** 定义类 `CopyOp`，其基类为 Op。
+- **L67** `    """` — **EN:** Starts the docstring for the class `CopyOp`. **CN:** 开始说明 class `CopyOp` 的文档字符串。
+- **L68** `    Copy Operation abstract base class.` — **EN:** Continues the docstring for the class `CopyOp`. **CN:** 继续说明 class `CopyOp` 的文档字符串。
+- **L69** `    """` — **EN:** Ends the docstring for the class `CopyOp`. **CN:** 结束说明 class `CopyOp` 的文档字符串。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    @abstractmethod` — **EN:** Applies decorator `abstractmethod` to the following definition. **CN:** 将装饰器 `abstractmethod` 应用于后面的定义。
+- **L72** `    def _make_trait(` — **EN:** Defines function `_make_trait`. **CN:** 定义函数 `_make_trait`。
+- **L73** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L74** `        copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L75** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L76** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L77** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L78** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L79** `    ) -> "Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L80** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `class Trait(ABC):` — **EN:** Defines class `Trait` with bases ABC. **CN:** 定义类 `Trait`，其基类为 ABC。
+- **L84** `    """` — **EN:** Starts the docstring for the class `Trait`. **CN:** 开始说明 class `Trait` 的文档字符串。
+- **L85** `    Trait abstract base class.` — **EN:** Continues the docstring for the class `Trait`. **CN:** 继续说明 class `Trait` 的文档字符串。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `    Traits are internal-only classes used by Atoms that wrap the underlying IR Value. The Python` — **EN:** Continues the docstring for the class `Trait`. **CN:** 继续说明 class `Trait` 的文档字符串。
+- **L88** `    user should only interact with Ops and Atoms.` — **EN:** Continues the docstring for the class `Trait`. **CN:** 继续说明 class `Trait` 的文档字符串。
+- **L89** `    """` — **EN:** Ends the docstring for the class `Trait`. **CN:** 结束说明 class `Trait` 的文档字符串。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `    def __init__(self, value: ir.Value) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L92** `        self.value = value` — **EN:** Assigns a value to self.value. **CN:** 将一个值赋给 self.value。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    def __extract_mlir_values__(self) -> List[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L95** `        return [self.value]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> "Trait":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L98** `        return self.__class__(values[0])` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    def set(` — **EN:** Defines function `set`. **CN:** 定义函数 `set`。
+- **L101** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L102** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L103** `        value: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L104** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L105** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L106** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L107** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L108** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L109** `            "set not implemented, the requesting Atom has likely no runtime state"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `    def get(` — **EN:** Defines function `get`. **CN:** 定义函数 `get`。
+- **L113** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L114** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L115** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L116** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L117** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L118** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L119** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L120** `            "get not implemented, the requesting Atom has likely no runtime state"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L123** `    def unpack(` — **EN:** Defines function `unpack`. **CN:** 定义函数 `unpack`。
+- **L124** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L125** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L126** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L127** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L128** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L129** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L130** `        return self.value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L133** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L134** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L135** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L136** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `    ) -> "Trait":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L139** `        return self.__class__(self.unpack(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `def make_atom(` — **EN:** Defines function `make_atom`. **CN:** 定义函数 `make_atom`。
+- **L143** `    ty: ir.Type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `    values: Optional[List[ir.Value]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L147** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L148** `) -> ir.OpResult:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L149** `    """` — **EN:** Starts the docstring for the function `make_atom`. **CN:** 开始说明 function `make_atom` 的文档字符串。
+- **L150** `    This is a wrapper around the _cute_ir.make_atom operation, providing default value for the values argument.` — **EN:** Continues the docstring for the function `make_atom`. **CN:** 继续说明 function `make_atom` 的文档字符串。
+- **L151** `    """` — **EN:** Ends the docstring for the function `make_atom`. **CN:** 结束说明 function `make_atom` 的文档字符串。
+- **L152** `    if values is None:` — **EN:** Starts a conditional branch guarded by `values is None`. **CN:** 开始一个由 `values is None` 控制的条件分支。
+- **L153** `        values = []` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L154** `    return _cute_ir.make_atom(ty, values, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L155** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `class Atom(ABC):` — **EN:** Defines class `Atom` with bases ABC. **CN:** 定义类 `Atom`，其基类为 ABC。
+- **L158** `    """` — **EN:** Starts the docstring for the class `Atom`. **CN:** 开始说明 class `Atom` 的文档字符串。
+- **L159** `    Atom base class.` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L160** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L161** `    An Atom is the composition of` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    - a MMA or Copy Operation;` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L164** `    - an internal MMA or Copy Trait.` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    An Operation is a pure Python class that is used to model a specific MMA or Copy instruction.` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L167** `    The Trait wraps the underlying IR Value and provides access to the metadata of the instruction` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L168** `    encoded using CuTe Layouts. When the Trait can be constructed straighforwardly from an` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L169** `    Operation, the \`\`make_mma_atom\`\` or \`\`make_copy_atom\`\` API should be used. There are cases where` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L170** `    constructing the metadata is not trivial and requires more information, for example to determine` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L171** `    the number of bytes copied per TMA instruction ("the TMA vector length"). In such cases,` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L172** `    dedicated helper functions are provided with an appropriate API such that the Atom is` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L173** `    constructed internally in an optimal fashion for the user.` — **EN:** Continues the docstring for the class `Atom`. **CN:** 继续说明 class `Atom` 的文档字符串。
+- **L174** `    """` — **EN:** Ends the docstring for the class `Atom`. **CN:** 结束说明 class `Atom` 的文档字符串。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `    def __init__(self, op: Op, trait: Trait) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L177** `        self._op = op` — **EN:** Assigns a value to self._op. **CN:** 将一个值赋给 self._op。
+- **L178** `        self._trait = trait` — **EN:** Assigns a value to self._trait. **CN:** 将一个值赋给 self._trait。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `    def __extract_mlir_values__(self) -> List[ir.Value]:` — **EN:** Defines function `__extract_mlir_values__`. **CN:** 定义函数 `__extract_mlir_values__`。
+- **L181** `        return extract_mlir_values(self._trait) + extract_mlir_values(self._op)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L182** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L183** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> "Atom":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L184** `        traits_value = values[: len(extract_mlir_values(self._trait))]` — **EN:** Assigns a value to traits_value. **CN:** 将一个值赋给 traits_value。
+- **L185** `        op_value = values[len(extract_mlir_values(self._trait)) :]` — **EN:** Assigns a value to op_value. **CN:** 将一个值赋给 op_value。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `        new_trait = new_from_mlir_values(self._trait, traits_value)` — **EN:** Assigns a value to new_trait. **CN:** 将一个值赋给 new_trait。
+- **L188** `        new_op = new_from_mlir_values(self._op, op_value)` — **EN:** Assigns a value to new_op. **CN:** 将一个值赋给 new_op。
+- **L189** `        return self.__class__(new_op, new_trait)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L191** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L192** `    def op(self) -> Op:` — **EN:** Defines function `op`. **CN:** 定义函数 `op`。
+- **L193** `        return self._op` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L196** `    def type(self) -> ir.Type:` — **EN:** Defines function `type`. **CN:** 定义函数 `type`。
+- **L197** `        return self._trait.value.type` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L200** `    def set(` — **EN:** Defines function `set`. **CN:** 定义函数 `set`。
+- **L201** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L202** `        modifier: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L203** `        value: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L204** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L205** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L206** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L207** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L208** `        """` — **EN:** Starts the docstring for the function `set`. **CN:** 开始说明 function `set` 的文档字符串。
+- **L209** `        Sets runtime fields of the Atom.` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `        Some Atoms have runtime state, for example a tcgen05 MMA Atom` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `        .. code-block:: python` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `            tiled_mma = cute.make_tiled_mma(some_tcgen05_mma_op)` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L217** `            tiled_mma.set(cute.nvgpu.tcgen05.Field.ACCUMULATE, True)` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `        The \`\`set\`\` method provides a way to the user to modify such runtime state. Modifiable` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L220** `        fields are provided by arch-specific enumerations, for example \`\`tcgen05.Field\`\`. The Atom` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L221** `        instance internally validates the field as well as the value provided by the user to set` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L222** `        the field to.` — **EN:** Continues the docstring for the function `set`. **CN:** 继续说明 function `set` 的文档字符串。
+- **L223** `        """` — **EN:** Ends the docstring for the function `set`. **CN:** 结束说明 function `set` 的文档字符串。
+- **L224** `        self._trait.set(modifier, value, loc=loc, ip=ip)` — **EN:** Invokes `self._trait.set` as a standalone call. **CN:** 以独立语句方式调用 `self._trait.set`。
+- **L225** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L226** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L227** `    def get(` — **EN:** Defines function `get`. **CN:** 定义函数 `get`。
+- **L228** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L229** `        field: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L230** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L231** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L232** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L233** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L234** `        """` — **EN:** Starts the docstring for the function `get`. **CN:** 开始说明 function `get` 的文档字符串。
+- **L235** `        Gets runtime fields of the Atom.` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L236** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L237** `        Some Atoms have runtime state, for example a tcgen05 MMA Atom` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L238** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L239** `        .. code-block:: python` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `            tiled_mma = cute.make_tiled_mma(some_tcgen05_mma_op)` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L242** `            accum = tiled_mma.get(cute.nvgpu.tcgen05.Field.ACCUMULATE)` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `        The \`\`get\`\` method provides a way to the user to access such runtime state. Modifiable` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L245** `        fields are provided by arch-specific enumerations, for example \`\`tcgen05.Field\`\`. The Atom` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L246** `        instance internally validates the field as well as the value provided by the user to set` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L247** `        the field to.` — **EN:** Continues the docstring for the function `get`. **CN:** 继续说明 function `get` 的文档字符串。
+- **L248** `        """` — **EN:** Ends the docstring for the function `get`. **CN:** 结束说明 function `get` 的文档字符串。
+- **L249** `        return self._trait.get(field, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    def with_(` — **EN:** Defines function `with_`. **CN:** 定义函数 `with_`。
+- **L252** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L253** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L254** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L255** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L256** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L257** `    ) -> "Atom":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L258** `        """` — **EN:** Starts the docstring for the function `with_`. **CN:** 开始说明 function `with_` 的文档字符串。
+- **L259** `        Returns a new Atom with the new Operation and Trait with the given runtime state. The runtime state` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L260** `        is provided as keyword arguments and it is Atom-specific.` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L261** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L262** `        .. code-block:: python` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `            tiled_copy = cute.make_tiled_copy(tma_copy_op)` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L265** `            new_tiled_copy = tiled_copy.with_(tma_bar_ptr=tma_bar_ptr, cache_policy=cute.CacheEvictionPriority.EVICT_LAST)` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `        The \`\`with_\`\` method provides a way to the user to modify such runtime state or create an executable Atom` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L268** `        (e.g. an Executable TMA Load Atom).` — **EN:** Continues the docstring for the function `with_`. **CN:** 继续说明 function `with_` 的文档字符串。
+- **L269** `        """` — **EN:** Ends the docstring for the function `with_`. **CN:** 结束说明 function `with_` 的文档字符串。
+- **L270** `        return self.__class__(self.op, self._trait.with_(loc=loc, ip=ip, **kwargs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L271** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L272** `    def _unpack(` — **EN:** Defines function `_unpack`. **CN:** 定义函数 `_unpack`。
+- **L273** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L274** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L275** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L276** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L277** `        **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L278** `    ) -> ir.Value:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L279** `        return self._trait.unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L280** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L281** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L282** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L283** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L284** `# MMA Atoms, TiledMma, and ThrMma` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L285** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L286** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L287** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `class MmaAtom(Atom):` — **EN:** Defines class `MmaAtom` with bases Atom. **CN:** 定义类 `MmaAtom`，其基类为 Atom。
+- **L290** `    """` — **EN:** Starts the docstring for the class `MmaAtom`. **CN:** 开始说明 class `MmaAtom` 的文档字符串。
+- **L291** `    The MMA Atom class.` — **EN:** Continues the docstring for the class `MmaAtom`. **CN:** 继续说明 class `MmaAtom` 的文档字符串。
+- **L292** `    """` — **EN:** Ends the docstring for the class `MmaAtom`. **CN:** 结束说明 class `MmaAtom` 的文档字符串。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L295** `        res = "MMA Atom\n"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L296** `        res += "  ThrID:       " + pretty_str(self.thr_id) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L297** `        res += "  Shape MNK:   " + pretty_str(self.shape_mnk) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L298** `        res += "  TV Layout A: " + pretty_str(self.tv_layout_A) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L299** `        res += "  TV Layout B: " + pretty_str(self.tv_layout_B) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L300** `        res += "  TV Layout C: " + pretty_str(self.tv_layout_C)` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L301** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L304** `    # Properties` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L305** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L306** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L307** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L308** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L309** `    def thr_id(` — **EN:** Defines function `thr_id`. **CN:** 定义函数 `thr_id`。
+- **L310** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L311** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L312** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L313** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L314** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L315** `        return static(self._trait.value.type.thr_id, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L318** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L319** `    def shape_mnk(` — **EN:** Defines function `shape_mnk`. **CN:** 定义函数 `shape_mnk`。
+- **L320** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L321** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L322** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L323** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L324** `    ) -> Shape:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L325** `        return _unpack_x_tuple(self._trait.value.type.shape_mnk, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L328** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L329** `    def tv_layout_A(` — **EN:** Defines function `tv_layout_A`. **CN:** 定义函数 `tv_layout_A`。
+- **L330** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L331** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L332** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L333** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L334** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L335** `        return static(self._trait.value.type.layout_a_tv, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L336** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L337** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L338** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L339** `    def tv_layout_B(` — **EN:** Defines function `tv_layout_B`. **CN:** 定义函数 `tv_layout_B`。
+- **L340** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L343** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L344** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L345** `        return static(self._trait.value.type.layout_b_tv, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L348** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L349** `    def tv_layout_C(` — **EN:** Defines function `tv_layout_C`. **CN:** 定义函数 `tv_layout_C`。
+- **L350** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L351** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L352** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L353** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L354** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L355** `        return static(self._trait.value.type.layout_c_tv)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L358** `    # make_fragment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L359** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L362** `    def make_fragment_A(` — **EN:** Defines function `make_fragment_A`. **CN:** 定义函数 `make_fragment_A`。
+- **L363** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L364** `        input: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L365** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L366** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L367** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L368** `    ) -> ir.OpResult:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L369** `        # input could be memref/shape/layout for tmem based fragment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L370** `        if isinstance(input, _Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(input, _Tensor)`. **CN:** 开始一个由 `isinstance(input, _Tensor)` 控制的条件分支。
+- **L371** `            if self.op is not None:` — **EN:** Starts a conditional branch guarded by `self.op is not None`. **CN:** 开始一个由 `self.op is not None` 控制的条件分支。
+- **L372** `                self.op._verify_fragment_A(input, loc=loc, ip=ip)  # type: ignore[attr-defined]` — **EN:** Invokes `self.op._verify_fragment_A` as a standalone call. **CN:** 以独立语句方式调用 `self.op._verify_fragment_A`。
+- **L373** `            input = input.value` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L374** `        if isinstance(input, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(input, tuple)`. **CN:** 开始一个由 `isinstance(input, tuple)` 控制的条件分支。
+- **L375** `            input = _pack_shape(input, loc=loc, ip=ip)` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L376** `        return _cute_ir.mma_make_fragment(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L377** `            _cute_ir.MmaOperand.A, self._trait.value, input, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L378** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L379** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L380** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L381** `    def make_fragment_B(` — **EN:** Defines function `make_fragment_B`. **CN:** 定义函数 `make_fragment_B`。
+- **L382** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L383** `        input: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L384** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L385** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L386** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L387** `    ) -> ir.OpResult:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L388** `        if isinstance(input, _Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(input, _Tensor)`. **CN:** 开始一个由 `isinstance(input, _Tensor)` 控制的条件分支。
+- **L389** `            if self.op is not None:` — **EN:** Starts a conditional branch guarded by `self.op is not None`. **CN:** 开始一个由 `self.op is not None` 控制的条件分支。
+- **L390** `                self.op._verify_fragment_B(input, loc=loc, ip=ip)  # type: ignore[attr-defined]` — **EN:** Invokes `self.op._verify_fragment_B` as a standalone call. **CN:** 以独立语句方式调用 `self.op._verify_fragment_B`。
+- **L391** `            input = input.value` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L392** `        if isinstance(input, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(input, tuple)`. **CN:** 开始一个由 `isinstance(input, tuple)` 控制的条件分支。
+- **L393** `            input = _pack_shape(input, loc=loc, ip=ip)` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L394** `        return _cute_ir.mma_make_fragment(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L395** `            _cute_ir.MmaOperand.B, self._trait.value, input, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L396** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L399** `    def make_fragment_C(` — **EN:** Defines function `make_fragment_C`. **CN:** 定义函数 `make_fragment_C`。
+- **L400** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L401** `        input: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L402** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L403** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L404** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L405** `    ) -> ir.OpResult:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L406** `        # input could be memref/shape/layout for tmem based fragment` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L407** `        if isinstance(input, _Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(input, _Tensor)`. **CN:** 开始一个由 `isinstance(input, _Tensor)` 控制的条件分支。
+- **L408** `            input = input.value` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L409** `        if isinstance(input, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(input, tuple)`. **CN:** 开始一个由 `isinstance(input, tuple)` 控制的条件分支。
+- **L410** `            input = _pack_shape(input, loc=loc, ip=ip)` — **EN:** Assigns a value to input. **CN:** 将一个值赋给 input。
+- **L411** `        return _cute_ir.mma_make_fragment(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L412** `            _cute_ir.MmaOperand.C, self._trait.value, input, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L415** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L416** `class TiledMma(MmaAtom):` — **EN:** Defines class `TiledMma` with bases MmaAtom. **CN:** 定义类 `TiledMma`，其基类为 MmaAtom。
+- **L417** `    """` — **EN:** Starts the docstring for the class `TiledMma`. **CN:** 开始说明 class `TiledMma` 的文档字符串。
+- **L418** `    The tiled MMA class.` — **EN:** Continues the docstring for the class `TiledMma`. **CN:** 继续说明 class `TiledMma` 的文档字符串。
+- **L419** `    """` — **EN:** Ends the docstring for the class `TiledMma`. **CN:** 结束说明 class `TiledMma` 的文档字符串。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L422** `        res = "Tiled MMA\n"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L423** `        res += "  Thr Layout VMNK: " + pretty_str(self.thr_layout_vmnk) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L424** `        res += "  Permutation MNK: " + pretty_str(self.permutation_mnk) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L425** `        res += "MMA Atom\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L426** `        res += "  ThrID:           " + pretty_str(self.thr_id) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L427** `        res += "  Shape MNK:       " + pretty_str(self.shape_mnk) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L428** `        res += "  TV Layout A:     " + pretty_str(self.tv_layout_A) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L429** `        res += "  TV Layout B:     " + pretty_str(self.tv_layout_B) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L430** `        res += "  TV Layout C:     " + pretty_str(self.tv_layout_C)` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L431** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L432** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L433** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L434** `    # Properties` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L435** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L436** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L437** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L438** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L439** `    def tv_layout_A_tiled(` — **EN:** Defines function `tv_layout_A_tiled`. **CN:** 定义函数 `tv_layout_A_tiled`。
+- **L440** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L441** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L442** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L443** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L444** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L445** `        return static(self._trait.value.type.layout_a_tv_tiled, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L446** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L447** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L448** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L449** `    def tv_layout_B_tiled(` — **EN:** Defines function `tv_layout_B_tiled`. **CN:** 定义函数 `tv_layout_B_tiled`。
+- **L450** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L451** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L452** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L453** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L454** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L455** `        return static(self._trait.value.type.layout_b_tv_tiled, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L456** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L457** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L458** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L459** `    def tv_layout_C_tiled(` — **EN:** Defines function `tv_layout_C_tiled`. **CN:** 定义函数 `tv_layout_C_tiled`。
+- **L460** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L461** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L462** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L463** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L464** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L465** `        return static(self._trait.value.type.layout_c_tv_tiled, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L466** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L467** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L468** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L469** `    def permutation_mnk(` — **EN:** Defines function `permutation_mnk`. **CN:** 定义函数 `permutation_mnk`。
+- **L470** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L471** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L472** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L473** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `    ) -> Tile:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L475** `        return _unpack_x_tuple(self._trait.value.type.permutation_mnk, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L476** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L477** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L478** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L479** `    def thr_layout_vmnk(` — **EN:** Defines function `thr_layout_vmnk`. **CN:** 定义函数 `thr_layout_vmnk`。
+- **L480** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L481** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L482** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L483** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L484** `    ) -> Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L485** `        return static(self._trait.value.type.thr_layout_vmnk, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L488** `    def size(self) -> int:` — **EN:** Defines function `size`. **CN:** 定义函数 `size`。
+- **L489** `        return self._trait.value.type.size` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L490** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L491** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L492** `    # Tiler` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L493** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L495** `    def get_tile_size(self, mode_idx: int) -> Shape:` — **EN:** Defines function `get_tile_size`. **CN:** 定义函数 `get_tile_size`。
+- **L496** `        assert (mode_idx >= 0) and (mode_idx < 3)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L497** `        perm_tile = self.permutation_mnk[mode_idx]` — **EN:** Assigns a value to perm_tile. **CN:** 将一个值赋给 perm_tile。
+- **L498** `        if perm_tile is None:` — **EN:** Starts a conditional branch guarded by `perm_tile is None`. **CN:** 开始一个由 `perm_tile is None` 控制的条件分支。
+- **L499** `            thr_layout_vmnk = self.thr_layout_vmnk` — **EN:** Assigns a value to thr_layout_vmnk. **CN:** 将一个值赋给 thr_layout_vmnk。
+- **L500** `            atom_shape_mnk = self.shape_mnk` — **EN:** Assigns a value to atom_shape_mnk. **CN:** 将一个值赋给 atom_shape_mnk。
+- **L501** `            return size(atom_shape_mnk, mode=[mode_idx]) * size(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L502** `                thr_layout_vmnk, mode=[mode_idx + 1]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L503** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L504** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L505** `            return size(perm_tile)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L508** `    # get_slice` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L509** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L510** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L511** `    def get_slice(self, thr_idx: Union[int, Int32]) -> "ThrMma":` — **EN:** Defines function `get_slice`. **CN:** 定义函数 `get_slice`。
+- **L512** `        return ThrMma(self.op, self._trait, thr_idx)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L513** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L514** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L515** `    # partition_shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L516** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `    def _partition_shape(` — **EN:** Defines function `_partition_shape`. **CN:** 定义函数 `_partition_shape`。
+- **L519** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L520** `        operand_id: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L521** `        shape: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L522** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L523** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L524** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L525** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L526** `        shape = _pack_shape(shape, loc=loc, ip=ip)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L527** `        return _unpack_x_tuple(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L528** `            _cute_ir.tiled_mma_partition_shape(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L529** `                operand_id, self._trait.value, shape, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L530** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L531** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L532** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L533** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L535** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L536** `    def partition_shape_A(` — **EN:** Defines function `partition_shape_A`. **CN:** 定义函数 `partition_shape_A`。
+- **L537** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L538** `        shape_mk: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L539** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L540** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L541** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L542** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L543** `        return self._partition_shape(_cute_ir.MmaOperand.A, shape_mk, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L545** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L546** `    def partition_shape_B(` — **EN:** Defines function `partition_shape_B`. **CN:** 定义函数 `partition_shape_B`。
+- **L547** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L548** `        shape_nk: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L549** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L550** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L551** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L552** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L553** `        return self._partition_shape(_cute_ir.MmaOperand.B, shape_nk, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L555** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L556** `    def partition_shape_C(` — **EN:** Defines function `partition_shape_C`. **CN:** 定义函数 `partition_shape_C`。
+- **L557** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L558** `        shape_mn: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L559** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L560** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L561** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L562** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L563** `        return self._partition_shape(_cute_ir.MmaOperand.C, shape_mn, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L564** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L565** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L566** `    # _thrfrg` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L567** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L568** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L569** `    @overload` — **EN:** Applies decorator `overload` to the following definition. **CN:** 将装饰器 `overload` 应用于后面的定义。
+- **L570** `    def _thrfrg(` — **EN:** Defines function `_thrfrg`. **CN:** 定义函数 `_thrfrg`。
+- **L571** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L572** `        operand_id: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L573** `        input: Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L574** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L575** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L576** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L577** `    ) -> Layout: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L578** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L579** `    @overload` — **EN:** Applies decorator `overload` to the following definition. **CN:** 将装饰器 `overload` 应用于后面的定义。
+- **L580** `    def _thrfrg(` — **EN:** Defines function `_thrfrg`. **CN:** 定义函数 `_thrfrg`。
+- **L581** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L582** `        operand_id: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L583** `        input: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L584** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L585** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L586** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L587** `    ) -> Tensor: ...` — **EN:** Evaluates a standalone expression. **CN:** 计算一个独立表达式。
+- **L588** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L589** `    def _thrfrg(` — **EN:** Defines function `_thrfrg`. **CN:** 定义函数 `_thrfrg`。
+- **L590** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L591** `        operand_id: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L592** `        input: Union[Layout, Tensor],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L593** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L594** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L595** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L596** `    ) -> Union[Tensor, Layout]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L597** `        if isinstance(input, Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(input, Tensor)`. **CN:** 开始一个由 `isinstance(input, Tensor)` 控制的条件分支。
+- **L598** `            return make_tensor(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L599** `                input.iterator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L600** `                self._thrfrg(operand_id, input.layout, loc=loc, ip=ip),  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L601** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L602** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L603** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L604** `        elif isinstance(input, Layout):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L605** `            if not is_static(input.type):` — **EN:** Starts a conditional branch guarded by `not is_static(input.type)`. **CN:** 开始一个由 `not is_static(input.type)` 控制的条件分支。
+- **L606** `                raise ValueError(f"Expects a static layout but got {input.type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L607** `            return static(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L608** `                self._trait.value.type.thrfrg(operand_id, input), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L609** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L610** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L611** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L612** `            f"Expects a layout or a tensor as input but got {type(input)=}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L613** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L614** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L615** `    def _thrfrg_A(` — **EN:** Defines function `_thrfrg_A`. **CN:** 定义函数 `_thrfrg_A`。
+- **L616** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L617** `        input: Union[Layout, Tensor],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L618** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L619** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L620** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L621** `    ) -> Union[Layout, Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L622** `        return self._thrfrg(_cute_ir.MmaOperand.A, input, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L623** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L624** `    def _thrfrg_B(` — **EN:** Defines function `_thrfrg_B`. **CN:** 定义函数 `_thrfrg_B`。
+- **L625** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L626** `        input: Union[Layout, Tensor],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L627** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L628** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L629** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L630** `    ) -> Union[Layout, Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L631** `        return self._thrfrg(_cute_ir.MmaOperand.B, input, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L632** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L633** `    def _thrfrg_C(` — **EN:** Defines function `_thrfrg_C`. **CN:** 定义函数 `_thrfrg_C`。
+- **L634** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L635** `        input: Union[Layout, Tensor],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L636** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L637** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L638** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L639** `    ) -> Union[Layout, Tensor]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L640** `        return self._thrfrg(_cute_ir.MmaOperand.C, input, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L641** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L642** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L643** `class ThrMma(TiledMma):` — **EN:** Defines class `ThrMma` with bases TiledMma. **CN:** 定义类 `ThrMma`，其基类为 TiledMma。
+- **L644** `    """` — **EN:** Starts the docstring for the class `ThrMma`. **CN:** 开始说明 class `ThrMma` 的文档字符串。
+- **L645** `    The thread MMA class for modeling a thread-slice of a tiled MMA.` — **EN:** Continues the docstring for the class `ThrMma`. **CN:** 继续说明 class `ThrMma` 的文档字符串。
+- **L646** `    """` — **EN:** Ends the docstring for the class `ThrMma`. **CN:** 结束说明 class `ThrMma` 的文档字符串。
+- **L647** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L648** `    def __init__(self, op: Op, trait: Trait, thr_idx: Union[int, Int32]) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L649** `        super().__init__(op, trait)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L650** `        self._thr_idx = thr_idx` — **EN:** Assigns a value to self._thr_idx. **CN:** 将一个值赋给 self._thr_idx。
+- **L651** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L652** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> "ThrMma":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L653** `        return self.__class__(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L654** `            self.op, new_from_mlir_values(self._trait, values), self.thr_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L655** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L657** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L658** `    def thr_idx(self) -> Union[int, Int32]:` — **EN:** Defines function `thr_idx`. **CN:** 定义函数 `thr_idx`。
+- **L659** `        return self._thr_idx` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L660** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L661** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L662** `    def partition_A(` — **EN:** Defines function `partition_A`. **CN:** 定义函数 `partition_A`。
+- **L663** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L664** `        input_mk: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L665** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L666** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L667** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L668** `    ) -> Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L669** `        thr_idx = _pack_coord(self.thr_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to thr_idx. **CN:** 将一个值赋给 thr_idx。
+- **L670** `        return _cute_ir.tiled_mma_partition(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L671** `            _cute_ir.MmaOperand.A,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L672** `            self._trait.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L673** `            input_mk.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L674** `            thr_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L675** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L676** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L677** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L680** `    def partition_B(` — **EN:** Defines function `partition_B`. **CN:** 定义函数 `partition_B`。
+- **L681** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L682** `        input_nk: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L683** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L684** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L685** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L686** `    ) -> Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L687** `        thr_idx = _pack_coord(self.thr_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to thr_idx. **CN:** 将一个值赋给 thr_idx。
+- **L688** `        return _cute_ir.tiled_mma_partition(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L689** `            _cute_ir.MmaOperand.B,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L690** `            self._trait.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L691** `            input_nk.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L692** `            thr_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L693** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L694** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L695** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L696** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L697** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L698** `    def partition_C(` — **EN:** Defines function `partition_C`. **CN:** 定义函数 `partition_C`。
+- **L699** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L700** `        input_mn: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L701** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L702** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L703** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L704** `    ) -> Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L705** `        thr_idx = _pack_coord(self.thr_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to thr_idx. **CN:** 将一个值赋给 thr_idx。
+- **L706** `        return _cute_ir.tiled_mma_partition(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L707** `            _cute_ir.MmaOperand.C,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L708** `            self._trait.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L709** `            input_mn.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L710** `            thr_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L711** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L712** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L713** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L714** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L715** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L716** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L717** `def make_mma_atom(` — **EN:** Defines function `make_mma_atom`. **CN:** 定义函数 `make_mma_atom`。
+- **L718** `    op: MmaOp,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L719** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L720** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L721** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L722** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L723** `) -> MmaAtom:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L724** `    """` — **EN:** Starts the docstring for the function `make_mma_atom`. **CN:** 开始说明 function `make_mma_atom` 的文档字符串。
+- **L725** `    Makes an MMA Atom from an MMA Operation.` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L726** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L727** `    This function creates an MMA Atom from a given MMA Operation. Arbitrary kw arguments can be` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L728** `    provided for Op-specific additional parameters. They are not used as of today.` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L729** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L730** `    :param op: The MMA Operation to construct an Atom for` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L731** `    :type op:  MmaOp` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L732** `    :return:   The MMA Atom` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L733** `    :rtype:    MmaAtom` — **EN:** Continues the docstring for the function `make_mma_atom`. **CN:** 继续说明 function `make_mma_atom` 的文档字符串。
+- **L734** `    """` — **EN:** Ends the docstring for the function `make_mma_atom`. **CN:** 结束说明 function `make_mma_atom` 的文档字符串。
+- **L735** `    trait = op._make_trait(loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to trait. **CN:** 将一个值赋给 trait。
+- **L736** `    return MmaAtom(op, trait)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L737** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L738** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L739** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L740** `def make_tiled_mma(` — **EN:** Defines function `make_tiled_mma`. **CN:** 定义函数 `make_tiled_mma`。
+- **L741** `    op_or_atom: Union[Op, MmaAtom],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L742** `    atom_layout_mnk: Any = (1, 1, 1),` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L743** `    permutation_mnk: Any = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L744** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L745** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L746** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L747** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L748** `) -> TiledMma:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L749** `    """` — **EN:** Starts the docstring for the function `make_tiled_mma`. **CN:** 开始说明 function `make_tiled_mma` 的文档字符串。
+- **L750** `    Makes a tiled MMA from an MMA Operation or an MMA Atom.` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L751** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L752** `    :param op_or_atom:      The MMA Operation or Atom` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L753** `    :type op_or_atom:       Union[Op, MmaAtom]` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L754** `    :param atom_layout_mnk: A Layout describing the tiling of Atom across threads` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L755** `    :type atom_layout_mnk:  Layout` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L756** `    :param permutation_mnk: A permutation Tiler describing the tiling of Atom across values including any permutation of such tiling` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L757** `    :type permutation_mnk:  Tiler` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L758** `    :return:                The resulting tiled MMA` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L759** `    :rtype:                 TiledMma` — **EN:** Continues the docstring for the function `make_tiled_mma`. **CN:** 继续说明 function `make_tiled_mma` 的文档字符串。
+- **L760** `    """` — **EN:** Ends the docstring for the function `make_tiled_mma`. **CN:** 结束说明 function `make_tiled_mma` 的文档字符串。
+- **L761** `    if isinstance(op_or_atom, Op):` — **EN:** Starts a conditional branch guarded by `isinstance(op_or_atom, Op)`. **CN:** 开始一个由 `isinstance(op_or_atom, Op)` 控制的条件分支。
+- **L762** `        op = op_or_atom` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L763** `        atom = make_mma_atom(op_or_atom, loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to atom. **CN:** 将一个值赋给 atom。
+- **L764** `    elif isinstance(op_or_atom, MmaAtom):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L765** `        op = op_or_atom.op` — **EN:** Assigns a value to op. **CN:** 将一个值赋给 op。
+- **L766** `        atom = op_or_atom` — **EN:** Assigns a value to atom. **CN:** 将一个值赋给 atom。
+- **L767** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L768** `        raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L769** `            f"expected an MMA Op or Atom, but got an instance of {type(op_or_atom)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L770** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L771** `    if isinstance(atom_layout_mnk, tuple):` — **EN:** Starts a conditional branch guarded by `isinstance(atom_layout_mnk, tuple)`. **CN:** 开始一个由 `isinstance(atom_layout_mnk, tuple)` 控制的条件分支。
+- **L772** `        atom_layout_mnk = make_layout(atom_layout_mnk, loc=loc, ip=ip)` — **EN:** Assigns a value to atom_layout_mnk. **CN:** 将一个值赋给 atom_layout_mnk。
+- **L773** `    if rank(atom_layout_mnk) != 3:` — **EN:** Starts a conditional branch guarded by `rank(atom_layout_mnk) != 3`. **CN:** 开始一个由 `rank(atom_layout_mnk) != 3` 控制的条件分支。
+- **L774** `        raise ValueError(f"expects rank-3 MNK atom layout, but got {atom_layout_mnk}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L775** `    permutation_mnk_ty = None` — **EN:** Assigns a value to permutation_mnk_ty. **CN:** 将一个值赋给 permutation_mnk_ty。
+- **L776** `    if permutation_mnk is not None:` — **EN:** Starts a conditional branch guarded by `permutation_mnk is not None`. **CN:** 开始一个由 `permutation_mnk is not None` 控制的条件分支。
+- **L777** `        permutation_mnk_ty = _pack_tile(permutation_mnk, loc=loc, ip=ip).type` — **EN:** Assigns a value to permutation_mnk_ty. **CN:** 将一个值赋给 permutation_mnk_ty。
+- **L778** `    ty = _cute_nvgpu_ir.TiledMmaType.get(` — **EN:** Assigns a value to ty. **CN:** 将一个值赋给 ty。
+- **L779** `        atom._trait.value.type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L780** `        atom_layout_mnk.type,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L781** `        permutation_mnk_ty,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L782** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L783** `    val = _cute_ir.make_tiled_mma(ty, atom._trait.value, loc=loc, ip=ip)` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L784** `    # Instead of modifying atom which might have been provided by the user, create a brand new` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L785** `    # trait instance and replace the Atom ir.Value with the tiled one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L786** `    trait = new_from_mlir_values(atom._trait, [val])` — **EN:** Assigns a value to trait. **CN:** 将一个值赋给 trait。
+- **L787** `    return TiledMma(op, trait)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L788** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L789** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L790** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L791** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L792** `# Copy Atoms, TiledCopy, and ThrCopy` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L793** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L794** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L795** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L796** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L797** `class CopyAtom(Atom):` — **EN:** Defines class `CopyAtom` with bases Atom. **CN:** 定义类 `CopyAtom`，其基类为 Atom。
+- **L798** `    """` — **EN:** Starts the docstring for the class `CopyAtom`. **CN:** 开始说明 class `CopyAtom` 的文档字符串。
+- **L799** `    The Copy Atom class.` — **EN:** Continues the docstring for the class `CopyAtom`. **CN:** 继续说明 class `CopyAtom` 的文档字符串。
+- **L800** `    """` — **EN:** Ends the docstring for the class `CopyAtom`. **CN:** 结束说明 class `CopyAtom` 的文档字符串。
+- **L801** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L802** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L803** `        res = "Copy Atom\n"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L804** `        res += "  ThrID:         " + str(self.thr_id) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L805** `        res += "  TV Layout Src: " + str(self.layout_src_tv) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L806** `        res += "  TV Layout Dst: " + str(self.layout_dst_tv) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L807** `        res += "  Value type:    " + str(self._trait.value.type.value_type)` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L808** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L809** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L810** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L811** `    # Properties` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L812** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L813** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L814** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L815** `    def value_type(self) -> Type[Numeric]:` — **EN:** Defines function `value_type`. **CN:** 定义函数 `value_type`。
+- **L816** `        return Numeric.from_mlir_type(self._trait.value.type.value_type)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L817** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L818** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L819** `    def thr_id(self) -> Layout:` — **EN:** Defines function `thr_id`. **CN:** 定义函数 `thr_id`。
+- **L820** `        return static(self._trait.value.type.thr_id)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L821** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L822** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L823** `    def layout_src_tv(self) -> Layout:` — **EN:** Defines function `layout_src_tv`. **CN:** 定义函数 `layout_src_tv`。
+- **L824** `        return static(self._trait.value.type.layout_src_tv)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L825** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L826** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L827** `    def layout_dst_tv(self) -> Layout:` — **EN:** Defines function `layout_dst_tv`. **CN:** 定义函数 `layout_dst_tv`。
+- **L828** `        return static(self._trait.value.type.layout_dst_tv)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L829** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L830** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L831** `class TiledCopy(CopyAtom):` — **EN:** Defines class `TiledCopy` with bases CopyAtom. **CN:** 定义类 `TiledCopy`，其基类为 CopyAtom。
+- **L832** `    """` — **EN:** Starts the docstring for the class `TiledCopy`. **CN:** 开始说明 class `TiledCopy` 的文档字符串。
+- **L833** `    The tiled Copy class.` — **EN:** Continues the docstring for the class `TiledCopy`. **CN:** 继续说明 class `TiledCopy` 的文档字符串。
+- **L834** `    """` — **EN:** Ends the docstring for the class `TiledCopy`. **CN:** 结束说明 class `TiledCopy` 的文档字符串。
+- **L835** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L836** `    def __str__(self) -> str:` — **EN:** Defines function `__str__`. **CN:** 定义函数 `__str__`。
+- **L837** `        res = "Tiled Copy\n"` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L838** `        res += "  Tiler MN:        " + pretty_str(self.tiler_mn) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L839** `        res += "  TV Layout tiled: " + str(self.layout_tv_tiled) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L840** `        res += "Copy Atom\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L841** `        res += "  ThrID:           " + str(self.thr_id) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L842** `        res += "  TV Layout Src:   " + str(self.layout_src_tv) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L843** `        res += "  TV Layout Dst:   " + str(self.layout_dst_tv) + "\n"` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L844** `        res += "  Value type:      " + str(self._trait.value.type.value_type)` — **EN:** Updates res in place. **CN:** 原地更新 res。
+- **L845** `        return res` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L846** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L847** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L848** `    # Properties` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L849** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L850** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L851** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L852** `    def layout_tv_tiled(self) -> Layout:` — **EN:** Defines function `layout_tv_tiled`. **CN:** 定义函数 `layout_tv_tiled`。
+- **L853** `        return static(self._trait.value.type.layout_tv_tiled)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L854** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L855** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L856** `    def tiler_mn(self) -> Tile:` — **EN:** Defines function `tiler_mn`. **CN:** 定义函数 `tiler_mn`。
+- **L857** `        return _unpack_x_tuple(self._trait.value.type.tiler_mn)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L858** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L859** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L860** `    def layout_src_tv_tiled(self) -> Layout:` — **EN:** Defines function `layout_src_tv_tiled`. **CN:** 定义函数 `layout_src_tv_tiled`。
+- **L861** `        return static(self._trait.value.type.layout_src_tv_tiled)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L862** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L863** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L864** `    def layout_dst_tv_tiled(self) -> Layout:` — **EN:** Defines function `layout_dst_tv_tiled`. **CN:** 定义函数 `layout_dst_tv_tiled`。
+- **L865** `        return static(self._trait.value.type.layout_dst_tv_tiled)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L866** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L867** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L868** `    def size(self) -> int:` — **EN:** Defines function `size`. **CN:** 定义函数 `size`。
+- **L869** `        return self._trait.value.type.size` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L870** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L871** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L872** `    # get_slice and retile` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L873** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L874** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L875** `    def get_slice(self, thr_idx: Union[int, Int32]) -> "ThrCopy":` — **EN:** Defines function `get_slice`. **CN:** 定义函数 `get_slice`。
+- **L876** `        return ThrCopy(self.op, self._trait, thr_idx)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L877** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L878** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L879** `    def retile(` — **EN:** Defines function `retile`. **CN:** 定义函数 `retile`。
+- **L880** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L881** `        src: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L882** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L883** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L884** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L885** `    ) -> Any:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L886** `        return _cute_ir.tiled_copy_retile(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L887** `            tiled_copy=self._trait.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L888** `            input=src.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L889** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L890** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L891** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L892** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L893** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L894** `class ThrCopy(TiledCopy):` — **EN:** Defines class `ThrCopy` with bases TiledCopy. **CN:** 定义类 `ThrCopy`，其基类为 TiledCopy。
+- **L895** `    """` — **EN:** Starts the docstring for the class `ThrCopy`. **CN:** 开始说明 class `ThrCopy` 的文档字符串。
+- **L896** `    The thread Copy class for modeling a thread-slice of a tiled Copy.` — **EN:** Continues the docstring for the class `ThrCopy`. **CN:** 继续说明 class `ThrCopy` 的文档字符串。
+- **L897** `    """` — **EN:** Ends the docstring for the class `ThrCopy`. **CN:** 结束说明 class `ThrCopy` 的文档字符串。
+- **L898** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L899** `    def __init__(self, op: Op, trait: Trait, thr_idx: Union[int, Int32]) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L900** `        super().__init__(op, trait)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L901** `        self._thr_idx = thr_idx` — **EN:** Assigns a value to self._thr_idx. **CN:** 将一个值赋给 self._thr_idx。
+- **L902** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L903** `    def __new_from_mlir_values__(self, values: List[ir.Value]) -> "ThrCopy":` — **EN:** Defines function `__new_from_mlir_values__`. **CN:** 定义函数 `__new_from_mlir_values__`。
+- **L904** `        return self.__class__(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L905** `            self.op, new_from_mlir_values(self._trait, values), self.thr_idx` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L906** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L907** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L908** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L909** `    def thr_idx(self) -> Union[int, Int32]:` — **EN:** Defines function `thr_idx`. **CN:** 定义函数 `thr_idx`。
+- **L910** `        return self._thr_idx` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L911** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L912** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L913** `    def partition_S(` — **EN:** Defines function `partition_S`. **CN:** 定义函数 `partition_S`。
+- **L914** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L915** `        src: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L916** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L917** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L918** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L919** `    ) -> Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L920** `        thr_idx = _pack_coord(self.thr_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to thr_idx. **CN:** 将一个值赋给 thr_idx。
+- **L921** `        return _cute_ir.tiled_copy_partition_S(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L922** `            self._trait.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L923** `            src.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L924** `            thr_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L925** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L926** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L927** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L928** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L929** `    @dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L930** `    def partition_D(` — **EN:** Defines function `partition_D`. **CN:** 定义函数 `partition_D`。
+- **L931** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L932** `        dst: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L933** `        *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L934** `        loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L935** `        ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L936** `    ) -> Tensor:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L937** `        thr_idx = _pack_coord(self.thr_idx, loc=loc, ip=ip)` — **EN:** Assigns a value to thr_idx. **CN:** 将一个值赋给 thr_idx。
+- **L938** `        return _cute_ir.tiled_copy_partition_D(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L939** `            self._trait.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L940** `            dst.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L941** `            thr_idx,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L942** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L943** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L944** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L945** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L946** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L947** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L948** `def make_copy_atom(` — **EN:** Defines function `make_copy_atom`. **CN:** 定义函数 `make_copy_atom`。
+- **L949** `    op: CopyOp,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L950** `    copy_internal_type: Type[Numeric],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L951** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L952** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L953** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L954** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L955** `) -> CopyAtom:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L956** `    """` — **EN:** Starts the docstring for the function `make_copy_atom`. **CN:** 开始说明 function `make_copy_atom` 的文档字符串。
+- **L957** `    Makes a Copy Atom from a Copy Operation.` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L958** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L959** `    This function creates a Copy Atom from a given Copy Operation. Arbitrary kw arguments can be` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L960** `    provided for Op-specific additional parameters.` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L961** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L962** `    Example:` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L963** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L964** `    .. code-block:: python` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L965** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L966** `        op = cute.nvgpu.CopyUniversalOp()` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L967** `        atom = cute.make_copy_atom(op, tensor_dtype, num_bits_per_copy=64)` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L968** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L969** `    :param op:                 The Copy Operation to construct an Atom for` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L970** `    :type op:                  CopyOp` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L971** `    :param copy_internal_type: An internal data type used to construct the source/destination layouts in unit of tensor elements` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L972** `    :type copy_internal_type:  Type[Numeric]` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L973** `    :return:                   The Copy Atom` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L974** `    :rtype:                    CopyAtom` — **EN:** Continues the docstring for the function `make_copy_atom`. **CN:** 继续说明 function `make_copy_atom` 的文档字符串。
+- **L975** `    """` — **EN:** Ends the docstring for the function `make_copy_atom`. **CN:** 结束说明 function `make_copy_atom` 的文档字符串。
+- **L976** `    trait = op._make_trait(copy_internal_type, loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to trait. **CN:** 将一个值赋给 trait。
+- **L977** `    return CopyAtom(op, trait)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L978** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L979** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L980** `def _make_tiled_copy(` — **EN:** Defines function `_make_tiled_copy`. **CN:** 定义函数 `_make_tiled_copy`。
+- **L981** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L982** `    layout_tv: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L983** `    tiler_mn: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L984** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L985** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L986** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L987** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L988** `    if type(tiler_mn) is tuple:` — **EN:** Starts a conditional branch guarded by `type(tiler_mn) is tuple`. **CN:** 开始一个由 `type(tiler_mn) is tuple` 控制的条件分支。
+- **L989** `        tiler_mn = _pack_tile(tiler_mn, loc=loc, ip=ip)` — **EN:** Assigns a value to tiler_mn. **CN:** 将一个值赋给 tiler_mn。
+- **L990** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L991** `    assert isinstance(tiler_mn, ir.Value) and _cute_ir.TileType.isinstance(` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L992** `        tiler_mn.type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L993** `    ), f"tiler_mn must be a Tile, but got {type(tiler_mn)}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L994** `    assert is_static(layout_tv.type) and is_static(tiler_mn.type), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L995** `        "layout tv and tiler mn must be static"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L996** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L997** `    tiled_copy_ty = _cute_nvgpu_ir.TiledCopyType.get(` — **EN:** Assigns a value to tiled_copy_ty. **CN:** 将一个值赋给 tiled_copy_ty。
+- **L998** `        atom.type, layout_tv.type, tiler_mn.type` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L999** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1000** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1001** `    val = _cute_ir.make_tiled_copy(tiled_copy_ty, atom._trait.value, loc=loc, ip=ip)` — **EN:** Assigns a value to val. **CN:** 将一个值赋给 val。
+- **L1002** `    # Instead of modifying atom which might have been provided by the user, create a brand new` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1003** `    # trait instance and replace the Atom ir.Value with the tiled one` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1004** `    trait = new_from_mlir_values(atom._trait, [val])` — **EN:** Assigns a value to trait. **CN:** 将一个值赋给 trait。
+- **L1005** `    return TiledCopy(atom.op, trait)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1006** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1007** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1008** `def make_tiled_copy(` — **EN:** Defines function `make_tiled_copy`. **CN:** 定义函数 `make_tiled_copy`。
+- **L1009** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1010** `    layout_tv: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1011** `    tiler_mn: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1012** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1013** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1014** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1015** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1016** `    """Create a tiled type given a TV partitioner and tiler.` — **EN:** Starts the docstring for the function `make_tiled_copy`. **CN:** 开始说明 function `make_tiled_copy` 的文档字符串。
+- **L1017** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1018** `    :param atom: Copy atom, e.g. smit_copy and simt_async_copy, tma_load, etc.` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1019** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1020** `    :param layout_tv: Thread-value layout` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1021** `    :type layout_tv: Layout` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1022** `    :param tiler_mn: Tile size` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1023** `    :type tiler_mn: Tiler` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1024** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1025** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1026** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1027** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1028** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1029** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1030** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy`. **CN:** 继续说明 function `make_tiled_copy` 的文档字符串。
+- **L1031** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy`. **CN:** 结束说明 function `make_tiled_copy` 的文档字符串。
+- **L1032** `    return _make_tiled_copy(atom, layout_tv, tiler_mn, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1033** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1034** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1035** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1036** `def make_tiled_copy_tv(` — **EN:** Defines function `make_tiled_copy_tv`. **CN:** 定义函数 `make_tiled_copy_tv`。
+- **L1037** `    atom: CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1038** `    thr_layout: Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1039** `    val_layout: Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1040** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1041** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1042** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1043** `) -> TiledCopy:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1044** `    """Create a tiled copy given separate thread and value layouts.` — **EN:** Starts the docstring for the function `make_tiled_copy_tv`. **CN:** 开始说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1045** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1046** `    A TV partitioner is inferred based on the input layouts. The input thread layout` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1047** `    must be compact.` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1048** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1049** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1050** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1051** `    :param thr_layout: Layout mapping from \`\`(TileM,TileN)\`\` coordinates to thread IDs (must be compact)` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1052** `    :type thr_layout: Layout` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1053** `    :param val_layout: Layout mapping from \`\`(ValueM,ValueN)\`\` coordinates to value IDs` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1054** `    :type val_layout: Layout` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1055** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1056** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1057** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1058** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1059** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1060** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1061** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_tv`. **CN:** 继续说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1062** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_tv`. **CN:** 结束说明 function `make_tiled_copy_tv` 的文档字符串。
+- **L1063** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1064** `    tiler_mn, layout_tv = make_layout_tv(thr_layout, val_layout, loc=loc, ip=ip)` — **EN:** Assigns a value to (tiler_mn, layout_tv). **CN:** 将一个值赋给 (tiler_mn, layout_tv)。
+- **L1065** `    tiler_mn = _pack_tile(product_each(tiler_mn, loc=loc, ip=ip), loc=loc, ip=ip)` — **EN:** Assigns a value to tiler_mn. **CN:** 将一个值赋给 tiler_mn。
+- **L1066** `    return _make_tiled_copy(atom, layout_tv, tiler_mn, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1067** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1068** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1069** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1070** `def make_cotiled_copy(` — **EN:** Defines function `make_cotiled_copy`. **CN:** 定义函数 `make_cotiled_copy`。
+- **L1071** `    atom: CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1072** `    atom_layout_tv: Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1073** `    data_layout: Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1074** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1075** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1076** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1077** `) -> TiledCopy:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1078** `    """` — **EN:** Starts the docstring for the function `make_cotiled_copy`. **CN:** 开始说明 function `make_cotiled_copy` 的文档字符串。
+- **L1079** `    Produce a TiledCopy from thread and value offset maps.` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1080** `    The TV Layout maps threads and values to the codomain of the data_layout.` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1081** `    It is verified that the intended codomain is valid within data_layout.` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1082** `    Useful when threads and values don't care about owning specific coordinates, but` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1083** `    care more about the vector-width and offsets between them.` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1084** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1085** `    Parameters` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1086** `    ----------` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1087** `    atom : copy atom, e.g. simt_copy and simt_async_copy, tgen05.st, etc.` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1088** `    atom_layout_tv : (tid, vid) -> data addr` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1089** `    data_layout : data coord -> data addr` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1090** `    loc     : source location for mlir (optional)` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1091** `    ip      : insertion point (optional)` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1092** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1093** `    Returns` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1094** `    -------` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1095** `    tiled_copy` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1096** `            A tuple of A tiled copy and atom` — **EN:** Continues the docstring for the function `make_cotiled_copy`. **CN:** 继续说明 function `make_cotiled_copy` 的文档字符串。
+- **L1097** `    """` — **EN:** Ends the docstring for the function `make_cotiled_copy`. **CN:** 结束说明 function `make_cotiled_copy` 的文档字符串。
+- **L1098** `    assert is_static(atom_layout_tv.type) and is_static(data_layout.type), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1099** `        "atom_layout_tv and data_layout must be static"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1100** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1101** `    # data addr -> data coord` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1102** `    inv_layout_ = left_inverse(data_layout, loc=loc, ip=ip)` — **EN:** Assigns a value to inv_layout_. **CN:** 将一个值赋给 inv_layout_。
+- **L1103** `    inv_data_layout = make_layout(` — **EN:** Assigns a value to inv_data_layout. **CN:** 将一个值赋给 inv_data_layout。
+- **L1104** `        (inv_layout_.shape, (1)), stride=(inv_layout_.stride, (0)), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1105** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1106** `    # (tid,vid) -> data_coord` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1107** `    layout_tv_data = composition(inv_data_layout, atom_layout_tv, loc=loc, ip=ip)` — **EN:** Assigns a value to layout_tv_data. **CN:** 将一个值赋给 layout_tv_data。
+- **L1108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1109** `    # check validity` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1110** `    atom_layout_v_to_check = coalesce(` — **EN:** Assigns a value to atom_layout_v_to_check. **CN:** 将一个值赋给 atom_layout_v_to_check。
+- **L1111** `        make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1112** `            atom_layout_tv.shape[1],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1113** `            stride=atom_layout_tv.stride[1],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1114** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1115** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1116** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1117** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1118** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1119** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1120** `    data_layout_v_to_check = coalesce(` — **EN:** Assigns a value to data_layout_v_to_check. **CN:** 将一个值赋给 data_layout_v_to_check。
+- **L1121** `        composition(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1122** `            data_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1123** `            make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1124** `                layout_tv_data.shape[1], stride=layout_tv_data.stride[1], loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1125** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1126** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1127** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1128** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1129** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1130** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1131** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1132** `    assert data_layout_v_to_check == atom_layout_v_to_check, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L1133** `        "the memory pointed to by atom_layout_tv does not exist in the data_layout."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1134** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1136** `    flat_data_shape = product_each(data_layout.shape, loc=loc, ip=ip)` — **EN:** Assigns a value to flat_data_shape. **CN:** 将一个值赋给 flat_data_shape。
+- **L1137** `    tiler = tuple(` — **EN:** Assigns a value to tiler. **CN:** 将一个值赋给 tiler。
+- **L1138** `        filter(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1139** `            composition(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1140** `                make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1141** `                    flat_data_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1142** `                    stride=tuple(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1143** `                        0 if j != i else 1 for j in range(rank(flat_data_shape))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1144** `                    ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1145** `                    loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1146** `                    ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1147** `                ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1148** `                layout_tv_data,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1149** `                loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1150** `                ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1151** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1152** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1153** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1154** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1155** `        for i in range(rank(flat_data_shape))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1156** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1157** `    # tile_coord -> data_coord` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1158** `    tile2data = composition(` — **EN:** Assigns a value to tile2data. **CN:** 将一个值赋给 tile2data。
+- **L1159** `        make_layout(flat_data_shape, loc=loc, ip=ip), tiler, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1160** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1161** `    # (tid,vid) -> tile_coord` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1162** `    layout_tv = composition(` — **EN:** Assigns a value to layout_tv. **CN:** 将一个值赋给 layout_tv。
+- **L1163** `        left_inverse(tile2data, loc=loc, ip=ip), layout_tv_data, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1164** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1165** `    return _make_tiled_copy(atom, layout_tv, tiler, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1166** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1168** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1169** `def make_tiled_copy_A(` — **EN:** Defines function `make_tiled_copy_A`. **CN:** 定义函数 `make_tiled_copy_A`。
+- **L1170** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1171** `    tiled_mma: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1172** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1173** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1174** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1175** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1176** `    """Create a tiled copy out of the copy_atom that matches the A-Layout of tiled_mma.` — **EN:** Starts the docstring for the function `make_tiled_copy_A`. **CN:** 开始说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1178** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1179** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1180** `    :param tiled_mma: Tiled MMA` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1181** `    :type tiled_mma: TiledMma` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1182** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1183** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1184** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1185** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1187** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1188** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_A`. **CN:** 继续说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1189** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_A`. **CN:** 结束说明 function `make_tiled_copy_A` 的文档字符串。
+- **L1190** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1191** `    return _make_tiled_copy(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1192** `        atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1193** `        tiled_mma.tv_layout_A_tiled,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1194** `        (tiled_mma.get_tile_size(0), tiled_mma.get_tile_size(2)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1195** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1196** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1197** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1200** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1201** `def make_tiled_copy_B(` — **EN:** Defines function `make_tiled_copy_B`. **CN:** 定义函数 `make_tiled_copy_B`。
+- **L1202** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1203** `    tiled_mma: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1204** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1205** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1206** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1207** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1208** `    """Create a tiled copy out of the copy_atom that matches the B-Layout of tiled_mma.` — **EN:** Starts the docstring for the function `make_tiled_copy_B`. **CN:** 开始说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1210** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1211** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1212** `    :param tiled_mma: Tiled MMA` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1213** `    :type tiled_mma: TiledMma` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1214** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1215** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1216** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1217** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1219** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1220** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_B`. **CN:** 继续说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1221** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_B`. **CN:** 结束说明 function `make_tiled_copy_B` 的文档字符串。
+- **L1222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1223** `    return _make_tiled_copy(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1224** `        atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1225** `        tiled_mma.tv_layout_B_tiled,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1226** `        (tiled_mma.get_tile_size(1), tiled_mma.get_tile_size(2)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1227** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1228** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1229** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1230** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1231** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1232** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1233** `def make_tiled_copy_C(` — **EN:** Defines function `make_tiled_copy_C`. **CN:** 定义函数 `make_tiled_copy_C`。
+- **L1234** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1235** `    tiled_mma: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1236** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1237** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1238** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1239** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1240** `    """Create a tiled copy out of the copy_atom that matches the C-Layout of tiled_mma.` — **EN:** Starts the docstring for the function `make_tiled_copy_C`. **CN:** 开始说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1242** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1243** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1244** `    :param tiled_mma: Tiled MMA` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1245** `    :type tiled_mma: TiledMma` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1246** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1247** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1248** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1249** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1251** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1252** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_C`. **CN:** 继续说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1253** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_C`. **CN:** 结束说明 function `make_tiled_copy_C` 的文档字符串。
+- **L1254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1255** `    return _make_tiled_copy(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1256** `        atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1257** `        tiled_mma.tv_layout_C_tiled,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1258** `        (tiled_mma.get_tile_size(0), tiled_mma.get_tile_size(1)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1259** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1260** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1261** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1264** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1265** `def make_tiled_copy_S(` — **EN:** Defines function `make_tiled_copy_S`. **CN:** 定义函数 `make_tiled_copy_S`。
+- **L1266** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1267** `    tiled_copy: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1268** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1269** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1270** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1271** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1272** `    """Create a tiled copy out of the copy_atom that matches the Src-Layout of tiled_copy.` — **EN:** Starts the docstring for the function `make_tiled_copy_S`. **CN:** 开始说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1274** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1275** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1276** `    :param tiled_copy: Tiled copy` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1277** `    :type tiled_copy: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1278** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1279** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1280** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1281** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1283** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1284** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_S`. **CN:** 继续说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1285** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_S`. **CN:** 结束说明 function `make_tiled_copy_S` 的文档字符串。
+- **L1286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1287** `    return _make_tiled_copy(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1288** `        atom, tiled_copy.layout_src_tv_tiled, tiled_copy.tiler_mn, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1289** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1290** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1292** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1293** `def make_tiled_copy_D(` — **EN:** Defines function `make_tiled_copy_D`. **CN:** 定义函数 `make_tiled_copy_D`。
+- **L1294** `    atom: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1295** `    tiled_copy: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1296** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1297** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1298** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1299** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1300** `    """Create a tiled copy out of the copy_atom that matches the Dst-Layout of tiled_copy.` — **EN:** Starts the docstring for the function `make_tiled_copy_D`. **CN:** 开始说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1301** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1302** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1303** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1304** `    :param tiled_copy: Tiled copy` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1305** `    :type tiled_copy: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1306** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1307** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1308** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1309** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1310** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1311** `    :return: A tiled copy for the partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1312** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_D`. **CN:** 继续说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1313** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_D`. **CN:** 结束说明 function `make_tiled_copy_D` 的文档字符串。
+- **L1314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1315** `    return _make_tiled_copy(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1316** `        atom, tiled_copy.layout_dst_tv_tiled, tiled_copy.tiler_mn, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1317** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1320** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1321** `def make_tiled_copy_C_atom(` — **EN:** Defines function `make_tiled_copy_C_atom`. **CN:** 定义函数 `make_tiled_copy_C_atom`。
+- **L1322** `    atom: CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1323** `    mma: TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1324** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1325** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1326** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1327** `) -> "TiledCopy":` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1328** `    """Create the smallest tiled copy that can retile LayoutC_TV for use with pipelined epilogues with subtiled stores.` — **EN:** Starts the docstring for the function `make_tiled_copy_C_atom`. **CN:** 开始说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1330** `    :param atom: Copy atom` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1331** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1332** `    :param mma: Tiled MMA` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1333** `    :type mma: TiledMma` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1334** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1335** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1336** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1337** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1338** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1339** `    :return: A tiled copy for partitioner` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1340** `    :rtype: TiledCopy` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1341** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1342** `    :raises ValueError: If the number value of CopyAtom's source layout is greater than the size of TiledMma's LayoutC_TV` — **EN:** Continues the docstring for the function `make_tiled_copy_C_atom`. **CN:** 继续说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1343** `    """` — **EN:** Ends the docstring for the function `make_tiled_copy_C_atom`. **CN:** 结束说明 function `make_tiled_copy_C_atom` 的文档字符串。
+- **L1344** `    # Truncate the V-layout to just the Copy_Atom, keep the V-order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1345** `    layoutC_tv = mma.tv_layout_C_tiled` — **EN:** Assigns a value to layoutC_tv. **CN:** 将一个值赋给 layoutC_tv。
+- **L1346** `    val_layout_src = atom.layout_src_tv` — **EN:** Assigns a value to val_layout_src. **CN:** 将一个值赋给 val_layout_src。
+- **L1347** `    num_val_src = size(val_layout_src, mode=[1], loc=loc, ip=ip)` — **EN:** Assigns a value to num_val_src. **CN:** 将一个值赋给 num_val_src。
+- **L1348** `    num_val_layoutC_tv = size(layoutC_tv, mode=[1], loc=loc, ip=ip)` — **EN:** Assigns a value to num_val_layoutC_tv. **CN:** 将一个值赋给 num_val_layoutC_tv。
+- **L1349** `    if num_val_src > num_val_layoutC_tv:` — **EN:** Starts a conditional branch guarded by `num_val_src > num_val_layoutC_tv`. **CN:** 开始一个由 `num_val_src > num_val_layoutC_tv` 控制的条件分支。
+- **L1350** `        raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1351** `            f"The number value of CopyAtom's source layout {num_val_src} "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1352** `            f"is greater than the size of TiledMma's LayoutC_TV {num_val_layoutC_tv}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1353** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1354** `    layout_TV = composition(` — **EN:** Assigns a value to layout_TV. **CN:** 将一个值赋给 layout_TV。
+- **L1355** `        layoutC_tv,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1356** `        make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1357** `            (size(layoutC_tv, mode=[0], loc=loc, ip=ip), num_val_src), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1358** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1359** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1360** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1361** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1363** `    # Recompute tiler and restride the TV layout for the new tiler` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1365** `    # Tiler -- Find the active elements in the MMA tensor and generate a tiler to extract them` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1366** `    # Convert to the awkward by-mode tiler to preserve the modes of the tiled MMA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1367** `    mma_tiler = (mma.get_tile_size(0), mma.get_tile_size(1))` — **EN:** Assigns a value to mma_tiler. **CN:** 将一个值赋给 mma_tiler。
+- **L1368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1369** `    tiler_0 = filter(` — **EN:** Assigns a value to tiler_0. **CN:** 将一个值赋给 tiler_0。
+- **L1370** `        composition(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1371** `            make_layout(mma_tiler, stride=(1, 0), loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1372** `            layout_TV,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1373** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1374** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1375** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1376** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1377** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1378** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1379** `    tiler_1 = filter(` — **EN:** Assigns a value to tiler_1. **CN:** 将一个值赋给 tiler_1。
+- **L1380** `        composition(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1381** `            make_layout(mma_tiler, stride=(0, 1), loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1382** `            layout_TV,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1383** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1384** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1385** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1386** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1387** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1388** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1389** `    tiler = (tiler_0, tiler_1)` — **EN:** Assigns a value to tiler. **CN:** 将一个值赋给 tiler。
+- **L1390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1391** `    tile2mma = composition(` — **EN:** Assigns a value to tile2mma. **CN:** 将一个值赋给 tile2mma。
+- **L1392** `        make_layout(mma_tiler, loc=loc, ip=ip), tiler, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1393** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1394** `    layout_tv = composition(` — **EN:** Assigns a value to layout_tv. **CN:** 将一个值赋给 layout_tv。
+- **L1395** `        left_inverse(tile2mma, loc=loc, ip=ip), layout_TV, loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1396** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1398** `    tiler_mn = _pack_tile(tiler, loc=loc, ip=ip)` — **EN:** Assigns a value to tiler_mn. **CN:** 将一个值赋给 tiler_mn。
+- **L1399** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1400** `    return _make_tiled_copy(atom, layout_tv, tiler_mn, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1401** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1403** `def _normalize_variadic_tensor_operand(` — **EN:** Defines function `_normalize_variadic_tensor_operand`. **CN:** 定义函数 `_normalize_variadic_tensor_operand`。
+- **L1404** `    x: Union["Tensor", List["Tensor"], Tuple["Tensor", ...]], name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1405** `) -> List["Tensor"]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1406** `    """Normalize a Tensor or sequence of Tensors to a list of Tensors.` — **EN:** Starts the docstring for the function `_normalize_variadic_tensor_operand`. **CN:** 开始说明 function `_normalize_variadic_tensor_operand` 的文档字符串。
+- **L1407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1408** `    Helper function for operations with variadic operands.` — **EN:** Continues the docstring for the function `_normalize_variadic_tensor_operand`. **CN:** 继续说明 function `_normalize_variadic_tensor_operand` 的文档字符串。
+- **L1409** `    """` — **EN:** Ends the docstring for the function `_normalize_variadic_tensor_operand`. **CN:** 结束说明 function `_normalize_variadic_tensor_operand` 的文档字符串。
+- **L1410** `    if isinstance(x, Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(x, Tensor)`. **CN:** 开始一个由 `isinstance(x, Tensor)` 控制的条件分支。
+- **L1411** `        return [x]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1412** `    if isinstance(x, (list, tuple)):` — **EN:** Starts a conditional branch guarded by `isinstance(x, (list, tuple))`. **CN:** 开始一个由 `isinstance(x, (list, tuple))` 控制的条件分支。
+- **L1413** `        if len(x) == 0:` — **EN:** Starts a conditional branch guarded by `len(x) == 0`. **CN:** 开始一个由 `len(x) == 0` 控制的条件分支。
+- **L1414** `            raise ValueError(f"\`{name}\` must contain at least one Tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1415** `        if not all(isinstance(t, Tensor) for t in x):` — **EN:** Starts a conditional branch guarded by `not all((isinstance(t, Tensor) for t in x))`. **CN:** 开始一个由 `not all((isinstance(t, Tensor) for t in x))` 控制的条件分支。
+- **L1416** `            raise TypeError(f"All elements of \`{name}\` must be Tensor")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1417** `        return list(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1418** `    raise TypeError(f"\`{name}\` must be a Tensor or a sequence of Tensors")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1419** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1421** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1422** `def copy_atom_call(` — **EN:** Defines function `copy_atom_call`. **CN:** 定义函数 `copy_atom_call`。
+- **L1423** `    atom: CopyAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1424** `    src: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1425** `    dst: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1426** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1427** `    pred: Optional[Tensor] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1428** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1429** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1430** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1431** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1432** `    """` — **EN:** Starts the docstring for the function `copy_atom_call`. **CN:** 开始说明 function `copy_atom_call` 的文档字符串。
+- **L1433** `    Execute a single copy atom operation.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1435** `    The copy_atom_call operation executes a copy atom with the given operands.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1436** `    Source and destination tensors have layout profile \`\`(V)\`\`.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1438** `    The \`\`V-mode\`\` represents either:` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1440** `    - A singular mode directly consumable by the provided Copy Atom` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1441** `    - A composite mode requiring recursive decomposition, structured as \`\`(V, Rest...)\`\`,` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1442** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1443** `    For src/dst layout like \`\`(V, Rest...)\`\`, the layout profile of \`\`pred\`\` must match \`\`(Rest...)\`\`.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1445** `        - Certain Atoms may require additional operation-specific keyword arguments.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1446** `        - Current implementation limits \`\`V-mode\`\` rank to 2 or less. Support for higher ranks is planned` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1447** `          for future releases.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1448** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1449** `    Both \`\`src\`\` and \`\`dst\`\` operands are variadic, containing a variable number of tensors:` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1450** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1451** `    - For regular copy, \`\`src\`\` and \`\`dst\`\` each contain a single tensor.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1452** `    - For copy with auxiliary operands, they contain the main tensor followed by` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1453** `      auxiliary tensors. For example:` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1455** `      - For static load from tensor memory, \`\`dst\`\` = [data, stat].` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1456** `      - For TMA gather4, \`\`src\`\` = [coord0, coord1, coord2, coord3] (four 2D coordinate tensors).` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1457** `      - For TMA scatter4, \`\`dst\`\` = [coord0, coord1, coord2, coord3] (four 2D coordinate tensors).` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1459** `    :param atom: Copy atom specifying the transfer operation` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1460** `    :type atom: CopyAtom` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1461** `    :param src: Source tensor(s) with layout profile \`\`(V)\`\`. Can be a single Tensor` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1462** `        or a list/tuple of Tensors for operations with auxiliary source operands.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1463** `    :type src: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1464** `    :param dst: Destination tensor(s) with layout profile \`\`(V)\`\`. Can be a single Tensor` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1465** `        or a list/tuple of Tensors for operations with auxiliary destination operands.` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1466** `    :type dst: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1467** `    :param pred: Optional predication tensor for conditional transfers, defaults to None` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1468** `    :type pred: Optional[Tensor], optional` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1469** `    :param loc: Source location information, defaults to None` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1470** `    :type loc: Any, optional` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1471** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1472** `    :type ip: Any, optional` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1473** `    :param kwargs: Additional copy atom specific arguments` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1474** `    :type kwargs: Dict[str, Any]` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1475** `    :raises TypeError: If source and destination element type bit widths differ` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1476** `    :return: None` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1477** `    :rtype: None` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1479** `    **Examples**:` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1480** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1481** `    .. code-block:: python` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1482** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1483** `        # Regular copy atom operation` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1484** `        cute.copy_atom_call(copy_atom, src, dst)` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1486** `        # Predicated copy atom operation` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1487** `        cute.copy_atom_call(copy_atom, src, dst, pred=pred)` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1489** `        # Static load from tensor memory: load with row-wise reduction (MAX, MIN, MAXABS, MINABS)` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1490** `        cute.copy_atom_call(loadtm_stat_atom, src, [data, stat])` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1491** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1492** `        # TMA gather4: combine four 2D coordinate tensors into single destination` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1493** `        cute.copy_atom_call(tma_gather4_atom, [coord0, coord1, coord2, coord3], dst)` — **EN:** Continues the docstring for the function `copy_atom_call`. **CN:** 继续说明 function `copy_atom_call` 的文档字符串。
+- **L1494** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1495** `    """` — **EN:** Ends the docstring for the function `copy_atom_call`. **CN:** 结束说明 function `copy_atom_call` 的文档字符串。
+- **L1496** `    # Normalize src/dst to lists for variadic IR operands, while keeping old API working.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1497** `    src_list = _normalize_variadic_tensor_operand(src, "src")` — **EN:** Assigns a value to src_list. **CN:** 将一个值赋给 src_list。
+- **L1498** `    dst_list = _normalize_variadic_tensor_operand(dst, "dst")` — **EN:** Assigns a value to dst_list. **CN:** 将一个值赋给 dst_list。
+- **L1499** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1500** `    # Validate first src/dst for element type width check.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1501** `    if isinstance(src_list[0].type, _cute_ir.MemRefType) and isinstance(  # type: ignore[attr-defined]` — **EN:** Starts a conditional branch guarded by `isinstance(src_list[0].type, _cute_ir.MemRefType) and isi...`. **CN:** 开始一个由 `isinstance(src_list[0].type, _cute_ir.MemRefType) and isi...` 控制的条件分支。
+- **L1502** `        dst_list[0].type,  # type: ignore[attr-defined]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1503** `        _cute_ir.MemRefType,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1504** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1505** `        if (` — **EN:** Starts a conditional branch guarded by `len(dst_list) == 1 and src_list[0].element_type.width != ...`. **CN:** 开始一个由 `len(dst_list) == 1 and src_list[0].element_type.width != ...` 控制的条件分支。
+- **L1506** `            len(dst_list) == 1` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1507** `            and src_list[0].element_type.width != dst_list[0].element_type.width  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1508** `        ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1509** `            raise TypeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1510** `                "\`copy_atom_call\` currently only supports equal source and destination "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1511** `                "element type bit width"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1512** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1513** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1514** `    if rank(src_list[0], mode=[0]) > 2 or rank(dst_list[0], mode=[0]) > 2:` — **EN:** Starts a conditional branch guarded by `rank(src_list[0], mode=[0]) > 2 or rank(dst_list[0], mode...`. **CN:** 开始一个由 `rank(src_list[0], mode=[0]) > 2 or rank(dst_list[0], mode...` 控制的条件分支。
+- **L1515** `        raise NotImplementedError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L1516** `            "V-mode (mode-0) with rank > 2 is not supported yet, "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1517** `            f"but got rank(src, mode=[0]) = {rank(src_list[0], mode=[0])} and rank(dst, mode=[0]) = {rank(dst_list[0], mode=[0])}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1518** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1519** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1520** `    value = atom._unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L1521** `    if isinstance(pred, Tensor):` — **EN:** Starts a conditional branch guarded by `isinstance(pred, Tensor)`. **CN:** 开始一个由 `isinstance(pred, Tensor)` 控制的条件分支。
+- **L1522** `        pred = pred.value` — **EN:** Assigns a value to pred. **CN:** 将一个值赋给 pred。
+- **L1523** `    src_vals = [t.value for t in src_list]` — **EN:** Assigns a value to src_vals. **CN:** 将一个值赋给 src_vals。
+- **L1524** `    dst_vals = [t.value for t in dst_list]` — **EN:** Assigns a value to dst_vals. **CN:** 将一个值赋给 dst_vals。
+- **L1525** `    return _cute_ir.copy_atom_call(value, src_vals, dst_vals, pred=pred, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1527** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1528** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L1529** `def mma_atom_call(` — **EN:** Defines function `mma_atom_call`. **CN:** 定义函数 `mma_atom_call`。
+- **L1530** `    atom: MmaAtom,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1531** `    d: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1532** `    a: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1533** `    b: Union[Tensor, List[Tensor], Tuple[Tensor, ...]],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1534** `    c: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1535** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1536** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1537** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1538** `    **kwargs: Any,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L1539** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L1540** `    """` — **EN:** Starts the docstring for the function `mma_atom_call`. **CN:** 开始说明 function `mma_atom_call` 的文档字符串。
+- **L1541** `    Execute a single MMA atom operation.` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1542** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1543** `    The mma_atom_call operation executes an MMA atom with the given operands.` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1544** `    This performs a matrix multiplication and accumulation operation:` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1545** `    D = A * B + C` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1546** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1547** `    Note: The tensors 'd', 'a', 'b', and 'c' must only have a single fragment.` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1548** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1549** `    The operands \`a\` and \`b\` are variadic, each containing a variable number of tensors:` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1550** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1551** `    - For regular MMA, \`a\` and \`b\` contain the MMA A and B tensors respectively.` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1552** `    - For MMA with auxiliary operands, \`a\` and \`b\` contain the MMA A and B tensors followed by` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1553** `      their respective auxiliary tensors. For example:` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1554** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1555** `      - For BlockScaledMMA, \`a\` = [A, SFA] and \`b\` = [B, SFB].` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1556** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1557** `    :param atom: The MMA atom to execute` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1558** `    :type atom: MmaAtom` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1559** `    :param d: Destination tensor (output accumulator)` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1560** `    :type d: Tensor` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1561** `    :param a: A tensor or list of tensors containing the MMA A tensor and optional auxiliary tensors` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1562** `    :type a: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1563** `    :param b: B tensor or list of tensors containing the MMA B tensor and optional auxiliary tensors` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1564** `    :type b: Union[Tensor, List[Tensor], Tuple[Tensor, ...]]` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1565** `    :param c: Input accumulator tensor` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1566** `    :type c: Tensor` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1567** `    :param loc: Source location for MLIR, defaults to None` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1568** `    :type loc: Optional[Location], optional` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1569** `    :param ip: Insertion point, defaults to None` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1570** `    :type ip: Optional[InsertionPoint], optional` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1571** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1572** `    Examples:` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1573** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1574** `    .. code-block:: python` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1575** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1576** `        # Regular MMA atom call` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1577** `        cute.mma_atom_call(mma_atom, d_tensor, a_tensor, b_tensor, c_tensor)` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1578** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1579** `        # Block-scaled MMA atom call` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1580** `        cute.mma_atom_call(mma_atom, d_tensor, [a_tensor, sfa_tensor],` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1581** `                          [b_tensor, sfb_tensor], c_tensor)` — **EN:** Continues the docstring for the function `mma_atom_call`. **CN:** 继续说明 function `mma_atom_call` 的文档字符串。
+- **L1582** `    """` — **EN:** Ends the docstring for the function `mma_atom_call`. **CN:** 结束说明 function `mma_atom_call` 的文档字符串。
+- **L1583** `    # Normalize A/B to lists for variadic IR operands, while keeping old API working.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L1584** `    a_list = _normalize_variadic_tensor_operand(a, "a")` — **EN:** Assigns a value to a_list. **CN:** 将一个值赋给 a_list。
+- **L1585** `    b_list = _normalize_variadic_tensor_operand(b, "b")` — **EN:** Assigns a value to b_list. **CN:** 将一个值赋给 b_list。
+- **L1586** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L1587** `    value = atom._unpack(loc=loc, ip=ip, **kwargs)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L1588** `    a_vals = [t.value for t in a_list]` — **EN:** Assigns a value to a_vals. **CN:** 将一个值赋给 a_vals。
+- **L1589** `    b_vals = [t.value for t in b_list]` — **EN:** Assigns a value to b_vals. **CN:** 将一个值赋给 b_vals。
+- **L1590** `    return _cute_ir.mma_atom_call(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L1591** `        value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1592** `        d.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1593** `        a_vals,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1594** `        b_vals,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1595** `        c.value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1596** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1597** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L1598** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.atom`. CN: 模块名为 `CuTeDSL.cutlass.cute.atom`。
+- EN: Top-level classes: Op, MmaOp, CopyOp, Trait, Atom, MmaAtom, TiledMma, ThrMma, CopyAtom, TiledCopy, ThrCopy CN: 顶层类包括：Op, MmaOp, CopyOp, Trait, Atom, MmaAtom, TiledMma, ThrMma, CopyAtom, TiledCopy, ThrCopy
+- EN: Top-level functions: make_atom, make_mma_atom, make_tiled_mma, make_copy_atom, _make_tiled_copy, make_tiled_copy, make_tiled_copy_tv, make_cotiled_copy, make_tiled_copy_A, make_tiled_copy_B, make_tiled_copy_C, make_tiled_copy_S, ... (+5 more) CN: 顶层函数包括：make_atom, make_mma_atom, make_tiled_mma, make_copy_atom, _make_tiled_copy, make_tiled_copy, make_tiled_copy_tv, make_cotiled_copy, make_tiled_copy_A, make_tiled_copy_B, make_tiled_copy_C, make_tiled_copy_S, ... (+5 more)
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .typing:Shape,Layout,Tile,Tensor,Numeric,Int32, .core:composition,coalesce,left_inverse,filter,pretty_str,is_static,make_layout,make_layout_tv,rank,size,static, .tuple:product_each, .core:_unpack_x_tuple,_pack_shape,_pack_coord,_pack_tile, .tensor:_Tensor,make_tensor, cutlass.cutlass_dsl:extract_mlir_values,new_from_mlir_values,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:cute, cutlass._mlir.dialects:cute_nvgpu CN: 内部依赖：.typing:Shape,Layout,Tile,Tensor,Numeric,Int32, .core:composition,coalesce,left_inverse,filter,pretty_str,is_static,make_layout,make_layout_tv,rank,size,static, .tuple:product_each, .core:_unpack_x_tuple,_pack_shape,_pack_coord,_pack_tile, .tensor:_Tensor,make_tensor, cutlass.cutlass_dsl:extract_mlir_values,new_from_mlir_values,dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects:cute, cutlass._mlir.dialects:cute_nvgpu
+- EN: External or standard-library dependencies: abc:ABC,ABCMeta,abstractmethod, typing:Type,Union,Optional,Any,overload,List,Tuple CN: 外部或标准库依赖：abc:ABC,ABCMeta,abstractmethod, typing:Type,Union,Optional,Any,overload,List,Tuple

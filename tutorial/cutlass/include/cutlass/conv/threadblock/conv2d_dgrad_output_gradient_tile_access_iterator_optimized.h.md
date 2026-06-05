@@ -1,0 +1,2491 @@
+# conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/threadblock/conv2d_dgrad_output_gradient_tile_access_iterator_optimized.h`
+**Purpose / 用途**: Templates implementing loading of convolution tiles mapped to GEMM A (output gradient tile). / 提供threadblock 构件、迭代器工具、数据梯度路径、2D 卷积支持。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief Templates implementing loading of convolution tiles mapped to GEMM A (output gradient tile) `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — `    matrix from memory.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `    This iterator assumes TensorNHWC layout of tensors in Global Memory.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `    The iterator is specialized for each of the three convolution operators: forward propagation (Fprop),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 38 / 第 38 行** — `    backward data gradient (Dgrad), and backward weight gradient (Wgrad). `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 39 / 第 39 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 40 / 第 40 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 43 / 第 43 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 44 / 第 44 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 45 / 第 45 行** — `#include "cutlass/array.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/array.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/array.h`。
+- **Line 46 / 第 46 行** — `#include "cutlass/coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/coord.h`。
+- **Line 47 / 第 47 行** — `#include "cutlass/matrix_shape.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/matrix_shape.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/matrix_shape.h`。
+- **Line 48 / 第 48 行** — `#include "cutlass/predicate_vector.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/predicate_vector.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/predicate_vector.h`。
+- **Line 49 / 第 49 行** — `#include "cutlass/tensor_ref.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_ref.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_ref.h`。
+- **Line 50 / 第 50 行** — `#include "cutlass/tensor_view.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_view.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_view.h`。
+- **Line 51 / 第 51 行** — `#include "cutlass/layout/pitch_linear.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/pitch_linear.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/pitch_linear.h`。
+- **Line 52 / 第 52 行** — `#include "cutlass/layout/tensor.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/tensor.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/tensor.h`。
+- **Line 53 / 第 53 行** — `#include "cutlass/layout/matrix.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/layout/matrix.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/layout/matrix.h`。
+- **Line 54 / 第 54 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 55 / 第 55 行** — `#include "cutlass/conv/conv2d_problem_size.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/conv2d_problem_size.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/conv2d_problem_size.h`。
+- **Line 56 / 第 56 行** — `#include "cutlass/conv/threadblock/conv2d_params.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/threadblock/conv2d_params.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_params.h`。
+- **Line 57 / 第 57 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 58 / 第 58 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 59 / 第 59 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 60 / 第 60 行** — `namespace cutlass {`
+  - **EN**: Opens namespace `cutlass` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass`。
+- **Line 61 / 第 61 行** — `namespace conv {`
+  - **EN**: Opens namespace `conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `conv`。
+- **Line 62 / 第 62 行** — `namespace threadblock {`
+  - **EN**: Opens namespace `threadblock` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `threadblock`。
+- **Line 63 / 第 63 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 64 / 第 64 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 65 / 第 65 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 66 / 第 66 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 67 / 第 67 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 68 / 第 68 行** — `  typename Element_,`
+  - **EN**: Adds template parameter specifier `typename Element_`.
+  - **CN**: 补充模板参数说明符 `typename Element_`。
+- **Line 69 / 第 69 行** — `  typename ThreadMap_,`
+  - **EN**: Adds template parameter specifier `typename ThreadMap_`.
+  - **CN**: 补充模板参数说明符 `typename ThreadMap_`。
+- **Line 70 / 第 70 行** — `  conv::StrideSupport StrideSupport_ = conv::StrideSupport::kUnity,`
+  - **EN**: Adds template parameter specifier `conv::StrideSupport StrideSupport_ = conv::StrideSupport::kUnity`.
+  - **CN**: 补充模板参数说明符 `conv::StrideSupport StrideSupport_ = conv::StrideSupport::kUnity`。
+- **Line 71 / 第 71 行** — `  typename AccessType_ = cutlass::AlignedArray<Element_, ThreadMap_::kElementsPerAccess>`
+  - **EN**: Adds template parameter specifier `typename AccessType_ = cutlass::AlignedArray<Element_, ThreadMap_::kElementsPerAccess>`.
+  - **CN**: 补充模板参数说明符 `typename AccessType_ = cutlass::AlignedArray<Element_, ThreadMap_::kElementsPerAccess>`。
+- **Line 72 / 第 72 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 73 / 第 73 行** — `class Conv2dDgradOutputGradientTileAccessIteratorOptimized;`
+  - **EN**: Declares class `Conv2dDgradOutputGradientTileAccessIteratorOptimized`.
+  - **CN**: 声明 class `Conv2dDgradOutputGradientTileAccessIteratorOptimized`。
+- **Line 74 / 第 74 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 75 / 第 75 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 76 / 第 76 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 77 / 第 77 行** — `// Conv2dDgradOutputGradientTileAccessIteratorOptimized strided dgrad needs special handling `
+  - **EN**: Inline comment explaining intent: `Conv2dDgradOutputGradientTileAccessIteratorOptimized strided dgrad needs special handling`.
+  - **CN**: 行内注释说明意图：`Conv2dDgradOutputGradientTileAccessIteratorOptimized strided dgrad needs special handling`。
+- **Line 78 / 第 78 行** — `// to skip MMAs (Dx = Dy * w) on invalid filter positions`
+  - **EN**: Inline comment explaining intent: `to skip MMAs (Dx = Dy * w) on invalid filter positions`.
+  - **CN**: 行内注释说明意图：`to skip MMAs (Dx = Dy * w) on invalid filter positions`。
+- **Line 79 / 第 79 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 80 / 第 80 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 81 / 第 81 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 82 / 第 82 行** — `  typename Element_,`
+  - **EN**: Adds template parameter specifier `typename Element_`.
+  - **CN**: 补充模板参数说明符 `typename Element_`。
+- **Line 83 / 第 83 行** — `  typename ThreadMap_,`
+  - **EN**: Adds template parameter specifier `typename ThreadMap_`.
+  - **CN**: 补充模板参数说明符 `typename ThreadMap_`。
+- **Line 84 / 第 84 行** — `  typename AccessType_`
+  - **EN**: Adds template parameter specifier `typename AccessType_`.
+  - **CN**: 补充模板参数说明符 `typename AccessType_`。
+- **Line 85 / 第 85 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 86 / 第 86 行** — `class Conv2dDgradOutputGradientTileAccessIteratorOptimized <`
+  - **EN**: Declares class `Conv2dDgradOutputGradientTileAccessIteratorOptimized`.
+  - **CN**: 声明 class `Conv2dDgradOutputGradientTileAccessIteratorOptimized`。
+- **Line 87 / 第 87 行** — `  Shape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 88 / 第 88 行** — `  Element_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 89 / 第 89 行** — `  ThreadMap_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 90 / 第 90 行** — `  conv::StrideSupport::kStrided,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 91 / 第 91 行** — `  AccessType_`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 92 / 第 92 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 93 / 第 93 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 94 / 第 94 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 95 / 第 95 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 96 / 第 96 行** — `  // Types`
+  - **EN**: Inline comment explaining intent: `Types`.
+  - **CN**: 行内注释说明意图：`Types`。
+- **Line 97 / 第 97 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 98 / 第 98 行** — `  using Shape = Shape_;`
+  - **EN**: Introduces type or value alias `Shape`.
+  - **CN**: 引入类型或值别名 `Shape`。
+- **Line 99 / 第 99 行** — `  using Element = Element_;`
+  - **EN**: Introduces type or value alias `Element`.
+  - **CN**: 引入类型或值别名 `Element`。
+- **Line 100 / 第 100 行** — `  using Layout = layout::TensorNHWC;`
+  - **EN**: Introduces type or value alias `Layout`.
+  - **CN**: 引入类型或值别名 `Layout`。
+- **Line 101 / 第 101 行** — `  using ThreadMap = ThreadMap_;`
+  - **EN**: Introduces type or value alias `ThreadMap`.
+  - **CN**: 引入类型或值别名 `ThreadMap`。
+- **Line 102 / 第 102 行** — `  using AccessType = AccessType_;`
+  - **EN**: Introduces type or value alias `AccessType`.
+  - **CN**: 引入类型或值别名 `AccessType`。
+- **Line 103 / 第 103 行** — `  using TensorRef = cutlass::TensorRef<Element, Layout>;`
+  - **EN**: Introduces type or value alias `TensorRef`.
+  - **CN**: 引入类型或值别名 `TensorRef`。
+- **Line 104 / 第 104 行** — `  using TensorCoord = typename Layout::TensorCoord;`
+  - **EN**: Introduces type or value alias `TensorCoord`.
+  - **CN**: 引入类型或值别名 `TensorCoord`。
+- **Line 105 / 第 105 行** — `  using Index = typename Layout::Index;`
+  - **EN**: Introduces type or value alias `Index`.
+  - **CN**: 引入类型或值别名 `Index`。
+- **Line 106 / 第 106 行** — `  using LongIndex = typename Layout::LongIndex;`
+  - **EN**: Introduces type or value alias `LongIndex`.
+  - **CN**: 引入类型或值别名 `LongIndex`。
+- **Line 107 / 第 107 行** — `  static IteratorAlgorithm const kIteratorAlgorithm = conv::IteratorAlgorithm::kOptimized;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 108 / 第 108 行** — `  static StrideSupport const kStrideSupport = conv::StrideSupport::kStrided;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 109 / 第 109 行** — `  static int const kConvDim = 2;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 110 / 第 110 行** — `  using ConvProblemSize = typename conv::Conv2dProblemSize;`
+  - **EN**: Introduces type or value alias `ConvProblemSize`.
+  - **CN**: 引入类型或值别名 `ConvProblemSize`。
+- **Line 111 / 第 111 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 112 / 第 112 行** — `  static int const kAccessesPerVector = ThreadMap::kElementsPerAccess / AccessType::kElements;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 113 / 第 113 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 114 / 第 114 行** — `  static_assert(!(ThreadMap::kElementsPerAccess % AccessType::kElements), `
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 115 / 第 115 行** — `    "Vectors implied by the thread map must be divisible by the access type.");`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 116 / 第 116 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 117 / 第 117 行** — `  using Mask = uint64_t;`
+  - **EN**: Introduces type or value alias `Mask`.
+  - **CN**: 引入类型或值别名 `Mask`。
+- **Line 118 / 第 118 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 119 / 第 119 行** — `  static_assert(sizeof_bits<Element>::value >= 8,`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 120 / 第 120 行** — `    "DGRAD requires elements of size 8b or greater.");`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 121 / 第 121 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 122 / 第 122 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 123 / 第 123 行** — `  // Simpligying assertions`
+  - **EN**: Inline comment explaining intent: `Simpligying assertions`.
+  - **CN**: 行内注释说明意图：`Simpligying assertions`。
+- **Line 124 / 第 124 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 125 / 第 125 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 126 / 第 126 行** — `  static_assert(ThreadMap::Iterations::kContiguous == 1,`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 127 / 第 127 行** — `    "Require Iterations::kContiguous == 1");`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 128 / 第 128 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 129 / 第 129 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 130 / 第 130 行** — `  // Parameters structure`
+  - **EN**: Inline comment explaining intent: `Parameters structure`.
+  - **CN**: 行内注释说明意图：`Parameters structure`。
+- **Line 131 / 第 131 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 132 / 第 132 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 133 / 第 133 行** — `  using Params = Conv2dStridedDgradOutputGradientIteratorOptimizedParams;`
+  - **EN**: Introduces type or value alias `Params`.
+  - **CN**: 引入类型或值别名 `Params`。
+- **Line 134 / 第 134 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 135 / 第 135 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 136 / 第 136 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 137 / 第 137 行** — `  Params const &params_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 138 / 第 138 行** — `  Conv2dProblemSize const &problem_size_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 139 / 第 139 行** — `  LongIndex iteration_contiguous_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 140 / 第 140 行** — `  LongIndex iteration_strided_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 141 / 第 141 行** — `  LongIndex iteration_vector_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 142 / 第 142 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 143 / 第 143 行** — `  // One pointer per access`
+  - **EN**: Inline comment explaining intent: `One pointer per access`.
+  - **CN**: 行内注释说明意图：`One pointer per access`。
+- **Line 144 / 第 144 行** — `  char const *pointer_[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 145 / 第 145 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 146 / 第 146 行** — `  int filter_k_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 147 / 第 147 行** — `  int filter_r_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 148 / 第 148 行** — `  int filter_s_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 149 / 第 149 行** — `  int start_r_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 150 / 第 150 行** — `  int start_s_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 151 / 第 151 行** — `  int64_t reset_bytes_s_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 152 / 第 152 行** — `  int64_t reset_bytes_r_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 153 / 第 153 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 154 / 第 154 行** — `  Index masks_[ThreadMap::Iterations::kStrided][kAccessesPerVector][2];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 155 / 第 155 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 156 / 第 156 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 157 / 第 157 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 158 / 第 158 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 159 / 第 159 行** — `  Conv2dDgradOutputGradientTileAccessIteratorOptimized(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 160 / 第 160 行** — `    Params const &params, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 161 / 第 161 行** — `    Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 162 / 第 162 行** — `    Element const *ptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 163 / 第 163 行** — `    int thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 164 / 第 164 行** — `    FastDivmod const &stride_h_divmod, FastDivmod const &stride_w_divmod,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 165 / 第 165 行** — `    int start_r, int start_s,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 166 / 第 166 行** — `    MatrixCoord const &threadblock_offset = MatrixCoord()     // threadblock offset - units are whole CTA tiles`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 167 / 第 167 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 168 / 第 168 行** — `    params_(params), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 169 / 第 169 行** — `    problem_size_(problem_size), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 170 / 第 170 行** — `    filter_k_(0),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 171 / 第 171 行** — `    filter_r_(start_r),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 172 / 第 172 行** — `    filter_s_(start_s),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 173 / 第 173 行** — `    start_r_(start_r),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 174 / 第 174 行** — `    start_s_(start_s) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 175 / 第 175 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 176 / 第 176 行** — `    layout::PitchLinearCoord thread_coord = ThreadMap::initial_offset(thread_idx);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 177 / 第 177 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 178 / 第 178 行** — `    filter_k_ = threadblock_offset.column() + thread_coord.contiguous();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 179 / 第 179 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 180 / 第 180 行** — `    reset_bytes_s_ = (problem_size_.num_gemm_k_filter_s(start_s_) - 1) * params_.inc_next[0];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 181 / 第 181 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 182 / 第 182 行** — `    reset_bytes_r_ = (problem_size_.num_gemm_k_filter_s(start_s_) - 1) * params_.inc_next[0] +`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 183 / 第 183 行** — `                      (problem_size_.num_gemm_k_filter_r(start_r_) - 1) * params_.inc_next[1];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 184 / 第 184 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 185 / 第 185 行** — `    int offset_n[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 186 / 第 186 行** — `    int offset_p[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 187 / 第 187 行** — `    int offset_q[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 188 / 第 188 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 189 / 第 189 行** — `    int filter_r = filter_r_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 190 / 第 190 行** — `    int filter_s = filter_s_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 191 / 第 191 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 192 / 第 192 行** — `    if (problem_size_.mode == Mode::kConvolution) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 193 / 第 193 行** — `      filter_r = (problem_size_.R - 1 - filter_r);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 194 / 第 194 行** — `      filter_s = (problem_size_.S - 1 - filter_s);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 195 / 第 195 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 196 / 第 196 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 197 / 第 197 行** — `    // Starting h, w positions for filter position in gemm_k=0`
+  - **EN**: Inline comment explaining intent: `Starting h, w positions for filter position in gemm_k=0`.
+  - **CN**: 行内注释说明意图：`Starting h, w positions for filter position in gemm_k=0`。
+- **Line 198 / 第 198 行** — `    int start_h, start_w;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 199 / 第 199 行** — `    strided_dgrad_starting_coords(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 200 / 第 200 行** — `      problem_size_, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 201 / 第 201 行** — `      stride_h_divmod, stride_w_divmod, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 202 / 第 202 行** — `      filter_r, filter_s, `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 203 / 第 203 行** — `      start_h, start_w);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 204 / 第 204 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 205 / 第 205 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 206 / 第 206 行** — `    // Effective starting P and Q for filter position required for remapping NHW rows`
+  - **EN**: Inline comment explaining intent: `Effective starting P and Q for filter position required for remapping NHW rows`.
+  - **CN**: 行内注释说明意图：`Effective starting P and Q for filter position required for remapping NHW rows`。
+- **Line 207 / 第 207 行** — `    int P = (problem_size_.H - start_h + problem_size_.stride_h - 1) / problem_size_.stride_h;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 208 / 第 208 行** — `    int Q = (problem_size_.W - start_w + problem_size_.stride_w - 1) / problem_size_.stride_w;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 209 / 第 209 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 210 / 第 210 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 211 / 第 211 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 212 / 第 212 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 213 / 第 213 行** — `      pointer_[s] = reinterpret_cast<char const *>(ptr);      `
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 214 / 第 214 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 215 / 第 215 行** — `      int offset_npq = (threadblock_offset.row() + thread_coord.strided() + s * ThreadMap::Delta::kStrided) % params_.tiled_rows_per_filter;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 216 / 第 216 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 217 / 第 217 行** — `      // (STEP 1) [reorder NHW rows to start with same filter positions]`
+  - **EN**: Inline comment explaining intent: `(STEP 1) [reorder NHW rows to start with same filter positions]`.
+  - **CN**: 行内注释说明意图：`(STEP 1) [reorder NHW rows to start with same filter positions]`。
+- **Line 218 / 第 218 行** — `      offset_n[s] = offset_npq / (P * Q);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 219 / 第 219 行** — `      int residual = offset_npq % (P * Q);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 220 / 第 220 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 221 / 第 221 行** — `      int p = (residual / Q);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 222 / 第 222 行** — `      int q = (residual % Q);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 223 / 第 223 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 224 / 第 224 行** — `      int mapped_h = (start_h + p * problem_size_.stride_h);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 225 / 第 225 行** — `      int mapped_w = (start_w + q * problem_size_.stride_w);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 226 / 第 226 行** — `      `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 227 / 第 227 行** — `      // Access (p, q) coordinates for Dy tensor for filter position in gemm_k=0`
+  - **EN**: Inline comment explaining intent: `Access (p, q) coordinates for Dy tensor for filter position in gemm_k=0`.
+  - **CN**: 行内注释说明意图：`Access (p, q) coordinates for Dy tensor for filter position in gemm_k=0`。
+- **Line 228 / 第 228 行** — `      // note that (h + pad_h - filter_r) and (w + pad_w - filter_s) are ensured to be `
+  - **EN**: Inline comment explaining intent: `note that (h + pad_h - filter_r) and (w + pad_w - filter_s) are ensured to be`.
+  - **CN**: 行内注释说明意图：`note that (h + pad_h - filter_r) and (w + pad_w - filter_s) are ensured to be`。
+- **Line 229 / 第 229 行** — `      // divisible by stride_h and stride_w`
+  - **EN**: Inline comment explaining intent: `divisible by stride_h and stride_w`.
+  - **CN**: 行内注释说明意图：`divisible by stride_h and stride_w`。
+- **Line 230 / 第 230 行** — `      offset_p[s] = (mapped_h + problem_size_.pad_h - filter_r) / problem_size_.stride_h;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 231 / 第 231 行** — `      offset_q[s] = (mapped_w + problem_size_.pad_w - filter_s) / problem_size_.stride_w;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 232 / 第 232 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 233 / 第 233 行** — `      // Initialize pointers for gemm_k=0`
+  - **EN**: Inline comment explaining intent: `Initialize pointers for gemm_k=0`.
+  - **CN**: 行内注释说明意图：`Initialize pointers for gemm_k=0`。
+- **Line 234 / 第 234 行** — `      TensorCoord coord{offset_n[s], offset_p[s], offset_q[s], filter_k_};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 235 / 第 235 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 236 / 第 236 行** — `      pointer_[s] += params_.layout(coord) * sizeof_bits<Element>::value / 8;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 237 / 第 237 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 238 / 第 238 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 239 / 第 239 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 240 / 第 240 行** — `    // Precompute mask predicates`
+  - **EN**: Inline comment explaining intent: `Precompute mask predicates`.
+  - **CN**: 行内注释说明意图：`Precompute mask predicates`。
+- **Line 241 / 第 241 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 242 / 第 242 行** — `    clear_mask();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 243 / 第 243 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 244 / 第 244 行** — `    CUTLASS_PRAGMA_NO_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 245 / 第 245 行** — `    for (int r = start_r; r < problem_size_.R; r += problem_size_.stride_h) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 246 / 第 246 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 247 / 第 247 行** — `      for (int s_idx = 0; s_idx < ThreadMap::Iterations::kStrided; ++s_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 248 / 第 248 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 249 / 第 249 行** — `        int p = offset_p[s_idx] ;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 250 / 第 250 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 251 / 第 251 行** — `        p += (params_.conv_sign * (r / problem_size_.stride_h));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 252 / 第 252 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 253 / 第 253 行** — `        bool pred = (offset_n[s_idx] < problem_size_.N && p >= 0 && p < problem_size_.P);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 254 / 第 254 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 255 / 第 255 行** — `        CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 256 / 第 256 行** — `        for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 257 / 第 257 行** — `          masks_[s_idx][v_idx][0] |= (pred << r);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 258 / 第 258 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 259 / 第 259 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 260 / 第 260 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 261 / 第 261 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 262 / 第 262 行** — `    CUTLASS_PRAGMA_NO_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 263 / 第 263 行** — `    for(int s = start_s; s < problem_size_.S; s += problem_size_.stride_w) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 264 / 第 264 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 265 / 第 265 行** — `      for (int s_idx = 0; s_idx < ThreadMap::Iterations::kStrided; ++s_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 266 / 第 266 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 267 / 第 267 行** — `        int q = offset_q[s_idx];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 268 / 第 268 行** — `        q += (params_.conv_sign * (s / problem_size_.stride_w));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 269 / 第 269 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 270 / 第 270 行** — `        bool pred = (q >=0 && q < problem_size_.Q);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 271 / 第 271 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 272 / 第 272 行** — `        CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 273 / 第 273 行** — `        for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 274 / 第 274 行** — `          masks_[s_idx][v_idx][1] |= (pred << s);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 275 / 第 275 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 276 / 第 276 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 277 / 第 277 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 278 / 第 278 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 279 / 第 279 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 280 / 第 280 行** — `    for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 281 / 第 281 行** — `      clear_mask(v_idx, (filter_k_ + v_idx * AccessType::kElements) >= problem_size.K);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 282 / 第 282 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 283 / 第 283 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 284 / 第 284 行** — `    set_iteration_index(0);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 285 / 第 285 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 286 / 第 286 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 287 / 第 287 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 288 / 第 288 行** — `  static Params getParams(Conv2dProblemSize const &problem_size, Layout const &layout) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 289 / 第 289 行** — `    return Params(problem_size, `
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 290 / 第 290 行** — `                  layout,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 291 / 第 291 行** — `                  sizeof_bits<Element>::value,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 292 / 第 292 行** — `                  {Shape::kRow, Shape::kColumn});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 293 / 第 293 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 294 / 第 294 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 295 / 第 295 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 296 / 第 296 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 297 / 第 297 行** — `  /// Adds a pointer offset in units of element`
+  - **EN**: Inline comment explaining intent: `Adds a pointer offset in units of element`.
+  - **CN**: 行内注释说明意图：`Adds a pointer offset in units of element`。
+- **Line 298 / 第 298 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 299 / 第 299 行** — `  void add_byte_offset_(LongIndex byte_offset, LongIndex byte_reset = 0) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 300 / 第 300 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 301 / 第 301 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 302 / 第 302 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 303 / 第 303 行** — `      pointer_[s] += byte_offset - byte_reset;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 304 / 第 304 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 305 / 第 305 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 306 / 第 306 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 307 / 第 307 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 308 / 第 308 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 309 / 第 309 行** — `  /// Overrides the internal iteration index`
+  - **EN**: Inline comment explaining intent: `Overrides the internal iteration index`.
+  - **CN**: 行内注释说明意图：`Overrides the internal iteration index`。
+- **Line 310 / 第 310 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 311 / 第 311 行** — `  void set_iteration_index(Index index) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 312 / 第 312 行** — `    iteration_vector_ = index % kAccessesPerVector;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 313 / 第 313 行** — `    int residual_access = index / kAccessesPerVector;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 314 / 第 314 行** — `    iteration_contiguous_ = residual_access % ThreadMap::Iterations::kContiguous;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 315 / 第 315 行** — `    iteration_strided_ = residual_access / ThreadMap::Iterations::kContiguous;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 316 / 第 316 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 317 / 第 317 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 318 / 第 318 行** — `  /// Adds a pointer offset in units of Element`
+  - **EN**: Inline comment explaining intent: `Adds a pointer offset in units of Element`.
+  - **CN**: 行内注释说明意图：`Adds a pointer offset in units of Element`。
+- **Line 319 / 第 319 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 320 / 第 320 行** — `  void add_pointer_offset(LongIndex pointer_offset) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 321 / 第 321 行** — `    add_byte_offset_(pointer_offset * sizeof_bits<Element>::value / 8);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 322 / 第 322 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 323 / 第 323 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 324 / 第 324 行** — `  CUTLASS_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 325 / 第 325 行** — `  void advance() {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 326 / 第 326 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 327 / 第 327 行** — `    int next_idx = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 328 / 第 328 行** — `    int64_t reset_bytes = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 329 / 第 329 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 330 / 第 330 行** — `    // Move filter_s by stride_w`
+  - **EN**: Inline comment explaining intent: `Move filter_s by stride_w`.
+  - **CN**: 行内注释说明意图：`Move filter_s by stride_w`。
+- **Line 331 / 第 331 行** — `    filter_s_ +=  problem_size_.stride_w;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 332 / 第 332 行** — `    if (filter_s_ >= problem_size_.S) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 333 / 第 333 行** — `      `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 334 / 第 334 行** — `      // Restore filter_s`
+  - **EN**: Inline comment explaining intent: `Restore filter_s`.
+  - **CN**: 行内注释说明意图：`Restore filter_s`。
+- **Line 335 / 第 335 行** — `      filter_s_ = start_s_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 336 / 第 336 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 337 / 第 337 行** — `      // Move filter_r by stride_h`
+  - **EN**: Inline comment explaining intent: `Move filter_r by stride_h`.
+  - **CN**: 行内注释说明意图：`Move filter_r by stride_h`。
+- **Line 338 / 第 338 行** — `      filter_r_ += problem_size_.stride_h;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 339 / 第 339 行** — `#if 0`
+  - **EN**: Starts a preprocessor conditional block.
+  - **CN**: 开始一个预处理条件块。
+- **Line 340 / 第 340 行** — `      if (filter_r_ < problem_size_.R) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 341 / 第 341 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 342 / 第 342 行** — `        next_idx = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 343 / 第 343 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 344 / 第 344 行** — `        // Restore bytes in q coordinate (Mma in filter s dimension)`
+  - **EN**: Inline comment explaining intent: `Restore bytes in q coordinate (Mma in filter s dimension)`.
+  - **CN**: 行内注释说明意图：`Restore bytes in q coordinate (Mma in filter s dimension)`。
+- **Line 345 / 第 345 行** — `        reset_bytes = reset_bytes_s_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 346 / 第 346 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 347 / 第 347 行** — `      } else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 348 / 第 348 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 349 / 第 349 行** — `        // Restore filter_r`
+  - **EN**: Inline comment explaining intent: `Restore filter_r`.
+  - **CN**: 行内注释说明意图：`Restore filter_r`。
+- **Line 350 / 第 350 行** — `        filter_r_ = start_r_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 351 / 第 351 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 352 / 第 352 行** — `        next_idx = 2;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 353 / 第 353 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 354 / 第 354 行** — `        // Restore bytes in p and q coordinate (Mma in filter s and r dimension)`
+  - **EN**: Inline comment explaining intent: `Restore bytes in p and q coordinate (Mma in filter s and r dimension)`.
+  - **CN**: 行内注释说明意图：`Restore bytes in p and q coordinate (Mma in filter s and r dimension)`。
+- **Line 355 / 第 355 行** — `        reset_bytes = reset_bytes_r_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 356 / 第 356 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 357 / 第 357 行** — `#else`
+  - **EN**: Begins the fallback branch of the current preprocessor condition.
+  - **CN**: 开始当前预处理条件的回退分支。
+- **Line 358 / 第 358 行** — `      asm volatile(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 359 / 第 359 行** — `          "{\n\t"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 360 / 第 360 行** — `          " .reg .pred %%p;\n\t"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 361 / 第 361 行** — `          " setp.lt.s32 %%p, %3, %4;\n\t"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 362 / 第 362 行** — `          " selp.s32 %0, %3, %5, %%p;\n\t"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 363 / 第 363 行** — `          " selp.s32 %1, 1, 2, %%p;\n\t"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 364 / 第 364 行** — `          " selp.s64 %2, %6, %7, %%p;\n\t"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 365 / 第 365 行** — `          "}\n"`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 366 / 第 366 行** — `          : "=r"(filter_r_), "=r"(next_idx), "=l"(reset_bytes)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 367 / 第 367 行** — `          : "r"(filter_r_), "r"(problem_size_.R), "r"(start_r_),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 368 / 第 368 行** — `            "l"(reset_bytes_s_), "l"(reset_bytes_r_));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 369 / 第 369 行** — `#endif`
+  - **EN**: Ends the current preprocessor conditional block.
+  - **CN**: 结束当前预处理条件块。
+- **Line 370 / 第 370 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 371 / 第 371 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 372 / 第 372 行** — `    // offset pointers by offset_bytes`
+  - **EN**: Inline comment explaining intent: `offset pointers by offset_bytes`.
+  - **CN**: 行内注释说明意图：`offset pointers by offset_bytes`。
+- **Line 373 / 第 373 行** — `    add_byte_offset_(params_.inc_next[next_idx] - reset_bytes);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 374 / 第 374 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 375 / 第 375 行** — `    if (next_idx == 2) {  `
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 376 / 第 376 行** — `      filter_k_ += params_.filter_k_delta;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 377 / 第 377 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 378 / 第 378 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 379 / 第 379 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 380 / 第 380 行** — `    for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 381 / 第 381 行** — `      clear_mask(v_idx, (filter_k_ + v_idx * AccessType::kElements) >= problem_size_.K);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 382 / 第 382 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 383 / 第 383 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 384 / 第 384 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 385 / 第 385 行** — `  /// Clears the predicates`
+  - **EN**: Inline comment explaining intent: `Clears the predicates`.
+  - **CN**: 行内注释说明意图：`Clears the predicates`。
+- **Line 386 / 第 386 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 387 / 第 387 行** — `  void clear_mask(bool clear = true) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 388 / 第 388 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 389 / 第 389 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 390 / 第 390 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 391 / 第 391 行** — `      for (int v = 0; v < kAccessesPerVector; ++v) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 392 / 第 392 行** — `        masks_[s][v][0] = clear ? Mask(0) : masks_[s][v][0];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 393 / 第 393 行** — `        masks_[s][v][1] = clear ? Mask(0) : masks_[s][v][1];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 394 / 第 394 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 395 / 第 395 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 396 / 第 396 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 397 / 第 397 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 398 / 第 398 行** — `  /// Clears the predicates`
+  - **EN**: Inline comment explaining intent: `Clears the predicates`.
+  - **CN**: 行内注释说明意图：`Clears the predicates`。
+- **Line 399 / 第 399 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 400 / 第 400 行** — `  void clear_mask(int v, bool clear = true) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 401 / 第 401 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 402 / 第 402 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 403 / 第 403 行** — `      masks_[s][v][0] = clear ? Mask(0) : masks_[s][v][0];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 404 / 第 404 行** — `      masks_[s][v][1] = clear ? Mask(0) : masks_[s][v][1];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 405 / 第 405 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 406 / 第 406 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 407 / 第 407 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 408 / 第 408 行** — `  /// Returns true if the current coordinate is within the output tensor Dy`
+  - **EN**: Inline comment explaining intent: `Returns true if the current coordinate is within the output tensor Dy`.
+  - **CN**: 行内注释说明意图：`Returns true if the current coordinate is within the output tensor Dy`。
+- **Line 409 / 第 409 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 410 / 第 410 行** — `  bool valid() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 411 / 第 411 行** — `    return `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 412 / 第 412 行** — `      (masks_[iteration_strided_][iteration_vector_][0] & (Index(1) << filter_r_)) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 413 / 第 413 行** — `      (masks_[iteration_strided_][iteration_vector_][1] & (Index(1) << filter_s_));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 414 / 第 414 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 415 / 第 415 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 416 / 第 416 行** — `  /// Returns a pointer to the vector starting at the current coordinate`
+  - **EN**: Inline comment explaining intent: `Returns a pointer to the vector starting at the current coordinate`.
+  - **CN**: 行内注释说明意图：`Returns a pointer to the vector starting at the current coordinate`。
+- **Line 417 / 第 417 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 418 / 第 418 行** — `  AccessType const *get() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 419 / 第 419 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 420 / 第 420 行** — `    return reinterpret_cast<AccessType const *>(pointer_[iteration_strided_]) + iteration_vector_;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 421 / 第 421 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 422 / 第 422 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 423 / 第 423 行** — `  /// Increments to the next memory access`
+  - **EN**: Inline comment explaining intent: `Increments to the next memory access`.
+  - **CN**: 行内注释说明意图：`Increments to the next memory access`。
+- **Line 424 / 第 424 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 425 / 第 425 行** — `  Conv2dDgradOutputGradientTileAccessIteratorOptimized &operator++() {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 426 / 第 426 行** — `    ++iteration_vector_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 427 / 第 427 行** — `    if (iteration_vector_ < kAccessesPerVector) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 428 / 第 428 行** — `      return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 429 / 第 429 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 430 / 第 430 行** — `    iteration_vector_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 431 / 第 431 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 432 / 第 432 行** — `    ++iteration_contiguous_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 433 / 第 433 行** — `    if (iteration_contiguous_ < ThreadMap::Iterations::kContiguous) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 434 / 第 434 行** — `      return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 435 / 第 435 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 436 / 第 436 行** — `    iteration_contiguous_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 437 / 第 437 行** — `    ++iteration_strided_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 438 / 第 438 行** — `    if (iteration_strided_ < ThreadMap::Iterations::kStrided) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 439 / 第 439 行** — `      return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 440 / 第 440 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 441 / 第 441 行** — `    iteration_strided_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 442 / 第 442 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 443 / 第 443 行** — `    return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 444 / 第 444 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 445 / 第 445 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 446 / 第 446 行** — `  /// Determines whether the Implicit GEMM can execute the given problem.`
+  - **EN**: Inline comment explaining intent: `Determines whether the Implicit GEMM can execute the given problem.`.
+  - **CN**: 行内注释说明意图：`Determines whether the Implicit GEMM can execute the given problem.`。
+- **Line 447 / 第 447 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 448 / 第 448 行** — `  static Status can_implement(Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 449 / 第 449 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 450 / 第 450 行** — `    // check alignment constraint on iterator's contiguous dimension`
+  - **EN**: Inline comment explaining intent: `check alignment constraint on iterator's contiguous dimension`.
+  - **CN**: 行内注释说明意图：`check alignment constraint on iterator's contiguous dimension`。
+- **Line 451 / 第 451 行** — `    if (problem_size.K % AccessType::kElements) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 452 / 第 452 行** — `      return Status::kErrorInvalidProblem;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 453 / 第 453 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 454 / 第 454 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 455 / 第 455 行** — `    // Limit on filter size`
+  - **EN**: Inline comment explaining intent: `Limit on filter size`.
+  - **CN**: 行内注释说明意图：`Limit on filter size`。
+- **Line 456 / 第 456 行** — `    if (problem_size.R > 32 || problem_size.S > 32) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 457 / 第 457 行** — `      return Status::kErrorNotSupported;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 458 / 第 458 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 459 / 第 459 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 460 / 第 460 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 461 / 第 461 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 462 / 第 462 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 463 / 第 463 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 464 / 第 464 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 465 / 第 465 行** — `// Conv2dDgradOutputGradientTileAccessIteratorOptimized unity stride dgrad is optimized for dgrad`
+  - **EN**: Inline comment explaining intent: `Conv2dDgradOutputGradientTileAccessIteratorOptimized unity stride dgrad is optimized for dgrad`.
+  - **CN**: 行内注释说明意图：`Conv2dDgradOutputGradientTileAccessIteratorOptimized unity stride dgrad is optimized for dgrad`。
+- **Line 466 / 第 466 行** — `// with problem stride = {1x1}`
+  - **EN**: Inline comment explaining intent: `with problem stride = {1x1}`.
+  - **CN**: 行内注释说明意图：`with problem stride = {1x1}`。
+- **Line 467 / 第 467 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 468 / 第 468 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 469 / 第 469 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 470 / 第 470 行** — `  typename Shape_,`
+  - **EN**: Adds template parameter specifier `typename Shape_`.
+  - **CN**: 补充模板参数说明符 `typename Shape_`。
+- **Line 471 / 第 471 行** — `  typename Element_,`
+  - **EN**: Adds template parameter specifier `typename Element_`.
+  - **CN**: 补充模板参数说明符 `typename Element_`。
+- **Line 472 / 第 472 行** — `  typename ThreadMap_,`
+  - **EN**: Adds template parameter specifier `typename ThreadMap_`.
+  - **CN**: 补充模板参数说明符 `typename ThreadMap_`。
+- **Line 473 / 第 473 行** — `  typename AccessType_`
+  - **EN**: Adds template parameter specifier `typename AccessType_`.
+  - **CN**: 补充模板参数说明符 `typename AccessType_`。
+- **Line 474 / 第 474 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 475 / 第 475 行** — `class Conv2dDgradOutputGradientTileAccessIteratorOptimized <`
+  - **EN**: Declares class `Conv2dDgradOutputGradientTileAccessIteratorOptimized`.
+  - **CN**: 声明 class `Conv2dDgradOutputGradientTileAccessIteratorOptimized`。
+- **Line 476 / 第 476 行** — `  Shape_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 477 / 第 477 行** — `  Element_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 478 / 第 478 行** — `  ThreadMap_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 479 / 第 479 行** — `  conv::StrideSupport::kUnity,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 480 / 第 480 行** — `  AccessType_`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 481 / 第 481 行** — `> {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 482 / 第 482 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 483 / 第 483 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 484 / 第 484 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 485 / 第 485 行** — `  // Types`
+  - **EN**: Inline comment explaining intent: `Types`.
+  - **CN**: 行内注释说明意图：`Types`。
+- **Line 486 / 第 486 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 487 / 第 487 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 488 / 第 488 行** — `  using Shape = Shape_;`
+  - **EN**: Introduces type or value alias `Shape`.
+  - **CN**: 引入类型或值别名 `Shape`。
+- **Line 489 / 第 489 行** — `  using Element = Element_;`
+  - **EN**: Introduces type or value alias `Element`.
+  - **CN**: 引入类型或值别名 `Element`。
+- **Line 490 / 第 490 行** — `  using Layout = layout::TensorNHWC;`
+  - **EN**: Introduces type or value alias `Layout`.
+  - **CN**: 引入类型或值别名 `Layout`。
+- **Line 491 / 第 491 行** — `  using TensorCoord = typename Layout::TensorCoord;`
+  - **EN**: Introduces type or value alias `TensorCoord`.
+  - **CN**: 引入类型或值别名 `TensorCoord`。
+- **Line 492 / 第 492 行** — `  using ThreadMap = ThreadMap_;`
+  - **EN**: Introduces type or value alias `ThreadMap`.
+  - **CN**: 引入类型或值别名 `ThreadMap`。
+- **Line 493 / 第 493 行** — `  using AccessType = AccessType_;`
+  - **EN**: Introduces type or value alias `AccessType`.
+  - **CN**: 引入类型或值别名 `AccessType`。
+- **Line 494 / 第 494 行** — `  using TensorRef = cutlass::TensorRef<Element, Layout>;`
+  - **EN**: Introduces type or value alias `TensorRef`.
+  - **CN**: 引入类型或值别名 `TensorRef`。
+- **Line 495 / 第 495 行** — `  using Index = typename Layout::Index;`
+  - **EN**: Introduces type or value alias `Index`.
+  - **CN**: 引入类型或值别名 `Index`。
+- **Line 496 / 第 496 行** — `  using LongIndex = typename Layout::LongIndex;`
+  - **EN**: Introduces type or value alias `LongIndex`.
+  - **CN**: 引入类型或值别名 `LongIndex`。
+- **Line 497 / 第 497 行** — `  static IteratorAlgorithm const kIteratorAlgorithm = conv::IteratorAlgorithm::kOptimized;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 498 / 第 498 行** — `  static StrideSupport const kStrideSupport = conv::StrideSupport::kUnity;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 499 / 第 499 行** — `  static int const kConvDim = 2;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 500 / 第 500 行** — `  using ConvProblemSize = typename conv::Conv2dProblemSize;`
+  - **EN**: Introduces type or value alias `ConvProblemSize`.
+  - **CN**: 引入类型或值别名 `ConvProblemSize`。
+- **Line 501 / 第 501 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 502 / 第 502 行** — `  static int const kAccessesPerVector = ThreadMap::kElementsPerAccess / AccessType::kElements;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 503 / 第 503 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 504 / 第 504 行** — `  static_assert(!(ThreadMap::kElementsPerAccess % AccessType::kElements), `
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 505 / 第 505 行** — `    "Vectors implied by the thread map must be divisible by the access type.");`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 506 / 第 506 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 507 / 第 507 行** — `  using Mask = uint64_t;`
+  - **EN**: Introduces type or value alias `Mask`.
+  - **CN**: 引入类型或值别名 `Mask`。
+- **Line 508 / 第 508 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 509 / 第 509 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 510 / 第 510 行** — `  // Simplifying assertions`
+  - **EN**: Inline comment explaining intent: `Simplifying assertions`.
+  - **CN**: 行内注释说明意图：`Simplifying assertions`。
+- **Line 511 / 第 511 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 512 / 第 512 行** — `  static_assert(ThreadMap::Iterations::kContiguous == 1,`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 513 / 第 513 行** — `    "Require Iterations::kContiguous == 1");`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 514 / 第 514 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 515 / 第 515 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 516 / 第 516 行** — `  // Parameters structure`
+  - **EN**: Inline comment explaining intent: `Parameters structure`.
+  - **CN**: 行内注释说明意图：`Parameters structure`。
+- **Line 517 / 第 517 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 518 / 第 518 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 519 / 第 519 行** — `  using Params = Conv2dDgradOutputGradientIteratorOptimizedParams;`
+  - **EN**: Introduces type or value alias `Params`.
+  - **CN**: 引入类型或值别名 `Params`。
+- **Line 520 / 第 520 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 521 / 第 521 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 522 / 第 522 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 523 / 第 523 行** — `  Conv2dDgradOutputGradientIteratorOptimizedParams const &params_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 524 / 第 524 行** — `  Conv2dProblemSize const &problem_size_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 525 / 第 525 行** — `  LongIndex iteration_contiguous_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 526 / 第 526 行** — `  LongIndex iteration_strided_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 527 / 第 527 行** — `  LongIndex iteration_vector_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 528 / 第 528 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 529 / 第 529 行** — `  // One pointer per access`
+  - **EN**: Inline comment explaining intent: `One pointer per access`.
+  - **CN**: 行内注释说明意图：`One pointer per access`。
+- **Line 530 / 第 530 行** — `  char const *pointer_[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 531 / 第 531 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 532 / 第 532 行** — `  // current filter position (r, s)`
+  - **EN**: Inline comment explaining intent: `current filter position (r, s)`.
+  - **CN**: 行内注释说明意图：`current filter position (r, s)`。
+- **Line 533 / 第 533 行** — `  int filter_r_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 534 / 第 534 行** — `  int filter_s_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 535 / 第 535 行** — `  int filter_k_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 536 / 第 536 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 537 / 第 537 行** — `  Index masks_[ThreadMap::Iterations::kStrided][kAccessesPerVector][2];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 538 / 第 538 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 539 / 第 539 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 540 / 第 540 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 541 / 第 541 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 542 / 第 542 行** — `  Conv2dDgradOutputGradientTileAccessIteratorOptimized(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 543 / 第 543 行** — `    Conv2dDgradOutputGradientIteratorOptimizedParams const &params,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 544 / 第 544 行** — `    Conv2dProblemSize const &problem_size,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 545 / 第 545 行** — `    Element const *ptr,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 546 / 第 546 行** — `    int thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 547 / 第 547 行** — `    MatrixCoord const &threadblock_offset = MatrixCoord()       // tile index - units are threadblock-scoped tiles`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 548 / 第 548 行** — `  ):`
+  - **EN**: Continues a label, access section, or initializer list.
+  - **CN**: 继续一个标签、访问区段或初始化列表。
+- **Line 549 / 第 549 行** — `    params_(params), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 550 / 第 550 行** — `    problem_size_(problem_size),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 551 / 第 551 行** — `    filter_k_(0), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 552 / 第 552 行** — `    filter_r_(0), `
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 553 / 第 553 行** — `    filter_s_(0) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 554 / 第 554 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 555 / 第 555 行** — `    layout::PitchLinearCoord thread_coord = ThreadMap::initial_offset(thread_idx);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 556 / 第 556 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 557 / 第 557 行** — `    filter_k_ = threadblock_offset.column() + thread_coord.contiguous();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 558 / 第 558 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 559 / 第 559 行** — `    int offset_n[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 560 / 第 560 行** — `    int offset_h[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 561 / 第 561 行** — `    int offset_w[ThreadMap::Iterations::kStrided];`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 562 / 第 562 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 563 / 第 563 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 564 / 第 564 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 565 / 第 565 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 566 / 第 566 行** — `      pointer_[s] = reinterpret_cast<char const *>(ptr);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 567 / 第 567 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 568 / 第 568 行** — `      int offset_nhw = threadblock_offset.row() + thread_coord.strided() + s * ThreadMap::Delta::kStrided;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 569 / 第 569 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 570 / 第 570 行** — `      // The subseqnet fast_divmod() operations are equivalent to the following logical computation:`
+  - **EN**: Inline comment explaining intent: `The subseqnet fast_divmod() operations are equivalent to the following logical computation:`.
+  - **CN**: 行内注释说明意图：`The subseqnet fast_divmod() operations are equivalent to the following logical computation:`。
+- **Line 571 / 第 571 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 572 / 第 572 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 573 / 第 573 行** — `      //  offset_n[s] = offset_nhw / (problem_size_.H * problem_size_.W);`
+  - **EN**: Inline comment explaining intent: `offset_n[s] = offset_nhw / (problem_size_.H * problem_size_.W);`.
+  - **CN**: 行内注释说明意图：`offset_n[s] = offset_nhw / (problem_size_.H * problem_size_.W);`。
+- **Line 574 / 第 574 行** — `      //  int residual = offset_nhw % (problem_size_.H * problem_size_.W);`
+  - **EN**: Inline comment explaining intent: `int residual = offset_nhw % (problem_size_.H * problem_size_.W);`.
+  - **CN**: 行内注释说明意图：`int residual = offset_nhw % (problem_size_.H * problem_size_.W);`。
+- **Line 575 / 第 575 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 576 / 第 576 行** — `      //  offset_h[s] = residual / problem_size_.W;`
+  - **EN**: Inline comment explaining intent: `offset_h[s] = residual / problem_size_.W;`.
+  - **CN**: 行内注释说明意图：`offset_h[s] = residual / problem_size_.W;`。
+- **Line 577 / 第 577 行** — `      //  offset_w[s] = residual % problem_size_.W;`
+  - **EN**: Inline comment explaining intent: `offset_w[s] = residual % problem_size_.W;`.
+  - **CN**: 行内注释说明意图：`offset_w[s] = residual % problem_size_.W;`。
+- **Line 578 / 第 578 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 579 / 第 579 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 580 / 第 580 行** — `      int residual;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 581 / 第 581 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 582 / 第 582 行** — `      params_.hw_divmod(offset_n[s], residual, offset_nhw);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 583 / 第 583 行** — `      params_.w_divmod(offset_h[s], offset_w[s], residual);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 584 / 第 584 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 585 / 第 585 行** — `      TensorCoord coord = at_(offset_n[s], offset_h[s], offset_w[s], 0, 0);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 586 / 第 586 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 587 / 第 587 行** — `      pointer_[s] += params_.layout(coord) * sizeof_bits<Element>::value / 8;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 588 / 第 588 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 589 / 第 589 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 590 / 第 590 行** — `    clear_mask();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 591 / 第 591 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 592 / 第 592 行** — `    CUTLASS_PRAGMA_NO_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 593 / 第 593 行** — `    for (int r = 0; r < problem_size_.R; ++r) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 594 / 第 594 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 595 / 第 595 行** — `      for (int s_idx = 0; s_idx < ThreadMap::Iterations::kStrided; ++s_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 596 / 第 596 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 597 / 第 597 行** — `        int r_ = r;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 598 / 第 598 行** — `        if (problem_size_.mode == Mode::kConvolution) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 599 / 第 599 行** — `          r_ = problem_size_.R - 1 - r;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 600 / 第 600 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 601 / 第 601 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 602 / 第 602 行** — `        int p = offset_h[s_idx] + problem_size_.pad_h - r_ * problem_size_.dilation_h;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 603 / 第 603 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 604 / 第 604 行** — `        bool pred = (offset_n[s_idx] < problem_size_.N && p >= 0 && p < problem_size_.P);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 605 / 第 605 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 606 / 第 606 行** — `        CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 607 / 第 607 行** — `        for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 608 / 第 608 行** — `          masks_[s_idx][v_idx][0] |= (pred << r);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 609 / 第 609 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 610 / 第 610 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 611 / 第 611 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 612 / 第 612 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 613 / 第 613 行** — `    CUTLASS_PRAGMA_NO_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 614 / 第 614 行** — `    for (int s = 0; s < problem_size_.S; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 615 / 第 615 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 616 / 第 616 行** — `      for (int s_idx = 0; s_idx < ThreadMap::Iterations::kStrided; ++s_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 617 / 第 617 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 618 / 第 618 行** — `        int s_ = s;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 619 / 第 619 行** — `        if (problem_size_.mode == Mode::kConvolution) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 620 / 第 620 行** — `          s_ = problem_size_.S - 1 - s;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 621 / 第 621 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 622 / 第 622 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 623 / 第 623 行** — `        int q = offset_w[s_idx] + problem_size_.pad_w - s_ * problem_size_.dilation_w;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 624 / 第 624 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 625 / 第 625 行** — `        bool pred = (q >= 0 && q < problem_size_.Q);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 626 / 第 626 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 627 / 第 627 行** — `        CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 628 / 第 628 行** — `        for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 629 / 第 629 行** — `          masks_[s_idx][v_idx][1] |= (pred << s);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 630 / 第 630 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 631 / 第 631 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 632 / 第 632 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 633 / 第 633 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 634 / 第 634 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 635 / 第 635 行** — `    for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 636 / 第 636 行** — `      clear_mask(v_idx, filter_k_ + v_idx * AccessType::kElements >= problem_size.K);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 637 / 第 637 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 638 / 第 638 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 639 / 第 639 行** — `    set_iteration_index(0);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 640 / 第 640 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 641 / 第 641 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 642 / 第 642 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 643 / 第 643 行** — `  static Params getParams(Conv2dProblemSize const &problem_size, Layout const &layout) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 644 / 第 644 行** — `    return Params(problem_size,`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 645 / 第 645 行** — `                  layout,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 646 / 第 646 行** — `                  sizeof_bits<Element>::value,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 647 / 第 647 行** — `                  {Shape::kRow, Shape::kColumn},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 648 / 第 648 行** — `                  ThreadMap::kThreads,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 649 / 第 649 行** — `                  ThreadMap::kElementsPerAccess,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 650 / 第 650 行** — `                  {ThreadMap::Iterations::kContiguous, ThreadMap::Iterations::kStrided},`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 651 / 第 651 行** — `                  {ThreadMap::Delta::kContiguous, ThreadMap::Delta::kStrided});`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 652 / 第 652 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 653 / 第 653 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 654 / 第 654 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 655 / 第 655 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 656 / 第 656 行** — `  /// Returns the coordinate in the output gradient tensor dy that is correspoinding to `
+  - **EN**: Inline comment explaining intent: `Returns the coordinate in the output gradient tensor dy that is correspoinding to`.
+  - **CN**: 行内注释说明意图：`Returns the coordinate in the output gradient tensor dy that is correspoinding to`。
+- **Line 657 / 第 657 行** — `  // activation nhw and filter position k, r, s`
+  - **EN**: Inline comment explaining intent: `activation nhw and filter position k, r, s`.
+  - **CN**: 行内注释说明意图：`activation nhw and filter position k, r, s`。
+- **Line 658 / 第 658 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 659 / 第 659 行** — `  TensorCoord at_(int n, int h, int w, int r, int s) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 660 / 第 660 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 661 / 第 661 行** — `    if (problem_size_.mode == Mode::kConvolution) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 662 / 第 662 行** — `      r = problem_size_.R - 1 - r;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 663 / 第 663 行** — `      s = problem_size_.S - 1 - s;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 664 / 第 664 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 665 / 第 665 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 666 / 第 666 行** — `    int p = h + problem_size_.pad_h - r * problem_size_.dilation_h;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 667 / 第 667 行** — `    int q = w + problem_size_.pad_w - s * problem_size_.dilation_w;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 668 / 第 668 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 669 / 第 669 行** — `    return TensorCoord(n, p, q, filter_k_);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 670 / 第 670 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 671 / 第 671 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 672 / 第 672 行** — `  /// Adds a pointer offset in units of element`
+  - **EN**: Inline comment explaining intent: `Adds a pointer offset in units of element`.
+  - **CN**: 行内注释说明意图：`Adds a pointer offset in units of element`。
+- **Line 673 / 第 673 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 674 / 第 674 行** — `  void add_byte_offset_(LongIndex byte_offset) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 675 / 第 675 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 676 / 第 676 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 677 / 第 677 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 678 / 第 678 行** — `      pointer_[s] += byte_offset;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 679 / 第 679 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 680 / 第 680 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 681 / 第 681 行** — `  `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 682 / 第 682 行** — `public:`
+  - **EN**: Sets the current access level to `public`.
+  - **CN**: 将当前访问级别设置为 `public`。
+- **Line 683 / 第 683 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 684 / 第 684 行** — `  /// Overrides the internal iteration index`
+  - **EN**: Inline comment explaining intent: `Overrides the internal iteration index`.
+  - **CN**: 行内注释说明意图：`Overrides the internal iteration index`。
+- **Line 685 / 第 685 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 686 / 第 686 行** — `  void set_iteration_index(Index index) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 687 / 第 687 行** — `    iteration_vector_ = index % kAccessesPerVector;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 688 / 第 688 行** — `    int residual_access = index / kAccessesPerVector;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 689 / 第 689 行** — `    iteration_contiguous_ = residual_access % ThreadMap::Iterations::kContiguous;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 690 / 第 690 行** — `    iteration_strided_ = residual_access / ThreadMap::Iterations::kContiguous;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 691 / 第 691 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 692 / 第 692 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 693 / 第 693 行** — `  /// Adds a pointer offset in units of element`
+  - **EN**: Inline comment explaining intent: `Adds a pointer offset in units of element`.
+  - **CN**: 行内注释说明意图：`Adds a pointer offset in units of element`。
+- **Line 694 / 第 694 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 695 / 第 695 行** — `  void add_pointer_offset(LongIndex pointer_offset) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 696 / 第 696 行** — `    add_byte_offset_(pointer_offset * sizeof_bits<Element>::value / 8);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 697 / 第 697 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 698 / 第 698 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 699 / 第 699 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 700 / 第 700 行** — `  void advance() { `
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 701 / 第 701 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 702 / 第 702 行** — `    int next_idx = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 703 / 第 703 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 704 / 第 704 行** — `    // moves to the next tile`
+  - **EN**: Inline comment explaining intent: `moves to the next tile`.
+  - **CN**: 行内注释说明意图：`moves to the next tile`。
+- **Line 705 / 第 705 行** — `    ++filter_s_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 706 / 第 706 行** — `    if (filter_s_ == problem_size_.S) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 707 / 第 707 行** — `      filter_s_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 708 / 第 708 行** — `      ++filter_r_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 709 / 第 709 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 710 / 第 710 行** — `      if (filter_r_ < problem_size_.R) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 711 / 第 711 行** — `        next_idx = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 712 / 第 712 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 713 / 第 713 行** — `      else {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 714 / 第 714 行** — `        filter_r_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 715 / 第 715 行** — `        next_idx = 2;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 716 / 第 716 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 717 / 第 717 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 718 / 第 718 行** — `    `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 719 / 第 719 行** — `    add_byte_offset_(params_.inc_next[next_idx]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 720 / 第 720 行** — `      `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 721 / 第 721 行** — `    if (next_idx == 2) {  `
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 722 / 第 722 行** — `      filter_k_ += params_.filter_k_delta;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 723 / 第 723 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 724 / 第 724 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 725 / 第 725 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 726 / 第 726 行** — `    for (int v_idx = 0; v_idx < kAccessesPerVector; ++v_idx) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 727 / 第 727 行** — `      clear_mask(v_idx, (filter_k_ + v_idx * AccessType::kElements) >= problem_size_.K);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 728 / 第 728 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 729 / 第 729 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 730 / 第 730 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 731 / 第 731 行** — `  /// Clears the predicates`
+  - **EN**: Inline comment explaining intent: `Clears the predicates`.
+  - **CN**: 行内注释说明意图：`Clears the predicates`。
+- **Line 732 / 第 732 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 733 / 第 733 行** — `  void clear_mask(bool clear = true) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 734 / 第 734 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 735 / 第 735 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 736 / 第 736 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 737 / 第 737 行** — `      for (int v = 0; v < kAccessesPerVector; ++v) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 738 / 第 738 行** — `        masks_[s][v][0] = clear ? Mask(0) : masks_[s][v][0];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 739 / 第 739 行** — `        masks_[s][v][1] = clear ? Mask(0) : masks_[s][v][1];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 740 / 第 740 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 741 / 第 741 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 742 / 第 742 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 743 / 第 743 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 744 / 第 744 行** — `  /// Clears the predicates`
+  - **EN**: Inline comment explaining intent: `Clears the predicates`.
+  - **CN**: 行内注释说明意图：`Clears the predicates`。
+- **Line 745 / 第 745 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 746 / 第 746 行** — `  void clear_mask(int v, bool clear = true) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 747 / 第 747 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 748 / 第 748 行** — `    for (int s = 0; s < ThreadMap::Iterations::kStrided; ++s) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 749 / 第 749 行** — `      masks_[s][v][0] = clear ? Mask(0) : masks_[s][v][0];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 750 / 第 750 行** — `      masks_[s][v][1] = clear ? Mask(0) : masks_[s][v][1];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 751 / 第 751 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 752 / 第 752 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 753 / 第 753 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 754 / 第 754 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 755 / 第 755 行** — `  bool valid() {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 756 / 第 756 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 757 / 第 757 行** — `    return `
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 758 / 第 758 行** — `      (masks_[iteration_strided_][iteration_vector_][0] & (Index(1) << filter_r_)) &&`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 759 / 第 759 行** — `      (masks_[iteration_strided_][iteration_vector_][1] & (Index(1) << filter_s_));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 760 / 第 760 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 761 / 第 761 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 762 / 第 762 行** — `  /// Returns a pointer to the vector starting at the current coordinate`
+  - **EN**: Inline comment explaining intent: `Returns a pointer to the vector starting at the current coordinate`.
+  - **CN**: 行内注释说明意图：`Returns a pointer to the vector starting at the current coordinate`。
+- **Line 763 / 第 763 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 764 / 第 764 行** — `  AccessType const *get() const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 765 / 第 765 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 766 / 第 766 行** — `    return reinterpret_cast<AccessType const *>(pointer_[iteration_strided_]) + iteration_vector_;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 767 / 第 767 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 768 / 第 768 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 769 / 第 769 行** — `  /// Increments to the next memory access`
+  - **EN**: Inline comment explaining intent: `Increments to the next memory access`.
+  - **CN**: 行内注释说明意图：`Increments to the next memory access`。
+- **Line 770 / 第 770 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 771 / 第 771 行** — `  Conv2dDgradOutputGradientTileAccessIteratorOptimized &operator++() {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 772 / 第 772 行** — `    ++iteration_vector_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 773 / 第 773 行** — `    if (iteration_vector_ < kAccessesPerVector) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 774 / 第 774 行** — `      return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 775 / 第 775 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 776 / 第 776 行** — `    iteration_vector_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 777 / 第 777 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 778 / 第 778 行** — `    ++iteration_contiguous_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 779 / 第 779 行** — `    if (iteration_contiguous_ < ThreadMap::Iterations::kContiguous) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 780 / 第 780 行** — `      return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 781 / 第 781 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 782 / 第 782 行** — `    iteration_contiguous_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 783 / 第 783 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 784 / 第 784 行** — `    ++iteration_strided_;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 785 / 第 785 行** — `    if (iteration_strided_ < ThreadMap::Iterations::kStrided) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 786 / 第 786 行** — `      return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 787 / 第 787 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 788 / 第 788 行** — `    iteration_strided_ = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 789 / 第 789 行** — ` `
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 790 / 第 790 行** — `    return *this;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 791 / 第 791 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 792 / 第 792 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 793 / 第 793 行** — `  /// Determines whether the Implicit GEMM can execute the given problem.`
+  - **EN**: Inline comment explaining intent: `Determines whether the Implicit GEMM can execute the given problem.`.
+  - **CN**: 行内注释说明意图：`Determines whether the Implicit GEMM can execute the given problem.`。
+- **Line 794 / 第 794 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 795 / 第 795 行** — `  static Status can_implement(Conv2dProblemSize const &problem_size) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 796 / 第 796 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 797 / 第 797 行** — `    // This is specialized for unit stride`
+  - **EN**: Inline comment explaining intent: `This is specialized for unit stride`.
+  - **CN**: 行内注释说明意图：`This is specialized for unit stride`。
+- **Line 798 / 第 798 行** — `    if (problem_size.stride() != MatrixCoord({1, 1})) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 799 / 第 799 行** — `      return Status::kErrorNotSupported;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 800 / 第 800 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 801 / 第 801 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 802 / 第 802 行** — `    // check alignment constraint on iterator's contiguous dimension`
+  - **EN**: Inline comment explaining intent: `check alignment constraint on iterator's contiguous dimension`.
+  - **CN**: 行内注释说明意图：`check alignment constraint on iterator's contiguous dimension`。
+- **Line 803 / 第 803 行** — `    if (problem_size.K % AccessType::kElements) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 804 / 第 804 行** — `      return Status::kErrorNotSupported;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 805 / 第 805 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 806 / 第 806 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 807 / 第 807 行** — `    // Limit on filter size`
+  - **EN**: Inline comment explaining intent: `Limit on filter size`.
+  - **CN**: 行内注释说明意图：`Limit on filter size`。
+- **Line 808 / 第 808 行** — `    if (problem_size.R > 32 || problem_size.S > 32) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 809 / 第 809 行** — `      return Status::kErrorNotSupported;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 810 / 第 810 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 811 / 第 811 行** — `    return Status::kSuccess;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 812 / 第 812 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 813 / 第 813 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 814 / 第 814 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 815 / 第 815 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 816 / 第 816 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 817 / 第 817 行** — `} // namespace threadblock`
+  - **EN**: Closes namespace `threadblock`.
+  - **CN**: 关闭命名空间 `threadblock`。
+- **Line 818 / 第 818 行** — `} // namespace conv`
+  - **EN**: Closes namespace `conv`.
+  - **CN**: 关闭命名空间 `conv`。
+- **Line 819 / 第 819 行** — `} // namespace cutlass`
+  - **EN**: Closes namespace `cutlass`.
+  - **CN**: 关闭命名空间 `cutlass`。
+- **Line 820 / 第 820 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 821 / 第 821 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Implicit GEMM / 隐式 GEMM
+- Problem shapes / 问题形状
+- Layouts and strides / 布局与步幅
+- Iterators / 迭代器
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/array.h` — CUTLASS dependency `cutlass/array.h` / CUTLASS 依赖 `cutlass/array.h`
+- `cutlass/coord.h` — CUTLASS dependency `cutlass/coord.h` / CUTLASS 依赖 `cutlass/coord.h`
+- `cutlass/matrix_shape.h` — CUTLASS dependency `cutlass/matrix_shape.h` / CUTLASS 依赖 `cutlass/matrix_shape.h`
+- `cutlass/predicate_vector.h` — CUTLASS dependency `cutlass/predicate_vector.h` / CUTLASS 依赖 `cutlass/predicate_vector.h`
+- `cutlass/tensor_ref.h` — CUTLASS dependency `cutlass/tensor_ref.h` / CUTLASS 依赖 `cutlass/tensor_ref.h`
+- `cutlass/tensor_view.h` — CUTLASS dependency `cutlass/tensor_view.h` / CUTLASS 依赖 `cutlass/tensor_view.h`
+- `cutlass/layout/pitch_linear.h` — Layout definition `cutlass/layout/pitch_linear.h` / 布局定义 `cutlass/layout/pitch_linear.h`
+- `cutlass/layout/tensor.h` — Layout definition `cutlass/layout/tensor.h` / 布局定义 `cutlass/layout/tensor.h`
+- `cutlass/layout/matrix.h` — Layout definition `cutlass/layout/matrix.h` / 布局定义 `cutlass/layout/matrix.h`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/conv/conv2d_problem_size.h` — CUTLASS convolution component `cutlass/conv/conv2d_problem_size.h` / CUTLASS 卷积组件 `cutlass/conv/conv2d_problem_size.h`
+- `cutlass/conv/threadblock/conv2d_params.h` — CUTLASS convolution component `cutlass/conv/threadblock/conv2d_params.h` / CUTLASS 卷积组件 `cutlass/conv/threadblock/conv2d_params.h`

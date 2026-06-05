@@ -1,0 +1,123 @@
+# logger.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/utils/logger.py`
+
+## Purpose / 作用
+- EN: This module provides logging helper functions
+- CN: 该模块的文档字符串将其描述为：This module provides logging helper functions
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L13** `This module provides logging helper functions` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L14** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `logger: logging.Logger` — **EN:** Assigns a typed value to logger. **CN:** 为 logger 赋予带类型标注的值。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `def log() -> logging.Logger:` — **EN:** Defines function `log`. **CN:** 定义函数 `log`。
+- **L22** `    return logger` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `def setup_log(` — **EN:** Defines function `setup_log`. **CN:** 定义函数 `setup_log`。
+- **L26** `    name: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L27** `    log_to_console: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L28** `    log_to_file: bool = False,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L29** `    log_file_path: str | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L30** `    log_level: int = 1,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L31** `) -> logging.Logger:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L32** `    """Set up and configure a logger with console and/or file handlers.` — **EN:** Starts the docstring for the function `setup_log`. **CN:** 开始说明 function `setup_log` 的文档字符串。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `    :param name: Name of the logger to create` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L35** `    :type name: str` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L36** `    :param log_to_console: Whether to enable logging to console, defaults to False` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L37** `    :type log_to_console: bool, optional` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L38** `    :param log_to_file: Whether to enable logging to file, defaults to False` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L39** `    :type log_to_file: bool, optional` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L40** `    :param log_file_path: Path to the log file, required if log_to_file is True` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L41** `    :type log_file_path: str, optional` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L42** `    :param log_level: Logging level to set, defaults to 1` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L43** `    :type log_level: int, optional` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L44** `    :raises ValueError: If log_to_file is True but log_file_path is not provided` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L45** `    :return: Configured logger instance` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L46** `    :rtype: logging.Logger` — **EN:** Continues the docstring for the function `setup_log`. **CN:** 继续说明 function `setup_log` 的文档字符串。
+- **L47** `    """` — **EN:** Ends the docstring for the function `setup_log`. **CN:** 结束说明 function `setup_log` 的文档字符串。
+- **L48** `    # Create a custom logger` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L49** `    global logger` — **EN:** Declares logger as module-level globals. **CN:** 将 logger 声明为模块级全局变量。
+- **L50** `    logger = logging.getLogger(name)` — **EN:** Assigns a value to logger. **CN:** 将一个值赋给 logger。
+- **L51** `    if log_to_console or log_to_file:` — **EN:** Starts a conditional branch guarded by `log_to_console or log_to_file`. **CN:** 开始一个由 `log_to_console or log_to_file` 控制的条件分支。
+- **L52** `        logger.setLevel(log_level)` — **EN:** Invokes `logger.setLevel` as a standalone call. **CN:** 以独立语句方式调用 `logger.setLevel`。
+- **L53** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L54** `        # Makes sure logging is OFF` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L55** `        logger.setLevel(logging.CRITICAL + 1)` — **EN:** Invokes `logger.setLevel` as a standalone call. **CN:** 以独立语句方式调用 `logger.setLevel`。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    # Clear existing handlers to prevent duplicate logs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L58** `    if logger.hasHandlers():` — **EN:** Starts a conditional branch guarded by `logger.hasHandlers()`. **CN:** 开始一个由 `logger.hasHandlers()` 控制的条件分支。
+- **L59** `        logger.handlers.clear()` — **EN:** Invokes `logger.handlers.clear` as a standalone call. **CN:** 以独立语句方式调用 `logger.handlers.clear`。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    # Define formatter` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L62** `    formatter = logging.Formatter(` — **EN:** Assigns a value to formatter. **CN:** 将一个值赋给 formatter。
+- **L63** `        f"%(asctime)s - %(name)s - %(levelname)s - [%(funcName)s] - %(message)s"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    # Add console handler if enabled` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L67** `    if log_to_console:` — **EN:** Starts a conditional branch guarded by `log_to_console`. **CN:** 开始一个由 `log_to_console` 控制的条件分支。
+- **L68** `        console_handler = logging.StreamHandler()` — **EN:** Assigns a value to console_handler. **CN:** 将一个值赋给 console_handler。
+- **L69** `        console_handler.setLevel(log_level)` — **EN:** Invokes `console_handler.setLevel` as a standalone call. **CN:** 以独立语句方式调用 `console_handler.setLevel`。
+- **L70** `        console_handler.setFormatter(formatter)` — **EN:** Invokes `console_handler.setFormatter` as a standalone call. **CN:** 以独立语句方式调用 `console_handler.setFormatter`。
+- **L71** `        logger.addHandler(console_handler)` — **EN:** Invokes `logger.addHandler` as a standalone call. **CN:** 以独立语句方式调用 `logger.addHandler`。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** `    # Add file handler if enabled` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L74** `    if log_to_file:` — **EN:** Starts a conditional branch guarded by `log_to_file`. **CN:** 开始一个由 `log_to_file` 控制的条件分支。
+- **L75** `        if not log_file_path:` — **EN:** Starts a conditional branch guarded by `not log_file_path`. **CN:** 开始一个由 `not log_file_path` 控制的条件分支。
+- **L76** `            raise ValueError("log_file_path must be provided when enable_file is True")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L77** `        file_handler = logging.FileHandler(log_file_path)` — **EN:** Assigns a value to file_handler. **CN:** 将一个值赋给 file_handler。
+- **L78** `        file_handler.setLevel(log_level)` — **EN:** Invokes `file_handler.setLevel` as a standalone call. **CN:** 以独立语句方式调用 `file_handler.setLevel`。
+- **L79** `        file_handler.setFormatter(formatter)` — **EN:** Invokes `file_handler.setFormatter` as a standalone call. **CN:** 以独立语句方式调用 `file_handler.setFormatter`。
+- **L80** `        logger.addHandler(file_handler)` — **EN:** Invokes `logger.addHandler` as a standalone call. **CN:** 以独立语句方式调用 `logger.addHandler`。
+- **L81** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L82** `    return logger` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `def _init_logger_with_client_name(prefix: str) -> None:` — **EN:** Defines function `_init_logger_with_client_name`. **CN:** 定义函数 `_init_logger_with_client_name`。
+- **L86** `    from ..env_manager import LogEnvironmentManager` — **EN:** Imports LogEnvironmentManager from `..env_manager`. **CN:** 从 `..env_manager` 导入 LogEnvironmentManager。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** `    log_env = LogEnvironmentManager(prefix)` — **EN:** Assigns a value to log_env. **CN:** 将一个值赋给 log_env。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `    if log_env.log_to_console == False and log_env.jit_time_profiling:` — **EN:** Starts a conditional branch guarded by `log_env.log_to_console == False and log_env.jit_time_prof...`. **CN:** 开始一个由 `log_env.log_to_console == False and log_env.jit_time_prof...` 控制的条件分支。
+- **L91** `        log_env.log_to_console = True` — **EN:** Assigns a value to log_env.log_to_console. **CN:** 将一个值赋给 log_env.log_to_console。
+- **L92** `        log_env.log_level = 20  # info level` — **EN:** Assigns a value to log_env.log_level. **CN:** 将一个值赋给 log_env.log_level。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    setup_log(` — **EN:** Invokes `setup_log` as a standalone call. **CN:** 以独立语句方式调用 `setup_log`。
+- **L95** `        prefix,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `        log_env.log_to_console,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `        log_env.log_to_file,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `        f"{prefix}.log",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `        log_env.log_level,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `logger = setup_log("generic")` — **EN:** Assigns a value to logger. **CN:** 将一个值赋给 logger。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.utils.logger`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.utils.logger`。
+- EN: Module docstring summary: This module provides logging helper functions CN: 模块文档摘要为：This module provides logging helper functions
+- EN: Top-level functions: log, setup_log, _init_logger_with_client_name CN: 顶层函数包括：log, setup_log, _init_logger_with_client_name
+
+## Dependencies / 依赖
+- EN: Internal dependencies: ..env_manager:LogEnvironmentManager CN: 内部依赖：..env_manager:LogEnvironmentManager
+- EN: External or standard-library dependencies: logging CN: 外部或标准库依赖：logging

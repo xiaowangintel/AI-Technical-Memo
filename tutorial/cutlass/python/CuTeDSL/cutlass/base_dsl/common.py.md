@@ -1,0 +1,827 @@
+# common.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/common.py`
+
+## Purpose / 作用
+- EN: Defines 10 classes (Colors, DSLBaseError, DSLSubprocessCallError, DSLRuntimeError, ... (+6 more)) and 7 functions (register_env_manager, _dsl_excepthook, _get_friendly_cuda_error_message, translate_mlir_nanobind_error, ... (+3 more)) in `CuTeDSL.cutlass.base_dsl.common`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl.common` 定义了 10 个类（Colors, DSLBaseError, DSLSubprocessCallError, DSLRuntimeError, ... (+6 more)） 和 7 个函数（register_env_manager, _dsl_excepthook, _get_friendly_cuda_error_message, translate_mlir_nanobind_error, ... (+3 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L13** `import os` — **EN:** Imports os for later use. **CN:** 导入 os 供后续使用。
+- **L14** `import subprocess` — **EN:** Imports subprocess for later use. **CN:** 导入 subprocess 供后续使用。
+- **L15** `import sys` — **EN:** Imports sys for later use. **CN:** 导入 sys 供后续使用。
+- **L16** `import types` — **EN:** Imports types for later use. **CN:** 导入 types 供后续使用。
+- **L17** `from typing import Any, Dict, Optional, Union` — **EN:** Imports Any, Dict, Optional, Union from `typing`. **CN:** 从 `typing` 导入 Any, Dict, Optional, Union。
+- **L18** `from functools import total_ordering` — **EN:** Imports total_ordering from `functools`. **CN:** 从 `functools` 导入 total_ordering。
+- **L19** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L20** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L21** `"""` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L22** `This module provides a Exception classes DSL class for any Dialect.` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L26** `# Store the original exception hook` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `_original_excepthook = sys.excepthook` — **EN:** Assigns a value to _original_excepthook. **CN:** 将一个值赋给 _original_excepthook。
+- **L28** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L29** `# Store registered environment manager (set by DSL singleton)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `_registered_env_manager = None` — **EN:** Assigns a value to _registered_env_manager. **CN:** 将一个值赋给 _registered_env_manager。
+- **L31** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `def register_env_manager(env_manager: Any) -> None:` — **EN:** Defines function `register_env_manager`. **CN:** 定义函数 `register_env_manager`。
+- **L34** `    """Register an EnvironmentVarManager instance for use by exception handling.` — **EN:** Starts the docstring for the function `register_env_manager`. **CN:** 开始说明 function `register_env_manager` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    Called by DSL singleton when it initializes.` — **EN:** Continues the docstring for the function `register_env_manager`. **CN:** 继续说明 function `register_env_manager` 的文档字符串。
+- **L37** `    """` — **EN:** Ends the docstring for the function `register_env_manager`. **CN:** 结束说明 function `register_env_manager` 的文档字符串。
+- **L38** `    global _registered_env_manager` — **EN:** Declares _registered_env_manager as module-level globals. **CN:** 将 _registered_env_manager 声明为模块级全局变量。
+- **L39** `    _registered_env_manager = env_manager` — **EN:** Assigns a value to _registered_env_manager. **CN:** 将一个值赋给 _registered_env_manager。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L42** `def _dsl_excepthook(` — **EN:** Defines function `_dsl_excepthook`. **CN:** 定义函数 `_dsl_excepthook`。
+- **L43** `    exc_type: type,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L44** `    exc_value: BaseException,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L45** `    exc_traceback: Optional[types.TracebackType],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L46** `) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L47** `    """` — **EN:** Starts the docstring for the function `_dsl_excepthook`. **CN:** 开始说明 function `_dsl_excepthook` 的文档字符串。
+- **L48** `    Custom exception hook that shows clean error messages for DSL exceptions.` — **EN:** Continues the docstring for the function `_dsl_excepthook`. **CN:** 继续说明 function `_dsl_excepthook` 的文档字符串。
+- **L49** `    For DSLOperationError, shows only the formatted message without traceback.` — **EN:** Continues the docstring for the function `_dsl_excepthook`. **CN:** 继续说明 function `_dsl_excepthook` 的文档字符串。
+- **L50** `    For other exceptions, uses the default Python traceback.` — **EN:** Continues the docstring for the function `_dsl_excepthook`. **CN:** 继续说明 function `_dsl_excepthook` 的文档字符串。
+- **L51** `    """` — **EN:** Ends the docstring for the function `_dsl_excepthook`. **CN:** 结束说明 function `_dsl_excepthook` 的文档字符串。
+- **L52** `    # Check if show_stacktrace is enabled via registered env manager` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L53** `    show_stacktrace = False` — **EN:** Assigns a value to show_stacktrace. **CN:** 将一个值赋给 show_stacktrace。
+- **L54** `    if _registered_env_manager is not None:` — **EN:** Starts a conditional branch guarded by `_registered_env_manager is not None`. **CN:** 开始一个由 `_registered_env_manager is not None` 控制的条件分支。
+- **L55** `        show_stacktrace = getattr(_registered_env_manager, "show_stacktrace", False)` — **EN:** Assigns a value to show_stacktrace. **CN:** 将一个值赋给 show_stacktrace。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** `    # Check if it's a DSL operation error (by name to avoid circular import issues)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L58** `    if exc_type.__name__ in ("DSLOperationError", "DSLOperationBuildError"):` — **EN:** Starts a conditional branch guarded by `exc_type.__name__ in ('DSLOperationError', 'DSLOperationB...`. **CN:** 开始一个由 `exc_type.__name__ in ('DSLOperationError', 'DSLOperationB...` 控制的条件分支。
+- **L59** `        if show_stacktrace:` — **EN:** Starts a conditional branch guarded by `show_stacktrace`. **CN:** 开始一个由 `show_stacktrace` 控制的条件分支。
+- **L60** `            # Show full traceback in verbose mode` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L61** `            _original_excepthook(exc_type, exc_value, exc_traceback)` — **EN:** Invokes `_original_excepthook` as a standalone call. **CN:** 以独立语句方式调用 `_original_excepthook`。
+- **L62** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L63** `            # Just print the formatted message (which is in __str__)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `            print(str(exc_value), file=sys.stderr)` — **EN:** Invokes `print` as a standalone call. **CN:** 以独立语句方式调用 `print`。
+- **L65** `        sys.exit(1)` — **EN:** Invokes `sys.exit` as a standalone call. **CN:** 以独立语句方式调用 `sys.exit`。
+- **L66** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L67** `        # Use the original exception hook for other exceptions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L68** `        _original_excepthook(exc_type, exc_value, exc_traceback)` — **EN:** Invokes `_original_excepthook` as a standalone call. **CN:** 以独立语句方式调用 `_original_excepthook`。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `# Install the custom exception hook` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `sys.excepthook = _dsl_excepthook` — **EN:** Assigns a value to sys.excepthook. **CN:** 将一个值赋给 sys.excepthook。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `# Add color codes at the top of the file after imports` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L76** `class Colors:` — **EN:** Defines class `Colors`. **CN:** 定义类 `Colors`。
+- **L77** `    """ANSI color codes for error messages"""` — **EN:** Docstring line documenting the class `Colors`. **CN:** 文档字符串行，用于说明 class `Colors`。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    RED = "\033[91m"` — **EN:** Assigns a value to RED. **CN:** 将一个值赋给 RED。
+- **L80** `    YELLOW = "\033[93m"` — **EN:** Assigns a value to YELLOW. **CN:** 将一个值赋给 YELLOW。
+- **L81** `    BLUE = "\033[94m"` — **EN:** Assigns a value to BLUE. **CN:** 将一个值赋给 BLUE。
+- **L82** `    GREEN = "\033[92m"` — **EN:** Assigns a value to GREEN. **CN:** 将一个值赋给 GREEN。
+- **L83** `    BOLD = "\033[1m"` — **EN:** Assigns a value to BOLD. **CN:** 将一个值赋给 BOLD。
+- **L84** `    RESET = "\033[0m"` — **EN:** Assigns a value to RESET. **CN:** 将一个值赋给 RESET。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L88** `# DSL Exceptions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L89** `# =============================================================================` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L92** `class DSLBaseError(Exception):` — **EN:** Defines class `DSLBaseError` with bases Exception. **CN:** 定义类 `DSLBaseError`，其基类为 Exception。
+- **L93** `    """` — **EN:** Starts the docstring for the class `DSLBaseError`. **CN:** 开始说明 class `DSLBaseError` 的文档字符串。
+- **L94** `    Base exception for DSL-related errors.` — **EN:** Continues the docstring for the class `DSLBaseError`. **CN:** 继续说明 class `DSLBaseError` 的文档字符串。
+- **L95** `    Provides optional contextual metadata to aid in debugging.` — **EN:** Continues the docstring for the class `DSLBaseError`. **CN:** 继续说明 class `DSLBaseError` 的文档字符串。
+- **L96** `    """` — **EN:** Ends the docstring for the class `DSLBaseError`. **CN:** 结束说明 class `DSLBaseError` 的文档字符串。
+- **L97** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L98** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L99** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L100** `        message: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L101** `        line: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L102** `        snippet: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L103** `        filename: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L104** `        error_code: Optional[Union[str, int]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L105** `        context: Optional[Union[Dict[str, Any], str]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L106** `        suggestion: Union[str, list[str], tuple[str, ...], None] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L107** `        cause: Optional[BaseException] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L109** `        self.message = message` — **EN:** Assigns a value to self.message. **CN:** 将一个值赋给 self.message。
+- **L110** `        self.line = line` — **EN:** Assigns a value to self.line. **CN:** 将一个值赋给 self.line。
+- **L111** `        self.filename = filename` — **EN:** Assigns a value to self.filename. **CN:** 将一个值赋给 self.filename。
+- **L112** `        self.snippet = snippet` — **EN:** Assigns a value to self.snippet. **CN:** 将一个值赋给 self.snippet。
+- **L113** `        self.error_code = error_code` — **EN:** Assigns a value to self.error_code. **CN:** 将一个值赋给 self.error_code。
+- **L114** `        self.context = context` — **EN:** Assigns a value to self.context. **CN:** 将一个值赋给 self.context。
+- **L115** `        self.suggestion = suggestion` — **EN:** Assigns a value to self.suggestion. **CN:** 将一个值赋给 self.suggestion。
+- **L116** `        self.cause = cause` — **EN:** Assigns a value to self.cause. **CN:** 将一个值赋给 self.cause。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `        super().__init__(self._format_message())` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** `    def _generate_cause(self) -> str:` — **EN:** Defines function `_generate_cause`. **CN:** 定义函数 `_generate_cause`。
+- **L121** `        """` — **EN:** Starts the docstring for the function `_generate_cause`. **CN:** 开始说明 function `_generate_cause` 的文档字符串。
+- **L122** `        Generates a string representation of the cause of the error, if available.` — **EN:** Continues the docstring for the function `_generate_cause`. **CN:** 继续说明 function `_generate_cause` 的文档字符串。
+- **L123** `        """` — **EN:** Ends the docstring for the function `_generate_cause`. **CN:** 结束说明 function `_generate_cause` 的文档字符串。
+- **L124** `        if self.cause:` — **EN:** Starts a conditional branch guarded by `self.cause`. **CN:** 开始一个由 `self.cause` 控制的条件分支。
+- **L125** `            return f"Caused exception: {self.cause}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L126** `        return ""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    def _format_message(self) -> str:` — **EN:** Defines function `_format_message`. **CN:** 定义函数 `_format_message`。
+- **L129** `        """` — **EN:** Starts the docstring for the function `_format_message`. **CN:** 开始说明 function `_format_message` 的文档字符串。
+- **L130** `        Formats the complete error message with available metadata.` — **EN:** Continues the docstring for the function `_format_message`. **CN:** 继续说明 function `_format_message` 的文档字符串。
+- **L131** `        Override this in subclasses if you want to change formatting logic.` — **EN:** Continues the docstring for the function `_format_message`. **CN:** 继续说明 function `_format_message` 的文档字符串。
+- **L132** `        """` — **EN:** Ends the docstring for the function `_format_message`. **CN:** 结束说明 function `_format_message` 的文档字符串。
+- **L133** `        parts = [f"{self.__class__.__name__}: {self.message}"]` — **EN:** Assigns a value to parts. **CN:** 将一个值赋给 parts。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `        if self.error_code is not None:` — **EN:** Starts a conditional branch guarded by `self.error_code is not None`. **CN:** 开始一个由 `self.error_code is not None` 控制的条件分支。
+- **L136** `            parts.append(f"{Colors.BOLD}Error Code:{Colors.RESET} {self.error_code}\n")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `        if self.line is not None:` — **EN:** Starts a conditional branch guarded by `self.line is not None`. **CN:** 开始一个由 `self.line is not None` 控制的条件分支。
+- **L139** `            parts.append(f"  Line: {self.line}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `        if self.filename is not None:` — **EN:** Starts a conditional branch guarded by `self.filename is not None`. **CN:** 开始一个由 `self.filename is not None` 控制的条件分支。
+- **L142** `            parts.append(f"  File: {self.filename}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L143** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L144** `        if self.snippet:` — **EN:** Starts a conditional branch guarded by `self.snippet`. **CN:** 开始一个由 `self.snippet` 控制的条件分支。
+- **L145** `            # Optionally truncate long snippets for readability` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L146** `            parts.append(f"  Snippet: \n {self.snippet}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `        cause = self._generate_cause()` — **EN:** Assigns a value to cause. **CN:** 将一个值赋给 cause。
+- **L149** `        if cause:` — **EN:** Starts a conditional branch guarded by `cause`. **CN:** 开始一个由 `cause` 控制的条件分支。
+- **L150** `            parts.append(cause)` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `        if self.context:` — **EN:** Starts a conditional branch guarded by `self.context`. **CN:** 开始一个由 `self.context` 控制的条件分支。
+- **L153** `            if isinstance(self.context, dict):` — **EN:** Starts a conditional branch guarded by `isinstance(self.context, dict)`. **CN:** 开始一个由 `isinstance(self.context, dict)` 控制的条件分支。
+- **L154** `                parts.append(f"{Colors.BLUE}🔍 Additional Context:{Colors.RESET}\n")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L155** `                for key, value in self.context.items():` — **EN:** Starts a loop assigning items from `self.context.items()` to `(key, value)`. **CN:** 开始一个循环，将 `self.context.items()` 的元素赋给 `(key, value)`。
+- **L156** `                    parts.append(f"    {key}: {value}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L157** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L158** `                parts.append(` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L159** `                    f"{Colors.BLUE}🔍 Additional Context:{Colors.RESET} {self.context}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `        if self.suggestion:` — **EN:** Starts a conditional branch guarded by `self.suggestion`. **CN:** 开始一个由 `self.suggestion` 控制的条件分支。
+- **L163** `            parts.append(f"{Colors.GREEN}💡 Suggestions:{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L164** `            if isinstance(self.suggestion, (list, tuple)):` — **EN:** Starts a conditional branch guarded by `isinstance(self.suggestion, (list, tuple))`. **CN:** 开始一个由 `isinstance(self.suggestion, (list, tuple))` 控制的条件分支。
+- **L165** `                for suggestion in self.suggestion:` — **EN:** Starts a loop assigning items from `self.suggestion` to `suggestion`. **CN:** 开始一个循环，将 `self.suggestion` 的元素赋给 `suggestion`。
+- **L166** `                    parts.append(f" {Colors.GREEN}{suggestion}{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L167** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L168** `                parts.append(f" {self.suggestion}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `        return "\n".join(parts)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L171** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `class DSLSubprocessCallError(DSLBaseError):` — **EN:** Defines class `DSLSubprocessCallError` with bases DSLBaseError. **CN:** 定义类 `DSLSubprocessCallError`，其基类为 DSLBaseError。
+- **L174** `    """` — **EN:** Starts the docstring for the class `DSLSubprocessCallError`. **CN:** 开始说明 class `DSLSubprocessCallError` 的文档字符串。
+- **L175** `    Raised when an error occurs during a subprocess call in the DSL.` — **EN:** Continues the docstring for the class `DSLSubprocessCallError`. **CN:** 继续说明 class `DSLSubprocessCallError` 的文档字符串。
+- **L176** `    """` — **EN:** Ends the docstring for the class `DSLSubprocessCallError`. **CN:** 结束说明 class `DSLSubprocessCallError` 的文档字符串。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `    def _generate_cause(self) -> str:` — **EN:** Defines function `_generate_cause`. **CN:** 定义函数 `_generate_cause`。
+- **L179** `        assert isinstance(self.cause, subprocess.CalledProcessError), (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L180** `            "cause must be a subprocess.CalledProcessError"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `        cause = []` — **EN:** Assigns a value to cause. **CN:** 将一个值赋给 cause。
+- **L183** `        cause.append(f"  Caused exception: {self.cause}")` — **EN:** Invokes `cause.append` as a standalone call. **CN:** 以独立语句方式调用 `cause.append`。
+- **L184** `        cause.append(` — **EN:** Invokes `cause.append` as a standalone call. **CN:** 以独立语句方式调用 `cause.append`。
+- **L185** `            f"    Command: \033[93m{' '.join(str(item) for item in self.cause.cmd)}\033[0m"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `        cause.append(f"    Return code: {self.cause.returncode}")` — **EN:** Invokes `cause.append` as a standalone call. **CN:** 以独立语句方式调用 `cause.append`。
+- **L188** `        cause.append(f"    stdout: {self.cause.stdout}")` — **EN:** Invokes `cause.append` as a standalone call. **CN:** 以独立语句方式调用 `cause.append`。
+- **L189** `        cause.append(f"    stderr: {Colors.BOLD}{self.cause.stderr}{Colors.RESET}")` — **EN:** Invokes `cause.append` as a standalone call. **CN:** 以独立语句方式调用 `cause.append`。
+- **L190** `        return "\n".join(cause)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `class DSLRuntimeError(DSLBaseError):` — **EN:** Defines class `DSLRuntimeError` with bases DSLBaseError. **CN:** 定义类 `DSLRuntimeError`，其基类为 DSLBaseError。
+- **L194** `    """` — **EN:** Starts the docstring for the class `DSLRuntimeError`. **CN:** 开始说明 class `DSLRuntimeError` 的文档字符串。
+- **L195** `    Raised when an error occurs during JIT-time code generation in the DSL.` — **EN:** Continues the docstring for the class `DSLRuntimeError`. **CN:** 继续说明 class `DSLRuntimeError` 的文档字符串。
+- **L196** `    """` — **EN:** Ends the docstring for the class `DSLRuntimeError`. **CN:** 结束说明 class `DSLRuntimeError` 的文档字符串。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `    # Inherits all logic from DSLBaseError; override methods if you need` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L199** `    # specialized behavior or formatting for runtime errors.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L200** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L201** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `def _get_friendly_cuda_error_message(` — **EN:** Defines function `_get_friendly_cuda_error_message`. **CN:** 定义函数 `_get_friendly_cuda_error_message`。
+- **L204** `    error_code: int, error_name: Union[str, bytes]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L205** `) -> tuple[str, str, Union[str, tuple[str, ...]]]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L206** `    # Avoid circular dependency` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L207** `    from .runtime.cuda import get_device_info` — **EN:** Imports get_device_info from `.runtime.cuda`. **CN:** 从 `.runtime.cuda` 导入 get_device_info。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `    """Get a user-friendly error message for common CUDA errors."""` — **EN:** Provides documentation text as a docstring. **CN:** 以文档字符串形式提供说明文本。
+- **L210** `    # Strip the byte string markers if present` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L211** `    if isinstance(error_name, bytes):` — **EN:** Starts a conditional branch guarded by `isinstance(error_name, bytes)`. **CN:** 开始一个由 `isinstance(error_name, bytes)` 控制的条件分支。
+- **L212** `        error_name = error_name.decode("utf-8")` — **EN:** Assigns a value to error_name. **CN:** 将一个值赋给 error_name。
+- **L213** `    elif (` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L214** `        isinstance(error_name, str)` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L215** `        and error_name.startswith("b'")` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L216** `        and error_name.endswith("'")` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L217** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L218** `        error_name = error_name[2:-1]` — **EN:** Assigns a value to error_name. **CN:** 将一个值赋给 error_name。
+- **L219** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L220** `    # Add target architecture info` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L221** `    target_arch = os.getenv("CUTE_DSL_ARCH", "unknown")` — **EN:** Assigns a value to target_arch. **CN:** 将一个值赋给 target_arch。
+- **L222** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L223** `    additional_info = {` — **EN:** Assigns a value to additional_info. **CN:** 将一个值赋给 additional_info。
+- **L224** `        "CUDA_ERROR_INVALID_SOURCE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `            f"{Colors.RED}❌ Failed to load CUDA kernel - likely architecture mismatch.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `        "CUDA_ERROR_NO_BINARY_FOR_GPU": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `            f"{Colors.RED}❌ CUDA kernel not compatible with your GPU.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `        "CUDA_ERROR_OUT_OF_MEMORY": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `            f"{Colors.RED}💾 CUDA out of memory error.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `        "CUDA_ERROR_INVALID_DEVICE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `            f"{Colors.RED}❌ Invalid CUDA device.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `        "CUDA_ERROR_NOT_INITIALIZED": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `            f"{Colors.RED}❌ CUDA context not initialized.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `        "CUDA_ERROR_INVALID_CONTEXT": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** `            f"{Colors.RED}❌ CUDA context not initialized.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `        "CUDA_ERROR_INVALID_VALUE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `            f"{Colors.RED}⚠️ Invalid parameter passed to CUDA operation.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `            f"{Colors.YELLOW}This is likely a bug - please report it with:{Colors.RESET}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `        "CUDA_ERROR_INVALID_CLUSTER_SIZE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `            f"{Colors.RED}❌ Invalid cluster size.{Colors.RESET}\n\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    error_suggestions = {` — **EN:** Assigns a value to error_suggestions. **CN:** 将一个值赋给 error_suggestions。
+- **L252** `        "CUDA_ERROR_INVALID_CONTEXT": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L253** `            "1. Check if CUDA context is properly initialized under your environment",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L254** `            "2. Initialize CUDA context with \`cuda.cuInit(0)\` or \`cutlass.cuda.initialize_cuda_context()\`",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L255** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L256** `        "CUDA_ERROR_INVALID_SOURCE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L257** `            "1. Ensure env CUTE_DSL_ARCH matches your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `            "2. Clear the compilation cache and regenerate the kernel",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `            "3. Check CUDA toolkit installation",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `        "CUDA_ERROR_NO_BINARY_FOR_GPU": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** `            "Set env CUTE_DSL_ARCH to match your GPU architecture",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L263** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L264** `        "CUDA_ERROR_OUT_OF_MEMORY": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L265** `            "1. Reduce batch size",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L266** `            "2. Reduce model size",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L267** `            "3. Free unused GPU memory",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L268** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L269** `        "CUDA_ERROR_INVALID_DEVICE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L270** `            "1. Check if CUDA device is properly initialized",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L271** `            "2. Verify GPU is detected: nvidia-smi",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L272** `            "3. Check CUDA_VISIBLE_DEVICES environment variable",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `        "CUDA_ERROR_NOT_INITIALIZED": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L275** `            "1. Check CUDA driver installation",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L276** `            "2. call \`cuda.cuInit(0)\` before any other CUDA operation",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L277** `            "3. Run nvidia-smi to confirm GPU status",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** `        "CUDA_ERROR_INVALID_VALUE": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `            "1. Your GPU model",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `            "2. SM ARCH setting",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `            "3. Steps to reproduce",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L283** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L284** `        "cudaErrorInsufficientDriver": (` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L285** `            "1. Run nvidia-smi to confirm CUDA driver version",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L286** `            "2. Ensure the CUDA driver version meets the requirement of the installed cuda-python package",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L287** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L290** `    message = (` — **EN:** Assigns a value to message. **CN:** 将一个值赋给 message。
+- **L291** `        f"{error_name} (error code: {error_code}) \n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `        f"{additional_info.get(error_name, '')} \n\n{Colors.RESET}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `    # Add debug information` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L296** `    debug_info = f"\n- {Colors.BOLD}Error name: {error_name}\n"` — **EN:** Assigns a value to debug_info. **CN:** 将一个值赋给 debug_info。
+- **L297** `    debug_info += f"- Error code: {error_code}\n"` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L298** `    debug_info += f"- CUDA_TOOLKIT_PATH: {os.getenv('CUDA_TOOLKIT_PATH', 'not set')}\n"` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L299** `    debug_info += (` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L300** `        f"- Target SM ARCH: {os.getenv('CUTE_DSL_ARCH', 'not set')}{Colors.RESET}\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L301** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `    try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L304** `        # Get GPU information using CUDA Python API` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L305** `        debug_info += f"\n{Colors.BLUE}📊 GPU Information:{Colors.RESET}\n"` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L306** `        gpu_info = get_device_info()` — **EN:** Assigns a value to gpu_info. **CN:** 将一个值赋给 gpu_info。
+- **L307** `        debug_info += gpu_info.pretty_str()` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L308** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L309** `        if target_arch and gpu_info.compatible_archs:` — **EN:** Starts a conditional branch guarded by `target_arch and gpu_info.compatible_archs`. **CN:** 开始一个由 `target_arch and gpu_info.compatible_archs` 控制的条件分支。
+- **L310** `            debug_info += f"\n{Colors.BOLD}Compatibility Check:{Colors.RESET}\n"` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `            if target_arch not in gpu_info.compatible_archs:` — **EN:** Starts a conditional branch guarded by `target_arch not in gpu_info.compatible_archs`. **CN:** 开始一个由 `target_arch not in gpu_info.compatible_archs` 控制的条件分支。
+- **L313** `                debug_info += (` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L314** `                    f"{Colors.RED}❌ Error: Target SM ARCH {target_arch} is not compatible\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `                    f"💡 Please use one of SM ARCHs: "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** `                    f"{Colors.GREEN}{', '.join(gpu_info.compatible_archs or [])}{Colors.RESET}\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** `            elif target_arch != gpu_info.sm_arch:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L319** `                debug_info += (` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L320** `                    f"{Colors.YELLOW}⚠️  Warning: Using compatible but non-optimal architecture\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `                    f"• Current: {target_arch}\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `                    f"• Recommended: {Colors.GREEN}{gpu_info.sm_arch}{Colors.RESET} (native)\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L325** `                debug_info += f"{Colors.GREEN}✓ Using optimal architecture: {gpu_info.sm_arch}{Colors.RESET}\n"` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `    except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L328** `        debug_info += (` — **EN:** Updates debug_info in place. **CN:** 原地更新 debug_info。
+- **L329** `            f"\n{Colors.YELLOW}ℹ️  Could not retrieve GPU info: {str(e)}{Colors.RESET}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L330** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `    return message, debug_info, error_suggestions.get(error_name, "")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L333** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `class DSLCudaRuntimeError(DSLBaseError):` — **EN:** Defines class `DSLCudaRuntimeError` with bases DSLBaseError. **CN:** 定义类 `DSLCudaRuntimeError`，其基类为 DSLBaseError。
+- **L336** `    """` — **EN:** Starts the docstring for the class `DSLCudaRuntimeError`. **CN:** 开始说明 class `DSLCudaRuntimeError` 的文档字符串。
+- **L337** `    Raised when an error occurs during CUDA runtime code generation in the DSL.` — **EN:** Continues the docstring for the class `DSLCudaRuntimeError`. **CN:** 继续说明 class `DSLCudaRuntimeError` 的文档字符串。
+- **L338** `    """` — **EN:** Ends the docstring for the class `DSLCudaRuntimeError`. **CN:** 结束说明 class `DSLCudaRuntimeError` 的文档字符串。
+- **L339** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L340** `    # Inherits all logic from DSLRuntimeError; override methods if you need` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L341** `    # specialized behavior or formatting for runtime errors.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L342** `    def __init__(self, error_code: int, error_name: Union[str, bytes]) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L343** `        self._error_code = error_code` — **EN:** Assigns a value to self._error_code. **CN:** 将一个值赋给 self._error_code。
+- **L344** `        self._error_name = error_name` — **EN:** Assigns a value to self._error_name. **CN:** 将一个值赋给 self._error_name。
+- **L345** `        message, debug_info, suggestion = _get_friendly_cuda_error_message(` — **EN:** Assigns a value to (message, debug_info, suggestion). **CN:** 将一个值赋给 (message, debug_info, suggestion)。
+- **L346** `            error_code, error_name` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L347** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L348** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L349** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L350** `            message, error_code=error_code, context=debug_info, suggestion=suggestion` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L351** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L354** `class DSLAstPreprocessorError(DSLBaseError):` — **EN:** Defines class `DSLAstPreprocessorError` with bases DSLBaseError. **CN:** 定义类 `DSLAstPreprocessorError`，其基类为 DSLBaseError。
+- **L355** `    """` — **EN:** Starts the docstring for the class `DSLAstPreprocessorError`. **CN:** 开始说明 class `DSLAstPreprocessorError` 的文档字符串。
+- **L356** `    Raised when an error occurs during AST preprocessing or visiting in the DSL.` — **EN:** Continues the docstring for the class `DSLAstPreprocessorError`. **CN:** 继续说明 class `DSLAstPreprocessorError` 的文档字符串。
+- **L357** `    """` — **EN:** Ends the docstring for the class `DSLAstPreprocessorError`. **CN:** 结束说明 class `DSLAstPreprocessorError` 的文档字符串。
+- **L358** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L359** `    # Same approach: You could override _format_message if you want` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L360** `    # to emphasize AST node details or anything specific to preprocessing.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L361** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `class DSLNotImplemented(DSLBaseError):` — **EN:** Defines class `DSLNotImplemented` with bases DSLBaseError. **CN:** 定义类 `DSLNotImplemented`，其基类为 DSLBaseError。
+- **L365** `    """` — **EN:** Starts the docstring for the class `DSLNotImplemented`. **CN:** 开始说明 class `DSLNotImplemented` 的文档字符串。
+- **L366** `    Raised when a feature of the DSL is not implemented yet.` — **EN:** Continues the docstring for the class `DSLNotImplemented`. **CN:** 继续说明 class `DSLNotImplemented` 的文档字符串。
+- **L367** `    """` — **EN:** Ends the docstring for the class `DSLNotImplemented`. **CN:** 结束说明 class `DSLNotImplemented` 的文档字符串。
+- **L368** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L369** `    # Useful for stubs in your DSL that you plan to implement in the future.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L370** `    pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `def translate_mlir_nanobind_error(exc: BaseException) -> str:` — **EN:** Defines function `translate_mlir_nanobind_error`. **CN:** 定义函数 `translate_mlir_nanobind_error`。
+- **L374** `    """` — **EN:** Starts the docstring for the function `translate_mlir_nanobind_error`. **CN:** 开始说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L375** `    Translate nanobind/MLIR exceptions into user-friendly messages.` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** `    Nanobind exceptions from MLIR C++ bindings:` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L378** `    - nb::value_error -> ValueError` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L379** `    - nb::type_error -> TypeError` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L380** `    - nb::cast_error -> RuntimeError (usually)` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L381** `    - nb::python_error -> Various Python exceptions` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L382** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L383** `    Returns:` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L384** `        tuple of (translated_message, None, original_message)` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L385** `        Note: suggestions are None - only show if explicitly provided` — **EN:** Continues the docstring for the function `translate_mlir_nanobind_error`. **CN:** 继续说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L386** `    """` — **EN:** Ends the docstring for the function `translate_mlir_nanobind_error`. **CN:** 结束说明 function `translate_mlir_nanobind_error` 的文档字符串。
+- **L387** `    exc_type = type(exc).__name__` — **EN:** Assigns a value to exc_type. **CN:** 将一个值赋给 exc_type。
+- **L388** `    error_msg = str(exc).lower()` — **EN:** Assigns a value to error_msg. **CN:** 将一个值赋给 error_msg。
+- **L389** `    original = str(exc)` — **EN:** Assigns a value to original. **CN:** 将一个值赋给 original。
+- **L390** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L391** `    # Type casting errors (nb::cast_error, std::bad_cast)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L392** `    if "std::bad_cast" in error_msg or "cast" in exc_type.lower():` — **EN:** Starts a conditional branch guarded by `'std::bad_cast' in error_msg or 'cast' in exc_type.lower()`. **CN:** 开始一个由 `'std::bad_cast' in error_msg or 'cast' in exc_type.lower()` 控制的条件分支。
+- **L393** `        if "must be a type" in error_msg:` — **EN:** Starts a conditional branch guarded by `'must be a type' in error_msg`. **CN:** 开始一个由 `'must be a type' in error_msg` 控制的条件分支。
+- **L394** `            return "Type mismatch: The operation expected a different type than what was provided"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L395** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L396** `        return "Type casting failed: Cannot convert between incompatible types"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L397** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L398** `    # Value errors (nb::value_error)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L399** `    if exc_type == "ValueError":` — **EN:** Starts a conditional branch guarded by `exc_type == 'ValueError'`. **CN:** 开始一个由 `exc_type == 'ValueError'` 控制的条件分支。
+- **L400** `        if "verification" in error_msg or "failed to verify" in error_msg:` — **EN:** Starts a conditional branch guarded by `'verification' in error_msg or 'failed to verify' in erro...`. **CN:** 开始一个由 `'verification' in error_msg or 'failed to verify' in erro...` 控制的条件分支。
+- **L401** `            return "MLIR operation verification failed: The operation constraints are not satisfied"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L403** `        if "result" in error_msg and "operation" in error_msg:` — **EN:** Starts a conditional branch guarded by `'result' in error_msg and 'operation' in error_msg`. **CN:** 开始一个由 `'result' in error_msg and 'operation' in error_msg` 控制的条件分支。
+- **L404** `            return "Invalid operation result type: The operation produced an unexpected type"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `        if "attribute" in error_msg:` — **EN:** Starts a conditional branch guarded by `'attribute' in error_msg`. **CN:** 开始一个由 `'attribute' in error_msg` 控制的条件分支。
+- **L407** `            return "Invalid attribute: Attribute value or type is incorrect"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L408** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L409** `    # Type errors (nb::type_error)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L410** `    if exc_type == "TypeError":` — **EN:** Starts a conditional branch guarded by `exc_type == 'TypeError'`. **CN:** 开始一个由 `exc_type == 'TypeError'` 控制的条件分支。
+- **L411** `        if "argument" in error_msg or "parameter" in error_msg:` — **EN:** Starts a conditional branch guarded by `'argument' in error_msg or 'parameter' in error_msg`. **CN:** 开始一个由 `'argument' in error_msg or 'parameter' in error_msg` 控制的条件分支。
+- **L412** `            return "Wrong argument type: Function received an incompatible type"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L413** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L414** `    # Runtime errors (often from nb::cast_error)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L415** `    if exc_type == "RuntimeError":` — **EN:** Starts a conditional branch guarded by `exc_type == 'RuntimeError'`. **CN:** 开始一个由 `exc_type == 'RuntimeError'` 控制的条件分支。
+- **L416** `        if "operand" in error_msg:` — **EN:** Starts a conditional branch guarded by `'operand' in error_msg`. **CN:** 开始一个由 `'operand' in error_msg` 控制的条件分支。
+- **L417** `            return (` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L418** `                "Invalid operand: Operation received wrong number or type of operands"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `        if "not registered" in error_msg or "unknown" in error_msg:` — **EN:** Starts a conditional branch guarded by `'not registered' in error_msg or 'unknown' in error_msg`. **CN:** 开始一个由 `'not registered' in error_msg or 'unknown' in error_msg` 控制的条件分支。
+- **L422** `            return "Operation or dialect not found"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    # Generic fallback` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L425** `    return f"{exc_type}: {original}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L426** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L427** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L428** `class DSLUserCodeError(DSLBaseError):` — **EN:** Defines class `DSLUserCodeError` with bases DSLBaseError. **CN:** 定义类 `DSLUserCodeError`，其基类为 DSLBaseError。
+- **L429** `    """Raised when an error is detected in user DSL code.` — **EN:** Starts the docstring for the class `DSLUserCodeError`. **CN:** 开始说明 class `DSLUserCodeError` 的文档字符串。
+- **L430** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L431** `    Covers mutation violations, scope errors, type mismatches, and similar` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L432** `    user-facing diagnostics.  Takes explicit \`\`filename\`\` and \`\`lineno\`\` --` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L433** `    no \`\`inspect.stack()\`\` magic inside the class.` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L434** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L435** `    Usage::` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L436** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L437** `        raise DSLUserCodeError(` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L438** `            "Scope Error: variable \`a\` escapes its scope",` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L439** `            filename="/path/to/user.py",` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L440** `            lineno=42,` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L441** `            suggestion="Define the variable before the loop.",` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L442** `        )` — **EN:** Continues the docstring for the class `DSLUserCodeError`. **CN:** 继续说明 class `DSLUserCodeError` 的文档字符串。
+- **L443** `    """` — **EN:** Ends the docstring for the class `DSLUserCodeError`. **CN:** 结束说明 class `DSLUserCodeError` 的文档字符串。
+- **L444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L445** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L446** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L447** `        message: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L448** `        filename: Optional[str] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L449** `        lineno: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L450** `        col_offset: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L451** `        cause: Optional[BaseException] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L452** `        suggestion: Optional[Union[str, list]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L453** `        context: Optional[Union[Dict[str, Any], str]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L454** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L455** `        snippet = None` — **EN:** Assigns a value to snippet. **CN:** 将一个值赋给 snippet。
+- **L456** `        if filename and lineno:` — **EN:** Starts a conditional branch guarded by `filename and lineno`. **CN:** 开始一个由 `filename and lineno` 控制的条件分支。
+- **L457** `            snippet = self._read_source_snippet(filename, lineno, col_offset)` — **EN:** Assigns a value to snippet. **CN:** 将一个值赋给 snippet。
+- **L458** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L459** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L460** `            message,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L461** `            line=lineno,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L462** `            filename=filename,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `            snippet=snippet,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `            cause=cause,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `            suggestion=suggestion,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `            context=context,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L467** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L470** `    def _read_source_snippet(` — **EN:** Defines function `_read_source_snippet`. **CN:** 定义函数 `_read_source_snippet`。
+- **L471** `        filename: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L472** `        lineno: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L473** `        col_offset: Optional[int] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L474** `    ) -> Optional[str]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L475** `        """Read a single source line and format it as a snippet."""` — **EN:** Docstring line documenting the function `_read_source_snippet`. **CN:** 文档字符串行，用于说明 function `_read_source_snippet`。
+- **L476** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L477** `            import linecache` — **EN:** Imports linecache for later use. **CN:** 导入 linecache 供后续使用。
+- **L478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L479** `            code_line = linecache.getline(filename, lineno).rstrip()` — **EN:** Assigns a value to code_line. **CN:** 将一个值赋给 code_line。
+- **L480** `            if not code_line:` — **EN:** Starts a conditional branch guarded by `not code_line`. **CN:** 开始一个由 `not code_line` 控制的条件分支。
+- **L481** `                return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L482** `            snippet = f"   {lineno:4d} | {code_line}"` — **EN:** Assigns a value to snippet. **CN:** 将一个值赋给 snippet。
+- **L483** `            if col_offset is not None:` — **EN:** Starts a conditional branch guarded by `col_offset is not None`. **CN:** 开始一个由 `col_offset is not None` 控制的条件分支。
+- **L484** `                snippet += f"\n        | {' ' * col_offset}^"` — **EN:** Updates snippet in place. **CN:** 原地更新 snippet。
+- **L485** `            return snippet` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L486** `        except Exception:  # noqa: BLE001 — best-effort snippet` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L487** `            return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L488** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L489** `    def _format_message(self) -> str:` — **EN:** Defines function `_format_message`. **CN:** 定义函数 `_format_message`。
+- **L490** `        """Format a rich error message with code snippet and suggestions."""` — **EN:** Docstring line documenting the function `_format_message`. **CN:** 文档字符串行，用于说明 function `_format_message`。
+- **L491** `        parts = []` — **EN:** Assigns a value to parts. **CN:** 将一个值赋给 parts。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** `        parts.append(` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L494** `            f"\n{Colors.RED}{Colors.BOLD}[Error] {self.message}{Colors.RESET}\n"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `        if self.snippet and self.filename:` — **EN:** Starts a conditional branch guarded by `self.snippet and self.filename`. **CN:** 开始一个由 `self.snippet and self.filename` 控制的条件分支。
+- **L498** `            loc = f"{self.filename}:{self.line}" if self.line else self.filename` — **EN:** Assigns a value to loc. **CN:** 将一个值赋给 loc。
+- **L499** `            parts.append(f"{Colors.BLUE}Code:{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L500** `            parts.append(f"--> {Colors.BLUE}{loc}{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L501** `            parts.append(self.snippet)` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L502** `            parts.append("")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L503** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L504** `        if self.cause:` — **EN:** Starts a conditional branch guarded by `self.cause`. **CN:** 开始一个由 `self.cause` 控制的条件分支。
+- **L505** `            parts.append(f"{Colors.BLUE}Cause:{Colors.RESET} {self.cause}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L506** `            parts.append("")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L507** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L508** `        if self.context:` — **EN:** Starts a conditional branch guarded by `self.context`. **CN:** 开始一个由 `self.context` 控制的条件分支。
+- **L509** `            if isinstance(self.context, dict):` — **EN:** Starts a conditional branch guarded by `isinstance(self.context, dict)`. **CN:** 开始一个由 `isinstance(self.context, dict)` 控制的条件分支。
+- **L510** `                parts.append(f"{Colors.BLUE}Additional Context:{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L511** `                for key, value in self.context.items():` — **EN:** Starts a loop assigning items from `self.context.items()` to `(key, value)`. **CN:** 开始一个循环，将 `self.context.items()` 的元素赋给 `(key, value)`。
+- **L512** `                    parts.append(f"    {key}: {value}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L513** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L514** `                parts.append(` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L515** `                    f"{Colors.BLUE}Additional Context:{Colors.RESET} {self.context}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L516** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L517** `            parts.append("")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L518** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L519** `        if self.suggestion:` — **EN:** Starts a conditional branch guarded by `self.suggestion`. **CN:** 开始一个由 `self.suggestion` 控制的条件分支。
+- **L520** `            parts.append(f"{Colors.GREEN}Suggestion:{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L521** `            if isinstance(self.suggestion, (list, tuple)):` — **EN:** Starts a conditional branch guarded by `isinstance(self.suggestion, (list, tuple))`. **CN:** 开始一个由 `isinstance(self.suggestion, (list, tuple))` 控制的条件分支。
+- **L522** `                for s in self.suggestion:` — **EN:** Starts a loop assigning items from `self.suggestion` to `s`. **CN:** 开始一个循环，将 `self.suggestion` 的元素赋给 `s`。
+- **L523** `                    parts.append(f"  {Colors.GREEN}{s}{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L524** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L525** `                parts.append(f"  {self.suggestion}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L526** `            parts.append("")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L527** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L528** `        parts.append("=" * 100)` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L529** `        return "\n".join(parts)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L530** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L531** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L532** `class DSLOperationBuildError(DSLBaseError):` — **EN:** Defines class `DSLOperationBuildError` with bases DSLBaseError. **CN:** 定义类 `DSLOperationBuildError`，其基类为 DSLBaseError。
+- **L533** `    """` — **EN:** Starts the docstring for the class `DSLOperationBuildError`. **CN:** 开始说明 class `DSLOperationBuildError` 的文档字符串。
+- **L534** `    Raised when an error occurs during a DSL operation with formatted source location.` — **EN:** Continues the docstring for the class `DSLOperationBuildError`. **CN:** 继续说明 class `DSLOperationBuildError` 的文档字符串。
+- **L535** `    This exception provides a nicely formatted error message showing the exact line` — **EN:** Continues the docstring for the class `DSLOperationBuildError`. **CN:** 继续说明 class `DSLOperationBuildError` 的文档字符串。
+- **L536** `    of user code that caused the error.` — **EN:** Continues the docstring for the class `DSLOperationBuildError`. **CN:** 继续说明 class `DSLOperationBuildError` 的文档字符串。
+- **L537** `    """` — **EN:** Ends the docstring for the class `DSLOperationBuildError`. **CN:** 结束说明 class `DSLOperationBuildError` 的文档字符串。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L540** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L541** `        message: str,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L542** `        cause: Optional[BaseException] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L543** `        frameInfo: Optional[inspect.Traceback] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L544** `        auto_translate: bool = True,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L545** `    ) -> None:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L546** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L547** `        Args:` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L548** `            message: The error message to display` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L549** `            cause: The underlying exception that caused this error` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L550** `            frameInfo: Optional frame info from inspect.getframeinfo() - if not provided,` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L551** `                      automatically captures the caller's frame` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L552** `            auto_translate: If True, attempt to translate MLIR/nanobind errors` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L553** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L554** `        import inspect` — **EN:** Imports inspect for later use. **CN:** 导入 inspect 供后续使用。
+- **L555** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L556** `        # If frameInfo not provided, capture the caller's frame information` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L557** `        if frameInfo is None:` — **EN:** Starts a conditional branch guarded by `frameInfo is None`. **CN:** 开始一个由 `frameInfo is None` 控制的条件分支。
+- **L558** `            current_frame = inspect.currentframe()` — **EN:** Assigns a value to current_frame. **CN:** 将一个值赋给 current_frame。
+- **L559** `            frame = current_frame.f_back if current_frame else None` — **EN:** Assigns a value to frame. **CN:** 将一个值赋给 frame。
+- **L560** `            frameInfo = inspect.getframeinfo(frame) if frame else None` — **EN:** Assigns a value to frameInfo. **CN:** 将一个值赋给 frameInfo。
+- **L561** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L562** `        # Try to translate MLIR/nanobind errors if no custom message provided` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L563** `        self.original_error = str(message)` — **EN:** Assigns a value to self.original_error. **CN:** 将一个值赋给 self.original_error。
+- **L564** `        if auto_translate and cause:` — **EN:** Starts a conditional branch guarded by `auto_translate and cause`. **CN:** 开始一个由 `auto_translate and cause` 控制的条件分支。
+- **L565** `            translated_msg = translate_mlir_nanobind_error(cause)` — **EN:** Assigns a value to translated_msg. **CN:** 将一个值赋给 translated_msg。
+- **L566** `            if translated_msg != str(cause):` — **EN:** Starts a conditional branch guarded by `translated_msg != str(cause)`. **CN:** 开始一个由 `translated_msg != str(cause)` 控制的条件分支。
+- **L567** `                message = translated_msg` — **EN:** Assigns a value to message. **CN:** 将一个值赋给 message。
+- **L568** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L569** `        self.frameInfo = frameInfo` — **EN:** Assigns a value to self.frameInfo. **CN:** 将一个值赋给 self.frameInfo。
+- **L570** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L571** `        # Extract line and filename from frameInfo` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L572** `        line = frameInfo.lineno if frameInfo else None` — **EN:** Assigns a value to line. **CN:** 将一个值赋给 line。
+- **L573** `        filename = frameInfo.filename if frameInfo else None` — **EN:** Assigns a value to filename. **CN:** 将一个值赋给 filename。
+- **L574** `        snippet = None` — **EN:** Assigns a value to snippet. **CN:** 将一个值赋给 snippet。
+- **L575** `        if frameInfo and frameInfo.code_context:` — **EN:** Starts a conditional branch guarded by `frameInfo and frameInfo.code_context`. **CN:** 开始一个由 `frameInfo and frameInfo.code_context` 控制的条件分支。
+- **L576** `            lineno = frameInfo.lineno` — **EN:** Assigns a value to lineno. **CN:** 将一个值赋给 lineno。
+- **L577** `            code_line = frameInfo.code_context[0].rstrip()` — **EN:** Assigns a value to code_line. **CN:** 将一个值赋给 code_line。
+- **L578** `            snippet = f"   {lineno:4d} | {code_line}"` — **EN:** Assigns a value to snippet. **CN:** 将一个值赋给 snippet。
+- **L579** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L580** `            # Add column pointer if available (Python 3.11+)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L581** `            if (` — **EN:** Starts a conditional branch guarded by `hasattr(frameInfo, 'positions') and frameInfo.positions.c...`. **CN:** 开始一个由 `hasattr(frameInfo, 'positions') and frameInfo.positions.c...` 控制的条件分支。
+- **L582** `                hasattr(frameInfo, "positions")` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L583** `                and frameInfo.positions.col_offset is not None  # type: ignore[attr-defined]` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L584** `            ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L585** `                col = frameInfo.positions.col_offset  # type: ignore[attr-defined]` — **EN:** Assigns a value to col. **CN:** 将一个值赋给 col。
+- **L586** `                snippet += f"\n        | {' ' * col}^"` — **EN:** Updates snippet in place. **CN:** 原地更新 snippet。
+- **L587** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L588** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L589** `            message,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `            line=line,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `            filename=filename,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `            snippet=snippet,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L593** `            cause=cause,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L594** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L595** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L596** `    def _collect_dsl_errors(` — **EN:** Defines function `_collect_dsl_errors`. **CN:** 定义函数 `_collect_dsl_errors`。
+- **L597** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L598** `    ) -> tuple[` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L599** `        list[tuple["DSLOperationBuildError", str, str]], Optional[BaseException]` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L600** `    ]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L601** `        """` — **EN:** Starts the docstring for the function `_collect_dsl_errors`. **CN:** 开始说明 function `_collect_dsl_errors` 的文档字符串。
+- **L602** `        Recursively collect all DSLOperationErrors in the exception chain.` — **EN:** Continues the docstring for the function `_collect_dsl_errors`. **CN:** 继续说明 function `_collect_dsl_errors` 的文档字符串。
+- **L603** `        Returns a tuple of (list of unique errors with snippets, final non-DSLOperationError cause).` — **EN:** Continues the docstring for the function `_collect_dsl_errors`. **CN:** 继续说明 function `_collect_dsl_errors` 的文档字符串。
+- **L604** `        Deduplicates by (filename, lineno) to avoid redundant output.` — **EN:** Continues the docstring for the function `_collect_dsl_errors`. **CN:** 继续说明 function `_collect_dsl_errors` 的文档字符串。
+- **L605** `        """` — **EN:** Ends the docstring for the function `_collect_dsl_errors`. **CN:** 结束说明 function `_collect_dsl_errors` 的文档字符串。
+- **L606** `        errors_with_snippets = []` — **EN:** Assigns a value to errors_with_snippets. **CN:** 将一个值赋给 errors_with_snippets。
+- **L607** `        seen_locations = set()` — **EN:** Assigns a value to seen_locations. **CN:** 将一个值赋给 seen_locations。
+- **L608** `        current = self` — **EN:** Assigns a value to current. **CN:** 将一个值赋给 current。
+- **L609** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L610** `        while current:` — **EN:** Starts a while-loop guarded by `current`. **CN:** 开始一个由 `current` 控制的 while 循环。
+- **L611** `            # Add error if it has a snippet to show and location is unique` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L612** `            if current.snippet and current.filename and current.line:` — **EN:** Starts a conditional branch guarded by `current.snippet and current.filename and current.line`. **CN:** 开始一个由 `current.snippet and current.filename and current.line` 控制的条件分支。
+- **L613** `                location_key = (current.filename, current.line)` — **EN:** Assigns a value to location_key. **CN:** 将一个值赋给 location_key。
+- **L614** `                if location_key not in seen_locations:` — **EN:** Starts a conditional branch guarded by `location_key not in seen_locations`. **CN:** 开始一个由 `location_key not in seen_locations` 控制的条件分支。
+- **L615** `                    seen_locations.add(location_key)` — **EN:** Invokes `seen_locations.add` as a standalone call. **CN:** 以独立语句方式调用 `seen_locations.add`。
+- **L616** `                    errors_with_snippets.append(` — **EN:** Invokes `errors_with_snippets.append` as a standalone call. **CN:** 以独立语句方式调用 `errors_with_snippets.append`。
+- **L617** `                        (current, current.snippet, current.filename)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L618** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L619** `            # Check if cause is also a DSLOperationError` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L620** `            if current.cause and isinstance(current.cause, DSLOperationBuildError):` — **EN:** Starts a conditional branch guarded by `current.cause and isinstance(current.cause, DSLOperationB...`. **CN:** 开始一个由 `current.cause and isinstance(current.cause, DSLOperationB...` 控制的条件分支。
+- **L621** `                current = current.cause` — **EN:** Assigns a value to current. **CN:** 将一个值赋给 current。
+- **L622** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L623** `                # Found the final cause (not a DSLOperationError)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L624** `                break` — **EN:** Exits the nearest loop. **CN:** 退出最近的一层循环。
+- **L625** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L626** `        return errors_with_snippets, current.cause if current else None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L627** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L628** `    def _format_message(self) -> str:` — **EN:** Defines function `_format_message`. **CN:** 定义函数 `_format_message`。
+- **L629** `        """Formats the error message with nice visual presentation."""` — **EN:** Docstring line documenting the function `_format_message`. **CN:** 文档字符串行，用于说明 function `_format_message`。
+- **L630** `        parts = []` — **EN:** Assigns a value to parts. **CN:** 将一个值赋给 parts。
+- **L631** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L632** `        # Collect all DSLOperationErrors in the chain recursively` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L633** `        dsl_errors, final_cause = self._collect_dsl_errors()` — **EN:** Assigns a value to (dsl_errors, final_cause). **CN:** 将一个值赋给 (dsl_errors, final_cause)。
+- **L634** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L635** `        # Show error header with the root cause message` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L636** `        error_msg = self.message` — **EN:** Assigns a value to error_msg. **CN:** 将一个值赋给 error_msg。
+- **L637** `        if final_cause:` — **EN:** Starts a conditional branch guarded by `final_cause`. **CN:** 开始一个由 `final_cause` 控制的条件分支。
+- **L638** `            error_msg = f"{type(final_cause).__name__}: {final_cause}"` — **EN:** Assigns a value to error_msg. **CN:** 将一个值赋给 error_msg。
+- **L639** `        parts.append(f"\n{Colors.RED}{Colors.BOLD}[Error] {error_msg}{Colors.RESET}\n")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L640** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L641** `        # Show the actual traceback first (where the error originated)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L642** `        if final_cause:` — **EN:** Starts a conditional branch guarded by `final_cause`. **CN:** 开始一个由 `final_cause` 控制的条件分支。
+- **L643** `            import traceback` — **EN:** Imports traceback for later use. **CN:** 导入 traceback 供后续使用。
+- **L644** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L645** `            tb = final_cause.__traceback__` — **EN:** Assigns a value to tb. **CN:** 将一个值赋给 tb。
+- **L646** `            if tb:` — **EN:** Starts a conditional branch guarded by `tb`. **CN:** 开始一个由 `tb` 控制的条件分支。
+- **L647** `                parts.append(f"{Colors.BLUE}📍 Exception Origin:{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L648** `                # Format the traceback from the original exception` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L649** `                tb_lines = traceback.format_tb(tb)` — **EN:** Assigns a value to tb_lines. **CN:** 将一个值赋给 tb_lines。
+- **L650** `                for line in tb_lines:` — **EN:** Starts a loop assigning items from `tb_lines` to `line`. **CN:** 开始一个循环，将 `tb_lines` 的元素赋给 `line`。
+- **L651** `                    parts.append(line.rstrip())` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L652** `                parts.append("")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L653** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L654** `        # Show unique code snippets from DSL call chain (user code locations)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L655** `        if dsl_errors:` — **EN:** Starts a conditional branch guarded by `dsl_errors`. **CN:** 开始一个由 `dsl_errors` 控制的条件分支。
+- **L656** `            parts.append(f"{Colors.BLUE}📋 DSL Call Stack:{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L657** `            for error, snippet, filename in dsl_errors:` — **EN:** Starts a loop assigning items from `dsl_errors` to `(error, snippet, filename)`. **CN:** 开始一个循环，将 `dsl_errors` 的元素赋给 `(error, snippet, filename)`。
+- **L658** `                parts.append(f"--> {Colors.BLUE}{filename}{Colors.RESET}")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L659** `                parts.append(snippet)` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L660** `                parts.append("")` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L661** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L662** `        parts.append("=" * 100)` — **EN:** Invokes `parts.append` as a standalone call. **CN:** 以独立语句方式调用 `parts.append`。
+- **L663** `        return "\n".join(parts)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L664** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L665** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L666** `def _get_cuda_version() -> str:` — **EN:** Defines function `_get_cuda_version`. **CN:** 定义函数 `_get_cuda_version`。
+- **L667** `    # Client of this module should implement this function` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L668** `    """` — **EN:** Starts the docstring for the function `_get_cuda_version`. **CN:** 开始说明 function `_get_cuda_version` 的文档字符串。
+- **L669** `    Placeholder for CUDA version query.` — **EN:** Continues the docstring for the function `_get_cuda_version`. **CN:** 继续说明 function `_get_cuda_version` 的文档字符串。
+- **L670** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L671** `    This function should be implemented by the client of this module.` — **EN:** Continues the docstring for the function `_get_cuda_version`. **CN:** 继续说明 function `_get_cuda_version` 的文档字符串。
+- **L672** `    When implemented, it must return the CUDA version as a string, e.g. "12.2".` — **EN:** Continues the docstring for the function `_get_cuda_version`. **CN:** 继续说明 function `_get_cuda_version` 的文档字符串。
+- **L673** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L674** `    Raises:` — **EN:** Continues the docstring for the function `_get_cuda_version`. **CN:** 继续说明 function `_get_cuda_version` 的文档字符串。
+- **L675** `        NotImplementedError: Always, unless overridden by the package initializer or client.` — **EN:** Continues the docstring for the function `_get_cuda_version`. **CN:** 继续说明 function `_get_cuda_version` 的文档字符串。
+- **L676** `    """` — **EN:** Ends the docstring for the function `_get_cuda_version`. **CN:** 结束说明 function `_get_cuda_version` 的文档字符串。
+- **L677** `    raise NotImplementedError("_get_cuda_version is not implemented")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L678** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L679** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L680** `@total_ordering` — **EN:** Applies decorator `total_ordering` to the following definition. **CN:** 将装饰器 `total_ordering` 应用于后面的定义。
+- **L681** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L682** `class DSLCudaVersion:` — **EN:** Defines class `DSLCudaVersion`. **CN:** 定义类 `DSLCudaVersion`。
+- **L683** `    """` — **EN:** Starts the docstring for the class `DSLCudaVersion`. **CN:** 开始说明 class `DSLCudaVersion` 的文档字符串。
+- **L684** `    Class to represent the CUDA version used to build the DSL.` — **EN:** Continues the docstring for the class `DSLCudaVersion`. **CN:** 继续说明 class `DSLCudaVersion` 的文档字符串。
+- **L685** `    """` — **EN:** Ends the docstring for the class `DSLCudaVersion`. **CN:** 结束说明 class `DSLCudaVersion` 的文档字符串。
+- **L686** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L687** `    major: int` — **EN:** Assigns a typed value to major. **CN:** 为 major 赋予带类型标注的值。
+- **L688** `    minor: int` — **EN:** Assigns a typed value to minor. **CN:** 为 minor 赋予带类型标注的值。
+- **L689** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L690** `    def __init__(self, version: str):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L691** `        parts = version.split(".")` — **EN:** Assigns a value to parts. **CN:** 将一个值赋给 parts。
+- **L692** `        object.__setattr__(self, "major", int(parts[0]))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L693** `        object.__setattr__(self, "minor", int(parts[1]))` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L694** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L695** `    def __eq__(self, other: object) -> bool:` — **EN:** Defines function `__eq__`. **CN:** 定义函数 `__eq__`。
+- **L696** `        if not isinstance(other, DSLCudaVersion):` — **EN:** Starts a conditional branch guarded by `not isinstance(other, DSLCudaVersion)`. **CN:** 开始一个由 `not isinstance(other, DSLCudaVersion)` 控制的条件分支。
+- **L697** `            return NotImplemented` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L698** `        return self.major == other.major and self.minor == other.minor` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L699** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L700** `    def __lt__(self, other: "DSLCudaVersion") -> bool:` — **EN:** Defines function `__lt__`. **CN:** 定义函数 `__lt__`。
+- **L701** `        return [self.major, self.minor] < [other.major, other.minor]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L702** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L703** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L704** `def _coerce_to_cuda_version(` — **EN:** Defines function `_coerce_to_cuda_version`. **CN:** 定义函数 `_coerce_to_cuda_version`。
+- **L705** `    value: Optional[Union[DSLCudaVersion, str]], param_name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L706** `) -> Optional[DSLCudaVersion]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L707** `    """` — **EN:** Starts the docstring for the function `_coerce_to_cuda_version`. **CN:** 开始说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L708** `    Coerce a value to DSLCudaVersion.` — **EN:** Continues the docstring for the function `_coerce_to_cuda_version`. **CN:** 继续说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L709** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L710** `    :param value: The value to coerce (DSLCudaVersion, str, or None).` — **EN:** Continues the docstring for the function `_coerce_to_cuda_version`. **CN:** 继续说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L711** `    :param param_name: The parameter name for error messages.` — **EN:** Continues the docstring for the function `_coerce_to_cuda_version`. **CN:** 继续说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L712** `    :returns: DSLCudaVersion or None if value is None.` — **EN:** Continues the docstring for the function `_coerce_to_cuda_version`. **CN:** 继续说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L713** `    :raises DSLRuntimeError: If value is not a supported type.` — **EN:** Continues the docstring for the function `_coerce_to_cuda_version`. **CN:** 继续说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L714** `    """` — **EN:** Ends the docstring for the function `_coerce_to_cuda_version`. **CN:** 结束说明 function `_coerce_to_cuda_version` 的文档字符串。
+- **L715** `    if value is None:` — **EN:** Starts a conditional branch guarded by `value is None`. **CN:** 开始一个由 `value is None` 控制的条件分支。
+- **L716** `        return None` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L717** `    if isinstance(value, DSLCudaVersion):` — **EN:** Starts a conditional branch guarded by `isinstance(value, DSLCudaVersion)`. **CN:** 开始一个由 `isinstance(value, DSLCudaVersion)` 控制的条件分支。
+- **L718** `        return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L719** `    if isinstance(value, str):` — **EN:** Starts a conditional branch guarded by `isinstance(value, str)`. **CN:** 开始一个由 `isinstance(value, str)` 控制的条件分支。
+- **L720** `        return DSLCudaVersion(value)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L721** `    raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L722** `        f"{param_name} must be a DSLCudaVersion or str, got {type(value).__name__}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L723** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L724** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L725** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L726** `def target_version(` — **EN:** Defines function `target_version`. **CN:** 定义函数 `target_version`。
+- **L727** `    exact_version: Optional[Union[DSLCudaVersion, str]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L728** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L729** `    min_version: Optional[Union[DSLCudaVersion, str]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L730** `    max_version: Optional[Union[DSLCudaVersion, str]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L731** `) -> bool:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L732** `    """` — **EN:** Starts the docstring for the function `target_version`. **CN:** 开始说明 function `target_version` 的文档字符串。
+- **L733** `    Check if the current CUDA version used to build the DSL matches an exact version` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L734** `    or falls within specified bounds at compile-time.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L735** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L736** `    Only one of \`\`exact_version\`\` *or* \`\`min_version\`\`/\`\`max_version\`\` may be specified.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L737** `    At least one must be provided.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L738** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L739** `    :param exact_version: The required CUDA version (e.g., "12.3").` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L740** `    :type exact_version: Optional[Union[DSLCudaVersion, str]]` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L741** `    :param min_version: The minimum CUDA version required (inclusive, e.g., "12.0").` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L742** `    :type min_version: Optional[Union[DSLCudaVersion, str]]` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L743** `    :param max_version: The maximum CUDA version allowed (inclusive, e.g., "13.2").` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L744** `    :type max_version: Optional[Union[DSLCudaVersion, str]]` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L745** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L746** `    :returns: \`\`True\`\` if the CUDA version matches the requirement(s) specified.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L747** `    :rtype: bool` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L748** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L749** `    :raises DSLRuntimeError:` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L750** `        - If neither an \`\`exact_version\`\` nor version range is given.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L751** `        - If both an exact version and a range are provided.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L752** `        - If \`\`min_version\`\` > \`\`max_version\`\`.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L753** `        - If any version parameter is not a DSLCudaVersion or str.` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L754** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L755** `    **Examples**` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L756** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L757** `    .. code-block:: python` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L758** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L759** `        target_version(exact_version="12.3")` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L760** `        # True if CUDA_VERSION == 12.3` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L761** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L762** `        target_version(min_version="12.0")` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L763** `        # True if CUDA_VERSION >= 12.0` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L764** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L765** `        target_version(max_version="13.2")` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L766** `        # True if CUDA_VERSION <= 13.2` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L767** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L768** `        target_version(min_version="12.0", max_version="13.2")` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L769** `        # True if 12.0 <= CUDA_VERSION <= 13.2` — **EN:** Continues the docstring for the function `target_version`. **CN:** 继续说明 function `target_version` 的文档字符串。
+- **L770** `    """` — **EN:** Ends the docstring for the function `target_version`. **CN:** 结束说明 function `target_version` 的文档字符串。
+- **L771** `    # Avoid circular dependency` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L772** `    from .version_info import CUDA_VERSION` — **EN:** Imports CUDA_VERSION from `.version_info`. **CN:** 从 `.version_info` 导入 CUDA_VERSION。
+- **L773** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L774** `    # Coerce all version parameters to DSLCudaVersion at the start` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L775** `    exact_v = _coerce_to_cuda_version(exact_version, "exact_version")` — **EN:** Assigns a value to exact_v. **CN:** 将一个值赋给 exact_v。
+- **L776** `    min_v = _coerce_to_cuda_version(min_version, "min_version")` — **EN:** Assigns a value to min_v. **CN:** 将一个值赋给 min_v。
+- **L777** `    max_v = _coerce_to_cuda_version(max_version, "max_version")` — **EN:** Assigns a value to max_v. **CN:** 将一个值赋给 max_v。
+- **L778** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L779** `    # Sanity check` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L780** `    is_range_check = min_v is not None or max_v is not None` — **EN:** Assigns a value to is_range_check. **CN:** 将一个值赋给 is_range_check。
+- **L781** `    is_exact_version_check = exact_v is not None` — **EN:** Assigns a value to is_exact_version_check. **CN:** 将一个值赋给 is_exact_version_check。
+- **L782** `    if is_range_check and is_exact_version_check:` — **EN:** Starts a conditional branch guarded by `is_range_check and is_exact_version_check`. **CN:** 开始一个由 `is_range_check and is_exact_version_check` 控制的条件分支。
+- **L783** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L784** `            "Cannot use exact_version and [min_version, max_version] check at the same time"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L785** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L786** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L787** `    if is_range_check:` — **EN:** Starts a conditional branch guarded by `is_range_check`. **CN:** 开始一个由 `is_range_check` 控制的条件分支。
+- **L788** `        if min_v is None and max_v is None:` — **EN:** Starts a conditional branch guarded by `min_v is None and max_v is None`. **CN:** 开始一个由 `min_v is None and max_v is None` 控制的条件分支。
+- **L789** `            raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L790** `                "min_version and max_version cannot be None at the same time"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L791** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L792** `        if min_v is not None and max_v is not None:` — **EN:** Starts a conditional branch guarded by `min_v is not None and max_v is not None`. **CN:** 开始一个由 `min_v is not None and max_v is not None` 控制的条件分支。
+- **L793** `            if min_v > max_v:` — **EN:** Starts a conditional branch guarded by `min_v > max_v`. **CN:** 开始一个由 `min_v > max_v` 控制的条件分支。
+- **L794** `                raise DSLRuntimeError("min_version must be less than max_version")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L795** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L796** `        result = True` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L797** `        if min_v is not None:` — **EN:** Starts a conditional branch guarded by `min_v is not None`. **CN:** 开始一个由 `min_v is not None` 控制的条件分支。
+- **L798** `            result = result and CUDA_VERSION >= min_v` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L799** `        if max_v is not None:` — **EN:** Starts a conditional branch guarded by `max_v is not None`. **CN:** 开始一个由 `max_v is not None` 控制的条件分支。
+- **L800** `            result = result and CUDA_VERSION <= max_v` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L801** `        return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L802** `    elif is_exact_version_check:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L803** `        return CUDA_VERSION == exact_v` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L804** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L805** `        raise DSLRuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L806** `            "either exact_version, min_version, or max_version must be provided"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L807** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl.common`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl.common`。
+- EN: Top-level classes: Colors, DSLBaseError, DSLSubprocessCallError, DSLRuntimeError, DSLCudaRuntimeError, DSLAstPreprocessorError, DSLNotImplemented, DSLUserCodeError, DSLOperationBuildError, DSLCudaVersion CN: 顶层类包括：Colors, DSLBaseError, DSLSubprocessCallError, DSLRuntimeError, DSLCudaRuntimeError, DSLAstPreprocessorError, DSLNotImplemented, DSLUserCodeError, DSLOperationBuildError, DSLCudaVersion
+- EN: Top-level functions: register_env_manager, _dsl_excepthook, _get_friendly_cuda_error_message, translate_mlir_nanobind_error, _get_cuda_version, _coerce_to_cuda_version, target_version CN: 顶层函数包括：register_env_manager, _dsl_excepthook, _get_friendly_cuda_error_message, translate_mlir_nanobind_error, _get_cuda_version, _coerce_to_cuda_version, target_version
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .runtime.cuda:get_device_info, .version_info:CUDA_VERSION CN: 内部依赖：.runtime.cuda:get_device_info, .version_info:CUDA_VERSION
+- EN: External or standard-library dependencies: inspect, os, subprocess, sys, types, typing:Any,Dict,Optional,Union, functools:total_ordering, dataclasses:dataclass, linecache, traceback CN: 外部或标准库依赖：inspect, os, subprocess, sys, types, typing:Any,Dict,Optional,Union, functools:total_ordering, dataclasses:dataclass, linecache, traceback

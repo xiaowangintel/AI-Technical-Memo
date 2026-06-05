@@ -1,0 +1,491 @@
+# host_uncompress.h — Code Analysis / 代码分析
+**Source / 源文件**: `tools/util/include/cutlass/util/host_uncompress.h`
+**Purpose / 用途**: Provides host-side helpers for uncompress. / 提供与 uncompress 相关的主机端辅助工具。
+---
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** <code>/***************************************************************************************************</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L2** <code> * Copyright (c) 2017 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L3** <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Provides the SPDX license identifier for automated tooling.
+  - CN: 给出供自动化工具识别的 SPDX 许可证标识。
+- **L4** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L5** <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L6** <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Comment that documents intent or context: "modification, are permitted provided that the following conditions are met:".
+  - CN: 用于说明意图或上下文的注释："modification, are permitted provided that the following conditions are met:"。
+- **L7** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L8** <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L9** <code> * list of conditions and the following disclaimer.</code>
+  - EN: Comment that documents intent or context: "list of conditions and the following disclaimer.".
+  - CN: 用于说明意图或上下文的注释："list of conditions and the following disclaimer."。
+- **L10** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L11** <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L12** <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Comment that documents intent or context: "this list of conditions and the following disclaimer in the documentation".
+  - CN: 用于说明意图或上下文的注释："this list of conditions and the following disclaimer in the documentation"。
+- **L13** <code> * and/or other materials provided with the distribution.</code>
+  - EN: Comment that documents intent or context: "and/or other materials provided with the distribution.".
+  - CN: 用于说明意图或上下文的注释："and/or other materials provided with the distribution."。
+- **L14** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L15** <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L16** <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L17** <code> * this software without specific prior written permission.</code>
+  - EN: Comment that documents intent or context: "this software without specific prior written permission.".
+  - CN: 用于说明意图或上下文的注释："this software without specific prior written permission."。
+- **L18** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L19** <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L20** <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L21** <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L22** <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明该源文件的版权归属。
+- **L23** <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Comment that documents intent or context: "FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL".
+  - CN: 用于说明意图或上下文的注释："FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL"。
+- **L24** <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Comment that documents intent or context: "DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR".
+  - CN: 用于说明意图或上下文的注释："DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR"。
+- **L25** <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Comment that documents intent or context: "SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER".
+  - CN: 用于说明意图或上下文的注释："SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER"。
+- **L26** <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Comment that documents intent or context: "CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,".
+  - CN: 用于说明意图或上下文的注释："CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"。
+- **L27** <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Comment that documents intent or context: "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE".
+  - CN: 用于说明意图或上下文的注释："OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE"。
+- **L28** <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the BSD-3-Clause license terms and warranty disclaimer.
+  - CN: 继续给出 BSD-3-Clause 许可条款与免责说明。
+- **L29** <code> *</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L30** <code> **************************************************************************************************/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L31** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L32** <code>/*! \file</code>
+  - EN: Comment that documents intent or context: "! \file".
+  - CN: 用于说明意图或上下文的注释："! \file"。
+- **L33** <code>    \brief uncompress sparse matrix from the host side </code>
+  - EN: Comment that documents intent or context: "\brief uncompress sparse matrix from the host side".
+  - CN: 用于说明意图或上下文的注释："\brief uncompress sparse matrix from the host side"。
+- **L34** <code>*/</code>
+  - EN: Comment-only separator that visually divides sections of the file.
+  - CN: 仅作为视觉分隔的注释行，用于划分文件章节。
+- **L35** <code>#pragma once</code>
+  - EN: Uses `#pragma once` to prevent multiple inclusion of this header.
+  - CN: 使用 `#pragma once` 防止头文件被重复包含。
+- **L36** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L37** <code>#include &quot;cutlass/coord.h&quot;</code>
+  - EN: Includes `cutlass/coord.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/coord.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L38** <code>#include &quot;cutlass/util/host_tensor.h&quot;</code>
+  - EN: Includes `cutlass/util/host_tensor.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/host_tensor.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L39** <code>#include &quot;cutlass/tensor_view.h&quot;</code>
+  - EN: Includes `cutlass/tensor_view.h` so this file can use general CUTLASS declarations.
+  - CN: 引入 `cutlass/tensor_view.h`，使当前文件可以使用CUTLASS 通用声明。
+- **L40** <code>#include &quot;cutlass/util/tensor_view_io.h&quot;</code>
+  - EN: Includes `cutlass/util/tensor_view_io.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/tensor_view_io.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L41** <code>#include &quot;cutlass/util/reference/host/gemm.h&quot;</code>
+  - EN: Includes `cutlass/util/reference/host/gemm.h` so this file can use CUTLASS utility or reference helpers.
+  - CN: 引入 `cutlass/util/reference/host/gemm.h`，使当前文件可以使用CUTLASS 工具或参考辅助模块。
+- **L42** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L43** <code>namespace cutlass {</code>
+  - EN: Opens namespace `cutlass` to group related symbols.
+  - CN: 打开命名空间 `cutlass`，用于归组相关符号。
+- **L44** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L45** <code>// uncompress sparse tensor core A matrix</code>
+  - EN: Comment that documents intent or context: "uncompress sparse tensor core A matrix".
+  - CN: 用于说明意图或上下文的注释："uncompress sparse tensor core A matrix"。
+- **L46** <code>template &lt;typename ElementA, typename LayoutA, typename ElementE,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L47** <code>          typename LayoutE&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L48** <code>void uncompress(TensorRef&lt;ElementA, LayoutA&gt; uncompressed_tensor_a,</code>
+  - EN: Begins or continues the signature/call syntax involving `uncompress`.
+  - CN: 开始或继续与 `uncompress` 相关的签名/调用语法。
+- **L49** <code>                TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L50** <code>                TensorRef&lt;ElementE, LayoutE&gt; tensor_e, int row, int col) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L51** <code>  // How many uncompressed data we can get with ElementE meta data</code>
+  - EN: Comment that documents intent or context: "How many uncompressed data we can get with ElementE meta data".
+  - CN: 用于说明意图或上下文的注释："How many uncompressed data we can get with ElementE meta data"。
+- **L52** <code>  int DecompressedElementsPerElementE =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L53** <code>      256 / cutlass::sizeof_bits&lt;ElementA&gt;::value;</code>
+  - EN: Declares the symbol `value` in the current scope.
+  - CN: 在当前作用域中声明符号 `value`。
+- **L54** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L55** <code>  // Process 4bit meta data a time </code>
+  - EN: Comment that documents intent or context: "Process 4bit meta data a time".
+  - CN: 用于说明意图或上下文的注释："Process 4bit meta data a time"。
+- **L56** <code>  int step;</code>
+  - EN: Declares the symbol `step` in the current scope.
+  - CN: 在当前作用域中声明符号 `step`。
+- **L57** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L58** <code>  // 1:2 or 2:4 or 4:8</code>
+  - EN: Comment that documents intent or context: "1:2 or 2:4 or 4:8".
+  - CN: 用于说明意图或上下文的注释："1:2 or 2:4 or 4:8"。
+- **L59** <code>  int a, b;</code>
+  - EN: Declares the symbol `b` in the current scope.
+  - CN: 在当前作用域中声明符号 `b`。
+- **L60** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L61** <code>  if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 4) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L62** <code>    step = 8;</code>
+  - EN: Assigns or initializes `step` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `step` 进行赋值或初始化。
+- **L63** <code>    a = 4;</code>
+  - EN: Assigns or initializes `a` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `a` 进行赋值或初始化。
+- **L64** <code>    b = 8;</code>
+  - EN: Assigns or initializes `b` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `b` 进行赋值或初始化。
+- **L65** <code>  } else if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 8) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L66** <code>    step = 4;</code>
+  - EN: Assigns or initializes `step` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `step` 进行赋值或初始化。
+- **L67** <code>    a = 2;</code>
+  - EN: Assigns or initializes `a` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `a` 进行赋值或初始化。
+- **L68** <code>    b = 4;</code>
+  - EN: Assigns or initializes `b` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `b` 进行赋值或初始化。
+- **L69** <code>  } else if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 16) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L70** <code>    step = 4;</code>
+  - EN: Assigns or initializes `step` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `step` 进行赋值或初始化。
+- **L71** <code>    a = 2;</code>
+  - EN: Assigns or initializes `a` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `a` 进行赋值或初始化。
+- **L72** <code>    b = 4;</code>
+  - EN: Assigns or initializes `b` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `b` 进行赋值或初始化。
+- **L73** <code>  } else if (cutlass::sizeof_bits&lt;ElementA&gt;::value == 32) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L74** <code>    step = 2;</code>
+  - EN: Assigns or initializes `step` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `step` 进行赋值或初始化。
+- **L75** <code>    a = 1;</code>
+  - EN: Assigns or initializes `a` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `a` 进行赋值或初始化。
+- **L76** <code>    b = 2;</code>
+  - EN: Assigns or initializes `b` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `b` 进行赋值或初始化。
+- **L77** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L78** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L79** <code>  int ElementsPerE = (cutlass::sizeof_bits&lt;ElementA&gt;::value == 4) ? 2 : 1;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L80** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L81** <code>  for (int r = 0; r &lt; row; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L82** <code>    for (int c = 0; c &lt; (col / DecompressedElementsPerElementE); ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L83** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L84** <code>      ElementE meta = tensor_e.at(MatrixCoord(r, c));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L85** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L86** <code>      for (int i = 0; i &lt; DecompressedElementsPerElementE; i += step) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L87** <code>        int e = (meta &gt;&gt; (i / step * 4)) &amp; 0xf;</code>
+  - EN: Assigns or initializes `e` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `e` 进行赋值或初始化。
+- **L88** <code>        int idx0 = e &amp; 0x3;</code>
+  - EN: Assigns or initializes `idx0` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `idx0` 进行赋值或初始化。
+- **L89** <code>        int idx1 = e &gt;&gt; 2;</code>
+  - EN: Assigns or initializes `idx1` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `idx1` 进行赋值或初始化。
+- **L90** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L91** <code>        if (a == 1) idx0 = idx0 / 2;</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L92** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L93** <code>        for (int ii = 0; ii &lt; step; ii += ElementsPerE) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L94** <code>          int real_col =</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L95** <code>              c * DecompressedElementsPerElementE + i + ii;</code>
+  - EN: Declares the symbol `ii` in the current scope.
+  - CN: 在当前作用域中声明符号 `ii`。
+- **L96** <code>          int compressed_col = (real_col / b) * a;</code>
+  - EN: Assigns or initializes `compressed_col` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `compressed_col` 进行赋值或初始化。
+- **L97** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L98** <code>          if (ii == (idx0 * ElementsPerE)) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L99** <code>            uncompressed_tensor_a.at(MatrixCoord(r, real_col)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L100** <code>                tensor_a.at(MatrixCoord(r, compressed_col));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L101** <code>            if (ElementsPerE == 2)</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L102** <code>              uncompressed_tensor_a.at(MatrixCoord(r, real_col + 1)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L103** <code>                  tensor_a.at(MatrixCoord(r, compressed_col + 1));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L104** <code>          } else if ((ii == (idx1 * ElementsPerE)) &amp;&amp; (a != 1)) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L105** <code>            uncompressed_tensor_a.at(MatrixCoord(r, real_col)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L106** <code>                tensor_a.at(MatrixCoord(r, compressed_col + ElementsPerE));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L107** <code>            if (ElementsPerE == 2)</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L108** <code>              uncompressed_tensor_a.at(MatrixCoord(r, real_col + 1)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L109** <code>                  tensor_a.at(</code>
+  - EN: Begins or continues the signature/call syntax involving `at`.
+  - CN: 开始或继续与 `at` 相关的签名/调用语法。
+- **L110** <code>                      MatrixCoord(r, compressed_col + ElementsPerE + 1));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L111** <code>          } else {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L112** <code>            uncompressed_tensor_a.at(MatrixCoord(r, real_col)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L113** <code>                ElementA(0);</code>
+  - EN: Declares function or method `ElementA` without defining it here.
+  - CN: 声明函数或方法 `ElementA`，但不在此处给出定义。
+- **L114** <code>            if (ElementsPerE == 2)</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L115** <code>              uncompressed_tensor_a.at(MatrixCoord(r, real_col + 1)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L116** <code>                  ElementA(0);</code>
+  - EN: Declares function or method `ElementA` without defining it here.
+  - CN: 声明函数或方法 `ElementA`，但不在此处给出定义。
+- **L117** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L118** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L119** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L120** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L121** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L122** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L123** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L124** <code>// uncompress ELL block sparse matrix</code>
+  - EN: Comment that documents intent or context: "uncompress ELL block sparse matrix".
+  - CN: 用于说明意图或上下文的注释："uncompress ELL block sparse matrix"。
+- **L125** <code>template &lt;typename ElementA, typename LayoutA,</code>
+  - EN: Declares template parameters so later code can be specialized at compile time.
+  - CN: 声明模板参数，使后续代码可以在编译期特化。
+- **L126** <code>          typename ElementE, typename LayoutE&gt;</code>
+  - EN: Continues the surrounding declaration, expression, or control-flow logic.
+  - CN: 继续当前声明、表达式或控制流逻辑。
+- **L127** <code>void uncompress_ell_block_sparse(</code>
+  - EN: Begins or continues the signature/call syntax involving `uncompress_ell_block_sparse`.
+  - CN: 开始或继续与 `uncompress_ell_block_sparse` 相关的签名/调用语法。
+- **L128** <code>                TensorRef&lt;ElementA, LayoutA&gt; uncompressed_tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L129** <code>                TensorRef&lt;ElementA, LayoutA&gt; tensor_a,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L130** <code>                TensorRef&lt;ElementE, LayoutE&gt; ell_idx,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L131** <code>                int rows, int cols,</code>
+  - EN: Continues a multi-line list of arguments, fields, or template parameters.
+  - CN: 继续一个跨多行的参数、字段或模板参数列表。
+- **L132** <code>                int ell_num_cols, int ell_blocksize) {</code>
+  - EN: Opens a new code block whose body appears on following lines.
+  - CN: 打开一个新的代码块，其主体出现在后续行中。
+- **L133** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L134** <code>  for (int r = 0; r &lt; rows / ell_blocksize; ++r) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L135** <code>    for (int c = 0; c &lt; ell_num_cols / ell_blocksize; ++c) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L136** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L137** <code>      ElementE idx = ell_idx.at(MatrixCoord(r, c));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L138** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L139** <code>      if (idx != -1) {</code>
+  - EN: Evaluates a condition before choosing whether to execute the following block.
+  - CN: 先判断条件，再决定是否执行后续代码块。
+- **L140** <code>        int row_begin = r * ell_blocksize;</code>
+  - EN: Assigns or initializes `row_begin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `row_begin` 进行赋值或初始化。
+- **L141** <code>        int col_begin_real = idx * ell_blocksize;</code>
+  - EN: Assigns or initializes `col_begin_real` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `col_begin_real` 进行赋值或初始化。
+- **L142** <code>        int col_begin = c * ell_blocksize;</code>
+  - EN: Assigns or initializes `col_begin` with the expression on the right-hand side.
+  - CN: 用右侧表达式对 `col_begin` 进行赋值或初始化。
+- **L143** <code>  </code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L144** <code>        for (int i = 0; i &lt; ell_blocksize; ++i) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L145** <code>          for (int j = 0; j &lt; ell_blocksize; ++j) {</code>
+  - EN: Starts a `for` loop that iterates over a range or index space.
+  - CN: 开始一个 `for` 循环，用于遍历范围或索引空间。
+- **L146** <code>            uncompressed_tensor_a.at(MatrixCoord(row_begin + i, col_begin_real + j)) =</code>
+  - EN: Begins or continues the signature/call syntax involving `MatrixCoord`.
+  - CN: 开始或继续与 `MatrixCoord` 相关的签名/调用语法。
+- **L147** <code>                tensor_a.at(</code>
+  - EN: Begins or continues the signature/call syntax involving `at`.
+  - CN: 开始或继续与 `at` 相关的签名/调用语法。
+- **L148** <code>                    MatrixCoord(row_begin + i, col_begin +j));</code>
+  - EN: Declares function or method `MatrixCoord` without defining it here.
+  - CN: 声明函数或方法 `MatrixCoord`，但不在此处给出定义。
+- **L149** <code>          }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L150** <code>        }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L151** <code>      }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L152** <code>    }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L153** <code>  }</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L154** <code>}</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L155** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+- **L156** <code>} // namespace cutlass</code>
+  - EN: Closes the current scope, type, or control-flow block.
+  - CN: 结束当前作用域、类型定义或控制流代码块。
+- **L157** <code>(blank)</code>
+  - EN: Blank line that separates nearby declarations or logical blocks.
+  - CN: 用于分隔相邻声明或逻辑块的空行。
+
+## Key Concepts / 核心概念
+
+- Shared utilities used by tests, examples, and tools / 测试、示例与工具共享的辅助模块
+- Template-heavy C++ interface design / 大量使用模板的 C++ 接口设计
+- Type aliases, helper utilities, and control flow wiring / 类型别名、辅助工具与控制流程拼装
+
+## Dependencies / 依赖关系
+
+- <code>cutlass/coord.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/host_tensor.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/tensor_view.h</code> — general CUTLASS declarations / CUTLASS 通用声明
+- <code>cutlass/util/tensor_view_io.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块
+- <code>cutlass/util/reference/host/gemm.h</code> — CUTLASS utility or reference helpers / CUTLASS 工具或参考辅助模块

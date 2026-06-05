@@ -1,0 +1,521 @@
+# helpers.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/cute/nvgpu/helpers.py`
+
+## Purpose / 作用
+- EN: Defines 3 functions (make_tiled_tma_atom_A, make_tiled_tma_atom_B, make_im2col_tma_atom_A) in `CuTeDSL.cutlass.cute.nvgpu.helpers`.
+- CN: 该模块 `CuTeDSL.cutlass.cute.nvgpu.helpers` 定义了 3 个函数（make_tiled_tma_atom_A, make_tiled_tma_atom_B, make_im2col_tma_atom_A）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from typing import Any, Optional, Tuple, Type, Union, cast` — **EN:** Imports Any, Optional, Tuple, Type, Union, cast from `typing`. **CN:** 从 `typing` 导入 Any, Optional, Tuple, Type, Union, cast。
+- **L13** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L14** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L15** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L16** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L17** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L18** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L19** `from .. import core, atom` — **EN:** Imports core, atom from the parent package. **CN:** 从父包导入 core, atom。
+- **L20** `from ..typing import Shape, Layout, ComposedLayout, Tensor, Numeric, NumericMeta` — **EN:** Imports Shape, Layout, ComposedLayout, Tensor, Numeric, NumericMeta from `..typing`. **CN:** 从 `..typing` 导入 Shape, Layout, ComposedLayout, Tensor, Numeric, NumericMeta。
+- **L21** `from .cpasync.copy import (` — **EN:** Imports CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SNonExecTrait, CopyBulkTensorTileG2SMulticastOp, CopyBulkTensorTileG2SMulticastNonExecTrait, CopyBulkTensorIm2ColG2SOp, CopyBulkTensorIm2ColG2SNonExecTrait, ... (+2 more) from `.cpasync.copy`. **CN:** 从 `.cpasync.copy` 导入 CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SNonExecTrait, CopyBulkTensorTileG2SMulticastOp, CopyBulkTensorTileG2SMulticastNonExecTrait, CopyBulkTensorIm2ColG2SOp, CopyBulkTensorIm2ColG2SNonExecTrait, ... (+2 more)。
+- **L22** `    CopyBulkTensorTileG2SOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L23** `    CopyBulkTensorTileG2SNonExecTrait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L24** `    CopyBulkTensorTileG2SMulticastOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L25** `    CopyBulkTensorTileG2SMulticastNonExecTrait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L26** `    CopyBulkTensorIm2ColG2SOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L27** `    CopyBulkTensorIm2ColG2SNonExecTrait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L28** `    CopyBulkTensorIm2ColG2SMulticastOp,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    CopyBulkTensorIm2ColG2SMulticastNonExecTrait,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `from .cpasync.helpers import TmaInfo` — **EN:** Imports TmaInfo from `.cpasync.helpers`. **CN:** 从 `.cpasync.helpers` 导入 TmaInfo。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `__all__ = [` — **EN:** Assigns a value to __all__. **CN:** 将一个值赋给 __all__。
+- **L35** `    "make_tiled_tma_atom_A",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L36** `    "make_tiled_tma_atom_B",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L37** `    "make_im2col_tma_atom_A",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L38** `]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L41** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L42** `# TMA creation helpers for tcgen05 MMAs` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L43** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L44** `####################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L45** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L48** `def make_tiled_tma_atom_A(` — **EN:** Defines function `make_tiled_tma_atom_A`. **CN:** 定义函数 `make_tiled_tma_atom_A`。
+- **L49** `    op: Union[CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SMulticastOp],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `    gmem_tensor: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L51** `    smem_layout: Union[Layout, ComposedLayout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `    mma_tiler_mnk: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L53** `    tiled_mma: atom.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L54** `    cluster_shape_vmnk: Union[Shape, None] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L55** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L56** `    internal_type: Optional[Type[Numeric]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `) -> TmaInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L60** `    """` — **EN:** Starts the docstring for the function `make_tiled_tma_atom_A`. **CN:** 开始说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L61** `    Makes a TMA Copy atom mapping to \`\`.tile\`\` mode for \`\`cp.async.bulk.tensor\`\` PTX operation` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L62** `    accounting for the MK projections of the TiledMMA for A tensor loads.` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** `    Given` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L65** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L66** `    - a GMEM tensor` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L67** `    - a SMEM layout` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L68** `    - a MMA Tiler` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L69** `    - a TiledMma` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L70** `    - a Cluster-level shape` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L71** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L72** `    this function figures out the bulk tensor asynchronous copy instruction to use with the maximum` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L73** `    "TMA vector length" to copy tiles of the GMEM tensor to an SMEM buffer with the provided` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L74** `    layout and consistent with the provided Tiler & tiled_mma (considering the M-mode & K-mode).` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L75** `    The Cluster-level shape is used to determine the multicast factor across the N-mode for A tensor loads.` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `    This function returns two results:` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    1. the Copy Atom` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L80** `    2. the so-called TMA tensor used to map logical coordinates of the GMEM tensor to coordinates` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L81** `       that the TMA unit can consume. TMA tensors have so-called basis stride elements so that the` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L82** `       associated layout can output coordinates. Otherwise, TMA tensors can be partitioned` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L83** `       similarly to any other CuTe tensors using the algebra.` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L84** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L85** `    :param op:                 The Copy Operation to construct an Atom for` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L86** `    :type op:                  Union[CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SMulticastOp]` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L87** `    :param gmem_tensor:        The GMEM tensor to be loaded by this copy atom` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L88** `    :type gmem_tensor:         Tensor` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L89** `    :param smem_layout:        Shared memory layout to load the tensor into (PDSL)` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L90** `    :type smem_layout:         Union[Layout, ComposedLayout]` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L91** `    :param mma_tiler_mnk:      The MMA Tiler shape (TILE_M, TILE_N, TILE_K) in MNK dimensions` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L92** `    :type mma_tiler_mnk:       Shape` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L93** `    :param tiled_mma:          The TiledMMA that will consume the load as operands` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L94** `    :type tiled_mma:           atom.TiledMma` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L95** `    :param cluster_shape_vmnk: The Cluster-level shape in VMNK dimensions` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L96** `    :type cluster_shape_vmnk:  Shape` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L97** `    :param internal_type:      An optional parameter for the internal data type to when element` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L98** `                               type does not match the copy type` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L99** `    :type internal_type:       Type[Numeric]` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L100** `    :return:                   A TmaInfo containing the Copy Atom, TMA tensor, and SMEM layout` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L101** `    :rtype:                    TmaInfo` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_A`. **CN:** 继续说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L102** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L103** `    """` — **EN:** Ends the docstring for the function `make_tiled_tma_atom_A`. **CN:** 结束说明 function `make_tiled_tma_atom_A` 的文档字符串。
+- **L104** `    smem_rank = core.rank(smem_layout)` — **EN:** Assigns a value to smem_rank. **CN:** 将一个值赋给 smem_rank。
+- **L105** `    assert smem_rank == 3 or smem_rank == 4, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L106** `        "a_smem_layout must be non-staged (atom, rest_m, rest_k) "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `        "or staged (atom, rest_m, rest_k, stage), "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `        f"but got rank = {smem_rank}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `    # Keep the original SMEM layout object for later retrieval at Python level.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L112** `    stored_smem_layout = smem_layout` — **EN:** Assigns a value to stored_smem_layout. **CN:** 将一个值赋给 stored_smem_layout。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `    # Slice the smem_layout if it is staged` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L115** `    if smem_rank == 4:` — **EN:** Starts a conditional branch guarded by `smem_rank == 4`. **CN:** 开始一个由 `smem_rank == 4` 控制的条件分支。
+- **L116** `        smem_layout = core.select(smem_layout, mode=[0, 1, 2])` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L117** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L118** `    ident = core.make_identity_layout(gmem_tensor.shape, loc=loc, ip=ip)` — **EN:** Assigns a value to ident. **CN:** 将一个值赋给 ident。
+- **L119** `    mma_mnk: Any = mma_tiler_mnk` — **EN:** Assigns a typed value to mma_mnk. **CN:** 为 mma_mnk 赋予带类型标注的值。
+- **L120** `    mma_tiler_mk = (mma_mnk[0], *mma_mnk[2:])` — **EN:** Assigns a value to mma_tiler_mk. **CN:** 将一个值赋给 mma_tiler_mk。
+- **L121** `    g_tile = core.composition(ident, mma_tiler_mk, loc=loc, ip=ip)` — **EN:** Assigns a value to g_tile. **CN:** 将一个值赋给 g_tile。
+- **L122** `    cta_v_map: Any = tiled_mma._thrfrg_A(g_tile)` — **EN:** Assigns a typed value to cta_v_map. **CN:** 为 cta_v_map 赋予带类型标注的值。
+- **L123** `    cta_v_map = core.get(cta_v_map, mode=[1])` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L124** `    cta_v_map = core.dice(cta_v_map, (1, (1,) * core.rank(g_tile)))` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `    if isinstance(op, CopyBulkTensorTileG2SOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, CopyBulkTensorTileG2SOp)`. **CN:** 开始一个由 `isinstance(op, CopyBulkTensorTileG2SOp)` 控制的条件分支。
+- **L127** `        num_multicast = 1` — **EN:** Assigns a value to num_multicast. **CN:** 将一个值赋给 num_multicast。
+- **L128** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L129** `        assert isinstance(op, CopyBulkTensorTileG2SMulticastOp)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L130** `        # multicast across the N-mode since those would share the same tile of A` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L131** `        if cluster_shape_vmnk is None:` — **EN:** Starts a conditional branch guarded by `cluster_shape_vmnk is None`. **CN:** 开始一个由 `cluster_shape_vmnk is None` 控制的条件分支。
+- **L132** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L133** `                "cluster_shape_vmnk must be provided for multicast A tensor loads"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L134** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L135** `        num_multicast = core.size(cluster_shape_vmnk, mode=[2])` — **EN:** Assigns a value to num_multicast. **CN:** 将一个值赋给 num_multicast。
+- **L136** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L137** `    smem_for_ir: Any = smem_layout` — **EN:** Assigns a typed value to smem_for_ir. **CN:** 为 smem_for_ir 赋予带类型标注的值。
+- **L138** `    if isinstance(smem_for_ir, core._ComposedLayout):` — **EN:** Starts a conditional branch guarded by `isinstance(smem_for_ir, core._ComposedLayout)`. **CN:** 开始一个由 `isinstance(smem_for_ir, core._ComposedLayout)` 控制的条件分支。
+- **L139** `        smem_for_ir = smem_for_ir.value` — **EN:** Assigns a value to smem_for_ir. **CN:** 将一个值赋给 smem_for_ir。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    tma_format = None` — **EN:** Assigns a value to tma_format. **CN:** 将一个值赋给 tma_format。
+- **L142** `    if internal_type is not None:` — **EN:** Starts a conditional branch guarded by `internal_type is not None`. **CN:** 开始一个由 `internal_type is not None` 控制的条件分支。
+- **L143** `        itype: Any = internal_type` — **EN:** Assigns a typed value to itype. **CN:** 为 itype 赋予带类型标注的值。
+- **L144** `        if not isinstance(internal_type, NumericMeta):` — **EN:** Starts a conditional branch guarded by `not isinstance(internal_type, NumericMeta)`. **CN:** 开始一个由 `not isinstance(internal_type, NumericMeta)` 控制的条件分支。
+- **L145** `            raise TypeError(f"internal_type must be a Numeric, but got {internal_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L146** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L147** `        use_unpack = (` — **EN:** Assigns a value to use_unpack. **CN:** 将一个值赋给 use_unpack。
+- **L148** `            itype.width == 8` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `            and isinstance(gmem_tensor.element_type, NumericMeta)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** `            and gmem_tensor.element_type.width < 8  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L151** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `        internal_mlir_type = (` — **EN:** Assigns a value to internal_mlir_type. **CN:** 将一个值赋给 internal_mlir_type。
+- **L153** `            gmem_tensor.element_type.mlir_type if use_unpack else itype.mlir_type  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `        tma_format = _cute_nvgpu_ir.TmaDataFormat(` — **EN:** Assigns a value to tma_format. **CN:** 将一个值赋给 tma_format。
+- **L156** `            _cute_nvgpu_ir.get_default_tma_format(internal_mlir_type, use_unpack)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L159** `    # res[0] = the IR Value for the non-executable atom instance` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L160** `    # res[1] = the IR Value for the associated TMA tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L161** `    res = _cute_nvgpu_ir.atom_make_non_exec_tiled_tma_load(` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L162** `        cast(Any, gmem_tensor).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `        smem_for_ir,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `        cta_v_map,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** `        op._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L166** `        num_multicast=num_multicast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L167** `        tma_format=tma_format,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L168** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `    if isinstance(op, CopyBulkTensorTileG2SOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, CopyBulkTensorTileG2SOp)`. **CN:** 开始一个由 `isinstance(op, CopyBulkTensorTileG2SOp)` 控制的条件分支。
+- **L172** `        return TmaInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L173** `            atom.CopyAtom(op, CopyBulkTensorTileG2SNonExecTrait(res[0])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `            res[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `            stored_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L176** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `    assert isinstance(op, CopyBulkTensorTileG2SMulticastOp)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L179** `    return TmaInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L180** `        atom.CopyAtom(op, CopyBulkTensorTileG2SMulticastNonExecTrait(res[0])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L181** `        res[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L182** `        stored_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L187** `def make_tiled_tma_atom_B(` — **EN:** Defines function `make_tiled_tma_atom_B`. **CN:** 定义函数 `make_tiled_tma_atom_B`。
+- **L188** `    op: Union[CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SMulticastOp],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L189** `    gmem_tensor: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L190** `    smem_layout: Union[Layout, ComposedLayout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L191** `    mma_tiler_mnk: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L192** `    tiled_mma: atom.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L193** `    cluster_shape_vmnk: Union[Shape, None] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L194** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L195** `    internal_type: Optional[Type[Numeric]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L196** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L197** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L198** `) -> TmaInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L199** `    """` — **EN:** Starts the docstring for the function `make_tiled_tma_atom_B`. **CN:** 开始说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L200** `    Makes a TMA Copy atom mapping to \`\`.tile\`\` mode for \`\`cp.async.bulk.tensor\`\` PTX operation` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L201** `    accounting for the NK projections of the TiledMMA for B tensor loads.` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** `    Given` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L204** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L205** `    - a GMEM tensor` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L206** `    - a SMEM layout` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L207** `    - a MMA Tiler` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L208** `    - a TiledMma` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L209** `    - a Cluster-level shape` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    this function figures out the bulk tensor asynchronous copy instruction to use with the maximum` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L212** `    "TMA vector length" to copy tiles of the GMEM tensor to an SMEM buffer with the provided` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L213** `    layout and consistent with the provided Tiler & tiled_mma (considering the N-mode & K-mode).` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L214** `    The Cluster-level shape is used to determine the multicast factor across the M-mode for B tensor loads.` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `    This function returns two results:` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L217** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L218** `    1. the Copy Atom` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L219** `    2. the so-called TMA tensor used to map logical coordinates of the GMEM tensor to coordinates` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L220** `       that the TMA unit can consume. TMA tensors have so-called basis stride elements so that the` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L221** `       associated layout can output coordinates. Otherwise, TMA tensors can be partitioned` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L222** `       similarly to any other CuTe tensors using the algebra.` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `    :param op:                 The Copy Operation to construct an Atom for` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L225** `    :type op:                  Union[CopyBulkTensorTileG2SOp, CopyBulkTensorTileG2SMulticastOp]` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L226** `    :param gmem_tensor:        The GMEM tensor to be loaded by this copy atom` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L227** `    :type gmem_tensor:         Tensor` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L228** `    :param smem_layout:        Shared memory layout to load the tensor into (PDSL)` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L229** `    :type smem_layout:         Union[Layout, ComposedLayout]` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L230** `    :param mma_tiler_mnk:      The MMA Tiler shape (TILE_M, TILE_N, TILE_K) in MNK dimensions` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L231** `    :type mma_tiler_mnk:       Shape` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L232** `    :param tiled_mma:          The TiledMMA that will consume the load as operands` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L233** `    :type tiled_mma:           core.TiledMma` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L234** `    :param cluster_shape_vmnk: The Cluster-level shape in VMNK dimensions` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L235** `    :type cluster_shape_vmnk:  Shape` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L236** `    :param internal_type:      An optional parameter for the internal data type to when element` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L237** `                               type does not match the copy type` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L238** `    :type internal_type:       Type[Numeric]` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L239** `    :return:                   A TmaInfo containing the Copy Atom, TMA tensor, and SMEM layout` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L240** `    :rtype:                    TmaInfo` — **EN:** Continues the docstring for the function `make_tiled_tma_atom_B`. **CN:** 继续说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L241** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L242** `    """` — **EN:** Ends the docstring for the function `make_tiled_tma_atom_B`. **CN:** 结束说明 function `make_tiled_tma_atom_B` 的文档字符串。
+- **L243** `    smem_rank = core.rank(smem_layout)` — **EN:** Assigns a value to smem_rank. **CN:** 将一个值赋给 smem_rank。
+- **L244** `    assert smem_rank == 3 or smem_rank == 4, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L245** `        "b_smem_layout must be non-staged (atom, rest_n, rest_k) "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** `        "or staged (atom, rest_n, rest_k, stage), "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L247** `        f"but got rank = {smem_rank}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L248** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `    # Keep the original SMEM layout object for later retrieval at Python level.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L251** `    stored_smem_layout = smem_layout` — **EN:** Assigns a value to stored_smem_layout. **CN:** 将一个值赋给 stored_smem_layout。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `    # Slice the smem_layout if it is staged` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L254** `    if smem_rank == 4:` — **EN:** Starts a conditional branch guarded by `smem_rank == 4`. **CN:** 开始一个由 `smem_rank == 4` 控制的条件分支。
+- **L255** `        smem_layout = core.select(smem_layout, mode=[0, 1, 2])` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L256** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L257** `    ident = core.make_identity_layout(gmem_tensor.shape, loc=loc, ip=ip)` — **EN:** Assigns a value to ident. **CN:** 将一个值赋给 ident。
+- **L258** `    mma_mnk: Any = mma_tiler_mnk` — **EN:** Assigns a typed value to mma_mnk. **CN:** 为 mma_mnk 赋予带类型标注的值。
+- **L259** `    mma_tiler_nk = (mma_mnk[1], *mma_mnk[2:])` — **EN:** Assigns a value to mma_tiler_nk. **CN:** 将一个值赋给 mma_tiler_nk。
+- **L260** `    g_tile = core.composition(ident, mma_tiler_nk, loc=loc, ip=ip)` — **EN:** Assigns a value to g_tile. **CN:** 将一个值赋给 g_tile。
+- **L261** `    cta_v_map: Any = tiled_mma._thrfrg_B(g_tile)` — **EN:** Assigns a typed value to cta_v_map. **CN:** 为 cta_v_map 赋予带类型标注的值。
+- **L262** `    cta_v_map = core.get(cta_v_map, mode=[1])` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L263** `    cta_v_map = core.dice(cta_v_map, (1, (1,) * core.rank(g_tile)))` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** `    if isinstance(op, CopyBulkTensorTileG2SOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, CopyBulkTensorTileG2SOp)`. **CN:** 开始一个由 `isinstance(op, CopyBulkTensorTileG2SOp)` 控制的条件分支。
+- **L266** `        num_multicast = 1` — **EN:** Assigns a value to num_multicast. **CN:** 将一个值赋给 num_multicast。
+- **L267** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L268** `        assert isinstance(op, CopyBulkTensorTileG2SMulticastOp)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L269** `        # multicast across the M-mode since those would share the same tile of B` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L270** `        if cluster_shape_vmnk is None:` — **EN:** Starts a conditional branch guarded by `cluster_shape_vmnk is None`. **CN:** 开始一个由 `cluster_shape_vmnk is None` 控制的条件分支。
+- **L271** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L272** `                "cluster_shape_vmnk must be provided for multicast B tensor loads"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L273** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L274** `        num_multicast = core.size(cluster_shape_vmnk, mode=[1])` — **EN:** Assigns a value to num_multicast. **CN:** 将一个值赋给 num_multicast。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `    smem_for_ir: Any = smem_layout` — **EN:** Assigns a typed value to smem_for_ir. **CN:** 为 smem_for_ir 赋予带类型标注的值。
+- **L277** `    if isinstance(smem_for_ir, core._ComposedLayout):` — **EN:** Starts a conditional branch guarded by `isinstance(smem_for_ir, core._ComposedLayout)`. **CN:** 开始一个由 `isinstance(smem_for_ir, core._ComposedLayout)` 控制的条件分支。
+- **L278** `        smem_for_ir = smem_for_ir.value` — **EN:** Assigns a value to smem_for_ir. **CN:** 将一个值赋给 smem_for_ir。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `    tma_format = None` — **EN:** Assigns a value to tma_format. **CN:** 将一个值赋给 tma_format。
+- **L281** `    if internal_type is not None:` — **EN:** Starts a conditional branch guarded by `internal_type is not None`. **CN:** 开始一个由 `internal_type is not None` 控制的条件分支。
+- **L282** `        itype: Any = internal_type` — **EN:** Assigns a typed value to itype. **CN:** 为 itype 赋予带类型标注的值。
+- **L283** `        if not isinstance(internal_type, NumericMeta):` — **EN:** Starts a conditional branch guarded by `not isinstance(internal_type, NumericMeta)`. **CN:** 开始一个由 `not isinstance(internal_type, NumericMeta)` 控制的条件分支。
+- **L284** `            raise TypeError(f"internal_type must be a Numeric, but got {internal_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L285** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L286** `        use_unpack = (` — **EN:** Assigns a value to use_unpack. **CN:** 将一个值赋给 use_unpack。
+- **L287** `            itype.width == 8` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L288** `            and isinstance(gmem_tensor.element_type, NumericMeta)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L289** `            and gmem_tensor.element_type.width < 8  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `        internal_mlir_type = (` — **EN:** Assigns a value to internal_mlir_type. **CN:** 将一个值赋给 internal_mlir_type。
+- **L292** `            gmem_tensor.element_type.mlir_type if use_unpack else itype.mlir_type  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** `        tma_format = _cute_nvgpu_ir.TmaDataFormat(` — **EN:** Assigns a value to tma_format. **CN:** 将一个值赋给 tma_format。
+- **L295** `            _cute_nvgpu_ir.get_default_tma_format(internal_mlir_type, use_unpack)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L296** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `    # res[0] = the IR Value for the non-executable atom instance` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L299** `    # res[1] = the IR Value for the associated TMA tensor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L300** `    res = _cute_nvgpu_ir.atom_make_non_exec_tiled_tma_load(` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L301** `        cast(Any, gmem_tensor).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L302** `        smem_for_ir,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `        cta_v_map,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `        op._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** `        num_multicast=num_multicast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L306** `        tma_format=tma_format,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L307** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L308** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L309** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `    if isinstance(op, CopyBulkTensorTileG2SOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, CopyBulkTensorTileG2SOp)`. **CN:** 开始一个由 `isinstance(op, CopyBulkTensorTileG2SOp)` 控制的条件分支。
+- **L311** `        return TmaInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L312** `            atom.CopyAtom(op, CopyBulkTensorTileG2SNonExecTrait(res[0])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L313** `            res[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L314** `            stored_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L315** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L316** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L317** `    assert isinstance(op, CopyBulkTensorTileG2SMulticastOp)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L318** `    return TmaInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L319** `        atom.CopyAtom(op, CopyBulkTensorTileG2SMulticastNonExecTrait(res[0])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L320** `        res[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `        stored_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L326** `def make_im2col_tma_atom_A(` — **EN:** Defines function `make_im2col_tma_atom_A`. **CN:** 定义函数 `make_im2col_tma_atom_A`。
+- **L327** `    op: Union[CopyBulkTensorIm2ColG2SOp, CopyBulkTensorIm2ColG2SMulticastOp],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L328** `    gmem_tensor: Tensor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L329** `    smem_layout: Union[Layout, ComposedLayout],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L330** `    mma_tiler_mnk: Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L331** `    tiled_mma: atom.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L332** `    filter_trs: Tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L333** `    upper_padding_dhw: Tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L334** `    lower_padding_dhw: Tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L335** `    stride_dhw: Tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L336** `    dilation_dhw: Tuple[int, int, int],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L337** `    cluster_shape_vmnk: Union[Shape, None] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L338** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L339** `    internal_type: Optional[Type[Numeric]] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L340** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L341** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L342** `) -> TmaInfo:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L343** `    """` — **EN:** Starts the docstring for the function `make_im2col_tma_atom_A`. **CN:** 开始说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L344** `    Makes a TMA Copy atom mapping to \`\`.im2col\`\` mode for \`\`cp.async.bulk.tensor\`\` PTX operation accounting for the MK projections of the TiledMMA for A tensor loads.` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `    Given` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `    - a GMEM tensor` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L349** `    - a SMEM layout` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L350** `    - a MMA Tiler` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L351** `    - a TiledMma` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L352** `    - a filter shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L353** `    - a padding shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L354** `    - a stride shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L355** `    - a dilation shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L356** `    - a Cluster-level shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L357** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L358** `    this function figures out the bulk tensor asynchronous copy instruction to use with the maximum` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L359** `    "TMA vector length" to copy tiles of the GMEM tensor to/from an SMEM buffer with the provided` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L360** `    layout while maintaining consistency with the provided Tiler.` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L361** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L362** `    This function returns two results:` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L363** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L364** `    1. the Copy Atom` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L365** `    2. the TMA tensor used to map logical coordinates of the GMEM tensor to coordinates` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L366** `       that the TMA unit can consume. TMA tensors have so-called basis stride elements so that the` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L367** `       associated layout can output coordinates. Otherwise, TMA tensors can be partitioned` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L368** `       similarly to any other CuTe tensors using the algebra.` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L369** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L370** `    :param op:                 The Copy Operation to construct an Atom for` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L371** `    :type op:                  Union[CopyBulkTensorIm2ColG2SOp, CopyBulkTensorIm2ColG2SMulticastOp]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L372** `    :param gmem_tensor:        The GMEM tensor to be loaded by this copy atom` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L373** `    :type gmem_tensor:         Tensor` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L374** `    :param smem_layout:        Shared memory layout to load the tensor into (PDSL)` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L375** `    :type smem_layout:         Union[Layout, ComposedLayout]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L376** `    :param mma_tiler_mnk:      The MMA Tiler shape (TILE_M, TILE_N, TILE_K) in MNK dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L377** `    :type mma_tiler_mnk:       Shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L378** `    :param tiled_mma:          The TiledMMA that will consume the load as operands` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L379** `    :type tiled_mma:           atom.TiledMma` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L380** `    :param filter_trs:         The filter shape (T, R, S) in TRS dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L381** `    :type filter_trs:          Tuple[int, int, int]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L382** `    :param upper_padding_dhw:  The upper padding shape (D, H, W) in DHW dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L383** `    :type upper_padding_dhw:   Tuple[int, int, int]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L384** `    :param lower_padding_dhw:  The lower padding shape (D, H, W) in DHW dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L385** `    :type lower_padding_dhw:   Tuple[int, int, int]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L386** `    :param stride_dhw:         The stride shape (D, H, W) in DHW dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L387** `    :type stride_dhw:          Tuple[int, int, int]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L388** `    :param dilation_dhw:       The dilation shape (D, H, W) in DHW dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L389** `    :type dilation_dhw:        Tuple[int, int, int]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L390** `    :param cluster_shape_vmnk: The Cluster-level shape in VMNK dimensions` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L391** `    :type cluster_shape_vmnk:  Shape` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L392** `    :param internal_type:      An optional parameter for the internal data type to when element` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L393** `                               type does not match the copy type` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L394** `    :type internal_type:       Type[Numeric]` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L395** `    :return:                   A TmaInfo containing the Copy Atom, TMA tensor, and SMEM layout` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L396** `    :rtype:                    TmaInfo` — **EN:** Continues the docstring for the function `make_im2col_tma_atom_A`. **CN:** 继续说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L397** `    """` — **EN:** Ends the docstring for the function `make_im2col_tma_atom_A`. **CN:** 结束说明 function `make_im2col_tma_atom_A` 的文档字符串。
+- **L398** `    smem_rank = core.rank(smem_layout)` — **EN:** Assigns a value to smem_rank. **CN:** 将一个值赋给 smem_rank。
+- **L399** `    assert smem_rank == 3 or smem_rank == 4, (` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L400** `        "a_smem_layout must be non-staged (atom, rest_m, rest_k) "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `        "or staged (atom, rest_m, rest_k, stage), "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** `        f"but got rank = {smem_rank}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L403** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L404** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L405** `    # Keep the original SMEM layout object for later retrieval at Python level.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L406** `    stored_smem_layout = smem_layout` — **EN:** Assigns a value to stored_smem_layout. **CN:** 将一个值赋给 stored_smem_layout。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** `    # Slice the smem_layout if it is staged` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L409** `    if smem_rank == 4:` — **EN:** Starts a conditional branch guarded by `smem_rank == 4`. **CN:** 开始一个由 `smem_rank == 4` 控制的条件分支。
+- **L410** `        smem_layout = core.select(smem_layout, mode=[0, 1, 2])` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** `    ident = core.make_identity_layout(` — **EN:** Assigns a value to ident. **CN:** 将一个值赋给 ident。
+- **L413** `        core.product_each(gmem_tensor.shape), loc=loc, ip=ip` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `    mma_mnk: Any = mma_tiler_mnk` — **EN:** Assigns a typed value to mma_mnk. **CN:** 为 mma_mnk 赋予带类型标注的值。
+- **L416** `    mma_tiler_mk = (mma_mnk[0], *mma_mnk[2:])` — **EN:** Assigns a value to mma_tiler_mk. **CN:** 将一个值赋给 mma_tiler_mk。
+- **L417** `    g_tile = core.composition(ident, mma_tiler_mk, loc=loc, ip=ip)` — **EN:** Assigns a value to g_tile. **CN:** 将一个值赋给 g_tile。
+- **L418** `    cta_v_map: Any = tiled_mma._thrfrg_A(g_tile)` — **EN:** Assigns a typed value to cta_v_map. **CN:** 为 cta_v_map 赋予带类型标注的值。
+- **L419** `    cta_v_map = core.get(cta_v_map, mode=[1])` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L420** `    cta_v_map = core.dice(cta_v_map, (1, (1,) * core.rank(g_tile)))` — **EN:** Assigns a value to cta_v_map. **CN:** 将一个值赋给 cta_v_map。
+- **L421** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L422** `    # Compute im2col descriptor parameters` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L423** `    pad_upper_d, pad_upper_h, pad_upper_w = upper_padding_dhw` — **EN:** Assigns a value to (pad_upper_d, pad_upper_h, pad_upper_w). **CN:** 将一个值赋给 (pad_upper_d, pad_upper_h, pad_upper_w)。
+- **L424** `    pad_lower_d, pad_lower_h, pad_lower_w = lower_padding_dhw` — **EN:** Assigns a value to (pad_lower_d, pad_lower_h, pad_lower_w). **CN:** 将一个值赋给 (pad_lower_d, pad_lower_h, pad_lower_w)。
+- **L425** `    stride_d, stride_h, stride_w = stride_dhw` — **EN:** Assigns a value to (stride_d, stride_h, stride_w). **CN:** 将一个值赋给 (stride_d, stride_h, stride_w)。
+- **L426** `    dilation_d, dilation_h, dilation_w = dilation_dhw` — **EN:** Assigns a value to (dilation_d, dilation_h, dilation_w). **CN:** 将一个值赋给 (dilation_d, dilation_h, dilation_w)。
+- **L427** `    filter_t, filter_r, filter_s = filter_trs` — **EN:** Assigns a value to (filter_t, filter_r, filter_s). **CN:** 将一个值赋给 (filter_t, filter_r, filter_s)。
+- **L428** `    lower_corner_whd = (-pad_lower_w, -pad_lower_h, -pad_lower_d)` — **EN:** Assigns a value to lower_corner_whd. **CN:** 将一个值赋给 lower_corner_whd。
+- **L429** `    upper_corner_whd = (` — **EN:** Assigns a value to upper_corner_whd. **CN:** 将一个值赋给 upper_corner_whd。
+- **L430** `        pad_upper_w - ((filter_s - 1) * dilation_w),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `        pad_upper_h - ((filter_r - 1) * dilation_h),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `        pad_upper_d - ((filter_t - 1) * dilation_d),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L434** `    lower_padding_whd = (pad_lower_w, pad_lower_h, pad_lower_d)` — **EN:** Assigns a value to lower_padding_whd. **CN:** 将一个值赋给 lower_padding_whd。
+- **L435** `    upper_padding_whd = (pad_upper_w, pad_upper_h, pad_upper_d)` — **EN:** Assigns a value to upper_padding_whd. **CN:** 将一个值赋给 upper_padding_whd。
+- **L436** `    stride_whd = (stride_w, stride_h, stride_d)` — **EN:** Assigns a value to stride_whd. **CN:** 将一个值赋给 stride_whd。
+- **L437** `    lower_srt = (0, 0, 0)` — **EN:** Assigns a value to lower_srt. **CN:** 将一个值赋给 lower_srt。
+- **L438** `    stride_srt = (dilation_w, dilation_h, dilation_d)` — **EN:** Assigns a value to stride_srt. **CN:** 将一个值赋给 stride_srt。
+- **L439** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L440** `    if isinstance(op, CopyBulkTensorIm2ColG2SOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, CopyBulkTensorIm2ColG2SOp)`. **CN:** 开始一个由 `isinstance(op, CopyBulkTensorIm2ColG2SOp)` 控制的条件分支。
+- **L441** `        num_multicast = 1` — **EN:** Assigns a value to num_multicast. **CN:** 将一个值赋给 num_multicast。
+- **L442** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L443** `        assert isinstance(op, CopyBulkTensorIm2ColG2SMulticastOp)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L444** `        # multicast across the N-mode since those would share the same tile of A` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L445** `        if cluster_shape_vmnk is None:` — **EN:** Starts a conditional branch guarded by `cluster_shape_vmnk is None`. **CN:** 开始一个由 `cluster_shape_vmnk is None` 控制的条件分支。
+- **L446** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L447** `                "cluster_shape_vmnk must be provided for multicast A tensor loads"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `        num_multicast = core.size(cluster_shape_vmnk, mode=[2])` — **EN:** Assigns a value to num_multicast. **CN:** 将一个值赋给 num_multicast。
+- **L450** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L451** `    smem_for_ir: Any = smem_layout` — **EN:** Assigns a typed value to smem_for_ir. **CN:** 为 smem_for_ir 赋予带类型标注的值。
+- **L452** `    if isinstance(smem_for_ir, core._ComposedLayout):` — **EN:** Starts a conditional branch guarded by `isinstance(smem_for_ir, core._ComposedLayout)`. **CN:** 开始一个由 `isinstance(smem_for_ir, core._ComposedLayout)` 控制的条件分支。
+- **L453** `        smem_for_ir = smem_for_ir.value` — **EN:** Assigns a value to smem_for_ir. **CN:** 将一个值赋给 smem_for_ir。
+- **L454** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L455** `    tma_format = None` — **EN:** Assigns a value to tma_format. **CN:** 将一个值赋给 tma_format。
+- **L456** `    if internal_type is not None:` — **EN:** Starts a conditional branch guarded by `internal_type is not None`. **CN:** 开始一个由 `internal_type is not None` 控制的条件分支。
+- **L457** `        itype: Any = internal_type` — **EN:** Assigns a typed value to itype. **CN:** 为 itype 赋予带类型标注的值。
+- **L458** `        if not isinstance(internal_type, NumericMeta):` — **EN:** Starts a conditional branch guarded by `not isinstance(internal_type, NumericMeta)`. **CN:** 开始一个由 `not isinstance(internal_type, NumericMeta)` 控制的条件分支。
+- **L459** `            raise TypeError(f"internal_type must be a Numeric, but got {internal_type}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `        use_unpack = (` — **EN:** Assigns a value to use_unpack. **CN:** 将一个值赋给 use_unpack。
+- **L462** `            itype.width == 8` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L463** `            and isinstance(gmem_tensor.element_type, NumericMeta)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L464** `            and gmem_tensor.element_type.width < 8  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L465** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L466** `        internal_mlir_type = (` — **EN:** Assigns a value to internal_mlir_type. **CN:** 将一个值赋给 internal_mlir_type。
+- **L467** `            gmem_tensor.element_type.mlir_type if use_unpack else itype.mlir_type  # type: ignore[union-attr]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L468** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L469** `        tma_format = _cute_nvgpu_ir.TmaDataFormat(` — **EN:** Assigns a value to tma_format. **CN:** 将一个值赋给 tma_format。
+- **L470** `            _cute_nvgpu_ir.get_default_tma_format(internal_mlir_type, use_unpack)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L473** `    res = _cute_nvgpu_ir.atom_make_non_exec_im2col_tma_load(` — **EN:** Assigns a value to res. **CN:** 将一个值赋给 res。
+- **L474** `        cast(Any, gmem_tensor).value,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L475** `        smem_for_ir,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L476** `        cta_v_map,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L477** `        op._to_ir(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L478** `        core._pack_int_tuple(lower_corner_whd, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L479** `        core._pack_int_tuple(upper_corner_whd, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L480** `        core._pack_int_tuple(lower_padding_whd, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L481** `        core._pack_int_tuple(upper_padding_whd, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L482** `        core._pack_int_tuple(stride_whd, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L483** `        core._pack_int_tuple(lower_srt, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L484** `        core._pack_int_tuple(stride_srt, loc=loc, ip=ip),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L485** `        num_multicast=num_multicast,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L486** `        tma_format=tma_format,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L487** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L488** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L489** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L490** `    if isinstance(op, CopyBulkTensorIm2ColG2SOp):` — **EN:** Starts a conditional branch guarded by `isinstance(op, CopyBulkTensorIm2ColG2SOp)`. **CN:** 开始一个由 `isinstance(op, CopyBulkTensorIm2ColG2SOp)` 控制的条件分支。
+- **L491** `        return TmaInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L492** `            atom.CopyAtom(op, CopyBulkTensorIm2ColG2SNonExecTrait(res[0])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L493** `            res[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L494** `            stored_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L495** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L496** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L497** `    assert isinstance(op, CopyBulkTensorIm2ColG2SMulticastOp)` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L498** `    return TmaInfo(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L499** `        atom.CopyAtom(op, CopyBulkTensorIm2ColG2SMulticastNonExecTrait(res[0])),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L500** `        res[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L501** `        stored_smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L502** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.cute.nvgpu.helpers`. CN: 模块名为 `CuTeDSL.cutlass.cute.nvgpu.helpers`。
+- EN: Top-level functions: make_tiled_tma_atom_A, make_tiled_tma_atom_B, make_im2col_tma_atom_A CN: 顶层函数包括：make_tiled_tma_atom_A, make_tiled_tma_atom_B, make_im2col_tma_atom_A
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects.cute_nvgpu, ..:core,atom, ..typing:Shape,Layout,ComposedLayout,Tensor,Numeric,NumericMeta, .cpasync.copy:CopyBulkTensorTileG2SOp,CopyBulkTensorTileG2SNonExecTrait,CopyBulkTensorTileG2SMulticastOp,CopyBulkTensorTileG2SMulticastNonExecTrait,CopyBulkTensorIm2ColG2SOp,CopyBulkTensorIm2ColG2SNonExecTrait,CopyBulkTensorIm2ColG2SMulticastOp,CopyBulkTensorIm2ColG2SMulticastNonExecTrait, .cpasync.helpers:TmaInfo CN: 内部依赖：cutlass.cutlass_dsl:dsl_user_op, cutlass._mlir:ir, cutlass._mlir.dialects.cute_nvgpu, ..:core,atom, ..typing:Shape,Layout,ComposedLayout,Tensor,Numeric,NumericMeta, .cpasync.copy:CopyBulkTensorTileG2SOp,CopyBulkTensorTileG2SNonExecTrait,CopyBulkTensorTileG2SMulticastOp,CopyBulkTensorTileG2SMulticastNonExecTrait,CopyBulkTensorIm2ColG2SOp,CopyBulkTensorIm2ColG2SNonExecTrait,CopyBulkTensorIm2ColG2SMulticastOp,CopyBulkTensorIm2ColG2SMulticastNonExecTrait, .cpasync.helpers:TmaInfo
+- EN: External or standard-library dependencies: typing:Any,Optional,Tuple,Type,Union,cast CN: 外部或标准库依赖：typing:Any,Optional,Tuple,Type,Union,cast

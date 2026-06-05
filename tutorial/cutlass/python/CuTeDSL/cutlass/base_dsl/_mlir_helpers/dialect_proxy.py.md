@@ -1,0 +1,129 @@
+# dialect_proxy.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/base_dsl/_mlir_helpers/dialect_proxy.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (DialectAutoConvertProxy) in `CuTeDSL.cutlass.base_dsl._mlir_helpers.dialect_proxy`.
+- CN: 该模块 `CuTeDSL.cutlass.base_dsl._mlir_helpers.dialect_proxy` 定义了 1 个类（DialectAutoConvertProxy）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025-2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L13** `import types` — **EN:** Imports types for later use. **CN:** 导入 types 供后续使用。
+- **L14** `from collections.abc import Callable` — **EN:** Imports Callable from `collections.abc`. **CN:** 从 `collections.abc` 导入 Callable。
+- **L15** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L18** `class DialectAutoConvertProxy:` — **EN:** Defines class `DialectAutoConvertProxy`. **CN:** 定义类 `DialectAutoConvertProxy`。
+- **L19** `    """` — **EN:** Starts the docstring for the class `DialectAutoConvertProxy`. **CN:** 开始说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L20** `    Proxy that wraps a raw MLIR dialect module, auto-converting DSL types` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L21** `    (anything with an \`\`.ir_value()\`\` method) to \`\`ir.Value\`\` when calling` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L22** `    dialect operations.` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `    This enables users to write cleaner code without explicit` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L25** `    \`\`.ir_value()\`\` calls::` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `        # Before (raw dialect module):` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L28** `        nvvm.shfl_sync(T.i32(), Int32(mask).ir_value(), ...)` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `        # After (proxied):` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L31** `        nvvm.shfl_sync(T.i32(), Int32(mask), ...)` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `    Non-callable attributes and enum classes are passed through unchanged` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L34** `    so that attribute access like \`\`nvvm.ShflKind.idx\`\` still works.` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    Parameters` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L37** `    ----------` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L38** `    dialect_module` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L39** `        The raw MLIR dialect module to wrap` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L40** `        (e.g. \`\`cutlass._mlir.dialects.nvvm\`\`).` — **EN:** Continues the docstring for the class `DialectAutoConvertProxy`. **CN:** 继续说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L41** `    """` — **EN:** Ends the docstring for the class `DialectAutoConvertProxy`. **CN:** 结束说明 class `DialectAutoConvertProxy` 的文档字符串。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `    def __init__(self, dialect_module: types.ModuleType) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L44** `        self._module = dialect_module` — **EN:** Assigns a value to self._module. **CN:** 将一个值赋给 self._module。
+- **L45** `        self._wrapped_cache: dict[str, Callable[..., object]] = {}` — **EN:** Assigns a typed value to self._wrapped_cache. **CN:** 为 self._wrapped_cache 赋予带类型标注的值。
+- **L46** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L47** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L48** `    def _convert_arg(` — **EN:** Defines function `_convert_arg`. **CN:** 定义函数 `_convert_arg`。
+- **L49** `        arg: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L50** `        loc: object | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L51** `        ip: object | None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L52** `    ) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L53** `        """Recursively convert DSL objects to ir.Value."""` — **EN:** Docstring line documenting the function `_convert_arg`. **CN:** 文档字符串行，用于说明 function `_convert_arg`。
+- **L54** `        if hasattr(arg, "ir_value") and callable(arg.ir_value):` — **EN:** Starts a conditional branch guarded by `hasattr(arg, 'ir_value') and callable(arg.ir_value)`. **CN:** 开始一个由 `hasattr(arg, 'ir_value') and callable(arg.ir_value)` 控制的条件分支。
+- **L55** `            try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L56** `                return arg.ir_value(loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** `            except TypeError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L58** `                # Some ir_value() methods (e.g. Array) don't accept loc/ip.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L59** `                return arg.ir_value()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L60** `        if isinstance(arg, (list, tuple)):` — **EN:** Starts a conditional branch guarded by `isinstance(arg, (list, tuple))`. **CN:** 开始一个由 `isinstance(arg, (list, tuple))` 控制的条件分支。
+- **L61** `            converted = [` — **EN:** Assigns a value to converted. **CN:** 将一个值赋给 converted。
+- **L62** `                DialectAutoConvertProxy._convert_arg(item, loc, ip) for item in arg` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L63** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L64** `            return type(arg)(converted)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L65** `        return arg` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `    def __getattr__(self, name: str) -> Any:` — **EN:** Defines function `__getattr__`. **CN:** 定义函数 `__getattr__`。
+- **L68** `        attr = getattr(self._module, name)` — **EN:** Assigns a value to attr. **CN:** 将一个值赋给 attr。
+- **L69** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L70** `        # Non-callable attributes and enum classes pass through` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L71** `        # unchanged.  Enum classes need attribute access (e.g.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L72** `        # ShflKind.idx), but MLIR operation classes should be` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** `        # wrapped for argument conversion.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L74** `        if not callable(attr) or isinstance(attr, enum.EnumMeta):` — **EN:** Starts a conditional branch guarded by `not callable(attr) or isinstance(attr, enum.EnumMeta)`. **CN:** 开始一个由 `not callable(attr) or isinstance(attr, enum.EnumMeta)` 控制的条件分支。
+- **L75** `            return attr` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L76** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L77** `        # Use cache for wrapped callables` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L78** `        if name not in self._wrapped_cache:` — **EN:** Starts a conditional branch guarded by `name not in self._wrapped_cache`. **CN:** 开始一个由 `name not in self._wrapped_cache` 控制的条件分支。
+- **L79** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L80** `            def _make_wrapper(` — **EN:** Defines function `_make_wrapper`. **CN:** 定义函数 `_make_wrapper`。
+- **L81** `                func: Callable[..., object],` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L82** `            ) -> Callable[..., object]:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L83** `                def wrapped(` — **EN:** Defines function `wrapped`. **CN:** 定义函数 `wrapped`。
+- **L84** `                    *args: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L85** `                    loc: object | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L86** `                    ip: object | None = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L87** `                    **kwargs: object,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L88** `                ) -> object:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L89** `                    converted_args = tuple(` — **EN:** Assigns a value to converted_args. **CN:** 将一个值赋给 converted_args。
+- **L90** `                        DialectAutoConvertProxy._convert_arg(arg, loc, ip)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                        for arg in args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `                    converted_kwargs = {` — **EN:** Assigns a value to converted_kwargs. **CN:** 将一个值赋给 converted_kwargs。
+- **L94** `                        k: DialectAutoConvertProxy._convert_arg(v, loc, ip)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `                        for k, v in kwargs.items()` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `                    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `                    return func(` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L98** `                        *converted_args,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `                        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `                        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `                        **converted_kwargs,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `                    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** `                return wrapped` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `            self._wrapped_cache[name] = _make_wrapper(attr)` — **EN:** Assigns a value to self._wrapped_cache[name]. **CN:** 将一个值赋给 self._wrapped_cache[name]。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `        return self._wrapped_cache[name]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    def __dir__(self) -> list[str]:` — **EN:** Defines function `__dir__`. **CN:** 定义函数 `__dir__`。
+- **L111** `        return dir(self._module)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.base_dsl._mlir_helpers.dialect_proxy`. CN: 模块名为 `CuTeDSL.cutlass.base_dsl._mlir_helpers.dialect_proxy`。
+- EN: Top-level classes: DialectAutoConvertProxy CN: 顶层类包括：DialectAutoConvertProxy
+
+## Dependencies / 依赖
+- EN: External or standard-library dependencies: enum, types, collections.abc:Callable, typing:Any CN: 外部或标准库依赖：enum, types, collections.abc:Callable, typing:Any

@@ -1,0 +1,284 @@
+# compile.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/jax/compile.py`
+
+## Purpose / 作用
+- EN: Defines 3 classes (Arg, FunctionSpec, CompileResult) and 5 functions (jit_wrapper, _check_is_valid_type, build_function_spec, get_or_compile_kernel, ... (+1 more)) in `CuTeDSL.cutlass.jax.compile`.
+- CN: 该模块 `CuTeDSL.cutlass.jax.compile` 定义了 3 个类（Arg, FunctionSpec, CompileResult） 和 5 个函数（jit_wrapper, _check_is_valid_type, build_function_spec, get_or_compile_kernel, ... (+1 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `import gc` — **EN:** Imports gc for later use. **CN:** 导入 gc 供后续使用。
+- **L13** `from typing import Any` — **EN:** Imports Any from `typing`. **CN:** 从 `typing` 导入 Any。
+- **L14** `from dataclasses import dataclass` — **EN:** Imports dataclass from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass。
+- **L15** `from functools import partial` — **EN:** Imports partial from `functools`. **CN:** 从 `functools` 导入 partial。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `import time` — **EN:** Imports time for later use. **CN:** 导入 time 供后续使用。
+- **L18** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L19** `import threading` — **EN:** Imports threading for later use. **CN:** 导入 threading 供后续使用。
+- **L20** `import hashlib` — **EN:** Imports hashlib for later use. **CN:** 导入 hashlib 供后续使用。
+- **L21** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L22** `import cuda.bindings.driver as cuda` — **EN:** Imports cuda.bindings.driver as cuda for later use. **CN:** 导入 cuda.bindings.driver as cuda 供后续使用。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** `import jax` — **EN:** Imports jax for later use. **CN:** 导入 jax 供后续使用。
+- **L25** `import jax.numpy as jnp` — **EN:** Imports jax.numpy as jnp for later use. **CN:** 导入 jax.numpy as jnp 供后续使用。
+- **L26** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L27** `from .types import (` — **EN:** Imports jax_to_cutlass_dtype, JaxArrayList, TensorSpec, JaxTracedArray, DEFAULT_CUTLASS_DEVICE_MEMSPACE from `.types`. **CN:** 从 `.types` 导入 jax_to_cutlass_dtype, JaxArrayList, TensorSpec, JaxTracedArray, DEFAULT_CUTLASS_DEVICE_MEMSPACE。
+- **L28** `    jax_to_cutlass_dtype,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L29** `    JaxArrayList,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L30** `    TensorSpec,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L31** `    JaxTracedArray,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L32** `    DEFAULT_CUTLASS_DEVICE_MEMSPACE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L33** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `import cutlass` — **EN:** Imports cutlass for later use. **CN:** 导入 cutlass 供后续使用。
+- **L36** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L37** `from cutlass.cutlass_dsl.cutlass import CuTeDSL` — **EN:** Imports CuTeDSL from `cutlass.cutlass_dsl.cutlass`. **CN:** 从 `cutlass.cutlass_dsl.cutlass` 导入 CuTeDSL。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `logger = logging.getLogger(__name__)` — **EN:** Assigns a value to logger. **CN:** 将一个值赋给 logger。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `_CUTLASS_COMPILE_CACHE = {}` — **EN:** Assigns a value to _CUTLASS_COMPILE_CACHE. **CN:** 将一个值赋给 _CUTLASS_COMPILE_CACHE。
+- **L42** `_EXPORT_PREFIX = "cutlass_call"` — **EN:** Assigns a value to _EXPORT_PREFIX. **CN:** 将一个值赋给 _EXPORT_PREFIX。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L45** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L46** `class Arg:` — **EN:** Defines class `Arg`. **CN:** 定义类 `Arg`。
+- **L47** `    idx: int  # position in pytree` — **EN:** Assigns a typed value to idx. **CN:** 为 idx 赋予带类型标注的值。
+- **L48** `    shape: tuple[Any, ...]` — **EN:** Assigns a typed value to shape. **CN:** 为 shape 赋予带类型标注的值。
+- **L49** `    dtype: jnp.dtype` — **EN:** Assigns a typed value to dtype. **CN:** 为 dtype 赋予带类型标注的值。
+- **L50** `    spec: TensorSpec` — **EN:** Assigns a typed value to spec. **CN:** 为 spec 赋予带类型标注的值。
+- **L51** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L52** `    def get_static_flag(self, use_static_tensors: bool):` — **EN:** Defines function `get_static_flag`. **CN:** 定义函数 `get_static_flag`。
+- **L53** `        if self.spec.static is None:` — **EN:** Starts a conditional branch guarded by `self.spec.static is None`. **CN:** 开始一个由 `self.spec.static is None` 控制的条件分支。
+- **L54** `            return use_static_tensors` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L55** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L56** `            return self.spec.static` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L60** `class FunctionSpec:` — **EN:** Defines class `FunctionSpec`. **CN:** 定义类 `FunctionSpec`。
+- **L61** `    """Contains a specification of the inputs and outputs to the kernel."""` — **EN:** Docstring line documenting the class `FunctionSpec`. **CN:** 文档字符串行，用于说明 class `FunctionSpec`。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    in_args: tuple[Arg, ...]` — **EN:** Assigns a typed value to in_args. **CN:** 为 in_args 赋予带类型标注的值。
+- **L64** `    input_tree: Any` — **EN:** Assigns a typed value to input_tree. **CN:** 为 input_tree 赋予带类型标注的值。
+- **L65** `    out_args: tuple[Arg, ...]` — **EN:** Assigns a typed value to out_args. **CN:** 为 out_args 赋予带类型标注的值。
+- **L66** `    output_tree: Any` — **EN:** Assigns a typed value to output_tree. **CN:** 为 output_tree 赋予带类型标注的值。
+- **L67** `    input_output_aliases: tuple[tuple[int, int], ...]` — **EN:** Assigns a typed value to input_output_aliases. **CN:** 为 input_output_aliases 赋予带类型标注的值。
+- **L68** `    input_spec: tuple[TensorSpec, ...]` — **EN:** Assigns a typed value to input_spec. **CN:** 为 input_spec 赋予带类型标注的值。
+- **L69** `    output_spec: tuple[TensorSpec, ...]` — **EN:** Assigns a typed value to output_spec. **CN:** 为 output_spec 赋予带类型标注的值。
+- **L70** `    compile_options: str` — **EN:** Assigns a typed value to compile_options. **CN:** 为 compile_options 赋予带类型标注的值。
+- **L71** `    use_static_tensors: bool` — **EN:** Assigns a typed value to use_static_tensors. **CN:** 为 use_static_tensors 赋予带类型标注的值。
+- **L72** `    kwargs: tuple[tuple[str, Any]]` — **EN:** Assigns a typed value to kwargs. **CN:** 为 kwargs 赋予带类型标注的值。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `    def get_compile_args(self):` — **EN:** Defines function `get_compile_args`. **CN:** 定义函数 `get_compile_args`。
+- **L75** `        """Returns the arguments to provide to cute.compile."""` — **EN:** Docstring line documenting the function `get_compile_args`. **CN:** 文档字符串行，用于说明 function `get_compile_args`。
+- **L76** `        compiler_ins = [` — **EN:** Assigns a value to compiler_ins. **CN:** 将一个值赋给 compiler_ins。
+- **L77** `            JaxTracedArray(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `                jax_to_cutlass_dtype(leaf.dtype),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `                leaf.shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `                DEFAULT_CUTLASS_DEVICE_MEMSPACE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `                leaf.spec.ptr_assumed_align,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `                leaf.spec.layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `                leaf.spec.mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `                leaf.get_static_flag(self.use_static_tensors),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `                leaf.spec.divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `            for leaf in self.in_args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `        compiler_outs = [` — **EN:** Assigns a value to compiler_outs. **CN:** 将一个值赋给 compiler_outs。
+- **L90** `            JaxTracedArray(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `                jax_to_cutlass_dtype(leaf.dtype),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `                leaf.shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `                DEFAULT_CUTLASS_DEVICE_MEMSPACE,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `                leaf.spec.ptr_assumed_align,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `                leaf.spec.layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** `                leaf.spec.mode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L97** `                leaf.get_static_flag(self.use_static_tensors),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** `                leaf.spec.divisibility,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L99** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `            for leaf in self.out_args` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `        return JaxArrayList(tuple(compiler_ins + compiler_outs))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `@cute.jit` — **EN:** Applies decorator `cute.jit` to the following definition. **CN:** 将装饰器 `cute.jit` 应用于后面的定义。
+- **L106** `def jit_wrapper(` — **EN:** Defines function `jit_wrapper`. **CN:** 定义函数 `jit_wrapper`。
+- **L107** `    stream: cuda.CUstream,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L108** `    args: JaxArrayList,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L109** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L110** `    wrapped_fn: cutlass.Constexpr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L111** `    spec: cutlass.Constexpr,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L112** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L113** `    # split buffer argument into inputs and outputs and return to tree` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L114** `    ins, outs = args[: len(spec.in_args)], args[(len(spec.in_args)) :]  # type: ignore[attr-defined]` — **EN:** Assigns a value to (ins, outs). **CN:** 将一个值赋给 (ins, outs)。
+- **L115** `    ins = [x.get_tensor() for x in ins]  # type: ignore[assignment, attr-defined]` — **EN:** Assigns a value to ins. **CN:** 将一个值赋给 ins。
+- **L116** `    outs = [x.get_tensor() for x in outs]  # type: ignore[assignment, attr-defined]` — **EN:** Assigns a value to outs. **CN:** 将一个值赋给 outs。
+- **L117** `    ins = jax.tree.unflatten(spec.input_tree, ins)  # type: ignore[attr-defined]` — **EN:** Assigns a value to ins. **CN:** 将一个值赋给 ins。
+- **L118** `    outs = jax.tree.unflatten(spec.output_tree, outs)  # type: ignore[attr-defined]` — **EN:** Assigns a value to outs. **CN:** 将一个值赋给 outs。
+- **L119** `    wrapped_fn(stream, *ins, *outs, **dict(spec.kwargs))  # type: ignore[operator, attr-defined]` — **EN:** Invokes `wrapped_fn` as a standalone call. **CN:** 以独立语句方式调用 `wrapped_fn`。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `@dataclass` — **EN:** Applies decorator `dataclass` to the following definition. **CN:** 将装饰器 `dataclass` 应用于后面的定义。
+- **L123** `class CompileResult:` — **EN:** Defines class `CompileResult`. **CN:** 定义类 `CompileResult`。
+- **L124** `    """Holds reference to the compiled kernel and argument spec."""` — **EN:** Docstring line documenting the class `CompileResult`. **CN:** 文档字符串行，用于说明 class `CompileResult`。
+- **L125** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L126** `    module: bytes` — **EN:** Assigns a typed value to module. **CN:** 为 module 赋予带类型标注的值。
+- **L127** `    fingerprint: bytes` — **EN:** Assigns a typed value to fingerprint. **CN:** 为 fingerprint 赋予带类型标注的值。
+- **L128** `    spec: FunctionSpec` — **EN:** Assigns a typed value to spec. **CN:** 为 spec 赋予带类型标注的值。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `def _check_is_valid_type(x, is_input):` — **EN:** Defines function `_check_is_valid_type`. **CN:** 定义函数 `_check_is_valid_type`。
+- **L132** `    if not is_input:` — **EN:** Starts a conditional branch guarded by `not is_input`. **CN:** 开始一个由 `not is_input` 控制的条件分支。
+- **L133** `        if not isinstance(x, jax.ShapeDtypeStruct):` — **EN:** Starts a conditional branch guarded by `not isinstance(x, jax.ShapeDtypeStruct)`. **CN:** 开始一个由 `not isinstance(x, jax.ShapeDtypeStruct)` 控制的条件分支。
+- **L134** `            raise TypeError("Invalid output value passed.", x)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L135** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L136** `        if not isinstance(x, jax.Array):` — **EN:** Starts a conditional branch guarded by `not isinstance(x, jax.Array)`. **CN:** 开始一个由 `not isinstance(x, jax.Array)` 控制的条件分支。
+- **L137** `            raise TypeError("Invalid type passed.", x)` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L138** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `def build_function_spec(` — **EN:** Defines function `build_function_spec`. **CN:** 定义函数 `build_function_spec`。
+- **L141** `    ins,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L142** `    in_tree,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L143** `    outs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L144** `    out_tree,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L145** `    input_spec,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L146** `    output_spec,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L147** `    input_output_aliases,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L148** `    compile_options,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L149** `    use_static_tensors,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L150** `    kwargs,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L151** `):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L152** `    in_args = []` — **EN:** Assigns a value to in_args. **CN:** 将一个值赋给 in_args。
+- **L153** `    for idx, (arg, spec) in enumerate(zip(ins, input_spec)):` — **EN:** Starts a loop assigning items from `enumerate(zip(ins, input_spec))` to `(idx, (arg, spec))`. **CN:** 开始一个循环，将 `enumerate(zip(ins, input_spec))` 的元素赋给 `(idx, (arg, spec))`。
+- **L154** `        _check_is_valid_type(arg, is_input=True)` — **EN:** Invokes `_check_is_valid_type` as a standalone call. **CN:** 以独立语句方式调用 `_check_is_valid_type`。
+- **L155** `        in_args.append(Arg(idx, arg.shape, arg.dtype, spec))` — **EN:** Invokes `in_args.append` as a standalone call. **CN:** 以独立语句方式调用 `in_args.append`。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    out_args = []` — **EN:** Assigns a value to out_args. **CN:** 将一个值赋给 out_args。
+- **L158** `    for idx, (arg, spec) in enumerate(zip(outs, output_spec)):` — **EN:** Starts a loop assigning items from `enumerate(zip(outs, output_spec))` to `(idx, (arg, spec))`. **CN:** 开始一个循环，将 `enumerate(zip(outs, output_spec))` 的元素赋给 `(idx, (arg, spec))`。
+- **L159** `        _check_is_valid_type(arg, is_input=False)` — **EN:** Invokes `_check_is_valid_type` as a standalone call. **CN:** 以独立语句方式调用 `_check_is_valid_type`。
+- **L160** `        out_args.append(Arg(idx, arg.shape, arg.dtype, spec))` — **EN:** Invokes `out_args.append` as a standalone call. **CN:** 以独立语句方式调用 `out_args.append`。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `    # Return the argument specs to the original pytree structure` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L163** `    # We need this structure to sanely match index positions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L164** `    # arguments to the kernel.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L165** `    ins_args_structured = jax.tree.unflatten(in_tree, in_args)` — **EN:** Assigns a value to ins_args_structured. **CN:** 将一个值赋给 ins_args_structured。
+- **L166** `    out_args_structured = jax.tree.unflatten(out_tree, out_args)` — **EN:** Assigns a value to out_args_structured. **CN:** 将一个值赋给 out_args_structured。
+- **L167** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L168** `    # Assign per-leaf aliases` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L169** `    input_output_aliases_per_leaf = {}` — **EN:** Assigns a value to input_output_aliases_per_leaf. **CN:** 将一个值赋给 input_output_aliases_per_leaf。
+- **L170** `    for input_arg_alias_idx in input_output_aliases:` — **EN:** Starts a loop assigning items from `input_output_aliases` to `input_arg_alias_idx`. **CN:** 开始一个循环，将 `input_output_aliases` 的元素赋给 `input_arg_alias_idx`。
+- **L171** `        flat_in, _ = jax.tree.flatten(ins_args_structured[input_arg_alias_idx])` — **EN:** Assigns a value to (flat_in, _). **CN:** 将一个值赋给 (flat_in, _)。
+- **L172** `        flat_out, _ = jax.tree.flatten(` — **EN:** Assigns a value to (flat_out, _). **CN:** 将一个值赋给 (flat_out, _)。
+- **L173** `            out_args_structured[input_output_aliases[input_arg_alias_idx]]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** `        for i, o in zip(flat_in, flat_out):` — **EN:** Starts a loop assigning items from `zip(flat_in, flat_out)` to `(i, o)`. **CN:** 开始一个循环，将 `zip(flat_in, flat_out)` 的元素赋给 `(i, o)`。
+- **L176** `            input_output_aliases_per_leaf[i.idx] = o.idx` — **EN:** Assigns a value to input_output_aliases_per_leaf[i.idx]. **CN:** 将一个值赋给 input_output_aliases_per_leaf[i.idx]。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `    # Remove aliased arguments from output set since they are also provided` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L179** `    # as inputs. This is done at the very top level of the tree to simplify` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L180** `    # how we handle aliasing. The assumption is that the entire pytree is` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L181** `    # aliased.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L182** `    out_args_structured = list(out_args_structured)` — **EN:** Assigns a value to out_args_structured. **CN:** 将一个值赋给 out_args_structured。
+- **L183** `    for out_idx in sorted(tuple(set(input_output_aliases.values())), reverse=True):` — **EN:** Starts a loop assigning items from `sorted(tuple(set(input_output_aliases.values())...` to `out_idx`. **CN:** 开始一个循环，将 `sorted(tuple(set(input_output_aliases.values())...` 的元素赋给 `out_idx`。
+- **L184** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L185** `            out_args_structured.pop(out_idx)` — **EN:** Invokes `out_args_structured.pop` as a standalone call. **CN:** 以独立语句方式调用 `out_args_structured.pop`。
+- **L186** `        except IndexError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L187** `            raise ValueError(f"Invalid output alias {out_idx} in input_output_aliases.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L188** `    out_args_structured = tuple(out_args_structured)` — **EN:** Assigns a value to out_args_structured. **CN:** 将一个值赋给 out_args_structured。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `    in_args_flat, _ = jax.tree.flatten(ins_args_structured)` — **EN:** Assigns a value to (in_args_flat, _). **CN:** 将一个值赋给 (in_args_flat, _)。
+- **L191** `    out_args_flat, out_tree = jax.tree.flatten(out_args_structured)` — **EN:** Assigns a value to (out_args_flat, out_tree). **CN:** 将一个值赋给 (out_args_flat, out_tree)。
+- **L192** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L193** `    spec = FunctionSpec(` — **EN:** Assigns a value to spec. **CN:** 将一个值赋给 spec。
+- **L194** `        tuple(in_args_flat),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L195** `        in_tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L196** `        tuple(out_args_flat),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L197** `        out_tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L198** `        tuple(input_output_aliases_per_leaf.items()),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L199** `        tuple(input_spec),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L200** `        tuple(output_spec),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L201** `        compile_options,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L202** `        use_static_tensors,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L203** `        tuple((k, kwargs[k]) for k in kwargs),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L204** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `    return spec` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L207** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `_compile_lock = threading.Lock()` — **EN:** Assigns a value to _compile_lock. **CN:** 将一个值赋给 _compile_lock。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L212** `def get_or_compile_kernel(fn, spec):` — **EN:** Defines function `get_or_compile_kernel`. **CN:** 定义函数 `get_or_compile_kernel`。
+- **L213** `    """Gets or compiles fn and returns a CutlassCompileResult.` — **EN:** Starts the docstring for the function `get_or_compile_kernel`. **CN:** 开始说明 function `get_or_compile_kernel` 的文档字符串。
+- **L214** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L215** `    The function and its specification is used as a key to determine if a new` — **EN:** Continues the docstring for the function `get_or_compile_kernel`. **CN:** 继续说明 function `get_or_compile_kernel` 的文档字符串。
+- **L216** `    function must be compiled.` — **EN:** Continues the docstring for the function `get_or_compile_kernel`. **CN:** 继续说明 function `get_or_compile_kernel` 的文档字符串。
+- **L217** `    """` — **EN:** Ends the docstring for the function `get_or_compile_kernel`. **CN:** 结束说明 function `get_or_compile_kernel` 的文档字符串。
+- **L218** `    cache_key = (fn, spec)` — **EN:** Assigns a value to cache_key. **CN:** 将一个值赋给 cache_key。
+- **L219** `    if cache_key in _CUTLASS_COMPILE_CACHE:` — **EN:** Starts a conditional branch guarded by `cache_key in _CUTLASS_COMPILE_CACHE`. **CN:** 开始一个由 `cache_key in _CUTLASS_COMPILE_CACHE` 控制的条件分支。
+- **L220** `        return _CUTLASS_COMPILE_CACHE[cache_key]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `    # Don't allow more than 1 thead to compile at any time.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L223** `    # We assume that the cache key is per thread so we don't need to lock` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L224** `    # the above check in compile cache,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L225** `    compiled_fn = None` — **EN:** Assigns a value to compiled_fn. **CN:** 将一个值赋给 compiled_fn。
+- **L226** `    with _compile_lock:` — **EN:** Starts a context-managed block using _compile_lock. **CN:** 开始一个使用 _compile_lock 的上下文管理代码块。
+- **L227** `        start = time.time()` — **EN:** Assigns a value to start. **CN:** 将一个值赋给 start。
+- **L228** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L229** `            cute_compile = cutlass.cute.compile` — **EN:** Assigns a value to cute_compile. **CN:** 将一个值赋给 cute_compile。
+- **L230** `            if spec.compile_options:` — **EN:** Starts a conditional branch guarded by `spec.compile_options`. **CN:** 开始一个由 `spec.compile_options` 控制的条件分支。
+- **L231** `                cute_compile = partial(cute_compile, options=spec.compile_options)  # type: ignore[assignment]` — **EN:** Assigns a value to cute_compile. **CN:** 将一个值赋给 cute_compile。
+- **L232** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L233** `            compiled_fn = cute_compile(` — **EN:** Assigns a value to compiled_fn. **CN:** 将一个值赋给 compiled_fn。
+- **L234** `                jit_wrapper,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `                cuda.CUstream(0),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `                spec.get_compile_args(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `                wrapped_fn=fn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `                spec=spec,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `            module = compiled_fn.dump_to_object(_EXPORT_PREFIX)` — **EN:** Assigns a value to module. **CN:** 将一个值赋给 module。
+- **L242** `            fingerprint = bytes.fromhex(hashlib.sha256(module).hexdigest())` — **EN:** Assigns a value to fingerprint. **CN:** 将一个值赋给 fingerprint。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `        except Exception as e:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L245** `            # Log here because Jax can obscure the exception details.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L246** `            logger.exception("Compilation failure for kernel.")` — **EN:** Invokes `logger.exception` as a standalone call. **CN:** 以独立语句方式调用 `logger.exception`。
+- **L247** `            raise e` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L248** `        end = time.time()` — **EN:** Assigns a value to end. **CN:** 将一个值赋给 end。
+- **L249** `    logger.debug(f"Took {end - start} to compile cute kernel.")` — **EN:** Invokes `logger.debug` as a standalone call. **CN:** 以独立语句方式调用 `logger.debug`。
+- **L250** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L251** `    result = CompileResult(module=module, spec=spec, fingerprint=fingerprint)` — **EN:** Assigns a value to result. **CN:** 将一个值赋给 result。
+- **L252** `    _CUTLASS_COMPILE_CACHE[cache_key] = result` — **EN:** Assigns a value to _CUTLASS_COMPILE_CACHE[cache_key]. **CN:** 将一个值赋给 _CUTLASS_COMPILE_CACHE[cache_key]。
+- **L253** `    return result` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L256** `def release_compile_cache():` — **EN:** Defines function `release_compile_cache`. **CN:** 定义函数 `release_compile_cache`。
+- **L257** `    """Releases entries from the compile cache.` — **EN:** Starts the docstring for the function `release_compile_cache`. **CN:** 开始说明 function `release_compile_cache` 的文档字符串。
+- **L258** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L259** `    Note that is may prevent cute dsl from saving its persistent compilation cache entries.` — **EN:** Continues the docstring for the function `release_compile_cache`. **CN:** 继续说明 function `release_compile_cache` 的文档字符串。
+- **L260** `    """` — **EN:** Ends the docstring for the function `release_compile_cache`. **CN:** 结束说明 function `release_compile_cache` 的文档字符串。
+- **L261** `    _CUTLASS_COMPILE_CACHE.clear()` — **EN:** Invokes `_CUTLASS_COMPILE_CACHE.clear` as a standalone call. **CN:** 以独立语句方式调用 `_CUTLASS_COMPILE_CACHE.clear`。
+- **L262** `    dsl = CuTeDSL._get_dsl()` — **EN:** Assigns a value to dsl. **CN:** 将一个值赋给 dsl。
+- **L263** `    dsl.jit_cache.clear()` — **EN:** Invokes `dsl.jit_cache.clear` as a standalone call. **CN:** 以独立语句方式调用 `dsl.jit_cache.clear`。
+- **L264** `    gc.collect()` — **EN:** Invokes `gc.collect` as a standalone call. **CN:** 以独立语句方式调用 `gc.collect`。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.jax.compile`. CN: 模块名为 `CuTeDSL.cutlass.jax.compile`。
+- EN: Top-level classes: Arg, FunctionSpec, CompileResult CN: 顶层类包括：Arg, FunctionSpec, CompileResult
+- EN: Top-level functions: jit_wrapper, _check_is_valid_type, build_function_spec, get_or_compile_kernel, release_compile_cache CN: 顶层函数包括：jit_wrapper, _check_is_valid_type, build_function_spec, get_or_compile_kernel, release_compile_cache
+
+## Dependencies / 依赖
+- EN: Internal dependencies: .types:jax_to_cutlass_dtype,JaxArrayList,TensorSpec,JaxTracedArray,DEFAULT_CUTLASS_DEVICE_MEMSPACE, cutlass, cutlass.cute, cutlass.cutlass_dsl.cutlass:CuTeDSL CN: 内部依赖：.types:jax_to_cutlass_dtype,JaxArrayList,TensorSpec,JaxTracedArray,DEFAULT_CUTLASS_DEVICE_MEMSPACE, cutlass, cutlass.cute, cutlass.cutlass_dsl.cutlass:CuTeDSL
+- EN: External or standard-library dependencies: gc, typing:Any, dataclasses:dataclass, functools:partial, time, logging, threading, hashlib, cuda.bindings.driver, jax, jax.numpy CN: 外部或标准库依赖：gc, typing:Any, dataclasses:dataclass, functools:partial, time, logging, threading, hashlib, cuda.bindings.driver, jax, jax.numpy

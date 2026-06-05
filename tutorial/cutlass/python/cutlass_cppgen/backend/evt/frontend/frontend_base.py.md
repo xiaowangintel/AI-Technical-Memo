@@ -1,0 +1,292 @@
+# frontend_base.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/frontend/frontend_base.py`
+
+## Purpose / 作用
+- EN: Base class for Python EVT Frontend
+- CN: 该模块的文档字符串将其描述为：Base class for Python EVT Frontend
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Base class for Python EVT Frontend` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from typing import Union` — **EN:** Imports Union from `typing`. **CN:** 从 `typing` 导入 Union。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from cutlass_library import DataType` — **EN:** Imports DataType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType。
+- **L40** `from cutlass_cppgen.backend.evt.ir import (` — **EN:** Imports ComputeNode, DAGIR, LayoutNode, LoadNode, StoreNode from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 ComputeNode, DAGIR, LayoutNode, LoadNode, StoreNode。
+- **L41** `    ComputeNode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L42** `    DAGIR,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    LayoutNode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    LoadNode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    StoreNode,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `from cutlass_cppgen.backend.evt.passes import (` — **EN:** Imports EVTGraphDrawer, EVTPassManager, GetSmemSize, PassDAG2Tree, PassGetArgumentType, PassGetImpl, ... (+4 more) from `cutlass_cppgen.backend.evt.passes`. **CN:** 从 `cutlass_cppgen.backend.evt.passes` 导入 EVTGraphDrawer, EVTPassManager, GetSmemSize, PassDAG2Tree, PassGetArgumentType, PassGetImpl, ... (+4 more)。
+- **L48** `    EVTGraphDrawer,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    EVTPassManager,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    GetSmemSize,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `    PassDAG2Tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `    PassGetArgumentType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** `    PassGetImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L54** `    PassFixElementD,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L55** `    PassLayoutManipulateElimination,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L56** `    PassPreprocessRed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L57** `    PassShapeTypePropagation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L58** `)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L59** `from cutlass_cppgen.backend.evt.passes.util import cc_map` — **EN:** Imports cc_map from `cutlass_cppgen.backend.evt.passes.util`. **CN:** 从 `cutlass_cppgen.backend.evt.passes.util` 导入 cc_map。
+- **L60** `from cutlass_cppgen.backend.utils import device_cc` — **EN:** Imports device_cc from `cutlass_cppgen.backend.utils`. **CN:** 从 `cutlass_cppgen.backend.utils` 导入 device_cc。
+- **L61** `from cutlass_cppgen.epilogue.evt_ops import permute, reshape` — **EN:** Imports permute, reshape from `cutlass_cppgen.epilogue.evt_ops`. **CN:** 从 `cutlass_cppgen.epilogue.evt_ops` 导入 permute, reshape。
+- **L62** `from cutlass_cppgen.utils.datatypes import library_type` — **EN:** Imports library_type from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 library_type。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `class EVTFrontendBase:` — **EN:** Defines class `EVTFrontendBase`. **CN:** 定义类 `EVTFrontendBase`。
+- **L66** `    layout_fns = {` — **EN:** Assigns a value to layout_fns. **CN:** 将一个值赋给 layout_fns。
+- **L67** `        "permute": permute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `        "reshape": reshape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L71** `    def __init__(self, cc, element_compute=DataType.f32, additional_passes=[], **kwargs) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L72** `        self.cc = cc` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L73** `        self.element_compute = library_type(element_compute)` — **EN:** Assigns a value to self.element_compute. **CN:** 将一个值赋给 self.element_compute。
+- **L74** `        self.dag_ir = DAGIR(self.cc, self.element_compute)` — **EN:** Assigns a value to self.dag_ir. **CN:** 将一个值赋给 self.dag_ir。
+- **L75** `        self.compute_cnt = 0` — **EN:** Assigns a value to self.compute_cnt. **CN:** 将一个值赋给 self.compute_cnt。
+- **L76** `        self.layout_cnt = 0` — **EN:** Assigns a value to self.layout_cnt. **CN:** 将一个值赋给 self.layout_cnt。
+- **L77** `        self.imm_cnt = 0` — **EN:** Assigns a value to self.imm_cnt. **CN:** 将一个值赋给 self.imm_cnt。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `        self.pass_manager = EVTPassManager(` — **EN:** Assigns a value to self.pass_manager. **CN:** 将一个值赋给 self.pass_manager。
+- **L80** `            self.dag_ir,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `            [` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** `                PassPreprocessRed,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L83** `                PassGetArgumentType,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `                PassShapeTypePropagation,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `                PassLayoutManipulateElimination,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `                PassGetImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `                PassDAG2Tree,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `                PassFixElementD` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `            ] + additional_passes)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L91** `        if self.cc == 80:` — **EN:** Starts a conditional branch guarded by `self.cc == 80`. **CN:** 开始一个由 `self.cc == 80` 控制的条件分支。
+- **L92** `            self._epilogue_stages = 1` — **EN:** Assigns a value to self._epilogue_stages. **CN:** 将一个值赋给 self._epilogue_stages。
+- **L93** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L94** `            self._epilogue_stages = None` — **EN:** Assigns a value to self._epilogue_stages. **CN:** 将一个值赋给 self._epilogue_stages。
+- **L95** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L96** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L97** `    def epilogue_stages(self):` — **EN:** Defines function `epilogue_stages`. **CN:** 定义函数 `epilogue_stages`。
+- **L98** `        return self._epilogue_stages` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L99** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L100** `    @epilogue_stages.setter` — **EN:** Applies decorator `epilogue_stages.setter` to the following definition. **CN:** 将装饰器 `epilogue_stages.setter` 应用于后面的定义。
+- **L101** `    def epilogue_stages(self, stages):` — **EN:** Defines function `epilogue_stages`. **CN:** 定义函数 `epilogue_stages`。
+- **L102** `        self._epilogue_stages = stages` — **EN:** Assigns a value to self._epilogue_stages. **CN:** 将一个值赋给 self._epilogue_stages。
+- **L103** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    def parse(self, *args, **kwargs):` — **EN:** Defines function `parse`. **CN:** 定义函数 `parse`。
+- **L106** `        raise NotImplementedError(f"The 'parse' function must be overloaded in frontend class")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L107** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L108** `    def trace(self, *args, **kwargs):` — **EN:** Defines function `trace`. **CN:** 定义函数 `trace`。
+- **L109** `        # Parse the input` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L110** `        self.parse(*args, **kwargs)` — **EN:** Invokes `self.parse` as a standalone call. **CN:** 以独立语句方式调用 `self.parse`。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `        # Verify the DAG IR to ensure that "D" is the output node with out_degree = 0` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L113** `        if (self.cc >= 90):` — **EN:** Starts a conditional branch guarded by `self.cc >= 90`. **CN:** 开始一个由 `self.cc >= 90` 控制的条件分支。
+- **L114** `            if (self.dag_ir.out_degree("D") != 0):` — **EN:** Starts a conditional branch guarded by `self.dag_ir.out_degree('D') != 0`. **CN:** 开始一个由 `self.dag_ir.out_degree('D') != 0` 控制的条件分支。
+- **L115** `                raise RuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L116** `                    f"On SM90 or higher, D is expected to be a output node with 0 users to "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L117** `                    f"enable smem reuse between C and D, but got {self.dag_ir.out_degree('D')}")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L119** `        # Run the passes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L120** `        self.pass_manager()` — **EN:** Invokes `self.pass_manager` as a standalone call. **CN:** 以独立语句方式调用 `self.pass_manager`。
+- **L121** `        # Set the epilogue type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L122** `        self.epilogue_thread_type = self.dag_ir.epilogue_thread_type` — **EN:** Assigns a value to self.epilogue_thread_type. **CN:** 将一个值赋给 self.epilogue_thread_type。
+- **L123** `        if cc_map[self.cc] in [90, 100]:` — **EN:** Starts a conditional branch guarded by `cc_map[self.cc] in [90, 100]`. **CN:** 开始一个由 `cc_map[self.cc] in [90, 100]` 控制的条件分支。
+- **L124** `            self.arg_c_type = self.dag_ir.arg_c_type` — **EN:** Assigns a value to self.arg_c_type. **CN:** 将一个值赋给 self.arg_c_type。
+- **L125** `            self.arg_d_type = self.dag_ir.arg_d_type` — **EN:** Assigns a value to self.arg_d_type. **CN:** 将一个值赋给 self.arg_d_type。
+- **L126** `        self.reduction_names = self.dag_ir.reduction_names` — **EN:** Assigns a value to self.reduction_names. **CN:** 将一个值赋给 self.reduction_names。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L129** `    # Helper functions for DAG IR manipulation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L130** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `    def add_node(self, node):` — **EN:** Defines function `add_node`. **CN:** 定义函数 `add_node`。
+- **L133** `        self.dag_ir.add_node(node)` — **EN:** Invokes `self.dag_ir.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_node`。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    def add_edge(self, src, tgt, weight=0):` — **EN:** Defines function `add_edge`. **CN:** 定义函数 `add_edge`。
+- **L136** `        self.dag_ir.add_edge(src, tgt, weight=weight)` — **EN:** Invokes `self.dag_ir.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `self.dag_ir.add_edge`。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    def set_tensor(self, node_name, example):` — **EN:** Defines function `set_tensor`. **CN:** 定义函数 `set_tensor`。
+- **L139** `        """` — **EN:** Starts the docstring for the function `set_tensor`. **CN:** 开始说明 function `set_tensor` 的文档字符串。
+- **L140** `        Add an example tensor to node {node_name} in the DAG IR` — **EN:** Continues the docstring for the function `set_tensor`. **CN:** 继续说明 function `set_tensor` 的文档字符串。
+- **L141** `        """` — **EN:** Ends the docstring for the function `set_tensor`. **CN:** 结束说明 function `set_tensor` 的文档字符串。
+- **L142** `        meta = self.dag_ir.get_node_meta(node_name)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L143** `        meta.tensor = {"tensor": example}` — **EN:** Assigns a value to meta.tensor. **CN:** 将一个值赋给 meta.tensor。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `    def set_store_tensor(self, node_name, example):` — **EN:** Defines function `set_store_tensor`. **CN:** 定义函数 `set_store_tensor`。
+- **L146** `        """` — **EN:** Starts the docstring for the function `set_store_tensor`. **CN:** 开始说明 function `set_store_tensor` 的文档字符串。
+- **L147** `        Add an example tensor to node {node_name} in the DAG IR` — **EN:** Continues the docstring for the function `set_store_tensor`. **CN:** 继续说明 function `set_store_tensor` 的文档字符串。
+- **L148** `        """` — **EN:** Ends the docstring for the function `set_store_tensor`. **CN:** 结束说明 function `set_store_tensor` 的文档字符串。
+- **L149** `        meta = self.dag_ir.get_node_meta(node_name)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L150** `        meta.store_tensor = {"tensor": example}` — **EN:** Assigns a value to meta.store_tensor. **CN:** 将一个值赋给 meta.store_tensor。
+- **L151** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L152** `    def mark_output(self, node_name):` — **EN:** Defines function `mark_output`. **CN:** 定义函数 `mark_output`。
+- **L153** `        """` — **EN:** Starts the docstring for the function `mark_output`. **CN:** 开始说明 function `mark_output` 的文档字符串。
+- **L154** `        Mark a store node as output` — **EN:** Continues the docstring for the function `mark_output`. **CN:** 继续说明 function `mark_output` 的文档字符串。
+- **L155** `        """` — **EN:** Ends the docstring for the function `mark_output`. **CN:** 结束说明 function `mark_output` 的文档字符串。
+- **L156** `        meta = self.dag_ir.get_node_meta(node_name)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L157** `        if not isinstance(meta, StoreNode):` — **EN:** Starts a conditional branch guarded by `not isinstance(meta, StoreNode)`. **CN:** 开始一个由 `not isinstance(meta, StoreNode)` 控制的条件分支。
+- **L158** `            raise ValueError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L159** `                f"Only StoreNodes can be marked as output. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `                f"Got {type(meta).__name__}: {node_name}")` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L161** `        meta.is_output = True` — **EN:** Assigns a value to meta.is_output. **CN:** 将一个值赋给 meta.is_output。
+- **L162** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L163** `    # Add node with specific type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L164** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L165** `    def add_load_node(self, name, example):` — **EN:** Defines function `add_load_node`. **CN:** 定义函数 `add_load_node`。
+- **L166** `        """` — **EN:** Starts the docstring for the function `add_load_node`. **CN:** 开始说明 function `add_load_node` 的文档字符串。
+- **L167** `        Add a Load node to DAG IR` — **EN:** Continues the docstring for the function `add_load_node`. **CN:** 继续说明 function `add_load_node` 的文档字符串。
+- **L168** `        :param name: name of the loaded variable` — **EN:** Continues the docstring for the function `add_load_node`. **CN:** 继续说明 function `add_load_node` 的文档字符串。
+- **L169** `        :type name: str` — **EN:** Continues the docstring for the function `add_load_node`. **CN:** 继续说明 function `add_load_node` 的文档字符串。
+- **L170** `        :param example: example input` — **EN:** Continues the docstring for the function `add_load_node`. **CN:** 继续说明 function `add_load_node` 的文档字符串。
+- **L171** `        :type example: np.ndarray|torch.Tensor|cupy.ndarray|float` — **EN:** Continues the docstring for the function `add_load_node`. **CN:** 继续说明 function `add_load_node` 的文档字符串。
+- **L172** `        """` — **EN:** Ends the docstring for the function `add_load_node`. **CN:** 结束说明 function `add_load_node` 的文档字符串。
+- **L173** `        if name is None:` — **EN:** Starts a conditional branch guarded by `name is None`. **CN:** 开始一个由 `name is None` 控制的条件分支。
+- **L174** `            raise ValueError(f"Name is not provided.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L175** `        if example is None:` — **EN:** Starts a conditional branch guarded by `example is None`. **CN:** 开始一个由 `example is None` 控制的条件分支。
+- **L176** `            raise ValueError(f"Example input for {name} is not provided.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L177** `        load_node = LoadNode(name)` — **EN:** Assigns a value to load_node. **CN:** 将一个值赋给 load_node。
+- **L178** `        load_node.tensor = {"tensor": example}` — **EN:** Assigns a value to load_node.tensor. **CN:** 将一个值赋给 load_node.tensor。
+- **L179** `        # Special logics for accumulator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L180** `        if name == "accum":` — **EN:** Starts a conditional branch guarded by `name == 'accum'`. **CN:** 开始一个由 `name == 'accum'` 控制的条件分支。
+- **L181** `            if load_node.tensor.rank == 2:` — **EN:** Starts a conditional branch guarded by `load_node.tensor.rank == 2`. **CN:** 开始一个由 `load_node.tensor.rank == 2` 控制的条件分支。
+- **L182** `                new_shape = tuple([1, ] + list(load_node.tensor.shape))` — **EN:** Assigns a value to new_shape. **CN:** 将一个值赋给 new_shape。
+- **L183** `                load_node.tensor.broadcast(new_shape)` — **EN:** Invokes `load_node.tensor.broadcast` as a standalone call. **CN:** 以独立语句方式调用 `load_node.tensor.broadcast`。
+- **L184** `            elif load_node.tensor.rank < 2 or load_node.tensor.rank > 3:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L185** `                raise ValueError(f"Expect example inputs for 'accum' be a rank-2 or rank-3 tensor. Got {load_node.tensor.shape}.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L186** `        self.add_node(load_node)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L187** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L188** `    def add_imm(self, value: Union[float,int]):` — **EN:** Defines function `add_imm`. **CN:** 定义函数 `add_imm`。
+- **L189** `        """` — **EN:** Starts the docstring for the function `add_imm`. **CN:** 开始说明 function `add_imm` 的文档字符串。
+- **L190** `        Add an immediate scalar value to DAG IR` — **EN:** Continues the docstring for the function `add_imm`. **CN:** 继续说明 function `add_imm` 的文档字符串。
+- **L191** `        :param value: the value of the immediate scalar` — **EN:** Continues the docstring for the function `add_imm`. **CN:** 继续说明 function `add_imm` 的文档字符串。
+- **L192** `        :type value: float` — **EN:** Continues the docstring for the function `add_imm`. **CN:** 继续说明 function `add_imm` 的文档字符串。
+- **L193** `        """` — **EN:** Ends the docstring for the function `add_imm`. **CN:** 结束说明 function `add_imm` 的文档字符串。
+- **L194** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L195** `            value = float(value)` — **EN:** Assigns a value to value. **CN:** 将一个值赋给 value。
+- **L196** `        except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L197** `            raise ValueError(f"{type(value).__name__} cannot be converted to float.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L198** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L199** `        name = f"imm_{value}_k{self.imm_cnt}".replace('.', '_')` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L200** `        self.imm_cnt += 1` — **EN:** Updates self.imm_cnt in place. **CN:** 原地更新 self.imm_cnt。
+- **L201** `        load_node = LoadNode(name)` — **EN:** Assigns a value to load_node. **CN:** 将一个值赋给 load_node。
+- **L202** `        load_node.tensor = {"tensor": value, "is_constant": True}` — **EN:** Assigns a value to load_node.tensor. **CN:** 将一个值赋给 load_node.tensor。
+- **L203** `        self.add_node(load_node)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L204** `        return name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `    def add_compute_node(self, op, name=None):` — **EN:** Defines function `add_compute_node`. **CN:** 定义函数 `add_compute_node`。
+- **L207** `        """` — **EN:** Starts the docstring for the function `add_compute_node`. **CN:** 开始说明 function `add_compute_node` 的文档字符串。
+- **L208** `        Add a compute node.` — **EN:** Continues the docstring for the function `add_compute_node`. **CN:** 继续说明 function `add_compute_node` 的文档字符串。
+- **L209** `        :param op: the computation op` — **EN:** Continues the docstring for the function `add_compute_node`. **CN:** 继续说明 function `add_compute_node` 的文档字符串。
+- **L210** `        :param name: the node name (optional)` — **EN:** Continues the docstring for the function `add_compute_node`. **CN:** 继续说明 function `add_compute_node` 的文档字符串。
+- **L211** `        :type name: str` — **EN:** Continues the docstring for the function `add_compute_node`. **CN:** 继续说明 function `add_compute_node` 的文档字符串。
+- **L212** `        :return: the name of the compute node` — **EN:** Continues the docstring for the function `add_compute_node`. **CN:** 继续说明 function `add_compute_node` 的文档字符串。
+- **L213** `        """` — **EN:** Ends the docstring for the function `add_compute_node`. **CN:** 结束说明 function `add_compute_node` 的文档字符串。
+- **L214** `        if name is None:` — **EN:** Starts a conditional branch guarded by `name is None`. **CN:** 开始一个由 `name is None` 控制的条件分支。
+- **L215** `            name = f"compute_{self.compute_cnt}"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L216** `            self.compute_cnt += 1` — **EN:** Updates self.compute_cnt in place. **CN:** 原地更新 self.compute_cnt。
+- **L217** `        compute_node = ComputeNode(` — **EN:** Assigns a value to compute_node. **CN:** 将一个值赋给 compute_node。
+- **L218** `            name=name, fn=op,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `            element_output=self.element_compute,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `            element_compute=self.element_compute)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `        self.add_node(compute_node)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L222** `        return compute_node.name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `    def add_layout_node(self, op, kwargs, name=None):` — **EN:** Defines function `add_layout_node`. **CN:** 定义函数 `add_layout_node`。
+- **L225** `        """` — **EN:** Starts the docstring for the function `add_layout_node`. **CN:** 开始说明 function `add_layout_node` 的文档字符串。
+- **L226** `        Add a layout node.` — **EN:** Continues the docstring for the function `add_layout_node`. **CN:** 继续说明 function `add_layout_node` 的文档字符串。
+- **L227** `        :param op: the layout op` — **EN:** Continues the docstring for the function `add_layout_node`. **CN:** 继续说明 function `add_layout_node` 的文档字符串。
+- **L228** `        :type op: evt_ops` — **EN:** Continues the docstring for the function `add_layout_node`. **CN:** 继续说明 function `add_layout_node` 的文档字符串。
+- **L229** `        :param name: the node name (optional)` — **EN:** Continues the docstring for the function `add_layout_node`. **CN:** 继续说明 function `add_layout_node` 的文档字符串。
+- **L230** `        :type name: str` — **EN:** Continues the docstring for the function `add_layout_node`. **CN:** 继续说明 function `add_layout_node` 的文档字符串。
+- **L231** `        :return: the name of the layout node` — **EN:** Continues the docstring for the function `add_layout_node`. **CN:** 继续说明 function `add_layout_node` 的文档字符串。
+- **L232** `        """` — **EN:** Ends the docstring for the function `add_layout_node`. **CN:** 结束说明 function `add_layout_node` 的文档字符串。
+- **L233** `        if name is None:` — **EN:** Starts a conditional branch guarded by `name is None`. **CN:** 开始一个由 `name is None` 控制的条件分支。
+- **L234** `            name = f"layout_{self.layout_cnt}"` — **EN:** Assigns a value to name. **CN:** 将一个值赋给 name。
+- **L235** `            self.layout_cnt += 1` — **EN:** Updates self.layout_cnt in place. **CN:** 原地更新 self.layout_cnt。
+- **L236** `        layout_node = LayoutNode(name=name, fn=op, kwargs=kwargs)` — **EN:** Assigns a value to layout_node. **CN:** 将一个值赋给 layout_node。
+- **L237** `        self.add_node(layout_node)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L238** `        return layout_node.name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L239** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L240** `    def add_store_node(self, name):` — **EN:** Defines function `add_store_node`. **CN:** 定义函数 `add_store_node`。
+- **L241** `        store_node = StoreNode(name)` — **EN:** Assigns a value to store_node. **CN:** 将一个值赋给 store_node。
+- **L242** `        self.add_node(store_node)` — **EN:** Invokes `self.add_node` as a standalone call. **CN:** 以独立语句方式调用 `self.add_node`。
+- **L243** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L244** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L245** `    # Visualization The DAG IR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L246** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L247** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L248** `    def visualize(self, name="dag_ir"):` — **EN:** Defines function `visualize`. **CN:** 定义函数 `visualize`。
+- **L249** `        """` — **EN:** Starts the docstring for the function `visualize`. **CN:** 开始说明 function `visualize` 的文档字符串。
+- **L250** `        Visualize the dag ir with svg file` — **EN:** Continues the docstring for the function `visualize`. **CN:** 继续说明 function `visualize` 的文档字符串。
+- **L251** `        :param name: the name of the graph` — **EN:** Continues the docstring for the function `visualize`. **CN:** 继续说明 function `visualize` 的文档字符串。
+- **L252** `        """` — **EN:** Ends the docstring for the function `visualize`. **CN:** 结束说明 function `visualize` 的文档字符串。
+- **L253** `        drawer = EVTGraphDrawer(self.dag_ir, name)` — **EN:** Assigns a value to drawer. **CN:** 将一个值赋给 drawer。
+- **L254** `        try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L255** `            for name, graph in drawer.get_dot_graph():` — **EN:** Starts a loop assigning items from `drawer.get_dot_graph()` to `(name, graph)`. **CN:** 开始一个循环，将 `drawer.get_dot_graph()` 的元素赋给 `(name, graph)`。
+- **L256** `                graph.write_svg(f"./{name}.svg")` — **EN:** Invokes `graph.write_svg` as a standalone call. **CN:** 以独立语句方式调用 `graph.write_svg`。
+- **L257** `        except:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L258** `            raise RuntimeError(` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L259** `                "'dot' is not found in path. GraphDrawer is disabled. "` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `                "Please install it with 'sudo apt-get install graphviz'."` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L264** `    # Get shared memory size` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L265** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L266** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L267** `    def get_smem_size(self, tile_description):` — **EN:** Defines function `get_smem_size`. **CN:** 定义函数 `get_smem_size`。
+- **L268** `        """` — **EN:** Starts the docstring for the function `get_smem_size`. **CN:** 开始说明 function `get_smem_size` 的文档字符串。
+- **L269** `        Get the shared memory size of the epilogue` — **EN:** Continues the docstring for the function `get_smem_size`. **CN:** 继续说明 function `get_smem_size` 的文档字符串。
+- **L270** `        """` — **EN:** Ends the docstring for the function `get_smem_size`. **CN:** 结束说明 function `get_smem_size` 的文档字符串。
+- **L271** `        smem_size = GetSmemSize(self.dag_ir)(tile_description)` — **EN:** Assigns a value to smem_size. **CN:** 将一个值赋给 smem_size。
+- **L272** `        return smem_size` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.frontend.frontend_base`. CN: 模块名为 `cutlass_cppgen.backend.evt.frontend.frontend_base`。
+- EN: Module docstring summary: Base class for Python EVT Frontend CN: 模块文档摘要为：Base class for Python EVT Frontend
+- EN: Top-level classes: EVTFrontendBase CN: 顶层类包括：EVTFrontendBase
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataType, cutlass_cppgen.backend.evt.ir:ComputeNode,DAGIR,LayoutNode,LoadNode,StoreNode, cutlass_cppgen.backend.evt.passes:EVTGraphDrawer,EVTPassManager,GetSmemSize,PassDAG2Tree,PassGetArgumentType,PassGetImpl,PassFixElementD,PassLayoutManipulateElimination,PassPreprocessRed,PassShapeTypePropagation, cutlass_cppgen.backend.evt.passes.util:cc_map, cutlass_cppgen.backend.utils:device_cc, cutlass_cppgen.epilogue.evt_ops:permute,reshape, cutlass_cppgen.utils.datatypes:library_type CN: 内部依赖：cutlass_library:DataType, cutlass_cppgen.backend.evt.ir:ComputeNode,DAGIR,LayoutNode,LoadNode,StoreNode, cutlass_cppgen.backend.evt.passes:EVTGraphDrawer,EVTPassManager,GetSmemSize,PassDAG2Tree,PassGetArgumentType,PassGetImpl,PassFixElementD,PassLayoutManipulateElimination,PassPreprocessRed,PassShapeTypePropagation, cutlass_cppgen.backend.evt.passes.util:cc_map, cutlass_cppgen.backend.utils:device_cc, cutlass_cppgen.epilogue.evt_ops:permute,reshape, cutlass_cppgen.utils.datatypes:library_type
+- EN: External or standard-library dependencies: typing:Union CN: 外部或标准库依赖：typing:Union

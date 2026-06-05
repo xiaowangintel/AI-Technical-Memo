@@ -1,0 +1,1129 @@
+# polynomial_horner3_16.hpp — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `third-party/boost-math/include/boost/math/tools/detail/polynomial_horner3_16.hpp`
+- **Repository / 仓库**: `/root/xw/llvm-project/` (`llvm-project`)
+- **Purpose / 目的**:
+  - **EN**: This file is machine generated, do not edit by hand.
+  - **CN**: 提供 Boost.Math 的工具模板、数值 traits、策略与底层支撑辅助逻辑。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-20 / 第 1-20 行
+
+````cpp
+   1: //  (C) Copyright John Maddock 2007.
+   2: //  Use, modification and distribution are subject to the
+   3: //  Boost Software License, Version 1.0. (See accompanying file
+   4: //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+   5: //
+   6: //  This file is machine generated, do not edit by hand
+   7: 
+   8: // Unrolled polynomial evaluation using second order Horners rule
+   9: #ifndef BOOST_MATH_TOOLS_POLY_EVAL_16_HPP
+  10: #define BOOST_MATH_TOOLS_POLY_EVAL_16_HPP
+  11: 
+  12: namespace boost{ namespace math{ namespace tools{ namespace detail{
+  13: 
+  14: template <class T, class V>
+  15: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T*, const V&, const boost::math::integral_constant<int, 0>*) BOOST_MATH_NOEXCEPT(V)
+  16: {
+  17:    return static_cast<V>(0);
+  18: }
+  19: 
+  20: template <class T, class V>
+````
+- **L1 EN**: License or provenance comment documenting ownership and reuse terms.
+  - **L1 CN**: 许可或来源注释，用于说明归属与复用条款。
+- **L2 EN**: License or provenance comment documenting ownership and reuse terms.
+  - **L2 CN**: 许可或来源注释，用于说明归属与复用条款。
+- **L3 EN**: License or provenance comment documenting ownership and reuse terms.
+  - **L3 CN**: 许可或来源注释，用于说明归属与复用条款。
+- **L4 EN**: License or provenance comment documenting ownership and reuse terms.
+  - **L4 CN**: 许可或来源注释，用于说明归属与复用条款。
+- **L5 EN**: Separator comment used for visual grouping.
+  - **L5 CN**: 分隔注释，用于视觉分组。
+- **L6 EN**: Comment documents nearby intent or usage notes: `This file is machine generated, do not edit by hand`.
+  - **L6 CN**: 注释说明附近代码的意图或使用说明：`This file is machine generated, do not edit by hand`。
+- **L7 EN**: Blank line separating nearby declarations or logic.
+  - **L7 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L8 EN**: Comment documents nearby intent or usage notes: `Unrolled polynomial evaluation using second order Horners rule`.
+  - **L8 CN**: 注释说明附近代码的意图或使用说明：`Unrolled polynomial evaluation using second order Horners rule`。
+- **L9 EN**: Starts a header guard condition: `#ifndef BOOST_MATH_TOOLS_POLY_EVAL_16_HPP`.
+  - **L9 CN**: 开始头文件保护条件：`#ifndef BOOST_MATH_TOOLS_POLY_EVAL_16_HPP`。
+- **L10 EN**: Defines macro `BOOST_MATH_TOOLS_POLY_EVAL_16_HPP` for compile-time control, shorthand, or generated boilerplate.
+  - **L10 CN**: 定义宏 `BOOST_MATH_TOOLS_POLY_EVAL_16_HPP`，用于编译期控制、简写或生成样板代码。
+- **L11 EN**: Blank line separating nearby declarations or logic.
+  - **L11 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L12 EN**: Opens namespace scope `boost{ namespace math{ namespace tools{ namespace detail`.
+  - **L12 CN**: 打开命名空间作用域 `boost{ namespace math{ namespace tools{ namespace detail`。
+- **L13 EN**: Blank line separating nearby declarations or logic.
+  - **L13 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L14 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L14 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L15 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L15 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L16 EN**: Opens a new lexical scope or compound statement.
+  - **L16 CN**: 打开一个新的词法作用域或复合语句块。
+- **L17 EN**: Returns from the current function with `static_cast<V>(0)`.
+  - **L17 CN**: 以 `static_cast<V>(0)` 从当前函数返回。
+- **L18 EN**: Closes the current lexical scope or compound statement.
+  - **L18 CN**: 结束当前词法作用域或复合语句块。
+- **L19 EN**: Blank line separating nearby declarations or logic.
+  - **L19 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L20 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L20 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+
+### Lines 21-40 / 第 21-40 行
+
+````cpp
+  21: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V&, const boost::math::integral_constant<int, 1>*) BOOST_MATH_NOEXCEPT(V)
+  22: {
+  23:    return static_cast<V>(a[0]);
+  24: }
+  25: 
+  26: template <class T, class V>
+  27: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 2>*) BOOST_MATH_NOEXCEPT(V)
+  28: {
+  29:    return static_cast<V>(a[1] * x + a[0]);
+  30: }
+  31: 
+  32: template <class T, class V>
+  33: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 3>*) BOOST_MATH_NOEXCEPT(V)
+  34: {
+  35:    return static_cast<V>((a[2] * x + a[1]) * x + a[0]);
+  36: }
+  37: 
+  38: template <class T, class V>
+  39: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 4>*) BOOST_MATH_NOEXCEPT(V)
+  40: {
+````
+- **L21 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L21 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L22 EN**: Opens a new lexical scope or compound statement.
+  - **L22 CN**: 打开一个新的词法作用域或复合语句块。
+- **L23 EN**: Returns from the current function with `static_cast<V>(a[0])`.
+  - **L23 CN**: 以 `static_cast<V>(a[0])` 从当前函数返回。
+- **L24 EN**: Closes the current lexical scope or compound statement.
+  - **L24 CN**: 结束当前词法作用域或复合语句块。
+- **L25 EN**: Blank line separating nearby declarations or logic.
+  - **L25 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L26 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L26 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L27 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L27 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L28 EN**: Opens a new lexical scope or compound statement.
+  - **L28 CN**: 打开一个新的词法作用域或复合语句块。
+- **L29 EN**: Returns from the current function with `static_cast<V>(a[1] * x + a[0])`.
+  - **L29 CN**: 以 `static_cast<V>(a[1] * x + a[0])` 从当前函数返回。
+- **L30 EN**: Closes the current lexical scope or compound statement.
+  - **L30 CN**: 结束当前词法作用域或复合语句块。
+- **L31 EN**: Blank line separating nearby declarations or logic.
+  - **L31 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L32 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L32 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L33 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L33 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L34 EN**: Opens a new lexical scope or compound statement.
+  - **L34 CN**: 打开一个新的词法作用域或复合语句块。
+- **L35 EN**: Returns from the current function with `static_cast<V>((a[2] * x + a[1]) * x + a[0])`.
+  - **L35 CN**: 以 `static_cast<V>((a[2] * x + a[1]) * x + a[0])` 从当前函数返回。
+- **L36 EN**: Closes the current lexical scope or compound statement.
+  - **L36 CN**: 结束当前词法作用域或复合语句块。
+- **L37 EN**: Blank line separating nearby declarations or logic.
+  - **L37 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L38 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L38 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L39 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L39 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L40 EN**: Opens a new lexical scope or compound statement.
+  - **L40 CN**: 打开一个新的词法作用域或复合语句块。
+
+### Lines 41-60 / 第 41-60 行
+
+````cpp
+  41:    return static_cast<V>(((a[3] * x + a[2]) * x + a[1]) * x + a[0]);
+  42: }
+  43: 
+  44: template <class T, class V>
+  45: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 5>*) BOOST_MATH_NOEXCEPT(V)
+  46: {
+  47:    V x2 = x * x;
+  48:    V t[2];
+  49:    t[0] = static_cast<V>(a[4] * x2 + a[2]);
+  50:    t[1] = static_cast<V>(a[3] * x2 + a[1]);
+  51:    t[0] *= x2;
+  52:    t[0] += static_cast<V>(a[0]);
+  53:    t[1] *= x;
+  54:    return t[0] + t[1];
+  55: }
+  56: 
+  57: template <class T, class V>
+  58: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 6>*) BOOST_MATH_NOEXCEPT(V)
+  59: {
+  60:    V x2 = x * x;
+````
+- **L41 EN**: Returns from the current function with `static_cast<V>(((a[3] * x + a[2]) * x + a[1]) * x + a[0])`.
+  - **L41 CN**: 以 `static_cast<V>(((a[3] * x + a[2]) * x + a[1]) * x + a[0])` 从当前函数返回。
+- **L42 EN**: Closes the current lexical scope or compound statement.
+  - **L42 CN**: 结束当前词法作用域或复合语句块。
+- **L43 EN**: Blank line separating nearby declarations or logic.
+  - **L43 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L44 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L44 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L45 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L45 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L46 EN**: Opens a new lexical scope or compound statement.
+  - **L46 CN**: 打开一个新的词法作用域或复合语句块。
+- **L47 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L47 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L48 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L48 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L49 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L49 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L50 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L50 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L51 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L51 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L52 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L52 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L53 EN**: Executes a standalone statement or declaration: `t[1] *= x;`.
+  - **L53 CN**: 执行一条独立语句或声明：`t[1] *= x;`。
+- **L54 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L54 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L55 EN**: Closes the current lexical scope or compound statement.
+  - **L55 CN**: 结束当前词法作用域或复合语句块。
+- **L56 EN**: Blank line separating nearby declarations or logic.
+  - **L56 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L57 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L57 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L58 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L58 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L59 EN**: Opens a new lexical scope or compound statement.
+  - **L59 CN**: 打开一个新的词法作用域或复合语句块。
+- **L60 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L60 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+
+### Lines 61-80 / 第 61-80 行
+
+````cpp
+  61:    V t[2];
+  62:    t[0] = a[5] * x2 + a[3];
+  63:    t[1] = a[4] * x2 + a[2];
+  64:    t[0] *= x2;
+  65:    t[1] *= x2;
+  66:    t[0] += static_cast<V>(a[1]);
+  67:    t[1] += static_cast<V>(a[0]);
+  68:    t[0] *= x;
+  69:    return t[0] + t[1];
+  70: }
+  71: 
+  72: template <class T, class V>
+  73: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 7>*) BOOST_MATH_NOEXCEPT(V)
+  74: {
+  75:    V x2 = x * x;
+  76:    V t[2];
+  77:    t[0] = static_cast<V>(a[6] * x2 + a[4]);
+  78:    t[1] = static_cast<V>(a[5] * x2 + a[3]);
+  79:    t[0] *= x2;
+  80:    t[1] *= x2;
+````
+- **L61 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L61 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L62 EN**: Executes a standalone statement or declaration: `t[0] = a[5] * x2 + a[3];`.
+  - **L62 CN**: 执行一条独立语句或声明：`t[0] = a[5] * x2 + a[3];`。
+- **L63 EN**: Executes a standalone statement or declaration: `t[1] = a[4] * x2 + a[2];`.
+  - **L63 CN**: 执行一条独立语句或声明：`t[1] = a[4] * x2 + a[2];`。
+- **L64 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L64 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L65 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L65 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L66 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L66 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L67 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L67 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L68 EN**: Executes a standalone statement or declaration: `t[0] *= x;`.
+  - **L68 CN**: 执行一条独立语句或声明：`t[0] *= x;`。
+- **L69 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L69 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L70 EN**: Closes the current lexical scope or compound statement.
+  - **L70 CN**: 结束当前词法作用域或复合语句块。
+- **L71 EN**: Blank line separating nearby declarations or logic.
+  - **L71 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L72 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L72 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L73 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L73 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L74 EN**: Opens a new lexical scope or compound statement.
+  - **L74 CN**: 打开一个新的词法作用域或复合语句块。
+- **L75 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L75 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L76 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L76 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L77 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L77 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L78 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L78 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L79 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L79 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L80 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L80 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+
+### Lines 81-100 / 第 81-100 行
+
+````cpp
+  81:    t[0] += static_cast<V>(a[2]);
+  82:    t[1] += static_cast<V>(a[1]);
+  83:    t[0] *= x2;
+  84:    t[0] += static_cast<V>(a[0]);
+  85:    t[1] *= x;
+  86:    return t[0] + t[1];
+  87: }
+  88: 
+  89: template <class T, class V>
+  90: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 8>*) BOOST_MATH_NOEXCEPT(V)
+  91: {
+  92:    V x2 = x * x;
+  93:    V t[2];
+  94:    t[0] = a[7] * x2 + a[5];
+  95:    t[1] = a[6] * x2 + a[4];
+  96:    t[0] *= x2;
+  97:    t[1] *= x2;
+  98:    t[0] += static_cast<V>(a[3]);
+  99:    t[1] += static_cast<V>(a[2]);
+ 100:    t[0] *= x2;
+````
+- **L81 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L81 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L82 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L82 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L83 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L83 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L84 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L84 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L85 EN**: Executes a standalone statement or declaration: `t[1] *= x;`.
+  - **L85 CN**: 执行一条独立语句或声明：`t[1] *= x;`。
+- **L86 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L86 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L87 EN**: Closes the current lexical scope or compound statement.
+  - **L87 CN**: 结束当前词法作用域或复合语句块。
+- **L88 EN**: Blank line separating nearby declarations or logic.
+  - **L88 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L89 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L89 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L90 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L90 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L91 EN**: Opens a new lexical scope or compound statement.
+  - **L91 CN**: 打开一个新的词法作用域或复合语句块。
+- **L92 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L92 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L93 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L93 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L94 EN**: Executes a standalone statement or declaration: `t[0] = a[7] * x2 + a[5];`.
+  - **L94 CN**: 执行一条独立语句或声明：`t[0] = a[7] * x2 + a[5];`。
+- **L95 EN**: Executes a standalone statement or declaration: `t[1] = a[6] * x2 + a[4];`.
+  - **L95 CN**: 执行一条独立语句或声明：`t[1] = a[6] * x2 + a[4];`。
+- **L96 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L96 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L97 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L97 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L98 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L98 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L99 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L99 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L100 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L100 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+
+### Lines 101-120 / 第 101-120 行
+
+````cpp
+ 101:    t[1] *= x2;
+ 102:    t[0] += static_cast<V>(a[1]);
+ 103:    t[1] += static_cast<V>(a[0]);
+ 104:    t[0] *= x;
+ 105:    return t[0] + t[1];
+ 106: }
+ 107: 
+ 108: template <class T, class V>
+ 109: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 9>*) BOOST_MATH_NOEXCEPT(V)
+ 110: {
+ 111:    V x2 = x * x;
+ 112:    V t[2];
+ 113:    t[0] = static_cast<V>(a[8] * x2 + a[6]);
+ 114:    t[1] = static_cast<V>(a[7] * x2 + a[5]);
+ 115:    t[0] *= x2;
+ 116:    t[1] *= x2;
+ 117:    t[0] += static_cast<V>(a[4]);
+ 118:    t[1] += static_cast<V>(a[3]);
+ 119:    t[0] *= x2;
+ 120:    t[1] *= x2;
+````
+- **L101 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L101 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L102 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L102 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L103 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L103 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L104 EN**: Executes a standalone statement or declaration: `t[0] *= x;`.
+  - **L104 CN**: 执行一条独立语句或声明：`t[0] *= x;`。
+- **L105 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L105 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L106 EN**: Closes the current lexical scope or compound statement.
+  - **L106 CN**: 结束当前词法作用域或复合语句块。
+- **L107 EN**: Blank line separating nearby declarations or logic.
+  - **L107 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L108 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L108 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L109 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L109 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L110 EN**: Opens a new lexical scope or compound statement.
+  - **L110 CN**: 打开一个新的词法作用域或复合语句块。
+- **L111 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L111 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L112 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L112 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L113 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L113 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L114 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L114 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L115 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L115 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L116 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L116 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L117 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L117 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L118 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L118 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L119 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L119 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L120 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L120 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+
+### Lines 121-140 / 第 121-140 行
+
+````cpp
+ 121:    t[0] += static_cast<V>(a[2]);
+ 122:    t[1] += static_cast<V>(a[1]);
+ 123:    t[0] *= x2;
+ 124:    t[0] += static_cast<V>(a[0]);
+ 125:    t[1] *= x;
+ 126:    return t[0] + t[1];
+ 127: }
+ 128: 
+ 129: template <class T, class V>
+ 130: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 10>*) BOOST_MATH_NOEXCEPT(V)
+ 131: {
+ 132:    V x2 = x * x;
+ 133:    V t[2];
+ 134:    t[0] = a[9] * x2 + a[7];
+ 135:    t[1] = a[8] * x2 + a[6];
+ 136:    t[0] *= x2;
+ 137:    t[1] *= x2;
+ 138:    t[0] += static_cast<V>(a[5]);
+ 139:    t[1] += static_cast<V>(a[4]);
+ 140:    t[0] *= x2;
+````
+- **L121 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L121 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L122 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L122 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L123 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L123 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L124 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L124 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L125 EN**: Executes a standalone statement or declaration: `t[1] *= x;`.
+  - **L125 CN**: 执行一条独立语句或声明：`t[1] *= x;`。
+- **L126 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L126 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L127 EN**: Closes the current lexical scope or compound statement.
+  - **L127 CN**: 结束当前词法作用域或复合语句块。
+- **L128 EN**: Blank line separating nearby declarations or logic.
+  - **L128 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L129 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L129 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L130 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L130 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L131 EN**: Opens a new lexical scope or compound statement.
+  - **L131 CN**: 打开一个新的词法作用域或复合语句块。
+- **L132 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L132 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L133 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L133 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L134 EN**: Executes a standalone statement or declaration: `t[0] = a[9] * x2 + a[7];`.
+  - **L134 CN**: 执行一条独立语句或声明：`t[0] = a[9] * x2 + a[7];`。
+- **L135 EN**: Executes a standalone statement or declaration: `t[1] = a[8] * x2 + a[6];`.
+  - **L135 CN**: 执行一条独立语句或声明：`t[1] = a[8] * x2 + a[6];`。
+- **L136 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L136 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L137 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L137 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L138 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L138 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L139 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L139 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L140 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L140 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+
+### Lines 141-160 / 第 141-160 行
+
+````cpp
+ 141:    t[1] *= x2;
+ 142:    t[0] += static_cast<V>(a[3]);
+ 143:    t[1] += static_cast<V>(a[2]);
+ 144:    t[0] *= x2;
+ 145:    t[1] *= x2;
+ 146:    t[0] += static_cast<V>(a[1]);
+ 147:    t[1] += static_cast<V>(a[0]);
+ 148:    t[0] *= x;
+ 149:    return t[0] + t[1];
+ 150: }
+ 151: 
+ 152: template <class T, class V>
+ 153: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 11>*) BOOST_MATH_NOEXCEPT(V)
+ 154: {
+ 155:    V x2 = x * x;
+ 156:    V t[2];
+ 157:    t[0] = static_cast<V>(a[10] * x2 + a[8]);
+ 158:    t[1] = static_cast<V>(a[9] * x2 + a[7]);
+ 159:    t[0] *= x2;
+ 160:    t[1] *= x2;
+````
+- **L141 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L141 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L142 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L142 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L143 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L143 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L144 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L144 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L145 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L145 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L146 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L146 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L147 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L147 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L148 EN**: Executes a standalone statement or declaration: `t[0] *= x;`.
+  - **L148 CN**: 执行一条独立语句或声明：`t[0] *= x;`。
+- **L149 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L149 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L150 EN**: Closes the current lexical scope or compound statement.
+  - **L150 CN**: 结束当前词法作用域或复合语句块。
+- **L151 EN**: Blank line separating nearby declarations or logic.
+  - **L151 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L152 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L152 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L153 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L153 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L154 EN**: Opens a new lexical scope or compound statement.
+  - **L154 CN**: 打开一个新的词法作用域或复合语句块。
+- **L155 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L155 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L156 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L156 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L157 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L157 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L158 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L158 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L159 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L159 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L160 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L160 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+
+### Lines 161-180 / 第 161-180 行
+
+````cpp
+ 161:    t[0] += static_cast<V>(a[6]);
+ 162:    t[1] += static_cast<V>(a[5]);
+ 163:    t[0] *= x2;
+ 164:    t[1] *= x2;
+ 165:    t[0] += static_cast<V>(a[4]);
+ 166:    t[1] += static_cast<V>(a[3]);
+ 167:    t[0] *= x2;
+ 168:    t[1] *= x2;
+ 169:    t[0] += static_cast<V>(a[2]);
+ 170:    t[1] += static_cast<V>(a[1]);
+ 171:    t[0] *= x2;
+ 172:    t[0] += static_cast<V>(a[0]);
+ 173:    t[1] *= x;
+ 174:    return t[0] + t[1];
+ 175: }
+ 176: 
+ 177: template <class T, class V>
+ 178: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 12>*) BOOST_MATH_NOEXCEPT(V)
+ 179: {
+ 180:    V x2 = x * x;
+````
+- **L161 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L161 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L162 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L162 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L163 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L163 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L164 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L164 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L165 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L165 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L166 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L166 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L167 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L167 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L168 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L168 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L169 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L169 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L170 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L170 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L171 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L171 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L172 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L172 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L173 EN**: Executes a standalone statement or declaration: `t[1] *= x;`.
+  - **L173 CN**: 执行一条独立语句或声明：`t[1] *= x;`。
+- **L174 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L174 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L175 EN**: Closes the current lexical scope or compound statement.
+  - **L175 CN**: 结束当前词法作用域或复合语句块。
+- **L176 EN**: Blank line separating nearby declarations or logic.
+  - **L176 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L177 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L177 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L178 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L178 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L179 EN**: Opens a new lexical scope or compound statement.
+  - **L179 CN**: 打开一个新的词法作用域或复合语句块。
+- **L180 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L180 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+
+### Lines 181-200 / 第 181-200 行
+
+````cpp
+ 181:    V t[2];
+ 182:    t[0] = a[11] * x2 + a[9];
+ 183:    t[1] = a[10] * x2 + a[8];
+ 184:    t[0] *= x2;
+ 185:    t[1] *= x2;
+ 186:    t[0] += static_cast<V>(a[7]);
+ 187:    t[1] += static_cast<V>(a[6]);
+ 188:    t[0] *= x2;
+ 189:    t[1] *= x2;
+ 190:    t[0] += static_cast<V>(a[5]);
+ 191:    t[1] += static_cast<V>(a[4]);
+ 192:    t[0] *= x2;
+ 193:    t[1] *= x2;
+ 194:    t[0] += static_cast<V>(a[3]);
+ 195:    t[1] += static_cast<V>(a[2]);
+ 196:    t[0] *= x2;
+ 197:    t[1] *= x2;
+ 198:    t[0] += static_cast<V>(a[1]);
+ 199:    t[1] += static_cast<V>(a[0]);
+ 200:    t[0] *= x;
+````
+- **L181 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L181 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L182 EN**: Executes a standalone statement or declaration: `t[0] = a[11] * x2 + a[9];`.
+  - **L182 CN**: 执行一条独立语句或声明：`t[0] = a[11] * x2 + a[9];`。
+- **L183 EN**: Executes a standalone statement or declaration: `t[1] = a[10] * x2 + a[8];`.
+  - **L183 CN**: 执行一条独立语句或声明：`t[1] = a[10] * x2 + a[8];`。
+- **L184 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L184 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L185 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L185 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L186 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L186 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L187 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L187 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L188 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L188 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L189 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L189 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L190 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L190 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L191 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L191 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L192 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L192 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L193 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L193 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L194 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L194 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L195 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L195 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L196 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L196 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L197 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L197 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L198 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L198 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L199 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L199 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L200 EN**: Executes a standalone statement or declaration: `t[0] *= x;`.
+  - **L200 CN**: 执行一条独立语句或声明：`t[0] *= x;`。
+
+### Lines 201-220 / 第 201-220 行
+
+````cpp
+ 201:    return t[0] + t[1];
+ 202: }
+ 203: 
+ 204: template <class T, class V>
+ 205: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 13>*) BOOST_MATH_NOEXCEPT(V)
+ 206: {
+ 207:    V x2 = x * x;
+ 208:    V t[2];
+ 209:    t[0] = static_cast<V>(a[12] * x2 + a[10]);
+ 210:    t[1] = static_cast<V>(a[11] * x2 + a[9]);
+ 211:    t[0] *= x2;
+ 212:    t[1] *= x2;
+ 213:    t[0] += static_cast<V>(a[8]);
+ 214:    t[1] += static_cast<V>(a[7]);
+ 215:    t[0] *= x2;
+ 216:    t[1] *= x2;
+ 217:    t[0] += static_cast<V>(a[6]);
+ 218:    t[1] += static_cast<V>(a[5]);
+ 219:    t[0] *= x2;
+ 220:    t[1] *= x2;
+````
+- **L201 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L201 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L202 EN**: Closes the current lexical scope or compound statement.
+  - **L202 CN**: 结束当前词法作用域或复合语句块。
+- **L203 EN**: Blank line separating nearby declarations or logic.
+  - **L203 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L204 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L204 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L205 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L205 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L206 EN**: Opens a new lexical scope or compound statement.
+  - **L206 CN**: 打开一个新的词法作用域或复合语句块。
+- **L207 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L207 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L208 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L208 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L209 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L209 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L210 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L210 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L211 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L211 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L212 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L212 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L213 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L213 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L214 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L214 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L215 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L215 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L216 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L216 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L217 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L217 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L218 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L218 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L219 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L219 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L220 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L220 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+
+### Lines 221-240 / 第 221-240 行
+
+````cpp
+ 221:    t[0] += static_cast<V>(a[4]);
+ 222:    t[1] += static_cast<V>(a[3]);
+ 223:    t[0] *= x2;
+ 224:    t[1] *= x2;
+ 225:    t[0] += static_cast<V>(a[2]);
+ 226:    t[1] += static_cast<V>(a[1]);
+ 227:    t[0] *= x2;
+ 228:    t[0] += static_cast<V>(a[0]);
+ 229:    t[1] *= x;
+ 230:    return t[0] + t[1];
+ 231: }
+ 232: 
+ 233: template <class T, class V>
+ 234: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 14>*) BOOST_MATH_NOEXCEPT(V)
+ 235: {
+ 236:    V x2 = x * x;
+ 237:    V t[2];
+ 238:    t[0] = a[13] * x2 + a[11];
+ 239:    t[1] = a[12] * x2 + a[10];
+ 240:    t[0] *= x2;
+````
+- **L221 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L221 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L222 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L222 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L223 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L223 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L224 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L224 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L225 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L225 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L226 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L226 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L227 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L227 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L228 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L228 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L229 EN**: Executes a standalone statement or declaration: `t[1] *= x;`.
+  - **L229 CN**: 执行一条独立语句或声明：`t[1] *= x;`。
+- **L230 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L230 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L231 EN**: Closes the current lexical scope or compound statement.
+  - **L231 CN**: 结束当前词法作用域或复合语句块。
+- **L232 EN**: Blank line separating nearby declarations or logic.
+  - **L232 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L233 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L233 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L234 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L234 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L235 EN**: Opens a new lexical scope or compound statement.
+  - **L235 CN**: 打开一个新的词法作用域或复合语句块。
+- **L236 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L236 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L237 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L237 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L238 EN**: Executes a standalone statement or declaration: `t[0] = a[13] * x2 + a[11];`.
+  - **L238 CN**: 执行一条独立语句或声明：`t[0] = a[13] * x2 + a[11];`。
+- **L239 EN**: Executes a standalone statement or declaration: `t[1] = a[12] * x2 + a[10];`.
+  - **L239 CN**: 执行一条独立语句或声明：`t[1] = a[12] * x2 + a[10];`。
+- **L240 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L240 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+
+### Lines 241-260 / 第 241-260 行
+
+````cpp
+ 241:    t[1] *= x2;
+ 242:    t[0] += static_cast<V>(a[9]);
+ 243:    t[1] += static_cast<V>(a[8]);
+ 244:    t[0] *= x2;
+ 245:    t[1] *= x2;
+ 246:    t[0] += static_cast<V>(a[7]);
+ 247:    t[1] += static_cast<V>(a[6]);
+ 248:    t[0] *= x2;
+ 249:    t[1] *= x2;
+ 250:    t[0] += static_cast<V>(a[5]);
+ 251:    t[1] += static_cast<V>(a[4]);
+ 252:    t[0] *= x2;
+ 253:    t[1] *= x2;
+ 254:    t[0] += static_cast<V>(a[3]);
+ 255:    t[1] += static_cast<V>(a[2]);
+ 256:    t[0] *= x2;
+ 257:    t[1] *= x2;
+ 258:    t[0] += static_cast<V>(a[1]);
+ 259:    t[1] += static_cast<V>(a[0]);
+ 260:    t[0] *= x;
+````
+- **L241 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L241 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L242 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L242 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L243 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L243 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L244 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L244 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L245 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L245 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L246 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L246 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L247 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L247 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L248 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L248 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L249 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L249 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L250 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L250 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L251 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L251 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L252 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L252 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L253 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L253 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L254 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L254 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L255 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L255 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L256 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L256 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L257 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L257 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L258 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L258 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L259 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L259 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L260 EN**: Executes a standalone statement or declaration: `t[0] *= x;`.
+  - **L260 CN**: 执行一条独立语句或声明：`t[0] *= x;`。
+
+### Lines 261-280 / 第 261-280 行
+
+````cpp
+ 261:    return t[0] + t[1];
+ 262: }
+ 263: 
+ 264: template <class T, class V>
+ 265: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 15>*) BOOST_MATH_NOEXCEPT(V)
+ 266: {
+ 267:    V x2 = x * x;
+ 268:    V t[2];
+ 269:    t[0] = static_cast<V>(a[14] * x2 + a[12]);
+ 270:    t[1] = static_cast<V>(a[13] * x2 + a[11]);
+ 271:    t[0] *= x2;
+ 272:    t[1] *= x2;
+ 273:    t[0] += static_cast<V>(a[10]);
+ 274:    t[1] += static_cast<V>(a[9]);
+ 275:    t[0] *= x2;
+ 276:    t[1] *= x2;
+ 277:    t[0] += static_cast<V>(a[8]);
+ 278:    t[1] += static_cast<V>(a[7]);
+ 279:    t[0] *= x2;
+ 280:    t[1] *= x2;
+````
+- **L261 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L261 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L262 EN**: Closes the current lexical scope or compound statement.
+  - **L262 CN**: 结束当前词法作用域或复合语句块。
+- **L263 EN**: Blank line separating nearby declarations or logic.
+  - **L263 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L264 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L264 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L265 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L265 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L266 EN**: Opens a new lexical scope or compound statement.
+  - **L266 CN**: 打开一个新的词法作用域或复合语句块。
+- **L267 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L267 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+- **L268 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L268 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L269 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L269 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L270 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L270 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L271 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L271 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L272 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L272 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L273 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L273 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L274 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L274 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L275 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L275 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L276 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L276 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L277 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L277 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L278 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L278 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L279 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L279 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L280 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L280 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+
+### Lines 281-300 / 第 281-300 行
+
+````cpp
+ 281:    t[0] += static_cast<V>(a[6]);
+ 282:    t[1] += static_cast<V>(a[5]);
+ 283:    t[0] *= x2;
+ 284:    t[1] *= x2;
+ 285:    t[0] += static_cast<V>(a[4]);
+ 286:    t[1] += static_cast<V>(a[3]);
+ 287:    t[0] *= x2;
+ 288:    t[1] *= x2;
+ 289:    t[0] += static_cast<V>(a[2]);
+ 290:    t[1] += static_cast<V>(a[1]);
+ 291:    t[0] *= x2;
+ 292:    t[0] += static_cast<V>(a[0]);
+ 293:    t[1] *= x;
+ 294:    return t[0] + t[1];
+ 295: }
+ 296: 
+ 297: template <class T, class V>
+ 298: BOOST_MATH_GPU_ENABLED inline V evaluate_polynomial_c_imp(const T* a, const V& x, const boost::math::integral_constant<int, 16>*) BOOST_MATH_NOEXCEPT(V)
+ 299: {
+ 300:    V x2 = x * x;
+````
+- **L281 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L281 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L282 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L282 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L283 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L283 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L284 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L284 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L285 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L285 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L286 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L286 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L287 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L287 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L288 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L288 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L289 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L289 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L290 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L290 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L291 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L291 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L292 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L292 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L293 EN**: Executes a standalone statement or declaration: `t[1] *= x;`.
+  - **L293 CN**: 执行一条独立语句或声明：`t[1] *= x;`。
+- **L294 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L294 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L295 EN**: Closes the current lexical scope or compound statement.
+  - **L295 CN**: 结束当前词法作用域或复合语句块。
+- **L296 EN**: Blank line separating nearby declarations or logic.
+  - **L296 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L297 EN**: Introduces template parameters or specialization context: `template <class T, class V>`.
+  - **L297 CN**: 为后续声明引入模板参数或特化上下文：`template <class T, class V>`。
+- **L298 EN**: Uses a Boost.Math macro for portability, policy plumbing, or compile-time configuration.
+  - **L298 CN**: 使用 Boost.Math 宏处理可移植性、策略连接或编译期配置。
+- **L299 EN**: Opens a new lexical scope or compound statement.
+  - **L299 CN**: 打开一个新的词法作用域或复合语句块。
+- **L300 EN**: Executes a standalone statement or declaration: `V x2 = x * x;`.
+  - **L300 CN**: 执行一条独立语句或声明：`V x2 = x * x;`。
+
+### Lines 301-320 / 第 301-320 行
+
+````cpp
+ 301:    V t[2];
+ 302:    t[0] = a[15] * x2 + a[13];
+ 303:    t[1] = a[14] * x2 + a[12];
+ 304:    t[0] *= x2;
+ 305:    t[1] *= x2;
+ 306:    t[0] += static_cast<V>(a[11]);
+ 307:    t[1] += static_cast<V>(a[10]);
+ 308:    t[0] *= x2;
+ 309:    t[1] *= x2;
+ 310:    t[0] += static_cast<V>(a[9]);
+ 311:    t[1] += static_cast<V>(a[8]);
+ 312:    t[0] *= x2;
+ 313:    t[1] *= x2;
+ 314:    t[0] += static_cast<V>(a[7]);
+ 315:    t[1] += static_cast<V>(a[6]);
+ 316:    t[0] *= x2;
+ 317:    t[1] *= x2;
+ 318:    t[0] += static_cast<V>(a[5]);
+ 319:    t[1] += static_cast<V>(a[4]);
+ 320:    t[0] *= x2;
+````
+- **L301 EN**: Executes a standalone statement or declaration: `V t[2];`.
+  - **L301 CN**: 执行一条独立语句或声明：`V t[2];`。
+- **L302 EN**: Executes a standalone statement or declaration: `t[0] = a[15] * x2 + a[13];`.
+  - **L302 CN**: 执行一条独立语句或声明：`t[0] = a[15] * x2 + a[13];`。
+- **L303 EN**: Executes a standalone statement or declaration: `t[1] = a[14] * x2 + a[12];`.
+  - **L303 CN**: 执行一条独立语句或声明：`t[1] = a[14] * x2 + a[12];`。
+- **L304 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L304 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L305 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L305 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L306 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L306 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L307 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L307 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L308 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L308 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L309 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L309 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L310 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L310 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L311 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L311 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L312 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L312 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L313 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L313 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L314 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L314 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L315 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L315 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L316 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L316 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L317 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L317 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L318 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L318 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L319 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L319 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L320 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L320 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+
+### Lines 321-336 / 第 321-336 行
+
+````cpp
+ 321:    t[1] *= x2;
+ 322:    t[0] += static_cast<V>(a[3]);
+ 323:    t[1] += static_cast<V>(a[2]);
+ 324:    t[0] *= x2;
+ 325:    t[1] *= x2;
+ 326:    t[0] += static_cast<V>(a[1]);
+ 327:    t[1] += static_cast<V>(a[0]);
+ 328:    t[0] *= x;
+ 329:    return t[0] + t[1];
+ 330: }
+ 331: 
+ 332: 
+ 333: }}}} // namespaces
+ 334: 
+ 335: #endif // include guard
+ 336: 
+````
+- **L321 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L321 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L322 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L322 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L323 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L323 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L324 EN**: Executes a standalone statement or declaration: `t[0] *= x2;`.
+  - **L324 CN**: 执行一条独立语句或声明：`t[0] *= x2;`。
+- **L325 EN**: Executes a standalone statement or declaration: `t[1] *= x2;`.
+  - **L325 CN**: 执行一条独立语句或声明：`t[1] *= x2;`。
+- **L326 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L326 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L327 EN**: Executes a call or declaration centered on `static_cast<V>`.
+  - **L327 CN**: 执行以 `static_cast<V>` 为核心的调用或声明。
+- **L328 EN**: Executes a standalone statement or declaration: `t[0] *= x;`.
+  - **L328 CN**: 执行一条独立语句或声明：`t[0] *= x;`。
+- **L329 EN**: Returns from the current function with `t[0] + t[1]`.
+  - **L329 CN**: 以 `t[0] + t[1]` 从当前函数返回。
+- **L330 EN**: Closes the current lexical scope or compound statement.
+  - **L330 CN**: 结束当前词法作用域或复合语句块。
+- **L331 EN**: Blank line separating nearby declarations or logic.
+  - **L331 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L332 EN**: Blank line separating nearby declarations or logic.
+  - **L332 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L333 EN**: Continues the surrounding expression or declaration: `}}}} // namespaces`.
+  - **L333 CN**: 继续构造周围的表达式或声明：`}}}} // namespaces`。
+- **L334 EN**: Blank line separating nearby declarations or logic.
+  - **L334 CN**: 空行，用于分隔相邻声明或逻辑。
+- **L335 EN**: Closes the current preprocessor conditional block or header guard.
+  - **L335 CN**: 结束当前预处理条件块或头文件保护。
+- **L336 EN**: Blank line separating nearby declarations or logic.
+  - **L336 CN**: 空行，用于分隔相邻声明或逻辑。
+
+## Key Concepts / 关键概念
+
+- **Numeric support layer / 数值支撑层**:
+  - **EN**: Provides low-level traits, constants, policy hooks, and helpers reused across Boost.Math algorithms.
+  - **CN**: 提供可在 Boost.Math 算法之间复用的底层 traits、常量、策略钩子与辅助逻辑。
+- **Template genericity / 模板泛型**:
+  - **EN**: Uses C++ templates to adapt behavior across types, policies, or compile-time parameters.
+  - **CN**: 使用 C++ 模板使行为适配不同类型、策略或编译期参数。
+- **Advanced numeric formulas / 高级数值公式**:
+  - **EN**: Implements carefully conditioned mathematical formulas, recurrences, or approximations.
+  - **CN**: 实现经过精心条件化的数学公式、递推关系或近似算法。
+- **Boost integration / Boost 集成**:
+  - **EN**: Fits the implementation into Boost naming, configuration, and portability conventions.
+  - **CN**: 让实现融入 Boost 的命名、配置与可移植性约定。
+- **Header contracts / 头文件契约**:
+  - **EN**: Provides declarations, inline logic, or macros that other translation units consume.
+  - **CN**: 提供供其他编译单元使用的声明、内联逻辑或宏。
+
+## Dependencies / 依赖关系
+
+- **Direct includes / 直接包含**: none / 无
+
+- **EN**: No direct `#include` dependencies appear in this file.
+  - **CN**: 该文件中没有直接出现 `#include` 依赖。

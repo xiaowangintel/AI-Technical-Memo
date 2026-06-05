@@ -1,0 +1,432 @@
+# dispatch_policy.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/dispatch_policy.hpp`
+**Purpose / 用途**: Provides dispatch policy selection. / 提供调度策略选择。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 32 / 第 32 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 33 / 第 33 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 34 / 第 34 行** — `#include "cutlass/epilogue/thread/activation.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/epilogue/thread/activation.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/epilogue/thread/activation.h`。
+- **Line 35 / 第 35 行** — `#include "cutlass/arch/arch.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/arch/arch.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/arch/arch.h`。
+- **Line 36 / 第 36 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 37 / 第 37 行** — `#include "cute/layout.hpp"`
+  - **EN**: Includes CuTe dependency `cute/layout.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/layout.hpp`。
+- **Line 38 / 第 38 行** — `#include "cute/numeric/integral_constant.hpp"`
+  - **EN**: Includes CuTe dependency `cute/numeric/integral_constant.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/numeric/integral_constant.hpp`。
+- **Line 39 / 第 39 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 40 / 第 40 行** — `#include "cutlass/gemm/dispatch_policy.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/gemm/dispatch_policy.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/gemm/dispatch_policy.hpp`。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `//////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 43 / 第 43 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 44 / 第 44 行** — `//////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 45 / 第 45 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 46 / 第 46 行** — `namespace cutlass::conv {`
+  - **EN**: Opens namespace `cutlass::conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv`。
+- **Line 47 / 第 47 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 48 / 第 48 行** — `//////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 49 / 第 49 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 50 / 第 50 行** — `//`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 51 / 第 51 行** — `// Policies for categorical dispatch of mainloop against kernel grid schedules`
+  - **EN**: Inline comment explaining intent: `Policies for categorical dispatch of mainloop against kernel grid schedules`.
+  - **CN**: 行内注释说明意图：`Policies for categorical dispatch of mainloop against kernel grid schedules`。
+- **Line 52 / 第 52 行** — `//`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 53 / 第 53 行** — `struct KernelImplicitTmaWarpSpecializedSm90 : cutlass::gemm::KernelTmaWarpSpecialized { };`
+  - **EN**: Starts the definition of struct `KernelImplicitTmaWarpSpecializedSm90`.
+  - **CN**: 开始定义 struct `KernelImplicitTmaWarpSpecializedSm90`。
+- **Line 54 / 第 54 行** — `struct KernelImplicitTmaWarpSpecializedSm90Cooperative { };`
+  - **EN**: Starts the definition of struct `KernelImplicitTmaWarpSpecializedSm90Cooperative`.
+  - **CN**: 开始定义 struct `KernelImplicitTmaWarpSpecializedSm90Cooperative`。
+- **Line 55 / 第 55 行** — `struct KernelImplicitTmaWarpSpecializedSm90Pingpong { };`
+  - **EN**: Starts the definition of struct `KernelImplicitTmaWarpSpecializedSm90Pingpong`.
+  - **CN**: 开始定义 struct `KernelImplicitTmaWarpSpecializedSm90Pingpong`。
+- **Line 56 / 第 56 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 57 / 第 57 行** — `//`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 58 / 第 58 行** — `// Collective Mainloop Policies`
+  - **EN**: Inline comment explaining intent: `Collective Mainloop Policies`.
+  - **CN**: 行内注释说明意图：`Collective Mainloop Policies`。
+- **Line 59 / 第 59 行** — `//`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 60 / 第 60 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 61 / 第 61 行** — `// n-buffer in smem (Hopper TMA), pipelined with Hopper GMMA and TMA, static schedule between TMA and GMMA`
+  - **EN**: Inline comment explaining intent: `n-buffer in smem (Hopper TMA), pipelined with Hopper GMMA and TMA, static schedule between TMA a...`.
+  - **CN**: 行内注释说明意图：`n-buffer in smem (Hopper TMA), pipelined with Hopper GMMA and TMA, static schedule between TMA a...`。
+- **Line 62 / 第 62 行** — `// for fprop`
+  - **EN**: Inline comment explaining intent: `for fprop`.
+  - **CN**: 行内注释说明意图：`for fprop`。
+- **Line 63 / 第 63 行** — `template<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 64 / 第 64 行** — `  conv::Operator ConvOp_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 65 / 第 65 行** — `  int Stages_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 66 / 第 66 行** — `  int NumSpatialDimensions_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 67 / 第 67 行** — `  class ClusterShape_ = cute::Shape<cute::C<1>,cute::C<1>,cute::C<1>>,`
+  - **EN**: Declares class `ClusterShape_`.
+  - **CN**: 声明 class `ClusterShape_`。
+- **Line 68 / 第 68 行** — `  class KernelSchedule = KernelImplicitTmaWarpSpecializedSm90,`
+  - **EN**: Declares class `KernelSchedule`.
+  - **CN**: 声明 class `KernelSchedule`。
+- **Line 69 / 第 69 行** — `  int PipelineAsyncMmaStages_ = 1`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 70 / 第 70 行** — `>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 71 / 第 71 行** — `struct MainloopSm90TmaGmmaWarpSpecializedImplicitGemm {`
+  - **EN**: Starts the definition of struct `MainloopSm90TmaGmmaWarpSpecializedImplicitGemm`.
+  - **CN**: 开始定义 struct `MainloopSm90TmaGmmaWarpSpecializedImplicitGemm`。
+- **Line 72 / 第 72 行** — `  static constexpr int Stages = Stages_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 73 / 第 73 行** — `  static constexpr int NumSpatialDimensions = NumSpatialDimensions_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 74 / 第 74 行** — `  static constexpr Operator ConvOp = ConvOp_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 75 / 第 75 行** — `  static constexpr int PipelineAsyncMmaStages = PipelineAsyncMmaStages_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 76 / 第 76 行** — `  using ClusterShape = ClusterShape_;`
+  - **EN**: Introduces type or value alias `ClusterShape`.
+  - **CN**: 引入类型或值别名 `ClusterShape`。
+- **Line 77 / 第 77 行** — `  using ArchTag = arch::Sm90;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 78 / 第 78 行** — `  using Schedule = KernelSchedule;`
+  - **EN**: Introduces type or value alias `Schedule`.
+  - **CN**: 引入类型或值别名 `Schedule`。
+- **Line 79 / 第 79 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 80 / 第 80 行** — `  static_assert(NumSpatialDimensions >= 1);`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 81 / 第 81 行** — `  static_assert(! (cute::is_same_v<KernelSchedule,KernelImplicitTmaWarpSpecializedSm90Cooperative> ||`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 82 / 第 82 行** — `                   cute::is_same_v<KernelSchedule,KernelImplicitTmaWarpSpecializedSm90Pingpong>),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 83 / 第 83 行** — `    "Persistent schedules not support for conv yet.");`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 84 / 第 84 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 85 / 第 85 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 86 / 第 86 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 87 / 第 87 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 88 / 第 88 行** — `// SM100 tensor op kernel schedule`
+  - **EN**: Inline comment explaining intent: `SM100 tensor op kernel schedule`.
+  - **CN**: 行内注释说明意图：`SM100 tensor op kernel schedule`。
+- **Line 89 / 第 89 行** — `struct KernelImplicitTmaWarpSpecializedSm100 {`
+  - **EN**: Starts the definition of struct `KernelImplicitTmaWarpSpecializedSm100`.
+  - **CN**: 开始定义 struct `KernelImplicitTmaWarpSpecializedSm100`。
+- **Line 90 / 第 90 行** — `  static constexpr int SchedulerPipelineStageCount = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 91 / 第 91 行** — `  static constexpr int AccumulatorPipelineStageCount = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 92 / 第 92 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 93 / 第 93 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 94 / 第 94 行** — `// Pseudo-policies for builder auto override that dispatches to the KernelImplicitTmaWarpSpecializedSm100`
+  - **EN**: Inline comment explaining intent: `Pseudo-policies for builder auto override that dispatches to the KernelImplicitTmaWarpSpecialize...`.
+  - **CN**: 行内注释说明意图：`Pseudo-policies for builder auto override that dispatches to the KernelImplicitTmaWarpSpecialize...`。
+- **Line 95 / 第 95 行** — `// but for opting into 1 or 2 SM atoms`
+  - **EN**: Inline comment explaining intent: `but for opting into 1 or 2 SM atoms`.
+  - **CN**: 行内注释说明意图：`but for opting into 1 or 2 SM atoms`。
+- **Line 96 / 第 96 行** — `struct KernelImplicitTmaWarpSpecialized1SmSm100 : KernelImplicitTmaWarpSpecializedSm100 { };`
+  - **EN**: Starts the definition of struct `KernelImplicitTmaWarpSpecialized1SmSm100`.
+  - **CN**: 开始定义 struct `KernelImplicitTmaWarpSpecialized1SmSm100`。
+- **Line 97 / 第 97 行** — `struct KernelImplicitTmaWarpSpecialized2SmSm100 : KernelImplicitTmaWarpSpecializedSm100 { };`
+  - **EN**: Starts the definition of struct `KernelImplicitTmaWarpSpecialized2SmSm100`.
+  - **CN**: 开始定义 struct `KernelImplicitTmaWarpSpecialized2SmSm100`。
+- **Line 98 / 第 98 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 99 / 第 99 行** — `struct KernelStridedDgradTmaWs1SmSm100 { };`
+  - **EN**: Starts the definition of struct `KernelStridedDgradTmaWs1SmSm100`.
+  - **CN**: 开始定义 struct `KernelStridedDgradTmaWs1SmSm100`。
+- **Line 100 / 第 100 行** — `struct KernelStridedDgradTmaWs2SmSm100 { };`
+  - **EN**: Starts the definition of struct `KernelStridedDgradTmaWs2SmSm100`.
+  - **CN**: 开始定义 struct `KernelStridedDgradTmaWs2SmSm100`。
+- **Line 101 / 第 101 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 102 / 第 102 行** — `// Policy for implicit gemm kernel`
+  - **EN**: Inline comment explaining intent: `Policy for implicit gemm kernel`.
+  - **CN**: 行内注释说明意图：`Policy for implicit gemm kernel`。
+- **Line 103 / 第 103 行** — `template<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 104 / 第 104 行** — `  int SchedulerPipelineStageCount_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 105 / 第 105 行** — `  int AccumulatorPipelineStageCount_`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 106 / 第 106 行** — `>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 107 / 第 107 行** — `struct KernelScheduleImplicitTmaWarpSpecializedSm100 : KernelImplicitTmaWarpSpecializedSm100 {`
+  - **EN**: Starts the definition of struct `KernelScheduleImplicitTmaWarpSpecializedSm100`.
+  - **CN**: 开始定义 struct `KernelScheduleImplicitTmaWarpSpecializedSm100`。
+- **Line 108 / 第 108 行** — `  static constexpr int SchedulerPipelineStageCount = SchedulerPipelineStageCount_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 109 / 第 109 行** — `  static constexpr int AccumulatorPipelineStageCount = AccumulatorPipelineStageCount_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 110 / 第 110 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 111 / 第 111 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 112 / 第 112 行** — `// n-buffer in smem (Blackwell TMA), pipelined with Blackwell UMMA and TMA, fprop`
+  - **EN**: Inline comment explaining intent: `n-buffer in smem (Blackwell TMA), pipelined with Blackwell UMMA and TMA, fprop`.
+  - **CN**: 行内注释说明意图：`n-buffer in smem (Blackwell TMA), pipelined with Blackwell UMMA and TMA, fprop`。
+- **Line 113 / 第 113 行** — `template<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 114 / 第 114 行** — `  conv::Operator ConvOp_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 115 / 第 115 行** — `  int Stages_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 116 / 第 116 行** — `  int NumSpatialDimensions_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 117 / 第 117 行** — `  int SchedulerPipelineStageCount_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 118 / 第 118 行** — `  int AccumulatorPipelineStageCount_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 119 / 第 119 行** — `  class ClusterShape_ = cute::Shape<cute::C<1>,cute::C<1>,cute::C<1>>,`
+  - **EN**: Declares class `ClusterShape_`.
+  - **CN**: 声明 class `ClusterShape_`。
+- **Line 120 / 第 120 行** — `  class ArchTag_ = arch::Sm100`
+  - **EN**: Declares class `ArchTag_`.
+  - **CN**: 声明 class `ArchTag_`。
+- **Line 121 / 第 121 行** — `>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 122 / 第 122 行** — `struct MainloopSm100TmaUmmaWarpSpecializedImplicitGemm {`
+  - **EN**: Starts the definition of struct `MainloopSm100TmaUmmaWarpSpecializedImplicitGemm`.
+  - **CN**: 开始定义 struct `MainloopSm100TmaUmmaWarpSpecializedImplicitGemm`。
+- **Line 123 / 第 123 行** — `  static constexpr int Stages = Stages_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 124 / 第 124 行** — `  static constexpr int NumSpatialDimensions = NumSpatialDimensions_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 125 / 第 125 行** — `  static constexpr Operator ConvOp = ConvOp_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 126 / 第 126 行** — `  using ClusterShape = ClusterShape_;`
+  - **EN**: Introduces type or value alias `ClusterShape`.
+  - **CN**: 引入类型或值别名 `ClusterShape`。
+- **Line 127 / 第 127 行** — `  using ArchTag = ArchTag_;`
+  - **EN**: Introduces type or value alias `ArchTag`.
+  - **CN**: 引入类型或值别名 `ArchTag`。
+- **Line 128 / 第 128 行** — `  using Schedule = KernelScheduleImplicitTmaWarpSpecializedSm100<SchedulerPipelineStageCount_, AccumulatorPipelineStageCount_>;`
+  - **EN**: Introduces type or value alias `Schedule`.
+  - **CN**: 引入类型或值别名 `Schedule`。
+- **Line 129 / 第 129 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 130 / 第 130 行** — `  static_assert(NumSpatialDimensions >= 1);`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 131 / 第 131 行** — `}; `
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 132 / 第 132 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 133 / 第 133 行** — `//////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 134 / 第 134 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 135 / 第 135 行** — `} // namespace cutlass::conv `
+  - **EN**: Closes namespace `cutlass::conv`.
+  - **CN**: 关闭命名空间 `cutlass::conv`。
+- **Line 136 / 第 136 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 137 / 第 137 行** — `//////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+- Dispatch policy / 调度策略
+
+## Dependencies / 依赖
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/epilogue/thread/activation.h` — Epilogue support `cutlass/epilogue/thread/activation.h` / 尾处理支持 `cutlass/epilogue/thread/activation.h`
+- `cutlass/arch/arch.h` — Architecture-specific support `cutlass/arch/arch.h` / 架构特化支持 `cutlass/arch/arch.h`
+- `cute/layout.hpp` — CuTe dependency `cute/layout.hpp` / CuTe 依赖 `cute/layout.hpp`
+- `cute/numeric/integral_constant.hpp` — CuTe dependency `cute/numeric/integral_constant.hpp` / CuTe 依赖 `cute/numeric/integral_constant.hpp`
+- `cutlass/gemm/dispatch_policy.hpp` — CUTLASS GEMM primitive `cutlass/gemm/dispatch_policy.hpp` / CUTLASS GEMM 原语 `cutlass/gemm/dispatch_policy.hpp`

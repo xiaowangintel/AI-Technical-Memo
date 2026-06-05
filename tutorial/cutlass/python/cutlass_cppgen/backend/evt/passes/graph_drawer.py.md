@@ -1,0 +1,161 @@
+# graph_drawer.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/passes/graph_drawer.py`
+
+## Purpose / 作用
+- EN: Defines 1 classes (EVTGraphDrawer) in `cutlass_cppgen.backend.evt.passes.graph_drawer`.
+- CN: 该模块 `cutlass_cppgen.backend.evt.passes.graph_drawer` 定义了 1 个类（EVTGraphDrawer）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** `from __future__ import annotations` — **EN:** Imports annotations from `__future__`. **CN:** 从 `__future__` 导入 annotations。
+- **L33** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L34** `import subprocess` — **EN:** Imports subprocess for later use. **CN:** 导入 subprocess 供后续使用。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `from cutlass_library import DataTypeTag` — **EN:** Imports DataTypeTag from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeTag。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `from cutlass_cppgen.backend.evt.ir.dag_ir import DAGIR` — **EN:** Imports DAGIR from `cutlass_cppgen.backend.evt.ir.dag_ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.dag_ir` 导入 DAGIR。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `_COLOR_MAP = {` — **EN:** Assigns a value to _COLOR_MAP. **CN:** 将一个值赋给 _COLOR_MAP。
+- **L42** `    "load": '"AliceBlue"',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L43** `    "compute": "LemonChiffon1",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L44** `    "accumulator": "LightGrey",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L45** `    "store": "PowderBlue",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    "layout": "lightseagreen",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    "dag": "darkorange"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `class EVTGraphDrawer:` — **EN:** Defines class `EVTGraphDrawer`. **CN:** 定义类 `EVTGraphDrawer`。
+- **L52** `    """` — **EN:** Starts the docstring for the class `EVTGraphDrawer`. **CN:** 开始说明 class `EVTGraphDrawer` 的文档字符串。
+- **L53** `    Visualize a EVT DAGIR with graphviz` — **EN:** Continues the docstring for the class `EVTGraphDrawer`. **CN:** 继续说明 class `EVTGraphDrawer` 的文档字符串。
+- **L54** `    """` — **EN:** Ends the docstring for the class `EVTGraphDrawer`. **CN:** 结束说明 class `EVTGraphDrawer` 的文档字符串。
+- **L55** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L56** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L57** `        graph: DAGIR,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L58** `        name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L59** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L60** `        self._name = name` — **EN:** Assigns a value to self._name. **CN:** 将一个值赋给 self._name。
+- **L61** `        self._dot_graphs = {}` — **EN:** Assigns a value to self._dot_graphs. **CN:** 将一个值赋给 self._dot_graphs。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `        self._dot_graphs[name] = self._to_dot(graph, name)` — **EN:** Assigns a value to self._dot_graphs[name]. **CN:** 将一个值赋给 self._dot_graphs[name]。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    def _get_node_style(self, node):` — **EN:** Defines function `_get_node_style`. **CN:** 定义函数 `_get_node_style`。
+- **L66** `        template = {` — **EN:** Assigns a value to template. **CN:** 将一个值赋给 template。
+- **L67** `            "shape": "record",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `            "fillcolor": "#CAFFE3",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `            "style": '"filled,rounded"',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `            "fontcolor": "#000000",` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `        if node.op in _COLOR_MAP:` — **EN:** Starts a conditional branch guarded by `node.op in _COLOR_MAP`. **CN:** 开始一个由 `node.op in _COLOR_MAP` 控制的条件分支。
+- **L73** `            template["fillcolor"] = _COLOR_MAP[node.op]` — **EN:** Assigns a value to template['fillcolor']. **CN:** 将一个值赋给 template['fillcolor']。
+- **L74** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L75** `            raise NotImplementedError("unknown node op")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L76** `        if node.disabled:` — **EN:** Starts a conditional branch guarded by `node.disabled`. **CN:** 开始一个由 `node.disabled` 控制的条件分支。
+- **L77** `            template["fontcolor"] = "grey"` — **EN:** Assigns a value to template['fontcolor']. **CN:** 将一个值赋给 template['fontcolor']。
+- **L78** `            template["fillcolor"] = "white"` — **EN:** Assigns a value to template['fillcolor']. **CN:** 将一个值赋给 template['fillcolor']。
+- **L79** `        return template` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L80** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L81** `    def _get_node_label(self, node):` — **EN:** Defines function `_get_node_label`. **CN:** 定义函数 `_get_node_label`。
+- **L82** `        label = "{" + f"name={node.name}|op={node.op}"` — **EN:** Assigns a value to label. **CN:** 将一个值赋给 label。
+- **L83** `        if node.op == "layout":` — **EN:** Starts a conditional branch guarded by `node.op == 'layout'`. **CN:** 开始一个由 `node.op == 'layout'` 控制的条件分支。
+- **L84** `            label += f"|fn={node.fn.__name__}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L85** `            for key in node.kwargs:` — **EN:** Starts a loop assigning items from `node.kwargs` to `key`. **CN:** 开始一个循环，将 `node.kwargs` 的元素赋给 `key`。
+- **L86** `                label += f"|{key}={node.kwargs[key]}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L87** `        if node.underlying_impl is not None:` — **EN:** Starts a conditional branch guarded by `node.underlying_impl is not None`. **CN:** 开始一个由 `node.underlying_impl is not None` 控制的条件分支。
+- **L88** `            label += f"|impl={type(node.underlying_impl).__name__}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L89** `            if node.op == "load":` — **EN:** Starts a conditional branch guarded by `node.op == 'load'`. **CN:** 开始一个由 `node.op == 'load'` 控制的条件分支。
+- **L90** `                label += f"|element_output={DataTypeTag[node.underlying_impl.element]}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L91** `            elif node.op == "compute":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L92** `                label += f"|element_compute={DataTypeTag[node.underlying_impl.element_compute]}|element_output={DataTypeTag[node.underlying_impl.element_output]}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L93** `            elif node.op == "store":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L94** `                label += f"|element_store={DataTypeTag[node.underlying_impl.element]}|element_output={DataTypeTag[node.underlying_impl.element_output]}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L95** `            elif node.op == "dag":` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L96** `                label += f"|element_output={DataTypeTag[node.underlying_impl.element_output]}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L97** `        if node.tensor is not None:` — **EN:** Starts a conditional branch guarded by `node.tensor is not None`. **CN:** 开始一个由 `node.tensor is not None` 控制的条件分支。
+- **L98** `            shape = node.tensor.shape` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L99** `            stride = node.tensor.stride` — **EN:** Assigns a value to stride. **CN:** 将一个值赋给 stride。
+- **L100** `            label += f"|shape={shape}|stride={stride}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `        if hasattr(node, "store_tensor") and node.store_tensor is not None:` — **EN:** Starts a conditional branch guarded by `hasattr(node, 'store_tensor') and node.store_tensor is no...`. **CN:** 开始一个由 `hasattr(node, 'store_tensor') and node.store_tensor is no...` 控制的条件分支。
+- **L103** `            store_shape = node.store_tensor.shape` — **EN:** Assigns a value to store_shape. **CN:** 将一个值赋给 store_shape。
+- **L104** `            store_stride = node.store_tensor.stride` — **EN:** Assigns a value to store_stride. **CN:** 将一个值赋给 store_stride。
+- **L105** `            label += f"|store_shape={store_shape}|store_stride={store_stride}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L106** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L107** `        label += "}"` — **EN:** Updates label in place. **CN:** 原地更新 label。
+- **L108** `        return label` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L109** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L110** `    def _to_dot(` — **EN:** Defines function `_to_dot`. **CN:** 定义函数 `_to_dot`。
+- **L111** `        self,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L112** `        graph: DAGIR,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L113** `        name: str` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L114** `    ):` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L115** `        import pydot` — **EN:** Imports pydot for later use. **CN:** 导入 pydot 供后续使用。
+- **L116** `        dot_graph = pydot.Dot(name, rankdir="TB")` — **EN:** Assigns a value to dot_graph. **CN:** 将一个值赋给 dot_graph。
+- **L117** `        for node in graph.nodes_meta:` — **EN:** Starts a loop assigning items from `graph.nodes_meta` to `node`. **CN:** 开始一个循环，将 `graph.nodes_meta` 的元素赋给 `node`。
+- **L118** `            style = self._get_node_style(node)` — **EN:** Assigns a value to style. **CN:** 将一个值赋给 style。
+- **L119** `            label = self._get_node_label(node)` — **EN:** Assigns a value to label. **CN:** 将一个值赋给 label。
+- **L120** `            dot_node = pydot.Node(` — **EN:** Assigns a value to dot_node. **CN:** 将一个值赋给 dot_node。
+- **L121** `                node.name, label=label, **style` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `            dot_graph.add_node(dot_node)` — **EN:** Invokes `dot_graph.add_node` as a standalone call. **CN:** 以独立语句方式调用 `dot_graph.add_node`。
+- **L124** `            if node.op == "dag":` — **EN:** Starts a conditional branch guarded by `node.op == 'dag'`. **CN:** 开始一个由 `node.op == 'dag'` 控制的条件分支。
+- **L125** `                dot_subgraph = self._to_dot(node.subgraph, name=node.name)` — **EN:** Assigns a value to dot_subgraph. **CN:** 将一个值赋给 dot_subgraph。
+- **L126** `                self._dot_graphs[node.name] = dot_subgraph` — **EN:** Assigns a value to self._dot_graphs[node.name]. **CN:** 将一个值赋给 self._dot_graphs[node.name]。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `        # Add edges` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L129** `        for src, dst in graph.edges:` — **EN:** Starts a loop assigning items from `graph.edges` to `(src, dst)`. **CN:** 开始一个循环，将 `graph.edges` 的元素赋给 `(src, dst)`。
+- **L130** `            weight = graph.get_edge_weight(src, dst)` — **EN:** Assigns a value to weight. **CN:** 将一个值赋给 weight。
+- **L131** `            dot_graph.add_edge(pydot.Edge(src, dst, label=weight))` — **EN:** Invokes `dot_graph.add_edge` as a standalone call. **CN:** 以独立语句方式调用 `dot_graph.add_edge`。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `        return dot_graph` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    def get_dot_graph(self) -> "pydot.Dot":` — **EN:** Defines function `get_dot_graph`. **CN:** 定义函数 `get_dot_graph`。
+- **L136** `        return [(key, self.get_dot_graph_by_name(key)) for key in self._dot_graphs.keys()]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L137** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L138** `    def get_dot_graph_by_name(self, name) -> "pydot.Dot":` — **EN:** Defines function `get_dot_graph_by_name`. **CN:** 定义函数 `get_dot_graph_by_name`。
+- **L139** `        return self._dot_graphs[name]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L140** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L141** `    def get_main_dot_graph(self) -> "pydot.Dot":` — **EN:** Defines function `get_main_dot_graph`. **CN:** 定义函数 `get_main_dot_graph`。
+- **L142** `        return self._dot_graphs[self._name]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.passes.graph_drawer`. CN: 模块名为 `cutlass_cppgen.backend.evt.passes.graph_drawer`。
+- EN: Top-level classes: EVTGraphDrawer CN: 顶层类包括：EVTGraphDrawer
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataTypeTag, cutlass_cppgen.backend.evt.ir.dag_ir:DAGIR CN: 内部依赖：cutlass_library:DataTypeTag, cutlass_cppgen.backend.evt.ir.dag_ir:DAGIR
+- EN: External or standard-library dependencies: __future__:annotations, subprocess, pydot CN: 外部或标准库依赖：__future__:annotations, subprocess, pydot

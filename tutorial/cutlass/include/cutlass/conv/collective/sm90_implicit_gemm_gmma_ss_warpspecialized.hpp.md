@@ -1,0 +1,2383 @@
+# sm90_implicit_gemm_gmma_ss_warpspecialized.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/collective/sm90_implicit_gemm_gmma_ss_warpspecialized.hpp`
+**Purpose / 用途**: Provides convolution collective composition, implicit GEMM support, SM90 specialization. / 提供卷积 collective 组合、隐式 GEMM 支持、SM90 特化。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 32 / 第 32 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 33 / 第 33 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 34 / 第 34 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 35 / 第 35 行** — `#include "cute/arch/cluster_sm90.hpp"`
+  - **EN**: Includes CuTe dependency `cute/arch/cluster_sm90.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/arch/cluster_sm90.hpp`。
+- **Line 36 / 第 36 行** — `#include "cute/arch/copy_sm90.hpp"`
+  - **EN**: Includes CuTe dependency `cute/arch/copy_sm90.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/arch/copy_sm90.hpp`。
+- **Line 37 / 第 37 行** — `#include "cute/atom/mma_atom.hpp"`
+  - **EN**: Includes CuTe dependency `cute/atom/mma_atom.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/atom/mma_atom.hpp`。
+- **Line 38 / 第 38 行** — `#include "cute/atom/copy_traits_sm90_im2col.hpp"`
+  - **EN**: Includes CuTe dependency `cute/atom/copy_traits_sm90_im2col.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/atom/copy_traits_sm90_im2col.hpp`。
+- **Line 39 / 第 39 行** — `#include "cute/numeric/arithmetic_tuple.hpp"`
+  - **EN**: Includes CuTe dependency `cute/numeric/arithmetic_tuple.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/numeric/arithmetic_tuple.hpp`。
+- **Line 40 / 第 40 行** — `#include "cute/algorithm/functional.hpp"`
+  - **EN**: Includes CuTe dependency `cute/algorithm/functional.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/algorithm/functional.hpp`。
+- **Line 41 / 第 41 行** — `#include "cute/algorithm/gemm.hpp"`
+  - **EN**: Includes CuTe dependency `cute/algorithm/gemm.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/algorithm/gemm.hpp`。
+- **Line 42 / 第 42 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 43 / 第 43 行** — `#include "cutlass/conv/detail.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/detail.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/detail.hpp`。
+- **Line 44 / 第 44 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 45 / 第 45 行** — `#include "cutlass/conv/dispatch_policy.hpp"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/dispatch_policy.hpp`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/dispatch_policy.hpp`。
+- **Line 46 / 第 46 行** — `#include "cutlass/pipeline/pipeline.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/pipeline/pipeline.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/pipeline/pipeline.hpp`。
+- **Line 47 / 第 47 行** — `#include "cutlass/util/packed_stride.hpp"`
+  - **EN**: Includes CUTLASS dependency `cutlass/util/packed_stride.hpp`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/util/packed_stride.hpp`。
+- **Line 48 / 第 48 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 49 / 第 49 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `namespace cutlass::conv::collective {`
+  - **EN**: Opens namespace `cutlass::conv::collective` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv::collective`。
+- **Line 52 / 第 52 行** — `using namespace cute;`
+  - **EN**: Introduces type or value alias `namespace`.
+  - **CN**: 引入类型或值别名 `namespace`。
+- **Line 53 / 第 53 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 54 / 第 54 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 55 / 第 55 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 56 / 第 56 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 57 / 第 57 行** — `  conv::Operator ConvOp,`
+  - **EN**: Adds template parameter specifier `conv::Operator ConvOp`.
+  - **CN**: 补充模板参数说明符 `conv::Operator ConvOp`。
+- **Line 58 / 第 58 行** — `  int Stages,`
+  - **EN**: Adds template parameter specifier `int Stages`.
+  - **CN**: 补充模板参数说明符 `int Stages`。
+- **Line 59 / 第 59 行** — `  int NumSpatialDims,`
+  - **EN**: Adds template parameter specifier `int NumSpatialDims`.
+  - **CN**: 补充模板参数说明符 `int NumSpatialDims`。
+- **Line 60 / 第 60 行** — `  class ClusterShape,`
+  - **EN**: Adds template parameter specifier `class ClusterShape`.
+  - **CN**: 补充模板参数说明符 `class ClusterShape`。
+- **Line 61 / 第 61 行** — `  class KernelSchedule,`
+  - **EN**: Adds template parameter specifier `class KernelSchedule`.
+  - **CN**: 补充模板参数说明符 `class KernelSchedule`。
+- **Line 62 / 第 62 行** — `  int PipelineAsyncMmaStages,`
+  - **EN**: Adds template parameter specifier `int PipelineAsyncMmaStages`.
+  - **CN**: 补充模板参数说明符 `int PipelineAsyncMmaStages`。
+- **Line 63 / 第 63 行** — `  class TileShape_,`
+  - **EN**: Adds template parameter specifier `class TileShape_`.
+  - **CN**: 补充模板参数说明符 `class TileShape_`。
+- **Line 64 / 第 64 行** — `  class ElementA_,`
+  - **EN**: Adds template parameter specifier `class ElementA_`.
+  - **CN**: 补充模板参数说明符 `class ElementA_`。
+- **Line 65 / 第 65 行** — `  class ElementB_,`
+  - **EN**: Adds template parameter specifier `class ElementB_`.
+  - **CN**: 补充模板参数说明符 `class ElementB_`。
+- **Line 66 / 第 66 行** — `  class TiledMma_,`
+  - **EN**: Adds template parameter specifier `class TiledMma_`.
+  - **CN**: 补充模板参数说明符 `class TiledMma_`。
+- **Line 67 / 第 67 行** — `  class TileTraitsA_,`
+  - **EN**: Adds template parameter specifier `class TileTraitsA_`.
+  - **CN**: 补充模板参数说明符 `class TileTraitsA_`。
+- **Line 68 / 第 68 行** — `  class TileTraitsB_>`
+  - **EN**: Adds template parameter specifier `class TileTraitsB_>`.
+  - **CN**: 补充模板参数说明符 `class TileTraitsB_>`。
+- **Line 69 / 第 69 行** — `struct CollectiveConv<`
+  - **EN**: Adds template parameter specifier `struct CollectiveConv<`.
+  - **CN**: 补充模板参数说明符 `struct CollectiveConv<`。
+- **Line 70 / 第 70 行** — `    MainloopSm90TmaGmmaWarpSpecializedImplicitGemm<`
+  - **EN**: Adds template parameter specifier `MainloopSm90TmaGmmaWarpSpecializedImplicitGemm<`.
+  - **CN**: 补充模板参数说明符 `MainloopSm90TmaGmmaWarpSpecializedImplicitGemm<`。
+- **Line 71 / 第 71 行** — `        ConvOp, Stages, NumSpatialDims, ClusterShape, KernelSchedule, PipelineAsyncMmaStages>,`
+  - **EN**: Adds template parameter specifier `ConvOp, Stages, NumSpatialDims, ClusterShape, KernelSchedule, PipelineAsyncMmaStages>`.
+  - **CN**: 补充模板参数说明符 `ConvOp, Stages, NumSpatialDims, ClusterShape, KernelSchedule, PipelineAsyncMmaStages>`。
+- **Line 72 / 第 72 行** — `    TileShape_,`
+  - **EN**: Adds template parameter specifier `TileShape_`.
+  - **CN**: 补充模板参数说明符 `TileShape_`。
+- **Line 73 / 第 73 行** — `    ElementA_,`
+  - **EN**: Adds template parameter specifier `ElementA_`.
+  - **CN**: 补充模板参数说明符 `ElementA_`。
+- **Line 74 / 第 74 行** — `    ElementB_,`
+  - **EN**: Adds template parameter specifier `ElementB_`.
+  - **CN**: 补充模板参数说明符 `ElementB_`。
+- **Line 75 / 第 75 行** — `    TiledMma_,`
+  - **EN**: Adds template parameter specifier `TiledMma_`.
+  - **CN**: 补充模板参数说明符 `TiledMma_`。
+- **Line 76 / 第 76 行** — `    TileTraitsA_,`
+  - **EN**: Adds template parameter specifier `TileTraitsA_`.
+  - **CN**: 补充模板参数说明符 `TileTraitsA_`。
+- **Line 77 / 第 77 行** — `    TileTraitsB_>`
+  - **EN**: Adds template parameter specifier `TileTraitsB_>`.
+  - **CN**: 补充模板参数说明符 `TileTraitsB_>`。
+- **Line 78 / 第 78 行** — `{`
+  - **EN**: Adds template parameter specifier `{`.
+  - **CN**: 补充模板参数说明符 `{`。
+- **Line 79 / 第 79 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 80 / 第 80 行** — `  // Type Aliases`
+  - **EN**: Adds template parameter specifier `// Type Aliases`.
+  - **CN**: 补充模板参数说明符 `// Type Aliases`。
+- **Line 81 / 第 81 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 82 / 第 82 行** — `  using DispatchPolicy = MainloopSm90TmaGmmaWarpSpecializedImplicitGemm<`
+  - **EN**: Adds template parameter specifier `using DispatchPolicy = MainloopSm90TmaGmmaWarpSpecializedImplicitGemm<`.
+  - **CN**: 补充模板参数说明符 `using DispatchPolicy = MainloopSm90TmaGmmaWarpSpecializedImplicitGemm<`。
+- **Line 83 / 第 83 行** — `      ConvOp, Stages, NumSpatialDims, ClusterShape, KernelSchedule, PipelineAsyncMmaStages>;`
+  - **EN**: Adds template parameter specifier `ConvOp, Stages, NumSpatialDims, ClusterShape, KernelSchedule, PipelineAsyncMmaStages>;`.
+  - **CN**: 补充模板参数说明符 `ConvOp, Stages, NumSpatialDims, ClusterShape, KernelSchedule, PipelineAsyncMmaStages>;`。
+- **Line 84 / 第 84 行** — `  using TileShape = TileShape_;`
+  - **EN**: Adds template parameter specifier `using TileShape = TileShape_;`.
+  - **CN**: 补充模板参数说明符 `using TileShape = TileShape_;`。
+- **Line 85 / 第 85 行** — `  using ElementA = ElementA_;`
+  - **EN**: Adds template parameter specifier `using ElementA = ElementA_;`.
+  - **CN**: 补充模板参数说明符 `using ElementA = ElementA_;`。
+- **Line 86 / 第 86 行** — `  using ElementB = ElementB_;`
+  - **EN**: Adds template parameter specifier `using ElementB = ElementB_;`.
+  - **CN**: 补充模板参数说明符 `using ElementB = ElementB_;`。
+- **Line 87 / 第 87 行** — `  using TiledMma = TiledMma_;`
+  - **EN**: Adds template parameter specifier `using TiledMma = TiledMma_;`.
+  - **CN**: 补充模板参数说明符 `using TiledMma = TiledMma_;`。
+- **Line 88 / 第 88 行** — `  using ElementAccumulator = typename TiledMma::ValTypeC;`
+  - **EN**: Adds template parameter specifier `using ElementAccumulator = typename TiledMma::ValTypeC;`.
+  - **CN**: 补充模板参数说明符 `using ElementAccumulator = typename TiledMma::ValTypeC;`。
+- **Line 89 / 第 89 行** — `  using GmemTiledCopyA = typename TileTraitsA_::GmemTiledCopy;`
+  - **EN**: Adds template parameter specifier `using GmemTiledCopyA = typename TileTraitsA_::GmemTiledCopy;`.
+  - **CN**: 补充模板参数说明符 `using GmemTiledCopyA = typename TileTraitsA_::GmemTiledCopy;`。
+- **Line 90 / 第 90 行** — `  using GmemTiledCopyB = typename TileTraitsB_::GmemTiledCopy;`
+  - **EN**: Adds template parameter specifier `using GmemTiledCopyB = typename TileTraitsB_::GmemTiledCopy;`.
+  - **CN**: 补充模板参数说明符 `using GmemTiledCopyB = typename TileTraitsB_::GmemTiledCopy;`。
+- **Line 91 / 第 91 行** — `  using SmemLayoutA = typename TileTraitsA_::SmemLayout;`
+  - **EN**: Adds template parameter specifier `using SmemLayoutA = typename TileTraitsA_::SmemLayout;`.
+  - **CN**: 补充模板参数说明符 `using SmemLayoutA = typename TileTraitsA_::SmemLayout;`。
+- **Line 92 / 第 92 行** — `  using SmemLayoutB = typename TileTraitsB_::SmemLayout;`
+  - **EN**: Adds template parameter specifier `using SmemLayoutB = typename TileTraitsB_::SmemLayout;`.
+  - **CN**: 补充模板参数说明符 `using SmemLayoutB = typename TileTraitsB_::SmemLayout;`。
+- **Line 93 / 第 93 行** — `  using ArchTag = typename DispatchPolicy::ArchTag;`
+  - **EN**: Adds template parameter specifier `using ArchTag = typename DispatchPolicy::ArchTag;`.
+  - **CN**: 补充模板参数说明符 `using ArchTag = typename DispatchPolicy::ArchTag;`。
+- **Line 94 / 第 94 行** — `  static constexpr int NumSpatialDimensions = DispatchPolicy::NumSpatialDimensions;`
+  - **EN**: Adds template parameter specifier `static constexpr int NumSpatialDimensions = DispatchPolicy::NumSpatialDimensions;`.
+  - **CN**: 补充模板参数说明符 `static constexpr int NumSpatialDimensions = DispatchPolicy::NumSpatialDimensions;`。
+- **Line 95 / 第 95 行** — `  static constexpr int NumTensorDimensions = NumSpatialDimensions + 2;`
+  - **EN**: Adds template parameter specifier `static constexpr int NumTensorDimensions = NumSpatialDimensions + 2;`.
+  - **CN**: 补充模板参数说明符 `static constexpr int NumTensorDimensions = NumSpatialDimensions + 2;`。
+- **Line 96 / 第 96 行** — `  // Deduce the kernel-facing stride tuple types based on the dispatch policy`
+  - **EN**: Adds template parameter specifier `// Deduce the kernel-facing stride tuple types based on the dispatch policy`.
+  - **CN**: 补充模板参数说明符 `// Deduce the kernel-facing stride tuple types based on the dispatch policy`。
+- **Line 97 / 第 97 行** — `  // (which is a function of the number of spatial dimensions, the algorithm, etc.)`
+  - **EN**: Adds template parameter specifier `// (which is a function of the number of spatial dimensions, the algorithm, etc.)`.
+  - **CN**: 补充模板参数说明符 `// (which is a function of the number of spatial dimensions, the algorithm, etc.)`。
+- **Line 98 / 第 98 行** — `  using StrideA = decltype(detail::sm90_dispatch_policy_to_stride_A<DispatchPolicy>());`
+  - **EN**: Adds template parameter specifier `using StrideA = decltype(detail::sm90_dispatch_policy_to_stride_A<DispatchPolicy>());`.
+  - **CN**: 补充模板参数说明符 `using StrideA = decltype(detail::sm90_dispatch_policy_to_stride_A<DispatchPolicy>());`。
+- **Line 99 / 第 99 行** — `  using StrideB = decltype(detail::sm90_dispatch_policy_to_stride_B<DispatchPolicy>());`
+  - **EN**: Adds template parameter specifier `using StrideB = decltype(detail::sm90_dispatch_policy_to_stride_B<DispatchPolicy>());`.
+  - **CN**: 补充模板参数说明符 `using StrideB = decltype(detail::sm90_dispatch_policy_to_stride_B<DispatchPolicy>());`。
+- **Line 100 / 第 100 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 101 / 第 101 行** — `  using MainloopPipeline = cutlass::PipelineTmaAsync<DispatchPolicy::Stages>;`
+  - **EN**: Adds template parameter specifier `using MainloopPipeline = cutlass::PipelineTmaAsync<DispatchPolicy::Stages>;`.
+  - **CN**: 补充模板参数说明符 `using MainloopPipeline = cutlass::PipelineTmaAsync<DispatchPolicy::Stages>;`。
+- **Line 102 / 第 102 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 103 / 第 103 行** — `  using PipelineParams = typename MainloopPipeline::Params;`
+  - **EN**: Adds template parameter specifier `using PipelineParams = typename MainloopPipeline::Params;`.
+  - **CN**: 补充模板参数说明符 `using PipelineParams = typename MainloopPipeline::Params;`。
+- **Line 104 / 第 104 行** — `  using PipelineState  = typename cutlass::PipelineState<DispatchPolicy::Stages>;`
+  - **EN**: Adds template parameter specifier `using PipelineState  = typename cutlass::PipelineState<DispatchPolicy::Stages>;`.
+  - **CN**: 补充模板参数说明符 `using PipelineState  = typename cutlass::PipelineState<DispatchPolicy::Stages>;`。
+- **Line 105 / 第 105 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 106 / 第 106 行** — `  using ProblemShape = ConvProblemShape<ConvOp, NumSpatialDimensions>;`
+  - **EN**: Adds template parameter specifier `using ProblemShape = ConvProblemShape<ConvOp, NumSpatialDimensions>;`.
+  - **CN**: 补充模板参数说明符 `using ProblemShape = ConvProblemShape<ConvOp, NumSpatialDimensions>;`。
+- **Line 107 / 第 107 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 108 / 第 108 行** — `  static_assert(rank(SmemLayoutA{}) == 3, "SmemLayout must be rank 3 (M/N, K, PIPE)");`
+  - **EN**: Adds template parameter specifier `static_assert(rank(SmemLayoutA{}) == 3, "SmemLayout must be rank 3 (M/N, K, PIPE)");`.
+  - **CN**: 补充模板参数说明符 `static_assert(rank(SmemLayoutA{}) == 3, "SmemLayout must be rank 3 (M/N, K, PIPE)");`。
+- **Line 109 / 第 109 行** — `  static_assert((size<0>(TileShape{}) == size<0>(SmemLayoutA{})), "SmemLayout must be compatible with the tile shape.");`
+  - **EN**: Adds template parameter specifier `static_assert((size<0>(TileShape{}) == size<0>(SmemLayoutA{})), "SmemLayout must be compatible with the tile shape.");`.
+  - **CN**: 补充模板参数说明符 `static_assert((size<0>(TileShape{}) == size<0>(SmemLayoutA{})), "SmemLayout must be compatible with the tile shape.");`。
+- **Line 110 / 第 110 行** — `  static_assert((size<2>(TileShape{}) == size<1>(SmemLayoutA{})), "SmemLayout must be compatible with the tile shape.");`
+  - **EN**: Adds template parameter specifier `static_assert((size<2>(TileShape{}) == size<1>(SmemLayoutA{})), "SmemLayout must be compatible with the tile shape.");`.
+  - **CN**: 补充模板参数说明符 `static_assert((size<2>(TileShape{}) == size<1>(SmemLayoutA{})), "SmemLayout must be compatible with the tile shape.");`。
+- **Line 111 / 第 111 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 112 / 第 112 行** — `  static_assert(rank(SmemLayoutB{}) == 3, "SmemLayout must be rank 3 (M/N, K, PIPE)");`
+  - **EN**: Adds template parameter specifier `static_assert(rank(SmemLayoutB{}) == 3, "SmemLayout must be rank 3 (M/N, K, PIPE)");`.
+  - **CN**: 补充模板参数说明符 `static_assert(rank(SmemLayoutB{}) == 3, "SmemLayout must be rank 3 (M/N, K, PIPE)");`。
+- **Line 113 / 第 113 行** — `  static_assert((size<1>(TileShape{}) == size<0>(SmemLayoutB{})), "SmemLayout must be compatible with the tile shape.");`
+  - **EN**: Adds template parameter specifier `static_assert((size<1>(TileShape{}) == size<0>(SmemLayoutB{})), "SmemLayout must be compatible with the tile shape.");`.
+  - **CN**: 补充模板参数说明符 `static_assert((size<1>(TileShape{}) == size<0>(SmemLayoutB{})), "SmemLayout must be compatible with the tile shape.");`。
+- **Line 114 / 第 114 行** — `  static_assert((size<2>(TileShape{}) == size<1>(SmemLayoutB{})), "SmemLayout must be compatible with the tile shape.");`
+  - **EN**: Adds template parameter specifier `static_assert((size<2>(TileShape{}) == size<1>(SmemLayoutB{})), "SmemLayout must be compatible with the tile shape.");`.
+  - **CN**: 补充模板参数说明符 `static_assert((size<2>(TileShape{}) == size<1>(SmemLayoutB{})), "SmemLayout must be compatible with the tile shape.");`。
+- **Line 115 / 第 115 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 116 / 第 116 行** — `  static_assert(DispatchPolicy::Stages >= 2, "Specialization requires Stages set to value 1 or more.");`
+  - **EN**: Adds template parameter specifier `static_assert(DispatchPolicy::Stages >= 2, "Specialization requires Stages set to value 1 or more.");`.
+  - **CN**: 补充模板参数说明符 `static_assert(DispatchPolicy::Stages >= 2, "Specialization requires Stages set to value 1 or more.");`。
+- **Line 117 / 第 117 行** — `  static_assert(cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeA>::value &&`
+  - **EN**: Adds template parameter specifier `static_assert(cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeA>::value &&`.
+  - **CN**: 补充模板参数说明符 `static_assert(cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeA>::value &&`。
+- **Line 118 / 第 118 行** — `                cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeB>::value,`
+  - **EN**: Adds template parameter specifier `cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeB>::value`.
+  - **CN**: 补充模板参数说明符 `cute::is_base_of<cute::GMMA::DescriptorIterator, typename TiledMma::FrgTypeB>::value`。
+- **Line 119 / 第 119 行** — `                "MMA atom must source both A and B operand from smem_desc for this mainloop.");`
+  - **EN**: Adds template parameter specifier `"MMA atom must source both A and B operand from smem_desc for this mainloop.");`.
+  - **CN**: 补充模板参数说明符 `"MMA atom must source both A and B operand from smem_desc for this mainloop.");`。
+- **Line 120 / 第 120 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 121 / 第 121 行** — `  // The tma load mode of wgrad is tiled for tensor A and im2col for tensor B while the tma load mode of fprop and dgrad`
+  - **EN**: Adds template parameter specifier `// The tma load mode of wgrad is tiled for tensor A and im2col for tensor B while the tma load mode of fprop and dgrad`.
+  - **CN**: 补充模板参数说明符 `// The tma load mode of wgrad is tiled for tensor A and im2col for tensor B while the tma load mode of fprop and dgrad`。
+- **Line 122 / 第 122 行** — `  // kernel is im2col for tensor A and tiled for tensor B.`
+  - **EN**: Adds template parameter specifier `// kernel is im2col for tensor A and tiled for tensor B.`.
+  - **CN**: 补充模板参数说明符 `// kernel is im2col for tensor A and tiled for tensor B.`。
+- **Line 123 / 第 123 行** — `  static_assert((ConvOp == conv::Operator::kWgrad`
+  - **EN**: Adds template parameter specifier `static_assert((ConvOp == conv::Operator::kWgrad`.
+  - **CN**: 补充模板参数说明符 `static_assert((ConvOp == conv::Operator::kWgrad`。
+- **Line 124 / 第 124 行** — `             && (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD> || cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_MULTICAST>))`
+  - **EN**: Adds template parameter specifier `&& (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD> || cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_MULTICAST>))`.
+  - **CN**: 补充模板参数说明符 `&& (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD> || cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_MULTICAST>))`。
+- **Line 125 / 第 125 行** — `             || (ConvOp != conv::Operator::kWgrad`
+  - **EN**: Adds template parameter specifier `|| (ConvOp != conv::Operator::kWgrad`.
+  - **CN**: 补充模板参数说明符 `|| (ConvOp != conv::Operator::kWgrad`。
+- **Line 126 / 第 126 行** — `             && (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL> || cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL_MULTICAST>)),`
+  - **EN**: Adds template parameter specifier `&& (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL> || cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL_MULTICAST>))`.
+  - **CN**: 补充模板参数说明符 `&& (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL> || cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL_MULTICAST>))`。
+- **Line 127 / 第 127 行** — `      "GmemTiledCopyA - invalid SM90 TMA copy atom specified.");`
+  - **EN**: Adds template parameter specifier `"GmemTiledCopyA - invalid SM90 TMA copy atom specified.");`.
+  - **CN**: 补充模板参数说明符 `"GmemTiledCopyA - invalid SM90 TMA copy atom specified.");`。
+- **Line 128 / 第 128 行** — `  static_assert((ConvOp == conv::Operator::kWgrad`
+  - **EN**: Adds template parameter specifier `static_assert((ConvOp == conv::Operator::kWgrad`.
+  - **CN**: 补充模板参数说明符 `static_assert((ConvOp == conv::Operator::kWgrad`。
+- **Line 129 / 第 129 行** — `             && (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL> || cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL_MULTICAST>))`
+  - **EN**: Adds template parameter specifier `&& (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL> || cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL_MULTICAST>))`.
+  - **CN**: 补充模板参数说明符 `&& (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL> || cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL_MULTICAST>))`。
+- **Line 130 / 第 130 行** — `             || (ConvOp != conv::Operator::kWgrad`
+  - **EN**: Adds template parameter specifier `|| (ConvOp != conv::Operator::kWgrad`.
+  - **CN**: 补充模板参数说明符 `|| (ConvOp != conv::Operator::kWgrad`。
+- **Line 131 / 第 131 行** — `             && (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD> || cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_MULTICAST>)),`
+  - **EN**: Adds template parameter specifier `&& (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD> || cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_MULTICAST>))`.
+  - **CN**: 补充模板参数说明符 `&& (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD> || cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_MULTICAST>))`。
+- **Line 132 / 第 132 行** — `      "GmemTiledCopyB - invalid SM90 TMA copy atom specified.");`
+  - **EN**: Adds template parameter specifier `"GmemTiledCopyB - invalid SM90 TMA copy atom specified.");`.
+  - **CN**: 补充模板参数说明符 `"GmemTiledCopyB - invalid SM90 TMA copy atom specified.");`。
+- **Line 133 / 第 133 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 134 / 第 134 行** — `  static constexpr bool is_im2col_A = detail::is_im2col_load<GmemTiledCopyA>::value;`
+  - **EN**: Adds template parameter specifier `static constexpr bool is_im2col_A = detail::is_im2col_load<GmemTiledCopyA>::value;`.
+  - **CN**: 补充模板参数说明符 `static constexpr bool is_im2col_A = detail::is_im2col_load<GmemTiledCopyA>::value;`。
+- **Line 135 / 第 135 行** — `  static constexpr bool is_im2col_B = detail::is_im2col_load<GmemTiledCopyB>::value;`
+  - **EN**: Adds template parameter specifier `static constexpr bool is_im2col_B = detail::is_im2col_load<GmemTiledCopyB>::value;`.
+  - **CN**: 补充模板参数说明符 `static constexpr bool is_im2col_B = detail::is_im2col_load<GmemTiledCopyB>::value;`。
+- **Line 136 / 第 136 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 137 / 第 137 行** — `  // TMA converts f32 input to tf32 when copying from GMEM to SMEM`
+  - **EN**: Adds template parameter specifier `// TMA converts f32 input to tf32 when copying from GMEM to SMEM`.
+  - **CN**: 补充模板参数说明符 `// TMA converts f32 input to tf32 when copying from GMEM to SMEM`。
+- **Line 138 / 第 138 行** — `  // For all other types, cast to size equivalent uint type to avoid any rounding by TMA.`
+  - **EN**: Adds template parameter specifier `// For all other types, cast to size equivalent uint type to avoid any rounding by TMA.`.
+  - **CN**: 补充模板参数说明符 `// For all other types, cast to size equivalent uint type to avoid any rounding by TMA.`。
+- **Line 139 / 第 139 行** — `  static constexpr bool ConvertF32toTF32A = cute::is_same_v<float, ElementA>;`
+  - **EN**: Adds template parameter specifier `static constexpr bool ConvertF32toTF32A = cute::is_same_v<float, ElementA>;`.
+  - **CN**: 补充模板参数说明符 `static constexpr bool ConvertF32toTF32A = cute::is_same_v<float, ElementA>;`。
+- **Line 140 / 第 140 行** — `  static constexpr bool ConvertF32toTF32B = cute::is_same_v<float, ElementB>;`
+  - **EN**: Adds template parameter specifier `static constexpr bool ConvertF32toTF32B = cute::is_same_v<float, ElementB>;`.
+  - **CN**: 补充模板参数说明符 `static constexpr bool ConvertF32toTF32B = cute::is_same_v<float, ElementB>;`。
+- **Line 141 / 第 141 行** — `  using InternalElementA = cute::conditional_t<ConvertF32toTF32A, tfloat32_t, uint_bit_t<sizeof_bits_v<ElementA>>>;`
+  - **EN**: Adds template parameter specifier `using InternalElementA = cute::conditional_t<ConvertF32toTF32A, tfloat32_t, uint_bit_t<sizeof_bits_v<ElementA>>>;`.
+  - **CN**: 补充模板参数说明符 `using InternalElementA = cute::conditional_t<ConvertF32toTF32A, tfloat32_t, uint_bit_t<sizeof_bits_v<ElementA>>>;`。
+- **Line 142 / 第 142 行** — `  using InternalElementB = cute::conditional_t<ConvertF32toTF32B, tfloat32_t, uint_bit_t<sizeof_bits_v<ElementB>>>;`
+  - **EN**: Adds template parameter specifier `using InternalElementB = cute::conditional_t<ConvertF32toTF32B, tfloat32_t, uint_bit_t<sizeof_bits_v<ElementB>>>;`.
+  - **CN**: 补充模板参数说明符 `using InternalElementB = cute::conditional_t<ConvertF32toTF32B, tfloat32_t, uint_bit_t<sizeof_bits_v<ElementB>>>;`。
+- **Line 143 / 第 143 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 144 / 第 144 行** — `  struct SharedStorage`
+  - **EN**: Adds template parameter specifier `struct SharedStorage`.
+  - **CN**: 补充模板参数说明符 `struct SharedStorage`。
+- **Line 145 / 第 145 行** — `  {`
+  - **EN**: Adds template parameter specifier `{`.
+  - **CN**: 补充模板参数说明符 `{`。
+- **Line 146 / 第 146 行** — `    struct TensorStorage : cute::aligned_struct<128, _0> {`
+  - **EN**: Adds template parameter specifier `struct TensorStorage : cute::aligned_struct<128, _0> {`.
+  - **CN**: 补充模板参数说明符 `struct TensorStorage : cute::aligned_struct<128, _0> {`。
+- **Line 147 / 第 147 行** — `      cute::array_aligned<typename TiledMma::ValTypeA, cute::cosize_v<SmemLayoutA>> smem_A;`
+  - **EN**: Adds template parameter specifier `cute::array_aligned<typename TiledMma::ValTypeA, cute::cosize_v<SmemLayoutA>> smem_A;`.
+  - **CN**: 补充模板参数说明符 `cute::array_aligned<typename TiledMma::ValTypeA, cute::cosize_v<SmemLayoutA>> smem_A;`。
+- **Line 148 / 第 148 行** — `      cute::array_aligned<typename TiledMma::ValTypeB, cute::cosize_v<SmemLayoutB>> smem_B;`
+  - **EN**: Adds template parameter specifier `cute::array_aligned<typename TiledMma::ValTypeB, cute::cosize_v<SmemLayoutB>> smem_B;`.
+  - **CN**: 补充模板参数说明符 `cute::array_aligned<typename TiledMma::ValTypeB, cute::cosize_v<SmemLayoutB>> smem_B;`。
+- **Line 149 / 第 149 行** — `    } tensors;`
+  - **EN**: Adds template parameter specifier `} tensors;`.
+  - **CN**: 补充模板参数说明符 `} tensors;`。
+- **Line 150 / 第 150 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 151 / 第 151 行** — `    using PipelineStorage = typename MainloopPipeline::SharedStorage;`
+  - **EN**: Adds template parameter specifier `using PipelineStorage = typename MainloopPipeline::SharedStorage;`.
+  - **CN**: 补充模板参数说明符 `using PipelineStorage = typename MainloopPipeline::SharedStorage;`。
+- **Line 152 / 第 152 行** — `    PipelineStorage pipeline;`
+  - **EN**: Adds template parameter specifier `PipelineStorage pipeline;`.
+  - **CN**: 补充模板参数说明符 `PipelineStorage pipeline;`。
+- **Line 153 / 第 153 行** — `  };`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 154 / 第 154 行** — `  using TensorStorage = typename SharedStorage::TensorStorage;`
+  - **EN**: Adds template parameter specifier `using TensorStorage = typename SharedStorage::TensorStorage;`.
+  - **CN**: 补充模板参数说明符 `using TensorStorage = typename SharedStorage::TensorStorage;`。
+- **Line 155 / 第 155 行** — `  using PipelineStorage = typename SharedStorage::PipelineStorage;`
+  - **EN**: Adds template parameter specifier `using PipelineStorage = typename SharedStorage::PipelineStorage;`.
+  - **CN**: 补充模板参数说明符 `using PipelineStorage = typename SharedStorage::PipelineStorage;`。
+- **Line 156 / 第 156 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 157 / 第 157 行** — `  static constexpr int K_PIPE_MAX = DispatchPolicy::Stages;`
+  - **EN**: Adds template parameter specifier `static constexpr int K_PIPE_MAX = DispatchPolicy::Stages;`.
+  - **CN**: 补充模板参数说明符 `static constexpr int K_PIPE_MAX = DispatchPolicy::Stages;`。
+- **Line 158 / 第 158 行** — `  static constexpr int K_PIPE_MMAS = DispatchPolicy::PipelineAsyncMmaStages;`
+  - **EN**: Adds template parameter specifier `static constexpr int K_PIPE_MMAS = DispatchPolicy::PipelineAsyncMmaStages;`.
+  - **CN**: 补充模板参数说明符 `static constexpr int K_PIPE_MMAS = DispatchPolicy::PipelineAsyncMmaStages;`。
+- **Line 159 / 第 159 行** — `  static constexpr uint32_t TmaTransactionBytes =`
+  - **EN**: Adds template parameter specifier `static constexpr uint32_t TmaTransactionBytes =`.
+  - **CN**: 补充模板参数说明符 `static constexpr uint32_t TmaTransactionBytes =`。
+- **Line 160 / 第 160 行** — `      (size<0>(SmemLayoutA{}) * size<1>(SmemLayoutA{}) * static_cast<uint32_t>(sizeof(InternalElementA)))+`
+  - **EN**: Adds template parameter specifier `(size<0>(SmemLayoutA{}) * size<1>(SmemLayoutA{}) * static_cast<uint32_t>(sizeof(InternalElementA)))+`.
+  - **CN**: 补充模板参数说明符 `(size<0>(SmemLayoutA{}) * size<1>(SmemLayoutA{}) * static_cast<uint32_t>(sizeof(InternalElementA)))+`。
+- **Line 161 / 第 161 行** — `      (size<0>(SmemLayoutB{}) * size<1>(SmemLayoutB{}) * static_cast<uint32_t>(sizeof(InternalElementB)));`
+  - **EN**: Adds template parameter specifier `(size<0>(SmemLayoutB{}) * size<1>(SmemLayoutB{}) * static_cast<uint32_t>(sizeof(InternalElementB)));`.
+  - **CN**: 补充模板参数说明符 `(size<0>(SmemLayoutB{}) * size<1>(SmemLayoutB{}) * static_cast<uint32_t>(sizeof(InternalElementB)));`。
+- **Line 162 / 第 162 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 163 / 第 163 行** — `  // Host side kernel arguments`
+  - **EN**: Adds template parameter specifier `// Host side kernel arguments`.
+  - **CN**: 补充模板参数说明符 `// Host side kernel arguments`。
+- **Line 164 / 第 164 行** — `  struct Arguments {`
+  - **EN**: Adds template parameter specifier `struct Arguments {`.
+  - **CN**: 补充模板参数说明符 `struct Arguments {`。
+- **Line 165 / 第 165 行** — `    ElementA const* ptr_A{nullptr};`
+  - **EN**: Adds template parameter specifier `ElementA const* ptr_A{nullptr};`.
+  - **CN**: 补充模板参数说明符 `ElementA const* ptr_A{nullptr};`。
+- **Line 166 / 第 166 行** — `    ElementB const* ptr_B{nullptr};`
+  - **EN**: Adds template parameter specifier `ElementB const* ptr_B{nullptr};`.
+  - **CN**: 补充模板参数说明符 `ElementB const* ptr_B{nullptr};`。
+- **Line 167 / 第 167 行** — `  };`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 168 / 第 168 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 169 / 第 169 行** — `private:`
+  - **EN**: Adds template parameter specifier `private:`.
+  - **CN**: 补充模板参数说明符 `private:`。
+- **Line 170 / 第 170 行** — `  // Note that for fprop and dgrad kernel, the tma load mode is im2col for tensor A and tiled for`
+  - **EN**: Adds template parameter specifier `// Note that for fprop and dgrad kernel, the tma load mode is im2col for tensor A and tiled for`.
+  - **CN**: 补充模板参数说明符 `// Note that for fprop and dgrad kernel, the tma load mode is im2col for tensor A and tiled for`。
+- **Line 171 / 第 171 行** — `  // tensor B while for wgrad kernel, the tma load mode is tiled for tensor A and im2col for tensor`
+  - **EN**: Adds template parameter specifier `// tensor B while for wgrad kernel, the tma load mode is tiled for tensor A and im2col for tensor`.
+  - **CN**: 补充模板参数说明符 `// tensor B while for wgrad kernel, the tma load mode is tiled for tensor A and im2col for tensor`。
+- **Line 172 / 第 172 行** — `  // B since operand A, B is swapped.`
+  - **EN**: Adds template parameter specifier `// B since operand A, B is swapped.`.
+  - **CN**: 补充模板参数说明符 `// B since operand A, B is swapped.`。
+- **Line 173 / 第 173 行** — `  // Get tma_load_a instantce.`
+  - **EN**: Adds template parameter specifier `// Get tma_load_a instantce.`.
+  - **CN**: 补充模板参数说明符 `// Get tma_load_a instantce.`。
+- **Line 174 / 第 174 行** — `  template <class TensorA>`
+  - **EN**: Starts a template declaration with specifier `class TensorA`.
+  - **CN**: 开始一个模板声明，说明符为 `class TensorA`。
+- **Line 175 / 第 175 行** — `  static constexpr auto`
+  - **EN**: Adds template parameter specifier `static constexpr auto`.
+  - **CN**: 补充模板参数说明符 `static constexpr auto`。
+- **Line 176 / 第 176 行** — `  get_tma_load_a_instance(TensorA const& tensor_a, ProblemShape const& problem_shape) {`
+  - **EN**: Adds template parameter specifier `get_tma_load_a_instance(TensorA const& tensor_a, ProblemShape const& problem_shape) {`.
+  - **CN**: 补充模板参数说明符 `get_tma_load_a_instance(TensorA const& tensor_a, ProblemShape const& problem_shape) {`。
+- **Line 177 / 第 177 行** — `    if constexpr (is_im2col_A) {`
+  - **EN**: Adds template parameter specifier `if constexpr (is_im2col_A) {`.
+  - **CN**: 补充模板参数说明符 `if constexpr (is_im2col_A) {`。
+- **Line 178 / 第 178 行** — `      // compute the upper and lower corners based on the conv padding`
+  - **EN**: Adds template parameter specifier `// compute the upper and lower corners based on the conv padding`.
+  - **CN**: 补充模板参数说明符 `// compute the upper and lower corners based on the conv padding`。
+- **Line 179 / 第 179 行** — `      auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`。
+- **Line 180 / 第 180 行** — `      auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`。
+- **Line 181 / 第 181 行** — `      auto lower_srt = detail::compute_lower_srt(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto lower_srt = detail::compute_lower_srt(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto lower_srt = detail::compute_lower_srt(problem_shape);`。
+- **Line 182 / 第 182 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 183 / 第 183 行** — `      // The calculation of gbasis strides for dgrad kernel needs perform negate for dilation values.`
+  - **EN**: Adds template parameter specifier `// The calculation of gbasis strides for dgrad kernel needs perform negate for dilation values.`.
+  - **CN**: 补充模板参数说明符 `// The calculation of gbasis strides for dgrad kernel needs perform negate for dilation values.`。
+- **Line 184 / 第 184 行** — `      cute::array<int32_t, NumSpatialDimensions> stride_srt{};`
+  - **EN**: Adds template parameter specifier `cute::array<int32_t, NumSpatialDimensions> stride_srt{};`.
+  - **CN**: 补充模板参数说明符 `cute::array<int32_t, NumSpatialDimensions> stride_srt{};`。
+- **Line 185 / 第 185 行** — `      for (int i = 0; i < NumSpatialDimensions; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < NumSpatialDimensions; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < NumSpatialDimensions; ++i) {`。
+- **Line 186 / 第 186 行** — `        stride_srt[i] = ConvOp == conv::Operator::kDgrad ?`
+  - **EN**: Adds template parameter specifier `stride_srt[i] = ConvOp == conv::Operator::kDgrad ?`.
+  - **CN**: 补充模板参数说明符 `stride_srt[i] = ConvOp == conv::Operator::kDgrad ?`。
+- **Line 187 / 第 187 行** — `            -problem_shape.dilation[NumSpatialDimensions-1-i] :`
+  - **EN**: Adds template parameter specifier `-problem_shape.dilation[NumSpatialDimensions-1-i] :`.
+  - **CN**: 补充模板参数说明符 `-problem_shape.dilation[NumSpatialDimensions-1-i] :`。
+- **Line 188 / 第 188 行** — `            problem_shape.dilation[NumSpatialDimensions-1-i];`
+  - **EN**: Adds template parameter specifier `problem_shape.dilation[NumSpatialDimensions-1-i];`.
+  - **CN**: 补充模板参数说明符 `problem_shape.dilation[NumSpatialDimensions-1-i];`。
+- **Line 189 / 第 189 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 190 / 第 190 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 191 / 第 191 行** — `      return make_im2col_tma_copy(`
+  - **EN**: Adds template parameter specifier `return make_im2col_tma_copy(`.
+  - **CN**: 补充模板参数说明符 `return make_im2col_tma_copy(`。
+- **Line 192 / 第 192 行** — `          GmemTiledCopyA{},`
+  - **EN**: Adds template parameter specifier `GmemTiledCopyA{}`.
+  - **CN**: 补充模板参数说明符 `GmemTiledCopyA{}`。
+- **Line 193 / 第 193 行** — `          tensor_a,`
+  - **EN**: Adds template parameter specifier `tensor_a`.
+  - **CN**: 补充模板参数说明符 `tensor_a`。
+- **Line 194 / 第 194 行** — `          SmemLayoutA{}(_,_,_0{}),`
+  - **EN**: Adds template parameter specifier `SmemLayoutA{}(_,_,_0{})`.
+  - **CN**: 补充模板参数说明符 `SmemLayoutA{}(_,_,_0{})`。
+- **Line 195 / 第 195 行** — `          product_each(shape(SmemLayoutA{}(_,_,_0{}))),`
+  - **EN**: Adds template parameter specifier `product_each(shape(SmemLayoutA{}(_,_,_0{})))`.
+  - **CN**: 补充模板参数说明符 `product_each(shape(SmemLayoutA{}(_,_,_0{})))`。
+- **Line 196 / 第 196 行** — `          size<1>(ClusterShape{}),`
+  - **EN**: Adds template parameter specifier `size<1>(ClusterShape{})`.
+  - **CN**: 补充模板参数说明符 `size<1>(ClusterShape{})`。
+- **Line 197 / 第 197 行** — `          shape(lower_corner_whd),`
+  - **EN**: Adds template parameter specifier `shape(lower_corner_whd)`.
+  - **CN**: 补充模板参数说明符 `shape(lower_corner_whd)`。
+- **Line 198 / 第 198 行** — `          shape(upper_corner_whd),`
+  - **EN**: Adds template parameter specifier `shape(upper_corner_whd)`.
+  - **CN**: 补充模板参数说明符 `shape(upper_corner_whd)`。
+- **Line 199 / 第 199 行** — `          cute::reverse(shape(problem_shape.lower_padding)),`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.lower_padding))`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.lower_padding))`。
+- **Line 200 / 第 200 行** — `          cute::reverse(shape(problem_shape.upper_padding)),`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.upper_padding))`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.upper_padding))`。
+- **Line 201 / 第 201 行** — `          cute::reverse(shape(problem_shape.traversal_stride)),`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.traversal_stride))`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.traversal_stride))`。
+- **Line 202 / 第 202 行** — `          shape(lower_srt),`
+  - **EN**: Adds template parameter specifier `shape(lower_srt)`.
+  - **CN**: 补充模板参数说明符 `shape(lower_srt)`。
+- **Line 203 / 第 203 行** — `          shape(stride_srt));`
+  - **EN**: Adds template parameter specifier `shape(stride_srt));`.
+  - **CN**: 补充模板参数说明符 `shape(stride_srt));`。
+- **Line 204 / 第 204 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 205 / 第 205 行** — `    // TMA tiled mode for tensor A in wgrad kernel.`
+  - **EN**: Adds template parameter specifier `// TMA tiled mode for tensor A in wgrad kernel.`.
+  - **CN**: 补充模板参数说明符 `// TMA tiled mode for tensor A in wgrad kernel.`。
+- **Line 206 / 第 206 行** — `    else {`
+  - **EN**: Adds template parameter specifier `else {`.
+  - **CN**: 补充模板参数说明符 `else {`。
+- **Line 207 / 第 207 行** — `      return make_tma_copy(`
+  - **EN**: Adds template parameter specifier `return make_tma_copy(`.
+  - **CN**: 补充模板参数说明符 `return make_tma_copy(`。
+- **Line 208 / 第 208 行** — `          GmemTiledCopyA{},`
+  - **EN**: Adds template parameter specifier `GmemTiledCopyA{}`.
+  - **CN**: 补充模板参数说明符 `GmemTiledCopyA{}`。
+- **Line 209 / 第 209 行** — `          tensor_a,`
+  - **EN**: Adds template parameter specifier `tensor_a`.
+  - **CN**: 补充模板参数说明符 `tensor_a`。
+- **Line 210 / 第 210 行** — `          SmemLayoutA{}(_,_,_0{}),`
+  - **EN**: Adds template parameter specifier `SmemLayoutA{}(_,_,_0{})`.
+  - **CN**: 补充模板参数说明符 `SmemLayoutA{}(_,_,_0{})`。
+- **Line 211 / 第 211 行** — `          make_shape(shape<0>(TileShape{}), shape<2>(TileShape{})),`
+  - **EN**: Adds template parameter specifier `make_shape(shape<0>(TileShape{}), shape<2>(TileShape{}))`.
+  - **CN**: 补充模板参数说明符 `make_shape(shape<0>(TileShape{}), shape<2>(TileShape{}))`。
+- **Line 212 / 第 212 行** — `          size<1>(ClusterShape{}));`
+  - **EN**: Adds template parameter specifier `size<1>(ClusterShape{}));`.
+  - **CN**: 补充模板参数说明符 `size<1>(ClusterShape{}));`。
+- **Line 213 / 第 213 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 214 / 第 214 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 215 / 第 215 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 216 / 第 216 行** — `  // Get tma_load_b instantce.`
+  - **EN**: Adds template parameter specifier `// Get tma_load_b instantce.`.
+  - **CN**: 补充模板参数说明符 `// Get tma_load_b instantce.`。
+- **Line 217 / 第 217 行** — `  template <class TensorB>`
+  - **EN**: Starts a template declaration with specifier `class TensorB`.
+  - **CN**: 开始一个模板声明，说明符为 `class TensorB`。
+- **Line 218 / 第 218 行** — `  static constexpr auto`
+  - **EN**: Adds template parameter specifier `static constexpr auto`.
+  - **CN**: 补充模板参数说明符 `static constexpr auto`。
+- **Line 219 / 第 219 行** — `  get_tma_load_b_instance(TensorB const& tensor_b, ProblemShape const& problem_shape) {`
+  - **EN**: Adds template parameter specifier `get_tma_load_b_instance(TensorB const& tensor_b, ProblemShape const& problem_shape) {`.
+  - **CN**: 补充模板参数说明符 `get_tma_load_b_instance(TensorB const& tensor_b, ProblemShape const& problem_shape) {`。
+- **Line 220 / 第 220 行** — `    // TMA im2col mode for tensor B in wgrad kernel.`
+  - **EN**: Adds template parameter specifier `// TMA im2col mode for tensor B in wgrad kernel.`.
+  - **CN**: 补充模板参数说明符 `// TMA im2col mode for tensor B in wgrad kernel.`。
+- **Line 221 / 第 221 行** — `    if constexpr (is_im2col_B) {`
+  - **EN**: Adds template parameter specifier `if constexpr (is_im2col_B) {`.
+  - **CN**: 补充模板参数说明符 `if constexpr (is_im2col_B) {`。
+- **Line 222 / 第 222 行** — `      // compute the upper and lower corners based on the conv padding`
+  - **EN**: Adds template parameter specifier `// compute the upper and lower corners based on the conv padding`.
+  - **CN**: 补充模板参数说明符 `// compute the upper and lower corners based on the conv padding`。
+- **Line 223 / 第 223 行** — `      auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`。
+- **Line 224 / 第 224 行** — `      auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`。
+- **Line 225 / 第 225 行** — `      auto lower_srt = detail::compute_lower_srt(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto lower_srt = detail::compute_lower_srt(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto lower_srt = detail::compute_lower_srt(problem_shape);`。
+- **Line 226 / 第 226 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 227 / 第 227 行** — `      return make_im2col_tma_copy(`
+  - **EN**: Adds template parameter specifier `return make_im2col_tma_copy(`.
+  - **CN**: 补充模板参数说明符 `return make_im2col_tma_copy(`。
+- **Line 228 / 第 228 行** — `          GmemTiledCopyB{},`
+  - **EN**: Adds template parameter specifier `GmemTiledCopyB{}`.
+  - **CN**: 补充模板参数说明符 `GmemTiledCopyB{}`。
+- **Line 229 / 第 229 行** — `          tensor_b,`
+  - **EN**: Adds template parameter specifier `tensor_b`.
+  - **CN**: 补充模板参数说明符 `tensor_b`。
+- **Line 230 / 第 230 行** — `          SmemLayoutB{}(_,_,_0{}),`
+  - **EN**: Adds template parameter specifier `SmemLayoutB{}(_,_,_0{})`.
+  - **CN**: 补充模板参数说明符 `SmemLayoutB{}(_,_,_0{})`。
+- **Line 231 / 第 231 行** — `          product_each(shape(SmemLayoutB{}(_,_,_0{}))),`
+  - **EN**: Adds template parameter specifier `product_each(shape(SmemLayoutB{}(_,_,_0{})))`.
+  - **CN**: 补充模板参数说明符 `product_each(shape(SmemLayoutB{}(_,_,_0{})))`。
+- **Line 232 / 第 232 行** — `          size<0>(ClusterShape{}),`
+  - **EN**: Adds template parameter specifier `size<0>(ClusterShape{})`.
+  - **CN**: 补充模板参数说明符 `size<0>(ClusterShape{})`。
+- **Line 233 / 第 233 行** — `          shape(lower_corner_whd),`
+  - **EN**: Adds template parameter specifier `shape(lower_corner_whd)`.
+  - **CN**: 补充模板参数说明符 `shape(lower_corner_whd)`。
+- **Line 234 / 第 234 行** — `          shape(upper_corner_whd),`
+  - **EN**: Adds template parameter specifier `shape(upper_corner_whd)`.
+  - **CN**: 补充模板参数说明符 `shape(upper_corner_whd)`。
+- **Line 235 / 第 235 行** — `          cute::reverse(shape(problem_shape.lower_padding)),`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.lower_padding))`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.lower_padding))`。
+- **Line 236 / 第 236 行** — `          cute::reverse(shape(problem_shape.upper_padding)),`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.upper_padding))`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.upper_padding))`。
+- **Line 237 / 第 237 行** — `          cute::reverse(shape(problem_shape.traversal_stride)),`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.traversal_stride))`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.traversal_stride))`。
+- **Line 238 / 第 238 行** — `          shape(lower_srt),`
+  - **EN**: Adds template parameter specifier `shape(lower_srt)`.
+  - **CN**: 补充模板参数说明符 `shape(lower_srt)`。
+- **Line 239 / 第 239 行** — `          cute::reverse(shape(problem_shape.dilation)));`
+  - **EN**: Adds template parameter specifier `cute::reverse(shape(problem_shape.dilation)));`.
+  - **CN**: 补充模板参数说明符 `cute::reverse(shape(problem_shape.dilation)));`。
+- **Line 240 / 第 240 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 241 / 第 241 行** — `    else {`
+  - **EN**: Adds template parameter specifier `else {`.
+  - **CN**: 补充模板参数说明符 `else {`。
+- **Line 242 / 第 242 行** — `      return make_tma_copy(`
+  - **EN**: Adds template parameter specifier `return make_tma_copy(`.
+  - **CN**: 补充模板参数说明符 `return make_tma_copy(`。
+- **Line 243 / 第 243 行** — `          GmemTiledCopyB{},`
+  - **EN**: Adds template parameter specifier `GmemTiledCopyB{}`.
+  - **CN**: 补充模板参数说明符 `GmemTiledCopyB{}`。
+- **Line 244 / 第 244 行** — `          tensor_b,`
+  - **EN**: Adds template parameter specifier `tensor_b`.
+  - **CN**: 补充模板参数说明符 `tensor_b`。
+- **Line 245 / 第 245 行** — `          SmemLayoutB{}(_,_,_0{}),`
+  - **EN**: Adds template parameter specifier `SmemLayoutB{}(_,_,_0{})`.
+  - **CN**: 补充模板参数说明符 `SmemLayoutB{}(_,_,_0{})`。
+- **Line 246 / 第 246 行** — `          make_shape(shape<1>(TileShape{}), shape<2>(TileShape{})),`
+  - **EN**: Adds template parameter specifier `make_shape(shape<1>(TileShape{}), shape<2>(TileShape{}))`.
+  - **CN**: 补充模板参数说明符 `make_shape(shape<1>(TileShape{}), shape<2>(TileShape{}))`。
+- **Line 247 / 第 247 行** — `          size<0>(ClusterShape{}));`
+  - **EN**: Adds template parameter specifier `size<0>(ClusterShape{}));`.
+  - **CN**: 补充模板参数说明符 `size<0>(ClusterShape{}));`。
+- **Line 248 / 第 248 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 249 / 第 249 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 250 / 第 250 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 251 / 第 251 行** — `public:`
+  - **EN**: Adds template parameter specifier `public:`.
+  - **CN**: 补充模板参数说明符 `public:`。
+- **Line 252 / 第 252 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 253 / 第 253 行** — `  // Performs im2col transformations on the input of type ConvProblemShape`
+  - **EN**: Adds template parameter specifier `// Performs im2col transformations on the input of type ConvProblemShape`.
+  - **CN**: 补充模板参数说明符 `// Performs im2col transformations on the input of type ConvProblemShape`。
+- **Line 254 / 第 254 行** — `  static constexpr auto`
+  - **EN**: Adds template parameter specifier `static constexpr auto`.
+  - **CN**: 补充模板参数说明符 `static constexpr auto`。
+- **Line 255 / 第 255 行** — `  get_problem_shape_MNKL(ProblemShape const& problem_shape) {`
+  - **EN**: Adds template parameter specifier `get_problem_shape_MNKL(ProblemShape const& problem_shape) {`.
+  - **CN**: 补充模板参数说明符 `get_problem_shape_MNKL(ProblemShape const& problem_shape) {`。
+- **Line 256 / 第 256 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 257 / 第 257 行** — `    if constexpr (is_im2col_A || is_im2col_B) {`
+  - **EN**: Adds template parameter specifier `if constexpr (is_im2col_A || is_im2col_B) {`.
+  - **CN**: 补充模板参数说明符 `if constexpr (is_im2col_A || is_im2col_B) {`。
+- **Line 258 / 第 258 行** — `      // transformation + im2col linearization`
+  - **EN**: Adds template parameter specifier `// transformation + im2col linearization`.
+  - **CN**: 补充模板参数说明符 `// transformation + im2col linearization`。
+- **Line 259 / 第 259 行** — `      return cutlass::conv::detail::get_linearized_problem_shape_MNKL(problem_shape);`
+  - **EN**: Adds template parameter specifier `return cutlass::conv::detail::get_linearized_problem_shape_MNKL(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `return cutlass::conv::detail::get_linearized_problem_shape_MNKL(problem_shape);`。
+- **Line 260 / 第 260 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 261 / 第 261 行** — `    else {`
+  - **EN**: Adds template parameter specifier `else {`.
+  - **CN**: 补充模板参数说明符 `else {`。
+- **Line 262 / 第 262 行** — `      // transformation`
+  - **EN**: Adds template parameter specifier `// transformation`.
+  - **CN**: 补充模板参数说明符 `// transformation`。
+- **Line 263 / 第 263 行** — `      return cutlass::conv::detail::get_transformed_problem_shape_MNKL(problem_shape);`
+  - **EN**: Adds template parameter specifier `return cutlass::conv::detail::get_transformed_problem_shape_MNKL(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `return cutlass::conv::detail::get_transformed_problem_shape_MNKL(problem_shape);`。
+- **Line 264 / 第 264 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 265 / 第 265 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 266 / 第 266 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 267 / 第 267 行** — `  // Device side kernel params`
+  - **EN**: Adds template parameter specifier `// Device side kernel params`.
+  - **CN**: 补充模板参数说明符 `// Device side kernel params`。
+- **Line 268 / 第 268 行** — `  struct Params {`
+  - **EN**: Adds template parameter specifier `struct Params {`.
+  - **CN**: 补充模板参数说明符 `struct Params {`。
+- **Line 269 / 第 269 行** — `    using _Submode = decltype(take<0,NumTensorDimensions-1>(typename ProblemShape::TensorExtent{}));`
+  - **EN**: Adds template parameter specifier `using _Submode = decltype(take<0,NumTensorDimensions-1>(typename ProblemShape::TensorExtent{}));`.
+  - **CN**: 补充模板参数说明符 `using _Submode = decltype(take<0,NumTensorDimensions-1>(typename ProblemShape::TensorExtent{}));`。
+- **Line 270 / 第 270 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 271 / 第 271 行** — `    // Assumption: StrideA is congruent with Problem_MK`
+  - **EN**: Adds template parameter specifier `// Assumption: StrideA is congruent with Problem_MK`.
+  - **CN**: 补充模板参数说明符 `// Assumption: StrideA is congruent with Problem_MK`。
+- **Line 272 / 第 272 行** — `    // Select TMA load type according to convolution operator.`
+  - **EN**: Adds template parameter specifier `// Select TMA load type according to convolution operator.`.
+  - **CN**: 补充模板参数说明符 `// Select TMA load type according to convolution operator.`。
+- **Line 273 / 第 273 行** — `    using TensorShapeA = cute::conditional_t<ConvOp == conv::Operator::kWgrad,`
+  - **EN**: Adds template parameter specifier `using TensorShapeA = cute::conditional_t<ConvOp == conv::Operator::kWgrad`.
+  - **CN**: 补充模板参数说明符 `using TensorShapeA = cute::conditional_t<ConvOp == conv::Operator::kWgrad`。
+- **Line 274 / 第 274 行** — `        decltype(repeat_like(StrideA{}, int32_t(0))),`
+  - **EN**: Adds template parameter specifier `decltype(repeat_like(StrideA{}, int32_t(0)))`.
+  - **CN**: 补充模板参数说明符 `decltype(repeat_like(StrideA{}, int32_t(0)))`。
+- **Line 275 / 第 275 行** — `        decltype(make_shape(_Submode{}, int(0)))>;`
+  - **EN**: Adds template parameter specifier `decltype(make_shape(_Submode{}, int(0)))>;`.
+  - **CN**: 补充模板参数说明符 `decltype(make_shape(_Submode{}, int(0)))>;`。
+- **Line 276 / 第 276 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 277 / 第 277 行** — `    using TensorShapeB = cute::conditional_t<ConvOp == conv::Operator::kWgrad,`
+  - **EN**: Adds template parameter specifier `using TensorShapeB = cute::conditional_t<ConvOp == conv::Operator::kWgrad`.
+  - **CN**: 补充模板参数说明符 `using TensorShapeB = cute::conditional_t<ConvOp == conv::Operator::kWgrad`。
+- **Line 278 / 第 278 行** — `        decltype(make_shape(int(0), _Submode{})),`
+  - **EN**: Adds template parameter specifier `decltype(make_shape(int(0), _Submode{}))`.
+  - **CN**: 补充模板参数说明符 `decltype(make_shape(int(0), _Submode{}))`。
+- **Line 279 / 第 279 行** — `        decltype(repeat_like(StrideB{}, int32_t(0)))>;`
+  - **EN**: Adds template parameter specifier `decltype(repeat_like(StrideB{}, int32_t(0)))>;`.
+  - **CN**: 补充模板参数说明符 `decltype(repeat_like(StrideB{}, int32_t(0)))>;`。
+- **Line 280 / 第 280 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 281 / 第 281 行** — `    using TMA_A = decltype(get_tma_load_a_instance(`
+  - **EN**: Adds template parameter specifier `using TMA_A = decltype(get_tma_load_a_instance(`.
+  - **CN**: 补充模板参数说明符 `using TMA_A = decltype(get_tma_load_a_instance(`。
+- **Line 282 / 第 282 行** — `        make_tensor(`
+  - **EN**: Adds template parameter specifier `make_tensor(`.
+  - **CN**: 补充模板参数说明符 `make_tensor(`。
+- **Line 283 / 第 283 行** — `            make_gmem_ptr(static_cast<InternalElementA const*>(nullptr)),`
+  - **EN**: Adds template parameter specifier `make_gmem_ptr(static_cast<InternalElementA const*>(nullptr))`.
+  - **CN**: 补充模板参数说明符 `make_gmem_ptr(static_cast<InternalElementA const*>(nullptr))`。
+- **Line 284 / 第 284 行** — `            make_layout(TensorShapeA{}, StrideA{})),`
+  - **EN**: Adds template parameter specifier `make_layout(TensorShapeA{}, StrideA{}))`.
+  - **CN**: 补充模板参数说明符 `make_layout(TensorShapeA{}, StrideA{}))`。
+- **Line 285 / 第 285 行** — `        ConvProblemShape<ConvOp, NumSpatialDimensions>{}));`
+  - **EN**: Adds template parameter specifier `ConvProblemShape<ConvOp, NumSpatialDimensions>{}));`.
+  - **CN**: 补充模板参数说明符 `ConvProblemShape<ConvOp, NumSpatialDimensions>{}));`。
+- **Line 286 / 第 286 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 287 / 第 287 行** — `    using TMA_B = decltype(get_tma_load_b_instance(`
+  - **EN**: Adds template parameter specifier `using TMA_B = decltype(get_tma_load_b_instance(`.
+  - **CN**: 补充模板参数说明符 `using TMA_B = decltype(get_tma_load_b_instance(`。
+- **Line 288 / 第 288 行** — `        make_tensor(`
+  - **EN**: Adds template parameter specifier `make_tensor(`.
+  - **CN**: 补充模板参数说明符 `make_tensor(`。
+- **Line 289 / 第 289 行** — `            make_gmem_ptr(static_cast<InternalElementB const*>(nullptr)),`
+  - **EN**: Adds template parameter specifier `make_gmem_ptr(static_cast<InternalElementB const*>(nullptr))`.
+  - **CN**: 补充模板参数说明符 `make_gmem_ptr(static_cast<InternalElementB const*>(nullptr))`。
+- **Line 290 / 第 290 行** — `            make_layout(TensorShapeB{}, StrideB{})),`
+  - **EN**: Adds template parameter specifier `make_layout(TensorShapeB{}, StrideB{}))`.
+  - **CN**: 补充模板参数说明符 `make_layout(TensorShapeB{}, StrideB{}))`。
+- **Line 291 / 第 291 行** — `        ConvProblemShape<ConvOp, NumSpatialDimensions>{}));`
+  - **EN**: Adds template parameter specifier `ConvProblemShape<ConvOp, NumSpatialDimensions>{}));`.
+  - **CN**: 补充模板参数说明符 `ConvProblemShape<ConvOp, NumSpatialDimensions>{}));`。
+- **Line 292 / 第 292 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 293 / 第 293 行** — `    // Members`
+  - **EN**: Adds template parameter specifier `// Members`.
+  - **CN**: 补充模板参数说明符 `// Members`。
+- **Line 294 / 第 294 行** — `    TMA_A tma_load_a;`
+  - **EN**: Adds template parameter specifier `TMA_A tma_load_a;`.
+  - **CN**: 补充模板参数说明符 `TMA_A tma_load_a;`。
+- **Line 295 / 第 295 行** — `    TMA_B tma_load_b;`
+  - **EN**: Adds template parameter specifier `TMA_B tma_load_b;`.
+  - **CN**: 补充模板参数说明符 `TMA_B tma_load_b;`。
+- **Line 296 / 第 296 行** — `    uint32_t tma_transaction_bytes = TmaTransactionBytes;`
+  - **EN**: Adds template parameter specifier `uint32_t tma_transaction_bytes = TmaTransactionBytes;`.
+  - **CN**: 补充模板参数说明符 `uint32_t tma_transaction_bytes = TmaTransactionBytes;`。
+- **Line 297 / 第 297 行** — `  };`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 298 / 第 298 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 299 / 第 299 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 300 / 第 300 行** — `  // Methods`
+  - **EN**: Adds template parameter specifier `// Methods`.
+  - **CN**: 补充模板参数说明符 `// Methods`。
+- **Line 301 / 第 301 行** — `  //`
+  - **EN**: Adds template parameter specifier `//`.
+  - **CN**: 补充模板参数说明符 `//`。
+- **Line 302 / 第 302 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 303 / 第 303 行** — `  // Lowers the host side user facing arguments to the kernel facing lauch params`
+  - **EN**: Adds template parameter specifier `// Lowers the host side user facing arguments to the kernel facing lauch params`.
+  - **CN**: 补充模板参数说明符 `// Lowers the host side user facing arguments to the kernel facing lauch params`。
+- **Line 304 / 第 304 行** — `  static constexpr Params`
+  - **EN**: Adds template parameter specifier `static constexpr Params`.
+  - **CN**: 补充模板参数说明符 `static constexpr Params`。
+- **Line 305 / 第 305 行** — `  to_underlying_arguments(ProblemShape const& problem_shape, Arguments const& args, void* workspace) {`
+  - **EN**: Adds template parameter specifier `to_underlying_arguments(ProblemShape const& problem_shape, Arguments const& args, void* workspace) {`.
+  - **CN**: 补充模板参数说明符 `to_underlying_arguments(ProblemShape const& problem_shape, Arguments const& args, void* workspace) {`。
+- **Line 306 / 第 306 行** — `    (void) workspace;`
+  - **EN**: Adds template parameter specifier `(void) workspace;`.
+  - **CN**: 补充模板参数说明符 `(void) workspace;`。
+- **Line 307 / 第 307 行** — `    // from the flat problem shape arrays of ConvProblemShape<ConvOp, N>, create a rank-3 MNK problem shape tuple`
+  - **EN**: Adds template parameter specifier `// from the flat problem shape arrays of ConvProblemShape<ConvOp, N>, create a rank-3 MNK problem shape tuple`.
+  - **CN**: 补充模板参数说明符 `// from the flat problem shape arrays of ConvProblemShape<ConvOp, N>, create a rank-3 MNK problem shape tuple`。
+- **Line 308 / 第 308 行** — `    // tma desc creation depends on the original untransformed domain.`
+  - **EN**: Adds template parameter specifier `// tma desc creation depends on the original untransformed domain.`.
+  - **CN**: 补充模板参数说明符 `// tma desc creation depends on the original untransformed domain.`。
+- **Line 309 / 第 309 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 310 / 第 310 行** — `    // A extents.`
+  - **EN**: Adds template parameter specifier `// A extents.`.
+  - **CN**: 补充模板参数说明符 `// A extents.`。
+- **Line 311 / 第 311 行** — `    auto shape_A_orig = problem_shape.get_shape_A();`
+  - **EN**: Adds template parameter specifier `auto shape_A_orig = problem_shape.get_shape_A();`.
+  - **CN**: 补充模板参数说明符 `auto shape_A_orig = problem_shape.get_shape_A();`。
+- **Line 312 / 第 312 行** — `    // B extents.`
+  - **EN**: Adds template parameter specifier `// B extents.`.
+  - **CN**: 补充模板参数说明符 `// B extents.`。
+- **Line 313 / 第 313 行** — `    auto shape_B_orig = problem_shape.get_shape_B();`
+  - **EN**: Adds template parameter specifier `auto shape_B_orig = problem_shape.get_shape_B();`.
+  - **CN**: 补充模板参数说明符 `auto shape_B_orig = problem_shape.get_shape_B();`。
+- **Line 314 / 第 314 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 315 / 第 315 行** — `    // Fill inferred cute strides from flat stride arrays`
+  - **EN**: Adds template parameter specifier `// Fill inferred cute strides from flat stride arrays`.
+  - **CN**: 补充模板参数说明符 `// Fill inferred cute strides from flat stride arrays`。
+- **Line 316 / 第 316 行** — `    auto dA = make_cute_packed_stride(StrideA{}, problem_shape.stride_A, ConvOp);`
+  - **EN**: Adds template parameter specifier `auto dA = make_cute_packed_stride(StrideA{}, problem_shape.stride_A, ConvOp);`.
+  - **CN**: 补充模板参数说明符 `auto dA = make_cute_packed_stride(StrideA{}, problem_shape.stride_A, ConvOp);`。
+- **Line 317 / 第 317 行** — `    auto dB = make_cute_packed_stride(StrideB{}, problem_shape.stride_B, ConvOp);`
+  - **EN**: Adds template parameter specifier `auto dB = make_cute_packed_stride(StrideB{}, problem_shape.stride_B, ConvOp);`.
+  - **CN**: 补充模板参数说明符 `auto dB = make_cute_packed_stride(StrideB{}, problem_shape.stride_B, ConvOp);`。
+- **Line 318 / 第 318 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 319 / 第 319 行** — `    auto ptr_A = reinterpret_cast<InternalElementA const*>(args.ptr_A);`
+  - **EN**: Adds template parameter specifier `auto ptr_A = reinterpret_cast<InternalElementA const*>(args.ptr_A);`.
+  - **CN**: 补充模板参数说明符 `auto ptr_A = reinterpret_cast<InternalElementA const*>(args.ptr_A);`。
+- **Line 320 / 第 320 行** — `    auto ptr_B = reinterpret_cast<InternalElementB const*>(args.ptr_B);`
+  - **EN**: Adds template parameter specifier `auto ptr_B = reinterpret_cast<InternalElementB const*>(args.ptr_B);`.
+  - **CN**: 补充模板参数说明符 `auto ptr_B = reinterpret_cast<InternalElementB const*>(args.ptr_B);`。
+- **Line 321 / 第 321 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 322 / 第 322 行** — `    Tensor tensor_a = make_tensor(make_gmem_ptr(ptr_A), make_layout(shape_A_orig, dA));`
+  - **EN**: Adds template parameter specifier `Tensor tensor_a = make_tensor(make_gmem_ptr(ptr_A), make_layout(shape_A_orig, dA));`.
+  - **CN**: 补充模板参数说明符 `Tensor tensor_a = make_tensor(make_gmem_ptr(ptr_A), make_layout(shape_A_orig, dA));`。
+- **Line 323 / 第 323 行** — `    Tensor tensor_b = make_tensor(make_gmem_ptr(ptr_B), make_layout(shape_B_orig, dB));`
+  - **EN**: Adds template parameter specifier `Tensor tensor_b = make_tensor(make_gmem_ptr(ptr_B), make_layout(shape_B_orig, dB));`.
+  - **CN**: 补充模板参数说明符 `Tensor tensor_b = make_tensor(make_gmem_ptr(ptr_B), make_layout(shape_B_orig, dB));`。
+- **Line 324 / 第 324 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 325 / 第 325 行** — `    auto tma_load_a = get_tma_load_a_instance(tensor_a, problem_shape);`
+  - **EN**: Adds template parameter specifier `auto tma_load_a = get_tma_load_a_instance(tensor_a, problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto tma_load_a = get_tma_load_a_instance(tensor_a, problem_shape);`。
+- **Line 326 / 第 326 行** — `    auto tma_load_b = get_tma_load_b_instance(tensor_b, problem_shape);`
+  - **EN**: Adds template parameter specifier `auto tma_load_b = get_tma_load_b_instance(tensor_b, problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto tma_load_b = get_tma_load_b_instance(tensor_b, problem_shape);`。
+- **Line 327 / 第 327 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 328 / 第 328 行** — `    return {`
+  - **EN**: Adds template parameter specifier `return {`.
+  - **CN**: 补充模板参数说明符 `return {`。
+- **Line 329 / 第 329 行** — `      tma_load_a,`
+  - **EN**: Adds template parameter specifier `tma_load_a`.
+  - **CN**: 补充模板参数说明符 `tma_load_a`。
+- **Line 330 / 第 330 行** — `      tma_load_b,`
+  - **EN**: Adds template parameter specifier `tma_load_b`.
+  - **CN**: 补充模板参数说明符 `tma_load_b`。
+- **Line 331 / 第 331 行** — `      TmaTransactionBytes`
+  - **EN**: Adds template parameter specifier `TmaTransactionBytes`.
+  - **CN**: 补充模板参数说明符 `TmaTransactionBytes`。
+- **Line 332 / 第 332 行** — `    };`
+  - **EN**: Adds template parameter specifier `};`.
+  - **CN**: 补充模板参数说明符 `};`。
+- **Line 333 / 第 333 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 334 / 第 334 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 335 / 第 335 行** — `  template <class ProblemShape>`
+  - **EN**: Starts a template declaration with specifier `class ProblemShape`.
+  - **CN**: 开始一个模板声明，说明符为 `class ProblemShape`。
+- **Line 336 / 第 336 行** — `  static bool`
+  - **EN**: Adds template parameter specifier `static bool`.
+  - **CN**: 补充模板参数说明符 `static bool`。
+- **Line 337 / 第 337 行** — `  can_implement(`
+  - **EN**: Adds template parameter specifier `can_implement(`.
+  - **CN**: 补充模板参数说明符 `can_implement(`。
+- **Line 338 / 第 338 行** — `      ProblemShape const& problem_shape,`
+  - **EN**: Adds template parameter specifier `ProblemShape const& problem_shape`.
+  - **CN**: 补充模板参数说明符 `ProblemShape const& problem_shape`。
+- **Line 339 / 第 339 行** — `      Arguments const& args) {`
+  - **EN**: Adds template parameter specifier `Arguments const& args) {`.
+  - **CN**: 补充模板参数说明符 `Arguments const& args) {`。
+- **Line 340 / 第 340 行** — `    // Activation and Filter channel mode extents much match`
+  - **EN**: Adds template parameter specifier `// Activation and Filter channel mode extents much match`.
+  - **CN**: 补充模板参数说明符 `// Activation and Filter channel mode extents much match`。
+- **Line 341 / 第 341 行** — `    bool implementable = true;`
+  - **EN**: Adds template parameter specifier `bool implementable = true;`.
+  - **CN**: 补充模板参数说明符 `bool implementable = true;`。
+- **Line 342 / 第 342 行** — `    // channel mode is major`
+  - **EN**: Adds template parameter specifier `// channel mode is major`.
+  - **CN**: 补充模板参数说明符 `// channel mode is major`。
+- **Line 343 / 第 343 行** — `    implementable &= problem_shape.stride_A[NumTensorDimensions-1] == 1;`
+  - **EN**: Adds template parameter specifier `implementable &= problem_shape.stride_A[NumTensorDimensions-1] == 1;`.
+  - **CN**: 补充模板参数说明符 `implementable &= problem_shape.stride_A[NumTensorDimensions-1] == 1;`。
+- **Line 344 / 第 344 行** — `    implementable &= problem_shape.stride_B[NumTensorDimensions-1] == 1;`
+  - **EN**: Adds template parameter specifier `implementable &= problem_shape.stride_B[NumTensorDimensions-1] == 1;`.
+  - **CN**: 补充模板参数说明符 `implementable &= problem_shape.stride_B[NumTensorDimensions-1] == 1;`。
+- **Line 345 / 第 345 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 346 / 第 346 行** — `    constexpr int tma_alignment_bits = 128;`
+  - **EN**: Adds template parameter specifier `constexpr int tma_alignment_bits = 128;`.
+  - **CN**: 补充模板参数说明符 `constexpr int tma_alignment_bits = 128;`。
+- **Line 347 / 第 347 行** — `    // A extents.`
+  - **EN**: Adds template parameter specifier `// A extents.`.
+  - **CN**: 补充模板参数说明符 `// A extents.`。
+- **Line 348 / 第 348 行** — `    auto shape_A_orig = problem_shape.get_shape_A();`
+  - **EN**: Adds template parameter specifier `auto shape_A_orig = problem_shape.get_shape_A();`.
+  - **CN**: 补充模板参数说明符 `auto shape_A_orig = problem_shape.get_shape_A();`。
+- **Line 349 / 第 349 行** — `    // B extents.`
+  - **EN**: Adds template parameter specifier `// B extents.`.
+  - **CN**: 补充模板参数说明符 `// B extents.`。
+- **Line 350 / 第 350 行** — `    auto shape_B_orig = problem_shape.get_shape_B();`
+  - **EN**: Adds template parameter specifier `auto shape_B_orig = problem_shape.get_shape_B();`.
+  - **CN**: 补充模板参数说明符 `auto shape_B_orig = problem_shape.get_shape_B();`。
+- **Line 351 / 第 351 行** — `    constexpr int min_tma_aligned_elements_A = tma_alignment_bits / cutlass::sizeof_bits<ElementA>::value;`
+  - **EN**: Adds template parameter specifier `constexpr int min_tma_aligned_elements_A = tma_alignment_bits / cutlass::sizeof_bits<ElementA>::value;`.
+  - **CN**: 补充模板参数说明符 `constexpr int min_tma_aligned_elements_A = tma_alignment_bits / cutlass::sizeof_bits<ElementA>::value;`。
+- **Line 352 / 第 352 行** — `    implementable = implementable && cutlass::detail::check_alignment<min_tma_aligned_elements_A>(shape_A_orig, StrideA{});`
+  - **EN**: Adds template parameter specifier `implementable = implementable && cutlass::detail::check_alignment<min_tma_aligned_elements_A>(shape_A_orig, StrideA{});`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && cutlass::detail::check_alignment<min_tma_aligned_elements_A>(shape_A_orig, StrideA{});`。
+- **Line 353 / 第 353 行** — `    constexpr int min_tma_aligned_elements_B = tma_alignment_bits / cutlass::sizeof_bits<ElementB>::value;`
+  - **EN**: Adds template parameter specifier `constexpr int min_tma_aligned_elements_B = tma_alignment_bits / cutlass::sizeof_bits<ElementB>::value;`.
+  - **CN**: 补充模板参数说明符 `constexpr int min_tma_aligned_elements_B = tma_alignment_bits / cutlass::sizeof_bits<ElementB>::value;`。
+- **Line 354 / 第 354 行** — `    implementable = implementable && cutlass::detail::check_alignment<min_tma_aligned_elements_B>(shape_B_orig, StrideB{});`
+  - **EN**: Adds template parameter specifier `implementable = implementable && cutlass::detail::check_alignment<min_tma_aligned_elements_B>(shape_B_orig, StrideB{});`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && cutlass::detail::check_alignment<min_tma_aligned_elements_B>(shape_B_orig, StrideB{});`。
+- **Line 355 / 第 355 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 356 / 第 356 行** — `    if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 357 / 第 357 行** — `      CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Problem Size doesn't meet the minimum alignment requirements for TMA.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Problem Size doesn't meet the minimum alignment requirements for TMA.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Problem Size doesn't meet the minimum alignment requirements for TMA.\n");`。
+- **Line 358 / 第 358 行** — `      return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 359 / 第 359 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 360 / 第 360 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 361 / 第 361 行** — `    // Check valid padding values for TMA_LOAD_IM2COL`
+  - **EN**: Adds template parameter specifier `// Check valid padding values for TMA_LOAD_IM2COL`.
+  - **CN**: 补充模板参数说明符 `// Check valid padding values for TMA_LOAD_IM2COL`。
+- **Line 362 / 第 362 行** — `    constexpr int padding_limit = (ProblemShape::RankS == 1) ? 65536 : (ProblemShape::RankS == 2 ? 256 : 16);`
+  - **EN**: Adds template parameter specifier `constexpr int padding_limit = (ProblemShape::RankS == 1) ? 65536 : (ProblemShape::RankS == 2 ? 256 : 16);`.
+  - **CN**: 补充模板参数说明符 `constexpr int padding_limit = (ProblemShape::RankS == 1) ? 65536 : (ProblemShape::RankS == 2 ? 256 : 16);`。
+- **Line 363 / 第 363 行** — `    for (int i = 0; i < problem_shape.RankS; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < problem_shape.RankS; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < problem_shape.RankS; ++i) {`。
+- **Line 364 / 第 364 行** — `      implementable = implementable && problem_shape.lower_padding[i] <= padding_limit && problem_shape.lower_padding[i] >= 0;`
+  - **EN**: Adds template parameter specifier `implementable = implementable && problem_shape.lower_padding[i] <= padding_limit && problem_shape.lower_padding[i] >= 0;`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && problem_shape.lower_padding[i] <= padding_limit && problem_shape.lower_padding[i] >= 0;`。
+- **Line 365 / 第 365 行** — `      implementable = implementable && problem_shape.upper_padding[i] <= padding_limit && problem_shape.upper_padding[i] >= 0;`
+  - **EN**: Adds template parameter specifier `implementable = implementable && problem_shape.upper_padding[i] <= padding_limit && problem_shape.upper_padding[i] >= 0;`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && problem_shape.upper_padding[i] <= padding_limit && problem_shape.upper_padding[i] >= 0;`。
+- **Line 366 / 第 366 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 367 / 第 367 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 368 / 第 368 行** — `    if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 369 / 第 369 行** — `      CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Padding values don't meet requirements for TMA LOAD IM2COL.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Padding values don't meet requirements for TMA LOAD IM2COL.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Padding values don't meet requirements for TMA LOAD IM2COL.\n");`。
+- **Line 370 / 第 370 行** — `      return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 371 / 第 371 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 372 / 第 372 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 373 / 第 373 行** — `    if (is_im2col_A || is_im2col_B) {`
+  - **EN**: Adds template parameter specifier `if (is_im2col_A || is_im2col_B) {`.
+  - **CN**: 补充模板参数说明符 `if (is_im2col_A || is_im2col_B) {`。
+- **Line 374 / 第 374 行** — `      // Check valid corner values for TMA_LOAD_IM2COL, signed int ranging from [-corner_limit, corner_limit - 1]`
+  - **EN**: Adds template parameter specifier `// Check valid corner values for TMA_LOAD_IM2COL, signed int ranging from [-corner_limit, corner_limit - 1]`.
+  - **CN**: 补充模板参数说明符 `// Check valid corner values for TMA_LOAD_IM2COL, signed int ranging from [-corner_limit, corner_limit - 1]`。
+- **Line 375 / 第 375 行** — `      constexpr int32_t corner_limit = 1 << (16 / NumSpatialDimensions - 1);`
+  - **EN**: Adds template parameter specifier `constexpr int32_t corner_limit = 1 << (16 / NumSpatialDimensions - 1);`.
+  - **CN**: 补充模板参数说明符 `constexpr int32_t corner_limit = 1 << (16 / NumSpatialDimensions - 1);`。
+- **Line 376 / 第 376 行** — `      auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto lower_corner_whd = detail::compute_lower_corner_whd(problem_shape);`。
+- **Line 377 / 第 377 行** — `      for (int i = 0; i < problem_shape.RankS; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < problem_shape.RankS; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < problem_shape.RankS; ++i) {`。
+- **Line 378 / 第 378 行** — `        implementable = implementable && lower_corner_whd[i] >= -corner_limit && lower_corner_whd[i] <= (corner_limit - 1);`
+  - **EN**: Adds template parameter specifier `implementable = implementable && lower_corner_whd[i] >= -corner_limit && lower_corner_whd[i] <= (corner_limit - 1);`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && lower_corner_whd[i] >= -corner_limit && lower_corner_whd[i] <= (corner_limit - 1);`。
+- **Line 379 / 第 379 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 380 / 第 380 行** — `      auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto upper_corner_whd = detail::compute_upper_corner_whd(problem_shape);`。
+- **Line 381 / 第 381 行** — `      for (int i = 0; i < problem_shape.RankS; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < problem_shape.RankS; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < problem_shape.RankS; ++i) {`。
+- **Line 382 / 第 382 行** — `        implementable = implementable && upper_corner_whd[i] >= -corner_limit && upper_corner_whd[i] <= (corner_limit - 1);`
+  - **EN**: Adds template parameter specifier `implementable = implementable && upper_corner_whd[i] >= -corner_limit && upper_corner_whd[i] <= (corner_limit - 1);`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && upper_corner_whd[i] >= -corner_limit && upper_corner_whd[i] <= (corner_limit - 1);`。
+- **Line 383 / 第 383 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 384 / 第 384 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 385 / 第 385 行** — `      if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 386 / 第 386 行** — `        CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Padding values don't meet requirements for TMA LOAD IM2COL.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Padding values don't meet requirements for TMA LOAD IM2COL.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Padding values don't meet requirements for TMA LOAD IM2COL.\n");`。
+- **Line 387 / 第 387 行** — `        return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 388 / 第 388 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 389 / 第 389 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 390 / 第 390 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 391 / 第 391 行** — `    if (is_im2col_A || is_im2col_B) {`
+  - **EN**: Adds template parameter specifier `if (is_im2col_A || is_im2col_B) {`.
+  - **CN**: 补充模板参数说明符 `if (is_im2col_A || is_im2col_B) {`。
+- **Line 392 / 第 392 行** — `      // Check valid filter offsets for TMA_LOAD_IM2COL, unsigned int ranging from [0, offset_limit - 1]`
+  - **EN**: Adds template parameter specifier `// Check valid filter offsets for TMA_LOAD_IM2COL, unsigned int ranging from [0, offset_limit - 1]`.
+  - **CN**: 补充模板参数说明符 `// Check valid filter offsets for TMA_LOAD_IM2COL, unsigned int ranging from [0, offset_limit - 1]`。
+- **Line 393 / 第 393 行** — `      constexpr int32_t offset_limit = (1 << (16 / NumSpatialDimensions)) - 1;`
+  - **EN**: Adds template parameter specifier `constexpr int32_t offset_limit = (1 << (16 / NumSpatialDimensions)) - 1;`.
+  - **CN**: 补充模板参数说明符 `constexpr int32_t offset_limit = (1 << (16 / NumSpatialDimensions)) - 1;`。
+- **Line 394 / 第 394 行** — `      auto flt_data = (ConvOp == conv::Operator::kWgrad) ? problem_shape.shape_C : problem_shape.shape_B;`
+  - **EN**: Adds template parameter specifier `auto flt_data = (ConvOp == conv::Operator::kWgrad) ? problem_shape.shape_C : problem_shape.shape_B;`.
+  - **CN**: 补充模板参数说明符 `auto flt_data = (ConvOp == conv::Operator::kWgrad) ? problem_shape.shape_C : problem_shape.shape_B;`。
+- **Line 395 / 第 395 行** — `      for (int i = 0; i < problem_shape.RankS; ++i) {`
+  - **EN**: Adds template parameter specifier `for (int i = 0; i < problem_shape.RankS; ++i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = 0; i < problem_shape.RankS; ++i) {`。
+- **Line 396 / 第 396 行** — `        // flt_data array contains [K, T, R, S, C], so pure filter [T, R, S] starts from the second position in the array`
+  - **EN**: Adds template parameter specifier `// flt_data array contains [K, T, R, S, C], so pure filter [T, R, S] starts from the second position in the array`.
+  - **CN**: 补充模板参数说明符 `// flt_data array contains [K, T, R, S, C], so pure filter [T, R, S] starts from the second position in the array`。
+- **Line 397 / 第 397 行** — `        implementable = implementable && ((flt_data[i+1] - 1) * problem_shape.dilation[i] >= 0)`
+  - **EN**: Adds template parameter specifier `implementable = implementable && ((flt_data[i+1] - 1) * problem_shape.dilation[i] >= 0)`.
+  - **CN**: 补充模板参数说明符 `implementable = implementable && ((flt_data[i+1] - 1) * problem_shape.dilation[i] >= 0)`。
+- **Line 398 / 第 398 行** — `                                      && ((flt_data[i+1] - 1) * problem_shape.dilation[i] < offset_limit);`
+  - **EN**: Adds template parameter specifier `&& ((flt_data[i+1] - 1) * problem_shape.dilation[i] < offset_limit);`.
+  - **CN**: 补充模板参数说明符 `&& ((flt_data[i+1] - 1) * problem_shape.dilation[i] < offset_limit);`。
+- **Line 399 / 第 399 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 400 / 第 400 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 401 / 第 401 行** — `      if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 402 / 第 402 行** — `        CUTLASS_TRACE_HOST("  CAN IMPLEMENT: tensor coordinate offset values don't meet requirements for TMA LOAD IM2COL.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: tensor coordinate offset values don't meet requirements for TMA LOAD IM2COL.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: tensor coordinate offset values don't meet requirements for TMA LOAD IM2COL.\n");`。
+- **Line 403 / 第 403 行** — `        return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 404 / 第 404 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 405 / 第 405 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 406 / 第 406 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 407 / 第 407 行** — `    // Wgrad kernels don't support non-packed output strides, non-packed tensor A stride (linearized)`
+  - **EN**: Adds template parameter specifier `// Wgrad kernels don't support non-packed output strides, non-packed tensor A stride (linearized)`.
+  - **CN**: 补充模板参数说明符 `// Wgrad kernels don't support non-packed output strides, non-packed tensor A stride (linearized)`。
+- **Line 408 / 第 408 行** — `    if constexpr (ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Adds template parameter specifier `if constexpr (ConvOp == conv::Operator::kWgrad) {`.
+  - **CN**: 补充模板参数说明符 `if constexpr (ConvOp == conv::Operator::kWgrad) {`。
+- **Line 409 / 第 409 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 410 / 第 410 行** — `      std::ostringstream os;`
+  - **EN**: Adds template parameter specifier `std::ostringstream os;`.
+  - **CN**: 补充模板参数说明符 `std::ostringstream os;`。
+- **Line 411 / 第 411 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 412 / 第 412 行** — `      const auto & input_shape  = problem_shape.shape_A;`
+  - **EN**: Adds template parameter specifier `const auto & input_shape  = problem_shape.shape_A;`.
+  - **CN**: 补充模板参数说明符 `const auto & input_shape  = problem_shape.shape_A;`。
+- **Line 413 / 第 413 行** — `      const auto & input_stride  = problem_shape.stride_A;`
+  - **EN**: Adds template parameter specifier `const auto & input_stride  = problem_shape.stride_A;`.
+  - **CN**: 补充模板参数说明符 `const auto & input_stride  = problem_shape.stride_A;`。
+- **Line 414 / 第 414 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 415 / 第 415 行** — `      implementable &= input_stride[ProblemShape::RankT - 1] == 1;`
+  - **EN**: Adds template parameter specifier `implementable &= input_stride[ProblemShape::RankT - 1] == 1;`.
+  - **CN**: 补充模板参数说明符 `implementable &= input_stride[ProblemShape::RankT - 1] == 1;`。
+- **Line 416 / 第 416 行** — `      int64_t input_shape_size = 1;`
+  - **EN**: Adds template parameter specifier `int64_t input_shape_size = 1;`.
+  - **CN**: 补充模板参数说明符 `int64_t input_shape_size = 1;`。
+- **Line 417 / 第 417 行** — `      for (int i = ProblemShape::RankT - 2; i >= 0; --i) {`
+  - **EN**: Adds template parameter specifier `for (int i = ProblemShape::RankT - 2; i >= 0; --i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = ProblemShape::RankT - 2; i >= 0; --i) {`。
+- **Line 418 / 第 418 行** — `        input_shape_size *= input_shape[i + 1];`
+  - **EN**: Adds template parameter specifier `input_shape_size *= input_shape[i + 1];`.
+  - **CN**: 补充模板参数说明符 `input_shape_size *= input_shape[i + 1];`。
+- **Line 419 / 第 419 行** — `        implementable &= input_stride[i] == input_shape_size;`
+  - **EN**: Adds template parameter specifier `implementable &= input_stride[i] == input_shape_size;`.
+  - **CN**: 补充模板参数说明符 `implementable &= input_stride[i] == input_shape_size;`。
+- **Line 420 / 第 420 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 421 / 第 421 行** — `        if (input_stride[i] != input_shape_size) {`
+  - **EN**: Adds template parameter specifier `if (input_stride[i] != input_shape_size) {`.
+  - **CN**: 补充模板参数说明符 `if (input_stride[i] != input_shape_size) {`。
+- **Line 422 / 第 422 行** — `          os << "\n    *** input_stride[" << i << "] = " << input_stride[i] << " != input_shape_size = " << input_shape_size << " ***";`
+  - **EN**: Adds template parameter specifier `os << "\n    *** input_stride[" << i << "] = " << input_stride[i] << " != input_shape_size = " << input_shape_size << " ***";`.
+  - **CN**: 补充模板参数说明符 `os << "\n    *** input_stride[" << i << "] = " << input_stride[i] << " != input_shape_size = " << input_shape_size << " ***";`。
+- **Line 423 / 第 423 行** — `        }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 424 / 第 424 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 425 / 第 425 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 426 / 第 426 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 427 / 第 427 行** — `      if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 428 / 第 428 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 429 / 第 429 行** — `        os << "\n    input_shape_size: " << input_shape_size`
+  - **EN**: Adds template parameter specifier `os << "\n    input_shape_size: " << input_shape_size`.
+  - **CN**: 补充模板参数说明符 `os << "\n    input_shape_size: " << input_shape_size`。
+- **Line 430 / 第 430 行** — `           << "\n    input_shape: " << input_shape`
+  - **EN**: Adds template parameter specifier `<< "\n    input_shape: " << input_shape`.
+  - **CN**: 补充模板参数说明符 `<< "\n    input_shape: " << input_shape`。
+- **Line 431 / 第 431 行** — `           << "\n    input_stride: " << input_stride`
+  - **EN**: Adds template parameter specifier `<< "\n    input_stride: " << input_stride`.
+  - **CN**: 补充模板参数说明符 `<< "\n    input_stride: " << input_stride`。
+- **Line 432 / 第 432 行** — `           << "\n";`
+  - **EN**: Adds template parameter specifier `<< "\n";`.
+  - **CN**: 补充模板参数说明符 `<< "\n";`。
+- **Line 433 / 第 433 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 434 / 第 434 行** — `        CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Wgrad kernels don't support non-packed input strides.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Wgrad kernels don't support non-packed input strides.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Wgrad kernels don't support non-packed input strides.\n");`。
+- **Line 435 / 第 435 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 436 / 第 436 行** — `        CUTLASS_TRACE_HOST(os.str());`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST(os.str());`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST(os.str());`。
+- **Line 437 / 第 437 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 438 / 第 438 行** — `        return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 439 / 第 439 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 440 / 第 440 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 441 / 第 441 行** — `      const auto & output_shape  = problem_shape.shape_C;`
+  - **EN**: Adds template parameter specifier `const auto & output_shape  = problem_shape.shape_C;`.
+  - **CN**: 补充模板参数说明符 `const auto & output_shape  = problem_shape.shape_C;`。
+- **Line 442 / 第 442 行** — `      const auto & output_stride  = problem_shape.stride_C;`
+  - **EN**: Adds template parameter specifier `const auto & output_stride  = problem_shape.stride_C;`.
+  - **CN**: 补充模板参数说明符 `const auto & output_stride  = problem_shape.stride_C;`。
+- **Line 443 / 第 443 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 444 / 第 444 行** — `      implementable &= output_stride[ProblemShape::RankT - 1] == 1;`
+  - **EN**: Adds template parameter specifier `implementable &= output_stride[ProblemShape::RankT - 1] == 1;`.
+  - **CN**: 补充模板参数说明符 `implementable &= output_stride[ProblemShape::RankT - 1] == 1;`。
+- **Line 445 / 第 445 行** — `      int64_t output_shape_size = 1;`
+  - **EN**: Adds template parameter specifier `int64_t output_shape_size = 1;`.
+  - **CN**: 补充模板参数说明符 `int64_t output_shape_size = 1;`。
+- **Line 446 / 第 446 行** — `      for (int i = ProblemShape::RankT - 2; i >= 0; --i) {`
+  - **EN**: Adds template parameter specifier `for (int i = ProblemShape::RankT - 2; i >= 0; --i) {`.
+  - **CN**: 补充模板参数说明符 `for (int i = ProblemShape::RankT - 2; i >= 0; --i) {`。
+- **Line 447 / 第 447 行** — `        output_shape_size *= output_shape[i + 1];`
+  - **EN**: Adds template parameter specifier `output_shape_size *= output_shape[i + 1];`.
+  - **CN**: 补充模板参数说明符 `output_shape_size *= output_shape[i + 1];`。
+- **Line 448 / 第 448 行** — `        implementable &= output_stride[i] == output_shape_size;`
+  - **EN**: Adds template parameter specifier `implementable &= output_stride[i] == output_shape_size;`.
+  - **CN**: 补充模板参数说明符 `implementable &= output_stride[i] == output_shape_size;`。
+- **Line 449 / 第 449 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 450 / 第 450 行** — `        if (output_stride[i] != output_shape_size) {`
+  - **EN**: Adds template parameter specifier `if (output_stride[i] != output_shape_size) {`.
+  - **CN**: 补充模板参数说明符 `if (output_stride[i] != output_shape_size) {`。
+- **Line 451 / 第 451 行** — `          os << "\n    *** output_stride[" << i << "] = " << output_stride[i] << " != output_shape_size = " << output_shape_size << " ***";`
+  - **EN**: Adds template parameter specifier `os << "\n    *** output_stride[" << i << "] = " << output_stride[i] << " != output_shape_size = " << output_shape_size << " ***";`.
+  - **CN**: 补充模板参数说明符 `os << "\n    *** output_stride[" << i << "] = " << output_stride[i] << " != output_shape_size = " << output_shape_size << " ***";`。
+- **Line 452 / 第 452 行** — `        }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 453 / 第 453 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 454 / 第 454 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 455 / 第 455 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 456 / 第 456 行** — `      if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 457 / 第 457 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 458 / 第 458 行** — `        os << "\n    output_shape_size: " << input_shape_size`
+  - **EN**: Adds template parameter specifier `os << "\n    output_shape_size: " << input_shape_size`.
+  - **CN**: 补充模板参数说明符 `os << "\n    output_shape_size: " << input_shape_size`。
+- **Line 459 / 第 459 行** — `           << "\n    output_shape: " << input_shape`
+  - **EN**: Adds template parameter specifier `<< "\n    output_shape: " << input_shape`.
+  - **CN**: 补充模板参数说明符 `<< "\n    output_shape: " << input_shape`。
+- **Line 460 / 第 460 行** — `           << "\n    output_stride: " << input_stride`
+  - **EN**: Adds template parameter specifier `<< "\n    output_stride: " << input_stride`.
+  - **CN**: 补充模板参数说明符 `<< "\n    output_stride: " << input_stride`。
+- **Line 461 / 第 461 行** — `           << "\n";`
+  - **EN**: Adds template parameter specifier `<< "\n";`.
+  - **CN**: 补充模板参数说明符 `<< "\n";`。
+- **Line 462 / 第 462 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 463 / 第 463 行** — `        CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Wgrad kernels don't support non-packed output strides.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Wgrad kernels don't support non-packed output strides.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Wgrad kernels don't support non-packed output strides.\n");`。
+- **Line 464 / 第 464 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Adds template parameter specifier `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`.
+  - **CN**: 补充模板参数说明符 `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`。
+- **Line 465 / 第 465 行** — `        CUTLASS_TRACE_HOST(os.str());`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST(os.str());`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST(os.str());`。
+- **Line 466 / 第 466 行** — `#endif`
+  - **EN**: Adds template parameter specifier `#endif`.
+  - **CN**: 补充模板参数说明符 `#endif`。
+- **Line 467 / 第 467 行** — `        return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 468 / 第 468 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 469 / 第 469 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 470 / 第 470 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 471 / 第 471 行** — `    // Conv kernels only support cross correlation mode currently.`
+  - **EN**: Adds template parameter specifier `// Conv kernels only support cross correlation mode currently.`.
+  - **CN**: 补充模板参数说明符 `// Conv kernels only support cross correlation mode currently.`。
+- **Line 472 / 第 472 行** — `    implementable &= problem_shape.mode == cutlass::conv::Mode::kCrossCorrelation;`
+  - **EN**: Adds template parameter specifier `implementable &= problem_shape.mode == cutlass::conv::Mode::kCrossCorrelation;`.
+  - **CN**: 补充模板参数说明符 `implementable &= problem_shape.mode == cutlass::conv::Mode::kCrossCorrelation;`。
+- **Line 473 / 第 473 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 474 / 第 474 行** — `    if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 475 / 第 475 行** — `      CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Conv kernels only support cross correlation mode currently.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Conv kernels only support cross correlation mode currently.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: Conv kernels only support cross correlation mode currently.\n");`。
+- **Line 476 / 第 476 行** — `      return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 477 / 第 477 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 478 / 第 478 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 479 / 第 479 行** — `    if (problem_shape.groups > 1) {`
+  - **EN**: Adds template parameter specifier `if (problem_shape.groups > 1) {`.
+  - **CN**: 补充模板参数说明符 `if (problem_shape.groups > 1) {`。
+- **Line 480 / 第 480 行** — `      CUTLASS_TRACE_HOST("  CAN IMPLEMENT: This kernel does not support conv groups > 1.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: This kernel does not support conv groups > 1.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: This kernel does not support conv groups > 1.\n");`。
+- **Line 481 / 第 481 行** — `      return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 482 / 第 482 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 483 / 第 483 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 484 / 第 484 行** — `    if constexpr (is_im2col_A || is_im2col_B) {`
+  - **EN**: Adds template parameter specifier `if constexpr (is_im2col_A || is_im2col_B) {`.
+  - **CN**: 补充模板参数说明符 `if constexpr (is_im2col_A || is_im2col_B) {`。
+- **Line 485 / 第 485 行** — `      auto [M, N, K, L] = cutlass::conv::detail::get_transformed_problem_shape_MNKL(problem_shape);`
+  - **EN**: Adds template parameter specifier `auto [M, N, K, L] = cutlass::conv::detail::get_transformed_problem_shape_MNKL(problem_shape);`.
+  - **CN**: 补充模板参数说明符 `auto [M, N, K, L] = cutlass::conv::detail::get_transformed_problem_shape_MNKL(problem_shape);`。
+- **Line 486 / 第 486 行** — `      auto to_64b = [](auto S) { return transform_leaf(S, [](auto s) { return static_cast<int64_t>(s); }); };`
+  - **EN**: Adds template parameter specifier `auto to_64b = [](auto S) { return transform_leaf(S, [](auto s) { return static_cast<int64_t>(s); }); };`.
+  - **CN**: 补充模板参数说明符 `auto to_64b = [](auto S) { return transform_leaf(S, [](auto s) { return static_cast<int64_t>(s); }); };`。
+- **Line 487 / 第 487 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 488 / 第 488 行** — `      if constexpr (ConvOp == conv::Operator::kFprop || ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Adds template parameter specifier `if constexpr (ConvOp == conv::Operator::kFprop || ConvOp == conv::Operator::kDgrad) {`.
+  - **CN**: 补充模板参数说明符 `if constexpr (ConvOp == conv::Operator::kFprop || ConvOp == conv::Operator::kDgrad) {`。
+- **Line 489 / 第 489 行** — `        implementable &= (cute::product(to_64b(M)) <= cutlass::platform::numeric_limits<int32_t>::max()) &`
+  - **EN**: Adds template parameter specifier `implementable &= (cute::product(to_64b(M)) <= cutlass::platform::numeric_limits<int32_t>::max()) &`.
+  - **CN**: 补充模板参数说明符 `implementable &= (cute::product(to_64b(M)) <= cutlass::platform::numeric_limits<int32_t>::max()) &`。
+- **Line 490 / 第 490 行** — `                         (cute::product(to_64b(L)) <= cutlass::platform::numeric_limits<int32_t>::max());`
+  - **EN**: Adds template parameter specifier `(cute::product(to_64b(L)) <= cutlass::platform::numeric_limits<int32_t>::max());`.
+  - **CN**: 补充模板参数说明符 `(cute::product(to_64b(L)) <= cutlass::platform::numeric_limits<int32_t>::max());`。
+- **Line 491 / 第 491 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 492 / 第 492 行** — `      else if constexpr (ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Adds template parameter specifier `else if constexpr (ConvOp == conv::Operator::kWgrad) {`.
+  - **CN**: 补充模板参数说明符 `else if constexpr (ConvOp == conv::Operator::kWgrad) {`。
+- **Line 493 / 第 493 行** — `        implementable &= (cute::product(to_64b(K)) <= cutlass::platform::numeric_limits<int32_t>::max());`
+  - **EN**: Adds template parameter specifier `implementable &= (cute::product(to_64b(K)) <= cutlass::platform::numeric_limits<int32_t>::max());`.
+  - **CN**: 补充模板参数说明符 `implementable &= (cute::product(to_64b(K)) <= cutlass::platform::numeric_limits<int32_t>::max());`。
+- **Line 494 / 第 494 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 495 / 第 495 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 496 / 第 496 行** — `      if (!implementable) {`
+  - **EN**: Adds template parameter specifier `if (!implementable) {`.
+  - **CN**: 补充模板参数说明符 `if (!implementable) {`。
+- **Line 497 / 第 497 行** — `        CUTLASS_TRACE_HOST("  CAN IMPLEMENT: the extents exceed the maximum number.\n");`
+  - **EN**: Adds template parameter specifier `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: the extents exceed the maximum number.\n");`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_TRACE_HOST("  CAN IMPLEMENT: the extents exceed the maximum number.\n");`。
+- **Line 498 / 第 498 行** — `        return false;`
+  - **EN**: Adds template parameter specifier `return false;`.
+  - **CN**: 补充模板参数说明符 `return false;`。
+- **Line 499 / 第 499 行** — `      }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 500 / 第 500 行** — `    }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 501 / 第 501 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 502 / 第 502 行** — `    return true;`
+  - **EN**: Adds template parameter specifier `return true;`.
+  - **CN**: 补充模板参数说明符 `return true;`。
+- **Line 503 / 第 503 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 504 / 第 504 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 505 / 第 505 行** — `  /// Issue Tma Descriptor Prefetch -- ideally from a single thread for best performance`
+  - **EN**: Adds template parameter specifier `/// Issue Tma Descriptor Prefetch -- ideally from a single thread for best performance`.
+  - **CN**: 补充模板参数说明符 `/// Issue Tma Descriptor Prefetch -- ideally from a single thread for best performance`。
+- **Line 506 / 第 506 行** — `  CUTLASS_DEVICE`
+  - **EN**: Adds template parameter specifier `CUTLASS_DEVICE`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_DEVICE`。
+- **Line 507 / 第 507 行** — `  static void prefetch_tma_descriptors(Params const& mainloop_params) {`
+  - **EN**: Adds template parameter specifier `static void prefetch_tma_descriptors(Params const& mainloop_params) {`.
+  - **CN**: 补充模板参数说明符 `static void prefetch_tma_descriptors(Params const& mainloop_params) {`。
+- **Line 508 / 第 508 行** — `    cute::prefetch_tma_descriptor(mainloop_params.tma_load_a.get_tma_descriptor());`
+  - **EN**: Adds template parameter specifier `cute::prefetch_tma_descriptor(mainloop_params.tma_load_a.get_tma_descriptor());`.
+  - **CN**: 补充模板参数说明符 `cute::prefetch_tma_descriptor(mainloop_params.tma_load_a.get_tma_descriptor());`。
+- **Line 509 / 第 509 行** — `    cute::prefetch_tma_descriptor(mainloop_params.tma_load_b.get_tma_descriptor());`
+  - **EN**: Adds template parameter specifier `cute::prefetch_tma_descriptor(mainloop_params.tma_load_b.get_tma_descriptor());`.
+  - **CN**: 补充模板参数说明符 `cute::prefetch_tma_descriptor(mainloop_params.tma_load_b.get_tma_descriptor());`。
+- **Line 510 / 第 510 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 511 / 第 511 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 512 / 第 512 行** — `  /// Set up the data needed by this collective for load and mma.`
+  - **EN**: Adds template parameter specifier `/// Set up the data needed by this collective for load and mma.`.
+  - **CN**: 补充模板参数说明符 `/// Set up the data needed by this collective for load and mma.`。
+- **Line 513 / 第 513 行** — `  /// Returns a tuple of tensors. The collective and the kernel layer have the contract`
+  - **EN**: Adds template parameter specifier `/// Returns a tuple of tensors. The collective and the kernel layer have the contract`.
+  - **CN**: 补充模板参数说明符 `/// Returns a tuple of tensors. The collective and the kernel layer have the contract`。
+- **Line 514 / 第 514 行** — `  /// Returned tuple must contain at least two elements, with the first two elements being:`
+  - **EN**: Adds template parameter specifier `/// Returned tuple must contain at least two elements, with the first two elements being:`.
+  - **CN**: 补充模板参数说明符 `/// Returned tuple must contain at least two elements, with the first two elements being:`。
+- **Line 515 / 第 515 行** — `  /// gA_mk - The tma tensor, A after a local tile so it has shape  (BLK_M,BLK_K,m,k)`
+  - **EN**: Adds template parameter specifier `/// gA_mk - The tma tensor, A after a local tile so it has shape  (BLK_M,BLK_K,m,k)`.
+  - **CN**: 补充模板参数说明符 `/// gA_mk - The tma tensor, A after a local tile so it has shape  (BLK_M,BLK_K,m,k)`。
+- **Line 516 / 第 516 行** — `  /// gB_nk - The tma tensor, B after a local tile so it has shape  (BLK_N,BLK_K,n,k)`
+  - **EN**: Adds template parameter specifier `/// gB_nk - The tma tensor, B after a local tile so it has shape  (BLK_N,BLK_K,n,k)`.
+  - **CN**: 补充模板参数说明符 `/// gB_nk - The tma tensor, B after a local tile so it has shape  (BLK_N,BLK_K,n,k)`。
+- **Line 517 / 第 517 行** — `  /// The rest of the tensors can be specified as needed by this collective.`
+  - **EN**: Adds template parameter specifier `/// The rest of the tensors can be specified as needed by this collective.`.
+  - **CN**: 补充模板参数说明符 `/// The rest of the tensors can be specified as needed by this collective.`。
+- **Line 518 / 第 518 行** — `  /// The dimensions of gA_mk and gA_nk do not contain L to maintain consistency with`
+  - **EN**: Adds template parameter specifier `/// The dimensions of gA_mk and gA_nk do not contain L to maintain consistency with`.
+  - **CN**: 补充模板参数说明符 `/// The dimensions of gA_mk and gA_nk do not contain L to maintain consistency with`。
+- **Line 519 / 第 519 行** — `  /// StrideA and StrideB set up for TMA`
+  - **EN**: Adds template parameter specifier `/// StrideA and StrideB set up for TMA`.
+  - **CN**: 补充模板参数说明符 `/// StrideA and StrideB set up for TMA`。
+- **Line 520 / 第 520 行** — `  template <class ProblemShapeMNKL>`
+  - **EN**: Starts a template declaration with specifier `class ProblemShapeMNKL`.
+  - **CN**: 开始一个模板声明，说明符为 `class ProblemShapeMNKL`。
+- **Line 521 / 第 521 行** — `  CUTLASS_DEVICE auto`
+  - **EN**: Adds template parameter specifier `CUTLASS_DEVICE auto`.
+  - **CN**: 补充模板参数说明符 `CUTLASS_DEVICE auto`。
+- **Line 522 / 第 522 行** — `  load_init(ProblemShapeMNKL const& problem_shape_MNKL, Params const& mainloop_params){`
+  - **EN**: Adds template parameter specifier `load_init(ProblemShapeMNKL const& problem_shape_MNKL, Params const& mainloop_params){`.
+  - **CN**: 补充模板参数说明符 `load_init(ProblemShapeMNKL const& problem_shape_MNKL, Params const& mainloop_params){`。
+- **Line 523 / 第 523 行** — `  //load_init(ProblemShapeMNKL const& problem_shape_MNKL, Params const& mainloop_params) const {`
+  - **EN**: Adds template parameter specifier `//load_init(ProblemShapeMNKL const& problem_shape_MNKL, Params const& mainloop_params) const {`.
+  - **CN**: 补充模板参数说明符 `//load_init(ProblemShapeMNKL const& problem_shape_MNKL, Params const& mainloop_params) const {`。
+- **Line 524 / 第 524 行** — `    using X = Underscore;`
+  - **EN**: Adds template parameter specifier `using X = Underscore;`.
+  - **CN**: 补充模板参数说明符 `using X = Underscore;`。
+- **Line 525 / 第 525 行** — `    // Separate out problem shape for convenience`
+  - **EN**: Adds template parameter specifier `// Separate out problem shape for convenience`.
+  - **CN**: 补充模板参数说明符 `// Separate out problem shape for convenience`。
+- **Line 526 / 第 526 行** — `    auto [M, N, K, L] = problem_shape_MNKL;`
+  - **EN**: Adds template parameter specifier `auto [M, N, K, L] = problem_shape_MNKL;`.
+  - **CN**: 补充模板参数说明符 `auto [M, N, K, L] = problem_shape_MNKL;`。
+- **Line 527 / 第 527 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 528 / 第 528 行** — `    // TMA requires special handling of strides to deal with coord codomain mapping`
+  - **EN**: Adds template parameter specifier `// TMA requires special handling of strides to deal with coord codomain mapping`.
+  - **CN**: 补充模板参数说明符 `// TMA requires special handling of strides to deal with coord codomain mapping`。
+- **Line 529 / 第 529 行** — `    // Represent the full tensors -- get these from TMA`
+  - **EN**: Adds template parameter specifier `// Represent the full tensors -- get these from TMA`.
+  - **CN**: 补充模板参数说明符 `// Represent the full tensors -- get these from TMA`。
+- **Line 530 / 第 530 行** — `    Tensor mA_mk = mainloop_params.tma_load_a.get_tma_tensor(make_shape(M,K));                            // (m,k)`
+  - **EN**: Adds template parameter specifier `Tensor mA_mk = mainloop_params.tma_load_a.get_tma_tensor(make_shape(M,K));                            // (m,k)`.
+  - **CN**: 补充模板参数说明符 `Tensor mA_mk = mainloop_params.tma_load_a.get_tma_tensor(make_shape(M,K));                            // (m,k)`。
+- **Line 531 / 第 531 行** — `    Tensor mB_nk = mainloop_params.tma_load_b.get_tma_tensor(make_shape(N,K));                            // (n,k)`
+  - **EN**: Adds template parameter specifier `Tensor mB_nk = mainloop_params.tma_load_b.get_tma_tensor(make_shape(N,K));                            // (n,k)`.
+  - **CN**: 补充模板参数说明符 `Tensor mB_nk = mainloop_params.tma_load_b.get_tma_tensor(make_shape(N,K));                            // (n,k)`。
+- **Line 532 / 第 532 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 533 / 第 533 行** — `    // Make tiled views, defer the slice`
+  - **EN**: Adds template parameter specifier `// Make tiled views, defer the slice`.
+  - **CN**: 补充模板参数说明符 `// Make tiled views, defer the slice`。
+- **Line 534 / 第 534 行** — `    Tensor gA_mk = local_tile(mA_mk, TileShape{}, make_coord(_,_,_), Step<_1, X,_1>{});        // (BLK_M,BLK_K,m,k)`
+  - **EN**: Adds template parameter specifier `Tensor gA_mk = local_tile(mA_mk, TileShape{}, make_coord(_,_,_), Step<_1, X,_1>{});        // (BLK_M,BLK_K,m,k)`.
+  - **CN**: 补充模板参数说明符 `Tensor gA_mk = local_tile(mA_mk, TileShape{}, make_coord(_,_,_), Step<_1, X,_1>{});        // (BLK_M,BLK_K,m,k)`。
+- **Line 535 / 第 535 行** — `    Tensor gB_nk = local_tile(mB_nk, TileShape{}, make_coord(_,_,_), Step< X,_1,_1>{});        // (BLK_N,BLK_K,n,k)`
+  - **EN**: Adds template parameter specifier `Tensor gB_nk = local_tile(mB_nk, TileShape{}, make_coord(_,_,_), Step< X,_1,_1>{});        // (BLK_N,BLK_K,n,k)`.
+  - **CN**: 补充模板参数说明符 `Tensor gB_nk = local_tile(mB_nk, TileShape{}, make_coord(_,_,_), Step< X,_1,_1>{});        // (BLK_N,BLK_K,n,k)`。
+- **Line 536 / 第 536 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 537 / 第 537 行** — `    return cute::make_tuple(gA_mk, gB_nk);`
+  - **EN**: Adds template parameter specifier `return cute::make_tuple(gA_mk, gB_nk);`.
+  - **CN**: 补充模板参数说明符 `return cute::make_tuple(gA_mk, gB_nk);`。
+- **Line 538 / 第 538 行** — `  }`
+  - **EN**: Adds template parameter specifier `}`.
+  - **CN**: 补充模板参数说明符 `}`。
+- **Line 539 / 第 539 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 540 / 第 540 行** — `  /// Perform a collective-scoped matrix multiply-accumulate`
+  - **EN**: Adds template parameter specifier `/// Perform a collective-scoped matrix multiply-accumulate`.
+  - **CN**: 补充模板参数说明符 `/// Perform a collective-scoped matrix multiply-accumulate`。
+- **Line 541 / 第 541 行** — `  /// Producer Perspective`
+  - **EN**: Adds template parameter specifier `/// Producer Perspective`.
+  - **CN**: 补充模板参数说明符 `/// Producer Perspective`。
+- **Line 542 / 第 542 行** — `  template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 543 / 第 543 行** — `    class TensorA, class TensorB,`
+  - **EN**: Adds template parameter specifier `class TensorA, class TensorB`.
+  - **CN**: 补充模板参数说明符 `class TensorA, class TensorB`。
+- **Line 544 / 第 544 行** — `    class KTileIterator, class BlockCoord`
+  - **EN**: Adds template parameter specifier `class KTileIterator, class BlockCoord`.
+  - **CN**: 补充模板参数说明符 `class KTileIterator, class BlockCoord`。
+- **Line 545 / 第 545 行** — `  >`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 546 / 第 546 行** — `  CUTLASS_DEVICE void`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 547 / 第 547 行** — `  load(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 548 / 第 548 行** — `      Params const& mainloop_params,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 549 / 第 549 行** — `      MainloopPipeline pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 550 / 第 550 行** — `      PipelineState smem_pipe_producer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 551 / 第 551 行** — `      cute::tuple<TensorA, TensorB> const& load_inputs,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 552 / 第 552 行** — `      BlockCoord const& blk_coord,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 553 / 第 553 行** — `      KTileIterator k_tile_iter, int k_tile_count,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 554 / 第 554 行** — `      int thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 555 / 第 555 行** — `      uint32_t block_rank_in_cluster,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 556 / 第 556 行** — `      TensorStorage& shared_tensors) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 557 / 第 557 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 558 / 第 558 行** — `    int lane_predicate = cute::elect_one_sync();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 559 / 第 559 行** — `    if (lane_predicate) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 560 / 第 560 行** — `      Tensor sA = make_tensor(make_smem_ptr(shared_tensors.smem_A.data()), SmemLayoutA{});        // (BLK_M,BLK_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 561 / 第 561 行** — `      Tensor sB = make_tensor(make_smem_ptr(shared_tensors.smem_B.data()), SmemLayoutB{});        // (BLK_N,BLK_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 562 / 第 562 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 563 / 第 563 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 564 / 第 564 行** — `      // Prepare the TMA loads for A and B`
+  - **EN**: Inline comment explaining intent: `Prepare the TMA loads for A and B`.
+  - **CN**: 行内注释说明意图：`Prepare the TMA loads for A and B`。
+- **Line 565 / 第 565 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 566 / 第 566 行** — `      constexpr uint32_t cluster_shape_x = get<0>(ClusterShape());`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 567 / 第 567 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 568 / 第 568 行** — `      uint2 cluster_local_block_id = {block_rank_in_cluster % cluster_shape_x, block_rank_in_cluster / cluster_shape_x};`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 569 / 第 569 行** — `      auto block_tma_a = mainloop_params.tma_load_a.get_slice(cluster_local_block_id.y);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 570 / 第 570 行** — `      auto block_tma_b = mainloop_params.tma_load_b.get_slice(cluster_local_block_id.x);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 571 / 第 571 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 572 / 第 572 行** — `      auto [gA_mk, gB_nk] = load_inputs;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 573 / 第 573 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 574 / 第 574 行** — `      // Partition the inputs based on the current block coordinates.`
+  - **EN**: Inline comment explaining intent: `Partition the inputs based on the current block coordinates.`.
+  - **CN**: 行内注释说明意图：`Partition the inputs based on the current block coordinates.`。
+- **Line 575 / 第 575 行** — `      auto [m_coord, n_coord, k_coord, l_coord] = blk_coord;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 576 / 第 576 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 577 / 第 577 行** — `      Tensor gA = gA_mk(_,_,m_coord,_);                                                     // (BLK_M,BLK_K,k)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 578 / 第 578 行** — `      Tensor gB = gB_nk(_,_,n_coord,_);                                                     // (BLK_N,BLK_K,k)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 579 / 第 579 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 580 / 第 580 行** — `      // Applies the mapping from block_tma_a`
+  - **EN**: Inline comment explaining intent: `Applies the mapping from block_tma_a`.
+  - **CN**: 行内注释说明意图：`Applies the mapping from block_tma_a`。
+- **Line 581 / 第 581 行** — `      Tensor tAgA = block_tma_a.partition_S(gA);                                                 // (TMA,TMA_M,TMA_K,k)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 582 / 第 582 行** — `      Tensor tAsA = block_tma_a.partition_D(sA);                                              // (TMA,TMA_M,TMA_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 583 / 第 583 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 584 / 第 584 行** — `      Tensor tBgB = block_tma_b.partition_S(gB);                                                 // (TMA,TMA_N,TMA_K,k)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 585 / 第 585 行** — `      Tensor tBsB = block_tma_b.partition_D(sB);                                              // (TMA,TMA_N,TMA_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 586 / 第 586 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 587 / 第 587 行** — `      uint16_t mcast_mask_a = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 588 / 第 588 行** — `      uint16_t mcast_mask_b = 0;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 589 / 第 589 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 590 / 第 590 行** — `      // Issue TmaLoads`
+  - **EN**: Inline comment explaining intent: `Issue TmaLoads`.
+  - **CN**: 行内注释说明意图：`Issue TmaLoads`。
+- **Line 591 / 第 591 行** — `      // Maps the tile -> block, value`
+  - **EN**: Inline comment explaining intent: `Maps the tile -> block, value`.
+  - **CN**: 行内注释说明意图：`Maps the tile -> block, value`。
+- **Line 592 / 第 592 行** — `      if constexpr (cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_IM2COL_MULTICAST> ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 593 / 第 593 行** — `                    cute::is_same_v<GmemTiledCopyA, SM90_TMA_LOAD_MULTICAST>) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 594 / 第 594 行** — `        auto block_layout = Layout<typename DispatchPolicy::ClusterShape>{}; // (m,n) -> block_id`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 595 / 第 595 行** — `        for (int n = 0; n < size<1>(block_layout); ++n) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 596 / 第 596 行** — `          mcast_mask_a |= (uint16_t(1) << block_layout(cluster_local_block_id.x,n,Int<0>{}));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 597 / 第 597 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 598 / 第 598 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 599 / 第 599 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 600 / 第 600 行** — `      if constexpr (cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_IM2COL_MULTICAST> ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 601 / 第 601 行** — `                    cute::is_same_v<GmemTiledCopyB, SM90_TMA_LOAD_MULTICAST>) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 602 / 第 602 行** — `        auto block_layout = Layout<typename DispatchPolicy::ClusterShape>{}; // (m,n) -> block_id`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 603 / 第 603 行** — `        for (int m = 0; m < size<0>(block_layout); ++m) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 604 / 第 604 行** — `          mcast_mask_b |= (uint16_t(1) << block_layout(m,cluster_local_block_id.y,Int<0>{}));`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 605 / 第 605 行** — `        }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 606 / 第 606 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 607 / 第 607 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 608 / 第 608 行** — `      // Mainloop`
+  - **EN**: Inline comment explaining intent: `Mainloop`.
+  - **CN**: 行内注释说明意图：`Mainloop`。
+- **Line 609 / 第 609 行** — `      CUTLASS_PRAGMA_NO_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 610 / 第 610 行** — `      for ( ; k_tile_count > 0; --k_tile_count) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 611 / 第 611 行** — `        // LOCK smem_pipe_producer_state for _writing_`
+  - **EN**: Inline comment explaining intent: `LOCK smem_pipe_producer_state for _writing_`.
+  - **CN**: 行内注释说明意图：`LOCK smem_pipe_producer_state for _writing_`。
+- **Line 612 / 第 612 行** — `        pipeline.producer_acquire(smem_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 613 / 第 613 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 614 / 第 614 行** — `        //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 615 / 第 615 行** — `        // Copy gmem to smem for *k_tile_iter`
+  - **EN**: Inline comment explaining intent: `Copy gmem to smem for *k_tile_iter`.
+  - **CN**: 行内注释说明意图：`Copy gmem to smem for *k_tile_iter`。
+- **Line 616 / 第 616 行** — `        //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 617 / 第 617 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 618 / 第 618 行** — `        using BarrierType = typename MainloopPipeline::ProducerBarrierType;`
+  - **EN**: Introduces type or value alias `BarrierType`.
+  - **CN**: 引入类型或值别名 `BarrierType`。
+- **Line 619 / 第 619 行** — `        BarrierType* tma_barrier = pipeline.producer_get_barrier(smem_pipe_producer_state);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 620 / 第 620 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 621 / 第 621 行** — `        int write_stage = smem_pipe_producer_state.index();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 622 / 第 622 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 623 / 第 623 行** — `        copy(mainloop_params.tma_load_a.with(*tma_barrier, mcast_mask_a), tAgA(_,_,_,*k_tile_iter), tAsA(_,_,_,write_stage));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 624 / 第 624 行** — `        copy(mainloop_params.tma_load_b.with(*tma_barrier, mcast_mask_b), tBgB(_,_,_,*k_tile_iter), tBsB(_,_,_,write_stage));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 625 / 第 625 行** — `        ++k_tile_iter;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 626 / 第 626 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 627 / 第 627 行** — `        // Advance smem_pipe_producer_state`
+  - **EN**: Inline comment explaining intent: `Advance smem_pipe_producer_state`.
+  - **CN**: 行内注释说明意图：`Advance smem_pipe_producer_state`。
+- **Line 628 / 第 628 行** — `        ++smem_pipe_producer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 629 / 第 629 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 630 / 第 630 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 631 / 第 631 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 632 / 第 632 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 633 / 第 633 行** — `  /// Perform a Producer Epilogue to prevent early exit of blocks in a Cluster`
+  - **EN**: Inline comment explaining intent: `Perform a Producer Epilogue to prevent early exit of blocks in a Cluster`.
+  - **CN**: 行内注释说明意图：`Perform a Producer Epilogue to prevent early exit of blocks in a Cluster`。
+- **Line 634 / 第 634 行** — `  CUTLASS_DEVICE void`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 635 / 第 635 行** — `  load_tail(MainloopPipeline pipeline, PipelineState smem_pipe_producer_state) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 636 / 第 636 行** — `    int lane_predicate = cute::elect_one_sync();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 637 / 第 637 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 638 / 第 638 行** — `    // Issue the epilogue waits`
+  - **EN**: Inline comment explaining intent: `Issue the epilogue waits`.
+  - **CN**: 行内注释说明意图：`Issue the epilogue waits`。
+- **Line 639 / 第 639 行** — `    if (lane_predicate) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 640 / 第 640 行** — `      /* This helps avoid early exit of blocks in Cluster`
+  - **EN**: Documentation/comment text: `This helps avoid early exit of blocks in Cluster`.
+  - **CN**: 文档/注释内容：`This helps avoid early exit of blocks in Cluster`。
+- **Line 641 / 第 641 行** — `       * Waits for all stages to either be released (all`
+  - **EN**: Documentation/comment text: `Waits for all stages to either be released (all`.
+  - **CN**: 文档/注释内容：`Waits for all stages to either be released (all`。
+- **Line 642 / 第 642 行** — `       * Consumer UNLOCKs), or if the stage was never used`
+  - **EN**: Documentation/comment text: `Consumer UNLOCKs), or if the stage was never used`.
+  - **CN**: 文档/注释内容：`Consumer UNLOCKs), or if the stage was never used`。
+- **Line 643 / 第 643 行** — `       * then would just be acquired since the phase was`
+  - **EN**: Documentation/comment text: `then would just be acquired since the phase was`.
+  - **CN**: 文档/注释内容：`then would just be acquired since the phase was`。
+- **Line 644 / 第 644 行** — `       * still inverted from make_producer_start_state`
+  - **EN**: Documentation/comment text: `still inverted from make_producer_start_state`.
+  - **CN**: 文档/注释内容：`still inverted from make_producer_start_state`。
+- **Line 645 / 第 645 行** — `       */`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 646 / 第 646 行** — `      pipeline.producer_tail(smem_pipe_producer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 647 / 第 647 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 648 / 第 648 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 649 / 第 649 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 650 / 第 650 行** — `  /// Perform a collective-scoped matrix multiply-accumulate`
+  - **EN**: Inline comment explaining intent: `Perform a collective-scoped matrix multiply-accumulate`.
+  - **CN**: 行内注释说明意图：`Perform a collective-scoped matrix multiply-accumulate`。
+- **Line 651 / 第 651 行** — `  /// Consumer Perspective`
+  - **EN**: Inline comment explaining intent: `Consumer Perspective`.
+  - **CN**: 行内注释说明意图：`Consumer Perspective`。
+- **Line 652 / 第 652 行** — `  template <class FrgTensorC>`
+  - **EN**: Starts a template declaration with specifier `class FrgTensorC`.
+  - **CN**: 开始一个模板声明，说明符为 `class FrgTensorC`。
+- **Line 653 / 第 653 行** — `  CUTLASS_DEVICE void`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 654 / 第 654 行** — `  mma(MainloopPipeline pipeline,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 655 / 第 655 行** — `      PipelineState smem_pipe_consumer_state,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 656 / 第 656 行** — `      FrgTensorC& accum,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 657 / 第 657 行** — `      int k_tile_count,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 658 / 第 658 行** — `      int thread_idx,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 659 / 第 659 行** — `      TensorStorage& shared_tensors,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 660 / 第 660 行** — `      Params const& mainloop_params) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 661 / 第 661 行** — `    static_assert(is_rmem<FrgTensorC>::value, "C tensor must be rmem resident.");`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 662 / 第 662 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 663 / 第 663 行** — `    Tensor sA = make_tensor(make_smem_ptr(shared_tensors.smem_A.data()), SmemLayoutA{});          // (BLK_M,BLK_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 664 / 第 664 行** — `    Tensor sB = make_tensor(make_smem_ptr(shared_tensors.smem_B.data()), SmemLayoutB{});          // (BLK_N,BLK_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 665 / 第 665 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 666 / 第 666 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 667 / 第 667 行** — `    // Define C accumulators and A/B partitioning`
+  - **EN**: Inline comment explaining intent: `Define C accumulators and A/B partitioning`.
+  - **CN**: 行内注释说明意图：`Define C accumulators and A/B partitioning`。
+- **Line 668 / 第 668 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 669 / 第 669 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 670 / 第 670 行** — `    TiledMma tiled_mma;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 671 / 第 671 行** — `    auto thread_mma = tiled_mma.get_thread_slice(thread_idx);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 672 / 第 672 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 673 / 第 673 行** — `    Tensor tCsA = thread_mma.partition_A(sA);                                                 // (MMA,MMA_M,MMA_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 674 / 第 674 行** — `    Tensor tCsB = thread_mma.partition_B(sB);                                                 // (MMA,MMA_N,MMA_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 675 / 第 675 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 676 / 第 676 行** — `    // Allocate "fragments/descriptors"`
+  - **EN**: Inline comment explaining intent: `Allocate "fragments/descriptors"`.
+  - **CN**: 行内注释说明意图：`Allocate "fragments/descriptors"`。
+- **Line 677 / 第 677 行** — `    Tensor tCrA = thread_mma.make_fragment_A(tCsA);                                           // (MMA,MMA_M,MMA_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 678 / 第 678 行** — `    Tensor tCrB = thread_mma.make_fragment_B(tCsB);                                           // (MMA,MMA_N,MMA_K,PIPE)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 679 / 第 679 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 680 / 第 680 行** — `    CUTE_STATIC_ASSERT_V(size<1>(tCsA) == size<1>(accum));                                                         // M`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 681 / 第 681 行** — `    CUTE_STATIC_ASSERT_V(size<1>(tCsB) == size<2>(accum));                                                         // N`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 682 / 第 682 行** — `    CUTE_STATIC_ASSERT_V(size<2>(tCsA) == size<2>(tCsB));                                                          // K`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 683 / 第 683 行** — `    CUTE_STATIC_ASSERT_V(size<3>(tCsA) == size<3>(tCsB));                                                       // PIPE`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 684 / 第 684 行** — `    CUTE_STATIC_ASSERT_V(Int<DispatchPolicy::Stages>{} == size<2>(sA));                                         // PIPE`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 685 / 第 685 行** — `    CUTE_STATIC_ASSERT_V(Int<DispatchPolicy::Stages>{} == size<2>(sB));                                         // PIPE`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 686 / 第 686 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 687 / 第 687 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 688 / 第 688 行** — `    // PIPELINED MAIN LOOP`
+  - **EN**: Inline comment explaining intent: `PIPELINED MAIN LOOP`.
+  - **CN**: 行内注释说明意图：`PIPELINED MAIN LOOP`。
+- **Line 689 / 第 689 行** — `    //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 690 / 第 690 行** — `    static_assert((0 <= K_PIPE_MMAS) && (K_PIPE_MMAS <  K_PIPE_MAX),`
+  - **EN**: Performs compile-time validation of assumptions in this header.
+  - **CN**: 在编译期验证该头文件中的假设。
+- **Line 691 / 第 691 行** — `        "ERROR : Incorrect number of MMAs in flight");`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 692 / 第 692 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 693 / 第 693 行** — `    // We release buffers to producer warps(dma load) with some mmas in flight`
+  - **EN**: Inline comment explaining intent: `We release buffers to producer warps(dma load) with some mmas in flight`.
+  - **CN**: 行内注释说明意图：`We release buffers to producer warps(dma load) with some mmas in flight`。
+- **Line 694 / 第 694 行** — `    PipelineState smem_pipe_release = smem_pipe_consumer_state;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 695 / 第 695 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 696 / 第 696 行** — `    // Prologue GMMAs`
+  - **EN**: Inline comment explaining intent: `Prologue GMMAs`.
+  - **CN**: 行内注释说明意图：`Prologue GMMAs`。
+- **Line 697 / 第 697 行** — `    int prologue_mma_count = min(K_PIPE_MMAS, k_tile_count);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 698 / 第 698 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 699 / 第 699 行** — `    tiled_mma.accumulate_ = GMMA::ScaleOut::Zero;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 700 / 第 700 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 701 / 第 701 行** — `    warpgroup_fence_operand(accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 702 / 第 702 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 703 / 第 703 行** — `    for (int k_tile_prologue = prologue_mma_count; k_tile_prologue > 0; --k_tile_prologue) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 704 / 第 704 行** — `      // WAIT on smem_pipe_consumer_state until its data are available (phase bit flips from rdPhaseBit value)`
+  - **EN**: Inline comment explaining intent: `WAIT on smem_pipe_consumer_state until its data are available (phase bit flips from rdPhaseBit v...`.
+  - **CN**: 行内注释说明意图：`WAIT on smem_pipe_consumer_state until its data are available (phase bit flips from rdPhaseBit v...`。
+- **Line 705 / 第 705 行** — `      pipeline.consumer_wait(smem_pipe_consumer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 706 / 第 706 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 707 / 第 707 行** — `      int read_stage = smem_pipe_consumer_state.index();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 708 / 第 708 行** — `      warpgroup_arrive();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 709 / 第 709 行** — `      // Unroll the K mode manually to set scale D to 1`
+  - **EN**: Inline comment explaining intent: `Unroll the K mode manually to set scale D to 1`.
+  - **CN**: 行内注释说明意图：`Unroll the K mode manually to set scale D to 1`。
+- **Line 710 / 第 710 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 711 / 第 711 行** — `      for (int k_block = 0; k_block < size<2>(tCrA); ++k_block) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 712 / 第 712 行** — `        // (V,M,K) x (V,N,K) => (V,M,N)`
+  - **EN**: Inline comment explaining intent: `(V,M,K) x (V,N,K) => (V,M,N)`.
+  - **CN**: 行内注释说明意图：`(V,M,K) x (V,N,K) => (V,M,N)`。
+- **Line 713 / 第 713 行** — `        cute::gemm(tiled_mma, tCrA(_,_,k_block,read_stage), tCrB(_,_,k_block,read_stage), accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 714 / 第 714 行** — `        tiled_mma.accumulate_ = GMMA::ScaleOut::One;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 715 / 第 715 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 716 / 第 716 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 717 / 第 717 行** — `      warpgroup_commit_batch();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 718 / 第 718 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 719 / 第 719 行** — `      ++smem_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 720 / 第 720 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 721 / 第 721 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 722 / 第 722 行** — `    warpgroup_fence_operand(accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 723 / 第 723 行** — `    // Mainloop GMMAs`
+  - **EN**: Inline comment explaining intent: `Mainloop GMMAs`.
+  - **CN**: 行内注释说明意图：`Mainloop GMMAs`。
+- **Line 724 / 第 724 行** — `    k_tile_count -= prologue_mma_count;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 725 / 第 725 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 726 / 第 726 行** — `    CUTLASS_PRAGMA_NO_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 727 / 第 727 行** — `    for ( ; k_tile_count > 0; --k_tile_count) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 728 / 第 728 行** — `      // WAIT on smem_pipe_consumer_state until its data are available (phase bit flips from rdPhaseBit value)`
+  - **EN**: Inline comment explaining intent: `WAIT on smem_pipe_consumer_state until its data are available (phase bit flips from rdPhaseBit v...`.
+  - **CN**: 行内注释说明意图：`WAIT on smem_pipe_consumer_state until its data are available (phase bit flips from rdPhaseBit v...`。
+- **Line 729 / 第 729 行** — `      pipeline.consumer_wait(smem_pipe_consumer_state);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 730 / 第 730 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 731 / 第 731 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 732 / 第 732 行** — `      // Compute on k_tile`
+  - **EN**: Inline comment explaining intent: `Compute on k_tile`.
+  - **CN**: 行内注释说明意图：`Compute on k_tile`。
+- **Line 733 / 第 733 行** — `      //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 734 / 第 734 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 735 / 第 735 行** — `      int read_stage = smem_pipe_consumer_state.index();`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 736 / 第 736 行** — `      warpgroup_fence_operand(accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 737 / 第 737 行** — `      warpgroup_arrive();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 738 / 第 738 行** — `      // Unroll the K mode manually to set scale D to 1`
+  - **EN**: Inline comment explaining intent: `Unroll the K mode manually to set scale D to 1`.
+  - **CN**: 行内注释说明意图：`Unroll the K mode manually to set scale D to 1`。
+- **Line 739 / 第 739 行** — `      CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 740 / 第 740 行** — `      for (int k_block = 0; k_block < size<2>(tCrA); ++k_block) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 741 / 第 741 行** — `        // (V,M) x (V,N) => (V,M,N)`
+  - **EN**: Inline comment explaining intent: `(V,M) x (V,N) => (V,M,N)`.
+  - **CN**: 行内注释说明意图：`(V,M) x (V,N) => (V,M,N)`。
+- **Line 742 / 第 742 行** — `        cute::gemm(tiled_mma, tCrA(_,_,k_block,read_stage), tCrB(_,_,k_block,read_stage), accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 743 / 第 743 行** — `        tiled_mma.accumulate_ = GMMA::ScaleOut::One;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 744 / 第 744 行** — `      }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 745 / 第 745 行** — `      warpgroup_commit_batch();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 746 / 第 746 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 747 / 第 747 行** — `      /// Wait on the GMMA barrier for K_PIPE_MMAS (or fewer) outstanding to ensure smem_pipe_producer_state is consumed`
+  - **EN**: Inline comment explaining intent: `Wait on the GMMA barrier for K_PIPE_MMAS (or fewer) outstanding to ensure smem_pipe_producer_sta...`.
+  - **CN**: 行内注释说明意图：`Wait on the GMMA barrier for K_PIPE_MMAS (or fewer) outstanding to ensure smem_pipe_producer_sta...`。
+- **Line 748 / 第 748 行** — `      warpgroup_wait<K_PIPE_MMAS>();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 749 / 第 749 行** — `      warpgroup_fence_operand(accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 750 / 第 750 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 751 / 第 751 行** — `      // UNLOCK smem_pipe_release, done _computing_ on it`
+  - **EN**: Inline comment explaining intent: `UNLOCK smem_pipe_release, done _computing_ on it`.
+  - **CN**: 行内注释说明意图：`UNLOCK smem_pipe_release, done _computing_ on it`。
+- **Line 752 / 第 752 行** — `      pipeline.consumer_release(smem_pipe_release);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 753 / 第 753 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 754 / 第 754 行** — `      // Advance smem_pipe_consumer_state and smem_pipe_release`
+  - **EN**: Inline comment explaining intent: `Advance smem_pipe_consumer_state and smem_pipe_release`.
+  - **CN**: 行内注释说明意图：`Advance smem_pipe_consumer_state and smem_pipe_release`。
+- **Line 755 / 第 755 行** — `      ++smem_pipe_consumer_state;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 756 / 第 756 行** — `      ++smem_pipe_release;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 757 / 第 757 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 758 / 第 758 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 759 / 第 759 行** — `    warpgroup_fence_operand(accum);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 760 / 第 760 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 761 / 第 761 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 762 / 第 762 行** — `  /// Perform a Consumer Epilogue to release all buffers`
+  - **EN**: Inline comment explaining intent: `Perform a Consumer Epilogue to release all buffers`.
+  - **CN**: 行内注释说明意图：`Perform a Consumer Epilogue to release all buffers`。
+- **Line 763 / 第 763 行** — `  CUTLASS_DEVICE void`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 764 / 第 764 行** — `  mma_tail(MainloopPipeline pipeline, PipelineState smem_pipe_release, int k_tile_count) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 765 / 第 765 行** — `    // Prologue GMMAs`
+  - **EN**: Inline comment explaining intent: `Prologue GMMAs`.
+  - **CN**: 行内注释说明意图：`Prologue GMMAs`。
+- **Line 766 / 第 766 行** — `    int prologue_mma_count = min(K_PIPE_MMAS, k_tile_count);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 767 / 第 767 行** — `    k_tile_count -= prologue_mma_count;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 768 / 第 768 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 769 / 第 769 行** — `    smem_pipe_release.advance(k_tile_count);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 770 / 第 770 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 771 / 第 771 行** — `    // Wait on all GMMAs to complete`
+  - **EN**: Inline comment explaining intent: `Wait on all GMMAs to complete`.
+  - **CN**: 行内注释说明意图：`Wait on all GMMAs to complete`。
+- **Line 772 / 第 772 行** — `    warpgroup_wait<0>();`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 773 / 第 773 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 774 / 第 774 行** — `    for (int count = 0; count < prologue_mma_count; ++count) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 775 / 第 775 行** — `      pipeline.consumer_release(smem_pipe_release);                 // UNLOCK smem_pipe_release, done _computing_ on it`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 776 / 第 776 行** — `      ++smem_pipe_release;`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 777 / 第 777 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 778 / 第 778 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 779 / 第 779 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 780 / 第 780 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 781 / 第 781 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 782 / 第 782 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 783 / 第 783 行** — `} // namespace cutlass::conv::collective`
+  - **EN**: Closes namespace `cutlass::conv::collective`.
+  - **CN**: 关闭命名空间 `cutlass::conv::collective`。
+- **Line 784 / 第 784 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 785 / 第 785 行** — `/////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Collectives / Collective 组合
+- Implicit GEMM / 隐式 GEMM
+- Architecture specialization / 架构特化
+- Layouts and strides / 布局与步幅
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cute/arch/cluster_sm90.hpp` — CuTe dependency `cute/arch/cluster_sm90.hpp` / CuTe 依赖 `cute/arch/cluster_sm90.hpp`
+- `cute/arch/copy_sm90.hpp` — CuTe dependency `cute/arch/copy_sm90.hpp` / CuTe 依赖 `cute/arch/copy_sm90.hpp`
+- `cute/atom/mma_atom.hpp` — CuTe dependency `cute/atom/mma_atom.hpp` / CuTe 依赖 `cute/atom/mma_atom.hpp`
+- `cute/atom/copy_traits_sm90_im2col.hpp` — CuTe dependency `cute/atom/copy_traits_sm90_im2col.hpp` / CuTe 依赖 `cute/atom/copy_traits_sm90_im2col.hpp`
+- `cute/numeric/arithmetic_tuple.hpp` — CuTe dependency `cute/numeric/arithmetic_tuple.hpp` / CuTe 依赖 `cute/numeric/arithmetic_tuple.hpp`
+- `cute/algorithm/functional.hpp` — CuTe dependency `cute/algorithm/functional.hpp` / CuTe 依赖 `cute/algorithm/functional.hpp`
+- `cute/algorithm/gemm.hpp` — CuTe dependency `cute/algorithm/gemm.hpp` / CuTe 依赖 `cute/algorithm/gemm.hpp`
+- `cutlass/conv/detail.hpp` — CUTLASS convolution component `cutlass/conv/detail.hpp` / CUTLASS 卷积组件 `cutlass/conv/detail.hpp`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cutlass/conv/dispatch_policy.hpp` — CUTLASS convolution component `cutlass/conv/dispatch_policy.hpp` / CUTLASS 卷积组件 `cutlass/conv/dispatch_policy.hpp`
+- `cutlass/pipeline/pipeline.hpp` — CUTLASS dependency `cutlass/pipeline/pipeline.hpp` / CUTLASS 依赖 `cutlass/pipeline/pipeline.hpp`
+- `cutlass/util/packed_stride.hpp` — CUTLASS dependency `cutlass/util/packed_stride.hpp` / CUTLASS 依赖 `cutlass/util/packed_stride.hpp`

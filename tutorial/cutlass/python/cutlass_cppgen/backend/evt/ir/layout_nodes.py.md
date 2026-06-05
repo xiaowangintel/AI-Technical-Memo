@@ -1,0 +1,356 @@
+# layout_nodes.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/ir/layout_nodes.py`
+
+## Purpose / 作用
+- EN: Layout manipulation nodes and implementations The layout Nodes change the layout of intermediate nodes in epilogue visitor graph
+- CN: 该模块的文档字符串将其描述为：Layout manipulation nodes and implementations The layout Nodes change the layout of intermediate nodes in epilogue visitor graph
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Layout manipulation nodes and implementations` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `The layout Nodes change the layout of intermediate nodes in epilogue visitor graph` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L37** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L38** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L39** `from copy import deepcopy` — **EN:** Imports deepcopy from `copy`. **CN:** 从 `copy` 导入 deepcopy。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `from cutlass_library import LayoutType` — **EN:** Imports LayoutType from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 LayoutType。
+- **L42** `from pycute import product, flatten` — **EN:** Imports product, flatten from `pycute`. **CN:** 从 `pycute` 导入 product, flatten。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `import cutlass_cppgen` — **EN:** Imports cutlass_cppgen for later use. **CN:** 导入 cutlass_cppgen 供后续使用。
+- **L45** `from cutlass_cppgen.backend.evt.ir.layout_algorithm import _list_to_tuple, _tuple_to_list` — **EN:** Imports _list_to_tuple, _tuple_to_list from `cutlass_cppgen.backend.evt.ir.layout_algorithm`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.layout_algorithm` 导入 _list_to_tuple, _tuple_to_list。
+- **L46** `from cutlass_cppgen.backend.evt.ir.node import NodeBase` — **EN:** Imports NodeBase from `cutlass_cppgen.backend.evt.ir.node`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.node` 导入 NodeBase。
+- **L47** `from cutlass_cppgen.backend.evt.ir.tensor import Tensor` — **EN:** Imports Tensor from `cutlass_cppgen.backend.evt.ir.tensor`. **CN:** 从 `cutlass_cppgen.backend.evt.ir.tensor` 导入 Tensor。
+- **L48** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `class PermutationImpl:` — **EN:** Defines class `PermutationImpl`. **CN:** 定义类 `PermutationImpl`。
+- **L51** `    """` — **EN:** Starts the docstring for the class `PermutationImpl`. **CN:** 开始说明 class `PermutationImpl` 的文档字符串。
+- **L52** `    Detailed implementation and helper functions for permutation` — **EN:** Continues the docstring for the class `PermutationImpl`. **CN:** 继续说明 class `PermutationImpl` 的文档字符串。
+- **L53** `    """` — **EN:** Ends the docstring for the class `PermutationImpl`. **CN:** 结束说明 class `PermutationImpl` 的文档字符串。
+- **L54** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L55** `        assert "indices" in node.kwargs.keys()` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L56** `        self.indices = list(node.kwargs["indices"])` — **EN:** Assigns a value to self.indices. **CN:** 将一个值赋给 self.indices。
+- **L57** `        self.inverse_indices = self.get_inverse_indices(self.indices)` — **EN:** Assigns a value to self.inverse_indices. **CN:** 将一个值赋给 self.inverse_indices。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `    def get_inverse_impl(self):` — **EN:** Defines function `get_inverse_impl`. **CN:** 定义函数 `get_inverse_impl`。
+- **L60** `        inverse_impl = deepcopy(self)` — **EN:** Assigns a value to inverse_impl. **CN:** 将一个值赋给 inverse_impl。
+- **L61** `        inverse_impl.indices = self.inverse_indices` — **EN:** Assigns a value to inverse_impl.indices. **CN:** 将一个值赋给 inverse_impl.indices。
+- **L62** `        inverse_impl.inverse_indices = self.indices` — **EN:** Assigns a value to inverse_impl.inverse_indices. **CN:** 将一个值赋给 inverse_impl.inverse_indices。
+- **L63** `        return inverse_impl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    def update(self, shape):` — **EN:** Defines function `update`. **CN:** 定义函数 `update`。
+- **L66** `        num_dim = len(shape)` — **EN:** Assigns a value to num_dim. **CN:** 将一个值赋给 num_dim。
+- **L67** `        indices = self.indices` — **EN:** Assigns a value to indices. **CN:** 将一个值赋给 indices。
+- **L68** `        num_old_dim = len(indices)` — **EN:** Assigns a value to num_old_dim. **CN:** 将一个值赋给 num_old_dim。
+- **L69** `        # Add offset` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L70** `        for i, idx in enumerate(indices):` — **EN:** Starts a loop assigning items from `enumerate(indices)` to `(i, idx)`. **CN:** 开始一个循环，将 `enumerate(indices)` 的元素赋给 `(i, idx)`。
+- **L71** `            indices[i] = idx + num_dim - num_old_dim` — **EN:** Assigns a value to indices[i]. **CN:** 将一个值赋给 indices[i]。
+- **L72** `        # Add broadcast dims` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L73** `        for i in range(num_dim - num_old_dim):` — **EN:** Starts a loop assigning items from `range(num_dim - num_old_dim)` to `i`. **CN:** 开始一个循环，将 `range(num_dim - num_old_dim)` 的元素赋给 `i`。
+- **L74** `            indices = [i,] + indices` — **EN:** Assigns a value to indices. **CN:** 将一个值赋给 indices。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `        self.indices = indices` — **EN:** Assigns a value to self.indices. **CN:** 将一个值赋给 self.indices。
+- **L77** `        self.inverse_indices = self.get_inverse_indices(self.indices)` — **EN:** Assigns a value to self.inverse_indices. **CN:** 将一个值赋给 self.inverse_indices。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    def get_inverse_indices(self, indices):` — **EN:** Defines function `get_inverse_indices`. **CN:** 定义函数 `get_inverse_indices`。
+- **L80** `        """` — **EN:** Starts the docstring for the function `get_inverse_indices`. **CN:** 开始说明 function `get_inverse_indices` 的文档字符串。
+- **L81** `        Get the indices for inverse permutation` — **EN:** Continues the docstring for the function `get_inverse_indices`. **CN:** 继续说明 function `get_inverse_indices` 的文档字符串。
+- **L82** `        """` — **EN:** Ends the docstring for the function `get_inverse_indices`. **CN:** 结束说明 function `get_inverse_indices` 的文档字符串。
+- **L83** `        num_dim = len(indices)` — **EN:** Assigns a value to num_dim. **CN:** 将一个值赋给 num_dim。
+- **L84** `        inverse_indices = [0] * num_dim` — **EN:** Assigns a value to inverse_indices. **CN:** 将一个值赋给 inverse_indices。
+- **L85** `        for i in range(num_dim):` — **EN:** Starts a loop assigning items from `range(num_dim)` to `i`. **CN:** 开始一个循环，将 `range(num_dim)` 的元素赋给 `i`。
+- **L86** `            inverse_indices[indices[i]] = i` — **EN:** Assigns a value to inverse_indices[indices[i]]. **CN:** 将一个值赋给 inverse_indices[indices[i]]。
+- **L87** `        return inverse_indices` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `    def shape_propagation(self, input_node_meta):` — **EN:** Defines function `shape_propagation`. **CN:** 定义函数 `shape_propagation`。
+- **L90** `        input_shape = input_node_meta.tensor.shape` — **EN:** Assigns a value to input_shape. **CN:** 将一个值赋给 input_shape。
+- **L91** `        output_shape = tuple([input_shape[idx] for idx in self.indices])` — **EN:** Assigns a value to output_shape. **CN:** 将一个值赋给 output_shape。
+- **L92** `        return output_shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `    def broadcast(self, shape, node_meta: NodeBase):` — **EN:** Defines function `broadcast`. **CN:** 定义函数 `broadcast`。
+- **L95** `        """` — **EN:** Starts the docstring for the function `broadcast`. **CN:** 开始说明 function `broadcast` 的文档字符串。
+- **L96** `        Broadcast the inputs based on current shape` — **EN:** Continues the docstring for the function `broadcast`. **CN:** 继续说明 function `broadcast` 的文档字符串。
+- **L97** `        """` — **EN:** Ends the docstring for the function `broadcast`. **CN:** 结束说明 function `broadcast` 的文档字符串。
+- **L98** `        self.update(shape)` — **EN:** Invokes `self.update` as a standalone call. **CN:** 以独立语句方式调用 `self.update`。
+- **L99** `        inverse_shape = tuple([shape[idx] for idx in self.inverse_indices])` — **EN:** Assigns a value to inverse_shape. **CN:** 将一个值赋给 inverse_shape。
+- **L100** `        node_meta.tensor.broadcast(inverse_shape)` — **EN:** Invokes `node_meta.tensor.broadcast` as a standalone call. **CN:** 以独立语句方式调用 `node_meta.tensor.broadcast`。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def apply_to_user(self, usr_meta: NodeBase):` — **EN:** Defines function `apply_to_user`. **CN:** 定义函数 `apply_to_user`。
+- **L103** `        """` — **EN:** Starts the docstring for the function `apply_to_user`. **CN:** 开始说明 function `apply_to_user` 的文档字符串。
+- **L104** `        Propagate the permutation to the users of the current nodes` — **EN:** Continues the docstring for the function `apply_to_user`. **CN:** 继续说明 function `apply_to_user` 的文档字符串。
+- **L105** `        """` — **EN:** Ends the docstring for the function `apply_to_user`. **CN:** 结束说明 function `apply_to_user` 的文档字符串。
+- **L106** `        usr_meta.tensor.permute(self.inverse_indices)` — **EN:** Invokes `usr_meta.tensor.permute` as a standalone call. **CN:** 以独立语句方式调用 `usr_meta.tensor.permute`。
+- **L107** `        if hasattr(usr_meta, "store_tensor"):` — **EN:** Starts a conditional branch guarded by `hasattr(usr_meta, 'store_tensor')`. **CN:** 开始一个由 `hasattr(usr_meta, 'store_tensor')` 控制的条件分支。
+- **L108** `            if usr_meta.store_tensor is not None:` — **EN:** Starts a conditional branch guarded by `usr_meta.store_tensor is not None`. **CN:** 开始一个由 `usr_meta.store_tensor is not None` 控制的条件分支。
+- **L109** `                usr_meta.store_tensor.permute(self.inverse_indices)` — **EN:** Invokes `usr_meta.store_tensor.permute` as a standalone call. **CN:** 以独立语句方式调用 `usr_meta.store_tensor.permute`。
+- **L110** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L111** `    def apply_to_input(self, input_meta: NodeBase):` — **EN:** Defines function `apply_to_input`. **CN:** 定义函数 `apply_to_input`。
+- **L112** `        """` — **EN:** Starts the docstring for the function `apply_to_input`. **CN:** 开始说明 function `apply_to_input` 的文档字符串。
+- **L113** `        Propagate the permutation to inputs of the current nodes` — **EN:** Continues the docstring for the function `apply_to_input`. **CN:** 继续说明 function `apply_to_input` 的文档字符串。
+- **L114** `        """` — **EN:** Ends the docstring for the function `apply_to_input`. **CN:** 结束说明 function `apply_to_input` 的文档字符串。
+- **L115** `        input_meta.tensor.permute(self.indices)` — **EN:** Invokes `input_meta.tensor.permute` as a standalone call. **CN:** 以独立语句方式调用 `input_meta.tensor.permute`。
+- **L116** `        if hasattr(input_meta, "store_tensor"):` — **EN:** Starts a conditional branch guarded by `hasattr(input_meta, 'store_tensor')`. **CN:** 开始一个由 `hasattr(input_meta, 'store_tensor')` 控制的条件分支。
+- **L117** `            if input_meta.store_tensor is not None:` — **EN:** Starts a conditional branch guarded by `input_meta.store_tensor is not None`. **CN:** 开始一个由 `input_meta.store_tensor is not None` 控制的条件分支。
+- **L118** `                input_meta.store_tensor.permute(self.indices)` — **EN:** Invokes `input_meta.store_tensor.permute` as a standalone call. **CN:** 以独立语句方式调用 `input_meta.store_tensor.permute`。
+- **L119** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L120** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L121** `class ReshapeImpl:` — **EN:** Defines class `ReshapeImpl`. **CN:** 定义类 `ReshapeImpl`。
+- **L122** `    """` — **EN:** Starts the docstring for the class `ReshapeImpl`. **CN:** 开始说明 class `ReshapeImpl` 的文档字符串。
+- **L123** `    Detailed implementation and helper functions for reshape` — **EN:** Continues the docstring for the class `ReshapeImpl`. **CN:** 继续说明 class `ReshapeImpl` 的文档字符串。
+- **L124** `    """` — **EN:** Ends the docstring for the class `ReshapeImpl`. **CN:** 结束说明 class `ReshapeImpl` 的文档字符串。
+- **L125** `    def __init__(self, node) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L126** `        self.node = node` — **EN:** Assigns a value to self.node. **CN:** 将一个值赋给 self.node。
+- **L127** `        assert "new_shape" in node.kwargs.keys()` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L128** `        self.output_shape = _list_to_tuple(node.kwargs["new_shape"])` — **EN:** Assigns a value to self.output_shape. **CN:** 将一个值赋给 self.output_shape。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    def get_inverse_impl(self):` — **EN:** Defines function `get_inverse_impl`. **CN:** 定义函数 `get_inverse_impl`。
+- **L131** `        inverse_impl = deepcopy(self)` — **EN:** Assigns a value to inverse_impl. **CN:** 将一个值赋给 inverse_impl。
+- **L132** `        inverse_impl.output_shape = self.input_shape` — **EN:** Assigns a value to inverse_impl.output_shape. **CN:** 将一个值赋给 inverse_impl.output_shape。
+- **L133** `        inverse_impl.input_shape = self.output_shape` — **EN:** Assigns a value to inverse_impl.input_shape. **CN:** 将一个值赋给 inverse_impl.input_shape。
+- **L134** `        return inverse_impl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L135** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L136** `    def shape_propagation(self, input_node_meta):` — **EN:** Defines function `shape_propagation`. **CN:** 定义函数 `shape_propagation`。
+- **L137** `        self.input_shape = input_node_meta.tensor.shape` — **EN:** Assigns a value to self.input_shape. **CN:** 将一个值赋给 self.input_shape。
+- **L138** `        return _list_to_tuple(self.output_shape)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `    def broadcast(self, shape, node_meta: NodeBase):` — **EN:** Defines function `broadcast`. **CN:** 定义函数 `broadcast`。
+- **L141** `        """` — **EN:** Starts the docstring for the function `broadcast`. **CN:** 开始说明 function `broadcast` 的文档字符串。
+- **L142** `        Broadcast the inputs based on current shape.` — **EN:** Continues the docstring for the function `broadcast`. **CN:** 继续说明 function `broadcast` 的文档字符串。
+- **L143** `        """` — **EN:** Ends the docstring for the function `broadcast`. **CN:** 结束说明 function `broadcast` 的文档字符串。
+- **L144** `        # Step 1: infer split` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L145** `        flatten_split_shape = self.infer_split(flatten(self.input_shape), flatten(self.output_shape))` — **EN:** Assigns a value to flatten_split_shape. **CN:** 将一个值赋给 flatten_split_shape。
+- **L146** `        split_input_shape = self.infer_merge(flatten_split_shape, self.input_shape)` — **EN:** Assigns a value to split_input_shape. **CN:** 将一个值赋给 split_input_shape。
+- **L147** `        split_output_shape = self.infer_merge(flatten_split_shape, self.output_shape)` — **EN:** Assigns a value to split_output_shape. **CN:** 将一个值赋给 split_output_shape。
+- **L148** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L149** `        # broadcast shape -> split_output_shape -> flatten_split_shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L150** `        if len(shape) - len(split_output_shape) > 0:` — **EN:** Starts a conditional branch guarded by `len(shape) - len(split_output_shape) > 0`. **CN:** 开始一个由 `len(shape) - len(split_output_shape) > 0` 控制的条件分支。
+- **L151** `            for _ in range(len(shape) - len(split_output_shape)):` — **EN:** Starts a loop assigning items from `range(len(shape) - len(split_output_shape))` to `_`. **CN:** 开始一个循环，将 `range(len(shape) - len(split_output_shape))` 的元素赋给 `_`。
+- **L152** `                split_output_shape = [1,] + split_output_shape` — **EN:** Assigns a value to split_output_shape. **CN:** 将一个值赋给 split_output_shape。
+- **L153** `                flatten_split_shape = [1,] + flatten_split_shape` — **EN:** Assigns a value to flatten_split_shape. **CN:** 将一个值赋给 flatten_split_shape。
+- **L154** `                split_input_shape = [1,] + split_input_shape` — **EN:** Assigns a value to split_input_shape. **CN:** 将一个值赋给 split_input_shape。
+- **L155** `        broadcast_factor = []` — **EN:** Assigns a value to broadcast_factor. **CN:** 将一个值赋给 broadcast_factor。
+- **L156** `        for dim, old_dim in zip(shape, split_output_shape):` — **EN:** Starts a loop assigning items from `zip(shape, split_output_shape)` to `(dim, old_dim)`. **CN:** 开始一个循环，将 `zip(shape, split_output_shape)` 的元素赋给 `(dim, old_dim)`。
+- **L157** `            if not isinstance(dim, list):` — **EN:** Starts a conditional branch guarded by `not isinstance(dim, list)`. **CN:** 开始一个由 `not isinstance(dim, list)` 控制的条件分支。
+- **L158** `                dim = [dim,]` — **EN:** Assigns a value to dim. **CN:** 将一个值赋给 dim。
+- **L159** `            if not isinstance(old_dim, list):` — **EN:** Starts a conditional branch guarded by `not isinstance(old_dim, list)`. **CN:** 开始一个由 `not isinstance(old_dim, list)` 控制的条件分支。
+- **L160** `                old_dim = [old_dim,]` — **EN:** Assigns a value to old_dim. **CN:** 将一个值赋给 old_dim。
+- **L161** `            if product(tuple(dim)) == product(tuple(old_dim)):` — **EN:** Starts a conditional branch guarded by `product(tuple(dim)) == product(tuple(old_dim))`. **CN:** 开始一个由 `product(tuple(dim)) == product(tuple(old_dim))` 控制的条件分支。
+- **L162** `                broadcast_factor += [1] * len(old_dim)` — **EN:** Updates broadcast_factor in place. **CN:** 原地更新 broadcast_factor。
+- **L163** `            elif product(tuple(old_dim)) == 1:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L164** `                assert len(dim) == 1` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L165** `                broadcast_factor.append(dim[0])` — **EN:** Invokes `broadcast_factor.append` as a standalone call. **CN:** 以独立语句方式调用 `broadcast_factor.append`。
+- **L166** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L167** `                raise NotImplementedError(f"Invalid Broadcast: {old_dim} -> {dim}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L168** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L169** `        # flatten_split_shape -> split_input_shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L170** `        factor_idx = 0` — **EN:** Assigns a value to factor_idx. **CN:** 将一个值赋给 factor_idx。
+- **L171** `        broadcast_split_input_shape = []` — **EN:** Assigns a value to broadcast_split_input_shape. **CN:** 将一个值赋给 broadcast_split_input_shape。
+- **L172** `        for dim in split_input_shape:` — **EN:** Starts a loop assigning items from `split_input_shape` to `dim`. **CN:** 开始一个循环，将 `split_input_shape` 的元素赋给 `dim`。
+- **L173** `            if isinstance(dim, list):` — **EN:** Starts a conditional branch guarded by `isinstance(dim, list)`. **CN:** 开始一个由 `isinstance(dim, list)` 控制的条件分支。
+- **L174** `                new_dim = []` — **EN:** Assigns a value to new_dim. **CN:** 将一个值赋给 new_dim。
+- **L175** `                for d in dim:` — **EN:** Starts a loop assigning items from `dim` to `d`. **CN:** 开始一个循环，将 `dim` 的元素赋给 `d`。
+- **L176** `                    new_dim.append(d * broadcast_factor[factor_idx])` — **EN:** Invokes `new_dim.append` as a standalone call. **CN:** 以独立语句方式调用 `new_dim.append`。
+- **L177** `                    factor_idx += 1` — **EN:** Updates factor_idx in place. **CN:** 原地更新 factor_idx。
+- **L178** `                broadcast_split_input_shape.append(new_dim)` — **EN:** Invokes `broadcast_split_input_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `broadcast_split_input_shape.append`。
+- **L179** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L180** `                broadcast_split_input_shape.append(dim * broadcast_factor[factor_idx])` — **EN:** Invokes `broadcast_split_input_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `broadcast_split_input_shape.append`。
+- **L181** `                factor_idx += 1` — **EN:** Updates factor_idx in place. **CN:** 原地更新 factor_idx。
+- **L182** `        broadcast_split_input_shape = _list_to_tuple(broadcast_split_input_shape)` — **EN:** Assigns a value to broadcast_split_input_shape. **CN:** 将一个值赋给 broadcast_split_input_shape。
+- **L183** `        node_meta.tensor.reshape(_list_to_tuple(split_input_shape))` — **EN:** Invokes `node_meta.tensor.reshape` as a standalone call. **CN:** 以独立语句方式调用 `node_meta.tensor.reshape`。
+- **L184** `        node_meta.tensor.broadcast(broadcast_split_input_shape)` — **EN:** Invokes `node_meta.tensor.broadcast` as a standalone call. **CN:** 以独立语句方式调用 `node_meta.tensor.broadcast`。
+- **L185** `        # Last reshape op to clean up` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L186** `        broadcast_input_shape = tuple([product(dim) for dim in broadcast_split_input_shape])` — **EN:** Assigns a value to broadcast_input_shape. **CN:** 将一个值赋给 broadcast_input_shape。
+- **L187** `        node_meta.tensor.reshape(broadcast_input_shape)` — **EN:** Invokes `node_meta.tensor.reshape` as a standalone call. **CN:** 以独立语句方式调用 `node_meta.tensor.reshape`。
+- **L188** `        # Update the input shape and output shape` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L189** `        self.input_shape = _list_to_tuple(node_meta.tensor.shape)` — **EN:** Assigns a value to self.input_shape. **CN:** 将一个值赋给 self.input_shape。
+- **L190** `        self.output_shape = _list_to_tuple(shape)` — **EN:** Assigns a value to self.output_shape. **CN:** 将一个值赋给 self.output_shape。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `    def apply_to_user(self, user_meta: NodeBase):` — **EN:** Defines function `apply_to_user`. **CN:** 定义函数 `apply_to_user`。
+- **L193** `        """` — **EN:** Starts the docstring for the function `apply_to_user`. **CN:** 开始说明 function `apply_to_user` 的文档字符串。
+- **L194** `        Propagate the reshape to user nodes` — **EN:** Continues the docstring for the function `apply_to_user`. **CN:** 继续说明 function `apply_to_user` 的文档字符串。
+- **L195** `        """` — **EN:** Ends the docstring for the function `apply_to_user`. **CN:** 结束说明 function `apply_to_user` 的文档字符串。
+- **L196** `        user_meta.tensor.reshape(tuple(self.input_shape))` — **EN:** Invokes `user_meta.tensor.reshape` as a standalone call. **CN:** 以独立语句方式调用 `user_meta.tensor.reshape`。
+- **L197** `        if hasattr(user_meta, "store_tensor"):` — **EN:** Starts a conditional branch guarded by `hasattr(user_meta, 'store_tensor')`. **CN:** 开始一个由 `hasattr(user_meta, 'store_tensor')` 控制的条件分支。
+- **L198** `            if user_meta.store_tensor is not None:` — **EN:** Starts a conditional branch guarded by `user_meta.store_tensor is not None`. **CN:** 开始一个由 `user_meta.store_tensor is not None` 控制的条件分支。
+- **L199** `                user_meta.store_tensor.reshape(tuple(self.input_shape))` — **EN:** Invokes `user_meta.store_tensor.reshape` as a standalone call. **CN:** 以独立语句方式调用 `user_meta.store_tensor.reshape`。
+- **L200** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L201** `    def apply_to_input(self, input_meta: NodeBase):` — **EN:** Defines function `apply_to_input`. **CN:** 定义函数 `apply_to_input`。
+- **L202** `        """` — **EN:** Starts the docstring for the function `apply_to_input`. **CN:** 开始说明 function `apply_to_input` 的文档字符串。
+- **L203** `        Propagate the reshape to input nodes` — **EN:** Continues the docstring for the function `apply_to_input`. **CN:** 继续说明 function `apply_to_input` 的文档字符串。
+- **L204** `        """` — **EN:** Ends the docstring for the function `apply_to_input`. **CN:** 结束说明 function `apply_to_input` 的文档字符串。
+- **L205** `        input_meta.tensor.reshape(tuple(self.output_shape))` — **EN:** Invokes `input_meta.tensor.reshape` as a standalone call. **CN:** 以独立语句方式调用 `input_meta.tensor.reshape`。
+- **L206** `        if hasattr(input_meta, "store_tensor"):` — **EN:** Starts a conditional branch guarded by `hasattr(input_meta, 'store_tensor')`. **CN:** 开始一个由 `hasattr(input_meta, 'store_tensor')` 控制的条件分支。
+- **L207** `            if input_meta.store_tensor is not None:` — **EN:** Starts a conditional branch guarded by `input_meta.store_tensor is not None`. **CN:** 开始一个由 `input_meta.store_tensor is not None` 控制的条件分支。
+- **L208** `                input_meta.store_tensor.reshape(tuple(self.output_shape))` — **EN:** Invokes `input_meta.store_tensor.reshape` as a standalone call. **CN:** 以独立语句方式调用 `input_meta.store_tensor.reshape`。
+- **L209** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L210** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L211** `    # Helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L212** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L213** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L214** `    def infer_split(self, input_shape, output_shape):` — **EN:** Defines function `infer_split`. **CN:** 定义函数 `infer_split`。
+- **L215** `        """` — **EN:** Starts the docstring for the function `infer_split`. **CN:** 开始说明 function `infer_split` 的文档字符串。
+- **L216** `        Infer the flatten splitted shape that can be merged to both input_shape and output_shape` — **EN:** Continues the docstring for the function `infer_split`. **CN:** 继续说明 function `infer_split` 的文档字符串。
+- **L217** `        """` — **EN:** Ends the docstring for the function `infer_split`. **CN:** 结束说明 function `infer_split` 的文档字符串。
+- **L218** `        input_shape = _tuple_to_list(input_shape)` — **EN:** Assigns a value to input_shape. **CN:** 将一个值赋给 input_shape。
+- **L219** `        output_shape = _tuple_to_list(output_shape)` — **EN:** Assigns a value to output_shape. **CN:** 将一个值赋给 output_shape。
+- **L220** `        if len(input_shape) == 0 and len(output_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(input_shape) == 0 and len(output_shape) == 0`. **CN:** 开始一个由 `len(input_shape) == 0 and len(output_shape) == 0` 控制的条件分支。
+- **L221** `            return []` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L222** `        if len(input_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(input_shape) == 0`. **CN:** 开始一个由 `len(input_shape) == 0` 控制的条件分支。
+- **L223** `            if product(tuple(output_shape)) != 1:` — **EN:** Starts a conditional branch guarded by `product(tuple(output_shape)) != 1`. **CN:** 开始一个由 `product(tuple(output_shape)) != 1` 控制的条件分支。
+- **L224** `                raise ValueError("Invalid reshape size")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L225** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L226** `                return output_shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L227** `        if len(output_shape) == 0:` — **EN:** Starts a conditional branch guarded by `len(output_shape) == 0`. **CN:** 开始一个由 `len(output_shape) == 0` 控制的条件分支。
+- **L228** `            if product(tuple(input_shape)) != 1:` — **EN:** Starts a conditional branch guarded by `product(tuple(input_shape)) != 1`. **CN:** 开始一个由 `product(tuple(input_shape)) != 1` 控制的条件分支。
+- **L229** `                raise ValueError("Invalid reshape size")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L230** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L231** `                return input_shape` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L232** `        # This is done recursively by only process the last dimension at each time` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L233** `        old_dim = input_shape[-1]` — **EN:** Assigns a value to old_dim. **CN:** 将一个值赋给 old_dim。
+- **L234** `        new_dim = output_shape[-1]` — **EN:** Assigns a value to new_dim. **CN:** 将一个值赋给 new_dim。
+- **L235** `        # Exact match` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L236** `        if old_dim == new_dim:` — **EN:** Starts a conditional branch guarded by `old_dim == new_dim`. **CN:** 开始一个由 `old_dim == new_dim` 控制的条件分支。
+- **L237** `            return self.infer_split(input_shape[:-1], output_shape[:-1]) + [new_dim,]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L238** `        # Needs split` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L239** `        if old_dim > new_dim and old_dim % new_dim == 0:` — **EN:** Starts a conditional branch guarded by `old_dim > new_dim and old_dim % new_dim == 0`. **CN:** 开始一个由 `old_dim > new_dim and old_dim % new_dim == 0` 控制的条件分支。
+- **L240** `            residual = old_dim // new_dim` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L241** `            return self.infer_split(input_shape[:-1] + [residual,], output_shape[:-1]) + [new_dim,]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L242** `        # Needs merge` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L243** `        if old_dim < new_dim and new_dim % old_dim == 0:` — **EN:** Starts a conditional branch guarded by `old_dim < new_dim and new_dim % old_dim == 0`. **CN:** 开始一个由 `old_dim < new_dim and new_dim % old_dim == 0` 控制的条件分支。
+- **L244** `            residual = new_dim // old_dim` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L245** `            return self.infer_split(input_shape[:-1], output_shape[:-1] + [residual,]) + [old_dim,]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `        raise NotImplementedError(f"Unsupported split: {input_shape} -> {output_shape}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L248** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L249** `    def infer_merge(self, flatten_shape, shape):` — **EN:** Defines function `infer_merge`. **CN:** 定义函数 `infer_merge`。
+- **L250** `        flatten_shape = _tuple_to_list(flatten_shape)` — **EN:** Assigns a value to flatten_shape. **CN:** 将一个值赋给 flatten_shape。
+- **L251** `        shape = _tuple_to_list(shape)` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L252** `        idx_flat = len(flatten_shape) - 1` — **EN:** Assigns a value to idx_flat. **CN:** 将一个值赋给 idx_flat。
+- **L253** `        merged_shape = []` — **EN:** Assigns a value to merged_shape. **CN:** 将一个值赋给 merged_shape。
+- **L254** `        for dim in reversed(shape):` — **EN:** Starts a loop assigning items from `reversed(shape)` to `dim`. **CN:** 开始一个循环，将 `reversed(shape)` 的元素赋给 `dim`。
+- **L255** `            # Exact match` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L256** `            if dim == flatten_shape[idx_flat]:` — **EN:** Starts a conditional branch guarded by `dim == flatten_shape[idx_flat]`. **CN:** 开始一个由 `dim == flatten_shape[idx_flat]` 控制的条件分支。
+- **L257** `                merged_shape.append(dim)` — **EN:** Invokes `merged_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `merged_shape.append`。
+- **L258** `                idx_flat -= 1` — **EN:** Updates idx_flat in place. **CN:** 原地更新 idx_flat。
+- **L259** `            # need group` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L260** `            elif dim > flatten_shape[idx_flat] and dim % flatten_shape[idx_flat] == 0:` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L261** `                residual = dim` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L262** `                group = []` — **EN:** Assigns a value to group. **CN:** 将一个值赋给 group。
+- **L263** `                while(residual > 1):` — **EN:** Starts a while-loop guarded by `residual > 1`. **CN:** 开始一个由 `residual > 1` 控制的 while 循环。
+- **L264** `                    group.append(flatten_shape[idx_flat])` — **EN:** Invokes `group.append` as a standalone call. **CN:** 以独立语句方式调用 `group.append`。
+- **L265** `                    residual = residual // flatten_shape[idx_flat]` — **EN:** Assigns a value to residual. **CN:** 将一个值赋给 residual。
+- **L266** `                    idx_flat -= 1` — **EN:** Updates idx_flat in place. **CN:** 原地更新 idx_flat。
+- **L267** `                merged_shape.append(group[::-1])` — **EN:** Invokes `merged_shape.append` as a standalone call. **CN:** 以独立语句方式调用 `merged_shape.append`。
+- **L268** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L269** `                raise NotImplementedError(f"Unsupported merge: {flatten_shape} -> {shape}")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `        return merged_shape[::-1]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L274** `class LayoutNode(NodeBase):` — **EN:** Defines class `LayoutNode` with bases NodeBase. **CN:** 定义类 `LayoutNode`，其基类为 NodeBase。
+- **L275** `    """` — **EN:** Starts the docstring for the class `LayoutNode`. **CN:** 开始说明 class `LayoutNode` 的文档字符串。
+- **L276** `    Layout manipulation nodes` — **EN:** Continues the docstring for the class `LayoutNode`. **CN:** 继续说明 class `LayoutNode` 的文档字符串。
+- **L277** `    """` — **EN:** Ends the docstring for the class `LayoutNode`. **CN:** 结束说明 class `LayoutNode` 的文档字符串。
+- **L278** `    fn_to_impl = {` — **EN:** Assigns a value to fn_to_impl. **CN:** 将一个值赋给 fn_to_impl。
+- **L279** `        "permute": PermutationImpl,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L280** `        "reshape": ReshapeImpl` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L281** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L282** `    def __init__(self, name: str, fn, kwargs: dict) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L283** `        super().__init__(name)` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L284** `        self.op = "layout"` — **EN:** Assigns a value to self.op. **CN:** 将一个值赋给 self.op。
+- **L285** `        self.fn = fn` — **EN:** Assigns a value to self.fn. **CN:** 将一个值赋给 self.fn。
+- **L286** `        self.kwargs = kwargs` — **EN:** Assigns a value to self.kwargs. **CN:** 将一个值赋给 self.kwargs。
+- **L287** `        self.underlying_impl = self.fn_to_impl[self.fn.__name__](self)` — **EN:** Assigns a value to self.underlying_impl. **CN:** 将一个值赋给 self.underlying_impl。
+- **L288** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L289** `    def get_inverse_node(self):` — **EN:** Defines function `get_inverse_node`. **CN:** 定义函数 `get_inverse_node`。
+- **L290** `        inverse_node = deepcopy(self)` — **EN:** Assigns a value to inverse_node. **CN:** 将一个值赋给 inverse_node。
+- **L291** `        inverse_node.underlying_impl = self.underlying_impl.get_inverse_impl()` — **EN:** Assigns a value to inverse_node.underlying_impl. **CN:** 将一个值赋给 inverse_node.underlying_impl。
+- **L292** `        return inverse_node` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L293** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L294** `    def shape_propagation(self, input_node_metas):` — **EN:** Defines function `shape_propagation`. **CN:** 定义函数 `shape_propagation`。
+- **L295** `        if self._tensor is not None:` — **EN:** Starts a conditional branch guarded by `self._tensor is not None`. **CN:** 开始一个由 `self._tensor is not None` 控制的条件分支。
+- **L296** `            return` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L297** `        assert len(input_node_metas) == 1, "Layout node can only have one input node"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `        output_shape = self.underlying_impl.shape_propagation(input_node_metas[0])` — **EN:** Assigns a value to output_shape. **CN:** 将一个值赋给 output_shape。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** `        self._tensor = Tensor(` — **EN:** Assigns a value to self._tensor. **CN:** 将一个值赋给 self._tensor。
+- **L302** `            element=self.element_output,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L303** `            shape=output_shape, layout_tag=LayoutType.RowMajor` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L304** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L305** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L306** `        return super().shape_propagation(input_node_metas)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** `    def type_propagation(self, input_node_metas: 'list[NodeBase]'):` — **EN:** Defines function `type_propagation`. **CN:** 定义函数 `type_propagation`。
+- **L309** `        """` — **EN:** Starts the docstring for the function `type_propagation`. **CN:** 开始说明 function `type_propagation` 的文档字符串。
+- **L310** `        The store nodes has element_output = element_input` — **EN:** Continues the docstring for the function `type_propagation`. **CN:** 继续说明 function `type_propagation` 的文档字符串。
+- **L311** `        """` — **EN:** Ends the docstring for the function `type_propagation`. **CN:** 结束说明 function `type_propagation` 的文档字符串。
+- **L312** `        assert len(input_node_metas) == 1, "Layout node can only have one input node"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L313** `        self.element_output = input_node_metas[0].element_output` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `    def broadcast_propagation(self, input_node_metas: 'list[NodeBase]'):` — **EN:** Defines function `broadcast_propagation`. **CN:** 定义函数 `broadcast_propagation`。
+- **L316** `        """` — **EN:** Starts the docstring for the function `broadcast_propagation`. **CN:** 开始说明 function `broadcast_propagation` 的文档字符串。
+- **L317** `        Propagate the broadcast in the reversed topological order` — **EN:** Continues the docstring for the function `broadcast_propagation`. **CN:** 继续说明 function `broadcast_propagation` 的文档字符串。
+- **L318** `        """` — **EN:** Ends the docstring for the function `broadcast_propagation`. **CN:** 结束说明 function `broadcast_propagation` 的文档字符串。
+- **L319** `        if self.tensor is None:` — **EN:** Starts a conditional branch guarded by `self.tensor is None`. **CN:** 开始一个由 `self.tensor is None` 控制的条件分支。
+- **L320** `            raise RuntimeError(f"The tensor of node {self.name} is unknown.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L321** `        shape = self.tensor.shape` — **EN:** Assigns a value to shape. **CN:** 将一个值赋给 shape。
+- **L322** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L323** `        for child in input_node_metas:` — **EN:** Starts a loop assigning items from `input_node_metas` to `child`. **CN:** 开始一个循环，将 `input_node_metas` 的元素赋给 `child`。
+- **L324** `            self.underlying_impl.broadcast(shape, child)` — **EN:** Invokes `self.underlying_impl.broadcast` as a standalone call. **CN:** 以独立语句方式调用 `self.underlying_impl.broadcast`。
+- **L325** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L326** `    def apply_to_user(self, usr_meta: NodeBase):` — **EN:** Defines function `apply_to_user`. **CN:** 定义函数 `apply_to_user`。
+- **L327** `        """` — **EN:** Starts the docstring for the function `apply_to_user`. **CN:** 开始说明 function `apply_to_user` 的文档字符串。
+- **L328** `        Propagate the permutation to user nodes` — **EN:** Continues the docstring for the function `apply_to_user`. **CN:** 继续说明 function `apply_to_user` 的文档字符串。
+- **L329** `        """` — **EN:** Ends the docstring for the function `apply_to_user`. **CN:** 结束说明 function `apply_to_user` 的文档字符串。
+- **L330** `        self.underlying_impl.apply_to_user(usr_meta)` — **EN:** Invokes `self.underlying_impl.apply_to_user` as a standalone call. **CN:** 以独立语句方式调用 `self.underlying_impl.apply_to_user`。
+- **L331** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L332** `    def apply_to_input(self, input_meta: NodeBase):` — **EN:** Defines function `apply_to_input`. **CN:** 定义函数 `apply_to_input`。
+- **L333** `        """` — **EN:** Starts the docstring for the function `apply_to_input`. **CN:** 开始说明 function `apply_to_input` 的文档字符串。
+- **L334** `        Propagate the permutation to input nodes` — **EN:** Continues the docstring for the function `apply_to_input`. **CN:** 继续说明 function `apply_to_input` 的文档字符串。
+- **L335** `        """` — **EN:** Ends the docstring for the function `apply_to_input`. **CN:** 结束说明 function `apply_to_input` 的文档字符串。
+- **L336** `        self.underlying_impl.apply_to_input(input_meta)` — **EN:** Invokes `self.underlying_impl.apply_to_input` as a standalone call. **CN:** 以独立语句方式调用 `self.underlying_impl.apply_to_input`。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.ir.layout_nodes`. CN: 模块名为 `cutlass_cppgen.backend.evt.ir.layout_nodes`。
+- EN: Module docstring summary: Layout manipulation nodes and implementations The layout Nodes change the layout of intermediate nodes in epilogue visitor graph CN: 模块文档摘要为：Layout manipulation nodes and implementations The layout Nodes change the layout of intermediate nodes in epilogue visitor graph
+- EN: Top-level classes: PermutationImpl, ReshapeImpl, LayoutNode CN: 顶层类包括：PermutationImpl, ReshapeImpl, LayoutNode
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:LayoutType, pycute:product,flatten, cutlass_cppgen, cutlass_cppgen.backend.evt.ir.layout_algorithm:_list_to_tuple,_tuple_to_list, cutlass_cppgen.backend.evt.ir.node:NodeBase, cutlass_cppgen.backend.evt.ir.tensor:Tensor CN: 内部依赖：cutlass_library:LayoutType, pycute:product,flatten, cutlass_cppgen, cutlass_cppgen.backend.evt.ir.layout_algorithm:_list_to_tuple,_tuple_to_list, cutlass_cppgen.backend.evt.ir.node:NodeBase, cutlass_cppgen.backend.evt.ir.tensor:Tensor
+- EN: External or standard-library dependencies: copy:deepcopy CN: 外部或标准库依赖：copy:deepcopy

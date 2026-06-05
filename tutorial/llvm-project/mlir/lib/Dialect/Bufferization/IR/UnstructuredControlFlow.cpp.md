@@ -1,0 +1,102 @@
+# UnstructuredControlFlow.cpp — Code Analysis / 代码分析
+
+## Source / 来源
+
+- **File / 文件**: `mlir/lib/Dialect/Bufferization/IR/UnstructuredControlFlow.cpp`
+- **Repository / 仓库**: `llvm-project`
+- **Purpose / 目的**:
+  - **EN**: Implements the core IR, operations, types, attributes, or interfaces for bufferization infrastructure and tensor-to-buffer lowering.
+  - **CN**: 实现 Bufferization 基础设施与张量到缓冲区的 lowering 的核心 IR、操作、类型、属性或接口。
+
+## Line-by-Line Analysis / 逐行分析
+
+### Lines 1-7
+```cpp
+//===- UnstructuredControlFlow.cpp - Op Interface Helpers  ----------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+```
+- **EN**: Contains the standard LLVM/MLIR file banner, license notice, and high-level file description.
+- **CN**: 包含 LLVM/MLIR 标准文件头、许可证声明以及文件的高层描述。
+
+### Lines 8-12
+```cpp
+
+#include "mlir/Dialect/Bufferization/IR/UnstructuredControlFlow.h"
+
+using namespace mlir;
+
+```
+- **EN**: Pulls in the headers needed by this translation unit, including `mlir/Dialect/Bufferization/IR/UnstructuredControlFlow.h`.
+- **CN**: 引入该编译单元所需的头文件，其中包括 `mlir/Dialect/Bufferization/IR/UnstructuredControlFlow.h`。
+
+### Lines 13-20
+```cpp
+SmallVector<OpOperand *>
+mlir::bufferization::detail::getCallerOpOperands(BlockArgument bbArg) {
+  SmallVector<OpOperand *> result;
+  Block *block = bbArg.getOwner();
+  for (Operation *caller : block->getUsers()) {
+    auto branchOp = dyn_cast<BranchOpInterface>(caller);
+    assert(branchOp && "expected that all callers implement BranchOpInterface");
+    auto it = llvm::find(caller->getSuccessors(), block);
+```
+- **EN**: Implements logic around `getCallerOpOperands`, `getOwner`, `getUsers`, `dyn_cast`, and 2 more symbols; this block manipulates MLIR regions, blocks, or control-flow edges.
+- **CN**: 围绕 `getCallerOpOperands`, `getOwner`, `getUsers`, `dyn_cast`, and 2 more symbols 实现具体逻辑；该代码块处理 MLIR region、block 或控制流边。
+
+### Lines 21-28
+```cpp
+    assert(it != caller->getSuccessors().end() && "could not find successor");
+    int64_t successorIdx = std::distance(caller->getSuccessors().begin(), it);
+    SuccessorOperands operands = branchOp.getSuccessorOperands(successorIdx);
+    assert(operands.getProducedOperandCount() == 0 &&
+           "produced operands not supported");
+    int64_t operandIndex =
+        operands.getForwardedOperands().getBeginOperandIndex() +
+        bbArg.getArgNumber();
+```
+- **EN**: Implements logic around `assert`, `distance`, `getSuccessorOperands`, `getForwardedOperands`, and 1 more symbols; this block manipulates MLIR regions, blocks, or control-flow edges.
+- **CN**: 围绕 `assert`, `distance`, `getSuccessorOperands`, `getForwardedOperands`, and 1 more symbols 实现具体逻辑；该代码块处理 MLIR region、block 或控制流边。
+
+### Lines 29-32
+```cpp
+    result.push_back(&caller->getOpOperand(operandIndex));
+  }
+  return result;
+}
+```
+- **EN**: Implements logic around `push_back`.
+- **CN**: 围绕 `push_back` 实现具体逻辑。
+
+## Key Concepts / 关键概念
+
+- **Dialect IR modeling / 方言 IR 建模**:
+  - **EN**: Defines operations, attributes, types, verifiers, parsers, and printers for a dialect.
+  - **CN**: 定义方言的操作、属性、类型、验证器、解析器与打印器。
+- **Bufferization / 缓冲区化**:
+  - **EN**: Bridges tensor-style IR to explicit memory buffers and ownership-aware updates.
+  - **CN**: 在张量风格 IR 与显式内存缓冲区、所有权感知更新之间建立桥接。
+- **CFG regions / CFG Region**:
+  - **EN**: Represents branching, loops, and region-level control-flow edges.
+  - **CN**: 表示分支、循环以及 region 级控制流边。
+- **Tensor/buffer boundary / 张量/缓冲区边界**:
+  - **EN**: Tracks how abstract tensor values are converted into explicit memory effects and memref-based IR.
+  - **CN**: 跟踪抽象张量值如何转换成显式内存效应与基于 memref 的 IR。
+- **Interface dispatch / 接口分派**:
+  - **EN**: Attaches shared behavior to different ops or types through MLIR interfaces.
+  - **CN**: 通过 MLIR 接口把共享行为附着到不同操作或类型上。
+- **Region-based control flow / 基于 Region 的控制流**:
+  - **EN**: Represents nested blocks and successors as first-class IR structure.
+  - **CN**: 把嵌套 block 与后继边表示为一等 IR 结构。
+- **LLVM interop / LLVM 互操作**:
+  - **EN**: Bridges MLIR concepts to LLVM-compatible data structures, intrinsics, or codegen expectations.
+  - **CN**: 把 MLIR 概念桥接到 LLVM 兼容的数据结构、intrinsic 或代码生成预期。
+
+## Dependencies / 依赖关系
+
+- **Direct MLIR/LLVM/local includes / 直接的 MLIR/LLVM/本地包含**: `mlir/Dialect/Bufferization/IR/UnstructuredControlFlow.h`
+- **Subsystem categories / 子系统类别**: other MLIR dialect declarations / 其他 MLIR 方言声明 (1)

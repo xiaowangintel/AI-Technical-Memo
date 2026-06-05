@@ -1,0 +1,1188 @@
+# gemm_mixed_input_sm80.cu — Code Analysis / 代码分析
+
+**Source / 源文件**: `test/unit/gemm/warp/gemm_mixed_input_sm80.cu`
+
+## Purpose / 目的
+- EN: This file tests warp-level mixed-input GEMM configurations for SM80, where operand and accumulator types intentionally differ.
+- CN: 该文件测试 SM80 上的 warp 级混合输入 GEMM 配置，其中操作数类型与累加器类型被有意设置为不同。
+
+---
+
+## Line-by-Line Analysis / 逐行分析
+
+- **Line 1**: <code>/***************************************************************************************************</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 2**: <code> * Copyright (c) 2023 - 2026 NVIDIA CORPORATION &amp; AFFILIATES. All rights reserved.</code>
+  - EN: States the copyright ownership for this source file.
+  - CN: 说明此源文件的版权归属。
+- **Line 3**: <code> * SPDX-License-Identifier: BSD-3-Clause</code>
+  - EN: Records the SPDX license identifier used by the file.
+  - CN: 记录该文件使用的 SPDX 许可证标识符。
+- **Line 4**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 5**: <code> * Redistribution and use in source and binary forms, with or without</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 6**: <code> * modification, are permitted provided that the following conditions are met:</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 7**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 8**: <code> * 1. Redistributions of source code must retain the above copyright notice, this</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 9**: <code> * list of conditions and the following disclaimer.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 10**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 11**: <code> * 2. Redistributions in binary form must reproduce the above copyright notice,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 12**: <code> * this list of conditions and the following disclaimer in the documentation</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 13**: <code> * and/or other materials provided with the distribution.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 14**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 15**: <code> * 3. Neither the name of the copyright holder nor the names of its</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 16**: <code> * contributors may be used to endorse or promote products derived from</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 17**: <code> * this software without specific prior written permission.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 18**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 19**: <code> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 20**: <code> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 21**: <code> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 22**: <code> * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 23**: <code> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 24**: <code> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 25**: <code> * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 26**: <code> * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 27**: <code> * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 28**: <code> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 29**: <code> *</code>
+  - EN: Continues the license or documentation comment.
+  - CN: 继续许可证或文档注释内容。
+- **Line 30**: <code> **************************************************************************************************/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 31**: <code>/*! \file </code>
+  - EN: Starts a Doxygen file-level documentation block.
+  - CN: 开始 Doxygen 文件级文档块。
+- **Line 32**: <code>    \brief Unit tests for thread-level GEMM</code>
+  - EN: Gives a short Doxygen summary of the file's role.
+  - CN: 给出该文件作用的 Doxygen 简短摘要。
+- **Line 33**: <code>*/</code>
+  - EN: Closes the current block comment.
+  - CN: 结束当前块注释。
+- **Line 34**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 35**: <code>#include &quot;../../common/cutlass_unit_test.h&quot;</code>
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- **Line 36**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 37**: <code>#include &quot;cutlass/aligned_buffer.h&quot;</code>
+  - EN: Provides statically aligned storage containers used for fragments or shared-memory staging.
+  - CN: 提供用于片段或共享内存暂存的静态对齐存储容器。
+- **Line 38**: <code>#include &quot;cutlass/half.h&quot;</code>
+  - EN: Defines CUTLASS half-precision numeric types and conversions.
+  - CN: 定义 CUTLASS 半精度数值类型及其转换。
+- **Line 39**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 40**: <code>#include &quot;cutlass/gemm/warp/default_mma_tensor_op.h&quot;</code>
+  - EN: Builds default warp-level Tensor Core MMA policies.
+  - CN: 构建默认的 warp 级 Tensor Core MMA 策略。
+- **Line 41**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 42**: <code>#include &quot;cutlass/core_io.h&quot;</code>
+  - EN: Provides formatted printing helpers for CUTLASS core types and fragments.
+  - CN: 提供 CUTLASS 核心类型与片段的格式化打印辅助函数。
+- **Line 43**: <code>#include &quot;cutlass/util/host_tensor.h&quot;</code>
+  - EN: Provides host/device tensor containers used by the testbeds.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- **Line 44**: <code>#include &quot;cutlass/util/tensor_view_io.h&quot;</code>
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- **Line 45**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 46**: <code>#include &quot;cutlass/util/reference/host/tensor_fill.h&quot;</code>
+  - EN: Provides deterministic and randomized tensor initialization helpers.
+  - CN: 提供确定性和随机化的张量初始化辅助函数。
+- **Line 47**: <code>#include &quot;cutlass/util/reference/host/tensor_compare.h&quot;</code>
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- **Line 48**: <code>#include &quot;cutlass/util/reference/host/gemm.h&quot;</code>
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性检查的 CPU 参考 GEMM 实现。
+- **Line 49**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 50**: <code>#include &quot;testbed.h&quot;</code>
+  - EN: Provides the local GEMM testbed that allocates tensors, launches kernels, and validates outputs.
+  - CN: 提供本地 GEMM 测试平台，用于分配张量、启动内核并验证输出。
+- **Line 51**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 52**: <code>#if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)</code>
+  - EN: Compiles the following code only when `CUTLASS_ARCH_MMA_SM80_SUPPORTED` is available.
+  - CN: 仅当 `CUTLASS_ARCH_MMA_SM80_SUPPORTED` 可用时才编译后续代码。
+- **Line 53**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 54**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 55**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 56**: <code>/// F32 &lt;= F16 * I8 + F32 (Upcast on Operand B)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 57**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 58**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 59**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_i8, 128x128x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_i8 / 128x128x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_i8 / 128x128x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 60**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 61**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 62**: <code>  using ElementA = cutlass::half_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 63**: <code>  using ElementB = int8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 64**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 65**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 66**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 67**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 68**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 69**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 70**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 71**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 72**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 73**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 74**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 75**: <code>                            cutlass::gemm::GemmShape&lt;128, 128, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 76**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 77**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 78**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 79**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_i8, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_i8 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_i8 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 80**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 81**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 82**: <code>  using ElementA = cutlass::half_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 83**: <code>  using ElementB = int8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 84**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 85**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 86**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 87**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 88**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 89**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 90**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 91**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 92**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 93**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 94**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 95**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 96**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 97**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 98**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 99**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 100**: <code>/// F32 &lt;= I8 * F16 + F32 (Upcast on Operand A)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 101**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 102**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 103**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_f16, 128x128x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_f16 / 128x128x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_f16 / 128x128x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 104**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 105**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 106**: <code>  using ElementA = int8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 107**: <code>  using ElementB = cutlass::half_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 108**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 109**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 110**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 111**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 112**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 113**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 114**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 115**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 116**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 117**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 118**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 119**: <code>                            cutlass::gemm::GemmShape&lt;128, 128, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 120**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 121**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 122**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 123**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_f16, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_f16 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_f16 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 124**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 125**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 126**: <code>  using ElementA = int8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 127**: <code>  using ElementB = cutlass::half_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 128**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 129**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 130**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 131**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 132**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 133**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 134**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 135**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 136**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 137**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 138**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 139**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 140**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 141**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 142**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 143**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 144**: <code>/// F32 &lt;= F16 * U8 + F32 (Upcast on Operand B)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 145**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 146**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 147**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_u8, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_u8 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_u8 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 148**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 149**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 150**: <code>  using ElementA = cutlass::half_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 151**: <code>  using ElementB = uint8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 152**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 153**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 154**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 155**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 156**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 157**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 158**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 159**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 160**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 161**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 162**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 163**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 164**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 165**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 166**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 167**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_u8, 128x128x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_u8 / 128x128x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_f16_u8 / 128x128x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 168**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 169**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 170**: <code>  using ElementA = cutlass::half_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 171**: <code>  using ElementB = uint8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 172**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 173**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 174**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 175**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 176**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 177**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 178**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 179**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 180**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 181**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 182**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 183**: <code>                            cutlass::gemm::GemmShape&lt;128, 128, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 184**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 185**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 186**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 187**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 188**: <code>/// F32 &lt;= U8 * F16 + F32 (Upcast on Operand A)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 189**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 190**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 191**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_f16, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_f16 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_f16 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 192**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 193**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 194**: <code>  using ElementA = uint8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 195**: <code>  using ElementB = cutlass::half_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 196**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 197**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 198**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 199**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 200**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 201**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 202**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 203**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 204**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 205**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 206**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 207**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 208**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 209**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 210**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 211**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_f16, 128x128x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_f16 / 128x128x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_f16 / 128x128x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 212**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 213**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 214**: <code>  using ElementA = uint8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 215**: <code>  using ElementB = cutlass::half_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 216**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 217**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 218**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 219**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 220**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 221**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 222**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 223**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 224**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 225**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 226**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 227**: <code>                            cutlass::gemm::GemmShape&lt;128, 128, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 228**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 229**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 230**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 231**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 232**: <code>/// F32 &lt;= B16 * U8 + F32 (Upcast on Operand B)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 233**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 234**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 235**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_bf16_u8, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_bf16_u8 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_bf16_u8 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 236**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 237**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 238**: <code>  using ElementA = cutlass::bfloat16_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 239**: <code>  using ElementB = uint8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 240**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 241**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 242**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 243**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 244**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 245**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 246**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 247**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 248**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 249**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 250**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 251**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 252**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 253**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 254**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 255**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 256**: <code>/// F32 &lt;= U8 * BF16 + F32 (Upcast on Operand A)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 257**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 258**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 259**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_bf16, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_bf16 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_u8_bf16 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 260**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 261**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 262**: <code>  using ElementA = uint8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 263**: <code>  using ElementB = cutlass::bfloat16_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 264**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 265**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 266**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 267**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 268**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 269**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 270**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 271**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 272**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 273**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 274**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 275**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 276**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 277**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 278**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 279**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 280**: <code>/// F32 &lt;= I8 * BF16 + F32 (Upcast on Operand A)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 281**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 282**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 283**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_bf16_i8, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_bf16_i8 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_bf16_i8 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 284**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 285**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 286**: <code>  using ElementA = cutlass::bfloat16_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 287**: <code>  using ElementB = int8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 288**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 289**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 290**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 291**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 292**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 293**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 294**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 295**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 296**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 297**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 298**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 299**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 300**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 301**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 302**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 303**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 304**: <code>/// F32 &lt;= B16 * I8 + F32 (Upcast on Operand B)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 305**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 306**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 307**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_bf16, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_bf16 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_bf16 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 308**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 309**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 16&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 310**: <code>  using ElementA = int8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 311**: <code>  using ElementB = cutlass::bfloat16_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 312**: <code>  using ElementC = float;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 313**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 314**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 315**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 316**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 317**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 318**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 319**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 320**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 321**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 322**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 323**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 324**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 325**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 326**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 327**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 328**: <code>/// S32 &lt;= I4 * I8 + S32 (Upcast on Operand A)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 329**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 330**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 331**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_i4_i8, 64x64x64_64x64x64_16x8x16) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i4_i8 / 64x64x64_64x64x64_16x8x16`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i4_i8 / 64x64x64_64x64x64_16x8x16`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 332**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 333**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 32&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 334**: <code>  using ElementA = cutlass::int4b_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 335**: <code>  using ElementB = int8_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 336**: <code>  using ElementC = int32_t;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 337**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 338**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 339**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 340**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 341**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 342**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 343**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 344**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 345**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 346**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 347**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 348**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 349**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 350**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 351**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 352**: <code>/// S32 &lt;= I8 * I4 + S32 (Upcast on Operand B)</code>
+  - EN: Adds a short Doxygen-style comment explaining the next member or section.
+  - CN: 添加 Doxygen 风格短注释，用于说明后续成员或代码段。
+- **Line 353**: <code>////////////////////////////////////////////////////////////////////////////////</code>
+  - EN: Adds a visual separator between major test or helper sections.
+  - CN: 在主要测试或辅助代码片段之间加入可视分隔线。
+- **Line 354**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 355**: <code>TEST(SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_i4, 64x64x64_64x64x64_16x8x32) {</code>
+  - EN: Starts GoogleTest case `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_i4 / 64x64x64_64x64x64_16x8x32`; this case instantiates one concrete configuration and runs it through the shared harness.
+  - CN: 开始 GoogleTest 用例 `SM80_warp_gemm_mixed_input_tensor_op_crosswise_i8_i4 / 64x64x64_64x64x64_16x8x32`；该用例会实例化一种具体配置并通过共享测试框架运行。
+- **Line 356**: <code>  using Shape = cutlass::gemm::GemmShape&lt;64, 64, 64&gt;;</code>
+  - EN: Defines alias `Shape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `Shape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 357**: <code>  using InstructionShape = cutlass::gemm::GemmShape&lt;16, 8, 32&gt;;</code>
+  - EN: Defines alias `InstructionShape` to fix one GEMM tile shape used by the test.
+  - CN: 定义别名 `InstructionShape`，以固定测试使用的一种 GEMM tile 形状。
+- **Line 358**: <code>  using ElementA = int8_t;</code>
+  - EN: Defines alias `ElementA` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementA`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 359**: <code>  using ElementB = cutlass::int4b_t;</code>
+  - EN: Defines alias `ElementB` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementB`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 360**: <code>  using ElementC = int32_t;</code>
+  - EN: Defines alias `ElementC` to name one scalar type used by the kernel or testbed.
+  - CN: 定义别名 `ElementC`，用于命名内核或测试平台使用的一种标量类型。
+- **Line 361**: <code>  using LayoutA = cutlass::layout::RowMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutA` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutA`，以固定某个操作数或输出的内存布局。
+- **Line 362**: <code>      cutlass::sizeof_bits&lt;ElementA&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 363**: <code>  using LayoutB = cutlass::layout::ColumnMajorTensorOpMultiplicandCrosswise&lt;</code>
+  - EN: Defines `LayoutB` to lock in one operand or output memory layout.
+  - CN: 定义 `LayoutB`，以固定某个操作数或输出的内存布局。
+- **Line 364**: <code>      cutlass::sizeof_bits&lt;ElementB&gt;::value, 64&gt;;</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 365**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 366**: <code>  using MmaTensorOp = typename cutlass::gemm::warp::DefaultMmaTensorOp&lt;</code>
+  - EN: Defines alias `MmaTensorOp` for the MMA operator type built from the chosen policies.
+  - CN: 为根据所选策略构建出的 MMA 算子类型定义别名 `MmaTensorOp`。
+- **Line 367**: <code>      Shape, InstructionShape, ElementA, LayoutA, ElementB, LayoutB, ElementC,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 368**: <code>      cutlass::layout::RowMajor, cutlass::arch::OpMultiplyAddMixedInputUpcast&gt;::Type;</code>
+  - EN: Chooses the memory layout used by one of the GEMM operands or outputs.
+  - CN: 选择某个 GEMM 输入或输出所使用的内存布局。
+- **Line 369**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 370**: <code>  test::gemm::warp::TransformTestbed&lt;MmaTensorOp,</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 371**: <code>                            cutlass::gemm::GemmShape&lt;64, 64, 64&gt; &gt;()</code>
+  - EN: Specifies a GEMM tile shape, such as the problem, threadblock, warp, or instruction shape.
+  - CN: 指定一个 GEMM tile 形状，例如问题规模、线程块、warp 或指令级形状。
+- **Line 372**: <code>      .run();</code>
+  - EN: Continues the current declaration, argument list, expression, or helper implementation.
+  - CN: 继续当前的声明、参数列表、表达式或辅助实现。
+- **Line 373**: <code>}</code>
+  - EN: Closes the current C++ scope or initializer.
+  - CN: 结束当前的 C++ 作用域或初始化列表。
+- **Line 374**: <code>(blank)</code>
+  - EN: Leaves a blank line to separate logical sections for readability.
+  - CN: 保留空行以分隔逻辑片段并提升可读性。
+- **Line 375**: <code>#endif // if defined(CUTLASS_ARCH_MMA_SM80_SUPPORTED)</code>
+  - EN: Closes the active preprocessor conditional block.
+  - CN: 结束当前的预处理条件块。
+
+## Key Concepts / 关键概念
+
+- `warp-level MMA`
+  - EN: The file focuses on warp-scoped MMA, where lanes cooperate to load fragments and execute matrix-multiply instructions.
+  - CN: 该文件关注 warp 作用域的 MMA，其中各个 lane 协作加载片段并执行矩阵乘法指令。
+- `shared-memory staging`
+  - EN: The warp testbed stages operand tiles in shared memory before iterator-based fragment loads.
+  - CN: warp 测试平台会先把操作数 tile 放入共享内存，再通过迭代器方式加载片段。
+- `mixed precision`
+  - EN: The mixed-input tests intentionally combine different input and accumulator types to check conversion and accumulation rules.
+  - CN: 混合输入测试会有意组合不同的输入类型与累加器类型，以检查类型转换和累加规则。
+- `GemmShape`
+  - EN: Tile shapes are encoded explicitly, so each test documents the M/N/K sizes handled by the chosen MMA operator.
+  - CN: tile 形状通过显式类型编码，因此每个测试都直接说明了所选 MMA 算子处理的 M/N/K 尺寸。
+
+## Dependencies / 依赖
+
+- `../../common/cutlass_unit_test.h`
+  - EN: Supplies the CUTLASS unit-test harness and assertion macros.
+  - CN: 提供 CUTLASS 单元测试框架与断言宏。
+- `cutlass/aligned_buffer.h`
+  - EN: Provides statically aligned storage containers used for fragments or shared-memory staging.
+  - CN: 提供用于片段或共享内存暂存的静态对齐存储容器。
+- `cutlass/half.h`
+  - EN: Defines CUTLASS half-precision numeric types and conversions.
+  - CN: 定义 CUTLASS 半精度数值类型及其转换。
+- `cutlass/gemm/warp/default_mma_tensor_op.h`
+  - EN: Builds default warp-level Tensor Core MMA policies.
+  - CN: 构建默认的 warp 级 Tensor Core MMA 策略。
+- `cutlass/core_io.h`
+  - EN: Provides formatted printing helpers for CUTLASS core types and fragments.
+  - CN: 提供 CUTLASS 核心类型与片段的格式化打印辅助函数。
+- `cutlass/util/host_tensor.h`
+  - EN: Provides host/device tensor containers used by the testbeds.
+  - CN: 提供测试平台使用的主机/设备张量容器。
+- `cutlass/util/tensor_view_io.h`
+  - EN: Provides formatted printing helpers for tensor views.
+  - CN: 提供张量视图的格式化打印辅助函数。
+- `cutlass/util/reference/host/tensor_fill.h`
+  - EN: Provides deterministic and randomized tensor initialization helpers.
+  - CN: 提供确定性和随机化的张量初始化辅助函数。
+- `cutlass/util/reference/host/tensor_compare.h`
+  - EN: Provides elementwise tensor comparison utilities.
+  - CN: 提供逐元素张量比较工具。
+- `cutlass/util/reference/host/gemm.h`
+  - EN: Provides CPU reference GEMM implementations for correctness checks.
+  - CN: 提供用于正确性检查的 CPU 参考 GEMM 实现。
+- `testbed.h`
+  - EN: Provides the local GEMM testbed that allocates tensors, launches kernels, and validates outputs.
+  - CN: 提供本地 GEMM 测试平台，用于分配张量、启动内核并验证输出。

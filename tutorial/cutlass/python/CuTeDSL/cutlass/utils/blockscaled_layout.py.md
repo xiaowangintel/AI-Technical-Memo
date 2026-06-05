@@ -1,0 +1,677 @@
+# blockscaled_layout.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/CuTeDSL/cutlass/utils/blockscaled_layout.py`
+
+## Purpose / 作用
+- EN: Defines 2 classes (BlockScaledBasicChunk, Sm103BlockScaledBasicChunk) and 10 functions (tile_atom_to_shape_SF, make_smem_layout_sf, make_smem_layout_sfa, make_smem_layout_sfb, ... (+6 more)) in `CuTeDSL.cutlass.utils.blockscaled_layout`.
+- CN: 该模块 `CuTeDSL.cutlass.utils.blockscaled_layout` 定义了 2 个类（BlockScaledBasicChunk, Sm103BlockScaledBasicChunk） 和 10 个函数（tile_atom_to_shape_SF, make_smem_layout_sf, make_smem_layout_sfa, make_smem_layout_sfb, ... (+6 more)）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `# SPDX-FileCopyrightText: Copyright (c) 2025 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L2** `# SPDX-License-Identifier: LicenseRef-NvidiaProprietary` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L3** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L4** `# Use of this software is governed by the terms and conditions of the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L5** `# NVIDIA End User License Agreement (EULA), available at:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L6** `# https://docs.nvidia.com/cutlass/latest/media/docs/pythonDSL/license.html` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L7** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L8** `# Any use, reproduction, disclosure, or distribution of this software` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L9** `# and related documentation outside the scope permitted by the EULA` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L10** `# is strictly prohibited.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L12** `from dataclasses import dataclass, field` — **EN:** Imports dataclass, field from `dataclasses`. **CN:** 从 `dataclasses` 导入 dataclass, field。
+- **L13** `from typing import Optional` — **EN:** Imports Optional from `typing`. **CN:** 从 `typing` 导入 Optional。
+- **L14** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L15** `from cutlass.cutlass_dsl import dsl_user_op` — **EN:** Imports dsl_user_op from `cutlass.cutlass_dsl`. **CN:** 从 `cutlass.cutlass_dsl` 导入 dsl_user_op。
+- **L16** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L17** `import cutlass.cute as cute` — **EN:** Imports cutlass.cute as cute for later use. **CN:** 导入 cutlass.cute as cute 供后续使用。
+- **L18** `from cutlass.cute.nvgpu import OperandMajorMode` — **EN:** Imports OperandMajorMode from `cutlass.cute.nvgpu`. **CN:** 从 `cutlass.cute.nvgpu` 导入 OperandMajorMode。
+- **L19** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L20** `from cutlass._mlir import ir` — **EN:** Imports ir from `cutlass._mlir`. **CN:** 从 `cutlass._mlir` 导入 ir。
+- **L21** `import cutlass._mlir.dialects.cute as _cute_ir` — **EN:** Imports cutlass._mlir.dialects.cute as _cute_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute as _cute_ir 供后续使用。
+- **L22** `import cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir` — **EN:** Imports cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir for later use. **CN:** 导入 cutlass._mlir.dialects.cute_nvgpu as _cute_nvgpu_ir 供后续使用。
+- **L23** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L24** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L25** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L26** `class BlockScaledBasicChunk:` — **EN:** Defines class `BlockScaledBasicChunk`. **CN:** 定义类 `BlockScaledBasicChunk`。
+- **L27** `    """` — **EN:** Starts the docstring for the class `BlockScaledBasicChunk`. **CN:** 开始说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L28** `    The basic scale factor atom layout decided by tcgen05 BlockScaled MMA Ops.` — **EN:** Continues the docstring for the class `BlockScaledBasicChunk`. **CN:** 继续说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L29** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L30** `    This class represents the fixed layout pattern for scale factors used in` — **EN:** Continues the docstring for the class `BlockScaledBasicChunk`. **CN:** 继续说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L31** `    tcgen05 BlockScaled MMA Ops. The layout is determined by the` — **EN:** Continues the docstring for the class `BlockScaledBasicChunk`. **CN:** 继续说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L32** `    instruction specification and cannot be modified.` — **EN:** Continues the docstring for the class `BlockScaledBasicChunk`. **CN:** 继续说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L33** `    See \`PTX documentation <https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-scale-factor-a-layout-1x>\`.` — **EN:** Continues the docstring for the class `BlockScaledBasicChunk`. **CN:** 继续说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L34** `    """` — **EN:** Ends the docstring for the class `BlockScaledBasicChunk`. **CN:** 结束说明 class `BlockScaledBasicChunk` 的文档字符串。
+- **L35** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L36** `    sf_vec_size: int` — **EN:** Assigns a typed value to sf_vec_size. **CN:** 为 sf_vec_size 赋予带类型标注的值。
+- **L37** `    major_mode: OperandMajorMode = OperandMajorMode.K` — **EN:** Assigns a typed value to major_mode. **CN:** 为 major_mode 赋予带类型标注的值。
+- **L38** `    _layout: cute.Layout = field(init=False, repr=False)` — **EN:** Assigns a typed value to _layout. **CN:** 为 _layout 赋予带类型标注的值。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L41** `        if self.major_mode == OperandMajorMode.K:` — **EN:** Starts a conditional branch guarded by `self.major_mode == OperandMajorMode.K`. **CN:** 开始一个由 `self.major_mode == OperandMajorMode.K` 控制的条件分支。
+- **L42** `            # K-major layout: (AtomMN, AtomK)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L43** `            atom_shape = ((32, 4), (self.sf_vec_size, 4))` — **EN:** Assigns a value to atom_shape. **CN:** 将一个值赋给 atom_shape。
+- **L44** `            atom_stride = ((16, 4), (0, 1))` — **EN:** Assigns a value to atom_stride. **CN:** 将一个值赋给 atom_stride。
+- **L45** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L46** `            # MN-major layout: (AtomK, AtomMN)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L47** `            atom_shape = ((self.sf_vec_size, 4), (32, 4))` — **EN:** Assigns a value to atom_shape. **CN:** 将一个值赋给 atom_shape。
+- **L48** `            atom_stride = ((0, 1), (16, 4))` — **EN:** Assigns a value to atom_stride. **CN:** 将一个值赋给 atom_stride。
+- **L49** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L50** `        object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L51** `            self, "_layout", cute.make_layout(atom_shape, stride=atom_stride)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L53** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L54** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L55** `    def layout(self) -> cute.Layout:` — **EN:** Defines function `layout`. **CN:** 定义函数 `layout`。
+- **L56** `        """` — **EN:** Starts the docstring for the function `layout`. **CN:** 开始说明 function `layout` 的文档字符串。
+- **L57** `        Get the layout for this block scaled chunk.` — **EN:** Continues the docstring for the function `layout`. **CN:** 继续说明 function `layout` 的文档字符串。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `        :return: The layout representing the scale factor atom` — **EN:** Continues the docstring for the function `layout`. **CN:** 继续说明 function `layout` 的文档字符串。
+- **L60** `        :rtype: cute.Layout` — **EN:** Continues the docstring for the function `layout`. **CN:** 继续说明 function `layout` 的文档字符串。
+- **L61** `        """` — **EN:** Ends the docstring for the function `layout`. **CN:** 结束说明 function `layout` 的文档字符串。
+- **L62** `        return self._layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L63** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L66** `def tile_atom_to_shape_SF(` — **EN:** Defines function `tile_atom_to_shape_SF`. **CN:** 定义函数 `tile_atom_to_shape_SF`。
+- **L67** `    Shape: cute.Shape,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L68** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L69** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L70** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L71** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L72** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L73** `    """` — **EN:** Starts the docstring for the function `tile_atom_to_shape_SF`. **CN:** 开始说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L74** `    A helper function to get dynamic SFA/SFB layout by filling dynamic A/B shape to the scale factor atom layout.` — **EN:** Continues the docstring for the function `tile_atom_to_shape_SF`. **CN:** 继续说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L75** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L76** `    :param Shape: The shape of the A/B tensor` — **EN:** Continues the docstring for the function `tile_atom_to_shape_SF`. **CN:** 继续说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L77** `    :param sf_vec_size: Scale factor vector size` — **EN:** Continues the docstring for the function `tile_atom_to_shape_SF`. **CN:** 继续说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L78** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L79** `    :return: The layout of the SFA/SFB tensor` — **EN:** Continues the docstring for the function `tile_atom_to_shape_SF`. **CN:** 继续说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L80** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `tile_atom_to_shape_SF`. **CN:** 继续说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L81** `    """` — **EN:** Ends the docstring for the function `tile_atom_to_shape_SF`. **CN:** 结束说明 function `tile_atom_to_shape_SF` 的文档字符串。
+- **L82** `    # ((Atom_MN, Rest_MN),(Atom_K, Rest_K),RestL)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L83** `    sf_layout = cute.tile_to_shape(` — **EN:** Assigns a value to sf_layout. **CN:** 将一个值赋给 sf_layout。
+- **L84** `        BlockScaledBasicChunk(sf_vec_size).layout, Shape, (2, 1, 3)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `    return sf_layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L87** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L88** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L89** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L90** `def make_smem_layout_sf(` — **EN:** Defines function `make_smem_layout_sf`. **CN:** 定义函数 `make_smem_layout_sf`。
+- **L91** `    tile_shape: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L92** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L93** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L94** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L95** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L96** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L97** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L98** `    """` — **EN:** Starts the docstring for the function `make_smem_layout_sf`. **CN:** 开始说明 function `make_smem_layout_sf` 的文档字符串。
+- **L99** `    A helper function to get dynamic SFA/SFB layout by filling dynamic A/B shape to the scale factor atom layout.` — **EN:** Continues the docstring for the function `make_smem_layout_sf`. **CN:** 继续说明 function `make_smem_layout_sf` 的文档字符串。
+- **L100** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L101** `    :param Shape: The shape of the A/B tensor` — **EN:** Continues the docstring for the function `make_smem_layout_sf`. **CN:** 继续说明 function `make_smem_layout_sf` 的文档字符串。
+- **L102** `    :param sf_vec_size: Scale factor vector size` — **EN:** Continues the docstring for the function `make_smem_layout_sf`. **CN:** 继续说明 function `make_smem_layout_sf` 的文档字符串。
+- **L103** `    :param num_stages: Number of stages` — **EN:** Continues the docstring for the function `make_smem_layout_sf`. **CN:** 继续说明 function `make_smem_layout_sf` 的文档字符串。
+- **L104** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L105** `    :return: The layout of the SFA/SFB tensor` — **EN:** Continues the docstring for the function `make_smem_layout_sf`. **CN:** 继续说明 function `make_smem_layout_sf` 的文档字符串。
+- **L106** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `make_smem_layout_sf`. **CN:** 继续说明 function `make_smem_layout_sf` 的文档字符串。
+- **L107** `    """` — **EN:** Ends the docstring for the function `make_smem_layout_sf`. **CN:** 结束说明 function `make_smem_layout_sf` 的文档字符串。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `    smem_layout = cute.tile_to_shape(` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L110** `        BlockScaledBasicChunk(sf_vec_size).layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `        tile_shape,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        (2, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L114** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L115** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L116** `    smem_layout_staged = cute.append(` — **EN:** Assigns a value to smem_layout_staged. **CN:** 将一个值赋给 smem_layout_staged。
+- **L117** `        smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L118** `        cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L119** `            num_stages,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L120** `            stride=cute.cosize(cute.filter_zeros(smem_layout)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L121** `            loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L122** `            ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L123** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L124** `        loc=loc,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L125** `        ip=ip,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L126** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L127** `    return smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L131** `def make_smem_layout_sfa(` — **EN:** Defines function `make_smem_layout_sfa`. **CN:** 定义函数 `make_smem_layout_sfa`。
+- **L132** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L133** `    mma_tiler_mnk: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L134** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L135** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L136** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L139** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L140** `    """` — **EN:** Starts the docstring for the function `make_smem_layout_sfa`. **CN:** 开始说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L141** `    Make smem layout for SFA based on:` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `    1. BlockScaledBasicChunk` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L144** `    2. MMA tiler shape` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L145** `    3. Scale factor vector size` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L146** `    4. Number of stages` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L147** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L148** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L149** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L150** `    :param mma_tiler_mnk: The mma tiler shape` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L151** `    :type mma_tiler_mnk: cute.Tile` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L152** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L153** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L154** `    :param num_stages: The number of stages` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L155** `    :type num_stages: int` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `    :return: Smem layout for SFA` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L158** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `make_smem_layout_sfa`. **CN:** 继续说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L159** `    """` — **EN:** Ends the docstring for the function `make_smem_layout_sfa`. **CN:** 结束说明 function `make_smem_layout_sfa` 的文档字符串。
+- **L160** `    # (CTA_Tile_Shape_M, MMA_Tile_Shape_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L161** `    sfa_tile_shape = (` — **EN:** Assigns a value to sfa_tile_shape. **CN:** 将一个值赋给 sfa_tile_shape。
+- **L162** `        mma_tiler_mnk[0] // cute.size(tiled_mma.thr_id.shape),  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L163** `        mma_tiler_mnk[2],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L164** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `    # ((Atom_M, Rest_M),(Atom_K, Rest_K))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L167** `    smem_layout = cute.tile_to_shape(` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L168** `        BlockScaledBasicChunk(sf_vec_size).layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `        sfa_tile_shape,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `        (2, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L173** `    # Number of MMA instructions to cover all k-tiles` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L174** `    mma_tile_inst_m = mma_tiler_mnk[0] // cute.size(tiled_mma.shape_mnk, mode=[0])  # type: ignore[index]` — **EN:** Assigns a value to mma_tile_inst_m. **CN:** 将一个值赋给 mma_tile_inst_m。
+- **L175** `    mma_tile_inst_k = mma_tiler_mnk[2] // cute.size(tiled_mma.shape_mnk, mode=[2])  # type: ignore[index]` — **EN:** Assigns a value to mma_tile_inst_k. **CN:** 将一个值赋给 mma_tile_inst_k。
+- **L176** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L177** `    # (CTA_Tile_Shape_M, MMA_Inst_Shape_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L178** `    sfa_tile_shape = cute.shape_div(sfa_tile_shape, (mma_tile_inst_m, mma_tile_inst_k))` — **EN:** Assigns a value to sfa_tile_shape. **CN:** 将一个值赋给 sfa_tile_shape。
+- **L179** `    # ((Atom_Inst_M, Atom_Inst_K), MMA_M, MMA_K))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L180** `    smem_layout = cute.tiled_divide(smem_layout, sfa_tile_shape)` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    atom_m = 128` — **EN:** Assigns a value to atom_m. **CN:** 将一个值赋给 atom_m。
+- **L183** `    tiler_inst = ((atom_m, sf_vec_size),)` — **EN:** Assigns a value to tiler_inst. **CN:** 将一个值赋给 tiler_inst。
+- **L184** `    # (((Atom_Inst_M, Rest_M),(Atom_Inst_K, Rest_K)), MMA_M, MMA_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L185** `    smem_layout = cute.logical_divide(smem_layout, tiler_inst)` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L186** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L187** `    # (((Atom_Inst_M, Rest_M),(Atom_Inst_K, Rest_K)), MMA_M, MMA_K, STAGE)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `    sfa_smem_layout_staged = cute.append(` — **EN:** Assigns a value to sfa_smem_layout_staged. **CN:** 将一个值赋给 sfa_smem_layout_staged。
+- **L189** `        smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L190** `        cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L191** `            num_stages, stride=cute.cosize(cute.filter_zeros(smem_layout))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L192** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L193** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** `    return sfa_smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L198** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L199** `def make_smem_layout_sfb(` — **EN:** Defines function `make_smem_layout_sfb`. **CN:** 定义函数 `make_smem_layout_sfb`。
+- **L200** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L201** `    mma_tiler_mnk: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L202** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L203** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L204** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L205** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L206** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L207** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L208** `    """` — **EN:** Starts the docstring for the function `make_smem_layout_sfb`. **CN:** 开始说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L209** `    Make smem layout for SFB based on:` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    1. BlockScaledBasicChunk` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L212** `    2. MMA tiler shape` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L213** `    3. Scale factor vector size` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L214** `    4. Number of stages` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L215** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L216** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L217** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L218** `    :param mma_tiler_mnk: The mma tiler shape` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L219** `    :type mma_tiler_mnk: cute.Tile` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L220** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L221** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L222** `    :param num_stages: The number of stages` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L223** `    :type num_stages: int` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L224** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L225** `    :return: Smem layout for SFA` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L226** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `make_smem_layout_sfb`. **CN:** 继续说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L227** `    """` — **EN:** Ends the docstring for the function `make_smem_layout_sfb`. **CN:** 结束说明 function `make_smem_layout_sfb` 的文档字符串。
+- **L228** `    # (Round_Up(CTA_Tile_Shape_N, 128), MMA_Tile_Shape_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L229** `    sfb_tile_shape = (` — **EN:** Assigns a value to sfb_tile_shape. **CN:** 将一个值赋给 sfb_tile_shape。
+- **L230** `        cute.round_up(mma_tiler_mnk[1], 128),  # type: ignore[index, arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `        mma_tiler_mnk[2],  # type: ignore[index]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L234** `    # ((Atom_N, Rest_N),(Atom_K, Rest_K))` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L235** `    smem_layout = cute.tile_to_shape(` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L236** `        BlockScaledBasicChunk(sf_vec_size).layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L237** `        sfb_tile_shape,  # type: ignore[arg-type]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L238** `        (2, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L239** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L240** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L241** `    # Number of MMA instructions to cover all k-tiles` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L242** `    mma_tile_inst_n = mma_tiler_mnk[1] // cute.size(tiled_mma.shape_mnk, mode=[1])  # type: ignore[index]` — **EN:** Assigns a value to mma_tile_inst_n. **CN:** 将一个值赋给 mma_tile_inst_n。
+- **L243** `    mma_tile_inst_k = mma_tiler_mnk[2] // cute.size(tiled_mma.shape_mnk, mode=[2])  # type: ignore[index]` — **EN:** Assigns a value to mma_tile_inst_k. **CN:** 将一个值赋给 mma_tile_inst_k。
+- **L244** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L245** `    # (CTA_Tile_Shape_N, MMA_Inst_Shape_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L246** `    sfb_tile_shape = cute.shape_div(sfb_tile_shape, (mma_tile_inst_n, mma_tile_inst_k))` — **EN:** Assigns a value to sfb_tile_shape. **CN:** 将一个值赋给 sfb_tile_shape。
+- **L247** `    # ((Atom_Inst_N, Atom_Inst_K), MMA_N, MMA_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L248** `    smem_layout = cute.tiled_divide(smem_layout, sfb_tile_shape)` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `    atom_n = 128` — **EN:** Assigns a value to atom_n. **CN:** 将一个值赋给 atom_n。
+- **L251** `    tiler_inst = ((atom_n, sf_vec_size),)` — **EN:** Assigns a value to tiler_inst. **CN:** 将一个值赋给 tiler_inst。
+- **L252** `    # (((Atom_Inst_M, Rest_M),(Atom_Inst_K, Rest_K)), MMA_M, MMA_K)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L253** `    smem_layout = cute.logical_divide(smem_layout, tiler_inst)` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L254** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L255** `    # (((Atom_Inst_M, Rest_M),(Atom_Inst_K, Rest_K)), MMA_M, MMA_K, STAGE)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L256** `    sfb_smem_layout_staged = cute.append(` — **EN:** Assigns a value to sfb_smem_layout_staged. **CN:** 将一个值赋给 sfb_smem_layout_staged。
+- **L257** `        smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L258** `        cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L259** `            num_stages, stride=cute.cosize(cute.filter_zeros(smem_layout))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L260** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L261** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L262** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L263** `    return sfb_smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L264** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L267** `def sm120_make_smem_layout_sfa(` — **EN:** Defines function `sm120_make_smem_layout_sfa`. **CN:** 定义函数 `sm120_make_smem_layout_sfa`。
+- **L268** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L269** `    tile_shape_mnk: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L270** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L271** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L272** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L273** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L274** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L275** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L276** `    """` — **EN:** Starts the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 开始说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L277** `    Make smem layout for SFA based on:` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L278** `    1. BlockScaledBasicChunk` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L279** `    2. MMA tiler shape` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L280** `    3. Scale factor vector size` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L281** `    4. Number of stages` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L283** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L284** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L285** `    :param mma_tiler_mnk: The mma tiler shape` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L286** `    :type mma_tiler_mnk: cute.Tile` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L287** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L288** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L289** `    :param num_stages: The number of stages` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L290** `    :type num_stages: int` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L291** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L292** `    :return: Smem layout for SFA` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L293** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 继续说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L294** `    """` — **EN:** Ends the docstring for the function `sm120_make_smem_layout_sfa`. **CN:** 结束说明 function `sm120_make_smem_layout_sfa` 的文档字符串。
+- **L295** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L296** `    assert sf_vec_size == 16 or sf_vec_size == 32, "sf_vec_size must be 16 or 32"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L297** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L298** `    blk_mn = 128` — **EN:** Assigns a value to blk_mn. **CN:** 将一个值赋给 blk_mn。
+- **L299** `    blk_sf = 4` — **EN:** Assigns a value to blk_sf. **CN:** 将一个值赋给 blk_sf。
+- **L300** `    blk_elems = blk_mn * blk_sf` — **EN:** Assigns a value to blk_elems. **CN:** 将一个值赋给 blk_elems。
+- **L301** `    mma_nsf = tiled_mma.shape_mnk[2] // sf_vec_size` — **EN:** Assigns a value to mma_nsf. **CN:** 将一个值赋给 mma_nsf。
+- **L302** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L303** `    mn_basic_block_shape = (32, 4)` — **EN:** Assigns a value to mn_basic_block_shape. **CN:** 将一个值赋给 mn_basic_block_shape。
+- **L304** `    mn_basic_block_stride = (16, 4)` — **EN:** Assigns a value to mn_basic_block_stride. **CN:** 将一个值赋给 mn_basic_block_stride。
+- **L305** `    k_basic_block_shape = (sf_vec_size, mma_nsf)` — **EN:** Assigns a value to k_basic_block_shape. **CN:** 将一个值赋给 k_basic_block_shape。
+- **L306** `    k_basic_block_stride = (0, 1)` — **EN:** Assigns a value to k_basic_block_stride. **CN:** 将一个值赋给 k_basic_block_stride。
+- **L307** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L308** `    assert tile_shape_mnk[0] % blk_mn == 0, (  # type: ignore[index, operator]` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L309** `        "tile_shape_mnk[0] must be divisible by blk_mn"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L310** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `    sSFA_shapeM = (mn_basic_block_shape, tile_shape_mnk[0] // blk_mn)  # type: ignore[index, operator]` — **EN:** Assigns a value to sSFA_shapeM. **CN:** 将一个值赋给 sSFA_shapeM。
+- **L313** `    sSF_strideM = (mn_basic_block_stride, blk_elems)` — **EN:** Assigns a value to sSF_strideM. **CN:** 将一个值赋给 sSF_strideM。
+- **L314** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L315** `    assert tile_shape_mnk[2] % (blk_sf * mma_nsf) == 0, (  # type: ignore[index]` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L316** `        "tile_shape_mnk[2] must be divisible by blk_sf * mma_nsf"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L317** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L318** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L319** `    sSFA_shapeK = (` — **EN:** Assigns a value to sSFA_shapeK. **CN:** 将一个值赋给 sSFA_shapeK。
+- **L320** `        k_basic_block_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L321** `        blk_sf // mma_nsf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L322** `        tile_shape_mnk[2] // sf_vec_size // blk_sf,  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L323** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L324** `    sSF_strideK = (` — **EN:** Assigns a value to sSF_strideK. **CN:** 将一个值赋给 sSF_strideK。
+- **L325** `        k_basic_block_stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L326** `        mma_nsf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L327** `        tile_shape_mnk[0] // blk_mn * blk_elems,  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L328** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L329** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L330** `    sSFA_shape = (sSFA_shapeM, sSFA_shapeK)` — **EN:** Assigns a value to sSFA_shape. **CN:** 将一个值赋给 sSFA_shape。
+- **L331** `    sSFA_stride = (sSF_strideM, sSF_strideK)` — **EN:** Assigns a value to sSFA_stride. **CN:** 将一个值赋给 sSFA_stride。
+- **L332** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L333** `    smem_layout = cute.make_layout(sSFA_shape, stride=sSFA_stride)` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L334** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L335** `    # (((Atom_Inst_M, Rest_M),(Atom_Inst_K, Rest_K)), MMA_M, MMA_K, STAGE)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L336** `    sfa_smem_layout_staged = cute.append(` — **EN:** Assigns a value to sfa_smem_layout_staged. **CN:** 将一个值赋给 sfa_smem_layout_staged。
+- **L337** `        smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L338** `        cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L339** `            num_stages, stride=cute.cosize(cute.filter_zeros(smem_layout))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L341** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L342** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L343** `    return sfa_smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L344** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L345** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L346** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L347** `def sm120_make_smem_layout_sfb(` — **EN:** Defines function `sm120_make_smem_layout_sfb`. **CN:** 定义函数 `sm120_make_smem_layout_sfb`。
+- **L348** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L349** `    tile_shape_mnk: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L350** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L351** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L352** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L353** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L354** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L355** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L356** `    """` — **EN:** Starts the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 开始说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L357** `    Make smem layout for SFB based on:` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L358** `    1. BlockScaledBasicChunk` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L359** `    2. MMA tiler shape` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L360** `    3. Scale factor vector size` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L361** `    4. Number of stages` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L362** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L363** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L364** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L365** `    :param mma_tiler_mnk: The mma tiler shape` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L366** `    :type mma_tiler_mnk: cute.Tile` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L367** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L368** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L369** `    :param num_stages: The number of stages` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L370** `    :type num_stages: int` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L371** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L372** `    :return: Smem layout for SFA` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L373** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 继续说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L374** `    """` — **EN:** Ends the docstring for the function `sm120_make_smem_layout_sfb`. **CN:** 结束说明 function `sm120_make_smem_layout_sfb` 的文档字符串。
+- **L375** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L376** `    # A single indivisible block will hold 4 scale factors of 128 rows/columns (A/B matrix).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L377** `    # 4 is chosen to make consecutive 32bits of data to have scale factors for only a single row(col).` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L378** `    blk_mn = 128` — **EN:** Assigns a value to blk_mn. **CN:** 将一个值赋给 blk_mn。
+- **L379** `    blk_sf = 4` — **EN:** Assigns a value to blk_sf. **CN:** 将一个值赋给 blk_sf。
+- **L380** `    blk_elems = blk_mn * blk_sf` — **EN:** Assigns a value to blk_elems. **CN:** 将一个值赋给 blk_elems。
+- **L381** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L382** `    assert sf_vec_size == 16 or sf_vec_size == 32, "sf_vec_size must be 16 or 32"` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L383** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L384** `    assert tile_shape_mnk[1] % blk_mn == 0, (  # type: ignore[index, operator]` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L385** `        "tile_shape_mnk[1] must be divisible by blk_mn"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L386** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L387** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L388** `    assert tile_shape_mnk[2] % sf_vec_size == 0, (  # type: ignore[index, operator]` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L389** `        "tile_shape_mnk[2] must be divisible by sf_vec_size"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L390** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L391** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L392** `    mma_nsf = tiled_mma.shape_mnk[2] // sf_vec_size` — **EN:** Assigns a value to mma_nsf. **CN:** 将一个值赋给 mma_nsf。
+- **L393** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L394** `    mn_basic_block_shape = (32, 4)` — **EN:** Assigns a value to mn_basic_block_shape. **CN:** 将一个值赋给 mn_basic_block_shape。
+- **L395** `    mn_basic_block_stride = (16, 4)` — **EN:** Assigns a value to mn_basic_block_stride. **CN:** 将一个值赋给 mn_basic_block_stride。
+- **L396** `    k_basic_block_shape = (sf_vec_size, mma_nsf)` — **EN:** Assigns a value to k_basic_block_shape. **CN:** 将一个值赋给 k_basic_block_shape。
+- **L397** `    k_basic_block_stride = (0, 1)` — **EN:** Assigns a value to k_basic_block_stride. **CN:** 将一个值赋给 k_basic_block_stride。
+- **L398** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L399** `    assert tile_shape_mnk[1] % blk_mn == 0, (  # type: ignore[index, operator]` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L400** `        "tile_shape_mnk[1] must be divisible by blk_mn"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L401** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L402** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L403** `    sSFA_shapeN = (mn_basic_block_shape, tile_shape_mnk[1] // blk_mn)  # type: ignore[index, operator]` — **EN:** Assigns a value to sSFA_shapeN. **CN:** 将一个值赋给 sSFA_shapeN。
+- **L404** `    sSF_strideN = (mn_basic_block_stride, blk_elems)` — **EN:** Assigns a value to sSF_strideN. **CN:** 将一个值赋给 sSF_strideN。
+- **L405** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L406** `    assert tile_shape_mnk[2] % (blk_sf * mma_nsf) == 0, (  # type: ignore[index]` — **EN:** Checks an invariant during execution. **CN:** 在执行期间检查不变量。
+- **L407** `        "tile_shape_mnk[2] must be divisible by blk_sf * mma_nsf"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L408** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L409** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L410** `    sSFA_shapeK = (` — **EN:** Assigns a value to sSFA_shapeK. **CN:** 将一个值赋给 sSFA_shapeK。
+- **L411** `        k_basic_block_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L412** `        blk_sf // mma_nsf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L413** `        tile_shape_mnk[2] // sf_vec_size // blk_sf,  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L414** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L415** `    sSF_strideK = (` — **EN:** Assigns a value to sSF_strideK. **CN:** 将一个值赋给 sSF_strideK。
+- **L416** `        k_basic_block_stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L417** `        mma_nsf,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L418** `        tile_shape_mnk[1] // blk_mn * blk_elems,  # type: ignore[index, operator]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L419** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L420** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L421** `    sSFA_shape = (sSFA_shapeN, sSFA_shapeK)` — **EN:** Assigns a value to sSFA_shape. **CN:** 将一个值赋给 sSFA_shape。
+- **L422** `    sSFA_stride = (sSF_strideN, sSF_strideK)` — **EN:** Assigns a value to sSFA_stride. **CN:** 将一个值赋给 sSFA_stride。
+- **L423** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L424** `    smem_layout = cute.make_layout(sSFA_shape, stride=sSFA_stride)` — **EN:** Assigns a value to smem_layout. **CN:** 将一个值赋给 smem_layout。
+- **L425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L426** `    # (((Atom_Inst_M, Rest_M),(Atom_Inst_K, Rest_K)), MMA_M, MMA_K, STAGE)` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L427** `    sfb_smem_layout_staged = cute.append(` — **EN:** Assigns a value to sfb_smem_layout_staged. **CN:** 将一个值赋给 sfb_smem_layout_staged。
+- **L428** `        smem_layout,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L429** `        cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L430** `            num_stages, stride=cute.cosize(cute.filter_zeros(smem_layout))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L431** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L432** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** `    return sfb_smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L435** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L436** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L437** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L438** `def make_tmem_layout_sfa(` — **EN:** Defines function `make_tmem_layout_sfa`. **CN:** 定义函数 `make_tmem_layout_sfa`。
+- **L439** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L440** `    mma_tiler_mnk: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L441** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L442** `    smem_layout: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L443** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L444** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L445** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L446** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L447** `    """Make tmem layout for SFA based on:` — **EN:** Starts the docstring for the function `make_tmem_layout_sfa`. **CN:** 开始说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L448** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L449** `    1. SFA smem layout per stage` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L450** `    2. Cta tile shape m` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L451** `    3. tiled MMA atom thr size` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L452** `    4. Scale factor vector size` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L455** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L456** `    :param mma_tiler_mnk: The mma tiler shape` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L457** `    :type mma_tiler_mnk: cute.Tile` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L458** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L459** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L460** `    :param smem_layout: The smem layout of SFA per stage` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L461** `    :type smem_layout: cute.Layout` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** `    :return: TMEM layout for SFA` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L464** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `make_tmem_layout_sfa`. **CN:** 继续说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L465** `    """` — **EN:** Ends the docstring for the function `make_tmem_layout_sfa`. **CN:** 结束说明 function `make_tmem_layout_sfa` 的文档字符串。
+- **L466** `    atom_thr_size = cute.size(tiled_mma.thr_id.shape, loc=loc, ip=ip)` — **EN:** Assigns a value to atom_thr_size. **CN:** 将一个值赋给 atom_thr_size。
+- **L467** `    cta_tile_shape_m = mma_tiler_mnk[0] // atom_thr_size  # type: ignore[index]` — **EN:** Assigns a value to cta_tile_shape_m. **CN:** 将一个值赋给 cta_tile_shape_m。
+- **L468** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L469** `    sfa_layout_ty = _cute_nvgpu_ir.make_tmem_layout_sfa(` — **EN:** Assigns a value to sfa_layout_ty. **CN:** 将一个值赋给 sfa_layout_ty。
+- **L470** `        smem_layout, cta_tile_shape_m, atom_thr_size, sf_vec_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L471** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L472** `    return _cute_ir.static(sfa_layout_ty, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L473** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L476** `def make_tmem_layout_sfb(` — **EN:** Defines function `make_tmem_layout_sfb`. **CN:** 定义函数 `make_tmem_layout_sfb`。
+- **L477** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L478** `    mma_tiler_mnk: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L479** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L480** `    smem_layout: cute.Layout,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L481** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L482** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L483** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L484** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L485** `    """Make tmem layout for SFB based on:` — **EN:** Starts the docstring for the function `make_tmem_layout_sfb`. **CN:** 开始说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L486** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L487** `    1. SFB smem layout per stage` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L488** `    2. Cta tile shape m` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L489** `    3. tiled MMA atom thr size` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L490** `    4. Scale factor vector size` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L491** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L492** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L493** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L494** `    :param mma_tiler_mnk: The mma tiler shape` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L495** `    :type mma_tiler_mnk: cute.Tile` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L496** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L497** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L498** `    :param smem_layout: The smem layout of SFB per stage` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L499** `    :type smem_layout: cute.Layout` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** `    :return: TMEM layout for SFB` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L502** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `make_tmem_layout_sfb`. **CN:** 继续说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L503** `    """` — **EN:** Ends the docstring for the function `make_tmem_layout_sfb`. **CN:** 结束说明 function `make_tmem_layout_sfb` 的文档字符串。
+- **L504** `    atom_thr_size = cute.size(tiled_mma.thr_id.shape, loc=loc, ip=ip)` — **EN:** Assigns a value to atom_thr_size. **CN:** 将一个值赋给 atom_thr_size。
+- **L505** `    cta_tile_shape_m = mma_tiler_mnk[0] // atom_thr_size  # type: ignore[index]` — **EN:** Assigns a value to cta_tile_shape_m. **CN:** 将一个值赋给 cta_tile_shape_m。
+- **L506** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L507** `    sfb_layout_ty = _cute_nvgpu_ir.make_tmem_layout_sfb(` — **EN:** Assigns a value to sfb_layout_ty. **CN:** 将一个值赋给 sfb_layout_ty。
+- **L508** `        smem_layout, cta_tile_shape_m, atom_thr_size, sf_vec_size` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L509** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L510** `    return _cute_ir.static(sfb_layout_ty, loc=loc, ip=ip)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L511** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L512** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L513** `@dataclass(frozen=True)` — **EN:** Applies decorator `dataclass(frozen=True)` to the following definition. **CN:** 将装饰器 `dataclass(frozen=True)` 应用于后面的定义。
+- **L514** `class Sm103BlockScaledBasicChunk:` — **EN:** Defines class `Sm103BlockScaledBasicChunk`. **CN:** 定义类 `Sm103BlockScaledBasicChunk`。
+- **L515** `    """` — **EN:** Starts the docstring for the class `Sm103BlockScaledBasicChunk`. **CN:** 开始说明 class `Sm103BlockScaledBasicChunk` 的文档字符串。
+- **L516** `    Basic scale-factor atom layout decided by tcgen05 BlockScaled MMA Ops on SM103.` — **EN:** Continues the docstring for the class `Sm103BlockScaledBasicChunk`. **CN:** 继续说明 class `Sm103BlockScaledBasicChunk` 的文档字符串。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `    Represents the fixed layout pattern for scale factors used by tcgen05` — **EN:** Continues the docstring for the class `Sm103BlockScaledBasicChunk`. **CN:** 继续说明 class `Sm103BlockScaledBasicChunk` 的文档字符串。
+- **L519** `    BlockScaled MMA Ops on SM103. The layout is determined by the instruction` — **EN:** Continues the docstring for the class `Sm103BlockScaledBasicChunk`. **CN:** 继续说明 class `Sm103BlockScaledBasicChunk` 的文档字符串。
+- **L520** `    specification and is not configurable.` — **EN:** Continues the docstring for the class `Sm103BlockScaledBasicChunk`. **CN:** 继续说明 class `Sm103BlockScaledBasicChunk` 的文档字符串。
+- **L521** `    """` — **EN:** Ends the docstring for the class `Sm103BlockScaledBasicChunk`. **CN:** 结束说明 class `Sm103BlockScaledBasicChunk` 的文档字符串。
+- **L522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L523** `    sf_vec_size: int` — **EN:** Assigns a typed value to sf_vec_size. **CN:** 为 sf_vec_size 赋予带类型标注的值。
+- **L524** `    major_mode: OperandMajorMode = OperandMajorMode.K` — **EN:** Assigns a typed value to major_mode. **CN:** 为 major_mode 赋予带类型标注的值。
+- **L525** `    _layout: cute.Layout = field(init=False, repr=False)` — **EN:** Assigns a typed value to _layout. **CN:** 为 _layout 赋予带类型标注的值。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `    def __post_init__(self) -> None:` — **EN:** Defines function `__post_init__`. **CN:** 定义函数 `__post_init__`。
+- **L528** `        atom_shape: cute.Shape` — **EN:** Assigns a typed value to atom_shape. **CN:** 为 atom_shape 赋予带类型标注的值。
+- **L529** `        atom_stride: cute.Stride` — **EN:** Assigns a typed value to atom_stride. **CN:** 为 atom_stride 赋予带类型标注的值。
+- **L530** `        if self.major_mode == OperandMajorMode.K:` — **EN:** Starts a conditional branch guarded by `self.major_mode == OperandMajorMode.K`. **CN:** 开始一个由 `self.major_mode == OperandMajorMode.K` 控制的条件分支。
+- **L531** `            atom_shape = ((8, 4, 4), (self.sf_vec_size, 4))` — **EN:** Assigns a value to atom_shape. **CN:** 将一个值赋给 atom_shape。
+- **L532** `            atom_stride = ((16, 128, 4), (0, 1))` — **EN:** Assigns a value to atom_stride. **CN:** 将一个值赋给 atom_stride。
+- **L533** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L534** `            atom_shape = ((self.sf_vec_size, 4), (8, 4, 4))` — **EN:** Assigns a value to atom_shape. **CN:** 将一个值赋给 atom_shape。
+- **L535** `            atom_stride = ((0, 1), (16, 128, 4))` — **EN:** Assigns a value to atom_stride. **CN:** 将一个值赋给 atom_stride。
+- **L536** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L537** `        object.__setattr__(` — **EN:** Invokes `object.__setattr__` as a standalone call. **CN:** 以独立语句方式调用 `object.__setattr__`。
+- **L538** `            self, "_layout", cute.make_layout(shape=atom_shape, stride=atom_stride)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L539** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L540** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L541** `    @property` — **EN:** Applies decorator `property` to the following definition. **CN:** 将装饰器 `property` 应用于后面的定义。
+- **L542** `    def layout(self) -> cute.Layout:` — **EN:** Defines function `layout`. **CN:** 定义函数 `layout`。
+- **L543** `        return self._layout` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L544** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L545** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L546** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L547** `def sm103_make_smem_layout_sfa(` — **EN:** Defines function `sm103_make_smem_layout_sfa`. **CN:** 定义函数 `sm103_make_smem_layout_sfa`。
+- **L548** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L549** `    mma_tiler: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L550** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L551** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L552** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L553** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L554** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L555** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L556** `    """` — **EN:** Starts the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 开始说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L557** `    Make SMEM layout for SFA based on:` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L558** `    1) Sm103BlockScaledBasicChunk, 2) MMA tiler, 3) sf_vec_size, 4) stages.` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L559** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L560** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L561** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L562** `    :param mma_tiler: The mma tiler shape` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L563** `    :type mma_tiler: cute.Tile` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L564** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L565** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L566** `    :param num_stages: The number of stages` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L567** `    :type num_stages: int` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L568** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L569** `    :return: Smem layout for SFA` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L570** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 继续说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L571** `    """` — **EN:** Ends the docstring for the function `sm103_make_smem_layout_sfa`. **CN:** 结束说明 function `sm103_make_smem_layout_sfa` 的文档字符串。
+- **L572** `    mma_shape_mk = tiled_mma.partition_shape_A((mma_tiler[0], mma_tiler[2]))  # type: ignore[index]` — **EN:** Assigns a value to mma_shape_mk. **CN:** 将一个值赋给 mma_shape_mk。
+- **L573** `    sf_atom = Sm103BlockScaledBasicChunk(sf_vec_size, tiled_mma.op.a_major_mode).layout  # type: ignore[attr-defined]` — **EN:** Assigns a value to sf_atom. **CN:** 将一个值赋给 sf_atom。
+- **L574** `    k_divisor = 4 if sf_vec_size == 16 else 2` — **EN:** Assigns a value to k_divisor. **CN:** 将一个值赋给 k_divisor。
+- **L575** `    mma_sfa_tiler = (` — **EN:** Assigns a value to mma_sfa_tiler. **CN:** 将一个值赋给 mma_sfa_tiler。
+- **L576** `        mma_shape_mk[0][0] * mma_shape_mk[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L577** `        mma_shape_mk[0][1] * mma_shape_mk[2] // k_divisor,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L578** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L579** `    sfa_smem_atom_layout = cute.tiled_product(` — **EN:** Assigns a value to sfa_smem_atom_layout. **CN:** 将一个值赋给 sfa_smem_atom_layout。
+- **L580** `        sf_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L581** `        cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L582** `            cute.shape_div(mma_sfa_tiler, cute.product_each(sf_atom.shape))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L583** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L584** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L585** `    sfa_smem_layout_staged = cute.make_layout(` — **EN:** Assigns a value to sfa_smem_layout_staged. **CN:** 将一个值赋给 sfa_smem_layout_staged。
+- **L586** `        shape=cute.append(sfa_smem_atom_layout.shape, num_stages),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L587** `        stride=cute.append(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L588** `            sfa_smem_atom_layout.stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L589** `            cute.size(cute.filter_zeros(sfa_smem_atom_layout)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L590** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L591** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L592** `    return sfa_smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L593** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L594** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L595** `@dsl_user_op` — **EN:** Applies decorator `dsl_user_op` to the following definition. **CN:** 将装饰器 `dsl_user_op` 应用于后面的定义。
+- **L596** `def sm103_make_smem_layout_sfb(` — **EN:** Defines function `sm103_make_smem_layout_sfb`. **CN:** 定义函数 `sm103_make_smem_layout_sfb`。
+- **L597** `    tiled_mma: cute.TiledMma,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L598** `    mma_tiler: cute.Tile,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L599** `    sf_vec_size: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L600** `    num_stages: int,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L601** `    *,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L602** `    loc: Optional[ir.Location] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L603** `    ip: Optional[ir.InsertionPoint] = None,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L604** `) -> cute.Layout:` — **EN:** Continues the previous multi-line expression. **CN:** 继续上一行的多行表达式。
+- **L605** `    """` — **EN:** Starts the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 开始说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L606** `    Make SMEM layout for SFB based on the basic chunk, MMA tiler, sf_vec_size, stages.` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L607** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L608** `    :param tiled_mma: The tiled MMA` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L609** `    :type tiled_mma: cute.TiledMma` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L610** `    :param mma_tiler: The mma tiler shape` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L611** `    :type mma_tiler: cute.Tile` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L612** `    :param sf_vec_size: The scale factor vector size` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L613** `    :type sf_vec_size: int` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L614** `    :param num_stages: The number of stages` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L615** `    :type num_stages: int` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L616** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L617** `    :return: Smem layout for SFB` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L618** `    :rtype: cute.Layout` — **EN:** Continues the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 继续说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L619** `    """` — **EN:** Ends the docstring for the function `sm103_make_smem_layout_sfb`. **CN:** 结束说明 function `sm103_make_smem_layout_sfb` 的文档字符串。
+- **L620** `    sf_atom = Sm103BlockScaledBasicChunk(sf_vec_size, tiled_mma.op.b_major_mode).layout  # type: ignore[attr-defined]` — **EN:** Assigns a value to sf_atom. **CN:** 将一个值赋给 sf_atom。
+- **L621** `    k_divisor = 4 if sf_vec_size == 16 else 2` — **EN:** Assigns a value to k_divisor. **CN:** 将一个值赋给 k_divisor。
+- **L622** `    mma_sfb_tiler = (mma_tiler[1], mma_tiler[2] // k_divisor)  # type: ignore[index, operator]` — **EN:** Assigns a value to mma_sfb_tiler. **CN:** 将一个值赋给 mma_sfb_tiler。
+- **L623** `    if mma_sfb_tiler[0] == 128:` — **EN:** Starts a conditional branch guarded by `mma_sfb_tiler[0] == 128`. **CN:** 开始一个由 `mma_sfb_tiler[0] == 128` 控制的条件分支。
+- **L624** `        sfb_smem_atom_layout = cute.tiled_product(` — **EN:** Assigns a value to sfb_smem_atom_layout. **CN:** 将一个值赋给 sfb_smem_atom_layout。
+- **L625** `            sf_atom,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L626** `            cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L627** `                cute.shape_div(mma_sfb_tiler, cute.product_each(sf_atom.shape))` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L628** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L629** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L630** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L631** `        sf_k_major_atom256 = cute.make_layout(` — **EN:** Assigns a value to sf_k_major_atom256. **CN:** 将一个值赋给 sf_k_major_atom256。
+- **L632** `            shape=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L633** `                (32, 4, 2),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L634** `                (sf_vec_size, 4),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L635** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L636** `            stride=(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L637** `                (16, 4, mma_sfb_tiler[1] // sf_vec_size // 4 * 512),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L638** `                (0, 1),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L639** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L640** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L641** `        sfb_smem_atom_layout = cute.tiled_product(` — **EN:** Assigns a value to sfb_smem_atom_layout. **CN:** 将一个值赋给 sfb_smem_atom_layout。
+- **L642** `            sf_k_major_atom256,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L643** `            cute.make_layout(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L644** `                cute.shape_div(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L645** `                    mma_sfb_tiler, cute.product_each(sf_k_major_atom256.shape)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L646** `                )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L647** `            ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L648** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L649** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L650** `    sfb_smem_layout_staged = cute.make_layout(` — **EN:** Assigns a value to sfb_smem_layout_staged. **CN:** 将一个值赋给 sfb_smem_layout_staged。
+- **L651** `        shape=cute.append(sfb_smem_atom_layout.shape, num_stages),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L652** `        stride=cute.append(` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L653** `            sfb_smem_atom_layout.stride,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L654** `            cute.size(cute.filter_zeros(sfb_smem_atom_layout)),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L655** `        ),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L656** `    )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L657** `    return sfb_smem_layout_staged` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `CuTeDSL.cutlass.utils.blockscaled_layout`. CN: 模块名为 `CuTeDSL.cutlass.utils.blockscaled_layout`。
+- EN: Top-level classes: BlockScaledBasicChunk, Sm103BlockScaledBasicChunk CN: 顶层类包括：BlockScaledBasicChunk, Sm103BlockScaledBasicChunk
+- EN: Top-level functions: tile_atom_to_shape_SF, make_smem_layout_sf, make_smem_layout_sfa, make_smem_layout_sfb, sm120_make_smem_layout_sfa, sm120_make_smem_layout_sfb, make_tmem_layout_sfa, make_tmem_layout_sfb, sm103_make_smem_layout_sfa, sm103_make_smem_layout_sfb CN: 顶层函数包括：tile_atom_to_shape_SF, make_smem_layout_sf, make_smem_layout_sfa, make_smem_layout_sfb, sm120_make_smem_layout_sfa, sm120_make_smem_layout_sfb, make_tmem_layout_sfa, make_tmem_layout_sfb, sm103_make_smem_layout_sfa, sm103_make_smem_layout_sfb
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass.cutlass_dsl:dsl_user_op, cutlass.cute, cutlass.cute.nvgpu:OperandMajorMode, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu CN: 内部依赖：cutlass.cutlass_dsl:dsl_user_op, cutlass.cute, cutlass.cute.nvgpu:OperandMajorMode, cutlass._mlir:ir, cutlass._mlir.dialects.cute, cutlass._mlir.dialects.cute_nvgpu
+- EN: External or standard-library dependencies: dataclasses:dataclass,field, typing:Optional CN: 外部或标准库依赖：dataclasses:dataclass,field, typing:Optional

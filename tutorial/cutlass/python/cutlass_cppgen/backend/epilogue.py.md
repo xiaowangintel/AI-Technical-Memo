@@ -1,0 +1,561 @@
+# epilogue.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/epilogue.py`
+
+## Purpose / 作用
+- EN: Defines 23 classes (EpilogueFunctorBase, LinearCombination, LinearCombinationClamp, FastLinearCombinationClamp, ... (+19 more)) and 2 functions (get_scalar, to_ctype_value) in `cutlass_cppgen.backend.epilogue`.
+- CN: 该模块 `cutlass_cppgen.backend.epilogue` 定义了 23 个类（EpilogueFunctorBase, LinearCombination, LinearCombinationClamp, FastLinearCombinationClamp, ... (+19 more)） 和 2 个函数（get_scalar, to_ctype_value）。
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2017 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `import ctypes` — **EN:** Imports ctypes for later use. **CN:** 导入 ctypes 供后续使用。
+- **L34** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L35** `from cutlass_library import SubstituteTemplate` — **EN:** Imports SubstituteTemplate from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 SubstituteTemplate。
+- **L36** `import numpy as np` — **EN:** Imports numpy as np for later use. **CN:** 导入 numpy as np 供后续使用。
+- **L37** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L38** `from cutlass_library import DataType, DataTypeTag` — **EN:** Imports DataType, DataTypeTag from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataType, DataTypeTag。
+- **L39** `from cutlass_cppgen.backend.c_types import MatrixCoord_, tuple_factory` — **EN:** Imports MatrixCoord_, tuple_factory from `cutlass_cppgen.backend.c_types`. **CN:** 从 `cutlass_cppgen.backend.c_types` 导入 MatrixCoord_, tuple_factory。
+- **L40** `from cutlass_cppgen.backend.frontend import NumpyFrontend` — **EN:** Imports NumpyFrontend from `cutlass_cppgen.backend.frontend`. **CN:** 从 `cutlass_cppgen.backend.frontend` 导入 NumpyFrontend。
+- **L41** `from cutlass_cppgen.backend.library import ActivationOp, ActivationOpTag` — **EN:** Imports ActivationOp, ActivationOpTag from `cutlass_cppgen.backend.library`. **CN:** 从 `cutlass_cppgen.backend.library` 导入 ActivationOp, ActivationOpTag。
+- **L42** `from cutlass_cppgen.utils.datatypes import is_numpy_tensor, is_torch_available, is_torch_tensor` — **EN:** Imports is_numpy_tensor, is_torch_available, is_torch_tensor from `cutlass_cppgen.utils.datatypes`. **CN:** 从 `cutlass_cppgen.utils.datatypes` 导入 is_numpy_tensor, is_torch_available, is_torch_tensor。
+- **L43** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L44** `dtype2ctype = {` — **EN:** Assigns a value to dtype2ctype. **CN:** 将一个值赋给 dtype2ctype。
+- **L45** `    DataType.f16: ctypes.c_uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L46** `    DataType.bf16: ctypes.c_uint16,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L47** `    DataType.f32: ctypes.c_float,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L48** `    DataType.f64: ctypes.c_double,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L49** `    DataType.s8: ctypes.c_int8,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L50** `    DataType.s32: ctypes.c_int32` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L51** `}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `if is_torch_available():` — **EN:** Starts a conditional branch guarded by `is_torch_available()`. **CN:** 开始一个由 `is_torch_available()` 控制的条件分支。
+- **L54** `    import torch` — **EN:** Imports torch for later use. **CN:** 导入 torch 供后续使用。
+- **L55** `    import torch.nn.functional as F` — **EN:** Imports torch.nn.functional as F for later use. **CN:** 导入 torch.nn.functional as F 供后续使用。
+- **L56** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L57** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L58** `def get_scalar(value):` — **EN:** Defines function `get_scalar`. **CN:** 定义函数 `get_scalar`。
+- **L59** `    """` — **EN:** Starts the docstring for the function `get_scalar`. **CN:** 开始说明 function `get_scalar` 的文档字符串。
+- **L60** `    Returns a scalar value from a container (e.g., np.ndarray)` — **EN:** Continues the docstring for the function `get_scalar`. **CN:** 继续说明 function `get_scalar` 的文档字符串。
+- **L61** `    """` — **EN:** Ends the docstring for the function `get_scalar`. **CN:** 结束说明 function `get_scalar` 的文档字符串。
+- **L62** `    if is_numpy_tensor(value):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(value)`. **CN:** 开始一个由 `is_numpy_tensor(value)` 控制的条件分支。
+- **L63** `        if value.size != 1:` — **EN:** Starts a conditional branch guarded by `value.size != 1`. **CN:** 开始一个由 `value.size != 1` 控制的条件分支。
+- **L64** `            raise Exception("Scalars used in epilogue must be of size 1")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L65** `        return value.reshape(-1)[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L66** `    elif is_torch_tensor(value):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L67** `        if value.size != 1:` — **EN:** Starts a conditional branch guarded by `value.size != 1`. **CN:** 开始一个由 `value.size != 1` 控制的条件分支。
+- **L68** `            raise Exception("Scalars used in epilogue must be of size 1")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L69** `        return value.reshape(-1)[0]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L70** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L71** `        return value` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L73** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L74** `def to_ctype_value(value, dtype):` — **EN:** Defines function `to_ctype_value`. **CN:** 定义函数 `to_ctype_value`。
+- **L75** `    """` — **EN:** Starts the docstring for the function `to_ctype_value`. **CN:** 开始说明 function `to_ctype_value` 的文档字符串。
+- **L76** `    Converts \`\`value\`\` to the corresponding storage needed for the ctype that` — **EN:** Continues the docstring for the function `to_ctype_value`. **CN:** 继续说明 function `to_ctype_value` 的文档字符串。
+- **L77** `    will store \`\`value\`\`.` — **EN:** Continues the docstring for the function `to_ctype_value`. **CN:** 继续说明 function `to_ctype_value` 的文档字符串。
+- **L78** `    """` — **EN:** Ends the docstring for the function `to_ctype_value`. **CN:** 结束说明 function `to_ctype_value` 的文档字符串。
+- **L79** `    scalar = get_scalar(value)` — **EN:** Assigns a value to scalar. **CN:** 将一个值赋给 scalar。
+- **L80** `    if dtype == DataType.f16:` — **EN:** Starts a conditional branch guarded by `dtype == DataType.f16`. **CN:** 开始一个由 `dtype == DataType.f16` 控制的条件分支。
+- **L81** `        # Convert f16 value into an integer` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L82** `        return int.from_bytes(np.float16(scalar).tobytes(), "little")` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L83** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L84** `        return scalar` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L85** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L86** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L87** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L88** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L89** `# Epilogue Functors` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L90** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L91** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L92** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L93** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L94** `class EpilogueFunctorBase:` — **EN:** Defines class `EpilogueFunctorBase`. **CN:** 定义类 `EpilogueFunctorBase`。
+- **L95** `    """` — **EN:** Starts the docstring for the class `EpilogueFunctorBase`. **CN:** 开始说明 class `EpilogueFunctorBase` 的文档字符串。
+- **L96** `    Base class for thread-level epilogue functors` — **EN:** Continues the docstring for the class `EpilogueFunctorBase`. **CN:** 继续说明 class `EpilogueFunctorBase` 的文档字符串。
+- **L97** `    """` — **EN:** Ends the docstring for the class `EpilogueFunctorBase`. **CN:** 结束说明 class `EpilogueFunctorBase` 的文档字符串。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `    def __init__(self) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L100** `        pass` — **EN:** Keeps the block syntactically non-empty. **CN:** 使代码块在语法上保持非空。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def emit(self, tag, template_argument):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L103** `        template = """${tag}<${arguments}>"""` — **EN:** Assigns a value to template. **CN:** 将一个值赋给 template。
+- **L104** `        arguments = ""` — **EN:** Assigns a value to arguments. **CN:** 将一个值赋给 arguments。
+- **L105** `        for idx, arg in enumerate(template_argument):` — **EN:** Starts a loop assigning items from `enumerate(template_argument)` to `(idx, arg)`. **CN:** 开始一个循环，将 `enumerate(template_argument)` 的元素赋给 `(idx, arg)`。
+- **L106** `            arguments += arg` — **EN:** Updates arguments in place. **CN:** 原地更新 arguments。
+- **L107** `            if idx < len(template_argument) - 1:` — **EN:** Starts a conditional branch guarded by `idx < len(template_argument) - 1`. **CN:** 开始一个由 `idx < len(template_argument) - 1` 控制的条件分支。
+- **L108** `                arguments += ", "` — **EN:** Updates arguments in place. **CN:** 原地更新 arguments。
+- **L109** `        values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L110** `            "tag": tag,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L111** `            "arguments": arguments,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L112** `        }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `        return SubstituteTemplate(template, values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `class LinearCombination(EpilogueFunctorBase):` — **EN:** Defines class `LinearCombination` with bases EpilogueFunctorBase. **CN:** 定义类 `LinearCombination`，其基类为 EpilogueFunctorBase。
+- **L118** `    """` — **EN:** Starts the docstring for the class `LinearCombination`. **CN:** 开始说明 class `LinearCombination` 的文档字符串。
+- **L119** `    Apply a linear combination operator to an array of elements` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L120** `    D = alpha * accumulator + beta * source` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L121** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L122** `    :param element_output: data type used to load and store tensors` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L123** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L124** `    :param epilogue_vector_length: number of elements computed per operation.` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L125** `    Usually it is 128/sizeof_bits_v<ElementOutput_>, but we use 64 and 32 sometimes` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L126** `    when there are not enough data to store` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L127** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L128** `    :param element_accumulator: Accumulator data type` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L129** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L130** `    :param element_epilogue: data type used to compute linear combination` — **EN:** Continues the docstring for the class `LinearCombination`. **CN:** 继续说明 class `LinearCombination` 的文档字符串。
+- **L131** `    """` — **EN:** Ends the docstring for the class `LinearCombination`. **CN:** 结束说明 class `LinearCombination` 的文档字符串。
+- **L132** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L133** `    tag = "cutlass::epilogue::thread::LinearCombination"` — **EN:** Assigns a value to tag. **CN:** 将一个值赋给 tag。
+- **L134** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L135** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L136** `        self, element_output, epilogue_vector_length,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L137** `        element_accumulator=None, element_epilogue=None) -> None:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L138** `        super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L139** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L140** `        if element_accumulator is None:` — **EN:** Starts a conditional branch guarded by `element_accumulator is None`. **CN:** 开始一个由 `element_accumulator is None` 控制的条件分支。
+- **L141** `            element_accumulator = element_output` — **EN:** Assigns a value to element_accumulator. **CN:** 将一个值赋给 element_accumulator。
+- **L142** `        if element_epilogue is None:` — **EN:** Starts a conditional branch guarded by `element_epilogue is None`. **CN:** 开始一个由 `element_epilogue is None` 控制的条件分支。
+- **L143** `            element_epilogue = element_output` — **EN:** Assigns a value to element_epilogue. **CN:** 将一个值赋给 element_epilogue。
+- **L144** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L145** `        self.element_output = element_output` — **EN:** Assigns a value to self.element_output. **CN:** 将一个值赋给 self.element_output。
+- **L146** `        self.element_accumulator = element_accumulator` — **EN:** Assigns a value to self.element_accumulator. **CN:** 将一个值赋给 self.element_accumulator。
+- **L147** `        self.element_epilogue = element_epilogue` — **EN:** Assigns a value to self.element_epilogue. **CN:** 将一个值赋给 self.element_epilogue。
+- **L148** `        self.epilogue_vector_length = epilogue_vector_length` — **EN:** Assigns a value to self.epilogue_vector_length. **CN:** 将一个值赋给 self.epilogue_vector_length。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `        self.template_arguments = [` — **EN:** Assigns a value to self.template_arguments. **CN:** 将一个值赋给 self.template_arguments。
+- **L151** `            DataTypeTag[element_output],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L152** `            str(epilogue_vector_length),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L153** `            DataTypeTag[element_accumulator],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L154** `            DataTypeTag[element_epilogue],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L155** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L156** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L157** `        c_element_epilogue = dtype2ctype[self.element_epilogue]` — **EN:** Assigns a value to c_element_epilogue. **CN:** 将一个值赋给 c_element_epilogue。
+- **L158** `        element_epilogue = self.element_epilogue` — **EN:** Assigns a value to element_epilogue. **CN:** 将一个值赋给 element_epilogue。
+- **L159** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L160** `        class _EpilogueOutputOpParamsEVT(ctypes.Structure):` — **EN:** Defines class `_EpilogueOutputOpParamsEVT` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueOutputOpParamsEVT`，其基类为 ctypes.Structure。
+- **L161** `            """` — **EN:** Starts the docstring for the class `_EpilogueOutputOpParamsEVT`. **CN:** 开始说明 class `_EpilogueOutputOpParamsEVT` 的文档字符串。
+- **L162** `            Epilogue params when using the default linear combination of EVT, which` — **EN:** Continues the docstring for the class `_EpilogueOutputOpParamsEVT`. **CN:** 继续说明 class `_EpilogueOutputOpParamsEVT` 的文档字符串。
+- **L163** `            does not currently use {alpha,beta}_ptr_array` — **EN:** Continues the docstring for the class `_EpilogueOutputOpParamsEVT`. **CN:** 继续说明 class `_EpilogueOutputOpParamsEVT` 的文档字符串。
+- **L164** `            """` — **EN:** Ends the docstring for the class `_EpilogueOutputOpParamsEVT`. **CN:** 结束说明 class `_EpilogueOutputOpParamsEVT` 的文档字符串。
+- **L165** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L166** `            stride_type = tuple_factory((0,0,1), "int64_t", [0])` — **EN:** Assigns a value to stride_type. **CN:** 将一个值赋给 stride_type。
+- **L167** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L168** `                ("alpha", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L169** `                ("beta", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L170** `                ("alpha_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L171** `                ("beta_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L172** `                ("dalpha", stride_type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L173** `                ("dbeta", stride_type),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L174** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L175** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L176** `            def __init__(self, alpha, beta, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L177** `                self.alpha = to_ctype_value(alpha, element_epilogue)` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L178** `                self.beta = to_ctype_value(beta, element_epilogue)` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L179** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L180** `        class _EpilogueOutputOpParams(ctypes.Structure):` — **EN:** Defines class `_EpilogueOutputOpParams` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueOutputOpParams`，其基类为 ctypes.Structure。
+- **L181** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L182** `                ("alpha", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L183** `                ("beta", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L184** `                ("alpha_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L185** `                ("beta_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L186** `                ("alpha_ptr_array", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L187** `                ("beta_ptr_array", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L188** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L189** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L190** `            def __init__(self, alpha, beta, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L191** `                self.alpha = to_ctype_value(alpha, element_epilogue)` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L192** `                self.beta = to_ctype_value(beta, element_epilogue)` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L193** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L194** `            def to_evt_params(self) -> _EpilogueOutputOpParamsEVT:` — **EN:** Defines function `to_evt_params`. **CN:** 定义函数 `to_evt_params`。
+- **L195** `                return _EpilogueOutputOpParamsEVT(self.alpha, self.beta)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L196** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L197** `        self.epilogue_type = _EpilogueOutputOpParams` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L198** `        self.epilogue_type_evt = _EpilogueOutputOpParamsEVT` — **EN:** Assigns a value to self.epilogue_type_evt. **CN:** 将一个值赋给 self.epilogue_type_evt。
+- **L199** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L200** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L201** `        return super().emit(self.tag, self.template_arguments)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L202** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L203** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L204** `class LinearCombinationClamp(LinearCombination):` — **EN:** Defines class `LinearCombinationClamp` with bases LinearCombination. **CN:** 定义类 `LinearCombinationClamp`，其基类为 LinearCombination。
+- **L205** `    """` — **EN:** Starts the docstring for the class `LinearCombinationClamp`. **CN:** 开始说明 class `LinearCombinationClamp` 的文档字符串。
+- **L206** `    Applies a linear combination operator to an array of elements then clamps` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L207** `    the output before converting to the output element type.` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L208** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L209** `    D = alpha * accumulator + beta * source + uniform` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L210** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L211** `    :param element_output: data type used to load and store tensors` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L212** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L213** `    :param epilogue_vector_length: number of elements computed per operation.` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L214** `    Usually it is 128/sizeof_bits_v<ElementOutput_>, but we use 64 and 32 sometimes` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L215** `    when there are not enough data to store` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L216** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L217** `    :param element_accumulator: Accumulator data type` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L218** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L219** `    :param element_epilogue: data type used to compute linear combination` — **EN:** Continues the docstring for the class `LinearCombinationClamp`. **CN:** 继续说明 class `LinearCombinationClamp` 的文档字符串。
+- **L220** `    """` — **EN:** Ends the docstring for the class `LinearCombinationClamp`. **CN:** 结束说明 class `LinearCombinationClamp` 的文档字符串。
+- **L221** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L222** `    tag = "cutlass::epilogue::thread::LinearCombinationClamp"` — **EN:** Assigns a value to tag. **CN:** 将一个值赋给 tag。
+- **L223** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L224** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L225** `        self, element_output, epilogue_vector_length,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L226** `        element_accumulator=None, element_epilogue=None) -> None:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L227** `        # Base constructor` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L228** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L229** `            element_output,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `            epilogue_vector_length,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `            element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `            element_epilogue,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L235** `        c_element_epilogue = dtype2ctype[self.element_epilogue]` — **EN:** Assigns a value to c_element_epilogue. **CN:** 将一个值赋给 c_element_epilogue。
+- **L236** `        element_epilogue = self.element_epilogue` — **EN:** Assigns a value to element_epilogue. **CN:** 将一个值赋给 element_epilogue。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `        class _EpilogueOutputOpParams(ctypes.Structure):` — **EN:** Defines class `_EpilogueOutputOpParams` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueOutputOpParams`，其基类为 ctypes.Structure。
+- **L239** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L240** `                ("alpha", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L241** `                ("beta", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L242** `                ("alpha_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                ("beta_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L246** `            def __init__(self, alpha, beta, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L247** `                self.alpha = to_ctype_value(alpha, element_epilogue)` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L248** `                self.beta = to_ctype_value(beta, element_epilogue)` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L249** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L250** `        self.epilogue_type = _EpilogueOutputOpParams` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L251** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L252** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L253** `class FastLinearCombinationClamp(EpilogueFunctorBase):` — **EN:** Defines class `FastLinearCombinationClamp` with bases EpilogueFunctorBase. **CN:** 定义类 `FastLinearCombinationClamp`，其基类为 EpilogueFunctorBase。
+- **L254** `    """` — **EN:** Starts the docstring for the class `FastLinearCombinationClamp`. **CN:** 开始说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L255** `    Applies a linear combination operator to an array of elements then clamps` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L256** `    the output before converting to the output element type.` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L257** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L258** `    D = alpha * accumulator + beta * source` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L259** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L260** `    Note: The below method only when problem_size_K <= 256 for signed int8 gemm` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L261** `    or problem_size_K <= 128 for unsigned int8 gemm. The default approach is` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L262** `    above.` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L263** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L264** `    :param element_output: data type used to load and store tensors` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L265** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L266** `    :param epilogue_vector_length: number of elements computed per operation.` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L267** `    Usually it is 128/sizeof_bits_v<ElementOutput_>, but we use 64 and 32 sometimes` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L268** `    when there are not enough data to store` — **EN:** Continues the docstring for the class `FastLinearCombinationClamp`. **CN:** 继续说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L269** `    """` — **EN:** Ends the docstring for the class `FastLinearCombinationClamp`. **CN:** 结束说明 class `FastLinearCombinationClamp` 的文档字符串。
+- **L270** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L271** `    tag = "cutlass::epilogue::thread::FastLinearCombinationClamp"` — **EN:** Assigns a value to tag. **CN:** 将一个值赋给 tag。
+- **L272** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L273** `    def __init__(self, element_output, epilogue_vector_length, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L274** `        super().__init__()` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L275** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L276** `        self.template_arguments = [` — **EN:** Assigns a value to self.template_arguments. **CN:** 将一个值赋给 self.template_arguments。
+- **L277** `            DataTypeTag[element_output], str(epilogue_vector_length)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L278** `        ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L279** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L280** `        self.element_accumulator = DataType.s32` — **EN:** Assigns a value to self.element_accumulator. **CN:** 将一个值赋给 self.element_accumulator。
+- **L281** `        self.element_epilogue = DataType.f32` — **EN:** Assigns a value to self.element_epilogue. **CN:** 将一个值赋给 self.element_epilogue。
+- **L282** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L283** `        # get epilogue output op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L284** `        c_element_epilogue = dtype2ctype[self.element_epilogue]` — **EN:** Assigns a value to c_element_epilogue. **CN:** 将一个值赋给 c_element_epilogue。
+- **L285** `        element_epilogue = self.element_epilogue` — **EN:** Assigns a value to element_epilogue. **CN:** 将一个值赋给 element_epilogue。
+- **L286** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L287** `        class _EpilogueOutputOpParams(ctypes.Structure):` — **EN:** Defines class `_EpilogueOutputOpParams` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueOutputOpParams`，其基类为 ctypes.Structure。
+- **L288** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L289** `                ("alpha", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L290** `                ("beta", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L291** `                ("alpha_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L292** `                ("beta_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L293** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L294** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L295** `            def __init__(self, alpha, beta, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L296** `                self.alpha = to_ctype_value(alpha, element_epilogue)` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L297** `                self.beta = to_ctype_value(beta, element_epilogue)` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L298** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L299** `        self.epilogue_type = _EpilogueOutputOpParams` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L300** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L301** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L302** `        return super().emit(self.tag, self.template_arguments)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L303** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L304** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L305** `class LinearCombinationGeneric(LinearCombination):` — **EN:** Defines class `LinearCombinationGeneric` with bases LinearCombination. **CN:** 定义类 `LinearCombinationGeneric`，其基类为 LinearCombination。
+- **L306** `    """` — **EN:** Starts the docstring for the class `LinearCombinationGeneric`. **CN:** 开始说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L307** `    Applies a linear combination operator followed by an activation function` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L308** `    to an array of elements.` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L309** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L310** `    D = activation(alpha * accumulator + beta * source)` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L311** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L312** `    :param activation_functor: input activation functor` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L313** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L314** `    :param element_output: data type used to load and store tensors` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L315** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L316** `    :param epilogue_vector_length: number of elements computed per operation.` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L317** `    Usually it is 128/sizeof_bits_v<ElementOutput_>, but we use 64 and 32 sometimes` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L318** `    when there are not enough data to store` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L319** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L320** `    :param element_accumulator: Accumulator data type` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L321** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L322** `    :param element_epilogue: data type used to compute linear combination` — **EN:** Continues the docstring for the class `LinearCombinationGeneric`. **CN:** 继续说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L323** `    """` — **EN:** Ends the docstring for the class `LinearCombinationGeneric`. **CN:** 结束说明 class `LinearCombinationGeneric` 的文档字符串。
+- **L324** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L325** `    tag = "cutlass::epilogue::thread::LinearCombinationGeneric"` — **EN:** Assigns a value to tag. **CN:** 将一个值赋给 tag。
+- **L326** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L327** `    def __init__(` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L328** `        self, activation_functor,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L329** `        element_output, epilogue_vector_length,` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L330** `        element_accumulator=None, element_epilogue=None) -> None:` — **EN:** Executes or configures logic within the current block. **CN:** 在当前代码块中执行或配置逻辑。
+- **L331** `        super().__init__(` — **EN:** Invokes `super().__init__` as a standalone call. **CN:** 以独立语句方式调用 `super().__init__`。
+- **L332** `            element_output,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L333** `            epilogue_vector_length,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L334** `            element_accumulator,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L335** `            element_epilogue,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L336** `        )` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L337** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L338** `        self.template_arguments = [` — **EN:** Assigns a value to self.template_arguments. **CN:** 将一个值赋给 self.template_arguments。
+- **L339** `            activation_functor.emit()] + self.template_arguments` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L340** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L341** `        self.activation_functor = activation_functor` — **EN:** Assigns a value to self.activation_functor. **CN:** 将一个值赋给 self.activation_functor。
+- **L342** `        self.element_epilogue = element_epilogue` — **EN:** Assigns a value to self.element_epilogue. **CN:** 将一个值赋给 self.element_epilogue。
+- **L343** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L344** `        # get epilogue output op` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L345** `        self.epilogue_type = self.activation_functor.epilogue_output_op(self.element_epilogue)` — **EN:** Assigns a value to self.epilogue_type. **CN:** 将一个值赋给 self.epilogue_type。
+- **L346** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L347** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L348** `class ActivationFunctor:` — **EN:** Defines class `ActivationFunctor`. **CN:** 定义类 `ActivationFunctor`。
+- **L349** `    """` — **EN:** Starts the docstring for the class `ActivationFunctor`. **CN:** 开始说明 class `ActivationFunctor` 的文档字符串。
+- **L350** `    Base class for frequently used activation functions` — **EN:** Continues the docstring for the class `ActivationFunctor`. **CN:** 继续说明 class `ActivationFunctor` 的文档字符串。
+- **L351** `    """` — **EN:** Ends the docstring for the class `ActivationFunctor`. **CN:** 结束说明 class `ActivationFunctor` 的文档字符串。
+- **L352** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L353** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L354** `    def numpy(x: np.ndarray):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L355** `        raise NotImplementedError()` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L356** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L357** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L358** `    def emit(cls):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L359** `        return ActivationOpTag[cls.binding_type]` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L360** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L361** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L362** `    def epilogue_output_op(element_epilogue):` — **EN:** Defines function `epilogue_output_op`. **CN:** 定义函数 `epilogue_output_op`。
+- **L363** `        c_element_epilogue = dtype2ctype[element_epilogue]` — **EN:** Assigns a value to c_element_epilogue. **CN:** 将一个值赋给 c_element_epilogue。
+- **L364** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L365** `        class _EpilogueOutputOpParams(ctypes.Structure):` — **EN:** Defines class `_EpilogueOutputOpParams` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueOutputOpParams`，其基类为 ctypes.Structure。
+- **L366** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L367** `                ("alpha", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L368** `                ("beta", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L369** `                ("alpha_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L370** `                ("beta_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L371** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L372** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L373** `            def __init__(self, alpha, beta, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L374** `                self.alpha = to_ctype_value(alpha, element_epilogue)` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L375** `                self.beta = to_ctype_value(beta, element_epilogue)` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L376** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L377** `        return _EpilogueOutputOpParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L378** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L379** `class ActivationMeta(type):` — **EN:** Defines class `ActivationMeta` with bases type. **CN:** 定义类 `ActivationMeta`，其基类为 type。
+- **L380** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L381** `    def __call__(cls, x, *args):` — **EN:** Defines function `__call__`. **CN:** 定义函数 `__call__`。
+- **L382** `        if is_numpy_tensor(x):` — **EN:** Starts a conditional branch guarded by `is_numpy_tensor(x)`. **CN:** 开始一个由 `is_numpy_tensor(x)` 控制的条件分支。
+- **L383** `            return cls.numpy(x, *args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L384** `        elif is_torch_tensor(x):` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L385** `            return cls.torch(x, *args)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L386** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L387** `            raise NotImplementedError("Unsupported tensor type")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L388** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L389** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L390** `    def numpy(cls, *args):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L391** `        raise NotImplementedError(f"Numpy reference for {cls.__name__[:-4]} is not implemented.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L392** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L393** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L394** `    def torch(cls, *args):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L395** `        raise NotImplementedError(f"PyTorch reference for {cls.__name__[:-4]} is not implemented.")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L396** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L397** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L398** `# identity operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L399** `class identityMeta(ActivationMeta):` — **EN:** Defines class `identityMeta` with bases ActivationMeta. **CN:** 定义类 `identityMeta`，其基类为 ActivationMeta。
+- **L400** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L401** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L402** `        return x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L403** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L404** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L405** `    def torch(cls, x):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L406** `        return x` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L407** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L408** `class identity(ActivationFunctor, metaclass=identityMeta):` — **EN:** Defines class `identity` with bases ActivationFunctor. **CN:** 定义类 `identity`，其基类为 ActivationFunctor。
+- **L409** `    binding_type = ActivationOp.Identity` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L410** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L411** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L412** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L413** `# ReLu operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L414** `class reluMeta(ActivationMeta):` — **EN:** Defines class `reluMeta` with bases ActivationMeta. **CN:** 定义类 `reluMeta`，其基类为 ActivationMeta。
+- **L415** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L416** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L417** `        return np.where(x > 0, x, 0)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L418** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L419** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L420** `    def torch(cls, x):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L421** `        return F.relu(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L422** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L423** `class relu(ActivationFunctor, metaclass=reluMeta):` — **EN:** Defines class `relu` with bases ActivationFunctor. **CN:** 定义类 `relu`，其基类为 ActivationFunctor。
+- **L424** `    binding_type = ActivationOp.ReLU` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L425** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L426** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L427** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L428** `# Leaky ReLu operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L429** `class leakyReLUMeta(ActivationMeta):` — **EN:** Defines class `leakyReLUMeta` with bases ActivationMeta. **CN:** 定义类 `leakyReLUMeta`，其基类为 ActivationMeta。
+- **L430** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L431** `    def numpy(cls, x, leaky_alpha):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L432** `        return np.maximum(x, 0) + np.minimum(x, 0) * leaky_alpha` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L433** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L434** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L435** `    def torch(cls, x, leaky_alpha):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L436** `        return F.leaky_relu(x, leaky_alpha)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L437** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L438** `class leaky_relu(ActivationFunctor, metaclass=leakyReLUMeta):` — **EN:** Defines class `leaky_relu` with bases ActivationFunctor. **CN:** 定义类 `leaky_relu`，其基类为 ActivationFunctor。
+- **L439** `    binding_type = ActivationOp.LeakyReLU` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L440** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L441** `    @staticmethod` — **EN:** Applies decorator `staticmethod` to the following definition. **CN:** 将装饰器 `staticmethod` 应用于后面的定义。
+- **L442** `    def epilogue_output_op(element_epilogue):` — **EN:** Defines function `epilogue_output_op`. **CN:** 定义函数 `epilogue_output_op`。
+- **L443** `        c_element_epilogue = dtype2ctype[element_epilogue]` — **EN:** Assigns a value to c_element_epilogue. **CN:** 将一个值赋给 c_element_epilogue。
+- **L444** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L445** `        class _EpilogueOutputOpParams(ctypes.Structure):` — **EN:** Defines class `_EpilogueOutputOpParams` with bases ctypes.Structure. **CN:** 定义类 `_EpilogueOutputOpParams`，其基类为 ctypes.Structure。
+- **L446** `            _fields_ = [` — **EN:** Assigns a value to _fields_. **CN:** 将一个值赋给 _fields_。
+- **L447** `                ("alpha", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L448** `                ("beta", c_element_epilogue),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L449** `                ("alpha_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L450** `                ("beta_ptr", ctypes.c_void_p),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L451** `                ("leaky_alpha", c_element_epilogue)` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L452** `            ]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L453** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L454** `            def __init__(self, alpha, beta, leaky_alpha=0.2, *args) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L455** `                self.alpha = to_ctype_value(alpha, element_epilogue)` — **EN:** Assigns a value to self.alpha. **CN:** 将一个值赋给 self.alpha。
+- **L456** `                self.beta = to_ctype_value(beta, element_epilogue)` — **EN:** Assigns a value to self.beta. **CN:** 将一个值赋给 self.beta。
+- **L457** `                self.alpha_ptr = 0` — **EN:** Assigns a value to self.alpha_ptr. **CN:** 将一个值赋给 self.alpha_ptr。
+- **L458** `                self.beta_ptr = 0` — **EN:** Assigns a value to self.beta_ptr. **CN:** 将一个值赋给 self.beta_ptr。
+- **L459** `                self.leaky_alpha = to_ctype_value(leaky_alpha, element_epilogue)` — **EN:** Assigns a value to self.leaky_alpha. **CN:** 将一个值赋给 self.leaky_alpha。
+- **L460** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L461** `        return _EpilogueOutputOpParams` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L462** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L463** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L464** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L465** `# Tanh operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L466** `class tanhMeta(ActivationMeta):` — **EN:** Defines class `tanhMeta` with bases ActivationMeta. **CN:** 定义类 `tanhMeta`，其基类为 ActivationMeta。
+- **L467** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L468** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L469** `        return np.tanh(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L470** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L471** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L472** `    def torch(cls, x):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L473** `        return torch.tanh(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L474** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L475** `class tanh(ActivationFunctor, metaclass=tanhMeta):` — **EN:** Defines class `tanh` with bases ActivationFunctor. **CN:** 定义类 `tanh`，其基类为 ActivationFunctor。
+- **L476** `    binding_type = ActivationOp.Tanh` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L477** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L478** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L479** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L480** `# Sigmoid operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L481** `class sigmoidMeta(ActivationMeta):` — **EN:** Defines class `sigmoidMeta` with bases ActivationMeta. **CN:** 定义类 `sigmoidMeta`，其基类为 ActivationMeta。
+- **L482** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L483** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L484** `        return 1.0 / (1.0 + np.exp(-x))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L485** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L486** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L487** `    def torch(cls, x):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L488** `        return F.sigmoid(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L489** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L490** `class sigmoid(ActivationFunctor, metaclass=sigmoidMeta):` — **EN:** Defines class `sigmoid` with bases ActivationFunctor. **CN:** 定义类 `sigmoid`，其基类为 ActivationFunctor。
+- **L491** `    binding_type = ActivationOp.Sigmoid` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L492** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L493** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L494** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L495** `# SiLu operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L496** `class siluMeta(ActivationMeta):` — **EN:** Defines class `siluMeta` with bases ActivationMeta. **CN:** 定义类 `siluMeta`，其基类为 ActivationMeta。
+- **L497** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L498** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L499** `        return x * sigmoidMeta.numpy()` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L500** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L501** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L502** `    def silu(cls, x):` — **EN:** Defines function `silu`. **CN:** 定义函数 `silu`。
+- **L503** `        return F.silu(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L504** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L505** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L506** `class silu(ActivationFunctor, metaclass=siluMeta):` — **EN:** Defines class `silu` with bases ActivationFunctor. **CN:** 定义类 `silu`，其基类为 ActivationFunctor。
+- **L507** `    binding_type = ActivationOp.SiLU` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L508** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L509** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L510** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L511** `# Hardswish operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L512** `class hardswishMeta(ActivationMeta):` — **EN:** Defines class `hardswishMeta` with bases ActivationMeta. **CN:** 定义类 `hardswishMeta`，其基类为 ActivationMeta。
+- **L513** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L514** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L515** `        relu6 = np.minimum(np.maximum(x + 3.0, 0), 6.0)` — **EN:** Assigns a value to relu6. **CN:** 将一个值赋给 relu6。
+- **L516** `        return x * relu6 / 6.0` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L517** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L518** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L519** `    def torch(cls, x):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L520** `        return F.hardswish(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L521** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L522** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L523** `class hardswish(ActivationFunctor, metaclass=hardswishMeta):` — **EN:** Defines class `hardswish` with bases ActivationFunctor. **CN:** 定义类 `hardswish`，其基类为 ActivationFunctor。
+- **L524** `    binding_type = ActivationOp.HardSwish` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+- **L525** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L526** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L527** `##############################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L528** `# GELU operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L529** `class geluMeta(ActivationMeta):` — **EN:** Defines class `geluMeta` with bases ActivationMeta. **CN:** 定义类 `geluMeta`，其基类为 ActivationMeta。
+- **L530** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L531** `    def numpy(cls, x):` — **EN:** Defines function `numpy`. **CN:** 定义函数 `numpy`。
+- **L532** `        from scipy.special import erf` — **EN:** Imports erf from `scipy.special`. **CN:** 从 `scipy.special` 导入 erf。
+- **L533** `        return 0.5 * x * (1 + erf(x / np.sqrt(2.0)))` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L534** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L535** `    @classmethod` — **EN:** Applies decorator `classmethod` to the following definition. **CN:** 将装饰器 `classmethod` 应用于后面的定义。
+- **L536** `    def torch(cls, x):` — **EN:** Defines function `torch`. **CN:** 定义函数 `torch`。
+- **L537** `        return F.gelu(x)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L538** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L539** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L540** `class gelu(ActivationFunctor, metaclass=geluMeta):` — **EN:** Defines class `gelu` with bases ActivationFunctor. **CN:** 定义类 `gelu`，其基类为 ActivationFunctor。
+- **L541** `    binding_type = ActivationOp.Gelu` — **EN:** Assigns a value to binding_type. **CN:** 将一个值赋给 binding_type。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.epilogue`. CN: 模块名为 `cutlass_cppgen.backend.epilogue`。
+- EN: Top-level classes: EpilogueFunctorBase, LinearCombination, LinearCombinationClamp, FastLinearCombinationClamp, LinearCombinationGeneric, ActivationFunctor, ActivationMeta, identityMeta, identity, reluMeta, relu, leakyReLUMeta, ... (+11 more) CN: 顶层类包括：EpilogueFunctorBase, LinearCombination, LinearCombinationClamp, FastLinearCombinationClamp, LinearCombinationGeneric, ActivationFunctor, ActivationMeta, identityMeta, identity, reluMeta, relu, leakyReLUMeta, ... (+11 more)
+- EN: Top-level functions: get_scalar, to_ctype_value CN: 顶层函数包括：get_scalar, to_ctype_value
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:SubstituteTemplate, cutlass_library:DataType,DataTypeTag, cutlass_cppgen.backend.c_types:MatrixCoord_,tuple_factory, cutlass_cppgen.backend.frontend:NumpyFrontend, cutlass_cppgen.backend.library:ActivationOp,ActivationOpTag, cutlass_cppgen.utils.datatypes:is_numpy_tensor,is_torch_available,is_torch_tensor CN: 内部依赖：cutlass_library:SubstituteTemplate, cutlass_library:DataType,DataTypeTag, cutlass_cppgen.backend.c_types:MatrixCoord_,tuple_factory, cutlass_cppgen.backend.frontend:NumpyFrontend, cutlass_cppgen.backend.library:ActivationOp,ActivationOpTag, cutlass_cppgen.utils.datatypes:is_numpy_tensor,is_torch_available,is_torch_tensor
+- EN: External or standard-library dependencies: ctypes, numpy, torch, torch.nn.functional, scipy.special:erf CN: 外部或标准库依赖：ctypes, numpy, torch, torch.nn.functional, scipy.special:erf

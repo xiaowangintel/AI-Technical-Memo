@@ -1,0 +1,1821 @@
+# convnd_problem_shape.hpp — Code Analysis / 代码分析
+**Source / 源文件**: `include/cutlass/conv/convnd_problem_shape.hpp`
+**Purpose / 用途**: This file contains definitions and utility functions for describing convolution problem shapes. / 提供问题形状描述、N 维卷积支持。
+---
+## Line-by-Line Analysis / 逐行分析
+- **Line 1 / 第 1 行** — `/***************************************************************************************************`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 2 / 第 2 行** — ` * Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.`
+  - **EN**: States copyright ownership for the file.
+  - **CN**: 说明该文件的版权归属。
+- **Line 3 / 第 3 行** — ` * SPDX-License-Identifier: BSD-3-Clause`
+  - **EN**: Declares the SPDX license identifier.
+  - **CN**: 声明 SPDX 许可证标识。
+- **Line 4 / 第 4 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 5 / 第 5 行** — ` * Redistribution and use in source and binary forms, with or without`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 6 / 第 6 行** — ` * modification, are permitted provided that the following conditions are met:`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 7 / 第 7 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 8 / 第 8 行** — ` * 1. Redistributions of source code must retain the above copyright notice, this`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 9 / 第 9 行** — ` * list of conditions and the following disclaimer.`
+  - **EN**: Documentation/comment text: `list of conditions and the following disclaimer.`.
+  - **CN**: 文档/注释内容：`list of conditions and the following disclaimer.`。
+- **Line 10 / 第 10 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 11 / 第 11 行** — ` * 2. Redistributions in binary form must reproduce the above copyright notice,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 12 / 第 12 行** — ` * this list of conditions and the following disclaimer in the documentation`
+  - **EN**: Documentation/comment text: `this list of conditions and the following disclaimer in the documentation`.
+  - **CN**: 文档/注释内容：`this list of conditions and the following disclaimer in the documentation`。
+- **Line 13 / 第 13 行** — ` * and/or other materials provided with the distribution.`
+  - **EN**: Documentation/comment text: `and/or other materials provided with the distribution.`.
+  - **CN**: 文档/注释内容：`and/or other materials provided with the distribution.`。
+- **Line 14 / 第 14 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 15 / 第 15 行** — ` * 3. Neither the name of the copyright holder nor the names of its`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 16 / 第 16 行** — ` * contributors may be used to endorse or promote products derived from`
+  - **EN**: Documentation/comment text: `contributors may be used to endorse or promote products derived from`.
+  - **CN**: 文档/注释内容：`contributors may be used to endorse or promote products derived from`。
+- **Line 17 / 第 17 行** — ` * this software without specific prior written permission.`
+  - **EN**: Documentation/comment text: `this software without specific prior written permission.`.
+  - **CN**: 文档/注释内容：`this software without specific prior written permission.`。
+- **Line 18 / 第 18 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 19 / 第 19 行** — ` * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 20 / 第 20 行** — ` * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 21 / 第 21 行** — ` * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 22 / 第 22 行** — ` * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 23 / 第 23 行** — ` * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 24 / 第 24 行** — ` * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 25 / 第 25 行** — ` * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 26 / 第 26 行** — ` * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 27 / 第 27 行** — ` * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 28 / 第 28 行** — ` * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 29 / 第 29 行** — ` *`
+  - **EN**: Continues the BSD-3-Clause license banner.
+  - **CN**: 继续 BSD-3-Clause 许可证说明。
+- **Line 30 / 第 30 行** — ` **************************************************************************************************/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 31 / 第 31 行** — `/*! \file`
+  - **EN**: Marks this comment block as file-level documentation.
+  - **CN**: 将该注释块标记为文件级文档。
+- **Line 32 / 第 32 行** — `    \brief This file contains definitions and utility functions for describing convolution problem shapes.`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 33 / 第 33 行** — `*/`
+  - **EN**: Comment separator used to visually divide sections.
+  - **CN**: 用于视觉分隔章节的注释分隔线。
+- **Line 34 / 第 34 行** — `#pragma once`
+  - **EN**: Prevents multiple inclusion of this header.
+  - **CN**: 防止该头文件被重复包含。
+- **Line 35 / 第 35 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 36 / 第 36 行** — `#include "cutlass/cutlass.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/cutlass.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/cutlass.h`。
+- **Line 37 / 第 37 行** — `#include "cutlass/tensor_coord.h"`
+  - **EN**: Includes CUTLASS dependency `cutlass/tensor_coord.h`.
+  - **CN**: 引入 CUTLASS 依赖 `cutlass/tensor_coord.h`。
+- **Line 38 / 第 38 行** — `#include "cutlass/conv/convolution.h"`
+  - **EN**: Includes another CUTLASS convolution component `cutlass/conv/convolution.h`.
+  - **CN**: 引入另一个 CUTLASS 卷积组件 `cutlass/conv/convolution.h`。
+- **Line 39 / 第 39 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 40 / 第 40 行** — `#include "cute/container/array.hpp"`
+  - **EN**: Includes CuTe dependency `cute/container/array.hpp`.
+  - **CN**: 引入 CuTe 依赖 `cute/container/array.hpp`。
+- **Line 41 / 第 41 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 42 / 第 42 行** — `#if ! defined(__CUDACC_RTC__)`
+  - **EN**: Starts a preprocessor conditional block.
+  - **CN**: 开始一个预处理条件块。
+- **Line 43 / 第 43 行** — `#include <initializer_list>`
+  - **EN**: Includes standard library header `initializer_list`.
+  - **CN**: 引入标准库头文件 `initializer_list`。
+- **Line 44 / 第 44 行** — `#endif`
+  - **EN**: Ends the current preprocessor conditional block.
+  - **CN**: 结束当前预处理条件块。
+- **Line 45 / 第 45 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 46 / 第 46 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 47 / 第 47 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 48 / 第 48 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 49 / 第 49 行** — `namespace cutlass::conv {`
+  - **EN**: Opens namespace `cutlass::conv` for the declarations that follow.
+  - **CN**: 为后续声明打开命名空间 `cutlass::conv`。
+- **Line 50 / 第 50 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 51 / 第 51 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 52 / 第 52 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 53 / 第 53 行** — `// Implements the user facing argument for all CUTLASS 3.x convolutions in a rank agnostic fashion.`
+  - **EN**: Inline comment explaining intent: `Implements the user facing argument for all CUTLASS 3.x convolutions in a rank agnostic fashion.`.
+  - **CN**: 行内注释说明意图：`Implements the user facing argument for all CUTLASS 3.x convolutions in a rank agnostic fashion.`。
+- **Line 54 / 第 54 行** — `// All tensors are flat and by default treated as layout right (NDHWC, KTRSC, NZPQK)`
+  - **EN**: Inline comment explaining intent: `All tensors are flat and by default treated as layout right (NDHWC, KTRSC, NZPQK)`.
+  - **CN**: 行内注释说明意图：`All tensors are flat and by default treated as layout right (NDHWC, KTRSC, NZPQK)`。
+- **Line 55 / 第 55 行** — `// Supports asymmetric padding, traversal strides, dilations, and all conv algorithm types.`
+  - **EN**: Inline comment explaining intent: `Supports asymmetric padding, traversal strides, dilations, and all conv algorithm types.`.
+  - **CN**: 行内注释说明意图：`Supports asymmetric padding, traversal strides, dilations, and all conv algorithm types.`。
+- **Line 56 / 第 56 行** — `template <`
+  - **EN**: Begins a multi-line template parameter list.
+  - **CN**: 开始多行模板参数列表。
+- **Line 57 / 第 57 行** — `  conv::Operator ConvOp_,`
+  - **EN**: Adds template parameter specifier `conv::Operator ConvOp_`.
+  - **CN**: 补充模板参数说明符 `conv::Operator ConvOp_`。
+- **Line 58 / 第 58 行** — `  int NumSpatialDimensions_`
+  - **EN**: Adds template parameter specifier `int NumSpatialDimensions_`.
+  - **CN**: 补充模板参数说明符 `int NumSpatialDimensions_`。
+- **Line 59 / 第 59 行** — `>`
+  - **EN**: Closes the multi-line template parameter list.
+  - **CN**: 结束多行模板参数列表。
+- **Line 60 / 第 60 行** — `struct ConvProblemShape {`
+  - **EN**: Starts the definition of struct `ConvProblemShape`.
+  - **CN**: 开始定义 struct `ConvProblemShape`。
+- **Line 61 / 第 61 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 62 / 第 62 行** — `  // Alias types for members`
+  - **EN**: Inline comment explaining intent: `Alias types for members`.
+  - **CN**: 行内注释说明意图：`Alias types for members`。
+- **Line 63 / 第 63 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 64 / 第 64 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 65 / 第 65 行** — `  static constexpr int RankS = NumSpatialDimensions_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 66 / 第 66 行** — `  static constexpr int RankT = NumSpatialDimensions_ + 2;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 67 / 第 67 行** — `  static constexpr conv::Operator ConvOp = ConvOp_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 68 / 第 68 行** — `  static constexpr int NumSpatialDimensions = NumSpatialDimensions_;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 69 / 第 69 行** — `  using SpatialExtent = cute::array<int, RankS>;`
+  - **EN**: Introduces type or value alias `SpatialExtent`.
+  - **CN**: 引入类型或值别名 `SpatialExtent`。
+- **Line 70 / 第 70 行** — `  using TensorExtent  = cute::array<int, RankT>;`
+  - **EN**: Introduces type or value alias `TensorExtent`.
+  - **CN**: 引入类型或值别名 `TensorExtent`。
+- **Line 71 / 第 71 行** — `  using TensorStride  = cute::array<int64_t, RankT>;`
+  - **EN**: Introduces type or value alias `TensorStride`.
+  - **CN**: 引入类型或值别名 `TensorStride`。
+- **Line 72 / 第 72 行** — `  using ShapePadding = SpatialExtent;`
+  - **EN**: Introduces type or value alias `ShapePadding`.
+  - **CN**: 引入类型或值别名 `ShapePadding`。
+- **Line 73 / 第 73 行** — `  using TraversalStride = SpatialExtent;`
+  - **EN**: Introduces type or value alias `TraversalStride`.
+  - **CN**: 引入类型或值别名 `TraversalStride`。
+- **Line 74 / 第 74 行** — `  using ShapeDilation = SpatialExtent;`
+  - **EN**: Introduces type or value alias `ShapeDilation`.
+  - **CN**: 引入类型或值别名 `ShapeDilation`。
+- **Line 75 / 第 75 行** — `  using Corner = SpatialExtent;`
+  - **EN**: Introduces type or value alias `Corner`.
+  - **CN**: 引入类型或值别名 `Corner`。
+- **Line 76 / 第 76 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 77 / 第 77 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 78 / 第 78 行** — `  // Members`
+  - **EN**: Inline comment explaining intent: `Members`.
+  - **CN**: 行内注释说明意图：`Members`。
+- **Line 79 / 第 79 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 80 / 第 80 行** — `  cutlass::conv::Mode mode{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 81 / 第 81 行** — `  TensorExtent shape_A{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 82 / 第 82 行** — `  TensorStride stride_A{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 83 / 第 83 行** — `  TensorExtent shape_B{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 84 / 第 84 行** — `  TensorStride stride_B{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 85 / 第 85 行** — `  TensorExtent shape_C{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 86 / 第 86 行** — `  TensorStride stride_C{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 87 / 第 87 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 88 / 第 88 行** — `  // asymmetric padding, both upper and lower padding must be >= 0`
+  - **EN**: Inline comment explaining intent: `asymmetric padding, both upper and lower padding must be >= 0`.
+  - **CN**: 行内注释说明意图：`asymmetric padding, both upper and lower padding must be >= 0`。
+- **Line 89 / 第 89 行** — `  ShapePadding lower_padding{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 90 / 第 90 行** — `  ShapePadding upper_padding{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 91 / 第 91 行** — `  TraversalStride traversal_stride{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 92 / 第 92 行** — `  ShapeDilation dilation{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 93 / 第 93 行** — `  int groups = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 94 / 第 94 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 95 / 第 95 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 96 / 第 96 行** — `  // Methods`
+  - **EN**: Inline comment explaining intent: `Methods`.
+  - **CN**: 行内注释说明意图：`Methods`。
+- **Line 97 / 第 97 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 98 / 第 98 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 99 / 第 99 行** — `  ConvProblemShape() = default;`
+  - **EN**: Declares a defaulted special member function.
+  - **CN**: 声明一个默认实现的特殊成员函数。
+- **Line 100 / 第 100 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 101 / 第 101 行** — `  // Constructor accepts user facing arguments and computes to stores the corners as its internal state`
+  - **EN**: Inline comment explaining intent: `Constructor accepts user facing arguments and computes to stores the corners as its internal sta...`.
+  - **CN**: 行内注释说明意图：`Constructor accepts user facing arguments and computes to stores the corners as its internal sta...`。
+- **Line 102 / 第 102 行** — `  ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 103 / 第 103 行** — `      conv::Mode mode,                                                     // convolution/cross-correlation`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 104 / 第 104 行** — `      TensorExtent shape_act,                                              // [n,d,h,w,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 105 / 第 105 行** — `      TensorStride stride_act,                                             // [n,d,h,w,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 106 / 第 106 行** — `      TensorExtent shape_flt,                                              // [k,t,r,s,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 107 / 第 107 行** — `      TensorStride stride_flt,                                             // [k,t,r,s,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 108 / 第 108 行** — `      ShapePadding lower_padding,                                          // [pad_d, pad_h, pad_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 109 / 第 109 行** — `      ShapePadding upper_padding,                                          // [pad_d, pad_h, pad_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 110 / 第 110 行** — `      TraversalStride tstride,                                             // [stride_d, stride_h, stride_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 111 / 第 111 行** — `      ShapeDilation dilation,                                              // [dilation_d, dilation_h, dilation_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 112 / 第 112 行** — `      int groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 113 / 第 113 行** — `      : mode(mode)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 114 / 第 114 行** — `      , lower_padding(lower_padding)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 115 / 第 115 行** — `      , upper_padding(upper_padding)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 116 / 第 116 行** — `      , traversal_stride(tstride)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 117 / 第 117 行** — `      , dilation(dilation)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 118 / 第 118 行** — `      , groups(groups) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 119 / 第 119 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 120 / 第 120 行** — `    auto [shape_xformed_act, stride_xformed_act] = calculate_xformed_act(shape_act, shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 121 / 第 121 行** — `    set_shape_stride_ABC(shape_act, stride_act, shape_flt, stride_flt, shape_xformed_act, stride_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 122 / 第 122 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 123 / 第 123 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 124 / 第 124 行** — `  // Allow user input of xformed activation stride to support non-packed strides.`
+  - **EN**: Inline comment explaining intent: `Allow user input of xformed activation stride to support non-packed strides.`.
+  - **CN**: 行内注释说明意图：`Allow user input of xformed activation stride to support non-packed strides.`。
+- **Line 125 / 第 125 行** — `  ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 126 / 第 126 行** — `      conv::Mode mode,                                                     // convolution/cross-correlation`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 127 / 第 127 行** — `      TensorExtent shape_act,                                              // [n,d,h,w,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 128 / 第 128 行** — `      TensorStride stride_act,                                             // [n,d,h,w,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 129 / 第 129 行** — `      TensorExtent shape_flt,                                              // [k,t,r,s,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 130 / 第 130 行** — `      TensorStride stride_flt,                                             // [k,t,r,s,c]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 131 / 第 131 行** — `      TensorStride stride_xformed_act,                                     // [n,z,p,q,k]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 132 / 第 132 行** — `      ShapePadding lower_padding,                                          // [pad_d, pad_h, pad_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 133 / 第 133 行** — `      ShapePadding upper_padding,                                          // [pad_d, pad_h, pad_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 134 / 第 134 行** — `      TraversalStride tstride,                                             // [stride_d, stride_h, stride_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 135 / 第 135 行** — `      ShapeDilation dilation,                                              // [dilation_d, dilation_h, dilation_w]`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 136 / 第 136 行** — `      int groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 137 / 第 137 行** — `      : mode(mode)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 138 / 第 138 行** — `      , lower_padding(lower_padding)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 139 / 第 139 行** — `      , upper_padding(upper_padding)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 140 / 第 140 行** — `      , traversal_stride(tstride)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 141 / 第 141 行** — `      , dilation(dilation)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 142 / 第 142 行** — `      , groups(groups) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 143 / 第 143 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 144 / 第 144 行** — `    CUTLASS_ASSERT(stride_act[RankT - 1] == 1);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 145 / 第 145 行** — `    CUTLASS_ASSERT(stride_flt[RankT - 1] == 1);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 146 / 第 146 行** — `    CUTLASS_ASSERT(stride_xformed_act[RankT - 1] == 1);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 147 / 第 147 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 148 / 第 148 行** — `    auto stride_act_packed = packed_stride_right_major(shape_act);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 149 / 第 149 行** — `    auto stride_flt_packed = packed_stride_right_major(shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 150 / 第 150 行** — `    auto [shape_xformed_act, stride_xformed_act_packed] = calculate_xformed_act(shape_act, shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 151 / 第 151 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 152 / 第 152 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 153 / 第 153 行** — `    for(int i = 0; i < RankT - 1; ++i) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 154 / 第 154 行** — `      CUTLASS_ASSERT(stride_act[i] >= stride_act_packed[i]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 155 / 第 155 行** — `      CUTLASS_ASSERT(stride_flt[i] >= stride_flt_packed[i]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 156 / 第 156 行** — `      CUTLASS_ASSERT(stride_xformed_act[i] >= stride_xformed_act_packed[i]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 157 / 第 157 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 158 / 第 158 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 159 / 第 159 行** — `    set_shape_stride_ABC(shape_act, stride_act, shape_flt, stride_flt, shape_xformed_act, stride_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 160 / 第 160 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 161 / 第 161 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 162 / 第 162 行** — `  // Constructor accepts user facing arguments and presume packed tensor strides in canonical (CWHDN) order.`
+  - **EN**: Inline comment explaining intent: `Constructor accepts user facing arguments and presume packed tensor strides in canonical (CWHDN)...`.
+  - **CN**: 行内注释说明意图：`Constructor accepts user facing arguments and presume packed tensor strides in canonical (CWHDN)...`。
+- **Line 163 / 第 163 行** — `  ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 164 / 第 164 行** — `      conv::Mode mode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 165 / 第 165 行** — `      TensorExtent shape_act,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 166 / 第 166 行** — `      TensorExtent shape_flt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 167 / 第 167 行** — `      ShapePadding lower_padding,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 168 / 第 168 行** — `      ShapePadding upper_padding,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 169 / 第 169 行** — `      TraversalStride tstride,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 170 / 第 170 行** — `      ShapeDilation dilation,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 171 / 第 171 行** — `      int groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 172 / 第 172 行** — `      : ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 173 / 第 173 行** — `        mode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 174 / 第 174 行** — `        shape_act,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 175 / 第 175 行** — `        packed_stride_right_major(shape_act),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 176 / 第 176 行** — `        shape_flt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 177 / 第 177 行** — `        packed_stride_right_major(shape_flt),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 178 / 第 178 行** — `        lower_padding,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 179 / 第 179 行** — `        upper_padding,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 180 / 第 180 行** — `        tstride,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 181 / 第 181 行** — `        dilation,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 182 / 第 182 行** — `        groups) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 183 / 第 183 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 184 / 第 184 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 185 / 第 185 行** — `#if ! defined(__CUDACC_RTC__)`
+  - **EN**: Starts a preprocessor conditional block.
+  - **CN**: 开始一个预处理条件块。
+- **Line 186 / 第 186 行** — `  // Constructor accepts user facing arguments and computes to stores the corners as its internal state`
+  - **EN**: Inline comment explaining intent: `Constructor accepts user facing arguments and computes to stores the corners as its internal sta...`.
+  - **CN**: 行内注释说明意图：`Constructor accepts user facing arguments and computes to stores the corners as its internal sta...`。
+- **Line 187 / 第 187 行** — `  ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 188 / 第 188 行** — `      conv::Mode                     mode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 189 / 第 189 行** — `      std::initializer_list<int>     shape_act_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 190 / 第 190 行** — `      std::initializer_list<int64_t> stride_act_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 191 / 第 191 行** — `      std::initializer_list<int>     shape_flt_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 192 / 第 192 行** — `      std::initializer_list<int64_t> stride_flt_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 193 / 第 193 行** — `      std::initializer_list<int>     lower_padding_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 194 / 第 194 行** — `      std::initializer_list<int>     upper_padding_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 195 / 第 195 行** — `      std::initializer_list<int>     traversal_stride_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 196 / 第 196 行** — `      std::initializer_list<int>     dilation_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 197 / 第 197 行** — `      int groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 198 / 第 198 行** — `      : mode(mode)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 199 / 第 199 行** — `      , groups(groups) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 200 / 第 200 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 201 / 第 201 行** — `    TensorExtent shape_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 202 / 第 202 行** — `    TensorStride stride_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 203 / 第 203 行** — `    TensorExtent shape_flt{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 204 / 第 204 行** — `    TensorStride stride_flt{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 205 / 第 205 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 206 / 第 206 行** — `    assert(shape_act_.size() == shape_act.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 207 / 第 207 行** — `    assert(stride_act_.size() == stride_act.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 208 / 第 208 行** — `    assert(shape_flt_.size() == shape_flt.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 209 / 第 209 行** — `    assert(stride_flt_.size() == stride_flt.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 210 / 第 210 行** — `    assert(lower_padding_.size() == lower_padding.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 211 / 第 211 行** — `    assert(upper_padding_.size() == upper_padding.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 212 / 第 212 行** — `    assert(traversal_stride_.size() == traversal_stride.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 213 / 第 213 行** — `    assert(dilation_.size() == dilation.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 214 / 第 214 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 215 / 第 215 行** — `    std::copy(shape_act_.begin(), shape_act_.end(), shape_act.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 216 / 第 216 行** — `    std::copy(stride_act_.begin(), stride_act_.end(), stride_act.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 217 / 第 217 行** — `    std::copy(shape_flt_.begin(), shape_flt_.end(), shape_flt.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 218 / 第 218 行** — `    std::copy(stride_flt_.begin(), stride_flt_.end(), stride_flt.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 219 / 第 219 行** — `    std::copy(lower_padding_.begin(), lower_padding_.end(), lower_padding.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 220 / 第 220 行** — `    std::copy(upper_padding_.begin(), upper_padding_.end(), upper_padding.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 221 / 第 221 行** — `    std::copy(traversal_stride_.begin(), traversal_stride_.end(), traversal_stride.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 222 / 第 222 行** — `    std::copy(dilation_.begin(), dilation_.end(), dilation.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 223 / 第 223 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 224 / 第 224 行** — `    auto [shape_xformed_act, stride_xformed_act] = calculate_xformed_act(shape_act, shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 225 / 第 225 行** — `    set_shape_stride_ABC(shape_act, stride_act, shape_flt, stride_flt, shape_xformed_act, stride_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 226 / 第 226 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 227 / 第 227 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 228 / 第 228 行** — `  // Allow user input of xformed activation stride to support non-packed strides.`
+  - **EN**: Inline comment explaining intent: `Allow user input of xformed activation stride to support non-packed strides.`.
+  - **CN**: 行内注释说明意图：`Allow user input of xformed activation stride to support non-packed strides.`。
+- **Line 229 / 第 229 行** — `  ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 230 / 第 230 行** — `      conv::Mode                     mode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 231 / 第 231 行** — `      std::initializer_list<int>     shape_act_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 232 / 第 232 行** — `      std::initializer_list<int64_t> stride_act_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 233 / 第 233 行** — `      std::initializer_list<int>     shape_flt_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 234 / 第 234 行** — `      std::initializer_list<int64_t> stride_flt_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 235 / 第 235 行** — `      std::initializer_list<int64_t> stride_xformed_act_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 236 / 第 236 行** — `      std::initializer_list<int>     lower_padding_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 237 / 第 237 行** — `      std::initializer_list<int>     upper_padding_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 238 / 第 238 行** — `      std::initializer_list<int>     traversal_stride_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 239 / 第 239 行** — `      std::initializer_list<int>     dilation_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 240 / 第 240 行** — `      int groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 241 / 第 241 行** — `      : mode(mode)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 242 / 第 242 行** — `      , groups(groups) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 243 / 第 243 行** — `    TensorExtent shape_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 244 / 第 244 行** — `    TensorStride stride_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 245 / 第 245 行** — `    TensorExtent shape_flt{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 246 / 第 246 行** — `    TensorStride stride_flt{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 247 / 第 247 行** — `    TensorStride stride_xformed_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 248 / 第 248 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 249 / 第 249 行** — `    std::copy(shape_act_.begin(), shape_act_.end(), shape_act.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 250 / 第 250 行** — `    std::copy(stride_act_.begin(), stride_act_.end(), stride_act.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 251 / 第 251 行** — `    std::copy(shape_flt_.begin(), shape_flt_.end(), shape_flt.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 252 / 第 252 行** — `    std::copy(stride_flt_.begin(), stride_flt_.end(), stride_flt.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 253 / 第 253 行** — `    std::copy(stride_xformed_act_.begin(), stride_xformed_act_.end(), stride_xformed_act.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 254 / 第 254 行** — `    std::copy(lower_padding_.begin(), lower_padding_.end(), lower_padding.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 255 / 第 255 行** — `    std::copy(upper_padding_.begin(), upper_padding_.end(), upper_padding.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 256 / 第 256 行** — `    std::copy(traversal_stride_.begin(), traversal_stride_.end(), traversal_stride.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 257 / 第 257 行** — `    std::copy(dilation_.begin(), dilation_.end(), dilation.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 258 / 第 258 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 259 / 第 259 行** — `    CUTLASS_ASSERT(stride_act[RankT - 1] == 1);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 260 / 第 260 行** — `    CUTLASS_ASSERT(stride_flt[RankT - 1] == 1);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 261 / 第 261 行** — `    CUTLASS_ASSERT(stride_xformed_act[RankT - 1] == 1);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 262 / 第 262 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 263 / 第 263 行** — `    auto stride_act_packed = packed_stride_right_major(shape_act);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 264 / 第 264 行** — `    auto stride_flt_packed = packed_stride_right_major(shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 265 / 第 265 行** — `    auto [shape_xformed_act, stride_xformed_act_packed] = calculate_xformed_act(shape_act, shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 266 / 第 266 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 267 / 第 267 行** — `    CUTLASS_PRAGMA_UNROLL`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 268 / 第 268 行** — `    for(int i = 0; i < RankT - 1; ++i) {`
+  - **EN**: Starts a loop over indices or elements.
+  - **CN**: 开始一个遍历索引或元素的循环。
+- **Line 269 / 第 269 行** — `      CUTLASS_ASSERT(stride_act[i] >= stride_act_packed[i]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 270 / 第 270 行** — `      CUTLASS_ASSERT(stride_flt[i] >= stride_flt_packed[i]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 271 / 第 271 行** — `      CUTLASS_ASSERT(stride_xformed_act[i] >= stride_xformed_act_packed[i]);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 272 / 第 272 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 273 / 第 273 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 274 / 第 274 行** — `    set_shape_stride_ABC(shape_act, stride_act, shape_flt, stride_flt, shape_xformed_act, stride_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 275 / 第 275 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 276 / 第 276 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 277 / 第 277 行** — `  // Constructor accepts user facing arguments and computes to stores the corners as its internal state`
+  - **EN**: Inline comment explaining intent: `Constructor accepts user facing arguments and computes to stores the corners as its internal sta...`.
+  - **CN**: 行内注释说明意图：`Constructor accepts user facing arguments and computes to stores the corners as its internal sta...`。
+- **Line 278 / 第 278 行** — `  ConvProblemShape(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 279 / 第 279 行** — `      conv::Mode                     mode,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 280 / 第 280 行** — `      std::initializer_list<int>     shape_act_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 281 / 第 281 行** — `      std::initializer_list<int>     shape_flt_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 282 / 第 282 行** — `      std::initializer_list<int>     lower_padding_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 283 / 第 283 行** — `      std::initializer_list<int>     upper_padding_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 284 / 第 284 行** — `      std::initializer_list<int>     traversal_stride_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 285 / 第 285 行** — `      std::initializer_list<int>     dilation_,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 286 / 第 286 行** — `      int groups)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 287 / 第 287 行** — `      : mode(mode)`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 288 / 第 288 行** — `      , groups(groups) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 289 / 第 289 行** — `    TensorExtent shape_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 290 / 第 290 行** — `    TensorStride stride_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 291 / 第 291 行** — `    TensorExtent shape_flt{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 292 / 第 292 行** — `    TensorStride stride_flt{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 293 / 第 293 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 294 / 第 294 行** — `    assert(shape_act_.size() == shape_act.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 295 / 第 295 行** — `    assert(shape_flt_.size() == shape_flt.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 296 / 第 296 行** — `    assert(lower_padding_.size() == lower_padding.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 297 / 第 297 行** — `    assert(upper_padding_.size() == upper_padding.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 298 / 第 298 行** — `    assert(traversal_stride_.size() == traversal_stride.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 299 / 第 299 行** — `    assert(dilation_.size() == dilation.size());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 300 / 第 300 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 301 / 第 301 行** — `    std::copy(shape_act_.begin(), shape_act_.end(), shape_act.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 302 / 第 302 行** — `    std::copy(shape_flt_.begin(), shape_flt_.end(), shape_flt.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 303 / 第 303 行** — `    std::copy(lower_padding_.begin(), lower_padding_.end(), lower_padding.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 304 / 第 304 行** — `    std::copy(upper_padding_.begin(), upper_padding_.end(), upper_padding.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 305 / 第 305 行** — `    std::copy(traversal_stride_.begin(), traversal_stride_.end(), traversal_stride.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 306 / 第 306 行** — `    std::copy(dilation_.begin(), dilation_.end(), dilation.begin());`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 307 / 第 307 行** — `    stride_act = packed_stride_right_major(shape_act);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 308 / 第 308 行** — `    stride_flt = packed_stride_right_major(shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 309 / 第 309 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 310 / 第 310 行** — `    auto [shape_xformed_act, stride_xformed_act] = calculate_xformed_act(shape_act, shape_flt);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 311 / 第 311 行** — `    set_shape_stride_ABC(shape_act, stride_act, shape_flt, stride_flt, shape_xformed_act, stride_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 312 / 第 312 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 313 / 第 313 行** — `#endif // not defined(__CUDACC_RTC__)`
+  - **EN**: Ends the current preprocessor conditional block.
+  - **CN**: 结束当前预处理条件块。
+- **Line 314 / 第 314 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 315 / 第 315 行** — `  // Set shape and stride of tensor A/B/C according to following table:`
+  - **EN**: Inline comment explaining intent: `Set shape and stride of tensor A/B/C according to following table:`.
+  - **CN**: 行内注释说明意图：`Set shape and stride of tensor A/B/C according to following table:`。
+- **Line 316 / 第 316 行** — `  // |              | Fprop  | Dgrad  | Wgrad |`
+  - **EN**: Inline comment explaining intent: `|              | Fprop  | Dgrad  | Wgrad |`.
+  - **CN**: 行内注释说明意图：`|              | Fprop  | Dgrad  | Wgrad |`。
+- **Line 317 / 第 317 行** — `  // | ------       | ------ | ------ | ------|`
+  - **EN**: Inline comment explaining intent: `| ------       | ------ | ------ | ------|`.
+  - **CN**: 行内注释说明意图：`| ------       | ------ | ------ | ------|`。
+- **Line 318 / 第 318 行** — `  // |   ShapeA     | NDHWC  | NZPQK  | NZPQK |`
+  - **EN**: Inline comment explaining intent: `|   ShapeA     | NDHWC  | NZPQK  | NZPQK |`.
+  - **CN**: 行内注释说明意图：`|   ShapeA     | NDHWC  | NZPQK  | NZPQK |`。
+- **Line 319 / 第 319 行** — `  // |   ShapeB     | KTRSC  | KTRSC  | NDHWC |`
+  - **EN**: Inline comment explaining intent: `|   ShapeB     | KTRSC  | KTRSC  | NDHWC |`.
+  - **CN**: 行内注释说明意图：`|   ShapeB     | KTRSC  | KTRSC  | NDHWC |`。
+- **Line 320 / 第 320 行** — `  // |   ShapeC     | NZPQK  | NDHWC  | KTRSC |`
+  - **EN**: Inline comment explaining intent: `|   ShapeC     | NZPQK  | NDHWC  | KTRSC |`.
+  - **CN**: 行内注释说明意图：`|   ShapeC     | NZPQK  | NDHWC  | KTRSC |`。
+- **Line 321 / 第 321 行** — `  //`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 322 / 第 322 行** — `  // Input comes from calculate_xformed_act, which does NOT depend on ConvOp.`
+  - **EN**: Inline comment explaining intent: `Input comes from calculate_xformed_act, which does NOT depend on ConvOp.`.
+  - **CN**: 行内注释说明意图：`Input comes from calculate_xformed_act, which does NOT depend on ConvOp.`。
+- **Line 323 / 第 323 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 324 / 第 324 行** — `  constexpr void`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 325 / 第 325 行** — `  set_shape_stride_ABC(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 326 / 第 326 行** — `    TensorExtent shape_act,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 327 / 第 327 行** — `    TensorStride stride_act,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 328 / 第 328 行** — `    TensorExtent shape_flt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 329 / 第 329 行** — `    TensorStride stride_flt,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 330 / 第 330 行** — `    TensorExtent shape_xformed_act,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 331 / 第 331 行** — `    TensorStride stride_xformed_act) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 332 / 第 332 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Starts a preprocessor conditional block.
+  - **CN**: 开始一个预处理条件块。
+- **Line 333 / 第 333 行** — `    printf("*** set_shape_stride_ABC ***");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 334 / 第 334 行** — `    printf("\n  shape_act: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 335 / 第 335 行** — `    print(shape_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 336 / 第 336 行** — `    printf("\n  stride_act: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 337 / 第 337 行** — `    print(stride_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 338 / 第 338 行** — `    printf("\n  shape_flt: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 339 / 第 339 行** — `    print(shape_flt);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 340 / 第 340 行** — `    printf("\n  stride_flt: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 341 / 第 341 行** — `    print(stride_flt);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 342 / 第 342 行** — `    printf("\n  shape_xformed_act: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 343 / 第 343 行** — `    print(shape_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 344 / 第 344 行** — `    printf("\n  stride_xformed_act: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 345 / 第 345 行** — `    print(stride_xformed_act);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 346 / 第 346 行** — `    if constexpr (ConvOp == cutlass::conv::Operator::kFprop) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 347 / 第 347 行** — `      printf("\n  ConvOp: Fprop");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 348 / 第 348 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 349 / 第 349 行** — `    if constexpr (ConvOp == cutlass::conv::Operator::kDgrad) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 350 / 第 350 行** — `      printf("\n  ConvOp: Dgrad");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 351 / 第 351 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 352 / 第 352 行** — `    if constexpr (ConvOp == cutlass::conv::Operator::kWgrad) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 353 / 第 353 行** — `      printf("\n  ConvOp: Wgrad");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 354 / 第 354 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 355 / 第 355 行** — `    printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 356 / 第 356 行** — `#endif`
+  - **EN**: Ends the current preprocessor conditional block.
+  - **CN**: 结束当前预处理条件块。
+- **Line 357 / 第 357 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 358 / 第 358 行** — `    if constexpr (ConvOp == cutlass::conv::Operator::kFprop) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 359 / 第 359 行** — `      shape_A = shape_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 360 / 第 360 行** — `      stride_A = stride_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 361 / 第 361 行** — `      shape_B = shape_flt;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 362 / 第 362 行** — `      stride_B = stride_flt;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 363 / 第 363 行** — `      shape_C = shape_xformed_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 364 / 第 364 行** — `      stride_C = stride_xformed_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 365 / 第 365 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 366 / 第 366 行** — `    else if constexpr (ConvOp == cutlass::conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 367 / 第 367 行** — `      shape_A = shape_xformed_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 368 / 第 368 行** — `      stride_A = stride_xformed_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 369 / 第 369 行** — `      shape_B = shape_flt;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 370 / 第 370 行** — `      stride_B = stride_flt;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 371 / 第 371 行** — `      shape_C = shape_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 372 / 第 372 行** — `      stride_C = stride_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 373 / 第 373 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 374 / 第 374 行** — `    else if constexpr (ConvOp == cutlass::conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 375 / 第 375 行** — `      shape_A = shape_xformed_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 376 / 第 376 行** — `      stride_A = stride_xformed_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 377 / 第 377 行** — `      shape_B = shape_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 378 / 第 378 行** — `      stride_B = stride_act;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 379 / 第 379 行** — `      shape_C = shape_flt;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 380 / 第 380 行** — `      stride_C = stride_flt;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 381 / 第 381 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 382 / 第 382 行** — `#if defined(CUTLASS_DEBUG_TRACE_LEVEL) && (CUTLASS_DEBUG_TRACE_LEVEL > 1)`
+  - **EN**: Starts a preprocessor conditional block.
+  - **CN**: 开始一个预处理条件块。
+- **Line 383 / 第 383 行** — `    printf("\n  shape_A: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 384 / 第 384 行** — `    print(shape_A);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 385 / 第 385 行** — `    printf("\n  stride_A: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 386 / 第 386 行** — `    print(stride_A);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 387 / 第 387 行** — `    printf("\n  shape_B: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 388 / 第 388 行** — `    print(shape_B);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 389 / 第 389 行** — `    printf("\n  stride_B: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 390 / 第 390 行** — `    print(stride_B);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 391 / 第 391 行** — `    printf("\n  shape_C: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 392 / 第 392 行** — `    print(shape_C);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 393 / 第 393 行** — `    printf("\n  stride_C: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 394 / 第 394 行** — `    print(stride_C);`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 395 / 第 395 行** — `#endif`
+  - **EN**: Ends the current preprocessor conditional block.
+  - **CN**: 结束当前预处理条件块。
+- **Line 396 / 第 396 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 397 / 第 397 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 398 / 第 398 行** — `  // Get A extents.`
+  - **EN**: Inline comment explaining intent: `Get A extents.`.
+  - **CN**: 行内注释说明意图：`Get A extents.`。
+- **Line 399 / 第 399 行** — `  // fprop: A extents array contains [N,D,H,W,C]. Turn that into ((W,H,D,N), (C))`
+  - **EN**: Inline comment explaining intent: `fprop: A extents array contains [N,D,H,W,C]. Turn that into ((W,H,D,N), (C))`.
+  - **CN**: 行内注释说明意图：`fprop: A extents array contains [N,D,H,W,C]. Turn that into ((W,H,D,N), (C))`。
+- **Line 400 / 第 400 行** — `  // dgrad: A extents array contains [N,Z,P,Q,K]. Turn that into ((Q,P,Z,N), (K))`
+  - **EN**: Inline comment explaining intent: `dgrad: A extents array contains [N,Z,P,Q,K]. Turn that into ((Q,P,Z,N), (K))`.
+  - **CN**: 行内注释说明意图：`dgrad: A extents array contains [N,Z,P,Q,K]. Turn that into ((Q,P,Z,N), (K))`。
+- **Line 401 / 第 401 行** — `  // wgrad: A extents array contains [N,Z,P,Q,K]. Turn that into ((K), (Q,P,Z,N))`
+  - **EN**: Inline comment explaining intent: `wgrad: A extents array contains [N,Z,P,Q,K]. Turn that into ((K), (Q,P,Z,N))`.
+  - **CN**: 行内注释说明意图：`wgrad: A extents array contains [N,Z,P,Q,K]. Turn that into ((K), (Q,P,Z,N))`。
+- **Line 402 / 第 402 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 403 / 第 403 行** — `  constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 404 / 第 404 行** — `  get_shape_A() const {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 405 / 第 405 行** — `    using cute::make_shape;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 406 / 第 406 行** — `    using cute::take;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 407 / 第 407 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 408 / 第 408 行** — `    if constexpr (ConvOp == conv::Operator::kFprop ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 409 / 第 409 行** — `                  ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 410 / 第 410 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 411 / 第 411 行** — `        cute::reverse(take<0, RankT - 1>(shape_A)),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 412 / 第 412 行** — `        shape_A[RankT - 1]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 413 / 第 413 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 414 / 第 414 行** — `    // For wgrad kernel, we need to linearize NZPQ for tensor A`
+  - **EN**: Inline comment explaining intent: `For wgrad kernel, we need to linearize NZPQ for tensor A`.
+  - **CN**: 行内注释说明意图：`For wgrad kernel, we need to linearize NZPQ for tensor A`。
+- **Line 415 / 第 415 行** — `    else if constexpr (ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 416 / 第 416 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 417 / 第 417 行** — `        shape_A[RankT - 1],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 418 / 第 418 行** — `        cute::product(take<0, RankT - 1>(shape_A)));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 419 / 第 419 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 420 / 第 420 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 421 / 第 421 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 422 / 第 422 行** — `  // Get B extents.`
+  - **EN**: Inline comment explaining intent: `Get B extents.`.
+  - **CN**: 行内注释说明意图：`Get B extents.`。
+- **Line 423 / 第 423 行** — `  // fprop: B extents array contains [K,T,R,S,C]. Turn that into ((K), (C,S,R,T))`
+  - **EN**: Inline comment explaining intent: `fprop: B extents array contains [K,T,R,S,C]. Turn that into ((K), (C,S,R,T))`.
+  - **CN**: 行内注释说明意图：`fprop: B extents array contains [K,T,R,S,C]. Turn that into ((K), (C,S,R,T))`。
+- **Line 424 / 第 424 行** — `  // dgrad: B extents array contains [K,T,R,S,C]. Turn that into ((C), (K,S,R,T))`
+  - **EN**: Inline comment explaining intent: `dgrad: B extents array contains [K,T,R,S,C]. Turn that into ((C), (K,S,R,T))`.
+  - **CN**: 行内注释说明意图：`dgrad: B extents array contains [K,T,R,S,C]. Turn that into ((C), (K,S,R,T))`。
+- **Line 425 / 第 425 行** — `  // wgrad: B extents array contains [N,D,H,W,C]. Turn that into ((C), (W,H,D,N))`
+  - **EN**: Inline comment explaining intent: `wgrad: B extents array contains [N,D,H,W,C]. Turn that into ((C), (W,H,D,N))`.
+  - **CN**: 行内注释说明意图：`wgrad: B extents array contains [N,D,H,W,C]. Turn that into ((C), (W,H,D,N))`。
+- **Line 426 / 第 426 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 427 / 第 427 行** — `  constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 428 / 第 428 行** — `  get_shape_B() const {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 429 / 第 429 行** — `    using cute::make_shape;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 430 / 第 430 行** — `    using cute::reverse;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 431 / 第 431 行** — `    using cute::take;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 432 / 第 432 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 433 / 第 433 行** — `    if constexpr (ConvOp == conv::Operator::kFprop) {`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 434 / 第 434 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 435 / 第 435 行** — `        shape_B[0],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 436 / 第 436 行** — `        reverse(take<1, RankT>(shape_B)));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 437 / 第 437 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 438 / 第 438 行** — `    else if constexpr (ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 439 / 第 439 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 440 / 第 440 行** — `        shape_B[RankT - 1],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 441 / 第 441 行** — `        reverse(take<0, RankT - 1>(shape_B)));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 442 / 第 442 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 443 / 第 443 行** — `    else if constexpr (ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 444 / 第 444 行** — `      // shape_B: [K,T,R,S,C], return: [(C),(K,S,R,T)]`
+  - **EN**: Inline comment explaining intent: `shape_B: [K,T,R,S,C], return: [(C),(K,S,R,T)]`.
+  - **CN**: 行内注释说明意图：`shape_B: [K,T,R,S,C], return: [(C),(K,S,R,T)]`。
+- **Line 445 / 第 445 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 446 / 第 446 行** — `        shape_B[RankT - 1],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 447 / 第 447 行** — `        cute::insert<0>(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 448 / 第 448 行** — `          reverse(take<1, RankT - 1>(shape_B)),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 449 / 第 449 行** — `          shape_B[0]));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 450 / 第 450 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 451 / 第 451 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 452 / 第 452 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 453 / 第 453 行** — `  // Get C extents.`
+  - **EN**: Inline comment explaining intent: `Get C extents.`.
+  - **CN**: 行内注释说明意图：`Get C extents.`。
+- **Line 454 / 第 454 行** — `  // fprop: C extents array contains [N,Z,P,Q,K]. Turn that into ((Q,P,Z,N), (K))`
+  - **EN**: Inline comment explaining intent: `fprop: C extents array contains [N,Z,P,Q,K]. Turn that into ((Q,P,Z,N), (K))`.
+  - **CN**: 行内注释说明意图：`fprop: C extents array contains [N,Z,P,Q,K]. Turn that into ((Q,P,Z,N), (K))`。
+- **Line 455 / 第 455 行** — `  // dgrad: C extents array contains [N,D,H,W,C]. Turn that into ((W,H,D,N), (C))`
+  - **EN**: Inline comment explaining intent: `dgrad: C extents array contains [N,D,H,W,C]. Turn that into ((W,H,D,N), (C))`.
+  - **CN**: 行内注释说明意图：`dgrad: C extents array contains [N,D,H,W,C]. Turn that into ((W,H,D,N), (C))`。
+- **Line 456 / 第 456 行** — `  // wgrad: C extents array contains [K,T,R,S,C]. Turn that into ((K), (C,S,R,T))`
+  - **EN**: Inline comment explaining intent: `wgrad: C extents array contains [K,T,R,S,C]. Turn that into ((K), (C,S,R,T))`.
+  - **CN**: 行内注释说明意图：`wgrad: C extents array contains [K,T,R,S,C]. Turn that into ((K), (C,S,R,T))`。
+- **Line 457 / 第 457 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 458 / 第 458 行** — `  constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 459 / 第 459 行** — `  get_shape_C() const {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 460 / 第 460 行** — `    using cute::make_shape;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 461 / 第 461 行** — `    using cute::reverse;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 462 / 第 462 行** — `    using cute::take;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 463 / 第 463 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 464 / 第 464 行** — `    if constexpr (ConvOp == conv::Operator::kFprop ||`
+  - **EN**: Introduces a conditional branch.
+  - **CN**: 引入一个条件分支。
+- **Line 465 / 第 465 行** — `                  ConvOp == conv::Operator::kDgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 466 / 第 466 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 467 / 第 467 行** — `        reverse(take<0, RankT - 1>(shape_C)),`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 468 / 第 468 行** — `        shape_C[RankT - 1]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 469 / 第 469 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 470 / 第 470 行** — `    else if constexpr (ConvOp == conv::Operator::kWgrad) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 471 / 第 471 行** — `      return make_shape(`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 472 / 第 472 行** — `        shape_C[0],`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 473 / 第 473 行** — `        reverse(take<1, RankT>(shape_C)));`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 474 / 第 474 行** — `    }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 475 / 第 475 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 476 / 第 476 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 477 / 第 477 行** — `  // Static method that returns the canonical strides of tensors (layouts are right major and compact)`
+  - **EN**: Inline comment explaining intent: `Static method that returns the canonical strides of tensors (layouts are right major and compact...`.
+  - **CN**: 行内注释说明意图：`Static method that returns the canonical strides of tensors (layouts are right major and compact...`。
+- **Line 478 / 第 478 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 479 / 第 479 行** — `  static constexpr TensorStride`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 480 / 第 480 行** — `  packed_stride_right_major(TensorExtent const& extents) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 481 / 第 481 行** — `    TensorStride strides{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 482 / 第 482 行** — `    strides[RankT-1] = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 483 / 第 483 行** — `    cute::for_each(cute::make_rseq<RankT-1>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 484 / 第 484 行** — `      strides[i] = extents[i+1] * strides[i+1];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 485 / 第 485 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 486 / 第 486 行** — `    return strides;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 487 / 第 487 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 488 / 第 488 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 489 / 第 489 行** — `  // Static method that returns the packed logical size of any TensorExtent`
+  - **EN**: Inline comment explaining intent: `Static method that returns the packed logical size of any TensorExtent`.
+  - **CN**: 行内注释说明意图：`Static method that returns the packed logical size of any TensorExtent`。
+- **Line 490 / 第 490 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 491 / 第 491 行** — `  static constexpr size_t`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 492 / 第 492 行** — `  size(TensorExtent const& extents) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 493 / 第 493 行** — `    size_t size = 1;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 494 / 第 494 行** — `    cute::for_each(cute::make_seq<RankT>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 495 / 第 495 行** — `      size *= extents[i];`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 496 / 第 496 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 497 / 第 497 行** — `    return size;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 498 / 第 498 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 499 / 第 499 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 500 / 第 500 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 501 / 第 501 行** — `  constexpr size_t`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 502 / 第 502 行** — `  size_A() const {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 503 / 第 503 行** — `    return shape_A[0] * stride_A[0];`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 504 / 第 504 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 505 / 第 505 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 506 / 第 506 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 507 / 第 507 行** — `  constexpr size_t`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 508 / 第 508 行** — `  size_B() const {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 509 / 第 509 行** — `    return shape_B[0] * stride_B[0];`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 510 / 第 510 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 511 / 第 511 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 512 / 第 512 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 513 / 第 513 行** — `  constexpr size_t`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 514 / 第 514 行** — `  size_C() const {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 515 / 第 515 行** — `    return shape_C[0] * stride_C[0];`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 516 / 第 516 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 517 / 第 517 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 518 / 第 518 行** — `  // Equality operator`
+  - **EN**: Inline comment explaining intent: `Equality operator`.
+  - **CN**: 行内注释说明意图：`Equality operator`。
+- **Line 519 / 第 519 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 520 / 第 520 行** — `  bool operator==(ConvProblemShape<ConvOp, NumSpatialDimensions> const& rhs) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 521 / 第 521 行** — `    using cute::for_each;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 522 / 第 522 行** — `    using cute::make_seq;`
+  - **EN**: Introduces type or value alias `cute`.
+  - **CN**: 引入类型或值别名 `cute`。
+- **Line 523 / 第 523 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 524 / 第 524 行** — `    bool is_equal = true;`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 525 / 第 525 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 526 / 第 526 行** — `    // Compare all tensor extents`
+  - **EN**: Inline comment explaining intent: `Compare all tensor extents`.
+  - **CN**: 行内注释说明意图：`Compare all tensor extents`。
+- **Line 527 / 第 527 行** — `    for_each(make_seq<RankT>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 528 / 第 528 行** — `      is_equal = is_equal`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 529 / 第 529 行** — `          && (shape_A[i] == rhs.shape_A[i])`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 530 / 第 530 行** — `          && (shape_B[i] == rhs.shape_B[i]);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 531 / 第 531 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 532 / 第 532 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 533 / 第 533 行** — `    // Compare all spatial extents`
+  - **EN**: Inline comment explaining intent: `Compare all spatial extents`.
+  - **CN**: 行内注释说明意图：`Compare all spatial extents`。
+- **Line 534 / 第 534 行** — `    for_each(make_seq<RankS>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 535 / 第 535 行** — `      is_equal = is_equal`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 536 / 第 536 行** — `          && (lower_padding[i] == rhs.lower_padding[i])`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 537 / 第 537 行** — `          && (upper_padding[i] == rhs.upper_padding[i])`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 538 / 第 538 行** — `          && (traversal_stride[i] == rhs.traversal_stride[i])`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 539 / 第 539 行** — `          && (dilation[i] == rhs.dilation[i]);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 540 / 第 540 行** — `    });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 541 / 第 541 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 542 / 第 542 行** — `    return is_equal;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 543 / 第 543 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 544 / 第 544 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 545 / 第 545 行** — `  /// Inequality operator`
+  - **EN**: Inline comment explaining intent: `Inequality operator`.
+  - **CN**: 行内注释说明意图：`Inequality operator`。
+- **Line 546 / 第 546 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 547 / 第 547 行** — `  bool operator!=(ConvProblemShape<ConvOp, NumSpatialDimensions> const &rhs) const {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 548 / 第 548 行** — `    return !(*this == rhs);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 549 / 第 549 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 550 / 第 550 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 551 / 第 551 行** — `private:`
+  - **EN**: Sets the current access level to `private`.
+  - **CN**: 将当前访问级别设置为 `private`。
+- **Line 552 / 第 552 行** — `  CUTLASS_HOST_DEVICE`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 553 / 第 553 行** — `  constexpr auto`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 554 / 第 554 行** — `  calculate_xformed_act(TensorExtent shape_act, TensorExtent shape_flt) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 555 / 第 555 行** — `    TensorExtent shape_xformed_act{};`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 556 / 第 556 行** — `    // calculate n,z,p,q,k.`
+  - **EN**: Inline comment explaining intent: `calculate n,z,p,q,k.`.
+  - **CN**: 行内注释说明意图：`calculate n,z,p,q,k.`。
+- **Line 557 / 第 557 行** — `    // a helper lambda to compute a single spatial extent of the nzpqk tensor`
+  - **EN**: Inline comment explaining intent: `a helper lambda to compute a single spatial extent of the nzpqk tensor`.
+  - **CN**: 行内注释说明意图：`a helper lambda to compute a single spatial extent of the nzpqk tensor`。
+- **Line 558 / 第 558 行** — `    auto nzpqk_extent = [](int act_ext, int filter_ext, int pad_total, int dilation, int tstride) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 559 / 第 559 行** — `      return 1 + (act_ext + pad_total - ((filter_ext -1) * dilation + 1)) / tstride;`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 560 / 第 560 行** — `    };`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 561 / 第 561 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 562 / 第 562 行** — `    shape_xformed_act[0] = shape_act[0]; // Activation N extent`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 563 / 第 563 行** — `    cute::for_each(cute::make_seq<RankS>{}, [&](auto i) {`
+  - **EN**: Starts a function or constructor definition.
+  - **CN**: 开始一个函数或构造函数定义。
+- **Line 564 / 第 564 行** — `      shape_xformed_act[i+1] = nzpqk_extent(`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 565 / 第 565 行** — `          shape_act[i+1], shape_flt[i+1], upper_padding[i] + lower_padding[i], dilation[i], traversal_stride[i]);`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 566 / 第 566 行** — `      });`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 567 / 第 567 行** — `    shape_xformed_act[RankT-1] = shape_flt[0]; // Filter K extent`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 568 / 第 568 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 569 / 第 569 行** — `    TensorStride stride_xformed_act = packed_stride_right_major(shape_xformed_act);`
+  - **EN**: Initializes or assigns a value in the current scope.
+  - **CN**: 在当前作用域中初始化或赋值。
+- **Line 570 / 第 570 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 571 / 第 571 行** — `    return cute::make_tuple(shape_xformed_act, stride_xformed_act);`
+  - **EN**: Returns a value from the current function.
+  - **CN**: 从当前函数返回一个值。
+- **Line 572 / 第 572 行** — `  }`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 573 / 第 573 行** — `};`
+  - **EN**: Closes the current type definition.
+  - **CN**: 结束当前类型定义。
+- **Line 574 / 第 574 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 575 / 第 575 行** — `template<`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 576 / 第 576 行** — `  conv::Operator ConvOp,`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 577 / 第 577 行** — `  int SpatialDim`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 578 / 第 578 行** — `>`
+  - **EN**: Continues the surrounding declaration or expression.
+  - **CN**: 继续外层的声明或表达式。
+- **Line 579 / 第 579 行** — `void print(ConvProblemShape<ConvOp, SpatialDim> const& problem) {`
+  - **EN**: Opens a new scope attached to the preceding declaration.
+  - **CN**: 为前面的声明打开一个新作用域。
+- **Line 580 / 第 580 行** — `  printf("ConvProblemShape with %d spatial dimensions implementing cutlass::conv::Operator::%d\n",`
+  - **EN**: Continues a comma-separated list of parameters, arguments, or fields.
+  - **CN**: 继续一个由逗号分隔的参数、实参或字段列表。
+- **Line 581 / 第 581 行** — `      SpatialDim, int(ConvOp));`
+  - **EN**: Ends a declaration or statement.
+  - **CN**: 结束一个声明或语句。
+- **Line 582 / 第 582 行** — `  printf("\tTensorA: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 583 / 第 583 行** — `      cute::print(problem.shape_A); printf(":");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 584 / 第 584 行** — `      cute::print(problem.stride_A); printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 585 / 第 585 行** — `  printf("\tTensorB: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 586 / 第 586 行** — `      cute::print(problem.shape_B); printf(":");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 587 / 第 587 行** — `      cute::print(problem.stride_B); printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 588 / 第 588 行** — `  printf("\tTensorC: ");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 589 / 第 589 行** — `      cute::print(problem.shape_C); printf(":");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 590 / 第 590 行** — `      cute::print(problem.stride_C); printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 591 / 第 591 行** — `  printf("\tLower padding:     "); print(problem.lower_padding);       printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 592 / 第 592 行** — `  printf("\tUpper padding:     "); print(problem.upper_padding);       printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 593 / 第 593 行** — `  printf("\tTraversal strides: "); print(problem.traversal_stride);    printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 594 / 第 594 行** — `  printf("\tDilation:          "); print(problem.dilation);            printf("\n");`
+  - **EN**: Declares a function or constructor signature.
+  - **CN**: 声明一个函数或构造函数签名。
+- **Line 595 / 第 595 行** — `}`
+  - **EN**: Closes the current scope.
+  - **CN**: 结束当前作用域。
+- **Line 596 / 第 596 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 597 / 第 597 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+- **Line 598 / 第 598 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 599 / 第 599 行** — `} // namespace cutlass::conv`
+  - **EN**: Closes namespace `cutlass::conv`.
+  - **CN**: 关闭命名空间 `cutlass::conv`。
+- **Line 600 / 第 600 行** — *(blank line / 空行)*
+  - **EN**: Blank line that separates nearby declarations.
+  - **CN**: 用于分隔相邻声明的空行。
+- **Line 601 / 第 601 行** — `////////////////////////////////////////////////////////////////////////////////////////////////////`
+  - **EN**: Separator comment used to split major sections.
+  - **CN**: 用于分隔主要章节的分隔注释。
+
+## Key Concepts / 核心概念
+- Templates / 模板
+- Convolution operators / 卷积算子
+- Problem shapes / 问题形状
+- Layouts and strides / 布局与步幅
+
+## Dependencies / 依赖
+- `cutlass/cutlass.h` — CUTLASS dependency `cutlass/cutlass.h` / CUTLASS 依赖 `cutlass/cutlass.h`
+- `cutlass/tensor_coord.h` — CUTLASS dependency `cutlass/tensor_coord.h` / CUTLASS 依赖 `cutlass/tensor_coord.h`
+- `cutlass/conv/convolution.h` — CUTLASS convolution component `cutlass/conv/convolution.h` / CUTLASS 卷积组件 `cutlass/conv/convolution.h`
+- `cute/container/array.hpp` — CuTe dependency `cute/container/array.hpp` / CuTe 依赖 `cute/container/array.hpp`
+- `initializer_list` — Dependency `initializer_list` / 依赖 `initializer_list`

@@ -1,0 +1,178 @@
+# emitter_base.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_cppgen/backend/evt/backend/emitter_base.py`
+
+## Purpose / 作用
+- EN: Base class for Epilogue Visitor Emitter
+- CN: 该模块的文档字符串将其描述为：Base class for Epilogue Visitor Emitter
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2023 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Base class for Epilogue Visitor Emitter` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `from cutlass_library import DataTypeTag` — **EN:** Imports DataTypeTag from `cutlass_library`. **CN:** 从 `cutlass_library` 导入 DataTypeTag。
+- **L38** `from cutlass_cppgen.backend.evt.ir import TopoVisitorNode, DAGIR` — **EN:** Imports TopoVisitorNode, DAGIR from `cutlass_cppgen.backend.evt.ir`. **CN:** 从 `cutlass_cppgen.backend.evt.ir` 导入 TopoVisitorNode, DAGIR。
+- **L39** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L40** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L41** `class FusionCallbacks:` — **EN:** Defines class `FusionCallbacks`. **CN:** 定义类 `FusionCallbacks`。
+- **L42** `    def __init__(self, dag_ir: DAGIR, cc: int, emit_CD=True) -> None:` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L43** `        """` — **EN:** Starts the docstring for the function `__init__`. **CN:** 开始说明 function `__init__` 的文档字符串。
+- **L44** `        Emit the EVT fusion callbacks` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L45** `        :param dag_ir: the DAG IR holding the epilogue visitor` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L46** `        :param cc: compute capability` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L47** `        :param emit_CD: whether to emit nodes C & D as a part of the fusion callbacks` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L48** `                        For Sm90, set emit_CD=False, as Tensor C & D are hardcoded in the collective API` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L49** `                        so that their shared memory can be explicitly reused` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L50** `                        For Sm89, set emit_CD=True as they are treated as normal AuxLoad & AuxStore nodes.` — **EN:** Continues the docstring for the function `__init__`. **CN:** 继续说明 function `__init__` 的文档字符串。
+- **L51** `        """` — **EN:** Ends the docstring for the function `__init__`. **CN:** 结束说明 function `__init__` 的文档字符串。
+- **L52** `        self.dag_ir = dag_ir` — **EN:** Assigns a value to self.dag_ir. **CN:** 将一个值赋给 self.dag_ir。
+- **L53** `        self.emit_CD = emit_CD` — **EN:** Assigns a value to self.emit_CD. **CN:** 将一个值赋给 self.emit_CD。
+- **L54** `        self.cc = cc` — **EN:** Assigns a value to self.cc. **CN:** 将一个值赋给 self.cc。
+- **L55** `        self.evt_cc = 90 if cc >= 90 else cc` — **EN:** Assigns a value to self.evt_cc. **CN:** 将一个值赋给 self.evt_cc。
+- **L56** `        if self.cc < 90:` — **EN:** Starts a conditional branch guarded by `self.cc < 90`. **CN:** 开始一个由 `self.cc < 90` 控制的条件分支。
+- **L57** `            self.namespace = "threadblock"` — **EN:** Assigns a value to self.namespace. **CN:** 将一个值赋给 self.namespace。
+- **L58** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L59** `            self.namespace = "fusion"` — **EN:** Assigns a value to self.namespace. **CN:** 将一个值赋给 self.namespace。
+- **L60** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L61** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L62** `    # Helper functions` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L63** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L64** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L65** `    def get_visitor_name(self, node: str):` — **EN:** Defines function `get_visitor_name`. **CN:** 定义函数 `get_visitor_name`。
+- **L66** `        """` — **EN:** Starts the docstring for the function `get_visitor_name`. **CN:** 开始说明 function `get_visitor_name` 的文档字符串。
+- **L67** `        Get the visitor name` — **EN:** Continues the docstring for the function `get_visitor_name`. **CN:** 继续说明 function `get_visitor_name` 的文档字符串。
+- **L68** `        """` — **EN:** Ends the docstring for the function `get_visitor_name`. **CN:** 结束说明 function `get_visitor_name` 的文档字符串。
+- **L69** `        meta = self.dag_ir.get_node_meta(node)` — **EN:** Assigns a value to meta. **CN:** 将一个值赋给 meta。
+- **L70** `        if not isinstance(meta, TopoVisitorNode) and self.dag_ir.in_degree(node) > 0:` — **EN:** Starts a conditional branch guarded by `not isinstance(meta, TopoVisitorNode) and self.dag_ir.in_...`. **CN:** 开始一个由 `not isinstance(meta, TopoVisitorNode) and self.dag_ir.in_...` 控制的条件分支。
+- **L71** `            return f"EVT{meta.name_camel}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L72** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L73** `            return meta.name_camel` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L74** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L75** `    def emit(self):` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L76** `        node_metas = self.dag_ir.node_metas_topological_order()` — **EN:** Assigns a value to node_metas. **CN:** 将一个值赋给 node_metas。
+- **L77** `        epilogue_str = ""` — **EN:** Assigns a value to epilogue_str. **CN:** 将一个值赋给 epilogue_str。
+- **L78** `        # Step 1: emit individual node type decl` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L79** `        #         emit the EVT & DAG connector` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L80** `        for meta in node_metas:` — **EN:** Starts a loop assigning items from `node_metas` to `meta`. **CN:** 开始一个循环，将 `node_metas` 的元素赋给 `meta`。
+- **L81** `            if not meta.disabled:` — **EN:** Starts a conditional branch guarded by `not meta.disabled`. **CN:** 开始一个由 `not meta.disabled` 控制的条件分支。
+- **L82** `                epilogue_str += self.emit_node(meta)` — **EN:** Updates epilogue_str in place. **CN:** 原地更新 epilogue_str。
+- **L83** `            if not self.emit_CD and meta.name == "D":` — **EN:** Starts a conditional branch guarded by `not self.emit_CD and meta.name == 'D'`. **CN:** 开始一个由 `not self.emit_CD and meta.name == 'D'` 控制的条件分支。
+- **L84** `                continue` — **EN:** Skips to the next loop iteration. **CN:** 跳到下一次循环迭代。
+- **L85** `            if isinstance(meta, TopoVisitorNode):` — **EN:** Starts a conditional branch guarded by `isinstance(meta, TopoVisitorNode)`. **CN:** 开始一个由 `isinstance(meta, TopoVisitorNode)` 控制的条件分支。
+- **L86** `                epilogue_str += self.emit_dag(meta)` — **EN:** Updates epilogue_str in place. **CN:** 原地更新 epilogue_str。
+- **L87** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L88** `                epilogue_str += self.emit_evt(meta)` — **EN:** Updates epilogue_str in place. **CN:** 原地更新 epilogue_str。
+- **L89** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L90** `        # Step 2: post-processing & get callback name` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L91** `        if not self.emit_CD:` — **EN:** Starts a conditional branch guarded by `not self.emit_CD`. **CN:** 开始一个由 `not self.emit_CD` 控制的条件分支。
+- **L92** `            if not self.dag_ir.has_node("C"):` — **EN:** Starts a conditional branch guarded by `not self.dag_ir.has_node('C')`. **CN:** 开始一个由 `not self.dag_ir.has_node('C')` 控制的条件分支。
+- **L93** `                epilogue_str += "using ElementC = void;\nusing StrideC = StrideD;\n"` — **EN:** Updates epilogue_str in place. **CN:** 原地更新 epilogue_str。
+- **L94** `            output_node = self.dag_ir.get_all_inputs("D")[0]` — **EN:** Assigns a value to output_node. **CN:** 将一个值赋给 output_node。
+- **L95** `            # The callback is the src of node D` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L96** `            callback_name = self.get_visitor_name(output_node)` — **EN:** Assigns a value to callback_name. **CN:** 将一个值赋给 callback_name。
+- **L97** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L98** `            # The callback is the last node in the topological order` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L99** `            callback_name = self.get_visitor_name(node_metas[-1].name)` — **EN:** Assigns a value to callback_name. **CN:** 将一个值赋给 callback_name。
+- **L100** `        return epilogue_str, callback_name` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L101** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L102** `    def emit_evt(self, node):` — **EN:** Defines function `emit_evt`. **CN:** 定义函数 `emit_evt`。
+- **L103** `        if self.dag_ir.in_degree(node.name) == 0:` — **EN:** Starts a conditional branch guarded by `self.dag_ir.in_degree(node.name) == 0`. **CN:** 开始一个由 `self.dag_ir.in_degree(node.name) == 0` 控制的条件分支。
+- **L104** `            return ""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L105** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L106** `        evt_tmp = f"""` — **EN:** Assigns a value to evt_tmp. **CN:** 将一个值赋给 evt_tmp。
+- **L107** `using EVT{node.name_camel} = cutlass::epilogue::{self.namespace}::Sm{self.evt_cc}EVT<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** `    {node.name_camel},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L109** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L110** `        sorted_children = self.dag_ir.get_all_inputs(node.name)` — **EN:** Assigns a value to sorted_children. **CN:** 将一个值赋给 sorted_children。
+- **L111** `        evt_node_strs = [f"    {self.get_visitor_name(child_name)}" for child_name in sorted_children]` — **EN:** Assigns a value to evt_node_strs. **CN:** 将一个值赋给 evt_node_strs。
+- **L112** `        evt_tmp += ",\n".join(evt_node_strs) + ">;\n"` — **EN:** Updates evt_tmp in place. **CN:** 原地更新 evt_tmp。
+- **L113** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L114** `        return evt_tmp` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L115** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L116** `    def emit_dag(self, node):` — **EN:** Defines function `emit_dag`. **CN:** 定义函数 `emit_dag`。
+- **L117** `        subgraph = node.subgraph` — **EN:** Assigns a value to subgraph. **CN:** 将一个值赋给 subgraph。
+- **L118** `        subgraph_nodes = subgraph.nodes_topological_order()` — **EN:** Assigns a value to subgraph_nodes. **CN:** 将一个值赋给 subgraph_nodes。
+- **L119** `        # Emit the Edge Tuple` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L120** `        edge_tuples = "cute::tuple<\n"` — **EN:** Assigns a value to edge_tuples. **CN:** 将一个值赋给 edge_tuples。
+- **L121** `        for n in subgraph_nodes[:-1]:` — **EN:** Starts a loop assigning items from `subgraph_nodes[:-1]` to `n`. **CN:** 开始一个循环，将 `subgraph_nodes[:-1]` 的元素赋给 `n`。
+- **L122** `            in_edges = subgraph.in_edges(n)` — **EN:** Assigns a value to in_edges. **CN:** 将一个值赋给 in_edges。
+- **L123** `            edge_weights = [subgraph.get_edge_weight(edge[0], edge[1]) for edge in in_edges]` — **EN:** Assigns a value to edge_weights. **CN:** 将一个值赋给 edge_weights。
+- **L124** `            sorted_children = [edge[0] for _, edge in sorted(zip(edge_weights, in_edges))]` — **EN:** Assigns a value to sorted_children. **CN:** 将一个值赋给 sorted_children。
+- **L125** `            edge_tuple = "        cute::seq<"` — **EN:** Assigns a value to edge_tuple. **CN:** 将一个值赋给 edge_tuple。
+- **L126** `            edge_str = [str(subgraph_nodes.index(child)) for child in sorted_children]` — **EN:** Assigns a value to edge_str. **CN:** 将一个值赋给 edge_str。
+- **L127** `            edge_tuple += ", ".join(edge_str) + ">,\n"` — **EN:** Updates edge_tuple in place. **CN:** 原地更新 edge_tuple。
+- **L128** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L129** `            edge_tuples += edge_tuple` — **EN:** Updates edge_tuples in place. **CN:** 原地更新 edge_tuples。
+- **L130** `        edge_tuples += "    >"` — **EN:** Updates edge_tuples in place. **CN:** 原地更新 edge_tuples。
+- **L131** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L132** `        # Emit the node list` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `        dag_nodes = ""` — **EN:** Assigns a value to dag_nodes. **CN:** 将一个值赋给 dag_nodes。
+- **L134** `        dag_node_strs = []` — **EN:** Assigns a value to dag_node_strs. **CN:** 将一个值赋给 dag_node_strs。
+- **L135** `        for n in subgraph_nodes[:-1]:` — **EN:** Starts a loop assigning items from `subgraph_nodes[:-1]` to `n`. **CN:** 开始一个循环，将 `subgraph_nodes[:-1]` 的元素赋给 `n`。
+- **L136** `            n_meta = subgraph.get_node_meta(n)` — **EN:** Assigns a value to n_meta. **CN:** 将一个值赋给 n_meta。
+- **L137** `            if n_meta.disabled:` — **EN:** Starts a conditional branch guarded by `n_meta.disabled`. **CN:** 开始一个由 `n_meta.disabled` 控制的条件分支。
+- **L138** `                dag_node_strs.append(f"    {self.get_visitor_name(n)}")` — **EN:** Invokes `dag_node_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `dag_node_strs.append`。
+- **L139** `            else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L140** `                dag_node_strs.append(f"    {n_meta.name_camel}")` — **EN:** Invokes `dag_node_strs.append` as a standalone call. **CN:** 以独立语句方式调用 `dag_node_strs.append`。
+- **L141** `        dag_nodes = ",\n".join(dag_node_strs)` — **EN:** Assigns a value to dag_nodes. **CN:** 将一个值赋给 dag_nodes。
+- **L142** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L143** `        return f"""` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L144** `using {node.name_camel} = cutlass::epilogue::{self.namespace}::Sm{self.evt_cc}TopologicalVisitor<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `    {DataTypeTag[node.subgraph.element_compute]},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `    {edge_tuples},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `{dag_nodes}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L149** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L150** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L151** `    def emit_node(self, node):` — **EN:** Defines function `emit_node`. **CN:** 定义函数 `emit_node`。
+- **L152** `        if isinstance(node, TopoVisitorNode):` — **EN:** Starts a conditional branch guarded by `isinstance(node, TopoVisitorNode)`. **CN:** 开始一个由 `isinstance(node, TopoVisitorNode)` 控制的条件分支。
+- **L153** `            emission = ""` — **EN:** Assigns a value to emission. **CN:** 将一个值赋给 emission。
+- **L154** `            for node in node.subgraph.node_metas_topological_order():` — **EN:** Starts a loop assigning items from `node.subgraph.node_metas_topological_order()` to `node`. **CN:** 开始一个循环，将 `node.subgraph.node_metas_topological_order()` 的元素赋给 `node`。
+- **L155** `                if not node.disabled:` — **EN:** Starts a conditional branch guarded by `not node.disabled`. **CN:** 开始一个由 `not node.disabled` 控制的条件分支。
+- **L156** `                    emission += self.emit_node(node)` — **EN:** Updates emission in place. **CN:** 原地更新 emission。
+- **L157** `            return emission` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L158** `        else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L159** `            return node.underlying_impl.type_decl` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_cppgen.backend.evt.backend.emitter_base`. CN: 模块名为 `cutlass_cppgen.backend.evt.backend.emitter_base`。
+- EN: Module docstring summary: Base class for Epilogue Visitor Emitter CN: 模块文档摘要为：Base class for Epilogue Visitor Emitter
+- EN: Top-level classes: FusionCallbacks CN: 顶层类包括：FusionCallbacks
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library:DataTypeTag, cutlass_cppgen.backend.evt.ir:TopoVisitorNode,DAGIR CN: 内部依赖：cutlass_library:DataTypeTag, cutlass_cppgen.backend.evt.ir:TopoVisitorNode,DAGIR

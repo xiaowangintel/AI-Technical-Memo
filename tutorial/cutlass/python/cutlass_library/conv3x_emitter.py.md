@@ -1,0 +1,270 @@
+# conv3x_emitter.py — Code Analysis / 代码分析
+
+## Source / 源文件
+- `python/cutlass_library/conv3x_emitter.py`
+
+## Purpose / 作用
+- EN: Utilities for emitting CUTLASS >= 3 convolution kernels
+- CN: 该模块的文档字符串将其描述为：Utilities for emitting CUTLASS >= 3 convolution kernels
+
+## Line-by-Line Analysis / 逐行分析
+
+- **L1** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L2** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L3** `# Copyright (c) 2024 - 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L4** `# SPDX-License-Identifier: BSD-3-Clause` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L5** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L6** `# Redistribution and use in source and binary forms, with or without` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L7** `# modification, are permitted provided that the following conditions are met:` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L8** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L9** `# 1. Redistributions of source code must retain the above copyright notice, this` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L10** `# list of conditions and the following disclaimer.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L11** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L12** `# 2. Redistributions in binary form must reproduce the above copyright notice,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L13** `# this list of conditions and the following disclaimer in the documentation` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L14** `# and/or other materials provided with the distribution.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L15** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L16** `# 3. Neither the name of the copyright holder nor the names of its` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L17** `# contributors may be used to endorse or promote products derived from` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L18** `# this software without specific prior written permission.` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L19** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L20** `# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L21** `# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L22** `# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L23** `# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L24** `# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L25** `# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L26** `# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L27** `# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,` — **EN:** States licensing or redistribution terms. **CN:** 说明许可证或再分发条款。
+- **L28** `# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L29** `# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L30** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L31** `#################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L32** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L33** `"""` — **EN:** Starts the docstring for the module `module`. **CN:** 开始说明 module `module` 的文档字符串。
+- **L34** `Utilities for emitting CUTLASS >= 3 convolution kernels` — **EN:** Continues the docstring for the module `module`. **CN:** 继续说明 module `module` 的文档字符串。
+- **L35** `"""` — **EN:** Ends the docstring for the module `module`. **CN:** 结束说明 module `module` 的文档字符串。
+- **L36** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L37** `import enum` — **EN:** Imports enum for later use. **CN:** 导入 enum 供后续使用。
+- **L38** `import os.path` — **EN:** Imports os.path for later use. **CN:** 导入 os.path 供后续使用。
+- **L39** `import shutil` — **EN:** Imports shutil for later use. **CN:** 导入 shutil 供后续使用。
+- **L40** `import logging` — **EN:** Imports logging for later use. **CN:** 导入 logging 供后续使用。
+- **L41** `from string import Template` — **EN:** Imports Template from `string`. **CN:** 从 `string` 导入 Template。
+- **L42** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L43** `try:` — **EN:** Starts protected logic that may raise exceptions. **CN:** 开始可能抛出异常的受保护逻辑。
+- **L44** `  import builtins` — **EN:** Imports builtins for later use. **CN:** 导入 builtins 供后续使用。
+- **L45** `  if hasattr(builtins, "CUTLASS_IGNORE_PACKAGE") and CUTLASS_IGNORE_PACKAGE == True:` — **EN:** Starts a conditional branch guarded by `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...`. **CN:** 开始一个由 `hasattr(builtins, 'CUTLASS_IGNORE_PACKAGE') and CUTLASS_I...` 控制的条件分支。
+- **L46** `    raise ImportError("Disabling attempt to import cutlass_library")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L47** `  from cutlass_library.library import *` — **EN:** Imports * from `cutlass_library.library`. **CN:** 从 `cutlass_library.library` 导入 *。
+- **L48** `except ImportError:` — **EN:** Starts an exception-handling branch. **CN:** 开始一个异常处理分支。
+- **L49** `  from library import *` — **EN:** Imports * from `library`. **CN:** 从 `library` 导入 *。
+- **L50** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L51** `_LOGGER = logging.getLogger(__name__)` — **EN:** Assigns a value to _LOGGER. **CN:** 将一个值赋给 _LOGGER。
+- **L52** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L53** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L54** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L55** `# Emits single instances of a CUTLASS device-wide operator` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L56** `#` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L57** `###################################################################################################` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L58** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L59** `class EmitConv3xInstance:` — **EN:** Defines class `EmitConv3xInstance`. **CN:** 定义类 `EmitConv3xInstance`。
+- **L60** `  def __init__(self):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L61** `    _LOGGER.debug("*** EmitConv3xInstance::__init__")` — **EN:** Invokes `_LOGGER.debug` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.debug`。
+- **L62** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L63** `    # Define epilogue type first, so that the mainloop type` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L64** `    # can use it with StageCountAutoCarveout.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L65** `    self.template = """` — **EN:** Assigns a value to self.template. **CN:** 将一个值赋给 self.template。
+- **L66** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L67** `// CUTLASS >= 3 convolution ${conv_kind_name} kernel instance "${operation_name}"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L68** `using ${operation_name}_epilogue =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L69** `  typename cutlass::epilogue::collective::CollectiveBuilder<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L70** `    ${arch},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L71** `    ${opcode_class_epi},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L72** `    ${mma_tile_shape},               // mma tile shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L73** `    ${cluster_shape},                // cluster shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L74** `    ${epi_tile_mn},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L75** `    ${element_accumulator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L76** `    ${element_compute},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L77** `    ${element_c}, ${layout_c}, 128 / cute::sizeof_bits_v<${element_c}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L78** `    ${element_d}, ${layout_d}, 128 / cute::sizeof_bits_v<${element_d}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L79** `    ${epilogue_schedule}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L80** `    // , class FusionOpOrCallbacks = cutlass::epilogue::fusion::LinearCombination<ElementD,ElementCompute>` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L81** `  >::CollectiveOp;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L82** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L83** `using ${operation_name}_mainloop =` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L84** `  typename cutlass::conv::collective::CollectiveBuilder<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L85** `    ${arch},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L86** `    ${opcode_class_main},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L87** `    ${conv_kind},         // kFprop, kDgrad, or kWgrad` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L88** `    ${element_a}, ${layout_a}, 128 / cute::sizeof_bits_v<${element_a}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L89** `    ${element_b}, ${layout_b}, 128 / cute::sizeof_bits_v<${element_b}>,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L90** `    ${element_accumulator},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L91** `    ${mma_tile_shape},        // mma tile shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L92** `    ${cluster_shape},         // cluster shape` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L93** `    ${stages},` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L94** `    ${kernel_schedule}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L95** `  >::CollectiveOp;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L96** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L97** `using ${operation_name}_problem_shape = cutlass::conv::ConvProblemShape<${conv_kind}, ${operation_name}_mainloop::NumSpatialDimensions>;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L98** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L99** `// Unit tests call this "ConvKernel".` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L100** `// Conv operator ${operation_name}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L101** `using ${operation_name}_base = cutlass::conv::kernel::ConvUniversal<` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L102** `    ${operation_name}_problem_shape,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L103** `    ${operation_name}_mainloop,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L104** `    ${operation_name}_epilogue,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L105** `    ${tile_scheduler}` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L106** `  >;` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L107** `"""` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L108** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L109** `  def arch_number_to_type(self, arch: int) -> str:` — **EN:** Defines function `arch_number_to_type`. **CN:** 定义函数 `arch_number_to_type`。
+- **L110** `    return f"cutlass::arch::Sm{arch}"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L111** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L112** `  def mma_tile_shape(self, operation, cta_m, cta_n, cta_k) -> str:` — **EN:** Defines function `mma_tile_shape`. **CN:** 定义函数 `mma_tile_shape`。
+- **L113** `    mma_m = cta_m` — **EN:** Assigns a value to mma_m. **CN:** 将一个值赋给 mma_m。
+- **L114** `    mma_n = cta_n` — **EN:** Assigns a value to mma_n. **CN:** 将一个值赋给 mma_n。
+- **L115** `    mma_k = cta_k` — **EN:** Assigns a value to mma_k. **CN:** 将一个值赋给 mma_k。
+- **L116** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L117** `    if operation.arch >= 100:` — **EN:** Starts a conditional branch guarded by `operation.arch >= 100`. **CN:** 开始一个由 `operation.arch >= 100` 控制的条件分支。
+- **L118** `      # MmaTileShape (mma_m, mma_n, mma_k) is passed to kernel mainloop where` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L119** `      # mma_m = cta_m for 1sm version and mma_m = cta_m * 2 for 2sm version.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L120** `      # If schedule is auto and cluster size is static and cta_m % 64 == 0 and cluster_m % 2 == 0, 2sm kernel version is allocated,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L121** `      # otherwise 1sm kernel is allocated.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L122** `      cta_m_per_mma_instruction = 1` — **EN:** Assigns a value to cta_m_per_mma_instruction. **CN:** 将一个值赋给 cta_m_per_mma_instruction。
+- **L123** `      if "2sm" in operation.procedural_name() :` — **EN:** Starts a conditional branch guarded by `'2sm' in operation.procedural_name()`. **CN:** 开始一个由 `'2sm' in operation.procedural_name()` 控制的条件分支。
+- **L124** `        cta_m_per_mma_instruction = 2` — **EN:** Assigns a value to cta_m_per_mma_instruction. **CN:** 将一个值赋给 cta_m_per_mma_instruction。
+- **L125** `      elif "1sm" in operation.procedural_name() :` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L126** `        cta_m_per_mma_instruction = 1` — **EN:** Assigns a value to cta_m_per_mma_instruction. **CN:** 将一个值赋给 cta_m_per_mma_instruction。
+- **L127** `      elif operation.tile_description.cluster_shape[0] > 0 and operation.tile_description.cluster_shape[0] % 2 == 0 and cta_m % 64 == 0 :` — **EN:** Continues the conditional chain with another branch. **CN:** 用另一个分支继续条件链。
+- **L128** `        cta_m_per_mma_instruction = 2` — **EN:** Assigns a value to cta_m_per_mma_instruction. **CN:** 将一个值赋给 cta_m_per_mma_instruction。
+- **L129** `      mma_m = cta_m * cta_m_per_mma_instruction` — **EN:** Assigns a value to mma_m. **CN:** 将一个值赋给 mma_m。
+- **L130** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L131** `    # For all three kinds of convolutions, the tile shape's K mode` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L132** `    # differs from GEMM in that needs to be wrapped in a Shape.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L133** `    # For Wgrad convolutions specifically,` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L134** `    # the N tile shape also needs to be wrapped in a Shape.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L135** `    m_template = 'cute::_${mma_m}'` — **EN:** Assigns a value to m_template. **CN:** 将一个值赋给 m_template。
+- **L136** `    if operation.conv_kind == ConvKind.Wgrad:` — **EN:** Starts a conditional branch guarded by `operation.conv_kind == ConvKind.Wgrad`. **CN:** 开始一个由 `operation.conv_kind == ConvKind.Wgrad` 控制的条件分支。
+- **L137** `      n_template = 'cute::Shape<cute::_${mma_n}>'` — **EN:** Assigns a value to n_template. **CN:** 将一个值赋给 n_template。
+- **L138** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L139** `      n_template = 'cute::_${mma_n}'` — **EN:** Assigns a value to n_template. **CN:** 将一个值赋给 n_template。
+- **L140** `    k_template = 'cute::Shape<cute::_${mma_k}>'` — **EN:** Assigns a value to k_template. **CN:** 将一个值赋给 k_template。
+- **L141** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L142** `    mma_tile_shape_template = f'cute::Shape<{m_template}, {n_template}, {k_template}>'` — **EN:** Assigns a value to mma_tile_shape_template. **CN:** 将一个值赋给 mma_tile_shape_template。
+- **L143** `    values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L144** `      'mma_m': mma_m,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L145** `      'mma_n': mma_n,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L146** `      'mma_k': mma_k` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L147** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L148** `    return Template(mma_tile_shape_template).substitute(values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L149** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L150** `  def cluster_shape(self, operation) -> str:` — **EN:** Defines function `cluster_shape`. **CN:** 定义函数 `cluster_shape`。
+- **L151** `    m_template = 'cute::_${cluster_shape_m}' if operation.tile_description.cluster_shape[0] > 0 else 'int(0)'` — **EN:** Assigns a value to m_template. **CN:** 将一个值赋给 m_template。
+- **L152** `    n_template = 'cute::_${cluster_shape_n}' if operation.tile_description.cluster_shape[1] > 0 else 'int(0)'` — **EN:** Assigns a value to n_template. **CN:** 将一个值赋给 n_template。
+- **L153** `    k_template = 'cute::_${cluster_shape_k}' if operation.tile_description.cluster_shape[2] > 0 else 'int(0)'` — **EN:** Assigns a value to k_template. **CN:** 将一个值赋给 k_template。
+- **L154** `    cluster_shape_template = f'cute::Shape<{m_template}, {n_template}, {k_template}>'` — **EN:** Assigns a value to cluster_shape_template. **CN:** 将一个值赋给 cluster_shape_template。
+- **L155** `    values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L156** `      'cluster_shape_m': operation.tile_description.cluster_shape[0],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L157** `      'cluster_shape_n': operation.tile_description.cluster_shape[1],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L158** `      'cluster_shape_k': operation.tile_description.cluster_shape[2],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L159** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L160** `    return Template(cluster_shape_template).substitute(values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L161** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L162** `  def stage_count(self, operation) -> str:` — **EN:** Defines function `stage_count`. **CN:** 定义函数 `stage_count`。
+- **L163** `    # stages == 0 tells builder to pick the number of stages automatically` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L164** `    namespace_prefix = 'cutlass::conv::collective::'` — **EN:** Assigns a value to namespace_prefix. **CN:** 将一个值赋给 namespace_prefix。
+- **L165** `    if operation.tile_description.stages > 0:` — **EN:** Starts a conditional branch guarded by `operation.tile_description.stages > 0`. **CN:** 开始一个由 `operation.tile_description.stages > 0` 控制的条件分支。
+- **L166** `      return f"{namespace_prefix}StageCount<{str(operation.tile_description.stages)}>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L167** `    else:` — **EN:** Starts the fallback branch of the current conditional. **CN:** 开始当前条件结构的兜底分支。
+- **L168** `      return f"{namespace_prefix}StageCountAutoCarveout<sizeof(typename {operation.procedural_name()}_epilogue::SharedStorage)>"` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L169** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L170** `  def emit(self, operation) -> str:` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L171** `    _LOGGER.debug("*** EmitConv3xInstance::emit")` — **EN:** Invokes `_LOGGER.debug` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.debug`。
+- **L172** `    _LOGGER.debug("***   operation: procedural_name()=" + operation.procedural_name())` — **EN:** Invokes `_LOGGER.debug` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.debug`。
+- **L173** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L174** `    # Identify the operation as CUTLASS 3 by its is_3x field` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L175** `    if (not hasattr(operation, 'is_3x')) or (not operation.is_3x):` — **EN:** Starts a conditional branch guarded by `not hasattr(operation, 'is_3x') or not operation.is_3x`. **CN:** 开始一个由 `not hasattr(operation, 'is_3x') or not operation.is_3x` 控制的条件分支。
+- **L176** `      raise RuntimeError("operation must be a CUTLASS 3 operation")` — **EN:** Raises an exception or re-raises a caught error. **CN:** 抛出异常或重新抛出已捕获的错误。
+- **L177** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L178** `    epi_tile_mn = "cutlass::epilogue::collective::EpilogueTileAuto"` — **EN:** Assigns a value to epi_tile_mn. **CN:** 将一个值赋给 epi_tile_mn。
+- **L179** `    opcode_class_main = OpcodeClassTag[operation.tile_description.math_instruction.opcode_class]` — **EN:** Assigns a value to opcode_class_main. **CN:** 将一个值赋给 opcode_class_main。
+- **L180** `    opcode_class_epi = opcode_class_main` — **EN:** Assigns a value to opcode_class_epi. **CN:** 将一个值赋给 opcode_class_epi。
+- **L181** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L182** `    tile_shape = operation.tile_description.tile_shape` — **EN:** Assigns a value to tile_shape. **CN:** 将一个值赋给 tile_shape。
+- **L183** `    cluster_m = operation.tile_description.cluster_shape[0]` — **EN:** Assigns a value to cluster_m. **CN:** 将一个值赋给 cluster_m。
+- **L184** `    cluster_n = operation.tile_description.cluster_shape[1]` — **EN:** Assigns a value to cluster_n. **CN:** 将一个值赋给 cluster_n。
+- **L185** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L186** `    cta_m, cta_n, cta_k = tile_shape` — **EN:** Assigns a value to (cta_m, cta_n, cta_k). **CN:** 将一个值赋给 (cta_m, cta_n, cta_k)。
+- **L187** `    # account for static/dynamic cluster shapes` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L188** `    if operation.arch >= 100:` — **EN:** Starts a conditional branch guarded by `operation.arch >= 100`. **CN:** 开始一个由 `operation.arch >= 100` 控制的条件分支。
+- **L189** `      cta_m = cta_m // cluster_m if cluster_m > 0 else cta_m` — **EN:** Assigns a value to cta_m. **CN:** 将一个值赋给 cta_m。
+- **L190** `      cta_n = cta_n // cluster_n if cluster_n > 0 else cta_n` — **EN:** Assigns a value to cta_n. **CN:** 将一个值赋给 cta_n。
+- **L191** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L192** `    warp_count = operation.tile_description.warp_count` — **EN:** Assigns a value to warp_count. **CN:** 将一个值赋给 warp_count。
+- **L193** `    epilogue_schedule = EpilogueScheduleTag[operation.epilogue_schedule]` — **EN:** Assigns a value to epilogue_schedule. **CN:** 将一个值赋给 epilogue_schedule。
+- **L194** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L195** `    # KernelScheduleTag and TileSchedulerTag both hard-code the` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L196** `    # namespace qualification of KernelScheduleAuto as` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L197** `    # "cutlass::gemm::collective::" (unless the tag is 'void').` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L198** `    #` — **EN:** Draws a visual separator in the file. **CN:** 在文件中绘制视觉分隔线。
+- **L199** `    # For TileSchedulerTag, this namespace is fine, since CUTLASS 3` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L200** `    # convolutions use the same tile schedulers (from the same` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L201** `    # cutlass::gemm::collective namespace) as GEMMs.` — **EN:** Comment documents the surrounding logic. **CN:** 注释说明周围的逻辑。
+- **L202** `    kernel_schedule = KernelScheduleTag[operation.kernel_schedule].replace('gemm::', 'conv::')` — **EN:** Assigns a value to kernel_schedule. **CN:** 将一个值赋给 kernel_schedule。
+- **L203** `    tile_scheduler = TileSchedulerTag[operation.tile_scheduler]` — **EN:** Assigns a value to tile_scheduler. **CN:** 将一个值赋给 tile_scheduler。
+- **L204** `    opcode_class = OpcodeClassTag[operation.tile_description.math_instruction.opcode_class]` — **EN:** Assigns a value to opcode_class. **CN:** 将一个值赋给 opcode_class。
+- **L205** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L206** `    values = {` — **EN:** Assigns a value to values. **CN:** 将一个值赋给 values。
+- **L207** `      'operation_name': operation.procedural_name(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L208** `      'conv_kind':      ConvKindTag[operation.conv_kind],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L209** `      'conv_kind_name': ConvKindNames[operation.conv_kind].capitalize(),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L210** `      'element_a':      DataTypeTag[operation.A.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L211** `      'layout_a':       LayoutTag[operation.A.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L212** `      'align_a':        int(operation.A.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L213** `      'element_b':      DataTypeTag[operation.B.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L214** `      'layout_b':       LayoutTag[operation.B.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L215** `      'align_b':        int(operation.B.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L216** `      'element_c':      DataTypeTag[operation.C.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L217** `      'layout_c':       LayoutTag[operation.C.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L218** `      'align_c':        int(operation.C.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L219** `      'element_d':      DataTypeTag[operation.D.element],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L220** `      'layout_d':       LayoutTag[operation.D.layout],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L221** `      'align_d':        int(operation.D.alignment),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L222** `      'element_accumulator':   DataTypeTag[operation.accumulator_type()],` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L223** `      'opcode_class':          opcode_class,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L224** `      'arch':                  self.arch_number_to_type(operation.arch),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L225** `      'mma_tile_shape':        self.mma_tile_shape(operation, cta_m, cta_n, cta_k),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L226** `      'cluster_shape':         self.cluster_shape(operation),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L227** `      'opcode_class_epi':      opcode_class_epi,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L228** `      'opcode_class_main':     opcode_class_main,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L229** `      'epi_tile_mn':           epi_tile_mn,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L230** `      'stages':                self.stage_count(operation),` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L231** `      'kernel_schedule':       kernel_schedule,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L232** `      'epilogue_schedule':     epilogue_schedule,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L233** `      'tile_scheduler':        tile_scheduler,` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L234** `      'element_compute':       DataTypeTag[operation.element_compute]` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L235** `    }` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L236** `    return Template(self.template).substitute(values)` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L237** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L238** `class EmitConv3xIncludes:` — **EN:** Defines class `EmitConv3xIncludes`. **CN:** 定义类 `EmitConv3xIncludes`。
+- **L239** `  def __init__(self):` — **EN:** Defines function `__init__`. **CN:** 定义函数 `__init__`。
+- **L240** `    _LOGGER.debug("*** EmitConv3xIncludes::__init__")` — **EN:** Invokes `_LOGGER.debug` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.debug`。
+- **L241** `    self.includes = ['conv_operation_3x.hpp',` — **EN:** Assigns a value to self.includes. **CN:** 将一个值赋给 self.includes。
+- **L242** `                     'cutlass/conv/device/conv_universal_adapter.hpp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L243** `                     'cutlass/conv/kernel/conv_universal.hpp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L244** `                     'cutlass/conv/collective/collective_builder.hpp',` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L245** `                     'cutlass/epilogue/collective/collective_builder.hpp']` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+- **L246** *(blank)* — **EN:** Blank line separating code sections. **CN:** 空行，用于分隔代码段。
+- **L247** `  def emit(self, operation) -> str:` — **EN:** Defines function `emit`. **CN:** 定义函数 `emit`。
+- **L248** `    _LOGGER.debug("*** EmitConv3xIncludes::emit")` — **EN:** Invokes `_LOGGER.debug` as a standalone call. **CN:** 以独立语句方式调用 `_LOGGER.debug`。
+- **L249** `    return '\n'.join(f"#include \"{incl}\"" for incl in self.includes) + \` — **EN:** Returns a value to the caller. **CN:** 向调用方返回一个值。
+- **L250** `      "\n\n///////////////////////////////////////////////////////////////////////////////////////////////////"` — **EN:** Continues the previous multi-line statement. **CN:** 继续上一条多行语句。
+
+## Key Concepts / 关键概念
+- EN: Module name `cutlass_library.conv3x_emitter`. CN: 模块名为 `cutlass_library.conv3x_emitter`。
+- EN: Module docstring summary: Utilities for emitting CUTLASS >= 3 convolution kernels CN: 模块文档摘要为：Utilities for emitting CUTLASS >= 3 convolution kernels
+- EN: Top-level classes: EmitConv3xInstance, EmitConv3xIncludes CN: 顶层类包括：EmitConv3xInstance, EmitConv3xIncludes
+
+## Dependencies / 依赖
+- EN: Internal dependencies: cutlass_library.library:* CN: 内部依赖：cutlass_library.library:*
+- EN: External or standard-library dependencies: enum, os.path, shutil, logging, string:Template, builtins, library:* CN: 外部或标准库依赖：enum, os.path, shutil, logging, string:Template, builtins, library:*
